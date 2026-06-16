@@ -529,10 +529,10 @@
 | [x] | Quiz Reinos de la Naturaleza | `/quiz-reinos-naturaleza/` | estudiantes, juegos |
 | [x] | Quiz Símbolos Químicos | `/quiz-simbolos-quimicos/` | estudiantes |
 | [x] | Quiz Tabla Periódica | `/quiz-tabla-periodica/` | estudiantes, juegos |
-| [ ] | Quiz: Clasifica 40 Plantas — ¿Musgo, Helecho o Angiosperma? | `/quiz-tipos-plantas/` | estudiantes, juegos |
-| [ ] | Radioactividad: Desintegración, Vida Media y Datación | `/visualizador-radioactividad/` | estudiantes, cultura |
-| [ ] | Reacciones Químicas - Cuando los Átomos Cambian de Pareja | `/visualizador-reacciones-quimicas/` | estudiantes, cultura |
-| [ ] | Redes de Computadoras: TCP/IP, DNS, Routing y CDN | `/visualizador-redes-computadoras/` | estudiantes, tecnicas |
+| [x] | Quiz: Clasifica 40 Plantas — ¿Musgo, Helecho o Angiosperma? | `/quiz-tipos-plantas/` | estudiantes, juegos |
+| [x] | Radioactividad: Desintegración, Vida Media y Datación | `/visualizador-radioactividad/` | estudiantes, cultura |
+| [x] | Reacciones Químicas - Cuando los Átomos Cambian de Pareja | `/visualizador-reacciones-quimicas/` | estudiantes, cultura |
+| [x] | Redes de Computadoras: TCP/IP, DNS, Routing y CDN | `/visualizador-redes-computadoras/` | estudiantes, tecnicas |
 | [ ] | Regímenes Políticos: Tipología y Características Estructurales | `/visualizador-regimenes-politicos/` | estudiantes, cultura |
 | [ ] | Reino Animal: Vertebrados, Invertebrados y Árbol Filogenético | `/visualizador-reino-animal/` | estudiantes, cultura |
 | [ ] | Relatividad Especial - Dilatación del Tiempo y E=mc² | `/visualizador-relatividad-especial/` | estudiantes, cultura, tecnicas |

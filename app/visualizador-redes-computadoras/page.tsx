@@ -269,6 +269,7 @@ export default function VisualizadorRedesComputadoras() {
         ).map(tab => (
           <button
             key={tab.id}
+            type="button"
             onClick={() => setTabActiva(tab.id)}
             className={`${styles.tab} ${tabActiva === tab.id ? styles.tabActiva : ''}`}
             aria-pressed={tabActiva === tab.id}
@@ -293,6 +294,7 @@ export default function VisualizadorRedesComputadoras() {
             {CAPAS_TCPIP.map(capa => (
               <button
                 key={capa.id}
+                type="button"
                 className={`${styles.capaBtn} ${capaSeleccionada === capa.id ? styles.capaActiva : ''}`}
                 style={{ '--color-capa': capa.color } as React.CSSProperties}
                 onClick={() => setCapaSeleccionada(capaSeleccionada === capa.id ? null : capa.id)}
@@ -350,6 +352,7 @@ export default function VisualizadorRedesComputadoras() {
 
             <div className={styles.encapsulamientoBtns}>
               <button
+                type="button"
                 className={styles.btnSecundario}
                 onClick={() => setPasoEncapsulamiento(p => Math.max(0, p - 1))}
                 disabled={pasoEncapsulamiento === 0}
@@ -361,6 +364,7 @@ export default function VisualizadorRedesComputadoras() {
                 Paso {pasoEncapsulamiento + 1} / {PASOS_ENCAPSULAMIENTO.length}
               </span>
               <button
+                type="button"
                 className={styles.btnPrimario}
                 onClick={() => setPasoEncapsulamiento(p => Math.min(PASOS_ENCAPSULAMIENTO.length - 1, p + 1))}
                 disabled={pasoEncapsulamiento === PASOS_ENCAPSULAMIENTO.length - 1}
@@ -431,6 +435,7 @@ export default function VisualizadorRedesComputadoras() {
 
             <div className={styles.encapsulamientoBtns}>
               <button
+                type="button"
                 className={styles.btnSecundario}
                 onClick={() => setPasoDns(p => Math.max(0, p - 1))}
                 disabled={pasoDns === 0}
@@ -440,6 +445,7 @@ export default function VisualizadorRedesComputadoras() {
               </button>
               <span className={styles.pasoContador}>Paso {pasoDns + 1} / {PASOS_DNS.length}</span>
               <button
+                type="button"
                 className={styles.btnPrimario}
                 onClick={() => setPasoDns(p => Math.min(PASOS_DNS.length - 1, p + 1))}
                 disabled={pasoDns === PASOS_DNS.length - 1}
@@ -703,6 +709,7 @@ export default function VisualizadorRedesComputadoras() {
           <div className={styles.cdnControles}>
             <div className={styles.cdnModo}>
               <button
+                type="button"
                 className={`${styles.modoBtn} ${modoCDN === 'sin' ? styles.modoBtnActivo : ''}`}
                 onClick={() => setModoCDN('sin')}
                 aria-pressed={modoCDN === 'sin'}
@@ -710,6 +717,7 @@ export default function VisualizadorRedesComputadoras() {
                 Sin CDN
               </button>
               <button
+                type="button"
                 className={`${styles.modoBtn} ${modoCDN === 'con' ? styles.modoBtnActivo : ''}`}
                 onClick={() => setModoCDN('con')}
                 aria-pressed={modoCDN === 'con'}

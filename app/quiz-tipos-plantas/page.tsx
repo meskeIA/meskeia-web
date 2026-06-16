@@ -261,9 +261,9 @@ export default function QuizTiposPlantas() {
             Pregunta {juego.indiceActual + 1} / {juego.preguntas.length}
           </span>
           <span className={styles.puntuacion}>
-            ✅ {juego.respuestasCorrectas} correctas
+            <span aria-hidden="true">✅</span> {juego.respuestasCorrectas} correctas
           </span>
-          <button className={styles.btnSalir} onClick={reiniciar} aria-label="Salir del quiz">
+          <button type="button" className={styles.btnSalir} onClick={reiniciar} aria-label="Salir del quiz">
             ✕ Salir
           </button>
         </div>
@@ -294,6 +294,7 @@ export default function QuizTiposPlantas() {
               return (
                 <button
                   key={grupo}
+                  type="button"
                   className={claseBoton}
                   onClick={() => seleccionarRespuesta(grupo)}
                   disabled={esFeedback}
@@ -313,10 +314,12 @@ export default function QuizTiposPlantas() {
         {esFeedback && (
           <div className={`${styles.feedbackPanel} ${esCorrecta ? styles.feedbackCorrecto : styles.feedbackIncorrecto}`} role="alert" aria-live="polite">
             <p className={styles.feedbackTitulo}>
-              {esCorrecta ? '✅ ¡Correcto!' : `❌ Era: ${GRUPOS[plantaActual.grupo].emoji} ${GRUPOS[plantaActual.grupo].label}`}
+              {esCorrecta
+                ? <><span aria-hidden="true">✅</span> ¡Correcto!</>
+                : <><span aria-hidden="true">❌</span> Era: <span aria-hidden="true">{GRUPOS[plantaActual.grupo].emoji}</span> {GRUPOS[plantaActual.grupo].label}</>}
             </p>
             <p className={styles.feedbackExplicacion}>{plantaActual.explicacion}</p>
-            <button className={styles.btnSiguiente} onClick={siguientePregunta}>
+            <button type="button" className={styles.btnSiguiente} onClick={siguientePregunta}>
               {juego.indiceActual >= juego.preguntas.length - 1 ? 'Ver resultados →' : 'Siguiente →'}
             </button>
           </div>
@@ -402,8 +405,8 @@ export default function QuizTiposPlantas() {
             )}
 
             <div className={styles.resultadosBotones}>
-              <button className={styles.btnPrimario} onClick={reiniciar}>
-                🔄 Volver a jugar
+              <button type="button" className={styles.btnPrimario} onClick={reiniciar}>
+                <span aria-hidden="true">🔄</span> Volver a jugar
               </button>
             </div>
           </div>
@@ -549,6 +552,7 @@ export default function QuizTiposPlantas() {
 
           <div className={styles.modosPrincipales}>
             <button
+              type="button"
               className={styles.btnModo}
               onClick={() => iniciarQuiz('rapido')}
               aria-label="Modo rápido: 20 preguntas aleatorias"
@@ -559,6 +563,7 @@ export default function QuizTiposPlantas() {
             </button>
 
             <button
+              type="button"
               className={`${styles.btnModo} ${styles.btnModoDestacado}`}
               onClick={() => iniciarQuiz('completo')}
               aria-label="Modo completo: las 40 plantas"
@@ -577,6 +582,7 @@ export default function QuizTiposPlantas() {
               return (
                 <button
                   key={grupo}
+                  type="button"
                   className={styles.btnGrupo}
                   onClick={() => iniciarQuiz(grupo)}
                   style={{ '--grupo-color': info.color } as React.CSSProperties}

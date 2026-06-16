@@ -392,6 +392,7 @@ export default function VisualizadorReaccionesQuimicasPage() {
         {CAMBIOS.map((c, i) => (
           <button
             key={c.tipo}
+            type="button"
             className={`${styles.comparacionCard} ${cambioActivo === i ? styles.comparacionActiva : ''} ${c.esQuimico ? styles.comparacionQuimico : styles.comparacionFisico}`}
             onClick={() => setCambioActivo(cambioActivo === i ? null : i)}
             aria-expanded={cambioActivo === i}
@@ -426,6 +427,7 @@ export default function VisualizadorReaccionesQuimicasPage() {
           {TIPOS_REACCION.map((t, i) => (
             <button
               key={t.id}
+              type="button"
               className={`${styles.tipoBtn} ${tipoSeleccionado === i ? styles.tipoBtnActivo : ''}`}
               style={tipoSeleccionado === i ? { borderColor: t.color, background: t.color, color: '#fff' } : {}}
               onClick={() => setTipoSeleccionado(i)}
@@ -484,6 +486,7 @@ export default function VisualizadorReaccionesQuimicasPage() {
         {ECUACIONES_BALANCEO.map((eq, i) => (
           <button
             key={eq.id}
+            type="button"
             className={`${styles.eqBtn} ${ecuacionActiva === i ? styles.eqBtnActivo : ''}`}
             onClick={() => { setEcuacionActiva(i); setMostrarPista(false); }}
             aria-pressed={ecuacionActiva === i}
@@ -501,12 +504,14 @@ export default function VisualizadorReaccionesQuimicasPage() {
             {i > 0 && <span className={styles.balanceoOperador}>+</span>}
             <div className={styles.coefControl}>
               <button
+                type="button"
                 className={styles.coefBtn}
                 onClick={() => ajustarCoef(i, -1)}
                 aria-label={`Reducir coeficiente de ${comp.formula}`}
               >−</button>
               <span className={styles.coefValor}>{coefs[i] || 1}</span>
               <button
+                type="button"
                 className={styles.coefBtn}
                 onClick={() => ajustarCoef(i, 1)}
                 aria-label={`Aumentar coeficiente de ${comp.formula}`}
@@ -525,12 +530,14 @@ export default function VisualizadorReaccionesQuimicasPage() {
               {i > 0 && <span className={styles.balanceoOperador}>+</span>}
               <div className={styles.coefControl}>
                 <button
+                  type="button"
                   className={styles.coefBtn}
                   onClick={() => ajustarCoef(idx, -1)}
                   aria-label={`Reducir coeficiente de ${comp.formula}`}
                 >−</button>
                 <span className={styles.coefValor}>{coefs[idx] || 1}</span>
                 <button
+                  type="button"
                   className={styles.coefBtn}
                   onClick={() => ajustarCoef(idx, 1)}
                   aria-label={`Aumentar coeficiente de ${comp.formula}`}
@@ -583,10 +590,10 @@ export default function VisualizadorReaccionesQuimicasPage() {
 
       {/* Botones de ayuda */}
       <div className={styles.balanceoAcciones}>
-        <button className={styles.btnSecundario} onClick={resetearEcuacion}>
+        <button type="button" className={styles.btnSecundario} onClick={resetearEcuacion}>
           Reiniciar
         </button>
-        <button className={styles.btnSecundario} onClick={() => setMostrarPista(true)}>
+        <button type="button" className={styles.btnSecundario} onClick={() => setMostrarPista(true)}>
           Pista
         </button>
       </div>
@@ -610,6 +617,7 @@ export default function VisualizadorReaccionesQuimicasPage() {
         {REACCIONES_COTIDIANAS.map((r, i) => (
           <button
             key={r.titulo}
+            type="button"
             className={`${styles.cotidianaCard} ${cotidianaActiva === i ? styles.cotidianaActiva : ''}`}
             onClick={() => setCotidianaActiva(cotidianaActiva === i ? null : i)}
             aria-expanded={cotidianaActiva === i}
@@ -649,7 +657,7 @@ export default function VisualizadorReaccionesQuimicasPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>⚗️ Reacciones Químicas</h1>
+          <h1 className={styles.title}><span aria-hidden="true">⚗️</span> Reacciones Químicas</h1>
           <p className={styles.subtitle}>Cuando los átomos cambian de pareja</p>
         </header>
 
@@ -660,6 +668,7 @@ export default function VisualizadorReaccionesQuimicasPage() {
           {SECCIONES.map((s) => (
             <button
               key={s.id}
+              type="button"
               className={`${styles.navBtn} ${seccionActiva === s.id ? styles.navActivo : ''}`}
               onClick={() => setSeccionActiva(s.id)}
               aria-pressed={seccionActiva === s.id}

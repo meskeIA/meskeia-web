@@ -632,6 +632,7 @@ const TabCarbono14 = () => {
             className={`${styles.isotopoBtn} ${Math.abs(actividadPct - ej.actividadPct) < 0.1 ? styles.isotopoBtnActive : ''}`}
             onClick={() => setActividadPct(ej.actividadPct)}
             aria-label={`${ej.nombre}: actividad ${ej.actividadPct}%`}
+            aria-pressed={Math.abs(actividadPct - ej.actividadPct) < 0.1}
           >
             <span className={styles.isotopoSimbolo}>{ej.actividadPct}%</span>
             <span className={styles.isotopoVida}>{ej.nombre}</span>
@@ -957,19 +958,19 @@ export default function VisualizadorRadioactividad() {
           <h3>Casos de Uso</h3>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <h4>🏥 Medicina Nuclear</h4>
+              <h4><span aria-hidden="true">🏥</span> Medicina Nuclear</h4>
               <p>El Tc-99m (t½ = 6h) se usa en gammagrafías: se inyecta al paciente y los detectores capturan los fotones γ emitidos por los órganos. El I-131 (t½ = 8 días) trata el hipertiroidismo destruyendo tejido tiroideo específicamente.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🏺 Arqueología y Geología</h4>
+              <h4><span aria-hidden="true">🏺</span> Arqueología y Geología</h4>
               <p>El carbono-14 (t½ = 5730 años) data materiales orgánicos hasta 50.000 años. Para rocas más antiguas se usa U-Pb (U-238, t½ = 4468 Ma) que permite datar el Sistema Solar y los meteoritos más primitivos.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>⚡ Energía Nuclear</h4>
+              <h4><span aria-hidden="true">⚡</span> Energía Nuclear</h4>
               <p>Los reactores nucleares usan la fisión del U-235: un neutrón lento impacta el núcleo, que se parte liberando 2-3 neutrones nuevos y energía en forma de radiación γ y partículas. El control de esta reacción en cadena genera electricidad.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🔬 Investigación Científica</h4>
+              <h4><span aria-hidden="true">🔬</span> Investigación Científica</h4>
               <p>Los trazadores radiactivos permiten seguir moléculas en reacciones biológicas: se introduce un isótopo radiactivo (ej. C-14 en glucosa) y se rastrea su destino metabólico. Así se descubrió el ciclo de Calvin en la fotosíntesis.</p>
             </div>
           </div>
@@ -983,7 +984,7 @@ export default function VisualizadorRadioactividad() {
             <div className={styles.faqItem}>
               <strong>¿Por qué la vida media no cambia con la temperatura o presión?</strong>
               <p>La desintegración radiactiva depende de la estructura nuclear, no de factores externos como temperatura, presión o estado químico. Los electrones de los orbitales exteriores no afectan al núcleo. Solo la captura electrónica (un caso especial) tiene ligera dependencia del entorno.</p>
-              <div className={styles.faqTip}>💡 La vida media del C-14 en un diamante y en un ser vivo es idéntica: 5730 años.</div>
+              <div className={styles.faqTip}><span aria-hidden="true">💡</span> La vida media del C-14 en un diamante y en un ser vivo es idéntica: 5730 años.</div>
             </div>
             <div className={styles.faqItem}>
               <strong>¿Cómo funciona exactamente la datación por C-14?</strong>
@@ -1034,28 +1035,28 @@ export default function VisualizadorRadioactividad() {
           <h3>Mejores Prácticas</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🛡️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🛡️</span>
               <div>
                 <strong>Tiempo, distancia, blindaje</strong>
                 <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>Los tres principios de protección radiológica: minimizar el tiempo de exposición, maximizar la distancia (ley inversa del cuadrado) y usar el blindaje adecuado a cada tipo de radiación.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <div>
                 <strong>Escala logarítmica para vidas medias</strong>
                 <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>Las vidas medias van de microsegundos (Po-212: 299 ns) a miles de millones de años (U-238: 4.468 Ga). Compararlas requiere escala logarítmica — diferencias de 20 órdenes de magnitud.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚕️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚕️</span>
               <div>
                 <strong>Factor de ponderación: α es 20× más dañino</strong>
                 <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>La radiación α es muy ionizante en tejido vivo aunque no penetre piel. Si se inhala (radón) o ingiere (polonio), el daño celular es 20 veces mayor que con la misma dosis de rayos γ.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🕐</span>
+              <span className={styles.tipIcon} aria-hidden="true">🕐</span>
               <div>
                 <strong>t½ médica vs t½ geológica</strong>
                 <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>En medicina nuclear, se usan isótopos con t½ de horas/días (Tc-99m: 6h) para minimizar la exposición post-diagnóstico. En geología, se necesitan t½ de millones de años para datar rocas antiguas.</p>
@@ -1065,7 +1066,7 @@ export default function VisualizadorRadioactividad() {
 
           <div className={styles.warningBoxEdu}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               Errores Conceptuales Frecuentes
             </div>
             <ul className={styles.warningList}>
