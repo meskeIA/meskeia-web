@@ -261,10 +261,10 @@
 | [x] | Historia del Oriente Medio: De Sykes-Picot al Siglo XXI | `/visualizador-historia/historia-oriente-medio/` | cultura |
 | [x] | Historia del Pensamiento Político: De Platón al Populismo del Siglo XXI | `/visualizador-historia/historia-pensamiento-politico/` | cultura |
 | [x] | Historia del Periodismo: De la Acta Diurna a la IA Generativa | `/visualizador-historia/historia-periodismo/` | cultura, estudiantes |
-| [ ] | Historia del Reino Unido: De la Conquista Normanda al Brexit | `/visualizador-historia/historia-reino-unido/` | cultura |
-| [ ] | Historia del Sudeste Asiático: De Angkor al ASEAN del Siglo XXI | `/visualizador-historia/sudeste-asiatico/` | cultura, estudiantes |
-| [ ] | Historia del Teatro: Del Teatro Griego al Teatro Digital | `/visualizador-historia/teatro/` | cultura |
-| [ ] | Historia del Teléfono: De Bell al 5G y la IA Conversacional | `/visualizador-historia/telefono/` | cultura, tecnicas |
+| [x] | Historia del Reino Unido: De la Conquista Normanda al Brexit | `/visualizador-historia/historia-reino-unido/` | cultura |
+| [x] | Historia del Sudeste Asiático: De Angkor al ASEAN del Siglo XXI | `/visualizador-historia/sudeste-asiatico/` | cultura, estudiantes |
+| [x] | Historia del Teatro: Del Teatro Griego al Teatro Digital | `/visualizador-historia/teatro/` | cultura |
+| [x] | Historia del Teléfono: De Bell al 5G y la IA Conversacional | `/visualizador-historia/telefono/` | cultura, tecnicas |
 | [ ] | Historia del Trabajo: De la Esclavitud Antigua al Teletrabajo del Siglo XXI | `/visualizador-historia/historia-trabajo/` | cultura |
 | [ ] | Historia del Tren: Del Vapor al AVE y el Maglev | `/visualizador-historia/tren/` | cultura, tecnicas |
 | [ ] | Historia del Turismo: Del Grand Tour al Turismo Sostenible | `/visualizador-historia/historia-turismo/` | cultura |
