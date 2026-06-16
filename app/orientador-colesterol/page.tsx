@@ -254,10 +254,10 @@ export default function CalculadoraColesterolPage() {
           </div>
 
           <div className={styles.buttonGroup}>
-            <button onClick={calcular} className={styles.btnPrimary}>
+            <button type="button" onClick={calcular} className={styles.btnPrimary}>
               Analizar
             </button>
-            <button onClick={limpiar} className={styles.btnSecondary}>
+            <button type="button" onClick={limpiar} className={styles.btnSecondary}>
               Limpiar
             </button>
           </div>
@@ -326,7 +326,7 @@ export default function CalculadoraColesterolPage() {
 
             {/* Recomendaciones */}
             <div className={styles.recommendationsSection}>
-              <h3>💡 Recomendaciones</h3>
+              <h3><span aria-hidden="true">💡</span> Recomendaciones</h3>
               <ul className={styles.recommendationsList}>
                 {getRecomendaciones().map((rec, i) => (
                   <li key={i}>{rec}</li>
@@ -358,13 +358,13 @@ export default function CalculadoraColesterolPage() {
         </ul>
 
         <p className={styles.highlight}>
-          <strong>⚕️ Esta herramienta NO sustituye la interpretación médica de tus análisis.</strong>
+          <strong><span aria-hidden="true">⚕️</span> Esta herramienta NO sustituye la interpretación médica de tus análisis.</strong>
           Si tu analítica muestra valores alterados, consulta con tu médico de familia, cardiólogo o endocrinólogo.
           Nunca inicies, cambies o suspendas medicación sin supervisión médica.
         </p>
 
         <p className={styles.emergency}>
-          🚨 <strong>Si presentas dolor torácico, falta de aire, mareos intensos o síntomas de infarto,
+          <span aria-hidden="true">🚨</span> <strong>Si presentas dolor torácico, falta de aire, mareos intensos o síntomas de infarto,
           llama al 112 inmediatamente.</strong> El colesterol alto no suele dar síntomas hasta que causa complicaciones graves.
         </p>
       </DisclaimerCard>
@@ -451,27 +451,27 @@ export default function CalculadoraColesterolPage() {
         {/* Escenarios de uso */}
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <h3>🩺 Análisis de sangre rutinario</h3>
+            <h3><span aria-hidden="true">🩺</span> Análisis de sangre rutinario</h3>
             <p>Recibes tu analítica anual y quieres entender qué significan los valores de CT, HDL, LDL y triglicéridos. Introduce los datos y obtén una interpretación inmediata con los ratios calculados.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>💊 Paciente en tratamiento</h3>
+            <h3><span aria-hidden="true">💊</span> Paciente en tratamiento</h3>
             <p>Si estás tomando estatinas u otros fármacos hipolipemiantes, monitoriza la evolución de tus valores en el tiempo. Compara analíticas sucesivas para ver si el tratamiento está funcionando.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>👨‍👩‍👧 Antecedentes familiares</h3>
+            <h3><span aria-hidden="true">👨‍👩‍👧</span> Antecedentes familiares</h3>
             <p>Con historial familiar de infarto o hipercolesterolemia familiar, los objetivos de LDL son más estrictos (&lt;70 mg/dL en riesgo muy alto). La calculadora ayuda a ver qué tan lejos estás del objetivo.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🥗 Cambio de dieta</h3>
+            <h3><span aria-hidden="true">🥗</span> Cambio de dieta</h3>
             <p>Tras reducir grasas saturadas, aumentar fibra o adoptar una dieta mediterránea, verifica en tu próxima analítica si los cambios han tenido efecto en tu perfil lipídico.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🏃 Deportista con CT elevado</h3>
+            <h3><span aria-hidden="true">🏃</span> Deportista con CT elevado</h3>
             <p>El ejercicio intenso puede temporalmente alterar el perfil lipídico. El HDL suele aumentar con entrenamiento aeróbico. Un CT alto en atletas puede deberse a HDL elevado, que es protector.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>📊 Entender los ratios</h3>
+            <h3><span aria-hidden="true">📊</span> Entender los ratios</h3>
             <p>El CT aislado es poco informativo. Los ratios CT/HDL y LDL/HDL son mejores predictores de riesgo cardiovascular. Un CT de 220 con HDL de 80 es muy diferente de un CT de 220 con HDL de 35.</p>
           </div>
         </div>
@@ -568,34 +568,34 @@ export default function CalculadoraColesterolPage() {
         {/* Mejores prácticas */}
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <h3>🫒 Dieta mediterránea</h3>
+            <h3><span aria-hidden="true">🫒</span> Dieta mediterránea</h3>
             <p>Aceite de oliva virgen extra, pescado azul 2-3 veces/semana, legumbres, frutos secos y abundante verdura. Es la dieta con mayor evidencia para mejorar el perfil lipídico.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🏃 Ejercicio aeróbico</h3>
+            <h3><span aria-hidden="true">🏃</span> Ejercicio aeróbico</h3>
             <p>150 minutos/semana de actividad moderada (caminar a paso rápido, natación, ciclismo) aumenta el HDL y reduce triglicéridos. Es el único modificador no farmacológico que sube el HDL de forma significativa.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🚭 Dejar de fumar</h3>
+            <h3><span aria-hidden="true">🚭</span> Dejar de fumar</h3>
             <p>El tabaco reduce el HDL y daña el endotelio arterial. Dejar de fumar mejora el HDL en 5-10% en pocos meses y reduce el riesgo cardiovascular de forma rápida y significativa.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🌾 Fibra soluble</h3>
+            <h3><span aria-hidden="true">🌾</span> Fibra soluble</h3>
             <p>10 g diarios de fibra soluble (avena, psyllium, legumbres) reducen el LDL un 5-10%. Es el suplemento dietético con mayor evidencia para reducir el colesterol LDL.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>⚖️ Control del peso</h3>
+            <h3><span aria-hidden="true">⚖️</span> Control del peso</h3>
             <p>Perder un 5-10% del peso corporal mejora todos los parámetros lipídicos: baja LDL y triglicéridos, sube HDL. El efecto es más pronunciado en personas con triglicéridos elevados.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>📅 Analítica anual</h3>
+            <h3><span aria-hidden="true">📅</span> Analítica anual</h3>
             <p>Si tienes factores de riesgo o ya estás en tratamiento, una analítica anual es el mínimo. Lleva un registro de tus valores para mostrar la tendencia a tu médico en cada revisión.</p>
           </div>
         </div>
 
         {/* Aviso importante */}
         <div className={styles.warningBox}>
-          <h3>⚠️ Esta calculadora no sustituye al médico</h3>
+          <h3><span aria-hidden="true">⚠️</span> Esta calculadora no sustituye al médico</h3>
           <ul className={styles.warningList}>
             <li>Los resultados son orientativos. El riesgo cardiovascular real depende de factores adicionales: edad, sexo, diabetes, hipertensión, tabaco y antecedentes familiares.</li>
             <li>El objetivo de LDL a alcanzar varía según el riesgo cardiovascular individual (bajo, moderado, alto, muy alto) y solo tu médico puede determinarlo.</li>
@@ -615,7 +615,7 @@ export default function CalculadoraColesterolPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🔵 Colesterol Total (CT)</h4>
+              <h4><span aria-hidden="true">🔵</span> Colesterol Total (CT)</h4>
               <p>
                 Suma de todo el colesterol en sangre (HDL + LDL + VLDL).
                 Es una medida general, pero por sí solo no indica el riesgo real.
@@ -628,7 +628,7 @@ export default function CalculadoraColesterolPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>💚 HDL (Colesterol Bueno)</h4>
+              <h4><span aria-hidden="true">💚</span> HDL (Colesterol Bueno)</h4>
               <p>
                 Lipoproteína de Alta Densidad. Transporta el colesterol desde las arterias
                 hacia el hígado para su eliminación. <strong>Cuanto más alto, mejor</strong>.
@@ -641,7 +641,7 @@ export default function CalculadoraColesterolPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🔴 LDL (Colesterol Malo)</h4>
+              <h4><span aria-hidden="true">🔴</span> LDL (Colesterol Malo)</h4>
               <p>
                 Lipoproteína de Baja Densidad. Deposita colesterol en las paredes arteriales,
                 formando placas de ateroma. <strong>Cuanto más bajo, mejor</strong>.
@@ -656,7 +656,7 @@ export default function CalculadoraColesterolPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🟡 Triglicéridos (TG)</h4>
+              <h4><span aria-hidden="true">🟡</span> Triglicéridos (TG)</h4>
               <p>
                 Otro tipo de grasa en sangre. Niveles altos se asocian con enfermedad
                 cardíaca, especialmente combinados con HDL bajo.
@@ -673,7 +673,7 @@ export default function CalculadoraColesterolPage() {
           <h3>Ratios e índices importantes</h3>
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>📊 Ratio CT/HDL</h4>
+              <h4><span aria-hidden="true">📊</span> Ratio CT/HDL</h4>
               <p>
                 El <strong>índice aterogénico</strong> más usado. Relaciona el colesterol total
                 con el HDL protector. Es mejor predictor de riesgo que el CT solo.
@@ -686,7 +686,7 @@ export default function CalculadoraColesterolPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>⚖️ Ratio LDL/HDL</h4>
+              <h4><span aria-hidden="true">⚖️</span> Ratio LDL/HDL</h4>
               <p>
                 Compara directamente el colesterol &quot;malo&quot; con el &quot;bueno&quot;.
                 Muy útil para evaluar el equilibrio del perfil lipídico.
@@ -699,7 +699,7 @@ export default function CalculadoraColesterolPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🔬 Colesterol No-HDL</h4>
+              <h4><span aria-hidden="true">🔬</span> Colesterol No-HDL</h4>
               <p>
                 CT menos HDL. Incluye todas las lipoproteínas aterogénicas (LDL, VLDL, etc.).
                 Útil cuando no se mide LDL directamente.
@@ -712,7 +712,7 @@ export default function CalculadoraColesterolPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🧮 Fórmula de Friedewald</h4>
+              <h4><span aria-hidden="true">🧮</span> Fórmula de Friedewald</h4>
               <p>
                 Permite estimar el LDL cuando no se mide directamente:
               </p>

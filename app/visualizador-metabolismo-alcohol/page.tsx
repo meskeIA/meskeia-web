@@ -192,7 +192,7 @@ export default function MetabolismoAlcoholPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <div className={styles.heroIcon}>🍷</div>
+        <div className={styles.heroIcon} aria-hidden="true">🍷</div>
         <h1>Metabolismo del Alcohol</h1>
         <p>Del etanol al acetaldehído: por qué el metabolito intermedio es el verdadero responsable del daño</p>
       </header>
@@ -226,6 +226,7 @@ export default function MetabolismoAlcoholPage() {
         {tabs.map(tab => (
           <button
             key={tab.id}
+            type="button"
             className={`${styles.tab} ${tabActiva === tab.id ? styles.tabActiva : ''}`}
             onClick={() => setTabActiva(tab.id)}
             aria-pressed={tabActiva === tab.id}
@@ -266,13 +267,13 @@ export default function MetabolismoAlcoholPage() {
           </div>
 
           <div className={styles.warningBox}>
-            <strong>⚠️ El acetaldehído es un carcinógeno Tipo 1 (IARC):</strong> Forma adductos covalentes
+            <strong><span aria-hidden="true">⚠️</span> El acetaldehído es un carcinógeno Tipo 1 (IARC):</strong> Forma adductos covalentes
             con el ADN celular, causando mutaciones. No existe un &ldquo;umbral seguro&rdquo; conocido.
             El daño es acumulativo con cada exposición.
           </div>
 
           <div className={styles.infoBox}>
-            <strong>💡 Ratio NADH/NAD+:</strong> Por cada gramo de alcohol metabolizado, se consume
+            <strong><span aria-hidden="true">💡</span> Ratio NADH/NAD+:</strong> Por cada gramo de alcohol metabolizado, se consume
             NAD+ y se produce NADH. Este desequilibrio altera el metabolismo de la glucosa (hipoglucemia),
             los lípidos (acumulación grasa) y el lactato. Es la razón por la que el alcohol &ldquo;roba&rdquo;
             el metabolismo normal del hígado.
@@ -293,6 +294,7 @@ export default function MetabolismoAlcoholPage() {
             {ORGANOS.map(organo => (
               <button
                 key={organo.id}
+                type="button"
                 className={`${styles.organoBtn} ${organoSeleccionado === organo.id ? styles.organoBtnActivo : ''}`}
                 style={organoSeleccionado === organo.id ? { borderColor: organo.color, backgroundColor: organo.color + '18' } : {}}
                 onClick={() => setOrganoSeleccionado(organo.id)}
@@ -332,7 +334,7 @@ export default function MetabolismoAlcoholPage() {
             </div>
 
             <div className={styles.datosClave}>
-              <strong>💡 Dato clave:</strong> {organoActual.datosClave}
+              <strong><span aria-hidden="true">💡</span> Dato clave:</strong> {organoActual.datosClave}
             </div>
           </div>
         </section>
@@ -376,7 +378,7 @@ export default function MetabolismoAlcoholPage() {
           </div>
 
           <div className={styles.warningBox}>
-            <strong>⚠️ El &ldquo;efecto flus&rdquo; no es solo una molestia:</strong> Los estudios muestran que
+            <strong><span aria-hidden="true">⚠️</span> El &ldquo;efecto flus&rdquo; no es solo una molestia:</strong> Los estudios muestran que
             las personas con ALDH2*2 heterocigoto que beben regularmente tienen un riesgo de cáncer esofágico
             hasta 6-10 veces mayor que la población general. El enrojecimiento es una señal de alerta biológica,
             no simplemente una predisposición a la intolerancia.
@@ -425,7 +427,7 @@ export default function MetabolismoAlcoholPage() {
                 <li>Síntomas: ansiedad, insomnio, temblores, convulsiones, delirium tremens</li>
               </ul>
               <div className={styles.peligroAbstinencia}>
-                ⚠️ La abstinencia alcohólica severa puede ser mortal. A diferencia de opiáceos o estimulantes,
+                <span aria-hidden="true">⚠️</span> La abstinencia alcohólica severa puede ser mortal. A diferencia de opiáceos o estimulantes,
                 requiere supervisión médica.
               </div>
             </div>

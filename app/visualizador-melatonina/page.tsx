@@ -225,8 +225,8 @@ function BloqueCircadiano() {
         <Line data={datosGrafico} options={opcionesGrafico} />
       </div>
       <div className={styles.franjaLeyenda}>
-        <span className={styles.franjaNoche}>🌙 Noche (20:00–8:00): melatonina dominante</span>
-        <span className={styles.franjaDia}>☀️ Día (8:00–20:00): cortisol dominante</span>
+        <span className={styles.franjaNoche}><span aria-hidden="true">🌙</span> Noche (20:00–8:00): melatonina dominante</span>
+        <span className={styles.franjaDia}><span aria-hidden="true">☀️</span> Día (8:00–20:00): cortisol dominante</span>
       </div>
       <div className={styles.insightBox}>
         <p>

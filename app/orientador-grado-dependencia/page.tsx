@@ -259,7 +259,7 @@ export default function OrientadorGradoDependencia() {
 
               {resultado.prestaciones.length > 0 && (
                 <div className={styles.prestacionesCard}>
-                  <div className={styles.cardSubtitle}>💶 Prestaciones/servicios a los que puede acceder</div>
+                  <div className={styles.cardSubtitle}><span aria-hidden="true">💶</span> Prestaciones/servicios a los que puede acceder</div>
                   <ul className={styles.prestacionesList}>
                     {resultado.prestaciones.map((p, i) => (
                       <li key={i} className={styles.prestacionItem}>{p}</li>
@@ -345,7 +345,7 @@ export default function OrientadorGradoDependencia() {
       <div className={styles.escenariosGrid}>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>🧓</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">🧓</span>
             <strong>Persona mayor con movilidad limitada</strong>
           </div>
           <p>75 años, necesita ayuda para ducharse y vestirse pero puede comer sola y moverse por casa. Probable Grado I o II. La solicitud permite acceder a SAD y teleasistencia.</p>
@@ -354,7 +354,7 @@ export default function OrientadorGradoDependencia() {
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>🧠</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">🧠</span>
             <strong>Persona con demencia moderada</strong>
           </div>
           <p>Alzheimer en fase moderada, desorientada, riesgo de fugas. Probable Grado II o III. Las prestaciones pueden financiar residencia o cuidadora interna permanente.</p>
@@ -363,7 +363,7 @@ export default function OrientadorGradoDependencia() {
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>♿</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">♿</span>
             <strong>Persona joven con discapacidad severa</strong>
           </div>
           <p>30 años con parálisis cerebral que requiere apoyos para las actividades básicas diarias. Si la valoración resulta en Grado III, el SAAD ofrece asistencia personal (orientada a mantener vida activa, estudios o trabajo), servicios de apoyo a la autonomía y centros especializados.</p>
@@ -372,7 +372,7 @@ export default function OrientadorGradoDependencia() {
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>🩺</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">🩺</span>
             <strong>Persona tras accidente o enfermedad grave</strong>
           </div>
           <p>Ictus con hemiplejia. Dependencia sobrevenida. Puede solicitarse durante la rehabilitación. El proceso puede ser más rápido en situaciones de urgencia o riesgo vital.</p>
@@ -503,7 +503,7 @@ export default function OrientadorGradoDependencia() {
       {/* 6. Warning Box */}
       <div className={styles.warningBox}>
         <div className={styles.warningHeader}>
-          <span className={styles.warningIcon}>⚠️</span>
+          <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
           <strong>Errores frecuentes en la tramitación de la dependencia</strong>
         </div>
         <ul className={styles.warningList}>

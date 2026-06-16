@@ -1042,10 +1042,10 @@
 | [x] | La Piel - Capas, Funciones y Cicatrización | `/visualizador-piel/` | salud, estudiantes, cultura |
 | [x] | Lactasa - La Enzima que Revolucionó la Historia Humana | `/visualizador-lactasa/` | salud, cultura, estudiantes |
 | [x] | Lo que Cuesta Enfermarse | `/visualizador-coste-sanidad/` | salud, cultura |
-| [ ] | Melatonina - La Hormona del Reloj Interno | `/visualizador-melatonina/` | salud, cultura, estudiantes |
-| [ ] | Metabolismo del Alcohol: El Acetaldehído Multi-Órgano | `/visualizador-metabolismo-alcohol/` | salud, cultura |
-| [ ] | Orientador Colesterol | `/orientador-colesterol/` | salud, legal-fiscal |
-| [ ] | Orientador Grado de Dependencia | `/orientador-grado-dependencia/` | salud, legal-fiscal |
+| [x] | Melatonina - La Hormona del Reloj Interno | `/visualizador-melatonina/` | salud, cultura, estudiantes |
+| [x] | Metabolismo del Alcohol: El Acetaldehído Multi-Órgano | `/visualizador-metabolismo-alcohol/` | salud, cultura |
+| [x] | Orientador Colesterol | `/orientador-colesterol/` | salud, legal-fiscal |
+| [x] | Orientador Grado de Dependencia | `/orientador-grado-dependencia/` | salud, legal-fiscal |
 | [ ] | Orientador Grado de Discapacidad | `/orientador-discapacidad/` | salud, legal-fiscal |
 | [ ] | Orientador IMC | `/orientador-imc/` | salud |
 | [ ] | Orientador Medicamentos Mascotas | `/orientador-medicamentos-mascotas/` | salud |
