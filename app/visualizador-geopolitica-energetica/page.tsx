@@ -235,6 +235,7 @@ export default function VisualizadorGeopoliticaEnergetica() {
           {(['gas', 'petroleo', 'electricidad'] as EnergiaToggle[]).map((e) => (
             <button
               key={e}
+              type="button"
               className={`${styles.toggleTab} ${energiaToggle === e ? styles.toggleTabActive : ''}`}
               onClick={() => setEnergiaToggle(e)}
               aria-pressed={energiaToggle === e}
@@ -247,6 +248,7 @@ export default function VisualizadorGeopoliticaEnergetica() {
         {/* Toggle de período */}
         <div className={styles.comparisonToggle}>
           <button
+            type="button"
             className={`${styles.compBtn} ${periodoToggle === 'pre2022' ? styles.compBtnActive : ''}`}
             onClick={() => setPeriodoToggle('pre2022')}
             aria-pressed={periodoToggle === 'pre2022'}
@@ -254,6 +256,7 @@ export default function VisualizadorGeopoliticaEnergetica() {
             Pre-2022 (media 2018-2021)
           </button>
           <button
+            type="button"
             className={`${styles.compBtn} ${periodoToggle === 'post2022' ? styles.compBtnActive : ''}`}
             onClick={() => setPeriodoToggle('post2022')}
             aria-pressed={periodoToggle === 'post2022'}
@@ -375,6 +378,7 @@ export default function VisualizadorGeopoliticaEnergetica() {
 
         <div className={styles.toggleTabs}>
           <button
+            type="button"
             className={`${styles.toggleTab} ${infraToggle === 'gasoductos' ? styles.toggleTabActive : ''}`}
             onClick={() => setInfraToggle('gasoductos')}
             aria-pressed={infraToggle === 'gasoductos'}
@@ -382,6 +386,7 @@ export default function VisualizadorGeopoliticaEnergetica() {
             Gasoductos
           </button>
           <button
+            type="button"
             className={`${styles.toggleTab} ${infraToggle === 'lng' ? styles.toggleTabActive : ''}`}
             onClick={() => setInfraToggle('lng')}
             aria-pressed={infraToggle === 'lng'}
@@ -457,6 +462,7 @@ export default function VisualizadorGeopoliticaEnergetica() {
         <div className={styles.inversionWrapper}>
           <div className={styles.inversionToggle}>
             <button
+              type="button"
               className={`${styles.toggleTab} ${inversionToggle === 'inversion' ? styles.toggleTabActive : ''}`}
               onClick={() => setInversionToggle('inversion')}
               aria-pressed={inversionToggle === 'inversion'}
@@ -464,6 +470,7 @@ export default function VisualizadorGeopoliticaEnergetica() {
               Inversión 2023 (bn USD)
             </button>
             <button
+              type="button"
               className={`${styles.toggleTab} ${inversionToggle === 'capacidad' ? styles.toggleTabActive : ''}`}
               onClick={() => setInversionToggle('capacidad')}
               aria-pressed={inversionToggle === 'capacidad'}

@@ -298,7 +298,7 @@ export default function GerminacionPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🌱 Germinación</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🌱</span> Germinación</h1>
           <p className={styles.subtitle}>De la semilla a la planta: el viaje más asombroso de la naturaleza</p>
         </header>
 
@@ -309,6 +309,7 @@ export default function GerminacionPage() {
           {SECCIONES.map(s => (
             <button
               key={s.id}
+              type="button"
               className={`${styles.navBtn} ${seccion === s.id ? styles.navActivo : ''}`}
               onClick={() => setSeccion(s.id)}
               aria-pressed={seccion === s.id}
@@ -322,7 +323,7 @@ export default function GerminacionPage() {
         {/* Título de sección */}
         <div className={styles.seccionHeader}>
           <h2 className={styles.seccionTitulo}>
-            {SECCIONES.find(s => s.id === seccion)?.icono}{' '}
+            <span aria-hidden="true">{SECCIONES.find(s => s.id === seccion)?.icono}</span>{' '}
             {SECCIONES.find(s => s.id === seccion)?.titulo}
           </h2>
           <p className={styles.seccionSubtitulo}>
@@ -345,6 +346,7 @@ export default function GerminacionPage() {
                       {PARTES_SEMILLA.map(parte => (
                         <button
                           key={parte.id}
+                          type="button"
                           className={`${styles.parteSemilla} ${styles[`parte_${parte.id}`]} ${parteSeleccionada === parte.id ? styles.parteActiva : ''}`}
                           onClick={() => setParteSeleccionada(parteSeleccionada === parte.id ? null : parte.id)}
                           aria-pressed={parteSeleccionada === parte.id}
@@ -375,12 +377,12 @@ export default function GerminacionPage() {
 
               {/* Insight */}
               <div className={styles.insight}>
-                <p><strong>💡 Dato clave:</strong> Una semilla es una planta completa en miniatura con su propia reserva de comida, esperando las condiciones adecuadas para despertar.</p>
+                <p><strong><span aria-hidden="true">💡</span> Dato clave:</strong> Una semilla es una planta completa en miniatura con su propia reserva de comida, esperando las condiciones adecuadas para despertar.</p>
               </div>
 
               {/* Comparativa Mono vs Dicotiledóneas */}
               <div className={styles.comparativaCard}>
-                <h3 className={styles.comparativaTitulo}>🫘 Judía vs 🌽 Maíz — ¿Qué diferencia hay?</h3>
+                <h3 className={styles.comparativaTitulo}><span aria-hidden="true">🫘</span> Judía vs <span aria-hidden="true">🌽</span> Maíz — ¿Qué diferencia hay?</h3>
                 <div className={styles.comparativaGrid}>
                   <div className={styles.comparativaCol}>
                     <span className={styles.comparativaColTitulo}>🌽 Monocotiledónea</span>
@@ -416,6 +418,7 @@ export default function GerminacionPage() {
               {/* Controles de fase */}
               <div className={styles.faseControles}>
                 <button
+                  type="button"
                   className={styles.faseBtn}
                   onClick={() => setFaseActual(Math.max(0, faseActual - 1))}
                   disabled={faseActual === 0}
@@ -427,6 +430,7 @@ export default function GerminacionPage() {
                   Fase {faseActual + 1} de {FASES_GERMINACION.length}
                 </span>
                 <button
+                  type="button"
                   className={styles.faseBtn}
                   onClick={() => setFaseActual(Math.min(FASES_GERMINACION.length - 1, faseActual + 1))}
                   disabled={faseActual === FASES_GERMINACION.length - 1}
@@ -487,7 +491,7 @@ export default function GerminacionPage() {
                     </div>
                     <p className={styles.faseCardDetalle}>{fase.detalle}</p>
                     <div className={styles.faseCardDuracion}>
-                      <span aria-hidden="true">⏱️</span> Duración aproximada: <strong>{fase.duracion}</strong>
+                      <span aria-hidden="true">⏱️</span> <span>Duración aproximada: <strong>{fase.duracion}</strong></span>
                     </div>
                   </div>
                 );
@@ -500,6 +504,7 @@ export default function GerminacionPage() {
                   {FASES_GERMINACION.map((fase, i) => (
                     <button
                       key={fase.id}
+                      type="button"
                       className={`${styles.timelinePunto} ${i === faseActual ? styles.timelinePuntoActivo : ''} ${i < faseActual ? styles.timelinePuntoPasado : ''}`}
                       onClick={() => setFaseActual(i)}
                       style={{ borderColor: fase.colorBorde }}
@@ -515,7 +520,7 @@ export default function GerminacionPage() {
               </div>
 
               <div className={styles.insight}>
-                <p><strong>💡 Dato clave:</strong> El momento en que la plántula hace su primera fotosíntesis marca su independencia: ya no necesita las reservas de la semilla.</p>
+                <p><strong><span aria-hidden="true">💡</span> Dato clave:</strong> El momento en que la plántula hace su primera fotosíntesis marca su independencia: ya no necesita las reservas de la semilla.</p>
               </div>
             </>
           )}
@@ -536,6 +541,7 @@ export default function GerminacionPage() {
                   <p className={styles.factorDesc}>Sin agua no hay imbibición. Es el disparador de todo el proceso.</p>
                   <button
                     className={`${styles.factorToggle} ${aguaActiva ? styles.factorToggleOn : styles.factorToggleOff}`}
+                    type="button"
                     onClick={() => setAguaActiva(!aguaActiva)}
                     aria-pressed={aguaActiva}
                     aria-label={`Agua ${aguaActiva ? 'activada' : 'desactivada'}`}
@@ -598,7 +604,7 @@ export default function GerminacionPage() {
 
               {/* Luz (factor opcional) */}
               <div className={styles.factorLuz}>
-                <h3 className={styles.factorLuzTitulo}>💡 ¿Y la luz?</h3>
+                <h3 className={styles.factorLuzTitulo}><span aria-hidden="true">💡</span> ¿Y la luz?</h3>
                 <p className={styles.factorLuzDesc}>
                   La mayoría de semillas no necesitan luz para germinar (germinan bajo tierra). Sin embargo, algunas semillas pequeñas como la lechuga necesitan luz para activar el fitocromo que desencadena la germinación. Otras, como la cebolla, prefieren oscuridad.
                 </p>
@@ -633,7 +639,7 @@ export default function GerminacionPage() {
 
               {/* Dormancia */}
               <div className={styles.insight}>
-                <p><strong>💡 Dormancia:</strong> Muchas semillas no germinan aunque las condiciones sean perfectas. La dormancia es un mecanismo de supervivencia: la semilla &quot;espera&quot; a que pase el invierno, un incendio o incluso el tránsito por el sistema digestivo de un animal antes de germinar.</p>
+                <p><strong><span aria-hidden="true">💡</span> Dormancia:</strong> Muchas semillas no germinan aunque las condiciones sean perfectas. La dormancia es un mecanismo de supervivencia: la semilla &quot;espera&quot; a que pase el invierno, un incendio o incluso el tránsito por el sistema digestivo de un animal antes de germinar.</p>
               </div>
             </>
           )}
@@ -645,6 +651,7 @@ export default function GerminacionPage() {
                 {DATOS_FASCINANTES.map((dato, i) => (
                   <button
                     key={i}
+                    type="button"
                     className={`${styles.datoCard} ${datoSeleccionado === i ? styles.datoCardActivo : ''}`}
                     onClick={() => setDatoSeleccionado(datoSeleccionado === i ? null : i)}
                     aria-pressed={datoSeleccionado === i}
@@ -660,7 +667,7 @@ export default function GerminacionPage() {
               </div>
 
               <div className={styles.insight}>
-                <p><strong>💡 Dato clave:</strong> Algunas semillas necesitan pasar por el estómago de un animal para germinar. Los ácidos gástricos debilitan la testa, facilitando la imbibición.</p>
+                <p><strong><span aria-hidden="true">💡</span> Dato clave:</strong> Algunas semillas necesitan pasar por el estómago de un animal para germinar. Los ácidos gástricos debilitan la testa, facilitando la imbibición.</p>
               </div>
 
               {/* Comparativa Mono vs Dico resumida */}
@@ -718,7 +725,7 @@ export default function GerminacionPage() {
             </p>
 
             <div className={styles.warningBox}>
-              <strong>⚠️ Nota educativa:</strong> Este visualizador es una herramienta educativa. Los tiempos y condiciones de germinación son aproximados y varían significativamente entre especies, variedades y condiciones ambientales específicas.
+              <strong><span aria-hidden="true">⚠️</span> Nota educativa:</strong> Este visualizador es una herramienta educativa. Los tiempos y condiciones de germinación son aproximados y varían significativamente entre especies, variedades y condiciones ambientales específicas.
             </div>
           </section>
         </EducationalSection>

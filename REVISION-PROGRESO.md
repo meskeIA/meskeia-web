@@ -477,11 +477,11 @@
 | [x] | Funciones que Gobiernan el Mundo | `/visualizador-funciones-mundo/` | estudiantes, cultura |
 | [x] | Generador de Horarios de Estudio | `/generador-horarios-estudio/` | estudiantes |
 | [x] | Geometría Analítica: Cónicas e Hipérbolas | `/visualizador-geometria-analitica/` | estudiantes, tecnicas |
-| [ ] | Geometría Fractal - Autosimilitud e Infinito | `/visualizador-geometria-fractales/` | estudiantes, cultura |
-| [ ] | Geopolítica Energética: Flujos, Dependencias e Infraestructuras | `/visualizador-geopolitica-energetica/` | estudiantes, cultura, tecnicas |
-| [ ] | Germinación - De la Semilla a la Planta | `/visualizador-germinacion/` | estudiantes, cultura |
+| [x] | Geometría Fractal - Autosimilitud e Infinito | `/visualizador-geometria-fractales/` | estudiantes, cultura |
+| [x] | Geopolítica Energética: Flujos, Dependencias e Infraestructuras | `/visualizador-geopolitica-energetica/` | estudiantes, cultura, tecnicas |
+| [x] | Germinación - De la Semilla a la Planta | `/visualizador-germinacion/` | estudiantes, cultura |
 | [x] | Glosario de Física y Química | `/glosario-fisica-quimica/` | estudiantes |
-| [ ] | Glosario de Programación | `/glosario-programacion/` | estudiantes, tecnicas |
+| [x] | Glosario de Programación | `/glosario-programacion/` | estudiantes, tecnicas |
 | [x] | Inferencia Bayesiana | `/inferencia-bayesiana/` | estudiantes |
 | [ ] | La Célula por Dentro - Animal vs Vegetal | `/visualizador-celula/` | estudiantes, cultura, salud |
 | [ ] | La Escala del Universo | `/visualizador-escala-universo/` | estudiantes, cultura |

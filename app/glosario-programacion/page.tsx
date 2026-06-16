@@ -73,7 +73,7 @@ export default function GlosarioProgramacionPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>📖</span>
+        <span className={styles.heroIcon} aria-hidden="true">📖</span>
         <h1 className={styles.title}>Glosario de Programación</h1>
         <p className={styles.subtitle}>
           Más de {TERMINOS.length} términos esenciales de desarrollo web explicados en español
@@ -85,7 +85,7 @@ export default function GlosarioProgramacionPage() {
       {/* Buscador */}
       <div className={styles.searchSection}>
         <div className={styles.searchBox}>
-          <span className={styles.searchIcon}>🔍</span>
+          <span className={styles.searchIcon} aria-hidden="true">🔍</span>
           <input
             type="text"
             value={busqueda}
@@ -98,6 +98,7 @@ export default function GlosarioProgramacionPage() {
           />
           {busqueda && (
             <button
+              type="button"
               onClick={() => setBusqueda('')}
               className={styles.clearSearch}
               aria-label="Limpiar búsqueda"
@@ -112,11 +113,13 @@ export default function GlosarioProgramacionPage() {
       <div className={styles.alfabetoSection}>
         <div className={styles.alfabetoWrapper}>
           <button
+            type="button"
             onClick={() => {
               setLetraSeleccionada(null);
               setBusqueda('');
             }}
             className={`${styles.letraBtn} ${!letraSeleccionada && !busqueda ? styles.letraActiva : ''}`}
+            aria-pressed={!letraSeleccionada && !busqueda}
           >
             Todos
           </button>
@@ -125,6 +128,7 @@ export default function GlosarioProgramacionPage() {
             return (
               <button
                 key={letra}
+                type="button"
                 onClick={() => {
                   if (disponible) {
                     setLetraSeleccionada(letra);
@@ -133,6 +137,7 @@ export default function GlosarioProgramacionPage() {
                 }}
                 className={`${styles.letraBtn} ${letraSeleccionada === letra ? styles.letraActiva : ''} ${!disponible ? styles.letraDisabled : ''}`}
                 disabled={!disponible}
+                aria-pressed={letraSeleccionada === letra}
               >
                 {letra}
               </button>
@@ -145,18 +150,22 @@ export default function GlosarioProgramacionPage() {
       <div className={styles.categoriasSection}>
         <div className={styles.categoriasWrapper}>
           <button
+            type="button"
             onClick={() => setCategoriaSeleccionada(null)}
             className={`${styles.categoriaBtn} ${!categoriaSeleccionada ? styles.categoriaActiva : ''}`}
+            aria-pressed={!categoriaSeleccionada}
           >
-            📚 Todas
+            <span aria-hidden="true">📚</span> Todas
           </button>
           {Object.entries(CATEGORIAS).map(([key, { nombre, icono }]) => (
             <button
               key={key}
+              type="button"
               onClick={() => setCategoriaSeleccionada(key as Categoria)}
               className={`${styles.categoriaBtn} ${categoriaSeleccionada === key ? styles.categoriaActiva : ''}`}
+              aria-pressed={categoriaSeleccionada === key}
             >
-              {icono} {nombre}
+              <span aria-hidden="true">{icono}</span> {nombre}
             </button>
           ))}
         </div>
@@ -168,7 +177,7 @@ export default function GlosarioProgramacionPage() {
           {terminosFiltrados.length} {terminosFiltrados.length === 1 ? 'término encontrado' : 'términos encontrados'}
         </span>
         {(letraSeleccionada || categoriaSeleccionada || busqueda) && (
-          <button onClick={limpiarFiltros} className={styles.limpiarBtn}>
+          <button type="button" onClick={limpiarFiltros} className={styles.limpiarBtn}>
             Limpiar filtros
           </button>
         )}
@@ -178,9 +187,9 @@ export default function GlosarioProgramacionPage() {
       <div className={styles.terminosSection}>
         {terminosFiltrados.length === 0 ? (
           <div className={styles.sinResultados}>
-            <span className={styles.sinResultadosIcon}>🔍</span>
+            <span className={styles.sinResultadosIcon} aria-hidden="true">🔍</span>
             <p>No se encontraron términos con esos criterios</p>
-            <button onClick={limpiarFiltros} className={styles.btnSecondary}>
+            <button type="button" onClick={limpiarFiltros} className={styles.btnSecondary}>
               Ver todos los términos
             </button>
           </div>
@@ -192,12 +201,13 @@ export default function GlosarioProgramacionPage() {
                 className={`${styles.terminoCard} ${terminoExpandido === termino.id ? styles.terminoExpandido : ''}`}
               >
                 <button
+                  type="button"
                   className={styles.terminoHeader}
                   onClick={() => toggleTermino(termino.id)}
                   aria-expanded={terminoExpandido === termino.id}
                 >
                   <div className={styles.terminoTitulo}>
-                    <span className={styles.categoriaIcon}>
+                    <span className={styles.categoriaIcon} aria-hidden="true">
                       {CATEGORIAS[termino.categoria].icono}
                     </span>
                     <h3 className={styles.terminoNombre}>{termino.termino}</h3>
@@ -217,20 +227,21 @@ export default function GlosarioProgramacionPage() {
                     <div className={styles.detalles}>
                       {termino.ejemplo && (
                         <div className={styles.ejemplo}>
-                          <span className={styles.ejemploLabel}>💡 Ejemplo:</span>
+                          <span className={styles.ejemploLabel}><span aria-hidden="true">💡</span> Ejemplo:</span>
                           <code className={styles.ejemploCodigo}>{termino.ejemplo}</code>
                         </div>
                       )}
 
                       {termino.relacionados && termino.relacionados.length > 0 && (
                         <div className={styles.relacionados}>
-                          <span className={styles.relacionadosLabel}>🔗 Relacionados:</span>
+                          <span className={styles.relacionadosLabel}><span aria-hidden="true">🔗</span> Relacionados:</span>
                           <div className={styles.relacionadosLista}>
                             {termino.relacionados.map(rel => {
                               const terminoRelacionado = buscarTerminoPorNombre(rel);
                               return terminoRelacionado ? (
                                 <button
                                   key={rel}
+                                  type="button"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setBusqueda(rel);
@@ -368,7 +379,7 @@ export default function GlosarioProgramacionPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🌱</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🌱</span>
                 <h3>Principiante que empieza a programar</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -381,7 +392,7 @@ export default function GlosarioProgramacionPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💼</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💼</span>
                 <h3>Desarrollador junior en su primer empleo</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -394,7 +405,7 @@ export default function GlosarioProgramacionPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🔄</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔄</span>
                 <h3>Programador de otro stack aprendiendo web</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -407,7 +418,7 @@ export default function GlosarioProgramacionPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🧪</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🧪</span>
                 <h3>QA / Tester técnico</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -569,32 +580,32 @@ export default function GlosarioProgramacionPage() {
           <h2>✅ Mejores Prácticas para Aprender Programación</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏗️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏗️</span>
               <h4>Aprende construyendo, no solo leyendo</h4>
               <p>Por cada hora de tutorial, pasa 2 horas escribiendo código. Leer sobre programación sin practicar es como leer sobre natación sin entrar al agua. El error es parte del aprendizaje.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔗</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔗</span>
               <h4>Entiende el "por qué", no solo el "cómo"</h4>
               <p>Entender por qué existe un patrón (ej: por qué los closures resuelven el problema de scope) te permite aplicarlo en contextos nuevos. Memorizar sintaxis sin comprensión no escala.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📖</span>
+              <span className={styles.tipIcon} aria-hidden="true">📖</span>
               <h4>Lee documentación oficial, no solo tutoriales</h4>
               <p>MDN Web Docs (JavaScript/HTML/CSS), documentación de React, PostgreSQL y Node.js son fuentes autoritativas. Los tutoriales pueden estar desactualizados; la doc oficial siempre refleja la versión actual.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🐛</span>
+              <span className={styles.tipIcon} aria-hidden="true">🐛</span>
               <h4>Aprende a depurar antes de pedir ayuda</h4>
               <p>Antes de preguntar: lee el error completo, busca en Google el mensaje exacto, usa <code>console.log</code> estratégicamente, revisa la documentación. El 90% de errores tienen solución en Stack Overflow.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <h4>Un lenguaje bien, no cinco a medias</h4>
               <p>Domina JavaScript antes de aprender Python o Go. Los conceptos (funciones, bucles, objetos, async) son transferibles entre lenguajes. La profundidad en uno facilita aprender el siguiente.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📦</span>
+              <span className={styles.tipIcon} aria-hidden="true">📦</span>
               <h4>Versiona todo en Git desde el primer día</h4>
               <p>Aunque el proyecto sea pequeño, crea un repositorio. El historial de commits en GitHub es tu portafolio en tiempo real. Los empleadores lo revisan antes de la entrevista técnica.</p>
             </div>
@@ -605,7 +616,7 @@ export default function GlosarioProgramacionPage() {
         <section className={styles.guideSection}>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>Errores Conceptuales Frecuentes que Frenan el Aprendizaje</h3>
             </div>
             <ul className={styles.warningList}>
