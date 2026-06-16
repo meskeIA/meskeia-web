@@ -1005,10 +1005,10 @@
 | [x] | El Hígado - Detoxificación y Metabolismo | `/visualizador-higado/` | salud, estudiantes, cultura |
 | [x] | El Magnesio: 300 Reacciones Enzimáticas y Déficit Silencioso | `/visualizador-magnesio/` | salud, cultura, estudiantes |
 | [x] | El Riñón y la Filtración - Nefrona y Formación de Orina | `/visualizador-rinon-filtracion/` | salud, estudiantes, cultura |
-| [ ] | Endorfinas - Los Opioides que Fabrica tu Cuerpo | `/visualizador-endorfinas/` | salud, cultura, estudiantes |
-| [ ] | Envejecimiento Celular - Telómeros, Senescencia y Hallmarks | `/visualizador-envejecimiento-celular/` | salud, estudiantes, cultura |
-| [ ] | Estimación de Baja Maternal y Paternal | `/estimacion-baja-maternal/` | salud, productividad |
-| [ ] | Estimación de Deducción IRPF por Discapacidad | `/estimacion-deduccion-discapacidad/` | salud, finanzas, legal-fiscal |
+| [x] | Endorfinas - Los Opioides que Fabrica tu Cuerpo | `/visualizador-endorfinas/` | salud, cultura, estudiantes |
+| [x] | Envejecimiento Celular - Telómeros, Senescencia y Hallmarks | `/visualizador-envejecimiento-celular/` | salud, estudiantes, cultura |
+| [x] | Estimación de Baja Maternal y Paternal | `/estimacion-baja-maternal/` | salud, productividad |
+| [x] | Estimación de Deducción IRPF por Discapacidad | `/estimacion-deduccion-discapacidad/` | salud, finanzas, legal-fiscal |
 | [ ] | Estimación de Prestación por Nacimiento | `/estimacion-prestacion-nacimiento/` | salud, finanzas |
 | [ ] | Estimación de Prestaciones por Dependencia | `/estimacion-prestaciones-dependencia/` | salud, legal-fiscal, finanzas |
 | [ ] | Estimador de Riesgo de Osteoporosis | `/estimador-riesgo-osteoporosis/` | salud, legal-fiscal |

@@ -179,7 +179,7 @@ export default function VisualizadorEnvejecimientoCelularPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <div className={styles.heroIcono}>🔬</div>
+        <div className={styles.heroIcono} aria-hidden="true">🔬</div>
         <h1>Visualizador del Envejecimiento Celular</h1>
         <p>Telómeros, senescencia, mitocondrias y las teorías moleculares del envejecimiento</p>
       </header>
@@ -191,6 +191,7 @@ export default function VisualizadorEnvejecimientoCelularPage() {
         {secciones.map(s => (
           <button
             key={s.id}
+            type="button"
             className={`${styles.navBtn} ${seccionActiva === s.id ? styles.navBtnActivo : ''}`}
             onClick={() => setSeccionActiva(s.id)}
             aria-pressed={seccionActiva === s.id}

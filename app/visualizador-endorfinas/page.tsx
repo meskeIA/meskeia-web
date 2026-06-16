@@ -179,7 +179,7 @@ export default function VisualizadorEndorfinas() {
             los mismos receptores que la morfina y la heroína, pero producidos internamente por el organismo.
           </p>
           <div className={styles.tarjetaIntroDestacado}>
-            <span className={styles.tarjetaIntroIcono}>🔬</span>
+            <span className={styles.tarjetaIntroIcono} aria-hidden="true">🔬</span>
             <span>
               Descubiertas en <strong>1975</strong> por Hughes y Kosterlitz en la Universidad de Aberdeen.
               El hallazgo explicó por primera vez por qué los opioides externos tienen efecto en el cerebro:
@@ -218,7 +218,7 @@ export default function VisualizadorEndorfinas() {
         <div className={styles.mitoRealidad}>
           <div className={styles.mitoColumna}>
             <div className={styles.mitoHeader}>
-              <span className={styles.mitoIcono}>❌</span>
+              <span className={styles.mitoIcono} aria-hidden="true">❌</span>
               <h3>El mito popular</h3>
             </div>
             <p>
@@ -232,7 +232,7 @@ export default function VisualizadorEndorfinas() {
 
           <div className={styles.realidadColumna}>
             <div className={styles.realidadHeader}>
-              <span className={styles.realidadIcono}>✅</span>
+              <span className={styles.realidadIcono} aria-hidden="true">✅</span>
               <h3>Lo que dice la ciencia</h3>
             </div>
             <p>
@@ -245,7 +245,7 @@ export default function VisualizadorEndorfinas() {
 
         <div className={styles.tarjetaAnandamida}>
           <div className={styles.anandamidaHeader}>
-            <span className={styles.anandamidaIcono}>🌿</span>
+            <span className={styles.anandamidaIcono} aria-hidden="true">🌿</span>
             <div>
               <h3 className={styles.anandamidaNombre}>Anandamida (AEA) — el endocannabinoide</h3>
               <p className={styles.anandamidaSubtitulo}>
@@ -278,7 +278,7 @@ export default function VisualizadorEndorfinas() {
 
         <div className={styles.conclusionMito}>
           <div className={styles.conclusionItem}>
-            <span className={styles.conclusionIcono}>💊</span>
+            <span className={styles.conclusionIcono} aria-hidden="true">💊</span>
             <div>
               <strong>Endorfinas</strong>
               <span>= alivio del dolor muscular (periférico)</span>
@@ -286,7 +286,7 @@ export default function VisualizadorEndorfinas() {
           </div>
           <div className={styles.conclusionSeparador}>+</div>
           <div className={styles.conclusionItem}>
-            <span className={styles.conclusionIcono}>🌿</span>
+            <span className={styles.conclusionIcono} aria-hidden="true">🌿</span>
             <div>
               <strong>Anandamida</strong>
               <span>= la euforia del runner&apos;s high (central)</span>
@@ -309,6 +309,7 @@ export default function VisualizadorEndorfinas() {
           {ACTIVADORES.map((activador, index) => (
             <button
               key={activador.nombre}
+              type="button"
               className={`${styles.activadorCard} ${activadorSeleccionado === index ? styles.activadorCardActivo : ''}`}
               onClick={() => setActivadorSeleccionado(activadorSeleccionado === index ? null : index)}
               aria-expanded={activadorSeleccionado === index}
