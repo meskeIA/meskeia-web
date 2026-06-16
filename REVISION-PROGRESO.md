@@ -680,11 +680,11 @@
 | [x] | Selector de Tipo de Préstamo | `/selector-tipo-prestamo/` | finanzas, inmobiliaria |
 | [x] | Selector de Tipo de Vehículo | `/selector-vehiculo/` | finanzas, inmobiliaria, productividad |
 | [x] | Simulador de Paga y Ahorro | `/simulador-paga-ahorro/` | finanzas, estudiantes |
-| [ ] | Simulador Sesgos del Inversor | `/simulador-sesgos-inversor/` | finanzas, cultura |
+| [x] | Simulador Sesgos del Inversor | `/simulador-sesgos-inversor/` | finanzas, cultura |
 | [x] | Test de Perfil Inversor | `/test-perfil-inversor/` | finanzas |
-| [ ] | Test de Tolerancia al Riesgo Detallado | `/test-tolerancia-riesgo-detallado/` | finanzas |
-| [ ] | Tipos de Interés BCE - Transmisión Monetaria | `/visualizador-tipos-interes-bce/` | finanzas, cultura, estudiantes |
-| [ ] | Tu Jubilación en Perspectiva | `/visualizador-jubilacion-perspectiva/` | finanzas, cultura |
+| [x] | Test de Tolerancia al Riesgo Detallado | `/test-tolerancia-riesgo-detallado/` | finanzas |
+| [x] | Tipos de Interés BCE - Transmisión Monetaria | `/visualizador-tipos-interes-bce/` | finanzas, cultura, estudiantes |
+| [x] | Tu Jubilación en Perspectiva | `/visualizador-jubilacion-perspectiva/` | finanzas, cultura |
 | [x] | Tu Sueldo al Desnudo | `/visualizador-sueldo-neto/` | finanzas, freelance, cultura |
 
 ## Freelance y Autónomo (`freelance`) — 38 apps

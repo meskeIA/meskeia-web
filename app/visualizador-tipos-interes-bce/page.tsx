@@ -207,7 +207,7 @@ export default function VisualizadorTiposInteresBce() {
       {/* ── Hero ── */}
       <header className={styles.hero}>
         <div className={styles.heroContent}>
-          <div className={styles.heroBadge}>🏛️ Banco Central Europeo</div>
+          <div className={styles.heroBadge}><span aria-hidden="true">🏛️</span> Banco Central Europeo</div>
           <h1 className={styles.heroTitle}>Tipos de Interés del BCE</h1>
           <p className={styles.heroSubtitle}>
             Cómo una decisión en Fráncfort se transmite a tu hipoteca, tu crédito, tu bolsa y tu cuenta de ahorro
@@ -351,6 +351,7 @@ export default function VisualizadorTiposInteresBce() {
             {CANALES_TRANSMISION.map((canal) => (
               <button
                 key={canal.id}
+                type="button"
                 className={`${styles.canalBtn} ${canalSeleccionado === canal.id ? styles.canalBtnActivo : ''}`}
                 onClick={() => setCanalSeleccionado(canalSeleccionado === canal.id ? null : canal.id)}
                 aria-expanded={canalSeleccionado === canal.id}
@@ -380,7 +381,7 @@ export default function VisualizadorTiposInteresBce() {
             </h3>
             <p className={styles.canalDetalleTexto}>{canalActivo.explicacion}</p>
             <div className={styles.ejemploBox}>
-              <div className={styles.ejemploLabel}>📊 Ejemplo numérico</div>
+              <div className={styles.ejemploLabel}><span aria-hidden="true">📊</span> Ejemplo numérico</div>
               <p className={styles.ejemploTexto}>{canalActivo.ejemploNumerico}</p>
             </div>
             <div className={styles.impactoRow}>
@@ -424,7 +425,7 @@ export default function VisualizadorTiposInteresBce() {
             </div>
 
             <div className={styles.gpSubheader}>
-              <span className={styles.gpGanaLabel}>✅ Ganan</span>
+              <span className={styles.gpGanaLabel}><span aria-hidden="true">✅</span> Ganan</span>
             </div>
             <ul className={styles.gpLista}>
               <li className={styles.gpGana}>
@@ -458,7 +459,7 @@ export default function VisualizadorTiposInteresBce() {
             </ul>
 
             <div className={styles.gpSubheader}>
-              <span className={styles.gpPierdeLabel}>❌ Pierden</span>
+              <span className={styles.gpPierdeLabel}><span aria-hidden="true">❌</span> Pierden</span>
             </div>
             <ul className={styles.gpLista}>
               <li className={styles.gpPierde}>
@@ -500,7 +501,7 @@ export default function VisualizadorTiposInteresBce() {
             </div>
 
             <div className={styles.gpSubheader}>
-              <span className={styles.gpGanaLabel}>✅ Ganan</span>
+              <span className={styles.gpGanaLabel}><span aria-hidden="true">✅</span> Ganan</span>
             </div>
             <ul className={styles.gpLista}>
               <li className={styles.gpGana}>
@@ -534,7 +535,7 @@ export default function VisualizadorTiposInteresBce() {
             </ul>
 
             <div className={styles.gpSubheader}>
-              <span className={styles.gpPierdeLabel}>❌ Pierden</span>
+              <span className={styles.gpPierdeLabel}><span aria-hidden="true">❌</span> Pierden</span>
             </div>
             <ul className={styles.gpLista}>
               <li className={styles.gpPierde}>
@@ -590,20 +591,20 @@ export default function VisualizadorTiposInteresBce() {
               </div>
               <div className={styles.cicloBody}>
                 <div className={styles.cicloItem}>
-                  <span className={styles.cicloItemLabel}>📌 Contexto</span>
+                  <span className={styles.cicloItemLabel}><span aria-hidden="true">📌</span> Contexto</span>
                   <p>{ciclo.contexto}</p>
                 </div>
                 <div className={styles.cicloItem}>
-                  <span className={styles.cicloItemLabel}>🏛️ Decisión BCE</span>
+                  <span className={styles.cicloItemLabel}><span aria-hidden="true">🏛️</span> Decisión BCE</span>
                   <p>{ciclo.decisionBce}</p>
                 </div>
                 <div className={styles.cicloGrid2}>
                   <div className={styles.cicloItem}>
-                    <span className={styles.cicloItemLabel}>📊 Euríbor</span>
+                    <span className={styles.cicloItemLabel}><span aria-hidden="true">📊</span> Euríbor</span>
                     <p>{ciclo.euribor}</p>
                   </div>
                   <div className={styles.cicloItem}>
-                    <span className={styles.cicloItemLabel}>🏠 Hipotecas</span>
+                    <span className={styles.cicloItemLabel}><span aria-hidden="true">🏠</span> Hipotecas</span>
                     <p>{ciclo.hipotecas}</p>
                   </div>
                 </div>

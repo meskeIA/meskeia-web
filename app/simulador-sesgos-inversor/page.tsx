@@ -367,7 +367,7 @@ export default function SimuladorSesgosInversorPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.heroTitle}>🧠 Sesgos del Inversor</h1>
+        <h1 className={styles.heroTitle}><span aria-hidden="true">🧠</span> Sesgos del Inversor</h1>
         <p className={styles.heroSubtitle}>
           8 escenarios reales para descubrir qué frena tu rentabilidad
         </p>
@@ -394,12 +394,12 @@ export default function SimuladorSesgosInversorPage() {
               <div className={styles.sesgosGrid}>
                 {Object.entries(INFO_SESGOS).map(([id, info]) => (
                   <div key={id} className={styles.sesgoBadgeInicio}>
-                    <span>{info.emoji}</span>
+                    <span aria-hidden="true">{info.emoji}</span>
                     <span>{info.nombre}</span>
                   </div>
                 ))}
               </div>
-              <button className={styles.btnPrimario} onClick={iniciar}>
+              <button type="button" className={styles.btnPrimario} onClick={iniciar}>
                 Empezar simulación →
               </button>
             </div>
@@ -425,7 +425,7 @@ export default function SimuladorSesgosInversorPage() {
             </div>
 
             <div className={styles.escenarioCard}>
-              <p className={styles.escenarioTitulo}>📋 {escenario.titulo}</p>
+              <p className={styles.escenarioTitulo}><span aria-hidden="true">📋</span> {escenario.titulo}</p>
               <div className={styles.contexto}>
                 <p>{escenario.contexto}</p>
               </div>
@@ -442,9 +442,11 @@ export default function SimuladorSesgosInversorPage() {
                   return (
                     <button
                       key={i}
+                      type="button"
                       className={clase}
                       onClick={() => elegir(i)}
                       disabled={haRespondido}
+                      aria-pressed={seleccionada === i}
                     >
                       {op.texto}
                     </button>
@@ -456,14 +458,14 @@ export default function SimuladorSesgosInversorPage() {
                 <div className={`${styles.feedback} ${opcionElegida.sesgoId ? styles.feedbackSesgo : styles.feedbackNeutral}`}>
                   {opcionElegida.sesgoId && (
                     <p className={styles.feedbackSesgoNombre}>
-                      {opcionElegida.nivel === 'alto' ? '🔴' : '🟡'} {INFO_SESGOS[opcionElegida.sesgoId].nombre} detectado
+                      <span aria-hidden="true">{opcionElegida.nivel === 'alto' ? '🔴' : '🟡'}</span> {INFO_SESGOS[opcionElegida.sesgoId].nombre} detectado
                     </p>
                   )}
                   {!opcionElegida.sesgoId && (
-                    <p className={styles.feedbackSesgoNombre}>✅ Decisión racional</p>
+                    <p className={styles.feedbackSesgoNombre}><span aria-hidden="true">✅</span> Decisión racional</p>
                   )}
                   <p className={styles.feedbackTexto}>{opcionElegida.feedbackInmediato}</p>
-                  <button className={styles.btnSiguiente} onClick={siguiente}>
+                  <button type="button" className={styles.btnSiguiente} onClick={siguiente}>
                     {indice + 1 >= ESCENARIOS.length ? 'Ver mi perfil →' : 'Siguiente escenario →'}
                   </button>
                 </div>
@@ -477,7 +479,7 @@ export default function SimuladorSesgosInversorPage() {
           <div className={styles.resultado}>
             <div className={styles.resumenCard}>
               <div className={styles.resumenHeader}>
-                <span className={styles.resumenEmoji}>
+                <span className={styles.resumenEmoji} aria-hidden="true">
                   {sesgosDetectados.length === 0 ? '🏆' : sesgosDetectados.filter(s => s.nivel === 'alto').length >= 3 ? '⚠️' : '📊'}
                 </span>
                 <h2 className={styles.resumenTitulo}>
@@ -493,19 +495,19 @@ export default function SimuladorSesgosInversorPage() {
                   <span className={styles.nivelNum} style={{ color: '#dc2626' }}>
                     {sesgosDetectados.filter(s => s.nivel === 'alto').length}
                   </span>
-                  <span className={styles.nivelLabel}>🔴 Alto impacto</span>
+                  <span className={styles.nivelLabel}><span aria-hidden="true">🔴</span> Alto impacto</span>
                 </div>
                 <div className={styles.nivelStat}>
                   <span className={styles.nivelNum} style={{ color: '#ca8a04' }}>
                     {sesgosDetectados.filter(s => s.nivel === 'moderado').length}
                   </span>
-                  <span className={styles.nivelLabel}>🟡 Moderado</span>
+                  <span className={styles.nivelLabel}><span aria-hidden="true">🟡</span> Moderado</span>
                 </div>
                 <div className={styles.nivelStat}>
                   <span className={styles.nivelNum} style={{ color: '#16a34a' }}>
                     {sesgosNoDetectados.length}
                   </span>
-                  <span className={styles.nivelLabel}>✅ No detectados</span>
+                  <span className={styles.nivelLabel}><span aria-hidden="true">✅</span> No detectados</span>
                 </div>
               </div>
             </div>
@@ -518,11 +520,11 @@ export default function SimuladorSesgosInversorPage() {
                   return (
                     <div key={id} className={`${styles.sesgoCard} ${nivel === 'alto' ? styles.sesgoAlto : styles.sesgoModerado}`}>
                       <div className={styles.sesgoCardHeader}>
-                        <span className={styles.sesgoEmoji}>{info.emoji}</span>
+                        <span className={styles.sesgoEmoji} aria-hidden="true">{info.emoji}</span>
                         <div className={styles.sesgoHeaderTexto}>
                           <h4 className={styles.sesgoNombre}>{info.nombre}</h4>
                           <span className={`${styles.nivelBadge} ${nivel === 'alto' ? styles.nivelBadgeAlto : styles.nivelBadgeModerado}`}>
-                            {nivel === 'alto' ? '🔴 Impacto alto' : '🟡 Impacto moderado'}
+                            <span aria-hidden="true">{nivel === 'alto' ? '🔴' : '🟡'}</span>{nivel === 'alto' ? ' Impacto alto' : ' Impacto moderado'}
                           </span>
                         </div>
                       </div>
@@ -549,7 +551,7 @@ export default function SimuladorSesgosInversorPage() {
                 <div className={styles.noDetectadosGrid}>
                   {sesgosNoDetectados.map(id => (
                     <div key={id} className={styles.noDetectadoItem}>
-                      <span>{INFO_SESGOS[id].emoji}</span>
+                      <span aria-hidden="true">{INFO_SESGOS[id].emoji}</span>
                       <span>{INFO_SESGOS[id].nombre}</span>
                     </div>
                   ))}
@@ -557,7 +559,7 @@ export default function SimuladorSesgosInversorPage() {
               </div>
             )}
 
-            <button className={styles.btnReiniciar} onClick={iniciar}>
+            <button type="button" className={styles.btnReiniciar} onClick={iniciar}>
               Repetir simulación
             </button>
           </div>
@@ -598,22 +600,22 @@ export default function SimuladorSesgosInversorPage() {
         <h3>¿A quién afectan más estos sesgos?</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <span className={styles.escenarioIcon}>📱</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">📱</span>
             <h4>Inversor activo en apps</h4>
             <p>Alta frecuencia de operaciones amplifica el exceso de confianza y el efecto de disposición. Cada operación genera costes y oportunidades de error.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <span className={styles.escenarioIcon}>📺</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">📺</span>
             <h4>Seguidor de noticias financieras</h4>
             <p>Los medios amplifican el sesgo de recencia y el efecto manada. La narrativa del momento domina sobre los fundamentos a largo plazo.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <span className={styles.escenarioIcon}>💬</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">💬</span>
             <h4>Inversor por recomendación social</h4>
             <p>El entorno social (amigos, foros, redes) es el principal motor del efecto manada. La presión social deforma la percepción de riesgo.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <span className={styles.escenarioIcon}>🧓</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">🧓</span>
             <h4>Inversor con cartera "heredada"</h4>
             <p>Las carteras que nadie ha revisado en años son el hábitat natural del sesgo de statu quo y del efecto de disposición acumulado.</p>
           </div>
@@ -685,32 +687,32 @@ export default function SimuladorSesgosInversorPage() {
         <h3>Principios para invertir con más racionalidad</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🎯</span>
+            <span className={styles.tipIcon} aria-hidden="true">🎯</span>
             <strong>El precio de compra es irrelevante</strong>
             <p>La única pregunta que importa es: dado el precio de hoy, ¿compraría esto? El pasado no cambia el valor actual.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📊</span>
+            <span className={styles.tipIcon} aria-hidden="true">📊</span>
             <strong>La popularidad no es un argumento</strong>
             <p>Que "todo el mundo" invierta en algo suele ser una señal de que el precio ya incorpora el optimismo. Las mejores oportunidades suelen ser incómodas.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>⏳</span>
+            <span className={styles.tipIcon} aria-hidden="true">⏳</span>
             <strong>El tiempo en el mercado supera al timing</strong>
             <p>Intentar acertar el momento de entrada y salida es estadísticamente perdedor. La permanencia disciplinada supera al market timing en la gran mayoría de casos.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🤖</span>
+            <span className={styles.tipIcon} aria-hidden="true">🤖</span>
             <strong>Automatiza para protegerte de ti mismo</strong>
             <p>Las decisiones automatizadas (aportaciones, rebalanceo) eliminan el componente emocional que genera los peores errores de timing.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📝</span>
+            <span className={styles.tipIcon} aria-hidden="true">📝</span>
             <strong>Lleva un diario de decisiones</strong>
             <p>Registrar las decisiones y sus razonamientos permite aprender de los errores reales, no de los que recuerdas selectivamente.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔄</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔄</span>
             <strong>Revisa, no reacciones</strong>
             <p>Hay diferencia entre revisar la cartera con criterios predefinidos (revisión) y mirar el precio cuando hay noticias y actuar (reacción). La primera es sana; la segunda, peligrosa.</p>
           </div>
@@ -718,7 +720,7 @@ export default function SimuladorSesgosInversorPage() {
 
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores frecuentes que amplifican los sesgos</strong>
           </div>
           <ul className={styles.warningList}>

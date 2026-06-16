@@ -408,12 +408,12 @@ export default function TestToleranciaRiesgoDetallado() {
             <div className={styles.dimensionesGrid}>
               {DIMENSIONES.map((d, i) => (
                 <div key={i} className={styles.dimensionPill}>
-                  <strong>{d.icono} {d.nombre}</strong>
+                  <strong><span aria-hidden="true">{d.icono}</span> {d.nombre}</strong>
                   4 preguntas
                 </div>
               ))}
             </div>
-            <button className={styles.startBtn} onClick={() => { setFase('test'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+            <button type="button" className={styles.startBtn} onClick={() => { setFase('test'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
               Comenzar el test →
             </button>
           </div>
@@ -468,7 +468,7 @@ export default function TestToleranciaRiesgoDetallado() {
 
             <div className={styles.calcularBox}>
               {errorCalc && <p className={styles.errorMsg}>{errorCalc}</p>}
-              <button className={styles.calcularBtn} onClick={calcular}>
+              <button type="button" className={styles.calcularBtn} onClick={calcular}>
                 Ver mi perfil de riesgo →
               </button>
             </div>
@@ -497,7 +497,7 @@ export default function TestToleranciaRiesgoDetallado() {
                 return (
                   <div key={di} className={styles.dimRow}>
                     <div className={styles.dimRowHeader}>
-                      <span className={styles.dimRowLabel}>{dim.icono} {dim.nombre}</span>
+                      <span className={styles.dimRowLabel}><span aria-hidden="true">{dim.icono}</span> {dim.nombre}</span>
                       <span className={styles.dimRowScore}>{nivel} ({suma}/{max})</span>
                     </div>
                     <div className={styles.dimBarTrack}>
@@ -548,7 +548,7 @@ export default function TestToleranciaRiesgoDetallado() {
             </div>
 
             <div style={{ textAlign: 'center' }}>
-              <button className={styles.repetirBtn} onClick={reiniciar}>
+              <button type="button" className={styles.repetirBtn} onClick={reiniciar}>
                 Repetir el test
               </button>
             </div>
