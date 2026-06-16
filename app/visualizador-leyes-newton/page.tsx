@@ -395,7 +395,7 @@ export default function VisualizadorLeyesNewtonPage() {
                 style={{ width: `${vectorWidth}px` }}
                 aria-hidden="true"
               />
-              <div className={styles.vectorObjeto}>📦</div>
+              <div className={styles.vectorObjeto} aria-hidden="true">📦</div>
             </div>
 
             {/* Tabla comparativa */}

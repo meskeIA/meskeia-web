@@ -744,7 +744,7 @@ export default function SangreComponentesPage() {
 
         {/* Cabecera de sección */}
         <div className={styles.seccionHeader}>
-          <h2 className={styles.seccionTitulo}>{seccionInfo.icono} {seccionInfo.titulo}</h2>
+          <h2 className={styles.seccionTitulo}><span aria-hidden="true">{seccionInfo.icono}</span> {seccionInfo.titulo}</h2>
           <p className={styles.seccionSubtitulo}>{seccionInfo.subtitulo}</p>
         </div>
 

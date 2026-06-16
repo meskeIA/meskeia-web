@@ -487,10 +487,10 @@
 | [x] | La Escala del Universo | `/visualizador-escala-universo/` | estudiantes, cultura |
 | [x] | La Fotosíntesis - De la Luz Solar a la Vida | `/visualizador-fotosintesis/` | estudiantes, cultura |
 | [x] | La Historia de la Humanidad en un Reloj | `/visualizador-historia-reloj/` | estudiantes, cultura |
-| [ ] | La Sangre - Componentes, Grupos y Coagulación | `/visualizador-sangre-componentes/` | estudiantes, cultura, salud |
-| [ ] | La Tabla Periódica en tu Vida | `/visualizador-tabla-periodica/` | estudiantes, cultura |
-| [ ] | La Vida de una Estrella | `/visualizador-vida-estrella/` | estudiantes, cultura |
-| [ ] | Las 3 Leyes de Newton | `/visualizador-leyes-newton/` | estudiantes, cultura |
+| [x] | La Sangre - Componentes, Grupos y Coagulación | `/visualizador-sangre-componentes/` | estudiantes, cultura, salud |
+| [x] | La Tabla Periódica en tu Vida | `/visualizador-tabla-periodica/` | estudiantes, cultura |
+| [x] | La Vida de una Estrella | `/visualizador-vida-estrella/` | estudiantes, cultura |
+| [x] | Las 3 Leyes de Newton | `/visualizador-leyes-newton/` | estudiantes, cultura |
 | [ ] | Las Estaciones del Año - 23,5° que lo Cambian Todo | `/visualizador-estaciones-ano/` | estudiantes, cultura |
 | [ ] | Las Fuerzas Invisibles del Día a Día | `/visualizador-fuerzas-invisibles/` | estudiantes, cultura |
 | [ ] | Lógica Proposicional: Tablas de Verdad, Karnaugh y Formas Normales | `/visualizador-logica-proposicional/` | estudiantes, tecnicas |

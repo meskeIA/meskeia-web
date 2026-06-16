@@ -343,6 +343,7 @@ function SeccionBolsillo() {
           type="button"
           className={`${styles.componenteBtn} ${componenteActivo === null ? styles.componenteBtnActivo : ''}`}
           onClick={() => setComponenteActivo(null)}
+          aria-pressed={componenteActivo === null}
         >
           <span aria-hidden="true">📱</span> Todos
         </button>
