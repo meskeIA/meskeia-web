@@ -129,6 +129,7 @@ export default function MotorCombustionPage() {
       <nav className={styles.tabs} aria-label="Secciones">
         {tabs.map(tab => (
           <button key={tab.id}
+            type="button"
             className={`${styles.tab} ${tabActiva === tab.id ? styles.tabActiva : ''}`}
             onClick={() => setTabActiva(tab.id)}
             aria-pressed={tabActiva === tab.id}>
@@ -146,6 +147,7 @@ export default function MotorCombustionPage() {
           <div className={styles.tiemposNav} role="group" aria-label="Seleccionar tiempo del ciclo">
             {TIEMPOS_OTTO.map(t => (
               <button key={t.numero}
+                type="button"
                 className={`${styles.tiempoBtn} ${tiempoActivo === t.numero ? styles.tiempoBtnActivo : ''}`}
                 style={tiempoActivo === t.numero ? { borderColor: t.color, backgroundColor: t.color + '18' } : {}}
                 onClick={() => setTiempoActivo(t.numero)}
@@ -233,7 +235,7 @@ export default function MotorCombustionPage() {
 
           {tiempoActivo === 3 && (
             <div className={styles.warningBox}>
-              <strong>💡 Solo 1 de 4 tiempos es motor:</strong> En un motor de 4 cilindros, cada cilindro
+              <strong><span aria-hidden="true">💡</span> Solo 1 de 4 tiempos es motor:</strong> En un motor de 4 cilindros, cada cilindro
               produce potencia una vez por cada 2 revoluciones del cigüeñal. Los 4 cilindros se escalonan
               para que siempre haya uno en fase de expansión, dando sensación de funcionamiento continuo.
             </div>
@@ -389,8 +391,8 @@ export default function MotorCombustionPage() {
               <thead>
                 <tr>
                   <th>Aspecto</th>
-                  <th>🔧 Combustión</th>
-                  <th>⚡ Eléctrico</th>
+                  <th><span aria-hidden="true">🔧</span> Combustión</th>
+                  <th><span aria-hidden="true">⚡</span> Eléctrico</th>
                 </tr>
               </thead>
               <tbody>
@@ -398,11 +400,11 @@ export default function MotorCombustionPage() {
                   <tr key={item.aspecto} className={styles.filaComp}>
                     <td className={styles.celdaAspecto}>{item.aspecto}</td>
                     <td className={`${styles.celdaValor} ${item.ganador === 'combustion' ? styles.ganador : ''}`}>
-                      {item.ganador === 'combustion' && <span className={styles.ganadorMarca}>✅ </span>}
+                      {item.ganador === 'combustion' && <span className={styles.ganadorMarca} aria-hidden="true">✅ </span>}
                       {item.combustion}
                     </td>
                     <td className={`${styles.celdaValor} ${item.ganador === 'electrico' ? styles.ganador : ''}`}>
-                      {item.ganador === 'electrico' && <span className={styles.ganadorMarca}>✅ </span>}
+                      {item.ganador === 'electrico' && <span className={styles.ganadorMarca} aria-hidden="true">✅ </span>}
                       {item.electrico}
                     </td>
                   </tr>
@@ -412,7 +414,7 @@ export default function MotorCombustionPage() {
           </div>
 
           <div className={styles.infoBox}>
-            <strong>💡 La emisiones totales importan:</strong> Un vehículo eléctrico cargado con electricidad
+            <strong><span aria-hidden="true">💡</span> La emisiones totales importan:</strong> Un vehículo eléctrico cargado con electricidad
             de carbón puede tener más emisiones de CO₂ por km que uno de gasolina moderno. En España (2024,
             mix ~35% renovables), el VE ya es significativamente mejor. A medida que la red se descarboniza,
             la ventaja del eléctrico crece automáticamente sin cambiar el vehículo.

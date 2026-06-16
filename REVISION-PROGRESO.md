@@ -503,10 +503,10 @@
 | [x] | Minerales y Gemas - Escala de Mohs y Piedras Preciosas | `/visualizador-minerales-gemas/` | estudiantes, cultura |
 | [x] | Mitosis y Meiosis - La Danza de los Cromosomas | `/visualizador-mitosis-meiosis/` | estudiantes, cultura |
 | [x] | Modelos Epidemiológicos: SIR, SEIR y Rₜ | `/visualizador-modelos-epidemiologicos/` | estudiantes, salud, cultura |
-| [ ] | Motor de Combustión: Ciclo Otto y Por Qué Desperdicia el 70% | `/visualizador-motor-combustion/` | estudiantes, cultura |
-| [ ] | Motor Eléctrico: Campo Magnético Rotante y Regeneración | `/visualizador-motor-electrico/` | estudiantes, cultura, tecnicas |
-| [ ] | Músculos y Movimiento - Del Sarcómero a la Articulación | `/visualizador-musculos-movimiento/` | estudiantes, cultura, salud |
-| [ ] | Números Complejos: El Plano de Argand | `/visualizador-numeros-complejos/` | estudiantes, tecnicas |
+| [x] | Motor de Combustión: Ciclo Otto y Por Qué Desperdicia el 70% | `/visualizador-motor-combustion/` | estudiantes, cultura |
+| [x] | Motor Eléctrico: Campo Magnético Rotante y Regeneración | `/visualizador-motor-electrico/` | estudiantes, cultura, tecnicas |
+| [x] | Músculos y Movimiento - Del Sarcómero a la Articulación | `/visualizador-musculos-movimiento/` | estudiantes, cultura, salud |
+| [x] | Números Complejos: El Plano de Argand | `/visualizador-numeros-complejos/` | estudiantes, tecnicas |
 | [ ] | Números Primos - De Eratóstenes a la Criptografía | `/visualizador-numeros-primos/` | estudiantes, cultura |
 | [ ] | Océanos y Corrientes - AMOC, Corriente del Golfo y Acidificación | `/visualizador-oceanos-corrientes/` | estudiantes, cultura |
 | [ ] | Oferta, Demanda y por qué Suben los Precios | `/visualizador-oferta-demanda/` | estudiantes, finanzas, cultura |

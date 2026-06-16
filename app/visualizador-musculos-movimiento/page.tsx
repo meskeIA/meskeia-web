@@ -473,6 +473,7 @@ export default function MusculosMovimientoPage() {
             return (
               <button
                 key={tipo.id}
+                type="button"
                 className={`${styles.tipoCard} ${activo ? styles.tipoCardActivo : ''}`}
                 style={{ borderLeftColor: tipo.color }}
                 onClick={() => setTipoActivo(activo ? null : tipo.id)}
@@ -540,6 +541,7 @@ export default function MusculosMovimientoPage() {
             return (
               <button
                 key={paso.num}
+                type="button"
                 className={`${styles.pasoItem} ${activo ? styles.pasoActivo : ''}`}
                 onClick={() => setPasoActivo(activo ? null : paso.num)}
                 aria-expanded={activo}
@@ -584,6 +586,7 @@ export default function MusculosMovimientoPage() {
           {ARTICULACIONES.map((art) => (
             <button
               key={art.id}
+              type="button"
               className={`${styles.artCard} ${artActiva === art.id ? styles.artCardActiva : ''}`}
               onClick={() => setArtActiva(artActiva === art.id ? null : art.id)}
               aria-expanded={artActiva === art.id}
@@ -597,7 +600,7 @@ export default function MusculosMovimientoPage() {
 
         {artSeleccionada && (
           <div className={styles.artDetalle}>
-            <h4 className={styles.artDetalleTitulo}>{artSeleccionada.icono} {artSeleccionada.nombre} ({artSeleccionada.ejemplo})</h4>
+            <h4 className={styles.artDetalleTitulo}><span aria-hidden="true">{artSeleccionada.icono}</span> {artSeleccionada.nombre} ({artSeleccionada.ejemplo})</h4>
             <p className={styles.artDetalleDesc}>{artSeleccionada.descripcion}</p>
             <p className={styles.artDetalleDesc}><strong>Movimiento:</strong> {artSeleccionada.movimiento}</p>
             <p className={styles.artDetalleDato}><span aria-hidden="true">💡</span> {artSeleccionada.dato}</p>
@@ -715,6 +718,7 @@ export default function MusculosMovimientoPage() {
           {SECCIONES.map((s) => (
             <button
               key={s.id}
+              type="button"
               className={`${styles.navBtn} ${seccionActiva === s.id ? styles.navActivo : ''}`}
               onClick={() => setSeccionActiva(s.id)}
               aria-pressed={seccionActiva === s.id}
@@ -727,7 +731,7 @@ export default function MusculosMovimientoPage() {
 
         {/* Header sección */}
         <div className={styles.seccionHeader}>
-          <h2 className={styles.seccionTitulo}>{seccionInfo.icono} {seccionInfo.titulo}</h2>
+          <h2 className={styles.seccionTitulo}><span aria-hidden="true">{seccionInfo.icono}</span> {seccionInfo.titulo}</h2>
           <p className={styles.seccionSubtitulo}>{seccionInfo.subtitulo}</p>
         </div>
 

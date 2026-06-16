@@ -259,7 +259,7 @@ function TabInterior(): React.ReactNode {
 
       <div className={styles.partsGrid}>
         <div className={styles.partCard}>
-          <div className={styles.partIcon} style={{ background: 'linear-gradient(135deg, var(--primary), var(--secondary))' }}>🔵</div>
+          <div className={styles.partIcon} style={{ background: 'linear-gradient(135deg, var(--primary), var(--secondary))' }} aria-hidden="true">🔵</div>
           <h3>Estátor</h3>
           <p>Parte <strong>fija</strong>. Contiene las bobinas de cobre que crean el campo magnético rotante cuando reciben corriente alterna trifásica.</p>
           <ul>
@@ -269,7 +269,7 @@ function TabInterior(): React.ReactNode {
           </ul>
         </div>
         <div className={styles.partCard}>
-          <div className={styles.partIcon} style={{ background: 'linear-gradient(135deg, var(--secondary), #48A9A6)' }}>🔴</div>
+          <div className={styles.partIcon} style={{ background: 'linear-gradient(135deg, var(--secondary), #48A9A6)' }} aria-hidden="true">🔴</div>
           <h3>Rotor</h3>
           <p>Parte <strong>móvil</strong>. En motores síncronos lleva imanes permanentes de neodimio; en asíncronos, barras de aluminio (jaula de ardilla).</p>
           <ul>
@@ -438,9 +438,11 @@ export default function VisualizadorMotorElectrico(): React.ReactNode {
         {TABS.map((tab) => (
           <button
             key={tab.id}
+            type="button"
             className={`${styles.tab} ${tabActiva === tab.id ? styles.tabActive : ''}`}
             onClick={() => setTabActiva(tab.id)}
             aria-current={tabActiva === tab.id ? 'page' : undefined}
+            aria-pressed={tabActiva === tab.id}
           >
             <span aria-hidden="true">{tab.emoji}</span>
             <span>{tab.label}</span>
