@@ -166,16 +166,20 @@ export default function NivelBurbujaPage() {
           {/* Selector de modo */}
           <div className={styles.modeSelector}>
             <button
+              type="button"
               className={`${styles.modeBtn} ${viewMode === 'bubble' ? styles.active : ''}`}
               onClick={() => setViewMode('bubble')}
+              aria-pressed={viewMode === 'bubble'}
             >
-              🫧 Burbuja
+              <span aria-hidden="true">🫧</span> Burbuja
             </button>
             <button
+              type="button"
               className={`${styles.modeBtn} ${viewMode === 'inclinometer' ? styles.active : ''}`}
               onClick={() => setViewMode('inclinometer')}
+              aria-pressed={viewMode === 'inclinometer'}
             >
-              📏 Inclinómetro
+              <span aria-hidden="true">📏</span> Inclinómetro
             </button>
           </div>
 
@@ -336,26 +340,28 @@ export default function NivelBurbujaPage() {
           <div className={styles.controls}>
             {!isActive ? (
               <button
+                type="button"
                 onClick={startMeasuring}
                 className={styles.btnStart}
                 disabled={!isSupported}
               >
-                📐 Iniciar nivel
+                <span aria-hidden="true">📐</span> Iniciar nivel
               </button>
             ) : (
               <>
-                <button onClick={stopMeasuring} className={styles.btnStop}>
-                  ⏹️ Detener
+                <button type="button" onClick={stopMeasuring} className={styles.btnStop}>
+                  <span aria-hidden="true">⏹️</span> Detener
                 </button>
                 <button
+                  type="button"
                   onClick={calibrate}
                   className={`${styles.btnCalibrate} ${isCalibrating ? styles.calibrating : ''}`}
                 >
-                  🎯 Calibrar
+                  <span aria-hidden="true">🎯</span> Calibrar
                 </button>
                 {(calibrationOffset.beta !== 0 || calibrationOffset.gamma !== 0) && (
-                  <button onClick={resetCalibration} className={styles.btnReset}>
-                    🔄 Reset
+                  <button type="button" onClick={resetCalibration} className={styles.btnReset}>
+                    <span aria-hidden="true">🔄</span> Reset
                   </button>
                 )}
               </>
@@ -368,20 +374,26 @@ export default function NivelBurbujaPage() {
               <span className={styles.optionLabel}>Bloquear eje:</span>
               <div className={styles.toggleButtons}>
                 <button
+                  type="button"
                   className={`${styles.toggleBtn} ${lockAxis === 'none' ? styles.active : ''}`}
                   onClick={() => setLockAxis('none')}
+                  aria-pressed={lockAxis === 'none'}
                 >
                   Ninguno
                 </button>
                 <button
+                  type="button"
                   className={`${styles.toggleBtn} ${lockAxis === 'x' ? styles.active : ''}`}
                   onClick={() => setLockAxis('x')}
+                  aria-pressed={lockAxis === 'x'}
                 >
                   Eje X
                 </button>
                 <button
+                  type="button"
                   className={`${styles.toggleBtn} ${lockAxis === 'y' ? styles.active : ''}`}
                   onClick={() => setLockAxis('y')}
+                  aria-pressed={lockAxis === 'y'}
                 >
                   Eje Y
                 </button>

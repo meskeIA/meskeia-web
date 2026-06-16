@@ -774,10 +774,10 @@
 | [x] | Generador de Hashes | `/generador-hashes/` | tecnicas |
 | [x] | Generador de Ondas y Visualizador | `/generador-ondas/` | tecnicas, estudiantes |
 | [x] | Generador de Tonos de Audio | `/generador-tonos/` | tecnicas |
-| [ ] | IDEs con IA 2026: Cursor vs Windsurf vs VS Code vs Zed vs JetBrains | `/comparador-ides-ia/` | tecnicas, productividad |
-| [ ] | Impacto de la IA en los Sectores - Automatización y Empleos | `/visualizador-impacto-ia-sectores/` | tecnicas, cultura, estudiantes |
-| [ ] | Luxómetro / Fotómetro | `/luxometro/` | tecnicas |
-| [ ] | Nivel de Burbuja Digital | `/nivel-burbuja/` | tecnicas |
+| [x] | IDEs con IA 2026: Cursor vs Windsurf vs VS Code vs Zed vs JetBrains | `/comparador-ides-ia/` | tecnicas, productividad |
+| [x] | Impacto de la IA en los Sectores - Automatización y Empleos | `/visualizador-impacto-ia-sectores/` | tecnicas, cultura, estudiantes |
+| [x] | Luxómetro / Fotómetro | `/luxometro/` | tecnicas |
+| [x] | Nivel de Burbuja Digital | `/nivel-burbuja/` | tecnicas |
 | [ ] | Porcentaje del Panadero (Baker's Percentage) | `/calculadora-porcentaje-panadero/` | tecnicas, cultura |
 | [ ] | Prueba de Cámara Web | `/prueba-camara/` | tecnicas |
 | [ ] | Prueba de Micrófono | `/prueba-microfono/` | tecnicas |

@@ -328,6 +328,7 @@ export default function VisualizadorImpactoIASectores() {
           {SECTORES.map((sector) => (
             <button
               key={sector.id}
+              type="button"
               className={`${styles.sectorCard} ${sectorActivo === sector.id ? styles.sectorCardActivo : ''}`}
               onClick={() => handleSectorClick(sector.id)}
               aria-pressed={sectorActivo === sector.id}
@@ -357,7 +358,7 @@ export default function VisualizadorImpactoIASectores() {
               <div className={styles.panelHeader}>
                 <span aria-hidden="true">{sectorSeleccionado.icono}</span>
                 <h3>{sectorSeleccionado.nombre}</h3>
-                <button className={styles.btnCerrar} onClick={() => setSectorActivo(null)} aria-label="Cerrar panel">✕</button>
+                <button type="button" className={styles.btnCerrar} onClick={() => setSectorActivo(null)} aria-label="Cerrar panel">✕</button>
               </div>
 
               <div className={styles.panelGrid}>

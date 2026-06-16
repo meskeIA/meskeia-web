@@ -283,7 +283,7 @@ export default function LuxometroPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>💡</span>
+        <span className={styles.heroIcon} aria-hidden="true">💡</span>
         <h1 className={styles.title}>Luxómetro / Fotómetro</h1>
         <p className={styles.subtitle}>
           Mide la intensidad de luz en lux. Ideal para fotógrafos: obtén recomendaciones de exposición según la iluminación.
@@ -344,32 +344,36 @@ export default function LuxometroPage() {
           {/* Error */}
           {error && (
             <div className={styles.errorMessage}>
-              <span>⚠️</span> {error}
+              <span aria-hidden="true">⚠️</span> {error}
             </div>
           )}
 
           {/* Controles principales */}
           <div className={styles.controls}>
             {!isActive ? (
-              <button onClick={startMeasurement} className={styles.btnPrimary}>
-                <span>▶️</span> Iniciar Medición
+              <button type="button" onClick={startMeasurement} className={styles.btnPrimary}>
+                <span aria-hidden="true">▶️</span> Iniciar Medición
               </button>
             ) : (
               <>
-                <button onClick={stopMeasurement} className={styles.btnSecondary}>
-                  <span>⏹️</span> Detener
+                <button type="button" onClick={stopMeasurement} className={styles.btnSecondary}>
+                  <span aria-hidden="true">⏹️</span> Detener
                 </button>
                 <button
+                  type="button"
                   onClick={() => setShowHistory(!showHistory)}
                   className={`${styles.btnIcon} ${showHistory ? styles.active : ''}`}
                   title="Ver historial"
+                  aria-pressed={showHistory}
                 >
                   📊
                 </button>
                 <button
+                  type="button"
                   onClick={() => setShowCalibration(!showCalibration)}
                   className={`${styles.btnIcon} ${showCalibration ? styles.active : ''}`}
                   title="Calibrar"
+                  aria-pressed={showCalibration}
                 >
                   ⚙️
                 </button>
@@ -400,12 +404,12 @@ export default function LuxometroPage() {
                   placeholder="Valor real en lux"
                   className={styles.calibrationInput}
                 />
-                <button onClick={calibrate} className={styles.btnSmall}>
+                <button type="button" onClick={calibrate} className={styles.btnSmall}>
                   Calibrar
                 </button>
               </div>
               {calibrationFactor !== 1 && (
-                <button onClick={resetCalibration} className={styles.btnSmallDanger}>
+                <button type="button" onClick={resetCalibration} className={styles.btnSmallDanger}>
                   Resetear calibración
                 </button>
               )}
@@ -439,7 +443,7 @@ export default function LuxometroPage() {
         {lux !== null && photoRec && (
           <div className={styles.photoPanel}>
             <h2 className={styles.sectionTitle}>
-              <span>📸</span> Recomendaciones Fotográficas
+              <span aria-hidden="true">📸</span> Recomendaciones Fotográficas
             </h2>
             <div className={styles.recGrid}>
               <div className={styles.recCard}>
@@ -451,12 +455,12 @@ export default function LuxometroPage() {
                 <span className={styles.recValue}>{photoRec.aperture}</span>
               </div>
               <div className={styles.recCard}>
-                <span className={styles.recIcon}>⏱️</span>
+                <span className={styles.recIcon} aria-hidden="true">⏱️</span>
                 <span className={styles.recValue}>{photoRec.speed}</span>
               </div>
             </div>
             <p className={styles.recTip}>
-              💡 {photoRec.tips}
+              <span aria-hidden="true">💡</span> {photoRec.tips}
             </p>
           </div>
         )}
@@ -464,7 +468,7 @@ export default function LuxometroPage() {
         {/* Escala de referencia */}
         <div className={styles.referencePanel}>
           <h2 className={styles.sectionTitle}>
-            <span>📊</span> Escala de Referencia
+            <span aria-hidden="true">📊</span> Escala de Referencia
           </h2>
           <div className={styles.referenceGrid}>
             {LUX_REFERENCES.map((ref, idx) => (

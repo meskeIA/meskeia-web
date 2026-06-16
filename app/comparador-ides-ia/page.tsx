@@ -322,6 +322,7 @@ export default function ComparadorIdesIa() {
           ] as const).map(({ id, label }) => (
             <button
               key={id}
+              type="button"
               role="tab"
               aria-selected={tab === id}
               className={`${styles.tabBtn} ${tab === id ? styles.tabBtnActive : ''}`}
@@ -375,10 +376,10 @@ export default function ComparadorIdesIa() {
                           </div>
                         </td>
                         <td className={styles.td}><span className={styles.basadoLabel}>{ide.basado}</span></td>
-                        <td className={styles.td}>{ide.planGratuito ? <span className={styles.siTag}>✅ Sí</span> : <span className={styles.noTag}>❌ No</span>}</td>
+                        <td className={styles.td}>{ide.planGratuito ? <span className={styles.siTag}><span aria-hidden="true">✅</span> Sí</span> : <span className={styles.noTag}><span aria-hidden="true">❌</span> No</span>}</td>
                         <td className={styles.td}><span className={styles.precioTag} style={{ borderColor: ide.color, color: ide.color }}>{ide.precioDesde}</span></td>
                         <td className={styles.td}>{dispIcon(ide.iaNativa)}</td>
-                        <td className={styles.td}>{dispIcon(ide.agenteAutonomo)} <span className={styles.dispLabel}>{dispLabel(ide.agenteAutonomo)}</span></td>
+                        <td className={styles.td}><span aria-hidden="true">{dispIcon(ide.agenteAutonomo)}</span> <span className={styles.dispLabel}>{dispLabel(ide.agenteAutonomo)}</span></td>
                         <td className={styles.td}>{dispIcon(ide.extensionesVSCode)}</td>
                         <td className={styles.td}>{dispIcon(ide.openSource)}</td>
                       </tr>
@@ -407,7 +408,7 @@ export default function ComparadorIdesIa() {
                                 </div>
                                 <div className={styles.detalleFila}>
                                   <span className={styles.detalleEtiqueta}>Colaboración:</span>
-                                  <span>{dispIcon(ide.colaboracion)} {dispLabel(ide.colaboracion)}</span>
+                                  <span><span aria-hidden="true">{dispIcon(ide.colaboracion)}</span> {dispLabel(ide.colaboracion)}</span>
                                 </div>
                               </div>
                               <div className={styles.mejorParaRow}>
@@ -416,7 +417,7 @@ export default function ComparadorIdesIa() {
                                 ))}
                               </div>
                               <a href={ide.urlPrecios} target="_blank" rel="noopener noreferrer" className={styles.enlaceOficial}>
-                                🔗 Precios oficiales →
+                                <span aria-hidden="true">🔗</span> Precios oficiales →
                               </a>
                             </div>
                           </td>
@@ -473,9 +474,9 @@ export default function ComparadorIdesIa() {
               ))}
             </div>
             <div className={styles.leyendaDisp}>
-              <span>✅ Disponible</span>
-              <span>🟡 Disponible con limitaciones</span>
-              <span>❌ No disponible</span>
+              <span><span aria-hidden="true">✅</span> Disponible</span>
+              <span><span aria-hidden="true">🟡</span> Disponible con limitaciones</span>
+              <span><span aria-hidden="true">❌</span> No disponible</span>
             </div>
           </div>
         )}
@@ -500,13 +501,13 @@ export default function ComparadorIdesIa() {
                       {primera && (
                         <div className={styles.lenguajeOpcion}>
                           <span className={styles.lenguajeOpcionLabel} style={{ background: primera.color }}>1ª opción</span>
-                          <span style={{ color: primera.color, fontWeight: 700 }}>{primera.icono} {primera.nombre}</span>
+                          <span style={{ color: primera.color, fontWeight: 700 }}><span aria-hidden="true">{primera.icono}</span> {primera.nombre}</span>
                         </div>
                       )}
                       {alt && (
                         <div className={styles.lenguajeOpcion}>
                           <span className={styles.lenguajeOpcionLabel} style={{ background: '#888' }}>Alternativa</span>
-                          <span style={{ color: alt.color, fontWeight: 700 }}>{alt.icono} {alt.nombre}</span>
+                          <span style={{ color: alt.color, fontWeight: 700 }}><span aria-hidden="true">{alt.icono}</span> {alt.nombre}</span>
                         </div>
                       )}
                     </div>
@@ -530,6 +531,7 @@ export default function ComparadorIdesIa() {
               {PERFILES.map((p) => (
                 <button
                   key={p.id}
+                  type="button"
                   className={`${styles.perfilCard} ${perfilSeleccionado === p.id ? styles.perfilCardActivo : ''}`}
                   onClick={() => setPerfilSeleccionado(perfilSeleccionado === p.id ? null : p.id)}
                   aria-pressed={perfilSeleccionado === p.id}
@@ -549,12 +551,12 @@ export default function ComparadorIdesIa() {
               const alt = getIde(perfilActivo.alternativa, IDES);
               return (
                 <div className={styles.recomPanel} role="region" aria-label={`Recomendación para ${perfilActivo.nombre}`}>
-                  <h3 className={styles.recomTitulo}>{perfilActivo.icono} Recomendación para {perfilActivo.nombre}</h3>
+                  <h3 className={styles.recomTitulo}><span aria-hidden="true">{perfilActivo.icono}</span> Recomendación para {perfilActivo.nombre}</h3>
                   <div className={styles.recomCards}>
                     {rec && (
                       <div className={styles.recomCard} style={{ borderColor: rec.color }}>
                         <div className={styles.recomBadge} style={{ background: rec.color }}>Primera opción</div>
-                        <span style={{ fontSize: '2rem', color: rec.color }}>{rec.icono}</span>
+                        <span style={{ fontSize: '2rem', color: rec.color }} aria-hidden="true">{rec.icono}</span>
                         <p className={styles.recomNombre}>{rec.nombre}</p>
                         <p className={styles.recomPrecio}>{rec.precioDesde}</p>
                       </div>
@@ -562,7 +564,7 @@ export default function ComparadorIdesIa() {
                     {alt && (
                       <div className={styles.recomCard} style={{ borderColor: '#CCC' }}>
                         <div className={styles.recomBadge} style={{ background: '#888' }}>Alternativa</div>
-                        <span style={{ fontSize: '2rem', color: alt.color }}>{alt.icono}</span>
+                        <span style={{ fontSize: '2rem', color: alt.color }} aria-hidden="true">{alt.icono}</span>
                         <p className={styles.recomNombre}>{alt.nombre}</p>
                         <p className={styles.recomPrecio}>{alt.precioDesde}</p>
                       </div>
@@ -623,19 +625,19 @@ export default function ComparadorIdesIa() {
         </h4>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <strong>🎓 Estudiante</strong>
+            <strong><span aria-hidden="true">🎓</span> Estudiante</strong>
             <p>VS Code gratis + extensión gratuita (Copilot Free o Gemini Code Assist). Los tutoriales online usan VS Code como referencia universal.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🌐 Web developer</strong>
+            <strong><span aria-hidden="true">🌐</span> Web developer</strong>
             <p>Cursor o Windsurf con IA nativa. Para proyectos JS/TS/React/Next.js la IA agentiva es un multiplicador real de productividad.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>☕ Backend JVM</strong>
+            <strong><span aria-hidden="true">☕</span> Backend JVM</strong>
             <p>IntelliJ IDEA Ultimate es indispensable para Java/Kotlin profesional. Sin competencia real en herramientas de refactoring y análisis semántico.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🔓 Open source / privacidad</strong>
+            <strong><span aria-hidden="true">🔓</span> Open source / privacidad</strong>
             <p>Zed (GPL-3.0) o VS Code (MIT). Ambos open source. Zed además permite modelos locales vía Ollama sin enviar código a servidores externos.</p>
           </div>
         </div>
