@@ -278,6 +278,7 @@ export default function VisualizadorNarratologiaPage() {
       <nav className={styles.tabsNav} role="tablist" aria-label="Secciones de narratología">
         {TABS.map((tab) => (
           <button
+            type="button"
             key={tab.id}
             className={`${styles.tabBtn} ${tabActivo === tab.id ? styles.tabBtnActive : ''}`}
             style={tabActivo === tab.id ? { borderBottomColor: TAB_COLORES[tab.id], color: TAB_COLORES[tab.id] } : {}}

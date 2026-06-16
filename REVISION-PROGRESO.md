@@ -298,10 +298,10 @@
 | [x] | Minerales del Mundo | `/minerales-del-mundo/` | cultura |
 | [x] | Movimientos Artísticos: Historia del Arte desde el Románico hasta el Arte Digital | `/visualizador-arte-movimientos/` | cultura |
 | [x] | Movimientos Literarios: Cronología de la Épica Griega al Posmodernismo | `/visualizador-literatura-movimientos/` | cultura |
-| [ ] | Movimientos Musicales: Cronología del Gregoriano a la Música Electrónica | `/visualizador-musica-movimientos/` | cultura |
-| [ ] | Narratología Visual | `/visualizador-narratologia/` | cultura, estudiantes |
-| [ ] | Orientador de Escritura Creativa | `/orientador-escritura-creativa/` | cultura, productividad |
-| [ ] | Osteoporosis — El Ciclo de Remodelado Óseo | `/visualizador-osteoporosis/` | cultura, estudiantes, salud |
+| [x] | Movimientos Musicales: Cronología del Gregoriano a la Música Electrónica | `/visualizador-musica-movimientos/` | cultura |
+| [x] | Narratología Visual | `/visualizador-narratologia/` | cultura, estudiantes |
+| [x] | Orientador de Escritura Creativa | `/orientador-escritura-creativa/` | cultura, productividad |
+| [x] | Osteoporosis — El Ciclo de Remodelado Óseo | `/visualizador-osteoporosis/` | cultura, estudiantes, salud |
 | [x] | Países del Mundo | `/paises-del-mundo/` | cultura, viajes |
 | [ ] | Pirámide de Población: España 1950-2100 | `/visualizador-piramide-poblacion/` | cultura, estudiantes |
 | [ ] | Portugal y el Ultramar: El Primer Imperio Global | `/visualizador-historia/historia-portugal-ultramar/` | cultura |
