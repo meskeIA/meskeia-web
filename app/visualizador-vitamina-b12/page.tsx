@@ -241,7 +241,7 @@ function BloqueCicloMetilacion() {
 
   return (
     <section className={styles.section}>
-      <h2 className={styles.sectionTitle}>🔄 Ciclo de Metilación</h2>
+      <h2 className={styles.sectionTitle}><span aria-hidden="true">🔄</span> Ciclo de Metilación</h2>
       <p className={styles.sectionDesc}>
         La B12 es cofactor esencial para regenerar metionina desde homocisteína.
         Sin B12, el ciclo se interrumpe y la homocisteína se acumula — un marcador de riesgo cardiovascular y cognitivo.
@@ -252,6 +252,7 @@ function BloqueCicloMetilacion() {
         {NODOS_METILACION.map((n) => (
           <button
             key={n.id}
+            type="button"
             className={`${styles.methylNode} ${nodoSeleccionado === n.id ? styles.methylNodeActive : ''}`}
             style={{ borderColor: n.color }}
             onClick={() => setNodoSeleccionado(nodoSeleccionado === n.id ? null : n.id)}
@@ -290,7 +291,7 @@ function BloqueAbsorcion() {
 
   return (
     <section className={styles.section}>
-      <h2 className={styles.sectionTitle}>🏭 Sistema de Absorción Especial</h2>
+      <h2 className={styles.sectionTitle}><span aria-hidden="true">🏭</span> Sistema de Absorción Especial</h2>
       <p className={styles.sectionDesc}>
         La B12 tiene el sistema de absorción más complejo de todas las vitaminas.
         Requiere ácido gástrico, Factor Intrínseco y un receptor intestinal específico.
@@ -301,6 +302,7 @@ function BloqueAbsorcion() {
         {PASOS_ABSORCION.map((paso) => (
           <button
             key={paso.id}
+            type="button"
             className={`${styles.absorptionStep} ${pasoActivo === paso.id ? styles.absorptionStepActive : ''}`}
             onClick={() => setPasoActivo(pasoActivo === paso.id ? null : paso.id)}
             aria-pressed={pasoActivo === paso.id}
@@ -352,7 +354,7 @@ function BloqueGruposRiesgo() {
 
   return (
     <section className={styles.section}>
-      <h2 className={styles.sectionTitle}>⚠️ Grupos de Riesgo</h2>
+      <h2 className={styles.sectionTitle}><span aria-hidden="true">⚠️</span> Grupos de Riesgo</h2>
       <p className={styles.sectionDesc}>
         Cinco situaciones donde la absorción o el aporte de B12 están comprometidos.
         Haz clic en cada tarjeta para ver el detalle clínico.
@@ -366,6 +368,7 @@ function BloqueGruposRiesgo() {
             style={{ borderTopColor: colorSeveridad(grupo.severidad) }}
           >
             <button
+              type="button"
               className={styles.riskCardHeader}
               onClick={() => setExpandido(expandido === grupo.id ? null : grupo.id)}
               aria-expanded={expandido === grupo.id}
@@ -409,7 +412,7 @@ function BloqueSintomas() {
 
   return (
     <section className={styles.section}>
-      <h2 className={styles.sectionTitle}>🩺 Síntomas por Nivel de Deficiencia</h2>
+      <h2 className={styles.sectionTitle}><span aria-hidden="true">🩺</span> Síntomas por Nivel de Deficiencia</h2>
       <p className={styles.sectionDesc}>
         La deficiencia de B12 avanza en dos tracks paralelos: hematológico y neurológico.
         Lo más importante: los síntomas neurológicos pueden aparecer <strong>sin anemia previa</strong>.
@@ -417,18 +420,20 @@ function BloqueSintomas() {
 
       <div className={styles.trackSelector}>
         <button
+          type="button"
           className={`${styles.trackBtn} ${trackActivo === 'hematologico' ? styles.trackBtnActive : ''}`}
           onClick={() => setTrackActivo('hematologico')}
           aria-pressed={trackActivo === 'hematologico'}
         >
-          🔴 Track Hematológico
+          <span aria-hidden="true">🔴</span> Track Hematológico
         </button>
         <button
+          type="button"
           className={`${styles.trackBtn} ${trackActivo === 'neurologico' ? styles.trackBtnActive : ''}`}
           onClick={() => setTrackActivo('neurologico')}
           aria-pressed={trackActivo === 'neurologico'}
         >
-          🧠 Track Neurológico
+          <span aria-hidden="true">🧠</span> Track Neurológico
         </button>
       </div>
 
@@ -447,7 +452,7 @@ function BloqueSintomas() {
       )}
 
       <div className={`${styles.warningBox}`} role="alert">
-        <strong>⚠️ Reversibilidad:</strong> Los síntomas hematológicos mejoran rápidamente con tratamiento.
+        <strong><span aria-hidden="true">⚠️</span> Reversibilidad:</strong> Los síntomas hematológicos mejoran rápidamente con tratamiento.
         Los daños neurológicos pueden ser <strong>permanentes</strong> si la deficiencia persiste más de 6-12 meses
         antes del diagnóstico. El diagnóstico precoz es fundamental.
       </div>
@@ -466,7 +471,7 @@ export default function VisualizadorVitaminaB12Page() {
 
       <header className={styles.hero}>
         <div className={styles.heroContent}>
-          <span className={styles.heroBadge}>🔴 Vitamina B12</span>
+          <span className={styles.heroBadge}><span aria-hidden="true">🔴</span> Vitamina B12</span>
           <h1 className={styles.heroTitle}>Vitamina B12: El Nutriente con Absorción Especial</h1>
           <p className={styles.heroSubtitle}>
             Ciclo de metilación, factor intrínseco y por qué veganos y mayores de 50 son los más vulnerables

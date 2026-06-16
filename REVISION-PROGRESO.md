@@ -1080,8 +1080,8 @@
 | [x] | Testosterona - La Hormona del Rendimiento | `/visualizador-testosterona/` | salud, cultura, estudiantes |
 | [x] | Tiroides - La Glándula que Regula tu Metabolismo | `/visualizador-tiroides/` | salud, cultura, estudiantes |
 | [x] | Tu Cuerpo en Números | `/visualizador-cuerpo-numeros/` | salud, cultura, estudiantes |
-| [ ] | Vitamina B12: Ciclo de Metilación y Factor Intrínseco | `/visualizador-vitamina-b12/` | salud, cultura, estudiantes |
-| [ ] | Vitamina D: La Vitamina que Actúa como Hormona | `/visualizador-vitamina-d/` | salud, cultura, estudiantes |
+| [x] | Vitamina B12: Ciclo de Metilación y Factor Intrínseco | `/visualizador-vitamina-b12/` | salud, cultura, estudiantes |
+| [x] | Vitamina D: La Vitamina que Actúa como Hormona | `/visualizador-vitamina-d/` | salud, cultura, estudiantes |
 | [x] | Vitaminas y Minerales | `/vitaminas-minerales/` | salud, cultura |
 
 ## Viajes y Turismo (`viajes`) — 10 apps
