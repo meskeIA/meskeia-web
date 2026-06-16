@@ -353,11 +353,11 @@
 | [x] | Editor EXIF | `/editor-exif/` | diseno, tecnicas |
 | [x] | Generador de Avatares | `/generador-avatares/` | diseno |
 | [x] | Generador de Carruseles | `/generador-carruseles/` | diseno |
-| [ ] | Generador de Códigos de Barras | `/generador-codigos-barras/` | diseno, productividad |
-| [ ] | Generador de Códigos QR | `/generador-qr/` | diseno, productividad |
-| [ ] | Generador de Enlaces UTM | `/generador-utm/` | diseno |
+| [x] | Generador de Códigos de Barras | `/generador-codigos-barras/` | diseno, productividad |
+| [x] | Generador de Códigos QR | `/generador-qr/` | diseno, productividad |
+| [x] | Generador de Enlaces UTM | `/generador-utm/` | diseno |
 | [x] | Generador de Gradientes | `/generador-gradientes/` | diseno |
-| [ ] | Generador de Hashtags | `/generador-hashtags/` | diseno |
+| [x] | Generador de Hashtags | `/generador-hashtags/` | diseno |
 | [ ] | Generador de Iconos PWA | `/generador-iconos/` | diseno |
 | [ ] | Generador de Meta Descripciones | `/generador-meta-descripciones/` | diseno |
 | [ ] | Generador de Nombres | `/generador-nombres-empresa/` | diseno, freelance |

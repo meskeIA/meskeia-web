@@ -162,15 +162,17 @@ export default function GeneradorHashtagsPage() {
         <div className={styles.selectorPanel}>
           {/* Selector de plataforma */}
           <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>📱 Plataforma</h3>
+            <h3 className={styles.sectionTitle}><span aria-hidden="true">📱</span> Plataforma</h3>
             <div className={styles.platformGrid}>
               {PLATAFORMAS.map(p => (
                 <button
                   key={p.id}
+                  type="button"
                   onClick={() => setPlataforma(p.id)}
                   className={`${styles.platformBtn} ${plataforma === p.id ? styles.active : ''}`}
+                  aria-pressed={plataforma === p.id}
                 >
-                  <span className={styles.platformIcon}>{p.icono}</span>
+                  <span className={styles.platformIcon} aria-hidden="true">{p.icono}</span>
                   <span className={styles.platformName}>{p.nombre}</span>
                   <span className={styles.platformTip}>{p.recomendado} hashtags</span>
                 </button>
@@ -180,13 +182,15 @@ export default function GeneradorHashtagsPage() {
 
           {/* Selector de nicho */}
           <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>🎯 Nicho / Temática</h3>
+            <h3 className={styles.sectionTitle}><span aria-hidden="true">🎯</span> Nicho / Temática</h3>
             <div className={styles.nichoGrid}>
               {Object.keys(HASHTAGS_POR_NICHO).map(nicho => (
                 <button
                   key={nicho}
+                  type="button"
                   onClick={() => setNichoSeleccionado(nicho)}
                   className={`${styles.nichoBtn} ${nichoSeleccionado === nicho ? styles.active : ''}`}
+                  aria-pressed={nichoSeleccionado === nicho}
                 >
                   {nicho.charAt(0).toUpperCase() + nicho.slice(1)}
                 </button>
@@ -196,7 +200,7 @@ export default function GeneradorHashtagsPage() {
 
           {/* Hashtag personalizado */}
           <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>✏️ Añadir personalizado</h3>
+            <h3 className={styles.sectionTitle}><span aria-hidden="true">✏️</span> Añadir personalizado</h3>
             <div className={styles.customInput}>
               <input
                 type="text"
@@ -206,7 +210,7 @@ export default function GeneradorHashtagsPage() {
                 className={styles.input}
                 onKeyDown={(e) => e.key === 'Enter' && añadirPersonalizado()}
               />
-              <button onClick={añadirPersonalizado} className={styles.addBtn}>
+              <button type="button" onClick={añadirPersonalizado} className={styles.addBtn}>
                 Añadir
               </button>
             </div>
@@ -219,9 +223,10 @@ export default function GeneradorHashtagsPage() {
             {categorias.map(cat => (
               <div key={cat.nombre} className={styles.categoryBlock}>
                 <div className={styles.categoryHeader}>
-                  <span className={styles.categoryIcon}>{cat.icono}</span>
+                  <span className={styles.categoryIcon} aria-hidden="true">{cat.icono}</span>
                   <span className={styles.categoryName}>{cat.nombre}</span>
                   <button
+                    type="button"
                     onClick={() => seleccionarCategoria(cat.hashtags)}
                     className={styles.selectAllBtn}
                   >
@@ -232,8 +237,10 @@ export default function GeneradorHashtagsPage() {
                   {cat.hashtags.map(h => (
                     <button
                       key={h}
+                      type="button"
                       onClick={() => toggleHashtag(h)}
                       className={`${styles.hashtagBtn} ${hashtagsSeleccionados.has(h) ? styles.selected : ''}`}
+                      aria-pressed={hashtagsSeleccionados.has(h)}
                     >
                       #{h}
                     </button>
@@ -248,10 +255,10 @@ export default function GeneradorHashtagsPage() {
         <div className={styles.resultPanel}>
           <div className={styles.resultHeader}>
             <h3 className={styles.resultTitle}>
-              📋 Tu selección ({hashtagsSeleccionados.size})
+              <span aria-hidden="true">📋</span> Tu selección ({hashtagsSeleccionados.size})
             </h3>
             {hashtagsSeleccionados.size > 0 && (
-              <button onClick={limpiarSeleccion} className={styles.clearBtn}>
+              <button type="button" onClick={limpiarSeleccion} className={styles.clearBtn}>
                 Limpiar
               </button>
             )}
@@ -276,21 +283,21 @@ export default function GeneradorHashtagsPage() {
               </div>
 
               <div className={styles.resultActions}>
-                <button onClick={copiarHashtags} className={styles.copyBtn}>
-                  {copiado ? '✅ ¡Copiados!' : '📋 Copiar todos'}
+                <button type="button" onClick={copiarHashtags} className={styles.copyBtn}>
+                  {copiado ? <><span aria-hidden="true">✅</span> ¡Copiados!</> : <><span aria-hidden="true">📋</span> Copiar todos</>}
                 </button>
               </div>
 
               {plataformaActual && hashtagsSeleccionados.size > parseInt(plataformaActual.recomendado.split('-')[1]) && (
                 <div className={styles.warning}>
-                  ⚠️ Para {plataformaActual.nombre} se recomiendan {plataformaActual.recomendado} hashtags.
+                  <span aria-hidden="true">⚠️</span> Para {plataformaActual.nombre} se recomiendan {plataformaActual.recomendado} hashtags.
                   Tienes {hashtagsSeleccionados.size}.
                 </div>
               )}
             </>
           ) : (
             <div className={styles.emptyState}>
-              <span className={styles.emptyIcon}>👆</span>
+              <span className={styles.emptyIcon} aria-hidden="true">👆</span>
               <p>Selecciona hashtags haciendo clic sobre ellos</p>
             </div>
           )}
@@ -299,7 +306,7 @@ export default function GeneradorHashtagsPage() {
 
       {/* Contenido educativo */}
       <EducationalSection
-        title="📚 Guía de Hashtags para Redes Sociales"
+        title="Guía de Hashtags para Redes Sociales"
         subtitle="Estrategia por plataforma, casos de uso y errores a evitar"
         defaultOpen={false}
       >
@@ -326,32 +333,32 @@ export default function GeneradorHashtagsPage() {
           <h2>Estrategias reales por tipo de cuenta</h2>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🍕</span><h3>Restaurante local</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">🍕</span><h3>Restaurante local</h3></div>
               <p className={styles.escenarioExample}>Mezcla hashtags geolocalizados (#RestaurantesMadrid, #ComidaMadrid), de nicho (#PizzaArtesanal, #CocinaItaliana) y de descubrimiento (#FoodieSpain). Evita hashtags genéricos como #food (2B+ publicaciones = invisible).</p>
               <span className={styles.escenarioTip}>Geolocalización + nicho = audiencia local cualificada</span>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>💄</span><h3>Influencer de belleza</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">💄</span><h3>Influencer de belleza</h3></div>
               <p className={styles.escenarioExample}>Combina: 3 hashtags de marca propia (#[TuNombre]Beauty), 5 de nicho (#MaquillajeNatural, #SkincareEspaña), 4 de tendencia (#GRWM, #MakeupTutorial) y 2 de comunidad (#BeautyBloggerES). Rota semanalmente.</p>
               <span className={styles.escenarioTip}>Rotación semanal evita penalización por spam</span>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🏋️</span><h3>Entrenador personal</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">🏋️</span><h3>Entrenador personal</h3></div>
               <p className={styles.escenarioExample}>Hashtags de servicio (#EntrenadorPersonalMadrid), de contenido (#EjerciciosEnCasa, #RutinaFuerza), de comunidad (#FitnessEspaña, #VidaSaludable) y trending de fitness. LinkedIn: #Fitness #Entrenamiento #BienestarLaboral.</p>
               <span className={styles.escenarioTip}>Servicio + ubicación + contenido = captación local</span>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>💻</span><h3>Freelance / Desarrollador</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">💻</span><h3>Freelance / Desarrollador</h3></div>
               <p className={styles.escenarioExample}>LinkedIn es la plataforma clave: #DesarrolloWeb, #JavaScript, #ReactJS, #Freelance, #TechSpain. Twitter/X: hashtags de comunidad (#100DaysOfCode, #DevTwitter). Instagram: menos relevante para B2B tech.</p>
               <span className={styles.escenarioTip}>LinkedIn + Twitter = las plataformas para tech</span>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🎨</span><h3>Artista / Ilustrador</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">🎨</span><h3>Artista / Ilustrador</h3></div>
               <p className={styles.escenarioExample}>Instagram es el escaparate clave. Mezcla: #IlustraciónEspañola, #ArteDigital, #IllustrationArt (inglés para alcance global), #ArtistOnInstagram, #DrawingOfTheDay. Pinterest: keywords de búsqueda visuales (#IlustracionDigital).</p>
               <span className={styles.escenarioTip}>Incluye hashtags en inglés para alcance global</span>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🏠</span><h3>Agencia inmobiliaria</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">🏠</span><h3>Agencia inmobiliaria</h3></div>
               <p className={styles.escenarioExample}>Geolocalización es esencial: #InmobiliariaBarcelona, #PisosEnVenta[Ciudad], #AlquilerMadrid. Contenido: #TipsInmobiliarios, #ComprarPiso, #InversionInmobiliaria. LinkedIn: #MercadoInmobiliario, #PropTech.</p>
               <span className={styles.escenarioTip}>Sin geolocalización, el inmobiliario no funciona</span>
             </div>
@@ -388,18 +395,18 @@ export default function GeneradorHashtagsPage() {
         <div className={styles.eduTips}>
           <h2>Trucos para hashtags más efectivos</h2>
           <div className={styles.tipsGrid}>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>🎯</span><strong>Relevancia &gt; volumen</strong><p>Un hashtag de nicho con 50K publicaciones donde puedes aparecer en &quot;recientes&quot; es más valioso que uno con 50M donde te pierdes en segundos.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>📍</span><strong>Geolocaliza siempre si eres local</strong><p>Para negocios locales (restaurantes, clínicas, tiendas), los hashtags geolocalizados (#[Servicio][Ciudad]) atraen audiencia que puede convertirse en cliente real.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>🔄</span><strong>Rota tus grupos</strong><p>Guarda 3–5 grupos de hashtags en notas. Alterna entre ellos en cada publicación. Evita usar exactamente los mismos hashtags en todos los posts.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>📊</span><strong>Mide siempre</strong><p>Activa los insights de cada post a las 48h. Si los hashtags aportan menos del 10% de las impresiones, necesitas cambiar de estrategia.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>🌍</span><strong>Mezcla idiomas según objetivo</strong><p>Español para audiencia local, inglés para alcance global. En nichos como tecnología, moda o arte, los hashtags en inglés tienen comunidades mucho más grandes.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>🏷️</span><strong>Crea tu hashtag de marca</strong><p>Desde el primer post, usa un hashtag propio único (#MiMarca o #MiCampaña). Facilita encontrar UGC, agrupar contenido y construir comunidad propia.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">🎯</span><strong>Relevancia &gt; volumen</strong><p>Un hashtag de nicho con 50K publicaciones donde puedes aparecer en &quot;recientes&quot; es más valioso que uno con 50M donde te pierdes en segundos.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">📍</span><strong>Geolocaliza siempre si eres local</strong><p>Para negocios locales (restaurantes, clínicas, tiendas), los hashtags geolocalizados (#[Servicio][Ciudad]) atraen audiencia que puede convertirse en cliente real.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">🔄</span><strong>Rota tus grupos</strong><p>Guarda 3–5 grupos de hashtags en notas. Alterna entre ellos en cada publicación. Evita usar exactamente los mismos hashtags en todos los posts.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">📊</span><strong>Mide siempre</strong><p>Activa los insights de cada post a las 48h. Si los hashtags aportan menos del 10% de las impresiones, necesitas cambiar de estrategia.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">🌍</span><strong>Mezcla idiomas según objetivo</strong><p>Español para audiencia local, inglés para alcance global. En nichos como tecnología, moda o arte, los hashtags en inglés tienen comunidades mucho más grandes.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">🏷️</span><strong>Crea tu hashtag de marca</strong><p>Desde el primer post, usa un hashtag propio único (#MiMarca o #MiCampaña). Facilita encontrar UGC, agrupar contenido y construir comunidad propia.</p></div>
           </div>
         </div>
 
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores que reducen el alcance de tus hashtags</strong>
           </div>
           <ul className={styles.warningList}>

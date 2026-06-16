@@ -484,22 +484,28 @@ export default function GeneradorQRPage() {
           {/* Tabs de navegación */}
           <div className={styles.tabs}>
             <button
+              type="button"
               className={`${styles.tab} ${tabActiva === 'contenido' ? styles.tabActiva : ''}`}
               onClick={() => setTabActiva('contenido')}
+              aria-pressed={tabActiva === 'contenido'}
             >
-              📝 Contenido
+              <span aria-hidden="true">📝</span> Contenido
             </button>
             <button
+              type="button"
               className={`${styles.tab} ${tabActiva === 'estilo' ? styles.tabActiva : ''}`}
               onClick={() => setTabActiva('estilo')}
+              aria-pressed={tabActiva === 'estilo'}
             >
-              🎨 Estilo
+              <span aria-hidden="true">🎨</span> Estilo
             </button>
             <button
+              type="button"
               className={`${styles.tab} ${tabActiva === 'logo' ? styles.tabActiva : ''}`}
               onClick={() => setTabActiva('logo')}
+              aria-pressed={tabActiva === 'logo'}
             >
-              🖼️ Logo
+              <span aria-hidden="true">🖼️</span> Logo
             </button>
           </div>
 
@@ -511,10 +517,12 @@ export default function GeneradorQRPage() {
                 {tiposQR.map((tipo) => (
                   <button
                     key={tipo.id}
+                    type="button"
                     className={`${styles.tipoBtn} ${tipoQR === tipo.id ? styles.tipoBtnActivo : ''}`}
                     onClick={() => setTipoQR(tipo.id as TipoQR)}
+                    aria-pressed={tipoQR === tipo.id}
                   >
-                    <span className={styles.tipoEmoji}>{tipo.emoji}</span>
+                    <span className={styles.tipoEmoji} aria-hidden="true">{tipo.emoji}</span>
                     <span className={styles.tipoNombre}>{tipo.nombre}</span>
                   </button>
                 ))}
@@ -774,8 +782,10 @@ export default function GeneradorQRPage() {
                   {estilosPuntos.map((estilo) => (
                     <button
                       key={estilo.id}
+                      type="button"
                       className={`${styles.estiloBtn} ${configEstilo.formaPuntos === estilo.id ? styles.estiloBtnActivo : ''}`}
                       onClick={() => setConfigEstilo({ ...configEstilo, formaPuntos: estilo.id })}
+                      aria-pressed={configEstilo.formaPuntos === estilo.id}
                     >
                       {estilo.nombre}
                     </button>
@@ -790,8 +800,10 @@ export default function GeneradorQRPage() {
                   {estilosEsquinas.map((estilo) => (
                     <button
                       key={estilo.id}
+                      type="button"
                       className={`${styles.estiloBtn} ${configEstilo.formaEsquinas === estilo.id ? styles.estiloBtnActivo : ''}`}
                       onClick={() => setConfigEstilo({ ...configEstilo, formaEsquinas: estilo.id })}
+                      aria-pressed={configEstilo.formaEsquinas === estilo.id}
                     >
                       {estilo.nombre}
                     </button>
@@ -903,14 +915,14 @@ export default function GeneradorQRPage() {
 
                 {!logoUrl ? (
                   <label htmlFor="logoInput" className={styles.uploadLabel}>
-                    <span className={styles.uploadIcon}>📤</span>
+                    <span className={styles.uploadIcon} aria-hidden="true">📤</span>
                     <span>Seleccionar imagen</span>
                     <span className={styles.uploadHint}>PNG, JPG, SVG o WebP (máx. 2MB)</span>
                   </label>
                 ) : (
                   <div className={styles.logoPreview}>
                     <img src={logoUrl} alt="Logo" className={styles.logoImg} />
-                    <button onClick={eliminarLogo} className={styles.btnEliminarLogo}>
+                    <button type="button" onClick={eliminarLogo} className={styles.btnEliminarLogo}>
                       ✕ Eliminar
                     </button>
                   </div>
@@ -998,24 +1010,24 @@ export default function GeneradorQRPage() {
               <div className={styles.descargaSection}>
                 <h3 className={styles.sectionTitleSmall}>Descargar como</h3>
                 <div className={styles.botonesDescarga}>
-                  <button onClick={() => descargarQR('png')} className={styles.btnDescarga}>
-                    📥 PNG
+                  <button type="button" onClick={() => descargarQR('png')} className={styles.btnDescarga}>
+                    <span aria-hidden="true">📥</span> PNG
                   </button>
-                  <button onClick={() => descargarQR('svg')} className={styles.btnDescarga}>
-                    📐 SVG
+                  <button type="button" onClick={() => descargarQR('svg')} className={styles.btnDescarga}>
+                    <span aria-hidden="true">📐</span> SVG
                   </button>
-                  <button onClick={() => descargarQR('jpeg')} className={styles.btnDescarga}>
-                    🖼️ JPEG
+                  <button type="button" onClick={() => descargarQR('jpeg')} className={styles.btnDescarga}>
+                    <span aria-hidden="true">🖼️</span> JPEG
                   </button>
-                  <button onClick={() => descargarQR('pdf')} className={styles.btnDescarga}>
-                    📄 PDF
+                  <button type="button" onClick={() => descargarQR('pdf')} className={styles.btnDescarga}>
+                    <span aria-hidden="true">📄</span> PDF
                   </button>
                 </div>
               </div>
 
               {/* Copiar */}
-              <button onClick={copiarQR} className={styles.btnCopiar}>
-                {copiado ? '✅ Copiado al portapapeles' : '📋 Copiar imagen'}
+              <button type="button" onClick={copiarQR} className={styles.btnCopiar}>
+                <span aria-hidden="true">{copiado ? '✅' : '📋'}</span> {copiado ? 'Copiado al portapapeles' : 'Copiar imagen'}
               </button>
             </>
           )}
@@ -1033,9 +1045,11 @@ export default function GeneradorQRPage() {
               </p>
             </div>
             <button
+              type="button"
               onClick={() => setHtmlExpanded(!htmlExpanded)}
               className={styles.btnToggleCode}
               aria-label={htmlExpanded ? 'Ocultar código' : 'Mostrar código'}
+              aria-pressed={htmlExpanded}
             >
               {htmlExpanded ? '▼ Ocultar código' : '▶ Ver código HTML'}
             </button>
@@ -1046,8 +1060,8 @@ export default function GeneradorQRPage() {
               <pre className={styles.codeBlock}>
                 <code>{htmlCode}</code>
               </pre>
-              <button onClick={copiarCodigoHTML} className={styles.btnCopyCode}>
-                {copiado ? '✅ Copiado' : '📋 Copiar código'}
+              <button type="button" onClick={copiarCodigoHTML} className={styles.btnCopyCode}>
+                <span aria-hidden="true">{copiado ? '✅' : '📋'}</span> {copiado ? 'Copiado' : 'Copiar código'}
               </button>
             </div>
           )}

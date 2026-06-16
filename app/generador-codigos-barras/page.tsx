@@ -381,8 +381,10 @@ export default function GeneradorCodigosBarrasPage() {
             {tiposCodigo.map((tipo) => (
               <button
                 key={tipo.id}
+                type="button"
                 className={`${styles.tipoBtn} ${config.tipo === tipo.id ? styles.tipoBtnActivo : ''}`}
                 onClick={() => setConfig({ ...config, tipo: tipo.id as TipoCodigoBarras, valor: '' })}
+                aria-pressed={config.tipo === tipo.id}
               >
                 <span className={styles.tipoNombre}>{tipo.nombre}</span>
                 <span className={styles.tipoDesc}>{tipo.desc}</span>
@@ -410,6 +412,7 @@ export default function GeneradorCodigosBarrasPage() {
             </div>
 
             <button
+              type="button"
               className={styles.btnEjemplo}
               onClick={() => setConfig({ ...config, valor: tipoActual?.ejemplo || '' })}
             >
@@ -484,17 +487,17 @@ export default function GeneradorCodigosBarrasPage() {
 
           {codigoGenerado && (
             <div className={styles.acciones}>
-              <button onClick={descargarPNG} className={styles.btnPrimario}>
-                📥 Descargar PNG
+              <button type="button" onClick={descargarPNG} className={styles.btnPrimario}>
+                <span aria-hidden="true">📥</span> Descargar PNG
               </button>
-              <button onClick={copiarAlPortapapeles} className={styles.btnSecundario}>
-                {copiado ? '✅ Copiado' : '📋 Copiar'}
+              <button type="button" onClick={copiarAlPortapapeles} className={styles.btnSecundario}>
+                {copiado ? <><span aria-hidden="true">✅</span> Copiado</> : <><span aria-hidden="true">📋</span> Copiar</>}
               </button>
             </div>
           )}
 
           <div className={styles.infoCard}>
-            <h4>💡 Información del formato {config.tipo}</h4>
+            <h4><span aria-hidden="true">💡</span> Información del formato {config.tipo}</h4>
             <ul>
               {config.tipo === 'EAN13' && (
                 <>
@@ -544,21 +547,21 @@ export default function GeneradorCodigosBarrasPage() {
         <h3>Tipos de códigos de barras</h3>
         <div className={styles.infoGrid}>
           <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>🛒</span>
+            <span className={styles.infoIcon} aria-hidden="true">🛒</span>
             <div>
               <strong>EAN/UPC</strong>
               <p>Para productos de consumo en tiendas y supermercados</p>
             </div>
           </div>
           <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>📦</span>
+            <span className={styles.infoIcon} aria-hidden="true">📦</span>
             <div>
               <strong>Code128/39</strong>
               <p>Logística, inventario y etiquetado industrial</p>
             </div>
           </div>
           <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>🏭</span>
+            <span className={styles.infoIcon} aria-hidden="true">🏭</span>
             <div>
               <strong>ITF-14</strong>
               <p>Cajas de envío y agrupación de productos</p>

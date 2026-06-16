@@ -306,10 +306,10 @@ export default function GeneradorUTMPage() {
           </div>
 
           <div className={styles.actions}>
-            <button onClick={generateUrl} className={styles.btnPrimary}>
+            <button type="button" onClick={generateUrl} className={styles.btnPrimary}>
               Generar Enlace UTM
             </button>
-            <button onClick={handleClear} className={styles.btnSecondary}>
+            <button type="button" onClick={handleClear} className={styles.btnSecondary}>
               Limpiar
             </button>
           </div>
@@ -326,10 +326,10 @@ export default function GeneradorUTMPage() {
               </div>
 
               <div className={styles.resultActions}>
-                <button onClick={handleCopy} className={styles.btnPrimary}>
+                <button type="button" onClick={handleCopy} className={styles.btnPrimary}>
                   {copied ? '✓ Copiado' : 'Copiar enlace'}
                 </button>
-                <button onClick={saveLink} className={styles.btnSecondary}>
+                <button type="button" onClick={saveLink} className={styles.btnSecondary}>
                   Guardar en historial
                 </button>
               </div>
@@ -366,7 +366,7 @@ export default function GeneradorUTMPage() {
             </>
           ) : (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>🔗</span>
+              <span className={styles.placeholderIcon} aria-hidden="true">🔗</span>
               <p>Completa los campos y genera tu enlace UTM</p>
             </div>
           )}
@@ -387,12 +387,14 @@ export default function GeneradorUTMPage() {
                 <code className={styles.historyUrl}>{link.fullUrl}</code>
                 <div className={styles.historyActions}>
                   <button
+                    type="button"
                     onClick={() => navigator.clipboard.writeText(link.fullUrl)}
                     className={styles.historyBtn}
                   >
                     Copiar
                   </button>
                   <button
+                    type="button"
                     onClick={() => deleteLink(link.id)}
                     className={styles.historyBtnDelete}
                   >
@@ -474,7 +476,7 @@ export default function GeneradorUTMPage() {
 
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoEmoji}>📢</span>
+                <span className={styles.casoEmoji} aria-hidden="true">📢</span>
                 <div>
                   <h3>Ana — Campaña de Google Ads</h3>
                   <span className={styles.casoTag}>Marketing de pago</span>
@@ -489,7 +491,7 @@ export default function GeneradorUTMPage() {
 
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoEmoji}>📧</span>
+                <span className={styles.casoEmoji} aria-hidden="true">📧</span>
                 <div>
                   <h3>Carlos — A/B en email marketing</h3>
                   <span className={styles.casoTag}>Email / Newsletter</span>
@@ -505,7 +507,7 @@ export default function GeneradorUTMPage() {
 
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoEmoji}>📱</span>
+                <span className={styles.casoEmoji} aria-hidden="true">📱</span>
                 <div>
                   <h3>Laura — Instagram multiformat</h3>
                   <span className={styles.casoTag}>Redes sociales</span>
@@ -521,7 +523,7 @@ export default function GeneradorUTMPage() {
 
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoEmoji}>🛒</span>
+                <span className={styles.casoEmoji} aria-hidden="true">🛒</span>
                 <div>
                   <h3>Pedro — Black Friday multicanal</h3>
                   <span className={styles.casoTag}>E-commerce</span>
@@ -743,7 +745,7 @@ export default function GeneradorUTMPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📊</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📊</span>
                 <h3>Responsable de marketing — ROI de email</h3>
               </div>
               <p>Mide el retorno de cada campaña de email marketing comparando aperturas, clics y conversiones por campaña desde GA4.</p>
@@ -755,7 +757,7 @@ export default function GeneradorUTMPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📱</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📱</span>
                 <h3>Community manager — Rendimiento por red social</h3>
               </div>
               <p>Compara el tráfico orgánico de Instagram, TikTok y LinkedIn con el mismo utm_campaign para ver qué red convierte mejor.</p>
@@ -767,7 +769,7 @@ export default function GeneradorUTMPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🔗</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔗</span>
                 <h3>Afiliado — Rastreo de conversiones por fuente</h3>
               </div>
               <p>Un afiliado que promociona el mismo producto en varias webs y foros usa utm_source distinto en cada enlace para saber qué fuente genera más comisiones.</p>
@@ -779,7 +781,7 @@ export default function GeneradorUTMPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏢</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏢</span>
                 <h3>Agencia digital — Reporting a cliente</h3>
               </div>
               <p>La agencia usa utm_campaign con el nombre del cliente y utm_content para diferenciar creatividades. El cliente ve en GA4 exactamente qué campaña generó cada resultado.</p>
@@ -918,37 +920,37 @@ export default function GeneradorUTMPage() {
           <div className={styles.tipsGrid}>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔡</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔡</span>
               <h4>Siempre en minúsculas y sin espacios</h4>
               <p>Usa guiones (<code>-</code>) o guiones bajos (<code>_</code>) para separar palabras. Los espacios se codifican como <code>%20</code> y ensucian las URLs y los informes.</p>
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📖</span>
+              <span className={styles.tipIcon} aria-hidden="true">📖</span>
               <h4>Crea una guía de nomenclatura para el equipo</h4>
               <p>Un documento con los valores permitidos de source y medium evita que cada persona use convenciones distintas, lo que fragmente los datos de GA4.</p>
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🚫</span>
+              <span className={styles.tipIcon} aria-hidden="true">🚫</span>
               <h4>Nunca uses UTM en links internos</h4>
               <p>Los UTMs en la navegación interna de tu web contaminan los datos de sesión y sobreescriben el origen real del usuario, falsificando tus informes de adquisición.</p>
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✂️</span>
+              <span className={styles.tipIcon} aria-hidden="true">✂️</span>
               <h4>Acorta las URLs largas para redes sociales</h4>
               <p>Una URL con 5 parámetros UTM puede superar los 200 caracteres. Usa bit.ly o short.io para compartir un enlace limpio que preserve el tracking interno.</p>
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧪</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧪</span>
               <h4>Usa utm_content para tests A/B de creatividades</h4>
               <p>Cuando pruebas dos versiones del mismo anuncio o posición del CTA, utm_content te permite comparar cuál convierte mejor sin crear campañas separadas.</p>
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <h4>Documenta todas las campañas en una hoja compartida</h4>
               <p>Mantén un registro con URL, canal, fecha de lanzamiento y resultado esperado. Imprescindible cuando varias personas del equipo crean enlaces UTM.</p>
             </div>
@@ -959,7 +961,7 @@ export default function GeneradorUTMPage() {
         {/* ====== SECCIÓN V2.0 — WARNING BOX ====== */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <h3>Errores frecuentes que arruinan tus datos en GA4</h3>
           </div>
           <ul className={styles.warningList}>
