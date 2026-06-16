@@ -289,10 +289,12 @@ export default function GeneradorSchemaMarkupPage() {
             {schemaTypes.map((type) => (
               <button
                 key={type.id}
+                type="button"
                 className={`${styles.schemaTypeBtn} ${schemaType === type.id ? styles.active : ''}`}
                 onClick={() => setSchemaType(type.id as SchemaType)}
+                aria-pressed={schemaType === type.id}
               >
-                <span className={styles.schemaIcon}>{type.icon}</span>
+                <span className={styles.schemaIcon} aria-hidden="true">{type.icon}</span>
                 <span className={styles.schemaName}>{type.name}</span>
                 <span className={styles.schemaDesc}>{type.desc}</span>
               </button>
@@ -301,7 +303,7 @@ export default function GeneradorSchemaMarkupPage() {
 
           <div className={styles.formSection}>
             <h3 className={styles.sectionTitle}>
-              {schemaTypes.find(t => t.id === schemaType)?.icon} Datos de {schemaTypes.find(t => t.id === schemaType)?.name}
+              <span aria-hidden="true">{schemaTypes.find(t => t.id === schemaType)?.icon}</span> Datos de {schemaTypes.find(t => t.id === schemaType)?.name}
             </h3>
 
             {/* Article Form */}
@@ -507,6 +509,7 @@ export default function GeneradorSchemaMarkupPage() {
                       <span>Pregunta {index + 1}</span>
                       {faqItems.length > 1 && (
                         <button
+                          type="button"
                           className={styles.removeBtn}
                           onClick={() => removeFaqItem(index)}
                         >
@@ -528,7 +531,7 @@ export default function GeneradorSchemaMarkupPage() {
                     />
                   </div>
                 ))}
-                <button className={styles.addFaqBtn} onClick={addFaqItem}>
+                <button type="button" className={styles.addFaqBtn} onClick={addFaqItem}>
                   + Añadir otra pregunta
                 </button>
               </div>
@@ -753,6 +756,7 @@ export default function GeneradorSchemaMarkupPage() {
           <div className={styles.codePanelHeader}>
             <h2 className={styles.panelTitle}>Código JSON-LD</h2>
             <button
+              type="button"
               className={`${styles.copyBtn} ${copied ? styles.copied : ''}`}
               onClick={copyToClipboard}
             >
@@ -794,17 +798,17 @@ export default function GeneradorSchemaMarkupPage() {
             </p>
             <div className={styles.benefitsGrid}>
               <div className={styles.benefitCard}>
-                <span className={styles.benefitIcon}>⭐</span>
+                <span className={styles.benefitIcon} aria-hidden="true">⭐</span>
                 <h4>Rich Snippets</h4>
                 <p>Estrellas, precios, disponibilidad directamente en Google</p>
               </div>
               <div className={styles.benefitCard}>
-                <span className={styles.benefitIcon}>📈</span>
+                <span className={styles.benefitIcon} aria-hidden="true">📈</span>
                 <h4>Mayor CTR</h4>
                 <p>Los resultados enriquecidos destacan más y reciben más clics</p>
               </div>
               <div className={styles.benefitCard}>
-                <span className={styles.benefitIcon}>🔍</span>
+                <span className={styles.benefitIcon} aria-hidden="true">🔍</span>
                 <h4>Mejor SEO</h4>
                 <p>Google entiende mejor tu contenido y lo posiciona mejor</p>
               </div>

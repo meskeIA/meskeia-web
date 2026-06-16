@@ -125,7 +125,7 @@ text-align: ${textAlign};`;
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🔤 Generador de Tipografías</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🔤</span> Generador de Tipografías</h1>
         <p className={styles.subtitle}>
           Explora y compara fuentes de Google Fonts
         </p>
@@ -143,8 +143,10 @@ text-align: ${textAlign};`;
             {CATEGORIES.map(cat => (
               <button
                 key={cat}
+                type="button"
                 className={`${styles.categoryBtn} ${category === cat ? styles.categoryActive : ''}`}
                 onClick={() => setCategory(cat)}
+                aria-pressed={category === cat}
               >
                 {cat === 'all' ? 'Todas' : cat}
               </button>
@@ -155,6 +157,7 @@ text-align: ${textAlign};`;
             {filteredFonts.map(font => (
               <button
                 key={font.name}
+                type="button"
                 className={`${styles.fontItem} ${selectedFont.name === font.name ? styles.fontActive : ''}`}
                 onClick={() => {
                   setSelectedFont(font);
@@ -162,6 +165,7 @@ text-align: ${textAlign};`;
                     setFontWeight(font.weights[Math.floor(font.weights.length / 2)]);
                   }
                 }}
+                aria-pressed={selectedFont.name === font.name}
               >
                 <span className={styles.fontName}>{font.name}</span>
                 <span className={styles.fontMeta}>
@@ -202,32 +206,42 @@ text-align: ${textAlign};`;
           <div className={styles.sampleSection}>
             <div className={styles.sampleTabs}>
               <button
+                type="button"
                 className={`${styles.sampleBtn} ${sampleType === 'pangram' ? styles.sampleActive : ''}`}
                 onClick={() => setSampleType('pangram')}
+                aria-pressed={sampleType === 'pangram'}
               >
                 Pangrama
               </button>
               <button
+                type="button"
                 className={`${styles.sampleBtn} ${sampleType === 'alphabet' ? styles.sampleActive : ''}`}
                 onClick={() => setSampleType('alphabet')}
+                aria-pressed={sampleType === 'alphabet'}
               >
                 Alfabeto
               </button>
               <button
+                type="button"
                 className={`${styles.sampleBtn} ${sampleType === 'numbers' ? styles.sampleActive : ''}`}
                 onClick={() => setSampleType('numbers')}
+                aria-pressed={sampleType === 'numbers'}
               >
                 Números
               </button>
               <button
+                type="button"
                 className={`${styles.sampleBtn} ${sampleType === 'lorem' ? styles.sampleActive : ''}`}
                 onClick={() => setSampleType('lorem')}
+                aria-pressed={sampleType === 'lorem'}
               >
                 Lorem
               </button>
               <button
+                type="button"
                 className={`${styles.sampleBtn} ${sampleType === 'custom' ? styles.sampleActive : ''}`}
                 onClick={() => setSampleType('custom')}
+                aria-pressed={sampleType === 'custom'}
               >
                 Personalizado
               </button>
@@ -247,8 +261,8 @@ text-align: ${textAlign};`;
           <div className={styles.codeSection}>
             <div className={styles.codeHeader}>
               <span>Código CSS</span>
-              <button onClick={copyCode} className={styles.copyBtn}>
-                {copied ? '✓ Copiado' : '📋 Copiar'}
+              <button type="button" onClick={copyCode} className={styles.copyBtn}>
+                {copied ? '✓ Copiado' : <><span aria-hidden="true">📋</span> Copiar</>}
               </button>
             </div>
             <pre className={styles.codeBlock}>
@@ -269,8 +283,10 @@ text-align: ${textAlign};`;
               {selectedFont.weights.map(w => (
                 <button
                   key={w}
+                  type="button"
                   className={`${styles.weightBtn} ${fontWeight === w ? styles.weightActive : ''}`}
                   onClick={() => setFontWeight(w)}
+                  aria-pressed={fontWeight === w}
                 >
                   {w}
                 </button>
@@ -293,8 +309,10 @@ text-align: ${textAlign};`;
               {[16, 24, 32, 48, 64].map(s => (
                 <button
                   key={s}
+                  type="button"
                   className={`${styles.sizeBtn} ${fontSize === s ? styles.sizeActive : ''}`}
                   onClick={() => setFontSize(s)}
+                  aria-pressed={fontSize === s}
                 >
                   {s}
                 </button>
@@ -337,8 +355,11 @@ text-align: ${textAlign};`;
               {(['left', 'center', 'right', 'justify'] as const).map(align => (
                 <button
                   key={align}
+                  type="button"
                   className={`${styles.alignBtn} ${textAlign === align ? styles.alignActive : ''}`}
                   onClick={() => setTextAlign(align)}
+                  aria-pressed={textAlign === align}
+                  aria-label={align === 'left' ? 'Alinear a la izquierda' : align === 'center' ? 'Centrar' : align === 'right' ? 'Alinear a la derecha' : 'Justificar'}
                 >
                   {align === 'left' ? '⬅️' : align === 'center' ? '↔️' : align === 'right' ? '➡️' : '⬌'}
                 </button>
@@ -399,7 +420,7 @@ text-align: ${textAlign};`;
         icon="🅰️"
       >
         <section>
-          <h3>📊 Clasificación Tipográfica: Las 5 Grandes Familias</h3>
+          <h3><span aria-hidden="true">📊</span> Clasificación Tipográfica: Las 5 Grandes Familias</h3>
           <div className={styles.eduTablaWrapper}>
             <table className={styles.eduTabla}>
               <thead>
@@ -453,25 +474,25 @@ text-align: ${textAlign};`;
         </section>
 
         <section>
-          <h3>🎯 Aplicaciones Profesionales de la Tipografía</h3>
+          <h3><span aria-hidden="true">🎯</span> Aplicaciones Profesionales de la Tipografía</h3>
           <div className={styles.eduEscenariosGrid}>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>🌐</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">🌐</span>
               <h4>Diseño Web y Apps</h4>
               <p>En pantallas, las sans-serif dominan por su legibilidad en resoluciones variables. La combinación estándar es: una sans-serif para cuerpo (Inter, Roboto, Open Sans) y una display o serif para títulos. El tamaño mínimo legible en cuerpo es 16px; en móvil nunca bajar de 14px. El interlineado óptimo (line-height) es 1,5-1,6× el tamaño de fuente.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>🏢</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">🏢</span>
               <h4>Identidad Corporativa y Branding</h4>
               <p>La tipografía comunica la personalidad de una marca antes de que el usuario lea una sola palabra. Marcas tecnológicas usan sans-serif geométricas (Apple: San Francisco, Google: Product Sans). Bancos y seguros prefieren serif (Times, Garamond) para transmitir solidez. El fast food usa display robustas (Impact) para urgencia y apetito. Elegir mal la tipografía corporativa puede contradecir todos los demás valores de marca.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>📄</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">📄</span>
               <h4>Documentos y Presentaciones</h4>
               <p>En PowerPoint/Keynote, la regla es: no más de 2 fuentes, máximo 3 tamaños distintos. Para presentaciones proyectadas, mínimo 24pt para cuerpo (la regla de Guy Kawasaki: tamaño de fuente = edad del oyente más mayor dividida entre 2). Para documentos impresos profesionales, Georgia o Palatino para el cuerpo y una sans-serif para los títulos funciona muy bien.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>♿</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">♿</span>
               <h4>Accesibilidad y Legibilidad Universal</h4>
               <p>Las fuentes diseñadas para accesibilidad (Atkinson Hyperlegible, Lexie Readable, OpenDyslexic) reducen la confusión entre caracteres similares (I/l/1, 0/O, b/d). Las WCAG 2.1 recomiendan al menos 4,5:1 de contraste entre texto y fondo. Las fuentes monoline sin rasgos decorativos excesivos benefician a lectores con dislexia o visión reducida. El tamaño importa más que la familia: 16px legible &gt; 12px con una fuente &quot;perfecta&quot;.</p>
             </div>
@@ -479,7 +500,7 @@ text-align: ${textAlign};`;
         </section>
 
         <section>
-          <h3>❓ Preguntas Frecuentes sobre Tipografía</h3>
+          <h3><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Tipografía</h3>
           <div className={styles.eduFaqList}>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqPregunta}>¿Cuántas fuentes debo usar en un diseño?</summary>
@@ -517,7 +538,7 @@ text-align: ${textAlign};`;
         </section>
 
         <section>
-          <h3>📋 Cómo Elegir Tipografías para un Proyecto: Guía en 6 Pasos</h3>
+          <h3><span aria-hidden="true">📋</span> Cómo Elegir Tipografías para un Proyecto: Guía en 6 Pasos</h3>
           <ol className={styles.eduPasosList}>
             <li className={styles.eduPaso}>
               <span className={styles.eduPasoNum}>1</span>
@@ -565,35 +586,35 @@ text-align: ${textAlign};`;
         </section>
 
         <section>
-          <h3>💡 Principios Tipográficos que Todo Diseñador Debería Conocer</h3>
+          <h3><span aria-hidden="true">💡</span> Principios Tipográficos que Todo Diseñador Debería Conocer</h3>
           <div className={styles.eduTipsGrid}>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>📏</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">📏</span>
               <h4>Interlineado: 1,5× el tamaño</h4>
               <p>El line-height óptimo para legibilidad en cuerpo de texto es 1,4-1,6 veces el tamaño de fuente. Para 16px de cuerpo: 24-26px de interlineado. Menos → las líneas se solapan visualmente. Más → se pierde la cohesión del párrafo.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>📐</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">📐</span>
               <h4>Longitud de línea: 65-75 caracteres</h4>
               <p>La longitud ideal de una línea de texto es 65-75 caracteres (incluyendo espacios). Más largo → el ojo se cansa de volver al inicio. Más corto → demasiados saltos de línea. En CSS: max-width de 60-70ch para columnas de texto.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>🎨</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">🎨</span>
               <h4>Contraste mínimo 4,5:1 (WCAG AA)</h4>
               <p>El estándar de accesibilidad web WCAG 2.1 requiere 4,5:1 de contraste entre texto y fondo para AA, y 7:1 para AAA. Texto negro (#000) sobre blanco (#fff) = 21:1. Gris medio (#767676) sobre blanco = 4,54:1, exactamente en el límite. Usa la herramienta de contraste de WebAIM para verificar.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>🔡</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">🔡</span>
               <h4>Mayúsculas: añade tracking positivo</h4>
               <p>El texto en mayúsculas es más difícil de leer sin espacio adicional entre letras. Cuando uses uppercase en CSS, añade siempre letter-spacing: 0.05-0.1em. Las mayúsculas sin tracking parecen apretadas y difíciles de leer, especialmente en etiquetas pequeñas y botones.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>🚫</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">🚫</span>
               <h4>Evita itálica en sans-serif a cuerpo pequeño</h4>
               <p>Las itálicas de fuentes sans-serif (especialmente las &quot;oblique&quot;, que son solo versiones inclinadas matemáticamente) pierden legibilidad en tamaños pequeños. Si necesitas énfasis en cuerpo pequeño, usa bold en lugar de itálica, o una fuente con itálica verdadera (calligraphic italic) bien diseñada.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>⚖️</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">⚖️</span>
               <h4>Display font: solo para textos cortos</h4>
               <p>Las fuentes decorativas y display son poderosas en títulos grandes pero ilegibles en cuerpo. Regla de oro: si usas una display font, que sea solo para 1-5 palabras en tamaño grande. Nunca uses una fuente decorativa para párrafos completos, formularios o botones con texto largo.</p>
             </div>
@@ -602,7 +623,7 @@ text-align: ${textAlign};`;
 
         <section>
           <div className={styles.warningBox}>
-            <span className={styles.warningIcono}>⚠️</span>
+            <span className={styles.warningIcono} aria-hidden="true">⚠️</span>
             <div>
               <strong>Errores comunes al trabajar con tipografías</strong>
               <ul>

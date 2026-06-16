@@ -362,10 +362,10 @@
 | [x] | Generador de Meta Descripciones | `/generador-meta-descripciones/` | diseno |
 | [x] | Generador de Nombres | `/generador-nombres-empresa/` | diseno, freelance |
 | [x] | Generador de Palabras Clave | `/generador-palabras-clave/` | diseno |
-| [ ] | Generador de Schema Markup | `/generador-schema-markup/` | diseno |
-| [ ] | Generador de Sombras | `/generador-sombras/` | diseno |
-| [ ] | Generador de Tipografías | `/generador-tipografias/` | diseno |
-| [ ] | Generador Imágenes OG | `/generador-og-images/` | diseno |
+| [x] | Generador de Schema Markup | `/generador-schema-markup/` | diseno |
+| [x] | Generador de Sombras | `/generador-sombras/` | diseno |
+| [x] | Generador de Tipografías | `/generador-tipografias/` | diseno |
+| [x] | Generador Imágenes OG | `/generador-og-images/` | diseno |
 | [ ] | Generador Lorem Ipsum | `/generador-lorem-ipsum/` | diseno |
 | [x] | Playground SQL | `/playground-sql/` | diseno, estudiantes |
 | [ ] | Recortador de Audio | `/recortador-audio/` | diseno, productividad |

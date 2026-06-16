@@ -632,8 +632,10 @@ export default function GeneradorOGImagesPage() {
             ].map(tab => (
               <button
                 key={tab.id}
+                type="button"
                 className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
                 onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                aria-pressed={activeTab === tab.id}
               >
                 {tab.label}
               </button>
@@ -648,10 +650,11 @@ export default function GeneradorOGImagesPage() {
                 {TEMPLATES.map(template => (
                   <button
                     key={template.type}
+                    type="button"
                     className={styles.templateCard}
                     onClick={() => applyTemplate(template)}
                   >
-                    <span className={styles.templateIcon}>{template.icon}</span>
+                    <span className={styles.templateIcon} aria-hidden="true">{template.icon}</span>
                     <span className={styles.templateName}>{template.name}</span>
                   </button>
                 ))}
@@ -666,10 +669,13 @@ export default function GeneradorOGImagesPage() {
                   {['color', 'gradient', 'image'].map(type => (
                     <button
                       key={type}
+                      type="button"
                       className={`${styles.bgTypeBtn} ${design.background.type === type ? styles.bgTypeBtnActive : ''}`}
                       onClick={() => updateBackground({ type: type as BackgroundType })}
+                      aria-pressed={design.background.type === type}
                     >
-                      {type === 'color' ? '🎨 Color' : type === 'gradient' ? '🌈 Gradiente' : '🖼️ Imagen'}
+                      <span aria-hidden="true">{type === 'color' ? '🎨' : type === 'gradient' ? '🌈' : '🖼️'}</span>
+                      {' '}{type === 'color' ? 'Color' : type === 'gradient' ? 'Gradiente' : 'Imagen'}
                     </button>
                   ))}
                 </div>
@@ -691,10 +697,12 @@ export default function GeneradorOGImagesPage() {
                     {GRADIENTS.map(g => (
                       <button
                         key={g.name}
+                        type="button"
                         className={`${styles.gradientSwatch} ${design.background.gradientName === g.name ? styles.gradientSwatchActive : ''}`}
                         style={{ background: g.css }}
                         onClick={() => updateBackground({ gradientName: g.name })}
                         title={g.name}
+                        aria-pressed={design.background.gradientName === g.name}
                       />
                     ))}
                   </div>
@@ -703,10 +711,11 @@ export default function GeneradorOGImagesPage() {
                 {design.background.type === 'image' && (
                   <>
                     <button
+                      type="button"
                       className={styles.uploadBtn}
                       onClick={() => fileInputRef.current?.click()}
                     >
-                      📷 Subir imagen
+                      <span aria-hidden="true">📷</span>{' '}Subir imagen
                     </button>
                     <input
                       ref={fileInputRef}
@@ -987,6 +996,7 @@ export default function GeneradorOGImagesPage() {
                       {['NUEVO', 'HOT 🔥', 'GRATIS', '-50%', 'PRO', 'BETA', 'TOP', 'VIP'].map(preset => (
                         <button
                           key={preset}
+                          type="button"
                           className={styles.badgePreset}
                           onClick={() => updateBadge({ text: preset })}
                         >
@@ -1039,8 +1049,10 @@ export default function GeneradorOGImagesPage() {
                       {POPULAR_EMOJIS.map(emoji => (
                         <button
                           key={emoji}
+                          type="button"
                           className={`${styles.emojiBtn} ${design.icon.emoji === emoji ? styles.emojiBtnActive : ''}`}
                           onClick={() => updateIcon({ emoji })}
+                          aria-pressed={design.icon.emoji === emoji}
                         >
                           {emoji}
                         </button>
@@ -1084,10 +1096,11 @@ export default function GeneradorOGImagesPage() {
                 {!design.logo.imageUrl ? (
                   <>
                     <button
+                      type="button"
                       className={styles.uploadBtn}
                       onClick={() => logoInputRef.current?.click()}
                     >
-                      🖼️ Subir logo
+                      <span aria-hidden="true">🖼️</span>{' '}Subir logo
                     </button>
                     <input
                       ref={logoInputRef}
@@ -1102,6 +1115,7 @@ export default function GeneradorOGImagesPage() {
                     <div className={styles.logoPreview}>
                       <img src={design.logo.imageUrl} alt="Logo preview" />
                       <button
+                        type="button"
                         className={styles.removeLogoBtn}
                         onClick={removeLogo}
                         title="Eliminar logo"
@@ -1151,10 +1165,11 @@ export default function GeneradorOGImagesPage() {
                         </div>
 
                         <button
+                          type="button"
                           className={styles.changeLogoBtn}
                           onClick={() => logoInputRef.current?.click()}
                         >
-                          📷 Cambiar logo
+                          <span aria-hidden="true">📷</span>{' '}Cambiar logo
                         </button>
                         <input
                           ref={logoInputRef}
@@ -1172,8 +1187,8 @@ export default function GeneradorOGImagesPage() {
           </div>
 
           {/* Botón exportar */}
-          <button className={styles.exportBtn} onClick={exportImage}>
-            💾 Descargar imagen (1200×630)
+          <button type="button" className={styles.exportBtn} onClick={exportImage}>
+            <span aria-hidden="true">💾</span>{' '}Descargar imagen (1200×630)
           </button>
         </div>
 
@@ -1194,12 +1209,12 @@ export default function GeneradorOGImagesPage() {
 
           <div className={styles.previewInfo}>
             <div className={styles.sizeInfo}>
-              <span>📐 1200 × 630 px</span>
+              <span><span aria-hidden="true">📐</span> 1200 × 630 px</span>
               <span className={styles.separator}>•</span>
               <span>Ratio 1.91:1</span>
             </div>
             <div className={styles.platformsInfo}>
-              ✅ Facebook • ✅ Twitter • ✅ LinkedIn • ✅ WhatsApp
+              <span aria-hidden="true">✅</span> Facebook • <span aria-hidden="true">✅</span> Twitter • <span aria-hidden="true">✅</span> LinkedIn • <span aria-hidden="true">✅</span> WhatsApp
             </div>
           </div>
         </div>
@@ -1225,28 +1240,28 @@ export default function GeneradorOGImagesPage() {
             <h3>Tamaños recomendados</h3>
             <div className={styles.sizesGrid}>
               <div className={styles.sizeCard}>
-                <h4>📘 Facebook</h4>
+                <h4><span aria-hidden="true">📘</span> Facebook</h4>
                 <p><strong>1200 × 630 px</strong></p>
                 <p>Ratio 1.91:1</p>
               </div>
               <div className={styles.sizeCard}>
-                <h4>🐦 Twitter</h4>
+                <h4><span aria-hidden="true">🐦</span> Twitter</h4>
                 <p><strong>1200 × 628 px</strong></p>
                 <p>Ratio 1.91:1</p>
               </div>
               <div className={styles.sizeCard}>
-                <h4>💼 LinkedIn</h4>
+                <h4><span aria-hidden="true">💼</span> LinkedIn</h4>
                 <p><strong>1200 × 627 px</strong></p>
                 <p>Ratio 1.91:1</p>
               </div>
               <div className={styles.sizeCard}>
-                <h4>💬 WhatsApp</h4>
+                <h4><span aria-hidden="true">💬</span> WhatsApp</h4>
                 <p><strong>1200 × 630 px</strong></p>
                 <p>Ratio 1.91:1</p>
               </div>
             </div>
             <p className={styles.note}>
-              💡 <strong>1200 × 630 px</strong> es el tamaño universal que funciona en todas las plataformas.
+              <span aria-hidden="true">💡</span> <strong>1200 × 630 px</strong> es el tamaño universal que funciona en todas las plataformas.
             </p>
           </section>
 
@@ -1269,12 +1284,12 @@ export default function GeneradorOGImagesPage() {
           <section className={styles.eduSection}>
             <h3>Consejos de diseño</h3>
             <ul className={styles.tipsList}>
-              <li>✅ Usa texto grande y legible (mínimo 60px para el título)</li>
-              <li>✅ Alto contraste entre texto y fondo</li>
-              <li>✅ Incluye tu logo o branding</li>
-              <li>✅ Deja márgenes de seguridad (algunas plataformas recortan los bordes)</li>
-              <li>✅ Evita texto muy cerca de los bordes</li>
-              <li>⚠️ No dependas solo de texto pequeño (puede no verse bien en móvil)</li>
+              <li><span aria-hidden="true">✅</span> Usa texto grande y legible (mínimo 60px para el título)</li>
+              <li><span aria-hidden="true">✅</span> Alto contraste entre texto y fondo</li>
+              <li><span aria-hidden="true">✅</span> Incluye tu logo o branding</li>
+              <li><span aria-hidden="true">✅</span> Deja márgenes de seguridad (algunas plataformas recortan los bordes)</li>
+              <li><span aria-hidden="true">✅</span> Evita texto muy cerca de los bordes</li>
+              <li><span aria-hidden="true">⚠️</span> No dependas solo de texto pequeño (puede no verse bien en móvil)</li>
             </ul>
           </section>
 
@@ -1362,7 +1377,7 @@ export default function GeneradorOGImagesPage() {
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>📰</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">📰</span>
                   <h4>Blog / medio digital</h4>
                 </div>
                 <p className={styles.escenarioExample}>Cada artículo lleva una OG image personalizada con el titular del post y la imagen destacada, maximizando el CTR en redes sociales.</p>
@@ -1370,7 +1385,7 @@ export default function GeneradorOGImagesPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🛍️</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🛍️</span>
                   <h4>E-commerce</h4>
                 </div>
                 <p className={styles.escenarioExample}>Las fichas de producto se comparten con imagen optimizada que muestra el artículo, nombre y precio, incentivando la compra directa desde el preview.</p>
@@ -1378,7 +1393,7 @@ export default function GeneradorOGImagesPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🚀</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🚀</span>
                   <h4>SaaS / Startup</h4>
                 </div>
                 <p className={styles.escenarioExample}>Las landing pages refuerzan la identidad de marca al compartirse, con logo, propuesta de valor y colores corporativos bien visibles.</p>
@@ -1386,7 +1401,7 @@ export default function GeneradorOGImagesPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>📢</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">📢</span>
                   <h4>Agencia de marketing</h4>
                 </div>
                 <p className={styles.escenarioExample}>Las agencias crean plantillas personalizadas para cada cliente, con branding consistente en todas las campañas y canales.</p>
@@ -1496,32 +1511,32 @@ export default function GeneradorOGImagesPage() {
             <h3>Mejores prácticas de diseño</h3>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📐</span>
+                <span className={styles.tipIcon} aria-hidden="true">📐</span>
                 <h4>Tamaño estándar universal</h4>
                 <p>Usa siempre <strong>1200 × 630 px</strong> como base. Es el único tamaño que funciona correctamente en todas las plataformas principales sin ajustes adicionales.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>⚖️</span>
+                <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
                 <h4>Peso máximo del archivo</h4>
                 <p>Mantén el archivo por debajo de <strong>1 MB</strong> (idealmente menos de 300 KB). Archivos pesados ralentizan la carga del preview y pueden ser rechazados por algunas plataformas.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🔤</span>
+                <span className={styles.tipIcon} aria-hidden="true">🔤</span>
                 <h4>Texto grande y legible</h4>
                 <p>El título debe tener <strong>mínimo 40 px</strong> de tamaño. Recuerda que el preview en móvil es pequeño: lo que parece legible en pantalla grande puede ser ilegible en el feed.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🏷️</span>
+                <span className={styles.tipIcon} aria-hidden="true">🏷️</span>
                 <h4>Logo en esquina</h4>
                 <p>Incluye siempre el logo en una esquina visible (preferiblemente superior izquierda o inferior derecha). Refuerza el reconocimiento de marca incluso cuando el usuario no hace clic.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🎨</span>
+                <span className={styles.tipIcon} aria-hidden="true">🎨</span>
                 <h4>Contraste suficiente</h4>
                 <p>Asegúrate de que el fondo y el texto tengan un ratio de contraste mínimo de 4.5:1. Fondos oscuros con texto blanco o fondos claros con texto oscuro son las combinaciones más seguras.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🔗</span>
+                <span className={styles.tipIcon} aria-hidden="true">🔗</span>
                 <h4>Misma imagen para og:image y twitter:image</h4>
                 <p>Salvo que uses formatos distintos (cuadrado para Twitter), reutiliza la misma imagen 1200 × 630 px en ambas meta tags para simplificar el mantenimiento.</p>
               </div>
@@ -1532,7 +1547,7 @@ export default function GeneradorOGImagesPage() {
           <section className={styles.eduSection}>
             <div className={styles.warningBox}>
               <div className={styles.warningHeader}>
-                <span className={styles.warningIcon}>⚠️</span>
+                <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
                 <h4>Errores comunes que debes evitar</h4>
               </div>
               <ul className={styles.warningList}>

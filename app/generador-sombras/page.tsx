@@ -194,7 +194,7 @@ export default function GeneradorSombrasPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🌓 Generador de Sombras CSS</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🌓</span> Generador de Sombras CSS</h1>
         <p className={styles.subtitle}>
           Crea box-shadow y text-shadow con editor visual
         </p>
@@ -248,6 +248,7 @@ export default function GeneradorSombrasPage() {
             <div className={styles.codeHeader}>
               <span>CSS</span>
               <button
+                type="button"
                 onClick={copyToClipboard}
                 className={`${styles.copyBtn} ${copied ? styles.copied : ''}`}
               >
@@ -266,6 +267,7 @@ export default function GeneradorSombrasPage() {
               {PRESETS.filter(p => p.type === shadowType).map((preset) => (
                 <button
                   key={preset.name}
+                  type="button"
                   className={styles.presetBtn}
                   onClick={() => applyPreset(preset)}
                 >
@@ -285,16 +287,20 @@ export default function GeneradorSombrasPage() {
             <label className={styles.label}>Tipo de Sombra</label>
             <div className={styles.typeTabs}>
               <button
+                type="button"
                 className={`${styles.typeBtn} ${shadowType === 'box' ? styles.typeActive : ''}`}
                 onClick={() => setShadowType('box')}
+                aria-pressed={shadowType === 'box'}
               >
-                📦 Box Shadow
+                <span aria-hidden="true">📦</span> Box Shadow
               </button>
               <button
+                type="button"
                 className={`${styles.typeBtn} ${shadowType === 'text' ? styles.typeActive : ''}`}
                 onClick={() => setShadowType('text')}
+                aria-pressed={shadowType === 'text'}
               >
-                ✏️ Text Shadow
+                <span aria-hidden="true">✏️</span> Text Shadow
               </button>
             </div>
           </div>
@@ -304,6 +310,7 @@ export default function GeneradorSombrasPage() {
             <div className={styles.layersHeader}>
               <label className={styles.label}>Capas ({layers.length}/5)</label>
               <button
+                type="button"
                 onClick={addLayer}
                 className={styles.addBtn}
                 disabled={layers.length >= 5}
@@ -322,6 +329,7 @@ export default function GeneradorSombrasPage() {
                   <span>Capa {index + 1}</span>
                   {layers.length > 1 && (
                     <button
+                      type="button"
                       onClick={(e) => {
                         e.stopPropagation();
                         removeLayer(layer.id);
@@ -439,17 +447,17 @@ export default function GeneradorSombrasPage() {
         <h3>Propiedades de Sombras CSS</h3>
         <div className={styles.infoGrid}>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>↔️</span>
+            <span className={styles.infoIcon} aria-hidden="true">↔️</span>
             <h4>Offset X/Y</h4>
             <p>Desplazamiento horizontal y vertical de la sombra respecto al elemento</p>
           </div>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>🌫️</span>
+            <span className={styles.infoIcon} aria-hidden="true">🌫️</span>
             <h4>Blur</h4>
             <p>Desenfoque de la sombra. Mayor valor = más suave y difusa</p>
           </div>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>⭕</span>
+            <span className={styles.infoIcon} aria-hidden="true">⭕</span>
             <h4>Spread</h4>
             <p>Expansión de la sombra. Valores positivos la agrandan, negativos la reducen</p>
           </div>
@@ -487,7 +495,7 @@ export default function GeneradorSombrasPage() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🖥️</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🖥️</span>
               <strong>Diseñador UI/UX</strong>
             </div>
             <p>Crea sistemas de elevación (z-depth) consistentes para cards, modales y botones. Una sombra progresiva comunica la jerarquía visual sin necesidad de bordes ni colores adicionales.</p>
@@ -495,7 +503,7 @@ export default function GeneradorSombrasPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>👨‍💻</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">👨‍💻</span>
               <strong>Desarrollador Frontend</strong>
             </div>
             <p>Genera el código CSS listo para copiar en proyectos React, Vue o Angular. Crea sombras para hover states, focus rings accesibles y efectos de profundidad en componentes.</p>
@@ -503,7 +511,7 @@ export default function GeneradorSombrasPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🎨</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🎨</span>
               <strong>Diseñador Gráfico / Brand</strong>
             </div>
             <p>Crea efectos de texto con sombra para títulos impactantes en landing pages, banners y presentaciones. Las sombras de texto son clave en el estilo neón, retro y flat design.</p>
@@ -511,7 +519,7 @@ export default function GeneradorSombrasPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>📱</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">📱</span>
               <strong>Desarrollador Mobile / PWA</strong>
             </div>
             <p>Diseña sombras optimizadas para dispositivos con pantallas OLED donde las sombras oscuras son más económicas en batería. Adapta la intensidad según el modo claro/oscuro.</p>
@@ -521,7 +529,7 @@ export default function GeneradorSombrasPage() {
 
         {/* 3. FAQ */}
         <details className={styles.faqList}>
-          <summary className={styles.faqItem} style={{listStyle:'none', cursor:'pointer', fontWeight:600, fontSize:'1.1rem', padding:'0.75rem 0'}}>❓ Preguntas Frecuentes sobre Sombras CSS</summary>
+          <summary className={styles.faqItem} style={{listStyle:'none', cursor:'pointer', fontWeight:600, fontSize:'1.1rem', padding:'0.75rem 0'}}><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Sombras CSS</summary>
           <div>
             <div className={styles.faqItem}>
               <div className={styles.faqPregunta}>¿Cuál es la diferencia entre box-shadow y filter: drop-shadow()?</div>
@@ -589,32 +597,32 @@ export default function GeneradorSombrasPage() {
         {/* 5. TIPS GRID */}
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>💡</span>
+            <span className={styles.tipIcono} aria-hidden="true">💡</span>
             <strong>Luz consistente</strong>
             <p>Elige una única dirección de luz para toda la interfaz. Si la luz viene de arriba-izquierda, todos los box-shadow deben tener offset positivo en x e y.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🎚️</span>
+            <span className={styles.tipIcono} aria-hidden="true">🎚️</span>
             <strong>Sistema de elevación</strong>
             <p>Define 4-5 niveles de sombra como variables CSS. Úsalos consistentemente: nivel 1 para cards, nivel 2 para dropdowns, nivel 3 para modales.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>⚡</span>
+            <span className={styles.tipIcono} aria-hidden="true">⚡</span>
             <strong>Animación eficiente</strong>
             <p>Para hover con sombra animada, usa un pseudo-elemento ::after con la sombra final ya calculada y anima solo su opacity. 60fps garantizados.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🌓</span>
+            <span className={styles.tipIcono} aria-hidden="true">🌓</span>
             <strong>Sombras coloreadas</strong>
             <p>Las sombras con el color de la marca (ej: sombra azul bajo botón azul) crean un efecto de brillo muy llamativo en CTAs y elementos hero.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>📐</span>
+            <span className={styles.tipIcono} aria-hidden="true">📐</span>
             <strong>Menos es más</strong>
             <p>Una sola sombra bien calibrada es más efectiva que cinco sombras mediocres. La mayoría de los diseños profesionales usan solo 2-3 niveles de sombra.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🔍</span>
+            <span className={styles.tipIcono} aria-hidden="true">🔍</span>
             <strong>Accesibilidad</strong>
             <p>No uses box-shadow como único indicador de focus. Combínalo con outline para usuarios que navegan por teclado. Chrome añade focus rings automáticamente en algunos elementos.</p>
           </div>
@@ -623,7 +631,7 @@ export default function GeneradorSombrasPage() {
         {/* 6. WARNING BOX */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcono}>⚠️</span>
+            <span className={styles.warningIcono} aria-hidden="true">⚠️</span>
             <strong>Errores comunes con sombras CSS</strong>
           </div>
           <ul className={styles.warningList}>
