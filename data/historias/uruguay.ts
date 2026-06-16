@@ -122,7 +122,7 @@ export const uruguay: HistoriaData = {
       anioInicio: 2000,
       anioFin: 2025,
       color: '#2E8B57',
-      categoria: 'contemporanea',
+      categoria: 'economia',
       descripcion: 'En el siglo XXI Uruguay consolidó su perfil como exportador de productos agropecuarios (soja, carne, celulosa) y servicios de tecnología de la información. El sector del software y los servicios globales creció de forma sostenida, posicionando a Uruguay como referente regional en economía del conocimiento. Las tensiones geopolíticas incluyeron el debate sobre un acuerdo bilateral con China, con implicaciones para el bloque Mercosur. Los referéndums sobre seguridad pública de 2022 y 2024 mostraron una ciudadanía activa en el uso de los mecanismos de democracia directa, característica histórica del sistema político uruguayo.',
       obraIconica: 'Uruguay: referente regional en software, agro y democracia directa en el siglo XXI',
       paises: ['Uruguay'],
@@ -231,6 +231,7 @@ export const uruguay: HistoriaData = {
     democracia: 'Democracia',
     'frente-amplio': 'Frente Amplio',
     contemporanea: 'Contemporánea',
+    economia: 'Economía',
   },
 
   colores: {
@@ -242,6 +243,7 @@ export const uruguay: HistoriaData = {
     democracia: '#2E86AB',
     'frente-amplio': '#48A9A6',
     contemporanea: '#6A0DAD',
+    economia: '#2E8B57',
   },
 
   disclaimer: 'exempt',

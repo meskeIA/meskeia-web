@@ -237,10 +237,10 @@
 | [x] | Historia de México: Del Grito de Dolores a la México Contemporánea | `/visualizador-historia/mexico-moderno/` | cultura, estudiantes |
 | [x] | Historia de Perú: De la Independencia al Perú Contemporáneo | `/visualizador-historia/peru/` | cultura, estudiantes |
 | [x] | Historia de Polonia: Del Bautismo de Mieszko I a la Polonia Contemporánea | `/visualizador-historia/polonia/` | cultura, estudiantes |
-| [ ] | Historia de Puerto Rico: De la Colonia Española al Estado Libre Asociado | `/visualizador-historia/puerto-rico/` | cultura, estudiantes |
-| [ ] | Historia de Rusia: De Rurik al Siglo XXI | `/visualizador-historia/historia-rusia/` | cultura |
-| [ ] | Historia de Silicon Valley: Del Garaje de HP a la Era de la IA | `/visualizador-historia/silicon-valley/` | cultura, tecnicas |
-| [ ] | Historia de Uruguay: De la Independencia a la Democracia Plena | `/visualizador-historia/uruguay/` | cultura, estudiantes |
+| [x] | Historia de Puerto Rico: De la Colonia Española al Estado Libre Asociado | `/visualizador-historia/puerto-rico/` | cultura, estudiantes |
+| [x] | Historia de Rusia: De Rurik al Siglo XXI | `/visualizador-historia/historia-rusia/` | cultura |
+| [x] | Historia de Silicon Valley: Del Garaje de HP a la Era de la IA | `/visualizador-historia/silicon-valley/` | cultura, tecnicas |
+| [x] | Historia de Uruguay: De la Independencia a la Democracia Plena | `/visualizador-historia/uruguay/` | cultura, estudiantes |
 | [ ] | Historia de Venezuela: Del Libertador a la Venezuela Contemporánea | `/visualizador-historia/venezuela/` | cultura, estudiantes |
 | [ ] | Historia del Antiguo Egipto: De los Faraones a Cleopatra | `/visualizador-historia/egipto/` | cultura |
 | [ ] | Historia del Automóvil: De Benz al Coche Eléctrico Autónomo | `/visualizador-historia/automocion/` | cultura, tecnicas |
