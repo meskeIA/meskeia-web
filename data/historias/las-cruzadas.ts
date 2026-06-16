@@ -216,7 +216,7 @@ export const lasCruzadas: HistoriaData = {
       hasta: 1260,
       icono: '📜',
       hitosDestacados: [
-        'Las Cruzadas del Siglo XIII: Fracasos y Curiosidades',
+        'Las Cruzadas del Siglo XIII: Diplomacia y Fracasos',
       ],
       eventos: [
         'Cruzada de los Niños (1212): doble fracaso en Francia y Alemania',

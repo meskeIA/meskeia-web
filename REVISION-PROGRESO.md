@@ -285,10 +285,10 @@
 | [x] | La Inflamación — Aliada y Enemiga del Cuerpo | `/visualizador-inflamacion/` | cultura, estudiantes, salud |
 | [x] | La Primera Guerra Mundial: De Sarajevo al Tratado de Versalles | `/visualizador-historia/primera-guerra-mundial/` | cultura |
 | [x] | La Reforma Protestante: De Lutero a la Paz de Westfalia | `/visualizador-historia/la-reforma/` | cultura |
-| [ ] | La Revolución Francesa: De la Bastilla a Waterloo | `/visualizador-historia/revolucion-francesa/` | cultura |
-| [ ] | La Segunda Guerra Mundial: De la Invasión de Polonia a Hiroshima | `/visualizador-historia/segunda-guerra-mundial/` | cultura |
-| [ ] | La Unión Europea: De las Cenizas de la Guerra a la Integración | `/visualizador-historia/historia-union-europea/` | cultura |
-| [ ] | Las Cruzadas: De Clermont a la Caída de Acre | `/visualizador-historia/las-cruzadas/` | cultura |
+| [x] | La Revolución Francesa: De la Bastilla a Waterloo | `/visualizador-historia/revolucion-francesa/` | cultura |
+| [x] | La Segunda Guerra Mundial: De la Invasión de Polonia a Hiroshima | `/visualizador-historia/segunda-guerra-mundial/` | cultura |
+| [x] | La Unión Europea: De las Cenizas de la Guerra a la Integración | `/visualizador-historia/historia-union-europea/` | cultura |
+| [x] | Las Cruzadas: De Clermont a la Caída de Acre | `/visualizador-historia/las-cruzadas/` | cultura |
 | [ ] | Las Grandes Dinastías Chinas: De Qin a la República | `/visualizador-historia/china-dinastias/` | cultura |
 | [ ] | Las Guerras Napoleónicas: Europa en Llamas (1799-1815) | `/visualizador-historia/guerras-napoleonicas/` | cultura, estudiantes |
 | [x] | Los Números de la Música | `/visualizador-matematicas-musica/` | cultura, estudiantes |
