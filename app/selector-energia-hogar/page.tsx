@@ -378,7 +378,7 @@ export default function SelectorEnergiaHogarPage() {
 
       {/* Hero */}
       <header className={styles.hero}>
-        <h1 className={styles.heroTitle}>🏠 Selector de Energía para el Hogar</h1>
+        <h1 className={styles.heroTitle}><span aria-hidden="true">🏠</span> Selector de Energía para el Hogar</h1>
         <p className={styles.heroSubtitle}>
           Test de 10 preguntas para saber qué sistema de calefacción y agua caliente se adapta
           mejor a tu vivienda, zona y presupuesto: gas natural, aerotermia, bomba de calor,
@@ -525,7 +525,7 @@ export default function SelectorEnergiaHogarPage() {
                 {/* Ventajas y consideraciones */}
                 <div className={styles.ventajasSection}>
                   <div className={styles.ventajasBloque}>
-                    <h3 className={styles.ventajasTitulo}>✓ Puntos fuertes</h3>
+                    <h3 className={styles.ventajasTitulo}><span aria-hidden="true">✓</span> Puntos fuertes</h3>
                     <ul className={`${styles.ventajasList} ${styles.ventajasPositivo}`}>
                       {recomendacion.ventajas.map((v, i) => (
                         <li key={i}>{v}</li>
@@ -544,7 +544,7 @@ export default function SelectorEnergiaHogarPage() {
 
                 {/* Subvenciones */}
                 <div className={styles.subvencionesSection}>
-                  <h3 className={styles.subvencionesTitulo}>💰 Ayudas y subvenciones disponibles</h3>
+                  <h3 className={styles.subvencionesTitulo}><span aria-hidden="true">💰</span> Ayudas y subvenciones disponibles</h3>
                   <p className={styles.subvencionesTexto}>{recomendacion.subvenciones}</p>
                 </div>
 
@@ -577,7 +577,7 @@ export default function SelectorEnergiaHogarPage() {
 
           {/* Aviso de precio variable */}
           <div className={styles.warningBox}>
-            <strong>⚠️ Nota sobre precios de la energía</strong>
+            <strong><span aria-hidden="true">⚠️</span> Nota sobre precios de la energía</strong>
             Los precios del gas natural y la electricidad fluctúan considerablemente según el
             mercado, la tarifa contratada y los impuestos vigentes. Los rangos indicados en esta
             herramienta son orientativos (año 2025). Un estudio de eficiencia energética
@@ -606,35 +606,35 @@ export default function SelectorEnergiaHogarPage() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td>🔥 Gas natural (condensación)</td>
+                    <td><span aria-hidden="true">🔥</span> Gas natural (condensación)</td>
                     <td>2.000 – 5.000 €</td>
                     <td>800 – 1.400 €</td>
                     <td>Referencia</td>
                     <td>15-20 años</td>
                   </tr>
                   <tr>
-                    <td>⚡ Bomba calor aire-aire</td>
+                    <td><span aria-hidden="true">⚡</span> Bomba calor aire-aire</td>
                     <td>2.000 – 6.000 €</td>
                     <td>600 – 1.200 €</td>
                     <td>3-7 años vs. gas</td>
                     <td>15-20 años</td>
                   </tr>
                   <tr>
-                    <td>🌬️ Aerotermia aire-agua</td>
+                    <td><span aria-hidden="true">🌬️</span> Aerotermia aire-agua</td>
                     <td>8.000 – 18.000 €</td>
                     <td>500 – 1.000 €</td>
                     <td>8-15 años (sin sub.)</td>
                     <td>20-25 años</td>
                   </tr>
                   <tr>
-                    <td>🪵 Biomasa / pellets</td>
+                    <td><span aria-hidden="true">🪵</span> Biomasa / pellets</td>
                     <td>8.000 – 16.000 €</td>
                     <td>400 – 900 €</td>
                     <td>6-12 años vs. gas</td>
                     <td>20-25 años</td>
                   </tr>
                   <tr>
-                    <td>☀️ Solar térmica + apoyo</td>
+                    <td><span aria-hidden="true">☀️</span> Solar térmica + apoyo</td>
                     <td>4.000 – 10.000 €</td>
                     <td>200 – 600 €</td>
                     <td>7-12 años</td>

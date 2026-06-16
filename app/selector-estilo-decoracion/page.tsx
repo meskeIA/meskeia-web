@@ -366,11 +366,11 @@ export default function SelectorEstiloDecoracion() {
               industrial, nórdico o mediterráneo.
             </p>
             <ul className={styles.introFeatures}>
-              <li><span>🎨</span>Paleta de colores y materiales preferidos</li>
-              <li><span>🧹</span>Actitud ante el orden y el minimalismo</li>
-              <li><span>💡</span>Tipo de iluminación y ambiente</li>
-              <li><span>✈️</span>Referencias culturales que te inspiran</li>
-              <li><span>⚖️</span>Funcionalidad vs. estética</li>
+              <li><span aria-hidden="true">🎨</span>Paleta de colores y materiales preferidos</li>
+              <li><span aria-hidden="true">🧹</span>Actitud ante el orden y el minimalismo</li>
+              <li><span aria-hidden="true">💡</span>Tipo de iluminación y ambiente</li>
+              <li><span aria-hidden="true">✈️</span>Referencias culturales que te inspiran</li>
+              <li><span aria-hidden="true">⚖️</span>Funcionalidad vs. estética</li>
             </ul>
             <button type="button" className={styles.btnStart} onClick={iniciarTest}>
               Comenzar el test — 10 preguntas
@@ -479,7 +479,7 @@ export default function SelectorEstiloDecoracion() {
 
           {/* Consejos */}
           <div className={styles.consejosSection}>
-            <p className={styles.consejosTitulo}>💡 Consejos para empezar</p>
+            <p className={styles.consejosTitulo}><span aria-hidden="true">💡</span> Consejos para empezar</p>
             {estiloInfo.consejos.map((consejo, i) => (
               <p key={i} className={styles.consejoItem}>{consejo}</p>
             ))}

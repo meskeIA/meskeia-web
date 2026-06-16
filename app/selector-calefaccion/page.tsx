@@ -386,7 +386,7 @@ export default function SelectorCalefaccion() {
 
       {pantalla !== 'resultado' ? (
         <header className={styles.hero}>
-          <h1 className={styles.heroTitle}>🏠 Asesor de Calefacción</h1>
+          <h1 className={styles.heroTitle}><span aria-hidden="true">🏠</span> Asesor de Calefacción</h1>
           <p className={styles.heroSubtitle}>
             {pantalla === 'intro'
               ? '10 preguntas para saber qué sistema de calefacción te conviene'
@@ -540,7 +540,7 @@ export default function SelectorCalefaccion() {
           {/* Subvenciones */}
           {resultado.subvenciones && (
             <div className={styles.subvencionesSection}>
-              <p className={styles.subvencionesTitulo}>🏛️ Subvenciones disponibles en 2025</p>
+              <p className={styles.subvencionesTitulo}><span aria-hidden="true">🏛️</span> Subvenciones disponibles en 2025</p>
               <p className={styles.subvencionesDesc}>
                 El programa <strong>Next Generation EU</strong> y el <strong>PERTE Industria Verde</strong> ofrecen ayudas
                 de hasta el <strong>40-60% del coste</strong> para instalación de bombas de calor, aerotermia y sistemas

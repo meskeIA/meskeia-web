@@ -828,10 +828,10 @@
 | [x] | Planificador de Mudanzas | `/planificador-mudanzas/` | inmobiliaria, productividad |
 | [x] | Rentabilidad de Inversión en Alquiler | `/calculadora-rentabilidad-alquiler/` | inmobiliaria, finanzas |
 | [x] | Selector de Alquiler o Compra | `/selector-alquiler-vs-compra/` | inmobiliaria, finanzas |
-| [ ] | Selector de Energía para el Hogar | `/selector-energia-hogar/` | inmobiliaria, tecnicas |
-| [ ] | Selector de Estilo de Decoración | `/selector-estilo-decoracion/` | inmobiliaria, productividad |
-| [ ] | Selector de Seguro de Hogar | `/selector-seguro-hogar/` | inmobiliaria, finanzas |
-| [ ] | Selector de Sistema de Calefacción | `/selector-calefaccion/` | inmobiliaria, finanzas, productividad |
+| [x] | Selector de Energía para el Hogar | `/selector-energia-hogar/` | inmobiliaria, tecnicas |
+| [x] | Selector de Estilo de Decoración | `/selector-estilo-decoracion/` | inmobiliaria, productividad |
+| [x] | Selector de Seguro de Hogar | `/selector-seguro-hogar/` | inmobiliaria, finanzas |
+| [x] | Selector de Sistema de Calefacción | `/selector-calefaccion/` | inmobiliaria, finanzas, productividad |
 | [ ] | Selector de Tarifa Eléctrica | `/selector-tarifa-electrica/` | inmobiliaria, tecnicas |
 | [ ] | Selector de Tipo de Vivienda | `/selector-tipo-vivienda/` | inmobiliaria |
 | [ ] | Selector de Zona de Residencia | `/selector-zona-residencia/` | inmobiliaria, productividad |
