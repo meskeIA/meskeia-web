@@ -102,7 +102,7 @@ export default function EspejoPage() {
           <div className={styles.espejoPlaceholder}>
             {permisoCamara === 'denied' ? (
               <>
-                <span className={styles.placeholderIcon}>🚫</span>
+                <span className={styles.placeholderIcon} aria-hidden="true">🚫</span>
                 <p>Permiso de cámara denegado</p>
                 <p className={styles.placeholderSubtexto}>
                   Activa la cámara en la configuración del navegador
@@ -110,7 +110,7 @@ export default function EspejoPage() {
               </>
             ) : (
               <>
-                <span className={styles.placeholderIcon}>🪞</span>
+                <span className={styles.placeholderIcon} aria-hidden="true">🪞</span>
                 <p>Pulsa para activar el espejo</p>
               </>
             )}
@@ -133,7 +133,7 @@ export default function EspejoPage() {
         {/* Controles en pantalla completa */}
         {activo && pantallaCompleta && (
           <div className={styles.controlesFullscreen}>
-            <button onClick={togglePantallaCompleta} className={styles.btnSalirFullscreen}>
+            <button type="button" onClick={togglePantallaCompleta} className={styles.btnSalirFullscreen}>
               ✕ Salir
             </button>
           </div>
@@ -143,10 +143,11 @@ export default function EspejoPage() {
       {/* Botón principal */}
       <div className={styles.controlPrincipal}>
         <button
+          type="button"
           className={`${styles.btnPrincipal} ${activo ? styles.activo : ''}`}
           onClick={activo ? detenerCamara : iniciarCamara}
         >
-          {activo ? '⏹️ Apagar' : '🪞 Activar espejo'}
+          <span aria-hidden="true">{activo ? '⏹️' : '🪞'}</span>{activo ? ' Apagar' : ' Activar espejo'}
         </button>
       </div>
 
@@ -155,19 +156,22 @@ export default function EspejoPage() {
         <div className={styles.controles}>
           {/* Espejado */}
           <button
+            type="button"
+            aria-pressed={espejado}
             className={`${styles.controlBtn} ${espejado ? styles.controlActivo : ''}`}
             onClick={() => setEspejado(!espejado)}
           >
-            <span className={styles.controlIcono}>↔️</span>
+            <span className={styles.controlIcono} aria-hidden="true">↔️</span>
             <span className={styles.controlTexto}>{espejado ? 'Espejado' : 'Normal'}</span>
           </button>
 
           {/* Pantalla completa */}
           <button
+            type="button"
             className={styles.controlBtn}
             onClick={togglePantallaCompleta}
           >
-            <span className={styles.controlIcono}>⛶</span>
+            <span className={styles.controlIcono} aria-hidden="true">⛶</span>
             <span className={styles.controlTexto}>Pantalla completa</span>
           </button>
         </div>
@@ -177,7 +181,7 @@ export default function EspejoPage() {
       {activo && (
         <div className={styles.section}>
           <div className={styles.ajuste}>
-            <label>☀️ Brillo: {brillo}%</label>
+            <label><span aria-hidden="true">☀️</span> Brillo: {brillo}%</label>
             <input
               type="range"
               min="50"
@@ -189,7 +193,7 @@ export default function EspejoPage() {
           </div>
 
           <div className={styles.ajuste}>
-            <label>🔍 Zoom: {zoom}x</label>
+            <label><span aria-hidden="true">🔍</span> Zoom: {zoom}x</label>
             <input
               type="range"
               min="1"
@@ -202,6 +206,7 @@ export default function EspejoPage() {
           </div>
 
           <button
+            type="button"
             className={styles.btnReset}
             onClick={() => {
               setBrillo(100);
@@ -209,7 +214,7 @@ export default function EspejoPage() {
               setEspejado(true);
             }}
           >
-            ↺ Restablecer
+            <span aria-hidden="true">↺</span> Restablecer
           </button>
         </div>
       )}
@@ -217,12 +222,12 @@ export default function EspejoPage() {
       {/* Info */}
       <div className={styles.infoSection}>
         <div className={styles.infoCard}>
-          <span className={styles.infoIcon}>💡</span>
+          <span className={styles.infoIcon} aria-hidden="true">💡</span>
           <h4>Consejo</h4>
           <p>Para mejor iluminación, colócate frente a una fuente de luz natural o artificial.</p>
         </div>
         <div className={styles.infoCard}>
-          <span className={styles.infoIcon}>📱</span>
+          <span className={styles.infoIcon} aria-hidden="true">📱</span>
           <h4>Móvil</h4>
           <p>Usa la pantalla completa para tener un espejo más grande y cómodo.</p>
         </div>
@@ -253,28 +258,28 @@ export default function EspejoPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>🪮 Arreglarse antes de una reunión</td>
+                  <td><span aria-hidden="true">🪮</span> Arreglarse antes de una reunión</td>
                   <td>Frontal (selfie)</td>
                   <td>30 – 50 cm</td>
                   <td>Luz frontal difusa</td>
                   <td>Espejo de bolso o de baño</td>
                 </tr>
                 <tr>
-                  <td>👕 Probarse ropa sin espejo físico</td>
+                  <td><span aria-hidden="true">👕</span> Probarse ropa sin espejo físico</td>
                   <td>Frontal en modo apaisado</td>
                   <td>1 – 1,5 m</td>
                   <td>Luz ambiente amplia</td>
                   <td>Espejo de cuerpo entero</td>
                 </tr>
                 <tr>
-                  <td>🚌 Verificar aspecto en desplazamientos</td>
+                  <td><span aria-hidden="true">🚌</span> Verificar aspecto en desplazamientos</td>
                   <td>Frontal</td>
                   <td>25 – 40 cm</td>
                   <td>Luz natural de ventana</td>
                   <td>Espejo compacto de bolsillo</td>
                 </tr>
                 <tr>
-                  <td>💻 Comprobar iluminación para videollamada</td>
+                  <td><span aria-hidden="true">💻</span> Comprobar iluminación para videollamada</td>
                   <td>Frontal o cámara web del portátil</td>
                   <td>40 – 60 cm</td>
                   <td>Luz frontal, sin contraluz</td>

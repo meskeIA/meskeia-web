@@ -224,7 +224,7 @@ export default function ExtractorAudioVideoPage() {
 
       {/* Badge privacidad — SIEMPRE VISIBLE */}
       <div className={styles.privacyBadge}>
-        <span className={styles.privacyIcon}>🔒</span>
+        <span className={styles.privacyIcon} aria-hidden="true">🔒</span>
         <div>
           <strong>Privacidad garantizada</strong>
           <p>
@@ -450,6 +450,7 @@ export default function ExtractorAudioVideoPage() {
                       type="button"
                       onClick={() => setCalidadMp3(c)}
                       className={`${styles.btnCalidad} ${calidadMp3 === c ? styles.btnCalidadActivo : ''}`}
+                      aria-pressed={calidadMp3 === c}
                     >
                       {c === '128k' ? '128 kbps — Estándar' : c === '192k' ? '192 kbps — Alta ✓' : '320 kbps — Máxima'}
                     </button>
@@ -515,7 +516,7 @@ export default function ExtractorAudioVideoPage() {
                   download={nombreDescarga}
                   className={styles.btnDescargar}
                 >
-                  ⬇️ Descargar {formato.toUpperCase()} — {nombreDescarga}
+                  <span aria-hidden="true">⬇️</span> Descargar {formato.toUpperCase()} — {nombreDescarga}
                 </a>
               </div>
             )}
@@ -525,7 +526,7 @@ export default function ExtractorAudioVideoPage() {
 
       {/* Aviso de privacidad — SIEMPRE VISIBLE, fuera del toggle */}
       <div className={styles.avisoPrivacidad}>
-        <h3>🔐 Compromiso de privacidad</h3>
+        <h3><span aria-hidden="true">🔐</span> Compromiso de privacidad</h3>
         <p>
           Esta herramienta procesa tus archivos íntegramente en tu navegador usando WebAssembly (ffmpeg.wasm).{' '}
           <strong>Ningún archivo, fragmento ni dato sale de tu dispositivo.</strong> No se realizan peticiones

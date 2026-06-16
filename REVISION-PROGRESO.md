@@ -764,11 +764,11 @@
 | [x] | Contador Manual (Tally Counter) | `/contador-manual/` | tecnicas, productividad |
 | [x] | Conversor de Unidades RF | `/conversor-unidades-rf/` | tecnicas |
 | [x] | Criptografía - AES, RSA, ECDSA, SHA-256 y TLS | `/visualizador-criptografia/` | tecnicas, cultura, estudiantes |
-| [ ] | Desarrolladores — Servidor MCP de meskeIA | `/developers/` | tecnicas |
+| [x] | Desarrolladores — Servidor MCP de meskeIA | `/developers/` | tecnicas |
 | [x] | Diapasón Digital (La 440Hz) | `/diapason/` | tecnicas, cultura |
-| [ ] | Escalador de Recetas | `/escalador-recetas/` | tecnicas, productividad |
-| [ ] | Espejo Digital | `/espejo/` | tecnicas |
-| [ ] | Extractor de Audio de Vídeo | `/extractor-audio-video/` | tecnicas, productividad |
+| [x] | Escalador de Recetas | `/escalador-recetas/` | tecnicas, productividad |
+| [x] | Espejo Digital | `/espejo/` | tecnicas |
+| [x] | Extractor de Audio de Vídeo | `/extractor-audio-video/` | tecnicas, productividad |
 | [ ] | Generador de .gitignore | `/generador-gitignore/` | tecnicas, diseno |
 | [ ] | Generador de Contraseñas | `/generador-contrasenas/` | tecnicas |
 | [ ] | Generador de Hashes | `/generador-hashes/` | tecnicas |

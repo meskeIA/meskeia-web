@@ -139,6 +139,7 @@ export default function DevelopersPage() {
           <span className={styles.heroUrlLabel}>URL del servidor</span>
           <span>{MCP_URL}</span>
           <button
+            type="button"
             onClick={copiarUrl}
             className={styles.badge}
             style={{ cursor: 'pointer', border: 'none' }}
@@ -162,12 +163,13 @@ export default function DevelopersPage() {
 
         {/* ── Inicio rápido ─────────────────────────────── */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>⚡ Inicio rápido</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">⚡</span> Inicio rápido</h2>
 
           <div className={styles.clientTabs}>
             {CLIENTES.map((c, i) => (
               <button
                 key={c.id}
+                type="button"
                 className={`${styles.clientTab} ${i === clienteActivo ? styles.active : ''}`}
                 onClick={() => setClienteActivo(i)}
                 aria-pressed={i === clienteActivo}
@@ -183,6 +185,7 @@ export default function DevelopersPage() {
             </p>
             <pre>{CLIENTES[clienteActivo].config}</pre>
             <button
+              type="button"
               className={`${styles.copyBtn} ${copiado ? styles.copyBtnDone : ''}`}
               onClick={copiarConfig}
               aria-label="Copiar configuración"
@@ -200,7 +203,7 @@ export default function DevelopersPage() {
 
         {/* ── Herramientas disponibles ───────────────────── */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>🗂️ Herramientas disponibles</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">🗂️</span> Herramientas disponibles</h2>
           <div className={styles.categoryGrid}>
             {CATEGORIAS.map((cat) => (
               <div key={cat.nombre} className={styles.categoryCard}>
@@ -215,7 +218,7 @@ export default function DevelopersPage() {
 
         {/* ── Cómo funciona ─────────────────────────────── */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>🔄 Cómo funciona</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">🔄</span> Cómo funciona</h2>
           <div className={styles.stepsGrid}>
             {PASOS.map((p) => (
               <div key={p.n} className={styles.stepCard}>
@@ -229,7 +232,7 @@ export default function DevelopersPage() {
 
         {/* ── Avisos y términos ─────────────────────────── */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>⚖️ Uso responsable</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">⚖️</span> Uso responsable</h2>
           <div className={styles.termsBox}>
             <p>
               Todos los resultados del servidor MCP son <strong>estimaciones orientativas</strong> generadas

@@ -247,6 +247,7 @@ export default function EscaladorRecetasPage() {
                     </td>
                     <td>
                       <button
+                        type="button"
                         onClick={() => handleEliminarFila(fila.id)}
                         className={styles.btnEliminar}
                         aria-label={`Eliminar ingrediente ${fila.nombre || ''}`}
@@ -261,7 +262,7 @@ export default function EscaladorRecetasPage() {
             </table>
           </div>
 
-          <button onClick={handleAnadirFila} className={styles.btnAnadir}>
+          <button type="button" onClick={handleAnadirFila} className={styles.btnAnadir}>
             + Añadir ingrediente
           </button>
         </section>
@@ -269,13 +270,14 @@ export default function EscaladorRecetasPage() {
         {/* Botones de acción */}
         <div className={styles.botonesAccion}>
           <button
+            type="button"
             onClick={handleCalcular}
             className={styles.btnCalcular}
             disabled={!rO || !rN || rO <= 0 || rN <= 0}
           >
             Escalar receta
           </button>
-          <button onClick={handleReset} className={styles.btnReset}>
+          <button type="button" onClick={handleReset} className={styles.btnReset}>
             Restablecer ejemplo
           </button>
         </div>
