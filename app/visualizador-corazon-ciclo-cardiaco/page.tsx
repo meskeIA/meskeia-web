@@ -162,11 +162,13 @@ function SeccionLatido(): React.ReactNode {
 
         <div className={styles.corazonBotones}>
           <button
+            type="button"
             className={styles.btnPrimario}
             onClick={() => setLatiendo((v) => !v)}
+            aria-pressed={latiendo}
             aria-label={latiendo ? 'Pausar latido' : 'Iniciar latido'}
           >
-            {latiendo ? '⏸ Pausar latido' : '▶ Iniciar latido'}
+            {latiendo ? <><span aria-hidden="true">⏸</span> Pausar latido</> : <><span aria-hidden="true">▶</span> Iniciar latido</>}
           </button>
         </div>
       </div>
@@ -226,6 +228,7 @@ function SeccionValvulas(): React.ReactNode {
           const v = VALVULAS[id];
           return (
             <button
+              type="button"
               key={id}
               className={`${styles.valvulaCard} ${activa === id ? styles.valvulaActiva : ''}`}
               onClick={() => setActiva((prev) => (prev === id ? null : id))}
@@ -357,6 +360,7 @@ function SeccionECG(): React.ReactNode {
         <div className={styles.ecgRitmosBotones} role="group" aria-label="Tipo de ritmo cardíaco">
           {(Object.keys(RITMOS_ECG) as RitmoECG[]).map((r) => (
             <button
+              type="button"
               key={r}
               className={`${styles.ecgRitmoBtn} ${ritmo === r ? styles.ecgRitmoActivo : ''}`}
               onClick={() => setRitmo(r)}
@@ -373,6 +377,7 @@ function SeccionECG(): React.ReactNode {
             const data = ONDAS_ECG[id as Exclude<OndaECG, null>];
             return (
               <button
+                type="button"
                 key={id}
                 className={`${styles.ecgOndaCard} ${ondaActiva === id ? styles.ecgOndaActiva : ''}`}
                 onClick={() => setOndaActiva((prev) => (prev === id ? null : id))}

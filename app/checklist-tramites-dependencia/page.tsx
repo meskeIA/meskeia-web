@@ -337,7 +337,7 @@ export default function ChecklistTramitesDependenciaPage() {
         {/* Mensaje completado */}
         {todoCompleto && (
           <div className={styles.mensajeCompleto} role="alert" aria-live="polite">
-            <h2>🎉 ¡Todos los pasos completados!</h2>
+            <h2><span aria-hidden="true">🎉</span> ¡Todos los pasos completados!</h2>
             <p>
               Has marcado todos los pasos del proceso de solicitud de dependencia.
               Recuerda que los plazos reales dependen de tu Comunidad Autónoma.
@@ -519,28 +519,28 @@ export default function ChecklistTramitesDependenciaPage() {
             <h4 className={styles.eduSectionTitle}>Cuándo buscar asesoría legal</h4>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>⚖️</span>
+                <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
                 <div>
                   <strong>Recurso de alzada denegado</strong>
                   <p>Si presentaste recurso de alzada y fue rechazado, un abogado especializado en dependencia puede valorar la vía contencioso-administrativa.</p>
                 </div>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>⏰</span>
+                <span className={styles.tipIcon} aria-hidden="true">⏰</span>
                 <div>
                   <strong>La administración no responde en plazo</strong>
                   <p>Si han pasado más de 6 meses sin resolución, hay silencio administrativo positivo. Un profesional puede ayudarte a reclamarlo.</p>
                 </div>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📉</span>
+                <span className={styles.tipIcon} aria-hidden="true">📉</span>
                 <div>
                   <strong>El grado reconocido parece insuficiente</strong>
                   <p>Si crees que el grado no refleja la situación real, un informe pericial independiente puede reforzar tu recurso.</p>
                 </div>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>💰</span>
+                <span className={styles.tipIcon} aria-hidden="true">💰</span>
                 <div>
                   <strong>Problemas con la prestación económica</strong>
                   <p>Si no recibes el retroactivo desde la fecha de solicitud o el importe no es correcto, busca asesoría especializada.</p>
@@ -620,42 +620,42 @@ export default function ChecklistTramitesDependenciaPage() {
             <h4 className={styles.eduSectionTitle}>Consejos prácticos para cada fase</h4>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📋</span>
+                <span className={styles.tipIcon} aria-hidden="true">📋</span>
                 <div>
                   <strong>Fase 1: Informe médico detallado</strong>
                   <p>Pide al médico de cabecera que describa concretamente qué no puede hacer la persona, no solo el diagnóstico. Ejemplo: &ldquo;No puede vestirse sin ayuda, se desorienta al salir de casa&rdquo;.</p>
                 </div>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📝</span>
+                <span className={styles.tipIcon} aria-hidden="true">📝</span>
                 <div>
                   <strong>Fase 2: Fecha de registro</strong>
                   <p>La fecha de la solicitud sellada es el inicio de tus derechos económicos. Presenta cuanto antes, incluso si te falta algún documento menor que puedas aportar después.</p>
                 </div>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🏠</span>
+                <span className={styles.tipIcon} aria-hidden="true">🏠</span>
                 <div>
                   <strong>Fase 3: No disimular la situación</strong>
                   <p>El mayor error es presentar a la persona en su mejor momento. El valorador necesita ver la realidad del día a día, incluidos los peores momentos.</p>
                 </div>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📄</span>
+                <span className={styles.tipIcon} aria-hidden="true">📄</span>
                 <div>
                   <strong>Fase 4: Recurrir si no estás de acuerdo</strong>
                   <p>Tienes 1 mes para recurrir. Prepara informes médicos adicionales y describe las situaciones concretas que el valorador pudo no observar durante la visita.</p>
                 </div>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🤝</span>
+                <span className={styles.tipIcon} aria-hidden="true">🤝</span>
                 <div>
                   <strong>Fase 5: Informarse sobre opciones</strong>
                   <p>Antes de la reunión del PIA, infórmate sobre todas las modalidades disponibles en tu CCAA. No aceptes la primera opción sin entender las alternativas.</p>
                 </div>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>✅</span>
+                <span className={styles.tipIcon} aria-hidden="true">✅</span>
                 <div>
                   <strong>Fase 6: Verificar el retroactivo</strong>
                   <p>La prestación económica debe incluir los meses desde la solicitud. Si el importe no cuadra, reclama por escrito ante los Servicios Sociales.</p>
@@ -668,7 +668,7 @@ export default function ChecklistTramitesDependenciaPage() {
           <section className={styles.eduSection}>
             <div className={styles.warningBox}>
               <div className={styles.warningHeader}>
-                <span className={styles.warningIcon}>⚠️</span>
+                <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
                 <strong>Errores frecuentes que pueden retrasar o perjudicar tu solicitud</strong>
               </div>
               <ul className={styles.warningList}>

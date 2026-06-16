@@ -176,6 +176,7 @@ export default function VisualizadorSistemasEquilibrio() {
             {SISTEMAS.map((s) => (
               <button
                 key={s.id}
+                type="button"
                 className={`${styles.sistemaBtn} ${styles[`sistemaBtn_${s.id}`]} ${sistemaActivo === s.id ? styles.sistemaActivo : ''} ${getSistemaAfectado(s.id) ? styles.sistemaAfectado : ''}`}
                 onClick={() => setSistemaActivo(s.id)}
                 style={{ '--sistema-color': s.color } as React.CSSProperties}
@@ -223,7 +224,7 @@ export default function VisualizadorSistemasEquilibrio() {
             <span className={styles.detalleIcono} aria-hidden="true">{sistema.icono}</span>
             <div>
               <h3 className={styles.detalleNombre}>{sistema.nombre}</h3>
-              <p className={styles.detalleOrgano}>📍 {sistema.organo}</p>
+              <p className={styles.detalleOrgano}><span aria-hidden="true">📍</span> {sistema.organo}</p>
             </div>
           </div>
 
@@ -260,6 +261,7 @@ export default function VisualizadorSistemasEquilibrio() {
             {PERTURBACIONES.map((p) => (
               <button
                 key={p.id}
+                type="button"
                 className={`${styles.perturbacionBtn} ${perturbacionActiva === p.id ? styles.perturbacionActiva : ''}`}
                 onClick={() => setPerturbacionActiva(perturbacionActiva === p.id ? null : p.id)}
                 aria-pressed={perturbacionActiva === p.id}
@@ -284,7 +286,7 @@ export default function VisualizadorSistemasEquilibrio() {
                   const s = SISTEMAS.find((x) => x.id === sid)!;
                   return (
                     <span key={sid} className={styles.sistemaBadge} style={{ background: s.color }}>
-                      {s.icono} {s.nombre.replace('Sistema ', '')}
+                      <span aria-hidden="true">{s.icono}</span> {s.nombre.replace('Sistema ', '')}
                     </span>
                   );
                 })}
@@ -300,7 +302,7 @@ export default function VisualizadorSistemasEquilibrio() {
 
         {/* Clave pedagógica */}
         <section className={styles.warningBox}>
-          <h3>🔑 La redundancia como seguridad</h3>
+          <h3><span aria-hidden="true">🔑</span> La redundancia como seguridad</h3>
           <p>
             El cerebro nunca confía en un solo sistema. Compara permanentemente las tres fuentes de información y detecta incongruencias. Si el vestibular dice &ldquo;estoy girando&rdquo; pero los ojos ven estático, el resultado es mareo. Si la propiocepción del cuello envía señales distorsionadas por tensión muscular, el cerebro puede interpretar movimiento donde no lo hay.
           </p>

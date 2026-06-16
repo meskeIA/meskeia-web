@@ -988,10 +988,10 @@
 | [x] | Calculadora Zonas de Entrenamiento — FC por Zona y Karvonen | `/calculadora-zonas-entrenamiento/` | salud |
 | [x] | Catalasa - La Enzima más Rápida del Cuerpo | `/visualizador-catalasa/` | salud, cultura, estudiantes |
 | [x] | Cerebro y Emociones - Amígdala, Neurotransmisores y Regulación | `/visualizador-cerebro-emociones/` | salud, estudiantes, cultura |
-| [ ] | Checklist de Trámites de Dependencia | `/checklist-tramites-dependencia/` | salud, legal-fiscal |
-| [ ] | Chequeos Médicos Preventivos | `/planificador-chequeos-medicos/` | salud, legal-fiscal |
-| [ ] | Ciclo Cardíaco - Sístole, Diástole y ECG | `/visualizador-corazon-ciclo-cardiaco/` | salud, estudiantes, cultura |
-| [ ] | Cómo el Cuerpo Mantiene el Equilibrio | `/visualizador-sistemas-equilibrio/` | salud, estudiantes |
+| [x] | Checklist de Trámites de Dependencia | `/checklist-tramites-dependencia/` | salud, legal-fiscal |
+| [x] | Chequeos Médicos Preventivos | `/planificador-chequeos-medicos/` | salud, legal-fiscal |
+| [x] | Ciclo Cardíaco - Sístole, Diástole y ECG | `/visualizador-corazon-ciclo-cardiaco/` | salud, estudiantes, cultura |
+| [x] | Cómo el Cuerpo Mantiene el Equilibrio | `/visualizador-sistemas-equilibrio/` | salud, estudiantes |
 | [ ] | Cómo Envejece tu Cuerpo | `/visualizador-envejecimiento-cuerpo/` | salud, cultura |
 | [ ] | Cómo Funciona el Dolor — Nocicepción y Tipos | `/visualizador-como-funciona-el-dolor/` | salud, estudiantes |
 | [ ] | Cómo Funciona una Vacuna | `/visualizador-vacunas/` | salud, cultura, estudiantes |

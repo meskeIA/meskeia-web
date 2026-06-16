@@ -296,8 +296,8 @@ function TarjetaChequeo({ chequeo, alDia, onToggle }: TarjetaChequeoProps) {
         <div className={styles.tarjetaInfo}>
           <h3 className={styles.tarjetaNombre}>{chequeo.nombre}</h3>
           <div className={styles.tarjetaMeta}>
-            <span className={styles.badge}>{catConfig.icono} {catConfig.nombre}</span>
-            <span className={styles.frecuencia}>⏱ {chequeo.frecuencia}</span>
+            <span className={styles.badge}><span aria-hidden="true">{catConfig.icono}</span> {catConfig.nombre}</span>
+            <span className={styles.frecuencia}><span aria-hidden="true">⏱</span> {chequeo.frecuencia}</span>
             {chequeo.aplicaA !== 'todos' && (
               <span className={`${styles.badge} ${styles.badgeSexo}`}>
                 {chequeo.aplicaA === 'mujer' ? '♀ Solo mujeres' : '♂ Solo hombres'}
@@ -322,7 +322,7 @@ function TarjetaChequeo({ chequeo, alDia, onToggle }: TarjetaChequeoProps) {
       <p className={styles.tarjetaDescripcion}>{chequeo.descripcion}</p>
 
       {chequeo.nota && (
-        <p className={styles.tarjetaNota}>ℹ️ {chequeo.nota}</p>
+        <p className={styles.tarjetaNota}><span aria-hidden="true">ℹ️</span> {chequeo.nota}</p>
       )}
 
       <p className={styles.tarjetaFuente}>Fuente: {chequeo.fuente}</p>
@@ -447,7 +447,7 @@ export default function PlanificadorChequeosMedicos() {
         )}
         {totalAlDia === totalAplicables && totalAplicables > 0 && (
           <p className={styles.resumenCompleto} role="status">
-            ✅ ¡Tienes todas las revisiones de tu perfil al día!
+            <span aria-hidden="true">✅</span> ¡Tienes todas las revisiones de tu perfil al día!
           </p>
         )}
       </div>
@@ -462,7 +462,7 @@ export default function PlanificadorChequeosMedicos() {
             return (
               <section key={cat} className={styles.categoria}>
                 <h2 className={styles.categoriaTitulo}>
-                  {catConfig.icono} {catConfig.nombre}
+                  <span aria-hidden="true">{catConfig.icono}</span> {catConfig.nombre}
                 </h2>
                 <div className={styles.categoriaGrid}>
                   {chequeos.map(c => (
@@ -537,39 +537,39 @@ export default function PlanificadorChequeosMedicos() {
         <div className={styles.casosGrid}>
           <div className={styles.casoCard}>
             <div className={styles.casoHeader}>
-              <span className={styles.casoEmoji}>👨‍💼</span>
+              <span className={styles.casoEmoji} aria-hidden="true">👨‍💼</span>
               <h3>Hombre 45 años, sedentario</h3>
               <span className={styles.casoTag}>Cardiovascular</span>
             </div>
             <p>Carlos, ejecutivo con estrés laboral, nunca había hecho analíticas. Un chequeo rutinario detecta colesterol 280 mg/dL y glucemia 118 mg/dL (prediabetes). Cambia dieta y hace ejercicio.</p>
-            <p className={styles.casoResultado}>✅ Evita evento cardiovascular en 5-10 años</p>
+            <p className={styles.casoResultado}><span aria-hidden="true">✅</span> Evita evento cardiovascular en 5-10 años</p>
           </div>
           <div className={styles.casoCard}>
             <div className={styles.casoHeader}>
-              <span className={styles.casoEmoji}>👩</span>
+              <span className={styles.casoEmoji} aria-hidden="true">👩</span>
               <h3>Mujer 52 años, menopausia</h3>
               <span className={styles.casoTag}>Cribado SNS</span>
             </div>
             <p>Marta recibe carta del programa de cribado de mama. En la mamografía encuentran una lesión de 8 mm en estadio I. Tratamiento conservador con alta probabilidad de curación.</p>
-            <p className={styles.casoResultado}>✅ Detección precoz = mejor pronóstico</p>
+            <p className={styles.casoResultado}><span aria-hidden="true">✅</span> Detección precoz = mejor pronóstico</p>
           </div>
           <div className={styles.casoCard}>
             <div className={styles.casoHeader}>
-              <span className={styles.casoEmoji}>👴</span>
+              <span className={styles.casoEmoji} aria-hidden="true">👴</span>
               <h3>Hombre 68 años, fumador ex</h3>
               <span className={styles.casoTag}>Respiratorio</span>
             </div>
             <p>Antonio, exfumador de 40 paquetes-año, se apunta al cribado de cáncer de pulmón por TC de baja dosis disponible en su comunidad. Espirometría revela EPOC moderada no diagnosticada.</p>
-            <p className={styles.casoResultado}>✅ Tratamiento precoz frena el deterioro</p>
+            <p className={styles.casoResultado}><span aria-hidden="true">✅</span> Tratamiento precoz frena el deterioro</p>
           </div>
           <div className={styles.casoCard}>
             <div className={styles.casoHeader}>
-              <span className={styles.casoEmoji}>👧</span>
+              <span className={styles.casoEmoji} aria-hidden="true">👧</span>
               <h3>Mujer 28 años, antecedentes familiares</h3>
               <span className={styles.casoTag}>Genética</span>
             </div>
             <p>Sara tiene madre y abuela con cáncer de mama. Su médico la deriva a la Unidad de Consejo Genético que estudia mutación BRCA. Con resultado positivo inicia seguimiento intensificado.</p>
-            <p className={styles.casoResultado}>✅ Vigilancia precoz individualizada</p>
+            <p className={styles.casoResultado}><span aria-hidden="true">✅</span> Vigilancia precoz individualizada</p>
           </div>
         </div>
 
@@ -655,32 +655,32 @@ export default function PlanificadorChequeosMedicos() {
         <h2>Hábitos que potencian la eficacia de tus chequeos</h2>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>📋</div>
+            <div className={styles.tipIcon} aria-hidden="true">📋</div>
             <h4>Lleva un historial propio</h4>
             <p>Guarda todos tus informes médicos. Tener acceso rápido a resultados anteriores permite comparar evolución.</p>
           </div>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>🩸</div>
+            <div className={styles.tipIcon} aria-hidden="true">🩸</div>
             <h4>Ayuno correcto para analíticas</h4>
             <p>8-12 horas de ayuno para glucemia y triglicéridos fiables. Puedes beber agua, pero no café ni zumos.</p>
           </div>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>💊</div>
+            <div className={styles.tipIcon} aria-hidden="true">💊</div>
             <h4>Comunica tu medicación</h4>
             <p>Informa siempre de todos los medicamentos, suplementos y vitaminas que tomas. Algunos alteran resultados.</p>
           </div>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>🏃</div>
+            <div className={styles.tipIcon} aria-hidden="true">🏃</div>
             <h4>Prevención activa</h4>
             <p>No fumar, 150 min/semana de ejercicio moderado, dieta mediterránea y peso saludable reducen el 80% de las enfermedades crónicas.</p>
           </div>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>🦷</div>
+            <div className={styles.tipIcon} aria-hidden="true">🦷</div>
             <h4>No olvides la salud bucodental</h4>
             <p>Revisión dental anual: la enfermedad periodontal se asocia a mayor riesgo cardiovascular y de diabetes.</p>
           </div>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>🧠</div>
+            <div className={styles.tipIcon} aria-hidden="true">🧠</div>
             <h4>Salud mental también es salud</h4>
             <p>El cribado de depresión está recomendado en atención primaria. No dudes en comentar a tu médico cómo te sientes emocionalmente.</p>
           </div>
@@ -689,7 +689,7 @@ export default function PlanificadorChequeosMedicos() {
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <h3>Síntomas que no deben esperar a la próxima revisión</h3>
           </div>
           <ul className={styles.warningList}>
