@@ -244,6 +244,7 @@ export default function ChecklistPrepararVerifactuPage() {
             return (
               <section key={seccion.id} className={styles.seccion}>
                 <button
+                  type="button"
                   className={styles.seccionHeader}
                   onClick={() => toggleSection(seccion.id)}
                   aria-expanded={!isCollapsed}
@@ -283,6 +284,7 @@ export default function ChecklistPrepararVerifactuPage() {
                               </span>
                             </label>
                             <button
+                              type="button"
                               className={styles.infoToggle}
                               onClick={() => toggleExpand(item.id)}
                               aria-expanded={isExpanded}
@@ -309,11 +311,12 @@ export default function ChecklistPrepararVerifactuPage() {
         {/* Botón reiniciar */}
         <div className={styles.resetWrapper}>
           <button
+            type="button"
             className={styles.btnReset}
             onClick={resetChecklist}
             aria-label="Reiniciar checklist: desmarcar todos los elementos"
           >
-            🔄 Reiniciar checklist
+            <span aria-hidden="true">🔄</span> Reiniciar checklist
           </button>
         </div>
 

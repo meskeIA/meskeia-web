@@ -238,16 +238,16 @@ export default function DiagnosticoModeloNegocioPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🏛️ Diagnóstico de Modelo de Negocio</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🏛️</span> Diagnóstico de Modelo de Negocio</h1>
           <p className={styles.subtitle}>
             ¿Los pilares de tu negocio están equilibrados?
             <br />
             Basado en el Business Model Canvas simplificado
           </p>
           <div className={styles.badges}>
-            <span className={styles.badge}>🕐 3 minutos</span>
-            <span className={styles.badge}>📊 10 preguntas</span>
-            <span className={styles.badge}>🔒 Sin registro</span>
+            <span className={styles.badge}><span aria-hidden="true">🕐</span> 3 minutos</span>
+            <span className={styles.badge}><span aria-hidden="true">📊</span> 10 preguntas</span>
+            <span className={styles.badge}><span aria-hidden="true">🔒</span> Sin registro</span>
           </div>
         </header>
 
@@ -297,7 +297,7 @@ export default function DiagnosticoModeloNegocioPage() {
 
           <div className={styles.progressInfo}>{Object.keys(respuestas).length} de {PREGUNTAS.length} respondidas</div>
 
-          <button className={styles.btnPrimary} onClick={calcularResultado} disabled={!todasRespondidas} aria-label="Ver mi diagnóstico">
+          <button type="button" className={styles.btnPrimary} onClick={calcularResultado} disabled={!todasRespondidas} aria-label="Ver mi diagnóstico">
             {todasRespondidas ? 'Ver mi diagnóstico' : `Responde las ${PREGUNTAS.length - Object.keys(respuestas).length} preguntas restantes`}
           </button>
         </section>
@@ -308,16 +308,16 @@ export default function DiagnosticoModeloNegocioPage() {
 
             <div className={styles.mapContainer}>
               <div className={styles.mapLabels}>
-                <span className={styles.mapLabelTop}>💰 Alta Sostenibilidad</span>
+                <span className={styles.mapLabelTop}><span aria-hidden="true">💰</span> Alta Sostenibilidad</span>
                 <span className={styles.mapLabelBottom}>Baja Sostenibilidad</span>
                 <span className={styles.mapLabelLeft}>Baja Propuesta</span>
-                <span className={styles.mapLabelRight}>💡 Alta Propuesta</span>
+                <span className={styles.mapLabelRight}><span aria-hidden="true">💡</span> Alta Propuesta</span>
               </div>
               <div className={styles.map}>
-                <div className={`${styles.quadrant} ${styles.quadrantTL}`}><span>⚙️ Funcional sin Alma</span></div>
-                <div className={`${styles.quadrant} ${styles.quadrantTR}`}><span>🏛️ Negocio Sólido</span></div>
-                <div className={`${styles.quadrant} ${styles.quadrantBL}`}><span>🧭 Fase Exploratoria</span></div>
-                <div className={`${styles.quadrant} ${styles.quadrantBR}`}><span>💡 Gran Idea, Modelo Débil</span></div>
+                <div className={`${styles.quadrant} ${styles.quadrantTL}`}><span><span aria-hidden="true">⚙️</span> Funcional sin Alma</span></div>
+                <div className={`${styles.quadrant} ${styles.quadrantTR}`}><span><span aria-hidden="true">🏛️</span> Negocio Sólido</span></div>
+                <div className={`${styles.quadrant} ${styles.quadrantBL}`}><span><span aria-hidden="true">🧭</span> Fase Exploratoria</span></div>
+                <div className={`${styles.quadrant} ${styles.quadrantBR}`}><span><span aria-hidden="true">💡</span> Gran Idea, Modelo Débil</span></div>
                 <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
                 <div className={styles.thresholdLineV} style={{ left: '65%' }} aria-hidden="true" />
                 <div className={styles.thresholdLineH} style={{ top: '35%' }} aria-hidden="true" />
@@ -330,11 +330,11 @@ export default function DiagnosticoModeloNegocioPage() {
 
             <div className={styles.scoresContainer}>
               <div className={styles.scoreBar}>
-                <div className={styles.scoreHeader}><span>💡 Propuesta</span><span className={styles.scoreValue}>{puntuacionPropuesta}/25</span></div>
+                <div className={styles.scoreHeader}><span><span aria-hidden="true">💡</span> Propuesta</span><span className={styles.scoreValue}>{puntuacionPropuesta}/25</span></div>
                 <div className={styles.barTrack}><div className={`${styles.barFill} ${styles.barPropuesta}`} style={{ width: `${(puntuacionPropuesta / 25) * 100}%` }} /></div>
               </div>
               <div className={styles.scoreBar}>
-                <div className={styles.scoreHeader}><span>💰 Sostenibilidad</span><span className={styles.scoreValue}>{puntuacionSostenibilidad}/25</span></div>
+                <div className={styles.scoreHeader}><span><span aria-hidden="true">💰</span> Sostenibilidad</span><span className={styles.scoreValue}>{puntuacionSostenibilidad}/25</span></div>
                 <div className={styles.barTrack}><div className={`${styles.barFill} ${styles.barSostenibilidad}`} style={{ width: `${(puntuacionSostenibilidad / 25) * 100}%` }} /></div>
               </div>
             </div>
@@ -343,13 +343,13 @@ export default function DiagnosticoModeloNegocioPage() {
               <div className={styles.profileHeader}><span className={styles.profileEmoji}>{perfil.emoji}</span><h3 className={styles.profileName}>{perfil.nombre}</h3></div>
               <p className={styles.profileDescription}>{perfil.descripcion}</p>
               <div className={styles.profileColumns}>
-                <div className={styles.profileColumn}><h4 className={styles.columnTitle}>✅ Fortalezas</h4><ul className={styles.profileList}>{perfil.fortalezas.map((f, i) => (<li key={i}>{f}</li>))}</ul></div>
-                <div className={styles.profileColumn}><h4 className={styles.columnTitle}>⚠️ Riesgos</h4><ul className={styles.profileList}>{perfil.riesgos.map((r, i) => (<li key={i}>{r}</li>))}</ul></div>
+                <div className={styles.profileColumn}><h4 className={styles.columnTitle}><span aria-hidden="true">✅</span> Fortalezas</h4><ul className={styles.profileList}>{perfil.fortalezas.map((f, i) => (<li key={i}>{f}</li>))}</ul></div>
+                <div className={styles.profileColumn}><h4 className={styles.columnTitle}><span aria-hidden="true">⚠️</span> Riesgos</h4><ul className={styles.profileList}>{perfil.riesgos.map((r, i) => (<li key={i}>{r}</li>))}</ul></div>
               </div>
-              <div className={styles.actionsSection}><h4 className={styles.actionsTitle}>🎯 Acciones sugeridas</h4><ol className={styles.actionsList}>{perfil.acciones.map((a, i) => (<li key={i}>{a}</li>))}</ol></div>
+              <div className={styles.actionsSection}><h4 className={styles.actionsTitle}><span aria-hidden="true">🎯</span> Acciones sugeridas</h4><ol className={styles.actionsList}>{perfil.acciones.map((a, i) => (<li key={i}>{a}</li>))}</ol></div>
             </div>
 
-            <button className={styles.btnSecondary} onClick={reiniciar}>Repetir diagnóstico</button>
+            <button type="button" className={styles.btnSecondary} onClick={reiniciar}>Repetir diagnóstico</button>
           </section>
         )}
 

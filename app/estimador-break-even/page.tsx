@@ -116,7 +116,7 @@ export default function CalculadoraBreakEvenPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📊 Estimador Break-Even</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📊</span> Estimador Break-Even</h1>
         <p className={styles.subtitle}>
           Calcula el punto de equilibrio de tus productos y descubre cuántas unidades necesitas vender para empezar a ganar dinero
         </p>
@@ -272,14 +272,18 @@ export default function CalculadoraBreakEvenPage() {
       <div className={styles.tabsContainer}>
         <div className={styles.tabs}>
           <button
+            type="button"
             className={`${styles.tab} ${tabActivo === 'basico' ? styles.tabActivo : ''}`}
             onClick={() => setTabActivo('basico')}
+            aria-pressed={tabActivo === 'basico'}
           >
             Análisis Básico
           </button>
           <button
+            type="button"
             className={`${styles.tab} ${tabActivo === 'escenarios' ? styles.tabActivo : ''}`}
             onClick={() => setTabActivo('escenarios')}
+            aria-pressed={tabActivo === 'escenarios'}
           >
             Escenarios What-If
           </button>
@@ -341,12 +345,12 @@ export default function CalculadoraBreakEvenPage() {
 
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
-                <h4>📊 Actual</h4>
+                <h4><span aria-hidden="true">📊</span> Actual</h4>
                 <p className={styles.escenarioBreakEven}>{formatNumber(escenarios.actual.breakEven, 0)} uds</p>
                 <p className={styles.escenarioSubtexto}>{formatCurrency(escenarios.actual.breakEvenEuros)}</p>
               </div>
               <div className={styles.escenarioCard}>
-                <h4>📈 +10% Precio</h4>
+                <h4><span aria-hidden="true">📈</span> +10% Precio</h4>
                 <p className={styles.escenarioBreakEven}>{formatNumber(escenarios.precioPlusTen.breakEven, 0)} uds</p>
                 <p className={`${styles.escenarioSubtexto} ${escenarios.precioPlusTen.breakEven < escenarios.actual.breakEven ? styles.mejora : ''}`}>
                   {escenarios.precioPlusTen.breakEven < escenarios.actual.breakEven
@@ -356,14 +360,14 @@ export default function CalculadoraBreakEvenPage() {
                 </p>
               </div>
               <div className={styles.escenarioCard}>
-                <h4>📉 -10% Costo Var.</h4>
+                <h4><span aria-hidden="true">📉</span> -10% Costo Var.</h4>
                 <p className={styles.escenarioBreakEven}>{formatNumber(escenarios.costoVarMinusTen.breakEven, 0)} uds</p>
                 <p className={`${styles.escenarioSubtexto} ${styles.mejora}`}>
                   ↓ {formatNumber(escenarios.actual.breakEven - escenarios.costoVarMinusTen.breakEven, 0)} uds menos
                 </p>
               </div>
               <div className={styles.escenarioCard}>
-                <h4>🏢 -20% Costos Fijos</h4>
+                <h4><span aria-hidden="true">🏢</span> -20% Costos Fijos</h4>
                 <p className={styles.escenarioBreakEven}>{formatNumber(escenarios.fijoMinusTwenty.breakEven, 0)} uds</p>
                 <p className={`${styles.escenarioSubtexto} ${styles.mejora}`}>
                   ↓ {formatNumber(escenarios.actual.breakEven - escenarios.fijoMinusTwenty.breakEven, 0)} uds menos
@@ -373,7 +377,7 @@ export default function CalculadoraBreakEvenPage() {
 
             {/* Escenario personalizado */}
             <div className={styles.escenarioCustom}>
-              <h4>🔧 Escenario Personalizado</h4>
+              <h4><span aria-hidden="true">🔧</span> Escenario Personalizado</h4>
               <div className={styles.customInputs}>
                 <NumberInput
                   value={escenarioPrecio}
@@ -432,28 +436,28 @@ export default function CalculadoraBreakEvenPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>📌 Fórmula básica</h4>
+              <h4><span aria-hidden="true">📌</span> Fórmula básica</h4>
               <p>
                 <strong>Punto de Equilibrio = Costos Fijos ÷ Margen de Contribución</strong><br /><br />
                 Donde Margen de Contribución = Precio de Venta - Costo Variable por unidad
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📌 Costos Fijos vs Variables</h4>
+              <h4><span aria-hidden="true">📌</span> Costos Fijos vs Variables</h4>
               <p>
                 <strong>Fijos:</strong> No cambian con las ventas (alquiler, salarios, seguros).<br />
                 <strong>Variables:</strong> Aumentan con cada venta (materia prima, envío, comisiones).
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📌 ¿Qué es el Margen de Seguridad?</h4>
+              <h4><span aria-hidden="true">📌</span> ¿Qué es el Margen de Seguridad?</h4>
               <p>
                 Es la diferencia entre tus ventas actuales y el punto de equilibrio.
                 Cuanto mayor sea, más colchón tienes ante caídas de ventas.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📌 ¿Cómo reducir el break-even?</h4>
+              <h4><span aria-hidden="true">📌</span> ¿Cómo reducir el break-even?</h4>
               <p>
                 1. Subir el precio (si el mercado lo permite).<br />
                 2. Reducir costos variables (negociar con proveedores).<br />

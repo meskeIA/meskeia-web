@@ -697,11 +697,11 @@
 | [x] | Calculadora de Presupuestos | `/calculadora-presupuestos/` | freelance |
 | [x] | Calculadora de Productividad | `/calculadora-productividad/` | freelance, productividad |
 | [x] | Checklist Cambio de Régimen Fiscal Autónomo | `/checklist-cambio-regimen-autonomo/` | freelance |
-| [ ] | Checklist VeriFactu - Facturación Electrónica | `/checklist-preparar-verifactu/` | freelance, legal-fiscal |
+| [x] | Checklist VeriFactu - Facturación Electrónica | `/checklist-preparar-verifactu/` | freelance, legal-fiscal |
 | [x] | Conversor de Horarios | `/conversor-horarios/` | freelance, productividad, viajes |
-| [ ] | Diagnóstico de Modelo de Negocio | `/diagnostico-modelo-negocio/` | freelance, finanzas |
-| [ ] | El Ciclo de Vida de un Proyecto Freelance | `/visualizador-ciclo-vida-freelance/` | freelance, cultura |
-| [ ] | Estimador Break-Even | `/estimador-break-even/` | freelance |
+| [x] | Diagnóstico de Modelo de Negocio | `/diagnostico-modelo-negocio/` | freelance, finanzas |
+| [x] | El Ciclo de Vida de un Proyecto Freelance | `/visualizador-ciclo-vida-freelance/` | freelance, cultura |
+| [x] | Estimador Break-Even | `/estimador-break-even/` | freelance |
 | [x] | Estimador ROI Marketing | `/estimador-roi-marketing/` | freelance, diseno |
 | [ ] | Estructura de Costes del Autónomo | `/visualizador-estructura-costes-autonomo/` | freelance, finanzas, cultura |
 | [ ] | Generador de Facturas | `/generador-facturas/` | freelance |
