@@ -1013,10 +1013,10 @@
 | [x] | Estimación de Prestaciones por Dependencia | `/estimacion-prestaciones-dependencia/` | salud, legal-fiscal, finanzas |
 | [x] | Estimador de Riesgo de Osteoporosis | `/estimador-riesgo-osteoporosis/` | salud, legal-fiscal |
 | [x] | Estrógenos - Las Hormonas del Ciclo y la Salud Ósea | `/visualizador-estrogenos/` | salud, cultura, estudiantes |
-| [ ] | Farmacocinética - Cómo Viaja un Fármaco por el Cuerpo | `/visualizador-farmacocinetica/` | salud, estudiantes, cultura |
-| [ ] | GABA: El Gran Freno del Sistema Nervioso | `/visualizador-gaba/` | salud, cultura, estudiantes |
-| [ ] | Guía Cuidado de Mascotas | `/guia-cuidado-mascota/` | salud, cultura |
-| [ ] | Guía de Aditivos E Alimentarios | `/aditivos-e-alimentarios/` | salud, cultura |
+| [x] | Farmacocinética - Cómo Viaja un Fármaco por el Cuerpo | `/visualizador-farmacocinetica/` | salud, estudiantes, cultura |
+| [x] | GABA: El Gran Freno del Sistema Nervioso | `/visualizador-gaba/` | salud, cultura, estudiantes |
+| [x] | Guía Cuidado de Mascotas | `/guia-cuidado-mascota/` | salud, cultura |
+| [x] | Guía de Aditivos E Alimentarios | `/aditivos-e-alimentarios/` | salud, cultura |
 | [ ] | Guía de Cortes de Carne | `/guia-cortes-carne/` | salud, cultura |
 | [ ] | Guía de Especias | `/guia-especias/` | salud, cultura |
 | [ ] | Guía de Frutas Exóticas | `/guia-frutas-exoticas/` | salud, cultura |

@@ -186,7 +186,7 @@ export default function AdditivosEAlimentariosPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🏷️ Guía de Aditivos E Alimentarios</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🏷️</span> Guía de Aditivos E Alimentarios</h1>
           <p className={styles.subtitle}>
             Consulta los 90 aditivos E más comunes: código, categoría, origen y función. Información oficial EFSA.
           </p>
@@ -222,6 +222,7 @@ export default function AdditivosEAlimentariosPage() {
             />
             {busqueda && (
               <button
+                type="button"
                 className={styles.clearBtn}
                 onClick={() => setBusqueda('')}
                 aria-label="Limpiar búsqueda"
@@ -237,6 +238,7 @@ export default function AdditivosEAlimentariosPage() {
           {categoriasConConteo.map(({ nombre, count }) => (
             <button
               key={nombre}
+              type="button"
               className={`${styles.filtroBtn} ${categoriaActiva === nombre ? styles.filtroActivo : ''}`}
               onClick={() => setCategoriaActiva(nombre)}
               aria-pressed={categoriaActiva === nombre}
@@ -292,7 +294,7 @@ export default function AdditivosEAlimentariosPage() {
         >
           {/* 1. Tabla comparativa de categorías */}
           <section className={styles.guideSection}>
-            <h2>📊 Categorías de aditivos E</h2>
+            <h2><span aria-hidden="true">📊</span> Categorías de aditivos E</h2>
             <p>
               Los aditivos alimentarios se agrupan por su función tecnológica. La normativa europea (Reglamento CE 1333/2008) establece 26 categorías funcionales. Estas son las más frecuentes en el etiquetado:
             </p>
@@ -322,11 +324,11 @@ export default function AdditivosEAlimentariosPage() {
 
           {/* 2. Casos de uso */}
           <section className={styles.guideSection}>
-            <h2>👥 ¿Quién usa esta guía?</h2>
+            <h2><span aria-hidden="true">👥</span> ¿Quién usa esta guía?</h2>
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🛒</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🛒</span>
                   <h3>Consumidor en el supermercado</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -338,7 +340,7 @@ export default function AdditivosEAlimentariosPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🤧</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🤧</span>
                   <h3>Persona con intolerancias</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -350,7 +352,7 @@ export default function AdditivosEAlimentariosPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🎓</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
                   <h3>Estudiante de nutrición o tecnología alimentaria</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -362,7 +364,7 @@ export default function AdditivosEAlimentariosPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>👨‍🍳</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">👨‍🍳</span>
                   <h3>Cocinero o artesano alimentario</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -377,78 +379,78 @@ export default function AdditivosEAlimentariosPage() {
 
           {/* 3. FAQ */}
           <section className={styles.guideSection}>
-            <h2>❓ Preguntas frecuentes</h2>
+            <h2><span aria-hidden="true">❓</span> Preguntas frecuentes</h2>
             <div className={styles.faqList}>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Qué significa exactamente el número E?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Qué significa exactamente el número E?</h4>
                 <p>
                   La «E» significa que el aditivo ha sido evaluado y autorizado en Europa (Europe). El número identifica el aditivo específico. Un aditivo con código E tiene que haber superado la evaluación de seguridad de la EFSA (Autoridad Europea de Seguridad Alimentaria) antes de ser aprobado para uso en alimentos.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Dato:</strong> La EFSA reevalúa periódicamente todos los aditivos. El E171 (dióxido de titanio) fue prohibido en la UE en 2022 tras una reevaluación que no pudo excluir su genotoxicidad.
+                  <span aria-hidden="true">💡</span> <strong>Dato:</strong> La EFSA reevalúa periódicamente todos los aditivos. El E171 (dióxido de titanio) fue prohibido en la UE en 2022 tras una reevaluación que no pudo excluir su genotoxicidad.
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Natural significa siempre más seguro?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Natural significa siempre más seguro?</h4>
                 <p>
                   No necesariamente. La seguridad depende de la dosis y la persona, no del origen. La curcumina (E100) es natural, pero en dosis muy altas puede ser hepatotóxica. El ácido ascórbico (E300, Vitamina C) se produce industrialmente pero es idéntico al natural y es seguro. Lo que importa es la IDA (Ingesta Diaria Admisible) establecida por la EFSA.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Regla:</strong> Natural ≠ seguro, y sintético ≠ peligroso. La evaluación científica es lo que cuenta.
+                  <span aria-hidden="true">💡</span> <strong>Regla:</strong> Natural ≠ seguro, y sintético ≠ peligroso. La evaluación científica es lo que cuenta.
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Qué aditivos son alérgenos declarados en la UE?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Qué aditivos son alérgenos declarados en la UE?</h4>
                 <p>
                   Los sulfitos (E220–E228) son alérgenos declarados obligatoriamente en la UE cuando superan los 10 mg/kg en el producto final. Las personas con asma u hipersensibilidad a los sulfitos deben revisar las etiquetas. El aspartamo (E951) debe indicar «contiene una fuente de fenilalanina» por ser relevante para personas con fenilcetonuria.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Consejo:</strong> Busca «sulfitos» o «contiene fenilalanina» en el etiquetado, no solo el código E.
+                  <span aria-hidden="true">💡</span> <strong>Consejo:</strong> Busca «sulfitos» o «contiene fenilalanina» en el etiquetado, no solo el código E.
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Qué son los nitritos y por qué son polémicos?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Qué son los nitritos y por qué son polémicos?</h4>
                 <p>
                   Los nitritos (E250, E251) son esenciales para prevenir el botulismo en carnes curadas, uno de los peligros microbiológicos más graves. Su polémica proviene de que, en ciertas condiciones (alta temperatura, entorno ácido), pueden formarse nitrosaminas, compuestos potencialmente carcinogénicos. La OMS clasifica las carnes procesadas como grupo 1 (carcinogénico), aunque el riesgo absoluto en consumo moderado es pequeño.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Contexto:</strong> Sin nitritos, el riesgo de botulismo en embutidos curados sería mucho mayor. Es un equilibrio riesgo-beneficio regulado por la EFSA.
+                  <span aria-hidden="true">💡</span> <strong>Contexto:</strong> Sin nitritos, el riesgo de botulismo en embutidos curados sería mucho mayor. Es un equilibrio riesgo-beneficio regulado por la EFSA.
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Puede un aditivo E aparecer en productos «ecológicos» o «bio»?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Puede un aditivo E aparecer en productos «ecológicos» o «bio»?</h4>
                 <p>
                   Sí, pero solo una lista muy restringida. El Reglamento CE 889/2008 permite ciertos aditivos naturales en producción ecológica: E270 (ácido láctico), E330 (ácido cítrico), E406 (agar), E440 (pectina), E500 (bicarbonato) o E901 (cera de abeja), entre otros. Los colorantes sintéticos y conservantes como benzoatos o sulfitos están prohibidos en ecológico.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Pista:</strong> El sello europeo de agricultura ecológica (hoja verde) garantiza que no hay colorantes artificiales ni conservantes sintéticos.
+                  <span aria-hidden="true">💡</span> <strong>Pista:</strong> El sello europeo de agricultura ecológica (hoja verde) garantiza que no hay colorantes artificiales ni conservantes sintéticos.
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿El glutamato monosódico (E621) es perjudicial para la salud?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿El glutamato monosódico (E621) es perjudicial para la salud?</h4>
                 <p>
                   Según la EFSA y la FDA, el glutamato monosódico es seguro para la población general. El «síndrome del restaurante chino» no está respaldado científicamente: estudios doble ciego no han reproducido los síntomas atribuidos al MSG. El glutamato está presente de forma natural en tomates, queso parmesano, setas y algas kombu en cantidades similares o superiores a las que se añaden como aditivo.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Dato:</strong> El queso parmesano contiene hasta 1.200 mg de glutamato libre por 100 g, frente a los 500 mg/100 g de los productos más ricos en E621 añadido.
+                  <span aria-hidden="true">💡</span> <strong>Dato:</strong> El queso parmesano contiene hasta 1.200 mg de glutamato libre por 100 g, frente a los 500 mg/100 g de los productos más ricos en E621 añadido.
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Los edulcorantes intensos son seguros a largo plazo?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Los edulcorantes intensos son seguros a largo plazo?</h4>
                 <p>
                   Los edulcorantes aprobados por la EFSA tienen establecida una IDA basada en estudios toxicológicos. En 2023, la IARC clasificó el aspartamo como «posiblemente cancerígeno» (Grupo 2B), pero con evidencia limitada y a dosis muy superiores a la IDA. La OMS recomienda no usarlos para perder peso, ya que la evidencia sobre su beneficio a largo plazo es débil. El debate científico sigue abierto.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Perspectiva:</strong> «Posiblemente cancerígeno Grupo 2B» incluye también el café y los encurtidos. La dosis es clave.
+                  <span aria-hidden="true">💡</span> <strong>Perspectiva:</strong> «Posiblemente cancerígeno Grupo 2B» incluye también el café y los encurtidos. La dosis es clave.
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Cómo sé cuántos aditivos E tiene un producto?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Cómo sé cuántos aditivos E tiene un producto?</h4>
                 <p>
                   Busca en la lista de ingredientes de la etiqueta: todos los aditivos deben declararse por su nombre o código E, precedidos de su función («colorante: E102» o «conservante: sorbato potásico»). En la UE, esta información es obligatoria y debe aparecer en orden decreciente de cantidad para los ingredientes, aunque los aditivos no siguen necesariamente ese orden.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Truco:</strong> Cuantos más aditivos aparezcan al inicio de la lista de ingredientes, mayor proporción tienen en el producto.
+                  <span aria-hidden="true">💡</span> <strong>Truco:</strong> Cuantos más aditivos aparezcan al inicio de la lista de ingredientes, mayor proporción tienen en el producto.
                 </p>
               </div>
             </div>
@@ -456,7 +458,7 @@ export default function AdditivosEAlimentariosPage() {
 
           {/* 4. Guía paso a paso */}
           <section className={styles.guideSection}>
-            <h2>📋 Cómo leer la etiqueta alimentaria en 5 pasos</h2>
+            <h2><span aria-hidden="true">📋</span> Cómo leer la etiqueta alimentaria en 5 pasos</h2>
             <div className={styles.stepGuide}>
               <div className={styles.step}>
                 <div className={styles.stepNumber}>1</div>
@@ -498,35 +500,35 @@ export default function AdditivosEAlimentariosPage() {
 
           {/* 5. Mejores prácticas */}
           <section className={styles.guideSection}>
-            <h2>✅ Consejos para consumidores</h2>
+            <h2><span aria-hidden="true">✅</span> Consejos para consumidores</h2>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🔍</span>
+                <span className={styles.tipIcon} aria-hidden="true">🔍</span>
                 <h4>Busca por función, no solo por código</h4>
                 <p>La etiqueta puede usar el nombre completo en lugar del código E. «Sorbato potásico» y «E202» son lo mismo.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🌿</span>
+                <span className={styles.tipIcon} aria-hidden="true">🌿</span>
                 <h4>Natural no siempre significa sin aditivos</h4>
                 <p>Productos etiquetados como «naturales» pueden contener E300 (Vitamina C) o E440 (pectina), que son de origen natural pero siguen siendo aditivos.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>⚗️</span>
+                <span className={styles.tipIcon} aria-hidden="true">⚗️</span>
                 <h4>El origen importa si tienes restricciones dietéticas</h4>
                 <p>E120 (cochinilla) es de insecto: no apto para veganos. E422 (glicerol) puede ser de origen animal. Consulta al fabricante si tienes dudas.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📊</span>
+                <span className={styles.tipIcon} aria-hidden="true">📊</span>
                 <h4>Compara productos similares</h4>
                 <p>Dos yogures de la misma marca pueden tener listas de aditivos muy diferentes. Comparar etiquetas ayuda a elegir el de menor procesado.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🍷</span>
+                <span className={styles.tipIcon} aria-hidden="true">🍷</span>
                 <h4>Recuerda los sulfitos en vinos y frutos secos</h4>
                 <p>El vino contiene sulfitos de forma natural (fermentación) y añadidos. Los asmáticos sensibles deben revisar etiquetas de bebidas alcohólicas y frutos secos.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📱</span>
+                <span className={styles.tipIcon} aria-hidden="true">📱</span>
                 <h4>Usa esta guía en el punto de venta</h4>
                 <p>Funciona 100% sin conexión desde el navegador. Busca el código E mientras tienes el producto en la mano en el supermercado.</p>
               </div>
@@ -537,24 +539,24 @@ export default function AdditivosEAlimentariosPage() {
           <section className={styles.guideSection}>
             <div className={styles.warningBox}>
               <div className={styles.warningHeader}>
-                <span className={styles.warningIcon}>⚠️</span>
+                <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
                 <h3>Errores comunes al interpretar los aditivos E</h3>
               </div>
               <ul className={styles.warningList}>
                 <li>
-                  <strong>❌ Asumir que todos los aditivos E son artificiales:</strong> Muchos son de origen completamente natural: E100 (curcumina), E120 (cochinilla), E300 (vitamina C), E406 (agar), E440 (pectina), E901 (cera de abeja). El código E indica autorización, no síntesis artificial.
+                  <strong><span aria-hidden="true">❌</span> Asumir que todos los aditivos E son artificiales:</strong> Muchos son de origen completamente natural: E100 (curcumina), E120 (cochinilla), E300 (vitamina C), E406 (agar), E440 (pectina), E901 (cera de abeja). El código E indica autorización, no síntesis artificial.
                 </li>
                 <li>
-                  <strong>❌ Creer que «sin aditivos» significa sin conservantes de ningún tipo:</strong> La sal (cloruro sódico), el vinagre (ácido acético) y el azúcar son conservantes naturales que no se declaran como «aditivos E» porque son ingredientes. Un producto «sin E» puede tener alta carga de sal o azúcar.
+                  <strong><span aria-hidden="true">❌</span> Creer que «sin aditivos» significa sin conservantes de ningún tipo:</strong> La sal (cloruro sódico), el vinagre (ácido acético) y el azúcar son conservantes naturales que no se declaran como «aditivos E» porque son ingredientes. Un producto «sin E» puede tener alta carga de sal o azúcar.
                 </li>
                 <li>
-                  <strong>❌ Generalizar la intolerancia a toda una categoría:</strong> Una sensibilidad a un colorante azoico (E102) no implica sensibilidad a todos los colorantes. Los mecanismos son distintos: algunos son reacciones inmunológicas, otros farmacológicas. La consulta médica individualiza el diagnóstico.
+                  <strong><span aria-hidden="true">❌</span> Generalizar la intolerancia a toda una categoría:</strong> Una sensibilidad a un colorante azoico (E102) no implica sensibilidad a todos los colorantes. Los mecanismos son distintos: algunos son reacciones inmunológicas, otros farmacológicas. La consulta médica individualiza el diagnóstico.
                 </li>
                 <li>
-                  <strong>❌ Confundir «posiblemente cancerígeno Grupo 2B» con cancerígeno confirmado:</strong> El IARC Grupo 2B incluye evidencia limitada o inadecuada. El café, el aloe vera en extracto y los encurtidos también están en este grupo. No es equivalente al Grupo 1 (cancerígeno confirmado) como el alcohol o el tabaco.
+                  <strong><span aria-hidden="true">❌</span> Confundir «posiblemente cancerígeno Grupo 2B» con cancerígeno confirmado:</strong> El IARC Grupo 2B incluye evidencia limitada o inadecuada. El café, el aloe vera en extracto y los encurtidos también están en este grupo. No es equivalente al Grupo 1 (cancerígeno confirmado) como el alcohol o el tabaco.
                 </li>
                 <li>
-                  <strong>❌ Ignorar la dosis y la frecuencia de consumo:</strong> La IDA (Ingesta Diaria Admisible) establece la cantidad segura para toda la vida. Consumir esporádicamente un producto con E102 no supone el mismo riesgo que consumirlo diariamente en grandes cantidades.
+                  <strong><span aria-hidden="true">❌</span> Ignorar la dosis y la frecuencia de consumo:</strong> La IDA (Ingesta Diaria Admisible) establece la cantidad segura para toda la vida. Consumir esporádicamente un producto con E102 no supone el mismo riesgo que consumirlo diariamente en grandes cantidades.
                 </li>
               </ul>
             </div>

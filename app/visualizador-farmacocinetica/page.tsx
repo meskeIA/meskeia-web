@@ -217,6 +217,7 @@ export default function VisualizadorFarmacocinetica() {
             {SECCIONES_ADME.map((s) => (
               <button
                 key={s.id}
+                type="button"
                 className={`${styles.admeBtn} ${seccionActiva === s.id ? styles.admeBtnActivo : ''}`}
                 onClick={() => setSeccionActiva(s.id)}
                 aria-pressed={seccionActiva === s.id}
@@ -375,6 +376,7 @@ export default function VisualizadorFarmacocinetica() {
             ] as const).map((tab) => (
               <button
                 key={tab.id}
+                type="button"
                 role="tab"
                 aria-selected={seccionInteractiva === tab.id}
                 className={`${styles.tabBtn} ${seccionInteractiva === tab.id ? styles.tabActivo : ''}`}
@@ -587,8 +589,8 @@ export default function VisualizadorFarmacocinetica() {
               </p>
 
               <div className={styles.cypLegenda}>
-                <span className={styles.cypBadgeInductor}>⚡ Inductor — acelera el metabolismo → reduce niveles del fármaco</span>
-                <span className={styles.cypBadgeInhibidor}>🚫 Inhibidor — frena el metabolismo → aumenta niveles del fármaco</span>
+                <span className={styles.cypBadgeInductor}><span aria-hidden="true">⚡</span> Inductor — acelera el metabolismo → reduce niveles del fármaco</span>
+                <span className={styles.cypBadgeInhibidor}><span aria-hidden="true">🚫</span> Inhibidor — frena el metabolismo → aumenta niveles del fármaco</span>
               </div>
 
               <div className={styles.cypGrid}>
@@ -624,7 +626,7 @@ export default function VisualizadorFarmacocinetica() {
 
         {/* ── Clave pedagógica ── */}
         <section className={styles.warningBox}>
-          <h3>🔑 Índice terapéutico y margen de seguridad</h3>
+          <h3><span aria-hidden="true">🔑</span> Índice terapéutico y margen de seguridad</h3>
           <p>
             El <strong>índice terapéutico (IT)</strong> mide el margen entre la dosis eficaz y la dosis tóxica.
             Los fármacos con IT estrecho —warfarina, digoxina, litio, teofilina, ciclosporina— requieren monitorización

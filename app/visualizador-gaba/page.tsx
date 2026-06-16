@@ -265,6 +265,7 @@ function ModuladoresSection() {
       {MODULADORES_ALOSTERICOS.map((mod, idx) => (
         <div key={mod.titulo} className={styles.moduladorItem}>
           <button
+            type="button"
             className={`${styles.moduladorBtn} ${abierto === idx ? styles.moduladorBtnActivo : ''}`}
             onClick={() => toggleModulador(idx)}
             aria-expanded={abierto === idx}

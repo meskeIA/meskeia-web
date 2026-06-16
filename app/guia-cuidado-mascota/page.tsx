@@ -16,7 +16,7 @@ function GuideContent() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🐾</span>
+        <span className={styles.heroIcon} aria-hidden="true">🐾</span>
         <h1 className={styles.title}>Guía para el Cuidado de tu Mascota</h1>
         <p className={styles.subtitle}>
           Todo lo que necesitas saber para cuidar a tu perro o gato.
@@ -28,7 +28,7 @@ function GuideContent() {
           rel="noopener noreferrer"
           className={styles.videoButton}
         >
-          <span className={styles.videoIcon}>▶️</span>
+          <span className={styles.videoIcon} aria-hidden="true">▶️</span>
           Ver introducción en video
         </a>
       </header>
@@ -38,22 +38,22 @@ function GuideContent() {
       {/* Stats */}
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>📚</span>
+          <span className={styles.statIcon} aria-hidden="true">📚</span>
           <div className={styles.statValue}>{getTotalChapters()}</div>
           <div className={styles.statLabel}>Capítulos</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>⏱️</span>
+          <span className={styles.statIcon} aria-hidden="true">⏱️</span>
           <div className={styles.statValue}>{getTotalDuration()}</div>
           <div className={styles.statLabel}>Minutos</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>✅</span>
+          <span className={styles.statIcon} aria-hidden="true">✅</span>
           <div className={styles.statValue}>{getCompletedCount()}</div>
           <div className={styles.statLabel}>Completados</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>📈</span>
+          <span className={styles.statIcon} aria-hidden="true">📈</span>
           <div className={styles.statValue}>{progress}%</div>
           <div className={styles.statLabel}>Progreso</div>
         </div>
@@ -61,7 +61,7 @@ function GuideContent() {
 
       {/* Chapters */}
       <section className={styles.modulesSection}>
-        <h2 className={styles.sectionTitle}>📖 Contenido de la Guía</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">📖</span> Contenido de la Guía</h2>
         <div className={styles.chaptersGrid}>
           {COURSE_MODULES.map((module) => (
             module.chapters.map((chapter) => (
@@ -74,7 +74,7 @@ function GuideContent() {
                   <div className={styles.chapterIcon}>{module.icon}</div>
                   <div className={styles.chapterInfo}>
                     <div className={styles.chapterTitle}>{chapter.title}</div>
-                    <div className={styles.chapterDuration}>⏱️ {chapter.duration} min</div>
+                    <div className={styles.chapterDuration}><span aria-hidden="true">⏱️</span> {chapter.duration} min</div>
                   </div>
                 </div>
                 <div className={styles.chapterTopics}>
@@ -90,30 +90,30 @@ function GuideContent() {
 
       {/* Related Apps */}
       <section className={styles.appsSection}>
-        <h2 className={styles.sectionTitle}>🧰 Herramientas de Mascotas</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">🧰</span> Herramientas de Mascotas</h2>
         <div className={styles.appsGrid}>
           <Link href="/planificador-mascota/" className={styles.appCard}>
-            <span className={styles.appIcon}>📋</span>
+            <span className={styles.appIcon} aria-hidden="true">📋</span>
             <div className={styles.appName}>Planificador</div>
             <div className={styles.appDesc}>Checklist completo</div>
           </Link>
           <Link href="/calculadora-alimentacion-mascotas/" className={styles.appCard}>
-            <span className={styles.appIcon}>🍖</span>
+            <span className={styles.appIcon} aria-hidden="true">🍖</span>
             <div className={styles.appName}>Alimentación</div>
             <div className={styles.appDesc}>Cuánto debe comer</div>
           </Link>
           <Link href="/calculadora-medicamentos-mascotas/" className={styles.appCard}>
-            <span className={styles.appIcon}>💊</span>
+            <span className={styles.appIcon} aria-hidden="true">💊</span>
             <div className={styles.appName}>Medicamentos</div>
             <div className={styles.appDesc}>Dosis correctas</div>
           </Link>
           <Link href="/calculadora-tamano-adulto-perro/" className={styles.appCard}>
-            <span className={styles.appIcon}>📏</span>
+            <span className={styles.appIcon} aria-hidden="true">📏</span>
             <div className={styles.appName}>Tamaño Adulto</div>
             <div className={styles.appDesc}>Peso de cachorro</div>
           </Link>
           <Link href="/calculadora-edad-mascotas/" className={styles.appCard}>
-            <span className={styles.appIcon}>🎂</span>
+            <span className={styles.appIcon} aria-hidden="true">🎂</span>
             <div className={styles.appName}>Edad</div>
             <div className={styles.appDesc}>Años humanos</div>
           </Link>
@@ -122,7 +122,7 @@ function GuideContent() {
 
       {/* CTA */}
       <section className={styles.ctaSection}>
-        <h2 className={styles.ctaTitle}>🚀 ¡Comienza tu aprendizaje!</h2>
+        <h2 className={styles.ctaTitle}><span aria-hidden="true">🚀</span> ¡Comienza tu aprendizaje!</h2>
         <p className={styles.ctaText}>
           Aprende todo lo necesario para ser el mejor dueño que tu mascota pueda tener.
         </p>
@@ -139,7 +139,7 @@ function GuideContent() {
           <li><strong>No sustituye atención veterinaria</strong>: Consulta siempre con tu veterinario para diagnósticos, vacunas y tratamientos</li>
           <li><strong>Cada mascota es única</strong>: Razas, edades y estados de salud requieren cuidados específicos</li>
         </ul>
-        <p className={styles.highlight}><strong>🐾 Ante cualquier emergencia médica de tu mascota, acude inmediatamente a tu veterinario o clínica de urgencias.</strong></p>
+        <p className={styles.highlight}><strong><span aria-hidden="true">🐾</span> Ante cualquier emergencia médica de tu mascota, acude inmediatamente a tu veterinario o clínica de urgencias.</strong></p>
       </DisclaimerCard>
 
       <RelatedApps apps={getRelatedApps('guia-cuidado-mascota')} />
