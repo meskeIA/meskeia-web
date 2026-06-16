@@ -205,15 +205,19 @@ export default function ValidadorJSONPage() {
       {/* Tabs */}
       <div className={styles.tabs}>
         <button
+          type="button"
           className={`${styles.tab} ${activeTab === 'json' ? styles.tabActive : ''}`}
           onClick={() => handleTabChange('json')}
+          aria-pressed={activeTab === 'json'}
         >
           <span className={styles.tabIcon}>{ }</span>
           JSON
         </button>
         <button
+          type="button"
           className={`${styles.tab} ${activeTab === 'xml' ? styles.tabActive : ''}`}
           onClick={() => handleTabChange('xml')}
+          aria-pressed={activeTab === 'xml'}
         >
           <span className={styles.tabIcon}>&lt;/&gt;</span>
           XML
@@ -233,13 +237,13 @@ export default function ValidadorJSONPage() {
 
           <div className={styles.examples}>
             <span className={styles.examplesLabel}>Ejemplos:</span>
-            <button onClick={() => loadExample('simple')} className={styles.exampleBtn}>
+            <button type="button" onClick={() => loadExample('simple')} className={styles.exampleBtn}>
               Simple
             </button>
-            <button onClick={() => loadExample('array')} className={styles.exampleBtn}>
+            <button type="button" onClick={() => loadExample('array')} className={styles.exampleBtn}>
               {activeTab === 'json' ? 'Array' : 'Lista'}
             </button>
-            <button onClick={() => loadExample('complejo')} className={styles.exampleBtn}>
+            <button type="button" onClick={() => loadExample('complejo')} className={styles.exampleBtn}>
               Complejo
             </button>
           </div>
@@ -253,16 +257,16 @@ export default function ValidadorJSONPage() {
           />
 
           <div className={styles.actions}>
-            <button onClick={handleValidate} className={styles.btnPrimary}>
+            <button type="button" onClick={handleValidate} className={styles.btnPrimary}>
               Validar
             </button>
-            <button onClick={handleFormat} className={styles.btnSecondary}>
+            <button type="button" onClick={handleFormat} className={styles.btnSecondary}>
               Formatear
             </button>
-            <button onClick={handleMinify} className={styles.btnSecondary}>
+            <button type="button" onClick={handleMinify} className={styles.btnSecondary}>
               Minificar
             </button>
-            <button onClick={handleClear} className={styles.btnSecondary}>
+            <button type="button" onClick={handleClear} className={styles.btnSecondary}>
               Limpiar
             </button>
           </div>
@@ -273,6 +277,7 @@ export default function ValidadorJSONPage() {
           <div className={styles.panelHeader}>
             <h2 className={styles.panelTitle}>Resultado</h2>
             <button
+              type="button"
               onClick={handleCopy}
               className={styles.copyBtn}
               disabled={!output && !input}
@@ -382,7 +387,7 @@ export default function ValidadorJSONPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🔌</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔌</span>
                 <h3>APIs REST: JSON para comunicación rápida</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -404,7 +409,7 @@ export default function ValidadorJSONPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>⚙️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">⚙️</span>
                 <h3>Configuraciones: package.json, tsconfig.json</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -427,7 +432,7 @@ export default function ValidadorJSONPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📰</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📰</span>
                 <h3>RSS Feeds: XML para sindicación de contenido</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -452,7 +457,7 @@ export default function ValidadorJSONPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🗄️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🗄️</span>
                 <h3>Logs y trazabilidad: JSON Lines (.jsonl)</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -469,7 +474,7 @@ export default function ValidadorJSONPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏢</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏢</span>
                 <h3>Sistemas legacy: SOAP con XML</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -492,7 +497,7 @@ export default function ValidadorJSONPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🌐</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🌐</span>
                 <h3>Sitemaps SEO: XML para indexación Google</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -749,7 +754,7 @@ export default function ValidadorJSONPage() {
           <h2>Mejores Prácticas Profesionales</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Valida ANTES de commit a Git</h4>
               <p>
                 Un JSON inválido rompe builds y frustra al equipo. Valida siempre antes de push -
@@ -758,7 +763,7 @@ export default function ValidadorJSONPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Usa JSON Schema para validación estructural</h4>
               <p>
                 Esta herramienta valida sintaxis, pero JSON Schema valida estructura (campos requeridos,
@@ -767,7 +772,7 @@ export default function ValidadorJSONPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Minifica solo en build, nunca en source</h4>
               <p>
                 Mantén código fuente formateado (legible) y minifica automáticamente en tu pipeline
@@ -776,7 +781,7 @@ export default function ValidadorJSONPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Evita JSON anidado más de 3 niveles</h4>
               <p>
                 JSON con 5+ niveles de anidación es difícil de mantener y debuggear. Aplana la
@@ -785,7 +790,7 @@ export default function ValidadorJSONPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Prefiere JSON sobre XML para APIs nuevas</h4>
               <p>
                 JSON es más rápido, más compacto y parseado nativamente en JavaScript. Usa XML solo
@@ -794,7 +799,7 @@ export default function ValidadorJSONPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Automatiza validación con pre-commit hooks</h4>
               <p>
                 Usa herramientas como Husky para validar JSON automáticamente antes de cada commit.
@@ -807,7 +812,7 @@ export default function ValidadorJSONPage() {
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <h3>Errores Comunes que Rompen Producción</h3>
           </div>
           <ul className={styles.warningList}>

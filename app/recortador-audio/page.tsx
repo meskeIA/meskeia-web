@@ -506,7 +506,7 @@ export default function RecortadorAudioPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>✂️</span>
+        <span className={styles.heroIcon} aria-hidden="true">✂️</span>
         <h1 className={styles.title}>Recortador de Audio</h1>
         <p className={styles.subtitle}>
           Recorta, edita y exporta audio sin límites ni marcas de agua
@@ -532,7 +532,7 @@ export default function RecortadorAudioPage() {
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
           >
-            <span className={styles.dropIcon}>🎵</span>
+            <span className={styles.dropIcon} aria-hidden="true">🎵</span>
             <p className={styles.dropText}>Arrastra un archivo de audio aquí o haz clic para seleccionar</p>
             <span className={styles.dropHint}>MP3, WAV, OGG, M4A, FLAC</span>
             <input
@@ -554,7 +554,7 @@ export default function RecortadorAudioPage() {
               <span className={styles.fileMeta}>
                 {formatSize(audioInfo.size)} • {formatTime(audioInfo.duration)}
               </span>
-              <button onClick={handleClear} className={styles.clearBtn}>
+              <button type="button" onClick={handleClear} className={styles.clearBtn}>
                 Cambiar archivo
               </button>
             </div>
@@ -614,10 +614,12 @@ export default function RecortadorAudioPage() {
             {/* Controles de reproducción */}
             <div className={styles.playbackControls}>
               <button
+                type="button"
                 onClick={isPlaying ? stopPlayback : playAudio}
                 className={styles.playBtn}
+                aria-pressed={isPlaying}
               >
-                {isPlaying ? '⏹️ Detener' : '▶️ Reproducir selección'}
+                {isPlaying ? <><span aria-hidden="true">⏹️</span> Detener</> : <><span aria-hidden="true">▶️</span> Reproducir selección</>}
               </button>
               <span className={styles.currentTime}>
                 {formatTime(currentTime)} / {formatTime(selectedDuration)}
@@ -674,20 +676,26 @@ export default function RecortadorAudioPage() {
               <h3>Formato de salida</h3>
               <div className={styles.formatButtons}>
                 <button
+                  type="button"
                   className={`${styles.formatBtn} ${outputFormat === 'mp3' ? styles.formatActive : ''}`}
                   onClick={() => setOutputFormat('mp3')}
+                  aria-pressed={outputFormat === 'mp3'}
                 >
                   MP3
                 </button>
                 <button
+                  type="button"
                   className={`${styles.formatBtn} ${outputFormat === 'wav' ? styles.formatActive : ''}`}
                   onClick={() => setOutputFormat('wav')}
+                  aria-pressed={outputFormat === 'wav'}
                 >
                   WAV
                 </button>
                 <button
+                  type="button"
                   className={`${styles.formatBtn} ${outputFormat === 'ogg' ? styles.formatActive : ''}`}
                   onClick={() => setOutputFormat('ogg')}
+                  aria-pressed={outputFormat === 'ogg'}
                 >
                   OGG
                 </button>
@@ -700,25 +708,26 @@ export default function RecortadorAudioPage() {
             {/* Botones de acción */}
             <div className={styles.actions}>
               <button
+                type="button"
                 onClick={processAudio}
                 className={styles.btnPrimary}
                 disabled={isProcessing}
               >
-                {isProcessing ? 'Procesando...' : '✂️ Recortar y Procesar'}
+                {isProcessing ? 'Procesando...' : <><span aria-hidden="true">✂️</span> Recortar y Procesar</>}
               </button>
             </div>
 
             {/* Resultado */}
             {processedUrl && (
               <div className={styles.result}>
-                <h3>✅ Audio procesado</h3>
+                <h3><span aria-hidden="true">✅</span> Audio procesado</h3>
                 <div className={styles.resultInfo}>
                   <span>Tamaño: {processedSize && formatSize(processedSize)}</span>
                   <span>Duración: {formatTime(selectedDuration)}</span>
                 </div>
                 <audio src={processedUrl} controls className={styles.audioPlayer} />
-                <button onClick={downloadAudio} className={styles.btnPrimary}>
-                  📥 Descargar audio
+                <button type="button" onClick={downloadAudio} className={styles.btnPrimary}>
+                  <span aria-hidden="true">📥</span> Descargar audio
                 </button>
               </div>
             )}
@@ -728,22 +737,22 @@ export default function RecortadorAudioPage() {
         {/* Características */}
         <div className={styles.features}>
           <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>✂️</span>
+            <span className={styles.featureIcon} aria-hidden="true">✂️</span>
             <h4>Recorte preciso</h4>
             <p>Selecciona el inicio y fin exactos con precisión de centésimas de segundo</p>
           </div>
           <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>🎚️</span>
+            <span className={styles.featureIcon} aria-hidden="true">🎚️</span>
             <h4>Ajuste de volumen</h4>
             <p>Aumenta o reduce el volumen del audio de 0% a 200%</p>
           </div>
           <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>🌊</span>
+            <span className={styles.featureIcon} aria-hidden="true">🌊</span>
             <h4>Fade In/Out</h4>
             <p>Añade transiciones suaves al inicio y final del audio</p>
           </div>
           <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>🔒</span>
+            <span className={styles.featureIcon} aria-hidden="true">🔒</span>
             <h4>100% Privado</h4>
             <p>Todo se procesa en tu navegador, sin subir nada a servidores</p>
           </div>

@@ -129,24 +129,27 @@ export default function GeneradorLoremIpsumPage() {
               <div className={styles.formatoButtons}>
                 <button
                   type="button"
+                  aria-pressed={formato === 'parrafos'}
                   className={`${styles.formatoBtn} ${formato === 'parrafos' ? styles.active : ''}`}
                   onClick={() => { setFormato('parrafos'); setCantidad(Math.min(cantidad, 12)); }}
                 >
-                  📄 Párrafos
+                  <span aria-hidden="true">📄</span> Párrafos
                 </button>
                 <button
                   type="button"
+                  aria-pressed={formato === 'oraciones'}
                   className={`${styles.formatoBtn} ${formato === 'oraciones' ? styles.active : ''}`}
                   onClick={() => { setFormato('oraciones'); setCantidad(Math.min(cantidad, 50)); }}
                 >
-                  📝 Oraciones
+                  <span aria-hidden="true">📝</span> Oraciones
                 </button>
                 <button
                   type="button"
+                  aria-pressed={formato === 'palabras'}
                   className={`${styles.formatoBtn} ${formato === 'palabras' ? styles.active : ''}`}
                   onClick={() => { setFormato('palabras'); setCantidad(Math.min(cantidad, 500)); }}
                 >
-                  🔤 Palabras
+                  <span aria-hidden="true">🔤</span> Palabras
                 </button>
               </div>
             </div>
@@ -174,7 +177,7 @@ export default function GeneradorLoremIpsumPage() {
 
           <div className={styles.buttonRow}>
             <button type="button" onClick={generarTexto} className={styles.btnPrimary}>
-              ✨ Generar Lorem Ipsum
+              <span aria-hidden="true">✨</span> Generar Lorem Ipsum
             </button>
             <button type="button" onClick={limpiar} className={styles.btnSecondary} disabled={!resultado}>
               Limpiar
@@ -192,7 +195,7 @@ export default function GeneradorLoremIpsumPage() {
               className={styles.btnCopy}
               disabled={!resultado}
             >
-              {copiado ? '✅ Copiado' : '📋 Copiar'}
+              {copiado ? <><span aria-hidden="true">✅</span> Copiado</> : <><span aria-hidden="true">📋</span> Copiar</>}
             </button>
           </div>
 
@@ -206,9 +209,9 @@ export default function GeneradorLoremIpsumPage() {
 
           {resultado && (
             <div className={styles.stats}>
-              <span>📄 {stats.parrafos} párrafo{stats.parrafos !== 1 ? 's' : ''}</span>
-              <span>📝 {stats.palabras} palabra{stats.palabras !== 1 ? 's' : ''}</span>
-              <span>🔤 {stats.caracteres} carácter{stats.caracteres !== 1 ? 'es' : ''}</span>
+              <span><span aria-hidden="true">📄</span> {stats.parrafos} párrafo{stats.parrafos !== 1 ? 's' : ''}</span>
+              <span><span aria-hidden="true">📝</span> {stats.palabras} palabra{stats.palabras !== 1 ? 's' : ''}</span>
+              <span><span aria-hidden="true">🔤</span> {stats.caracteres} carácter{stats.caracteres !== 1 ? 'es' : ''}</span>
             </div>
           )}
         </section>

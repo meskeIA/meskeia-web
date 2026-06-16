@@ -366,12 +366,12 @@
 | [x] | Generador de Sombras | `/generador-sombras/` | diseno |
 | [x] | Generador de Tipografías | `/generador-tipografias/` | diseno |
 | [x] | Generador Imágenes OG | `/generador-og-images/` | diseno |
-| [ ] | Generador Lorem Ipsum | `/generador-lorem-ipsum/` | diseno |
+| [x] | Generador Lorem Ipsum | `/generador-lorem-ipsum/` | diseno |
 | [x] | Playground SQL | `/playground-sql/` | diseno, estudiantes |
-| [ ] | Recortador de Audio | `/recortador-audio/` | diseno, productividad |
-| [ ] | Selector de Canal de Venta | `/selector-canal-venta/` | diseno, freelance |
+| [x] | Recortador de Audio | `/recortador-audio/` | diseno, productividad |
+| [x] | Selector de Canal de Venta | `/selector-canal-venta/` | diseno, freelance |
 | [x] | Simulador de Puertas Lógicas | `/simulador-puertas-logicas/` | diseno, estudiantes |
-| [ ] | Validador JSON | `/validador-json/` | diseno, tecnicas |
+| [x] | Validador JSON | `/validador-json/` | diseno, tecnicas |
 | [ ] | Validador RegEx | `/validador-regex/` | diseno, tecnicas |
 | [x] | Visualizador de Algoritmos | `/visualizador-algoritmos/` | diseno, estudiantes |
 
