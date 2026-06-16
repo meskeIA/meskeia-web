@@ -420,18 +420,22 @@ export default function GuiaCortesCarne() {
               <span className={styles.filtroLabel}>Animal:</span>
               <div className={styles.filtros} role="group" aria-label="Filtrar por animal">
                 <button
+                  type="button"
                   className={`${styles.filtroBtn} ${animal === 'Todos' ? styles.filtroActivo : ''}`}
                   onClick={() => setAnimal('Todos')}
+                  aria-pressed={animal === 'Todos'}
                 >
                   Todos
                 </button>
                 {ANIMALES.map((a) => (
                   <button
                     key={a}
+                    type="button"
                     className={`${styles.filtroBtn} ${animal === a ? styles.filtroActivo : ''}`}
                     onClick={() => setAnimal(a)}
+                    aria-pressed={animal === a}
                   >
-                    {ANIMAL_EMOJI[a]} {a}
+                    <span aria-hidden="true">{ANIMAL_EMOJI[a]}</span> {a}
                   </button>
                 ))}
               </div>
@@ -440,16 +444,20 @@ export default function GuiaCortesCarne() {
               <span className={styles.filtroLabel}>Método de cocción:</span>
               <div className={styles.filtros} role="group" aria-label="Filtrar por método de cocción">
                 <button
+                  type="button"
                   className={`${styles.filtroBtn} ${metodo === 'Todos' ? styles.filtroActivo : ''}`}
                   onClick={() => setMetodo('Todos')}
+                  aria-pressed={metodo === 'Todos'}
                 >
                   Todos
                 </button>
                 {METODOS.map((m) => (
                   <button
                     key={m}
+                    type="button"
                     className={`${styles.filtroBtn} ${metodo === m ? styles.filtroActivo : ''}`}
                     onClick={() => setMetodo(m)}
+                    aria-pressed={metodo === m}
                   >
                     {m}
                   </button>

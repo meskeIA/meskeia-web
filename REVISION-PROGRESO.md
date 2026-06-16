@@ -1017,10 +1017,10 @@
 | [x] | GABA: El Gran Freno del Sistema Nervioso | `/visualizador-gaba/` | salud, cultura, estudiantes |
 | [x] | Guía Cuidado de Mascotas | `/guia-cuidado-mascota/` | salud, cultura |
 | [x] | Guía de Aditivos E Alimentarios | `/aditivos-e-alimentarios/` | salud, cultura |
-| [ ] | Guía de Cortes de Carne | `/guia-cortes-carne/` | salud, cultura |
-| [ ] | Guía de Especias | `/guia-especias/` | salud, cultura |
-| [ ] | Guía de Frutas Exóticas | `/guia-frutas-exoticas/` | salud, cultura |
-| [ ] | Guía de Frutos Secos | `/guia-frutos-secos/` | salud, cultura |
+| [x] | Guía de Cortes de Carne | `/guia-cortes-carne/` | salud, cultura |
+| [x] | Guía de Especias | `/guia-especias/` | salud, cultura |
+| [x] | Guía de Frutas Exóticas | `/guia-frutas-exoticas/` | salud, cultura |
+| [x] | Guía de Frutos Secos | `/guia-frutos-secos/` | salud, cultura |
 | [ ] | Guía de Hierbas Aromáticas | `/guia-hierbas-aromaticas/` | salud, cultura |
 | [ ] | Guía de Infusiones | `/guia-infusiones/` | salud, cultura |
 | [ ] | Guía de Insectos del Jardín | `/guia-insectos-jardin/` | salud, cultura |

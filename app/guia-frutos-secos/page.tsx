@@ -918,6 +918,7 @@ export default function GuiaFrutosSecosPage() {
               {CATEGORIAS.map((cat) => (
                 <button
                   key={cat}
+                  type="button"
                   className={`${styles.filtroBtn} ${
                     categoria === cat ? styles.filtroActivo : ''
                   }`}
@@ -940,6 +941,7 @@ export default function GuiaFrutosSecosPage() {
               {REGIONES.map((reg) => (
                 <button
                   key={reg}
+                  type="button"
                   className={`${styles.filtroBtn} ${
                     region === reg ? styles.filtroActivo : ''
                   }`}
@@ -962,6 +964,7 @@ export default function GuiaFrutosSecosPage() {
               {NIVELES_CALORICOS.map((n) => (
                 <button
                   key={n}
+                  type="button"
                   className={`${styles.filtroBtn} ${
                     nivel === n ? styles.filtroActivo : ''
                   }`}
@@ -984,6 +987,7 @@ export default function GuiaFrutosSecosPage() {
               {PERFILES_NUTRICIONALES.map((p) => (
                 <button
                   key={p}
+                  type="button"
                   className={`${styles.filtroBtn} ${
                     perfil === p ? styles.filtroActivo : ''
                   }`}

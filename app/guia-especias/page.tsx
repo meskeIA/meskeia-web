@@ -796,7 +796,7 @@ export default function GuiaEspeciasPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🌿 Guía de Especias</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🌿</span> Guía de Especias</h1>
           <p className={styles.subtitle}>
             Perfil de sabor, intensidad, usos y consejos de conservación de {ESPECIAS.length} especias.
           </p>
@@ -831,7 +831,7 @@ export default function GuiaEspeciasPage() {
               aria-label="Buscar especia"
             />
             {busqueda && (
-              <button className={styles.clearBtn} onClick={() => setBusqueda('')} aria-label="Limpiar búsqueda">
+              <button type="button" className={styles.clearBtn} onClick={() => setBusqueda('')} aria-label="Limpiar búsqueda">
                 ✕
               </button>
             )}
@@ -843,6 +843,7 @@ export default function GuiaEspeciasPage() {
           {familiasConConteo.map(({ nombre, count }) => (
             <button
               key={nombre}
+              type="button"
               className={`${styles.filtroBtn} ${familiaActiva === nombre ? styles.filtroActivo : ''} ${nombre !== 'Todas' ? FAMILIA_ESTILOS[nombre as Familia] + 'Btn' : ''}`}
               onClick={() => setFamiliaActiva(nombre)}
               aria-pressed={familiaActiva === nombre}
@@ -880,8 +881,8 @@ export default function GuiaEspeciasPage() {
               <p className={styles.nombreCientifico}>{e.nombreCientifico}</p>
 
               <div className={styles.metaRow}>
-                <span className={styles.metaTag}>🌱 {e.partePlanta}</span>
-                <span className={styles.metaTag}>📍 {e.origen}</span>
+                <span className={styles.metaTag}><span aria-hidden="true">🌱</span> {e.partePlanta}</span>
+                <span className={styles.metaTag}><span aria-hidden="true">📍</span> {e.origen}</span>
               </div>
 
               <PuntosIntensidad intensidad={e.intensidad} />
@@ -907,7 +908,7 @@ export default function GuiaEspeciasPage() {
               </div>
 
               <p className={styles.conservacion}>
-                <span className={styles.conservaIcon}>🫙</span>
+                <span className={styles.conservaIcon} aria-hidden="true">🫙</span>
                 {e.conservacion}
               </p>
             </article>
@@ -921,7 +922,7 @@ export default function GuiaEspeciasPage() {
         >
           {/* 1. Tabla: mezclas clásicas */}
           <section className={styles.guideSection}>
-            <h2>📊 Mezclas de especias clásicas del mundo</h2>
+            <h2><span aria-hidden="true">📊</span> Mezclas de especias clásicas del mundo</h2>
             <p>
               Las grandes mezclas tradicionales combinan especias para crear perfiles de sabor complejos que serían imposibles de lograr con una sola. Conocerlas es entender la cocina de cada región:
             </p>
@@ -991,11 +992,11 @@ export default function GuiaEspeciasPage() {
 
           {/* 2. Casos de uso */}
           <section className={styles.guideSection}>
-            <h2>👥 ¿Para quién es esta guía?</h2>
+            <h2><span aria-hidden="true">👥</span> ¿Para quién es esta guía?</h2>
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🍳</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🍳</span>
                   <h3>Cocinero en casa que quiere ampliar su despensa</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -1007,7 +1008,7 @@ export default function GuiaEspeciasPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🧹</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🧹</span>
                   <h3>Organizar y revisar la despensa de especias</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -1019,7 +1020,7 @@ export default function GuiaEspeciasPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🌍</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🌍</span>
                   <h3>Cocinero curioso por una gastronomía nueva</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -1031,7 +1032,7 @@ export default function GuiaEspeciasPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🎁</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🎁</span>
                   <h3>Elegir especias para regalar o recibir como regalo</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -1046,69 +1047,69 @@ export default function GuiaEspeciasPage() {
 
           {/* 3. FAQ */}
           <section className={styles.guideSection}>
-            <h2>❓ Preguntas frecuentes</h2>
+            <h2><span aria-hidden="true">❓</span> Preguntas frecuentes</h2>
             <div className={styles.faqList}>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Cuánto tiempo duran las especias realmente?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Cuánto tiempo duran las especias realmente?</h4>
                 <p>
                   Las especias enteras duran de 2 a 5 años; las molidas entre 1 y 2 años. Sin embargo, la pérdida de aroma empieza mucho antes: a los 6 meses muchas especias molidas ya han perdido el 50% de sus aceites esenciales volátiles. La fecha de caducidad indica seguridad microbiológica, no calidad aromática.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Prueba de frescor:</strong> Frota un poco de especia en la palma de la mano y huele. Si el aroma es débil, es hora de renovarla, aunque no haya caducado.
+                  <span aria-hidden="true">💡</span> <strong>Prueba de frescor:</strong> Frota un poco de especia en la palma de la mano y huele. Si el aroma es débil, es hora de renovarla, aunque no haya caducado.
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Enteras o molidas? ¿Cuál es mejor comprar?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Enteras o molidas? ¿Cuál es mejor comprar?</h4>
                 <p>
                   Las enteras siempre conservan mejor el aroma porque los aceites esenciales quedan atrapados. Moler en casa con un molinillo (o mortero) justo antes de usar multiplica la intensidad. Para uso diario sin molinillo, las molidas son prácticas. Nunca compres grandes cantidades de molida: se apagan rápido.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Regla práctica:</strong> Compra enteras las especias que usas menos de una vez por semana; molida lo que usas cada día (como la pimienta en el molinillo de mesa).
+                  <span aria-hidden="true">💡</span> <strong>Regla práctica:</strong> Compra enteras las especias que usas menos de una vez por semana; molida lo que usas cada día (como la pimienta en el molinillo de mesa).
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Por qué tostar las especias antes de usarlas?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Por qué tostar las especias antes de usarlas?</h4>
                 <p>
                   El tostado en seco (sin aceite, a fuego medio) activa las reacciones de Maillard y libera aceites esenciales, intensificando y transformando el sabor. El comino tostado tiene más profundidad que el crudo; las semillas de mostaza en aceite caliente "explotan" liberando su aroma. No todas las especias se benefician: la cúrcuma, por ejemplo, se quema fácilmente.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Técnica:</strong> Tuesta en seco a fuego medio moviendo constantemente. En cuanto notes el aroma y empiece a humear ligeramente, retira inmediatamente de la sartén.
+                  <span aria-hidden="true">💡</span> <strong>Técnica:</strong> Tuesta en seco a fuego medio moviendo constantemente. En cuanto notes el aroma y empiece a humear ligeramente, retira inmediatamente de la sartén.
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Cuándo se añaden las especias: al inicio o al final?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Cuándo se añaden las especias: al inicio o al final?</h4>
                 <p>
                   Depende del efecto deseado. Al inicio en grasa caliente (tempering) se liberan compuestos liposolubles que aroman todo el plato. Al final se preservan compuestos volátiles más delicados que el calor destruiría. Las especias robustas (comino, mostaza, cardamomo) al inicio; las delicadas (hierbas frescas, azafrán, cilantro fresco) al final.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Regla:</strong> Si la especia aguanta el calor, tempérala en aceite al inicio. Si es aromática y frágil (como el cilantro fresco o la menta), añádela cruda al servir.
+                  <span aria-hidden="true">💡</span> <strong>Regla:</strong> Si la especia aguanta el calor, tempérala en aceite al inicio. Si es aromática y frágil (como el cilantro fresco o la menta), añádela cruda al servir.
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Hay especias que no puedan tomarse en grandes cantidades?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Hay especias que no puedan tomarse en grandes cantidades?</h4>
                 <p>
                   Sí. La nuez moscada contiene miristicina: más de 5-10 g (unas 2 cucharaditas) puede causar síntomas de intoxicación. La canela de Cassia (la más común en supermercados) contiene cumarina, que en dosis altas es hepatotóxica. La asafétida mal dosificada puede causar molestias digestivas intensas. El wasabi real en grandes cantidades irrita las mucosas. Las dosis culinarias normales son seguras.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Nota:</strong> La canela de Ceilán (Cinnamomum verum, más cara) tiene muy baja cumarina y es más segura para consumo frecuente que la Cassia.
+                  <span aria-hidden="true">💡</span> <strong>Nota:</strong> La canela de Ceilán (Cinnamomum verum, más cara) tiene muy baja cumarina y es más segura para consumo frecuente que la Cassia.
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Cómo reconocer especias de calidad?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Cómo reconocer especias de calidad?</h4>
                 <p>
                   Color intenso y uniforme, aroma potente al abrir el tarro, sin grumos ni humedad, fecha de envasado reciente. Para el azafrán: filamentos rojos con punta amarilla, no polvo; el precio es una pista (el barato casi siempre es adulterado con pétalos de cártamo). Para la vainilla: vainas flexibles, húmedas y aromáticas, no secas y quebradizas.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Truco del azafrán:</strong> Disuelve unos hilos en agua templada: el color debe liberarse gradualmente y los filamentos seguir intactos. Si se deshacen, es cártamo.
+                  <span aria-hidden="true">💡</span> <strong>Truco del azafrán:</strong> Disuelve unos hilos en agua templada: el color debe liberarse gradualmente y los filamentos seguir intactos. Si se deshacen, es cártamo.
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Cómo deben guardarse las especias?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Cómo deben guardarse las especias?</h4>
                 <p>
                   Los tres enemigos de las especias son el calor, la luz y la humedad. Un tarro de cristal hermético, opaco o guardado en armario oscuro, alejado del fuego y del vapor de la cocina, es lo ideal. Los tarros junto a la vitrocerámica aceleran la degradación. El frigorífico o congelador es una opción válida para especias enteras muy aromáticas como la vainilla o el azafrán.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Regla:</strong> Si al abrir un tarro de especia el aroma no te llega antes de acercar la nariz, ya ha perdido su potencia. Renuévala.
+                  <span aria-hidden="true">💡</span> <strong>Regla:</strong> Si al abrir un tarro de especia el aroma no te llega antes de acercar la nariz, ya ha perdido su potencia. Renuévala.
                 </p>
               </div>
             </div>
@@ -1116,7 +1117,7 @@ export default function GuiaEspeciasPage() {
 
           {/* 4. Guía paso a paso */}
           <section className={styles.guideSection}>
-            <h2>📋 Cómo construir una despensa de especias desde cero</h2>
+            <h2><span aria-hidden="true">📋</span> Cómo construir una despensa de especias desde cero</h2>
             <div className={styles.stepGuide}>
               <div className={styles.step}>
                 <div className={styles.stepNumber}>1</div>
@@ -1165,35 +1166,35 @@ export default function GuiaEspeciasPage() {
 
           {/* 5. Mejores prácticas */}
           <section className={styles.guideSection}>
-            <h2>✅ Claves para usar especias como un profesional</h2>
+            <h2><span aria-hidden="true">✅</span> Claves para usar especias como un profesional</h2>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🔥</span>
+                <span className={styles.tipIcon} aria-hidden="true">🔥</span>
                 <h4>Tempera en grasa al inicio</h4>
                 <p>Comino, mostaza o cardamomo en aceite caliente liberan compuestos liposolubles que perfuman todo el plato. Añadirlos en seco al final es menos eficaz.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🫙</span>
+                <span className={styles.tipIcon} aria-hidden="true">🫙</span>
                 <h4>Muele justo antes de usar</h4>
                 <p>Un molinillo de especias (o de café limpio) transforma el resultado. La pimienta recién molida y el cardamomo recién machacado no tienen comparación con el polvo envasado.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🌡️</span>
+                <span className={styles.tipIcon} aria-hidden="true">🌡️</span>
                 <h4>Cúrcuma siempre con pimienta negra</h4>
                 <p>La piperina de la pimienta negra aumenta la biodisponibilidad de la curcumina hasta 20 veces. Es una combinación que tiene sentido tanto culinario como nutricional.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>💡</span>
+                <span className={styles.tipIcon} aria-hidden="true">💡</span>
                 <h4>Menos es más con los sabores intensos</h4>
                 <p>Clavo, asafétida, wasabi y anís estrellado son potentísimos. Empieza con la cantidad mínima (¼ cucharadita o incluso menos) y ajusta. Un exceso arruina el plato.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📍</span>
+                <span className={styles.tipIcon} aria-hidden="true">📍</span>
                 <h4>El origen importa en las especias nobles</h4>
                 <p>El azafrán de La Mancha, el pimentón de La Vera, el cardamomo de Guatemala, la vainilla de Madagascar o Tahití: el terroir afecta profundamente al aroma y calidad.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🔄</span>
+                <span className={styles.tipIcon} aria-hidden="true">🔄</span>
                 <h4>Adapta el formato al uso</h4>
                 <p>Especias enteras para guisos largos (se retiran). Molidas para mezclas y aliños. Frescas para terminar el plato. Cada formato aporta una intensidad y momento de entrega diferente.</p>
               </div>
@@ -1204,27 +1205,27 @@ export default function GuiaEspeciasPage() {
           <section className={styles.guideSection}>
             <div className={styles.warningBox}>
               <div className={styles.warningHeader}>
-                <span className={styles.warningIcon}>⚠️</span>
+                <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
                 <h3>Errores comunes al cocinar con especias</h3>
               </div>
               <ul className={styles.warningList}>
                 <li>
-                  <strong>❌ Guardar especias junto al fuego o en el alféizar:</strong> El calor y la luz directa degradan los aceites esenciales en semanas. Una especia guardada mal junto a la vitrocerámica pierde su potencia en 1-2 meses.
+                  <strong><span aria-hidden="true">❌</span> Guardar especias junto al fuego o en el alféizar:</strong> El calor y la luz directa degradan los aceites esenciales en semanas. Una especia guardada mal junto a la vitrocerámica pierde su potencia en 1-2 meses.
                 </li>
                 <li>
-                  <strong>❌ Usar cucharas húmedas para sacar especias del tarro:</strong> La humedad crea grumos y acelera la pérdida de aroma. Siempre usar cuchara seca, nunca directamente sobre el vapor de la olla.
+                  <strong><span aria-hidden="true">❌</span> Usar cucharas húmedas para sacar especias del tarro:</strong> La humedad crea grumos y acelera la pérdida de aroma. Siempre usar cuchara seca, nunca directamente sobre el vapor de la olla.
                 </li>
                 <li>
-                  <strong>❌ Confundir anís verde, anís estrellado e hinojo:</strong> Tienen perfiles de sabor distintos y no son intercambiables a la misma dosis. El estrellado es mucho más potente y profundo que el verde; el hinojo es más suave y dulce.
+                  <strong><span aria-hidden="true">❌</span> Confundir anís verde, anís estrellado e hinojo:</strong> Tienen perfiles de sabor distintos y no son intercambiables a la misma dosis. El estrellado es mucho más potente y profundo que el verde; el hinojo es más suave y dulce.
                 </li>
                 <li>
-                  <strong>❌ Añadir el azafrán directamente sin infusionar:</strong> El azafrán debe infusionarse 10-15 minutos en agua templada, caldo o leche antes de incorporarlo. Añadirlo seco desperdicia gran parte de su aroma y color.
+                  <strong><span aria-hidden="true">❌</span> Añadir el azafrán directamente sin infusionar:</strong> El azafrán debe infusionarse 10-15 minutos en agua templada, caldo o leche antes de incorporarlo. Añadirlo seco desperdicia gran parte de su aroma y color.
                 </li>
                 <li>
-                  <strong>❌ Abusar del curry en polvo comercial:</strong> El curry industrial es una mezcla estandarizada con proporciones fijas. Aprender a combinar comino, cilantro, cúrcuma, cardamomo y pimienta por separado da más control y mejor resultado.
+                  <strong><span aria-hidden="true">❌</span> Abusar del curry en polvo comercial:</strong> El curry industrial es una mezcla estandarizada con proporciones fijas. Aprender a combinar comino, cilantro, cúrcuma, cardamomo y pimienta por separado da más control y mejor resultado.
                 </li>
                 <li>
-                  <strong>❌ Comprar especias en grandes envases del supermercado:</strong> El precio por kilo suele ser más alto y la fecha de envasado más antigua que en tiendas especializadas. Mejor comprar menos cantidad con mayor frescor.
+                  <strong><span aria-hidden="true">❌</span> Comprar especias en grandes envases del supermercado:</strong> El precio por kilo suele ser más alto y la fecha de envasado más antigua que en tiendas especializadas. Mejor comprar menos cantidad con mayor frescor.
                 </li>
               </ul>
             </div>
