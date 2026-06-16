@@ -364,6 +364,7 @@ export default function VisualizadorTelomerasa() {
 
           <div className={styles.stepControls}>
             <button
+              type="button"
               className={styles.btnPaso}
               onClick={() => setPasoActual((p) => Math.max(0, p - 1))}
               disabled={pasoActual === 0}
@@ -376,15 +377,18 @@ export default function VisualizadorTelomerasa() {
               {PASOS.map((_, i) => (
                 <button
                   key={i}
+                  type="button"
                   className={`${styles.dot} ${i === pasoActual ? styles.dotActivo : ''}`}
                   onClick={() => setPasoActual(i)}
                   aria-label={`Ir al paso ${i + 1}`}
+                  aria-pressed={i === pasoActual}
                   aria-current={i === pasoActual ? 'step' : undefined}
                 />
               ))}
             </div>
 
             <button
+              type="button"
               className={styles.btnPaso}
               onClick={() => setPasoActual((p) => Math.min(PASOS.length - 1, p + 1))}
               disabled={pasoActual === PASOS.length - 1}
@@ -408,7 +412,7 @@ export default function VisualizadorTelomerasa() {
               <div className={styles.nombreCelula}>{celula.nombre}</div>
               <BarraActividad nivel={celula.nivel} esCancer={celula.esCancer} />
               <div className={styles.nivelLabel}>
-                {celula.esCancer ? '⚠️ ' : ''}
+                {celula.esCancer ? <span aria-hidden="true">⚠️ </span> : ''}
                 {celula.nivel === 5
                   ? 'Muy alta'
                   : celula.nivel === 4

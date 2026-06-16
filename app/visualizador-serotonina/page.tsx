@@ -255,7 +255,7 @@ function BloqueSintesis() {
         <span className={styles.flujoFlecha} aria-hidden="true">→</span>
         <span className={styles.flujoItem} style={{ background: '#2E86AB' }}>Serotonina</span>
         <span className={styles.flujoFlecha} aria-hidden="true">→</span>
-        <span className={styles.flujoItem} style={{ background: '#1A5276' }}>Melatonina 🌙</span>
+        <span className={styles.flujoItem} style={{ background: '#1A5276' }}>Melatonina <span aria-hidden="true">🌙</span></span>
       </div>
     </section>
   );
@@ -364,7 +364,7 @@ function BloqueSSRI() {
       <div className={styles.sinapsisNeurona} aria-label="Neurona postsináptica con SSRI">
         <div className={styles.sinapsisNeuronaTitulo}>Neurona postsináptica</div>
         <div className={styles.sinapsisReceptor} style={{ borderColor: '#48A9A6', background: 'rgba(72,169,166,0.12)' }}>
-          Receptor 5-HT activado de forma prolongada ✓
+          Receptor 5-HT activado de forma prolongada <span aria-hidden="true">✓</span>
         </div>
       </div>
       <p className={styles.sinapsisDesc}>

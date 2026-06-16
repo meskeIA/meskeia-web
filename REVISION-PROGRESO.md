@@ -1068,10 +1068,10 @@
 | [x] | Selector de Gestión del Estrés | `/selector-gestion-estres/` | salud, productividad |
 | [x] | Selector de Mascota | `/selector-mascota/` | salud, productividad |
 | [x] | Selector de Seguro de Salud | `/selector-seguro-salud/` | salud, finanzas |
-| [ ] | Selector de Tipo de Gimnasio | `/selector-tipo-gimnasio/` | salud, productividad |
-| [ ] | Serotonina: Mucho Más que la Hormona de la Felicidad | `/visualizador-serotonina/` | salud, cultura, estudiantes |
-| [ ] | Telomerasa - La Enzima de la Inmortalidad Celular | `/visualizador-telomerasa/` | salud, cultura, estudiantes |
-| [ ] | Test de Bienestar WHO-5 | `/test-bienestar-who5/` | salud |
+| [x] | Selector de Tipo de Gimnasio | `/selector-tipo-gimnasio/` | salud, productividad |
+| [x] | Serotonina: Mucho Más que la Hormona de la Felicidad | `/visualizador-serotonina/` | salud, cultura, estudiantes |
+| [x] | Telomerasa - La Enzima de la Inmortalidad Celular | `/visualizador-telomerasa/` | salud, cultura, estudiantes |
+| [x] | Test de Bienestar WHO-5 | `/test-bienestar-who5/` | salud |
 | [ ] | Test de Burnout Laboral | `/test-burnout-laboral/` | salud, productividad |
 | [ ] | Test de Estilo Parental | `/test-estilo-parental/` | salud |
 | [ ] | Test de Fragilidad (Escala FRAIL) | `/test-fragilidad/` | salud, legal-fiscal |
