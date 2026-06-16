@@ -690,14 +690,18 @@ export default function GuiaTe() {
               <span className={styles.filtroLabel}>Familia:</span>
               <div className={styles.filtros} role="group" aria-label="Filtrar por familia">
                 <button
+                  type="button"
                   className={`${styles.filtroBtn} ${familia === 'Todas' ? styles.filtroActivo : ''}`}
                   onClick={() => setFamilia('Todas')}
+                  aria-pressed={familia === 'Todas'}
                 >Todas</button>
                 {FAMILIAS.map((f) => (
                   <button
                     key={f}
+                    type="button"
                     className={`${styles.filtroBtn} ${familia === f ? styles.filtroActivo : ''}`}
                     onClick={() => setFamilia(f)}
+                    aria-pressed={familia === f}
                   >{f}</button>
                 ))}
               </div>
@@ -815,7 +819,7 @@ export default function GuiaTe() {
         <h3>¿Qué té es para ti?</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <strong>🌿 Buscas calma y relajación</strong>
+            <strong><span aria-hidden="true">🌿</span> Buscas calma y relajación</strong>
             <p>
               Los tés blancos (Silver Needle, White Peony) y el Gyokuro son ricos en L-teanina,
               un aminoácido que promueve la relajación sin somnolencia. El Rooibos es perfecto
@@ -823,7 +827,7 @@ export default function GuiaTe() {
             </p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🧠 Necesitas concentración</strong>
+            <strong><span aria-hidden="true">🧠</span> Necesitas concentración</strong>
             <p>
               El Gyokuro y el Matcha tienen la combinación óptima de cafeína y L-teanina para
               una energía limpia y sostenida. El Sencha y el Kabusecha son más suaves para
@@ -831,7 +835,7 @@ export default function GuiaTe() {
             </p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>⚡ Quieres más energía</strong>
+            <strong><span aria-hidden="true">⚡</span> Quieres más energía</strong>
             <p>
               Los tés negros (Assam, English Breakfast) tienen más cafeína por taza. El Sheng
               Pu-erh joven es sorprendentemente energizante. Preparados con agua más caliente y
@@ -839,7 +843,7 @@ export default function GuiaTe() {
             </p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>👥 Momento social o familiar</strong>
+            <strong><span aria-hidden="true">👥</span> Momento social o familiar</strong>
             <p>
               El té de menta marroquí (Gunpowder + hierbabuena), el Earl Grey inglés o el
               Rooibos son perfectos para compartir sin barreras culturales. El Hojicha
@@ -868,7 +872,7 @@ export default function GuiaTe() {
               estándar tiene 20-50mg vs 80-120mg del café.
             </p>
             <span className={styles.faqTip}>
-              💡 La L-teanina del té modera el efecto de la cafeína, dando una energía más suave y sostenida que el café.
+              <span aria-hidden="true">💡</span> La L-teanina del té modera el efecto de la cafeína, dando una energía más suave y sostenida que el café.
             </span>
           </li>
           <li className={styles.faqItem}>
@@ -889,7 +893,7 @@ export default function GuiaTe() {
               troceada y se agota en la primera infusión.
             </p>
             <span className={styles.faqTip}>
-              🍵 Los maestros del té dicen que la segunda o tercera infusión suele ser la mejor.
+              <span aria-hidden="true">🍵</span> Los maestros del té dicen que la segunda o tercera infusión suele ser la mejor.
             </span>
           </li>
           <li className={styles.faqItem}>

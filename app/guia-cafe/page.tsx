@@ -578,12 +578,13 @@ export default function GuiaCafe() {
         {/* ── GUÍA DE REFERENCIA ─────────────────────────────────── */}
         <div className={styles.refSection}>
           <button
+            type="button"
             className={styles.refToggle}
             onClick={() => setMostrarRef((v) => !v)}
             aria-expanded={mostrarRef}
           >
-            <span>📖 Guía de referencia: Especies · Procesado · Tueste</span>
-            <span className={styles.refToggleIcon}>{mostrarRef ? '▲' : '▼'}</span>
+            <span><span aria-hidden="true">📖</span> Guía de referencia: Especies · Procesado · Tueste</span>
+            <span className={styles.refToggleIcon} aria-hidden="true">{mostrarRef ? '▲' : '▼'}</span>
           </button>
 
           {mostrarRef && (
@@ -592,12 +593,13 @@ export default function GuiaCafe() {
                 {(['especies', 'procesado', 'tueste'] as TabRef[]).map((t) => (
                   <button
                     key={t}
+                    type="button"
                     role="tab"
                     aria-selected={tabRef === t}
                     className={`${styles.refTab} ${tabRef === t ? styles.refTabActivo : ''}`}
                     onClick={() => setTabRef(t)}
                   >
-                    {t === 'especies' ? '🌱 Especies' : t === 'procesado' ? '⚙️ Procesado' : '🌡️ Tueste'}
+                    {t === 'especies' ? <><span aria-hidden="true">🌱</span> Especies</> : t === 'procesado' ? <><span aria-hidden="true">⚙️</span> Procesado</> : <><span aria-hidden="true">🌡️</span> Tueste</>}
                   </button>
                 ))}
               </div>
@@ -692,14 +694,18 @@ export default function GuiaCafe() {
               <span className={styles.filtroLabel}>Continente:</span>
               <div className={styles.filtros} role="group" aria-label="Filtrar por continente">
                 <button
+                  type="button"
                   className={`${styles.filtroBtn} ${continente === 'Todos' ? styles.filtroActivo : ''}`}
                   onClick={() => setContinente('Todos')}
+                  aria-pressed={continente === 'Todos'}
                 >Todos</button>
                 {CONTINENTES.map((c) => (
                   <button
                     key={c}
+                    type="button"
                     className={`${styles.filtroBtn} ${continente === c ? styles.filtroActivo : ''}`}
                     onClick={() => setContinente(c)}
+                    aria-pressed={continente === c}
                   >{c}</button>
                 ))}
               </div>
@@ -716,7 +722,7 @@ export default function GuiaCafe() {
             <article key={o.nombre} className={styles.card}>
               <div className={styles.cardHeader}>
                 <span className={`${styles.continenteBadge} ${o.continente === 'América' ? styles.badgeAmerica : o.continente === 'África' ? styles.badgeAfrica : styles.badgeAsia}`}>
-                  {o.continente === 'América' ? '🌎' : o.continente === 'África' ? '🌍' : '🌏'} {o.continente}
+                  <span aria-hidden="true">{o.continente === 'América' ? '🌎' : o.continente === 'África' ? '🌍' : '🌏'}</span> {o.continente}
                 </span>
                 <span className={`${styles.especieBadge} ${o.especie === 'Arábica' ? styles.badgeArabica : o.especie === 'Robusta' ? styles.badgeRobusta : styles.badgeLibeica}`}>
                   {o.especie}
@@ -728,7 +734,7 @@ export default function GuiaCafe() {
                 <span className={styles.paisRegion}>{o.pais} · {o.region}</span>
               </div>
 
-              <span className={styles.altitudPill}>⛰️ {o.altitud}</span>
+              <span className={styles.altitudPill}><span aria-hidden="true">⛰️</span> {o.altitud}</span>
 
               <p className={styles.descripcion}>{o.descripcion}</p>
 
@@ -765,7 +771,7 @@ export default function GuiaCafe() {
                 </div>
                 <div>
                   <span className={styles.sectionLabel}>Cosecha</span>
-                  <span className={styles.cosecha}>🗓️ {o.cosecha}</span>
+                  <span className={styles.cosecha}><span aria-hidden="true">🗓️</span> {o.cosecha}</span>
                 </div>
               </div>
 
@@ -835,7 +841,7 @@ export default function GuiaCafe() {
         <h3>¿Para qué perfil es cada café?</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <strong>🎨 El aficionado al café de especialidad</strong>
+            <strong><span aria-hidden="true">🎨</span> El aficionado al café de especialidad</strong>
             <p>
               Empieza por Etiopía Yirgacheffe o Colombia Huila en V60. Busca la acidez brillante
               y la complejidad frutal que el café convencional nunca muestra. El tostado claro
@@ -843,7 +849,7 @@ export default function GuiaCafe() {
             </p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>☕ El amante del espresso italiano</strong>
+            <strong><span aria-hidden="true">☕</span> El amante del espresso italiano</strong>
             <p>
               Brasil Cerrado o Sumatra Mandheling en tostado oscuro. Cuerpo intenso, crema
               espesa, amargo elegante. Añade Robusta de Vietnam o Costa de Marfil a la mezcla
@@ -851,7 +857,7 @@ export default function GuiaCafe() {
             </p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🧊 El fan del cold brew y el filtrado en frío</strong>
+            <strong><span aria-hidden="true">🧊</span> El fan del cold brew y el filtrado en frío</strong>
             <p>
               Los cafés de alta acidez brillan en frío: Kenia, Burundi o Colombia Nariño.
               La acidez "jugosa" se acentúa con el frío y las notas frutales emergen sin
@@ -859,7 +865,7 @@ export default function GuiaCafe() {
             </p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🌱 El curioso de orígenes raros</strong>
+            <strong><span aria-hidden="true">🌱</span> El curioso de orígenes raros</strong>
             <p>
               Yemen Moka, Bolivia Caranavi, Timor Oriental o el Geisha de Panamá. Cafés con
               historia, perfiles únicos y a veces precios que justifican una ocasión especial.
@@ -888,7 +894,7 @@ export default function GuiaCafe() {
               florales y frutales que ningún otro origen puede replicar.
             </p>
             <span className={styles.faqTip}>
-              💡 El Yirgacheffe lavado y el Harrar natural son como dos mundos distintos siendo
+              <span aria-hidden="true">💡</span> El Yirgacheffe lavado y el Harrar natural son como dos mundos distintos siendo
               del mismo país.
             </span>
           </li>
@@ -941,7 +947,7 @@ export default function GuiaCafe() {
               los canales más fiables.
             </p>
             <span className={styles.faqTip}>
-              ☕ Un café de especialidad suele costar entre 15 y 40 €/250 g. Por encima de 40 €
+              <span aria-hidden="true">☕</span> Un café de especialidad suele costar entre 15 y 40 €/250 g. Por encima de 40 €
               suele ser un lote muy pequeño o de concurso.
             </span>
           </li>

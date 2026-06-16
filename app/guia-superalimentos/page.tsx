@@ -611,6 +611,7 @@ export default function GuiaSuperalimentosPage() {
             {CATEGORIAS.map((cat) => (
               <button
                 key={cat}
+                type="button"
                 className={`${styles.filtroBtn} ${categoria === cat ? styles.filtroActivo : ''}`}
                 onClick={() => setCategoria(cat)}
                 aria-pressed={categoria === cat}

@@ -752,15 +752,19 @@ export default function GuiaAceiteOliva() {
               <span className={styles.filtroLabel}>País:</span>
               <div className={styles.filtros} role="group" aria-label="Filtrar por país">
                 <button
+                  type="button"
                   className={`${styles.filtroBtn} ${pais === 'Todos' ? styles.filtroActivo : ''}`}
                   onClick={() => setPais('Todos')}
+                  aria-pressed={pais === 'Todos'}
                 >Todos</button>
                 {PAISES.map((p) => (
                   <button
                     key={p}
+                    type="button"
                     className={`${styles.filtroBtn} ${pais === p ? styles.filtroActivo : ''}`}
                     onClick={() => setPais(p)}
-                  >{BANDERA[p]} {p}</button>
+                    aria-pressed={pais === p}
+                  ><span aria-hidden="true">{BANDERA[p]}</span> {p}</button>
                 ))}
               </div>
             </div>
@@ -768,14 +772,18 @@ export default function GuiaAceiteOliva() {
               <span className={styles.filtroLabel}>Perfil:</span>
               <div className={styles.filtros} role="group" aria-label="Filtrar por perfil de sabor">
                 <button
+                  type="button"
                   className={`${styles.filtroBtn} ${perfil === 'Todos' ? styles.filtroActivo : ''}`}
                   onClick={() => setPerfil('Todos')}
+                  aria-pressed={perfil === 'Todos'}
                 >Todos</button>
                 {PERFILES.map((p) => (
                   <button
                     key={p}
+                    type="button"
                     className={`${styles.filtroBtn} ${perfil === p ? styles.filtroActivo : ''}`}
                     onClick={() => setPerfil(p)}
+                    aria-pressed={perfil === p}
                   >{p}</button>
                 ))}
               </div>
@@ -795,7 +803,7 @@ export default function GuiaAceiteOliva() {
                   {v.perfil}
                 </span>
                 <span className={styles.paisBadge}>
-                  {BANDERA[v.pais]} {v.pais}
+                  <span aria-hidden="true">{BANDERA[v.pais]}</span> {v.pais}
                 </span>
               </div>
 
@@ -851,7 +859,7 @@ export default function GuiaAceiteOliva() {
               <div className={styles.metaRow}>
                 <div>
                   <span className={styles.sectionLabel}>Cosecha</span>
-                  <span className={styles.cosecha}>🗓️ {v.cosecha}</span>
+                  <span className={styles.cosecha}><span aria-hidden="true">🗓️</span> {v.cosecha}</span>
                 </div>
               </div>
 
@@ -953,7 +961,7 @@ export default function GuiaAceiteOliva() {
         <h3>¿Para qué perfil es cada aceite?</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <strong>🍞 Pan con aceite: el desayuno mediterráneo</strong>
+            <strong><span aria-hidden="true">🍞</span> Pan con aceite: el desayuno mediterráneo</strong>
             <p>
               Un AOVE frutado verde intenso (Picual, Koroneiki, Coratina) sobre tostada con sal
               es el desayuno más polifenólico posible. El picor en garganta es señal de oleocantal,
@@ -962,7 +970,7 @@ export default function GuiaAceiteOliva() {
             </p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🍳 Cocinero / fritura</strong>
+            <strong><span aria-hidden="true">🍳</span> Cocinero / fritura</strong>
             <p>
               Para fritura de alta temperatura, elige un AOVE rico en ácido oleico y polifenoles:
               Picual o Cornicabra. Aguantan hasta 180°C sin degradarse ni generar aldehídos.
@@ -971,7 +979,7 @@ export default function GuiaAceiteOliva() {
             </p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🎂 Repostería: bizcochos y dulces</strong>
+            <strong><span aria-hidden="true">🎂</span> Repostería: bizcochos y dulces</strong>
             <p>
               Arbequina, Empeltre o Taggiasca en bizcochos, muffins y tarta de aceite. El perfil
               dulce de almendra y fruta madura complementa perfectamente los sabores de la
@@ -979,7 +987,7 @@ export default function GuiaAceiteOliva() {
             </p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🧀 Maridaje con queso y jamón ibérico</strong>
+            <strong><span aria-hidden="true">🧀</span> Maridaje con queso y jamón ibérico</strong>
             <p>
               Sobre queso manchego curado o jamón ibérico de bellota, un AOVE Picual o Cornicabra
               en cosecha temprana crea una sinergia perfecta: la grasa del ibérico y los
@@ -1010,7 +1018,7 @@ export default function GuiaAceiteOliva() {
               0,2°. La acidez mide daño estructural en la grasa, no sabor.
             </p>
             <span className={styles.faqTip}>
-              💡 El sabor amargo y el picor son indicadores reales de calidad: más polifenoles
+              <span aria-hidden="true">💡</span> El sabor amargo y el picor son indicadores reales de calidad: más polifenoles
               = más amargo/picante = más saludable.
             </span>
           </li>
@@ -1052,7 +1060,7 @@ export default function GuiaAceiteOliva() {
               es la firma de los mejores AOVE.
             </p>
             <span className={styles.faqTip}>
-              🫒 Los catadores profesionales puntúan el aceite por fruitiness, bitterness y pungency
+              <span aria-hidden="true">🫒</span> Los catadores profesionales puntúan el aceite por fruitiness, bitterness y pungency
               (frutosidad, amargor y picor). Los tres deben estar equilibrados en un buen AOVE.
             </span>
           </li>

@@ -1029,10 +1029,10 @@
 | [x] | Guía de Razas de Gatos | `/guia-razas-gatos/` | salud, cultura |
 | [x] | Guía de Razas de Perros | `/guia-razas-perros/` | salud, cultura |
 | [x] | Guía de Setas | `/guia-setas/` | salud, cultura |
-| [ ] | Guía de Superalimentos | `/guia-superalimentos/` | salud, cultura |
-| [ ] | Guía del Aceite de Oliva | `/guia-aceite-oliva/` | salud, cultura |
-| [ ] | Guía del Café | `/guia-cafe/` | salud, cultura |
-| [ ] | Guía del Té | `/guia-te/` | salud, cultura |
+| [x] | Guía de Superalimentos | `/guia-superalimentos/` | salud, cultura |
+| [x] | Guía del Aceite de Oliva | `/guia-aceite-oliva/` | salud, cultura |
+| [x] | Guía del Café | `/guia-cafe/` | salud, cultura |
+| [x] | Guía del Té | `/guia-te/` | salud, cultura |
 | [x] | Huesos del Cuerpo Humano | `/huesos-cuerpo-humano/` | salud, cultura |
 | [ ] | Ibuprofeno: Inhibidor COX con Efecto Antiinflamatorio | `/visualizador-ibuprofeno/` | salud, cultura, estudiantes |
 | [ ] | Índice Glucémico vs. Carga Glucémica: La Paradoja de la Sandía | `/visualizador-indice-glucemico/` | salud, cultura, estudiantes |
