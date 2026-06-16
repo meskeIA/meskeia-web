@@ -194,6 +194,7 @@ function TabTipos(): React.ReactNode {
         {TIPOS_SEGURO.map((tipo) => (
           <button
             key={tipo.id}
+            type="button"
             className={`${styles.tipoCard} ${activo === tipo.id ? styles.tipoCardActivo : ''}`}
             onClick={() => setActivo(tipo.id)}
             aria-pressed={activo === tipo.id}
@@ -476,6 +477,7 @@ function TabConceptos(): React.ReactNode {
         return (
           <button
             key={c.termino}
+            type="button"
             className={`${styles.conceptoCard} ${estaExpandido ? styles.conceptoCardExpanded : ''}`}
             onClick={() => setExpandido(estaExpandido ? null : c.termino)}
             aria-expanded={estaExpandido}
@@ -500,11 +502,11 @@ function TabConceptos(): React.ReactNode {
 // Componente principal
 // ─────────────────────────────────────────────
 
-const TABS: { id: TabId; label: string }[] = [
-  { id: 'tipos', label: '🛡️ Tipos de seguro' },
-  { id: 'prima', label: '🧮 Cálculo de prima' },
-  { id: 'pool', label: '👥 Pool de riesgo' },
-  { id: 'conceptos', label: '📖 Conceptos clave' },
+const TABS: { id: TabId; icon: string; label: string }[] = [
+  { id: 'tipos', icon: '🛡️', label: 'Tipos de seguro' },
+  { id: 'prima', icon: '🧮', label: 'Cálculo de prima' },
+  { id: 'pool', icon: '👥', label: 'Pool de riesgo' },
+  { id: 'conceptos', icon: '📖', label: 'Conceptos clave' },
 ];
 
 export default function VisualizadorSegurosRiesgo(): React.ReactNode {
@@ -530,11 +532,12 @@ export default function VisualizadorSegurosRiesgo(): React.ReactNode {
           {TABS.map((tab) => (
             <button
               key={tab.id}
+              type="button"
               className={`${styles.tabBtn} ${tabActiva === tab.id ? styles.tabBtnActivo : ''}`}
               onClick={() => setTabActiva(tab.id)}
               aria-current={tabActiva === tab.id ? 'page' : undefined}
             >
-              {tab.label}
+              <span aria-hidden="true">{tab.icon}</span>{' '}{tab.label}
             </button>
           ))}
         </nav>

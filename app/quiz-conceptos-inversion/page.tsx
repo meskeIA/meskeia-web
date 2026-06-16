@@ -468,7 +468,7 @@ export default function QuizConceptosInversionPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📈 Quiz Conceptos de Inversión</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📈</span> Quiz Conceptos de Inversión</h1>
         <p className={styles.subtitle}>
           Sharpe, beta, duration, TER, rebalanceo y valoración — nivel intermedio con explicaciones detalladas
         </p>
@@ -483,17 +483,21 @@ export default function QuizConceptosInversionPage() {
           <div className={styles.inicio}>
             <div className={styles.modoSelector}>
               <button
+                type="button"
                 onClick={() => setModo('examen')}
                 className={`${styles.modoBtn} ${modo === 'examen' ? styles.modoBtnActivo : ''}`}
+                aria-pressed={modo === 'examen'}
               >
-                📝 Examen completo
+                <span aria-hidden="true">📝</span> Examen completo
                 <span>25 preguntas</span>
               </button>
               <button
+                type="button"
                 onClick={() => setModo('practica')}
                 className={`${styles.modoBtn} ${modo === 'practica' ? styles.modoBtnActivo : ''}`}
+                aria-pressed={modo === 'practica'}
               >
-                🎯 Práctica por categoría
+                <span aria-hidden="true">🎯</span> Práctica por categoría
                 <span>5 preguntas</span>
               </button>
             </div>
@@ -505,11 +509,13 @@ export default function QuizConceptosInversionPage() {
                   {(Object.entries(CATEGORIAS) as [Categoria, typeof CATEGORIAS[Categoria]][]).map(([id, cfg]) => (
                     <button
                       key={id}
+                      type="button"
                       onClick={() => setCategoriaSeleccionada(id)}
                       className={`${styles.catBtn} ${categoriaSeleccionada === id ? styles.catBtnActivo : ''}`}
                       style={{ borderColor: categoriaSeleccionada === id ? cfg.color : undefined }}
+                      aria-pressed={categoriaSeleccionada === id}
                     >
-                      <span>{cfg.icono}</span>
+                      <span aria-hidden="true">{cfg.icono}</span>
                       <span>{cfg.label}</span>
                     </button>
                   ))}
@@ -520,13 +526,13 @@ export default function QuizConceptosInversionPage() {
             <div className={styles.categoriasList}>
               {(Object.entries(CATEGORIAS) as [Categoria, typeof CATEGORIAS[Categoria]][]).map(([id, cfg]) => (
                 <div key={id} className={styles.catInfo} style={{ borderLeftColor: cfg.color }}>
-                  <span>{cfg.icono} <strong>{cfg.label}</strong></span>
+                  <span><span aria-hidden="true">{cfg.icono}</span> <strong>{cfg.label}</strong></span>
                   <span className={styles.catCount}>5 preguntas</span>
                 </div>
               ))}
             </div>
 
-            <button onClick={iniciar} className={styles.btnIniciar}>
+            <button type="button" onClick={iniciar} className={styles.btnIniciar}>
               Empezar quiz →
             </button>
 
@@ -569,6 +575,7 @@ export default function QuizConceptosInversionPage() {
                 return (
                   <button
                     key={i}
+                    type="button"
                     onClick={() => responder(i)}
                     disabled={estado === 'respondida'}
                     className={cls}
@@ -585,10 +592,11 @@ export default function QuizConceptosInversionPage() {
             {estado === 'respondida' && (
               <div className={`${styles.feedback} ${respuestaElegida === preguntaActual.correcta ? styles.feedbackOk : styles.feedbackFail}`}>
                 <p className={styles.feedbackTitulo}>
-                  {respuestaElegida === preguntaActual.correcta ? '✅ Correcto' : '❌ Incorrecto'}
+                  <span aria-hidden="true">{respuestaElegida === preguntaActual.correcta ? '✅' : '❌'}</span>
+                  {respuestaElegida === preguntaActual.correcta ? ' Correcto' : ' Incorrecto'}
                 </p>
                 <p className={styles.feedbackExplicacion}>{preguntaActual.explicacion}</p>
-                <button onClick={siguiente} className={styles.btnSiguiente}>
+                <button type="button" onClick={siguiente} className={styles.btnSiguiente}>
                   {indice + 1 < preguntas.length ? 'Siguiente pregunta →' : 'Ver resultado →'}
                 </button>
               </div>
@@ -617,7 +625,7 @@ export default function QuizConceptosInversionPage() {
                   const pct = Math.round((r.correctas / r.total) * 100);
                   return (
                     <div key={cat} className={styles.desgloseItem}>
-                      <span>{CATEGORIAS[cat].icono} {CATEGORIAS[cat].label}</span>
+                      <span><span aria-hidden="true">{CATEGORIAS[cat].icono}</span> {CATEGORIAS[cat].label}</span>
                       <div className={styles.desgloseBar}>
                         <div
                           className={styles.desgloseRelleno}
@@ -632,7 +640,7 @@ export default function QuizConceptosInversionPage() {
                 })}
             </div>
 
-            <button onClick={reiniciar} className={styles.btnReiniciar}>
+            <button type="button" onClick={reiniciar} className={styles.btnReiniciar}>
               ↺ Volver a empezar
             </button>
           </div>

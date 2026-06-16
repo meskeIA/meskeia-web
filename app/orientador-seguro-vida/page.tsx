@@ -131,7 +131,7 @@ export default function CalculadoraSeguroVidaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🛡️</span>
+        <span className={styles.heroIcon} aria-hidden="true">🛡️</span>
         <h1 className={styles.title}>Orientador Seguro de Vida</h1>
         <p className={styles.subtitle}>
           Descubre cuánto capital necesitas para proteger a tu familia ante imprevistos
@@ -144,7 +144,7 @@ export default function CalculadoraSeguroVidaPage() {
         {/* Panel de entrada */}
         <div className={styles.inputPanel}>
           <div className={styles.inputSection}>
-            <h2 className={styles.sectionTitle}>👤 Datos Personales</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">👤</span> Datos Personales</h2>
             <div className={styles.inputGrid}>
               <NumberInput
                 value={edad}
@@ -167,7 +167,7 @@ export default function CalculadoraSeguroVidaPage() {
           </div>
 
           <div className={styles.inputSection}>
-            <h2 className={styles.sectionTitle}>💰 Ingresos Anuales</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">💰</span> Ingresos Anuales</h2>
             <div className={styles.inputGrid}>
               <NumberInput
                 value={ingresoAnual}
@@ -187,7 +187,7 @@ export default function CalculadoraSeguroVidaPage() {
           </div>
 
           <div className={styles.inputSection}>
-            <h2 className={styles.sectionTitle}>🏠 Deudas y Compromisos</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">🏠</span> Deudas y Compromisos</h2>
             <div className={styles.inputGrid}>
               <NumberInput
                 value={hipotecaPendiente}
@@ -207,7 +207,7 @@ export default function CalculadoraSeguroVidaPage() {
           </div>
 
           <div className={styles.inputSection}>
-            <h2 className={styles.sectionTitle}>👨‍👩‍👧‍👦 Situación Familiar</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">👨‍👩‍👧‍👦</span> Situación Familiar</h2>
             <div className={styles.inputGrid}>
               <NumberInput
                 value={numHijos}
@@ -228,7 +228,7 @@ export default function CalculadoraSeguroVidaPage() {
           </div>
 
           <div className={styles.inputSection}>
-            <h2 className={styles.sectionTitle}>💼 Recursos Actuales</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">💼</span> Recursos Actuales</h2>
             <div className={styles.inputGrid}>
               <NumberInput
                 value={ahorrosActuales}
@@ -248,7 +248,7 @@ export default function CalculadoraSeguroVidaPage() {
           </div>
 
           <button type="button" onClick={limpiarFormulario} className={styles.btnSecondary}>
-            🔄 Limpiar formulario
+            <span aria-hidden="true">🔄</span> Limpiar formulario
           </button>
         </div>
 
@@ -281,7 +281,7 @@ export default function CalculadoraSeguroVidaPage() {
               </div>
 
               <div className={styles.desgloseSection}>
-                <h3 className={styles.desgloseTitle}>📊 Desglose de Necesidades</h3>
+                <h3 className={styles.desgloseTitle}><span aria-hidden="true">📊</span> Desglose de Necesidades</h3>
                 <div className={styles.desgloseGrid}>
                   <div className={styles.desgloseItem}>
                     <span className={styles.desgloseLabel}>Sustitución de ingresos</span>
@@ -311,7 +311,7 @@ export default function CalculadoraSeguroVidaPage() {
               </div>
 
               <div className={styles.recomendacion}>
-                <h3>💡 Recomendación</h3>
+                <h3><span aria-hidden="true">💡</span> Recomendación</h3>
                 <p>
                   {calcularNecesidades.capitalRecomendado === 0 ? (
                     'Con tus recursos actuales y seguro existente, ya tienes una cobertura adecuada. Revisa periódicamente si cambia tu situación.'
@@ -327,7 +327,7 @@ export default function CalculadoraSeguroVidaPage() {
             </>
           ) : (
             <div className={styles.emptyState}>
-              <span className={styles.emptyIcon}>🛡️</span>
+              <span className={styles.emptyIcon} aria-hidden="true">🛡️</span>
               <h3>Calcula tu protección</h3>
               <p>Introduce tu edad e ingresos para ver cuánto seguro de vida necesitas</p>
             </div>
@@ -358,28 +358,28 @@ export default function CalculadoraSeguroVidaPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🏠 Proteger la vivienda</h4>
+              <h4><span aria-hidden="true">🏠</span> Proteger la vivienda</h4>
               <p>
                 Si tienes hipoteca, el banco exige un seguro de vida vinculado. Pero ojo: ese seguro solo
                 cubre el préstamo, no las necesidades de tu familia.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>👨‍👩‍👧 Sustituir ingresos</h4>
+              <h4><span aria-hidden="true">👨‍👩‍👧</span> Sustituir ingresos</h4>
               <p>
                 El objetivo principal es reemplazar tus ingresos durante los años que tu familia los necesitaría
                 hasta que puedan ser económicamente independientes.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>🎓 Educación de los hijos</h4>
+              <h4><span aria-hidden="true">🎓</span> Educación de los hijos</h4>
               <p>
                 Desde guardería hasta universidad, el coste total de educar un hijo puede superar los 100.000€.
                 Un seguro de vida garantiza que no tendrán que renunciar a su formación.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>💳 Cancelar deudas</h4>
+              <h4><span aria-hidden="true">💳</span> Cancelar deudas</h4>
               <p>
                 Hipoteca, préstamo del coche, tarjetas de crédito... Las deudas no desaparecen al fallecer.
                 El seguro evita que tu familia herede una carga financiera.
@@ -393,21 +393,21 @@ export default function CalculadoraSeguroVidaPage() {
 
           <div className={styles.tiposGrid}>
             <div className={styles.tipoCard}>
-              <h4>⏱️ Seguro Temporal (Riesgo)</h4>
+              <h4><span aria-hidden="true">⏱️</span> Seguro Temporal (Riesgo)</h4>
               <p><strong>Cómo funciona:</strong> Pagas una prima anual y estás cubierto durante un período (10, 20, 30 años).</p>
               <p><strong>Ventaja:</strong> Es el más económico. Ideal si tu necesidad de protección disminuye con el tiempo.</p>
               <p><strong>Ejemplo:</strong> Persona de 35 años con hijos pequeños contrata 200.000€ a 20 años hasta que sean adultos.</p>
             </div>
 
             <div className={styles.tipoCard}>
-              <h4>♾️ Seguro de Vida Entera</h4>
+              <h4><span aria-hidden="true">♾️</span> Seguro de Vida Entera</h4>
               <p><strong>Cómo funciona:</strong> Cobertura vitalicia. La prima es fija y acumula un valor de rescate.</p>
               <p><strong>Ventaja:</strong> Garantiza el pago siempre que fallezcas, no solo en un período.</p>
               <p><strong>Desventaja:</strong> Primas mucho más altas que el temporal.</p>
             </div>
 
             <div className={styles.tipoCard}>
-              <h4>🏦 Seguro Vida-Ahorro</h4>
+              <h4><span aria-hidden="true">🏦</span> Seguro Vida-Ahorro</h4>
               <p><strong>Cómo funciona:</strong> Combina protección con un componente de inversión.</p>
               <p><strong>Tipos:</strong> Unit-linked, PIAS, PPA.</p>
               <p><strong>Consideración:</strong> Evalúa por separado el seguro y la inversión. A veces es mejor contratarlos por separado.</p>
@@ -466,7 +466,7 @@ export default function CalculadoraSeguroVidaPage() {
             </table>
           </div>
           <p className={styles.tablaNota}>
-            💡 Para la mayoría de familias con hipoteca e hijos, el <strong>seguro temporal</strong> ofrece la mejor relación protección/coste.
+            <span aria-hidden="true">💡</span> Para la mayoría de familias con hipoteca e hijos, el <strong>seguro temporal</strong> ofrece la mejor relación protección/coste.
             La vida entera y el unit-linked tienen sentido en contextos de planificación patrimonial avanzada.
           </p>
         </section>
@@ -476,19 +476,19 @@ export default function CalculadoraSeguroVidaPage() {
 
           <div className={styles.metodosGrid}>
             <div className={styles.metodoCard}>
-              <h4>📐 Regla del Múltiplo de Ingresos</h4>
+              <h4><span aria-hidden="true">📐</span> Regla del Múltiplo de Ingresos</h4>
               <p>Capital = Ingresos anuales × 10</p>
               <p className={styles.metodoNota}>Simple pero impreciso. No considera deudas ni situación familiar.</p>
             </div>
 
             <div className={styles.metodoCard}>
-              <h4>📊 Método DINK (Dual Income No Kids)</h4>
+              <h4><span aria-hidden="true">📊</span> Método DINK (Dual Income No Kids)</h4>
               <p>Sustituye los ingresos necesarios durante X años ajustando por aportación del cónyuge.</p>
               <p className={styles.metodoNota}>Esta calculadora usa una versión mejorada de este método.</p>
             </div>
 
             <div className={styles.metodoCard}>
-              <h4>🎯 Análisis de Necesidades</h4>
+              <h4><span aria-hidden="true">🎯</span> Análisis de Necesidades</h4>
               <p>Suma: Deudas + Educación hijos + Sustitución ingresos + Gastos finales - Recursos disponibles</p>
               <p className={styles.metodoNota}>El método más preciso. Es el que usamos aquí.</p>
             </div>
@@ -500,42 +500,42 @@ export default function CalculadoraSeguroVidaPage() {
 
           <div className={styles.factoresGrid}>
             <div className={styles.factorItem}>
-              <span className={styles.factorIcon}>🎂</span>
+              <span className={styles.factorIcon} aria-hidden="true">🎂</span>
               <div>
                 <strong>Edad</strong>
                 <p>A mayor edad, mayor prima. Cada año que esperes, más caro será.</p>
               </div>
             </div>
             <div className={styles.factorItem}>
-              <span className={styles.factorIcon}>🚬</span>
+              <span className={styles.factorIcon} aria-hidden="true">🚬</span>
               <div>
                 <strong>Tabaquismo</strong>
                 <p>Fumadores pagan entre 50% y 100% más que no fumadores.</p>
               </div>
             </div>
             <div className={styles.factorItem}>
-              <span className={styles.factorIcon}>⚕️</span>
+              <span className={styles.factorIcon} aria-hidden="true">⚕️</span>
               <div>
                 <strong>Estado de salud</strong>
                 <p>Enfermedades preexistentes pueden aumentar la prima o causar exclusiones.</p>
               </div>
             </div>
             <div className={styles.factorItem}>
-              <span className={styles.factorIcon}>👷</span>
+              <span className={styles.factorIcon} aria-hidden="true">👷</span>
               <div>
                 <strong>Profesión</strong>
                 <p>Trabajos de riesgo (construcción, minería, pilotos) pagan más.</p>
               </div>
             </div>
             <div className={styles.factorItem}>
-              <span className={styles.factorIcon}>🏃</span>
+              <span className={styles.factorIcon} aria-hidden="true">🏃</span>
               <div>
                 <strong>Hobbies</strong>
                 <p>Deportes extremos, buceo o paracaidismo pueden incrementar la prima.</p>
               </div>
             </div>
             <div className={styles.factorItem}>
-              <span className={styles.factorIcon}>⏳</span>
+              <span className={styles.factorIcon} aria-hidden="true">⏳</span>
               <div>
                 <strong>Duración</strong>
                 <p>A mayor plazo de cobertura, mayor prima anual.</p>
@@ -597,28 +597,28 @@ export default function CalculadoraSeguroVidaPage() {
           <h2>Casos de Uso: ¿Cuánto seguro necesito?</h2>
           <div className={styles.casosGrid}>
             <div className={styles.casoCard}>
-              <span className={styles.casoIcono}>🧑</span>
+              <span className={styles.casoIcono} aria-hidden="true">🧑</span>
               <h4>Joven sin hijos (28 años)</h4>
               <p><strong>Situación</strong>: Soltero, sin hipoteca, sin dependientes.</p>
               <p><strong>Necesidad</strong>: Baja. Solo si tiene deudas compartidas o quiere cubrir gastos funerarios.</p>
               <p><strong>Recomendación</strong>: Puede esperar. Si contrata, un temporal de 50.000–100.000 € cubre lo básico.</p>
             </div>
             <div className={styles.casoCard}>
-              <span className={styles.casoIcono}>👨‍👩‍👧</span>
+              <span className={styles.casoIcono} aria-hidden="true">👨‍👩‍👧</span>
               <h4>Familia con hipoteca e hijos (35-45 años)</h4>
               <p><strong>Situación</strong>: Pareja, 2 hijos, hipoteca de 180.000 €, ingreso único o doble con disparidad.</p>
               <p><strong>Necesidad</strong>: Alta. Sin seguro, la familia puede perder la vivienda y el nivel de vida.</p>
               <p><strong>Recomendación</strong>: Seguro temporal de 250.000–400.000 € a 20-25 años. Revisar al liquidar la hipoteca.</p>
             </div>
             <div className={styles.casoCard}>
-              <span className={styles.casoIcono}>💼</span>
+              <span className={styles.casoIcono} aria-hidden="true">💼</span>
               <h4>Autónomo (40 años)</h4>
               <p><strong>Situación</strong>: Sin nómina garantizada, sin cobertura laboral de empresa. Puede tener créditos del negocio.</p>
               <p><strong>Necesidad</strong>: Alta. La falta de red de seguridad laboral aumenta el riesgo familiar.</p>
               <p><strong>Recomendación</strong>: Seguro temporal de 200.000–350.000 € cubriendo deudas del negocio + necesidades familiares.</p>
             </div>
             <div className={styles.casoCard}>
-              <span className={styles.casoIcono}>👴</span>
+              <span className={styles.casoIcono} aria-hidden="true">👴</span>
               <h4>Jubilado o cercano a la jubilación (60+ años)</h4>
               <p><strong>Situación</strong>: Hijos independientes, hipoteca casi o completamente pagada.</p>
               <p><strong>Necesidad</strong>: Baja-media. La necesidad de sustitución de ingresos se reduce.</p>

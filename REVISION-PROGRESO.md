@@ -666,10 +666,10 @@
 | [x] | Las 6 Clases de Activos — Rentabilidad, Riesgo y Correlación | `/visualizador-tipos-activos/` | finanzas, estudiantes, cultura |
 | [x] | Mercados Financieros - Bolsa, Órdenes y Activos | `/visualizador-mercados-financieros/` | finanzas, cultura |
 | [x] | Orientador Regla 50/30/20 | `/orientador-regla-50-30-20/` | finanzas |
-| [ ] | Orientador Seguro de Vida | `/orientador-seguro-vida/` | finanzas, legal-fiscal |
-| [ ] | Quiz Conceptos de Inversión — Sharpe, Beta, Duration y TER | `/quiz-conceptos-inversion/` | finanzas, estudiantes |
-| [ ] | Seguros y Riesgo: Prima Actuarial, Pool de Riesgo y Mutualización | `/visualizador-seguros-riesgo/` | finanzas, cultura |
-| [ ] | Selector de Coche Nuevo o Usado | `/selector-coche-nuevo-usado/` | finanzas, inmobiliaria |
+| [x] | Orientador Seguro de Vida | `/orientador-seguro-vida/` | finanzas, legal-fiscal |
+| [x] | Quiz Conceptos de Inversión — Sharpe, Beta, Duration y TER | `/quiz-conceptos-inversion/` | finanzas, estudiantes |
+| [x] | Seguros y Riesgo: Prima Actuarial, Pool de Riesgo y Mutualización | `/visualizador-seguros-riesgo/` | finanzas, cultura |
+| [x] | Selector de Coche Nuevo o Usado | `/selector-coche-nuevo-usado/` | finanzas, inmobiliaria |
 | [ ] | Selector de Cuenta Bancaria | `/selector-cuenta-bancaria/` | finanzas |
 | [x] | Selector de Plan de Pensiones | `/selector-plan-pensiones/` | finanzas, freelance |
 | [ ] | Selector de Seguro de Coche | `/selector-seguro-coche/` | finanzas, tecnicas |
