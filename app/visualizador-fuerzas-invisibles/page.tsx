@@ -238,7 +238,7 @@ export default function VisualizadorFuerzasInvisiblesPage() {
                   {/* Dato sorprendente */}
                   <div className={styles.sorpresaBox}>
                     <span className={styles.sorpresaLabel} style={{ color: f.color }}>
-                      ✨ Dato sorprendente
+                      <span aria-hidden="true">✨</span> Dato sorprendente
                     </span>
                     <p className={styles.sorpresaTexto}>{f.datoSorprendente}</p>
                   </div>

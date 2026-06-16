@@ -119,6 +119,7 @@ function Badge({ valor }: { valor: boolean }) {
 function Toggle({ valor, onChange, label }: { valor: boolean; onChange: () => void; label: string }) {
   return (
     <button
+      type="button"
       className={`${styles.toggle} ${valor ? styles.toggleOn : styles.toggleOff}`}
       onClick={onChange}
       aria-pressed={valor}
@@ -165,8 +166,10 @@ function TabConectores({
           {conectores.map((c) => (
             <button
               key={c}
+              type="button"
               className={`${styles.conectorBtn} ${conectorSeleccionado === c ? styles.conectorBtnActivo : ''}`}
               onClick={() => setConectorSeleccionado(c)}
+              aria-pressed={conectorSeleccionado === c}
             >
               <span className={styles.conectorSimbolo}>{simboloConector(c)}</span>
               <span className={styles.conectorNombre}>{c}</span>
@@ -293,6 +296,7 @@ function TabEvaluador({
           {EJEMPLOS_FORMULA.map(ej => (
             <button
               key={ej.label}
+              type="button"
               className={styles.ejemploBtn}
               onClick={() => setFormula(ej.formula)}
             >
@@ -443,6 +447,7 @@ function TabKarnaugh() {
           </table>
         </div>
         <button
+          type="button"
           className={styles.btnSecundario}
           onClick={() => setCeldas(Array(8).fill(false))}
         >
@@ -557,6 +562,7 @@ function TabFormasNormales() {
                   <td><Badge valor={combo.r} /></td>
                   <td>
                     <button
+                      type="button"
                       className={`${styles.salidaBtn} ${salidas[i] ? styles.salidaBtnV : styles.salidaBtnF}`}
                       onClick={() => toggleSalida(i)}
                       aria-pressed={salidas[i]}
@@ -576,14 +582,18 @@ function TabFormasNormales() {
         <h3 className={styles.sectionTitle}>Formas Normales</h3>
         <div className={styles.formaToggle}>
           <button
+            type="button"
             className={`${styles.formaBtn} ${mostrarFND ? styles.formaBtnActivo : ''}`}
             onClick={() => setMostrarFND(true)}
+            aria-pressed={mostrarFND}
           >
             FND — Disyuntiva
           </button>
           <button
+            type="button"
             className={`${styles.formaBtn} ${!mostrarFND ? styles.formaBtnActivo : ''}`}
             onClick={() => setMostrarFND(false)}
+            aria-pressed={!mostrarFND}
           >
             FNC — Conjuntiva
           </button>
@@ -931,6 +941,7 @@ export default function VisualizadorLogicaProposicional() {
           {tabs.map(tab => (
             <button
               key={tab.id}
+              type="button"
               className={`${styles.tabBtn} ${tabActiva === tab.id ? styles.tabBtnActivo : ''}`}
               onClick={() => setTabActiva(tab.id)}
               aria-current={tabActiva === tab.id ? 'page' : undefined}

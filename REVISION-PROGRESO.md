@@ -491,10 +491,10 @@
 | [x] | La Tabla Periódica en tu Vida | `/visualizador-tabla-periodica/` | estudiantes, cultura |
 | [x] | La Vida de una Estrella | `/visualizador-vida-estrella/` | estudiantes, cultura |
 | [x] | Las 3 Leyes de Newton | `/visualizador-leyes-newton/` | estudiantes, cultura |
-| [ ] | Las Estaciones del Año - 23,5° que lo Cambian Todo | `/visualizador-estaciones-ano/` | estudiantes, cultura |
-| [ ] | Las Fuerzas Invisibles del Día a Día | `/visualizador-fuerzas-invisibles/` | estudiantes, cultura |
-| [ ] | Lógica Proposicional: Tablas de Verdad, Karnaugh y Formas Normales | `/visualizador-logica-proposicional/` | estudiantes, tecnicas |
-| [ ] | Máquinas Simples - Cómo Multiplicar tu Fuerza | `/visualizador-maquinas-simples/` | estudiantes, cultura |
+| [x] | Las Estaciones del Año - 23,5° que lo Cambian Todo | `/visualizador-estaciones-ano/` | estudiantes, cultura |
+| [x] | Las Fuerzas Invisibles del Día a Día | `/visualizador-fuerzas-invisibles/` | estudiantes, cultura |
+| [x] | Lógica Proposicional: Tablas de Verdad, Karnaugh y Formas Normales | `/visualizador-logica-proposicional/` | estudiantes, tecnicas |
+| [x] | Máquinas Simples - Cómo Multiplicar tu Fuerza | `/visualizador-maquinas-simples/` | estudiantes, cultura |
 | [ ] | Matrices - El Lenguaje de las Transformaciones | `/visualizador-matrices/` | estudiantes, cultura |
 | [ ] | Mecánica Cuántica - Dualidad, Incertidumbre y Efecto Túnel | `/visualizador-mecanica-cuantica/` | estudiantes, cultura, tecnicas |
 | [ ] | Mecánica de Fluidos: Reynolds, Magnus y Bernoulli | `/visualizador-mecanica-fluidos/` | estudiantes, tecnicas |

@@ -254,7 +254,7 @@ export default function VisualizadorMaquinasSimples() {
 
         <header className={styles.hero}>
           <p className={styles.heroTag} aria-hidden="true">Física &middot; Mecánica</p>
-          <h1 className={styles.title}>⚙️ Máquinas Simples</h1>
+          <h1 className={styles.title}><span aria-hidden="true">⚙️</span> Máquinas Simples</h1>
           <p className={styles.subtitle}>
             Cómo levantar 100 kg con solo 10 kg de fuerza: de Arquímedes a las grúas modernas
           </p>

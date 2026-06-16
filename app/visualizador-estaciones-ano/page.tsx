@@ -398,6 +398,7 @@ export default function VisualizadorEstacionesAno() {
           {SECCIONES.map((s) => (
             <button
               key={s.id}
+              type="button"
               className={`${styles.navBtn} ${seccion === s.id ? styles.navBtnActive : ''}`}
               onClick={() => setSeccion(s.id)}
               aria-current={seccion === s.id ? 'true' : undefined}
