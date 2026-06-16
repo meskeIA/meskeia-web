@@ -548,6 +548,7 @@ export default function VisualizadorMitosisMeiosisPage() {
                     className={`${styles.faseDot} ${i === faseMitosis ? styles.faseDotActivo : ''}`}
                     onClick={() => setFaseMitosis(i)}
                     aria-label={`Ir a ${f.nombre}`}
+                    aria-pressed={i === faseMitosis}
                   />
                 ))}
               </div>
@@ -627,6 +628,7 @@ export default function VisualizadorMitosisMeiosisPage() {
                     className={`${styles.faseDot} ${i === faseMeiosis ? styles.faseDotActivo : ''}`}
                     onClick={() => setFaseMeiosis(i)}
                     aria-label={`Ir a ${f.nombre}`}
+                    aria-pressed={i === faseMeiosis}
                   />
                 ))}
               </div>

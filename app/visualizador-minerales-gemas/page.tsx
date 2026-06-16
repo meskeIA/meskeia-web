@@ -216,6 +216,7 @@ export default function VisualizadorMineralesGemas() {
             {MINERALES_MOHS.map((m, i) => (
               <button
                 key={m.dureza}
+                type="button"
                 className={styles.mohsBarraSegmento}
                 style={{ backgroundColor: m.colorHex }}
                 onClick={() => setMineralSeleccionado(mineralSeleccionado === i ? null : i)}
@@ -241,6 +242,7 @@ export default function VisualizadorMineralesGemas() {
           {MINERALES_MOHS.map((m, i) => (
             <button
               key={m.dureza}
+              type="button"
               className={`${styles.mineralCard} ${mineralSeleccionado === i ? styles.mineralCardActivo : ''}`}
               onClick={() => setMineralSeleccionado(mineralSeleccionado === i ? null : i)}
               aria-expanded={mineralSeleccionado === i}
@@ -305,7 +307,7 @@ export default function VisualizadorMineralesGemas() {
           <div className={styles.sliderListas}>
             <div>
               <div className={`${styles.sliderListaTitulo} ${styles.sliderListaRaya}`}>
-                ✅ Raya ({mineralesQueRaya.length})
+                <span aria-hidden="true">✅</span> Raya ({mineralesQueRaya.length})
               </div>
               {mineralesQueRaya.map(m => (
                 <div key={m.dureza} className={styles.sliderListaItem}>
@@ -318,7 +320,7 @@ export default function VisualizadorMineralesGemas() {
             </div>
             <div>
               <div className={`${styles.sliderListaTitulo} ${styles.sliderListaNoRaya}`}>
-                ❌ No raya ({mineralesQueNoRaya.length})
+                <span aria-hidden="true">❌</span> No raya ({mineralesQueNoRaya.length})
               </div>
               {mineralesQueNoRaya.map(m => (
                 <div key={m.dureza} className={styles.sliderListaItem}>
@@ -355,6 +357,7 @@ export default function VisualizadorMineralesGemas() {
           {GEMAS.map((g, i) => (
             <button
               key={g.nombre}
+              type="button"
               className={`${styles.gemaCard} ${gemaSeleccionada === i ? styles.gemaCardActiva : ''}`}
               style={{ borderColor: gemaSeleccionada === i ? g.colorHex : undefined }}
               onClick={() => setGemaSeleccionada(gemaSeleccionada === i ? null : i)}
@@ -447,6 +450,7 @@ export default function VisualizadorMineralesGemas() {
           {TIPOS_FORMACION.map(t => (
             <button
               key={t.id}
+              type="button"
               className={`${styles.formacionCard} ${formacionSeleccionada === t.id ? styles.formacionCardActiva : ''}`}
               onClick={() => setFormacionSeleccionada(formacionSeleccionada === t.id ? null : t.id)}
               aria-expanded={formacionSeleccionada === t.id}
@@ -462,7 +466,7 @@ export default function VisualizadorMineralesGemas() {
         {tipoActivo && (
           <div className={styles.formacionDetalle} role="region" aria-label={`Formación ${tipoActivo.nombre}`}>
             <div className={styles.formacionDetalleTitulo}>
-              {tipoActivo.icono} Formación {tipoActivo.nombre}
+              <span aria-hidden="true">{tipoActivo.icono}</span> Formación {tipoActivo.nombre}
             </div>
             <div className={styles.formacionDetalleDesc}>{tipoActivo.descripcion}</div>
             <div className={styles.formacionEjemplos}>
@@ -594,6 +598,7 @@ export default function VisualizadorMineralesGemas() {
         {SECCIONES.map(s => (
           <button
             key={s.id}
+            type="button"
             className={`${styles.navBtn} ${seccion === s.id ? styles.navActivo : ''}`}
             onClick={() => setSeccion(s.id)}
             aria-pressed={seccion === s.id}

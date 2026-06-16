@@ -306,12 +306,13 @@ export default function MetamorfosisPage() {
           {FASES_COMPLETA.map((f, i) => (
             <button
               key={f.id}
+              type="button"
               className={`${styles.progresoFase} ${i === faseCompleta ? styles.progresoActivo : ''} ${i < faseCompleta ? styles.progresoCompletado : ''}`}
               onClick={() => setFaseCompleta(i)}
               aria-label={`Ir a fase ${f.nombre}`}
               aria-pressed={i === faseCompleta}
             >
-              <span className={styles.progresoIcono}>{f.icono}</span>
+              <span className={styles.progresoIcono} aria-hidden="true">{f.icono}</span>
               <span className={styles.progresoNombre}>{f.nombre}</span>
             </button>
           ))}
@@ -351,6 +352,7 @@ export default function MetamorfosisPage() {
         {/* Botones avanzar/retroceder */}
         <div className={styles.navegacion}>
           <button
+            type="button"
             className={styles.btnNav}
             onClick={retrocederCompleta}
             disabled={faseCompleta === 0}
@@ -360,6 +362,7 @@ export default function MetamorfosisPage() {
           </button>
           <span className={styles.navContador}>{faseCompleta + 1} / {FASES_COMPLETA.length}</span>
           <button
+            type="button"
             className={styles.btnNav}
             onClick={avanzarCompleta}
             disabled={faseCompleta === FASES_COMPLETA.length - 1}
@@ -402,12 +405,13 @@ export default function MetamorfosisPage() {
           {FASES_INCOMPLETA.map((f, i) => (
             <button
               key={f.id}
+              type="button"
               className={`${styles.progresoFase} ${i === faseIncompleta ? styles.progresoActivo : ''} ${i < faseIncompleta ? styles.progresoCompletado : ''}`}
               onClick={() => setFaseIncompleta(i)}
               aria-label={`Ir a fase ${f.nombre}`}
               aria-pressed={i === faseIncompleta}
             >
-              <span className={styles.progresoIcono}>{f.icono}</span>
+              <span className={styles.progresoIcono} aria-hidden="true">{f.icono}</span>
               <span className={styles.progresoNombre}>{f.nombre}</span>
             </button>
           ))}
@@ -428,9 +432,9 @@ export default function MetamorfosisPage() {
         </div>
 
         <div className={styles.navegacion}>
-          <button className={styles.btnNav} onClick={retrocederIncompleta} disabled={faseIncompleta === 0} aria-label="Fase anterior">← Anterior</button>
+          <button type="button" className={styles.btnNav} onClick={retrocederIncompleta} disabled={faseIncompleta === 0} aria-label="Fase anterior">← Anterior</button>
           <span className={styles.navContador}>{faseIncompleta + 1} / {FASES_INCOMPLETA.length}</span>
-          <button className={styles.btnNav} onClick={avanzarIncompleta} disabled={faseIncompleta === FASES_INCOMPLETA.length - 1} aria-label="Fase siguiente">Siguiente →</button>
+          <button type="button" className={styles.btnNav} onClick={avanzarIncompleta} disabled={faseIncompleta === FASES_INCOMPLETA.length - 1} aria-label="Fase siguiente">Siguiente →</button>
         </div>
 
         {/* Comparativa visual */}
@@ -486,12 +490,13 @@ export default function MetamorfosisPage() {
           {FASES_ANFIBIO.map((f, i) => (
             <button
               key={f.id}
+              type="button"
               className={`${styles.progresoFase} ${i === faseAnfibio ? styles.progresoActivo : ''} ${i < faseAnfibio ? styles.progresoCompletado : ''}`}
               onClick={() => setFaseAnfibio(i)}
               aria-label={`Ir a fase ${f.nombre}`}
               aria-pressed={i === faseAnfibio}
             >
-              <span className={styles.progresoIcono}>{f.icono}</span>
+              <span className={styles.progresoIcono} aria-hidden="true">{f.icono}</span>
               <span className={styles.progresoNombre}>{f.nombre}</span>
             </button>
           ))}
@@ -529,9 +534,9 @@ export default function MetamorfosisPage() {
         </div>
 
         <div className={styles.navegacion}>
-          <button className={styles.btnNav} onClick={retrocederAnfibio} disabled={faseAnfibio === 0} aria-label="Fase anterior">← Anterior</button>
+          <button type="button" className={styles.btnNav} onClick={retrocederAnfibio} disabled={faseAnfibio === 0} aria-label="Fase anterior">← Anterior</button>
           <span className={styles.navContador}>{faseAnfibio + 1} / {FASES_ANFIBIO.length}</span>
-          <button className={styles.btnNav} onClick={avanzarAnfibio} disabled={faseAnfibio === FASES_ANFIBIO.length - 1} aria-label="Fase siguiente">Siguiente →</button>
+          <button type="button" className={styles.btnNav} onClick={avanzarAnfibio} disabled={faseAnfibio === FASES_ANFIBIO.length - 1} aria-label="Fase siguiente">Siguiente →</button>
         </div>
 
         {/* Tabla resumen de cambios */}
@@ -588,11 +593,12 @@ export default function MetamorfosisPage() {
         {DATOS_FASCINANTES.map((dato, i) => (
           <button
             key={i}
+            type="button"
             className={`${styles.datoCard} ${datoActivo === i ? styles.datoCardActivo : ''}`}
             onClick={() => setDatoActivo(datoActivo === i ? null : i)}
             aria-pressed={datoActivo === i}
           >
-            <span className={styles.datoIcono}>{dato.icono}</span>
+            <span className={styles.datoIcono} aria-hidden="true">{dato.icono}</span>
             <span className={styles.datoTitulo}>{dato.titulo}</span>
             <span className={styles.datoTexto}>{dato.texto}</span>
             {datoActivo === i && (
@@ -633,11 +639,12 @@ export default function MetamorfosisPage() {
           {SECCIONES.map(s => (
             <button
               key={s.id}
+              type="button"
               className={`${styles.navBtn} ${seccion === s.id ? styles.navActivo : ''}`}
               onClick={() => setSeccion(s.id)}
               aria-pressed={seccion === s.id}
             >
-              <span className={styles.navIcono}>{s.icono}</span>
+              <span className={styles.navIcono} aria-hidden="true">{s.icono}</span>
               <span className={styles.navTexto}>{s.titulo}</span>
             </button>
           ))}

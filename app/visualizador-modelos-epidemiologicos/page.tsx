@@ -668,7 +668,7 @@ const SeccionRt = () => {
         </div>
         <div className={styles.sliderGroup}>
           <label className={styles.sliderLabel}>
-            <span>🎛️ Medidas de control</span>
+            <span><span aria-hidden="true">🎛️</span> Medidas de control</span>
             <span className={styles.sliderValor}>{control}%</span>
           </label>
           <input type="range" className={styles.sliderInput}
@@ -790,7 +790,7 @@ const SeccionComparativa = ({ onSeleccionar }: { onSeleccionar: (e: EnfermedadPr
           <tbody>
             {ENFERMEDADES.map((e, idx) => (
               <tr key={e.nombre} className={seleccionada === idx ? styles.filaSeleccionada : ''}>
-                <td><strong>{e.emoji} {e.nombre}</strong></td>
+                <td><strong><span aria-hidden="true">{e.emoji}</span> {e.nombre}</strong></td>
                 <td>
                   <span className={`${styles.r0Badge} ${badgeClass(e.r0)}`}>{e.r0}</span>
                 </td>
@@ -817,7 +817,7 @@ const SeccionComparativa = ({ onSeleccionar }: { onSeleccionar: (e: EnfermedadPr
       {seleccionada !== null && (
         <div className={`${styles.infoIncubacion} ${styles.fadeIn}`}>
           <p className={styles.infoIncubacionTitle}>
-            {ENFERMEDADES[seleccionada].emoji} {ENFERMEDADES[seleccionada].nombre} — cargada en el Simulador SIR
+            <span aria-hidden="true">{ENFERMEDADES[seleccionada].emoji}</span> {ENFERMEDADES[seleccionada].nombre} — cargada en el Simulador SIR
           </p>
           <p>
             β = {ENFERMEDADES[seleccionada].beta}, γ = {ENFERMEDADES[seleccionada].gamma},

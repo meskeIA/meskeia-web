@@ -499,10 +499,10 @@
 | [x] | Mecánica Cuántica - Dualidad, Incertidumbre y Efecto Túnel | `/visualizador-mecanica-cuantica/` | estudiantes, cultura, tecnicas |
 | [x] | Mecánica de Fluidos: Reynolds, Magnus y Bernoulli | `/visualizador-mecanica-fluidos/` | estudiantes, tecnicas |
 | [x] | Mercado Inmobiliario: Burbuja, Precios y Accesibilidad | `/visualizador-mercado-inmobiliario/` | estudiantes, cultura, inmobiliaria, finanzas |
-| [ ] | Metamorfosis - La Transformación más Radical | `/visualizador-metamorfosis/` | estudiantes, cultura |
-| [ ] | Minerales y Gemas - Escala de Mohs y Piedras Preciosas | `/visualizador-minerales-gemas/` | estudiantes, cultura |
-| [ ] | Mitosis y Meiosis - La Danza de los Cromosomas | `/visualizador-mitosis-meiosis/` | estudiantes, cultura |
-| [ ] | Modelos Epidemiológicos: SIR, SEIR y Rₜ | `/visualizador-modelos-epidemiologicos/` | estudiantes, salud, cultura |
+| [x] | Metamorfosis - La Transformación más Radical | `/visualizador-metamorfosis/` | estudiantes, cultura |
+| [x] | Minerales y Gemas - Escala de Mohs y Piedras Preciosas | `/visualizador-minerales-gemas/` | estudiantes, cultura |
+| [x] | Mitosis y Meiosis - La Danza de los Cromosomas | `/visualizador-mitosis-meiosis/` | estudiantes, cultura |
+| [x] | Modelos Epidemiológicos: SIR, SEIR y Rₜ | `/visualizador-modelos-epidemiologicos/` | estudiantes, salud, cultura |
 | [ ] | Motor de Combustión: Ciclo Otto y Por Qué Desperdicia el 70% | `/visualizador-motor-combustion/` | estudiantes, cultura |
 | [ ] | Motor Eléctrico: Campo Magnético Rotante y Regeneración | `/visualizador-motor-electrico/` | estudiantes, cultura, tecnicas |
 | [ ] | Músculos y Movimiento - Del Sarcómero a la Articulación | `/visualizador-musculos-movimiento/` | estudiantes, cultura, salud |
