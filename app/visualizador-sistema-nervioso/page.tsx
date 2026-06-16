@@ -665,7 +665,7 @@ function SeccionSinapsis() {
       <div className={styles.faseDetalle} style={{ borderLeftColor: fase.color }}>
         <div className={styles.faseHeader}>
           <h4 className={styles.faseTitulo} style={{ color: fase.color }}>
-            {fase.icono} {fase.nombre}
+            <span aria-hidden="true">{fase.icono}</span> {fase.nombre}
           </h4>
           <span className={styles.faseVoltaje} style={{ background: fase.color }}>{fase.voltaje}</span>
         </div>
@@ -1013,7 +1013,7 @@ export default function VisualizadorSistemaNerviosoPage() {
           <h2>Preguntas Frecuentes</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuántas neuronas tiene el cerebro humano?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuántas neuronas tiene el cerebro humano?</h4>
               <p>
                 Aproximadamente 86.000 millones (Azevedo et al., 2009). Hay un número similar de
                 neuronas y células gliales — la idea de que hay 10 veces más gliales es un mito
@@ -1021,7 +1021,7 @@ export default function VisualizadorSistemaNerviosoPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿A qué velocidad viaja un impulso nervioso?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿A qué velocidad viaja un impulso nervioso?</h4>
               <p>
                 Depende de la mielina: las fibras mielinizadas A-alfa alcanzan 70-120 m/s, mientras
                 que las fibras C sin mielina (responsables del dolor lento) solo llegan a 0,5-2 m/s.
@@ -1029,7 +1029,7 @@ export default function VisualizadorSistemaNerviosoPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Por qué la cocaína produce euforia?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Por qué la cocaína produce euforia?</h4>
               <p>
                 Bloquea el transportador de recaptación de dopamina (DAT), provocando acumulación
                 de dopamina en la hendidura sináptica. La euforia es la consecuencia del exceso de
@@ -1037,7 +1037,7 @@ export default function VisualizadorSistemaNerviosoPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué ocurre en la esclerosis múltiple?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué ocurre en la esclerosis múltiple?</h4>
               <p>
                 El sistema inmune ataca la mielina (desmielinización). Sin aislamiento, los impulsos
                 se ralentizan o se pierden, causando debilidad, problemas de coordinación y fatiga.
@@ -1045,7 +1045,7 @@ export default function VisualizadorSistemaNerviosoPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Se pueden crear nuevas neuronas siendo adulto?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Se pueden crear nuevas neuronas siendo adulto?</h4>
               <p>
                 Sí. Hay neurogénesis adulta especialmente en el hipocampo (memoria) y el bulbo
                 olfatorio. El ejercicio aeróbico y el aprendizaje la favorecen, mientras que el
@@ -1131,10 +1131,10 @@ export default function VisualizadorSistemaNerviosoPage() {
             <h3>Errores Comunes sobre el Sistema Nervioso</h3>
           </div>
           <ul className={styles.warningList}>
-            <li><strong>❌ &quot;Solo usamos el 10% del cerebro&quot;:</strong> Mito sin base científica. Todas las regiones cerebrales tienen funciones conocidas y las neuroimágenes muestran actividad distribuida en todo el cerebro.</li>
-            <li><strong>❌ &quot;Las neuronas no se regeneran nunca&quot;:</strong> Hay neurogénesis adulta en el hipocampo y el bulbo olfatorio. No es tan extensa como en otros tejidos, pero existe y puede estimularse.</li>
-            <li><strong>❌ &quot;El alcohol mata neuronas permanentemente&quot;:</strong> El alcohol interfiere con la sinapsis y puede causar déficits de tiamina (síndrome de Wernicke), pero no destruye neuronas directamente en consumo moderado ocasional.</li>
-            <li><strong>❌ &quot;Más dopamina = más felicidad&quot;:</strong> Un exceso de dopamina puede causar psicosis o comportamientos compulsivos. El equilibrio, no el exceso, es la clave del bienestar neurológico.</li>
+            <li><strong><span aria-hidden="true">❌</span> &quot;Solo usamos el 10% del cerebro&quot;:</strong> Mito sin base científica. Todas las regiones cerebrales tienen funciones conocidas y las neuroimágenes muestran actividad distribuida en todo el cerebro.</li>
+            <li><strong><span aria-hidden="true">❌</span> &quot;Las neuronas no se regeneran nunca&quot;:</strong> Hay neurogénesis adulta en el hipocampo y el bulbo olfatorio. No es tan extensa como en otros tejidos, pero existe y puede estimularse.</li>
+            <li><strong><span aria-hidden="true">❌</span> &quot;El alcohol mata neuronas permanentemente&quot;:</strong> El alcohol interfiere con la sinapsis y puede causar déficits de tiamina (síndrome de Wernicke), pero no destruye neuronas directamente en consumo moderado ocasional.</li>
+            <li><strong><span aria-hidden="true">❌</span> &quot;Más dopamina = más felicidad&quot;:</strong> Un exceso de dopamina puede causar psicosis o comportamientos compulsivos. El equilibrio, no el exceso, es la clave del bienestar neurológico.</li>
           </ul>
         </div>
       </EducationalSection>

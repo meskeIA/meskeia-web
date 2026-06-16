@@ -410,7 +410,7 @@ function TabDefensas() {
 
       <div className={styles.lineaDetalle} style={{ borderLeftColor: linea.color }}>
         <h3 className={styles.lineaTitulo} style={{ color: linea.color }}>
-          {linea.emoji} {linea.numero}ª Línea — {linea.titulo}
+          <span aria-hidden="true">{linea.emoji}</span> {linea.numero}ª Línea — {linea.titulo}
         </h3>
         <p className={styles.lineaDesc}>{linea.descripcion}</p>
 
@@ -889,7 +889,7 @@ export default function VisualizadorSistemaInmune() {
             <h2>Preguntas frecuentes</h2>
             <div className={styles.faqList}>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Las vacunas sobrecargan el sistema inmune?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Las vacunas sobrecargan el sistema inmune?</h4>
                 <p>
                   No. Un organismo sano puede responder a miles de antígenos simultáneamente. Las vacunas
                   actuales usan solo fragmentos de patógenos — un estímulo mínimo comparado con cualquier
@@ -901,7 +901,7 @@ export default function VisualizadorSistemaInmune() {
                 </div>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Qué son los anticuerpos monoclonales?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Qué son los anticuerpos monoclonales?</h4>
                 <p>
                   Anticuerpos producidos en laboratorio para reconocer un objetivo específico (célula
                   tumoral, proteína viral). Medicamentos como trastuzumab (cáncer de mama) o nivolumab
@@ -913,7 +913,7 @@ export default function VisualizadorSistemaInmune() {
                 </div>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Por qué el VIH es tan difícil de curar?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Por qué el VIH es tan difícil de curar?</h4>
                 <p>
                   El VIH infecta precisamente los linfocitos T CD4 — los coordinadores de la inmunidad
                   adaptativa. Al reducirlos, deteriora la respuesta inmune adaptativa. Además, se integra
@@ -925,7 +925,7 @@ export default function VisualizadorSistemaInmune() {
                 </div>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Qué diferencia hay entre autoinmunidad y alergia?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Qué diferencia hay entre autoinmunidad y alergia?</h4>
                 <p>
                   La autoinmunidad ataca tejidos propios (artritis reumatoide, diabetes tipo 1, lupus).
                   La alergia es una respuesta desproporcionada a sustancias externas inofensivas mediada
@@ -937,7 +937,7 @@ export default function VisualizadorSistemaInmune() {
                 </div>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Pueden mejorarse las defensas con suplementos?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Pueden mejorarse las defensas con suplementos?</h4>
                 <p>
                   El concepto de &ldquo;reforzar el sistema inmune&rdquo; está sobrevalorado comercialmente. Un
                   sistema hiperactivo causa autoinmunidad y alergias. Lo que sí apoya su funcionamiento
@@ -1063,23 +1063,23 @@ export default function VisualizadorSistemaInmune() {
             </div>
             <ul className={styles.warningList}>
               <li>
-                <strong>❌ &ldquo;Los antibióticos curan las infecciones víricas&rdquo;:</strong> Falso.
+                <strong><span aria-hidden="true">❌</span> &ldquo;Los antibióticos curan las infecciones víricas&rdquo;:</strong> Falso.
                 Solo actúan contra bacterias. Usarlos contra virus (catarro, gripe) no aporta
                 beneficio y contribuye a la resistencia bacteriana.
               </li>
               <li>
-                <strong>❌ &ldquo;Un sistema inmune fuerte es siempre mejor&rdquo;:</strong> Un sistema
+                <strong><span aria-hidden="true">❌</span> &ldquo;Un sistema inmune fuerte es siempre mejor&rdquo;:</strong> Un sistema
                 hiperactivo causa autoinmunidad (artritis reumatoide, lupus) y alergias severas.
                 El equilibrio es el objetivo, no la hiperactividad.
               </li>
               <li>
-                <strong>❌ &ldquo;Las vacunas causan autismo&rdquo;:</strong> Afirmación ampliamente
+                <strong><span aria-hidden="true">❌</span> &ldquo;Las vacunas causan autismo&rdquo;:</strong> Afirmación ampliamente
                 refutada. El estudio original de Wakefield fue retractado por fraude y conflicto de
                 intereses. Ningún estudio posterior —en decenas de millones de niños— ha encontrado
                 relación causal.
               </li>
               <li>
-                <strong>❌ &ldquo;Si tengo buenas defensas, no necesito vacunarme&rdquo;:</strong> La
+                <strong><span aria-hidden="true">❌</span> &ldquo;Si tengo buenas defensas, no necesito vacunarme&rdquo;:</strong> La
                 inmunidad natural frente a muchos patógenos requiere haber pasado la enfermedad,
                 con sus riesgos asociados. La vacuna ofrece protección sin necesidad de pasar por
                 las posibles complicaciones de la infección.

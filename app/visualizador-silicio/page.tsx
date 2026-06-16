@@ -228,6 +228,7 @@ export default function VisualizadorSilicio() {
           {(['conductor', 'semiconductor', 'aislante'] as TipoBanda[]).map((tipo) => (
             <button
               key={tipo}
+              type="button"
               className={`${styles.bandaBtn} ${bandaActiva === tipo ? styles.bandaBtnActivo : ''}`}
               onClick={() => setBandaActiva(tipo)}
               aria-pressed={bandaActiva === tipo}
@@ -306,6 +307,7 @@ export default function VisualizadorSilicio() {
 
         <div className={styles.dopingSelector}>
           <button
+            type="button"
             className={`${styles.dopingBtn} ${dopado === 'N' ? styles.dopingBtnN : ''}`}
             onClick={() => setDopado('N')}
             aria-pressed={dopado === 'N'}
@@ -313,6 +315,7 @@ export default function VisualizadorSilicio() {
             Tipo N (Fósforo)
           </button>
           <button
+            type="button"
             className={`${styles.dopingBtn} ${dopado === 'P' ? styles.dopingBtnP : ''}`}
             onClick={() => setDopado('P')}
             aria-pressed={dopado === 'P'}
@@ -406,17 +409,17 @@ export default function VisualizadorSilicio() {
 
           {estadoPolarizacion === 'directa' && (
             <div className={styles.corrienteIndicador} role="alert" aria-live="polite">
-              ⚡ Corriente fluyendo — Polarización directa
+              <span aria-hidden="true">⚡</span> Corriente fluyendo — Polarización directa
             </div>
           )}
           {estadoPolarizacion === 'inversa' && (
             <div className={styles.bloqueadoIndicador} role="alert" aria-live="polite">
-              🚫 Sin corriente — Polarización inversa (bloqueado)
+              <span aria-hidden="true">🚫</span> Sin corriente — Polarización inversa (bloqueado)
             </div>
           )}
           {estadoPolarizacion === 'neutro' && (
             <div className={styles.neutroIndicador}>
-              ⚖️ En equilibrio — sin voltaje aplicado
+              <span aria-hidden="true">⚖️</span> En equilibrio — sin voltaje aplicado
             </div>
           )}
 
@@ -514,15 +517,15 @@ export default function VisualizadorSilicio() {
 
         <div className={styles.murosGrid}>
           <div className={`${styles.muroCuantico} ${styles.muroCard}`}>
-            <h3>🔥 Muro del Calor</h3>
+            <h3><span aria-hidden="true">🔥</span> Muro del Calor</h3>
             <p>Más transistores → más calor por cm². Enfriamiento imposible con la arquitectura clásica. Solución: chips <em>multinúcleo</em> y menor voltaje.</p>
           </div>
           <div className={`${styles.muroMemoria} ${styles.muroCard}`}>
-            <h3>🧠 Muro de la Memoria</h3>
+            <h3><span aria-hidden="true">🧠</span> Muro de la Memoria</h3>
             <p>CPU cientos de veces más rápida que la RAM. El cuello de botella no es el procesador sino el bus de datos. Solución: caché L1/L2/L3 en el propio chip.</p>
           </div>
           <div className={`${styles.muroCuanticoFis} ${styles.muroCard}`}>
-            <h3>⚛️ Muro Cuántico</h3>
+            <h3><span aria-hidden="true">⚛️</span> Muro Cuántico</h3>
             <p>A 1–2 nm los electrones hacen <em>efecto túnel</em>: atraviesan barreras que deberían ser opacas. Fugas de corriente incontrolables. Límite absoluto ≈ 0,5 nm (2 átomos de Si).</p>
           </div>
         </div>

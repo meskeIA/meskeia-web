@@ -448,10 +448,10 @@
 | [x] | El Oro: Por Qué la Relatividad Explica su Color y su Nobleza | `/visualizador-oro/` | estudiantes, cultura |
 | [x] | El Reino Fungi — Ascomicetos, Basidiomicetos y Ciclo de Vida | `/visualizador-reino-fungi/` | estudiantes, cultura |
 | [x] | El Reino Vegetal: de las Algas a las Angiospermas | `/visualizador-reino-vegetal/` | estudiantes, cultura |
-| [ ] | El Silicio: De la Arena al Chip y la Ley de Moore | `/visualizador-silicio/` | estudiantes, cultura, tecnicas |
-| [ ] | El Sistema Endocrino - Glándulas, Hormonas y Feedback | `/visualizador-sistema-endocrino/` | estudiantes, cultura, salud |
-| [ ] | El Sistema Inmune - Tu Ejército Invisible | `/visualizador-sistema-inmune/` | estudiantes, cultura, salud |
-| [ ] | El Sistema Nervioso - Neuronas, Sinapsis y Neurotransmisores | `/visualizador-sistema-nervioso/` | estudiantes, cultura, salud |
+| [x] | El Silicio: De la Arena al Chip y la Ley de Moore | `/visualizador-silicio/` | estudiantes, cultura, tecnicas |
+| [x] | El Sistema Endocrino - Glándulas, Hormonas y Feedback | `/visualizador-sistema-endocrino/` | estudiantes, cultura, salud |
+| [x] | El Sistema Inmune - Tu Ejército Invisible | `/visualizador-sistema-inmune/` | estudiantes, cultura, salud |
+| [x] | El Sistema Nervioso - Neuronas, Sinapsis y Neurotransmisores | `/visualizador-sistema-nervioso/` | estudiantes, cultura, salud |
 | [ ] | El Sistema Respiratorio - Del Aire al Alvéolo | `/visualizador-sistema-respiratorio/` | estudiantes, cultura, salud |
 | [ ] | El Sistema Solar en Números | `/visualizador-sistema-solar/` | estudiantes, cultura |
 | [ ] | El Viaje de tu Comida | `/visualizador-viaje-comida/` | estudiantes, salud, cultura |
