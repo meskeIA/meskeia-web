@@ -107,7 +107,7 @@ export default function InteresCompuestoPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📈 Interés Compuesto</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📈</span> Interés Compuesto</h1>
         <p className={styles.subtitle}>
           Simula el crecimiento de tu inversión a largo plazo
         </p>
@@ -126,7 +126,7 @@ export default function InteresCompuestoPage() {
           Este simulador proporciona <strong>proyecciones educativas</strong> basadas en rentabilidades constantes.
         </p>
         <p>
-          <strong>⚠️ Factores NO considerados:</strong>
+          <strong><span aria-hidden="true">⚠️</span> Factores NO considerados:</strong>
         </p>
         <ul>
           <li><strong>Volatilidad:</strong> Los mercados fluctúan; las rentabilidades nunca son constantes</li>
@@ -147,7 +147,7 @@ export default function InteresCompuestoPage() {
       <div className={styles.mainContent}>
         {/* Panel de Configuración */}
         <div className={styles.configPanel}>
-          <h2 className={styles.sectionTitle}>💰 Datos de la Inversión</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">💰</span> Datos de la Inversión</h2>
 
           <div className={styles.inputGroup}>
             <label className={styles.label}>Capital inicial</label>
@@ -196,7 +196,7 @@ export default function InteresCompuestoPage() {
             />
           </div>
 
-          <h2 className={styles.sectionTitle}>📥 Aportaciones Periódicas</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">📥</span> Aportaciones Periódicas</h2>
 
           <div className={styles.inputGroup}>
             <label className={styles.label}>Aportación</label>
@@ -243,7 +243,7 @@ export default function InteresCompuestoPage() {
 
         {/* Panel de Resultados */}
         <div className={styles.resultsPanel}>
-          <h2 className={styles.sectionTitle}>📊 Resultado de la Simulación</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">📊</span> Resultado de la Simulación</h2>
 
           {/* Resultado Principal */}
           <div className={styles.resultadoPrincipal}>
@@ -259,21 +259,21 @@ export default function InteresCompuestoPage() {
           {/* Desglose */}
           <div className={styles.desgloseGrid}>
             <div className={styles.desgloseCard}>
-              <div className={styles.desgloseIcon}>💵</div>
+              <div className={styles.desgloseIcon} aria-hidden="true">💵</div>
               <span className={styles.desgloseLabel}>Total aportado</span>
               <span className={styles.desgloseValor}>
                 {formatCurrency(resultado.totalAportado)}
               </span>
             </div>
             <div className={`${styles.desgloseCard} ${styles.intereses}`}>
-              <div className={styles.desgloseIcon}>📈</div>
+              <div className={styles.desgloseIcon} aria-hidden="true">📈</div>
               <span className={styles.desgloseLabel}>Intereses generados</span>
               <span className={styles.desgloseValor}>
                 +{formatCurrency(resultado.totalIntereses)}
               </span>
             </div>
             <div className={styles.desgloseCard}>
-              <div className={styles.desgloseIcon}>📊</div>
+              <div className={styles.desgloseIcon} aria-hidden="true">📊</div>
               <span className={styles.desgloseLabel}>% de intereses</span>
               <span className={styles.desgloseValor}>
                 {formatNumber((resultado.totalIntereses / resultado.capitalFinal) * 100, 1)}%
@@ -283,7 +283,7 @@ export default function InteresCompuestoPage() {
 
           {/* Tabla de Evolución */}
           <div className={styles.tablaSection}>
-            <h3 className={styles.sectionTitle}>📅 Evolución Anual</h3>
+            <h3 className={styles.sectionTitle}><span aria-hidden="true">📅</span> Evolución Anual</h3>
             <div className={styles.tablaContainer}>
               <table className={styles.tabla}>
                 <thead>
@@ -322,7 +322,7 @@ export default function InteresCompuestoPage() {
 
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
+        <h3><span aria-hidden="true">⚠️</span> Aviso Importante</h3>
         <p>
           Esta calculadora proporciona una <strong>simulación teórica</strong> basada en una rentabilidad
           constante. En la realidad, los mercados fluctúan y las rentabilidades pasadas no garantizan
@@ -390,7 +390,7 @@ export default function InteresCompuestoPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏖️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏖️</span>
                 <strong>Ahorro para la jubilación (30 años)</strong>
               </div>
               <p className={styles.eduEscenarioExample}>Si pudieras aportar 200 €/mes desde los 30 años al 7% nominal, a los 65 tendrías ~284.000 € nominales (~140.000 € en poder adquisitivo de hoy con inflación 2,5%). Este ejemplo asume capacidad de ahorro constante, algo que no siempre es posible — invierte solo lo que tu situación te permita sin comprometer gastos esenciales.</p>
@@ -398,7 +398,7 @@ export default function InteresCompuestoPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎓</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
                 <strong>Educación universitaria de un hijo</strong>
               </div>
               <p className={styles.eduEscenarioExample}>Si hoy inviertes 10.000 € cuando nace tu hijo al 6% anual, en 18 años tendrás ~28.543 €. Si añades 100 €/mes, llegarás a ~57.000 €: suficiente para una carrera y máster.</p>
@@ -406,7 +406,7 @@ export default function InteresCompuestoPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏠</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏠</span>
                 <strong>Ahorro para entrada de un piso (5 años)</strong>
               </div>
               <p className={styles.eduEscenarioExample}>Necesitas 40.000 € en 5 años. Si inviertes 600 €/mes al 4% anual, alcanzas ~39.700 €. En horizontes cortos, el interés compuesto ayuda pero el ahorro mensual es lo que más importa.</p>
@@ -414,7 +414,7 @@ export default function InteresCompuestoPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📈</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📈</span>
                 <strong>Inversión en fondo indexado (largo plazo)</strong>
               </div>
               <p className={styles.eduEscenarioExample}>Históricamente el S&amp;P 500 ha rentado ~7-10% anual en USD (1926-2023). Para un inversor en euros, descontando comisiones y retención fiscal sobre dividendos, la rentabilidad real efectiva ha sido más cercana al 5-7% nominal. La constancia ayuda, pero el resultado real depende de muchos factores fuera de tu control.</p>
@@ -422,7 +422,7 @@ export default function InteresCompuestoPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💳</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💳</span>
                 <strong>Deuda con interés compuesto (trampa)</strong>
               </div>
               <p className={styles.eduEscenarioExample}>Una tarjeta de crédito al 25% anual. Si debes 5.000 € y solo pagas el mínimo, en 10 años habrás pagado más de 15.000 €. El interés compuesto funciona igual de rápido en tu contra.</p>
@@ -430,7 +430,7 @@ export default function InteresCompuestoPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🔄</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔄</span>
                 <strong>Reinversión de dividendos (DRIP)</strong>
               </div>
               <p className={styles.eduEscenarioExample}>Invertir 10.000 € en acciones con 4% de dividendo anual reinvertido durante 20 años: 21.911 € sin reinversión vs 21.911 € con reinversión + crecimiento del capital. Los dividendos reinvertidos aceleran el efecto compuesto.</p>
@@ -539,32 +539,32 @@ export default function InteresCompuestoPage() {
           <h2>Tips para maximizar el efecto del interés compuesto</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⏰</span>
+              <span className={styles.tipIcon} aria-hidden="true">⏰</span>
               <strong>El tiempo es tu mayor activo</strong>
               <p>Cada año que adelantas el inicio puede suponer decenas de miles de euros en el resultado final.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💸</span>
+              <span className={styles.tipIcon} aria-hidden="true">💸</span>
               <strong>Minimiza costes y comisiones</strong>
               <p>Una diferencia del 1% en comisiones anuales puede reducir tu capital final en un 20-30% a 30 años.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <strong>Reinvierte siempre los rendimientos</strong>
               <p>No consumas los intereses. Cada euro retirado frena el efecto bola de nieve de forma permanente.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧮</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧮</span>
               <strong>Usa la regla del 72</strong>
               <p>Divide 72 entre tu rentabilidad esperada para saber en cuántos años se duplica tu dinero.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🛡️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🛡️</span>
               <strong>Cancela deudas de alto interés primero</strong>
               <p>Una deuda al 20% crece más rápido que cualquier inversión. Cancélala antes de invertir.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <strong>Diversifica para reducir volatilidad</strong>
               <p>Un fondo global indexado diversifica en miles de empresas, reduciendo el riesgo sin sacrificar rentabilidad a largo plazo.</p>
             </div>
@@ -574,7 +574,7 @@ export default function InteresCompuestoPage() {
         {/* Warning Box */}
         <div className={styles.eduWarningBox}>
           <div className={styles.eduWarningHeader}>
-            <span className={styles.eduWarningIcon}>⚠️</span>
+            <span className={styles.eduWarningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores que destruyen el efecto del interés compuesto</strong>
           </div>
           <ul className={styles.eduWarningList}>

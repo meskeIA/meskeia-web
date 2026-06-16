@@ -654,10 +654,10 @@
 | [x] | Estimador de Deuda | `/estimador-deuda/` | finanzas |
 | [x] | Estimador de Inflación | `/estimador-inflacion/` | finanzas |
 | [x] | Estimador de Infraseguro | `/estimador-infraseguro/` | finanzas, inmobiliaria |
-| [ ] | Estimador de Inversiones | `/estimador-inversiones/` | finanzas |
-| [ ] | Estimador FIRE | `/estimador-fire/` | finanzas, legal-fiscal |
-| [ ] | Estimador Fondo de Emergencia | `/estimador-fondo-emergencia/` | finanzas |
-| [ ] | Estimador Interés Compuesto | `/estimador-interes-compuesto/` | finanzas |
+| [x] | Estimador de Inversiones | `/estimador-inversiones/` | finanzas |
+| [x] | Estimador FIRE | `/estimador-fire/` | finanzas, legal-fiscal |
+| [x] | Estimador Fondo de Emergencia | `/estimador-fondo-emergencia/` | finanzas |
+| [x] | Estimador Interés Compuesto | `/estimador-interes-compuesto/` | finanzas |
 | [ ] | Estimador TIR-VAN | `/estimador-tir-van/` | finanzas, freelance, estudiantes |
 | [ ] | Fondo de Inversión: Por Dentro | `/visualizador-fondo-inversion/` | finanzas |
 | [ ] | Guía Reclamar Seguro Coche | `/guia-reclamar-seguro-coche/` | finanzas, cultura |

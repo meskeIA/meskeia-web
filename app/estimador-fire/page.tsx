@@ -172,7 +172,7 @@ export default function CalculadoraFIREPage() {
             />
           </div>
 
-          <button onClick={calcularFIRE} className={styles.btnPrimary}>
+          <button type="button" onClick={calcularFIRE} className={styles.btnPrimary}>
             Calcular mi FIRE
           </button>
         </div>
@@ -181,7 +181,7 @@ export default function CalculadoraFIREPage() {
           {resultado && (
             <>
               <div className={styles.tipoFireBadge}>
-                <span className={styles.tipoFireIcon}>{getTipoFIREInfo(resultado.tipoFIRE).icon}</span>
+                <span className={styles.tipoFireIcon} aria-hidden="true">{getTipoFIREInfo(resultado.tipoFIRE).icon}</span>
                 <div>
                   <span className={styles.tipoFireNombre}>{getTipoFIREInfo(resultado.tipoFIRE).nombre}</span>
                   <span className={styles.tipoFireDesc}>{getTipoFIREInfo(resultado.tipoFIRE).descripcion}</span>
@@ -342,7 +342,7 @@ export default function CalculadoraFIREPage() {
           <div className={styles.casosGrid}>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoIcon}>💼</span>
+                <span className={styles.casoIcon} aria-hidden="true">💼</span>
                 <span className={styles.casoNivel}>Empleado con ahorro</span>
               </div>
               <p className={styles.casoTip}>
@@ -352,7 +352,7 @@ export default function CalculadoraFIREPage() {
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoIcon}>🏠</span>
+                <span className={styles.casoIcon} aria-hidden="true">🏠</span>
                 <span className={styles.casoNivel}>Con patrimonio inicial</span>
               </div>
               <p className={styles.casoTip}>
@@ -362,7 +362,7 @@ export default function CalculadoraFIREPage() {
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoIcon}>📉</span>
+                <span className={styles.casoIcon} aria-hidden="true">📉</span>
                 <span className={styles.casoNivel}>Simulación de inflación</span>
               </div>
               <p className={styles.casoTip}>
@@ -372,7 +372,7 @@ export default function CalculadoraFIREPage() {
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoIcon}>🎯</span>
+                <span className={styles.casoIcon} aria-hidden="true">🎯</span>
                 <span className={styles.casoNivel}>Encontrar tu tasa de ahorro</span>
               </div>
               <p className={styles.casoTip}>
@@ -505,37 +505,37 @@ export default function CalculadoraFIREPage() {
           <h2>6 claves para acelerar tu FIRE</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⬆️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⬆️</span>
               <strong>Aumenta ingresos, no solo recortes</strong>
               <p>La tasa de ahorro puede crecer más rápido aumentando ingresos (ascenso, freelance, negocio) que reduciendo gastos. Ambas palancas son necesarias.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧮</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧮</span>
               <strong>Usa la rentabilidad real, no la nominal</strong>
               <p>Resta la inflación (2-3%) a la rentabilidad esperada. Un 7% nominal con 3% de inflación da un 4% real. Tu calculadora debe usar el dato real para ser precisa.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🛡️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🛡️</span>
               <strong>Mantén un colchón extra en el retiro</strong>
               <p>Añade un 15-20% al número FIRE calculado como margen de seguridad ante crisis de mercado en los primeros años del retiro (riesgo de secuencia de rendimientos).</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💼</span>
+              <span className={styles.tipIcon} aria-hidden="true">💼</span>
               <strong>Considera el Barista FIRE</strong>
               <p>Trabajar a tiempo parcial en el retiro cubriendo solo gastos básicos (1.000 €/mes) reduce el capital necesario a la mitad. El semi-retiro es una etapa intermedia muy válida.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <strong>Diversifica en múltiples activos</strong>
               <p>No solo acciones. Renta fija, REITs e incluso bienes raíces físicos como fuente de alquiler pueden reducir la volatilidad de la cartera y añadir ingresos pasivos diversificados.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧘</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧘</span>
               <strong>Define el &quot;por qué&quot; antes del número</strong>
               <p>FIRE no es solo dejar de trabajar. Define qué harás con tu tiempo. Tener un propósito claro reduce el riesgo de &quot;one more year syndrome&quot; (posponer el retiro indefinidamente).</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚖️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
               <strong>FIRE no es para todos</strong>
               <p>Trabajar hasta la jubilación ordinaria es una opción tan válida como la independencia financiera temprana, especialmente si tu trabajo te aporta más allá del salario.</p>
             </div>
@@ -546,7 +546,7 @@ export default function CalculadoraFIREPage() {
         <section className={styles.guideSection}>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h2>Errores frecuentes en la planificación FIRE</h2>
             </div>
             <ul className={styles.warningList}>

@@ -184,7 +184,7 @@ export default function CalculadoraFondoEmergenciaPage() {
             </select>
           </div>
 
-          <button onClick={calcularFondo} className={styles.btnPrimary}>
+          <button type="button" onClick={calcularFondo} className={styles.btnPrimary}>
             Calcular fondo necesario
           </button>
         </div>
@@ -336,7 +336,7 @@ export default function CalculadoraFondoEmergenciaPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏛️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏛️</span>
                 <strong>Funcionario o indefinido antiguo</strong>
               </div>
               <p className={styles.escenarioExample}>Estabilidad alta, sin cargas. 3 meses suele ser suficiente como colchón para imprevistos.</p>
@@ -344,7 +344,7 @@ export default function CalculadoraFondoEmergenciaPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💼</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💼</span>
                 <strong>Autónomo / freelance</strong>
               </div>
               <p className={styles.escenarioExample}>Ingresos variables. El colchón recomendado es mayor que para empleados (idealmente 9-12 meses). Construirlo lleva tiempo: empieza por un mínimo de 3 meses y amplía gradualmente.</p>
@@ -352,7 +352,7 @@ export default function CalculadoraFondoEmergenciaPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👨‍👩‍👧</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👨‍👩‍👧</span>
                 <strong>Familia con hijos pequeños</strong>
               </div>
               <p className={styles.escenarioExample}>Gastos imprevistos frecuentes (médicos, reparaciones). Las cargas familiares exigen mayor cobertura.</p>
@@ -360,7 +360,7 @@ export default function CalculadoraFondoEmergenciaPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📋</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📋</span>
                 <strong>Contrato temporal o por obra</strong>
               </div>
               <p className={styles.escenarioExample}>Alta rotación laboral. El paro puede durar meses y los contratos terminar de golpe.</p>
@@ -368,7 +368,7 @@ export default function CalculadoraFondoEmergenciaPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💑</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💑</span>
                 <strong>Pareja con doble ingreso</strong>
               </div>
               <p className={styles.escenarioExample}>El segundo ingreso actúa como amortiguador. Podéis dividir responsabilidad del fondo.</p>
@@ -376,7 +376,7 @@ export default function CalculadoraFondoEmergenciaPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📈</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📈</span>
                 <strong>Inversor con activos líquidos</strong>
               </div>
               <p className={styles.escenarioExample}>Si tienes fondos monetarios o ETFs que puedes vender en días, el fondo de emergencia puede ser menor.</p>
@@ -485,32 +485,32 @@ export default function CalculadoraFondoEmergenciaPage() {
           <h2>Tips para mantener tu fondo de emergencia</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <strong>Reconstruye después de usarlo</strong>
               <p>Si usas el fondo, reconstitúyelo antes de cualquier otro objetivo financiero.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <strong>Revisa anualmente</strong>
               <p>Tus gastos cambian. Si te mudas o cambias de trabajo, recalcula cuánto necesitas.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔒</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔒</span>
               <strong>No lo toques salvo emergencias reales</strong>
               <p>Las vacaciones o una TV nueva no son emergencias. Define tus criterios antes de necesitarlo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💡</span>
+              <span className={styles.tipIcon} aria-hidden="true">💡</span>
               <strong>Busca rentabilidad sin perder liquidez</strong>
               <p>Cuentas ahorro remuneradas o fondos monetarios ofrecen rendimiento sin sacrificar acceso.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <strong>Empieza aunque sea pequeño</strong>
               <p>100 € al mes durante 20 meses = 2.000 €. El hábito importa más que la cifra inicial.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🛡️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🛡️</span>
               <strong>Es seguro de tranquilidad, no inversión</strong>
               <p>Su función es darte paz mental y protegerte. No lo optimices en exceso buscando más rentabilidad.</p>
             </div>
@@ -520,7 +520,7 @@ export default function CalculadoraFondoEmergenciaPage() {
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores comunes que debes evitar</strong>
           </div>
           <ul className={styles.warningList}>

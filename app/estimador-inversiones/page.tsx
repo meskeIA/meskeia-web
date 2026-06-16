@@ -313,18 +313,20 @@ export default function CalculadoraInversionesPage() {
       <div className={styles.modoSelector}>
         <button
           type="button"
+          aria-pressed={modo === 'calculadora'}
           className={`${styles.modoBtn} ${modo === 'calculadora' ? styles.modoActivo : ''}`}
           onClick={() => setModo('calculadora')}
         >
-          <span className={styles.modoIcon}>🧮</span>
+          <span className={styles.modoIcon} aria-hidden="true">🧮</span>
           <span className={styles.modoNombre}>Calculadora</span>
         </button>
         <button
           type="button"
+          aria-pressed={modo === 'comparador'}
           className={`${styles.modoBtn} ${modo === 'comparador' ? styles.modoActivo : ''}`}
           onClick={() => setModo('comparador')}
         >
-          <span className={styles.modoIcon}>📊</span>
+          <span className={styles.modoIcon} aria-hidden="true">📊</span>
           <span className={styles.modoNombre}>Comparador</span>
         </button>
       </div>
@@ -387,10 +389,12 @@ export default function CalculadoraInversionesPage() {
             {(Object.keys(PERFILES) as PerfilInversor[]).map((key) => (
               <button
                 key={key}
+                type="button"
+                aria-pressed={perfil === key}
                 className={`${styles.perfilBtn} ${perfil === key ? styles.activo : ''}`}
                 onClick={() => setPerfil(key)}
               >
-                <div className={styles.perfilIcon}>{PERFILES[key].icon}</div>
+                <div className={styles.perfilIcon}><span aria-hidden="true">{PERFILES[key].icon}</span></div>
                 <span className={styles.perfilNombre}>{PERFILES[key].nombre}</span>
                 <span className={styles.perfilDesc}>{PERFILES[key].desc}</span>
               </button>
@@ -557,10 +561,11 @@ export default function CalculadoraInversionesPage() {
                 <button
                   key={key}
                   type="button"
+                  aria-pressed={perfil === key}
                   className={`${styles.perfilBtnSmall} ${perfil === key ? styles.activo : ''}`}
                   onClick={() => setPerfil(key)}
                 >
-                  {PERFILES[key].icon} {PERFILES[key].nombre}
+                  <span aria-hidden="true">{PERFILES[key].icon}</span> {PERFILES[key].nombre}
                 </button>
               ))}
             </div>
@@ -582,7 +587,7 @@ export default function CalculadoraInversionesPage() {
         {/* Inputs de Escenarios */}
         <div className={styles.escenariosInputGrid}>
           <div className={styles.escenarioInput}>
-            <label className={styles.escenarioLabel}>💰 Escenario 1</label>
+            <label className={styles.escenarioLabel}><span aria-hidden="true">💰</span> Escenario 1</label>
             <div className={styles.inputWrapper}>
               <input
                 type="text"
@@ -595,7 +600,7 @@ export default function CalculadoraInversionesPage() {
             </div>
           </div>
           <div className={styles.escenarioInput}>
-            <label className={styles.escenarioLabel}>💰 Escenario 2</label>
+            <label className={styles.escenarioLabel}><span aria-hidden="true">💰</span> Escenario 2</label>
             <div className={styles.inputWrapper}>
               <input
                 type="text"
@@ -608,7 +613,7 @@ export default function CalculadoraInversionesPage() {
             </div>
           </div>
           <div className={styles.escenarioInput}>
-            <label className={styles.escenarioLabel}>💰 Escenario 3</label>
+            <label className={styles.escenarioLabel}><span aria-hidden="true">💰</span> Escenario 3</label>
             <div className={styles.inputWrapper}>
               <input
                 type="text"
