@@ -961,10 +961,10 @@
 
 | Estado | Nombre | URL | Suites |
 |---|---|---|---|
-| [ ] | Acetilcolina: El Primer Neurotransmisor Descubierto | `/visualizador-acetilcolina/` | salud, cultura, estudiantes |
-| [ ] | Adaptación del Hogar | `/adaptacion-hogar/` | salud, legal-fiscal, inmobiliaria |
-| [ ] | ADN Polimerasa - La Máquina que Copia tu Genoma | `/visualizador-adn-polimerasa/` | salud, cultura, estudiantes |
-| [ ] | Adrenalina: La Hormona de la Supervivencia | `/visualizador-adrenalina/` | salud, cultura, estudiantes |
+| [x] | Acetilcolina: El Primer Neurotransmisor Descubierto | `/visualizador-acetilcolina/` | salud, cultura, estudiantes |
+| [x] | Adaptación del Hogar | `/adaptacion-hogar/` | salud, legal-fiscal, inmobiliaria |
+| [x] | ADN Polimerasa - La Máquina que Copia tu Genoma | `/visualizador-adn-polimerasa/` | salud, cultura, estudiantes |
+| [x] | Adrenalina: La Hormona de la Supervivencia | `/visualizador-adrenalina/` | salud, cultura, estudiantes |
 | [ ] | Anestesia: Cómo se Apaga y Enciende la Consciencia | `/visualizador-anestesia/` | salud, cultura, estudiantes |
 | [ ] | Antibióticos: Cómo Matan Bacterias y la Resistencia | `/visualizador-antibioticos/` | salud, cultura, estudiantes |
 | [ ] | Aspirina, Paracetamol e Ibuprofeno: Comparativa de los 3 Analgésicos | `/visualizador-analgesicos/` | salud, cultura, estudiantes |

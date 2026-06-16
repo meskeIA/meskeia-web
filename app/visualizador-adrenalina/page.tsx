@@ -259,6 +259,7 @@ function BloqueTimeline() {
         {HITOS_TIMELINE.map((h, i) => (
           <button
             key={i}
+            type="button"
             role="tab"
             aria-selected={hitoActivo === i}
             aria-label={`${h.tiempo}: ${h.titulo}`}
@@ -305,6 +306,7 @@ function BloqueReceptores() {
               {receptor.subtipos.map((sub) => (
                 <div key={sub.nombre}>
                   <button
+                    type="button"
                     className={`${styles.receptorSubtipo} ${subtipoActivo === sub.nombre ? styles.receptorSubtipoActivo : ''}`}
                     style={subtipoActivo === sub.nombre ? { borderColor: receptor.color, backgroundColor: receptor.color + '12' } : {}}
                     onClick={() => setSubtipoActivo(subtipoActivo === sub.nombre ? null : sub.nombre)}
@@ -346,6 +348,7 @@ function BloqueMedicamentos() {
         {USOS_MEDICOS.map((tarjeta, i) => (
           <button
             key={i}
+            type="button"
             className={`${styles.medicamentoCard} ${tarjetaActiva === i ? styles.medicamentoCardActiva : ''}`}
             onClick={() => setTarjetaActiva(tarjetaActiva === i ? null : i)}
             aria-expanded={tarjetaActiva === i}
@@ -416,7 +419,7 @@ function BloqueEstres() {
 
       <div className={styles.comparativaEstres}>
         <div className={styles.comparativaCol}>
-          <h3 className={styles.comparativaTitulo} style={{ color: '#2E86AB' }}>⚡ Estrés agudo (adaptativo)</h3>
+          <h3 className={styles.comparativaTitulo} style={{ color: '#2E86AB' }}><span aria-hidden="true">⚡</span> Estrés agudo (adaptativo)</h3>
           <ul className={styles.comparativaLista}>
             <li>Mejora el rendimiento cognitivo a corto plazo</li>
             <li>Moviliza energía de forma eficiente</li>
@@ -426,7 +429,7 @@ function BloqueEstres() {
           </ul>
         </div>
         <div className={styles.comparativaCol}>
-          <h3 className={styles.comparativaTitulo} style={{ color: '#C0392B' }}>🔥 Estrés crónico (dañino)</h3>
+          <h3 className={styles.comparativaTitulo} style={{ color: '#C0392B' }}><span aria-hidden="true">🔥</span> Estrés crónico (dañino)</h3>
           <ul className={styles.comparativaLista}>
             <li>Hipertensión arterial sostenida</li>
             <li>Inmunosupresión a largo plazo</li>

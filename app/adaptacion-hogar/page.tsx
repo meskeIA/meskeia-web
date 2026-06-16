@@ -216,7 +216,7 @@ export default function AdaptacionHogar() {
 
               {resumen.conAyuda > 0 && (
                 <div className={styles.ayudasCard}>
-                  <div className={styles.ayudasCardTitulo}>ℹ Posibles ayudas públicas</div>
+                  <div className={styles.ayudasCardTitulo}><span aria-hidden="true">ℹ</span> Posibles ayudas públicas</div>
                   {resumen.conAyuda} de tus adaptaciones pueden ser elegibles para ayudas del IMSERSO, Plan Estatal de Vivienda o programas autonómicos. Consulta en tu ayuntamiento o servicios sociales municipales.
                 </div>
               )}
@@ -306,39 +306,39 @@ export default function AdaptacionHogar() {
       <div className={styles.escenariosGrid}>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>🦯</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">🦯</span>
             <strong>Persona mayor con movilidad reducida</strong>
           </div>
           <p>75 años, dificultad para subir escaleras y bañarse. Necesita instalación de barras, sustitución de bañera por plato ducha y posiblemente elevador o rampa.</p>
           <div className={styles.escenarioExample}>Coste estimado: 3.000-8.000 € → con ayudas: puede cubrirse 40-80%</div>
-          <div className={styles.escenarioTip}>💡 Solicitar valoración de dependencia antes de iniciar obras para poder acceder a todas las ayudas.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> Solicitar valoración de dependencia antes de iniciar obras para poder acceder a todas las ayudas.</div>
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>♿</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">♿</span>
             <strong>Persona con discapacidad reconocida</strong>
           </div>
           <p>Discapacidad motriz 40%, trabaja en casa y necesita adaptar el acceso, baño y cocina. El Plan de Vivienda estatal puede cubrir gran parte del coste.</p>
           <div className={styles.escenarioExample}>Ejemplo: Presupuesto 15.000 € → subvención 60% = 9.000 € cubiertos</div>
-          <div className={styles.escenarioTip}>💡 Con certificado de discapacidad en vigor, los trámites para las ayudas son más ágiles.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> Con certificado de discapacidad en vigor, los trámites para las ayudas son más ágiles.</div>
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>🏠</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">🏠</span>
             <strong>Familiar cuidador que acondiciona la casa</strong>
           </div>
           <p>Hijo que acoge a su madre con dependencia Grado II. Necesita adaptar una habitación y el baño. Puede acceder a ayudas del SAAD y deducción autonómica.</p>
           <div className={styles.escenarioExample}>Prestación SAAD para adaptación + deducción IRPF autonómica por obras</div>
-          <div className={styles.escenarioTip}>💡 El cuidador familiar puede solicitar la prestación económica para cuidados en el entorno familiar también.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> El cuidador familiar puede solicitar la prestación económica para cuidados en el entorno familiar también.</div>
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>🔨</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">🔨</span>
             <strong>Propietario mayor que quiere hacer accesible el piso</strong>
           </div>
           <p>70 años, sin dependencia reconocida pero prevé dificultades. Inversión preventiva en accesibilidad. Puede aprovechar IVA reducido y deducciones IRPF autonómicas.</p>
           <div className={styles.escenarioExample}>Obras 10.000 € con IVA 10% en vez de 21% → ahorro 1.100 € en IVA</div>
-          <div className={styles.escenarioTip}>💡 Invertir en accesibilidad preventiva aumenta el valor de la vivienda y facilita el envejecimiento activo.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> Invertir en accesibilidad preventiva aumenta el valor de la vivienda y facilita el envejecimiento activo.</div>
         </div>
       </div>
 
@@ -376,7 +376,7 @@ export default function AdaptacionHogar() {
         <div className={styles.faqItem}>
           <strong>¿La tecnología domótica puede incluirse en las ayudas?</strong>
           <p>Sí, adaptaciones tecnológicas como sistemas de alarma, control domótico por voz o sensores de seguridad para mayores pueden incluirse en algunas convocatorias de ayudas a la accesibilidad.</p>
-          <div className={styles.faqTip}>💡 Consultar con servicios sociales municipales qué tecnologías específicas están subvencionadas en tu localidad.</div>
+          <div className={styles.faqTip}><span aria-hidden="true">💡</span> Consultar con servicios sociales municipales qué tecnologías específicas están subvencionadas en tu localidad.</div>
         </div>
       </div>
 
@@ -430,37 +430,37 @@ export default function AdaptacionHogar() {
       {/* 5. Mejores Prácticas */}
       <div className={styles.tipsGrid}>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>📋</div>
+          <div className={styles.tipIcon} aria-hidden="true">📋</div>
           <strong>Consulta Servicios Sociales primero</strong>
           <p>Antes de contratar ninguna obra, visita Servicios Sociales municipales. Pueden asesorarte sobre todas las ayudas disponibles y los pasos a seguir.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>🏗️</div>
+          <div className={styles.tipIcon} aria-hidden="true">🏗️</div>
           <strong>Prioriza las zonas de mayor riesgo</strong>
           <p>El baño es la zona de mayor riesgo de caídas en mayores. Adaptarlo primero (barras, ducha accesible, antideslizante) tiene el mayor impacto en seguridad.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>📅</div>
+          <div className={styles.tipIcon} aria-hidden="true">📅</div>
           <strong>Actúa antes de que sea urgente</strong>
           <p>Las adaptaciones preventivas son más baratas y mejor planificadas. No esperes a tener un accidente para solicitar ayudas y hacer obras.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>🔍</div>
+          <div className={styles.tipIcon} aria-hidden="true">🔍</div>
           <strong>Pide varios presupuestos</strong>
           <p>Las empresas especializadas en adaptaciones para mayores o discapacidad son necesarias para el IVA reducido. Compara al menos 3 presupuestos.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>📊</div>
+          <div className={styles.tipIcon} aria-hidden="true">📊</div>
           <strong>Combina varias ayudas</strong>
           <p>Es posible combinar subvención del Plan de Vivienda con ayudas municipales y deducción IRPF autonómica. La combinación puede cubrir casi todo el coste.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>🏦</div>
+          <div className={styles.tipIcon} aria-hidden="true">🏦</div>
           <strong>Considera el ICO para financiar si hay espera</strong>
           <p>Mientras tramitas las ayudas, existe financiación ICO específica para obras de accesibilidad con condiciones ventajosas. Consulta con tu banco.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>🤝</div>
+          <div className={styles.tipIcon} aria-hidden="true">🤝</div>
           <strong>Recursos si el coste sigue siendo inasumible</strong>
           <p>Si el coste sigue siendo inasumible incluso con todas las ayudas, los Servicios Sociales municipales pueden valorar ayudas excepcionales por emergencia social, y existen ayudas técnicas de préstamo (Bancos de Productos de Apoyo) gestionadas por algunas CCAA o entidades como Cruz Roja para soluciones temporales sin coste.</p>
         </div>
@@ -469,7 +469,7 @@ export default function AdaptacionHogar() {
       {/* 6. Warning Box */}
       <div className={styles.warningBox}>
         <div className={styles.warningHeader}>
-          <span className={styles.warningIcon}>⚠️</span>
+          <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
           <strong>Errores frecuentes al adaptar el hogar</strong>
         </div>
         <ul className={styles.warningList}>

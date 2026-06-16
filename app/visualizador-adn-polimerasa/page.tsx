@@ -243,10 +243,12 @@ export default function VisualizadorAdnPolimerasa() {
             {PASOS_HORQUILLA.map((_, i) => (
               <button
                 key={i}
+                type="button"
                 className={`${styles.indicadorPunto} ${i === pasoActual ? styles.indicadorPuntoActivo : ''}`}
                 onClick={() => setPasoActual(i)}
                 aria-label={`Ir al paso ${i + 1}: ${PASOS_HORQUILLA[i].titulo}`}
                 aria-current={i === pasoActual ? 'step' : undefined}
+                aria-pressed={i === pasoActual}
               />
             ))}
           </div>
@@ -266,6 +268,7 @@ export default function VisualizadorAdnPolimerasa() {
 
           <div className={styles.stepControls}>
             <button
+              type="button"
               className={styles.btnPaso}
               onClick={irAtras}
               disabled={pasoActual === 0}
@@ -277,6 +280,7 @@ export default function VisualizadorAdnPolimerasa() {
               {pasoActual + 1} / {PASOS_HORQUILLA.length}
             </span>
             <button
+              type="button"
               className={styles.btnPaso}
               onClick={irAdelante}
               disabled={pasoActual === PASOS_HORQUILLA.length - 1}

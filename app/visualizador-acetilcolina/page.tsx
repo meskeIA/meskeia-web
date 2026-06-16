@@ -411,6 +411,7 @@ export default function VisualizadorAcetilcolina() {
           {SISTEMAS.map((s) => (
             <button
               key={s.id}
+              type="button"
               role="tab"
               aria-selected={s.id === sistemaActivo}
               aria-controls={`panel-${s.id}`}
