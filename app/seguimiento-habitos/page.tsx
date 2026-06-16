@@ -439,7 +439,7 @@ export default function SeguimientoHabitosPage() {
 
       {/* Hero */}
       <header className={styles.hero}>
-        <h1 className={styles.title}>📊 Seguimiento de Hábitos</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📊</span> Seguimiento de Hábitos</h1>
         <p className={styles.subtitle}>Construye rutinas saludables con visualización de rachas</p>
       </header>
 
@@ -455,33 +455,39 @@ export default function SeguimientoHabitosPage() {
       {/* Navegación */}
       <div className={styles.navegacion}>
         <button
+          type="button"
           className={`${styles.navBtn} ${vistaActiva === 'habitos' ? styles.navBtnActivo : ''}`}
           onClick={() => setVistaActiva('habitos')}
+          aria-pressed={vistaActiva === 'habitos'}
         >
-          📋 Mis Hábitos
+          <span aria-hidden="true">📋</span> Mis Hábitos
         </button>
         <button
+          type="button"
           className={`${styles.navBtn} ${vistaActiva === 'calendario' ? styles.navBtnActivo : ''}`}
           onClick={() => setVistaActiva('calendario')}
+          aria-pressed={vistaActiva === 'calendario'}
         >
-          📅 Calendario
+          <span aria-hidden="true">📅</span> Calendario
         </button>
         <button
+          type="button"
           className={`${styles.navBtn} ${vistaActiva === 'estadisticas' ? styles.navBtnActivo : ''}`}
           onClick={() => setVistaActiva('estadisticas')}
+          aria-pressed={vistaActiva === 'estadisticas'}
         >
-          📈 Estadísticas
+          <span aria-hidden="true">📈</span> Estadísticas
         </button>
       </div>
 
       {/* Acciones */}
       <div className={styles.acciones}>
-        <button className={styles.btnPrimary} onClick={abrirModalNuevo}>
-          ➕ Nuevo Hábito
+        <button type="button" className={styles.btnPrimary} onClick={abrirModalNuevo}>
+          <span aria-hidden="true">➕</span> Nuevo Hábito
         </button>
         <div className={styles.accionesSecundarias}>
-          <button className={styles.btnSecondary} onClick={exportarDatos}>
-            💾 Exportar
+          <button type="button" className={styles.btnSecondary} onClick={exportarDatos}>
+            <span aria-hidden="true">💾</span> Exportar
           </button>
           <label className={styles.btnSecondary}>
             📥 Importar
@@ -497,7 +503,7 @@ export default function SeguimientoHabitosPage() {
             <div className={styles.estadoVacio}>
               <div className={styles.estadoVacioIcono}>📊</div>
               <p>Aún no tienes hábitos registrados</p>
-              <button className={styles.btnPrimary} onClick={abrirModalNuevo}>
+              <button type="button" className={styles.btnPrimary} onClick={abrirModalNuevo}>
                 Crear mi primer hábito
               </button>
             </div>
@@ -515,14 +521,14 @@ export default function SeguimientoHabitosPage() {
                     <div className={styles.habitoInfo}>
                       <div className={styles.habitoColor} style={{ background: habito.color }} />
                       <span className={styles.habitoNombre}>
-                        {habito.icono} {habito.nombre}
+                        <span aria-hidden="true">{habito.icono}</span> {habito.nombre}
                       </span>
                       {habito.tipo === 'evitar' && (
                         <span className={styles.habitoTipoEvitar}>Evitar</span>
                       )}
                     </div>
                     <div className={styles.habitoRacha}>
-                      🔥 {rachaActual} días
+                      <span aria-hidden="true">🔥</span> {rachaActual} días
                     </div>
                   </div>
 
@@ -560,10 +566,12 @@ export default function SeguimientoHabitosPage() {
                       return (
                         <button
                           key={fechaStr}
+                          type="button"
                           className={`${styles.diaCirculo} ${completado ? styles.diaCompletado : ''}`}
                           style={completado ? { background: habito.color, borderColor: habito.color } : {}}
                           onClick={() => toggleDia(habito.id, fechaStr)}
                           title={`${DIAS_SEMANA_LARGO[diaSemana]} ${fecha.getDate()}`}
+                          aria-pressed={!!completado}
                         >
                           <span className={styles.diaCirculoLetra}>{DIAS_SEMANA[diaSemana]}</span>
                           {completado && <span className={styles.diaCirculoCheck}>✓</span>}
@@ -574,16 +582,18 @@ export default function SeguimientoHabitosPage() {
 
                   <div className={styles.habitoAcciones}>
                     <button
+                      type="button"
                       className={`${styles.btnMarcar} ${completadoHoy ? styles.btnMarcado : ''}`}
                       style={completadoHoy ? { background: habito.color, borderColor: habito.color } : {}}
                       onClick={() => toggleDia(habito.id, hoy)}
+                      aria-pressed={!!completadoHoy}
                     >
                       {completadoHoy ? '✓ Completado hoy' : '○ Marcar hoy'}
                     </button>
-                    <button className={styles.btnIcon} onClick={() => abrirModalEditar(habito)} title="Editar">
+                    <button type="button" className={styles.btnIcon} onClick={() => abrirModalEditar(habito)} title="Editar">
                       ✏️
                     </button>
-                    <button className={styles.btnIcon} onClick={() => eliminarHabito(habito.id)} title="Eliminar">
+                    <button type="button" className={styles.btnIcon} onClick={() => eliminarHabito(habito.id)} title="Eliminar">
                       🗑️
                     </button>
                   </div>
@@ -601,6 +611,7 @@ export default function SeguimientoHabitosPage() {
             <h2 className={styles.calendarioTitulo}>📅 Calendario Mensual</h2>
             <div className={styles.calendarioNav}>
               <button
+                type="button"
                 className={styles.navMesBtn}
                 onClick={() => setMesActual(new Date(mesActual.getFullYear(), mesActual.getMonth() - 1))}
               >
@@ -610,6 +621,7 @@ export default function SeguimientoHabitosPage() {
                 {meses[mesActual.getMonth()]} {mesActual.getFullYear()}
               </span>
               <button
+                type="button"
                 className={styles.navMesBtn}
                 onClick={() => setMesActual(new Date(mesActual.getFullYear(), mesActual.getMonth() + 1))}
               >
@@ -629,7 +641,7 @@ export default function SeguimientoHabitosPage() {
             {habitos.map(habito => (
               <div key={habito.id} className={styles.leyendaItem}>
                 <div className={styles.leyendaColor} style={{ background: habito.color }} />
-                <span>{habito.icono} {habito.nombre}</span>
+                <span><span aria-hidden="true">{habito.icono}</span> {habito.nombre}</span>
               </div>
             ))}
           </div>
@@ -642,24 +654,24 @@ export default function SeguimientoHabitosPage() {
           {/* Resumen general */}
           <div className={styles.resumenGeneral}>
             <div className={styles.resumenCard}>
-              <span className={styles.resumenIcono}>📊</span>
+              <span className={styles.resumenIcono} aria-hidden="true">📊</span>
               <span className={styles.resumenValor}>{habitos.length}</span>
               <span className={styles.resumenLabel}>Hábitos activos</span>
             </div>
             <div className={styles.resumenCard}>
-              <span className={styles.resumenIcono}>🔥</span>
+              <span className={styles.resumenIcono} aria-hidden="true">🔥</span>
               <span className={styles.resumenValor}>
                 {habitos.length > 0 ? Math.max(...habitos.map(h => calcularRachaActual(h))) : 0}
               </span>
               <span className={styles.resumenLabel}>Mejor racha actual</span>
             </div>
             <div className={styles.resumenCard}>
-              <span className={styles.resumenIcono}>🏆</span>
+              <span className={styles.resumenIcono} aria-hidden="true">🏆</span>
               <span className={styles.resumenValor}>{logrosDesbloqueados.size}</span>
               <span className={styles.resumenLabel}>Logros desbloqueados</span>
             </div>
             <div className={styles.resumenCard}>
-              <span className={styles.resumenIcono}>📈</span>
+              <span className={styles.resumenIcono} aria-hidden="true">📈</span>
               <span className={styles.resumenValor}>
                 {habitos.length > 0
                   ? Math.round(habitos.reduce((acc, h) => acc + calcularTasaCumplimiento(h), 0) / habitos.length)
@@ -680,7 +692,7 @@ export default function SeguimientoHabitosPage() {
                     key={logro.id}
                     className={`${styles.logroCard} ${desbloqueado ? styles.logroDesbloqueado : styles.logroBloqueado}`}
                   >
-                    <div className={styles.logroIcono}>{logro.icono}</div>
+                    <div className={styles.logroIcono} aria-hidden="true">{logro.icono}</div>
                     <div className={styles.logroTitulo}>{logro.titulo}</div>
                     <div className={styles.logroDescripcion}>{logro.descripcion}</div>
                   </div>
@@ -703,7 +715,7 @@ export default function SeguimientoHabitosPage() {
                   <div key={habito.id} className={styles.detalleCard}>
                     <div className={styles.detalleHeader}>
                       <div className={styles.detalleColor} style={{ background: habito.color }} />
-                      <span className={styles.detalleNombre}>{habito.icono} {habito.nombre}</span>
+                      <span className={styles.detalleNombre}><span aria-hidden="true">{habito.icono}</span> {habito.nombre}</span>
                     </div>
                     <div className={styles.detalleStats}>
                       <div className={styles.detalleStat}>
@@ -737,7 +749,7 @@ export default function SeguimientoHabitosPage() {
           <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <h3>{habitoEditando ? 'Editar Hábito' : 'Nuevo Hábito'}</h3>
-              <button className={styles.modalClose} onClick={() => setModalAbierto(false)}>✕</button>
+              <button type="button" className={styles.modalClose} onClick={() => setModalAbierto(false)}>✕</button>
             </div>
 
             <div className={styles.formGroup}>
@@ -761,6 +773,7 @@ export default function SeguimientoHabitosPage() {
                     type="button"
                     className={`${styles.iconoBtn} ${formIcono === icono ? styles.iconoSeleccionado : ''}`}
                     onClick={() => setFormIcono(icono)}
+                    aria-pressed={formIcono === icono}
                   >
                     {icono}
                   </button>
@@ -778,6 +791,7 @@ export default function SeguimientoHabitosPage() {
                     className={`${styles.colorBtn} ${formColor === color ? styles.colorSeleccionado : ''}`}
                     style={{ background: color }}
                     onClick={() => setFormColor(color)}
+                    aria-pressed={formColor === color}
                   />
                 ))}
               </div>
@@ -792,8 +806,9 @@ export default function SeguimientoHabitosPage() {
                     type="button"
                     className={`${styles.categoriaBtn} ${formCategoria === cat.id ? styles.categoriaSeleccionada : ''}`}
                     onClick={() => setFormCategoria(cat.id)}
+                    aria-pressed={formCategoria === cat.id}
                   >
-                    {cat.icono} {cat.nombre}
+                    <span aria-hidden="true">{cat.icono}</span> {cat.nombre}
                   </button>
                 ))}
               </div>
@@ -806,16 +821,18 @@ export default function SeguimientoHabitosPage() {
                   type="button"
                   className={`${styles.tipoBtn} ${formTipo === 'construir' ? styles.tipoSeleccionado : ''}`}
                   onClick={() => setFormTipo('construir')}
+                  aria-pressed={formTipo === 'construir'}
                 >
-                  ✅ Construir
+                  <span aria-hidden="true">✅</span> Construir
                   <span className={styles.tipoDesc}>Quiero hacer más</span>
                 </button>
                 <button
                   type="button"
                   className={`${styles.tipoBtn} ${formTipo === 'evitar' ? styles.tipoSeleccionado : ''}`}
                   onClick={() => setFormTipo('evitar')}
+                  aria-pressed={formTipo === 'evitar'}
                 >
-                  🚫 Evitar
+                  <span aria-hidden="true">🚫</span> Evitar
                   <span className={styles.tipoDesc}>Quiero dejar de hacer</span>
                 </button>
               </div>
@@ -828,6 +845,7 @@ export default function SeguimientoHabitosPage() {
                   type="button"
                   className={`${styles.frecuenciaBtn} ${formFrecuencia === 'diario' ? styles.frecuenciaSeleccionada : ''}`}
                   onClick={() => setFormFrecuencia('diario')}
+                  aria-pressed={formFrecuencia === 'diario'}
                 >
                   Todos los días
                 </button>
@@ -835,6 +853,7 @@ export default function SeguimientoHabitosPage() {
                   type="button"
                   className={`${styles.frecuenciaBtn} ${formFrecuencia === 'personalizado' ? styles.frecuenciaSeleccionada : ''}`}
                   onClick={() => setFormFrecuencia('personalizado')}
+                  aria-pressed={formFrecuencia === 'personalizado'}
                 >
                   Días específicos
                 </button>
@@ -848,6 +867,7 @@ export default function SeguimientoHabitosPage() {
                       type="button"
                       className={`${styles.diaSemanaBtn} ${formDiasSemana.includes(i) ? styles.diaSemanaSeleccionado : ''}`}
                       onClick={() => toggleDiaSemana(i)}
+                      aria-pressed={formDiasSemana.includes(i)}
                     >
                       {dia}
                     </button>
@@ -869,10 +889,10 @@ export default function SeguimientoHabitosPage() {
             </div>
 
             <div className={styles.modalAcciones}>
-              <button className={styles.btnPrimary} onClick={guardarHabito}>
+              <button type="button" className={styles.btnPrimary} onClick={guardarHabito}>
                 {habitoEditando ? 'Guardar cambios' : 'Crear hábito'}
               </button>
-              <button className={styles.btnSecondary} onClick={() => setModalAbierto(false)}>
+              <button type="button" className={styles.btnSecondary} onClick={() => setModalAbierto(false)}>
                 Cancelar
               </button>
             </div>
@@ -884,12 +904,12 @@ export default function SeguimientoHabitosPage() {
       {celebracion && (
         <div className={styles.modalOverlay} onClick={() => setCelebracion(null)}>
           <div className={styles.modalCelebracion} onClick={e => e.stopPropagation()}>
-            <div className={styles.celebracionIcono}>{celebracion.logro.icono}</div>
+            <div className={styles.celebracionIcono} aria-hidden="true">{celebracion.logro.icono}</div>
             <h2 className={styles.celebracionTitulo}>¡{celebracion.logro.titulo}!</h2>
             <p className={styles.celebracionMensaje}>
               Has alcanzado {celebracion.logro.dias} días consecutivos en &quot;{celebracion.habito.nombre}&quot;. ¡Sigue así!
             </p>
-            <button className={styles.btnPrimary} onClick={() => setCelebracion(null)}>
+            <button type="button" className={styles.btnPrimary} onClick={() => setCelebracion(null)}>
               ¡Gracias!
             </button>
           </div>

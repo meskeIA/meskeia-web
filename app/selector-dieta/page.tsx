@@ -421,7 +421,7 @@ export default function SelectorDieta() {
                   type="button"
                   className={`${styles.opcionBtn} ${respuestas[preguntaActual.id] === op.valor ? styles.opcionSeleccionada : ''}`}
                   onClick={() => handleSeleccionarOpcion(op.valor)}
-                  aria-pressed={respuestas[preguntaActual.id] === op.valor ? true : false}
+                  aria-pressed={respuestas[preguntaActual.id] === op.valor}
                 >
                   <span className={styles.opcionEtiqueta}>{op.etiqueta}</span>
                   <span className={styles.opcionDesc}>{op.descripcion}</span>
@@ -476,7 +476,7 @@ export default function SelectorDieta() {
 
           {/* Alimentos clave */}
           <section className={styles.alimentosSection} aria-label="Alimentos clave de esta dieta">
-            <p className={styles.alimentosTitulo}>✅ Alimentos clave</p>
+            <p className={styles.alimentosTitulo}><span aria-hidden="true">✅</span> Alimentos clave</p>
             {dietaInfo.alimentosClave.map((alimento) => (
               <p key={alimento} className={styles.alimentoItem}>{alimento}</p>
             ))}
@@ -492,7 +492,7 @@ export default function SelectorDieta() {
 
           {/* Consejos prácticos */}
           <section className={styles.consejosSection} aria-label="Consejos prácticos de transición">
-            <p className={styles.consejosTitulo}>💡 Consejos para empezar</p>
+            <p className={styles.consejosTitulo}><span aria-hidden="true">💡</span> Consejos para empezar</p>
             {dietaInfo.consejos.map((consejo) => (
               <p key={consejo} className={styles.consejoItem}>{consejo}</p>
             ))}

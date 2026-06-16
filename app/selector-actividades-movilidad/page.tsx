@@ -284,6 +284,7 @@ export default function SelectorActividadesMovilidadPage() {
               <div className={styles.filtrosGrid}>
                 <button
                   type="button"
+                  aria-pressed={filtroCategoria === 'todas'}
                   className={`${styles.filtroBtn} ${filtroCategoria === 'todas' ? styles.filtroActivo : ''}`}
                   onClick={() => setFiltroCategoria('todas')}
                 >
@@ -296,6 +297,7 @@ export default function SelectorActividadesMovilidadPage() {
                     <button
                       key={cat}
                       type="button"
+                      aria-pressed={filtroCategoria === cat}
                       className={`${styles.filtroBtn} ${filtroCategoria === cat ? styles.filtroActivo : ''}`}
                       onClick={() => setFiltroCategoria(cat)}
                     >

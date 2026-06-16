@@ -238,7 +238,7 @@ export default function SeguimientoCicloMenstrualPage() {
       </section>
 
       <div className={styles.btnWrapper}>
-        <button onClick={calcular} className={styles.btnCalcular} aria-label="Calcular ciclo y ventana fértil">
+        <button type="button" onClick={calcular} className={styles.btnCalcular} aria-label="Calcular ciclo y ventana fértil">
           Calcular ciclo y fertilidad
         </button>
       </div>
@@ -375,7 +375,7 @@ export default function SeguimientoCicloMenstrualPage() {
         <div className={styles.casosGrid}>
           <div className={styles.casoCard}>
             <div className={styles.casoHeader}>
-              <span className={styles.casoEmoji}>👶</span>
+              <span className={styles.casoEmoji} aria-hidden="true">👶</span>
               <h3>Buscar embarazo</h3>
               <span className={styles.casoTag}>Fertilidad</span>
             </div>
@@ -384,7 +384,7 @@ export default function SeguimientoCicloMenstrualPage() {
           </div>
           <div className={styles.casoCard}>
             <div className={styles.casoHeader}>
-              <span className={styles.casoEmoji}>🏋️</span>
+              <span className={styles.casoEmoji} aria-hidden="true">🏋️</span>
               <h3>Optimizar entrenamiento</h3>
               <span className={styles.casoTag}>Deporte</span>
             </div>
@@ -393,7 +393,7 @@ export default function SeguimientoCicloMenstrualPage() {
           </div>
           <div className={styles.casoCard}>
             <div className={styles.casoHeader}>
-              <span className={styles.casoEmoji}>📅</span>
+              <span className={styles.casoEmoji} aria-hidden="true">📅</span>
               <h3>Planificar eventos importantes</h3>
               <span className={styles.casoTag}>Productividad</span>
             </div>
@@ -402,7 +402,7 @@ export default function SeguimientoCicloMenstrualPage() {
           </div>
           <div className={styles.casoCard}>
             <div className={styles.casoHeader}>
-              <span className={styles.casoEmoji}>⚠️</span>
+              <span className={styles.casoEmoji} aria-hidden="true">⚠️</span>
               <h3>Detectar irregularidades</h3>
               <span className={styles.casoTag}>Salud</span>
             </div>
@@ -493,32 +493,32 @@ export default function SeguimientoCicloMenstrualPage() {
         <h2>Consejos para cada fase del ciclo</h2>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>🔴</div>
+            <div className={styles.tipIcon} aria-hidden="true">🔴</div>
             <h4>Fase menstrual</h4>
             <p>Descansa más, aplica calor en el abdomen, evita el exceso de sal y cafeína, hidrátate bien.</p>
           </div>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>🌱</div>
+            <div className={styles.tipIcon} aria-hidden="true">🌱</div>
             <h4>Fase folicular</h4>
             <p>Aprovecha la energía creciente para proyectos nuevos y entrenamientos de mayor intensidad.</p>
           </div>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>✨</div>
+            <div className={styles.tipIcon} aria-hidden="true">✨</div>
             <h4>Ovulación</h4>
             <p>Tu pico de vitalidad y comunicación: ideal para presentaciones, reuniones importantes y socializar.</p>
           </div>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>🌙</div>
+            <div className={styles.tipIcon} aria-hidden="true">🌙</div>
             <h4>Fase lútea</h4>
             <p>Prioriza el descanso, reduce azúcar y alcohol, practica yoga o meditación para gestionar el SPM.</p>
           </div>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>📱</div>
+            <div className={styles.tipIcon} aria-hidden="true">📱</div>
             <h4>Registro consistente</h4>
             <p>Usa siempre el mismo criterio para el día 1 y registra en las primeras 24 horas para mayor precisión.</p>
           </div>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>🩺</div>
+            <div className={styles.tipIcon} aria-hidden="true">🩺</div>
             <h4>Revisión anual</h4>
             <p>Comparte tu historial con tu ginecóloga en la revisión anual. Los datos longitudinales son muy valiosos.</p>
           </div>
@@ -527,7 +527,7 @@ export default function SeguimientoCicloMenstrualPage() {
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <h3>Señales que requieren consulta médica urgente</h3>
           </div>
           <ul className={styles.warningList}>

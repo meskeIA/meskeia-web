@@ -1060,10 +1060,10 @@
 | [x] | Predictor de Tiempos de Running | `/calculadora-tiempos-running/` | salud, tecnicas |
 | [x] | Qué Pasa Cuando Duermes | `/visualizador-ciclos-sueno/` | salud, cultura |
 | [x] | Residencia vs Cuidado en Casa | `/residencia-vs-cuidado-en-casa/` | salud, legal-fiscal, finanzas |
-| [ ] | Seguimiento Ciclo Menstrual y Fertilidad | `/seguimiento-ciclo-menstrual/` | salud |
-| [ ] | Seguimiento de Hábitos | `/seguimiento-habitos/` | salud, productividad |
-| [ ] | Selector de Actividades según Movilidad | `/selector-actividades-movilidad/` | salud, legal-fiscal |
-| [ ] | Selector de Dieta | `/selector-dieta/` | salud |
+| [x] | Seguimiento Ciclo Menstrual y Fertilidad | `/seguimiento-ciclo-menstrual/` | salud |
+| [x] | Seguimiento de Hábitos | `/seguimiento-habitos/` | salud, productividad |
+| [x] | Selector de Actividades según Movilidad | `/selector-actividades-movilidad/` | salud, legal-fiscal |
+| [x] | Selector de Dieta | `/selector-dieta/` | salud |
 | [ ] | Selector de Ejercicio | `/selector-ejercicio/` | salud, productividad |
 | [ ] | Selector de Gestión del Estrés | `/selector-gestion-estres/` | salud, productividad |
 | [ ] | Selector de Mascota | `/selector-mascota/` | salud, productividad |
