@@ -238,16 +238,16 @@ export default function TestSindromeImpostorPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🎭 Test de Síndrome del Impostor</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🎭</span> Test de Síndrome del Impostor</h1>
           <p className={styles.subtitle}>
             ¿Subestimas tu competencia real?
             <br />
             Basado en la Escala de Clance adaptada
           </p>
           <div className={styles.badges}>
-            <span className={styles.badge}>🕐 3 minutos</span>
-            <span className={styles.badge}>📊 10 preguntas</span>
-            <span className={styles.badge}>🔒 Sin registro</span>
+            <span className={styles.badge}><span aria-hidden="true">🕐</span> 3 minutos</span>
+            <span className={styles.badge}><span aria-hidden="true">📊</span> 10 preguntas</span>
+            <span className={styles.badge}><span aria-hidden="true">🔒</span> Sin registro</span>
           </div>
         </header>
 
@@ -287,6 +287,7 @@ export default function TestSindromeImpostorPage() {
                 {ESCALA.map((opcion) => (
                   <button
                     key={opcion.valor}
+                    type="button"
                     className={`${styles.scaleButton} ${respuestas[pregunta.id] === opcion.valor ? styles.scaleButtonActive : ''}`}
                     onClick={() => handleRespuesta(pregunta.id, opcion.valor)}
                     role="radio"
@@ -306,6 +307,7 @@ export default function TestSindromeImpostorPage() {
           </div>
 
           <button
+            type="button"
             className={styles.btnPrimary}
             onClick={calcularResultado}
             disabled={!todasRespondidas}
@@ -321,23 +323,23 @@ export default function TestSindromeImpostorPage() {
 
             <div className={styles.mapContainer}>
               <div className={styles.mapLabels}>
-                <span className={styles.mapLabelTop}>💚 Alto Reconocimiento</span>
+                <span className={styles.mapLabelTop}><span aria-hidden="true">💚</span> Alto Reconocimiento</span>
                 <span className={styles.mapLabelBottom}>Bajo Reconocimiento</span>
                 <span className={styles.mapLabelLeft}>Baja Autoexigencia</span>
-                <span className={styles.mapLabelRight}>🎭 Alta Autoexigencia</span>
+                <span className={styles.mapLabelRight}><span aria-hidden="true">🎭</span> Alta Autoexigencia</span>
               </div>
               <div className={styles.map}>
                 <div className={`${styles.quadrant} ${styles.quadrantTL}`}>
-                  <span>💚 Confianza Estable</span>
+                  <span><span aria-hidden="true">💚</span> Confianza Estable</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantTR}`}>
-                  <span>🎯 Perfeccionista Consciente</span>
+                  <span><span aria-hidden="true">🎯</span> Perfeccionista Consciente</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBL}`}>
-                  <span>😶 Desconexión</span>
+                  <span><span aria-hidden="true">😶</span> Desconexión</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
-                  <span>🎭 Impostor Activo</span>
+                  <span><span aria-hidden="true">🎭</span> Impostor Activo</span>
                 </div>
                 <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
                 <div className={styles.thresholdLineV} style={{ left: '65%' }} aria-hidden="true" />
@@ -356,7 +358,7 @@ export default function TestSindromeImpostorPage() {
             <div className={styles.scoresContainer}>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>🎭 Autoexigencia</span>
+                  <span><span aria-hidden="true">🎭</span> Autoexigencia</span>
                   <span className={styles.scoreValue}>{puntuacionAutoexigencia}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -368,7 +370,7 @@ export default function TestSindromeImpostorPage() {
               </div>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>💚 Reconocimiento</span>
+                  <span><span aria-hidden="true">💚</span> Reconocimiento</span>
                   <span className={styles.scoreValue}>{puntuacionReconocimiento}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -382,14 +384,14 @@ export default function TestSindromeImpostorPage() {
 
             <div className={styles.profileCard}>
               <div className={styles.profileHeader}>
-                <span className={styles.profileEmoji}>{perfil.emoji}</span>
+                <span className={styles.profileEmoji} aria-hidden="true">{perfil.emoji}</span>
                 <h3 className={styles.profileName}>{perfil.nombre}</h3>
               </div>
               <p className={styles.profileDescription}>{perfil.descripcion}</p>
 
               <div className={styles.profileColumns}>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>✅ Fortalezas</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">✅</span> Fortalezas</h4>
                   <ul className={styles.profileList}>
                     {perfil.fortalezas.map((f, i) => (
                       <li key={i}>{f}</li>
@@ -397,7 +399,7 @@ export default function TestSindromeImpostorPage() {
                   </ul>
                 </div>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>⚠️ Riesgos</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">⚠️</span> Riesgos</h4>
                   <ul className={styles.profileList}>
                     {perfil.riesgos.map((r, i) => (
                       <li key={i}>{r}</li>
@@ -407,7 +409,7 @@ export default function TestSindromeImpostorPage() {
               </div>
 
               <div className={styles.actionsSection}>
-                <h4 className={styles.actionsTitle}>🎯 Acciones sugeridas</h4>
+                <h4 className={styles.actionsTitle}><span aria-hidden="true">🎯</span> Acciones sugeridas</h4>
                 <ol className={styles.actionsList}>
                   {perfil.acciones.map((a, i) => (
                     <li key={i}>{a}</li>
@@ -425,14 +427,14 @@ export default function TestSindromeImpostorPage() {
               </p>
             </div>
 
-            <button className={styles.btnSecondary} onClick={reiniciar}>
+            <button type="button" className={styles.btnSecondary} onClick={reiniciar}>
               Repetir diagnóstico
             </button>
           </section>
         )}
 
         <EducationalSection
-          title="📚 El síndrome del impostor: qué es y qué no es"
+          title="El síndrome del impostor: qué es y qué no es"
           subtitle="La ciencia detrás de sentirse un fraude"
         >
           <section className={styles.guideSection}>

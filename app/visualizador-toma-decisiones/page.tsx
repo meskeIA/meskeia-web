@@ -99,7 +99,7 @@ export default function TomaDecisionesPage() {
 
         {/* Hero */}
         <header className={styles.hero}>
-          <h1 className={styles.title}>🧠 Toma de Decisiones</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🧠</span> Toma de Decisiones</h1>
           <p className={styles.subtitle}>
             Cómo decide realmente el cerebro humano: dos sistemas, fatiga decisional,
             heurísticos y la ciencia del nudge
@@ -113,6 +113,7 @@ export default function TomaDecisionesPage() {
           {tabs.map(tab => (
             <button
               key={tab.id}
+              type="button"
               className={`${styles.tab} ${tabActiva === tab.id ? styles.tabActive : ''}`}
               onClick={() => setTabActiva(tab.id)}
               aria-pressed={tabActiva === tab.id}
@@ -201,7 +202,7 @@ export default function TomaDecisionesPage() {
 
             {/* La trampa clave */}
             <div className={styles.trampaBox}>
-              <h2 className={styles.trampaTitle}>⚠️ La trampa más importante</h2>
+              <h2 className={styles.trampaTitle}><span aria-hidden="true">⚠️</span> La trampa más importante</h2>
               <p>
                 El Sistema 2 cree que supervisa y controla al Sistema 1. En realidad, muchas veces
                 solo <strong>racionaliza después</strong> la decisión que ya tomó el Sistema 1. Creemos
@@ -214,7 +215,7 @@ export default function TomaDecisionesPage() {
             <h2 className={styles.seccionTitulo}>Trampas clásicas del Sistema 1 en decisiones importantes</h2>
             <div className={styles.trampaGrid}>
               <div className={styles.trampaCard}>
-                <span className={styles.trampaIcono}>🔍</span>
+                <span className={styles.trampaIcono} aria-hidden="true">🔍</span>
                 <h3>Disponibilidad</h3>
                 <p>
                   Tomamos peores decisiones en base a lo que nos viene fácil a la mente.
@@ -223,7 +224,7 @@ export default function TomaDecisionesPage() {
                 </p>
               </div>
               <div className={styles.trampaCard}>
-                <span className={styles.trampaIcono}>🎭</span>
+                <span className={styles.trampaIcono} aria-hidden="true">🎭</span>
                 <h3>Representatividad</h3>
                 <p>
                   Juzgamos probabilidades por parecido superficial con un prototipo mental, ignorando
@@ -232,7 +233,7 @@ export default function TomaDecisionesPage() {
                 </p>
               </div>
               <div className={styles.trampaCard}>
-                <span className={styles.trampaIcono}>🖼️</span>
+                <span className={styles.trampaIcono} aria-hidden="true">🖼️</span>
                 <h3>Encuadre (Framing)</h3>
                 <p>
                   «90% de supervivencia» se siente radicalmente diferente a «10% de mortalidad»,
@@ -256,7 +257,7 @@ export default function TomaDecisionesPage() {
             <h2 className={styles.seccionTitulo}>El experimento que lo demostró</h2>
             <div className={styles.juecesCard}>
               <div className={styles.juecesHeader}>
-                <span className={styles.juecesIcono}>⚖️</span>
+                <span className={styles.juecesIcono} aria-hidden="true">⚖️</span>
                 <div>
                   <h3>Los jueces israelíes (2011)</h3>
                   <p className={styles.juecesRef}>Danziger, Levav & Avnaim-Pesso — Proceedings of the National Academy of Sciences</p>
@@ -318,7 +319,7 @@ export default function TomaDecisionesPage() {
             <h2 className={styles.seccionTitulo}>La fatiga en tu vida cotidiana</h2>
             <div className={styles.paradojaGrid}>
               <div className={styles.paradojaCard}>
-                <span className={styles.paradojaIcono}>🛒</span>
+                <span className={styles.paradojaIcono} aria-hidden="true">🛒</span>
                 <h3>Compras impulsivas</h3>
                 <p>
                   Los supermercados colocan los productos de impulso (golosinas, revistas) junto a la caja.
@@ -327,7 +328,7 @@ export default function TomaDecisionesPage() {
                 </p>
               </div>
               <div className={styles.paradojaCard}>
-                <span className={styles.paradojaIcono}>📃</span>
+                <span className={styles.paradojaIcono} aria-hidden="true">📃</span>
                 <h3>Firmar sin leer</h3>
                 <p>
                   Al final de un proceso largo (comprar un coche, contratar un seguro) firmas cláusulas
@@ -336,7 +337,7 @@ export default function TomaDecisionesPage() {
                 </p>
               </div>
               <div className={styles.paradojaCard}>
-                <span className={styles.paradojaIcono}>📉</span>
+                <span className={styles.paradojaIcono} aria-hidden="true">📉</span>
                 <h3>Inversiones al final del día</h3>
                 <p>
                   Los traders profesionales toman peores decisiones de inversión en la última hora
@@ -345,7 +346,7 @@ export default function TomaDecisionesPage() {
                 </p>
               </div>
               <div className={styles.paradojaCard}>
-                <span className={styles.paradojaIcono}>🤯</span>
+                <span className={styles.paradojaIcono} aria-hidden="true">🤯</span>
                 <h3>La paradoja de la elección</h3>
                 <p>
                   Barry Schwartz (2004): más opciones generan más esfuerzo y más arrepentimiento.
@@ -417,12 +418,14 @@ export default function TomaDecisionesPage() {
                     {!respondido ? (
                       <div className={styles.ejercicioOpciones}>
                         <button
+                          type="button"
                           className={styles.preguntaBtn}
                           onClick={() => elegirRespuesta(ej.id, 'intuitiva')}
                         >
                           {ej.opcionIntuitiva}
                         </button>
                         <button
+                          type="button"
                           className={styles.preguntaBtn}
                           onClick={() => elegirRespuesta(ej.id, 'racional')}
                         >
@@ -438,6 +441,7 @@ export default function TomaDecisionesPage() {
                         </p>
                         <p className={styles.respuestaExplicacion}>{ej.explicacion}</p>
                         <button
+                          type="button"
                           className={styles.reiniciarBtn}
                           onClick={() => {
                             const copia = { ...respuestasElegidas };
@@ -519,7 +523,7 @@ export default function TomaDecisionesPage() {
                 </p>
                 <div className={styles.nudgeEjemplos}>
                   <div className={styles.nudgeEjemplo}>
-                    <span className={styles.nudgeEjemploIcono}>🫀</span>
+                    <span className={styles.nudgeEjemploIcono} aria-hidden="true">🫀</span>
                     <div>
                       <strong>Donación de órganos</strong>
                       <p>
@@ -530,7 +534,7 @@ export default function TomaDecisionesPage() {
                     </div>
                   </div>
                   <div className={styles.nudgeEjemplo}>
-                    <span className={styles.nudgeEjemploIcono}>💰</span>
+                    <span className={styles.nudgeEjemploIcono} aria-hidden="true">💰</span>
                     <div>
                       <strong>Planes de pensiones</strong>
                       <p>
@@ -554,7 +558,7 @@ export default function TomaDecisionesPage() {
                 </p>
                 <div className={styles.nudgeEjemplos}>
                   <div className={styles.nudgeEjemplo}>
-                    <span className={styles.nudgeEjemploIcono}>🍎</span>
+                    <span className={styles.nudgeEjemploIcono} aria-hidden="true">🍎</span>
                     <div>
                       <strong>Cafeterías escolares</strong>
                       <p>
@@ -564,7 +568,7 @@ export default function TomaDecisionesPage() {
                     </div>
                   </div>
                   <div className={styles.nudgeEjemplo}>
-                    <span className={styles.nudgeEjemploIcono}>📋</span>
+                    <span className={styles.nudgeEjemploIcono} aria-hidden="true">📋</span>
                     <div>
                       <strong>Listas de opciones</strong>
                       <p>
@@ -588,7 +592,7 @@ export default function TomaDecisionesPage() {
                 </p>
                 <div className={styles.nudgeEjemplos}>
                   <div className={styles.nudgeEjemplo}>
-                    <span className={styles.nudgeEjemploIcono}>📊</span>
+                    <span className={styles.nudgeEjemploIcono} aria-hidden="true">📊</span>
                     <div>
                       <strong>Declaraciones fiscales pre-rellenadas</strong>
                       <p>
@@ -599,7 +603,7 @@ export default function TomaDecisionesPage() {
                     </div>
                   </div>
                   <div className={styles.nudgeEjemplo}>
-                    <span className={styles.nudgeEjemploIcono}>📱</span>
+                    <span className={styles.nudgeEjemploIcono} aria-hidden="true">📱</span>
                     <div>
                       <strong>Recordatorios de citas</strong>
                       <p>
@@ -622,7 +626,7 @@ export default function TomaDecisionesPage() {
                 </p>
                 <div className={styles.nudgeEjemplos}>
                   <div className={styles.nudgeEjemplo}>
-                    <span className={styles.nudgeEjemploIcono}>💳</span>
+                    <span className={styles.nudgeEjemploIcono} aria-hidden="true">💳</span>
                     <div>
                       <strong>Pago de impuestos</strong>
                       <p>
@@ -632,7 +636,7 @@ export default function TomaDecisionesPage() {
                     </div>
                   </div>
                   <div className={styles.nudgeEjemplo}>
-                    <span className={styles.nudgeEjemploIcono}>💡</span>
+                    <span className={styles.nudgeEjemploIcono} aria-hidden="true">💡</span>
                     <div>
                       <strong>Consumo energético</strong>
                       <p>
@@ -676,7 +680,7 @@ export default function TomaDecisionesPage() {
 
         {/* Contenido educativo colapsable */}
         <EducationalSection
-          title="📚 Profundiza: ética, ilusiones y ciencia"
+          title="Profundiza: ética, ilusiones y ciencia"
           subtitle="Debates y matices sobre la psicología de la decisión"
         >
           <section>

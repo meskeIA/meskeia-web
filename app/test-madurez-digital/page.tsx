@@ -235,6 +235,7 @@ export default function TestMadurezDigitalPage() {
                     <button
                       key={opcion.puntos}
                       type="button"
+                      aria-pressed={respuestas[pregunta.id] === opcion.puntos}
                       className={`${styles.opcionItem} ${respuestas[pregunta.id] === opcion.puntos ? styles.opcionActiva : ''}`}
                       onClick={() => responder(pregunta.id, opcion.puntos)}
                     >

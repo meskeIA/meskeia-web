@@ -952,10 +952,10 @@
 | [x] | Selector de Modalidad de Trabajo | `/selector-modalidad-trabajo/` | productividad, freelance |
 | [x] | Selector de Vacaciones | `/selector-vacaciones/` | productividad, salud |
 | [x] | Test de Delegación Efectiva | `/test-delegacion-efectiva/` | productividad, freelance |
-| [ ] | Test de Ritmo Vital | `/test-ritmo-vital/` | productividad, salud |
-| [ ] | Test de Síndrome del Impostor | `/test-sindrome-impostor/` | productividad, salud |
-| [ ] | Test Madurez Digital | `/test-madurez-digital/` | productividad, tecnicas, diseno |
-| [ ] | Toma de Decisiones: Sistemas 1 y 2 de Kahneman | `/visualizador-toma-decisiones/` | productividad, cultura |
+| [x] | Test de Ritmo Vital | `/test-ritmo-vital/` | productividad, salud |
+| [x] | Test de Síndrome del Impostor | `/test-sindrome-impostor/` | productividad, salud |
+| [x] | Test Madurez Digital | `/test-madurez-digital/` | productividad, tecnicas, diseno |
+| [x] | Toma de Decisiones: Sistemas 1 y 2 de Kahneman | `/visualizador-toma-decisiones/` | productividad, cultura |
 
 ## Salud y Bienestar (`salud`) — 122 apps
 
