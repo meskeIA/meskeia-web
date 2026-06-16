@@ -334,7 +334,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📐 Simulador de Transformaciones de Funciones</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📐</span> Simulador de Transformaciones de Funciones</h1>
         <p className={styles.subtitle}>
           Observa en tiempo real cómo los parámetros <strong>a</strong>, <strong>b</strong>, <strong>c</strong> y <strong>d</strong> transforman
           cualquier función base mediante <code>f(x) = a · g(b·(x − c)) + d</code>.
@@ -348,6 +348,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
         {FUNCIONES_BASE.map(f => (
           <button
             key={f.id}
+            type="button"
             className={`${styles.funcBtn} ${funcBase === f.id ? styles.funcBtnActive : ''}`}
             onClick={() => setFuncBase(f.id)}
             aria-pressed={funcBase === f.id}
@@ -486,7 +487,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
           <span className={styles.leyendaTransf}>— Función transformada f(x)</span>
         </div>
 
-        <button className={styles.btnReset} onClick={restablecer} aria-label="Restablecer todos los parámetros">
+        <button type="button" className={styles.btnReset} onClick={restablecer} aria-label="Restablecer todos los parámetros">
           Restablecer todo
         </button>
       </div>
@@ -580,7 +581,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
           <h3>4 escenarios reales donde aparecen estas transformaciones</h3>
           <div className={styles.scenariosGrid}>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🎵</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🎵</span>
               <strong>Señales de audio</strong>
               <p>
                 En ingeniería de sonido, <strong>a</strong> controla el volumen (amplitud de onda),
@@ -589,7 +590,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
               </p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🌊</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🌊</span>
               <strong>Física de ondas</strong>
               <p>
                 Las ondas mecánicas y electromagnéticas se describen como
@@ -599,7 +600,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
               </p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>📈</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">📈</span>
               <strong>Modelado de poblaciones</strong>
               <p>
                 El crecimiento y las oscilaciones estacionales de poblaciones (depredador-presa)
@@ -608,7 +609,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
               </p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🔬</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🔬</span>
               <strong>Calibración de instrumentos</strong>
               <p>
                 Sensores y termómetros aplican transformaciones lineales (parámetros equivalentes
@@ -758,7 +759,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
           <h3>4 trucos para recordar el efecto de cada parámetro</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📏</span>
+              <span className={styles.tipIcon} aria-hidden="true">📏</span>
               <strong>a actúa sobre Y, b sobre X</strong>
               <p>
                 Fácil de recordar: a está "fuera" de g (afecta al resultado → Y),
@@ -767,7 +768,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <strong>b invierte el efecto esperado</strong>
               <p>
                 Doblar b comprime (no estira) horizontalmente. Reducir b a la mitad estira.
@@ -776,7 +777,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>➡️</span>
+              <span className={styles.tipIcon} aria-hidden="true">➡️</span>
               <strong>El signo de c indica la dirección exacta del desplazamiento</strong>
               <p>
                 El subtractor (x − c) hace que c&gt;0 desplace a la derecha.
@@ -785,7 +786,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⬆️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⬆️</span>
               <strong>d es la más intuitiva de todas</strong>
               <p>
                 d sube o baja la gráfica entera sin deformarla. Es la única transformación
@@ -799,7 +800,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
         {/* WARNING BOX */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>5 errores frecuentes al trabajar con transformaciones</strong>
           </div>
           <ul className={styles.warningList}>

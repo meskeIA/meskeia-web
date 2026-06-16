@@ -585,13 +585,13 @@
 | [x] | Simulador de Reemplazo de Páginas | `/simulador-reemplazo-paginas/` | estudiantes, tecnicas |
 | [x] | Simulador de Regresión Lineal y Logística | `/simulador-regresion/` | estudiantes, tecnicas |
 | [x] | Simulador de SQL JOIN Visual | `/simulador-sql-join/` | estudiantes, tecnicas |
-| [ ] | Simulador de Test de Hipótesis | `/simulador-test-hipotesis/` | estudiantes |
+| [x] | Simulador de Test de Hipótesis | `/simulador-test-hipotesis/` | estudiantes |
 | [x] | Simulador de Titulación Ácido-Base | `/simulador-titulacion/` | estudiantes |
-| [ ] | Simulador de Transformaciones de Funciones | `/simulador-funciones-transformaciones/` | estudiantes |
+| [x] | Simulador de Transformaciones de Funciones | `/simulador-funciones-transformaciones/` | estudiantes |
 | [x] | Simulador del Ciclo de Carnot | `/simulador-termodinamica-carnot/` | estudiantes |
 | [x] | Simulador del Círculo Trigonométrico | `/simulador-trigonometria-circulo-unitario/` | estudiantes |
-| [ ] | Simulador del Handshake TCP | `/simulador-tcp-handshake/` | estudiantes |
-| [ ] | Simulador del Multiplicador del Gasto | `/simulador-multiplicador-gasto/` | estudiantes |
+| [x] | Simulador del Handshake TCP | `/simulador-tcp-handshake/` | estudiantes |
+| [x] | Simulador del Multiplicador del Gasto | `/simulador-multiplicador-gasto/` | estudiantes |
 | [ ] | Simulador del Potencial de Acción Neuronal | `/simulador-potencial-accion/` | estudiantes |
 | [ ] | Simulador del Problema de Monty Hall | `/simulador-monty-hall/` | estudiantes |
 | [ ] | Simulador del Teorema Central del Límite | `/simulador-teorema-central-limite/` | estudiantes |

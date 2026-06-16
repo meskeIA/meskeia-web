@@ -422,7 +422,7 @@ export default function SimuladorTestHipotesisPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🎯 Simulador de Test de Hipótesis</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🎯</span> Simulador de Test de Hipótesis</h1>
         <p className={styles.subtitle}>
           Visualiza al mismo tiempo <strong>α, β, p-valor y potencia</strong> con dos distribuciones
           superpuestas (H₀ y H₁) y regiones de rechazo interactivas. Comprende los errores tipo I y II.
@@ -436,11 +436,12 @@ export default function SimuladorTestHipotesisPage() {
         {TIPOS_TEST.map(t => (
           <button
             key={t.id}
+            type="button"
             className={`${styles.testBtn} ${tipo === t.id ? styles.testBtnActive : ''}`}
             onClick={() => setTipo(t.id)}
             aria-pressed={tipo === t.id}
           >
-            <span className={styles.testIcon}>{t.icono}</span>
+            <span className={styles.testIcon} aria-hidden="true">{t.icono}</span>
             <span className={styles.testName}>{t.nombre}</span>
             <span className={styles.testHipotesis}>{t.hipotesis}</span>
           </button>
@@ -514,6 +515,7 @@ export default function SimuladorTestHipotesisPage() {
                 {N_VALORES.map(v => (
                   <button
                     key={v}
+                    type="button"
                     className={`${styles.stepBtn} ${n === v ? styles.stepBtnActive : ''}`}
                     onClick={() => setN(v)}
                     aria-pressed={n === v}
@@ -534,6 +536,7 @@ export default function SimuladorTestHipotesisPage() {
                 {ALPHAS.map(v => (
                   <button
                     key={v}
+                    type="button"
                     className={`${styles.stepBtn} ${alpha === v ? styles.stepBtnActive : ''}`}
                     onClick={() => setAlpha(v)}
                     aria-pressed={alpha === v}
@@ -676,7 +679,7 @@ export default function SimuladorTestHipotesisPage() {
           BLOQUE EDUCATIVO v2.0
           ============================================ */}
       <EducationalSection
-        title="📚 Aprende qué es un test de hipótesis"
+        title="Aprende qué es un test de hipótesis"
         subtitle="α, β, p-valor y potencia: lo que confunde a casi todo el mundo"
       >
         {/* INTRO */}
@@ -743,22 +746,22 @@ export default function SimuladorTestHipotesisPage() {
           <h3>4 escenarios donde se usa contraste de hipótesis</h3>
           <div className={styles.scenariosGrid}>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>💊</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">💊</span>
               <strong>Ensayos clínicos</strong>
               <p>H₀: el fármaco no es mejor que el placebo. H₁: sí lo es. Si el p-valor es muy bajo, se rechaza H₀ y se concluye que el fármaco tiene efecto. La FDA exige potencia ≥ 80 %.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🏭</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🏭</span>
               <strong>Control de calidad</strong>
               <p>H₀: el peso medio del lote es 500 g (especificación). Si rechazas H₀, paras la línea. α bajo (1 %) reduce falsas alarmas, pero exige n grande para no perder defectos reales.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🧪</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🧪</span>
               <strong>Investigación científica</strong>
               <p>H₀: no hay diferencia entre dos métodos. Rechazar H₀ con p &lt; 0,05 ha sido el estándar durante décadas. Hoy hay debate sobre si esa cifra es demasiado laxa.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>📈</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">📈</span>
               <strong>A/B testing en producto digital</strong>
               <p>H₀: la nueva versión del botón no aumenta clics. Si el test muestra p &lt; 0,05 con un efecto razonable, se despliega la nueva versión. La potencia depende del tráfico (n).</p>
             </div>
@@ -848,22 +851,22 @@ export default function SimuladorTestHipotesisPage() {
           <h3>4 buenas prácticas con tests de hipótesis</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📐</span>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
               <strong>Calcula la potencia ANTES del estudio</strong>
               <p>El cálculo de tamaño muestral asume una potencia objetivo (≥ 80 %). Si lanzas un test con n insuficiente, las conclusiones serán cuestionables, gane o pierda.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <strong>Reporta el tamaño de efecto, no solo el p-valor</strong>
               <p>Un p &lt; 0,001 con n = 1.000.000 puede ocultar un efecto irrelevante en la práctica. El tamaño de efecto (d de Cohen, diferencia bruta, IC) cuenta la historia real.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🚫</span>
+              <span className={styles.tipIcon} aria-hidden="true">🚫</span>
               <strong>NO hagas múltiples tests sin corregir α</strong>
               <p>Si haces 20 tests independientes a α = 5 %, esperarás 1 falso positivo de media. Aplica corrección Bonferroni (α/k) o métodos FDR para controlar la tasa de error global.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📝</span>
+              <span className={styles.tipIcon} aria-hidden="true">📝</span>
               <strong>Pre-registra hipótesis y diseño</strong>
               <p>El pre-registro de H₀, H₁, α y n antes de tomar datos es la mejor protección contra p-hacking, HARKing y otros sesgos. Especialmente en investigación científica formal.</p>
             </div>
@@ -873,7 +876,7 @@ export default function SimuladorTestHipotesisPage() {
         {/* WARNING BOX */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>5 errores frecuentes con tests de hipótesis</strong>
           </div>
           <ul className={styles.warningList}>

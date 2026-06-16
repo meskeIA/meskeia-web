@@ -556,8 +556,10 @@ export default function SimuladorTcpHandshakePage() {
               {(['lenta', 'normal', 'rapida'] as VelocidadAnim[]).map((v) => (
                 <button
                   key={v}
+                  type="button"
                   className={`${styles.velBtn} ${velocidad === v ? styles.velBtnActivo : ''}`}
                   onClick={() => setVelocidad(v)}
+                  aria-pressed={velocidad === v}
                 >
                   {v === 'lenta' ? 'Lenta' : v === 'normal' ? 'Normal' : 'Rápida'}
                 </button>
@@ -568,14 +570,18 @@ export default function SimuladorTcpHandshakePage() {
             <label className={styles.configLabel}>Modo</label>
             <div className={styles.velSelector}>
               <button
+                type="button"
                 className={`${styles.velBtn} ${modo === 'apertura' ? styles.velBtnActivo : ''}`}
                 onClick={() => { setModo('apertura'); reiniciar(); }}
+                aria-pressed={modo === 'apertura'}
               >
                 Solo apertura
               </button>
               <button
+                type="button"
                 className={`${styles.velBtn} ${modo === 'completo' ? styles.velBtnActivo : ''}`}
                 onClick={() => { setModo('completo'); reiniciar(); }}
+                aria-pressed={modo === 'completo'}
               >
                 Apertura + Cierre
               </button>
@@ -583,10 +589,10 @@ export default function SimuladorTcpHandshakePage() {
           </div>
         </div>
         <div className={styles.configAcciones}>
-          <button className={styles.btnSecundario} onClick={aplicarISN}>
+          <button type="button" className={styles.btnSecundario} onClick={aplicarISN}>
             Aplicar ISN
           </button>
-          <button className={styles.btnSecundario} onClick={generarISNAleatorio}>
+          <button type="button" className={styles.btnSecundario} onClick={generarISNAleatorio}>
             ISN Aleatorio
           </button>
         </div>
@@ -686,22 +692,25 @@ export default function SimuladorTcpHandshakePage() {
       {/* ============================================ */}
       <div className={styles.controles}>
         <button
+          type="button"
           className={styles.btnControl}
           onClick={retrocederPaso}
           disabled={pasoActivo < 0 || animando}
           aria-label="Paso anterior"
         >
-          ← Anterior
+          <span aria-hidden="true">←</span> Anterior
         </button>
         <button
+          type="button"
           className={styles.btnControlPrimario}
           onClick={avanzarPaso}
           disabled={animando || pasoActivo >= pasos.length - 1}
           aria-label="Siguiente paso"
         >
-          Siguiente →
+          Siguiente <span aria-hidden="true">→</span>
         </button>
         <button
+          type="button"
           className={`${styles.btnControl} ${autoplay ? styles.btnControlActivo : ''}`}
           onClick={() => {
             if (autoplay) {
@@ -713,15 +722,17 @@ export default function SimuladorTcpHandshakePage() {
           }}
           disabled={animando && !autoplay}
           aria-label={autoplay ? 'Pausar autoplay' : 'Iniciar autoplay'}
+          aria-pressed={autoplay}
         >
-          {autoplay ? '⏸ Pausar' : '▶ Autoplay'}
+          {autoplay ? <><span aria-hidden="true">⏸</span> Pausar</> : <><span aria-hidden="true">▶</span> Autoplay</>}
         </button>
         <button
+          type="button"
           className={styles.btnControl}
           onClick={reiniciar}
           aria-label="Reiniciar simulador"
         >
-          ↺ Reiniciar
+          <span aria-hidden="true">↺</span> Reiniciar
         </button>
       </div>
 
@@ -819,28 +830,28 @@ export default function SimuladorTcpHandshakePage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🤝</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🤝</span>
                 <strong>Handshake normal</strong>
               </div>
               <p>ISN cliente 1000, ISN servidor 5000 → 3 pasos perfectos + conexión establecida. La secuencia ideal para entender el protocolo básico.</p>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🔄</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔄</span>
                 <strong>Ciclo de vida completo</strong>
               </div>
               <p>Los 7 pasos (apertura 3-way + cierre 4-way FIN) del ciclo de vida completo de una conexión TCP. Activa el modo &quot;Apertura + Cierre&quot;.</p>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎲</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎲</span>
                 <strong>Números de secuencia aleatorios</strong>
               </div>
               <p>Los ISN son aleatorios para prevenir ataques de predicción de secuencia (IP spoofing). Pulsa &quot;ISN Aleatorio&quot; y observa cómo cambian los números.</p>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>⚠️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">⚠️</span>
                 <strong>SYN flood (DDoS)</strong>
               </div>
               <p>Un atacante envía miles de SYN sin completar el handshake: el servidor mantiene conexiones &quot;half-open&quot; hasta agotar recursos. La defensa usa SYN cookies.</p>
@@ -907,22 +918,22 @@ export default function SimuladorTcpHandshakePage() {
           <h3>Conceptos clave</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>🔢</span>
+              <span className={styles.tipIcono} aria-hidden="true">🔢</span>
               <strong>seq+1 en el ACK</strong>
               <p>El SYN &quot;consume&quot; un número de secuencia (como si fuera 1 byte de datos), por eso ack = seq + 1 y no seq.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>↔️</span>
+              <span className={styles.tipIcono} aria-hidden="true">↔️</span>
               <strong>Full-duplex</strong>
               <p>TCP permite flujo de datos en ambas direcciones simultáneamente tras el handshake: uploads y downloads ocurren en paralelo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>🔒</span>
+              <span className={styles.tipIcono} aria-hidden="true">🔒</span>
               <strong>TLS sobre TCP</strong>
               <p>HTTPS = TCP handshake (3 pasos) + TLS handshake + HTTP. QUIC (HTTP/3) combina ambos en 1 RTT para reducir latencia.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>⚡</span>
+              <span className={styles.tipIcono} aria-hidden="true">⚡</span>
               <strong>QUIC reemplaza TCP</strong>
               <p>HTTP/3 usa QUIC (sobre UDP) que combina el handshake TCP+TLS en 1 RTT. YouTube y Google ya usan QUIC para millones de conexiones.</p>
             </div>
@@ -932,7 +943,7 @@ export default function SimuladorTcpHandshakePage() {
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcono}>⚠️</span>
+            <span className={styles.warningIcono} aria-hidden="true">⚠️</span>
             <strong>5 errores frecuentes al estudiar TCP</strong>
           </div>
           <ul className={styles.warningLista}>

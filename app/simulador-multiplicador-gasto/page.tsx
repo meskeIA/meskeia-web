@@ -121,7 +121,7 @@ export default function SimuladorMultiplicadorGastoPage() {
 
         {/* Hero */}
         <header className={styles.hero}>
-          <h1 className={styles.title}>💰 Simulador del Multiplicador del Gasto</h1>
+          <h1 className={styles.title}><span aria-hidden="true">💰</span> Simulador del Multiplicador del Gasto</h1>
           <p className={styles.subtitle}>
             Descubre por qué 1 € de gasto público puede generar más de 1 € de PIB.
             Ajusta la propensión marginal a consumir, los impuestos y las importaciones
