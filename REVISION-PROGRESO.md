@@ -614,10 +614,10 @@
 | [x] | Terremotos y Tsunamis: De la Falla al Impacto | `/visualizador-terremotos-tsunamis/` | estudiantes, cultura |
 | [x] | Tipos de Desempleo: Friccional, Estructural y Cíclico | `/visualizador-desempleo-tipos/` | estudiantes, cultura |
 | [x] | Tipos de Rocas - El Ciclo que Nunca se Detiene | `/visualizador-tipos-rocas/` | estudiantes, cultura |
-| [ ] | Topología: Superficies, Nudos y Homeomorfismos | `/visualizador-topologia/` | estudiantes |
-| [ ] | Transferencia de Calor - Conducción, Convección y Radiación | `/visualizador-termodinamica/` | estudiantes, cultura |
-| [ ] | Transformada de Fourier: Señales y Frecuencias | `/visualizador-transformada-fourier/` | estudiantes, tecnicas |
-| [ ] | Transporte en las Plantas - Agua que Sube sin Motor | `/visualizador-transporte-plantas/` | estudiantes, cultura |
+| [x] | Topología: Superficies, Nudos y Homeomorfismos | `/visualizador-topologia/` | estudiantes |
+| [x] | Transferencia de Calor - Conducción, Convección y Radiación | `/visualizador-termodinamica/` | estudiantes, cultura |
+| [x] | Transformada de Fourier: Señales y Frecuencias | `/visualizador-transformada-fourier/` | estudiantes, tecnicas |
+| [x] | Transporte en las Plantas - Agua que Sube sin Motor | `/visualizador-transporte-plantas/` | estudiantes, cultura |
 | [x] | Trigonometría: Círculo Unitario y Funciones | `/visualizador-trigonometria/` | estudiantes, tecnicas |
 | [ ] | Tu ADN en Números | `/visualizador-adn-numeros/` | estudiantes, cultura |
 | [x] | Visualizador de Estructuras de Datos | `/visualizador-estructuras-datos/` | estudiantes, diseno |

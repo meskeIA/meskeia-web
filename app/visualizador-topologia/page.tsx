@@ -421,6 +421,7 @@ export default function VisualizadorTopologiaPage() {
             {GENUS_DATOS.map((g) => (
               <button
                 key={g.valor}
+                type="button"
                 role="tab"
                 aria-selected={genusActivo === g.valor}
                 className={`${styles.genusTab} ${genusActivo === g.valor ? styles.genusTabActivo : ''}`}
