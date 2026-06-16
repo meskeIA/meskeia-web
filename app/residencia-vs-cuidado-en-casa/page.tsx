@@ -247,7 +247,7 @@ export default function ResidenciaVsCuidadoCasa() {
                   {opcion.notaPublica && (
                     <>
                       <div className={styles.divider} />
-                      <p className={styles.notaPublica}>💡 {opcion.notaPublica}</p>
+                      <p className={styles.notaPublica}><span aria-hidden="true">💡</span> {opcion.notaPublica}</p>
                     </>
                   )}
                 </div>
@@ -328,39 +328,39 @@ export default function ResidenciaVsCuidadoCasa() {
       <div className={styles.escenariosGrid}>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>🏥</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">🏥</span>
             <strong>Dependencia Grado III con necesidad médica</strong>
           </div>
           <p>Persona con demencia avanzada, incontinencia y riesgo de caídas. Necesita atención 24h que la familia no puede proveer. La residencia especializada es la opción más segura.</p>
           <div className={styles.escenarioExample}>Indicador: Grado III + necesidad atención médica continua → residencia especializada</div>
-          <div className={styles.escenarioTip}>💡 La lista de espera en residencias públicas puede ser larga; solicitar plaza con antelación.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> La lista de espera en residencias públicas puede ser larga; solicitar plaza con antelación.</div>
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>🏠</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">🏠</span>
             <strong>Dependencia moderada con familia cercana</strong>
           </div>
           <p>Grado I-II, familia próxima, preferencia por el hogar. SAD + cuidador parcial puede ser suficiente con apoyos municipales y adaptación del hogar.</p>
           <div className={styles.escenarioExample}>Solución: SAD municipal 3h/día + cuidador interno 2 días + teleasistencia</div>
-          <div className={styles.escenarioTip}>💡 Combinar SAD, teleasistencia y prestación económica del SAAD puede cubrir necesidades a coste razonable.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> Combinar SAD, teleasistencia y prestación económica del SAAD puede cubrir necesidades a coste razonable.</div>
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>👩‍👦</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">👩‍👦</span>
             <strong>Cuidador único con trabajo a jornada completa</strong>
           </div>
           <p>Hijo único trabajador, no puede atender a progenitor con dependencia durante el día. Sin red de apoyo, el cuidado en casa no es sostenible.</p>
           <div className={styles.escenarioExample}>Alternativa: Centro de día + teleasistencia + cuidador nocturno eventual</div>
-          <div className={styles.escenarioTip}>💡 Los centros de día (no internamiento) son una solución intermedia menos costosa y más flexible.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> Los centros de día (no internamiento) son una solución intermedia menos costosa y más flexible.</div>
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>🏘️</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">🏘️</span>
             <strong>Persona mayor que rechaza la residencia</strong>
           </div>
           <p>Autonomía suficiente pero soledad y riesgos. Prefiere su casa. Teleasistencia + visitas SAD + comunidad de vecinos puede ser viable con seguimiento estrecho.</p>
           <div className={styles.escenarioExample}>Mínimo viable: teleasistencia + visita SAD diaria + red vecinal activa</div>
-          <div className={styles.escenarioTip}>💡 La teleasistencia avanzada (sensores de movimiento, detección de caídas) permite mayor autonomía con seguridad.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> La teleasistencia avanzada (sensores de movimiento, detección de caídas) permite mayor autonomía con seguridad.</div>
         </div>
       </div>
 
@@ -451,32 +451,32 @@ export default function ResidenciaVsCuidadoCasa() {
       {/* 5. Mejores Prácticas */}
       <div className={styles.tipsGrid}>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>⏰</div>
+          <div className={styles.tipIcon} aria-hidden="true">⏰</div>
           <strong>Solicita la valoración de dependencia pronto</strong>
           <p>Las listas de espera tanto para valoración como para plazas en residencias públicas son largas. No esperar a una crisis para iniciar los trámites.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>🤝</div>
+          <div className={styles.tipIcon} aria-hidden="true">🤝</div>
           <strong>Cuida al cuidador</strong>
           <p>El cuidador familiar tiene riesgo de síndrome de burnout. Incluir servicios de respiro, grupos de apoyo y tiempo libre en la planificación es fundamental.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>📱</div>
+          <div className={styles.tipIcon} aria-hidden="true">📱</div>
           <strong>Invierte en teleasistencia</strong>
           <p>Es uno de los servicios con mejor relación coste-beneficio. Da tranquilidad a la familia y seguridad a la persona mayor con un coste muy bajo.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>🔄</div>
+          <div className={styles.tipIcon} aria-hidden="true">🔄</div>
           <strong>Considera soluciones mixtas</strong>
           <p>El centro de día + casa es una opción intermedia valiosa. La persona duerme en casa pero recibe atención profesional durante el día.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>💼</div>
+          <div className={styles.tipIcon} aria-hidden="true">💼</div>
           <strong>Verifica la regularización del cuidador</strong>
           <p>Los cuidadores contratados en casa deben estar regularizados (Sistema Especial Empleados del Hogar). La economía sumergida conlleva riesgos legales y laborales.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>⚖️</div>
+          <div className={styles.tipIcon} aria-hidden="true">⚖️</div>
           <strong>Planifica el aspecto patrimonial</strong>
           <p>La decisión sobre residencia tiene implicaciones hereditarias. Consultar con un notario o abogado antes de tomar decisiones que afecten al patrimonio familiar.</p>
         </div>
@@ -485,7 +485,7 @@ export default function ResidenciaVsCuidadoCasa() {
       {/* 6. Warning Box */}
       <div className={styles.warningBox}>
         <div className={styles.warningHeader}>
-          <span className={styles.warningIcon}>⚠️</span>
+          <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
           <strong>Errores frecuentes en la decisión residencia vs casa</strong>
         </div>
         <ul className={styles.warningList}>

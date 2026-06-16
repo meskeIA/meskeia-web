@@ -387,7 +387,7 @@ export default function CalculadoraFechaPartoPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🤰 Planificador de Embarazo y Bebé</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🤰</span> Planificador de Embarazo y Bebé</h1>
         <p className={styles.subtitle}>
           Calcula tu fecha de parto, organiza tus tareas y prepara todo para la llegada del bebé
         </p>
@@ -398,28 +398,36 @@ export default function CalculadoraFechaPartoPage() {
       {/* Navegación de Tabs */}
       <div className={styles.tabs}>
         <button
+          type="button"
           className={`${styles.tab} ${tabActiva === 'calculadora' ? styles.tabActiva : ''}`}
           onClick={() => setTabActiva('calculadora')}
+          aria-pressed={tabActiva === 'calculadora'}
         >
-          📅 Calculadora
+          <span aria-hidden="true">📅</span> Calculadora
         </button>
         <button
+          type="button"
           className={`${styles.tab} ${tabActiva === 'checklist' ? styles.tabActiva : ''}`}
           onClick={() => setTabActiva('checklist')}
+          aria-pressed={tabActiva === 'checklist'}
         >
-          ✅ Checklist
+          <span aria-hidden="true">✅</span> Checklist
         </button>
         <button
+          type="button"
           className={`${styles.tab} ${tabActiva === 'compras' ? styles.tabActiva : ''}`}
           onClick={() => setTabActiva('compras')}
+          aria-pressed={tabActiva === 'compras'}
         >
-          🛒 Compras
+          <span aria-hidden="true">🛒</span> Compras
         </button>
         <button
+          type="button"
           className={`${styles.tab} ${tabActiva === 'vacunas' ? styles.tabActiva : ''}`}
           onClick={() => setTabActiva('vacunas')}
+          aria-pressed={tabActiva === 'vacunas'}
         >
-          💉 Vacunas
+          <span aria-hidden="true">💉</span> Vacunas
         </button>
       </div>
 
@@ -427,7 +435,7 @@ export default function CalculadoraFechaPartoPage() {
       {tabActiva === 'calculadora' && (
         <div className={styles.mainContent}>
           <div className={styles.inputPanel}>
-            <h2 className={styles.panelTitle}>📅 Datos del embarazo</h2>
+            <h2 className={styles.panelTitle}><span aria-hidden="true">📅</span> Datos del embarazo</h2>
 
             <div className={styles.inputGroup}>
               <label>Fecha de última regla (FUR)</label>
@@ -445,16 +453,16 @@ export default function CalculadoraFechaPartoPage() {
             </div>
 
             <div className={styles.botones}>
-              <button onClick={calcular} className={styles.btnPrimary}>
+              <button type="button" onClick={calcular} className={styles.btnPrimary}>
                 Calcular
               </button>
-              <button onClick={limpiar} className={styles.btnSecondary}>
+              <button type="button" onClick={limpiar} className={styles.btnSecondary}>
                 Limpiar
               </button>
             </div>
 
             <div className={styles.infoCalculo}>
-              <h4>ℹ️ ¿Cómo se calcula?</h4>
+              <h4><span aria-hidden="true">ℹ️</span> ¿Cómo se calcula?</h4>
               <p>
                 La fecha probable de parto se calcula sumando <strong>280 días</strong> (40 semanas)
                 a la fecha de tu última regla, según la regla de Naegele.
@@ -544,7 +552,7 @@ export default function CalculadoraFechaPartoPage() {
       {tabActiva === 'checklist' && (
         <div className={styles.checklistContainer}>
           <div className={styles.checklistHeader}>
-            <h2 className={styles.panelTitle}>✅ Checklist del Embarazo</h2>
+            <h2 className={styles.panelTitle}><span aria-hidden="true">✅</span> Checklist del Embarazo</h2>
             <div className={styles.progresoCompacto}>
               <span>{getProgresoChecklist().completados} de {getProgresoChecklist().total} completados</span>
               <div className={styles.progresoBarMini}>
@@ -556,18 +564,22 @@ export default function CalculadoraFechaPartoPage() {
 
           <div className={styles.filtros}>
             <button
+              type="button"
               className={`${styles.filtroBtn} ${filtroTrimestre === 'todos' ? styles.activo : ''}`}
               onClick={() => setFiltroTrimestre('todos')}
+              aria-pressed={filtroTrimestre === 'todos'}
             >
               Todos
             </button>
             {(['primero', 'segundo', 'tercero', 'postparto'] as TrimestreType[]).map(trimestre => (
               <button
+                type="button"
                 key={trimestre}
                 className={`${styles.filtroBtn} ${filtroTrimestre === trimestre ? styles.activo : ''}`}
                 onClick={() => setFiltroTrimestre(trimestre)}
+                aria-pressed={filtroTrimestre === trimestre}
               >
-                {emojisTrimestre[trimestre]} {nombresTrimestre[trimestre]}
+                <span aria-hidden="true">{emojisTrimestre[trimestre]}</span> {nombresTrimestre[trimestre]}
               </button>
             ))}
           </div>
@@ -590,8 +602,8 @@ export default function CalculadoraFechaPartoPage() {
             ))}
           </div>
 
-          <button onClick={resetChecklist} className={styles.btnSecondary}>
-            🔄 Reiniciar Checklist
+          <button type="button" onClick={resetChecklist} className={styles.btnSecondary}>
+            <span aria-hidden="true">🔄</span> Reiniciar Checklist
           </button>
         </div>
       )}
@@ -600,7 +612,7 @@ export default function CalculadoraFechaPartoPage() {
       {tabActiva === 'compras' && (
         <div className={styles.comprasContainer}>
           <div className={styles.comprasHeader}>
-            <h2 className={styles.panelTitle}>🛒 Lista de Compras del Bebé</h2>
+            <h2 className={styles.panelTitle}><span aria-hidden="true">🛒</span> Lista de Compras del Bebé</h2>
             <div className={styles.progresoCompacto}>
               <span>{getProgresoCompras().comprados} de {getProgresoCompras().total} comprados</span>
               <div className={styles.progresoBarMini}>
@@ -613,16 +625,20 @@ export default function CalculadoraFechaPartoPage() {
           <div className={styles.filtrosCompras}>
             <div className={styles.filtrosCategoria}>
               <button
+                type="button"
                 className={`${styles.filtroBtn} ${filtroCategoria === 'todos' ? styles.activo : ''}`}
                 onClick={() => setFiltroCategoria('todos')}
+                aria-pressed={filtroCategoria === 'todos'}
               >
                 Todas
               </button>
               {(Object.keys(nombresCategoriaCompra) as CategoriaCompra[]).map(cat => (
                 <button
+                  type="button"
                   key={cat}
                   className={`${styles.filtroBtn} ${filtroCategoria === cat ? styles.activo : ''}`}
                   onClick={() => setFiltroCategoria(cat)}
+                  aria-pressed={filtroCategoria === cat}
                 >
                   {nombresCategoriaCompra[cat]}
                 </button>
@@ -662,8 +678,8 @@ export default function CalculadoraFechaPartoPage() {
             ))}
           </div>
 
-          <button onClick={resetCompras} className={styles.btnSecondary}>
-            🔄 Reiniciar Lista
+          <button type="button" onClick={resetCompras} className={styles.btnSecondary}>
+            <span aria-hidden="true">🔄</span> Reiniciar Lista
           </button>
         </div>
       )}
@@ -671,7 +687,7 @@ export default function CalculadoraFechaPartoPage() {
       {/* Tab: Vacunas */}
       {tabActiva === 'vacunas' && (
         <div className={styles.vacunasContainer}>
-          <h2 className={styles.panelTitle}>💉 Calendario de Vacunación Infantil (España 2024)</h2>
+          <h2 className={styles.panelTitle}><span aria-hidden="true">💉</span> Calendario de Vacunación Infantil (España 2024)</h2>
 
           <div className={styles.vacunasInfo}>
             <p>Este es el calendario de vacunación oficial del Sistema Nacional de Salud.
@@ -702,7 +718,7 @@ export default function CalculadoraFechaPartoPage() {
 
           {/* Enlace a Calculadora de Percentiles */}
           <div className={styles.enlaceRelacionado}>
-            <p>📊 <strong>¿Tu bebé ya nació?</strong> Sigue su crecimiento con la{' '}
+            <p><span aria-hidden="true">📊</span> <strong>¿Tu bebé ya nació?</strong> Sigue su crecimiento con la{' '}
               <a href="/calculadora-percentiles/">Calculadora de Percentiles Infantiles</a>
               {' '}(peso y talla según tablas OMS)
             </p>
@@ -753,11 +769,11 @@ export default function CalculadoraFechaPartoPage() {
         subtitle="Descubre consejos, errores comunes a evitar y listas completas para prepararte"
       >
         <section className={styles.guideSection}>
-          <h2>🌟 Consejos para un Embarazo Saludable</h2>
+          <h2><span aria-hidden="true">🌟</span> Consejos para un Embarazo Saludable</h2>
 
           <div className={styles.consejosGrid}>
             <div className={styles.consejoCard}>
-              <h4>🥗 Alimentación</h4>
+              <h4><span aria-hidden="true">🥗</span> Alimentación</h4>
               <ul>
                 <li>Evita carnes crudas, embutidos no cocidos y pescados crudos</li>
                 <li>Lava bien frutas y verduras</li>
@@ -768,7 +784,7 @@ export default function CalculadoraFechaPartoPage() {
             </div>
 
             <div className={styles.consejoCard}>
-              <h4>🏃‍♀️ Actividad Física</h4>
+              <h4><span aria-hidden="true">🏃‍♀️</span> Actividad Física</h4>
               <ul>
                 <li>Caminar 30 minutos diarios es ideal</li>
                 <li>Natación y yoga prenatal son excelentes</li>
@@ -779,7 +795,7 @@ export default function CalculadoraFechaPartoPage() {
             </div>
 
             <div className={styles.consejoCard}>
-              <h4>😴 Descanso</h4>
+              <h4><span aria-hidden="true">😴</span> Descanso</h4>
               <ul>
                 <li>Duerme 8-9 horas si es posible</li>
                 <li>Usa almohada entre las piernas al dormir de lado</li>
@@ -792,7 +808,7 @@ export default function CalculadoraFechaPartoPage() {
         </section>
 
         <section className={styles.guideSection}>
-          <h2>❌ Errores Comunes a Evitar</h2>
+          <h2><span aria-hidden="true">❌</span> Errores Comunes a Evitar</h2>
 
           <div className={styles.erroresGrid}>
             <div className={styles.errorCard}>
@@ -831,11 +847,11 @@ export default function CalculadoraFechaPartoPage() {
         </section>
 
         <section className={styles.guideSection}>
-          <h2>🧳 Bolsa del Hospital - Lista Completa</h2>
+          <h2><span aria-hidden="true">🧳</span> Bolsa del Hospital - Lista Completa</h2>
 
           <div className={styles.bolsaGrid}>
             <div className={styles.bolsaCard}>
-              <h4>👩 Para la Mamá</h4>
+              <h4><span aria-hidden="true">👩</span> Para la Mamá</h4>
               <ul>
                 <li>DNI y tarjeta sanitaria</li>
                 <li>Cartilla del embarazo</li>
@@ -854,7 +870,7 @@ export default function CalculadoraFechaPartoPage() {
             </div>
 
             <div className={styles.bolsaCard}>
-              <h4>👶 Para el Bebé</h4>
+              <h4><span aria-hidden="true">👶</span> Para el Bebé</h4>
               <ul>
                 <li>4-5 bodies (talla 0 o primera puesta)</li>
                 <li>2-3 pijamas enterizos</li>
@@ -870,7 +886,7 @@ export default function CalculadoraFechaPartoPage() {
             </div>
 
             <div className={styles.bolsaCard}>
-              <h4>👨 Para el Acompañante</h4>
+              <h4><span aria-hidden="true">👨</span> Para el Acompañante</h4>
               <ul>
                 <li>Muda de ropa</li>
                 <li>Artículos de aseo básicos</li>
@@ -885,7 +901,7 @@ export default function CalculadoraFechaPartoPage() {
         </section>
 
         <section className={styles.guideSection}>
-          <h2>📝 Trámites Tras el Nacimiento</h2>
+          <h2><span aria-hidden="true">📝</span> Trámites Tras el Nacimiento</h2>
 
           <div className={styles.tramitesTimeline}>
             <div className={styles.tramiteItem}>
@@ -927,7 +943,7 @@ export default function CalculadoraFechaPartoPage() {
         </section>
 
         <section className={styles.guideSection}>
-          <h2>❓ Preguntas Frecuentes</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes</h2>
 
           <div className={styles.faqGrid}>
             <details className={styles.faqItem}>
@@ -1075,37 +1091,37 @@ export default function CalculadoraFechaPartoPage() {
           <h2>Consejos para un embarazo tranquilo</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💊</span>
+              <span className={styles.tipIcon} aria-hidden="true">💊</span>
               <strong>Toma ácido fólico desde antes</strong>
               <p>Lo ideal es empezar a tomar ácido fólico (400-800 mcg) al menos 1 mes antes de la concepción
               y continuar hasta la semana 12. Previene defectos del tubo neural.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🚭</span>
+              <span className={styles.tipIcon} aria-hidden="true">🚭</span>
               <strong>Cero tabaco, alcohol y drogas</strong>
               <p>No existe una cantidad segura de alcohol durante el embarazo. El tabaco aumenta el riesgo de
               aborto, parto prematuro y bajo peso al nacer. Abandona estos hábitos antes de concebir.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🐱</span>
+              <span className={styles.tipIcon} aria-hidden="true">🐱</span>
               <strong>Cuidado con la toxoplasmosis</strong>
               <p>Evita la caja de arena del gato (o usa guantes) y consume carne bien cocida. La toxoplasmosis
               en el primer trimestre puede causar daños graves al feto si no existe inmunidad previa.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>😴</span>
+              <span className={styles.tipIcon} aria-hidden="true">😴</span>
               <strong>Duerme sobre el lado izquierdo</strong>
               <p>A partir del segundo trimestre, la posición de lado izquierdo mejora la circulación al bebé
               y reduce la presión en la vena cava. Usa una almohada entre las rodillas para mayor comodidad.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📸</span>
+              <span className={styles.tipIcon} aria-hidden="true">📸</span>
               <strong>Fotografía la evolución</strong>
               <p>Una foto mensual del perfil con la misma ropa y fondo crea un recuerdo muy valioso.
               Muchas mujeres lamentan no haberlo hecho desde el principio del embarazo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧘</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧘</span>
               <strong>Yoga prenatal y suelo pélvico</strong>
               <p>Los ejercicios de suelo pélvico (Kegel) son esenciales desde el primer trimestre y especialmente
               importantes en el postparto. El yoga prenatal reduce el estrés y mejora la postura.</p>
@@ -1116,7 +1132,7 @@ export default function CalculadoraFechaPartoPage() {
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Señales de alarma: cuándo ir urgencias durante el embarazo</strong>
           </div>
           <ul className={styles.warningList}>

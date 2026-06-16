@@ -1056,10 +1056,10 @@
 | [x] | Planificador de Gastos del Primer Año del Bebé | `/planificador-gastos-bebe/` | salud, finanzas |
 | [x] | Planificador de Mascota | `/planificador-mascota/` | salud |
 | [x] | Planificador de Turnos de Cuidadores | `/planificador-turnos-cuidadores/` | salud, productividad |
-| [ ] | Planificador Embarazo y Bebé | `/planificador-embarazo/` | salud |
-| [ ] | Predictor de Tiempos de Running | `/calculadora-tiempos-running/` | salud, tecnicas |
-| [ ] | Qué Pasa Cuando Duermes | `/visualizador-ciclos-sueno/` | salud, cultura |
-| [ ] | Residencia vs Cuidado en Casa | `/residencia-vs-cuidado-en-casa/` | salud, legal-fiscal, finanzas |
+| [x] | Planificador Embarazo y Bebé | `/planificador-embarazo/` | salud |
+| [x] | Predictor de Tiempos de Running | `/calculadora-tiempos-running/` | salud, tecnicas |
+| [x] | Qué Pasa Cuando Duermes | `/visualizador-ciclos-sueno/` | salud, cultura |
+| [x] | Residencia vs Cuidado en Casa | `/residencia-vs-cuidado-en-casa/` | salud, legal-fiscal, finanzas |
 | [ ] | Seguimiento Ciclo Menstrual y Fertilidad | `/seguimiento-ciclo-menstrual/` | salud |
 | [ ] | Seguimiento de Hábitos | `/seguimiento-habitos/` | salud, productividad |
 | [ ] | Selector de Actividades según Movilidad | `/selector-actividades-movilidad/` | salud, legal-fiscal |
