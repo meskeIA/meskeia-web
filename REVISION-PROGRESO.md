@@ -391,19 +391,19 @@
 | [x] | Cadenas de Suministro Globales: JIT, Disrupciones y Reshoring | `/visualizador-cadenas-suministro/` | estudiantes, cultura, productividad |
 | [x] | Calculadora Álgebra Abstracta | `/calculadora-algebra-abstracta/` | estudiantes |
 | [x] | Calculadora de Álgebra Booleana | `/calculadora-algebra-booleana/` | estudiantes, tecnicas |
-| [ ] | Calculadora de Cálculo | `/calculadora-calculo/` | estudiantes |
+| [x] | Calculadora de Cálculo | `/calculadora-calculo/` | estudiantes |
 | [x] | Calculadora de Distribuciones | `/calculadora-distribuciones/` | estudiantes |
-| [ ] | Calculadora de Ecuaciones | `/algebra-ecuaciones/` | estudiantes |
+| [x] | Calculadora de Ecuaciones | `/algebra-ecuaciones/` | estudiantes |
 | [x] | Calculadora de Electricidad | `/calculadora-electricidad/` | estudiantes |
 | [x] | Calculadora de Geometría | `/calculadora-geometria/` | estudiantes |
 | [x] | Calculadora de Movimiento | `/calculadora-movimiento/` | estudiantes |
 | [x] | Calculadora de Notas | `/calculadora-notas/` | estudiantes |
-| [ ] | Calculadora de Probabilidad | `/calculadora-probabilidad/` | estudiantes |
+| [x] | Calculadora de Probabilidad | `/calculadora-probabilidad/` | estudiantes |
 | [x] | Calculadora de Sistemas Numéricos | `/calculadora-sistemas-numericos/` | estudiantes, tecnicas |
 | [x] | Calculadora de Trigonometría | `/calculadora-trigonometria/` | estudiantes |
 | [x] | Calculadora Estadística | `/calculadora-estadistica/` | estudiantes |
 | [x] | Calculadora Matemática Avanzada | `/calculadora-matematica/` | estudiantes |
-| [ ] | Calculadora MCD y MCM | `/calculadora-mcd-mcm/` | estudiantes |
+| [x] | Calculadora MCD y MCM | `/calculadora-mcd-mcm/` | estudiantes |
 | [ ] | Calculadora Teoría de Colas | `/calculadora-teoria-colas/` | estudiantes |
 | [ ] | Calculadora Teoría de Números | `/calculadora-teoria-numeros/` | estudiantes |
 | [x] | Cálculo Visual: Límites, Derivadas e Integrales | `/visualizador-calculo-visual/` | estudiantes, tecnicas |

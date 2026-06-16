@@ -210,6 +210,7 @@ export default function CalculadoraMcdMcmPage() {
                 />
                 {inputs.length > 2 && (
                   <button
+                    type="button"
                     onClick={() => removeInput(index)}
                     className={styles.removeBtn}
                     title="Eliminar"
@@ -222,7 +223,7 @@ export default function CalculadoraMcdMcmPage() {
           </div>
 
           {inputs.length < 5 && (
-            <button onClick={addInput} className={styles.addBtn}>
+            <button type="button" onClick={addInput} className={styles.addBtn}>
               + Añadir número
             </button>
           )}
@@ -230,10 +231,10 @@ export default function CalculadoraMcdMcmPage() {
           {error && <div className={styles.errorMsg}>{error}</div>}
 
           <div className={styles.buttonGroup}>
-            <button onClick={calcular} className={styles.btnPrimary}>
+            <button type="button" onClick={calcular} className={styles.btnPrimary}>
               Calcular MCD y MCM
             </button>
-            <button onClick={limpiar} className={styles.btnSecondary}>
+            <button type="button" onClick={limpiar} className={styles.btnSecondary}>
               Limpiar
             </button>
           </div>
@@ -287,7 +288,7 @@ export default function CalculadoraMcdMcmPage() {
             </>
           ) : (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>🔢</span>
+              <span className={styles.placeholderIcon} aria-hidden="true">🔢</span>
               <p>Introduce al menos 2 números y pulsa &quot;Calcular&quot;</p>
             </div>
           )}

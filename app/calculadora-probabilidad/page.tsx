@@ -191,10 +191,12 @@ export default function CalculadoraProbabilidadPage() {
             {tipos.map((tipo) => (
               <button
                 key={tipo.id}
+                type="button"
                 className={`${styles.tipoBtn} ${tipoCalculo === tipo.id ? styles.tipoActivo : ''}`}
                 onClick={() => { setTipoCalculo(tipo.id); limpiar(); }}
+                aria-pressed={tipoCalculo === tipo.id}
               >
-                <span className={styles.tipoIcono}>{tipo.icono}</span>
+                <span className={styles.tipoIcono} aria-hidden="true">{tipo.icono}</span>
                 <span className={styles.tipoNombre}>{tipo.nombre}</span>
               </button>
             ))}
@@ -298,7 +300,7 @@ export default function CalculadoraProbabilidadPage() {
             )}
           </div>
 
-          <button onClick={limpiar} className={styles.btnLimpiar}>
+          <button type="button" onClick={limpiar} className={styles.btnLimpiar}>
             Limpiar
           </button>
         </div>

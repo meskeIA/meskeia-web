@@ -247,6 +247,8 @@ export default function CalculadoraCalculoPage() {
             {tipos.map((tipo) => (
               <button
                 key={tipo.id}
+                type="button"
+                aria-pressed={tipoCalculo === tipo.id}
                 className={`${styles.tipoBtn} ${tipoCalculo === tipo.id ? styles.tipoActivo : ''}`}
                 onClick={() => setTipoCalculo(tipo.id)}
               >
@@ -349,12 +351,16 @@ export default function CalculadoraCalculoPage() {
               <>
                 <div className={styles.serieSelector}>
                   <button
+                    type="button"
+                    aria-pressed={tipoSerie === 'aritmetica'}
                     className={`${styles.serieBtn} ${tipoSerie === 'aritmetica' ? styles.serieActiva : ''}`}
                     onClick={() => setTipoSerie('aritmetica')}
                   >
                     Aritmética
                   </button>
                   <button
+                    type="button"
+                    aria-pressed={tipoSerie === 'geometrica'}
                     className={`${styles.serieBtn} ${tipoSerie === 'geometrica' ? styles.serieActiva : ''}`}
                     onClick={() => setTipoSerie('geometrica')}
                   >
@@ -588,27 +594,27 @@ export default function CalculadoraCalculoPage() {
 
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <h3>🚀 Física: velocidad instantánea</h3>
+            <h3><span aria-hidden="true">🚀</span> Física: velocidad instantánea</h3>
             <p>La derivada de la posición respecto al tiempo da la velocidad instantánea. Calcula f&apos;(t) en cualquier instante para analizar el movimiento de un objeto.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>📊 Probabilidad: área bajo distribución</h3>
+            <h3><span aria-hidden="true">📊</span> Probabilidad: área bajo distribución</h3>
             <p>Integra una función de densidad de probabilidad entre dos valores para calcular la probabilidad de que una variable aleatoria caiga en ese rango.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>💰 Finanzas: series geométricas</h3>
+            <h3><span aria-hidden="true">💰</span> Finanzas: series geométricas</h3>
             <p>Una inversión con capitalización compuesta forma una serie geométrica. Calcula la suma total acumulada tras n períodos con razón (1 + tasa de interés).</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>📐 Optimización de funciones</h3>
+            <h3><span aria-hidden="true">📐</span> Optimización de funciones</h3>
             <p>Encuentra máximos y mínimos de funciones de coste o beneficio. La primera derivada cero indica un punto crítico; la segunda determina si es máximo o mínimo.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🔬 Verificar límites teóricos</h3>
+            <h3><span aria-hidden="true">🔬</span> Verificar límites teóricos</h3>
             <p>Comprueba límites clásicos como lim(x→0) sin(x)/x = 1 o lim(x→∞)(1+1/x)^x = e, observando la convergencia desde ambos lados del punto.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🎓 Preparar exámenes de cálculo</h3>
+            <h3><span aria-hidden="true">🎓</span> Preparar exámenes de cálculo</h3>
             <p>Verifica tus cálculos manuales de derivadas, integrales y límites antes de un examen. Identifica dónde te equivocas comparando con los resultados numéricos.</p>
           </div>
         </div>
@@ -702,33 +708,33 @@ export default function CalculadoraCalculoPage() {
 
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <h3>🎯 Verifica con valores conocidos</h3>
+            <h3><span aria-hidden="true">🎯</span> Verifica con valores conocidos</h3>
             <p>Prueba primero con funciones cuya derivada conozcas: si f(x) = x², f&apos;(2) debe dar exactamente 4. Si coincide, confía en los resultados más complejos.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>📊 Usa 1000+ subdivisiones para integrales</h3>
+            <h3><span aria-hidden="true">📊</span> Usa 1000+ subdivisiones para integrales</h3>
             <p>Con funciones oscilantes como sin(x), usa al menos 1000 subdivisiones para obtener resultados precisos. El cálculo es rápido y la ganancia en precisión es significativa.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>↔️ Compara límites laterales</h3>
+            <h3><span aria-hidden="true">↔️</span> Compara límites laterales</h3>
             <p>Siempre observa si el límite por izquierda y derecha son iguales. Si difieren, el límite no existe. Es fundamental para detectar discontinuidades.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🔢 Verifica convergencia en series</h3>
+            <h3><span aria-hidden="true">🔢</span> Verifica convergencia en series</h3>
             <p>Para series geométricas, comprueba |r| &lt; 1 antes de interpretar la suma infinita. Si |r| ≥ 1, la serie diverge y no tiene suma finita.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>📈 Interpreta el signo de la derivada</h3>
+            <h3><span aria-hidden="true">📈</span> Interpreta el signo de la derivada</h3>
             <p>f&apos;(x) &gt; 0: función creciente. f&apos;(x) &lt; 0: decreciente. f&apos;(x) = 0: punto crítico (posible máximo, mínimo o inflexión). La segunda derivada aclara el tipo.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>⚡ Combina herramientas</h3>
+            <h3><span aria-hidden="true">⚡</span> Combina herramientas</h3>
             <p>Usa derivadas para encontrar puntos críticos, luego intégralas para calcular áreas. Combinar las cuatro operaciones te da una visión completa del comportamiento de la función.</p>
           </div>
         </div>
 
         <div className={styles.warningBox}>
-          <h3>⚠️ Limitaciones de los métodos numéricos</h3>
+          <h3><span aria-hidden="true">⚠️</span> Limitaciones de los métodos numéricos</h3>
           <ul className={styles.warningList}>
             <li>Los métodos numéricos tienen errores de redondeo y aproximación. No son exactos como el cálculo simbólico.</li>
             <li>Para funciones con discontinuidades o singularidades, los resultados pueden ser incorrectos o inestables.</li>

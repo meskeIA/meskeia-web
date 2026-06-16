@@ -324,22 +324,25 @@ export default function AlgebraEcuacionesPage() {
           type="button"
           className={`${styles.typeButton} ${equationType === 'linear' ? styles.active : ''}`}
           onClick={() => setEquationType('linear')}
+          aria-pressed={equationType === 'linear'}
         >
-          📐 Lineal
+          <span aria-hidden="true">📐</span> Lineal
         </button>
         <button
           type="button"
           className={`${styles.typeButton} ${equationType === 'quadratic' ? styles.active : ''}`}
           onClick={() => setEquationType('quadratic')}
+          aria-pressed={equationType === 'quadratic'}
         >
-          📊 Cuadrática
+          <span aria-hidden="true">📊</span> Cuadrática
         </button>
         <button
           type="button"
           className={`${styles.typeButton} ${equationType === 'system' ? styles.active : ''}`}
           onClick={() => setEquationType('system')}
+          aria-pressed={equationType === 'system'}
         >
-          🔗 Sistema 2x2
+          <span aria-hidden="true">🔗</span> Sistema 2x2
         </button>
       </div>
 
