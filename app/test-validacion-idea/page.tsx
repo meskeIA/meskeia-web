@@ -126,12 +126,12 @@ export default function TestValidacionIdeaPage() {
     <div className={styles.container}>
         <MeskeiaLogo />
         <header className={styles.hero}>
-          <h1 className={styles.title}>🧪 Test de Validación de Idea</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🧪</span> Test de Validación de Idea</h1>
           <p className={styles.subtitle}>¿Tu idea resuelve un problema real o solo te gusta a ti?<br />Basado en Lean Startup (Eric Ries)</p>
           <div className={styles.badges}>
-            <span className={styles.badge}>🕐 3 minutos</span>
-            <span className={styles.badge}>📊 10 preguntas</span>
-            <span className={styles.badge}>🔒 Sin registro</span>
+            <span className={styles.badge}><span aria-hidden="true">🕐</span> 3 minutos</span>
+            <span className={styles.badge}><span aria-hidden="true">📊</span> 10 preguntas</span>
+            <span className={styles.badge}><span aria-hidden="true">🔒</span> Sin registro</span>
           </div>
         </header>
 
@@ -151,7 +151,7 @@ export default function TestValidacionIdeaPage() {
               <p className={styles.questionText}>{pregunta.texto}</p>
               <div className={styles.scaleContainer} role="radiogroup" aria-label={`Pregunta ${index + 1}: ${pregunta.texto}`}>
                 {ESCALA.map((opcion) => (
-                  <button key={opcion.valor} className={`${styles.scaleButton} ${respuestas[pregunta.id] === opcion.valor ? styles.scaleButtonActive : ''}`} onClick={() => handleRespuesta(pregunta.id, opcion.valor)} role="radio" aria-checked={respuestas[pregunta.id] === opcion.valor} aria-label={`${opcion.etiqueta} (${opcion.valor} de 5)`}>
+                  <button key={opcion.valor} type="button" className={`${styles.scaleButton} ${respuestas[pregunta.id] === opcion.valor ? styles.scaleButtonActive : ''}`} onClick={() => handleRespuesta(pregunta.id, opcion.valor)} role="radio" aria-checked={respuestas[pregunta.id] === opcion.valor} aria-label={`${opcion.etiqueta} (${opcion.valor} de 5)`}>
                     <span className={styles.scaleValue}>{opcion.valor}</span><span className={styles.scaleLabel}>{opcion.etiqueta}</span>
                   </button>
                 ))}
@@ -159,7 +159,7 @@ export default function TestValidacionIdeaPage() {
             </div>
           ))}
           <div className={styles.progressInfo}>{Object.keys(respuestas).length} de {PREGUNTAS.length} respondidas</div>
-          <button className={styles.btnPrimary} onClick={calcularResultado} disabled={!todasRespondidas} aria-label="Ver mi diagnóstico">
+          <button type="button" className={styles.btnPrimary} onClick={calcularResultado} disabled={!todasRespondidas} aria-label="Ver mi diagnóstico">
             {todasRespondidas ? 'Ver mi diagnóstico' : `Responde las ${PREGUNTAS.length - Object.keys(respuestas).length} preguntas restantes`}
           </button>
         </section>
@@ -169,16 +169,16 @@ export default function TestValidacionIdeaPage() {
             <h2 className={styles.sectionTitle}>Tu diagnóstico</h2>
             <div className={styles.mapContainer}>
               <div className={styles.mapLabels}>
-                <span className={styles.mapLabelTop}>🔬 Alta Validación</span>
+                <span className={styles.mapLabelTop}><span aria-hidden="true">🔬</span> Alta Validación</span>
                 <span className={styles.mapLabelBottom}>Baja Validación</span>
                 <span className={styles.mapLabelLeft}>Baja Asunción</span>
-                <span className={styles.mapLabelRight}>💘 Alta Asunción</span>
+                <span className={styles.mapLabelRight}><span aria-hidden="true">💘</span> Alta Asunción</span>
               </div>
               <div className={styles.map}>
-                <div className={`${styles.quadrant} ${styles.quadrantTL}`}><span>🔬 Emprendedor Metódico</span></div>
-                <div className={`${styles.quadrant} ${styles.quadrantTR}`}><span>🔀 En Conflicto</span></div>
-                <div className={`${styles.quadrant} ${styles.quadrantBL}`}><span>🌱 Fase Exploración</span></div>
-                <div className={`${styles.quadrant} ${styles.quadrantBR}`}><span>💘 Enamorado de la Idea</span></div>
+                <div className={`${styles.quadrant} ${styles.quadrantTL}`}><span><span aria-hidden="true">🔬</span> Emprendedor Metódico</span></div>
+                <div className={`${styles.quadrant} ${styles.quadrantTR}`}><span><span aria-hidden="true">🔀</span> En Conflicto</span></div>
+                <div className={`${styles.quadrant} ${styles.quadrantBL}`}><span><span aria-hidden="true">🌱</span> Fase Exploración</span></div>
+                <div className={`${styles.quadrant} ${styles.quadrantBR}`}><span><span aria-hidden="true">💘</span> Enamorado de la Idea</span></div>
                 <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
                 <div className={styles.thresholdLineV} style={{ left: '65%' }} aria-hidden="true" />
                 <div className={styles.thresholdLineH} style={{ top: '35%' }} aria-hidden="true" />
@@ -190,24 +190,24 @@ export default function TestValidacionIdeaPage() {
             </div>
 
             <div className={styles.scoresContainer}>
-              <div className={styles.scoreBar}><div className={styles.scoreHeader}><span>💘 Asunción</span><span className={styles.scoreValue}>{puntuacionAsuncion}/25</span></div><div className={styles.barTrack}><div className={`${styles.barFill} ${styles.barAsuncion}`} style={{ width: `${(puntuacionAsuncion / 25) * 100}%` }} /></div></div>
-              <div className={styles.scoreBar}><div className={styles.scoreHeader}><span>🔬 Validación</span><span className={styles.scoreValue}>{puntuacionValidacion}/25</span></div><div className={styles.barTrack}><div className={`${styles.barFill} ${styles.barValidacion}`} style={{ width: `${(puntuacionValidacion / 25) * 100}%` }} /></div></div>
+              <div className={styles.scoreBar}><div className={styles.scoreHeader}><span><span aria-hidden="true">💘</span> Asunción</span><span className={styles.scoreValue}>{puntuacionAsuncion}/25</span></div><div className={styles.barTrack}><div className={`${styles.barFill} ${styles.barAsuncion}`} style={{ width: `${(puntuacionAsuncion / 25) * 100}%` }} /></div></div>
+              <div className={styles.scoreBar}><div className={styles.scoreHeader}><span><span aria-hidden="true">🔬</span> Validación</span><span className={styles.scoreValue}>{puntuacionValidacion}/25</span></div><div className={styles.barTrack}><div className={`${styles.barFill} ${styles.barValidacion}`} style={{ width: `${(puntuacionValidacion / 25) * 100}%` }} /></div></div>
             </div>
 
             <div className={styles.profileCard}>
-              <div className={styles.profileHeader}><span className={styles.profileEmoji}>{perfil.emoji}</span><h3 className={styles.profileName}>{perfil.nombre}</h3></div>
+              <div className={styles.profileHeader}><span className={styles.profileEmoji} aria-hidden="true">{perfil.emoji}</span><h3 className={styles.profileName}>{perfil.nombre}</h3></div>
               <p className={styles.profileDescription}>{perfil.descripcion}</p>
               <div className={styles.profileColumns}>
-                <div className={styles.profileColumn}><h4 className={styles.columnTitle}>✅ Fortalezas</h4><ul className={styles.profileList}>{perfil.fortalezas.map((f, i) => (<li key={i}>{f}</li>))}</ul></div>
-                <div className={styles.profileColumn}><h4 className={styles.columnTitle}>⚠️ Riesgos</h4><ul className={styles.profileList}>{perfil.riesgos.map((r, i) => (<li key={i}>{r}</li>))}</ul></div>
+                <div className={styles.profileColumn}><h4 className={styles.columnTitle}><span aria-hidden="true">✅</span> Fortalezas</h4><ul className={styles.profileList}>{perfil.fortalezas.map((f, i) => (<li key={i}>{f}</li>))}</ul></div>
+                <div className={styles.profileColumn}><h4 className={styles.columnTitle}><span aria-hidden="true">⚠️</span> Riesgos</h4><ul className={styles.profileList}>{perfil.riesgos.map((r, i) => (<li key={i}>{r}</li>))}</ul></div>
               </div>
-              <div className={styles.actionsSection}><h4 className={styles.actionsTitle}>🎯 Acciones sugeridas</h4><ol className={styles.actionsList}>{perfil.acciones.map((a, i) => (<li key={i}>{a}</li>))}</ol></div>
+              <div className={styles.actionsSection}><h4 className={styles.actionsTitle}><span aria-hidden="true">🎯</span> Acciones sugeridas</h4><ol className={styles.actionsList}>{perfil.acciones.map((a, i) => (<li key={i}>{a}</li>))}</ol></div>
             </div>
-            <button className={styles.btnSecondary} onClick={reiniciar}>Repetir diagnóstico</button>
+            <button type="button" className={styles.btnSecondary} onClick={reiniciar}>Repetir diagnóstico</button>
           </section>
         )}
 
-        <EducationalSection title="📚 Lean Startup: validar antes de construir" subtitle="El método que cambió el emprendimiento">
+        <EducationalSection title="Lean Startup: validar antes de construir" subtitle="El método que cambió el emprendimiento">
           <section className={styles.guideSection}>
             <h2>El ciclo Build-Measure-Learn</h2>
             <p>Eric Ries propuso en 2011 un ciclo iterativo para emprender: <strong>Construir</strong> una versión mínima (MVP), <strong>Medir</strong> cómo responde el mercado, y <strong>Aprender</strong> para decidir si pivotar o perseverar. La clave es que el ciclo sea lo más corto posible.</p>

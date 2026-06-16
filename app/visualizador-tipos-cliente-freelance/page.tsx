@@ -263,14 +263,18 @@ export default function VisualizadorTiposClienteFreelance() {
       {/* Controles de vista */}
       <div className={styles.vistaControles}>
         <button
+          type="button"
           className={`${styles.vistaBtn} ${!vistaComparativa ? styles.vistaBtnActivo : ''}`}
           onClick={() => setVistaComparativa(false)}
+          aria-pressed={!vistaComparativa}
         >
           <span aria-hidden="true">📋</span> Tarjetas
         </button>
         <button
+          type="button"
           className={`${styles.vistaBtn} ${vistaComparativa ? styles.vistaBtnActivo : ''}`}
           onClick={() => setVistaComparativa(true)}
+          aria-pressed={vistaComparativa}
         >
           <span aria-hidden="true">📊</span> Comparativa
         </button>
@@ -288,6 +292,7 @@ export default function VisualizadorTiposClienteFreelance() {
                   className={`${styles.tarjeta} ${tipo.esIlegal ? styles.tarjetaIlegal : ''} ${expandido ? styles.tarjetaExpandida : ''}`}
                 >
                   <button
+                    type="button"
                     className={styles.tarjetaHeader}
                     onClick={() => toggleTipo(tipo.id)}
                     aria-expanded={expandido}
@@ -392,6 +397,7 @@ export default function VisualizadorTiposClienteFreelance() {
                 {ESPECTRO.map(item => (
                   <button
                     key={item.id}
+                    type="button"
                     className={`${styles.espectroPunto} ${item.id === 'falso-autonomo' ? styles.espectroPuntoIlegal : ''}`}
                     style={{ left: `${100 - item.pct}%` }}
                     onClick={() => { setVistaComparativa(false); setActivo(item.id); }}

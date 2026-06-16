@@ -725,10 +725,10 @@
 | [x] | Selector Régimen Fiscal Autónomo | `/selector-regimen-fiscal-autonomo/` | freelance, finanzas |
 | [x] | Simulador de Colchón de Emergencia Freelance | `/simulador-colchon-emergencia-freelance/` | freelance, finanzas |
 | [x] | Temporizador Pomodoro | `/temporizador-pomodoro/` | freelance, productividad, estudiantes |
-| [ ] | Test de Salud de tu Negocio Freelance | `/test-salud-negocio-freelance/` | freelance, productividad |
-| [ ] | Test de Validación de Idea | `/test-validacion-idea/` | freelance, cultura |
-| [ ] | Time Tracker | `/time-tracker/` | freelance, productividad |
-| [ ] | Tipos de Cliente Freelance | `/visualizador-tipos-cliente-freelance/` | freelance, cultura |
+| [x] | Test de Salud de tu Negocio Freelance | `/test-salud-negocio-freelance/` | freelance, productividad |
+| [x] | Test de Validación de Idea | `/test-validacion-idea/` | freelance, cultura |
+| [x] | Time Tracker | `/time-tracker/` | freelance, productividad |
+| [x] | Tipos de Cliente Freelance | `/visualizador-tipos-cliente-freelance/` | freelance, cultura |
 
 ## Herramientas Técnicas (`tecnicas`) — 57 apps
 

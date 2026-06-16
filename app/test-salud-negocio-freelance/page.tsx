@@ -423,6 +423,7 @@ export default function TestSaludNegocioFreelance() {
               recomendaciones personalizadas con herramientas de meskeIA.
             </p>
             <button
+              type="button"
               className={styles.btnPrimary}
               onClick={() => setFase('test')}
               aria-label="Empezar el test de salud de negocio freelance"
@@ -464,6 +465,7 @@ export default function TestSaludNegocioFreelance() {
               {pregunta.opciones.map((opcion, idx) => (
                 <button
                   key={idx}
+                  type="button"
                   className={styles.optionBtn}
                   onClick={() => seleccionarRespuesta(pregunta.id, opcion.puntos)}
                   aria-label={`${opcion.texto} - Opción ${idx + 1} de ${pregunta.opciones.length}`}
@@ -552,6 +554,7 @@ export default function TestSaludNegocioFreelance() {
               </div>
 
               <button
+                type="button"
                 className={styles.btnPrimary}
                 onClick={reiniciarTest}
                 aria-label="Repetir el test desde el principio"

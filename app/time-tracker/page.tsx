@@ -253,7 +253,7 @@ export default function TimeTrackerPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>⏱️ Time Tracker</h1>
+        <h1 className={styles.title}><span aria-hidden="true">⏱️</span> Time Tracker</h1>
         <p className={styles.subtitle}>
           Registra el tiempo dedicado a cada proyecto y cliente
         </p>
@@ -292,15 +292,18 @@ export default function TimeTrackerPage() {
                   {proyectos.slice(0, 5).map(p => (
                     <button
                       key={p.nombre}
+                      type="button"
                       onClick={() => selectProyecto(p)}
                       className={`${styles.proyectoTag} ${proyecto === p.nombre ? styles.active : ''}`}
                       style={{ borderColor: p.color }}
+                      aria-pressed={proyecto === p.nombre}
                     >
                       <span className={styles.proyectoColor} style={{ background: p.color }} />
                       {p.nombre}
                     </button>
                   ))}
                   <button
+                    type="button"
                     onClick={() => setNuevoProyecto(true)}
                     className={styles.nuevoProyectoBtn}
                   >
@@ -365,6 +368,7 @@ export default function TimeTrackerPage() {
             )}
 
             <button
+              type="button"
               onClick={isTracking ? stopTracking : startTracking}
               className={`${styles.trackButton} ${isTracking ? styles.stop : styles.start}`}
             >
@@ -376,7 +380,7 @@ export default function TimeTrackerPage() {
         {/* Panel de estadísticas */}
         <div className={styles.statsPanel}>
           <div className={styles.statsHeader}>
-            <h2 className={styles.panelTitle}>📊 Resumen</h2>
+            <h2 className={styles.panelTitle}><span aria-hidden="true">📊</span> Resumen</h2>
             <div className={styles.filters}>
               <select
                 value={filtroProyecto}
@@ -452,8 +456,8 @@ export default function TimeTrackerPage() {
           )}
 
           {entriesFiltradas.length > 0 && (
-            <button onClick={exportarCSV} className={styles.exportBtn}>
-              📥 Exportar CSV
+            <button type="button" onClick={exportarCSV} className={styles.exportBtn}>
+              <span aria-hidden="true">📥</span> Exportar CSV
             </button>
           )}
         </div>
@@ -462,7 +466,7 @@ export default function TimeTrackerPage() {
       {/* Historial */}
       {entriesFiltradas.length > 0 && (
         <div className={styles.historySection}>
-          <h2 className={styles.sectionTitle}>📜 Historial de registros</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">📜</span> Historial de registros</h2>
           <div className={styles.entriesList}>
             {entriesFiltradas.slice(0, 20).map(entry => {
               const proy = proyectos.find(p => p.nombre === entry.proyecto);
@@ -491,11 +495,12 @@ export default function TimeTrackerPage() {
                     </div>
                   </div>
                   <button
+                    type="button"
                     onClick={() => deleteEntry(entry.id)}
                     className={styles.deleteBtn}
-                    title="Eliminar"
+                    aria-label="Eliminar registro"
                   >
-                    🗑️
+                    <span aria-hidden="true">🗑️</span>
                   </button>
                 </div>
               );
