@@ -232,6 +232,7 @@ export default function VisualizadorAspirina() {
           {PASOS_MECANISMO.map((p, i) => (
             <button
               key={p.id}
+              type="button"
               role="tab"
               aria-selected={i === pasoActivo}
               aria-label={`Paso ${p.id}: ${p.titulo}`}
@@ -246,6 +247,7 @@ export default function VisualizadorAspirina() {
           {PASOS_MECANISMO.map((p, i) => (
             <button
               key={p.id}
+              type="button"
               className={`${styles.mecanismoCard} ${i === pasoActivo ? styles.mecanismoCardActiva : ''}`}
               onClick={() => setPasoActivo(i)}
               aria-pressed={i === pasoActivo}
@@ -278,6 +280,7 @@ export default function VisualizadorAspirina() {
           {/* Controles de navegación */}
           <div className={styles.stepControls}>
             <button
+              type="button"
               className={styles.stepBtn}
               onClick={() => setPasoActivo((prev) => Math.max(0, prev - 1))}
               disabled={pasoActivo === 0}
@@ -289,6 +292,7 @@ export default function VisualizadorAspirina() {
               {pasoActivo + 1} / {PASOS_MECANISMO.length}
             </span>
             <button
+              type="button"
               className={styles.stepBtn}
               onClick={() => setPasoActivo((prev) => Math.min(PASOS_MECANISMO.length - 1, prev + 1))}
               disabled={pasoActivo === PASOS_MECANISMO.length - 1}
@@ -311,6 +315,7 @@ export default function VisualizadorAspirina() {
           {EFECTOS.map((efecto, i) => (
             <button
               key={efecto.nombre}
+              type="button"
               className={`${styles.efectoCard} ${efectoActivo === i ? styles.efectoCardActivo : ''}`}
               onClick={() => setEfectoActivo(efectoActivo === i ? null : i)}
               aria-expanded={efectoActivo === i}
@@ -343,6 +348,7 @@ export default function VisualizadorAspirina() {
           {HITOS_HISTORICOS.map((h, i) => (
             <button
               key={h.anio}
+              type="button"
               role="tab"
               aria-selected={i === hitoActivo}
               className={`${styles.hitoBtn} ${i === hitoActivo ? styles.hitoBtnActivo : ''}`}

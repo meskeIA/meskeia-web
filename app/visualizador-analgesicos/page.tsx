@@ -424,6 +424,7 @@ export default function VisualizadorAnalgesicos() {
             return (
               <button
                 key={key}
+                type="button"
                 className={`${styles.farmacoBtn} ${activo ? styles.farmacoBtnActivo : ''}`}
                 onClick={() => setFarmacoSeleccionado(key)}
                 aria-pressed={activo}
@@ -505,7 +506,7 @@ export default function VisualizadorAnalgesicos() {
 
           <div className={styles.organoRiesgo}>
             <p className={styles.organoRiesgoLabel}>
-              <strong>⚠️ Órgano de riesgo:</strong> {farmaco.organoRiesgo}
+              <strong><span aria-hidden="true">⚠️</span> Órgano de riesgo:</strong> {farmaco.organoRiesgo}
             </p>
             <p className={styles.organoRiesgoDesc}>{farmaco.organoRiesgoDesc}</p>
           </div>
@@ -526,13 +527,13 @@ export default function VisualizadorAnalgesicos() {
                 <tr>
                   <th className={styles.tablaHeaderCaract}>Característica</th>
                   <th className={`${styles.tablaHeader} ${styles.tablaHeaderAspirina}`}>
-                    ❤️ Aspirina
+                    <span aria-hidden="true">❤️</span> Aspirina
                   </th>
                   <th className={`${styles.tablaHeader} ${styles.tablaHeaderParacetamol}`}>
-                    🧠 Paracetamol
+                    <span aria-hidden="true">🧠</span> Paracetamol
                   </th>
                   <th className={`${styles.tablaHeader} ${styles.tablaHeaderIbuprofeno}`}>
-                    💊 Ibuprofeno
+                    <span aria-hidden="true">💊</span> Ibuprofeno
                   </th>
                 </tr>
               </thead>
@@ -710,7 +711,7 @@ export default function VisualizadorAnalgesicos() {
           </p>
 
           <div className={styles.warningBox} role="note">
-            <strong>⚠️ Nota importante:</strong> Este visualizador explica mecanismos farmacológicos
+            <strong><span aria-hidden="true">⚠️</span> Nota importante:</strong> Este visualizador explica mecanismos farmacológicos
             con fines educativos. Para el uso correcto de cualquier medicamento, especialmente en niños,
             embarazo o personas con enfermedades crónicas, consulta siempre con tu médico o farmacéutico.
             Las dosis, interacciones y contraindicaciones son individuales y deben ser evaluadas por un

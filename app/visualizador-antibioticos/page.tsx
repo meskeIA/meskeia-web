@@ -329,6 +329,7 @@ export default function VisualizadorAntibioticos() {
           {MECANISMOS.map((m, i) => (
             <button
               key={m.id}
+              type="button"
               className={`${styles.mecanismoBtn} ${mecanismoActivo === i ? styles.mecanismoBtnActivo : ''}`}
               onClick={() => setMecanismoActivo(i)}
               aria-pressed={mecanismoActivo === i}
@@ -412,7 +413,7 @@ export default function VisualizadorAntibioticos() {
                     mecanismo.tipo === 'bactericida' ? styles.metaBactericida : styles.metaBacteriostático
                   }`}
                 >
-                  {mecanismo.tipo === 'bactericida' ? '☠️ Bactericida' : '⏸️ Bacteriostático'}
+                  {mecanismo.tipo === 'bactericida' ? <><span aria-hidden="true">☠️</span> Bactericida</> : <><span aria-hidden="true">⏸️</span> Bacteriostático</>}
                 </span>
               </div>
             </div>
@@ -442,12 +443,12 @@ export default function VisualizadorAntibioticos() {
 
         <div className={styles.resistenciaGrid} style={{ marginTop: '1.5rem' }}>
           <div className={styles.resistenciaCard} style={{ borderTop: '4px solid #E05A5A' }}>
-            <h4>☠️ Bactericida</h4>
+            <h4><span aria-hidden="true">☠️</span> Bactericida</h4>
             <p>Mata activamente las bacterias. No necesita sistema inmune. Preferible en infecciones graves, endocarditis, meningitis.</p>
             <p className={styles.resistenciaEjemplos}>β-lactámicos, fluoroquinolonas, aminoglucósidos, polimixinas</p>
           </div>
           <div className={styles.resistenciaCard} style={{ borderTop: '4px solid #D4820A' }}>
-            <h4>⏸️ Bacteriostático</h4>
+            <h4><span aria-hidden="true">⏸️</span> Bacteriostático</h4>
             <p>Detiene el crecimiento. El sistema inmune del paciente elimina las bacterias. Suficiente en infecciones leves-moderadas en pacientes inmunocompetentes.</p>
             <p className={styles.resistenciaEjemplos}>Macrólidos, tetraciclinas, cloranfenicol, linezolid</p>
           </div>
@@ -465,6 +466,7 @@ export default function VisualizadorAntibioticos() {
           {RESISTENCIAS.map((r, i) => (
             <div key={r.nombre} className={styles.resistenciaExpandCard}>
               <button
+                type="button"
                 className={styles.resistenciaCardToggle}
                 onClick={() => toggleResistencia(i)}
                 aria-expanded={resistenciasAbiertas[i]}
@@ -521,13 +523,13 @@ export default function VisualizadorAntibioticos() {
               <div className={styles.comparativaFila}>
                 <div className={styles.comparativaColumna}>
                   <span className={styles.comparativaBadge} style={{ background: 'rgba(46,134,171,0.12)', color: '#2E86AB' }}>
-                    {item.iconoBacteria} Bacteria
+                    <span aria-hidden="true">{item.iconoBacteria}</span> Bacteria
                   </span>
                   <p>{item.bacteria}</p>
                 </div>
                 <div className={styles.comparativaColumna}>
                   <span className={styles.comparativaBadge} style={{ background: 'rgba(224,90,90,0.1)', color: '#c0392b' }}>
-                    {item.iconoVirus} Virus
+                    <span aria-hidden="true">{item.iconoVirus}</span> Virus
                   </span>
                   <p>{item.virus}</p>
                 </div>

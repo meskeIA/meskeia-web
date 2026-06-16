@@ -965,10 +965,10 @@
 | [x] | Adaptación del Hogar | `/adaptacion-hogar/` | salud, legal-fiscal, inmobiliaria |
 | [x] | ADN Polimerasa - La Máquina que Copia tu Genoma | `/visualizador-adn-polimerasa/` | salud, cultura, estudiantes |
 | [x] | Adrenalina: La Hormona de la Supervivencia | `/visualizador-adrenalina/` | salud, cultura, estudiantes |
-| [ ] | Anestesia: Cómo se Apaga y Enciende la Consciencia | `/visualizador-anestesia/` | salud, cultura, estudiantes |
-| [ ] | Antibióticos: Cómo Matan Bacterias y la Resistencia | `/visualizador-antibioticos/` | salud, cultura, estudiantes |
-| [ ] | Aspirina, Paracetamol e Ibuprofeno: Comparativa de los 3 Analgésicos | `/visualizador-analgesicos/` | salud, cultura, estudiantes |
-| [ ] | Aspirina: Cómo Funciona el Fármaco más Universal | `/visualizador-aspirina/` | salud, cultura, estudiantes |
+| [x] | Anestesia: Cómo se Apaga y Enciende la Consciencia | `/visualizador-anestesia/` | salud, cultura, estudiantes |
+| [x] | Antibióticos: Cómo Matan Bacterias y la Resistencia | `/visualizador-antibioticos/` | salud, cultura, estudiantes |
+| [x] | Aspirina, Paracetamol e Ibuprofeno: Comparativa de los 3 Analgésicos | `/visualizador-analgesicos/` | salud, cultura, estudiantes |
+| [x] | Aspirina: Cómo Funciona el Fármaco más Universal | `/visualizador-aspirina/` | salud, cultura, estudiantes |
 | [ ] | ATP Sintasa - El Motor Molecular que te da Energía | `/visualizador-atp-sintasa/` | salud, cultura, estudiantes |
 | [ ] | Ayuno Intermitente: Fases Metabólicas y Autofagia | `/visualizador-ayuno-intermitente/` | salud |
 | [ ] | Calculadora de 1RM — Repetición Máxima | `/calculadora-1rm-gimnasio/` | salud, tecnicas |
