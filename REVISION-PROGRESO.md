@@ -257,10 +257,10 @@
 | [x] | Historia del Imperio Mongol: De Gengis Kan a la Dinastía Yuan | `/visualizador-historia/mongol/` | cultura |
 | [x] | Historia del Imperio Otomano: De Osmán a Atatürk | `/visualizador-historia/otomano/` | cultura |
 | [x] | Historia del Japón Moderno: De Meiji al Siglo XXI | `/visualizador-historia/historia-japon-moderno/` | cultura |
-| [ ] | Historia del Ocio: Del Circo Romano al Streaming Global | `/visualizador-historia/historia-ocio/` | cultura |
-| [ ] | Historia del Oriente Medio: De Sykes-Picot al Siglo XXI | `/visualizador-historia/historia-oriente-medio/` | cultura |
-| [ ] | Historia del Pensamiento Político: De Platón al Populismo del Siglo XXI | `/visualizador-historia/historia-pensamiento-politico/` | cultura |
-| [ ] | Historia del Periodismo: De la Acta Diurna a la IA Generativa | `/visualizador-historia/historia-periodismo/` | cultura, estudiantes |
+| [x] | Historia del Ocio: Del Circo Romano al Streaming Global | `/visualizador-historia/historia-ocio/` | cultura |
+| [x] | Historia del Oriente Medio: De Sykes-Picot al Siglo XXI | `/visualizador-historia/historia-oriente-medio/` | cultura |
+| [x] | Historia del Pensamiento Político: De Platón al Populismo del Siglo XXI | `/visualizador-historia/historia-pensamiento-politico/` | cultura |
+| [x] | Historia del Periodismo: De la Acta Diurna a la IA Generativa | `/visualizador-historia/historia-periodismo/` | cultura, estudiantes |
 | [ ] | Historia del Reino Unido: De la Conquista Normanda al Brexit | `/visualizador-historia/historia-reino-unido/` | cultura |
 | [ ] | Historia del Sudeste Asiático: De Angkor al ASEAN del Siglo XXI | `/visualizador-historia/sudeste-asiatico/` | cultura, estudiantes |
 | [ ] | Historia del Teatro: Del Teatro Griego al Teatro Digital | `/visualizador-historia/teatro/` | cultura |
