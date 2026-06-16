@@ -241,10 +241,10 @@
 | [x] | Historia de Rusia: De Rurik al Siglo XXI | `/visualizador-historia/historia-rusia/` | cultura |
 | [x] | Historia de Silicon Valley: Del Garaje de HP a la Era de la IA | `/visualizador-historia/silicon-valley/` | cultura, tecnicas |
 | [x] | Historia de Uruguay: De la Independencia a la Democracia Plena | `/visualizador-historia/uruguay/` | cultura, estudiantes |
-| [ ] | Historia de Venezuela: Del Libertador a la Venezuela Contemporánea | `/visualizador-historia/venezuela/` | cultura, estudiantes |
-| [ ] | Historia del Antiguo Egipto: De los Faraones a Cleopatra | `/visualizador-historia/egipto/` | cultura |
-| [ ] | Historia del Automóvil: De Benz al Coche Eléctrico Autónomo | `/visualizador-historia/automocion/` | cultura, tecnicas |
-| [ ] | Historia del Azúcar: De Papua Nueva Guinea a la Crisis Global de Salud | `/visualizador-historia/azucar/` | cultura, estudiantes |
+| [x] | Historia de Venezuela: Del Libertador a la Venezuela Contemporánea | `/visualizador-historia/venezuela/` | cultura, estudiantes |
+| [x] | Historia del Antiguo Egipto: De los Faraones a Cleopatra | `/visualizador-historia/egipto/` | cultura |
+| [x] | Historia del Automóvil: De Benz al Coche Eléctrico Autónomo | `/visualizador-historia/automocion/` | cultura, tecnicas |
+| [x] | Historia del Azúcar: De Papua Nueva Guinea a la Crisis Global de Salud | `/visualizador-historia/azucar/` | cultura, estudiantes |
 | [ ] | Historia del Chocolate: Del Cacao Sagrado de los Mayas a la Industria Global | `/visualizador-historia/chocolate/` | cultura, estudiantes |
 | [ ] | Historia del Cine: De los Lumière a la Inteligencia Artificial | `/visualizador-historia/cine/` | cultura |
 | [ ] | Historia del Clima: De la Última Glaciación a la Emergencia Climática | `/visualizador-historia/clima/` | cultura, tecnicas |
