@@ -178,7 +178,7 @@ export default function EficienciaEnergeticaPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>⚡ Calculadora de Eficiencia Energética</h1>
+          <h1 className={styles.title}><span aria-hidden="true">⚡</span> Calculadora de Eficiencia Energética</h1>
           <p className={styles.subtitle}>
             Calcula el ahorro y la amortización de mejoras en aislamiento, ventanas y calefacción
           </p>
@@ -325,12 +325,12 @@ export default function EficienciaEnergeticaPage() {
                   <p className={styles.hint}>Bomba de calor + instalación: 5.000 – 15.000 €</p>
                 </div>
                 <div className={styles.warningBox} role="note">
-                  💡 El cálculo asume precio eléctrico de referencia de 0,18 €/kWh. El ahorro real depende de la tarifa contratada y el uso.
+                  <span aria-hidden="true">💡</span> El cálculo asume precio eléctrico de referencia de 0,18 €/kWh. El ahorro real depende de la tarifa contratada y el uso.
                 </div>
               </>
             )}
 
-            <button onClick={calcular} className={styles.btnPrimary}>
+            <button type="button" onClick={calcular} className={styles.btnPrimary}>
               Calcular ahorro y amortización
             </button>
           </div>
@@ -352,7 +352,7 @@ export default function EficienciaEnergeticaPage() {
               </div>
             ) : (
               <div className={styles.emptyState}>
-                <p>⚡ Introduce los datos y pulsa <strong>Calcular</strong></p>
+                <p><span aria-hidden="true">⚡</span> Introduce los datos y pulsa <strong>Calcular</strong></p>
                 <p style={{ marginTop: '0.5rem', fontSize: '0.85rem' }}>Obtendrás el ahorro anual estimado y el plazo de amortización de tu inversión.</p>
               </div>
             )}
@@ -377,7 +377,7 @@ export default function EficienciaEnergeticaPage() {
             </p>
 
             {/* Guía paso a paso */}
-            <h3>📋 Hoja de ruta para rehabilitar energéticamente tu vivienda</h3>
+            <h3><span aria-hidden="true">📋</span> Hoja de ruta para rehabilitar energéticamente tu vivienda</h3>
             <div className={styles.stepGuide}>
               <div className={styles.step}>
                 <div className={styles.stepNumber}>1</div>
@@ -424,7 +424,7 @@ export default function EficienciaEnergeticaPage() {
             </div>
 
             {/* Tabla comparativa sistemas de calefacción */}
-            <h3>⚖️ Comparativa: sistemas de calefacción</h3>
+            <h3><span aria-hidden="true">⚖️</span> Comparativa: sistemas de calefacción</h3>
             <div className={styles.tableWrapper}>
               <table className={styles.comparativaTable}>
                 <thead>
@@ -477,7 +477,7 @@ export default function EficienciaEnergeticaPage() {
             </div>
 
             {/* Casos de uso */}
-            <h3>💼 Escenarios habituales</h3>
+            <h3><span aria-hidden="true">💼</span> Escenarios habituales</h3>
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
@@ -534,7 +534,7 @@ export default function EficienciaEnergeticaPage() {
             </div>
 
             {/* Mejores prácticas */}
-            <h3>✅ Claves para maximizar el retorno de tu inversión</h3>
+            <h3><span aria-hidden="true">✅</span> Claves para maximizar el retorno de tu inversión</h3>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
                 <span className={styles.tipIcon}>📋</span>
@@ -571,7 +571,7 @@ export default function EficienciaEnergeticaPage() {
             {/* Warning box */}
             <div className={styles.warningBoxV2}>
               <div className={styles.warningHeader}>
-                <span>⚠️</span>
+                <span aria-hidden="true">⚠️</span>
                 <span>Errores que reducen el retorno de tu inversión</span>
               </div>
               <ul className={styles.warningList}>
@@ -584,7 +584,7 @@ export default function EficienciaEnergeticaPage() {
             </div>
 
             {/* FAQ */}
-            <h3>❓ Preguntas frecuentes</h3>
+            <h3><span aria-hidden="true">❓</span> Preguntas frecuentes</h3>
             <div className={styles.faqList}>
               <div className={styles.faqItem}>
                 <strong>¿Cuánto cuesta aislar el tejado de una casa de 100 m²?</strong>

@@ -344,8 +344,10 @@ export default function CalculadoraGastoEnergeticoPage() {
             {categorias.map(cat => (
               <button
                 key={cat}
+                type="button"
                 className={`${styles.categoriaBtn} ${categoriaFiltro === cat ? styles.active : ''}`}
                 onClick={() => setCategoriaFiltro(cat)}
+                aria-pressed={categoriaFiltro === cat}
               >
                 {cat}
               </button>
@@ -356,20 +358,22 @@ export default function CalculadoraGastoEnergeticoPage() {
             {presetsFiltrados.map((preset, index) => (
               <button
                 key={index}
+                type="button"
                 className={styles.presetCard}
                 onClick={() => añadirDesdePreset(preset)}
                 title={`${preset.potencia}W - ${preset.horasTypicas}h/día típico`}
               >
-                <span className={styles.presetIcon}>{preset.icono}</span>
+                <span className={styles.presetIcon} aria-hidden="true">{preset.icono}</span>
                 <span className={styles.presetNombre}>{preset.nombre}</span>
                 <span className={styles.presetPotencia}>{preset.potencia}W</span>
               </button>
             ))}
             <button
+              type="button"
               className={`${styles.presetCard} ${styles.presetCustom}`}
               onClick={añadirPersonalizado}
             >
-              <span className={styles.presetIcon}>➕</span>
+              <span className={styles.presetIcon} aria-hidden="true">➕</span>
               <span className={styles.presetNombre}>Personalizado</span>
             </button>
           </div>
@@ -381,8 +385,8 @@ export default function CalculadoraGastoEnergeticoPage() {
         <div className={styles.listaPanel}>
           <div className={styles.listaHeader}>
             <h2>Tu consumo ({electrodomesticos.length} aparatos)</h2>
-            <button onClick={limpiarTodo} className={styles.limpiarBtn}>
-              🗑️ Limpiar todo
+            <button type="button" onClick={limpiarTodo} className={styles.limpiarBtn}>
+              <span aria-hidden="true">🗑️</span> Limpiar todo
             </button>
           </div>
 
@@ -405,8 +409,8 @@ export default function CalculadoraGastoEnergeticoPage() {
                       className={styles.nombreInput}
                     />
                     <div className={styles.electrodomesticoActions}>
-                      <button onClick={() => duplicarElectrodomestico(e.id)} title="Duplicar">📋</button>
-                      <button onClick={() => eliminarElectrodomestico(e.id)} title="Eliminar">❌</button>
+                      <button type="button" onClick={() => duplicarElectrodomestico(e.id)} title="Duplicar">📋</button>
+                      <button type="button" onClick={() => eliminarElectrodomestico(e.id)} title="Eliminar">❌</button>
                     </div>
                   </div>
 
@@ -473,25 +477,25 @@ export default function CalculadoraGastoEnergeticoPage() {
 
         <div className={styles.resultadosGrid}>
           <div className={styles.resultadoCard}>
-            <span className={styles.resultadoIcon}>⚡</span>
+            <span className={styles.resultadoIcon} aria-hidden="true">⚡</span>
             <span className={styles.resultadoLabel}>Consumo total</span>
             <span className={styles.resultadoValor}>{formatNumber(calculos.consumoTotal, 2)} kWh</span>
           </div>
 
           <div className={styles.resultadoCard}>
-            <span className={styles.resultadoIcon}>💡</span>
+            <span className={styles.resultadoIcon} aria-hidden="true">💡</span>
             <span className={styles.resultadoLabel}>Coste energía</span>
             <span className={styles.resultadoValor}>{formatCurrency(calculos.costeEnergia)}</span>
           </div>
 
           <div className={styles.resultadoCard}>
-            <span className={styles.resultadoIcon}>🔌</span>
+            <span className={styles.resultadoIcon} aria-hidden="true">🔌</span>
             <span className={styles.resultadoLabel}>Término potencia</span>
             <span className={styles.resultadoValor}>{formatCurrency(calculos.terminoPotencia)}</span>
           </div>
 
           <div className={`${styles.resultadoCard} ${styles.destacado}`}>
-            <span className={styles.resultadoIcon}>📄</span>
+            <span className={styles.resultadoIcon} aria-hidden="true">📄</span>
             <span className={styles.resultadoLabel}>Total factura (IVA incl.)</span>
             <span className={styles.resultadoValor}>{formatCurrency(calculos.total)}</span>
           </div>
@@ -609,7 +613,7 @@ export default function CalculadoraGastoEnergeticoPage() {
           <h2>Consejos para ahorrar energía</h2>
           <div className={styles.tipsList}>
             <div className={styles.tip}>
-              <span className={styles.tipIcon}>❄️</span>
+              <span className={styles.tipIcon} aria-hidden="true">❄️</span>
               <div>
                 <h4>Climatización eficiente</h4>
                 <p>Cada grado menos en calefacción o más en aire acondicionado ahorra un 7% de energía.
@@ -617,7 +621,7 @@ export default function CalculadoraGastoEnergeticoPage() {
               </div>
             </div>
             <div className={styles.tip}>
-              <span className={styles.tipIcon}>💡</span>
+              <span className={styles.tipIcon} aria-hidden="true">💡</span>
               <div>
                 <h4>Cambia a LED</h4>
                 <p>Una bombilla LED consume 10 veces menos que una incandescente y dura 25 veces más.
@@ -625,7 +629,7 @@ export default function CalculadoraGastoEnergeticoPage() {
               </div>
             </div>
             <div className={styles.tip}>
-              <span className={styles.tipIcon}>🔌</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔌</span>
               <div>
                 <h4>Elimina el standby</h4>
                 <p>Los aparatos en standby consumen hasta un 10% de tu factura. Usa regletas con
@@ -633,7 +637,7 @@ export default function CalculadoraGastoEnergeticoPage() {
               </div>
             </div>
             <div className={styles.tip}>
-              <span className={styles.tipIcon}>🧺</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧺</span>
               <div>
                 <h4>Lavadora en frío</h4>
                 <p>El 90% de la energía de la lavadora se usa para calentar el agua.
@@ -641,7 +645,7 @@ export default function CalculadoraGastoEnergeticoPage() {
               </div>
             </div>
             <div className={styles.tip}>
-              <span className={styles.tipIcon}>🌙</span>
+              <span className={styles.tipIcon} aria-hidden="true">🌙</span>
               <div>
                 <h4>Aprovecha las horas valle</h4>
                 <p>Con tarifa PVPC, programa lavadora, lavavajillas y carga de vehículo eléctrico
@@ -751,7 +755,7 @@ export default function CalculadoraGastoEnergeticoPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏠</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏠</span>
                 <h4>Piso pequeño (2 personas)</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -764,7 +768,7 @@ export default function CalculadoraGastoEnergeticoPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👨‍👩‍👧‍👦</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👨‍👩‍👧‍👦</span>
                 <h4>Casa familiar (4 personas)</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -777,7 +781,7 @@ export default function CalculadoraGastoEnergeticoPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>❄️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">❄️</span>
                 <h4>Hogar con climatización</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -790,7 +794,7 @@ export default function CalculadoraGastoEnergeticoPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🌙</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🌙</span>
                 <h4>Aprovechamiento hora valle</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -974,7 +978,7 @@ export default function CalculadoraGastoEnergeticoPage() {
           <h2>✅ Mejores Prácticas de Ahorro Energético</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>❄️</span>
+              <span className={styles.tipIcon} aria-hidden="true">❄️</span>
               <h4>Climatización inteligente</h4>
               <p>
                 Cada grado menos de A/C en verano (o más de calefacción en invierno) ahorra un 7%
@@ -982,7 +986,7 @@ export default function CalculadoraGastoEnergeticoPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧊</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧊</span>
               <h4>Frigorífico optimizado</h4>
               <p>
                 La nevera representa el 15% de la factura y funciona las 24 horas. Mantén la
@@ -991,7 +995,7 @@ export default function CalculadoraGastoEnergeticoPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧺</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧺</span>
               <h4>Lavadora en 30°C</h4>
               <p>
                 El 90% de la energía de la lavadora se usa para calentar el agua. Lavar a 30°C
@@ -1000,7 +1004,7 @@ export default function CalculadoraGastoEnergeticoPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔴</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔴</span>
               <h4>Standby: el ladrón silencioso</h4>
               <p>
                 Los aparatos en modo standby (piloto rojo encendido) pueden suponer el 10% de tu
@@ -1009,7 +1013,7 @@ export default function CalculadoraGastoEnergeticoPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <h4>Compara ofertas cada 12 meses</h4>
               <p>
                 El mercado libre cambia constantemente. Comparar ofertas anualmente usando
@@ -1018,7 +1022,7 @@ export default function CalculadoraGastoEnergeticoPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🤝</span>
+              <span className={styles.tipIcon} aria-hidden="true">🤝</span>
               <h4>Bono Social Eléctrico</h4>
               <p>
                 Si cumples los requisitos (pensionista, familia numerosa, desempleado, discapacidad

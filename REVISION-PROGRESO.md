@@ -790,7 +790,7 @@
 | [x] | Selector de Tipo de Televisión | `/selector-tipo-television/` | tecnicas, productividad |
 | [x] | Selector de Vehículo Eléctrico | `/selector-vehiculo-electrico/` | tecnicas, finanzas |
 | [x] | Sonómetro / Decibelímetro | `/sonometro/` | tecnicas |
-| [ ] | Tokenizador Visual de IA | `/tokenizador-ia/` | tecnicas, productividad |
+| [x] | Tokenizador Visual de IA | `/tokenizador-ia/` | tecnicas, productividad |
 
 ## Inmobiliaria y Hogar (`inmobiliaria`) — 46 apps
 
@@ -799,9 +799,9 @@
 | [x] | Amortización Anticipada Hipoteca | `/amortizacion-hipoteca/` | inmobiliaria, finanzas |
 | [x] | Calculadora Consumo Combustible | `/calculadora-combustible/` | inmobiliaria, finanzas, viajes |
 | [x] | Calculadora de Cocina | `/calculadora-cocina/` | inmobiliaria, cultura |
-| [ ] | Calculadora de Eficiencia Energética | `/calculadora-eficiencia-energetica/` | inmobiliaria, finanzas |
-| [ ] | Calculadora de Gasto Energético | `/calculadora-gasto-energetico/` | inmobiliaria, finanzas |
-| [ ] | Calculadora de Materiales de Construcción | `/calculadora-materiales-construccion/` | inmobiliaria |
+| [x] | Calculadora de Eficiencia Energética | `/calculadora-eficiencia-energetica/` | inmobiliaria, finanzas |
+| [x] | Calculadora de Gasto Energético | `/calculadora-gasto-energetico/` | inmobiliaria, finanzas |
+| [x] | Calculadora de Materiales de Construcción | `/calculadora-materiales-construccion/` | inmobiliaria |
 | [x] | Calculadora de Pintura | `/calculadora-pintura/` | inmobiliaria |
 | [ ] | Calculadora de Piscinas | `/calculadora-piscinas/` | inmobiliaria |
 | [x] | Calculadora de Suscripciones | `/calculadora-suscripciones/` | inmobiliaria, finanzas |

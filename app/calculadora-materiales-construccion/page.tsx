@@ -204,7 +204,7 @@ export default function CalculadoraMaterialesPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🧱 Calculadora de Materiales de Construcción</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🧱</span> Calculadora de Materiales de Construcción</h1>
           <p className={styles.subtitle}>
             Calcula azulejos, pintura, tarima y mortero con desperdicio incluido
           </p>
@@ -385,12 +385,12 @@ export default function CalculadoraMaterialesPage() {
                   <input id="m-precio" type="text" inputMode="decimal" className={styles.input} placeholder="12,00" value={mPrecio} onChange={e => setMPrecio(e.target.value)} />
                 </div>
                 <div className={styles.warningBox} role="note">
-                  💡 El consumo real puede variar según la planitud del soporte y el grosor de aplicación.
+                  <span aria-hidden="true">💡</span> El consumo real puede variar según la planitud del soporte y el grosor de aplicación.
                 </div>
               </>
             )}
 
-            <button onClick={calcular} className={styles.btnPrimary} aria-label="Calcular materiales necesarios">
+            <button type="button" onClick={calcular} className={styles.btnPrimary} aria-label="Calcular materiales necesarios">
               Calcular materiales
             </button>
           </div>
@@ -409,7 +409,7 @@ export default function CalculadoraMaterialesPage() {
               </div>
             ) : (
               <div className={styles.emptyState} aria-label="Sin resultados aún">
-                <p>🧮 Introduce los datos y pulsa <strong>Calcular materiales</strong></p>
+                <p><span aria-hidden="true">🧮</span> Introduce los datos y pulsa <strong>Calcular materiales</strong></p>
                 <p style={{ marginTop: '0.5rem', fontSize: '0.85rem' }}>Los resultados incluirán desperdicio y coste opcional.</p>
               </div>
             )}
@@ -435,7 +435,7 @@ export default function CalculadoraMaterialesPage() {
             </p>
 
             {/* Guía paso a paso */}
-            <h3>📋 Guía paso a paso para calcular materiales</h3>
+            <h3><span aria-hidden="true">📋</span> Guía paso a paso para calcular materiales</h3>
             <div className={styles.stepGuide}>
               <div className={styles.step}>
                 <div className={styles.stepNumber}>1</div>
@@ -482,7 +482,7 @@ export default function CalculadoraMaterialesPage() {
             </div>
 
             {/* Tabla comparativa de desperdicios */}
-            <h3>⚖️ Comparativa: ¿qué porcentaje de desperdicio usar?</h3>
+            <h3><span aria-hidden="true">⚖️</span> Comparativa: ¿qué porcentaje de desperdicio usar?</h3>
             <div className={styles.tableWrapper}>
               <table className={styles.comparativaTable}>
                 <thead>
@@ -529,11 +529,11 @@ export default function CalculadoraMaterialesPage() {
             </div>
 
             {/* Casos de uso */}
-            <h3>💼 Casos de uso habituales</h3>
+            <h3><span aria-hidden="true">💼</span> Casos de uso habituales</h3>
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🛁</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🛁</span>
                   <strong>Reformar un baño completo</strong>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -545,7 +545,7 @@ export default function CalculadoraMaterialesPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🛋️</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🛋️</span>
                   <strong>Pintar un salón-cocina abierto</strong>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -556,7 +556,7 @@ export default function CalculadoraMaterialesPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🪵</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🪵</span>
                   <strong>Tarima flotante en toda la planta</strong>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -567,7 +567,7 @@ export default function CalculadoraMaterialesPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🏡</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🏡</span>
                   <strong>Terrazas y exteriores</strong>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -579,35 +579,35 @@ export default function CalculadoraMaterialesPage() {
             </div>
 
             {/* Mejores prácticas */}
-            <h3>✅ Mejores prácticas de compra</h3>
+            <h3><span aria-hidden="true">✅</span> Mejores prácticas de compra</h3>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🔢</span>
+                <span className={styles.tipIcon} aria-hidden="true">🔢</span>
                 <strong>Redondea siempre hacia arriba</strong>
                 <p>Si necesitas 7,3 cajas, compra 8. Nunca redondees hacia abajo: quedarte sin material a mitad de obra es mucho más caro que tener una caja de sobra.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🏷️</span>
+                <span className={styles.tipIcon} aria-hidden="true">🏷️</span>
                 <strong>Verifica el número de lote</strong>
                 <p>El lote (shade/calibre) garantiza tono uniforme. Pide al vendedor que compruebe que todas las cajas son del mismo lote antes de facturar.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📦</span>
+                <span className={styles.tipIcon} aria-hidden="true">📦</span>
                 <strong>Compra el mortero al final</strong>
                 <p>El consumo real de mortero depende de la obra. Compra el 80% inicial y el resto al avanzar. Los sacos abiertos absorben humedad y pierden resistencia.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🎨</span>
+                <span className={styles.tipIcon} aria-hidden="true">🎨</span>
                 <strong>Pide muestra física de pintura</strong>
                 <p>El color en pantalla puede diferir hasta un 20% del real. Pide una muestra o compra el bote más pequeño disponible antes de pintar toda la habitación.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📏</span>
+                <span className={styles.tipIcon} aria-hidden="true">📏</span>
                 <strong>Mide dos veces, compra una</strong>
                 <p>Mide la habitación en al menos 2 puntos distintos. Las habitaciones raramente son perfectamente cuadradas y la diferencia puede ser de 5–10 cm.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🏪</span>
+                <span className={styles.tipIcon} aria-hidden="true">🏪</span>
                 <strong>Consulta la política de devolución</strong>
                 <p>Muchas tiendas de materiales aceptan devolución de material no abierto. Si compras 1-2 cajas extra y sobran, puedes devolverlas sin coste.</p>
               </div>
@@ -616,30 +616,30 @@ export default function CalculadoraMaterialesPage() {
             {/* Warning box */}
             <div className={styles.warningBoxV2}>
               <div className={styles.warningHeader}>
-                <span>⚠️</span>
+                <span aria-hidden="true">⚠️</span>
                 <span>Errores comunes que encarecen la reforma</span>
               </div>
               <ul className={styles.warningList}>
-                <li><strong>❌ Calcular sin desperdicio:</strong> Olvidar los cortes puede suponer quedarte corto en un 8–20%. Comprar material adicional de otra partida puede no coincidir en tono o calibre.</li>
-                <li><strong>❌ Comprar de distintos lotes:</strong> Aunque el modelo sea idéntico, lotes distintos pueden tener variaciones de color visibles. Pide siempre el mismo número de lote.</li>
-                <li><strong>❌ Usar adhesivo estándar en exteriores:</strong> El adhesivo C1 no está diseñado para ciclos de temperatura extremos. En terrazas y exteriores usa siempre C2TE o superior.</li>
-                <li><strong>❌ Pintar sobre superficie sin preparar:</strong> Pintar sobre humedad, polvo o paredes desconchadas reduce la vida útil a menos de 2 años. Imprimación y saneado previo son imprescindibles.</li>
-                <li><strong>❌ Comprar la tarima sin aclimatarla:</strong> La tarima debe reposar 48 h en la habitación donde se va a instalar para adaptarse a la temperatura y humedad del ambiente.</li>
+                <li><strong><span aria-hidden="true">❌</span> Calcular sin desperdicio:</strong> Olvidar los cortes puede suponer quedarte corto en un 8–20%. Comprar material adicional de otra partida puede no coincidir en tono o calibre.</li>
+                <li><strong><span aria-hidden="true">❌</span> Comprar de distintos lotes:</strong> Aunque el modelo sea idéntico, lotes distintos pueden tener variaciones de color visibles. Pide siempre el mismo número de lote.</li>
+                <li><strong><span aria-hidden="true">❌</span> Usar adhesivo estándar en exteriores:</strong> El adhesivo C1 no está diseñado para ciclos de temperatura extremos. En terrazas y exteriores usa siempre C2TE o superior.</li>
+                <li><strong><span aria-hidden="true">❌</span> Pintar sobre superficie sin preparar:</strong> Pintar sobre humedad, polvo o paredes desconchadas reduce la vida útil a menos de 2 años. Imprimación y saneado previo son imprescindibles.</li>
+                <li><strong><span aria-hidden="true">❌</span> Comprar la tarima sin aclimatarla:</strong> La tarima debe reposar 48 h en la habitación donde se va a instalar para adaptarse a la temperatura y humedad del ambiente.</li>
               </ul>
             </div>
 
             {/* FAQ */}
-            <h3>❓ Preguntas frecuentes</h3>
+            <h3><span aria-hidden="true">❓</span> Preguntas frecuentes</h3>
             <div className={styles.faqList}>
               <div className={styles.faqItem}>
                 <strong>¿Cuántas cajas de azulejos necesito para un baño estándar?</strong>
                 <p>Un baño de 4–6 m² de suelo y 20–25 m² de pared necesita aproximadamente 5–8 cajas para el suelo y 35–45 cajas para las paredes, dependiendo del formato del azulejo y el porcentaje de desperdicio. Usa la calculadora introduciendo las dimensiones exactas para un cálculo preciso.</p>
-                <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Para baños pequeños con muchos recortes alrededor de sanitarios, añade un 15% de desperdicio en lugar del 10% estándar.</p>
+                <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Consejo:</strong> Para baños pequeños con muchos recortes alrededor de sanitarios, añade un 15% de desperdicio en lugar del 10% estándar.</p>
               </div>
               <div className={styles.faqItem}>
                 <strong>¿Cuántos litros de pintura necesito para una habitación de 12 m²?</strong>
                 <p>Una habitación de 3×4 m con 2,5 m de altura tiene aproximadamente 35 m² de paredes netas (descontando puerta y ventana) más 12 m² de techo. Con 2 manos y rendimiento de 10 m²/L, necesitas unos 9,4 L → 2 botes de 5 L.</p>
-                <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Si pintas sobre un color oscuro, aplica primero una mano de pintura de imprimación o selladora para evitar que el color anterior traspase.</p>
+                <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Consejo:</strong> Si pintas sobre un color oscuro, aplica primero una mano de pintura de imprimación o selladora para evitar que el color anterior traspase.</p>
               </div>
               <div className={styles.faqItem}>
                 <strong>¿Qué es el &quot;calibre&quot; de los azulejos y cómo afecta al cálculo?</strong>
@@ -648,7 +648,7 @@ export default function CalculadoraMaterialesPage() {
               <div className={styles.faqItem}>
                 <strong>¿Cuántos sacos de mortero necesito para alicatar 20 m²?</strong>
                 <p>Para azulejos cerámicos en interiores con adhesivo flexible (C2): aproximadamente 4,5 kg/m² × 20 m² = 90 kg → 4 sacos de 25 kg. En exteriores o con soportes irregulares, puede subir a 6 kg/m² → 5 sacos.</p>
-                <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Compra 1 saco extra. El mortero sobrante sellado en bolsa puede conservarse 3–6 meses en lugar seco.</p>
+                <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Consejo:</strong> Compra 1 saco extra. El mortero sobrante sellado en bolsa puede conservarse 3–6 meses en lugar seco.</p>
               </div>
               <div className={styles.faqItem}>
                 <strong>¿Puedo instalar tarima sobre tarima existente?</strong>

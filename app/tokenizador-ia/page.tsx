@@ -131,11 +131,11 @@ export default function TokenizadorIa() {
         {/* Ejemplos rápidos */}
         <div className={styles.ejemplosRow} role="group" aria-label="Ejemplos rápidos">
           {EJEMPLOS.map((ej) => (
-            <button key={ej.etiqueta} className={styles.ejemploBtn} onClick={() => handleEjemplo(ej.texto)}>
-              {ej.etiqueta}
+            <button key={ej.etiqueta} type="button" className={styles.ejemploBtn} onClick={() => handleEjemplo(ej.texto)}>
+              <span aria-hidden="true">{ej.etiqueta.split(' ')[0]}</span>{' '}{ej.etiqueta.split(' ').slice(1).join(' ')}
             </button>
           ))}
-          <button className={styles.ejemploBtn} onClick={() => setTexto('')}>🗑️ Limpiar</button>
+          <button type="button" className={styles.ejemploBtn} onClick={() => setTexto('')}><span aria-hidden="true">🗑️</span> Limpiar</button>
         </div>
 
         {/* Textarea */}
@@ -272,8 +272,8 @@ export default function TokenizadorIa() {
             Precios en USD por millón de tokens (input / output). Sin IVA. Tipo de cambio variable — consulta precios actuales en cada web oficial.
           </p>
 
-          <button className={styles.editarBtn} onClick={() => setEditandoPrecios((p) => !p)} aria-expanded={editandoPrecios}>
-            {editandoPrecios ? '▲ Ocultar editor de precios' : '✏️ Editar precios'}
+          <button type="button" className={styles.editarBtn} onClick={() => setEditandoPrecios((p) => !p)} aria-expanded={editandoPrecios}>
+            {editandoPrecios ? '▲ Ocultar editor de precios' : <><span aria-hidden="true">✏️</span>{' Editar precios'}</>}
           </button>
 
           {editandoPrecios && (
@@ -282,7 +282,7 @@ export default function TokenizadorIa() {
               <div className={styles.editorGrid}>
                 {modelos.map((m) => (
                   <div key={m.id} className={styles.editorCard}>
-                    <p className={styles.editorModeloNombre}>{m.icono} {m.nombre}</p>
+                    <p className={styles.editorModeloNombre}><span aria-hidden="true">{m.icono}</span> {m.nombre}</p>
                     <div className={styles.editorInputRow}>
                       <label htmlFor={`entrada-${m.id}`} className={styles.editorInputLabel}>Entrada ($/1M)</label>
                       <input id={`entrada-${m.id}`} type="number" min="0" step="0.01" className={styles.editorInput}
@@ -296,8 +296,8 @@ export default function TokenizadorIa() {
                   </div>
                 ))}
               </div>
-              <button className={styles.restaurarBtn} onClick={restaurarDefecto}>
-                🔄 Restaurar precios por defecto (junio 2026)
+              <button type="button" className={styles.restaurarBtn} onClick={restaurarDefecto}>
+                <span aria-hidden="true">🔄</span> Restaurar precios por defecto (junio 2026)
               </button>
             </div>
           )}
