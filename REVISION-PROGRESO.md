@@ -716,10 +716,10 @@
 | [x] | Orientador Facturación y Retenciones | `/orientador-facturacion-retencion/` | freelance, finanzas |
 | [x] | Orientador Tarifa Freelance | `/orientador-tarifa-freelance/` | freelance |
 | [x] | Planificador Cash Flow | `/planificador-cashflow/` | freelance |
-| [ ] | Planificador de Vacaciones para Autónomos | `/planificador-vacaciones-autonomo/` | freelance, productividad |
-| [ ] | Planificador Trimestral para Autónomos | `/planificador-trimestres-freelance/` | freelance, productividad |
-| [ ] | Selector de Financiación Empresarial | `/selector-financiacion-empresa/` | freelance, finanzas |
-| [ ] | Selector de Forma Jurídica | `/selector-forma-juridica/` | freelance, finanzas |
+| [x] | Planificador de Vacaciones para Autónomos | `/planificador-vacaciones-autonomo/` | freelance, productividad |
+| [x] | Planificador Trimestral para Autónomos | `/planificador-trimestres-freelance/` | freelance, productividad |
+| [x] | Selector de Financiación Empresarial | `/selector-financiacion-empresa/` | freelance, finanzas |
+| [x] | Selector de Forma Jurídica | `/selector-forma-juridica/` | freelance, finanzas |
 | [ ] | Selector de Modelo de Negocio | `/selector-modelo-negocio/` | freelance, finanzas, productividad |
 | [ ] | Selector de Tipo de Contrato | `/selector-contrato-trabajo/` | freelance, productividad |
 | [x] | Selector Régimen Fiscal Autónomo | `/selector-regimen-fiscal-autonomo/` | freelance, finanzas |

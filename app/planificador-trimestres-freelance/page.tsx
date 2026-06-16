@@ -276,11 +276,12 @@ export default function PlanificadorTrimestresFreelancePage() {
             </div>
           </div>
           <button
+            type="button"
             className={styles.btnEqualize}
             onClick={repartirEquitativo}
             aria-label="Repartir el objetivo equitativamente entre los 4 trimestres"
           >
-            ⚖️ Repartir equitativamente
+            <span aria-hidden="true">⚖️</span> Repartir equitativamente
           </button>
         </section>
 
@@ -344,9 +345,9 @@ export default function PlanificadorTrimestresFreelancePage() {
                 <div key={idx} className={styles.monthColumn}>
                   <div className={styles.monthIcons}>
                     {mes.esFiscal && (
-                      <span title="Mes de presentación de modelos fiscales">📅</span>
+                      <span aria-hidden="true" title="Mes de presentación de modelos fiscales">📅</span>
                     )}
-                    {mes.esAlerta && <span title="Mes crítico">⚠️</span>}
+                    {mes.esAlerta && <span aria-hidden="true" title="Mes crítico">⚠️</span>}
                   </div>
                   <div className={styles.monthAmount}>
                     {mes.ingresos > 0 ? formatNumber(mes.ingresos / 1000, 1) + 'k' : '—'}
@@ -443,7 +444,7 @@ export default function PlanificadorTrimestresFreelancePage() {
               {/* Info fiscal */}
               <div className={styles.cardFiscal}>
                 <div className={styles.fiscalDate}>
-                  <span aria-hidden="true">📅</span> Presentación: {tri.fechaModelo}
+                  <span aria-hidden="true">📅</span>{' '}Presentación: {tri.fechaModelo}
                 </div>
                 <ul className={styles.fiscalModelos}>
                   {tri.modelos.map((modelo) => (
