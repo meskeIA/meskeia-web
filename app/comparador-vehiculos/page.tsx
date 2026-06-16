@@ -324,7 +324,7 @@ export default function ComparadorVehiculosPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🚗 Comparador de Compra de Vehículos</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🚗</span> Comparador de Compra de Vehículos</h1>
         <p className={styles.subtitle}>
           Contado vs Financiación vs Renting vs Leasing: descubre cuál te conviene más
         </p>
@@ -337,12 +337,13 @@ export default function ComparadorVehiculosPage() {
         <div className={styles.inputPanel}>
           {/* Perfil del usuario */}
           <div className={styles.seccion}>
-            <h2 className={styles.seccionTitulo}>👤 Tu perfil</h2>
+            <h2 className={styles.seccionTitulo}><span aria-hidden="true">👤</span> Tu perfil</h2>
             <div className={styles.perfilBtns}>
               <button
                 type="button"
                 className={`${styles.perfilBtn} ${perfil === 'particular' ? styles.activo : ''}`}
                 onClick={() => setPerfil('particular')}
+                aria-pressed={perfil === 'particular'}
               >
                 Particular
               </button>
@@ -350,6 +351,7 @@ export default function ComparadorVehiculosPage() {
                 type="button"
                 className={`${styles.perfilBtn} ${perfil === 'autonomo' ? styles.activo : ''}`}
                 onClick={() => setPerfil('autonomo')}
+                aria-pressed={perfil === 'autonomo'}
               >
                 Autónomo
               </button>
@@ -357,20 +359,21 @@ export default function ComparadorVehiculosPage() {
                 type="button"
                 className={`${styles.perfilBtn} ${perfil === 'empresa' ? styles.activo : ''}`}
                 onClick={() => setPerfil('empresa')}
+                aria-pressed={perfil === 'empresa'}
               >
                 Empresa
               </button>
             </div>
             {perfil !== 'particular' && (
               <p className={styles.infoFiscal}>
-                💡 Se calculará el ahorro fiscal en renting y leasing
+                <span aria-hidden="true">💡</span> Se calculará el ahorro fiscal en renting y leasing
               </p>
             )}
           </div>
 
           {/* Datos del vehículo */}
           <div className={styles.seccion}>
-            <h2 className={styles.seccionTitulo}>🚙 Datos del vehículo</h2>
+            <h2 className={styles.seccionTitulo}><span aria-hidden="true">🚙</span> Datos del vehículo</h2>
             <div className={styles.inputGrid}>
               <NumberInput
                 value={vehiculo.precioVenta}
@@ -404,7 +407,7 @@ export default function ComparadorVehiculosPage() {
 
           {/* Selector de opciones */}
           <div className={styles.seccion}>
-            <h2 className={styles.seccionTitulo}>📋 Opciones a comparar</h2>
+            <h2 className={styles.seccionTitulo}><span aria-hidden="true">📋</span> Opciones a comparar</h2>
             <div className={styles.opcionesToggle}>
               <label className={styles.toggleLabel}>
                 <input
@@ -412,7 +415,7 @@ export default function ComparadorVehiculosPage() {
                   checked={opcionesActivas.contado}
                   onChange={() => toggleOpcion('contado')}
                 />
-                <span className={styles.toggleText}>💵 Contado</span>
+                <span className={styles.toggleText}><span aria-hidden="true">💵</span> Contado</span>
               </label>
               <label className={styles.toggleLabel}>
                 <input
@@ -420,7 +423,7 @@ export default function ComparadorVehiculosPage() {
                   checked={opcionesActivas.financiacion}
                   onChange={() => toggleOpcion('financiacion')}
                 />
-                <span className={styles.toggleText}>🏦 Financiación</span>
+                <span className={styles.toggleText}><span aria-hidden="true">🏦</span> Financiación</span>
               </label>
               <label className={styles.toggleLabel}>
                 <input
@@ -428,7 +431,7 @@ export default function ComparadorVehiculosPage() {
                   checked={opcionesActivas.renting}
                   onChange={() => toggleOpcion('renting')}
                 />
-                <span className={styles.toggleText}>🔄 Renting</span>
+                <span className={styles.toggleText}><span aria-hidden="true">🔄</span> Renting</span>
               </label>
               <label className={styles.toggleLabel}>
                 <input
@@ -436,7 +439,7 @@ export default function ComparadorVehiculosPage() {
                   checked={opcionesActivas.leasing}
                   onChange={() => toggleOpcion('leasing')}
                 />
-                <span className={styles.toggleText}>📑 Leasing</span>
+                <span className={styles.toggleText}><span aria-hidden="true">📑</span> Leasing</span>
               </label>
             </div>
           </div>
@@ -444,7 +447,7 @@ export default function ComparadorVehiculosPage() {
           {/* Datos Financiación */}
           {opcionesActivas.financiacion && (
             <div className={styles.seccion}>
-              <h3 className={styles.opcionTitulo}>🏦 Financiación</h3>
+              <h3 className={styles.opcionTitulo}><span aria-hidden="true">🏦</span> Financiación</h3>
               <div className={styles.inputGrid}>
                 <NumberInput
                   value={financiacion.entrada}
@@ -477,7 +480,7 @@ export default function ComparadorVehiculosPage() {
           {/* Datos Renting */}
           {opcionesActivas.renting && (
             <div className={styles.seccion}>
-              <h3 className={styles.opcionTitulo}>🔄 Renting</h3>
+              <h3 className={styles.opcionTitulo}><span aria-hidden="true">🔄</span> Renting</h3>
               <div className={styles.inputGrid}>
                 <NumberInput
                   value={renting.cuotaMensual}
@@ -511,7 +514,7 @@ export default function ComparadorVehiculosPage() {
           {/* Datos Leasing */}
           {opcionesActivas.leasing && (
             <div className={styles.seccion}>
-              <h3 className={styles.opcionTitulo}>📑 Leasing</h3>
+              <h3 className={styles.opcionTitulo}><span aria-hidden="true">📑</span> Leasing</h3>
               <div className={styles.inputGrid}>
                 <NumberInput
                   value={leasing.cuotaMensual}
@@ -544,7 +547,7 @@ export default function ComparadorVehiculosPage() {
           {/* Gastos adicionales */}
           {(opcionesActivas.contado || opcionesActivas.financiacion || opcionesActivas.leasing) && (
             <div className={styles.seccion}>
-              <h3 className={styles.opcionTitulo}>💰 Gastos anuales (contado/financiación/leasing)</h3>
+              <h3 className={styles.opcionTitulo}><span aria-hidden="true">💰</span> Gastos anuales (contado/financiación/leasing)</h3>
               <p className={styles.infoGastos}>El renting ya incluye estos gastos en la cuota</p>
               <div className={styles.inputGrid}>
                 <NumberInput
@@ -591,7 +594,7 @@ export default function ComparadorVehiculosPage() {
 
               {/* Tabla comparativa */}
               <div className={styles.tablaWrapper}>
-                <h3 className={styles.tablaTitulo}>📊 Comparativa de costes</h3>
+                <h3 className={styles.tablaTitulo}><span aria-hidden="true">📊</span> Comparativa de costes</h3>
                 <table className={styles.tablaComparativa}>
                   <thead>
                     <tr>
@@ -684,7 +687,7 @@ export default function ComparadorVehiculosPage() {
               <span className={styles.placeholderIcon}>🚗</span>
               <p>Introduce el precio del vehículo y los datos de las opciones que quieras comparar</p>
               <p className={styles.placeholderTip}>
-                💡 Puedes pedir al concesionario los datos exactos de cada opción
+                <span aria-hidden="true">💡</span> Puedes pedir al concesionario los datos exactos de cada opción
               </p>
             </div>
           )}

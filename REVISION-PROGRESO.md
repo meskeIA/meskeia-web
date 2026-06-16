@@ -636,10 +636,10 @@
 | [x] | Checklist Coberturas de Seguros | `/checklist-coberturas-seguros/` | finanzas, cultura |
 | [x] | Ciclo Económico - Expansión, Recesión y Curva de Rendimientos | `/visualizador-ciclo-economico/` | finanzas, cultura, estudiantes |
 | [x] | Comercio Internacional - Ventaja Comparativa y Aranceles | `/visualizador-comercio-internacional/` | finanzas, cultura, estudiantes |
-| [ ] | Cómo Funciona un Banco | `/visualizador-como-funciona-banco/` | finanzas, cultura, estudiantes |
-| [ ] | Comparador Compra Vehículos | `/comparador-vehiculos/` | finanzas, inmobiliaria |
-| [ ] | Comparador Eléctrico vs Combustión | `/comparador-electrico/` | finanzas, inmobiliaria |
-| [ ] | Comparador Tipos de Seguros | `/comparador-tipos-seguros/` | finanzas, cultura |
+| [x] | Cómo Funciona un Banco | `/visualizador-como-funciona-banco/` | finanzas, cultura, estudiantes |
+| [x] | Comparador Compra Vehículos | `/comparador-vehiculos/` | finanzas, inmobiliaria |
+| [x] | Comparador Eléctrico vs Combustión | `/comparador-electrico/` | finanzas, inmobiliaria |
+| [x] | Comparador Tipos de Seguros | `/comparador-tipos-seguros/` | finanzas, cultura |
 | [ ] | Control de Gastos | `/control-gastos/` | finanzas |
 | [x] | Curso Decisiones de Inversión | `/curso-decisiones-inversion/` | finanzas, cultura |
 | [ ] | Desigualdad de la Riqueza - Curva de Lorenz y Coeficiente Gini | `/visualizador-desigualdad-riqueza/` | finanzas, cultura, estudiantes |

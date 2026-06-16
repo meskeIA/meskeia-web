@@ -220,7 +220,7 @@ export default function ComparadorTiposSegurosPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>📊</span>
+        <span className={styles.heroIcon} aria-hidden="true">📊</span>
         <h1 className={styles.title}>Comparador de Tipos de Seguros</h1>
         <p className={styles.subtitle}>
           Guía educativa para entender las diferencias entre seguros de vida, auto, hogar y salud en España
@@ -235,13 +235,14 @@ export default function ComparadorTiposSegurosPage() {
           <button
             key={cat}
             type="button"
+            aria-pressed={categoriaActiva === cat}
             className={`${styles.categoryBtn} ${categoriaActiva === cat ? styles.categoryBtnActive : ''}`}
             onClick={() => {
               setCategoriaActiva(cat);
               setTipoExpandido(null);
             }}
           >
-            <span className={styles.categoryIcon}>{segurosData[cat].icon}</span>
+            <span className={styles.categoryIcon} aria-hidden="true">{segurosData[cat].icon}</span>
             <span className={styles.categoryLabel}>{segurosData[cat].titulo}</span>
           </button>
         ))}
@@ -266,7 +267,7 @@ export default function ComparadorTiposSegurosPage() {
                 aria-expanded={tipoExpandido === tipo.nombre ? true : false}
               >
                 <div className={styles.tipoHeaderLeft}>
-                  <span className={styles.tipoIcon}>{tipo.icon}</span>
+                  <span className={styles.tipoIcon} aria-hidden="true">{tipo.icon}</span>
                   <h3 className={styles.tipoNombre}>{tipo.nombre}</h3>
                 </div>
                 <span className={styles.tipoToggle}>
@@ -284,7 +285,7 @@ export default function ComparadorTiposSegurosPage() {
               {tipoExpandido === tipo.nombre && (
                 <div className={styles.tipoDetalles}>
                   <div className={styles.detalleBloque}>
-                    <h4>✅ Coberturas principales</h4>
+                    <h4><span aria-hidden="true">✅</span> Coberturas principales</h4>
                     <ul>
                       {tipo.coberturas.map((cob, i) => (
                         <li key={i}>{cob}</li>
@@ -293,7 +294,7 @@ export default function ComparadorTiposSegurosPage() {
                   </div>
 
                   <div className={styles.detalleBloque}>
-                    <h4>👍 Ventajas</h4>
+                    <h4><span aria-hidden="true">👍</span> Ventajas</h4>
                     <ul className={styles.ventajasList}>
                       {tipo.ventajas.map((v, i) => (
                         <li key={i}>{v}</li>
@@ -302,7 +303,7 @@ export default function ComparadorTiposSegurosPage() {
                   </div>
 
                   <div className={styles.detalleBloque}>
-                    <h4>👎 Desventajas</h4>
+                    <h4><span aria-hidden="true">👎</span> Desventajas</h4>
                     <ul className={styles.desventajasList}>
                       {tipo.desventajas.map((d, i) => (
                         <li key={i}>{d}</li>
@@ -311,7 +312,7 @@ export default function ComparadorTiposSegurosPage() {
                   </div>
 
                   <div className={styles.detalleBloque}>
-                    <h4>🎯 Ideal para</h4>
+                    <h4><span aria-hidden="true">🎯</span> Ideal para</h4>
                     <ul className={styles.idealList}>
                       {tipo.idealPara.map((ip, i) => (
                         <li key={i}>{ip}</li>
@@ -336,7 +337,7 @@ export default function ComparadorTiposSegurosPage() {
 
       {/* Tabla comparativa rápida */}
       <div className={styles.tablaSection}>
-        <h2 className={styles.sectionTitle}>📋 Tabla Comparativa Rápida</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">📋</span> Tabla Comparativa Rápida</h2>
 
         {categoriaActiva === 'vida' && (
           <div className={styles.tablaWrapper}>
@@ -525,25 +526,25 @@ export default function ComparadorTiposSegurosPage() {
 
       {/* Consejos generales */}
       <div className={styles.consejosSection}>
-        <h2 className={styles.sectionTitle}>💡 Consejos para Elegir Seguro</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">💡</span> Consejos para Elegir Seguro</h2>
         <div className={styles.consejosGrid}>
           <div className={styles.consejoCard}>
-            <span className={styles.consejoIcon}>🔍</span>
+            <span className={styles.consejoIcon} aria-hidden="true">🔍</span>
             <h4>Compara varias ofertas</h4>
             <p>Pide presupuesto a 3-4 aseguradoras. Los precios varían mucho para el mismo perfil.</p>
           </div>
           <div className={styles.consejoCard}>
-            <span className={styles.consejoIcon}>📖</span>
+            <span className={styles.consejoIcon} aria-hidden="true">📖</span>
             <h4>Lee las exclusiones</h4>
             <p>Lo que NO cubre es tan importante como lo que cubre. Revisa la letra pequeña.</p>
           </div>
           <div className={styles.consejoCard}>
-            <span className={styles.consejoIcon}>💰</span>
+            <span className={styles.consejoIcon} aria-hidden="true">💰</span>
             <h4>No solo mires el precio</h4>
             <p>El seguro más barato puede salirte caro si tiene muchas exclusiones o franquicias altas.</p>
           </div>
           <div className={styles.consejoCard}>
-            <span className={styles.consejoIcon}>📅</span>
+            <span className={styles.consejoIcon} aria-hidden="true">📅</span>
             <h4>Revisa anualmente</h4>
             <p>Tu situación cambia. Revisa cada año si tu seguro sigue siendo el adecuado.</p>
           </div>
@@ -750,32 +751,32 @@ export default function ComparadorTiposSegurosPage() {
           <h2>Consejos para optimizar tus seguros</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔍</span>
               <strong>Compara cada año en la renovación</strong>
               <p>Los precios varían entre aseguradoras. Revisa en comparadores 30 días antes del vencimiento para negociar o cambiar con antelación suficiente.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📋</span>
+              <span className={styles.tipIcon} aria-hidden="true">📋</span>
               <strong>Lee siempre las exclusiones</strong>
               <p>Las exclusiones definen realmente para qué sirve el seguro. Un seguro barato con muchas exclusiones puede dejar sin cobertura el siniestro que más te preocupa.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <strong>Ajusta el capital asegurado</strong>
               <p>Ni de más ni de menos. Sobresegurar desperdicia dinero. Infrasegurar puede dejar el siniestro sin cubrir totalmente. Revisa el capital real necesario cada 3-5 años.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💰</span>
+              <span className={styles.tipIcon} aria-hidden="true">💰</span>
               <strong>Valora las franquicias</strong>
               <p>Aumentar la franquicia puede reducir la prima un 20-40%. Si tienes capacidad de asumir pequeños siniestros, las franquicias altas pueden ser muy rentables.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📦</span>
+              <span className={styles.tipIcon} aria-hidden="true">📦</span>
               <strong>Agrupa seguros con la misma aseguradora</strong>
               <p>Muchas aseguradoras ofrecen descuentos del 10-20% por tener varios seguros contratados (auto + hogar + vida). Negocia un descuento multiproducto.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚖️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
               <strong>Usa el defensor del asegurado</strong>
               <p>Si la aseguradora rechaza un siniestro injustamente, acude al Servicio de Atención al Cliente y luego a la DGSFP. El proceso es gratuito y suele resolver en tu favor.</p>
             </div>
@@ -785,7 +786,7 @@ export default function ComparadorTiposSegurosPage() {
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores frecuentes al contratar y gestionar seguros</strong>
           </div>
           <ul className={styles.warningList}>
