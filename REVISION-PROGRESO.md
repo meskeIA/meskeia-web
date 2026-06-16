@@ -469,10 +469,10 @@
 | [x] | Estructuras Cristalinas 3D - Celdas Unitarias Rotables | `/visualizador-estructuras-cristalinas/` | estudiantes, cultura |
 | [x] | Estructuras de Mercado: Monopolio, Oligopolio y Competencia | `/visualizador-estructuras-mercado/` | estudiantes, cultura |
 | [x] | Evolución Molecular: Relojes, Filogenética y Kimura | `/visualizador-evolucion-molecular/` | estudiantes, cultura |
-| [ ] | Exoplanetas: Tránsito, Zona Habitable y Kepler | `/visualizador-exoplanetas/` | estudiantes, cultura |
-| [ ] | Fases de la Luna y Eclipses | `/visualizador-fases-luna-eclipses/` | estudiantes, cultura |
-| [ ] | Fenómenos Meteorológicos - Del Cielo a la Tierra | `/visualizador-fenomenos-meteorologicos/` | estudiantes, cultura |
-| [ ] | Fibonacci en la Naturaleza | `/visualizador-fibonacci-naturaleza/` | estudiantes, cultura |
+| [x] | Exoplanetas: Tránsito, Zona Habitable y Kepler | `/visualizador-exoplanetas/` | estudiantes, cultura |
+| [x] | Fases de la Luna y Eclipses | `/visualizador-fases-luna-eclipses/` | estudiantes, cultura |
+| [x] | Fenómenos Meteorológicos - Del Cielo a la Tierra | `/visualizador-fenomenos-meteorologicos/` | estudiantes, cultura |
+| [x] | Fibonacci en la Naturaleza | `/visualizador-fibonacci-naturaleza/` | estudiantes, cultura |
 | [ ] | Fósiles y Tiempo Geológico | `/visualizador-fosiles-tiempo-geologico/` | estudiantes, cultura |
 | [ ] | Funciones que Gobiernan el Mundo | `/visualizador-funciones-mundo/` | estudiantes, cultura |
 | [ ] | Generador de Horarios de Estudio | `/generador-horarios-estudio/` | estudiantes |

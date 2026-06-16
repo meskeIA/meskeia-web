@@ -545,6 +545,7 @@ export default function VisualizadorExoplanetas() {
             {TIPOS_ESTELARES.map(t => (
               <button
                 key={t.id}
+                type="button"
                 className={`${styles.btnTipo} ${tipoEstrella === t.id ? styles.btnTipoActivo : ''}`}
                 onClick={() => setTipoEstrella(t.id)}
                 aria-pressed={tipoEstrella === t.id}

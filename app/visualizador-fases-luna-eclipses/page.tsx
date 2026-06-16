@@ -418,7 +418,7 @@ export default function VisualizadorFasesLunaEclipsesPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🌙 Fases de la Luna y Eclipses</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🌙</span> Fases de la Luna y Eclipses</h1>
           <p className={styles.subtitle}>La danza Sol-Tierra-Luna: fases, eclipses, mareas y curiosidades</p>
         </header>
 
@@ -429,6 +429,7 @@ export default function VisualizadorFasesLunaEclipsesPage() {
           {SECCIONES.map((s) => (
             <button
               key={s.id}
+              type="button"
               className={`${styles.navBtn} ${seccion === s.id ? styles.navActivo : ''}`}
               onClick={() => setSeccion(s.id)}
               aria-pressed={seccion === s.id}
@@ -500,6 +501,7 @@ export default function VisualizadorFasesLunaEclipsesPage() {
                 {FASES.map((f, i) => (
                   <button
                     key={i}
+                    type="button"
                     className={`${styles.faseBtn} ${i === faseIndex ? styles.faseBtnActivo : ''}`}
                     onClick={() => setFaseIndex(i)}
                     aria-pressed={i === faseIndex}
@@ -511,7 +513,7 @@ export default function VisualizadorFasesLunaEclipsesPage() {
               </div>
 
               <div className={styles.insight}>
-                <p><strong>💡 Rotación sincrónica:</strong> Siempre vemos la misma cara de la Luna porque tarda exactamente lo mismo en rotar sobre sí misma que en orbitar la Tierra (29,5 días). No es coincidencia: la gravedad terrestre &quot;frenó&quot; su rotación hasta acoplarla.</p>
+                <p><strong><span aria-hidden="true">💡</span> Rotación sincrónica:</strong> Siempre vemos la misma cara de la Luna porque tarda exactamente lo mismo en rotar sobre sí misma que en orbitar la Tierra (29,5 días). No es coincidencia: la gravedad terrestre &quot;frenó&quot; su rotación hasta acoplarla.</p>
               </div>
             </>
           )}
@@ -527,18 +529,20 @@ export default function VisualizadorFasesLunaEclipsesPage() {
               {/* Toggle solar/lunar */}
               <div className={styles.toggleEclipse}>
                 <button
+                  type="button"
                   className={`${styles.toggleBtn} ${tipoEclipse === 'solar' ? styles.toggleActivo : ''}`}
                   onClick={() => setTipoEclipse('solar')}
                   aria-pressed={tipoEclipse === 'solar'}
                 >
-                  🌑 Eclipse solar
+                  <span aria-hidden="true">🌑</span> Eclipse solar
                 </button>
                 <button
+                  type="button"
                   className={`${styles.toggleBtn} ${tipoEclipse === 'lunar' ? styles.toggleActivo : ''}`}
                   onClick={() => setTipoEclipse('lunar')}
                   aria-pressed={tipoEclipse === 'lunar'}
                 >
-                  🔴 Eclipse lunar
+                  <span aria-hidden="true">🔴</span> Eclipse lunar
                 </button>
               </div>
 
@@ -578,7 +582,7 @@ export default function VisualizadorFasesLunaEclipsesPage() {
               )}
 
               <div className={styles.insight}>
-                <p><strong>💡 Coincidencia cósmica:</strong> La Luna tiene exactamente el tamaño justo para cubrir el Sol visto desde la Tierra. El Sol es 400 veces más grande, pero está 400 veces más lejos. Esta coincidencia no ocurre en ningún otro planeta conocido.</p>
+                <p><strong><span aria-hidden="true">💡</span> Coincidencia cósmica:</strong> La Luna tiene exactamente el tamaño justo para cubrir el Sol visto desde la Tierra. El Sol es 400 veces más grande, pero está 400 veces más lejos. Esta coincidencia no ocurre en ningún otro planeta conocido.</p>
               </div>
             </>
           )}
@@ -594,18 +598,20 @@ export default function VisualizadorFasesLunaEclipsesPage() {
               {/* Toggle vivas/muertas */}
               <div className={styles.toggleEclipse}>
                 <button
+                  type="button"
                   className={`${styles.toggleBtn} ${tipoMarea === 'vivas' ? styles.toggleActivo : ''}`}
                   onClick={() => setTipoMarea('vivas')}
                   aria-pressed={tipoMarea === 'vivas'}
                 >
-                  🌊 Mareas vivas
+                  <span aria-hidden="true">🌊</span> Mareas vivas
                 </button>
                 <button
+                  type="button"
                   className={`${styles.toggleBtn} ${tipoMarea === 'muertas' ? styles.toggleActivo : ''}`}
                   onClick={() => setTipoMarea('muertas')}
                   aria-pressed={tipoMarea === 'muertas'}
                 >
-                  🌙 Mareas muertas
+                  <span aria-hidden="true">🌙</span> Mareas muertas
                 </button>
               </div>
 
@@ -637,7 +643,7 @@ export default function VisualizadorFasesLunaEclipsesPage() {
               </div>
 
               <div className={styles.insight}>
-                <p><strong>💡 Dato asombroso:</strong> La Luna se aleja 3,8 cm al año — robando energía rotacional a la Tierra. En ~600 millones de años, los eclipses totales serán imposibles porque la Luna será demasiado pequeña vista desde aquí.</p>
+                <p><strong><span aria-hidden="true">💡</span> Dato asombroso:</strong> La Luna se aleja 3,8 cm al año — robando energía rotacional a la Tierra. En ~600 millones de años, los eclipses totales serán imposibles porque la Luna será demasiado pequeña vista desde aquí.</p>
               </div>
             </>
           )}
@@ -649,6 +655,7 @@ export default function VisualizadorFasesLunaEclipsesPage() {
                 {DATOS_FASCINANTES.map((dato, i) => (
                   <button
                     key={i}
+                    type="button"
                     className={`${styles.datoCard} ${datoExpandido === i ? styles.datoActivo : ''}`}
                     onClick={() => setDatoExpandido(datoExpandido === i ? null : i)}
                     aria-expanded={datoExpandido === i}
@@ -713,7 +720,7 @@ export default function VisualizadorFasesLunaEclipsesPage() {
             </p>
 
             <div className={styles.warningBox}>
-              <strong>⚠️ Datos de referencia:</strong> Los datos astronómicos y las fechas de eclipses
+              <strong><span aria-hidden="true">⚠️</span> Datos de referencia:</strong> Los datos astronómicos y las fechas de eclipses
               son aproximados y tienen fines educativos. Para predicciones precisas de eclipses, consulta
               fuentes oficiales como el Instituto Geográfico Nacional o la NASA.
             </div>
