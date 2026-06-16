@@ -489,31 +489,31 @@ export default function SelectorFormacionPostgradoPage() {
             </thead>
             <tbody>
               <tr>
-                <td>🎓 Máster Universitario</td>
+                <td><span aria-hidden="true">🎓</span> Máster Universitario</td>
                 <td>1-2 años</td>
                 <td>3.000 – 30.000 €</td>
                 <td>Oficial universitario</td>
               </tr>
               <tr>
-                <td>🔧 FP Grado Superior</td>
+                <td><span aria-hidden="true">🔧</span> FP Grado Superior</td>
                 <td>1-2 años</td>
                 <td>0 – 2.000 €</td>
                 <td>Técnico Superior</td>
               </tr>
               <tr>
-                <td>💻 Bootcamp / Online</td>
+                <td><span aria-hidden="true">💻</span> Bootcamp / Online</td>
                 <td>3-6 meses</td>
                 <td>2.000 – 12.000 €</td>
                 <td>Certificado propio</td>
               </tr>
               <tr>
-                <td>🏛️ Oposiciones</td>
+                <td><span aria-hidden="true">🏛️</span> Oposiciones</td>
                 <td>2-5 años</td>
                 <td>500 – 3.000 €</td>
                 <td>Funcionario de carrera</td>
               </tr>
               <tr>
-                <td>🏅 Certificación Profesional</td>
+                <td><span aria-hidden="true">🏅</span> Certificación Profesional</td>
                 <td>Semanas-6 meses</td>
                 <td>200 – 3.000 €</td>
                 <td>Internacional/sectorial</td>

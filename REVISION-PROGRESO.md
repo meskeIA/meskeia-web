@@ -537,10 +537,10 @@
 | [x] | Reino Animal: Vertebrados, Invertebrados y Árbol Filogenético | `/visualizador-reino-animal/` | estudiantes, cultura |
 | [x] | Relatividad Especial - Dilatación del Tiempo y E=mc² | `/visualizador-relatividad-especial/` | estudiantes, cultura, tecnicas |
 | [x] | Relatividad General: Curvatura del Espacio-Tiempo | `/visualizador-relatividad-general/` | estudiantes, cultura |
-| [ ] | Respiración Celular - La Central Energética | `/visualizador-respiracion-celular/` | estudiantes, cultura |
-| [ ] | Selección Natural - El Motor de la Evolución | `/visualizador-seleccion-natural/` | estudiantes, cultura |
-| [ ] | Selector de Carrera Universitaria | `/selector-carrera-universitaria/` | estudiantes, productividad |
-| [ ] | Selector de Formación Postgrado | `/selector-formacion-postgrado/` | estudiantes, productividad |
+| [x] | Respiración Celular - La Central Energética | `/visualizador-respiracion-celular/` | estudiantes, cultura |
+| [x] | Selección Natural - El Motor de la Evolución | `/visualizador-seleccion-natural/` | estudiantes, cultura |
+| [x] | Selector de Carrera Universitaria | `/selector-carrera-universitaria/` | estudiantes, productividad |
+| [x] | Selector de Formación Postgrado | `/selector-formacion-postgrado/` | estudiantes, productividad |
 | [ ] | Selector de Idioma | `/selector-idioma/` | estudiantes, cultura |
 | [ ] | Selector de Método de Estudio | `/selector-metodo-estudio/` | estudiantes, productividad |
 | [ ] | Series y Convergencia: Taylor, Criterios y π | `/visualizador-series-convergencia/` | estudiantes, tecnicas |

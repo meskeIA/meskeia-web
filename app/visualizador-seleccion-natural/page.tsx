@@ -220,6 +220,7 @@ export default function SeleccionNaturalPage() {
         {PILARES.map((pilar, i) => (
           <button
             key={pilar.nombre}
+            type="button"
             className={`${styles.pilarCard} ${pilarActivo === pilar.nombre ? styles.pilarActivo : ''}`}
             onClick={() => setPilarActivo(pilarActivo === pilar.nombre ? null : pilar.nombre)}
             aria-pressed={pilarActivo === pilar.nombre}
@@ -276,6 +277,7 @@ export default function SeleccionNaturalPage() {
 
         <div className={styles.simulacionBotones}>
           <button
+            type="button"
             onClick={retrocederGeneracion}
             disabled={generacion === 0}
             className={styles.btnSecundario}
@@ -284,6 +286,7 @@ export default function SeleccionNaturalPage() {
             ← Anterior
           </button>
           <button
+            type="button"
             onClick={reiniciarSimulacion}
             className={styles.btnSecundario}
             aria-label="Reiniciar simulación"
@@ -291,6 +294,7 @@ export default function SeleccionNaturalPage() {
             Reiniciar
           </button>
           <button
+            type="button"
             onClick={avanzarGeneracion}
             disabled={generacion === GENERACIONES.length - 1}
             className={styles.btnPrimario}
@@ -316,6 +320,7 @@ export default function SeleccionNaturalPage() {
         {EJEMPLOS.map(ej => (
           <button
             key={ej.id}
+            type="button"
             className={`${styles.ejemploCard} ${ejemploActivo === ej.id ? styles.ejemploActivo : ''}`}
             onClick={() => setEjemploActivo(ejemploActivo === ej.id ? null : ej.id)}
             aria-pressed={ejemploActivo === ej.id}
@@ -333,7 +338,7 @@ export default function SeleccionNaturalPage() {
               </div>
               <div className={styles.flujoFlecha} aria-hidden="true">→</div>
               <div className={styles.flujoEtapa}>
-                <div className={styles.flujoCirculoPresion}>⚡</div>
+                <div className={styles.flujoCirculoPresion} aria-hidden="true">⚡</div>
                 <div className={styles.flujoLabel}>Presión selectiva</div>
                 <div className={styles.flujoTexto}>{ej.presion}</div>
               </div>
@@ -368,7 +373,7 @@ export default function SeleccionNaturalPage() {
       <div className={styles.comparativaGrid}>
         {/* Lamarck */}
         <div className={`${styles.comparativaCard} ${styles.comparativaIncorrecto}`}>
-          <div className={styles.comparativaEtiqueta}>❌ INCORRECTO</div>
+          <div className={styles.comparativaEtiqueta}><span aria-hidden="true">❌</span> INCORRECTO</div>
           <h3 className={styles.comparativaNombre}>Lamarck (1809)</h3>
           <div className={styles.comparativaSubtitulo}>Herencia de caracteres adquiridos</div>
 
@@ -394,7 +399,7 @@ export default function SeleccionNaturalPage() {
 
         {/* Darwin */}
         <div className={`${styles.comparativaCard} ${styles.comparativaCorrecto}`}>
-          <div className={styles.comparativaEtiqueta}>✅ CORRECTO</div>
+          <div className={styles.comparativaEtiqueta}><span aria-hidden="true">✅</span> CORRECTO</div>
           <h3 className={styles.comparativaNombre}>Darwin (1859)</h3>
           <div className={styles.comparativaSubtitulo}>Selección natural</div>
 
@@ -442,6 +447,7 @@ export default function SeleccionNaturalPage() {
         {DATOS.map(d => (
           <button
             key={d.titulo}
+            type="button"
             className={`${styles.datoCard} ${datoActivo === d.titulo ? styles.datoActivo : ''}`}
             onClick={() => setDatoActivo(datoActivo === d.titulo ? null : d.titulo)}
             aria-pressed={datoActivo === d.titulo}
@@ -503,6 +509,7 @@ export default function SeleccionNaturalPage() {
           {SECCIONES.map(s => (
             <button
               key={s.id}
+              type="button"
               className={`${styles.navBtn} ${seccionActiva === s.id ? styles.navActivo : ''}`}
               onClick={() => setSeccionActiva(s.id)}
               aria-pressed={seccionActiva === s.id}

@@ -470,7 +470,7 @@ function SeccionFases() {
             <span aria-hidden="true" className={styles.faseDetalleIcono}>{faseSeleccionada.icono}</span>
             <div>
               <h3 className={styles.faseDetalleTitulo}>{faseSeleccionada.nombre}</h3>
-              <span className={styles.faseDetalleLugar}>📍 {faseSeleccionada.lugar}</span>
+              <span className={styles.faseDetalleLugar}><span aria-hidden="true">📍</span> {faseSeleccionada.lugar}</span>
             </div>
           </div>
           <div className={styles.faseDetalleReaccion}>{faseSeleccionada.reaccion}</div>
@@ -728,7 +728,7 @@ function SeccionDatos() {
             type="button"
             className={`${styles.datoCard} ${datoActivo === i ? styles.datoCardActivo : ''}`}
             onClick={() => setDatoActivo(datoActivo === i ? null : i)}
-            aria-expanded={datoActivo === i}
+            aria-pressed={datoActivo === i}
           >
             <span className={styles.datoIcono} aria-hidden="true">{d.icono}</span>
             <span className={styles.datoCifra}>{d.cifra}</span>
