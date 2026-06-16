@@ -239,16 +239,16 @@ export default function DiagnosticoComunicacionInternaPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>📡 Diagnóstico de Comunicación Interna</h1>
+          <h1 className={styles.title}><span aria-hidden="true">📡</span> Diagnóstico de Comunicación Interna</h1>
           <p className={styles.subtitle}>
             ¿Tu equipo comunica rápido pero sin profundidad?
             <br />
             Velocidad y profundidad: las dos dimensiones que importan
           </p>
           <div className={styles.badges}>
-            <span className={styles.badge}>🕐 3 minutos</span>
-            <span className={styles.badge}>📊 10 preguntas</span>
-            <span className={styles.badge}>🔒 Sin registro</span>
+            <span className={styles.badge}><span aria-hidden="true">🕐</span> 3 minutos</span>
+            <span className={styles.badge}><span aria-hidden="true">📊</span> 10 preguntas</span>
+            <span className={styles.badge}><span aria-hidden="true">🔒</span> Sin registro</span>
           </div>
         </header>
 
@@ -288,6 +288,7 @@ export default function DiagnosticoComunicacionInternaPage() {
                 {ESCALA.map((opcion) => (
                   <button
                     key={opcion.valor}
+                    type="button"
                     className={`${styles.scaleButton} ${respuestas[pregunta.id] === opcion.valor ? styles.scaleButtonActive : ''}`}
                     onClick={() => handleRespuesta(pregunta.id, opcion.valor)}
                     role="radio"
@@ -307,6 +308,7 @@ export default function DiagnosticoComunicacionInternaPage() {
           </div>
 
           <button
+            type="button"
             className={styles.btnPrimary}
             onClick={calcularResultado}
             disabled={!todasRespondidas}
@@ -322,23 +324,23 @@ export default function DiagnosticoComunicacionInternaPage() {
 
             <div className={styles.mapContainer}>
               <div className={styles.mapLabels}>
-                <span className={styles.mapLabelTop}>⚡ Alta velocidad</span>
+                <span className={styles.mapLabelTop}><span aria-hidden="true">⚡</span> Alta velocidad</span>
                 <span className={styles.mapLabelBottom}>Baja velocidad</span>
                 <span className={styles.mapLabelLeft}>Baja profundidad</span>
-                <span className={styles.mapLabelRight}>📖 Alta profundidad</span>
+                <span className={styles.mapLabelRight}><span aria-hidden="true">📖</span> Alta profundidad</span>
               </div>
               <div className={styles.map}>
                 <div className={`${styles.quadrant} ${styles.quadrantTL}`}>
-                  <span>⚡ Velocidad sin Sustancia</span>
+                  <span><span aria-hidden="true">⚡</span> Velocidad sin Sustancia</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantTR}`}>
-                  <span>💎 Comunicación Completa</span>
+                  <span><span aria-hidden="true">💎</span> Comunicación Completa</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBL}`}>
-                  <span>🔇 Comunicación Rota</span>
+                  <span><span aria-hidden="true">🔇</span> Comunicación Rota</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
-                  <span>📖 Profunda pero Lenta</span>
+                  <span><span aria-hidden="true">📖</span> Profunda pero Lenta</span>
                 </div>
                 <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
                 <div className={styles.thresholdLineV} style={{ left: '65%' }} aria-hidden="true" />
@@ -357,7 +359,7 @@ export default function DiagnosticoComunicacionInternaPage() {
             <div className={styles.scoresContainer}>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>⚡ Velocidad</span>
+                  <span><span aria-hidden="true">⚡</span> Velocidad</span>
                   <span className={styles.scoreValue}>{puntuacionVelocidad}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -369,7 +371,7 @@ export default function DiagnosticoComunicacionInternaPage() {
               </div>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>📖 Profundidad</span>
+                  <span><span aria-hidden="true">📖</span> Profundidad</span>
                   <span className={styles.scoreValue}>{puntuacionProfundidad}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -390,7 +392,7 @@ export default function DiagnosticoComunicacionInternaPage() {
 
               <div className={styles.profileColumns}>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>✅ Fortalezas</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">✅</span> Fortalezas</h4>
                   <ul className={styles.profileList}>
                     {perfil.fortalezas.map((f, i) => (
                       <li key={i}>{f}</li>
@@ -398,7 +400,7 @@ export default function DiagnosticoComunicacionInternaPage() {
                   </ul>
                 </div>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>⚠️ Riesgos</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">⚠️</span> Riesgos</h4>
                   <ul className={styles.profileList}>
                     {perfil.riesgos.map((r, i) => (
                       <li key={i}>{r}</li>
@@ -408,7 +410,7 @@ export default function DiagnosticoComunicacionInternaPage() {
               </div>
 
               <div className={styles.actionsSection}>
-                <h4 className={styles.actionsTitle}>🎯 Acciones sugeridas</h4>
+                <h4 className={styles.actionsTitle}><span aria-hidden="true">🎯</span> Acciones sugeridas</h4>
                 <ol className={styles.actionsList}>
                   {perfil.acciones.map((a, i) => (
                     <li key={i}>{a}</li>
@@ -417,7 +419,7 @@ export default function DiagnosticoComunicacionInternaPage() {
               </div>
             </div>
 
-            <button className={styles.btnSecondary} onClick={reiniciar}>
+            <button type="button" className={styles.btnSecondary} onClick={reiniciar}>
               Repetir diagnóstico
             </button>
           </section>

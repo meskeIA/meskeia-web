@@ -934,10 +934,10 @@
 | [x] | Conversor de Tallas | `/conversor-tallas/` | productividad |
 | [x] | Conversor de Texto | `/conversor-texto/` | productividad |
 | [x] | Conversor de Unidades | `/conversor-unidades/` | productividad, viajes |
-| [ ] | Cronómetro y Temporizador | `/cronometro/` | productividad |
-| [ ] | Diagnóstico de Comunicación Interna | `/diagnostico-comunicacion-interna/` | productividad, freelance |
-| [ ] | Diagnóstico de Estancamiento Profesional | `/diagnostico-estancamiento-profesional/` | productividad, cultura |
-| [ ] | Diagnóstico de Multitarea | `/diagnostico-multitarea/` | productividad |
+| [x] | Cronómetro y Temporizador | `/cronometro/` | productividad |
+| [x] | Diagnóstico de Comunicación Interna | `/diagnostico-comunicacion-interna/` | productividad, freelance |
+| [x] | Diagnóstico de Estancamiento Profesional | `/diagnostico-estancamiento-profesional/` | productividad, cultura |
+| [x] | Diagnóstico de Multitarea | `/diagnostico-multitarea/` | productividad |
 | [ ] | Diagnóstico Explotación vs Exploración | `/diagnostico-explotacion-exploracion/` | productividad, freelance |
 | [ ] | Generador de Actas de Reunión | `/generador-actas/` | productividad |
 | [ ] | Generador de Firmas Email | `/generador-firma-email/` | productividad |

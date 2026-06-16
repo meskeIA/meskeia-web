@@ -238,16 +238,16 @@ export default function DiagnosticoMultitareaPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🔀 Diagnóstico de Multitarea</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🔀</span> Diagnóstico de Multitarea</h1>
           <p className={styles.subtitle}>
             ¿Tu multitarea es productiva o destructiva?
             <br />
             Reflexión sobre fragmentación y foco
           </p>
           <div className={styles.badges}>
-            <span className={styles.badge}>🕐 3 minutos</span>
-            <span className={styles.badge}>📊 10 preguntas</span>
-            <span className={styles.badge}>🔒 Sin registro</span>
+            <span className={styles.badge}><span aria-hidden="true">🕐</span> 3 minutos</span>
+            <span className={styles.badge}><span aria-hidden="true">📊</span> 10 preguntas</span>
+            <span className={styles.badge}><span aria-hidden="true">🔒</span> Sin registro</span>
           </div>
         </header>
 
@@ -286,6 +286,7 @@ export default function DiagnosticoMultitareaPage() {
                 {ESCALA.map((opcion) => (
                   <button
                     key={opcion.valor}
+                    type="button"
                     className={`${styles.scaleButton} ${respuestas[pregunta.id] === opcion.valor ? styles.scaleButtonActive : ''}`}
                     onClick={() => handleRespuesta(pregunta.id, opcion.valor)}
                     role="radio"
@@ -305,6 +306,7 @@ export default function DiagnosticoMultitareaPage() {
           </div>
 
           <button
+            type="button"
             className={styles.btnPrimary}
             onClick={calcularResultado}
             disabled={!todasRespondidas}
@@ -320,10 +322,10 @@ export default function DiagnosticoMultitareaPage() {
 
             <div className={styles.mapContainer}>
               <div className={styles.mapLabels}>
-                <span className={styles.mapLabelTop}>🎯 Alto Foco</span>
+                <span className={styles.mapLabelTop}><span aria-hidden="true">🎯</span> Alto Foco</span>
                 <span className={styles.mapLabelBottom}>Bajo Foco</span>
                 <span className={styles.mapLabelLeft}>Baja Fragmentación</span>
-                <span className={styles.mapLabelRight}>💥 Alta Fragmentación</span>
+                <span className={styles.mapLabelRight}><span aria-hidden="true">💥</span> Alta Fragmentación</span>
               </div>
               <div className={styles.map}>
                 <div className={`${styles.quadrant} ${styles.quadrantTL}`}>
@@ -355,7 +357,7 @@ export default function DiagnosticoMultitareaPage() {
             <div className={styles.scoresContainer}>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>💥 Fragmentación</span>
+                  <span><span aria-hidden="true">💥</span> Fragmentación</span>
                   <span className={styles.scoreValue}>{puntuacionFragmentacion}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -367,7 +369,7 @@ export default function DiagnosticoMultitareaPage() {
               </div>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>🎯 Foco</span>
+                  <span><span aria-hidden="true">🎯</span> Foco</span>
                   <span className={styles.scoreValue}>{puntuacionFoco}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -388,7 +390,7 @@ export default function DiagnosticoMultitareaPage() {
 
               <div className={styles.profileColumns}>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>✅ Fortalezas</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">✅</span> Fortalezas</h4>
                   <ul className={styles.profileList}>
                     {perfil.fortalezas.map((f, i) => (
                       <li key={i}>{f}</li>
@@ -396,7 +398,7 @@ export default function DiagnosticoMultitareaPage() {
                   </ul>
                 </div>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>⚠️ Riesgos</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">⚠️</span> Riesgos</h4>
                   <ul className={styles.profileList}>
                     {perfil.riesgos.map((r, i) => (
                       <li key={i}>{r}</li>
@@ -406,7 +408,7 @@ export default function DiagnosticoMultitareaPage() {
               </div>
 
               <div className={styles.actionsSection}>
-                <h4 className={styles.actionsTitle}>🎯 Acciones sugeridas</h4>
+                <h4 className={styles.actionsTitle}><span aria-hidden="true">🎯</span> Acciones sugeridas</h4>
                 <ol className={styles.actionsList}>
                   {perfil.acciones.map((a, i) => (
                     <li key={i}>{a}</li>
@@ -415,14 +417,14 @@ export default function DiagnosticoMultitareaPage() {
               </div>
             </div>
 
-            <button className={styles.btnSecondary} onClick={reiniciar}>
+            <button type="button" className={styles.btnSecondary} onClick={reiniciar}>
               Repetir diagnóstico
             </button>
           </section>
         )}
 
         <EducationalSection
-          title="📚 La ciencia del cambio de contexto"
+          title="La ciencia del cambio de contexto"
           subtitle="Por qué la multitarea rara vez funciona como crees"
         >
           <section className={styles.guideSection}>

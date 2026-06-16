@@ -242,16 +242,16 @@ export default function DiagnosticoEstancamientoProfesionalPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🌊 Diagnóstico de Estancamiento Profesional</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🌊</span> Diagnóstico de Estancamiento Profesional</h1>
           <p className={styles.subtitle}>
             ¿Estás en zona de confort, estrés o flujo?
             <br />
             Basado en el modelo de flujo de Csikszentmihalyi
           </p>
           <div className={styles.badges}>
-            <span className={styles.badge}>🕐 3 minutos</span>
-            <span className={styles.badge}>📊 10 preguntas</span>
-            <span className={styles.badge}>🔒 Sin registro</span>
+            <span className={styles.badge}><span aria-hidden="true">🕐</span> 3 minutos</span>
+            <span className={styles.badge}><span aria-hidden="true">📊</span> 10 preguntas</span>
+            <span className={styles.badge}><span aria-hidden="true">🔒</span> Sin registro</span>
           </div>
         </header>
 
@@ -292,6 +292,7 @@ export default function DiagnosticoEstancamientoProfesionalPage() {
                     key={opcion.valor}
                     className={`${styles.scaleButton} ${respuestas[pregunta.id] === opcion.valor ? styles.scaleButtonActive : ''}`}
                     onClick={() => handleRespuesta(pregunta.id, opcion.valor)}
+                    type="button"
                     role="radio"
                     aria-checked={respuestas[pregunta.id] === opcion.valor}
                     aria-label={`${opcion.etiqueta} (${opcion.valor} de 5)`}
@@ -309,6 +310,7 @@ export default function DiagnosticoEstancamientoProfesionalPage() {
           </div>
 
           <button
+            type="button"
             className={styles.btnPrimary}
             onClick={calcularResultado}
             disabled={!todasRespondidas}
@@ -326,24 +328,24 @@ export default function DiagnosticoEstancamientoProfesionalPage() {
             {/* Mapa 2D */}
             <div className={styles.mapContainer}>
               <div className={styles.mapLabels}>
-                <span className={styles.mapLabelTop}>🎯 Alta Habilidad</span>
+                <span className={styles.mapLabelTop}><span aria-hidden="true">🎯</span> Alta Habilidad</span>
                 <span className={styles.mapLabelBottom}>Baja Habilidad</span>
                 <span className={styles.mapLabelLeft}>Bajo Desafío</span>
-                <span className={styles.mapLabelRight}>⚡ Alto Desafío</span>
+                <span className={styles.mapLabelRight}><span aria-hidden="true">⚡</span> Alto Desafío</span>
               </div>
               <div className={styles.map}>
                 {/* Cuadrantes */}
                 <div className={`${styles.quadrant} ${styles.quadrantTL}`}>
-                  <span>😴 Zona de Confort</span>
+                  <span><span aria-hidden="true">😴</span> Zona de Confort</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantTR}`}>
-                  <span>🌊 Estado de Flujo</span>
+                  <span><span aria-hidden="true">🌊</span> Estado de Flujo</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBL}`}>
-                  <span>😶 Zona de Apatía</span>
+                  <span><span aria-hidden="true">😶</span> Zona de Apatía</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
-                  <span>😰 Zona de Ansiedad</span>
+                  <span><span aria-hidden="true">😰</span> Zona de Ansiedad</span>
                 </div>
                 {/* Líneas de umbral */}
                 <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
@@ -365,7 +367,7 @@ export default function DiagnosticoEstancamientoProfesionalPage() {
             <div className={styles.scoresContainer}>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>⚡ Desafío</span>
+                  <span><span aria-hidden="true">⚡</span> Desafío</span>
                   <span className={styles.scoreValue}>{puntuacionDesafio}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -377,7 +379,7 @@ export default function DiagnosticoEstancamientoProfesionalPage() {
               </div>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>🎯 Habilidad</span>
+                  <span><span aria-hidden="true">🎯</span> Habilidad</span>
                   <span className={styles.scoreValue}>{puntuacionHabilidad}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -399,7 +401,7 @@ export default function DiagnosticoEstancamientoProfesionalPage() {
 
               <div className={styles.profileColumns}>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>✅ Fortalezas</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">✅</span> Fortalezas</h4>
                   <ul className={styles.profileList}>
                     {perfil.fortalezas.map((f, i) => (
                       <li key={i}>{f}</li>
@@ -407,7 +409,7 @@ export default function DiagnosticoEstancamientoProfesionalPage() {
                   </ul>
                 </div>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>⚠️ Riesgos</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">⚠️</span> Riesgos</h4>
                   <ul className={styles.profileList}>
                     {perfil.riesgos.map((r, i) => (
                       <li key={i}>{r}</li>
@@ -417,7 +419,7 @@ export default function DiagnosticoEstancamientoProfesionalPage() {
               </div>
 
               <div className={styles.actionsSection}>
-                <h4 className={styles.actionsTitle}>🎯 Acciones sugeridas</h4>
+                <h4 className={styles.actionsTitle}><span aria-hidden="true">🎯</span> Acciones sugeridas</h4>
                 <ol className={styles.actionsList}>
                   {perfil.acciones.map((a, i) => (
                     <li key={i}>{a}</li>
@@ -426,7 +428,7 @@ export default function DiagnosticoEstancamientoProfesionalPage() {
               </div>
             </div>
 
-            <button className={styles.btnSecondary} onClick={reiniciar}>
+            <button type="button" className={styles.btnSecondary} onClick={reiniciar}>
               Repetir diagnóstico
             </button>
           </section>
@@ -434,7 +436,7 @@ export default function DiagnosticoEstancamientoProfesionalPage() {
 
         {/* Contenido educativo */}
         <EducationalSection
-          title="📚 El modelo de flujo de Csikszentmihalyi"
+          title="El modelo de flujo de Csikszentmihalyi"
           subtitle="El marco teórico detrás de este diagnóstico"
         >
           <section className={styles.guideSection}>

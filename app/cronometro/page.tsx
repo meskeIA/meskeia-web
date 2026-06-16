@@ -212,18 +212,22 @@ export default function CronometroPage() {
       {/* Tabs de modo */}
       <div className={styles.tabs}>
         <button
+          type="button"
           className={`${styles.tab} ${modo === 'cronometro' ? styles.tabActivo : ''}`}
           onClick={() => cambiarModo('cronometro')}
           disabled={corriendo}
+          aria-pressed={modo === 'cronometro'}
         >
-          ⏱️ Cronómetro
+          <span aria-hidden="true">⏱️</span> Cronómetro
         </button>
         <button
+          type="button"
           className={`${styles.tab} ${modo === 'temporizador' ? styles.tabActivo : ''}`}
           onClick={() => cambiarModo('temporizador')}
           disabled={corriendo}
+          aria-pressed={modo === 'temporizador'}
         >
-          ⏳ Temporizador
+          <span aria-hidden="true">⏳</span> Temporizador
         </button>
       </div>
 
@@ -237,22 +241,24 @@ export default function CronometroPage() {
               </div>
               <div className={styles.controles}>
                 {!corriendo ? (
-                  <button onClick={iniciarCronometro} className={styles.btnPrimario}>
+                  <button type="button" onClick={iniciarCronometro} className={styles.btnPrimario}>
                     ▶ Iniciar
                   </button>
                 ) : (
-                  <button onClick={pausarCronometro} className={styles.btnPausar}>
+                  <button type="button" onClick={pausarCronometro} className={styles.btnPausar}>
                     ⏸ Pausar
                   </button>
                 )}
                 <button
+                  type="button"
                   onClick={registrarVuelta}
                   className={styles.btnSecundario}
                   disabled={!corriendo && tiempoCronometro === 0}
                 >
-                  🏁 Vuelta
+                  <span aria-hidden="true">🏁</span> Vuelta
                 </button>
                 <button
+                  type="button"
                   onClick={resetearCronometro}
                   className={styles.btnSecundario}
                   disabled={tiempoCronometro === 0}
@@ -355,6 +361,7 @@ export default function CronometroPage() {
                 <div className={styles.presets}>
                   {presets.map((preset) => (
                     <button
+                      type="button"
                       key={preset.label}
                       onClick={() => aplicarPreset(preset.minutos)}
                       className={styles.presetBtn}
@@ -367,15 +374,16 @@ export default function CronometroPage() {
 
               <div className={styles.controles}>
                 {!corriendo ? (
-                  <button onClick={iniciarTemporizador} className={styles.btnPrimario}>
+                  <button type="button" onClick={iniciarTemporizador} className={styles.btnPrimario}>
                     ▶ Iniciar
                   </button>
                 ) : (
-                  <button onClick={pausarTemporizador} className={styles.btnPausar}>
+                  <button type="button" onClick={pausarTemporizador} className={styles.btnPausar}>
                     ⏸ Pausar
                   </button>
                 )}
                 <button
+                  type="button"
                   onClick={resetearTemporizador}
                   className={styles.btnSecundario}
                   disabled={tiempoTemporizador === 0 && !corriendo}
@@ -393,21 +401,21 @@ export default function CronometroPage() {
         <h3>Sobre esta herramienta</h3>
         <div className={styles.infoGrid}>
           <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>⏱️</span>
+            <span className={styles.infoIcon} aria-hidden="true">⏱️</span>
             <div>
               <strong>Cronómetro</strong>
               <p>Mide tiempo con precisión de centésimas y registra vueltas</p>
             </div>
           </div>
           <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>⏳</span>
+            <span className={styles.infoIcon} aria-hidden="true">⏳</span>
             <div>
               <strong>Temporizador</strong>
               <p>Cuenta atrás con alarma sonora al finalizar</p>
             </div>
           </div>
           <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>🎯</span>
+            <span className={styles.infoIcon} aria-hidden="true">🎯</span>
             <div>
               <strong>Presets rápidos</strong>
               <p>Tiempos predefinidos para uso inmediato</p>
