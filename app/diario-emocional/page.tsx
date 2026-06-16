@@ -168,7 +168,7 @@ export default function DiarioEmocionalPage() {
                 aria-pressed={(emocionSeleccionada || entradaHoy?.emocionId) === emo.id}
                 data-color={emo.id}
               >
-                <span className={styles.emocionEmoji}>{emo.emoji}</span>
+                <span className={styles.emocionEmoji} aria-hidden="true">{emo.emoji}</span>
                 <span className={styles.emocionLabel}>{emo.label}</span>
               </button>
             ))}
@@ -210,7 +210,7 @@ export default function DiarioEmocionalPage() {
                 return (
                   <div key={fecha} className={`${styles.diaCard} ${fecha === hoy() ? styles.diaHoy : ''}`}>
                     <span className={styles.diaLabel}>{formatFechaCorta(fecha)}</span>
-                    <span className={styles.diaEmoji}>{emo ? emo.emoji : '·'}</span>
+                    <span className={styles.diaEmoji} aria-hidden="true">{emo ? emo.emoji : '·'}</span>
                     {entrada?.nota && <span className={styles.diaNota} title={entrada.nota}>📝</span>}
                   </div>
                 );

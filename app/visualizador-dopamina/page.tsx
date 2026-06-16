@@ -368,6 +368,7 @@ export default function VisualizadorDopamina() {
             {PASOS_CIRCUITO.map((p, i) => (
               <button
                 key={p.id}
+                type="button"
                 role="tab"
                 aria-selected={i === pasoActual}
                 aria-label={`Paso ${p.id}: ${p.titulo}`}
@@ -400,6 +401,7 @@ export default function VisualizadorDopamina() {
           {/* Controles */}
           <div className={styles.stepControls}>
             <button
+              type="button"
               className={styles.btnControl}
               onClick={irAnterior}
               disabled={pasoActual === 0}
@@ -409,6 +411,7 @@ export default function VisualizadorDopamina() {
             </button>
             <span className={styles.stepCounterText}>{pasoActual + 1} de {PASOS_CIRCUITO.length}</span>
             <button
+              type="button"
               className={styles.btnControl}
               onClick={irSiguiente}
               disabled={pasoActual === PASOS_CIRCUITO.length - 1}

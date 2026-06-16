@@ -996,11 +996,11 @@
 | [x] | Cómo Funciona el Dolor — Nocicepción y Tipos | `/visualizador-como-funciona-el-dolor/` | salud, estudiantes |
 | [x] | Cómo Funciona una Vacuna | `/visualizador-vacunas/` | salud, cultura, estudiantes |
 | [x] | Cómo Piensa tu Cerebro | `/visualizador-cerebro/` | salud, cultura, estudiantes |
-| [ ] | Cómo se Descubre un Medicamento | `/visualizador-desarrollo-farmaco/` | salud, cultura |
-| [ ] | Cortisol - La Hormona del Estrés en tu Cuerpo | `/visualizador-cortisol/` | salud, cultura |
+| [x] | Cómo se Descubre un Medicamento | `/visualizador-desarrollo-farmaco/` | salud, cultura |
+| [x] | Cortisol - La Hormona del Estrés en tu Cuerpo | `/visualizador-cortisol/` | salud, cultura |
 | [x] | Curso de Nutrición | `/curso-nutrisalud/` | salud, cultura |
-| [ ] | Diario Emocional Visual | `/diario-emocional/` | salud |
-| [ ] | Dopamina - El Sistema de Recompensa del Cerebro | `/visualizador-dopamina/` | salud, cultura, estudiantes |
+| [x] | Diario Emocional Visual | `/diario-emocional/` | salud |
+| [x] | Dopamina - El Sistema de Recompensa del Cerebro | `/visualizador-dopamina/` | salud, cultura, estudiantes |
 | [ ] | El Hierro: Hemoglobina, Absorción y Anemia Ferropénica | `/visualizador-hierro/` | salud, cultura, estudiantes |
 | [ ] | El Hígado - Detoxificación y Metabolismo | `/visualizador-higado/` | salud, estudiantes, cultura |
 | [ ] | El Magnesio: 300 Reacciones Enzimáticas y Déficit Silencioso | `/visualizador-magnesio/` | salud, cultura, estudiantes |

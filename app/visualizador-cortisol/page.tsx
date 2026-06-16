@@ -379,7 +379,7 @@ function SeccionRitmo() {
           onClick={() => setMostrarMalSueno(!mostrarMalSueno)}
           aria-pressed={mostrarMalSueno}
         >
-          {mostrarMalSueno ? '✅' : '👁️'} Ver con privación de sueño
+          <span aria-hidden="true">{mostrarMalSueno ? '✅' : '👁️'}</span> Ver con privación de sueño
         </button>
         {mostrarMalSueno && (
           <div className={styles.alerta}>
@@ -461,7 +461,7 @@ function SeccionEstres() {
             onClick={simularAgudo}
             aria-label="Simular respuesta de estrés agudo"
           >
-            🟢 Simular estrés agudo
+            <span aria-hidden="true">🟢</span> Simular estrés agudo
           </button>
           <button
             type="button"
@@ -469,7 +469,7 @@ function SeccionEstres() {
             onClick={simularCronico}
             aria-label="Simular estrés crónico"
           >
-            🔴 Simular estrés crónico
+            <span aria-hidden="true">🔴</span> Simular estrés crónico
           </button>
         </div>
       </div>
