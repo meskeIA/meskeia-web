@@ -222,19 +222,11 @@ export const epidemias: HistoriaData = {
   categorias: {
     bacteriana: 'Bacteriana',
     virica: 'Vírica',
-    parasitaria: 'Parasitaria',
-    cuarentena: 'Medidas de Control',
-    vacunacion: 'Era Vacunas',
-    moderna: 'Epidemiología Moderna',
   },
 
   colores: {
     bacteriana: '#8B4513',
     virica: '#C62828',
-    parasitaria: '#2E7D32',
-    cuarentena: '#1A237E',
-    vacunacion: '#E65100',
-    moderna: '#1565C0',
   },
 
   disclaimer: 'exempt',

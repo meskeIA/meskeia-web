@@ -213,10 +213,10 @@
 | [x] | Historia de la Vejez y la Longevidad: De la Antigüedad a la Ciencia Longevity | `/visualizador-historia/vejez-longevidad/` | cultura, estudiantes |
 | [x] | Historia de la Vivienda: De las Primeras Construcciones a la Crisis de Asequibilidad | `/visualizador-historia/vivienda/` | cultura, estudiantes |
 | [x] | Historia de las Constituciones y la Democracia: De la Magna Carta al Siglo XXI | `/visualizador-historia/historia-constituciones/` | cultura |
-| [ ] | Historia de las Criptomonedas y Blockchain: De Bitcoin al Mercado Institucional | `/visualizador-historia/criptomonedas/` | cultura, tecnicas |
-| [ ] | Historia de las Epidemias: Cronología, Mortalidad y Legado Médico | `/visualizador-historia/epidemias/` | cultura, salud |
-| [ ] | Historia de las Especias y las Rutas Comerciales: De Arabia a los Mercados Globales | `/visualizador-historia/especias-rutas-comerciales/` | cultura, estudiantes |
-| [ ] | Historia de las Matemáticas: De Babilonia a la IA Matemática | `/visualizador-historia/matematicas/` | cultura |
+| [x] | Historia de las Criptomonedas y Blockchain: De Bitcoin al Mercado Institucional | `/visualizador-historia/criptomonedas/` | cultura, tecnicas |
+| [x] | Historia de las Epidemias: Cronología, Mortalidad y Legado Médico | `/visualizador-historia/epidemias/` | cultura, salud |
+| [x] | Historia de las Especias y las Rutas Comerciales: De Arabia a los Mercados Globales | `/visualizador-historia/especias-rutas-comerciales/` | cultura, estudiantes |
+| [x] | Historia de las Matemáticas: De Babilonia a la IA Matemática | `/visualizador-historia/matematicas/` | cultura |
 | [ ] | Historia de las Redes Sociales: De SixDegrees a la Era de la IA Social | `/visualizador-historia/redes-sociales/` | cultura, tecnicas |
 | [ ] | Historia de los Aztecas: De Aztlán a la Caída de Tenochtitlan | `/visualizador-historia/azteca/` | cultura, estudiantes |
 | [ ] | Historia de los Derechos Humanos: Cronología de la Magna Carta a los Derechos Digitales | `/visualizador-derechos-humanos/` | cultura |
