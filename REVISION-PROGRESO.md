@@ -507,10 +507,10 @@
 | [x] | Motor Eléctrico: Campo Magnético Rotante y Regeneración | `/visualizador-motor-electrico/` | estudiantes, cultura, tecnicas |
 | [x] | Músculos y Movimiento - Del Sarcómero a la Articulación | `/visualizador-musculos-movimiento/` | estudiantes, cultura, salud |
 | [x] | Números Complejos: El Plano de Argand | `/visualizador-numeros-complejos/` | estudiantes, tecnicas |
-| [ ] | Números Primos - De Eratóstenes a la Criptografía | `/visualizador-numeros-primos/` | estudiantes, cultura |
-| [ ] | Océanos y Corrientes - AMOC, Corriente del Golfo y Acidificación | `/visualizador-oceanos-corrientes/` | estudiantes, cultura |
-| [ ] | Oferta, Demanda y por qué Suben los Precios | `/visualizador-oferta-demanda/` | estudiantes, finanzas, cultura |
-| [ ] | Óptica - El Viaje de la Luz | `/visualizador-optica/` | estudiantes, cultura |
+| [x] | Números Primos - De Eratóstenes a la Criptografía | `/visualizador-numeros-primos/` | estudiantes, cultura |
+| [x] | Océanos y Corrientes - AMOC, Corriente del Golfo y Acidificación | `/visualizador-oceanos-corrientes/` | estudiantes, cultura |
+| [x] | Oferta, Demanda y por qué Suben los Precios | `/visualizador-oferta-demanda/` | estudiantes, finanzas, cultura |
+| [x] | Óptica - El Viaje de la Luz | `/visualizador-optica/` | estudiantes, cultura |
 | [ ] | Óptica Ondulatoria: Young, Difracción y Polarización | `/visualizador-optica-ondulatoria/` | estudiantes, tecnicas |
 | [ ] | Orientador de Tipo de Oposición | `/orientador-tipo-oposicion/` | estudiantes, productividad |
 | [ ] | Partículas Subatómicas: Modelo Estándar y Higgs | `/visualizador-particulas-subatomicas/` | estudiantes, cultura |

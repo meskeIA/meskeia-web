@@ -291,6 +291,7 @@ function SeccionCriba() {
           type="button"
           className={`${styles.btnSimular} ${animando ? styles.btnActivo : ''}`}
           onClick={automatico}
+          aria-pressed={animando}
         >
           {animando ? 'Pausar' : 'Automático'}
         </button>

@@ -265,6 +265,7 @@ export default function VisualizadorOceanosCorreintes() {
         {SECCIONES.map(sec => (
           <button
             key={sec.id}
+            type="button"
             onClick={() => setSeccionActiva(sec.id)}
             className={`${styles.navBtn} ${seccionActiva === sec.id ? styles.navBtnActivo : ''}`}
             aria-pressed={seccionActiva === sec.id}
@@ -295,6 +296,7 @@ export default function VisualizadorOceanosCorreintes() {
               <span className={styles.toggleLabel}>Estado de la circulación:</span>
               <div className={styles.toggleBtns}>
                 <button
+                  type="button"
                   className={`${styles.toggleBtn} ${!conveyorDebilitado ? styles.toggleBtnActivo : ''}`}
                   onClick={() => setConveyorDebilitado(false)}
                   aria-pressed={!conveyorDebilitado}
@@ -302,6 +304,7 @@ export default function VisualizadorOceanosCorreintes() {
                   Normal
                 </button>
                 <button
+                  type="button"
                   className={`${styles.toggleBtn} ${conveyorDebilitado ? styles.toggleBtnActivo : ''}`}
                   onClick={() => setConveyorDebilitado(true)}
                   aria-pressed={conveyorDebilitado}
@@ -457,6 +460,7 @@ export default function VisualizadorOceanosCorreintes() {
               <span className={styles.toggleLabel}>Escenario de temperatura:</span>
               <div className={styles.toggleBtns}>
                 <button
+                  type="button"
                   className={`${styles.toggleBtn} ${!sinCorriente ? styles.toggleBtnActivo : ''}`}
                   onClick={() => setSinCorriente(false)}
                   aria-pressed={!sinCorriente}
@@ -464,6 +468,7 @@ export default function VisualizadorOceanosCorreintes() {
                   Con Corriente del Golfo
                 </button>
                 <button
+                  type="button"
                   className={`${styles.toggleBtn} ${sinCorriente ? styles.toggleBtnActivo : ''}`}
                   onClick={() => setSinCorriente(true)}
                   aria-pressed={sinCorriente}
@@ -686,6 +691,7 @@ export default function VisualizadorOceanosCorreintes() {
               {ESPECIES_MARINAS.map(esp => (
                 <button
                   key={esp.id}
+                  type="button"
                   className={`${styles.phEspecieCard} ${especieSel === esp.id ? styles.phEspecieCardActiva : ''}`}
                   onClick={() => setEspecieSel(especieSel === esp.id ? null : esp.id)}
                   aria-expanded={especieSel === esp.id}
