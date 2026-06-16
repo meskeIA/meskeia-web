@@ -782,10 +782,10 @@
 | [x] | Prueba de Cámara Web | `/prueba-camara/` | tecnicas |
 | [x] | Prueba de Micrófono | `/prueba-microfono/` | tecnicas |
 | [x] | Redes Neuronales e IA - Cómo Aprende una Inteligencia Artificial | `/visualizador-ia-redes-neuronales/` | tecnicas, cultura, estudiantes |
-| [ ] | Selector de Auriculares | `/selector-auriculares/` | tecnicas, productividad |
-| [ ] | Selector de Movilidad Urbana | `/selector-movilidad-urbana/` | tecnicas, productividad |
-| [ ] | Selector de Portátil y PC | `/selector-portatil/` | tecnicas, productividad |
-| [ ] | Selector de Smartphone | `/selector-smartphone/` | tecnicas, productividad |
+| [x] | Selector de Auriculares | `/selector-auriculares/` | tecnicas, productividad |
+| [x] | Selector de Movilidad Urbana | `/selector-movilidad-urbana/` | tecnicas, productividad |
+| [x] | Selector de Portátil y PC | `/selector-portatil/` | tecnicas, productividad |
+| [x] | Selector de Smartphone | `/selector-smartphone/` | tecnicas, productividad |
 | [ ] | Selector de Tablet | `/selector-tablet/` | tecnicas, estudiantes |
 | [ ] | Selector de Tipo de Televisión | `/selector-tipo-television/` | tecnicas, productividad |
 | [ ] | Selector de Vehículo Eléctrico | `/selector-vehiculo-electrico/` | tecnicas, finanzas |

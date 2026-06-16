@@ -508,7 +508,7 @@ export default function SelectorPortatil() {
 
       {pantalla !== 'resultado' ? (
         <header className={styles.hero}>
-          <h1 className={styles.heroTitle}>💻 Asesor de Portátil y PC</h1>
+          <h1 className={styles.heroTitle}><span aria-hidden="true">💻</span> Asesor de Portátil y PC</h1>
           <p className={styles.heroSubtitle}>
             {pantalla === 'intro'
               ? '10 preguntas para saber qué ordenador te conviene de verdad'

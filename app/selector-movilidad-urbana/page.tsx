@@ -509,7 +509,7 @@ export default function SelectorMovilidadUrbana() {
                 </ul>
 
                 <div className={styles.costoEstimado}>
-                  <strong>💶 Coste orientativo</strong>
+                  <strong><span aria-hidden="true">💶</span> Coste orientativo</strong>
                   {res.costoMensual}
                 </div>
 
