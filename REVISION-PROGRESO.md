@@ -269,10 +269,10 @@
 | [x] | Historia del Tren: Del Vapor al AVE y el Maglev | `/visualizador-historia/tren/` | cultura, tecnicas |
 | [x] | Historia del Turismo: Del Grand Tour al Turismo Sostenible | `/visualizador-historia/historia-turismo/` | cultura |
 | [x] | Historia del Urbanismo: De Uruk a la Ciudad Inteligente | `/visualizador-historia/urbanismo/` | cultura, estudiantes |
-| [ ] | Historia Económica de España: Del Imperio Colonial a Europa | `/visualizador-historia/economia-espana/` | cultura, finanzas |
-| [ ] | Instrumentos Musicales | `/instrumentos-musicales/` | cultura |
-| [ ] | La Conquista de América: Choque de Civilizaciones | `/visualizador-historia/historia-conquista-america/` | cultura |
-| [ ] | La Edad Media Europea: De la Caída de Roma a Constantinopla | `/visualizador-historia/edad-media-europea/` | cultura |
+| [x] | Historia Económica de España: Del Imperio Colonial a Europa | `/visualizador-historia/economia-espana/` | cultura, finanzas |
+| [x] | Instrumentos Musicales | `/instrumentos-musicales/` | cultura |
+| [x] | La Conquista de América: Choque de Civilizaciones | `/visualizador-historia/historia-conquista-america/` | cultura |
+| [x] | La Edad Media Europea: De la Caída de Roma a Constantinopla | `/visualizador-historia/edad-media-europea/` | cultura |
 | [ ] | La Era Vikinga: Expansión, Comercio y Exploración (793-1100) | `/visualizador-historia/historia-vikingos/` | cultura |
 | [ ] | La España Antigua: De Tartessos a Hispania Romana | `/visualizador-historia/espana-antigua/` | cultura, estudiantes |
 | [ ] | La España de los Austrias: Del Imperio Universal al Ocaso | `/visualizador-historia/espana-austrias/` | cultura |

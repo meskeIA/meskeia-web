@@ -110,7 +110,7 @@ export const historiaConquistaAmerica: HistoriaData = {
       nombre: 'Catástrofe Demográfica y Mestizaje',
       anioInicio: 1520,
       anioFin: 1580,
-      color: '#6A1B9A',
+      color: '#2E7D32',
       categoria: 'sociedad',
       descripcion: 'La mayor catástrofe demográfica de la historia: viruela, sarampión, tifus reducen la población indígena de ~60 millones a ~6 millones en un siglo (90% de mortalidad). Inicio de la sociedad mestiza y el sincretismo cultural. Nace el mestizo.',
       obraIconica: 'Catálogo de epidemias coloniales — viruela 1520, sarampión 1531, tifus 1545. Ondas de muerte sucesivas',
@@ -173,7 +173,7 @@ export const historiaConquistaAmerica: HistoriaData = {
     {
       nombre: 'Debate Ético y Expansión',
       desde: 1540,
-      hasta: 1565,
+      hasta: 1545,
       icono: '📜',
       hitosDestacados: ['Nuevas Leyes y Resistencia Indígena', 'Expansión: Norte, Sur y Filipinas'],
       eventos: [
