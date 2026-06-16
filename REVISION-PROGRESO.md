@@ -592,10 +592,10 @@
 | [x] | Simulador del Círculo Trigonométrico | `/simulador-trigonometria-circulo-unitario/` | estudiantes |
 | [x] | Simulador del Handshake TCP | `/simulador-tcp-handshake/` | estudiantes |
 | [x] | Simulador del Multiplicador del Gasto | `/simulador-multiplicador-gasto/` | estudiantes |
-| [ ] | Simulador del Potencial de Acción Neuronal | `/simulador-potencial-accion/` | estudiantes |
-| [ ] | Simulador del Problema de Monty Hall | `/simulador-monty-hall/` | estudiantes |
-| [ ] | Simulador del Teorema Central del Límite | `/simulador-teorema-central-limite/` | estudiantes |
-| [ ] | Simulador del Teorema de Bayes | `/simulador-teorema-bayes/` | estudiantes |
+| [x] | Simulador del Potencial de Acción Neuronal | `/simulador-potencial-accion/` | estudiantes |
+| [x] | Simulador del Problema de Monty Hall | `/simulador-monty-hall/` | estudiantes |
+| [x] | Simulador del Teorema Central del Límite | `/simulador-teorema-central-limite/` | estudiantes |
+| [x] | Simulador del Teorema de Bayes | `/simulador-teorema-bayes/` | estudiantes |
 | [ ] | Simulador Depredador-Presa (Lotka-Volterra) | `/simulador-lotka-volterra/` | estudiantes |
 | [ ] | Simulador Masa-Resorte (MAS) | `/simulador-mas-resorte/` | estudiantes |
 | [ ] | Simulador VSEPR de Geometría Molecular | `/simulador-vsepr/` | estudiantes |

@@ -359,7 +359,7 @@ export default function SimuladorPotencialAccionPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>⚡ Simulador del Potencial de Acción</h1>
+        <h1 className={styles.title}><span aria-hidden="true">⚡</span> Simulador del Potencial de Acción</h1>
         <p className={styles.subtitle}>
           Lanza estímulos a una neurona y observa el disparo (o no) en directo. La <strong>ley del &quot;todo
           o nada&quot;</strong>: subumbral nada pasa, supraumbral PA completo de mismo tamaño.
@@ -378,20 +378,22 @@ export default function SimuladorPotencialAccionPage() {
 
         <div className={styles.modeSelector}>
           <button
+            type="button"
             className={`${styles.modeBtn} ${modo === 'unico' ? styles.modeBtnActive : ''}`}
             onClick={() => setModo('unico')}
             aria-pressed={modo === 'unico'}
           >
-            <span className={styles.modeIcon}>⚡</span>
+            <span className={styles.modeIcon} aria-hidden="true">⚡</span>
             <span className={styles.modeName}>Estímulo único</span>
             <span className={styles.modeDesc}>Un pulso. Verás 0 o 1 PA según intensidad.</span>
           </button>
           <button
+            type="button"
             className={`${styles.modeBtn} ${modo === 'sostenido' ? styles.modeBtnActive : ''}`}
             onClick={() => setModo('sostenido')}
             aria-pressed={modo === 'sostenido'}
           >
-            <span className={styles.modeIcon}>🔁</span>
+            <span className={styles.modeIcon} aria-hidden="true">🔁</span>
             <span className={styles.modeName}>Estímulo sostenido</span>
             <span className={styles.modeDesc}>Pulsos repetidos: trenes de PA, frecuencia variable.</span>
           </button>
@@ -493,8 +495,8 @@ export default function SimuladorPotencialAccionPage() {
         {/* STATUS */}
         <div className={`${styles.statusBar} ${disparo ? styles.statusFire : styles.statusNoFire}`}>
           {disparo
-            ? `✅ La neurona DISPARA. ${numSpikes} potencial${numSpikes > 1 ? 'es' : ''} de acción registrado${numSpikes > 1 ? 's' : ''}.`
-            : '❌ Estímulo SUBUMBRAL: la neurona no dispara, vuelve al reposo.'}
+            ? <><span aria-hidden="true">✅</span>{` La neurona DISPARA. ${numSpikes} potencial${numSpikes > 1 ? 'es' : ''} de acción registrado${numSpikes > 1 ? 's' : ''}.`}</>
+            : <><span aria-hidden="true">❌</span>{' Estímulo SUBUMBRAL: la neurona no dispara, vuelve al reposo.'}</>}
         </div>
 
         {/* RESULTADOS */}
@@ -632,22 +634,22 @@ export default function SimuladorPotencialAccionPage() {
           <h3>4 escenarios donde el PA es la pieza clave</h3>
           <div className={styles.scenariosGrid}>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🧠</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🧠</span>
               <strong>Aprendizaje y memoria</strong>
               <p>La sincronización de PAs entre neuronas (potenciación a largo plazo, LTP) es la base celular del aprendizaje. Patrones repetidos refuerzan sinapsis y consolidan recuerdos.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>💊</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">💊</span>
               <strong>Anestésicos locales</strong>
               <p>La lidocaína y otros bloquean canales de Na⁺ dependientes de voltaje. Sin esos canales no hay PA, no hay señal de dolor. Las dentistas y cirujanos usan este principio a diario.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>❤️</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">❤️</span>
               <strong>Ritmo cardíaco</strong>
               <p>Las células del nodo SA disparan PAs espontáneos a ~70 Hz. Marcapasos artificiales reproducen estos pulsos cuando el SA falla. El ECG es el promedio de millones de PAs cardíacos.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🦂</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🦂</span>
               <strong>Toxinas y venenos</strong>
               <p>Tetrodotoxina (pez globo), veneno de medusa, escorpión: todos atacan canales iónicos. Bloquear Na⁺ paraliza nervios; bloquear K⁺ produce PAs continuos. Letales en dosis pequeñas.</p>
             </div>
@@ -660,13 +662,13 @@ export default function SimuladorPotencialAccionPage() {
             <div className={styles.faqItem}>
               <h4>¿Qué significa la ley del &quot;todo o nada&quot;?</h4>
               <p>Si el estímulo NO alcanza el umbral, no hay PA: solo respuesta pasiva que decae rápido. Si SÍ lo alcanza (o lo supera), el PA es <strong>siempre del mismo tamaño</strong> e idéntica forma. Aumentar la intensidad NO produce un PA &quot;más grande&quot;; produce más PAs por segundo (codificación por frecuencia).</p>
-              <p className={styles.faqTip}>💡 En el simulador, prueba intensidad = 14 (subumbral) y luego 16: verás un cambio brusco de NADA a PA completo.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> En el simulador, prueba intensidad = 14 (subumbral) y luego 16: verás un cambio brusco de NADA a PA completo.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Cómo codifica una neurona la intensidad de un estímulo?</h4>
               <p>Por <strong>frecuencia de disparo</strong>: estímulos más fuertes producen PAs más rápidos (hasta ~500 Hz, limitado por el periodo refractario). El cerebro decodifica esa frecuencia: muchos PAs/s = sensación intensa, pocos = sensación leve. Es codificación digital por modulación de frecuencia.</p>
-              <p className={styles.faqTip}>💡 En el simulador, modo sostenido, sube la intensidad y mira cómo aumenta la frecuencia de spikes.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> En el simulador, modo sostenido, sube la intensidad y mira cómo aumenta la frecuencia de spikes.</p>
             </div>
 
             <div className={styles.faqItem}>
@@ -675,19 +677,19 @@ export default function SimuladorPotencialAccionPage() {
               <strong> absoluto</strong> (1-2 ms): canales de Na⁺ inactivados, IMPOSIBLE disparar.
               <strong> relativo</strong> (3-5 ms): hiperpolarización, NECESITA estímulo más fuerte.
               Esto limita la frecuencia máxima a ~500 Hz e impide que el PA &quot;se devuelva&quot; por donde llegó.</p>
-              <p className={styles.faqTip}>💡 Es lo que asegura la propagación unidireccional del PA por el axón.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Es lo que asegura la propagación unidireccional del PA por el axón.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Por qué el PA solo va en un sentido por el axón?</h4>
               <p>Por el <strong>periodo refractario</strong>. Cuando el PA viaja por el axón, la zona inmediatamente posterior está refractaria (canales inactivados). El PA solo puede &quot;saltar&quot; hacia adelante, donde la membrana sí está disponible. Sin refractario, el PA rebotaría infinitamente.</p>
-              <p className={styles.faqTip}>💡 La conducción saltatoria entre nódulos de Ranvier (axones mielinizados) acelera ×10-100 la velocidad.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> La conducción saltatoria entre nódulos de Ranvier (axones mielinizados) acelera ×10-100 la velocidad.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Hay neuronas que NO disparan PA?</h4>
               <p>Sí. Los <strong>bastones y conos</strong> de la retina, las células bipolares y horizontales usan <em>potenciales graduados</em>: el voltaje cambia en cantidad proporcional al estímulo, sin disparo todo-o-nada. Las primeras células ganglionares de la retina sí disparan PAs, propagándolos por el nervio óptico.</p>
-              <p className={styles.faqTip}>💡 Los potenciales graduados conservan más información (analógicos), pero solo funcionan en distancias cortas. PAs son digitales y propagan a metros sin pérdida.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Los potenciales graduados conservan más información (analógicos), pero solo funcionan en distancias cortas. PAs son digitales y propagan a metros sin pérdida.</p>
             </div>
           </div>
         </section>
@@ -737,22 +739,22 @@ export default function SimuladorPotencialAccionPage() {
           <h3>4 buenas prácticas con neurofisiología</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <strong>Distingue PA de potencial graduado</strong>
               <p>PA: todo-o-nada, amplitud fija, propaga sin pérdida. Graduado: variable, amplitud proporcional al estímulo, decae con la distancia. Cada uno tiene su contexto: dendritas usan graduados, axones usan PAs.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚡</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚡</span>
               <strong>Memoriza los iones clave</strong>
               <p>Na⁺ entra → despolariza. K⁺ sale → repolariza. Cl⁻ entra → hiperpolariza (inhibitoria). Ca²⁺ entra → libera neurotransmisor en sinapsis. Los 4 cubren 90 % de la fisiología neuronal básica.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <strong>Codifica la intensidad por frecuencia</strong>
               <p>Una sola neurona dispara PAs a frecuencias entre 1 y 500 Hz según el estímulo. NO codifica intensidad por amplitud (todo-o-nada). El cerebro lee la frecuencia de muchas neuronas en paralelo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <strong>Valora la mielinización</strong>
               <p>Axones mielinizados conducen mucho más rápido. La conducción saltatoria entre nódulos puede multiplicar ×100 la velocidad. Defectos de mielina (esclerosis múltiple) producen síntomas neurológicos variados según el sistema afectado.</p>
             </div>
@@ -761,7 +763,7 @@ export default function SimuladorPotencialAccionPage() {
 
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>5 errores frecuentes con potenciales de acción</strong>
           </div>
           <ul className={styles.warningList}>

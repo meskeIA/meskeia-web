@@ -218,7 +218,7 @@ export default function SimuladorMontyHallPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🚪 Simulador del Problema de Monty Hall</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🚪</span> Simulador del Problema de Monty Hall</h1>
         <p className={styles.subtitle}>
           Elige una puerta. Monty revela una cabra. ¿Cambias? Descubre por qué la probabilidad
           de ganar cambiando es el <strong>doble</strong> que quedándote.
@@ -230,18 +230,20 @@ export default function SimuladorMontyHallPage() {
       {/* SELECTOR DE MODO */}
       <div className={styles.modeSelector}>
         <button
+          type="button"
           className={`${styles.modeBtn} ${mode === 'manual' ? styles.modeBtnActive : ''}`}
           onClick={() => setMode('manual')}
           aria-pressed={mode === 'manual'}
         >
-          🎮 Modo manual
+          <span aria-hidden="true">🎮</span> Modo manual
         </button>
         <button
+          type="button"
           className={`${styles.modeBtn} ${mode === 'automatico' ? styles.modeBtnActive : ''}`}
           onClick={() => setMode('automatico')}
           aria-pressed={mode === 'automatico'}
         >
-          🤖 Simulación automática
+          <span aria-hidden="true">🤖</span> Simulación automática
         </button>
       </div>
 
@@ -262,6 +264,7 @@ export default function SimuladorMontyHallPage() {
           <div className={styles.doorsGrid}>
             {puertas.map(puerta => (
               <button
+                type="button"
                 key={puerta.numero}
                 className={clasePuerta(puerta)}
                 onClick={() => seleccionarPuerta(puerta.numero)}
@@ -286,16 +289,18 @@ export default function SimuladorMontyHallPage() {
           {fase === 'decidir' && seleccionada !== null && revelada !== null && (
             <div className={styles.actionButtons}>
               <button
+                type="button"
                 className={styles.btnPrimary}
                 onClick={() => tomarDecision(true)}
               >
-                🔄 Cambiar de puerta (recomendado)
+                <span aria-hidden="true">🔄</span> Cambiar de puerta (recomendado)
               </button>
               <button
+                type="button"
                 className={styles.btnSecondary}
                 onClick={() => tomarDecision(false)}
               >
-                🔒 Mantener mi puerta
+                <span aria-hidden="true">🔒</span> Mantener mi puerta
               </button>
             </div>
           )}
@@ -304,10 +309,11 @@ export default function SimuladorMontyHallPage() {
           {fase === 'resultado' && (
             <div className={styles.actionButtons}>
               <button
+                type="button"
                 className={styles.btnPrimary}
                 onClick={reiniciarJuego}
               >
-                ▶ Nueva partida
+                <span aria-hidden="true">▶</span> Nueva partida
               </button>
             </div>
           )}
@@ -370,8 +376,8 @@ export default function SimuladorMontyHallPage() {
           </div>
 
           <div className={styles.actionButtons}>
-            <button className={styles.btnPrimary} onClick={ejecutarSimulacion}>
-              ▶ Simular ahora
+            <button type="button" className={styles.btnPrimary} onClick={ejecutarSimulacion}>
+              <span aria-hidden="true">▶</span> Simular ahora
             </button>
           </div>
 
@@ -380,7 +386,7 @@ export default function SimuladorMontyHallPage() {
               <div className={styles.barChart}>
                 {/* Barra "Cambiando siempre" */}
                 <div className={styles.barRow}>
-                  <span className={styles.barLabel}>🔄 Cambiando siempre</span>
+                  <span className={styles.barLabel}><span aria-hidden="true">🔄</span> Cambiando siempre</span>
                   <div className={styles.barTrack}>
                     <div
                       className={styles.barFillPrimary}
@@ -395,7 +401,7 @@ export default function SimuladorMontyHallPage() {
                 </div>
                 {/* Barra "Sin cambiar" */}
                 <div className={styles.barRow}>
-                  <span className={styles.barLabel}>🔒 Sin cambiar</span>
+                  <span className={styles.barLabel}><span aria-hidden="true">🔒</span> Sin cambiar</span>
                   <div className={styles.barTrack}>
                     <div
                       className={styles.barFillSecondary}
@@ -509,22 +515,22 @@ export default function SimuladorMontyHallPage() {
           <h3>4 escenarios que ayudan a entender el problema</h3>
           <div className={styles.scenariosGrid}>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🚪</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🚪</span>
               <strong>Con 100 puertas</strong>
               <p>Imagina 100 puertas, solo una con coche. Eliges la número 37. Monty abre 98 puertas con cabras y deja cerrada la número 82. ¿Cambiarías? La probabilidad de que el coche esté en la 82 es del 99 %. Con solo 3 puertas el efecto es idéntico, aunque menos obvio.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🎲</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🎲</span>
               <strong>Monty elige aleatoriamente</strong>
               <p>Si Monty abriera una puerta <em>al azar</em> (y a veces revelara el coche por error), la probabilidad de ganar cambiando sí sería del 50 %. El problema clave es que Monty <em>siempre sabe</em> dónde está el coche y <em>nunca</em> lo revela. Esa información asimétrica lo cambia todo.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🏆</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🏆</span>
               <strong>En un concurso real</strong>
               <p>Marilyn vos Savant publicó la solución correcta en 1990 en <em>Parade Magazine</em>. Recibió más de 10.000 cartas de protesta, incluidas cientos de matemáticos. Una columna de respuesta con simulaciones físicas demostró que tenía razón. Hoy es uno de los ejemplos más citados de sesgo de confirmación.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>📐</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">📐</span>
               <strong>Versión generalizada: k puertas</strong>
               <p>Con k puertas, si Monty abre m de ellas (todas con cabras), la probabilidad de ganar cambiando es (k−1) / [k·(k−1−m)]. Con k=3 y m=1 obtenemos 2/3. Con k=100 y m=98 obtenemos 99/100. El principio es siempre el mismo: Monty transfiere información.</p>
             </div>
@@ -662,25 +668,25 @@ export default function SimuladorMontyHallPage() {
           <h3>4 claves para ganar en situaciones similares</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔍</span>
               <strong>Identifica quién tiene información asimétrica</strong>
               <p>En cualquier juego o negociación, si alguien que sabe más que tú te da una opción,
               esa opción lleva información implícita. Actualiza tus probabilidades según sus acciones, no solo sus palabras.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <strong>Confía en la estadística, no en la intuición</strong>
               <p>El cerebro humano sobrevalora la &quot;lealtad&quot; a la primera elección (efecto dotación).
               En probabilidad pura, lo que elegiste antes no tiene valor sentimental: solo importan las probabilidades actualizadas.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <strong>Simula antes de decidir en la vida real</strong>
               <p>Ante decisiones bajo incertidumbre, puedes modelar el problema con simulaciones rápidas.
               Una hoja de cálculo o unos minutos de código son suficientes para validar si tu intuición coincide con los datos.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧠</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧠</span>
               <strong>Recuerda que más opciones ≠ más información</strong>
               <p>Que queden dos puertas no significa que cada una tenga 50 % de probabilidad.
               La distribución de probabilidades depende del proceso que generó la situación, no del número de opciones visibles.</p>
@@ -691,7 +697,7 @@ export default function SimuladorMontyHallPage() {
         {/* WARNING BOX */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>5 errores conceptuales frecuentes con el Problema de Monty Hall</strong>
           </div>
           <ul className={styles.warningList}>

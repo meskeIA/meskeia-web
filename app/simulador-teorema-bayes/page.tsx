@@ -386,7 +386,7 @@ export default function SimuladorTeoremaBayesPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🎲 Simulador del Teorema de Bayes</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🎲</span> Simulador del Teorema de Bayes</h1>
         <p className={styles.subtitle}>
           Visualiza por qué un test &quot;99% preciso&quot; puede dar más <strong>falsos positivos</strong> que
           verdaderos. La paradoja bayesiana en directo, con casos médicos reales.
@@ -398,20 +398,22 @@ export default function SimuladorTeoremaBayesPage() {
       {/* MODO */}
       <div className={styles.modeSelector}>
         <button
+          type="button"
           className={`${styles.modeBtn} ${modo === 'rectangulo' ? styles.modeBtnActive : ''}`}
           onClick={() => setModo('rectangulo')}
           aria-pressed={modo === 'rectangulo'}
         >
-          <span className={styles.modeIcon}>🟦</span>
+          <span aria-hidden="true" className={styles.modeIcon}>🟦</span>
           <span className={styles.modeName}>Rectángulo proporcional</span>
           <span className={styles.modeDesc}>Áreas = probabilidades, ideal para ver la paradoja</span>
         </button>
         <button
+          type="button"
           className={`${styles.modeBtn} ${modo === 'arbol' ? styles.modeBtnActive : ''}`}
           onClick={() => setModo('arbol')}
           aria-pressed={modo === 'arbol'}
         >
-          <span className={styles.modeIcon}>🌳</span>
+          <span aria-hidden="true" className={styles.modeIcon}>🌳</span>
           <span className={styles.modeName}>Diagrama de árbol</span>
           <span className={styles.modeDesc}>1000 personas dividiéndose por categorías</span>
         </button>
@@ -424,11 +426,12 @@ export default function SimuladorTeoremaBayesPage() {
           {ESCENARIOS.map(esc => (
             <button
               key={esc.id}
+              type="button"
               className={`${styles.scenarioBtn} ${escenarioId === esc.id ? styles.scenarioBtnActive : ''}`}
               onClick={() => cargarEscenario(esc)}
               aria-pressed={escenarioId === esc.id}
             >
-              <span>{esc.icono}</span>
+              <span aria-hidden="true">{esc.icono}</span>
               <span>{esc.nombre}</span>
             </button>
           ))}
@@ -646,22 +649,22 @@ export default function SimuladorTeoremaBayesPage() {
           <h3>4 escenarios donde Bayes es la herramienta clave</h3>
           <div className={styles.scenariosGrid}>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🩺</span>
+              <span aria-hidden="true" className={styles.scenarioIcon}>🩺</span>
               <strong>Diagnóstico médico</strong>
               <p>Cualquier test (PCR, mamografía, biopsia) tiene VPP que depende de la prevalencia local. Por eso los criterios de cribado masivo evitan poblaciones de muy baja prevalencia (más daño que beneficio por sobrediagnóstico).</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>📨</span>
+              <span aria-hidden="true" className={styles.scenarioIcon}>📨</span>
               <strong>Filtros de spam</strong>
               <p>Spam-Bayes y derivados clasifican correos calculando P(spam|palabras). Aprenden de cada email que marcas: actualizan los priors. Es de lejos el filtro más potente con datos limitados.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>⚖️</span>
+              <span aria-hidden="true" className={styles.scenarioIcon}>⚖️</span>
               <strong>Decisión judicial</strong>
               <p>Pruebas forenses (ADN, huellas) tienen tasas de error que el jurado interpreta mal sin Bayes. La &quot;falacia del fiscal&quot;: confundir P(prueba|inocente) con P(inocente|prueba). Errores graves cuando el sospechoso es uno entre miles.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🤖</span>
+              <span aria-hidden="true" className={styles.scenarioIcon}>🤖</span>
               <strong>Machine learning</strong>
               <p>Los clasificadores Naive Bayes, redes bayesianas y métodos bayesianos en general se basan directamente en el teorema. Es la base teórica de gran parte del aprendizaje supervisado moderno.</p>
             </div>
@@ -748,22 +751,22 @@ export default function SimuladorTeoremaBayesPage() {
           <h3>4 buenas prácticas con Bayes</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span aria-hidden="true" className={styles.tipIcon}>🎯</span>
               <strong>Trabaja siempre con frecuencias naturales</strong>
               <p>&quot;De cada 1000 personas, 50 están enfermas&quot; es más fácil de razonar que &quot;P(D) = 0,05&quot;. Estudios de Gigerenzer y Hoffrage demuestran que las frecuencias mejoran la comprensión hasta un 80 %.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span aria-hidden="true" className={styles.tipIcon}>📊</span>
               <strong>Comprueba sensibilidad y especificidad por separado</strong>
               <p>Un test puede tener sens 99 % y esp 50 %: muchísimos falsos positivos. O viceversa. Mira ambas SIEMPRE, no aceptes &quot;tiene 99 % de precisión&quot;: ese término es ambiguo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span aria-hidden="true" className={styles.tipIcon}>🔄</span>
               <strong>Itera con tests sucesivos</strong>
               <p>Un primer positivo vuelve el prior. Un segundo test calcula posterior usando ese prior. Aplicar Bayes iterativamente da VPPs combinados muy altos con dos tests independientes mediocres.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span aria-hidden="true" className={styles.tipIcon}>✅</span>
               <strong>Verifica con la regla de probabilidad total</strong>
               <p>P(+) = P(+|D)·P(D) + P(+|¬D)·P(¬D). Si la suma de tus 4 categorías (TP+FN+FP+TN) no da el total, hay un error. Es la verificación más rápida.</p>
             </div>
@@ -772,7 +775,7 @@ export default function SimuladorTeoremaBayesPage() {
 
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span aria-hidden="true" className={styles.warningIcon}>⚠️</span>
             <strong>5 errores frecuentes con el teorema de Bayes</strong>
           </div>
           <ul className={styles.warningList}>

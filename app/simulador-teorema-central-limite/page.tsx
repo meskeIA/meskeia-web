@@ -592,7 +592,7 @@ export default function SimuladorTeoremaCentralLimitePage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🎲 Simulador del Teorema Central del Límite</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🎲</span> Simulador del Teorema Central del Límite</h1>
         <p className={styles.subtitle}>
           Lanza muestras de distribuciones muy distintas y mira cómo, al promediar,
           <strong> emerge siempre la curva normal</strong>. Es la magia que sostiene buena parte de la estadística.
@@ -608,11 +608,12 @@ export default function SimuladorTeoremaCentralLimitePage() {
           return (
             <button
               key={id}
+              type="button"
               className={`${styles.distBtn} ${distId === id ? styles.distBtnActive : ''}`}
               onClick={() => setDistId(id)}
               aria-pressed={distId === id}
             >
-              <span className={styles.distIcon}>{d.icono}</span>
+              <span className={styles.distIcon} aria-hidden="true">{d.icono}</span>
               <span className={styles.distName}>{d.nombre}</span>
               <span className={styles.distMeta}>{d.meta}</span>
             </button>
@@ -635,6 +636,7 @@ export default function SimuladorTeoremaCentralLimitePage() {
                 {N_VALORES.map(v => (
                   <button
                     key={v}
+                    type="button"
                     className={`${styles.stepBtn} ${n === v ? styles.stepBtnActive : ''}`}
                     onClick={() => setN(v)}
                     aria-pressed={n === v}
@@ -652,6 +654,7 @@ export default function SimuladorTeoremaCentralLimitePage() {
                 {NUM_MUESTRAS_VALORES.map(v => (
                   <button
                     key={v}
+                    type="button"
                     className={`${styles.stepBtn} ${numMuestras === v ? styles.stepBtnActive : ''}`}
                     onClick={() => setNumMuestras(v)}
                     aria-pressed={numMuestras === v}
@@ -673,24 +676,24 @@ export default function SimuladorTeoremaCentralLimitePage() {
           </label>
 
           <div className={styles.actions}>
-            <button className={styles.runBtn} onClick={lanzar} disabled={animando}>
-              {animando ? '⏳ Generando muestras...' : '▶ Lanzar simulación'}
+            <button type="button" className={styles.runBtn} onClick={lanzar} disabled={animando}>
+              <span aria-hidden="true">{animando ? '⏳' : '▶'}</span> {animando ? 'Generando muestras...' : 'Lanzar simulación'}
             </button>
-            <button className={styles.resetBtn} onClick={reset}>
-              🔄 Reiniciar
+            <button type="button" className={styles.resetBtn} onClick={reset}>
+              <span aria-hidden="true">🔄</span> Reiniciar
             </button>
           </div>
         </div>
 
         {/* CANVAS POBLACIÓN */}
         <div className={styles.canvasWrapper}>
-          <div className={styles.canvasLabel}>📐 Distribución poblacional teórica</div>
+          <div className={styles.canvasLabel}><span aria-hidden="true">📐</span> Distribución poblacional teórica</div>
           <canvas ref={canvasPobRef} className={styles.canvasPoblacion} aria-label="Distribución poblacional teórica" />
         </div>
 
         {/* CANVAS HISTOGRAMA MEDIAS */}
         <div className={styles.canvasWrapper}>
-          <div className={styles.canvasLabel}>📊 Distribución de la media muestral X̄</div>
+          <div className={styles.canvasLabel}><span aria-hidden="true">📊</span> Distribución de la media muestral X̄</div>
           <canvas ref={canvasMedRef} className={styles.canvasMedias} aria-label="Histograma de las medias muestrales" />
         </div>
 
@@ -821,22 +824,22 @@ export default function SimuladorTeoremaCentralLimitePage() {
           <h3>4 escenarios donde el TCL es la base de todo</h3>
           <div className={styles.scenariosGrid}>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>📊</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">📊</span>
               <strong>Encuestas y muestreo</strong>
               <p>El margen de error de las encuestas (&quot;±3 %, 95 % de confianza&quot;) sale directamente del TCL: sin él, no podríamos inferir nada sobre la población a partir de unos cientos de personas.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🏭</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🏭</span>
               <strong>Control estadístico de procesos</strong>
               <p>Las cartas X̄-R del control de calidad asumen que la media de los lotes es normal. Sin el TCL, no podrías detectar desviaciones del proceso con muestras pequeñas.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🧪</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🧪</span>
               <strong>Intervalos de confianza para μ</strong>
               <p>X̄ ± 1,96·σ/√n es el intervalo al 95 %. La forma normal de X̄ (gracias al TCL) hace que ese 1,96 sea válido aunque la población no sea normal, si n es razonablemente grande.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🎲</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🎲</span>
               <strong>Simulación Monte Carlo</strong>
               <p>Para estimar magnitudes complicadas (precio de una opción financiera, integrales sin solución analítica), simulamos N veces y promediamos. El TCL nos dice cuán precisa es esa estimación.</p>
             </div>
@@ -926,22 +929,22 @@ export default function SimuladorTeoremaCentralLimitePage() {
           <h3>4 buenas prácticas con el TCL</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📏</span>
+              <span className={styles.tipIcon} aria-hidden="true">📏</span>
               <strong>Mira siempre la asimetría antes</strong>
               <p>Si tu población tiene skew muy alto (datos económicos, tiempos de espera), no apliques el TCL con n = 30 sin más. Aumenta n o usa métodos robustos (bootstrap, mediana).</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📐</span>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
               <strong>Recuerda: dividir por √n, no por n</strong>
               <p>Para reducir el error a la mitad necesitas <em>cuadruplicar</em> la muestra. Esta es la ley de los retornos decrecientes en muestreo: el coste por unidad de precisión es cada vez mayor.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔬</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔬</span>
               <strong>Si σ es desconocida, usa la t de Student</strong>
               <p>Cuando estimas σ con la muestra (s) y n &lt; 30, los cuantiles de la normal se quedan cortos. La t corrige esa incertidumbre extra. A partir de n = 30, t ≈ z y da igual cuál uses.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <strong>Simula antes de calcular</strong>
               <p>Antes de aplicar fórmulas, lanza una simulación Monte Carlo como esta. Si el TCL no se nota con tu n y tu población, las fórmulas tampoco te darán intervalos válidos.</p>
             </div>
@@ -951,7 +954,7 @@ export default function SimuladorTeoremaCentralLimitePage() {
         {/* WARNING BOX */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>5 errores frecuentes con el TCL</strong>
           </div>
           <ul className={styles.warningList}>
