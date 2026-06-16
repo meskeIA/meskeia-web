@@ -295,16 +295,20 @@ export default function EnzimasCuerpoHumanoPage() {
         {/* Filtro de categorías */}
         <div className={styles.filtrosEnzimas}>
           <button
+            type="button"
             className={`${styles.filtroBtn} ${categoriaFiltro === 'todas' ? styles.filtroActivo : ''}`}
             onClick={() => setCategoriaFiltro('todas')}
+            aria-pressed={categoriaFiltro === 'todas'}
           >
             Todas ({ENZIMAS.length})
           </button>
           {CATEGORIAS_ENZIMAS.map(cat => (
             <button
               key={cat.id}
+              type="button"
               className={`${styles.filtroBtn} ${categoriaFiltro === cat.id ? styles.filtroActivo : ''}`}
               onClick={() => setCategoriaFiltro(cat.id)}
+              aria-pressed={categoriaFiltro === cat.id}
             >
               <span aria-hidden="true">{cat.icono}</span> {cat.titulo} ({ENZIMAS.filter(e => e.categoria === cat.id).length})
             </button>
@@ -318,6 +322,7 @@ export default function EnzimasCuerpoHumanoPage() {
             return (
               <button
                 key={enzima.nombre}
+                type="button"
                 className={`${styles.enzimaCard} ${expandida ? styles.enzimaActiva : ''}`}
                 onClick={() => toggleEnzima(enzima.nombre)}
                 aria-expanded={expandida}
@@ -332,19 +337,19 @@ export default function EnzimasCuerpoHumanoPage() {
                 {expandida && (
                   <div className={styles.enzimaDetalle}>
                     <div className={styles.enzimaFila}>
-                      <span className={styles.enzimaLabel}>📍 Dónde actúa:</span>
+                      <span className={styles.enzimaLabel}><span aria-hidden="true">📍</span> Dónde actúa:</span>
                       <span>{enzima.dondeActua}</span>
                     </div>
                     <div className={styles.enzimaFila}>
-                      <span className={styles.enzimaLabel}>🔹 Sustrato:</span>
+                      <span className={styles.enzimaLabel}><span aria-hidden="true">🔹</span> Sustrato:</span>
                       <span>{enzima.sustrato}</span>
                     </div>
                     <div className={styles.enzimaFila}>
-                      <span className={styles.enzimaLabel}>🔸 Producto:</span>
+                      <span className={styles.enzimaLabel}><span aria-hidden="true">🔸</span> Producto:</span>
                       <span>{enzima.producto}</span>
                     </div>
                     <div className={styles.enzimaFila}>
-                      <span className={styles.enzimaLabel}>⚗️ pH óptimo:</span>
+                      <span className={styles.enzimaLabel}><span aria-hidden="true">⚗️</span> pH óptimo:</span>
                       <span>{enzima.phOptimo}</span>
                     </div>
                     <div className={styles.enzimaDatoCurioso}>
@@ -572,6 +577,7 @@ export default function EnzimasCuerpoHumanoPage() {
             return (
               <button
                 key={cf.nombre}
+                type="button"
                 className={`${styles.cofactorCard} ${expandido ? styles.cofactorActivo : ''} ${cf.tipo === 'ion' ? styles.cofactorIon : styles.cofactorCoenzima}`}
                 onClick={() => toggleCofactor(cf.nombre)}
                 aria-expanded={expandido}
@@ -584,15 +590,15 @@ export default function EnzimasCuerpoHumanoPage() {
                 {expandido && (
                   <div className={styles.cofactorDetalle}>
                     <div className={styles.enzimaFila}>
-                      <span className={styles.enzimaLabel}>🍽️ Fuente:</span>
+                      <span className={styles.enzimaLabel}><span aria-hidden="true">🍽️</span> Fuente:</span>
                       <span>{cf.origen}</span>
                     </div>
                     <div className={styles.enzimaFila}>
-                      <span className={styles.enzimaLabel}>⚙️ Función:</span>
+                      <span className={styles.enzimaLabel}><span aria-hidden="true">⚙️</span> Función:</span>
                       <span>{cf.funcion}</span>
                     </div>
                     <div className={styles.enzimaFila}>
-                      <span className={styles.enzimaLabel}>🧬 Enzimas:</span>
+                      <span className={styles.enzimaLabel}><span aria-hidden="true">🧬</span> Enzimas:</span>
                       <span>{cf.enzimasRelacionadas}</span>
                     </div>
                   </div>
@@ -637,6 +643,7 @@ export default function EnzimasCuerpoHumanoPage() {
           {SECCIONES.map(s => (
             <button
               key={s.id}
+              type="button"
               className={`${styles.navBtn} ${seccion === s.id ? styles.navActivo : ''}`}
               onClick={() => setSeccion(s.id)}
               aria-current={seccion === s.id ? 'true' : undefined}

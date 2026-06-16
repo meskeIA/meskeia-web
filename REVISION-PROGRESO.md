@@ -460,10 +460,10 @@
 | [x] | Embriogénesis: Fecundación, Segmentación y Organogénesis | `/visualizador-embriogenesis/` | estudiantes, salud |
 | [x] | Energía Nuclear - Fisión, Fusión y Comparativa | `/visualizador-energia-nuclear/` | estudiantes, cultura, tecnicas |
 | [x] | Enlaces Químicos - Cómo se Unen los Átomos | `/visualizador-enlaces-quimicos/` | estudiantes, cultura |
-| [ ] | Entrenador Tablas Multiplicar | `/tablas-multiplicar/` | estudiantes |
-| [ ] | Enzimas del Cuerpo Humano - Catalizadores de la Vida | `/visualizador-enzimas-cuerpo-humano/` | estudiantes, cultura, salud |
-| [ ] | Estadística Avanzada | `/estadistica-avanzada/` | estudiantes |
-| [ ] | Estadística Inferencial: p-valor, Errores y Confianza | `/visualizador-estadistica-inferencial/` | estudiantes, tecnicas |
+| [x] | Entrenador Tablas Multiplicar | `/tablas-multiplicar/` | estudiantes |
+| [x] | Enzimas del Cuerpo Humano - Catalizadores de la Vida | `/visualizador-enzimas-cuerpo-humano/` | estudiantes, cultura, salud |
+| [x] | Estadística Avanzada | `/estadistica-avanzada/` | estudiantes |
+| [x] | Estadística Inferencial: p-valor, Errores y Confianza | `/visualizador-estadistica-inferencial/` | estudiantes, tecnicas |
 | [ ] | Estados de la Materia | `/visualizador-estados-materia/` | estudiantes, cultura |
 | [ ] | Estructura del Átomo - Partículas, Orbitales e Isótopos | `/visualizador-estructura-atomo/` | estudiantes, cultura |
 | [x] | Estructuras Cristalinas 3D - Celdas Unitarias Rotables | `/visualizador-estructuras-cristalinas/` | estudiantes, cultura |

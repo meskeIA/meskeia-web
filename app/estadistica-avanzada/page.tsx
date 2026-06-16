@@ -466,10 +466,12 @@ export default function EstadisticaAvanzadaPage() {
         {tabs.map(tab => (
           <button
             key={tab.id}
+            type="button"
             onClick={() => setActiveTab(tab.id)}
             className={`${styles.tabButton} ${activeTab === tab.id ? styles.tabActive : ''}`}
+            aria-pressed={activeTab === tab.id}
           >
-            <span className={styles.tabIcon}>{tab.icon}</span>
+            <span className={styles.tabIcon} aria-hidden="true">{tab.icon}</span>
             <span className={styles.tabLabel}>{tab.label}</span>
           </button>
         ))}
@@ -534,7 +536,7 @@ export default function EstadisticaAvanzadaPage() {
                 </div>
               )}
 
-              <button onClick={() => loadExample('ttest')} className={styles.btnSecondary}>
+              <button type="button" onClick={() => loadExample('ttest')} className={styles.btnSecondary}>
                 Cargar ejemplo
               </button>
             </div>
@@ -626,7 +628,7 @@ export default function EstadisticaAvanzadaPage() {
                 />
               </div>
 
-              <button onClick={() => loadExample('correlation')} className={styles.btnSecondary}>
+              <button type="button" onClick={() => loadExample('correlation')} className={styles.btnSecondary}>
                 Cargar ejemplo
               </button>
             </div>
@@ -701,7 +703,7 @@ export default function EstadisticaAvanzadaPage() {
                 />
               </div>
 
-              <button onClick={() => loadExample('regression')} className={styles.btnSecondary}>
+              <button type="button" onClick={() => loadExample('regression')} className={styles.btnSecondary}>
                 Cargar ejemplo
               </button>
             </div>
@@ -787,7 +789,7 @@ export default function EstadisticaAvanzadaPage() {
                 </span>
               </div>
 
-              <button onClick={() => loadExample('chisquare')} className={styles.btnSecondary}>
+              <button type="button" onClick={() => loadExample('chisquare')} className={styles.btnSecondary}>
                 Cargar ejemplo
               </button>
             </div>
@@ -876,7 +878,7 @@ export default function EstadisticaAvanzadaPage() {
                 </select>
               </div>
 
-              <button onClick={() => loadExample('confidence')} className={styles.btnSecondary}>
+              <button type="button" onClick={() => loadExample('confidence')} className={styles.btnSecondary}>
                 Cargar ejemplo
               </button>
             </div>
@@ -952,7 +954,7 @@ export default function EstadisticaAvanzadaPage() {
                 />
               </div>
 
-              <button onClick={() => loadExample('normality')} className={styles.btnSecondary}>
+              <button type="button" onClick={() => loadExample('normality')} className={styles.btnSecondary}>
                 Cargar ejemplo
               </button>
             </div>

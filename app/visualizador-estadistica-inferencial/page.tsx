@@ -432,6 +432,7 @@ export default function VisualizadorEstadisticaInferencial() {
           {SECCIONES.map((sec) => (
             <button
               key={sec.id}
+              type="button"
               className={`${styles.seccionBtn} ${seccionActiva === sec.id ? styles.seccionBtnActivo : ''}`}
               onClick={() => setSeccionActiva(sec.id)}
               aria-pressed={seccionActiva === sec.id}
@@ -634,11 +635,12 @@ export default function VisualizadorEstadisticaInferencial() {
             </div>
 
             <div className={styles.botonesRow}>
-              <button className={styles.btnPrimario} onClick={simularIC}>
+              <button type="button" className={styles.btnPrimario} onClick={simularIC}>
                 Simular 100 muestras
               </button>
               {simulado && (
                 <button
+                  type="button"
                   className={styles.btnSecundario}
                   onClick={() => { setSimulado(false); setIntervalos([]); }}
                 >

@@ -287,7 +287,9 @@ export default function TablasMultiplicarPage() {
               {(Object.keys(DIFICULTADES) as Dificultad[]).map((dif) => (
                 <button
                   key={dif}
+                  type="button"
                   onClick={() => setDificultad(dif)}
+                  aria-pressed={dificultad === dif}
                   className={`${styles.difficultyButton} ${dificultad === dif ? styles.difficultyActive : ''}`}
                 >
                   <span className={styles.difficultyEmoji}>
@@ -313,7 +315,9 @@ export default function TablasMultiplicarPage() {
               {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((tabla) => (
                 <button
                   key={tabla}
+                  type="button"
                   onClick={() => toggleTabla(tabla)}
+                  aria-pressed={tablasSeleccionadas.includes(tabla)}
                   className={`${styles.tablaButton} ${tablasSeleccionadas.includes(tabla) ? styles.tablaActive : ''}`}
                 >
                   {tabla}
@@ -322,6 +326,7 @@ export default function TablasMultiplicarPage() {
             </div>
             {tablasSeleccionadas.length > 0 && (
               <button
+                type="button"
                 onClick={() => setTablasSeleccionadas([])}
                 className={styles.clearButton}
               >
@@ -331,8 +336,8 @@ export default function TablasMultiplicarPage() {
           </div>
 
           {/* Botón de inicio */}
-          <button onClick={iniciarJuego} className={styles.startButton}>
-            🚀 ¡Empezar a jugar!
+          <button type="button" onClick={iniciarJuego} className={styles.startButton}>
+            <span aria-hidden="true">🚀</span> ¡Empezar a jugar!
           </button>
         </div>
       )}
@@ -443,11 +448,11 @@ export default function TablasMultiplicarPage() {
             </div>
 
             <div className={styles.resultActions}>
-              <button onClick={iniciarJuego} className={styles.playAgainButton}>
-                🔄 Jugar de nuevo
+              <button type="button" onClick={iniciarJuego} className={styles.playAgainButton}>
+                <span aria-hidden="true">🔄</span> Jugar de nuevo
               </button>
-              <button onClick={() => setEstado('menu')} className={styles.menuButton}>
-                📋 Volver al menú
+              <button type="button" onClick={() => setEstado('menu')} className={styles.menuButton}>
+                <span aria-hidden="true">📋</span> Volver al menú
               </button>
             </div>
           </div>
