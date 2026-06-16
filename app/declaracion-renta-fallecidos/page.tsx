@@ -202,6 +202,7 @@ export default function DeclaracionRentaFallecidosPage() {
           {([1, 2, 3, 4, 5] as Paso[]).map(paso => (
             <button
               key={paso}
+              type="button"
               className={`${styles.progressStep} ${paso === pasoActual ? styles.progressStepActive : ''} ${paso < pasoActual ? styles.progressStepDone : ''}`}
               onClick={() => setPasoActual(paso)}
               aria-label={`Paso ${paso}: ${PASOS_NOMBRES[paso]}`}
@@ -261,7 +262,7 @@ export default function DeclaracionRentaFallecidosPage() {
 
             {/* Resultado */}
             <div className={`${styles.resultBox} ${resultado.obligado ? styles.resultObligado : styles.resultNoObligado}`} role="alert" aria-live="polite">
-              <strong>{resultado.obligado ? '✅ Sí, probablemente esté obligado a declarar' : '🔵 Probablemente no esté obligado a declarar'}</strong>
+              <strong>{resultado.obligado ? <><span aria-hidden="true">✅</span> Sí, probablemente esté obligado a declarar</> : <><span aria-hidden="true">🔵</span> Probablemente no esté obligado a declarar</>}</strong>
               <p>{resultado.motivo}</p>
             </div>
 
@@ -272,7 +273,7 @@ export default function DeclaracionRentaFallecidosPage() {
 
             <div className={styles.navButtons}>
               <div />
-              <button className={styles.btnPrimary} onClick={avanzar}>Siguiente <span aria-hidden="true">→</span></button>
+              <button type="button" className={styles.btnPrimary} onClick={avanzar}>Siguiente <span aria-hidden="true">→</span></button>
             </div>
           </section>
         )}
@@ -334,8 +335,8 @@ export default function DeclaracionRentaFallecidosPage() {
             </div>
 
             <div className={styles.navButtons}>
-              <button className={styles.btnSecondary} onClick={retroceder}><span aria-hidden="true">←</span> Anterior</button>
-              <button className={styles.btnPrimary} onClick={avanzar}>Siguiente <span aria-hidden="true">→</span></button>
+              <button type="button" className={styles.btnSecondary} onClick={retroceder}><span aria-hidden="true">←</span> Anterior</button>
+              <button type="button" className={styles.btnPrimary} onClick={avanzar}>Siguiente <span aria-hidden="true">→</span></button>
             </div>
           </section>
         )}
@@ -389,8 +390,8 @@ export default function DeclaracionRentaFallecidosPage() {
             </div>
 
             <div className={styles.navButtons}>
-              <button className={styles.btnSecondary} onClick={retroceder}><span aria-hidden="true">←</span> Anterior</button>
-              <button className={styles.btnPrimary} onClick={avanzar}>Siguiente <span aria-hidden="true">→</span></button>
+              <button type="button" className={styles.btnSecondary} onClick={retroceder}><span aria-hidden="true">←</span> Anterior</button>
+              <button type="button" className={styles.btnPrimary} onClick={avanzar}>Siguiente <span aria-hidden="true">→</span></button>
             </div>
           </section>
         )}
@@ -471,8 +472,8 @@ export default function DeclaracionRentaFallecidosPage() {
             )}
 
             <div className={styles.navButtons}>
-              <button className={styles.btnSecondary} onClick={retroceder}><span aria-hidden="true">←</span> Anterior</button>
-              <button className={styles.btnPrimary} onClick={avanzar}>Siguiente <span aria-hidden="true">→</span></button>
+              <button type="button" className={styles.btnSecondary} onClick={retroceder}><span aria-hidden="true">←</span> Anterior</button>
+              <button type="button" className={styles.btnPrimary} onClick={avanzar}>Siguiente <span aria-hidden="true">→</span></button>
             </div>
           </section>
         )}
@@ -541,8 +542,8 @@ export default function DeclaracionRentaFallecidosPage() {
             </div>
 
             <div className={styles.navButtons}>
-              <button className={styles.btnSecondary} onClick={retroceder}><span aria-hidden="true">←</span> Anterior</button>
-              <button className={styles.btnPrimary} onClick={() => setPasoActual(1)}><span aria-hidden="true">🔄</span> Empezar de nuevo</button>
+              <button type="button" className={styles.btnSecondary} onClick={retroceder}><span aria-hidden="true">←</span> Anterior</button>
+              <button type="button" className={styles.btnPrimary} onClick={() => setPasoActual(1)}><span aria-hidden="true">🔄</span> Empezar de nuevo</button>
             </div>
           </section>
         )}

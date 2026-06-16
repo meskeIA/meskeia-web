@@ -266,7 +266,7 @@ export default function AsistenteConstitucionSociedadPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🏢 Asistente Constitución de Sociedad</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🏢</span> Asistente Constitución de Sociedad</h1>
         <p className={styles.subtitle}>
           Guía completa para crear una SL, SLU o SA en España: trámites, costes y documentación
         </p>
@@ -291,6 +291,7 @@ export default function AsistenteConstitucionSociedadPage() {
               type="button"
               className={`${styles.tipoCard} ${tipoSeleccionado === tipo ? styles.tipoCardActivo : ''}`}
               onClick={() => setTipoSeleccionado(tipo)}
+              aria-pressed={tipoSeleccionado === tipo}
             >
               <span className={styles.tipoSiglas}>{info.siglas}</span>
               <span className={styles.tipoNombre}>{info.nombre}</span>
@@ -315,15 +316,16 @@ export default function AsistenteConstitucionSociedadPage() {
       {/* Tabs */}
       <div className={styles.tabs}>
         {[
-          { id: 'checklist' as TabActiva, label: '✅ Checklist', desc: 'Trámites paso a paso' },
-          { id: 'datos' as TabActiva, label: '📝 Datos Sociedad', desc: 'Formulario de constitución' },
-          { id: 'costes' as TabActiva, label: '💰 Costes Estimados', desc: 'Qué vas a pagar' },
+          { id: 'checklist' as TabActiva, label: <><span aria-hidden="true">✅</span> Checklist</>, desc: 'Trámites paso a paso' },
+          { id: 'datos' as TabActiva, label: <><span aria-hidden="true">📝</span> Datos Sociedad</>, desc: 'Formulario de constitución' },
+          { id: 'costes' as TabActiva, label: <><span aria-hidden="true">💰</span> Costes Estimados</>, desc: 'Qué vas a pagar' },
         ].map(tab => (
           <button
             key={tab.id}
             type="button"
             className={`${styles.tab} ${tabActiva === tab.id ? styles.tabActivo : ''}`}
             onClick={() => setTabActiva(tab.id)}
+            aria-pressed={tabActiva === tab.id}
           >
             <span>{tab.label}</span>
             <span className={styles.tabDesc}>{tab.desc}</span>
@@ -346,7 +348,7 @@ export default function AsistenteConstitucionSociedadPage() {
                   aria-expanded={abierta ? 'true' : 'false'}
                 >
                   <div className={styles.faseHeaderLeft}>
-                    <span className={styles.faseIcono}>{fase.icono}</span>
+                    <span className={styles.faseIcono} aria-hidden="true">{fase.icono}</span>
                     <div>
                       <span className={styles.faseNombre}>Fase {fase.numero}: {fase.nombre}</span>
                       <span className={styles.faseDescripcion}>{fase.descripcion}</span>
@@ -354,7 +356,7 @@ export default function AsistenteConstitucionSociedadPage() {
                   </div>
                   <div className={styles.faseHeaderRight}>
                     <span className={styles.faseProg}>{prog.completados}/{prog.total}</span>
-                    <span className={styles.faseToggle}>{abierta ? '▲' : '▼'}</span>
+                    <span className={styles.faseToggle} aria-hidden="true">{abierta ? '▲' : '▼'}</span>
                   </div>
                 </button>
                 <div className={styles.faseMiniBar}>
@@ -383,7 +385,7 @@ export default function AsistenteConstitucionSociedadPage() {
                             <span className={styles.checkDesc}>{item.descripcion}</span>
                             {item.enlaceUtil && (
                               <a href={item.enlaceUtil.url} target="_blank" rel="noopener noreferrer" className={styles.checkEnlace}>
-                                🔗 {item.enlaceUtil.texto}
+                                <span aria-hidden="true">🔗</span> {item.enlaceUtil.texto}
                               </a>
                             )}
                           </div>
@@ -403,7 +405,7 @@ export default function AsistenteConstitucionSociedadPage() {
         <div className={styles.tabContent}>
           {/* Denominación */}
           <div className={styles.formSeccion}>
-            <h3 className={styles.formSeccionTitulo}>📛 Denominación Social</h3>
+            <h3 className={styles.formSeccionTitulo}><span aria-hidden="true">📛</span> Denominación Social</h3>
             <p className={styles.formSeccionDesc}>Prepara 3 opciones por si alguna ya está registrada.</p>
             {[
               { campo: 'denominacion1' as keyof DatosSociedad, label: '1.ª opción (preferida)', placeholder: 'Ej.: Innovatech Solutions' },
@@ -430,7 +432,7 @@ export default function AsistenteConstitucionSociedadPage() {
 
           {/* Capital social */}
           <div className={styles.formSeccion}>
-            <h3 className={styles.formSeccionTitulo}>💶 Capital Social</h3>
+            <h3 className={styles.formSeccionTitulo}><span aria-hidden="true">💶</span> Capital Social</h3>
             <NumberInput
               value={datos.capitalSocial}
               onChange={v => actualizarDato('capitalSocial', v)}
@@ -440,14 +442,14 @@ export default function AsistenteConstitucionSociedadPage() {
             />
             {capitalInsuficiente && (
               <p className={styles.alertaCapital}>
-                ⚠️ El capital mínimo para {tipoSeleccionado} es {formatCurrency(capitalMinimo)}
+                <span aria-hidden="true">⚠️</span> El capital mínimo para {tipoSeleccionado} es {formatCurrency(capitalMinimo)}
               </p>
             )}
           </div>
 
           {/* Domicilio */}
           <div className={styles.formSeccion}>
-            <h3 className={styles.formSeccionTitulo}>📍 Domicilio Social</h3>
+            <h3 className={styles.formSeccionTitulo}><span aria-hidden="true">📍</span> Domicilio Social</h3>
             <div className={styles.campo}>
               <label className={styles.label}>Calle y número</label>
               <input type="text" value={datos.domicilio} onChange={e => actualizarDato('domicilio', e.target.value)} placeholder="Calle Mayor, 1" className={styles.input} />
@@ -470,7 +472,7 @@ export default function AsistenteConstitucionSociedadPage() {
 
           {/* Objeto social */}
           <div className={styles.formSeccion}>
-            <h3 className={styles.formSeccionTitulo}>🎯 Objeto Social</h3>
+            <h3 className={styles.formSeccionTitulo}><span aria-hidden="true">🎯</span> Objeto Social</h3>
             <p className={styles.formSeccionDesc}>Describe las actividades de la empresa. Redacción amplia para no limitar futuras actividades.</p>
             <div className={styles.campo}>
               <label className={styles.label}>Objeto social</label>
@@ -486,7 +488,7 @@ export default function AsistenteConstitucionSociedadPage() {
 
           {/* Órgano de administración */}
           <div className={styles.formSeccion}>
-            <h3 className={styles.formSeccionTitulo}>👔 Órgano de Administración</h3>
+            <h3 className={styles.formSeccionTitulo}><span aria-hidden="true">👔</span> Órgano de Administración</h3>
             <div className={styles.radioGroup}>
               {[
                 { val: 'unico', label: 'Administrador único', desc: '1 persona, más sencillo' },
@@ -512,11 +514,11 @@ export default function AsistenteConstitucionSociedadPage() {
 
           {/* Socios fundadores */}
           <div className={styles.formSeccion}>
-            <h3 className={styles.formSeccionTitulo}>👥 Socios Fundadores</h3>
+            <h3 className={styles.formSeccionTitulo}><span aria-hidden="true">👥</span> Socios Fundadores</h3>
             <p className={styles.formSeccionDesc}>
               Los porcentajes deben sumar 100%.{' '}
               {sumaPorcentajes !== 100 && <span className={styles.alertaPct}>Suma actual: {sumaPorcentajes.toFixed(1)}%</span>}
-              {sumaPorcentajes === 100 && <span className={styles.okPct}>✅ Suma correcta</span>}
+              {sumaPorcentajes === 100 && <span className={styles.okPct}><span aria-hidden="true">✅</span> Suma correcta</span>}
             </p>
             {datos.socios.map((socio, i) => (
               <div key={socio.id} className={styles.socioRow}>
@@ -553,7 +555,7 @@ export default function AsistenteConstitucionSociedadPage() {
           </div>
 
           <button type="button" onClick={resetear} className={styles.btnResetear}>
-            🔄 Reiniciar todos los datos
+            <span aria-hidden="true">🔄</span> Reiniciar todos los datos
           </button>
         </div>
       )}
@@ -615,10 +617,10 @@ export default function AsistenteConstitucionSociedadPage() {
             </div>
 
             <div className={styles.costesNotas}>
-              <p>✅ El <strong>ITPyAJD</strong> está exento desde 2010 (solo hay que presentar el modelo).</p>
-              <p>✅ El capital social no es un gasto: queda disponible en la cuenta de la empresa.</p>
-              <p>💡 La constitución electrónica (PAE/CIRCE) puede reducir plazos y algunos costes.</p>
-              <p>💡 Algunos bancos ofrecen cuenta de constitución sin comisiones para startups.</p>
+              <p><span aria-hidden="true">✅</span> El <strong>ITPyAJD</strong> está exento desde 2010 (solo hay que presentar el modelo).</p>
+              <p><span aria-hidden="true">✅</span> El capital social no es un gasto: queda disponible en la cuenta de la empresa.</p>
+              <p><span aria-hidden="true">💡</span> La constitución electrónica (PAE/CIRCE) puede reducir plazos y algunos costes.</p>
+              <p><span aria-hidden="true">💡</span> Algunos bancos ofrecen cuenta de constitución sin comisiones para startups.</p>
             </div>
           </div>
         </div>
@@ -633,19 +635,19 @@ export default function AsistenteConstitucionSociedadPage() {
           <h2>Ventajas de Constituir una Sociedad</h2>
           <div className={styles.ventajasGrid}>
             <div className={styles.ventajaCard}>
-              <h4>🛡️ Responsabilidad limitada</h4>
+              <h4><span aria-hidden="true">🛡️</span> Responsabilidad limitada</h4>
               <p>Los socios solo responden con el capital aportado. Tu patrimonio personal queda protegido frente a deudas de la empresa.</p>
             </div>
             <div className={styles.ventajaCard}>
-              <h4>💸 Ventaja fiscal (a partir de ciertos ingresos)</h4>
+              <h4><span aria-hidden="true">💸</span> Ventaja fiscal (a partir de ciertos ingresos)</h4>
               <p>El Impuesto de Sociedades (IS) tiene tipo general del 25% (15% para nuevas empresas los 2 primeros años con base positiva). Puede ser más ventajoso que IRPF si facturas más de 40.000–50.000 €/año.</p>
             </div>
             <div className={styles.ventajaCard}>
-              <h4>🤝 Imagen profesional</h4>
+              <h4><span aria-hidden="true">🤝</span> Imagen profesional</h4>
               <p>Muchos clientes y proveedores, especialmente empresas grandes, prefieren trabajar con sociedades. Facilita la contratación pública.</p>
             </div>
             <div className={styles.ventajaCard}>
-              <h4>📈 Facilita la inversión</h4>
+              <h4><span aria-hidden="true">📈</span> Facilita la inversión</h4>
               <p>Permite incorporar socios inversores, emitir participaciones/acciones y acceder a financiación más estructurada (capital riesgo, rondas).</p>
             </div>
           </div>

@@ -488,7 +488,7 @@ export default function ComparadorFormasJuridicasPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>⚖️</span>
+        <span className={styles.heroIcon} aria-hidden="true">⚖️</span>
         <h1 className={styles.title}>Comparador de Formas Jurídicas</h1>
         <p className={styles.subtitle}>
           Descubre qué estructura legal se adapta mejor a tu proyecto: autónomo, sociedad, cooperativa o asociación
@@ -502,25 +502,31 @@ export default function ComparadorFormasJuridicasPage() {
       {/* Navegación de vistas */}
       <div className={styles.vistas}>
         <button
+          type="button"
           className={`${styles.vistaBtn} ${vistaActiva === 'comparador' ? styles.vistaActiva : ''}`}
           onClick={() => setVistaActiva('comparador')}
+          aria-pressed={vistaActiva === 'comparador'}
         >
-          📊 Comparador
+          <span aria-hidden="true">📊</span> Comparador
         </button>
         <button
+          type="button"
           className={`${styles.vistaBtn} ${vistaActiva === 'test' ? styles.vistaActiva : ''}`}
           onClick={() => setVistaActiva('test')}
+          aria-pressed={vistaActiva === 'test'}
         >
-          🎯 Test Rápido
+          <span aria-hidden="true">🎯</span> Test Rápido
         </button>
         <button
+          type="button"
           className={`${styles.vistaBtn} ${vistaActiva === 'detalle' ? styles.vistaActiva : ''}`}
           onClick={() => {
             if (!formaDetalle) setFormaDetalle('autonomo');
             setVistaActiva('detalle');
           }}
+          aria-pressed={vistaActiva === 'detalle'}
         >
-          📋 Ficha Detallada
+          <span aria-hidden="true">📋</span> Ficha Detallada
         </button>
       </div>
 
@@ -534,11 +540,13 @@ export default function ComparadorFormasJuridicasPage() {
               {FORMAS_JURIDICAS.map(forma => (
                 <button
                   key={forma.id}
+                  type="button"
                   className={`${styles.formaBtn} ${formasSeleccionadas.includes(forma.id) ? styles.formaSeleccionada : ''}`}
                   onClick={() => toggleForma(forma.id)}
                   style={{ '--forma-color': forma.color } as React.CSSProperties}
+                  aria-pressed={formasSeleccionadas.includes(forma.id)}
                 >
-                  <span className={styles.formaIcon}>{forma.icon}</span>
+                  <span className={styles.formaIcon} aria-hidden="true">{forma.icon}</span>
                   <span className={styles.formaNombre}>{forma.nombreCorto}</span>
                 </button>
               ))}
@@ -560,9 +568,11 @@ export default function ComparadorFormasJuridicasPage() {
                       <span className={styles.headerIcon}>{forma.icon}</span>
                       <span>{forma.nombreCorto}</span>
                       <button
+                        type="button"
                         className={styles.btnDetalle}
                         onClick={() => verDetalle(forma.id)}
                         title="Ver ficha completa"
+                        aria-label="Ver ficha completa"
                       >
                         📋
                       </button>
@@ -574,7 +584,7 @@ export default function ComparadorFormasJuridicasPage() {
                 {CRITERIOS.map(criterio => (
                   <tr key={criterio.id}>
                     <td className={styles.criterioCell}>
-                      <span className={styles.criterioIcon}>{criterio.icon}</span>
+                      <span className={styles.criterioIcon} aria-hidden="true">{criterio.icon}</span>
                       {criterio.label}
                     </td>
                     {formasConDatos.map(forma => (
@@ -621,7 +631,7 @@ export default function ComparadorFormasJuridicasPage() {
       {/* VISTA: TEST RÁPIDO */}
       {vistaActiva === 'test' && (
         <div className={styles.testContainer}>
-          <h2 className={styles.testTitulo}>🎯 ¿Qué forma jurídica me conviene?</h2>
+          <h2 className={styles.testTitulo}><span aria-hidden="true">🎯</span> ¿Qué forma jurídica me conviene?</h2>
           <p className={styles.testIntro}>
             Responde estas 5 preguntas rápidas para obtener una recomendación personalizada
           </p>
@@ -636,8 +646,10 @@ export default function ComparadorFormasJuridicasPage() {
                     {pregunta.opciones.map(opcion => (
                       <button
                         key={opcion.valor}
+                        type="button"
                         className={`${styles.opcionBtn} ${respuestasTest[pregunta.id] === opcion.valor ? styles.opcionSeleccionada : ''}`}
                         onClick={() => setRespuestasTest(prev => ({ ...prev, [pregunta.id]: opcion.valor }))}
+                        aria-pressed={respuestasTest[pregunta.id] === opcion.valor}
                       >
                         {opcion.texto}
                       </button>
@@ -648,7 +660,7 @@ export default function ComparadorFormasJuridicasPage() {
             </div>
           ) : (
             <div className={styles.resultadoTest}>
-              <h3>📊 Tu recomendación</h3>
+              <h3><span aria-hidden="true">📊</span> Tu recomendación</h3>
               <div className={styles.rankingGrid}>
                 {recomendacionTest.slice(0, 3).map((forma, index) => (
                   <div
@@ -656,14 +668,15 @@ export default function ComparadorFormasJuridicasPage() {
                     className={`${styles.rankingCard} ${index === 0 ? styles.rankingPrimero : ''}`}
                     style={{ borderColor: forma.color }}
                   >
-                    <div className={styles.rankingPosicion}>
+                    <div className={styles.rankingPosicion} aria-hidden="true">
                       {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
                     </div>
                     <div className={styles.rankingInfo}>
-                      <span className={styles.rankingIcon}>{forma.icon}</span>
+                      <span className={styles.rankingIcon} aria-hidden="true">{forma.icon}</span>
                       <strong>{forma.nombre}</strong>
                       <p>{forma.descripcion}</p>
                       <button
+                        type="button"
                         className={styles.btnVerDetalle}
                         onClick={() => verDetalle(forma.id)}
                       >
@@ -673,8 +686,8 @@ export default function ComparadorFormasJuridicasPage() {
                   </div>
                 ))}
               </div>
-              <button className={styles.btnReiniciar} onClick={reiniciarTest}>
-                🔄 Repetir test
+              <button type="button" className={styles.btnReiniciar} onClick={reiniciarTest}>
+                <span aria-hidden="true">🔄</span> Repetir test
               </button>
             </div>
           )}
@@ -689,11 +702,13 @@ export default function ComparadorFormasJuridicasPage() {
             {FORMAS_JURIDICAS.map(forma => (
               <button
                 key={forma.id}
+                type="button"
                 className={`${styles.detalleBtn} ${formaDetalle === forma.id ? styles.detalleActivo : ''}`}
                 onClick={() => setFormaDetalle(forma.id)}
                 style={{ '--forma-color': forma.color } as React.CSSProperties}
+                aria-pressed={formaDetalle === forma.id}
               >
-                {forma.icon} {forma.nombreCorto}
+                <span aria-hidden="true">{forma.icon}</span> {forma.nombreCorto}
               </button>
             ))}
           </div>

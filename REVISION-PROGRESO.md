@@ -874,12 +874,12 @@
 |---|---|---|---|
 | [x] | Asistente Alta Autónomo | `/asistente-alta-autonomo/` | legal-fiscal, freelance |
 | [x] | Asistente Constitución Asociación | `/asistente-constitucion-asociacion/` | legal-fiscal |
-| [ ] | Asistente Constitución Sociedad | `/asistente-constitucion-sociedad/` | legal-fiscal, freelance |
+| [x] | Asistente Constitución Sociedad | `/asistente-constitucion-sociedad/` | legal-fiscal, freelance |
 | [x] | Calendario Fiscal Emprendedor | `/calendario-fiscal-emprendedor/` | legal-fiscal, freelance |
-| [ ] | Checklist Declaración de la Renta 2026 | `/checklist-declaracion-renta/` | legal-fiscal, finanzas, freelance |
+| [x] | Checklist Declaración de la Renta 2026 | `/checklist-declaracion-renta/` | legal-fiscal, finanzas, freelance |
 | [x] | Comparador Autónomo vs SL | `/comparador-autonomo-vs-sl/` | legal-fiscal, freelance |
-| [ ] | Comparador de Formas Jurídicas | `/comparador-formas-juridicas/` | legal-fiscal, freelance |
-| [ ] | Declaración Renta Persona Fallecida | `/declaracion-renta-fallecidos/` | legal-fiscal, finanzas |
+| [x] | Comparador de Formas Jurídicas | `/comparador-formas-juridicas/` | legal-fiscal, freelance |
+| [x] | Declaración Renta Persona Fallecida | `/declaracion-renta-fallecidos/` | legal-fiscal, finanzas |
 | [ ] | Estimador de Complemento a Mínimos | `/estimador-complemento-minimos/` | legal-fiscal, finanzas |
 | [ ] | Estimador de Costas Judiciales | `/estimador-costas-judiciales/` | legal-fiscal |
 | [ ] | Estimador de Costes de Divorcio | `/estimador-costes-divorcio/` | legal-fiscal |

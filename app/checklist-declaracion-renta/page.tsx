@@ -246,7 +246,7 @@ export default function ChecklistDeclaracionRentaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📋 Checklist Declaración de la Renta 2026</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📋</span> Checklist Declaración de la Renta 2026</h1>
         <p className={styles.subtitle}>Documentos organizados por perfil para la campaña del ejercicio 2025</p>
       </header>
 
@@ -260,7 +260,7 @@ export default function ChecklistDeclaracionRentaPage() {
 
       {/* Fechas clave */}
       <div className={styles.fechasWrapper}>
-        <h2 className={styles.fechasTitulo}>📅 Fechas clave campaña 2026</h2>
+        <h2 className={styles.fechasTitulo}><span aria-hidden="true">📅</span> Fechas clave campaña 2026</h2>
         <div className={styles.fechasGrid}>
           {FECHAS_CLAVE.map(f => (
             <div key={f.fecha} className={styles.fechaItem}>
@@ -280,11 +280,12 @@ export default function ChecklistDeclaracionRentaPage() {
           {(Object.entries(PERFILES_CONFIG) as [Perfil, typeof PERFILES_CONFIG[Perfil]][]).map(([perfil, cfg]) => (
             <button
               key={perfil}
+              type="button"
               onClick={() => togglePerfil(perfil)}
               className={`${styles.perfilBtn} ${perfilesSeleccionados.has(perfil) ? styles.active : ''}`}
               aria-pressed={perfilesSeleccionados.has(perfil)}
             >
-              <span className={styles.perfilIcono}>{cfg.icono}</span>
+              <span className={styles.perfilIcono} aria-hidden="true">{cfg.icono}</span>
               <span className={styles.perfilLabel}>{cfg.label}</span>
               <span className={styles.perfilBtnDesc}>{cfg.desc}</span>
             </button>
@@ -297,7 +298,7 @@ export default function ChecklistDeclaracionRentaPage() {
         <div className={styles.progresoHeader}>
           <span className={styles.progresoTexto}>
             {todoCompleto
-              ? '✅ ¡Tienes todo preparado para hacer la renta!'
+              ? <><span aria-hidden="true">✅</span> ¡Tienes todo preparado para hacer la renta!</>
               : `${itemsCompletados} de ${totalItems} documentos verificados`}
           </span>
           <span className={styles.progresoPorcentaje}>{porcentaje}%</span>
@@ -310,20 +311,20 @@ export default function ChecklistDeclaracionRentaPage() {
       {/* Acciones rápidas */}
       <div className={styles.acciones}>
         <button type="button" onClick={() => marcarTodos(true)} className={styles.btnAccion}>
-          ✓ Marcar todo
+          <span aria-hidden="true">✓</span> Marcar todo
         </button>
         <button type="button" onClick={() => marcarTodos(false)} className={styles.btnAccion}>
-          ✗ Desmarcar todo
+          <span aria-hidden="true">✗</span> Desmarcar todo
         </button>
         <button type="button" onClick={descargarChecklist} className={styles.btnDescargar}>
-          ⬇️ Descargar lista
+          <span aria-hidden="true">⬇️</span> Descargar lista
         </button>
       </div>
 
       {/* Mensaje completado */}
       {todoCompleto && (
         <div className={styles.mensajeCompleto} role="alert" aria-live="polite">
-          <h2>🎉 ¡Todo en orden!</h2>
+          <h2><span aria-hidden="true">🎉</span> ¡Todo en orden!</h2>
           <p>Tienes todos los documentos preparados. Ya puedes acceder a Renta Web desde el 8 de abril para presentar tu declaración.</p>
           <a
             href="https://sede.agenciatributaria.gob.es"
@@ -384,7 +385,7 @@ export default function ChecklistDeclaracionRentaPage() {
 
       {/* Aviso legal — SIEMPRE VISIBLE */}
       <div className={styles.avisoLegal} role="note">
-        <strong>⚠️ Aviso importante</strong>
+        <strong><span aria-hidden="true">⚠️</span> Aviso importante</strong>
         <p>
           Esta herramienta es una guía orientativa de carácter general para la campaña de la Renta 2026 (ejercicio 2025) en España.
           No sustituye el asesoramiento de un profesional tributario. La normativa fiscal puede variar según la comunidad autónoma,
@@ -490,7 +491,7 @@ export default function ChecklistDeclaracionRentaPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👔</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👔</span>
                 <strong>Asalariado con un solo pagador</strong>
               </div>
               <p className={styles.escenarioExample}>Ejemplo: trabajador en una empresa todo el año con nómina regular.</p>
@@ -505,7 +506,7 @@ export default function ChecklistDeclaracionRentaPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🧾</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🧾</span>
                 <strong>Autónomo en estimación directa simplificada</strong>
               </div>
               <p className={styles.escenarioExample}>Ejemplo: freelance o profesional liberal con actividad todo el año.</p>
@@ -520,7 +521,7 @@ export default function ChecklistDeclaracionRentaPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏠</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏠</span>
                 <strong>Propietario que alquila un piso</strong>
               </div>
               <p className={styles.escenarioExample}>Ejemplo: tiene un piso heredado alquilado a una familia.</p>
@@ -535,7 +536,7 @@ export default function ChecklistDeclaracionRentaPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📈</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📈</span>
                 <strong>Inversor con acciones y fondos</strong>
               </div>
               <p className={styles.escenarioExample}>Ejemplo: tiene cartera en acciones españolas y un fondo indexado.</p>
@@ -659,42 +660,42 @@ export default function ChecklistDeclaracionRentaPage() {
           <h4 className={styles.eduSectionTitle}>6 cosas que la gente olvida declarar o deducir</h4>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎁</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎁</span>
               <div>
                 <strong>Donaciones a ONGs</strong>
                 <p>Las donaciones a entidades acogidas a la Ley 49/2002 tienen una deducción del 80 % en los primeros 150 € y del 35 % en el resto. Si donaste a ONGs en 2025, consérvalos justificantes: la deducción se aplica automáticamente si la entidad ha informado a la AEAT, pero conviene revisar el borrador.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📑</span>
+              <span className={styles.tipIcon} aria-hidden="true">📑</span>
               <div>
                 <strong>Cuotas de sindicatos y colegios profesionales</strong>
                 <p>Las cuotas anuales pagadas a sindicatos (CCOO, UGT…) y colegios profesionales de afiliación obligatoria son gasto deducible del trabajo. Muchos asalariados las olvidan porque no aparecen en el borrador.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏗️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏗️</span>
               <div>
                 <strong>Deducción por mejoras de eficiencia energética</strong>
                 <p>Si hiciste obras en tu vivienda habitual para mejorar la eficiencia energética (caldera, aislamientos, ventanas…), puedes deducir entre el 20% y el 60% de la inversión, según el nivel de mejora. Necesitas el certificado energético pre y post obra.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏠</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏠</span>
               <div>
                 <strong>IBI y comunidad del inmueble alquilado</strong>
                 <p>El IBI y las cuotas de comunidad del piso en alquiler son gastos deducibles del rendimiento. Muchos propietarios los olvidan porque los paga el propietario pero afectan directamente al rendimiento neto tributable.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📉</span>
+              <span className={styles.tipIcon} aria-hidden="true">📉</span>
               <div>
                 <strong>Pérdidas de años anteriores para compensar</strong>
                 <p>Si en años anteriores tuviste pérdidas en fondos o acciones que no pudiste compensar totalmente, pueden usarse para reducir las ganancias de este año (hasta 4 ejercicios). La AEAT lo incluye en el borrador, pero revísalo.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>👶</span>
+              <span className={styles.tipIcon} aria-hidden="true">👶</span>
               <div>
                 <strong>Deducciones por guardería y maternidad</strong>
                 <p>Las madres trabajadoras con hijos menores de 3 años tienen derecho a la deducción por maternidad (hasta 1.200 € al año) y hasta 1.000 € adicionales por gastos de guardería. Se solicita en Renta Web pero no siempre aparece en el borrador.</p>
@@ -707,7 +708,7 @@ export default function ChecklistDeclaracionRentaPage() {
         <section className={styles.eduSection}>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <strong>6 errores frecuentes que pueden costar dinero o una sanción</strong>
             </div>
             <ul className={styles.warningList}>
