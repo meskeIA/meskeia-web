@@ -175,6 +175,7 @@ export default function GuiaPlantas() {
                 {NIVELES_LUZ.map(n => (
                   <button
                     key={n}
+                    type="button"
                     onClick={() => setLuz(n)}
                     className={`${styles.filtroBtn} ${luz === n ? styles.filtroActivo : ''}`}
                     aria-pressed={luz === n}
@@ -191,6 +192,7 @@ export default function GuiaPlantas() {
                 {NIVELES_DIF.map(d => (
                   <button
                     key={d}
+                    type="button"
                     onClick={() => setDificultad(d)}
                     className={`${styles.filtroBtn} ${dificultad === d ? styles.filtroActivo : ''}`}
                     aria-pressed={dificultad === d}
@@ -208,7 +210,7 @@ export default function GuiaPlantas() {
               checked={soloAptas}
               onChange={e => setSoloAptas(e.target.checked)}
             />
-            Solo aptas para mascotas 🐾
+            Solo aptas para mascotas <span aria-hidden="true">🐾</span>
           </label>
         </div>
 
@@ -256,23 +258,23 @@ export default function GuiaPlantas() {
                   <div className={styles.metaGrid}>
                     <div className={styles.metaItem}>
                       <span className={styles.metaLabel}>Riego</span>
-                      <span className={styles.metaValor}>💧 {planta.riego}</span>
+                      <span className={styles.metaValor}><span aria-hidden="true">💧</span> {planta.riego}</span>
                     </div>
                     <div className={styles.metaItem}>
                       <span className={styles.metaLabel}>Humedad</span>
-                      <span className={styles.metaValor}>💨 {planta.humedad}</span>
+                      <span className={styles.metaValor}><span aria-hidden="true">💨</span> {planta.humedad}</span>
                     </div>
                     <div className={styles.metaItem}>
                       <span className={styles.metaLabel}>Temperatura</span>
-                      <span className={styles.metaValor}>🌡️ {planta.temperatura}</span>
+                      <span className={styles.metaValor}><span aria-hidden="true">🌡️</span> {planta.temperatura}</span>
                     </div>
                     <div className={styles.metaItem}>
                       <span className={styles.metaLabel}>Tamaño</span>
-                      <span className={styles.metaValor}>📏 {planta.tamano}</span>
+                      <span className={styles.metaValor}><span aria-hidden="true">📏</span> {planta.tamano}</span>
                     </div>
                     <div className={styles.metaItem}>
                       <span className={styles.metaLabel}>Origen</span>
-                      <span className={styles.metaValor}>🌍 {planta.origen}</span>
+                      <span className={styles.metaValor}><span aria-hidden="true">🌍</span> {planta.origen}</span>
                     </div>
                   </div>
 

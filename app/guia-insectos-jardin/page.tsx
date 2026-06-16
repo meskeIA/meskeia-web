@@ -678,18 +678,18 @@ export default function GuiaInsectosJardinPage() {
 
         {/* Hero */}
         <header className={styles.hero}>
-          <h1 className={styles.title}>🪲 Guía de Insectos del Jardín</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🪲</span> Guía de Insectos del Jardín</h1>
           <p className={styles.subtitle}>
             35 insectos del jardín y huerto: identifica aliados y plagas, y sabe exactamente qué hacer con cada uno
           </p>
           <div className={styles.heroStats}>
-            <span className={styles.stat}>🟢 {contadorPorRol.Beneficioso} beneficiosos</span>
+            <span className={styles.stat}><span aria-hidden="true">🟢</span> {contadorPorRol.Beneficioso} beneficiosos</span>
             <span className={styles.statDivider}>·</span>
-            <span className={styles.stat}>🔴 {contadorPorRol.Perjudicial} perjudiciales</span>
+            <span className={styles.stat}><span aria-hidden="true">🔴</span> {contadorPorRol.Perjudicial} perjudiciales</span>
             <span className={styles.statDivider}>·</span>
-            <span className={styles.stat}>🌸 {contadorPorRol.Polinizador} polinizadores</span>
+            <span className={styles.stat}><span aria-hidden="true">🌸</span> {contadorPorRol.Polinizador} polinizadores</span>
             <span className={styles.statDivider}>·</span>
-            <span className={styles.stat}>⚪ {contadorPorRol.Neutro} neutros</span>
+            <span className={styles.stat}><span aria-hidden="true">⚪</span> {contadorPorRol.Neutro} neutros</span>
           </div>
         </header>
 
@@ -709,6 +709,7 @@ export default function GuiaInsectosJardinPage() {
             />
             {busqueda && (
               <button
+                type="button"
                 className={styles.clearBtn}
                 onClick={() => setBusqueda('')}
                 aria-label="Limpiar búsqueda"
@@ -721,19 +722,22 @@ export default function GuiaInsectosJardinPage() {
           {/* Filtros por rol */}
           <div className={styles.filtrosRow} role="group" aria-label="Filtrar por rol">
             <button
+              type="button"
               className={`${styles.filtroBtn} ${filtroRol === 'Todos' ? styles.filtroActivo : ''}`}
               onClick={() => setFiltroRol('Todos')}
+              aria-pressed={filtroRol === 'Todos'}
             >
               Todos ({INSECTOS.length})
             </button>
             {TODOS_ROLES.map((rol) => (
               <button
                 key={rol}
+                type="button"
                 className={`${styles.filtroBtn} ${filtroRol === rol ? styles.filtroActivo : ''} ${styles[`filtroRol${rol}`]}`}
                 onClick={() => setFiltroRol(filtroRol === rol ? 'Todos' : rol)}
                 aria-pressed={filtroRol === rol}
               >
-                {ROL_CONFIG[rol].icono} {rol} ({contadorPorRol[rol]})
+                <span aria-hidden="true">{ROL_CONFIG[rol].icono}</span> {rol} ({contadorPorRol[rol]})
               </button>
             ))}
           </div>
@@ -741,14 +745,17 @@ export default function GuiaInsectosJardinPage() {
           {/* Filtros por zona */}
           <div className={styles.filtrosRow} role="group" aria-label="Filtrar por zona del jardín">
             <button
+              type="button"
               className={`${styles.filtroBtn} ${filtroZona === 'Todas' ? styles.filtroActivo : ''}`}
               onClick={() => setFiltroZona('Todas')}
+              aria-pressed={filtroZona === 'Todas'}
             >
               Todas las zonas
             </button>
             {TODAS_ZONAS.map((zona) => (
               <button
                 key={zona}
+                type="button"
                 className={`${styles.filtroBtn} ${filtroZona === zona ? styles.filtroActivo : ''}`}
                 onClick={() => setFiltroZona(filtroZona === zona ? 'Todas' : zona)}
                 aria-pressed={filtroZona === zona}
@@ -796,7 +803,7 @@ export default function GuiaInsectosJardinPage() {
                       color: ROL_CONFIG[insecto.rol].color,
                     }}
                   >
-                    {ROL_CONFIG[insecto.rol].icono} {insecto.rol}
+                    <span aria-hidden="true">{ROL_CONFIG[insecto.rol].icono}</span> {insecto.rol}
                   </span>
                 </div>
 
@@ -832,7 +839,7 @@ export default function GuiaInsectosJardinPage() {
 
                 {/* Cómo identificarlo */}
                 <div className={styles.identificacionBox}>
-                  <p className={styles.identificacionLabel}>🔍 Cómo identificarlo</p>
+                  <p className={styles.identificacionLabel}><span aria-hidden="true">🔍</span> Cómo identificarlo</p>
                   <p className={styles.identificacionTexto}>{insecto.comoIdentificarlo}</p>
                 </div>
 
@@ -846,7 +853,7 @@ export default function GuiaInsectosJardinPage() {
 
                 {/* Curiosidad */}
                 <div className={styles.curiosidadBox}>
-                  <span className={styles.curiosidadLabel}>💡 Curiosidad: </span>
+                  <span className={styles.curiosidadLabel}><span aria-hidden="true">💡</span> Curiosidad: </span>
                   {insecto.curiosidad}
                 </div>
               </article>
@@ -933,22 +940,22 @@ export default function GuiaInsectosJardinPage() {
             <h2>¿Cuál es tu situación?</h2>
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
-                <h4>🥕 Huerto urbano</h4>
+                <h4><span aria-hidden="true">🥕</span> Huerto urbano</h4>
                 <p>Las principales amenazas son pulgones en tomates y pimientos, mosca blanca en cucurbitáceas y escarabajo de la patata. Prioriza el jabón potásico y atrae mariquitas.</p>
                 <div className={styles.escenarioExample}>Aliados clave: mariquita, crisopa, avispa parásita</div>
               </div>
               <div className={styles.escenarioCard}>
-                <h4>🌹 Jardín ornamental</h4>
+                <h4><span aria-hidden="true">🌹</span> Jardín ornamental</h4>
                 <p>Los pulgones atacan rosas, los trips dañan flores y las cochinillas se instalan en plantas de hoja. Un jardín con diversidad de flora atrae depredadores naturales.</p>
                 <div className={styles.escenarioExample}>Aliados clave: sírfidos, crisopa, chinche Orius</div>
               </div>
               <div className={styles.escenarioCard}>
-                <h4>🪴 Terraza con macetas</h4>
+                <h4><span aria-hidden="true">🪴</span> Terraza con macetas</h4>
                 <p>En macetas la araña roja y la cochinilla algodonosa son las plagas más frecuentes. La falta de enemigos naturales hace más necesario el tratamiento manual.</p>
                 <div className={styles.escenarioExample}>Control: alcohol isopropílico, aceite de neem, ducha de agua</div>
               </div>
               <div className={styles.escenarioCard}>
-                <h4>👶 Jardín con niños y mascotas</h4>
+                <h4><span aria-hidden="true">👶</span> Jardín con niños y mascotas</h4>
                 <p>Evita cualquier pesticida. Usa control manual, barreras físicas (mallas, collares) y atrae depredadores. Ojo especial con la procesionaria del pino: peligrosa para mascotas.</p>
                 <div className={styles.escenarioExample}>Prioridad: identificación correcta antes de actuar</div>
               </div>

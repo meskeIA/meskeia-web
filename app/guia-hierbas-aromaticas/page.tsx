@@ -687,7 +687,7 @@ export default function GuiaHierbasAromaticasPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🌿 Guía de Hierbas Aromáticas</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🌿</span> Guía de Hierbas Aromáticas</h1>
           <p className={styles.subtitle}>
             Descubre {HIERBAS.length} hierbas aromáticas: sabor, usos, cultivo y maridaje. Eleva tus platos con la hierba correcta.
           </p>
@@ -724,6 +724,7 @@ export default function GuiaHierbasAromaticasPage() {
             />
             {busqueda && (
               <button
+                type="button"
                 className={styles.clearBtn}
                 onClick={() => setBusqueda('')}
                 aria-label="Limpiar búsqueda"
@@ -739,6 +740,7 @@ export default function GuiaHierbasAromaticasPage() {
           <span className={styles.filtroLabel}>Familia botánica</span>
           <div className={styles.filtrosWrapper} role="group" aria-label="Filtrar por familia">
             <button
+              type="button"
               className={`${styles.filtroBtn} ${familiaActiva === 'Todas' ? styles.filtroActivo : ''}`}
               onClick={() => setFamiliaActiva('Todas')}
               aria-pressed={familiaActiva === 'Todas'}
@@ -751,6 +753,7 @@ export default function GuiaHierbasAromaticasPage() {
               return (
                 <button
                   key={f}
+                  type="button"
                   className={`${styles.filtroBtn} ${familiaActiva === f ? styles.filtroActivo : ''}`}
                   onClick={() => setFamiliaActiva(f)}
                   aria-pressed={familiaActiva === f}
@@ -768,6 +771,7 @@ export default function GuiaHierbasAromaticasPage() {
           <span className={styles.filtroLabel}>Origen</span>
           <div className={styles.filtrosWrapper} role="group" aria-label="Filtrar por origen">
             <button
+              type="button"
               className={`${styles.filtroBtn} ${origenActivo === 'Todos' ? styles.filtroActivo : ''}`}
               onClick={() => setOrigenActivo('Todos')}
               aria-pressed={origenActivo === 'Todos'}
@@ -780,6 +784,7 @@ export default function GuiaHierbasAromaticasPage() {
               return (
                 <button
                   key={o}
+                  type="button"
                   className={`${styles.filtroBtn} ${origenActivo === o ? styles.filtroActivo : ''}`}
                   onClick={() => setOrigenActivo(o)}
                   aria-pressed={origenActivo === o}
@@ -797,6 +802,7 @@ export default function GuiaHierbasAromaticasPage() {
           <span className={styles.filtroLabel}>Intensidad de aroma</span>
           <div className={styles.filtrosWrapper} role="group" aria-label="Filtrar por intensidad">
             <button
+              type="button"
               className={`${styles.filtroBtn} ${intensidadActiva === 'Todas' ? styles.filtroActivo : ''}`}
               onClick={() => setIntensidadActiva('Todas')}
               aria-pressed={intensidadActiva === 'Todas'}
@@ -809,6 +815,7 @@ export default function GuiaHierbasAromaticasPage() {
               return (
                 <button
                   key={i}
+                  type="button"
                   className={`${styles.filtroBtn} ${intensidadActiva === i ? styles.filtroActivo : ''}`}
                   onClick={() => setIntensidadActiva(i)}
                   aria-pressed={intensidadActiva === i}
@@ -826,6 +833,7 @@ export default function GuiaHierbasAromaticasPage() {
           <span className={styles.filtroLabel}>Forma de uso</span>
           <div className={styles.filtrosWrapper} role="group" aria-label="Filtrar por forma de uso">
             <button
+              type="button"
               className={`${styles.filtroBtn} ${formaActiva === 'Todas' ? styles.filtroActivo : ''}`}
               onClick={() => setFormaActiva('Todas')}
               aria-pressed={formaActiva === 'Todas'}
@@ -838,6 +846,7 @@ export default function GuiaHierbasAromaticasPage() {
               return (
                 <button
                   key={f}
+                  type="button"
                   className={`${styles.filtroBtn} ${formaActiva === f ? styles.filtroActivo : ''}`}
                   onClick={() => setFormaActiva(f)}
                   aria-pressed={formaActiva === f}
@@ -855,6 +864,7 @@ export default function GuiaHierbasAromaticasPage() {
           <span className={styles.filtroLabel}>Dificultad de cultivo</span>
           <div className={styles.filtrosWrapper} role="group" aria-label="Filtrar por dificultad">
             <button
+              type="button"
               className={`${styles.filtroBtn} ${dificultadActiva === 'Todas' ? styles.filtroActivo : ''}`}
               onClick={() => setDificultadActiva('Todas')}
               aria-pressed={dificultadActiva === 'Todas'}
@@ -867,6 +877,7 @@ export default function GuiaHierbasAromaticasPage() {
               return (
                 <button
                   key={d}
+                  type="button"
                   className={`${styles.filtroBtn} ${dificultadActiva === d ? styles.filtroActivo : ''}`}
                   onClick={() => setDificultadActiva(d)}
                   aria-pressed={dificultadActiva === d}
@@ -887,7 +898,7 @@ export default function GuiaHierbasAromaticasPage() {
                 No hay hierbas que coincidan con los filtros aplicados.
               </p>
               <div style={{ textAlign: 'center' }}>
-                <button className={styles.btnReset} onClick={resetFiltros}>
+                <button type="button" className={styles.btnReset} onClick={resetFiltros}>
                   Restablecer filtros
                 </button>
               </div>
@@ -910,8 +921,8 @@ export default function GuiaHierbasAromaticasPage() {
 
               <div className={styles.badgesRow}>
                 <span className={`${styles.badge} ${FAMILIA_ESTILOS[h.familia]}`}>{h.familia}</span>
-                <span className={`${styles.badge} ${styles.origenBadge}`}>📍 {h.origen}</span>
-                <span className={`${styles.badge} ${styles.intensidadBadge}`}>🌶️ {h.intensidad}</span>
+                <span className={`${styles.badge} ${styles.origenBadge}`}><span aria-hidden="true">📍</span> {h.origen}</span>
+                <span className={`${styles.badge} ${styles.intensidadBadge}`}><span aria-hidden="true">🌶️</span> {h.intensidad}</span>
                 <span className={`${styles.badge} ${styles.formaBadge}`}>{h.formaUso}</span>
               </div>
 
@@ -921,11 +932,11 @@ export default function GuiaHierbasAromaticasPage() {
                   <span className={styles.cultivoValor}>{h.dificultadCultivo}</span>
                 </div>
                 <div className={styles.cultivoItem}>
-                  <span className={styles.cultivoLabel}>☀️ Sol</span>
+                  <span className={styles.cultivoLabel}><span aria-hidden="true">☀️</span> Sol</span>
                   <span className={styles.cultivoValor}>{h.exposicionSol}</span>
                 </div>
                 <div className={styles.cultivoItem}>
-                  <span className={styles.cultivoLabel}>💧 Riego</span>
+                  <span className={styles.cultivoLabel}><span aria-hidden="true">💧</span> Riego</span>
                   <span className={styles.cultivoValor}>{h.riego}</span>
                 </div>
               </div>
@@ -971,7 +982,7 @@ export default function GuiaHierbasAromaticasPage() {
               </p>
 
               <p className={styles.curiosidad}>
-                <strong>💡 ¿Sabías que...?</strong> {h.curiosidad}
+                <strong><span aria-hidden="true">💡</span> ¿Sabías que...?</strong> {h.curiosidad}
               </p>
             </article>
           ))}
@@ -986,7 +997,7 @@ export default function GuiaHierbasAromaticasPage() {
         >
           {/* 1. Tabla comparativa */}
           <section className={styles.guideSection}>
-            <h2>📊 Tabla comparativa: intensidad, uso y momento de añadir</h2>
+            <h2><span aria-hidden="true">📊</span> Tabla comparativa: intensidad, uso y momento de añadir</h2>
             <p>
               Conocer cuándo añadir cada hierba durante la cocción y si funciona mejor fresca o seca marca la diferencia
               entre un plato perfumado y otro insípido. Esta guía resume las hierbas más usadas en la cocina diaria:
@@ -1089,7 +1100,7 @@ export default function GuiaHierbasAromaticasPage() {
 
           {/* 2. Casos de uso */}
           <section className={styles.guideSection}>
-            <h2>👥 ¿Para quién es esta guía?</h2>
+            <h2><span aria-hidden="true">👥</span> ¿Para quién es esta guía?</h2>
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
@@ -1144,61 +1155,61 @@ export default function GuiaHierbasAromaticasPage() {
 
           {/* 3. FAQ */}
           <section className={styles.guideSection}>
-            <h2>❓ Preguntas frecuentes</h2>
+            <h2><span aria-hidden="true">❓</span> Preguntas frecuentes</h2>
             <div className={styles.faqList}>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Cuál es la diferencia entre hierba y especia?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Cuál es la diferencia entre hierba y especia?</h4>
                 <p>
                   Las <strong>hierbas</strong> son las hojas verdes (frescas o secas) de plantas no leñosas: albahaca, perejil,
                   cilantro, romero, tomillo... Las <strong>especias</strong> proceden de otras partes de la planta: semillas
                   (comino, cilantro seco), corteza (canela), flores (clavo), raíces (jengibre, cúrcuma) o frutos secos (pimienta).
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Curiosidad:</strong> El cilantro es ambas cosas: sus hojas son hierba, sus semillas son especia (coriandro), con sabores muy diferentes entre sí.
+                  <span aria-hidden="true">💡</span> <strong>Curiosidad:</strong> El cilantro es ambas cosas: sus hojas son hierba, sus semillas son especia (coriandro), con sabores muy diferentes entre sí.
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Cuándo usar hierbas frescas y cuándo secas?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Cuándo usar hierbas frescas y cuándo secas?</h4>
                 <p>
                   Las <strong>frescas</strong> son ideales cuando se añaden al final (albahaca, perejil, cilantro, eneldo) porque
                   el calor destruye sus aceites volátiles. Las <strong>secas</strong> aguantan cocciones largas y aportan sabor
                   más concentrado (orégano, tomillo, romero). Regla práctica: 1 cucharada de hierba fresca = 1 cucharadita de seca.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Excepción:</strong> El orégano es la única hierba que <em>mejora</em> al secarse — más intenso y aromático que fresco.
+                  <span aria-hidden="true">💡</span> <strong>Excepción:</strong> El orégano es la única hierba que <em>mejora</em> al secarse — más intenso y aromático que fresco.
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Cómo conservar las hierbas frescas en la nevera?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Cómo conservar las hierbas frescas en la nevera?</h4>
                 <p>
                   Las hierbas de tallo blando (albahaca, perejil, cilantro, eneldo, menta) duran 1-2 semanas si las metes con
                   el tallo en un vaso con agua, como un ramo de flores, cubiertas con bolsa de plástico floja en la nevera.
                   Las leñosas (romero, tomillo, salvia) se guardan envueltas en papel de cocina húmedo dentro de un tupper.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Truco:</strong> La albahaca prefiere temperatura ambiente — si la metes en la nevera se ennegrece. Mejor en un vaso con agua sobre la encimera.
+                  <span aria-hidden="true">💡</span> <strong>Truco:</strong> La albahaca prefiere temperatura ambiente — si la metes en la nevera se ennegrece. Mejor en un vaso con agua sobre la encimera.
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Qué son las &quot;hierbas de Provenza&quot; y las &quot;finas hierbas&quot;?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Qué son las &quot;hierbas de Provenza&quot; y las &quot;finas hierbas&quot;?</h4>
                 <p>
                   Son dos mezclas clásicas francesas muy diferentes. <strong>Hierbas de Provenza</strong>: tomillo, romero,
                   orégano, ajedrea, mejorana y a veces lavanda — para asados y guisos. <strong>Finas hierbas</strong>: perejil,
                   cebollino, estragón y perifollo — siempre frescas y al final, para huevos, pescados delicados y salsas.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Regla:</strong> Hierbas de Provenza son secas y para cocción larga; finas hierbas son frescas y para platos delicados.
+                  <span aria-hidden="true">💡</span> <strong>Regla:</strong> Hierbas de Provenza son secas y para cocción larga; finas hierbas son frescas y para platos delicados.
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Por qué el cilantro le sabe a jabón a algunas personas?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Por qué el cilantro le sabe a jabón a algunas personas?</h4>
                 <p>
                   Una variante del gen <strong>OR6A2</strong> (receptor olfativo) hace que entre el 8% y el 15% de la población
                   perciba los aldehídos del cilantro como un sabor jabonoso desagradable. Es genético, no preferencia. Si te
                   pasa, sustituirlo por perejil de hoja plana es la mejor alternativa en la mayoría de recetas.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Prueba sociedad:</strong> En México y Tailandia, donde el cilantro es esencial, esta variante genética es mucho menos frecuente que en Europa.
+                  <span aria-hidden="true">💡</span> <strong>Prueba sociedad:</strong> En México y Tailandia, donde el cilantro es esencial, esta variante genética es mucho menos frecuente que en Europa.
                 </p>
               </div>
             </div>
@@ -1206,7 +1217,7 @@ export default function GuiaHierbasAromaticasPage() {
 
           {/* 4. Pasos: Cómo cultivar hierbas en casa */}
           <section className={styles.guideSection}>
-            <h2>🌱 5 pasos para cultivar hierbas aromáticas en casa</h2>
+            <h2><span aria-hidden="true">🌱</span> 5 pasos para cultivar hierbas aromáticas en casa</h2>
             <div className={styles.stepGuide}>
               <div className={styles.step}>
                 <div className={styles.stepNumber}>1</div>
@@ -1268,7 +1279,7 @@ export default function GuiaHierbasAromaticasPage() {
 
           {/* 5. Tips */}
           <section className={styles.guideSection}>
-            <h2>💡 5 trucos para sacar el máximo a tus hierbas</h2>
+            <h2><span aria-hidden="true">💡</span> 5 trucos para sacar el máximo a tus hierbas</h2>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
                 <span className={styles.tipIcon} aria-hidden="true">

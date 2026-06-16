@@ -741,18 +741,22 @@ export default function GuiaInfusiones() {
           />
           <div className={styles.filtros} role="group" aria-label="Filtrar por familia">
             <button
+              type="button"
               className={`${styles.filtroBtn} ${familiaActiva === 'Todas' ? styles.filtroActivo : ''}`}
               onClick={() => setFamiliaActiva('Todas')}
+              aria-pressed={familiaActiva === 'Todas'}
             >
               Todas
             </button>
             {FAMILIAS.map((f) => (
               <button
                 key={f}
+                type="button"
                 className={`${styles.filtroBtn} ${familiaActiva === f ? styles.filtroActivo : ''}`}
                 onClick={() => setFamiliaActiva(f)}
+                aria-pressed={familiaActiva === f}
               >
-                {FAMILIA_ICONOS[f]} {f}
+                <span aria-hidden="true">{FAMILIA_ICONOS[f]}</span> {f}
               </button>
             ))}
           </div>
@@ -767,9 +771,9 @@ export default function GuiaInfusiones() {
             <article key={inf.nombre} className={styles.card}>
               <div className={styles.cardHeader}>
                 <span className={`${styles.familiaBadge} ${getFamiliaClass(inf.familia)}`}>
-                  {FAMILIA_ICONOS[inf.familia]} {inf.familia}
+                  <span aria-hidden="true">{FAMILIA_ICONOS[inf.familia]}</span> {inf.familia}
                 </span>
-                <span className={styles.partePlanta}>🌱 {inf.partePlanta}</span>
+                <span className={styles.partePlanta}><span aria-hidden="true">🌱</span> {inf.partePlanta}</span>
               </div>
 
               <h2 className={styles.nombre}>{inf.nombre}</h2>
@@ -876,49 +880,49 @@ export default function GuiaInfusiones() {
             </thead>
             <tbody>
               <tr>
-                <td>🌿 Digestiva</td>
+                <td><span aria-hidden="true">🌿</span> Digestiva</td>
                 <td>Pesadez, gases, digestión lenta</td>
                 <td>Tras las comidas</td>
                 <td>Manzanilla, hinojo, menta</td>
               </tr>
               <tr>
-                <td>🌙 Relajante</td>
+                <td><span aria-hidden="true">🌙</span> Relajante</td>
                 <td>Nerviosismo, insomnio, ansiedad leve</td>
                 <td>Tarde-noche</td>
                 <td>Tila, valeriana, melisa</td>
               </tr>
               <tr>
-                <td>⚡ Estimulante</td>
+                <td><span aria-hidden="true">⚡</span> Estimulante</td>
                 <td>Energía, concentración, alerta</td>
                 <td>Mañana, mediodía</td>
                 <td>Té verde, yerba mate</td>
               </tr>
               <tr>
-                <td>💧 Depurativa</td>
+                <td><span aria-hidden="true">💧</span> Depurativa</td>
                 <td>Drenaje, retención de líquidos</td>
                 <td>Mañana en ayunas</td>
                 <td>Diente de León, cola de caballo</td>
               </tr>
               <tr>
-                <td>🌬️ Respiratoria</td>
+                <td><span aria-hidden="true">🌬️</span> Respiratoria</td>
                 <td>Tos, catarro, congestión</td>
                 <td>Ante síntomas</td>
                 <td>Tomillo, eucalipto, poleo</td>
               </tr>
               <tr>
-                <td>🔥 Antiinflamatoria</td>
+                <td><span aria-hidden="true">🔥</span> Antiinflamatoria</td>
                 <td>Articulaciones, dolores leves, fiebre</td>
                 <td>Según necesidad</td>
                 <td>Jengibre, cúrcuma, salvia</td>
               </tr>
               <tr>
-                <td>✨ Antioxidante</td>
+                <td><span aria-hidden="true">✨</span> Antioxidante</td>
                 <td>Protección celular, vitamina C</td>
                 <td>Cualquier momento</td>
                 <td>Hibisco, rosa mosqueta, rooibos</td>
               </tr>
               <tr>
-                <td>🌱 Adaptógena</td>
+                <td><span aria-hidden="true">🌱</span> Adaptógena</td>
                 <td>Estrés crónico, energía sostenida</td>
                 <td>Mañana, mediodía</td>
                 <td>Ashwagandha, ginseng, rhodiola</td>
@@ -930,7 +934,7 @@ export default function GuiaInfusiones() {
         <h3>¿Para qué perfil es cada familia?</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <strong>👩‍💼 Persona con vida estresante</strong>
+            <strong><span aria-hidden="true">👩‍💼</span> Persona con vida estresante</strong>
             <p>
               Las familias Relajante y Adaptógena son un buen punto de partida. La tila o la
               melisa por la tarde; el ashwagandha o la rhodiola por la mañana para gestionar el
@@ -938,21 +942,21 @@ export default function GuiaInfusiones() {
             </p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🥗 Persona con problemas digestivos</strong>
+            <strong><span aria-hidden="true">🥗</span> Persona con problemas digestivos</strong>
             <p>
               Las infusiones Digestivas tras cada comida: manzanilla, hinojo o menta piperita
               según el síntoma. Boldo o alcachofa si hay pesadez hepática.
             </p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🤧 Persona con catarros frecuentes</strong>
+            <strong><span aria-hidden="true">🤧</span> Persona con catarros frecuentes</strong>
             <p>
               La familia Respiratoria es aliada en temporada de frío: tomillo, saúco o poleo ante
               los primeros síntomas, acompañados de rosa mosqueta para el aporte de vitamina C.
             </p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>☕ Persona que quiere reducir el café</strong>
+            <strong><span aria-hidden="true">☕</span> Persona que quiere reducir el café</strong>
             <p>
               Té verde o té negro para una energía más suave y sostenida. Si se quiere eliminar
               la cafeína, el rooibos tiene sabor agradable sin teína. La yerba mate si se quiere

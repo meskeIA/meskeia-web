@@ -1021,10 +1021,10 @@
 | [x] | Guía de Especias | `/guia-especias/` | salud, cultura |
 | [x] | Guía de Frutas Exóticas | `/guia-frutas-exoticas/` | salud, cultura |
 | [x] | Guía de Frutos Secos | `/guia-frutos-secos/` | salud, cultura |
-| [ ] | Guía de Hierbas Aromáticas | `/guia-hierbas-aromaticas/` | salud, cultura |
-| [ ] | Guía de Infusiones | `/guia-infusiones/` | salud, cultura |
-| [ ] | Guía de Insectos del Jardín | `/guia-insectos-jardin/` | salud, cultura |
-| [ ] | Guía de Plantas de Interior | `/guia-plantas-interior/` | salud, cultura |
+| [x] | Guía de Hierbas Aromáticas | `/guia-hierbas-aromaticas/` | salud, cultura |
+| [x] | Guía de Infusiones | `/guia-infusiones/` | salud, cultura |
+| [x] | Guía de Insectos del Jardín | `/guia-insectos-jardin/` | salud, cultura |
+| [x] | Guía de Plantas de Interior | `/guia-plantas-interior/` | salud, cultura |
 | [ ] | Guía de Quesos | `/guia-quesos/` | salud, cultura |
 | [ ] | Guía de Razas de Gatos | `/guia-razas-gatos/` | salud, cultura |
 | [ ] | Guía de Razas de Perros | `/guia-razas-perros/` | salud, cultura |
