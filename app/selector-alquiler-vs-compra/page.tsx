@@ -427,7 +427,7 @@ export default function SelectorAlquilerVsCompra() {
           {/* Grid de 4 factores clave */}
           <div className={styles.factoresGrid}>
             <div className={styles.factorCard}>
-              <p className={styles.factorLabel}>📅 Horizonte temporal</p>
+              <p className={styles.factorLabel}><span aria-hidden="true">📅</span> Horizonte temporal</p>
               <p className={styles.factorValor}>
                 {resultado.respuestasPorCategoria['horizonte']
                   ? getEtiquetaRespuesta('horizonte', resultado.respuestasPorCategoria['horizonte'])
@@ -435,7 +435,7 @@ export default function SelectorAlquilerVsCompra() {
               </p>
             </div>
             <div className={styles.factorCard}>
-              <p className={styles.factorLabel}>💼 Estabilidad laboral</p>
+              <p className={styles.factorLabel}><span aria-hidden="true">💼</span> Estabilidad laboral</p>
               <p className={styles.factorValor}>
                 {resultado.respuestasPorCategoria['laboral']
                   ? getEtiquetaRespuesta('laboral', resultado.respuestasPorCategoria['laboral'])
@@ -443,7 +443,7 @@ export default function SelectorAlquilerVsCompra() {
               </p>
             </div>
             <div className={styles.factorCard}>
-              <p className={styles.factorLabel}>💰 Capacidad de ahorro</p>
+              <p className={styles.factorLabel}><span aria-hidden="true">💰</span> Capacidad de ahorro</p>
               <p className={styles.factorValor}>
                 {resultado.respuestasPorCategoria['ahorro']
                   ? getEtiquetaRespuesta('ahorro', resultado.respuestasPorCategoria['ahorro'])
@@ -451,7 +451,7 @@ export default function SelectorAlquilerVsCompra() {
               </p>
             </div>
             <div className={styles.factorCard}>
-              <p className={styles.factorLabel}>🏙️ Mercado local</p>
+              <p className={styles.factorLabel}><span aria-hidden="true">🏙️</span> Mercado local</p>
               <p className={styles.factorValor}>
                 {resultado.respuestasPorCategoria['mercado']
                   ? getEtiquetaRespuesta('mercado', resultado.respuestasPorCategoria['mercado'])

@@ -186,7 +186,7 @@ export default function PlanificadorMenuPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📅 Planificador de Menú Semanal</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📅</span> Planificador de Menú Semanal</h1>
         <p className={styles.subtitle}>
           Organiza tus comidas de la semana de forma equilibrada y saludable
         </p>
@@ -196,11 +196,11 @@ export default function PlanificadorMenuPage() {
 
       {/* Controles */}
       <div className={styles.controls}>
-        <button onClick={generateRandomMenu} className={styles.btnPrimary}>
-          🎲 Generar Menú Aleatorio
+        <button type="button" onClick={generateRandomMenu} className={styles.btnPrimary}>
+          <span aria-hidden="true">🎲</span> Generar Menú Aleatorio
         </button>
-        <button onClick={clearMenu} className={styles.btnSecondary}>
-          🗑️ Limpiar Todo
+        <button type="button" onClick={clearMenu} className={styles.btnSecondary}>
+          <span aria-hidden="true">🗑️</span> Limpiar Todo
         </button>
       </div>
 
@@ -238,9 +238,9 @@ export default function PlanificadorMenuPage() {
             {(['desayuno', 'almuerzo', 'cena'] as MealType[]).map(mealType => (
               <tr key={mealType}>
                 <td className={styles.mealLabel}>
-                  {mealType === 'desayuno' && '🌅 Desayuno'}
-                  {mealType === 'almuerzo' && '☀️ Almuerzo'}
-                  {mealType === 'cena' && '🌙 Cena'}
+                  {mealType === 'desayuno' && <><span aria-hidden="true">🌅</span> Desayuno</>}
+                  {mealType === 'almuerzo' && <><span aria-hidden="true">☀️</span> Almuerzo</>}
+                  {mealType === 'cena' && <><span aria-hidden="true">🌙</span> Cena</>}
                 </td>
                 {DAYS.map(day => (
                   <td key={`${day.id}-${mealType}`} className={styles.mealCell}>
@@ -279,8 +279,10 @@ export default function PlanificadorMenuPage() {
                 {DAYS.find(d => d.id === showSuggestions.day)?.name}
               </h3>
               <button
+                type="button"
                 className={styles.modalClose}
                 onClick={() => setShowSuggestions(null)}
+                aria-label="Cerrar"
               >
                 ✕
               </button>
@@ -288,17 +290,19 @@ export default function PlanificadorMenuPage() {
             <div className={styles.suggestionsGrid}>
               {MEAL_OPTIONS[showSuggestions.meal].map((option, idx) => (
                 <button
+                  type="button"
                   key={idx}
                   className={styles.suggestionCard}
                   onClick={() => selectMeal(showSuggestions.day, showSuggestions.meal, option.name)}
                 >
-                  <span className={styles.suggestionIcon}>{option.icon}</span>
+                  <span className={styles.suggestionIcon} aria-hidden="true">{option.icon}</span>
                   <span className={styles.suggestionName}>{option.name}</span>
                   <span className={styles.suggestionCategory}>{option.category}</span>
                 </button>
               ))}
             </div>
             <button
+              type="button"
               className={styles.btnClear}
               onClick={() => selectMeal(showSuggestions.day, showSuggestions.meal, '')}
             >
@@ -311,7 +315,7 @@ export default function PlanificadorMenuPage() {
       {/* Tips de compra */}
       {menuGenerated && countFilledMeals() > 10 && (
         <div className={styles.shoppingTips}>
-          <h3>🛒 Consejos para la Compra</h3>
+          <h3><span aria-hidden="true">🛒</span> Consejos para la Compra</h3>
           <ul>
             {generateShoppingTips().map((tip, idx) => (
               <li key={idx}>{tip}</li>

@@ -446,7 +446,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📦 Planificador de Mudanzas</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📦</span> Planificador de Mudanzas</h1>
         <p className={styles.subtitle}>
           Organiza tu mudanza paso a paso: tareas, inventario y presupuesto
         </p>
@@ -495,26 +495,32 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
         {/* Tabs de navegación */}
         <nav className={styles.tabs}>
           <button
+            type="button"
             className={`${styles.tab} ${tabActiva === 'tareas' ? styles.tabActiva : ''}`}
             onClick={() => setTabActiva('tareas')}
+            aria-pressed={tabActiva === 'tareas'}
           >
-            <span className={styles.tabIcon}>✅</span>
+            <span className={styles.tabIcon} aria-hidden="true">✅</span>
             <span className={styles.tabText}>Tareas</span>
             <span className={styles.tabBadge}>{tareasCompletadas}/{totalTareas}</span>
           </button>
           <button
+            type="button"
             className={`${styles.tab} ${tabActiva === 'inventario' ? styles.tabActiva : ''}`}
             onClick={() => setTabActiva('inventario')}
+            aria-pressed={tabActiva === 'inventario'}
           >
-            <span className={styles.tabIcon}>📋</span>
+            <span className={styles.tabIcon} aria-hidden="true">📋</span>
             <span className={styles.tabText}>Inventario</span>
             <span className={styles.tabBadge}>{objetosTotal}</span>
           </button>
           <button
+            type="button"
             className={`${styles.tab} ${tabActiva === 'presupuesto' ? styles.tabActiva : ''}`}
             onClick={() => setTabActiva('presupuesto')}
+            aria-pressed={tabActiva === 'presupuesto'}
           >
-            <span className={styles.tabIcon}>💰</span>
+            <span className={styles.tabIcon} aria-hidden="true">💰</span>
             <span className={styles.tabText}>Presupuesto</span>
           </button>
         </nav>
@@ -537,17 +543,21 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
               <span className={styles.filtroLabel}>Filtrar por fase:</span>
               <div className={styles.filtrosBotones}>
                 <button
+                  type="button"
                   className={`${styles.filtroBtn} ${filtroFase === 'todas' ? styles.activo : ''}`}
                   onClick={() => setFiltroFase('todas')}
+                  aria-pressed={filtroFase === 'todas'}
                 >
                   Todas
                 </button>
                 {(Object.keys(fasesInfo) as FaseTarea[]).map(fase => (
                   <button
                     key={fase}
+                    type="button"
                     className={`${styles.filtroBtn} ${filtroFase === fase ? styles.activo : ''}`}
                     onClick={() => setFiltroFase(fase)}
                     title={fasesInfo[fase].nombre}
+                    aria-pressed={filtroFase === fase}
                   >
                     {fasesInfo[fase].emoji}
                   </button>
@@ -576,7 +586,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                   </option>
                 ))}
               </select>
-              <button onClick={agregarTarea} className={styles.btnAdd}>
+              <button type="button" onClick={agregarTarea} className={styles.btnAdd}>
                 + Añadir
               </button>
             </div>
@@ -586,7 +596,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
               {tareasAgrupadas.map(grupo => (
                 <div key={grupo.fase} className={styles.grupoTareas}>
                   <h3 className={styles.grupoHeader}>
-                    <span className={styles.grupoEmoji}>{grupo.emoji}</span>
+                    <span className={styles.grupoEmoji} aria-hidden="true">{grupo.emoji}</span>
                     {grupo.nombre}
                     <span className={styles.grupoCount}>
                       ({grupo.tareas.filter(t => t.completada).length}/{grupo.tareas.length})
@@ -596,8 +606,10 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                     {grupo.tareas.map(tarea => (
                       <li key={tarea.id} className={`${styles.tareaItem} ${tarea.completada ? styles.completada : ''}`}>
                         <button
+                          type="button"
                           className={styles.checkBtn}
                           onClick={() => toggleTarea(tarea.id)}
+                          aria-pressed={tarea.completada}
                         >
                           {tarea.completada ? '✓' : '○'}
                         </button>
@@ -607,6 +619,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                         </span>
                         {tarea.esPersonalizada && (
                           <button
+                            type="button"
                             className={styles.deleteBtn}
                             onClick={() => eliminarTarea(tarea.id)}
                           >
@@ -628,17 +641,17 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
             {/* Resumen */}
             <div className={styles.resumenPanel}>
               <div className={styles.resumenCard}>
-                <span className={styles.resumenIcon}>📦</span>
+                <span className={styles.resumenIcon} aria-hidden="true">📦</span>
                 <span className={styles.resumenValor}>{objetosTotal}</span>
                 <span className={styles.resumenLabel}>Total objetos</span>
               </div>
               <div className={styles.resumenCard}>
-                <span className={styles.resumenIcon}>🚚</span>
+                <span className={styles.resumenIcon} aria-hidden="true">🚚</span>
                 <span className={styles.resumenValor}>{objetosLlevar}</span>
                 <span className={styles.resumenLabel}>A transportar</span>
               </div>
               <div className={styles.resumenCard}>
-                <span className={styles.resumenIcon}>💶</span>
+                <span className={styles.resumenIcon} aria-hidden="true">💶</span>
                 <span className={styles.resumenValor}>{formatCurrency(valorTotal)}</span>
                 <span className={styles.resumenLabel}>Valor estimado</span>
               </div>
@@ -648,17 +661,21 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
             <div className={styles.filtrosPanel}>
               <div className={styles.filtrosBotones}>
                 <button
+                  type="button"
                   className={`${styles.filtroBtn} ${filtroHabitacion === 'todas' ? styles.activo : ''}`}
                   onClick={() => setFiltroHabitacion('todas')}
+                  aria-pressed={filtroHabitacion === 'todas'}
                 >
                   Todas
                 </button>
                 {(Object.keys(habitacionesInfo) as HabitacionType[]).map(hab => (
                   <button
                     key={hab}
+                    type="button"
                     className={`${styles.filtroBtn} ${filtroHabitacion === hab ? styles.activo : ''}`}
                     onClick={() => setFiltroHabitacion(hab)}
                     title={habitacionesInfo[hab].nombre}
+                    aria-pressed={filtroHabitacion === hab}
                   >
                     {habitacionesInfo[hab].emoji}
                   </button>
@@ -721,7 +738,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                   min="0"
                   className={styles.inputValor}
                 />
-                <button onClick={agregarObjeto} className={styles.btnAdd}>
+                <button type="button" onClick={agregarObjeto} className={styles.btnAdd}>
                   + Añadir
                 </button>
               </div>
@@ -739,7 +756,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                 inventarioAgrupado.map(grupo => (
                   <div key={grupo.habitacion} className={styles.grupoInventario}>
                     <h3 className={styles.grupoHeader}>
-                      <span className={styles.grupoEmoji}>{grupo.emoji}</span>
+                      <span className={styles.grupoEmoji} aria-hidden="true">{grupo.emoji}</span>
                       {grupo.nombre}
                       <span className={styles.grupoCount}>({grupo.objetos.length})</span>
                     </h3>
@@ -752,6 +769,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                           <div className={styles.objetoHeader}>
                             <span className={styles.objetoNombre}>{objeto.nombre}</span>
                             <button
+                              type="button"
                               className={styles.deleteBtn}
                               onClick={() => eliminarObjeto(objeto.id)}
                             >
@@ -768,8 +786,10 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                             )}
                           </div>
                           <button
+                            type="button"
                             className={`${styles.btnLlevar} ${objeto.seLleva ? styles.llevar : styles.noLlevar}`}
                             onClick={() => toggleSeLleva(objeto.id)}
+                            aria-pressed={objeto.seLleva}
                           >
                             {objeto.seLleva ? '🚚 Se lleva' : '🚫 No se lleva'}
                           </button>
@@ -821,7 +841,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                 min="0"
                 className={styles.inputEstimado}
               />
-              <button onClick={agregarGasto} className={styles.btnAdd}>
+              <button type="button" onClick={agregarGasto} className={styles.btnAdd}>
                 + Añadir
               </button>
             </div>
@@ -836,8 +856,10 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                   <div className={styles.gastoInfo}>
                     <span className={styles.gastoConcepto}>{gasto.concepto}</span>
                     <button
+                      type="button"
                       className={`${styles.btnPagado} ${gasto.pagado ? styles.pagadoActivo : ''}`}
                       onClick={() => togglePagado(gasto.id)}
+                      aria-pressed={gasto.pagado}
                     >
                       {gasto.pagado ? '✓ Pagado' : '○ Pendiente'}
                     </button>
@@ -866,6 +888,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                       />
                     </div>
                     <button
+                      type="button"
                       className={styles.deleteBtn}
                       onClick={() => eliminarGasto(gasto.id)}
                     >
@@ -880,21 +903,21 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
 
         {/* Acciones generales */}
         <section className={styles.accionesPanel}>
-          <button onClick={exportarResumen} className={styles.btnAccion}>
-            📤 Exportar resumen
+          <button type="button" onClick={exportarResumen} className={styles.btnAccion}>
+            <span aria-hidden="true">📤</span> Exportar resumen
           </button>
-          <button onClick={guardarMudanza} className={styles.btnAccion}>
-            💾 Guardar mudanza
+          <button type="button" onClick={guardarMudanza} className={styles.btnAccion}>
+            <span aria-hidden="true">💾</span> Guardar mudanza
           </button>
-          <button onClick={nuevaMudanza} className={styles.btnAccionSecundario}>
-            🆕 Nueva mudanza
+          <button type="button" onClick={nuevaMudanza} className={styles.btnAccionSecundario}>
+            <span aria-hidden="true">🆕</span> Nueva mudanza
           </button>
         </section>
 
         {/* Mudanzas guardadas */}
         {mudanzasGuardadas.length > 0 && (
           <section className={styles.mudanzasGuardadasPanel}>
-            <h3 className={styles.seccionTitulo}>📁 Mudanzas guardadas</h3>
+            <h3 className={styles.seccionTitulo}><span aria-hidden="true">📁</span> Mudanzas guardadas</h3>
             <div className={styles.mudanzasGrid}>
               {mudanzasGuardadas.map(mudanza => (
                 <div key={mudanza.id} className={styles.mudanzaCard}>
@@ -908,10 +931,10 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                     {formatCurrency(mudanza.presupuesto.reduce((a, g) => a + g.real, 0))}
                   </p>
                   <div className={styles.mudanzaCardAcciones}>
-                    <button onClick={() => cargarMudanza(mudanza)} className={styles.btnCargar}>
+                    <button type="button" onClick={() => cargarMudanza(mudanza)} className={styles.btnCargar}>
                       Cargar
                     </button>
-                    <button onClick={() => eliminarMudanzaGuardada(mudanza.id)} className={styles.btnEliminar}>
+                    <button type="button" onClick={() => eliminarMudanzaGuardada(mudanza.id)} className={styles.btnEliminar}>
                       Eliminar
                     </button>
                   </div>

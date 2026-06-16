@@ -823,11 +823,11 @@
 | [x] | Orientador Alquiler vs Compra | `/orientador-alquiler-vs-compra/` | inmobiliaria, finanzas |
 | [x] | Orientador Aval ICO Vivienda | `/orientador-aval-ico/` | inmobiliaria, finanzas, legal-fiscal |
 | [x] | Orientador Ayudas Primera Vivienda en Zona Rural 2026 | `/orientador-ayuda-vivienda-rural/` | inmobiliaria, finanzas |
-| [ ] | Orientador Deducción IRPF Obras Energéticas | `/orientador-deduccion-obras-energeticas/` | inmobiliaria, finanzas, legal-fiscal |
-| [ ] | Planificador de Menú Semanal | `/planificador-menu/` | inmobiliaria, salud |
-| [ ] | Planificador de Mudanzas | `/planificador-mudanzas/` | inmobiliaria, productividad |
+| [x] | Orientador Deducción IRPF Obras Energéticas | `/orientador-deduccion-obras-energeticas/` | inmobiliaria, finanzas, legal-fiscal |
+| [x] | Planificador de Menú Semanal | `/planificador-menu/` | inmobiliaria, salud |
+| [x] | Planificador de Mudanzas | `/planificador-mudanzas/` | inmobiliaria, productividad |
 | [x] | Rentabilidad de Inversión en Alquiler | `/calculadora-rentabilidad-alquiler/` | inmobiliaria, finanzas |
-| [ ] | Selector de Alquiler o Compra | `/selector-alquiler-vs-compra/` | inmobiliaria, finanzas |
+| [x] | Selector de Alquiler o Compra | `/selector-alquiler-vs-compra/` | inmobiliaria, finanzas |
 | [ ] | Selector de Energía para el Hogar | `/selector-energia-hogar/` | inmobiliaria, tecnicas |
 | [ ] | Selector de Estilo de Decoración | `/selector-estilo-decoracion/` | inmobiliaria, productividad |
 | [ ] | Selector de Seguro de Hogar | `/selector-seguro-hogar/` | inmobiliaria, finanzas |
