@@ -483,10 +483,10 @@
 | [x] | Glosario de Física y Química | `/glosario-fisica-quimica/` | estudiantes |
 | [x] | Glosario de Programación | `/glosario-programacion/` | estudiantes, tecnicas |
 | [x] | Inferencia Bayesiana | `/inferencia-bayesiana/` | estudiantes |
-| [ ] | La Célula por Dentro - Animal vs Vegetal | `/visualizador-celula/` | estudiantes, cultura, salud |
-| [ ] | La Escala del Universo | `/visualizador-escala-universo/` | estudiantes, cultura |
-| [ ] | La Fotosíntesis - De la Luz Solar a la Vida | `/visualizador-fotosintesis/` | estudiantes, cultura |
-| [ ] | La Historia de la Humanidad en un Reloj | `/visualizador-historia-reloj/` | estudiantes, cultura |
+| [x] | La Célula por Dentro - Animal vs Vegetal | `/visualizador-celula/` | estudiantes, cultura, salud |
+| [x] | La Escala del Universo | `/visualizador-escala-universo/` | estudiantes, cultura |
+| [x] | La Fotosíntesis - De la Luz Solar a la Vida | `/visualizador-fotosintesis/` | estudiantes, cultura |
+| [x] | La Historia de la Humanidad en un Reloj | `/visualizador-historia-reloj/` | estudiantes, cultura |
 | [ ] | La Sangre - Componentes, Grupos y Coagulación | `/visualizador-sangre-componentes/` | estudiantes, cultura, salud |
 | [ ] | La Tabla Periódica en tu Vida | `/visualizador-tabla-periodica/` | estudiantes, cultura |
 | [ ] | La Vida de una Estrella | `/visualizador-vida-estrella/` | estudiantes, cultura |

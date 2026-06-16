@@ -399,8 +399,8 @@ function SeccionComparativa() {
       <div className={styles.comparativaCard}>
         <div className={styles.comparativaHeader}>
           <span className={styles.comparativaHeaderNombre}>Orgánulo</span>
-          <span className={styles.comparativaHeaderTipo}>🔬 Animal</span>
-          <span className={styles.comparativaHeaderTipo}>🌿 Vegetal</span>
+          <span className={styles.comparativaHeaderTipo}><span aria-hidden="true">🔬</span> Animal</span>
+          <span className={styles.comparativaHeaderTipo}><span aria-hidden="true">🌿</span> Vegetal</span>
         </div>
         {COMPARATIVA.map((item, i) => {
           const soloAnimal = item.animal && !item.vegetal;
@@ -414,8 +414,8 @@ function SeccionComparativa() {
                 <span className={styles.comparativaOrgNombre}>{item.nombre}</span>
                 <span className={styles.comparativaOrgNota}>{item.nota}</span>
               </div>
-              <span className={styles.comparativaCheck}>{item.animal ? '✅' : '❌'}</span>
-              <span className={styles.comparativaCheck}>{item.vegetal ? '✅' : '❌'}</span>
+              <span className={styles.comparativaCheck} aria-label={item.animal ? 'Sí' : 'No'}>{item.animal ? '✅' : '❌'}</span>
+              <span className={styles.comparativaCheck} aria-label={item.vegetal ? 'Sí' : 'No'}>{item.vegetal ? '✅' : '❌'}</span>
             </div>
           );
         })}

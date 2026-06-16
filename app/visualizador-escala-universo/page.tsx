@@ -276,9 +276,9 @@ export default function VisualizadorEscalaUniversoPage() {
           {/* Slider / controles de navegación */}
           <div className={styles.sliderZona}>
             <div className={styles.sliderLabels}>
-              <span className={styles.sliderLabelMin}>⚛️ Quark</span>
-              <span className={styles.sliderLabelCentro}>🧍 Humano</span>
-              <span className={styles.sliderLabelMax}>🌌 Galaxia</span>
+              <span className={styles.sliderLabelMin}><span aria-hidden="true">⚛️</span> Quark</span>
+              <span className={styles.sliderLabelCentro}><span aria-hidden="true">🧍</span> Humano</span>
+              <span className={styles.sliderLabelMax}><span aria-hidden="true">🌌</span> Galaxia</span>
             </div>
             <input
               type="range"
@@ -328,6 +328,7 @@ export default function VisualizadorEscalaUniversoPage() {
                 onClick={() => setNivelActivo(i)}
                 title={`${n.nombre}: ${n.notacion}`}
                 aria-label={`Nivel ${n.nombre}, ${n.notacion}`}
+                aria-pressed={i === nivelActivo}
               />
             ))}
           </div>
