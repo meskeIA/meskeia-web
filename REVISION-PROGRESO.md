@@ -265,10 +265,10 @@
 | [x] | Historia del Sudeste Asiático: De Angkor al ASEAN del Siglo XXI | `/visualizador-historia/sudeste-asiatico/` | cultura, estudiantes |
 | [x] | Historia del Teatro: Del Teatro Griego al Teatro Digital | `/visualizador-historia/teatro/` | cultura |
 | [x] | Historia del Teléfono: De Bell al 5G y la IA Conversacional | `/visualizador-historia/telefono/` | cultura, tecnicas |
-| [ ] | Historia del Trabajo: De la Esclavitud Antigua al Teletrabajo del Siglo XXI | `/visualizador-historia/historia-trabajo/` | cultura |
-| [ ] | Historia del Tren: Del Vapor al AVE y el Maglev | `/visualizador-historia/tren/` | cultura, tecnicas |
-| [ ] | Historia del Turismo: Del Grand Tour al Turismo Sostenible | `/visualizador-historia/historia-turismo/` | cultura |
-| [ ] | Historia del Urbanismo: De Uruk a la Ciudad Inteligente | `/visualizador-historia/urbanismo/` | cultura, estudiantes |
+| [x] | Historia del Trabajo: De la Esclavitud Antigua al Teletrabajo del Siglo XXI | `/visualizador-historia/historia-trabajo/` | cultura |
+| [x] | Historia del Tren: Del Vapor al AVE y el Maglev | `/visualizador-historia/tren/` | cultura, tecnicas |
+| [x] | Historia del Turismo: Del Grand Tour al Turismo Sostenible | `/visualizador-historia/historia-turismo/` | cultura |
+| [x] | Historia del Urbanismo: De Uruk a la Ciudad Inteligente | `/visualizador-historia/urbanismo/` | cultura, estudiantes |
 | [ ] | Historia Económica de España: Del Imperio Colonial a Europa | `/visualizador-historia/economia-espana/` | cultura, finanzas |
 | [ ] | Instrumentos Musicales | `/instrumentos-musicales/` | cultura |
 | [ ] | La Conquista de América: Choque de Civilizaciones | `/visualizador-historia/historia-conquista-america/` | cultura |
