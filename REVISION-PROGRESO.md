@@ -473,10 +473,10 @@
 | [x] | Fases de la Luna y Eclipses | `/visualizador-fases-luna-eclipses/` | estudiantes, cultura |
 | [x] | Fenómenos Meteorológicos - Del Cielo a la Tierra | `/visualizador-fenomenos-meteorologicos/` | estudiantes, cultura |
 | [x] | Fibonacci en la Naturaleza | `/visualizador-fibonacci-naturaleza/` | estudiantes, cultura |
-| [ ] | Fósiles y Tiempo Geológico | `/visualizador-fosiles-tiempo-geologico/` | estudiantes, cultura |
-| [ ] | Funciones que Gobiernan el Mundo | `/visualizador-funciones-mundo/` | estudiantes, cultura |
-| [ ] | Generador de Horarios de Estudio | `/generador-horarios-estudio/` | estudiantes |
-| [ ] | Geometría Analítica: Cónicas e Hipérbolas | `/visualizador-geometria-analitica/` | estudiantes, tecnicas |
+| [x] | Fósiles y Tiempo Geológico | `/visualizador-fosiles-tiempo-geologico/` | estudiantes, cultura |
+| [x] | Funciones que Gobiernan el Mundo | `/visualizador-funciones-mundo/` | estudiantes, cultura |
+| [x] | Generador de Horarios de Estudio | `/generador-horarios-estudio/` | estudiantes |
+| [x] | Geometría Analítica: Cónicas e Hipérbolas | `/visualizador-geometria-analitica/` | estudiantes, tecnicas |
 | [ ] | Geometría Fractal - Autosimilitud e Infinito | `/visualizador-geometria-fractales/` | estudiantes, cultura |
 | [ ] | Geopolítica Energética: Flujos, Dependencias e Infraestructuras | `/visualizador-geopolitica-energetica/` | estudiantes, cultura, tecnicas |
 | [ ] | Germinación - De la Semilla a la Planta | `/visualizador-germinacion/` | estudiantes, cultura |

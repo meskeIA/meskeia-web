@@ -448,6 +448,7 @@ function VisualizadorParabola({ params, onChange }: VisualizadorParabolaProps) {
           {(['vertical', 'horizontal'] as OrientacionParabola[]).map((ori) => (
             <button
               key={ori}
+              type="button"
               className={`${styles.orientacionBtn} ${orientacion === ori ? styles.orientacionActivo : ''}`}
               onClick={() => onChange({ ...params, orientacion: ori })}
               aria-pressed={orientacion === ori}
@@ -638,6 +639,7 @@ function VisualizadorPolares({ curva, onCurva, nPetalos, onNPetalos }: Visualiza
         {OPCIONES_CURVA.map((op) => (
           <button
             key={op.id}
+            type="button"
             className={`${styles.tabPolar} ${curva === op.id ? styles.tabPolarActivo : ''}`}
             onClick={() => onCurva(op.id)}
             aria-pressed={curva === op.id}
@@ -777,6 +779,7 @@ export default function VisualizadorGeometriaAnalitica() {
         {TABS.map((tab) => (
           <button
             key={tab.id}
+            type="button"
             className={`${styles.tab} ${tabActivo === tab.id ? styles.tabActivo : ''}`}
             onClick={() => handleTabChange(tab.id)}
             aria-pressed={tabActivo === tab.id}

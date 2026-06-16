@@ -455,25 +455,29 @@ export default function GeneradorHorariosPage() {
       {/* Alertas de entregas urgentes */}
       {alertasUrgentes > 0 && (
         <div className={styles.alertaBanner} onClick={() => setActiveTab('entregas')}>
-          <span className={styles.alertaIcono}>⚠️</span>
+          <span className={styles.alertaIcono} aria-hidden="true">⚠️</span>
           <span>Tienes <strong>{alertasUrgentes}</strong> {alertasUrgentes === 1 ? 'entrega' : 'entregas'} en los próximos 3 días</span>
-          <span className={styles.alertaFlecha}>→</span>
+          <span className={styles.alertaFlecha} aria-hidden="true">→</span>
         </div>
       )}
 
       {/* Tabs */}
       <div className={styles.tabs}>
         <button
+          type="button"
           className={`${styles.tab} ${activeTab === 'horario' ? styles.tabActive : ''}`}
           onClick={() => setActiveTab('horario')}
+          aria-pressed={activeTab === 'horario'}
         >
-          📅 Horario Semanal
+          <span aria-hidden="true">📅</span> Horario Semanal
         </button>
         <button
+          type="button"
           className={`${styles.tab} ${activeTab === 'entregas' ? styles.tabActive : ''}`}
           onClick={() => setActiveTab('entregas')}
+          aria-pressed={activeTab === 'entregas'}
         >
-          📋 Trabajos y Exámenes
+          <span aria-hidden="true">📋</span> Trabajos y Exámenes
           {entregas.filter(e => !e.completada).length > 0 && (
             <span className={styles.tabBadge}>{entregas.filter(e => !e.completada).length}</span>
           )}
@@ -487,7 +491,7 @@ export default function GeneradorHorariosPage() {
           <div className={styles.configPanel}>
             {/* Asignaturas */}
             <h2 className={styles.sectionTitle}>
-              <span>📚</span> Mis Asignaturas
+              <span aria-hidden="true">📚</span> Mis Asignaturas
             </h2>
 
             <div className={styles.asignaturasList}>
@@ -517,6 +521,7 @@ export default function GeneradorHorariosPage() {
                       <span className={styles.horasLabel}>h/sem</span>
                     </div>
                     <button
+                      type="button"
                       className={styles.btnEliminar}
                       onClick={() => eliminarAsignatura(asig.id)}
                       disabled={asignaturas.length <= 1}
@@ -544,14 +549,14 @@ export default function GeneradorHorariosPage() {
               ))}
             </div>
 
-            <button className={styles.btnAnadir} onClick={agregarAsignatura}>
-              <span>+</span> Añadir asignatura
+            <button type="button" className={styles.btnAnadir} onClick={agregarAsignatura}>
+              <span aria-hidden="true">+</span> Añadir asignatura
             </button>
 
             {/* Disponibilidad */}
             <div className={styles.disponibilidadSection}>
               <h2 className={styles.sectionTitle}>
-                <span>📅</span> Mi Disponibilidad
+                <span aria-hidden="true">📅</span> Mi Disponibilidad
               </h2>
               <p className={styles.disponibilidadHint}>Haz clic en las celdas para activar/desactivar</p>
 
@@ -567,11 +572,13 @@ export default function GeneradorHorariosPage() {
                     {DIAS.map((_, diaIdx) => (
                       <button
                         key={diaIdx}
+                        type="button"
                         className={`${styles.disponibilidadSlot} ${
                           disponibilidad[franjaIdx]?.[diaIdx] ? styles.slotActivo : ''
                         }`}
                         onClick={() => toggleDisponibilidad(franjaIdx, diaIdx)}
                         title={`${DIAS_COMPLETOS[diaIdx]} - ${franja.nombre}`}
+                        aria-pressed={!!disponibilidad[franjaIdx]?.[diaIdx]}
                       >
                         {disponibilidad[franjaIdx]?.[diaIdx] && '✓'}
                       </button>
@@ -584,7 +591,7 @@ export default function GeneradorHorariosPage() {
             {/* Preferencias */}
             <div className={styles.preferenciasSection}>
               <h2 className={styles.sectionTitle}>
-                <span>⚙️</span> Preferencias
+                <span aria-hidden="true">⚙️</span> Preferencias
               </h2>
 
               <div className={styles.preferenciaItem}>
@@ -601,8 +608,8 @@ export default function GeneradorHorariosPage() {
               </div>
             </div>
 
-            <button className={styles.btnPrimary} onClick={generarHorario}>
-              <span>⚡</span> Generar Horario
+            <button type="button" className={styles.btnPrimary} onClick={generarHorario}>
+              <span aria-hidden="true">⚡</span> Generar Horario
             </button>
 
             {/* Resumen rápido */}
@@ -626,7 +633,7 @@ export default function GeneradorHorariosPage() {
           <div className={styles.calendarioPanel}>
             <div className={styles.calendarioHeader}>
               <h2 className={styles.calendarioTitulo}>
-                {horarioGenerado.length > 0 ? '📆 Tu Horario Semanal' : '📆 Vista Previa'}
+                <span aria-hidden="true">📆</span> {horarioGenerado.length > 0 ? 'Tu Horario Semanal' : 'Vista Previa'}
               </h2>
             </div>
 
@@ -710,7 +717,7 @@ export default function GeneradorHorariosPage() {
                 {/* Resumen */}
                 <div className={styles.resumenSection}>
                   <h3 className={styles.sectionTitle}>
-                    <span>📊</span> Resumen del Plan
+                    <span aria-hidden="true">📊</span> Resumen del Plan
                   </h3>
                   <div className={styles.resumenGrid}>
                     <div className={styles.resumenCard}>
@@ -751,9 +758,10 @@ export default function GeneradorHorariosPage() {
         <div className={styles.entregasContent}>
           <div className={styles.entregasHeader}>
             <h2 className={styles.sectionTitle}>
-              <span>📋</span> Trabajos y Exámenes
+              <span aria-hidden="true">📋</span> Trabajos y Exámenes
             </h2>
             <button
+              type="button"
               className={styles.btnPrimary}
               onClick={() => {
                 resetFormEntrega();
@@ -839,8 +847,9 @@ export default function GeneradorHorariosPage() {
                         type="button"
                         className={`${styles.importanciaBtn} ${formEntrega.prioridad === n ? styles.importanciaBtnActive : ''}`}
                         onClick={() => setFormEntrega({ ...formEntrega, prioridad: n })}
+                        aria-pressed={formEntrega.prioridad === n}
                       >
-                        {n === 1 ? '🟢 Baja' : n === 2 ? '🟡 Media' : '🔴 Alta'}
+                        {n === 1 ? <><span aria-hidden="true">🟢</span> Baja</> : n === 2 ? <><span aria-hidden="true">🟡</span> Media</> : <><span aria-hidden="true">🔴</span> Alta</>}
                       </button>
                     ))}
                   </div>
@@ -848,10 +857,10 @@ export default function GeneradorHorariosPage() {
               </div>
 
               <div className={styles.formActions}>
-                <button className={styles.btnSecondary} onClick={resetFormEntrega}>
+                <button type="button" className={styles.btnSecondary} onClick={resetFormEntrega}>
                   Cancelar
                 </button>
-                <button className={styles.btnPrimary} onClick={guardarEntrega} style={{ width: 'auto', marginTop: 0 }}>
+                <button type="button" className={styles.btnPrimary} onClick={guardarEntrega} style={{ width: 'auto', marginTop: 0 }}>
                   {editandoEntrega ? 'Guardar cambios' : 'Añadir entrega'}
                 </button>
               </div>
@@ -898,18 +907,22 @@ export default function GeneradorHorariosPage() {
                       </div>
                       <div className={styles.entregaActions}>
                         <button
+                          type="button"
                           className={styles.btnIconSmall}
                           onClick={() => editarEntrega(entrega)}
                           title="Editar"
+                          aria-label="Editar entrega"
                         >
-                          ✏️
+                          <span aria-hidden="true">✏️</span>
                         </button>
                         <button
+                          type="button"
                           className={styles.btnIconSmall}
                           onClick={() => eliminarEntrega(entrega.id)}
                           title="Eliminar"
+                          aria-label="Eliminar entrega"
                         >
-                          🗑️
+                          <span aria-hidden="true">🗑️</span>
                         </button>
                       </div>
                     </div>
@@ -958,8 +971,8 @@ export default function GeneradorHorariosPage() {
                             <span className={styles.rowAsignatura}>{entrega.asignaturaNombre}</span>
                             <span className={styles.rowFecha}>{formatearFecha(entrega.fechaEntrega)}</span>
                             <div className={styles.rowActions}>
-                              <button onClick={() => editarEntrega(entrega)}>✏️</button>
-                              <button onClick={() => eliminarEntrega(entrega.id)}>🗑️</button>
+                              <button type="button" onClick={() => editarEntrega(entrega)} aria-label="Editar entrega"><span aria-hidden="true">✏️</span></button>
+                              <button type="button" onClick={() => eliminarEntrega(entrega.id)} aria-label="Eliminar entrega"><span aria-hidden="true">🗑️</span></button>
                             </div>
                           </div>
                         );
@@ -989,7 +1002,7 @@ export default function GeneradorHorariosPage() {
                             <span className={styles.rowAsignatura}>{entrega.asignaturaNombre}</span>
                             <span className={styles.rowFecha}>{formatearFecha(entrega.fechaEntrega)}</span>
                             <div className={styles.rowActions}>
-                              <button onClick={() => eliminarEntrega(entrega.id)}>🗑️</button>
+<button type="button" onClick={() => eliminarEntrega(entrega.id)} aria-label="Eliminar entrega"><span aria-hidden="true">🗑️</span></button>
                             </div>
                           </div>
                         );
