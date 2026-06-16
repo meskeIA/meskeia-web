@@ -88,8 +88,8 @@ export default function SimuladorPagaAhorroPage() {
             <div className={styles.formGroup}>
               <label className={styles.label}>¿Cada cuánto recibes tu paga?</label>
               <div className={styles.switchRow}>
-                <button type="button" className={`${styles.switchBtn} ${frecuencia === 'semanal' ? styles.switchActivo : ''}`} onClick={() => setFrecuencia('semanal')}>Semanal</button>
-                <button type="button" className={`${styles.switchBtn} ${frecuencia === 'mensual' ? styles.switchActivo : ''}`} onClick={() => setFrecuencia('mensual')}>Mensual</button>
+                <button type="button" aria-pressed={frecuencia === 'semanal'} className={`${styles.switchBtn} ${frecuencia === 'semanal' ? styles.switchActivo : ''}`} onClick={() => setFrecuencia('semanal')}>Semanal</button>
+                <button type="button" aria-pressed={frecuencia === 'mensual'} className={`${styles.switchBtn} ${frecuencia === 'mensual' ? styles.switchActivo : ''}`} onClick={() => setFrecuencia('mensual')}>Mensual</button>
               </div>
             </div>
 

@@ -1020,14 +1020,14 @@ export default function SelectorVehiculo() {
               leasing con el coste total real de cada opción.
             </p>
             <a href="/comparador-vehiculos/" className={styles.btnCta}>
-              Comparar formas de compra →
+              Comparar formas de compra <span aria-hidden="true">→</span>
             </a>
           </div>
 
           {/* Reiniciar */}
           <div className={styles.reiniciarWrap}>
             <button type="button" className={styles.btnReiniciar} onClick={reiniciar}>
-              ↺ Repetir el test
+              <span aria-hidden="true">↺</span> Repetir el test
             </button>
           </div>
 

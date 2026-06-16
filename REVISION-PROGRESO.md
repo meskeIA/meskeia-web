@@ -676,10 +676,10 @@
 | [x] | Selector de Seguro de Vida | `/selector-seguro-vida/` | finanzas, salud |
 | [x] | Selector de Tipo de Ahorro | `/selector-tipo-ahorro/` | finanzas, productividad |
 | [x] | Selector de Tipo de Hipoteca | `/selector-tipo-hipoteca/` | finanzas, inmobiliaria |
-| [ ] | Selector de Tipo de Inversión | `/selector-inversiones/` | finanzas |
-| [ ] | Selector de Tipo de Préstamo | `/selector-tipo-prestamo/` | finanzas, inmobiliaria |
-| [ ] | Selector de Tipo de Vehículo | `/selector-vehiculo/` | finanzas, inmobiliaria, productividad |
-| [ ] | Simulador de Paga y Ahorro | `/simulador-paga-ahorro/` | finanzas, estudiantes |
+| [x] | Selector de Tipo de Inversión | `/selector-inversiones/` | finanzas |
+| [x] | Selector de Tipo de Préstamo | `/selector-tipo-prestamo/` | finanzas, inmobiliaria |
+| [x] | Selector de Tipo de Vehículo | `/selector-vehiculo/` | finanzas, inmobiliaria, productividad |
+| [x] | Simulador de Paga y Ahorro | `/simulador-paga-ahorro/` | finanzas, estudiantes |
 | [ ] | Simulador Sesgos del Inversor | `/simulador-sesgos-inversor/` | finanzas, cultura |
 | [x] | Test de Perfil Inversor | `/test-perfil-inversor/` | finanzas |
 | [ ] | Test de Tolerancia al Riesgo Detallado | `/test-tolerancia-riesgo-detallado/` | finanzas |
