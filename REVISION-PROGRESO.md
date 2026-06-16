@@ -938,12 +938,12 @@
 | [x] | Diagnóstico de Comunicación Interna | `/diagnostico-comunicacion-interna/` | productividad, freelance |
 | [x] | Diagnóstico de Estancamiento Profesional | `/diagnostico-estancamiento-profesional/` | productividad, cultura |
 | [x] | Diagnóstico de Multitarea | `/diagnostico-multitarea/` | productividad |
-| [ ] | Diagnóstico Explotación vs Exploración | `/diagnostico-explotacion-exploracion/` | productividad, freelance |
-| [ ] | Generador de Actas de Reunión | `/generador-actas/` | productividad |
-| [ ] | Generador de Firmas Email | `/generador-firma-email/` | productividad |
+| [x] | Diagnóstico Explotación vs Exploración | `/diagnostico-explotacion-exploracion/` | productividad, freelance |
+| [x] | Generador de Actas de Reunión | `/generador-actas/` | productividad |
+| [x] | Generador de Firmas Email | `/generador-firma-email/` | productividad |
 | [x] | Limpiador de Texto | `/limpiador-texto/` | productividad |
 | [x] | Lista de Equipaje | `/lista-equipaje/` | productividad, viajes |
-| [ ] | Mapa de Compromisos vs Capacidad | `/mapa-compromisos-capacidad/` | productividad, freelance |
+| [x] | Mapa de Compromisos vs Capacidad | `/mapa-compromisos-capacidad/` | productividad, freelance |
 | [ ] | Mapa de Decisiones Urgentes vs Importantes | `/mapa-decisiones-urgentes-importantes/` | productividad, freelance |
 | [ ] | Matriz Eisenhower | `/matriz-eisenhower/` | productividad, freelance |
 | [ ] | Planificador de Boda | `/planificador-boda/` | productividad, inmobiliaria |

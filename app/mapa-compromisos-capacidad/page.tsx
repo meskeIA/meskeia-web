@@ -238,16 +238,16 @@ export default function MapaCompromisosCapacidadPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>📋 Mapa de Compromisos vs Capacidad</h1>
+          <h1 className={styles.title}><span aria-hidden="true">📋</span> Mapa de Compromisos vs Capacidad</h1>
           <p className={styles.subtitle}>
             ¿Has dicho sí a más de lo que puedes hacer bien?
             <br />
             Análisis de carga realista
           </p>
           <div className={styles.badges}>
-            <span className={styles.badge}>🕐 3 minutos</span>
-            <span className={styles.badge}>📊 10 preguntas</span>
-            <span className={styles.badge}>🔒 Sin registro</span>
+            <span className={styles.badge}><span aria-hidden="true">🕐</span> 3 minutos</span>
+            <span className={styles.badge}><span aria-hidden="true">📊</span> 10 preguntas</span>
+            <span className={styles.badge}><span aria-hidden="true">🔒</span> Sin registro</span>
           </div>
         </header>
 
@@ -284,6 +284,7 @@ export default function MapaCompromisosCapacidadPage() {
                 {ESCALA.map((opcion) => (
                   <button
                     key={opcion.valor}
+                    type="button"
                     className={`${styles.scaleButton} ${respuestas[pregunta.id] === opcion.valor ? styles.scaleButtonActive : ''}`}
                     onClick={() => handleRespuesta(pregunta.id, opcion.valor)}
                     role="radio"
@@ -303,6 +304,7 @@ export default function MapaCompromisosCapacidadPage() {
           </div>
 
           <button
+            type="button"
             className={styles.btnPrimary}
             onClick={calcularResultado}
             disabled={!todasRespondidas}
@@ -318,23 +320,23 @@ export default function MapaCompromisosCapacidadPage() {
 
             <div className={styles.mapContainer}>
               <div className={styles.mapLabels}>
-                <span className={styles.mapLabelTop}>💪 Alta Capacidad</span>
+                <span className={styles.mapLabelTop}><span aria-hidden="true">💪</span> Alta Capacidad</span>
                 <span className={styles.mapLabelBottom}>Baja Capacidad</span>
                 <span className={styles.mapLabelLeft}>Baja Carga</span>
-                <span className={styles.mapLabelRight}>🫠 Alta Carga</span>
+                <span className={styles.mapLabelRight}><span aria-hidden="true">🫠</span> Alta Carga</span>
               </div>
               <div className={styles.map}>
                 <div className={`${styles.quadrant} ${styles.quadrantTL}`}>
-                  <span>💚 Capacidad Disponible</span>
+                  <span><span aria-hidden="true">💚</span> Capacidad Disponible</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantTR}`}>
-                  <span>🏋️ Alta Carga Gestionada</span>
+                  <span><span aria-hidden="true">🏋️</span> Alta Carga Gestionada</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBL}`}>
-                  <span>😶 Baja Activación</span>
+                  <span><span aria-hidden="true">😶</span> Baja Activación</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
-                  <span>🫠 Sobrecarga</span>
+                  <span><span aria-hidden="true">🫠</span> Sobrecarga</span>
                 </div>
                 <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
                 <div className={styles.thresholdLineV} style={{ left: '65%' }} aria-hidden="true" />
@@ -353,7 +355,7 @@ export default function MapaCompromisosCapacidadPage() {
             <div className={styles.scoresContainer}>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>🫠 Carga</span>
+                  <span><span aria-hidden="true">🫠</span> Carga</span>
                   <span className={styles.scoreValue}>{puntuacionCarga}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -365,7 +367,7 @@ export default function MapaCompromisosCapacidadPage() {
               </div>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>💪 Capacidad</span>
+                  <span><span aria-hidden="true">💪</span> Capacidad</span>
                   <span className={styles.scoreValue}>{puntuacionCapacidad}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -379,14 +381,14 @@ export default function MapaCompromisosCapacidadPage() {
 
             <div className={styles.profileCard}>
               <div className={styles.profileHeader}>
-                <span className={styles.profileEmoji}>{perfil.emoji}</span>
+                <span className={styles.profileEmoji} aria-hidden="true">{perfil.emoji}</span>
                 <h3 className={styles.profileName}>{perfil.nombre}</h3>
               </div>
               <p className={styles.profileDescription}>{perfil.descripcion}</p>
 
               <div className={styles.profileColumns}>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>✅ Fortalezas</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">✅</span> Fortalezas</h4>
                   <ul className={styles.profileList}>
                     {perfil.fortalezas.map((f, i) => (
                       <li key={i}>{f}</li>
@@ -394,7 +396,7 @@ export default function MapaCompromisosCapacidadPage() {
                   </ul>
                 </div>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>⚠️ Riesgos</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">⚠️</span> Riesgos</h4>
                   <ul className={styles.profileList}>
                     {perfil.riesgos.map((r, i) => (
                       <li key={i}>{r}</li>
@@ -404,7 +406,7 @@ export default function MapaCompromisosCapacidadPage() {
               </div>
 
               <div className={styles.actionsSection}>
-                <h4 className={styles.actionsTitle}>🎯 Acciones sugeridas</h4>
+                <h4 className={styles.actionsTitle}><span aria-hidden="true">🎯</span> Acciones sugeridas</h4>
                 <ol className={styles.actionsList}>
                   {perfil.acciones.map((a, i) => (
                     <li key={i}>{a}</li>
@@ -413,7 +415,7 @@ export default function MapaCompromisosCapacidadPage() {
               </div>
             </div>
 
-            <button className={styles.btnSecondary} onClick={reiniciar}>
+            <button type="button" className={styles.btnSecondary} onClick={reiniciar}>
               Repetir diagnóstico
             </button>
           </section>

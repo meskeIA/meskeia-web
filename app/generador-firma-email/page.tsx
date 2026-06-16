@@ -335,6 +335,8 @@ export default function GeneradorFirmaEmailPage() {
             {templates.map(t => (
               <button
                 key={t.id}
+                type="button"
+                aria-pressed={template === t.id}
                 className={`${styles.templateBtn} ${template === t.id ? styles.active : ''}`}
                 onClick={() => setTemplate(t.id)}
               >
@@ -352,10 +354,10 @@ export default function GeneradorFirmaEmailPage() {
           />
 
           <div className={styles.buttonRow}>
-            <button onClick={handleCopy} className={styles.btnPrimary}>
+            <button type="button" onClick={handleCopy} className={styles.btnPrimary}>
               {copied ? '¡Copiado!' : 'Copiar HTML'}
             </button>
-            <button onClick={handleReset} className={styles.btnSecondary}>
+            <button type="button" onClick={handleReset} className={styles.btnSecondary}>
               Restablecer
             </button>
           </div>
@@ -443,7 +445,7 @@ export default function GeneradorFirmaEmailPage() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>💼</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">💼</span>
               <strong>Freelance o autónomo</strong>
             </div>
             <p className={styles.escenarioDesc}>
@@ -452,7 +454,7 @@ export default function GeneradorFirmaEmailPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🏢</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🏢</span>
               <strong>Empresa o corporación</strong>
             </div>
             <p className={styles.escenarioDesc}>
@@ -461,7 +463,7 @@ export default function GeneradorFirmaEmailPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>📣</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">📣</span>
               <strong>Marketing y ventas</strong>
             </div>
             <p className={styles.escenarioDesc}>
@@ -470,7 +472,7 @@ export default function GeneradorFirmaEmailPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🎨</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🎨</span>
               <strong>Diseñador o creativo</strong>
             </div>
             <p className={styles.escenarioDesc}>
@@ -549,32 +551,32 @@ export default function GeneradorFirmaEmailPage() {
         <h3 className={styles.eduTitle}>Buenas prácticas de firma de email</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>✂️</span>
+            <span className={styles.tipIcon} aria-hidden="true">✂️</span>
             <strong>Menos es más</strong>
             <p>Limita la firma a 5-6 líneas de información. Una firma demasiado larga distrae del contenido del email.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📞</span>
+            <span className={styles.tipIcon} aria-hidden="true">📞</span>
             <strong>Formato de teléfono completo</strong>
             <p>Incluye siempre el prefijo internacional (+34 para España) para facilitar el contacto a clientes o colaboradores internacionales.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🎨</span>
+            <span className={styles.tipIcon} aria-hidden="true">🎨</span>
             <strong>Coherencia de marca</strong>
             <p>El color de la firma debe coincidir con el de tu web, tarjetas y materiales corporativos para reforzar la identidad visual.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📱</span>
+            <span className={styles.tipIcon} aria-hidden="true">📱</span>
             <strong>Prueba en móvil</strong>
             <p>Antes de distribuir la firma a tu equipo, verifica que se ve correctamente en iOS y Android, donde se leen más del 60% de los emails.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔄</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔄</span>
             <strong>Actualización periódica</strong>
             <p>Revisa tu firma cada 6 meses. Un cargo desactualizado o un número de teléfono incorrecto genera desconfianza en el receptor.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>👥</span>
+            <span className={styles.tipIcon} aria-hidden="true">👥</span>
             <strong>Consistencia en el equipo</strong>
             <p>Si gestionas un equipo, usa una plantilla unificada para toda la empresa. La coherencia refuerza la imagen profesional de la organización.</p>
           </div>
@@ -582,7 +584,7 @@ export default function GeneradorFirmaEmailPage() {
 
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores que hay que evitar en firmas de email</strong>
           </div>
           <ul className={styles.warningList}>

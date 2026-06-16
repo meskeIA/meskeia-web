@@ -325,25 +325,29 @@ export default function GeneradorActasPage() {
       {/* Barra de acciones - Solo visible en pantalla */}
       <div className={`${styles.actionsBar} ${styles.noPrint}`}>
         <div className={styles.actionsLeft}>
-          <button onClick={newActa} className={styles.btnAction}>
-            ➕ Nueva Acta
+          <button type="button" onClick={newActa} className={styles.btnAction}>
+            <span aria-hidden="true">➕</span> Nueva Acta
           </button>
-          <button onClick={saveDraft} className={styles.btnAction}>
-            💾 Guardar Borrador
+          <button type="button" onClick={saveDraft} className={styles.btnAction}>
+            <span aria-hidden="true">💾</span> Guardar Borrador
           </button>
         </div>
         <div className={styles.actionsRight}>
           <button
+            type="button"
             onClick={() => setShowDrafts(!showDrafts)}
             className={`${styles.btnAction} ${showDrafts ? styles.active : ''}`}
+            aria-pressed={showDrafts}
           >
-            📁 Borradores ({drafts.length})
+            <span aria-hidden="true">📁</span> Borradores ({drafts.length})
           </button>
           <button
+            type="button"
             onClick={() => setShowHistory(!showHistory)}
             className={`${styles.btnAction} ${showHistory ? styles.active : ''}`}
+            aria-pressed={showHistory}
           >
-            📜 Historial ({history.length})
+            <span aria-hidden="true">📜</span> Historial ({history.length})
           </button>
         </div>
       </div>
@@ -363,10 +367,10 @@ export default function GeneradorActasPage() {
                     <span>{formatDate(draft.fecha)}</span>
                   </div>
                   <div className={styles.draftActions}>
-                    <button onClick={() => loadDraft(draft)} className={styles.btnSmall}>
+                    <button type="button" onClick={() => loadDraft(draft)} className={styles.btnSmall}>
                       Cargar
                     </button>
-                    <button onClick={() => deleteDraft(draft.id)} className={styles.btnSmallDanger}>
+                    <button type="button" onClick={() => deleteDraft(draft.id)} className={styles.btnSmallDanger}>
                       🗑️
                     </button>
                   </div>
@@ -392,7 +396,7 @@ export default function GeneradorActasPage() {
                     <span>{formatDate(item.fecha)}</span>
                   </div>
                   <div className={styles.draftActions}>
-                    <button onClick={() => loadFromHistory(item)} className={styles.btnSmall}>
+                    <button type="button" onClick={() => loadFromHistory(item)} className={styles.btnSmall}>
                       Reutilizar
                     </button>
                   </div>
@@ -409,10 +413,12 @@ export default function GeneradorActasPage() {
           {steps.map((step, index) => (
             <button
               key={step.id}
+              type="button"
               className={`${styles.stepButton} ${currentStep === step.id ? styles.stepActive : ''} ${index < currentStepIndex ? styles.stepCompleted : ''}`}
               onClick={() => setCurrentStep(step.id)}
+              aria-pressed={currentStep === step.id}
             >
-              <span className={styles.stepIcon}>{step.icon}</span>
+              <span className={styles.stepIcon} aria-hidden="true">{step.icon}</span>
               <span className={styles.stepLabel}>{step.label}</span>
             </button>
           ))}
@@ -433,10 +439,12 @@ export default function GeneradorActasPage() {
                 {PLANTILLAS.map(plantilla => (
                   <button
                     key={plantilla.id}
+                    type="button"
                     className={`${styles.templateCard} ${acta.tipo === plantilla.id ? styles.templateActive : ''}`}
                     onClick={() => setActa({ ...acta, tipo: plantilla.id })}
+                    aria-pressed={acta.tipo === plantilla.id}
                   >
-                    <span className={styles.templateIcon}>{plantilla.icon}</span>
+                    <span className={styles.templateIcon} aria-hidden="true">{plantilla.icon}</span>
                     <span className={styles.templateName}>{plantilla.nombre}</span>
                   </button>
                 ))}
@@ -534,7 +542,7 @@ export default function GeneradorActasPage() {
 
             <div className={styles.navigationButtons}>
               <div></div>
-              <button onClick={() => setCurrentStep('asistentes')} className={styles.btnPrimary}>
+              <button type="button" onClick={() => setCurrentStep('asistentes')} className={styles.btnPrimary}>
                 Siguiente: Asistentes →
               </button>
             </div>
@@ -550,8 +558,8 @@ export default function GeneradorActasPage() {
               <p className={styles.helperText}>
                 Añade los participantes de la reunión. Marca como "Ausente" a quienes fueron convocados pero no asistieron.
               </p>
-              <button onClick={addAsistente} className={styles.btnAdd}>
-                ➕ Añadir Asistente
+              <button type="button" onClick={addAsistente} className={styles.btnAdd}>
+                <span aria-hidden="true">➕</span> Añadir Asistente
               </button>
             </div>
 
@@ -559,7 +567,7 @@ export default function GeneradorActasPage() {
               <div className={styles.emptyState}>
                 <span className={styles.emptyIcon}>👤</span>
                 <p>No hay asistentes añadidos</p>
-                <button onClick={addAsistente} className={styles.btnPrimary}>
+                <button type="button" onClick={addAsistente} className={styles.btnPrimary}>
                   Añadir primer asistente
                 </button>
               </div>
@@ -596,6 +604,7 @@ export default function GeneradorActasPage() {
                       </label>
                     </div>
                     <button
+                      type="button"
                       onClick={() => removeAsistente(asistente.id)}
                       className={styles.btnRemove}
                       title="Eliminar asistente"
@@ -608,10 +617,10 @@ export default function GeneradorActasPage() {
             )}
 
             <div className={styles.navigationButtons}>
-              <button onClick={() => setCurrentStep('info')} className={styles.btnSecondary}>
+              <button type="button" onClick={() => setCurrentStep('info')} className={styles.btnSecondary}>
                 ← Anterior
               </button>
-              <button onClick={() => setCurrentStep('orden')} className={styles.btnPrimary}>
+              <button type="button" onClick={() => setCurrentStep('orden')} className={styles.btnPrimary}>
                 Siguiente: Orden del Día →
               </button>
             </div>
@@ -627,8 +636,8 @@ export default function GeneradorActasPage() {
               <p className={styles.helperText}>
                 Define los puntos tratados en la reunión. Incluye el desarrollo de cada punto y los acuerdos alcanzados.
               </p>
-              <button onClick={addPuntoOrdenDia} className={styles.btnAdd}>
-                ➕ Añadir Punto
+              <button type="button" onClick={addPuntoOrdenDia} className={styles.btnAdd}>
+                <span aria-hidden="true">➕</span> Añadir Punto
               </button>
             </div>
 
@@ -636,7 +645,7 @@ export default function GeneradorActasPage() {
               <div className={styles.emptyState}>
                 <span className={styles.emptyIcon}>📝</span>
                 <p>No hay puntos en el orden del día</p>
-                <button onClick={addPuntoOrdenDia} className={styles.btnPrimary}>
+                <button type="button" onClick={addPuntoOrdenDia} className={styles.btnPrimary}>
                   Añadir primer punto
                 </button>
               </div>
@@ -647,6 +656,7 @@ export default function GeneradorActasPage() {
                     <div className={styles.puntoHeader}>
                       <span className={styles.puntoNumber}>Punto {index + 1}</span>
                       <button
+                        type="button"
                         onClick={() => removePuntoOrdenDia(punto.id)}
                         className={styles.btnRemove}
                         title="Eliminar punto"
@@ -702,10 +712,10 @@ export default function GeneradorActasPage() {
             )}
 
             <div className={styles.navigationButtons}>
-              <button onClick={() => setCurrentStep('asistentes')} className={styles.btnSecondary}>
+              <button type="button" onClick={() => setCurrentStep('asistentes')} className={styles.btnSecondary}>
                 ← Anterior
               </button>
-              <button onClick={() => setCurrentStep('tareas')} className={styles.btnPrimary}>
+              <button type="button" onClick={() => setCurrentStep('tareas')} className={styles.btnPrimary}>
                 Siguiente: Tareas →
               </button>
             </div>
@@ -721,8 +731,8 @@ export default function GeneradorActasPage() {
               <p className={styles.helperText}>
                 Define las tareas asignadas durante la reunión con responsable y fecha límite.
               </p>
-              <button onClick={addTarea} className={styles.btnAdd}>
-                ➕ Añadir Tarea
+              <button type="button" onClick={addTarea} className={styles.btnAdd}>
+                <span aria-hidden="true">➕</span> Añadir Tarea
               </button>
             </div>
 
@@ -730,7 +740,7 @@ export default function GeneradorActasPage() {
               <div className={styles.emptyState}>
                 <span className={styles.emptyIcon}>✅</span>
                 <p>No hay tareas asignadas</p>
-                <button onClick={addTarea} className={styles.btnPrimary}>
+                <button type="button" onClick={addTarea} className={styles.btnPrimary}>
                   Añadir primera tarea
                 </button>
               </div>
@@ -741,6 +751,7 @@ export default function GeneradorActasPage() {
                     <div className={styles.tareaHeader}>
                       <span className={styles.tareaNumber}>Tarea {index + 1}</span>
                       <button
+                        type="button"
                         onClick={() => removeTarea(tarea.id)}
                         className={styles.btnRemove}
                         title="Eliminar tarea"
@@ -823,11 +834,11 @@ export default function GeneradorActasPage() {
             </div>
 
             <div className={styles.navigationButtons}>
-              <button onClick={() => setCurrentStep('orden')} className={styles.btnSecondary}>
+              <button type="button" onClick={() => setCurrentStep('orden')} className={styles.btnSecondary}>
                 ← Anterior
               </button>
-              <button onClick={() => setCurrentStep('preview')} className={styles.btnPrimary}>
-                Ver Vista Previa 👁️
+              <button type="button" onClick={() => setCurrentStep('preview')} className={styles.btnPrimary}>
+                Ver Vista Previa <span aria-hidden="true">👁️</span>
               </button>
             </div>
           </div>
@@ -838,11 +849,11 @@ export default function GeneradorActasPage() {
           <>
             {/* Botones de acción - Solo visibles en pantalla */}
             <div className={`${styles.previewActions} ${styles.noPrint}`}>
-              <button onClick={() => setCurrentStep('tareas')} className={styles.btnSecondary}>
+              <button type="button" onClick={() => setCurrentStep('tareas')} className={styles.btnSecondary}>
                 ← Volver a editar
               </button>
-              <button onClick={handlePrint} className={styles.btnPrimary}>
-                🖨️ Imprimir / Exportar PDF
+              <button type="button" onClick={handlePrint} className={styles.btnPrimary}>
+                <span aria-hidden="true">🖨️</span> Imprimir / Exportar PDF
               </button>
             </div>
 

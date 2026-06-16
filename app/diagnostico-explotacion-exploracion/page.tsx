@@ -241,16 +241,16 @@ export default function DiagnosticoExplotacionExploracionPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>⚖️ Diagnóstico: Explotación vs Exploración</h1>
+          <h1 className={styles.title}><span aria-hidden="true">⚖️</span> Diagnóstico: Explotación vs Exploración</h1>
           <p className={styles.subtitle}>
             ¿Tu organización equilibra eficiencia e innovación?
             <br />
             Basado en el modelo de James G. March (1991)
           </p>
           <div className={styles.badges}>
-            <span className={styles.badge}>🕐 3 minutos</span>
-            <span className={styles.badge}>📊 10 preguntas</span>
-            <span className={styles.badge}>🔒 Sin registro</span>
+            <span className={styles.badge}><span aria-hidden="true">🕐</span> 3 minutos</span>
+            <span className={styles.badge}><span aria-hidden="true">📊</span> 10 preguntas</span>
+            <span className={styles.badge}><span aria-hidden="true">🔒</span> Sin registro</span>
           </div>
         </header>
 
@@ -290,6 +290,7 @@ export default function DiagnosticoExplotacionExploracionPage() {
                 {ESCALA.map((opcion) => (
                   <button
                     key={opcion.valor}
+                    type="button"
                     className={`${styles.scaleButton} ${respuestas[pregunta.id] === opcion.valor ? styles.scaleButtonActive : ''}`}
                     onClick={() => handleRespuesta(pregunta.id, opcion.valor)}
                     role="radio"
@@ -309,6 +310,7 @@ export default function DiagnosticoExplotacionExploracionPage() {
           </div>
 
           <button
+            type="button"
             className={styles.btnPrimary}
             onClick={calcularResultado}
             disabled={!todasRespondidas}
@@ -326,24 +328,24 @@ export default function DiagnosticoExplotacionExploracionPage() {
             {/* Mapa 2D */}
             <div className={styles.mapContainer}>
               <div className={styles.mapLabels}>
-                <span className={styles.mapLabelTop}>🔬 Alta Exploración</span>
+                <span className={styles.mapLabelTop}><span aria-hidden="true">🔬</span> Alta Exploración</span>
                 <span className={styles.mapLabelBottom}>Baja Exploración</span>
                 <span className={styles.mapLabelLeft}>Baja Explotación</span>
-                <span className={styles.mapLabelRight}>⚙️ Alta Explotación</span>
+                <span className={styles.mapLabelRight}><span aria-hidden="true">⚙️</span> Alta Explotación</span>
               </div>
               <div className={styles.map}>
                 {/* Cuadrantes */}
                 <div className={`${styles.quadrant} ${styles.quadrantTL}`}>
-                  <span>🔬 Laboratorio Permanente</span>
+                  <span><span aria-hidden="true">🔬</span> Laboratorio Permanente</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantTR}`}>
-                  <span>⚖️ Ambidiestra</span>
+                  <span><span aria-hidden="true">⚖️</span> Ambidiestra</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBL}`}>
-                  <span>⏸️ Punto Muerto</span>
+                  <span><span aria-hidden="true">⏸️</span> Punto Muerto</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
-                  <span>⚙️ Máquina de Eficiencia</span>
+                  <span><span aria-hidden="true">⚙️</span> Máquina de Eficiencia</span>
                 </div>
                 {/* Líneas de umbral */}
                 <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
@@ -365,7 +367,7 @@ export default function DiagnosticoExplotacionExploracionPage() {
             <div className={styles.scoresContainer}>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>⚙️ Explotación</span>
+                  <span><span aria-hidden="true">⚙️</span> Explotación</span>
                   <span className={styles.scoreValue}>{puntuacionExplotacion}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -377,7 +379,7 @@ export default function DiagnosticoExplotacionExploracionPage() {
               </div>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>🔬 Exploración</span>
+                  <span><span aria-hidden="true">🔬</span> Exploración</span>
                   <span className={styles.scoreValue}>{puntuacionExploracion}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -399,7 +401,7 @@ export default function DiagnosticoExplotacionExploracionPage() {
 
               <div className={styles.profileColumns}>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>✅ Fortalezas</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">✅</span> Fortalezas</h4>
                   <ul className={styles.profileList}>
                     {perfil.fortalezas.map((f, i) => (
                       <li key={i}>{f}</li>
@@ -407,7 +409,7 @@ export default function DiagnosticoExplotacionExploracionPage() {
                   </ul>
                 </div>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>⚠️ Riesgos</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">⚠️</span> Riesgos</h4>
                   <ul className={styles.profileList}>
                     {perfil.riesgos.map((r, i) => (
                       <li key={i}>{r}</li>
@@ -417,7 +419,7 @@ export default function DiagnosticoExplotacionExploracionPage() {
               </div>
 
               <div className={styles.actionsSection}>
-                <h4 className={styles.actionsTitle}>🎯 Acciones sugeridas</h4>
+                <h4 className={styles.actionsTitle}><span aria-hidden="true">🎯</span> Acciones sugeridas</h4>
                 <ol className={styles.actionsList}>
                   {perfil.acciones.map((a, i) => (
                     <li key={i}>{a}</li>
@@ -426,7 +428,7 @@ export default function DiagnosticoExplotacionExploracionPage() {
               </div>
             </div>
 
-            <button className={styles.btnSecondary} onClick={reiniciar}>
+            <button type="button" className={styles.btnSecondary} onClick={reiniciar}>
               Repetir diagnóstico
             </button>
           </section>
