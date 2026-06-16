@@ -426,12 +426,12 @@
 | [x] | Creador de Flashcards | `/creador-flashcards/` | estudiantes |
 | [x] | CRISPR-Cas9: Mecanismo, Edición Genómica y Bioética | `/visualizador-crispr-cas9/` | estudiantes, cultura |
 | [x] | Cuadro de Punnett: Genética Mendeliana | `/simulador-punnett/` | estudiantes |
-| [ ] | Curso de Introducción a la Teoría Política | `/curso-teoria-politica/` | estudiantes, cultura |
-| [ ] | Curso de Pensamiento Científico | `/curso-pensamiento-cientifico/` | estudiantes |
+| [x] | Curso de Introducción a la Teoría Política | `/curso-teoria-politica/` | estudiantes, cultura |
+| [x] | Curso de Pensamiento Científico | `/curso-pensamiento-cientifico/` | estudiantes |
 | [x] | Curso de Pensamiento Sistémico | `/curso-pensamiento-sistemico/` | estudiantes, cultura |
 | [x] | Curso de Redacción Académica | `/curso-redaccion-academica/` | estudiantes |
-| [ ] | De dónde Viene tu Camiseta | `/visualizador-origen-camiseta/` | estudiantes, cultura |
-| [ ] | Diabetes: Mecanismo Biológico de Insulina y Glucagón | `/visualizador-diabetes-mecanismo/` | estudiantes, cultura, salud |
+| [x] | De dónde Viene tu Camiseta | `/visualizador-origen-camiseta/` | estudiantes, cultura |
+| [x] | Diabetes: Mecanismo Biológico de Insulina y Glucagón | `/visualizador-diabetes-mecanismo/` | estudiantes, cultura, salud |
 | [ ] | Digestión y Nutrientes - De la Comida a la Célula | `/visualizador-digestion-nutrientes/` | estudiantes, cultura, salud |
 | [ ] | Ecosistemas - El Flujo de Energía | `/visualizador-ecosistema/` | estudiantes, cultura |
 | [ ] | Ecuaciones Diferenciales: Campos de Dirección y Lotka-Volterra | `/visualizador-ecuaciones-diferenciales/` | estudiantes, tecnicas |

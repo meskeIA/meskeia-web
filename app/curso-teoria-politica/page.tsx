@@ -30,7 +30,7 @@ export default function CursoTeoriaPoliticaPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🏛️</span>
+        <span className={styles.heroIcon} aria-hidden="true">🏛️</span>
         <h1 className={styles.title}>Curso de Introducción a la Teoría Política</h1>
         <p className={styles.subtitle}>
           Recorre 2.500 años de pensamiento político: desde la Grecia clásica hasta
@@ -43,7 +43,7 @@ export default function CursoTeoriaPoliticaPage() {
           rel="noopener noreferrer"
           className={styles.videoButton}
         >
-          <span className={styles.videoIcon}>▶️</span>
+          <span className={styles.videoIcon} aria-hidden="true">▶️</span>
           Ver introducción en video
         </a>
       </header>
@@ -53,22 +53,22 @@ export default function CursoTeoriaPoliticaPage() {
       {/* Stats Grid */}
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>📚</span>
+          <span className={styles.statIcon} aria-hidden="true">📚</span>
           <div className={styles.statValue}>{MODULES.length}</div>
           <div className={styles.statLabel}>Módulos</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>📖</span>
+          <span className={styles.statIcon} aria-hidden="true">📖</span>
           <div className={styles.statValue}>{CHAPTERS.length}</div>
           <div className={styles.statLabel}>Capítulos</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>⏱️</span>
+          <span className={styles.statIcon} aria-hidden="true">⏱️</span>
           <div className={styles.statValue}>{Math.round(totalDuration / 60)}h {totalDuration % 60}m</div>
           <div className={styles.statLabel}>Duración Total</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>📊</span>
+          <span className={styles.statIcon} aria-hidden="true">📊</span>
           <div className={styles.statValue}>{progress}%</div>
           <div className={styles.statLabel}>
             {completedCount}/{CHAPTERS.length} completados
@@ -79,26 +79,26 @@ export default function CursoTeoriaPoliticaPage() {
       {/* Qué aprenderás */}
       <section className={styles.overviewSection}>
         <h2 className={styles.sectionTitle}>
-          <span>🎯</span> ¿Qué aprenderás?
+          <span aria-hidden="true">🎯</span> ¿Qué aprenderás?
         </h2>
         <div className={styles.overviewGrid}>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>🏛️</span>
+            <span className={styles.overviewIcon} aria-hidden="true">🏛️</span>
             <h3>Fundamentos clásicos</h3>
             <p>Las bases del pensamiento político con Platón y Aristóteles</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>⚔️</span>
+            <span className={styles.overviewIcon} aria-hidden="true">⚔️</span>
             <h3>Estado moderno</h3>
             <p>El nacimiento del Estado con Maquiavelo, Hobbes y Locke</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>💡</span>
+            <span className={styles.overviewIcon} aria-hidden="true">💡</span>
             <h3>Ilustración</h3>
             <p>La razón y el contrato social con Montesquieu y Rousseau</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>🌍</span>
+            <span className={styles.overviewIcon} aria-hidden="true">🌍</span>
             <h3>Pensamiento contemporáneo</h3>
             <p>Crítica y justicia con Marx y Rawls</p>
           </div>
@@ -108,7 +108,7 @@ export default function CursoTeoriaPoliticaPage() {
       {/* Módulos y Capítulos */}
       <section className={styles.modulesSection}>
         <h2 className={styles.sectionTitle}>
-          <span>📚</span> Contenido del Curso
+          <span aria-hidden="true">📚</span> Contenido del Curso
         </h2>
 
         {MODULES.map((module) => {
@@ -123,6 +123,7 @@ export default function CursoTeoriaPoliticaPage() {
                 <div
                   className={styles.moduleIcon}
                   style={{ background: `${module.color}20` }}
+                  aria-hidden="true"
                 >
                   {module.icon}
                 </div>
@@ -150,7 +151,7 @@ export default function CursoTeoriaPoliticaPage() {
                         </span>
                         <div className={styles.chapterInfo}>
                           <h4 className={styles.chapterTitle}>
-                            {chapter.icon} {chapter.title}
+                            <span aria-hidden="true">{chapter.icon}</span> {chapter.title}
                           </h4>
                           <span className={styles.chapterDuration}>
                             {chapter.duration} · {chapter.subtitle}
@@ -182,7 +183,7 @@ export default function CursoTeoriaPoliticaPage() {
       {/* Recursos */}
       <section className={styles.resourcesSection}>
         <h2 className={styles.sectionTitle}>
-          <span>📖</span> Recursos Adicionales
+          <span aria-hidden="true">📖</span> Recursos Adicionales
         </h2>
         <div className={styles.resourcesGrid}>
           {RESOURCES.map((resource) => (
@@ -191,7 +192,7 @@ export default function CursoTeoriaPoliticaPage() {
               href={resource.href}
               className={styles.resourceCard}
             >
-              <span className={styles.resourceIcon}>{resource.icon}</span>
+              <span className={styles.resourceIcon} aria-hidden="true">{resource.icon}</span>
               <h3 className={styles.resourceName}>{resource.name}</h3>
               <p className={styles.resourceDesc}>{resource.description}</p>
             </Link>

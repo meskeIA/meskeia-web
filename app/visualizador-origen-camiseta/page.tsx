@@ -178,7 +178,7 @@ export default function VisualizadorOrigenCamisetaPage() {
             {ETAPAS.map(e => (
               <div key={e.id} className={styles.barraLeyendaItem}>
                 <span className={styles.barraLeyendaDot} style={{ backgroundColor: e.color }} aria-hidden="true" />
-                <span className={styles.barraLeyendaTexto}>{e.icono} {e.nombre}</span>
+                <span className={styles.barraLeyendaTexto}><span aria-hidden="true">{e.icono}</span> {e.nombre}</span>
                 <span className={styles.barraLeyendaCoste}>{e.coste.toFixed(2).replace('.', ',')} €</span>
               </div>
             ))}

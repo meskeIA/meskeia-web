@@ -74,6 +74,7 @@ function BloquePancreas() {
 
       <div className={styles.toggleRow}>
         <button
+          type="button"
           className={`${styles.toggleBtn} ${esAlta ? styles.toggleBtnActivo : ''}`}
           onClick={() => setEstado('alta')}
           aria-pressed={esAlta}
@@ -81,6 +82,7 @@ function BloquePancreas() {
           Glucosa elevada (tras comer)
         </button>
         <button
+          type="button"
           className={`${styles.toggleBtn} ${!esAlta ? styles.toggleBtnActivo : ''}`}
           onClick={() => setEstado('baja')}
           aria-pressed={!esAlta}
@@ -215,6 +217,7 @@ function BloqueTipos() {
         {(['tipo1', 'tipo2', 'gestacional'] as TipoActivo[]).map((t) => (
           <button
             key={t}
+            type="button"
             role="tab"
             aria-selected={tipoActivo === t}
             className={`${styles.tab} ${tipoActivo === t ? styles.tabActivo : ''}`}
@@ -620,6 +623,7 @@ function BloqueComplicaciones() {
         {MECANISMOS_COMPLICACIONES.map((mec, i) => (
           <button
             key={i}
+            type="button"
             className={`${styles.complicacionCard} ${mecanismoActivo === i ? styles.complicacionCardActiva : ''}`}
             style={mecanismoActivo === i ? { borderColor: mec.color, background: `${mec.color}10` } : {}}
             onClick={() => setMecanismoActivo(mecanismoActivo === i ? null : i)}

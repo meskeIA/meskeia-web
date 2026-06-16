@@ -42,7 +42,7 @@ export default function CursoPensamientoCientificoPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🧠</span>
+        <span className={styles.heroIcon} aria-hidden="true">🧠</span>
         <h1 className={styles.title}>Curso de Pensamiento Científico</h1>
         <p className={styles.subtitle}>
           Aprende a pensar como un científico: método científico, pensamiento crítico,
@@ -54,7 +54,7 @@ export default function CursoPensamientoCientificoPage() {
           rel="noopener noreferrer"
           className={styles.videoButton}
         >
-          <span className={styles.videoIcon}>▶️</span>
+          <span className={styles.videoIcon} aria-hidden="true">▶️</span>
           Ver introducción en video
         </a>
       </header>
@@ -64,22 +64,22 @@ export default function CursoPensamientoCientificoPage() {
       {/* Stats Grid */}
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>📚</span>
+          <span className={styles.statIcon} aria-hidden="true">📚</span>
           <div className={styles.statValue}>{totalChapters}</div>
           <div className={styles.statLabel}>Capítulos</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>⏱️</span>
+          <span className={styles.statIcon} aria-hidden="true">⏱️</span>
           <div className={styles.statValue}>{totalDuration}</div>
           <div className={styles.statLabel}>Minutos</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>✅</span>
+          <span className={styles.statIcon} aria-hidden="true">✅</span>
           <div className={styles.statValue}>{completedCount}/{totalChapters}</div>
           <div className={styles.statLabel}>Completados</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>📊</span>
+          <span className={styles.statIcon} aria-hidden="true">📊</span>
           <div className={styles.statValue}>{progress}%</div>
           <div className={styles.statLabel}>Progreso</div>
         </div>
@@ -89,22 +89,22 @@ export default function CursoPensamientoCientificoPage() {
       <section className={styles.overviewSection}>
         <div className={styles.overviewGrid}>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>🎓</span>
+            <span className={styles.overviewIcon} aria-hidden="true">🎓</span>
             <h3>Aprenderás</h3>
             <p>Fundamentos del método científico y pensamiento crítico</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>🛡️</span>
+            <span className={styles.overviewIcon} aria-hidden="true">🛡️</span>
             <h3>Detectarás</h3>
             <p>Falacias lógicas, sesgos cognitivos y pseudociencia</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>🧩</span>
+            <span className={styles.overviewIcon} aria-hidden="true">🧩</span>
             <h3>Aplicarás</h3>
             <p>Pensamiento científico en decisiones cotidianas</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>🌟</span>
+            <span className={styles.overviewIcon} aria-hidden="true">🌟</span>
             <h3>Comprenderás</h3>
             <p>Los límites y responsabilidades de la ciencia</p>
           </div>
@@ -175,12 +175,12 @@ export default function CursoPensamientoCientificoPage() {
         <h2 className={styles.sectionTitle}>📚 Recursos Adicionales</h2>
         <div className={styles.resourcesGrid}>
           <Link href="/curso-pensamiento-cientifico/recursos/glosario" className={styles.resourceCard}>
-            <span className={styles.resourceIcon}>📖</span>
+            <span className={styles.resourceIcon} aria-hidden="true">📖</span>
             <div className={styles.resourceName}>Glosario de Términos</div>
             <div className={styles.resourceDesc}>Definiciones clave del pensamiento científico</div>
           </Link>
           <Link href="/curso-pensamiento-cientifico/recursos/ejercicios" className={styles.resourceCard}>
-            <span className={styles.resourceIcon}>✏️</span>
+            <span className={styles.resourceIcon} aria-hidden="true">✏️</span>
             <div className={styles.resourceName}>Ejercicios Prácticos</div>
             <div className={styles.resourceDesc}>Pon a prueba tu pensamiento crítico</div>
           </Link>
