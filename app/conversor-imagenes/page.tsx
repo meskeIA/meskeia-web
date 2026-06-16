@@ -203,7 +203,7 @@ export default function ConversorImagenesPage() {
               <img src={originalImage.src} alt="Original" className={styles.preview} />
             ) : (
               <>
-                <span className={styles.dropIcon}>🖼️</span>
+                <span className={styles.dropIcon} aria-hidden="true">🖼️</span>
                 <p>Haz clic o arrastra una imagen</p>
                 <span className={styles.dropHint}>JPG, PNG, WebP, GIF</span>
               </>
@@ -233,8 +233,10 @@ export default function ConversorImagenesPage() {
                   {(['jpeg', 'png', 'webp'] as OutputFormat[]).map(format => (
                     <button
                       key={format}
+                      type="button"
                       className={`${styles.formatBtn} ${outputFormat === format ? styles.formatActive : ''}`}
                       onClick={() => setOutputFormat(format)}
+                      aria-pressed={outputFormat === format}
                     >
                       {format.toUpperCase()}
                     </button>
@@ -301,10 +303,11 @@ export default function ConversorImagenesPage() {
                   {PRESETS.map(preset => (
                     <button
                       key={preset.name}
+                      type="button"
                       className={styles.presetBtn}
                       onClick={() => applyPreset(preset)}
                     >
-                      <span className={styles.presetIcon}>{preset.icon}</span>
+                      <span className={styles.presetIcon} aria-hidden="true">{preset.icon}</span>
                       <span className={styles.presetName}>{preset.name}</span>
                       <span className={styles.presetSize}>{preset.width}×{preset.height}</span>
                     </button>
@@ -313,10 +316,10 @@ export default function ConversorImagenesPage() {
               </div>
 
               <div className={styles.actions}>
-                <button onClick={convertImage} className={styles.btnPrimary} disabled={isConverting}>
+                <button type="button" onClick={convertImage} className={styles.btnPrimary} disabled={isConverting}>
                   {isConverting ? 'Convirtiendo...' : 'Convertir imagen'}
                 </button>
-                <button onClick={handleClear} className={styles.btnSecondary}>
+                <button type="button" onClick={handleClear} className={styles.btnSecondary}>
                   Limpiar
                 </button>
               </div>
@@ -355,13 +358,13 @@ export default function ConversorImagenesPage() {
                 )}
               </div>
 
-              <button onClick={downloadImage} className={styles.btnPrimary}>
+              <button type="button" onClick={downloadImage} className={styles.btnPrimary}>
                 Descargar imagen
               </button>
             </>
           ) : (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>🖼️</span>
+              <span className={styles.placeholderIcon} aria-hidden="true">🖼️</span>
               <p>La imagen convertida aparecerá aquí</p>
             </div>
           )}
@@ -373,17 +376,17 @@ export default function ConversorImagenesPage() {
         <h3>Formatos soportados</h3>
         <div className={styles.infoGrid}>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>📷</span>
+            <span className={styles.infoIcon} aria-hidden="true">📷</span>
             <h4>JPEG/JPG</h4>
             <p>Ideal para fotos. Compresión con pérdida, no soporta transparencia</p>
           </div>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>🎨</span>
+            <span className={styles.infoIcon} aria-hidden="true">🎨</span>
             <h4>PNG</h4>
             <p>Sin pérdida de calidad. Soporta transparencia. Mayor tamaño</p>
           </div>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>🌐</span>
+            <span className={styles.infoIcon} aria-hidden="true">🌐</span>
             <h4>WebP</h4>
             <p>Formato moderno. Mejor compresión que JPG/PNG. Ideal para web</p>
           </div>
@@ -445,22 +448,22 @@ export default function ConversorImagenesPage() {
         <h3>Casos de uso habituales</h3>
         <div className={styles.eduEscenariosGrid}>
           <div className={styles.eduEscenarioCard}>
-            <span className={styles.eduEscenarioIcon}>📱</span>
+            <span className={styles.eduEscenarioIcon} aria-hidden="true">📱</span>
             <h4>Redes sociales</h4>
             <p>Usa JPEG a 80-85% para fotos. Para Instagram Stories o posts con texto, WebP reduce el tamaño sin pérdida visible.</p>
           </div>
           <div className={styles.eduEscenarioCard}>
-            <span className={styles.eduEscenarioIcon}>🌐</span>
+            <span className={styles.eduEscenarioIcon} aria-hidden="true">🌐</span>
             <h4>Web y e-commerce</h4>
             <p>WebP es el estándar actual: hasta 30% más pequeño que JPEG a igual calidad. Mejora Core Web Vitals (LCP).</p>
           </div>
           <div className={styles.eduEscenarioCard}>
-            <span className={styles.eduEscenarioIcon}>🎨</span>
+            <span className={styles.eduEscenarioIcon} aria-hidden="true">🎨</span>
             <h4>Diseño gráfico</h4>
             <p>PNG para exportar activos con transparencia. Mantén siempre el original en alta resolución antes de convertir.</p>
           </div>
           <div className={styles.eduEscenarioCard}>
-            <span className={styles.eduEscenarioIcon}>📧</span>
+            <span className={styles.eduEscenarioIcon} aria-hidden="true">📧</span>
             <h4>Email marketing</h4>
             <p>JPEG sigue siendo el más seguro en emails (máxima compatibilidad). Evita WebP en clientes como Outlook.</p>
           </div>
@@ -535,17 +538,17 @@ export default function ConversorImagenesPage() {
         {/* Tips */}
         <h3>6 buenas prácticas con imágenes</h3>
         <div className={styles.eduTipsGrid}>
-          <div className={styles.eduTipCard}><span className={styles.eduTipIcono}>💾</span><p>Guarda siempre el original sin comprimir antes de convertir.</p></div>
-          <div className={styles.eduTipCard}><span className={styles.eduTipIcono}>📐</span><p>Redimensiona antes de comprimir para mejores resultados.</p></div>
-          <div className={styles.eduTipCard}><span className={styles.eduTipIcono}>🔄</span><p>Convierte lotes de imágenes del mismo tipo con los mismos ajustes.</p></div>
-          <div className={styles.eduTipCard}><span className={styles.eduTipIcono}>🌐</span><p>Para web, activa lazy loading en imágenes below-the-fold.</p></div>
-          <div className={styles.eduTipCard}><span className={styles.eduTipIcono}>📱</span><p>Genera versiones 1x y 2x para pantallas Retina/HiDPI.</p></div>
-          <div className={styles.eduTipCard}><span className={styles.eduTipIcono}>🔍</span><p>Usa Google PageSpeed para auditar el impacto de tus imágenes.</p></div>
+          <div className={styles.eduTipCard}><span className={styles.eduTipIcono} aria-hidden="true">💾</span><p>Guarda siempre el original sin comprimir antes de convertir.</p></div>
+          <div className={styles.eduTipCard}><span className={styles.eduTipIcono} aria-hidden="true">📐</span><p>Redimensiona antes de comprimir para mejores resultados.</p></div>
+          <div className={styles.eduTipCard}><span className={styles.eduTipIcono} aria-hidden="true">🔄</span><p>Convierte lotes de imágenes del mismo tipo con los mismos ajustes.</p></div>
+          <div className={styles.eduTipCard}><span className={styles.eduTipIcono} aria-hidden="true">🌐</span><p>Para web, activa lazy loading en imágenes below-the-fold.</p></div>
+          <div className={styles.eduTipCard}><span className={styles.eduTipIcono} aria-hidden="true">📱</span><p>Genera versiones 1x y 2x para pantallas Retina/HiDPI.</p></div>
+          <div className={styles.eduTipCard}><span className={styles.eduTipIcono} aria-hidden="true">🔍</span><p>Usa Google PageSpeed para auditar el impacto de tus imágenes.</p></div>
         </div>
 
         {/* Warning */}
         <div className={styles.warningBox}>
-          <span className={styles.warningIcono}>⚠️</span>
+          <span className={styles.warningIcono} aria-hidden="true">⚠️</span>
           <div>
             <strong>Conversión con pérdida</strong>
             <ul>

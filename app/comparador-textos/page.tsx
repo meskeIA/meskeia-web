@@ -215,13 +215,13 @@ Nueva línea agregada
           </label>
         </div>
         <div className={styles.opcionesBotones}>
-          <button onClick={cargarEjemplo} className={styles.btnSecundario}>
+          <button type="button" onClick={cargarEjemplo} className={styles.btnSecundario}>
             Cargar ejemplo
           </button>
-          <button onClick={intercambiarTextos} className={styles.btnSecundario}>
-            ↔ Intercambiar
+          <button type="button" onClick={intercambiarTextos} className={styles.btnSecundario}>
+            <span aria-hidden="true">↔</span> Intercambiar
           </button>
-          <button onClick={limpiarTodo} className={styles.btnSecundario}>
+          <button type="button" onClick={limpiarTodo} className={styles.btnSecundario}>
             Limpiar
           </button>
         </div>
@@ -347,21 +347,21 @@ Nueva línea agregada
         <h3>Sobre esta herramienta</h3>
         <div className={styles.infoGrid}>
           <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>🔒</span>
+            <span className={styles.infoIcon} aria-hidden="true">🔒</span>
             <div>
               <strong>100% Privado</strong>
               <p>Tu texto nunca sale de tu navegador</p>
             </div>
           </div>
           <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>⚡</span>
+            <span className={styles.infoIcon} aria-hidden="true">⚡</span>
             <div>
               <strong>Tiempo real</strong>
               <p>Comparación instantánea mientras escribes</p>
             </div>
           </div>
           <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>📊</span>
+            <span className={styles.infoIcon} aria-hidden="true">📊</span>
             <div>
               <strong>Estadísticas</strong>
               <p>Porcentaje de similitud y conteo de cambios</p>
@@ -376,7 +376,7 @@ Nueva línea agregada
         icon="🔍"
       >
         <section>
-          <h3>📊 Tipos de Comparación Textual y Sus Algoritmos</h3>
+          <h3><span aria-hidden="true">📊</span> Tipos de Comparación Textual y Sus Algoritmos</h3>
           <div className={styles.eduTablaWrapper}>
             <table className={styles.eduTabla}>
               <thead>
@@ -430,25 +430,25 @@ Nueva línea agregada
         </section>
 
         <section>
-          <h3>🎯 Usos Prácticos de la Comparación de Textos</h3>
+          <h3><span aria-hidden="true">🎯</span> Usos Prácticos de la Comparación de Textos</h3>
           <div className={styles.eduEscenariosGrid}>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>⚖️</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">⚖️</span>
               <h4>Revisión Legal y Contractual</h4>
               <p>Abogados y notarios comparan versiones de contratos para identificar exactamente qué cláusulas cambiaron entre borradores. Un cambio aparentemente menor (&quot;podrá&quot; vs &quot;deberá&quot;) puede tener consecuencias legales enormes. El diff de palabras permite ver esos cambios con precisión quirúrgica sin leer dos veces el documento completo.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>✍️</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">✍️</span>
               <h4>Edición y Revisión Académica</h4>
               <p>Editores, correctores y docentes usan comparadores para revisar las correcciones aplicadas entre versiones de un trabajo. En el contexto universitario, también ayuda a detectar si un alumno realmente reescribió una sección o simplemente sustituyó sinónimos. Los trabajos de fin de grado sometidos a dos rondas de revisión se comparan sistemáticamente.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>💻</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">💻</span>
               <h4>Control de Versiones en Desarrollo</h4>
               <p>Git usa el algoritmo Myers diff (variante de LCS) para mostrar los cambios entre commits. El comando &quot;git diff&quot; es la herramienta de comparación más usada del mundo. Las herramientas de code review (GitHub PR, GitLab MR) presentan estos diffs con coloreado para facilitar la revisión. Entender cómo funciona el diff ayuda a hacer commits más limpios y descriptivos.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>📰</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">📰</span>
               <h4>Periodismo y Verificación de Hechos</h4>
               <p>Los fact-checkers comparan comunicados oficiales, discursos o páginas web entre versiones para detectar ediciones retroactivas sin aviso. Comparar la caché de Google con la versión actual de una página puede revelar cambios encubiertos en datos, estadísticas o declaraciones. Es una herramienta fundamental del periodismo de datos.</p>
             </div>
@@ -456,7 +456,7 @@ Nueva línea agregada
         </section>
 
         <section>
-          <h3>❓ Preguntas Frecuentes sobre Comparación de Textos</h3>
+          <h3><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Comparación de Textos</h3>
           <div className={styles.eduFaqList}>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqPregunta}>¿Cómo funciona el algoritmo LCS que usan los comparadores?</summary>
@@ -494,7 +494,7 @@ Nueva línea agregada
         </section>
 
         <section>
-          <h3>📋 Guía: Cómo Sacar el Máximo al Comparador</h3>
+          <h3><span aria-hidden="true">📋</span> Guía: Cómo Sacar el Máximo al Comparador</h3>
           <ol className={styles.eduPasosList}>
             <li className={styles.eduPaso}>
               <span className={styles.eduPasoNum}>1</span>
@@ -542,35 +542,35 @@ Nueva línea agregada
         </section>
 
         <section>
-          <h3>💡 Consejos para Comparaciones más Efectivas</h3>
+          <h3><span aria-hidden="true">💡</span> Consejos para Comparaciones más Efectivas</h3>
           <div className={styles.eduTipsGrid}>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>📋</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">📋</span>
               <h4>Pega desde texto plano</h4>
               <p>Al copiar desde Word o PDF, el formato puede introducir caracteres invisibles. Pega primero en un editor de texto plano (Bloc de notas, Notepad++) y luego copia desde ahí para evitar sorpresas en el diff.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>🔢</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">🔢</span>
               <h4>Los números son sensibles</h4>
               <p>El comparador distingue &quot;1.234,56&quot; de &quot;1234.56&quot; como completamente distintos. Normaliza el formato de números antes de comparar documentos de distintas fuentes o idiomas (español vs inglés).</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>🔤</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">🔤</span>
               <h4>Mayúsculas y tildes importan</h4>
               <p>La comparación distingue mayúsculas de minúsculas y letras con tilde de las que no la tienen. &quot;Esta&quot; y &quot;está&quot; son distintas. Si esto genera ruido, normaliza el texto a minúsculas antes de comparar (útil para análisis de contenido, no para análisis legal).</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>⚡</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">⚡</span>
               <h4>Textos muy largos: divide y vencerás</h4>
               <p>La complejidad del algoritmo LCS es O(n×m), donde n y m son las longitudes de los textos. Para documentos de miles de líneas, los comparadores web pueden volverse lentos. Divide en bloques de 1.000-2.000 palabras para mantener la fluidez.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>🔒</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">🔒</span>
               <h4>Los textos no salen del navegador</h4>
               <p>Esta herramienta procesa todo localmente en tu navegador: ningún texto se envía a ningún servidor. Puedes comparar documentos confidenciales con total seguridad. Esto también significa que funciona sin conexión a internet una vez cargada la página.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>🔄</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">🔄</span>
               <h4>Intercambia los textos para otra perspectiva</h4>
               <p>El diff A→B y el diff B→A no son simétricos en la presentación: cambiar qué texto es &quot;original&quot; y cuál es &quot;revisado&quot; cambia qué aparece como añadido y qué como eliminado. Si los colores te confunden, prueba a intercambiar los textos.</p>
             </div>
@@ -579,7 +579,7 @@ Nueva línea agregada
 
         <section>
           <div className={styles.warningBox}>
-            <span className={styles.warningIcono}>⚠️</span>
+            <span className={styles.warningIcono} aria-hidden="true">⚠️</span>
             <div>
               <strong>Limitaciones importantes del comparador de textos</strong>
               <ul>

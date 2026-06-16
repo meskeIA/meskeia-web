@@ -335,12 +335,12 @@
 | [x] | Calculadora de Aspectos | `/calculadora-aspectos/` | diseno |
 | [x] | Calculadora de Legibilidad | `/calculadora-legibilidad/` | diseno |
 | [x] | Calculadora Tiempo de Lectura | `/calculadora-tiempo-lectura/` | diseno |
-| [ ] | Comparador de Textos | `/comparador-textos/` | diseno, productividad |
-| [ ] | Compresor de Imágenes por Lotes | `/compresor-imagenes/` | diseno |
+| [x] | Comparador de Textos | `/comparador-textos/` | diseno, productividad |
+| [x] | Compresor de Imágenes por Lotes | `/compresor-imagenes/` | diseno |
 | [x] | Contador de Palabras | `/contador-palabras/` | diseno, productividad |
-| [ ] | Conversor Base64 | `/conversor-base64/` | diseno, tecnicas |
+| [x] | Conversor Base64 | `/conversor-base64/` | diseno, tecnicas |
 | [x] | Conversor de Colores | `/conversor-colores/` | diseno |
-| [ ] | Conversor de Imágenes | `/conversor-imagenes/` | diseno, productividad |
+| [x] | Conversor de Imágenes | `/conversor-imagenes/` | diseno, productividad |
 | [ ] | Conversor Markdown-HTML | `/conversor-markdown-html/` | diseno |
 | [x] | Creador de Paletas | `/creador-paletas/` | diseno |
 | [ ] | Creador de Thumbnails YouTube | `/creador-thumbnails/` | diseno |

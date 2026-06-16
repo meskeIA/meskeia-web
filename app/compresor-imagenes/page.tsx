@@ -419,7 +419,7 @@ export default function CompresorImagenesPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🗜️</span>
+        <span className={styles.heroIcon} aria-hidden="true">🗜️</span>
         <h1 className={styles.title}>Compresor de Imágenes Avanzado</h1>
         <p className={styles.subtitle}>
           Comprime y redimensiona múltiples imágenes con vista previa y comparación
@@ -437,7 +437,7 @@ export default function CompresorImagenesPage() {
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
         >
-          <span className={styles.dropIcon}>📁</span>
+          <span className={styles.dropIcon} aria-hidden="true">📁</span>
           <p className={styles.dropText}>Arrastra imágenes aquí o haz clic para seleccionar</p>
           <span className={styles.dropHint}>JPG, PNG, WebP, GIF • Sin límite de cantidad</span>
           <input
@@ -484,29 +484,33 @@ export default function CompresorImagenesPage() {
                   className={`${styles.presetBtn} ${qualityPreset === 'smart' ? styles.presetActive : ''}`}
                   onClick={() => applyPreset('smart')}
                   title="Ajusta automáticamente según el tipo de imagen"
+                  aria-pressed={qualityPreset === 'smart'}
                 >
-                  🧠 Inteligente
+                  <span aria-hidden="true">🧠</span> Inteligente
                 </button>
                 <button
                   type="button"
                   className={`${styles.presetBtn} ${qualityPreset === 'max' ? styles.presetActive : ''}`}
                   onClick={() => applyPreset('max')}
+                  aria-pressed={qualityPreset === 'max'}
                 >
-                  🚀 Máxima
+                  <span aria-hidden="true">🚀</span> Máxima
                 </button>
                 <button
                   type="button"
                   className={`${styles.presetBtn} ${qualityPreset === 'balanced' ? styles.presetActive : ''}`}
                   onClick={() => applyPreset('balanced')}
+                  aria-pressed={qualityPreset === 'balanced'}
                 >
-                  ⚖️ Equilibrado
+                  <span aria-hidden="true">⚖️</span> Equilibrado
                 </button>
                 <button
                   type="button"
                   className={`${styles.presetBtn} ${qualityPreset === 'high' ? styles.presetActive : ''}`}
                   onClick={() => applyPreset('high')}
+                  aria-pressed={qualityPreset === 'high'}
                 >
-                  💎 Alta
+                  <span aria-hidden="true">💎</span> Alta
                 </button>
               </div>
             </div>
@@ -521,6 +525,7 @@ export default function CompresorImagenesPage() {
                   type="button"
                   className={`${styles.formatBtn} ${outputFormat === 'original' ? styles.formatActive : ''}`}
                   onClick={() => setOutputFormat('original')}
+                  aria-pressed={outputFormat === 'original'}
                 >
                   Original
                 </button>
@@ -528,6 +533,7 @@ export default function CompresorImagenesPage() {
                   type="button"
                   className={`${styles.formatBtn} ${outputFormat === 'webp' ? styles.formatActive : ''}`}
                   onClick={() => setOutputFormat('webp')}
+                  aria-pressed={outputFormat === 'webp'}
                 >
                   WebP
                 </button>
@@ -535,6 +541,7 @@ export default function CompresorImagenesPage() {
                   type="button"
                   className={`${styles.formatBtn} ${outputFormat === 'jpeg' ? styles.formatActive : ''}`}
                   onClick={() => setOutputFormat('jpeg')}
+                  aria-pressed={outputFormat === 'jpeg'}
                 >
                   JPG
                 </button>
@@ -542,6 +549,7 @@ export default function CompresorImagenesPage() {
                   type="button"
                   className={`${styles.formatBtn} ${outputFormat === 'png' ? styles.formatActive : ''}`}
                   onClick={() => setOutputFormat('png')}
+                  aria-pressed={outputFormat === 'png'}
                 >
                   PNG
                 </button>
@@ -712,7 +720,7 @@ export default function CompresorImagenesPage() {
               </button>
               {stats.completed > 0 && (
                 <button type="button" onClick={downloadAllAsZip} className={styles.btnSecondary}>
-                  📥 Descargar todo (ZIP)
+                  <span aria-hidden="true">📥</span> Descargar todo (ZIP)
                 </button>
               )}
             </div>
@@ -804,22 +812,22 @@ export default function CompresorImagenesPage() {
         {/* Características */}
         <div className={styles.features}>
           <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>🧠</span>
+            <span className={styles.featureIcon} aria-hidden="true">🧠</span>
             <h4>Modo Inteligente</h4>
             <p>Detecta automáticamente el tipo de imagen y aplica la calidad óptima</p>
           </div>
           <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>📐</span>
+            <span className={styles.featureIcon} aria-hidden="true">📐</span>
             <h4>Redimensionado</h4>
             <p>Reduce el tamaño de imágenes grandes automáticamente</p>
           </div>
           <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>👁️</span>
+            <span className={styles.featureIcon} aria-hidden="true">👁️</span>
             <h4>Comparación Visual</h4>
             <p>Compara antes y después con slider interactivo</p>
           </div>
           <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>🔒</span>
+            <span className={styles.featureIcon} aria-hidden="true">🔒</span>
             <h4>100% Privado</h4>
             <p>Todo se procesa en tu navegador, nada se sube a servidores</p>
           </div>

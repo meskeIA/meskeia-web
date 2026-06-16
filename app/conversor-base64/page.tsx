@@ -145,31 +145,37 @@ export default function ConversorBase64Page() {
       {/* Tabs */}
       <div className={styles.tabs}>
         <button
+          type="button"
           className={`${styles.tab} ${activeTab === 'texto' ? styles.tabActive : ''}`}
           onClick={() => setActiveTab('texto')}
+          aria-pressed={activeTab === 'texto'}
         >
           <span className={styles.tabIcon}>Aa</span>
           Texto
         </button>
         <button
+          type="button"
           className={`${styles.tab} ${activeTab === 'imagen' ? styles.tabActive : ''}`}
           onClick={() => setActiveTab('imagen')}
+          aria-pressed={activeTab === 'imagen'}
         >
-          <span className={styles.tabIcon}>🖼️</span>
+          <span className={styles.tabIcon} aria-hidden="true">🖼️</span>
           Imagen
         </button>
         <button
+          type="button"
           className={`${styles.tab} ${activeTab === 'archivo' ? styles.tabActive : ''}`}
           onClick={() => setActiveTab('archivo')}
+          aria-pressed={activeTab === 'archivo'}
         >
-          <span className={styles.tabIcon}>📄</span>
+          <span className={styles.tabIcon} aria-hidden="true">📄</span>
           Archivo
         </button>
       </div>
 
       {error && (
         <div className={styles.errorBanner}>
-          <span>⚠️</span> {error}
+          <span aria-hidden="true">⚠️</span> {error}
         </div>
       )}
 
@@ -186,13 +192,13 @@ export default function ConversorBase64Page() {
                 placeholder="Escribe o pega el texto aquí..."
               />
               <div className={styles.actions}>
-                <button onClick={encodeText} className={styles.btnPrimary}>
+                <button type="button" onClick={encodeText} className={styles.btnPrimary}>
                   Codificar a Base64
                 </button>
-                <button onClick={decodeText} className={styles.btnSecondary}>
+                <button type="button" onClick={decodeText} className={styles.btnSecondary}>
                   Decodificar Base64
                 </button>
-                <button onClick={handleClear} className={styles.btnSecondary}>
+                <button type="button" onClick={handleClear} className={styles.btnSecondary}>
                   Limpiar
                 </button>
               </div>
@@ -202,6 +208,7 @@ export default function ConversorBase64Page() {
               <div className={styles.panelHeader}>
                 <h2 className={styles.panelTitle}>Resultado</h2>
                 <button
+                  type="button"
                   onClick={() => handleCopy(textOutput)}
                   className={styles.copyBtn}
                   disabled={!textOutput}
@@ -262,7 +269,7 @@ export default function ConversorBase64Page() {
                   <span>{imageInfo.type}</span>
                 </div>
               )}
-              <button onClick={handleClear} className={styles.btnSecondary} style={{ marginTop: '1rem' }}>
+              <button type="button" onClick={handleClear} className={styles.btnSecondary} style={{ marginTop: '1rem' }}>
                 Limpiar
               </button>
             </div>
@@ -271,6 +278,7 @@ export default function ConversorBase64Page() {
               <div className={styles.panelHeader}>
                 <h2 className={styles.panelTitle}>Base64 / Data URI</h2>
                 <button
+                  type="button"
                   onClick={() => handleCopy(imageBase64)}
                   className={styles.copyBtn}
                   disabled={!imageBase64}
@@ -330,7 +338,7 @@ export default function ConversorBase64Page() {
                   <span>{fileInfo.type || 'Desconocido'}</span>
                 </div>
               )}
-              <button onClick={handleClear} className={styles.btnSecondary} style={{ marginTop: '1rem' }}>
+              <button type="button" onClick={handleClear} className={styles.btnSecondary} style={{ marginTop: '1rem' }}>
                 Limpiar
               </button>
             </div>
@@ -339,6 +347,7 @@ export default function ConversorBase64Page() {
               <div className={styles.panelHeader}>
                 <h2 className={styles.panelTitle}>Base64 / Data URI</h2>
                 <button
+                  type="button"
                   onClick={() => handleCopy(fileBase64)}
                   className={styles.copyBtn}
                   disabled={!fileBase64}
