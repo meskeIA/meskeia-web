@@ -270,7 +270,7 @@ export default function SelectorSeguroSalud() {
 
       {pantalla !== 'resultado' ? (
         <header className={styles.hero}>
-          <h1 className={styles.heroTitle}>🏥 Asesor de Seguro de Salud</h1>
+          <h1 className={styles.heroTitle}><span aria-hidden="true">🏥</span> Asesor de Seguro de Salud</h1>
           <p className={styles.heroSubtitle}>
             {pantalla === 'intro' ? '10 preguntas para saber si el seguro privado te aporta valor real'
               : `Pregunta ${paso + 1} de ${totalPreguntas} · ${preguntaActual.categoria}`}
@@ -335,7 +335,7 @@ export default function SelectorSeguroSalud() {
                 <button key={op.valor} type="button"
                   className={`${styles.opcionBtn} ${respuestas[preguntaActual.id] === op.valor ? styles.opcionSeleccionada : ''}`}
                   onClick={() => seleccionarOpcion(op.valor)}
-                  aria-pressed={respuestas[preguntaActual.id] === op.valor ? true : false}
+                  aria-pressed={respuestas[preguntaActual.id] === op.valor}
                 >
                   <span className={styles.opcionEtiqueta}>{op.etiqueta}</span>
                   <span className={styles.opcionDesc}>{op.desc}</span>

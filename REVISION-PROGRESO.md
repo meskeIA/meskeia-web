@@ -1064,10 +1064,10 @@
 | [x] | Seguimiento de Hábitos | `/seguimiento-habitos/` | salud, productividad |
 | [x] | Selector de Actividades según Movilidad | `/selector-actividades-movilidad/` | salud, legal-fiscal |
 | [x] | Selector de Dieta | `/selector-dieta/` | salud |
-| [ ] | Selector de Ejercicio | `/selector-ejercicio/` | salud, productividad |
-| [ ] | Selector de Gestión del Estrés | `/selector-gestion-estres/` | salud, productividad |
-| [ ] | Selector de Mascota | `/selector-mascota/` | salud, productividad |
-| [ ] | Selector de Seguro de Salud | `/selector-seguro-salud/` | salud, finanzas |
+| [x] | Selector de Ejercicio | `/selector-ejercicio/` | salud, productividad |
+| [x] | Selector de Gestión del Estrés | `/selector-gestion-estres/` | salud, productividad |
+| [x] | Selector de Mascota | `/selector-mascota/` | salud, productividad |
+| [x] | Selector de Seguro de Salud | `/selector-seguro-salud/` | salud, finanzas |
 | [ ] | Selector de Tipo de Gimnasio | `/selector-tipo-gimnasio/` | salud, productividad |
 | [ ] | Serotonina: Mucho Más que la Hormona de la Felicidad | `/visualizador-serotonina/` | salud, cultura, estudiantes |
 | [ ] | Telomerasa - La Enzima de la Inmortalidad Celular | `/visualizador-telomerasa/` | salud, cultura, estudiantes |

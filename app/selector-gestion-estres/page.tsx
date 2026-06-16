@@ -435,7 +435,7 @@ export default function SelectorGestionEstresPage() {
 
       {/* Hero */}
       <header className={styles.hero}>
-        <h1>🧠 Selector de Gestión del Estrés</h1>
+        <h1><span aria-hidden="true">🧠</span> Selector de Gestión del Estrés</h1>
         <p>
           10 preguntas para descubrir qué método de gestión del estrés se adapta mejor a tu perfil
           y estilo de vida.
@@ -589,7 +589,7 @@ export default function SelectorGestionEstresPage() {
         <section className={styles.guideSection}>
           <h2>Los 5 métodos explicados</h2>
 
-          <h3>🧘 Meditación y Mindfulness</h3>
+          <h3><span aria-hidden="true">🧘</span> Meditación y Mindfulness</h3>
           <p>
             El mindfulness entrena la atención para estar en el presente sin juzgar. Las prácticas
             de mindfulness se han asociado a reducción de la rumia y mejora del sueño en varios
@@ -599,7 +599,7 @@ export default function SelectorGestionEstresPage() {
             intensiva. Ideal para quienes tienen muchos pensamientos intrusivos o insomnio.
           </p>
 
-          <h3>🏃 Ejercicio Físico</h3>
+          <h3><span aria-hidden="true">🏃</span> Ejercicio Físico</h3>
           <p>
             El movimiento libera endorfinas, serotonina y BDNF (factor neurotrófico que protege las
             neuronas). Reduce el cortisol acumulado y mejora la calidad del sueño. Hay evidencia
@@ -608,7 +608,7 @@ export default function SelectorGestionEstresPage() {
             tratamiento psicológico ni farmacológico cuando un profesional los considera indicados.
           </p>
 
-          <h3>🛋️ Terapia Psicológica</h3>
+          <h3><span aria-hidden="true">🛋️</span> Terapia Psicológica</h3>
           <p>
             Cuando el estrés tiene raíces más profundas (traumas, patrones cognitivos distorsionados,
             dificultades de regulación emocional), la autoayuda puede quedarse corta. La terapia
@@ -617,7 +617,7 @@ export default function SelectorGestionEstresPage() {
             es una segunda línea muy eficaz.
           </p>
 
-          <h3>🎨 Hobbies y Actividades Creativas</h3>
+          <h3><span aria-hidden="true">🎨</span> Hobbies y Actividades Creativas</h3>
           <p>
             El "estado de flujo" (Csikszentmihalyi) ocurre cuando hacemos algo que nos absorbe
             completamente. Durante ese estado el cortisol baja y el sistema nervioso entra en
@@ -625,7 +625,7 @@ export default function SelectorGestionEstresPage() {
             añadido de involucrar el cuerpo, lo que ancla la atención en el presente.
           </p>
 
-          <h3>🌿 Desconexión Digital y Naturaleza</h3>
+          <h3><span aria-hidden="true">🌿</span> Desconexión Digital y Naturaleza</h3>
           <p>
             El exceso de notificaciones, información y comparación social en redes mantiene el sistema
             nervioso en alerta constante. Estudios recientes (Hunter et al., 2019, Universidad de

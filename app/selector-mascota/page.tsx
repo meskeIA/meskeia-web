@@ -360,7 +360,7 @@ export default function SelectorMascota() {
 
       {pantalla !== 'resultado' ? (
         <header className={styles.hero}>
-          <h1 className={styles.heroTitle}>🐾 Asesor de Mascota</h1>
+          <h1 className={styles.heroTitle}><span aria-hidden="true">🐾</span> Asesor de Mascota</h1>
           <p className={styles.heroSubtitle}>
             {pantalla === 'intro' ? '10 preguntas para saber qué mascota se adapta a tu vida real'
               : `Pregunta ${paso + 1} de ${totalPreguntas} · ${preguntaActual.categoria}`}
