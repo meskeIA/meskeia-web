@@ -515,10 +515,10 @@
 | [x] | Orientador de Tipo de Oposición | `/orientador-tipo-oposicion/` | estudiantes, productividad |
 | [x] | Partículas Subatómicas: Modelo Estándar y Higgs | `/visualizador-particulas-subatomicas/` | estudiantes, cultura |
 | [x] | pH: Ácidos y Bases - La Escala de la Química Cotidiana | `/visualizador-ph-acidos-bases/` | estudiantes, cultura |
-| [ ] | Planificador de Estudio para Oposiciones | `/planificador-estudio-oposiciones/` | estudiantes, productividad |
-| [ ] | Plegamiento de Proteínas: Estructura y Enfermedades | `/visualizador-proteinas-plegamiento/` | estudiantes, cultura |
-| [ ] | Polímeros y Materiales: Plásticos, Propiedades y Reciclaje | `/visualizador-polimeros-materiales/` | estudiantes, tecnicas |
-| [ ] | Química Orgánica: Grupos Funcionales y Reacciones Interactivas | `/visualizador-quimica-organica/` | estudiantes, cultura, tecnicas |
+| [x] | Planificador de Estudio para Oposiciones | `/planificador-estudio-oposiciones/` | estudiantes, productividad |
+| [x] | Plegamiento de Proteínas: Estructura y Enfermedades | `/visualizador-proteinas-plegamiento/` | estudiantes, cultura |
+| [x] | Polímeros y Materiales: Plásticos, Propiedades y Reciclaje | `/visualizador-polimeros-materiales/` | estudiantes, tecnicas |
+| [x] | Química Orgánica: Grupos Funcionales y Reacciones Interactivas | `/visualizador-quimica-organica/` | estudiantes, cultura, tecnicas |
 | [ ] | Quiz Biología Molecular — ADN, ARN, Replicación y Traducción | `/quiz-biologia-molecular/` | estudiantes, cultura |
 | [ ] | Quiz Complejidad Algorítmica — Big O, Ordenación y Estructuras de Datos | `/quiz-complejidad-algoritmos/` | estudiantes, tecnicas |
 | [ ] | Quiz de Conceptos Financieros | `/quiz-conceptos-financieros/` | estudiantes, finanzas |

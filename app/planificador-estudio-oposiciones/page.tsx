@@ -147,8 +147,8 @@ export default function PlanificadorEstudioOposicionesPage() {
               <div className={styles.formGroup}>
                 <label className={styles.label}>Repasos espaciados</label>
                 <div className={styles.switchRow}>
-                  <button type="button" className={`${styles.switchBtn} ${incluirRepasos ? styles.switchActivo : ''}`} onClick={() => { setIncluirRepasos(true); setGenerado(false); }}>Sí (recomendado)</button>
-                  <button type="button" className={`${styles.switchBtn} ${!incluirRepasos ? styles.switchActivo : ''}`} onClick={() => { setIncluirRepasos(false); setGenerado(false); }}>No</button>
+                  <button type="button" aria-pressed={incluirRepasos} className={`${styles.switchBtn} ${incluirRepasos ? styles.switchActivo : ''}`} onClick={() => { setIncluirRepasos(true); setGenerado(false); }}>Sí (recomendado)</button>
+                  <button type="button" aria-pressed={!incluirRepasos} className={`${styles.switchBtn} ${!incluirRepasos ? styles.switchActivo : ''}`} onClick={() => { setIncluirRepasos(false); setGenerado(false); }}>No</button>
                 </div>
               </div>
             </div>

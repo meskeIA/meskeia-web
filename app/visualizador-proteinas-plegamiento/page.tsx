@@ -387,6 +387,7 @@ export default function VisualizadorProteinasPlegamiento() {
             {(['1', '2', '3', '4'] as NivelEstructura[]).map(n => (
               <button
                 key={n}
+                type="button"
                 role="tab"
                 aria-selected={nivelActivo === n}
                 className={`${styles.nivelTab} ${nivelActivo === n ? styles.nivelTabActivo : ''}`}
@@ -444,6 +445,7 @@ export default function VisualizadorProteinasPlegamiento() {
             {TIPOS_FUNCIONALES.map(tipo => (
               <button
                 key={tipo.id}
+                type="button"
                 className={`${styles.tipoCard} ${tipoSeleccionado === tipo.id ? styles.tipoCardActivo : ''}`}
                 onClick={() => setTipoSeleccionado(tipoSeleccionado === tipo.id ? null : tipo.id)}
                 aria-expanded={tipoSeleccionado === tipo.id}
@@ -470,6 +472,7 @@ export default function VisualizadorProteinasPlegamiento() {
             {ENFERMEDADES.map(enf => (
               <div key={enf.id} className={styles.enfermedadCard}>
                 <button
+                  type="button"
                   className={styles.enfermedadBtn}
                   onClick={() => setEnfermedadSeleccionada(enfermedadSeleccionada === enf.id ? null : enf.id)}
                   aria-expanded={enfermedadSeleccionada === enf.id}

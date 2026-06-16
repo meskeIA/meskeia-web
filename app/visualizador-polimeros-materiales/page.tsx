@@ -223,6 +223,7 @@ export default function VisualizadorPolimerosMateriales() {
           {tabs.map((t) => (
             <button
               key={t.id}
+              type="button"
               role="tab"
               aria-selected={tabActiva === t.id}
               className={`${styles.tab} ${tabActiva === t.id ? styles.tabActive : ''}`}
@@ -370,6 +371,7 @@ export default function VisualizadorPolimerosMateriales() {
               {POLIMEROS.map((p) => (
                 <button
                   key={p.nombre}
+                  type="button"
                   className={`${styles.polimeroBtn} ${polimeroSeleccionado.nombre === p.nombre ? styles.polimeroBtnActive : ''}`}
                   onClick={() => setPolimeroSeleccionado(p)}
                   aria-pressed={polimeroSeleccionado.nombre === p.nombre}
@@ -496,8 +498,10 @@ export default function VisualizadorPolimerosMateriales() {
                 {(['termoplasticos', 'termoestables', 'elastomeros'] as NodoId[]).map((id) => (
                   <button
                     key={id}
+                    type="button"
                     className={`${styles.nodo} ${nodoActivo === id ? styles.nodoActivo : ''}`}
                     onClick={() => setNodoActivo(nodoActivo === id ? null : id)}
+                    aria-pressed={nodoActivo === id}
                     aria-expanded={nodoActivo === id}
                   >
                     {NODOS[id].label}
@@ -512,8 +516,10 @@ export default function VisualizadorPolimerosMateriales() {
                   {(['cristalinos', 'amorfos'] as NodoId[]).map((id) => (
                     <button
                       key={id}
+                      type="button"
                       className={`${styles.nodo} ${styles.nodoSecundario} ${nodoActivo === id ? styles.nodoActivo : ''}`}
                       onClick={() => setNodoActivo(nodoActivo === id ? null : id)}
+                      aria-pressed={nodoActivo === id}
                       aria-expanded={nodoActivo === id}
                     >
                       {NODOS[id].label}
@@ -526,8 +532,10 @@ export default function VisualizadorPolimerosMateriales() {
                   {(['epoxi', 'baquelita', 'poliuretano'] as NodoId[]).map((id) => (
                     <button
                       key={id}
+                      type="button"
                       className={`${styles.nodo} ${styles.nodoSecundario} ${nodoActivo === id ? styles.nodoActivo : ''}`}
                       onClick={() => setNodoActivo(nodoActivo === id ? null : id)}
+                      aria-pressed={nodoActivo === id}
                       aria-expanded={nodoActivo === id}
                     >
                       {NODOS[id].label}
@@ -540,8 +548,10 @@ export default function VisualizadorPolimerosMateriales() {
                   {(['natural', 'sbr', 'silicona'] as NodoId[]).map((id) => (
                     <button
                       key={id}
+                      type="button"
                       className={`${styles.nodo} ${styles.nodoSecundario} ${nodoActivo === id ? styles.nodoActivo : ''}`}
                       onClick={() => setNodoActivo(nodoActivo === id ? null : id)}
+                      aria-pressed={nodoActivo === id}
                       aria-expanded={nodoActivo === id}
                     >
                       {NODOS[id].label}
@@ -790,19 +800,19 @@ export default function VisualizadorPolimerosMateriales() {
           <h3>Casos de Uso</h3>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <h4>📦 Industria del Envase</h4>
+              <h4><span aria-hidden="true">📦</span> Industria del Envase</h4>
               <p>El PET (código 1) es el plástico más reciclado del mundo: botellas de agua, bandejas alimentarias. Su alta transparencia, barrera a gases y bajo peso lo hacen ideal. El HDPE (código 2) domina en botellas de leche y detergentes por su resistencia química.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🏗️ Ingeniería y Construcción</h4>
+              <h4><span aria-hidden="true">🏗️</span> Ingeniería y Construcción</h4>
               <p>El PVC (código 3) es el segundo plástico más producido del mundo: tuberías, perfiles de ventana, suelos. Los elastómeros de silicona sellan juntas a -50°C/+200°C. Las resinas epoxi (termoestable) son la matriz de los composites de fibra de carbono en aeronáutica.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🏥 Medicina y Biotecnología</h4>
+              <h4><span aria-hidden="true">🏥</span> Medicina y Biotecnología</h4>
               <p>El PLA (poliláctico, biodegradable) se usa en suturas absorbibles e implantes temporales que el cuerpo degrada naturalmente. El PTFE (teflón) recubre catéteres y válvulas cardíacas por su biocompatibilidad y no adhesión.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🌱 Economía Circular</h4>
+              <h4><span aria-hidden="true">🌱</span> Economía Circular</h4>
               <p>Los biopolímeros bio-basados (PHA, PLA de maíz) cierran el ciclo de carbono: las bacterias producen PHA almacenándolo como reserva energética. Al biodegradarse, devuelven CO₂ al ciclo atmosférico sin acumularse en el océano.</p>
             </div>
           </div>
@@ -816,7 +826,7 @@ export default function VisualizadorPolimerosMateriales() {
             <div className={styles.faqItem}>
               <strong>¿Qué diferencia hay entre Tg y Tm?</strong>
               <p>Tm (temperatura de fusión) aplica a polímeros cristalinos: a esa temperatura, las regiones cristalinas se desordenan y el material fluye. Tg (temperatura de transición vítrea) aplica a polímeros amorfos: por debajo, el polímero es rígido y frágil («vítreo»); por encima, es flexible y gomoroso («caucho»).</p>
-              <div className={styles.faqTip}>💡 Muchos polímeros son semicristalinos: tienen tanto Tg (parte amorfa) como Tm (parte cristalina). El PET es un ejemplo clásico.</div>
+              <div className={styles.faqTip}><span aria-hidden="true">💡</span> Muchos polímeros son semicristalinos: tienen tanto Tg (parte amorfa) como Tm (parte cristalina). El PET es un ejemplo clásico.</div>
             </div>
             <div className={styles.faqItem}>
               <strong>¿Por qué el código de reciclaje 7 es «otros»?</strong>
@@ -867,28 +877,28 @@ export default function VisualizadorPolimerosMateriales() {
           <h3>Mejores Prácticas</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>♻️</span>
+              <span className={styles.tipIcon} aria-hidden="true">♻️</span>
               <div>
                 <strong>Lee el código de reciclaje</strong>
                 <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>Antes de tirar un plástico, busca el símbolo ♻️ con número en el fondo. Los códigos 1 (PET) y 2 (HDPE) son los más aceptados globalmente. El 6 (PS) y el 7 rara vez se reciclan.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🌡️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🌡️</span>
               <div>
                 <strong>Tg para elegir el polímero adecuado</strong>
                 <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>Si necesitas rigidez a temperatura ambiente, elige un polímero con Tg &gt; 20°C (PS: 100°C, PC: 147°C). Si necesitas flexibilidad (manguera, guantes), Tg &lt; 20°C (PVC plastificado, silicona: -97°C).</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧪</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧪</span>
               <div>
                 <strong>Verificar resistencia química antes de diseñar</strong>
                 <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>El PTFE resiste casi todos los solventes y ácidos concentrados. El PS se disuelve en acetona. La resistencia química es un parámetro de diseño crítico en envases, tuberías y equipos industriales.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <div>
                 <strong>Bio-basado ≠ biodegradable</strong>
                 <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>Verificar siempre ambas características. El PLA es bio-basado Y biodegradable (en condiciones industriales). El bioPE es bio-basado pero NO biodegradable. Confundirlos lleva a falsas promesas de sostenibilidad.</p>
@@ -898,7 +908,7 @@ export default function VisualizadorPolimerosMateriales() {
 
           <div className={styles.warningBoxEdu}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               Errores Conceptuales Frecuentes
             </div>
             <ul className={styles.warningList}>

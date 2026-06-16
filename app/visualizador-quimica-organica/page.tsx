@@ -597,6 +597,7 @@ export default function VisualizadorQuimicaOrganica() {
         {tabs.map((t) => (
           <button
             key={t.id}
+            type="button"
             role="tab"
             aria-selected={tabActiva === t.id}
             onClick={() => setTabActiva(t.id)}
@@ -617,6 +618,7 @@ export default function VisualizadorQuimicaOrganica() {
               {GRUPOS.map((g) => (
                 <button
                   key={g.id}
+                  type="button"
                   onClick={() => setGrupoSeleccionado(g.id)}
                   className={`${styles.grupoCard} ${grupoSeleccionado === g.id ? styles.grupoCardActive : ''}`}
                   style={grupoSeleccionado === g.id ? { borderColor: g.color, color: g.color } as React.CSSProperties : undefined}
@@ -674,6 +676,7 @@ export default function VisualizadorQuimicaOrganica() {
             {REACCIONES.map((r) => (
               <button
                 key={r.id}
+                type="button"
                 onClick={() => setReaccionSeleccionada(r.id)}
                 className={`${styles.reaccionBtn} ${reaccionSeleccionada === r.id ? styles.reaccionBtnActive : ''}`}
                 aria-pressed={reaccionSeleccionada === r.id}
@@ -732,14 +735,18 @@ export default function VisualizadorQuimicaOrganica() {
           <div className={styles.bencenoBox}>
             <div className={styles.bencenoToggle}>
               <button
+                type="button"
                 onClick={() => setBencenoVista('kekule')}
                 className={`${styles.toggleBtn} ${bencenoVista === 'kekule' ? styles.toggleBtnActive : ''}`}
+                aria-pressed={bencenoVista === 'kekule'}
               >
                 Estructura de Kekulé
               </button>
               <button
+                type="button"
                 onClick={() => setBencenoVista('resonancia')}
                 className={`${styles.toggleBtn} ${bencenoVista === 'resonancia' ? styles.toggleBtnActive : ''}`}
+                aria-pressed={bencenoVista === 'resonancia'}
               >
                 Resonancia (Thiele)
               </button>
@@ -808,6 +815,7 @@ export default function VisualizadorQuimicaOrganica() {
             {TIPOS_ISOMERIA.map((t) => (
               <button
                 key={t.id}
+                type="button"
                 onClick={() => setIsomeriaSeleccionada(t.id)}
                 className={`${styles.isomeriaBtn} ${isomeriaSeleccionada === t.id ? styles.isomeriaBtnActive : ''}`}
                 aria-pressed={isomeriaSeleccionada === t.id}
@@ -891,19 +899,19 @@ export default function VisualizadorQuimicaOrganica() {
         <h3>Casos de Uso</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <h4>🏥 Industria Farmacéutica</h4>
+            <h4><span aria-hidden="true">🏥</span> Industria Farmacéutica</h4>
             <p>La aspirina es un éster del ácido salicílico. La morfina es un alcohol y amina. El ibuprofeno es un ácido carboxílico. Conocer los grupos funcionales predice la solubilidad, metabolismo y actividad biológica de los fármacos.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h4>🧴 Cosmética y Perfumería</h4>
+            <h4><span aria-hidden="true">🧴</span> Cosmética y Perfumería</h4>
             <p>Los ésteres naturales dan el aroma de las frutas: acetato de isoamilo (plátano), acetato de etilo (disolvente de esmalte). Los perfumes artificiales replican estas estructuras con reacciones de esterificación controladas.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h4>🧪 Síntesis de Materiales</h4>
+            <h4><span aria-hidden="true">🧪</span> Síntesis de Materiales</h4>
             <p>El nylon se forma por reacción de aminas con ácidos carboxílicos (amidación). El PET (botellas) por esterificación del ácido tereftálico. Comprender la química orgánica es diseñar materiales a medida.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h4>🌱 Bioquímica y Metabolismo</h4>
+            <h4><span aria-hidden="true">🌱</span> Bioquímica y Metabolismo</h4>
             <p>Los carbohidratos son alcoholes y aldehídos/cetonas. Las grasas son ésteres de glicerol y ácidos grasos. Las proteínas son polímeros de aminoácidos (amino + ácido). Toda la bioquímica es química orgánica.</p>
           </div>
         </div>
@@ -917,7 +925,7 @@ export default function VisualizadorQuimicaOrganica() {
           <div className={styles.faqItem}>
             <strong>¿Cómo sé si una molécula orgánica es polar?</strong>
             <p>Busca grupos funcionales con electronegatividad alta: -OH, -COOH, -NH₂, C=O son polares y miscibles en agua. Los alcanos y alquenos son apolares y no se mezclan con agua («el aceite no se mezcla con el agua» es este principio).</p>
-            <div className={styles.faqTip}>💡 Regla: «semejante disuelve a semejante» — polar disuelve polar, apolar disuelve apolar.</div>
+            <div className={styles.faqTip}><span aria-hidden="true">💡</span> Regla: «semejante disuelve a semejante» — polar disuelve polar, apolar disuelve apolar.</div>
           </div>
           <div className={styles.faqItem}>
             <strong>¿Qué diferencia hay entre aldehído y cetona?</strong>
@@ -968,28 +976,28 @@ export default function VisualizadorQuimicaOrganica() {
         <h3>Mejores Prácticas</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔍</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔍</span>
             <div>
               <strong>Identifica primero el grupo funcional</strong>
               <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>En química orgánica, el grupo funcional determina el 90% de la reactividad. Ignora momentáneamente la cadena carbonada y localiza el grupo R-X que dicta el comportamiento.</p>
             </div>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>⚡</span>
+            <span className={styles.tipIcon} aria-hidden="true">⚡</span>
             <div>
               <strong>Aprende patrones de reacción, no memorices</strong>
               <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>Hay ~5 patrones fundamentales (adición, sustitución, eliminación, oxidación, condensación). Dominarlos te permite predecir miles de reacciones específicas.</p>
             </div>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🧪</span>
+            <span className={styles.tipIcon} aria-hidden="true">🧪</span>
             <div>
               <strong>Polar vs apolar: regla de miscibilidad</strong>
               <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>El agua es polar: los compuestos con -OH, -COOH, -NH₂ se disuelven en ella. Los alcanos y ésteres no. Esto determina la formulación de medicamentos, cosméticos y alimentos.</p>
             </div>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔄</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔄</span>
             <div>
               <strong>Los equilibrios orgánicos importan</strong>
               <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>La esterificación de Fischer es reversible (⇌). Para desplazar el equilibrio hacia el éster: eliminar agua (destilación azeotrópica) o usar exceso de un reactivo. Le Chatelier en acción.</p>
@@ -999,7 +1007,7 @@ export default function VisualizadorQuimicaOrganica() {
 
         <div className={styles.warningBoxEdu}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             Errores Conceptuales Frecuentes
           </div>
           <ul className={styles.warningList}>
