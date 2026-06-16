@@ -209,6 +209,7 @@ export default function OrientadorTipoOposicionPage() {
                   <button
                     key={op.valor}
                     type="button"
+                    aria-pressed={respuestas[PREGUNTAS[preguntaActual].id] === op.valor}
                     className={`${styles.opcionBtn} ${respuestas[PREGUNTAS[preguntaActual].id] === op.valor ? styles.opcionSeleccionada : ''}`}
                     onClick={() => handleRespuesta(PREGUNTAS[preguntaActual].id, op.valor)}
                   >

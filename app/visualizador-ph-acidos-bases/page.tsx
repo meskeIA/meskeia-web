@@ -257,6 +257,7 @@ export default function VisualizadorPhAcidosBases() {
           {SECCIONES.map(s => (
             <button
               key={s.id}
+              type="button"
               className={`${styles.navBtn} ${seccionActiva === s.id ? styles.navActivo : ''}`}
               onClick={() => setSeccionActiva(s.id)}
               aria-pressed={seccionActiva === s.id}
@@ -365,6 +366,7 @@ export default function VisualizadorPhAcidosBases() {
               {SUSTANCIAS.map(s => (
                 <button
                   key={s.nombre}
+                  type="button"
                   className={styles.mapaPunto}
                   style={{
                     left: `${(s.ph / 14) * 100}%`,
@@ -374,7 +376,7 @@ export default function VisualizadorPhAcidosBases() {
                   title={`${s.nombre} (pH ${s.ph})`}
                   aria-label={`${s.nombre}, pH ${s.ph}`}
                 >
-                  <span className={styles.mapaPuntoLabel}>{s.icono}</span>
+                  <span className={styles.mapaPuntoLabel} aria-hidden="true">{s.icono}</span>
                 </button>
               ))}
               <div className={styles.mapaGradient} />
@@ -423,16 +425,20 @@ export default function VisualizadorPhAcidosBases() {
             {/* Tabs ácidos / bases */}
             <div className={styles.tabSelector}>
               <button
+                type="button"
                 className={`${styles.tabBtn} ${acidoBaseTab === 'acidos' ? styles.tabActivo : ''}`}
                 onClick={() => setAcidoBaseTab('acidos')}
                 style={acidoBaseTab === 'acidos' ? { borderColor: '#FF4444', color: '#FF4444' } : {}}
+                aria-pressed={acidoBaseTab === 'acidos'}
               >
                 Ácidos (fuertes y débiles)
               </button>
               <button
+                type="button"
                 className={`${styles.tabBtn} ${acidoBaseTab === 'bases' ? styles.tabActivo : ''}`}
                 onClick={() => setAcidoBaseTab('bases')}
                 style={acidoBaseTab === 'bases' ? { borderColor: '#4444FF', color: '#4444FF' } : {}}
+                aria-pressed={acidoBaseTab === 'bases'}
               >
                 Bases (fuertes y débiles)
               </button>
@@ -539,8 +545,10 @@ export default function VisualizadorPhAcidosBases() {
               {EJEMPLOS_NEUTRALIZACION.map((ej, i) => (
                 <button
                   key={ej.titulo}
+                  type="button"
                   className={`${styles.neutralizacionCard} ${neutralizacionActiva === i ? styles.neutralizacionActiva : ''}`}
                   onClick={() => setNeutralizacionActiva(i)}
+                  aria-pressed={neutralizacionActiva === i}
                 >
                   <span className={styles.neutralizacionIcono} aria-hidden="true">{ej.icono}</span>
                   <span className={styles.neutralizacionTitulo}>{ej.titulo}</span>

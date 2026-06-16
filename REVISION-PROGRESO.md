@@ -511,10 +511,10 @@
 | [x] | Océanos y Corrientes - AMOC, Corriente del Golfo y Acidificación | `/visualizador-oceanos-corrientes/` | estudiantes, cultura |
 | [x] | Oferta, Demanda y por qué Suben los Precios | `/visualizador-oferta-demanda/` | estudiantes, finanzas, cultura |
 | [x] | Óptica - El Viaje de la Luz | `/visualizador-optica/` | estudiantes, cultura |
-| [ ] | Óptica Ondulatoria: Young, Difracción y Polarización | `/visualizador-optica-ondulatoria/` | estudiantes, tecnicas |
-| [ ] | Orientador de Tipo de Oposición | `/orientador-tipo-oposicion/` | estudiantes, productividad |
-| [ ] | Partículas Subatómicas: Modelo Estándar y Higgs | `/visualizador-particulas-subatomicas/` | estudiantes, cultura |
-| [ ] | pH: Ácidos y Bases - La Escala de la Química Cotidiana | `/visualizador-ph-acidos-bases/` | estudiantes, cultura |
+| [x] | Óptica Ondulatoria: Young, Difracción y Polarización | `/visualizador-optica-ondulatoria/` | estudiantes, tecnicas |
+| [x] | Orientador de Tipo de Oposición | `/orientador-tipo-oposicion/` | estudiantes, productividad |
+| [x] | Partículas Subatómicas: Modelo Estándar y Higgs | `/visualizador-particulas-subatomicas/` | estudiantes, cultura |
+| [x] | pH: Ácidos y Bases - La Escala de la Química Cotidiana | `/visualizador-ph-acidos-bases/` | estudiantes, cultura |
 | [ ] | Planificador de Estudio para Oposiciones | `/planificador-estudio-oposiciones/` | estudiantes, productividad |
 | [ ] | Plegamiento de Proteínas: Estructura y Enfermedades | `/visualizador-proteinas-plegamiento/` | estudiantes, cultura |
 | [ ] | Polímeros y Materiales: Plásticos, Propiedades y Reciclaje | `/visualizador-polimeros-materiales/` | estudiantes, tecnicas |

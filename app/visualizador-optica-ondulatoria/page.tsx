@@ -167,7 +167,7 @@ function TabInterferencia() {
 
   return (
     <div className={styles.seccion}>
-      <h2 className={styles.seccionTitulo}>🌈 Doble rendija de Young</h2>
+      <h2 className={styles.seccionTitulo}><span aria-hidden="true">🌈</span> Doble rendija de Young</h2>
       <p className={styles.seccionDesc}>
         El experimento fundamental que demostró la naturaleza ondulatoria de la luz (1801). Dos rendijas paralelas crean franjas alternantes de luz y oscuridad.
       </p>
@@ -265,9 +265,11 @@ function TabInterferencia() {
             aria-label="Animación de ondas circulares expandiéndose desde las rendijas"
           />
           <button
+            type="button"
             className={animando ? styles.btnSecundario : styles.btnPrimario}
             onClick={() => setAnimando(v => !v)}
             aria-label={animando ? 'Pausar animación de ondas' : 'Iniciar animación de ondas'}
+            aria-pressed={animando}
           >
             {animando ? '⏸ Pausar animación' : '▶ Animar ondas'}
           </button>
@@ -331,7 +333,7 @@ function TabDifraccion() {
 
   return (
     <div className={styles.seccion}>
-      <h2 className={styles.seccionTitulo}>〰 Difracción en rendija simple</h2>
+      <h2 className={styles.seccionTitulo}><span aria-hidden="true">〰</span> Difracción en rendija simple</h2>
       <p className={styles.seccionDesc}>
         Cuando la luz pasa por una rendija estrecha, se dobla y crea un patrón de intensidad. La clave: si la apertura <em>a</em> es comparable a <em>λ</em>, la difracción es máxima.
       </p>
@@ -442,7 +444,7 @@ function TabPolarizacion() {
 
   return (
     <div className={styles.seccion}>
-      <h2 className={styles.seccionTitulo}>🕶 Polarización de la luz</h2>
+      <h2 className={styles.seccionTitulo}><span aria-hidden="true">🕶</span> Polarización de la luz</h2>
       <p className={styles.seccionDesc}>
         La luz natural vibra en todas las direcciones. Un polarizador selecciona una sola dirección de vibración. La intensidad transmitida sigue la <strong>Ley de Malus</strong>: I = I₀·cos²(θ).
       </p>
@@ -624,7 +626,7 @@ function TabCoherencia() {
 
   return (
     <div className={styles.seccion}>
-      <h2 className={styles.seccionTitulo}>💡 Coherencia y luz láser</h2>
+      <h2 className={styles.seccionTitulo}><span aria-hidden="true">💡</span> Coherencia y luz láser</h2>
       <p className={styles.seccionDesc}>
         La <strong>coherencia</strong> mide hasta qué distancia las ondas mantienen una relación de fase definida. El láser es la fuente de luz más coherente que existe.
       </p>
@@ -740,7 +742,7 @@ export default function OpticaOndulatoria() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.heroTitle}>🌊 Óptica Ondulatoria</h1>
+        <h1 className={styles.heroTitle}><span aria-hidden="true">🌊</span> Óptica Ondulatoria</h1>
         <p className={styles.heroSubtitle}>
           La naturaleza ondulatoria de la luz: interferencia, difracción, polarización y coherencia. Simulaciones interactivas con física real.
         </p>
@@ -752,9 +754,11 @@ export default function OpticaOndulatoria() {
         {tabs.map(tab => (
           <button
             key={tab.id}
+            type="button"
             className={`${styles.tabBtn} ${tabActiva === tab.id ? styles.tabBtnActivo : ''}`}
             onClick={() => setTabActiva(tab.id)}
             aria-current={tabActiva === tab.id ? 'page' : undefined}
+            aria-pressed={tabActiva === tab.id}
           >
             <span className={styles.tabIcon} aria-hidden="true">{tab.emoji}</span>
             {tab.label}
@@ -813,19 +817,19 @@ export default function OpticaOndulatoria() {
         <h3>Casos de Uso</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <h4>🔬 Investigador de Óptica</h4>
+            <h4><span aria-hidden="true">🔬</span> Investigador de Óptica</h4>
             <p>Mide la longitud de onda de una fuente desconocida con el experimento de doble rendija: conociendo la separación y la distancia a la pantalla, d·sin θ = mλ da λ con precisión nanométrica.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h4>📷 Fotógrafo y Videógrafo</h4>
+            <h4><span aria-hidden="true">📷</span> Fotógrafo y Videógrafo</h4>
             <p>Usa filtros polarizadores para eliminar reflejos en agua y cristal. La ley de Malus explica que girando el filtro 90° respecto a la reflexión se logra extinción total del reflejo.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h4>🔭 Diseñador de Instrumentos Ópticos</h4>
+            <h4><span aria-hidden="true">🔭</span> Diseñador de Instrumentos Ópticos</h4>
             <p>El criterio de Rayleigh (basado en difracción) fija el límite de resolución de telescopios y microscopios. Reducir λ (UV, rayos X) o aumentar la apertura mejora la resolución.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h4>🏥 Médico con Tomografía OCT</h4>
+            <h4><span aria-hidden="true">🏥</span> Médico con Tomografía OCT</h4>
             <p>La tomografía de coherencia óptica usa la longitud de coherencia del láser para obtener imágenes de retina con resolución de micras, sin contacto. La coherencia temporal define la profundidad de imagen.</p>
           </div>
         </div>
@@ -897,28 +901,28 @@ export default function OpticaOndulatoria() {
         <h3>Mejores Prácticas</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🌈</span>
+            <span className={styles.tipIcon} aria-hidden="true">🌈</span>
             <div>
               <strong>λ determina el color</strong>
               <p style={{ margin: '0.25rem 0 0', fontSize: '0.875rem' }}>Visible: 380 nm (violeta) a 700 nm (rojo). UV (&lt;380 nm) mejora resolución. IR (&gt;700 nm) aumenta difracción. La longitud de onda es la huella dactilar de la luz.</p>
             </div>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📏</span>
+            <span className={styles.tipIcon} aria-hidden="true">📏</span>
             <div>
               <strong>Distancia amplifica el patrón</strong>
               <p style={{ margin: '0.25rem 0 0', fontSize: '0.875rem' }}>En Young, las franjas son más visibles cuanto mayor es la distancia D a la pantalla. En laboratorio, D = 1-2 m es suficiente para medir λ con regla.</p>
             </div>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔲</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔲</span>
             <div>
               <strong>Filtros polarizadores en serie</strong>
               <p style={{ margin: '0.25rem 0 0', fontSize: '0.875rem' }}>Dos filtros a 90° extinguen la luz totalmente. Pero insertar un tercero entre ellos a 45° «reabre» el paso: la luz rota su polarización en cada filtro (paradoja de la polarización).</p>
             </div>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🎯</span>
+            <span className={styles.tipIcon} aria-hidden="true">🎯</span>
             <div>
               <strong>Coherencia = calidad del interferómetro</strong>
               <p style={{ margin: '0.25rem 0 0', fontSize: '0.875rem' }}>Un láser HeNe (λ = 632,8 nm, Δλ muy pequeño) tiene longitud de coherencia de kilómetros. Una bombilla de tungsteno tiene longitud de coherencia de micras.</p>

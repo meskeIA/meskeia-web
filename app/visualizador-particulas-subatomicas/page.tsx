@@ -327,6 +327,7 @@ export default function VisualizadorParticulasSubatomicas() {
             return (
               <button
                 key={tab}
+                type="button"
                 role="tab"
                 aria-selected={tabActivo === tab}
                 className={`${styles.tabBtn} ${tabActivo === tab ? styles.tabBtnActivo : ''}`}
@@ -353,6 +354,7 @@ export default function VisualizadorParticulasSubatomicas() {
             {/* Toggle antipartículas */}
             <div className={styles.toggleRow}>
               <button
+                type="button"
                 className={`${styles.toggleBtn} ${mostrarAntiparticulas ? styles.toggleBtnActivo : ''}`}
                 onClick={() => setMostrarAntiparticulas(!mostrarAntiparticulas)}
                 aria-pressed={mostrarAntiparticulas}
@@ -394,6 +396,7 @@ export default function VisualizadorParticulasSubatomicas() {
                       {quarks.filter(q => q.generacion === gen).map(p => (
                         <button
                           key={p.simbolo}
+                          type="button"
                           className={`${styles.particula} ${styles.particulaQuark} ${particulaSeleccionada?.simbolo === p.simbolo ? styles.particulaSeleccionada : ''}`}
                           onClick={() => setParticulaSeleccionada(p)}
                           aria-label={`${mostrarAntiparticulas ? 'Anti-' : ''}${p.nombre}`}
@@ -424,6 +427,7 @@ export default function VisualizadorParticulasSubatomicas() {
                       {leptones.filter(l => l.generacion === gen).map(p => (
                         <button
                           key={p.simbolo}
+                          type="button"
                           className={`${styles.particula} ${styles.particulaLeptón} ${particulaSeleccionada?.simbolo === p.simbolo ? styles.particulaSeleccionada : ''}`}
                           onClick={() => setParticulaSeleccionada(p)}
                           aria-label={`${mostrarAntiparticulas ? 'Anti-' : ''}${p.nombre}`}
@@ -451,6 +455,7 @@ export default function VisualizadorParticulasSubatomicas() {
                   {[...bosonesGauge, ...higgs].map(p => (
                     <button
                       key={p.simbolo}
+                      type="button"
                       className={`${styles.particula} ${p.tipo === 'higgs' ? styles.particulaHiggs : styles.particulaBosón} ${particulaSeleccionada?.simbolo === p.simbolo ? styles.particulaSeleccionada : ''}`}
                       onClick={() => setParticulaSeleccionada(p)}
                       aria-label={p.nombre}
@@ -476,6 +481,7 @@ export default function VisualizadorParticulasSubatomicas() {
                     )}
                   </div>
                   <button
+                    type="button"
                     className={styles.panelCerrar}
                     onClick={() => setParticulaSeleccionada(null)}
                     aria-label="Cerrar panel de detalles"
@@ -974,19 +980,19 @@ export default function VisualizadorParticulasSubatomicas() {
         <h3>Casos de Uso</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <h4>🎓 Estudiante de Física</h4>
+            <h4><span aria-hidden="true">🎓</span> Estudiante de Física</h4>
             <p>El Modelo Estándar es la teoría más precisa de la historia: predice el momento magnético anómalo del electrón con 12 decimales de exactitud. Entenderlo es imprescindible para cualquier física teórica o experimental.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h4>🏥 Médico — PET y Radioterapia</h4>
+            <h4><span aria-hidden="true">🏥</span> Médico — PET y Radioterapia</h4>
             <p>El PET usa positrones (antielectrones) que se aniquilan con electrones emitiendo pares de fotones γ detectables. La radioterapia con protones aprovecha el efecto Bragg para depositar energía justo en el tumor, protegiendo tejido sano.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h4>⚛️ Ingeniero Nuclear</h4>
+            <h4><span aria-hidden="true">⚛️</span> Ingeniero Nuclear</h4>
             <p>La fisión del U-235 libera neutrones que inician reacciones en cadena. Entender la sección eficaz de captura neutrónica de cada isótopo es crucial para el diseño del reactor, el enriquecimiento y la gestión del combustible gastado.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h4>🌌 Cosmólogo</h4>
+            <h4><span aria-hidden="true">🌌</span> Cosmólogo</h4>
             <p>La asimetría materia-antimateria (violación CP) explica por qué hay más materia que antimateria en el universo. Experimentos como Belle II y LHCb buscan la fuente de esta asimetría que hizo posible nuestra existencia.</p>
           </div>
         </div>
@@ -1051,28 +1057,28 @@ export default function VisualizadorParticulasSubatomicas() {
         <h3>Mejores Prácticas</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>⚛️</span>
+            <span className={styles.tipIcon} aria-hidden="true">⚛️</span>
             <div>
               <strong>Masa en eV/c²</strong>
               <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>En física de partículas se usa eV/c² (electronvoltio/c²). El protón pesa 938 MeV/c². El Higgs pesa 125 GeV/c². El neutrino, menos de 0,12 eV/c²: ¡8 órdenes de magnitud de diferencia!</p>
             </div>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔗</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔗</span>
             <div>
               <strong>Confinamiento de color</strong>
               <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>Los quarks nunca se observan aislados: la fuerza entre ellos crece con la distancia (como una goma). Al separarlos, se crea un par quark-antiquark nuevo: «hadronización».</p>
             </div>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🌊</span>
+            <span className={styles.tipIcon} aria-hidden="true">🌊</span>
             <div>
               <strong>Las 4 fuerzas tienen alcances distintos</strong>
               <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>EM y gravedad: infinito. Fuerte: ~1 fm (tamaño del núcleo). Débil: ~0,001 fm. El alcance es inverso a la masa del bosón mediador (W, Z son muy masivos).</p>
             </div>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔭</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔭</span>
             <div>
               <strong>Colisionadores vs observatorios</strong>
               <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>El LHC crea partículas. Los observatorios de neutrinos (IceCube, Super-K) detectan partículas de origen cósmico. Ambos enfoques son complementarios para explorar la física más allá del Modelo Estándar.</p>
@@ -1082,7 +1088,7 @@ export default function VisualizadorParticulasSubatomicas() {
 
         <div className={styles.warningBoxEdu}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             Errores Conceptuales Frecuentes
           </div>
           <ul className={styles.warningList}>
