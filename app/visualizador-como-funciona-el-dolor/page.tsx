@@ -181,6 +181,7 @@ export default function ComoFuncionaElDolorPage() {
             {FASES.map(fase => (
               <button
                 key={fase.id}
+                type="button"
                 className={`${styles.faseBtn} ${faseActiva === fase.id ? styles.faseBtnActivo : ''}`}
                 style={faseActiva === fase.id ? { borderColor: fase.color, background: fase.colorBg } : undefined}
                 onClick={() => setFaseActiva(fase.id)}
@@ -264,7 +265,7 @@ export default function ComoFuncionaElDolorPage() {
                 </div>
                 <div className={styles.modulacionGrid}>
                   <div className={styles.modulacionCard} style={{ borderColor: '#27AE60' }}>
-                    <h4 className={styles.modulacionTitulo} style={{ color: '#27AE60' }}>🔒 Cierra la puerta (menos dolor)</h4>
+                    <h4 className={styles.modulacionTitulo} style={{ color: '#27AE60' }}><span aria-hidden="true">🔒</span> Cierra la puerta (menos dolor)</h4>
                     <ul className={styles.listaPuntos}>
                       <li>Opioides endógenos (endorfinas, encefalinas)</li>
                       <li>Serotonina y noradrenalina</li>
@@ -273,7 +274,7 @@ export default function ComoFuncionaElDolorPage() {
                     </ul>
                   </div>
                   <div className={styles.modulacionCard} style={{ borderColor: '#E74C3C' }}>
-                    <h4 className={styles.modulacionTitulo} style={{ color: '#E74C3C' }}>🔓 Abre la puerta (más dolor)</h4>
+                    <h4 className={styles.modulacionTitulo} style={{ color: '#E74C3C' }}><span aria-hidden="true">🔓</span> Abre la puerta (más dolor)</h4>
                     <ul className={styles.listaPuntos}>
                       <li>Estrés y ansiedad sostenidos</li>
                       <li>Falta de sueño crónica</li>
@@ -326,6 +327,7 @@ export default function ComoFuncionaElDolorPage() {
             {TIPOS_DOLOR.map(tipo => (
               <button
                 key={tipo.id}
+                type="button"
                 role="tab"
                 aria-selected={tipoActivo === tipo.id}
                 className={`${styles.tipoBtn} ${tipoActivo === tipo.id ? styles.tipoBtnActivo : ''}`}
@@ -414,8 +416,7 @@ export default function ComoFuncionaElDolorPage() {
 
         {/* warningBox */}
         <div className={styles.warningBox}>
-          <span aria-hidden="true">🔑</span>{' '}
-          <strong>El dolor siempre es real:</strong> aunque no haya lesión visible, el dolor crónico
+          <span aria-hidden="true">🔑</span> <strong>El dolor siempre es real:</strong> aunque no haya lesión visible, el dolor crónico
           no es &quot;imaginado&quot;. Los cambios en el sistema nervioso central son medibles y reales.
           Comprender el mecanismo es el primer paso del tratamiento.
         </div>

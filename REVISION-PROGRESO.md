@@ -992,10 +992,10 @@
 | [x] | Chequeos Médicos Preventivos | `/planificador-chequeos-medicos/` | salud, legal-fiscal |
 | [x] | Ciclo Cardíaco - Sístole, Diástole y ECG | `/visualizador-corazon-ciclo-cardiaco/` | salud, estudiantes, cultura |
 | [x] | Cómo el Cuerpo Mantiene el Equilibrio | `/visualizador-sistemas-equilibrio/` | salud, estudiantes |
-| [ ] | Cómo Envejece tu Cuerpo | `/visualizador-envejecimiento-cuerpo/` | salud, cultura |
-| [ ] | Cómo Funciona el Dolor — Nocicepción y Tipos | `/visualizador-como-funciona-el-dolor/` | salud, estudiantes |
-| [ ] | Cómo Funciona una Vacuna | `/visualizador-vacunas/` | salud, cultura, estudiantes |
-| [ ] | Cómo Piensa tu Cerebro | `/visualizador-cerebro/` | salud, cultura, estudiantes |
+| [x] | Cómo Envejece tu Cuerpo | `/visualizador-envejecimiento-cuerpo/` | salud, cultura |
+| [x] | Cómo Funciona el Dolor — Nocicepción y Tipos | `/visualizador-como-funciona-el-dolor/` | salud, estudiantes |
+| [x] | Cómo Funciona una Vacuna | `/visualizador-vacunas/` | salud, cultura, estudiantes |
+| [x] | Cómo Piensa tu Cerebro | `/visualizador-cerebro/` | salud, cultura, estudiantes |
 | [ ] | Cómo se Descubre un Medicamento | `/visualizador-desarrollo-farmaco/` | salud, cultura |
 | [ ] | Cortisol - La Hormona del Estrés en tu Cuerpo | `/visualizador-cortisol/` | salud, cultura |
 | [x] | Curso de Nutrición | `/curso-nutrisalud/` | salud, cultura |

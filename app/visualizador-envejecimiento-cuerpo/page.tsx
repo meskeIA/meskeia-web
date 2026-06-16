@@ -173,7 +173,7 @@ export default function VisualizadorEnvejecimientoCuerpoPage() {
             color: 'var(--text-primary)',
           }}
         >
-          <strong>⚠️ Aviso:</strong> Las cifras son aproximaciones ilustrativas para visualizar tendencias generales. Los valores reales varían enormemente entre individuos y no proceden de un estudio único.
+          <strong><span aria-hidden="true">⚠️</span> Aviso:</strong> Las cifras son aproximaciones ilustrativas para visualizar tendencias generales. Los valores reales varían enormemente entre individuos y no proceden de un estudio único.
         </div>
 
         {/* Selector de década */}
