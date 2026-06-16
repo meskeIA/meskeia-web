@@ -619,18 +619,18 @@
 | [x] | Transformada de Fourier: Señales y Frecuencias | `/visualizador-transformada-fourier/` | estudiantes, tecnicas |
 | [x] | Transporte en las Plantas - Agua que Sube sin Motor | `/visualizador-transporte-plantas/` | estudiantes, cultura |
 | [x] | Trigonometría: Círculo Unitario y Funciones | `/visualizador-trigonometria/` | estudiantes, tecnicas |
-| [ ] | Tu ADN en Números | `/visualizador-adn-numeros/` | estudiantes, cultura |
+| [x] | Tu ADN en Números | `/visualizador-adn-numeros/` | estudiantes, cultura |
 | [x] | Visualizador de Estructuras de Datos | `/visualizador-estructuras-datos/` | estudiantes, diseno |
 | [x] | Visualizador de Volúmenes 3D: Esfera, Cubo, Cilindro, Cono y Pirámide | `/visualizador-volumenes/` | estudiantes, cultura |
-| [ ] | Vuelo de Avión: El Gran Mito de Bernoulli | `/visualizador-vuelo-avion/` | estudiantes, cultura |
+| [x] | Vuelo de Avión: El Gran Mito de Bernoulli | `/visualizador-vuelo-avion/` | estudiantes, cultura |
 
 ## Finanzas e Inversión (`finanzas`) — 58 apps
 
 | Estado | Nombre | URL | Suites |
 |---|---|---|---|
-| [ ] | ¿Cuánto tardo en ahorrar? | `/estimador-tiempo-ahorro/` | finanzas, estudiantes |
+| [x] | ¿Cuánto tardo en ahorrar? | `/estimador-tiempo-ahorro/` | finanzas, estudiantes |
 | [x] | Anatomía de una Nómina | `/visualizador-anatomia-nomina/` | finanzas, cultura |
-| [ ] | Burbuja Especulativa: Las 5 Fases de Minsky | `/visualizador-burbuja-especulativa/` | finanzas, cultura |
+| [x] | Burbuja Especulativa: Las 5 Fases de Minsky | `/visualizador-burbuja-especulativa/` | finanzas, cultura |
 | [ ] | Calculadora de Descuentos | `/calculadora-descuentos/` | finanzas, productividad |
 | [x] | Calculadora de Propinas | `/calculadora-propinas/` | finanzas, productividad, viajes |
 | [ ] | Checklist Coberturas de Seguros | `/checklist-coberturas-seguros/` | finanzas, cultura |

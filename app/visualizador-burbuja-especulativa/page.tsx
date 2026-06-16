@@ -335,6 +335,7 @@ export default function VisualizadorBurbujaEspeculativa() {
         {TABS.map((tab) => (
           <button
             key={tab.id}
+            type="button"
             className={`${styles.tab} ${tabActiva === tab.id ? styles.tabActive : ''}`}
             onClick={() => setTabActiva(tab.id)}
             aria-selected={tabActiva === tab.id}
@@ -435,6 +436,7 @@ export default function VisualizadorBurbujaEspeculativa() {
               {FASES_MINSKY.map((fase) => (
                 <button
                   key={fase.numero}
+                  type="button"
                   className={`${styles.faseCard} ${faseSeleccionada === fase.numero ? styles.faseCardActive : ''}`}
                   onClick={() => setFaseSeleccionada(faseSeleccionada === fase.numero ? null : fase.numero)}
                   aria-expanded={faseSeleccionada === fase.numero}
@@ -499,6 +501,7 @@ export default function VisualizadorBurbujaEspeculativa() {
                   style={{ borderTopColor: caso.color }}
                 >
                   <button
+                    type="button"
                     className={styles.casoHeader}
                     onClick={() => setCasoSeleccionado(casoSeleccionado === i ? null : i)}
                     aria-expanded={casoSeleccionado === i}

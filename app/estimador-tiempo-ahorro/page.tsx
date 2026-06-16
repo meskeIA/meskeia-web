@@ -93,6 +93,7 @@ export default function EstimadorTiempoAhorroPage() {
               <button
                 key={obj.nombre}
                 type="button"
+                aria-pressed={objetivo === obj.nombre}
                 className={`${styles.objetivoChip} ${objetivo === obj.nombre ? styles.objetivoActivo : ''}`}
                 onClick={() => seleccionarObjetivo(obj)}
               >

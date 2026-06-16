@@ -139,7 +139,7 @@ export default function VueloAvionPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <div className={styles.heroIcon}>✈️</div>
+        <div className={styles.heroIcon}><span aria-hidden="true">✈️</span></div>
         <h1>Por qué Vuelan los Aviones</h1>
         <p>Bernoulli tiene razón, pero solo a medias. La explicación completa que los libros suelen omitir.</p>
       </header>
@@ -149,6 +149,7 @@ export default function VueloAvionPage() {
       <nav className={styles.tabs} aria-label="Secciones">
         {tabs.map(tab => (
           <button key={tab.id}
+            type="button"
             className={`${styles.tab} ${tabActiva === tab.id ? styles.tabActiva : ''}`}
             onClick={() => setTabActiva(tab.id)}
             aria-pressed={tabActiva === tab.id}>
@@ -188,7 +189,7 @@ export default function VueloAvionPage() {
           </div>
 
           <div className={styles.infoBox}>
-            <strong>💡 ¿Bernoulli está equivocado?</strong> No. El principio de Bernoulli es correcto:
+            <strong><span aria-hidden="true">💡</span> ¿Bernoulli está equivocado?</strong> No. El principio de Bernoulli es correcto:
             a mayor velocidad de un fluido, menor presión. El problema es que no explica <em>por qué</em>{' '}
             el aire va más rápido sobre el ala. Para eso necesitamos el ángulo de ataque.
           </div>
@@ -300,16 +301,16 @@ export default function VueloAvionPage() {
             </div>
 
             <div className={styles.anguloExplicacion}>
-              {anguloAtaque < 0 && <p>⬇️ El ala genera sustentación hacia abajo. Un avión de acrobacia en vuelo invertido usa este principio.</p>}
-              {anguloAtaque >= 0 && anguloAtaque <= 5 && <p>✈️ Crucero normal. El ala desvía el aire ligeramente hacia abajo. Eficiencia máxima.</p>}
-              {anguloAtaque > 5 && anguloAtaque <= 12 && <p>⬆️ Ascenso o baja velocidad. Mayor sustentación pero también más resistencia.</p>}
-              {anguloAtaque > 12 && anguloAtaque <= 18 && <p>⚠️ Aproximación a la pérdida. El flujo empieza a separarse del ala. Zona peligrosa sin flaps.</p>}
-              {anguloAtaque > 18 && <p>🔴 STALL: el flujo se ha separado bruscamente. La sustentación colapsa. El avión desciende.</p>}
+              {anguloAtaque < 0 && <p><span aria-hidden="true">⬇️</span> El ala genera sustentación hacia abajo. Un avión de acrobacia en vuelo invertido usa este principio.</p>}
+              {anguloAtaque >= 0 && anguloAtaque <= 5 && <p><span aria-hidden="true">✈️</span> Crucero normal. El ala desvía el aire ligeramente hacia abajo. Eficiencia máxima.</p>}
+              {anguloAtaque > 5 && anguloAtaque <= 12 && <p><span aria-hidden="true">⬆️</span> Ascenso o baja velocidad. Mayor sustentación pero también más resistencia.</p>}
+              {anguloAtaque > 12 && anguloAtaque <= 18 && <p><span aria-hidden="true">⚠️</span> Aproximación a la pérdida. El flujo empieza a separarse del ala. Zona peligrosa sin flaps.</p>}
+              {anguloAtaque > 18 && <p><span aria-hidden="true">🔴</span> STALL: el flujo se ha separado bruscamente. La sustentación colapsa. El avión desciende.</p>}
             </div>
           </div>
 
           <div className={styles.infoBox}>
-            <strong>💡 La condición de Kutta:</strong> El flujo de aire debe salir limpiamente por el borde de fuga del ala (sin separarse). Esta condición, junto con el ángulo de ataque, determina cuánta circulación se genera y por lo tanto cuánta sustentación.
+            <strong><span aria-hidden="true">💡</span> La condición de Kutta:</strong> El flujo de aire debe salir limpiamente por el borde de fuga del ala (sin separarse). Esta condición, junto con el ángulo de ataque, determina cuánta circulación se genera y por lo tanto cuánta sustentación.
           </div>
         </section>
       )}
@@ -323,6 +324,7 @@ export default function VueloAvionPage() {
           <div className={styles.fuerzasSelector} role="group" aria-label="Seleccionar fuerza">
             {FUERZAS.map(f => (
               <button key={f.nombre}
+                type="button"
                 className={`${styles.fuerzaBtn} ${fuerzaActiva === f.nombre ? styles.fuerzaBtnActiva : ''}`}
                 style={fuerzaActiva === f.nombre ? { borderColor: f.color, backgroundColor: f.color + '18' } : {}}
                 onClick={() => setFuerzaActiva(f.nombre)}
@@ -382,14 +384,14 @@ export default function VueloAvionPage() {
           </div>
 
           <div className={styles.equilibrioBox}>
-            <h3>⚖️ Equilibrio en vuelo nivelado</h3>
+            <h3><span aria-hidden="true">⚖️</span> Equilibrio en vuelo nivelado</h3>
             <div className={styles.equilibrioGrid}>
               <div className={styles.equilibrioItem}>
-                <span className={styles.equilibrioIcono} style={{ color: '#16A34A' }}>⬆️</span>
+                <span className={styles.equilibrioIcono} style={{ color: '#16A34A' }} aria-hidden="true">⬆️</span>
                 <span>Sustentación = Peso</span>
               </div>
               <div className={styles.equilibrioItem}>
-                <span className={styles.equilibrioIcono} style={{ color: '#2E86AB' }}>➡️</span>
+                <span className={styles.equilibrioIcono} style={{ color: '#2E86AB' }} aria-hidden="true">➡️</span>
                 <span>Empuje = Resistencia</span>
               </div>
             </div>
@@ -411,8 +413,8 @@ export default function VueloAvionPage() {
                   <span className={styles.casoIcono} aria-hidden="true">{caso.icono}</span>
                   <h3 className={styles.casoTitulo}>{caso.titulo}</h3>
                 </div>
-                <p className={styles.casoPregunta}><strong>❓ {caso.pregunta}</strong></p>
-                <p className={styles.casoRespuesta}>✅ {caso.respuesta}</p>
+                <p className={styles.casoPregunta}><strong><span aria-hidden="true">❓</span> {caso.pregunta}</strong></p>
+                <p className={styles.casoRespuesta}><span aria-hidden="true">✅</span> {caso.respuesta}</p>
                 <p className={styles.casoDetalle}>{caso.detalle}</p>
               </div>
             ))}
