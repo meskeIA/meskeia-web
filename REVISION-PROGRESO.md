@@ -209,10 +209,10 @@
 | [x] | Historia de la Radio: De Marconi al Podcast con IA | `/visualizador-historia/radio/` | cultura, tecnicas |
 | [x] | Historia de la República Dominicana: De la Independencia al Caribe del Siglo XXI | `/visualizador-historia/republica-dominicana/` | cultura, estudiantes |
 | [x] | Historia de la Robótica: De Čapek a la IA Encarnada | `/visualizador-historia/robotica/` | cultura, tecnicas |
-| [ ] | Historia de la Televisión: De Baird a la TV con IA | `/visualizador-historia/television/` | cultura, tecnicas |
-| [ ] | Historia de la Vejez y la Longevidad: De la Antigüedad a la Ciencia Longevity | `/visualizador-historia/vejez-longevidad/` | cultura, estudiantes |
-| [ ] | Historia de la Vivienda: De las Primeras Construcciones a la Crisis de Asequibilidad | `/visualizador-historia/vivienda/` | cultura, estudiantes |
-| [ ] | Historia de las Constituciones y la Democracia: De la Magna Carta al Siglo XXI | `/visualizador-historia/historia-constituciones/` | cultura |
+| [x] | Historia de la Televisión: De Baird a la TV con IA | `/visualizador-historia/television/` | cultura, tecnicas |
+| [x] | Historia de la Vejez y la Longevidad: De la Antigüedad a la Ciencia Longevity | `/visualizador-historia/vejez-longevidad/` | cultura, estudiantes |
+| [x] | Historia de la Vivienda: De las Primeras Construcciones a la Crisis de Asequibilidad | `/visualizador-historia/vivienda/` | cultura, estudiantes |
+| [x] | Historia de las Constituciones y la Democracia: De la Magna Carta al Siglo XXI | `/visualizador-historia/historia-constituciones/` | cultura |
 | [ ] | Historia de las Criptomonedas y Blockchain: De Bitcoin al Mercado Institucional | `/visualizador-historia/criptomonedas/` | cultura, tecnicas |
 | [ ] | Historia de las Epidemias: Cronología, Mortalidad y Legado Médico | `/visualizador-historia/epidemias/` | cultura, salud |
 | [ ] | Historia de las Especias y las Rutas Comerciales: De Arabia a los Mercados Globales | `/visualizador-historia/especias-rutas-comerciales/` | cultura, estudiantes |
