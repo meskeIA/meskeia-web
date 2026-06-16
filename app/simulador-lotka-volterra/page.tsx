@@ -393,6 +393,7 @@ export default function Page() {
               className={`${styles.modoBtn} ${modo === 'clasico' ? styles.modoActive : ''}`}
               onClick={() => setModo('clasico')}
               type="button"
+              aria-pressed={modo === 'clasico'}
             >
               Lotka-Volterra clásico
             </button>
@@ -400,6 +401,7 @@ export default function Page() {
               className={`${styles.modoBtn} ${modo === 'logistico' ? styles.modoActive : ''}`}
               onClick={() => setModo('logistico')}
               type="button"
+              aria-pressed={modo === 'logistico'}
             >
               Con capacidad de carga
             </button>
@@ -422,7 +424,7 @@ export default function Page() {
                 onClick={() => aplicarPreset(preset)}
                 type="button"
               >
-                <span className={styles.presetIcono}>{preset.icono}</span>
+                <span className={styles.presetIcono} aria-hidden="true">{preset.icono}</span>
                 <strong>{preset.nombre}</strong>
                 <p>{preset.descripcion}</p>
               </button>
@@ -728,7 +730,7 @@ export default function Page() {
             <ul className={styles.eventList}>
               {eventos.map((ev, idx) => (
                 <li key={idx} className={styles.eventItem}>
-                  <span className={styles.eventIcon}>
+                  <span className={styles.eventIcon} aria-hidden="true">
                     {ev.tipo.startsWith('pico') ? '📈' : ev.tipo.startsWith('extincion') ? '⚠️' : '📉'}
                   </span>
                   <span>{ev.descripcion}</span>
@@ -799,19 +801,19 @@ export default function Page() {
           <h3>Casos de Uso Reales</h3>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <h4>🎓 Estudiante de biología/ecología</h4>
+              <h4><span aria-hidden="true">🎓</span> Estudiante de biología/ecología</h4>
               <p>Visualiza por qué las poblaciones de linces y liebres oscilan en ciclos de ~10 años. Manipula β y γ para ver cómo cambia la frecuencia de los ciclos.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🧮 Universitario de matemáticas aplicadas</h4>
+              <h4><span aria-hidden="true">🧮</span> Universitario de matemáticas aplicadas</h4>
               <p>Estudia ecuaciones diferenciales no lineales acopladas, puntos de equilibrio y estabilidad. Compara comportamiento clásico vs logístico.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🧑‍🏫 Profesor de ciencias</h4>
+              <h4><span aria-hidden="true">🧑‍🏫</span> Profesor de ciencias</h4>
               <p>Demuestra en clase cómo emergen oscilaciones de reglas locales simples. Usa los presets para casos didácticos clásicos.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🔬 Investigador de ecosistemas</h4>
+              <h4><span aria-hidden="true">🔬</span> Investigador de ecosistemas</h4>
               <p>Explora escenarios de sobrepesca, introducción de especies invasoras o impacto de cambios en la tasa de mortalidad por enfermedad.</p>
             </div>
           </div>
@@ -898,42 +900,42 @@ export default function Page() {
           <h3>Mejores Prácticas</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <div>
                 <strong>Empieza con el preset de linces y liebres</strong>
                 <p>Es el caso clásico de los libros de texto. Familiarízate antes de cambiar parámetros.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📐</span>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
               <div>
                 <strong>Calcula equilibrios teóricos</strong>
                 <p>El punto fijo no trivial está en x* = γ/δ, y* = α/β. Verifícalo con la simulación.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <div>
                 <strong>Compara modos clásico vs logístico</strong>
                 <p>Mismos α, β, δ, γ pero distinto modo da resultados radicalmente distintos.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚡</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚡</span>
               <div>
                 <strong>Sube el tiempo total para ver tendencias</strong>
                 <p>Con t=100 puedes ver 4-5 ciclos completos. Con t=200, ves la convergencia (logístico) o la persistencia (clásico).</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧪</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧪</span>
               <div>
                 <strong>Experimenta con condiciones extremas</strong>
                 <p>Sube β o γ al máximo para provocar colapsos. Usa el preset &quot;Sobrepesca&quot; como punto de partida.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <div>
                 <strong>Lee siempre el diagrama de fases</strong>
                 <p>Da más información que el gráfico temporal. Permite distinguir oscilación, espiral, ciclo límite o extinción.</p>
@@ -943,7 +945,7 @@ export default function Page() {
 
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               Limitaciones del Modelo
             </div>
             <ul className={styles.warningList}>

@@ -364,7 +364,7 @@ export default function SimuladorMasResortePage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🌀 Simulador Masa-Resorte</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🌀</span> Simulador Masa-Resorte</h1>
         <p className={styles.subtitle}>
           Movimiento Armónico Simple con amortiguamiento viscoso — observa x(t), energías y período en tiempo real
         </p>
@@ -557,18 +557,21 @@ export default function SimuladorMasResortePage() {
         {/* ── Botones de control ───────────────────────────────────────── */}
         <div className={styles.controlButtons}>
           <button
+            type="button"
             className={styles.btnPause}
             onClick={() => setRunning((r) => !r)}
             aria-label={running ? 'Pausar simulación' : 'Reanudar simulación'}
+            aria-pressed={!running}
           >
-            {running ? '⏸ Pausar' : '▶ Reanudar'}
+            {running ? <><span aria-hidden="true">⏸</span> Pausar</> : <><span aria-hidden="true">▶</span> Reanudar</>}
           </button>
           <button
+            type="button"
             className={styles.btnReset}
             onClick={reiniciar}
             aria-label="Reiniciar simulación"
           >
-            ↺ Reiniciar
+            <span aria-hidden="true">↺</span> Reiniciar
           </button>
         </div>
 

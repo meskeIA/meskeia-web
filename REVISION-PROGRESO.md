@@ -596,11 +596,11 @@
 | [x] | Simulador del Problema de Monty Hall | `/simulador-monty-hall/` | estudiantes |
 | [x] | Simulador del Teorema Central del Límite | `/simulador-teorema-central-limite/` | estudiantes |
 | [x] | Simulador del Teorema de Bayes | `/simulador-teorema-bayes/` | estudiantes |
-| [ ] | Simulador Depredador-Presa (Lotka-Volterra) | `/simulador-lotka-volterra/` | estudiantes |
-| [ ] | Simulador Masa-Resorte (MAS) | `/simulador-mas-resorte/` | estudiantes |
-| [ ] | Simulador VSEPR de Geometría Molecular | `/simulador-vsepr/` | estudiantes |
+| [x] | Simulador Depredador-Presa (Lotka-Volterra) | `/simulador-lotka-volterra/` | estudiantes |
+| [x] | Simulador Masa-Resorte (MAS) | `/simulador-mas-resorte/` | estudiantes |
+| [x] | Simulador VSEPR de Geometría Molecular | `/simulador-vsepr/` | estudiantes |
 | [x] | Sistema de Pensiones: Reparto, Demografía y Reformas | `/visualizador-sistema-pensiones/` | estudiantes, cultura, finanzas |
-| [ ] | Sistemas Circulatorios - Del Corazón de 2 al de 4 Cámaras | `/visualizador-sistemas-circulatorios/` | estudiantes, cultura |
+| [x] | Sistemas Circulatorios - Del Corazón de 2 al de 4 Cámaras | `/visualizador-sistemas-circulatorios/` | estudiantes, cultura |
 | [ ] | Sistemas Operativos: Procesos, Scheduling, Memoria y Ficheros | `/visualizador-sistemas-operativos/` | estudiantes, tecnicas |
 | [ ] | Sonido y Ondas - Frecuencia, Amplitud y Decibelios | `/visualizador-sonido-ondas/` | estudiantes, cultura |
 | [ ] | Superconductividad: Efecto Meissner y Pares de Cooper | `/visualizador-superconductividad/` | estudiantes, tecnicas |
