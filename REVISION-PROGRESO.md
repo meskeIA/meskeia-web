@@ -533,10 +533,10 @@
 | [x] | Radioactividad: Desintegración, Vida Media y Datación | `/visualizador-radioactividad/` | estudiantes, cultura |
 | [x] | Reacciones Químicas - Cuando los Átomos Cambian de Pareja | `/visualizador-reacciones-quimicas/` | estudiantes, cultura |
 | [x] | Redes de Computadoras: TCP/IP, DNS, Routing y CDN | `/visualizador-redes-computadoras/` | estudiantes, tecnicas |
-| [ ] | Regímenes Políticos: Tipología y Características Estructurales | `/visualizador-regimenes-politicos/` | estudiantes, cultura |
-| [ ] | Reino Animal: Vertebrados, Invertebrados y Árbol Filogenético | `/visualizador-reino-animal/` | estudiantes, cultura |
-| [ ] | Relatividad Especial - Dilatación del Tiempo y E=mc² | `/visualizador-relatividad-especial/` | estudiantes, cultura, tecnicas |
-| [ ] | Relatividad General: Curvatura del Espacio-Tiempo | `/visualizador-relatividad-general/` | estudiantes, cultura |
+| [x] | Regímenes Políticos: Tipología y Características Estructurales | `/visualizador-regimenes-politicos/` | estudiantes, cultura |
+| [x] | Reino Animal: Vertebrados, Invertebrados y Árbol Filogenético | `/visualizador-reino-animal/` | estudiantes, cultura |
+| [x] | Relatividad Especial - Dilatación del Tiempo y E=mc² | `/visualizador-relatividad-especial/` | estudiantes, cultura, tecnicas |
+| [x] | Relatividad General: Curvatura del Espacio-Tiempo | `/visualizador-relatividad-general/` | estudiantes, cultura |
 | [ ] | Respiración Celular - La Central Energética | `/visualizador-respiracion-celular/` | estudiantes, cultura |
 | [ ] | Selección Natural - El Motor de la Evolución | `/visualizador-seleccion-natural/` | estudiantes, cultura |
 | [ ] | Selector de Carrera Universitaria | `/selector-carrera-universitaria/` | estudiantes, productividad |

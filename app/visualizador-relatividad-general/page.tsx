@@ -266,6 +266,7 @@ export default function RelatividadGeneralPage(): React.ReactNode {
             {CONCEPTOS.map((concepto, idx) => (
               <button
                 key={idx}
+                type="button"
                 className={`${styles.conceptoCard} ${conceptoActivo === idx ? styles.conceptoActivo : ''}`}
                 onClick={() => handleConceptoClick(idx)}
                 aria-expanded={conceptoActivo === idx}

@@ -418,7 +418,7 @@ export default function VisualizadorRegimenesPoliticos() {
                         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleCelda(ri, ci); } }}
                         style={{ outline: activa ? '2px solid #2E86AB' : undefined, borderRadius: 6 }}
                       >
-                        {ICONOS_MATRIZ[val]}
+                        <span aria-hidden="true">{ICONOS_MATRIZ[val]}</span>
                       </td>
                     );
                   })}
@@ -443,6 +443,7 @@ export default function VisualizadorRegimenesPoliticos() {
               {EXPLICACIONES[celdaActiva.caractIndex][celdaActiva.regimenIndex]}
             </p>
             <button
+              type="button"
               className={styles.btnCerrar}
               onClick={() => setCeldaActiva(null)}
               aria-label="Cerrar explicación"

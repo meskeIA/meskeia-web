@@ -368,12 +368,13 @@ function TabVertebrados() {
         {CLASES_VERTEBRADOS.map((c) => (
           <button
             key={c.id}
+            type="button"
             className={`${styles.claseCard} ${claseActiva === c.id ? styles.claseCardActive : ''}`}
             onClick={() => setClaseActiva(c.id)}
             aria-pressed={claseActiva === c.id}
             style={{ borderColor: claseActiva === c.id ? c.color : undefined }}
           >
-            <span className={styles.claseIcono}>{c.icono}</span>
+            <span className={styles.claseIcono} aria-hidden="true">{c.icono}</span>
             <span className={styles.claseNombre}>{c.nombre}</span>
             <span className={styles.claseEspecies}>{c.especies}</span>
           </button>
@@ -394,13 +395,14 @@ function TabVertebrados() {
         {/* Badges de características clave */}
         <div className={styles.badgesRow}>
           <span className={clase.termia === 'endotermo' ? styles.badgeEndotermo : styles.badgeEctotermo}>
-            {clase.termia === 'endotermo' ? '🔥 Endotermo' : '❄️ Ectotermo'}
+            <span aria-hidden="true">{clase.termia === 'endotermo' ? '🔥' : '❄️'}</span>{' '}
+            {clase.termia === 'endotermo' ? 'Endotermo' : 'Ectotermo'}
           </span>
           <span className={styles.badge}>
-            ❤️ {clase.camarasCorazon} cámaras
+            <span aria-hidden="true">❤️</span>{' '}{clase.camarasCorazon} cámaras
           </span>
           <span className={styles.badge}>
-            🛡️ {clase.cubierta.split('(')[0].trim()}
+            <span aria-hidden="true">🛡️</span>{' '}{clase.cubierta.split('(')[0].trim()}
           </span>
         </div>
 
@@ -472,12 +474,13 @@ function TabInvertebrados() {
         {PHYLA_INVERTEBRADOS.map((p) => (
           <button
             key={p.id}
+            type="button"
             className={`${styles.phylaCard} ${phylumActivo === p.id ? styles.phylaCardActive : ''}`}
             onClick={() => setPhylumActivo(p.id)}
             aria-pressed={phylumActivo === p.id}
             style={{ borderColor: phylumActivo === p.id ? p.color : undefined }}
           >
-            <span className={styles.phylaIcono}>{p.icono}</span>
+            <span className={styles.phylaIcono} aria-hidden="true">{p.icono}</span>
             <span className={styles.phylaNombre}>{p.nombre}</span>
             <span className={styles.phylaEjemplo}>{p.ejemplo}</span>
           </button>
@@ -495,8 +498,8 @@ function TabInvertebrados() {
         </div>
 
         <div className={styles.phylaBadgesRow}>
-          <span className={styles.badge}>⊕ {phylum.simetria}</span>
-          <span className={styles.badge}>🔵 {phylum.celoma}</span>
+          <span className={styles.badge}><span aria-hidden="true">⊕</span>{' '}{phylum.simetria}</span>
+          <span className={styles.badge}><span aria-hidden="true">🔵</span>{' '}{phylum.celoma}</span>
         </div>
 
         <p className={styles.phylaDescripcion}>{phylum.descripcion}</p>
@@ -546,8 +549,10 @@ function TabComparativa() {
         {FILAS_TABLA.map((f) => (
           <button
             key={f.sistema}
+            type="button"
             className={`${styles.filtroBtn} ${filtraFila === f.sistema ? styles.filtroBtnActivo : ''}`}
             onClick={() => setFiltraFila(filtraFila === f.sistema ? null : f.sistema)}
+            aria-pressed={filtraFila === f.sistema}
           >
             {f.sistema}
           </button>
@@ -561,7 +566,7 @@ function TabComparativa() {
               <th className={styles.thSistema}>Sistema</th>
               {CLASES_VERTEBRADOS.map((c) => (
                 <th key={c.id} className={styles.thClase}>
-                  {c.icono} {c.nombre}
+                  <span aria-hidden="true">{c.icono}</span>{' '}{c.nombre}
                 </th>
               ))}
             </tr>
@@ -736,6 +741,7 @@ export default function VisualizadorReinoAnimalPage() {
           {TABS.map((t) => (
             <button
               key={t.id}
+              type="button"
               role="tab"
               aria-selected={tabActiva === t.id}
               className={`${styles.tab} ${tabActiva === t.id ? styles.tabActive : ''}`}
@@ -785,7 +791,7 @@ export default function VisualizadorReinoAnimalPage() {
                 </thead>
                 <tbody>
                   <tr className={styles.trEdu}>
-                    <td className={styles.tdEduLabel}>🐟 Peces</td>
+                    <td className={styles.tdEduLabel}><span aria-hidden="true">🐟</span>{' '}Peces</td>
                     <td className={styles.tdEdu}>2</td>
                     <td className={styles.tdEdu}>Ectotermo</td>
                     <td className={styles.tdEdu}>Ovíparo acuático</td>
@@ -793,7 +799,7 @@ export default function VisualizadorReinoAnimalPage() {
                     <td className={styles.tdEdu}>Salmón atlántico</td>
                   </tr>
                   <tr className={styles.trEduAlt}>
-                    <td className={styles.tdEduLabel}>🐸 Anfibios</td>
+                    <td className={styles.tdEduLabel}><span aria-hidden="true">🐸</span>{' '}Anfibios</td>
                     <td className={styles.tdEdu}>3</td>
                     <td className={styles.tdEdu}>Ectotermo</td>
                     <td className={styles.tdEdu}>Metamorfosis</td>
@@ -801,7 +807,7 @@ export default function VisualizadorReinoAnimalPage() {
                     <td className={styles.tdEdu}>Rana común</td>
                   </tr>
                   <tr className={styles.trEdu}>
-                    <td className={styles.tdEduLabel}>🦎 Reptiles</td>
+                    <td className={styles.tdEduLabel}><span aria-hidden="true">🦎</span>{' '}Reptiles</td>
                     <td className={styles.tdEdu}>3–4*</td>
                     <td className={styles.tdEdu}>Ectotermo</td>
                     <td className={styles.tdEdu}>Ovíparo terrestre</td>
@@ -809,7 +815,7 @@ export default function VisualizadorReinoAnimalPage() {
                     <td className={styles.tdEdu}>Tortuga laúd</td>
                   </tr>
                   <tr className={styles.trEduAlt}>
-                    <td className={styles.tdEduLabel}>🦅 Aves</td>
+                    <td className={styles.tdEduLabel}><span aria-hidden="true">🦅</span>{' '}Aves</td>
                     <td className={styles.tdEdu}>4</td>
                     <td className={styles.tdEdu}>Endotermo</td>
                     <td className={styles.tdEdu}>Ovípara, incubación</td>
@@ -817,7 +823,7 @@ export default function VisualizadorReinoAnimalPage() {
                     <td className={styles.tdEdu}>Águila real</td>
                   </tr>
                   <tr className={styles.trEdu}>
-                    <td className={styles.tdEduLabel}>🦁 Mamíferos</td>
+                    <td className={styles.tdEduLabel}><span aria-hidden="true">🦁</span>{' '}Mamíferos</td>
                     <td className={styles.tdEdu}>4</td>
                     <td className={styles.tdEdu}>Endotermo</td>
                     <td className={styles.tdEdu}>Vivíparo + lactancia</td>

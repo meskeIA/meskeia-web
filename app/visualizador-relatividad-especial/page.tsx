@@ -159,7 +159,7 @@ function SeccionDilatacion(): React.ReactNode {
       {/* Barra visual de velocidad */}
       <div className={styles.barraVelocidadContainer}>
         <div className={styles.barraVelocidadLabel}>
-          <span>🚀 Nave espacial</span>
+          <span><span aria-hidden="true">🚀</span> Nave espacial</span>
           <span>{velocidad}% c</span>
         </div>
         <div className={styles.barraVelocidadTrack} aria-hidden="true">
@@ -194,6 +194,7 @@ function SeccionDilatacion(): React.ReactNode {
             return (
               <button
                 key={v}
+                type="button"
                 className={styles.referenciaBtn}
                 onClick={() => setVelocidad(v)}
                 aria-label={`Ver ejemplo a ${label}`}
@@ -366,6 +367,7 @@ function SeccionEnergia(): React.ReactNode {
           {(Object.keys(MASAS) as MasaOpcion[]).map((key) => (
             <button
               key={key}
+              type="button"
               className={`${styles.masaBtn} ${masaSeleccionada === key ? styles.masaBtnActivo : ''}`}
               onClick={() => setMasaSeleccionada(key)}
               aria-pressed={masaSeleccionada === key}
@@ -524,6 +526,7 @@ function SeccionGemelos(): React.ReactNode {
         {PASOS_GEMELOS.map((p, i) => (
           <button
             key={i}
+            type="button"
             className={`${styles.pasoIndicadorBtn} ${i === paso ? styles.pasoIndicadorActivo : ''} ${i < paso ? styles.pasoIndicadorCompletado : ''}`}
             onClick={() => setPaso(i)}
             role="tab"
@@ -571,6 +574,7 @@ function SeccionGemelos(): React.ReactNode {
       {/* Botones de navegación */}
       <div className={styles.pasoNavegacion}>
         <button
+          type="button"
           className={styles.pasoNavBtn}
           onClick={() => setPaso((p) => Math.max(0, p - 1))}
           disabled={paso === 0}
@@ -582,6 +586,7 @@ function SeccionGemelos(): React.ReactNode {
           {paso + 1} / {PASOS_GEMELOS.length}
         </span>
         <button
+          type="button"
           className={styles.pasoNavBtn}
           onClick={() => setPaso((p) => Math.min(PASOS_GEMELOS.length - 1, p + 1))}
           disabled={paso === PASOS_GEMELOS.length - 1}
