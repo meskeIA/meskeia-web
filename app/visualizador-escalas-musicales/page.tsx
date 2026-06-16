@@ -343,6 +343,7 @@ export default function VisualizadorEscalasMusicales() {
               {NOTAS_CROMATICAS.map((nota, idx) => (
                 <button
                   key={nota}
+                  type="button"
                   className={`${styles.notaBtn} ${notaRaiz === idx ? styles.notaBtnActiva : ''}`}
                   onClick={() => setNotaRaiz(idx)}
                   aria-pressed={notaRaiz === idx}
@@ -366,6 +367,7 @@ export default function VisualizadorEscalasMusicales() {
                     return (
                       <button
                         key={escalaItem.nombre}
+                        type="button"
                         className={`${styles.escalaBtn} ${escalaSeleccionada === idx ? styles.escalaBtnActiva : ''}`}
                         onClick={() => setEscalaSeleccionada(idx)}
                         aria-pressed={escalaSeleccionada === idx}

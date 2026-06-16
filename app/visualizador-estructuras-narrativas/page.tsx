@@ -187,6 +187,7 @@ export default function VisualizadorEstructurasNarrativasPage() {
         {ESTRUCTURAS.map((e) => (
           <button
             key={e.id}
+            type="button"
             className={`${styles.tabBtn} ${activa === e.id ? styles.tabBtnActive : ''}`}
             onClick={() => setActiva(e.id)}
             role="tab"
@@ -293,19 +294,19 @@ export default function VisualizadorEstructurasNarrativasPage() {
         <h3>Para qué tipo de escritor es cada modelo</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <strong>✍️ Escritor primerizo</strong>
+            <strong><span aria-hidden="true">✍️</span> Escritor primerizo</strong>
             <p>Empezar con la Estructura en 3 Actos o la Pirámide de Freytag. Son los modelos más extendidos en talleres y manuales, y ofrecen una andamiaje claro sin ser demasiado prescriptivos.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🎬 Guionista o escritor de género</strong>
+            <strong><span aria-hidden="true">🎬</span> Guionista o escritor de género</strong>
             <p>Save the Cat proporciona una hoja de ruta detallada que funciona bien en narrativa comercial y de acción. Permite revisar y ajustar cada beat de forma sistemática.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>📚 Escritor literario o experimental</strong>
+            <strong><span aria-hidden="true">📚</span> Escritor literario o experimental</strong>
             <p>El Kishōtenketsu ofrece una alternativa al modelo de conflicto occidental. Útil para cuentos cortos, relatos contemplativos o historias que exploran temas en lugar de resolver problemas.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🔍 Lector y analista literario</strong>
+            <strong><span aria-hidden="true">🔍</span> Lector y analista literario</strong>
             <p>El Viaje del Héroe y la Estructura en 5 Actos son los más útiles para analizar obras clásicas. Campbell permite leer mitos y épicas con una lente universal.</p>
           </div>
         </div>

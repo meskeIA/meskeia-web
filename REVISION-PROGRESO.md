@@ -321,15 +321,15 @@
 | [x] | Test: ¿Qué tipo de lector eres? | `/test-tipo-lector/` | cultura |
 | [x] | Transpositor de Acordes | `/transpositor-acordes/` | cultura, estudiantes |
 | [x] | Urbanismo: Modelos Urbanos, Densidad, Movilidad y Sostenibilidad | `/visualizador-urbanismo/` | cultura, tecnicas |
-| [ ] | Visualizador de Escalas Musicales | `/visualizador-escalas-musicales/` | cultura, estudiantes |
-| [ ] | Visualizador de Estructuras Narrativas | `/visualizador-estructuras-narrativas/` | cultura, estudiantes |
-| [ ] | Visualizador de Focales Fotográficas (14/24/50/85/200 mm) | `/visualizador-focales-fotografia/` | cultura, tecnicas |
+| [x] | Visualizador de Escalas Musicales | `/visualizador-escalas-musicales/` | cultura, estudiantes |
+| [x] | Visualizador de Estructuras Narrativas | `/visualizador-estructuras-narrativas/` | cultura, estudiantes |
+| [x] | Visualizador de Focales Fotográficas (14/24/50/85/200 mm) | `/visualizador-focales-fotografia/` | cultura, tecnicas |
 
 ## Diseño y Contenido (`diseno`) — 45 apps
 
 | Estado | Nombre | URL | Suites |
 |---|---|---|---|
-| [ ] | Analizador de Densidad SEO | `/analizador-densidad-seo/` | diseno |
+| [x] | Analizador de Densidad SEO | `/analizador-densidad-seo/` | diseno |
 | [ ] | Analizador de Títulos SEO | `/analizador-titulos-seo/` | diseno |
 | [ ] | Analizador GEO/AEO | `/analizador-geo/` | diseno |
 | [x] | Calculadora de Aspectos | `/calculadora-aspectos/` | diseno |

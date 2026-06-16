@@ -133,7 +133,7 @@ export default function VisualizadorFocalesFotografiaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1>🔭 Visualizador de Focales Fotográficas</h1>
+        <h1><span aria-hidden="true">🔭</span> Visualizador de Focales Fotográficas</h1>
         <p>
           Compara lado a lado cómo cambia la perspectiva con 14, 24, 50, 85 y 200 mm. El sujeto
           permanece igual; el fondo &quot;respira&quot; según la focal.
@@ -147,6 +147,7 @@ export default function VisualizadorFocalesFotografiaPage() {
           {ESCENAS.map((esc) => (
             <button
               key={esc.id}
+              type="button"
               role="tab"
               aria-selected={escenaId === esc.id}
               className={`${styles.tabBtn} ${escenaId === esc.id ? styles.tabActive : ''}`}
@@ -162,6 +163,7 @@ export default function VisualizadorFocalesFotografiaPage() {
           {SENSORES.map((s) => (
             <button
               key={s.id}
+              type="button"
               className={`${styles.sensorBtn} ${sensorId === s.id ? styles.sensorActive : ''}`}
               onClick={() => setSensorId(s.id)}
               aria-pressed={sensorId === s.id}
@@ -178,7 +180,7 @@ export default function VisualizadorFocalesFotografiaPage() {
 
         <div className={styles.escenaInfo}>
           <strong>
-            {escena.emoji} {escena.nombre}:
+            <span aria-hidden="true">{escena.emoji}</span> {escena.nombre}:
           </strong>{' '}
           {escena.descripcion}
         </div>
@@ -222,7 +224,7 @@ export default function VisualizadorFocalesFotografiaPage() {
         </div>
 
         <div className={styles.notaPerspectiva}>
-          <strong>👀 Lo que estás viendo:</strong> el sujeto principal está al mismo tamaño en las 5
+          <strong><span aria-hidden="true">👀</span> Lo que estás viendo:</strong> el sujeto principal está al mismo tamaño en las 5
           imágenes — lo conseguirías acercándote más con el gran angular y alejándote con el tele.
           Lo que cambia es la <strong>perspectiva</strong>: el fondo se &quot;comprime&quot; o se
           &quot;expande&quot;. No es zoom, es geometría.
@@ -369,7 +371,7 @@ export default function VisualizadorFocalesFotografiaPage() {
                 proporciones faciales agradables.
               </p>
               <p className={styles.faqTip}>
-                💡 En APS-C, el equivalente es ~56 mm. Hay lentes muy luminosas a ese precio.
+                <span aria-hidden="true">💡</span> En APS-C, el equivalente es ~56 mm. Hay lentes muy luminosas a ese precio.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -414,7 +416,7 @@ export default function VisualizadorFocalesFotografiaPage() {
                 combina apertura amplia con focal larga.
               </p>
               <p className={styles.faqTip}>
-                💡 Si quieres bokeh sin gastar en una lente de f/1,4, usa una focal más larga.
+                <span aria-hidden="true">💡</span> Si quieres bokeh sin gastar en una lente de f/1,4, usa una focal más larga.
               </p>
             </div>
           </div>

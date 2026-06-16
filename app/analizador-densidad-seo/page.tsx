@@ -195,7 +195,7 @@ export default function AnalizadorDensidadSeoPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📊 Analizador de Densidad SEO</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📊</span> Analizador de Densidad SEO</h1>
         <p className={styles.subtitle}>
           Analiza la frecuencia de palabras clave y optimiza tu contenido para SEO
         </p>
@@ -213,7 +213,7 @@ export default function AnalizadorDensidadSeoPage() {
       <div className={styles.mainContent}>
         {/* Panel de entrada */}
         <div className={styles.inputPanel}>
-          <h2 className={styles.panelTitle}>✏️ Tu contenido</h2>
+          <h2 className={styles.panelTitle}><span aria-hidden="true">✏️</span> Tu contenido</h2>
 
           <div className={styles.inputGroup}>
             <label className={styles.label}>Palabra clave objetivo (opcional)</label>
@@ -305,9 +305,9 @@ export default function AnalizadorDensidadSeoPage() {
                     </div>
                   </div>
                   <div className={styles.keywordRecommendation}>
-                    {analisis.keywordAnalisis.estado === 'bajo' && '⚠️ '}
-                    {analisis.keywordAnalisis.estado === 'optimo' && '✅ '}
-                    {analisis.keywordAnalisis.estado === 'alto' && '🚨 '}
+                    {analisis.keywordAnalisis.estado === 'bajo' && <span aria-hidden="true">⚠️ </span>}
+                    {analisis.keywordAnalisis.estado === 'optimo' && <span aria-hidden="true">✅ </span>}
+                    {analisis.keywordAnalisis.estado === 'alto' && <span aria-hidden="true">🚨 </span>}
                     {analisis.keywordAnalisis.recomendacion}
                   </div>
                 </div>
@@ -315,7 +315,7 @@ export default function AnalizadorDensidadSeoPage() {
 
               {/* Top palabras */}
               <div className={styles.section}>
-                <h3 className={styles.sectionTitle}>🔤 Top 20 Palabras</h3>
+                <h3 className={styles.sectionTitle}><span aria-hidden="true">🔤</span> Top 20 Palabras</h3>
                 <div className={styles.wordsList}>
                   {analisis.palabrasTop.map((item, index) => (
                     <div key={item.word} className={styles.wordItem}>
@@ -339,7 +339,7 @@ export default function AnalizadorDensidadSeoPage() {
               {/* Frases de 2 palabras */}
               {analisis.bigramas.length > 0 && (
                 <div className={styles.section}>
-                  <h3 className={styles.sectionTitle}>📝 Frases de 2 palabras</h3>
+                  <h3 className={styles.sectionTitle}><span aria-hidden="true">📝</span> Frases de 2 palabras</h3>
                   <div className={styles.phrasesList}>
                     {analisis.bigramas.map((item) => (
                       <div key={item.phrase} className={styles.phraseItem}>
@@ -355,7 +355,7 @@ export default function AnalizadorDensidadSeoPage() {
               {/* Frases de 3 palabras */}
               {analisis.trigramas.length > 0 && (
                 <div className={styles.section}>
-                  <h3 className={styles.sectionTitle}>📄 Frases de 3 palabras</h3>
+                  <h3 className={styles.sectionTitle}><span aria-hidden="true">📄</span> Frases de 3 palabras</h3>
                   <div className={styles.phrasesList}>
                     {analisis.trigramas.map((item) => (
                       <div key={item.phrase} className={styles.phraseItem}>
@@ -370,7 +370,7 @@ export default function AnalizadorDensidadSeoPage() {
             </>
           ) : (
             <div className={styles.placeholder}>
-              <div className={styles.placeholderIcon}>📊</div>
+              <div className={styles.placeholderIcon} aria-hidden="true">📊</div>
               <p>Pega tu texto para analizar la densidad de palabras clave</p>
             </div>
           )}
@@ -379,7 +379,7 @@ export default function AnalizadorDensidadSeoPage() {
 
       {/* Guía de densidad */}
       <div className={styles.densityGuide}>
-        <h3>📏 Guía de Densidad de Keywords</h3>
+        <h3><span aria-hidden="true">📏</span> Guía de Densidad de Keywords</h3>
         <div className={styles.guideItems}>
           <div className={styles.guideItem}>
             <span className={`${styles.guideIndicator} ${styles.densityLow}`}></span>
@@ -458,7 +458,7 @@ export default function AnalizadorDensidadSeoPage() {
               y puede resultar en una bajada drástica de posiciones o incluso desindexación.
             </p>
             <div className={styles.warningBox}>
-              <strong>⚠️ Señales de alerta:</strong>
+              <strong><span aria-hidden="true">⚠️</span> Señales de alerta:</strong>
               <ul>
                 <li>Densidad superior al 3%</li>
                 <li>Texto que suena artificial o robótico</li>
