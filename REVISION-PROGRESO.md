@@ -983,11 +983,11 @@
 | [x] | Calculadora de Sueño | `/calculadora-sueno/` | salud |
 | [x] | Calculadora de Zonas Cardíacas (Karvonen) | `/calculadora-zonas-cardiacas/` | salud, tecnicas |
 | [x] | Calculadora Edad Mascotas | `/calculadora-edad-mascotas/` | salud |
-| [ ] | Calculadora SWOLF — Eficiencia en Natación | `/calculadora-swolf-natacion/` | salud, tecnicas |
+| [x] | Calculadora SWOLF — Eficiencia en Natación | `/calculadora-swolf-natacion/` | salud, tecnicas |
 | [x] | Calculadora Tamaño Adulto Cachorro | `/calculadora-tamano-adulto-perro/` | salud |
-| [ ] | Calculadora Zonas de Entrenamiento — FC por Zona y Karvonen | `/calculadora-zonas-entrenamiento/` | salud |
-| [ ] | Catalasa - La Enzima más Rápida del Cuerpo | `/visualizador-catalasa/` | salud, cultura, estudiantes |
-| [ ] | Cerebro y Emociones - Amígdala, Neurotransmisores y Regulación | `/visualizador-cerebro-emociones/` | salud, estudiantes, cultura |
+| [x] | Calculadora Zonas de Entrenamiento — FC por Zona y Karvonen | `/calculadora-zonas-entrenamiento/` | salud |
+| [x] | Catalasa - La Enzima más Rápida del Cuerpo | `/visualizador-catalasa/` | salud, cultura, estudiantes |
+| [x] | Cerebro y Emociones - Amígdala, Neurotransmisores y Regulación | `/visualizador-cerebro-emociones/` | salud, estudiantes, cultura |
 | [ ] | Checklist de Trámites de Dependencia | `/checklist-tramites-dependencia/` | salud, legal-fiscal |
 | [ ] | Chequeos Médicos Preventivos | `/planificador-chequeos-medicos/` | salud, legal-fiscal |
 | [ ] | Ciclo Cardíaco - Sístole, Diástole y ECG | `/visualizador-corazon-ciclo-cardiaco/` | salud, estudiantes, cultura |

@@ -69,6 +69,7 @@ export default function CalculadoraSwolfNatacionPage() {
             <label className={styles.inputLabel}>Longitud de la piscina</label>
             <div className={styles.selectorPiscina} role="group" aria-label="Seleccionar longitud de piscina">
               <button
+                type="button"
                 className={`${styles.piscinaBtn} ${metrosPiscina === 25 ? styles.piscinaBtnActive : ''}`}
                 onClick={() => setMetrosPiscina(25)}
                 aria-pressed={metrosPiscina === 25}
@@ -76,6 +77,7 @@ export default function CalculadoraSwolfNatacionPage() {
                 25 m
               </button>
               <button
+                type="button"
                 className={`${styles.piscinaBtn} ${metrosPiscina === 50 ? styles.piscinaBtnActive : ''}`}
                 onClick={() => setMetrosPiscina(50)}
                 aria-pressed={metrosPiscina === 50}
@@ -307,7 +309,7 @@ export default function CalculadoraSwolfNatacionPage() {
           <h3 className={styles.eduSubtitle}>Cómo mejorar el índice SWOLF</h3>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <h4>⬇️ Reducir brazadas</h4>
+              <h4><span aria-hidden="true">⬇️</span> Reducir brazadas</h4>
               <p>
                 Trabaja la deslizamiento y el planeado entre brazadas. Ejercicios como
                 el <em>catch-up</em> (esperar a que el brazo avanzado llegue a la cadera
@@ -315,14 +317,14 @@ export default function CalculadoraSwolfNatacionPage() {
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>⏱️ Reducir el tiempo</h4>
+              <h4><span aria-hidden="true">⏱️</span> Reducir el tiempo</h4>
               <p>
                 Mejora la patada, el agarre del agua en la fase de tire y la rotación
                 del cuerpo. Un mejor agarre da más propulsión por brazada sin añadir ciclos.
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🔄 Drills de técnica</h4>
+              <h4><span aria-hidden="true">🔄</span> Drills de técnica</h4>
               <p>
                 <em>Dedos al suelo</em>, <em>bandera de popa</em> (nadar con los pies
                 cruzados) y <em>aletas</em> ayudan a sentir el deslizamiento y a
@@ -330,7 +332,7 @@ export default function CalculadoraSwolfNatacionPage() {
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>📏 Viraje eficiente</h4>
+              <h4><span aria-hidden="true">📏</span> Viraje eficiente</h4>
               <p>
                 El viraje suma tiempo pero no brazadas. Un giro de volteo bien ejecutado
                 puede ahorrar 0,5–1 segundo por largo, lo que mejora el SWOLF directamente.
@@ -395,7 +397,7 @@ export default function CalculadoraSwolfNatacionPage() {
                 deslizamiento.
               </p>
               <p className={styles.faqTip}>
-                💡 Los nadadores de élite suelen nadar con más brazadas que los intermedios
+                <span aria-hidden="true">💡</span> Los nadadores de élite suelen nadar con más brazadas que los intermedios
                 porque su eficiencia por ciclo es mayor y su velocidad hace que el tiempo
                 compense.
               </p>

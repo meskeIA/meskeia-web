@@ -312,6 +312,7 @@ function SeccionEstructuras() {
           {ESTRUCTURAS.map((e) => (
             <button
               key={e.id}
+              type="button"
               className={`${styles.estructuraBtn} ${activa === e.id ? styles.estructuraBtnActiva : ''}`}
               style={{ '--estructura-color': e.color } as React.CSSProperties}
               onClick={() => setActiva(activa === e.id ? null : e.id)}
@@ -339,7 +340,7 @@ function SeccionEstructuras() {
             </div>
             <p className={styles.estructuraDetalleFuncion}>{est.funcion}</p>
             <div className={styles.datoClaveBox}>
-              <span className={styles.datoClaveLabel}>💡 Dato clave</span>
+              <span className={styles.datoClaveLabel}><span aria-hidden="true">💡</span> Dato clave</span>
               <p className={styles.datoClaveTexto}>{est.datoClave}</p>
             </div>
           </div>
@@ -350,22 +351,22 @@ function SeccionEstructuras() {
         <h3 className={styles.triploModeloTitulo}>El modelo del cerebro trino (MacLean)</h3>
         <div className={styles.triploModeloGrid}>
           <div className={styles.triploItem}>
-            <span className={styles.triploIcono}>🦎</span>
+            <span className={styles.triploIcono} aria-hidden="true">🦎</span>
             <strong>Reptiliano</strong>
             <p>Supervivencia, respiración, ritmo cardíaco. Instintos básicos.</p>
           </div>
           <div className={styles.triploItem}>
-            <span className={styles.triploIcono}>🦁</span>
+            <span className={styles.triploIcono} aria-hidden="true">🦁</span>
             <strong>Límbico</strong>
             <p>Emociones, vínculos, memoria emocional. Compartido con mamíferos.</p>
           </div>
           <div className={styles.triploItem}>
-            <span className={styles.triploIcono}>🧠</span>
+            <span className={styles.triploIcono} aria-hidden="true">🧠</span>
             <strong>Neocórtex</strong>
             <p>Razón, lenguaje, planificación. Muy desarrollado en humanos.</p>
           </div>
         </div>
-        <p className={styles.triploNota}>⚠️ Simplificación útil pero no anatómicamente precisa — el cerebro real no funciona por capas separadas.</p>
+        <p className={styles.triploNota}><span aria-hidden="true">⚠️</span> Simplificación útil pero no anatómicamente precisa — el cerebro real no funciona por capas separadas.</p>
       </div>
     </div>
   );
@@ -384,6 +385,7 @@ function SeccionNeurotransmisores() {
         {NEUROTRANSMISORES.map((n) => (
           <button
             key={n.id}
+            type="button"
             className={`${styles.neuroCard} ${activo === n.id ? styles.neuroCardActiva : ''}`}
             style={{ '--neuro-color': n.color } as React.CSSProperties}
             onClick={() => setActivo(activo === n.id ? null : n.id)}
@@ -407,19 +409,19 @@ function SeccionNeurotransmisores() {
             </h3>
             <div className={styles.neuroDetalleGrid}>
               <div className={styles.neuroDetalleItem}>
-                <span className={styles.neuroDetalleLabel}>⚡ Qué lo activa</span>
+                <span className={styles.neuroDetalleLabel}><span aria-hidden="true">⚡</span> Qué lo activa</span>
                 <p>{n.queLoActiva}</p>
               </div>
               <div className={styles.neuroDetalleItem}>
-                <span className={styles.neuroDetalleLabel}>📉 Déficit</span>
+                <span className={styles.neuroDetalleLabel}><span aria-hidden="true">📉</span> Déficit</span>
                 <p>{n.deficit}</p>
               </div>
               <div className={styles.neuroDetalleItem}>
-                <span className={styles.neuroDetalleLabel}>📈 Exceso</span>
+                <span className={styles.neuroDetalleLabel}><span aria-hidden="true">📈</span> Exceso</span>
                 <p>{n.exceso}</p>
               </div>
               <div className={styles.neuroDetalleItem}>
-                <span className={styles.neuroDetalleLabel}>💊 Cómo modularlo</span>
+                <span className={styles.neuroDetalleLabel}><span aria-hidden="true">💊</span> Cómo modularlo</span>
                 <p>{n.modulador}</p>
               </div>
             </div>
@@ -444,8 +446,10 @@ function SeccionCircuitos() {
         {CIRCUITOS.map((c) => (
           <button
             key={c.id}
+            type="button"
             className={`${styles.circuitoSelectorBtn} ${circuito === c.id ? styles.circuitoSelectorBtnActivo : ''}`}
             onClick={() => setCircuito(c.id)}
+            aria-pressed={circuito === c.id}
           >
             <span aria-hidden="true">{c.icono}</span> {c.nombre}
           </button>
@@ -511,6 +515,7 @@ function SeccionRegulacion() {
         {ESTRATEGIAS.map((e) => (
           <div key={e.id} className={styles.regulacionCard}>
             <button
+              type="button"
               className={styles.regulacionCardHeader}
               onClick={() => setActiva(activa === e.id ? null : e.id)}
               aria-expanded={activa === e.id}
@@ -560,7 +565,7 @@ function SeccionRegulacion() {
               <div className={styles.regulacionDetalle}>
                 <p>{e.descripcion}</p>
                 <div className={styles.regulacionEjemploBox}>
-                  <span className={styles.regulacionEjemploLabel}>💬 Ejemplo</span>
+                  <span className={styles.regulacionEjemploLabel}><span aria-hidden="true">💬</span> Ejemplo</span>
                   <p className={styles.regulacionEjemploTexto}>{e.ejemplo}</p>
                 </div>
               </div>
@@ -612,6 +617,7 @@ export default function VisualizadorCerebroEmociones() {
             {SECCIONES.map((s) => (
               <button
                 key={s.id}
+                type="button"
                 role="tab"
                 aria-selected={seccion === s.id}
                 aria-controls={`seccion-${s.id}`}

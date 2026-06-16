@@ -126,7 +126,7 @@ export default function CalculadoraZonasEntrenamientoPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>❤️ Zonas de Entrenamiento</h1>
+        <h1 className={styles.title}><span aria-hidden="true">❤️</span> Zonas de Entrenamiento</h1>
         <p className={styles.subtitle}>
           Calcula tus 5 zonas de frecuencia cardíaca y entrena con precisión
         </p>
@@ -189,15 +189,19 @@ export default function CalculadoraZonasEntrenamientoPage() {
             <p className={styles.metodoLabel}>Método de cálculo:</p>
             <div className={styles.metodoBtns}>
               <button
+                type="button"
                 onClick={() => { setMetodo('simple'); setCalculado(false); }}
                 className={`${styles.metodoBtn} ${metodo === 'simple' ? styles.metodoBtnActivo : ''}`}
+                aria-pressed={metodo === 'simple'}
               >
                 <strong>Fórmula simple</strong>
                 <span>FCmáx = 220 − edad</span>
               </button>
               <button
+                type="button"
                 onClick={() => { setMetodo('karvonen'); setCalculado(false); }}
                 className={`${styles.metodoBtn} ${metodo === 'karvonen' ? styles.metodoBtnActivo : ''}`}
+                aria-pressed={metodo === 'karvonen'}
               >
                 <strong>Fórmula de Karvonen</strong>
                 <span>Usa FC en reposo — más precisa</span>
@@ -206,7 +210,7 @@ export default function CalculadoraZonasEntrenamientoPage() {
           </div>
 
           <div className={styles.btnWrapper}>
-            <button onClick={calcular} className={styles.btnCalcular}>
+            <button type="button" onClick={calcular} className={styles.btnCalcular}>
               Calcular mis zonas →
             </button>
           </div>
@@ -328,7 +332,7 @@ export default function CalculadoraZonasEntrenamientoPage() {
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>📐</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">📐</span>
                   <h3>Fórmula simple (220−edad)</h3>
                 </div>
                 <p className={styles.escenarioTip}>
@@ -337,7 +341,7 @@ export default function CalculadoraZonasEntrenamientoPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🎯</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🎯</span>
                   <h3>Fórmula de Karvonen</h3>
                 </div>
                 <p className={styles.escenarioTip}>
@@ -346,7 +350,7 @@ export default function CalculadoraZonasEntrenamientoPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>⌚</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">⌚</span>
                   <h3>Cómo medir la FC en reposo</h3>
                 </div>
                 <p className={styles.escenarioTip}>
@@ -355,7 +359,7 @@ export default function CalculadoraZonasEntrenamientoPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>⚠️</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">⚠️</span>
                   <h3>Limitación de la fórmula 220−edad</h3>
                 </div>
                 <p className={styles.escenarioTip}>
@@ -369,26 +373,26 @@ export default function CalculadoraZonasEntrenamientoPage() {
             <h2>Preguntas Frecuentes</h2>
             <div className={styles.faqList}>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Cuánto tiempo debería pasar en cada zona?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Cuánto tiempo debería pasar en cada zona?</h4>
                 <p>
                   Depende del objetivo. Para salud general: 70–80% del tiempo en Z1–Z2 y 20–30% en Z3–Z4. Para rendimiento deportivo: la pirámide de polarización (80% baja intensidad / 20% alta) ha demostrado ser más eficaz que el "entrenamiento en zona media" para la mayoría de deportes de resistencia.
                 </p>
                 <p className={styles.faqTip}>💡 El error más común de los amateurs es entrenar demasiado en Z3 — "demasiado duro para adaptarse, demasiado fácil para mejorar".</p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿A qué zona corresponde caminar?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿A qué zona corresponde caminar?</h4>
                 <p>
                   Caminar a paso normal suele situarse en Z1–Z2 (50–70% FCmáx) para la mayoría de adultos. Caminar rápido o en subida puede llegar a Z2–Z3. Aunque la FC absoluta parezca baja, para personas sedentarias o mayores puede ser suficiente estímulo aeróbico.
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Es cierto que la Z2 quema más grasa que la Z4?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Es cierto que la Z2 quema más grasa que la Z4?</h4>
                 <p>
                   En términos de porcentaje de energía procedente de grasas, sí: Z2 usa ~70% grasas / 30% carbohidratos. Z4 usa ~20% grasas / 80% carbohidratos. Pero en total de calorías quemadas, Z4 gana. Para pérdida de peso, la zona importa menos que el déficit calórico total diario.
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Puedo usar estas zonas con la bicicleta o la natación?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Puedo usar estas zonas con la bicicleta o la natación?</h4>
                 <p>
                   Sí, la FC no depende del deporte. Sin embargo, en ciclismo la FC media suele ser 5–10 ppm inferior que corriendo (postura, menos masa muscular implicada). En natación, 10–15 ppm inferior. Si monitorizas con dispositivo, úsalo como referencia en el deporte que practiques.
                 </p>
@@ -441,22 +445,22 @@ export default function CalculadoraZonasEntrenamientoPage() {
             <h2>Claves Prácticas</h2>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📉</span>
+                <span className={styles.tipIcon} aria-hidden="true">📉</span>
                 <h4>FC reposo baja = corazón eficiente</h4>
                 <p>Cada latido bombea más sangre. Ciclistas y corredores de élite tienen FC reposos de 35–45 ppm. No es un objetivo en sí, es una consecuencia del entrenamiento.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🎯</span>
+                <span className={styles.tipIcon} aria-hidden="true">🎯</span>
                 <h4>La Z2 es la zona más subestimada</h4>
                 <p>La mayoría de amateurs va demasiado rápido los días "suaves". Si puedes mantener conversación completa y cómoda, estás en Z2. Si no, ve más despacio.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>⚡</span>
+                <span className={styles.tipIcon} aria-hidden="true">⚡</span>
                 <h4>La Z4 eleva el umbral de lactato</h4>
                 <p>Entrenar justo en el umbral anaeróbico (Z4) permite sostener ritmos más altos antes de "acidificar". Es el trabajo clave para mejorar el ritmo de carrera o marcha.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>😴</span>
+                <span className={styles.tipIcon} aria-hidden="true">😴</span>
                 <h4>El descanso también cuenta</h4>
                 <p>La FC en reposo sube 5–10 ppm cuando hay sobreentrenamiento, mala calidad del sueño o inicio de enfermedad. Monitorízala cada mañana para detectar señales tempranas.</p>
               </div>
@@ -465,7 +469,7 @@ export default function CalculadoraZonasEntrenamientoPage() {
 
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>Errores Frecuentes al Entrenar por Zonas</h3>
             </div>
             <ul className={styles.warningList}>

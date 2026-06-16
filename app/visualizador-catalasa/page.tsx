@@ -243,20 +243,22 @@ export default function VisualizadorCatalasa() {
 
             <div className={styles.botonesReaccion}>
               <button
+                type="button"
                 className={styles.btnActivar}
                 onClick={activarReaccion}
                 disabled={reaccionActiva}
                 aria-label="Activar reacción de la catalasa"
               >
-                {reaccionActiva ? '⚗️ Reacción activa' : '▶ Activar reacción'}
+                {reaccionActiva ? <><span aria-hidden="true">⚗️</span> Reacción activa</> : <><span aria-hidden="true">▶</span> Activar reacción</>}
               </button>
               {reaccionActiva && (
                 <button
+                  type="button"
                   className={styles.btnReiniciar}
                   onClick={reiniciarReaccion}
                   aria-label="Reiniciar simulación"
                 >
-                  ↺ Reiniciar
+                  <span aria-hidden="true">↺</span> Reiniciar
                 </button>
               )}
             </div>
@@ -325,6 +327,7 @@ export default function VisualizadorCatalasa() {
           {SUSTANCIAS.map((s) => (
             <button
               key={s.id}
+              type="button"
               className={`${styles.btnSustancia} ${sustanciaSeleccionada === s.id ? styles.btnSustanciaActivo : ''}`}
               onClick={() => setSustanciaSeleccionada(s.id)}
               aria-pressed={sustanciaSeleccionada === s.id}
@@ -375,7 +378,7 @@ export default function VisualizadorCatalasa() {
                 />
               ))}
             </svg>
-            <p className={styles.vasoLabel}>{sustanciaActual.emoji} {sustanciaActual.nombre}</p>
+            <p className={styles.vasoLabel}><span aria-hidden="true">{sustanciaActual.emoji}</span> {sustanciaActual.nombre}</p>
           </div>
 
           {/* Información y barra */}
