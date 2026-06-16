@@ -603,18 +603,22 @@ export default function QuizBiologiaMolecularPage() {
               {/* Selector de modo */}
               <div className={styles.modoSelector}>
                 <button
+                  type="button"
                   className={`${styles.modoBtn} ${modo === 'examen' ? styles.modoBtnActivo : ''}`}
                   onClick={() => setModo('examen')}
+                  aria-pressed={modo === 'examen'}
                 >
-                  <span className={styles.modoBtnIcon}>📝</span>
+                  <span aria-hidden="true" className={styles.modoBtnIcon}>📝</span>
                   <span className={styles.modoBtnLabel}>Examen completo</span>
                   <span className={styles.modoBtnSub}>30 preguntas</span>
                 </button>
                 <button
+                  type="button"
                   className={`${styles.modoBtn} ${modo === 'practica' ? styles.modoBtnActivo : ''}`}
                   onClick={() => setModo('practica')}
+                  aria-pressed={modo === 'practica'}
                 >
-                  <span className={styles.modoBtnIcon}>🎯</span>
+                  <span aria-hidden="true" className={styles.modoBtnIcon}>🎯</span>
                   <span className={styles.modoBtnLabel}>Práctica por categoría</span>
                   <span className={styles.modoBtnSub}>6 preguntas</span>
                 </button>
@@ -628,6 +632,7 @@ export default function QuizBiologiaMolecularPage() {
                     {CATEGORIAS_ORDEN.map((cat) => (
                       <button
                         key={cat}
+                        type="button"
                         className={`${styles.categoriaBtn} ${categoriaSeleccionada === cat ? styles.categoriaBtnActiva : ''}`}
                         style={
                           categoriaSeleccionada === cat
@@ -635,6 +640,7 @@ export default function QuizBiologiaMolecularPage() {
                             : {}
                         }
                         onClick={() => setCategoriaSeleccionada(cat)}
+                        aria-pressed={categoriaSeleccionada === cat}
                       >
                         {ETIQUETAS_CATEGORIA[cat]}
                       </button>
@@ -654,7 +660,7 @@ export default function QuizBiologiaMolecularPage() {
                 </div>
               )}
 
-              <button className={styles.btnPrimario} onClick={iniciarQuiz}>
+              <button type="button" className={styles.btnPrimario} onClick={iniciarQuiz}>
                 Comenzar quiz →
               </button>
             </div>
@@ -709,6 +715,7 @@ export default function QuizBiologiaMolecularPage() {
                   return (
                     <button
                       key={i}
+                      type="button"
                       className={`${styles.opcion} ${claseExtra}`}
                       onClick={() => responder(i)}
                       disabled={estado === 'respondida'}
@@ -732,7 +739,7 @@ export default function QuizBiologiaMolecularPage() {
                     {respuesta === preguntaActual.correcta ? '✓ ¡Correcto!' : '✗ Incorrecto'}
                   </p>
                   <p className={styles.explicacion}>{preguntaActual.explicacion}</p>
-                  <button className={styles.btnSiguiente} onClick={siguiente}>
+                  <button type="button" className={styles.btnSiguiente} onClick={siguiente}>
                     {indice + 1 >= totalPreguntas ? 'Ver resultados →' : 'Siguiente pregunta →'}
                   </button>
                 </div>
@@ -795,7 +802,7 @@ export default function QuizBiologiaMolecularPage() {
                 </div>
               </div>
 
-              <button className={styles.btnPrimario} onClick={reiniciar}>
+              <button type="button" className={styles.btnPrimario} onClick={reiniciar}>
                 Volver al inicio
               </button>
             </div>

@@ -156,7 +156,7 @@ export default function QuizConceptosFinancierosPage() {
               const nivel = getNivel();
               return (
                 <div className={styles.resultadoHero}>
-                  <span className={styles.resultadoEmoji}>{nivel.emoji}</span>
+                  <span className={styles.resultadoEmoji} aria-hidden="true">{nivel.emoji}</span>
                   <h2>{nivel.titulo}</h2>
                   <div className={styles.resultadoPuntuacion}>
                     {aciertos} / {PREGUNTAS.length}

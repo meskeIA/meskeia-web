@@ -171,6 +171,7 @@ export default function QuizGeografiaEspanaPage() {
                     <button
                       key={d}
                       type="button"
+                      aria-pressed={dificultad === d}
                       className={`${styles.difCard} ${dificultad === d ? styles.difActivo : ''}`}
                       onClick={() => setDificultad(d)}
                     >
@@ -255,8 +256,8 @@ export default function QuizGeografiaEspanaPage() {
             <div className={styles.feedbackPanel} role="alert" aria-live="polite">
               <div className={`${styles.feedbackMensaje} ${seleccionada === preguntaActual.correcta ? styles.feedbackOk : styles.feedbackFail}`}>
                 {seleccionada === preguntaActual.correcta
-                  ? '✅ ¡Correcto!'
-                  : `❌ Incorrecto. La respuesta correcta es: "${preguntaActual.correcta}"`}
+                  ? <><span aria-hidden="true">✅</span>{' ¡Correcto!'}</>
+                  : <><span aria-hidden="true">❌</span>{` Incorrecto. La respuesta correcta es: "${preguntaActual.correcta}"`}</>}
               </div>
               {preguntaActual.explicacion && (
                 <p className={styles.explicacionTexto}>{preguntaActual.explicacion}</p>
@@ -302,7 +303,7 @@ export default function QuizGeografiaEspanaPage() {
                 {errores.map((e, i) => (
                   <div key={i} className={styles.errorItem}>
                     <span className={styles.errorPregunta}>{e.pregunta}</span>
-                    <span className={styles.errorCorrecta}>✓ {e.correcta}</span>
+                    <span className={styles.errorCorrecta}><span aria-hidden="true">✓</span> {e.correcta}</span>
                   </div>
                 ))}
               </div>
@@ -504,7 +505,7 @@ export default function QuizGeografiaEspanaPage() {
 
         {/* Warning */}
         <section className={styles.warningBox}>
-          <h2>⚠️ Sobre el contenido de este quiz</h2>
+          <h2><span aria-hidden="true">⚠️</span> Sobre el contenido de este quiz</h2>
           <div className={styles.warningGrid}>
             {[
               { titulo: 'Las preguntas están basadas en datos oficiales', desc: 'Todas las preguntas están verificadas con datos del INE, IGN y fuentes oficiales. Capitales, longitudes de ríos y altitudes se corresponden con registros actualizados.' },

@@ -405,14 +405,18 @@ export default function QuizComplejidadAlgoritmosPage() {
                 <p className={styles.labelModo}>Modo de juego:</p>
                 <div className={styles.botonesModо}>
                   <button
+                    type="button"
                     className={`${styles.btnModo} ${modo === 'examen' ? styles.btnModoActivo : ''}`}
                     onClick={() => setModo('examen')}
+                    aria-pressed={modo === 'examen'}
                   >
                     Examen completo (25)
                   </button>
                   <button
+                    type="button"
                     className={`${styles.btnModo} ${modo === 'practica' ? styles.btnModoActivo : ''}`}
                     onClick={() => setModo('practica')}
+                    aria-pressed={modo === 'practica'}
                   >
                     Práctica por categoría (5)
                   </button>
@@ -426,8 +430,10 @@ export default function QuizComplejidadAlgoritmosPage() {
                     {TODAS_CATEGORIAS.map(cat => (
                       <button
                         key={cat}
+                        type="button"
                         className={`${styles.btnCategoria} ${styles[`cat_${cat.replace(/-/g, '_')}`]} ${categoriaSeleccionada === cat ? styles.btnCategoriaActivo : ''}`}
                         onClick={() => setCategoriaSeleccionada(cat)}
+                        aria-pressed={categoriaSeleccionada === cat}
                       >
                         {ETIQUETAS_CATEGORIA[cat]}
                       </button>
@@ -444,7 +450,7 @@ export default function QuizComplejidadAlgoritmosPage() {
                 ))}
               </div>
 
-              <button className={styles.btnPrimario} onClick={iniciarQuiz}>
+              <button type="button" className={styles.btnPrimario} onClick={iniciarQuiz}>
                 {modo === 'examen' ? 'Comenzar examen →' : `Practicar ${ETIQUETAS_CATEGORIA[categoriaSeleccionada]} →`}
               </button>
             </div>
@@ -497,6 +503,7 @@ export default function QuizComplejidadAlgoritmosPage() {
                   return (
                     <button
                       key={i}
+                      type="button"
                       className={claseOpcion}
                       onClick={() => responder(i)}
                       disabled={haRespondido}
@@ -521,7 +528,7 @@ export default function QuizComplejidadAlgoritmosPage() {
                     {seleccionada === preguntaActual.correcta ? '✓ ¡Correcto!' : '✗ Incorrecto'}
                   </p>
                   <p className={styles.explicacionFeedback}>{preguntaActual.explicacion}</p>
-                  <button className={styles.btnSiguiente} onClick={siguiente}>
+                  <button type="button" className={styles.btnSiguiente} onClick={siguiente}>
                     {indice + 1 >= preguntas.length ? 'Ver resultados →' : 'Siguiente pregunta →'}
                   </button>
                 </div>
@@ -586,10 +593,10 @@ export default function QuizComplejidadAlgoritmosPage() {
               )}
 
               <div className={styles.botonesResultado}>
-                <button className={styles.btnPrimario} onClick={iniciarQuiz}>
+                <button type="button" className={styles.btnPrimario} onClick={iniciarQuiz}>
                   Repetir quiz
                 </button>
-                <button className={styles.btnSecundario} onClick={reiniciar}>
+                <button type="button" className={styles.btnSecundario} onClick={reiniciar}>
                   Cambiar modo
                 </button>
               </div>

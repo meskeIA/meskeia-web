@@ -519,11 +519,11 @@
 | [x] | Plegamiento de Proteínas: Estructura y Enfermedades | `/visualizador-proteinas-plegamiento/` | estudiantes, cultura |
 | [x] | Polímeros y Materiales: Plásticos, Propiedades y Reciclaje | `/visualizador-polimeros-materiales/` | estudiantes, tecnicas |
 | [x] | Química Orgánica: Grupos Funcionales y Reacciones Interactivas | `/visualizador-quimica-organica/` | estudiantes, cultura, tecnicas |
-| [ ] | Quiz Biología Molecular — ADN, ARN, Replicación y Traducción | `/quiz-biologia-molecular/` | estudiantes, cultura |
-| [ ] | Quiz Complejidad Algorítmica — Big O, Ordenación y Estructuras de Datos | `/quiz-complejidad-algoritmos/` | estudiantes, tecnicas |
-| [ ] | Quiz de Conceptos Financieros | `/quiz-conceptos-financieros/` | estudiantes, finanzas |
+| [x] | Quiz Biología Molecular — ADN, ARN, Replicación y Traducción | `/quiz-biologia-molecular/` | estudiantes, cultura |
+| [x] | Quiz Complejidad Algorítmica — Big O, Ordenación y Estructuras de Datos | `/quiz-complejidad-algoritmos/` | estudiantes, tecnicas |
+| [x] | Quiz de Conceptos Financieros | `/quiz-conceptos-financieros/` | estudiantes, finanzas |
 | [x] | Quiz Figuras Retóricas | `/quiz-figuras-retoricas/` | estudiantes, juegos |
-| [ ] | Quiz Geografía de España | `/quiz-geografia-espana/` | estudiantes |
+| [x] | Quiz Geografía de España | `/quiz-geografia-espana/` | estudiantes |
 | [ ] | Quiz Historia de España | `/quiz-historia-espana/` | estudiantes |
 | [ ] | Quiz Países y Capitales | `/quiz-paises-capitales/` | estudiantes, juegos |
 | [ ] | Quiz Reinos de la Naturaleza | `/quiz-reinos-naturaleza/` | estudiantes, juegos |
