@@ -328,6 +328,7 @@ export default function TestTipoLector() {
               {PREGUNTAS[indice].opciones.map((opcion, i) => (
                 <button
                   key={i}
+                  type="button"
                   className={`${styles.opcion} ${seleccionada === i ? styles.opcionSeleccionada : ''}`}
                   onClick={() => handleOpcion(i)}
                   aria-pressed={seleccionada === i}
@@ -339,6 +340,7 @@ export default function TestTipoLector() {
             </div>
 
             <button
+              type="button"
               className={styles.btnSiguiente}
               onClick={handleSiguiente}
               disabled={seleccionada === null}
@@ -365,7 +367,7 @@ export default function TestTipoLector() {
                 <div className={styles.resultadoGrid}>
                   {/* Rasgos */}
                   <div className={styles.resultadoBloque}>
-                    <h3 className={styles.resultadoBloqueTitle}>📌 Te reconocerás en esto</h3>
+                    <h3 className={styles.resultadoBloqueTitle}><span aria-hidden="true">📌</span> Te reconocerás en esto</h3>
                     <ul className={styles.rasgosList}>
                       {resultado.rasgos.map(r => (
                         <li key={r} className={styles.rasgoItem}>{r}</li>
@@ -375,14 +377,14 @@ export default function TestTipoLector() {
 
                   {/* Géneros */}
                   <div className={styles.resultadoBloque}>
-                    <h3 className={styles.resultadoBloqueTitle}>📚 Tus géneros</h3>
+                    <h3 className={styles.resultadoBloqueTitle}><span aria-hidden="true">📚</span> Tus géneros</h3>
                     <div className={styles.generosWrap}>
                       {resultado.generos.map(g => (
                         <span key={g} className={styles.generoTag} style={{ borderColor: resultado.color, color: resultado.color }}>{g}</span>
                       ))}
                     </div>
 
-                    <h3 className={styles.resultadoBloqueTitle} style={{ marginTop: '1.25rem' }}>✒️ Autores que te gustarán</h3>
+                    <h3 className={styles.resultadoBloqueTitle} style={{ marginTop: '1.25rem' }}><span aria-hidden="true">✒️</span> Autores que te gustarán</h3>
                     <div className={styles.autoresList}>
                       {resultado.autores.map(a => (
                         <span key={a} className={styles.autorItem}>{a}</span>
@@ -393,7 +395,7 @@ export default function TestTipoLector() {
 
                 {/* Lecturas */}
                 <div className={styles.lecturasBloque}>
-                  <h3 className={styles.resultadoBloqueTitle}>📖 Lecturas recomendadas para ti</h3>
+                  <h3 className={styles.resultadoBloqueTitle}><span aria-hidden="true">📖</span> Lecturas recomendadas para ti</h3>
                   <div className={styles.lecturasGrid}>
                     {resultado.lecturas.map(l => (
                       <div key={l.titulo} className={styles.lecturaCard} style={{ borderLeftColor: resultado.color }}>
@@ -410,8 +412,8 @@ export default function TestTipoLector() {
                   <p className={styles.consejoTexto}>{resultado.consejo}</p>
                 </div>
 
-                <button className={styles.btnReiniciar} onClick={handleReiniciar}>
-                  🔄 Repetir el test
+                <button type="button" className={styles.btnReiniciar} onClick={handleReiniciar}>
+                  <span aria-hidden="true">🔄</span> Repetir el test
                 </button>
               </div>
             </div>
@@ -436,11 +438,11 @@ export default function TestTipoLector() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr><td>🔍 El Detective</td><td>Resolver la trama</td><td>Thriller, negro, misterio</td><td>Final predecible</td><td>Christie, Larsson, Flynn</td></tr>
-                  <tr><td>🌌 El Explorador</td><td>Salir del mundo real</td><td>Fantasía, sci-fi, histórica</td><td>Ambientación pobre</td><td>Tolkien, Le Guin, Follett</td></tr>
-                  <tr><td>❤️ El Empático</td><td>Personajes verdaderos</td><td>Novela contemporánea, drama</td><td>Personajes planos</td><td>Ferrante, Rooney, Munro</td></tr>
-                  <tr><td>✒️ El Esteta</td><td>La belleza del lenguaje</td><td>Novela literaria, modernismo</td><td>Prosa descuidada</td><td>Nabokov, Woolf, Borges</td></tr>
-                  <tr><td>💡 El Pensador</td><td>Ideas transformadoras</td><td>Ficción filosófica, ensayo</td><td>Sin profundidad</td><td>Dostoievski, Camus, Kundera</td></tr>
+                  <tr><td><span aria-hidden="true">🔍</span> El Detective</td><td>Resolver la trama</td><td>Thriller, negro, misterio</td><td>Final predecible</td><td>Christie, Larsson, Flynn</td></tr>
+                  <tr><td><span aria-hidden="true">🌌</span> El Explorador</td><td>Salir del mundo real</td><td>Fantasía, sci-fi, histórica</td><td>Ambientación pobre</td><td>Tolkien, Le Guin, Follett</td></tr>
+                  <tr><td><span aria-hidden="true">❤️</span> El Empático</td><td>Personajes verdaderos</td><td>Novela contemporánea, drama</td><td>Personajes planos</td><td>Ferrante, Rooney, Munro</td></tr>
+                  <tr><td><span aria-hidden="true">✒️</span> El Esteta</td><td>La belleza del lenguaje</td><td>Novela literaria, modernismo</td><td>Prosa descuidada</td><td>Nabokov, Woolf, Borges</td></tr>
+                  <tr><td><span aria-hidden="true">💡</span> El Pensador</td><td>Ideas transformadoras</td><td>Ficción filosófica, ensayo</td><td>Sin profundidad</td><td>Dostoievski, Camus, Kundera</td></tr>
                 </tbody>
               </table>
             </div>
@@ -450,35 +452,35 @@ export default function TestTipoLector() {
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcono}>🔍</span>
+                  <span className={styles.escenarioIcono} aria-hidden="true">🔍</span>
                   <h4>El Detective elige un libro</h4>
                 </div>
                 <p>Lee la contraportada buscando el gancho de la trama. Si hay un crimen, una conspiración o un secreto, ya está convencido.</p>
-                <p className={styles.escenarioTip}>💡 Prueba a leer un clásico literario como si fuera un thriller: siempre hay un secreto que descubrir.</p>
+                <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> Prueba a leer un clásico literario como si fuera un thriller: siempre hay un secreto que descubrir.</p>
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcono}>🌌</span>
+                  <span className={styles.escenarioIcono} aria-hidden="true">🌌</span>
                   <h4>El Explorador elige un libro</h4>
                 </div>
                 <p>Busca el mapa al principio. Si hay un glosario de términos inventados, mejor. La sinopsis le interesa menos que el mundo que promete.</p>
-                <p className={styles.escenarioTip}>💡 La novela histórica rigurosa puede darte mundos tan ricos como la mejor fantasía.</p>
+                <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> La novela histórica rigurosa puede darte mundos tan ricos como la mejor fantasía.</p>
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcono}>❤️</span>
+                  <span className={styles.escenarioIcono} aria-hidden="true">❤️</span>
                   <h4>El Empático elige un libro</h4>
                 </div>
                 <p>Pregunta a alguien de confianza: «¿Este libro te ha emocionado?». Si la respuesta es sí, y si conoce a quién le pregunta, el libro es suyo.</p>
-                <p className={styles.escenarioTip}>💡 Los personajes más complejos están en la novela literaria: merece la pena salir del género de confort.</p>
+                <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> Los personajes más complejos están en la novela literaria: merece la pena salir del género de confort.</p>
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcono}>💡</span>
+                  <span className={styles.escenarioIcono} aria-hidden="true">💡</span>
                   <h4>El Pensador elige un libro</h4>
                 </div>
                 <p>Lee el índice, el prólogo, las últimas líneas. Quiere saber si hay algo que no sabía antes de empezar. La promesa de una idea nueva basta.</p>
-                <p className={styles.escenarioTip}>💡 La mejor ficción filosófica es también un thriller de ideas: Dostoievski, Kafka, Saramago.</p>
+                <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> La mejor ficción filosófica es también un thriller de ideas: Dostoievski, Kafka, Saramago.</p>
               </div>
             </div>
 
@@ -540,32 +542,32 @@ export default function TestTipoLector() {
             <h3>Consejos por arquetipo</h3>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>🔍</span>
+                <span className={styles.tipIcono} aria-hidden="true">🔍</span>
                 <h4>Detective</h4>
                 <p>Prueba el thriller histórico (Arturo Pérez-Reverte) o el noir escandinavo: más psicología, menos acción.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>🌌</span>
+                <span className={styles.tipIcono} aria-hidden="true">🌌</span>
                 <h4>Explorador</h4>
                 <p>La novela histórica rigurosa puede darte mundos tan ricos como la mejor fantasía épica.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>❤️</span>
+                <span className={styles.tipIcono} aria-hidden="true">❤️</span>
                 <h4>Empático</h4>
                 <p>Lee autoficción: las narraciones en primera persona de Ferrante, Knausgård o Ernaux te darán personajes sin filtro.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>✒️</span>
+                <span className={styles.tipIcono} aria-hidden="true">✒️</span>
                 <h4>Esteta</h4>
                 <p>Colecciona traducciones: la misma obra puede sonar completamente diferente según el traductor.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>💡</span>
+                <span className={styles.tipIcono} aria-hidden="true">💡</span>
                 <h4>Pensador</h4>
                 <p>Alterna ficción y ensayo: leer "La náusea" de Sartre y su ensayo "El existencialismo es un humanismo" en paralelo dobla el efecto.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>📚</span>
+                <span className={styles.tipIcono} aria-hidden="true">📚</span>
                 <h4>Todos</h4>
                 <p>El mejor libro siempre es el que te da algo que los del mismo género no te dan. Sal del perfil una vez al año.</p>
               </div>
@@ -574,7 +576,7 @@ export default function TestTipoLector() {
             {/* Warning box */}
             <div className={styles.warningBox}>
               <div className={styles.warningHeader}>
-                <span className={styles.warningIcono}>⚠️</span>
+                <span className={styles.warningIcono} aria-hidden="true">⚠️</span>
                 <h4>Errores frecuentes al elegir lecturas</h4>
               </div>
               <ul className={styles.warningList}>

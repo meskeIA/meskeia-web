@@ -409,6 +409,7 @@ function TabModelos() {
         {modelos.map((m) => (
           <button
             key={m.id}
+            type="button"
             className={`${styles.modeloBtn} ${modelo === m.id ? styles.modeloBtnActivo : ''}`}
             onClick={() => handleModelo(m.id)}
             aria-pressed={modelo === m.id}
@@ -675,6 +676,7 @@ function TabMovilidad() {
         {tiposCiudad.map((t) => (
           <button
             key={t.id}
+            type="button"
             className={`${styles.modeloBtn} ${tipoCiudad === t.id ? styles.modeloBtnActivo : ''}`}
             onClick={() => setTipoCiudad(t.id)}
             aria-pressed={tipoCiudad === t.id}
@@ -688,6 +690,7 @@ function TabMovilidad() {
         {MODOS_TRANSPORTE.map((m) => (
           <button
             key={m.id}
+            type="button"
             role="listitem"
             className={`${styles.movilidadCard} ${modoId === m.id ? styles.movilidadCardActivo : ''}`}
             onClick={() => setModoId(m.id)}
@@ -718,7 +721,7 @@ function TabMovilidad() {
           </p>
         </div>
         <div className={styles.movilidadStats}>
-          <h3 className={styles.sectionTitle}>{modoActual.icono} {modoActual.nombre}</h3>
+          <h3 className={styles.sectionTitle}><span aria-hidden="true">{modoActual.icono}</span> {modoActual.nombre}</h3>
           <div className={styles.statRow}><span>Velocidad en ciudad {tipoCiudad}</span><strong>{velocidad} km/h</strong></div>
           <div className={styles.statRow}><span>Coste por km</span><strong>{modoActual.costePorKm === 0 ? 'Gratuito' : `${modoActual.costePorKm.toFixed(2).replace('.', ',')} €`}</strong></div>
           <div className={styles.statRow}><span>Emisiones CO₂</span><strong>{modoActual.emisionesCO2} g/km</strong></div>
@@ -900,6 +903,7 @@ export default function VisualizadorUrbanismo() {
           {tabs.map((tab) => (
             <button
               key={tab.id}
+              type="button"
               role="tab"
               aria-selected={tabActiva === tab.id}
               className={`${styles.tabBtn} ${tabActiva === tab.id ? styles.tabBtnActivo : ''}`}

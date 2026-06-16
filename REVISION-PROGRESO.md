@@ -317,10 +317,10 @@
 | [x] | Simulador de Fotografía: Triángulo de Exposición | `/simulador-fotografia/` | cultura, tecnicas |
 | [x] | Termodinámica Química: ΔG, Equilibrio y Le Chatelier | `/visualizador-termodinamica-quimica/` | cultura, estudiantes, tecnicas |
 | [x] | Test de Dependencia Tecnológica | `/test-dependencia-tecnologica/` | cultura, productividad |
-| [ ] | Test de Pensamiento de Grupo | `/test-pensamiento-grupo/` | cultura, productividad |
-| [ ] | Test: ¿Qué tipo de lector eres? | `/test-tipo-lector/` | cultura |
-| [ ] | Transpositor de Acordes | `/transpositor-acordes/` | cultura, estudiantes |
-| [ ] | Urbanismo: Modelos Urbanos, Densidad, Movilidad y Sostenibilidad | `/visualizador-urbanismo/` | cultura, tecnicas |
+| [x] | Test de Pensamiento de Grupo | `/test-pensamiento-grupo/` | cultura, productividad |
+| [x] | Test: ¿Qué tipo de lector eres? | `/test-tipo-lector/` | cultura |
+| [x] | Transpositor de Acordes | `/transpositor-acordes/` | cultura, estudiantes |
+| [x] | Urbanismo: Modelos Urbanos, Densidad, Movilidad y Sostenibilidad | `/visualizador-urbanismo/` | cultura, tecnicas |
 | [ ] | Visualizador de Escalas Musicales | `/visualizador-escalas-musicales/` | cultura, estudiantes |
 | [ ] | Visualizador de Estructuras Narrativas | `/visualizador-estructuras-narrativas/` | cultura, estudiantes |
 | [ ] | Visualizador de Focales Fotográficas (14/24/50/85/200 mm) | `/visualizador-focales-fotografia/` | cultura, tecnicas |

@@ -159,7 +159,7 @@ export default function TranspositorAcordesPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🎸 Transpositor de Acordes</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🎸</span> Transpositor de Acordes</h1>
         <p className={styles.subtitle}>
           Transpón los acordes de cualquier canción a otro tono al instante. Escribe los acordes, elige el tono destino y obtén la versión transpuesta.
         </p>
@@ -217,6 +217,7 @@ export default function TranspositorAcordesPage() {
             {PROGRESIONES.map(p => (
               <button
                 key={p.nombre}
+                type="button"
                 className={styles.progresionBtn}
                 onClick={() => aplicarProgresion(p.grados)}
                 title={p.descripcion}
@@ -255,12 +256,13 @@ export default function TranspositorAcordesPage() {
                 : `Acordes transpuestos a ${tonoDestino}`}
             </span>
             <button
+              type="button"
               className={`${styles.copiarBtn} ${copiado ? styles.copiarBtnCopiado : ''}`}
               onClick={copiarResultado}
               aria-label="Copiar acordes transpuestos"
               disabled={!acordesTranspuestos.trim()}
             >
-              {copiado ? '✓ Copiado' : '📋 Copiar'}
+              <span aria-hidden="true">{copiado ? '✓' : '📋'}</span> {copiado ? 'Copiado' : 'Copiar'}
             </button>
           </div>
           <div className={styles.resultadoTexto} aria-live="polite">
@@ -436,7 +438,7 @@ export default function TranspositorAcordesPage() {
         {/* 6. Warning box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             Errores frecuentes al transponer acordes
           </div>
           <ul className={styles.warningList}>
