@@ -491,11 +491,12 @@ export default function VisualizadorDigestionNutrientesPage() {
                       <span className={styles.microNombre}>{mn.nombre}</span>
                       {mn.solubilidad && (
                         <span className={`${styles.microBadge} ${mn.solubilidad === 'hidrosoluble' ? styles.badgeHidro : styles.badgeLipo}`}>
-                          {mn.solubilidad === 'hidrosoluble' ? '💧 Hidrosoluble' : '🫒 Liposoluble'}
+                          <span aria-hidden="true">{mn.solubilidad === 'hidrosoluble' ? '💧' : '🫒'}</span>{' '}
+                          {mn.solubilidad === 'hidrosoluble' ? 'Hidrosoluble' : 'Liposoluble'}
                         </span>
                       )}
                       {mn.tipo === 'mineral' && (
-                        <span className={`${styles.microBadge} ${styles.badgeMineral}`}>⚙️ Mineral</span>
+                        <span className={`${styles.microBadge} ${styles.badgeMineral}`}><span aria-hidden="true">⚙️</span>{' '}Mineral</span>
                       )}
                     </div>
                   </div>

@@ -334,14 +334,16 @@ function TabCampo() {
 
       <div className={styles.botonRow}>
         <button
+          type="button"
           className={styles.btnPrimario}
           onClick={animar}
           disabled={animando}
           aria-label="Animar solución desde la condición inicial"
         >
-          {animando ? 'Animando…' : '▶ Animar solución'}
+          {animando ? 'Animando…' : <><span aria-hidden="true">▶</span> Animar solución</>}
         </button>
         <button
+          type="button"
           className={styles.btnSecundario}
           onClick={() => setPuntosVisibles(61)}
           aria-label="Mostrar solución completa"
@@ -473,11 +475,11 @@ function TabLotkaVolterra() {
           </div>
 
           <div className={styles.botonRow}>
-            <button className={styles.btnPrimario} onClick={animar} disabled={animando}
+            <button type="button" className={styles.btnPrimario} onClick={animar} disabled={animando}
               aria-label="Animar simulación Lotka-Volterra">
-              {animando ? 'Simulando…' : '▶ Animar'}
+              {animando ? 'Simulando…' : <><span aria-hidden="true">▶</span> Animar</>}
             </button>
-            <button className={styles.btnSecundario} onClick={() => setVisibles(300)}
+            <button type="button" className={styles.btnSecundario} onClick={() => setVisibles(300)}
               aria-label="Ver resultado completo">
               Ver completo
             </button>
@@ -592,20 +594,22 @@ function TabAplicaciones() {
       {/* Subtabs */}
       <div className={styles.subtabs} role="tablist" aria-label="Aplicaciones">
         <button
+          type="button"
           role="tab"
           aria-selected={subtab === 'enfriamiento'}
           className={subtab === 'enfriamiento' ? styles.subtabActivo : styles.subtab}
           onClick={() => setSubtab('enfriamiento')}
         >
-          ☕ Enfriamiento Newton
+          <span aria-hidden="true">☕</span> Enfriamiento Newton
         </button>
         <button
+          type="button"
           role="tab"
           aria-selected={subtab === 'rc'}
           className={subtab === 'rc' ? styles.subtabActivo : styles.subtab}
           onClick={() => setSubtab('rc')}
         >
-          ⚡ Circuito RC
+          <span aria-hidden="true">⚡</span> Circuito RC
         </button>
       </div>
 
@@ -685,11 +689,13 @@ function TabAplicaciones() {
           </div>
           <div className={styles.modoToggle}>
             <button
+              type="button"
               className={cargando ? styles.btnPrimario : styles.btnSecundario}
               onClick={() => setCargando(true)}
               aria-pressed={cargando}
             >Carga</button>
             <button
+              type="button"
               className={!cargando ? styles.btnPrimario : styles.btnSecundario}
               onClick={() => setCargando(false)}
               aria-pressed={!cargando}
@@ -760,6 +766,7 @@ export default function VisualizadorEcuacionesDiferenciales() {
         {TABS.map(t => (
           <button
             key={t.id}
+            type="button"
             role="tab"
             aria-selected={tab === t.id}
             className={tab === t.id ? styles.tabActivo : styles.tabBtn}

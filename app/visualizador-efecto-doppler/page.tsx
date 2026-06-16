@@ -196,10 +196,10 @@ export default function VisualizadorEfectoDoppler(): React.ReactNode {
             onClick={() => setTab(t)}
             className={`${styles.tab} ${tab === t ? styles.tabActive : ''}`}
           >
-            {t === 'efecto' && '🌊 El efecto'}
-            {t === 'slider' && '🎚️ Interactivo'}
-            {t === 'aplicaciones' && '📡 Aplicaciones'}
-            {t === 'cosmos' && '🌌 Cosmos'}
+            {t === 'efecto' && <><span aria-hidden="true">🌊</span> El efecto</>}
+            {t === 'slider' && <><span aria-hidden="true">🎚️</span> Interactivo</>}
+            {t === 'aplicaciones' && <><span aria-hidden="true">📡</span> Aplicaciones</>}
+            {t === 'cosmos' && <><span aria-hidden="true">🌌</span> Cosmos</>}
           </button>
         ))}
       </nav>
@@ -311,6 +311,8 @@ export default function VisualizadorEfectoDoppler(): React.ReactNode {
                 ].map(c => (
                   <button
                     key={c.v}
+                    type="button"
+                    aria-pressed={velocidadFuente === c.v}
                     onClick={() => setVelocidadFuente(c.v)}
                     className={`${styles.casoBtn} ${velocidadFuente === c.v ? styles.casoBtnActive : ''}`}
                   >

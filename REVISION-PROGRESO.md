@@ -432,10 +432,10 @@
 | [x] | Curso de Redacción Académica | `/curso-redaccion-academica/` | estudiantes |
 | [x] | De dónde Viene tu Camiseta | `/visualizador-origen-camiseta/` | estudiantes, cultura |
 | [x] | Diabetes: Mecanismo Biológico de Insulina y Glucagón | `/visualizador-diabetes-mecanismo/` | estudiantes, cultura, salud |
-| [ ] | Digestión y Nutrientes - De la Comida a la Célula | `/visualizador-digestion-nutrientes/` | estudiantes, cultura, salud |
-| [ ] | Ecosistemas - El Flujo de Energía | `/visualizador-ecosistema/` | estudiantes, cultura |
-| [ ] | Ecuaciones Diferenciales: Campos de Dirección y Lotka-Volterra | `/visualizador-ecuaciones-diferenciales/` | estudiantes, tecnicas |
-| [ ] | Efecto Doppler: De las Sirenas al Redshift de Galaxias | `/visualizador-efecto-doppler/` | estudiantes, cultura |
+| [x] | Digestión y Nutrientes - De la Comida a la Célula | `/visualizador-digestion-nutrientes/` | estudiantes, cultura, salud |
+| [x] | Ecosistemas - El Flujo de Energía | `/visualizador-ecosistema/` | estudiantes, cultura |
+| [x] | Ecuaciones Diferenciales: Campos de Dirección y Lotka-Volterra | `/visualizador-ecuaciones-diferenciales/` | estudiantes, tecnicas |
+| [x] | Efecto Doppler: De las Sirenas al Redshift de Galaxias | `/visualizador-efecto-doppler/` | estudiantes, cultura |
 | [ ] | El Árbol de la Vida Animal | `/visualizador-arbol-vida/` | estudiantes, cultura |
 | [ ] | El Carbono: Diamante, Grafeno y la Molécula de la Vida | `/visualizador-carbono/` | estudiantes, cultura |
 | [ ] | El Ciclo del Agua - El Viaje Infinito de cada Gota | `/visualizador-ciclo-agua/` | estudiantes, cultura |
