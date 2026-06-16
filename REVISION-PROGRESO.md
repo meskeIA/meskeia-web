@@ -382,10 +382,10 @@
 | [x] | Adaptaciones de las Plantas — Hábitats Extremos y Carnívoras | `/visualizador-adaptaciones-plantas/` | estudiantes, cultura, salud |
 | [x] | ADN y Código Genético - De la Doble Hélice a la Proteína | `/visualizador-adn-codigo-genetico/` | estudiantes, cultura |
 | [x] | Agujeros Negros: Anatomía, Hawking y Espaguetización | `/visualizador-agujeros-negros/` | estudiantes, cultura |
-| [ ] | Álgebra Lineal: Vectores, Transformaciones y Eigenvalores | `/visualizador-algebra-lineal/` | estudiantes, tecnicas |
-| [ ] | Alzheimer y Parkinson: Mecanismo Neurobiológico | `/visualizador-alzheimer-parkinson/` | estudiantes, cultura, salud |
-| [ ] | Anatomía de una Flor - De la Polinización al Fruto | `/visualizador-anatomia-flor/` | estudiantes, cultura |
-| [ ] | Arquitectura del Computador — CPU, Ciclo FDE y Jerarquía de Memoria | `/visualizador-arquitectura-computador/` | estudiantes, tecnicas |
+| [x] | Álgebra Lineal: Vectores, Transformaciones y Eigenvalores | `/visualizador-algebra-lineal/` | estudiantes, tecnicas |
+| [x] | Alzheimer y Parkinson: Mecanismo Neurobiológico | `/visualizador-alzheimer-parkinson/` | estudiantes, cultura, salud |
+| [x] | Anatomía de una Flor - De la Polinización al Fruto | `/visualizador-anatomia-flor/` | estudiantes, cultura |
+| [x] | Arquitectura del Computador — CPU, Ciclo FDE y Jerarquía de Memoria | `/visualizador-arquitectura-computador/` | estudiantes, tecnicas |
 | [ ] | Biomas Terrestres: Clima, Fauna y Conservación | `/visualizador-biomas-terrestres/` | estudiantes, cultura |
 | [ ] | Biomoléculas - Los 4 Ingredientes de la Vida | `/visualizador-biomoleculas/` | estudiantes, cultura |
 | [ ] | Cadenas de Suministro Globales: JIT, Disrupciones y Reshoring | `/visualizador-cadenas-suministro/` | estudiantes, cultura, productividad |

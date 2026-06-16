@@ -281,7 +281,7 @@ export default function AnatomiaFlorPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🌸 Anatomía de una Flor</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🌸</span> Anatomía de una Flor</h1>
           <p className={styles.subtitle}>De la polinización a la formación de frutos y semillas</p>
         </header>
 
@@ -292,6 +292,7 @@ export default function AnatomiaFlorPage() {
           {SECCIONES.map((s) => (
             <button
               key={s.id}
+              type="button"
               className={`${styles.navBtn} ${seccion === s.id ? styles.navActivo : ''}`}
               onClick={() => setSeccion(s.id)}
               aria-pressed={seccion === s.id}
@@ -305,7 +306,7 @@ export default function AnatomiaFlorPage() {
         {/* Cabecera de sección */}
         {seccionActual && (
           <div className={styles.seccionHeader}>
-            <h2 className={styles.seccionTitulo}>{seccionActual.icono} {seccionActual.titulo}</h2>
+            <h2 className={styles.seccionTitulo}><span aria-hidden="true">{seccionActual.icono}</span> {seccionActual.titulo}</h2>
             <p className={styles.seccionSubtitulo}>{seccionActual.subtitulo}</p>
           </div>
         )}
@@ -345,6 +346,7 @@ export default function AnatomiaFlorPage() {
               {PARTES.map((parte) => (
                 <button
                   key={parte.id}
+                  type="button"
                   className={`${styles.parteCard} ${parteSeleccionada === parte.id ? styles.parteCardActiva : ''}`}
                   onClick={() => setParteSeleccionada(parteSeleccionada === parte.id ? null : parte.id)}
                   aria-pressed={parteSeleccionada === parte.id}
@@ -359,7 +361,7 @@ export default function AnatomiaFlorPage() {
             </div>
 
             <div className={styles.insight}>
-              <p><strong>💡 Flor completa vs. incompleta:</strong> Una flor completa tiene las 4 partes (sépalos, pétalos, estambres y pistilo). Si falta alguna es incompleta. Las gramíneas (trigo, arroz) tienen flores incompletas: sin pétalos ni sépalos vistosos, porque dependen del viento, no de polinizadores.</p>
+              <p><strong><span aria-hidden="true">💡</span> Flor completa vs. incompleta:</strong> Una flor completa tiene las 4 partes (sépalos, pétalos, estambres y pistilo). Si falta alguna es incompleta. Las gramíneas (trigo, arroz) tienen flores incompletas: sin pétalos ni sépalos vistosos, porque dependen del viento, no de polinizadores.</p>
             </div>
 
             <div className={styles.insight}>
@@ -382,7 +384,7 @@ export default function AnatomiaFlorPage() {
             </div>
 
             <div className={styles.insight}>
-              <p><strong>🔄 Autopolinización vs. polinización cruzada:</strong> La autopolinización (misma flor o misma planta) es más fiable pero reduce la diversidad genética. La polinización cruzada (entre plantas distintas) genera descendientes más resistentes. La mayoría de las plantas tiene mecanismos para favorecer la cruzada.</p>
+              <p><strong><span aria-hidden="true">🔄</span> Autopolinización vs. polinización cruzada:</strong> La autopolinización (misma flor o misma planta) es más fiable pero reduce la diversidad genética. La polinización cruzada (entre plantas distintas) genera descendientes más resistentes. La mayoría de las plantas tiene mecanismos para favorecer la cruzada.</p>
             </div>
 
             <div className={styles.seccionLabel}>Tipos de polinización</div>
@@ -390,6 +392,7 @@ export default function AnatomiaFlorPage() {
               {TIPOS_POLINIZACION.map((tipo) => (
                 <button
                   key={tipo.id}
+                  type="button"
                   className={`${styles.tipoCard} ${tipoPolinizacion === tipo.id ? styles.tipoCardActivo : ''}`}
                   onClick={() => setTipoPolinizacion(tipoPolinizacion === tipo.id ? null : tipo.id)}
                   aria-pressed={tipoPolinizacion === tipo.id}
@@ -430,6 +433,7 @@ export default function AnatomiaFlorPage() {
               {TIPOS_FRUTO.map((fruto) => (
                 <button
                   key={fruto.id}
+                  type="button"
                   className={`${styles.frutoCard} ${tipoFruto === fruto.id ? styles.frutoCardActivo : ''}`}
                   onClick={() => setTipoFruto(tipoFruto === fruto.id ? null : fruto.id)}
                   aria-pressed={tipoFruto === fruto.id}
@@ -470,6 +474,7 @@ export default function AnatomiaFlorPage() {
               {DATOS.map((dato) => (
                 <button
                   key={dato.id}
+                  type="button"
                   className={`${styles.datoCard} ${datoActivo === dato.id ? styles.datoCardActivo : ''}`}
                   onClick={() => setDatoActivo(datoActivo === dato.id ? null : dato.id)}
                   aria-pressed={datoActivo === dato.id}
@@ -516,7 +521,7 @@ export default function AnatomiaFlorPage() {
 
         {/* ═══════ CONTENIDO EDUCATIVO ═══════ */}
         <EducationalSection
-          title="📚 ¿Quieres aprender más?"
+          title="¿Quieres aprender más?"
           subtitle="Conceptos clave de botánica reproductiva"
         >
           <section className={styles.guideSection}>

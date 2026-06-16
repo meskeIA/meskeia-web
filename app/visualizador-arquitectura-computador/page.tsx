@@ -428,7 +428,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🖥️ Arquitectura del Computador</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🖥️</span> Arquitectura del Computador</h1>
         <p className={styles.subtitle}>
           Von Neumann, CPU, ciclo fetch-decode-execute y jerarquía de memoria — explicados de forma visual
         </p>
@@ -448,6 +448,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
         ).map((tab) => (
           <button
             key={tab.id}
+            type="button"
             onClick={() => setTabActiva(tab.id)}
             className={`${styles.tabBtn} ${tabActiva === tab.id ? styles.tabBtnActive : ''}`}
             aria-pressed={tabActiva === tab.id}
@@ -553,11 +554,13 @@ export default function VisualizadorArquitecturaComputadorPage() {
             {COMPONENTES_CPU.map((c) => (
               <button
                 key={c.id}
+                type="button"
                 onClick={() => setComponenteSeleccionado(componenteSeleccionado?.id === c.id ? null : c)}
                 className={`${styles.cpuCard} ${componenteSeleccionado?.id === c.id ? styles.cpuCardActive : ''}`}
                 style={{ borderColor: componenteSeleccionado?.id === c.id ? c.color : undefined }}
+                aria-pressed={componenteSeleccionado?.id === c.id}
               >
-                <span className={styles.cpuIcono}>{c.icono}</span>
+                <span className={styles.cpuIcono} aria-hidden="true">{c.icono}</span>
                 <span className={styles.cpuSigla} style={{ color: c.color }}>{c.sigla}</span>
                 <span className={styles.cpuNombre}>{c.nombre}</span>
                 <span className={styles.cpuFuncion}>{c.funcion}</span>
@@ -568,7 +571,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
           {componenteSeleccionado && (
             <div className={styles.cpuDetalle} style={{ borderLeftColor: componenteSeleccionado.color }}>
               <h3 style={{ color: componenteSeleccionado.color }}>
-                {componenteSeleccionado.icono} {componenteSeleccionado.sigla} — {componenteSeleccionado.nombre}
+                <span aria-hidden="true">{componenteSeleccionado.icono}</span> {componenteSeleccionado.sigla} — {componenteSeleccionado.nombre}
               </h3>
               <p>{componenteSeleccionado.detalle}</p>
             </div>
@@ -589,10 +592,12 @@ export default function VisualizadorArquitecturaComputadorPage() {
             {PASOS_FDE.map((p, i) => (
               <button
                 key={i}
+                type="button"
                 onClick={() => setPasoFDE(i)}
                 className={`${styles.fdeProgresoPunto} ${i === pasoFDE ? styles.fdeProgresoPuntoActivo : ''} ${i < pasoFDE ? styles.fdeProgresoPuntoVisto : ''}`}
                 style={{ backgroundColor: i <= pasoFDE ? fasesColores[p.fase] : undefined }}
                 aria-label={`Paso ${i + 1}: ${p.fase}`}
+                aria-pressed={i === pasoFDE}
                 title={`Paso ${i + 1}: ${p.fase}`}
               />
             ))}
@@ -622,6 +627,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
           {/* Controles */}
           <div className={styles.fdeControles}>
             <button
+              type="button"
               onClick={() => setPasoFDE(Math.max(0, pasoFDE - 1))}
               disabled={pasoFDE === 0}
               className={styles.fdeBtn}
@@ -633,6 +639,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
               Paso {pasoFDE + 1} / {PASOS_FDE.length}
             </span>
             <button
+              type="button"
               onClick={() => setPasoFDE(Math.min(PASOS_FDE.length - 1, pasoFDE + 1))}
               disabled={pasoFDE === PASOS_FDE.length - 1}
               className={styles.fdeBtn}
@@ -642,7 +649,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
             </button>
           </div>
           <div className={styles.fdeReinicio}>
-            <button onClick={() => setPasoFDE(0)} className={styles.fdeBtnReinicio}>
+            <button type="button" onClick={() => setPasoFDE(0)} className={styles.fdeBtnReinicio}>
               ↺ Reiniciar
             </button>
           </div>
@@ -683,7 +690,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
                     className={styles.memoriaBarra}
                     style={{ backgroundColor: n.color }}
                   >
-                    <span className={styles.memoriaBarraIcono}>{n.icono}</span>
+                    <span className={styles.memoriaBarraIcono} aria-hidden="true">{n.icono}</span>
                     <span className={styles.memoriaBarraNombre}>{n.nombre}</span>
                   </div>
                 </div>
@@ -752,7 +759,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💻</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💻</span>
                 <h3>Tu ordenador ejecutando Chrome</h3>
               </div>
               <p className={styles.escenarioTip}>
@@ -763,7 +770,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📱</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📱</span>
                 <h3>Procesador ARM en tu móvil</h3>
               </div>
               <p className={styles.escenarioTip}>
@@ -774,7 +781,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎮</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎮</span>
                 <h3>GPU y procesamiento paralelo</h3>
               </div>
               <p className={styles.escenarioTip}>
@@ -785,7 +792,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>☁️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">☁️</span>
                 <h3>Servidores en la nube</h3>
               </div>
               <p className={styles.escenarioTip}>
@@ -896,22 +903,22 @@ export default function VisualizadorArquitecturaComputadorPage() {
           <h2>Claves para Entender la Arquitectura</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚡</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚡</span>
               <h4>La caché L1 es la reina</h4>
               <p>El 90% de los accesos se resuelven en L1 (~1 ns). Optimizar para caché tiene más impacto que cambiar el algoritmo en muchos casos.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <h4>El pipeline multiplica la velocidad</h4>
               <p>Un pipeline de 5 etapas puede ejecutar 5 instrucciones en paralelo (en diferentes fases). Los procesadores modernos tienen pipelines de 15–20 etapas.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📍</span>
+              <span className={styles.tipIcon} aria-hidden="true">📍</span>
               <h4>El PC es el hilo conductor</h4>
               <p>Seguir el valor del PC a través del ciclo FDE es la forma más clara de entender la ejecución de cualquier programa.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏗️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏗️</span>
               <h4>Von Neumann sigue vigente</h4>
               <p>Todos los computadores actuales — desde microcontroladores de 8 bits hasta supercomputadores — siguen el modelo de Von Neumann de 1945.</p>
             </div>
@@ -921,7 +928,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
         {/* 6. Warning Box v2.0 */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <h3>Errores Comunes al Estudiar Arquitectura</h3>
           </div>
           <ul className={styles.warningList}>

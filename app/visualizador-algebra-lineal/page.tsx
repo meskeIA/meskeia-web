@@ -389,7 +389,7 @@ function TabTransformaciones() {
             <p className={styles.presetsLabel}>Presets:</p>
             <div className={styles.presetsBotones}>
               {PRESETS.map((p) => (
-                <button key={p.label} className={styles.presetBtn}
+                <button key={p.label} type="button" className={styles.presetBtn}
                   onClick={() => aplicarPreset(p.matriz)}>
                   {p.label}
                 </button>
@@ -692,6 +692,7 @@ export default function VisualizadorAlgebraLineal() {
           {tabs.map((tab) => (
             <button
               key={tab.id}
+              type="button"
               role="tab"
               aria-selected={tabActivo === tab.id}
               className={`${styles.tab} ${tabActivo === tab.id ? styles.tabActivo : ''}`}
