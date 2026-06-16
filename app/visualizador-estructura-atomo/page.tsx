@@ -370,6 +370,7 @@ export default function EstructuraAtomoPage() {
           {SECCIONES.map((s) => (
             <button
               key={s.id}
+              type="button"
               className={`${styles.tab} ${seccionActiva === s.id ? styles.tabActive : ''}`}
               onClick={() => setSeccionActiva(s.id)}
               aria-pressed={seccionActiva === s.id}
@@ -429,6 +430,7 @@ export default function EstructuraAtomoPage() {
                 {PARTICULAS.map((p, i) => (
                   <button
                     key={p.nombre}
+                    type="button"
                     className={`${styles.particulaCard} ${particulaActiva === i ? styles.particulaCardActive : ''}`}
                     style={{ borderColor: particulaActiva === i ? p.color : undefined }}
                     onClick={() => setParticulaActiva(particulaActiva === i ? null : i)}
@@ -581,7 +583,11 @@ export default function EstructuraAtomoPage() {
                         <span className={styles.ionFlecha} aria-hidden="true">→</span>
                         <span className={styles.ionResultado}>{ion.resultado}</span>
                       </div>
-                      <span className={styles.ionTipo}>{ion.tipo === 'catión' ? '🔴 Catión (+)' : '🔵 Anión (−)'}</span>
+                      <span className={styles.ionTipo}>
+                        {ion.tipo === 'catión'
+                          ? <><span aria-hidden="true">🔴</span> Catión (+)</>
+                          : <><span aria-hidden="true">🔵</span> Anión (−)</>}
+                      </span>
                       <p className={styles.ionEjemplo}>{ion.ejemplo}</p>
                     </div>
                   ))}

@@ -131,7 +131,7 @@ export default function VisualizadorEstructurasMercadoPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.heroTitle}>📊 Estructuras de Mercado</h1>
+          <h1 className={styles.heroTitle}><span aria-hidden="true">📊</span> Estructuras de Mercado</h1>
           <p className={styles.heroSubtitle}>
             Competencia perfecta, monopolio, oligopolio y bienestar social — microeconomía visual
           </p>
@@ -145,6 +145,7 @@ export default function VisualizadorEstructurasMercadoPage() {
             {tabs.map((tab) => (
               <button
                 key={tab.id}
+                type="button"
                 className={`${styles.tabBtn} ${tabActiva === tab.id ? styles.tabBtnActivo : ''}`}
                 onClick={() => setTabActiva(tab.id)}
                 aria-current={tabActiva === tab.id ? 'true' : undefined}
@@ -168,8 +169,10 @@ export default function VisualizadorEstructurasMercadoPage() {
                   {FILAS_COMPARATIVA.map((fila) => (
                     <button
                       key={fila.id}
+                      type="button"
                       className={`${styles.btnEstructura} ${estructuraActiva === fila.id ? styles.btnEstructuraActivo : ''}`}
                       onClick={() => setEstructuraActiva(fila.id)}
+                      aria-pressed={estructuraActiva === fila.id}
                     >
                       {fila.nombre}
                     </button>
@@ -305,14 +308,18 @@ export default function VisualizadorEstructurasMercadoPage() {
                     <span className={styles.estrategiaLabel}>Empresa A:</span>
                     <div className={styles.estrategiaBtns}>
                       <button
+                        type="button"
                         className={`${styles.btnEstrategia} ${estrategiaA === 'cooperar' ? styles.btnEstrategiaActivo : ''}`}
                         onClick={() => setEstrategiaA('cooperar')}
+                        aria-pressed={estrategiaA === 'cooperar'}
                       >
                         Cooperar (fijar precio alto)
                       </button>
                       <button
+                        type="button"
                         className={`${styles.btnEstrategia} ${estrategiaA === 'traicionar' ? styles.btnEstrategiaActivo : ''}`}
                         onClick={() => setEstrategiaA('traicionar')}
+                        aria-pressed={estrategiaA === 'traicionar'}
                       >
                         Traicionar (bajar precio)
                       </button>
@@ -322,14 +329,18 @@ export default function VisualizadorEstructurasMercadoPage() {
                     <span className={styles.estrategiaLabel}>Empresa B:</span>
                     <div className={styles.estrategiaBtns}>
                       <button
+                        type="button"
                         className={`${styles.btnEstrategia} ${estrategiaB === 'cooperar' ? styles.btnEstrategiaActivo : ''}`}
                         onClick={() => setEstrategiaB('cooperar')}
+                        aria-pressed={estrategiaB === 'cooperar'}
                       >
                         Cooperar (fijar precio alto)
                       </button>
                       <button
+                        type="button"
                         className={`${styles.btnEstrategia} ${estrategiaB === 'traicionar' ? styles.btnEstrategiaActivo : ''}`}
                         onClick={() => setEstrategiaB('traicionar')}
+                        aria-pressed={estrategiaB === 'traicionar'}
                       >
                         Traicionar (bajar precio)
                       </button>
@@ -626,7 +637,7 @@ export default function VisualizadorEstructurasMercadoPage() {
           {/* SECCIÓN 6 — Warning Box */}
           <section>
             <div className={styles.warningBox}>
-              <h3>⚠️ Errores frecuentes al analizar estructuras de mercado</h3>
+              <h3><span aria-hidden="true">⚠️</span> Errores frecuentes al analizar estructuras de mercado</h3>
               <ul>
                 <li><strong>Confundir &laquo;mercado competitivo&raquo; con &laquo;mercado eficiente&raquo;.</strong> Un mercado puede ser muy competitivo (muchos vendedores) y aun así ser ineficiente por externalidades, información asimétrica o bienes públicos.</li>
                 <li><strong>Asumir que el oligopolio siempre colude.</strong> Los oligopolistas también pueden entrar en guerras de precios (competencia de Bertrand) que llevan los precios hasta el coste marginal, como en la competencia perfecta.</li>

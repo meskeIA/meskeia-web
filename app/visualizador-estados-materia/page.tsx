@@ -328,6 +328,7 @@ export default function VisualizadorEstadosMateria() {
           {ESTADOS.map(e => (
             <button
               key={e.id}
+              type="button"
               className={`${styles.estadoBtn} ${estadoActivo === e.id ? styles.estadoBtnActivo : ''}`}
               onClick={() => setEstadoActivo(e.id)}
               aria-pressed={estadoActivo === e.id}
@@ -368,7 +369,7 @@ export default function VisualizadorEstadosMateria() {
                 <th>Propiedad</th>
                 {ESTADOS.map(e => (
                   <th key={e.id} style={{ color: e.color }}>
-                    <span aria-hidden="true">{e.icono}</span> {e.nombre}
+                    <span aria-hidden="true">{e.icono}</span>{' '}{e.nombre}
                   </th>
                 ))}
               </tr>
@@ -418,6 +419,7 @@ export default function VisualizadorEstadosMateria() {
         {TRANSICIONES.map((t, i) => (
           <button
             key={t.nombre}
+            type="button"
             className={`${styles.transicionCard} ${transicionActiva === i ? styles.transicionActiva : ''}`}
             onClick={() => setTransicionActiva(transicionActiva === i ? null : i)}
             aria-expanded={transicionActiva === i}
@@ -644,7 +646,7 @@ export default function VisualizadorEstadosMateria() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🔬 Estados de la Materia</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🔬</span> Estados de la Materia</h1>
           <p className={styles.subtitle}>Sólido, líquido, gas y plasma: la materia en movimiento</p>
         </header>
 
@@ -655,6 +657,7 @@ export default function VisualizadorEstadosMateria() {
           {SECCIONES.map(s => (
             <button
               key={s.id}
+              type="button"
               className={`${styles.navBtn} ${seccionActiva === s.id ? styles.navActivo : ''}`}
               onClick={() => setSeccionActiva(s.id)}
               aria-pressed={seccionActiva === s.id}

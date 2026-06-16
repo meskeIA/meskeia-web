@@ -381,7 +381,7 @@ export default function VisualizadorEvolucionMolecular() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🧬 Evolución Molecular</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🧬</span> Evolución Molecular</h1>
         <p className={styles.subtitle}>
           Cómo mutan las secuencias de ADN, cómo el reloj molecular mide el tiempo evolutivo
           y cómo se reconstruye la historia de la vida desde el genoma
@@ -396,6 +396,7 @@ export default function VisualizadorEvolucionMolecular() {
           {NAV_SECCIONES.map(s => (
             <button
               key={s.id}
+              type="button"
               className={`${styles.navBtn} ${seccionActiva === s.id ? styles.navActivo : ''}`}
               onClick={() => setSeccionActiva(s.id)}
               aria-pressed={seccionActiva === s.id}
@@ -495,10 +496,10 @@ export default function VisualizadorEvolucionMolecular() {
             )}
 
             <div className={styles.botones}>
-              <button className={styles.btnPrimario} onClick={handleMutar} aria-label="Introducir mutación aleatoria">
+              <button type="button" className={styles.btnPrimario} onClick={handleMutar} aria-label="Introducir mutación aleatoria">
                 🔬 Mutar
               </button>
-              <button className={styles.btnSecundario} onClick={handleResetDna} aria-label="Resetear secuencia original">
+              <button type="button" className={styles.btnSecundario} onClick={handleResetDna} aria-label="Resetear secuencia original">
                 Reiniciar
               </button>
             </div>
@@ -639,6 +640,7 @@ export default function VisualizadorEvolucionMolecular() {
             {CONJUNTOS_ESPECIES.map(c => (
               <button
                 key={c.id}
+                type="button"
                 className={`${styles.conjuntoBtn} ${conjuntoActivo === c.id ? styles.conjuntoActivo : ''}`}
                 onClick={() => {
                   setConjuntoActivo(c.id);
@@ -692,6 +694,7 @@ export default function VisualizadorEvolucionMolecular() {
               {conjuntoData.especies.map(sp => (
                 <button
                   key={sp.id}
+                  type="button"
                   className={`${styles.especieSelBtn} ${(especieSelA === sp.id || especieSelB === sp.id) ? styles.especieSelActiva : ''}`}
                   onClick={() => {
                     if (especieSelA === sp.id) {
@@ -756,6 +759,7 @@ export default function VisualizadorEvolucionMolecular() {
             {EVIDENCIAS.map(ev => (
               <button
                 key={ev.id}
+                type="button"
                 className={`${styles.evidenciaCard} ${evidenciaActiva === ev.id ? styles.evidenciaActiva : ''}`}
                 onClick={() => setEvidenciaActiva(prev => prev === ev.id ? null : ev.id)}
                 aria-expanded={evidenciaActiva === ev.id}

@@ -464,11 +464,11 @@
 | [x] | Enzimas del Cuerpo Humano - Catalizadores de la Vida | `/visualizador-enzimas-cuerpo-humano/` | estudiantes, cultura, salud |
 | [x] | Estadística Avanzada | `/estadistica-avanzada/` | estudiantes |
 | [x] | Estadística Inferencial: p-valor, Errores y Confianza | `/visualizador-estadistica-inferencial/` | estudiantes, tecnicas |
-| [ ] | Estados de la Materia | `/visualizador-estados-materia/` | estudiantes, cultura |
-| [ ] | Estructura del Átomo - Partículas, Orbitales e Isótopos | `/visualizador-estructura-atomo/` | estudiantes, cultura |
+| [x] | Estados de la Materia | `/visualizador-estados-materia/` | estudiantes, cultura |
+| [x] | Estructura del Átomo - Partículas, Orbitales e Isótopos | `/visualizador-estructura-atomo/` | estudiantes, cultura |
 | [x] | Estructuras Cristalinas 3D - Celdas Unitarias Rotables | `/visualizador-estructuras-cristalinas/` | estudiantes, cultura |
-| [ ] | Estructuras de Mercado: Monopolio, Oligopolio y Competencia | `/visualizador-estructuras-mercado/` | estudiantes, cultura |
-| [ ] | Evolución Molecular: Relojes, Filogenética y Kimura | `/visualizador-evolucion-molecular/` | estudiantes, cultura |
+| [x] | Estructuras de Mercado: Monopolio, Oligopolio y Competencia | `/visualizador-estructuras-mercado/` | estudiantes, cultura |
+| [x] | Evolución Molecular: Relojes, Filogenética y Kimura | `/visualizador-evolucion-molecular/` | estudiantes, cultura |
 | [ ] | Exoplanetas: Tránsito, Zona Habitable y Kepler | `/visualizador-exoplanetas/` | estudiantes, cultura |
 | [ ] | Fases de la Luna y Eclipses | `/visualizador-fases-luna-eclipses/` | estudiantes, cultura |
 | [ ] | Fenómenos Meteorológicos - Del Cielo a la Tierra | `/visualizador-fenomenos-meteorologicos/` | estudiantes, cultura |
