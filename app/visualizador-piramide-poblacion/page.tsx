@@ -174,7 +174,7 @@ export default function PiramidePoblacionPage() {
 
       {/* Insight box */}
       <div className={styles.insightBox}>
-        <strong>🔍 Radiografía 2024 vs 2100:</strong> Si se cumplen las proyecciones del INE, España pasará de 45 a 58 años de edad mediana. Por cada persona mayor de 64 años habrá menos de una en edad de trabajar. La inmigración es el único factor que puede moderar esta tendencia.
+        <strong><span aria-hidden="true">🔍</span> Radiografía 2024 vs 2100:</strong> Si se cumplen las proyecciones del INE, España pasará de 45 a 58 años de edad mediana. Por cada persona mayor de 64 años habrá menos de una en edad de trabajar. La inmigración es el único factor que puede moderar esta tendencia.
       </div>
 
       <EducationalSection title="¿Cómo leer una pirámide de población?" subtitle="Demografía, transición demográfica y proyecciones del INE" defaultOpen={false}>
@@ -191,7 +191,7 @@ export default function PiramidePoblacionPage() {
           La <strong>edad mediana</strong> divide a la población en dos mitades iguales: la mitad es mayor y la mitad es menor que ese valor. España tenía una edad mediana de 27 años en 1950; las proyecciones apuntan a 58 años en 2100, una de las más altas del mundo.
         </p>
         <div className={styles.warningBox}>
-          <strong>⚠️ Fuentes y limitaciones:</strong> Los datos históricos proceden del INE (Padrón Municipal, Censos de Población y Viviendas). Las proyecciones 2050-2100 corresponden al escenario central INE/EUROSTAT y pueden variar significativamente según evolución de la natalidad, esperanza de vida e inmigración. Todos los datos están expresados en miles de personas y son aproximados con fines educativos y divulgativos.
+          <strong><span aria-hidden="true">⚠️</span> Fuentes y limitaciones:</strong> Los datos históricos proceden del INE (Padrón Municipal, Censos de Población y Viviendas). Las proyecciones 2050-2100 corresponden al escenario central INE/EUROSTAT y pueden variar significativamente según evolución de la natalidad, esperanza de vida e inmigración. Todos los datos están expresados en miles de personas y son aproximados con fines educativos y divulgativos.
         </div>
       </EducationalSection>
 

@@ -37,7 +37,7 @@ export const historiaPortugalUltramar: HistoriaData = {
       nombre: 'La Costa de África: El Avance Sistemático',
       anioInicio: 1440,
       anioFin: 1488,
-      color: '#0277BD',
+      color: '#003399',
       categoria: 'exploracion',
       descripcion:
         'Los navegantes portugueses avanzan metódicamente por la costa africana: Cabo Verde (1456), Costa de Marfil, Costa de Oro (Ghana), el Congo. Bartolomeu Dias dobla el Cabo de Buena Esperanza (1488): la ruta a India está abierta. El padrão (pilar de piedra con las armas de Portugal): Portugal marca lo que descubre.',
@@ -50,7 +50,7 @@ export const historiaPortugalUltramar: HistoriaData = {
       nombre: 'Vasco da Gama: La Ruta a India',
       anioInicio: 1497,
       anioFin: 1499,
-      color: '#1565C0',
+      color: '#003399',
       categoria: 'exploracion',
       descripcion:
         'Vasco da Gama parte de Lisboa (julio 1497) y llega a Calicut, India (mayo 1498): la primera vez en la historia que un europeo alcanza India por mar. La ruta de las especias está abierta. La vuelta con pimienta y canela multiplica por 60 la inversión. Portugal rompe el monopolio árabe y veneciano del comercio con Oriente.',
@@ -63,7 +63,7 @@ export const historiaPortugalUltramar: HistoriaData = {
       nombre: 'Pedro Álvares Cabral y el Descubrimiento de Brasil',
       anioInicio: 1500,
       anioFin: 1530,
-      color: '#2E7D32',
+      color: '#003399',
       categoria: 'exploracion',
       descripcion:
         'Pedro Álvares Cabral, en ruta a India, avista Brasil (22 abril 1500) — quizás no fue accidental. El Tratado de Tordesillas (1494) ya le había asignado ese territorio a Portugal. Brasil será el legado más duradero del Imperio: el mayor país de América del Sur, de lengua portuguesa, con 215 millones de habitantes hoy.',
@@ -76,7 +76,7 @@ export const historiaPortugalUltramar: HistoriaData = {
       nombre: 'El Estado da India: El Imperio de los Mares',
       anioInicio: 1505,
       anioFin: 1560,
-      color: '#0288D1',
+      color: '#1B5E20',
       categoria: 'imperio',
       descripcion:
         'Afonso de Albuquerque conquista Goa (1510), Malaca (1511), Ormuz (1515): Portugal controla los tres grandes nodos del comercio mundial. El Estado da India es un Imperio de fortalezas y factorías costeras, no de conquista territorial. Carracas y galeones armados imponen los primeros peajes marítimos de la historia.',
@@ -89,7 +89,7 @@ export const historiaPortugalUltramar: HistoriaData = {
       nombre: 'Japón, China y el Primer Imperio Global',
       anioInicio: 1543,
       anioFin: 1580,
-      color: '#FF8C00',
+      color: '#1B5E20',
       categoria: 'imperio',
       descripcion:
         'Los portugueses llegan a Japón (1543): primera presencia europea en el archipiélago, introducen las armas de fuego. Macau (1557): base comercial en China que durará hasta 1999. Portugal construye el primer Imperio verdaderamente global: factorías desde Brasil a Japón, pasando por África, India y el sudeste asiático.',
@@ -128,7 +128,7 @@ export const historiaPortugalUltramar: HistoriaData = {
       nombre: 'África Colonial: El Último Imperio',
       anioInicio: 1822,
       anioFin: 1974,
-      color: '#5D4037',
+      color: '#C62828',
       categoria: 'declive',
       descripcion:
         'Tras perder Brasil, Portugal se aferra a sus colonias africanas: Angola, Mozambique, Guinea-Bissau, Cabo Verde. El Imperio africano sobrevive gracias a la debilidad diplomática de Portugal para negociar en el siglo XX. Las guerras coloniales (1961-1974) contra los movimientos independentistas desangran el país.',
@@ -141,7 +141,7 @@ export const historiaPortugalUltramar: HistoriaData = {
       nombre: 'La Revolución de los Claveles y el Fin del Imperio',
       anioInicio: 1974,
       anioFin: 9999,
-      color: '#E91E63',
+      color: '#003399',
       categoria: 'exploracion',
       descripcion:
         'El 25 de abril de 1974, los militares derrocan la dictadura de Caetano (sucesor de Salazar): la Revolución de los Claveles, la más pacífica del siglo XX. La descolonización rápida (1974-1975): Angola, Mozambique, Guinea-Bissau independientes. Macao devuelta a China en 1999. El Imperio termina, pero la lengua portuguesa vincula a 260 millones de personas en 9 países.',

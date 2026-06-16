@@ -303,10 +303,10 @@
 | [x] | Orientador de Escritura Creativa | `/orientador-escritura-creativa/` | cultura, productividad |
 | [x] | Osteoporosis — El Ciclo de Remodelado Óseo | `/visualizador-osteoporosis/` | cultura, estudiantes, salud |
 | [x] | Países del Mundo | `/paises-del-mundo/` | cultura, viajes |
-| [ ] | Pirámide de Población: España 1950-2100 | `/visualizador-piramide-poblacion/` | cultura, estudiantes |
-| [ ] | Portugal y el Ultramar: El Primer Imperio Global | `/visualizador-historia/historia-portugal-ultramar/` | cultura |
-| [ ] | Prehistoria: De los Primeros Homínidos a las Primeras Ciudades | `/visualizador-historia/historia-prehistoria/` | cultura |
-| [ ] | Puntos de Inflexión Climáticos - Tipping Points | `/visualizador-cambio-climatico-tipping-points/` | cultura, estudiantes |
+| [x] | Pirámide de Población: España 1950-2100 | `/visualizador-piramide-poblacion/` | cultura, estudiantes |
+| [x] | Portugal y el Ultramar: El Primer Imperio Global | `/visualizador-historia/historia-portugal-ultramar/` | cultura |
+| [x] | Prehistoria: De los Primeros Homínidos a las Primeras Ciudades | `/visualizador-historia/historia-prehistoria/` | cultura |
+| [x] | Puntos de Inflexión Climáticos - Tipping Points | `/visualizador-cambio-climatico-tipping-points/` | cultura, estudiantes |
 | [ ] | Quiz de Literatura Universal | `/quiz-literatura-universal/` | cultura, estudiantes |
 | [ ] | Quiz de Métrica y Estrofas | `/quiz-metrica-estrofas/` | cultura, estudiantes |
 | [ ] | Quiz: Mitos y Realidades de la Ciencia | `/quiz-mitos-ciencia/` | cultura, estudiantes |

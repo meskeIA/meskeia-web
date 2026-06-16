@@ -348,6 +348,7 @@ export default function VisualizadorCambioClimatico() {
       <nav className={styles.navSecciones} aria-label="Secciones del visualizador">
         {SECCIONES.map(sec => (
           <button
+            type="button"
             key={sec.id}
             onClick={() => setSeccionActiva(sec.id)}
             className={`${styles.navBtn} ${seccionActiva === sec.id ? styles.navBtnActivo : ''}`}
@@ -374,6 +375,7 @@ export default function VisualizadorCambioClimatico() {
             <div className={styles.tippingGrid}>
               {TIPPING_POINTS.map(tp => (
                 <button
+                  type="button"
                   key={tp.id}
                   className={`${styles.tippingCard} ${tippingSeleccionado === tp.id ? styles.tippingCardActiva : ''}`}
                   style={{ '--tp-color': tp.color } as React.CSSProperties}
@@ -400,6 +402,7 @@ export default function VisualizadorCambioClimatico() {
                     <span className={styles.tippingDetalleUmbral}>{tippingDetalle.umbral}</span>
                   </div>
                   <button
+                    type="button"
                     className={styles.tippingDetalleCerrar}
                     onClick={() => setTippingSeleccionado(null)}
                     aria-label="Cerrar detalle"
@@ -574,6 +577,7 @@ export default function VisualizadorCambioClimatico() {
             <div className={styles.escenarioSelector}>
               {ESCENARIOS.map(esc => (
                 <button
+                  type="button"
                   key={esc.id}
                   className={`${styles.escenarioBtn} ${escenarioSeleccionado === esc.id ? styles.escenarioBtnActivo : ''}`}
                   style={{ '--esc-color': esc.color } as React.CSSProperties}
