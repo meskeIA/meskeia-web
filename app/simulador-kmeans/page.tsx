@@ -708,6 +708,7 @@ export default function SimuladorKmeans() {
               <div className={styles.metodoSelector}>
                 <button
                   type="button"
+                  aria-pressed={modoEdicion === 'anadir'}
                   className={`${styles.metodoBtn} ${modoEdicion === 'anadir' ? styles.metodoActive : ''}`}
                   onClick={() => setModoEdicion('anadir')}
                 >
@@ -715,6 +716,7 @@ export default function SimuladorKmeans() {
                 </button>
                 <button
                   type="button"
+                  aria-pressed={modoEdicion === 'arrastrar'}
                   className={`${styles.metodoBtn} ${modoEdicion === 'arrastrar' ? styles.metodoActive : ''}`}
                   onClick={() => setModoEdicion('arrastrar')}
                 >
@@ -753,6 +755,7 @@ export default function SimuladorKmeans() {
               <div className={styles.metodoSelector}>
                 <button
                   type="button"
+                  aria-pressed={metodoInit === 'aleatorio'}
                   className={`${styles.metodoBtn} ${metodoInit === 'aleatorio' ? styles.metodoActive : ''}`}
                   onClick={() => setMetodoInit('aleatorio')}
                 >
@@ -760,6 +763,7 @@ export default function SimuladorKmeans() {
                 </button>
                 <button
                   type="button"
+                  aria-pressed={metodoInit === 'kmeans++'}
                   className={`${styles.metodoBtn} ${metodoInit === 'kmeans++' ? styles.metodoActive : ''}`}
                   onClick={() => setMetodoInit('kmeans++')}
                 >

@@ -563,13 +563,13 @@
 | [x] | Simulador de Estequiometría: Reactivo Limitante | `/simulador-estequiometria/` | estudiantes |
 | [x] | Simulador de Física | `/simulador-fisica/` | estudiantes |
 | [x] | Simulador de Fluidos: Ecuación de Bernoulli | `/simulador-fluidos-bernoulli/` | estudiantes |
-| [ ] | Simulador de Fotosíntesis: Factores Limitantes | `/simulador-fotosintesis-factores/` | estudiantes |
-| [ ] | Simulador de Gas Ideal y Termodinámica | `/simulador-gas-ideal/` | estudiantes |
+| [x] | Simulador de Fotosíntesis: Factores Limitantes | `/simulador-fotosintesis-factores/` | estudiantes |
+| [x] | Simulador de Gas Ideal y Termodinámica | `/simulador-gas-ideal/` | estudiantes |
 | [x] | Simulador de Genética Mendeliana | `/simulador-genetica/` | estudiantes, salud |
-| [ ] | Simulador de Hashing y Colisiones | `/simulador-hashing-colisiones/` | estudiantes |
+| [x] | Simulador de Hashing y Colisiones | `/simulador-hashing-colisiones/` | estudiantes |
 | [x] | Simulador de Integrales: Área bajo la Curva | `/simulador-integral-area/` | estudiantes |
 | [x] | Simulador de Intervalos de Confianza | `/simulador-intervalos-confianza/` | estudiantes |
-| [ ] | Simulador de K-Means Clustering | `/simulador-kmeans/` | estudiantes, tecnicas |
+| [x] | Simulador de K-Means Clustering | `/simulador-kmeans/` | estudiantes, tecnicas |
 | [ ] | Simulador de la Curva de Phillips | `/simulador-curva-phillips/` | estudiantes |
 | [x] | Simulador de Lentes Ópticas: Trazado de Rayos | `/simulador-lentes-opticas/` | estudiantes |
 | [x] | Simulador de Máquina de Turing | `/simulador-maquina-turing/` | estudiantes, tecnicas |

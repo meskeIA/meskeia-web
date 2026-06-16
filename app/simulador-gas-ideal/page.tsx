@@ -565,6 +565,7 @@ function ProcesosTab(): React.ReactElement {
           <button
             key={p}
             type="button"
+            aria-pressed={proceso === p}
             className={`${styles.cicloCard} ${proceso === p ? styles.cicloCardActive : ''}`}
             onClick={() => setProceso(p)}
           >
@@ -1169,6 +1170,7 @@ function CiclosTab(): React.ReactElement {
           <button
             key={c}
             type="button"
+            aria-pressed={ciclo === c}
             className={`${styles.cicloCard} ${ciclo === c ? styles.cicloCardActive : ''}`}
             onClick={() => setCiclo(c)}
           >
@@ -1761,14 +1763,14 @@ export default function Page(): React.ReactElement {
           <h3 className={styles.eduSubtitle}>Mejores Prácticas</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✓</span>
+              <span className={styles.tipIcon} aria-hidden="true">✓</span>
               <div>
                 <strong>Trabaja siempre en kelvin</strong>
                 <p>0 °C = 273,15 K. Una T en °C metida en PV=nRT da resultados erróneos.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✓</span>
+              <span className={styles.tipIcon} aria-hidden="true">✓</span>
               <div>
                 <strong>Elige R adecuada</strong>
                 <p>
@@ -1777,21 +1779,21 @@ export default function Page(): React.ReactElement {
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✓</span>
+              <span className={styles.tipIcon} aria-hidden="true">✓</span>
               <div>
                 <strong>Dibuja el diagrama P-V</strong>
                 <p>Te ayuda a ver el sentido del proceso y a no equivocarte con los signos de W.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✓</span>
+              <span className={styles.tipIcon} aria-hidden="true">✓</span>
               <div>
                 <strong>Verifica el primer principio</strong>
                 <p>ΔU = Q − W siempre se cumple. Si los signos no cuadran, revisa el cálculo.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✓</span>
+              <span className={styles.tipIcon} aria-hidden="true">✓</span>
               <div>
                 <strong>Compara con Carnot</strong>
                 <p>
@@ -1801,7 +1803,7 @@ export default function Page(): React.ReactElement {
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✓</span>
+              <span className={styles.tipIcon} aria-hidden="true">✓</span>
               <div>
                 <strong>Identifica γ correcto</strong>
                 <p>
@@ -1813,7 +1815,7 @@ export default function Page(): React.ReactElement {
 
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <span>Errores Frecuentes</span>
             </div>
             <ul className={styles.warningList}>

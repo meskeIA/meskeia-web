@@ -272,7 +272,7 @@ export default function SimuladorFotosintesisFactoresPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🌿 Simulador de Fotosíntesis: Factores Limitantes</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🌿</span> Simulador de Fotosíntesis: Factores Limitantes</h1>
           <p className={styles.subtitle}>
             Ajusta la luz, el CO₂ y la temperatura y descubre cuál limita la producción de glucosa.
             Basado en la Ley de Blackman (1905) y el modelo cinético Michaelis-Menten.
@@ -306,7 +306,7 @@ export default function SimuladorFotosintesisFactoresPage() {
           {/* Luz */}
           <div className={styles.sliderGroup}>
             <label className={styles.sliderLabel} htmlFor="slider-luz">
-              ☀️ Intensidad lumínica
+              <span aria-hidden="true">☀️</span> Intensidad lumínica
               <span className={styles.sliderValue}>{luz}%</span>
             </label>
             <input
@@ -333,7 +333,7 @@ export default function SimuladorFotosintesisFactoresPage() {
           {/* CO₂ */}
           <div className={styles.sliderGroup}>
             <label className={styles.sliderLabel} htmlFor="slider-co2">
-              💨 Concentración de CO₂
+              <span aria-hidden="true">💨</span> Concentración de CO₂
               <span className={styles.sliderValue}>{formatNumber(co2 * 100, 2)}%</span>
             </label>
             <input
@@ -360,7 +360,7 @@ export default function SimuladorFotosintesisFactoresPage() {
           {/* Temperatura */}
           <div className={styles.sliderGroup}>
             <label className={styles.sliderLabel} htmlFor="slider-temp">
-              🌡️ Temperatura
+              <span aria-hidden="true">🌡️</span> Temperatura
               <span className={styles.sliderValue}>{temp} °C</span>
             </label>
             <input
@@ -576,7 +576,7 @@ export default function SimuladorFotosintesisFactoresPage() {
             <dl className={styles.faqList}>
               {faq.map((item) => (
                 <div key={item.pregunta} className={styles.faqItem}>
-                  <dt className={styles.faqTip}>❓ {item.pregunta}</dt>
+                  <dt className={styles.faqTip}><span aria-hidden="true">❓</span> {item.pregunta}</dt>
                   <dd>{item.respuesta}</dd>
                 </div>
               ))}
