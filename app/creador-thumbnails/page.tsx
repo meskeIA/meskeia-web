@@ -721,7 +721,7 @@ export default function CreadorThumbnailsPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🎬 Creador de Thumbnails YouTube</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🎬</span> Creador de Thumbnails YouTube</h1>
         <p className={styles.subtitle}>
           Diseña miniaturas profesionales para tus videos. Añade texto, imágenes y formas.
         </p>
@@ -741,34 +741,44 @@ export default function CreadorThumbnailsPage() {
         <div className={styles.toolsPanel}>
           <div className={styles.tabs}>
             <button
+              type="button"
               className={`${styles.tab} ${activeTab === 'background' ? styles.tabActive : ''}`}
               onClick={() => setActiveTab('background')}
+              aria-pressed={activeTab === 'background'}
             >
-              🎨 Fondo
+              <span aria-hidden="true">🎨</span> Fondo
             </button>
             <button
+              type="button"
               className={`${styles.tab} ${activeTab === 'text' ? styles.tabActive : ''}`}
               onClick={() => setActiveTab('text')}
+              aria-pressed={activeTab === 'text'}
             >
-              📝 Texto
+              <span aria-hidden="true">📝</span> Texto
             </button>
             <button
+              type="button"
               className={`${styles.tab} ${activeTab === 'image' ? styles.tabActive : ''}`}
               onClick={() => setActiveTab('image')}
+              aria-pressed={activeTab === 'image'}
             >
-              🖼️ Imagen
+              <span aria-hidden="true">🖼️</span> Imagen
             </button>
             <button
+              type="button"
               className={`${styles.tab} ${activeTab === 'shapes' ? styles.tabActive : ''}`}
               onClick={() => setActiveTab('shapes')}
+              aria-pressed={activeTab === 'shapes'}
             >
-              ⬜ Formas
+              <span aria-hidden="true">⬜</span> Formas
             </button>
             <button
+              type="button"
               className={`${styles.tab} ${activeTab === 'emoji' ? styles.tabActive : ''}`}
               onClick={() => setActiveTab('emoji')}
+              aria-pressed={activeTab === 'emoji'}
             >
-              😀 Emoji
+              <span aria-hidden="true">😀</span> Emoji
             </button>
           </div>
 
@@ -779,20 +789,26 @@ export default function CreadorThumbnailsPage() {
                 <h3>Tipo de fondo</h3>
                 <div className={styles.bgTypeButtons}>
                   <button
+                    type="button"
                     className={`${styles.bgTypeBtn} ${background.type === 'color' ? styles.bgTypeActive : ''}`}
                     onClick={() => setBackground(prev => ({ ...prev, type: 'color' }))}
+                    aria-pressed={background.type === 'color'}
                   >
                     Color
                   </button>
                   <button
+                    type="button"
                     className={`${styles.bgTypeBtn} ${background.type === 'gradient' ? styles.bgTypeActive : ''}`}
                     onClick={() => setBackground(prev => ({ ...prev, type: 'gradient' }))}
+                    aria-pressed={background.type === 'gradient'}
                   >
                     Degradado
                   </button>
                   <button
+                    type="button"
                     className={`${styles.bgTypeBtn} ${background.type === 'image' ? styles.bgTypeActive : ''}`}
                     onClick={() => bgFileInputRef.current?.click()}
+                    aria-pressed={background.type === 'image'}
                   >
                     Imagen
                   </button>
@@ -815,10 +831,12 @@ export default function CreadorThumbnailsPage() {
                     {GRADIENTS.map(g => (
                       <button
                         key={g.name}
+                        type="button"
                         className={`${styles.gradientBtn} ${background.gradientName === g.name ? styles.gradientActive : ''}`}
                         style={{ background: g.css }}
                         onClick={() => setBackground(prev => ({ ...prev, gradientName: g.name }))}
                         title={g.name}
+                        aria-pressed={background.gradientName === g.name}
                       >
                         <span className={styles.gradientName}>{g.name}</span>
                       </button>
@@ -839,7 +857,7 @@ export default function CreadorThumbnailsPage() {
             {/* Tab Texto */}
             {activeTab === 'text' && (
               <div className={styles.section}>
-                <button onClick={addText} className={styles.addBtn}>
+                <button type="button" onClick={addText} className={styles.addBtn}>
                   + Añadir Texto
                 </button>
 
@@ -958,7 +976,7 @@ export default function CreadorThumbnailsPage() {
             {/* Tab Imagen */}
             {activeTab === 'image' && (
               <div className={styles.section}>
-                <button onClick={() => fileInputRef.current?.click()} className={styles.addBtn}>
+                <button type="button" onClick={() => fileInputRef.current?.click()} className={styles.addBtn}>
                   + Subir Imagen
                 </button>
                 <input
@@ -1000,11 +1018,12 @@ export default function CreadorThumbnailsPage() {
                   {SHAPES.map(shape => (
                     <button
                       key={shape.type}
+                      type="button"
                       className={styles.shapeBtn}
                       onClick={() => addShape(shape.type)}
                       title={shape.name}
                     >
-                      <span className={styles.shapeIcon}>{shape.icon}</span>
+                      <span className={styles.shapeIcon} aria-hidden="true">{shape.icon}</span>
                       <span className={styles.shapeName}>{shape.name}</span>
                     </button>
                   ))}
@@ -1057,6 +1076,7 @@ export default function CreadorThumbnailsPage() {
                   {POPULAR_EMOJIS.map(emoji => (
                     <button
                       key={emoji}
+                      type="button"
                       className={styles.emojiBtn}
                       onClick={() => addEmoji(emoji)}
                     >
@@ -1115,7 +1135,7 @@ export default function CreadorThumbnailsPage() {
                   className={`${styles.layerItem} ${el.id === selectedId ? styles.layerSelected : ''}`}
                   onClick={() => setSelectedId(el.id)}
                 >
-                  <span className={styles.layerIcon}>
+                  <span className={styles.layerIcon} aria-hidden="true">
                     {el.type === 'text' && '📝'}
                     {el.type === 'image' && '🖼️'}
                     {el.type === 'shape' && '⬜'}
@@ -1128,6 +1148,7 @@ export default function CreadorThumbnailsPage() {
                     {el.type === 'emoji' && 'Emoji'}
                   </span>
                   <button
+                    type="button"
                     className={styles.layerVisibility}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -1135,6 +1156,7 @@ export default function CreadorThumbnailsPage() {
                         item.id === el.id ? { ...item, visible: !item.visible } : item
                       ));
                     }}
+                    aria-pressed={el.visible}
                   >
                     {el.visible ? '👁️' : '👁️‍🗨️'}
                   </button>
@@ -1145,16 +1167,16 @@ export default function CreadorThumbnailsPage() {
 
           {selectedId && (
             <div className={styles.layerActions}>
-              <button onClick={() => moveLayer('up')} className={styles.layerBtn} title="Subir capa">
+              <button type="button" onClick={() => moveLayer('up')} className={styles.layerBtn} title="Subir capa">
                 ⬆️
               </button>
-              <button onClick={() => moveLayer('down')} className={styles.layerBtn} title="Bajar capa">
+              <button type="button" onClick={() => moveLayer('down')} className={styles.layerBtn} title="Bajar capa">
                 ⬇️
               </button>
-              <button onClick={duplicateSelected} className={styles.layerBtn} title="Duplicar (Ctrl+D)">
+              <button type="button" onClick={duplicateSelected} className={styles.layerBtn} title="Duplicar (Ctrl+D)">
                 📋
               </button>
-              <button onClick={deleteSelected} className={styles.layerBtnDanger} title="Eliminar (Delete)">
+              <button type="button" onClick={deleteSelected} className={styles.layerBtnDanger} title="Eliminar (Delete)">
                 🗑️
               </button>
             </div>
@@ -1164,8 +1186,8 @@ export default function CreadorThumbnailsPage() {
 
       {/* Botón exportar */}
       <div className={styles.exportSection}>
-        <button onClick={exportPNG} className={styles.exportBtn}>
-          📥 Descargar PNG
+        <button type="button" onClick={exportPNG} className={styles.exportBtn}>
+          <span aria-hidden="true">📥</span> Descargar PNG
         </button>
         <p className={styles.exportHint}>Se descargará a 1280×720 píxeles (resolución óptima para YouTube)</p>
       </div>

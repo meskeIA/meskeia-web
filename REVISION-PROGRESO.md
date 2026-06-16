@@ -341,11 +341,11 @@
 | [x] | Conversor Base64 | `/conversor-base64/` | diseno, tecnicas |
 | [x] | Conversor de Colores | `/conversor-colores/` | diseno |
 | [x] | Conversor de Imágenes | `/conversor-imagenes/` | diseno, productividad |
-| [ ] | Conversor Markdown-HTML | `/conversor-markdown-html/` | diseno |
+| [x] | Conversor Markdown-HTML | `/conversor-markdown-html/` | diseno |
 | [x] | Creador de Paletas | `/creador-paletas/` | diseno |
-| [ ] | Creador de Thumbnails YouTube | `/creador-thumbnails/` | diseno |
-| [ ] | Curso de Emprendimiento | `/curso-emprendimiento/` | diseno, cultura |
-| [ ] | Curso de Empresa Familiar | `/curso-empresa-familiar/` | diseno, cultura |
+| [x] | Creador de Thumbnails YouTube | `/creador-thumbnails/` | diseno |
+| [x] | Curso de Emprendimiento | `/curso-emprendimiento/` | diseno, cultura |
+| [x] | Curso de Empresa Familiar | `/curso-empresa-familiar/` | diseno, cultura |
 | [ ] | Curso de Estrategia Empresarial | `/curso-estrategia-empresarial/` | diseno, cultura |
 | [x] | Curso de Marketing Digital 2025 | `/curso-marketing-digital/` | diseno, cultura |
 | [x] | Curso de Negociación Exitosa | `/curso-negociacion/` | diseno, cultura |

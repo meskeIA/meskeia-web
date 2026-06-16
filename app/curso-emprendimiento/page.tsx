@@ -30,7 +30,7 @@ export default function CursoEmprendimientoPage() {
           rel="noopener noreferrer"
           className={styles.videoButton}
         >
-          <span className={styles.videoIcon}>▶️</span>
+          <span className={styles.videoIcon} aria-hidden="true">▶️</span>
           Ver introducción en video
         </a>
       </header>
@@ -64,7 +64,7 @@ export default function CursoEmprendimientoPage() {
       {/* Overview */}
       <section className={styles.overviewSection}>
         <h2 className={styles.sectionTitle}>
-          <span>📖</span> ¿Qué aprenderás?
+          <span aria-hidden="true">📖</span> ¿Qué aprenderás?
         </h2>
         <p className={styles.overviewText}>
           Este curso te guiará paso a paso desde la identificación de una oportunidad de negocio
@@ -95,7 +95,7 @@ export default function CursoEmprendimientoPage() {
       {/* Chapters */}
       <section className={styles.chaptersSection}>
         <h2 className={styles.sectionTitle}>
-          <span>🎓</span> Capítulos del curso
+          <span aria-hidden="true">🎓</span> Capítulos del curso
         </h2>
 
         <div className={styles.chaptersGrid}>
@@ -135,7 +135,7 @@ export default function CursoEmprendimientoPage() {
       {/* Tools */}
       <section className={styles.toolsSection}>
         <h2 className={styles.sectionTitle}>
-          <span>🛠️</span> Herramientas Interactivas
+          <span aria-hidden="true">🛠️</span> Herramientas Interactivas
         </h2>
 
         <div className={styles.toolsGrid}>
@@ -176,10 +176,10 @@ export default function CursoEmprendimientoPage() {
           className={styles.ctaButton}
         >
           {completedCount === 0
-            ? '🚀 Empezar el curso'
+            ? <><span aria-hidden="true">🚀</span> Empezar el curso</>
             : completedCount === 6
-              ? '🎨 Crear mi Canvas'
-              : '▶️ Continuar'
+              ? <><span aria-hidden="true">🎨</span> Crear mi Canvas</>
+              : <><span aria-hidden="true">▶️</span> Continuar</>
           }
         </Link>
       </section>

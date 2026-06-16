@@ -434,20 +434,26 @@ ${htmlOutput}
         <span className={styles.ejemplosLabel}>Ejemplos rápidos:</span>
         <div className={styles.ejemplosBtns}>
           <button
+            type="button"
             onClick={() => cargarEjemplo('articulo')}
             className={`${styles.ejemploBtn} ${ejemploActivo === 'articulo' ? styles.active : ''}`}
+            aria-pressed={ejemploActivo === 'articulo'}
           >
             Artículo de blog
           </button>
           <button
+            type="button"
             onClick={() => cargarEjemplo('documentacion')}
             className={`${styles.ejemploBtn} ${ejemploActivo === 'documentacion' ? styles.active : ''}`}
+            aria-pressed={ejemploActivo === 'documentacion'}
           >
             Documentación
           </button>
           <button
+            type="button"
             onClick={() => cargarEjemplo('readme')}
             className={`${styles.ejemploBtn} ${ejemploActivo === 'readme' ? styles.active : ''}`}
+            aria-pressed={ejemploActivo === 'readme'}
           >
             README
           </button>
@@ -501,6 +507,7 @@ console.log('Hola mundo');
         <div className={styles.panelHeader}>
           <span>Código HTML Generado</span>
           <button
+            type="button"
             onClick={copiarHTML}
             className={styles.copyBtn}
             disabled={!htmlOutput}
@@ -515,13 +522,13 @@ console.log('Hola mundo');
 
       {/* Acciones */}
       <div className={styles.actionsBar}>
-        <button onClick={descargarHTML} className={styles.btnPrimary} disabled={!htmlOutput}>
+        <button type="button" onClick={descargarHTML} className={styles.btnPrimary} disabled={!htmlOutput}>
           Descargar HTML
         </button>
-        <button onClick={descargarMD} className={styles.btnSecondary} disabled={!markdown}>
+        <button type="button" onClick={descargarMD} className={styles.btnSecondary} disabled={!markdown}>
           Descargar .md
         </button>
-        <button onClick={limpiarTodo} className={styles.btnOutline} disabled={!markdown}>
+        <button type="button" onClick={limpiarTodo} className={styles.btnOutline} disabled={!markdown}>
           Limpiar todo
         </button>
       </div>
@@ -546,22 +553,22 @@ console.log('Hola mundo');
         <h2>¿Para qué se utiliza?</h2>
         <div className={styles.infoGrid}>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>📝</span>
+            <span className={styles.infoIcon} aria-hidden="true">📝</span>
             <h3>Bloggers</h3>
             <p>Escribe posts en Markdown y conviértelos a HTML para WordPress, Blogger, etc.</p>
           </div>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>💻</span>
+            <span className={styles.infoIcon} aria-hidden="true">💻</span>
             <h3>Desarrolladores</h3>
             <p>Documenta proyectos y convierte README.md a HTML para web.</p>
           </div>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>📚</span>
+            <span className={styles.infoIcon} aria-hidden="true">📚</span>
             <h3>Escritores técnicos</h3>
             <p>Crea documentación con sintaxis simple que se convierte a HTML profesional.</p>
           </div>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>🔒</span>
+            <span className={styles.infoIcon} aria-hidden="true">🔒</span>
             <h3>Privacidad total</h3>
             <p>Todo el procesamiento es local. Tu contenido nunca sale de tu navegador.</p>
           </div>
@@ -600,7 +607,7 @@ console.log('Hola mundo');
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>👨‍💻</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">👨‍💻</span>
               <strong>Desarrollador</strong>
             </div>
             <p>Convierte README.md de proyectos GitHub a HTML para mostrarlos en webs corporativas o wikis internas. También útil para previsualizar documentación técnica antes de publicarla.</p>
@@ -608,7 +615,7 @@ console.log('Hola mundo');
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>✍️</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">✍️</span>
               <strong>Escritor / Blogger</strong>
             </div>
             <p>Redacta en Markdown (más rápido y limpio que HTML) y convierte al formato requerido por WordPress, Ghost o cualquier CMS que acepte HTML como input.</p>
@@ -616,7 +623,7 @@ console.log('Hola mundo');
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>📧</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">📧</span>
               <strong>Marketing / Comunicación</strong>
             </div>
             <p>Genera el HTML de newsletters y correos HTML desde Markdown. Muchas plataformas de email (Mailchimp, SendGrid) aceptan HTML directo que puedes generar aquí.</p>
@@ -624,7 +631,7 @@ console.log('Hola mundo');
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>📊</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">📊</span>
               <strong>Analista / Investigador</strong>
             </div>
             <p>Transforma informes y notas en Markdown a HTML listo para incrustar en dashboards internos, Notion, Confluence o cualquier herramienta de gestión del conocimiento.</p>
@@ -634,7 +641,7 @@ console.log('Hola mundo');
 
         {/* 3. FAQ */}
         <details className={styles.faqList}>
-          <summary className={styles.faqItem} style={{listStyle:'none', cursor:'pointer', fontWeight:600, fontSize:'1.1rem', padding:'0.75rem 0'}}>❓ Preguntas Frecuentes sobre Markdown y HTML</summary>
+          <summary className={styles.faqItem} style={{listStyle:'none', cursor:'pointer', fontWeight:600, fontSize:'1.1rem', padding:'0.75rem 0'}}><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Markdown y HTML</summary>
           <div>
             <div className={styles.faqItem}>
               <div className={styles.faqPregunta}>¿Quién inventó Markdown y por qué?</div>
@@ -702,32 +709,32 @@ console.log('Hola mundo');
         {/* 5. TIPS GRID */}
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>⚡</span>
+            <span className={styles.tipIcono} aria-hidden="true">⚡</span>
             <strong>Atajos de teclado</strong>
             <p>En editores Markdown: Ctrl+B (negrita), Ctrl+I (cursiva), Ctrl+K (enlace). Aprende los atajos del editor que uses para multiplicar tu velocidad.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>📐</span>
+            <span className={styles.tipIcono} aria-hidden="true">📐</span>
             <strong>Líneas en blanco</strong>
             <p>Una línea en blanco separa párrafos. Dos espacios al final de una línea crean un salto de línea sin nuevo párrafo. Esta es la fuente del 80% de los problemas de formato.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🔗</span>
+            <span className={styles.tipIcono} aria-hidden="true">🔗</span>
             <strong>Referencias de enlace</strong>
             <p>Para texto con muchos enlaces, usa la sintaxis de referencia: <code>[texto][1]</code> y al final del documento <code>[1]: https://url</code>. Más limpio y mantenible.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>💻</span>
+            <span className={styles.tipIcono} aria-hidden="true">💻</span>
             <strong>Bloques de código</strong>
             <p>Especifica el lenguaje después de las triple comillas: <code>```javascript</code>. Esto activa el resaltado de sintaxis en la mayoría de renderizadores.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🔄</span>
+            <span className={styles.tipIcono} aria-hidden="true">🔄</span>
             <strong>Flujo de trabajo</strong>
             <p>Escribe en Markdown → previsualiza en tiempo real → exporta a HTML cuando necesites. Mantén siempre el Markdown como fuente de verdad, no el HTML.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🛡️</span>
+            <span className={styles.tipIcono} aria-hidden="true">🛡️</span>
             <strong>Seguridad primero</strong>
             <p>Nunca insertes HTML de Markdown no confiable directamente con innerHTML. Usa siempre DOMPurify o una librería equivalente en producción.</p>
           </div>
@@ -736,7 +743,7 @@ console.log('Hola mundo');
         {/* 6. WARNING BOX */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcono}>⚠️</span>
+            <span className={styles.warningIcono} aria-hidden="true">⚠️</span>
             <strong>Errores frecuentes al trabajar con Markdown y HTML</strong>
           </div>
           <ul className={styles.warningList}>

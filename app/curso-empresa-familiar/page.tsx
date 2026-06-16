@@ -42,7 +42,7 @@ export default function CursoEmpresaFamiliarPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🏢</span>
+        <span className={styles.heroIcon} aria-hidden="true">🏢</span>
         <h1 className={styles.title}>Curso de Empresa Familiar</h1>
         <p className={styles.subtitle}>
           Domina la gestión de empresas familiares: gobierno corporativo, protocolo familiar,
@@ -55,7 +55,7 @@ export default function CursoEmpresaFamiliarPage() {
           rel="noopener noreferrer"
           className={styles.videoButton}
         >
-          <span className={styles.videoIcon}>▶️</span>
+          <span className={styles.videoIcon} aria-hidden="true">▶️</span>
           Ver introducción en video
         </a>
       </header>
@@ -65,22 +65,22 @@ export default function CursoEmpresaFamiliarPage() {
       {/* Stats Grid */}
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>📚</span>
+          <span className={styles.statIcon} aria-hidden="true">📚</span>
           <div className={styles.statValue}>{totalChapters}</div>
           <div className={styles.statLabel}>Capítulos</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>⏱️</span>
+          <span className={styles.statIcon} aria-hidden="true">⏱️</span>
           <div className={styles.statValue}>{totalDuration}</div>
           <div className={styles.statLabel}>Minutos</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>✅</span>
+          <span className={styles.statIcon} aria-hidden="true">✅</span>
           <div className={styles.statValue}>{completedCount}/{totalChapters}</div>
           <div className={styles.statLabel}>Completados</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>📊</span>
+          <span className={styles.statIcon} aria-hidden="true">📊</span>
           <div className={styles.statValue}>{progress}%</div>
           <div className={styles.statLabel}>Progreso</div>
         </div>
@@ -90,22 +90,22 @@ export default function CursoEmpresaFamiliarPage() {
       <section className={styles.overviewSection}>
         <div className={styles.overviewGrid}>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>🏛️</span>
+            <span className={styles.overviewIcon} aria-hidden="true">🏛️</span>
             <h3>Gobierno</h3>
             <p>Consejo de Familia, protocolo y estructuras de decisión</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>🔄</span>
+            <span className={styles.overviewIcon} aria-hidden="true">🔄</span>
             <h3>Sucesión</h3>
             <p>Planificación generacional y continuidad empresarial</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>📈</span>
+            <span className={styles.overviewIcon} aria-hidden="true">📈</span>
             <h3>Profesionalización</h3>
             <p>Separar familia y empresa para crecer con éxito</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>🇪🇸</span>
+            <span className={styles.overviewIcon} aria-hidden="true">🇪🇸</span>
             <h3>Casos Reales</h3>
             <p>Inditex, Mercadona, El Corte Inglés y más</p>
           </div>
@@ -114,7 +114,7 @@ export default function CursoEmpresaFamiliarPage() {
 
       {/* Modules Section */}
       <section className={styles.modulesSection}>
-        <h2 className={styles.sectionTitle}>📖 Contenido del Curso</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">📖</span> Contenido del Curso</h2>
 
         {modules.map((module) => {
           const completedInModule = module.chapters.filter(ch => isCompleted(ch.id)).length;
@@ -127,7 +127,7 @@ export default function CursoEmpresaFamiliarPage() {
                   className={styles.moduleIcon}
                   style={{ background: MODULE_COLORS[module.id] || MODULE_COLORS['fundamentos'] }}
                 >
-                  {MODULE_ICONS[module.id] || '📖'}
+                  <span aria-hidden="true">{MODULE_ICONS[module.id] || '📖'}</span>
                 </div>
                 <div className={styles.moduleInfo}>
                   <h3 className={styles.moduleTitle}>{module.title}</h3>
@@ -151,7 +151,7 @@ export default function CursoEmpresaFamiliarPage() {
                         <span className={styles.chapterNumber}>{globalChapterIndex}</span>
                         <div className={styles.chapterInfo}>
                           <h4 className={styles.chapterTitle}>{chapter.title}</h4>
-                          <span className={styles.chapterDuration}>⏱️ {chapter.duration} min</span>
+                          <span className={styles.chapterDuration}><span aria-hidden="true">⏱️</span> {chapter.duration} min</span>
                         </div>
                       </div>
                       <div className={styles.chapterTopics}>
@@ -173,15 +173,15 @@ export default function CursoEmpresaFamiliarPage() {
 
       {/* Resources Section */}
       <section className={styles.resourcesSection}>
-        <h2 className={styles.sectionTitle}>📚 Recursos Adicionales</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">📚</span> Recursos Adicionales</h2>
         <div className={styles.resourcesGrid}>
           <Link href="/curso-empresa-familiar/recursos/glosario" className={styles.resourceCard}>
-            <span className={styles.resourceIcon}>📖</span>
+            <span className={styles.resourceIcon} aria-hidden="true">📖</span>
             <div className={styles.resourceName}>Glosario de Términos</div>
             <div className={styles.resourceDesc}>Conceptos clave de empresa familiar</div>
           </Link>
           <Link href="/curso-empresa-familiar/recursos/ejercicios" className={styles.resourceCard}>
-            <span className={styles.resourceIcon}>✏️</span>
+            <span className={styles.resourceIcon} aria-hidden="true">✏️</span>
             <div className={styles.resourceName}>Ejercicios Prácticos</div>
             <div className={styles.resourceDesc}>Aplica lo aprendido a tu empresa</div>
           </Link>
@@ -192,7 +192,7 @@ export default function CursoEmpresaFamiliarPage() {
       <section className={styles.ctaSection}>
         {progress === 0 ? (
           <>
-            <h2 className={styles.ctaTitle}>🚀 ¡Comienza tu Formación en Empresa Familiar!</h2>
+            <h2 className={styles.ctaTitle}><span aria-hidden="true">🚀</span> ¡Comienza tu Formación en Empresa Familiar!</h2>
             <p className={styles.ctaText}>
               Aprende a gestionar los desafíos únicos de las empresas familiares:
               gobierno, sucesión, profesionalización y modelos de gestión.
@@ -206,7 +206,7 @@ export default function CursoEmpresaFamiliarPage() {
           </>
         ) : progress === 100 ? (
           <>
-            <h2 className={styles.ctaTitle}>🎉 ¡Felicidades, has completado el curso!</h2>
+            <h2 className={styles.ctaTitle}><span aria-hidden="true">🎉</span> ¡Felicidades, has completado el curso!</h2>
             <p className={styles.ctaText}>
               Has adquirido conocimientos fundamentales sobre gestión de empresas familiares.
               Ahora puedes aplicarlos a tu propia situación empresarial.
@@ -220,7 +220,7 @@ export default function CursoEmpresaFamiliarPage() {
           </>
         ) : (
           <>
-            <h2 className={styles.ctaTitle}>📈 ¡Sigue avanzando!</h2>
+            <h2 className={styles.ctaTitle}><span aria-hidden="true">📈</span> ¡Sigue avanzando!</h2>
             <p className={styles.ctaText}>
               Llevas {completedCount} de {totalChapters} capítulos completados.
               ¡Continúa desarrollando tus conocimientos en empresa familiar!
