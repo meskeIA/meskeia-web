@@ -225,10 +225,10 @@
 | [x] | Historia de los Estados Unidos: De las Colonias a la Superpotencia | `/visualizador-historia/historia-eeuu/` | cultura |
 | [x] | Historia de los Idiomas del Mundo: De las Primeras Lenguas al Inglés Global | `/visualizador-historia/idiomas-mundo/` | cultura, estudiantes |
 | [x] | Historia de los Mayas: De las Primeras Aldeas al Fin del Mundo Clásico | `/visualizador-historia/maya/` | cultura, estudiantes |
-| [ ] | Historia de los Olmecas: La Civilización Madre de Mesoamérica | `/visualizador-historia/olmeca/` | cultura, estudiantes |
-| [ ] | Historia de los Ordenadores: De Babbage a la IA Cuántica | `/visualizador-historia/ordenadores/` | cultura, tecnicas |
-| [ ] | Historia de los Países Bajos: De los Frisios a la Holanda Moderna | `/visualizador-historia/paises-bajos/` | cultura, estudiantes |
-| [ ] | Historia de los Toltecas: El Imperio de Tula y la Leyenda de Quetzalcóatl | `/visualizador-historia/tolteca/` | cultura, estudiantes |
+| [x] | Historia de los Olmecas: La Civilización Madre de Mesoamérica | `/visualizador-historia/olmeca/` | cultura, estudiantes |
+| [x] | Historia de los Ordenadores: De Babbage a la IA Cuántica | `/visualizador-historia/ordenadores/` | cultura, tecnicas |
+| [x] | Historia de los Países Bajos: De los Frisios a la Holanda Moderna | `/visualizador-historia/paises-bajos/` | cultura, estudiantes |
+| [x] | Historia de los Toltecas: El Imperio de Tula y la Leyenda de Quetzalcóatl | `/visualizador-historia/tolteca/` | cultura, estudiantes |
 | [ ] | Historia de los Viajes Espaciales: De Gagarin a Starship | `/visualizador-historia/viajes-espaciales/` | cultura, tecnicas |
 | [ ] | Historia de los Videojuegos Españoles: De la Edad de Oro a Metroid Dread | `/visualizador-historia/videojuegos-espanoles/` | cultura, juegos |
 | [ ] | Historia de los Videojuegos Japoneses: De Nintendo a los Gacha | `/visualizador-historia/historia-videojuegos-japoneses/` | cultura, juegos |
