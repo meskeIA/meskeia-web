@@ -601,11 +601,11 @@
 | [x] | Simulador VSEPR de Geometría Molecular | `/simulador-vsepr/` | estudiantes |
 | [x] | Sistema de Pensiones: Reparto, Demografía y Reformas | `/visualizador-sistema-pensiones/` | estudiantes, cultura, finanzas |
 | [x] | Sistemas Circulatorios - Del Corazón de 2 al de 4 Cámaras | `/visualizador-sistemas-circulatorios/` | estudiantes, cultura |
-| [ ] | Sistemas Operativos: Procesos, Scheduling, Memoria y Ficheros | `/visualizador-sistemas-operativos/` | estudiantes, tecnicas |
-| [ ] | Sonido y Ondas - Frecuencia, Amplitud y Decibelios | `/visualizador-sonido-ondas/` | estudiantes, cultura |
-| [ ] | Superconductividad: Efecto Meissner y Pares de Cooper | `/visualizador-superconductividad/` | estudiantes, tecnicas |
+| [x] | Sistemas Operativos: Procesos, Scheduling, Memoria y Ficheros | `/visualizador-sistemas-operativos/` | estudiantes, tecnicas |
+| [x] | Sonido y Ondas - Frecuencia, Amplitud y Decibelios | `/visualizador-sonido-ondas/` | estudiantes, cultura |
+| [x] | Superconductividad: Efecto Meissner y Pares de Cooper | `/visualizador-superconductividad/` | estudiantes, tecnicas |
 | [x] | Tabla Periódica Interactiva | `/tabla-periodica/` | estudiantes |
-| [ ] | Tectónica de Placas | `/visualizador-tectonica-placas/` | estudiantes, cultura |
+| [x] | Tectónica de Placas | `/visualizador-tectonica-placas/` | estudiantes, cultura |
 | [ ] | Tendencias de la Tabla Periódica | `/visualizador-tabla-periodica-interactiva/` | estudiantes, cultura |
 | [ ] | Tendencias de la Tabla Periódica | `/simulador-tabla-periodica-tendencias/` | estudiantes |
 | [ ] | Teoría de Grafos: Dijkstra, Königsberg y Redes | `/visualizador-teoria-grafos/` | estudiantes, tecnicas |

@@ -339,7 +339,7 @@ export default function VisualizadorSistemasOperativos() {
 
       <header className={styles.hero}>
         <div className={styles.heroContent}>
-          <span className={styles.heroBadge}>🖥️ Sistemas Operativos</span>
+          <span className={styles.heroBadge}><span aria-hidden="true">🖥️</span> Sistemas Operativos</span>
           <h1 className={styles.heroTitle}>Visualizador de Sistemas Operativos</h1>
           <p className={styles.heroSubtitle}>
             Procesos, planificación de CPU, memoria virtual y sistema de ficheros — todo interactivo
@@ -355,6 +355,7 @@ export default function VisualizadorSistemasOperativos() {
           {TABS.map(tab => (
             <button
               key={tab.id}
+              type="button"
               role="tab"
               aria-selected={tabActiva === tab.id}
               aria-controls={`panel-${tab.id}`}
@@ -450,6 +451,7 @@ export default function VisualizadorSistemasOperativos() {
                 {transicionesEstado[estadoProceso].map(siguiente => (
                   <button
                     key={siguiente}
+                    type="button"
                     className={styles.btnTransicion}
                     onClick={() => setEstadoProceso(siguiente)}
                     style={{ borderColor: colorEstado[siguiente], color: colorEstado[siguiente] }}
@@ -458,7 +460,7 @@ export default function VisualizadorSistemasOperativos() {
                   </button>
                 ))}
                 {estadoProceso === 'terminado' && (
-                  <button className={styles.btnReinicio} onClick={() => setEstadoProceso('nuevo')}>
+                  <button type="button" className={styles.btnReinicio} onClick={() => setEstadoProceso('nuevo')}>
                     Reiniciar proceso
                   </button>
                 )}
@@ -541,6 +543,8 @@ export default function VisualizadorSistemasOperativos() {
                   {(['FIFO', 'RR', 'SJF', 'PRIORIDAD'] as AlgoritmoScheduling[]).map(alg => (
                     <button
                       key={alg}
+                      type="button"
+                      aria-pressed={algoritmo === alg}
                       className={`${styles.algoBtn} ${algoritmo === alg ? styles.algoBtnActivo : ''}`}
                       onClick={() => setAlgoritmo(alg)}
                     >
@@ -850,6 +854,8 @@ export default function VisualizadorSistemasOperativos() {
                   {(Object.keys(INFO_NODOS) as NodoDir[]).map(nodo => (
                     <li key={nodo} role="treeitem" aria-selected={nodoSeleccionado === nodo}>
                       <button
+                        type="button"
+                        aria-pressed={nodoSeleccionado === nodo}
                         className={`${styles.nodoBtn} ${nodoSeleccionado === nodo ? styles.nodoBtnActivo : ''}`}
                         onClick={() => setNodoSeleccionado(nodo)}
                       >

@@ -558,7 +558,7 @@ function SeccionBordes() {
       {/* Información del borde */}
       <div className={styles.bordeInfo} style={{ borderLeftColor: borde.color }}>
         <h3 className={styles.bordeInfoTitulo} style={{ color: borde.color }}>
-          {borde.icono} Borde {borde.nombre}
+          <span aria-hidden="true">{borde.icono}</span> Borde {borde.nombre}
         </h3>
         <p className={styles.bordeInfoDesc}>{borde.descripcion}</p>
         <p className={styles.bordeInfoProceso}>{borde.proceso}</p>

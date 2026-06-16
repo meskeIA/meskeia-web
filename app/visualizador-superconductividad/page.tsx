@@ -124,6 +124,7 @@ export default function SuperconductividadPage() {
           {MATERIALES.map((m, i) => (
             <button
               key={m.nombre}
+              type="button"
               className={`${styles.materialBtn} ${i === materialIdx ? styles.materialBtnActivo : ''}`}
               onClick={() => setMaterialIdx(i)}
               aria-pressed={i === materialIdx}
