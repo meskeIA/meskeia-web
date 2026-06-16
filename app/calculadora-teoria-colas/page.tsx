@@ -416,14 +416,14 @@ RESULTADOS DE SIMULACIÓN
         </div>
 
         <div className={styles.buttonGroup}>
-          <button onClick={calcularMetricas} className={styles.btnPrimary}>
-            📈 Calcular Métricas
+          <button type="button" onClick={calcularMetricas} className={styles.btnPrimary}>
+            <span aria-hidden="true">📈</span> Calcular Métricas
           </button>
-          <button onClick={cargarEjemplo} className={styles.btnSecondary}>
-            📋 Cargar Ejemplo
+          <button type="button" onClick={cargarEjemplo} className={styles.btnSecondary}>
+            <span aria-hidden="true">📋</span> Cargar Ejemplo
           </button>
-          <button onClick={limpiar} className={styles.btnOutline}>
-            🗑️ Limpiar
+          <button type="button" onClick={limpiar} className={styles.btnOutline}>
+            <span aria-hidden="true">🗑️</span> Limpiar
           </button>
         </div>
       </div>
@@ -451,14 +451,14 @@ RESULTADOS DE SIMULACIÓN
           {/* Métricas principales */}
           <div className={styles.metricsGrid}>
             <div className={styles.metricCard}>
-              <div className={styles.metricIcon}>⚙️</div>
+              <div className={styles.metricIcon} aria-hidden="true">⚙️</div>
               <div className={styles.metricValue}>{formatNumber(metricas.rho * 100, 2)}%</div>
               <div className={styles.metricLabel}>Utilización (ρ)</div>
               <div className={styles.metricDesc}>Porcentaje de tiempo servidor ocupado</div>
             </div>
 
             <div className={styles.metricCard}>
-              <div className={styles.metricIcon}>🚪</div>
+              <div className={styles.metricIcon} aria-hidden="true">🚪</div>
               <div className={styles.metricValue}>{formatNumber(metricas.P0 * 100, 2)}%</div>
               <div className={styles.metricLabel}>P₀ - Sistema Vacío</div>
               <div className={styles.metricDesc}>Probabilidad de no tener clientes</div>
@@ -467,28 +467,28 @@ RESULTADOS DE SIMULACIÓN
             {metricas.estable && (
               <>
                 <div className={styles.metricCard}>
-                  <div className={styles.metricIcon}>👥</div>
+                  <div className={styles.metricIcon} aria-hidden="true">👥</div>
                   <div className={styles.metricValue}>{formatNumber(metricas.L, 4)}</div>
                   <div className={styles.metricLabel}>L - En Sistema</div>
                   <div className={styles.metricDesc}>Clientes promedio en el sistema</div>
                 </div>
 
                 <div className={styles.metricCard}>
-                  <div className={styles.metricIcon}>🚶</div>
+                  <div className={styles.metricIcon} aria-hidden="true">🚶</div>
                   <div className={styles.metricValue}>{formatNumber(metricas.Lq, 4)}</div>
                   <div className={styles.metricLabel}>Lq - En Cola</div>
                   <div className={styles.metricDesc}>Clientes promedio esperando</div>
                 </div>
 
                 <div className={styles.metricCard}>
-                  <div className={styles.metricIcon}>⏱️</div>
+                  <div className={styles.metricIcon} aria-hidden="true">⏱️</div>
                   <div className={styles.metricValue}>{formatNumber(metricas.W * 60, 2)} min</div>
                   <div className={styles.metricLabel}>W - Tiempo en Sistema</div>
                   <div className={styles.metricDesc}>Tiempo promedio total</div>
                 </div>
 
                 <div className={styles.metricCard}>
-                  <div className={styles.metricIcon}>⏳</div>
+                  <div className={styles.metricIcon} aria-hidden="true">⏳</div>
                   <div className={styles.metricValue}>{formatNumber(metricas.Wq * 60, 2)} min</div>
                   <div className={styles.metricLabel}>Wq - Tiempo en Cola</div>
                   <div className={styles.metricDesc}>Tiempo promedio de espera</div>
@@ -521,14 +521,15 @@ RESULTADOS DE SIMULACIÓN
           {/* Botones de acción */}
           <div className={styles.actionButtons}>
             <button
+              type="button"
               onClick={ejecutarSimulacion}
               className={styles.btnSecondary}
               disabled={simulando}
             >
-              {simulando ? '⏳ Simulando...' : '🎲 Ejecutar Simulación'}
+              {simulando ? <><span aria-hidden="true">⏳</span> Simulando...</> : <><span aria-hidden="true">🎲</span> Ejecutar Simulación</>}
             </button>
-            <button onClick={exportarReporte} className={styles.btnOutline}>
-              📄 Exportar Reporte
+            <button type="button" onClick={exportarReporte} className={styles.btnOutline}>
+              <span aria-hidden="true">📄</span> Exportar Reporte
             </button>
           </div>
         </div>

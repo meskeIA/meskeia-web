@@ -404,11 +404,11 @@
 | [x] | Calculadora Estadística | `/calculadora-estadistica/` | estudiantes |
 | [x] | Calculadora Matemática Avanzada | `/calculadora-matematica/` | estudiantes |
 | [x] | Calculadora MCD y MCM | `/calculadora-mcd-mcm/` | estudiantes |
-| [ ] | Calculadora Teoría de Colas | `/calculadora-teoria-colas/` | estudiantes |
-| [ ] | Calculadora Teoría de Números | `/calculadora-teoria-numeros/` | estudiantes |
+| [x] | Calculadora Teoría de Colas | `/calculadora-teoria-colas/` | estudiantes |
+| [x] | Calculadora Teoría de Números | `/calculadora-teoria-numeros/` | estudiantes |
 | [x] | Cálculo Visual: Límites, Derivadas e Integrales | `/visualizador-calculo-visual/` | estudiantes, tecnicas |
-| [ ] | Cáncer: Biología Molecular, Hallmarks e Inmunoterapia | `/visualizador-cancer/` | estudiantes, cultura, salud |
-| [ ] | Caos y Mariposa: El Atractor de Lorenz | `/visualizador-caos-mariposa/` | estudiantes, cultura, tecnicas |
+| [x] | Cáncer: Biología Molecular, Hallmarks e Inmunoterapia | `/visualizador-cancer/` | estudiantes, cultura, salud |
+| [x] | Caos y Mariposa: El Atractor de Lorenz | `/visualizador-caos-mariposa/` | estudiantes, cultura, tecnicas |
 | [ ] | Capas de la Tierra - Del Suelo al Núcleo | `/visualizador-capas-tierra/` | estudiantes, cultura |
 | [ ] | Cartografía y Proyecciones - Por qué Todos los Mapas Mienten | `/visualizador-cartografia-proyecciones/` | estudiantes, cultura |
 | [ ] | Ciclo de Replicación Viral: Cómo se Reproducen los Virus | `/visualizador-ciclo-viral/` | estudiantes, cultura, salud |

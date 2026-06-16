@@ -357,10 +357,12 @@ export default function CalculadoraTeoriaNumerosPage() {
             {tipos.map((tipo) => (
               <button
                 key={tipo.id}
+                type="button"
                 className={`${styles.tipoBtn} ${tipoCalculo === tipo.id ? styles.tipoActivo : ''}`}
                 onClick={() => setTipoCalculo(tipo.id)}
+                aria-pressed={tipoCalculo === tipo.id}
               >
-                <span className={styles.tipoIcono}>{tipo.icono}</span>
+                <span className={styles.tipoIcono} aria-hidden="true">{tipo.icono}</span>
                 <span className={styles.tipoNombre}>{tipo.nombre}</span>
               </button>
             ))}
