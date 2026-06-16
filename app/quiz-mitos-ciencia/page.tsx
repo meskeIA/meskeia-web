@@ -337,7 +337,7 @@ export default function QuizMitosCiencia() {
               Para cada afirmación, decide si es <strong>Verdad</strong> o <strong>Mito</strong>.
               Después de responder verás la explicación científica.
             </p>
-            <button className={styles.btnIniciar} onClick={iniciar}>
+            <button type="button" className={styles.btnIniciar} onClick={iniciar}>
               Comenzar quiz
             </button>
           </div>
@@ -350,7 +350,7 @@ export default function QuizMitosCiencia() {
             <div className={styles.progressArea}>
               <div className={styles.progressInfo}>
                 <span className={styles.progCategoria}>
-                  {CATEGORIAS[pregunta.categoria].emoji} {CATEGORIAS[pregunta.categoria].nombre}
+                  <span aria-hidden="true">{CATEGORIAS[pregunta.categoria].emoji}</span> {CATEGORIAS[pregunta.categoria].nombre}
                 </span>
                 <span className={styles.progNum}>{indice + 1} / {PREGUNTAS.length}</span>
               </div>
@@ -371,12 +371,12 @@ export default function QuizMitosCiencia() {
             {/* Botones de respuesta */}
             {fase === 'jugando' && (
               <div className={styles.botonesRespuesta}>
-                <button className={styles.btnVerdad} onClick={() => responder(true)}>
-                  <span className={styles.btnIcon}>✓</span>
+                <button type="button" className={styles.btnVerdad} onClick={() => responder(true)}>
+                  <span className={styles.btnIcon} aria-hidden="true">✓</span>
                   <span>Verdad</span>
                 </button>
-                <button className={styles.btnMito} onClick={() => responder(false)}>
-                  <span className={styles.btnIcon}>✗</span>
+                <button type="button" className={styles.btnMito} onClick={() => responder(false)}>
+                  <span className={styles.btnIcon} aria-hidden="true">✗</span>
                   <span>Mito</span>
                 </button>
               </div>
@@ -394,7 +394,7 @@ export default function QuizMitosCiencia() {
                 <div className={styles.explicacionBox}>
                   <p className={styles.explicacion}>{pregunta.explicacion}</p>
                 </div>
-                <button className={styles.btnSiguiente} onClick={siguiente}>
+                <button type="button" className={styles.btnSiguiente} onClick={siguiente}>
                   {indice + 1 < PREGUNTAS.length ? 'Siguiente →' : 'Ver resultados'}
                 </button>
               </div>
@@ -424,7 +424,7 @@ export default function QuizMitosCiencia() {
                   return (
                     <div key={key} className={styles.catResultItem}>
                       <div className={styles.catResultHeader}>
-                        <span>{cat.emoji} {cat.nombre}</span>
+                        <span><span aria-hidden="true">{cat.emoji}</span> {cat.nombre}</span>
                         <span className={styles.catScore}>{datos.correctas}/{datos.total}</span>
                       </div>
                       <div className={styles.catBar}>
@@ -436,7 +436,7 @@ export default function QuizMitosCiencia() {
               </div>
             </div>
 
-            <button className={styles.btnRepetir} onClick={iniciar}>
+            <button type="button" className={styles.btnRepetir} onClick={iniciar}>
               Repetir quiz
             </button>
           </div>

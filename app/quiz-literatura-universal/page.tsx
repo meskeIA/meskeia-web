@@ -481,30 +481,32 @@ export default function QuizLiteraturaUniversal() {
             <div className={styles.nivelesGrid}>
               {(['basico', 'medio', 'avanzado'] as Nivel[]).map(n => (
                 <button
+                  type="button"
                   key={n}
                   className={`${styles.nivelBtn} ${nivelElegido === n ? styles.nivelBtnActivo : ''}`}
                   style={nivelElegido === n ? { borderColor: NIVEL_CONFIG[n].color, background: NIVEL_CONFIG[n].color + '18' } : {}}
                   onClick={() => setNivelElegido(n)}
                   aria-pressed={nivelElegido === n}
                 >
-                  <span className={styles.nivelEmoji}>{NIVEL_CONFIG[n].emoji}</span>
+                  <span className={styles.nivelEmoji} aria-hidden="true">{NIVEL_CONFIG[n].emoji}</span>
                   <span className={styles.nivelLabel}>{NIVEL_CONFIG[n].label}</span>
                   <span className={styles.nivelDesc}>{NIVEL_CONFIG[n].desc}</span>
                 </button>
               ))}
               <button
+                type="button"
                 className={`${styles.nivelBtn} ${nivelElegido === 'todos' ? styles.nivelBtnActivo : ''}`}
                 style={nivelElegido === 'todos' ? { borderColor: '#7B5EA7', background: '#7B5EA714' } : {}}
                 onClick={() => setNivelElegido('todos')}
                 aria-pressed={nivelElegido === 'todos'}
               >
-                <span className={styles.nivelEmoji}>🎲</span>
+                <span className={styles.nivelEmoji} aria-hidden="true">🎲</span>
                 <span className={styles.nivelLabel}>Mezcla</span>
                 <span className={styles.nivelDesc}>Preguntas de todos los niveles</span>
               </button>
             </div>
             <p className={styles.seleccionInfo}>{PREGUNTAS_POR_PARTIDA} preguntas aleatorias · Explicación tras cada respuesta</p>
-            <button className={styles.btnIniciar} onClick={handleIniciar}>
+            <button type="button" className={styles.btnIniciar} onClick={handleIniciar}>
               Empezar el quiz →
             </button>
           </section>
@@ -544,6 +546,7 @@ export default function QuizLiteraturaUniversal() {
                 }
                 return (
                   <button
+                    type="button"
                     key={i}
                     className={`${styles.opcion} ${estadoClass}`}
                     onClick={() => handleRespuesta(i)}
@@ -552,8 +555,8 @@ export default function QuizLiteraturaUniversal() {
                   >
                     <span className={styles.opcionLetra}>{String.fromCharCode(65 + i)}</span>
                     <span className={styles.opcionTexto}>{opcion}</span>
-                    {respondida && i === preguntaActual.correcta && <span className={styles.opcionMarca}>✓</span>}
-                    {respondida && i === seleccionada && i !== preguntaActual.correcta && <span className={styles.opcionMarca}>✗</span>}
+                    {respondida && i === preguntaActual.correcta && <span className={styles.opcionMarca} aria-hidden="true">✓</span>}
+                    {respondida && i === seleccionada && i !== preguntaActual.correcta && <span className={styles.opcionMarca} aria-hidden="true">✗</span>}
                   </button>
                 );
               })}
@@ -567,7 +570,7 @@ export default function QuizLiteraturaUniversal() {
             )}
 
             {respondida && (
-              <button className={styles.btnSiguiente} onClick={handleSiguiente}>
+              <button type="button" className={styles.btnSiguiente} onClick={handleSiguiente}>
                 {indice + 1 < preguntas.length ? 'Siguiente →' : 'Ver resultado'}
               </button>
             )}
@@ -599,8 +602,8 @@ export default function QuizLiteraturaUniversal() {
               </div>
 
               <div className={styles.resultadoBotones}>
-                <button className={styles.btnReiniciar} onClick={handleReiniciar}>
-                  🔄 Jugar de nuevo
+                <button type="button" className={styles.btnReiniciar} onClick={handleReiniciar}>
+                  <span aria-hidden="true">🔄</span> Jugar de nuevo
                 </button>
               </div>
             </div>

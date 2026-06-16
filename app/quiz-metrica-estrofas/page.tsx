@@ -361,6 +361,7 @@ export default function QuizMetricaEstrofasPage() {
           <div className={styles.nivelGrid}>
             {(Object.entries(NIVEL_CONFIG) as [Nivel, typeof NIVEL_CONFIG[Nivel]][]).map(([key, cfg]) => (
               <button
+                type="button"
                 key={key}
                 className={`${styles.nivelBtn} ${nivel === key ? styles.active : ''}`}
                 onClick={() => setNivel(key)}
@@ -377,6 +378,7 @@ export default function QuizMetricaEstrofasPage() {
           <div className={styles.preguntasRow} role="group" aria-label="Número de preguntas">
             {OPCIONES_PREGUNTAS.map(n => (
               <button
+                type="button"
                 key={n}
                 className={`${styles.pregBtn} ${numPreguntas === n ? styles.active : ''}`}
                 onClick={() => setNumPreguntas(n)}
@@ -387,7 +389,7 @@ export default function QuizMetricaEstrofasPage() {
             ))}
           </div>
 
-          <button className={styles.btnIniciar} onClick={iniciarQuiz}>
+          <button type="button" className={styles.btnIniciar} onClick={iniciarQuiz}>
             Empezar Quiz — {numPreguntas} preguntas · {NIVEL_CONFIG[nivel].label}
           </button>
 
@@ -452,6 +454,7 @@ export default function QuizMetricaEstrofasPage() {
               }
               return (
                 <button
+                  type="button"
                   key={opcion}
                   className={`${styles.opcion} ${claseExtra}`}
                   onClick={() => responder(opcion)}
@@ -493,7 +496,7 @@ export default function QuizMetricaEstrofasPage() {
                 </div>
               </div>
 
-              <button className={styles.btnSiguiente} onClick={siguiente}>
+              <button type="button" className={styles.btnSiguiente} onClick={siguiente}>
                 {esUltima ? 'Ver resultados' : 'Siguiente pregunta →'}
               </button>
             </>
@@ -527,10 +530,10 @@ export default function QuizMetricaEstrofasPage() {
           </div>
 
           <div className={styles.botonesResultado}>
-            <button className={styles.btnRejugar} onClick={reiniciar}>
+            <button type="button" className={styles.btnRejugar} onClick={reiniciar}>
               🔄 Jugar de nuevo
             </button>
-            <button className={styles.btnConfig} onClick={volverConfig}>
+            <button type="button" className={styles.btnConfig} onClick={volverConfig}>
               ⚙️ Cambiar nivel
             </button>
           </div>

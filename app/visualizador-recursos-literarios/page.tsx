@@ -184,7 +184,9 @@ export default function VisualizadorRecursosLiterariosPage() {
             <div className={styles.filtrosBotones}>
               {(['todos', 'basico', 'intermedio', 'avanzado'] as FiltroNivel[]).map(n => (
                 <button
+                  type="button"
                   key={n}
+                  aria-pressed={filtroNivel === n}
                   className={`${styles.filtroBtn} ${filtroNivel === n ? styles.filtroBtnActivo : ''}`}
                   onClick={() => { setFiltroNivel(n); setFiltroGrupo('todos'); }}
                   style={filtroNivel === n && n !== 'todos' ? { background: NIVEL_COLOR[n as NivelFigura], borderColor: NIVEL_COLOR[n as NivelFigura] } : {}}
@@ -199,6 +201,8 @@ export default function VisualizadorRecursosLiterariosPage() {
             <span className={styles.filtroLabel}>Grupo:</span>
             <div className={styles.filtrosBotones}>
               <button
+                type="button"
+                aria-pressed={filtroGrupo === 'todos'}
                 className={`${styles.filtroBtn} ${filtroGrupo === 'todos' ? styles.filtroBtnActivo : ''}`}
                 onClick={() => setFiltroGrupo('todos')}
               >
@@ -206,7 +210,9 @@ export default function VisualizadorRecursosLiterariosPage() {
               </button>
               {gruposDisponibles.map(g => (
                 <button
+                  type="button"
                   key={g}
+                  aria-pressed={filtroGrupo === g}
                   className={`${styles.filtroBtn} ${filtroGrupo === g ? styles.filtroBtnActivo : ''}`}
                   onClick={() => setFiltroGrupo(g)}
                   style={filtroGrupo === g ? { background: GRUPO_COLOR[g], borderColor: GRUPO_COLOR[g] } : {}}
@@ -229,6 +235,7 @@ export default function VisualizadorRecursosLiterariosPage() {
           <div className={styles.galeriaGrid}>
             {figurasFiltradas.map(figura => (
               <button
+                type="button"
                 key={figura.id}
                 className={styles.figuraCard}
                 onClick={() => abrirDetalle(figura)}
@@ -264,7 +271,7 @@ export default function VisualizadorRecursosLiterariosPage() {
         ) : (
           <div className={styles.sinResultados}>
             <p>No se encontraron figuras con ese criterio.</p>
-            <button className={styles.btnReset} onClick={() => { setBusqueda(''); setFiltroNivel('todos'); setFiltroGrupo('todos'); }}>
+            <button type="button" className={styles.btnReset} onClick={() => { setBusqueda(''); setFiltroNivel('todos'); setFiltroGrupo('todos'); }}>
               Limpiar filtros
             </button>
           </div>
@@ -274,7 +281,7 @@ export default function VisualizadorRecursosLiterariosPage() {
         {figuraActiva && (
           <div className={styles.modalOverlay} onClick={cerrarDetalle} role="dialog" aria-modal="true" aria-label={`Detalle de ${figuraActiva.nombre}`}>
             <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
-              <button className={styles.modalCerrar} onClick={cerrarDetalle} aria-label="Cerrar detalle">✕</button>
+              <button type="button" className={styles.modalCerrar} onClick={cerrarDetalle} aria-label="Cerrar detalle">✕</button>
 
               <div className={styles.modalHeader} style={{ borderColor: GRUPO_COLOR[figuraActiva.grupo] }}>
                 <h2 className={styles.modalNombre}>{figuraActiva.nombre}</h2>
@@ -335,6 +342,7 @@ export default function VisualizadorRecursosLiterariosPage() {
               <div key={i} className={styles.parCard}>
                 <div className={styles.parHeader}>
                   <button
+                    type="button"
                     className={styles.parFiguraBtn}
                     onClick={() => {
                       const fig = figurasRetorica.find(f => f.nombre === par.figuraA);
@@ -345,6 +353,7 @@ export default function VisualizadorRecursosLiterariosPage() {
                   </button>
                   <span className={styles.parVs}>vs</span>
                   <button
+                    type="button"
                     className={styles.parFiguraBtn}
                     onClick={() => {
                       const fig = figurasRetorica.find(f => f.nombre === par.figuraB);

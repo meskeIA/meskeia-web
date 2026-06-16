@@ -307,10 +307,10 @@
 | [x] | Portugal y el Ultramar: El Primer Imperio Global | `/visualizador-historia/historia-portugal-ultramar/` | cultura |
 | [x] | Prehistoria: De los Primeros Homínidos a las Primeras Ciudades | `/visualizador-historia/historia-prehistoria/` | cultura |
 | [x] | Puntos de Inflexión Climáticos - Tipping Points | `/visualizador-cambio-climatico-tipping-points/` | cultura, estudiantes |
-| [ ] | Quiz de Literatura Universal | `/quiz-literatura-universal/` | cultura, estudiantes |
-| [ ] | Quiz de Métrica y Estrofas | `/quiz-metrica-estrofas/` | cultura, estudiantes |
-| [ ] | Quiz: Mitos y Realidades de la Ciencia | `/quiz-mitos-ciencia/` | cultura, estudiantes |
-| [ ] | Recursos Literarios | `/visualizador-recursos-literarios/` | cultura, estudiantes |
+| [x] | Quiz de Literatura Universal | `/quiz-literatura-universal/` | cultura, estudiantes |
+| [x] | Quiz de Métrica y Estrofas | `/quiz-metrica-estrofas/` | cultura, estudiantes |
+| [x] | Quiz: Mitos y Realidades de la Ciencia | `/quiz-mitos-ciencia/` | cultura, estudiantes |
+| [x] | Recursos Literarios | `/visualizador-recursos-literarios/` | cultura, estudiantes |
 | [ ] | Revoluciones Industriales: Cronología de la Máquina de Vapor a la Industria 5.0 | `/visualizador-revoluciones-industriales/` | cultura, tecnicas |
 | [ ] | Selector de Tipo de Alojamiento | `/selector-tipo-alojamiento/` | cultura, productividad |
 | [x] | Simulador de Balance de Blancos (2500K-10000K) | `/simulador-balance-blancos/` | cultura, tecnicas |
