@@ -145,6 +145,7 @@ export default function CalculadoraPaceRunningPage() {
           )}
 
           <button
+            type="button"
             onClick={calcular}
             className={styles.btnPrimary}
             aria-label="Calcular pace"

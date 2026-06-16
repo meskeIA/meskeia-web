@@ -135,7 +135,7 @@ export default function CalculadoraAlimentacionMascotasPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🍖 Calculadora de Alimentación</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🍖</span> Calculadora de Alimentación</h1>
         <p className={styles.subtitle}>
           Calcula la ración diaria ideal para tu perro o gato
         </p>
@@ -148,10 +148,12 @@ export default function CalculadoraAlimentacionMascotasPage() {
         {tabs.map((tab) => (
           <button
             key={tab.id}
+            type="button"
             className={`${styles.tab} ${activeTab === tab.id ? styles.active : ''}`}
             onClick={() => setActiveTab(tab.id)}
+            aria-pressed={activeTab === tab.id}
           >
-            <span>{tab.emoji}</span> {tab.label}
+            <span aria-hidden="true">{tab.emoji}</span> {tab.label}
           </button>
         ))}
       </div>
@@ -163,16 +165,20 @@ export default function CalculadoraAlimentacionMascotasPage() {
             {/* Selector de mascota */}
             <div className={styles.mascotaSelector}>
               <button
+                type="button"
                 className={`${styles.mascotaBtn} ${tipoMascota === 'perro' ? styles.active : ''}`}
                 onClick={() => { setTipoMascota('perro'); setResultado(null); }}
+                aria-pressed={tipoMascota === 'perro'}
               >
-                🐕 Perro
+                <span aria-hidden="true">🐕</span> Perro
               </button>
               <button
+                type="button"
                 className={`${styles.mascotaBtn} ${tipoMascota === 'gato' ? styles.active : ''}`}
                 onClick={() => { setTipoMascota('gato'); setResultado(null); }}
+                aria-pressed={tipoMascota === 'gato'}
               >
-                🐈 Gato
+                <span aria-hidden="true">🐈</span> Gato
               </button>
             </div>
 
@@ -205,8 +211,10 @@ export default function CalculadoraAlimentacionMascotasPage() {
                   ].map((t) => (
                     <button
                       key={t.id}
+                      type="button"
                       className={`${styles.tamanoBtn} ${tamanoPerro === t.id ? styles.active : ''}`}
                       onClick={() => setTamanoPerro(t.id as TamanoPerro)}
+                      aria-pressed={tamanoPerro === t.id}
                     >
                       <span className={styles.tamanoLabel}>{t.label}</span>
                       <span className={styles.tamanoPeso}>{t.peso}</span>
@@ -221,22 +229,28 @@ export default function CalculadoraAlimentacionMascotasPage() {
               <label>Etapa de vida</label>
               <div className={styles.opcionesGrid}>
                 <button
+                  type="button"
                   className={`${styles.opcionBtn} ${edad === 'cachorro' ? styles.active : ''}`}
                   onClick={() => setEdad('cachorro')}
+                  aria-pressed={edad === 'cachorro'}
                 >
-                  🍼 Cachorro
+                  <span aria-hidden="true">🍼</span> Cachorro
                 </button>
                 <button
+                  type="button"
                   className={`${styles.opcionBtn} ${edad === 'adulto' ? styles.active : ''}`}
                   onClick={() => setEdad('adulto')}
+                  aria-pressed={edad === 'adulto'}
                 >
-                  💪 Adulto
+                  <span aria-hidden="true">💪</span> Adulto
                 </button>
                 <button
+                  type="button"
                   className={`${styles.opcionBtn} ${edad === 'senior' ? styles.active : ''}`}
                   onClick={() => setEdad('senior')}
+                  aria-pressed={edad === 'senior'}
                 >
-                  🧓 Senior
+                  <span aria-hidden="true">🧓</span> Senior
                 </button>
               </div>
             </div>
@@ -246,28 +260,36 @@ export default function CalculadoraAlimentacionMascotasPage() {
               <label>Nivel de actividad</label>
               <div className={styles.opcionesGrid}>
                 <button
+                  type="button"
                   className={`${styles.opcionBtn} ${actividad === 'baja' ? styles.active : ''}`}
                   onClick={() => setActividad('baja')}
+                  aria-pressed={actividad === 'baja'}
                 >
-                  🛋️ Baja
+                  <span aria-hidden="true">🛋️</span> Baja
                 </button>
                 <button
+                  type="button"
                   className={`${styles.opcionBtn} ${actividad === 'normal' ? styles.active : ''}`}
                   onClick={() => setActividad('normal')}
+                  aria-pressed={actividad === 'normal'}
                 >
-                  🚶 Normal
+                  <span aria-hidden="true">🚶</span> Normal
                 </button>
                 <button
+                  type="button"
                   className={`${styles.opcionBtn} ${actividad === 'alta' ? styles.active : ''}`}
                   onClick={() => setActividad('alta')}
+                  aria-pressed={actividad === 'alta'}
                 >
-                  🏃 Alta
+                  <span aria-hidden="true">🏃</span> Alta
                 </button>
                 <button
+                  type="button"
                   className={`${styles.opcionBtn} ${actividad === 'muy_alta' ? styles.active : ''}`}
                   onClick={() => setActividad('muy_alta')}
+                  aria-pressed={actividad === 'muy_alta'}
                 >
-                  🏋️ Muy alta
+                  <span aria-hidden="true">🏋️</span> Muy alta
                 </button>
               </div>
             </div>
@@ -285,10 +307,10 @@ export default function CalculadoraAlimentacionMascotasPage() {
             </div>
 
             <div className={styles.botones}>
-              <button onClick={calcular} className={styles.btnPrimary}>
+              <button type="button" onClick={calcular} className={styles.btnPrimary}>
                 Calcular Ración
               </button>
-              <button onClick={limpiar} className={styles.btnSecondary}>
+              <button type="button" onClick={limpiar} className={styles.btnSecondary}>
                 Limpiar
               </button>
             </div>
@@ -298,7 +320,7 @@ export default function CalculadoraAlimentacionMascotasPage() {
             {resultado ? (
               <>
                 <div className={styles.resultadoPrincipal}>
-                  <span className={styles.resultadoIcon}>🍖</span>
+                  <span className={styles.resultadoIcon} aria-hidden="true">🍖</span>
                   <div className={styles.resultadoValor}>
                     {formatNumber(resultado.gramosPienso, 0)} g/día
                   </div>
@@ -309,24 +331,24 @@ export default function CalculadoraAlimentacionMascotasPage() {
 
                 <div className={styles.detallesGrid}>
                   <div className={styles.detalleCard}>
-                    <span className={styles.detalleIcon}>🔥</span>
+                    <span className={styles.detalleIcon} aria-hidden="true">🔥</span>
                     <span className={styles.detalleValor}>{formatNumber(resultado.kcalDiarias, 0)}</span>
                     <span className={styles.detalleLabel}>kcal/día</span>
                   </div>
                   <div className={styles.detalleCard}>
-                    <span className={styles.detalleIcon}>🍽️</span>
+                    <span className={styles.detalleIcon} aria-hidden="true">🍽️</span>
                     <span className={styles.detalleValor}>{resultado.racionesRecomendadas}</span>
                     <span className={styles.detalleLabel}>raciones/día</span>
                   </div>
                   <div className={styles.detalleCard}>
-                    <span className={styles.detalleIcon}>⚖️</span>
+                    <span className={styles.detalleIcon} aria-hidden="true">⚖️</span>
                     <span className={styles.detalleValor}>{formatNumber(resultado.gramosPienso / resultado.racionesRecomendadas, 0)}</span>
                     <span className={styles.detalleLabel}>g por ración</span>
                   </div>
                 </div>
 
                 <div className={styles.rangoInfo}>
-                  <h4>📊 Rango según tipo de pienso</h4>
+                  <h4><span aria-hidden="true">📊</span> Rango según tipo de pienso</h4>
                   <p>
                     <strong>{formatNumber(resultado.gramosPiensoMin, 0)} - {formatNumber(resultado.gramosPiensoMax, 0)} g/día</strong>
                   </p>
@@ -337,7 +359,7 @@ export default function CalculadoraAlimentacionMascotasPage() {
               </>
             ) : (
               <div className={styles.placeholder}>
-                <span className={styles.placeholderIcon}>🐾</span>
+                <span className={styles.placeholderIcon} aria-hidden="true">🐾</span>
                 <p>Introduce los datos de tu mascota para calcular su ración diaria</p>
               </div>
             )}
@@ -349,7 +371,7 @@ export default function CalculadoraAlimentacionMascotasPage() {
       {activeTab === 'toxicos' && (
         <div className={styles.toxicosContainer}>
           <div className={styles.toxicosHeader}>
-            <h2>⚠️ Alimentos Peligrosos para Mascotas</h2>
+            <h2><span aria-hidden="true">⚠️</span> Alimentos Peligrosos para Mascotas</h2>
             <p>Estos alimentos pueden causar desde malestar hasta la muerte. ¡Evítalos siempre!</p>
           </div>
 
@@ -360,10 +382,10 @@ export default function CalculadoraAlimentacionMascotasPage() {
                 className={`${styles.toxicoCard} ${alimento.peligro === 'alto' ? styles.peligroAlto : styles.peligroMedio}`}
               >
                 <div className={styles.toxicoHeader}>
-                  <span className={styles.toxicoEmoji}>{alimento.emoji}</span>
+                  <span className={styles.toxicoEmoji} aria-hidden="true">{alimento.emoji}</span>
                   <span className={styles.toxicoNombre}>{alimento.nombre}</span>
                   <span className={`${styles.toxicoBadge} ${alimento.peligro === 'alto' ? styles.badgeAlto : styles.badgeMedio}`}>
-                    {alimento.peligro === 'alto' ? '🔴 Alto' : '🟡 Medio'}
+                    <span aria-hidden="true">{alimento.peligro === 'alto' ? '🔴' : '🟡'}</span> {alimento.peligro === 'alto' ? 'Alto' : 'Medio'}
                   </span>
                 </div>
                 <p className={styles.toxicoDescripcion}>{alimento.descripcion}</p>
@@ -375,7 +397,7 @@ export default function CalculadoraAlimentacionMascotasPage() {
           </div>
 
           <div className={styles.emergenciaBox}>
-            <h3>🚨 ¿Tu mascota ha ingerido algo tóxico?</h3>
+            <h3><span aria-hidden="true">🚨</span> ¿Tu mascota ha ingerido algo tóxico?</h3>
             <p>Llama inmediatamente a tu veterinario o a urgencias veterinarias.</p>
             <p>No intentes provocar el vómito sin indicación profesional.</p>
           </div>
@@ -386,7 +408,7 @@ export default function CalculadoraAlimentacionMascotasPage() {
       {activeTab === 'transicion' && (
         <div className={styles.transicionContainer}>
           <div className={styles.transicionHeader}>
-            <h2>🔄 Guía de Cambio de Pienso</h2>
+            <h2><span aria-hidden="true">🔄</span> Guía de Cambio de Pienso</h2>
             <p>Cambiar bruscamente de alimentación puede causar problemas digestivos. Sigue esta transición gradual.</p>
           </div>
 
@@ -436,7 +458,7 @@ export default function CalculadoraAlimentacionMascotasPage() {
           </div>
 
           <div className={styles.transicionTips}>
-            <h3>💡 Consejos para una transición exitosa</h3>
+            <h3><span aria-hidden="true">💡</span> Consejos para una transición exitosa</h3>
             <ul>
               <li>Si tu mascota tiene problemas digestivos, alarga la transición a 10-14 días</li>
               <li>Observa las heces: deben mantenerse firmes y sin mucosidad</li>
@@ -528,7 +550,7 @@ export default function CalculadoraAlimentacionMascotasPage() {
           <div className={styles.casosGrid}>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoEmoji}>🐶</span>
+                <span className={styles.casoEmoji} aria-hidden="true">🐶</span>
                 <span className={styles.casoTag}>Cachorro en crecimiento</span>
               </div>
               <p>Max es un labrador de 3 meses. Necesita pienso específico para cachorro (más proteína y calcio),
@@ -538,7 +560,7 @@ export default function CalculadoraAlimentacionMascotasPage() {
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoEmoji}>🐱</span>
+                <span className={styles.casoEmoji} aria-hidden="true">🐱</span>
                 <span className={styles.casoTag}>Gato con tendencia al sobrepeso</span>
               </div>
               <p>Luna pesa 6 kg cuando debería pesar 4,5 kg. El veterinario recomienda pienso de control de peso
@@ -548,7 +570,7 @@ export default function CalculadoraAlimentacionMascotasPage() {
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoEmoji}>👴</span>
+                <span className={styles.casoEmoji} aria-hidden="true">👴</span>
                 <span className={styles.casoTag}>Perro senior con problemas renales</span>
               </div>
               <p>Rocky tiene 11 años y problemas renales iniciales. El veterinario prescribe dieta baja en fósforo
@@ -558,7 +580,7 @@ export default function CalculadoraAlimentacionMascotasPage() {
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoEmoji}>🌿</span>
+                <span className={styles.casoEmoji} aria-hidden="true">🌿</span>
                 <span className={styles.casoTag}>Mascota con alergia alimentaria</span>
               </div>
               <p>Tarta, una gata, tiene dermatitis crónica. Tras descartar parásitos, el veterinario sospecha
@@ -570,29 +592,29 @@ export default function CalculadoraAlimentacionMascotasPage() {
         </section>
 
         <section className={styles.guideSection}>
-          <h2>🍽️ Principios de Alimentación Saludable</h2>
+          <h2><span aria-hidden="true">🍽️</span> Principios de Alimentación Saludable</h2>
           <div className={styles.principiosGrid}>
             <div className={styles.principioCard}>
-              <h4>⏰ Horarios Regulares</h4>
+              <h4><span aria-hidden="true">⏰</span> Horarios Regulares</h4>
               <p>Alimenta a tu mascota a las mismas horas cada día. Esto regula su digestión y metabolismo.</p>
             </div>
             <div className={styles.principioCard}>
-              <h4>💧 Agua Fresca</h4>
+              <h4><span aria-hidden="true">💧</span> Agua Fresca</h4>
               <p>El agua debe estar siempre disponible y cambiarse al menos una vez al día.</p>
             </div>
             <div className={styles.principioCard}>
-              <h4>🍖 Calidad del Pienso</h4>
+              <h4><span aria-hidden="true">🍖</span> Calidad del Pienso</h4>
               <p>Elige piensos con proteína animal como primer ingrediente. Evita cereales como base.</p>
             </div>
             <div className={styles.principioCard}>
-              <h4>📏 Porciones Medidas</h4>
+              <h4><span aria-hidden="true">📏</span> Porciones Medidas</h4>
               <p>Usa una taza medidora o báscula. Evita alimentar &quot;a ojo&quot; para prevenir obesidad.</p>
             </div>
           </div>
         </section>
 
         <section className={styles.guideSection}>
-          <h2>❓ Preguntas Frecuentes</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes</h2>
           <div className={styles.faqGrid}>
             <details className={styles.faqItem}>
               <summary>¿Cuántas veces al día debo alimentar a mi mascota?</summary>
@@ -680,37 +702,37 @@ export default function CalculadoraAlimentacionMascotasPage() {
           <h2>Consejos prácticos de nutrición</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚖️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
               <strong>Usa báscula de cocina</strong>
               <p>Una taza medidora tiene un 20-30% de error según cómo se llena. Una báscula elimina
               la variabilidad y garantiza la precisión de la ración.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💧</span>
+              <span className={styles.tipIcon} aria-hidden="true">💧</span>
               <strong>Agua fresca siempre disponible</strong>
               <p>Cambia el agua al menos una vez al día. Los gatos son especialmente propensos a la
               deshidratación si comen solo pienso seco. Considera una fuente de agua circulante.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏷️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏷️</span>
               <strong>Lee los ingredientes del pienso</strong>
               <p>Los ingredientes se listan por peso. El primer ingrediente debe ser una proteína animal
               identificada (pollo, salmón, ternera), no "derivados cárnicos" ni cereales como base.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🍬</span>
+              <span className={styles.tipIcon} aria-hidden="true">🍬</span>
               <strong>Los snacks no superan el 10% de calorías</strong>
               <p>Los premios engordan más de lo que parece. Si das snacks frecuentes, reduce la ración
               diaria de pienso en proporción para mantener el equilibrio calórico.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <strong>Retira el plato a los 20 minutos</strong>
               <p>Si deja comida, retírala. No dejes comida disponible todo el día: enseña a comer en horarios,
               evita que el pienso se estropee y ayuda a detectar pérdidas de apetito.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <strong>Cambia gradualmente (7-10 días)</strong>
               <p>Cualquier cambio de alimento debe hacerse mezclando progresivamente. Los cambios bruscos
               alteran la flora intestinal y suelen causar diarrea y rechazo del nuevo alimento.</p>
@@ -721,7 +743,7 @@ export default function CalculadoraAlimentacionMascotasPage() {
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Alimentos tóxicos y errores de alimentación frecuentes</strong>
           </div>
           <ul className={styles.warningList}>

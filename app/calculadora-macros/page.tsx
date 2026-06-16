@@ -175,7 +175,7 @@ export default function CalculadoraMacrosPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🥗 Calculadora de Macros</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🥗</span> Calculadora de Macros</h1>
         <p className={styles.subtitle}>
           Calcula tus macronutrientes diarios según tu objetivo: volumen, definición o mantenimiento
         </p>
@@ -223,17 +223,19 @@ export default function CalculadoraMacrosPage() {
               <div className={styles.sexoBtns}>
                 <button
                   type="button"
+                  aria-pressed={sexo === 'hombre'}
                   className={`${styles.sexoBtn} ${sexo === 'hombre' ? styles.activo : ''}`}
                   onClick={() => setSexo('hombre')}
                 >
-                  👨 Hombre
+                  <span aria-hidden="true">👨</span> Hombre
                 </button>
                 <button
                   type="button"
+                  aria-pressed={sexo === 'mujer'}
                   className={`${styles.sexoBtn} ${sexo === 'mujer' ? styles.activo : ''}`}
                   onClick={() => setSexo('mujer')}
                 >
-                  👩 Mujer
+                  <span aria-hidden="true">👩</span> Mujer
                 </button>
               </div>
             </div>
@@ -246,10 +248,11 @@ export default function CalculadoraMacrosPage() {
                 <button
                   key={obj.id}
                   type="button"
+                  aria-pressed={objetivo === obj.id}
                   className={`${styles.objetivoCard} ${objetivo === obj.id ? styles.seleccionado : ''}`}
                   onClick={() => setObjetivo(obj.id)}
                 >
-                  <span className={styles.objetivoIcono}>{obj.icono}</span>
+                  <span className={styles.objetivoIcono} aria-hidden="true">{obj.icono}</span>
                   <span className={styles.objetivoNombre}>{obj.nombre}</span>
                   <span className={styles.objetivoDesc}>{obj.descripcion}</span>
                 </button>
@@ -264,6 +267,7 @@ export default function CalculadoraMacrosPage() {
                 <button
                   key={nivel.id}
                   type="button"
+                  aria-pressed={actividad === nivel.id}
                   className={`${styles.actividadCard} ${actividad === nivel.id ? styles.seleccionado : ''}`}
                   onClick={() => setActividad(nivel.id)}
                 >
@@ -314,7 +318,7 @@ export default function CalculadoraMacrosPage() {
               </div>
 
               <div className={styles.chartSection}>
-                <h3 className={styles.seccionTitulo}>📊 Distribución de Macros</h3>
+                <h3 className={styles.seccionTitulo}><span aria-hidden="true">📊</span> Distribución de Macros</h3>
                 <div className={styles.chartWrapper}>
                   <div className={styles.chartContainer}>
                     <canvas ref={chartRef}></canvas>
@@ -379,7 +383,7 @@ export default function CalculadoraMacrosPage() {
               </div>
 
               <div className={styles.detallesMetabolismo}>
-                <h3 className={styles.seccionTitulo}>⚡ Tu metabolismo</h3>
+                <h3 className={styles.seccionTitulo}><span aria-hidden="true">⚡</span> Tu metabolismo</h3>
                 <div className={styles.detallesGrid}>
                   <div className={styles.detalleItem}>
                     <span className={styles.detalleLabel}>TMB (Tasa Metabólica Basal)</span>
@@ -400,7 +404,7 @@ export default function CalculadoraMacrosPage() {
               </div>
 
               <div className={styles.formulaBox}>
-                <h4>📐 Fórmula Mifflin-St Jeor</h4>
+                <h4><span aria-hidden="true">📐</span> Fórmula Mifflin-St Jeor</h4>
                 <p className={styles.formulaText}>
                   {sexo === 'hombre'
                     ? 'TMB = 10 × peso + 6,25 × altura - 5 × edad + 5'
@@ -444,13 +448,13 @@ export default function CalculadoraMacrosPage() {
         </ul>
 
         <p className={styles.highlight}>
-          <strong>⚕️ Esta herramienta NO sustituye la valoración de un dietista-nutricionista colegiado.</strong>
+          <strong><span aria-hidden="true">⚕️</span> Esta herramienta NO sustituye la valoración de un dietista-nutricionista colegiado.</strong>
           Especialmente si tienes diabetes, enfermedad renal, trastornos alimentarios, embarazo o lactancia,
           es OBLIGATORIO consultar con un profesional sanitario antes de modificar tu dieta.
         </p>
 
         <p className={styles.emergency}>
-          🚨 <strong>Si presentas pérdida de peso involuntaria, fatiga extrema, mareos frecuentes o amenorrea
+          <span aria-hidden="true">🚨</span> <strong>Si presentas pérdida de peso involuntaria, fatiga extrema, mareos frecuentes o amenorrea
           (pérdida de menstruación), consulta con tu médico inmediatamente.</strong> Las dietas restrictivas
           sin supervisión pueden causar deficiencias nutricionales graves.
         </p>
@@ -476,35 +480,35 @@ export default function CalculadoraMacrosPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>🔥 Definición (déficit)</td>
+                  <td><span aria-hidden="true">🔥</span> Definición (déficit)</td>
                   <td>TDEE − 300/500 kcal</td>
                   <td>2,0 – 2,2 g/kg</td>
                   <td>Moderados</td>
                   <td>Mínimo 0,6 g/kg</td>
                 </tr>
                 <tr>
-                  <td>💪 Volumen (superávit)</td>
+                  <td><span aria-hidden="true">💪</span> Volumen (superávit)</td>
                   <td>TDEE + 300/500 kcal</td>
                   <td>1,6 – 2,0 g/kg</td>
                   <td>Altos</td>
                   <td>0,8 – 1,0 g/kg</td>
                 </tr>
                 <tr>
-                  <td>⚖️ Mantenimiento</td>
+                  <td><span aria-hidden="true">⚖️</span> Mantenimiento</td>
                   <td>= TDEE</td>
                   <td>1,6 – 1,8 g/kg</td>
                   <td>Equilibrados</td>
                   <td>0,8 – 1,0 g/kg</td>
                 </tr>
                 <tr>
-                  <td>🏃 Rendimiento deportivo</td>
+                  <td><span aria-hidden="true">🏃</span> Rendimiento deportivo</td>
                   <td>TDEE + 200/300 kcal</td>
                   <td>1,6 – 2,0 g/kg</td>
                   <td>Muy altos (5-8 g/kg)</td>
                   <td>20-25% kcal totales</td>
                 </tr>
                 <tr>
-                  <td>🧘 Sedentario/salud general</td>
+                  <td><span aria-hidden="true">🧘</span> Sedentario/salud general</td>
                   <td>= TDEE o − 200 kcal</td>
                   <td>0,8 – 1,2 g/kg</td>
                   <td>Moderados</td>
@@ -521,7 +525,7 @@ export default function CalculadoraMacrosPage() {
           <div className={styles.casosGrid}>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoEmoji}>🏋️</span>
+                <span className={styles.casoEmoji} aria-hidden="true">🏋️</span>
                 <span className={styles.casoTag}>Definición muscular</span>
               </div>
               <p>Carlos, 80 kg, entrena 4 días/semana. TDEE estimado: 2.800 kcal. En fase de definición aplica
@@ -531,7 +535,7 @@ export default function CalculadoraMacrosPage() {
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoEmoji}>🌱</span>
+                <span className={styles.casoEmoji} aria-hidden="true">🌱</span>
                 <span className={styles.casoTag}>Dieta vegana y fitness</span>
               </div>
               <p>María, 60 kg, vegana activa. Le preocupa cubrir proteínas sin carne ni lácteos. Con legumbres,
@@ -541,7 +545,7 @@ export default function CalculadoraMacrosPage() {
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoEmoji}>🏃‍♀️</span>
+                <span className={styles.casoEmoji} aria-hidden="true">🏃‍♀️</span>
                 <span className={styles.casoTag}>Corredora de fondo</span>
               </div>
               <p>Laura, 55 kg, corre 60 km/semana preparando un maratón. Sus necesidades de carbohidratos
@@ -551,7 +555,7 @@ export default function CalculadoraMacrosPage() {
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoEmoji}>👨‍💼</span>
+                <span className={styles.casoEmoji} aria-hidden="true">👨‍💼</span>
                 <span className={styles.casoTag}>Persona sedentaria con sobrepeso</span>
               </div>
               <p>Tomás, 90 kg, trabajo de oficina, sin deporte. TDEE: ~2.200 kcal. Con un déficit moderado de
@@ -566,7 +570,7 @@ export default function CalculadoraMacrosPage() {
           <h2>Conceptos Clave</h2>
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🥩 Proteínas</h4>
+              <h4><span aria-hidden="true">🥩</span> Proteínas</h4>
               <p>
                 Esenciales para la construcción y reparación muscular. Cada gramo aporta 4 kcal.
                 Recomendación general: 1,6-2,2g/kg de peso corporal para personas activas.
@@ -574,7 +578,7 @@ export default function CalculadoraMacrosPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>🍚 Carbohidratos</h4>
+              <h4><span aria-hidden="true">🍚</span> Carbohidratos</h4>
               <p>
                 Principal fuente de energía para el cuerpo y el cerebro. Cada gramo aporta 4 kcal.
                 Prioriza carbohidratos complejos (arroz integral, avena, patata) sobre los simples.
@@ -582,7 +586,7 @@ export default function CalculadoraMacrosPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>🥑 Grasas</h4>
+              <h4><span aria-hidden="true">🥑</span> Grasas</h4>
               <p>
                 Esenciales para hormonas, absorción de vitaminas y salud celular. Cada gramo aporta 9 kcal.
                 Nunca bajes de 0,5g/kg de peso. Prioriza grasas insaturadas (aceite de oliva, aguacate,
@@ -590,7 +594,7 @@ export default function CalculadoraMacrosPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>⚖️ Balance Calórico</h4>
+              <h4><span aria-hidden="true">⚖️</span> Balance Calórico</h4>
               <p>
                 <strong>Déficit:</strong> Ingerir menos calorías de las que gastas (pérdida de peso).
                 <strong> Superávit:</strong> Ingerir más calorías (ganancia de peso/músculo).
@@ -604,7 +608,7 @@ export default function CalculadoraMacrosPage() {
           <h2>Consejos por Objetivo</h2>
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🔥 Definición</h4>
+              <h4><span aria-hidden="true">🔥</span> Definición</h4>
               <p>
                 • Proteína alta (2-2,2g/kg) para preservar músculo<br/>
                 • Déficit moderado (300-500 kcal/día)<br/>
@@ -613,7 +617,7 @@ export default function CalculadoraMacrosPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>💪 Volumen</h4>
+              <h4><span aria-hidden="true">💪</span> Volumen</h4>
               <p>
                 • Superávit controlado (300-500 kcal/día)<br/>
                 • Carbohidratos suficientes para rendir en el gimnasio<br/>
@@ -723,37 +727,37 @@ export default function CalculadoraMacrosPage() {
           <h2>Consejos para seguir tus macros con éxito</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📱</span>
+              <span className={styles.tipIcon} aria-hidden="true">📱</span>
               <strong>Usa una app de seguimiento</strong>
               <p>MyFitnessPal, Cronometer o Yazio permiten registrar alimentos con detalle. La constancia
               en el registro (incluso parcial) es más efectiva que el perfeccionismo esporádico.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🥣</span>
+              <span className={styles.tipIcon} aria-hidden="true">🥣</span>
               <strong>Prepara comidas con antelación (meal prep)</strong>
               <p>Cocinar en lotes el domingo reduce la improvisación y facilita controlar los macros.
               Las comidas preparadas eliminan las decisiones difíciles cuando tienes hambre.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚖️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
               <strong>Usa báscula de cocina al principio</strong>
               <p>Pesar los alimentos durante las primeras semanas educa tu percepción de las porciones.
               Después podrás estimar visualmente con mucha más precisión.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💧</span>
+              <span className={styles.tipIcon} aria-hidden="true">💧</span>
               <strong>Hidratación como cuarto macro</strong>
               <p>El agua no tiene calorías pero afecta al rendimiento y al apetito. Bebe al menos 2 litros
               al día. Confundir sed con hambre es muy común durante las primeras semanas de dieta.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <strong>Revisa y ajusta regularmente</strong>
               <p>Si no ves progreso en 2-3 semanas sin haber cambiado el entrenamiento, ajusta las calorías
               en ±100-200 kcal. Los ajustes pequeños son más sostenibles que los cambios drásticos.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🍽️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🍽️</span>
               <strong>Flexibilidad: el 80/20 funciona</strong>
               <p>Seguir los macros el 80-90% del tiempo produce excelentes resultados. La rigidez total
               lleva al abandono. Un 10-20% de comidas más libres no arruina el progreso a largo plazo.</p>
@@ -764,7 +768,7 @@ export default function CalculadoraMacrosPage() {
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores comunes al calcular y seguir los macros</strong>
           </div>
           <ul className={styles.warningList}>

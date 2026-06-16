@@ -137,7 +137,7 @@ export default function CalculadoraHidratacionPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>💧 Calculadora de Hidratación</h1>
+        <h1 className={styles.title}><span aria-hidden="true">💧</span> Calculadora de Hidratación</h1>
         <p className={styles.subtitle}>
           Descubre cuánta agua necesitas beber al día para mantener una hidratación óptima
         </p>
@@ -166,10 +166,12 @@ export default function CalculadoraHidratacionPage() {
                 ([key, valor]) => (
                   <button
                     key={key}
+                    type="button"
+                    aria-pressed={actividad === key}
                     className={`${styles.opcionCard} ${actividad === key ? styles.seleccionada : ''}`}
                     onClick={() => setActividad(key)}
                   >
-                    <span className={styles.opcionIcono}>{valor.icono}</span>
+                    <span className={styles.opcionIcono} aria-hidden="true">{valor.icono}</span>
                     <span className={styles.opcionNombre}>{valor.nombre}</span>
                     <span className={styles.opcionDesc}>{valor.descripcion}</span>
                   </button>
@@ -184,10 +186,12 @@ export default function CalculadoraHidratacionPage() {
               {(Object.entries(tiposClima) as [Clima, FactorClima][]).map(([key, valor]) => (
                 <button
                   key={key}
+                  type="button"
+                  aria-pressed={clima === key}
                   className={`${styles.climaCard} ${clima === key ? styles.seleccionada : ''}`}
                   onClick={() => setClima(key)}
                 >
-                  <span className={styles.climaIcono}>{valor.icono}</span>
+                  <span className={styles.climaIcono} aria-hidden="true">{valor.icono}</span>
                   <span className={styles.climaNombre}>{valor.nombre}</span>
                   <span className={styles.climaTemp}>{valor.descripcion}</span>
                 </button>
@@ -196,10 +200,10 @@ export default function CalculadoraHidratacionPage() {
           </div>
 
           <div className={styles.buttonGroup}>
-            <button onClick={calcular} className={styles.btnPrimary} disabled={!peso}>
+            <button type="button" onClick={calcular} className={styles.btnPrimary} disabled={!peso}>
               Calcular Hidratación
             </button>
-            <button onClick={limpiar} className={styles.btnSecondary}>
+            <button type="button" onClick={limpiar} className={styles.btnSecondary}>
               Limpiar
             </button>
           </div>
@@ -209,7 +213,7 @@ export default function CalculadoraHidratacionPage() {
           {resultado ? (
             <>
               <div className={styles.resultadoPrincipal}>
-                <span className={styles.aguaIcono}>💧</span>
+                <span className={styles.aguaIcono} aria-hidden="true">💧</span>
                 <div className={styles.litrosDisplay}>
                   <span className={styles.litrosValor}>{formatNumber(resultado.litrosTotal, 1)}</span>
                   <span className={styles.litrosUnidad}>litros/día</span>
@@ -245,7 +249,7 @@ export default function CalculadoraHidratacionPage() {
               </div>
 
               <div className={styles.distribucionSection}>
-                <h3>📅 Distribución recomendada</h3>
+                <h3><span aria-hidden="true">📅</span> Distribución recomendada</h3>
                 <div className={styles.distribucionGrid}>
                   {resultado.distribucion.map((item, index) => (
                     <div key={index} className={styles.distribucionCard}>
@@ -258,7 +262,7 @@ export default function CalculadoraHidratacionPage() {
               </div>
 
               <div className={styles.tipsSection}>
-                <h3>💡 Consejos de hidratación</h3>
+                <h3><span aria-hidden="true">💡</span> Consejos de hidratación</h3>
                 <ul className={styles.tipsList}>
                   <li>Bebe un vaso de agua al despertar para rehidratarte tras las horas de sueño</li>
                   <li>No esperes a tener sed; cuando la sientes, ya hay deshidratación leve</li>
@@ -269,7 +273,7 @@ export default function CalculadoraHidratacionPage() {
               </div>
 
               <div className={styles.formulaBox}>
-                <h4>📐 Fórmula utilizada</h4>
+                <h4><span aria-hidden="true">📐</span> Fórmula utilizada</h4>
                 <p className={styles.formulaText}>
                   Agua = (Peso × 35ml) × Factor Actividad × Factor Clima
                 </p>
@@ -308,7 +312,7 @@ export default function CalculadoraHidratacionPage() {
         </ul>
 
         <p className={styles.highlight}>
-          <strong>⚕️ Si tienes enfermedad renal, cardíaca o hepática, NO uses esta calculadora.</strong>
+          <strong><span aria-hidden="true">⚕️</span> Si tienes enfermedad renal, cardíaca o hepática, NO uses esta calculadora.</strong>
           Sigue estrictamente las indicaciones médicas sobre ingesta de líquidos. El exceso de agua puede ser peligroso en estas condiciones.
         </p>
       </DisclaimerCard>

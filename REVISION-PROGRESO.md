@@ -972,12 +972,12 @@
 | [x] | ATP Sintasa - El Motor Molecular que te da Energía | `/visualizador-atp-sintasa/` | salud, cultura, estudiantes |
 | [x] | Ayuno Intermitente: Fases Metabólicas y Autofagia | `/visualizador-ayuno-intermitente/` | salud |
 | [x] | Calculadora de 1RM — Repetición Máxima | `/calculadora-1rm-gimnasio/` | salud, tecnicas |
-| [ ] | Calculadora de Alimentación Mascotas | `/calculadora-alimentacion-mascotas/` | salud |
+| [x] | Calculadora de Alimentación Mascotas | `/calculadora-alimentacion-mascotas/` | salud |
 | [x] | Calculadora de Calorías | `/calculadora-calorias-ejercicio/` | salud |
 | [x] | Calculadora de Estadística Médica | `/calculadora-estadistica-medica/` | salud, estudiantes |
-| [ ] | Calculadora de Hidratación | `/calculadora-hidratacion/` | salud |
-| [ ] | Calculadora de Macros | `/calculadora-macros/` | salud |
-| [ ] | Calculadora de Pace de Running | `/calculadora-pace-running/` | salud, tecnicas |
+| [x] | Calculadora de Hidratación | `/calculadora-hidratacion/` | salud |
+| [x] | Calculadora de Macros | `/calculadora-macros/` | salud |
+| [x] | Calculadora de Pace de Running | `/calculadora-pace-running/` | salud, tecnicas |
 | [x] | Calculadora de Porciones | `/calculadora-porciones/` | salud |
 | [ ] | Calculadora de Potencia en Ciclismo (W/kg y VAM) | `/calculadora-potencia-ciclismo/` | salud, tecnicas |
 | [ ] | Calculadora de Sueño | `/calculadora-sueno/` | salud |
