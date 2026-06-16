@@ -110,7 +110,7 @@ export const comics: HistoriaData = {
       paises: ['EE.UU.'],
     },
     {
-      id: 'digital-webcómic',
+      id: 'digital-webcomic',
       nombre: 'Webcómic y Cómic Digital',
       anioInicio: 2000,
       anioFin: 2022,

@@ -249,10 +249,10 @@
 | [x] | Historia del Cine: De los Lumière a la Inteligencia Artificial | `/visualizador-historia/cine/` | cultura |
 | [x] | Historia del Clima: De la Última Glaciación a la Emergencia Climática | `/visualizador-historia/clima/` | cultura, tecnicas |
 | [x] | Historia del Comercio Mundial: De Mesopotamia al E-Commerce Global | `/visualizador-historia/historia-comercio/` | cultura |
-| [ ] | Historia del Cómic: De Töpffer a la IA Generativa | `/visualizador-historia/comics/` | cultura, juegos |
-| [ ] | Historia del Deporte: De los Juegos Olímpicos Griegos a los eSports | `/visualizador-historia/deporte/` | cultura, juegos |
-| [ ] | Historia del Derecho: De Hammurabi al Derecho Digital | `/visualizador-historia/historia-derecho/` | cultura |
-| [ ] | Historia del Fútbol: De las FA Rules al Fútbol Global | `/visualizador-historia/historia-futbol/` | cultura, juegos |
+| [x] | Historia del Cómic: De Töpffer a la IA Generativa | `/visualizador-historia/comics/` | cultura, juegos |
+| [x] | Historia del Deporte: De los Juegos Olímpicos Griegos a los eSports | `/visualizador-historia/deporte/` | cultura, juegos |
+| [x] | Historia del Derecho: De Hammurabi al Derecho Digital | `/visualizador-historia/historia-derecho/` | cultura |
+| [x] | Historia del Fútbol: De las FA Rules al Fútbol Global | `/visualizador-historia/historia-futbol/` | cultura, juegos |
 | [ ] | Historia del Imperio Inca: Del Lago Titicaca al Tawantinsuyu | `/visualizador-historia/inca/` | cultura, estudiantes |
 | [ ] | Historia del Imperio Mongol: De Gengis Kan a la Dinastía Yuan | `/visualizador-historia/mongol/` | cultura |
 | [ ] | Historia del Imperio Otomano: De Osmán a Atatürk | `/visualizador-historia/otomano/` | cultura |
