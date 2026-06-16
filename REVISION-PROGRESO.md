@@ -915,16 +915,16 @@
 | [x] | Simulador Módulos vs Estimación Directa Autónomos | `/simulador-modulos-vs-directa/` | legal-fiscal, freelance |
 | [x] | Simulador Plan de Pensiones IRPF: Aporte vs Rescate | `/simulador-renta-plan-pensiones/` | legal-fiscal, finanzas |
 | [x] | Simulador Visual de Tramos IRPF 2025 | `/simulador-irpf-tramos/` | legal-fiscal, finanzas |
-| [ ] | Test Obligación Declarar Renta 2025 | `/test-obligado-declarar-renta/` | legal-fiscal, finanzas, freelance |
+| [x] | Test Obligación Declarar Renta 2025 | `/test-obligado-declarar-renta/` | legal-fiscal, finanzas, freelance |
 | [x] | Verificador del Complemento por Brecha de Género | `/verificador-complemento-brecha-genero/` | legal-fiscal, finanzas |
 
 ## Productividad (`productividad`) — 34 apps
 
 | Estado | Nombre | URL | Suites |
 |---|---|---|---|
-| [ ] | Auditoría de Energía Semanal | `/auditoria-energia-semanal/` | productividad, salud |
-| [ ] | Auditoría de Habilidades vs Mercado | `/auditoria-habilidades-mercado/` | productividad, cultura |
-| [ ] | Auditoría de Reuniones | `/auditoria-reuniones/` | productividad, freelance |
+| [x] | Auditoría de Energía Semanal | `/auditoria-energia-semanal/` | productividad, salud |
+| [x] | Auditoría de Habilidades vs Mercado | `/auditoria-habilidades-mercado/` | productividad, cultura |
+| [x] | Auditoría de Reuniones | `/auditoria-reuniones/` | productividad, freelance |
 | [ ] | Calculadora Costes Teletrabajo | `/calculadora-costes-teletrabajo/` | productividad, finanzas, freelance |
 | [x] | Calculadora de Fechas | `/calculadora-fechas/` | productividad |
 | [x] | Calculadora de Porcentajes | `/calculadora-porcentajes/` | productividad, estudiantes |

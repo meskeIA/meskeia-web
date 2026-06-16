@@ -242,16 +242,16 @@ export default function AuditoriaReunionesPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>📋 Auditoría de Reuniones</h1>
+          <h1 className={styles.title}><span aria-hidden="true">📋</span> Auditoría de Reuniones</h1>
           <p className={styles.subtitle}>
             ¿Tus reuniones aportan lo que deberían?
             <br />
             Analiza la eficiencia y la cultura de reuniones de tu equipo
           </p>
           <div className={styles.badges}>
-            <span className={styles.badge}>🕐 3 minutos</span>
-            <span className={styles.badge}>📊 10 preguntas</span>
-            <span className={styles.badge}>🔒 Sin registro</span>
+            <span className={styles.badge}><span aria-hidden="true">🕐</span> 3 minutos</span>
+            <span className={styles.badge}><span aria-hidden="true">📊</span> 10 preguntas</span>
+            <span className={styles.badge}><span aria-hidden="true">🔒</span> Sin registro</span>
           </div>
         </header>
 
@@ -292,6 +292,7 @@ export default function AuditoriaReunionesPage() {
                   <button
                     key={opcion.valor}
                     className={`${styles.scaleButton} ${respuestas[pregunta.id] === opcion.valor ? styles.scaleButtonActive : ''}`}
+                    type="button"
                     onClick={() => handleRespuesta(pregunta.id, opcion.valor)}
                     role="radio"
                     aria-checked={respuestas[pregunta.id] === opcion.valor}
@@ -310,6 +311,7 @@ export default function AuditoriaReunionesPage() {
           </div>
 
           <button
+            type="button"
             className={styles.btnPrimary}
             onClick={calcularResultado}
             disabled={!todasRespondidas}
@@ -327,10 +329,10 @@ export default function AuditoriaReunionesPage() {
             {/* Mapa 2D */}
             <div className={styles.mapContainer}>
               <div className={styles.mapLabels}>
-                <span className={styles.mapLabelTop}>🌱 Cultura sana</span>
+                <span className={styles.mapLabelTop}><span aria-hidden="true">🌱</span> Cultura sana</span>
                 <span className={styles.mapLabelBottom}>Cultura débil</span>
                 <span className={styles.mapLabelLeft}>Baja eficiencia</span>
-                <span className={styles.mapLabelRight}>⚙️ Alta eficiencia</span>
+                <span className={styles.mapLabelRight}><span aria-hidden="true">⚙️</span> Alta eficiencia</span>
               </div>
               <div className={styles.map}>
                 {/* Cuadrantes */}
@@ -366,7 +368,7 @@ export default function AuditoriaReunionesPage() {
             <div className={styles.scoresContainer}>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>⚙️ Eficiencia</span>
+                  <span><span aria-hidden="true">⚙️</span> Eficiencia</span>
                   <span className={styles.scoreValue}>{puntuacionEficiencia}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -378,7 +380,7 @@ export default function AuditoriaReunionesPage() {
               </div>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>🌱 Cultura</span>
+                  <span><span aria-hidden="true">🌱</span> Cultura</span>
                   <span className={styles.scoreValue}>{puntuacionCultura}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -400,7 +402,7 @@ export default function AuditoriaReunionesPage() {
 
               <div className={styles.profileColumns}>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>✅ Fortalezas</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">✅</span> Fortalezas</h4>
                   <ul className={styles.profileList}>
                     {perfil.fortalezas.map((f, i) => (
                       <li key={i}>{f}</li>
@@ -408,7 +410,7 @@ export default function AuditoriaReunionesPage() {
                   </ul>
                 </div>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>⚠️ Riesgos</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">⚠️</span> Riesgos</h4>
                   <ul className={styles.profileList}>
                     {perfil.riesgos.map((r, i) => (
                       <li key={i}>{r}</li>
@@ -418,7 +420,7 @@ export default function AuditoriaReunionesPage() {
               </div>
 
               <div className={styles.actionsSection}>
-                <h4 className={styles.actionsTitle}>🎯 Acciones sugeridas</h4>
+                <h4 className={styles.actionsTitle}><span aria-hidden="true">🎯</span> Acciones sugeridas</h4>
                 <ol className={styles.actionsList}>
                   {perfil.acciones.map((a, i) => (
                     <li key={i}>{a}</li>
@@ -427,7 +429,7 @@ export default function AuditoriaReunionesPage() {
               </div>
             </div>
 
-            <button className={styles.btnSecondary} onClick={reiniciar}>
+            <button type="button" className={styles.btnSecondary} onClick={reiniciar}>
               Repetir diagnóstico
             </button>
           </section>

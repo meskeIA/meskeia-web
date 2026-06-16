@@ -238,16 +238,16 @@ export default function AuditoriaHabilidadesMercadoPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🎯 Auditoría de Habilidades vs Mercado</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🎯</span> Auditoría de Habilidades vs Mercado</h1>
           <p className={styles.subtitle}>
             ¿Lo que sabes hacer es lo que el mercado necesita?
             <br />
             Gap analysis de tus competencias profesionales
           </p>
           <div className={styles.badges}>
-            <span className={styles.badge}>🕐 3 minutos</span>
-            <span className={styles.badge}>📊 10 preguntas</span>
-            <span className={styles.badge}>🔒 Sin registro</span>
+            <span className={styles.badge}><span aria-hidden="true">🕐</span> 3 minutos</span>
+            <span className={styles.badge}><span aria-hidden="true">📊</span> 10 preguntas</span>
+            <span className={styles.badge}><span aria-hidden="true">🔒</span> Sin registro</span>
           </div>
         </header>
 
@@ -286,6 +286,7 @@ export default function AuditoriaHabilidadesMercadoPage() {
                 {ESCALA.map((opcion) => (
                   <button
                     key={opcion.valor}
+                    type="button"
                     className={`${styles.scaleButton} ${respuestas[pregunta.id] === opcion.valor ? styles.scaleButtonActive : ''}`}
                     onClick={() => handleRespuesta(pregunta.id, opcion.valor)}
                     role="radio"
@@ -305,6 +306,7 @@ export default function AuditoriaHabilidadesMercadoPage() {
           </div>
 
           <button
+            type="button"
             className={styles.btnPrimary}
             onClick={calcularResultado}
             disabled={!todasRespondidas}
@@ -320,23 +322,23 @@ export default function AuditoriaHabilidadesMercadoPage() {
 
             <div className={styles.mapContainer}>
               <div className={styles.mapLabels}>
-                <span className={styles.mapLabelTop}>📚 Alta Actualización</span>
+                <span className={styles.mapLabelTop}><span aria-hidden="true">📚</span> Alta Actualización</span>
                 <span className={styles.mapLabelBottom}>Baja Actualización</span>
                 <span className={styles.mapLabelLeft}>Baja Relevancia</span>
-                <span className={styles.mapLabelRight}>🎯 Alta Relevancia</span>
+                <span className={styles.mapLabelRight}><span aria-hidden="true">🎯</span> Alta Relevancia</span>
               </div>
               <div className={styles.map}>
                 <div className={`${styles.quadrant} ${styles.quadrantTL}`}>
-                  <span>🔄 En Transición</span>
+                  <span><span aria-hidden="true">🔄</span> En Transición</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantTR}`}>
-                  <span>🏆 Profesional en Forma</span>
+                  <span><span aria-hidden="true">🏆</span> Profesional en Forma</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBL}`}>
-                  <span>⚠️ Desactualización Activa</span>
+                  <span><span aria-hidden="true">⚠️</span> Desactualización Activa</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
-                  <span>⏳ Viviendo de las Rentas</span>
+                  <span><span aria-hidden="true">⏳</span> Viviendo de las Rentas</span>
                 </div>
                 <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
                 <div className={styles.thresholdLineV} style={{ left: '65%' }} aria-hidden="true" />
@@ -355,7 +357,7 @@ export default function AuditoriaHabilidadesMercadoPage() {
             <div className={styles.scoresContainer}>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>🎯 Relevancia</span>
+                  <span><span aria-hidden="true">🎯</span> Relevancia</span>
                   <span className={styles.scoreValue}>{puntuacionRelevancia}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -367,7 +369,7 @@ export default function AuditoriaHabilidadesMercadoPage() {
               </div>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>📚 Actualización</span>
+                  <span><span aria-hidden="true">📚</span> Actualización</span>
                   <span className={styles.scoreValue}>{puntuacionActualizacion}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -381,14 +383,14 @@ export default function AuditoriaHabilidadesMercadoPage() {
 
             <div className={styles.profileCard}>
               <div className={styles.profileHeader}>
-                <span className={styles.profileEmoji}>{perfil.emoji}</span>
+                <span className={styles.profileEmoji} aria-hidden="true">{perfil.emoji}</span>
                 <h3 className={styles.profileName}>{perfil.nombre}</h3>
               </div>
               <p className={styles.profileDescription}>{perfil.descripcion}</p>
 
               <div className={styles.profileColumns}>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>✅ Fortalezas</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">✅</span> Fortalezas</h4>
                   <ul className={styles.profileList}>
                     {perfil.fortalezas.map((f, i) => (
                       <li key={i}>{f}</li>
@@ -396,7 +398,7 @@ export default function AuditoriaHabilidadesMercadoPage() {
                   </ul>
                 </div>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>⚠️ Riesgos</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">⚠️</span> Riesgos</h4>
                   <ul className={styles.profileList}>
                     {perfil.riesgos.map((r, i) => (
                       <li key={i}>{r}</li>
@@ -406,7 +408,7 @@ export default function AuditoriaHabilidadesMercadoPage() {
               </div>
 
               <div className={styles.actionsSection}>
-                <h4 className={styles.actionsTitle}>🎯 Acciones sugeridas</h4>
+                <h4 className={styles.actionsTitle}><span aria-hidden="true">🎯</span> Acciones sugeridas</h4>
                 <ol className={styles.actionsList}>
                   {perfil.acciones.map((a, i) => (
                     <li key={i}>{a}</li>
@@ -415,14 +417,14 @@ export default function AuditoriaHabilidadesMercadoPage() {
               </div>
             </div>
 
-            <button className={styles.btnSecondary} onClick={reiniciar}>
+            <button type="button" className={styles.btnSecondary} onClick={reiniciar}>
               Repetir diagnóstico
             </button>
           </section>
         )}
 
         <EducationalSection
-          title="📚 Gap analysis profesional: cerrar la brecha"
+          title="Gap analysis profesional: cerrar la brecha"
           subtitle="Cómo mantener tus competencias relevantes"
         >
           <section className={styles.guideSection}>

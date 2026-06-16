@@ -238,16 +238,16 @@ export default function AuditoriaEnergiaSemanalPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🔋 Auditoría de Energía Semanal</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🔋</span> Auditoría de Energía Semanal</h1>
           <p className={styles.subtitle}>
             ¿Dónde gastas energía sin retorno?
             <br />
             Basado en el modelo de gestión de energía de Loehr y Schwartz
           </p>
           <div className={styles.badges}>
-            <span className={styles.badge}>🕐 3 minutos</span>
-            <span className={styles.badge}>📊 10 preguntas</span>
-            <span className={styles.badge}>🔒 Sin registro</span>
+            <span className={styles.badge}><span aria-hidden="true">🕐</span> 3 minutos</span>
+            <span className={styles.badge}><span aria-hidden="true">📊</span> 10 preguntas</span>
+            <span className={styles.badge}><span aria-hidden="true">🔒</span> Sin registro</span>
           </div>
         </header>
 
@@ -287,6 +287,7 @@ export default function AuditoriaEnergiaSemanalPage() {
                     className={`${styles.scaleButton} ${respuestas[pregunta.id] === opcion.valor ? styles.scaleButtonActive : ''}`}
                     onClick={() => handleRespuesta(pregunta.id, opcion.valor)}
                     role="radio"
+                    type="button"
                     aria-checked={respuestas[pregunta.id] === opcion.valor}
                     aria-label={`${opcion.etiqueta} (${opcion.valor} de 5)`}
                   >
@@ -303,6 +304,7 @@ export default function AuditoriaEnergiaSemanalPage() {
           </div>
 
           <button
+            type="button"
             className={styles.btnPrimary}
             onClick={calcularResultado}
             disabled={!todasRespondidas}
@@ -318,23 +320,23 @@ export default function AuditoriaEnergiaSemanalPage() {
 
             <div className={styles.mapContainer}>
               <div className={styles.mapLabels}>
-                <span className={styles.mapLabelTop}>🔋 Alta Recarga</span>
+                <span className={styles.mapLabelTop}><span aria-hidden="true">🔋</span> Alta Recarga</span>
                 <span className={styles.mapLabelBottom}>Baja Recarga</span>
                 <span className={styles.mapLabelLeft}>Bajo Desgaste</span>
-                <span className={styles.mapLabelRight}>🪫 Alto Desgaste</span>
+                <span className={styles.mapLabelRight}><span aria-hidden="true">🪫</span> Alto Desgaste</span>
               </div>
               <div className={styles.map}>
                 <div className={`${styles.quadrant} ${styles.quadrantTL}`}>
-                  <span>🔋 Energía Sostenible</span>
+                  <span><span aria-hidden="true">🔋</span> Energía Sostenible</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantTR}`}>
-                  <span>🔥 Alta Intensidad</span>
+                  <span><span aria-hidden="true">🔥</span> Alta Intensidad</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBL}`}>
-                  <span>😶 Modo Bajo Consumo</span>
+                  <span><span aria-hidden="true">😶</span> Modo Bajo Consumo</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
-                  <span>🪫 Déficit Energético</span>
+                  <span><span aria-hidden="true">🪫</span> Déficit Energético</span>
                 </div>
                 <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
                 <div className={styles.thresholdLineV} style={{ left: '65%' }} aria-hidden="true" />
@@ -353,7 +355,7 @@ export default function AuditoriaEnergiaSemanalPage() {
             <div className={styles.scoresContainer}>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>🪫 Desgaste</span>
+                  <span><span aria-hidden="true">🪫</span> Desgaste</span>
                   <span className={styles.scoreValue}>{puntuacionDesgaste}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -365,7 +367,7 @@ export default function AuditoriaEnergiaSemanalPage() {
               </div>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>🔋 Recarga</span>
+                  <span><span aria-hidden="true">🔋</span> Recarga</span>
                   <span className={styles.scoreValue}>{puntuacionRecarga}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -386,7 +388,7 @@ export default function AuditoriaEnergiaSemanalPage() {
 
               <div className={styles.profileColumns}>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>✅ Fortalezas</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">✅</span> Fortalezas</h4>
                   <ul className={styles.profileList}>
                     {perfil.fortalezas.map((f, i) => (
                       <li key={i}>{f}</li>
@@ -394,7 +396,7 @@ export default function AuditoriaEnergiaSemanalPage() {
                   </ul>
                 </div>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>⚠️ Riesgos</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">⚠️</span> Riesgos</h4>
                   <ul className={styles.profileList}>
                     {perfil.riesgos.map((r, i) => (
                       <li key={i}>{r}</li>
@@ -404,7 +406,7 @@ export default function AuditoriaEnergiaSemanalPage() {
               </div>
 
               <div className={styles.actionsSection}>
-                <h4 className={styles.actionsTitle}>🎯 Acciones sugeridas</h4>
+                <h4 className={styles.actionsTitle}><span aria-hidden="true">🎯</span> Acciones sugeridas</h4>
                 <ol className={styles.actionsList}>
                   {perfil.acciones.map((a, i) => (
                     <li key={i}>{a}</li>
@@ -413,7 +415,7 @@ export default function AuditoriaEnergiaSemanalPage() {
               </div>
             </div>
 
-            <button className={styles.btnSecondary} onClick={reiniciar}>
+            <button type="button" className={styles.btnSecondary} onClick={reiniciar}>
               Repetir diagnóstico
             </button>
           </section>
