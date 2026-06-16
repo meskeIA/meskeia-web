@@ -495,9 +495,11 @@ interface TarjetaHabitatProps {
 function TarjetaHabitat({ habitat, seleccionado, onSeleccionar }: TarjetaHabitatProps) {
   return (
     <button
+      type="button"
       className={`${styles.habitatCard} ${seleccionado ? styles.habitatCardActivo : ''}`}
       style={seleccionado ? { borderColor: habitat.color, background: `${habitat.color}15` } : {}}
       onClick={onSeleccionar}
+      aria-pressed={seleccionado}
       aria-expanded={seleccionado}
       aria-label={`Ver adaptaciones de ${habitat.nombre}`}
     >
@@ -616,8 +618,10 @@ function TabMecanismos() {
         {MECANISMOS.map((mec) => (
           <div key={mec.id} className={styles.mecanismoCardWrapper}>
             <button
+              type="button"
               className={`${styles.mecanismoCard} ${expandido === mec.id ? styles.mecanismoCardActivo : ''}`}
               onClick={() => toggleMecanismo(mec.id)}
+              aria-pressed={expandido === mec.id}
               aria-expanded={expandido === mec.id}
               aria-label={`${expandido === mec.id ? 'Ocultar' : 'Ver'} detalle de ${mec.nombre}`}
             >
@@ -666,6 +670,7 @@ function TabCarnivoras() {
         {CARNIVORAS.map((planta) => (
           <div key={planta.id} className={styles.carnivoraItem}>
             <button
+              type="button"
               className={`${styles.carnivoraHeader} ${expandida === planta.id ? styles.carnivoraHeaderActivo : ''}`}
               onClick={() => toggleCarnivora(planta.id)}
               aria-expanded={expandida === planta.id}
@@ -698,7 +703,7 @@ function TabCarnivoras() {
                     <p className={styles.carnivoraValor}>{planta.distribucion}</p>
                   </div>
                   <div className={`${styles.carnivoraFila} ${styles.carnivoraCuriosidad}`}>
-                    <span className={styles.carnivoraEtiqueta}>💡 Curiosidad</span>
+                    <span className={styles.carnivoraEtiqueta}><span aria-hidden="true">💡</span> Curiosidad</span>
                     <p className={styles.carnivoraValor}>{planta.curiosidad}</p>
                   </div>
                 </div>
@@ -744,6 +749,7 @@ export default function VisualizadorAdaptacionesPlantas() {
           {tabs.map((tab) => (
             <button
               key={tab.id}
+              type="button"
               role="tab"
               aria-selected={tabActiva === tab.id}
               className={`${styles.tabBtn} ${tabActiva === tab.id ? styles.tabBtnActivo : ''}`}

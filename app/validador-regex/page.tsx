@@ -146,7 +146,7 @@ export default function ValidadorRegexPage() {
 
           {error && (
             <div className={styles.errorMessage}>
-              <span>⚠️</span> {error}
+              <span aria-hidden="true">⚠️</span> {error}
             </div>
           )}
 
@@ -154,23 +154,29 @@ export default function ValidadorRegexPage() {
             <span className={styles.flagsLabel}>Flags:</span>
             <div className={styles.flagsButtons}>
               <button
+                type="button"
                 className={`${styles.flagBtn} ${flags.g ? styles.flagActive : ''}`}
                 onClick={() => toggleFlag('g')}
                 title="Global - Buscar todas las coincidencias"
+                aria-pressed={flags.g}
               >
                 g <span className={styles.flagDesc}>global</span>
               </button>
               <button
+                type="button"
                 className={`${styles.flagBtn} ${flags.i ? styles.flagActive : ''}`}
                 onClick={() => toggleFlag('i')}
                 title="Case Insensitive - Ignorar mayúsculas/minúsculas"
+                aria-pressed={flags.i}
               >
                 i <span className={styles.flagDesc}>insensible</span>
               </button>
               <button
+                type="button"
                 className={`${styles.flagBtn} ${flags.m ? styles.flagActive : ''}`}
                 onClick={() => toggleFlag('m')}
                 title="Multiline - ^ y $ aplican a cada línea"
+                aria-pressed={flags.m}
               >
                 m <span className={styles.flagDesc}>multilínea</span>
               </button>
@@ -187,7 +193,7 @@ export default function ValidadorRegexPage() {
             />
           </div>
 
-          <button onClick={handleClear} className={styles.btnSecondary}>
+          <button type="button" onClick={handleClear} className={styles.btnSecondary}>
             Limpiar todo
           </button>
         </div>
@@ -228,7 +234,7 @@ export default function ValidadorRegexPage() {
             </>
           ) : (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>🔍</span>
+              <span className={styles.placeholderIcon} aria-hidden="true">🔍</span>
               <p>Escribe un patrón y texto para ver las coincidencias</p>
             </div>
           )}
@@ -242,6 +248,7 @@ export default function ValidadorRegexPage() {
           {PATTERN_LIBRARY.map((item, index) => (
             <button
               key={index}
+              type="button"
               className={styles.libraryCard}
               onClick={() => loadPattern(item)}
             >
@@ -474,7 +481,7 @@ export default function ValidadorRegexPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💻</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💻</span>
                 <strong>Desarrollador Web</strong>
               </div>
               <p>Validación de formularios de usuario en el frontend y backend.</p>
@@ -499,7 +506,7 @@ export default function ValidadorRegexPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📊</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📊</span>
                 <strong>Data Scientist</strong>
               </div>
               <p>Extracción de datos estructurados desde texto no estructurado (logs, documentos, scraping).</p>
@@ -520,7 +527,7 @@ export default function ValidadorRegexPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🖥️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🖥️</span>
                 <strong>SysAdmin</strong>
               </div>
               <p>Filtrado y análisis de logs del sistema con herramientas de línea de comandos.</p>
@@ -541,7 +548,7 @@ export default function ValidadorRegexPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🧪</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🧪</span>
                 <strong>QA Tester</strong>
               </div>
               <p>Verificación automatizada de formatos en salidas de la aplicación y APIs.</p>
@@ -663,32 +670,32 @@ export default function ValidadorRegexPage() {
           <h4>Mejores Prácticas al Escribir Regex</h4>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧪</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧪</span>
               <strong>Prueba siempre los casos límite</strong>
               <p>Cadena vacía, un solo carácter, el valor mínimo y máximo permitido, caracteres especiales (<code>@</code>, <code>-</code>, <code>_</code>), unicode (tildes, ñ, emojis) y saltos de línea. El 80% de los bugs de regex aparecen en los extremos, no en los casos típicos.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚡</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚡</span>
               <strong>Usa grupos no capturantes cuando sea posible</strong>
               <p>Cuando solo necesitas agrupar para aplicar un cuantificador o alternación, usa <code>(?:...)</code> en lugar de <code>(...)</code>. Los grupos de captura tienen un coste de memoria y hacen el código más difícil de mantener si hay muchos grupos numerados.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📝</span>
+              <span className={styles.tipIcon} aria-hidden="true">📝</span>
               <strong>Comenta las regex complejas</strong>
               <p>En Python usa el modo verbose (<code>re.VERBOSE</code>) para añadir comentarios y espacios dentro del patrón. En otros lenguajes, define la regex como constante con nombre descriptivo y añade un comentario explicando su propósito, formato esperado y ejemplos válidos.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <strong>Prefiere regex específicas sobre genéricas</strong>
               <p>Un patrón demasiado amplio como <code>.*</code> acepta casi cualquier cosa y da falsos positivos. Define exactamente qué caracteres son válidos, sus rangos de longitud y su estructura. Cuanto más específico sea el patrón, menos mantenimiento necesitará en el futuro.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔒</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔒</span>
               <strong>Valida también el lado servidor</strong>
               <p>Nunca confíes únicamente en la validación regex del frontend. Un atacante puede saltársela manipulando la petición HTTP. La regex del cliente mejora la experiencia de usuario; la del servidor protege la integridad de los datos.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <strong>Evita compilar la misma regex en cada iteración</strong>
               <p>Si aplicas el mismo patrón en un bucle de miles de registros, compila la regex una sola vez fuera del bucle. En Python: <code>patrón = re.compile(r&apos;\d+&apos;)</code>. En JavaScript, define el literal de regex fuera de la función. Esto puede mejorar el rendimiento en factores de 10x o más.</p>
             </div>
@@ -699,7 +706,7 @@ export default function ValidadorRegexPage() {
         <section>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <strong>Errores frecuentes que causan bugs silenciosos</strong>
             </div>
             <ul className={styles.warningList}>

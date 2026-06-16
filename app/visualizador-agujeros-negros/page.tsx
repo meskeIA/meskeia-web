@@ -503,6 +503,7 @@ export default function AgujerosNegrosPage(): React.ReactNode {
               {ZONAS.map((z) => (
                 <button
                   key={z.id}
+                  type="button"
                   className={`${styles.leyendaItem} ${zonaActiva === z.id ? styles.leyendaActivo : ''}`}
                   onClick={() => handleLeyendaClick(z.id)}
                   aria-pressed={zonaActiva === z.id}
@@ -602,11 +603,13 @@ export default function AgujerosNegrosPage(): React.ReactNode {
 
             <div className={styles.espagControles}>
               <button
+                type="button"
                 className={styles.btnToggle}
                 onClick={() => setEspagAnimando((v) => !v)}
+                aria-pressed={espagAnimando}
                 aria-label={espagAnimando ? 'Detener animación de espaguetización' : 'Iniciar animación de espaguetización'}
               >
-                {espagAnimando ? '⏹ Detener' : '▶ Animar espaguetización'}
+                <span aria-hidden="true">{espagAnimando ? '⏹' : '▶'}</span>{espagAnimando ? ' Detener' : ' Animar espaguetización'}
               </button>
             </div>
 
@@ -642,12 +645,13 @@ export default function AgujerosNegrosPage(): React.ReactNode {
             {TIPOS.map((tipo) => (
               <button
                 key={tipo.id}
+                type="button"
                 role="tab"
                 aria-selected={tipoActivo === tipo.id}
                 className={`${styles.tipoTab} ${tipoActivo === tipo.id ? styles.tipoTabActivo : ''}`}
                 onClick={() => setTipoActivo(tipo.id)}
               >
-                {tipo.icono} {tipo.nombre}
+                <span aria-hidden="true">{tipo.icono}</span> {tipo.nombre}
               </button>
             ))}
           </div>

@@ -242,6 +242,7 @@ export default function AdnCodigoGeneticoPage() {
           {SECCIONES.map(s => (
             <button
               key={s.id}
+              type="button"
               className={`${styles.navBtn} ${seccion === s.id ? styles.navActivo : ''}`}
               onClick={() => setSeccion(s.id)}
               aria-pressed={seccion === s.id}
@@ -324,6 +325,7 @@ export default function AdnCodigoGeneticoPage() {
               {BASES.map(base => (
                 <button
                   key={base.letra}
+                  type="button"
                   className={`${styles.baseCard} ${baseActiva === base.letra ? styles.baseActiva : ''}`}
                   style={{ borderColor: base.color, background: baseActiva === base.letra ? base.colorClaro : undefined }}
                   onClick={() => setBaseActiva(baseActiva === base.letra ? null : base.letra)}
@@ -561,8 +563,10 @@ export default function AdnCodigoGeneticoPage() {
             {/* Filtro */}
             <div className={styles.filtroContainer}>
               <button
+                type="button"
                 className={`${styles.filtroBtn} ${codonFiltro === null ? styles.filtroBtnActivo : ''}`}
                 onClick={() => setCodonFiltro(null)}
+                aria-pressed={codonFiltro === null}
               >
                 Todos ({formatNumber(CODONES.length, 0)})
               </button>
@@ -571,8 +575,10 @@ export default function AdnCodigoGeneticoPage() {
                 return (
                   <button
                     key={aa}
+                    type="button"
                     className={`${styles.filtroBtn} ${codonFiltro === aa ? styles.filtroBtnActivo : ''}`}
                     onClick={() => setCodonFiltro(codonFiltro === aa ? null : aa)}
+                    aria-pressed={codonFiltro === aa}
                     style={codonFiltro === aa ? { background: CODONES.find(c => c.aminoacido === aa)?.color, borderColor: CODONES.find(c => c.aminoacido === aa)?.color, color: 'white' } : undefined}
                   >
                     {aa} ({count})

@@ -372,16 +372,16 @@
 | [x] | Selector de Canal de Venta | `/selector-canal-venta/` | diseno, freelance |
 | [x] | Simulador de Puertas Lógicas | `/simulador-puertas-logicas/` | diseno, estudiantes |
 | [x] | Validador JSON | `/validador-json/` | diseno, tecnicas |
-| [ ] | Validador RegEx | `/validador-regex/` | diseno, tecnicas |
+| [x] | Validador RegEx | `/validador-regex/` | diseno, tecnicas |
 | [x] | Visualizador de Algoritmos | `/visualizador-algoritmos/` | diseno, estudiantes |
 
 ## Estudiantes (`estudiantes`) — 244 apps
 
 | Estado | Nombre | URL | Suites |
 |---|---|---|---|
-| [ ] | Adaptaciones de las Plantas — Hábitats Extremos y Carnívoras | `/visualizador-adaptaciones-plantas/` | estudiantes, cultura, salud |
-| [ ] | ADN y Código Genético - De la Doble Hélice a la Proteína | `/visualizador-adn-codigo-genetico/` | estudiantes, cultura |
-| [ ] | Agujeros Negros: Anatomía, Hawking y Espaguetización | `/visualizador-agujeros-negros/` | estudiantes, cultura |
+| [x] | Adaptaciones de las Plantas — Hábitats Extremos y Carnívoras | `/visualizador-adaptaciones-plantas/` | estudiantes, cultura, salud |
+| [x] | ADN y Código Genético - De la Doble Hélice a la Proteína | `/visualizador-adn-codigo-genetico/` | estudiantes, cultura |
+| [x] | Agujeros Negros: Anatomía, Hawking y Espaguetización | `/visualizador-agujeros-negros/` | estudiantes, cultura |
 | [ ] | Álgebra Lineal: Vectores, Transformaciones y Eigenvalores | `/visualizador-algebra-lineal/` | estudiantes, tecnicas |
 | [ ] | Alzheimer y Parkinson: Mecanismo Neurobiológico | `/visualizador-alzheimer-parkinson/` | estudiantes, cultura, salud |
 | [ ] | Anatomía de una Flor - De la Polinización al Fruto | `/visualizador-anatomia-flor/` | estudiantes, cultura |
