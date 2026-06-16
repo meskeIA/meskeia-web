@@ -591,8 +591,10 @@ export default function VisualizadorTeoriaGrafosPage() {
           {GRAPHS.map((g) => (
             <button
               key={g.id}
+              type="button"
               className={`${styles.graphBtn} ${selectedGraphId === g.id ? styles.graphBtnActive : ''}`}
               onClick={() => handleGraphChange(g.id)}
+              aria-pressed={selectedGraphId === g.id}
             >
               <span className={styles.graphBtnName}>{g.name}</span>
               <span className={styles.graphBtnDesc}>{g.description}</span>
@@ -678,16 +680,20 @@ export default function VisualizadorTeoriaGrafosPage() {
         <div className={styles.dijkstraControls}>
           <div className={styles.nodeSelectRow}>
             <button
+              type="button"
               className={`${styles.selectNodeBtn} ${selectingNode === 'source' ? styles.selectNodeBtnActive : ''}`}
               onClick={() => setSelectingNode(selectingNode === 'source' ? null : 'source')}
+              aria-pressed={selectingNode === 'source'}
             >
               Origen: <strong>{graph.nodes.find((n) => n.id === selectedSource)?.label || selectedSource}</strong>
             </button>
             <span className={styles.arrow} aria-hidden="true">→</span>
             <button
+              type="button"
               className={`${styles.selectNodeBtn} ${selectingNode === 'target' ? styles.selectNodeBtnActive : ''}`}
               onClick={() => setSelectingNode(selectingNode === 'target' ? null : 'target')}
               style={{ borderColor: '#E63946' }}
+              aria-pressed={selectingNode === 'target'}
             >
               Destino: <strong>{graph.nodes.find((n) => n.id === selectedTarget)?.label || selectedTarget}</strong>
             </button>
@@ -695,14 +701,18 @@ export default function VisualizadorTeoriaGrafosPage() {
 
           <div className={styles.modeRow}>
             <button
+              type="button"
               className={`${styles.modeBtn} ${stepMode === 'manual' ? styles.modeBtnActive : ''}`}
               onClick={() => setStepMode('manual')}
+              aria-pressed={stepMode === 'manual'}
             >
               Paso a paso
             </button>
             <button
+              type="button"
               className={`${styles.modeBtn} ${stepMode === 'auto' ? styles.modeBtnActive : ''}`}
               onClick={() => setStepMode('auto')}
+              aria-pressed={stepMode === 'auto'}
             >
               Automático
             </button>
@@ -712,6 +722,7 @@ export default function VisualizadorTeoriaGrafosPage() {
             {stepMode === 'manual' ? (
               <>
                 <button
+                  type="button"
                   className={styles.btnPrimary}
                   onClick={dijkstraSteps.length === 0 ? startDijkstra : () => goToStep(currentStep - 1)}
                   disabled={dijkstraSteps.length > 0 && currentStep <= 0}
@@ -720,6 +731,7 @@ export default function VisualizadorTeoriaGrafosPage() {
                 </button>
                 {dijkstraSteps.length > 0 && (
                   <button
+                    type="button"
                     className={styles.btnPrimary}
                     onClick={() => goToStep(currentStep + 1)}
                     disabled={currentStep >= dijkstraSteps.length - 1}
@@ -730,6 +742,7 @@ export default function VisualizadorTeoriaGrafosPage() {
               </>
             ) : (
               <button
+                type="button"
                 className={styles.btnPrimary}
                 onClick={runAuto}
                 disabled={isRunning}
@@ -737,7 +750,7 @@ export default function VisualizadorTeoriaGrafosPage() {
                 {isRunning ? 'Ejecutando...' : 'Ejecutar animación'}
               </button>
             )}
-            <button className={styles.btnSecondary} onClick={resetDijkstra}>
+            <button type="button" className={styles.btnSecondary} onClick={resetDijkstra}>
               Reiniciar
             </button>
           </div>

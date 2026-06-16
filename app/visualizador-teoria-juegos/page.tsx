@@ -319,7 +319,7 @@ export default function TeoriaJuegosPage() {
           <div className={styles.sumaZeroCoopGrid}>
             {/* Suma cero */}
             <div className={styles.sumaZeroCard}>
-              <h3 className={styles.sumaZeroTitulo}>⚔️ Suma cero</h3>
+              <h3 className={styles.sumaZeroTitulo}><span aria-hidden="true">⚔️</span> Suma cero</h3>
               <p className={styles.sumaZeroDesc}>
                 Lo que gana uno lo pierde el otro. La suma de los pagos es siempre 0.
               </p>
@@ -364,7 +364,7 @@ export default function TeoriaJuegosPage() {
 
             {/* Cooperativos */}
             <div className={styles.cooperativoCard}>
-              <h3 className={styles.cooperativoTitulo}>🤝 Cooperativos</h3>
+              <h3 className={styles.cooperativoTitulo}><span aria-hidden="true">🤝</span> Cooperativos</h3>
               <p className={styles.cooperativoDesc}>
                 Las partes pueden comunicarse y hacer acuerdos vinculantes. Emergen coaliciones.
               </p>
@@ -587,7 +587,7 @@ export default function TeoriaJuegosPage() {
         </p>
 
         <div className={styles.warningBox}>
-          <strong>ℹ️ Nota:</strong> El Dilema del Prisionero es un modelo simplificado. Los
+          <strong><span aria-hidden="true">ℹ️</span> Nota:</strong> El Dilema del Prisionero es un modelo simplificado. Los
           juegos reales tienen más jugadores, información asimétrica y estrategias mixtas. La
           teoría de juegos es una herramienta de análisis, no una predicción exacta del
           comportamiento humano.

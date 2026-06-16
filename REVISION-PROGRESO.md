@@ -606,10 +606,10 @@
 | [x] | Superconductividad: Efecto Meissner y Pares de Cooper | `/visualizador-superconductividad/` | estudiantes, tecnicas |
 | [x] | Tabla Periódica Interactiva | `/tabla-periodica/` | estudiantes |
 | [x] | Tectónica de Placas | `/visualizador-tectonica-placas/` | estudiantes, cultura |
-| [ ] | Tendencias de la Tabla Periódica | `/visualizador-tabla-periodica-interactiva/` | estudiantes, cultura |
-| [ ] | Tendencias de la Tabla Periódica | `/simulador-tabla-periodica-tendencias/` | estudiantes |
-| [ ] | Teoría de Grafos: Dijkstra, Königsberg y Redes | `/visualizador-teoria-grafos/` | estudiantes, tecnicas |
-| [ ] | Teoría de Juegos: Dilema del Prisionero y Nash | `/visualizador-teoria-juegos/` | estudiantes, cultura, productividad |
+| [x] | Tendencias de la Tabla Periódica | `/visualizador-tabla-periodica-interactiva/` | estudiantes, cultura |
+| [x] | Tendencias de la Tabla Periódica | `/simulador-tabla-periodica-tendencias/` | estudiantes |
+| [x] | Teoría de Grafos: Dijkstra, Königsberg y Redes | `/visualizador-teoria-grafos/` | estudiantes, tecnicas |
+| [x] | Teoría de Juegos: Dilema del Prisionero y Nash | `/visualizador-teoria-juegos/` | estudiantes, cultura, productividad |
 | [ ] | Teoría de la Información: Entropía de Shannon, Huffman y Compresión | `/visualizador-teoria-informacion/` | estudiantes, tecnicas |
 | [ ] | Terremotos y Tsunamis: De la Falla al Impacto | `/visualizador-terremotos-tsunamis/` | estudiantes, cultura |
 | [ ] | Tipos de Desempleo: Friccional, Estructural y Cíclico | `/visualizador-desempleo-tipos/` | estudiantes, cultura |
