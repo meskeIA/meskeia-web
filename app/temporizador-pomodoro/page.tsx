@@ -348,20 +348,26 @@ export default function TemporizadorPomodoroPage() {
           {/* Selector de tipo de sesión */}
           <div className={styles.sessionSelector}>
             <button
+              type="button"
               className={`${styles.sessionBtn} ${sessionType === 'work' ? styles.active : ''}`}
               onClick={() => changeSessionType('work')}
+              aria-pressed={sessionType === 'work'}
             >
               Concentración
             </button>
             <button
+              type="button"
               className={`${styles.sessionBtn} ${sessionType === 'shortBreak' ? styles.active : ''}`}
               onClick={() => changeSessionType('shortBreak')}
+              aria-pressed={sessionType === 'shortBreak'}
             >
               Descanso corto
             </button>
             <button
+              type="button"
               className={`${styles.sessionBtn} ${sessionType === 'longBreak' ? styles.active : ''}`}
               onClick={() => changeSessionType('longBreak')}
+              aria-pressed={sessionType === 'longBreak'}
             >
               Descanso largo
             </button>
@@ -423,26 +429,29 @@ export default function TemporizadorPomodoroPage() {
 
           {/* Controles */}
           <div className={styles.controls}>
-            <button onClick={resetTimer} className={styles.controlBtn} title="Reiniciar">
+            <button type="button" onClick={resetTimer} className={styles.controlBtn} title="Reiniciar" aria-label="Reiniciar temporizador">
               ↺
             </button>
             <button
+              type="button"
               onClick={toggleTimer}
               className={`${styles.mainBtn} ${isRunning ? styles.pause : styles.play}`}
             >
               {isRunning ? '⏸ Pausar' : '▶ Iniciar'}
             </button>
-            <button onClick={skipSession} className={styles.controlBtn} title="Saltar">
+            <button type="button" onClick={skipSession} className={styles.controlBtn} title="Saltar" aria-label="Saltar sesión">
               ⏭
             </button>
           </div>
 
           {/* Botón de configuración */}
           <button
+            type="button"
             onClick={() => setShowConfig(!showConfig)}
             className={styles.configToggle}
+            aria-pressed={showConfig}
           >
-            ⚙️ {showConfig ? 'Ocultar' : 'Configuración'}
+            <span aria-hidden="true">⚙️</span> {showConfig ? 'Ocultar' : 'Configuración'}
           </button>
         </div>
 
@@ -469,7 +478,7 @@ export default function TemporizadorPomodoroPage() {
                 <span className={styles.statLabel}>Sesión actual</span>
               </div>
             </div>
-            <button onClick={resetStats} className={styles.resetStatsBtn}>
+            <button type="button" onClick={resetStats} className={styles.resetStatsBtn}>
               Resetear estadísticas
             </button>
           </div>
@@ -486,6 +495,7 @@ export default function TemporizadorPomodoroPage() {
                   {PRESETS.map(preset => (
                     <button
                       key={preset.name}
+                      type="button"
                       onClick={() => applyPreset(preset)}
                       className={styles.presetBtn}
                     >
@@ -608,10 +618,11 @@ export default function TemporizadorPomodoroPage() {
                     />
                   </label>
                   <button
+                    type="button"
                     onClick={playSound}
                     className={styles.testSoundBtn}
                   >
-                    🔔 Probar sonido
+                    <span aria-hidden="true">🔔</span> Probar sonido
                   </button>
                 </div>
               )}

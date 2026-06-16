@@ -720,11 +720,11 @@
 | [x] | Planificador Trimestral para Autónomos | `/planificador-trimestres-freelance/` | freelance, productividad |
 | [x] | Selector de Financiación Empresarial | `/selector-financiacion-empresa/` | freelance, finanzas |
 | [x] | Selector de Forma Jurídica | `/selector-forma-juridica/` | freelance, finanzas |
-| [ ] | Selector de Modelo de Negocio | `/selector-modelo-negocio/` | freelance, finanzas, productividad |
-| [ ] | Selector de Tipo de Contrato | `/selector-contrato-trabajo/` | freelance, productividad |
+| [x] | Selector de Modelo de Negocio | `/selector-modelo-negocio/` | freelance, finanzas, productividad |
+| [x] | Selector de Tipo de Contrato | `/selector-contrato-trabajo/` | freelance, productividad |
 | [x] | Selector Régimen Fiscal Autónomo | `/selector-regimen-fiscal-autonomo/` | freelance, finanzas |
-| [ ] | Simulador de Colchón de Emergencia Freelance | `/simulador-colchon-emergencia-freelance/` | freelance, finanzas |
-| [ ] | Temporizador Pomodoro | `/temporizador-pomodoro/` | freelance, productividad, estudiantes |
+| [x] | Simulador de Colchón de Emergencia Freelance | `/simulador-colchon-emergencia-freelance/` | freelance, finanzas |
+| [x] | Temporizador Pomodoro | `/temporizador-pomodoro/` | freelance, productividad, estudiantes |
 | [ ] | Test de Salud de tu Negocio Freelance | `/test-salud-negocio-freelance/` | freelance, productividad |
 | [ ] | Test de Validación de Idea | `/test-validacion-idea/` | freelance, cultura |
 | [ ] | Time Tracker | `/time-tracker/` | freelance, productividad |

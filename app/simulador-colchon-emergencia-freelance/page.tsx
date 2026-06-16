@@ -369,7 +369,7 @@ export default function SimuladorColchonEmergenciaFreelancePage() {
                           <div key={d.id} className={styles.leyendaItem}>
                             <span className={styles.leyendaColor} style={{ background: d.color }} />
                             <span className={styles.leyendaTexto}>
-                              {d.icono} {d.label}
+                              <span aria-hidden="true">{d.icono}</span> {d.label}
                             </span>
                             <span className={styles.leyendaPct}>
                               {formatNumber(d.porcentaje, 1)}%
@@ -381,7 +381,7 @@ export default function SimuladorColchonEmergenciaFreelancePage() {
 
                     {resultados.mayorGasto && (
                       <p className={styles.mayorGastoTexto}>
-                        Tu mayor gasto es: <strong>{resultados.mayorGasto.icono} {resultados.mayorGasto.label}</strong> ({formatNumber(resultados.mayorGasto.porcentaje, 1)}%)
+                        Tu mayor gasto es: <strong><span aria-hidden="true">{resultados.mayorGasto.icono}</span> {resultados.mayorGasto.label}</strong> ({formatNumber(resultados.mayorGasto.porcentaje, 1)}%)
                       </p>
                     )}
                   </div>
@@ -475,7 +475,7 @@ export default function SimuladorColchonEmergenciaFreelancePage() {
             </p>
             <div className={styles.comparativaGrid}>
               <div className={styles.comparativaCard}>
-                <h3>🛡️ Fondo de emergencia</h3>
+                <h3><span aria-hidden="true">🛡️</span> Fondo de emergencia</h3>
                 <ul>
                   <li>Liquido e inmediato (disponible manana)</li>
                   <li>No se invierte en productos con riesgo</li>
@@ -484,7 +484,7 @@ export default function SimuladorColchonEmergenciaFreelancePage() {
                 </ul>
               </div>
               <div className={styles.comparativaCard}>
-                <h3>📈 Ahorro para inversion</h3>
+                <h3><span aria-hidden="true">📈</span> Ahorro para inversion</h3>
                 <ul>
                   <li>Puede no ser inmediato (fondos, ETFs...)</li>
                   <li>Acepta cierto riesgo a cambio de rentabilidad</li>

@@ -515,12 +515,12 @@ export default function SelectorModeloNegocioPage() {
           </thead>
           <tbody>
             {[
-              ['🏪 Tienda física', 'Alto (20k–100k €)', '1–6 meses', 'Limitada (local)'],
-              ['🛒 E-commerce', 'Medio (2k–30k €)', '1–3 meses', 'Alta (nacional/global)'],
-              ['💼 Servicios', 'Bajo (0–5k €)', 'Días–semanas', 'Media (por horas)'],
-              ['💻 SaaS/Digital', 'Alto (desarrollo)', '6–18 meses', 'Muy alta'],
-              ['🔗 Marketplace', 'Alto (plataforma)', '6–24 meses', 'Muy alta (efecto red)'],
-            ].map(([modelo, capital, tiempo, escala], i) => (
+              ['🏪', 'Tienda física', 'Alto (20k–100k €)', '1–6 meses', 'Limitada (local)'],
+              ['🛒', 'E-commerce', 'Medio (2k–30k €)', '1–3 meses', 'Alta (nacional/global)'],
+              ['💼', 'Servicios', 'Bajo (0–5k €)', 'Días–semanas', 'Media (por horas)'],
+              ['💻', 'SaaS/Digital', 'Alto (desarrollo)', '6–18 meses', 'Muy alta'],
+              ['🔗', 'Marketplace', 'Alto (plataforma)', '6–24 meses', 'Muy alta (efecto red)'],
+            ].map(([icono, nombre, capital, tiempo, escala], i) => (
               <tr
                 key={i}
                 style={{
@@ -528,7 +528,9 @@ export default function SelectorModeloNegocioPage() {
                   borderBottom: '1px solid rgba(0,0,0,0.06)',
                 }}
               >
-                <td style={{ padding: '0.55rem 0.75rem', fontWeight: 600 }}>{modelo}</td>
+                <td style={{ padding: '0.55rem 0.75rem', fontWeight: 600 }}>
+                  <span aria-hidden="true">{icono}</span> {nombre}
+                </td>
                 <td style={{ padding: '0.55rem 0.75rem' }}>{capital}</td>
                 <td style={{ padding: '0.55rem 0.75rem' }}>{tiempo}</td>
                 <td style={{ padding: '0.55rem 0.75rem' }}>{escala}</td>
