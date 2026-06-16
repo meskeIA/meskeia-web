@@ -330,11 +330,11 @@
 | Estado | Nombre | URL | Suites |
 |---|---|---|---|
 | [x] | Analizador de Densidad SEO | `/analizador-densidad-seo/` | diseno |
-| [ ] | Analizador de Títulos SEO | `/analizador-titulos-seo/` | diseno |
-| [ ] | Analizador GEO/AEO | `/analizador-geo/` | diseno |
+| [x] | Analizador de Títulos SEO | `/analizador-titulos-seo/` | diseno |
+| [x] | Analizador GEO/AEO | `/analizador-geo/` | diseno |
 | [x] | Calculadora de Aspectos | `/calculadora-aspectos/` | diseno |
-| [ ] | Calculadora de Legibilidad | `/calculadora-legibilidad/` | diseno |
-| [ ] | Calculadora Tiempo de Lectura | `/calculadora-tiempo-lectura/` | diseno |
+| [x] | Calculadora de Legibilidad | `/calculadora-legibilidad/` | diseno |
+| [x] | Calculadora Tiempo de Lectura | `/calculadora-tiempo-lectura/` | diseno |
 | [ ] | Comparador de Textos | `/comparador-textos/` | diseno, productividad |
 | [ ] | Compresor de Imágenes por Lotes | `/compresor-imagenes/` | diseno |
 | [x] | Contador de Palabras | `/contador-palabras/` | diseno, productividad |

@@ -420,7 +420,7 @@ export default function AnalizadorGeoPage() {
 
       {/* Hero */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🤖</span>
+        <span className={styles.heroIcon} aria-hidden="true">🤖</span>
         <h1 className={styles.title}>Analizador GEO/AEO</h1>
         <p className={styles.subtitle}>
           Optimiza tu contenido para ser citado por ChatGPT, Perplexity, Gemini y Google AI Overviews
@@ -500,13 +500,14 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
 
           <div className={styles.buttonGroup}>
             <button
+              type="button"
               onClick={handleAnalyze}
               disabled={!content.trim() || isAnalyzing}
               className={styles.btnPrimary}
             >
-              {isAnalyzing ? 'Analizando...' : '🔍 Analizar Contenido'}
+              {isAnalyzing ? 'Analizando...' : <><span aria-hidden="true">🔍</span> Analizar Contenido</>}
             </button>
-            <button onClick={handleClear} className={styles.btnSecondary}>
+            <button type="button" onClick={handleClear} className={styles.btnSecondary}>
               Limpiar
             </button>
           </div>
@@ -539,7 +540,7 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
               {Object.entries(result.categories).map(([key, cat]) => (
                 <div key={key} className={styles.categoryCard}>
                   <div className={styles.categoryHeader}>
-                    <span className={styles.categoryIcon}>
+                    <span className={styles.categoryIcon} aria-hidden="true">
                       {key === 'estructura' && '📐'}
                       {key === 'citabilidad' && '📌'}
                       {key === 'entidades' && '🏷️'}
@@ -580,7 +581,7 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
             {/* Fortalezas */}
             {result.strengths.length > 0 && (
               <div className={styles.strengthsCard}>
-                <h3 className={styles.sectionTitle}>✅ Fortalezas</h3>
+                <h3 className={styles.sectionTitle}><span aria-hidden="true">✅</span> Fortalezas</h3>
                 <ul className={styles.strengthsList}>
                   {result.strengths.map((strength, idx) => (
                     <li key={idx}>{strength}</li>
@@ -592,7 +593,7 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
             {/* Recomendaciones */}
             {result.recommendations.length > 0 && (
               <div className={styles.recommendationsCard}>
-                <h3 className={styles.sectionTitle}>💡 Recomendaciones de Mejora</h3>
+                <h3 className={styles.sectionTitle}><span aria-hidden="true">💡</span> Recomendaciones de Mejora</h3>
                 <ul className={styles.recommendationsList}>
                   {result.recommendations.map((rec, idx) => (
                     <li key={idx}>{rec}</li>
@@ -619,11 +620,11 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
 
           <div className={styles.conceptGrid}>
             <div className={styles.conceptCard}>
-              <h4>🎯 GEO (Generative Engine Optimization)</h4>
+              <h4><span aria-hidden="true">🎯</span> GEO (Generative Engine Optimization)</h4>
               <p>Optimizar para que las IAs generativas (ChatGPT, Claude, Gemini) citen tu contenido en sus respuestas.</p>
             </div>
             <div className={styles.conceptCard}>
-              <h4>💬 AEO (Answer Engine Optimization)</h4>
+              <h4><span aria-hidden="true">💬</span> AEO (Answer Engine Optimization)</h4>
               <p>Estructurar contenido para que motores de respuesta (Perplexity, AI Overviews) lo extraigan como fuente.</p>
             </div>
           </div>
@@ -632,7 +633,7 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
 
           <div className={styles.categoryExplainer}>
             <div className={styles.explainerItem}>
-              <span className={styles.explainerIcon}>📐</span>
+              <span className={styles.explainerIcon} aria-hidden="true">📐</span>
               <div>
                 <strong>Estructura (25%)</strong>
                 <p>Títulos, subtítulos, listas, párrafos. Las IAs prefieren contenido bien organizado y escaneable.</p>
@@ -640,7 +641,7 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
             </div>
 
             <div className={styles.explainerItem}>
-              <span className={styles.explainerIcon}>📌</span>
+              <span className={styles.explainerIcon} aria-hidden="true">📌</span>
               <div>
                 <strong>Citabilidad (25%)</strong>
                 <p>Datos concretos, estadísticas, definiciones claras. Lo que las IAs pueden extraer y citar directamente.</p>
@@ -648,7 +649,7 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
             </div>
 
             <div className={styles.explainerItem}>
-              <span className={styles.explainerIcon}>🏷️</span>
+              <span className={styles.explainerIcon} aria-hidden="true">🏷️</span>
               <div>
                 <strong>Entidades (15%)</strong>
                 <p>Nombres propios, marcas, conceptos reconocibles. Ayudan a las IAs a contextualizar tu contenido.</p>
@@ -656,7 +657,7 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
             </div>
 
             <div className={styles.explainerItem}>
-              <span className={styles.explainerIcon}>🏆</span>
+              <span className={styles.explainerIcon} aria-hidden="true">🏆</span>
               <div>
                 <strong>E-E-A-T (20%)</strong>
                 <p>Experience, Expertise, Authoritativeness, Trust. Señales de que el contenido proviene de una fuente confiable.</p>
@@ -664,7 +665,7 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
             </div>
 
             <div className={styles.explainerItem}>
-              <span className={styles.explainerIcon}>📅</span>
+              <span className={styles.explainerIcon} aria-hidden="true">📅</span>
               <div>
                 <strong>Frescura (10%)</strong>
                 <p>Referencias temporales actuales. Las IAs priorizan contenido actualizado sobre información antigua.</p>
@@ -672,7 +673,7 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
             </div>
 
             <div className={styles.explainerItem}>
-              <span className={styles.explainerIcon}>✨</span>
+              <span className={styles.explainerIcon} aria-hidden="true">✨</span>
               <div>
                 <strong>Formato (5%)</strong>
                 <p>Tablas, énfasis, longitud de párrafos. Elementos que facilitan la extracción de información.</p>
@@ -777,7 +778,7 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🔍</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔍</span>
                 <strong>Consultor SEO / Agencia Digital</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -797,7 +798,7 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏢</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏢</span>
                 <strong>Empresa B2B (Software, Consultoría)</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -816,7 +817,7 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎓</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
                 <strong>Creador de Contenido Educativo</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -836,7 +837,7 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🛍️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🛍️</span>
                 <strong>Tienda Online / eCommerce</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -1135,7 +1136,7 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
           </p>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💬</span>
+              <span className={styles.tipIcon} aria-hidden="true">💬</span>
               <h4>Respuesta directa antes que introducción</h4>
               <p>
                 Las IAs extraen el primer bloque relevante. Coloca la respuesta completa
@@ -1148,7 +1149,7 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <h4>Datos verificables con fuentes citadas explícitamente</h4>
               <p>
                 No basta con decir «los estudios demuestran». Cita la fuente con nombre,
@@ -1161,7 +1162,7 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏆</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏆</span>
               <h4>E-E-A-T: Demuestra experiencia, no solo conocimiento</h4>
               <p>
                 Google definió E-E-A-T (Experience, Expertise, Authoritativeness,
@@ -1175,7 +1176,7 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏷️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏷️</span>
               <h4>Schema FAQ y HowTo en todas las páginas clave</h4>
               <p>
                 El marcado Schema.org no solo ayuda a Google: Perplexity y otros motores
@@ -1189,7 +1190,7 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔗</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔗</span>
               <h4>Cita fuentes primarias y enlaza a ellas</h4>
               <p>
                 Los sitios que enlazan a fuentes primarias de autoridad (estudios
@@ -1203,7 +1204,7 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <h4>Formato «pregunta → respuesta corta → desarrollo»</h4>
               <p>
                 Estructura cada sección importante siguiendo este patrón de tres capas:
@@ -1224,7 +1225,7 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
         <section className={styles.guideSection}>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>6 Errores Comunes que Impiden ser Citado por las IAs</h3>
             </div>
             <p>

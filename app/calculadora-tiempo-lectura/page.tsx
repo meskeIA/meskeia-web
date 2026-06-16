@@ -169,6 +169,7 @@ Finalmente, medir los resultados es esencial. Analiza métricas como tiempo en p
             <div className={styles.charInfo}>
               <span>{texto.length} caracteres</span>
               <button
+                type="button"
                 className={styles.ejemploBtn}
                 onClick={() => setTexto(textoEjemplo)}
               >
@@ -183,7 +184,9 @@ Finalmente, medir los resultados es esencial. Analiza métricas como tiempo en p
               {Object.entries(VELOCIDADES).map(([key, value]) => (
                 <button
                   key={key}
+                  type="button"
                   className={`${styles.velocidadBtn} ${velocidad === value ? styles.active : ''}`}
+                  aria-pressed={velocidad === value}
                   onClick={() => setVelocidad(value)}
                 >
                   <span className={styles.velocidadLabel}>
@@ -217,7 +220,7 @@ Finalmente, medir los resultados es esencial. Analiza métricas como tiempo en p
               {/* Tiempo principal */}
               <div className={styles.tiempoCard}>
                 <div className={styles.tiempoPrincipal}>
-                  <span className={styles.tiempoIcon}>⏱️</span>
+                  <span className={styles.tiempoIcon} aria-hidden="true">⏱️</span>
                   <div className={styles.tiempoInfo}>
                     <span className={styles.tiempoValor}>{formatTiempo(analisis.tiempoLectura)}</span>
                     <span className={styles.tiempoLabel}>tiempo de lectura</span>
@@ -225,7 +228,7 @@ Finalmente, medir los resultados es esencial. Analiza métricas como tiempo en p
                 </div>
                 <div className={styles.tiempoSecundario}>
                   <div className={styles.tiempoItem}>
-                    <span className={styles.tiempoItemIcon}>🎧</span>
+                    <span className={styles.tiempoItemIcon} aria-hidden="true">🎧</span>
                     <span className={styles.tiempoItemValor}>{formatTiempo(analisis.tiempoEscucha)}</span>
                     <span className={styles.tiempoItemLabel}>escucha (audio)</span>
                   </div>
@@ -237,7 +240,7 @@ Finalmente, medir los resultados es esencial. Analiza métricas como tiempo en p
                 const tipo = getTipoContenido(analisis.palabras);
                 return (
                   <div className={styles.tipoCard}>
-                    <span className={styles.tipoEmoji}>{tipo.emoji}</span>
+                    <span className={styles.tipoEmoji} aria-hidden="true">{tipo.emoji}</span>
                     <div className={styles.tipoInfo}>
                       <span className={styles.tipoNombre}>{tipo.tipo}</span>
                       <span className={styles.tipoDesc}>{tipo.descripcion}</span>
@@ -302,6 +305,7 @@ Finalmente, medir los resultados es esencial. Analiza métricas como tiempo en p
                   <span>⏱️ {Math.ceil(analisis.tiempoLectura)} min de lectura</span>
                 </div>
                 <button
+                  type="button"
                   className={styles.copyBtn}
                   onClick={() => {
                     navigator.clipboard.writeText(`⏱️ ${Math.ceil(analisis.tiempoLectura)} min de lectura`);
@@ -313,7 +317,7 @@ Finalmente, medir los resultados es esencial. Analiza métricas como tiempo en p
             </>
           ) : (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>⏱️</span>
+              <span className={styles.placeholderIcon} aria-hidden="true">⏱️</span>
               <p>Escribe o pega un texto para calcular el tiempo de lectura</p>
             </div>
           )}
@@ -325,31 +329,31 @@ Finalmente, medir los resultados es esencial. Analiza métricas como tiempo en p
         <h3>Longitudes recomendadas por tipo de contenido</h3>
         <div className={styles.referenciaGrid}>
           <div className={styles.referenciaCard}>
-            <span className={styles.referenciaIcon}>📱</span>
+            <span className={styles.referenciaIcon} aria-hidden="true">📱</span>
             <h4>Redes Sociales</h4>
             <span className={styles.referenciaPalabras}>50-150 palabras</span>
             <span className={styles.referenciaTiempo}>~30 seg</span>
           </div>
           <div className={styles.referenciaCard}>
-            <span className={styles.referenciaIcon}>📧</span>
+            <span className={styles.referenciaIcon} aria-hidden="true">📧</span>
             <h4>Email / Newsletter</h4>
             <span className={styles.referenciaPalabras}>200-500 palabras</span>
             <span className={styles.referenciaTiempo}>1-2 min</span>
           </div>
           <div className={styles.referenciaCard}>
-            <span className={styles.referenciaIcon}>📝</span>
+            <span className={styles.referenciaIcon} aria-hidden="true">📝</span>
             <h4>Blog Post</h4>
             <span className={styles.referenciaPalabras}>800-1500 palabras</span>
             <span className={styles.referenciaTiempo}>4-7 min</span>
           </div>
           <div className={styles.referenciaCard}>
-            <span className={styles.referenciaIcon}>📚</span>
+            <span className={styles.referenciaIcon} aria-hidden="true">📚</span>
             <h4>Guía Completa</h4>
             <span className={styles.referenciaPalabras}>2000-3000 palabras</span>
             <span className={styles.referenciaTiempo}>10-15 min</span>
           </div>
           <div className={styles.referenciaCard}>
-            <span className={styles.referenciaIcon}>📖</span>
+            <span className={styles.referenciaIcon} aria-hidden="true">📖</span>
             <h4>Ebook / Whitepaper</h4>
             <span className={styles.referenciaPalabras}>5000+ palabras</span>
             <span className={styles.referenciaTiempo}>25+ min</span>
@@ -454,7 +458,7 @@ Finalmente, medir los resultados es esencial. Analiza métricas como tiempo en p
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>✍️</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">✍️</span>
                   <div>
                     <h4>Blogger y redactor de contenidos</h4>
                     <p>SEO y experiencia de usuario</p>
@@ -469,7 +473,7 @@ Finalmente, medir los resultados es esencial. Analiza métricas como tiempo en p
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>📧</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">📧</span>
                   <div>
                     <h4>Editor de newsletters</h4>
                     <p>Duración óptima del email</p>
@@ -484,7 +488,7 @@ Finalmente, medir los resultados es esencial. Analiza métricas como tiempo en p
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🎓</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
                   <div>
                     <h4>Docente y formador</h4>
                     <p>Planificación de lecturas de clase</p>
@@ -499,7 +503,7 @@ Finalmente, medir los resultados es esencial. Analiza métricas como tiempo en p
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>💼</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">💼</span>
                   <div>
                     <h4>Profesional y directivo</h4>
                     <p>Informes y documentos largos</p>
@@ -633,32 +637,32 @@ Finalmente, medir los resultados es esencial. Analiza métricas como tiempo en p
             <h2>Mejores prácticas para redactores y bloggers</h2>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>⏱️</span>
+                <span className={styles.tipIcon} aria-hidden="true">⏱️</span>
                 <h4>Muestra el tiempo en artículos largos</h4>
                 <p>A partir de 3 minutos (~700 palabras) el badge aporta valor real. Por debajo, el usuario ya intuye que es breve y el indicador no mejora métricas.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📏</span>
+                <span className={styles.tipIcon} aria-hidden="true">📏</span>
                 <h4>Párrafos cortos = tiempo percibido menor</h4>
                 <p>Párrafos de 3-4 líneas hacen que el mismo contenido se perciba más rápido de leer. El lector ve &quot;espacio en blanco&quot; y avanza con menos resistencia.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🖼️</span>
+                <span className={styles.tipIcon} aria-hidden="true">🖼️</span>
                 <h4>Imágenes que reducen la fatiga lectora</h4>
                 <p>Una imagen cada 300-400 palabras crea pausas visuales naturales. Los lectores retoman el texto más descansados y leen más tiempo seguido.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🔤</span>
+                <span className={styles.tipIcon} aria-hidden="true">🔤</span>
                 <h4>Subtítulos para navegación y retención</h4>
                 <p>Los H2 y H3 permiten al lector orientarse y retomar el artículo desde donde lo dejó. Cada 400-500 palabras debería haber un nuevo subtítulo descriptivo.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📱</span>
+                <span className={styles.tipIcon} aria-hidden="true">📱</span>
                 <h4>Adapta la longitud al canal</h4>
                 <p>El mismo contenido funciona diferente en LinkedIn (900 palabras óptimo), blog (1.500-2.500), newsletter (200-500) y Twitter/X (280 caracteres por tweet).</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🎯</span>
+                <span className={styles.tipIcon} aria-hidden="true">🎯</span>
                 <h4>Velocidad 238 ppm como referencia estándar</h4>
                 <p>Para contenido generalista en España, usa 238 ppm (velocidad media adulto español) como base de cálculo. Ajusta a 150 ppm para textos técnicos o audiencias con menor fluidez lectora.</p>
               </div>
@@ -669,7 +673,7 @@ Finalmente, medir los resultados es esencial. Analiza métricas como tiempo en p
           <section className={styles.eduSection}>
             <div className={styles.warningBox}>
               <div className={styles.warningHeader}>
-                <span className={styles.warningIcon}>⚠️</span>
+                <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
                 <h4>Errores comunes al calcular el tiempo de lectura</h4>
               </div>
               <ul className={styles.warningList}>

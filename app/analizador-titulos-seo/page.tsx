@@ -244,6 +244,7 @@ export default function AnalizadorTitulosSeoPage() {
               {ejemplos.map((ej, idx) => (
                 <button
                   key={idx}
+                  type="button"
                   className={styles.ejemploBtn}
                   onClick={() => setTitulo(ej)}
                 >
@@ -336,7 +337,7 @@ export default function AnalizadorTitulosSeoPage() {
             </>
           ) : (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>🔍</span>
+              <span className={styles.placeholderIcon} aria-hidden="true">🔍</span>
               <p>Escribe un título para ver el análisis</p>
             </div>
           )}

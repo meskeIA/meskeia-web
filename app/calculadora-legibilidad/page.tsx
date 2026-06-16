@@ -220,6 +220,7 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
             <div className={styles.charInfo}>
               <span>{texto.length} caracteres</span>
               <button
+                type="button"
                 className={styles.ejemploBtn}
                 onClick={() => setTexto(textoEjemplo)}
               >
@@ -348,7 +349,7 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
             </>
           ) : (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>📖</span>
+              <span className={styles.placeholderIcon} aria-hidden="true">📖</span>
               <p>Escribe o pega un texto de al menos 20 caracteres</p>
             </div>
           )}
