@@ -340,6 +340,7 @@ export default function ComparadorAsistentesCodigo() {
           ] as const).map(({ id, label }) => (
             <button
               key={id}
+              type="button"
               role="tab"
               aria-selected={tab === id}
               className={`${styles.tabBtn} ${tab === id ? styles.tabBtnActive : ''}`}
@@ -354,7 +355,7 @@ export default function ComparadorAsistentesCodigo() {
         {tab === 'comparativa' && (
           <div className={styles.tabContent} role="tabpanel">
             <div className={styles.dataNotice} role="note">
-              📅 Datos verificados en junio 2026. Precios y funcionalidades cambian frecuentemente — verifica siempre en las webs oficiales antes de suscribirte.
+              <span aria-hidden="true">📅</span> Datos verificados en junio 2026. Precios y funcionalidades cambian frecuentemente — verifica siempre en las webs oficiales antes de suscribirte.
             </div>
             <div className={styles.tablaWrapper}>
               <table className={styles.tabla} aria-label="Comparativa de asistentes de código IA">
@@ -483,6 +484,7 @@ export default function ComparadorAsistentesCodigo() {
               {PERFILES.map((p) => (
                 <button
                   key={p.id}
+                  type="button"
                   className={`${styles.perfilCard} ${perfilSeleccionado === p.id ? styles.perfilCardActivo : ''}`}
                   onClick={() => setPerfilSeleccionado(perfilSeleccionado === p.id ? null : p.id)}
                   aria-pressed={perfilSeleccionado === p.id}
@@ -524,7 +526,7 @@ export default function ComparadorAsistentesCodigo() {
                     )}
                   </div>
                   <div className={styles.razonBox}>
-                    <span className={styles.razonIcono}>💡</span>
+                    <span className={styles.razonIcono} aria-hidden="true">💡</span>
                     {perfilActivo.razon}
                   </div>
                 </div>
@@ -557,13 +559,13 @@ export default function ComparadorAsistentesCodigo() {
                       {primera && (
                         <div className={styles.combinacionAsistente}>
                           <span className={styles.combinacionLabel}>1ª opción</span>
-                          <span style={{ color: primera.color }}>{primera.icono} {primera.nombreCorto}</span>
+                          <span style={{ color: primera.color }}><span aria-hidden="true">{primera.icono}</span> {primera.nombreCorto}</span>
                         </div>
                       )}
                       {alt && (
                         <div className={styles.combinacionAsistente}>
                           <span className={styles.combinacionLabel}>Alternativa</span>
-                          <span style={{ color: alt.color }}>{alt.icono} {alt.nombreCorto}</span>
+                          <span style={{ color: alt.color }}><span aria-hidden="true">{alt.icono}</span> {alt.nombreCorto}</span>
                         </div>
                       )}
                     </div>

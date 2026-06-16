@@ -285,10 +285,12 @@ export default function AfinadorInstrumentosPage() {
           </div>
         ) : (
           <button
+            type="button"
             className={`${styles.btnEscuchar} ${escuchando ? styles.activo : ''}`}
             onClick={escuchando ? detenerEscucha : iniciarEscucha}
+            aria-pressed={escuchando}
           >
-            <span className={styles.btnIcono}>{escuchando ? '🎤' : '🎙️'}</span>
+            <span className={styles.btnIcono} aria-hidden="true">{escuchando ? '🎤' : '🎙️'}</span>
             <span>{escuchando ? 'Detener' : 'Iniciar afinador'}</span>
           </button>
         )}
@@ -301,8 +303,10 @@ export default function AfinadorInstrumentosPage() {
           {INSTRUMENTOS.map((inst, idx) => (
             <button
               key={inst.nombre}
+              type="button"
               className={`${styles.instrumentoBtn} ${instrumentoSeleccionado === idx ? styles.instrumentoActivo : ''}`}
               onClick={() => setInstrumentoSeleccionado(idx)}
+              aria-pressed={instrumentoSeleccionado === idx}
             >
               {inst.nombre}
             </button>
@@ -326,6 +330,7 @@ export default function AfinadorInstrumentosPage() {
         <h3 className={styles.sectionTitle}>Frecuencia de referencia (La4)</h3>
         <div className={styles.referenciaControl}>
           <button
+            type="button"
             className={styles.btnReferencia}
             onClick={() => setA4Referencia(Math.max(420, a4Referencia - 1))}
           >
@@ -333,6 +338,7 @@ export default function AfinadorInstrumentosPage() {
           </button>
           <span className={styles.referenciaValor}>{a4Referencia} Hz</span>
           <button
+            type="button"
             className={styles.btnReferencia}
             onClick={() => setA4Referencia(Math.min(460, a4Referencia + 1))}
           >
@@ -340,9 +346,9 @@ export default function AfinadorInstrumentosPage() {
           </button>
         </div>
         <div className={styles.referenciasPreset}>
-          <button onClick={() => setA4Referencia(440)} className={a4Referencia === 440 ? styles.presetActivo : ''}>440 Hz (Estándar)</button>
-          <button onClick={() => setA4Referencia(442)} className={a4Referencia === 442 ? styles.presetActivo : ''}>442 Hz (Orquesta)</button>
-          <button onClick={() => setA4Referencia(432)} className={a4Referencia === 432 ? styles.presetActivo : ''}>432 Hz</button>
+          <button type="button" onClick={() => setA4Referencia(440)} className={a4Referencia === 440 ? styles.presetActivo : ''} aria-pressed={a4Referencia === 440}>440 Hz (Estándar)</button>
+          <button type="button" onClick={() => setA4Referencia(442)} className={a4Referencia === 442 ? styles.presetActivo : ''} aria-pressed={a4Referencia === 442}>442 Hz (Orquesta)</button>
+          <button type="button" onClick={() => setA4Referencia(432)} className={a4Referencia === 432 ? styles.presetActivo : ''} aria-pressed={a4Referencia === 432}>432 Hz</button>
         </div>
       </div>
 

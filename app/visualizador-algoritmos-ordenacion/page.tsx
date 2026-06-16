@@ -506,6 +506,7 @@ export default function VisualizadorAlgoritmosOrdenacionPage() {
         ].map(({ id, label }) => (
           <button
             key={id}
+            type="button"
             role="tab"
             aria-selected={tabActiva === id}
             className={tabActiva === id ? `${styles.tab} ${styles.tabActivo}` : styles.tab}
@@ -525,19 +526,20 @@ export default function VisualizadorAlgoritmosOrdenacionPage() {
               {ALGORITMOS.map(algo => (
                 <button
                   key={algo}
+                  type="button"
                   className={algoritmo === algo ? `${styles.algoBtn} ${styles.algoBtnActivo}` : styles.algoBtn}
                   onClick={() => cambiarAlgoritmo(algo)}
                   aria-pressed={algoritmo === algo}
                 >
-                  {INFO_ALGORITMOS[algo].emoji} {INFO_ALGORITMOS[algo].nombre.split(' (')[0]}
+                  <span aria-hidden="true">{INFO_ALGORITMOS[algo].emoji}</span> {INFO_ALGORITMOS[algo].nombre.split(' (')[0]}
                 </button>
               ))}
             </div>
 
             {/* Botón nuevo array */}
             <div className={styles.controles}>
-              <button className={styles.btnSecundario} onClick={nuevoArray}>
-                🔀 Nuevo array aleatorio
+              <button type="button" className={styles.btnSecundario} onClick={nuevoArray}>
+                <span aria-hidden="true">🔀</span> Nuevo array aleatorio
               </button>
             </div>
 
@@ -560,6 +562,7 @@ export default function VisualizadorAlgoritmosOrdenacionPage() {
             {/* Controles de pasos */}
             <div className={styles.controlesNavegacion}>
               <button
+                type="button"
                 className={styles.btnPaso}
                 onClick={pasoAnterior}
                 disabled={pasoActual === 0}
@@ -568,6 +571,7 @@ export default function VisualizadorAlgoritmosOrdenacionPage() {
                 ◀ Anterior
               </button>
               <button
+                type="button"
                 className={styles.btnPlay}
                 onClick={toggleReproducir}
                 aria-label={reproduciendo ? 'Pausar reproducción' : 'Reproducir automáticamente'}
@@ -575,6 +579,7 @@ export default function VisualizadorAlgoritmosOrdenacionPage() {
                 {reproduciendo ? '⏸ Pausar' : '▶ Reproducir'}
               </button>
               <button
+                type="button"
                 className={styles.btnPaso}
                 onClick={pasoSiguiente}
                 disabled={pasoActual === pasos.length - 1}
@@ -660,7 +665,7 @@ export default function VisualizadorAlgoritmosOrdenacionPage() {
                     const info = INFO_ALGORITMOS[algo];
                     return (
                       <tr key={algo}>
-                        <td><strong>{info.emoji} {info.nombre.split(' (')[0]}</strong></td>
+                        <td><strong><span aria-hidden="true">{info.emoji}</span> {info.nombre.split(' (')[0]}</strong></td>
                         <td className={styles.bigOCell}>{info.mejor}</td>
                         <td className={styles.bigOCell}>{info.medio}</td>
                         <td className={styles.bigOCell}>{info.peor}</td>

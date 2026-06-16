@@ -351,6 +351,7 @@ export default function ArbolDecisionIa() {
                       {ds.features.map((f) => (
                         <td key={f} className={styles.td}>
                           <button
+                            type="button"
                             className={`${styles.featBtn} ${ej.features[f] ? styles.featBtnOn : styles.featBtnOff}`}
                             onClick={() => toggleFeature(ej.id, f)}
                             aria-pressed={ej.features[f]}
@@ -362,23 +363,25 @@ export default function ArbolDecisionIa() {
                       ))}
                       <td className={styles.td}>
                         <button
+                          type="button"
                           className={`${styles.etiquetaBtn} ${ej.etiqueta ? styles.etiquetaBtnSi : styles.etiquetaBtnNo}`}
                           onClick={() => toggleEtiqueta(ej.id)}
                           style={{ borderColor: ej.etiqueta ? ds.colorSi : ds.colorNo, color: ej.etiqueta ? ds.colorSi : ds.colorNo }}
                           aria-label={`Resultado: ${ej.etiqueta ? ds.etiquetaSi : ds.etiquetaNo}. Clic para cambiar.`}
+                          aria-pressed={ej.etiqueta}
                         >
                           {ej.etiqueta ? `✓ ${ds.etiquetaSi}` : `✗ ${ds.etiquetaNo}`}
                         </button>
                       </td>
                       <td className={styles.td}>
-                        <button className={styles.eliminarBtn} onClick={() => eliminar(ej.id)} aria-label="Eliminar ejemplo">✕</button>
+                        <button type="button" className={styles.eliminarBtn} onClick={() => eliminar(ej.id)} aria-label="Eliminar ejemplo">✕</button>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <button className={styles.añadirBtn} onClick={añadir}>
+            <button type="button" className={styles.añadirBtn} onClick={añadir}>
               + Añadir ejemplo
             </button>
           </div>
@@ -467,6 +470,7 @@ export default function ArbolDecisionIa() {
             <div className={styles.clasifGrid}>
               {ds.features.map((f) => (
                 <button
+                  type="button"
                   key={f}
                   className={`${styles.clasifFeatBtn} ${nuevoEj[f] ? styles.clasifFeatBtnOn : styles.clasifFeatBtnOff}`}
                   onClick={() => { setNuevoEj((prev) => ({ ...prev, [f]: !prev[f] })); setResultado(null); }}
@@ -477,8 +481,8 @@ export default function ArbolDecisionIa() {
                 </button>
               ))}
             </div>
-            <button className={styles.clasifBtn} onClick={clasificarNuevo}>
-              ▶ Clasificar
+            <button type="button" className={styles.clasifBtn} onClick={clasificarNuevo}>
+              <span aria-hidden="true">▶</span> Clasificar
             </button>
             {resultado && (
               <div
@@ -541,19 +545,19 @@ export default function ArbolDecisionIa() {
         </h4>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <strong>🏥 Diagnóstico médico</strong>
+            <strong><span aria-hidden="true">🏥</span> Diagnóstico médico</strong>
             <p>Características: síntomas, edad, historial. Clasifica en grupos de riesgo o posibles diagnósticos. Valorado por su interpretabilidad.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🏦 Riesgo crediticio</strong>
+            <strong><span aria-hidden="true">🏦</span> Riesgo crediticio</strong>
             <p>Características: ingresos, historial, deuda. Predice si un préstamo será devuelto. Los bancos prefieren árboles porque pueden explicar la decisión.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>📧 Filtro de spam</strong>
+            <strong><span aria-hidden="true">📧</span> Filtro de spam</strong>
             <p>Características: palabras clave, remitente, formato. Uno de los primeros usos del ML. Los filtros modernos usan ensembles de árboles.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🛒 Segmentación de clientes</strong>
+            <strong><span aria-hidden="true">🛒</span> Segmentación de clientes</strong>
             <p>Características: historial de compra, demografía. Predice qué clientes comprarán o abandonarán. Base de sistemas de recomendación.</p>
           </div>
         </div>

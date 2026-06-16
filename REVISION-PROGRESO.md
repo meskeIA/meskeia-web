@@ -734,11 +734,11 @@
 
 | Estado | Nombre | URL | Suites |
 |---|---|---|---|
-| [ ] | Afinador de Instrumentos | `/afinador-instrumentos/` | tecnicas, cultura |
-| [ ] | Algoritmos de Ordenación: Visualizador Paso a Paso | `/visualizador-algoritmos-ordenacion/` | tecnicas, estudiantes |
+| [x] | Afinador de Instrumentos | `/afinador-instrumentos/` | tecnicas, cultura |
+| [x] | Algoritmos de Ordenación: Visualizador Paso a Paso | `/visualizador-algoritmos-ordenacion/` | tecnicas, estudiantes |
 | [x] | Analizador de Espectro | `/analizador-espectro/` | tecnicas |
-| [ ] | Árbol de Decisión Interactivo | `/arbol-decision-ia/` | tecnicas, estudiantes, cultura |
-| [ ] | Asistentes de Código IA 2026: Claude Code vs Copilot vs Gemini | `/comparador-asistentes-codigo/` | tecnicas, productividad |
+| [x] | Árbol de Decisión Interactivo | `/arbol-decision-ia/` | tecnicas, estudiantes, cultura |
+| [x] | Asistentes de Código IA 2026: Claude Code vs Copilot vs Gemini | `/comparador-asistentes-codigo/` | tecnicas, productividad |
 | [ ] | Base de Datos Relacional: Tablas, JOIN e Índices | `/visualizador-base-datos-relacional/` | tecnicas, estudiantes |
 | [ ] | Blockchain - Cadena de Bloques y Contratos Inteligentes | `/visualizador-blockchain/` | tecnicas, cultura, estudiantes |
 | [x] | Buscador de Palabras por Patrón | `/buscador-palabras-patron/` | tecnicas, cultura, juegos, productividad |
