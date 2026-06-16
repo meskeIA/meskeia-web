@@ -382,6 +382,7 @@ export default function VisualizadorCicatrizacion() {
         {SECCIONES.map(sec => (
           <button
             key={sec.id}
+            type="button"
             className={`${styles.navBtn} ${seccionActiva === sec.id ? styles.navBtnActivo : ''}`}
             onClick={() => setSeccionActiva(sec.id)}
             aria-pressed={seccionActiva === sec.id}
@@ -405,6 +406,7 @@ export default function VisualizadorCicatrizacion() {
               {FASES.map((fase, idx) => (
                 <button
                   key={fase.id}
+                  type="button"
                   className={`${styles.timelineItem} ${faseSeleccionada === fase.id ? styles.timelineItemActivo : ''}`}
                   onClick={() => setFaseSeleccionada(fase.id)}
                   style={{ '--fase-color': fase.color } as React.CSSProperties}
@@ -425,7 +427,7 @@ export default function VisualizadorCicatrizacion() {
                 <span className={styles.faseDetalleIcono} aria-hidden="true">{faseActual.icono}</span>
                 <div>
                   <h3 className={styles.faseDetalleNombre}>Fase {faseActual.numero}: {faseActual.nombre}</h3>
-                  <p className={styles.faseDetalleDuracion}>⏱️ {faseActual.duracion}</p>
+                  <p className={styles.faseDetalleDuracion}><span aria-hidden="true">⏱️</span> {faseActual.duracion}</p>
                 </div>
               </div>
               <p className={styles.faseDetalleResumen}>{faseActual.resumen}</p>
@@ -468,6 +470,7 @@ export default function VisualizadorCicatrizacion() {
               {CELULAS.map(celula => (
                 <button
                   key={celula.id}
+                  type="button"
                   className={`${styles.celulaCard} ${celulaSeleccionada === celula.id ? styles.celulaCardActiva : ''}`}
                   onClick={() => setCelulaSeleccionada(prev => prev === celula.id ? null : celula.id)}
                   style={{ '--celula-color': celula.color } as React.CSSProperties}
@@ -524,6 +527,7 @@ export default function VisualizadorCicatrizacion() {
               {TIPOS_CIERRE.map(tipo => (
                 <button
                   key={tipo.id}
+                  type="button"
                   className={`${styles.tipoBtn} ${tipoCierreSeleccionado === tipo.id ? styles.tipoBtnActivo : ''}`}
                   onClick={() => setTipoCierreSeleccionado(tipo.id)}
                   style={{ '--tipo-color': tipo.color } as React.CSSProperties}
@@ -577,6 +581,7 @@ export default function VisualizadorCicatrizacion() {
                 {FACTORES_POSITIVOS.map(factor => (
                   <div key={factor.id} className={styles.factorCard} data-tipo="positivo">
                     <button
+                      type="button"
                       className={styles.factorBtn}
                       onClick={() => toggleFactor(factor.id)}
                       aria-expanded={factorExpandido === factor.id}
@@ -607,6 +612,7 @@ export default function VisualizadorCicatrizacion() {
                 {FACTORES_NEGATIVOS.map(factor => (
                   <div key={factor.id} className={styles.factorCard} data-tipo="negativo">
                     <button
+                      type="button"
                       className={styles.factorBtn}
                       onClick={() => toggleFactor(factor.id)}
                       aria-expanded={factorExpandido === factor.id}
@@ -854,11 +860,11 @@ export default function VisualizadorCicatrizacion() {
             <strong>Errores comunes sobre la cicatrización</strong>
           </div>
           <ul className={styles.warningList}>
-            <li><strong>❌ &quot;El agua oxigenada es lo mejor para limpiar heridas&quot;</strong> — el H₂O₂ destruye los fibroblastos y retrasa la cicatrización; agua corriente limpia es suficiente para la mayoría de heridas.</li>
-            <li><strong>❌ &quot;Si no duele, está bien cicatrizando&quot;</strong> — las heridas crónicas como las úlceras neuropáticas no duelen porque hay daño nervioso asociado; la ausencia de dolor no es garantía de curación.</li>
-            <li><strong>❌ &quot;Los queloides salen por &lsquo;sangre mala&rsquo;&quot;</strong> — son una respuesta fibroblástica exagerada con base genética; más frecuentes en pieles oscuras y en zonas de alta tensión mecánica.</li>
-            <li><strong>❌ &quot;Los corticoides ayudan a curar heridas&quot;</strong> — los corticoides sistémicos inhiben la fase inflamatoria y reducen la proliferación de fibroblastos, retrasando activamente la cicatrización.</li>
-            <li><strong>❌ &quot;Una herida pequeña no necesita cuidados&quot;</strong> — las infecciones graves (celulitis, fascitis necrotizante) siempre empiezan en heridas pequeñas; la limpieza y cobertura básica son imprescindibles.</li>
+            <li><strong><span aria-hidden="true">❌</span> &quot;El agua oxigenada es lo mejor para limpiar heridas&quot;</strong> — el H₂O₂ destruye los fibroblastos y retrasa la cicatrización; agua corriente limpia es suficiente para la mayoría de heridas.</li>
+            <li><strong><span aria-hidden="true">❌</span> &quot;Si no duele, está bien cicatrizando&quot;</strong> — las heridas crónicas como las úlceras neuropáticas no duelen porque hay daño nervioso asociado; la ausencia de dolor no es garantía de curación.</li>
+            <li><strong><span aria-hidden="true">❌</span> &quot;Los queloides salen por &lsquo;sangre mala&rsquo;&quot;</strong> — son una respuesta fibroblástica exagerada con base genética; más frecuentes en pieles oscuras y en zonas de alta tensión mecánica.</li>
+            <li><strong><span aria-hidden="true">❌</span> &quot;Los corticoides ayudan a curar heridas&quot;</strong> — los corticoides sistémicos inhiben la fase inflamatoria y reducen la proliferación de fibroblastos, retrasando activamente la cicatrización.</li>
+            <li><strong><span aria-hidden="true">❌</span> &quot;Una herida pequeña no necesita cuidados&quot;</strong> — las infecciones graves (celulitis, fascitis necrotizante) siempre empiezan en heridas pequeñas; la limpieza y cobertura básica son imprescindibles.</li>
           </ul>
         </div>
       </EducationalSection>

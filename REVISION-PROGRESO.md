@@ -1034,10 +1034,10 @@
 | [x] | Guía del Café | `/guia-cafe/` | salud, cultura |
 | [x] | Guía del Té | `/guia-te/` | salud, cultura |
 | [x] | Huesos del Cuerpo Humano | `/huesos-cuerpo-humano/` | salud, cultura |
-| [ ] | Ibuprofeno: Inhibidor COX con Efecto Antiinflamatorio | `/visualizador-ibuprofeno/` | salud, cultura, estudiantes |
-| [ ] | Índice Glucémico vs. Carga Glucémica: La Paradoja de la Sandía | `/visualizador-indice-glucemico/` | salud, cultura, estudiantes |
-| [ ] | Insulina y Glucosa - Cómo Regula tu Cuerpo el Azúcar | `/visualizador-insulina-glucosa/` | salud, cultura, estudiantes |
-| [ ] | La Cicatrización - Las 4 Fases de Reparación de Heridas | `/visualizador-cicatrizacion/` | salud, estudiantes, cultura |
+| [x] | Ibuprofeno: Inhibidor COX con Efecto Antiinflamatorio | `/visualizador-ibuprofeno/` | salud, cultura, estudiantes |
+| [x] | Índice Glucémico vs. Carga Glucémica: La Paradoja de la Sandía | `/visualizador-indice-glucemico/` | salud, cultura, estudiantes |
+| [x] | Insulina y Glucosa - Cómo Regula tu Cuerpo el Azúcar | `/visualizador-insulina-glucosa/` | salud, cultura, estudiantes |
+| [x] | La Cicatrización - Las 4 Fases de Reparación de Heridas | `/visualizador-cicatrizacion/` | salud, estudiantes, cultura |
 | [ ] | La Huella de lo que Comes | `/visualizador-huella-alimentos/` | salud, cultura |
 | [ ] | La Piel - Capas, Funciones y Cicatrización | `/visualizador-piel/` | salud, estudiantes, cultura |
 | [ ] | Lactasa - La Enzima que Revolucionó la Historia Humana | `/visualizador-lactasa/` | salud, cultura, estudiantes |

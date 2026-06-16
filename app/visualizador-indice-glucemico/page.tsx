@@ -209,6 +209,7 @@ export default function IndiceGlucemicoPage() {
         {tabs.map(tab => (
           <button
             key={tab.id}
+            type="button"
             className={`${styles.tab} ${tabActiva === tab.id ? styles.tabActiva : ''}`}
             onClick={() => setTabActiva(tab.id)}
             aria-pressed={tabActiva === tab.id}
@@ -230,6 +231,7 @@ export default function IndiceGlucemicoPage() {
             {CONCEPTOS.map(c => (
               <button
                 key={c.id}
+                type="button"
                 className={`${styles.conceptoTab} ${conceptoActivo === c.id ? styles.conceptoTabActivo : ''}`}
                 style={conceptoActivo === c.id ? { borderColor: c.color, color: c.color } : {}}
                 onClick={() => setConceptoActivo(c.id)}
@@ -271,7 +273,7 @@ export default function IndiceGlucemicoPage() {
 
           <div className={styles.paradojasGrid}>
             <div className={styles.paradojaCard}>
-              <h3>🍉 La paradoja de la sandía</h3>
+              <h3><span aria-hidden="true">🍉</span> La paradoja de la sandía</h3>
               <p>
                 La sandía tiene un <strong>IG de 76</strong> (alto), lo que asusta a muchas personas que intentan
                 controlar su glucemia. Sin embargo, una porción real de 200 g de sandía contiene solo
@@ -280,7 +282,7 @@ export default function IndiceGlucemicoPage() {
               </p>
             </div>
             <div className={styles.paradojaCard}>
-              <h3>🥕 La paradoja de la zanahoria</h3>
+              <h3><span aria-hidden="true">🥕</span> La paradoja de la zanahoria</h3>
               <p>
                 La zanahoria <em>cocida</em> tiene un IG de ~70 (alto). La zanahoria <em>cruda</em>, un IG de ~35 (bajo).
                 El mismo vegetal con diferente IG según el método de preparación: la cocción rompe las paredes celulares
@@ -288,7 +290,7 @@ export default function IndiceGlucemicoPage() {
               </p>
             </div>
             <div className={styles.paradojaCard}>
-              <h3>🍝 La paradoja de la pasta</h3>
+              <h3><span aria-hidden="true">🍝</span> La paradoja de la pasta</h3>
               <p>
                 La pasta <em>al dente</em> tiene un IG de ~45 (bajo). La misma pasta <em>muy cocida</em>, un IG de ~65 (moderado-alto).
                 El almidón gelatinizado por cocción excesiva se digiere mucho más rápido. Cocinar al dente
@@ -311,6 +313,7 @@ export default function IndiceGlucemicoPage() {
             {CATEGORIAS.map(cat => (
               <button
                 key={cat.id}
+                type="button"
                 className={`${styles.categoriaTab} ${categoriaActiva === cat.id ? styles.categoriaTabActiva : ''}`}
                 onClick={() => setCategoriaActiva(cat.id)}
                 aria-pressed={categoriaActiva === cat.id}
@@ -391,7 +394,7 @@ export default function IndiceGlucemicoPage() {
 
           <div className={styles.fibraGrid}>
             <div className={styles.fibraCard} style={{ borderTopColor: '#2E86AB' }}>
-              <h3 style={{ color: '#2E86AB' }}>💧 Fibra soluble (viscosa)</h3>
+              <h3 style={{ color: '#2E86AB' }}><span aria-hidden="true">💧</span> Fibra soluble (viscosa)</h3>
               <p><strong>Dónde se encuentra:</strong> Avena (beta-glucano), legumbres, manzana, cebada, psyllium.</p>
               <p><strong>Mecanismo:</strong> En contacto con el agua forma un gel viscoso en el intestino que:
               </p>
@@ -404,7 +407,7 @@ export default function IndiceGlucemicoPage() {
             </div>
 
             <div className={styles.fibraCard} style={{ borderTopColor: '#48A9A6' }}>
-              <h3 style={{ color: '#48A9A6' }}>🌾 Fibra insoluble</h3>
+              <h3 style={{ color: '#48A9A6' }}><span aria-hidden="true">🌾</span> Fibra insoluble</h3>
               <p><strong>Dónde se encuentra:</strong> Salvado de trigo, piel de frutas y verduras, frutos secos.</p>
               <p><strong>Mecanismo:</strong> No forma gel. Su efecto sobre el IG es mucho menor que la fibra soluble. Principalmente:</p>
               <ul>
@@ -416,7 +419,7 @@ export default function IndiceGlucemicoPage() {
             </div>
 
             <div className={styles.fibraCard} style={{ borderTopColor: '#8B5E3C' }}>
-              <h3 style={{ color: '#8B5E3C' }}>🧊 Almidón resistente: el caso especial</h3>
+              <h3 style={{ color: '#8B5E3C' }}><span aria-hidden="true">🧊</span> Almidón resistente: el caso especial</h3>
               <p><strong>Qué es:</strong> Un tipo de almidón que no se digiere en el intestino delgado (actúa como fibra). Se forma cuando los alimentos almidonados se cocinan y luego se enfrían.</p>
               <p><strong>Ejemplos y reducción de IG:</strong></p>
               <ul>
@@ -429,7 +432,7 @@ export default function IndiceGlucemicoPage() {
             </div>
 
             <div className={styles.fibraCard} style={{ borderTopColor: '#5B4FC4' }}>
-              <h3 style={{ color: '#5B4FC4' }}>🍱 El orden de los alimentos importa</h3>
+              <h3 style={{ color: '#5B4FC4' }}><span aria-hidden="true">🍱</span> El orden de los alimentos importa</h3>
               <p>Estudios recientes sugieren que el <strong>orden en que se ingieren los alimentos</strong> en una comida afecta la respuesta glucémica:</p>
               <ul>
                 <li>Comer verdura y proteína <em>antes</em> que los carbohidratos reduce el pico de glucosa</li>
@@ -455,6 +458,7 @@ export default function IndiceGlucemicoPage() {
             {Object.entries(CURVAS).map(([id, curva]) => (
               <button
                 key={id}
+                type="button"
                 className={`${styles.curvaLeyendaItem} ${curvasVisibles.has(id) ? styles.curvaLeyendaActiva : styles.curvaLeyendaInactiva}`}
                 onClick={() => toggleCurva(id)}
                 aria-pressed={curvasVisibles.has(id)}
@@ -542,22 +546,22 @@ export default function IndiceGlucemicoPage() {
           </div>
 
           <div className={styles.curvaNota}>
-            <strong>ℹ️ Nota metodológica:</strong> Esta simulación es orientativa y educativa.
+            <strong><span aria-hidden="true">ℹ️</span> Nota metodológica:</strong> Esta simulación es orientativa y educativa.
             Los valores reales varían según el individuo, el contexto de la comida, la actividad física
             previa y otros factores. El punto de partida (glucemia basal) difiere entre personas.
           </div>
 
           <div className={styles.curvaInsights}>
             <div className={styles.insightCard}>
-              <h3>📈 Pico glucémico</h3>
+              <h3><span aria-hidden="true">📈</span> Pico glucémico</h3>
               <p>Los carbohidratos de IG alto producen un pico pronunciado (130-170 mg/dL) a los 30-45 minutos. Los de IG bajo generan una elevación moderada y sostenida que se normaliza más gradualmente.</p>
             </div>
             <div className={styles.insightCard}>
-              <h3>📉 El valle post-pico</h3>
+              <h3><span aria-hidden="true">📉</span> El valle post-pico</h3>
               <p>Tras un pico glucémico alto, la insulina puede causar una bajada brusca que puede alcanzar niveles por debajo de la glucemia basal. Esto genera sensación de hambre y fatiga más rápidamente.</p>
             </div>
             <div className={styles.insightCard}>
-              <h3>💡 La CG baja en práctica</h3>
+              <h3><span aria-hidden="true">💡</span> La CG baja en práctica</h3>
               <p>La sandía (CG baja) genera un impacto glucémico similar al de los alimentos de IG bajo, a pesar de su IG alto. La cantidad de carbohidratos en una porción real es el factor clave.</p>
             </div>
           </div>

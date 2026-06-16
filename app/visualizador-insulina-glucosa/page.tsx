@@ -313,6 +313,7 @@ export default function VisualizadorInsulinaGlucosa() {
           {(Object.keys(DATOS_PERFILES) as PerfilGlucosa[]).map(perfil => (
             <button
               key={perfil}
+              type="button"
               className={`${styles.btnPerfil} ${perfilActivo === perfil ? styles.btnPerfilActivo : ''}`}
               onClick={() => setPerfilActivo(perfil)}
               aria-pressed={perfilActivo === perfil}
@@ -367,6 +368,7 @@ export default function VisualizadorInsulinaGlucosa() {
 
           <div className={styles.stepBotones}>
             <button
+              type="button"
               className={styles.btnNav}
               onClick={() => setPasoActual(p => (Math.max(0, p - 1) as PasoAnimacion))}
               disabled={pasoActual === 0}
@@ -376,6 +378,7 @@ export default function VisualizadorInsulinaGlucosa() {
             </button>
             <span className={styles.stepCounter}>{pasoActual + 1} / {PASOS_ANIMACION.length}</span>
             <button
+              type="button"
               className={styles.btnNav}
               onClick={() => setPasoActual(p => (Math.min(2, p + 1) as PasoAnimacion))}
               disabled={pasoActual === 2}
@@ -401,6 +404,7 @@ export default function VisualizadorInsulinaGlucosa() {
           {(['todos', 'bajo', 'medio', 'alto'] as const).map(cat => (
             <button
               key={cat}
+              type="button"
               className={`${styles.btnFiltroIG} ${filtroCatIG === cat ? styles.btnFiltroIGActivo : ''} ${styles[`btnFiltro_${cat}`]}`}
               onClick={() => setFiltroCatIG(cat)}
               aria-pressed={filtroCatIG === cat}

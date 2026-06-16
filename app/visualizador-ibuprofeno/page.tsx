@@ -379,7 +379,7 @@ export default function VisualizadorIbuprofeno() {
             <div key={paso.numero} className={styles.pasoWrapper}>
               <div className={styles.paso}>
                 <div className={styles.pasoNumero}>{paso.numero}</div>
-                <div className={styles.pasoIcono}>{paso.icono}</div>
+                <div className={styles.pasoIcono} aria-hidden="true">{paso.icono}</div>
                 <h3 className={styles.pasoTitulo}>{paso.titulo}</h3>
                 <p className={styles.pasoDescripcion}>{paso.descripcion}</p>
               </div>
@@ -391,7 +391,7 @@ export default function VisualizadorIbuprofeno() {
         </div>
 
         <div className={styles.insightBox}>
-          <span className={styles.insightIcono}>💡</span>
+          <span className={styles.insightIcono} aria-hidden="true">💡</span>
           <div>
             <strong>Diferencia clave con la aspirina:</strong> La aspirina acetila permanentemente la COX
             (bloqueo irreversible). El ibuprofeno se une de forma reversible — cuando el fármaco se
@@ -417,6 +417,7 @@ export default function VisualizadorIbuprofeno() {
                 style={{ borderTopColor: cox.color }}
               >
                 <button
+                  type="button"
                   className={styles.coxCardHeader}
                   onClick={() => setCoxExpandida(coxExpandida === idx ? null : idx)}
                   aria-expanded={coxExpandida === idx}
@@ -447,7 +448,7 @@ export default function VisualizadorIbuprofeno() {
           </div>
 
           <div className={styles.insightBox}>
-            <span className={styles.insightIcono}>⚖️</span>
+            <span className={styles.insightIcono} aria-hidden="true">⚖️</span>
             <div>
               Por eso el ibuprofeno bloquea ambas: consigue el efecto antiinflamatorio (COX-2) pero
               paga el precio gástrico y renal (COX-1). Los coxibs intentaron solucionar esto solo
@@ -468,6 +469,7 @@ export default function VisualizadorIbuprofeno() {
           {SITUACIONES_USO.map((s, idx) => (
             <button
               key={idx}
+              type="button"
               className={`${styles.situacionCard} ${situacionSeleccionada === idx ? styles.situacionCardActiva : ''}`}
               onClick={() => setSituacionSeleccionada(situacionSeleccionada === idx ? null : idx)}
               aria-expanded={situacionSeleccionada === idx}
@@ -500,6 +502,7 @@ export default function VisualizadorIbuprofeno() {
             {RIESGOS_ADVERSOS.map((r, idx) => (
               <div key={idx} className={styles.riesgoCard}>
                 <button
+                  type="button"
                   className={styles.riesgoCardHeader}
                   onClick={() => setRiesgoExpandido(riesgoExpandido === idx ? null : idx)}
                   aria-expanded={riesgoExpandido === idx}
@@ -561,7 +564,7 @@ export default function VisualizadorIbuprofeno() {
         </div>
 
         <div className={styles.insightBox}>
-          <span className={styles.insightIcono}>🏥</span>
+          <span className={styles.insightIcono} aria-hidden="true">🏥</span>
           <div>
             <strong>El caso Vioxx:</strong> Los inhibidores selectivos de COX-2 (coxibs) se desarrollaron
             en los 90s para evitar el daño gástrico. Funcionaron: menos úlceras. Pero en 2004, Merck
@@ -580,7 +583,7 @@ export default function VisualizadorIbuprofeno() {
       >
         <div className={styles.eduContenido}>
           <div className={styles.eduBloque}>
-            <h3 className={styles.eduTitulo}>📖 La historia del ibuprofeno</h3>
+            <h3 className={styles.eduTitulo}><span aria-hidden="true">📖</span> La historia del ibuprofeno</h3>
             <p>
               Stuart Adams trabajaba en Boots UK en los años 60. Un lunes llegó con resaca y se tomó uno
               de sus nuevos compuestos experimentales (ibuprofen). Funcionó mejor que la aspirina. Lo
@@ -590,7 +593,7 @@ export default function VisualizadorIbuprofeno() {
           </div>
 
           <div className={styles.eduBloque}>
-            <h3 className={styles.eduTitulo}>🔬 Ibuprofeno racémico vs enantiómero S</h3>
+            <h3 className={styles.eduTitulo}><span aria-hidden="true">🔬</span> Ibuprofeno racémico vs enantiómero S</h3>
             <p>
               El ibuprofeno comercial es una mezcla racémica de dos enantiómeros (R y S). Solo el
               enantiómero S(+) es farmacológicamente activo e inhibe las COX. El cuerpo convierte
@@ -601,7 +604,7 @@ export default function VisualizadorIbuprofeno() {
           </div>
 
           <div className={styles.eduBloque}>
-            <h3 className={styles.eduTitulo}>🤰 Ibuprofeno y embarazo</h3>
+            <h3 className={styles.eduTitulo}><span aria-hidden="true">🤰</span> Ibuprofeno y embarazo</h3>
             <p>
               Algunos estudios observacionales asocian (sin establecer causalidad de forma concluyente) el uso
               de ibuprofeno en el primer trimestre con mayor riesgo de aborto. Por prudencia, las guías recomiendan
@@ -613,7 +616,7 @@ export default function VisualizadorIbuprofeno() {
           </div>
 
           <div className={styles.eduBloque}>
-            <h3 className={styles.eduTitulo}>💊 Interacción ibuprofeno + aspirina baja dosis</h3>
+            <h3 className={styles.eduTitulo}><span aria-hidden="true">💊</span> Interacción ibuprofeno + aspirina baja dosis</h3>
             <p>
               El ibuprofeno puede competir con la aspirina por el sitio de unión en COX-1 de las
               plaquetas. Si el ibuprofeno ocupa ese sitio antes que la aspirina, reduce el efecto
