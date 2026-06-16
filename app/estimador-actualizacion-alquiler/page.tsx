@@ -114,7 +114,7 @@ export default function EstimadorActualizacionAlquilerPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🏠 Estimador Actualización del Alquiler 2026</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🏠</span> Estimador Actualización del Alquiler 2026</h1>
         <p className={styles.subtitle}>
           Estima la subida máxima permitida según tu tipo de contrato — IRAV o IPC
         </p>
@@ -135,7 +135,7 @@ export default function EstimadorActualizacionAlquilerPage() {
             className={`${styles.tipoBtn} ${tipoContrato === 'nuevo' ? styles.active : ''}`}
             aria-pressed={tipoContrato === 'nuevo'}
           >
-            <span className={styles.tipoBtnIcono}>📄</span>
+            <span className={styles.tipoBtnIcono} aria-hidden="true">📄</span>
             <span className={styles.tipoBtnLabel}>Desde el 26 de mayo de 2023</span>
             <span className={styles.tipoBtnTag}>Índice IRAV</span>
             <span className={styles.tipoBtnDesc}>Ley de Vivienda (Ley 12/2023)</span>
@@ -147,7 +147,7 @@ export default function EstimadorActualizacionAlquilerPage() {
             className={`${styles.tipoBtn} ${tipoContrato === 'antiguo' ? styles.active : ''}`}
             aria-pressed={tipoContrato === 'antiguo'}
           >
-            <span className={styles.tipoBtnIcono}>📑</span>
+            <span className={styles.tipoBtnIcono} aria-hidden="true">📑</span>
             <span className={styles.tipoBtnLabel}>Antes del 26 de mayo de 2023</span>
             <span className={styles.tipoBtnTag}>Índice IPC</span>
             <span className={styles.tipoBtnDesc}>IPC interanual del mes anterior</span>
@@ -374,7 +374,7 @@ export default function EstimadorActualizacionAlquilerPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👨‍👩‍👧</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👨‍👩‍👧</span>
                 <strong>Inquilino con contrato desde 2020 (pre-Ley Vivienda)</strong>
               </div>
               <p className={styles.escenarioExample}>Firmó en septiembre de 2020, renta 750 €/mes. Aniversario en septiembre 2025.</p>
@@ -389,7 +389,7 @@ export default function EstimadorActualizacionAlquilerPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🔑</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔑</span>
                 <strong>Propietario que alquila desde julio 2023 (post-Ley Vivienda)</strong>
               </div>
               <p className={styles.escenarioExample}>Firmó en julio de 2023, renta 950 €/mes. Aniversario en julio 2025.</p>
@@ -404,7 +404,7 @@ export default function EstimadorActualizacionAlquilerPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏢</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏢</span>
                 <strong>Gran tenedor en zona tensionada</strong>
               </div>
               <p className={styles.escenarioExample}>Propietario con más de 10 inmuebles en una zona declarada tensionada por la CCAA.</p>
@@ -419,7 +419,7 @@ export default function EstimadorActualizacionAlquilerPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📊</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📊</span>
                 <strong>Contrato sin cláusula de actualización</strong>
               </div>
               <p className={styles.escenarioExample}>Firmaron el contrato en 2019 y no incluyeron cláusula de actualización de renta.</p>
@@ -548,42 +548,42 @@ export default function EstimadorActualizacionAlquilerPage() {
           <h4 className={styles.eduSectionTitle}>6 cosas que muchos no saben sobre la actualización del alquiler</h4>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <div>
                 <strong>El IRAV no es retroactivo</strong>
                 <p>Si el propietario no notifica la actualización en el momento del aniversario, pierde el derecho a aplicarla ese año con carácter retroactivo. Solo puede cobrar la renta actualizada desde la fecha de notificación, no desde el aniversario.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📑</span>
+              <span className={styles.tipIcon} aria-hidden="true">📑</span>
               <div>
                 <strong>Sin cláusula de actualización en el contrato, no hay subida</strong>
                 <p>Para poder actualizar la renta, el contrato debe incluir explícitamente una cláusula que lo permita. Si el contrato guarda silencio sobre este punto, la renta queda congelada hasta que ambas partes acuerden cambiarla.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏘️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏘️</span>
               <div>
                 <strong>Las prórrogas no cambian el tipo de índice</strong>
                 <p>Si el contrato original se firmó antes del 26 de mayo de 2023 y se prorroga, sigue usando el IPC aunque la prórroga sea posterior a esa fecha. El índice depende de la <em>firma original</em>, no de la renovación.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📉</span>
+              <span className={styles.tipIcon} aria-hidden="true">📉</span>
               <div>
                 <strong>El propietario puede aplicar menos del índice máximo</strong>
                 <p>El IRAV/IPC es un máximo, no una obligación. Muchos propietarios aplican un porcentaje menor o renuncian a la actualización con inquilinos estables, ya sea por relación personal o porque la rotación de inquilinos también tiene costes (períodos sin alquilar, gastos de gestión y posibles reparaciones).</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏙️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏙️</span>
               <div>
                 <strong>En zonas tensionadas hay un doble límite</strong>
                 <p>Además del IRAV/IPC, en zonas declaradas tensionadas la nueva renta no puede superar la del contrato anterior. Esto significa que si el piso cambió de inquilino, la renta de partida ya está limitada, independientemente de lo que marque el índice.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💬</span>
+              <span className={styles.tipIcon} aria-hidden="true">💬</span>
               <div>
                 <strong>El inquilino puede negociar</strong>
                 <p>El IRAV es el techo legal, pero la actualización puede negociarse. Inquilinos con varios años en el inmueble y sin incidencias suelen tener margen para acordar una subida menor, ya que la rotación implica costes para el propietario (períodos sin alquilar, gestiones, reparaciones de entrada).</p>
@@ -596,7 +596,7 @@ export default function EstimadorActualizacionAlquilerPage() {
         <section className={styles.eduSection}>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <strong>6 errores frecuentes en la actualización del alquiler</strong>
             </div>
             <ul className={styles.warningList}>

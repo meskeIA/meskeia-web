@@ -156,7 +156,7 @@ export default function CalculadoraGastosComunidadPage() {
 
       {/* HERO */}
       <header className={styles.hero}>
-        <h1 className={styles.heroTitle}>🏘️ Estimador Gastos de Comunidad</h1>
+        <h1 className={styles.heroTitle}><span aria-hidden="true">🏘️</span> Estimador Gastos de Comunidad</h1>
         <p className={styles.heroSubtitle}>
           Reparte los gastos de tu comunidad de propietarios de forma justa. Por partes iguales o según coeficiente de participación.
         </p>
@@ -173,20 +173,22 @@ export default function CalculadoraGastosComunidadPage() {
       {/* SELECTOR DE MODO */}
       <div className={styles.modeTabs} role="tablist" aria-label="Modo de reparto">
         <button
+          type="button"
           role="tab"
           aria-selected={modo === 'igual'}
           className={`${styles.modeTab} ${modo === 'igual' ? styles.active : ''}`}
           onClick={() => setModo('igual')}
         >
-          ⚖️ Partes iguales
+          <span aria-hidden="true">⚖️</span> Partes iguales
         </button>
         <button
+          type="button"
           role="tab"
           aria-selected={modo === 'coeficiente'}
           className={`${styles.modeTab} ${modo === 'coeficiente' ? styles.active : ''}`}
           onClick={() => setModo('coeficiente')}
         >
-          📐 Por coeficiente
+          <span aria-hidden="true">📐</span> Por coeficiente
         </button>
       </div>
 
@@ -235,6 +237,7 @@ export default function CalculadoraGastosComunidadPage() {
                 )}
                 <td>
                   <button
+                    type="button"
                     onClick={() => removeVecino(v.id)}
                     className={styles.btnRemove}
                     aria-label={`Eliminar ${v.nombre}`}
@@ -248,7 +251,7 @@ export default function CalculadoraGastosComunidadPage() {
             ))}
           </tbody>
         </table>
-        <button onClick={addVecino} className={styles.btnAddVecino} aria-label="Añadir propietario">
+        <button type="button" onClick={addVecino} className={styles.btnAddVecino} aria-label="Añadir propietario">
           <span aria-hidden="true">+</span> Añadir propietario
         </button>
       </section>
@@ -291,6 +294,7 @@ export default function CalculadoraGastosComunidadPage() {
                 </td>
                 <td>
                   <button
+                    type="button"
                     onClick={() => removeConcepto(c.id)}
                     className={styles.btnRemove}
                     aria-label={`Eliminar ${c.nombre}`}
@@ -302,14 +306,14 @@ export default function CalculadoraGastosComunidadPage() {
             ))}
           </tbody>
         </table>
-        <button onClick={addConcepto} className={styles.btnAddVecino} aria-label="Añadir concepto de gasto">
+        <button type="button" onClick={addConcepto} className={styles.btnAddVecino} aria-label="Añadir concepto de gasto">
           <span aria-hidden="true">+</span> Añadir concepto
         </button>
       </section>
 
       {/* BOTÓN CALCULAR */}
       <div className={styles.btnWrapper}>
-        <button onClick={calcular} className={styles.btnCalcular} aria-label="Calcular reparto de gastos">
+        <button type="button" onClick={calcular} className={styles.btnCalcular} aria-label="Calcular reparto de gastos">
           Calcular reparto
         </button>
       </div>

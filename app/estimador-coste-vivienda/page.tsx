@@ -134,7 +134,7 @@ export default function CalculadoraCosteViviendaPage() {
           {/* Gastos fijos */}
           <div className={styles.card}>
             <h2 className={styles.cardTitle}>
-              <span className={styles.cardIcon}>📋</span>
+              <span className={styles.cardIcon} aria-hidden="true">📋</span>
               Gastos fijos
             </h2>
 
@@ -181,7 +181,7 @@ export default function CalculadoraCosteViviendaPage() {
           {/* Suministros */}
           <div className={styles.card}>
             <h2 className={styles.cardTitle}>
-              <span className={styles.cardIcon}>💡</span>
+              <span className={styles.cardIcon} aria-hidden="true">💡</span>
               Suministros mensuales
             </h2>
 
@@ -219,7 +219,7 @@ export default function CalculadoraCosteViviendaPage() {
           {/* Otros gastos */}
           <div className={styles.card}>
             <h2 className={styles.cardTitle}>
-              <span className={styles.cardIcon}>🔧</span>
+              <span className={styles.cardIcon} aria-hidden="true">🔧</span>
               Otros gastos
             </h2>
 
@@ -439,12 +439,12 @@ export default function CalculadoraCosteViviendaPage() {
             </>
           ) : mostrarResultados ? (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>⚠️</span>
+              <span className={styles.placeholderIcon} aria-hidden="true">⚠️</span>
               <p>Introduce al menos un gasto para ver el resultado</p>
             </div>
           ) : (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>🏠</span>
+              <span className={styles.placeholderIcon} aria-hidden="true">🏠</span>
               <p>Introduce los gastos de tu vivienda</p>
               <p className={styles.placeholderHint}>
                 Solo necesitas rellenar los campos que te apliquen.

@@ -808,13 +808,13 @@
 | [x] | Calculadora Roommates | `/calculadora-roommates/` | inmobiliaria, finanzas |
 | [x] | Estimación de Ahorro Hídrico | `/estimacion-ahorro-hidrico/` | inmobiliaria, finanzas |
 | [x] | Estimación de Certificación Energética | `/estimacion-certificacion-energetica/` | inmobiliaria, tecnicas |
-| [ ] | Estimador Actualización Alquiler 2026 | `/estimador-actualizacion-alquiler/` | inmobiliaria, legal-fiscal |
+| [x] | Estimador Actualización Alquiler 2026 | `/estimador-actualizacion-alquiler/` | inmobiliaria, legal-fiscal |
 | [x] | Estimador Compraventa Inmobiliaria | `/estimador-compraventa-inmueble/` | inmobiliaria, finanzas |
-| [ ] | Estimador Coste Vivienda | `/estimador-coste-vivienda/` | inmobiliaria, finanzas |
+| [x] | Estimador Coste Vivienda | `/estimador-coste-vivienda/` | inmobiliaria, finanzas |
 | [x] | Estimador de Hipoteca | `/estimador-hipoteca/` | inmobiliaria, finanzas |
 | [x] | Estimador de Préstamos | `/estimador-prestamos/` | inmobiliaria, finanzas |
-| [ ] | Estimador Gastos de Comunidad | `/estimador-gastos-comunidad/` | inmobiliaria, finanzas |
-| [ ] | Estimador Reformas del Hogar | `/estimador-reformas-hogar/` | inmobiliaria, finanzas |
+| [x] | Estimador Gastos de Comunidad | `/estimador-gastos-comunidad/` | inmobiliaria, finanzas |
+| [x] | Estimador Reformas del Hogar | `/estimador-reformas-hogar/` | inmobiliaria, finanzas |
 | [ ] | Etiqueta DGT y Zonas de Bajas Emisiones | `/etiqueta-dgt/` | inmobiliaria, productividad |
 | [ ] | Golden Hour - Hora Dorada | `/golden-hour/` | inmobiliaria, diseno |
 | [ ] | Guía de Productos de Limpieza del Hogar | `/guia-productos-limpieza/` | inmobiliaria, salud |
