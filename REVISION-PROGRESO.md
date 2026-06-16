@@ -436,10 +436,10 @@
 | [x] | Ecosistemas - El Flujo de Energía | `/visualizador-ecosistema/` | estudiantes, cultura |
 | [x] | Ecuaciones Diferenciales: Campos de Dirección y Lotka-Volterra | `/visualizador-ecuaciones-diferenciales/` | estudiantes, tecnicas |
 | [x] | Efecto Doppler: De las Sirenas al Redshift de Galaxias | `/visualizador-efecto-doppler/` | estudiantes, cultura |
-| [ ] | El Árbol de la Vida Animal | `/visualizador-arbol-vida/` | estudiantes, cultura |
-| [ ] | El Carbono: Diamante, Grafeno y la Molécula de la Vida | `/visualizador-carbono/` | estudiantes, cultura |
-| [ ] | El Ciclo del Agua - El Viaje Infinito de cada Gota | `/visualizador-ciclo-agua/` | estudiantes, cultura |
-| [ ] | El Efecto Invernadero - Del Equilibrio al Cambio Climático | `/visualizador-efecto-invernadero/` | estudiantes, cultura |
+| [x] | El Árbol de la Vida Animal | `/visualizador-arbol-vida/` | estudiantes, cultura |
+| [x] | El Carbono: Diamante, Grafeno y la Molécula de la Vida | `/visualizador-carbono/` | estudiantes, cultura |
+| [x] | El Ciclo del Agua - El Viaje Infinito de cada Gota | `/visualizador-ciclo-agua/` | estudiantes, cultura |
+| [x] | El Efecto Invernadero - Del Equilibrio al Cambio Climático | `/visualizador-efecto-invernadero/` | estudiantes, cultura |
 | [ ] | El Espectro Electromagnético - De Radio a Gamma | `/visualizador-espectro-electromagnetico/` | estudiantes, cultura |
 | [ ] | El Hidrógeno: Del Big Bang a la Pila de Combustible | `/visualizador-hidrogeno/` | estudiantes, cultura |
 | [ ] | El Niño y La Niña: ENSO Explicado | `/visualizador-el-nino/` | estudiantes, cultura |

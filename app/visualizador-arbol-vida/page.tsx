@@ -176,7 +176,7 @@ export default function VisualizadorArbolVidaPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🌳 El Árbol de la Vida Animal</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🌳</span> El Árbol de la Vida Animal</h1>
           <p className={styles.subtitle}>De las esponjas a los mamíferos: 540 millones de años de evolución</p>
         </header>
 
@@ -187,6 +187,7 @@ export default function VisualizadorArbolVidaPage() {
           {SECCIONES.map(sec => (
             <button
               key={sec.id}
+              type="button"
               className={`${styles.navBtn} ${seccionActiva === sec.id ? styles.navActivo : ''}`}
               onClick={() => setSeccionActiva(sec.id)}
               aria-pressed={seccionActiva === sec.id}
@@ -207,7 +208,7 @@ export default function VisualizadorArbolVidaPage() {
           <div className={styles.seccionContent}>
             <div className={styles.arbolContainer}>
               <div className={styles.raiz}>
-                <span className={styles.raizLabel}>🧬 Ancestro común eucariota</span>
+                <span className={styles.raizLabel}><span aria-hidden="true">🧬</span> Ancestro común eucariota</span>
               </div>
 
               <div className={styles.ramasPrincipales}>
@@ -220,6 +221,7 @@ export default function VisualizadorArbolVidaPage() {
                     {invertebrados.map(grupo => (
                       <button
                         key={grupo.id}
+                        type="button"
                         className={`${styles.grupoCard} ${grupoSeleccionado === grupo.id ? styles.grupoActivo : ''}`}
                         onClick={() => setGrupoSeleccionado(grupoSeleccionado === grupo.id ? null : grupo.id)}
                         aria-pressed={grupoSeleccionado === grupo.id}
@@ -243,6 +245,7 @@ export default function VisualizadorArbolVidaPage() {
                     {vertebrados.map(grupo => (
                       <button
                         key={grupo.id}
+                        type="button"
                         className={`${styles.grupoCard} ${grupoSeleccionado === grupo.id ? styles.grupoActivo : ''}`}
                         onClick={() => setGrupoSeleccionado(grupoSeleccionado === grupo.id ? null : grupo.id)}
                         aria-pressed={grupoSeleccionado === grupo.id}
@@ -283,7 +286,7 @@ export default function VisualizadorArbolVidaPage() {
                     </div>
                   </div>
                   <div className={styles.panelCurioso}>
-                    <span className={styles.panelCuriosoLabel}>💡 Dato curioso: </span>
+                    <span className={styles.panelCuriosoLabel}><span aria-hidden="true">💡</span> Dato curioso: </span>
                     {grupoActivo.curioso}
                   </div>
                 </div>
@@ -291,7 +294,7 @@ export default function VisualizadorArbolVidaPage() {
             </div>
 
             <div className={styles.insight}>
-              <p><strong>💡 Perspectiva:</strong> Los vertebrados —peces, aves, mamíferos, reptiles, anfibios— representan solo el 3% de las especies animales. El 97% restante son invertebrados, dominados por los artrópodos.</p>
+              <p><strong><span aria-hidden="true">💡</span> Perspectiva:</strong> Los vertebrados —peces, aves, mamíferos, reptiles, anfibios— representan solo el 3% de las especies animales. El 97% restante son invertebrados, dominados por los artrópodos.</p>
             </div>
           </div>
         )}
@@ -302,6 +305,7 @@ export default function VisualizadorArbolVidaPage() {
             {/* Toggle invertebrados/vertebrados */}
             <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', marginBottom: '1rem' }}>
               <button
+                type="button"
                 className={`${styles.navBtn} ${tablaVista === 'invertebrados' ? styles.navActivo : ''}`}
                 onClick={() => setTablaVista('invertebrados')}
                 aria-pressed={tablaVista === 'invertebrados'}
@@ -310,6 +314,7 @@ export default function VisualizadorArbolVidaPage() {
                 <span aria-hidden="true">🦑</span> Invertebrados
               </button>
               <button
+                type="button"
                 className={`${styles.navBtn} ${tablaVista === 'vertebrados' ? styles.navActivo : ''}`}
                 onClick={() => setTablaVista('vertebrados')}
                 aria-pressed={tablaVista === 'vertebrados'}
@@ -358,7 +363,7 @@ export default function VisualizadorArbolVidaPage() {
             {/* Explicación de la característica seleccionada */}
             {caractActiva && (
               <div className={styles.explicacionCard}>
-                <div className={styles.explicacionTitulo}>{caractActiva.icono} {caractActiva.nombre}</div>
+                <div className={styles.explicacionTitulo}><span aria-hidden="true">{caractActiva.icono}</span> {caractActiva.nombre}</div>
                 <p className={styles.explicacionTexto}>{caractActiva.explicacion}</p>
                 <p className={styles.explicacionTexto} style={{ marginTop: '0.5rem', fontStyle: 'italic' }}>
                   <strong>Ejemplo:</strong> {caractActiva.ejemplo}
@@ -367,7 +372,7 @@ export default function VisualizadorArbolVidaPage() {
             )}
 
             <div className={styles.insight} style={{ marginTop: '1.5rem' }}>
-              <p><strong>💡 Clave:</strong> Solo las aves y los mamíferos son de sangre caliente (endotermos). Mantener la temperatura corporal cuesta mucha energía, pero permite actividad en cualquier clima.</p>
+              <p><strong><span aria-hidden="true">💡</span> Clave:</strong> Solo las aves y los mamíferos son de sangre caliente (endotermos). Mantener la temperatura corporal cuesta mucha energía, pero permite actividad en cualquier clima.</p>
             </div>
           </div>
         )}
@@ -408,7 +413,7 @@ export default function VisualizadorArbolVidaPage() {
             </div>
 
             <div className={styles.insight}>
-              <p><strong>💡 Si los animales votaran:</strong> los insectos ganarían siempre. Con más de 1 millón de especies conocidas, representan el 80% de todos los animales. Los mamíferos —incluidos nosotros— apenas somos el 0,5%.</p>
+              <p><strong><span aria-hidden="true">💡</span> Si los animales votaran:</strong> los insectos ganarían siempre. Con más de 1 millón de especies conocidas, representan el 80% de todos los animales. Los mamíferos —incluidos nosotros— apenas somos el 0,5%.</p>
             </div>
 
             <div className={styles.datoDestacado}>
@@ -439,7 +444,7 @@ export default function VisualizadorArbolVidaPage() {
                   <p className={styles.timelineDesc}>{evento.descripcion}</p>
                   {eventoSeleccionado === evento.id && (
                     <div className={styles.timelineCurioso}>
-                      <span className={styles.timelineCuriosoLabel}>💡 Dato curioso: </span>
+                      <span className={styles.timelineCuriosoLabel}><span aria-hidden="true">💡</span> Dato curioso: </span>
                       {evento.curioso}
                     </div>
                   )}
@@ -448,7 +453,7 @@ export default function VisualizadorArbolVidaPage() {
             </div>
 
             <div className={styles.insight}>
-              <p><strong>💡 Perspectiva:</strong> Los mamíferos y los dinosaurios aparecieron al mismo tiempo (hace 230 millones de años), pero los mamíferos esperaron 165 millones de años —pequeños y nocturnos— hasta que un asteroide les dio su oportunidad.</p>
+              <p><strong><span aria-hidden="true">💡</span> Perspectiva:</strong> Los mamíferos y los dinosaurios aparecieron al mismo tiempo (hace 230 millones de años), pero los mamíferos esperaron 165 millones de años —pequeños y nocturnos— hasta que un asteroide les dio su oportunidad.</p>
             </div>
           </div>
         )}
@@ -492,7 +497,7 @@ export default function VisualizadorArbolVidaPage() {
             </p>
 
             <div className={styles.warningBox}>
-              <strong>⚠️ Nota:</strong> Los números de especies son estimaciones basadas en la literatura
+              <strong><span aria-hidden="true">⚠️</span> Nota:</strong> Los números de especies son estimaciones basadas en la literatura
               científica actual. Las cifras reales pueden variar según la fuente consultada, y se
               descubren miles de especies nuevas cada año. Este visualizador tiene fines educativos
               y no sustituye a la bibliografía especializada.

@@ -250,6 +250,7 @@ export default function VisualizadorCarbono(): React.ReactNode {
           {ALOTROPOS.map((a) => (
             <button
               key={a.id}
+              type="button"
               role="tab"
               aria-selected={alotropoActivo === a.id}
               className={`${styles.alotropoBtn} ${alotropoActivo === a.id ? styles.alotropoBtnActive : ''}`}
@@ -273,7 +274,7 @@ export default function VisualizadorCarbono(): React.ReactNode {
           </div>
           <div className={styles.alotropoPanelRight}>
             <h3 className={styles.alotropoNombre} style={{ color: alotropoInfo.color }}>
-              {alotropoInfo.icono} {alotropoInfo.nombre}
+              <span aria-hidden="true">{alotropoInfo.icono}</span> {alotropoInfo.nombre}
             </h3>
             <p className={styles.alotropoDesc}>{alotropoInfo.descripcion}</p>
 
@@ -397,6 +398,7 @@ export default function VisualizadorCarbono(): React.ReactNode {
           {GRUPOS_FUNCIONALES.map((g, i) => (
             <button
               key={i}
+              type="button"
               role="listitem"
               className={`${styles.grupoFuncional} ${grupoActivo === i ? styles.grupoFuncionalActivo : ''}`}
               onClick={() => setGrupoActivo(grupoActivo === i ? null : i)}
@@ -491,7 +493,7 @@ export default function VisualizadorCarbono(): React.ReactNode {
 
             {anosC14 > 45000 && (
               <div className={styles.c14Aviso} role="alert">
-                ⚠️ Por encima de ~50.000 años, el C-14 residual es tan mínimo que la medición pierde precisión
+                <span aria-hidden="true">⚠️</span> Por encima de ~50.000 años, el C-14 residual es tan mínimo que la medición pierde precisión
               </div>
             )}
           </div>
