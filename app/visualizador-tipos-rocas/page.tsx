@@ -283,7 +283,7 @@ function SeccionTipos() {
       {/* Info del tipo */}
       <div className={styles.tipoCard} style={{ borderLeftColor: tipo.color }}>
         <h3 className={styles.tipoCardTitulo} style={{ color: tipo.color }}>
-          {tipo.icono} Rocas {tipo.nombre}
+          <span aria-hidden="true">{tipo.icono}</span> Rocas {tipo.nombre}
         </h3>
         <p className={styles.tipoCardDesc}>{tipo.descripcion}</p>
         <div className={styles.tipoCardMeta}>
@@ -336,7 +336,7 @@ function SeccionTipos() {
         </div>
         {TIPOS_ROCAS.map((t) => (
           <div key={t.id} className={styles.tablaRow}>
-            <span className={styles.tablaCell} style={{ color: t.color, fontWeight: 700 }}>{t.icono} {t.nombre}</span>
+            <span className={styles.tablaCell} style={{ color: t.color, fontWeight: 700 }}><span aria-hidden="true">{t.icono}</span> {t.nombre}</span>
             <span className={styles.tablaCell}>{t.proceso.split('→')[0].trim()}</span>
             <span className={styles.tablaCell}>{t.textura}</span>
             <span className={styles.tablaCell}>{t.dureza}</span>

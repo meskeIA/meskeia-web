@@ -202,6 +202,7 @@ export default function VisualizadorTerremotosTsunamis() {
         {TABS.map((tab) => (
           <button
             key={tab}
+            type="button"
             role="tab"
             aria-selected={tabActiva === tab}
             className={`${styles.tab} ${tabActiva === tab ? styles.tabActive : ''}`}
@@ -226,6 +227,7 @@ export default function VisualizadorTerremotosTsunamis() {
               {TIPOS_FALLA.map((falla, i) => (
                 <button
                   key={i}
+                  type="button"
                   className={`${styles.fallaCard} ${fallaSeleccionada === i ? styles.fallaCardActiva : ''}`}
                   onClick={() => setFallaSeleccionada(i)}
                   style={{ '--falla-color': falla.color } as React.CSSProperties}

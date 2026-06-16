@@ -610,10 +610,10 @@
 | [x] | Tendencias de la Tabla Periódica | `/simulador-tabla-periodica-tendencias/` | estudiantes |
 | [x] | Teoría de Grafos: Dijkstra, Königsberg y Redes | `/visualizador-teoria-grafos/` | estudiantes, tecnicas |
 | [x] | Teoría de Juegos: Dilema del Prisionero y Nash | `/visualizador-teoria-juegos/` | estudiantes, cultura, productividad |
-| [ ] | Teoría de la Información: Entropía de Shannon, Huffman y Compresión | `/visualizador-teoria-informacion/` | estudiantes, tecnicas |
-| [ ] | Terremotos y Tsunamis: De la Falla al Impacto | `/visualizador-terremotos-tsunamis/` | estudiantes, cultura |
-| [ ] | Tipos de Desempleo: Friccional, Estructural y Cíclico | `/visualizador-desempleo-tipos/` | estudiantes, cultura |
-| [ ] | Tipos de Rocas - El Ciclo que Nunca se Detiene | `/visualizador-tipos-rocas/` | estudiantes, cultura |
+| [x] | Teoría de la Información: Entropía de Shannon, Huffman y Compresión | `/visualizador-teoria-informacion/` | estudiantes, tecnicas |
+| [x] | Terremotos y Tsunamis: De la Falla al Impacto | `/visualizador-terremotos-tsunamis/` | estudiantes, cultura |
+| [x] | Tipos de Desempleo: Friccional, Estructural y Cíclico | `/visualizador-desempleo-tipos/` | estudiantes, cultura |
+| [x] | Tipos de Rocas - El Ciclo que Nunca se Detiene | `/visualizador-tipos-rocas/` | estudiantes, cultura |
 | [ ] | Topología: Superficies, Nudos y Homeomorfismos | `/visualizador-topologia/` | estudiantes |
 | [ ] | Transferencia de Calor - Conducción, Convección y Radiación | `/visualizador-termodinamica/` | estudiantes, cultura |
 | [ ] | Transformada de Fourier: Señales y Frecuencias | `/visualizador-transformada-fourier/` | estudiantes, tecnicas |

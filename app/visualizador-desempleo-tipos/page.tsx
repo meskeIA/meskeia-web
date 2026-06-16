@@ -264,22 +264,22 @@ export default function DesempleoTiposPage() {
 
               <div className={styles.tipoDetalleGrid}>
                 <div className={styles.tipoDetalleDato}>
-                  <span className={styles.tipoDetalleDatoLabel}>⏱️ Duración típica</span>
+                  <span className={styles.tipoDetalleDatoLabel}><span aria-hidden="true">⏱️</span> Duración típica</span>
                   <span className={styles.tipoDetalleDatoVal}>{tipoActual.duracion}</span>
                 </div>
                 <div className={styles.tipoDetalleDato}>
-                  <span className={styles.tipoDetalleDatoLabel}>📊 Magnitud estimada</span>
+                  <span className={styles.tipoDetalleDatoLabel}><span aria-hidden="true">📊</span> Magnitud estimada</span>
                   <span className={styles.tipoDetalleDatoVal}>{tipoActual.porcentaje}</span>
                 </div>
               </div>
 
               <div className={styles.tipoDetalleBloque}>
-                <p className={styles.tipoDetalleBloqueLabel}>💼 Ejemplo real</p>
+                <p className={styles.tipoDetalleBloqueLabel}><span aria-hidden="true">💼</span> Ejemplo real</p>
                 <p>{tipoActual.ejemplo}</p>
               </div>
 
               <div className={styles.tipoDetalleBloque}>
-                <p className={styles.tipoDetalleBloqueLabel}>🛠️ Posibles soluciones</p>
+                <p className={styles.tipoDetalleBloqueLabel}><span aria-hidden="true">🛠️</span> Posibles soluciones</p>
                 <p>{tipoActual.solucion}</p>
               </div>
             </div>
@@ -311,7 +311,7 @@ export default function DesempleoTiposPage() {
 
             <div className={styles.nairuPaisesGrid}>
               <div className={styles.nairuPais}>
-                <span className={styles.nairuPaisFlag}>🇪🇸</span>
+                <span className={styles.nairuPaisFlag} aria-hidden="true">🇪🇸</span>
                 <span className={styles.nairuPaisNombre}>España</span>
                 <span className={`${styles.nairuPaisPct} ${styles.nairuPctAlto}`}>~10–12%</span>
                 <span className={styles.nairuPaisComentario}>
@@ -319,7 +319,7 @@ export default function DesempleoTiposPage() {
                 </span>
               </div>
               <div className={styles.nairuPais}>
-                <span className={styles.nairuPaisFlag}>🇩🇪</span>
+                <span className={styles.nairuPaisFlag} aria-hidden="true">🇩🇪</span>
                 <span className={styles.nairuPaisNombre}>Alemania</span>
                 <span className={`${styles.nairuPaisPct} ${styles.nairuPctMedio}`}>~3–4%</span>
                 <span className={styles.nairuPaisComentario}>
@@ -327,7 +327,7 @@ export default function DesempleoTiposPage() {
                 </span>
               </div>
               <div className={styles.nairuPais}>
-                <span className={styles.nairuPaisFlag}>🇩🇰</span>
+                <span className={styles.nairuPaisFlag} aria-hidden="true">🇩🇰</span>
                 <span className={styles.nairuPaisNombre}>Dinamarca</span>
                 <span className={`${styles.nairuPaisPct} ${styles.nairuPctBajo}`}>~3–4%</span>
                 <span className={styles.nairuPaisComentario}>
@@ -335,7 +335,7 @@ export default function DesempleoTiposPage() {
                 </span>
               </div>
               <div className={styles.nairuPais}>
-                <span className={styles.nairuPaisFlag}>🇺🇸</span>
+                <span className={styles.nairuPaisFlag} aria-hidden="true">🇺🇸</span>
                 <span className={styles.nairuPaisNombre}>EE. UU.</span>
                 <span className={`${styles.nairuPaisPct} ${styles.nairuPctMedio}`}>~4–5%</span>
                 <span className={styles.nairuPaisComentario}>
@@ -703,7 +703,7 @@ export default function DesempleoTiposPage() {
               className={`${styles.tab} ${politicaTab === 'activas' ? styles.tabActivo : ''}`}
               onClick={() => setPoliticaTab('activas')}
             >
-              ✅ Políticas Activas
+              <span aria-hidden="true">✅</span> Políticas Activas
             </button>
             <button
               type="button"
@@ -714,7 +714,7 @@ export default function DesempleoTiposPage() {
               className={`${styles.tab} ${politicaTab === 'pasivas' ? styles.tabActivo : ''}`}
               onClick={() => setPoliticaTab('pasivas')}
             >
-              🛡️ Políticas Pasivas
+              <span aria-hidden="true">🛡️</span> Políticas Pasivas
             </button>
           </div>
 
