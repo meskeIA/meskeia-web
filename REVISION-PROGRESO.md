@@ -837,11 +837,11 @@
 | [x] | Selector de Zona de Residencia | `/selector-zona-residencia/` | inmobiliaria, productividad |
 | [x] | Simulador Bono Joven Alquiler | `/simulador-bono-joven-alquiler/` | inmobiliaria, finanzas, legal-fiscal |
 | [x] | Simulador de Ahorro con Placas Solares | `/simulador-placas-solares/` | inmobiliaria, tecnicas, finanzas |
-| [ ] | Simulador de Subvenciones para Rehabilitación Energética | `/simulador-subvenciones-rehabilitacion/` | inmobiliaria, finanzas |
-| [ ] | Simulador Gastos Compra Nave Industrial | `/simulador-gastos-compraventa-nave-industrial/` | inmobiliaria, legal-fiscal, freelance |
+| [x] | Simulador de Subvenciones para Rehabilitación Energética | `/simulador-subvenciones-rehabilitacion/` | inmobiliaria, finanzas |
+| [x] | Simulador Gastos Compra Nave Industrial | `/simulador-gastos-compraventa-nave-industrial/` | inmobiliaria, legal-fiscal, freelance |
 | [x] | Simulador Gastos Compraventa Garaje | `/simulador-gastos-compraventa-garaje/` | inmobiliaria, legal-fiscal |
 | [x] | Simulador Gastos Compraventa Trastero | `/simulador-gastos-compraventa-trastero/` | inmobiliaria, legal-fiscal |
-| [ ] | Tu Electricidad al Desnudo | `/visualizador-factura-electrica/` | inmobiliaria, cultura |
+| [x] | Tu Electricidad al Desnudo | `/visualizador-factura-electrica/` | inmobiliaria, cultura |
 
 ## Juegos y Ocio (`juegos`) — 20 apps
 
@@ -873,7 +873,7 @@
 | Estado | Nombre | URL | Suites |
 |---|---|---|---|
 | [x] | Asistente Alta Autónomo | `/asistente-alta-autonomo/` | legal-fiscal, freelance |
-| [ ] | Asistente Constitución Asociación | `/asistente-constitucion-asociacion/` | legal-fiscal |
+| [x] | Asistente Constitución Asociación | `/asistente-constitucion-asociacion/` | legal-fiscal |
 | [ ] | Asistente Constitución Sociedad | `/asistente-constitucion-sociedad/` | legal-fiscal, freelance |
 | [x] | Calendario Fiscal Emprendedor | `/calendario-fiscal-emprendedor/` | legal-fiscal, freelance |
 | [ ] | Checklist Declaración de la Renta 2026 | `/checklist-declaracion-renta/` | legal-fiscal, finanzas, freelance |

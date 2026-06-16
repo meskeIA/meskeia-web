@@ -159,13 +159,14 @@ export default function SimuladorNaveIndustrialPage() {
       {/* Formulario principal */}
       <section className={styles.mainContent}>
         <div className={styles.formPanel}>
-          <h2 className={styles.sectionTitle}>📋 Datos de la operación</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">📋</span> Datos de la operación</h2>
 
           {/* Tipo de transmisión */}
           <div className={styles.inputGroup}>
             <label className={styles.label}>Tipo de transmisión</label>
             <div className={styles.transmisionGrid}>
               <button
+                type="button"
                 className={`${styles.transmisionBtn} ${tipoTransmision === 'segunda-mano' ? styles.active : ''}`}
                 onClick={() => setTipoTransmision('segunda-mano')}
                 aria-pressed={tipoTransmision === 'segunda-mano'}
@@ -175,6 +176,7 @@ export default function SimuladorNaveIndustrialPage() {
                 <span className={styles.transmisionSub}>Paga ITP (tipo general)</span>
               </button>
               <button
+                type="button"
                 className={`${styles.transmisionBtn} ${tipoTransmision === 'primera-mano' ? styles.active : ''}`}
                 onClick={() => setTipoTransmision('primera-mano')}
                 aria-pressed={tipoTransmision === 'primera-mano'}
@@ -264,7 +266,7 @@ export default function SimuladorNaveIndustrialPage() {
               rel="noopener noreferrer"
               className={styles.catastroLink}
             >
-              🔗 Consultar valor de referencia catastral en la Sede del Catastro
+              <span aria-hidden="true">🔗</span> Consultar valor de referencia catastral en la Sede del Catastro
             </a>
           </div>
         </div>
@@ -405,28 +407,28 @@ export default function SimuladorNaveIndustrialPage() {
           <h2>Casos de uso habituales</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
             <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem' }}>
-              <strong>🏭 Empresa compra nave nueva al promotor</strong>
+              <strong><span aria-hidden="true">🏭</span> Empresa compra nave nueva al promotor</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
                 Paga IVA 21% + AJD. Si la empresa está dada de alta en actividades sujetas a IVA,
                 puede deducir el IVA en la declaración trimestral (modelo 303).
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem' }}>
-              <strong>🔄 Autónomo compra nave de segunda mano</strong>
+              <strong><span aria-hidden="true">🔄</span> Autónomo compra nave de segunda mano</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
                 Paga ITP al tipo general de su CCAA (no hay bonificaciones para naves industriales).
                 El ITP no es deducible como IVA, pero sí se añade al valor de adquisición del activo.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem' }}>
-              <strong>💡 IVA deducible: cuándo y cómo</strong>
+              <strong><span aria-hidden="true">💡</span> IVA deducible: cuándo y cómo</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
                 Solo si el comprador es sujeto pasivo de IVA y la nave se destina a la actividad económica.
                 El IVA se recupera en la declaración trimestral, reduciendo el coste real de adquisición.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem' }}>
-              <strong>📈 Vender nave con ganancia patrimonial</strong>
+              <strong><span aria-hidden="true">📈</span> Vender nave con ganancia patrimonial</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
                 Si vendes la nave como persona física, la ganancia tributa en el IRPF base del ahorro
                 (19-30%). Si vendes como empresa (IS), tributa en el Impuesto de Sociedades.

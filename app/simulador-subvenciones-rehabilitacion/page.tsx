@@ -283,6 +283,7 @@ export default function SimuladorSubvencionesRehabilitacionPage() {
             ]).map(opt => (
               <button
                 key={opt.value}
+                type="button"
                 className={`${styles.radioBtn} ${tipoActuacion === opt.value ? styles.radioBtnActive : ''}`}
                 onClick={() => { setTipoActuacion(opt.value); setCalculado(false); }}
                 role="radio"
@@ -304,6 +305,7 @@ export default function SimuladorSubvencionesRehabilitacionPage() {
             {MEJORAS.map(m => (
               <button
                 key={m.id}
+                type="button"
                 className={`${styles.checkboxBtn} ${mejoras.includes(m.id) ? styles.checkboxBtnActive : ''}`}
                 onClick={() => { toggleMejora(m.id); setCalculado(false); }}
                 aria-pressed={mejoras.includes(m.id)}
@@ -349,6 +351,7 @@ export default function SimuladorSubvencionesRehabilitacionPage() {
             ]).map(opt => (
               <button
                 key={opt.value}
+                type="button"
                 className={`${styles.radioBtn} ${ahorro === opt.value ? styles.radioBtnActive : ''}`}
                 onClick={() => { setAhorro(opt.value); setCalculado(false); }}
                 role="radio"
@@ -368,6 +371,7 @@ export default function SimuladorSubvencionesRehabilitacionPage() {
           <p className={styles.helperText}>Las deducciones IRPF solo aplican a vivienda habitual</p>
           <div className={styles.radioGroup} role="radiogroup" aria-label="¿Vivienda habitual?">
             <button
+              type="button"
               className={`${styles.radioBtn} ${viviendaHabitual === true ? styles.radioBtnActive : ''}`}
               onClick={() => { setViviendaHabitual(true); setCalculado(false); }}
               role="radio"
@@ -376,6 +380,7 @@ export default function SimuladorSubvencionesRehabilitacionPage() {
               Sí
             </button>
             <button
+              type="button"
               className={`${styles.radioBtn} ${viviendaHabitual === false ? styles.radioBtnActive : ''}`}
               onClick={() => { setViviendaHabitual(false); setCalculado(false); }}
               role="radio"
@@ -388,6 +393,7 @@ export default function SimuladorSubvencionesRehabilitacionPage() {
 
         {/* Botón calcular */}
         <button
+          type="button"
           className={styles.btnPrimary}
           onClick={handleCalcular}
           disabled={!puedeCalcular}
@@ -408,7 +414,7 @@ export default function SimuladorSubvencionesRehabilitacionPage() {
               >
                 <div className={styles.programHeader}>
                   <h3 className={styles.programName}>
-                    {prog.aplica ? '✅' : '❌'} {prog.nombre}
+                    <span aria-hidden="true">{prog.aplica ? '✅' : '❌'}</span> {prog.nombre}
                   </h3>
                   <span className={styles.programAmount}>
                     {prog.aplica ? formatCurrency(prog.importeEstimado) : 'No aplica'}
@@ -422,7 +428,7 @@ export default function SimuladorSubvencionesRehabilitacionPage() {
             <div className={`${styles.programCard} ${!resultados.deduccion.aplica ? styles.programIneligible : ''}`}>
               <div className={styles.programHeader}>
                 <h3 className={styles.programName}>
-                  {resultados.deduccion.aplica ? '✅' : '❌'} Deducción IRPF
+                  <span aria-hidden="true">{resultados.deduccion.aplica ? '✅' : '❌'}</span> Deducción IRPF
                 </h3>
                 <span className={styles.programAmount}>
                   {resultados.deduccion.aplica ? formatCurrency(resultados.deduccion.importeEstimado) : 'No aplica'}
@@ -434,7 +440,7 @@ export default function SimuladorSubvencionesRehabilitacionPage() {
             {/* IVA reducido */}
             <div className={styles.programCard}>
               <div className={styles.programHeader}>
-                <h3 className={styles.programName}>✅ IVA reducido (10% vs 21%)</h3>
+                <h3 className={styles.programName}><span aria-hidden="true">✅</span> IVA reducido (10% vs 21%)</h3>
                 <span className={styles.programAmount}>{formatCurrency(resultados.ahorroIVA)}</span>
               </div>
               <p className={styles.programDesc}>
@@ -671,7 +677,7 @@ export default function SimuladorSubvencionesRehabilitacionPage() {
 
           {/* Warning Box */}
           <section className={styles.warningBox}>
-            <h2>⚠️ Advertencias importantes</h2>
+            <h2><span aria-hidden="true">⚠️</span> Advertencias importantes</h2>
             <div className={styles.warningGrid}>
               <div className={styles.warningItem}>
                 <strong>Los importes son orientativos</strong>

@@ -1423,22 +1423,28 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
 
             <div className={styles.documentTabs}>
               <button
+                type="button"
                 className={`${styles.docTab} ${documentoActivo === 'acta' ? styles.docTabActive : ''}`}
                 onClick={() => setDocumentoActivo('acta')}
+                aria-pressed={documentoActivo === 'acta'}
               >
-                📋 Acta Fundacional
+                <span aria-hidden="true">📋</span> Acta Fundacional
               </button>
               <button
+                type="button"
                 className={`${styles.docTab} ${documentoActivo === 'estatutos' ? styles.docTabActive : ''}`}
                 onClick={() => setDocumentoActivo('estatutos')}
+                aria-pressed={documentoActivo === 'estatutos'}
               >
-                📜 Estatutos
+                <span aria-hidden="true">📜</span> Estatutos
               </button>
               <button
+                type="button"
                 className={`${styles.docTab} ${documentoActivo === 'solicitud' ? styles.docTabActive : ''}`}
                 onClick={() => setDocumentoActivo('solicitud')}
+                aria-pressed={documentoActivo === 'solicitud'}
               >
-                📝 Solicitud Registro
+                <span aria-hidden="true">📝</span> Solicitud Registro
               </button>
             </div>
 
@@ -1450,6 +1456,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
                   {documentoActivo === 'solicitud' && '📝 Solicitud de Inscripción'}
                 </h3>
                 <button
+                  type="button"
                   className={styles.btnCopiar}
                   onClick={() => copiarAlPortapapeles(
                     documentoActivo === 'acta' ? generarActaFundacional() :
@@ -1457,7 +1464,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
                     generarSolicitudRegistro()
                   )}
                 >
-                  📋 Copiar documento
+                  <span aria-hidden="true">📋</span> Copiar documento
                 </button>
               </div>
               <pre className={styles.documentText}>
