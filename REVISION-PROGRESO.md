@@ -703,10 +703,10 @@
 | [x] | El Ciclo de Vida de un Proyecto Freelance | `/visualizador-ciclo-vida-freelance/` | freelance, cultura |
 | [x] | Estimador Break-Even | `/estimador-break-even/` | freelance |
 | [x] | Estimador ROI Marketing | `/estimador-roi-marketing/` | freelance, diseno |
-| [ ] | Estructura de Costes del Autónomo | `/visualizador-estructura-costes-autonomo/` | freelance, finanzas, cultura |
-| [ ] | Generador de Facturas | `/generador-facturas/` | freelance |
-| [ ] | Lista de Tareas | `/lista-tareas/` | freelance, productividad |
-| [ ] | Mapa de Dependencia de Clientes | `/mapa-dependencia-clientes/` | freelance, productividad |
+| [x] | Estructura de Costes del Autónomo | `/visualizador-estructura-costes-autonomo/` | freelance, finanzas, cultura |
+| [x] | Generador de Facturas | `/generador-facturas/` | freelance |
+| [x] | Lista de Tareas | `/lista-tareas/` | freelance, productividad |
+| [x] | Mapa de Dependencia de Clientes | `/mapa-dependencia-clientes/` | freelance, productividad |
 | [ ] | Mapa de Riesgo del Emprendedor | `/mapa-riesgo-emprendedor/` | freelance, finanzas |
 | [ ] | Mi IP y Conexión | `/mi-ip/` | freelance, tecnicas |
 | [ ] | Notas | `/notas/` | freelance, productividad |

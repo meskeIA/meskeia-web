@@ -570,7 +570,7 @@ export default function GeneradorFacturasPage() {
           {/* Datos del emisor */}
           <div className={styles.section}>
             <h2 className={styles.sectionTitle}>
-              👤 Tus datos (Emisor)
+              <span aria-hidden="true">👤</span> Tus datos (Emisor)
               <span className={styles.sectionHint}>Se guardan automáticamente</span>
             </h2>
             <div className={styles.formGrid}>
@@ -684,7 +684,7 @@ export default function GeneradorFacturasPage() {
 
           {/* Datos del cliente */}
           <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>🏢 Datos del cliente</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">🏢</span> Datos del cliente</h2>
             <div className={styles.formGrid}>
               <div className={styles.formGroup}>
                 <label htmlFor="clienteNombre">Nombre / Razón social *</label>
@@ -754,7 +754,7 @@ export default function GeneradorFacturasPage() {
 
           {/* Configuración factura */}
           <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>⚙️ Configuración</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">⚙️</span> Configuración</h2>
             <div className={styles.formGrid}>
               <div className={styles.formGroup}>
                 <label htmlFor="configSerie">Serie</label>
@@ -830,7 +830,7 @@ export default function GeneradorFacturasPage() {
 
           {/* Líneas de factura */}
           <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>📝 Conceptos</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">📝</span> Conceptos</h2>
             <div className={styles.lineasContainer}>
               {lineas.map((linea, index) => (
                 <div key={linea.id} className={styles.lineaItem}>
@@ -909,7 +909,7 @@ export default function GeneradorFacturasPage() {
 
           {/* Notas */}
           <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>📌 Notas (opcional)</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">📌</span> Notas (opcional)</h2>
             <textarea
               value={config.notas}
               onChange={e => setConfig({ ...config, notas: e.target.value })}
@@ -960,7 +960,7 @@ export default function GeneradorFacturasPage() {
                 onClick={() => setMostrarPreview(true)}
                 className={styles.btnPreview}
               >
-                👁️ Vista previa
+                <span aria-hidden="true">👁️</span> Vista previa
               </button>
               <button
                 type="button"
@@ -968,14 +968,14 @@ export default function GeneradorFacturasPage() {
                 disabled={!esValida}
                 className={styles.btnGenerar}
               >
-                📄 Generar PDF
+                <span aria-hidden="true">📄</span> Generar PDF
               </button>
               <button
                 type="button"
                 onClick={nuevaFactura}
                 className={styles.btnNueva}
               >
-                🔄 Nueva factura
+                <span aria-hidden="true">🔄</span> Nueva factura
               </button>
             </div>
           </div>
@@ -986,8 +986,9 @@ export default function GeneradorFacturasPage() {
               type="button"
               onClick={() => setMostrarHistorial(!mostrarHistorial)}
               className={styles.historialToggle}
+              aria-pressed={mostrarHistorial}
             >
-              📋 Historial ({historial.length})
+              <span aria-hidden="true">📋</span> Historial ({historial.length})
               <span className={mostrarHistorial ? styles.arrowUp : styles.arrowDown}>▼</span>
             </button>
 
@@ -1122,7 +1123,7 @@ export default function GeneradorFacturasPage() {
 
             <div className={styles.previewActions}>
               <button type="button" onClick={() => window.print()} className={styles.btnImprimir}>
-                🖨️ Imprimir / Guardar PDF
+                <span aria-hidden="true">🖨️</span> Imprimir / Guardar PDF
               </button>
             </div>
           </div>
@@ -1135,7 +1136,7 @@ export default function GeneradorFacturasPage() {
       >
         {/* TABLA COMPARATIVA */}
         <section className={styles.eduComparativa}>
-          <h2>📋 Tipos de factura en España: cuándo y cómo usar cada una</h2>
+          <h2><span aria-hidden="true">📋</span> Tipos de factura en España: cuándo y cómo usar cada una</h2>
           <p className={styles.eduIntro}>
             Elegir el tipo de factura incorrecto puede costarte sanciones de 150–6.000 €. Esta tabla te ayuda a identificar qué configuración necesitas según tu situación real.
           </p>
@@ -1215,11 +1216,11 @@ export default function GeneradorFacturasPage() {
 
         {/* CASOS DE USO */}
         <section className={styles.eduEscenarios}>
-          <h2>💼 Situaciones reales: cómo facturar según tu perfil</h2>
+          <h2><span aria-hidden="true">💼</span> Situaciones reales: cómo facturar según tu perfil</h2>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👨‍💻</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👨‍💻</span>
                 <h3>Freelance de servicios digitales</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -1230,7 +1231,7 @@ export default function GeneradorFacturasPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏢</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏢</span>
                 <h3>Sociedad Limitada (SL)</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -1241,7 +1242,7 @@ export default function GeneradorFacturasPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🌍</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🌍</span>
                 <h3>Servicio a empresa europea</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -1252,7 +1253,7 @@ export default function GeneradorFacturasPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📚</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📚</span>
                 <h3>Formador o educador autónomo</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -1263,7 +1264,7 @@ export default function GeneradorFacturasPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🆕</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🆕</span>
                 <h3>Nuevo autónomo (primer año)</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -1274,7 +1275,7 @@ export default function GeneradorFacturasPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🛒</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🛒</span>
                 <h3>Tienda online o e-commerce</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -1288,59 +1289,59 @@ export default function GeneradorFacturasPage() {
 
         {/* FAQ */}
         <section className={styles.eduFaq}>
-          <h2>❓ Preguntas frecuentes sobre facturación</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas frecuentes sobre facturación</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuándo debo aplicar retención IRPF y cuándo no?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuándo debo aplicar retención IRPF y cuándo no?</h4>
               <p>
                 La retención IRPF la aplicas cuando eres autónomo con actividad profesional (o artística/deportiva) y facturas a una <strong>empresa o autónomo español obligado a retener</strong>. Si tu cliente es un particular, nunca aplica retención. Si tu cliente es una empresa extranjera, tampoco. Las sociedades limitadas (SL, SA) tampoco retienen en sus facturas, solo los autónomos en actividades profesionales.
               </p>
               <p className={styles.faqTip}>💡 <strong>Regla práctica:</strong> Si tu cliente tiene CIF (empresa) y eres autónomo con actividad profesional = aplica retención. Si tiene DNI (particular) o es empresa extranjera = sin retención.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué pasa si me olvido de incluir datos obligatorios en la factura?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué pasa si me olvido de incluir datos obligatorios en la factura?</h4>
               <p>
                 Una factura incompleta puede ser rechazada por el cliente para deducir el IVA, y Hacienda puede imponer sanciones entre <strong>150 € y 600 €</strong> por cada factura incorrecta (art. 201 LGT). Los datos obligatorios son: número correlativo, fecha, datos del emisor y receptor (nombre + NIF/CIF + domicilio), descripción del servicio, base imponible, tipo de IVA, cuota de IVA y total. Si el receptor es persona jurídica, también su domicilio.
               </p>
               <p className={styles.faqTip}>💡 <strong>Tip:</strong> El generador de meskeIA incluye automáticamente todos los campos obligatorios según la normativa española (RD 1619/2012).</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo corrijo un error en una factura ya emitida?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo corrijo un error en una factura ya emitida?</h4>
               <p>
                 <strong>Nunca modifiques una factura ya entregada.</strong> Hacerlo es falsificación de documento mercantil. La solución correcta es emitir una <strong>factura rectificativa</strong> que: haga referencia al número y fecha de la factura original, indique el motivo de la rectificación, y corrija los datos erróneos. La factura rectificativa lleva su propio número correlativo en la serie de rectificativas (ej: R-001, R-002...).
               </p>
               <p className={styles.faqTip}>💡 <strong>Tip:</strong> Puedes emitir facturas rectificativas tanto para corregir errores como para emitir abonos (cuando devuelves dinero al cliente).</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué es la numeración correlativa y por qué es tan importante?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué es la numeración correlativa y por qué es tan importante?</h4>
               <p>
                 La numeración correlativa significa que las facturas deben emitirse en orden secuencial sin saltos ni repeticiones (2024-001, 2024-002, 2024-003...). <strong>Hacienda considera un salto en la numeración como indicio de facturas ocultas.</strong> Puedes usar prefijos anuales (2025-001) o reiniciar la numeración cada ejercicio fiscal. Si detectas un salto, consúltalo con tu asesor antes de la próxima declaración.
               </p>
               <p className={styles.faqTip}>💡 <strong>Tip:</strong> Puedes tener series distintas para distintos tipos de facturas (ej: serie A para nacionales, serie E para exportación, serie R para rectificativas).</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuánto tiempo debo conservar las facturas?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuánto tiempo debo conservar las facturas?</h4>
               <p>
                 Mínimo <strong>4 años</strong> según la Ley General Tributaria (prescripción tributaria). Sin embargo, el Código de Comercio exige <strong>6 años</strong> para documentos contables. La recomendación práctica es guardar todo durante <strong>6 años</strong>. Si tienes pérdidas que compensar en ejercicios futuros, conserva la documentación hasta que se hayan compensado completamente.
               </p>
               <p className={styles.faqTip}>💡 <strong>Tip:</strong> Desde el 1 de julio de 2025, la obligación de factura electrónica (Ley Crea y Crece) se está implementando gradualmente. Prepárate para adoptar software certificado.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Puedo incluir mi cuenta bancaria en la factura para cobrar por transferencia?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Puedo incluir mi cuenta bancaria en la factura para cobrar por transferencia?</h4>
               <p>
                 Sí, es práctica habitual y recomendable incluir el IBAN en la factura para facilitar el pago. No es dato obligatorio según el reglamento de facturación, pero sí muy práctico. Asegúrate de indicar también el plazo de pago acordado. La Ley de Morosidad (Ley 3/2004) establece un plazo máximo de 30 días para empresas y 60 días para Administraciones Públicas.
               </p>
               <p className={styles.faqTip}>💡 <strong>Tip:</strong> Si el cliente tarda en pagar, puedes añadir intereses de demora (el tipo legal del dinero + 8 puntos para operaciones comerciales B2B).</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué diferencia hay entre factura ordinaria y factura simplificada?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué diferencia hay entre factura ordinaria y factura simplificada?</h4>
               <p>
                 La <strong>factura simplificada (ticket)</strong> puede emitirse cuando el destinatario es un particular o el importe es inferior a 400 € IVA incluido. No es necesario indicar los datos del receptor. Los comercios con autorización especial pueden usar tickets hasta 3.000 €. La factura <strong>ordinaria completa</strong> es obligatoria cuando el destinatario es una empresa o cuando supera los umbrales anteriores.
               </p>
               <p className={styles.faqTip}>💡 <strong>Regla:</strong> Si el cliente va a deducirse el IVA, necesita sí o sí una factura ordinaria completa con sus datos.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué es la factura electrónica y cuándo es obligatoria?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué es la factura electrónica y cuándo es obligatoria?</h4>
               <p>
                 La factura electrónica es una factura emitida y recibida en formato digital estructurado (XML, Facturae) con garantías de autenticidad e integridad. Ya es <strong>obligatoria para facturar a la Administración Pública</strong> desde 2015. Para el sector privado, la Ley &quot;Crea y Crece&quot; (Ley 18/2022) la hará obligatoria para empresas con facturación &gt;8M€ en 2025 y para el resto (incluidos autónomos) en 2026.
               </p>
@@ -1351,7 +1352,7 @@ export default function GeneradorFacturasPage() {
 
         {/* GUÍA PASO A PASO */}
         <section className={styles.eduGuia}>
-          <h2>📋 Cómo emitir una factura correcta paso a paso</h2>
+          <h2><span aria-hidden="true">📋</span> Cómo emitir una factura correcta paso a paso</h2>
           <div className={styles.stepGuide}>
             <div className={styles.step}>
               <div className={styles.stepNumber}>1</div>
@@ -1407,35 +1408,35 @@ export default function GeneradorFacturasPage() {
 
         {/* MEJORES PRÁCTICAS */}
         <section className={styles.eduTips}>
-          <h2>✅ Buenas prácticas de facturación profesional</h2>
+          <h2><span aria-hidden="true">✅</span> Buenas prácticas de facturación profesional</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <h4>Emite facturas el mismo día del servicio</h4>
               <p>La factura debe emitirse el día del devengo (cuando se realiza el servicio) o como máximo el último día del mes natural siguiente. Emitirla el mismo día acelera el cobro.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔢</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔢</span>
               <h4>Nunca rompas la correlación numérica</h4>
               <p>Si cancelas una factura antes de enviarla, emite igualmente una factura con importe 0 o una rectificativa. Un salto en la numeración es motivo de inspección en Hacienda.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📁</span>
+              <span className={styles.tipIcon} aria-hidden="true">📁</span>
               <h4>Organiza en carpetas por año y mes</h4>
               <p>Estructura: /Facturas/2025/01-Enero, /Facturas/2025/02-Febrero... Guarda tanto las emitidas como las recibidas. Facilita enormemente la preparación del trimestre.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Verifica el NIF antes de emitir, no después</h4>
               <p>Un NIF incorrecto invalida la factura y puede impedir que el cliente deduzca el IVA. Usa la herramienta de validación NIF de meskeIA antes de crear cada factura nueva.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💶</span>
+              <span className={styles.tipIcon} aria-hidden="true">💶</span>
               <h4>Usa IBAN y plazo de pago explícito</h4>
               <p>Indicar el IBAN y &quot;Pago en 30 días&quot; reduce el tiempo medio de cobro en 7-10 días. Los clientes con flujo de caja ajustado pagan primero las facturas con fecha límite clara.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <h4>Reconcilia con el libro de facturas mensualmente</h4>
               <p>Al cerrar cada mes, cruza las facturas emitidas con los cobros recibidos. Detectar impagos en menos de 30 días duplica la probabilidad de cobro. Pasados 90 días, el riesgo de impago se dispara.</p>
             </div>
@@ -1445,7 +1446,7 @@ export default function GeneradorFacturasPage() {
         {/* WARNING BOX */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <h3>Errores de facturación que generan sanciones o pérdida de derechos</h3>
           </div>
           <ul className={styles.warningList}>

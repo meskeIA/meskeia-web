@@ -222,7 +222,7 @@ export default function ListaTareasPage() {
                 onChange={(e) => setNuevaFecha(e.target.value)}
                 className={styles.inputFecha}
               />
-              <button onClick={agregarTarea} className={styles.btnAgregar}>
+              <button type="button" onClick={agregarTarea} className={styles.btnAgregar}>
                 + Añadir
               </button>
             </div>
@@ -262,20 +262,26 @@ export default function ListaTareasPage() {
         <section className={styles.filtrosPanel}>
           <div className={styles.filtrosGrupo}>
             <button
+              type="button"
               className={`${styles.filtroBtn} ${filtroEstado === 'todas' ? styles.activo : ''}`}
               onClick={() => setFiltroEstado('todas')}
+              aria-pressed={filtroEstado === 'todas'}
             >
               Todas
             </button>
             <button
+              type="button"
               className={`${styles.filtroBtn} ${filtroEstado === 'pendientes' ? styles.activo : ''}`}
               onClick={() => setFiltroEstado('pendientes')}
+              aria-pressed={filtroEstado === 'pendientes'}
             >
               Pendientes
             </button>
             <button
+              type="button"
               className={`${styles.filtroBtn} ${filtroEstado === 'completadas' ? styles.activo : ''}`}
               onClick={() => setFiltroEstado('completadas')}
+              aria-pressed={filtroEstado === 'completadas'}
             >
               Completadas
             </button>
@@ -309,7 +315,7 @@ export default function ListaTareasPage() {
         <section className={styles.listaPanel}>
           {tareasFiltradas.length === 0 ? (
             <div className={styles.listaVacia}>
-              <span className={styles.iconVacio}>✅</span>
+              <span className={styles.iconVacio} aria-hidden="true">✅</span>
               <p>{tareas.length === 0 ? 'No tienes tareas todavía' : 'No hay tareas con estos filtros'}</p>
               {tareas.length === 0 && (
                 <p className={styles.hint}>Añade tu primera tarea usando el formulario de arriba</p>
@@ -327,6 +333,7 @@ export default function ListaTareasPage() {
                     className={`${styles.tareaItem} ${tarea.completada ? styles.completada : ''} ${vencida ? styles.vencida : ''}`}
                   >
                     <button
+                      type="button"
                       onClick={() => toggleCompletada(tarea.id)}
                       className={styles.checkBtn}
                     >
@@ -343,11 +350,11 @@ export default function ListaTareasPage() {
                       <span className={styles.tareaTexto}>{tarea.texto}</span>
                       <div className={styles.tareaMeta}>
                         <span className={styles.tareaCategoria}>
-                          {categoria?.emoji} {categoria?.nombre}
+                          <span aria-hidden="true">{categoria?.emoji}</span> {categoria?.nombre}
                         </span>
                         {tarea.fechaLimite && (
                           <span className={`${styles.tareaFecha} ${vencida ? styles.fechaVencida : ''}`}>
-                            📅 {formatearFecha(tarea.fechaLimite)}
+                            <span aria-hidden="true">📅</span> {formatearFecha(tarea.fechaLimite)}
                             {vencida && ' (vencida)'}
                           </span>
                         )}
@@ -355,6 +362,7 @@ export default function ListaTareasPage() {
                     </div>
 
                     <button
+                      type="button"
                       onClick={() => eliminarTarea(tarea.id)}
                       className={styles.deleteBtn}
                       title="Eliminar tarea"
@@ -371,11 +379,11 @@ export default function ListaTareasPage() {
         {/* Acciones */}
         {tareas.length > 0 && (
           <section className={styles.accionesPanel}>
-            <button onClick={limpiarCompletadas} className={styles.btnAccion}>
-              🗑️ Limpiar completadas
+            <button type="button" onClick={limpiarCompletadas} className={styles.btnAccion}>
+              <span aria-hidden="true">🗑️</span> Limpiar completadas
             </button>
-            <button onClick={limpiarTodas} className={styles.btnAccionDanger}>
-              ❌ Eliminar todas
+            <button type="button" onClick={limpiarTodas} className={styles.btnAccionDanger}>
+              <span aria-hidden="true">❌</span> Eliminar todas
             </button>
           </section>
         )}

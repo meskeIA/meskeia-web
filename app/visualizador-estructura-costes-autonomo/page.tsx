@@ -179,6 +179,7 @@ function BloqueExpandible({ icono, label, valor, pct, color, nota, children }: B
   return (
     <div className={`${styles.bloque} ${colorClass}`}>
       <button
+        type="button"
         className={styles.bloqueHeader}
         onClick={() => setAbierto(!abierto)}
         aria-expanded={abierto}
