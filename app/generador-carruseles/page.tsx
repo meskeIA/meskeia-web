@@ -267,7 +267,7 @@ export default function GeneradorCarruselesPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📱 Generador de Carruseles</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📱</span> Generador de Carruseles</h1>
         <p className={styles.subtitle}>
           Crea slides profesionales para Instagram y LinkedIn
         </p>
@@ -304,18 +304,21 @@ export default function GeneradorCarruselesPage() {
                 </span>
                 <div className={styles.slideActions}>
                   <button
+                    type="button"
                     onClick={(e) => { e.stopPropagation(); moverSlide(index, 'up'); }}
                     disabled={index === 0}
                     className={styles.slideActionBtn}
                     title="Mover arriba"
                   >↑</button>
                   <button
+                    type="button"
                     onClick={(e) => { e.stopPropagation(); moverSlide(index, 'down'); }}
                     disabled={index === slides.length - 1}
                     className={styles.slideActionBtn}
                     title="Mover abajo"
                   >↓</button>
                   <button
+                    type="button"
                     onClick={(e) => { e.stopPropagation(); eliminarSlide(index); }}
                     disabled={slides.length <= 1}
                     className={`${styles.slideActionBtn} ${styles.deleteBtn}`}
@@ -326,6 +329,7 @@ export default function GeneradorCarruselesPage() {
             ))}
 
             <button
+              type="button"
               onClick={agregarSlide}
               disabled={slides.length >= 10}
               className={styles.addSlideBtn}
@@ -381,8 +385,10 @@ export default function GeneradorCarruselesPage() {
               {PLANTILLAS.map((plantilla) => (
                 <button
                   key={plantilla.id}
+                  type="button"
                   className={`${styles.plantillaBtn} ${plantillaActiva.id === plantilla.id ? styles.plantillaBtnActive : ''}`}
                   onClick={() => setPlantillaActiva(plantilla)}
+                  aria-pressed={plantillaActiva.id === plantilla.id}
                   style={{
                     background: plantilla.fondoGradiente || plantilla.fondoColor,
                     color: plantilla.textoColor,
@@ -408,6 +414,7 @@ export default function GeneradorCarruselesPage() {
 
           {/* Botón de exportar */}
           <button
+            type="button"
             onClick={exportarSlides}
             disabled={exportando}
             className={styles.exportBtn}
@@ -426,15 +433,19 @@ export default function GeneradorCarruselesPage() {
             <h2>Vista previa</h2>
             <div className={styles.previewNavigation}>
               <button
+                type="button"
                 onClick={() => setSlideActivo(Math.max(0, slideActivo - 1))}
                 disabled={slideActivo === 0}
                 className={styles.navBtn}
+                aria-label="Slide anterior"
               >←</button>
               <span>{slideActivo + 1} / {slides.length}</span>
               <button
+                type="button"
                 onClick={() => setSlideActivo(Math.min(slides.length - 1, slideActivo + 1))}
                 disabled={slideActivo === slides.length - 1}
                 className={styles.navBtn}
+                aria-label="Slide siguiente"
               >→</button>
             </div>
           </div>
@@ -551,7 +562,7 @@ export default function GeneradorCarruselesPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🧑‍💼</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🧑‍💼</span>
                 <h3>Marca personal de consultor</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -567,7 +578,7 @@ export default function GeneradorCarruselesPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🛒</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🛒</span>
                 <h3>E-commerce de producto</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -583,7 +594,7 @@ export default function GeneradorCarruselesPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📚</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📚</span>
                 <h3>Educador / Creador de cursos</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -599,7 +610,7 @@ export default function GeneradorCarruselesPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📊</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📊</span>
                 <h3>Agencia de marketing</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -615,7 +626,7 @@ export default function GeneradorCarruselesPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💡</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💡</span>
                 <h3>Infoproductor / Coach</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -631,7 +642,7 @@ export default function GeneradorCarruselesPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏢</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏢</span>
                 <h3>Empresa buscando talento</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -808,32 +819,32 @@ export default function GeneradorCarruselesPage() {
           <h2>✅ 6 mejores prácticas para carruseles de alto rendimiento</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Usa fuentes sans-serif grandes</h4>
               <p>Mínimo 40px en los slides exportados. En móvil, el 80% de los usuarios lee sin ampliar. Si no se lee cómodo, se pasa de largo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Contraste de al menos 4.5:1</h4>
               <p>Texto negro sobre blanco o blanco sobre azul meskeIA. Evita texto gris sobre fondo claro: es la queja más frecuente de accesibilidad en redes.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Una sola idea por slide</h4>
               <p>Si un slide necesita más de 40 palabras, divídelo en dos. La atención en redes dura 1,7 segundos por slide. El mensaje debe captarse de un vistazo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Activa la numeración (1/5, 2/5...)</h4>
               <p>La numeración reduce el abandono en un 20% porque crea un contrato implícito con el lector: sabe cuánto le queda. Especialmente útil en carruseles largos.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Termina con un CTA de baja fricción</h4>
               <p>&quot;Guarda este post&quot;, &quot;Etiqueta a alguien que necesite esto&quot; o &quot;Comenta tu experiencia&quot; son CTA efectivos. &quot;Compra ahora&quot; en el último slide de un carrusel educativo es demasiado agresivo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Reutiliza el carrusel en otras plataformas</h4>
               <p>Un carrusel de Instagram puede adaptarse a LinkedIn (mismo diseño, texto más extenso), a un hilo de Twitter/X, a un artículo de blog o a las diapositivas de una newsletter. Maximiza el retorno por hora de creación.</p>
             </div>
@@ -844,7 +855,7 @@ export default function GeneradorCarruselesPage() {
         <section className={styles.eduWarning}>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>Errores comunes que destruyen el alcance de tus carruseles</h3>
             </div>
             <ul className={styles.warningList}>

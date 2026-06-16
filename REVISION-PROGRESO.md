@@ -346,13 +346,13 @@
 | [x] | Creador de Thumbnails YouTube | `/creador-thumbnails/` | diseno |
 | [x] | Curso de Emprendimiento | `/curso-emprendimiento/` | diseno, cultura |
 | [x] | Curso de Empresa Familiar | `/curso-empresa-familiar/` | diseno, cultura |
-| [ ] | Curso de Estrategia Empresarial | `/curso-estrategia-empresarial/` | diseno, cultura |
+| [x] | Curso de Estrategia Empresarial | `/curso-estrategia-empresarial/` | diseno, cultura |
 | [x] | Curso de Marketing Digital 2025 | `/curso-marketing-digital/` | diseno, cultura |
 | [x] | Curso de Negociación Exitosa | `/curso-negociacion/` | diseno, cultura |
 | [x] | Curso de Optimización para IAs (GEO/AEO) | `/curso-optimizacion-ia/` | diseno, cultura |
-| [ ] | Editor EXIF | `/editor-exif/` | diseno, tecnicas |
-| [ ] | Generador de Avatares | `/generador-avatares/` | diseno |
-| [ ] | Generador de Carruseles | `/generador-carruseles/` | diseno |
+| [x] | Editor EXIF | `/editor-exif/` | diseno, tecnicas |
+| [x] | Generador de Avatares | `/generador-avatares/` | diseno |
+| [x] | Generador de Carruseles | `/generador-carruseles/` | diseno |
 | [ ] | Generador de Códigos de Barras | `/generador-codigos-barras/` | diseno, productividad |
 | [ ] | Generador de Códigos QR | `/generador-qr/` | diseno, productividad |
 | [ ] | Generador de Enlaces UTM | `/generador-utm/` | diseno |

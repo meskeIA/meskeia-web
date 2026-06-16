@@ -523,7 +523,7 @@ export default function EditorExifPage() {
       <canvas ref={canvasRef} style={{ display: 'none' }} />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🔍</span>
+        <span className={styles.heroIcon} aria-hidden="true">🔍</span>
         <h1 className={styles.title}>Editor de Metadatos EXIF</h1>
         <p className={styles.subtitle}>
           Descubre qué datos ocultos revelan tus fotos y protege tu privacidad
@@ -542,7 +542,7 @@ export default function EditorExifPage() {
             onDragLeave={() => setIsDragging(false)}
             onClick={() => fileInputRef.current?.click()}
           >
-            <span className={styles.dropIcon}>📷</span>
+            <span className={styles.dropIcon} aria-hidden="true">📷</span>
             <p className={styles.dropText}>Arrastra una foto aquí o haz clic para seleccionar</p>
             <span className={styles.dropHint}>Soporta JPEG, PNG, WebP • 100% offline, sin subir a servidores</span>
             <input
@@ -599,12 +599,12 @@ export default function EditorExifPage() {
             <div className={styles.metadataPanel}>
               {isAnalyzing ? (
                 <div className={styles.analyzing}>
-                  <span className={styles.spinner}>⏳</span>
+                  <span className={styles.spinner} aria-hidden="true">⏳</span>
                   <p>Analizando metadatos...</p>
                 </div>
               ) : parsedMetadata.length === 0 ? (
                 <div className={styles.noMetadata}>
-                  <span className={styles.noMetadataIcon}>✅</span>
+                  <span className={styles.noMetadataIcon} aria-hidden="true">✅</span>
                   <h3>¡Excelente!</h3>
                   <p>Esta imagen no contiene metadatos EXIF detectables o ya fueron eliminados.</p>
                 </div>
@@ -626,7 +626,7 @@ export default function EditorExifPage() {
                   {gpsCoords && (
                     <div className={styles.gpsSection}>
                       <div className={styles.gpsWarning}>
-                        <span className={styles.gpsWarningIcon}>⚠️</span>
+                        <span className={styles.gpsWarningIcon} aria-hidden="true">⚠️</span>
                         <div>
                           <strong>¡Ubicación detectada!</strong>
                           <p>Esta foto revela exactamente dónde fue tomada.</p>
@@ -640,7 +640,7 @@ export default function EditorExifPage() {
                         />
                       </div>
                       <p className={styles.gpsCoords}>
-                        📍 {gpsCoords.lat.toFixed(6)}, {gpsCoords.lng.toFixed(6)}
+                        <span aria-hidden="true">📍</span> {gpsCoords.lat.toFixed(6)}, {gpsCoords.lng.toFixed(6)}
                       </p>
                     </div>
                   )}
@@ -663,7 +663,7 @@ export default function EditorExifPage() {
                               onChange={() => toggleCategory(category.id)}
                               className={styles.categoryCheckbox}
                             />
-                            <span className={styles.categoryIcon}>{category.icon}</span>
+                            <span className={styles.categoryIcon} aria-hidden="true">{category.icon}</span>
                             <span>{category.name}</span>
                             <span className={styles.categoryCount}>({data.length})</span>
                           </div>
@@ -696,7 +696,9 @@ export default function EditorExifPage() {
                       disabled={isProcessing}
                       className={styles.btnPrimary}
                     >
-                      {isProcessing ? '⏳ Procesando...' : '🛡️ Descargar sin metadatos'}
+                      {isProcessing
+                        ? <><span aria-hidden="true">⏳</span> Procesando...</>
+                        : <><span aria-hidden="true">🛡️</span> Descargar sin metadatos</>}
                     </button>
                     <p className={styles.actionHint}>
                       Se creará una copia limpia de la imagen sin NINGÚN metadato EXIF
@@ -730,56 +732,56 @@ export default function EditorExifPage() {
               <tr>
                 <td><strong>GPS (coordenadas)</strong></td>
                 <td>Latitud, longitud, altitud exacta</td>
-                <td>🔴 Muy alto</td>
+                <td><span aria-hidden="true">🔴</span> Muy alto</td>
                 <td>Cualquiera que abra el archivo</td>
                 <td>Siempre antes de publicar</td>
               </tr>
               <tr>
                 <td><strong>Fecha y hora</strong></td>
                 <td>Cuándo se tomó la foto (y modificó)</td>
-                <td>🟠 Alto</td>
+                <td><span aria-hidden="true">🟠</span> Alto</td>
                 <td>Software de visualización, metabuscadores</td>
                 <td>Al compartir fotos personales</td>
               </tr>
               <tr>
                 <td><strong>Dispositivo (Make/Model)</strong></td>
                 <td>Marca, modelo, número de serie</td>
-                <td>🟡 Medio</td>
+                <td><span aria-hidden="true">🟡</span> Medio</td>
                 <td>Motores de búsqueda de imágenes</td>
                 <td>Fotos publicadas online</td>
               </tr>
               <tr>
                 <td><strong>Software</strong></td>
                 <td>App o cámara que tomó/editó la foto</td>
-                <td>🟡 Bajo-medio</td>
+                <td><span aria-hidden="true">🟡</span> Bajo-medio</td>
                 <td>Herramientas forenses digitales</td>
                 <td>Contextos de anonimato</td>
               </tr>
               <tr>
                 <td><strong>Autor / Copyright</strong></td>
                 <td>Nombre del fotógrafo, empresa, derechos</td>
-                <td>🟠 Variable</td>
+                <td><span aria-hidden="true">🟠</span> Variable</td>
                 <td>Adobe Bridge, Lightroom, buscadores</td>
                 <td>Si no quieres ser identificado</td>
               </tr>
               <tr>
                 <td><strong>Configuración cámara</strong></td>
                 <td>ISO, apertura, velocidad, flash, focal</td>
-                <td>🟢 Bajo</td>
+                <td><span aria-hidden="true">🟢</span> Bajo</td>
                 <td>Fotógrafos, editores, plataformas foto</td>
                 <td>Solo si hay info sensible implícita</td>
               </tr>
               <tr>
                 <td><strong>Miniatura (thumbnail)</strong></td>
                 <td>Previsualización incrustada en el archivo</td>
-                <td>🟠 Medio</td>
+                <td><span aria-hidden="true">🟠</span> Medio</td>
                 <td>Exploradores de archivos, apps de galería</td>
                 <td>Si la imagen original fue editada/recortada</td>
               </tr>
               <tr>
                 <td><strong>Datos XMP/IPTC</strong></td>
                 <td>Palabras clave, descripción, ciudad, país</td>
-                <td>🟡 Medio</td>
+                <td><span aria-hidden="true">🟡</span> Medio</td>
                 <td>Agencias de prensa, stock fotográfico</td>
                 <td>Al redistribuir fuera de su contexto</td>
               </tr>
@@ -790,27 +792,27 @@ export default function EditorExifPage() {
         {/* Escenarios de uso */}
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <h3>🛒 Venta de segunda mano</h3>
+            <h3><span aria-hidden="true">🛒</span> Venta de segunda mano</h3>
             <p>Al publicar fotos de artículos en Wallapop, eBay o Milanuncios, las imágenes tomadas en casa incluyen tus coordenadas GPS exactas. Elimina siempre el EXIF antes de subir fotos de ventas.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>📰 Periodismo y fuentes</h3>
+            <h3><span aria-hidden="true">📰</span> Periodismo y fuentes</h3>
             <p>Un periodista que comparte fotos con información sensible puede exponer la ubicación de una fuente confidencial. Eliminar metadatos GPS antes de publicar o enviar es una medida básica de seguridad.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>✊ Activismo y protestas</h3>
+            <h3><span aria-hidden="true">✊</span> Activismo y protestas</h3>
             <p>Fotos de manifestaciones o reuniones privadas con GPS activo pueden revelar la ubicación de participantes. Eliminar metadatos protege a los presentes y sus familias.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🏢 Empresa (protección de clientes)</h3>
+            <h3><span aria-hidden="true">🏢</span> Empresa (protección de clientes)</h3>
             <p>Al entregar fotografías de clientes o de instalaciones, los metadatos pueden revelar información de negocio sensible (ubicación de almacenes, identidad del cliente, horarios de trabajo).</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>⚖️ Documentación legal</h3>
+            <h3><span aria-hidden="true">⚖️</span> Documentación legal</h3>
             <p>En procesos legales, los metadatos EXIF (fecha, hora, GPS) pueden ser evidencia. Antes de compartir fotos en contextos legales, consulta con un abogado si debes preservarlos o eliminarlos.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>📸 Fotógrafo profesional</h3>
+            <h3><span aria-hidden="true">📸</span> Fotógrafo profesional</h3>
             <p>Elimina los metadatos de identificación personal antes de entregar fotos a clientes, pero considera conservar datos de copyright (autor, licencia) para proteger tu propiedad intelectual.</p>
           </div>
         </div>
@@ -907,34 +909,34 @@ export default function EditorExifPage() {
         {/* Mejores prácticas */}
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <h3>📵 Desactiva el GPS de la cámara</h3>
+            <h3><span aria-hidden="true">📵</span> Desactiva el GPS de la cámara</h3>
             <p>La solución preventiva más eficaz: en iOS ve a Ajustes → Privacidad → Localización → Cámara → Nunca. En Android varía por dispositivo, pero suele estar en la app de Cámara → Ajustes.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🔁 Captura de pantalla como método alternativo</h3>
+            <h3><span aria-hidden="true">🔁</span> Captura de pantalla como método alternativo</h3>
             <p>Hacer una captura de pantalla de la imagen crea un nuevo archivo sin metadatos EXIF del original. Es el método más rápido y universal para eliminar todos los datos de una foto.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>💾 Conserva siempre el original</h3>
+            <h3><span aria-hidden="true">💾</span> Conserva siempre el original</h3>
             <p>Nunca sobreescribas el original con la versión limpia. Guarda ambas: el original con EXIF para tu archivo personal y la copia limpia para compartir.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🔍 Revisa antes de publicar</h3>
+            <h3><span aria-hidden="true">🔍</span> Revisa antes de publicar</h3>
             <p>Haz una revisión rápida de metadatos antes de publicar cualquier foto en internet. Un solo campo GPS olvidado puede revelar información que no querías compartir.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>📋 Preserva el copyright si eres fotógrafo</h3>
+            <h3><span aria-hidden="true">📋</span> Preserva el copyright si eres fotógrafo</h3>
             <p>Si publicas fotos profesionales, los campos IPTC de copyright (autor, licencia, web) protegen tu propiedad intelectual. Considera eliminar GPS y datos personales, pero conservar el copyright.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🏢 Política de empresa</h3>
+            <h3><span aria-hidden="true">🏢</span> Política de empresa</h3>
             <p>Si manejas fotos de clientes o proyectos profesionales, establece una política clara: eliminar EXIF por defecto antes de enviar cualquier imagen fuera de la organización.</p>
           </div>
         </div>
 
         {/* Aviso importante */}
         <div className={styles.warningBox}>
-          <h3>⚠️ Eliminar EXIF no garantiza anonimato completo</h3>
+          <h3><span aria-hidden="true">⚠️</span> Eliminar EXIF no garantiza anonimato completo</h3>
           <ul className={styles.warningList}>
             <li>Las imágenes pueden ser identificadas por otros métodos: reconocimiento facial, análisis de píxeles (ELA), búsqueda inversa de imágenes (Google Lens, TinEye) o marcas de agua digitales.</li>
             <li>En contextos legales (procesos judiciales, litigios), eliminar metadatos podría interpretarse como destrucción de evidencia. Consulta con un abogado antes de actuar.</li>
@@ -952,22 +954,22 @@ export default function EditorExifPage() {
 
           <div className={styles.riskGrid}>
             <div className={styles.riskCard}>
-              <span className={styles.riskIcon}>📍</span>
+              <span className={styles.riskIcon} aria-hidden="true">📍</span>
               <h4>Tu ubicación exacta</h4>
               <p>Coordenadas GPS que muestran dónde vives, trabajas o vacacionas. Un extraño podría saber tu dirección.</p>
             </div>
             <div className={styles.riskCard}>
-              <span className={styles.riskIcon}>📅</span>
+              <span className={styles.riskIcon} aria-hidden="true">📅</span>
               <h4>Tus rutinas</h4>
               <p>Fecha y hora de cada foto revelan tus horarios: cuándo sales de casa, cuándo vuelves, tu agenda.</p>
             </div>
             <div className={styles.riskCard}>
-              <span className={styles.riskIcon}>📱</span>
+              <span className={styles.riskIcon} aria-hidden="true">📱</span>
               <h4>Tu dispositivo</h4>
               <p>Marca, modelo y número de serie pueden identificarte específicamente entre millones de usuarios.</p>
             </div>
             <div className={styles.riskCard}>
-              <span className={styles.riskIcon}>👤</span>
+              <span className={styles.riskIcon} aria-hidden="true">👤</span>
               <h4>Tu identidad</h4>
               <p>Nombre del fotógrafo, copyright y otros datos personales que hayas configurado.</p>
             </div>
@@ -978,19 +980,19 @@ export default function EditorExifPage() {
           <h2>¿Cuándo deberías eliminar los metadatos?</h2>
           <div className={styles.useCaseGrid}>
             <div className={styles.useCase}>
-              <strong>✅ Antes de publicar en redes sociales</strong>
+              <strong><span aria-hidden="true">✅</span> Antes de publicar en redes sociales</strong>
               <p>Facebook, Instagram y Twitter eliminan algunos metadatos, pero no todos. Mejor prevenir.</p>
             </div>
             <div className={styles.useCase}>
-              <strong>✅ Al vender productos online</strong>
+              <strong><span aria-hidden="true">✅</span> Al vender productos online</strong>
               <p>Las fotos de productos pueden revelar tu domicilio si no eliminas el GPS.</p>
             </div>
             <div className={styles.useCase}>
-              <strong>✅ Compartir con desconocidos</strong>
+              <strong><span aria-hidden="true">✅</span> Compartir con desconocidos</strong>
               <p>Enviar fotos por email, WhatsApp o foros mantiene todos los metadatos intactos.</p>
             </div>
             <div className={styles.useCase}>
-              <strong>✅ Periodismo y activismo</strong>
+              <strong><span aria-hidden="true">✅</span> Periodismo y activismo</strong>
               <p>Proteger fuentes y ubicaciones sensibles es crítico en contextos de riesgo.</p>
             </div>
           </div>

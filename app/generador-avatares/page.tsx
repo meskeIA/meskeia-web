@@ -556,7 +556,7 @@ export default function GeneradorAvataresPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>👤</span>
+        <span className={styles.heroIcon} aria-hidden="true">👤</span>
         <h1 className={styles.title}>Generador de Avatares</h1>
         <p className={styles.subtitle}>
           Crea avatares únicos y personalizados a partir de tu nombre. Sin subir fotos, 100% privado.
@@ -591,11 +591,13 @@ export default function GeneradorAvataresPage() {
               {avatarStyles.map((style) => (
                 <button
                   key={style.id}
+                  type="button"
                   onClick={() => setEstilo(style.id)}
                   className={`${styles.styleButton} ${estilo === style.id ? styles.styleButtonActive : ''}`}
                   title={style.description}
+                  aria-pressed={estilo === style.id}
                 >
-                  <span className={styles.styleIcon}>{style.icon}</span>
+                  <span className={styles.styleIcon} aria-hidden="true">{style.icon}</span>
                   <span className={styles.styleName}>{style.name}</span>
                 </button>
               ))}
@@ -608,8 +610,10 @@ export default function GeneradorAvataresPage() {
               {sizes.map((s) => (
                 <button
                   key={s}
+                  type="button"
                   onClick={() => setSize(s)}
                   className={`${styles.sizeButton} ${size === s ? styles.sizeButtonActive : ''}`}
+                  aria-pressed={size === s}
                 >
                   {s}px
                 </button>
@@ -660,14 +664,14 @@ export default function GeneradorAvataresPage() {
           </div>
 
           <div className={styles.actionButtons}>
-            <button onClick={downloadAvatar} className={styles.btnPrimary}>
-              📥 Descargar PNG
+            <button type="button" onClick={downloadAvatar} className={styles.btnPrimary}>
+              <span aria-hidden="true">📥</span> Descargar PNG
             </button>
-            <button onClick={copyToClipboard} className={styles.btnSecondary}>
-              📋 Copiar al portapapeles
+            <button type="button" onClick={copyToClipboard} className={styles.btnSecondary}>
+              <span aria-hidden="true">📋</span> Copiar al portapapeles
             </button>
-            <button onClick={generateAvatar} className={styles.btnSecondary}>
-              🔄 Regenerar
+            <button type="button" onClick={generateAvatar} className={styles.btnSecondary}>
+              <span aria-hidden="true">🔄</span> Regenerar
             </button>
           </div>
 
