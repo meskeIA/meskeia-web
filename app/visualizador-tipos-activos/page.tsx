@@ -413,7 +413,7 @@ export default function VisualizadorTiposActivosPage() {
 
         {/* Hero */}
         <header className={styles.hero}>
-          <h1 className={styles.titulo}>📊 Las 6 Clases de Activos</h1>
+          <h1 className={styles.titulo}><span aria-hidden="true">📊</span> Las 6 Clases de Activos</h1>
           <p className={styles.subtitulo}>
             Rentabilidad histórica, volatilidad, liquidez y correlación. Compara las grandes
             familias de inversión y descubre cómo combinarlas en una cartera equilibrada.
@@ -435,6 +435,7 @@ export default function VisualizadorTiposActivosPage() {
             {TABS.map((nombre, idx) => (
               <button
                 key={nombre}
+                type="button"
                 role="tab"
                 aria-selected={tabActivo === idx}
                 className={`${styles.tabBtn} ${tabActivo === idx ? styles.tabBtnActivo : ''}`}
@@ -452,6 +453,7 @@ export default function VisualizadorTiposActivosPage() {
                 {CLASES_ACTIVOS.map((clase) => (
                   <button
                     key={clase.id}
+                    type="button"
                     className={styles.tarjetaClase}
                     style={{ borderLeftColor: clase.color }}
                     onClick={() => seleccionarClase(clase.id)}
@@ -608,7 +610,7 @@ export default function VisualizadorTiposActivosPage() {
                   {/* Ventajas y riesgos */}
                   <div className={styles.vrGrid}>
                     <div className={styles.ventajasSec}>
-                      <h3 className={styles.subsecTitulo}>✅ Ventajas</h3>
+                      <h3 className={styles.subsecTitulo}><span aria-hidden="true">✅</span> Ventajas</h3>
                       <ul className={styles.vrList}>
                         {activo.ventajas.map((v) => (
                           <li key={v} className={styles.vrItem}>{v}</li>
@@ -616,7 +618,7 @@ export default function VisualizadorTiposActivosPage() {
                       </ul>
                     </div>
                     <div className={styles.riesgosSec}>
-                      <h3 className={styles.subsecTitulo}>⚠️ Riesgos</h3>
+                      <h3 className={styles.subsecTitulo}><span aria-hidden="true">⚠️</span> Riesgos</h3>
                       <ul className={styles.vrList}>
                         {activo.riesgos.map((r) => (
                           <li key={r} className={styles.vrItem}>{r}</li>
@@ -628,6 +630,7 @@ export default function VisualizadorTiposActivosPage() {
                   {/* Navegación anterior / siguiente */}
                   <div className={styles.navActivos}>
                     <button
+                      type="button"
                       className={styles.navBtn}
                       onClick={irAnterior}
                       disabled={activoIdx <= 0}
@@ -639,6 +642,7 @@ export default function VisualizadorTiposActivosPage() {
                       {activoIdx + 1} / {CLASES_ACTIVOS.length}
                     </span>
                     <button
+                      type="button"
                       className={styles.navBtn}
                       onClick={irSiguiente}
                       disabled={activoIdx >= CLASES_ACTIVOS.length - 1}
@@ -784,7 +788,7 @@ export default function VisualizadorTiposActivosPage() {
                               aria-hidden="true"
                             />
                             <span>
-                              {actClase.emoji} {actClase.nombre}: {seg.porcentaje}%
+                              <span aria-hidden="true">{actClase.emoji}</span> {actClase.nombre}: {seg.porcentaje}%
                             </span>
                           </div>
                         ) : null;

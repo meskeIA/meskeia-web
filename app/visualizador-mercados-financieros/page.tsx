@@ -317,6 +317,7 @@ export default function VisualizadorMercadosFinancieros() {
         ).map(({ id, label, icono }) => (
           <button
             key={id}
+            type="button"
             className={`${styles.tabBtn} ${seccionActiva === id ? styles.tabBtnActivo : ''}`}
             onClick={() => setSeccionActiva(id)}
             aria-pressed={seccionActiva === id}
@@ -406,7 +407,7 @@ export default function VisualizadorMercadosFinancieros() {
             {/* Columna Bid */}
             <div className={styles.orderBookCol}>
               <h3 className={styles.orderBookTitulo} style={{ color: 'var(--color-bid)' }}>
-                📗 Órdenes de Compra (Bid)
+                <span aria-hidden="true">📗</span> Órdenes de Compra (Bid)
               </h3>
               <div className={styles.orderBookHeader}>
                 <span>Precio (€)</span>
@@ -430,7 +431,7 @@ export default function VisualizadorMercadosFinancieros() {
             {/* Columna Ask */}
             <div className={styles.orderBookCol}>
               <h3 className={styles.orderBookTitulo} style={{ color: 'var(--color-ask)' }}>
-                📕 Órdenes de Venta (Ask)
+                <span aria-hidden="true">📕</span> Órdenes de Venta (Ask)
               </h3>
               <div className={styles.orderBookHeader}>
                 <span>Precio (€)</span>
@@ -459,19 +460,19 @@ export default function VisualizadorMercadosFinancieros() {
           )}
 
           <div className={styles.botonesOrderBook}>
-            <button className={styles.btnCompra} onClick={handleAnadirCompra}>
+            <button type="button" className={styles.btnCompra} onClick={handleAnadirCompra}>
               + Añadir orden de compra
             </button>
-            <button className={styles.btnVenta} onClick={handleAnadirVenta}>
+            <button type="button" className={styles.btnVenta} onClick={handleAnadirVenta}>
               + Añadir orden de venta
             </button>
-            <button className={styles.btnReset} onClick={resetOrderBook}>
+            <button type="button" className={styles.btnReset} onClick={resetOrderBook}>
               ↺ Reiniciar
             </button>
           </div>
 
           <div className={styles.warningBox}>
-            <strong>⚠️ Simulación educativa</strong> — Los precios y cantidades son ficticios. En los mercados reales el libro de órdenes se actualiza miles de veces por segundo.
+            <strong><span aria-hidden="true">⚠️</span> Simulación educativa</strong> — Los precios y cantidades son ficticios. En los mercados reales el libro de órdenes se actualiza miles de veces por segundo.
           </div>
         </section>
       )}
@@ -488,6 +489,7 @@ export default function VisualizadorMercadosFinancieros() {
             {INDICES.map((indice) => (
               <button
                 key={indice.id}
+                type="button"
                 className={`${styles.indiceTab} ${indiceSeleccionado === indice.id ? styles.indiceTabActivo : ''}`}
                 onClick={() => setIndiceSeleccionado(indice.id)}
                 role="tab"
@@ -509,11 +511,11 @@ export default function VisualizadorMercadosFinancieros() {
               </div>
               <div className={styles.indiceGrid}>
                 <div className={styles.indiceBloque}>
-                  <h4>📋 Criterio de inclusión</h4>
+                  <h4><span aria-hidden="true">📋</span> Criterio de inclusión</h4>
                   <p>{indiceActual.criterio}</p>
                 </div>
                 <div className={styles.indiceBloque}>
-                  <h4>🏢 Ejemplos de empresas</h4>
+                  <h4><span aria-hidden="true">🏢</span> Ejemplos de empresas</h4>
                   <ul className={styles.listaEmpresas}>
                     {indiceActual.ejemploEmpresas.map((emp) => (
                       <li key={emp}>{emp}</li>
@@ -521,7 +523,7 @@ export default function VisualizadorMercadosFinancieros() {
                   </ul>
                 </div>
                 <div className={`${styles.indiceBloque} ${styles.indiceCurioso}`}>
-                  <h4>💡 Dato curioso</h4>
+                  <h4><span aria-hidden="true">💡</span> Dato curioso</h4>
                   <p>{indiceActual.curioso}</p>
                 </div>
               </div>
@@ -561,7 +563,7 @@ export default function VisualizadorMercadosFinancieros() {
           </div>
 
           <div className={styles.participantesNota}>
-            <strong>📌 Nota:</strong> Los porcentajes de volumen son aproximados y varían según el mercado, el instrumento y las condiciones del día. En picos de volatilidad, el HFT puede superar el 50% del volumen intradiario.
+            <strong><span aria-hidden="true">📌</span> Nota:</strong> Los porcentajes de volumen son aproximados y varían según el mercado, el instrumento y las condiciones del día. En picos de volatilidad, el HFT puede superar el 50% del volumen intradiario.
           </div>
         </section>
       )}
@@ -700,7 +702,7 @@ export default function VisualizadorMercadosFinancieros() {
             </div>
           ))}
           <p className={styles.faqTip}>
-            💡 <strong>Consejo:</strong> La mejor forma de entender los mercados es usar el simulador de libro de órdenes de esta herramienta: añade órdenes y observa cómo se forma el precio en tiempo real.
+            <span aria-hidden="true">💡</span> <strong>Consejo:</strong> La mejor forma de entender los mercados es usar el simulador de libro de órdenes de esta herramienta: añade órdenes y observa cómo se forma el precio en tiempo real.
           </p>
         </div>
 

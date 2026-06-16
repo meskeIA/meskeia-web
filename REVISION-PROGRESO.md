@@ -662,10 +662,10 @@
 | [x] | Fondo de Inversión: Por Dentro | `/visualizador-fondo-inversion/` | finanzas |
 | [x] | Guía Reclamar Seguro Coche | `/guia-reclamar-seguro-coche/` | finanzas, cultura |
 | [x] | Inflación: Por Qué Suben los Precios | `/visualizador-inflacion/` | finanzas, cultura, estudiantes |
-| [ ] | Juego de Presupuesto Mensual | `/juego-presupuesto-mensual/` | finanzas, estudiantes, juegos |
-| [ ] | Las 6 Clases de Activos — Rentabilidad, Riesgo y Correlación | `/visualizador-tipos-activos/` | finanzas, estudiantes, cultura |
-| [ ] | Mercados Financieros - Bolsa, Órdenes y Activos | `/visualizador-mercados-financieros/` | finanzas, cultura |
-| [ ] | Orientador Regla 50/30/20 | `/orientador-regla-50-30-20/` | finanzas |
+| [x] | Juego de Presupuesto Mensual | `/juego-presupuesto-mensual/` | finanzas, estudiantes, juegos |
+| [x] | Las 6 Clases de Activos — Rentabilidad, Riesgo y Correlación | `/visualizador-tipos-activos/` | finanzas, estudiantes, cultura |
+| [x] | Mercados Financieros - Bolsa, Órdenes y Activos | `/visualizador-mercados-financieros/` | finanzas, cultura |
+| [x] | Orientador Regla 50/30/20 | `/orientador-regla-50-30-20/` | finanzas |
 | [ ] | Orientador Seguro de Vida | `/orientador-seguro-vida/` | finanzas, legal-fiscal |
 | [ ] | Quiz Conceptos de Inversión — Sharpe, Beta, Duration y TER | `/quiz-conceptos-inversion/` | finanzas, estudiantes |
 | [ ] | Seguros y Riesgo: Prima Actuarial, Pool de Riesgo y Mutualización | `/visualizador-seguros-riesgo/` | finanzas, cultura |

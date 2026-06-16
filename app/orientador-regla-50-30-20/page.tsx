@@ -136,7 +136,7 @@ export default function CalculadoraRegla503020Page() {
           />
 
           <div className={styles.categoriaHeader}>
-            <span className={styles.categoriaIcon}>🏠</span>
+            <span className={styles.categoriaIcon} aria-hidden="true">🏠</span>
             <span>Necesidades (50%)</span>
           </div>
           <NumberInput
@@ -149,7 +149,7 @@ export default function CalculadoraRegla503020Page() {
           />
 
           <div className={styles.categoriaHeader}>
-            <span className={styles.categoriaIcon}>🎉</span>
+            <span className={styles.categoriaIcon} aria-hidden="true">🎉</span>
             <span>Deseos (30%)</span>
           </div>
           <NumberInput
@@ -162,7 +162,7 @@ export default function CalculadoraRegla503020Page() {
           />
 
           <div className={styles.categoriaHeader}>
-            <span className={styles.categoriaIcon}>💰</span>
+            <span className={styles.categoriaIcon} aria-hidden="true">💰</span>
             <span>Ahorro (20%)</span>
           </div>
           <NumberInput
@@ -174,7 +174,7 @@ export default function CalculadoraRegla503020Page() {
             min={0}
           />
 
-          <button onClick={calcularDistribucion} className={styles.btnPrimary}>
+          <button type="button" onClick={calcularDistribucion} className={styles.btnPrimary}>
             Analizar mi presupuesto
           </button>
         </div>
@@ -364,7 +364,7 @@ export default function CalculadoraRegla503020Page() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏙️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏙️</span>
                 <strong>Mileurista en Madrid</strong>
               </div>
               <p className={styles.escenarioExample}>Con 1.000 € netos, el alquiler mínimo ya supera el 50%. Necesita adaptar la regla: 70% necesidades, 15% deseos, 15% ahorro como objetivo realista.</p>
@@ -372,7 +372,7 @@ export default function CalculadoraRegla503020Page() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💑</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💑</span>
                 <strong>Pareja con hipoteca compartida</strong>
               </div>
               <p className={styles.escenarioExample}>Ingresos combinados de 4.000 €. La hipoteca compartida reduce el % de necesidades. Pueden aspirar a la distribución estándar o incluso 40/30/30.</p>
@@ -380,7 +380,7 @@ export default function CalculadoraRegla503020Page() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎓</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
                 <strong>Joven sin cargas (25-30 años)</strong>
               </div>
               <p className={styles.escenarioExample}>Viviendo en casa familiar o con compañeros, los gastos fijos son menores. Si te interesa adelantarte en ahorro o inversión, es un momento favorable; si prefieres priorizar otras experiencias en esta etapa, también es una decisión legítima.</p>
@@ -388,7 +388,7 @@ export default function CalculadoraRegla503020Page() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👨‍👩‍👧‍👦</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👨‍👩‍👧‍👦</span>
                 <strong>Familia con hijos en edad escolar</strong>
               </div>
               <p className={styles.escenarioExample}>Colegio, actividades extraescolares y gastos médicos aumentan las &quot;necesidades&quot;. El 50% puede quedarse corto. Reclasificar educación como necesidad prioritaria.</p>
@@ -396,7 +396,7 @@ export default function CalculadoraRegla503020Page() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💼</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💼</span>
                 <strong>Autónomo con ingresos variables</strong>
               </div>
               <p className={styles.escenarioExample}>Aplicar la regla sobre el ingreso mínimo garantizado (peor mes). Los meses buenos, todo el exceso va a ahorro/fondo de emergencia.</p>
@@ -404,7 +404,7 @@ export default function CalculadoraRegla503020Page() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🧓</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🧓</span>
                 <strong>Jubilado con pensión</strong>
               </div>
               <p className={styles.escenarioExample}>Hipoteca pagada, hijos independientes. Necesidades reducidas al 30-35%. Mayor margen para deseos (viajes, cultura) y menos necesidad de ahorro agresivo.</p>
@@ -513,32 +513,32 @@ export default function CalculadoraRegla503020Page() {
           <h2>Tips para aplicar la regla 50/30/20 con éxito</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <strong>Empieza por el 20% de ahorro</strong>
               <p>Automatiza el ahorro antes de distribuir el resto. Lo que no ves, no lo gastas.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📱</span>
+              <span className={styles.tipIcon} aria-hidden="true">📱</span>
               <strong>Usa una app de seguimiento</strong>
               <p>Fintonic, Money Manager o una hoja de cálculo. Lo que se mide, se puede mejorar.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔍</span>
               <strong>Revisa tus suscripciones cada trimestre</strong>
               <p>Las suscripciones olvidadas son la mayor fuga de la categoría &quot;deseos&quot;. Audítalas.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📈</span>
+              <span className={styles.tipIcon} aria-hidden="true">📈</span>
               <strong>Aumenta el % de ahorro con cada subida</strong>
               <p>Cuando consigas un aumento, destina la mitad del incremento a ahorro antes de acostumbrarte a gastar más.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏆</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏆</span>
               <strong>Celebra los hitos</strong>
               <p>Llegar al primer mes con el 20% ahorrado merece reconocimiento. Usa la categoría &quot;deseos&quot; para celebrar el progreso.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <strong>Adapta la regla, no la abandones</strong>
               <p>Si un mes no puedes cumplirla, analiza por qué. Un gasto extraordinario no es un fracaso, es información.</p>
             </div>
@@ -548,7 +548,7 @@ export default function CalculadoraRegla503020Page() {
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores comunes al aplicar la regla 50/30/20</strong>
           </div>
           <ul className={styles.warningList}>

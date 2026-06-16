@@ -276,7 +276,7 @@ export default function JuegoPresupuestoMensualPage() {
                       </p>
                     </div>
                   </div>
-                  <p className={styles.decisionLeccion}>💡 {d.leccion}</p>
+                  <p className={styles.decisionLeccion}><span aria-hidden="true">💡</span> {d.leccion}</p>
                 </div>
               ))}
             </div>
