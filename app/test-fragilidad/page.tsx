@@ -312,7 +312,7 @@ export default function TestFragilidad() {
       <div className={styles.escenariosGrid}>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>🚶</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">🚶</span>
             <strong>Persona mayor activa (no frágil)</strong>
           </div>
           <p>72 años, camina 30 min diarios, sin limitaciones funcionales, bien nutrida. La prevención es la estrategia: mantener hábitos y vigilancia periódica.</p>
@@ -321,7 +321,7 @@ export default function TestFragilidad() {
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>⚠️</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">⚠️</span>
             <strong>Persona pre-frágil (1-2 puntos)</strong>
           </div>
           <p>75 años, refiere cansancio frecuente y ha bajado 4 kg en el último año. Pre-fragilidad: estado reversible con intervención adecuada. Ventana de oportunidad.</p>
@@ -330,7 +330,7 @@ export default function TestFragilidad() {
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>🏥</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">🏥</span>
             <strong>Persona frágil (3+ puntos)</strong>
           </div>
           <p>80 años, múltiples caídas, pérdida de fuerza muscular significativa, cansancio severo. Necesita valoración geriátrica integral y plan de cuidados multidisciplinar.</p>
@@ -339,7 +339,7 @@ export default function TestFragilidad() {
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>🔄</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">🔄</span>
             <strong>Tras una hospitalización o enfermedad aguda</strong>
           </div>
           <p>Una hospitalización puede precipitar fragilidad en una persona que antes era robusta. El test post-hospitalización orienta la recuperación funcional necesaria.</p>
@@ -436,32 +436,32 @@ export default function TestFragilidad() {
       {/* 5. Mejores Prácticas */}
       <div className={styles.tipsGrid}>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>🏋️</div>
+          <div className={styles.tipIcon} aria-hidden="true">🏋️</div>
           <strong>Prioriza el ejercicio de fuerza</strong>
           <p>Las personas mayores necesitan especialmente ejercicio de resistencia (pesas, bandas elásticas). El músculo se recupera a cualquier edad con el estímulo adecuado.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>🥩</div>
+          <div className={styles.tipIcon} aria-hidden="true">🥩</div>
           <strong>Aumenta la ingesta proteica</strong>
           <p>La proteína es esencial para mantener el músculo. Objetivo: 1,2-1,5 g/kg de peso/día. Distribuir en las tres comidas principales, no solo en la cena.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>👥</div>
+          <div className={styles.tipIcon} aria-hidden="true">👥</div>
           <strong>Mantén la red social activa</strong>
           <p>El aislamiento social acelera la fragilidad. Actividades en grupo, voluntariado, clubes de mayores o clases colectivas son tan importantes como el ejercicio.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>💊</div>
+          <div className={styles.tipIcon} aria-hidden="true">💊</div>
           <strong>Revisa la polifarmacia regularmente</strong>
           <p>Llevar una lista actualizada de todos los medicamentos al médico permite detectar interacciones y fármacos que ya no son necesarios o que perjudican.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>😴</div>
+          <div className={styles.tipIcon} aria-hidden="true">😴</div>
           <strong>Cuida el sueño y el bienestar emocional</strong>
           <p>Los trastornos del sueño y la depresión se asocian fuertemente con la fragilidad. Tratarlos mejora la energía, la movilidad y el apetito simultáneamente.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>🎯</div>
+          <div className={styles.tipIcon} aria-hidden="true">🎯</div>
           <strong>Actúa en pre-fragilidad, no en fragilidad</strong>
           <p>La pre-fragilidad es la ventana de mayor oportunidad. En este estadio, las intervenciones tienen más probabilidad de revertir el proceso que cuando la fragilidad ya está establecida.</p>
         </div>
@@ -470,7 +470,7 @@ export default function TestFragilidad() {
       {/* 6. Warning Box */}
       <div className={styles.warningBox}>
         <div className={styles.warningHeader}>
-          <span className={styles.warningIcon}>⚠️</span>
+          <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
           <strong>Errores frecuentes ante la fragilidad</strong>
         </div>
         <ul className={styles.warningList}>

@@ -298,7 +298,7 @@ export default function TestBurnoutLaboralPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.heroTitle}>🔥 Test de Burnout Laboral</h1>
+        <h1 className={styles.heroTitle}><span aria-hidden="true">🔥</span> Test de Burnout Laboral</h1>
         <p className={styles.heroSubtitle}>
           Evaluación orientativa del síndrome de desgaste profesional · 15 preguntas · 3 dimensiones
         </p>
@@ -329,6 +329,7 @@ export default function TestBurnoutLaboralPage() {
             {PREGUNTAS.map((p, idx) => (
               <button
                 key={p.id}
+                type="button"
                 className={[
                   styles.mapaBurbuja,
                   respuestas[p.id] !== undefined ? styles.mapaBurbujaRespondida : '',
@@ -339,6 +340,7 @@ export default function TestBurnoutLaboralPage() {
                 onClick={() => setPreguntaActual(idx)}
                 aria-label={`Ir a pregunta ${idx + 1}`}
                 aria-current={idx === preguntaActual ? 'true' : undefined}
+                aria-pressed={idx === preguntaActual}
               >
                 {idx + 1}
               </button>
@@ -348,9 +350,9 @@ export default function TestBurnoutLaboralPage() {
           {/* PREGUNTA ACTUAL */}
           <div className={styles.tarjetaPregunta}>
             <div className={styles.dimensionBadge}>
-              {pregunta.dimension === 'agotamiento' && '💫 Agotamiento emocional'}
-              {pregunta.dimension === 'cinismo' && '🧊 Cinismo / Despersonalización'}
-              {pregunta.dimension === 'realizacion' && '⭐ Realización personal'}
+              {pregunta.dimension === 'agotamiento' && <><span aria-hidden="true">💫</span> Agotamiento emocional</>}
+              {pregunta.dimension === 'cinismo' && <><span aria-hidden="true">🧊</span> Cinismo / Despersonalización</>}
+              {pregunta.dimension === 'realizacion' && <><span aria-hidden="true">⭐</span> Realización personal</>}
             </div>
             <p className={styles.textoPregunta}>{pregunta.texto}</p>
 
@@ -358,6 +360,7 @@ export default function TestBurnoutLaboralPage() {
               {OPCIONES.map(opcion => (
                 <button
                   key={opcion.valor}
+                  type="button"
                   className={[
                     styles.opcionBtn,
                     respuestas[pregunta.id] === opcion.valor ? styles.opcionSeleccionada : '',
@@ -377,6 +380,7 @@ export default function TestBurnoutLaboralPage() {
           {/* CONTROLES DE NAVEGACIÓN */}
           <div className={styles.navegacionBtns}>
             <button
+              type="button"
               className={styles.btnSecundario}
               onClick={() => setPreguntaActual(prev => Math.max(0, prev - 1))}
               disabled={preguntaActual === 0}
@@ -385,6 +389,7 @@ export default function TestBurnoutLaboralPage() {
             </button>
             {preguntaActual < totalPreguntas - 1 ? (
               <button
+                type="button"
                 className={styles.btnPrimario}
                 onClick={() => setPreguntaActual(prev => prev + 1)}
               >
@@ -392,6 +397,7 @@ export default function TestBurnoutLaboralPage() {
               </button>
             ) : (
               <button
+                type="button"
                 className={styles.btnCalcular}
                 onClick={calcularResultados}
                 disabled={respondidas < totalPreguntas}
@@ -415,7 +421,7 @@ export default function TestBurnoutLaboralPage() {
       {/* RESULTADOS */}
       {mostrarResultados && (
         <section id="resultados" className={styles.resultadosSection}>
-          <h2 className={styles.resultadosTitulo}>📊 Tus Resultados</h2>
+          <h2 className={styles.resultadosTitulo}><span aria-hidden="true">📊</span> Tus Resultados</h2>
           <p className={styles.resultadosSubtitulo}>
             Recuerda: esta evaluación es <strong>orientativa</strong>. Solo un profesional de salud mental
             puede realizar un diagnóstico.
@@ -424,7 +430,7 @@ export default function TestBurnoutLaboralPage() {
           {/* NIVEL GENERAL */}
           <div className={[styles.tarjetaGeneral, nivelGeneral.clase].join(' ')}>
             <div className={styles.generalHeader}>
-              <span className={styles.generalIcono}>
+              <span className={styles.generalIcono} aria-hidden="true">
                 {nivelGeneral.nivel === 'Sin indicadores significativos' ? '✅' : nivelGeneral.nivel === 'Riesgo moderado' ? '⚠️' : '🚨'}
               </span>
               <div>
@@ -501,8 +507,8 @@ export default function TestBurnoutLaboralPage() {
             </div>
           </div>
 
-          <button className={styles.btnReiniciar} onClick={reiniciar}>
-            🔄 Repetir el test
+          <button type="button" className={styles.btnReiniciar} onClick={reiniciar}>
+            <span aria-hidden="true">🔄</span> Repetir el test
           </button>
         </section>
       )}
@@ -528,21 +534,21 @@ export default function TestBurnoutLaboralPage() {
           <h2>Las 3 dimensiones del burnout</h2>
           <div className={styles.dimensionesList}>
             <div className={styles.dimensionItem}>
-              <h3>💫 Agotamiento emocional</h3>
+              <h3><span aria-hidden="true">💫</span> Agotamiento emocional</h3>
               <p>
                 Sensación de estar al límite de las propias fuerzas, de haber consumido todos los recursos
                 emocionales. La persona siente que no puede dar más de sí misma.
               </p>
             </div>
             <div className={styles.dimensionItem}>
-              <h3>🧊 Cinismo / Despersonalización</h3>
+              <h3><span aria-hidden="true">🧊</span> Cinismo / Despersonalización</h3>
               <p>
                 Actitudes negativas, distantes o frías hacia las personas del entorno laboral (clientes,
                 compañeros, superiores). Pérdida de implicación y entusiasmo por el trabajo.
               </p>
             </div>
             <div className={styles.dimensionItem}>
-              <h3>⭐ Reducción de la realización personal</h3>
+              <h3><span aria-hidden="true">⭐</span> Reducción de la realización personal</h3>
               <p>
                 Sentimiento de incompetencia, ineficacia y pérdida de confianza en uno mismo. La persona siente
                 que su trabajo no tiene valor ni impacto positivo.
@@ -735,7 +741,7 @@ export default function TestBurnoutLaboralPage() {
 
         {/* CONSEJOS DE BIENESTAR */}
         <section className={styles.consejosSection}>
-          <h2>💡 Estrategias de prevención del burnout</h2>
+          <h2><span aria-hidden="true">💡</span> Estrategias de prevención del burnout</h2>
           <div className={styles.consejosGrid}>
             <div className={styles.consejoCard}>
               <span aria-hidden="true">⏰</span>
@@ -777,7 +783,7 @@ export default function TestBurnoutLaboralPage() {
 
         {/* CAJA DE ADVERTENCIA — indicador v2.0 */}
         <div className={styles.warningBox}>
-          <strong>⚠️ Recuerda:</strong> Este test no es un instrumento diagnóstico clínico. Si te
+          <strong><span aria-hidden="true">⚠️</span> Recuerda:</strong> Este test no es un instrumento diagnóstico clínico. Si te
           preocupan tus resultados o llevas tiempo sintiéndote desbordado/a por el trabajo, busca apoyo
           de un profesional de salud mental. <strong>Pedir ayuda es un acto de valentía, no de debilidad.</strong>
         </div>

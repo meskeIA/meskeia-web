@@ -1072,10 +1072,10 @@
 | [x] | Serotonina: Mucho Más que la Hormona de la Felicidad | `/visualizador-serotonina/` | salud, cultura, estudiantes |
 | [x] | Telomerasa - La Enzima de la Inmortalidad Celular | `/visualizador-telomerasa/` | salud, cultura, estudiantes |
 | [x] | Test de Bienestar WHO-5 | `/test-bienestar-who5/` | salud |
-| [ ] | Test de Burnout Laboral | `/test-burnout-laboral/` | salud, productividad |
-| [ ] | Test de Estilo Parental | `/test-estilo-parental/` | salud |
-| [ ] | Test de Fragilidad (Escala FRAIL) | `/test-fragilidad/` | salud, legal-fiscal |
-| [ ] | Test de Hábitos Saludables | `/test-habitos-saludables/` | salud |
+| [x] | Test de Burnout Laboral | `/test-burnout-laboral/` | salud, productividad |
+| [x] | Test de Estilo Parental | `/test-estilo-parental/` | salud |
+| [x] | Test de Fragilidad (Escala FRAIL) | `/test-fragilidad/` | salud, legal-fiscal |
+| [x] | Test de Hábitos Saludables | `/test-habitos-saludables/` | salud |
 | [ ] | Test de Zarit — Sobrecarga del Cuidador | `/test-zarit-cuidador/` | salud |
 | [ ] | Testosterona - La Hormona del Rendimiento | `/visualizador-testosterona/` | salud, cultura, estudiantes |
 | [ ] | Tiroides - La Glándula que Regula tu Metabolismo | `/visualizador-tiroides/` | salud, cultura, estudiantes |

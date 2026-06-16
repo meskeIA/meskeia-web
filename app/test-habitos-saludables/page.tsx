@@ -430,7 +430,7 @@ export default function TestHabitosPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🌟 Test de Hábitos Saludables</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🌟</span> Test de Hábitos Saludables</h1>
         <p className={styles.subtitle}>
           Evalúa tus hábitos de vida y descubre áreas de mejora para tu bienestar
         </p>
@@ -462,12 +462,13 @@ export default function TestHabitosPage() {
             </div>
 
             <div className={styles.introInfo}>
-              <p>📝 <strong>21 preguntas</strong> en total (3 por área)</p>
-              <p>⏱️ <strong>5-7 minutos</strong> aproximadamente</p>
-              <p>🔒 <strong>Sin registro</strong> - tus datos no se guardan</p>
+              <p><span aria-hidden="true">📝</span> <strong>21 preguntas</strong> en total (3 por área)</p>
+              <p><span aria-hidden="true">⏱️</span> <strong>5-7 minutos</strong> aproximadamente</p>
+              <p><span aria-hidden="true">🔒</span> <strong>Sin registro</strong> - tus datos no se guardan</p>
             </div>
 
             <button
+              type="button"
               className={styles.btnStart}
               onClick={() => setCurrentStep('test')}
             >
@@ -521,10 +522,12 @@ export default function TestHabitosPage() {
                   {question.options.map((option, oIndex) => (
                     <button
                       key={oIndex}
+                      type="button"
                       className={`${styles.optionBtn} ${
                         answers[question.id] === option.score ? styles.optionSelected : ''
                       }`}
                       onClick={() => handleAnswer(question.id, option.score)}
+                      aria-pressed={answers[question.id] === option.score}
                       style={{
                         '--option-color': currentCategory.color,
                       } as React.CSSProperties}
@@ -540,6 +543,7 @@ export default function TestHabitosPage() {
           {/* Navigation */}
           <div className={styles.navigation}>
             <button
+              type="button"
               className={styles.btnNav}
               onClick={prevCategory}
               disabled={currentCategoryIndex === 0}
@@ -547,6 +551,7 @@ export default function TestHabitosPage() {
               ← Anterior
             </button>
             <button
+              type="button"
               className={styles.btnPrimary}
               onClick={nextCategory}
               disabled={!canProceed()}
@@ -576,7 +581,7 @@ export default function TestHabitosPage() {
             </p>
           </div>
 
-          <h2 className={styles.resultsTitle}>📊 Tu Perfil de Hábitos</h2>
+          <h2 className={styles.resultsTitle}><span aria-hidden="true">📊</span> Tu Perfil de Hábitos</h2>
 
           <div className={styles.resultsGrid}>
             {results.map(result => (
@@ -609,8 +614,8 @@ export default function TestHabitosPage() {
           </div>
 
           <div className={styles.resultsActions}>
-            <button className={styles.btnSecondary} onClick={resetTest}>
-              🔄 Repetir Test
+            <button type="button" className={styles.btnSecondary} onClick={resetTest}>
+              <span aria-hidden="true">🔄</span> Repetir Test
             </button>
           </div>
         </div>
@@ -781,7 +786,7 @@ export default function TestHabitosPage() {
 
         {/* Warning */}
         <div className={styles.warningBox}>
-          <span className={styles.warningIcono}>⚠️</span>
+          <span className={styles.warningIcono} aria-hidden="true">⚠️</span>
           <div>
             <strong>Importante sobre este test</strong>
             <ul>

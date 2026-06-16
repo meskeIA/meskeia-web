@@ -198,7 +198,7 @@ export default function TestEstiloParentalPage(): React.JSX.Element {
 
             {/* Tarjeta del estilo */}
             <div className={styles.styleCard}>
-              <h3>{estiloData.icono} {estiloData.nombre}</h3>
+              <h3><span aria-hidden="true">{estiloData.icono}</span> {estiloData.nombre}</h3>
               <p>{estiloData.descripcion}</p>
 
               <h4 className={styles.characteristicsTitle}>Características</h4>
@@ -300,7 +300,7 @@ export default function TestEstiloParentalPage(): React.JSX.Element {
             <div className={styles.contentGrid}>
               {ESTILOS_PARENTALES.map((estilo) => (
                 <div key={estilo.id} className={styles.contentCard}>
-                  <h4>{estilo.icono} {estilo.nombre}</h4>
+                  <h4><span aria-hidden="true">{estilo.icono}</span> {estilo.nombre}</h4>
                   <p>
                     <strong>Control:</strong> {estilo.control === 'alto' ? 'Alto' : 'Bajo'} |{' '}
                     <strong>Afecto:</strong> {estilo.afecto === 'alto' ? 'Alto' : 'Bajo'}
