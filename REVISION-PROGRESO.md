@@ -281,10 +281,10 @@
 | [x] | La Evolución de la Escritura | `/visualizador-historia-escritura/` | cultura, estudiantes |
 | [x] | La Evolución del Dinero | `/visualizador-historia-dinero/` | cultura, finanzas |
 | [x] | La Guerra Fría: De Yalta a la Caída del Muro (1945-1989) | `/visualizador-historia/historia-guerra-fria/` | cultura, tecnicas |
-| [ ] | La Ilustración: De Newton a la Revolución Francesa | `/visualizador-historia/ilustracion/` | cultura |
-| [ ] | La Inflamación — Aliada y Enemiga del Cuerpo | `/visualizador-inflamacion/` | cultura, estudiantes, salud |
-| [ ] | La Primera Guerra Mundial: De Sarajevo al Tratado de Versalles | `/visualizador-historia/primera-guerra-mundial/` | cultura |
-| [ ] | La Reforma Protestante: De Lutero a la Paz de Westfalia | `/visualizador-historia/la-reforma/` | cultura |
+| [x] | La Ilustración: De Newton a la Revolución Francesa | `/visualizador-historia/ilustracion/` | cultura |
+| [x] | La Inflamación — Aliada y Enemiga del Cuerpo | `/visualizador-inflamacion/` | cultura, estudiantes, salud |
+| [x] | La Primera Guerra Mundial: De Sarajevo al Tratado de Versalles | `/visualizador-historia/primera-guerra-mundial/` | cultura |
+| [x] | La Reforma Protestante: De Lutero a la Paz de Westfalia | `/visualizador-historia/la-reforma/` | cultura |
 | [ ] | La Revolución Francesa: De la Bastilla a Waterloo | `/visualizador-historia/revolucion-francesa/` | cultura |
 | [ ] | La Segunda Guerra Mundial: De la Invasión de Polonia a Hiroshima | `/visualizador-historia/segunda-guerra-mundial/` | cultura |
 | [ ] | La Unión Europea: De las Cenizas de la Guerra a la Integración | `/visualizador-historia/historia-union-europea/` | cultura |
