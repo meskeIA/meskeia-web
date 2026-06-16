@@ -207,9 +207,11 @@ export default function VisualizadorCriptografia() {
         ] as { id: SeccionActiva; label: string; icono: string }[]).map((s) => (
           <button
             key={s.id}
+            type="button"
             className={`${styles.tabBtn} ${seccion === s.id ? styles.tabActivo : ''}`}
             onClick={() => setSeccion(s.id)}
             aria-current={seccion === s.id ? 'page' : undefined}
+            aria-pressed={seccion === s.id}
           >
             <span aria-hidden="true">{s.icono}</span>
             <span>{s.label}</span>
@@ -226,8 +228,10 @@ export default function VisualizadorCriptografia() {
               {Object.keys(ALGORITMOS).map((key) => (
                 <button
                   key={key}
+                  type="button"
                   className={`${styles.algBtn} ${algoritmoSel === key ? styles.algActivo : ''}`}
                   onClick={() => setAlgoritmoSel(key)}
+                  aria-pressed={algoritmoSel === key}
                 >
                   {key}
                 </button>
@@ -266,14 +270,18 @@ export default function VisualizadorCriptografia() {
 
               <div className={styles.modoSelector}>
                 <button
+                  type="button"
                   className={`${styles.modoBtn} ${modoSim === 'cifrar' ? styles.modoActivo : ''}`}
                   onClick={() => setModoSim('cifrar')}
+                  aria-pressed={modoSim === 'cifrar'}
                 >
                   Cifrar
                 </button>
                 <button
+                  type="button"
                   className={`${styles.modoBtn} ${modoSim === 'descifrar' ? styles.modoActivo : ''}`}
                   onClick={() => setModoSim('descifrar')}
+                  aria-pressed={modoSim === 'descifrar'}
                 >
                   Descifrar
                 </button>
@@ -286,17 +294,17 @@ export default function VisualizadorCriptografia() {
                   <div className={styles.actorNombre}>Alice</div>
                   {esSimetrico ? (
                     <div className={styles.claveTag} aria-label="Clave secreta compartida">
-                      🗝️ Clave secreta
+                      <span aria-hidden="true">🗝️</span> Clave secreta
                     </div>
                   ) : (
                     <div className={styles.claveTagDual}>
                       {modoSim === 'cifrar' ? (
                         <>
-                          <span className={styles.clavePublica} aria-label="Clave pública de Bob">🔓 Clave pública (Bob)</span>
+                          <span className={styles.clavePublica} aria-label="Clave pública de Bob"><span aria-hidden="true">🔓</span> Clave pública (Bob)</span>
                         </>
                       ) : (
                         <>
-                          <span className={styles.clavePrivada} aria-label="Clave privada de Alice">🔐 Clave privada (Alice)</span>
+                          <span className={styles.clavePrivada} aria-label="Clave privada de Alice"><span aria-hidden="true">🔐</span> Clave privada (Alice)</span>
                         </>
                       )}
                     </div>
@@ -308,9 +316,9 @@ export default function VisualizadorCriptografia() {
                   <div className={styles.canalLinea} aria-hidden="true" />
                   <div className={styles.mensaje} aria-label="Mensaje cifrado en tránsito">
                     {modoSim === 'cifrar' ? (
-                      <span>📦 <em>mensaje cifrado</em></span>
+                      <span><span aria-hidden="true">📦</span> <em>mensaje cifrado</em></span>
                     ) : (
-                      <span>📄 <em>mensaje claro</em></span>
+                      <span><span aria-hidden="true">📄</span> <em>mensaje claro</em></span>
                     )}
                   </div>
                   <div className={styles.flecha} aria-hidden="true">→</div>
@@ -322,14 +330,14 @@ export default function VisualizadorCriptografia() {
                   <div className={styles.actorNombre}>Bob</div>
                   {esSimetrico ? (
                     <div className={styles.claveTag} aria-label="Clave secreta compartida">
-                      🗝️ Clave secreta
+                      <span aria-hidden="true">🗝️</span> Clave secreta
                     </div>
                   ) : (
                     <div className={styles.claveTagDual}>
                       {modoSim === 'cifrar' ? (
-                        <span className={styles.clavePrivada} aria-label="Clave privada de Bob">🔐 Clave privada (Bob)</span>
+                        <span className={styles.clavePrivada} aria-label="Clave privada de Bob"><span aria-hidden="true">🔐</span> Clave privada (Bob)</span>
                       ) : (
-                        <span className={styles.clavePublica} aria-label="Clave pública de Alice">🔓 Clave pública (Alice)</span>
+                        <span className={styles.clavePublica} aria-label="Clave pública de Alice"><span aria-hidden="true">🔓</span> Clave pública (Alice)</span>
                       )}
                     </div>
                   )}
@@ -486,14 +494,18 @@ export default function VisualizadorCriptografia() {
           <section className={styles.seccion} aria-label="Firma digital">
             <div className={styles.firmaTabs}>
               <button
+                type="button"
                 className={`${styles.firmaTab} ${pasoFirma < 4 ? styles.firmaTabActivo : ''}`}
                 onClick={() => setPasoFirma(0)}
+                aria-pressed={pasoFirma < 4}
               >
                 Firmar
               </button>
               <button
+                type="button"
                 className={`${styles.firmaTab} ${pasoFirma >= 4 ? styles.firmaTabActivo : ''}`}
                 onClick={() => setPasoFirma(4)}
+                aria-pressed={pasoFirma >= 4}
               >
                 Verificar
               </button>
@@ -598,12 +610,13 @@ export default function VisualizadorCriptografia() {
               <h2>El Handshake TLS 1.3</h2>
               <p>TLS combina lo mejor de ambos mundos: asimétrico para el intercambio de claves, simétrico para el tráfico.</p>
               <button
+                type="button"
                 className={styles.tlsPlayBtn}
                 onClick={iniciarAnimacionTLS}
                 disabled={animando}
                 aria-label={animando ? 'Animación en curso' : 'Iniciar animación del handshake TLS'}
               >
-                {animando ? '⏳ Conectando...' : '▶ Simular conexión HTTPS'}
+                {animando ? <><span aria-hidden="true">⏳</span> Conectando...</> : <><span aria-hidden="true">▶</span> Simular conexión HTTPS</>}
               </button>
             </div>
 

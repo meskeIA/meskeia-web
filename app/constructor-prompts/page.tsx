@@ -251,6 +251,7 @@ export default function ConstructorPrompts() {
           {([1, 2, 3, 4, 5, 6] as Paso[]).map((n) => (
             <button
               key={n}
+              type="button"
               className={`${styles.pasoBtn} ${paso === n ? styles.pasoBtnActivo : ''} ${n < paso ? styles.pasoBtnCompletado : ''}`}
               onClick={() => { if (n < paso || n === paso) irAPaso(n); }}
               aria-current={paso === n ? 'step' : undefined}
@@ -274,6 +275,7 @@ export default function ConstructorPrompts() {
               {MODELOS.map((m) => (
                 <button
                   key={m.id}
+                  type="button"
                   className={`${styles.opcionCard} ${sel.modelo === m.id ? styles.opcionCardActiva : ''}`}
                   onClick={() => actualizar('modelo', m.id)}
                   aria-pressed={sel.modelo === m.id}
@@ -286,6 +288,7 @@ export default function ConstructorPrompts() {
             </div>
             <div className={styles.pasoAcciones}>
               <button
+                type="button"
                 className={styles.btnSiguiente}
                 onClick={() => irAPaso(2)}
                 disabled={!sel.modelo}
@@ -309,6 +312,7 @@ export default function ConstructorPrompts() {
               {OBJETIVOS.map((o) => (
                 <button
                   key={o.id}
+                  type="button"
                   className={`${styles.opcionCard} ${sel.objetivo === o.id ? styles.opcionCardActiva : ''}`}
                   onClick={() => actualizar('objetivo', o.id)}
                   aria-pressed={sel.objetivo === o.id}
@@ -320,8 +324,9 @@ export default function ConstructorPrompts() {
               ))}
             </div>
             <div className={styles.pasoAcciones}>
-              <button className={styles.btnAnterior} onClick={() => setPaso(1)}>← Anterior</button>
+              <button type="button" className={styles.btnAnterior} onClick={() => setPaso(1)}>← Anterior</button>
               <button
+                type="button"
                 className={styles.btnSiguiente}
                 onClick={() => irAPaso(3)}
                 disabled={!sel.objetivo}
@@ -346,18 +351,20 @@ export default function ConstructorPrompts() {
 
             <div className={styles.toggleRow}>
               <button
+                type="button"
                 className={`${styles.toggleBtn} ${sel.usarRol ? styles.toggleBtnActivo : ''}`}
                 onClick={() => actualizar('usarRol', true)}
                 aria-pressed={sel.usarRol}
               >
-                ✅ Sí, asignar rol
+                <span aria-hidden="true">✅</span> Sí, asignar rol
               </button>
               <button
+                type="button"
                 className={`${styles.toggleBtn} ${!sel.usarRol ? styles.toggleBtnActivo : ''}`}
                 onClick={() => { actualizar('usarRol', false); actualizar('rol', ''); }}
                 aria-pressed={!sel.usarRol}
               >
-                ⏭️ Sin rol
+                <span aria-hidden="true">⏭️</span> Sin rol
               </button>
             </div>
 
@@ -367,6 +374,7 @@ export default function ConstructorPrompts() {
                   {ROLES.map((r) => (
                     <button
                       key={r.id}
+                      type="button"
                       className={`${styles.rolCard} ${sel.rol === r.id ? styles.rolCardActiva : ''}`}
                       onClick={() => actualizar('rol', r.id)}
                       aria-pressed={sel.rol === r.id}
@@ -413,8 +421,9 @@ export default function ConstructorPrompts() {
             )}
 
             <div className={styles.pasoAcciones}>
-              <button className={styles.btnAnterior} onClick={() => setPaso(2)}>← Anterior</button>
+              <button type="button" className={styles.btnAnterior} onClick={() => setPaso(2)}>← Anterior</button>
               <button
+                type="button"
                 className={styles.btnSiguiente}
                 onClick={() => irAPaso(4)}
                 disabled={sel.usarRol && !sel.rol}
@@ -438,6 +447,7 @@ export default function ConstructorPrompts() {
               {FORMATOS.map((f) => (
                 <button
                   key={f.id}
+                  type="button"
                   className={`${styles.formatoCard} ${sel.formato === f.id ? styles.formatoCardActivo : ''}`}
                   onClick={() => actualizar('formato', f.id)}
                   aria-pressed={sel.formato === f.id}
@@ -449,8 +459,9 @@ export default function ConstructorPrompts() {
               ))}
             </div>
             <div className={styles.pasoAcciones}>
-              <button className={styles.btnAnterior} onClick={() => setPaso(3)}>← Anterior</button>
+              <button type="button" className={styles.btnAnterior} onClick={() => setPaso(3)}>← Anterior</button>
               <button
+                type="button"
                 className={styles.btnSiguiente}
                 onClick={() => irAPaso(5)}
                 disabled={!sel.formato}
@@ -478,6 +489,7 @@ export default function ConstructorPrompts() {
                   {TONOS.map((t) => (
                     <button
                       key={t.id}
+                      type="button"
                       className={`${styles.ajusteBtn} ${sel.tono === t.id ? styles.ajusteBtnActivo : ''}`}
                       onClick={() => actualizar('tono', t.id)}
                       aria-pressed={sel.tono === t.id}
@@ -495,6 +507,7 @@ export default function ConstructorPrompts() {
                   {LONGITUDES.map((l) => (
                     <button
                       key={l.id}
+                      type="button"
                       className={`${styles.ajusteBtn} ${sel.longitud === l.id ? styles.ajusteBtnActivo : ''}`}
                       onClick={() => actualizar('longitud', l.id)}
                       aria-pressed={sel.longitud === l.id}
@@ -538,12 +551,13 @@ export default function ConstructorPrompts() {
             </div>
 
             <div className={styles.pasoAcciones}>
-              <button className={styles.btnAnterior} onClick={() => setPaso(4)}>← Anterior</button>
+              <button type="button" className={styles.btnAnterior} onClick={() => setPaso(4)}>← Anterior</button>
               <button
+                type="button"
                 className={styles.btnGenerar}
                 onClick={() => irAPaso(6)}
               >
-                ✨ Generar prompt
+                <span aria-hidden="true">✨</span> Generar prompt
               </button>
             </div>
           </section>
@@ -560,9 +574,9 @@ export default function ConstructorPrompts() {
             <div className={styles.calidadRow} role="status" aria-live="polite">
               <span className={styles.calidadLabel}>Calidad del prompt:</span>
               <span className={styles.calidadBadge} style={{ background: calidadColor }}>
-                {calidad === 'básico' && '⚠️ Básico'}
-                {calidad === 'bueno' && '👍 Bueno'}
-                {calidad === 'excelente' && '⭐ Excelente'}
+                {calidad === 'básico' && <><span aria-hidden="true">⚠️</span> Básico</>}
+                {calidad === 'bueno' && <><span aria-hidden="true">👍</span> Bueno</>}
+                {calidad === 'excelente' && <><span aria-hidden="true">⭐</span> Excelente</>}
               </span>
               <span className={styles.calidadInfo}>
                 {totalCampos} de 9 dimensiones configuradas
@@ -575,29 +589,32 @@ export default function ConstructorPrompts() {
 
             <div className={styles.resultadoAcciones}>
               <button
+                type="button"
                 className={styles.btnCopiar}
                 onClick={copiar}
                 aria-live="polite"
               >
-                {copiado ? '✅ ¡Copiado!' : '📋 Copiar prompt'}
+                {copiado ? <><span aria-hidden="true">✅</span> ¡Copiado!</> : <><span aria-hidden="true">📋</span> Copiar prompt</>}
               </button>
               <button
+                type="button"
                 className={styles.btnRefinir}
                 onClick={() => setPaso(5)}
               >
-                ✏️ Refinar
+                <span aria-hidden="true">✏️</span> Refinar
               </button>
               <button
+                type="button"
                 className={styles.btnNuevo}
                 onClick={reiniciar}
               >
-                🔄 Nuevo prompt
+                <span aria-hidden="true">🔄</span> Nuevo prompt
               </button>
             </div>
 
             {calidad === 'básico' && (
               <div className={styles.mejoraTip} role="note">
-                <strong>💡 Consejo:</strong> Tu prompt es básico porque tiene pocos detalles. Añade contexto (paso 3), restricciones de lo que debe evitar (paso 5) o especifica qué debe incluir para obtener respuestas mucho más precisas.
+                <strong><span aria-hidden="true">💡</span> Consejo:</strong> Tu prompt es básico porque tiene pocos detalles. Añade contexto (paso 3), restricciones de lo que debe evitar (paso 5) o especifica qué debe incluir para obtener respuestas mucho más precisas.
               </div>
             )}
 

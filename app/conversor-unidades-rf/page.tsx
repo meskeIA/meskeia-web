@@ -486,7 +486,7 @@ export default function ConversorUnidadesRFPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📡 Conversor de Unidades RF</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📡</span> Conversor de Unidades RF</h1>
         <p className={styles.subtitle}>
           Conversiones para radiofrecuencia: dBm↔Watts, VSWR, Return Loss, frecuencia↔longitud de onda
         </p>
@@ -503,10 +503,12 @@ export default function ConversorUnidadesRFPage() {
             {(Object.keys(CATEGORIAS_INFO) as CategoriaRF[]).map((cat) => (
               <button
                 key={cat}
+                type="button"
                 className={`${styles.categoriaBtn} ${categoria === cat ? styles.categoriaActiva : ''}`}
                 onClick={() => handleCategoriaChange(cat)}
+                aria-pressed={categoria === cat}
               >
-                <span className={styles.categoriaIcono}>{CATEGORIAS_INFO[cat].icono}</span>
+                <span className={styles.categoriaIcono} aria-hidden="true">{CATEGORIAS_INFO[cat].icono}</span>
                 <span className={styles.categoriaNombre}>{CATEGORIAS_INFO[cat].nombre}</span>
                 <span className={styles.categoriaDesc}>{CATEGORIAS_INFO[cat].descripcion}</span>
               </button>
@@ -515,7 +517,7 @@ export default function ConversorUnidadesRFPage() {
 
           {/* Referencias */}
           <div className={styles.referenciasSection}>
-            <h3 className={styles.referenciasTitle}>📋 Valores de referencia</h3>
+            <h3 className={styles.referenciasTitle}><span aria-hidden="true">📋</span> Valores de referencia</h3>
             <div className={styles.referenciasList}>
               {referenciasActuales.map((ref, idx) => (
                 <div key={idx} className={styles.referenciaItem}>
@@ -530,7 +532,7 @@ export default function ConversorUnidadesRFPage() {
         {/* Panel de conversión */}
         <div className={styles.resultsPanel}>
           <h2 className={styles.sectionTitle}>
-            {CATEGORIAS_INFO[categoria].icono} {CATEGORIAS_INFO[categoria].nombre}
+            <span aria-hidden="true">{CATEGORIAS_INFO[categoria].icono}</span> {CATEGORIAS_INFO[categoria].nombre}
           </h2>
 
           <div className={styles.conversionBox}>
@@ -577,13 +579,13 @@ export default function ConversorUnidadesRFPage() {
 
           {!resultado && valor !== '' && (
             <div className={styles.errorBox}>
-              <p>⚠️ Valor inválido. Verifica que el número sea correcto para esta unidad.</p>
+              <p><span aria-hidden="true">⚠️</span> Valor inválido. Verifica que el número sea correcto para esta unidad.</p>
             </div>
           )}
 
           {/* Fórmulas */}
           <div className={styles.formulasSection}>
-            <h3>📐 Fórmulas utilizadas</h3>
+            <h3><span aria-hidden="true">📐</span> Fórmulas utilizadas</h3>
             {categoria === 'potencia' && (
               <div className={styles.formulaBox}>
                 <p><strong>dBm a mW:</strong> P(mW) = 10^(P(dBm)/10)</p>

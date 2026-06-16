@@ -760,10 +760,10 @@
 | [x] | Cómo Funcionan los LLMs - Tokens, Embeddings y Atención | `/visualizador-llm-funcionamiento/` | tecnicas, cultura, estudiantes |
 | [x] | Comparador de IAs 2026: ChatGPT vs Claude vs Gemini y más | `/visualizador-comparador-ia/` | tecnicas, cultura, productividad |
 | [x] | Comparador de Velocidad de Almacenamiento: HDD vs SSD vs NVMe vs USB | `/comparador-velocidad-almacenamiento/` | tecnicas, cultura |
-| [ ] | Constructor de Prompts Guiado | `/constructor-prompts/` | tecnicas, productividad |
-| [ ] | Contador Manual (Tally Counter) | `/contador-manual/` | tecnicas, productividad |
-| [ ] | Conversor de Unidades RF | `/conversor-unidades-rf/` | tecnicas |
-| [ ] | Criptografía - AES, RSA, ECDSA, SHA-256 y TLS | `/visualizador-criptografia/` | tecnicas, cultura, estudiantes |
+| [x] | Constructor de Prompts Guiado | `/constructor-prompts/` | tecnicas, productividad |
+| [x] | Contador Manual (Tally Counter) | `/contador-manual/` | tecnicas, productividad |
+| [x] | Conversor de Unidades RF | `/conversor-unidades-rf/` | tecnicas |
+| [x] | Criptografía - AES, RSA, ECDSA, SHA-256 y TLS | `/visualizador-criptografia/` | tecnicas, cultura, estudiantes |
 | [ ] | Desarrolladores — Servidor MCP de meskeIA | `/developers/` | tecnicas |
 | [x] | Diapasón Digital (La 440Hz) | `/diapason/` | tecnicas, cultura |
 | [ ] | Escalador de Recetas | `/escalador-recetas/` | tecnicas, productividad |

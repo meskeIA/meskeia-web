@@ -167,18 +167,22 @@ export default function ContadorManualPage() {
       {/* Configuración */}
       <div className={styles.config}>
         <button
+          type="button"
           className={`${styles.configBtn} ${sonidoActivo ? styles.activo : ''}`}
           onClick={() => setSonidoActivo(!sonidoActivo)}
           title={sonidoActivo ? 'Desactivar sonido' : 'Activar sonido'}
+          aria-pressed={sonidoActivo}
         >
-          {sonidoActivo ? '🔊' : '🔇'} Sonido
+          <span aria-hidden="true">{sonidoActivo ? '🔊' : '🔇'}</span> Sonido
         </button>
         <button
+          type="button"
           className={`${styles.configBtn} ${vibracionActiva ? styles.activo : ''}`}
           onClick={() => setVibracionActiva(!vibracionActiva)}
           title={vibracionActiva ? 'Desactivar vibración' : 'Activar vibración'}
+          aria-pressed={vibracionActiva}
         >
-          {vibracionActiva ? '📳' : '📴'} Vibración
+          <span aria-hidden="true">{vibracionActiva ? '📳' : '📴'}</span> Vibración
         </button>
       </div>
 
@@ -187,7 +191,7 @@ export default function ContadorManualPage() {
         <div className={styles.totalGeneral}>
           <span className={styles.totalLabel}>Total general:</span>
           <span className={styles.totalValor}>{totalGeneral.toLocaleString('es-ES')}</span>
-          <button className={styles.btnResetAll} onClick={resetearTodos}>
+          <button type="button" className={styles.btnResetAll} onClick={resetearTodos}>
             Resetear todos
           </button>
         </div>
@@ -211,6 +215,7 @@ export default function ContadorManualPage() {
               />
               <div className={styles.contadorActions}>
                 <button
+                  type="button"
                   className={styles.btnColor}
                   onClick={() => cambiarColor(contador.id)}
                   title="Cambiar color"
@@ -220,6 +225,7 @@ export default function ContadorManualPage() {
                 </button>
                 {contadores.length > 1 && (
                   <button
+                    type="button"
                     className={styles.btnEliminar}
                     onClick={() => eliminarContador(contador.id)}
                     title="Eliminar contador"
@@ -232,6 +238,7 @@ export default function ContadorManualPage() {
 
             <div className={styles.contadorBody}>
               <button
+                type="button"
                 className={styles.btnDecrementar}
                 onClick={() => decrementar(contador.id)}
                 disabled={contador.valor === 0}
@@ -240,6 +247,7 @@ export default function ContadorManualPage() {
               </button>
 
               <button
+                type="button"
                 className={styles.valorDisplay}
                 onClick={() => incrementar(contador.id)}
                 style={{ background: contador.color }}
@@ -251,6 +259,7 @@ export default function ContadorManualPage() {
               </button>
 
               <button
+                type="button"
                 className={styles.btnIncrementar}
                 onClick={() => incrementar(contador.id)}
               >
@@ -259,6 +268,7 @@ export default function ContadorManualPage() {
             </div>
 
             <button
+              type="button"
               className={styles.btnReset}
               onClick={() => resetear(contador.id)}
               disabled={contador.valor === 0}
@@ -269,14 +279,14 @@ export default function ContadorManualPage() {
         ))}
 
         {/* Botón agregar contador */}
-        <button className={styles.btnAgregar} onClick={agregarContador}>
+        <button type="button" className={styles.btnAgregar} onClick={agregarContador}>
           <span className={styles.agregarIcon}>+</span>
           <span className={styles.agregarTexto}>Añadir contador</span>
         </button>
       </div>
 
       <EducationalSection
-        title="📊 Todo sobre el Contador Manual"
+        title="Todo sobre el Contador Manual"
         subtitle="Cómo usar un tally counter digital para cualquier situación de conteo"
       >
         {/* Tabla comparativa */}
@@ -323,7 +333,7 @@ export default function ContadorManualPage() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🏋️</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🏋️</span>
               <strong>Deportistas y entrenadores</strong>
             </div>
             <p>Cuenta series, repeticiones o vueltas sin perder el ritmo ni mirar el móvil.</p>
@@ -332,7 +342,7 @@ export default function ContadorManualPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>📦</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">📦</span>
               <strong>Almacén e inventario</strong>
             </div>
             <p>Cuenta unidades de distintos productos simultáneamente sin papel ni bolígrafo.</p>
@@ -341,7 +351,7 @@ export default function ContadorManualPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🎲</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🎲</span>
               <strong>Juegos y competiciones</strong>
             </div>
             <p>Lleva la puntuación de varios jugadores al mismo tiempo con colores distintos.</p>
@@ -409,22 +419,22 @@ export default function ContadorManualPage() {
         {/* Mejores prácticas */}
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🎨</span>
+            <span className={styles.tipIcon} aria-hidden="true">🎨</span>
             <strong>Usa colores distintos</strong>
             <p>Asigna un color único a cada contador para identificarlos de un vistazo.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🏷️</span>
+            <span className={styles.tipIcon} aria-hidden="true">🏷️</span>
             <strong>Nombra siempre los contadores</strong>
             <p>Un nombre descriptivo evita confusiones cuando tienes varios activos al mismo tiempo.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📱</span>
+            <span className={styles.tipIcon} aria-hidden="true">📱</span>
             <strong>Añade a pantalla de inicio</strong>
             <p>Guarda la página como acceso directo para abrir el contador con un solo toque.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔄</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔄</span>
             <strong>Resetea por contador</strong>
             <p>Usa el botón "↺ Resetear" individual en vez del reseteo general para no perder otros conteos.</p>
           </div>
@@ -433,7 +443,7 @@ export default function ContadorManualPage() {
         {/* Warning box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores frecuentes al contar</strong>
           </div>
           <ul className={styles.warningList}>
