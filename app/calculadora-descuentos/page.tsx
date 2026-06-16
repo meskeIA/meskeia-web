@@ -103,8 +103,10 @@ export default function CalculadoraDescuentosPage() {
               {QUICK_DISCOUNTS.map((d) => (
                 <button
                   key={d}
+                  type="button"
                   className={`${styles.quickBtn} ${descuento1 === d.toString() ? styles.active : ''}`}
                   onClick={() => setQuickDiscount(d)}
+                  aria-pressed={descuento1 === d.toString()}
                 >
                   {d}%
                 </button>
@@ -124,10 +126,10 @@ export default function CalculadoraDescuentosPage() {
           </div>
 
           <div className={styles.buttonGroup}>
-            <button onClick={calcular} className={styles.btnPrimary}>
+            <button type="button" onClick={calcular} className={styles.btnPrimary}>
               Calcular Descuento
             </button>
-            <button onClick={limpiar} className={styles.btnSecondary}>
+            <button type="button" onClick={limpiar} className={styles.btnSecondary}>
               Limpiar
             </button>
           </div>
@@ -158,7 +160,7 @@ export default function CalculadoraDescuentosPage() {
 
               {parseSpanishNumber(descuento2) > 0 && (
                 <div className={styles.chainedNote}>
-                  <span className={styles.noteIcon}>ℹ️</span>
+                  <span className={styles.noteIcon} aria-hidden="true">ℹ️</span>
                   <p>
                     Los descuentos se aplican de forma encadenada: primero el {descuento1}%
                     y sobre el resultado el {descuento2}% adicional.
@@ -168,7 +170,7 @@ export default function CalculadoraDescuentosPage() {
             </>
           ) : (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>🏷️</span>
+              <span className={styles.placeholderIcon} aria-hidden="true">🏷️</span>
               <p>Introduce el precio y el descuento para calcular</p>
             </div>
           )}
@@ -187,17 +189,17 @@ export default function CalculadoraDescuentosPage() {
         <h2>Consejos para aprovechar descuentos</h2>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔗</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔗</span>
             <h3>Descuentos encadenados</h3>
             <p>Un 20% + 10% adicional NO es un 30%. El segundo descuento se aplica sobre el precio ya rebajado.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📅</span>
+            <span className={styles.tipIcon} aria-hidden="true">📅</span>
             <h3>Mejores épocas</h3>
             <p>Black Friday, Rebajas de enero/julio y Cyber Monday suelen tener los mejores descuentos.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🧮</span>
+            <span className={styles.tipIcon} aria-hidden="true">🧮</span>
             <h3>Compara siempre</h3>
             <p>Antes de comprar, verifica que el precio &quot;original&quot; no esté inflado artificialmente.</p>
           </div>
@@ -258,28 +260,28 @@ export default function CalculadoraDescuentosPage() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🗓️</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🗓️</span>
               <h4>Rebajas de temporada</h4>
             </div>
             <p className={styles.escenarioDesc}>Enero y julio. Ideal para ropa, electrónica y hogar. Verifica que el precio base no subió antes de las rebajas.</p>
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🖤</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🖤</span>
               <h4>Black Friday</h4>
             </div>
             <p className={styles.escenarioDesc}>Los mejores descuentos reales suelen ser del 20-40%, no del 70%. Compara precios desde semanas antes.</p>
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🏷️</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🏷️</span>
               <h4>Cupones de descuento</h4>
             </div>
             <p className={styles.escenarioDesc}>Aplican sobre el precio ya rebajado (encadenados). Usa esta calculadora para saber el ahorro real exacto.</p>
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🏪</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🏪</span>
               <h4>Liquidación / Outlet</h4>
             </div>
             <p className={styles.escenarioDesc}>Descuentos del 50-80% en excedentes de temporada. Sin devoluciones habitualmente. Revisa el estado del producto.</p>
@@ -356,34 +358,34 @@ export default function CalculadoraDescuentosPage() {
         <h3 className={styles.eduTitle}>💡 Consejos para comprar con cabeza</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔗</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔗</span>
             <p>Los descuentos encadenados no se suman; se multiplican. Calcula siempre el % real total.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📉</span>
+            <span className={styles.tipIcon} aria-hidden="true">📉</span>
             <p>Comprueba el precio histórico antes de comprar. Las rebajas a veces ocultan subidas previas.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🧮</span>
+            <span className={styles.tipIcon} aria-hidden="true">🧮</span>
             <p>Calcula el coste por uso. ¿Merece la pena aunque esté rebajado si no lo necesitas?</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔍</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔍</span>
             <p>Busca el mismo producto en Google Shopping antes de confirmar la compra.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🚚</span>
+            <span className={styles.tipIcon} aria-hidden="true">🚚</span>
             <p>No olvides los gastos de envío. Pueden superar el ahorro del descuento.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📅</span>
+            <span className={styles.tipIcon} aria-hidden="true">📅</span>
             <p>Black Friday se convierte en &quot;Black November&quot;. Las ofertas suelen durar semanas.</p>
           </div>
         </div>
 
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores frecuentes al calcular descuentos</strong>
           </div>
           <ul className={styles.warningList}>

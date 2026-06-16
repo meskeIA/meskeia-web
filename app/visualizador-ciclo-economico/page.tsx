@@ -531,7 +531,7 @@ export default function VisualizadorCicloEconomicoPage() {
         {/* ── Hero ── */}
         <header className={styles.hero}>
           <div className={styles.heroContent}>
-            <div className={styles.heroBadge}>📊 Economía Visual</div>
+            <div className={styles.heroBadge}><span aria-hidden="true">📊</span> Economía Visual</div>
             <h1 className={styles.heroTitle}>Ciclo Económico</h1>
             <p className={styles.heroSubtitle}>
               Expansión, pico, recesión y recuperación — indicadores leading/lagging y la curva de rendimientos como predictor de recesión
@@ -544,7 +544,7 @@ export default function VisualizadorCicloEconomicoPage() {
         {/* ── SECCIÓN 1: Las 4 fases del ciclo ── */}
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionIcon}>🔄</span>
+            <span className={styles.sectionIcon} aria-hidden="true">🔄</span>
             <div>
               <h2 className={styles.sectionTitle}>Las 4 fases del ciclo económico</h2>
               <p className={styles.sectionSubtitle}>
@@ -632,6 +632,7 @@ export default function VisualizadorCicloEconomicoPage() {
             </svg>
 
             <button
+              type="button"
               className={styles.btnPausarAnim}
               onClick={() => setAnimando((a) => !a)}
               aria-label={animando ? 'Pausar animación' : 'Reanudar animación'}
@@ -644,6 +645,7 @@ export default function VisualizadorCicloEconomicoPage() {
           <div className={styles.fasesGrid}>
             {FASES.map((fase) => (
               <button
+                type="button"
                 key={fase.id}
                 className={`${styles.faseCard} ${faseActiva === fase.id ? styles.faseCardActiva : ''}`}
                 onClick={() => handleFaseClick(fase.id)}
@@ -673,26 +675,26 @@ export default function VisualizadorCicloEconomicoPage() {
 
             <div className={styles.faseIndicadoresGrid}>
               <div className={styles.faseIndicador}>
-                <span className={styles.faseIndicadorLabel}>📊 PIB</span>
+                <span className={styles.faseIndicadorLabel}><span aria-hidden="true">📊</span> PIB</span>
                 <span className={styles.faseIndicadorValor}>{faseData.pib}</span>
               </div>
               <div className={styles.faseIndicador}>
-                <span className={styles.faseIndicadorLabel}>👷 Empleo</span>
+                <span className={styles.faseIndicadorLabel}><span aria-hidden="true">👷</span> Empleo</span>
                 <span className={styles.faseIndicadorValor}>{faseData.empleo}</span>
               </div>
               <div className={styles.faseIndicador}>
-                <span className={styles.faseIndicadorLabel}>💰 Inflación</span>
+                <span className={styles.faseIndicadorLabel}><span aria-hidden="true">💰</span> Inflación</span>
                 <span className={styles.faseIndicadorValor}>{faseData.inflacion}</span>
               </div>
             </div>
 
             <div className={styles.faseEjemplos}>
               <div className={styles.faseEjemplo}>
-                <span className={styles.faseEjemploFlag}>🇪🇸</span>
+                <span className={styles.faseEjemploFlag} aria-hidden="true">🇪🇸</span>
                 <span>{faseData.ejemploEspana}</span>
               </div>
               <div className={styles.faseEjemplo}>
-                <span className={styles.faseEjemploFlag}>🌍</span>
+                <span className={styles.faseEjemploFlag} aria-hidden="true">🌍</span>
                 <span>{faseData.ejemploGlobal}</span>
               </div>
             </div>
@@ -702,7 +704,7 @@ export default function VisualizadorCicloEconomicoPage() {
         {/* ── SECCIÓN 2: Indicadores ── */}
         <section className={`${styles.section} ${styles.sectionAlt}`}>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionIcon}>🔍</span>
+            <span className={styles.sectionIcon} aria-hidden="true">🔍</span>
             <div>
               <h2 className={styles.sectionTitle}>Indicadores leading, coincident y lagging</h2>
               <p className={styles.sectionSubtitle}>
@@ -714,16 +716,20 @@ export default function VisualizadorCicloEconomicoPage() {
           {/* Toggle región */}
           <div className={styles.regionToggle}>
             <button
+              type="button"
               className={`${styles.btnToggle} ${filtroRegion === 'espana' ? styles.btnToggleActivo : ''}`}
               onClick={() => setFiltroRegion('espana')}
+              aria-pressed={filtroRegion === 'espana'}
             >
-              🇪🇸 Ver solo España
+              <span aria-hidden="true">🇪🇸</span> Ver solo España
             </button>
             <button
+              type="button"
               className={`${styles.btnToggle} ${filtroRegion === 'eurozona' ? styles.btnToggleActivo : ''}`}
               onClick={() => setFiltroRegion('eurozona')}
+              aria-pressed={filtroRegion === 'eurozona'}
             >
-              🇪🇺 Ver Eurozona
+              <span aria-hidden="true">🇪🇺</span> Ver Eurozona
             </button>
           </div>
 
@@ -732,7 +738,7 @@ export default function VisualizadorCicloEconomicoPage() {
             {(['leading', 'coincident', 'lagging'] as TipoIndicador[]).map((tipo) => (
               <div key={tipo} className={styles.indicadoresColumna}>
                 <div className={`${styles.indicadoresColHeader} ${styles[`colHeader_${tipo}`]}`}>
-                  <span className={styles.indicadoresColIcono}>
+                  <span className={styles.indicadoresColIcono} aria-hidden="true">
                     {tipo === 'leading' ? '⏩' : tipo === 'coincident' ? '⏺' : '⏪'}
                   </span>
                   <div>
@@ -751,6 +757,7 @@ export default function VisualizadorCicloEconomicoPage() {
 
                 {indicadoresPorTipo(tipo).map((ind) => (
                   <button
+                    type="button"
                     key={ind.id}
                     className={`${styles.indicadorCard} ${indicadorActivo === ind.id ? styles.indicadorCardActivo : ''}`}
                     onClick={() => setIndicadorActivo(indicadorActivo === ind.id ? null : ind.id)}
@@ -788,11 +795,11 @@ export default function VisualizadorCicloEconomicoPage() {
               </div>
               <div className={styles.datosActualesRow}>
                 <div className={`${styles.datoActual} ${filtroRegion === 'espana' ? styles.datoActualResaltado : ''}`}>
-                  <span>🇪🇸 España</span>
+                  <span><span aria-hidden="true">🇪🇸</span> España</span>
                   <strong>{indicadorData.datoEspana}</strong>
                 </div>
                 <div className={`${styles.datoActual} ${filtroRegion === 'eurozona' ? styles.datoActualResaltado : ''}`}>
-                  <span>🇪🇺 Eurozona</span>
+                  <span><span aria-hidden="true">🇪🇺</span> Eurozona</span>
                   <strong>{indicadorData.datoEurozona}</strong>
                 </div>
               </div>
@@ -803,7 +810,7 @@ export default function VisualizadorCicloEconomicoPage() {
         {/* ── SECCIÓN 3: Curva de rendimientos ── */}
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionIcon}>📐</span>
+            <span className={styles.sectionIcon} aria-hidden="true">📐</span>
             <div>
               <h2 className={styles.sectionTitle}>La curva de rendimientos (yield curve)</h2>
               <p className={styles.sectionSubtitle}>
@@ -816,12 +823,18 @@ export default function VisualizadorCicloEconomicoPage() {
           <div className={styles.curvaEstadoBtns}>
             {(['normal', 'plana', 'invertida'] as CurvaEstado[]).map((estado) => (
               <button
+                type="button"
                 key={estado}
                 className={`${styles.btnPrimario} ${curvaEstado === estado ? styles.btnPrimarioActivo : styles.btnSecundario}`}
                 onClick={() => setCurvaEstado(estado)}
                 style={curvaEstado === estado ? { background: coloresCurva[estado] } : {}}
+                aria-pressed={curvaEstado === estado}
               >
-                {estado === 'normal' ? '✅ Normal' : estado === 'plana' ? '⚠️ Plana' : '🚨 Invertida'}
+                {estado === 'normal'
+                  ? <><span aria-hidden="true">✅</span> Normal</>
+                  : estado === 'plana'
+                  ? <><span aria-hidden="true">⚠️</span> Plana</>
+                  : <><span aria-hidden="true">🚨</span> Invertida</>}
               </button>
             ))}
           </div>
@@ -889,7 +902,7 @@ export default function VisualizadorCicloEconomicoPage() {
             <div className={styles.yieldInterpretacion} style={{ borderColor: coloresCurva[curvaEstado] }}>
               {curvaEstado === 'normal' && (
                 <>
-                  <h4>✅ Curva con pendiente positiva — economía sana</h4>
+                  <h4><span aria-hidden="true">✅</span> Curva con pendiente positiva — economía sana</h4>
                   <p>
                     Los tipos a largo plazo son mayores que los de corto plazo. Los inversores exigen más rentabilidad
                     por prestar durante más tiempo, lo que es normal cuando la economía crece y la inflación es moderada.
@@ -899,7 +912,7 @@ export default function VisualizadorCicloEconomicoPage() {
               )}
               {curvaEstado === 'plana' && (
                 <>
-                  <h4>⚠️ Curva plana — señal de alerta</h4>
+                  <h4><span aria-hidden="true">⚠️</span> Curva plana — señal de alerta</h4>
                   <p>
                     Los tipos a corto y largo plazo convergen. Los inversores no ven diferencia significativa entre
                     prestar a 3 meses y a 10 años. Puede preceder a una inversión. Históricamente aparece antes de
@@ -909,7 +922,7 @@ export default function VisualizadorCicloEconomicoPage() {
               )}
               {curvaEstado === 'invertida' && (
                 <>
-                  <h4>🚨 Curva invertida — predictor de recesión</h4>
+                  <h4><span aria-hidden="true">🚨</span> Curva invertida — predictor de recesión</h4>
                   <p>
                     Los tipos a corto plazo superan a los de largo plazo. Los inversores anticipan que los bancos
                     centrales tendrán que bajar tipos (porque vendrá una recesión). <strong>Dato clave:</strong> la curva
@@ -923,7 +936,7 @@ export default function VisualizadorCicloEconomicoPage() {
 
           {/* Historial de inversiones */}
           <div className={styles.warningBox}>
-            <strong>📜 Historial de inversiones de la curva 2a-10a en EEUU:</strong>
+            <strong><span aria-hidden="true">📜</span> Historial de inversiones de la curva 2a-10a en EEUU:</strong>
             <ul className={styles.historialLista}>
               <li>1978: inversión → Recesión 1980</li>
               <li>1989: inversión → Recesión 1990-91</li>
@@ -941,7 +954,7 @@ export default function VisualizadorCicloEconomicoPage() {
         {/* ── SECCIÓN 4: Simulador ── */}
         <section className={`${styles.section} ${styles.sectionAlt}`}>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionIcon}>🎯</span>
+            <span className={styles.sectionIcon} aria-hidden="true">🎯</span>
             <div>
               <h2 className={styles.sectionTitle}>Simulador: ¿En qué fase estamos?</h2>
               <p className={styles.sectionSubtitle}>
@@ -963,18 +976,20 @@ export default function VisualizadorCicloEconomicoPage() {
                 <p className={styles.preguntaDesc}>{preg.descripcion}</p>
                 <div className={styles.preguntaBtns}>
                   <button
+                    type="button"
                     className={`${styles.btnRespuesta} ${respuestas[idx] === 'si' ? styles.btnRespuestaSi : ''}`}
                     onClick={() => handleRespuesta(idx, 'si')}
                     aria-pressed={respuestas[idx] === 'si'}
                   >
-                    ✅ Sí
+                    <span aria-hidden="true">✅</span> Sí
                   </button>
                   <button
+                    type="button"
                     className={`${styles.btnRespuesta} ${respuestas[idx] === 'no' ? styles.btnRespuestaNo : ''}`}
                     onClick={() => handleRespuesta(idx, 'no')}
                     aria-pressed={respuestas[idx] === 'no'}
                   >
-                    ❌ No
+                    <span aria-hidden="true">❌</span> No
                   </button>
                 </div>
               </div>
@@ -1001,7 +1016,7 @@ export default function VisualizadorCicloEconomicoPage() {
                 <p>{resultadoSimulador.siguiente}</p>
               </div>
               <p className={styles.simuladorDisclaimer}>
-                ⚠️ Este resultado es una estimación educativa basada en señales generales. Los ciclos económicos son
+                <span aria-hidden="true">⚠️</span> Este resultado es una estimación educativa basada en señales generales. Los ciclos económicos son
                 complejos y requieren análisis professional.
               </p>
             </div>
@@ -1084,7 +1099,7 @@ export default function VisualizadorCicloEconomicoPage() {
           </p>
 
           <div className={styles.warningBox}>
-            <strong>🔗 Para profundizar:</strong> Conecta este visualizador con el{' '}
+            <strong><span aria-hidden="true">🔗</span> Para profundizar:</strong> Conecta este visualizador con el{' '}
             <strong>Visualizador de Tipos de Interés del BCE</strong> para ver cómo la política monetaria
             interactúa con el ciclo económico. Los tipos son la principal palanca con la que el BCE intenta
             gestionar las fases del ciclo.

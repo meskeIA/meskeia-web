@@ -371,6 +371,7 @@ export default function VisualizadorComercioInternacional() {
         {SECCIONES_NAV.map((s) => (
           <button
             key={s.id}
+            type="button"
             className={`${styles.navBtn} ${seccionActiva === s.id ? styles.navBtnActivo : ''}`}
             onClick={() => setSeccionActiva(s.id)}
             aria-pressed={seccionActiva === s.id}
@@ -401,7 +402,7 @@ export default function VisualizadorComercioInternacional() {
           <div className={styles.comparativaGrid}>
             {/* Sliders España */}
             <div className={styles.paisCard}>
-              <h3 className={styles.paisNombre}>🇪🇸 España</h3>
+              <h3 className={styles.paisNombre}><span aria-hidden="true">🇪🇸</span> España</h3>
               <div className={styles.sliderGrupo}>
                 <label className={styles.sliderLabel} htmlFor="esp-coche">
                   Horas para producir 1 coche: <strong>{horasEspaniaCoche}h</strong>
@@ -438,7 +439,7 @@ export default function VisualizadorComercioInternacional() {
 
             {/* Sliders Marruecos */}
             <div className={styles.paisCard}>
-              <h3 className={styles.paisNombre}>🇲🇦 Marruecos</h3>
+              <h3 className={styles.paisNombre}><span aria-hidden="true">🇲🇦</span> Marruecos</h3>
               <div className={styles.sliderGrupo}>
                 <label className={styles.sliderLabel} htmlFor="mar-coche">
                   Horas para producir 1 coche: <strong>{horasMarruecosCoche}h</strong>
@@ -490,12 +491,12 @@ export default function VisualizadorComercioInternacional() {
               </thead>
               <tbody>
                 <tr>
-                  <td>🇪🇸 España</td>
+                  <td><span aria-hidden="true">🇪🇸</span> España</td>
                   <td>{vc.costeOportEspaniaCoche} naranjas</td>
                   <td>{vc.costeOportEspaniaNaranja} coches</td>
                 </tr>
                 <tr>
-                  <td>🇲🇦 Marruecos</td>
+                  <td><span aria-hidden="true">🇲🇦</span> Marruecos</td>
                   <td>{vc.costeOportMarruecosCoche} naranjas</td>
                   <td>{vc.costeOportMarruecosNaranja} coches</td>
                 </tr>
@@ -506,24 +507,24 @@ export default function VisualizadorComercioInternacional() {
           {/* Conclusión de ventajas */}
           <div className={styles.ventajasGrid}>
             <div className={styles.ventajaCard}>
-              <p className={styles.ventajaTipo}>Ventaja absoluta 🏆</p>
+              <p className={styles.ventajaTipo}>Ventaja absoluta <span aria-hidden="true">🏆</span></p>
               <p className={styles.ventajaDetalle}>
-                🚗 Coches: <strong>{vc.ventajaAbsolutaCoche}</strong>
+                <span aria-hidden="true">🚗</span> Coches: <strong>{vc.ventajaAbsolutaCoche}</strong>
               </p>
               <p className={styles.ventajaDetalle}>
-                🍊 Naranjas: <strong>{vc.ventajaAbsolutaNaranja}</strong>
+                <span aria-hidden="true">🍊</span> Naranjas: <strong>{vc.ventajaAbsolutaNaranja}</strong>
               </p>
               <p className={styles.ventajaExplicacion}>
                 El país que produce cada bien con menos horas totales.
               </p>
             </div>
             <div className={`${styles.ventajaCard} ${styles.ventajaCardDestacada}`}>
-              <p className={styles.ventajaTipo}>Ventaja comparativa ⭐</p>
+              <p className={styles.ventajaTipo}>Ventaja comparativa <span aria-hidden="true">⭐</span></p>
               <p className={styles.ventajaDetalle}>
-                🚗 Debe especializarse: <strong>{vc.ventajaComparativaCoche}</strong>
+                <span aria-hidden="true">🚗</span> Debe especializarse: <strong>{vc.ventajaComparativaCoche}</strong>
               </p>
               <p className={styles.ventajaDetalle}>
-                🍊 Debe especializarse: <strong>{vc.ventajaComparativaNaranja}</strong>
+                <span aria-hidden="true">🍊</span> Debe especializarse: <strong>{vc.ventajaComparativaNaranja}</strong>
               </p>
               <p className={styles.ventajaExplicacion}>
                 El país con menor coste de oportunidad relativo. Esto es lo que impulsa el comercio,
@@ -535,6 +536,7 @@ export default function VisualizadorComercioInternacional() {
           {/* Producción con/sin comercio */}
           <div className={styles.comercioToggle}>
             <button
+              type="button"
               className={!verConComercio ? styles.btnPrimario : styles.btnSecundario}
               onClick={() => setVerConComercio(false)}
               aria-pressed={!verConComercio}
@@ -542,6 +544,7 @@ export default function VisualizadorComercioInternacional() {
               Sin comercio
             </button>
             <button
+              type="button"
               className={verConComercio ? styles.btnPrimario : styles.btnSecundario}
               onClick={() => setVerConComercio(true)}
               aria-pressed={verConComercio}
@@ -553,37 +556,37 @@ export default function VisualizadorComercioInternacional() {
           {!verConComercio ? (
             <div className={styles.produccionGrid}>
               <div className={styles.produccionCard}>
-                <p className={styles.produccionPais}>🇪🇸 España (100h divididas)</p>
-                <p className={styles.produccionDato}>🚗 {vc.sinComercio.espaniaCocheSinComercio} coches</p>
-                <p className={styles.produccionDato}>🍊 {vc.sinComercio.espaniaNaranjaSinComercio} naranjas</p>
+                <p className={styles.produccionPais}><span aria-hidden="true">🇪🇸</span> España (100h divididas)</p>
+                <p className={styles.produccionDato}><span aria-hidden="true">🚗</span> {vc.sinComercio.espaniaCocheSinComercio} coches</p>
+                <p className={styles.produccionDato}><span aria-hidden="true">🍊</span> {vc.sinComercio.espaniaNaranjaSinComercio} naranjas</p>
               </div>
               <div className={styles.produccionCard}>
-                <p className={styles.produccionPais}>🇲🇦 Marruecos (100h divididas)</p>
-                <p className={styles.produccionDato}>🚗 {vc.sinComercio.marruecosCocheSinComercio} coches</p>
-                <p className={styles.produccionDato}>🍊 {vc.sinComercio.marruecosNaranjaSinComercio} naranjas</p>
+                <p className={styles.produccionPais}><span aria-hidden="true">🇲🇦</span> Marruecos (100h divididas)</p>
+                <p className={styles.produccionDato}><span aria-hidden="true">🚗</span> {vc.sinComercio.marruecosCocheSinComercio} coches</p>
+                <p className={styles.produccionDato}><span aria-hidden="true">🍊</span> {vc.sinComercio.marruecosNaranjaSinComercio} naranjas</p>
               </div>
               <div className={`${styles.produccionCard} ${styles.produccionTotal}`}>
                 <p className={styles.produccionPais}>Total mundial</p>
-                <p className={styles.produccionDato}>🚗 {vc.sinComercio.totalCoches} coches</p>
-                <p className={styles.produccionDato}>🍊 {vc.sinComercio.totalNaranjas} naranjas</p>
+                <p className={styles.produccionDato}><span aria-hidden="true">🚗</span> {vc.sinComercio.totalCoches} coches</p>
+                <p className={styles.produccionDato}><span aria-hidden="true">🍊</span> {vc.sinComercio.totalNaranjas} naranjas</p>
               </div>
             </div>
           ) : (
             <div className={styles.produccionGrid}>
               <div className={styles.produccionCard}>
-                <p className={styles.produccionPais}>🇪🇸 España (especializada)</p>
-                <p className={styles.produccionDato}>🚗 {vc.conComercio.espaniaCoches} coches</p>
-                <p className={styles.produccionDato}>🍊 {vc.conComercio.espaniaNaranjas} naranjas</p>
+                <p className={styles.produccionPais}><span aria-hidden="true">🇪🇸</span> España (especializada)</p>
+                <p className={styles.produccionDato}><span aria-hidden="true">🚗</span> {vc.conComercio.espaniaCoches} coches</p>
+                <p className={styles.produccionDato}><span aria-hidden="true">🍊</span> {vc.conComercio.espaniaNaranjas} naranjas</p>
               </div>
               <div className={styles.produccionCard}>
-                <p className={styles.produccionPais}>🇲🇦 Marruecos (especializado)</p>
-                <p className={styles.produccionDato}>🚗 {vc.conComercio.marruecosCoches} coches</p>
-                <p className={styles.produccionDato}>🍊 {vc.conComercio.marruecosNaranjas} naranjas</p>
+                <p className={styles.produccionPais}><span aria-hidden="true">🇲🇦</span> Marruecos (especializado)</p>
+                <p className={styles.produccionDato}><span aria-hidden="true">🚗</span> {vc.conComercio.marruecosCoches} coches</p>
+                <p className={styles.produccionDato}><span aria-hidden="true">🍊</span> {vc.conComercio.marruecosNaranjas} naranjas</p>
               </div>
               <div className={`${styles.produccionCard} ${styles.produccionTotal}`}>
                 <p className={styles.produccionPais}>Total mundial (especialización)</p>
-                <p className={styles.produccionDato}>🚗 {vc.conComercio.totalCoches} coches</p>
-                <p className={styles.produccionDato}>🍊 {vc.conComercio.totalNaranjas} naranjas</p>
+                <p className={styles.produccionDato}><span aria-hidden="true">🚗</span> {vc.conComercio.totalCoches} coches</p>
+                <p className={styles.produccionDato}><span aria-hidden="true">🍊</span> {vc.conComercio.totalNaranjas} naranjas</p>
               </div>
             </div>
           )}
@@ -621,11 +624,12 @@ export default function VisualizadorComercioInternacional() {
             {(['espana', 'alemania', 'china'] as const).map((p) => (
               <button
                 key={p}
+                type="button"
                 onClick={() => setPaisSeleccionado(p)}
                 className={`${styles.btnPais} ${paisSeleccionado === p ? styles.btnPaisActivo : ''}`}
                 aria-pressed={paisSeleccionado === p}
               >
-                {DATOS_BALANZA[p].bandera} {DATOS_BALANZA[p].pais}
+                <span aria-hidden="true">{DATOS_BALANZA[p].bandera}</span> {DATOS_BALANZA[p].pais}
               </button>
             ))}
           </div>
@@ -767,6 +771,7 @@ export default function VisualizadorComercioInternacional() {
                 {(['EUR/USD', 'EUR/GBP', 'EUR/JPY', 'EUR/CNY'] as const).map((par) => (
                   <button
                     key={par}
+                    type="button"
                     onClick={() => setParDivisas(par)}
                     className={`${styles.btnPaisSmall} ${parDivisas === par ? styles.btnPaisActivo : ''}`}
                     aria-pressed={parDivisas === par}
@@ -819,7 +824,7 @@ export default function VisualizadorComercioInternacional() {
             <div className={styles.cambioEfectos}>
               <div className={`${styles.cambioEfecto} ${apreciacion ? styles.efectoNegativo : depreciacion ? styles.efectoPositivo : styles.efectoNeutro}`}>
                 <p className={styles.cambioEfectoTitulo}>
-                  {apreciacion ? '📉' : depreciacion ? '📈' : '➡️'} Exportaciones españolas
+                  <span aria-hidden="true">{apreciacion ? '📉' : depreciacion ? '📈' : '➡️'}</span> Exportaciones españolas
                 </p>
                 <p className={styles.cambioEfectoDesc}>
                   {apreciacion
@@ -831,7 +836,7 @@ export default function VisualizadorComercioInternacional() {
               </div>
               <div className={`${styles.cambioEfecto} ${apreciacion ? styles.efectoPositivo : depreciacion ? styles.efectoNegativo : styles.efectoNeutro}`}>
                 <p className={styles.cambioEfectoTitulo}>
-                  {apreciacion ? '📈' : depreciacion ? '📉' : '➡️'} Importaciones a España
+                  <span aria-hidden="true">{apreciacion ? '📈' : depreciacion ? '📉' : '➡️'}</span> Importaciones a España
                 </p>
                 <p className={styles.cambioEfectoDesc}>
                   {apreciacion
@@ -992,6 +997,7 @@ export default function VisualizadorComercioInternacional() {
             {BARRERAS_COMERCIALES.map((b) => (
               <button
                 key={b.id}
+                type="button"
                 className={`${styles.barreraCard} ${barreraSeleccionada === b.id ? styles.barreraCardActiva : ''}`}
                 onClick={() => setBarreraSeleccionada(barreraSeleccionada === b.id ? null : b.id)}
                 style={{ '--barrera-color': b.color } as React.CSSProperties}

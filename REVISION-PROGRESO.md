@@ -631,11 +631,11 @@
 | [x] | ¿Cuánto tardo en ahorrar? | `/estimador-tiempo-ahorro/` | finanzas, estudiantes |
 | [x] | Anatomía de una Nómina | `/visualizador-anatomia-nomina/` | finanzas, cultura |
 | [x] | Burbuja Especulativa: Las 5 Fases de Minsky | `/visualizador-burbuja-especulativa/` | finanzas, cultura |
-| [ ] | Calculadora de Descuentos | `/calculadora-descuentos/` | finanzas, productividad |
+| [x] | Calculadora de Descuentos | `/calculadora-descuentos/` | finanzas, productividad |
 | [x] | Calculadora de Propinas | `/calculadora-propinas/` | finanzas, productividad, viajes |
-| [ ] | Checklist Coberturas de Seguros | `/checklist-coberturas-seguros/` | finanzas, cultura |
-| [ ] | Ciclo Económico - Expansión, Recesión y Curva de Rendimientos | `/visualizador-ciclo-economico/` | finanzas, cultura, estudiantes |
-| [ ] | Comercio Internacional - Ventaja Comparativa y Aranceles | `/visualizador-comercio-internacional/` | finanzas, cultura, estudiantes |
+| [x] | Checklist Coberturas de Seguros | `/checklist-coberturas-seguros/` | finanzas, cultura |
+| [x] | Ciclo Económico - Expansión, Recesión y Curva de Rendimientos | `/visualizador-ciclo-economico/` | finanzas, cultura, estudiantes |
+| [x] | Comercio Internacional - Ventaja Comparativa y Aranceles | `/visualizador-comercio-internacional/` | finanzas, cultura, estudiantes |
 | [ ] | Cómo Funciona un Banco | `/visualizador-como-funciona-banco/` | finanzas, cultura, estudiantes |
 | [ ] | Comparador Compra Vehículos | `/comparador-vehiculos/` | finanzas, inmobiliaria |
 | [ ] | Comparador Eléctrico vs Combustión | `/comparador-electrico/` | finanzas, inmobiliaria |

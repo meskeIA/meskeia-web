@@ -170,10 +170,12 @@ export default function ChecklistCoberturasSeguroPage() {
           {perfiles.map((perfil) => (
             <button
               key={perfil.id}
+              type="button"
               className={`${styles.perfilBtn} ${perfilActivo === perfil.id ? styles.perfilBtnActive : ''}`}
               onClick={() => cambiarPerfil(perfil.id)}
+              aria-pressed={perfilActivo === perfil.id}
             >
-              <span className={styles.perfilIcon}>{perfil.icon}</span>
+              <span className={styles.perfilIcon} aria-hidden="true">{perfil.icon}</span>
               <span className={styles.perfilNombre}>{perfil.nombre}</span>
             </button>
           ))}
@@ -183,7 +185,7 @@ export default function ChecklistCoberturasSeguroPage() {
       {/* Info del perfil activo */}
       <div className={styles.perfilInfo}>
         <div className={styles.perfilHeader}>
-          <span className={styles.perfilIconLarge}>{perfilData.icon}</span>
+          <span className={styles.perfilIconLarge} aria-hidden="true">{perfilData.icon}</span>
           <div>
             <h2 className={styles.perfilTitulo}>{perfilData.nombre}</h2>
             <p className={styles.perfilDesc}>{perfilData.descripcion}</p>
@@ -205,7 +207,7 @@ export default function ChecklistCoberturasSeguroPage() {
         {obligatorias.length > 0 && (
           <div className={styles.categoriaSection}>
             <h3 className={styles.categoriaTitulo}>
-              <span className={styles.categoriaIcon} style={{ background: tipoColores['obligatorio'].bg, color: tipoColores['obligatorio'].text }}>⚠️</span>
+              <span className={styles.categoriaIcon} style={{ background: tipoColores['obligatorio'].bg, color: tipoColores['obligatorio'].text }} aria-hidden="true">⚠️</span>
               Obligatorios por Ley
             </h3>
             <div className={styles.coberturasList}>
@@ -224,7 +226,7 @@ export default function ChecklistCoberturasSeguroPage() {
         {muyRecomendables.length > 0 && (
           <div className={styles.categoriaSection}>
             <h3 className={styles.categoriaTitulo}>
-              <span className={styles.categoriaIcon} style={{ background: tipoColores['muy-recomendable'].bg, color: tipoColores['muy-recomendable'].text }}>⭐</span>
+              <span className={styles.categoriaIcon} style={{ background: tipoColores['muy-recomendable'].bg, color: tipoColores['muy-recomendable'].text }} aria-hidden="true">⭐</span>
               Muy Recomendables
             </h3>
             <div className={styles.coberturasList}>
@@ -243,7 +245,7 @@ export default function ChecklistCoberturasSeguroPage() {
         {recomendables.length > 0 && (
           <div className={styles.categoriaSection}>
             <h3 className={styles.categoriaTitulo}>
-              <span className={styles.categoriaIcon} style={{ background: tipoColores['recomendable'].bg, color: tipoColores['recomendable'].text }}>👍</span>
+              <span className={styles.categoriaIcon} style={{ background: tipoColores['recomendable'].bg, color: tipoColores['recomendable'].text }} aria-hidden="true">👍</span>
               Recomendables
             </h3>
             <div className={styles.coberturasList}>
@@ -262,7 +264,7 @@ export default function ChecklistCoberturasSeguroPage() {
         {opcionales.length > 0 && (
           <div className={styles.categoriaSection}>
             <h3 className={styles.categoriaTitulo}>
-              <span className={styles.categoriaIcon} style={{ background: tipoColores['opcional'].bg, color: tipoColores['opcional'].text }}>💭</span>
+              <span className={styles.categoriaIcon} style={{ background: tipoColores['opcional'].bg, color: tipoColores['opcional'].text }} aria-hidden="true">💭</span>
               Opcionales
             </h3>
             <div className={styles.coberturasList}>
@@ -625,6 +627,7 @@ function CoberturaItem({
             {colores.label}
           </span>
           <button
+            type="button"
             className={styles.expandBtn}
             onClick={() => setExpandido(!expandido)}
             aria-label={expandido ? 'Ocultar detalles' : 'Ver detalles'}
