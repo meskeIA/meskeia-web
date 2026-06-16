@@ -745,11 +745,11 @@
 | [x] | Calculadora DDT — Temperatura de la Masa (Desired Dough Temperature) | `/calculadora-temperatura-masa/` | tecnicas |
 | [x] | Calculadora de Ángulo de Campo (FOV) para Vídeo | `/calculadora-fov-video/` | tecnicas, diseno |
 | [x] | Calculadora de Bitrate y Tamaño de Vídeo | `/calculadora-bitrate-video/` | tecnicas, diseno |
-| [ ] | Calculadora de Cámara Lenta (Slow Motion) | `/calculadora-camara-lenta/` | tecnicas, diseno |
-| [ ] | Calculadora de Filtro ND para Vídeo | `/calculadora-filtro-nd-video/` | tecnicas, diseno |
+| [x] | Calculadora de Cámara Lenta (Slow Motion) | `/calculadora-camara-lenta/` | tecnicas, diseno |
+| [x] | Calculadora de Filtro ND para Vídeo | `/calculadora-filtro-nd-video/` | tecnicas, diseno |
 | [x] | Calculadora de Ganache de Chocolate | `/calculadora-ganache/` | tecnicas, cultura |
-| [ ] | Calculadora de Hidratación del Pan | `/calculadora-hidratacion-pan/` | tecnicas, cultura |
-| [ ] | Calculadora de Puntos del Azúcar | `/calculadora-puntos-azucar/` | tecnicas, cultura |
+| [x] | Calculadora de Hidratación del Pan | `/calculadora-hidratacion-pan/` | tecnicas, cultura |
+| [x] | Calculadora de Puntos del Azúcar | `/calculadora-puntos-azucar/` | tecnicas, cultura |
 | [ ] | Calculadora de Resistencias para LED | `/calculadora-resistencias-led/` | tecnicas, estudiantes |
 | [ ] | Calculadora de Subredes IP | `/calculadora-subredes/` | tecnicas, estudiantes |
 | [x] | Calculadora de Sustitución de Gelatina | `/calculadora-gelatina/` | tecnicas |

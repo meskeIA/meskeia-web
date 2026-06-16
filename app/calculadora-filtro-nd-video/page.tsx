@@ -70,7 +70,7 @@ export default function CalculadoraFiltroNdVideoPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🎬 Calculadora de Filtro ND para Vídeo</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🎬</span> Calculadora de Filtro ND para Vídeo</h1>
         <p className={styles.subtitle}>
           Encuentra el filtro de densidad neutra necesario para cumplir la regla de los 180°
         </p>
@@ -89,6 +89,7 @@ export default function CalculadoraFiltroNdVideoPage() {
               {FPS_PRESETS.map(f => (
                 <button
                   key={f}
+                  type="button"
                   onClick={() => handleFpsPreset(f)}
                   className={`${styles.presetBtn} ${!usarFpsManual && fps === f ? styles.presetBtnActive : ''}`}
                   aria-pressed={!usarFpsManual && fps === f}

@@ -83,7 +83,7 @@ export default function CalculadoraCamaraLentaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1>🎬 Calculadora de Cámara Lenta</h1>
+        <h1><span aria-hidden="true">🎬</span> Calculadora de Cámara Lenta</h1>
         <p>
           Calcula el factor de ralentización, la velocidad de obturación correcta y la duración
           final de tu vídeo a cámara lenta (slow motion).
@@ -108,6 +108,7 @@ export default function CalculadoraCamaraLentaPage() {
                 {FPS_GRABACION_OPCIONES.map((fps) => (
                   <button
                     key={fps}
+                    type="button"
                     className={`${styles.fpsBtn} ${
                       fpsGrabacionCustom === '' && fpsGrabacion === fps ? styles.fpsBtnActive : ''
                     }`}
@@ -143,6 +144,7 @@ export default function CalculadoraCamaraLentaPage() {
                 {FPS_REPRODUCCION_OPCIONES.map((fps) => (
                   <button
                     key={fps}
+                    type="button"
                     className={`${styles.fpsBtn} ${
                       fpsReproduccionCustom === '' && fpsReproduccion === fps
                         ? styles.fpsBtnActive
@@ -321,7 +323,7 @@ export default function CalculadoraCamaraLentaPage() {
           <h3 className={styles.eduSubtitle}>FPS necesarios por tipo de uso</h3>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <h4>🏃 Deporte y acción</h4>
+              <h4><span aria-hidden="true">🏃</span> Deporte y acción</h4>
               <p>
                 120–240 fps para capturar gestos, saltos y momentos de impacto. Factor 4×–10× a 25
                 fps de reproducción. Muchas cámaras compactas y smartphones alcanzan 120–240 fps a
@@ -329,7 +331,7 @@ export default function CalculadoraCamaraLentaPage() {
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>💧 Líquidos y naturaleza</h4>
+              <h4><span aria-hidden="true">💧</span> Líquidos y naturaleza</h4>
               <p>
                 240–480 fps para goteo de agua, ondas o animales en vuelo. A 480 fps a 25 fps de
                 reproducción, el factor es 19×. Se necesita cámara dedicada o smartphone de gama
@@ -337,7 +339,7 @@ export default function CalculadoraCamaraLentaPage() {
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🔥 Efectos visuales</h4>
+              <h4><span aria-hidden="true">🔥</span> Efectos visuales</h4>
               <p>
                 500–1000 fps para explosiones, impactos o fenómenos físicos rápidos. A este rango
                 la resolución suele bajar drásticamente. Requiere cámaras especializadas o modelos
@@ -345,7 +347,7 @@ export default function CalculadoraCamaraLentaPage() {
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🎥 Uso cinematográfico</h4>
+              <h4><span aria-hidden="true">🎥</span> Uso cinematográfico</h4>
               <p>
                 48–120 fps para un slow motion suave y elegante: el clásico &quot;efecto
                 cine&quot;. Con 120 fps a 24 fps de reproducción se obtiene un factor 5×, suficiente

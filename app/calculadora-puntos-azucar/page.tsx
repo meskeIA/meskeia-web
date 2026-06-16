@@ -69,7 +69,7 @@ export default function CalculadoraPuntosAzucarPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🍬 Calculadora de Puntos del Azúcar</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🍬</span> Calculadora de Puntos del Azúcar</h1>
         <p className={styles.subtitle}>
           Introduce la temperatura de tu almíbar y descubre en qué fase se encuentra:
           desde el almíbar ligero hasta el caramelo quemado
@@ -128,6 +128,7 @@ export default function CalculadoraPuntosAzucarPage() {
           </div>
 
           <button
+            type="button"
             onClick={calcular}
             className={styles.btnPrimary}
             aria-label="Calcular fase del azúcar"
@@ -244,7 +245,7 @@ export default function CalculadoraPuntosAzucarPage() {
 
       {/* Tabla de referencia completa */}
       <section className={styles.tablaSection} aria-label="Tabla de referencia de fases del azúcar">
-        <h2 className={styles.tablaTitulo}>📊 Tabla de referencia: las 9 fases del azúcar</h2>
+        <h2 className={styles.tablaTitulo}><span aria-hidden="true">📊</span> Tabla de referencia: las 9 fases del azúcar</h2>
         <div className={styles.tablaWrapper}>
           <table className={styles.tablaFases}>
             <thead>

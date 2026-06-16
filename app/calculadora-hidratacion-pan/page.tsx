@@ -90,7 +90,7 @@ export default function CalculadoraHidratacionPanPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>💧 Hidratación del Pan</h1>
+        <h1 className={styles.title}><span aria-hidden="true">💧</span> Hidratación del Pan</h1>
         <p className={styles.subtitle}>
           Calcula el % de agua de tu masa o descubre cuánta agua necesitas para una hidratación objetivo
         </p>
@@ -105,6 +105,7 @@ export default function CalculadoraHidratacionPanPage() {
           {/* Toggle de modo */}
           <div className={styles.modoToggle} role="group" aria-label="Modo de cálculo">
             <button
+              type="button"
               className={`${styles.modoBtn} ${modo === 'calcular_porcentaje' ? styles.modoBtnActive : ''}`}
               onClick={() => cambiarModo('calcular_porcentaje')}
               aria-pressed={modo === 'calcular_porcentaje'}
@@ -112,6 +113,7 @@ export default function CalculadoraHidratacionPanPage() {
               ¿Qué hidratación tiene mi masa?
             </button>
             <button
+              type="button"
               className={`${styles.modoBtn} ${modo === 'calcular_agua' ? styles.modoBtnActive : ''}`}
               onClick={() => cambiarModo('calcular_agua')}
               aria-pressed={modo === 'calcular_agua'}
@@ -187,7 +189,7 @@ export default function CalculadoraHidratacionPanPage() {
             </div>
           )}
 
-          <button onClick={calcular} className={styles.btnPrimary}>
+          <button type="button" onClick={calcular} className={styles.btnPrimary}>
             Calcular
           </button>
 
@@ -204,6 +206,7 @@ export default function CalculadoraHidratacionPanPage() {
               ].map(ref => (
                 <button
                   key={ref.label}
+                  type="button"
                   className={styles.refBtn}
                   onClick={() => {
                     if (modo === 'calcular_agua') {
@@ -274,7 +277,7 @@ export default function CalculadoraHidratacionPanPage() {
                 <ul className={styles.ejemplosList}>
                   {resultado.ejemplos.map((ej, idx) => (
                     <li key={idx} className={styles.ejemplosItem}>
-                      🍞 {ej}
+                      <span aria-hidden="true">🍞</span> {ej}
                     </li>
                   ))}
                 </ul>
