@@ -390,7 +390,7 @@ export default function OptimizadorRentas60() {
 
               {/* Desglose bases */}
               <div className={styles.desgloseSection}>
-                <div className={styles.desgloseTitle}>📋 Desglose de bases imponibles</div>
+                <div className={styles.desgloseTitle}><span aria-hidden="true">📋</span> Desglose de bases imponibles</div>
 
                 <div className={styles.desgloseItem}>
                   <span>Rendimientos trabajo brutos</span>
@@ -434,7 +434,7 @@ export default function OptimizadorRentas60() {
 
               {/* Desglose cuotas */}
               <div className={styles.desgloseSection}>
-                <div className={styles.desgloseTitle}>💶 Desglose de cuotas</div>
+                <div className={styles.desgloseTitle}><span aria-hidden="true">💶</span> Desglose de cuotas</div>
                 <div className={styles.desgloseItem}>
                   <span>Cuota base general</span>
                   <strong>{formatCurrency(resultado.cuotaGeneral)}</strong>
@@ -537,39 +537,39 @@ export default function OptimizadorRentas60() {
       <div className={styles.escenariosGrid}>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>🏦</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">🏦</span>
             <strong>Rescate del plan de pensiones: cuándo y cómo</strong>
           </div>
           <p>Pensión 18.000 €/año + plan 80.000 €. Rescatar todo de golpe: tipo marginal 37-45%. Rescatar en renta mensual 6 años: tipo efectivo 19-24%. El ahorro puede ser de miles de euros.</p>
           <div className={styles.escenarioExample}>Rescate capital 80.000 € → tributación estimada 25.000 € | Renta 1.100 €/mes → ~14.000 €</div>
-          <div className={styles.escenarioTip}>💡 Nunca rescatar el plan en el año de jubilación si hay nóminas altas. Esperar al año siguiente.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> Nunca rescatar el plan en el año de jubilación si hay nóminas altas. Esperar al año siguiente.</div>
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>💰</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">💰</span>
             <strong>Renta vitalicia del artículo 38 LIRPF</strong>
           </div>
           <p>Más de 65 años, vende un inmueble o fondo. Puede reinvertir en renta vitalicia y la plusvalía queda exenta. La renta vitalicia tributa solo un pequeño porcentaje de interés.</p>
           <div className={styles.escenarioExample}>Plusvalía 60.000 € reinvertida en renta vitalicia → exenta de IRPF, solo tributa el &quot;rendimiento implícito&quot;</div>
-          <div className={styles.escenarioTip}>💡 Plazo máximo 6 meses desde la venta para reinvertir. Obligatorio en renta vitalicia garantizada.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> Plazo máximo 6 meses desde la venta para reinvertir. Obligatorio en renta vitalicia garantizada.</div>
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>📊</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">📊</span>
             <strong>Optimización de la declaración conjunta</strong>
           </div>
           <p>Matrimonio: él cobra pensión 22.000 €, ella 8.000 €. La declaración conjunta ofrece reducción de 3.400 €. Comparar con individual para ver cuál es más ventajosa.</p>
           <div className={styles.escenarioExample}>Individual: 2 declaraciones. Conjunta: reducción 3.400 € aplicada pero se suman todos los ingresos</div>
-          <div className={styles.escenarioTip}>💡 La conjunta no siempre es la mejor opción. Simular siempre con un asesor antes de elegir.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> La conjunta no siempre es la mejor opción. Simular siempre con un asesor antes de elegir.</div>
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>🏠</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">🏠</span>
             <strong>Venta de la vivienda habitual con más de 65 años</strong>
           </div>
           <p>Si tienes más de 65 años y vendes tu vivienda habitual, la ganancia patrimonial está totalmente exenta de IRPF. Sin necesidad de reinvertir.</p>
           <div className={styles.escenarioExample}>Venta piso comprado 80.000 €, vendido 250.000 €: plusvalía 170.000 € → exenta de IRPF</div>
-          <div className={styles.escenarioTip}>💡 Asegurarte de que sea tu vivienda habitual (residencia 3 años mínimo) antes de vender.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> Asegurarte de que sea tu vivienda habitual (residencia 3 años mínimo) antes de vender.</div>
         </div>
       </div>
 
@@ -607,7 +607,7 @@ export default function OptimizadorRentas60() {
         <div className={styles.faqItem}>
           <strong>¿Existe alguna deducción especial para mayores en el IRPF estatal?</strong>
           <p>El IRPF estatal no tiene deducciones específicas por edad más allá de los mínimos por edad (65 y 75 años). Las deducciones específicas para mayores suelen ser autonómicas y muy variables.</p>
-          <div className={styles.faqTip}>💡 Revisar las deducciones autonómicas de tu CCAA: algunas tienen deducciones por alquiler, gastos sanitarios o situación de dependencia.</div>
+          <div className={styles.faqTip}><span aria-hidden="true">💡</span> Revisar las deducciones autonómicas de tu CCAA: algunas tienen deducciones por alquiler, gastos sanitarios o situación de dependencia.</div>
         </div>
       </div>
 
@@ -661,32 +661,32 @@ export default function OptimizadorRentas60() {
       {/* 5. Mejores Prácticas */}
       <div className={styles.tipsGrid}>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>📅</div>
+          <div className={styles.tipIcon} aria-hidden="true">📅</div>
           <strong>Planifica el año de jubilación con detalle</strong>
           <p>El año en que dejas de trabajar y empiezas a cobrar pensión puede tener rentas altas de ambas fuentes. Es el año más crítico para la planificación fiscal.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>📊</div>
+          <div className={styles.tipIcon} aria-hidden="true">📊</div>
           <strong>Diversifica las fuentes de ingresos</strong>
           <p>Tener ingresos en base general (pensión) y base ahorro (dividendos, plusvalías) permite repartir la carga fiscal entre escalas, reduciendo el tipo efectivo global.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>🏠</div>
+          <div className={styles.tipIcon} aria-hidden="true">🏠</div>
           <strong>No vendas la vivienda antes de los 65</strong>
           <p>Si puedes esperar, la exención total de la ganancia de la vivienda habitual a partir de los 65 años puede suponer decenas de miles de euros de ahorro fiscal.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>💡</div>
+          <div className={styles.tipIcon} aria-hidden="true">💡</div>
           <strong>Usa el art. 38 antes de los 66 años</strong>
           <p>La renta vitalicia del art. 38 solo se puede contratar a partir de los 65. Planificar la venta de activos para ese momento puede permitir grandes exenciones fiscales.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>👫</div>
+          <div className={styles.tipIcon} aria-hidden="true">👫</div>
           <strong>Optimiza la declaración en pareja</strong>
           <p>La elección entre declaración individual y conjunta puede variar año a año según los ingresos. Simular ambas opciones antes de presentar es fundamental.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>🎁</div>
+          <div className={styles.tipIcon} aria-hidden="true">🎁</div>
           <strong>Considera donaciones en vida</strong>
           <p>Donar en vida puede ser más eficiente que dejar en herencia en CCAA con alta fiscalidad de sucesiones. Analizar el impacto de donaciones vs herencia con asesor.</p>
         </div>
@@ -695,7 +695,7 @@ export default function OptimizadorRentas60() {
       {/* 6. Warning Box */}
       <div className={styles.warningBox}>
         <div className={styles.warningHeader}>
-          <span className={styles.warningIcon}>⚠️</span>
+          <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
           <strong>Errores fiscales frecuentes a partir de los 60</strong>
         </div>
         <ul className={styles.warningList}>

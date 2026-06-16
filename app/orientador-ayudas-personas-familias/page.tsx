@@ -129,6 +129,7 @@ export default function OrientadorAyudasPersonasFamiliasPage() {
           {SITUACIONES.map(s => (
             <button
               key={s.id}
+              type="button"
               className={`${styles.figuraCard} ${situacion === s.id ? styles.figuraActiva : ''}`}
               onClick={() => setSituacion(s.id)}
               aria-pressed={situacion === s.id}
@@ -151,6 +152,7 @@ export default function OrientadorAyudasPersonasFamiliasPage() {
             return (
               <button
                 key={n.id}
+                type="button"
                 className={`${styles.checkboxCard} ${activo ? styles.checkboxActivo : ''}`}
                 onClick={() => toggleNecesidad(n.id)}
                 aria-pressed={activo}
@@ -176,6 +178,7 @@ export default function OrientadorAyudasPersonasFamiliasPage() {
             return (
               <button
                 key={p.id}
+                type="button"
                 className={`${styles.checkboxCard} ${activo ? styles.checkboxActivo : ''}`}
                 onClick={() => togglePerfil(p.id)}
                 aria-pressed={activo}
@@ -192,9 +195,10 @@ export default function OrientadorAyudasPersonasFamiliasPage() {
       {/* Resultados */}
       <section className={styles.section}>
         <h2 className={styles.sectionTitle} aria-live="polite">
+          <span aria-hidden="true">📋</span>{' '}
           {situacion
-            ? `📋 ${totalEspecificas} categorías para tu situación + recursos generales`
-            : '📋 Recursos generales — selecciona tu situación para ver más'}
+            ? `${totalEspecificas} categorías para tu situación + recursos generales`
+            : 'Recursos generales — selecciona tu situación para ver más'}
         </h2>
         {!situacion && (
           <div className={styles.pendienteMsg}>
@@ -412,7 +416,7 @@ export default function OrientadorAyudasPersonasFamiliasPage() {
 
         {/* Warning */}
         <section className={styles.warningBox}>
-          <h2>⚠️ Lo que debes saber antes de solicitar</h2>
+          <h2><span aria-hidden="true">⚠️</span> Lo que debes saber antes de solicitar</h2>
           <div className={styles.warningGrid}>
             {[
               { titulo: 'No garantiza que tengas derecho a ninguna ayuda', desc: 'Esta herramienta describe tipos de ayuda con carácter general. El acceso real depende de una valoración individual de tu situación por parte del organismo competente.' },

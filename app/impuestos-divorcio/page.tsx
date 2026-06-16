@@ -265,7 +265,7 @@ export default function ImpuestosDivorcioPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>⚖️ Impuestos en el Divorcio</h1>
+        <h1 className={styles.title}><span aria-hidden="true">⚖️</span> Impuestos en el Divorcio</h1>
         <p className={styles.subtitle}>
           Orientación fiscal personalizada para tu proceso de separación o divorcio en España
         </p>
@@ -338,9 +338,11 @@ export default function ImpuestosDivorcioPage() {
                   <div className={styles.formGroup}>
                     <p className={styles.fieldLabel}>¿Hay hijos menores de edad en el divorcio?</p>
                     <div className={styles.boolButtons}>
-                      <button className={`${styles.boolBtn} ${datos.tieneHijos === true ? styles.boolSelected : ''}`}
+                      <button type="button" className={`${styles.boolBtn} ${datos.tieneHijos === true ? styles.boolSelected : ''}`}
+                        aria-pressed={datos.tieneHijos === true}
                         onClick={() => upd('tieneHijos', true)}>Sí</button>
-                      <button className={`${styles.boolBtn} ${datos.tieneHijos === false ? styles.boolSelected : ''}`}
+                      <button type="button" className={`${styles.boolBtn} ${datos.tieneHijos === false ? styles.boolSelected : ''}`}
+                        aria-pressed={datos.tieneHijos === false}
                         onClick={() => { upd('tieneHijos', false); upd('custodia', null); }}>No</button>
                     </div>
                   </div>
@@ -351,8 +353,9 @@ export default function ImpuestosDivorcioPage() {
                         <p className={styles.fieldLabel}>Número de hijos</p>
                         <div className={styles.numButtons}>
                           {[1, 2, 3, 4].map(n => (
-                            <button key={n}
+                            <button key={n} type="button"
                               className={`${styles.numBtn} ${datos.numHijos === n ? styles.numSelected : ''}`}
+                              aria-pressed={datos.numHijos === n}
                               onClick={() => upd('numHijos', n)}>
                               {n === 4 ? '4+' : n}
                             </button>
@@ -386,9 +389,11 @@ export default function ImpuestosDivorcioPage() {
                   <div className={styles.formGroup}>
                     <p className={styles.fieldLabel}>¿Tenéis vivienda habitual en propiedad (total o parcialmente)?</p>
                     <div className={styles.boolButtons}>
-                      <button className={`${styles.boolBtn} ${datos.tieneVivienda === true ? styles.boolSelected : ''}`}
+                      <button type="button" className={`${styles.boolBtn} ${datos.tieneVivienda === true ? styles.boolSelected : ''}`}
+                        aria-pressed={datos.tieneVivienda === true}
                         onClick={() => upd('tieneVivienda', true)}>Sí</button>
-                      <button className={`${styles.boolBtn} ${datos.tieneVivienda === false ? styles.boolSelected : ''}`}
+                      <button type="button" className={`${styles.boolBtn} ${datos.tieneVivienda === false ? styles.boolSelected : ''}`}
+                        aria-pressed={datos.tieneVivienda === false}
                         onClick={() => { upd('tieneVivienda', false); upd('posVivienda', null); }}>No</button>
                     </div>
                   </div>
@@ -419,9 +424,11 @@ export default function ImpuestosDivorcioPage() {
                           <div className={styles.formGroup}>
                             <p className={styles.fieldLabel}>¿La vivienda está asignada judicialmente a los hijos?</p>
                             <div className={styles.boolButtons}>
-                              <button className={`${styles.boolBtn} ${datos.viviendasignadaHijos === true ? styles.boolSelected : ''}`}
+                              <button type="button" className={`${styles.boolBtn} ${datos.viviendasignadaHijos === true ? styles.boolSelected : ''}`}
+                                aria-pressed={datos.viviendasignadaHijos === true}
                                 onClick={() => upd('viviendasignadaHijos', true)}>Sí, asignada a los hijos</button>
-                              <button className={`${styles.boolBtn} ${datos.viviendasignadaHijos === false ? styles.boolSelected : ''}`}
+                              <button type="button" className={`${styles.boolBtn} ${datos.viviendasignadaHijos === false ? styles.boolSelected : ''}`}
+                                aria-pressed={datos.viviendasignadaHijos === false}
                                 onClick={() => upd('viviendasignadaHijos', false)}>No</button>
                             </div>
                             <p className={styles.helpText}>Si la vivienda está asignada judicialmente a los hijos, el propietario ausente queda exento de imputación de rentas.</p>
@@ -449,9 +456,11 @@ export default function ImpuestosDivorcioPage() {
                               <div className={styles.formGroup}>
                                 <p className={styles.fieldLabel}>¿El valor catastral fue revisado después de 2014?</p>
                                 <div className={styles.boolButtons}>
-                                  <button className={`${styles.boolBtn} ${datos.catastroRevisado === true ? styles.boolSelected : ''}`}
+                                  <button type="button" className={`${styles.boolBtn} ${datos.catastroRevisado === true ? styles.boolSelected : ''}`}
+                                    aria-pressed={datos.catastroRevisado === true}
                                     onClick={() => upd('catastroRevisado', true)}>Sí (revisado desde 2014)</button>
-                                  <button className={`${styles.boolBtn} ${datos.catastroRevisado === false ? styles.boolSelected : ''}`}
+                                  <button type="button" className={`${styles.boolBtn} ${datos.catastroRevisado === false ? styles.boolSelected : ''}`}
+                                    aria-pressed={datos.catastroRevisado === false}
                                     onClick={() => upd('catastroRevisado', false)}>No / No sé</button>
                                 </div>
                                 <p className={styles.helpText}>Si no lo sabes, selecciona &quot;No&quot; — se aplicará el tipo más conservador (2%).</p>
@@ -475,9 +484,11 @@ export default function ImpuestosDivorcioPage() {
                   <div className={styles.formGroup}>
                     <p className={styles.fieldLabel}>¿Hay pensión compensatoria acordada entre los cónyuges?</p>
                     <div className={styles.boolButtons}>
-                      <button className={`${styles.boolBtn} ${datos.tienePensionConyuge === true ? styles.boolSelected : ''}`}
+                      <button type="button" className={`${styles.boolBtn} ${datos.tienePensionConyuge === true ? styles.boolSelected : ''}`}
+                        aria-pressed={datos.tienePensionConyuge === true}
                         onClick={() => upd('tienePensionConyuge', true)}>Sí</button>
-                      <button className={`${styles.boolBtn} ${datos.tienePensionConyuge === false ? styles.boolSelected : ''}`}
+                      <button type="button" className={`${styles.boolBtn} ${datos.tienePensionConyuge === false ? styles.boolSelected : ''}`}
+                        aria-pressed={datos.tienePensionConyuge === false}
                         onClick={() => { upd('tienePensionConyuge', false); upd('rolPension', null); }}>No</button>
                     </div>
                   </div>
@@ -487,9 +498,11 @@ export default function ImpuestosDivorcioPage() {
                       <div className={styles.formGroup}>
                         <p className={styles.fieldLabel}>¿Eres quien la paga o quien la cobra?</p>
                         <div className={styles.boolButtons}>
-                          <button className={`${styles.boolBtn} ${datos.rolPension === 'pago' ? styles.boolSelected : ''}`}
+                          <button type="button" className={`${styles.boolBtn} ${datos.rolPension === 'pago' ? styles.boolSelected : ''}`}
+                            aria-pressed={datos.rolPension === 'pago'}
                             onClick={() => upd('rolPension', 'pago')}>La pago yo</button>
-                          <button className={`${styles.boolBtn} ${datos.rolPension === 'cobro' ? styles.boolSelected : ''}`}
+                          <button type="button" className={`${styles.boolBtn} ${datos.rolPension === 'cobro' ? styles.boolSelected : ''}`}
+                            aria-pressed={datos.rolPension === 'cobro'}
                             onClick={() => upd('rolPension', 'cobro')}>La cobro yo</button>
                         </div>
                       </div>
@@ -516,9 +529,11 @@ export default function ImpuestosDivorcioPage() {
                   <div className={styles.formGroup}>
                     <p className={styles.fieldLabel}>¿Tenéis hipoteca contratada antes del 1 de enero de 2013 con derecho a deducción transitoria?</p>
                     <div className={styles.boolButtons}>
-                      <button className={`${styles.boolBtn} ${datos.tieneHipotecaAntigua === true ? styles.boolSelected : ''}`}
+                      <button type="button" className={`${styles.boolBtn} ${datos.tieneHipotecaAntigua === true ? styles.boolSelected : ''}`}
+                        aria-pressed={datos.tieneHipotecaAntigua === true}
                         onClick={() => upd('tieneHipotecaAntigua', true)}>Sí</button>
-                      <button className={`${styles.boolBtn} ${datos.tieneHipotecaAntigua === false ? styles.boolSelected : ''}`}
+                      <button type="button" className={`${styles.boolBtn} ${datos.tieneHipotecaAntigua === false ? styles.boolSelected : ''}`}
+                        aria-pressed={datos.tieneHipotecaAntigua === false}
                         onClick={() => { upd('tieneHipotecaAntigua', false); upd('posHipoteca', null); }}>No / No aplica</button>
                     </div>
                   </div>
@@ -562,17 +577,17 @@ export default function ImpuestosDivorcioPage() {
 
             <div className={styles.wizardNav}>
               {paso > 0 && (
-                <button className={styles.btnSecundario} onClick={() => setPaso(p => p - 1)}>
+                <button type="button" className={styles.btnSecundario} onClick={() => setPaso(p => p - 1)}>
                   ← Anterior
                 </button>
               )}
               {paso < 4 ? (
-                <button className={styles.btnPrimary} onClick={() => { if (pasoValido()) setPaso(p => p + 1); }}
+                <button type="button" className={styles.btnPrimary} onClick={() => { if (pasoValido()) setPaso(p => p + 1); }}
                   disabled={!pasoValido()}>
                   Siguiente →
                 </button>
               ) : (
-                <button className={styles.btnPrimary} onClick={() => { if (pasoValido()) setPaso(5); }}
+                <button type="button" className={styles.btnPrimary} onClick={() => { if (pasoValido()) setPaso(5); }}
                   disabled={!pasoValido()}>
                   Ver mi análisis fiscal →
                 </button>
@@ -585,7 +600,7 @@ export default function ImpuestosDivorcioPage() {
               <div className={styles.resultHeader}>
                 <h2>Tu análisis fiscal personalizado</h2>
                 <p>Cifras orientativas basadas en IRPF 2025. Consulta obligatoriamente con un asesor fiscal.</p>
-                <button className={styles.btnSecundario} onClick={() => setPaso(0)}>
+                <button type="button" className={styles.btnSecundario} onClick={() => setPaso(0)}>
                   ← Modificar respuestas
                 </button>
               </div>
@@ -593,7 +608,7 @@ export default function ImpuestosDivorcioPage() {
               {/* Pensión compensatoria */}
               {resultados.pensionConyuge && (
                 <div className={`${styles.resultCard} ${resultados.pensionConyuge.tipo === 'ahorro' ? styles.cardBenefit : styles.cardCost}`}>
-                  <div className={styles.resultCardIcon}>{resultados.pensionConyuge.tipo === 'ahorro' ? '📉' : '📈'}</div>
+                  <div className={styles.resultCardIcon} aria-hidden="true">{resultados.pensionConyuge.tipo === 'ahorro' ? '📉' : '📈'}</div>
                   <div className={styles.resultCardBody}>
                     <h3>Pensión compensatoria — IRPF</h3>
                     <p className={styles.resultAmount}>
@@ -613,7 +628,7 @@ export default function ImpuestosDivorcioPage() {
               {/* Hijos */}
               {resultados.hijos && (
                 <div className={`${styles.resultCard} ${resultados.hijos.porcentaje > 0 ? styles.cardBenefit : styles.cardNeutral}`}>
-                  <div className={styles.resultCardIcon}>👨‍👧‍👦</div>
+                  <div className={styles.resultCardIcon} aria-hidden="true">👨‍👧‍👦</div>
                   <div className={styles.resultCardBody}>
                     <h3>Mínimo por descendientes — IRPF</h3>
                     {resultados.hijos.porcentaje > 0 ? (
@@ -644,7 +659,7 @@ export default function ImpuestosDivorcioPage() {
               {/* Vivienda */}
               {resultados.vivienda && (
                 <div className={`${styles.resultCard} ${resultados.vivienda.exenta ? styles.cardBenefit : styles.cardCost}`}>
-                  <div className={styles.resultCardIcon}>🏠</div>
+                  <div className={styles.resultCardIcon} aria-hidden="true">🏠</div>
                   <div className={styles.resultCardBody}>
                     <h3>Vivienda habitual — Imputación de rentas</h3>
                     {resultados.vivienda.exenta ? (
@@ -669,7 +684,7 @@ export default function ImpuestosDivorcioPage() {
               {/* Hipoteca */}
               {resultados.hipoteca && (
                 <div className={`${styles.resultCard} ${resultados.hipoteca.tipo === 'mantiene' ? styles.cardBenefit : styles.cardCost}`}>
-                  <div className={styles.resultCardIcon}>🏦</div>
+                  <div className={styles.resultCardIcon} aria-hidden="true">🏦</div>
                   <div className={styles.resultCardBody}>
                     <h3>Deducción hipotecaria transitoria (pre-2013)</h3>
                     {resultados.hipoteca.tipo === 'mantiene' ? (
@@ -693,7 +708,7 @@ export default function ImpuestosDivorcioPage() {
               {/* Gananciales */}
               {resultados.gananciales && (
                 <div className={`${styles.resultCard} ${styles.cardBenefit}`}>
-                  <div className={styles.resultCardIcon}>📋</div>
+                  <div className={styles.resultCardIcon} aria-hidden="true">📋</div>
                   <div className={styles.resultCardBody}>
                     <h3>Liquidación de gananciales</h3>
                     <p className={styles.resultDetail}>
@@ -705,7 +720,7 @@ export default function ImpuestosDivorcioPage() {
 
               {/* Declaración conjunta */}
               <div className={`${styles.resultCard} ${styles.cardNeutral}`}>
-                <div className={styles.resultCardIcon}>📄</div>
+                <div className={styles.resultCardIcon} aria-hidden="true">📄</div>
                 <div className={styles.resultCardBody}>
                   <h3>Declaración conjunta → individual</h3>
                   <p className={styles.resultDetail}>
@@ -716,7 +731,7 @@ export default function ImpuestosDivorcioPage() {
 
               {/* Fuera del alcance */}
               <div className={styles.outOfScope}>
-                <h3>⚠️ Qué NO cubre esta orientación</h3>
+                <h3><span aria-hidden="true">⚠️</span> Qué NO cubre esta orientación</h3>
                 <ul className={styles.outOfScopeList}>
                   <li><strong>Acciones, fondos de inversión y planes de pensiones:</strong> el reparto en el divorcio no genera plusvalía. La tributación de estos activos ocurrirá en el momento de su venta futura, en un proceso independiente del divorcio.</li>
                   <li><strong>Empresas propias o participaciones societarias:</strong> requieren valoración pericial y asesoramiento especializado.</li>
@@ -799,7 +814,7 @@ export default function ImpuestosDivorcioPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👫</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👫</span>
                 <h3>Divorcio sin hijos, sin vivienda</h3>
               </div>
               <p className={styles.escenarioTip}>
@@ -808,7 +823,7 @@ export default function ImpuestosDivorcioPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👩‍👧</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👩‍👧</span>
                 <h3>Custodia exclusiva + pensión de alimentos</h3>
               </div>
               <p className={styles.escenarioTip}>
@@ -817,7 +832,7 @@ export default function ImpuestosDivorcioPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏠</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏠</span>
                 <h3>Sale de la vivienda y mantiene propiedad</h3>
               </div>
               <p className={styles.escenarioTip}>
@@ -826,7 +841,7 @@ export default function ImpuestosDivorcioPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💰</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💰</span>
                 <h3>Pensión compensatoria alta + IRPF alto</h3>
               </div>
               <p className={styles.escenarioTip}>
@@ -918,27 +933,27 @@ export default function ImpuestosDivorcioPage() {
           <h2>Consejos para gestionar correctamente la fiscalidad del divorcio</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚖️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
               <h4>Considera el efecto fiscal de la pensión compensatoria</h4>
               <p>El pagador reduce su base imponible y quien la cobra tributa por ella como rendimiento del trabajo. Tener en cuenta este efecto al cuantificarla puede ayudar a evitar sorpresas, pero la cuantía debe responder al desequilibrio económico real, no a una optimización tributaria.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏠</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏠</span>
               <h4>Evita mantener copropiedad sin resolver</h4>
               <p>Dejar la vivienda en copropiedad indefinida genera imputaciones de rentas al cónyuge ausente y posibles conflictos. Es mejor acordar el uso exclusivo o la venta en el convenio.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📄</span>
+              <span className={styles.tipIcon} aria-hidden="true">📄</span>
               <h4>Simula la declaración individual y conjunta ese año</h4>
               <p>En el año de transición, puede haber diferencias significativas entre las modalidades. La herramienta de Renta Web de la AEAT permite simular ambas opciones antes de confirmar.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📋</span>
+              <span className={styles.tipIcon} aria-hidden="true">📋</span>
               <h4>Guarda toda la documentación del convenio</h4>
               <p>Las pensiones y deducciones del divorcio pueden ser objeto de comprobación años después. Guarda el convenio regulador, las resoluciones judiciales y los justificantes de pago.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>👨‍⚖️</span>
+              <span className={styles.tipIcon} aria-hidden="true">👨‍⚖️</span>
               <h4>Consulta siempre con asesor fiscal y abogado de familia</h4>
               <p>La fiscalidad del divorcio tiene muchas particularidades por CCAA, tipo de régimen matrimonial y circunstancias personales. Un error puede costar miles de euros en sanciones o beneficios no aplicados.</p>
             </div>
@@ -949,7 +964,7 @@ export default function ImpuestosDivorcioPage() {
         <section>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>Errores fiscales frecuentes en el divorcio</h3>
             </div>
             <ul className={styles.warningList}>

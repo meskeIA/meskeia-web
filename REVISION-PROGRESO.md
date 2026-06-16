@@ -895,11 +895,11 @@
 | [x] | Estimador Plusvalías IRPF | `/estimador-plusvalias-irpf/` | legal-fiscal, finanzas |
 | [x] | Estimador SMI 2026 | `/estimador-smi/` | legal-fiscal, finanzas |
 | [x] | Guía de Plazos Legales | `/plazos-legales/` | legal-fiscal |
-| [ ] | Guía para Gestionar una Herencia | `/guia/herencias/` | legal-fiscal |
-| [ ] | Impuestos en el Divorcio | `/impuestos-divorcio/` | legal-fiscal, finanzas |
-| [ ] | Optimizador de Rentas 60+ | `/optimizador-rentas-60/` | legal-fiscal, finanzas |
+| [x] | Guía para Gestionar una Herencia | `/guia/herencias/` | legal-fiscal |
+| [x] | Impuestos en el Divorcio | `/impuestos-divorcio/` | legal-fiscal, finanzas |
+| [x] | Optimizador de Rentas 60+ | `/optimizador-rentas-60/` | legal-fiscal, finanzas |
 | [x] | Orientación para Tramitar una Herencia | `/orientacion-tramitacion-herencias/` | legal-fiscal |
-| [ ] | Orientador de Ayudas y Prestaciones para Personas y Familias | `/orientador-ayudas-personas-familias/` | legal-fiscal, finanzas |
+| [x] | Orientador de Ayudas y Prestaciones para Personas y Familias | `/orientador-ayudas-personas-familias/` | legal-fiscal, finanzas |
 | [ ] | Orientador de Becas y Ayudas al Estudio | `/orientador-becas-ayudas-estudio/` | legal-fiscal, estudiantes |
 | [x] | Orientador de Gastos Deducibles | `/orientador-gastos-deducibles/` | legal-fiscal, freelance |
 | [ ] | Orientador de Intereses de Demora | `/orientador-intereses-demora/` | legal-fiscal, freelance |

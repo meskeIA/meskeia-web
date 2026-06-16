@@ -135,7 +135,7 @@ export default function GuiaHerenciasPage() {
 
       {/* Hero */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>📜</span>
+        <span className={styles.heroIcon} aria-hidden="true">📜</span>
         <h1 className={styles.title}>Guía para Gestionar una Herencia</h1>
         <p className={styles.subtitle}>
           Qué documentos necesitas, qué impuestos pagar, en qué orden actuar
@@ -163,7 +163,7 @@ export default function GuiaHerenciasPage() {
       {/* Journey */}
       <section className={styles.journeySection}>
         <h2 className={styles.sectionTitle}>
-          <span className={styles.sectionIcon}>🗺️</span>
+          <span className={styles.sectionIcon} aria-hidden="true">🗺️</span>
           El proceso paso a paso
         </h2>
         <div className={styles.journeyGrid}>
@@ -173,7 +173,7 @@ export default function GuiaHerenciasPage() {
               <h3 className={styles.journeyTitle}>{step.title}</h3>
               <p className={styles.journeyDescription}>{step.description}</p>
               <div className={styles.journeyTip}>
-                <span className={styles.tipIcon}>💡</span>
+                <span className={styles.tipIcon} aria-hidden="true">💡</span>
                 <span>{step.tip}</span>
               </div>
             </div>
@@ -184,7 +184,7 @@ export default function GuiaHerenciasPage() {
       {/* Caso de estudio */}
       <section className={styles.caseStudySection}>
         <h2 className={styles.sectionTitle}>
-          <span className={styles.sectionIcon}>📖</span>
+          <span className={styles.sectionIcon} aria-hidden="true">📖</span>
           Ejemplo real
         </h2>
         <div className={styles.caseStudyCard}>
@@ -203,7 +203,7 @@ export default function GuiaHerenciasPage() {
             ))}
           </div>
           <div className={styles.caseStudyConclusion}>
-            <span className={styles.conclusionIcon}>✅</span>
+            <span className={styles.conclusionIcon} aria-hidden="true">✅</span>
             <span><strong>Conclusión:</strong> {caseStudy.conclusion}</span>
           </div>
         </div>
@@ -212,7 +212,7 @@ export default function GuiaHerenciasPage() {
       {/* Herramientas */}
       <section className={styles.toolsSection}>
         <h2 className={styles.sectionTitle}>
-          <span className={styles.sectionIcon}>🧰</span>
+          <span className={styles.sectionIcon} aria-hidden="true">🧰</span>
           Herramientas disponibles
         </h2>
         <p className={styles.toolsSubtitle}>
@@ -222,7 +222,7 @@ export default function GuiaHerenciasPage() {
           {tools.map((tool) => (
             <Link key={tool.id} href={tool.url} className={styles.toolCard}>
               <div className={styles.toolHeader}>
-                <span className={styles.toolIcon}>{tool.icon}</span>
+                <span className={styles.toolIcon} aria-hidden="true">{tool.icon}</span>
                 <span className={styles.toolStep}>Paso {tool.step}</span>
               </div>
               <h3 className={styles.toolName}>{tool.name}</h3>
@@ -237,7 +237,7 @@ export default function GuiaHerenciasPage() {
       {/* FAQ */}
       <section className={styles.faqSection}>
         <h2 className={styles.sectionTitle}>
-          <span className={styles.sectionIcon}>❓</span>
+          <span className={styles.sectionIcon} aria-hidden="true">❓</span>
           Preguntas frecuentes
         </h2>
         <div className={styles.faqList}>
@@ -277,19 +277,19 @@ export default function GuiaHerenciasPage() {
       {/* Otras guías */}
       <section className={styles.otherGuidesSection}>
         <h2 className={styles.sectionTitle}>
-          <span className={styles.sectionIcon}>📚</span>
+          <span className={styles.sectionIcon} aria-hidden="true">📚</span>
           Otras guías relacionadas
         </h2>
         <div className={styles.otherGuidesGrid}>
           <Link href="/guia/invertir/" className={styles.otherGuideCard}>
-            <span className={styles.otherGuideIcon}>📈</span>
+            <span className={styles.otherGuideIcon} aria-hidden="true">📈</span>
             <div>
               <h3 className={styles.otherGuideTitle}>Guía para Invertir</h3>
               <p className={styles.otherGuideDescription}>Qué hacer con el dinero heredado</p>
             </div>
           </Link>
           <Link href="/guia/comprar-casa/" className={styles.otherGuideCard}>
-            <span className={styles.otherGuideIcon}>🏠</span>
+            <span className={styles.otherGuideIcon} aria-hidden="true">🏠</span>
             <div>
               <h3 className={styles.otherGuideTitle}>Guía Comprar Casa</h3>
               <p className={styles.otherGuideDescription}>Si vendes un inmueble heredado para comprar otro</p>
