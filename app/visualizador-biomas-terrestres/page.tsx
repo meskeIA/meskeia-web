@@ -616,6 +616,7 @@ function DiagramaLatitudes({
                   return (
                     <button
                       key={bid}
+                      type="button"
                       className={[
                         styles.latitudBiomaBtn,
                         biomaActivo === bid
@@ -629,8 +630,9 @@ function DiagramaLatitudes({
                       }
                       onClick={() => onSelectBioma(bid)}
                       aria-label={`Seleccionar bioma: ${bioma.nombre}`}
+                      aria-pressed={biomaActivo === bid}
                     >
-                      {bioma.icono} {bioma.nombre}
+                      <span aria-hidden="true">{bioma.icono}</span> {bioma.nombre}
                     </button>
                   );
                 })}
@@ -644,6 +646,7 @@ function DiagramaLatitudes({
         {BIOMAS.map((b) => (
           <button
             key={b.id}
+            type="button"
             className={[
               styles.leyendaItem,
               biomaActivo === b.id ? styles.leyendaItemActivo : '',
@@ -651,12 +654,13 @@ function DiagramaLatitudes({
             style={{ '--bioma-color': b.color } as React.CSSProperties}
             onClick={() => onSelectBioma(b.id)}
             aria-label={`Ver bioma: ${b.nombre}`}
+            aria-pressed={biomaActivo === b.id}
           >
             <span
               className={styles.leyendaColor}
               style={{ background: b.color }}
             />
-            {b.icono} {b.nombre}
+            <span aria-hidden="true">{b.icono}</span> {b.nombre}
           </button>
         ))}
       </div>
@@ -715,6 +719,7 @@ export default function VisualizadorBiomasTerrestres() {
         ).map((t) => (
           <button
             key={t.id}
+            type="button"
             className={[
               styles.tab,
               tab === t.id ? styles.tabActivo : '',
@@ -732,7 +737,7 @@ export default function VisualizadorBiomasTerrestres() {
       {tab === 'selector' && (
         <section className={styles.seccion}>
           <h2 className={styles.seccionTitulo}>
-            🌿 Selecciona un bioma
+            <span aria-hidden="true">🌿</span> Selecciona un bioma
           </h2>
           <p className={styles.seccionSubtitulo}>
             Los 7 biomas terrestres principales, organizados por latitud y
@@ -743,6 +748,7 @@ export default function VisualizadorBiomasTerrestres() {
             {BIOMAS.map((b) => (
               <button
                 key={b.id}
+                type="button"
                 className={[
                   styles.biomaCard,
                   biomaActivo === b.id ? styles.biomaCardActivo : '',
@@ -781,7 +787,7 @@ export default function VisualizadorBiomasTerrestres() {
                   {biomaSeleccionado.nombre}
                 </h3>
                 <p className={styles.biomaDetalleUbicacion}>
-                  📍 {biomaSeleccionado.ubicacion}
+                  <span aria-hidden="true">📍</span> {biomaSeleccionado.ubicacion}
                 </p>
               </div>
             </div>
@@ -789,7 +795,7 @@ export default function VisualizadorBiomasTerrestres() {
             <div className={styles.biomaDetalleGrid}>
               <div className={styles.biomaDetalleCelda}>
                 <span className={styles.biomaDetalleLabel}>
-                  🌡️ Temperatura
+                  <span aria-hidden="true">🌡️</span> Temperatura
                 </span>
                 <span className={styles.biomaDetalleValor}>
                   {biomaSeleccionado.tempMedia}
@@ -797,7 +803,7 @@ export default function VisualizadorBiomasTerrestres() {
               </div>
               <div className={styles.biomaDetalleCelda}>
                 <span className={styles.biomaDetalleLabel}>
-                  🌧️ Precipitación
+                  <span aria-hidden="true">🌧️</span> Precipitación
                 </span>
                 <span className={styles.biomaDetalleValor}>
                   {biomaSeleccionado.precipitacion}
@@ -805,7 +811,7 @@ export default function VisualizadorBiomasTerrestres() {
               </div>
               <div className={styles.biomaDetalleCelda}>
                 <span className={styles.biomaDetalleLabel}>
-                  📍 Latitud
+                  <span aria-hidden="true">📍</span> Latitud
                 </span>
                 <span className={styles.biomaDetalleValor}>
                   {biomaSeleccionado.latitud}
@@ -813,7 +819,7 @@ export default function VisualizadorBiomasTerrestres() {
               </div>
               <div className={styles.biomaDetalleCelda}>
                 <span className={styles.biomaDetalleLabel}>
-                  🌀 Estación
+                  <span aria-hidden="true">🌀</span> Estación
                 </span>
                 <span className={styles.biomaDetalleValor}>
                   {biomaSeleccionado.estacion}
@@ -832,7 +838,7 @@ export default function VisualizadorBiomasTerrestres() {
             <div className={styles.biomaDetalleListasGrid}>
               <div>
                 <p className={styles.biomaDetalleListaTitulo}>
-                  🦎 Fauna representativa
+                  <span aria-hidden="true">🦎</span> Fauna representativa
                 </p>
                 <ul className={styles.biomaDetalleList}>
                   {biomaSeleccionado.fauna.map((f) => (
@@ -842,7 +848,7 @@ export default function VisualizadorBiomasTerrestres() {
               </div>
               <div>
                 <p className={styles.biomaDetalleListaTitulo}>
-                  🌱 Flora característica
+                  <span aria-hidden="true">🌱</span> Flora característica
                 </p>
                 <ul className={styles.biomaDetalleList}>
                   {biomaSeleccionado.flora.map((f) => (
@@ -852,7 +858,7 @@ export default function VisualizadorBiomasTerrestres() {
               </div>
               <div>
                 <p className={styles.biomaDetalleListaTitulo}>
-                  ⚠️ Principales amenazas
+                  <span aria-hidden="true">⚠️</span> Principales amenazas
                 </p>
                 <ul className={styles.biomaDetalleList}>
                   {biomaSeleccionado.amenazas.map((a) => (
@@ -869,7 +875,7 @@ export default function VisualizadorBiomasTerrestres() {
       {tab === 'clima' && (
         <section className={styles.seccion}>
           <h2 className={styles.seccionTitulo}>
-            🌡️ Diagrama de Walter-Lieth
+            <span aria-hidden="true">🌡️</span> Diagrama de Walter-Lieth
           </h2>
           <p className={styles.seccionSubtitulo}>
             Temperatura media mensual (rojo) y precipitación mensual (azul)
@@ -880,14 +886,16 @@ export default function VisualizadorBiomasTerrestres() {
             {BIOMAS.map((b) => (
               <button
                 key={b.id}
+                type="button"
                 className={[
                   styles.biomaChip,
                   biomaActivo === b.id ? styles.biomaChipActivo : '',
                 ].join(' ')}
                 style={{ '--bioma-color': b.color } as React.CSSProperties}
                 onClick={() => setBiomaActivo(b.id)}
+                aria-pressed={biomaActivo === b.id}
               >
-                {b.icono} {b.nombre}
+                <span aria-hidden="true">{b.icono}</span> {b.nombre}
               </button>
             ))}
           </div>
@@ -898,7 +906,7 @@ export default function VisualizadorBiomasTerrestres() {
             <div className={styles.climaInfoCard}>
               <span className={styles.climaInfoLabel}>Bioma actual</span>
               <span className={styles.climaInfoValor}>
-                {biomaSeleccionado.icono} {biomaSeleccionado.nombre}
+                <span aria-hidden="true">{biomaSeleccionado.icono}</span> {biomaSeleccionado.nombre}
               </span>
             </div>
             <div className={styles.climaInfoCard}>
@@ -921,7 +929,7 @@ export default function VisualizadorBiomasTerrestres() {
       {tab === 'mapa' && (
         <section className={styles.seccion}>
           <h2 className={styles.seccionTitulo}>
-            🗺️ Distribución por latitud
+            <span aria-hidden="true">🗺️</span> Distribución por latitud
           </h2>
           <p className={styles.seccionSubtitulo}>
             Los biomas se distribuyen en cinturones latitudinales determinados
@@ -933,7 +941,7 @@ export default function VisualizadorBiomasTerrestres() {
           />
           <div className={styles.biomaDetalleMinimo}>
             <strong>
-              {biomaSeleccionado.icono} {biomaSeleccionado.nombre}
+              <span aria-hidden="true">{biomaSeleccionado.icono}</span> {biomaSeleccionado.nombre}
             </strong>
             : {biomaSeleccionado.ubicacion}
           </div>
@@ -944,7 +952,7 @@ export default function VisualizadorBiomasTerrestres() {
       {tab === 'amenazas' && (
         <section className={styles.seccion}>
           <h2 className={styles.seccionTitulo}>
-            ⚠️ Amenazas globales y conservación
+            <span aria-hidden="true">⚠️</span> Amenazas globales y conservación
           </h2>
           <p className={styles.seccionSubtitulo}>
             Principales presiones sobre los biomas terrestres y estado de
@@ -1039,7 +1047,7 @@ export default function VisualizadorBiomasTerrestres() {
                 {CONSERVACION.map((row) => (
                   <tr key={row.bioma}>
                     <td>
-                      {row.icono} {row.bioma}
+                      <span aria-hidden="true">{row.icono}</span> {row.bioma}
                     </td>
                     <td>{row.superficie}</td>
                     <td>
@@ -1129,7 +1137,7 @@ export default function VisualizadorBiomasTerrestres() {
             </thead>
             <tbody>
               <tr>
-                <td>🌴 Tropical húmedo</td>
+                <td><span aria-hidden="true">🌴</span> Tropical húmedo</td>
                 <td>25–30 °C</td>
                 <td>2.000–4.000 mm</td>
                 <td>Muy alta (50 % especies)</td>
@@ -1137,7 +1145,7 @@ export default function VisualizadorBiomasTerrestres() {
                 <td><strong style={{ color: '#E67E22' }}>18 %</strong></td>
               </tr>
               <tr>
-                <td>🌳 Templado</td>
+                <td><span aria-hidden="true">🌳</span> Templado</td>
                 <td>5–20 °C</td>
                 <td>500–1.500 mm</td>
                 <td>Media-alta</td>
@@ -1145,7 +1153,7 @@ export default function VisualizadorBiomasTerrestres() {
                 <td><strong style={{ color: '#E67E22' }}>14 %</strong></td>
               </tr>
               <tr>
-                <td>🌲 Taiga / Boreal</td>
+                <td><span aria-hidden="true">🌲</span> Taiga / Boreal</td>
                 <td>−5 a 5 °C</td>
                 <td>300–900 mm</td>
                 <td>Baja diversidad</td>
@@ -1153,7 +1161,7 @@ export default function VisualizadorBiomasTerrestres() {
                 <td><strong style={{ color: '#E67E22' }}>12 %</strong></td>
               </tr>
               <tr>
-                <td>🏔️ Tundra ártica</td>
+                <td><span aria-hidden="true">🏔️</span> Tundra ártica</td>
                 <td>−20 a 5 °C</td>
                 <td>150–250 mm</td>
                 <td>Muy baja</td>
@@ -1161,7 +1169,7 @@ export default function VisualizadorBiomasTerrestres() {
                 <td><strong style={{ color: '#27AE60' }}>22 %</strong></td>
               </tr>
               <tr>
-                <td>🏜️ Desierto</td>
+                <td><span aria-hidden="true">🏜️</span> Desierto</td>
                 <td>20–50 °C (día)</td>
                 <td>&lt; 250 mm</td>
                 <td>Baja, alta endemicidad</td>
@@ -1169,7 +1177,7 @@ export default function VisualizadorBiomasTerrestres() {
                 <td><strong style={{ color: '#C0392B' }}>8 %</strong></td>
               </tr>
               <tr>
-                <td>🦁 Sabana</td>
+                <td><span aria-hidden="true">🦁</span> Sabana</td>
                 <td>20–30 °C</td>
                 <td>500–1.500 mm estacionales</td>
                 <td>Alta (grandes herbívoros)</td>
@@ -1177,7 +1185,7 @@ export default function VisualizadorBiomasTerrestres() {
                 <td><strong style={{ color: '#E67E22' }}>15 %</strong></td>
               </tr>
               <tr>
-                <td>🌿 Mediterráneo</td>
+                <td><span aria-hidden="true">🌿</span> Mediterráneo</td>
                 <td>15–25 °C</td>
                 <td>300–900 mm (invierno)</td>
                 <td>Alta endemicidad</td>
@@ -1242,7 +1250,7 @@ export default function VisualizadorBiomasTerrestres() {
               alta montaña como categorías independientes.
             </p>
             <p className={styles.faqTip}>
-              💡 La clasificación de Whittaker (1975) basada en temperatura y precipitación es la referencia estándar.
+              <span aria-hidden="true">💡</span> La clasificación de Whittaker (1975) basada en temperatura y precipitación es la referencia estándar.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -1276,7 +1284,7 @@ export default function VisualizadorBiomasTerrestres() {
               ecosistema, la escala local.
             </p>
             <p className={styles.faqTip}>
-              💡 Regla rápida: varios ecosistemas distintos pueden compartir el mismo bioma.
+              <span aria-hidden="true">💡</span> Regla rápida: varios ecosistemas distintos pueden compartir el mismo bioma.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -1301,7 +1309,7 @@ export default function VisualizadorBiomasTerrestres() {
               mucho menos territorio para perder.
             </p>
             <p className={styles.faqTip}>
-              💡 Solo el 5 % del bioma mediterráneo está protegido frente al objetivo del 30 % para 2030.
+              <span aria-hidden="true">💡</span> Solo el 5 % del bioma mediterráneo está protegido frente al objetivo del 30 % para 2030.
             </p>
           </div>
         </div>

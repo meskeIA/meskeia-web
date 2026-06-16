@@ -294,7 +294,7 @@ export default function CalculadoraAlgebraAbstractaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🔷 Calculadora de Álgebra Abstracta</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🔷</span> Calculadora de Álgebra Abstracta</h1>
         <p className={styles.subtitle}>
           Grupos, anillos, cuerpos y estructuras algebraicas en Zn
         </p>
@@ -310,8 +310,10 @@ export default function CalculadoraAlgebraAbstractaPage() {
             {tipos.map((tipo) => (
               <button
                 key={tipo.id}
+                type="button"
                 className={`${styles.tipoBtn} ${tipoCalculo === tipo.id ? styles.tipoActivo : ''}`}
                 onClick={() => setTipoCalculo(tipo.id)}
+                aria-pressed={tipoCalculo === tipo.id}
               >
                 <span className={styles.tipoIcono}>{tipo.icono}</span>
                 <span className={styles.tipoNombre}>{tipo.nombre}</span>
@@ -353,14 +355,18 @@ export default function CalculadoraAlgebraAbstractaPage() {
                 />
                 <div className={styles.operacionSelector}>
                   <button
+                    type="button"
                     className={`${styles.opBtn} ${operacion === '+' ? styles.opActivo : ''}`}
                     onClick={() => setOperacion('+')}
+                    aria-pressed={operacion === '+'}
                   >
                     Suma (+)
                   </button>
                   <button
+                    type="button"
                     className={`${styles.opBtn} ${operacion === '*' ? styles.opActivo : ''}`}
                     onClick={() => setOperacion('*')}
+                    aria-pressed={operacion === '*'}
                   >
                     Producto (×)
                   </button>
@@ -385,7 +391,7 @@ export default function CalculadoraAlgebraAbstractaPage() {
 
           {!resultados ? (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>🔷</span>
+              <span className={styles.placeholderIcon} aria-hidden="true">🔷</span>
               <p>Ingresa los valores para analizar</p>
             </div>
           ) : (

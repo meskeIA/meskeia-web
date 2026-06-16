@@ -299,7 +299,7 @@ function SeccionFamilias() {
       {seleccionada && (
         <div className={styles.infoPanel} style={{ borderLeftColor: seleccionada.color }}>
           <h4 className={styles.infoPanelTitulo} style={{ color: seleccionada.color }}>
-            {seleccionada.icono} {seleccionada.nombre}
+            <span aria-hidden="true">{seleccionada.icono}</span> {seleccionada.nombre}
           </h4>
           <p className={styles.infoPanelFuncion}>{seleccionada.descripcion}</p>
           <div className={styles.infoPanelMeta}>

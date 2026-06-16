@@ -386,10 +386,10 @@
 | [x] | Alzheimer y Parkinson: Mecanismo Neurobiológico | `/visualizador-alzheimer-parkinson/` | estudiantes, cultura, salud |
 | [x] | Anatomía de una Flor - De la Polinización al Fruto | `/visualizador-anatomia-flor/` | estudiantes, cultura |
 | [x] | Arquitectura del Computador — CPU, Ciclo FDE y Jerarquía de Memoria | `/visualizador-arquitectura-computador/` | estudiantes, tecnicas |
-| [ ] | Biomas Terrestres: Clima, Fauna y Conservación | `/visualizador-biomas-terrestres/` | estudiantes, cultura |
-| [ ] | Biomoléculas - Los 4 Ingredientes de la Vida | `/visualizador-biomoleculas/` | estudiantes, cultura |
-| [ ] | Cadenas de Suministro Globales: JIT, Disrupciones y Reshoring | `/visualizador-cadenas-suministro/` | estudiantes, cultura, productividad |
-| [ ] | Calculadora Álgebra Abstracta | `/calculadora-algebra-abstracta/` | estudiantes |
+| [x] | Biomas Terrestres: Clima, Fauna y Conservación | `/visualizador-biomas-terrestres/` | estudiantes, cultura |
+| [x] | Biomoléculas - Los 4 Ingredientes de la Vida | `/visualizador-biomoleculas/` | estudiantes, cultura |
+| [x] | Cadenas de Suministro Globales: JIT, Disrupciones y Reshoring | `/visualizador-cadenas-suministro/` | estudiantes, cultura, productividad |
+| [x] | Calculadora Álgebra Abstracta | `/calculadora-algebra-abstracta/` | estudiantes |
 | [x] | Calculadora de Álgebra Booleana | `/calculadora-algebra-booleana/` | estudiantes, tecnicas |
 | [ ] | Calculadora de Cálculo | `/calculadora-calculo/` | estudiantes |
 | [x] | Calculadora de Distribuciones | `/calculadora-distribuciones/` | estudiantes |
