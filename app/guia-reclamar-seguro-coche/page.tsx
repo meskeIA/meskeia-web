@@ -280,10 +280,12 @@ export default function GuiaReclamarSeguroCochePage() {
           {situaciones.map((situacion) => (
             <button
               key={situacion.id}
+              type="button"
+              aria-pressed={situacionActiva === situacion.id}
               className={`${styles.situacionCard} ${situacionActiva === situacion.id ? styles.situacionCardActiva : ''}`}
               onClick={() => setSituacionActiva(situacionActiva === situacion.id ? null : situacion.id)}
             >
-              <span className={styles.situacionIcon}>{situacion.icon}</span>
+              <span className={styles.situacionIcon} aria-hidden="true">{situacion.icon}</span>
               <h3 className={styles.situacionTitulo}>{situacion.titulo}</h3>
               <p className={styles.situacionDesc}>{situacion.descripcion}</p>
               <div className={styles.situacionBadges}>
@@ -304,7 +306,7 @@ export default function GuiaReclamarSeguroCochePage() {
       {situacionSeleccionada && (
         <section className={styles.detalleSection}>
           <div className={styles.detalleHeader}>
-            <span className={styles.detalleIcon}>{situacionSeleccionada.icon}</span>
+            <span className={styles.detalleIcon} aria-hidden="true">{situacionSeleccionada.icon}</span>
             <div>
               <h2 className={styles.detalleTitulo}>{situacionSeleccionada.titulo}</h2>
               <p className={styles.detalleCobertura}>
@@ -363,32 +365,32 @@ export default function GuiaReclamarSeguroCochePage() {
 
         <div className={styles.factoresGrid}>
           <div className={styles.factorCard}>
-            <span className={styles.factorIcon}>💶</span>
+            <span className={styles.factorIcon} aria-hidden="true">💶</span>
             <h4>Coste de la reparación</h4>
             <p>¿Supera tu franquicia? Si no, no tiene sentido reclamar.</p>
           </div>
           <div className={styles.factorCard}>
-            <span className={styles.factorIcon}>📜</span>
+            <span className={styles.factorIcon} aria-hidden="true">📜</span>
             <h4>Tipo de cobertura</h4>
             <p>¿Tienes todo riesgo, terceros ampliado o básico?</p>
           </div>
           <div className={styles.factorCard}>
-            <span className={styles.factorIcon}>📊</span>
+            <span className={styles.factorIcon} aria-hidden="true">📊</span>
             <h4>Historial de siniestros</h4>
             <p>¿Has reclamado en los últimos 2-3 años?</p>
           </div>
           <div className={styles.factorCard}>
-            <span className={styles.factorIcon}>⏳</span>
+            <span className={styles.factorIcon} aria-hidden="true">⏳</span>
             <h4>Antigüedad de la póliza</h4>
             <p>Clientes fieles suelen tener mejor trato.</p>
           </div>
           <div className={styles.factorCard}>
-            <span className={styles.factorIcon}>🚙</span>
+            <span className={styles.factorIcon} aria-hidden="true">🚙</span>
             <h4>Valor del vehículo</h4>
             <p>En coches antiguos, la indemnización puede no compensar.</p>
           </div>
           <div className={styles.factorCard}>
-            <span className={styles.factorIcon}>👤</span>
+            <span className={styles.factorIcon} aria-hidden="true">👤</span>
             <h4>Culpabilidad</h4>
             <p>Si no eres culpable, reclama al seguro contrario.</p>
           </div>
@@ -403,6 +405,8 @@ export default function GuiaReclamarSeguroCochePage() {
           {faqData.map((faq, index) => (
             <div key={index} className={styles.faqItem}>
               <button
+                type="button"
+                aria-pressed={faqAbierta === index}
                 className={styles.faqPregunta}
                 onClick={() => setFaqAbierta(faqAbierta === index ? null : index)}
               >
@@ -528,7 +532,7 @@ export default function GuiaReclamarSeguroCochePage() {
           <div className={styles.casosGrid}>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoEmoji}>🅿️</span>
+                <span className={styles.casoEmoji} aria-hidden="true">🅿️</span>
                 <span className={styles.casoTag}>Golpe en aparcamiento</span>
               </div>
               <p>Alguien te roza el coche en un parking y no deja nota. Daño estimado: 400 €. Con todo riesgo
@@ -538,7 +542,7 @@ export default function GuiaReclamarSeguroCochePage() {
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoEmoji}>🌪️</span>
+                <span className={styles.casoEmoji} aria-hidden="true">🌪️</span>
                 <span className={styles.casoTag}>Granizo o tormenta</span>
               </div>
               <p>Una granizada destruye el capó y el techo del coche. Daño: 2.500 €. Este tipo de siniestro
@@ -548,7 +552,7 @@ export default function GuiaReclamarSeguroCochePage() {
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoEmoji}>🚧</span>
+                <span className={styles.casoEmoji} aria-hidden="true">🚧</span>
                 <span className={styles.casoTag}>Accidente con otro vehículo</span>
               </div>
               <p>Colisión en intersección con otro conductor que se da a la fuga. Sin testigos ni cámara.
@@ -558,7 +562,7 @@ export default function GuiaReclamarSeguroCochePage() {
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoEmoji}>🦌</span>
+                <span className={styles.casoEmoji} aria-hidden="true">🦌</span>
                 <span className={styles.casoTag}>Atropello de animal</span>
               </div>
               <p>Colisión con un jabalí en carretera de noche. Daño: 3.000 €. Requiere denuncia a la Guardia
@@ -673,37 +677,37 @@ export default function GuiaReclamarSeguroCochePage() {
           <h2>Consejos para gestionar mejor tu seguro de coche</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📱</span>
+              <span className={styles.tipIcon} aria-hidden="true">📱</span>
               <strong>Guarda el teléfono de siniestros</strong>
               <p>Ten el número de emergencias de tu aseguradora guardado en el móvil. En un accidente nocturno
               o en el extranjero, perder tiempo buscando el número es muy estresante.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📸</span>
+              <span className={styles.tipIcon} aria-hidden="true">📸</span>
               <strong>Fotografía siempre antes de mover</strong>
               <p>Nunca muevas el vehículo (salvo riesgo) sin documentar la posición. Una foto vale más que
               cualquier declaración verbal posterior en caso de disputa.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧮</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧮</span>
               <strong>Calcula si compensa reclamar</strong>
               <p>Antes de abrir parte, estima el coste del siniestro, la franquicia y el posible aumento de prima
               el año siguiente. A veces es más barato pagar de bolsillo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📋</span>
+              <span className={styles.tipIcon} aria-hidden="true">📋</span>
               <strong>Guarda el parte amistoso relleno</strong>
               <p>Saca una foto al parte amistoso antes de separarte del otro conductor. Si hay disputa posterior,
               la foto del documento original puede ser determinante.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <strong>Notifica aunque no vayas a reclamar</strong>
               <p>Comunica siempre el siniestro en el plazo de 7 días aunque no decidas reclamar de inmediato.
               Preservas tu derecho a hacerlo posteriormente si los daños son mayores de lo esperado.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔍</span>
               <strong>Revisa tu póliza antes del siniestro</strong>
               <p>Conoce tu franquicia, tus coberturas y los talleres concertados antes de necesitarlos.
               Sorprenderse en el momento del accidente es la peor situación para tomar buenas decisiones.</p>
@@ -714,7 +718,7 @@ export default function GuiaReclamarSeguroCochePage() {
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores frecuentes al reclamar al seguro de coche</strong>
           </div>
           <ul className={styles.warningList}>

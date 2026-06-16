@@ -99,6 +99,7 @@ export default function VisualizadorFondoInversion() {
           {TABS.map((tab) => (
             <button
               key={tab.id}
+              type="button"
               role="tab"
               aria-selected={tabActivo === tab.id}
               aria-controls={`panel-${tab.id}`}
@@ -487,6 +488,7 @@ export default function VisualizadorFondoInversion() {
                   {[10, 20, 30].map((a) => (
                     <button
                       key={a}
+                      type="button"
                       onClick={() => setSliderAnios(a)}
                       className={`${styles.anioBtn} ${sliderAnios === a ? styles.anioBtnActive : ''}`}
                       aria-pressed={sliderAnios === a}

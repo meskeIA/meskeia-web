@@ -658,10 +658,10 @@
 | [x] | Estimador FIRE | `/estimador-fire/` | finanzas, legal-fiscal |
 | [x] | Estimador Fondo de Emergencia | `/estimador-fondo-emergencia/` | finanzas |
 | [x] | Estimador Interés Compuesto | `/estimador-interes-compuesto/` | finanzas |
-| [ ] | Estimador TIR-VAN | `/estimador-tir-van/` | finanzas, freelance, estudiantes |
-| [ ] | Fondo de Inversión: Por Dentro | `/visualizador-fondo-inversion/` | finanzas |
-| [ ] | Guía Reclamar Seguro Coche | `/guia-reclamar-seguro-coche/` | finanzas, cultura |
-| [ ] | Inflación: Por Qué Suben los Precios | `/visualizador-inflacion/` | finanzas, cultura, estudiantes |
+| [x] | Estimador TIR-VAN | `/estimador-tir-van/` | finanzas, freelance, estudiantes |
+| [x] | Fondo de Inversión: Por Dentro | `/visualizador-fondo-inversion/` | finanzas |
+| [x] | Guía Reclamar Seguro Coche | `/guia-reclamar-seguro-coche/` | finanzas, cultura |
+| [x] | Inflación: Por Qué Suben los Precios | `/visualizador-inflacion/` | finanzas, cultura, estudiantes |
 | [ ] | Juego de Presupuesto Mensual | `/juego-presupuesto-mensual/` | finanzas, estudiantes, juegos |
 | [ ] | Las 6 Clases de Activos — Rentabilidad, Riesgo y Correlación | `/visualizador-tipos-activos/` | finanzas, estudiantes, cultura |
 | [ ] | Mercados Financieros - Bolsa, Órdenes y Activos | `/visualizador-mercados-financieros/` | finanzas, cultura |

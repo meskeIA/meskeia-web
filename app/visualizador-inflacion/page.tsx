@@ -222,6 +222,7 @@ export default function VisualizadorInflacion() {
         {TABS.map((tab) => (
           <button
             key={tab.id}
+            type="button"
             className={`${styles.tab} ${tabActiva === tab.id ? styles.tabActive : ''}`}
             onClick={() => setTabActiva(tab.id)}
             aria-pressed={tabActiva === tab.id}
@@ -280,6 +281,7 @@ export default function VisualizadorInflacion() {
             {CAUSAS.map((causa) => (
               <button
                 key={causa.id}
+                type="button"
                 className={`${styles.causaCard} ${causaActiva === causa.id ? styles.causaCardActive : ''}`}
                 onClick={() => setCausaActiva(causa.id)}
                 style={{ '--causa-color': causa.color } as React.CSSProperties}
