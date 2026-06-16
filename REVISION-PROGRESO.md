@@ -217,10 +217,10 @@
 | [x] | Historia de las Epidemias: Cronología, Mortalidad y Legado Médico | `/visualizador-historia/epidemias/` | cultura, salud |
 | [x] | Historia de las Especias y las Rutas Comerciales: De Arabia a los Mercados Globales | `/visualizador-historia/especias-rutas-comerciales/` | cultura, estudiantes |
 | [x] | Historia de las Matemáticas: De Babilonia a la IA Matemática | `/visualizador-historia/matematicas/` | cultura |
-| [ ] | Historia de las Redes Sociales: De SixDegrees a la Era de la IA Social | `/visualizador-historia/redes-sociales/` | cultura, tecnicas |
-| [ ] | Historia de los Aztecas: De Aztlán a la Caída de Tenochtitlan | `/visualizador-historia/azteca/` | cultura, estudiantes |
-| [ ] | Historia de los Derechos Humanos: Cronología de la Magna Carta a los Derechos Digitales | `/visualizador-derechos-humanos/` | cultura |
-| [ ] | Historia de los Descubrimientos Científicos: De Arquímedes al CRISPR | `/visualizador-historia/historia-descubrimientos-cientificos/` | cultura |
+| [x] | Historia de las Redes Sociales: De SixDegrees a la Era de la IA Social | `/visualizador-historia/redes-sociales/` | cultura, tecnicas |
+| [x] | Historia de los Aztecas: De Aztlán a la Caída de Tenochtitlan | `/visualizador-historia/azteca/` | cultura, estudiantes |
+| [x] | Historia de los Derechos Humanos: Cronología de la Magna Carta a los Derechos Digitales | `/visualizador-derechos-humanos/` | cultura |
+| [x] | Historia de los Descubrimientos Científicos: De Arquímedes al CRISPR | `/visualizador-historia/historia-descubrimientos-cientificos/` | cultura |
 | [ ] | Historia de los Diccionarios y Enciclopedias: De los Escribas a Wikipedia | `/visualizador-historia/diccionarios-enciclopedias/` | cultura, estudiantes |
 | [ ] | Historia de los Estados Unidos: De las Colonias a la Superpotencia | `/visualizador-historia/historia-eeuu/` | cultura |
 | [ ] | Historia de los Idiomas del Mundo: De las Primeras Lenguas al Inglés Global | `/visualizador-historia/idiomas-mundo/` | cultura, estudiantes |

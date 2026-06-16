@@ -245,9 +245,11 @@ function TabDetalle() {
         {MOVIMIENTOS.map((mov, i) => (
           <button
             key={mov.nombre}
+            type="button"
             className={`${styles.movimientoBtn} ${i === indice ? styles.movimientoBtnActivo : ''}`}
             onClick={() => setIndice(i)}
             style={i === indice ? { background: mov.color, borderColor: mov.color } : {}}
+            aria-pressed={i === indice}
           >
             {mov.nombre}
           </button>
@@ -280,6 +282,7 @@ function TabDetalle() {
 
       <div className={styles.navBtns}>
         <button
+          type="button"
           className={styles.btnAnterior}
           onClick={() => setIndice((i) => Math.max(0, i - 1))}
           disabled={indice === 0}
@@ -289,6 +292,7 @@ function TabDetalle() {
         </button>
         <span className={styles.navCounter}>{indice + 1} / {MOVIMIENTOS.length}</span>
         <button
+          type="button"
           className={styles.btnSiguiente}
           onClick={() => setIndice((i) => Math.min(MOVIMIENTOS.length - 1, i + 1))}
           disabled={indice === MOVIMIENTOS.length - 1}
@@ -466,6 +470,7 @@ export default function DerechosHumanos() {
           {tabs.map((tab) => (
             <button
               key={tab.id}
+              type="button"
               role="tab"
               aria-selected={tabActiva === tab.id}
               className={`${styles.tabBtn} ${tabActiva === tab.id ? styles.tabBtnActivo : ''}`}
