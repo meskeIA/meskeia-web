@@ -219,10 +219,12 @@ export default function CalculadoraMedicamentosMascotasPage() {
         {tabs.map((tab) => (
           <button
             key={tab.id}
+            type="button"
             className={`${styles.tab} ${activeTab === tab.id ? styles.active : ''}`}
             onClick={() => setActiveTab(tab.id)}
+            aria-pressed={activeTab === tab.id}
           >
-            <span>{tab.emoji}</span> {tab.label}
+            <span aria-hidden="true">{tab.emoji}</span> {tab.label}
           </button>
         ))}
       </div>
@@ -236,16 +238,20 @@ export default function CalculadoraMedicamentosMascotasPage() {
             {/* Selector de mascota */}
             <div className={styles.mascotaSelector}>
               <button
+                type="button"
                 className={`${styles.mascotaBtn} ${tipoMascota === 'perro' ? styles.active : ''}`}
                 onClick={() => { setTipoMascota('perro'); setResultado(null); }}
+                aria-pressed={tipoMascota === 'perro'}
               >
-                🐕 Perro
+                <span aria-hidden="true">🐕</span> Perro
               </button>
               <button
+                type="button"
                 className={`${styles.mascotaBtn} ${tipoMascota === 'gato' ? styles.active : ''}`}
                 onClick={() => { setTipoMascota('gato'); setResultado(null); }}
+                aria-pressed={tipoMascota === 'gato'}
               >
-                🐈 Gato
+                <span aria-hidden="true">🐈</span> Gato
               </button>
             </div>
 
@@ -269,25 +275,29 @@ export default function CalculadoraMedicamentosMascotasPage() {
               <label>Tipo de antiparasitario</label>
               <div className={styles.tipoSelector}>
                 <button
+                  type="button"
                   className={`${styles.tipoBtn} ${tipoAntiparasitario === 'externo' ? styles.active : ''}`}
                   onClick={() => setTipoAntiparasitario('externo')}
+                  aria-pressed={tipoAntiparasitario === 'externo'}
                 >
-                  <span className={styles.tipoIcon}>🦟</span>
+                  <span className={styles.tipoIcon} aria-hidden="true">🦟</span>
                   <span className={styles.tipoLabel}>Externo</span>
                   <span className={styles.tipoDesc}>Pulgas, garrapatas</span>
                 </button>
                 <button
+                  type="button"
                   className={`${styles.tipoBtn} ${tipoAntiparasitario === 'interno' ? styles.active : ''}`}
                   onClick={() => setTipoAntiparasitario('interno')}
+                  aria-pressed={tipoAntiparasitario === 'interno'}
                 >
-                  <span className={styles.tipoIcon}>🐛</span>
+                  <span className={styles.tipoIcon} aria-hidden="true">🐛</span>
                   <span className={styles.tipoLabel}>Interno</span>
                   <span className={styles.tipoDesc}>Lombrices, tenias</span>
                 </button>
               </div>
             </div>
 
-            <button onClick={calcularRecomendacion} className={styles.btnPrimary}>
+            <button type="button" onClick={calcularRecomendacion} className={styles.btnPrimary}>
               Ver Recomendación
             </button>
 

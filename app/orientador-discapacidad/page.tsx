@@ -267,7 +267,7 @@ export default function OrientadorDiscapacidadPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.heroTitle}>♿ Orientador Grado de Discapacidad</h1>
+        <h1 className={styles.heroTitle}><span aria-hidden="true">♿</span> Orientador Grado de Discapacidad</h1>
         <p className={styles.heroSubtitle}>
           ¿Vale la pena solicitar el reconocimiento? · Test orientativo · RD 888/2022
         </p>
@@ -329,12 +329,13 @@ export default function OrientadorDiscapacidadPage() {
                 <span className={styles.numPregunta}>{idx + 1}.</span> {p.pregunta}
               </p>
               {p.notaAyuda && (
-                <p className={styles.notaAyuda}>💡 {p.notaAyuda}</p>
+                <p className={styles.notaAyuda}><span aria-hidden="true">💡</span> {p.notaAyuda}</p>
               )}
               <div className={styles.opcionesLista}>
                 {p.opciones.map(op => (
                   <button
                     key={op.puntos}
+                    type="button"
                     className={[
                       styles.opcionBtn,
                       respuestas[p.id] === op.puntos ? styles.opcionSeleccionada : '',
@@ -356,14 +357,14 @@ export default function OrientadorDiscapacidadPage() {
 
           {/* PREGUNTA ADICIONAL: MOVILIDAD REDUCIDA */}
           <div className={styles.tarjetaPregunta}>
-            <div className={styles.ambitoLabel}>🅿️ Tarjeta de estacionamiento para personas con discapacidad</div>
+            <div className={styles.ambitoLabel}><span aria-hidden="true">🅿️</span> Tarjeta de estacionamiento para personas con discapacidad</div>
             <p className={styles.textoPregunta}>
               <span className={styles.numPregunta}>{PREGUNTAS.length + 1}.</span>{' '}
               ¿Tienes dificultades graves para caminar o desplazarte a pie que podrían justificar
               una tarjeta de estacionamiento para personas con movilidad reducida?
             </p>
             <p className={styles.notaAyuda}>
-              💡 Este beneficio tiene criterios propios: requiere que la limitación de movilidad sea
+              <span aria-hidden="true">💡</span> Este beneficio tiene criterios propios: requiere que la limitación de movilidad sea
               permanente y significativa, independientemente del grado de discapacidad reconocido.
             </p>
             <div className={styles.opcionesLista}>
@@ -373,6 +374,7 @@ export default function OrientadorDiscapacidadPage() {
               ].map(op => (
                 <button
                   key={String(op.valor)}
+                  type="button"
                   className={[
                     styles.opcionBtn,
                     movilidadReducida === op.valor ? styles.opcionSeleccionada : '',
@@ -393,6 +395,7 @@ export default function OrientadorDiscapacidadPage() {
 
           <div className={styles.accionWrapper}>
             <button
+              type="button"
               className={styles.btnCalcular}
               onClick={calcular}
               disabled={!todoRespondido}
@@ -433,7 +436,7 @@ export default function OrientadorDiscapacidadPage() {
 
           {resultado.movilidadReducida && (
             <div className={styles.movilidadBox}>
-              <strong>🅿️ Tarjeta de estacionamiento</strong>
+              <strong><span aria-hidden="true">🅿️</span> Tarjeta de estacionamiento</strong>
               <p>
                 Has indicado que tienes dificultades graves para desplazarte. Puedes solicitar la{' '}
                 <strong>tarjeta de estacionamiento para personas con movilidad reducida</strong> en el
@@ -444,13 +447,13 @@ export default function OrientadorDiscapacidadPage() {
           )}
 
           <div className={styles.resultadoAviso}>
-            <strong>⚠️ Recuerda:</strong> Este resultado es <strong>exclusivamente orientativo</strong>.
+            <strong><span aria-hidden="true">⚠️</span> Recuerda:</strong> Este resultado es <strong>exclusivamente orientativo</strong>.
             El porcentaje real solo puede determinarlo el equipo técnico de tu Comunidad Autónoma en una
             valoración presencial. Las prestaciones y beneficios concretos varían según cada CCAA.
           </div>
 
-          <button className={styles.btnReiniciar} onClick={reiniciar}>
-            🔄 Repetir el test
+          <button type="button" className={styles.btnReiniciar} onClick={reiniciar}>
+            <span aria-hidden="true">🔄</span> Repetir el test
           </button>
         </section>
       )}
@@ -674,7 +677,7 @@ export default function OrientadorDiscapacidadPage() {
 
         {/* CONSEJOS */}
         <section className={styles.consejosSection}>
-          <h2>💡 Consejos para el proceso</h2>
+          <h2><span aria-hidden="true">💡</span> Consejos para el proceso</h2>
           <div className={styles.consejosGrid}>
             <div className={styles.consejoCard}>
               <span aria-hidden="true">📋</span>
@@ -711,7 +714,7 @@ export default function OrientadorDiscapacidadPage() {
 
         {/* WARNING BOX — indicador v2.0 */}
         <div className={styles.warningBox}>
-          <strong>⚠️ Importante:</strong> Este orientador es una herramienta de autoevaluación
+          <strong><span aria-hidden="true">⚠️</span> Importante:</strong> Este orientador es una herramienta de autoevaluación
           funcional. <strong>No es un instrumento diagnóstico ni una valoración oficial.</strong>{' '}
           El grado de discapacidad solo puede reconocerlo el equipo técnico de tu Comunidad Autónoma
           en una valoración presencial. Las prestaciones y beneficios varían según cada CCAA.{' '}

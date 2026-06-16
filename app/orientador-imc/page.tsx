@@ -299,7 +299,7 @@ export default function CalculadoraIMCPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>⚖️ Orientador IMC</h1>
+        <h1 className={styles.title}><span aria-hidden="true">⚖️</span> Orientador IMC</h1>
         <p className={styles.subtitle}>
           Calcula tu Índice de Masa Corporal y conoce tu clasificación según la OMS
         </p>
@@ -313,16 +313,18 @@ export default function CalculadoraIMCPage() {
           type="button"
           className={`${styles.modoBtn} ${modo === 'calculadora' ? styles.modoActivo : ''}`}
           onClick={() => setModo('calculadora')}
+          aria-pressed={modo === 'calculadora'}
         >
-          <span className={styles.modoIcon}>⚖️</span>
+          <span className={styles.modoIcon} aria-hidden="true">⚖️</span>
           <span className={styles.modoNombre}>Calculadora</span>
         </button>
         <button
           type="button"
           className={`${styles.modoBtn} ${modo === 'comparador' ? styles.modoActivo : ''}`}
           onClick={() => setModo('comparador')}
+          aria-pressed={modo === 'comparador'}
         >
-          <span className={styles.modoIcon}>📊</span>
+          <span className={styles.modoIcon} aria-hidden="true">📊</span>
           <span className={styles.modoNombre}>Comparador</span>
         </button>
       </div>
@@ -362,7 +364,7 @@ export default function CalculadoraIMCPage() {
           </div>
 
           <div className={styles.formula}>
-            <h3>📐 Fórmula del IMC</h3>
+            <h3><span aria-hidden="true">📐</span> Fórmula del IMC</h3>
             <p className={styles.formulaText}>
               IMC = Peso (kg) ÷ Altura² (m)
             </p>
@@ -422,7 +424,7 @@ export default function CalculadoraIMCPage() {
               </div>
 
               <div className={styles.tablaIMC}>
-                <h3>📊 Clasificación OMS</h3>
+                <h3><span aria-hidden="true">📊</span> Clasificación OMS</h3>
                 <table>
                   <thead>
                     <tr>
@@ -474,7 +476,7 @@ export default function CalculadoraIMCPage() {
       {modo === 'comparador' && (
         <div className={styles.comparadorContent}>
           <div className={styles.comparadorIntro}>
-            <h2 className={styles.panelTitle}>📊 Comparador de Perfiles</h2>
+            <h2 className={styles.panelTitle}><span aria-hidden="true">📊</span> Comparador de Perfiles</h2>
             <p>Compara cómo variaría tu IMC con diferentes pesos para una misma altura</p>
           </div>
 
@@ -532,7 +534,7 @@ export default function CalculadoraIMCPage() {
             <>
               {/* Gráfico */}
               <div className={styles.chartSection}>
-                <h3>📈 Comparativa Visual de IMC</h3>
+                <h3><span aria-hidden="true">📈</span> Comparativa Visual de IMC</h3>
                 <div className={styles.chartLegend}>
                   <span className={styles.legendItem} data-color="bajo">Bajo peso</span>
                   <span className={styles.legendItem} data-color="normal">Normal</span>
@@ -583,14 +585,14 @@ export default function CalculadoraIMCPage() {
               {/* Info peso ideal */}
               <div className={styles.pesoIdealInfo}>
                 <p>
-                  🎯 <strong>Rango IMC estándar OMS para {formatNumber(parseSpanishNumber(alturaComparador), 0)} cm:</strong>{' '}
+                  <span aria-hidden="true">🎯</span> <strong>Rango IMC estándar OMS para {formatNumber(parseSpanishNumber(alturaComparador), 0)} cm:</strong>{' '}
                   {formatNumber(datosComparador.pesoIdealRango.min, 1)} - {formatNumber(datosComparador.pesoIdealRango.max, 1)} kg
                 </p>
               </div>
 
               {/* Tabla comparativa */}
               <div className={styles.tablaComparativa}>
-                <h3>📋 Tabla Comparativa</h3>
+                <h3><span aria-hidden="true">📋</span> Tabla Comparativa</h3>
                 <table>
                   <thead>
                     <tr>
@@ -663,12 +665,12 @@ export default function CalculadoraIMCPage() {
         </ul>
 
         <p className={styles.highlight}>
-          <strong>⚕️ Esta herramienta NO diagnostica ni trata enfermedades.</strong> Si tienes dudas sobre tu peso,
+          <strong><span aria-hidden="true">⚕️</span> Esta herramienta NO diagnostica ni trata enfermedades.</strong> Si tienes dudas sobre tu peso,
           composición corporal o salud metabólica, consulta con un médico, endocrinólogo o nutricionista colegiado.
         </p>
 
         <p className={styles.emergency}>
-          🚨 <strong>Si presentas pérdida/ganancia de peso involuntaria, fatiga extrema o síntomas preocupantes,
+          <span aria-hidden="true">🚨</span> <strong>Si presentas pérdida/ganancia de peso involuntaria, fatiga extrema o síntomas preocupantes,
           acude a tu médico de inmediato.</strong>
         </p>
       </DisclaimerCard>
@@ -944,7 +946,7 @@ export default function CalculadoraIMCPage() {
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores comunes al interpretar el IMC</strong>
           </div>
           <ul className={styles.warningList}>

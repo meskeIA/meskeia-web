@@ -258,6 +258,7 @@ export default function VisualizadorOxitocinaPage() {
           {SITUACIONES.map(situacion => (
             <button
               key={situacion.id}
+              type="button"
               role="listitem"
               className={`${styles.situacionCard} ${situacionActiva === situacion.id ? styles.situacionActiva : ''}`}
               onClick={() => handleSituacion(situacion.id)}
@@ -352,6 +353,7 @@ export default function VisualizadorOxitocinaPage() {
               {PUNTOS_EFECTO.map(punto => (
                 <button
                   key={punto.id}
+                  type="button"
                   className={`${styles.leyendaItem} ${puntoActivo === punto.id ? styles.leyendaActiva : ''}`}
                   onClick={() => handlePunto(punto.id)}
                   aria-pressed={puntoActivo === punto.id}
@@ -389,8 +391,8 @@ export default function VisualizadorOxitocinaPage() {
             <thead>
               <tr>
                 <th scope="col">Aspecto</th>
-                <th scope="col" className={styles.colOxitocina}>🩷 Oxitocina</th>
-                <th scope="col" className={styles.colVasopresina}>🔵 Vasopresina</th>
+                <th scope="col" className={styles.colOxitocina}><span aria-hidden="true">🩷</span> Oxitocina</th>
+                <th scope="col" className={styles.colVasopresina}><span aria-hidden="true">🔵</span> Vasopresina</th>
               </tr>
             </thead>
             <tbody>

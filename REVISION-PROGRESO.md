@@ -1046,12 +1046,12 @@
 | [x] | Metabolismo del Alcohol: El Acetaldehído Multi-Órgano | `/visualizador-metabolismo-alcohol/` | salud, cultura |
 | [x] | Orientador Colesterol | `/orientador-colesterol/` | salud, legal-fiscal |
 | [x] | Orientador Grado de Dependencia | `/orientador-grado-dependencia/` | salud, legal-fiscal |
-| [ ] | Orientador Grado de Discapacidad | `/orientador-discapacidad/` | salud, legal-fiscal |
-| [ ] | Orientador IMC | `/orientador-imc/` | salud |
-| [ ] | Orientador Medicamentos Mascotas | `/orientador-medicamentos-mascotas/` | salud |
+| [x] | Orientador Grado de Discapacidad | `/orientador-discapacidad/` | salud, legal-fiscal |
+| [x] | Orientador IMC | `/orientador-imc/` | salud |
+| [x] | Orientador Medicamentos Mascotas | `/orientador-medicamentos-mascotas/` | salud |
 | [x] | Orientador Percentiles Infantiles | `/orientador-percentiles/` | salud |
 | [x] | Orientador Tensión Arterial | `/orientador-tension-arterial/` | salud, legal-fiscal |
-| [ ] | Oxitocina - La Hormona del Vínculo Social | `/visualizador-oxitocina/` | salud, cultura, estudiantes |
+| [x] | Oxitocina - La Hormona del Vínculo Social | `/visualizador-oxitocina/` | salud, cultura, estudiantes |
 | [ ] | Paracetamol: Cómo Actúa en el Sistema Nervioso Central | `/visualizador-paracetamol/` | salud, cultura, estudiantes |
 | [ ] | Planificador de Gastos del Primer Año del Bebé | `/planificador-gastos-bebe/` | salud, finanzas |
 | [ ] | Planificador de Mascota | `/planificador-mascota/` | salud |
