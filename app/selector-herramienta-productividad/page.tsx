@@ -361,7 +361,7 @@ export default function SelectorHerramientaProductividad() {
               disabled={preguntaActual === 0}
               aria-label="Ir a la pregunta anterior"
             >
-              ← Anterior
+              <span aria-hidden="true">←</span> Anterior
             </button>
 
             {!esUltimaPregunta ? (
@@ -372,7 +372,7 @@ export default function SelectorHerramientaProductividad() {
                 disabled={respuestaActual < 0}
                 aria-label="Ir a la siguiente pregunta"
               >
-                Siguiente →
+                Siguiente <span aria-hidden="true">→</span>
               </button>
             ) : (
               <button
@@ -382,7 +382,7 @@ export default function SelectorHerramientaProductividad() {
                 disabled={!todasRespondidas}
                 aria-label="Ver mi recomendación personalizada"
               >
-                Ver mi resultado →
+                Ver mi resultado <span aria-hidden="true">→</span>
               </button>
             )}
           </div>
@@ -454,7 +454,7 @@ export default function SelectorHerramientaProductividad() {
               onClick={reiniciar}
               aria-label="Reiniciar el test"
             >
-              ↺ Repetir test
+              <span aria-hidden="true">↺</span> Repetir test
             </button>
           </section>
         );

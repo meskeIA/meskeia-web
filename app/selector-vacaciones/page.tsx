@@ -451,7 +451,7 @@ export default function SelectorVacaciones() {
 
       {/* 2. Hero */}
       <header className={styles.hero}>
-        <h1 className={styles.heroTitle}>🏖️ Selector de Vacaciones</h1>
+        <h1 className={styles.heroTitle}><span aria-hidden="true">🏖️</span> Selector de Vacaciones</h1>
         <p className={styles.heroSubtitle}>
           Test de 10 preguntas para descubrir qué tipo de viaje se adapta mejor a ti
         </p>
@@ -577,7 +577,7 @@ export default function SelectorVacaciones() {
                       <div key={idx} className={styles.presupuestoCard}>
                         <span className={styles.presupuestoDestino}>{ej.destino}</span>
                         <p className={styles.presupuestoDesc}>{ej.descripcion}</p>
-                        <span className={styles.presupuestoCoste}>📍 {ej.coste}</span>
+                        <span className={styles.presupuestoCoste}><span aria-hidden="true">📍</span> {ej.coste}</span>
                       </div>
                     ))}
                   </div>
@@ -601,7 +601,7 @@ export default function SelectorVacaciones() {
               onClick={reiniciar}
               aria-label="Volver a realizar el test desde el principio"
             >
-              🔄 Repetir el test
+              <span aria-hidden="true">🔄</span> Repetir el test
             </button>
           </section>
         )
@@ -619,7 +619,7 @@ export default function SelectorVacaciones() {
         {/* Grid de tipos */}
         <div className={styles.eduGrid}>
           <div className={styles.eduCard}>
-            <h4>🏖️ Playa y Costa</h4>
+            <h4><span aria-hidden="true">🏖️</span> Playa y Costa</h4>
             <p>Ideal para desconectar y recargar energías. España tiene más de 8.000 km de costa con playas para todos los gustos.</p>
             <ul>
               <li>Mejor época: junio a septiembre</li>
@@ -629,7 +629,7 @@ export default function SelectorVacaciones() {
           </div>
 
           <div className={styles.eduCard}>
-            <h4>🏔️ Montaña y Rural</h4>
+            <h4><span aria-hidden="true">🏔️</span> Montaña y Rural</h4>
             <p>Entornos naturales para el senderismo, la fauna y la gastronomía de interior. Menos masificación y precios más asequibles.</p>
             <ul>
               <li>Mejor época: primavera, verano y otoño</li>
@@ -639,7 +639,7 @@ export default function SelectorVacaciones() {
           </div>
 
           <div className={styles.eduCard}>
-            <h4>🏛️ Ciudad Cultural</h4>
+            <h4><span aria-hidden="true">🏛️</span> Ciudad Cultural</h4>
             <p>Museos, arquitectura y gastronomía urbana. Perfecta para viajes cortos: un fin de semana puede ser suficiente.</p>
             <ul>
               <li>Válida durante todo el año</li>
@@ -649,7 +649,7 @@ export default function SelectorVacaciones() {
           </div>
 
           <div className={styles.eduCard}>
-            <h4>🧗 Aventura y Mochilero</h4>
+            <h4><span aria-hidden="true">🧗</span> Aventura y Mochilero</h4>
             <p>Para quienes buscan salir de la zona de confort. Requiere más planificación y un seguro de viaje robusto.</p>
             <ul>
               <li>Mejor época: según el destino y la actividad</li>
@@ -659,7 +659,7 @@ export default function SelectorVacaciones() {
           </div>
 
           <div className={styles.eduCard}>
-            <h4>🗺️ Viaje Organizado</h4>
+            <h4><span aria-hidden="true">🗺️</span> Viaje Organizado</h4>
             <p>La opción más cómoda y sin sorpresas. El operador gestiona toda la logística: transporte, hotel y guías.</p>
             <ul>
               <li>Disponible durante todo el año</li>
@@ -671,13 +671,13 @@ export default function SelectorVacaciones() {
 
         {/* Aviso reserva con antelación */}
         <div className={styles.warningBox} role="note">
-          <strong>⏰ Reserva con antelación y ahorra</strong>
+          <strong><span aria-hidden="true">⏰</span> Reserva con antelación y ahorra</strong>
           Reservar con 3-6 meses de antelación para el verano puede suponer un ahorro significativo respecto al precio de última hora. Los precios de vuelos, hoteles y paquetes turísticos se disparan en temporada alta (julio-agosto) y en las semanas previas a la salida. Compara siempre en varios buscadores antes de confirmar la reserva.
         </div>
 
         {/* Consejo seguro de viaje */}
         <div className={styles.eduCard} style={{ marginTop: '1rem' }}>
-          <h4>🛡️ El seguro de viaje: no lo subestimes</h4>
+          <h4><span aria-hidden="true">🛡️</span> El seguro de viaje: no lo subestimes</h4>
           <p>
             Un buen seguro de viaje cubre cancelaciones, asistencia médica en el extranjero, pérdida de equipaje y repatriación.
             Su coste (habitualmente entre 20 € y 80 € por viaje) es mínimo comparado con los imprevistos que puede cubrir.

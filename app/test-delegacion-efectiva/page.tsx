@@ -242,16 +242,16 @@ export default function TestDelegacionEfectivaPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🤝 Test de Delegación Efectiva</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🤝</span> Test de Delegación Efectiva</h1>
           <p className={styles.subtitle}>
             ¿Delegas bien o solo sueltas tareas?
             <br />
             Basado en el Modelo Situacional de Hersey-Blanchard
           </p>
           <div className={styles.badges}>
-            <span className={styles.badge}>🕐 3 minutos</span>
-            <span className={styles.badge}>📊 10 preguntas</span>
-            <span className={styles.badge}>🔒 Sin registro</span>
+            <span className={styles.badge}><span aria-hidden="true">🕐</span> 3 minutos</span>
+            <span className={styles.badge}><span aria-hidden="true">📊</span> 10 preguntas</span>
+            <span className={styles.badge}><span aria-hidden="true">🔒</span> Sin registro</span>
           </div>
         </header>
 
@@ -297,6 +297,7 @@ export default function TestDelegacionEfectivaPage() {
                 {ESCALA.map((opcion) => (
                   <button
                     key={opcion.valor}
+                    type="button"
                     className={`${styles.scaleButton} ${respuestas[pregunta.id] === opcion.valor ? styles.scaleButtonActive : ''}`}
                     onClick={() => handleRespuesta(pregunta.id, opcion.valor)}
                     role="radio"
@@ -316,6 +317,7 @@ export default function TestDelegacionEfectivaPage() {
           </div>
 
           <button
+            type="button"
             className={styles.btnPrimary}
             onClick={calcularResultado}
             disabled={!todasRespondidas}
@@ -333,24 +335,24 @@ export default function TestDelegacionEfectivaPage() {
             {/* Mapa 2D */}
             <div className={styles.mapContainer}>
               <div className={styles.mapLabels}>
-                <span className={styles.mapLabelTop}>🤝 Alto acompañamiento</span>
+                <span className={styles.mapLabelTop}><span aria-hidden="true">🤝</span> Alto acompañamiento</span>
                 <span className={styles.mapLabelBottom}>Bajo acompañamiento</span>
                 <span className={styles.mapLabelLeft}>Baja autonomía</span>
-                <span className={styles.mapLabelRight}>🚀 Alta autonomía</span>
+                <span className={styles.mapLabelRight}><span aria-hidden="true">🚀</span> Alta autonomía</span>
               </div>
               <div className={styles.map}>
                 {/* Cuadrantes */}
                 <div className={`${styles.quadrant} ${styles.quadrantTL}`}>
-                  <span>🔍 Microgestión con Cariño</span>
+                  <span><span aria-hidden="true">🔍</span> Microgestión con Cariño</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantTR}`}>
-                  <span>🎯 Delegación Efectiva</span>
+                  <span><span aria-hidden="true">🎯</span> Delegación Efectiva</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBL}`}>
-                  <span>🔒 Retención Total</span>
+                  <span><span aria-hidden="true">🔒</span> Retención Total</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
-                  <span>🪂 Soltar y Rezar</span>
+                  <span><span aria-hidden="true">🪂</span> Soltar y Rezar</span>
                 </div>
                 {/* Líneas de umbral */}
                 <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
@@ -372,7 +374,7 @@ export default function TestDelegacionEfectivaPage() {
             <div className={styles.scoresContainer}>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>🤝 Acompañamiento</span>
+                  <span><span aria-hidden="true">🤝</span> Acompañamiento</span>
                   <span className={styles.scoreValue}>{puntuacionAcompanamiento}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -384,7 +386,7 @@ export default function TestDelegacionEfectivaPage() {
               </div>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>🚀 Autonomía</span>
+                  <span><span aria-hidden="true">🚀</span> Autonomía</span>
                   <span className={styles.scoreValue}>{puntuacionAutonomia}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -406,7 +408,7 @@ export default function TestDelegacionEfectivaPage() {
 
               <div className={styles.profileColumns}>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>✅ Fortalezas</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">✅</span> Fortalezas</h4>
                   <ul className={styles.profileList}>
                     {perfil.fortalezas.map((f, i) => (
                       <li key={i}>{f}</li>
@@ -414,7 +416,7 @@ export default function TestDelegacionEfectivaPage() {
                   </ul>
                 </div>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>⚠️ Riesgos</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">⚠️</span> Riesgos</h4>
                   <ul className={styles.profileList}>
                     {perfil.riesgos.map((r, i) => (
                       <li key={i}>{r}</li>
@@ -424,7 +426,7 @@ export default function TestDelegacionEfectivaPage() {
               </div>
 
               <div className={styles.actionsSection}>
-                <h4 className={styles.actionsTitle}>🎯 Acciones sugeridas</h4>
+                <h4 className={styles.actionsTitle}><span aria-hidden="true">🎯</span> Acciones sugeridas</h4>
                 <ol className={styles.actionsList}>
                   {perfil.acciones.map((a, i) => (
                     <li key={i}>{a}</li>
@@ -433,7 +435,7 @@ export default function TestDelegacionEfectivaPage() {
               </div>
             </div>
 
-            <button className={styles.btnSecondary} onClick={reiniciar}>
+            <button type="button" className={styles.btnSecondary} onClick={reiniciar}>
               Repetir diagnóstico
             </button>
           </section>
@@ -441,7 +443,7 @@ export default function TestDelegacionEfectivaPage() {
 
         {/* Contenido educativo */}
         <EducationalSection
-          title="📚 El Modelo Situacional: no existe un solo modo de delegar"
+          title="El Modelo Situacional: no existe un solo modo de delegar"
           subtitle="Hersey, Blanchard y la madurez del equipo"
         >
           <section className={styles.guideSection}>

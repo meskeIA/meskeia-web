@@ -948,10 +948,10 @@
 | [x] | Matriz Eisenhower | `/matriz-eisenhower/` | productividad, freelance |
 | [x] | Planificador de Boda | `/planificador-boda/` | productividad, inmobiliaria |
 | [x] | Planificador de Turnos | `/planificador-turnos/` | productividad |
-| [ ] | Selector de Método de Productividad | `/selector-herramienta-productividad/` | productividad, freelance |
-| [ ] | Selector de Modalidad de Trabajo | `/selector-modalidad-trabajo/` | productividad, freelance |
-| [ ] | Selector de Vacaciones | `/selector-vacaciones/` | productividad, salud |
-| [ ] | Test de Delegación Efectiva | `/test-delegacion-efectiva/` | productividad, freelance |
+| [x] | Selector de Método de Productividad | `/selector-herramienta-productividad/` | productividad, freelance |
+| [x] | Selector de Modalidad de Trabajo | `/selector-modalidad-trabajo/` | productividad, freelance |
+| [x] | Selector de Vacaciones | `/selector-vacaciones/` | productividad, salud |
+| [x] | Test de Delegación Efectiva | `/test-delegacion-efectiva/` | productividad, freelance |
 | [ ] | Test de Ritmo Vital | `/test-ritmo-vital/` | productividad, salud |
 | [ ] | Test de Síndrome del Impostor | `/test-sindrome-impostor/` | productividad, salud |
 | [ ] | Test Madurez Digital | `/test-madurez-digital/` | productividad, tecnicas, diseno |

@@ -496,7 +496,7 @@ export default function SelectorModalidadTrabajoPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1>🖥️ Selector de Modalidad de Trabajo</h1>
+        <h1><span aria-hidden="true">🖥️</span> Selector de Modalidad de Trabajo</h1>
         <p>
           Responde 10 preguntas y descubre si tu perfil encaja mejor con el trabajo presencial,
           teletrabajo, modelo híbrido, coworking o estilo de vida nómada digital.
@@ -594,7 +594,7 @@ export default function SelectorModalidadTrabajoPage() {
                     className={`${styles.puntuacionItem} ${esGanadora ? styles.puntuacionItemDestacado : ''}`}
                   >
                     <p className={`${styles.puntuacionLabel} ${esGanadora ? styles.puntuacionLabelDestacado : ''}`}>
-                      {MODALIDADES[id].icono} {nombresCortos[id]}
+                      <span aria-hidden="true">{MODALIDADES[id].icono}</span> {nombresCortos[id]}
                     </p>
                     <div className={styles.puntuacionBarra}>
                       <div
@@ -636,23 +636,23 @@ export default function SelectorModalidadTrabajoPage() {
 
           <div className={styles.tarjetasComparacion}>
             <div className={styles.tarjetaModalidad}>
-              <h4>🏢 Presencial</h4>
+              <h4><span aria-hidden="true">🏢</span> Presencial</h4>
               <p>Asistencia diaria a la oficina. Máxima interacción y estructura. Ideal cuando el trabajo requiere colaboración física o acceso a instalaciones.</p>
             </div>
             <div className={styles.tarjetaModalidad}>
-              <h4>🏡 Remoto total</h4>
+              <h4><span aria-hidden="true">🏡</span> Remoto total</h4>
               <p>100 % desde casa u otros espacios. Requiere alta autodisciplina y entorno doméstico adecuado. Máxima flexibilidad geográfica y horaria.</p>
             </div>
             <div className={styles.tarjetaModalidad}>
-              <h4>🔀 Híbrido</h4>
+              <h4><span aria-hidden="true">🔀</span> Híbrido</h4>
               <p>Combinación de días en oficina y días en remoto. El modelo más extendido en grandes empresas españolas tras la pandemia.</p>
             </div>
             <div className={styles.tarjetaModalidad}>
-              <h4>☕ Coworking</h4>
+              <h4><span aria-hidden="true">☕</span> Coworking</h4>
               <p>Espacio compartido de trabajo fuera de casa y de la empresa. Popular entre freelances, autónomos y trabajadores remotos que necesitan ambiente profesional.</p>
             </div>
             <div className={styles.tarjetaModalidad}>
-              <h4>🌍 Nómada digital</h4>
+              <h4><span aria-hidden="true">🌍</span> Nómada digital</h4>
               <p>Trabajo desde distintos países o ciudades de forma periódica. Requiere trabajo 100 % digital, autonomía total y planificación fiscal específica.</p>
             </div>
           </div>
