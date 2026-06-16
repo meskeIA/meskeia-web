@@ -292,7 +292,7 @@ export default function EstimadorRiesgoOsteoporosis() {
       <div className={styles.escenariosGrid}>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>👩</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">👩</span>
             <strong>Mujer posmenopáusica de 55 años</strong>
           </div>
           <p>Menopausia precoz a los 48, madre con fractura de cadera. Riesgo alto. La densitometría DEXA es esencial para evaluar el estado óseo actual.</p>
@@ -301,7 +301,7 @@ export default function EstimadorRiesgoOsteoporosis() {
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>💊</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">💊</span>
             <strong>Persona con corticoterapia crónica</strong>
           </div>
           <p>Artritis reumatoide tratada con prednisona. Los corticoides inhiben la formación ósea. Requiere seguimiento estrecho y puede necesitar tratamiento preventivo desde el inicio.</p>
@@ -310,7 +310,7 @@ export default function EstimadorRiesgoOsteoporosis() {
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>🏃</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">🏃</span>
             <strong>Hombre sedentario de 70 años</strong>
           </div>
           <p>La osteoporosis en hombres es menos frecuente pero existe. El sedentarismo acelera la pérdida ósea. El ejercicio de carga es la intervención más efectiva.</p>
@@ -319,7 +319,7 @@ export default function EstimadorRiesgoOsteoporosis() {
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>🥛</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">🥛</span>
             <strong>Persona con intolerancia a lácteos</strong>
           </div>
           <p>Sin lácteos, la ingesta de calcio puede ser insuficiente. Alternativas: sardinas con espina, almendras, brócoli y bebidas vegetales fortificadas.</p>
@@ -416,32 +416,32 @@ export default function EstimadorRiesgoOsteoporosis() {
       {/* 5. Mejores Prácticas */}
       <div className={styles.tipsGrid}>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>☀️</div>
+          <div className={styles.tipIcon} aria-hidden="true">☀️</div>
           <strong>Exposición solar diaria moderada</strong>
           <p>15-20 minutos de sol en brazos y piernas entre las 10h-14h sintetiza vitamina D suficiente en verano. En invierno, suplementación puede ser necesaria.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>🥗</div>
+          <div className={styles.tipIcon} aria-hidden="true">🥗</div>
           <strong>Dieta rica en calcio variada</strong>
           <p>No solo lácteos: sardinas (espina), brocoli, almendras, tofu y bebidas vegetales con calcio añadido son excelentes fuentes alternativas.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>🏋️</div>
+          <div className={styles.tipIcon} aria-hidden="true">🏋️</div>
           <strong>Ejercicio de resistencia como base</strong>
           <p>El ejercicio con carga (pesas, máquinas) estimula más la formación ósea que el ejercicio aeróbico. Incluirlo al menos 2 veces por semana.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>🚭</div>
+          <div className={styles.tipIcon} aria-hidden="true">🚭</div>
           <strong>Evitar tabaco y alcohol en exceso</strong>
           <p>El tabaco inhibe la absorción de calcio y reduce los niveles de estrógenos. El alcohol en exceso altera el metabolismo óseo directamente.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>🏠</div>
+          <div className={styles.tipIcon} aria-hidden="true">🏠</div>
           <strong>Prevenir caídas en casa</strong>
           <p>Eliminar obstáculos, alfombras resbaladizas, instalar barras en baño y mejorar la iluminación. Las caídas son el principal mecanismo de fractura.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>💊</div>
+          <div className={styles.tipIcon} aria-hidden="true">💊</div>
           <strong>No abandonar el tratamiento sin consultar</strong>
           <p>Los bifosfonatos y otros tratamientos requieren continuidad. Abandonarlos puede revertir la mejora de densidad ósea en pocos meses.</p>
         </div>
@@ -450,7 +450,7 @@ export default function EstimadorRiesgoOsteoporosis() {
       {/* 6. Warning Box */}
       <div className={styles.warningBox}>
         <div className={styles.warningHeader}>
-          <span className={styles.warningIcon}>⚠️</span>
+          <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
           <strong>Errores frecuentes en la prevención y tratamiento de la osteoporosis</strong>
         </div>
         <ul className={styles.warningList}>

@@ -1009,10 +1009,10 @@
 | [x] | Envejecimiento Celular - Telómeros, Senescencia y Hallmarks | `/visualizador-envejecimiento-celular/` | salud, estudiantes, cultura |
 | [x] | Estimación de Baja Maternal y Paternal | `/estimacion-baja-maternal/` | salud, productividad |
 | [x] | Estimación de Deducción IRPF por Discapacidad | `/estimacion-deduccion-discapacidad/` | salud, finanzas, legal-fiscal |
-| [ ] | Estimación de Prestación por Nacimiento | `/estimacion-prestacion-nacimiento/` | salud, finanzas |
-| [ ] | Estimación de Prestaciones por Dependencia | `/estimacion-prestaciones-dependencia/` | salud, legal-fiscal, finanzas |
-| [ ] | Estimador de Riesgo de Osteoporosis | `/estimador-riesgo-osteoporosis/` | salud, legal-fiscal |
-| [ ] | Estrógenos - Las Hormonas del Ciclo y la Salud Ósea | `/visualizador-estrogenos/` | salud, cultura, estudiantes |
+| [x] | Estimación de Prestación por Nacimiento | `/estimacion-prestacion-nacimiento/` | salud, finanzas |
+| [x] | Estimación de Prestaciones por Dependencia | `/estimacion-prestaciones-dependencia/` | salud, legal-fiscal, finanzas |
+| [x] | Estimador de Riesgo de Osteoporosis | `/estimador-riesgo-osteoporosis/` | salud, legal-fiscal |
+| [x] | Estrógenos - Las Hormonas del Ciclo y la Salud Ósea | `/visualizador-estrogenos/` | salud, cultura, estudiantes |
 | [ ] | Farmacocinética - Cómo Viaja un Fármaco por el Cuerpo | `/visualizador-farmacocinetica/` | salud, estudiantes, cultura |
 | [ ] | GABA: El Gran Freno del Sistema Nervioso | `/visualizador-gaba/` | salud, cultura, estudiantes |
 | [ ] | Guía Cuidado de Mascotas | `/guia-cuidado-mascota/` | salud, cultura |

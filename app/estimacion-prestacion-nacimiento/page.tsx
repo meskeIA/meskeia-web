@@ -573,7 +573,7 @@ export default function EstimacionPrestacionNacimiento() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioEmoji}>👩‍💼</span>
+                <span className={styles.escenarioEmoji} aria-hidden="true">👩‍💼</span>
                 <span className={styles.escenarioTag}>Nacimiento simple</span>
               </div>
               <p>
@@ -588,7 +588,7 @@ export default function EstimacionPrestacionNacimiento() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioEmoji}>👶👶</span>
+                <span className={styles.escenarioEmoji} aria-hidden="true">👶👶</span>
                 <span className={styles.escenarioTag}>Gemelos</span>
               </div>
               <p>
@@ -602,7 +602,7 @@ export default function EstimacionPrestacionNacimiento() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioEmoji}>✈️</span>
+                <span className={styles.escenarioEmoji} aria-hidden="true">✈️</span>
                 <span className={styles.escenarioTag}>Adopcion internacional</span>
               </div>
               <p>
@@ -617,7 +617,7 @@ export default function EstimacionPrestacionNacimiento() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioEmoji}>🏥</span>
+                <span className={styles.escenarioEmoji} aria-hidden="true">🏥</span>
                 <span className={styles.escenarioTag}>Prematuro con hospitalizacion</span>
               </div>
               <p>
@@ -773,7 +773,7 @@ export default function EstimacionPrestacionNacimiento() {
           <h2>Consejos practicos sobre el permiso por nacimiento</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <strong>Solicita cuanto antes</strong>
               <p>
                 Aunque el plazo es amplio (5 anos), cobras desde la fecha de solicitud.
@@ -781,7 +781,7 @@ export default function EstimacionPrestacionNacimiento() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💻</span>
+              <span className={styles.tipIcon} aria-hidden="true">💻</span>
               <strong>Tramita online</strong>
               <p>
                 Con certificado digital o Cl@ve es mas rapido. Evitas desplazamientos y
@@ -789,7 +789,7 @@ export default function EstimacionPrestacionNacimiento() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📋</span>
+              <span className={styles.tipIcon} aria-hidden="true">📋</span>
               <strong>Revisa tu vida laboral</strong>
               <p>
                 Comprueba que tienes la cotizacion minima para tu edad. Puedes consultar
@@ -797,7 +797,7 @@ export default function EstimacionPrestacionNacimiento() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🤝</span>
+              <span className={styles.tipIcon} aria-hidden="true">🤝</span>
               <strong>Coordina con tu pareja</strong>
               <p>
                 Las 6 semanas obligatorias son simultaneas. Planificad el resto (semanas
@@ -806,7 +806,7 @@ export default function EstimacionPrestacionNacimiento() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💰</span>
+              <span className={styles.tipIcon} aria-hidden="true">💰</span>
               <strong>Comprueba la deduccion por maternidad</strong>
               <p>
                 Las madres trabajadoras pueden cobrar {formatCurrency(1200)}/ano por hijo
@@ -814,7 +814,7 @@ export default function EstimacionPrestacionNacimiento() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚖️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
               <strong>Conoce tus derechos</strong>
               <p>
                 Tu puesto de trabajo esta protegido durante el permiso. El despido durante
@@ -827,7 +827,7 @@ export default function EstimacionPrestacionNacimiento() {
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores comunes al gestionar la prestacion por nacimiento</strong>
           </div>
           <ul className={styles.warningList}>

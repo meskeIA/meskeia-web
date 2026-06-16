@@ -125,6 +125,7 @@ export default function EstimacionPrestacionesDependencia() {
           {GRADOS_DEPENDENCIA.map((grado) => (
             <button
               key={grado.grado}
+              type="button"
               className={`${styles.gradoCard} ${gradoSeleccionado === grado.grado ? styles.gradoCardActivo : ''}`}
               onClick={() => setGradoSeleccionado(grado.grado)}
               aria-pressed={gradoSeleccionado === grado.grado}
@@ -290,7 +291,7 @@ export default function EstimacionPrestacionesDependencia() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioEmoji}>👵</span>
+                <span className={styles.escenarioEmoji} aria-hidden="true">👵</span>
                 <span className={styles.escenarioTag}>Cuidadora familiar</span>
               </div>
               <p>
@@ -305,7 +306,7 @@ export default function EstimacionPrestacionesDependencia() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioEmoji}>🏥</span>
+                <span className={styles.escenarioEmoji} aria-hidden="true">🏥</span>
                 <span className={styles.escenarioTag}>Residencia concertada</span>
               </div>
               <p>
@@ -320,7 +321,7 @@ export default function EstimacionPrestacionesDependencia() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioEmoji}>☀️</span>
+                <span className={styles.escenarioEmoji} aria-hidden="true">☀️</span>
                 <span className={styles.escenarioTag}>Centro de día + SAD</span>
               </div>
               <p>
@@ -334,7 +335,7 @@ export default function EstimacionPrestacionesDependencia() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioEmoji}>🧑‍🦼</span>
+                <span className={styles.escenarioEmoji} aria-hidden="true">🧑‍🦼</span>
                 <span className={styles.escenarioTag}>Asistencia personal</span>
               </div>
               <p>
@@ -493,7 +494,7 @@ export default function EstimacionPrestacionesDependencia() {
           <h2>Consejos para gestionar las prestaciones por dependencia</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <strong>Solicita cuanto antes</strong>
               <p>
                 Las prestaciones se devengan desde la fecha de solicitud. Cada mes de retraso
@@ -501,7 +502,7 @@ export default function EstimacionPrestacionesDependencia() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📋</span>
+              <span className={styles.tipIcon} aria-hidden="true">📋</span>
               <strong>Prepara bien la documentación médica</strong>
               <p>
                 Un informe médico detallado que describa las limitaciones funcionales mejora
@@ -509,7 +510,7 @@ export default function EstimacionPrestacionesDependencia() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏠</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏠</span>
               <strong>Solicita la visita en el peor momento</strong>
               <p>
                 Si la persona tiene días mejores y peores, intenta que la visita del valorador
@@ -517,7 +518,7 @@ export default function EstimacionPrestacionesDependencia() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📞</span>
+              <span className={styles.tipIcon} aria-hidden="true">📞</span>
               <strong>Activa la teleasistencia mientras esperas</strong>
               <p>
                 La teleasistencia municipal suele tramitarse más rápido que el SAAD. Es un
@@ -525,7 +526,7 @@ export default function EstimacionPrestacionesDependencia() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💼</span>
+              <span className={styles.tipIcon} aria-hidden="true">💼</span>
               <strong>Registra al cuidador en la Seguridad Social</strong>
               <p>
                 Si optas por la PECEF, da de alta al cuidador en el convenio especial.
@@ -533,7 +534,7 @@ export default function EstimacionPrestacionesDependencia() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <strong>Revisa el grado si la situación empeora</strong>
               <p>
                 Si la dependencia se agrava, puedes solicitar una revisión del grado en
@@ -546,7 +547,7 @@ export default function EstimacionPrestacionesDependencia() {
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores comunes al gestionar prestaciones por dependencia</strong>
           </div>
           <ul className={styles.warningList}>

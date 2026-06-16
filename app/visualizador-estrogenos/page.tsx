@@ -389,6 +389,7 @@ export default function VisualizadorEstrogenos() {
           {SISTEMAS_AFECTADOS.map(sistema => (
             <button
               key={sistema.id}
+              type="button"
               className={`${styles.tarjetaSistema} ${sistemasExpandidos.has(sistema.id) ? styles.tarjetaSistemaActiva : ''}`}
               onClick={() => toggleSistema(sistema.id)}
               aria-expanded={sistemasExpandidos.has(sistema.id)}
