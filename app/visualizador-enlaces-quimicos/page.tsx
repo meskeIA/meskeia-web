@@ -296,11 +296,12 @@ export default function VisualizadorEnlacesQuimicosPage() {
         {ENLACES.map((enlace) => (
           <button
             key={enlace.id}
+            type="button"
             className={`${styles.enlaceCard} ${enlaceSeleccionado === enlace.id ? styles.enlaceCardActiva : ''}`}
             onClick={() => setEnlaceSeleccionado(enlace.id)}
             aria-pressed={enlaceSeleccionado === enlace.id}
           >
-            <span className={styles.enlaceIcono}>{enlace.icono}</span>
+            <span className={styles.enlaceIcono} aria-hidden="true">{enlace.icono}</span>
             <strong className={styles.enlaceNombre}>{enlace.nombre}</strong>
             <span className={styles.enlaceEjemplo}>{enlace.ejemplo}</span>
           </button>
@@ -311,7 +312,7 @@ export default function VisualizadorEnlacesQuimicosPage() {
 
       <div className={styles.panelDetalle}>
         <h3 className={styles.panelTitulo}>
-          {enlaceActual.icono} Enlace {enlaceActual.nombre}
+          <span aria-hidden="true">{enlaceActual.icono}</span> Enlace {enlaceActual.nombre}
           <span className={styles.panelFormula}>{enlaceActual.formula}</span>
         </h3>
         <p className={styles.panelResumen}>{enlaceActual.resumen}</p>
@@ -416,9 +417,9 @@ export default function VisualizadorEnlacesQuimicosPage() {
           <thead>
             <tr>
               <th>Propiedad</th>
-              <th>🧂 Iónico</th>
-              <th>💧 Covalente</th>
-              <th>🔩 Metálico</th>
+              <th><span aria-hidden="true">🧂</span> Iónico</th>
+              <th><span aria-hidden="true">💧</span> Covalente</th>
+              <th><span aria-hidden="true">🔩</span> Metálico</th>
             </tr>
           </thead>
           <tbody>
@@ -463,7 +464,7 @@ export default function VisualizadorEnlacesQuimicosPage() {
         {EJEMPLOS_VIDA.map((ej, i) => (
           <div key={i} className={styles.vidaCard}>
             <div className={styles.vidaHeader}>
-              <span className={styles.vidaIcono}>{ej.icono}</span>
+              <span className={styles.vidaIcono} aria-hidden="true">{ej.icono}</span>
               <div>
                 <strong>{ej.nombre}</strong>
                 <span className={styles.vidaFormula}>{ej.formula}</span>
@@ -510,6 +511,7 @@ export default function VisualizadorEnlacesQuimicosPage() {
           {SECCIONES.map((s) => (
             <button
               key={s.id}
+              type="button"
               className={`${styles.navBtn} ${seccion === s.id ? styles.navBtnActivo : ''}`}
               onClick={() => setSeccion(s.id)}
               aria-pressed={seccion === s.id}

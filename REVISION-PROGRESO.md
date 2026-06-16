@@ -456,10 +456,10 @@
 | [x] | El Sistema Solar en Números | `/visualizador-sistema-solar/` | estudiantes, cultura |
 | [x] | El Viaje de tu Comida | `/visualizador-viaje-comida/` | estudiantes, salud, cultura |
 | [x] | Electricidad Doméstica - Tu Cuadro Eléctrico Explicado | `/visualizador-electricidad-domestica/` | estudiantes, cultura |
-| [ ] | Electromagnetismo - Campo Eléctrico, Magnético e Inducción | `/visualizador-electromagnetismo/` | estudiantes, cultura, tecnicas |
-| [ ] | Embriogénesis: Fecundación, Segmentación y Organogénesis | `/visualizador-embriogenesis/` | estudiantes, salud |
-| [ ] | Energía Nuclear - Fisión, Fusión y Comparativa | `/visualizador-energia-nuclear/` | estudiantes, cultura, tecnicas |
-| [ ] | Enlaces Químicos - Cómo se Unen los Átomos | `/visualizador-enlaces-quimicos/` | estudiantes, cultura |
+| [x] | Electromagnetismo - Campo Eléctrico, Magnético e Inducción | `/visualizador-electromagnetismo/` | estudiantes, cultura, tecnicas |
+| [x] | Embriogénesis: Fecundación, Segmentación y Organogénesis | `/visualizador-embriogenesis/` | estudiantes, salud |
+| [x] | Energía Nuclear - Fisión, Fusión y Comparativa | `/visualizador-energia-nuclear/` | estudiantes, cultura, tecnicas |
+| [x] | Enlaces Químicos - Cómo se Unen los Átomos | `/visualizador-enlaces-quimicos/` | estudiantes, cultura |
 | [ ] | Entrenador Tablas Multiplicar | `/tablas-multiplicar/` | estudiantes |
 | [ ] | Enzimas del Cuerpo Humano - Catalizadores de la Vida | `/visualizador-enzimas-cuerpo-humano/` | estudiantes, cultura, salud |
 | [ ] | Estadística Avanzada | `/estadistica-avanzada/` | estudiantes |

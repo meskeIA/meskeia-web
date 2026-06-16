@@ -537,6 +537,7 @@ export default function VisualizadorEmbriogenesis() {
         {TABS.map((t) => (
           <button
             key={t.id}
+            type="button"
             className={`${styles.tab} ${tabActiva === t.id ? styles.tabActive : ''}`}
             onClick={() => setTabActiva(t.id)}
             aria-pressed={tabActiva === t.id}
@@ -619,9 +620,11 @@ export default function VisualizadorEmbriogenesis() {
               {ESTADIOS.map((e, i) => (
                 <button
                   key={e.dia}
+                  type="button"
                   className={`${styles.tickBtn} ${i === estadioIdx ? styles.tickBtnActive : ''}`}
                   onClick={() => setEstadioIdx(i)}
                   aria-label={`Ir a día ${e.dia}: ${e.nombre}`}
+                  aria-pressed={i === estadioIdx}
                 >
                   {e.dia}
                 </button>
@@ -657,6 +660,7 @@ export default function VisualizadorEmbriogenesis() {
             {CAPAS.map((capa) => (
               <button
                 key={capa.id}
+                type="button"
                 className={`${styles.capaBtn} ${styles[`capaBtn${capa.nombre}`]} ${capaActiva === capa.id ? styles.capaBtnActive : ''}`}
                 onClick={() => setCapaActiva(capaActiva === capa.id ? null : capa.id)}
                 aria-pressed={capaActiva === capa.id}
@@ -742,9 +746,11 @@ export default function VisualizadorEmbriogenesis() {
                 {[4, 5, 6, 7, 8].map((s) => (
                   <button
                     key={s}
+                    type="button"
                     className={`${styles.tickBtn} ${s === semanaOrganogenesis ? styles.tickBtnActive : ''}`}
                     onClick={() => setSemanaOrganogenesis(s)}
                     aria-label={`Semana ${s}`}
+                    aria-pressed={s === semanaOrganogenesis}
                   >
                     S{s}
                   </button>
@@ -883,7 +889,7 @@ export default function VisualizadorEmbriogenesis() {
             <li key={item.pregunta} className={styles.faqItem}>
               <strong>{item.pregunta}</strong>
               <p>{item.respuesta}</p>
-              <span className={styles.faqTip}>💡 {item.tip}</span>
+              <span className={styles.faqTip}><span aria-hidden="true">💡</span> {item.tip}</span>
             </li>
           ))}
         </ul>

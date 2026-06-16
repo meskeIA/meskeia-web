@@ -116,6 +116,7 @@ export default function VisualizadorEnergiaNuclear() {
         {secciones.map((s) => (
           <button
             key={s.id}
+            type="button"
             className={`${styles.navBtn} ${seccionActiva === s.id ? styles.navBtnActivo : ''}`}
             onClick={() => setSeccionActiva(s.id)}
             aria-pressed={seccionActiva === s.id}
@@ -130,7 +131,7 @@ export default function VisualizadorEnergiaNuclear() {
         {/* SECCIÓN FISIÓN */}
         {seccionActiva === 'fision' && (
           <section className={styles.seccion}>
-            <h2 className={styles.tituloSeccion}>💥 Fisión Nuclear</h2>
+            <h2 className={styles.tituloSeccion}><span aria-hidden="true">💥</span> Fisión Nuclear</h2>
             <p className={styles.introSeccion}>
               La fisión ocurre cuando un núcleo pesado (U-235 o Pu-239) absorbe un neutrón lento
               y se divide en dos fragmentos más ligeros, liberando energía y más neutrones.
@@ -258,7 +259,7 @@ export default function VisualizadorEnergiaNuclear() {
         {/* SECCIÓN FUSIÓN */}
         {seccionActiva === 'fusion' && (
           <section className={styles.seccion}>
-            <h2 className={styles.tituloSeccion}>🌟 Fusión Nuclear</h2>
+            <h2 className={styles.tituloSeccion}><span aria-hidden="true">🌟</span> Fusión Nuclear</h2>
             <p className={styles.introSeccion}>
               La fusión une dos núcleos ligeros para formar uno más pesado, liberando enormes
               cantidades de energía. Es la fuente de energía del Sol y las estrellas.
@@ -391,7 +392,7 @@ export default function VisualizadorEnergiaNuclear() {
         {/* SECCIÓN REACTORES */}
         {seccionActiva === 'reactores' && (
           <section className={styles.seccion}>
-            <h2 className={styles.tituloSeccion}>🏭 Tipos de Reactor Nuclear</h2>
+            <h2 className={styles.tituloSeccion}><span aria-hidden="true">🏭</span> Tipos de Reactor Nuclear</h2>
             <p className={styles.introSeccion}>
               Existen varios diseños de reactores de fisión en operación y desarrollo. Selecciona
               uno para ver sus características y diagrama de funcionamiento.
@@ -402,6 +403,7 @@ export default function VisualizadorEnergiaNuclear() {
               {(Object.keys(INFO_REACTORES) as TipoReactor[]).map((tipo) => (
                 <button
                   key={tipo}
+                  type="button"
                   className={`${styles.reactorBtn} ${reactorSeleccionado === tipo ? styles.reactorBtnActivo : ''}`}
                   onClick={() => setReactorSeleccionado(tipo)}
                   aria-pressed={reactorSeleccionado === tipo}
@@ -421,18 +423,18 @@ export default function VisualizadorEnergiaNuclear() {
               {/* Diagrama simplificado */}
               <div className={styles.diagramaReactor} aria-label={`Diagrama de reactor ${reactorSeleccionado}`}>
                 <div className={styles.drNucleo}>
-                  <span>⚛️ Núcleo</span>
+                  <span><span aria-hidden="true">⚛️</span> Núcleo</span>
                   <span className={styles.drSubLabel}>Combustible nuclear</span>
                 </div>
                 <div className={styles.drFlechas} aria-hidden="true">
                   <span>⇅ {INFO_REACTORES[reactorSeleccionado].refrigerante}</span>
                 </div>
                 <div className={styles.drGenerador}>
-                  <span>⚡ Turbina/Generador</span>
+                  <span><span aria-hidden="true">⚡</span> Turbina/Generador</span>
                   <span className={styles.drSubLabel}>Electricidad</span>
                 </div>
                 <div className={styles.drTorre}>
-                  <span>🌡️ Torre de refrigeración</span>
+                  <span><span aria-hidden="true">🌡️</span> Torre de refrigeración</span>
                   <span className={styles.drSubLabel}>Disipación calor</span>
                 </div>
               </div>
@@ -468,7 +470,7 @@ export default function VisualizadorEnergiaNuclear() {
                   <div key={c.central} className={styles.centralCard} style={{ borderTopColor: c.color }}>
                     <strong>{c.central}</strong>
                     <span className={styles.centralTipo}>{c.tipo}</span>
-                    <span className={styles.centralUbicacion}>📍 {c.ubicacion}</span>
+                    <span className={styles.centralUbicacion}><span aria-hidden="true">📍</span> {c.ubicacion}</span>
                     <span
                       className={styles.centralEstado}
                       style={{ color: c.estado === 'Cerrada 2021' ? '#999' : '#2E86AB' }}
@@ -485,7 +487,7 @@ export default function VisualizadorEnergiaNuclear() {
         {/* SECCIÓN COMPARATIVA */}
         {seccionActiva === 'comparativa' && (
           <section className={styles.seccion}>
-            <h2 className={styles.tituloSeccion}>📊 Comparativa Energética</h2>
+            <h2 className={styles.tituloSeccion}><span aria-hidden="true">📊</span> Comparativa Energética</h2>
             <p className={styles.introSeccion}>
               La energía nuclear destaca por su bajo impacto de CO₂ y su alto factor de capacidad
               (disponibilidad continua), comparables a las renovables pero con producción constante.
@@ -494,6 +496,7 @@ export default function VisualizadorEnergiaNuclear() {
             {/* Toggle métrica */}
             <div className={styles.toggleMetrica}>
               <button
+                type="button"
                 className={`${styles.toggleBtn} ${metricaComparativa === 'co2' ? styles.toggleActivo : ''}`}
                 onClick={() => setMetricaComparativa('co2')}
                 aria-pressed={metricaComparativa === 'co2'}
@@ -501,6 +504,7 @@ export default function VisualizadorEnergiaNuclear() {
                 CO₂ por kWh (g)
               </button>
               <button
+                type="button"
                 className={`${styles.toggleBtn} ${metricaComparativa === 'capacidad' ? styles.toggleActivo : ''}`}
                 onClick={() => setMetricaComparativa('capacidad')}
                 aria-pressed={metricaComparativa === 'capacidad'}
@@ -594,7 +598,7 @@ export default function VisualizadorEnergiaNuclear() {
                       <span className={styles.residuoPorcentaje}>{r.porcentaje} del volumen total</span>
                     </div>
                     <p className={styles.residuoDesc}>{r.descripcion}</p>
-                    <span className={styles.residuoDuracion}>⏱ Aislamiento necesario: {r.duracion}</span>
+                    <span className={styles.residuoDuracion}><span aria-hidden="true">⏱</span> Aislamiento necesario: {r.duracion}</span>
                   </div>
                 ))}
               </div>
@@ -718,7 +722,7 @@ export default function VisualizadorEnergiaNuclear() {
             </div>
           ))}
           <div className={styles.faqTip}>
-            💡 <strong>Consejo:</strong> Usa la sección &ldquo;Comparativa Energética&rdquo; para ver los datos de CO₂ y factor de capacidad de cada fuente en perspectiva.
+            <span aria-hidden="true">💡</span> <strong>Consejo:</strong> Usa la sección &ldquo;Comparativa Energética&rdquo; para ver los datos de CO₂ y factor de capacidad de cada fuente en perspectiva.
           </div>
         </div>
 
@@ -766,11 +770,11 @@ export default function VisualizadorEnergiaNuclear() {
             <strong>Mitos y confusiones habituales sobre la energía nuclear</strong>
           </div>
           <ul className={styles.warningList}>
-            <li><strong>❌ &ldquo;Las torres de refrigeración contaminan&rdquo;</strong> — expulsan vapor de agua puro, no gases tóxicos ni CO₂. Son una imagen icónica pero malinterpretada.</li>
-            <li><strong>❌ &ldquo;Chernóbil hizo Europa inhabitable&rdquo;</strong> — la zona de exclusión de 30 km tiene hoy una biodiversidad inusualmente alta precisamente por la ausencia humana.</li>
-            <li><strong>❌ &ldquo;La fusión ya produce más energía de la que consume&rdquo;</strong> — el NIF logró Q &gt; 1 en 2022 solo en el plasma; contando toda la energía del láser, el balance energético total sigue siendo negativo.</li>
-            <li><strong>❌ &ldquo;Una central nuclear puede explotar como una bomba atómica&rdquo;</strong> — físicamente imposible: el enriquecimiento del combustible (3-5%) es insuficiente para una reacción explosiva supercrítica.</li>
-            <li><strong>❌ &ldquo;Los residuos nucleares se pueden tirar al mar&rdquo;</strong> — está prohibido por el Convenio de Londres desde 1993. Los residuos se gestionan en instalaciones terrestres controladas y catalogadas.</li>
+            <li><strong><span aria-hidden="true">❌</span> &ldquo;Las torres de refrigeración contaminan&rdquo;</strong> — expulsan vapor de agua puro, no gases tóxicos ni CO₂. Son una imagen icónica pero malinterpretada.</li>
+            <li><strong><span aria-hidden="true">❌</span> &ldquo;Chernóbil hizo Europa inhabitable&rdquo;</strong> — la zona de exclusión de 30 km tiene hoy una biodiversidad inusualmente alta precisamente por la ausencia humana.</li>
+            <li><strong><span aria-hidden="true">❌</span> &ldquo;La fusión ya produce más energía de la que consume&rdquo;</strong> — el NIF logró Q &gt; 1 en 2022 solo en el plasma; contando toda la energía del láser, el balance energético total sigue siendo negativo.</li>
+            <li><strong><span aria-hidden="true">❌</span> &ldquo;Una central nuclear puede explotar como una bomba atómica&rdquo;</strong> — físicamente imposible: el enriquecimiento del combustible (3-5%) es insuficiente para una reacción explosiva supercrítica.</li>
+            <li><strong><span aria-hidden="true">❌</span> &ldquo;Los residuos nucleares se pueden tirar al mar&rdquo;</strong> — está prohibido por el Convenio de Londres desde 1993. Los residuos se gestionan en instalaciones terrestres controladas y catalogadas.</li>
           </ul>
         </div>
       </EducationalSection>

@@ -144,6 +144,7 @@ function SeccionCampoElectrico(): React.ReactNode {
       <div className={styles.controlesRow}>
         <div className={styles.toggleGroup} role="group" aria-label="Tipo de carga">
           <button
+            type="button"
             className={`${styles.toggleBtn} ${tipoCarga === 'positiva' ? styles.toggleBtnActivo : ''}`}
             onClick={() => setTipoCarga('positiva')}
             aria-pressed={tipoCarga === 'positiva'}
@@ -151,6 +152,7 @@ function SeccionCampoElectrico(): React.ReactNode {
             + Carga positiva
           </button>
           <button
+            type="button"
             className={`${styles.toggleBtn} ${tipoCarga === 'negativa' ? styles.toggleBtnActivo : ''}`}
             onClick={() => setTipoCarga('negativa')}
             aria-pressed={tipoCarga === 'negativa'}
@@ -332,11 +334,12 @@ function SeccionCampoMagnetico(): React.ReactNode {
 
       <div className={styles.controlesRow}>
         <button
+          type="button"
           className={styles.btnPrimario}
           onClick={girarIman}
           aria-label="Girar imán 90 grados"
         >
-          🔄 Girar imán 90°
+          <span aria-hidden="true">🔄</span> Girar imán 90°
         </button>
         <div className={styles.brujulaWrapper} aria-label={`Brújula apuntando a ${brujulaAngulo}°`}>
           <div
@@ -479,14 +482,15 @@ function SeccionFaraday(): React.ReactNode {
         {(Object.keys(ESTADOS_IMAN) as EstadoIman[]).map((est) => (
           <button
             key={est}
+            type="button"
             className={`${styles.faradayBtn} ${estado === est ? styles.faradayBtnActivo : ''}`}
             onClick={() => setEstado(est)}
             aria-pressed={estado === est}
           >
-            {est === 'lejos' && '⬅ Lejos'}
-            {est === 'acercando' && '➡ Acercar'}
-            {est === 'cerca' && '⏸ Cerca'}
-            {est === 'alejando' && '⬅ Alejar'}
+            {est === 'lejos' && <><span aria-hidden="true">⬅</span> Lejos</>}
+            {est === 'acercando' && <><span aria-hidden="true">➡</span> Acercar</>}
+            {est === 'cerca' && <><span aria-hidden="true">⏸</span> Cerca</>}
+            {est === 'alejando' && <><span aria-hidden="true">⬅</span> Alejar</>}
           </button>
         ))}
       </div>
@@ -658,11 +662,12 @@ function SeccionEspectro(): React.ReactNode {
       {/* Toggle aplicaciones */}
       <div className={styles.controlesRow}>
         <button
+          type="button"
           className={`${styles.toggleBtn} ${mostrarAplicaciones ? styles.toggleBtnActivo : ''}`}
           onClick={() => setMostrarAplicaciones((v) => !v)}
           aria-pressed={mostrarAplicaciones}
         >
-          📱 Mostrar aplicaciones cotidianas
+          <span aria-hidden="true">📱</span> Mostrar aplicaciones cotidianas
         </button>
       </div>
 
@@ -677,6 +682,7 @@ function SeccionEspectro(): React.ReactNode {
           return (
             <button
               key={zona}
+              type="button"
               className={`${styles.espectroZona} ${isActive ? styles.espectroZonaActiva : ''}`}
               style={{ background: bgColor, color: info.colorTexto }}
               onClick={() => setZonaSeleccionada(zona)}
