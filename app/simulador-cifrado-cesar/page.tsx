@@ -402,6 +402,7 @@ export default function SimuladorCifradoCesar() {
                     type="button"
                     className={`${styles.toggleBtn} ${!modoDescifrar ? styles.active : ''}`}
                     onClick={() => setModoDescifrar(false)}
+                    aria-pressed={!modoDescifrar}
                   >
                     Cifrar
                   </button>
@@ -409,6 +410,7 @@ export default function SimuladorCifradoCesar() {
                     type="button"
                     className={`${styles.toggleBtn} ${modoDescifrar ? styles.active : ''}`}
                     onClick={() => setModoDescifrar(true)}
+                    aria-pressed={modoDescifrar}
                   >
                     Descifrar
                   </button>
@@ -428,6 +430,7 @@ export default function SimuladorCifradoCesar() {
                 type="button"
                 className={`${styles.presetBtn} ${presetActivo === p.id ? styles.active : ''}`}
                 onClick={() => handlePreset(p.id, p.texto)}
+                aria-pressed={presetActivo === p.id}
               >
                 {p.label}
               </button>

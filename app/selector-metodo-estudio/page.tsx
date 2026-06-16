@@ -486,7 +486,8 @@ export default function SelectorMetodoEstudioPage() {
               {(Object.keys(RECOMENDACIONES) as MetodoKey[]).map((key) => (
                 <div key={key} className={styles.puntuacionFila}>
                   <span className={styles.puntuacionEtiqueta}>
-                    {RECOMENDACIONES[key].emoji} {RECOMENDACIONES[key].titulo.split(' (')[0]}
+                    <span aria-hidden="true">{RECOMENDACIONES[key].emoji}</span>{' '}
+                    {RECOMENDACIONES[key].titulo.split(' (')[0]}
                   </span>
                   <div className={styles.puntuacionBarraWrap}>
                     <div
@@ -549,7 +550,7 @@ export default function SelectorMetodoEstudioPage() {
       {/* Tarjeta de pregunta */}
       <div className={styles.pregunta}>
         <p className={styles.preguntaNumero}>
-          {pregunta.icono} Pregunta {preguntaActual + 1}
+          <span aria-hidden="true">{pregunta.icono}</span>{' '}Pregunta {preguntaActual + 1}
         </p>
         <p className={styles.preguntaTexto} id={`pregunta-${pregunta.id}`}>
           {pregunta.texto}
@@ -629,7 +630,7 @@ export default function SelectorMetodoEstudioPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.heroTitle}>🎓 ¿Qué método de estudio te funciona mejor?</h1>
+        <h1 className={styles.heroTitle}><span aria-hidden="true">🎓</span> ¿Qué método de estudio te funciona mejor?</h1>
         <p className={styles.heroSubtitle}>
           Test de 10 preguntas para descubrir si debes usar repetición espaciada, mapas mentales,
           aprendizaje por proyectos, Pomodoro con libros o clases particulares.

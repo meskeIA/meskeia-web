@@ -371,6 +371,8 @@ function TaylorTab() {
             {(Object.keys(FUNCIONES) as FuncionKey[]).map((k) => (
               <button
                 key={k}
+                type="button"
+                aria-pressed={funcion === k}
                 className={`${styles.chip} ${funcion === k ? styles.chipActive : ''}`}
                 onClick={() => setFuncion(k)}
               >
@@ -532,6 +534,8 @@ function CriteriosTab() {
             {(Object.keys(SERIES) as SerieKey[]).map((k) => (
               <button
                 key={k}
+                type="button"
+                aria-pressed={serie === k}
                 className={`${styles.chip} ${serie === k ? styles.chipActive : ''}`}
                 onClick={() => setSerie(k)}
               >
@@ -765,6 +769,7 @@ export default function SeriesConvergenciaPage() {
           {tabs.map((t) => (
             <button
               key={t.key}
+              type="button"
               role="tab"
               aria-selected={tab === t.key}
               className={`${styles.tab} ${tab === t.key ? styles.tabActive : ''}`}

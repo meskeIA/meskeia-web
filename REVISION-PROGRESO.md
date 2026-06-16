@@ -541,16 +541,16 @@
 | [x] | Selección Natural - El Motor de la Evolución | `/visualizador-seleccion-natural/` | estudiantes, cultura |
 | [x] | Selector de Carrera Universitaria | `/selector-carrera-universitaria/` | estudiantes, productividad |
 | [x] | Selector de Formación Postgrado | `/selector-formacion-postgrado/` | estudiantes, productividad |
-| [ ] | Selector de Idioma | `/selector-idioma/` | estudiantes, cultura |
-| [ ] | Selector de Método de Estudio | `/selector-metodo-estudio/` | estudiantes, productividad |
-| [ ] | Series y Convergencia: Taylor, Criterios y π | `/visualizador-series-convergencia/` | estudiantes, tecnicas |
+| [x] | Selector de Idioma | `/selector-idioma/` | estudiantes, cultura |
+| [x] | Selector de Método de Estudio | `/selector-metodo-estudio/` | estudiantes, productividad |
+| [x] | Series y Convergencia: Taylor, Criterios y π | `/visualizador-series-convergencia/` | estudiantes, tecnicas |
 | [x] | Simulador Circuitos Eléctricos | `/simulador-circuitos-electricos/` | estudiantes, tecnicas |
 | [x] | Simulador de Algoritmos de Grafos (BFS, DFS, Dijkstra, A*) | `/simulador-grafos/` | estudiantes, tecnicas |
 | [x] | Simulador de Algoritmos de Ordenación | `/simulador-ordenacion/` | estudiantes, tecnicas |
 | [x] | Simulador de Árboles BST y AVL | `/simulador-arboles-bst-avl/` | estudiantes, tecnicas |
 | [x] | Simulador de Autómatas Finitos DFA y NFA | `/simulador-automatas-finitos/` | estudiantes, tecnicas |
 | [x] | Simulador de Campo Eléctrico | `/simulador-campo-electrico/` | estudiantes |
-| [ ] | Simulador de Cifrado César | `/simulador-cifrado-cesar/` | estudiantes |
+| [x] | Simulador de Cifrado César | `/simulador-cifrado-cesar/` | estudiantes |
 | [ ] | Simulador de Cinética Química: Ecuación de Arrhenius | `/simulador-cinetica-arrhenius/` | estudiantes |
 | [x] | Simulador de Colisiones — Elásticas e Inelásticas | `/simulador-colisiones/` | estudiantes, cultura |
 | [x] | Simulador de Conservación de la Energía | `/simulador-conservacion-energia/` | estudiantes |
