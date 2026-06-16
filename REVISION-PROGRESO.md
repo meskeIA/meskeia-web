@@ -906,14 +906,14 @@
 | [x] | Orientador de Justicia Gratuita | `/orientador-justicia-gratuita/` | legal-fiscal |
 | [x] | Orientador de Trámites de Jubilación | `/orientador-tramites-jubilacion/` | legal-fiscal, finanzas |
 | [x] | Orientador Límite Conjunto IRPF-Patrimonio | `/orientador-limite-conjunto-patrimonio/` | legal-fiscal, finanzas |
-| [ ] | Orientador Visa Nómada Digital | `/requisitos-nomada-digital/` | legal-fiscal, freelance |
+| [x] | Orientador Visa Nómada Digital | `/requisitos-nomada-digital/` | legal-fiscal, freelance |
 | [x] | Planificador de Ahorro para la Jubilación | `/planificador-ahorro-jubilacion/` | legal-fiscal, finanzas |
 | [x] | Simulador de Jubilación Pública | `/simulador-jubilacion-publica/` | legal-fiscal, finanzas |
-| [ ] | Simulador del Mito del Tramo Superior IRPF | `/simulador-mito-tramo-superior/` | legal-fiscal, finanzas |
+| [x] | Simulador del Mito del Tramo Superior IRPF | `/simulador-mito-tramo-superior/` | legal-fiscal, finanzas |
 | [x] | Simulador Desglose de Nómina (Bruto a Neto) | `/simulador-desglose-nomina/` | legal-fiscal, finanzas |
 | [x] | Simulador Heredar Vivienda (ISD + Plusvalía + IRPF) | `/simulador-heredar-vivienda/` | legal-fiscal, inmobiliaria |
-| [ ] | Simulador Módulos vs Estimación Directa Autónomos | `/simulador-modulos-vs-directa/` | legal-fiscal, freelance |
-| [ ] | Simulador Plan de Pensiones IRPF: Aporte vs Rescate | `/simulador-renta-plan-pensiones/` | legal-fiscal, finanzas |
+| [x] | Simulador Módulos vs Estimación Directa Autónomos | `/simulador-modulos-vs-directa/` | legal-fiscal, freelance |
+| [x] | Simulador Plan de Pensiones IRPF: Aporte vs Rescate | `/simulador-renta-plan-pensiones/` | legal-fiscal, finanzas |
 | [x] | Simulador Visual de Tramos IRPF 2025 | `/simulador-irpf-tramos/` | legal-fiscal, finanzas |
 | [ ] | Test Obligación Declarar Renta 2025 | `/test-obligado-declarar-renta/` | legal-fiscal, finanzas, freelance |
 | [x] | Verificador del Complemento por Brecha de Género | `/verificador-complemento-brecha-genero/` | legal-fiscal, finanzas |

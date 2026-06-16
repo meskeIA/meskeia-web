@@ -392,6 +392,7 @@ export default function SimuladorModulosVsDirectaPage() {
             {CASOS.map(caso => (
               <button
                 key={caso.id}
+                type="button"
                 className={styles.casoBtn}
                 onClick={() => aplicarCaso(caso)}
                 aria-label={`Aplicar caso ${caso.etiqueta}: ${caso.descripcion}`}
@@ -479,7 +480,7 @@ export default function SimuladorModulosVsDirectaPage() {
           <h2 className={styles.panelTitle}>Datos para Estimación Objetiva (Módulos)</h2>
 
           <p className={styles.avisoElegibilidad}>
-            ⚠️ Solo determinadas actividades pueden acogerse a módulos: hostelería, comercio menor,
+            <span aria-hidden="true">⚠️</span> Solo determinadas actividades pueden acogerse a módulos: hostelería, comercio menor,
             transporte, peluquería, taxi y otras listadas en la <strong>Orden HFP/X/2024</strong>.
             Las profesiones liberales <strong>NO</strong> pueden tributar por módulos. Verifica con
             tu asesor fiscal si tu actividad es elegible.
@@ -489,6 +490,7 @@ export default function SimuladorModulosVsDirectaPage() {
             {ACTIVIDADES.map(a => (
               <button
                 key={a.id}
+                type="button"
                 role="radio"
                 aria-checked={modulos.actividad === a.id}
                 className={`${styles.actividadBtn} ${modulos.actividad === a.id ? styles.actividadActiva : ''}`}
@@ -697,7 +699,7 @@ export default function SimuladorModulosVsDirectaPage() {
 
               {!resModulos.esApta && (
                 <p className={styles.avisoNoApta}>
-                  ⚠️ Sin parámetros suficientes — esta actividad/configuración probablemente NO es
+                  <span aria-hidden="true">⚠️</span> Sin parámetros suficientes — esta actividad/configuración probablemente NO es
                   elegible para módulos.
                 </p>
               )}
@@ -762,7 +764,7 @@ export default function SimuladorModulosVsDirectaPage() {
                 : 'Tu margen real es alto, así que tributar por unidades (módulos) limita el rendimiento computable y reduce el IRPF respecto a tributar por beneficio real (ED).'}
             </p>
             <p className={styles.recomendacionAviso}>
-              ⚠️ <strong>Importante:</strong> Módulos solo es elegible para tu actividad si está
+              <span aria-hidden="true">⚠️</span> <strong>Importante:</strong> Módulos solo es elegible para tu actividad si está
               listada en la Orden HFP/X/2024. <strong>Verifica con tu asesor fiscal</strong> antes
               de cambiar de régimen.
             </p>

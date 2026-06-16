@@ -373,6 +373,7 @@ export default function SimuladorRentaPlanPensionesPage() {
             {CASOS.map(c => (
               <button
                 key={c.id}
+                type="button"
                 className={styles.casoBtn}
                 onClick={() => aplicarCaso(c)}
                 aria-label={`Aplicar caso ${c.etiqueta}: ${c.descripcion}`}

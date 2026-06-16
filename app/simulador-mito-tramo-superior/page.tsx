@@ -218,6 +218,7 @@ export default function SimuladorMitoTramoSuperiorPage() {
             {CASOS_CLASICOS.map((caso) => (
               <button
                 key={caso.label}
+                type="button"
                 onClick={() => aplicarCaso(caso)}
                 className={styles.casoBtn}
                 aria-label={caso.descripcion}

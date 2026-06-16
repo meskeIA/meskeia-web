@@ -192,7 +192,7 @@ export default function RequisitosNomadaDigitalPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <div className={styles.heroIcon}>🌍</div>
+        <div className={styles.heroIcon} aria-hidden="true">🌍</div>
         <h1 className={styles.title}>Visa Nómada Digital</h1>
         <p className={styles.subtitle}>
           Comprueba si cumples los requisitos para trabajar en remoto desde España
@@ -224,18 +224,22 @@ export default function RequisitosNomadaDigitalPage() {
         <h2 className={styles.sectionTitle}>¿Cuál es tu situación?</h2>
         <div className={styles.perfilGrid}>
           <button
+            type="button"
             className={`${styles.perfilCard} ${perfil === 'empleado' ? styles.perfilActive : ''}`}
             onClick={() => { setPerfil('empleado'); setRespuestas({}); }}
+            aria-pressed={perfil === 'empleado'}
           >
-            <span className={styles.perfilIcon}>👔</span>
+            <span className={styles.perfilIcon} aria-hidden="true">👔</span>
             <strong>Empleado por cuenta ajena</strong>
             <span>Trabajo para una empresa con sede fuera de España</span>
           </button>
           <button
+            type="button"
             className={`${styles.perfilCard} ${perfil === 'freelancer' ? styles.perfilActive : ''}`}
             onClick={() => { setPerfil('freelancer'); setRespuestas({}); }}
+            aria-pressed={perfil === 'freelancer'}
           >
-            <span className={styles.perfilIcon}>💻</span>
+            <span className={styles.perfilIcon} aria-hidden="true">💻</span>
             <strong>Freelancer / Autónomo</strong>
             <span>Tengo clientes propios mayoritariamente fuera de España</span>
           </button>
@@ -260,12 +264,14 @@ export default function RequisitosNomadaDigitalPage() {
                 <label className={styles.label}>Familiares dependientes a cargo</label>
                 <div className={styles.stepperContainer}>
                   <button
+                    type="button"
                     className={styles.stepperBtn}
                     onClick={() => setDependientes(String(Math.max(0, dependientesNum - 1)))}
                     aria-label="Reducir dependientes"
                   >−</button>
                   <span className={styles.stepperValue}>{dependientesNum}</span>
                   <button
+                    type="button"
                     className={styles.stepperBtn}
                     onClick={() => setDependientes(String(dependientesNum + 1))}
                     aria-label="Añadir dependiente"
@@ -319,14 +325,18 @@ export default function RequisitosNomadaDigitalPage() {
                     <p className={styles.reqExplicacion}>{req.explicacion}</p>
                     <div className={styles.reqBotones}>
                       <button
+                        type="button"
                         className={`${styles.btnResp} ${resp === true ? styles.btnRespActiveSi : ''}`}
                         onClick={() => setRespuesta(req.id, true)}
+                        aria-pressed={resp === true}
                       >
                         Sí
                       </button>
                       <button
+                        type="button"
                         className={`${styles.btnResp} ${resp === false ? styles.btnRespActiveNo : ''}`}
                         onClick={() => setRespuesta(req.id, false)}
+                        aria-pressed={resp === false}
                       >
                         No
                       </button>
@@ -385,7 +395,7 @@ export default function RequisitosNomadaDigitalPage() {
               {/* Documentación necesaria */}
               {resultado === 'apto' || resultado === 'casi' ? (
                 <div className={styles.documentosSection}>
-                  <h3 className={styles.docsTitulo}>📄 Documentación que necesitarás</h3>
+                  <h3 className={styles.docsTitulo}><span aria-hidden="true">📄</span> Documentación que necesitarás</h3>
                   <div className={styles.docsGrid}>
                     <div className={styles.docsGrupo}>
                       <h4>Documentos comunes</h4>
@@ -419,7 +429,7 @@ export default function RequisitosNomadaDigitalPage() {
 
       {/* Disclaimer — siempre visible */}
       <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso importante</h3>
+        <h3><span aria-hidden="true">⚠️</span> Aviso importante</h3>
         <p>
           Esta herramienta ofrece orientación general basada en la{' '}
           <strong>Ley 28/2022 de Startups y el RD 1008/2023</strong>. No sustituye el
@@ -495,7 +505,7 @@ export default function RequisitosNomadaDigitalPage() {
           <h2>¿Quién puede beneficiarse? 4 perfiles reales</h2>
           <div className={styles.scenariosGrid}>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>👨‍💻</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">👨‍💻</span>
               <h3>Desarrollador de software</h3>
               <p>
                 Trabaja para una startup norteamericana en remoto. Quiere vivir en España disfrutando
@@ -504,7 +514,7 @@ export default function RequisitosNomadaDigitalPage() {
               </p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🎨</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🎨</span>
               <h3>Diseñadora freelancer</h3>
               <p>
                 Diseñadora gráfica con clientes en Reino Unido, Alemania y Estados Unidos. Factura
@@ -513,7 +523,7 @@ export default function RequisitosNomadaDigitalPage() {
               </p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>📊</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">📊</span>
               <h3>Consultor financiero</h3>
               <p>
                 Trabaja para un banco suizo en remoto. Ya lleva 6 meses con la empresa y tiene nóminas
@@ -521,7 +531,7 @@ export default function RequisitosNomadaDigitalPage() {
               </p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>✍️</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">✍️</span>
               <h3>Copywriter internacional</h3>
               <p>
                 Escribe contenido para marcas de EE.UU. y el Reino Unido. Sus ingresos superan el mínimo
@@ -667,7 +677,7 @@ export default function RequisitosNomadaDigitalPage() {
           <h2>6 consejos para que tu solicitud tenga éxito</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📑</span>
+              <span className={styles.tipIcon} aria-hidden="true">📑</span>
               <h3>Apostilla todo lo extranjero</h3>
               <p>
                 Cualquier documento emitido en el extranjero (contrato, antecedentes penales,
@@ -676,7 +686,7 @@ export default function RequisitosNomadaDigitalPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💰</span>
+              <span className={styles.tipIcon} aria-hidden="true">💰</span>
               <h3>Demuestra ingresos con solvencia</h3>
               <p>
                 Aporta los últimos 3-6 meses de nóminas o extractos bancarios. Si eres freelancer,
@@ -685,7 +695,7 @@ export default function RequisitosNomadaDigitalPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚖️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
               <h3>Asesórate antes de solicitar</h3>
               <p>
                 Un abogado especializado en derecho migratorio puede revisar tu caso, detectar
@@ -694,7 +704,7 @@ export default function RequisitosNomadaDigitalPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏥</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏥</span>
               <h3>Contrata el seguro médico antes</h3>
               <p>
                 El seguro médico debe estar activo en el momento de la solicitud y cubrir toda tu
@@ -703,7 +713,7 @@ export default function RequisitosNomadaDigitalPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📧</span>
+              <span className={styles.tipIcon} aria-hidden="true">📧</span>
               <h3>Pide carta detallada al empleador</h3>
               <p>
                 La carta del empleador debe detallar: que el trabajo es 100% remoto, tu antigüedad
@@ -712,7 +722,7 @@ export default function RequisitosNomadaDigitalPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🌍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🌍</span>
               <h3>Evalúa el régimen fiscal especial</h3>
               <p>
                 Si te conviertes en residente fiscal en España, estudia si te interesa el régimen del
@@ -725,7 +735,7 @@ export default function RequisitosNomadaDigitalPage() {
 
         {/* Warning box */}
         <section className={styles.warningBox}>
-          <h2>⚠️ 6 errores que pueden tumbar tu solicitud</h2>
+          <h2><span aria-hidden="true">⚠️</span> 6 errores que pueden tumbar tu solicitud</h2>
           <div className={styles.warningGrid}>
             <div className={styles.warningItem}>
               <strong>1. Documentos sin apostillar o sin traducción jurada</strong>
