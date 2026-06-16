@@ -174,8 +174,8 @@ export default function EstimadorCostesDivorcioPage() {
               <div className={styles.formGroup}>
                 <label className={styles.label}>¿Hay hijos menores o con discapacidad?</label>
                 <div className={styles.switchRow}>
-                  <button type="button" className={`${styles.switchBtn} ${!tieneHijos ? styles.switchActivo : ''}`} onClick={() => { setTieneHijos(false); setResultado(null); }}>No</button>
-                  <button type="button" className={`${styles.switchBtn} ${tieneHijos ? styles.switchActivo : ''}`} onClick={() => { setTieneHijos(true); setResultado(null); }}>Sí</button>
+                  <button type="button" className={`${styles.switchBtn} ${!tieneHijos ? styles.switchActivo : ''}`} onClick={() => { setTieneHijos(false); setResultado(null); }} aria-pressed={!tieneHijos}>No</button>
+                  <button type="button" className={`${styles.switchBtn} ${tieneHijos ? styles.switchActivo : ''}`} onClick={() => { setTieneHijos(true); setResultado(null); }} aria-pressed={tieneHijos}>Sí</button>
                 </div>
               </div>
             )}
@@ -226,27 +226,27 @@ export default function EstimadorCostesDivorcioPage() {
                 <div className={styles.desgloseCard}>
                   <h3 className={styles.desgloseTitle}>Desglose</h3>
                   <div className={styles.desgloseItem}>
-                    <span>👨‍⚖️ Abogado</span>
+                    <span><span aria-hidden="true">👨‍⚖️</span> Abogado</span>
                     <strong>{formatCurrency(resultado.abogado.min)} – {formatCurrency(resultado.abogado.max)}</strong>
                   </div>
                   <div className={styles.desgloseItem}>
-                    <span>📋 Procurador</span>
+                    <span><span aria-hidden="true">📋</span> Procurador</span>
                     <strong>{resultado.procurador > 0 ? formatCurrency(resultado.procurador) : 'No necesario'}</strong>
                   </div>
                   {resultado.notario > 0 && (
                     <div className={styles.desgloseItem}>
-                      <span>📄 Notario</span>
+                      <span><span aria-hidden="true">📄</span> Notario</span>
                       <strong>{formatCurrency(resultado.notario)}</strong>
                     </div>
                   )}
                   {resultado.registro > 0 && (
                     <div className={styles.desgloseItem}>
-                      <span>🏢 Registro Civil</span>
+                      <span><span aria-hidden="true">🏢</span> Registro Civil</span>
                       <strong>{formatCurrency(resultado.registro)}</strong>
                     </div>
                   )}
                   <div className={styles.desgloseItem}>
-                    <span>🏛️ Tasas judiciales</span>
+                    <span><span aria-hidden="true">🏛️</span> Tasas judiciales</span>
                     <strong>Exento</strong>
                   </div>
                 </div>

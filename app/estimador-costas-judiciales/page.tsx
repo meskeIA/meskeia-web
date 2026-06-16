@@ -207,10 +207,10 @@ export default function EstimadorCostasJudicialesPage() {
             <div className={styles.formGroup}>
               <label className={styles.label}>¿Quién eres?</label>
               <div className={styles.switchRow}>
-                <button type="button" className={`${styles.switchBtn} ${persona === 'fisica' ? styles.switchActivo : ''}`} onClick={() => { setPersona('fisica'); setResultado(null); }}>
+                <button type="button" className={`${styles.switchBtn} ${persona === 'fisica' ? styles.switchActivo : ''}`} onClick={() => { setPersona('fisica'); setResultado(null); }} aria-pressed={persona === 'fisica'}>
                   Persona física
                 </button>
-                <button type="button" className={`${styles.switchBtn} ${persona === 'juridica' ? styles.switchActivo : ''}`} onClick={() => { setPersona('juridica'); setResultado(null); }}>
+                <button type="button" className={`${styles.switchBtn} ${persona === 'juridica' ? styles.switchActivo : ''}`} onClick={() => { setPersona('juridica'); setResultado(null); }} aria-pressed={persona === 'juridica'}>
                   Empresa / persona jurídica
                 </button>
               </div>
@@ -233,10 +233,10 @@ export default function EstimadorCostasJudicialesPage() {
             <div className={styles.formGroup}>
               <label className={styles.label}>¿Necesitarás perito?</label>
               <div className={styles.switchRow}>
-                <button type="button" className={`${styles.switchBtn} ${!incluirPerito ? styles.switchActivo : ''}`} onClick={() => { setIncluirPerito(false); setResultado(null); }}>
+                <button type="button" className={`${styles.switchBtn} ${!incluirPerito ? styles.switchActivo : ''}`} onClick={() => { setIncluirPerito(false); setResultado(null); }} aria-pressed={!incluirPerito}>
                   No
                 </button>
-                <button type="button" className={`${styles.switchBtn} ${incluirPerito ? styles.switchActivo : ''}`} onClick={() => { setIncluirPerito(true); setResultado(null); }}>
+                <button type="button" className={`${styles.switchBtn} ${incluirPerito ? styles.switchActivo : ''}`} onClick={() => { setIncluirPerito(true); setResultado(null); }} aria-pressed={incluirPerito}>
                   Sí
                 </button>
               </div>
@@ -266,20 +266,20 @@ export default function EstimadorCostasJudicialesPage() {
                   <h3 className={styles.desgloseTitle}>Desglose</h3>
 
                   <div className={styles.desgloseItem}>
-                    <span>👨‍⚖️ Abogado</span>
+                    <span><span aria-hidden="true">👨‍⚖️</span> Abogado</span>
                     <strong>{formatCurrency(resultado.abogado.min)} – {formatCurrency(resultado.abogado.max)}</strong>
                   </div>
                   <div className={styles.desgloseItem}>
-                    <span>📋 Procurador</span>
+                    <span><span aria-hidden="true">📋</span> Procurador</span>
                     <strong>{resultado.procurador > 0 ? formatCurrency(resultado.procurador) : 'No requerido'}</strong>
                   </div>
                   <div className={styles.desgloseItem}>
-                    <span>🏛️ Tasas judiciales</span>
+                    <span><span aria-hidden="true">🏛️</span> Tasas judiciales</span>
                     <strong>{resultado.tasas > 0 ? formatCurrency(resultado.tasas) : 'Exento'}</strong>
                   </div>
                   {incluirPerito && (
                     <div className={styles.desgloseItem}>
-                      <span>🔍 Perito</span>
+                      <span><span aria-hidden="true">🔍</span> Perito</span>
                       <strong>{formatCurrency(resultado.perito)}</strong>
                     </div>
                   )}

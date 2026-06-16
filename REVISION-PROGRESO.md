@@ -880,15 +880,15 @@
 | [x] | Comparador Autónomo vs SL | `/comparador-autonomo-vs-sl/` | legal-fiscal, freelance |
 | [x] | Comparador de Formas Jurídicas | `/comparador-formas-juridicas/` | legal-fiscal, freelance |
 | [x] | Declaración Renta Persona Fallecida | `/declaracion-renta-fallecidos/` | legal-fiscal, finanzas |
-| [ ] | Estimador de Complemento a Mínimos | `/estimador-complemento-minimos/` | legal-fiscal, finanzas |
-| [ ] | Estimador de Costas Judiciales | `/estimador-costas-judiciales/` | legal-fiscal |
-| [ ] | Estimador de Costes de Divorcio | `/estimador-costes-divorcio/` | legal-fiscal |
+| [x] | Estimador de Complemento a Mínimos | `/estimador-complemento-minimos/` | legal-fiscal, finanzas |
+| [x] | Estimador de Costas Judiciales | `/estimador-costas-judiciales/` | legal-fiscal |
+| [x] | Estimador de Costes de Divorcio | `/estimador-costes-divorcio/` | legal-fiscal |
 | [x] | Estimador de Cuota de Autónomo | `/estimador-cuota-autonomo/` | legal-fiscal, freelance |
 | [x] | Estimador de Legítimas | `/estimador-legitimas/` | legal-fiscal, finanzas |
 | [x] | Estimador de Sueldo Neto | `/estimador-sueldo-neto/` | legal-fiscal, freelance |
 | [x] | Estimador Impuesto de Donaciones | `/estimador-impuesto-donaciones/` | legal-fiscal |
 | [x] | Estimador Impuesto de Sucesiones | `/estimador-impuesto-sucesiones/` | legal-fiscal |
-| [ ] | Estimador IRPF | `/estimador-irpf/` | legal-fiscal |
+| [x] | Estimador IRPF | `/estimador-irpf/` | legal-fiscal |
 | [x] | Estimador IRPF Pensionista | `/estimador-irpf-pensionista/` | legal-fiscal, finanzas |
 | [x] | Estimador Pensión de Viudedad | `/estimador-pension-viudedad/` | legal-fiscal, finanzas |
 | [ ] | Estimador Plusvalía Municipal (IIVTNU) | `/estimador-plusvalia-municipal/` | legal-fiscal, inmobiliaria |

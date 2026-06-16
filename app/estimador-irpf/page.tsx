@@ -295,10 +295,10 @@ export default function EstimadorIRPFPage() {
             </div>
 
             <div className={styles.buttonGroup}>
-              <button onClick={calcular} className={styles.btnPrimary}>
+              <button type="button" onClick={calcular} className={styles.btnPrimary}>
                 Estimar IRPF
               </button>
-              <button onClick={limpiar} className={styles.btnSecondary} aria-label="Limpiar formulario">
+              <button type="button" onClick={limpiar} className={styles.btnSecondary} aria-label="Limpiar formulario">
                 Limpiar
               </button>
             </div>
@@ -322,7 +322,7 @@ export default function EstimadorIRPFPage() {
                   {formatCurrency(Math.abs(resultado.cuotaDiferencial))}
                 </div>
                 <span className={resultado.cuotaDiferencial >= 0 ? styles.resultadoBadgePagar : styles.resultadoBadgeDevolver}>
-                  {resultado.cuotaDiferencial >= 0 ? '📤 A ingresar en Hacienda' : '📥 Hacienda te devuelve'}
+                  <span aria-hidden="true">{resultado.cuotaDiferencial >= 0 ? '📤' : '📥'}</span>{resultado.cuotaDiferencial >= 0 ? ' A ingresar en Hacienda' : ' Hacienda te devuelve'}
                 </span>
               </div>
 
@@ -374,7 +374,7 @@ export default function EstimadorIRPFPage() {
 
               {/* Desglose por tramos */}
               <div className={styles.tramosSection}>
-                <h3 className={styles.tramosTitle}>📊 Desglose por tramos IRPF 2025</h3>
+                <h3 className={styles.tramosTitle}><span aria-hidden="true">📊</span> Desglose por tramos IRPF 2025</h3>
                 <table className={styles.tramosTable}>
                   <thead>
                     <tr>
