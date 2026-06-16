@@ -438,36 +438,40 @@ export default function VisualizadorComparadorIA() {
         {/* Tabs */}
         <nav className={styles.tabsNav} role="tablist" aria-label="Secciones del comparador">
           <button
+            type="button"
             role="tab"
             aria-selected={tabActiva === 'modelos'}
             className={`${styles.tabBtn} ${tabActiva === 'modelos' ? styles.tabBtnActive : ''}`}
             onClick={() => setTabActiva('modelos')}
           >
-            🗂️ Modelos
+            <span aria-hidden="true">🗂️</span> Modelos
           </button>
           <button
+            type="button"
             role="tab"
             aria-selected={tabActiva === 'casos'}
             className={`${styles.tabBtn} ${tabActiva === 'casos' ? styles.tabBtnActive : ''}`}
             onClick={() => setTabActiva('casos')}
           >
-            🎯 Por caso de uso
+            <span aria-hidden="true">🎯</span> Por caso de uso
           </button>
           <button
+            type="button"
             role="tab"
             aria-selected={tabActiva === 'perfiles'}
             className={`${styles.tabBtn} ${tabActiva === 'perfiles' ? styles.tabBtnActive : ''}`}
             onClick={() => setTabActiva('perfiles')}
           >
-            👤 Por perfil
+            <span aria-hidden="true">👤</span> Por perfil
           </button>
           <button
+            type="button"
             role="tab"
             aria-selected={tabActiva === 'glosario'}
             className={`${styles.tabBtn} ${tabActiva === 'glosario' ? styles.tabBtnActive : ''}`}
             onClick={() => setTabActiva('glosario')}
           >
-            📖 Glosario
+            <span aria-hidden="true">📖</span> Glosario
           </button>
         </nav>
 
@@ -475,13 +479,14 @@ export default function VisualizadorComparadorIA() {
         {tabActiva === 'modelos' && (
           <div className={styles.tabContent} role="tabpanel">
             <div className={styles.dataNotice} role="note">
-              📅 Datos verificados en mayo de 2026. El ecosistema de IA evoluciona rápidamente — precios, modelos y capacidades pueden cambiar. Verifica en las webs oficiales antes de suscribirte.
+              <span aria-hidden="true">📅</span> Datos verificados en mayo de 2026. El ecosistema de IA evoluciona rápidamente — precios, modelos y capacidades pueden cambiar. Verifica en las webs oficiales antes de suscribirte.
             </div>
 
             {/* Filtros */}
             <div className={styles.filterRow} role="group" aria-label="Filtrar por precio">
               {(['todos', 'gratuito', 'freemium', 'pago', 'open-source'] as const).map((f) => (
                 <button
+                  type="button"
                   key={f}
                   className={`${styles.filterBtn} ${filtroPrecio === f ? styles.filterBtnActive : ''}`}
                   onClick={() => { setFiltroPrecio(f); setModeloExpandido(null); }}
@@ -576,7 +581,7 @@ export default function VisualizadorComparadorIA() {
                                 className={styles.enlaceOficial}
                                 onClick={(e) => e.stopPropagation()}
                               >
-                                🔗 Ir al sitio oficial
+                                <span aria-hidden="true">🔗</span> Ir al sitio oficial
                               </a>
                             </div>
                           </td>
@@ -596,6 +601,7 @@ export default function VisualizadorComparadorIA() {
             <div className={styles.casosGrid}>
               {CASOS_DE_USO.map((caso) => (
                 <button
+                  type="button"
                   key={caso.id}
                   className={`${styles.casoCard} ${casoSeleccionado === caso.id ? styles.casoCardActivo : ''}`}
                   onClick={() => handleCasoClick(caso.id)}
@@ -611,7 +617,7 @@ export default function VisualizadorComparadorIA() {
             {casoActivo && (
               <div className={styles.recomendacionPanel} role="region" aria-label={`Recomendaciones para ${casoActivo.nombre}`}>
                 <h3 className={styles.recomendacionTitulo}>
-                  {casoActivo.icono} Mejores IAs para {casoActivo.nombre}
+                  <span aria-hidden="true">{casoActivo.icono}</span> Mejores IAs para {casoActivo.nombre}
                 </h3>
                 <div className={styles.modelosRecomGrid}>
                   {casoActivo.modelosRecomendados.map((mid) => {
@@ -632,7 +638,7 @@ export default function VisualizadorComparadorIA() {
                   })}
                 </div>
                 <div className={styles.consejoBox}>
-                  <span className={styles.consejoLabel}>💡 Consejo</span>
+                  <span className={styles.consejoLabel}><span aria-hidden="true">💡</span> Consejo</span>
                   {casoActivo.consejo}
                 </div>
               </div>
@@ -646,6 +652,7 @@ export default function VisualizadorComparadorIA() {
             <div className={styles.perfilesGrid}>
               {PERFILES_USUARIO.map((perfil) => (
                 <button
+                  type="button"
                   key={perfil.id}
                   className={`${styles.perfilCard} ${perfilSeleccionado === perfil.id ? styles.perfilCardActivo : ''}`}
                   onClick={() => handlePerfilClick(perfil.id)}
@@ -668,7 +675,7 @@ export default function VisualizadorComparadorIA() {
             {perfilActivo && (
               <div className={styles.recomendacionPanel} role="region" aria-label={`Recomendaciones para ${perfilActivo.nombre}`}>
                 <h3 className={styles.recomendacionTitulo}>
-                  {perfilActivo.icono} IAs recomendadas para {perfilActivo.nombre}
+                  <span aria-hidden="true">{perfilActivo.icono}</span> IAs recomendadas para {perfilActivo.nombre}
                 </h3>
                 <div className={styles.modelosRecomGrid}>
                   {perfilActivo.modelosRecomendados.map((mid) => {
@@ -689,7 +696,7 @@ export default function VisualizadorComparadorIA() {
                   })}
                 </div>
                 <div className={styles.razonBox}>
-                  <span className={styles.razonLabel}>📌 Por qué estas IAs</span>
+                  <span className={styles.razonLabel}><span aria-hidden="true">📌</span> Por qué estas IAs</span>
                   {perfilActivo.razon}
                 </div>
               </div>
@@ -841,7 +848,7 @@ export default function VisualizadorComparadorIA() {
         </div>
 
         <div className={styles.warningBox} role="note">
-          <strong>⚠️ Nota importante:</strong> Esta guía es educativa. Los precios, modelos y capacidades cambian constantemente en el ecosistema de IA. Consulta siempre las webs oficiales para datos actualizados antes de contratar cualquier servicio o tomar decisiones empresariales basadas en esta información.
+          <strong><span aria-hidden="true">⚠️</span> Nota importante:</strong> Esta guía es educativa. Los precios, modelos y capacidades cambian constantemente en el ecosistema de IA. Consulta siempre las webs oficiales para datos actualizados antes de contratar cualquier servicio o tomar decisiones empresariales basadas en esta información.
         </div>
       </EducationalSection>
 

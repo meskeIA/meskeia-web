@@ -252,7 +252,7 @@ export default function ComparadorVelocidadAlmacenamientoPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>⚡ Comparador de Velocidad de Almacenamiento</h1>
+        <h1 className={styles.title}><span aria-hidden="true">⚡</span> Comparador de Velocidad de Almacenamiento</h1>
         <p className={styles.subtitle}>
           Mueve el slider para ver cuánto tarda en transferirse tu archivo en cada tecnología de almacenamiento
         </p>
@@ -269,8 +269,10 @@ export default function ComparadorVelocidadAlmacenamientoPage() {
             {PRESETS.map((p) => (
               <button
                 key={p.nombre}
+                type="button"
                 onClick={() => handlePreset(p)}
                 className={`${styles.presetBtn} ${presetActivo === p.nombre ? styles.presetBtnActivo : ''}`}
+                aria-pressed={presetActivo === p.nombre}
               >
                 <span aria-hidden="true">{p.emoji}</span>
                 {p.nombre}
@@ -307,18 +309,20 @@ export default function ComparadorVelocidadAlmacenamientoPage() {
           <span className={styles.modoLabel}>Operación:</span>
           <div className={styles.modoBtns} role="group" aria-label="Modo de operación">
             <button
+              type="button"
               onClick={() => setModo('lectura')}
               className={`${styles.modoBtn} ${modo === 'lectura' ? styles.modoBtnActivo : ''}`}
               aria-pressed={modo === 'lectura'}
             >
-              📖 Lectura
+              <span aria-hidden="true">📖</span> Lectura
             </button>
             <button
+              type="button"
               onClick={() => setModo('escritura')}
               className={`${styles.modoBtn} ${modo === 'escritura' ? styles.modoBtnActivo : ''}`}
               aria-pressed={modo === 'escritura'}
             >
-              ✍️ Escritura
+              <span aria-hidden="true">✍️</span> Escritura
             </button>
           </div>
         </div>

@@ -756,10 +756,10 @@
 | [x] | Calculadora de Sustitución de Levadura por Masa Madre | `/calculadora-masa-madre/` | tecnicas, cultura |
 | [x] | Calculadora Regla de los 180° para Vídeo | `/calculadora-regla-180-video/` | tecnicas, diseno |
 | [x] | Cifrado AES | `/cifrado-aes/` | tecnicas |
-| [ ] | Codificador Base64 | `/codificador-base64/` | tecnicas |
-| [ ] | Cómo Funcionan los LLMs - Tokens, Embeddings y Atención | `/visualizador-llm-funcionamiento/` | tecnicas, cultura, estudiantes |
-| [ ] | Comparador de IAs 2026: ChatGPT vs Claude vs Gemini y más | `/visualizador-comparador-ia/` | tecnicas, cultura, productividad |
-| [ ] | Comparador de Velocidad de Almacenamiento: HDD vs SSD vs NVMe vs USB | `/comparador-velocidad-almacenamiento/` | tecnicas, cultura |
+| [x] | Codificador Base64 | `/codificador-base64/` | tecnicas |
+| [x] | Cómo Funcionan los LLMs - Tokens, Embeddings y Atención | `/visualizador-llm-funcionamiento/` | tecnicas, cultura, estudiantes |
+| [x] | Comparador de IAs 2026: ChatGPT vs Claude vs Gemini y más | `/visualizador-comparador-ia/` | tecnicas, cultura, productividad |
+| [x] | Comparador de Velocidad de Almacenamiento: HDD vs SSD vs NVMe vs USB | `/comparador-velocidad-almacenamiento/` | tecnicas, cultura |
 | [ ] | Constructor de Prompts Guiado | `/constructor-prompts/` | tecnicas, productividad |
 | [ ] | Contador Manual (Tally Counter) | `/contador-manual/` | tecnicas, productividad |
 | [ ] | Conversor de Unidades RF | `/conversor-unidades-rf/` | tecnicas |

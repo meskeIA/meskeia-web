@@ -139,15 +139,17 @@ export default function CodificadorBase64Page() {
             type="button"
             className={`${styles.modeBtn} ${modo === 'texto' ? styles.active : ''}`}
             onClick={() => setModo('texto')}
+            aria-pressed={modo === 'texto'}
           >
-            📝 Texto
+            <span aria-hidden="true">📝</span> Texto
           </button>
           <button
             type="button"
             className={`${styles.modeBtn} ${modo === 'archivo' ? styles.active : ''}`}
             onClick={() => setModo('archivo')}
+            aria-pressed={modo === 'archivo'}
           >
-            📁 Archivo a Base64
+            <span aria-hidden="true">📁</span> Archivo a Base64
           </button>
         </div>
 
@@ -162,6 +164,7 @@ export default function CodificadorBase64Page() {
                   type="button"
                   className={`${styles.formatBtn} ${formato === 'base64' ? styles.active : ''}`}
                   onClick={() => setFormato('base64')}
+                  aria-pressed={formato === 'base64'}
                 >
                   Base64
                 </button>
@@ -169,6 +172,7 @@ export default function CodificadorBase64Page() {
                   type="button"
                   className={`${styles.formatBtn} ${formato === 'url' ? styles.active : ''}`}
                   onClick={() => setFormato('url')}
+                  aria-pressed={formato === 'url'}
                 >
                   URL Encode
                 </button>
@@ -176,6 +180,7 @@ export default function CodificadorBase64Page() {
                   type="button"
                   className={`${styles.formatBtn} ${formato === 'hex' ? styles.active : ''}`}
                   onClick={() => setFormato('hex')}
+                  aria-pressed={formato === 'hex'}
                 >
                   Hexadecimal
                 </button>
@@ -204,7 +209,7 @@ export default function CodificadorBase64Page() {
                   className={styles.btnPrimary}
                   disabled={!textoEntrada.trim()}
                 >
-                  🔒 Codificar
+                  <span aria-hidden="true">🔒</span> Codificar
                 </button>
                 <button
                   type="button"
@@ -212,7 +217,7 @@ export default function CodificadorBase64Page() {
                   className={styles.btnPrimary}
                   disabled={!textoEntrada.trim()}
                 >
-                  🔓 Decodificar
+                  <span aria-hidden="true">🔓</span> Decodificar
                 </button>
               </div>
             </section>
@@ -249,7 +254,7 @@ export default function CodificadorBase64Page() {
         {/* Error */}
         {error && (
           <div className={styles.errorBox}>
-            ❌ {error}
+            <span aria-hidden="true">❌</span> {error}
           </div>
         )}
 
@@ -269,7 +274,7 @@ export default function CodificadorBase64Page() {
                   onClick={copiarResultado}
                   className={styles.btnCopy}
                 >
-                  {copiado ? '✅ Copiado' : '📋 Copiar'}
+                  {copiado ? <><span aria-hidden="true">✅</span> Copiado</> : <><span aria-hidden="true">📋</span> Copiar</>}
                 </button>
               </div>
             </div>
@@ -280,7 +285,7 @@ export default function CodificadorBase64Page() {
               rows={6}
             />
             <div className={styles.stats}>
-              <span>📊 {resultado.length} caracteres</span>
+              <span><span aria-hidden="true">📊</span> {resultado.length} caracteres</span>
             </div>
           </section>
         )}

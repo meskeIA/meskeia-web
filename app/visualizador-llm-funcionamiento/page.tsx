@@ -359,6 +359,7 @@ export default function VisualizadorLlmFuncionamiento() {
             {EJEMPLOS_TEXTO.map((ej) => (
               <button
                 key={ej}
+                type="button"
                 className={styles.btnSecundario}
                 onClick={() => handleEjemplo(ej)}
                 style={{ fontSize: '0.78rem' }}
@@ -368,6 +369,7 @@ export default function VisualizadorLlmFuncionamiento() {
               </button>
             ))}
             <button
+              type="button"
               className={styles.btnSecundario}
               onClick={handleLimpiar}
               aria-label="Limpiar texto"
@@ -552,6 +554,7 @@ export default function VisualizadorLlmFuncionamiento() {
           )}
 
           <button
+            type="button"
             className={styles.btnPrimario}
             onClick={() => setMostrarAnalogia(!mostrarAnalogia)}
             aria-pressed={mostrarAnalogia}
@@ -583,18 +586,20 @@ export default function VisualizadorLlmFuncionamiento() {
           <div className={styles.contextoToggle}>
             <span className={styles.contextoLabel}>Contexto:</span>
             <button
+              type="button"
               className={`${styles.contextoBtn} ${contextoAtencion === 'rio' ? styles.contextoBtnActivo : ''}`}
               onClick={() => { setContextoAtencion('rio'); setTokenAtencionIdx(1); }}
               aria-pressed={contextoAtencion === 'rio'}
             >
-              🌊 Banco del río
+              <span aria-hidden="true">🌊</span> Banco del río
             </button>
             <button
+              type="button"
               className={`${styles.contextoBtn} ${contextoAtencion === 'financiero' ? styles.contextoBtnActivo : ''}`}
               onClick={() => { setContextoAtencion('financiero'); setTokenAtencionIdx(1); }}
               aria-pressed={contextoAtencion === 'financiero'}
             >
-              🏦 Banco financiero
+              <span aria-hidden="true">🏦</span> Banco financiero
             </button>
           </div>
 
@@ -602,6 +607,7 @@ export default function VisualizadorLlmFuncionamiento() {
             {FRASE_ATENCION.map((token, i) => (
               <button
                 key={i}
+                type="button"
                 className={`${styles.tokenAtencion} ${tokenAtencionIdx === i ? styles.tokenAtencionActivo : ''}`}
                 onClick={() => setTokenAtencionIdx(tokenAtencionIdx === i ? null : i)}
                 aria-pressed={tokenAtencionIdx === i}
@@ -658,8 +664,8 @@ export default function VisualizadorLlmFuncionamiento() {
 
           <div className={styles.atencionExplicacion} role="status" aria-live="polite">
             {contextoAtencion === 'rio'
-              ? '🌊 "banco" atiende fuertemente a "río" y "cerca" → el modelo infiere que es un asiento junto al río.'
-              : '🏦 En contexto financiero, "banco" se atiende a sí mismo y a "El" → institución financiera.'}
+              ? <><span aria-hidden="true">🌊</span> &quot;banco&quot; atiende fuertemente a &quot;río&quot; y &quot;cerca&quot; → el modelo infiere que es un asiento junto al río.</>
+              : <><span aria-hidden="true">🏦</span> En contexto financiero, &quot;banco&quot; se atiende a sí mismo y a &quot;El&quot; → institución financiera.</>}
           </div>
 
           <div className={styles.datosClave}>
@@ -692,8 +698,8 @@ export default function VisualizadorLlmFuncionamiento() {
 
           <div className={styles.tempSliderWrapper}>
             <div className={styles.tempEtiquetas}>
-              <span className={styles.tempEtiquetaFria}>❄️ Frío (predecible)</span>
-              <span className={styles.tempEtiquetaCaliente}>🔥 Caliente (creativo/caótico)</span>
+              <span className={styles.tempEtiquetaFria}><span aria-hidden="true">❄️</span> Frío (predecible)</span>
+              <span className={styles.tempEtiquetaCaliente}><span aria-hidden="true">🔥</span> Caliente (creativo/caótico)</span>
             </div>
             <input
               type="range"
@@ -738,6 +744,7 @@ export default function VisualizadorLlmFuncionamiento() {
             </p>
             <div className={styles.generadorBtns}>
               <button
+                type="button"
                 className={styles.btnPrimario}
                 onClick={handleGenerarToken}
                 aria-label="Generar siguiente token según la distribución actual"
@@ -745,11 +752,12 @@ export default function VisualizadorLlmFuncionamiento() {
                 ▶ Generar siguiente token
               </button>
               <button
+                type="button"
                 className={styles.btnSecundario}
                 onClick={handleResetGenerado}
                 aria-label="Reiniciar texto generado"
               >
-                🔄 Reiniciar
+                <span aria-hidden="true">🔄</span> Reiniciar
               </button>
             </div>
           </div>
