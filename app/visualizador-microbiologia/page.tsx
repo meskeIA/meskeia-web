@@ -402,6 +402,7 @@ export default function VisualizadorMicrobiologia() {
       <nav className={styles.tabBar} aria-label="Secciones de microbiología">
         {tabs.map((t) => (
           <button
+            type="button"
             key={t.id}
             className={`${styles.tab} ${tab === t.id ? styles.tabActive : ''}`}
             onClick={() => setTab(t.id)}
@@ -422,6 +423,7 @@ export default function VisualizadorMicrobiologia() {
           <div className={styles.morfologiasGrid}>
             {MORFOLOGIAS.map((m) => (
               <button
+                type="button"
                 key={m.id}
                 className={`${styles.morfologiaCard} ${morfologiaActiva === m.id ? styles.morfologiaCardActive : ''}`}
                 onClick={() => setMorfologiaActiva(m.id)}
@@ -457,6 +459,7 @@ export default function VisualizadorMicrobiologia() {
               <div className={styles.partesBtns}>
                 {PARTES_BACTERIANAS.map((p) => (
                   <button
+                    type="button"
                     key={p.id}
                     className={`${styles.parteBtn} ${parteActiva === p.id ? styles.parteBtnActive : ''}`}
                     style={{ '--parte-color': p.color } as React.CSSProperties}
@@ -547,6 +550,7 @@ export default function VisualizadorMicrobiologia() {
               { id: 'transformacion', label: 'Transformación', emoji: '🧬' },
             ].map((proc) => (
               <button
+                type="button"
                 key={proc.id}
                 className={`${styles.procesoBtn} ${procesoActivo === proc.id ? styles.procesoBtnActive : ''}`}
                 onClick={() => setProcesoActivo(procesoActivo === proc.id ? null : proc.id)}
@@ -613,18 +617,20 @@ export default function VisualizadorMicrobiologia() {
 
           <div className={styles.gramTabs}>
             <button
+              type="button"
               className={`${styles.gramTabBtn} ${gramTab === 'pos' ? styles.gramTabPos : ''}`}
               onClick={() => setGramTab('pos')}
               aria-pressed={gramTab === 'pos'}
             >
-              🟣 Gram Positivas
+              <span aria-hidden="true">🟣</span> Gram Positivas
             </button>
             <button
+              type="button"
               className={`${styles.gramTabBtn} ${gramTab === 'neg' ? styles.gramTabNeg : ''}`}
               onClick={() => setGramTab('neg')}
               aria-pressed={gramTab === 'neg'}
             >
-              🔴 Gram Negativas
+              <span aria-hidden="true">🔴</span> Gram Negativas
             </button>
           </div>
 

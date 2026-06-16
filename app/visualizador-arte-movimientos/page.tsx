@@ -279,7 +279,9 @@ function TabDetalle() {
       <div className={styles.movimientoSelector}>
         {MOVIMIENTOS.map((mov, i) => (
           <button
+            type="button"
             key={mov.id}
+            aria-pressed={i === indice}
             className={`${styles.movimientoBtn} ${i === indice ? styles.movimientoBtnActivo : ''}`}
             onClick={() => setIndice(i)}
             style={i === indice ? { background: mov.color, borderColor: mov.color } : {}}
@@ -326,6 +328,7 @@ function TabDetalle() {
 
       <div className={styles.navBtns}>
         <button
+          type="button"
           className={styles.btnAnterior}
           onClick={() => setIndice((i) => Math.max(0, i - 1))}
           disabled={indice === 0}
@@ -335,6 +338,7 @@ function TabDetalle() {
         </button>
         <span className={styles.navCounter}>{indice + 1} / {MOVIMIENTOS.length}</span>
         <button
+          type="button"
           className={styles.btnSiguiente}
           onClick={() => setIndice((i) => Math.min(MOVIMIENTOS.length - 1, i + 1))}
           disabled={indice === MOVIMIENTOS.length - 1}
@@ -372,6 +376,8 @@ function TabComparativa() {
 
       <div className={styles.filtroCategoria}>
         <button
+          type="button"
+          aria-pressed={categoriaFiltro === 'todos'}
           className={`${styles.filtroCatBtn} ${categoriaFiltro === 'todos' ? styles.filtroCatBtnActivo : ''}`}
           onClick={() => setCategoriaFiltro('todos')}
         >
@@ -379,7 +385,9 @@ function TabComparativa() {
         </button>
         {(Object.keys(ETIQUETAS_CATEGORIA) as Categoria[]).map((cat) => (
           <button
+            type="button"
             key={cat}
+            aria-pressed={categoriaFiltro === cat}
             className={`${styles.filtroCatBtn} ${categoriaFiltro === cat ? styles.filtroCatBtnActivo : ''}`}
             onClick={() => setCategoriaFiltro(cat)}
             style={categoriaFiltro === cat ? { background: COLORES_CATEGORIA[cat], borderColor: COLORES_CATEGORIA[cat] } : {}}
@@ -554,6 +562,7 @@ export default function VisualizadorArteMovimientos() {
         <nav className={styles.tabNav} role="tablist" aria-label="Secciones del visualizador">
           {tabs.map((tab) => (
             <button
+              type="button"
               key={tab.id}
               role="tab"
               aria-selected={tabActiva === tab.id}

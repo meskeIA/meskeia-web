@@ -294,10 +294,10 @@
 | [x] | Los Números de la Música | `/visualizador-matematicas-musica/` | cultura, estudiantes |
 | [x] | Los Números del Océano | `/visualizador-oceano/` | cultura, estudiantes |
 | [x] | Mapa de Automatización Personal | `/mapa-automatizacion-personal/` | cultura, productividad |
-| [ ] | Microbiología: Bacterias, Crecimiento y Tres Dominios de la Vida | `/visualizador-microbiologia/` | cultura, estudiantes, salud |
-| [ ] | Minerales del Mundo | `/minerales-del-mundo/` | cultura |
-| [ ] | Movimientos Artísticos: Historia del Arte desde el Románico hasta el Arte Digital | `/visualizador-arte-movimientos/` | cultura |
-| [ ] | Movimientos Literarios: Cronología de la Épica Griega al Posmodernismo | `/visualizador-literatura-movimientos/` | cultura |
+| [x] | Microbiología: Bacterias, Crecimiento y Tres Dominios de la Vida | `/visualizador-microbiologia/` | cultura, estudiantes, salud |
+| [x] | Minerales del Mundo | `/minerales-del-mundo/` | cultura |
+| [x] | Movimientos Artísticos: Historia del Arte desde el Románico hasta el Arte Digital | `/visualizador-arte-movimientos/` | cultura |
+| [x] | Movimientos Literarios: Cronología de la Épica Griega al Posmodernismo | `/visualizador-literatura-movimientos/` | cultura |
 | [ ] | Movimientos Musicales: Cronología del Gregoriano a la Música Electrónica | `/visualizador-musica-movimientos/` | cultura |
 | [ ] | Narratología Visual | `/visualizador-narratologia/` | cultura, estudiantes |
 | [ ] | Orientador de Escritura Creativa | `/orientador-escritura-creativa/` | cultura, productividad |

@@ -79,6 +79,7 @@ export default function MineralesDelMundoPage() {
           />
           {busqueda && (
             <button
+              type="button"
               onClick={() => setBusqueda('')}
               className={styles.clearButton}
               aria-label="Limpiar búsqueda"
@@ -90,20 +91,24 @@ export default function MineralesDelMundoPage() {
 
         <div className={styles.categoriesWrapper}>
           <button
+            type="button"
+            aria-pressed={categoriaFiltro === 'todas'}
             className={`${styles.categoryButton} ${categoriaFiltro === 'todas' ? styles.active : ''}`}
             onClick={() => setCategoriaFiltro('todas')}
           >
-            <span>📊</span>
+            <span aria-hidden="true">📊</span>
             <span>Todas</span>
             <span className={styles.categoryCount}>{conteosPorCategoria.todas}</span>
           </button>
           {CATEGORIAS.map(categoria => (
             <button
+              type="button"
               key={categoria}
+              aria-pressed={categoriaFiltro === categoria}
               className={`${styles.categoryButton} ${categoriaFiltro === categoria ? styles.active : ''}`}
               onClick={() => setCategoriaFiltro(categoria)}
             >
-              <span>{CATEGORIA_EMOJI[categoria]}</span>
+              <span aria-hidden="true">{CATEGORIA_EMOJI[categoria]}</span>
               <span>{categoria}</span>
               <span className={styles.categoryCount}>{conteosPorCategoria[categoria]}</span>
             </button>
@@ -232,6 +237,7 @@ export default function MineralesDelMundoPage() {
           <span className={styles.noResultsIcon}>🔍</span>
           <p>No se encontraron minerales con esos criterios</p>
           <button
+            type="button"
             onClick={() => { setBusqueda(''); setCategoriaFiltro('todas'); }}
             className={styles.resetButton}
           >
