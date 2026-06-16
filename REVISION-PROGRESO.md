@@ -229,10 +229,10 @@
 | [x] | Historia de los Ordenadores: De Babbage a la IA Cuántica | `/visualizador-historia/ordenadores/` | cultura, tecnicas |
 | [x] | Historia de los Países Bajos: De los Frisios a la Holanda Moderna | `/visualizador-historia/paises-bajos/` | cultura, estudiantes |
 | [x] | Historia de los Toltecas: El Imperio de Tula y la Leyenda de Quetzalcóatl | `/visualizador-historia/tolteca/` | cultura, estudiantes |
-| [ ] | Historia de los Viajes Espaciales: De Gagarin a Starship | `/visualizador-historia/viajes-espaciales/` | cultura, tecnicas |
-| [ ] | Historia de los Videojuegos Españoles: De la Edad de Oro a Metroid Dread | `/visualizador-historia/videojuegos-espanoles/` | cultura, juegos |
-| [ ] | Historia de los Videojuegos Japoneses: De Nintendo a los Gacha | `/visualizador-historia/historia-videojuegos-japoneses/` | cultura, juegos |
-| [ ] | Historia de los Videojuegos: De Pong a la IA Generativa | `/visualizador-historia/videojuegos/` | cultura, juegos |
+| [x] | Historia de los Viajes Espaciales: De Gagarin a Starship | `/visualizador-historia/viajes-espaciales/` | cultura, tecnicas |
+| [x] | Historia de los Videojuegos Españoles: De la Edad de Oro a Metroid Dread | `/visualizador-historia/videojuegos-espanoles/` | cultura, juegos |
+| [x] | Historia de los Videojuegos Japoneses: De Nintendo a los Gacha | `/visualizador-historia/historia-videojuegos-japoneses/` | cultura, juegos |
+| [x] | Historia de los Videojuegos: De Pong a la IA Generativa | `/visualizador-historia/videojuegos/` | cultura, juegos |
 | [ ] | Historia de Mesopotamia: La Cuna de la Civilización | `/visualizador-historia/mesopotamia/` | cultura |
 | [ ] | Historia de México: Del Grito de Dolores a la México Contemporánea | `/visualizador-historia/mexico-moderno/` | cultura, estudiantes |
 | [ ] | Historia de Perú: De la Independencia al Perú Contemporáneo | `/visualizador-historia/peru/` | cultura, estudiantes |
