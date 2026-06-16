@@ -221,10 +221,10 @@
 | [x] | Historia de los Aztecas: De Aztlán a la Caída de Tenochtitlan | `/visualizador-historia/azteca/` | cultura, estudiantes |
 | [x] | Historia de los Derechos Humanos: Cronología de la Magna Carta a los Derechos Digitales | `/visualizador-derechos-humanos/` | cultura |
 | [x] | Historia de los Descubrimientos Científicos: De Arquímedes al CRISPR | `/visualizador-historia/historia-descubrimientos-cientificos/` | cultura |
-| [ ] | Historia de los Diccionarios y Enciclopedias: De los Escribas a Wikipedia | `/visualizador-historia/diccionarios-enciclopedias/` | cultura, estudiantes |
-| [ ] | Historia de los Estados Unidos: De las Colonias a la Superpotencia | `/visualizador-historia/historia-eeuu/` | cultura |
-| [ ] | Historia de los Idiomas del Mundo: De las Primeras Lenguas al Inglés Global | `/visualizador-historia/idiomas-mundo/` | cultura, estudiantes |
-| [ ] | Historia de los Mayas: De las Primeras Aldeas al Fin del Mundo Clásico | `/visualizador-historia/maya/` | cultura, estudiantes |
+| [x] | Historia de los Diccionarios y Enciclopedias: De los Escribas a Wikipedia | `/visualizador-historia/diccionarios-enciclopedias/` | cultura, estudiantes |
+| [x] | Historia de los Estados Unidos: De las Colonias a la Superpotencia | `/visualizador-historia/historia-eeuu/` | cultura |
+| [x] | Historia de los Idiomas del Mundo: De las Primeras Lenguas al Inglés Global | `/visualizador-historia/idiomas-mundo/` | cultura, estudiantes |
+| [x] | Historia de los Mayas: De las Primeras Aldeas al Fin del Mundo Clásico | `/visualizador-historia/maya/` | cultura, estudiantes |
 | [ ] | Historia de los Olmecas: La Civilización Madre de Mesoamérica | `/visualizador-historia/olmeca/` | cultura, estudiantes |
 | [ ] | Historia de los Ordenadores: De Babbage a la IA Cuántica | `/visualizador-historia/ordenadores/` | cultura, tecnicas |
 | [ ] | Historia de los Países Bajos: De los Frisios a la Holanda Moderna | `/visualizador-historia/paises-bajos/` | cultura, estudiantes |
