@@ -66,7 +66,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🚴 Calculadora de Potencia en Ciclismo</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🚴</span> Calculadora de Potencia en Ciclismo</h1>
         <p className={styles.subtitle}>
           Analiza tu FTP, W/kg y VAM para conocer tu nivel como ciclista
         </p>
@@ -137,7 +137,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
               onClick={() => { setMostrarVam(v => !v); setResultado(null); }}
               aria-expanded={mostrarVam}
             >
-              {mostrarVam ? '▲' : '▼'} Calcular VAM para subida cronometrada (opcional)
+              <span aria-hidden="true">{mostrarVam ? '▲' : '▼'}</span> Calcular VAM para subida cronometrada (opcional)
             </button>
           </div>
 
@@ -183,7 +183,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
           )}
 
           <div className={styles.btnWrapper}>
-            <button onClick={calcular} className={styles.btnCalcular}>
+            <button type="button" onClick={calcular} className={styles.btnCalcular}>
               Calcular potencia →
             </button>
           </div>
@@ -274,7 +274,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>⚡</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">⚡</span>
                   <h3>Qué es el FTP</h3>
                 </div>
                 <p className={styles.escenarioTip}>
@@ -283,7 +283,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🧪</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🧪</span>
                   <h3>Test de 20 minutos</h3>
                 </div>
                 <p className={styles.escenarioTip}>
@@ -292,7 +292,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🔁</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🔁</span>
                   <h3>¿Cada cuánto actualizarlo?</h3>
                 </div>
                 <p className={styles.escenarioTip}>
@@ -301,7 +301,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>📱</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">📱</span>
                   <h3>Sin potenciómetro</h3>
                 </div>
                 <p className={styles.escenarioTip}>
@@ -365,13 +365,13 @@ export default function CalculadoraPotenciaCiclismoPage() {
             <h2>¿Qué es el VAM?</h2>
             <div className={styles.faqList}>
               <div className={styles.faqItem}>
-                <h4>📐 Definición y fórmula</h4>
+                <h4><span aria-hidden="true">📐</span> Definición y fórmula</h4>
                 <p>
                   VAM son las siglas de Velocidad Ascensional Media (en italiano: Velocità Ascensionale Media). Fue popularizado por el fisiólogo Michele Ferrari como indicador del rendimiento en escalada. Se calcula: VAM (m/h) = Desnivel (m) × 60 / Tiempo (min).
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>📊 Valores de referencia en subida</h4>
+                <h4><span aria-hidden="true">📊</span> Valores de referencia en subida</h4>
                 <p>
                   Ciclistas de nivel medio: 800–1.000 m/h. Amateurs fuertes: 1.000–1.200 m/h. Semi-profesionales: 1.200–1.400 m/h. Profesionales del World Tour: 1.600–1.800 m/h en grandes ascensiones. En el Tour de Francia, los mejores escaladores han superado 1.800 m/h.
                 </p>
@@ -380,7 +380,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>🔗 Relación VAM y W/kg</h4>
+                <h4><span aria-hidden="true">🔗</span> Relación VAM y W/kg</h4>
                 <p>
                   Existe una relación aproximada entre VAM y W/kg según la pendiente media de la subida. A 8% de pendiente: W/kg ≈ VAM / 255. Esta relación varía con la resistencia aerodinámica, el peso de la bici, la temperatura y la altura (altitud). Úsala como estimación orientativa, no como fórmula exacta.
                 </p>
@@ -433,22 +433,22 @@ export default function CalculadoraPotenciaCiclismoPage() {
             <h2>Claves para mejorar el W/kg</h2>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>⚡</span>
+                <span className={styles.tipIcon} aria-hidden="true">⚡</span>
                 <h4>Aumenta el FTP con consistencia</h4>
                 <p>El FTP mejora con entrenamiento regular y progresivo, no con esfuerzos esporádicos máximos. La consistencia durante semanas y meses es más efectiva que picos de intensidad aislados.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>⚖️</span>
+                <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
                 <h4>El peso importa especialmente en subidas</h4>
                 <p>Reducir 2–3 kg de peso corporal mejora el W/kg sin cambiar el FTP. En terreno llano este efecto es menor; en subidas largas puede suponer 1–2 min de diferencia por cada 500 m de desnivel.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🌬️</span>
+                <span className={styles.tipIcon} aria-hidden="true">🌬️</span>
                 <h4>La aerodinámica importa más en llano</h4>
                 <p>En llano, la resistencia aerodinámica representa el 70–80% del esfuerzo total. Una postura más agresiva sobre la bici o componentes aerodinámicos pueden ser más rentables que mejorar el FTP para reducir tiempos en terreno plano.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>😴</span>
+                <span className={styles.tipIcon} aria-hidden="true">😴</span>
                 <h4>El descanso es parte del entrenamiento</h4>
                 <p>El FTP no mejora durante el esfuerzo, sino en la recuperación. Dormir 7–9 horas, incluir semanas de descarga cada 3–4 semanas y gestionar el estrés general son factores que afectan al rendimiento tanto como las sesiones de calidad.</p>
               </div>
@@ -457,14 +457,14 @@ export default function CalculadoraPotenciaCiclismoPage() {
 
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>Errores Frecuentes en el Entrenamiento por Potencia</h3>
             </div>
             <ul className={styles.warningList}>
-              <li><strong>❌ Usar el FTP de otra persona como referencia propia:</strong> El FTP es individual. Compararse con valores de referencia de ciclistas profesionales o de amigos puede llevar a entrenar en zonas incorrectas.</li>
-              <li><strong>❌ Hacer el test FTP sin preparación adecuada:</strong> Un test realizado tras días de fatiga acumulada, enfermedad o sin un buen calentamiento dará un FTP subestimado y zonas demasiado conservadoras.</li>
-              <li><strong>❌ Entrenar siempre en Z4-Z5 creyendo que "más intensidad = más mejora":</strong> Sin base aeróbica sólida (Z2), los intervalos de alta intensidad tienen efecto limitado y aumentan el riesgo de sobreentrenamiento.</li>
-              <li><strong>❌ No actualizar las zonas al mejorar:</strong> Cuando el FTP sube, las zonas anteriores quedan obsoletas. Entrenar con zonas desfasadas significa hacerlo por debajo del estímulo necesario para seguir progresando.</li>
+              <li><strong><span aria-hidden="true">❌</span> Usar el FTP de otra persona como referencia propia:</strong> El FTP es individual. Compararse con valores de referencia de ciclistas profesionales o de amigos puede llevar a entrenar en zonas incorrectas.</li>
+              <li><strong><span aria-hidden="true">❌</span> Hacer el test FTP sin preparación adecuada:</strong> Un test realizado tras días de fatiga acumulada, enfermedad o sin un buen calentamiento dará un FTP subestimado y zonas demasiado conservadoras.</li>
+              <li><strong><span aria-hidden="true">❌</span> Entrenar siempre en Z4-Z5 creyendo que "más intensidad = más mejora":</strong> Sin base aeróbica sólida (Z2), los intervalos de alta intensidad tienen efecto limitado y aumentan el riesgo de sobreentrenamiento.</li>
+              <li><strong><span aria-hidden="true">❌</span> No actualizar las zonas al mejorar:</strong> Cuando el FTP sube, las zonas anteriores quedan obsoletas. Entrenar con zonas desfasadas significa hacerlo por debajo del estímulo necesario para seguir progresando.</li>
             </ul>
           </div>
         </EducationalSection>

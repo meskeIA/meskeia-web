@@ -108,16 +108,20 @@ export default function CalculadoraEdadMascotasPage() {
           {/* Selector de mascota */}
           <div className={styles.mascotaSelector}>
             <button
+              type="button"
+              aria-pressed={tipoMascota === 'perro'}
               className={`${styles.mascotaBtn} ${tipoMascota === 'perro' ? styles.active : ''}`}
               onClick={() => { setTipoMascota('perro'); setResultado(null); }}
             >
-              🐕 Perro
+              <span aria-hidden="true">🐕</span> Perro
             </button>
             <button
+              type="button"
+              aria-pressed={tipoMascota === 'gato'}
               className={`${styles.mascotaBtn} ${tipoMascota === 'gato' ? styles.active : ''}`}
               onClick={() => { setTipoMascota('gato'); setResultado(null); }}
             >
-              🐈 Gato
+              <span aria-hidden="true">🐈</span> Gato
             </button>
           </div>
 
@@ -127,34 +131,42 @@ export default function CalculadoraEdadMascotasPage() {
               <label>Tamaño del perro</label>
               <div className={styles.tamanoGrid}>
                 <button
+                  type="button"
+                  aria-pressed={tamanoPerro === 'pequeno'}
                   className={`${styles.tamanoBtn} ${tamanoPerro === 'pequeno' ? styles.active : ''}`}
                   onClick={() => setTamanoPerro('pequeno')}
                 >
-                  <span className={styles.tamanoIcon}>🐕</span>
+                  <span className={styles.tamanoIcon} aria-hidden="true">🐕</span>
                   <span className={styles.tamanoNombre}>Pequeño</span>
                   <span className={styles.tamanoPeso}>&lt;10 kg</span>
                 </button>
                 <button
+                  type="button"
+                  aria-pressed={tamanoPerro === 'mediano'}
                   className={`${styles.tamanoBtn} ${tamanoPerro === 'mediano' ? styles.active : ''}`}
                   onClick={() => setTamanoPerro('mediano')}
                 >
-                  <span className={styles.tamanoIcon}>🐕</span>
+                  <span className={styles.tamanoIcon} aria-hidden="true">🐕</span>
                   <span className={styles.tamanoNombre}>Mediano</span>
                   <span className={styles.tamanoPeso}>10-25 kg</span>
                 </button>
                 <button
+                  type="button"
+                  aria-pressed={tamanoPerro === 'grande'}
                   className={`${styles.tamanoBtn} ${tamanoPerro === 'grande' ? styles.active : ''}`}
                   onClick={() => setTamanoPerro('grande')}
                 >
-                  <span className={styles.tamanoIcon}>🐕</span>
+                  <span className={styles.tamanoIcon} aria-hidden="true">🐕</span>
                   <span className={styles.tamanoNombre}>Grande</span>
                   <span className={styles.tamanoPeso}>25-45 kg</span>
                 </button>
                 <button
+                  type="button"
+                  aria-pressed={tamanoPerro === 'gigante'}
                   className={`${styles.tamanoBtn} ${tamanoPerro === 'gigante' ? styles.active : ''}`}
                   onClick={() => setTamanoPerro('gigante')}
                 >
-                  <span className={styles.tamanoIcon}>🐕</span>
+                  <span className={styles.tamanoIcon} aria-hidden="true">🐕</span>
                   <span className={styles.tamanoNombre}>Gigante</span>
                   <span className={styles.tamanoPeso}>&gt;45 kg</span>
                 </button>
@@ -178,10 +190,10 @@ export default function CalculadoraEdadMascotasPage() {
           </div>
 
           <div className={styles.botones}>
-            <button onClick={calcular} className={styles.btnPrimary}>
+            <button type="button" onClick={calcular} className={styles.btnPrimary}>
               Calcular Edad Humana
             </button>
-            <button onClick={limpiar} className={styles.btnSecondary}>
+            <button type="button" onClick={limpiar} className={styles.btnSecondary}>
               Limpiar
             </button>
           </div>
@@ -193,7 +205,7 @@ export default function CalculadoraEdadMascotasPage() {
             <>
               {/* Edad humana */}
               <div className={styles.resultadoPrincipal}>
-                <span className={styles.resultadoIcon}>
+                <span className={styles.resultadoIcon} aria-hidden="true">
                   {tipoMascota === 'perro' ? '🐕' : '🐈'}
                 </span>
                 <div className={styles.resultadoValor}>
@@ -207,7 +219,7 @@ export default function CalculadoraEdadMascotasPage() {
               {/* Etapa de vida */}
               <div className={styles.etapaVida}>
                 <div className={styles.etapaTitulo}>
-                  <span className={styles.etapaEmoji}>
+                  <span className={styles.etapaEmoji} aria-hidden="true">
                     {resultado.etapaVida === 'Cachorro' || resultado.etapaVida === 'Gatito' ? '🍼' :
                      resultado.etapaVida.includes('joven') ? '🎾' :
                      resultado.etapaVida === 'Adulto' ? '💪' :
@@ -221,7 +233,7 @@ export default function CalculadoraEdadMascotasPage() {
               {/* Comparación visual */}
               <div className={styles.comparacion}>
                 <div className={styles.comparacionItem}>
-                  <div className={styles.comparacionIcono}>
+                  <div className={styles.comparacionIcono} aria-hidden="true">
                     {tipoMascota === 'perro' ? '🐕' : '🐈'}
                   </div>
                   <div className={styles.comparacionEdad}>
@@ -233,7 +245,7 @@ export default function CalculadoraEdadMascotasPage() {
                 </div>
                 <div className={styles.comparacionIgual}>=</div>
                 <div className={styles.comparacionItem}>
-                  <div className={styles.comparacionIcono}>👤</div>
+                  <div className={styles.comparacionIcono} aria-hidden="true">👤</div>
                   <div className={styles.comparacionEdad}>
                     {formatNumber(resultado.edadHumana, 0)} años
                   </div>
@@ -243,7 +255,7 @@ export default function CalculadoraEdadMascotasPage() {
 
               {/* Info adicional */}
               <div className={styles.infoAdicional}>
-                <h4>💡 ¿Sabías que...?</h4>
+                <h4><span aria-hidden="true">💡</span> ¿Sabías que...?</h4>
                 {tipoMascota === 'perro' ? (
                   <p>
                     Los perros de raza pequeña suelen vivir más años que los grandes.
@@ -260,7 +272,7 @@ export default function CalculadoraEdadMascotasPage() {
             </>
           ) : (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>🐾</span>
+              <span className={styles.placeholderIcon} aria-hidden="true">🐾</span>
               <p>Introduce la edad de tu mascota para calcular</p>
             </div>
           )}
@@ -269,10 +281,10 @@ export default function CalculadoraEdadMascotasPage() {
 
       {/* Tabla de referencia */}
       <div className={styles.tablaReferencia}>
-        <h3>📊 Tabla de Referencia Rápida</h3>
+        <h3><span aria-hidden="true">📊</span> Tabla de Referencia Rápida</h3>
         <div className={styles.tablasGrid}>
           <div className={styles.tablaCard}>
-            <h4>🐕 Perros (tamaño mediano)</h4>
+            <h4><span aria-hidden="true">🐕</span> Perros (tamaño mediano)</h4>
             <table>
               <thead>
                 <tr>
@@ -290,7 +302,7 @@ export default function CalculadoraEdadMascotasPage() {
             </table>
           </div>
           <div className={styles.tablaCard}>
-            <h4>🐈 Gatos</h4>
+            <h4><span aria-hidden="true">🐈</span> Gatos</h4>
             <table>
               <thead>
                 <tr>

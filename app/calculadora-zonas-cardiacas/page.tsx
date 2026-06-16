@@ -66,7 +66,7 @@ export default function CalculadoraZonasCardiacasPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1>❤️ Calculadora de Zonas Cardíacas</h1>
+        <h1><span aria-hidden="true">❤️</span> Calculadora de Zonas Cardíacas</h1>
         <p>
           Calcula tus 5 zonas de entrenamiento personalizadas con la fórmula de Karvonen.
           Introduce tu edad y frecuencia cardíaca en reposo para obtener rangos exactos.

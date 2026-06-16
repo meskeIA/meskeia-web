@@ -979,10 +979,10 @@
 | [x] | Calculadora de Macros | `/calculadora-macros/` | salud |
 | [x] | Calculadora de Pace de Running | `/calculadora-pace-running/` | salud, tecnicas |
 | [x] | Calculadora de Porciones | `/calculadora-porciones/` | salud |
-| [ ] | Calculadora de Potencia en Ciclismo (W/kg y VAM) | `/calculadora-potencia-ciclismo/` | salud, tecnicas |
-| [ ] | Calculadora de Sueño | `/calculadora-sueno/` | salud |
-| [ ] | Calculadora de Zonas Cardíacas (Karvonen) | `/calculadora-zonas-cardiacas/` | salud, tecnicas |
-| [ ] | Calculadora Edad Mascotas | `/calculadora-edad-mascotas/` | salud |
+| [x] | Calculadora de Potencia en Ciclismo (W/kg y VAM) | `/calculadora-potencia-ciclismo/` | salud, tecnicas |
+| [x] | Calculadora de Sueño | `/calculadora-sueno/` | salud |
+| [x] | Calculadora de Zonas Cardíacas (Karvonen) | `/calculadora-zonas-cardiacas/` | salud, tecnicas |
+| [x] | Calculadora Edad Mascotas | `/calculadora-edad-mascotas/` | salud |
 | [ ] | Calculadora SWOLF — Eficiencia en Natación | `/calculadora-swolf-natacion/` | salud, tecnicas |
 | [x] | Calculadora Tamaño Adulto Cachorro | `/calculadora-tamano-adulto-perro/` | salud |
 | [ ] | Calculadora Zonas de Entrenamiento — FC por Zona y Karvonen | `/calculadora-zonas-entrenamiento/` | salud |

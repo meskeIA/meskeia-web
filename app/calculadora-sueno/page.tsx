@@ -120,18 +120,22 @@ export default function CalculadoraSuenoPage() {
 
           <div className={styles.modoSelector}>
             <button
+              type="button"
+              aria-pressed={modo === 'despertar'}
               className={`${styles.modoBtn} ${modo === 'despertar' ? styles.activo : ''}`}
               onClick={() => { setModo('despertar'); setResultados(null); }}
             >
-              <span className={styles.modoIcono}>⏰</span>
+              <span aria-hidden="true" className={styles.modoIcono}>⏰</span>
               <span className={styles.modoTexto}>Sé a qué hora quiero despertar</span>
               <span className={styles.modoDesc}>Calcular hora para ir a dormir</span>
             </button>
             <button
+              type="button"
+              aria-pressed={modo === 'dormir'}
               className={`${styles.modoBtn} ${modo === 'dormir' ? styles.activo : ''}`}
               onClick={() => { setModo('dormir'); setResultados(null); }}
             >
-              <span className={styles.modoIcono}>🛏️</span>
+              <span aria-hidden="true" className={styles.modoIcono}>🛏️</span>
               <span className={styles.modoTexto}>Sé a qué hora me voy a dormir</span>
               <span className={styles.modoDesc}>Calcular hora para despertar</span>
             </button>
@@ -149,7 +153,7 @@ export default function CalculadoraSuenoPage() {
             />
           </div>
 
-          <button onClick={calcular} className={styles.btnPrimary}>
+          <button type="button" onClick={calcular} className={styles.btnPrimary}>
             Calcular Horas Óptimas
           </button>
 
