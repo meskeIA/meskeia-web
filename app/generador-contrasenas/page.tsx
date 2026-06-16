@@ -301,14 +301,14 @@ export default function GeneradorContrasenas() {
                 className={styles.btnCopy}
                 disabled={!password}
               >
-                {copyFeedback ? '✅ Copiado' : '📋 Copiar'}
+                {copyFeedback ? <><span aria-hidden="true">✅</span> Copiado</> : <><span aria-hidden="true">📋</span> Copiar</>}
               </button>
               <button
                 type="button"
                 onClick={generatePassword}
                 className={styles.btnGenerate}
               >
-                🔄 Generar Nueva
+                <span aria-hidden="true">🔄</span> Generar Nueva
               </button>
             </div>
           </ResultCard>
@@ -338,21 +338,21 @@ export default function GeneradorContrasenas() {
               onClick={() => applyPreset('web')}
               className={styles.btnPreset}
             >
-              🌐 Web<span className={styles.presetInfo}>(12 caracteres)</span>
+              <span aria-hidden="true">🌐</span> Web<span className={styles.presetInfo}>(12 caracteres)</span>
             </button>
             <button
               type="button"
               onClick={() => applyPreset('banking')}
               className={styles.btnPreset}
             >
-              🏦 Bancaria<span className={styles.presetInfo}>(16 caracteres)</span>
+              <span aria-hidden="true">🏦</span> Bancaria<span className={styles.presetInfo}>(16 caracteres)</span>
             </button>
             <button
               type="button"
               onClick={() => applyPreset('wifi')}
               className={styles.btnPreset}
             >
-              📡 Wi-Fi<span className={styles.presetInfo}>(20 caracteres)</span>
+              <span aria-hidden="true">📡</span> Wi-Fi<span className={styles.presetInfo}>(20 caracteres)</span>
             </button>
           </div>
         </div>
@@ -437,7 +437,7 @@ export default function GeneradorContrasenas() {
                 className={styles.btnClearHistory}
                 aria-label="Borrar historial de contraseñas almacenado"
               >
-                🗑️ Borrar historial
+                <span aria-hidden="true">🗑️</span> Borrar historial
               </button>
             </div>
             <div className={styles.historyList}>

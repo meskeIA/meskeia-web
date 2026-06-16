@@ -271,22 +271,25 @@ export default function GeneradorHashesPage() {
             type="button"
             className={`${styles.modeBtn} ${modo === 'texto' ? styles.active : ''}`}
             onClick={() => setModo('texto')}
+            aria-pressed={modo === 'texto'}
           >
-            📝 Texto
+            <span aria-hidden="true">📝</span> Texto
           </button>
           <button
             type="button"
             className={`${styles.modeBtn} ${modo === 'archivo' ? styles.active : ''}`}
             onClick={() => setModo('archivo')}
+            aria-pressed={modo === 'archivo'}
           >
-            📁 Archivo
+            <span aria-hidden="true">📁</span> Archivo
           </button>
           <button
             type="button"
             className={`${styles.modeBtn} ${modo === 'comparar' ? styles.active : ''}`}
             onClick={() => setModo('comparar')}
+            aria-pressed={modo === 'comparar'}
           >
-            🔍 Comparar
+            <span aria-hidden="true">🔍</span> Comparar
           </button>
         </div>
 
@@ -300,6 +303,7 @@ export default function GeneradorHashesPage() {
                 type="button"
                 className={`${styles.algoritmoBtn} ${algoritmo === algo ? styles.active : ''}`}
                 onClick={() => setAlgoritmo(algo)}
+                aria-pressed={algoritmo === algo}
               >
                 <span className={styles.algoritmoNombre}>{algo}</span>
                 <span className={styles.algoritmoBits}>{algoritmosInfo[algo].bits} bits</span>
@@ -327,7 +331,7 @@ export default function GeneradorHashesPage() {
                 className={styles.btnPrimary}
                 disabled={!texto.trim() || procesando}
               >
-                {procesando ? '⏳ Procesando...' : '🔐 Generar Hash'}
+                {procesando ? <><span aria-hidden="true">⏳</span> Procesando...</> : <><span aria-hidden="true">🔐</span> Generar Hash</>}
               </button>
               <button type="button" onClick={limpiar} className={styles.btnSecondary}>
                 Limpiar
@@ -386,7 +390,7 @@ export default function GeneradorHashesPage() {
               className={styles.btnPrimary}
               disabled={!hashActual || !hashComparar.trim()}
             >
-              🔍 Comparar Hashes
+              <span aria-hidden="true">🔍</span> Comparar Hashes
             </button>
 
             {resultadoComparacion !== null && (
@@ -419,15 +423,15 @@ export default function GeneradorHashesPage() {
                 onClick={() => copiarHash(hashActual, 'hash')}
                 className={styles.btnCopy}
               >
-                {copiado === 'hash' ? '✅ Copiado' : '📋 Copiar'}
+                {copiado === 'hash' ? <><span aria-hidden="true">✅</span> Copiado</> : <><span aria-hidden="true">📋</span> Copiar</>}
               </button>
             </div>
             <div className={styles.resultBox}>
               {hashActual}
             </div>
             <div className={styles.hashInfo}>
-              <span>🔢 {hashActual.length} caracteres hexadecimales</span>
-              <span>📊 {algoritmosInfo[algoritmo].bits} bits de seguridad</span>
+              <span><span aria-hidden="true">🔢</span> {hashActual.length} caracteres hexadecimales</span>
+              <span><span aria-hidden="true">📊</span> {algoritmosInfo[algoritmo].bits} bits de seguridad</span>
             </div>
           </div>
         )}
@@ -451,7 +455,7 @@ export default function GeneradorHashesPage() {
                 </p>
                 <pre className={styles.htmlPre}>{htmlCode}</pre>
                 <button type="button" onClick={copiarCodigoHTML} className={styles.btnCopyHtml}>
-                  {htmlCopiado ? '✅ ¡Copiado!' : '📋 Copiar código HTML'}
+                  {htmlCopiado ? <><span aria-hidden="true">✅</span> ¡Copiado!</> : <><span aria-hidden="true">📋</span> Copiar código HTML</>}
                 </button>
               </div>
             )}

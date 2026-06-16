@@ -440,16 +440,20 @@ export default function GeneradorOndasPage() {
         {/* Pestañas */}
         <div className={styles.tabs}>
           <button
+            type="button"
             className={`${styles.tab} ${activeTab === 'generator' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('generator')}
+            aria-pressed={activeTab === 'generator'}
           >
-            🎛️ Generador de Tonos
+            <span aria-hidden="true">🎛️</span> Generador de Tonos
           </button>
           <button
+            type="button"
             className={`${styles.tab} ${activeTab === 'visualizer' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('visualizer')}
+            aria-pressed={activeTab === 'visualizer'}
           >
-            📊 Visualizador de Audio
+            <span aria-hidden="true">📊</span> Visualizador de Audio
           </button>
         </div>
 
@@ -478,8 +482,10 @@ export default function GeneradorOndasPage() {
                 {(Object.keys(WAVE_INFO) as WaveType[]).map((type) => (
                   <button
                     key={type}
+                    type="button"
                     className={`${styles.waveTypeBtn} ${waveType === type ? styles.waveTypeActive : ''}`}
                     onClick={() => setWaveType(type)}
+                    aria-pressed={waveType === type}
                   >
                     <span className={styles.waveIcon}>{WAVE_INFO[type].icon}</span>
                     <span className={styles.waveName}>{WAVE_INFO[type].name}</span>
@@ -512,8 +518,10 @@ export default function GeneradorOndasPage() {
                   {MUSICAL_NOTES.map((note) => (
                     <button
                       key={note.name}
+                      type="button"
                       className={`${styles.noteBtn} ${Math.abs(frequency - note.freq) < 1 ? styles.noteBtnActive : ''}`}
                       onClick={() => setFrequency(note.freq)}
+                      aria-pressed={Math.abs(frequency - note.freq) < 1}
                     >
                       {note.name}
                     </button>
@@ -538,10 +546,12 @@ export default function GeneradorOndasPage() {
             {/* Botón reproducir */}
             <div className={styles.playSection}>
               <button
+                type="button"
                 onClick={togglePlay}
                 className={`${styles.playBtn} ${isPlaying ? styles.playBtnActive : ''}`}
+                aria-pressed={isPlaying}
               >
-                {isPlaying ? '⏹️ Detener' : '▶️ Reproducir'}
+                {isPlaying ? <><span aria-hidden="true">⏹️</span> Detener</> : <><span aria-hidden="true">▶️</span> Reproducir</>}
               </button>
             </div>
           </div>
@@ -584,7 +594,7 @@ export default function GeneradorOndasPage() {
                   <span className={styles.fileMeta}>
                     {formatSize(audioFile.size)} • {formatTime(audioDuration)}
                   </span>
-                  <button onClick={clearVisualizer} className={styles.clearBtn}>
+                  <button type="button" onClick={clearVisualizer} className={styles.clearBtn}>
                     Cambiar archivo
                   </button>
                 </div>
@@ -605,22 +615,28 @@ export default function GeneradorOndasPage() {
                     <h4>Estilo</h4>
                     <div className={styles.styleButtons}>
                       <button
+                        type="button"
                         className={`${styles.styleBtn} ${waveformStyle === 'bars' ? styles.styleBtnActive : ''}`}
                         onClick={() => setWaveformStyle('bars')}
+                        aria-pressed={waveformStyle === 'bars'}
                       >
-                        ▮▮▮ Barras
+                        <span aria-hidden="true">▮▮▮</span> Barras
                       </button>
                       <button
+                        type="button"
                         className={`${styles.styleBtn} ${waveformStyle === 'line' ? styles.styleBtnActive : ''}`}
                         onClick={() => setWaveformStyle('line')}
+                        aria-pressed={waveformStyle === 'line'}
                       >
-                        〜 Línea
+                        <span aria-hidden="true">〜</span> Línea
                       </button>
                       <button
+                        type="button"
                         className={`${styles.styleBtn} ${waveformStyle === 'mirror' ? styles.styleBtnActive : ''}`}
                         onClick={() => setWaveformStyle('mirror')}
+                        aria-pressed={waveformStyle === 'mirror'}
                       >
-                        ⫼ Espejo
+                        <span aria-hidden="true">⫼</span> Espejo
                       </button>
                     </div>
                   </div>
@@ -647,8 +663,8 @@ export default function GeneradorOndasPage() {
 
                 {/* Botón exportar */}
                 <div className={styles.exportSection}>
-                  <button onClick={exportWaveform} className={styles.exportBtn}>
-                    📥 Exportar como PNG
+                  <button type="button" onClick={exportWaveform} className={styles.exportBtn}>
+                    <span aria-hidden="true">📥</span> Exportar como PNG
                   </button>
                 </div>
               </>

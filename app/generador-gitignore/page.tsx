@@ -328,7 +328,7 @@ export default function GeneradorGitignorePage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>📝</span>
+        <span className={styles.heroIcon} aria-hidden="true">📝</span>
         <h1 className={styles.title}>Generador de .gitignore</h1>
         <p className={styles.subtitle}>
           Crea archivos .gitignore profesionales combinando plantillas para tus tecnologías. Compatible con Node.js, Python, Java, React y más de 10 tecnologías.
@@ -343,10 +343,10 @@ export default function GeneradorGitignorePage() {
           <div className={styles.selectionHeader}>
             <h2>Selecciona tus tecnologías</h2>
             <div className={styles.headerActions}>
-              <button onClick={selectAll} className={styles.btnSecondary} aria-label="Seleccionar todas las tecnologías">
+              <button type="button" onClick={selectAll} className={styles.btnSecondary} aria-label="Seleccionar todas las tecnologías">
                 Todas
               </button>
-              <button onClick={clearAll} className={styles.btnSecondary} aria-label="Limpiar selección de tecnologías">
+              <button type="button" onClick={clearAll} className={styles.btnSecondary} aria-label="Limpiar selección de tecnologías">
                 Limpiar
               </button>
             </div>
@@ -369,6 +369,7 @@ export default function GeneradorGitignorePage() {
                   {techsInCategory.map((tech) => (
                     <button
                       key={tech.id}
+                      type="button"
                       onClick={() => toggleTech(tech.id)}
                       className={`${styles.techCard} ${selectedTechs.has(tech.id) ? styles.techCardSelected : ''}`}
                       aria-pressed={selectedTechs.has(tech.id)}
@@ -390,11 +391,11 @@ export default function GeneradorGitignorePage() {
           <div className={styles.previewHeader}>
             <h2>.gitignore generado</h2>
             <div className={styles.previewActions}>
-              <button onClick={handleCopy} className={styles.btnSecondary} aria-label="Copiar contenido al portapapeles">
-                {copied ? '✓ Copiado' : '📋 Copiar'}
+              <button type="button" onClick={handleCopy} className={styles.btnSecondary} aria-label="Copiar contenido al portapapeles">
+                {copied ? '✓ Copiado' : <><span aria-hidden="true">📋</span> Copiar</>}
               </button>
-              <button onClick={handleDownload} className={styles.btnPrimary} aria-label="Descargar archivo .gitignore">
-                ⬇️ Descargar
+              <button type="button" onClick={handleDownload} className={styles.btnPrimary} aria-label="Descargar archivo .gitignore">
+                <span aria-hidden="true">⬇️</span> Descargar
               </button>
             </div>
           </div>
@@ -407,7 +408,7 @@ export default function GeneradorGitignorePage() {
 
           <div className={styles.previewFooter}>
             <p className={styles.previewTip}>
-              💡 <strong>Tip:</strong> Copia el contenido y crea un archivo llamado <code>.gitignore</code> en la raíz de tu proyecto Git.
+              <span aria-hidden="true">💡</span> <strong>Tip:</strong> Copia el contenido y crea un archivo llamado <code>.gitignore</code> en la raíz de tu proyecto Git.
             </p>
           </div>
         </div>

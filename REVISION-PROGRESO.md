@@ -769,10 +769,10 @@
 | [x] | Escalador de Recetas | `/escalador-recetas/` | tecnicas, productividad |
 | [x] | Espejo Digital | `/espejo/` | tecnicas |
 | [x] | Extractor de Audio de Vídeo | `/extractor-audio-video/` | tecnicas, productividad |
-| [ ] | Generador de .gitignore | `/generador-gitignore/` | tecnicas, diseno |
-| [ ] | Generador de Contraseñas | `/generador-contrasenas/` | tecnicas |
-| [ ] | Generador de Hashes | `/generador-hashes/` | tecnicas |
-| [ ] | Generador de Ondas y Visualizador | `/generador-ondas/` | tecnicas, estudiantes |
+| [x] | Generador de .gitignore | `/generador-gitignore/` | tecnicas, diseno |
+| [x] | Generador de Contraseñas | `/generador-contrasenas/` | tecnicas |
+| [x] | Generador de Hashes | `/generador-hashes/` | tecnicas |
+| [x] | Generador de Ondas y Visualizador | `/generador-ondas/` | tecnicas, estudiantes |
 | [x] | Generador de Tonos de Audio | `/generador-tonos/` | tecnicas |
 | [ ] | IDEs con IA 2026: Cursor vs Windsurf vs VS Code vs Zed vs JetBrains | `/comparador-ides-ia/` | tecnicas, productividad |
 | [ ] | Impacto de la IA en los Sectores - Automatización y Empleos | `/visualizador-impacto-ia-sectores/` | tecnicas, cultura, estudiantes |
