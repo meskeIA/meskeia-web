@@ -213,7 +213,7 @@ export default function ConversorTextoPage() {
               className={styles.btnSecundario}
               disabled={!textoSalida}
             >
-              📋 Copiar
+              <span aria-hidden="true">📋</span> Copiar
             </button>
           </div>
           <textarea
@@ -241,28 +241,28 @@ export default function ConversorTextoPage() {
 
           {/* SECCIÓN 1: Comparativa de conversiones */}
           <div className={styles.comparativaSection}>
-            <h3>📊 Guía de Conversiones: Cuándo Usar Cada Una</h3>
+            <h3><span aria-hidden="true">📊</span> Guía de Conversiones: Cuándo Usar Cada Una</h3>
             <div className={styles.infoGrid}>
               <div className={styles.infoCard}>
-                <h4>🔠 Mayúsculas / minúsculas</h4>
+                <h4><span aria-hidden="true">🔠</span> Mayúsculas / minúsculas</h4>
                 <p><strong>MAYÚSCULAS</strong> → énfasis, siglas, código de error<br />
                 <strong>minúsculas</strong> → normalizar antes de comparar, slugs, emails<br />
                 <strong>Invertir mayús</strong> → efecto visual, tipografía creativa</p>
               </div>
               <div className={styles.infoCard}>
-                <h4>📝 Formatos de título</h4>
+                <h4><span aria-hidden="true">📝</span> Formatos de título</h4>
                 <p><strong>Capitalizar</strong> → nombres propios, encabezados de tabla<br />
                 <strong>Formato Título</strong> → títulos en español (respeta artículos)<br />
                 <strong>Formato oración</strong> → inicio de párrafos, redes sociales</p>
               </div>
               <div className={styles.infoCard}>
-                <h4>🔄 Transformaciones especiales</h4>
+                <h4><span aria-hidden="true">🔄</span> Transformaciones especiales</h4>
                 <p><strong>Alternar (aLtErNaR)</strong> → memes, humor en redes<br />
                 <strong>Invertir caracteres</strong> → efecto espejo, steganografía simple<br />
                 <strong>Invertir palabras</strong> → ejercicios de comprensión lectora</p>
               </div>
               <div className={styles.infoCard}>
-                <h4>🧹 Limpieza de texto</h4>
+                <h4><span aria-hidden="true">🧹</span> Limpieza de texto</h4>
                 <p><strong>Sin acentos</strong> → URLs, IDs de base de datos, nombres de archivo<br />
                 <strong>Limpiar espacios</strong> → texto copiado de PDF o Word<br />
                 <strong>Combinar ambas</strong> → generar slugs para URLs amigables SEO</p>
@@ -272,7 +272,7 @@ export default function ConversorTextoPage() {
 
           {/* SECCIÓN 2: Uso en programación */}
           <div className={styles.programacionSection}>
-            <h3>💻 Convenciones de Texto en Programación</h3>
+            <h3><span aria-hidden="true">💻</span> Convenciones de Texto en Programación</h3>
             <p className={styles.programacionIntro}>
               En desarrollo de software, el formato del texto no es solo estética — es convención técnica.
               Cada lenguaje y ecosistema tiene sus estándares.
@@ -318,7 +318,7 @@ export default function ConversorTextoPage() {
 
           {/* SECCIÓN 3: FAQ */}
           <div className={styles.faqSection}>
-            <h3>❓ Preguntas Frecuentes sobre Transformación de Texto</h3>
+            <h3><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Transformación de Texto</h3>
             <div className={styles.faqList}>
               <details className={styles.faqItem}>
                 <summary className={styles.faqQuestion}>¿Por qué &quot;Sin acentos&quot; no elimina la ñ?</summary>
@@ -345,25 +345,25 @@ export default function ConversorTextoPage() {
 
           {/* SECCIÓN 4: Casos de uso reales */}
           <div className={styles.casosSection}>
-            <h3>🎯 Casos de Uso Reales</h3>
+            <h3><span aria-hidden="true">🎯</span> Casos de Uso Reales</h3>
             <div className={styles.casosGrid}>
               <div className={styles.casoCard}>
-                <span className={styles.casoIcon}>🔗</span>
+                <span className={styles.casoIcon} aria-hidden="true">🔗</span>
                 <h4>Generar slugs para URLs</h4>
                 <p>Proceso: <strong>minúsculas → sin acentos → limpiar espacios</strong> y reemplazar espacios por guiones. Resultado: &quot;Cómo Calcular el IVA&quot; → &quot;como-calcular-el-iva&quot;.</p>
               </div>
               <div className={styles.casoCard}>
-                <span className={styles.casoIcon}>📧</span>
+                <span className={styles.casoIcon} aria-hidden="true">📧</span>
                 <h4>Normalizar emails en bases de datos</h4>
                 <p>Convertir siempre a <strong>minúsculas</strong> antes de guardar o comparar emails. &quot;Usuario@Gmail.COM&quot; y &quot;usuario@gmail.com&quot; son el mismo email pero JavaScript los trata como strings diferentes.</p>
               </div>
               <div className={styles.casoCard}>
-                <span className={styles.casoIcon}>📄</span>
+                <span className={styles.casoIcon} aria-hidden="true">📄</span>
                 <h4>Limpiar texto de PDFs</h4>
                 <p>Los PDFs copiados suelen tener espacios dobles, triples y tabulaciones intercaladas. <strong>Limpiar espacios</strong> normaliza todo de una vez, ahorrando la edición manual.</p>
               </div>
               <div className={styles.casoCard}>
-                <span className={styles.casoIcon}>📱</span>
+                <span className={styles.casoIcon} aria-hidden="true">📱</span>
                 <h4>Formatear publicaciones en redes</h4>
                 <p><strong>Formato oración</strong> es ideal para posts donde copiamos texto en minúsculas. <strong>Alternar mayúsculas</strong> para memes o humor. El inversor de caracteres da un efecto visual llamativo.</p>
               </div>
@@ -372,25 +372,25 @@ export default function ConversorTextoPage() {
 
           {/* SECCIÓN 5: Tips */}
           <div className={styles.tipsSection}>
-            <h3>💡 Flujos de Trabajo Eficientes</h3>
+            <h3><span aria-hidden="true">💡</span> Flujos de Trabajo Eficientes</h3>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>⚡</span>
+                <span className={styles.tipIcon} aria-hidden="true">⚡</span>
                 <h4>Encadenar transformaciones</h4>
                 <p>Usa el botón &quot;↕ Usar resultado como entrada&quot; para aplicar múltiples conversiones secuencialmente. Por ejemplo: minúsculas → sin acentos → (manualmente reemplaza espacios por guiones) = slug perfecto.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📋</span>
+                <span className={styles.tipIcon} aria-hidden="true">📋</span>
                 <h4>Copiar al portapapeles</h4>
                 <p>El botón &quot;📋 Copiar&quot; copia el resultado directamente al portapapeles del sistema. No necesitas seleccionar el texto manualmente. Funciona en todos los navegadores modernos sobre HTTPS.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🔤</span>
+                <span className={styles.tipIcon} aria-hidden="true">🔤</span>
                 <h4>Contar sin copiar</h4>
                 <p>Los contadores de caracteres y palabras bajo los textareas se actualizan en tiempo real. Úsalos para verificar límites (Twitter: 280 chars, meta description: 155-160 chars, título SEO: 50-60 chars).</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🔁</span>
+                <span className={styles.tipIcon} aria-hidden="true">🔁</span>
                 <h4>Probar múltiples variantes</h4>
                 <p>Escribe tu texto base, aplica una conversión, cópiala, y luego prueba otra. El campo de entrada no cambia al aplicar conversiones, así que puedes probar todas las variantes sin volver a escribir.</p>
               </div>
@@ -400,14 +400,14 @@ export default function ConversorTextoPage() {
           {/* SECCIÓN 6: Warning Box */}
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>Limitaciones y Comportamientos a Tener en Cuenta</h3>
             </div>
             <ul className={styles.warningList}>
-              <li><strong>❌ El &quot;Formato Título&quot; no es perfecto para todos los idiomas:</strong> La lista de excepciones (artículos, preposiciones) está calibrada para el español. Textos en inglés siguen convenciones distintas (Title Case en inglés no excluye las mismas palabras). Para inglés, &quot;Capitalizar Palabras&quot; da resultados más predecibles.</li>
-              <li><strong>❌ &quot;Sin acentos&quot; puede crear ambigüedades en español:</strong> Eliminar tildes cambia el significado en pares como &quot;sé/se&quot;, &quot;él/el&quot;, &quot;más/mas&quot;, &quot;sí/si&quot;, &quot;cómo/como&quot;. Usa esta función solo cuando el contexto técnico lo requiera (URLs, IDs), nunca en textos que se publicarán para lectura humana.</li>
-              <li><strong>❌ La función &quot;Invertir&quot; trabaja sobre caracteres Unicode, no grafemas:</strong> Algunos emojis compuestos (como las banderas 🇪🇸) están formados por secuencias de puntos de código Unicode. Invertirlos puede romperlos visualmente porque los puntos de código quedan en orden incorrecto.</li>
-              <li><strong>❌ El contador de palabras usa espacios como separador:</strong> El recuento usa <code>split(/\s+/).filter(Boolean)</code>, que divide por cualquier espacio en blanco. Signos de puntuación pegados a palabras se cuentan como parte de la palabra. &quot;hola, mundo!&quot; = 2 palabras, no 4 tokens.</li>
+              <li><strong><span aria-hidden="true">❌</span> El &quot;Formato Título&quot; no es perfecto para todos los idiomas:</strong> La lista de excepciones (artículos, preposiciones) está calibrada para el español. Textos en inglés siguen convenciones distintas (Title Case en inglés no excluye las mismas palabras). Para inglés, &quot;Capitalizar Palabras&quot; da resultados más predecibles.</li>
+              <li><strong><span aria-hidden="true">❌</span> &quot;Sin acentos&quot; puede crear ambigüedades en español:</strong> Eliminar tildes cambia el significado en pares como &quot;sé/se&quot;, &quot;él/el&quot;, &quot;más/mas&quot;, &quot;sí/si&quot;, &quot;cómo/como&quot;. Usa esta función solo cuando el contexto técnico lo requiera (URLs, IDs), nunca en textos que se publicarán para lectura humana.</li>
+              <li><strong><span aria-hidden="true">❌</span> La función &quot;Invertir&quot; trabaja sobre caracteres Unicode, no grafemas:</strong> Algunos emojis compuestos (como las banderas 🇪🇸) están formados por secuencias de puntos de código Unicode. Invertirlos puede romperlos visualmente porque los puntos de código quedan en orden incorrecto.</li>
+              <li><strong><span aria-hidden="true">❌</span> El contador de palabras usa espacios como separador:</strong> El recuento usa <code>split(/\s+/).filter(Boolean)</code>, que divide por cualquier espacio en blanco. Signos de puntuación pegados a palabras se cuentan como parte de la palabra. &quot;hola, mundo!&quot; = 2 palabras, no 4 tokens.</li>
             </ul>
           </div>
 

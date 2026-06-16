@@ -925,14 +925,14 @@
 | [x] | Auditoría de Energía Semanal | `/auditoria-energia-semanal/` | productividad, salud |
 | [x] | Auditoría de Habilidades vs Mercado | `/auditoria-habilidades-mercado/` | productividad, cultura |
 | [x] | Auditoría de Reuniones | `/auditoria-reuniones/` | productividad, freelance |
-| [ ] | Calculadora Costes Teletrabajo | `/calculadora-costes-teletrabajo/` | productividad, finanzas, freelance |
+| [x] | Calculadora Costes Teletrabajo | `/calculadora-costes-teletrabajo/` | productividad, finanzas, freelance |
 | [x] | Calculadora de Fechas | `/calculadora-fechas/` | productividad |
 | [x] | Calculadora de Porcentajes | `/calculadora-porcentajes/` | productividad, estudiantes |
 | [x] | Calculadora Regla de Tres | `/calculadora-regla-de-tres/` | productividad, estudiantes |
-| [ ] | Checklist Pre-Mortem | `/checklist-pre-mortem/` | productividad, freelance |
-| [ ] | Conversor de Formatos | `/conversor-formatos/` | productividad |
+| [x] | Checklist Pre-Mortem | `/checklist-pre-mortem/` | productividad, freelance |
+| [x] | Conversor de Formatos | `/conversor-formatos/` | productividad |
 | [x] | Conversor de Tallas | `/conversor-tallas/` | productividad |
-| [ ] | Conversor de Texto | `/conversor-texto/` | productividad |
+| [x] | Conversor de Texto | `/conversor-texto/` | productividad |
 | [x] | Conversor de Unidades | `/conversor-unidades/` | productividad, viajes |
 | [ ] | Cronómetro y Temporizador | `/cronometro/` | productividad |
 | [ ] | Diagnóstico de Comunicación Interna | `/diagnostico-comunicacion-interna/` | productividad, freelance |

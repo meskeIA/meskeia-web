@@ -102,7 +102,7 @@ export default function CalculadoraCostesTeletrabajoPage() {
       <div className={styles.mainGrid}>
         {/* Izquierda — Días y Transporte */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>🏠 Tu situación</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">🏠</span> Tu situación</h2>
 
           <div className={styles.field}>
             <label className={styles.label}>
@@ -167,7 +167,7 @@ export default function CalculadoraCostesTeletrabajoPage() {
 
         {/* Derecha — Comidas y Energía */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>🍽️ Comidas y energía</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">🍽️</span> Comidas y energía</h2>
 
           <div className={styles.field}>
             <label className={styles.label} htmlFor="almuerzoOficina">
@@ -480,7 +480,7 @@ export default function CalculadoraCostesTeletrabajoPage() {
 
         {/* Warning */}
         <section className={styles.warningBox}>
-          <h2>⚠️ Lo que no cuenta la calculadora</h2>
+          <h2><span aria-hidden="true">⚠️</span> Lo que no cuenta la calculadora</h2>
           <div className={styles.warningGrid}>
             <div className={styles.warningItem}>
               <strong>1. El coste del tiempo perdido en desplazamientos</strong>

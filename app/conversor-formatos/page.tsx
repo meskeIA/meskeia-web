@@ -468,7 +468,7 @@ export default function ConversorFormatosPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🔄</span>
+        <span className={styles.heroIcon} aria-hidden="true">🔄</span>
         <h1 className={styles.title}>Conversor de Formatos de Archivo</h1>
         <p className={styles.subtitle}>
           Convierte entre JSON, CSV, Excel, XML y YAML. 100% privado, todo en tu navegador.
@@ -494,12 +494,12 @@ export default function ConversorFormatosPage() {
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
           >
-            <span className={styles.dropIcon}>📁</span>
+            <span className={styles.dropIcon} aria-hidden="true">📁</span>
             <p className={styles.dropText}>Arrastra un archivo aquí o haz clic para seleccionar</p>
             <div className={styles.formatBadges}>
               {Object.entries(formatInfo).map(([key, info]) => (
                 <span key={key} className={styles.formatBadge}>
-                  {info.icon} {info.name}
+                  <span aria-hidden="true">{info.icon}</span> {info.name}
                 </span>
               ))}
             </div>
@@ -516,7 +516,7 @@ export default function ConversorFormatosPage() {
         {/* Error */}
         {error && (
           <div className={styles.errorBox}>
-            <span>❌</span> {error}
+            <span aria-hidden="true">❌</span> {error}
           </div>
         )}
 
@@ -535,7 +535,7 @@ export default function ConversorFormatosPage() {
             <div className={styles.fileInfo}>
               <div className={styles.fileHeader}>
                 <div className={styles.fileDetails}>
-                  <span className={styles.fileIcon}>{formatInfo[parsedData.format].icon}</span>
+                  <span className={styles.fileIcon} aria-hidden="true">{formatInfo[parsedData.format].icon}</span>
                   <div>
                     <h3>{parsedData.fileName}</h3>
                     <span className={styles.fileMeta}>
@@ -596,8 +596,9 @@ export default function ConversorFormatosPage() {
                     className={`${styles.formatOption} ${targetFormat === key ? styles.formatSelected : ''} ${parsedData.format === key ? styles.formatDisabled : ''}`}
                     onClick={() => setTargetFormat(key as FileFormat)}
                     disabled={parsedData.format === key}
+                    aria-pressed={targetFormat === key}
                   >
-                    <span className={styles.formatOptionIcon}>{info.icon}</span>
+                    <span className={styles.formatOptionIcon} aria-hidden="true">{info.icon}</span>
                     <span className={styles.formatOptionName}>{info.name}</span>
                     <span className={styles.formatOptionExt}>{info.ext}</span>
                     {parsedData.format === key && <span className={styles.formatCurrent}>Origen</span>}
@@ -666,7 +667,7 @@ export default function ConversorFormatosPage() {
                 className={styles.btnPrimary}
                 disabled={isLoading}
               >
-                🔄 Convertir a {formatInfo[targetFormat].name}
+                <span aria-hidden="true">🔄</span> Convertir a {formatInfo[targetFormat].name}
               </button>
             </div>
 
@@ -674,15 +675,15 @@ export default function ConversorFormatosPage() {
             {convertedContent && (
               <div className={styles.resultSection}>
                 <div className={styles.resultHeader}>
-                  <h3>✅ Conversión completada</h3>
+                  <h3><span aria-hidden="true">✅</span> Conversión completada</h3>
                   <div className={styles.resultActions}>
                     {!(convertedContent instanceof Blob) && (
                       <button type="button" onClick={copyToClipboard} className={styles.btnSecondary}>
-                        📋 Copiar
+                        <span aria-hidden="true">📋</span> Copiar
                       </button>
                     )}
                     <button type="button" onClick={download} className={styles.btnPrimary}>
-                      ⬇️ Descargar {formatInfo[targetFormat].ext}
+                      <span aria-hidden="true">⬇️</span> Descargar {formatInfo[targetFormat].ext}
                     </button>
                   </div>
                 </div>
@@ -701,22 +702,22 @@ export default function ConversorFormatosPage() {
         {/* Características */}
         <div className={styles.features}>
           <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>🔒</span>
+            <span className={styles.featureIcon} aria-hidden="true">🔒</span>
             <h4>100% Privado</h4>
             <p>Todo se procesa en tu navegador. Tus datos nunca salen de tu dispositivo.</p>
           </div>
           <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>⚡</span>
+            <span className={styles.featureIcon} aria-hidden="true">⚡</span>
             <h4>Instantáneo</h4>
             <p>Conversión inmediata sin esperas ni límites de tamaño.</p>
           </div>
           <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>🔄</span>
+            <span className={styles.featureIcon} aria-hidden="true">🔄</span>
             <h4>Bidireccional</h4>
             <p>Convierte en cualquier dirección entre todos los formatos.</p>
           </div>
           <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>📊</span>
+            <span className={styles.featureIcon} aria-hidden="true">📊</span>
             <h4>Vista previa</h4>
             <p>Visualiza tus datos antes y después de la conversión.</p>
           </div>
@@ -821,7 +822,7 @@ export default function ConversorFormatosPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📊</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📊</span>
                 <h3>JSON → CSV: Análisis en Excel/Google Sheets</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -838,7 +839,7 @@ export default function ConversorFormatosPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🔌</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔌</span>
                 <h3>CSV → JSON: Alimentar APIs y Apps Web</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -855,7 +856,7 @@ export default function ConversorFormatosPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>⚙️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">⚙️</span>
                 <h3>Excel → JSON: Procesamiento Automatizado</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -872,7 +873,7 @@ export default function ConversorFormatosPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🐳</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🐳</span>
                 <h3>JSON → YAML: Configs DevOps (Docker, K8s)</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -889,7 +890,7 @@ export default function ConversorFormatosPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📈</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📈</span>
                 <h3>CSV → Excel: Informes con Formato Profesional</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -906,7 +907,7 @@ export default function ConversorFormatosPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🔄</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔄</span>
                 <h3>XML → JSON: Modernizar APIs Legacy</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -1154,7 +1155,7 @@ export default function ConversorFormatosPage() {
           <h2>Mejores Prácticas Profesionales</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Valida datos ANTES de convertir</h4>
               <p>
                 Usa herramientas como Validador JSON (meskeIA) o linters para verificar que tu archivo
@@ -1163,7 +1164,7 @@ export default function ConversorFormatosPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Backup obligatorio antes de conversiones masivas</h4>
               <p>
                 Siempre guarda una copia del archivo original antes de convertir. Las conversiones
@@ -1172,7 +1173,7 @@ export default function ConversorFormatosPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Usa UTF-8 para internacionalización</h4>
               <p>
                 Siempre trabaja en UTF-8 encoding. Evita problemas con caracteres especiales (ñ, á, €).
@@ -1181,7 +1182,7 @@ export default function ConversorFormatosPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Elige formato según audiencia, no preferencia</h4>
               <p>
                 Stakeholders no técnicos: Excel. Desarrolladores: JSON. Data analysts: CSV. DevOps: YAML.
@@ -1190,7 +1191,7 @@ export default function ConversorFormatosPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Automatiza conversiones recurrentes con scripts</h4>
               <p>
                 Si conviertes el mismo archivo más de 5 veces/mes, escribe un script (Python pandas, Node.js).
@@ -1199,7 +1200,7 @@ export default function ConversorFormatosPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Mantén formatos fuente editables</h4>
               <p>
                 Nunca edites archivos convertidos como fuente de verdad. Edita en el formato original
@@ -1212,7 +1213,7 @@ export default function ConversorFormatosPage() {
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <h3>Errores Comunes que Rompen Conversiones</h3>
           </div>
           <ul className={styles.warningList}>
