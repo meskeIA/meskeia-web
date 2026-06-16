@@ -182,7 +182,7 @@ export default function ControlGastosPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>💰 Control de Gastos</h1>
+        <h1 className={styles.title}><span aria-hidden="true">💰</span> Control de Gastos</h1>
         <p className={styles.subtitle}>
           Gestiona tu presupuesto mensual de forma sencilla
         </p>
@@ -222,16 +222,20 @@ export default function ControlGastosPage() {
           {/* Toggle Tipo */}
           <div className={styles.tipoToggle}>
             <button
+              type="button"
               className={`${styles.tipoBtn} ${styles.ingreso} ${tipo === 'ingreso' ? styles.activo : ''}`}
               onClick={() => { setTipo('ingreso'); setCategoria(''); }}
+              aria-pressed={tipo === 'ingreso'}
             >
-              📥 Ingreso
+              <span aria-hidden="true">📥</span> Ingreso
             </button>
             <button
+              type="button"
               className={`${styles.tipoBtn} ${styles.gasto} ${tipo === 'gasto' ? styles.activo : ''}`}
               onClick={() => { setTipo('gasto'); setCategoria(''); }}
+              aria-pressed={tipo === 'gasto'}
             >
-              📤 Gasto
+              <span aria-hidden="true">📤</span> Gasto
             </button>
           </div>
 
@@ -273,10 +277,12 @@ export default function ControlGastosPage() {
               {categoriasActuales.map((cat) => (
                 <button
                   key={cat.id}
+                  type="button"
                   className={`${styles.categoriaBtn} ${categoria === cat.id ? styles.activa : ''}`}
                   onClick={() => setCategoria(cat.id)}
+                  aria-pressed={categoria === cat.id}
                 >
-                  <span className={styles.categoriaIcon}>{cat.icon}</span>
+                  <span className={styles.categoriaIcon} aria-hidden="true">{cat.icon}</span>
                   <span className={styles.categoriaNombre}>{cat.nombre}</span>
                 </button>
               ))}
@@ -284,6 +290,7 @@ export default function ControlGastosPage() {
           </div>
 
           <button
+            type="button"
             className={`${styles.btnAnadir} ${tipo === 'ingreso' ? styles.ingreso : styles.gasto}`}
             onClick={agregarMovimiento}
             disabled={!concepto.trim() || !importe || !categoria}
@@ -314,11 +321,11 @@ export default function ControlGastosPage() {
 
           {/* Acciones */}
           <div className={styles.accionesGuardado}>
-            <button className={styles.btnSecundario} onClick={exportarDatos}>
-              📥 Exportar
+            <button type="button" className={styles.btnSecundario} onClick={exportarDatos}>
+              <span aria-hidden="true">📥</span> Exportar
             </button>
-            <button className={styles.btnSecundario} onClick={limpiarDatos}>
-              🗑️ Limpiar
+            <button type="button" className={styles.btnSecundario} onClick={limpiarDatos}>
+              <span aria-hidden="true">🗑️</span> Limpiar
             </button>
           </div>
         </div>
@@ -330,20 +337,26 @@ export default function ControlGastosPage() {
           {/* Filtros */}
           <div className={styles.filtros}>
             <button
+              type="button"
               className={`${styles.filtroBtn} ${filtro === 'todos' ? styles.activo : ''}`}
               onClick={() => setFiltro('todos')}
+              aria-pressed={filtro === 'todos'}
             >
               Todos ({movimientos.length})
             </button>
             <button
+              type="button"
               className={`${styles.filtroBtn} ${filtro === 'ingresos' ? styles.activo : ''}`}
               onClick={() => setFiltro('ingresos')}
+              aria-pressed={filtro === 'ingresos'}
             >
               Ingresos ({movimientos.filter(m => m.tipo === 'ingreso').length})
             </button>
             <button
+              type="button"
               className={`${styles.filtroBtn} ${filtro === 'gastos' ? styles.activo : ''}`}
               onClick={() => setFiltro('gastos')}
+              aria-pressed={filtro === 'gastos'}
             >
               Gastos ({movimientos.filter(m => m.tipo === 'gasto').length})
             </button>
@@ -370,6 +383,7 @@ export default function ControlGastosPage() {
                     {mov.tipo === 'ingreso' ? '+' : '-'}{formatCurrency(mov.importe)}
                   </div>
                   <button
+                    type="button"
                     className={styles.btnEliminar}
                     onClick={() => eliminarMovimiento(mov.id)}
                     title="Eliminar"

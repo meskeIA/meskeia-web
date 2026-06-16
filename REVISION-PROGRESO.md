@@ -640,11 +640,11 @@
 | [x] | Comparador Compra Vehículos | `/comparador-vehiculos/` | finanzas, inmobiliaria |
 | [x] | Comparador Eléctrico vs Combustión | `/comparador-electrico/` | finanzas, inmobiliaria |
 | [x] | Comparador Tipos de Seguros | `/comparador-tipos-seguros/` | finanzas, cultura |
-| [ ] | Control de Gastos | `/control-gastos/` | finanzas |
+| [x] | Control de Gastos | `/control-gastos/` | finanzas |
 | [x] | Curso Decisiones de Inversión | `/curso-decisiones-inversion/` | finanzas, cultura |
-| [ ] | Desigualdad de la Riqueza - Curva de Lorenz y Coeficiente Gini | `/visualizador-desigualdad-riqueza/` | finanzas, cultura, estudiantes |
-| [ ] | Deuda Pública - Bonos, Prima de Riesgo y Sostenibilidad | `/visualizador-deuda-publica/` | finanzas, cultura |
-| [ ] | El Dinero y el Tiempo | `/visualizador-dinero-y-tiempo/` | finanzas, cultura, freelance |
+| [x] | Desigualdad de la Riqueza - Curva de Lorenz y Coeficiente Gini | `/visualizador-desigualdad-riqueza/` | finanzas, cultura, estudiantes |
+| [x] | Deuda Pública - Bonos, Prima de Riesgo y Sostenibilidad | `/visualizador-deuda-publica/` | finanzas, cultura |
+| [x] | El Dinero y el Tiempo | `/visualizador-dinero-y-tiempo/` | finanzas, cultura, freelance |
 | [ ] | El Mapa de tu Dinero Mensual | `/visualizador-mapa-dinero-mensual/` | finanzas, cultura, freelance |
 | [ ] | El Precio Real de las Cosas | `/visualizador-precio-real-cosas/` | finanzas, cultura, freelance |
 | [ ] | El Viaje de tus Impuestos | `/visualizador-viaje-impuestos/` | finanzas, cultura, freelance |

@@ -164,6 +164,7 @@ export default function VisualizadorDeudaPublica() {
         {SECCIONES.map((s) => (
           <button
             key={s.id}
+            type="button"
             className={`${styles.navBtn} ${seccionActiva === s.id ? styles.navBtnActivo : ''}`}
             onClick={() => setSeccionActiva(s.id)}
             aria-pressed={seccionActiva === s.id}
@@ -177,7 +178,7 @@ export default function VisualizadorDeudaPublica() {
       {/* ── SECCIÓN: BONOS ── */}
       {seccionActiva === 'bonos' && (
         <section className={styles.seccion} aria-label="Bonos soberanos">
-          <h2 className={styles.seccionTitulo}>📜 Cómo funciona un bono soberano</h2>
+          <h2 className={styles.seccionTitulo}><span aria-hidden="true">📜</span> Cómo funciona un bono soberano</h2>
 
           <div className={styles.gridInstrumentos}>
             {[
@@ -209,9 +210,9 @@ export default function VisualizadorDeudaPublica() {
               <div key={inst.nombre} className={styles.cardInstrumento} style={{ borderTopColor: inst.color }}>
                 <h3 style={{ color: inst.color }}>{inst.nombre}</h3>
                 <div className={styles.chipGrid}>
-                  <span className={styles.chip}>⏱ {inst.plazo}</span>
-                  <span className={styles.chip}>💶 {inst.tipo}</span>
-                  <span className={styles.chip}>👤 {inst.inversor}</span>
+                  <span className={styles.chip}><span aria-hidden="true">⏱</span> {inst.plazo}</span>
+                  <span className={styles.chip}><span aria-hidden="true">💶</span> {inst.tipo}</span>
+                  <span className={styles.chip}><span aria-hidden="true">👤</span> {inst.inversor}</span>
                 </div>
                 <p className={styles.instDesc}>{inst.desc}</p>
               </div>
@@ -219,7 +220,7 @@ export default function VisualizadorDeudaPublica() {
           </div>
 
           <div className={styles.yieldBox}>
-            <h3>📈 Precio vs Rentabilidad (yield)</h3>
+            <h3><span aria-hidden="true">📈</span> Precio vs Rentabilidad (yield)</h3>
             <p className={styles.yieldExplicacion}>
               El precio y la rentabilidad de un bono se mueven en sentido <strong>opuesto</strong>.
               Si el mercado vende bonos (precio cae), la yield sube. Si hay demanda (precio sube), la yield baja.
@@ -266,7 +267,7 @@ export default function VisualizadorDeudaPublica() {
           </div>
 
           <div className={styles.curvaTipos}>
-            <h3>📉 Curva de tipos (yield curve)</h3>
+            <h3><span aria-hidden="true">📉</span> Curva de tipos (yield curve)</h3>
             <div className={styles.curvaGrid}>
               {[
                 { plazo: '3m', tipo: '3.2', desc: 'Corto plazo' },
@@ -303,7 +304,7 @@ export default function VisualizadorDeudaPublica() {
       {/* ── SECCIÓN: TENEDORES ── */}
       {seccionActiva === 'tenedores' && (
         <section className={styles.seccion} aria-label="Quién tiene la deuda española">
-          <h2 className={styles.seccionTitulo}>🥧 Quién tiene la deuda española</h2>
+          <h2 className={styles.seccionTitulo}><span aria-hidden="true">🥧</span> Quién tiene la deuda española</h2>
           <p className={styles.seccionSubtitulo}>
             Datos representativos 2024 (~1,6 billones €). Haz clic en cada grupo para ver más detalles.
           </p>
@@ -354,6 +355,7 @@ export default function VisualizadorDeudaPublica() {
               {TENEDORES.map((t, i) => (
                 <button
                   key={i}
+                  type="button"
                   className={`${styles.leyendaItem} ${tenedorSeleccionado === i ? styles.leyendaItemActivo : ''}`}
                   onClick={() => setTenedorSeleccionado(tenedorSeleccionado === i ? null : i)}
                   aria-pressed={tenedorSeleccionado === i}
@@ -377,7 +379,7 @@ export default function VisualizadorDeudaPublica() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>🔍 Clave para entender la estabilidad:</strong> Cuanto mayor es la participación de inversores domésticos (residentes), más resiliente es la deuda ante turbulencias internacionales.
+              <strong><span aria-hidden="true">🔍</span> Clave para entender la estabilidad:</strong> Cuanto mayor es la participación de inversores domésticos (residentes), más resiliente es la deuda ante turbulencias internacionales.
               Japón (260% PIB) puede mantener esa deuda porque el 90% la tienen ahorradores japoneses que no venden en pánico.
             </p>
           </div>
@@ -387,7 +389,7 @@ export default function VisualizadorDeudaPublica() {
       {/* ── SECCIÓN: PRIMA DE RIESGO ── */}
       {seccionActiva === 'prima' && (
         <section className={styles.seccion} aria-label="Prima de riesgo">
-          <h2 className={styles.seccionTitulo}>📊 Prima de riesgo en Europa</h2>
+          <h2 className={styles.seccionTitulo}><span aria-hidden="true">📊</span> Prima de riesgo en Europa</h2>
           <p className={styles.seccionSubtitulo}>
             Diferencial respecto al Bund alemán a 10 años (puntos básicos, pb). Datos representativos 2024.
             1 pb = 0,01 puntos porcentuales.
@@ -455,7 +457,7 @@ export default function VisualizadorDeudaPublica() {
       {/* ── SECCIÓN: SOSTENIBILIDAD ── */}
       {seccionActiva === 'sostenibilidad' && (
         <section className={styles.seccion} aria-label="Sostenibilidad de la deuda">
-          <h2 className={styles.seccionTitulo}>⚖️ ¿Cuándo es sostenible la deuda?</h2>
+          <h2 className={styles.seccionTitulo}><span aria-hidden="true">⚖️</span> ¿Cuándo es sostenible la deuda?</h2>
           <p className={styles.seccionSubtitulo}>
             La condición de Domar: si el PIB crece más rápido que los intereses, el ratio deuda/PIB se estabiliza solo.
           </p>
@@ -464,6 +466,7 @@ export default function VisualizadorDeudaPublica() {
             {ESCENARIOS.map((esc) => (
               <button
                 key={esc.id}
+                type="button"
                 className={`${styles.escenarioBtn} ${escenarioSeleccionado === esc.id ? styles.escenarioBtnActivo : ''}`}
                 onClick={() => setEscenarioSeleccionado(esc.id)}
                 aria-pressed={escenarioSeleccionado === esc.id}
@@ -522,7 +525,7 @@ export default function VisualizadorDeudaPublica() {
           </div>
 
           <div className={styles.maastrichtBox}>
-            <h3>📋 Límites del Pacto de Estabilidad (Maastricht)</h3>
+            <h3><span aria-hidden="true">📋</span> Límites del Pacto de Estabilidad (Maastricht)</h3>
             <div className={styles.maastrichtGrid}>
               <div className={styles.maastrichtItem}>
                 <span className={styles.maastrichtValor}>3%</span>
@@ -656,7 +659,7 @@ export default function VisualizadorDeudaPublica() {
             <li key={item.q} className={styles.faqItem}>
               <strong>{item.q}</strong>
               <span>{item.a}</span>
-              {item.tip && <span className={styles.faqTip}>💡 {item.tip}</span>}
+              {item.tip && <span className={styles.faqTip}><span aria-hidden="true">💡</span> {item.tip}</span>}
             </li>
           ))}
         </ul>
@@ -723,11 +726,11 @@ export default function VisualizadorDeudaPublica() {
             <strong>Errores comunes sobre la deuda pública</strong>
           </div>
           <ul className={styles.warningList}>
-            <li><strong>❌ &quot;La deuda pública es como la deuda de una familia&quot;</strong> — los estados tienen capacidad de crear dinero, emitir más deuda, recaudar impuestos y duran indefinidamente; las familias, no.</li>
-            <li><strong>❌ &quot;Reducir el déficit siempre es bueno para la economía&quot;</strong> — en recesión, la austeridad puede reducir el PIB más de lo que reduce el déficit (multiplicador fiscal negativo; caso Grecia 2010-2015).</li>
-            <li><strong>❌ &quot;Los bonos son siempre seguros&quot;</strong> — los bonos de países en dificultades (Grecia 2012, Argentina 2001) sufrieron quitas del 50-70%. El &quot;riesgo soberano&quot; es real.</li>
-            <li><strong>❌ &quot;El BCE imprime dinero para financiar España&quot;</strong> — el BCE no puede comprar deuda en el mercado primario (primera emisión). Solo puede hacerlo en el secundario, y con límites establecidos por el Tribunal de Justicia de la UE.</li>
-            <li><strong>❌ &quot;Una deuda alta siempre lleva al impago&quot;</strong> — Japón lleva décadas con +200% del PIB sin impago. La sostenibilidad depende de quién la tiene, en qué moneda y a qué tipo de interés.</li>
+            <li><strong><span aria-hidden="true">❌</span> &quot;La deuda pública es como la deuda de una familia&quot;</strong> — los estados tienen capacidad de crear dinero, emitir más deuda, recaudar impuestos y duran indefinidamente; las familias, no.</li>
+            <li><strong><span aria-hidden="true">❌</span> &quot;Reducir el déficit siempre es bueno para la economía&quot;</strong> — en recesión, la austeridad puede reducir el PIB más de lo que reduce el déficit (multiplicador fiscal negativo; caso Grecia 2010-2015).</li>
+            <li><strong><span aria-hidden="true">❌</span> &quot;Los bonos son siempre seguros&quot;</strong> — los bonos de países en dificultades (Grecia 2012, Argentina 2001) sufrieron quitas del 50-70%. El &quot;riesgo soberano&quot; es real.</li>
+            <li><strong><span aria-hidden="true">❌</span> &quot;El BCE imprime dinero para financiar España&quot;</strong> — el BCE no puede comprar deuda en el mercado primario (primera emisión). Solo puede hacerlo en el secundario, y con límites establecidos por el Tribunal de Justicia de la UE.</li>
+            <li><strong><span aria-hidden="true">❌</span> &quot;Una deuda alta siempre lleva al impago&quot;</strong> — Japón lleva décadas con +200% del PIB sin impago. La sostenibilidad depende de quién la tiene, en qué moneda y a qué tipo de interés.</li>
           </ul>
         </div>
       </EducationalSection>
