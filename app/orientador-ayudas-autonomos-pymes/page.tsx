@@ -124,6 +124,7 @@ export default function OrientadorAyudasAutonomosPymesPage() {
           {FIGURAS.map(f => (
             <button
               key={f.id}
+              type="button"
               className={`${styles.figuraCard} ${figura === f.id ? styles.figuraActiva : ''}`}
               onClick={() => setFigura(f.id)}
               aria-pressed={figura === f.id}
@@ -146,6 +147,7 @@ export default function OrientadorAyudasAutonomosPymesPage() {
             return (
               <button
                 key={o.id}
+                type="button"
                 className={`${styles.checkboxCard} ${activo ? styles.checkboxActivo : ''}`}
                 onClick={() => toggleObjetivo(o.id)}
                 aria-pressed={activo}
@@ -171,6 +173,7 @@ export default function OrientadorAyudasAutonomosPymesPage() {
             return (
               <button
                 key={p.id}
+                type="button"
                 className={`${styles.checkboxCard} ${activo ? styles.checkboxActivo : ''}`}
                 onClick={() => togglePerfil(p.id)}
                 aria-pressed={activo}
@@ -187,9 +190,10 @@ export default function OrientadorAyudasAutonomosPymesPage() {
       {/* Resultados */}
       <section className={styles.section}>
         <h2 className={styles.sectionTitle} aria-live="polite">
+          <span aria-hidden="true">📋</span>{' '}
           {figura
-            ? `📋 ${totalEspecificas} categorías para tu situación + recursos generales`
-            : '📋 Recursos generales — selecciona tu situación para ver más'}
+            ? `${totalEspecificas} categorías para tu situación + recursos generales`
+            : 'Recursos generales — selecciona tu situación para ver más'}
         </h2>
         {!figura && (
           <div className={styles.pendienteMsg}>
@@ -401,7 +405,7 @@ export default function OrientadorAyudasAutonomosPymesPage() {
 
         {/* Warning */}
         <section className={styles.warningBox}>
-          <h2>⚠️ Lo que debes saber antes de solicitar</h2>
+          <h2><span aria-hidden="true">⚠️</span> Lo que debes saber antes de solicitar</h2>
           <div className={styles.warningGrid}>
             {[
               { titulo: 'El presupuesto suele ser limitado', desc: 'Muchas convocatorias se resuelven por orden de llegada o agotan su dotación antes de la fecha límite. Cuanto antes presentes la solicitud completa, mejor.' },

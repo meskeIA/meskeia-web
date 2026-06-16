@@ -711,11 +711,11 @@
 | [x] | Mi IP y Conexión | `/mi-ip/` | freelance, tecnicas |
 | [x] | Notas | `/notas/` | freelance, productividad |
 | [x] | Orientador Contratos Mercantiles | `/orientador-contrato-mercantil/` | freelance, tecnicas |
-| [ ] | Orientador de Ayudas para Autónomos y Pymes | `/orientador-ayudas-autonomos-pymes/` | freelance, legal-fiscal |
-| [ ] | Orientador de Diversificación de Clientes | `/orientador-diversificacion-clientes/` | freelance, productividad |
-| [ ] | Orientador Facturación y Retenciones | `/orientador-facturacion-retencion/` | freelance, finanzas |
+| [x] | Orientador de Ayudas para Autónomos y Pymes | `/orientador-ayudas-autonomos-pymes/` | freelance, legal-fiscal |
+| [x] | Orientador de Diversificación de Clientes | `/orientador-diversificacion-clientes/` | freelance, productividad |
+| [x] | Orientador Facturación y Retenciones | `/orientador-facturacion-retencion/` | freelance, finanzas |
 | [x] | Orientador Tarifa Freelance | `/orientador-tarifa-freelance/` | freelance |
-| [ ] | Planificador Cash Flow | `/planificador-cashflow/` | freelance |
+| [x] | Planificador Cash Flow | `/planificador-cashflow/` | freelance |
 | [ ] | Planificador de Vacaciones para Autónomos | `/planificador-vacaciones-autonomo/` | freelance, productividad |
 | [ ] | Planificador Trimestral para Autónomos | `/planificador-trimestres-freelance/` | freelance, productividad |
 | [ ] | Selector de Financiación Empresarial | `/selector-financiacion-empresa/` | freelance, finanzas |

@@ -218,7 +218,7 @@ export default function OrientadorFacturacionRetencionPage() {
 
         <header className={styles.hero}>
           <div className={styles.heroContent}>
-            <span className={styles.heroBadge}>🧾 Suite Freelance</span>
+            <span className={styles.heroBadge}><span aria-hidden="true">🧾</span> Suite Freelance</span>
             <h1 className={styles.heroTitle}>Orientador de Retenciones IRPF</h1>
             <p className={styles.heroSubtitle}>
               Descubre qué retención aplicar en tus facturas como autónomo o profesional en España
@@ -255,6 +255,7 @@ export default function OrientadorFacturacionRetencionPage() {
               {OPCIONES_PERFIL.map((opcion) => (
                 <button
                   key={opcion.valor}
+                  type="button"
                   className={`${styles.opcionBtn} ${perfil === opcion.valor ? styles.opcionBtnActiva : ''}`}
                   onClick={() => handleSeleccionar(opcion.valor)}
                   aria-pressed={perfil === opcion.valor}
@@ -281,23 +282,23 @@ export default function OrientadorFacturacionRetencionPage() {
 
               <div className={styles.resultadoDetalles}>
                 <div className={styles.detalleBloque}>
-                  <span className={styles.detalleTitulo}>📅 ¿Cuándo se aplica?</span>
+                  <span className={styles.detalleTitulo}><span aria-hidden="true">📅</span> ¿Cuándo se aplica?</span>
                   <span className={styles.detalleTexto}>{resultado.cuando}</span>
                 </div>
                 <div className={styles.detalleBloque}>
-                  <span className={styles.detalleTitulo}>👥 ¿Quién retiene?</span>
+                  <span className={styles.detalleTitulo}><span aria-hidden="true">👥</span> ¿Quién retiene?</span>
                   <span className={styles.detalleTexto}>{resultado.quien}</span>
                 </div>
               </div>
 
               {resultado.advertencia && (
                 <div className={styles.advertenciaBloque} role="alert">
-                  <span className={styles.advertenciaIcono}>⚠️</span>
+                  <span className={styles.advertenciaIcono} aria-hidden="true">⚠️</span>
                   <span>{resultado.advertencia}</span>
                 </div>
               )}
 
-              <button className={styles.resetBtn} onClick={handleReset}>
+              <button type="button" className={styles.resetBtn} onClick={handleReset}>
                 ← Consultar otra situación
               </button>
             </section>
@@ -373,10 +374,10 @@ export default function OrientadorFacturacionRetencionPage() {
 
           {/* Declaración trimestral */}
           <section className={styles.declaracionSection}>
-            <h2 className={styles.sectionTitle}>📋 Cómo declarar las retenciones</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">📋</span> Cómo declarar las retenciones</h2>
             <div className={styles.declaracionGrid}>
               <div className={styles.declaracionCard}>
-                <div className={styles.declaracionIcono}>📅</div>
+                <div className={styles.declaracionIcono} aria-hidden="true">📅</div>
                 <h3>Modelo 111 — Trimestral</h3>
                 <p>Declaración trimestral de retenciones e ingresos a cuenta del IRPF sobre rendimientos del trabajo y actividades económicas.</p>
                 <ul className={styles.declaracionLista}>
@@ -387,7 +388,7 @@ export default function OrientadorFacturacionRetencionPage() {
                 </ul>
               </div>
               <div className={styles.declaracionCard}>
-                <div className={styles.declaracionIcono}>📊</div>
+                <div className={styles.declaracionIcono} aria-hidden="true">📊</div>
                 <h3>Modelo 190 — Resumen anual</h3>
                 <p>Resumen anual de retenciones e ingresos a cuenta. Detalla a cada perceptor las retenciones practicadas durante el ejercicio.</p>
                 <ul className={styles.declaracionLista}>
@@ -519,7 +520,7 @@ export default function OrientadorFacturacionRetencionPage() {
 
               {/* Warning box — indicador v2.0 */}
               <div className={styles.warningBox} role="note">
-                <span className={styles.warningIcono}>⚠️</span>
+                <span className={styles.warningIcono} aria-hidden="true">⚠️</span>
                 <p>
                   Los tipos de retención son establecidos por la normativa fiscal (RIRPF) y pueden modificarse con cada Ley de
                   Presupuestos Generales del Estado. Cualquier cambio en tu situación (inicio de actividad, cambio de régimen,

@@ -229,14 +229,14 @@ export default function OrientadorDiversificacionClientesPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>📊 Orientador de Diversificación de Clientes</h1>
+          <h1 className={styles.title}><span aria-hidden="true">📊</span> Orientador de Diversificación de Clientes</h1>
           <p className={styles.subtitle}>
             Analiza la concentración de tu cartera y detecta riesgos de dependencia excesiva
           </p>
           <div className={styles.badges}>
-            <span className={styles.badge}>🔒 Todo en tu navegador</span>
-            <span className={styles.badge}>📊 Índice HHI</span>
-            <span className={styles.badge}>⚖️ Alerta TRADE</span>
+            <span className={styles.badge}><span aria-hidden="true">🔒</span> Todo en tu navegador</span>
+            <span className={styles.badge}><span aria-hidden="true">📊</span> Índice HHI</span>
+            <span className={styles.badge}><span aria-hidden="true">⚖️</span> Alerta TRADE</span>
           </div>
         </header>
 
@@ -287,6 +287,7 @@ export default function OrientadorDiversificacionClientesPage() {
                 </div>
                 {clientes.length > 2 && (
                   <button
+                    type="button"
                     className={styles.btnEliminar}
                     onClick={() => eliminarCliente(cliente.id)}
                     aria-label={`Eliminar cliente ${cliente.nombre || index + 1}`}
@@ -300,7 +301,7 @@ export default function OrientadorDiversificacionClientesPage() {
 
           <div className={styles.controlsRow}>
             {clientes.length < MAX_CLIENTES && (
-              <button className={styles.btnAgregar} onClick={agregarCliente}>
+              <button type="button" className={styles.btnAgregar} onClick={agregarCliente}>
                 + Añadir cliente
               </button>
             )}
@@ -333,7 +334,7 @@ export default function OrientadorDiversificacionClientesPage() {
                 {formatNumber(hhi, 0)}
               </div>
               <div className={styles.hhiEtiqueta} style={{ color: nivel.color }}>
-                {nivel.emoji} {nivel.texto}
+                <span aria-hidden="true">{nivel.emoji}</span> {nivel.texto}
               </div>
 
               {/* Espectro HHI */}

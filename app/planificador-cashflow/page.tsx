@@ -202,7 +202,7 @@ export default function PlanificadorCashFlowPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>💰 Planificador Cash Flow</h1>
+        <h1 className={styles.title}><span aria-hidden="true">💰</span> Planificador Cash Flow</h1>
         <p className={styles.subtitle}>
           Proyecta tu flujo de caja mes a mes. Identifica riesgos de liquidez y planifica tu tesorería.
         </p>
@@ -250,22 +250,28 @@ export default function PlanificadorCashFlowPage() {
       <div className={styles.tabsContainer}>
         <div className={styles.tabs}>
           <button
+            type="button"
             className={`${styles.tab} ${tabActivo === 'datos' ? styles.tabActivo : ''}`}
             onClick={() => setTabActivo('datos')}
+            aria-pressed={tabActivo === 'datos'}
           >
-            📝 Datos
+            <span aria-hidden="true">📝</span> Datos
           </button>
           <button
+            type="button"
             className={`${styles.tab} ${tabActivo === 'proyeccion' ? styles.tabActivo : ''}`}
             onClick={() => setTabActivo('proyeccion')}
+            aria-pressed={tabActivo === 'proyeccion'}
           >
-            📊 Proyección
+            <span aria-hidden="true">📊</span> Proyección
           </button>
           <button
+            type="button"
             className={`${styles.tab} ${tabActivo === 'escenarios' ? styles.tabActivo : ''}`}
             onClick={() => setTabActivo('escenarios')}
+            aria-pressed={tabActivo === 'escenarios'}
           >
-            🔮 Escenarios
+            <span aria-hidden="true">🔮</span> Escenarios
           </button>
         </div>
 
@@ -288,8 +294,8 @@ export default function PlanificadorCashFlowPage() {
             {/* Ingresos */}
             <div className={styles.seccionDatos}>
               <div className={styles.seccionHeader}>
-                <h3>📈 Ingresos Previstos</h3>
-                <button className={styles.btnAgregar} onClick={agregarIngreso}>
+                <h3><span aria-hidden="true">📈</span> Ingresos Previstos</h3>
+                <button type="button" className={styles.btnAgregar} onClick={agregarIngreso}>
                   + Añadir Línea
                 </button>
               </div>
@@ -328,6 +334,7 @@ export default function PlanificadorCashFlowPage() {
                         ))}
                         <td>
                           <button
+                            type="button"
                             className={styles.btnEliminar}
                             onClick={() => eliminarIngreso(ing.id)}
                           >
@@ -344,12 +351,12 @@ export default function PlanificadorCashFlowPage() {
             {/* Gastos */}
             <div className={styles.seccionDatos}>
               <div className={styles.seccionHeader}>
-                <h3>📉 Gastos Previstos</h3>
+                <h3><span aria-hidden="true">📉</span> Gastos Previstos</h3>
                 <div className={styles.botonesGasto}>
-                  <button className={styles.btnAgregar} onClick={() => agregarGasto(true)}>
+                  <button type="button" className={styles.btnAgregar} onClick={() => agregarGasto(true)}>
                     + Gasto Fijo
                   </button>
-                  <button className={styles.btnAgregarVar} onClick={() => agregarGasto(false)}>
+                  <button type="button" className={styles.btnAgregarVar} onClick={() => agregarGasto(false)}>
                     + Gasto Variable
                   </button>
                 </div>
@@ -392,6 +399,7 @@ export default function PlanificadorCashFlowPage() {
                         ))}
                         <td>
                           <button
+                            type="button"
                             className={styles.btnEliminar}
                             onClick={() => eliminarGasto(g.id)}
                           >
@@ -597,7 +605,7 @@ export default function PlanificadorCashFlowPage() {
       >
         {/* TABLA COMPARATIVA */}
         <section className={styles.eduComparativa}>
-          <h2>⚖️ Cash Flow vs Beneficio: diferencias clave</h2>
+          <h2><span aria-hidden="true">⚖️</span> Cash Flow vs Beneficio: diferencias clave</h2>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
               <thead>
@@ -650,7 +658,7 @@ export default function PlanificadorCashFlowPage() {
 
         {/* ESCENARIOS */}
         <section className={styles.eduEscenarios}>
-          <h2>🎯 Situaciones reales de cash flow en negocios españoles</h2>
+          <h2><span aria-hidden="true">🎯</span> Situaciones reales de cash flow en negocios españoles</h2>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -723,7 +731,7 @@ export default function PlanificadorCashFlowPage() {
 
         {/* FAQ */}
         <section className={styles.eduFaq}>
-          <h2>❓ Preguntas frecuentes sobre cash flow y tesorería</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas frecuentes sobre cash flow y tesorería</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
               <h4>❓ ¿Cómo puede quebrar una empresa que tiene beneficios?</h4>
@@ -786,7 +794,7 @@ export default function PlanificadorCashFlowPage() {
 
         {/* GUÍA PASO A PASO */}
         <section className={styles.eduGuia}>
-          <h2>📋 Cómo elaborar tu plan de tesorería paso a paso</h2>
+          <h2><span aria-hidden="true">📋</span> Cómo elaborar tu plan de tesorería paso a paso</h2>
           <div className={styles.stepGuide}>
             <div className={styles.step}>
               <div className={styles.stepNumber}>1</div>
@@ -835,7 +843,7 @@ export default function PlanificadorCashFlowPage() {
 
         {/* TIPS */}
         <section className={styles.eduTips}>
-          <h2>✅ Mejores prácticas de gestión de tesorería</h2>
+          <h2><span aria-hidden="true">✅</span> Mejores prácticas de gestión de tesorería</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>🏦</span>
@@ -873,7 +881,7 @@ export default function PlanificadorCashFlowPage() {
         {/* WARNING BOX */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <h3>Errores frecuentes de tesorería que llevan a la quiebra técnica</h3>
           </div>
           <ul className={styles.warningList}>
