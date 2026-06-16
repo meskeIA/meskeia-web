@@ -395,9 +395,11 @@ export default function CartografiaProyeccionesPage() {
           {SECCIONES.map(s => (
             <button
               key={s.id}
+              type="button"
               className={`${styles.navBtn} ${seccion === s.id ? styles.navActivo : ''}`}
               onClick={() => setSeccion(s.id)}
               aria-current={seccion === s.id ? 'true' : undefined}
+              aria-pressed={seccion === s.id}
             >
               <span className={styles.navIcono} aria-hidden="true">{s.icono}</span>
               <span className={styles.navTexto}>{s.titulo}</span>
@@ -462,6 +464,7 @@ export default function CartografiaProyeccionesPage() {
               {PROPIEDADES.map((p, i) => (
                 <button
                   key={i}
+                  type="button"
                   className={`${styles.propiedadCard} ${propiedadActiva === i ? styles.propiedadActiva : ''}`}
                   onClick={() => setPropiedadActiva(propiedadActiva === i ? null : i)}
                   aria-expanded={propiedadActiva === i}
@@ -492,9 +495,11 @@ export default function CartografiaProyeccionesPage() {
               {PROYECCIONES.map((p, i) => (
                 <button
                   key={p.id}
+                  type="button"
                   className={`${styles.proyeccionPill} ${proyeccionActiva === i ? styles.proyeccionPillActiva : ''}`}
                   onClick={() => setProyeccionActiva(i)}
                   aria-current={proyeccionActiva === i ? 'true' : undefined}
+                  aria-pressed={proyeccionActiva === i}
                 >
                   {p.nombre} ({p.anio})
                 </button>
@@ -686,6 +691,7 @@ export default function CartografiaProyeccionesPage() {
               {CURIOSIDADES.map((c, i) => (
                 <button
                   key={i}
+                  type="button"
                   className={`${styles.curiosidadCard} ${curiosidadActiva === i ? styles.curiosidadActiva : ''}`}
                   onClick={() => setCuriosidadActiva(curiosidadActiva === i ? null : i)}
                   aria-expanded={curiosidadActiva === i}

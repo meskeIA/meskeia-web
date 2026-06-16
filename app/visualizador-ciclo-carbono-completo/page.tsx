@@ -358,6 +358,7 @@ export default function VisualizadorCicloCarbonoCompleto() {
           {TABS.map((tab) => (
             <button
               key={tab.id}
+              type="button"
               role="tab"
               aria-selected={tabActiva === tab.id}
               aria-controls={`panel-${tab.id}`}
@@ -403,6 +404,7 @@ export default function VisualizadorCicloCarbonoCompleto() {
               return (
                 <button
                   key={r.id}
+                  type="button"
                   className={`${styles.reservoirCard} ${isSelected ? styles.reservoirCardActive : ''}`}
                   onClick={() => setReservorioSeleccionado(isSelected ? null : r.id)}
                   aria-expanded={isSelected}
@@ -491,6 +493,7 @@ export default function VisualizadorCicloCarbonoCompleto() {
               return (
                 <button
                   key={flujo.id}
+                  type="button"
                   className={`${styles.flujoCard} ${
                     flujo.direccion === 'salida'
                       ? styles.flujoSalida

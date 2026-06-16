@@ -449,6 +449,7 @@ export default function VisualizadorCicloViral() {
                   <p>{etapa.ejemplo}</p>
                 </div>
                 <button
+                  type="button"
                   className={styles.btnCerrar}
                   onClick={() => setEtapaActiva(null)}
                   aria-label="Cerrar detalle de etapa"
@@ -464,6 +465,7 @@ export default function VisualizadorCicloViral() {
                   {ETAPAS.map((e) => (
                     <li key={e.numero}>
                       <button
+                        type="button"
                         className={styles.etapaBoton}
                         onClick={() => setEtapaActiva(e.numero)}
                       >
@@ -492,8 +494,10 @@ export default function VisualizadorCicloViral() {
           {(['adn', 'arn', 'retrovirus'] as const).map((tipo) => (
             <button
               key={tipo}
+              type="button"
               className={`${styles.tab} ${seccionActiva === tipo ? styles.tabActivo : ''}`}
               onClick={() => setSeccionActiva(tipo)}
+              aria-pressed={seccionActiva === tipo}
             >
               {tipo === 'adn' ? 'Virus ADN' : tipo === 'arn' ? 'Virus ARN' : 'Retrovirus'}
             </button>

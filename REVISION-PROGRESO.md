@@ -409,10 +409,10 @@
 | [x] | Cálculo Visual: Límites, Derivadas e Integrales | `/visualizador-calculo-visual/` | estudiantes, tecnicas |
 | [x] | Cáncer: Biología Molecular, Hallmarks e Inmunoterapia | `/visualizador-cancer/` | estudiantes, cultura, salud |
 | [x] | Caos y Mariposa: El Atractor de Lorenz | `/visualizador-caos-mariposa/` | estudiantes, cultura, tecnicas |
-| [ ] | Capas de la Tierra - Del Suelo al Núcleo | `/visualizador-capas-tierra/` | estudiantes, cultura |
-| [ ] | Cartografía y Proyecciones - Por qué Todos los Mapas Mienten | `/visualizador-cartografia-proyecciones/` | estudiantes, cultura |
-| [ ] | Ciclo de Replicación Viral: Cómo se Reproducen los Virus | `/visualizador-ciclo-viral/` | estudiantes, cultura, salud |
-| [ ] | Ciclo del Carbono Completo: Reservorios y Flujos | `/visualizador-ciclo-carbono-completo/` | estudiantes, cultura |
+| [x] | Capas de la Tierra - Del Suelo al Núcleo | `/visualizador-capas-tierra/` | estudiantes, cultura |
+| [x] | Cartografía y Proyecciones - Por qué Todos los Mapas Mienten | `/visualizador-cartografia-proyecciones/` | estudiantes, cultura |
+| [x] | Ciclo de Replicación Viral: Cómo se Reproducen los Virus | `/visualizador-ciclo-viral/` | estudiantes, cultura, salud |
+| [x] | Ciclo del Carbono Completo: Reservorios y Flujos | `/visualizador-ciclo-carbono-completo/` | estudiantes, cultura |
 | [ ] | Ciclo del Nitrógeno: Fijación, Nitrificación y Ciclos Biogeoquímicos | `/visualizador-ciclo-nitrogeno/` | estudiantes, cultura |
 | [ ] | Ciclo Menstrual: Fases y Hormonas | `/visualizador-ciclo-menstrual/` | estudiantes, salud |
 | [ ] | Circuitos Electrónicos: R-L-C, Transistor y Puertas Lógicas | `/visualizador-circuitos-electronicos/` | estudiantes, tecnicas |
