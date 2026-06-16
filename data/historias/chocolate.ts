@@ -194,7 +194,6 @@ export const chocolate: HistoriaData = {
       icono: '🚢',
       hitosDestacados: [
         'Plantaciones coloniales y expansión del cacao',
-        'El chocolate conquista Europa',
       ],
       eventos: [
         '1728: fundación de la Compañía Guipuzcoana de Caracas, monopolio del cacao venezolano',
@@ -265,7 +264,6 @@ export const chocolate: HistoriaData = {
     colonia: 'Economía Colonial',
     industria: 'Industrialización',
     sostenibilidad: 'Sostenibilidad y Futuro',
-    crisis: 'Controversias y Crisis',
   },
 
   colores: {
@@ -274,7 +272,6 @@ export const chocolate: HistoriaData = {
     colonia: '#DC2626',
     industria: '#374151',
     sostenibilidad: '#059669',
-    crisis: '#B45309',
   },
 
   disclaimer: 'exempt',

@@ -245,10 +245,10 @@
 | [x] | Historia del Antiguo Egipto: De los Faraones a Cleopatra | `/visualizador-historia/egipto/` | cultura |
 | [x] | Historia del Automóvil: De Benz al Coche Eléctrico Autónomo | `/visualizador-historia/automocion/` | cultura, tecnicas |
 | [x] | Historia del Azúcar: De Papua Nueva Guinea a la Crisis Global de Salud | `/visualizador-historia/azucar/` | cultura, estudiantes |
-| [ ] | Historia del Chocolate: Del Cacao Sagrado de los Mayas a la Industria Global | `/visualizador-historia/chocolate/` | cultura, estudiantes |
-| [ ] | Historia del Cine: De los Lumière a la Inteligencia Artificial | `/visualizador-historia/cine/` | cultura |
-| [ ] | Historia del Clima: De la Última Glaciación a la Emergencia Climática | `/visualizador-historia/clima/` | cultura, tecnicas |
-| [ ] | Historia del Comercio Mundial: De Mesopotamia al E-Commerce Global | `/visualizador-historia/historia-comercio/` | cultura |
+| [x] | Historia del Chocolate: Del Cacao Sagrado de los Mayas a la Industria Global | `/visualizador-historia/chocolate/` | cultura, estudiantes |
+| [x] | Historia del Cine: De los Lumière a la Inteligencia Artificial | `/visualizador-historia/cine/` | cultura |
+| [x] | Historia del Clima: De la Última Glaciación a la Emergencia Climática | `/visualizador-historia/clima/` | cultura, tecnicas |
+| [x] | Historia del Comercio Mundial: De Mesopotamia al E-Commerce Global | `/visualizador-historia/historia-comercio/` | cultura |
 | [ ] | Historia del Cómic: De Töpffer a la IA Generativa | `/visualizador-historia/comics/` | cultura, juegos |
 | [ ] | Historia del Deporte: De los Juegos Olímpicos Griegos a los eSports | `/visualizador-historia/deporte/` | cultura, juegos |
 | [ ] | Historia del Derecho: De Hammurabi al Derecho Digital | `/visualizador-historia/historia-derecho/` | cultura |
