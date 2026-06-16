@@ -253,10 +253,10 @@
 | [x] | Historia del Deporte: De los Juegos Olímpicos Griegos a los eSports | `/visualizador-historia/deporte/` | cultura, juegos |
 | [x] | Historia del Derecho: De Hammurabi al Derecho Digital | `/visualizador-historia/historia-derecho/` | cultura |
 | [x] | Historia del Fútbol: De las FA Rules al Fútbol Global | `/visualizador-historia/historia-futbol/` | cultura, juegos |
-| [ ] | Historia del Imperio Inca: Del Lago Titicaca al Tawantinsuyu | `/visualizador-historia/inca/` | cultura, estudiantes |
-| [ ] | Historia del Imperio Mongol: De Gengis Kan a la Dinastía Yuan | `/visualizador-historia/mongol/` | cultura |
-| [ ] | Historia del Imperio Otomano: De Osmán a Atatürk | `/visualizador-historia/otomano/` | cultura |
-| [ ] | Historia del Japón Moderno: De Meiji al Siglo XXI | `/visualizador-historia/historia-japon-moderno/` | cultura |
+| [x] | Historia del Imperio Inca: Del Lago Titicaca al Tawantinsuyu | `/visualizador-historia/inca/` | cultura, estudiantes |
+| [x] | Historia del Imperio Mongol: De Gengis Kan a la Dinastía Yuan | `/visualizador-historia/mongol/` | cultura |
+| [x] | Historia del Imperio Otomano: De Osmán a Atatürk | `/visualizador-historia/otomano/` | cultura |
+| [x] | Historia del Japón Moderno: De Meiji al Siglo XXI | `/visualizador-historia/historia-japon-moderno/` | cultura |
 | [ ] | Historia del Ocio: Del Circo Romano al Streaming Global | `/visualizador-historia/historia-ocio/` | cultura |
 | [ ] | Historia del Oriente Medio: De Sykes-Picot al Siglo XXI | `/visualizador-historia/historia-oriente-medio/` | cultura |
 | [ ] | Historia del Pensamiento Político: De Platón al Populismo del Siglo XXI | `/visualizador-historia/historia-pensamiento-politico/` | cultura |

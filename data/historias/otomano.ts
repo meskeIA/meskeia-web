@@ -117,7 +117,7 @@ export const otomano: HistoriaData = {
       paises: ['Anatolia', 'Tracia oriental', 'Oriente Próximo', 'Arabia', 'Mesopotamia'],
     },
     {
-      id: 'primera-guerra-disolución',
+      id: 'primera-guerra-disolucion',
       nombre: 'Primera Guerra Mundial y Disolución',
       anioInicio: 1914,
       anioFin: 1922,

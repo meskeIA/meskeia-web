@@ -208,7 +208,7 @@ export const inca: HistoriaData = {
     },
     {
       nombre: 'La Sociedad y el Pensamiento Inca',
-      desde: 1438,
+      desde: 1471,
       hasta: 1527,
       icono: '☀️',
       hitosDestacados: ['La Sociedad Inca y la Religión Solar'],
