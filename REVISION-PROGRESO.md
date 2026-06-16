@@ -273,10 +273,10 @@
 | [x] | Instrumentos Musicales | `/instrumentos-musicales/` | cultura |
 | [x] | La Conquista de América: Choque de Civilizaciones | `/visualizador-historia/historia-conquista-america/` | cultura |
 | [x] | La Edad Media Europea: De la Caída de Roma a Constantinopla | `/visualizador-historia/edad-media-europea/` | cultura |
-| [ ] | La Era Vikinga: Expansión, Comercio y Exploración (793-1100) | `/visualizador-historia/historia-vikingos/` | cultura |
-| [ ] | La España Antigua: De Tartessos a Hispania Romana | `/visualizador-historia/espana-antigua/` | cultura, estudiantes |
-| [ ] | La España de los Austrias: Del Imperio Universal al Ocaso | `/visualizador-historia/espana-austrias/` | cultura |
-| [ ] | La España de los Borbones: De Utrecht a Bayona | `/visualizador-historia/espana-borbones/` | cultura |
+| [x] | La Era Vikinga: Expansión, Comercio y Exploración (793-1100) | `/visualizador-historia/historia-vikingos/` | cultura |
+| [x] | La España Antigua: De Tartessos a Hispania Romana | `/visualizador-historia/espana-antigua/` | cultura, estudiantes |
+| [x] | La España de los Austrias: Del Imperio Universal al Ocaso | `/visualizador-historia/espana-austrias/` | cultura |
+| [x] | La España de los Borbones: De Utrecht a Bayona | `/visualizador-historia/espana-borbones/` | cultura |
 | [ ] | La España Medieval: De los Visigodos a los Reyes Católicos | `/visualizador-historia/espana-medieval/` | cultura |
 | [ ] | La Evolución de la Escritura | `/visualizador-historia-escritura/` | cultura, estudiantes |
 | [ ] | La Evolución del Dinero | `/visualizador-historia-dinero/` | cultura, finanzas |

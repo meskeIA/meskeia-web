@@ -110,7 +110,7 @@ export const historiaVikingos: HistoriaData = {
       paises: ['Dinamarca', 'Inglaterra', 'Noruega', 'Escocia'],
     },
     {
-      id: 'cristianizacion-escandinavía',
+      id: 'cristianizacion-escandinavia',
       nombre: 'Cristianización de Escandinavia',
       anioInicio: 960,
       anioFin: 1050,
