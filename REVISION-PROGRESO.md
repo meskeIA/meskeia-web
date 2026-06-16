@@ -649,11 +649,11 @@
 | [x] | El Precio Real de las Cosas | `/visualizador-precio-real-cosas/` | finanzas, cultura, freelance |
 | [x] | El Viaje de tus Impuestos | `/visualizador-viaje-impuestos/` | finanzas, cultura, freelance |
 | [x] | Estimación de Deducción por Maternidad IRPF | `/estimacion-deduccion-maternidad/` | finanzas, legal-fiscal |
-| [ ] | Estimador Coste Real a Plazos | `/estimador-coste-plazos/` | finanzas |
+| [x] | Estimador Coste Real a Plazos | `/estimador-coste-plazos/` | finanzas |
 | [x] | Estimador de Cartera de Inversión | `/estimador-cartera-inversion/` | finanzas |
-| [ ] | Estimador de Deuda | `/estimador-deuda/` | finanzas |
-| [ ] | Estimador de Inflación | `/estimador-inflacion/` | finanzas |
-| [ ] | Estimador de Infraseguro | `/estimador-infraseguro/` | finanzas, inmobiliaria |
+| [x] | Estimador de Deuda | `/estimador-deuda/` | finanzas |
+| [x] | Estimador de Inflación | `/estimador-inflacion/` | finanzas |
+| [x] | Estimador de Infraseguro | `/estimador-infraseguro/` | finanzas, inmobiliaria |
 | [ ] | Estimador de Inversiones | `/estimador-inversiones/` | finanzas |
 | [ ] | Estimador FIRE | `/estimador-fire/` | finanzas, legal-fiscal |
 | [ ] | Estimador Fondo de Emergencia | `/estimador-fondo-emergencia/` | finanzas |

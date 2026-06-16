@@ -228,7 +228,7 @@ export default function CalculadoraDeudaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🎯</span>
+        <span className={styles.heroIcon} aria-hidden="true">🎯</span>
         <h1 className={styles.title}>Estimador de Deuda</h1>
         <p className={styles.subtitle}>
           Compara el método Bola de Nieve vs Avalancha. Descubre cuál te ahorra más tiempo y dinero.
@@ -241,7 +241,7 @@ export default function CalculadoraDeudaPage() {
         {/* Panel de entrada */}
         <div className={styles.inputPanel}>
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>💳 Tus Deudas</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">💳</span> Tus Deudas</h2>
 
             <div className={styles.deudasContainer}>
               {deudas.map((deuda, index) => (
@@ -323,7 +323,7 @@ export default function CalculadoraDeudaPage() {
           </section>
 
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>💰 Pago Extra Mensual</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">💰</span> Pago Extra Mensual</h2>
             <p className={styles.sectionDesc}>
               ¿Cuánto dinero extra puedes destinar cada mes a pagar deudas (además de los mínimos)?
             </p>
@@ -343,7 +343,7 @@ export default function CalculadoraDeudaPage() {
             </div>
 
             <button type="button" onClick={calcular} className={styles.btnPrimary}>
-              📊 Comparar Métodos
+              <span aria-hidden="true">📊</span> Comparar Métodos
             </button>
           </section>
         </div>
@@ -371,14 +371,14 @@ export default function CalculadoraDeudaPage() {
               {/* Comparativa */}
               <section className={styles.comparativaSection}>
                 <h2 className={styles.sectionTitle}>
-                  {resultados.mismosResultados ? '📊 Tu Plan de Pago de Deudas' : '🏆 Comparativa de Métodos'}
+                  {resultados.mismosResultados ? <><span aria-hidden="true">📊</span> Tu Plan de Pago de Deudas</> : <><span aria-hidden="true">🏆</span> Comparativa de Métodos</>}
                 </h2>
 
                 {/* Cuando los resultados son idénticos, mostrar cuadro único */}
                 {resultados.mismosResultados ? (
                   <>
                     <div className={styles.mismosResultadosAviso}>
-                      <span className={styles.avisoIcono}>✨</span>
+                      <span className={styles.avisoIcono} aria-hidden="true">✨</span>
                       <div>
                         <strong>¡Buenas noticias!</strong>
                         <p>
@@ -414,7 +414,7 @@ export default function CalculadoraDeudaPage() {
                       </div>
 
                       <div className={styles.ordenPago}>
-                        <span className={styles.ordenTitulo}>📋 Tu orden óptimo de pago:</span>
+                        <span className={styles.ordenTitulo}><span aria-hidden="true">📋</span> Tu orden óptimo de pago:</span>
                         <ol className={styles.ordenLista}>
                           {resultados.metodos[0].deudas.map((d, index) => (
                             <li key={d.nombre}>
@@ -438,10 +438,10 @@ export default function CalculadoraDeudaPage() {
                           className={`${styles.metodoCard} ${metodo.nombre === resultados.mejorMetodo ? styles.metodoGanador : ''}`}
                         >
                           {metodo.nombre === resultados.mejorMetodo && (
-                            <span className={styles.metodoTag}>✨ Recomendado</span>
+                            <span className={styles.metodoTag}><span aria-hidden="true">✨</span> Recomendado</span>
                           )}
                           <h3 className={styles.metodoNombre}>
-                            {metodo.nombre === 'Bola de Nieve' ? '⚪' : '🏔️'} {metodo.nombre}
+                            <span aria-hidden="true">{metodo.nombre === 'Bola de Nieve' ? '⚪' : '🏔️'}</span> {metodo.nombre}
                           </h3>
                           <p className={styles.metodoDesc}>{metodo.descripcion}</p>
 
@@ -481,7 +481,7 @@ export default function CalculadoraDeudaPage() {
 
                     {resultados.diferencia > 10 && (
                       <div className={styles.veredicto}>
-                        <span className={styles.veredictoIcono}>💡</span>
+                        <span className={styles.veredictoIcono} aria-hidden="true">💡</span>
                         <p>
                           El método <strong>{resultados.mejorMetodo}</strong> implica{' '}
                           <strong>{formatCurrency(resultados.diferencia)}</strong> menos en intereses pagados.
@@ -494,7 +494,7 @@ export default function CalculadoraDeudaPage() {
 
                     {resultados.diferencia <= 10 && (
                       <div className={styles.veredicto}>
-                        <span className={styles.veredictoIcono}>🤝</span>
+                        <span className={styles.veredictoIcono} aria-hidden="true">🤝</span>
                         <p>
                           Ambos métodos son muy similares (diferencia de solo{' '}
                           <strong>{formatCurrency(resultados.diferencia)}</strong>).
@@ -510,7 +510,7 @@ export default function CalculadoraDeudaPage() {
               {/* Advertencia sin pago extra */}
               {parseSpanishNumber(pagoExtraMensual) === 0 && (
                 <section className={styles.advertenciaSection}>
-                  <h3>⚠️ Sin pago extra</h3>
+                  <h3><span aria-hidden="true">⚠️</span> Sin pago extra</h3>
                   <p>
                     Solo pagando los mínimos tardarás{' '}
                     <strong>
@@ -525,7 +525,7 @@ export default function CalculadoraDeudaPage() {
             </>
           ) : (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcono}>🎯</span>
+              <span className={styles.placeholderIcono} aria-hidden="true">🎯</span>
               <p>Añade tus deudas y el pago extra mensual</p>
               <p className={styles.placeholderTip}>
                 Te mostraremos el mejor camino para salir de deudas
@@ -550,7 +550,7 @@ export default function CalculadoraDeudaPage() {
       >
         <div className={styles.guideContent}>
           <section className={styles.guideSection}>
-            <h3>⚪ Método Bola de Nieve</h3>
+            <h3><span aria-hidden="true">⚪</span> Método Bola de Nieve</h3>
             <div className={styles.guideGrid}>
               <div className={styles.guideCard}>
                 <h4>Cómo funciona</h4>
@@ -573,7 +573,7 @@ export default function CalculadoraDeudaPage() {
           </section>
 
           <section className={styles.guideSection}>
-            <h3>🏔️ Método Avalancha</h3>
+            <h3><span aria-hidden="true">🏔️</span> Método Avalancha</h3>
             <div className={styles.guideGrid}>
               <div className={styles.guideCard}>
                 <h4>Cómo funciona</h4>
@@ -596,7 +596,7 @@ export default function CalculadoraDeudaPage() {
           </section>
 
           <section className={styles.guideSection}>
-            <h3>🤔 ¿Cuál elegir?</h3>
+            <h3><span aria-hidden="true">🤔</span> ¿Cuál elegir?</h3>
             <div className={styles.eleccionGrid}>
               <div className={styles.eleccionCard}>
                 <h4>Elige Bola de Nieve si...</h4>
@@ -620,7 +620,7 @@ export default function CalculadoraDeudaPage() {
           </section>
 
           <section className={styles.guideSection}>
-            <h3>💡 Consejos Adicionales</h3>
+            <h3><span aria-hidden="true">💡</span> Consejos Adicionales</h3>
             <ul className={styles.consejosList}>
               <li>
                 <strong>Asegura un colchón mínimo de liquidez:</strong> antes de destinar todo el excedente a deuda, conviene tener disponible al menos 1 mes de gastos fijos (alquiler/hipoteca, suministros, alimentación). En situaciones de mayor incertidumbre laboral, 3-6 meses suelen ser una referencia razonable.
@@ -642,14 +642,14 @@ export default function CalculadoraDeudaPage() {
 
           {/* Tabla comparativa */}
           <section className={styles.guideSection}>
-            <h3>📊 Comparativa: Bola de Nieve vs Avalancha vs Solo Mínimos</h3>
+            <h3><span aria-hidden="true">📊</span> Comparativa: Bola de Nieve vs Avalancha vs Solo Mínimos</h3>
             <div className={styles.tablaWrapper}>
               <table className={styles.tabla}>
                 <thead>
                   <tr>
                     <th>Criterio</th>
-                    <th>⚪ Bola de Nieve</th>
-                    <th>🏔️ Avalancha</th>
+                    <th><span aria-hidden="true">⚪</span> Bola de Nieve</th>
+                    <th><span aria-hidden="true">🏔️</span> Avalancha</th>
                     <th>Solo Mínimos</th>
                   </tr>
                 </thead>
@@ -692,7 +692,7 @@ export default function CalculadoraDeudaPage() {
 
           {/* Casos de uso */}
           <section className={styles.guideSection}>
-            <h3>🎯 Casos Reales</h3>
+            <h3><span aria-hidden="true">🎯</span> Casos Reales</h3>
             <div className={styles.casosGrid}>
               <div className={styles.casoCard}>
                 <span className={styles.casoIcono} aria-hidden="true">💳</span>
@@ -719,7 +719,7 @@ export default function CalculadoraDeudaPage() {
 
           {/* FAQ */}
           <section className={styles.guideSection}>
-            <h3>❓ Preguntas Frecuentes</h3>
+            <h3><span aria-hidden="true">❓</span> Preguntas Frecuentes</h3>
             <div className={styles.faqGrid}>
               <div className={styles.faqItem}>
                 <h4>¿Qué pasa si solo pago el mínimo de la tarjeta?</h4>

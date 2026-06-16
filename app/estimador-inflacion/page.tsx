@@ -306,16 +306,18 @@ export default function CalculadoraInflacionPage() {
           type="button"
           onClick={() => setModo('calculadora')}
           className={`${styles.modoBtn} ${modo === 'calculadora' ? styles.modoActivo : ''}`}
+          aria-pressed={modo === 'calculadora'}
         >
-          <span className={styles.modoIcon}>🧮</span>
+          <span className={styles.modoIcon} aria-hidden="true">🧮</span>
           <span className={styles.modoNombre}>Calculadora</span>
         </button>
         <button
           type="button"
           onClick={() => setModo('comparador')}
           className={`${styles.modoBtn} ${modo === 'comparador' ? styles.modoActivo : ''}`}
+          aria-pressed={modo === 'comparador'}
         >
-          <span className={styles.modoIcon}>📊</span>
+          <span className={styles.modoIcon} aria-hidden="true">📊</span>
           <span className={styles.modoNombre}>Comparador</span>
         </button>
       </div>
@@ -353,6 +355,7 @@ export default function CalculadoraInflacionPage() {
             </div>
 
             <button
+              type="button"
               onClick={intercambiarAños}
               className={styles.swapButton}
               title="Intercambiar años"
@@ -379,16 +382,16 @@ export default function CalculadoraInflacionPage() {
           <div className={styles.presets}>
             <span className={styles.presetsLabel}>Comparar con:</span>
             <div className={styles.presetButtons}>
-              <button onClick={() => { setAñoOrigen(2000); setAñoDestino(2025); }} className={styles.presetBtn}>
+              <button type="button" onClick={() => { setAñoOrigen(2000); setAñoDestino(2025); }} className={styles.presetBtn}>
                 2000 → Hoy
               </button>
-              <button onClick={() => { setAñoOrigen(2010); setAñoDestino(2025); }} className={styles.presetBtn}>
+              <button type="button" onClick={() => { setAñoOrigen(2010); setAñoDestino(2025); }} className={styles.presetBtn}>
                 2010 → Hoy
               </button>
-              <button onClick={() => { setAñoOrigen(2020); setAñoDestino(2025); }} className={styles.presetBtn}>
+              <button type="button" onClick={() => { setAñoOrigen(2020); setAñoDestino(2025); }} className={styles.presetBtn}>
                 2020 → Hoy
               </button>
-              <button onClick={() => { setAñoOrigen(2002); setAñoDestino(2025); }} className={styles.presetBtn}>
+              <button type="button" onClick={() => { setAñoOrigen(2002); setAñoDestino(2025); }} className={styles.presetBtn}>
                 Euro → Hoy
               </button>
             </div>
@@ -689,6 +692,7 @@ export default function CalculadoraInflacionPage() {
           {ejemplosHistoricos.map((item) => (
             <button
               key={item.año}
+              type="button"
               onClick={() => { setAñoOrigen(item.año); setAñoDestino(2025); }}
               className={styles.timelineCard}
             >

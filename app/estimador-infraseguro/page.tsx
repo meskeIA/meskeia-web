@@ -82,7 +82,7 @@ export default function CalculadoraInfraseguroPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>⚖️</span>
+        <span className={styles.heroIcon} aria-hidden="true">⚖️</span>
         <h1 className={styles.title}>Estimador de Infraseguro</h1>
         <p className={styles.subtitle}>
           Descubre cuánto cobrarías realmente en caso de siniestro si tu seguro no cubre el valor total
@@ -126,8 +126,8 @@ export default function CalculadoraInfraseguroPage() {
             />
           </div>
 
-          <button onClick={limpiarFormulario} className={styles.btnSecondary}>
-            🔄 Limpiar
+          <button type="button" onClick={limpiarFormulario} className={styles.btnSecondary}>
+            <span aria-hidden="true">🔄</span> Limpiar
           </button>
         </div>
 
@@ -163,7 +163,7 @@ export default function CalculadoraInfraseguroPage() {
 
               {/* Visualización de la fórmula */}
               <div className={styles.formulaBox}>
-                <h3>📐 Cálculo aplicado (Regla Proporcional)</h3>
+                <h3><span aria-hidden="true">📐</span> Cálculo aplicado (Regla Proporcional)</h3>
                 <div className={styles.formula}>
                   <div className={styles.formulaFraccion}>
                     <span className={styles.formulaNumerador}>{formatCurrency(parseSpanishNumber(capitalAsegurado) || 0)}</span>
@@ -182,7 +182,7 @@ export default function CalculadoraInfraseguroPage() {
 
               {/* Recomendación */}
               <div className={`${styles.recomendacion} ${resultado.hayInfraseguro ? styles.recomendacionWarning : styles.recomendacionSuccess}`}>
-                <h3>{resultado.hayInfraseguro ? '⚠️ Recomendación' : '✅ Buenas noticias'}</h3>
+                <h3><span aria-hidden="true">{resultado.hayInfraseguro ? '⚠️' : '✅'}</span> {resultado.hayInfraseguro ? 'Recomendación' : 'Buenas noticias'}</h3>
                 <p>{resultado.recomendacion}</p>
               </div>
 
@@ -239,7 +239,7 @@ export default function CalculadoraInfraseguroPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>📜 Base legal</h4>
+              <h4><span aria-hidden="true">📜</span> Base legal</h4>
               <p>
                 El artículo 30 de la Ley 50/1980 de Contrato de Seguro establece que si el valor del interés
                 asegurado es superior a la suma asegurada, el asegurador indemnizará el daño causado en la
@@ -247,7 +247,7 @@ export default function CalculadoraInfraseguroPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>⚖️ La regla proporcional</h4>
+              <h4><span aria-hidden="true">⚖️</span> La regla proporcional</h4>
               <p>
                 Si tienes asegurado el 70% del valor real, solo cobrarás el 70% de cualquier daño.
                 Aunque el siniestro sea parcial y no supere el capital asegurado, se aplica igualmente
@@ -559,7 +559,7 @@ export default function CalculadoraInfraseguroPage() {
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores comunes que generan infraseguro sin saberlo</strong>
           </div>
           <ul className={styles.warningList}>

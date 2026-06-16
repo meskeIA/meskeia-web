@@ -112,7 +112,7 @@ export default function CalculadoraCostePlazosPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>💳</span>
+        <span className={styles.heroIcon} aria-hidden="true">💳</span>
         <h1 className={styles.title}>Estimador Coste Real a Plazos</h1>
         <p className={styles.subtitle}>
           Descubre cuánto pagas realmente al financiar un producto. Calcula la TAE y los intereses ocultos.
@@ -125,7 +125,7 @@ export default function CalculadoraCostePlazosPage() {
         {/* Panel de entrada */}
         <div className={styles.inputPanel}>
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>📊 Datos de la Financiación</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">📊</span> Datos de la Financiación</h2>
 
             <div className={styles.formGrid}>
               <div className={styles.formGroup}>
@@ -197,22 +197,23 @@ export default function CalculadoraCostePlazosPage() {
             </div>
 
             <div className={styles.actions}>
-              <button onClick={calcular} className={styles.btnPrimary}>
-                🔍 Calcular Coste Real
+              <button type="button" onClick={calcular} className={styles.btnPrimary}>
+                <span aria-hidden="true">🔍</span> Calcular Coste Real
               </button>
-              <button onClick={limpiar} className={styles.btnSecondary}>
-                🗑️ Limpiar
+              <button type="button" onClick={limpiar} className={styles.btnSecondary}>
+                <span aria-hidden="true">🗑️</span> Limpiar
               </button>
             </div>
           </section>
 
           {/* Ejemplos */}
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>📱 Ejemplos Comunes</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">📱</span> Ejemplos Comunes</h2>
             <div className={styles.ejemplosGrid}>
               {ejemplos.map((ejemplo, i) => (
                 <button
                   key={i}
+                  type="button"
                   onClick={() => cargarEjemplo(ejemplo)}
                   className={styles.ejemploBtn}
                 >
@@ -230,7 +231,7 @@ export default function CalculadoraCostePlazosPage() {
           {resultado ? (
             <>
               <section className={styles.resultSection}>
-                <h2 className={styles.sectionTitle}>💰 Resultado del Análisis</h2>
+                <h2 className={styles.sectionTitle}><span aria-hidden="true">💰</span> Resultado del Análisis</h2>
 
                 <div className={styles.comparativa}>
                   <div className={styles.comparativaItem}>
@@ -245,7 +246,7 @@ export default function CalculadoraCostePlazosPage() {
                 </div>
 
                 <div className={styles.resultadoDestacado}>
-                  <div className={styles.resultadoIcono}>⚠️</div>
+                  <div className={styles.resultadoIcono} aria-hidden="true">⚠️</div>
                   <div className={styles.resultadoTexto}>
                     <span className={styles.resultadoEtiqueta}>Coste de la financiación</span>
                     <span className={styles.resultadoCantidad}>
@@ -262,7 +263,7 @@ export default function CalculadoraCostePlazosPage() {
 
                 <div className={styles.detallesGrid}>
                   <div className={styles.detalleItem}>
-                    <span className={styles.detalleIcono}>📊</span>
+                    <span className={styles.detalleIcono} aria-hidden="true">📊</span>
                     <span className={styles.detalleLabel}>TAE aproximada</span>
                     <span className={styles.detalleValor}>
                       {resultado.taeAproximada > 0
@@ -272,7 +273,7 @@ export default function CalculadoraCostePlazosPage() {
                     </span>
                   </div>
                   <div className={styles.detalleItem}>
-                    <span className={styles.detalleIcono}>📅</span>
+                    <span className={styles.detalleIcono} aria-hidden="true">📅</span>
                     <span className={styles.detalleLabel}>Cuota mensual</span>
                     <span className={styles.detalleValor}>{formatCurrency(resultado.cuotaMensual)}</span>
                   </div>
@@ -281,7 +282,7 @@ export default function CalculadoraCostePlazosPage() {
 
               {resultado.costeFinanciacion > 0 && (
                 <section className={styles.consejoSection}>
-                  <h3>💡 ¿Merece la pena financiar?</h3>
+                  <h3><span aria-hidden="true">💡</span> ¿Merece la pena financiar?</h3>
                   <ul className={styles.consejoLista}>
                     {resultado.taeAproximada > 20 && (
                       <li className={styles.consejoAlerta}>
@@ -379,7 +380,7 @@ export default function CalculadoraCostePlazosPage() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>📱</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">📱</span>
               <strong>Compra de tecnología</strong>
             </div>
             <p>Móviles, portátiles y televisores suelen ofrecerse con financiación a 12-24 meses. La TAE puede superar el 20%.</p>
@@ -388,7 +389,7 @@ export default function CalculadoraCostePlazosPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🛋️</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🛋️</span>
               <strong>Electrodomésticos y hogar</strong>
             </div>
             <p>Las grandes superficies ofrecen &quot;sin intereses&quot; pero con seguros obligatorios o comisiones de apertura que elevan la TAE real.</p>
@@ -397,7 +398,7 @@ export default function CalculadoraCostePlazosPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🚗</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🚗</span>
               <strong>Vehículos y motos</strong>
             </div>
             <p>Los préstamos de concesionario suelen tener TAE entre el 6% y el 12%. Compara siempre con un préstamo personal de banco.</p>
@@ -477,27 +478,27 @@ export default function CalculadoraCostePlazosPage() {
         {/* Mejores prácticas */}
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔍</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔍</span>
             <strong>Siempre compara la TAE</strong>
             <p>Es el único indicador legal que permite comparar financiaciones de forma justa.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📋</span>
+            <span className={styles.tipIcon} aria-hidden="true">📋</span>
             <strong>Lee el contrato completo</strong>
             <p>Seguros obligatorios, comisiones de gestión y penalizaciones aparecen en la letra pequeña.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>💰</span>
+            <span className={styles.tipIcon} aria-hidden="true">💰</span>
             <strong>Menos meses = menos intereses</strong>
             <p>Si puedes asumir una cuota mayor, reduce el plazo para pagar menos en total.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🏦</span>
+            <span className={styles.tipIcon} aria-hidden="true">🏦</span>
             <strong>Compara con tu banco</strong>
             <p>Un préstamo personal de tu banco suele ser más barato que la financiación del punto de venta.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📅</span>
+            <span className={styles.tipIcon} aria-hidden="true">📅</span>
             <strong>Calcula el coste mensual real</strong>
             <p>Divide el coste total de financiación entre los meses. Así ves lo que pagas de más cada mes.</p>
           </div>
@@ -506,7 +507,7 @@ export default function CalculadoraCostePlazosPage() {
         {/* Warning box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores frecuentes al financiar compras</strong>
           </div>
           <ul className={styles.warningList}>
