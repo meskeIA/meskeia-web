@@ -198,7 +198,7 @@ export default function GeneradorPalabrasClavePage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🔑 Generador de Palabras Clave</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🔑</span> Generador de Palabras Clave</h1>
         <p className={styles.subtitle}>
           Genera cientos de ideas de keywords long-tail para tu estrategia SEO
         </p>
@@ -216,7 +216,7 @@ export default function GeneradorPalabrasClavePage() {
       <div className={styles.mainContent}>
         {/* Panel de entrada */}
         <div className={styles.inputPanel}>
-          <h2 className={styles.panelTitle}>🌱 Palabra clave semilla</h2>
+          <h2 className={styles.panelTitle}><span aria-hidden="true">🌱</span> Palabra clave semilla</h2>
 
           <div className={styles.inputGroup}>
             <input
@@ -256,11 +256,11 @@ export default function GeneradorPalabrasClavePage() {
 
           {totalKeywords > 0 && (
             <div className={styles.actions}>
-              <button onClick={copiarTodas} className={styles.btnPrimary}>
+              <button type="button" onClick={copiarTodas} className={styles.btnPrimary}>
                 {copiado ? '✅ Copiadas!' : `📋 Copiar todas (${totalKeywords})`}
               </button>
-              <button onClick={exportarCSV} className={styles.btnSecondary}>
-                📥 Exportar CSV
+              <button type="button" onClick={exportarCSV} className={styles.btnSecondary}>
+                <span aria-hidden="true">📥</span> Exportar CSV
               </button>
             </div>
           )}
@@ -272,7 +272,7 @@ export default function GeneradorPalabrasClavePage() {
             <>
               <div className={styles.resultsHeader}>
                 <h2 className={styles.panelTitle}>
-                  🎯 {totalKeywords} keywords generadas
+                  <span aria-hidden="true">🎯</span> {totalKeywords} keywords generadas
                 </h2>
               </div>
 
@@ -280,10 +280,11 @@ export default function GeneradorPalabrasClavePage() {
                 {keywords.map((grupo) => (
                   <div key={grupo.categoria} className={styles.keywordGroup}>
                     <div className={styles.groupHeader}>
-                      <span className={styles.groupIcon}>{grupo.icono}</span>
+                      <span className={styles.groupIcon} aria-hidden="true">{grupo.icono}</span>
                       <span className={styles.groupTitle}>{grupo.categoria}</span>
                       <span className={styles.groupCount}>{grupo.keywords.length}</span>
                       <button
+                        type="button"
                         onClick={() => copiarGrupo(grupo.keywords)}
                         className={styles.copyGroupBtn}
                         title="Copiar grupo"
@@ -304,13 +305,13 @@ export default function GeneradorPalabrasClavePage() {
             </>
           ) : (
             <div className={styles.placeholder}>
-              <div className={styles.placeholderIcon}>🔑</div>
+              <div className={styles.placeholderIcon} aria-hidden="true">🔑</div>
               <p>Introduce una palabra clave semilla para generar ideas</p>
               <div className={styles.examples}>
                 <span>Ejemplos:</span>
-                <button onClick={() => setSemilla('marketing digital')}>marketing digital</button>
-                <button onClick={() => setSemilla('recetas')}>recetas</button>
-                <button onClick={() => setSemilla('inversiones')}>inversiones</button>
+                <button type="button" onClick={() => setSemilla('marketing digital')}>marketing digital</button>
+                <button type="button" onClick={() => setSemilla('recetas')}>recetas</button>
+                <button type="button" onClick={() => setSemilla('inversiones')}>inversiones</button>
               </div>
             </div>
           )}
@@ -319,25 +320,25 @@ export default function GeneradorPalabrasClavePage() {
 
       {/* Tips rápidos */}
       <div className={styles.tipsSection}>
-        <h3>💡 Cómo usar estas keywords</h3>
+        <h3><span aria-hidden="true">💡</span> Cómo usar estas keywords</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📝</span>
+            <span className={styles.tipIcon} aria-hidden="true">📝</span>
             <h4>Crea contenido</h4>
             <p>Usa las preguntas como títulos de artículos o secciones FAQ</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔍</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔍</span>
             <h4>Valida en Google</h4>
             <p>Busca cada keyword y mira los resultados de autocompletado</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📊</span>
+            <span className={styles.tipIcon} aria-hidden="true">📊</span>
             <h4>Agrupa por intención</h4>
             <p>Separa informacionales, transaccionales y navegacionales</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🎯</span>
+            <span className={styles.tipIcon} aria-hidden="true">🎯</span>
             <h4>Prioriza long-tail</h4>
             <p>Las keywords de 3+ palabras tienen menos competencia</p>
           </div>
@@ -490,7 +491,7 @@ export default function GeneradorPalabrasClavePage() {
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🛒</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🛒</span>
                   <h4>Tienda online / E-commerce</h4>
                 </div>
                 <p>Prioriza keywords transaccionales y de producto con modificadores de compra.</p>
@@ -506,7 +507,7 @@ export default function GeneradorPalabrasClavePage() {
 
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>✍️</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">✍️</span>
                   <h4>Blog de contenidos</h4>
                 </div>
                 <p>Apuesta por keywords informacionales long-tail para artículos de fondo (pillar content).</p>
@@ -523,7 +524,7 @@ export default function GeneradorPalabrasClavePage() {
 
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>📍</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">📍</span>
                   <h4>Negocio local</h4>
                 </div>
                 <p>Combina keywords de servicio + ciudad. Google My Business potencia estas búsquedas.</p>
@@ -539,7 +540,7 @@ export default function GeneradorPalabrasClavePage() {
 
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>💼</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">💼</span>
                   <h4>Freelancer / Consultor</h4>
                 </div>
                 <p>Combina tu especialidad + tipo de cliente + resultado esperado. Menos volumen, más calidad.</p>
@@ -751,7 +752,7 @@ export default function GeneradorPalabrasClavePage() {
             <h2>Mejores prácticas con datos concretos</h2>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📊</span>
+                <span className={styles.tipIcon} aria-hidden="true">📊</span>
                 <h4>Apunta a posición 1-3</h4>
                 <p>
                   El CTR cae drásticamente: posición 1 capta el 27,6% de los clics,
@@ -760,7 +761,7 @@ export default function GeneradorPalabrasClavePage() {
                 </p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🎯</span>
+                <span className={styles.tipIcon} aria-hidden="true">🎯</span>
                 <h4>Long-tail primero</h4>
                 <p>
                   El 70% de las búsquedas son long-tail. Una keyword de 4 palabras
@@ -769,7 +770,7 @@ export default function GeneradorPalabrasClavePage() {
                 </p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>✍️</span>
+                <span className={styles.tipIcon} aria-hidden="true">✍️</span>
                 <h4>Densidad entre 0,5% y 2%</h4>
                 <p>
                   Un artículo de 1.500 palabras debe mencionar la keyword principal
@@ -778,7 +779,7 @@ export default function GeneradorPalabrasClavePage() {
                 </p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🔗</span>
+                <span className={styles.tipIcon} aria-hidden="true">🔗</span>
                 <h4>Internal linking con anchor text</h4>
                 <p>
                   Enlaza internamente usando la keyword exacta como anchor text. Las
@@ -787,7 +788,7 @@ export default function GeneradorPalabrasClavePage() {
                 </p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📱</span>
+                <span className={styles.tipIcon} aria-hidden="true">📱</span>
                 <h4>Mobile-first en búsquedas locales</h4>
                 <p>
                   El 61% de las búsquedas locales en España se realizan desde móvil.
@@ -796,7 +797,7 @@ export default function GeneradorPalabrasClavePage() {
                 </p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🔄</span>
+                <span className={styles.tipIcon} aria-hidden="true">🔄</span>
                 <h4>Actualiza tu research cada 6 meses</h4>
                 <p>
                   Los volúmenes de búsqueda cambian con tendencias, estacionalidad
@@ -811,7 +812,7 @@ export default function GeneradorPalabrasClavePage() {
           <section className={styles.eduSection}>
             <div className={styles.warningBox}>
               <div className={styles.warningHeader}>
-                <span className={styles.warningIcon}>⚠️</span>
+                <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
                 <h3>Errores comunes en keyword research que debes evitar</h3>
               </div>
               <ul className={styles.warningList}>

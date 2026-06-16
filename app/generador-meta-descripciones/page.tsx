@@ -200,7 +200,7 @@ export default function GeneradorMetaDescripcionesPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🔍 Generador de Meta Descripciones</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🔍</span> Generador de Meta Descripciones</h1>
         <p className={styles.subtitle}>
           Crea meta descripciones optimizadas para SEO con vista previa de Google
         </p>
@@ -218,7 +218,7 @@ export default function GeneradorMetaDescripcionesPage() {
       <div className={styles.mainContent}>
         {/* Panel de edición */}
         <div className={styles.editorPanel}>
-          <h2 className={styles.panelTitle}>✏️ Editor</h2>
+          <h2 className={styles.panelTitle}><span aria-hidden="true">✏️</span> Editor</h2>
 
           {/* Plantillas */}
           <div className={styles.templatesSection}>
@@ -227,10 +227,12 @@ export default function GeneradorMetaDescripcionesPage() {
               {Object.entries(PLANTILLAS).map(([key, plantilla]) => (
                 <button
                   key={key}
+                  type="button"
                   onClick={() => aplicarPlantilla(key)}
                   className={`${styles.templateBtn} ${plantillaActiva === key ? styles.active : ''}`}
+                  aria-pressed={plantillaActiva === key}
                 >
-                  <span className={styles.templateIcon}>{plantilla.icono}</span>
+                  <span className={styles.templateIcon} aria-hidden="true">{plantilla.icono}</span>
                   <span>{plantilla.nombre}</span>
                 </button>
               ))}
@@ -296,10 +298,10 @@ export default function GeneradorMetaDescripcionesPage() {
 
           {/* Botones de acción */}
           <div className={styles.actions}>
-            <button onClick={copiarDescripcion} className={styles.btnPrimary} disabled={!descripcion}>
+            <button type="button" onClick={copiarDescripcion} className={styles.btnPrimary} disabled={!descripcion}>
               📋 Copiar descripción
             </button>
-            <button onClick={copiarHTML} className={styles.btnSecondary} disabled={!descripcion}>
+            <button type="button" onClick={copiarHTML} className={styles.btnSecondary} disabled={!descripcion}>
               {'<>'} Copiar HTML
             </button>
           </div>
@@ -307,7 +309,7 @@ export default function GeneradorMetaDescripcionesPage() {
 
         {/* Panel de vista previa */}
         <div className={styles.previewPanel}>
-          <h2 className={styles.panelTitle}>👁️ Vista Previa en Google</h2>
+          <h2 className={styles.panelTitle}><span aria-hidden="true">👁️</span> Vista Previa en Google</h2>
 
           {/* SERP Preview */}
           <div className={styles.serpPreview}>
@@ -327,26 +329,26 @@ export default function GeneradorMetaDescripcionesPage() {
 
           {/* Checklist SEO */}
           <div className={styles.checklistSection}>
-            <h3 className={styles.checklistTitle}>✅ Checklist SEO</h3>
+            <h3 className={styles.checklistTitle}><span aria-hidden="true">✅</span> Checklist SEO</h3>
             <div className={styles.checklist}>
               <div className={`${styles.checkItem} ${analisis.estado === 'optimo' ? styles.passed : styles.failed}`}>
-                <span className={styles.checkIcon}>{analisis.estado === 'optimo' ? '✓' : '✗'}</span>
+                <span className={styles.checkIcon} aria-hidden="true">{analisis.estado === 'optimo' ? '✓' : '✗'}</span>
                 <span>Longitud óptima (120-160 caracteres)</span>
               </div>
               <div className={`${styles.checkItem} ${analisis.tieneCallToAction ? styles.passed : styles.failed}`}>
-                <span className={styles.checkIcon}>{analisis.tieneCallToAction ? '✓' : '✗'}</span>
+                <span className={styles.checkIcon} aria-hidden="true">{analisis.tieneCallToAction ? '✓' : '✗'}</span>
                 <span>Incluye llamada a la acción (CTA)</span>
               </div>
               <div className={`${styles.checkItem} ${analisis.tieneNumeros ? styles.passed : styles.failed}`}>
-                <span className={styles.checkIcon}>{analisis.tieneNumeros ? '✓' : '✗'}</span>
+                <span className={styles.checkIcon} aria-hidden="true">{analisis.tieneNumeros ? '✓' : '✗'}</span>
                 <span>Contiene números (mejora CTR)</span>
               </div>
               <div className={`${styles.checkItem} ${analisis.tieneBeneficios ? styles.passed : styles.failed}`}>
-                <span className={styles.checkIcon}>{analisis.tieneBeneficios ? '✓' : '✗'}</span>
+                <span className={styles.checkIcon} aria-hidden="true">{analisis.tieneBeneficios ? '✓' : '✗'}</span>
                 <span>Menciona beneficios clave</span>
               </div>
               <div className={`${styles.checkItem} ${analisis.tieneEmojis ? styles.passed : styles.warning}`}>
-                <span className={styles.checkIcon}>{analisis.tieneEmojis ? '✓' : '○'}</span>
+                <span className={styles.checkIcon} aria-hidden="true">{analisis.tieneEmojis ? '✓' : '○'}</span>
                 <span>Usa emojis/símbolos (opcional)</span>
               </div>
             </div>
@@ -356,7 +358,7 @@ export default function GeneradorMetaDescripcionesPage() {
           {descripcion && htmlCode && (
             <div className={styles.codeSection}>
               <div className={styles.htmlHeader}>
-                <h3 className={styles.codeTitle}>📄 Código HTML para implementar</h3>
+                <h3 className={styles.codeTitle}><span aria-hidden="true">📄</span> Código HTML para implementar</h3>
                 <button
                   type="button"
                   onClick={() => setHtmlExpanded(!htmlExpanded)}
@@ -399,7 +401,7 @@ export default function GeneradorMetaDescripcionesPage() {
 
           {/* Tabla comparativa por tipo de página */}
           <section className={styles.eduSection}>
-            <h2>📊 Comparativa: Estrategias por Tipo de Página</h2>
+            <h2><span aria-hidden="true">📊</span> Comparativa: Estrategias por Tipo de Página</h2>
             <div className={styles.tableWrapper}>
               <table className={styles.comparativaTable}>
                 <thead>
@@ -412,37 +414,37 @@ export default function GeneradorMetaDescripcionesPage() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td><strong>🛍️ Producto/E-commerce</strong></td>
+                    <td><strong><span aria-hidden="true">🛍️</span> Producto/E-commerce</strong></td>
                     <td>Enfatizar beneficios y urgencia</td>
                     <td>Precio, descuento, envío gratis, garantía</td>
                     <td>Especificaciones técnicas excesivas</td>
                   </tr>
                   <tr>
-                    <td><strong>📝 Blog/Artículo</strong></td>
+                    <td><strong><span aria-hidden="true">📝</span> Blog/Artículo</strong></td>
                     <td>Destacar aprendizaje y valor</td>
                     <td>Número de consejos, guía completa, paso a paso</td>
                     <td>Clickbait engañoso</td>
                   </tr>
                   <tr>
-                    <td><strong>🎯 Landing Page</strong></td>
+                    <td><strong><span aria-hidden="true">🎯</span> Landing Page</strong></td>
                     <td>Propuesta de valor única (UVP)</td>
                     <td>Beneficio principal, número de usuarios, prueba social</td>
                     <td>Descripciones genéricas</td>
                   </tr>
                   <tr>
-                    <td><strong>📍 Negocio Local</strong></td>
+                    <td><strong><span aria-hidden="true">📍</span> Negocio Local</strong></td>
                     <td>Ubicación y confianza</td>
                     <td>Ciudad, años de experiencia, valoraciones, contacto</td>
                     <td>Información irrelevante para búsqueda local</td>
                   </tr>
                   <tr>
-                    <td><strong>⚖️ Comparativa</strong></td>
+                    <td><strong><span aria-hidden="true">⚖️</span> Comparativa</strong></td>
                     <td>Análisis objetivo y actualización</td>
                     <td>Año actual, aspectos analizados, imparcialidad</td>
                     <td>Favorecer claramente una opción</td>
                   </tr>
                   <tr>
-                    <td><strong>🏘️ Categoría</strong></td>
+                    <td><strong><span aria-hidden="true">🏘️</span> Categoría</strong></td>
                     <td>Variedad y facilidad</td>
                     <td>Número de productos, marcas, devolución fácil</td>
                     <td>Mencionar productos específicos</td>
@@ -454,11 +456,11 @@ export default function GeneradorMetaDescripcionesPage() {
 
           {/* Casos de uso prácticos */}
           <section className={styles.eduSection}>
-            <h2>💼 Casos de Uso Prácticos con Ejemplos</h2>
+            <h2><span aria-hidden="true">💼</span> Casos de Uso Prácticos con Ejemplos</h2>
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🛍️</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🛍️</span>
                   <h3>E-commerce: Ficha de Producto</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -476,7 +478,7 @@ export default function GeneradorMetaDescripcionesPage() {
 
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>📝</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">📝</span>
                   <h3>Blog: Artículo Educativo</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -494,7 +496,7 @@ export default function GeneradorMetaDescripcionesPage() {
 
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🎯</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🎯</span>
                   <h3>SaaS: Landing Page</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -512,7 +514,7 @@ export default function GeneradorMetaDescripcionesPage() {
 
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>📍</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">📍</span>
                   <h3>Negocio Local: Servicio</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -530,7 +532,7 @@ export default function GeneradorMetaDescripcionesPage() {
 
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>⚖️</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">⚖️</span>
                   <h3>Comparativa: Review</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -548,7 +550,7 @@ export default function GeneradorMetaDescripcionesPage() {
 
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🏘️</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🏘️</span>
                   <h3>Categoría: E-commerce</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -568,7 +570,7 @@ export default function GeneradorMetaDescripcionesPage() {
 
           {/* FAQ Ampliado */}
           <section className={styles.eduSection}>
-            <h2>❓ Preguntas Frecuentes (FAQ)</h2>
+            <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes (FAQ)</h2>
             <div className={styles.faqList}>
               <div className={styles.faqItem}>
                 <h4>¿Cuál es la longitud ideal de una meta descripción en 2026?</h4>
@@ -659,32 +661,32 @@ export default function GeneradorMetaDescripcionesPage() {
             <h2>Mejores prácticas</h2>
             <div className={styles.practicesList}>
               <div className={styles.practiceCard}>
-                <span className={styles.practiceIcon}>📏</span>
+                <span className={styles.practiceIcon} aria-hidden="true">📏</span>
                 <h4>Longitud ideal: 150-160 caracteres</h4>
                 <p>Google trunca descripciones largas. Mantén el mensaje clave al principio.</p>
               </div>
               <div className={styles.practiceCard}>
-                <span className={styles.practiceIcon}>🎯</span>
+                <span className={styles.practiceIcon} aria-hidden="true">🎯</span>
                 <h4>Incluye la palabra clave principal</h4>
                 <p>Google resalta en negrita las coincidencias con la búsqueda del usuario.</p>
               </div>
               <div className={styles.practiceCard}>
-                <span className={styles.practiceIcon}>💡</span>
+                <span className={styles.practiceIcon} aria-hidden="true">💡</span>
                 <h4>Propuesta de valor clara</h4>
                 <p>¿Por qué el usuario debería hacer clic? Responde esta pregunta.</p>
               </div>
               <div className={styles.practiceCard}>
-                <span className={styles.practiceIcon}>🔥</span>
+                <span className={styles.practiceIcon} aria-hidden="true">🔥</span>
                 <h4>Llamada a la acción (CTA)</h4>
                 <p>Usa verbos de acción: Descubre, Aprende, Compra, Obtén...</p>
               </div>
               <div className={styles.practiceCard}>
-                <span className={styles.practiceIcon}>🔢</span>
+                <span className={styles.practiceIcon} aria-hidden="true">🔢</span>
                 <h4>Usa números y datos</h4>
                 <p>Los números captan la atención: "15 consejos", "50% descuento", "2.000+ clientes"</p>
               </div>
               <div className={styles.practiceCard}>
-                <span className={styles.practiceIcon}>✨</span>
+                <span className={styles.practiceIcon} aria-hidden="true">✨</span>
                 <h4>Única para cada página</h4>
                 <p>Evita duplicar descripciones. Cada página debe tener la suya propia.</p>
               </div>
@@ -693,7 +695,7 @@ export default function GeneradorMetaDescripcionesPage() {
 
           {/* Guía paso a paso */}
           <section className={styles.eduSection}>
-            <h2>📋 Guía Paso a Paso: Cómo Escribir la Meta Descripción Perfecta</h2>
+            <h2><span aria-hidden="true">📋</span> Guía Paso a Paso: Cómo Escribir la Meta Descripción Perfecta</h2>
             <div className={styles.stepGuide}>
               <div className={styles.step}>
                 <div className={styles.stepNumber}>1</div>
@@ -786,7 +788,7 @@ export default function GeneradorMetaDescripcionesPage() {
           <section className={styles.eduSection}>
             <div className={styles.warningBox}>
               <div className={styles.warningHeader}>
-                <span className={styles.warningIcon}>⚠️</span>
+                <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
                 <h3>Errores Comunes que Destruyen tu CTR</h3>
               </div>
               <ul className={styles.warningList}>

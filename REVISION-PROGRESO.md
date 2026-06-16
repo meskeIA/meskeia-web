@@ -358,10 +358,10 @@
 | [x] | Generador de Enlaces UTM | `/generador-utm/` | diseno |
 | [x] | Generador de Gradientes | `/generador-gradientes/` | diseno |
 | [x] | Generador de Hashtags | `/generador-hashtags/` | diseno |
-| [ ] | Generador de Iconos PWA | `/generador-iconos/` | diseno |
-| [ ] | Generador de Meta Descripciones | `/generador-meta-descripciones/` | diseno |
-| [ ] | Generador de Nombres | `/generador-nombres-empresa/` | diseno, freelance |
-| [ ] | Generador de Palabras Clave | `/generador-palabras-clave/` | diseno |
+| [x] | Generador de Iconos PWA | `/generador-iconos/` | diseno |
+| [x] | Generador de Meta Descripciones | `/generador-meta-descripciones/` | diseno |
+| [x] | Generador de Nombres | `/generador-nombres-empresa/` | diseno, freelance |
+| [x] | Generador de Palabras Clave | `/generador-palabras-clave/` | diseno |
 | [ ] | Generador de Schema Markup | `/generador-schema-markup/` | diseno |
 | [ ] | Generador de Sombras | `/generador-sombras/` | diseno |
 | [ ] | Generador de Tipografías | `/generador-tipografias/` | diseno |

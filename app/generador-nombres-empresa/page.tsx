@@ -172,7 +172,7 @@ export default function GeneradorNombresEmpresaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🏢 Generador de Nombres de Empresa</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🏢</span> Generador de Nombres de Empresa</h1>
         <p className={styles.subtitle}>
           Encuentra el nombre perfecto para tu negocio. Genera ideas creativas y verifica dominios disponibles.
         </p>
@@ -192,17 +192,19 @@ export default function GeneradorNombresEmpresaPage() {
               {Object.keys(diccionarios).map((s) => (
                 <button
                   key={s}
+                  type="button"
                   className={`${styles.sectorBtn} ${sector === s ? styles.sectorActivo : ''}`}
                   onClick={() => setSector(s as Sector)}
+                  aria-pressed={sector === s}
                 >
-                  {s === 'tecnologia' && '💻'}
-                  {s === 'salud' && '🏥'}
-                  {s === 'finanzas' && '💰'}
-                  {s === 'creatividad' && '🎨'}
-                  {s === 'ecommerce' && '🛒'}
-                  {s === 'alimentacion' && '🍽️'}
-                  {s === 'educacion' && '📚'}
-                  {s === 'servicios' && '🔧'}
+                  {s === 'tecnologia' && <span aria-hidden="true">💻</span>}
+                  {s === 'salud' && <span aria-hidden="true">🏥</span>}
+                  {s === 'finanzas' && <span aria-hidden="true">💰</span>}
+                  {s === 'creatividad' && <span aria-hidden="true">🎨</span>}
+                  {s === 'ecommerce' && <span aria-hidden="true">🛒</span>}
+                  {s === 'alimentacion' && <span aria-hidden="true">🍽️</span>}
+                  {s === 'educacion' && <span aria-hidden="true">📚</span>}
+                  {s === 'servicios' && <span aria-hidden="true">🔧</span>}
                   <span>{s.charAt(0).toUpperCase() + s.slice(1)}</span>
                 </button>
               ))}
@@ -216,8 +218,10 @@ export default function GeneradorNombresEmpresaPage() {
               {Object.entries(estilos).map(([key, value]) => (
                 <button
                   key={key}
+                  type="button"
                   className={`${styles.estiloBtn} ${estilo === key ? styles.estiloActivo : ''}`}
                   onClick={() => setEstilo(key as Estilo)}
+                  aria-pressed={estilo === key}
                 >
                   <span className={styles.estiloNombre}>{key.charAt(0).toUpperCase() + key.slice(1)}</span>
                   <span className={styles.estiloDesc}>{value.descripcion}</span>
@@ -256,11 +260,12 @@ export default function GeneradorNombresEmpresaPage() {
 
           {/* Botón generar */}
           <button
+            type="button"
             className={styles.btnGenerar}
             onClick={generarNombres}
             disabled={generando}
           >
-            {generando ? '⏳ Generando...' : '✨ Generar Nombres'}
+            {generando ? <><span aria-hidden="true">⏳</span> Generando...</> : <><span aria-hidden="true">✨</span> Generar Nombres</>}
           </button>
         </div>
 
@@ -284,9 +289,11 @@ export default function GeneradorNombresEmpresaPage() {
                     <div className={styles.nombreHeader}>
                       <span className={styles.nombreTexto}>{n.nombre}</span>
                       <button
+                        type="button"
                         className={`${styles.btnFavorito} ${n.favorito ? styles.favoritoActivo : ''}`}
                         onClick={() => toggleFavorito(idx)}
                         title={n.favorito ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+                        aria-pressed={n.favorito}
                       >
                         {n.favorito ? '⭐' : '☆'}
                       </button>
@@ -294,25 +301,28 @@ export default function GeneradorNombresEmpresaPage() {
                     <span className={styles.nombreTipo}>{n.tipo}</span>
                     <div className={styles.nombreAcciones}>
                       <button
+                        type="button"
                         className={styles.btnAccion}
                         onClick={() => copiarNombre(n.nombre)}
                         title="Copiar nombre"
                       >
-                        📋 Copiar
+                        <span aria-hidden="true">📋</span> Copiar
                       </button>
                       <button
+                        type="button"
                         className={styles.btnAccion}
                         onClick={() => verificarDominio(n.nombre, '.com')}
                         title="Verificar .com"
                       >
-                        🌐 .com
+                        <span aria-hidden="true">🌐</span> .com
                       </button>
                       <button
+                        type="button"
                         className={styles.btnAccion}
                         onClick={() => verificarDominio(n.nombre, '.es')}
                         title="Verificar .es"
                       >
-                        🇪🇸 .es
+                        <span aria-hidden="true">🇪🇸</span> .es
                       </button>
                     </div>
                   </div>
@@ -322,7 +332,7 @@ export default function GeneradorNombresEmpresaPage() {
               {/* Favoritos */}
               {favoritos.length > 0 && (
                 <div className={styles.favoritosSection}>
-                  <h3>⭐ Tus Favoritos ({favoritos.length})</h3>
+                  <h3><span aria-hidden="true">⭐</span> Tus Favoritos ({favoritos.length})</h3>
                   <div className={styles.favoritosLista}>
                     {favoritos.map((n, idx) => (
                       <span key={idx} className={styles.favoritoTag}>
@@ -357,28 +367,28 @@ export default function GeneradorNombresEmpresaPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>📌 Fácil de pronunciar y recordar</h4>
+              <h4><span aria-hidden="true">📌</span> Fácil de pronunciar y recordar</h4>
               <p>
                 Un buen nombre se pronuncia fácil, se escucha claro y se recuerda sin esfuerzo.
                 Evita nombres largos, combinaciones de consonantes difíciles o números.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📌 Único y diferenciador</h4>
+              <h4><span aria-hidden="true">📌</span> Único y diferenciador</h4>
               <p>
                 Evita nombres genéricos o muy similares a competidores.
                 Un nombre distintivo te ayuda a destacar y evita problemas legales.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📌 Dominio disponible</h4>
+              <h4><span aria-hidden="true">📌</span> Dominio disponible</h4>
               <p>
                 Antes de decidir, verifica que el dominio .com y .es estén disponibles.
                 También revisa redes sociales (@nombreempresa).
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📌 Sin connotaciones negativas</h4>
+              <h4><span aria-hidden="true">📌</span> Sin connotaciones negativas</h4>
               <p>
                 Investiga si el nombre tiene significados negativos en otros idiomas,
                 especialmente si planeas internacionalizar.
@@ -482,7 +492,7 @@ export default function GeneradorNombresEmpresaPage() {
                 <h4>Autónomo creando su marca personal</h4>
               </div>
               <p>Cuando comienzas como freelance, usar tu nombre y apellido genera confianza inmediata. Sin embargo, si planeas escalar o contratar, una marca independiente te da más flexibilidad futura.</p>
-              <p className={styles.escenarioTip}>💡 Consejo: Reserva ambas opciones (dominio con tu nombre y con marca) desde el principio.</p>
+              <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> Consejo: Reserva ambas opciones (dominio con tu nombre y con marca) desde el principio.</p>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -498,7 +508,7 @@ export default function GeneradorNombresEmpresaPage() {
                 <h4>Comercio local con identidad de barrio</h4>
               </div>
               <p>Un negocio local puede beneficiarse de un nombre geográfico o descriptivo. La comunidad lo asocia rápidamente al lugar, lo que genera fidelización y SEO local orgánico.</p>
-              <p className={styles.escenarioTip}>💡 Consejo: Incluye el barrio o ciudad en el nombre solo si no planeas abrir más ubicaciones.</p>
+              <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> Consejo: Incluye el barrio o ciudad en el nombre solo si no planeas abrir más ubicaciones.</p>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>

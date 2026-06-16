@@ -368,7 +368,7 @@ export default function GeneradorIconosPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📱 Generador de Iconos PWA</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📱</span> Generador de Iconos PWA</h1>
         <p className={styles.subtitle}>
           Genera todos los tamaños de iconos para tu PWA, favicon y aplicaciones móviles
         </p>
@@ -388,7 +388,7 @@ export default function GeneradorIconosPage() {
               onDragOver={handleDragOver}
               onClick={() => fileInputRef.current?.click()}
             >
-              <span className={styles.dropIcon}>🖼️</span>
+              <span className={styles.dropIcon} aria-hidden="true">🖼️</span>
               <p>Arrastra tu imagen aquí o haz clic para seleccionar</p>
               <span className={styles.dropHint}>Recomendado: 512×512px o superior, formato PNG</span>
               <input
@@ -413,29 +413,35 @@ export default function GeneradorIconosPage() {
               <div className={styles.previewShapes}>
                 <span className={styles.shapeLabel}>Vista previa:</span>
                 <button
+                  type="button"
                   className={`${styles.shapeBtn} ${previewShape === 'square' ? styles.shapeActive : ''}`}
                   onClick={() => setPreviewShape('square')}
                   title="Cuadrado"
+                  aria-pressed={previewShape === 'square'}
                 >
-                  ⬜
+                  <span aria-hidden="true">⬜</span>
                 </button>
                 <button
+                  type="button"
                   className={`${styles.shapeBtn} ${previewShape === 'rounded' ? styles.shapeActive : ''}`}
                   onClick={() => setPreviewShape('rounded')}
                   title="Redondeado"
+                  aria-pressed={previewShape === 'rounded'}
                 >
-                  🔲
+                  <span aria-hidden="true">🔲</span>
                 </button>
                 <button
+                  type="button"
                   className={`${styles.shapeBtn} ${previewShape === 'circle' ? styles.shapeActive : ''}`}
                   onClick={() => setPreviewShape('circle')}
                   title="Círculo"
+                  aria-pressed={previewShape === 'circle'}
                 >
-                  ⚪
+                  <span aria-hidden="true">⚪</span>
                 </button>
               </div>
 
-              <button onClick={clearImage} className={styles.btnSecondary}>
+              <button type="button" onClick={clearImage} className={styles.btnSecondary}>
                 Cambiar imagen
               </button>
             </div>
@@ -452,10 +458,12 @@ export default function GeneradorIconosPage() {
               {ICON_PRESETS.map((preset) => (
                 <button
                   key={preset.name}
+                  type="button"
                   className={`${styles.presetBtn} ${selectedPreset.name === preset.name ? styles.presetActive : ''}`}
                   onClick={() => setSelectedPreset(preset)}
+                  aria-pressed={selectedPreset.name === preset.name}
                 >
-                  <span className={styles.presetIcon}>{preset.icon}</span>
+                  <span className={styles.presetIcon} aria-hidden="true">{preset.icon}</span>
                   <span className={styles.presetName}>{preset.name}</span>
                   <span className={styles.presetDesc}>{preset.sizes.length} tamaños</span>
                 </button>
@@ -472,8 +480,10 @@ export default function GeneradorIconosPage() {
               {(['png', 'webp', 'jpeg'] as OutputFormat[]).map((format) => (
                 <button
                   key={format}
+                  type="button"
                   className={`${styles.formatBtn} ${outputFormat === format ? styles.formatActive : ''}`}
                   onClick={() => setOutputFormat(format)}
+                  aria-pressed={outputFormat === format}
                 >
                   {format.toUpperCase()}
                 </button>
@@ -501,11 +511,12 @@ export default function GeneradorIconosPage() {
 
           <div className={styles.actions}>
             <button
+              type="button"
               onClick={generateIcons}
               disabled={!originalImage || isGenerating}
               className={styles.btnPrimary}
             >
-              {isGenerating ? '⏳ Generando...' : '🚀 Generar Iconos'}
+              {isGenerating ? <><span aria-hidden="true">⏳</span> Generando...</> : <><span aria-hidden="true">🚀</span> Generar Iconos</>}
             </button>
           </div>
         </div>
@@ -516,8 +527,8 @@ export default function GeneradorIconosPage() {
         <div className={styles.resultsSection}>
           <div className={styles.resultsHeader}>
             <h2>Iconos Generados ({generatedIcons.length})</h2>
-            <button onClick={downloadAllAsZip} className={styles.btnDownloadAll}>
-              📦 Descargar Todos
+            <button type="button" onClick={downloadAllAsZip} className={styles.btnDownloadAll}>
+              <span aria-hidden="true">📦</span> Descargar Todos
             </button>
           </div>
 
@@ -534,7 +545,7 @@ export default function GeneradorIconosPage() {
                   onClick={() => downloadIcon(icon)}
                   className={styles.btnDownload}
                 >
-                  📥 {icon.fileName}
+                  <span aria-hidden="true">📥</span> {icon.fileName}
                 </button>
               </div>
             ))}
@@ -545,7 +556,7 @@ export default function GeneradorIconosPage() {
             <div className={styles.icoSection}>
               <div className={styles.icoHeader}>
                 <div className={styles.icoInfo}>
-                  <span className={styles.icoIcon}>🎯</span>
+                  <span className={styles.icoIcon} aria-hidden="true">🎯</span>
                   <div>
                     <h3>Archivo favicon.ico</h3>
                     <p>Multi-resolución ({generatedIcons.filter(i => i.size <= 256).map(i => i.size).join(', ')}px) • {icoSizeKB} KB</p>
@@ -564,7 +575,7 @@ export default function GeneradorIconosPage() {
           {/* Preview en navbar simulada */}
           {generatedIcons.find(i => i.size === 32) && (
             <div className={styles.faviconPreviewSection}>
-              <h3>👀 Vista previa en navegador</h3>
+              <h3><span aria-hidden="true">👀</span> Vista previa en navegador</h3>
               <div className={styles.browserMockup}>
                 <div className={styles.browserHeader}>
                   <div className={styles.browserButtons}>
@@ -582,7 +593,7 @@ export default function GeneradorIconosPage() {
                   </div>
                 </div>
                 <div className={styles.browserContent}>
-                  <p className={styles.browserUrl}>🔒 https://misitio.com</p>
+                  <p className={styles.browserUrl}><span aria-hidden="true">🔒</span> https://misitio.com</p>
                 </div>
               </div>
             </div>
@@ -591,9 +602,9 @@ export default function GeneradorIconosPage() {
           {/* Código HTML */}
           <div className={styles.manifestSection}>
             <div className={styles.manifestHeader}>
-              <h3>🌐 Código HTML para tu &lt;head&gt;</h3>
-              <button onClick={() => navigator.clipboard.writeText(htmlCode)} className={styles.btnCopy}>
-                📋 Copiar
+              <h3><span aria-hidden="true">🌐</span> Código HTML para tu &lt;head&gt;</h3>
+              <button type="button" onClick={() => navigator.clipboard.writeText(htmlCode)} className={styles.btnCopy}>
+                <span aria-hidden="true">📋</span> Copiar
               </button>
             </div>
             <pre className={styles.manifestCode}>{htmlCode}</pre>
@@ -602,9 +613,9 @@ export default function GeneradorIconosPage() {
           {/* Código manifest.json */}
           <div className={styles.manifestSection}>
             <div className={styles.manifestHeader}>
-              <h3>📋 Código para manifest.json</h3>
-              <button onClick={copyManifest} className={styles.btnCopy}>
-                📋 Copiar
+              <h3><span aria-hidden="true">📋</span> Código para manifest.json</h3>
+              <button type="button" onClick={copyManifest} className={styles.btnCopy}>
+                <span aria-hidden="true">📋</span> Copiar
               </button>
             </div>
             <pre className={styles.manifestCode}>{manifestCode}</pre>
@@ -617,17 +628,17 @@ export default function GeneradorIconosPage() {
         <h3>¿Para qué sirven estos iconos?</h3>
         <div className={styles.infoGrid}>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>📱</span>
+            <span className={styles.infoIcon} aria-hidden="true">📱</span>
             <h4>PWA (Progressive Web App)</h4>
             <p>Los iconos 192px y 512px son obligatorios para manifest.json y permiten instalar tu web como app</p>
           </div>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>🌐</span>
+            <span className={styles.infoIcon} aria-hidden="true">🌐</span>
             <h4>Favicon</h4>
             <p>Iconos de 16px, 32px y 48px se muestran en pestañas del navegador y marcadores</p>
           </div>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>🍎</span>
+            <span className={styles.infoIcon} aria-hidden="true">🍎</span>
             <h4>Apple Touch Icon</h4>
             <p>El tamaño 180px es necesario para iOS cuando añades la web a la pantalla de inicio</p>
           </div>
@@ -636,57 +647,57 @@ export default function GeneradorIconosPage() {
 
       {/* Tabla de compatibilidad */}
       <div className={styles.compatibilitySection}>
-        <h3>🌍 Compatibilidad de navegadores y plataformas</h3>
+        <h3><span aria-hidden="true">🌍</span> Compatibilidad de navegadores y plataformas</h3>
         <div className={styles.compatibilityTable}>
           <div className={styles.compatRow}>
             <div className={styles.compatPlatform}>
-              <span className={styles.compatIcon}>🌐</span>
+              <span className={styles.compatIcon} aria-hidden="true">🌐</span>
               <div>
                 <strong>Chrome / Edge / Firefox</strong>
                 <p>Favicon 16px, 32px, 48px</p>
               </div>
             </div>
-            <div className={styles.compatStatus}>✅ Totalmente compatible</div>
+            <div className={styles.compatStatus}><span aria-hidden="true">✅</span> Totalmente compatible</div>
           </div>
           <div className={styles.compatRow}>
             <div className={styles.compatPlatform}>
-              <span className={styles.compatIcon}>🍎</span>
+              <span className={styles.compatIcon} aria-hidden="true">🍎</span>
               <div>
                 <strong>Safari / iOS</strong>
                 <p>Apple Touch Icon 180px</p>
               </div>
             </div>
-            <div className={styles.compatStatus}>✅ Totalmente compatible</div>
+            <div className={styles.compatStatus}><span aria-hidden="true">✅</span> Totalmente compatible</div>
           </div>
           <div className={styles.compatRow}>
             <div className={styles.compatPlatform}>
-              <span className={styles.compatIcon}>🤖</span>
+              <span className={styles.compatIcon} aria-hidden="true">🤖</span>
               <div>
                 <strong>Android Chrome</strong>
                 <p>PWA Icons 192px, 512px</p>
               </div>
             </div>
-            <div className={styles.compatStatus}>✅ Totalmente compatible</div>
+            <div className={styles.compatStatus}><span aria-hidden="true">✅</span> Totalmente compatible</div>
           </div>
           <div className={styles.compatRow}>
             <div className={styles.compatPlatform}>
-              <span className={styles.compatIcon}>🪟</span>
+              <span className={styles.compatIcon} aria-hidden="true">🪟</span>
               <div>
                 <strong>Windows 10/11</strong>
                 <p>Tiles 70px, 150px, 310px</p>
               </div>
             </div>
-            <div className={styles.compatStatus}>✅ Totalmente compatible</div>
+            <div className={styles.compatStatus}><span aria-hidden="true">✅</span> Totalmente compatible</div>
           </div>
         </div>
         <p className={styles.compatNote}>
-          💡 <strong>Recomendación:</strong> Usa el preset "PWA Completo" para máxima compatibilidad en todas las plataformas.
+          <span aria-hidden="true">💡</span> <strong>Recomendación:</strong> Usa el preset "PWA Completo" para máxima compatibilidad en todas las plataformas.
         </p>
       </div>
 
       {/* FAQ y guía */}
       <EducationalSection
-        title="📚 ¿Tienes dudas sobre iconos PWA y favicons?"
+        title="¿Tienes dudas sobre iconos PWA y favicons?"
         subtitle="Respuestas a las preguntas más frecuentes y guía completa de implementación"
         icon="📚"
       >
@@ -694,7 +705,7 @@ export default function GeneradorIconosPage() {
           <h2>Preguntas Frecuentes</h2>
 
           <div className={styles.faqItem}>
-            <h4>❓ ¿Qué tamaños son realmente obligatorios?</h4>
+            <h4><span aria-hidden="true">❓</span> ¿Qué tamaños son realmente obligatorios?</h4>
             <p>
               <strong>Mínimo indispensable:</strong> 16px, 32px (favicon navegador), 180px (Apple iOS), 192px y 512px (PWA Android).
               Con estos 5 tamaños cubrirás el 90% de casos.
@@ -706,7 +717,7 @@ export default function GeneradorIconosPage() {
           </div>
 
           <div className={styles.faqItem}>
-            <h4>❓ ¿Qué formato debo usar: PNG, WebP o JPEG?</h4>
+            <h4><span aria-hidden="true">❓</span> ¿Qué formato debo usar: PNG, WebP o JPEG?</h4>
             <p>
               <strong>PNG</strong> (recomendado): Soporta transparencia, calidad perfecta, compatible con todos los navegadores.
               Es el estándar para iconos.
@@ -721,7 +732,7 @@ export default function GeneradorIconosPage() {
           </div>
 
           <div className={styles.faqItem}>
-            <h4>❓ ¿Dónde subo los iconos en mi sitio web?</h4>
+            <h4><span aria-hidden="true">❓</span> ¿Dónde subo los iconos en mi sitio web?</h4>
             <p>
               <strong>Opción 1 (raíz):</strong> Sube todos los iconos a la carpeta raíz de tu sitio (ejemplo: <code>https://misitio.com/icon-192x192.png</code>).
               En el código HTML usa rutas absolutas: <code>/icon-192x192.png</code>
@@ -731,12 +742,12 @@ export default function GeneradorIconosPage() {
               En el código HTML usa: <code>/icons/icon-192x192.png</code>
             </p>
             <p>
-              <strong>⚠️ Importante:</strong> El archivo <code>manifest.json</code> debe estar en la raíz (<code>/manifest.json</code>).
+              <strong><span aria-hidden="true">⚠️</span> Importante:</strong> El archivo <code>manifest.json</code> debe estar en la raíz (<code>/manifest.json</code>).
             </p>
           </div>
 
           <div className={styles.faqItem}>
-            <h4>❓ ¿Qué es el archivo favicon.ico y lo necesito?</h4>
+            <h4><span aria-hidden="true">❓</span> ¿Qué es el archivo favicon.ico y lo necesito?</h4>
             <p>
               El archivo <code>.ico</code> es un formato antiguo que soportan todos los navegadores (incluso Internet Explorer).
               Contiene múltiples resoluciones (16px, 32px, 48px) en un solo archivo.
@@ -751,7 +762,7 @@ export default function GeneradorIconosPage() {
           </div>
 
           <div className={styles.faqItem}>
-            <h4>❓ ¿Cómo pruebo que los iconos funcionan correctamente?</h4>
+            <h4><span aria-hidden="true">❓</span> ¿Cómo pruebo que los iconos funcionan correctamente?</h4>
             <p><strong>Método 1 - Navegador:</strong></p>
             <ul>
               <li>Abre tu sitio en Chrome/Firefox/Safari</li>
@@ -772,7 +783,7 @@ export default function GeneradorIconosPage() {
           </div>
 
           <div className={styles.faqItem}>
-            <h4>❓ ¿Puedo usar un logo con texto o debe ser solo un icono?</h4>
+            <h4><span aria-hidden="true">❓</span> ¿Puedo usar un logo con texto o debe ser solo un icono?</h4>
             <p>
               <strong>Para tamaños pequeños (16-48px):</strong> Usa solo un icono/símbolo simple sin texto.
               El texto es ilegible a esos tamaños y se verá borroso.
@@ -841,10 +852,10 @@ export default function GeneradorIconosPage() {
 
           <h2>Recursos Adicionales</h2>
           <div className={styles.resourcesList}>
-            <p>📖 <a href="https://web.dev/add-manifest/" target="_blank" rel="noopener">Web.dev - Guía completa de manifest.json</a></p>
-            <p>🔍 <a href="https://realfavicongenerator.net/favicon_checker" target="_blank" rel="noopener">Favicon Checker - Verifica tus iconos</a></p>
-            <p>🍎 <a href="https://developer.apple.com/design/human-interface-guidelines/app-icons" target="_blank" rel="noopener">Apple - Guía de iconos iOS</a></p>
-            <p>🤖 <a href="https://developer.chrome.com/docs/android/trusted-web-activity/integration-guide" target="_blank" rel="noopener">Google - PWA en Android</a></p>
+            <p><span aria-hidden="true">📖</span> <a href="https://web.dev/add-manifest/" target="_blank" rel="noopener">Web.dev - Guía completa de manifest.json</a></p>
+            <p><span aria-hidden="true">🔍</span> <a href="https://realfavicongenerator.net/favicon_checker" target="_blank" rel="noopener">Favicon Checker - Verifica tus iconos</a></p>
+            <p><span aria-hidden="true">🍎</span> <a href="https://developer.apple.com/design/human-interface-guidelines/app-icons" target="_blank" rel="noopener">Apple - Guía de iconos iOS</a></p>
+            <p><span aria-hidden="true">🤖</span> <a href="https://developer.chrome.com/docs/android/trusted-web-activity/integration-guide" target="_blank" rel="noopener">Google - PWA en Android</a></p>
           </div>
         </section>
 
