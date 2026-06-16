@@ -235,7 +235,7 @@ export default function SonometroPage() {
             className={styles.levelIndicator}
             style={{ background: isActive ? currentLevel.color : 'var(--text-muted)' }}
           >
-            <span className={styles.levelIcon}>{isActive ? currentLevel.icon : '🎤'}</span>
+            <span className={styles.levelIcon} aria-hidden="true">{isActive ? currentLevel.icon : '🎤'}</span>
             <span className={styles.levelLabel}>
               {isActive ? currentLevel.label : 'Esperando...'}
             </span>
@@ -244,16 +244,16 @@ export default function SonometroPage() {
           {/* Botones de control */}
           <div className={styles.controls}>
             {!isActive ? (
-              <button onClick={startMeasuring} className={styles.btnStart}>
-                🎤 Iniciar medición
+              <button type="button" onClick={startMeasuring} className={styles.btnStart}>
+                <span aria-hidden="true">🎤</span> Iniciar medición
               </button>
             ) : (
               <>
-                <button onClick={stopMeasuring} className={styles.btnStop}>
-                  ⏹️ Detener
+                <button type="button" onClick={stopMeasuring} className={styles.btnStop}>
+                  <span aria-hidden="true">⏹️</span> Detener
                 </button>
-                <button onClick={resetStats} className={styles.btnReset}>
-                  🔄 Resetear
+                <button type="button" onClick={resetStats} className={styles.btnReset}>
+                  <span aria-hidden="true">🔄</span> Resetear
                 </button>
               </>
             )}
@@ -278,7 +278,7 @@ export default function SonometroPage() {
         {isActive && (
           <div className={styles.statsPanel}>
             <h2 className={styles.sectionTitle}>
-              <span>📊</span> Estadísticas de sesión
+              <span aria-hidden="true">📊</span> Estadísticas de sesión
             </h2>
             <div className={styles.statsGrid}>
               <div className={styles.statCard}>
@@ -311,7 +311,7 @@ export default function SonometroPage() {
         {/* Tabla de referencia */}
         <div className={styles.referencePanel}>
           <h2 className={styles.sectionTitle}>
-            <span>📋</span> Niveles de referencia
+            <span aria-hidden="true">📋</span> Niveles de referencia
           </h2>
           <div className={styles.referenceTable}>
             {NOISE_LEVELS.map((level, index) => (
@@ -324,7 +324,7 @@ export default function SonometroPage() {
                     className={styles.refIndicator}
                     style={{ background: level.color }}
                   />
-                  <span className={styles.refIcon}>{level.icon}</span>
+                  <span className={styles.refIcon} aria-hidden="true">{level.icon}</span>
                   <span className={styles.refLabel}>{level.label}</span>
                 </div>
                 <div className={styles.refRange}>

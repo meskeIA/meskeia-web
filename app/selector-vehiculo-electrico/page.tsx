@@ -443,7 +443,7 @@ export default function SelectorVehiculoElectrico() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1>⚡ Selector de Vehículo Eléctrico</h1>
+        <h1><span aria-hidden="true">⚡</span> Selector de Vehículo Eléctrico</h1>
         <p>Test de 10 preguntas para saber qué tipo de vehículo eléctrico o híbrido encaja con tu vida</p>
       </header>
 

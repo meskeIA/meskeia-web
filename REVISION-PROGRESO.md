@@ -786,10 +786,10 @@
 | [x] | Selector de Movilidad Urbana | `/selector-movilidad-urbana/` | tecnicas, productividad |
 | [x] | Selector de Portátil y PC | `/selector-portatil/` | tecnicas, productividad |
 | [x] | Selector de Smartphone | `/selector-smartphone/` | tecnicas, productividad |
-| [ ] | Selector de Tablet | `/selector-tablet/` | tecnicas, estudiantes |
-| [ ] | Selector de Tipo de Televisión | `/selector-tipo-television/` | tecnicas, productividad |
-| [ ] | Selector de Vehículo Eléctrico | `/selector-vehiculo-electrico/` | tecnicas, finanzas |
-| [ ] | Sonómetro / Decibelímetro | `/sonometro/` | tecnicas |
+| [x] | Selector de Tablet | `/selector-tablet/` | tecnicas, estudiantes |
+| [x] | Selector de Tipo de Televisión | `/selector-tipo-television/` | tecnicas, productividad |
+| [x] | Selector de Vehículo Eléctrico | `/selector-vehiculo-electrico/` | tecnicas, finanzas |
+| [x] | Sonómetro / Decibelímetro | `/sonometro/` | tecnicas |
 | [ ] | Tokenizador Visual de IA | `/tokenizador-ia/` | tecnicas, productividad |
 
 ## Inmobiliaria y Hogar (`inmobiliaria`) — 46 apps
