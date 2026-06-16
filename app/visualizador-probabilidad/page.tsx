@@ -356,7 +356,7 @@ export default function VisualizadorProbabilidadPage() {
         </nav>
 
         <div className={styles.seccionHeader}>
-          <h2 className={styles.seccionTitulo}>{SECCIONES.find(s => s.id === seccionActiva)?.icono} {SECCIONES.find(s => s.id === seccionActiva)?.titulo}</h2>
+          <h2 className={styles.seccionTitulo}><span aria-hidden="true">{SECCIONES.find(s => s.id === seccionActiva)?.icono}</span> {SECCIONES.find(s => s.id === seccionActiva)?.titulo}</h2>
           <p className={styles.seccionSub}>{SECCIONES.find(s => s.id === seccionActiva)?.subtitulo}</p>
         </div>
 

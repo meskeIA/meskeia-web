@@ -344,14 +344,18 @@ export default function ConversorIEEE754Page() {
             <label className={styles.configLabel}>Dirección</label>
             <div className={styles.modeSelector}>
               <button
+                type="button"
                 className={`${styles.modeBtn} ${mode === 'decimalToBinary' ? styles.modeBtnActive : ''}`}
                 onClick={() => setMode('decimalToBinary')}
+                aria-pressed={mode === 'decimalToBinary'}
               >
                 Decimal → Binario
               </button>
               <button
+                type="button"
                 className={`${styles.modeBtn} ${mode === 'binaryToDecimal' ? styles.modeBtnActive : ''}`}
                 onClick={() => setMode('binaryToDecimal')}
+                aria-pressed={mode === 'binaryToDecimal'}
               >
                 Binario → Decimal
               </button>
@@ -362,15 +366,19 @@ export default function ConversorIEEE754Page() {
             <label className={styles.configLabel}>Precisión</label>
             <div className={styles.precisionSelector}>
               <button
+                type="button"
                 className={`${styles.precisionBtn} ${precision === 'single' ? styles.precisionBtnActive : ''}`}
                 onClick={() => setPrecision('single')}
+                aria-pressed={precision === 'single'}
               >
                 <span className={styles.precisionIcon}>32</span>
                 <span className={styles.precisionName}>Simple (float)</span>
               </button>
               <button
+                type="button"
                 className={`${styles.precisionBtn} ${precision === 'double' ? styles.precisionBtnActive : ''}`}
                 onClick={() => setPrecision('double')}
+                aria-pressed={precision === 'double'}
               >
                 <span className={styles.precisionIcon}>64</span>
                 <span className={styles.precisionName}>Doble (double)</span>
@@ -400,6 +408,7 @@ export default function ConversorIEEE754Page() {
               {EXAMPLES.map((ex) => (
                 <button
                   key={ex.decimal}
+                  type="button"
                   className={styles.exampleBtn}
                   onClick={() => handleExampleClick(ex.decimal)}
                 >
@@ -474,6 +483,7 @@ export default function ConversorIEEE754Page() {
               <div className={styles.resultHeader}>
                 <span className={styles.resultLabel}>Hexadecimal</span>
                 <button
+                  type="button"
                   className={styles.copyBtn}
                   onClick={() => handleCopy(result.hexadecimal, 'hex')}
                 >
@@ -512,10 +522,11 @@ export default function ConversorIEEE754Page() {
             <div className={styles.fullBinaryHeader}>
               <span className={styles.fullBinaryLabel}>Binario completo ({config.totalBits} bits)</span>
               <button
+                type="button"
                 className={styles.copyBtn}
                 onClick={() => handleCopy(result.fullBinary, 'binary')}
               >
-                {copied === 'binary' ? '✓ Copiado' : '📋 Copiar'}
+                {copied === 'binary' ? '✓ Copiado' : <><span aria-hidden="true">📋</span> Copiar</>}
               </button>
             </div>
             <code className={styles.fullBinaryValue}>
@@ -527,10 +538,12 @@ export default function ConversorIEEE754Page() {
           {showSteps && result.steps.length > 0 && (
             <div className={styles.stepsSection}>
               <button
+                type="button"
                 className={styles.stepsToggle}
                 onClick={() => setShowSteps(!showSteps)}
+                aria-pressed={showSteps}
               >
-                📝 Proceso de conversión
+                <span aria-hidden="true">📝</span> Proceso de conversión
               </button>
               <div className={styles.stepsContent}>
                 {result.steps.map((step, i) => (

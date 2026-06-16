@@ -417,11 +417,11 @@
 | [x] | Ciclo Menstrual: Fases y Hormonas | `/visualizador-ciclo-menstrual/` | estudiantes, salud |
 | [x] | Circuitos Electrónicos: R-L-C, Transistor y Puertas Lógicas | `/visualizador-circuitos-electronicos/` | estudiantes, tecnicas |
 | [x] | Combinatoria: Permutaciones, Pascal y Binomio de Newton | `/visualizador-combinatoria/` | estudiantes, tecnicas |
-| [ ] | Cómo Funciona la Probabilidad | `/visualizador-probabilidad/` | estudiantes, cultura |
-| [ ] | Computación Cuántica - Qubits, Puertas y Algoritmo de Shor | `/visualizador-computacion-cuantica/` | estudiantes, cultura, tecnicas |
-| [ ] | Conjugador de Verbos Español | `/conjugador-verbos/` | estudiantes |
+| [x] | Cómo Funciona la Probabilidad | `/visualizador-probabilidad/` | estudiantes, cultura |
+| [x] | Computación Cuántica - Qubits, Puertas y Algoritmo de Shor | `/visualizador-computacion-cuantica/` | estudiantes, cultura, tecnicas |
+| [x] | Conjugador de Verbos Español | `/conjugador-verbos/` | estudiantes |
 | [x] | Contador de Sílabas | `/contador-silabas/` | estudiantes |
-| [ ] | Conversor IEEE 754 | `/conversor-ieee754/` | estudiantes, tecnicas |
+| [x] | Conversor IEEE 754 | `/conversor-ieee754/` | estudiantes, tecnicas |
 | [ ] | Cosmología: Composición del Universo y su Destino | `/visualizador-cosmologia/` | estudiantes, cultura |
 | [ ] | Creador de Flashcards | `/creador-flashcards/` | estudiantes |
 | [ ] | CRISPR-Cas9: Mecanismo, Edición Genómica y Bioética | `/visualizador-crispr-cas9/` | estudiantes, cultura |

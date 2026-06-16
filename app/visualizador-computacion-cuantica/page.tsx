@@ -362,11 +362,11 @@ export default function VisualizadorComputacionCuantica() {
           )}
 
           <div className={styles.botonesMedir}>
-            <button className={styles.btnPrimario} onClick={medir} aria-label="Medir el qubit y colapsar su estado">
-              ⚡ Medir qubit
+            <button type="button" className={styles.btnPrimario} onClick={medir} aria-label="Medir el qubit y colapsar su estado">
+              <span aria-hidden="true">⚡</span> Medir qubit
             </button>
-            <button className={styles.btnSecundario} onClick={resetQubit} aria-label="Restaurar el qubit a superposición">
-              🔄 Restaurar superposición
+            <button type="button" className={styles.btnSecundario} onClick={resetQubit} aria-label="Restaurar el qubit a superposición">
+              <span aria-hidden="true">🔄</span> Restaurar superposición
             </button>
           </div>
 
@@ -458,6 +458,7 @@ export default function VisualizadorComputacionCuantica() {
           <div className={styles.puertasGrid}>
             {PUERTAS.map((p) => (
               <button
+                type="button"
                 key={p.id}
                 className={`${styles.puertaCard} ${puertaSeleccionada === p.id ? styles.puertaCardActiva : ''}`}
                 onClick={() => setPuertaSeleccionada(puertaSeleccionada === p.id ? null : p.id)}
@@ -490,7 +491,7 @@ export default function VisualizadorComputacionCuantica() {
                   ))}
                 </tbody>
               </table>
-              <p className={styles.puertaAnalogia}>💡 {puertaActual.analogia}</p>
+              <p className={styles.puertaAnalogia}><span aria-hidden="true">💡</span> {puertaActual.analogia}</p>
             </div>
           )}
 
@@ -508,12 +509,13 @@ export default function VisualizadorComputacionCuantica() {
               Es el único generador de aleatoriedad perfecta del universo.
               <br />
               <button
+                type="button"
                 className={styles.btnPrimario}
                 style={{ marginTop: '0.75rem', fontSize: '0.85rem' }}
                 onClick={generarBit}
                 aria-label="Generar un byte cuántico aleatorio"
               >
-                ▶ Generar byte cuántico
+                <span aria-hidden="true">▶</span> Generar byte cuántico
               </button>
               {numeroAleatorio !== '—' && (
                 <span

@@ -78,7 +78,7 @@ export default function ConjugadorVerbosPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>📖</span>
+        <span className={styles.heroIcon} aria-hidden="true">📖</span>
         <h1 className={styles.title}>Conjugador de Verbos Español</h1>
         <p className={styles.subtitle}>
           Conjuga cualquier verbo en español. Incluye todos los tiempos verbales
@@ -136,6 +136,7 @@ export default function ConjugadorVerbosPage() {
               {verbosPopulares.map((verbo) => (
                 <button
                   key={verbo}
+                  type="button"
                   onClick={() => conjugar(verbo)}
                   className={styles.popularButton}
                 >
@@ -173,19 +174,25 @@ export default function ConjugadorVerbosPage() {
           {/* Tabs de modos */}
           <div className={styles.modeTabs}>
             <button
+              type="button"
               onClick={() => setModoVista('indicativo')}
+              aria-pressed={modoVista === 'indicativo'}
               className={`${styles.modeTab} ${modoVista === 'indicativo' ? styles.modeTabActive : ''}`}
             >
               Indicativo
             </button>
             <button
+              type="button"
               onClick={() => setModoVista('subjuntivo')}
+              aria-pressed={modoVista === 'subjuntivo'}
               className={`${styles.modeTab} ${modoVista === 'subjuntivo' ? styles.modeTabActive : ''}`}
             >
               Subjuntivo
             </button>
             <button
+              type="button"
               onClick={() => setModoVista('imperativo')}
+              aria-pressed={modoVista === 'imperativo'}
               className={`${styles.modeTab} ${modoVista === 'imperativo' ? styles.modeTabActive : ''}`}
             >
               Imperativo
@@ -263,6 +270,7 @@ export default function ConjugadorVerbosPage() {
 
           {/* Botón para nueva búsqueda */}
           <button
+            type="button"
             onClick={() => {
               setConjugacion(null);
               setBusqueda('');
@@ -277,7 +285,7 @@ export default function ConjugadorVerbosPage() {
       {/* Lista de verbos irregulares */}
       {!conjugacion && (
         <div className={styles.irregularSection}>
-          <h2 className={styles.sectionTitle}>📚 Verbos irregulares disponibles</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">📚</span> Verbos irregulares disponibles</h2>
           <p className={styles.sectionSubtitle}>
             Más de 60 verbos irregulares con conjugación completa verificada
           </p>
@@ -285,6 +293,7 @@ export default function ConjugadorVerbosPage() {
             {obtenerVerbosIrregulares().map((verbo) => (
               <button
                 key={verbo}
+                type="button"
                 onClick={() => conjugar(verbo)}
                 className={styles.irregularButton}
               >
@@ -306,21 +315,21 @@ export default function ConjugadorVerbosPage() {
           <h2>Los tres modos verbales del español</h2>
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🔹 Indicativo</h4>
+              <h4><span aria-hidden="true">🔹</span> Indicativo</h4>
               <p>
                 Expresa acciones reales y objetivas. Incluye presente, pretéritos,
                 futuro y condicional. Es el modo más utilizado en español.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>🔹 Subjuntivo</h4>
+              <h4><span aria-hidden="true">🔹</span> Subjuntivo</h4>
               <p>
                 Expresa deseos, dudas, posibilidades o situaciones hipotéticas.
                 Se usa con expresiones como &quot;ojalá&quot;, &quot;quiero que&quot;, &quot;dudo que&quot;.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>🔹 Imperativo</h4>
+              <h4><span aria-hidden="true">🔹</span> Imperativo</h4>
               <p>
                 Se usa para dar órdenes, instrucciones o consejos.
                 Tiene formas afirmativas y negativas distintas.
@@ -642,7 +651,7 @@ export default function ConjugadorVerbosPage() {
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <h3>Limitaciones del Conjugador y Errores Comunes</h3>
           </div>
           <ul className={styles.warningList}>
