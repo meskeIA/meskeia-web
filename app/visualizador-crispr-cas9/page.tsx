@@ -310,6 +310,7 @@ function TabMecanismo() {
           {PASOS_CRISPR.map((p) => (
             <button
               key={p.paso}
+              type="button"
               role="listitem"
               onClick={() => setPasoActivo(p.paso)}
               aria-pressed={pasoActivo === p.paso}
@@ -683,6 +684,7 @@ export default function VisualizadorCrisprCas9() {
         {tabs.map((t) => (
           <button
             key={t.id}
+            type="button"
             role="tab"
             aria-selected={tabActiva === t.id}
             aria-controls={`panel-${t.id}`}

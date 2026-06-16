@@ -310,7 +310,7 @@ export default function SimuladorPunnettPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🧬 Cuadro de Punnett</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🧬</span> Cuadro de Punnett</h1>
         <p className={styles.subtitle}>
           Simula cruces genéticos mendelianos, visualiza proporciones genotípicas y fenotípicas
           en monohíbrido y dihíbrido
@@ -322,18 +322,20 @@ export default function SimuladorPunnettPage() {
       {/* === Selector tipo de herencia === */}
       <div className={styles.tipoSelector} role="group" aria-label="Tipo de herencia">
         <button
+          type="button"
           className={`${styles.tipoBtn} ${tipo === 'monohibrido' ? styles.tipoBtnActive : ''}`}
           onClick={() => setTipo('monohibrido')}
           aria-pressed={tipo === 'monohibrido'}
         >
-          🔵 Monohíbrido (1 gen)
+          <span aria-hidden="true">🔵</span> Monohíbrido (1 gen)
         </button>
         <button
+          type="button"
           className={`${styles.tipoBtn} ${tipo === 'dihibrido' ? styles.tipoBtnActive : ''}`}
           onClick={() => setTipo('dihibrido')}
           aria-pressed={tipo === 'dihibrido'}
         >
-          🟢 Dihíbrido (2 genes)
+          <span aria-hidden="true">🟢</span> Dihíbrido (2 genes)
         </button>
       </div>
 
@@ -413,11 +415,12 @@ export default function SimuladorPunnettPage() {
       </div>
 
       <button
+        type="button"
         className={styles.btnAleatorio}
         onClick={casoAleatorio}
         aria-label="Generar caso aleatorio"
       >
-        🎲 Caso aleatorio
+        <span aria-hidden="true">🎲</span> Caso aleatorio
       </button>
 
       {/* === Cuadro de Punnett (tabla HTML) === */}
@@ -547,6 +550,7 @@ export default function SimuladorPunnettPage() {
       <div className={styles.scenariosRow} role="group" aria-label="Escenarios predefinidos">
         {ESCENARIOS.map(esc => (
           <button
+            type="button"
             key={esc.nombre}
             className={styles.scenarioBtn}
             onClick={() => aplicarEscenario(esc)}
@@ -655,7 +659,7 @@ export default function SimuladorPunnettPage() {
           <h3>Ejemplos reales de herencia mendeliana</h3>
           <div className={styles.scenariosGrid}>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🐭</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🐭</span>
               <strong>Color del pelo en ratones</strong>
               <p style={{ fontSize: '0.88rem', marginTop: '0.3rem', color: 'var(--text-secondary)' }}>
                 El pelo oscuro (B) es dominante sobre el albino (b). Un cruce Bb × Bb produce
@@ -663,7 +667,7 @@ export default function SimuladorPunnettPage() {
               </p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🩸</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🩸</span>
               <strong>Grupo sanguíneo ABO (codominancia)</strong>
               <p style={{ fontSize: '0.88rem', marginTop: '0.3rem', color: 'var(--text-secondary)' }}>
                 Los alelos I<sup>A</sup> e I<sup>B</sup> son codominantes sobre i. Un cruce I<sup>A</sup>i × I<sup>B</sup>i produce
@@ -671,7 +675,7 @@ export default function SimuladorPunnettPage() {
               </p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>👁️</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">👁️</span>
               <strong>Daltonismo ligado al X</strong>
               <p style={{ fontSize: '0.88rem', marginTop: '0.3rem', color: 'var(--text-secondary)' }}>
                 El gen está en el cromosoma X. Las mujeres necesitan dos alelos recesivos
@@ -680,7 +684,7 @@ export default function SimuladorPunnettPage() {
               </p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🧬</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🧬</span>
               <strong>Enfermedades autosómicas recesivas (fibrosis quística)</strong>
               <p style={{ fontSize: '0.88rem', marginTop: '0.3rem', color: 'var(--text-secondary)' }}>
                 Si ambos progenitores son portadores (Aa × Aa), el riesgo de descendencia
@@ -790,7 +794,7 @@ export default function SimuladorPunnettPage() {
           <h3>Consejos prácticos</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✍️</span>
+              <span className={styles.tipIcon} aria-hidden="true">✍️</span>
               <strong>Ordenar los alelos</strong>
               <p style={{ fontSize: '0.88rem', marginTop: '0.3rem', color: 'var(--text-secondary)' }}>
                 Siempre escribe el alelo dominante (mayúscula) antes del recesivo. Así "Aa" es
@@ -798,7 +802,7 @@ export default function SimuladorPunnettPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔢</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔢</span>
               <strong>Proporciones fenotípicas rápidas</strong>
               <p style={{ fontSize: '0.88rem', marginTop: '0.3rem', color: 'var(--text-secondary)' }}>
                 En Aa × Aa el fenotipo dominante incluye AA + Aa = 3 celdas. Cuenta celdas con
@@ -806,7 +810,7 @@ export default function SimuladorPunnettPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <strong>Dihíbrido: las 16 celdas</strong>
               <p style={{ fontSize: '0.88rem', marginTop: '0.3rem', color: 'var(--text-secondary)' }}>
                 El dihíbrido AaBb × AaBb siempre da 9:3:3:1 fenotípicamente (doble dominante :
@@ -814,7 +818,7 @@ export default function SimuladorPunnettPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>♻️</span>
+              <span className={styles.tipIcon} aria-hidden="true">♻️</span>
               <strong>Verifica siempre el recuento</strong>
               <p style={{ fontSize: '0.88rem', marginTop: '0.3rem', color: 'var(--text-secondary)' }}>
                 La suma de todas las proporciones genotípicas debe ser igual al número de celdas

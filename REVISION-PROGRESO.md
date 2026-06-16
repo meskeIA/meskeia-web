@@ -422,10 +422,10 @@
 | [x] | Conjugador de Verbos Español | `/conjugador-verbos/` | estudiantes |
 | [x] | Contador de Sílabas | `/contador-silabas/` | estudiantes |
 | [x] | Conversor IEEE 754 | `/conversor-ieee754/` | estudiantes, tecnicas |
-| [ ] | Cosmología: Composición del Universo y su Destino | `/visualizador-cosmologia/` | estudiantes, cultura |
-| [ ] | Creador de Flashcards | `/creador-flashcards/` | estudiantes |
-| [ ] | CRISPR-Cas9: Mecanismo, Edición Genómica y Bioética | `/visualizador-crispr-cas9/` | estudiantes, cultura |
-| [ ] | Cuadro de Punnett: Genética Mendeliana | `/simulador-punnett/` | estudiantes |
+| [x] | Cosmología: Composición del Universo y su Destino | `/visualizador-cosmologia/` | estudiantes, cultura |
+| [x] | Creador de Flashcards | `/creador-flashcards/` | estudiantes |
+| [x] | CRISPR-Cas9: Mecanismo, Edición Genómica y Bioética | `/visualizador-crispr-cas9/` | estudiantes, cultura |
+| [x] | Cuadro de Punnett: Genética Mendeliana | `/simulador-punnett/` | estudiantes |
 | [ ] | Curso de Introducción a la Teoría Política | `/curso-teoria-politica/` | estudiantes, cultura |
 | [ ] | Curso de Pensamiento Científico | `/curso-pensamiento-cientifico/` | estudiantes |
 | [x] | Curso de Pensamiento Sistémico | `/curso-pensamiento-sistemico/` | estudiantes, cultura |

@@ -361,24 +361,24 @@ export default function CreadorFlashcardsPage() {
       {/* Toolbar */}
       <div className={styles.toolbar}>
         <div className={styles.toolbarLeft}>
-          <button className={styles.btnPrimary} onClick={() => abrirModalMazo()}>
+          <button type="button" className={styles.btnPrimary} onClick={() => abrirModalMazo()}>
             <span>+</span> Nuevo Mazo
           </button>
           {mazoActivoData && mazoActivoData.tarjetas.length > 0 && (
-            <button className={styles.btnSuccess} onClick={iniciarEstudio}>
-              <span>▶</span> Estudiar
+            <button type="button" className={styles.btnSuccess} onClick={iniciarEstudio}>
+              <span aria-hidden="true">▶</span> Estudiar
             </button>
           )}
         </div>
         <div className={styles.toolbarRight}>
-          <button className={styles.btnSecondary} onClick={exportarJSON}>
-            <span>📥</span> JSON
+          <button type="button" className={styles.btnSecondary} onClick={exportarJSON}>
+            <span aria-hidden="true">📥</span> JSON
           </button>
-          <button className={styles.btnSecondary} onClick={exportarCSV}>
-            <span>📊</span> CSV
+          <button type="button" className={styles.btnSecondary} onClick={exportarCSV}>
+            <span aria-hidden="true">📊</span> CSV
           </button>
-          <button className={styles.btnSecondary} onClick={() => fileInputRef.current?.click()}>
-            <span>📤</span> Importar
+          <button type="button" className={styles.btnSecondary} onClick={() => fileInputRef.current?.click()}>
+            <span aria-hidden="true">📤</span> Importar
           </button>
           <input
             ref={fileInputRef}
@@ -434,6 +434,7 @@ export default function CreadorFlashcardsPage() {
                   </div>
                   <div className={styles.mazoActions}>
                     <button
+                      type="button"
                       className={styles.btnIcono}
                       onClick={(e) => { e.stopPropagation(); abrirModalMazo(mazo); }}
                       title="Editar mazo"
@@ -441,6 +442,7 @@ export default function CreadorFlashcardsPage() {
                       ✏️
                     </button>
                     <button
+                      type="button"
                       className={`${styles.btnIcono} ${styles.danger}`}
                       onClick={(e) => { e.stopPropagation(); eliminarMazo(mazo.id); }}
                       title="Eliminar mazo"
@@ -452,7 +454,7 @@ export default function CreadorFlashcardsPage() {
               ))}
             </div>
 
-            <button className={styles.btnAnadirMazo} onClick={() => abrirModalMazo()}>
+            <button type="button" className={styles.btnAnadirMazo} onClick={() => abrirModalMazo()}>
               + Añadir mazo
             </button>
           </aside>
@@ -484,6 +486,7 @@ export default function CreadorFlashcardsPage() {
                   <div className={styles.tarjetaBack}>{tarjeta.reverso}</div>
                   <div className={styles.tarjetaActions}>
                     <button
+                      type="button"
                       className={styles.btnIcono}
                       onClick={(e) => { e.stopPropagation(); abrirModalTarjeta(tarjeta); }}
                       title="Editar"
@@ -491,6 +494,7 @@ export default function CreadorFlashcardsPage() {
                       ✏️
                     </button>
                     <button
+                      type="button"
                       className={`${styles.btnIcono} ${styles.danger}`}
                       onClick={(e) => { e.stopPropagation(); eliminarTarjeta(tarjeta.id); }}
                       title="Eliminar"
@@ -502,7 +506,7 @@ export default function CreadorFlashcardsPage() {
               ))}
 
               {/* Botón añadir tarjeta */}
-              <button className={styles.btnAnadirTarjeta} onClick={() => abrirModalTarjeta()}>
+              <button type="button" className={styles.btnAnadirTarjeta} onClick={() => abrirModalTarjeta()}>
                 <span>+</span>
                 <span>Nueva tarjeta</span>
               </button>
@@ -521,6 +525,7 @@ export default function CreadorFlashcardsPage() {
         /* Modo Estudio */
         <div className={styles.modoEstudio}>
           <button
+            type="button"
             className={styles.btnSecondary}
             onClick={() => setModoEstudio(false)}
             style={{ alignSelf: 'flex-start', marginBottom: 'var(--spacing-lg)' }}
@@ -561,16 +566,18 @@ export default function CreadorFlashcardsPage() {
 
           <div className={styles.estudioControles}>
             <button
+              type="button"
               className={styles.btnAnterior}
               onClick={anteriorTarjeta}
               disabled={tarjetaActual === 0}
             >
               ← Anterior
             </button>
-            <button className={styles.btnMezclar} onClick={mezclarTarjetas}>
-              🔀 Mezclar
+            <button type="button" className={styles.btnMezclar} onClick={mezclarTarjetas}>
+              <span aria-hidden="true">🔀</span> Mezclar
             </button>
             <button
+              type="button"
               className={styles.btnSiguiente}
               onClick={siguienteTarjeta}
               disabled={tarjetaActual === tarjetasMezcladas.length - 1}
@@ -630,10 +637,10 @@ export default function CreadorFlashcardsPage() {
             </div>
 
             <div className={styles.modalActions}>
-              <button className={styles.btnSecondary} onClick={() => setModalAbierto(null)}>
+              <button type="button" className={styles.btnSecondary} onClick={() => setModalAbierto(null)}>
                 Cancelar
               </button>
-              <button className={styles.btnPrimary} onClick={guardarMazo}>
+              <button type="button" className={styles.btnPrimary} onClick={guardarMazo}>
                 {editandoMazo ? 'Guardar cambios' : 'Crear mazo'}
               </button>
             </div>
@@ -671,10 +678,10 @@ export default function CreadorFlashcardsPage() {
             </div>
 
             <div className={styles.modalActions}>
-              <button className={styles.btnSecondary} onClick={() => setModalAbierto(null)}>
+              <button type="button" className={styles.btnSecondary} onClick={() => setModalAbierto(null)}>
                 Cancelar
               </button>
-              <button className={styles.btnPrimary} onClick={guardarTarjeta}>
+              <button type="button" className={styles.btnPrimary} onClick={guardarTarjeta}>
                 {editandoTarjeta ? 'Guardar cambios' : 'Añadir tarjeta'}
               </button>
             </div>
