@@ -249,7 +249,7 @@ export default function CalculadoraPresupuestosPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>📋</span>
+        <span className={styles.heroIcon} aria-hidden="true">📋</span>
         <h1 className={styles.title}>Calculadora de Presupuestos</h1>
         <p className={styles.subtitle}>
           Crea presupuestos profesionales para tus clientes. Servicios, horas, materiales y descuentos.
@@ -270,7 +270,7 @@ export default function CalculadoraPresupuestosPage() {
         <div className={styles.editorPanel}>
           {/* Datos del Freelance */}
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>👤 Tus Datos (Freelance)</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">👤</span> Tus Datos (Freelance)</h2>
             <div className={styles.formGrid}>
               <div className={styles.formGroup}>
                 <label>Nombre / Razón Social</label>
@@ -331,7 +331,7 @@ export default function CalculadoraPresupuestosPage() {
 
           {/* Datos del Cliente */}
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>🏢 Datos del Cliente</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">🏢</span> Datos del Cliente</h2>
             <div className={styles.formGrid}>
               <div className={styles.formGroup}>
                 <label>Nombre de contacto</label>
@@ -383,7 +383,7 @@ export default function CalculadoraPresupuestosPage() {
 
           {/* Configuración del presupuesto */}
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>⚙️ Configuración</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">⚙️</span> Configuración</h2>
             <div className={styles.formGrid}>
               <div className={styles.formGroup}>
                 <label>Nº Presupuesto</label>
@@ -473,7 +473,7 @@ export default function CalculadoraPresupuestosPage() {
 
           {/* Título del proyecto */}
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>📝 Proyecto</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">📝</span> Proyecto</h2>
             <div className={styles.formGroupFull}>
               <label>Título del proyecto / servicio</label>
               <input
@@ -488,16 +488,16 @@ export default function CalculadoraPresupuestosPage() {
 
           {/* Líneas del presupuesto */}
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>📊 Conceptos</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">📊</span> Conceptos</h2>
 
             <div className={styles.addButtons}>
-              <button onClick={() => agregarLinea('servicio')} className={styles.addBtn}>
+              <button type="button" onClick={() => agregarLinea('servicio')} className={styles.addBtn}>
                 + Servicio
               </button>
-              <button onClick={() => agregarLinea('hora')} className={styles.addBtn}>
+              <button type="button" onClick={() => agregarLinea('hora')} className={styles.addBtn}>
                 + Horas
               </button>
-              <button onClick={() => agregarLinea('material')} className={styles.addBtn}>
+              <button type="button" onClick={() => agregarLinea('material')} className={styles.addBtn}>
                 + Material
               </button>
             </div>
@@ -510,6 +510,7 @@ export default function CalculadoraPresupuestosPage() {
                     <span className={styles.lineaTipo}>{getTipoLabel(linea.tipo)}</span>
                     {lineas.length > 1 && (
                       <button
+                        type="button"
                         onClick={() => eliminarLinea(linea.id)}
                         className={styles.deleteBtn}
                         title="Eliminar línea"
@@ -574,7 +575,7 @@ export default function CalculadoraPresupuestosPage() {
 
           {/* Notas */}
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>📌 Notas adicionales</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">📌</span> Notas adicionales</h2>
             <textarea
               value={config.notas}
               onChange={(e) => setConfig({ ...config, notas: e.target.value })}
@@ -612,11 +613,11 @@ export default function CalculadoraPresupuestosPage() {
 
           {/* Acciones */}
           <div className={styles.actions}>
-            <button onClick={exportarPDF} className={styles.btnPrimary}>
-              📄 Descargar PDF
+            <button type="button" onClick={exportarPDF} className={styles.btnPrimary}>
+              <span aria-hidden="true">📄</span> Descargar PDF
             </button>
-            <button onClick={nuevoPresupuesto} className={styles.btnSecondary}>
-              ✨ Nuevo Presupuesto
+            <button type="button" onClick={nuevoPresupuesto} className={styles.btnSecondary}>
+              <span aria-hidden="true">✨</span> Nuevo Presupuesto
             </button>
           </div>
         </div>
@@ -736,22 +737,22 @@ export default function CalculadoraPresupuestosPage() {
 
       {/* Flujo freelance */}
       <section className={styles.flujoSection}>
-        <h2>🔄 Flujo Completo Freelance</h2>
+        <h2><span aria-hidden="true">🔄</span> Flujo Completo Freelance</h2>
         <div className={styles.flujoSteps}>
           <div className={`${styles.flujoStep} ${styles.flujoStepActive}`}>
-            <span className={styles.flujoIcon}>📋</span>
+            <span className={styles.flujoIcon} aria-hidden="true">📋</span>
             <span className={styles.flujoLabel}>1. Presupuesto</span>
             <span className={styles.flujoDesc}>Estás aquí</span>
           </div>
           <div className={styles.flujoArrow}>→</div>
           <div className={styles.flujoStep}>
-            <span className={styles.flujoIcon}>⏱️</span>
+            <span className={styles.flujoIcon} aria-hidden="true">⏱️</span>
             <span className={styles.flujoLabel}>2. Time Tracker</span>
             <a href="/time-tracker/" className={styles.flujoLink}>Registra horas</a>
           </div>
           <div className={styles.flujoArrow}>→</div>
           <div className={styles.flujoStep}>
-            <span className={styles.flujoIcon}>🧾</span>
+            <span className={styles.flujoIcon} aria-hidden="true">🧾</span>
             <span className={styles.flujoLabel}>3. Factura</span>
             <a href="/generador-facturas/" className={styles.flujoLink}>Genera factura</a>
           </div>
@@ -765,7 +766,7 @@ export default function CalculadoraPresupuestosPage() {
         icon="📚"
       >
         <section className={styles.eduComparativa}>
-          <h2>⚖️ Tipos de presupuesto: formatos y cuándo usar cada uno</h2>
+          <h2><span aria-hidden="true">⚖️</span> Tipos de presupuesto: formatos y cuándo usar cada uno</h2>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
               <thead>
@@ -826,11 +827,11 @@ export default function CalculadoraPresupuestosPage() {
         </section>
 
         <section className={styles.eduEscenarios}>
-          <h2>🎯 Casos reales de presupuestos por sector</h2>
+          <h2><span aria-hidden="true">🎯</span> Casos reales de presupuestos por sector</h2>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎨</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎨</span>
                 <h3>Diseñador freelance — web corporativa</h3>
               </div>
               <p className={styles.escenarioExample}>Diseño web 5 páginas: 1.200 €. Desarrollo WordPress: 800 €. SEO básico: 300 €. Formación cliente: 150 €. <strong>Total: 2.450 € + IVA. Anticipo 40% al firmar.</strong></p>
@@ -838,7 +839,7 @@ export default function CalculadoraPresupuestosPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💻</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💻</span>
                 <h3>Agencia de desarrollo — app móvil</h3>
               </div>
               <p className={styles.escenarioExample}>Análisis y diseño UX: 3.500 €. Desarrollo iOS: 8.000 €. Desarrollo Android: 7.500 €. QA: 2.000 €. Producción: 500 €. <strong>Total: 21.500 € en 3 hitos (30/40/30%).</strong></p>
@@ -846,7 +847,7 @@ export default function CalculadoraPresupuestosPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📢</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📢</span>
                 <h3>Consultor de marketing — retainer</h3>
               </div>
               <p className={styles.escenarioExample}>Gestión redes sociales (3 canales): 600 €/mes. Newsletter: 200 €/mes. Informe mensual: 150 €/mes. <strong>Total: 950 €/mes. Contrato mínimo 3 meses.</strong></p>
@@ -854,7 +855,7 @@ export default function CalculadoraPresupuestosPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏗️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏗️</span>
                 <h3>Instalador / reformas — precio cerrado</h3>
               </div>
               <p className={styles.escenarioExample}>Materiales: 1.850 €. Mano de obra (3 días × 2 operarios): 1.440 €. Gestión residuos: 120 €. <strong>Total: 3.410 € + IVA. Anticipo 50% antes de inicio.</strong></p>
@@ -862,7 +863,7 @@ export default function CalculadoraPresupuestosPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📊</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📊</span>
                 <h3>Asesor fiscal — paquetes tiered</h3>
               </div>
               <p className={styles.escenarioExample}>Básico (IRPF simple): 120 €. Estándar (IRPF + actividad): 280 €. Premium (IRPF + sociedades + IVA trimestral): 850 €/año. <strong>El 70% elige el tier medio.</strong></p>
@@ -870,7 +871,7 @@ export default function CalculadoraPresupuestosPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📸</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📸</span>
                 <h3>Fotógrafo — evento corporativo</h3>
               </div>
               <p className={styles.escenarioExample}>Sesión (6 horas): 900 €. Edición y retoque (80 fotos): 400 €. Álbum digital: 100 €. Derechos de uso: 200 €. <strong>Total: 1.600 € + IVA. 50% anticipo, 50% en entrega.</strong></p>
@@ -880,7 +881,7 @@ export default function CalculadoraPresupuestosPage() {
         </section>
 
         <section className={styles.eduFaq}>
-          <h2>❓ Preguntas frecuentes sobre presupuestos comerciales</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas frecuentes sobre presupuestos comerciales</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
               <h4>❓ ¿Cuánto anticipo debo pedir?</h4>
@@ -926,7 +927,7 @@ export default function CalculadoraPresupuestosPage() {
         </section>
 
         <section className={styles.eduGuia}>
-          <h2>📋 Cómo crear un presupuesto que cierre ventas</h2>
+          <h2><span aria-hidden="true">📋</span> Cómo crear un presupuesto que cierre ventas</h2>
           <div className={styles.stepGuide}>
             <div className={styles.step}>
               <div className={styles.stepNumber}>1</div>
@@ -981,35 +982,35 @@ export default function CalculadoraPresupuestosPage() {
         </section>
 
         <section className={styles.eduTips}>
-          <h2>✅ Mejores prácticas para presupuestos que se aceptan</h2>
+          <h2><span aria-hidden="true">✅</span> Mejores prácticas para presupuestos que se aceptan</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <h4>Personaliza siempre</h4>
               <p>Menciona el nombre del cliente, su empresa y el objetivo concreto. Un presupuesto genérico parece una plantilla; uno personalizado parece una propuesta real.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💶</span>
+              <span className={styles.tipIcon} aria-hidden="true">💶</span>
               <h4>Ancla con la opción más cara</h4>
               <p>Si ofreces paquetes, presenta primero el más caro. El precio del medio parecerá más razonable por contraste. El 60-70% de clientes elige la opción media.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📄</span>
+              <span className={styles.tipIcon} aria-hidden="true">📄</span>
               <h4>Una página o menos</h4>
               <p>Para proyectos hasta 5.000 €, el presupuesto debería caber en 1-2 páginas. Los presupuestos largos dan miedo y reducen la tasa de aceptación.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⏱️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⏱️</span>
               <h4>Responde rápido</h4>
               <p>Enviar el presupuesto en las 24h siguientes a la reunión aumenta la tasa de aceptación. La rapidez transmite profesionalidad y aprovecha el interés en caliente.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔔</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔔</span>
               <h4>Crea urgencia real</h4>
               <p>La fecha de validez no es un truco: si tienes agenda ocupada, el cliente que espera puede quedarse sin plaza. Comunícalo honestamente.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <h4>Habla de ROI, no de precio</h4>
               <p>Muestra el retorno: &quot;Con esta web, si consigues un cliente más al mes, el proyecto se amortiza en 2 meses.&quot; El precio se convierte en inversión.</p>
             </div>
@@ -1018,7 +1019,7 @@ export default function CalculadoraPresupuestosPage() {
 
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <h3>Errores frecuentes en presupuestos que cuestan clientes y dinero</h3>
           </div>
           <ul className={styles.warningList}>

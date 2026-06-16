@@ -250,7 +250,7 @@ export default function ChecklistCambioRegimenPage() {
 
         {/* Hero */}
         <header className={styles.hero}>
-          <h1 className={styles.title}>📋 Cambio de Régimen Fiscal del Autónomo</h1>
+          <h1 className={styles.title}><span aria-hidden="true">📋</span> Cambio de Régimen Fiscal del Autónomo</h1>
           <p className={styles.subtitle}>
             De estimación objetiva (módulos) a estimación directa simplificada — Guía y checklist paso a paso
           </p>
@@ -292,6 +292,7 @@ export default function ChecklistCambioRegimenPage() {
                     </span>
                     <p className={styles.orientadorTitulo}>{item.titulo}</p>
                     <button
+                      type="button"
                       className={styles.infoToggle}
                       onClick={() => toggleOrientador(item.id)}
                       aria-expanded={isExpanded}
@@ -330,7 +331,7 @@ export default function ChecklistCambioRegimenPage() {
           </div>
           {porcentaje === 100 && (
             <div className={styles.completadoMsg} role="alert" aria-live="polite">
-              🎉 ¡Checklist completado! Ya estás listo para operar en el nuevo régimen.
+              <span aria-hidden="true">🎉</span> ¡Checklist completado! Ya estás listo para operar en el nuevo régimen.
             </div>
           )}
         </div>
@@ -344,6 +345,7 @@ export default function ChecklistCambioRegimenPage() {
             return (
               <section key={fase.id} className={`${styles.faseCard} ${styles[`fase-${fase.id}`]}`}>
                 <button
+                  type="button"
                   className={styles.faseCardHeader}
                   onClick={() => toggleFase(fase.id)}
                   aria-expanded={!isCollapsed}
@@ -397,6 +399,7 @@ export default function ChecklistCambioRegimenPage() {
                               </span>
                             </label>
                             <button
+                              type="button"
                               className={styles.infoToggle}
                               onClick={() => toggleExpand(item.id)}
                               aria-expanded={isExpanded}
@@ -423,17 +426,18 @@ export default function ChecklistCambioRegimenPage() {
         {/* Botón reiniciar */}
         <div className={styles.resetWrapper}>
           <button
+            type="button"
             className={styles.btnReset}
             onClick={resetChecklist}
             aria-label="Reiniciar checklist: desmarcar todos los elementos"
           >
-            🔄 Reiniciar checklist
+            <span aria-hidden="true">🔄</span> Reiniciar checklist
           </button>
         </div>
 
         {/* ── Sección educativa v2.0 ── */}
         <EducationalSection
-          title="📚 Módulos vs. Estimación Directa — Guía Completa"
+          title="Módulos vs. Estimación Directa — Guía Completa"
           subtitle="Todo lo que necesitas saber antes de cambiar de régimen fiscal"
         >
           {/* Aviso de advertencia — warningBox */}

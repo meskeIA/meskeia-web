@@ -691,12 +691,12 @@
 
 | Estado | Nombre | URL | Suites |
 |---|---|---|---|
-| [ ] | Auditoría de Propuesta de Valor | `/auditoria-propuesta-valor/` | freelance, diseno |
+| [x] | Auditoría de Propuesta de Valor | `/auditoria-propuesta-valor/` | freelance, diseno |
 | [x] | Calculadora de IVA | `/calculadora-iva/` | freelance, productividad |
 | [x] | Calculadora de Precio por Proyecto Freelance | `/calculadora-precio-por-proyecto/` | freelance, productividad |
-| [ ] | Calculadora de Presupuestos | `/calculadora-presupuestos/` | freelance |
-| [ ] | Calculadora de Productividad | `/calculadora-productividad/` | freelance, productividad |
-| [ ] | Checklist Cambio de Régimen Fiscal Autónomo | `/checklist-cambio-regimen-autonomo/` | freelance |
+| [x] | Calculadora de Presupuestos | `/calculadora-presupuestos/` | freelance |
+| [x] | Calculadora de Productividad | `/calculadora-productividad/` | freelance, productividad |
+| [x] | Checklist Cambio de Régimen Fiscal Autónomo | `/checklist-cambio-regimen-autonomo/` | freelance |
 | [ ] | Checklist VeriFactu - Facturación Electrónica | `/checklist-preparar-verifactu/` | freelance, legal-fiscal |
 | [x] | Conversor de Horarios | `/conversor-horarios/` | freelance, productividad, viajes |
 | [ ] | Diagnóstico de Modelo de Negocio | `/diagnostico-modelo-negocio/` | freelance, finanzas |

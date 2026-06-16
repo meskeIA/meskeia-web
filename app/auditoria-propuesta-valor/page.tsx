@@ -121,9 +121,9 @@ export default function AuditoriaPropuestaValorPage() {
     <div className={styles.container}>
         <MeskeiaLogo />
         <header className={styles.hero}>
-          <h1 className={styles.title}>💎 Auditoría de Propuesta de Valor</h1>
+          <h1 className={styles.title}><span aria-hidden="true">💎</span> Auditoría de Propuesta de Valor</h1>
           <p className={styles.subtitle}>¿Lo que ofreces encaja con lo que tu cliente necesita?<br />Basado en el Value Proposition Canvas de Osterwalder</p>
-          <div className={styles.badges}><span className={styles.badge}>🕐 3 minutos</span><span className={styles.badge}>📊 10 preguntas</span><span className={styles.badge}>🔒 Sin registro</span></div>
+          <div className={styles.badges}><span className={styles.badge}><span aria-hidden="true">🕐</span> 3 minutos</span><span className={styles.badge}><span aria-hidden="true">📊</span> 10 preguntas</span><span className={styles.badge}><span aria-hidden="true">🔒</span> Sin registro</span></div>
         </header>
 
         <LegalNotice />
@@ -142,7 +142,7 @@ export default function AuditoriaPropuestaValorPage() {
               <p className={styles.questionText}>{pregunta.texto}</p>
               <div className={styles.scaleContainer} role="radiogroup" aria-label={`Pregunta ${index + 1}: ${pregunta.texto}`}>
                 {ESCALA.map((opcion) => (
-                  <button key={opcion.valor} className={`${styles.scaleButton} ${respuestas[pregunta.id] === opcion.valor ? styles.scaleButtonActive : ''}`} onClick={() => handleRespuesta(pregunta.id, opcion.valor)} role="radio" aria-checked={respuestas[pregunta.id] === opcion.valor} aria-label={`${opcion.etiqueta} (${opcion.valor} de 5)`}>
+                  <button key={opcion.valor} type="button" className={`${styles.scaleButton} ${respuestas[pregunta.id] === opcion.valor ? styles.scaleButtonActive : ''}`} onClick={() => handleRespuesta(pregunta.id, opcion.valor)} role="radio" aria-checked={respuestas[pregunta.id] === opcion.valor} aria-label={`${opcion.etiqueta} (${opcion.valor} de 5)`}>
                     <span className={styles.scaleValue}>{opcion.valor}</span><span className={styles.scaleLabel}>{opcion.etiqueta}</span>
                   </button>
                 ))}
@@ -150,7 +150,7 @@ export default function AuditoriaPropuestaValorPage() {
             </div>
           ))}
           <div className={styles.progressInfo}>{Object.keys(respuestas).length} de {PREGUNTAS.length} respondidas</div>
-          <button className={styles.btnPrimary} onClick={calcularResultado} disabled={!todasRespondidas} aria-label="Ver mi diagnóstico">
+          <button type="button" className={styles.btnPrimary} onClick={calcularResultado} disabled={!todasRespondidas} aria-label="Ver mi diagnóstico">
             {todasRespondidas ? 'Ver mi diagnóstico' : `Responde las ${PREGUNTAS.length - Object.keys(respuestas).length} preguntas restantes`}
           </button>
         </section>
@@ -160,14 +160,14 @@ export default function AuditoriaPropuestaValorPage() {
             <h2 className={styles.sectionTitle}>Tu diagnóstico</h2>
             <div className={styles.mapContainer}>
               <div className={styles.mapLabels}>
-                <span className={styles.mapLabelTop}>📣 Alta Comunicación</span><span className={styles.mapLabelBottom}>Baja Comunicación</span>
-                <span className={styles.mapLabelLeft}>Bajo Encaje</span><span className={styles.mapLabelRight}>🎯 Alto Encaje</span>
+                <span className={styles.mapLabelTop}><span aria-hidden="true">📣</span> Alta Comunicación</span><span className={styles.mapLabelBottom}>Baja Comunicación</span>
+                <span className={styles.mapLabelLeft}>Bajo Encaje</span><span className={styles.mapLabelRight}><span aria-hidden="true">🎯</span> Alto Encaje</span>
               </div>
               <div className={styles.map}>
-                <div className={`${styles.quadrant} ${styles.quadrantTL}`}><span>📢 Marketing sin Sustancia</span></div>
-                <div className={`${styles.quadrant} ${styles.quadrantTR}`}><span>🎯 Propuesta Completa</span></div>
-                <div className={`${styles.quadrant} ${styles.quadrantBL}`}><span>🧭 Por Definir</span></div>
-                <div className={`${styles.quadrant} ${styles.quadrantBR}`}><span>💎 Valor Oculto</span></div>
+                <div className={`${styles.quadrant} ${styles.quadrantTL}`}><span><span aria-hidden="true">📢</span> Marketing sin Sustancia</span></div>
+                <div className={`${styles.quadrant} ${styles.quadrantTR}`}><span><span aria-hidden="true">🎯</span> Propuesta Completa</span></div>
+                <div className={`${styles.quadrant} ${styles.quadrantBL}`}><span><span aria-hidden="true">🧭</span> Por Definir</span></div>
+                <div className={`${styles.quadrant} ${styles.quadrantBR}`}><span><span aria-hidden="true">💎</span> Valor Oculto</span></div>
                 <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" /><div className={styles.thresholdLineV} style={{ left: '65%' }} aria-hidden="true" />
                 <div className={styles.thresholdLineH} style={{ top: '35%' }} aria-hidden="true" /><div className={styles.thresholdLineH} style={{ top: '55%' }} aria-hidden="true" />
                 <div className={styles.mapDot} style={{ left: `${posX}%`, top: `${posY}%` }} aria-label={`Tu posición: Encaje ${puntuacionEncaje}/25, Comunicación ${puntuacionComunicacion}/25`}>
@@ -176,19 +176,19 @@ export default function AuditoriaPropuestaValorPage() {
               </div>
             </div>
             <div className={styles.scoresContainer}>
-              <div className={styles.scoreBar}><div className={styles.scoreHeader}><span>🎯 Encaje</span><span className={styles.scoreValue}>{puntuacionEncaje}/25</span></div><div className={styles.barTrack}><div className={`${styles.barFill} ${styles.barEncaje}`} style={{ width: `${(puntuacionEncaje / 25) * 100}%` }} /></div></div>
-              <div className={styles.scoreBar}><div className={styles.scoreHeader}><span>📣 Comunicación</span><span className={styles.scoreValue}>{puntuacionComunicacion}/25</span></div><div className={styles.barTrack}><div className={`${styles.barFill} ${styles.barComunicacion}`} style={{ width: `${(puntuacionComunicacion / 25) * 100}%` }} /></div></div>
+              <div className={styles.scoreBar}><div className={styles.scoreHeader}><span><span aria-hidden="true">🎯</span> Encaje</span><span className={styles.scoreValue}>{puntuacionEncaje}/25</span></div><div className={styles.barTrack}><div className={`${styles.barFill} ${styles.barEncaje}`} style={{ width: `${(puntuacionEncaje / 25) * 100}%` }} /></div></div>
+              <div className={styles.scoreBar}><div className={styles.scoreHeader}><span><span aria-hidden="true">📣</span> Comunicación</span><span className={styles.scoreValue}>{puntuacionComunicacion}/25</span></div><div className={styles.barTrack}><div className={`${styles.barFill} ${styles.barComunicacion}`} style={{ width: `${(puntuacionComunicacion / 25) * 100}%` }} /></div></div>
             </div>
             <div className={styles.profileCard}>
-              <div className={styles.profileHeader}><span className={styles.profileEmoji}>{perfil.emoji}</span><h3 className={styles.profileName}>{perfil.nombre}</h3></div>
+              <div className={styles.profileHeader}><span className={styles.profileEmoji} aria-hidden="true">{perfil.emoji}</span><h3 className={styles.profileName}>{perfil.nombre}</h3></div>
               <p className={styles.profileDescription}>{perfil.descripcion}</p>
               <div className={styles.profileColumns}>
-                <div className={styles.profileColumn}><h4 className={styles.columnTitle}>✅ Fortalezas</h4><ul className={styles.profileList}>{perfil.fortalezas.map((f, i) => (<li key={i}>{f}</li>))}</ul></div>
-                <div className={styles.profileColumn}><h4 className={styles.columnTitle}>⚠️ Riesgos</h4><ul className={styles.profileList}>{perfil.riesgos.map((r, i) => (<li key={i}>{r}</li>))}</ul></div>
+                <div className={styles.profileColumn}><h4 className={styles.columnTitle}><span aria-hidden="true">✅</span> Fortalezas</h4><ul className={styles.profileList}>{perfil.fortalezas.map((f, i) => (<li key={i}>{f}</li>))}</ul></div>
+                <div className={styles.profileColumn}><h4 className={styles.columnTitle}><span aria-hidden="true">⚠️</span> Riesgos</h4><ul className={styles.profileList}>{perfil.riesgos.map((r, i) => (<li key={i}>{r}</li>))}</ul></div>
               </div>
-              <div className={styles.actionsSection}><h4 className={styles.actionsTitle}>🎯 Acciones sugeridas</h4><ol className={styles.actionsList}>{perfil.acciones.map((a, i) => (<li key={i}>{a}</li>))}</ol></div>
+              <div className={styles.actionsSection}><h4 className={styles.actionsTitle}><span aria-hidden="true">🎯</span> Acciones sugeridas</h4><ol className={styles.actionsList}>{perfil.acciones.map((a, i) => (<li key={i}>{a}</li>))}</ol></div>
             </div>
-            <button className={styles.btnSecondary} onClick={reiniciar}>Repetir diagnóstico</button>
+            <button type="button" className={styles.btnSecondary} onClick={reiniciar}>Repetir diagnóstico</button>
           </section>
         )}
 

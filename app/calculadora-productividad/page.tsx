@@ -171,7 +171,7 @@ export default function CalculadoraProductividadPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>📊</span>
+        <span className={styles.heroIcon} aria-hidden="true">📊</span>
         <h1 className={styles.title}>Calculadora de Productividad</h1>
         <p className={styles.subtitle}>
           Analiza tu productividad real como freelance. Calcula ingresos por hora efectiva
@@ -193,11 +193,11 @@ export default function CalculadoraProductividadPage() {
         <div className={styles.sectionHeader}>
           <h2>Tus Proyectos/Clientes</h2>
           <div className={styles.headerActions}>
-            <button onClick={addProject} className={styles.addButton}>
+            <button type="button" onClick={addProject} className={styles.addButton}>
               + Añadir proyecto
             </button>
             {projects.length > 1 && (
-              <button onClick={clearAll} className={styles.clearButton}>
+              <button type="button" onClick={clearAll} className={styles.clearButton}>
                 Limpiar todo
               </button>
             )}
@@ -219,6 +219,7 @@ export default function CalculadoraProductividadPage() {
                 />
                 {projects.length > 1 && (
                   <button
+                    type="button"
                     onClick={() => removeProject(project.id)}
                     className={styles.removeButton}
                     aria-label="Eliminar proyecto"
@@ -303,7 +304,7 @@ export default function CalculadoraProductividadPage() {
                   </div>
                   {results.tiempoNoFacturable > 0 && (
                     <p className={styles.resultNote}>
-                      ⏱️ {formatNumber(results.tiempoNoFacturable, 1)}h de tiempo no facturable
+                      <span aria-hidden="true">⏱️</span> {formatNumber(results.tiempoNoFacturable, 1)}h de tiempo no facturable
                       ({formatNumber((results.tiempoNoFacturable / parseSpanishNumber(project.horasTotales)) * 100, 0)}% del total)
                     </p>
                   )}
@@ -317,7 +318,7 @@ export default function CalculadoraProductividadPage() {
       {/* Resumen Global */}
       {globalSummary && globalSummary.projectsWithData > 0 && (
         <div className={styles.summarySection}>
-          <h2 className={styles.summaryTitle}>📈 Resumen Global</h2>
+          <h2 className={styles.summaryTitle}><span aria-hidden="true">📈</span> Resumen Global</h2>
           <div className={styles.summaryGrid}>
             <ResultCard
               title="Ingresos totales"
@@ -354,7 +355,7 @@ export default function CalculadoraProductividadPage() {
 
           {/* Interpretación */}
           <div className={styles.interpretation}>
-            <h3>💡 Interpretación</h3>
+            <h3><span aria-hidden="true">💡</span> Interpretación</h3>
             {globalSummary.eficienciaGlobal >= 80 ? (
               <p className={styles.interpretationGood}>
                 <strong>Excelente eficiencia ({formatNumber(globalSummary.eficienciaGlobal, 0)}%)</strong>:
@@ -373,7 +374,7 @@ export default function CalculadoraProductividadPage() {
               </p>
             )}
             <p className={styles.interpretationTip}>
-              📌 <strong>Tu tarifa efectiva es {formatCurrency(globalSummary.ingresosPorHoraEfectivaGlobal)}/hora</strong>,
+              <span aria-hidden="true">📌</span> <strong>Tu tarifa efectiva es {formatCurrency(globalSummary.ingresosPorHoraEfectivaGlobal)}/hora</strong>,
               no {formatCurrency(globalSummary.ingresosPorHoraGlobal)}/hora.
               Tenlo en cuenta al calcular presupuestos futuros.
             </p>
@@ -398,7 +399,7 @@ export default function CalculadoraProductividadPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🕐 Horas totales vs efectivas</h4>
+              <h4><span aria-hidden="true">🕐</span> Horas totales vs efectivas</h4>
               <p>
                 Las <strong>horas totales</strong> incluyen todo el tiempo que dedicas a un proyecto.
                 Las <strong>horas efectivas</strong> son solo las de trabajo productivo y facturable.
@@ -409,7 +410,7 @@ export default function CalculadoraProductividadPage() {
               </em></p>
             </div>
             <div className={styles.contentCard}>
-              <h4>💶 Tarifa aparente vs real</h4>
+              <h4><span aria-hidden="true">💶</span> Tarifa aparente vs real</h4>
               <p>
                 Tu <strong>tarifa aparente</strong> es lo que cobras por hora de trabajo.
                 Tu <strong>tarifa real</strong> incluye todo el tiempo &quot;gratis&quot; que dedicas.
@@ -420,7 +421,7 @@ export default function CalculadoraProductividadPage() {
               </em></p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📊 ¿Qué es buena eficiencia?</h4>
+              <h4><span aria-hidden="true">📊</span> ¿Qué es buena eficiencia?</h4>
               <ul>
                 <li><strong>+80%</strong>: Excelente, muy optimizado</li>
                 <li><strong>60-80%</strong>: Normal, mejorable</li>
@@ -431,7 +432,7 @@ export default function CalculadoraProductividadPage() {
               </em></p>
             </div>
             <div className={styles.contentCard}>
-              <h4>🎯 Cómo mejorar tu eficiencia</h4>
+              <h4><span aria-hidden="true">🎯</span> Cómo mejorar tu eficiencia</h4>
               <ul>
                 <li>Limita revisiones incluidas en el precio</li>
                 <li>Cobra las reuniones o inclúyelas en tarifa</li>
@@ -459,7 +460,7 @@ export default function CalculadoraProductividadPage() {
               <li>Eficiencia: 64%</li>
             </ul>
             <p className={styles.exampleConclusion}>
-              💡 Para cobrar realmente 40€/hora, deberías haber facturado <strong>3.125€</strong>
+              <span aria-hidden="true">💡</span> Para cobrar realmente 40€/hora, deberías haber facturado <strong>3.125€</strong>
               por este proyecto (o reducir tiempo no facturable).
             </p>
           </div>
@@ -535,7 +536,7 @@ export default function CalculadoraProductividadPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🧑‍💻</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🧑‍💻</span>
                 <h3>Autónomo / Freelance</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -555,7 +556,7 @@ export default function CalculadoraProductividadPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📋</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📋</span>
                 <h3>Consultor</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -575,7 +576,7 @@ export default function CalculadoraProductividadPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏢</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏢</span>
                 <h3>Empleado</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -595,7 +596,7 @@ export default function CalculadoraProductividadPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🚀</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🚀</span>
                 <h3>Emprendedor</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -828,7 +829,7 @@ export default function CalculadoraProductividadPage() {
           </p>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <h3>Tasa de utilización objetivo: 70–75%</h3>
               <p>
                 No intentes facturar el 100% de tu tiempo. Reserva el 25–30% restante para formación,
@@ -839,7 +840,7 @@ export default function CalculadoraProductividadPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⏰</span>
+              <span className={styles.tipIcon} aria-hidden="true">⏰</span>
               <h3>Bloques de trabajo profundo de 90 minutos</h3>
               <p>
                 El trabajo de alto valor (código complejo, redacción creativa, diseño estratégico) requiere
@@ -851,7 +852,7 @@ export default function CalculadoraProductividadPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <h3>Auditoría mensual de tiempo</h3>
               <p>
                 Dedica 30–45 minutos al final de cada mes a revisar tu distribución real de tiempo.
@@ -863,7 +864,7 @@ export default function CalculadoraProductividadPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🚫</span>
+              <span className={styles.tipIcon} aria-hidden="true">🚫</span>
               <h3>Elimina o cobra las reuniones innecesarias</h3>
               <p>
                 Antes de aceptar una reunión, aplica el filtro: ¿podría resolverse esto con un email
@@ -875,7 +876,7 @@ export default function CalculadoraProductividadPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💶</span>
+              <span className={styles.tipIcon} aria-hidden="true">💶</span>
               <h3>Calcula y comunica tu precio mínimo viable</h3>
               <p>
                 Tu precio mínimo viable es: (gastos fijos mensuales + cuota RETA + IRPF estimado +
@@ -887,7 +888,7 @@ export default function CalculadoraProductividadPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <h3>Revisión trimestral de tarifas como rutina</h3>
               <p>
                 Alinea la revisión de tarifas con el calendario fiscal español: enero, abril, julio
@@ -905,7 +906,7 @@ export default function CalculadoraProductividadPage() {
         <section className={styles.guideSection}>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h2>Errores frecuentes que destruyen tu rentabilidad</h2>
             </div>
             <p>
