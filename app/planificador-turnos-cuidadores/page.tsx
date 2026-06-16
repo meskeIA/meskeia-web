@@ -194,6 +194,7 @@ export default function PlanificadorTurnosCuidadoresPage() {
               maxLength={30}
             />
             <button
+              type="button"
               className={styles.btnPrimary}
               onClick={agregarCuidador}
               disabled={!nuevoNombre.trim() || cuidadores.length >= COLORES_CUIDADORES.length}
@@ -214,6 +215,7 @@ export default function PlanificadorTurnosCuidadoresPage() {
                   />
                   <span className={styles.cuidadorNombre}>{c.nombre}</span>
                   <button
+                    type="button"
                     className={styles.btnRemove}
                     onClick={() => eliminarCuidador(c.id)}
                     aria-label={`Eliminar a ${c.nombre}`}
@@ -386,6 +388,7 @@ export default function PlanificadorTurnosCuidadoresPage() {
             )}
 
             <button
+              type="button"
               className={styles.btnDanger}
               onClick={limpiarTodo}
               aria-label="Limpiar todo y empezar de nuevo"

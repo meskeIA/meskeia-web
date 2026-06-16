@@ -1052,10 +1052,10 @@
 | [x] | Orientador Percentiles Infantiles | `/orientador-percentiles/` | salud |
 | [x] | Orientador Tensión Arterial | `/orientador-tension-arterial/` | salud, legal-fiscal |
 | [x] | Oxitocina - La Hormona del Vínculo Social | `/visualizador-oxitocina/` | salud, cultura, estudiantes |
-| [ ] | Paracetamol: Cómo Actúa en el Sistema Nervioso Central | `/visualizador-paracetamol/` | salud, cultura, estudiantes |
-| [ ] | Planificador de Gastos del Primer Año del Bebé | `/planificador-gastos-bebe/` | salud, finanzas |
-| [ ] | Planificador de Mascota | `/planificador-mascota/` | salud |
-| [ ] | Planificador de Turnos de Cuidadores | `/planificador-turnos-cuidadores/` | salud, productividad |
+| [x] | Paracetamol: Cómo Actúa en el Sistema Nervioso Central | `/visualizador-paracetamol/` | salud, cultura, estudiantes |
+| [x] | Planificador de Gastos del Primer Año del Bebé | `/planificador-gastos-bebe/` | salud, finanzas |
+| [x] | Planificador de Mascota | `/planificador-mascota/` | salud |
+| [x] | Planificador de Turnos de Cuidadores | `/planificador-turnos-cuidadores/` | salud, productividad |
 | [ ] | Planificador Embarazo y Bebé | `/planificador-embarazo/` | salud |
 | [ ] | Predictor de Tiempos de Running | `/calculadora-tiempos-running/` | salud, tecnicas |
 | [ ] | Qué Pasa Cuando Duermes | `/visualizador-ciclos-sueno/` | salud, cultura |

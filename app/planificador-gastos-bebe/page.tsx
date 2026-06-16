@@ -216,7 +216,7 @@ export default function PlanificadorGastosBebePage(): React.JSX.Element {
                   className={styles.legendDot}
                   style={{ backgroundColor: CATEGORY_COLORS[idx] }}
                 />
-                {cat.icono} {cat.categoria.split(' ')[0]}
+                <span aria-hidden="true">{cat.icono}</span> {cat.categoria.split(' ')[0]}
               </span>
             ))}
           </div>

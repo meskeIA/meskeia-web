@@ -419,28 +419,36 @@ export default function PlanificadorMascotaPage() {
       {/* Navegación de Tabs */}
       <div className={styles.tabs}>
         <button
+          type="button"
           className={`${styles.tab} ${tabActiva === 'perfil' ? styles.tabActiva : ''}`}
           onClick={() => setTabActiva('perfil')}
+          aria-pressed={tabActiva === 'perfil'}
         >
-          {perfil.tipo === 'gato' ? '🐱' : '🐕'} Perfil
+          <span aria-hidden="true">{perfil.tipo === 'gato' ? '🐱' : '🐕'}</span> Perfil
         </button>
         <button
+          type="button"
           className={`${styles.tab} ${tabActiva === 'checklist' ? styles.tabActiva : ''}`}
           onClick={() => setTabActiva('checklist')}
+          aria-pressed={tabActiva === 'checklist'}
         >
-          ✅ Checklist
+          <span aria-hidden="true">✅</span> Checklist
         </button>
         <button
+          type="button"
           className={`${styles.tab} ${tabActiva === 'compras' ? styles.tabActiva : ''}`}
           onClick={() => setTabActiva('compras')}
+          aria-pressed={tabActiva === 'compras'}
         >
-          🛒 Compras
+          <span aria-hidden="true">🛒</span> Compras
         </button>
         <button
+          type="button"
           className={`${styles.tab} ${tabActiva === 'vacunas' ? styles.tabActiva : ''}`}
           onClick={() => setTabActiva('vacunas')}
+          aria-pressed={tabActiva === 'vacunas'}
         >
-          💉 Vacunas
+          <span aria-hidden="true">💉</span> Vacunas
         </button>
       </div>
 
@@ -453,16 +461,20 @@ export default function PlanificadorMascotaPage() {
             {/* Selector tipo mascota */}
             <div className={styles.mascotaSelector}>
               <button
+                type="button"
                 className={`${styles.mascotaBtn} ${perfil.tipo === 'perro' ? styles.active : ''}`}
                 onClick={() => setPerfil(prev => ({ ...prev, tipo: 'perro' }))}
+                aria-pressed={perfil.tipo === 'perro'}
               >
-                🐕 Perro
+                <span aria-hidden="true">🐕</span> Perro
               </button>
               <button
+                type="button"
                 className={`${styles.mascotaBtn} ${perfil.tipo === 'gato' ? styles.active : ''}`}
                 onClick={() => setPerfil(prev => ({ ...prev, tipo: 'gato' }))}
+                aria-pressed={perfil.tipo === 'gato'}
               >
-                🐱 Gato
+                <span aria-hidden="true">🐱</span> Gato
               </button>
             </div>
 
@@ -517,8 +529,10 @@ export default function PlanificadorMascotaPage() {
                   {(['pequeno', 'mediano', 'grande', 'gigante'] as TamanoPerro[]).map(tam => (
                     <button
                       key={tam}
+                      type="button"
                       className={`${styles.tamanoBtn} ${perfil.tamano === tam ? styles.active : ''}`}
                       onClick={() => setPerfil(prev => ({ ...prev, tamano: tam }))}
+                      aria-pressed={perfil.tamano === tam}
                     >
                       <span className={styles.tamanoNombre}>
                         {tam === 'pequeno' ? 'Pequeño' : tam === 'mediano' ? 'Mediano' : tam === 'grande' ? 'Grande' : 'Gigante'}
@@ -564,8 +578,8 @@ export default function PlanificadorMascotaPage() {
               </label>
             </div>
 
-            <button onClick={resetPerfil} className={styles.btnSecondary}>
-              🗑️ Borrar perfil
+            <button type="button" onClick={resetPerfil} className={styles.btnSecondary}>
+              <span aria-hidden="true">🗑️</span> Borrar perfil
             </button>
           </div>
 
@@ -669,18 +683,22 @@ export default function PlanificadorMascotaPage() {
 
           <div className={styles.filtros}>
             <button
+              type="button"
               className={`${styles.filtroBtn} ${filtroEtapa === 'todos' ? styles.activo : ''}`}
               onClick={() => setFiltroEtapa('todos')}
+              aria-pressed={filtroEtapa === 'todos'}
             >
               Todas
             </button>
             {(['llegada', 'primeros_meses', 'juvenil', 'adulto'] as EtapaType[]).map(etapa => (
               <button
                 key={etapa}
+                type="button"
                 className={`${styles.filtroBtn} ${filtroEtapa === etapa ? styles.activo : ''}`}
                 onClick={() => setFiltroEtapa(etapa)}
+                aria-pressed={filtroEtapa === etapa}
               >
-                {emojisEtapa[etapa]} {nombresEtapa[etapa]}
+                <span aria-hidden="true">{emojisEtapa[etapa]}</span> {nombresEtapa[etapa]}
               </button>
             ))}
           </div>
@@ -703,8 +721,8 @@ export default function PlanificadorMascotaPage() {
             ))}
           </div>
 
-          <button onClick={resetChecklist} className={styles.btnSecondary}>
-            🔄 Reiniciar Checklist
+          <button type="button" onClick={resetChecklist} className={styles.btnSecondary}>
+            <span aria-hidden="true">🔄</span> Reiniciar Checklist
           </button>
         </div>
       )}
@@ -728,16 +746,20 @@ export default function PlanificadorMascotaPage() {
           <div className={styles.filtrosCompras}>
             <div className={styles.filtrosCategoria}>
               <button
+                type="button"
                 className={`${styles.filtroBtn} ${filtroCategoria === 'todos' ? styles.activo : ''}`}
                 onClick={() => setFiltroCategoria('todos')}
+                aria-pressed={filtroCategoria === 'todos'}
               >
                 Todas
               </button>
               {(Object.keys(nombresCategoriaCompra) as CategoriaCompra[]).map(cat => (
                 <button
                   key={cat}
+                  type="button"
                   className={`${styles.filtroBtn} ${filtroCategoria === cat ? styles.activo : ''}`}
                   onClick={() => setFiltroCategoria(cat)}
+                  aria-pressed={filtroCategoria === cat}
                 >
                   {nombresCategoriaCompra[cat]}
                 </button>
@@ -777,8 +799,8 @@ export default function PlanificadorMascotaPage() {
             ))}
           </div>
 
-          <button onClick={resetCompras} className={styles.btnSecondary}>
-            🔄 Reiniciar Lista
+          <button type="button" onClick={resetCompras} className={styles.btnSecondary}>
+            <span aria-hidden="true">🔄</span> Reiniciar Lista
           </button>
         </div>
       )}
