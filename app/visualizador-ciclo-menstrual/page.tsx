@@ -320,6 +320,7 @@ export default function VisualizadorCicloMenstrual() {
           {FASES.map((fase) => (
             <button
               key={fase.id}
+              type="button"
               className={`${styles.botonFase} ${faseActiva === fase.id ? styles.botonFaseActivo : ''}`}
               style={
                 faseActiva === fase.id
@@ -363,6 +364,7 @@ export default function VisualizadorCicloMenstrual() {
         <h2 className={styles.tituloSeccion}>Variaciones y contextos clínicos</h2>
         <div className={styles.botonesExtra}>
           <button
+            type="button"
             className={`${styles.botonExtra} ${seccionExtra === 'sop' ? styles.botonExtraActivo : ''}`}
             onClick={() => toggleSeccion('sop')}
             aria-pressed={seccionExtra === 'sop'}
@@ -370,6 +372,7 @@ export default function VisualizadorCicloMenstrual() {
             SOP — Síndrome de Ovario Poliquístico
           </button>
           <button
+            type="button"
             className={`${styles.botonExtra} ${seccionExtra === 'anticonceptivos' ? styles.botonExtraActivo : ''}`}
             onClick={() => toggleSeccion('anticonceptivos')}
             aria-pressed={seccionExtra === 'anticonceptivos'}

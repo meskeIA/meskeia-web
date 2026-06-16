@@ -288,6 +288,7 @@ export default function VisualizadorCombinatoriaPage() {
           ] as { id: TabId; label: string }[]).map(tab => (
             <button
               key={tab.id}
+              type="button"
               role="tab"
               aria-selected={activeTab === tab.id}
               className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
@@ -440,6 +441,8 @@ export default function VisualizadorCombinatoriaPage() {
               {patternButtons.map(btn => (
                 <button
                   key={btn.id}
+                  type="button"
+                  aria-pressed={pascalPattern === btn.id}
                   className={`${styles.patternBtn} ${pascalPattern === btn.id ? styles.patternBtnActive : ''}`}
                   onClick={() => { setPascalPattern(btn.id); setSelectedCell(null); }}
                 >
@@ -567,6 +570,7 @@ export default function VisualizadorCombinatoriaPage() {
 
               <div className={styles.multiplyActions}>
                 <button
+                  type="button"
                   className={styles.btnSecondary}
                   onClick={addMultiplyStep}
                   disabled={multiplySteps.length >= 4}
@@ -575,6 +579,7 @@ export default function VisualizadorCombinatoriaPage() {
                   + Añadir paso
                 </button>
                 <button
+                  type="button"
                   className={styles.btnSecondary}
                   onClick={removeMultiplyStep}
                   disabled={multiplySteps.length <= 1}

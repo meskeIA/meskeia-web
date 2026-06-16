@@ -410,6 +410,7 @@ function TabCicloCompleto() {
         {PROCESOS.map(p => (
           <button
             key={p.id}
+            type="button"
             className={`${styles.procesoBadge} ${procesoSeleccionado === p.id ? styles.procesoBadgeActivo : ''}`}
             style={{ borderColor: p.color, color: procesoSeleccionado === p.id ? '#fff' : p.color,
               backgroundColor: procesoSeleccionado === p.id ? p.color : 'transparent' }}
@@ -429,6 +430,7 @@ function TabCicloCompleto() {
               {detalle.nombre}
             </span>
             <button
+              type="button"
               className={styles.procesoDetalleCerrar}
               onClick={() => setProcesoSeleccionado(null)}
               aria-label="Cerrar detalle"
@@ -468,6 +470,7 @@ function TabMicroorganismos() {
             className={`${styles.microCard} ${expandido === m.id ? styles.microCardExpanded : ''}`}
           >
             <button
+              type="button"
               className={styles.microCardBtn}
               onClick={() => setExpandido(expandido === m.id ? null : m.id)}
               aria-expanded={expandido === m.id}
@@ -587,27 +590,27 @@ function TabImpactoHumano() {
       <h3 className={styles.sectionTitle} style={{ marginTop: '1.5rem' }}>Consecuencias del exceso de nitrógeno</h3>
       <div className={styles.impactoGrid}>
         <div className={styles.consecuenciaItem + ' ' + styles.consecuenciaNegativa}>
-          <h4>🐟 Eutrofización</h4>
+          <h4><span aria-hidden="true">🐟</span> Eutrofización</h4>
           <p>El exceso de nitratos en ríos y lagos provoca proliferación masiva de algas que agotan el oxígeno disuelto. Crea «zonas muertas» en costas (Golfo de México, Mar Báltico).</p>
         </div>
         <div className={styles.consecuenciaItem + ' ' + styles.consecuenciaNegativa}>
-          <h4>🌧️ Lluvia ácida</h4>
+          <h4><span aria-hidden="true">🌧️</span> Lluvia ácida</h4>
           <p>Los óxidos de nitrógeno (NOₓ) de vehículos y centrales eléctricas se combinan con agua atmosférica formando HNO₃, que acidifica suelos y aguas.</p>
         </div>
         <div className={styles.consecuenciaItem + ' ' + styles.consecuenciaNegativa}>
-          <h4>☁️ Destrucción del ozono</h4>
+          <h4><span aria-hidden="true">☁️</span> Destrucción del ozono</h4>
           <p>El óxido nitroso (N₂O), producido en suelos agrícolas con exceso de fertilizantes, es el tercer gas de efecto invernadero y destruye la capa de ozono estratosférico.</p>
         </div>
         <div className={styles.consecuenciaItem + ' ' + styles.consecuenciaPositiva}>
-          <h4>🌾 Revolución Verde</h4>
+          <h4><span aria-hidden="true">🌾</span> Revolución Verde</h4>
           <p>Sin la síntesis de Haber-Bosch, la Tierra no podría alimentar a más de ~4.000 millones de personas. Los fertilizantes nitrogenados triplicaron los rendimientos agrícolas en el siglo XX.</p>
         </div>
         <div className={styles.consecuenciaItem + ' ' + styles.consecuenciaNegativa}>
-          <h4>🏥 Salud humana</h4>
+          <h4><span aria-hidden="true">🏥</span> Salud humana</h4>
           <p>El nitrato (NO₃⁻) en agua potable puede causar metahemoglobinemia en lactantes («enfermedad del bebé azul»). La OMS fija el límite en 50 mg/L.</p>
         </div>
         <div className={styles.consecuenciaItem + ' ' + styles.consecuenciaPositiva}>
-          <h4>♻️ Agricultura ecológica</h4>
+          <h4><span aria-hidden="true">♻️</span> Agricultura ecológica</h4>
           <p>La rotación de cultivos con leguminosas aprovecha la fijación biológica, reduciendo la dependencia de fertilizantes sintéticos y sus impactos ambientales.</p>
         </div>
       </div>
@@ -635,8 +638,10 @@ function TabComparativa() {
         {CICLOS.map(c => (
           <button
             key={c.id}
+            type="button"
             className={`${styles.cicloBtn} ${cicloActivo === c.id ? styles.cicloBtnActivo : ''}`}
             onClick={() => setCicloActivo(c.id)}
+            aria-pressed={cicloActivo === c.id}
           >
             {c.nombre}
           </button>

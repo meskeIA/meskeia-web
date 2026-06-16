@@ -413,10 +413,10 @@
 | [x] | Cartografía y Proyecciones - Por qué Todos los Mapas Mienten | `/visualizador-cartografia-proyecciones/` | estudiantes, cultura |
 | [x] | Ciclo de Replicación Viral: Cómo se Reproducen los Virus | `/visualizador-ciclo-viral/` | estudiantes, cultura, salud |
 | [x] | Ciclo del Carbono Completo: Reservorios y Flujos | `/visualizador-ciclo-carbono-completo/` | estudiantes, cultura |
-| [ ] | Ciclo del Nitrógeno: Fijación, Nitrificación y Ciclos Biogeoquímicos | `/visualizador-ciclo-nitrogeno/` | estudiantes, cultura |
-| [ ] | Ciclo Menstrual: Fases y Hormonas | `/visualizador-ciclo-menstrual/` | estudiantes, salud |
-| [ ] | Circuitos Electrónicos: R-L-C, Transistor y Puertas Lógicas | `/visualizador-circuitos-electronicos/` | estudiantes, tecnicas |
-| [ ] | Combinatoria: Permutaciones, Pascal y Binomio de Newton | `/visualizador-combinatoria/` | estudiantes, tecnicas |
+| [x] | Ciclo del Nitrógeno: Fijación, Nitrificación y Ciclos Biogeoquímicos | `/visualizador-ciclo-nitrogeno/` | estudiantes, cultura |
+| [x] | Ciclo Menstrual: Fases y Hormonas | `/visualizador-ciclo-menstrual/` | estudiantes, salud |
+| [x] | Circuitos Electrónicos: R-L-C, Transistor y Puertas Lógicas | `/visualizador-circuitos-electronicos/` | estudiantes, tecnicas |
+| [x] | Combinatoria: Permutaciones, Pascal y Binomio de Newton | `/visualizador-combinatoria/` | estudiantes, tecnicas |
 | [ ] | Cómo Funciona la Probabilidad | `/visualizador-probabilidad/` | estudiantes, cultura |
 | [ ] | Computación Cuántica - Qubits, Puertas y Algoritmo de Shor | `/visualizador-computacion-cuantica/` | estudiantes, cultura, tecnicas |
 | [ ] | Conjugador de Verbos Español | `/conjugador-verbos/` | estudiantes |

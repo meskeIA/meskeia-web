@@ -385,6 +385,7 @@ export default function VisualizadorCircuitosElectronicos() {
           ] as { id: TabActiva; label: string; icon: string }[]).map(tab => (
             <button
               key={tab.id}
+              type="button"
               onClick={() => setTabActiva(tab.id)}
               className={`${styles.tabBtn} ${tabActiva === tab.id ? styles.tabBtnActivo : ''}`}
               aria-pressed={tabActiva === tab.id}
@@ -410,6 +411,7 @@ export default function VisualizadorCircuitosElectronicos() {
               {COMPONENTES.map(c => (
                 <button
                   key={c.id}
+                  type="button"
                   onClick={() => setComponenteSeleccionado(c.id)}
                   className={`${styles.componenteCard} ${componenteSeleccionado === c.id ? styles.componenteCardActivo : ''}`}
                   aria-pressed={componenteSeleccionado === c.id}
@@ -537,11 +539,14 @@ export default function VisualizadorCircuitosElectronicos() {
                   {(['interruptor', 'amplificador'] as ModoTransistor[]).map(m => (
                     <button
                       key={m}
+                      type="button"
                       onClick={() => setModoTransistor(m)}
                       className={`${styles.modoBtn} ${modoTransistor === m ? styles.modoBtnActivo : ''}`}
                       aria-pressed={modoTransistor === m}
                     >
-                      {m === 'interruptor' ? '🔌 Interruptor' : '📈 Amplificador'}
+                      {m === 'interruptor'
+                        ? <><span aria-hidden="true">🔌</span> Interruptor</>
+                        : <><span aria-hidden="true">📈</span> Amplificador</>}
                     </button>
                   ))}
                 </div>
@@ -642,7 +647,7 @@ export default function VisualizadorCircuitosElectronicos() {
 
                     {senalEntradaMV * ganancia > 5000 && (
                       <div className={`${styles.warningBox} ${styles.warningOff}`}>
-                        ⚠️ La señal amplificada ({(senalEntradaMV * ganancia / 1000).toFixed(2)} V) supera la tensión de alimentación típica (5 V) — el transistor entraría en saturación y la señal se recortaría (clipping).
+                        <span aria-hidden="true">⚠️</span> La señal amplificada ({(senalEntradaMV * ganancia / 1000).toFixed(2)} V) supera la tensión de alimentación típica (5 V) — el transistor entraría en saturación y la señal se recortaría (clipping).
                       </div>
                     )}
 
@@ -679,6 +684,7 @@ export default function VisualizadorCircuitosElectronicos() {
               {PUERTAS.map(p => (
                 <button
                   key={p}
+                  type="button"
                   onClick={() => { setPuertaSeleccionada(p); setEntradaA(0); setEntradaB(0); }}
                   className={`${styles.puertaBtn} ${puertaSeleccionada === p ? styles.puertaBtnActivo : ''}`}
                   aria-pressed={puertaSeleccionada === p}
@@ -698,6 +704,7 @@ export default function VisualizadorCircuitosElectronicos() {
                 {/* Toggles de entrada */}
                 <div className={styles.entradasGrid}>
                   <button
+                    type="button"
                     onClick={() => setEntradaA(entradaA ? 0 : 1)}
                     className={`${styles.toggleBtn} ${entradaA ? styles.toggleOn : styles.toggleOff}`}
                     aria-pressed={!!entradaA}
@@ -707,6 +714,7 @@ export default function VisualizadorCircuitosElectronicos() {
                   </button>
                   {puertaSeleccionada !== 'NOT' && (
                     <button
+                      type="button"
                       onClick={() => setEntradaB(entradaB ? 0 : 1)}
                       className={`${styles.toggleBtn} ${entradaB ? styles.toggleOn : styles.toggleOff}`}
                       aria-pressed={!!entradaB}
@@ -824,6 +832,7 @@ export default function VisualizadorCircuitosElectronicos() {
               {NIVELES_CHIP.map(nivel => (
                 <button
                   key={nivel.id}
+                  type="button"
                   onClick={() => setNivelSeleccionado(nivel.id)}
                   className={`${styles.nivelBtn} ${nivelSeleccionado === nivel.id ? styles.nivelBtnActivo : ''}`}
                   aria-pressed={nivelSeleccionado === nivel.id}
