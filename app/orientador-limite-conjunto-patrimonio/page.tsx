@@ -155,7 +155,7 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
 
         {/* Cómo funciona */}
         <section className={styles.panel}>
-          <h2 className={styles.panelTitle}>📖 ¿Qué es el límite conjunto IRPF-Patrimonio?</h2>
+          <h2 className={styles.panelTitle}><span aria-hidden="true">📖</span> ¿Qué es el límite conjunto IRPF-Patrimonio?</h2>
           <p className={styles.panelDesc}>
             El Art. 31 de la Ley 19/1991 establece que la suma de tu cuota íntegra del IRPF más la cuota íntegra
             del Impuesto sobre el Patrimonio no puede superar el 60% de tu base imponible del IRPF. Si la supera,
@@ -193,7 +193,7 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
 
         {/* Formulario */}
         <section className={styles.panel} aria-label="Formulario de orientación">
-          <h2 className={styles.panelTitle}>📋 Tus datos</h2>
+          <h2 className={styles.panelTitle}><span aria-hidden="true">📋</span> Tus datos</h2>
           <p className={styles.panelDesc}>
             Indica los datos de tu última declaración (o de la que estés preparando). Todos los datos se procesan
             en tu navegador, no se envían a ningún servidor.
@@ -401,7 +401,7 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
                 </div>
 
                 <div className={styles.ctaAsesor}>
-                  <strong>👉 Próximo paso:</strong> acude a un asesor fiscal para que aplique el cálculo exacto.
+                  <strong><span aria-hidden="true">👉</span> Próximo paso:</strong> acude a un asesor fiscal para que aplique el cálculo exacto.
                   El cálculo real puede variar por:
                   <ul style={{ marginTop: '0.5rem', marginBottom: 0, paddingLeft: '1.2rem' }}>
                     <li>Prorrateo individual entre cónyuges (si IRPF conjunto)</li>
@@ -425,7 +425,7 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
 
             {resultado.tipo === 'descarte-bonificacion' && resultado.aplicaItsgf && (
               <div className={styles.ctaAsesor}>
-                <strong>⚠️ Atención al ITSGF:</strong> aunque tu CCAA bonifique el Patrimonio al 100%, los patrimonios
+                <strong><span aria-hidden="true">⚠️</span> Atención al ITSGF:</strong> aunque tu CCAA bonifique el Patrimonio al 100%, los patrimonios
                 netos superiores a {formatCurrency(ITSGF_UMBRAL)} pueden tributar por el Impuesto Temporal de
                 Solidaridad de las Grandes Fortunas (estatal). Consulta a tu asesor fiscal para evaluarlo.
               </div>
@@ -433,7 +433,7 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
 
             {resultado.tipo === 'descarte-no-supera-limite' && (
               <div className={styles.ctaAsesor}>
-                <strong>💡 Aun así, conviene revisar:</strong> si tu situación cambia (más patrimonio, menor renta
+                <strong><span aria-hidden="true">💡</span> Aun así, conviene revisar:</strong> si tu situación cambia (más patrimonio, menor renta
                 en años futuros), el límite podría activarse. Vuelve a comprobarlo cada ejercicio o consulta con
                 tu asesor fiscal si hay grandes variaciones.
               </div>

@@ -133,7 +133,7 @@ export default function OrientadorInteresesDemoraPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <div className={styles.heroIcon}>📄</div>
+        <div className={styles.heroIcon} aria-hidden="true">📄</div>
         <h1 className={styles.title}>Orientador de Intereses de Demora</h1>
         <p className={styles.subtitle}>
           Estima orientativamente los intereses que puedes reclamar por facturas impagadas o deudas vencidas.<br />
@@ -150,7 +150,7 @@ export default function OrientadorInteresesDemoraPage() {
 
         {/* Panel de datos */}
         <div className={styles.inputPanel}>
-          <h2 className={styles.panelTitle}>📋 Datos de la deuda</h2>
+          <h2 className={styles.panelTitle}><span aria-hidden="true">📋</span> Datos de la deuda</h2>
 
           <NumberInput
             value={importe}
@@ -238,7 +238,7 @@ export default function OrientadorInteresesDemoraPage() {
           {errores.length > 0 && (
             <div className={styles.errores} role="alert">
               {errores.map((e, i) => (
-                <p key={i} className={styles.errorItem}>⚠️ {e}</p>
+                <p key={i} className={styles.errorItem}><span aria-hidden="true">⚠️</span> {e}</p>
               ))}
             </div>
           )}
@@ -263,7 +263,7 @@ export default function OrientadorInteresesDemoraPage() {
         {/* Panel de resultados */}
         {resultado && (
           <div className={styles.resultsPanel}>
-            <h2 className={styles.panelTitle}>📊 Estimación orientativa</h2>
+            <h2 className={styles.panelTitle}><span aria-hidden="true">📊</span> Estimación orientativa</h2>
 
             <div className={styles.resultadoGrid}>
               <ResultCard
@@ -310,7 +310,7 @@ export default function OrientadorInteresesDemoraPage() {
 
             {tipoDeuda === 'comercial' && (
               <div className={styles.avisoSemestre}>
-                <span>ℹ️</span>
+                <span aria-hidden="true">ℹ️</span>
                 <p>
                   Si la deuda abarca <strong>varios semestres</strong>, el tipo de interés cambia en cada uno.
                   Esta orientación aplica el tipo del semestre de inicio. Para períodos largos, consulta
@@ -334,7 +334,7 @@ export default function OrientadorInteresesDemoraPage() {
 
       {/* Aviso específico */}
       <div className={styles.avisoEspecifico}>
-        <h3 className={styles.avisoEspecificoTitle}>⚠️ Lo que esta orientación NO sustituye</h3>
+        <h3 className={styles.avisoEspecificoTitle}><span aria-hidden="true">⚠️</span> Lo que esta orientación NO sustituye</h3>
         <ul className={styles.avisoLista}>
           <li>Esta herramienta usa el tipo vigente al <strong>inicio de la demora</strong>. Si el período abarca varios semestres, el tipo varía y debe recalcularse por tramos.</li>
           <li>Para deudas con <strong>tipo pactado expresamente en contrato</strong>, se aplica ese tipo, no el legal.</li>
@@ -492,7 +492,7 @@ export default function OrientadorInteresesDemoraPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🧾</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🧾</span>
                 <strong>Autónomo con factura impagada de 3.000 €</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -507,7 +507,7 @@ export default function OrientadorInteresesDemoraPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🤝</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🤝</span>
                 <strong>Préstamo personal entre particulares sin tipo pactado</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -522,7 +522,7 @@ export default function OrientadorInteresesDemoraPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏛️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏛️</span>
                 <strong>Deuda con Hacienda por declaración complementaria</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -538,7 +538,7 @@ export default function OrientadorInteresesDemoraPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🌍</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🌍</span>
                 <strong>Empresa reclamando a proveedor internacional</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -725,7 +725,7 @@ export default function OrientadorInteresesDemoraPage() {
           <div className={styles.tipsGrid}>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📝</span>
+              <span className={styles.tipIcon} aria-hidden="true">📝</span>
               <div>
                 <strong>Incluye la cláusula de intereses en tus contratos</strong>
                 <p>
@@ -737,7 +737,7 @@ export default function OrientadorInteresesDemoraPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📧</span>
+              <span className={styles.tipIcon} aria-hidden="true">📧</span>
               <div>
                 <strong>Envía recordatorio escrito antes del vencimiento</strong>
                 <p>
@@ -749,7 +749,7 @@ export default function OrientadorInteresesDemoraPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧮</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧮</span>
               <div>
                 <strong>Calcula los 40 € mínimos por factura, no por cliente</strong>
                 <p>
@@ -761,7 +761,7 @@ export default function OrientadorInteresesDemoraPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <div>
                 <strong>Interrumpe la prescripción con comunicaciones formales</strong>
                 <p>
@@ -773,7 +773,7 @@ export default function OrientadorInteresesDemoraPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🌍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🌍</span>
               <div>
                 <strong>En contratos internacionales, especifica la ley aplicable</strong>
                 <p>
@@ -785,7 +785,7 @@ export default function OrientadorInteresesDemoraPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💼</span>
+              <span className={styles.tipIcon} aria-hidden="true">💼</span>
               <div>
                 <strong>Emite la factura de intereses pronto: tributan en IRPF</strong>
                 <p>
@@ -803,7 +803,7 @@ export default function OrientadorInteresesDemoraPage() {
         <section className={styles.guideSection}>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <strong>Errores frecuentes que pueden costarte el cobro</strong>
             </div>
             <ul className={styles.warningList}>

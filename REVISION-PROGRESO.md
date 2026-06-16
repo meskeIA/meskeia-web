@@ -900,12 +900,12 @@
 | [x] | Optimizador de Rentas 60+ | `/optimizador-rentas-60/` | legal-fiscal, finanzas |
 | [x] | Orientación para Tramitar una Herencia | `/orientacion-tramitacion-herencias/` | legal-fiscal |
 | [x] | Orientador de Ayudas y Prestaciones para Personas y Familias | `/orientador-ayudas-personas-familias/` | legal-fiscal, finanzas |
-| [ ] | Orientador de Becas y Ayudas al Estudio | `/orientador-becas-ayudas-estudio/` | legal-fiscal, estudiantes |
+| [x] | Orientador de Becas y Ayudas al Estudio | `/orientador-becas-ayudas-estudio/` | legal-fiscal, estudiantes |
 | [x] | Orientador de Gastos Deducibles | `/orientador-gastos-deducibles/` | legal-fiscal, freelance |
-| [ ] | Orientador de Intereses de Demora | `/orientador-intereses-demora/` | legal-fiscal, freelance |
-| [ ] | Orientador de Justicia Gratuita | `/orientador-justicia-gratuita/` | legal-fiscal |
+| [x] | Orientador de Intereses de Demora | `/orientador-intereses-demora/` | legal-fiscal, freelance |
+| [x] | Orientador de Justicia Gratuita | `/orientador-justicia-gratuita/` | legal-fiscal |
 | [x] | Orientador de Trámites de Jubilación | `/orientador-tramites-jubilacion/` | legal-fiscal, finanzas |
-| [ ] | Orientador Límite Conjunto IRPF-Patrimonio | `/orientador-limite-conjunto-patrimonio/` | legal-fiscal, finanzas |
+| [x] | Orientador Límite Conjunto IRPF-Patrimonio | `/orientador-limite-conjunto-patrimonio/` | legal-fiscal, finanzas |
 | [ ] | Orientador Visa Nómada Digital | `/requisitos-nomada-digital/` | legal-fiscal, freelance |
 | [x] | Planificador de Ahorro para la Jubilación | `/planificador-ahorro-jubilacion/` | legal-fiscal, finanzas |
 | [x] | Simulador de Jubilación Pública | `/simulador-jubilacion-publica/` | legal-fiscal, finanzas |

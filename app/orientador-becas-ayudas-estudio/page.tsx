@@ -124,6 +124,7 @@ export default function OrientadorBecasAyudasEstudioPage() {
           {NIVELES.map(n => (
             <button
               key={n.id}
+              type="button"
               className={`${styles.figuraCard} ${nivel === n.id ? styles.figuraActiva : ''}`}
               onClick={() => setNivel(n.id)}
               aria-pressed={nivel === n.id}
@@ -146,6 +147,7 @@ export default function OrientadorBecasAyudasEstudioPage() {
             return (
               <button
                 key={n.id}
+                type="button"
                 className={`${styles.checkboxCard} ${activo ? styles.checkboxActivo : ''}`}
                 onClick={() => toggleNecesidad(n.id)}
                 aria-pressed={activo}
@@ -171,6 +173,7 @@ export default function OrientadorBecasAyudasEstudioPage() {
             return (
               <button
                 key={p.id}
+                type="button"
                 className={`${styles.checkboxCard} ${activo ? styles.checkboxActivo : ''}`}
                 onClick={() => togglePerfil(p.id)}
                 aria-pressed={activo}
@@ -187,9 +190,10 @@ export default function OrientadorBecasAyudasEstudioPage() {
       {/* Resultados */}
       <section className={styles.section}>
         <h2 className={styles.sectionTitle} aria-live="polite">
+          <span aria-hidden="true">📋</span>{' '}
           {nivel
-            ? `📋 ${totalEspecificas} categorías para tu situación + recursos generales`
-            : '📋 Recursos generales — selecciona el nivel educativo para ver más'}
+            ? `${totalEspecificas} categorías para tu situación + recursos generales`
+            : 'Recursos generales — selecciona el nivel educativo para ver más'}
         </h2>
         {!nivel && (
           <div className={styles.pendienteMsg}>
@@ -413,7 +417,7 @@ export default function OrientadorBecasAyudasEstudioPage() {
 
         {/* Warning */}
         <section className={styles.warningBox}>
-          <h2>⚠️ Lo que debes saber antes de solicitar</h2>
+          <h2><span aria-hidden="true">⚠️</span> Lo que debes saber antes de solicitar</h2>
           <div className={styles.warningGrid}>
             {[
               { titulo: 'No garantiza que tengas derecho a ninguna beca', desc: 'Esta herramienta describe tipos de beca y ayuda con carácter general. La concesión real depende de una valoración individual de tu situación por parte del organismo competente.' },
