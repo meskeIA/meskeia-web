@@ -289,11 +289,11 @@
 | [x] | La Segunda Guerra Mundial: De la Invasión de Polonia a Hiroshima | `/visualizador-historia/segunda-guerra-mundial/` | cultura |
 | [x] | La Unión Europea: De las Cenizas de la Guerra a la Integración | `/visualizador-historia/historia-union-europea/` | cultura |
 | [x] | Las Cruzadas: De Clermont a la Caída de Acre | `/visualizador-historia/las-cruzadas/` | cultura |
-| [ ] | Las Grandes Dinastías Chinas: De Qin a la República | `/visualizador-historia/china-dinastias/` | cultura |
-| [ ] | Las Guerras Napoleónicas: Europa en Llamas (1799-1815) | `/visualizador-historia/guerras-napoleonicas/` | cultura, estudiantes |
+| [x] | Las Grandes Dinastías Chinas: De Qin a la República | `/visualizador-historia/china-dinastias/` | cultura |
+| [x] | Las Guerras Napoleónicas: Europa en Llamas (1799-1815) | `/visualizador-historia/guerras-napoleonicas/` | cultura, estudiantes |
 | [x] | Los Números de la Música | `/visualizador-matematicas-musica/` | cultura, estudiantes |
-| [ ] | Los Números del Océano | `/visualizador-oceano/` | cultura, estudiantes |
-| [ ] | Mapa de Automatización Personal | `/mapa-automatizacion-personal/` | cultura, productividad |
+| [x] | Los Números del Océano | `/visualizador-oceano/` | cultura, estudiantes |
+| [x] | Mapa de Automatización Personal | `/mapa-automatizacion-personal/` | cultura, productividad |
 | [ ] | Microbiología: Bacterias, Crecimiento y Tres Dominios de la Vida | `/visualizador-microbiologia/` | cultura, estudiantes, salud |
 | [ ] | Minerales del Mundo | `/minerales-del-mundo/` | cultura |
 | [ ] | Movimientos Artísticos: Historia del Arte desde el Románico hasta el Arte Digital | `/visualizador-arte-movimientos/` | cultura |

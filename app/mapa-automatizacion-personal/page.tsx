@@ -241,16 +241,16 @@ export default function MapaAutomatizacionPersonalPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🗺️ Mapa de Automatización Personal</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🗺️</span> Mapa de Automatización Personal</h1>
           <p className={styles.subtitle}>
             ¿Qué tareas deberías automatizar y cuáles proteger?
             <br />
             Automatizar lo rutinario y proteger lo creativo
           </p>
           <div className={styles.badges}>
-            <span className={styles.badge}>🕐 3 minutos</span>
-            <span className={styles.badge}>📊 10 preguntas</span>
-            <span className={styles.badge}>🔒 Sin registro</span>
+            <span className={styles.badge}><span aria-hidden="true">🕐</span> 3 minutos</span>
+            <span className={styles.badge}><span aria-hidden="true">📊</span> 10 preguntas</span>
+            <span className={styles.badge}><span aria-hidden="true">🔒</span> Sin registro</span>
           </div>
         </header>
 
@@ -288,6 +288,7 @@ export default function MapaAutomatizacionPersonalPage() {
               <div className={styles.scaleContainer} role="radiogroup" aria-label={`Pregunta ${index + 1}: ${pregunta.texto}`}>
                 {ESCALA.map((opcion) => (
                   <button
+                    type="button"
                     key={opcion.valor}
                     className={`${styles.scaleButton} ${respuestas[pregunta.id] === opcion.valor ? styles.scaleButtonActive : ''}`}
                     onClick={() => handleRespuesta(pregunta.id, opcion.valor)}
@@ -308,6 +309,7 @@ export default function MapaAutomatizacionPersonalPage() {
           </div>
 
           <button
+            type="button"
             className={styles.btnPrimary}
             onClick={calcularResultado}
             disabled={!todasRespondidas}
@@ -323,23 +325,23 @@ export default function MapaAutomatizacionPersonalPage() {
 
             <div className={styles.mapContainer}>
               <div className={styles.mapLabels}>
-                <span className={styles.mapLabelTop}>⚙️ Alta automatización</span>
+                <span className={styles.mapLabelTop}><span aria-hidden="true">⚙️</span> Alta automatización</span>
                 <span className={styles.mapLabelBottom}>Baja automatización</span>
                 <span className={styles.mapLabelLeft}>Baja protección</span>
-                <span className={styles.mapLabelRight}>🛡️ Alta protección</span>
+                <span className={styles.mapLabelRight}><span aria-hidden="true">🛡️</span> Alta protección</span>
               </div>
               <div className={styles.map}>
                 <div className={`${styles.quadrant} ${styles.quadrantTL}`}>
-                  <span>🤖 Automatizador Compulsivo</span>
+                  <span><span aria-hidden="true">🤖</span> Automatizador Compulsivo</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantTR}`}>
-                  <span>🎯 Automatizador Estratégico</span>
+                  <span><span aria-hidden="true">🎯</span> Automatizador Estratégico</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBL}`}>
-                  <span>🌀 Sin Mapa</span>
+                  <span><span aria-hidden="true">🌀</span> Sin Mapa</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
-                  <span>✋ Artesano Consciente</span>
+                  <span><span aria-hidden="true">✋</span> Artesano Consciente</span>
                 </div>
                 <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
                 <div className={styles.thresholdLineV} style={{ left: '65%' }} aria-hidden="true" />
@@ -358,7 +360,7 @@ export default function MapaAutomatizacionPersonalPage() {
             <div className={styles.scoresContainer}>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>⚙️ Automatización de lo rutinario</span>
+                  <span><span aria-hidden="true">⚙️</span> Automatización de lo rutinario</span>
                   <span className={styles.scoreValue}>{puntuacionAutomatizacion}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -370,7 +372,7 @@ export default function MapaAutomatizacionPersonalPage() {
               </div>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>🛡️ Protección de lo creativo</span>
+                  <span><span aria-hidden="true">🛡️</span> Protección de lo creativo</span>
                   <span className={styles.scoreValue}>{puntuacionProteccion}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -391,7 +393,7 @@ export default function MapaAutomatizacionPersonalPage() {
 
               <div className={styles.profileColumns}>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>✅ Fortalezas</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">✅</span> Fortalezas</h4>
                   <ul className={styles.profileList}>
                     {perfil.fortalezas.map((f, i) => (
                       <li key={i}>{f}</li>
@@ -399,7 +401,7 @@ export default function MapaAutomatizacionPersonalPage() {
                   </ul>
                 </div>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>⚠️ Riesgos</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">⚠️</span> Riesgos</h4>
                   <ul className={styles.profileList}>
                     {perfil.riesgos.map((r, i) => (
                       <li key={i}>{r}</li>
@@ -409,7 +411,7 @@ export default function MapaAutomatizacionPersonalPage() {
               </div>
 
               <div className={styles.actionsSection}>
-                <h4 className={styles.actionsTitle}>🎯 Acciones sugeridas</h4>
+                <h4 className={styles.actionsTitle}><span aria-hidden="true">🎯</span> Acciones sugeridas</h4>
                 <ol className={styles.actionsList}>
                   {perfil.acciones.map((a, i) => (
                     <li key={i}>{a}</li>
@@ -418,7 +420,7 @@ export default function MapaAutomatizacionPersonalPage() {
               </div>
             </div>
 
-            <button className={styles.btnSecondary} onClick={reiniciar}>
+            <button type="button" className={styles.btnSecondary} onClick={reiniciar}>
               Repetir diagnóstico
             </button>
           </section>
