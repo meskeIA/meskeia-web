@@ -430,6 +430,7 @@ export default function EstimacionCertificacionEnergeticaPage() {
           </div>
 
           <button
+            type="button"
             onClick={calcular}
             className={styles.btnPrimary}
             disabled={!formularioCompleto}
@@ -505,7 +506,7 @@ export default function EstimacionCertificacionEnergeticaPage() {
 
             {/* Coste certificado oficial */}
             <div className={styles.infoBox}>
-              <span aria-hidden="true">ℹ️</span>
+              <span aria-hidden="true">ℹ️</span>{' '}
               <p>
                 Un certificado energetico oficial cuesta entre <strong>50 y 150 EUR</strong> segun
                 el tipo de vivienda y la zona geografica. Busca un tecnico certificador en tu
@@ -706,27 +707,27 @@ export default function EstimacionCertificacionEnergeticaPage() {
               <h2><span aria-hidden="true">⚠️</span> Errores comunes que encarecen tu factura energetica</h2>
               <div className={styles.warningGrid}>
                 <div className={styles.warningItem}>
-                  <strong>❌ No revisar el aislamiento al comprar una vivienda antigua</strong>
+                  <strong><span aria-hidden="true">❌</span> No revisar el aislamiento al comprar una vivienda antigua</strong>
                   <p>Un piso sin aislamiento puede gastar 1.500-2.500 EUR/anio en calefaccion. Pide siempre el certificado antes de comprar para valorar la inversion real.</p>
                 </div>
                 <div className={styles.warningItem}>
-                  <strong>❌ Cambiar la caldera sin mejorar la envolvente</strong>
+                  <strong><span aria-hidden="true">❌</span> Cambiar la caldera sin mejorar la envolvente</strong>
                   <p>Instalar una bomba de calor en un edificio sin aislamiento es como poner aire acondicionado con las ventanas abiertas. Primero aisla, luego cambia el sistema.</p>
                 </div>
                 <div className={styles.warningItem}>
-                  <strong>❌ Ignorar la ventilacion al aislar</strong>
+                  <strong><span aria-hidden="true">❌</span> Ignorar la ventilacion al aislar</strong>
                   <p>Un buen aislamiento sin ventilacion mecanica genera humedades y mala calidad del aire. Incluye siempre VMC (ventilacion mecanica controlada) en la reforma.</p>
                 </div>
                 <div className={styles.warningItem}>
-                  <strong>❌ No aprovechar las subvenciones disponibles</strong>
+                  <strong><span aria-hidden="true">❌</span> No aprovechar las subvenciones disponibles</strong>
                   <p>Los fondos Next Generation de la UE subvencionan hasta el 80% de reformas energeticas. Consulta las ayudas de tu comunidad autonoma antes de empezar.</p>
                 </div>
                 <div className={styles.warningItem}>
-                  <strong>❌ Confiar en estimaciones online como certificado real</strong>
+                  <strong><span aria-hidden="true">❌</span> Confiar en estimaciones online como certificado real</strong>
                   <p>Ninguna herramienta online sustituye al certificado oficial. Solo un tecnico con visita presencial y software homologado puede emitir un certificado valido.</p>
                 </div>
                 <div className={styles.warningItem}>
-                  <strong>❌ No negociar el precio de compra segun la letra</strong>
+                  <strong><span aria-hidden="true">❌</span> No negociar el precio de compra segun la letra</strong>
                   <p>Una vivienda con letra F-G necesitara 15.000-30.000 EUR en reformas energeticas. Usa la mala letra como argumento de negociacion al comprar.</p>
                 </div>
               </div>

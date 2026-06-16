@@ -271,7 +271,7 @@ export default function CalculadoraRoommatesPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🏠 Calculadora Roommates</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🏠</span> Calculadora Roommates</h1>
         <p className={styles.subtitle}>Divide los gastos del piso de forma justa</p>
       </header>
 
@@ -288,7 +288,7 @@ export default function CalculadoraRoommatesPage() {
         {/* Panel de compañeros */}
         <div className={styles.compañerosPanel}>
           <div className={styles.panelHeader}>
-            <h2 className={styles.sectionTitle}>👥 Compañeros de piso</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">👥</span> Compañeros de piso</h2>
             <button type="button" onClick={() => setModalCompañero(true)} className={styles.btnAgregar}>
               + Añadir
             </button>
@@ -329,7 +329,7 @@ export default function CalculadoraRoommatesPage() {
         {/* Panel de resumen */}
         {compañeros.length > 0 && (
           <div className={styles.resumenPanel}>
-            <h2 className={styles.sectionTitle}>📊 Resumen</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">📊</span> Resumen</h2>
             <div className={styles.resumenGrid}>
               <div className={styles.resumenCard}>
                 <span className={styles.resumenLabel}>Total gastos</span>
@@ -356,7 +356,7 @@ export default function CalculadoraRoommatesPage() {
         {/* Panel de deudas */}
         {deudas.length > 0 && (
           <div className={styles.deudasPanel}>
-            <h2 className={styles.sectionTitle}>💸 Quién debe a quién</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">💸</span> Quién debe a quién</h2>
             <div className={styles.deudasList}>
               {deudas.map((deuda, idx) => (
                 <div key={idx} className={styles.deudaItem}>
@@ -385,7 +385,7 @@ export default function CalculadoraRoommatesPage() {
         {/* Panel de gastos */}
         <div className={styles.gastosPanel}>
           <div className={styles.panelHeader}>
-            <h2 className={styles.sectionTitle}>📝 Gastos</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">📝</span> Gastos</h2>
             {compañeros.length > 0 && (
               <button type="button" onClick={() => abrirModalGasto()} className={styles.btnAgregar}>
                 + Nuevo gasto
@@ -440,7 +440,7 @@ export default function CalculadoraRoommatesPage() {
 
       {/* Info Panel */}
       <div className={styles.infoPanel}>
-        <h3>💡 ¿Cómo funciona?</h3>
+        <h3><span aria-hidden="true">💡</span> ¿Cómo funciona?</h3>
         <div className={styles.infoGrid}>
           <div className={styles.infoItem}>
             <span className={styles.infoIcon}>1️⃣</span>
@@ -573,6 +573,7 @@ export default function CalculadoraRoommatesPage() {
                     key={c.id}
                     type="button"
                     onClick={() => toggleParticipante(c.id)}
+                    aria-pressed={gastoParticipantes.includes(c.id)}
                     className={`${styles.participanteBtn} ${gastoParticipantes.includes(c.id) ? styles.activo : ''}`}
                     style={{
                       borderColor: gastoParticipantes.includes(c.id) ? c.color : undefined,

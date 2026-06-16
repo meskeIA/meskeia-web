@@ -128,6 +128,7 @@ export default function CalculadoraPiscinasPage() {
             ] as { id: FormaType; label: string; desc: string }[]).map(f => (
               <button
                 key={f.id}
+                type="button"
                 className={`${styles.shapeBtn} ${forma === f.id ? styles.shapeBtnActive : ''}`}
                 onClick={() => cambiarForma(f.id)}
                 aria-pressed={forma === f.id}
@@ -177,7 +178,7 @@ export default function CalculadoraPiscinasPage() {
             </div>
           </div>
 
-          <button onClick={calcular} className={styles.btnPrimary}>
+          <button type="button" onClick={calcular} className={styles.btnPrimary}>
             Calcular volumen y dosis de productos
           </button>
 
@@ -506,7 +507,7 @@ export default function CalculadoraPiscinasPage() {
             {/* Warning box */}
             <div className={styles.warningBoxV2}>
               <div className={styles.warningHeader}>
-                <span>⚠️</span>
+                <span aria-hidden="true">⚠️</span>
                 <span>Errores de seguridad graves en el tratamiento de piscinas</span>
               </div>
               <ul className={styles.warningList}>

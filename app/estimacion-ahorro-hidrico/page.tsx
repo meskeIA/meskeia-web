@@ -529,7 +529,7 @@ export default function EstimacionAhorroHidricoPage() {
             <h2><span aria-hidden="true">❓</span> Preguntas frecuentes</h2>
             <div className={styles.faqList}>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Cuánta agua gasta realmente una ducha de 10 minutos?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Cuánta agua gasta realmente una ducha de 10 minutos?</h4>
                 <p>
                   Un cabezal de ducha estándar tiene un caudal de 9-12 litros por minuto. Una ducha
                   de 10 minutos consume entre 90 y 120 litros. Reducirla a 5 minutos ahorra
@@ -542,7 +542,7 @@ export default function EstimacionAhorroHidricoPage() {
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Merece la pena invertir en una cisterna de doble descarga?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Merece la pena invertir en una cisterna de doble descarga?</h4>
                 <p>
                   Absolutamente. Una cisterna convencional gasta 9-12 litros por descarga. La de doble
                   pulsador permite elegir entre 3 y 6 litros. Con 5 usos diarios por persona, una
@@ -555,7 +555,7 @@ export default function EstimacionAhorroHidricoPage() {
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Cómo sé si tengo fugas de agua en casa?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Cómo sé si tengo fugas de agua en casa?</h4>
                 <p>
                   Cierra todos los grifos y electrodomésticos que usen agua. Anota la lectura del
                   contador. Espera 2 horas sin usar agua. Si la lectura ha cambiado, tienes una fuga.
@@ -568,7 +568,7 @@ export default function EstimacionAhorroHidricoPage() {
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Es más eficiente el lavavajillas que fregar a mano?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Es más eficiente el lavavajillas que fregar a mano?</h4>
                 <p>
                   Sí, siempre que se use a carga completa y en modo eco. Un lavavajillas moderno
                   consume 10-12 litros por ciclo, mientras que fregar a mano el equivalente gasta
@@ -581,7 +581,7 @@ export default function EstimacionAhorroHidricoPage() {
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Cuánto cuesta el agua en España realmente?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Cuánto cuesta el agua en España realmente?</h4>
                 <p>
                   El precio medio ronda los 2,10 €/m³, pero varía mucho: desde 1,50 € en zonas del
                   norte (Galicia, Asturias) hasta 3,50 € en la costa mediterránea (Murcia, Alicante).
@@ -594,7 +594,7 @@ export default function EstimacionAhorroHidricoPage() {
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Qué impacto tiene el ahorro de agua en el medio ambiente?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Qué impacto tiene el ahorro de agua en el medio ambiente?</h4>
                 <p>
                   Más allá del ahorro económico, reducir el consumo disminuye la energía necesaria para
                   potabilizar, bombear y depurar agua. En España, el ciclo urbano del agua genera unas
@@ -651,27 +651,27 @@ export default function EstimacionAhorroHidricoPage() {
             <h4><span aria-hidden="true">⚠️</span> Errores comunes que disparan el consumo de agua</h4>
             <ul>
               <li>
-                <strong>❌ Dejar correr el agua &quot;hasta que sale caliente&quot;:</strong> Se desperdician
+                <strong><span aria-hidden="true">❌</span> Dejar correr el agua &quot;hasta que sale caliente&quot;:</strong> Se desperdician
                 2-5 litros cada vez. Recoge esa agua en un cubo para regar o fregar.
               </li>
               <li>
-                <strong>❌ Poner la lavadora o lavavajillas a media carga:</strong> Consume casi lo mismo
+                <strong><span aria-hidden="true">❌</span> Poner la lavadora o lavavajillas a media carga:</strong> Consume casi lo mismo
                 que a carga completa. Espera a llenarla o usa el programa de media carga si lo tiene.
               </li>
               <li>
-                <strong>❌ Regar el jardín con manguera a chorro:</strong> Una manguera gasta 15-20 L/minuto.
+                <strong><span aria-hidden="true">❌</span> Regar el jardín con manguera a chorro:</strong> Una manguera gasta 15-20 L/minuto.
                 El riego por goteo usa un 50% menos y es más eficaz para las raíces.
               </li>
               <li>
-                <strong>❌ Ignorar un grifo que gotea:</strong> &quot;Son solo gotas&quot; puede significar
+                <strong><span aria-hidden="true">❌</span> Ignorar un grifo que gotea:</strong> &quot;Son solo gotas&quot; puede significar
                 30 litros/día o 10.950 litros/año. Más de 20 € anuales desperdiciados.
               </li>
               <li>
-                <strong>❌ Lavar el coche con manguera:</strong> Gasta 200-500 litros por lavado. Un cubo
+                <strong><span aria-hidden="true">❌</span> Lavar el coche con manguera:</strong> Gasta 200-500 litros por lavado. Un cubo
                 y esponja: 30-50 litros. O usa un túnel de lavado que recicla agua.
               </li>
               <li>
-                <strong>❌ No revisar la presión del agua:</strong> Una presión excesiva (&gt;4 bar) aumenta
+                <strong><span aria-hidden="true">❌</span> No revisar la presión del agua:</strong> Una presión excesiva (&gt;4 bar) aumenta
                 el consumo un 30%. Un reductor de presión cuesta 15-30 € y se instala fácilmente.
               </li>
             </ul>

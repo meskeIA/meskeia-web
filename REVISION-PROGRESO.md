@@ -803,11 +803,11 @@
 | [x] | Calculadora de Gasto Energético | `/calculadora-gasto-energetico/` | inmobiliaria, finanzas |
 | [x] | Calculadora de Materiales de Construcción | `/calculadora-materiales-construccion/` | inmobiliaria |
 | [x] | Calculadora de Pintura | `/calculadora-pintura/` | inmobiliaria |
-| [ ] | Calculadora de Piscinas | `/calculadora-piscinas/` | inmobiliaria |
+| [x] | Calculadora de Piscinas | `/calculadora-piscinas/` | inmobiliaria |
 | [x] | Calculadora de Suscripciones | `/calculadora-suscripciones/` | inmobiliaria, finanzas |
-| [ ] | Calculadora Roommates | `/calculadora-roommates/` | inmobiliaria, finanzas |
-| [ ] | Estimación de Ahorro Hídrico | `/estimacion-ahorro-hidrico/` | inmobiliaria, finanzas |
-| [ ] | Estimación de Certificación Energética | `/estimacion-certificacion-energetica/` | inmobiliaria, tecnicas |
+| [x] | Calculadora Roommates | `/calculadora-roommates/` | inmobiliaria, finanzas |
+| [x] | Estimación de Ahorro Hídrico | `/estimacion-ahorro-hidrico/` | inmobiliaria, finanzas |
+| [x] | Estimación de Certificación Energética | `/estimacion-certificacion-energetica/` | inmobiliaria, tecnicas |
 | [ ] | Estimador Actualización Alquiler 2026 | `/estimador-actualizacion-alquiler/` | inmobiliaria, legal-fiscal |
 | [x] | Estimador Compraventa Inmobiliaria | `/estimador-compraventa-inmueble/` | inmobiliaria, finanzas |
 | [ ] | Estimador Coste Vivienda | `/estimador-coste-vivienda/` | inmobiliaria, finanzas |
