@@ -164,7 +164,7 @@ export default function CalculadoraAlquilerVsCompraPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🏠 Alquiler vs Compra</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🏠</span> Alquiler vs Compra</h1>
         <p className={styles.subtitle}>¿Qué me conviene más? Análisis financiero completo</p>
       </header>
 
@@ -199,7 +199,7 @@ export default function CalculadoraAlquilerVsCompraPage() {
       <div className={styles.mainContent}>
         {/* Panel de datos vivienda */}
         <div className={styles.inputPanel}>
-          <h2 className={styles.sectionTitle}>🏡 Datos de la vivienda</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">🏡</span> Datos de la vivienda</h2>
 
           <div className={styles.inputGroup}>
             <label htmlFor="precioVivienda">Precio de compra</label>
@@ -266,7 +266,7 @@ export default function CalculadoraAlquilerVsCompraPage() {
 
         {/* Panel gastos compra */}
         <div className={styles.inputPanel}>
-          <h2 className={styles.sectionTitle}>💰 Gastos de propietario (anuales)</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">💰</span> Gastos de propietario (anuales)</h2>
 
           <div className={styles.inputRow}>
             <div className={styles.inputGroup}>
@@ -333,7 +333,7 @@ export default function CalculadoraAlquilerVsCompraPage() {
 
         {/* Panel alquiler */}
         <div className={styles.inputPanel}>
-          <h2 className={styles.sectionTitle}>🏢 Datos del alquiler</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">🏢</span> Datos del alquiler</h2>
 
           <div className={styles.inputRow}>
             <div className={styles.inputGroup}>
@@ -369,7 +369,7 @@ export default function CalculadoraAlquilerVsCompraPage() {
 
         {/* Panel inversión alternativa */}
         <div className={styles.inputPanel}>
-          <h2 className={styles.sectionTitle}>📈 Coste de oportunidad</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">📈</span> Coste de oportunidad</h2>
 
           <div className={styles.inputRow}>
             <div className={styles.inputGroup}>
@@ -428,7 +428,7 @@ export default function CalculadoraAlquilerVsCompraPage() {
         <div className={styles.resultadosSection}>
           {/* Veredicto principal */}
           <div className={`${styles.veredictoPanel} ${resultados.mejorOpcion === 'comprar' ? styles.comprar : styles.alquilar}`}>
-            <div className={styles.veredictoIcono}>
+            <div className={styles.veredictoIcono} aria-hidden="true">
               {resultados.mejorOpcion === 'comprar' ? '🏠' : '🏢'}
             </div>
             <div className={styles.veredictoTexto}>
@@ -446,7 +446,7 @@ export default function CalculadoraAlquilerVsCompraPage() {
           <div className={styles.comparativaGrid}>
             {/* Columna Comprar */}
             <div className={styles.comparativaColumna}>
-              <h3 className={styles.comparativaTitulo}>🏠 Comprar</h3>
+              <h3 className={styles.comparativaTitulo}><span aria-hidden="true">🏠</span> Comprar</h3>
 
               <div className={styles.comparativaItem}>
                 <span className={styles.comparativaLabel}>Cuota hipoteca</span>
@@ -481,7 +481,7 @@ export default function CalculadoraAlquilerVsCompraPage() {
 
             {/* Columna Alquilar */}
             <div className={styles.comparativaColumna}>
-              <h3 className={styles.comparativaTitulo}>🏢 Alquilar + Invertir</h3>
+              <h3 className={styles.comparativaTitulo}><span aria-hidden="true">🏢</span> Alquilar + Invertir</h3>
 
               <div className={styles.comparativaItem}>
                 <span className={styles.comparativaLabel}>Alquiler inicial</span>
@@ -519,7 +519,7 @@ export default function CalculadoraAlquilerVsCompraPage() {
 
           {/* Evolución temporal */}
           <div className={styles.evolucionPanel}>
-            <h3 className={styles.sectionTitle}>📊 Evolución del patrimonio</h3>
+            <h3 className={styles.sectionTitle}><span aria-hidden="true">📊</span> Evolución del patrimonio</h3>
             <div className={styles.evolucionTable}>
               <div className={styles.evolucionHeader}>
                 <span>Año</span>
@@ -547,7 +547,7 @@ export default function CalculadoraAlquilerVsCompraPage() {
 
             {resultados.puntoEquilibrio > 0 && (
               <p className={styles.puntoEquilibrio}>
-                📍 Punto de equilibrio: <strong>Año {resultados.puntoEquilibrio}</strong>
+                <span aria-hidden="true">📍</span> Punto de equilibrio: <strong>Año {resultados.puntoEquilibrio}</strong>
                 <br />
                 <small>A partir de este año, comprar empieza a ser más rentable</small>
               </p>
@@ -569,8 +569,8 @@ export default function CalculadoraAlquilerVsCompraPage() {
               <thead>
                 <tr>
                   <th>Factor</th>
-                  <th>🏢 Alquilar</th>
-                  <th>🏠 Comprar</th>
+                  <th><span aria-hidden="true">🏢</span> Alquilar</th>
+                  <th><span aria-hidden="true">🏠</span> Comprar</th>
                 </tr>
               </thead>
               <tbody>
@@ -620,7 +620,7 @@ export default function CalculadoraAlquilerVsCompraPage() {
           <div className={styles.casosGrid}>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoIcon}>🚀</span>
+                <span className={styles.casoIcon} aria-hidden="true">🚀</span>
                 <span className={styles.casoNivel}>Joven móvil (20-32 años)</span>
               </div>
               <p className={styles.casoTip}>
@@ -629,7 +629,7 @@ export default function CalculadoraAlquilerVsCompraPage() {
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoIcon}>👨‍👩‍👧</span>
+                <span className={styles.casoIcon} aria-hidden="true">👨‍👩‍👧</span>
                 <span className={styles.casoNivel}>Familia estable (35-50 años)</span>
               </div>
               <p className={styles.casoTip}>
@@ -638,7 +638,7 @@ export default function CalculadoraAlquilerVsCompraPage() {
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoIcon}>📊</span>
+                <span className={styles.casoIcon} aria-hidden="true">📊</span>
                 <span className={styles.casoNivel}>Mercado con PER alto (&gt;25)</span>
               </div>
               <p className={styles.casoTip}>
@@ -647,7 +647,7 @@ export default function CalculadoraAlquilerVsCompraPage() {
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoIcon}>🧳</span>
+                <span className={styles.casoIcon} aria-hidden="true">🧳</span>
                 <span className={styles.casoNivel}>Trabajador remoto / nómada</span>
               </div>
               <p className={styles.casoTip}>
@@ -760,32 +760,32 @@ export default function CalculadoraAlquilerVsCompraPage() {
           <h2>6 factores clave que suelen olvidarse</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔧</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔧</span>
               <strong>Mantenimiento real ~1% anual</strong>
               <p>Una vivienda de 250.000 € requiere unos 2.500 € al año en mantenimiento medio. Fontanería, electricidad, pintura, electrodomésticos... es un gasto real que muchos calculan en cero.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📋</span>
+              <span className={styles.tipIcon} aria-hidden="true">📋</span>
               <strong>Gastos de compraventa ~10%</strong>
               <p>ITP (4-10% según CCAA), notaría, registro y gestoría suman entre el 8-12% del precio. En una vivienda de 200.000 €, son 16.000-24.000 € que nunca se recuperan si vendes pronto.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📈</span>
+              <span className={styles.tipIcon} aria-hidden="true">📈</span>
               <strong>La revalorización no está garantizada</strong>
               <p>Usar un 3% anual de revalorización es razonable para grandes ciudades, pero en municipios pequeños o zonas con despoblación puede ser negativa. Ajusta según la zona concreta.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💸</span>
+              <span className={styles.tipIcon} aria-hidden="true">💸</span>
               <strong>El alquiler sube con la inflación</strong>
               <p>Con inflación al 3-4%, una renta de 1.000 €/mes en 2025 puede ser 1.350 €/mes en 2035. Una hipoteca fija protege de este riesgo, aunque el alquiler empieza siendo más bajo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏦</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏦</span>
               <strong>El ratio cuota/ingresos no debe superar el 35%</strong>
               <p>El banco exige que la cuota no supere el 30-35% de tus ingresos netos. Pero para tu estabilidad financiera personal, lo ideal es no superar el 25-28%.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚖️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
               <strong>Comprar no siempre genera más riqueza</strong>
               <p>En ciudades con PER &gt; 25 y mercados bursátiles con retornos del 7%, alquilar e invertir el capital libre genera en muchos casos más patrimonio a 20 años que comprar.</p>
             </div>
@@ -796,7 +796,7 @@ export default function CalculadoraAlquilerVsCompraPage() {
         <section className={styles.guideSection}>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h2>Errores frecuentes al tomar esta decisión</h2>
             </div>
             <ul className={styles.warningList}>

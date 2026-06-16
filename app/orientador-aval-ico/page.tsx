@@ -146,6 +146,7 @@ export default function OrientadorAvalIcoPage() {
         <h2 className={styles.sectionTitle}>¿Cuál es tu perfil?</h2>
         <div className={styles.perfilGrid}>
           <button
+            type="button"
             className={`${styles.perfilCard} ${perfil === 'jovenes' ? styles.perfilActivo : ''}`}
             onClick={() => setPerfil('jovenes')}
             aria-pressed={perfil === 'jovenes'}
@@ -155,6 +156,7 @@ export default function OrientadorAvalIcoPage() {
             <span>Aval del 20-25% del precio</span>
           </button>
           <button
+            type="button"
             className={`${styles.perfilCard} ${perfil === 'familias' ? styles.perfilActivo : ''}`}
             onClick={() => setPerfil('familias')}
             aria-pressed={perfil === 'familias'}
@@ -169,7 +171,7 @@ export default function OrientadorAvalIcoPage() {
       {/* Checklist */}
       {perfil && (
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>✅ Comprueba tus requisitos</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">✅</span> Comprueba tus requisitos</h2>
           <div className={styles.checkGrid} role="list">
             {requisitosFiltrados.map(req => {
               const estado = estados[req.id];
@@ -189,6 +191,7 @@ export default function OrientadorAvalIcoPage() {
                   )}
                   <div className={styles.radioGroup} role="group" aria-label={`Respuesta para: ${req.pregunta}`}>
                     <button
+                      type="button"
                       className={`${styles.radioBtn} ${estado === 'si' ? styles.radioBtnActive : ''}`}
                       onClick={() => toggleEstado(req.id, 'si')}
                       aria-pressed={estado === 'si'}
@@ -196,6 +199,7 @@ export default function OrientadorAvalIcoPage() {
                       Sí
                     </button>
                     <button
+                      type="button"
                       className={`${styles.radioBtn} ${estado === 'no' ? styles.radioBtnActive : ''}`}
                       onClick={() => toggleEstado(req.id, 'no')}
                       aria-pressed={estado === 'no'}
@@ -213,7 +217,7 @@ export default function OrientadorAvalIcoPage() {
       {/* Resultado */}
       {resultado !== 'pendiente' && (
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>📊 Tu resultado orientativo</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">📊</span> Tu resultado orientativo</h2>
           {resultado === 'positivo' && (
             <div className={`${styles.resultadoCard} ${styles['resultado-positivo']}`} role="alert" aria-live="polite">
               <div className={styles.resultadoIcon} aria-hidden="true">✅</div>
@@ -279,7 +283,7 @@ export default function OrientadorAvalIcoPage() {
 
       {/* Proceso */}
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>📋 Proceso de solicitud del Aval ICO</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">📋</span> Proceso de solicitud del Aval ICO</h2>
         <div className={styles.procesoPasos}>
           {[
             { n: '1', titulo: 'Consulta la lista de entidades adheridas', desc: 'El Aval ICO se tramita a través de entidades financieras adheridas al convenio con el ICO. Consulta el listado actualizado en ico.es.' },
@@ -300,7 +304,7 @@ export default function OrientadorAvalIcoPage() {
 
       {/* Documentación */}
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>📄 Documentación habitual</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">📄</span> Documentación habitual</h2>
         <div className={styles.docsGrid}>
           <div className={styles.docsGrupo}>
             <h4>Documentación personal</h4>
@@ -468,7 +472,7 @@ export default function OrientadorAvalIcoPage() {
 
         {/* Warning */}
         <section className={styles.warningBox}>
-          <h2>⚠️ Lo que debes saber antes de solicitar</h2>
+          <h2><span aria-hidden="true">⚠️</span> Lo que debes saber antes de solicitar</h2>
           <div className={styles.warningGrid}>
             {[
               { titulo: 'El banco puede rechazarte aunque cumplas los requisitos del ICO', desc: 'El ICO establece los requisitos del programa, pero la entidad financiera evalúa tu solvencia de forma independiente. Pueden rechazar la operación por riesgo crediticio.' },

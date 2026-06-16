@@ -819,10 +819,10 @@
 | [x] | Golden Hour - Hora Dorada | `/golden-hour/` | inmobiliaria, diseno |
 | [x] | Guía de Productos de Limpieza del Hogar | `/guia-productos-limpieza/` | inmobiliaria, salud |
 | [x] | Lista de Compras | `/lista-compras/` | inmobiliaria, productividad |
-| [ ] | Orientador Alquiler por Habitaciones | `/orientador-alquiler-habitaciones/` | inmobiliaria, legal-fiscal |
-| [ ] | Orientador Alquiler vs Compra | `/orientador-alquiler-vs-compra/` | inmobiliaria, finanzas |
-| [ ] | Orientador Aval ICO Vivienda | `/orientador-aval-ico/` | inmobiliaria, finanzas, legal-fiscal |
-| [ ] | Orientador Ayudas Primera Vivienda en Zona Rural 2026 | `/orientador-ayuda-vivienda-rural/` | inmobiliaria, finanzas |
+| [x] | Orientador Alquiler por Habitaciones | `/orientador-alquiler-habitaciones/` | inmobiliaria, legal-fiscal |
+| [x] | Orientador Alquiler vs Compra | `/orientador-alquiler-vs-compra/` | inmobiliaria, finanzas |
+| [x] | Orientador Aval ICO Vivienda | `/orientador-aval-ico/` | inmobiliaria, finanzas, legal-fiscal |
+| [x] | Orientador Ayudas Primera Vivienda en Zona Rural 2026 | `/orientador-ayuda-vivienda-rural/` | inmobiliaria, finanzas |
 | [ ] | Orientador Deducción IRPF Obras Energéticas | `/orientador-deduccion-obras-energeticas/` | inmobiliaria, finanzas, legal-fiscal |
 | [ ] | Planificador de Menú Semanal | `/planificador-menu/` | inmobiliaria, salud |
 | [ ] | Planificador de Mudanzas | `/planificador-mudanzas/` | inmobiliaria, productividad |

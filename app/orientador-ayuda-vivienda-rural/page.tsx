@@ -53,6 +53,7 @@ export default function OrientadorAyudaViviendaRural() {
     return (
       <div className={styles.radioGroup} role="group" aria-label="Respuesta">
         <button
+          type="button"
           className={`${styles.radioBtn} ${valor === 'si' ? styles.radioBtnSi : ''}`}
           onClick={() => setValor(valor === 'si' ? 'pendiente' : 'si')}
           aria-pressed={valor === 'si'}
@@ -61,6 +62,7 @@ export default function OrientadorAyudaViviendaRural() {
           Sí
         </button>
         <button
+          type="button"
           className={`${styles.radioBtn} ${valor === 'no' ? styles.radioBtnNo : ''}`}
           onClick={() => setValor(valor === 'no' ? 'pendiente' : 'no')}
           aria-pressed={valor === 'no'}
@@ -104,7 +106,7 @@ export default function OrientadorAyudaViviendaRural() {
 
       {/* PRECIO */}
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>💶 Precio orientativo de la vivienda</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">💶</span> Precio orientativo de la vivienda</h2>
         <div className={styles.precioField}>
           <label htmlFor="precio" className={styles.label}>Precio de compra (estimado)</label>
           <div className={styles.inputEuro}>
@@ -152,7 +154,7 @@ export default function OrientadorAyudaViviendaRural() {
 
       {/* REQUISITOS */}
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>✅ Comprueba tus requisitos</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">✅</span> Comprueba tus requisitos</h2>
 
         {/* Edad */}
         <div className={`${styles.reqCard} ${edad === 'si' ? styles.reqOk : edad === 'no' ? styles.reqFail : ''}`}>
@@ -183,29 +185,32 @@ export default function OrientadorAyudaViviendaRural() {
           <span className={styles.badgeReq}>IMPRESCINDIBLE</span>
           <div className={styles.municipioOpciones} role="group" aria-label="Tamaño del municipio">
             <button
+              type="button"
               className={`${styles.municipioBtn} ${municipio === 'pequeno' ? styles.municipioBtnActivo : ''}`}
               onClick={() => setMunicipio(municipio === 'pequeno' ? 'pendiente' : 'pequeno')}
               aria-pressed={municipio === 'pequeno'}
             >
-              <span className={styles.municipioBtnIcon}>🏘️</span>
+              <span className={styles.municipioBtnIcon} aria-hidden="true">🏘️</span>
               <span className={styles.municipioBtnTexto}>≤ 10.000 habitantes</span>
               <span className={styles.municipioBtnSub}>Elegible directamente</span>
             </button>
             <button
+              type="button"
               className={`${styles.municipioBtn} ${municipio === 'despoblacion' ? styles.municipioBtnActivo : ''}`}
               onClick={() => setMunicipio(municipio === 'despoblacion' ? 'pendiente' : 'despoblacion')}
               aria-pressed={municipio === 'despoblacion'}
             >
-              <span className={styles.municipioBtnIcon}>📉</span>
+              <span className={styles.municipioBtnIcon} aria-hidden="true">📉</span>
               <span className={styles.municipioBtnTexto}>10.001 – 20.000 hab</span>
               <span className={styles.municipioBtnSub}>Con pérdida de población (verifica en tu CA)</span>
             </button>
             <button
+              type="button"
               className={`${styles.municipioBtn} ${municipio === 'grande' ? styles.municipioBtnGrande : ''}`}
               onClick={() => setMunicipio(municipio === 'grande' ? 'pendiente' : 'grande')}
               aria-pressed={municipio === 'grande'}
             >
-              <span className={styles.municipioBtnIcon}>🏙️</span>
+              <span className={styles.municipioBtnIcon} aria-hidden="true">🏙️</span>
               <span className={styles.municipioBtnTexto}>&gt; 20.000 habitantes</span>
               <span className={styles.municipioBtnSub}>No aplica esta ayuda</span>
             </button>
@@ -231,7 +236,7 @@ export default function OrientadorAyudaViviendaRural() {
       {/* RESULTADO */}
       {estado !== 'pendiente' && (
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>📊 Orientación sobre tu situación</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">📊</span> Orientación sobre tu situación</h2>
 
           {estado === 'apto' && (
             <div className={`${styles.resultadoCard} ${styles.resultadoApto}`} role="alert" aria-live="polite">
@@ -272,7 +277,7 @@ export default function OrientadorAyudaViviendaRural() {
 
       {/* PRÓXIMOS PASOS */}
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>📋 ¿Qué puedo hacer ahora?</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">📋</span> ¿Qué puedo hacer ahora?</h2>
         <div className={styles.pasosGrid}>
           {[
             { num: '1', titulo: 'Guarda esta orientación', desc: 'Anota los requisitos que cumples y la estimación de ayuda. Te será útil cuando tu CA abra la convocatoria.' },
@@ -358,22 +363,22 @@ export default function OrientadorAyudaViviendaRural() {
         <h3>Perfiles que pueden beneficiarse</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <span style={{ fontSize: '1.5rem' }}>👩‍💻</span>
+            <span style={{ fontSize: '1.5rem' }} aria-hidden="true">👩‍💻</span>
             <h4>Teletrabajador/a, 29 años</h4>
             <p>Trabaja 100% remoto desde Madrid. Quiere mudarse a un pueblo de 3.000 habitantes. Vivienda de 80.000 €: ayuda orientativa de 15.000 € + puede conservar el salario urbano.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <span style={{ fontSize: '1.5rem' }}>👨‍🌾</span>
+            <span style={{ fontSize: '1.5rem' }} aria-hidden="true">👨‍🌾</span>
             <h4>Joven retornando al pueblo, 32 años</h4>
             <p>Vuelve al municipio de sus padres (8.000 hab) para trabajar en el sector agrario. Vivienda de 45.000 €: ayuda orientativa de 9.000 € (el 20%).</p>
           </div>
           <div className={styles.escenarioCard}>
-            <span style={{ fontSize: '1.5rem' }}>👫</span>
+            <span style={{ fontSize: '1.5rem' }} aria-hidden="true">👫</span>
             <h4>Pareja joven, ambos ≤ 35</h4>
             <p>Solo uno de los titulares puede solicitar la ayuda por vivienda. Conviene analizar quién presenta mejor perfil para la solicitud ante la CA.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <span style={{ fontSize: '1.5rem' }}>🏗️</span>
+            <span style={{ fontSize: '1.5rem' }} aria-hidden="true">🏗️</span>
             <h4>Autoconstrucción o rehabilitación</h4>
             <p>El Plan también contempla autopromoción (construcción propia). Si el precio del proyecto es de 60.000 €: ayuda orientativa de 12.000 €. Consultar los detalles en la convocatoria de tu CA.</p>
           </div>
@@ -453,19 +458,19 @@ export default function OrientadorAyudaViviendaRural() {
         <h3>Lo que conviene saber</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📐</span>
+            <span className={styles.tipIcon} aria-hidden="true">📐</span>
             <p>El punto de inflexión es <strong>75.000 €</strong>: por encima de ese precio, la ayuda siempre es 15.000 € (el tope). Por debajo, es el 20% del precio. Muchas viviendas rurales están por debajo de ese umbral.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔗</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔗</span>
             <p>Esta ayuda es <strong>compatible con el Bono Joven de Alquiler</strong> si primero alquilas mientras buscas vivienda para comprar. Son programas independientes del mismo Plan Estatal.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>💡</span>
+            <span className={styles.tipIcon} aria-hidden="true">💡</span>
             <p>Aparte de esta ayuda estatal, muchas <strong>CCAA y Diputaciones</strong> tienen programas propios de ayuda a la compra en zonas rurales: Aragón, Castilla y León, Extremadura o Castilla-La Mancha son especialmente activas en este ámbito.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📅</span>
+            <span className={styles.tipIcon} aria-hidden="true">📅</span>
             <p>Los fondos estatales se transfieren a las CCAA, que los gestionan de forma independiente. <strong>No todas abrirán convocatoria al mismo tiempo</strong> ni con los mismos importes. Verifica el estado de tu CA específica.</p>
           </div>
         </div>
@@ -473,7 +478,7 @@ export default function OrientadorAyudaViviendaRural() {
         {/* WARNING BOX */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             Aspectos críticos que no debes pasar por alto
           </div>
           <ul className={styles.warningList}>
