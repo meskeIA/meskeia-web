@@ -139,7 +139,7 @@ export default function QuizReinosNaturalezaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>Quiz Reinos de la Naturaleza 🔬</h1>
+        <h1 className={styles.title}>Quiz Reinos de la Naturaleza <span aria-hidden="true">🔬</span></h1>
         <p className={styles.subtitle}>
           ¿Animal, planta, hongo o bacteria? 43 organismos que sorprenden · Con curiosidades científicas
         </p>
@@ -156,6 +156,7 @@ export default function QuizReinosNaturalezaPage() {
             {(Object.entries(NIVEL_CONFIG) as [Nivel, typeof NIVEL_CONFIG[Nivel]][]).map(([key, cfg]) => (
               <button
                 key={key}
+                type="button"
                 className={`${styles.nivelBtn} ${nivel === key ? styles.active : ''}`}
                 onClick={() => setNivel(key)}
                 aria-pressed={nivel === key}
@@ -171,6 +172,7 @@ export default function QuizReinosNaturalezaPage() {
             {OPCIONES_PREGUNTAS.map(n => (
               <button
                 key={n}
+                type="button"
                 className={`${styles.pregBtn} ${numPreguntas === n ? styles.active : ''}`}
                 onClick={() => setNumPreguntas(n)}
                 aria-pressed={numPreguntas === n}
@@ -180,7 +182,7 @@ export default function QuizReinosNaturalezaPage() {
             ))}
           </div>
 
-          <button className={styles.btnIniciar} onClick={iniciarQuiz}>
+          <button type="button" className={styles.btnIniciar} onClick={iniciarQuiz}>
             Empezar Quiz — {numPreguntas} preguntas · {NIVEL_CONFIG[nivel].label}
           </button>
         </div>
@@ -240,6 +242,7 @@ export default function QuizReinosNaturalezaPage() {
               return (
                 <button
                   key={opcion}
+                  type="button"
                   className={`${styles.opcion} ${claseExtra}`}
                   onClick={() => responder(opcion)}
                   disabled={seleccionada !== null}
@@ -261,7 +264,7 @@ export default function QuizReinosNaturalezaPage() {
                 aria-live="polite"
               >
                 <div className={styles.feedbackCabecera}>
-                  <span className={styles.feedbackIcono}>
+                  <span className={styles.feedbackIcono} aria-hidden="true">
                     {seleccionada === pregunta.respuestaCorrecta ? '✅' : '❌'}
                   </span>
                   <div>
@@ -284,7 +287,7 @@ export default function QuizReinosNaturalezaPage() {
                 </div>
               </div>
 
-              <button className={styles.btnSiguiente} onClick={siguiente}>
+              <button type="button" className={styles.btnSiguiente} onClick={siguiente}>
                 {esUltima ? 'Ver resultados' : 'Siguiente pregunta →'}
               </button>
             </>
@@ -320,11 +323,11 @@ export default function QuizReinosNaturalezaPage() {
           </div>
 
           <div className={styles.botonesResultado}>
-            <button className={styles.btnRejugar} onClick={reiniciar}>
-              🔄 Jugar de nuevo
+            <button type="button" className={styles.btnRejugar} onClick={reiniciar}>
+              <span aria-hidden="true">🔄</span> Jugar de nuevo
             </button>
-            <button className={styles.btnConfig} onClick={volverConfig}>
-              ⚙️ Cambiar nivel
+            <button type="button" className={styles.btnConfig} onClick={volverConfig}>
+              <span aria-hidden="true">⚙️</span> Cambiar nivel
             </button>
           </div>
         </div>

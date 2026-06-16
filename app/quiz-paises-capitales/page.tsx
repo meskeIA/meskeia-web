@@ -165,7 +165,7 @@ export default function QuizPaisesCapitalesPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>Quiz Países y Capitales 🌍</h1>
+        <h1 className={styles.title}>Quiz Países y Capitales <span aria-hidden="true">🌍</span></h1>
         <p className={styles.subtitle}>
           Pon a prueba tus conocimientos de geografía mundial
         </p>
@@ -182,6 +182,7 @@ export default function QuizPaisesCapitalesPage() {
             {(Object.entries(MODO_CONFIG) as [ModoJuego, typeof MODO_CONFIG[ModoJuego]][]).map(([key, cfg]) => (
               <button
                 key={key}
+                type="button"
                 className={`${styles.modoBtn} ${modo === key ? styles.active : ''}`}
                 onClick={() => setModo(key)}
                 aria-pressed={modo === key}
@@ -197,6 +198,7 @@ export default function QuizPaisesCapitalesPage() {
             {(Object.entries(DIFICULTAD_CONFIG) as [Dificultad, typeof DIFICULTAD_CONFIG[Dificultad]][]).map(([key, cfg]) => (
               <button
                 key={key}
+                type="button"
                 className={`${styles.difBtn} ${dificultad === key ? styles.active : ''}`}
                 onClick={() => setDificultad(key)}
                 aria-pressed={dificultad === key}
@@ -206,7 +208,7 @@ export default function QuizPaisesCapitalesPage() {
             ))}
           </div>
 
-          <button className={styles.btnIniciar} onClick={iniciarQuiz}>
+          <button type="button" className={styles.btnIniciar} onClick={iniciarQuiz}>
             Empezar Quiz — {DIFICULTAD_CONFIG[dificultad].preguntas} preguntas
           </button>
         </div>
@@ -287,6 +289,7 @@ export default function QuizPaisesCapitalesPage() {
               return (
                 <button
                   key={opcion}
+                  type="button"
                   className={`${styles.opcion} ${claseExtra}`}
                   onClick={() => responder(opcion)}
                   disabled={seleccionada !== null}
@@ -311,7 +314,7 @@ export default function QuizPaisesCapitalesPage() {
                   ? `✅ ¡Correcto! La respuesta es ${pregunta.respuestaCorrecta}.`
                   : `❌ Incorrecto. La respuesta correcta es ${pregunta.respuestaCorrecta}.`}
               </div>
-              <button className={styles.btnSiguiente} onClick={siguiente}>
+              <button type="button" className={styles.btnSiguiente} onClick={siguiente}>
                 {esUltima ? 'Ver resultados' : 'Siguiente pregunta →'}
               </button>
             </>
@@ -347,11 +350,11 @@ export default function QuizPaisesCapitalesPage() {
           </div>
 
           <div className={styles.botonesResultado}>
-            <button className={styles.btnRejugar} onClick={reiniciar}>
-              🔄 Jugar de nuevo
+            <button type="button" className={styles.btnRejugar} onClick={reiniciar}>
+              <span aria-hidden="true">🔄</span> Jugar de nuevo
             </button>
-            <button className={styles.btnConfig} onClick={volverConfig}>
-              ⚙️ Cambiar modo
+            <button type="button" className={styles.btnConfig} onClick={volverConfig}>
+              <span aria-hidden="true">⚙️</span> Cambiar modo
             </button>
           </div>
         </div>
@@ -564,7 +567,7 @@ export default function QuizPaisesCapitalesPage() {
             </div>
           </dl>
           <p className={styles.faqTip}>
-            💡 <strong>Tip:</strong> Después de leer estas respuestas, pon a prueba tus conocimientos con el quiz en modo <strong>Maestro</strong>. Incluye preguntas de los 5 continentes.
+            <span aria-hidden="true">💡</span> <strong>Tip:</strong> Después de leer estas respuestas, pon a prueba tus conocimientos con el quiz en modo <strong>Maestro</strong>. Incluye preguntas de los 5 continentes.
           </p>
         </section>
 

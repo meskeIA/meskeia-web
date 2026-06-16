@@ -175,6 +175,7 @@ export default function QuizHistoriaEspanaPage() {
                     <button
                       key={d}
                       type="button"
+                      aria-pressed={dificultad === d}
                       className={`${styles.difCard} ${dificultad === d ? styles.difActivo : ''}`}
                       onClick={() => setDificultad(d)}
                     >
@@ -491,7 +492,7 @@ export default function QuizHistoriaEspanaPage() {
 
         {/* Warning */}
         <section className={styles.warningBox}>
-          <h2>⚠️ Sobre el contenido de este quiz</h2>
+          <h2><span aria-hidden="true">⚠️</span> Sobre el contenido de este quiz</h2>
           <div className={styles.warningGrid}>
             {[
               { titulo: 'Las preguntas cubren hechos históricos verificables', desc: 'Todas las preguntas están basadas en hechos históricos contrastados y fuentes académicas. Se han evitado preguntas de interpretación o valoración ideológica.' },

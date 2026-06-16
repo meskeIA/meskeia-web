@@ -524,11 +524,11 @@
 | [x] | Quiz de Conceptos Financieros | `/quiz-conceptos-financieros/` | estudiantes, finanzas |
 | [x] | Quiz Figuras Retóricas | `/quiz-figuras-retoricas/` | estudiantes, juegos |
 | [x] | Quiz Geografía de España | `/quiz-geografia-espana/` | estudiantes |
-| [ ] | Quiz Historia de España | `/quiz-historia-espana/` | estudiantes |
-| [ ] | Quiz Países y Capitales | `/quiz-paises-capitales/` | estudiantes, juegos |
-| [ ] | Quiz Reinos de la Naturaleza | `/quiz-reinos-naturaleza/` | estudiantes, juegos |
+| [x] | Quiz Historia de España | `/quiz-historia-espana/` | estudiantes |
+| [x] | Quiz Países y Capitales | `/quiz-paises-capitales/` | estudiantes, juegos |
+| [x] | Quiz Reinos de la Naturaleza | `/quiz-reinos-naturaleza/` | estudiantes, juegos |
 | [x] | Quiz Símbolos Químicos | `/quiz-simbolos-quimicos/` | estudiantes |
-| [ ] | Quiz Tabla Periódica | `/quiz-tabla-periodica/` | estudiantes, juegos |
+| [x] | Quiz Tabla Periódica | `/quiz-tabla-periodica/` | estudiantes, juegos |
 | [ ] | Quiz: Clasifica 40 Plantas — ¿Musgo, Helecho o Angiosperma? | `/quiz-tipos-plantas/` | estudiantes, juegos |
 | [ ] | Radioactividad: Desintegración, Vida Media y Datación | `/visualizador-radioactividad/` | estudiantes, cultura |
 | [ ] | Reacciones Químicas - Cuando los Átomos Cambian de Pareja | `/visualizador-reacciones-quimicas/` | estudiantes, cultura |

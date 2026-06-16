@@ -455,7 +455,7 @@ export default function QuizTablaPeriodicaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.heroTitle}>⚗️ Quiz Tabla Periódica</h1>
+        <h1 className={styles.heroTitle}><span aria-hidden="true">⚗️</span> Quiz Tabla Periódica</h1>
         <p className={styles.heroSubtitle}>
           40+ preguntas sobre elementos, grupos, propiedades y curiosidades
         </p>
@@ -478,7 +478,7 @@ export default function QuizTablaPeriodicaPage() {
                   <span key={cat} className={styles.badge}>{etiqueta}</span>
                 ))}
               </div>
-              <button className={styles.btnPrimario} onClick={iniciarQuiz}>
+              <button type="button" className={styles.btnPrimario} onClick={iniciarQuiz}>
                 Empezar quiz →
               </button>
             </div>
@@ -490,7 +490,7 @@ export default function QuizTablaPeriodicaPage() {
             <div className={styles.progreso}>
               <div className={styles.progresoInfo}>
                 <span>Pregunta {indice + 1} de {TOTAL_PREGUNTAS}</span>
-                <span className={styles.aciertosProgreso}>✓ {totalAciertos} aciertos</span>
+                <span className={styles.aciertosProgreso}><span aria-hidden="true">✓</span> {totalAciertos} aciertos</span>
               </div>
               <div className={styles.barraProgreso}>
                 <div
@@ -517,6 +517,7 @@ export default function QuizTablaPeriodicaPage() {
                   return (
                     <button
                       key={i}
+                      type="button"
                       className={clase}
                       onClick={() => responder(i)}
                       disabled={haRespondido}
@@ -533,10 +534,10 @@ export default function QuizTablaPeriodicaPage() {
               {haRespondido && (
                 <div className={`${styles.feedback} ${seleccionada === pregunta.correcta ? styles.feedbackCorrecto : styles.feedbackIncorrecto}`}>
                   <p className={styles.feedbackResultado}>
-                    {seleccionada === pregunta.correcta ? '✓ ¡Correcto!' : '✗ Incorrecto'}
+                    {seleccionada === pregunta.correcta ? <><span aria-hidden="true">✓</span> ¡Correcto!</> : <><span aria-hidden="true">✗</span> Incorrecto</>}
                   </p>
                   <p className={styles.explicacion}>{pregunta.explicacion}</p>
-                  <button className={styles.btnSiguiente} onClick={siguiente}>
+                  <button type="button" className={styles.btnSiguiente} onClick={siguiente}>
                     {indice + 1 >= TOTAL_PREGUNTAS ? 'Ver resultados →' : 'Siguiente pregunta →'}
                   </button>
                 </div>
@@ -570,7 +571,7 @@ export default function QuizTablaPeriodicaPage() {
                   <span className={styles.statLabel}>Puntuación</span>
                 </div>
               </div>
-              <button className={styles.btnPrimario} onClick={iniciarQuiz}>
+              <button type="button" className={styles.btnPrimario} onClick={iniciarQuiz}>
                 Jugar otra vez
               </button>
             </div>
@@ -604,17 +605,17 @@ export default function QuizTablaPeriodicaPage() {
         <h3>¿A quién le viene bien este quiz?</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <span className={styles.escenarioIcon}>🎓</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
             <h4>Estudiante de secundaria</h4>
             <p>Repasa grupos, períodos y propiedades antes del examen. Identifica las familias más importantes y sus características.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <span className={styles.escenarioIcon}>🏆</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">🏆</span>
             <h4>Aficionado a la ciencia</h4>
             <p>Descubre curiosidades sorprendentes sobre los elementos: cuáles son líquidos, cuáles tienen símbolos irregulares y por qué.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <span className={styles.escenarioIcon}>📚</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">📚</span>
             <h4>Preparación oposiciones</h4>
             <p>Cultura científica general para temarios de oposiciones de primaria, secundaria o acceso a ciclos formativos de química.</p>
           </div>
@@ -647,7 +648,7 @@ export default function QuizTablaPeriodicaPage() {
         <div className={styles.tipsGrid}>
           {educativo.tips.map((tip, i) => (
             <div key={i} className={styles.tipCard}>
-              <span className={styles.tipIcon}>💡</span>
+              <span className={styles.tipIcon} aria-hidden="true">💡</span>
               <strong>{tip.titulo}</strong>
               <p>{tip.descripcion}</p>
             </div>
@@ -656,7 +657,7 @@ export default function QuizTablaPeriodicaPage() {
 
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores frecuentes al estudiar la tabla periódica</strong>
           </div>
           <ul className={styles.warningList}>
