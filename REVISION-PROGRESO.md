@@ -707,10 +707,10 @@
 | [x] | Generador de Facturas | `/generador-facturas/` | freelance |
 | [x] | Lista de Tareas | `/lista-tareas/` | freelance, productividad |
 | [x] | Mapa de Dependencia de Clientes | `/mapa-dependencia-clientes/` | freelance, productividad |
-| [ ] | Mapa de Riesgo del Emprendedor | `/mapa-riesgo-emprendedor/` | freelance, finanzas |
-| [ ] | Mi IP y Conexión | `/mi-ip/` | freelance, tecnicas |
-| [ ] | Notas | `/notas/` | freelance, productividad |
-| [ ] | Orientador Contratos Mercantiles | `/orientador-contrato-mercantil/` | freelance, tecnicas |
+| [x] | Mapa de Riesgo del Emprendedor | `/mapa-riesgo-emprendedor/` | freelance, finanzas |
+| [x] | Mi IP y Conexión | `/mi-ip/` | freelance, tecnicas |
+| [x] | Notas | `/notas/` | freelance, productividad |
+| [x] | Orientador Contratos Mercantiles | `/orientador-contrato-mercantil/` | freelance, tecnicas |
 | [ ] | Orientador de Ayudas para Autónomos y Pymes | `/orientador-ayudas-autonomos-pymes/` | freelance, legal-fiscal |
 | [ ] | Orientador de Diversificación de Clientes | `/orientador-diversificacion-clientes/` | freelance, productividad |
 | [ ] | Orientador Facturación y Retenciones | `/orientador-facturacion-retencion/` | freelance, finanzas |

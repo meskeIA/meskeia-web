@@ -255,8 +255,8 @@ export default function MiIpPage() {
             <div className={styles.error}>
               <span className={styles.errorIcon}>⚠️</span>
               <p>{error}</p>
-              <button onClick={fetchIpInfo} className={styles.retryBtn}>
-                🔄 Reintentar
+              <button type="button" onClick={fetchIpInfo} className={styles.retryBtn}>
+                <span aria-hidden="true">🔄</span> Reintentar
               </button>
             </div>
           ) : ipInfo && (
@@ -266,6 +266,7 @@ export default function MiIpPage() {
                 <div className={styles.ipDisplay}>
                   <span className={styles.ipAddress}>{ipInfo.ip}</span>
                   <button
+                    type="button"
                     onClick={() => copyToClipboard(ipInfo.ip)}
                     className={styles.copyBtn}
                     title="Copiar IP"
@@ -282,6 +283,7 @@ export default function MiIpPage() {
                   <div className={styles.ipDisplay}>
                     <span className={styles.ipv6Address}>{ipv6}</span>
                     <button
+                      type="button"
                       onClick={() => copyToClipboard(ipv6)}
                       className={styles.copyBtnSmall}
                       title="Copiar IPv6"
@@ -445,14 +447,16 @@ export default function MiIpPage() {
             <h2 className={styles.sectionTitle}>📜 Historial de IPs</h2>
             <div className={styles.historyActions}>
               <button
+                type="button"
                 onClick={() => setShowHistory(!showHistory)}
                 className={styles.toggleBtn}
+                aria-pressed={showHistory}
               >
                 {showHistory ? '▲ Ocultar' : '▼ Mostrar'} ({history.length})
               </button>
               {history.length > 0 && (
-                <button onClick={clearHistory} className={styles.clearBtn}>
-                  🗑️ Limpiar
+                <button type="button" onClick={clearHistory} className={styles.clearBtn}>
+                  <span aria-hidden="true">🗑️</span> Limpiar
                 </button>
               )}
             </div>
@@ -481,8 +485,8 @@ export default function MiIpPage() {
 
         {/* Botón refrescar */}
         <div className={styles.refreshSection}>
-          <button onClick={fetchIpInfo} className={styles.refreshBtn} disabled={isLoading}>
-            🔄 Actualizar información
+          <button type="button" onClick={fetchIpInfo} className={styles.refreshBtn} disabled={isLoading}>
+            <span aria-hidden="true">🔄</span> Actualizar información
           </button>
         </div>
       </main>

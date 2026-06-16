@@ -386,6 +386,7 @@ export default function OrientadorContratoMercantilPage() {
                 {PREGUNTAS[preguntaActual].opciones.map((opcion) => (
                   <button
                     key={opcion.valor}
+                    type="button"
                     className={styles.opcionBtn}
                     onClick={() => handleRespuesta(opcion.valor)}
                     aria-label={opcion.etiqueta}
@@ -397,6 +398,7 @@ export default function OrientadorContratoMercantilPage() {
 
               {preguntaActual > 0 && (
                 <button
+                  type="button"
                   className={styles.btnSecundario}
                   onClick={() => {
                     const nuevasRespuestas = { ...respuestas };
@@ -488,10 +490,11 @@ export default function OrientadorContratoMercantilPage() {
               ))}
 
               <div className={styles.accionesResultado}>
-                <button className={styles.btnPrimary} onClick={reiniciar}>
+                <button type="button" className={styles.btnPrimary} onClick={reiniciar}>
                   Volver a empezar
                 </button>
                 <button
+                  type="button"
                   className={styles.btnSecundario}
                   onClick={() => setPaso('tabla')}
                 >
@@ -506,7 +509,7 @@ export default function OrientadorContratoMercantilPage() {
             <div className={styles.tablaSection}>
               <div className={styles.tablaTitulo}>
                 <h2>Comparativa de contratos mercantiles</h2>
-                <button className={styles.btnSecundario} onClick={() => setPaso('preguntas')}>
+                <button type="button" className={styles.btnSecundario} onClick={() => setPaso('preguntas')}>
                   ← Volver al orientador
                 </button>
               </div>
@@ -538,7 +541,7 @@ export default function OrientadorContratoMercantilPage() {
                 </table>
               </div>
               <div className={styles.tablaAcciones}>
-                <button className={styles.btnPrimary} onClick={reiniciar}>
+                <button type="button" className={styles.btnPrimary} onClick={reiniciar}>
                   Volver al orientador
                 </button>
               </div>

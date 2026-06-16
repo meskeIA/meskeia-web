@@ -214,7 +214,7 @@ export default function NotasPage() {
         {/* Panel de crear/editar nota */}
         <div className={styles.editorPanel}>
           <h2 className={styles.panelTitle}>
-            {notaEditando ? '✏️ Editar Nota' : '➕ Nueva Nota'}
+            {notaEditando ? <><span aria-hidden="true">✏️</span> Editar Nota</> : <><span aria-hidden="true">➕</span> Nueva Nota</>}
           </h2>
 
           <div className={styles.formGroup}>
@@ -260,6 +260,7 @@ export default function NotasPage() {
 
           <div className={styles.formActions}>
             <button
+              type="button"
               onClick={guardarNota}
               className={styles.btnPrimary}
               disabled={!titulo.trim() || !contenido.trim()}
@@ -267,7 +268,7 @@ export default function NotasPage() {
               {notaEditando ? 'Guardar Cambios' : 'Crear Nota'}
             </button>
             {notaEditando && (
-              <button onClick={cancelarEdicion} className={styles.btnSecondary}>
+              <button type="button" onClick={cancelarEdicion} className={styles.btnSecondary}>
                 Cancelar
               </button>
             )}
@@ -278,12 +279,12 @@ export default function NotasPage() {
         <div className={styles.notasPanel}>
           <div className={styles.notasHeader}>
             <h2 className={styles.panelTitle}>
-              📋 Mis Notas ({notasFiltradas.length})
+              <span aria-hidden="true">📋</span> Mis Notas ({notasFiltradas.length})
             </h2>
 
             <div className={styles.notasActions}>
-              <button onClick={exportarNotas} className={styles.btnSmall} disabled={notas.length === 0}>
-                💾 Exportar
+              <button type="button" onClick={exportarNotas} className={styles.btnSmall} disabled={notas.length === 0}>
+                <span aria-hidden="true">💾</span> Exportar
               </button>
               <label className={styles.btnSmall}>
                 📂 Importar
@@ -308,7 +309,7 @@ export default function NotasPage() {
                 className={styles.searchInput}
               />
               {busqueda && (
-                <button onClick={() => setBusqueda('')} className={styles.clearSearch}>
+                <button type="button" onClick={() => setBusqueda('')} className={styles.clearSearch}>
                   ✕
                 </button>
               )}
@@ -383,16 +384,18 @@ export default function NotasPage() {
                           </span>
                           <div className={styles.notaBtns}>
                             <button
+                              type="button"
                               onClick={() => editarNota(nota)}
                               className={styles.btnEdit}
                             >
-                              ✏️ Editar
+                              <span aria-hidden="true">✏️</span> Editar
                             </button>
                             <button
+                              type="button"
                               onClick={() => eliminarNota(nota.id)}
                               className={styles.btnDelete}
                             >
-                              🗑️ Eliminar
+                              <span aria-hidden="true">🗑️</span> Eliminar
                             </button>
                           </div>
                         </div>
@@ -411,21 +414,21 @@ export default function NotasPage() {
         <h3>Sobre esta herramienta</h3>
         <div className={styles.infoGrid}>
           <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>💾</span>
+            <span className={styles.infoIcon} aria-hidden="true">💾</span>
             <div>
               <strong>Guardado automático</strong>
               <p>Tus notas se guardan localmente en tu navegador</p>
             </div>
           </div>
           <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>🏷️</span>
+            <span className={styles.infoIcon} aria-hidden="true">🏷️</span>
             <div>
               <strong>8 categorías</strong>
               <p>Organiza tus notas por tipo: trabajo, personal, ideas...</p>
             </div>
           </div>
           <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>📤</span>
+            <span className={styles.infoIcon} aria-hidden="true">📤</span>
             <div>
               <strong>Exportar/Importar</strong>
               <p>Haz backup de tus notas en formato JSON</p>
