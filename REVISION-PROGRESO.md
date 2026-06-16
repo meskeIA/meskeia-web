@@ -645,10 +645,10 @@
 | [x] | Desigualdad de la Riqueza - Curva de Lorenz y Coeficiente Gini | `/visualizador-desigualdad-riqueza/` | finanzas, cultura, estudiantes |
 | [x] | Deuda Pública - Bonos, Prima de Riesgo y Sostenibilidad | `/visualizador-deuda-publica/` | finanzas, cultura |
 | [x] | El Dinero y el Tiempo | `/visualizador-dinero-y-tiempo/` | finanzas, cultura, freelance |
-| [ ] | El Mapa de tu Dinero Mensual | `/visualizador-mapa-dinero-mensual/` | finanzas, cultura, freelance |
-| [ ] | El Precio Real de las Cosas | `/visualizador-precio-real-cosas/` | finanzas, cultura, freelance |
-| [ ] | El Viaje de tus Impuestos | `/visualizador-viaje-impuestos/` | finanzas, cultura, freelance |
-| [ ] | Estimación de Deducción por Maternidad IRPF | `/estimacion-deduccion-maternidad/` | finanzas, legal-fiscal |
+| [x] | El Mapa de tu Dinero Mensual | `/visualizador-mapa-dinero-mensual/` | finanzas, cultura, freelance |
+| [x] | El Precio Real de las Cosas | `/visualizador-precio-real-cosas/` | finanzas, cultura, freelance |
+| [x] | El Viaje de tus Impuestos | `/visualizador-viaje-impuestos/` | finanzas, cultura, freelance |
+| [x] | Estimación de Deducción por Maternidad IRPF | `/estimacion-deduccion-maternidad/` | finanzas, legal-fiscal |
 | [ ] | Estimador Coste Real a Plazos | `/estimador-coste-plazos/` | finanzas |
 | [x] | Estimador de Cartera de Inversión | `/estimador-cartera-inversion/` | finanzas |
 | [ ] | Estimador de Deuda | `/estimador-deuda/` | finanzas |
