@@ -452,10 +452,10 @@
 | [x] | El Sistema Endocrino - Glándulas, Hormonas y Feedback | `/visualizador-sistema-endocrino/` | estudiantes, cultura, salud |
 | [x] | El Sistema Inmune - Tu Ejército Invisible | `/visualizador-sistema-inmune/` | estudiantes, cultura, salud |
 | [x] | El Sistema Nervioso - Neuronas, Sinapsis y Neurotransmisores | `/visualizador-sistema-nervioso/` | estudiantes, cultura, salud |
-| [ ] | El Sistema Respiratorio - Del Aire al Alvéolo | `/visualizador-sistema-respiratorio/` | estudiantes, cultura, salud |
-| [ ] | El Sistema Solar en Números | `/visualizador-sistema-solar/` | estudiantes, cultura |
-| [ ] | El Viaje de tu Comida | `/visualizador-viaje-comida/` | estudiantes, salud, cultura |
-| [ ] | Electricidad Doméstica - Tu Cuadro Eléctrico Explicado | `/visualizador-electricidad-domestica/` | estudiantes, cultura |
+| [x] | El Sistema Respiratorio - Del Aire al Alvéolo | `/visualizador-sistema-respiratorio/` | estudiantes, cultura, salud |
+| [x] | El Sistema Solar en Números | `/visualizador-sistema-solar/` | estudiantes, cultura |
+| [x] | El Viaje de tu Comida | `/visualizador-viaje-comida/` | estudiantes, salud, cultura |
+| [x] | Electricidad Doméstica - Tu Cuadro Eléctrico Explicado | `/visualizador-electricidad-domestica/` | estudiantes, cultura |
 | [ ] | Electromagnetismo - Campo Eléctrico, Magnético e Inducción | `/visualizador-electromagnetismo/` | estudiantes, cultura, tecnicas |
 | [ ] | Embriogénesis: Fecundación, Segmentación y Organogénesis | `/visualizador-embriogenesis/` | estudiantes, salud |
 | [ ] | Energía Nuclear - Fisión, Fusión y Comparativa | `/visualizador-energia-nuclear/` | estudiantes, cultura, tecnicas |

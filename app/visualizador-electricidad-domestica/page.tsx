@@ -719,7 +719,7 @@ export default function VisualizadorElectricidadDomestica() {
         {/* Cabecera seccion */}
         <div className={styles.seccionHeader}>
           <h2 className={styles.seccionTitulo}>
-            {SECCIONES.find(s => s.id === seccion)?.icono}{' '}
+            <span aria-hidden="true">{SECCIONES.find(s => s.id === seccion)?.icono}</span>{' '}
             {SECCIONES.find(s => s.id === seccion)?.titulo}
           </h2>
           <p className={styles.seccionSubtitulo}>{SECCIONES.find(s => s.id === seccion)?.subtitulo}</p>

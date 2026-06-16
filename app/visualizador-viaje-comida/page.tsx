@@ -226,6 +226,7 @@ export default function VisualizadorViajeComidaPage() {
             type="button"
             className={`${styles.vistaBtn} ${vistaDetalle === 'simple' ? styles.vistaActiva : ''}`}
             onClick={() => setVistaDetalle('simple')}
+            aria-pressed={vistaDetalle === 'simple'}
           >
             Explicación simple
           </button>
@@ -233,6 +234,7 @@ export default function VisualizadorViajeComidaPage() {
             type="button"
             className={`${styles.vistaBtn} ${vistaDetalle === 'bioquimica' ? styles.vistaActiva : ''}`}
             onClick={() => setVistaDetalle('bioquimica')}
+            aria-pressed={vistaDetalle === 'bioquimica'}
           >
             Proceso bioquímico
           </button>
