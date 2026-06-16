@@ -401,7 +401,7 @@ function SeccionAnatomia() {
           <div className={styles.zonaDetalle} style={{ borderLeftColor: zona.color }}>
             <h4 className={styles.zonaDetalleTitulo} style={{ color: zona.color }}>{zona.nombre}</h4>
             <p className={styles.zonaDescripcion}>{zona.descripcion}</p>
-            <p className={styles.zonaDato}>💡 {zona.dato}</p>
+            <p className={styles.zonaDato}><span aria-hidden="true">💡</span> {zona.dato}</p>
           </div>
         </div>
 
@@ -410,6 +410,7 @@ function SeccionAnatomia() {
           {ZONAS_HIGADO.map(z => (
             <button
               key={z.id}
+              type="button"
               className={`${styles.zonaBtn} ${zonaActiva === z.id ? styles.zonaBtnActivo : ''}`}
               style={zonaActiva === z.id ? { borderColor: z.color, background: z.color } : {}}
               onClick={() => setZonaActiva(z.id)}
@@ -466,6 +467,7 @@ function SeccionFunciones() {
           return (
             <div key={grupo.id} className={`${styles.funcionCard} ${activo ? styles.funcionCardActiva : ''}`}>
               <button
+                type="button"
                 className={styles.funcionBtn}
                 style={{ borderColor: grupo.color }}
                 onClick={() => setGrupoActivo(activo ? null : grupo.id)}
@@ -485,7 +487,7 @@ function SeccionFunciones() {
                       <li key={i}>{p}</li>
                     ))}
                   </ul>
-                  <p className={styles.funcionCuriosidad}>💡 {grupo.curiosidad}</p>
+                  <p className={styles.funcionCuriosidad}><span aria-hidden="true">💡</span> {grupo.curiosidad}</p>
                 </div>
               )}
             </div>
@@ -537,6 +539,7 @@ function SeccionDetox() {
         {SUSTANCIAS_DETOX.map((s, i) => (
           <button
             key={i}
+            type="button"
             className={`${styles.detoxBtn} ${sustanciaActiva === i ? styles.detoxBtnActivo : ''}`}
             onClick={() => setSustanciaActiva(i)}
             aria-pressed={sustanciaActiva === i}
@@ -588,6 +591,7 @@ function SeccionMetabolismo() {
         {META_CICLOS.map(c => (
           <button
             key={c.id}
+            type="button"
             className={`${styles.metaSelectorBtn} ${selector === c.id ? styles.metaSelectorActivo : ''}`}
             style={selector === c.id ? { borderColor: c.color, background: c.color } : {}}
             onClick={() => setSelector(c.id)}
@@ -602,25 +606,27 @@ function SeccionMetabolismo() {
       {/* Toggle estado nutricional */}
       <div className={styles.metaEstadoToggle}>
         <button
+          type="button"
           className={`${styles.metaEstadoBtn} ${estado === 'postprandial' ? styles.metaEstadoActivo : ''}`}
           onClick={() => setEstado('postprandial')}
           aria-pressed={estado === 'postprandial'}
         >
-          🍽️ Tras la comida
+          <span aria-hidden="true">🍽️</span> Tras la comida
         </button>
         <button
+          type="button"
           className={`${styles.metaEstadoBtn} ${estado === 'ayuno' ? styles.metaEstadoActivo : ''}`}
           onClick={() => setEstado('ayuno')}
           aria-pressed={estado === 'ayuno'}
         >
-          ⏱️ En ayuno
+          <span aria-hidden="true">⏱️</span> En ayuno
         </button>
       </div>
 
       {/* Ciclo metabólico */}
       <div className={styles.metaCicloCard} style={{ borderColor: ciclo.color }}>
         <h3 className={styles.metaCicloTitulo} style={{ color: ciclo.color }}>
-          {ciclo.icono} {cicloEstado.titulo}
+          <span aria-hidden="true">{ciclo.icono}</span> {cicloEstado.titulo}
         </h3>
         <ol className={styles.metaCicloPasos}>
           {cicloEstado.pasos.map((paso, i) => (
@@ -664,6 +670,7 @@ export default function VisualizadorHigado() {
         {SECCIONES.map(s => (
           <button
             key={s.id}
+            type="button"
             className={`${styles.navBtn} ${seccionActiva === s.id ? styles.navActivo : ''}`}
             onClick={() => setSeccionActiva(s.id)}
             aria-pressed={seccionActiva === s.id}
@@ -784,7 +791,7 @@ export default function VisualizadorHigado() {
             <div key={item.q} className={styles.faqItem}>
               <strong className={styles.faqPregunta}>{item.q}</strong>
               <p className={styles.faqRespuesta}>{item.a}</p>
-              {item.tip && <p className={styles.faqTip}>💡 {item.tip}</p>}
+              {item.tip && <p className={styles.faqTip}><span aria-hidden="true">💡</span> {item.tip}</p>}
             </div>
           ))}
         </div>

@@ -323,7 +323,7 @@ export default function VisualizadorMagnesio() {
 
       {/* Hero */}
       <header className={styles.hero}>
-        <div className={styles.heroIcon}>⚡</div>
+        <div className={styles.heroIcon} aria-hidden="true">⚡</div>
         <h1>El Magnesio</h1>
         <p>
           300 reacciones enzimáticas, cofactor del ATP, regulador del canal NMDA y protagonista
@@ -351,6 +351,7 @@ export default function VisualizadorMagnesio() {
             {CATEGORIAS_REACCIONES.map((cat) => (
               <button
                 key={cat.id}
+                type="button"
                 className={`${styles.categoryBtn} ${categoriaSeleccionada === cat.id ? styles.categoryBtnActive : ''}`}
                 onClick={() => setCategoriaSeleccionada((prev) => (prev === cat.id ? null : cat.id))}
                 style={{ borderLeftColor: cat.color }}
@@ -387,6 +388,7 @@ export default function VisualizadorMagnesio() {
             {ESTADOS_MUSCULARES.map((estado) => (
               <button
                 key={estado.id}
+                type="button"
                 role="tab"
                 aria-selected={estadoMuscular === estado.id}
                 className={`${styles.muscleStateBtn} ${estadoMuscular === estado.id ? styles.muscleStateBtnActive : ''}`}
@@ -475,28 +477,28 @@ export default function VisualizadorMagnesio() {
           <div className={styles.nmdaImplicaciones}>
             <h3>¿Por qué importa?</h3>
             <div className={styles.nmdaCard}>
-              <span className={styles.nmdaCardIcon}>😰</span>
+              <span className={styles.nmdaCardIcon} aria-hidden="true">😰</span>
               <div>
                 <strong>Ansiedad y estrés</strong>
                 <p>En modelos animales y algunos estudios humanos, el déficit de Mg se ha asociado con mayor reactividad al estrés. La evidencia sobre la suplementación como tratamiento de ansiedad en personas sin déficit es limitada y de baja calidad.</p>
               </div>
             </div>
             <div className={styles.nmdaCard}>
-              <span className={styles.nmdaCardIcon}>🤯</span>
+              <span className={styles.nmdaCardIcon} aria-hidden="true">🤯</span>
               <div>
                 <strong>Migraña</strong>
                 <p>El Mg intracelular es bajo en pacientes con migraña. El NMDA participa en la propagación cortical de la migraña.</p>
               </div>
             </div>
             <div className={styles.nmdaCard}>
-              <span className={styles.nmdaCardIcon}>💊</span>
+              <span className={styles.nmdaCardIcon} aria-hidden="true">💊</span>
               <div>
                 <strong>Ketamina y memantina</strong>
                 <p>Ambos fármacos actúan bloqueando el canal NMDA en el mismo sitio que el Mg2+ — validando el mecanismo.</p>
               </div>
             </div>
             <div className={styles.nmdaCard}>
-              <span className={styles.nmdaCardIcon}>🧠</span>
+              <span className={styles.nmdaCardIcon} aria-hidden="true">🧠</span>
               <div>
                 <strong>Plasticidad neuronal</strong>
                 <p>El NMDA es esencial para la memoria y el aprendizaje. La modulación por Mg regula cuándo se activa la plasticidad.</p>
@@ -528,15 +530,16 @@ export default function VisualizadorMagnesio() {
           {SINTOMAS_DEFICIENCIA.map((sistema) => (
             <div key={sistema.sistema} className={styles.symptomCard}>
               <button
+                type="button"
                 className={styles.symptomCardHeader}
                 onClick={() =>
                   setSistemaAbierto((prev) => (prev === sistema.sistema ? null : sistema.sistema))
                 }
                 aria-expanded={sistemaAbierto === sistema.sistema}
               >
-                <span className={styles.symptomIcon}>{sistema.icono}</span>
+                <span className={styles.symptomIcon} aria-hidden="true">{sistema.icono}</span>
                 <span className={styles.symptomSistema}>{sistema.sistema}</span>
-                <span className={styles.symptomToggle}>
+                <span className={styles.symptomToggle} aria-hidden="true">
                   {sistemaAbierto === sistema.sistema ? '▲' : '▼'}
                 </span>
               </button>
@@ -565,7 +568,7 @@ export default function VisualizadorMagnesio() {
               { icono: '🩺', causa: 'Diabetes no controlada', detalle: 'La glucosuria arrastra Mg por la orina' },
             ].map(({ icono, causa, detalle }) => (
               <div key={causa} className={styles.causaCard}>
-                <span className={styles.causaIcon}>{icono}</span>
+                <span className={styles.causaIcon} aria-hidden="true">{icono}</span>
                 <strong className={styles.causaNombre}>{causa}</strong>
                 <span className={styles.causaDetalle}>{detalle}</span>
               </div>
@@ -592,7 +595,7 @@ export default function VisualizadorMagnesio() {
         </div>
 
         <p className={styles.waterNote}>
-          🚰 El agua mineral puede aportar entre 1 y 120 mg/L de Mg (varía mucho según la fuente).
+          <span aria-hidden="true">🚰</span> El agua mineral puede aportar entre 1 y 120 mg/L de Mg (varía mucho según la fuente).
           Las aguas "duras" son una fuente significativa y frecuentemente ignorada.
         </p>
       </section>

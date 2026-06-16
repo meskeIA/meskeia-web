@@ -335,6 +335,7 @@ export default function VisualizadorRinonFiltracion() {
         {SECCIONES.map(sec => (
           <button
             key={sec.id}
+            type="button"
             className={`${styles.navBtn} ${seccionActiva === sec.id ? styles.navActivo : ''}`}
             onClick={() => setSeccionActiva(sec.id)}
             aria-pressed={seccionActiva === sec.id}
@@ -391,6 +392,7 @@ export default function VisualizadorRinonFiltracion() {
             {ZONAS_RENALES.map(zona => (
               <button
                 key={zona.id}
+                type="button"
                 className={`${styles.zonaCard} ${zonaSeleccionada === zona.id ? styles.zonaCardActiva : ''}`}
                 style={{ borderLeftColor: zona.color }}
                 onClick={() => setZonaSeleccionada(zonaSeleccionada === zona.id ? null : zona.id)}
@@ -410,7 +412,7 @@ export default function VisualizadorRinonFiltracion() {
                 <h3 className={styles.detalleTitulo}>{zonaActual.nombre}</h3>
               </div>
               <p className={styles.detalleDesc}>{zonaActual.descripcion}</p>
-              <p className={styles.detalleDato}>💡 {zonaActual.dato}</p>
+              <p className={styles.detalleDato}><span aria-hidden="true">💡</span> {zonaActual.dato}</p>
             </div>
           )}
 
@@ -437,6 +439,7 @@ export default function VisualizadorRinonFiltracion() {
             {SEGMENTOS_NEFRONA.map((seg, idx) => (
               <button
                 key={seg.id}
+                type="button"
                 className={`${styles.segmentoBtn} ${segmentoSeleccionado === seg.id ? styles.segmentoBtnActivo : ''}`}
                 style={{ borderLeftColor: seg.color }}
                 onClick={() => setSegmentoSeleccionado(segmentoSeleccionado === seg.id ? null : seg.id)}
@@ -489,6 +492,7 @@ export default function VisualizadorRinonFiltracion() {
             {PROCESOS_ORINA.map(proc => (
               <button
                 key={proc.id}
+                type="button"
                 className={`${styles.procesoNavBtn} ${procesoActivo === proc.id ? styles.procesoNavActivo : ''}`}
                 style={procesoActivo === proc.id ? { borderColor: proc.color, background: proc.color } : { borderColor: proc.color }}
                 onClick={() => setProcesoActivo(proc.id)}
@@ -520,7 +524,7 @@ export default function VisualizadorRinonFiltracion() {
             </ul>
 
             <div className={styles.procesoDato}>
-              💡 {procesoActual.dato}
+              <span aria-hidden="true">💡</span> {procesoActual.dato}
             </div>
           </div>
 
@@ -539,19 +543,19 @@ export default function VisualizadorRinonFiltracion() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td>🫧 Filtración</td>
+                    <td><span aria-hidden="true">🫧</span> Filtración</td>
                     <td>Capilar → Bowman</td>
                     <td>Glomérulo</td>
                     <td>Pasiva (presión)</td>
                   </tr>
                   <tr>
-                    <td>♻️ Reabsorción</td>
+                    <td><span aria-hidden="true">♻️</span> Reabsorción</td>
                     <td>Túbulo → Capilar</td>
                     <td>TCP, Asa, TCD, TC</td>
                     <td>Activa + pasiva</td>
                   </tr>
                   <tr>
-                    <td>🚿 Secreción</td>
+                    <td><span aria-hidden="true">🚿</span> Secreción</td>
                     <td>Capilar → Túbulo</td>
                     <td>TCP, TCD, TC</td>
                     <td>Activa</td>
@@ -614,6 +618,7 @@ export default function VisualizadorRinonFiltracion() {
             {HORMONAS_REGULACION.map(hor => (
               <button
                 key={hor.id}
+                type="button"
                 className={`${styles.hormonaCard} ${hormonaSeleccionada === hor.id ? styles.hormonaCardActiva : ''}`}
                 style={{ borderTopColor: hor.color }}
                 onClick={() => setHormonaSeleccionada(hormonaSeleccionada === hor.id ? null : hor.id)}
@@ -666,19 +671,19 @@ export default function VisualizadorRinonFiltracion() {
             </thead>
             <tbody>
               <tr>
-                <td>🫧 Filtración glomerular</td>
+                <td><span aria-hidden="true">🫧</span> Filtración glomerular</td>
                 <td>Glomérulo (Bowman)</td>
                 <td>180 L/día</td>
                 <td>Presión hidrostática neta ~17 mmHg</td>
               </tr>
               <tr>
-                <td>♻️ Reabsorción tubular</td>
+                <td><span aria-hidden="true">♻️</span> Reabsorción tubular</td>
                 <td>TCP, Asa Henle, TCD</td>
                 <td>~178 L/día recuperados</td>
                 <td>Activa (Na/K-ATPasa) y pasiva (ósmosis)</td>
               </tr>
               <tr>
-                <td>🚿 Secreción tubular</td>
+                <td><span aria-hidden="true">🚿</span> Secreción tubular</td>
                 <td>TCD y colector</td>
                 <td>Pequeñas cantidades</td>
                 <td>Activa: H⁺, K⁺, fármacos, tóxicos</td>
@@ -845,11 +850,11 @@ export default function VisualizadorRinonFiltracion() {
             <strong>Mitos y errores frecuentes sobre el riñón</strong>
           </div>
           <ul className={styles.warningList}>
-            <li><strong>❌ &quot;Beber mucha agua limpia los riñones&quot;</strong> — el exceso de agua sobrecarga innecesariamente la filtración; 2 L/día es suficiente en condiciones normales.</li>
-            <li><strong>❌ &quot;El análisis de orina solo detecta infecciones&quot;</strong> — también revela diabetes, problemas renales, deshidratación y enfermedades sistémicas.</li>
-            <li><strong>❌ &quot;Si no duele, el riñón está bien&quot;</strong> — la insuficiencia renal crónica es asintomática hasta estadios avanzados (ERC grados 1-3).</li>
-            <li><strong>❌ &quot;Los suplementos de proteínas no afectan al riñón&quot;</strong> — en dosis muy elevadas aumentan la carga de nitrógeno; evitar en ERC sin supervisión médica.</li>
-            <li><strong>❌ &quot;El contraste radiológico es inofensivo&quot;</strong> — en pacientes con ERC puede precipitar nefropatía por contraste; comunicar siempre al médico la función renal previa.</li>
+            <li><strong><span aria-hidden="true">❌</span> &quot;Beber mucha agua limpia los riñones&quot;</strong> — el exceso de agua sobrecarga innecesariamente la filtración; 2 L/día es suficiente en condiciones normales.</li>
+            <li><strong><span aria-hidden="true">❌</span> &quot;El análisis de orina solo detecta infecciones&quot;</strong> — también revela diabetes, problemas renales, deshidratación y enfermedades sistémicas.</li>
+            <li><strong><span aria-hidden="true">❌</span> &quot;Si no duele, el riñón está bien&quot;</strong> — la insuficiencia renal crónica es asintomática hasta estadios avanzados (ERC grados 1-3).</li>
+            <li><strong><span aria-hidden="true">❌</span> &quot;Los suplementos de proteínas no afectan al riñón&quot;</strong> — en dosis muy elevadas aumentan la carga de nitrógeno; evitar en ERC sin supervisión médica.</li>
+            <li><strong><span aria-hidden="true">❌</span> &quot;El contraste radiológico es inofensivo&quot;</strong> — en pacientes con ERC puede precipitar nefropatía por contraste; comunicar siempre al médico la función renal previa.</li>
           </ul>
         </div>
 

@@ -231,6 +231,7 @@ function DonutDistribucion() {
         {SECTORES_HIERRO.map((sector, i) => (
           <button
             key={sector.nombre}
+            type="button"
             className={`${styles.leyendaItem} ${sectorSeleccionado === i ? styles.leyendaItemActivo : ''}`}
             onClick={() => setSectorSeleccionado(i === sectorSeleccionado ? null : i)}
             aria-pressed={sectorSeleccionado === i}
@@ -402,6 +403,7 @@ function DiagramaHepcidina() {
         {ESCENARIOS_HEPCIDINA.map((esc) => (
           <button
             key={esc.id}
+            type="button"
             className={`${styles.escenarioBtn} ${escenarioActivo === esc.id ? styles.escenarioBtnActivo : ''} ${esc.nivelHepcidina === 'alta-paradoja' ? styles.escenarioBtnParadoja : ''}`}
             onClick={() => setEscenarioActivo(esc.id)}
             aria-pressed={escenarioActivo === esc.id}
@@ -466,6 +468,7 @@ function EspetroCli() {
           {estadosOrdenados.map((est) => (
             <button
               key={est.id}
+              type="button"
               className={`${styles.spectrumPoint} ${estadoActivo === est.id ? styles.spectrumPointActivo : ''}`}
               style={{
                 left: `${est.posicion}%`,
