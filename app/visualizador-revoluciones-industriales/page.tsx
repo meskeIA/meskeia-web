@@ -273,9 +273,11 @@ function TabDetalle() {
         {MOVIMIENTOS.map((mov, i) => (
           <button
             key={mov.id}
+            type="button"
             className={`${styles.movimientoBtn} ${i === indice ? styles.movimientoBtnActivo : ''}`}
             onClick={() => setIndice(i)}
             style={i === indice ? { background: mov.color, borderColor: mov.color } : {}}
+            aria-pressed={i === indice}
           >
             {mov.nombre}
           </button>
@@ -312,6 +314,7 @@ function TabDetalle() {
 
       <div className={styles.navBtns}>
         <button
+          type="button"
           className={styles.btnAnterior}
           onClick={() => setIndice((i) => Math.max(0, i - 1))}
           disabled={indice === 0}
@@ -321,6 +324,7 @@ function TabDetalle() {
         </button>
         <span className={styles.navCounter}>{indice + 1} / {MOVIMIENTOS.length}</span>
         <button
+          type="button"
           className={styles.btnSiguiente}
           onClick={() => setIndice((i) => Math.min(MOVIMIENTOS.length - 1, i + 1))}
           disabled={indice === MOVIMIENTOS.length - 1}
@@ -358,17 +362,21 @@ function TabComparativa() {
 
       <div className={styles.filtroCategoria}>
         <button
+          type="button"
           className={`${styles.filtroCatBtn} ${eraFiltro === 'todos' ? styles.filtroCatBtnActivo : ''}`}
           onClick={() => setEraFiltro('todos')}
+          aria-pressed={eraFiltro === 'todos'}
         >
           Todas
         </button>
         {(Object.keys(ETIQUETAS_ERA) as EraId[]).map((era) => (
           <button
             key={era}
+            type="button"
             className={`${styles.filtroCatBtn} ${eraFiltro === era ? styles.filtroCatBtnActivo : ''}`}
             onClick={() => setEraFiltro(era)}
             style={eraFiltro === era ? { background: COLORES_ERA[era], borderColor: COLORES_ERA[era] } : {}}
+            aria-pressed={eraFiltro === era}
           >
             {ETIQUETAS_ERA[era]}
           </button>
@@ -525,6 +533,7 @@ export default function RevolucionesIndustriales() {
           {tabs.map((tab) => (
             <button
               key={tab.id}
+              type="button"
               role="tab"
               aria-selected={tabActiva === tab.id}
               className={`${styles.tabBtn} ${tabActiva === tab.id ? styles.tabBtnActivo : ''}`}

@@ -114,6 +114,7 @@ const DiagramaEntalpia = () => {
         {EJEMPLOS_ENTALPIA.map(ej => (
           <button
             key={ej.id}
+            type="button"
             className={`${styles.ejemploBtn} ${ej.id === ejemploId ? styles.ejemploBtnActivo : ''}`}
             onClick={() => { setEjemploId(ej.id); setCatalizador(0); }}
             aria-pressed={ej.id === ejemploId}
@@ -187,7 +188,7 @@ const DiagramaEntalpia = () => {
 
       {ejemplo.ea > 0 && (
         <div className={styles.sliderRow}>
-          <span className={styles.sliderLabel}>🧪 Añadir catalizador</span>
+          <span className={styles.sliderLabel}><span aria-hidden="true">🧪</span> Añadir catalizador</span>
           <input
             type="range" min={0} max={80} value={catalizador}
             onChange={e => setCatalizador(Number(e.target.value))}
@@ -499,6 +500,7 @@ const LeChatelier = () => {
         {PERTURBACIONES.map(p => (
           <button
             key={p.id}
+            type="button"
             className={`${styles.pertBtn} ${pertSeleccion === p.id ? styles.pertBtnActivo : ''}`}
             onClick={() => setPertSeleccion(pertSeleccion === p.id ? 'ninguna' : p.id)}
             aria-pressed={pertSeleccion === p.id}
@@ -678,6 +680,7 @@ export default function TermodinamicaQuimicaPage() {
           {SECCIONES.map(sec => (
             <button
               key={sec.id}
+              type="button"
               className={`${styles.navBtn} ${seccionActiva === sec.id ? styles.navActivo : ''}`}
               onClick={() => setSeccionActiva(sec.id)}
               aria-pressed={seccionActiva === sec.id}

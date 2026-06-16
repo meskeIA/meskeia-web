@@ -239,16 +239,16 @@ export default function TestDependenciaTecnologicaPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🔗 Test de Dependencia Tecnológica</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🔗</span> Test de Dependencia Tecnológica</h1>
           <p className={styles.subtitle}>
             ¿Podrías hacer tu trabajo si mañana no tuvieras IA?
             <br />
             Autonomía real y adaptabilidad: las dos caras de tu relación con la tecnología
           </p>
           <div className={styles.badges}>
-            <span className={styles.badge}>🕐 3 minutos</span>
-            <span className={styles.badge}>📊 10 preguntas</span>
-            <span className={styles.badge}>🔒 Sin registro</span>
+            <span className={styles.badge}><span aria-hidden="true">🕐</span> 3 minutos</span>
+            <span className={styles.badge}><span aria-hidden="true">📊</span> 10 preguntas</span>
+            <span className={styles.badge}><span aria-hidden="true">🔒</span> Sin registro</span>
           </div>
         </header>
 
@@ -287,6 +287,7 @@ export default function TestDependenciaTecnologicaPage() {
                 {ESCALA.map((opcion) => (
                   <button
                     key={opcion.valor}
+                    type="button"
                     className={`${styles.scaleButton} ${respuestas[pregunta.id] === opcion.valor ? styles.scaleButtonActive : ''}`}
                     onClick={() => handleRespuesta(pregunta.id, opcion.valor)}
                     role="radio"
@@ -306,6 +307,7 @@ export default function TestDependenciaTecnologicaPage() {
           </div>
 
           <button
+            type="button"
             className={styles.btnPrimary}
             onClick={calcularResultado}
             disabled={!todasRespondidas}
@@ -321,23 +323,23 @@ export default function TestDependenciaTecnologicaPage() {
 
             <div className={styles.mapContainer}>
               <div className={styles.mapLabels}>
-                <span className={styles.mapLabelTop}>🔨 Alta autonomía</span>
+                <span className={styles.mapLabelTop}><span aria-hidden="true">🔨</span> Alta autonomía</span>
                 <span className={styles.mapLabelBottom}>Baja autonomía</span>
                 <span className={styles.mapLabelLeft}>Baja adaptabilidad</span>
-                <span className={styles.mapLabelRight}>🏄 Alta adaptabilidad</span>
+                <span className={styles.mapLabelRight}><span aria-hidden="true">🏄</span> Alta adaptabilidad</span>
               </div>
               <div className={styles.map}>
                 <div className={`${styles.quadrant} ${styles.quadrantTL}`}>
-                  <span>🔨 Artesano Tradicional</span>
+                  <span><span aria-hidden="true">🔨</span> Artesano Tradicional</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantTR}`}>
-                  <span>💎 Profesional Antifrágil</span>
+                  <span><span aria-hidden="true">💎</span> Profesional Antifrágil</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBL}`}>
-                  <span>🔗 Dependencia Silenciosa</span>
+                  <span><span aria-hidden="true">🔗</span> Dependencia Silenciosa</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
-                  <span>🏄 Surfista Digital</span>
+                  <span><span aria-hidden="true">🏄</span> Surfista Digital</span>
                 </div>
                 <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
                 <div className={styles.thresholdLineV} style={{ left: '65%' }} aria-hidden="true" />
@@ -356,7 +358,7 @@ export default function TestDependenciaTecnologicaPage() {
             <div className={styles.scoresContainer}>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>🔨 Autonomía real</span>
+                  <span><span aria-hidden="true">🔨</span> Autonomía real</span>
                   <span className={styles.scoreValue}>{puntuacionAutonomia}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -368,7 +370,7 @@ export default function TestDependenciaTecnologicaPage() {
               </div>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>🏄 Adaptabilidad</span>
+                  <span><span aria-hidden="true">🏄</span> Adaptabilidad</span>
                   <span className={styles.scoreValue}>{puntuacionAdaptabilidad}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -382,14 +384,14 @@ export default function TestDependenciaTecnologicaPage() {
 
             <div className={styles.profileCard}>
               <div className={styles.profileHeader}>
-                <span className={styles.profileEmoji}>{perfil.emoji}</span>
+                <span className={styles.profileEmoji} aria-hidden="true">{perfil.emoji}</span>
                 <h3 className={styles.profileName}>{perfil.nombre}</h3>
               </div>
               <p className={styles.profileDescription}>{perfil.descripcion}</p>
 
               <div className={styles.profileColumns}>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>✅ Fortalezas</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">✅</span> Fortalezas</h4>
                   <ul className={styles.profileList}>
                     {perfil.fortalezas.map((f, i) => (
                       <li key={i}>{f}</li>
@@ -397,7 +399,7 @@ export default function TestDependenciaTecnologicaPage() {
                   </ul>
                 </div>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>⚠️ Riesgos</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">⚠️</span> Riesgos</h4>
                   <ul className={styles.profileList}>
                     {perfil.riesgos.map((r, i) => (
                       <li key={i}>{r}</li>
@@ -407,7 +409,7 @@ export default function TestDependenciaTecnologicaPage() {
               </div>
 
               <div className={styles.actionsSection}>
-                <h4 className={styles.actionsTitle}>🎯 Acciones sugeridas</h4>
+                <h4 className={styles.actionsTitle}><span aria-hidden="true">🎯</span> Acciones sugeridas</h4>
                 <ol className={styles.actionsList}>
                   {perfil.acciones.map((a, i) => (
                     <li key={i}>{a}</li>
@@ -416,7 +418,7 @@ export default function TestDependenciaTecnologicaPage() {
               </div>
             </div>
 
-            <button className={styles.btnSecondary} onClick={reiniciar}>
+            <button type="button" className={styles.btnSecondary} onClick={reiniciar}>
               Repetir diagnóstico
             </button>
           </section>

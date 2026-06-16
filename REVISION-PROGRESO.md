@@ -311,12 +311,12 @@
 | [x] | Quiz de Métrica y Estrofas | `/quiz-metrica-estrofas/` | cultura, estudiantes |
 | [x] | Quiz: Mitos y Realidades de la Ciencia | `/quiz-mitos-ciencia/` | cultura, estudiantes |
 | [x] | Recursos Literarios | `/visualizador-recursos-literarios/` | cultura, estudiantes |
-| [ ] | Revoluciones Industriales: Cronología de la Máquina de Vapor a la Industria 5.0 | `/visualizador-revoluciones-industriales/` | cultura, tecnicas |
-| [ ] | Selector de Tipo de Alojamiento | `/selector-tipo-alojamiento/` | cultura, productividad |
+| [x] | Revoluciones Industriales: Cronología de la Máquina de Vapor a la Industria 5.0 | `/visualizador-revoluciones-industriales/` | cultura, tecnicas |
+| [x] | Selector de Tipo de Alojamiento | `/selector-tipo-alojamiento/` | cultura, productividad |
 | [x] | Simulador de Balance de Blancos (2500K-10000K) | `/simulador-balance-blancos/` | cultura, tecnicas |
 | [x] | Simulador de Fotografía: Triángulo de Exposición | `/simulador-fotografia/` | cultura, tecnicas |
-| [ ] | Termodinámica Química: ΔG, Equilibrio y Le Chatelier | `/visualizador-termodinamica-quimica/` | cultura, estudiantes, tecnicas |
-| [ ] | Test de Dependencia Tecnológica | `/test-dependencia-tecnologica/` | cultura, productividad |
+| [x] | Termodinámica Química: ΔG, Equilibrio y Le Chatelier | `/visualizador-termodinamica-quimica/` | cultura, estudiantes, tecnicas |
+| [x] | Test de Dependencia Tecnológica | `/test-dependencia-tecnologica/` | cultura, productividad |
 | [ ] | Test de Pensamiento de Grupo | `/test-pensamiento-grupo/` | cultura, productividad |
 | [ ] | Test: ¿Qué tipo de lector eres? | `/test-tipo-lector/` | cultura |
 | [ ] | Transpositor de Acordes | `/transpositor-acordes/` | cultura, estudiantes |

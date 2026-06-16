@@ -340,7 +340,7 @@ export default function SelectorTipoAlojamientoPage() {
 
       {/* 2. Hero */}
       <header className={styles.hero}>
-        <h1 className={styles.heroTitle}>🏨 Selector de Tipo de Alojamiento</h1>
+        <h1 className={styles.heroTitle}><span aria-hidden="true">🏨</span> Selector de Tipo de Alojamiento</h1>
         <p className={styles.heroSubtitle}>
           Test de 10 preguntas para saber qué tipo de alojamiento se adapta mejor a tu viaje
         </p>
@@ -476,7 +476,7 @@ export default function SelectorTipoAlojamientoPage() {
               onClick={reiniciar}
               aria-label="Volver a realizar el test desde el principio"
             >
-              🔄 Repetir el test
+              <span aria-hidden="true">🔄</span> Repetir el test
             </button>
           </section>
         )
@@ -493,7 +493,7 @@ export default function SelectorTipoAlojamientoPage() {
         {/* Grid de tipos */}
         <div className={styles.eduGrid}>
           <div className={styles.eduCard}>
-            <h4>🏨 Hotel</h4>
+            <h4><span aria-hidden="true">🏨</span> Hotel</h4>
             <p>El alojamiento con mayor servicio y comodidad. Ideal para estancias cortas, viajes de negocios o cuando quieres despreocuparte de la logística.</p>
             <ul>
               <li>Mejor para: viajes de 1-3 noches en ciudad</li>
@@ -503,7 +503,7 @@ export default function SelectorTipoAlojamientoPage() {
           </div>
 
           <div className={styles.eduCard}>
-            <h4>🏠 Apartamento Turístico</h4>
+            <h4><span aria-hidden="true">🏠</span> Apartamento Turístico</h4>
             <p>Más espacio y autonomía que un hotel al mismo precio o menos. Con cocina propia, perfecta para estancias largas o familias numerosas.</p>
             <ul>
               <li>Mejor para: estancias de 4 noches o más</li>
@@ -513,7 +513,7 @@ export default function SelectorTipoAlojamientoPage() {
           </div>
 
           <div className={styles.eduCard}>
-            <h4>🎒 Hostel o B&B</h4>
+            <h4><span aria-hidden="true">🎒</span> Hostel o B&B</h4>
             <p>La opción más económica y social. Los hostels modernos tienen zonas comunes de calidad, cocina compartida y organizan actividades para viajeros.</p>
             <ul>
               <li>Mejor para: viajeros solos o mochileros</li>
@@ -523,7 +523,7 @@ export default function SelectorTipoAlojamientoPage() {
           </div>
 
           <div className={styles.eduCard}>
-            <h4>⛺ Camping o Glamping</h4>
+            <h4><span aria-hidden="true">⛺</span> Camping o Glamping</h4>
             <p>Desde la tienda de campaña más básica hasta cabañas de lujo en el bosque. El glamping ha revolucionado este tipo de alojamiento con propuestas premium en entornos naturales únicos.</p>
             <ul>
               <li>Mejor para: destinos rurales, costa y montaña</li>
@@ -533,7 +533,7 @@ export default function SelectorTipoAlojamientoPage() {
           </div>
 
           <div className={styles.eduCard}>
-            <h4>🏡 Casa Rural</h4>
+            <h4><span aria-hidden="true">🏡</span> Casa Rural</h4>
             <p>Privacidad total en un espacio con carácter y encanto. La casa es tuya durante la estancia: perfecta para grupos o familias que quieren desconectar del todo.</p>
             <ul>
               <li>Mejor para: grupos de 4-10 personas</li>
@@ -545,13 +545,13 @@ export default function SelectorTipoAlojamientoPage() {
 
         {/* Consejo de reserva con antelación */}
         <div className={styles.warningBox} role="note">
-          <strong>📅 Reserva con antelación y ahorra hasta un 40 %</strong>
+          <strong><span aria-hidden="true">📅</span> Reserva con antelación y ahorra hasta un 40 %</strong>
           En temporada alta (verano, Semana Santa, puentes) los precios de todos los tipos de alojamiento se disparan. Reservar con 2-4 meses de antelación puede suponer un ahorro significativo, especialmente en casas rurales y apartamentos turísticos de costa. Los hoteles también ofrecen tarifas no reembolsables más baratas cuanto antes se reserven.
         </div>
 
         {/* Comparativa de criterios */}
         <div className={styles.eduCard} style={{ marginTop: '1rem' }}>
-          <h4>🔍 ¿Cómo elegir según el tipo de viaje?</h4>
+          <h4><span aria-hidden="true">🔍</span> ¿Cómo elegir según el tipo de viaje?</h4>
           <p>
             La elección del alojamiento depende de cuatro factores clave: el número de personas, el presupuesto total, la duración de la estancia y el tipo de destino.
             Para viajes cortos en ciudad, el hotel suele ser la mejor relación comodidad-precio.
