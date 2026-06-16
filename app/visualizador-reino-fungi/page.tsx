@@ -397,8 +397,8 @@ export default function VisualizadorReinoFungi() {
                   <thead>
                     <tr>
                       <th scope="col">Característica</th>
-                      <th scope="col" className={styles.thPlantas}>🌿 Plantas</th>
-                      <th scope="col" className={styles.thHongos}>🍄 Hongos</th>
+                      <th scope="col" className={styles.thPlantas}><span aria-hidden="true">🌿</span> Plantas</th>
+                      <th scope="col" className={styles.thHongos}><span aria-hidden="true">🍄</span> Hongos</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -584,29 +584,29 @@ export default function VisualizadorReinoFungi() {
             <h2>Preguntas Frecuentes</h2>
             <div className={styles.faqList}>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Los hongos son más parecidos a plantas o a animales?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Los hongos son más parecidos a plantas o a animales?</h4>
                 <p>Más a animales. Comparten glucógeno como reserva energética y quitina como material estructural (el mismo que el exoesqueleto de insectos). Divergieron de los animales hace aproximadamente 900 millones de años.</p>
-                <p className={styles.faqTip}>💡 <strong>Dato:</strong> Esta es la razón por la que los antifúngicos son más difíciles de desarrollar que los antibióticos.</p>
+                <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Dato:</strong> Esta es la razón por la que los antifúngicos son más difíciles de desarrollar que los antibióticos.</p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Todas las setas son comestibles?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Todas las setas son comestibles?</h4>
                 <p>No. La <em>Amanita phalloides</em> ("oronja verde") puede matar con tan solo 30g de ingesta. Provoca fallo hepático y no tiene antídoto eficaz. Nunca consumas setas sin identificación experta al 100%.</p>
-                <p className={styles.faqTip}>💡 <strong>Regla de seguridad:</strong> Sombrero verde-amarillento + láminas blancas + anillo + volva en la base = sospecha inmediata de Amanita.</p>
+                <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Regla de seguridad:</strong> Sombrero verde-amarillento + láminas blancas + anillo + volva en la base = sospecha inmediata de Amanita.</p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Por qué el moho del pan es peligroso aunque solo cubra una parte?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Por qué el moho del pan es peligroso aunque solo cubra una parte?</h4>
                 <p>Algunos mohos como <em>Aspergillus flavus</em> producen aflatoxinas, micotoxinas que son carcinógenos clasificados en el Grupo 1 por la IARC. Estas toxinas se difunden por todo el alimento y no son visibles. Retirar solo la parte visible no es suficiente.</p>
-                <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Desecha el alimento completo si tiene moho visible, especialmente pan, frutos secos y maíz.</p>
+                <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Consejo:</strong> Desecha el alimento completo si tiene moho visible, especialmente pan, frutos secos y maíz.</p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Qué es un hongo simbiótico?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Qué es un hongo simbiótico?</h4>
                 <p>Las micorrizas son una simbiosis mutualista entre hongos y raíces vegetales. El hongo obtiene azúcares (carbono) de la planta; la planta obtiene fósforo, nitrógeno y agua del hongo. La red micelial puede extenderse metros más allá de las raíces.</p>
-                <p className={styles.faqTip}>💡 <strong>Ejemplo:</strong> El famoso "Wood Wide Web" de los bosques es en gran parte una red de micorrizas que conecta árboles entre sí.</p>
+                <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Ejemplo:</strong> El famoso "Wood Wide Web" de los bosques es en gran parte una red de micorrizas que conecta árboles entre sí.</p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Son los líquenes hongos?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Son los líquenes hongos?</h4>
                 <p>Los líquenes son organismos compuestos: un hongo (mayoritariamente ascomiceto) asociado con un alga verde o una cianobacteria. El hongo aporta la estructura y protección; el alga aporta la fotosíntesis. El "organismo" visible es principalmente el hongo.</p>
-                <p className={styles.faqTip}>💡 <strong>Dato:</strong> Los líquenes pueden colonizar rocas desnudas y son pioneros en la sucesión ecológica de los ecosistemas.</p>
+                <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Dato:</strong> Los líquenes pueden colonizar rocas desnudas y son pioneros en la sucesión ecológica de los ecosistemas.</p>
               </div>
             </div>
           </section>
@@ -687,10 +687,10 @@ export default function VisualizadorReinoFungi() {
               <h3>Errores Comunes sobre los Hongos</h3>
             </div>
             <ul className={styles.warningList}>
-              <li><strong>❌ &quot;Si no se parece a las fotos del veneno, es seguro comer&quot;:</strong> Los hongos tóxicos varían enormemente de aspecto según la edad, la humedad y el sustrato. Solo la identificación experta al 100% es segura.</li>
-              <li><strong>❌ &quot;Retirar la parte con moho es suficiente&quot;:</strong> Las micotoxinas (como las aflatoxinas) se difunden microscópicamente por todo el alimento. Desecha el alimento completo.</li>
-              <li><strong>❌ &quot;Los hongos son plantas lentas&quot;:</strong> No son plantas. Son más cercanos evolutivamente a los animales que a las plantas, con metabolismo, reservas y pared celular completamente distintos.</li>
-              <li><strong>❌ &quot;Todos los mohos son iguales&quot;:</strong> Hay miles de especies de mohos. Algunos producen antibióticos vitales (<em>Penicillium</em>), otros producen carcinógenos potentes (<em>Aspergillus flavus</em>).</li>
+              <li><strong><span aria-hidden="true">❌</span> &quot;Si no se parece a las fotos del veneno, es seguro comer&quot;:</strong> Los hongos tóxicos varían enormemente de aspecto según la edad, la humedad y el sustrato. Solo la identificación experta al 100% es segura.</li>
+              <li><strong><span aria-hidden="true">❌</span> &quot;Retirar la parte con moho es suficiente&quot;:</strong> Las micotoxinas (como las aflatoxinas) se difunden microscópicamente por todo el alimento. Desecha el alimento completo.</li>
+              <li><strong><span aria-hidden="true">❌</span> &quot;Los hongos son plantas lentas&quot;:</strong> No son plantas. Son más cercanos evolutivamente a los animales que a las plantas, con metabolismo, reservas y pared celular completamente distintos.</li>
+              <li><strong><span aria-hidden="true">❌</span> &quot;Todos los mohos son iguales&quot;:</strong> Hay miles de especies de mohos. Algunos producen antibióticos vitales (<em>Penicillium</em>), otros producen carcinógenos potentes (<em>Aspergillus flavus</em>).</li>
             </ul>
           </div>
         </EducationalSection>

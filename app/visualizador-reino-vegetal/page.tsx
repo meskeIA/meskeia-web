@@ -629,8 +629,9 @@ function ArbolGrupo({ seccion, grupos, grupoSeleccionado, onSeleccionar }: Arbol
         style={{ borderLeftColor: seccion.colorHex }}
         onClick={() => setExpandida(!expandida)}
         aria-expanded={expandida}
+        aria-pressed={expandida}
       >
-        <span className={styles.arbolToggle}>{expandida ? '▼' : '▶'}</span>
+        <span className={styles.arbolToggle} aria-hidden="true">{expandida ? '▼' : '▶'}</span>
         <span className={styles.arbolSeccionNombre}>{seccion.nombre}</span>
         <span className={styles.arbolSeccionDesc}>{seccion.descripcion}</span>
       </button>
@@ -876,6 +877,7 @@ export default function VisualizadorReinoVegetal() {
                         className={`${styles.sidebarBtn} ${grupoSeleccionado === grupo.id ? styles.sidebarBtnActivo : ''}`}
                         style={grupoSeleccionado === grupo.id ? { borderLeftColor: grupo.colorHex } : {}}
                         onClick={() => setGrupoSeleccionado(grupo.id)}
+                        aria-pressed={grupoSeleccionado === grupo.id}
                       >
                         <span aria-hidden="true">{grupo.emoji}</span> {grupo.nombre}
                       </button>

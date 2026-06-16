@@ -444,10 +444,10 @@
 | [x] | El Hidrógeno: Del Big Bang a la Pila de Combustible | `/visualizador-hidrogeno/` | estudiantes, cultura |
 | [x] | El Niño y La Niña: ENSO Explicado | `/visualizador-el-nino/` | estudiantes, cultura |
 | [x] | El Oído y el Equilibrio - De la Vibración al Cerebro | `/visualizador-oido-equilibrio/` | estudiantes, cultura, salud |
-| [ ] | El Ojo Humano y la Visión - De la Córnea al Cerebro | `/visualizador-ojo-humano-vision/` | estudiantes, cultura, salud |
-| [ ] | El Oro: Por Qué la Relatividad Explica su Color y su Nobleza | `/visualizador-oro/` | estudiantes, cultura |
-| [ ] | El Reino Fungi — Ascomicetos, Basidiomicetos y Ciclo de Vida | `/visualizador-reino-fungi/` | estudiantes, cultura |
-| [ ] | El Reino Vegetal: de las Algas a las Angiospermas | `/visualizador-reino-vegetal/` | estudiantes, cultura |
+| [x] | El Ojo Humano y la Visión - De la Córnea al Cerebro | `/visualizador-ojo-humano-vision/` | estudiantes, cultura, salud |
+| [x] | El Oro: Por Qué la Relatividad Explica su Color y su Nobleza | `/visualizador-oro/` | estudiantes, cultura |
+| [x] | El Reino Fungi — Ascomicetos, Basidiomicetos y Ciclo de Vida | `/visualizador-reino-fungi/` | estudiantes, cultura |
+| [x] | El Reino Vegetal: de las Algas a las Angiospermas | `/visualizador-reino-vegetal/` | estudiantes, cultura |
 | [ ] | El Silicio: De la Arena al Chip y la Ley de Moore | `/visualizador-silicio/` | estudiantes, cultura, tecnicas |
 | [ ] | El Sistema Endocrino - Glándulas, Hormonas y Feedback | `/visualizador-sistema-endocrino/` | estudiantes, cultura, salud |
 | [ ] | El Sistema Inmune - Tu Ejército Invisible | `/visualizador-sistema-inmune/` | estudiantes, cultura, salud |

@@ -261,9 +261,11 @@ export default function VisualizadorOro() {
           {/* Toggle sin relatividad */}
           <div className={styles.relatividadToggleSection}>
             <button
+              type="button"
               className={styles.btnRelatividad}
               onClick={() => setMostrarSinRelatividad((v) => !v)}
               aria-expanded={mostrarSinRelatividad}
+              aria-pressed={mostrarSinRelatividad}
               aria-controls="panel-sin-relatividad"
             >
               {mostrarSinRelatividad ? '▲ Ocultar comparativa' : '▼ ¿Qué pasaría SIN la relatividad?'}
@@ -383,6 +385,7 @@ export default function VisualizadorOro() {
             return (
               <div key={uso.titulo} className={styles.medicinaCard} role="listitem">
                 <button
+                  type="button"
                   className={styles.medicnaToggle}
                   onClick={() => toggleMedicina(index)}
                   aria-expanded={abierta}
