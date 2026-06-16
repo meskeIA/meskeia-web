@@ -445,7 +445,7 @@ export default function SimuladorDerivadaPendientePage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📈 Simulador de Derivadas — Pendiente de la Tangente</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📈</span> Simulador de Derivadas — Pendiente de la Tangente</h1>
         <p className={styles.subtitle}>
           Mueve el punto P sobre la curva y observa cómo gira la recta tangente.
           Su pendiente es exactamente <strong>f&apos;(x)</strong>: ahí vive el concepto de derivada.
@@ -459,6 +459,7 @@ export default function SimuladorDerivadaPendientePage() {
         {FUNCION_IDS.map(id => (
           <button
             key={id}
+            type="button"
             className={`${styles.funcBtn} ${funcId === id ? styles.funcBtnActive : ''}`}
             onClick={() => setFuncId(id)}
             aria-pressed={funcId === id}
@@ -558,7 +559,7 @@ export default function SimuladorDerivadaPendientePage() {
             <div className={styles.resultCardMain} style={{ borderColor: clasificacion.color }}>
               <span className={styles.resultLabel}>f&apos;(x) — pendiente de la tangente</span>
               <span className={styles.resultValueLarge} style={{ color: clasificacion.color }}>{fmt(fpPunto)}</span>
-              <span className={styles.resultClassification}>{clasificacion.icono} {clasificacion.etiqueta}</span>
+              <span className={styles.resultClassification}><span aria-hidden="true">{clasificacion.icono}</span> {clasificacion.etiqueta}</span>
             </div>
             <div className={styles.resultCard}>
               <span className={styles.resultLabel}>Ángulo de la tangente</span>
@@ -576,7 +577,7 @@ export default function SimuladorDerivadaPendientePage() {
           </div>
         ) : (
           <div className={styles.warningPanel}>
-            ⚠️ El punto x = {fmt(xPunto)} está fuera del dominio de {funcion.expr}. Mueve el slider a una zona válida.
+            <span aria-hidden="true">⚠️</span> El punto x = {fmt(xPunto)} está fuera del dominio de {funcion.expr}. Mueve el slider a una zona válida.
           </div>
         )}
       </div>
@@ -674,22 +675,22 @@ export default function SimuladorDerivadaPendientePage() {
           <h3>4 contextos donde la derivada cuenta una historia</h3>
           <div className={styles.scenariosGrid}>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🚗</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🚗</span>
               <strong>Posición → velocidad</strong>
               <p>Si s(t) describe la posición de un coche en el tiempo, s&apos;(t) es su velocidad instantánea. Por eso el cuentakilómetros marca derivadas en tiempo real, no medias.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>📈</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">📈</span>
               <strong>Coste → coste marginal</strong>
               <p>En economía, si C(q) es el coste total de producir q unidades, C&apos;(q) es el coste marginal: cuánto cuesta producir una unidad más. Decisiones clave de producción dependen de él.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🏔️</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🏔️</span>
               <strong>Encontrar máximos y mínimos</strong>
               <p>Para optimizar (maximizar beneficio, minimizar coste, encontrar la altura máxima de un proyectil), se busca dónde f&apos;(x) = 0 y se estudia el signo a su alrededor.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🌡️</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🌡️</span>
               <strong>Tasa de cambio en ciencias</strong>
               <p>Velocidad de una reacción química, ritmo de cambio de temperatura, crecimiento de una población: todas son derivadas de magnitudes respecto al tiempo.</p>
             </div>
@@ -779,22 +780,22 @@ export default function SimuladorDerivadaPendientePage() {
           <h3>4 buenas prácticas con derivadas</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📝</span>
+              <span className={styles.tipIcon} aria-hidden="true">📝</span>
               <strong>Aprende las reglas, no memorices casos</strong>
               <p>Si dominas regla del producto, cociente y cadena, puedes derivar cualquier combinación. Memorizar derivadas concretas solo te resuelve un examen, las reglas te resuelven todos.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔍</span>
               <strong>Comprueba el signo de la derivada</strong>
               <p>Antes de dar un resultado, mira si tiene sentido. Si la función crece y obtienes f&apos; &lt; 0, hay un error. La intuición visual es tu mejor control de calidad.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📐</span>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
               <strong>Dibuja siempre la tangente</strong>
               <p>En problemas de optimización, esboza la función y marca dónde la tangente es horizontal. Esos puntos son tus candidatos a máximos y mínimos.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔁</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔁</span>
               <strong>Repite con derivadas analíticas y numéricas</strong>
               <p>Calcula la derivada con reglas y luego compárala con la aproximación numérica. Es la mejor forma de detectar errores de signo, factores olvidados o reglas mal aplicadas.</p>
             </div>
@@ -804,7 +805,7 @@ export default function SimuladorDerivadaPendientePage() {
         {/* WARNING BOX */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>5 errores frecuentes al calcular derivadas</strong>
           </div>
           <ul className={styles.warningList}>

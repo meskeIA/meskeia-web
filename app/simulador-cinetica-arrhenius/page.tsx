@@ -476,7 +476,7 @@ export default function SimuladorCineticaArrheniusPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>⚗️ Simulador de Cinética: Ecuación de Arrhenius</h1>
+        <h1 className={styles.title}><span aria-hidden="true">⚗️</span> Simulador de Cinética: Ecuación de Arrhenius</h1>
         <p className={styles.subtitle}>
           Sube la temperatura y observa cómo crece exponencialmente la <strong>cola reactiva</strong> de la
           distribución de Maxwell-Boltzmann. La constante k se dispara con T.
@@ -490,11 +490,12 @@ export default function SimuladorCineticaArrheniusPage() {
         {REACCIONES.map(r => (
           <button
             key={r.id}
+            type="button"
             className={`${styles.reactionBtn} ${reaccionId === r.id ? styles.reactionBtnActive : ''}`}
             onClick={() => cargarReaccion(r)}
             aria-pressed={reaccionId === r.id}
           >
-            <span className={styles.reactionIcon}>{r.icono}</span>
+            <span className={styles.reactionIcon} aria-hidden="true">{r.icono}</span>
             <span>{r.nombre}</span>
           </button>
         ))}
@@ -595,7 +596,7 @@ export default function SimuladorCineticaArrheniusPage() {
 
         {/* CANVAS MB */}
         <div className={styles.canvasWrapper}>
-          <div className={styles.canvasLabel}>📊 Distribución de Maxwell-Boltzmann (energías moleculares)</div>
+          <div className={styles.canvasLabel}><span aria-hidden="true">📊</span> Distribución de Maxwell-Boltzmann (energías moleculares)</div>
           <canvas ref={canvasMainRef} className={styles.canvasMain} aria-label="Distribución de Maxwell-Boltzmann a temperatura T" />
           <div className={styles.legendRow}>
             <span className={styles.legendItem}>
@@ -622,7 +623,7 @@ export default function SimuladorCineticaArrheniusPage() {
         {/* CANVAS ARRHENIUS */}
         {mostrarArrhenius && (
           <div className={styles.canvasWrapper}>
-            <div className={styles.canvasLabel}>📐 Recta de Arrhenius: ln k = ln A − Ea/(RT)</div>
+            <div className={styles.canvasLabel}><span aria-hidden="true">📐</span> Recta de Arrhenius: ln k = ln A − Ea/(RT)</div>
             <canvas ref={canvasArrheniusRef} className={styles.canvasArrhenius} aria-label="Recta de Arrhenius ln k vs 1/T" />
           </div>
         )}
@@ -772,22 +773,22 @@ export default function SimuladorCineticaArrheniusPage() {
           <h3>4 escenarios donde Arrhenius lo explica todo</h3>
           <div className={styles.scenariosGrid}>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🍳</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🍳</span>
               <strong>Cocinar y conservar alimentos</strong>
               <p>La nevera ralentiza el deterioro porque baja T (≈ 4 °C vs 22 °C: factor de aceleración ÷5 aprox). El horno acelera la cocción porque sube T 200 °C: la fracción reactiva crece millones de veces.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🧬</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🧬</span>
               <strong>Enzimas y vida</strong>
               <p>Las enzimas son catalizadores biológicos: bajan Ea sin alterarse. Sin ellas, la digestión humana tardaría décadas. Por eso una pérdida enzimática (cianuro, fluoroacetato) puede ser letal.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🚗</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🚗</span>
               <strong>Catalizadores en automóviles</strong>
               <p>El platino en el escape oxida CO y NOₓ a CO₂ y N₂ a la T de los gases (200-700 °C). Sin catalizador la reacción sería demasiado lenta. Bajan Ea de ~120 a ~80 kJ/mol.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>💊</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">💊</span>
               <strong>Caducidad de medicamentos</strong>
               <p>La descomposición sigue Arrhenius. Tests acelerados a 40 °C extrapolan la vida útil a 25 °C usando esta ecuación. Por eso los fármacos se conservan en frío: t½ se multiplica por mucho.</p>
             </div>
@@ -874,22 +875,22 @@ export default function SimuladorCineticaArrheniusPage() {
           <h3>4 buenas prácticas con cinética química</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <strong>Trabaja siempre en kelvin</strong>
               <p>La ecuación de Arrhenius requiere T absoluta. Mezclar Celsius con kelvin es el error #1 de cinética. Convierte SIEMPRE antes: K = °C + 273,15.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📐</span>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
               <strong>Linealiza con ln k vs 1/T</strong>
               <p>Si tienes datos experimentales, NO ajustes la exponencial directamente. Tomas logaritmos y haces regresión lineal: pendiente = −Ea/R, intercepto = ln A. Más fiable y más sencillo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚖️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
               <strong>Recuerda que A NO depende solo de la frecuencia de choques</strong>
               <p>A incorpora también el &quot;factor estérico&quot; (orientación correcta). Para reacciones complejas A es mucho menor que la frecuencia simple de choques. Eso explica que A varíe entre 10⁵ y 10²⁰.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <strong>Combina Arrhenius con leyes de velocidad</strong>
               <p>k(T) te da la constante; la ley de velocidad v = k·[A]ᵐ·[B]ⁿ te da cuánto reactivo se consume por unidad de tiempo. Necesitas ambas para predecir un perfil de reacción real.</p>
             </div>
@@ -898,7 +899,7 @@ export default function SimuladorCineticaArrheniusPage() {
 
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>5 errores frecuentes con la ecuación de Arrhenius</strong>
           </div>
           <ul className={styles.warningList}>

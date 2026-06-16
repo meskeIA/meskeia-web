@@ -551,16 +551,16 @@
 | [x] | Simulador de Autómatas Finitos DFA y NFA | `/simulador-automatas-finitos/` | estudiantes, tecnicas |
 | [x] | Simulador de Campo Eléctrico | `/simulador-campo-electrico/` | estudiantes |
 | [x] | Simulador de Cifrado César | `/simulador-cifrado-cesar/` | estudiantes |
-| [ ] | Simulador de Cinética Química: Ecuación de Arrhenius | `/simulador-cinetica-arrhenius/` | estudiantes |
+| [x] | Simulador de Cinética Química: Ecuación de Arrhenius | `/simulador-cinetica-arrhenius/` | estudiantes |
 | [x] | Simulador de Colisiones — Elásticas e Inelásticas | `/simulador-colisiones/` | estudiantes, cultura |
 | [x] | Simulador de Conservación de la Energía | `/simulador-conservacion-energia/` | estudiantes |
 | [x] | Simulador de Deriva Genética y Selección | `/simulador-deriva-genetica/` | estudiantes |
-| [ ] | Simulador de Derivadas: Pendiente de la Tangente | `/simulador-derivada-pendiente/` | estudiantes |
+| [x] | Simulador de Derivadas: Pendiente de la Tangente | `/simulador-derivada-pendiente/` | estudiantes |
 | [x] | Simulador de Distribución Normal | `/simulador-distribucion-normal/` | estudiantes |
 | [x] | Simulador de Ecosistema: Cadena Trófica | `/simulador-ecosistema-trofico/` | estudiantes |
-| [ ] | Simulador de Elasticidad Precio de la Demanda | `/simulador-elasticidad-precio/` | estudiantes |
+| [x] | Simulador de Elasticidad Precio de la Demanda | `/simulador-elasticidad-precio/` | estudiantes |
 | [x] | Simulador de Equilibrio Químico (Le Chatelier) | `/simulador-equilibrio-quimico/` | estudiantes |
-| [ ] | Simulador de Estequiometría: Reactivo Limitante | `/simulador-estequiometria/` | estudiantes |
+| [x] | Simulador de Estequiometría: Reactivo Limitante | `/simulador-estequiometria/` | estudiantes |
 | [x] | Simulador de Física | `/simulador-fisica/` | estudiantes |
 | [x] | Simulador de Fluidos: Ecuación de Bernoulli | `/simulador-fluidos-bernoulli/` | estudiantes |
 | [ ] | Simulador de Fotosíntesis: Factores Limitantes | `/simulador-fotosintesis-factores/` | estudiantes |

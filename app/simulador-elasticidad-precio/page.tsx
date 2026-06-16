@@ -420,7 +420,7 @@ export default function SimuladorElasticidadPrecio() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>📊 Simulador de Elasticidad-Precio</h1>
+          <h1 className={styles.title}><span aria-hidden="true">📊</span> Simulador de Elasticidad-Precio</h1>
           <p className={styles.subtitle}>
             Cambia el precio de 6 bienes reales y observa cómo varía la cantidad demandada y el
             ingreso total según su elasticidad
@@ -448,7 +448,7 @@ export default function SimuladorElasticidadPrecio() {
         {/* Descripción del bien */}
         <div className={styles.bienDescripcion}>
           <p>
-            <strong>{bien.emoji} {bien.nombre}</strong> — {bien.descripcion}
+            <strong><span aria-hidden="true">{bien.emoji}</span> {bien.nombre}</strong> — {bien.descripcion}
           </p>
           <p className={styles.bienEjemplo}>{bien.ejemplo}</p>
         </div>
@@ -461,7 +461,7 @@ export default function SimuladorElasticidadPrecio() {
             onClick={() => setTipoElasticidad('demanda')}
             aria-pressed={tipoElasticidad === 'demanda'}
           >
-            📉 Elasticidad de demanda (Ed)
+            <span aria-hidden="true">📉</span> Elasticidad de demanda (Ed)
           </button>
           <button
             type="button"
@@ -469,7 +469,7 @@ export default function SimuladorElasticidadPrecio() {
             onClick={() => setTipoElasticidad('oferta')}
             aria-pressed={tipoElasticidad === 'oferta'}
           >
-            📈 Elasticidad de oferta (Eo)
+            <span aria-hidden="true">📈</span> Elasticidad de oferta (Eo)
           </button>
         </div>
 
@@ -600,7 +600,7 @@ export default function SimuladorElasticidadPrecio() {
               </thead>
               <tbody>
                 <tr>
-                  <td>💉 Insulina</td>
+                  <td><span aria-hidden="true">💉</span> Insulina</td>
                   <td>0,10</td>
                   <td>Perfectamente inelástica</td>
                   <td className={styles.tdPositivo}>IT sube mucho</td>
@@ -608,7 +608,7 @@ export default function SimuladorElasticidadPrecio() {
                   <td>Sin sustitutivos, vital</td>
                 </tr>
                 <tr>
-                  <td>🧂 Sal</td>
+                  <td><span aria-hidden="true">🧂</span> Sal</td>
                   <td>0,10</td>
                   <td>Perfectamente inelástica</td>
                   <td className={styles.tdPositivo}>IT sube mucho</td>
@@ -616,7 +616,7 @@ export default function SimuladorElasticidadPrecio() {
                   <td>Gasto ínfimo en el presupuesto</td>
                 </tr>
                 <tr>
-                  <td>⛽ Gasolina</td>
+                  <td><span aria-hidden="true">⛽</span> Gasolina</td>
                   <td>0,35</td>
                   <td>Inelástica</td>
                   <td className={styles.tdPositivo}>IT sube</td>
@@ -624,7 +624,7 @@ export default function SimuladorElasticidadPrecio() {
                   <td>Pocas alternativas inmediatas</td>
                 </tr>
                 <tr>
-                  <td>☕ Café de marca</td>
+                  <td><span aria-hidden="true">☕</span> Café de marca</td>
                   <td>0,80</td>
                   <td>Inelástica (cerca de unitaria)</td>
                   <td className={styles.tdNeutro}>IT sube levemente</td>
@@ -632,7 +632,7 @@ export default function SimuladorElasticidadPrecio() {
                   <td>Sustitutivos cercanos (otras marcas, té)</td>
                 </tr>
                 <tr>
-                  <td>📱 Smartphone gama alta</td>
+                  <td><span aria-hidden="true">📱</span> Smartphone gama alta</td>
                   <td>1,50</td>
                   <td>Elástica</td>
                   <td className={styles.tdNegativo}>IT baja</td>
@@ -640,7 +640,7 @@ export default function SimuladorElasticidadPrecio() {
                   <td>Bien de lujo con muchos sustitutivos</td>
                 </tr>
                 <tr>
-                  <td>✈️ Vuelo turístico</td>
+                  <td><span aria-hidden="true">✈️</span> Vuelo turístico</td>
                   <td>2,40</td>
                   <td>Muy elástica</td>
                   <td className={styles.tdNegativo}>IT cae mucho</td>
@@ -655,7 +655,7 @@ export default function SimuladorElasticidadPrecio() {
           <h3>Escenarios reales</h3>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <h4>🚬 Impuesto al tabaco</h4>
+              <h4><span aria-hidden="true">🚬</span> Impuesto al tabaco</h4>
               <p>
                 El tabaco tiene |Ed| ≈ 0,4. Una subida del 10% en el precio reduce el consumo solo
                 un 4%, pero el ingreso fiscal sube. Políticamente útil para recaudar{' '}
@@ -663,7 +663,7 @@ export default function SimuladorElasticidadPrecio() {
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🚗 Precio dinámico en plataformas de movilidad</h4>
+              <h4><span aria-hidden="true">🚗</span> Precio dinámico en plataformas de movilidad</h4>
               <p>
                 Uber y similares usan el <em>surge pricing</em>: en hora punta, el precio sube y
                 filtra a usuarios con baja disposición a pagar (demanda elástica). Maximiza el
@@ -671,7 +671,7 @@ export default function SimuladorElasticidadPrecio() {
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>✈️ Diferenciación de precios en aerolíneas</h4>
+              <h4><span aria-hidden="true">✈️</span> Diferenciación de precios en aerolíneas</h4>
               <p>
                 Los viajeros de negocios son inelásticos (necesidad urgente) y los turistas son
                 elásticos (pueden esperar o cambiar de fecha). Las aerolíneas discriminan por precio
@@ -679,7 +679,7 @@ export default function SimuladorElasticidadPrecio() {
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🛒 IVA reducido en alimentos básicos</h4>
+              <h4><span aria-hidden="true">🛒</span> IVA reducido en alimentos básicos</h4>
               <p>
                 Los alimentos básicos son inelásticos: reducir el IVA solo traslada una parte del
                 ahorro al consumidor (los márgenes del comercio absorben el resto). El efecto en
@@ -804,7 +804,7 @@ export default function SimuladorElasticidadPrecio() {
           <h3>Consejos para el examen</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧠</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧠</span>
               <div>
                 <strong>Nemotecnia IT e inelasticidad</strong>
                 <p>
@@ -814,7 +814,7 @@ export default function SimuladorElasticidadPrecio() {
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📐</span>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
               <div>
                 <strong>Pendiente ≠ elasticidad</strong>
                 <p>
@@ -824,7 +824,7 @@ export default function SimuladorElasticidadPrecio() {
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⏱️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⏱️</span>
               <div>
                 <strong>El tiempo siempre aumenta la elasticidad</strong>
                 <p>
@@ -835,7 +835,7 @@ export default function SimuladorElasticidadPrecio() {
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <div>
                 <strong>Identifica el bien por sus características</strong>
                 <p>

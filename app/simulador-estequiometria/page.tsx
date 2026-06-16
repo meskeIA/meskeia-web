@@ -280,7 +280,7 @@ export default function SimuladorEstequiometriaPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>⚗️ Simulador de Estequiometría</h1>
+          <h1 className={styles.title}><span aria-hidden="true">⚗️</span> Simulador de Estequiometría</h1>
           <p className={styles.subtitle}>
             Introduce la masa de cada reactivo y descubre cuál es el <strong>reactivo limitante</strong>,
             cuánto producto se obtiene y cuánto exceso sobra.
@@ -294,6 +294,7 @@ export default function SimuladorEstequiometriaPage() {
           {REACCIONES.map(r => (
             <button
               key={r.id}
+              type="button"
               className={`${styles.reaccionBtn} ${reaccionId === r.id ? styles.reaccionBtnActive : ''}`}
               onClick={() => seleccionarReaccion(r.id)}
               aria-pressed={reaccionId === r.id}
@@ -345,6 +346,7 @@ export default function SimuladorEstequiometriaPage() {
             </label>
             <div className={styles.inputRow}>
               <button
+                type="button"
                 className={styles.btnAjuste}
                 onClick={() => ajustar(setGramosAStr, gramosAStr, -1)}
                 aria-label="Reducir gramos de reactivo A"
@@ -361,6 +363,7 @@ export default function SimuladorEstequiometriaPage() {
               />
               <span className={styles.inputUnidad}>g</span>
               <button
+                type="button"
                 className={styles.btnAjuste}
                 onClick={() => ajustar(setGramosAStr, gramosAStr, 1)}
                 aria-label="Aumentar gramos de reactivo A"
@@ -377,6 +380,7 @@ export default function SimuladorEstequiometriaPage() {
               </label>
               <div className={styles.inputRow}>
                 <button
+                  type="button"
                   className={styles.btnAjuste}
                   onClick={() => ajustar(setGramosBStr, gramosBStr, -1)}
                   aria-label="Reducir gramos de reactivo B"
@@ -393,6 +397,7 @@ export default function SimuladorEstequiometriaPage() {
                 />
                 <span className={styles.inputUnidad}>g</span>
                 <button
+                  type="button"
                   className={styles.btnAjuste}
                   onClick={() => ajustar(setGramosBStr, gramosBStr, 1)}
                   aria-label="Aumentar gramos de reactivo B"
@@ -402,7 +407,7 @@ export default function SimuladorEstequiometriaPage() {
           ) : (
             <div className={styles.inputGroup}>
               <div className={styles.catalizadorTag}>
-                <span>🧪</span>
+                <span aria-hidden="true">🧪</span>
                 <span>Levadura = catalizador. No se consume en la reacción.</span>
               </div>
             </div>
@@ -534,7 +539,7 @@ export default function SimuladorEstequiometriaPage() {
 
             {/* Contexto */}
             <div className={styles.resultadoContexto}>
-              <span>🌍</span>
+              <span aria-hidden="true">🌍</span>
               <span>{reaccion.contexto}</span>
             </div>
           </div>
@@ -648,7 +653,7 @@ export default function SimuladorEstequiometriaPage() {
             <h3>4 escenarios donde la estequiometría es decisiva</h3>
             <div className={styles.scenariosGrid}>
               <div className={styles.scenarioCard}>
-                <span className={styles.scenarioIcon}>🍳</span>
+                <span className={styles.scenarioIcon} aria-hidden="true">🍳</span>
                 <strong>Cocina de gas (metano + oxígeno del aire)</strong>
                 <p>
                   El aire contiene ~21% de O₂. Si el quemador no mezcla bien, el metano puede ser excesivo
@@ -657,7 +662,7 @@ export default function SimuladorEstequiometriaPage() {
                 </p>
               </div>
               <div className={styles.scenarioCard}>
-                <span className={styles.scenarioIcon}>🏭</span>
+                <span className={styles.scenarioIcon} aria-hidden="true">🏭</span>
                 <strong>Proceso Haber-Bosch (NH₃ industrial)</strong>
                 <p>
                   La reacción N₂ + 3 H₂ → 2 NH₃ se produce en condiciones de alta presión y temperatura
@@ -666,7 +671,7 @@ export default function SimuladorEstequiometriaPage() {
                 </p>
               </div>
               <div className={styles.scenarioCard}>
-                <span className={styles.scenarioIcon}>🍷</span>
+                <span className={styles.scenarioIcon} aria-hidden="true">🍷</span>
                 <strong>Fermentación vitivinícola</strong>
                 <p>
                   La glucosa del mosto es el único reactivo consumido. La levadura actúa como biocatalizador.
@@ -676,7 +681,7 @@ export default function SimuladorEstequiometriaPage() {
                 </p>
               </div>
               <div className={styles.scenarioCard}>
-                <span className={styles.scenarioIcon}>💊</span>
+                <span className={styles.scenarioIcon} aria-hidden="true">💊</span>
                 <strong>Control de calidad farmacéutico</strong>
                 <p>
                   En síntesis de principios activos, el reactivo más caro o tóxico se usa como limitante
@@ -827,7 +832,7 @@ export default function SimuladorEstequiometriaPage() {
             <h3>4 trucos para no equivocarse en estequiometría</h3>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🎯</span>
+                <span className={styles.tipIcon} aria-hidden="true">🎯</span>
                 <strong>Siempre pasa por moles</strong>
                 <p>
                   Nunca compares gramos directamente. 10 g de H₂ y 10 g de O₂ no son cantidades equivalentes:
@@ -835,7 +840,7 @@ export default function SimuladorEstequiometriaPage() {
                 </p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📐</span>
+                <span className={styles.tipIcon} aria-hidden="true">📐</span>
                 <strong>Usa el ratio, no el número absoluto</strong>
                 <p>
                   El reactivo limitante no es el que tiene menos moles, sino el que tiene menor
@@ -844,7 +849,7 @@ export default function SimuladorEstequiometriaPage() {
                 </p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>⚖️</span>
+                <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
                 <strong>El exceso se calcula con los moles realmente consumidos</strong>
                 <p>
                   Exceso = moles_disponibles − moles_consumidos_del_no_limitante. Los moles consumidos
@@ -852,7 +857,7 @@ export default function SimuladorEstequiometriaPage() {
                 </p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>✅</span>
+                <span className={styles.tipIcon} aria-hidden="true">✅</span>
                 <strong>Verifica con la conservación de masa</strong>
                 <p>
                   La suma de masas de reactivos consumidos debe igual a la masa de productos formados
@@ -865,7 +870,7 @@ export default function SimuladorEstequiometriaPage() {
           {/* WARNING BOX */}
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <strong>5 errores frecuentes en estequiometría</strong>
             </div>
             <ul className={styles.warningList}>
