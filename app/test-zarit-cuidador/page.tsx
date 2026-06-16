@@ -165,6 +165,7 @@ export default function TestZaritCuidadorPage() {
               {PREGUNTAS_ZARIT.map((_, idx) => (
                 <button
                   key={idx}
+                  type="button"
                   className={[
                     styles.mapaBurbuja,
                     respuestas[idx] !== undefined ? styles.mapaBurbujaRespondida : '',
@@ -194,6 +195,7 @@ export default function TestZaritCuidadorPage() {
                 {OPCIONES_ZARIT.map(opcion => (
                   <button
                     key={opcion.valor}
+                    type="button"
                     className={[
                       styles.opcionBtn,
                       respuestas[preguntaActual] === opcion.valor ? styles.opcionSeleccionada : '',
@@ -213,6 +215,7 @@ export default function TestZaritCuidadorPage() {
             {/* Navegación */}
             <div className={styles.navegacionBtns}>
               <button
+                type="button"
                 className={styles.btnSecundario}
                 onClick={() => setPreguntaActual(prev => Math.max(0, prev - 1))}
                 disabled={preguntaActual === 0}
@@ -221,6 +224,7 @@ export default function TestZaritCuidadorPage() {
               </button>
               {preguntaActual < totalPreguntas - 1 ? (
                 <button
+                  type="button"
                   className={styles.btnPrimario}
                   onClick={() => setPreguntaActual(prev => prev + 1)}
                 >
@@ -228,6 +232,7 @@ export default function TestZaritCuidadorPage() {
                 </button>
               ) : (
                 <button
+                  type="button"
                   className={styles.btnCalcular}
                   onClick={calcularResultados}
                   disabled={respondidas < totalPreguntas}
@@ -363,7 +368,7 @@ export default function TestZaritCuidadorPage() {
               </p>
             </div>
 
-            <button className={styles.btnReiniciar} onClick={reiniciar}>
+            <button type="button" className={styles.btnReiniciar} onClick={reiniciar}>
               <span aria-hidden="true">🔄</span> Repetir el test
             </button>
           </section>
@@ -663,7 +668,7 @@ export default function TestZaritCuidadorPage() {
 
           {/* warningBox — indicador v2.0 */}
           <div className={styles.warningBox}>
-            <strong>⚠️ Mitos sobre el cuidado:</strong> &quot;Un buen cuidador no necesita ayuda&quot;,
+            <strong><span aria-hidden="true">⚠️</span> Mitos sobre el cuidado:</strong> &quot;Un buen cuidador no necesita ayuda&quot;,
             &quot;Pedir ayuda es egoísmo&quot;, &quot;Nadie puede cuidar mejor que yo&quot;. Estos pensamientos
             son frecuentes pero <strong>falsos</strong>. Cuidar de ti mismo/a es la mejor forma de cuidar
             a tu familiar. <strong>Pedir ayuda no es debilidad, es responsabilidad.</strong>

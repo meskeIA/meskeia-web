@@ -1076,10 +1076,10 @@
 | [x] | Test de Estilo Parental | `/test-estilo-parental/` | salud |
 | [x] | Test de Fragilidad (Escala FRAIL) | `/test-fragilidad/` | salud, legal-fiscal |
 | [x] | Test de Hábitos Saludables | `/test-habitos-saludables/` | salud |
-| [ ] | Test de Zarit — Sobrecarga del Cuidador | `/test-zarit-cuidador/` | salud |
-| [ ] | Testosterona - La Hormona del Rendimiento | `/visualizador-testosterona/` | salud, cultura, estudiantes |
-| [ ] | Tiroides - La Glándula que Regula tu Metabolismo | `/visualizador-tiroides/` | salud, cultura, estudiantes |
-| [ ] | Tu Cuerpo en Números | `/visualizador-cuerpo-numeros/` | salud, cultura, estudiantes |
+| [x] | Test de Zarit — Sobrecarga del Cuidador | `/test-zarit-cuidador/` | salud |
+| [x] | Testosterona - La Hormona del Rendimiento | `/visualizador-testosterona/` | salud, cultura, estudiantes |
+| [x] | Tiroides - La Glándula que Regula tu Metabolismo | `/visualizador-tiroides/` | salud, cultura, estudiantes |
+| [x] | Tu Cuerpo en Números | `/visualizador-cuerpo-numeros/` | salud, cultura, estudiantes |
 | [ ] | Vitamina B12: Ciclo de Metilación y Factor Intrínseco | `/visualizador-vitamina-b12/` | salud, cultura, estudiantes |
 | [ ] | Vitamina D: La Vitamina que Actúa como Hormona | `/visualizador-vitamina-d/` | salud, cultura, estudiantes |
 | [x] | Vitaminas y Minerales | `/vitaminas-minerales/` | salud, cultura |

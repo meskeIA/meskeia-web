@@ -185,8 +185,10 @@ export default function VisualizadorTiroides() {
           </div>
 
           <button
+            type="button"
             className={styles.btnFeedback}
             onClick={() => setFeedbackActivo(prev => !prev)}
+            aria-pressed={feedbackActivo}
           >
             {feedbackActivo ? 'Ocultar el feedback' : 'Ver cómo funciona el feedback'}
           </button>
@@ -306,6 +308,7 @@ export default function VisualizadorTiroides() {
             {FACTORES_TIROIDEO.map((factor, idx) => (
               <button
                 key={idx}
+                type="button"
                 className={`${styles.factorCard} ${factorSeleccionado === idx ? styles.factorCardActiva : ''}`}
                 onClick={() => toggleFactor(idx)}
                 aria-expanded={factorSeleccionado === idx}

@@ -265,6 +265,7 @@ export default function VisualizadorTestosterona() {
           {/* Toggle */}
           <div className={styles.toggleGenero} role="group" aria-label="Seleccionar sexo biológico">
             <button
+              type="button"
               className={`${styles.btnGenero} ${genero === 'hombre' ? styles.btnGeneroActivo : ''}`}
               onClick={() => setGenero('hombre')}
               aria-pressed={genero === 'hombre'}
@@ -272,6 +273,7 @@ export default function VisualizadorTestosterona() {
               Hombre
             </button>
             <button
+              type="button"
               className={`${styles.btnGenero} ${genero === 'mujer' ? styles.btnGeneroActivo : ''}`}
               onClick={() => setGenero('mujer')}
               aria-pressed={genero === 'mujer'}
@@ -372,6 +374,7 @@ export default function VisualizadorTestosterona() {
             {SISTEMAS.map((s, idx) => (
               <button
                 key={idx}
+                type="button"
                 className={`${styles.sistemaCard} ${sistemaExpandido === idx ? styles.sistemaCardActivo : ''}`}
                 onClick={() => toggleSistema(idx)}
                 aria-expanded={sistemaExpandido === idx}
