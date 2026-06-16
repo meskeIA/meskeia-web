@@ -58,7 +58,7 @@ export default function CalculadoraRegla180VideoPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🎬 Regla de los 180° para Vídeo</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🎬</span> Regla de los 180° para Vídeo</h1>
         <p className={styles.subtitle}>
           Encuentra la velocidad de obturación correcta para cualquier frame rate
         </p>
@@ -74,6 +74,7 @@ export default function CalculadoraRegla180VideoPage() {
             {FPS_COMUNES.map(fps => (
               <button
                 key={fps}
+                type="button"
                 onClick={() => seleccionarFps(fps)}
                 className={`${styles.fpsBtn} ${fpsSeleccionado === fps ? styles.fpsBtnActive : ''}`}
                 aria-pressed={fpsSeleccionado === fps}
@@ -173,7 +174,7 @@ export default function CalculadoraRegla180VideoPage() {
 
         {/* Sección educativa */}
         <EducationalSection
-          title="📐 ¿Qué es la regla de los 180°?"
+          title={<><span aria-hidden="true">📐</span> ¿Qué es la regla de los 180°?</>}
           subtitle="Fundamentos del motion blur cinematográfico"
         >
           <div className={styles.educativo}>

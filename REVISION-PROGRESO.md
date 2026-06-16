@@ -750,12 +750,12 @@
 | [x] | Calculadora de Ganache de Chocolate | `/calculadora-ganache/` | tecnicas, cultura |
 | [x] | Calculadora de Hidratación del Pan | `/calculadora-hidratacion-pan/` | tecnicas, cultura |
 | [x] | Calculadora de Puntos del Azúcar | `/calculadora-puntos-azucar/` | tecnicas, cultura |
-| [ ] | Calculadora de Resistencias para LED | `/calculadora-resistencias-led/` | tecnicas, estudiantes |
-| [ ] | Calculadora de Subredes IP | `/calculadora-subredes/` | tecnicas, estudiantes |
+| [x] | Calculadora de Resistencias para LED | `/calculadora-resistencias-led/` | tecnicas, estudiantes |
+| [x] | Calculadora de Subredes IP | `/calculadora-subredes/` | tecnicas, estudiantes |
 | [x] | Calculadora de Sustitución de Gelatina | `/calculadora-gelatina/` | tecnicas |
 | [x] | Calculadora de Sustitución de Levadura por Masa Madre | `/calculadora-masa-madre/` | tecnicas, cultura |
-| [ ] | Calculadora Regla de los 180° para Vídeo | `/calculadora-regla-180-video/` | tecnicas, diseno |
-| [ ] | Cifrado AES | `/cifrado-aes/` | tecnicas |
+| [x] | Calculadora Regla de los 180° para Vídeo | `/calculadora-regla-180-video/` | tecnicas, diseno |
+| [x] | Cifrado AES | `/cifrado-aes/` | tecnicas |
 | [ ] | Codificador Base64 | `/codificador-base64/` | tecnicas |
 | [ ] | Cómo Funcionan los LLMs - Tokens, Embeddings y Atención | `/visualizador-llm-funcionamiento/` | tecnicas, cultura, estudiantes |
 | [ ] | Comparador de IAs 2026: ChatGPT vs Claude vs Gemini y más | `/visualizador-comparador-ia/` | tecnicas, cultura, productividad |

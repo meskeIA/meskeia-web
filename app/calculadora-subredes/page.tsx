@@ -244,6 +244,7 @@ export default function CalculadoraSubredesPage() {
                 <div className={styles.resultHeader}>
                   <span className={styles.resultLabel}>Máscara de Red</span>
                   <button
+                    type="button"
                     className={styles.copyBtn}
                     onClick={() => handleCopy(subnetInfo.subnetMask, 'mask')}
                     title="Copiar"
@@ -261,6 +262,7 @@ export default function CalculadoraSubredesPage() {
                 <div className={styles.resultHeader}>
                   <span className={styles.resultLabel}>Dirección de Red</span>
                   <button
+                    type="button"
                     className={styles.copyBtn}
                     onClick={() => handleCopy(subnetInfo.networkAddress, 'network')}
                     title="Copiar"
@@ -278,6 +280,7 @@ export default function CalculadoraSubredesPage() {
                 <div className={styles.resultHeader}>
                   <span className={styles.resultLabel}>Dirección Broadcast</span>
                   <button
+                    type="button"
                     className={styles.copyBtn}
                     onClick={() => handleCopy(subnetInfo.broadcastAddress, 'broadcast')}
                     title="Copiar"
@@ -295,6 +298,7 @@ export default function CalculadoraSubredesPage() {
                 <div className={styles.resultHeader}>
                   <span className={styles.resultLabel}>Máscara Wildcard</span>
                   <button
+                    type="button"
                     className={styles.copyBtn}
                     onClick={() => handleCopy(subnetInfo.wildcardMask, 'wildcard')}
                     title="Copiar"
@@ -342,10 +346,12 @@ export default function CalculadoraSubredesPage() {
             </div>
 
             <button
+              type="button"
               className={styles.binaryToggle}
               onClick={() => setShowBinary(!showBinary)}
+              aria-pressed={showBinary}
             >
-              {showBinary ? '🔢 Ocultar binario' : '🔢 Mostrar en binario'}
+              <span aria-hidden="true">🔢</span>{showBinary ? ' Ocultar binario' : ' Mostrar en binario'}
             </button>
           </section>
         )}

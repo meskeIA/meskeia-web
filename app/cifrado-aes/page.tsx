@@ -221,15 +221,17 @@ export default function CifradoAESPage() {
               type="button"
               className={`${styles.modoBtn} ${modo === 'cifrar' ? styles.active : ''}`}
               onClick={() => setModo('cifrar')}
+              aria-pressed={modo === 'cifrar'}
             >
-              🔒 Cifrar
+              <span aria-hidden="true">🔒</span> Cifrar
             </button>
             <button
               type="button"
               className={`${styles.modoBtn} ${modo === 'descifrar' ? styles.active : ''}`}
               onClick={() => setModo('descifrar')}
+              aria-pressed={modo === 'descifrar'}
             >
-              🔓 Descifrar
+              <span aria-hidden="true">🔓</span> Descifrar
             </button>
           </div>
 
@@ -241,6 +243,7 @@ export default function CifradoAESPage() {
                 type="button"
                 className={`${styles.algoritmoBtn} ${algoritmo === 'AES-GCM' ? styles.active : ''}`}
                 onClick={() => setAlgoritmo('AES-GCM')}
+                aria-pressed={algoritmo === 'AES-GCM'}
               >
                 <span className={styles.algoName}>AES-GCM</span>
                 <span className={styles.algoDesc}>Recomendado - Con autenticación</span>
@@ -249,6 +252,7 @@ export default function CifradoAESPage() {
                 type="button"
                 className={`${styles.algoritmoBtn} ${algoritmo === 'AES-CBC' ? styles.active : ''}`}
                 onClick={() => setAlgoritmo('AES-CBC')}
+                aria-pressed={algoritmo === 'AES-CBC'}
               >
                 <span className={styles.algoName}>AES-CBC</span>
                 <span className={styles.algoDesc}>Clásico - Solo cifrado</span>
@@ -272,6 +276,7 @@ export default function CifradoAESPage() {
                 onClick={() => setMostrarClave(!mostrarClave)}
                 className={styles.btnToggle}
                 title={mostrarClave ? 'Ocultar' : 'Mostrar'}
+                aria-pressed={mostrarClave}
               >
                 {mostrarClave ? '👁️' : '👁️‍🗨️'}
               </button>
@@ -286,7 +291,7 @@ export default function CifradoAESPage() {
             </div>
             <div className={styles.claveActions}>
               <button type="button" onClick={generarClave} className={styles.btnSecondary}>
-                🎲 Generar clave aleatoria
+                <span aria-hidden="true">🎲</span> Generar clave aleatoria
               </button>
             </div>
             <span className={styles.hint}>
@@ -320,14 +325,14 @@ export default function CifradoAESPage() {
             className={styles.btnPrimary}
             disabled={!texto.trim() || !clave.trim() || procesando}
           >
-            {procesando ? '⏳ Procesando...' : (modo === 'cifrar' ? '🔒 Cifrar con AES' : '🔓 Descifrar')}
+            {procesando ? <><span aria-hidden="true">⏳</span> Procesando...</> : (modo === 'cifrar' ? <><span aria-hidden="true">🔒</span> Cifrar con AES</> : <><span aria-hidden="true">🔓</span> Descifrar</>)}
           </button>
         </section>
 
         {/* Error */}
         {error && (
           <div className={styles.errorBox}>
-            ❌ {error}
+            <span aria-hidden="true">❌</span> {error}
           </div>
         )}
 
@@ -340,14 +345,14 @@ export default function CifradoAESPage() {
               </h2>
               <div className={styles.resultActions}>
                 <button type="button" onClick={intercambiar} className={styles.btnSecondary}>
-                  ↕ Intercambiar
+                  <span aria-hidden="true">↕</span> Intercambiar
                 </button>
                 <button
                   type="button"
                   onClick={copiarResultado}
                   className={styles.btnCopy}
                 >
-                  {copiado ? '✅ Copiado' : '📋 Copiar'}
+                  {copiado ? <><span aria-hidden="true">✅</span> Copiado</> : <><span aria-hidden="true">📋</span> Copiar</>}
                 </button>
               </div>
             </div>
@@ -358,10 +363,10 @@ export default function CifradoAESPage() {
               rows={5}
             />
             <div className={styles.stats}>
-              <span>📊 {resultado.length} caracteres</span>
+              <span><span aria-hidden="true">📊</span> {resultado.length} caracteres</span>
               {modo === 'cifrar' && (
                 <span className={styles.warning}>
-                  ⚠️ Guarda la clave - Sin ella no podrás descifrar el mensaje
+                  <span aria-hidden="true">⚠️</span> Guarda la clave - Sin ella no podrás descifrar el mensaje
                 </span>
               )}
             </div>
@@ -370,7 +375,7 @@ export default function CifradoAESPage() {
 
         {/* Info de seguridad */}
         <section className={styles.securityInfo}>
-          <h3>🛡️ Características de seguridad</h3>
+          <h3><span aria-hidden="true">🛡️</span> Características de seguridad</h3>
           <div className={styles.securityGrid}>
             <div className={styles.securityItem}>
               <span className={styles.checkIcon}>✓</span>
@@ -413,7 +418,7 @@ export default function CifradoAESPage() {
           <h2>Sobre el cifrado AES</h2>
           <div className={styles.infoGrid}>
             <div className={styles.infoCard}>
-              <h3>🏛️ Historia</h3>
+              <h3><span aria-hidden="true">🏛️</span> Historia</h3>
               <p>
                 AES (Advanced Encryption Standard) fue adoptado por el gobierno de EE.UU.
                 en 2001 tras un concurso público. El algoritmo ganador fue <strong>Rijndael</strong>,
@@ -421,7 +426,7 @@ export default function CifradoAESPage() {
               </p>
             </div>
             <div className={styles.infoCard}>
-              <h3>🔐 Cómo funciona</h3>
+              <h3><span aria-hidden="true">🔐</span> Cómo funciona</h3>
               <p>
                 AES es un cifrado por bloques que procesa datos en bloques de 128 bits.
                 Usa una clave de 128, 192 o 256 bits. Cada bloque pasa por múltiples
@@ -429,7 +434,7 @@ export default function CifradoAESPage() {
               </p>
             </div>
             <div className={styles.infoCard}>
-              <h3>⚡ GCM vs CBC</h3>
+              <h3><span aria-hidden="true">⚡</span> GCM vs CBC</h3>
               <p>
                 <strong>GCM</strong> (Galois/Counter Mode) proporciona autenticación además de cifrado,
                 detectando si el mensaje fue alterado. <strong>CBC</strong> (Cipher Block Chaining)
@@ -437,7 +442,7 @@ export default function CifradoAESPage() {
               </p>
             </div>
             <div className={styles.infoCard}>
-              <h3>🌍 Uso actual</h3>
+              <h3><span aria-hidden="true">🌍</span> Uso actual</h3>
               <p>
                 AES protege: comunicaciones HTTPS/TLS, WiFi WPA2/WPA3, discos cifrados,
                 mensajería (WhatsApp, Signal), VPNs, y datos clasificados del gobierno de EE.UU.
@@ -522,7 +527,7 @@ export default function CifradoAESPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💻</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💻</span>
                 <h3>Desarrollador web</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -534,7 +539,7 @@ export default function CifradoAESPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏢</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏢</span>
                 <h3>Empresa con datos RGPD</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -546,7 +551,7 @@ export default function CifradoAESPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🔍</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔍</span>
                 <h3>Profesional de seguridad</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -558,7 +563,7 @@ export default function CifradoAESPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎓</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
                 <h3>Estudiante de criptografía</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -693,32 +698,32 @@ export default function CifradoAESPage() {
           <h2>6 mejores prácticas de cifrado AES</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h3>Usa GCM sobre CBC</h3>
               <p>AES-GCM proporciona autenticación integrada (AEAD). TLS 1.3 solo acepta modos AEAD. CBC sin MAC es vulnerable a ataques de padding oracle. Si tu librería ofrece ambas opciones, elige siempre GCM.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔑</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔑</span>
               <h3>Nunca reutilices el IV/nonce</h3>
               <p>Genera un nonce aleatorio nuevo para cada operación de cifrado. En AES-GCM, reutilizar el nonce con la misma clave expone el keystream y destruye la autenticación. Almacena el nonce junto al ciphertext; no es secreto.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📏</span>
+              <span className={styles.tipIcon} aria-hidden="true">📏</span>
               <h3>Longitud de clave: siempre 256 bits</h3>
               <p>AES-128 es seguro hoy, pero AES-256 es el estándar recomendado para datos con largo horizonte temporal y para cumplir ENS categoría Alta y requisitos de defensa nacional. El coste de rendimiento es mínimo (&lt;15%).</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏦</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏦</span>
               <h3>Gestión segura de claves con KMS</h3>
               <p>Usa AWS KMS, Azure Key Vault, Google Cloud KMS o HashiCorp Vault. Separa la clave de los datos que protege. Activa la auditoría de uso de claves. En entornos on-premise, considera un HSM (Hardware Security Module) certificado FIPS 140-2.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧂</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧂</span>
               <h3>Derivación de clave: PBKDF2 o Argon2id</h3>
               <p>Si la clave AES se deriva de una contraseña de usuario, usa PBKDF2 con SHA-256 y mínimo 600.000 iteraciones (OWASP 2023), o Argon2id con los parámetros recomendados (m=64MB, t=3, p=4). Siempre con salt aleatorio de 128+ bits.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <h3>Rotación periódica de claves</h3>
               <p>Define una política de rotación anual o por volumen (máximo 2<sup>32</sup> bloques por clave en GCM según NIST). La rotación limita el impacto de una clave comprometida. Implementa re-cifrado incremental para no interrumpir el servicio.</p>
             </div>
@@ -729,7 +734,7 @@ export default function CifradoAESPage() {
         <section className={styles.infoSection}>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h2>Errores críticos que debes evitar</h2>
             </div>
             <ul className={styles.warningList}>

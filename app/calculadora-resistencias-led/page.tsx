@@ -135,11 +135,13 @@ export default function CalculadoraResistenciasLedPage() {
           {opciones.map(c => (
             <button
               key={c.nombre}
+              type="button"
               className={`${styles.colorBtn} ${c.nombre === color.nombre ? styles.colorBtnActivo : ''}`}
               style={{ background: c.hex, color: c.textColor }}
               onClick={() => onChange(c)}
               aria-label={c.nombre}
               title={c.nombre}
+              aria-pressed={c.nombre === color.nombre}
             >
               {c.nombre.slice(0, 2)}
             </button>
@@ -154,7 +156,7 @@ export default function CalculadoraResistenciasLedPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🔴 Calculadora de Resistencias para LED</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🔴</span> Calculadora de Resistencias para LED</h1>
         <p className={styles.subtitle}>
           Decodifica el código de colores de cualquier resistencia y calcula la resistencia limitadora exacta para tus circuitos con LED
         </p>
@@ -164,31 +166,39 @@ export default function CalculadoraResistenciasLedPage() {
 
       <div className={styles.tabs}>
         <button
+          type="button"
           className={`${styles.tab} ${seccion === 'decoder' ? styles.tabActivo : ''}`}
           onClick={() => setSeccion('decoder')}
+          aria-pressed={seccion === 'decoder'}
         >
-          🎨 Código de colores
+          <span aria-hidden="true">🎨</span> Código de colores
         </button>
         <button
+          type="button"
           className={`${styles.tab} ${seccion === 'led' ? styles.tabActivo : ''}`}
           onClick={() => setSeccion('led')}
+          aria-pressed={seccion === 'led'}
         >
-          💡 Calcular resistencia LED
+          <span aria-hidden="true">💡</span> Calcular resistencia LED
         </button>
       </div>
 
       {seccion === 'decoder' && (
         <div className={styles.card}>
           <div className={styles.cardHeader}>
-            <h2 className={styles.cardTitle}>🎨 Decodificador de Código de Colores</h2>
+            <h2 className={styles.cardTitle}><span aria-hidden="true">🎨</span> Decodificador de Código de Colores</h2>
             <div className={styles.modoSwitch}>
               <button
+                type="button"
                 className={`${styles.modoBtn} ${modoDecod === '4' ? styles.modoBtnActivo : ''}`}
                 onClick={() => setModoDecod('4')}
+                aria-pressed={modoDecod === '4'}
               >4 bandas</button>
               <button
+                type="button"
                 className={`${styles.modoBtn} ${modoDecod === '5' ? styles.modoBtnActivo : ''}`}
                 onClick={() => setModoDecod('5')}
+                aria-pressed={modoDecod === '5'}
               >5 bandas</button>
             </div>
           </div>
@@ -245,7 +255,7 @@ export default function CalculadoraResistenciasLedPage() {
 
       {seccion === 'led' && (
         <div className={styles.card}>
-          <h2 className={styles.cardTitle}>💡 Calculadora de Resistencia Limitadora para LED</h2>
+          <h2 className={styles.cardTitle}><span aria-hidden="true">💡</span> Calculadora de Resistencia Limitadora para LED</h2>
           <p className={styles.cardDesc}>
             Calcula la resistencia necesaria para limitar la corriente que pasa por tu LED usando la Ley de Ohm.
           </p>
@@ -284,6 +294,7 @@ export default function CalculadoraResistenciasLedPage() {
                 {LED_PRESETS.map(p => (
                   <button
                     key={p.label}
+                    type="button"
                     className={styles.presetBtn}
                     onClick={() => setVled(String(p.vf).replace('.', ','))}
                   >
@@ -395,22 +406,22 @@ export default function CalculadoraResistenciasLedPage() {
 
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <div className={styles.escenarioIcon}>🔴</div>
+            <div className={styles.escenarioIcon} aria-hidden="true">🔴</div>
             <h3>LED en Arduino (5V)</h3>
             <p>Vcc=5V, Vf=2V, I=20mA → R=150Ω. Valor E12: 150Ω. Una resistencia marrón-verde-marrón estándar.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <div className={styles.escenarioIcon}>💡</div>
+            <div className={styles.escenarioIcon} aria-hidden="true">💡</div>
             <h3>LED azul/blanco (3,3V)</h3>
             <p>Vcc=3,3V, Vf=3,2V, I=10mA → R=10Ω. Margen mínimo: usa siempre al menos 33Ω para proteger el LED.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <div className={styles.escenarioIcon}>🔋</div>
+            <div className={styles.escenarioIcon} aria-hidden="true">🔋</div>
             <h3>LED en pila de 9V</h3>
             <p>Vcc=9V, Vf=2V, I=20mA → R=350Ω. Valor E12: 330Ω o 390Ω. Potencia: 140mW (usa ¼W o ½W).</p>
           </div>
           <div className={styles.escenarioCard}>
-            <div className={styles.escenarioIcon}>💡</div>
+            <div className={styles.escenarioIcon} aria-hidden="true">💡</div>
             <h3>LED IR para mando a distancia</h3>
             <p>Vcc=5V, Vf=1,4V, I=100mA (pico) → R=36Ω. Usar transistor si la corriente supera los 40mA del GPIO.</p>
           </div>
@@ -465,22 +476,22 @@ export default function CalculadoraResistenciasLedPage() {
 
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>🔬</div>
+            <div className={styles.tipIcon} aria-hidden="true">🔬</div>
             <h4>Usa un multímetro</h4>
             <p>Mide la resistencia directamente si tienes dudas. El multímetro en modo Ω es la referencia definitiva.</p>
           </div>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>📦</div>
+            <div className={styles.tipIcon} aria-hidden="true">📦</div>
             <h4>Organiza por valor</h4>
             <p>Guarda las resistencias en cajas organizadas por valor. Un kit E12 completo cubre el 90% de las necesidades.</p>
           </div>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>⚡</div>
+            <div className={styles.tipIcon} aria-hidden="true">⚡</div>
             <h4>Respeta la potencia</h4>
             <p>Una resistencia de ¼W en aplicaciones de ½W se calentará y fallará. Siempre deja margen de seguridad ×2.</p>
           </div>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>🎨</div>
+            <div className={styles.tipIcon} aria-hidden="true">🎨</div>
             <h4>Daltonismo</h4>
             <p>Si tienes dificultades con ciertos colores, usa un multímetro o una app de lupa para contrastar mejor las bandas.</p>
           </div>
@@ -488,7 +499,7 @@ export default function CalculadoraResistenciasLedPage() {
 
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             Errores frecuentes al trabajar con resistencias y LEDs
           </div>
           <ul className={styles.warningList}>
