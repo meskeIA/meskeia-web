@@ -277,10 +277,10 @@
 | [x] | La España Antigua: De Tartessos a Hispania Romana | `/visualizador-historia/espana-antigua/` | cultura, estudiantes |
 | [x] | La España de los Austrias: Del Imperio Universal al Ocaso | `/visualizador-historia/espana-austrias/` | cultura |
 | [x] | La España de los Borbones: De Utrecht a Bayona | `/visualizador-historia/espana-borbones/` | cultura |
-| [ ] | La España Medieval: De los Visigodos a los Reyes Católicos | `/visualizador-historia/espana-medieval/` | cultura |
-| [ ] | La Evolución de la Escritura | `/visualizador-historia-escritura/` | cultura, estudiantes |
-| [ ] | La Evolución del Dinero | `/visualizador-historia-dinero/` | cultura, finanzas |
-| [ ] | La Guerra Fría: De Yalta a la Caída del Muro (1945-1989) | `/visualizador-historia/historia-guerra-fria/` | cultura, tecnicas |
+| [x] | La España Medieval: De los Visigodos a los Reyes Católicos | `/visualizador-historia/espana-medieval/` | cultura |
+| [x] | La Evolución de la Escritura | `/visualizador-historia-escritura/` | cultura, estudiantes |
+| [x] | La Evolución del Dinero | `/visualizador-historia-dinero/` | cultura, finanzas |
+| [x] | La Guerra Fría: De Yalta a la Caída del Muro (1945-1989) | `/visualizador-historia/historia-guerra-fria/` | cultura, tecnicas |
 | [ ] | La Ilustración: De Newton a la Revolución Francesa | `/visualizador-historia/ilustracion/` | cultura |
 | [ ] | La Inflamación — Aliada y Enemiga del Cuerpo | `/visualizador-inflamacion/` | cultura, estudiantes, salud |
 | [ ] | La Primera Guerra Mundial: De Sarajevo al Tratado de Versalles | `/visualizador-historia/primera-guerra-mundial/` | cultura |
