@@ -134,7 +134,7 @@ export const mesopotamia: HistoriaData = {
     {
       nombre: 'Período Sumerio y Primeras Ciudades',
       desde: -3500,
-      hasta: -2154,
+      hasta: -2112,
       icono: '🏺',
       hitosDestacados: ['Ciudades-Estado Sumerias', 'Imperio Acadio (Sargón de Acad)'],
       eventos: [
@@ -165,7 +165,7 @@ export const mesopotamia: HistoriaData = {
     {
       nombre: 'Babilonia Antigua y el Código de Hammurabi',
       desde: -1894,
-      hasta: -1000,
+      hasta: -1363,
       icono: '⚖️',
       hitosDestacados: ['Babilonia Antigua y el Código de Hammurabi', 'Período Casita y Edad Oscura'],
       eventos: [

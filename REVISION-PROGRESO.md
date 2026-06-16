@@ -233,10 +233,10 @@
 | [x] | Historia de los Videojuegos Españoles: De la Edad de Oro a Metroid Dread | `/visualizador-historia/videojuegos-espanoles/` | cultura, juegos |
 | [x] | Historia de los Videojuegos Japoneses: De Nintendo a los Gacha | `/visualizador-historia/historia-videojuegos-japoneses/` | cultura, juegos |
 | [x] | Historia de los Videojuegos: De Pong a la IA Generativa | `/visualizador-historia/videojuegos/` | cultura, juegos |
-| [ ] | Historia de Mesopotamia: La Cuna de la Civilización | `/visualizador-historia/mesopotamia/` | cultura |
-| [ ] | Historia de México: Del Grito de Dolores a la México Contemporánea | `/visualizador-historia/mexico-moderno/` | cultura, estudiantes |
-| [ ] | Historia de Perú: De la Independencia al Perú Contemporáneo | `/visualizador-historia/peru/` | cultura, estudiantes |
-| [ ] | Historia de Polonia: Del Bautismo de Mieszko I a la Polonia Contemporánea | `/visualizador-historia/polonia/` | cultura, estudiantes |
+| [x] | Historia de Mesopotamia: La Cuna de la Civilización | `/visualizador-historia/mesopotamia/` | cultura |
+| [x] | Historia de México: Del Grito de Dolores a la México Contemporánea | `/visualizador-historia/mexico-moderno/` | cultura, estudiantes |
+| [x] | Historia de Perú: De la Independencia al Perú Contemporáneo | `/visualizador-historia/peru/` | cultura, estudiantes |
+| [x] | Historia de Polonia: Del Bautismo de Mieszko I a la Polonia Contemporánea | `/visualizador-historia/polonia/` | cultura, estudiantes |
 | [ ] | Historia de Puerto Rico: De la Colonia Española al Estado Libre Asociado | `/visualizador-historia/puerto-rico/` | cultura, estudiantes |
 | [ ] | Historia de Rusia: De Rurik al Siglo XXI | `/visualizador-historia/historia-rusia/` | cultura |
 | [ ] | Historia de Silicon Valley: Del Garaje de HP a la Era de la IA | `/visualizador-historia/silicon-valley/` | cultura, tecnicas |
