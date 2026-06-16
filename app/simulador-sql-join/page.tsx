@@ -446,6 +446,7 @@ export default function Page() {
             {(Object.keys(JOIN_INFO) as TipoJoin[]).map((t) => (
               <button
                 key={t}
+                type="button"
                 role="tab"
                 aria-selected={tipoJoin === t}
                 className={`${styles.joinBtn} ${tipoJoin === t ? styles.joinActive : ''}`}
@@ -465,6 +466,7 @@ export default function Page() {
             {EJEMPLOS.map((ej) => (
               <button
                 key={ej.id}
+                type="button"
                 className={styles.exampleBtn}
                 onClick={() => cargarEjemplo(ej)}
               >
@@ -559,6 +561,7 @@ export default function Page() {
                     </td>
                     <td>
                       <button
+                        type="button"
                         className={styles.removeRowBtn}
                         onClick={() => eliminarFila('A', fila.id)}
                         aria-label="Eliminar fila"
@@ -571,7 +574,7 @@ export default function Page() {
               </tbody>
             </table>
             {filasA.length < 6 && (
-              <button className={styles.addRowBtn} onClick={() => agregarFila('A')}>
+              <button type="button" className={styles.addRowBtn} onClick={() => agregarFila('A')}>
                 + Añadir fila
               </button>
             )}
@@ -708,6 +711,7 @@ export default function Page() {
                     </td>
                     <td>
                       <button
+                        type="button"
                         className={styles.removeRowBtn}
                         onClick={() => eliminarFila('B', fila.id)}
                         aria-label="Eliminar fila"
@@ -720,7 +724,7 @@ export default function Page() {
               </tbody>
             </table>
             {filasB.length < 6 && (
-              <button className={styles.addRowBtn} onClick={() => agregarFila('B')}>
+              <button type="button" className={styles.addRowBtn} onClick={() => agregarFila('B')}>
                 + Añadir fila
               </button>
             )}
@@ -881,7 +885,7 @@ export default function Page() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🧾</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🧾</span>
               <strong>Facturación</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -894,7 +898,7 @@ export default function Page() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>📦</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">📦</span>
               <strong>Inventario</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -907,7 +911,7 @@ export default function Page() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>👥</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">👥</span>
               <strong>Gestión de equipos</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -920,7 +924,7 @@ export default function Page() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>📅</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">📅</span>
               <strong>Generación de calendarios</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -1067,7 +1071,7 @@ export default function Page() {
         <h3>Mejores Prácticas</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🎯</span>
+            <span className={styles.tipIcon} aria-hidden="true">🎯</span>
             <strong>Usa siempre ON explícito</strong>
             <p>
               Evita NATURAL JOIN y USING. <code>ON tabla1.id = tabla2.id_externo</code> es
@@ -1075,7 +1079,7 @@ export default function Page() {
             </p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📛</span>
+            <span className={styles.tipIcon} aria-hidden="true">📛</span>
             <strong>Pon alias a las tablas</strong>
             <p>
               <code>FROM empleados e JOIN departamentos d</code> hace consultas largas
@@ -1083,7 +1087,7 @@ export default function Page() {
             </p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔍</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔍</span>
             <strong>Indexa las columnas del ON</strong>
             <p>
               Sin índices en las claves del JOIN, la consulta hará scan completo. Las FKs
@@ -1091,7 +1095,7 @@ export default function Page() {
             </p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📐</span>
+            <span className={styles.tipIcon} aria-hidden="true">📐</span>
             <strong>Filtra en la cláusula ON cuando puedas</strong>
             <p>
               Para LEFT JOIN, filtrar la tabla derecha en el ON conserva las filas huérfanas;
@@ -1099,7 +1103,7 @@ export default function Page() {
             </p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🧪</span>
+            <span className={styles.tipIcon} aria-hidden="true">🧪</span>
             <strong>Verifica con EXPLAIN</strong>
             <p>
               <code>EXPLAIN SELECT ...</code> muestra el plan de ejecución y avisa si el SGBD
@@ -1107,7 +1111,7 @@ export default function Page() {
             </p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📊</span>
+            <span className={styles.tipIcon} aria-hidden="true">📊</span>
             <strong>Cuenta antes y después</strong>
             <p>
               Si esperas N filas y obtienes 10·N, casi seguro hay duplicados. Si obtienes N/3,

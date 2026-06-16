@@ -368,7 +368,7 @@ export default function SimuladorCurvaPhillipsPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📉 Simulador de la Curva de Phillips</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📉</span> Simulador de la Curva de Phillips</h1>
         <p className={styles.subtitle}>
           Visualiza el <strong>trade-off inflación-desempleo</strong> en tiempo real. Ajusta el desempleo,
           las expectativas y los shocks de oferta para ver cómo se mueve la economía entre recesión, estanflación y equilibrio.
@@ -622,22 +622,22 @@ export default function SimuladorCurvaPhillipsPage() {
           <h3>4 episodios históricos que definen la curva de Phillips moderna</h3>
           <div className={styles.scenariosGrid}>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🛢️</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🛢️</span>
               <strong>Estanflación de los 70 (crisis OPEP)</strong>
               <p>El embargo de la OPEP en 1973 disparó el precio del petróleo cuatro veces. La inflación se disparó al mismo tiempo que el desempleo aumentaba: la curva de Phillips &quot;no funcionaba&quot;. Era el primer gran shock de oferta negativo en la historia moderna, que desplazó la curva hacia arriba-derecha. Invalidó el modelo keynesiano simple.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>📊</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">📊</span>
               <strong>Gran Moderación 1990-2007</strong>
               <p>Período de baja volatilidad económica, inflación controlada en torno al 2 % y desempleo moderado en las economías avanzadas. Los bancos centrales habían aprendido a anclar las expectativas de inflación: la curva de Phillips estaba bien posicionada y el punto de equilibrio se mantuvo cerca del ideal durante casi dos décadas.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🦠</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🦠</span>
               <strong>Inflación post-COVID 2021-2023</strong>
               <p>La reapertura económica tras el COVID-19 combinó un shock positivo de demanda (estímulos fiscales masivos) con un shock negativo de oferta (disrupciones en cadenas de suministro). La inflación alcanzó máximos de 40 años. Los bancos centrales respondieron con la subida de tipos más rápida desde los años 80, aplicando el manual de Friedman-Volcker.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>📈</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">📈</span>
               <strong>Experimento Volcker (1981)</strong>
               <p>Para romper la espiral inflacionista de los 70, Paul Volcker (FED) subió los tipos al 20 %. La recesión fue severa (desempleo al 10,8 %), pero la inflación cayó del 13 % al 3 % en 3 años. Demostró que la credibilidad de los bancos centrales puede anclar las expectativas y restablecer la curva de Phillips en una posición más favorable.</p>
             </div>
@@ -720,22 +720,22 @@ export default function SimuladorCurvaPhillipsPage() {
           <h3>4 claves para interpretar el plano Phillips</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <strong>Movimiento vs. desplazamiento de la curva</strong>
               <p>Un cambio de u con las mismas expectativas y sin shock es un movimiento <em>a lo largo</em> de la curva. Un cambio de π<sub>e</sub> o ε es un <em>desplazamiento</em> de la curva completa. Son fenómenos distintos con causas y políticas distintas.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⏱️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⏱️</span>
               <strong>El tiempo cambia la curva</strong>
               <p>La curva de Phillips de corto plazo (con expectativas fijas) tiene pendiente negativa. A largo plazo, las expectativas se ajustan y la curva se vuelve vertical. Cada episodio tiene una escala temporal diferente: la política monetaria actúa en 6-18 meses.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🌡️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🌡️</span>
               <strong>La NAIRU no es universal ni fija</strong>
               <p>Cada país tiene su NAIRU, que varía con las instituciones laborales (negociación colectiva, protección al empleo, formación), las políticas de activas de empleo y los cambios tecnológicos. La NAIRU de España no es la de Alemania.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📡</span>
+              <span className={styles.tipIcon} aria-hidden="true">📡</span>
               <strong>Credibilidad del banco central</strong>
               <p>Si el banco central es creíble en su objetivo del 2 %, las expectativas de inflación quedan ancladas (π<sub>e</sub> ≈ 2 %) y la curva de CP permanece estable. Si pierde credibilidad, π<sub>e</sub> sube, la curva se desplaza y el coste de devolver la inflación al 2 % es mayor.</p>
             </div>
@@ -744,7 +744,7 @@ export default function SimuladorCurvaPhillipsPage() {
 
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>5 errores frecuentes sobre la curva de Phillips</strong>
           </div>
           <ul className={styles.warningList}>

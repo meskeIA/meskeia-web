@@ -834,6 +834,7 @@ export default function SimuladorRegresionPage() {
           <div className={styles.tipoSelector}>
             <button
               type="button"
+              aria-pressed={tipo === 'lineal'}
               className={`${styles.tipoBtn} ${tipo === 'lineal' ? styles.tipoActive : ''}`}
               onClick={() => {
                 setTipo('lineal');
@@ -845,6 +846,7 @@ export default function SimuladorRegresionPage() {
             </button>
             <button
               type="button"
+              aria-pressed={tipo === 'polinomica'}
               className={`${styles.tipoBtn} ${tipo === 'polinomica' ? styles.tipoActive : ''}`}
               onClick={() => {
                 setTipo('polinomica');
@@ -856,6 +858,7 @@ export default function SimuladorRegresionPage() {
             </button>
             <button
               type="button"
+              aria-pressed={tipo === 'logistica'}
               className={`${styles.tipoBtn} ${tipo === 'logistica' ? styles.tipoActive : ''}`}
               onClick={() => {
                 setTipo('logistica');
@@ -892,6 +895,7 @@ export default function SimuladorRegresionPage() {
             <div className={styles.metodoToggle}>
               <button
                 type="button"
+                aria-pressed={metodo === 'ols'}
                 className={`${styles.metodoBtn} ${metodo === 'ols' ? styles.metodoActive : ''}`}
                 onClick={() => setMetodo('ols')}
               >
@@ -899,6 +903,7 @@ export default function SimuladorRegresionPage() {
               </button>
               <button
                 type="button"
+                aria-pressed={metodo === 'gradiente'}
                 className={`${styles.metodoBtn} ${metodo === 'gradiente' ? styles.metodoActive : ''}`}
                 onClick={() => setMetodo('gradiente')}
               >
@@ -949,6 +954,7 @@ export default function SimuladorRegresionPage() {
               <span>Próximo clic será de clase:</span>
               <button
                 type="button"
+                aria-pressed={claseActual === 0}
                 className={`${styles.claseBtn} ${claseActual === 0 ? styles.claseActive0 : ''}`}
                 onClick={() => setClaseActual(0)}
               >
@@ -956,6 +962,7 @@ export default function SimuladorRegresionPage() {
               </button>
               <button
                 type="button"
+                aria-pressed={claseActual === 1}
                 className={`${styles.claseBtn} ${claseActual === 1 ? styles.claseActive1 : ''}`}
                 onClick={() => setClaseActual(1)}
               >
@@ -1370,7 +1377,7 @@ export default function SimuladorRegresionPage() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🎓</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
               <strong>Estudiante de IA / ML</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -1384,7 +1391,7 @@ export default function SimuladorRegresionPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>📈</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">📈</span>
               <strong>Predictor de precios</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -1398,7 +1405,7 @@ export default function SimuladorRegresionPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🔬</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🔬</span>
               <strong>Clasificación binaria</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -1412,7 +1419,7 @@ export default function SimuladorRegresionPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🧑‍🏫</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🧑‍🏫</span>
               <strong>Profesor de Estadística</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -1557,7 +1564,7 @@ export default function SimuladorRegresionPage() {
         <h3>Mejores Prácticas</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📊</span>
+            <span className={styles.tipIcon} aria-hidden="true">📊</span>
             <strong>Visualiza siempre antes de modelar</strong>
             <p>
               Un scatter plot en 5 segundos te ahorra horas. Detectarás outliers,
@@ -1565,7 +1572,7 @@ export default function SimuladorRegresionPage() {
             </p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>⚖️</span>
+            <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
             <strong>Normaliza las variables</strong>
             <p>
               Si una variable va de 0 a 1 y otra de 0 a 1.000.000, el gradiente
@@ -1574,7 +1581,7 @@ export default function SimuladorRegresionPage() {
             </p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🎯</span>
+            <span className={styles.tipIcon} aria-hidden="true">🎯</span>
             <strong>Elige bien la tasa de aprendizaje</strong>
             <p>
               Demasiado alta → diverge (la pérdida explota). Demasiado baja →
@@ -1583,7 +1590,7 @@ export default function SimuladorRegresionPage() {
             </p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🛡️</span>
+            <span className={styles.tipIcon} aria-hidden="true">🛡️</span>
             <strong>Usa regularización con muchas variables</strong>
             <p>
               Ridge (L2) y Lasso (L1) penalizan coeficientes grandes y previenen
@@ -1591,7 +1598,7 @@ export default function SimuladorRegresionPage() {
             </p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔁</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔁</span>
             <strong>Validación cruzada, no test único</strong>
             <p>
               k-fold CV (típico k=5 o k=10) da una estimación robusta del error
@@ -1599,7 +1606,7 @@ export default function SimuladorRegresionPage() {
             </p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🧪</span>
+            <span className={styles.tipIcon} aria-hidden="true">🧪</span>
             <strong>Compara baselines</strong>
             <p>
               Antes de presumir de modelo, compara con el más simple posible:
@@ -1611,7 +1618,7 @@ export default function SimuladorRegresionPage() {
 
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores frecuentes a evitar</strong>
           </div>
           <ul className={styles.warningList}>

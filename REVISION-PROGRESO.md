@@ -570,7 +570,7 @@
 | [x] | Simulador de Integrales: Área bajo la Curva | `/simulador-integral-area/` | estudiantes |
 | [x] | Simulador de Intervalos de Confianza | `/simulador-intervalos-confianza/` | estudiantes |
 | [x] | Simulador de K-Means Clustering | `/simulador-kmeans/` | estudiantes, tecnicas |
-| [ ] | Simulador de la Curva de Phillips | `/simulador-curva-phillips/` | estudiantes |
+| [x] | Simulador de la Curva de Phillips | `/simulador-curva-phillips/` | estudiantes |
 | [x] | Simulador de Lentes Ópticas: Trazado de Rayos | `/simulador-lentes-opticas/` | estudiantes |
 | [x] | Simulador de Máquina de Turing | `/simulador-maquina-turing/` | estudiantes, tecnicas |
 | [x] | Simulador de Mitosis y Meiosis | `/simulador-mitosis-meiosis/` | estudiantes |
@@ -581,10 +581,10 @@
 | [x] | Simulador de Planificación de Procesos en CPU | `/simulador-planificador-procesos/` | estudiantes, tecnicas |
 | [x] | Simulador de Proyectiles 2D | `/simulador-proyectiles/` | estudiantes |
 | [x] | Simulador de Reacciones Químicas | `/simulador-reacciones-quimicas/` | estudiantes, tecnicas |
-| [ ] | Simulador de Recursión y Pila de Llamadas | `/simulador-recursion/` | estudiantes, tecnicas |
+| [x] | Simulador de Recursión y Pila de Llamadas | `/simulador-recursion/` | estudiantes, tecnicas |
 | [x] | Simulador de Reemplazo de Páginas | `/simulador-reemplazo-paginas/` | estudiantes, tecnicas |
-| [ ] | Simulador de Regresión Lineal y Logística | `/simulador-regresion/` | estudiantes, tecnicas |
-| [ ] | Simulador de SQL JOIN Visual | `/simulador-sql-join/` | estudiantes, tecnicas |
+| [x] | Simulador de Regresión Lineal y Logística | `/simulador-regresion/` | estudiantes, tecnicas |
+| [x] | Simulador de SQL JOIN Visual | `/simulador-sql-join/` | estudiantes, tecnicas |
 | [ ] | Simulador de Test de Hipótesis | `/simulador-test-hipotesis/` | estudiantes |
 | [x] | Simulador de Titulación Ácido-Base | `/simulador-titulacion/` | estudiantes |
 | [ ] | Simulador de Transformaciones de Funciones | `/simulador-funciones-transformaciones/` | estudiantes |

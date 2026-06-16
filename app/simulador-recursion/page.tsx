@@ -1397,7 +1397,7 @@ export default function Page() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🌳</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🌳</span>
               <strong>Recorrer estructuras de árbol</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -1411,7 +1411,7 @@ export default function Page() {
 
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>📊</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">📊</span>
               <strong>Algoritmos divide y vencerás</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -1425,7 +1425,7 @@ export default function Page() {
 
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🧩</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🧩</span>
               <strong>Backtracking y combinatoria</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -1439,7 +1439,7 @@ export default function Page() {
 
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>💡</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">💡</span>
               <strong>Programación dinámica</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -1579,7 +1579,7 @@ export default function Page() {
         <h3>Mejores Prácticas</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🛑</span>
+            <span className={styles.tipIcon} aria-hidden="true">🛑</span>
             <strong>Define el caso base PRIMERO</strong>
             <p>
               Antes de pensar en el paso recursivo, escribe la condición de parada y su retorno.
@@ -1587,7 +1587,7 @@ export default function Page() {
             </p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📉</span>
+            <span className={styles.tipIcon} aria-hidden="true">📉</span>
             <strong>Asegura el avance</strong>
             <p>
               Cada llamada debe trabajar con un argumento estrictamente más simple. Si pasas el
@@ -1595,7 +1595,7 @@ export default function Page() {
             </p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🧠</span>
+            <span className={styles.tipIcon} aria-hidden="true">🧠</span>
             <strong>Confía en la inducción</strong>
             <p>
               No intentes desarrollar mentalmente toda la pila. Asume que la llamada recursiva
@@ -1603,7 +1603,7 @@ export default function Page() {
             </p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>💾</span>
+            <span className={styles.tipIcon} aria-hidden="true">💾</span>
             <strong>Memoiza cuando hay solapamiento</strong>
             <p>
               Si dibujas el árbol y ves los mismos argumentos en distintos nodos, cachea
@@ -1611,7 +1611,7 @@ export default function Page() {
             </p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔁</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔁</span>
             <strong>Convierte a iterativo si la pila es profunda</strong>
             <p>
               Recursiones con miles de frames son arriesgadas en JavaScript. Una pila explícita
@@ -1619,7 +1619,7 @@ export default function Page() {
             </p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📐</span>
+            <span className={styles.tipIcon} aria-hidden="true">📐</span>
             <strong>Calcula la complejidad</strong>
             <p>
               Antes de ejecutar, plantea la ecuación de recurrencia: T(n) = ... Aplica el teorema
@@ -1630,7 +1630,7 @@ export default function Page() {
 
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores frecuentes al programar recursión</strong>
           </div>
           <ul className={styles.warningList}>
