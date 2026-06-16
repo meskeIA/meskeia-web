@@ -271,22 +271,25 @@ export default function PruebaCamaraPage() {
               {/* Controles principales */}
               <div className={styles.controls}>
                 {!isActive ? (
-                  <button onClick={startCamera} className={styles.btnPrimary}>
-                    <span>▶️</span> Iniciar Cámara
+                  <button type="button" onClick={startCamera} className={styles.btnPrimary}>
+                    <span aria-hidden="true">▶️</span> Iniciar Cámara
                   </button>
                 ) : (
                   <>
-                    <button onClick={stopCamera} className={styles.btnSecondary}>
-                      <span>⏹️</span> Detener
+                    <button type="button" onClick={stopCamera} className={styles.btnSecondary}>
+                      <span aria-hidden="true">⏹️</span> Detener
                     </button>
-                    <button onClick={() => takePhoto(false)} className={styles.btnPrimary}>
-                      <span>📸</span> Foto
+                    <button type="button" onClick={() => takePhoto(false)} className={styles.btnPrimary}>
+                      <span aria-hidden="true">📸</span> Foto
                     </button>
-                    <button onClick={() => takePhoto(true)} className={styles.btnAccent}>
-                      <span>⏱️</span> Foto 3s
+                    <button type="button" onClick={() => takePhoto(true)} className={styles.btnAccent}>
+                      <span aria-hidden="true">⏱️</span> Foto 3s
                     </button>
                     <button
+                      type="button"
                       onClick={() => setShowSettings(!showSettings)}
+                      aria-pressed={showSettings}
+                      aria-expanded={showSettings}
                       className={`${styles.btnIcon} ${showSettings ? styles.active : ''}`}
                     >
                       ⚙️
@@ -322,7 +325,9 @@ export default function PruebaCamaraPage() {
                   <div className={styles.settingRow}>
                     <label>Espejo:</label>
                     <button
+                      type="button"
                       onClick={() => setIsMirrored(!isMirrored)}
+                      aria-pressed={isMirrored}
                       className={`${styles.toggleBtn} ${isMirrored ? styles.active : ''}`}
                     >
                       {isMirrored ? '✓ Activado' : 'Desactivado'}
@@ -357,10 +362,11 @@ export default function PruebaCamaraPage() {
 
                   {/* Reset */}
                   <button
+                    type="button"
                     onClick={() => { setBrightness(100); setContrast(100); }}
                     className={styles.btnSmall}
                   >
-                    🔄 Restablecer
+                    <span aria-hidden="true">🔄</span> Restablecer
                   </button>
                 </div>
               )}
@@ -377,10 +383,10 @@ export default function PruebaCamaraPage() {
                     <div key={photo.id} className={styles.photoCard}>
                       <img src={photo.dataUrl} alt="Foto capturada" className={styles.photoImg} />
                       <div className={styles.photoActions}>
-                        <button onClick={() => downloadPhoto(photo)} className={styles.btnSmall}>
-                          ⬇️ Descargar
+                        <button type="button" onClick={() => downloadPhoto(photo)} className={styles.btnSmall}>
+                          <span aria-hidden="true">⬇️</span> Descargar
                         </button>
-                        <button onClick={() => deletePhoto(photo.id)} className={styles.btnSmallDanger}>
+                        <button type="button" onClick={() => deletePhoto(photo.id)} className={styles.btnSmallDanger} aria-label="Eliminar foto">
                           🗑️
                         </button>
                       </div>

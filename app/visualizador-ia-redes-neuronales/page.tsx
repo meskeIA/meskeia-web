@@ -181,6 +181,7 @@ export default function VisualizadorIaRedesNeuronales() {
         {secciones.map(s => (
           <button
             key={s.id}
+            type="button"
             className={`${styles.navBtn} ${seccionActiva === s.id ? styles.navBtnActivo : ''}`}
             onClick={() => setSeccionActiva(s.id)}
             aria-pressed={seccionActiva === s.id}
@@ -271,6 +272,7 @@ export default function VisualizadorIaRedesNeuronales() {
                     {funcionesActivacion.map(fn => (
                       <button
                         key={fn.id}
+                        type="button"
                         className={`${styles.fnBtn} ${fnActivacion === fn.id ? styles.fnBtnActivo : ''}`}
                         onClick={() => setFnActivacion(fn.id)}
                         aria-pressed={fnActivacion === fn.id}
@@ -552,6 +554,7 @@ export default function VisualizadorIaRedesNeuronales() {
 
                 <div className={styles.botonesSim}>
                   <button
+                    type="button"
                     className={styles.btnSimular}
                     onClick={simularEpoch}
                     disabled={loss <= 0.01}
@@ -560,6 +563,7 @@ export default function VisualizadorIaRedesNeuronales() {
                     ▶ Ejecutar época {epoch + 1}
                   </button>
                   <button
+                    type="button"
                     className={styles.btnReset}
                     onClick={resetearEntrenamiento}
                     aria-label="Reiniciar entrenamiento"
@@ -602,6 +606,7 @@ export default function VisualizadorIaRedesNeuronales() {
                   className={`${styles.tipoCard} ${arquitecturaAbierta === arq.id ? styles.tipoCardAbierta : ''}`}
                 >
                   <button
+                    type="button"
                     className={styles.tipoCardHeader}
                     onClick={() => setArquitecturaAbierta(arquitecturaAbierta === arq.id ? null : arq.id)}
                     aria-expanded={arquitecturaAbierta === arq.id}
@@ -625,13 +630,13 @@ export default function VisualizadorIaRedesNeuronales() {
                       </div>
                       <div className={styles.tipoListas}>
                         <div className={styles.tipoVentajas}>
-                          <strong>✅ Ventajas</strong>
+                          <strong><span aria-hidden="true">✅</span> Ventajas</strong>
                           <ul>
                             {arq.ventajas.map((v, i) => <li key={i}>{v}</li>)}
                           </ul>
                         </div>
                         <div className={styles.tipoLimitaciones}>
-                          <strong>⚠️ Limitaciones</strong>
+                          <strong><span aria-hidden="true">⚠️</span> Limitaciones</strong>
                           <ul>
                             {arq.limitaciones.map((l, i) => <li key={i}>{l}</li>)}
                           </ul>
@@ -781,7 +786,7 @@ export default function VisualizadorIaRedesNeuronales() {
             <div key={i} className={styles.faqItem}>
               <strong className={styles.faqPregunta}>{item.pregunta}</strong>
               <p className={styles.faqRespuesta}>{item.respuesta}</p>
-              {item.tip && <p className={styles.faqTip}>💡 {item.tip}</p>}
+              {item.tip && <p className={styles.faqTip}><span aria-hidden="true">💡</span> {item.tip}</p>}
             </div>
           ))}
         </div>

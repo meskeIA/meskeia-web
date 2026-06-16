@@ -86,7 +86,7 @@ export default function CalculadoraPorcentajePanaderoPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🍞 Porcentaje del Panadero</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🍞</span> Porcentaje del Panadero</h1>
         <p className={styles.subtitle}>
           Calcula el baker&apos;s percentage de tu receta: cada ingrediente como porcentaje del peso de la harina
         </p>
@@ -148,6 +148,7 @@ export default function CalculadoraPorcentajePanaderoPage() {
                   <span className={styles.unidad}>g</span>
                 </div>
                 <button
+                  type="button"
                   onClick={() => quitarIngrediente(ing.id)}
                   className={styles.btnQuitar}
                   aria-label={`Eliminar ${ing.nombre || 'ingrediente'}`}
@@ -158,7 +159,7 @@ export default function CalculadoraPorcentajePanaderoPage() {
             ))}
           </div>
 
-          <button onClick={agregarIngrediente} className={styles.btnAgregar}>
+          <button type="button" onClick={agregarIngrediente} className={styles.btnAgregar}>
             + Añadir ingrediente
           </button>
 
@@ -188,7 +189,7 @@ export default function CalculadoraPorcentajePanaderoPage() {
             </div>
           )}
 
-          <button onClick={calcular} className={styles.btnPrimary}>
+          <button type="button" onClick={calcular} className={styles.btnPrimary}>
             Calcular porcentajes
           </button>
         </div>
@@ -240,7 +241,7 @@ export default function CalculadoraPorcentajePanaderoPage() {
                   <tbody>
                     {/* Harina siempre primero */}
                     <tr className={styles.rowHarina}>
-                      <td>🌾 Harina</td>
+                      <td><span aria-hidden="true">🌾</span> Harina</td>
                       <td>{formatNumber(resultado.harina_g, 0)} g</td>
                       <td className={styles.pct}>100,0 %</td>
                     </tr>
@@ -251,7 +252,7 @@ export default function CalculadoraPorcentajePanaderoPage() {
                           key={idx}
                           className={esAgua ? styles.rowAgua : styles.rowNormal}
                         >
-                          <td>{esAgua ? '💧' : '•'} {ing.nombre}</td>
+                          <td><span aria-hidden="true">{esAgua ? '💧' : '•'}</span> {ing.nombre}</td>
                           <td>{formatNumber(ing.gramos, 0)} g</td>
                           <td className={styles.pct}>{formatNumber(ing.porcentajePanadero, 1)} %</td>
                         </tr>
@@ -263,7 +264,7 @@ export default function CalculadoraPorcentajePanaderoPage() {
 
               {resultado.hidratacion_pct > 0 && (
                 <div className={styles.hidratacionNote} role="note">
-                  💧 La hidratación de esta masa es <strong>{formatNumber(resultado.hidratacion_pct, 1)} %</strong>
+                  <span aria-hidden="true">💧</span> La hidratación de esta masa es <strong>{formatNumber(resultado.hidratacion_pct, 1)} %</strong>
                   {resultado.hidratacion_pct < 60 && ' — masa seca, fácil de moldear'}
                   {resultado.hidratacion_pct >= 60 && resultado.hidratacion_pct < 70 && ' — hidratación estándar, equilibrada'}
                   {resultado.hidratacion_pct >= 70 && resultado.hidratacion_pct < 80 && ' — hidratación alta, miga abierta'}

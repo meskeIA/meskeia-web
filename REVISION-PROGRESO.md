@@ -778,10 +778,10 @@
 | [x] | Impacto de la IA en los Sectores - Automatización y Empleos | `/visualizador-impacto-ia-sectores/` | tecnicas, cultura, estudiantes |
 | [x] | Luxómetro / Fotómetro | `/luxometro/` | tecnicas |
 | [x] | Nivel de Burbuja Digital | `/nivel-burbuja/` | tecnicas |
-| [ ] | Porcentaje del Panadero (Baker's Percentage) | `/calculadora-porcentaje-panadero/` | tecnicas, cultura |
-| [ ] | Prueba de Cámara Web | `/prueba-camara/` | tecnicas |
-| [ ] | Prueba de Micrófono | `/prueba-microfono/` | tecnicas |
-| [ ] | Redes Neuronales e IA - Cómo Aprende una Inteligencia Artificial | `/visualizador-ia-redes-neuronales/` | tecnicas, cultura, estudiantes |
+| [x] | Porcentaje del Panadero (Baker's Percentage) | `/calculadora-porcentaje-panadero/` | tecnicas, cultura |
+| [x] | Prueba de Cámara Web | `/prueba-camara/` | tecnicas |
+| [x] | Prueba de Micrófono | `/prueba-microfono/` | tecnicas |
+| [x] | Redes Neuronales e IA - Cómo Aprende una Inteligencia Artificial | `/visualizador-ia-redes-neuronales/` | tecnicas, cultura, estudiantes |
 | [ ] | Selector de Auriculares | `/selector-auriculares/` | tecnicas, productividad |
 | [ ] | Selector de Movilidad Urbana | `/selector-movilidad-urbana/` | tecnicas, productividad |
 | [ ] | Selector de Portátil y PC | `/selector-portatil/` | tecnicas, productividad |

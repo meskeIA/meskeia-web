@@ -407,7 +407,7 @@ export default function PruebaMicrofonoPage() {
                     <span className={styles.volumeIcon}>{volumeStatus.icon}</span>
                     <span className={styles.volumeText}>{volumeStatus.text}</span>
                     <span className={styles.volumeValue}>{volume}%</span>
-                    <button onClick={resetPeak} className={styles.btnTiny}>
+                    <button type="button" onClick={resetPeak} className={styles.btnTiny}>
                       Reset pico
                     </button>
                   </div>
@@ -417,21 +417,21 @@ export default function PruebaMicrofonoPage() {
               {/* Controles principales */}
               <div className={styles.controls}>
                 {!isActive ? (
-                  <button onClick={startMicrophone} className={styles.btnPrimary}>
-                    <span>▶️</span> Iniciar Micrófono
+                  <button type="button" onClick={startMicrophone} className={styles.btnPrimary}>
+                    <span aria-hidden="true">▶️</span> Iniciar Micrófono
                   </button>
                 ) : (
                   <>
-                    <button onClick={stopMicrophone} className={styles.btnSecondary}>
-                      <span>⏹️</span> Detener
+                    <button type="button" onClick={stopMicrophone} className={styles.btnSecondary}>
+                      <span aria-hidden="true">⏹️</span> Detener
                     </button>
                     {!isRecording ? (
-                      <button onClick={startRecording} className={styles.btnRecord}>
-                        <span>🔴</span> Grabar
+                      <button type="button" onClick={startRecording} className={styles.btnRecord}>
+                        <span aria-hidden="true">🔴</span> Grabar
                       </button>
                     ) : (
-                      <button onClick={stopRecording} className={styles.btnStopRecord}>
-                        <span>⏹️</span> Parar ({formatTime(recordingTime)})
+                      <button type="button" onClick={stopRecording} className={styles.btnStopRecord}>
+                        <span aria-hidden="true">⏹️</span> Parar ({formatTime(recordingTime)})
                       </button>
                     )}
                   </>
@@ -464,16 +464,20 @@ export default function PruebaMicrofonoPage() {
                     <label>Visualización:</label>
                     <div className={styles.toggleGroup}>
                       <button
+                        type="button"
                         onClick={() => setShowWaveform(true)}
                         className={`${styles.toggleBtn} ${showWaveform ? styles.active : ''}`}
+                        aria-pressed={showWaveform}
                       >
-                        📊 Barras
+                        <span aria-hidden="true">📊</span> Barras
                       </button>
                       <button
+                        type="button"
                         onClick={() => setShowWaveform(false)}
                         className={`${styles.toggleBtn} ${!showWaveform ? styles.active : ''}`}
+                        aria-pressed={!showWaveform}
                       >
-                        〰️ Onda
+                        <span aria-hidden="true">〰️</span> Onda
                       </button>
                     </div>
                   </div>
@@ -515,12 +519,14 @@ export default function PruebaMicrofonoPage() {
                       <audio src={recording.url} controls className={styles.audioPlayer} />
                       <div className={styles.recordingActions}>
                         <button
+                          type="button"
                           onClick={() => downloadRecording(recording)}
                           className={styles.btnSmall}
                         >
-                          ⬇️ Descargar
+                          <span aria-hidden="true">⬇️</span> Descargar
                         </button>
                         <button
+                          type="button"
                           onClick={() => deleteRecording(recording.id)}
                           className={styles.btnSmallDanger}
                         >
