@@ -38,7 +38,7 @@ export default function Calculadora1RMGimnasioPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <h1 className={styles.title}>🏋️ Calculadora de 1RM</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🏋️</span> Calculadora de 1RM</h1>
         <p className={styles.subtitle}>
           Calcula tu fuerza máxima en cualquier ejercicio con las fórmulas Epley y Brzycki
         </p>
@@ -71,6 +71,7 @@ export default function Calculadora1RMGimnasioPage() {
           </div>
 
           <button
+            type="button"
             onClick={calcular}
             className={styles.btnPrimary}
             aria-label="Calcular repetición máxima"
@@ -131,7 +132,7 @@ export default function Calculadora1RMGimnasioPage() {
       {/* Tabla de cargas por porcentaje */}
       {resultado && (
         <div className={styles.tableSection}>
-          <h2 className={styles.tableTitle}>📊 Tabla de cargas de entrenamiento</h2>
+          <h2 className={styles.tableTitle}><span aria-hidden="true">📊</span> Tabla de cargas de entrenamiento</h2>
           <p className={styles.tableSubtitle}>
             Basada en tu 1RM estimado de <strong>{formatNumber(resultado.media, 1)} kg</strong>
           </p>

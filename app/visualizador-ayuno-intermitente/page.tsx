@@ -222,6 +222,7 @@ export default function AyunoIntermitentePage() {
         {tabs.map(tab => (
           <button
             key={tab.id}
+            type="button"
             className={`${styles.tab} ${tabActiva === tab.id ? styles.tabActiva : ''}`}
             onClick={() => setTabActiva(tab.id)}
             aria-pressed={tabActiva === tab.id}
@@ -244,6 +245,7 @@ export default function AyunoIntermitentePage() {
             {FASES.map(fase => (
               <button
                 key={fase.id}
+                type="button"
                 role="listitem"
                 className={`${styles.timelineItem} ${faseSeleccionada === fase.id ? styles.timelineActivo : ''}`}
                 style={{ borderColor: fase.color }}
@@ -291,7 +293,7 @@ export default function AyunoIntermitentePage() {
           </div>
 
           <div className={styles.nota}>
-            <strong>ℹ️ Nota:</strong> Los tiempos son orientativos y varían según el metabolismo basal,
+            <strong><span aria-hidden="true">ℹ️</span> Nota:</strong> Los tiempos son orientativos y varían según el metabolismo basal,
             el nivel de actividad física, las reservas de glucógeno previas y la composición de la última comida.
           </div>
         </section>
@@ -353,7 +355,7 @@ export default function AyunoIntermitentePage() {
           </div>
 
           <div className={styles.warningBox}>
-            <strong>⚠️ Importante:</strong> La autofagia no es una &ldquo;limpieza mágica&rdquo;. Es un proceso
+            <strong><span aria-hidden="true">⚠️</span> Importante:</strong> La autofagia no es una &ldquo;limpieza mágica&rdquo;. Es un proceso
             regulado con función fisiológica normal. Inducirla mediante ayuno extremo o prolongado sin supervisión
             puede tener efectos negativos, especialmente en personas con enfermedades crónicas.
           </div>
@@ -388,7 +390,7 @@ export default function AyunoIntermitentePage() {
           </div>
 
           <div className={styles.nota}>
-            <strong>ℹ️ Nota:</strong> Las fases metabólicas alcanzadas con cada protocolo dependen
+            <strong><span aria-hidden="true">ℹ️</span> Nota:</strong> Las fases metabólicas alcanzadas con cada protocolo dependen
             de los niveles previos de glucógeno, la actividad física y las características metabólicas individuales.
           </div>
         </section>
@@ -403,8 +405,8 @@ export default function AyunoIntermitentePage() {
           </p>
 
           <div className={styles.contraLeyenda}>
-            <span className={styles.contraAbsoluta}>● Contraindicación absoluta</span>
-            <span className={styles.contraRelativa}>● Requiere supervisión médica</span>
+            <span className={styles.contraAbsoluta}><span aria-hidden="true">●</span> Contraindicación absoluta</span>
+            <span className={styles.contraRelativa}><span aria-hidden="true">●</span> Requiere supervisión médica</span>
           </div>
 
           <div className={styles.contraGrid}>
@@ -426,7 +428,7 @@ export default function AyunoIntermitentePage() {
           </div>
 
           <div className={styles.warningBox}>
-            <strong>⚕️ Recuerda:</strong> Esta lista no es exhaustiva. Ante cualquier duda sobre tu situación
+            <strong><span aria-hidden="true">⚕️</span> Recuerda:</strong> Esta lista no es exhaustiva. Ante cualquier duda sobre tu situación
             particular, consulta con un médico o dietista-nutricionista antes de modificar tus hábitos alimentarios.
           </div>
         </section>

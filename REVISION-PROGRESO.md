@@ -969,9 +969,9 @@
 | [x] | Antibióticos: Cómo Matan Bacterias y la Resistencia | `/visualizador-antibioticos/` | salud, cultura, estudiantes |
 | [x] | Aspirina, Paracetamol e Ibuprofeno: Comparativa de los 3 Analgésicos | `/visualizador-analgesicos/` | salud, cultura, estudiantes |
 | [x] | Aspirina: Cómo Funciona el Fármaco más Universal | `/visualizador-aspirina/` | salud, cultura, estudiantes |
-| [ ] | ATP Sintasa - El Motor Molecular que te da Energía | `/visualizador-atp-sintasa/` | salud, cultura, estudiantes |
-| [ ] | Ayuno Intermitente: Fases Metabólicas y Autofagia | `/visualizador-ayuno-intermitente/` | salud |
-| [ ] | Calculadora de 1RM — Repetición Máxima | `/calculadora-1rm-gimnasio/` | salud, tecnicas |
+| [x] | ATP Sintasa - El Motor Molecular que te da Energía | `/visualizador-atp-sintasa/` | salud, cultura, estudiantes |
+| [x] | Ayuno Intermitente: Fases Metabólicas y Autofagia | `/visualizador-ayuno-intermitente/` | salud |
+| [x] | Calculadora de 1RM — Repetición Máxima | `/calculadora-1rm-gimnasio/` | salud, tecnicas |
 | [ ] | Calculadora de Alimentación Mascotas | `/calculadora-alimentacion-mascotas/` | salud |
 | [x] | Calculadora de Calorías | `/calculadora-calorias-ejercicio/` | salud |
 | [x] | Calculadora de Estadística Médica | `/calculadora-estadistica-medica/` | salud, estudiantes |

@@ -175,8 +175,10 @@ export default function VisualizadorAtpSintasa() {
         <div className={styles.motorWrapper}>
           <div className={styles.motorControls}>
             <button
+              type="button"
               className={`${styles.btnMotor} ${motorActivo ? styles.btnMotorActivo : ''}`}
               onClick={() => setMotorActivo(prev => !prev)}
+              aria-pressed={motorActivo}
             >
               {motorActivo ? '⏸ Pausar motor' : '▶ Activar motor'}
             </button>
@@ -257,7 +259,7 @@ export default function VisualizadorAtpSintasa() {
 
           <div className={styles.motorExplicacion}>
             <div className={styles.infoBox}>
-              <span className={styles.infoIcono}>🔄</span>
+              <span className={styles.infoIcono} aria-hidden="true">🔄</span>
               <p>Cada vez que <strong>3–4 protones</strong> pasan a través del F₀, la parte central gira <strong>120°</strong>. Una rotación completa (3 × 120°) produce <strong>3 moléculas de ATP</strong>.</p>
             </div>
           </div>
@@ -276,9 +278,11 @@ export default function VisualizadorAtpSintasa() {
             {PASO_TEXTOS.map((_, idx) => (
               <button
                 key={idx}
+                type="button"
                 className={`${styles.stepDot} ${idx === pasoActual ? styles.stepDotActivo : ''} ${idx < pasoActual ? styles.stepDotCompletado : ''}`}
                 onClick={() => setPasoActual(idx)}
                 aria-label={`Ir al paso ${idx + 1}`}
+                aria-pressed={idx === pasoActual}
               />
             ))}
           </div>
@@ -287,7 +291,7 @@ export default function VisualizadorAtpSintasa() {
             <div className={styles.stepNumero} style={{ backgroundColor: PASO_TEXTOS[pasoActual].color }}>
               {pasoActual + 1} / 4
             </div>
-            <div className={styles.stepIcono}>{PASO_TEXTOS[pasoActual].icono}</div>
+            <div className={styles.stepIcono} aria-hidden="true">{PASO_TEXTOS[pasoActual].icono}</div>
             <h3 className={styles.stepTitulo}>{PASO_TEXTOS[pasoActual].titulo}</h3>
             <p className={styles.stepDescripcion}>{PASO_TEXTOS[pasoActual].descripcion}</p>
             <div className={styles.stepDetalle}>
@@ -297,6 +301,7 @@ export default function VisualizadorAtpSintasa() {
 
           <div className={styles.stepControls}>
             <button
+              type="button"
               className={styles.btnStep}
               onClick={() => setPasoActual(prev => Math.max(0, prev - 1))}
               disabled={pasoActual === 0}
@@ -305,6 +310,7 @@ export default function VisualizadorAtpSintasa() {
             </button>
             <span className={styles.stepIndicador}>Paso {pasoActual + 1} de {PASO_TEXTOS.length}</span>
             <button
+              type="button"
               className={styles.btnStep}
               onClick={() => setPasoActual(prev => Math.min(PASO_TEXTOS.length - 1, prev + 1))}
               disabled={pasoActual === PASO_TEXTOS.length - 1}
@@ -357,21 +363,21 @@ export default function VisualizadorAtpSintasa() {
 
           <div className={styles.atpTarjetas}>
             <div className={styles.atpTarjeta}>
-              <span className={styles.atpTarjetaIcono}>🫀</span>
+              <span className={styles.atpTarjetaIcono} aria-hidden="true">🫀</span>
               <div className={styles.atpTarjetaInfo}>
                 <strong>Célula hepática en reposo</strong>
                 <span>~2.000 moléculas ATP/segundo</span>
               </div>
             </div>
             <div className={styles.atpTarjeta}>
-              <span className={styles.atpTarjetaIcono}>💪</span>
+              <span className={styles.atpTarjetaIcono} aria-hidden="true">💪</span>
               <div className={styles.atpTarjetaInfo}>
                 <strong>Célula muscular en ejercicio</strong>
                 <span>hasta 500.000 moléculas ATP/segundo</span>
               </div>
             </div>
             <div className={styles.atpTarjeta}>
-              <span className={styles.atpTarjetaIcono}>🧠</span>
+              <span className={styles.atpTarjetaIcono} aria-hidden="true">🧠</span>
               <div className={styles.atpTarjetaInfo}>
                 <strong>Neurona activa</strong>
                 <span>El cerebro usa ~20% del ATP total del cuerpo</span>
