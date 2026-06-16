@@ -690,6 +690,7 @@ export default function GuiaSetasPage() {
             />
             {busqueda && (
               <button
+                type="button"
                 className={styles.clearBtn}
                 onClick={() => setBusqueda('')}
                 aria-label="Limpiar búsqueda"
@@ -704,6 +705,7 @@ export default function GuiaSetasPage() {
             {COMESTIBILIDADES.map((c) => (
               <button
                 key={c}
+                type="button"
                 className={`${styles.filtroBtn} ${comestibilidad === c ? styles.filtroActivo : ''}`}
                 onClick={() => setComestibilidad(c)}
                 aria-pressed={comestibilidad === c}
@@ -718,6 +720,7 @@ export default function GuiaSetasPage() {
             {HABITATS.map((h) => (
               <button
                 key={h}
+                type="button"
                 className={`${styles.filtroBtn} ${habitat === h ? styles.filtroActivo : ''}`}
                 onClick={() => setHabitat(h)}
                 aria-pressed={habitat === h}

@@ -977,7 +977,7 @@ export default function GuiaRazasPerrosPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.heroTitle}>🐶 Guía de Razas de Perros</h1>
+          <h1 className={styles.heroTitle}><span aria-hidden="true">🐶</span> Guía de Razas de Perros</h1>
           <p className={styles.heroSubtitle}>
             40 razas con temperamento, energía, mantenimiento y consejos para elegir la raza ideal
           </p>
@@ -1001,16 +1001,20 @@ export default function GuiaRazasPerrosPage() {
               <span className={styles.filtroLabel}>Tamaño</span>
               <div className={styles.filtros} role="group" aria-label="Filtrar por tamaño">
                 <button
+                  type="button"
                   className={`${styles.filtroBtn} ${tamanoSelec === 'Todos' ? styles.filtroActivo : ''}`}
                   onClick={() => setTamanoSelec('Todos')}
+                  aria-pressed={tamanoSelec === 'Todos'}
                 >
                   Todos
                 </button>
                 {TAMANOS.map((t) => (
                   <button
                     key={t}
+                    type="button"
                     className={`${styles.filtroBtn} ${tamanoSelec === t ? styles.filtroActivo : ''}`}
                     onClick={() => setTamanoSelec(t)}
+                    aria-pressed={tamanoSelec === t}
                   >
                     {t}
                   </button>
@@ -1022,17 +1026,21 @@ export default function GuiaRazasPerrosPage() {
               <span className={styles.filtroLabel}>Nivel de energía</span>
               <div className={styles.filtros} role="group" aria-label="Filtrar por energía">
                 <button
+                  type="button"
                   className={`${styles.filtroBtn} ${energiaSelec === 'Todos' ? styles.filtroActivo : ''}`}
                   onClick={() => setEnergiaSelec('Todos')}
+                  aria-pressed={energiaSelec === 'Todos'}
                 >
                   Todos
                 </button>
                 {ENERGIAS.map((e) => (
                   <button
                     key={e}
+                    type="button"
                     className={`${styles.filtroBtn} ${energiaSelec === e ? styles.filtroActivo : ''}`}
                     onClick={() => setEnergiaSelec(e)}
                     style={energiaSelec === e ? {} : { borderColor: COLOR_ENERGIA[e] }}
+                    aria-pressed={energiaSelec === e}
                   >
                     {e}
                   </button>
@@ -1048,7 +1056,7 @@ export default function GuiaRazasPerrosPage() {
                   onChange={(e) => setSoloApartamento(e.target.checked)}
                   className={styles.toggleInput}
                 />
-                <span className={styles.toggleText}>🏠 Solo apto apartamento</span>
+                <span className={styles.toggleText}><span aria-hidden="true">🏠</span> Solo apto apartamento</span>
               </label>
               <label className={styles.toggleLabel}>
                 <input
@@ -1057,7 +1065,7 @@ export default function GuiaRazasPerrosPage() {
                   onChange={(e) => setSoloNinos(e.target.checked)}
                   className={styles.toggleInput}
                 />
-                <span className={styles.toggleText}>👦 Solo apto con niños</span>
+                <span className={styles.toggleText}><span aria-hidden="true">👦</span> Solo apto con niños</span>
               </label>
             </div>
 
@@ -1088,7 +1096,7 @@ export default function GuiaRazasPerrosPage() {
                   <div className={styles.cardTitulo}>
                     <h2 className={styles.nombre}>{raza.nombre}</h2>
                     <span className={styles.nombreIngles}>{raza.nombreIngles}</span>
-                    <span className={styles.origen}>🌍 {raza.origen}</span>
+                    <span className={styles.origen}><span aria-hidden="true">🌍</span> {raza.origen}</span>
                   </div>
                 </div>
 
@@ -1108,26 +1116,26 @@ export default function GuiaRazasPerrosPage() {
                   <span
                     className={`${styles.energiaBadge} ${getEnergiaClass(raza.energia, styles)}`}
                   >
-                    ⚡ {raza.energia}
+                    <span aria-hidden="true">⚡</span> {raza.energia}
                   </span>
                 </div>
 
                 {/* Iconos apto niños / apartamento */}
                 <div className={styles.aptoRow}>
                   <span className={raza.aptoApartamento ? styles.aptoSi : styles.aptoNo}>
-                    🏠 {raza.aptoApartamento ? 'Apto apartamento' : 'Necesita espacio'}
+                    <span aria-hidden="true">🏠</span> {raza.aptoApartamento ? 'Apto apartamento' : 'Necesita espacio'}
                   </span>
                   <span className={raza.aptoNinos ? styles.aptoSi : styles.aptoNo}>
-                    👦 {raza.aptoNinos ? 'Apto con niños' : 'Precaución con niños'}
+                    <span aria-hidden="true">👦</span> {raza.aptoNinos ? 'Apto con niños' : 'Precaución con niños'}
                   </span>
                 </div>
 
                 {/* Medidas */}
                 <div className={styles.medidasRow}>
-                  <span className={styles.medidaChip}>⚖️ {raza.pesoMin}–{raza.pesoMax} kg</span>
-                  <span className={styles.medidaChip}>📏 {raza.alturaMin}–{raza.alturaMax} cm</span>
-                  <span className={styles.medidaChip}>🦱 {raza.pelo}</span>
-                  <span className={styles.medidaChip}>❤️ {raza.esperanzaVida}</span>
+                  <span className={styles.medidaChip}><span aria-hidden="true">⚖️</span> {raza.pesoMin}–{raza.pesoMax} kg</span>
+                  <span className={styles.medidaChip}><span aria-hidden="true">📏</span> {raza.alturaMin}–{raza.alturaMax} cm</span>
+                  <span className={styles.medidaChip}><span aria-hidden="true">🦱</span> {raza.pelo}</span>
+                  <span className={styles.medidaChip}><span aria-hidden="true">❤️</span> {raza.esperanzaVida}</span>
                 </div>
 
                 {/* Descripción */}

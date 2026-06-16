@@ -576,27 +576,27 @@ export default function GuiaQuesos() {
             <div className={styles.filtroGrupo}>
               <span className={styles.filtroLabel}>País / Región:</span>
               <div className={styles.filtros} role="group" aria-label="Filtrar por país">
-                <button className={`${styles.filtroBtn} ${continente === 'Todos' ? styles.filtroActivo : ''}`} onClick={() => setContinente('Todos')}>Todos</button>
+                <button type="button" aria-pressed={continente === 'Todos'} className={`${styles.filtroBtn} ${continente === 'Todos' ? styles.filtroActivo : ''}`} onClick={() => setContinente('Todos')}>Todos</button>
                 {CONTINENTES.map((c) => (
-                  <button key={c} className={`${styles.filtroBtn} ${continente === c ? styles.filtroActivo : ''}`} onClick={() => setContinente(c)}>{c}</button>
+                  <button type="button" key={c} aria-pressed={continente === c} className={`${styles.filtroBtn} ${continente === c ? styles.filtroActivo : ''}`} onClick={() => setContinente(c)}>{c}</button>
                 ))}
               </div>
             </div>
             <div className={styles.filtroGrupo}>
               <span className={styles.filtroLabel}>Tipo de leche:</span>
               <div className={styles.filtros} role="group" aria-label="Filtrar por leche">
-                <button className={`${styles.filtroBtn} ${leche === 'Todas' ? styles.filtroActivo : ''}`} onClick={() => setLeche('Todas')}>Todas</button>
+                <button type="button" aria-pressed={leche === 'Todas'} className={`${styles.filtroBtn} ${leche === 'Todas' ? styles.filtroActivo : ''}`} onClick={() => setLeche('Todas')}>Todas</button>
                 {LECHES.map((l) => (
-                  <button key={l} className={`${styles.filtroBtn} ${leche === l ? styles.filtroActivo : ''}`} onClick={() => setLeche(l)}>{LECHE_EMOJI[l]} {l}</button>
+                  <button type="button" key={l} aria-pressed={leche === l} className={`${styles.filtroBtn} ${leche === l ? styles.filtroActivo : ''}`} onClick={() => setLeche(l)}><span aria-hidden="true">{LECHE_EMOJI[l]}</span> {l}</button>
                 ))}
               </div>
             </div>
             <div className={styles.filtroGrupo}>
               <span className={styles.filtroLabel}>Tipo de queso:</span>
               <div className={styles.filtros} role="group" aria-label="Filtrar por tipo">
-                <button className={`${styles.filtroBtn} ${tipo === 'Todos' ? styles.filtroActivo : ''}`} onClick={() => setTipo('Todos')}>Todos</button>
+                <button type="button" aria-pressed={tipo === 'Todos'} className={`${styles.filtroBtn} ${tipo === 'Todos' ? styles.filtroActivo : ''}`} onClick={() => setTipo('Todos')}>Todos</button>
                 {TIPOS.map((tp) => (
-                  <button key={tp} className={`${styles.filtroBtn} ${tipo === tp ? styles.filtroActivo : ''}`} onClick={() => setTipo(tp)}>{tp}</button>
+                  <button type="button" key={tp} aria-pressed={tipo === tp} className={`${styles.filtroBtn} ${tipo === tp ? styles.filtroActivo : ''}`} onClick={() => setTipo(tp)}>{tp}</button>
                 ))}
               </div>
             </div>
@@ -612,7 +612,7 @@ export default function GuiaQuesos() {
             <article key={q.nombre} className={styles.card}>
               <div className={styles.cardHeader}>
                 <span className={`${styles.tipoBadge} ${TIPO_CLASS[q.tipo]}`}>{q.tipo}</span>
-                <span className={styles.lecheBadge}>{LECHE_EMOJI[q.leche]} {q.leche}</span>
+                <span className={styles.lecheBadge}><span aria-hidden="true">{LECHE_EMOJI[q.leche]}</span> {q.leche}</span>
               </div>
 
               <div className={styles.cardTitulo}>
@@ -620,7 +620,7 @@ export default function GuiaQuesos() {
                 <span className={styles.paisRegion}>{q.pais} · {q.region}</span>
               </div>
 
-              <span className={styles.maduracionPill}>⏱️ {q.maduracion}</span>
+              <span className={styles.maduracionPill}><span aria-hidden="true">⏱️</span> {q.maduracion}</span>
 
               <p className={styles.descripcion}>{q.descripcion}</p>
 
@@ -647,7 +647,7 @@ export default function GuiaQuesos() {
 
               <div>
                 {q.denominacionOrigen !== 'Sin denominación' && q.denominacionOrigen !== 'Sin DOP' && !q.denominacionOrigen.startsWith('Sin ') ? (
-                  <span className={styles.doPill}>🏷️ {q.denominacionOrigen}</span>
+                  <span className={styles.doPill}><span aria-hidden="true">🏷️</span> {q.denominacionOrigen}</span>
                 ) : (
                   <span className={styles.sinDo}>{q.denominacionOrigen}</span>
                 )}
@@ -702,19 +702,19 @@ export default function GuiaQuesos() {
         <h3>¿Para qué ocasión?</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <h4>🍷 Tabla de quesos con vino</h4>
+            <h4><span aria-hidden="true">🍷</span> Tabla de quesos con vino</h4>
             <p>Combina 3–5 quesos de distinta intensidad: un fresco (Tetilla, Burrata), un semicurado (Mahón, Gouda), un curado (Manchego, Comté) y un azul (Cabrales, Gorgonzola). Añade membrillo, nueces y uva.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h4>🍕 Cocinar con queso</h4>
+            <h4><span aria-hidden="true">🍕</span> Cocinar con queso</h4>
             <p>Para fundir: Gruyère, Taleggio, Raclette, Scamorza. Para gratinar: Parmigiano, Grana. Para pizza: Mozzarella di Bufala. Para pasta: Pecorino Romano o Parmigiano rallado.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h4>🎉 Aperitivo informal</h4>
+            <h4><span aria-hidden="true">🎉</span> Aperitivo informal</h4>
             <p>Quesos de fácil acceso: Tetilla, Brie, Wensleydale, Havarti. Acompañamientos: membrillo, miel, frutos secos, embutido. Vino espumoso o cerveza artesana.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h4>🏆 Degustación de experto</h4>
+            <h4><span aria-hidden="true">🏆</span> Degustación de experto</h4>
             <p>Torta del Casar con cuajo vegetal, Cabrales de cueva, Roquefort AOP, Comté 36 meses, Époisses lavado. Solo o con Sauternes, Oporto o un licor de fruta.</p>
           </div>
         </div>
@@ -728,7 +728,7 @@ export default function GuiaQuesos() {
           <li className={styles.faqItem}>
             <strong>¿Se puede comer la corteza?</strong>
             <p>Depende del tipo. Las cortezas enmohecidas del Brie y Camembert son comestibles y sabrosas. Las cortezas lavadas (Taleggio, Époisses) también, aunque más intensas. Las cortezas duras del Parmigiano o Manchego no se comen directamente, aunque se añaden a caldos y sopas para dar sabor.</p>
-            <span className={styles.faqTip}>🧀 Las cortezas del Parmigiano hervidas en risotto o minestrone son un truco de la cocina italiana clásica.</span>
+            <span className={styles.faqTip}><span aria-hidden="true">🧀</span> Las cortezas del Parmigiano hervidas en risotto o minestrone son un truco de la cocina italiana clásica.</span>
           </li>
           <li className={styles.faqItem}>
             <strong>¿Cómo se conserva correctamente el queso?</strong>
@@ -741,7 +741,7 @@ export default function GuiaQuesos() {
           <li className={styles.faqItem}>
             <strong>¿Cómo marido un queso azul con vino?</strong>
             <p>La clave es el contraste dulce-salado: los azules piden vinos dulces (Sauternes con Roquefort, Oporto con Stilton, Lambrusco con Gorgonzola). También funcionan los vinos tánicos potentes que compiten en intensidad. Los vinos ligeros o blancos secos quedan aplastados por el azul.</p>
-            <span className={styles.faqTip}>💡 Miel sobre Cabrales es el maridaje por excelencia del norte de España. Prueba también con nueces.</span>
+            <span className={styles.faqTip}><span aria-hidden="true">💡</span> Miel sobre Cabrales es el maridaje por excelencia del norte de España. Prueba también con nueces.</span>
           </li>
           <li className={styles.faqItem}>
             <strong>¿Por qué unos quesos huelen más que otros?</strong>

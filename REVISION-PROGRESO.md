@@ -1025,10 +1025,10 @@
 | [x] | Guía de Infusiones | `/guia-infusiones/` | salud, cultura |
 | [x] | Guía de Insectos del Jardín | `/guia-insectos-jardin/` | salud, cultura |
 | [x] | Guía de Plantas de Interior | `/guia-plantas-interior/` | salud, cultura |
-| [ ] | Guía de Quesos | `/guia-quesos/` | salud, cultura |
-| [ ] | Guía de Razas de Gatos | `/guia-razas-gatos/` | salud, cultura |
-| [ ] | Guía de Razas de Perros | `/guia-razas-perros/` | salud, cultura |
-| [ ] | Guía de Setas | `/guia-setas/` | salud, cultura |
+| [x] | Guía de Quesos | `/guia-quesos/` | salud, cultura |
+| [x] | Guía de Razas de Gatos | `/guia-razas-gatos/` | salud, cultura |
+| [x] | Guía de Razas de Perros | `/guia-razas-perros/` | salud, cultura |
+| [x] | Guía de Setas | `/guia-setas/` | salud, cultura |
 | [ ] | Guía de Superalimentos | `/guia-superalimentos/` | salud, cultura |
 | [ ] | Guía del Aceite de Oliva | `/guia-aceite-oliva/` | salud, cultura |
 | [ ] | Guía del Café | `/guia-cafe/` | salud, cultura |
