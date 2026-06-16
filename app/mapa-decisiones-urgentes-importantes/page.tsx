@@ -242,16 +242,16 @@ export default function MapaDecisionesUrgentesImportantesPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🎯 Mapa de Decisiones: Urgente vs Importante</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🎯</span> Mapa de Decisiones: Urgente vs Importante</h1>
           <p className={styles.subtitle}>
             ¿Vives apagando fuegos o construyendo futuro?
             <br />
             Basado en la Matriz Eisenhower adaptada
           </p>
           <div className={styles.badges}>
-            <span className={styles.badge}>🕐 3 minutos</span>
-            <span className={styles.badge}>📊 10 preguntas</span>
-            <span className={styles.badge}>🔒 Sin registro</span>
+            <span className={styles.badge}><span aria-hidden="true">🕐</span> 3 minutos</span>
+            <span className={styles.badge}><span aria-hidden="true">📊</span> 10 preguntas</span>
+            <span className={styles.badge}><span aria-hidden="true">🔒</span> Sin registro</span>
           </div>
         </header>
 
@@ -298,6 +298,7 @@ export default function MapaDecisionesUrgentesImportantesPage() {
                 {ESCALA.map((opcion) => (
                   <button
                     key={opcion.valor}
+                    type="button"
                     className={`${styles.scaleButton} ${respuestas[pregunta.id] === opcion.valor ? styles.scaleButtonActive : ''}`}
                     onClick={() => handleRespuesta(pregunta.id, opcion.valor)}
                     role="radio"
@@ -317,6 +318,7 @@ export default function MapaDecisionesUrgentesImportantesPage() {
           </div>
 
           <button
+            type="button"
             className={styles.btnPrimary}
             onClick={calcularResultado}
             disabled={!todasRespondidas}
@@ -334,24 +336,24 @@ export default function MapaDecisionesUrgentesImportantesPage() {
             {/* Mapa 2D */}
             <div className={styles.mapContainer}>
               <div className={styles.mapLabels}>
-                <span className={styles.mapLabelTop}>🎯 Alta visión estratégica</span>
+                <span className={styles.mapLabelTop}><span aria-hidden="true">🎯</span> Alta visión estratégica</span>
                 <span className={styles.mapLabelBottom}>Baja visión estratégica</span>
                 <span className={styles.mapLabelLeft}>Bajo filtro de urgencia</span>
-                <span className={styles.mapLabelRight}>🛡️ Alto filtro de urgencia</span>
+                <span className={styles.mapLabelRight}><span aria-hidden="true">🛡️</span> Alto filtro de urgencia</span>
               </div>
               <div className={styles.map}>
                 {/* Cuadrantes */}
                 <div className={`${styles.quadrant} ${styles.quadrantTL}`}>
-                  <span>🎯 Visionario sin Escudo</span>
+                  <span><span aria-hidden="true">🎯</span> Visionario sin Escudo</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantTR}`}>
-                  <span>⚡ Estratega con Control</span>
+                  <span><span aria-hidden="true">⚡</span> Estratega con Control</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBL}`}>
-                  <span>🌀 Modo Supervivencia</span>
+                  <span><span aria-hidden="true">🌀</span> Modo Supervivencia</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
-                  <span>🔥 Apagafuegos Eficiente</span>
+                  <span><span aria-hidden="true">🔥</span> Apagafuegos Eficiente</span>
                 </div>
                 {/* Líneas de umbral */}
                 <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
@@ -373,7 +375,7 @@ export default function MapaDecisionesUrgentesImportantesPage() {
             <div className={styles.scoresContainer}>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>🎯 Visión estratégica</span>
+                  <span><span aria-hidden="true">🎯</span> Visión estratégica</span>
                   <span className={styles.scoreValue}>{puntuacionVision}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -385,7 +387,7 @@ export default function MapaDecisionesUrgentesImportantesPage() {
               </div>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>🛡️ Filtro de urgencia</span>
+                  <span><span aria-hidden="true">🛡️</span> Filtro de urgencia</span>
                   <span className={styles.scoreValue}>{puntuacionFiltro}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -407,7 +409,7 @@ export default function MapaDecisionesUrgentesImportantesPage() {
 
               <div className={styles.profileColumns}>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>✅ Fortalezas</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">✅</span> Fortalezas</h4>
                   <ul className={styles.profileList}>
                     {perfil.fortalezas.map((f, i) => (
                       <li key={i}>{f}</li>
@@ -415,7 +417,7 @@ export default function MapaDecisionesUrgentesImportantesPage() {
                   </ul>
                 </div>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>⚠️ Riesgos</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">⚠️</span> Riesgos</h4>
                   <ul className={styles.profileList}>
                     {perfil.riesgos.map((r, i) => (
                       <li key={i}>{r}</li>
@@ -425,7 +427,7 @@ export default function MapaDecisionesUrgentesImportantesPage() {
               </div>
 
               <div className={styles.actionsSection}>
-                <h4 className={styles.actionsTitle}>🎯 Acciones sugeridas</h4>
+                <h4 className={styles.actionsTitle}><span aria-hidden="true">🎯</span> Acciones sugeridas</h4>
                 <ol className={styles.actionsList}>
                   {perfil.acciones.map((a, i) => (
                     <li key={i}>{a}</li>
@@ -434,7 +436,7 @@ export default function MapaDecisionesUrgentesImportantesPage() {
               </div>
             </div>
 
-            <button className={styles.btnSecondary} onClick={reiniciar}>
+            <button type="button" className={styles.btnSecondary} onClick={reiniciar}>
               Repetir diagnóstico
             </button>
           </section>

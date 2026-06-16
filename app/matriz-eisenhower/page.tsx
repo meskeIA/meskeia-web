@@ -152,7 +152,7 @@ export default function MatrizEisenhowerPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>📊</span>
+        <span className={styles.heroIcon} aria-hidden="true">📊</span>
         <h1 className={styles.title}>Matriz Eisenhower</h1>
         <p className={styles.subtitle}>
           Prioriza tus tareas clasificándolas por urgencia e importancia.
@@ -192,7 +192,7 @@ export default function MatrizEisenhowerPage() {
             <option value="delegar">👥 Delegar (Urgente)</option>
             <option value="eliminar">🗑️ Eliminar (Ninguno)</option>
           </select>
-          <button onClick={addTask} className={styles.addButton} aria-label="Añadir tarea">
+          <button type="button" onClick={addTask} className={styles.addButton} aria-label="Añadir tarea">
             Añadir
           </button>
         </div>
@@ -206,18 +206,18 @@ export default function MatrizEisenhowerPage() {
           </span>
           <span className={styles.statDivider}>|</span>
           <span className={styles.statItem} style={{ color: QUADRANTS.hacer.color }}>
-            🔥 {tasksByQuadrant.hacer}
+            <span aria-hidden="true">🔥</span> {tasksByQuadrant.hacer}
           </span>
           <span className={styles.statItem} style={{ color: QUADRANTS.planificar.color }}>
-            📅 {tasksByQuadrant.planificar}
+            <span aria-hidden="true">📅</span> {tasksByQuadrant.planificar}
           </span>
           <span className={styles.statItem} style={{ color: QUADRANTS.delegar.color }}>
-            👥 {tasksByQuadrant.delegar}
+            <span aria-hidden="true">👥</span> {tasksByQuadrant.delegar}
           </span>
           <span className={styles.statItem} style={{ color: QUADRANTS.eliminar.color }}>
-            🗑️ {tasksByQuadrant.eliminar}
+            <span aria-hidden="true">🗑️</span> {tasksByQuadrant.eliminar}
           </span>
-          <button onClick={clearAll} className={styles.clearButton} aria-label="Limpiar todo">
+          <button type="button" onClick={clearAll} className={styles.clearButton} aria-label="Limpiar todo">
             Limpiar todo
           </button>
         </div>
@@ -250,7 +250,7 @@ export default function MatrizEisenhowerPage() {
               style={{ '--quadrant-color': QUADRANTS[quadrant].color } as React.CSSProperties}
             >
               <div className={styles.quadrantHeader}>
-                <span className={styles.quadrantIcon}>{QUADRANTS[quadrant].icon}</span>
+                <span className={styles.quadrantIcon} aria-hidden="true">{QUADRANTS[quadrant].icon}</span>
                 <div>
                   <h3 className={styles.quadrantTitle}>{QUADRANTS[quadrant].title}</h3>
                   <span className={styles.quadrantSubtitle}>{QUADRANTS[quadrant].subtitle}</span>
@@ -269,6 +269,7 @@ export default function MatrizEisenhowerPage() {
                   >
                     <span className={styles.taskText}>{task.text}</span>
                     <button
+                      type="button"
                       onClick={() => deleteTask(task.id)}
                       className={styles.deleteTaskButton}
                       aria-label={`Eliminar tarea: ${task.text}`}
@@ -305,28 +306,28 @@ export default function MatrizEisenhowerPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🔥 Cuadrante 1: Hacer</h4>
+              <h4><span aria-hidden="true">🔥</span> Cuadrante 1: Hacer</h4>
               <p><strong>Urgente + Importante</strong></p>
               <p>Crisis, plazos inminentes, problemas que requieren atención inmediata.
               Estas tareas no pueden esperar y tienen consecuencias significativas.</p>
               <p><em>Ejemplos: Entrega de proyecto mañana, cliente enfadado, avería crítica.</em></p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📅 Cuadrante 2: Planificar</h4>
+              <h4><span aria-hidden="true">📅</span> Cuadrante 2: Planificar</h4>
               <p><strong>No Urgente + Importante</strong></p>
               <p>El cuadrante más valioso. Aquí están las actividades que te hacen crecer:
               planificación, formación, relaciones, prevención.</p>
               <p><em>Ejemplos: Aprender una habilidad, ejercicio, planificar el trimestre.</em></p>
             </div>
             <div className={styles.contentCard}>
-              <h4>👥 Cuadrante 3: Delegar</h4>
+              <h4><span aria-hidden="true">👥</span> Cuadrante 3: Delegar</h4>
               <p><strong>Urgente + No Importante</strong></p>
               <p>Tareas que parecen urgentes pero no contribuyen a tus objetivos.
               Suelen ser urgencias de otros. Delega si puedes.</p>
               <p><em>Ejemplos: Algunas llamadas, emails &quot;urgentes&quot;, reuniones innecesarias.</em></p>
             </div>
             <div className={styles.contentCard}>
-              <h4>🗑️ Cuadrante 4: Eliminar</h4>
+              <h4><span aria-hidden="true">🗑️</span> Cuadrante 4: Eliminar</h4>
               <p><strong>No Urgente + No Importante</strong></p>
               <p>Actividades que no aportan valor. Distracciones y pérdidas de tiempo
               que deberías minimizar o eliminar.</p>
@@ -346,7 +347,7 @@ export default function MatrizEisenhowerPage() {
 
         {/* ===== SECCIÓN 1: TABLA COMPARATIVA ===== */}
         <section className={styles.eduComparativaSection}>
-          <h3>⚖️ Comparativa de los 4 Cuadrantes</h3>
+          <h3><span aria-hidden="true">⚖️</span> Comparativa de los 4 Cuadrantes</h3>
           <p className={styles.eduComparativaSubtitle}>Guía rápida para clasificar correctamente cada tarea</p>
           <div className={styles.eduTablaWrapper}>
             <table className={styles.eduTablaComparativa}>
@@ -362,7 +363,7 @@ export default function MatrizEisenhowerPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>🔥 Hacer (C1)</td>
+                  <td><span aria-hidden="true">🔥</span> Hacer (C1)</td>
                   <td>Alta</td>
                   <td>Alta</td>
                   <td>20-25%</td>
@@ -370,7 +371,7 @@ export default function MatrizEisenhowerPage() {
                   <td>Entrega proyecto en 2h, avería crítica en producción</td>
                 </tr>
                 <tr>
-                  <td>📅 Planificar (C2)</td>
+                  <td><span aria-hidden="true">📅</span> Planificar (C2)</td>
                   <td>Baja</td>
                   <td>Alta</td>
                   <td>60-65%</td>
@@ -378,7 +379,7 @@ export default function MatrizEisenhowerPage() {
                   <td>Formación, estrategia, ejercicio físico, relaciones clave</td>
                 </tr>
                 <tr>
-                  <td>👥 Delegar (C3)</td>
+                  <td><span aria-hidden="true">👥</span> Delegar (C3)</td>
                   <td>Alta</td>
                   <td>Baja</td>
                   <td>10-15%</td>
@@ -386,7 +387,7 @@ export default function MatrizEisenhowerPage() {
                   <td>Reunión sin valor para ti, tarea rutinaria urgente de otro</td>
                 </tr>
                 <tr>
-                  <td>🗑️ Eliminar (C4)</td>
+                  <td><span aria-hidden="true">🗑️</span> Eliminar (C4)</td>
                   <td>Baja</td>
                   <td>Baja</td>
                   <td>Mínimo (0-5%)</td>
@@ -400,7 +401,7 @@ export default function MatrizEisenhowerPage() {
 
         {/* ===== SECCIÓN 2: CASOS DE USO POR PERFIL ===== */}
         <section className={styles.eduEscenariosSection}>
-          <h3>💼 Casos de Uso por Perfil</h3>
+          <h3><span aria-hidden="true">💼</span> Casos de Uso por Perfil</h3>
           <p className={styles.eduEscenariosSubtitle}>Cómo aplica la Matriz Eisenhower según tu rol</p>
           <div className={styles.eduEscenariosGrid}>
             <div className={styles.eduEscenarioCard}>
@@ -468,7 +469,7 @@ export default function MatrizEisenhowerPage() {
 
         {/* ===== SECCIÓN 3: FAQ AMPLIADO ===== */}
         <section className={styles.eduFaqSection}>
-          <h3>❓ Preguntas Frecuentes sobre la Matriz Eisenhower</h3>
+          <h3><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre la Matriz Eisenhower</h3>
           <p className={styles.eduFaqSubtitle}>Resuelve las dudas más comunes al implementar este método</p>
           <div className={styles.eduFaqList}>
             <div className={styles.eduFaqItem}>
@@ -508,7 +509,7 @@ export default function MatrizEisenhowerPage() {
 
         {/* ===== SECCIÓN 4: GUÍA PASO A PASO ===== */}
         <section className={styles.eduStepSection}>
-          <h3>📋 Guía: Implementa la Matriz Eisenhower</h3>
+          <h3><span aria-hidden="true">📋</span> Guía: Implementa la Matriz Eisenhower</h3>
           <p className={styles.eduStepSubtitle}>6 pasos para pasar del caos al control de tu tiempo</p>
           <div className={styles.eduStepGuide}>
             <div className={styles.eduStepItem}>
@@ -558,7 +559,7 @@ export default function MatrizEisenhowerPage() {
 
         {/* ===== SECCIÓN 5: MEJORES PRÁCTICAS ===== */}
         <section className={styles.eduTipsSection}>
-          <h3>✅ 6 Hábitos del Gestor de Tiempo Eficaz</h3>
+          <h3><span aria-hidden="true">✅</span> 6 Hábitos del Gestor de Tiempo Eficaz</h3>
           <div className={styles.eduTipsGrid}>
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcon} aria-hidden="true">🧠</span>

@@ -328,7 +328,7 @@ export default function PlanificadorBodaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>💒 Planificador de Boda</h1>
+        <h1 className={styles.title}><span aria-hidden="true">💒</span> Planificador de Boda</h1>
         <p className={styles.subtitle}>
           Tu wedding planner digital: checklist, presupuesto y timeline
         </p>
@@ -353,7 +353,7 @@ export default function PlanificadorBodaPage() {
       {/* Fecha de boda */}
       <div className={styles.dateSection}>
         <label className={styles.dateLabel}>
-          📅 Fecha de la boda:
+          <span aria-hidden="true">📅</span> Fecha de la boda:
           <input
             type="date"
             value={weddingDate}
@@ -366,22 +366,28 @@ export default function PlanificadorBodaPage() {
       {/* Tabs de navegación */}
       <div className={styles.tabs}>
         <button
+          type="button"
           className={`${styles.tab} ${activeTab === 'checklist' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('checklist')}
+          aria-pressed={activeTab === 'checklist'}
         >
-          ✅ Checklist
+          <span aria-hidden="true">✅</span> Checklist
         </button>
         <button
+          type="button"
           className={`${styles.tab} ${activeTab === 'presupuesto' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('presupuesto')}
+          aria-pressed={activeTab === 'presupuesto'}
         >
-          💰 Presupuesto
+          <span aria-hidden="true">💰</span> Presupuesto
         </button>
         <button
+          type="button"
           className={`${styles.tab} ${activeTab === 'timeline' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('timeline')}
+          aria-pressed={activeTab === 'timeline'}
         >
-          ⏰ Timeline
+          <span aria-hidden="true">⏰</span> Timeline
         </button>
       </div>
 
@@ -409,38 +415,50 @@ export default function PlanificadorBodaPage() {
             <div className={styles.filters}>
               <div className={styles.monthsFilter}>
                 <button
+                  type="button"
                   className={`${styles.filterBtn} ${monthsFilter === 'all' ? styles.activeFilter : ''}`}
                   onClick={() => setMonthsFilter('all')}
+                  aria-pressed={monthsFilter === 'all'}
                 >
                   Todas
                 </button>
                 <button
+                  type="button"
                   className={`${styles.filterBtn} ${monthsFilter === '12-6' ? styles.activeFilter : ''}`}
                   onClick={() => setMonthsFilter('12-6')}
+                  aria-pressed={monthsFilter === '12-6'}
                 >
                   12-6 meses
                 </button>
                 <button
+                  type="button"
                   className={`${styles.filterBtn} ${monthsFilter === '6-3' ? styles.activeFilter : ''}`}
                   onClick={() => setMonthsFilter('6-3')}
+                  aria-pressed={monthsFilter === '6-3'}
                 >
                   6-3 meses
                 </button>
                 <button
+                  type="button"
                   className={`${styles.filterBtn} ${monthsFilter === '3-1' ? styles.activeFilter : ''}`}
                   onClick={() => setMonthsFilter('3-1')}
+                  aria-pressed={monthsFilter === '3-1'}
                 >
                   3-1 mes
                 </button>
                 <button
+                  type="button"
                   className={`${styles.filterBtn} ${monthsFilter === 'ultimo-mes' ? styles.activeFilter : ''}`}
                   onClick={() => setMonthsFilter('ultimo-mes')}
+                  aria-pressed={monthsFilter === 'ultimo-mes'}
                 >
                   Último mes
                 </button>
                 <button
+                  type="button"
                   className={`${styles.filterBtn} ${monthsFilter === 'dia-d' ? styles.activeFilter : ''}`}
                   onClick={() => setMonthsFilter('dia-d')}
+                  aria-pressed={monthsFilter === 'dia-d'}
                 >
                   Día D
                 </button>
@@ -506,6 +524,7 @@ export default function PlanificadorBodaPage() {
                   helperText="Estimación de invitados"
                 />
                 <button
+                  type="button"
                   onClick={initializeBudget}
                   className={styles.btnPrimary}
                   disabled={!totalBudget}
@@ -669,6 +688,7 @@ export default function PlanificadorBodaPage() {
             </div>
 
             <button
+              type="button"
               onClick={() => setTimeline([...timeline, {
                 id: `t${Date.now()}`,
                 time: '00:00',
@@ -686,8 +706,8 @@ export default function PlanificadorBodaPage() {
 
       {/* Botón resetear */}
       <div className={styles.resetSection}>
-        <button onClick={resetAll} className={styles.btnDanger}>
-          🗑️ Borrar todos los datos
+        <button type="button" onClick={resetAll} className={styles.btnDanger}>
+          <span aria-hidden="true">🗑️</span> Borrar todos los datos
         </button>
       </div>
 

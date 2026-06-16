@@ -944,10 +944,10 @@
 | [x] | Limpiador de Texto | `/limpiador-texto/` | productividad |
 | [x] | Lista de Equipaje | `/lista-equipaje/` | productividad, viajes |
 | [x] | Mapa de Compromisos vs Capacidad | `/mapa-compromisos-capacidad/` | productividad, freelance |
-| [ ] | Mapa de Decisiones Urgentes vs Importantes | `/mapa-decisiones-urgentes-importantes/` | productividad, freelance |
-| [ ] | Matriz Eisenhower | `/matriz-eisenhower/` | productividad, freelance |
-| [ ] | Planificador de Boda | `/planificador-boda/` | productividad, inmobiliaria |
-| [ ] | Planificador de Turnos | `/planificador-turnos/` | productividad |
+| [x] | Mapa de Decisiones Urgentes vs Importantes | `/mapa-decisiones-urgentes-importantes/` | productividad, freelance |
+| [x] | Matriz Eisenhower | `/matriz-eisenhower/` | productividad, freelance |
+| [x] | Planificador de Boda | `/planificador-boda/` | productividad, inmobiliaria |
+| [x] | Planificador de Turnos | `/planificador-turnos/` | productividad |
 | [ ] | Selector de Método de Productividad | `/selector-herramienta-productividad/` | productividad, freelance |
 | [ ] | Selector de Modalidad de Trabajo | `/selector-modalidad-trabajo/` | productividad, freelance |
 | [ ] | Selector de Vacaciones | `/selector-vacaciones/` | productividad, salud |

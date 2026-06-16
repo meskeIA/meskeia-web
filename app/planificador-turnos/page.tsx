@@ -457,22 +457,28 @@ export default function PlanificadorTurnosPage() {
       {/* Tabs */}
       <div className={styles.tabs}>
         <button
+          type="button"
           className={`${styles.tab} ${activeTab === 'empleados' ? styles.tabActive : ''}`}
           onClick={() => setActiveTab('empleados')}
+          aria-pressed={activeTab === 'empleados'}
         >
-          👥 Empleados ({empleados.length})
+          <span aria-hidden="true">👥</span> Empleados ({empleados.length})
         </button>
         <button
+          type="button"
           className={`${styles.tab} ${activeTab === 'franjas' ? styles.tabActive : ''}`}
           onClick={() => setActiveTab('franjas')}
+          aria-pressed={activeTab === 'franjas'}
         >
-          ⏰ Franjas ({franjas.length})
+          <span aria-hidden="true">⏰</span> Franjas ({franjas.length})
         </button>
         <button
+          type="button"
           className={`${styles.tab} ${activeTab === 'planificacion' ? styles.tabActive : ''}`}
           onClick={() => setActiveTab('planificacion')}
+          aria-pressed={activeTab === 'planificacion'}
         >
-          📋 Planificación
+          <span aria-hidden="true">📋</span> Planificación
         </button>
       </div>
 
@@ -482,6 +488,7 @@ export default function PlanificadorTurnosPage() {
           <div className={styles.sectionHeader}>
             <h2>Gestión de Empleados</h2>
             <button
+              type="button"
               className={styles.btnPrimary}
               onClick={() => {
                 setEditandoEmpleado(null);
@@ -520,10 +527,11 @@ export default function PlanificadorTurnosPage() {
                 </div>
               </div>
               <div className={styles.formActions}>
-                <button className={styles.btnSecondary} onClick={() => setMostrarFormEmpleado(false)}>
+                <button type="button" className={styles.btnSecondary} onClick={() => setMostrarFormEmpleado(false)}>
                   Cancelar
                 </button>
                 <button
+                  type="button"
                   className={styles.btnPrimary}
                   onClick={editandoEmpleado ? actualizarEmpleado : agregarEmpleado}
                 >
@@ -560,6 +568,7 @@ export default function PlanificadorTurnosPage() {
                     </div>
                     <div className={styles.empleadoActions}>
                       <button
+                        type="button"
                         className={styles.btnIcon}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -572,6 +581,7 @@ export default function PlanificadorTurnosPage() {
                         ✏️
                       </button>
                       <button
+                        type="button"
                         className={styles.btnIcon}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -637,6 +647,7 @@ export default function PlanificadorTurnosPage() {
           <div className={styles.sectionHeader}>
             <h2>Franjas Horarias</h2>
             <button
+              type="button"
               className={styles.btnPrimary}
               onClick={() => {
                 setEditandoFranja(null);
@@ -682,10 +693,11 @@ export default function PlanificadorTurnosPage() {
                 </div>
               </div>
               <div className={styles.formActions}>
-                <button className={styles.btnSecondary} onClick={() => setMostrarFormFranja(false)}>
+                <button type="button" className={styles.btnSecondary} onClick={() => setMostrarFormFranja(false)}>
                   Cancelar
                 </button>
                 <button
+                  type="button"
                   className={styles.btnPrimary}
                   onClick={editandoFranja ? actualizarFranja : agregarFranja}
                 >
@@ -706,6 +718,7 @@ export default function PlanificadorTurnosPage() {
                 </div>
                 <div className={styles.franjaActions}>
                   <button
+                    type="button"
                     className={styles.btnIcon}
                     onClick={() => {
                       setEditandoFranja(franja);
@@ -721,6 +734,7 @@ export default function PlanificadorTurnosPage() {
                     ✏️
                   </button>
                   <button
+                    type="button"
                     className={styles.btnIcon}
                     onClick={() => eliminarFranja(franja.id)}
                     title="Eliminar"
@@ -740,6 +754,7 @@ export default function PlanificadorTurnosPage() {
           <div className={styles.planificacionHeader}>
             <div className={styles.semanaNav}>
               <button
+                type="button"
                 className={styles.btnNav}
                 onClick={() => setSemanaActual(cambiarSemana(semanaActual, -1))}
               >
@@ -749,6 +764,7 @@ export default function PlanificadorTurnosPage() {
                 {formatearFechaSemana(semanaActual)}
               </span>
               <button
+                type="button"
                 className={styles.btnNav}
                 onClick={() => setSemanaActual(cambiarSemana(semanaActual, 1))}
               >
@@ -756,11 +772,11 @@ export default function PlanificadorTurnosPage() {
               </button>
             </div>
             <div className={styles.planificacionActions}>
-              <button className={styles.btnSecondary} onClick={limpiarSemana}>
-                🗑️ Limpiar
+              <button type="button" className={styles.btnSecondary} onClick={limpiarSemana}>
+                <span aria-hidden="true">🗑️</span> Limpiar
               </button>
-              <button className={styles.btnPrimary} onClick={generarAutomatico}>
-                ⚡ Generar automático
+              <button type="button" className={styles.btnPrimary} onClick={generarAutomatico}>
+                <span aria-hidden="true">⚡</span> Generar automático
               </button>
             </div>
           </div>
@@ -834,6 +850,7 @@ export default function PlanificadorTurnosPage() {
                                     <>
                                       {empleadosDisponibles(franja.id, diaIdx).map(emp => (
                                         <button
+                                          type="button"
                                           key={emp.id}
                                           className={`${styles.dropdownItem} ${asig?.empleadoId === emp.id ? styles.dropdownItemActive : ''}`}
                                           onClick={(e) => {
@@ -852,6 +869,7 @@ export default function PlanificadorTurnosPage() {
                                   )}
                                   {asig?.empleadoId && (
                                     <button
+                                      type="button"
                                       className={`${styles.dropdownItem} ${styles.dropdownItemRemove}`}
                                       onClick={(e) => {
                                         e.stopPropagation();
