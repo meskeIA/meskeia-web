@@ -386,7 +386,7 @@ export default function SelectorTarifaElectricaPage() {
               <div className={styles.barRow}>
                 <div className={styles.barLabel}>
                   <span>
-                    🏛️ PVPC (regulada)
+                    <span aria-hidden="true">🏛️</span> PVPC (regulada)
                     {resultado.costeAnualPvpc < resultado.costeAnualLibre && (
                       <span className={styles.winnerTag}>Mas barata</span>
                     )}
@@ -410,7 +410,7 @@ export default function SelectorTarifaElectricaPage() {
               <div className={styles.barRow}>
                 <div className={styles.barLabel}>
                   <span>
-                    🏪 Mercado libre
+                    <span aria-hidden="true">🏪</span> Mercado libre
                     {resultado.costeAnualLibre < resultado.costeAnualPvpc && (
                       <span className={styles.winnerTag}>Mas barata</span>
                     )}
@@ -613,8 +613,8 @@ export default function SelectorTarifaElectricaPage() {
                 <thead>
                   <tr>
                     <th>Criterio</th>
-                    <th>🏛️ PVPC</th>
-                    <th>🏪 Mercado libre</th>
+                    <th><span aria-hidden="true">🏛️</span> PVPC</th>
+                    <th><span aria-hidden="true">🏪</span> Mercado libre</th>
                   </tr>
                 </thead>
                 <tbody>

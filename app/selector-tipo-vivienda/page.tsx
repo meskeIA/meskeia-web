@@ -360,7 +360,7 @@ export default function SelectorTipoVivienda() {
                   type="button"
                   className={`${styles.opcionBtn}${opcionSeleccionada === idx ? ` ${styles.selected}` : ''}`}
                   onClick={() => handleSeleccionarOpcion(idx)}
-                  aria-pressed={opcionSeleccionada === idx ? true : false}
+                  aria-pressed={opcionSeleccionada === idx}
                 >
                   {opcion.texto}
                 </button>

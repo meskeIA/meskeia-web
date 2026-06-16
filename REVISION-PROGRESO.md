@@ -832,11 +832,11 @@
 | [x] | Selector de Estilo de Decoración | `/selector-estilo-decoracion/` | inmobiliaria, productividad |
 | [x] | Selector de Seguro de Hogar | `/selector-seguro-hogar/` | inmobiliaria, finanzas |
 | [x] | Selector de Sistema de Calefacción | `/selector-calefaccion/` | inmobiliaria, finanzas, productividad |
-| [ ] | Selector de Tarifa Eléctrica | `/selector-tarifa-electrica/` | inmobiliaria, tecnicas |
-| [ ] | Selector de Tipo de Vivienda | `/selector-tipo-vivienda/` | inmobiliaria |
-| [ ] | Selector de Zona de Residencia | `/selector-zona-residencia/` | inmobiliaria, productividad |
+| [x] | Selector de Tarifa Eléctrica | `/selector-tarifa-electrica/` | inmobiliaria, tecnicas |
+| [x] | Selector de Tipo de Vivienda | `/selector-tipo-vivienda/` | inmobiliaria |
+| [x] | Selector de Zona de Residencia | `/selector-zona-residencia/` | inmobiliaria, productividad |
 | [x] | Simulador Bono Joven Alquiler | `/simulador-bono-joven-alquiler/` | inmobiliaria, finanzas, legal-fiscal |
-| [ ] | Simulador de Ahorro con Placas Solares | `/simulador-placas-solares/` | inmobiliaria, tecnicas, finanzas |
+| [x] | Simulador de Ahorro con Placas Solares | `/simulador-placas-solares/` | inmobiliaria, tecnicas, finanzas |
 | [ ] | Simulador de Subvenciones para Rehabilitación Energética | `/simulador-subvenciones-rehabilitacion/` | inmobiliaria, finanzas |
 | [ ] | Simulador Gastos Compra Nave Industrial | `/simulador-gastos-compraventa-nave-industrial/` | inmobiliaria, legal-fiscal, freelance |
 | [x] | Simulador Gastos Compraventa Garaje | `/simulador-gastos-compraventa-garaje/` | inmobiliaria, legal-fiscal |

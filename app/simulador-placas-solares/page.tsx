@@ -255,6 +255,7 @@ export default function SimuladorPlacasSolaresPage() {
                     className={`${styles.quickBtn} ${potenciaKwp === String(p) ? styles.quickBtnActive : ''}`}
                     onClick={() => setPotenciaKwp(String(p))}
                     aria-label={`Seleccionar ${p} kWp`}
+                    aria-pressed={potenciaKwp === String(p)}
                   >
                     {p} kWp
                   </button>
