@@ -495,10 +495,10 @@
 | [x] | Las Fuerzas Invisibles del Día a Día | `/visualizador-fuerzas-invisibles/` | estudiantes, cultura |
 | [x] | Lógica Proposicional: Tablas de Verdad, Karnaugh y Formas Normales | `/visualizador-logica-proposicional/` | estudiantes, tecnicas |
 | [x] | Máquinas Simples - Cómo Multiplicar tu Fuerza | `/visualizador-maquinas-simples/` | estudiantes, cultura |
-| [ ] | Matrices - El Lenguaje de las Transformaciones | `/visualizador-matrices/` | estudiantes, cultura |
-| [ ] | Mecánica Cuántica - Dualidad, Incertidumbre y Efecto Túnel | `/visualizador-mecanica-cuantica/` | estudiantes, cultura, tecnicas |
-| [ ] | Mecánica de Fluidos: Reynolds, Magnus y Bernoulli | `/visualizador-mecanica-fluidos/` | estudiantes, tecnicas |
-| [ ] | Mercado Inmobiliario: Burbuja, Precios y Accesibilidad | `/visualizador-mercado-inmobiliario/` | estudiantes, cultura, inmobiliaria, finanzas |
+| [x] | Matrices - El Lenguaje de las Transformaciones | `/visualizador-matrices/` | estudiantes, cultura |
+| [x] | Mecánica Cuántica - Dualidad, Incertidumbre y Efecto Túnel | `/visualizador-mecanica-cuantica/` | estudiantes, cultura, tecnicas |
+| [x] | Mecánica de Fluidos: Reynolds, Magnus y Bernoulli | `/visualizador-mecanica-fluidos/` | estudiantes, tecnicas |
+| [x] | Mercado Inmobiliario: Burbuja, Precios y Accesibilidad | `/visualizador-mercado-inmobiliario/` | estudiantes, cultura, inmobiliaria, finanzas |
 | [ ] | Metamorfosis - La Transformación más Radical | `/visualizador-metamorfosis/` | estudiantes, cultura |
 | [ ] | Minerales y Gemas - Escala de Mohs y Piedras Preciosas | `/visualizador-minerales-gemas/` | estudiantes, cultura |
 | [ ] | Mitosis y Meiosis - La Danza de los Cromosomas | `/visualizador-mitosis-meiosis/` | estudiantes, cultura |

@@ -636,7 +636,7 @@ export default function VisualizadorMecanikaFluidos() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.heroTitle}>💧 Mecánica de Fluidos</h1>
+        <h1 className={styles.heroTitle}><span aria-hidden="true">💧</span> Mecánica de Fluidos</h1>
         <p className={styles.heroSubtitle}>
           Reynolds, efecto Magnus, el mito de Bernoulli en la aviación y los números de Mach.
           Visualizaciones interactivas con animaciones SVG en tiempo real.
@@ -650,6 +650,7 @@ export default function VisualizadorMecanikaFluidos() {
         {TABS.map(tab => (
           <button
             key={tab.id}
+            type="button"
             onClick={() => setTabActivo(tab.id)}
             className={`${styles.tabBtn} ${tabActivo === tab.id ? styles.tabBtnActivo : ''}`}
             aria-pressed={tabActivo === tab.id}
@@ -672,7 +673,7 @@ export default function VisualizadorMecanikaFluidos() {
           {/* Presets */}
           <div className={styles.presetsGrid} role="group" aria-label="Ejemplos preconfigurados">
             {PRESETS_FLUIDO.map(p => (
-              <button key={p.nombre} onClick={() => aplicarPreset(p)} className={styles.presetBtn}>
+              <button key={p.nombre} type="button" onClick={() => aplicarPreset(p)} className={styles.presetBtn}>
                 <span aria-hidden="true">{p.emoji}</span>
                 <span>{p.nombre}</span>
                 <span className={styles.presetDesc}>{p.descripcion}</span>
@@ -772,6 +773,7 @@ export default function VisualizadorMecanikaFluidos() {
 
           <div className={styles.toggleRow}>
             <button
+              type="button"
               onClick={() => setBernoulli(s => ({ ...s, modoRealidad: !s.modoRealidad }))}
               className={`${styles.toggleBtn} ${bernoulli.modoRealidad ? styles.toggleBtnOn : ''}`}
               aria-pressed={bernoulli.modoRealidad}
@@ -921,19 +923,19 @@ export default function VisualizadorMecanikaFluidos() {
         <h3>Casos de Uso</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <h4>✈️ Ingeniería Aeronáutica</h4>
+            <h4><span aria-hidden="true">✈️</span> Ingeniería Aeronáutica</h4>
             <p>Diseñar perfiles alares que maximicen la sustentación aplicando Bernoulli. El número de Reynolds determina si el flujo sobre el ala es laminar (eficiente) o turbulento (drag).</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h4>⚽ Deportes con Efecto</h4>
+            <h4><span aria-hidden="true">⚽</span> Deportes con Efecto</h4>
             <p>Los jugadores profesionales dominan intuitivamente el efecto Magnus: un balón con efecto lateral curva su trayectoria porque la rotación crea diferencia de presión a ambos lados.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h4>🔧 Ingeniería de Tuberías</h4>
+            <h4><span aria-hidden="true">🔧</span> Ingeniería de Tuberías</h4>
             <p>El número de Reynolds ayuda a predecir pérdidas de carga en tuberías. Un flujo turbulento disipa más energía pero transfiere más calor: el diseño depende del balance.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h4>🚢 Diseño Naval</h4>
+            <h4><span aria-hidden="true">🚢</span> Diseño Naval</h4>
             <p>La cavitación es el mayor enemigo de las hélices de barco: las burbujas implosionan contra el metal causando erosión. Controlar la presión local evita cavitación.</p>
           </div>
         </div>
@@ -947,7 +949,7 @@ export default function VisualizadorMecanikaFluidos() {
           <div className={styles.faqItem}>
             <strong>¿Por qué curva un balón con efecto?</strong>
             <p>El efecto Magnus: la rotación del balón arrastra aire a su alrededor. En el lado donde el balón gira «con» el flujo, el aire acelera y la presión baja. En el otro lado sube. Esta diferencia de presión crea una fuerza lateral.</p>
-            <div className={styles.faqTip}>💡 La fuerza Magnus es F = ρ·ω×v·V, proporcional a densidad del aire, velocidad angular y velocidad lineal.</div>
+            <div className={styles.faqTip}><span aria-hidden="true">💡</span> La fuerza Magnus es F = ρ·ω×v·V, proporcional a densidad del aire, velocidad angular y velocidad lineal.</div>
           </div>
           <div className={styles.faqItem}>
             <strong>¿Qué es exactamente la cavitación?</strong>
@@ -1005,28 +1007,28 @@ export default function VisualizadorMecanikaFluidos() {
         <h3>Mejores Prácticas</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📐</span>
+            <span className={styles.tipIcon} aria-hidden="true">📐</span>
             <div>
               <strong>Usa unidades SI</strong>
               <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>Introduce velocidades en m/s, longitudes en m y viscosidades en Pa·s para obtener el Re correcto sin conversiones.</p>
             </div>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔢</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔢</span>
             <div>
               <strong>Re como clasificador</strong>
               <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>Re &lt; 2300 → laminar. Re &gt; 4000 → turbulento. 2300-4000 → zona de transición inestable.</p>
             </div>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🎯</span>
+            <span className={styles.tipIcon} aria-hidden="true">🎯</span>
             <div>
               <strong>Similitud dinámica</strong>
               <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>Dos flujos con el mismo Re se comportan igual aunque tengan escalas muy diferentes: principio clave para ensayos en túnel de viento.</p>
             </div>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>💧</span>
+            <span className={styles.tipIcon} aria-hidden="true">💧</span>
             <div>
               <strong>Presión vs velocidad</strong>
               <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>Bernoulli solo aplica a flujos estacionarios, incompresibles y sin fricción. Para flujos reales, añade términos de pérdida de carga.</p>
@@ -1036,7 +1038,7 @@ export default function VisualizadorMecanikaFluidos() {
 
         <div className={styles.warningBoxEdu}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             Errores Conceptuales Frecuentes
           </div>
           <ul className={styles.warningList}>

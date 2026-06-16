@@ -336,7 +336,7 @@ function OperacionMultiplicacion() {
         </div>
         <div className={styles.botonesSimulacion}>
           {pasos.map((_, i) => (
-            <button key={i} type="button" className={`${styles.btnPaso} ${pasoActivo === i ? styles.btnPasoActivo : ''}`} onClick={() => setPasoActivo(i)}>
+            <button key={i} type="button" className={`${styles.btnPaso} ${pasoActivo === i ? styles.btnPasoActivo : ''}`} onClick={() => setPasoActivo(i)} aria-pressed={pasoActivo === i}>
               Paso {i + 1}
             </button>
           ))}

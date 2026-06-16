@@ -295,6 +295,7 @@ export default function VisualizadorMercadoInmobiliario() {
 
           <div className={styles.botonesOfertaDemanda}>
             <button
+              type="button"
               className={`${styles.btnModo} ${modo === 'base' ? styles.btnModoActivo : ''}`}
               onClick={() => setModo('base')}
               aria-pressed={modo === 'base'}
@@ -302,6 +303,7 @@ export default function VisualizadorMercadoInmobiliario() {
               Equilibrio base
             </button>
             <button
+              type="button"
               className={`${styles.btnModo} ${modo === 'demanda' ? styles.btnModoActivo : ''}`}
               onClick={() => setModo('demanda')}
               aria-pressed={modo === 'demanda'}
@@ -309,6 +311,7 @@ export default function VisualizadorMercadoInmobiliario() {
               Aumentar demanda
             </button>
             <button
+              type="button"
               className={`${styles.btnModo} ${modo === 'oferta' ? styles.btnModoActivo : ''}`}
               onClick={() => setModo('oferta')}
               aria-pressed={modo === 'oferta'}

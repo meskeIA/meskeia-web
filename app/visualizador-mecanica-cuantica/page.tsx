@@ -174,16 +174,22 @@ export default function VisualizadorMecanicaCuantica() {
               />
               {/* Etiqueta de estado */}
               <div className={styles.estadoLabel} role="status" aria-live="polite">
-                {observando ? '🔬 Partícula localizada' : '〰️ Función de onda'}
+                {observando ? (
+                  <><span aria-hidden="true">🔬</span>{' '}Partícula localizada</>
+                ) : (
+                  <><span aria-hidden="true">〰️</span>{' '}Función de onda</>
+                )}
               </div>
             </div>
 
             <button
+              type="button"
               className={`${styles.btnPrimario} ${observando ? styles.btnObservando : ''}`}
               onClick={handleObservar}
               aria-pressed={observando}
             >
-              {observando ? '🔭 Dejar de observar' : '🔬 Observar el electrón'}
+              <span aria-hidden="true">{observando ? '🔭' : '🔬'}</span>{' '}
+              {observando ? 'Dejar de observar' : 'Observar el electrón'}
             </button>
           </div>
 
@@ -349,6 +355,7 @@ export default function VisualizadorMecanicaCuantica() {
             {EJEMPLOS_INCERTIDUMBRE.map((ej, idx) => (
               <button
                 key={ej.nombre}
+                type="button"
                 className={`${styles.ejemploCard} ${ejemploSeleccionado === idx ? styles.ejemploActivo : ''}`}
                 onClick={() => handleEjemplo(idx)}
                 aria-pressed={ejemploSeleccionado === idx}
@@ -443,17 +450,20 @@ export default function VisualizadorMecanicaCuantica() {
             <div className={styles.gatoBotones}>
               {estadoGato === 'superposicion' && (
                 <button
+                  type="button"
                   className={styles.btnPrimario}
                   onClick={handleAbrirCaja}
                   disabled={abriendo}
                   aria-busy={abriendo}
                 >
-                  {abriendo ? '⟳ Abriendo...' : '📦 Abrir la caja'}
+                  <span aria-hidden="true">{abriendo ? '⟳' : '📦'}</span>{' '}
+                  {abriendo ? 'Abriendo...' : 'Abrir la caja'}
                 </button>
               )}
               {estadoGato !== 'superposicion' && (
-                <button className={styles.btnSecundario} onClick={handleReiniciarGato}>
-                  🔄 Cerrar y reiniciar
+                <button type="button" className={styles.btnSecundario} onClick={handleReiniciarGato}>
+                  <span aria-hidden="true">🔄</span>{' '}
+                  Cerrar y reiniciar
                 </button>
               )}
             </div>
