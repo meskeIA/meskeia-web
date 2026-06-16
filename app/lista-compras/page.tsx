@@ -276,7 +276,7 @@ export default function ListaComprasPage() {
               />
             ) : (
               <h2 onClick={() => setModoEdicion(true)} className={styles.tituloLista}>
-                {nombreLista} <span className={styles.editIcon}>✏️</span>
+                {nombreLista} <span className={styles.editIcon} aria-hidden="true">✏️</span>
               </h2>
             )}
           </div>
@@ -336,7 +336,7 @@ export default function ListaComprasPage() {
                 ))}
               </select>
             </div>
-            <button onClick={agregarItem} className={styles.btnAgregar}>
+            <button type="button" onClick={agregarItem} className={styles.btnAgregar}>
               + Añadir
             </button>
           </div>
@@ -346,16 +346,20 @@ export default function ListaComprasPage() {
         <section className={styles.filtrosPanel}>
           <div className={styles.filtrosCategorias}>
             <button
+              type="button"
               className={`${styles.filtroBtn} ${filtroCategoria === 'todas' ? styles.activo : ''}`}
               onClick={() => setFiltroCategoria('todas')}
+              aria-pressed={filtroCategoria === 'todas'}
             >
               Todas
             </button>
             {categoriasSupermercado.map(cat => (
               <button
                 key={cat.id}
+                type="button"
                 className={`${styles.filtroBtn} ${filtroCategoria === cat.id ? styles.activo : ''}`}
                 onClick={() => setFiltroCategoria(cat.id)}
+                aria-pressed={filtroCategoria === cat.id}
               >
                 {cat.emoji}
               </button>
@@ -394,8 +398,10 @@ export default function ListaComprasPage() {
                       className={`${styles.itemRow} ${item.completado ? styles.completado : ''}`}
                     >
                       <button
+                        type="button"
                         className={styles.checkBtn}
                         onClick={() => toggleCompletado(item.id)}
+                        aria-pressed={item.completado}
                       >
                         {item.completado ? '✓' : '○'}
                       </button>
@@ -404,6 +410,7 @@ export default function ListaComprasPage() {
                       </span>
                       <span className={styles.itemNombre}>{item.nombre}</span>
                       <button
+                        type="button"
                         className={styles.deleteBtn}
                         onClick={() => eliminarItem(item.id)}
                       >
@@ -420,17 +427,17 @@ export default function ListaComprasPage() {
         {/* Acciones de la lista */}
         {items.length > 0 && (
           <section className={styles.accionesPanel}>
-            <button onClick={compartirLista} className={styles.btnAccion}>
-              📤 Compartir
+            <button type="button" onClick={compartirLista} className={styles.btnAccion}>
+              <span aria-hidden="true">📤</span> Compartir
             </button>
-            <button onClick={guardarLista} className={styles.btnAccion}>
-              💾 Guardar
+            <button type="button" onClick={guardarLista} className={styles.btnAccion}>
+              <span aria-hidden="true">💾</span> Guardar
             </button>
-            <button onClick={limpiarCompletados} className={styles.btnAccionSecundario}>
-              🗑️ Limpiar completados
+            <button type="button" onClick={limpiarCompletados} className={styles.btnAccionSecundario}>
+              <span aria-hidden="true">🗑️</span> Limpiar completados
             </button>
-            <button onClick={limpiarTodo} className={styles.btnAccionDanger}>
-              ❌ Vaciar lista
+            <button type="button" onClick={limpiarTodo} className={styles.btnAccionDanger}>
+              <span aria-hidden="true">❌</span> Vaciar lista
             </button>
           </section>
         )}
@@ -451,12 +458,14 @@ export default function ListaComprasPage() {
                   </p>
                   <div className={styles.listaCardAcciones}>
                     <button
+                      type="button"
                       onClick={() => cargarLista(lista)}
                       className={styles.btnCargar}
                     >
                       Cargar
                     </button>
                     <button
+                      type="button"
                       onClick={() => eliminarListaGuardada(lista.id)}
                       className={styles.btnEliminar}
                     >

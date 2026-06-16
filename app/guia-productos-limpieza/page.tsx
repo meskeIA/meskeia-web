@@ -511,7 +511,7 @@ export default function GuiaProductosLimpiezaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🧹 Guía de Productos de Limpieza</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🧹</span> Guía de Productos de Limpieza</h1>
         <p className={styles.subtitle}>
           Usos correctos, superficies que dañan y mezclas peligrosas de los productos domésticos más comunes
         </p>
@@ -543,6 +543,7 @@ export default function GuiaProductosLimpiezaPage() {
             return (
               <button
                 key={p.id}
+                type="button"
                 onClick={() => setProductoActivo(p.id)}
                 className={`${styles.productoBtn} ${productoActivo === p.id ? styles.productoBtnActivo : ''}`}
                 aria-pressed={productoActivo === p.id}
@@ -660,63 +661,63 @@ export default function GuiaProductosLimpiezaPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>🧴 Lejía</strong></td>
+                  <td><strong><span aria-hidden="true">🧴</span> Lejía</strong></td>
                   <td>Álcali oxidante</td>
                   <td>11-13</td>
                   <td>Desinfectar y blanquear</td>
                   <td>No mezclar con ácidos ni amoniaco</td>
                 </tr>
                 <tr>
-                  <td><strong>⚗️ Salfumán</strong></td>
+                  <td><strong><span aria-hidden="true">⚗️</span> Salfumán</strong></td>
                   <td>Ácido fuerte</td>
                   <td>0-1</td>
                   <td>Eliminar cal y sarro resistente</td>
                   <td>Destruye mármol y metales</td>
                 </tr>
                 <tr>
-                  <td><strong>🍶 Vinagre</strong></td>
+                  <td><strong><span aria-hidden="true">🍶</span> Vinagre</strong></td>
                   <td>Ácido débil</td>
                   <td>2-3</td>
                   <td>Descalcificar y desodorizar</td>
                   <td>Daña mármol; no mezclar con lejía</td>
                 </tr>
                 <tr>
-                  <td><strong>🥄 Bicarbonato</strong></td>
+                  <td><strong><span aria-hidden="true">🥄</span> Bicarbonato</strong></td>
                   <td>Base débil</td>
                   <td>8-9</td>
                   <td>Desodorizar y limpiar suave</td>
                   <td>No mezclar con ácidos (se neutraliza)</td>
                 </tr>
                 <tr>
-                  <td><strong>💊 Alcohol</strong></td>
+                  <td><strong><span aria-hidden="true">💊</span> Alcohol</strong></td>
                   <td>Solvente</td>
                   <td>~7</td>
                   <td>Desinfectante y quitamanchas</td>
                   <td>Inflamable; no mezclar con lejía</td>
                 </tr>
                 <tr>
-                  <td><strong>🫧 Amoniaco</strong></td>
+                  <td><strong><span aria-hidden="true">🫧</span> Amoniaco</strong></td>
                   <td>Base volátil</td>
                   <td>11-12</td>
                   <td>Cristales y desengrasante</td>
                   <td>No mezclar con lejía (gas tóxico)</td>
                 </tr>
                 <tr>
-                  <td><strong>💧 Agua oxigenada</strong></td>
+                  <td><strong><span aria-hidden="true">💧</span> Agua oxigenada</strong></td>
                   <td>Oxidante</td>
                   <td>4-5</td>
                   <td>Desinfectar y blanquear juntas</td>
                   <td>No mezclar con vinagre ni lejía</td>
                 </tr>
                 <tr>
-                  <td><strong>🧪 Acetona</strong></td>
+                  <td><strong><span aria-hidden="true">🧪</span> Acetona</strong></td>
                   <td>Solvente orgánico</td>
                   <td>~7</td>
                   <td>Quitar esmaltes y adhesivos</td>
                   <td>Extremadamente inflamable</td>
                 </tr>
                 <tr>
-                  <td><strong>🫧 Jabón de Castilla</strong></td>
+                  <td><strong><span aria-hidden="true">🫧</span> Jabón de Castilla</strong></td>
                   <td>Base suave</td>
                   <td>9-10</td>
                   <td>Limpieza general suave</td>
@@ -795,7 +796,7 @@ export default function GuiaProductosLimpiezaPage() {
           <h2>Preguntas frecuentes</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Por qué el salfumán destruye el mármol pero no el azulejo?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Por qué el salfumán destruye el mármol pero no el azulejo?</h4>
               <p>
                 El mármol y la piedra caliza están compuestos principalmente de carbonato cálcico (CaCO₃),
                 que reacciona de forma inmediata y violenta con el ácido clorhídrico (HCl). El azulejo, en cambio,
@@ -803,11 +804,11 @@ export default function GuiaProductosLimpiezaPage() {
                 mármol para observar la efervescencia del CO₂ liberado: ese es el mármol disolviéndose.
               </p>
               <p className={styles.faqTip}>
-                💡 Si tienes dudas sobre un material, prueba en una zona oculta con una pequeña gota antes de aplicar en toda la superficie.
+                <span aria-hidden="true">💡</span> Si tienes dudas sobre un material, prueba en una zona oculta con una pequeña gota antes de aplicar en toda la superficie.
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Es verdad que mezclar lejía y amoniaco es tan peligroso?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Es verdad que mezclar lejía y amoniaco es tan peligroso?</h4>
               <p>
                 Sí, es la mezcla más peligrosa del hogar. El hipoclorito reacciona con el amoniaco
                 generando cloraminas gaseosas (monocloramina NH₂Cl y dicloramina NHCl₂). Estos vapores
@@ -817,7 +818,7 @@ export default function GuiaProductosLimpiezaPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿El bicarbonato y el vinagre juntos limpian mejor?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿El bicarbonato y el vinagre juntos limpian mejor?</h4>
               <p>
                 Es el mito de limpieza más extendido. La reacción ácido-base los neutraliza completamente:
                 el resultado es agua, sal de sodio (acetato sódico) y CO₂, sin propiedades limpiadoras.
@@ -826,11 +827,11 @@ export default function GuiaProductosLimpiezaPage() {
                 ácido descalcificador).
               </p>
               <p className={styles.faqTip}>
-                💡 La única excepción donde la mezcla tiene sentido es para desatascar sifones: el CO₂ generado ayuda a mover la obstrucción.
+                <span aria-hidden="true">💡</span> La única excepción donde la mezcla tiene sentido es para desatascar sifones: el CO₂ generado ayuda a mover la obstrucción.
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Por qué el alcohol al 70% desinfecta mejor que el de 96%?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Por qué el alcohol al 70% desinfecta mejor que el de 96%?</h4>
               <p>
                 El agua presente en el alcohol al 70% es esencial: ralentiza la evaporación (más tiempo de contacto
                 con la bacteria) y facilita la penetración a través de la membrana celular microbiana.
@@ -839,7 +840,7 @@ export default function GuiaProductosLimpiezaPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo limpio mármol correctamente?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo limpio mármol correctamente?</h4>
               <p>
                 El mármol solo admite productos neutros o ligeramente alcalinos muy suaves. La regla es:
                 agua tibia + jabón de Castilla o jabón neutro de PH 7, escurrido (nunca empapado).
@@ -848,11 +849,11 @@ export default function GuiaProductosLimpiezaPage() {
                 carbonato cálcico puro y reacciona con cualquier ácido, por débil que sea.
               </p>
               <p className={styles.faqTip}>
-                💡 Si el mármol ha perdido brillo por haber usado un ácido, solo puede recuperarse con pulido profesional.
+                <span aria-hidden="true">💡</span> Si el mármol ha perdido brillo por haber usado un ácido, solo puede recuperarse con pulido profesional.
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué hago si mezclo productos por error?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué hago si mezclo productos por error?</h4>
               <p>
                 Si mezclas lejía con amoniaco, vinagre u otros ácidos por accidente: abandona la habitación
                 inmediatamente, deja ventanas y puertas abiertas, sal al aire fresco y espera al menos

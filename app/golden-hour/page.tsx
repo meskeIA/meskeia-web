@@ -464,11 +464,12 @@ export default function GoldenHourPage() {
         {/* Panel de ubicación */}
         <div className={styles.locationPanel}>
           <h2 className={styles.sectionTitle}>
-            <span>📍</span> Ubicación
+            <span aria-hidden="true">📍</span> Ubicación
           </h2>
 
           <div className={styles.locationControls}>
             <button
+              type="button"
               onClick={getCurrentLocation}
               className={styles.btnPrimary}
               disabled={isLocating}
@@ -494,7 +495,7 @@ export default function GoldenHourPage() {
           {/* Buscador de ciudades */}
           <div className={styles.searchContainer} ref={searchContainerRef}>
             <div className={styles.searchInputWrapper}>
-              <span className={styles.searchIcon}>🔍</span>
+              <span className={styles.searchIcon} aria-hidden="true">🔍</span>
               <input
                 type="text"
                 value={searchQuery}
@@ -511,6 +512,7 @@ export default function GoldenHourPage() {
               <div className={styles.searchResults}>
                 {searchResults.map((city, index) => (
                   <button
+                    type="button"
                     key={`${city.lat}-${city.lon}-${index}`}
                     onMouseDown={(e) => {
                       e.preventDefault(); // Evitar que el input pierda el foco
@@ -518,7 +520,7 @@ export default function GoldenHourPage() {
                     }}
                     className={styles.searchResultItem}
                   >
-                    <span className={styles.resultIcon}>📍</span>
+                    <span className={styles.resultIcon} aria-hidden="true">📍</span>
                     <span className={styles.resultName}>{city.displayName}</span>
                   </button>
                 ))}
@@ -577,7 +579,7 @@ export default function GoldenHourPage() {
         {sunTimes && lat !== null && (
           <div className={styles.timelinePanel}>
             <h2 className={styles.sectionTitle}>
-              <span>⏰</span> Horarios del día
+              <span aria-hidden="true">⏰</span> Horarios del día
             </h2>
 
             <div className={styles.timeline}>
@@ -670,7 +672,7 @@ export default function GoldenHourPage() {
         {sunTimes && lat !== null && (
           <div className={styles.detailsPanel}>
             <h2 className={styles.sectionTitle}>
-              <span>📊</span> Detalle completo
+              <span aria-hidden="true">📊</span> Detalle completo
             </h2>
 
             <div className={styles.timesTable}>

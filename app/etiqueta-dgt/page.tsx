@@ -404,14 +404,21 @@ function BadgeZbe({ acceso }: BadgeZbeProps) {
     prohibido: styles.zbeProhibido,
   };
 
+  const iconoMap: Record<AccesoZBE, string> = {
+    libre: '✓',
+    restriccion: '⚠',
+    prohibido: '✕',
+  };
+
   const textoMap: Record<AccesoZBE, string> = {
-    libre: '✓ Libre acceso',
-    restriccion: '⚠ Con restricciones',
-    prohibido: '✕ Prohibido',
+    libre: 'Libre acceso',
+    restriccion: 'Con restricciones',
+    prohibido: 'Prohibido',
   };
 
   return (
     <span className={`${styles.zbeStatus} ${claseMap[acceso]}`}>
+      <span aria-hidden="true">{iconoMap[acceso]} </span>
       {textoMap[acceso]}
     </span>
   );

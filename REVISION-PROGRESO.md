@@ -815,10 +815,10 @@
 | [x] | Estimador de Préstamos | `/estimador-prestamos/` | inmobiliaria, finanzas |
 | [x] | Estimador Gastos de Comunidad | `/estimador-gastos-comunidad/` | inmobiliaria, finanzas |
 | [x] | Estimador Reformas del Hogar | `/estimador-reformas-hogar/` | inmobiliaria, finanzas |
-| [ ] | Etiqueta DGT y Zonas de Bajas Emisiones | `/etiqueta-dgt/` | inmobiliaria, productividad |
-| [ ] | Golden Hour - Hora Dorada | `/golden-hour/` | inmobiliaria, diseno |
-| [ ] | Guía de Productos de Limpieza del Hogar | `/guia-productos-limpieza/` | inmobiliaria, salud |
-| [ ] | Lista de Compras | `/lista-compras/` | inmobiliaria, productividad |
+| [x] | Etiqueta DGT y Zonas de Bajas Emisiones | `/etiqueta-dgt/` | inmobiliaria, productividad |
+| [x] | Golden Hour - Hora Dorada | `/golden-hour/` | inmobiliaria, diseno |
+| [x] | Guía de Productos de Limpieza del Hogar | `/guia-productos-limpieza/` | inmobiliaria, salud |
+| [x] | Lista de Compras | `/lista-compras/` | inmobiliaria, productividad |
 | [ ] | Orientador Alquiler por Habitaciones | `/orientador-alquiler-habitaciones/` | inmobiliaria, legal-fiscal |
 | [ ] | Orientador Alquiler vs Compra | `/orientador-alquiler-vs-compra/` | inmobiliaria, finanzas |
 | [ ] | Orientador Aval ICO Vivienda | `/orientador-aval-ico/` | inmobiliaria, finanzas, legal-fiscal |
