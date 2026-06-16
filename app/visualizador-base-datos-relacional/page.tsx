@@ -298,6 +298,7 @@ export default function VisualizadorBaseDatosRelacional() {
         {TABS.map(t => (
           <button
             key={t.id}
+            type="button"
             className={`${styles.tab} ${tabActivo === t.id ? styles.tabActive : ''}`}
             onClick={() => setTabActivo(t.id)}
             aria-pressed={tabActivo === t.id}
@@ -375,9 +376,11 @@ export default function VisualizadorBaseDatosRelacional() {
                       <td className={styles.pkCell}>{p.id_pedido}</td>
                       <td>
                         <button
+                          type="button"
                           className={styles.fkCell}
                           onClick={() => handleFkClick(p.id_cliente)}
                           aria-label={`Resaltar cliente ${p.id_cliente} en tabla clientes`}
+                          aria-pressed={fkResaltada === p.id_cliente}
                           title="Haz clic para ver el cliente relacionado"
                         >
                           {p.id_cliente}
@@ -459,6 +462,7 @@ export default function VisualizadorBaseDatosRelacional() {
             {(['INNER', 'LEFT', 'RIGHT', 'FULL'] as JoinType[]).map(tipo => (
               <button
                 key={tipo}
+                type="button"
                 className={`${styles.joinBtn} ${joinActivo === tipo ? styles.joinBtnActivo : ''}`}
                 onClick={() => setJoinActivo(tipo)}
                 aria-pressed={joinActivo === tipo}
@@ -529,6 +533,7 @@ export default function VisualizadorBaseDatosRelacional() {
               {N_OPCIONES.map(n => (
                 <button
                   key={n}
+                  type="button"
                   className={`${styles.sliderBtn} ${nFilas === n ? styles.sliderBtnActivo : ''}`}
                   onClick={() => setNFilas(n)}
                   aria-pressed={nFilas === n}

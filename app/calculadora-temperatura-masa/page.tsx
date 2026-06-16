@@ -72,7 +72,7 @@ export default function CalculadoraTemperaturaMasaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🌡️ Calculadora DDT para Pan</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🌡️</span> Calculadora DDT para Pan</h1>
         <p className={styles.subtitle}>
           Calcula la temperatura exacta del agua para que tu masa llegue a la DDT ideal (Desired Dough Temperature)
         </p>
@@ -161,6 +161,7 @@ export default function CalculadoraTemperaturaMasaPage() {
           {AMASADORAS.map(a => (
             <button
               key={a.id}
+              type="button"
               className={`${styles.amasadoraBtn} ${amasadora === a.id ? styles.amasadoraBtnActivo : ''}`}
               onClick={() => setAmasadora(a.id)}
               aria-pressed={amasadora === a.id}
@@ -216,7 +217,7 @@ export default function CalculadoraTemperaturaMasaPage() {
             <div className={`${styles.resultadoBox} ${getColorClass(res.temperatura_agua_c)}`}>
               <div className={styles.resultadoTitulo}>Temperatura del agua necesaria</div>
               <div className={styles.resultadoTempC}>
-                {getTempEmoji(res.temperatura_agua_c)} {res.temperatura_agua_c}°C
+                <span aria-hidden="true">{getTempEmoji(res.temperatura_agua_c)}</span> {res.temperatura_agua_c}°C
               </div>
               <div className={styles.resultadoTempF}>
                 ({res.temperatura_agua_f}°F)
@@ -344,22 +345,22 @@ export default function CalculadoraTemperaturaMasaPage() {
 
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <div className={styles.escenarioIcon}>☀️</div>
+            <div className={styles.escenarioIcon} aria-hidden="true">☀️</div>
             <h3>Verano — cocina a 28°C</h3>
             <p>DDT 24°C, KitchenAid: T_agua ≈ 40°C (agua tibia del grifo). Sin fricción: T_agua ≈ 16°C (frío del grifo). La amasadora importa mucho en verano.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <div className={styles.escenarioIcon}>❄️</div>
+            <div className={styles.escenarioIcon} aria-hidden="true">❄️</div>
             <h3>Invierno — cocina a 16°C</h3>
             <p>DDT 24°C, manual: T_agua ≈ 40°C. Las manos frías amasar en invierno puede bajar la DDT; usar agua algo más caliente como margen.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <div className={styles.escenarioIcon}>🥐</div>
+            <div className={styles.escenarioIcon} aria-hidden="true">🥐</div>
             <h3>Poolish (preferment 20°C)</h3>
             <p>DDT 24°C, T_amb 22°C, KitchenAid: T_agua = 24×4 − 22 − 22 − 8 − 20 = 24°C. Con preferment la fórmula cambia a ×4.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <div className={styles.escenarioIcon}>🌾</div>
+            <div className={styles.escenarioIcon} aria-hidden="true">🌾</div>
             <h3>Pan de centeno (DDT 28°C)</h3>
             <p>Las masas de centeno fermentan mejor a 27–28°C. Ajusta el DDT objetivo más alto y calcula con agua más caliente.</p>
           </div>
@@ -390,22 +391,22 @@ export default function CalculadoraTemperaturaMasaPage() {
 
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>🌡️</div>
+            <div className={styles.tipIcon} aria-hidden="true">🌡️</div>
             <h4>Mide antes de amasar</h4>
             <p>Comprueba la temperatura del agua con el termómetro justo antes de añadirla. Un par de minutos esperando puede cambiar la lectura.</p>
           </div>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>🧊</div>
+            <div className={styles.tipIcon} aria-hidden="true">🧊</div>
             <h4>Agua fría en verano</h4>
             <p>En verano puedes necesitar agua de nevera (4–8°C). Si el cálculo da negativo, refrigera también la harina.</p>
           </div>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>📝</div>
+            <div className={styles.tipIcon} aria-hidden="true">📝</div>
             <h4>Lleva un registro</h4>
             <p>Anota la DDT obtenida y la temperatura real de la masa tras amasar. Con el tiempo afinarás los factores para tu cocina y amasadora específica.</p>
           </div>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>⚗️</div>
+            <div className={styles.tipIcon} aria-hidden="true">⚗️</div>
             <h4>Mezcla agua fría y caliente</h4>
             <p>La forma más fácil de conseguir una temperatura exacta es mezclar agua fría de nevera con agua caliente del grifo y medir con termómetro.</p>
           </div>

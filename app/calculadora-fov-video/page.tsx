@@ -75,6 +75,7 @@ export default function CalculadoraFovVideoPage() {
               {SENSORES_OPCIONES.map(op => (
                 <button
                   key={op.valor}
+                  type="button"
                   onClick={() => setSensor(op.valor)}
                   className={`${styles.sensorBtn} ${sensor === op.valor ? styles.sensorBtnActive : ''}`}
                   aria-pressed={sensor === op.valor}
@@ -114,6 +115,7 @@ export default function CalculadoraFovVideoPage() {
               {FOCALES_COMUNES.map(f => (
                 <button
                   key={f}
+                  type="button"
                   onClick={() => handleFocalComun(f)}
                   className={`${styles.focalBtn} ${focal === f ? styles.focalBtnActive : ''}`}
                   aria-pressed={focal === f}

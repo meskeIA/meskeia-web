@@ -308,6 +308,7 @@ export default function VisualizadorBlockchainPage() {
           return (
             <button
               key={s}
+              type="button"
               className={`${styles.navBtn} ${seccion === s ? styles.navBtnActivo : ''}`}
               onClick={() => setSeccion(s)}
               aria-pressed={seccion === s}
@@ -364,14 +365,15 @@ export default function VisualizadorBlockchainPage() {
                             aria-label="Editar datos del bloque"
                           />
                           <div className={styles.editBtns}>
-                            <button className={styles.btnAplicar} onClick={aplicarEdicion}>Aplicar</button>
-                            <button className={styles.btnCancelar} onClick={() => setBloqueEditando(null)}>Cancelar</button>
+                            <button type="button" className={styles.btnAplicar} onClick={aplicarEdicion}>Aplicar</button>
+                            <button type="button" className={styles.btnCancelar} onClick={() => setBloqueEditando(null)}>Cancelar</button>
                           </div>
                         </div>
                       ) : (
                         <div className={styles.editableRow}>
                           <span className={styles.campoValor}>{bloque.datos}</span>
                           <button
+                            type="button"
                             className={styles.btnEditar}
                             onClick={() => iniciarEdicion(idx)}
                             aria-label={`Editar datos del bloque ${idx}`}
@@ -406,6 +408,7 @@ export default function VisualizadorBlockchainPage() {
 
                     {/* Transacciones (expandibles) */}
                     <button
+                      type="button"
                       className={styles.btnExpandir}
                       onClick={() => setBloqueExpandido(expandido ? null : idx)}
                       aria-expanded={expandido}
@@ -435,7 +438,7 @@ export default function VisualizadorBlockchainPage() {
           </div>
 
           <div className={styles.botonesBloque}>
-            <button className={styles.btnPrimario} onClick={restaurarCadena}>
+            <button type="button" className={styles.btnPrimario} onClick={restaurarCadena}>
               🔄 Restaurar cadena
             </button>
           </div>
@@ -458,6 +461,7 @@ export default function VisualizadorBlockchainPage() {
 
           <div className={styles.consensoSelector}>
             <button
+              type="button"
               className={`${styles.consensoBtn} ${consensoTipo === 'pow' ? styles.consensoBtnActivo : ''}`}
               onClick={() => { setConsensoTipo('pow'); setHashEncontrado(false); setNonceActual(0); setAnimandoPow(false); }}
               aria-pressed={consensoTipo === 'pow'}
@@ -465,6 +469,7 @@ export default function VisualizadorBlockchainPage() {
               ⛏️ Proof of Work
             </button>
             <button
+              type="button"
               className={`${styles.consensoBtn} ${consensoTipo === 'pos' ? styles.consensoBtnActivo : ''}`}
               onClick={() => { setConsensoTipo('pos'); setValidadorSeleccionado(null); }}
               aria-pressed={consensoTipo === 'pos'}
@@ -523,6 +528,7 @@ export default function VisualizadorBlockchainPage() {
                     )}
                   </div>
                   <button
+                    type="button"
                     className={styles.btnPrimario}
                     onClick={animarMinado}
                     disabled={animandoPow}
@@ -594,6 +600,7 @@ export default function VisualizadorBlockchainPage() {
                 </div>
 
                 <button
+                  type="button"
                   className={styles.btnPrimario}
                   onClick={seleccionarValidadorPos}
                   aria-label="Seleccionar validador aleatoriamente ponderado por stake"
@@ -664,6 +671,7 @@ export default function VisualizadorBlockchainPage() {
               return (
                 <button
                   key={c}
+                  type="button"
                   className={`${styles.contratoBtn} ${contratoTipo === c ? styles.contratoBtnActivo : ''}`}
                   onClick={() => { setContratoTipo(c); reiniciarContrato(); }}
                   aria-pressed={contratoTipo === c}
@@ -711,6 +719,7 @@ export default function VisualizadorBlockchainPage() {
                       </div>
                       {!ejecutado && (
                         <button
+                          type="button"
                           className={styles.btnEjecutarPaso}
                           onClick={() => ejecutarPaso(paso.id)}
                           disabled={activo || (paso.id > 1 && !pasosEjecutados.has(paso.id - 1))}
@@ -726,7 +735,7 @@ export default function VisualizadorBlockchainPage() {
             </div>
 
             <div className={styles.contratoBtns}>
-              <button className={styles.btnSecundario} onClick={reiniciarContrato}>
+              <button type="button" className={styles.btnSecundario} onClick={reiniciarContrato}>
                 🔄 Reiniciar
               </button>
               {pasosEjecutados.size === contrato.pasos.length && (

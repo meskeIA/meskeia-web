@@ -739,11 +739,11 @@
 | [x] | Analizador de Espectro | `/analizador-espectro/` | tecnicas |
 | [x] | Árbol de Decisión Interactivo | `/arbol-decision-ia/` | tecnicas, estudiantes, cultura |
 | [x] | Asistentes de Código IA 2026: Claude Code vs Copilot vs Gemini | `/comparador-asistentes-codigo/` | tecnicas, productividad |
-| [ ] | Base de Datos Relacional: Tablas, JOIN e Índices | `/visualizador-base-datos-relacional/` | tecnicas, estudiantes |
-| [ ] | Blockchain - Cadena de Bloques y Contratos Inteligentes | `/visualizador-blockchain/` | tecnicas, cultura, estudiantes |
+| [x] | Base de Datos Relacional: Tablas, JOIN e Índices | `/visualizador-base-datos-relacional/` | tecnicas, estudiantes |
+| [x] | Blockchain - Cadena de Bloques y Contratos Inteligentes | `/visualizador-blockchain/` | tecnicas, cultura, estudiantes |
 | [x] | Buscador de Palabras por Patrón | `/buscador-palabras-patron/` | tecnicas, cultura, juegos, productividad |
-| [ ] | Calculadora DDT — Temperatura de la Masa (Desired Dough Temperature) | `/calculadora-temperatura-masa/` | tecnicas |
-| [ ] | Calculadora de Ángulo de Campo (FOV) para Vídeo | `/calculadora-fov-video/` | tecnicas, diseno |
+| [x] | Calculadora DDT — Temperatura de la Masa (Desired Dough Temperature) | `/calculadora-temperatura-masa/` | tecnicas |
+| [x] | Calculadora de Ángulo de Campo (FOV) para Vídeo | `/calculadora-fov-video/` | tecnicas, diseno |
 | [x] | Calculadora de Bitrate y Tamaño de Vídeo | `/calculadora-bitrate-video/` | tecnicas, diseno |
 | [ ] | Calculadora de Cámara Lenta (Slow Motion) | `/calculadora-camara-lenta/` | tecnicas, diseno |
 | [ ] | Calculadora de Filtro ND para Vídeo | `/calculadora-filtro-nd-video/` | tecnicas, diseno |
