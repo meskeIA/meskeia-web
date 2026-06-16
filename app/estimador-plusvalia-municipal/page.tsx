@@ -158,7 +158,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <div className={styles.heroIcon}>🏙️</div>
+        <div className={styles.heroIcon} aria-hidden="true">🏙️</div>
         <h1 className={styles.title}>Estimador de Plusvalía Municipal</h1>
         <p className={styles.subtitle}>
           Oriéntate sobre el IIVTNU al vender o heredar un inmueble urbano.<br />
@@ -173,7 +173,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
 
       {/* Aviso metodológico prominente */}
       <div className={styles.avisoMetodologico}>
-        <span className={styles.avisoIcon}>ℹ️</span>
+        <span className={styles.avisoIcon} aria-hidden="true">ℹ️</span>
         <p>
           Desde la sentencia del Tribunal Constitucional de noviembre de 2021, puedes elegir entre
           el <strong>método objetivo</strong> (basado en coeficientes legales) o el <strong>método real</strong>
@@ -185,7 +185,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
 
         {/* Panel de datos comunes */}
         <div className={styles.inputPanel}>
-          <h2 className={styles.panelTitle}>📋 Datos del inmueble</h2>
+          <h2 className={styles.panelTitle}><span aria-hidden="true">📋</span> Datos del inmueble</h2>
 
           <NumberInput
             value={vcSuelo}
@@ -251,7 +251,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
 
           {usarMetodoReal && (
             <div className={styles.metodorealPanel}>
-              <h3 className={styles.subPanelTitle}>📊 Datos para el método real</h3>
+              <h3 className={styles.subPanelTitle}><span aria-hidden="true">📊</span> Datos para el método real</h3>
               <NumberInput
                 value={precioAdquisicion}
                 onChange={setPrecioAdquisicion}
@@ -307,7 +307,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
         {/* Panel de resultados */}
         {resultado && (
           <div className={styles.resultsPanel}>
-            <h2 className={styles.panelTitle}>📊 Estimación orientativa</h2>
+            <h2 className={styles.panelTitle}><span aria-hidden="true">📊</span> Estimación orientativa</h2>
 
             {/* Método objetivo */}
             <div className={styles.metodoSection}>
@@ -346,7 +346,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
                 </h3>
                 {resultado.real.motivo === 'sin-ganancia' ? (
                   <div className={styles.sinGanancia} role="alert">
-                    <span className={styles.sinGananciaIcon}>✅</span>
+                    <span className={styles.sinGananciaIcon} aria-hidden="true">✅</span>
                     <div>
                       <strong>Sin incremento real de valor</strong>
                       <p>Con el método real, el precio de transmisión no supera al de adquisición. En este caso, <strong>no se devenga el impuesto</strong>. Consulta con el Ayuntamiento para confirmarlo.</p>
@@ -404,7 +404,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
 
       {/* Aviso adicional específico IIVTNU */}
       <div className={styles.avisoEspecifico}>
-        <h3 className={styles.avisoEspecificoTitle}>⚠️ Aspectos que esta orientación NO contempla</h3>
+        <h3 className={styles.avisoEspecificoTitle}><span aria-hidden="true">⚠️</span> Aspectos que esta orientación NO contempla</h3>
         <ul className={styles.avisoLista}>
           <li>El tipo impositivo exacto de <strong>tu municipio</strong> (puede ser inferior al 30% que fijamos por defecto).</li>
           <li>Posibles <strong>bonificaciones municipales</strong> por herencia entre familiares directos (algunos Ayuntamientos las aplican).</li>
@@ -549,7 +549,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏠</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏠</span>
                 <strong>Venta de piso con ganancia</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -568,7 +568,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📋</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📋</span>
                 <strong>Herencia de piso</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -587,7 +587,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📉</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📉</span>
                 <strong>Venta con pérdida (crisis 2008)</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -606,7 +606,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏢</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏢</span>
                 <strong>Donación de local comercial</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -802,7 +802,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
           <div className={styles.tipsGrid}>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚖️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
               <div>
                 <strong>Calcula siempre los dos métodos</strong>
                 <p>Nunca autoliquides sin comparar método objetivo y real. La diferencia entre ambos métodos puede ser de varios miles de euros en transmisiones habituales.</p>
@@ -810,7 +810,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📁</span>
+              <span className={styles.tipIcon} aria-hidden="true">📁</span>
               <div>
                 <strong>Conserva escrituras y recibos de obras</strong>
                 <p>Las obras de mejora (no de conservación) pueden sumarse al precio de adquisición en el método real, reduciendo la base imponible.</p>
@@ -818,7 +818,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⏱️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⏱️</span>
               <div>
                 <strong>En herencias, solicita prórroga a la vez que el IS</strong>
                 <p>El plazo para el IIVTNU (6 meses) y para el Impuesto de Sucesiones son coincidentes. Tramita ambas prórrogas simultáneamente ante el Ayuntamiento y la CCAA.</p>
@@ -826,7 +826,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏛️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏛️</span>
               <div>
                 <strong>Consulta el tipo real de tu Ayuntamiento</strong>
                 <p>El tipo máximo es el 30%, pero muchos municipios aplican tipos inferiores. Un municipio con tipo del 20% supone un 33% menos de cuota que el máximo.</p>
@@ -834,7 +834,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <div>
                 <strong>Compara también los coeficientes municipales</strong>
                 <p>Los Ayuntamientos pueden aprobar coeficientes inferiores a los máximos legales. Si tu municipio aplica uno menor, el método objetivo resulta aún más ventajoso.</p>
@@ -842,7 +842,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔍</span>
               <div>
                 <strong>Solicita el porcentaje de suelo exacto en Catastro</strong>
                 <p>El recibo del IBI a veces muestra el porcentaje redondeado. El dato preciso de la sede catastral puede diferir del estimado y alterar el resultado del método real.</p>
@@ -856,7 +856,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
         <section className={styles.guideSection}>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <strong>6 errores frecuentes que conviene evitar</strong>
             </div>
             <ul className={styles.warningList}>

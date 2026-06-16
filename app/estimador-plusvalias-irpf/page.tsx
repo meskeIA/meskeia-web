@@ -186,7 +186,7 @@ export default function EstimadorPlusvalidasIRPFPage() {
             </div>
 
             <h3 style={{ fontSize: '0.95rem', fontWeight: 700, margin: '0 0 0.75rem', color: 'var(--text-primary)' }}>
-              📥 Datos de adquisición (compra)
+              <span aria-hidden="true">📥</span> Datos de adquisición (compra)
             </h3>
             <NumberInput
               value={precioCompra}
@@ -216,7 +216,7 @@ export default function EstimadorPlusvalidasIRPFPage() {
             </div>
 
             <h3 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 'var(--spacing-md) 0 0.75rem', color: 'var(--text-primary)' }}>
-              📤 Datos de transmisión (venta)
+              <span aria-hidden="true">📤</span> Datos de transmisión (venta)
             </h3>
             <NumberInput
               value={precioVenta}
@@ -246,10 +246,10 @@ export default function EstimadorPlusvalidasIRPFPage() {
             </div>
 
             <div className={styles.buttonGroup}>
-              <button onClick={calcular} className={styles.btnPrimary}>
+              <button type="button" onClick={calcular} className={styles.btnPrimary}>
                 Estimar plusvalía
               </button>
-              <button onClick={limpiar} className={styles.btnSecondary} aria-label="Limpiar formulario">
+              <button type="button" onClick={limpiar} className={styles.btnSecondary} aria-label="Limpiar formulario">
                 Limpiar
               </button>
             </div>
@@ -274,7 +274,7 @@ export default function EstimadorPlusvalidasIRPFPage() {
                 <p className={styles.cuotaTipoEfectivo}>
                   {resultado.esGanancia
                     ? `Tipo efectivo orientativo: ${formatNumber(resultado.tipoEfectivo, 2)}%`
-                    : '⬇️ No hay ganancia patrimonial — posible pérdida deducible'}
+                    : <><span aria-hidden="true">⬇️</span>{' No hay ganancia patrimonial — posible pérdida deducible'}</>}
                 </p>
               </div>
 
@@ -365,7 +365,7 @@ export default function EstimadorPlusvalidasIRPFPage() {
 
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <div className={styles.disclaimer}>
-        <h3>⚠️ Herramienta de Orientación — No es asesoramiento fiscal</h3>
+        <h3><span aria-hidden="true">⚠️</span> Herramienta de Orientación — No es asesoramiento fiscal</h3>
         <p>
           Este estimador proporciona una <strong>estimación orientativa</strong> basada en{' '}
           <a href={FISCAL_INMUEBLES_META.urlOficialIRPF} target="_blank" rel="noopener noreferrer">
@@ -400,21 +400,21 @@ export default function EstimadorPlusvalidasIRPFPage() {
           <h2>Ganancias y pérdidas patrimoniales en el IRPF</h2>
           <div className={styles.guideGrid}>
             <div className={styles.guideCard}>
-              <h4>📈 ¿Qué es una ganancia patrimonial?</h4>
+              <h4><span aria-hidden="true">📈</span> ¿Qué es una ganancia patrimonial?</h4>
               <p>
                 Es la diferencia positiva entre el valor de transmisión (venta) y el valor de adquisición (compra)
                 de un bien. Si vendes por más de lo que compraste (descontando gastos), tienes una ganancia patrimonial.
               </p>
             </div>
             <div className={styles.guideCard}>
-              <h4>📉 ¿Y si pierdo dinero?</h4>
+              <h4><span aria-hidden="true">📉</span> ¿Y si pierdo dinero?</h4>
               <p>
                 Las pérdidas patrimoniales pueden compensarse con ganancias del mismo año o de los 4 años siguientes.
                 No es obligatorio declarar pérdidas si el importe es pequeño, pero puede interesar para compensar futuras ganancias.
               </p>
             </div>
             <div className={styles.guideCard}>
-              <h4>⏱️ Importancia del plazo</h4>
+              <h4><span aria-hidden="true">⏱️</span> Importancia del plazo</h4>
               <p>
                 Si el activo se tuvo <strong>más de 1 año</strong>, tributa en la base del ahorro (19-30%).
                 Si se tuvo <strong>menos de 1 año</strong>, tributa en la base general con el IRPF normal (hasta 47%).
@@ -422,7 +422,7 @@ export default function EstimadorPlusvalidasIRPFPage() {
               </p>
             </div>
             <div className={styles.guideCard}>
-              <h4>🏠 Exención vivienda habitual</h4>
+              <h4><span aria-hidden="true">🏠</span> Exención vivienda habitual</h4>
               <p>
                 La ganancia por venta de la vivienda habitual está exenta si reinviertes el importe en otra vivienda habitual
                 en un plazo de 2 años. También exenta si el vendedor tiene más de 65 años y es su vivienda habitual.

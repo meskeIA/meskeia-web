@@ -891,10 +891,10 @@
 | [x] | Estimador IRPF | `/estimador-irpf/` | legal-fiscal |
 | [x] | Estimador IRPF Pensionista | `/estimador-irpf-pensionista/` | legal-fiscal, finanzas |
 | [x] | Estimador Pensión de Viudedad | `/estimador-pension-viudedad/` | legal-fiscal, finanzas |
-| [ ] | Estimador Plusvalía Municipal (IIVTNU) | `/estimador-plusvalia-municipal/` | legal-fiscal, inmobiliaria |
-| [ ] | Estimador Plusvalías IRPF | `/estimador-plusvalias-irpf/` | legal-fiscal, finanzas |
-| [ ] | Estimador SMI 2026 | `/estimador-smi/` | legal-fiscal, finanzas |
-| [ ] | Guía de Plazos Legales | `/plazos-legales/` | legal-fiscal |
+| [x] | Estimador Plusvalía Municipal (IIVTNU) | `/estimador-plusvalia-municipal/` | legal-fiscal, inmobiliaria |
+| [x] | Estimador Plusvalías IRPF | `/estimador-plusvalias-irpf/` | legal-fiscal, finanzas |
+| [x] | Estimador SMI 2026 | `/estimador-smi/` | legal-fiscal, finanzas |
+| [x] | Guía de Plazos Legales | `/plazos-legales/` | legal-fiscal |
 | [ ] | Guía para Gestionar una Herencia | `/guia/herencias/` | legal-fiscal |
 | [ ] | Impuestos en el Divorcio | `/impuestos-divorcio/` | legal-fiscal, finanzas |
 | [ ] | Optimizador de Rentas 60+ | `/optimizador-rentas-60/` | legal-fiscal, finanzas |

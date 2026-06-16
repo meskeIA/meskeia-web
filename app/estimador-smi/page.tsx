@@ -454,17 +454,17 @@ export default function EstimadorSMIPage() {
                 <thead>
                   <tr>
                     <th>
-                      <button type="button" className={styles.sortBtn} onClick={() => toggleSort('provincia')}>
+                      <button type="button" className={styles.sortBtn} onClick={() => toggleSort('provincia')} aria-pressed={sortField === 'provincia'}>
                         Provincia {sortField === 'provincia' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
                       </button>
                     </th>
                     <th>
-                      <button type="button" className={styles.sortBtn} onClick={() => toggleSort('salario')}>
+                      <button type="button" className={styles.sortBtn} onClick={() => toggleSort('salario')} aria-pressed={sortField === 'salario'}>
                         Salario medio {sortField === 'salario' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
                       </button>
                     </th>
                     <th>
-                      <button type="button" className={styles.sortBtn} onClick={() => toggleSort('ratio')}>
+                      <button type="button" className={styles.sortBtn} onClick={() => toggleSort('ratio')} aria-pressed={sortField === 'ratio'}>
                         SMI/Salario {sortField === 'ratio' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
                       </button>
                     </th>

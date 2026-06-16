@@ -42,7 +42,7 @@ export default function PlazosLegalesPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>⏱️</span>
+        <span className={styles.heroIcon} aria-hidden="true">⏱️</span>
         <h1 className={styles.title}>Plazos Legales España</h1>
         <p className={styles.subtitle}>
           Consulta los plazos de prescripción, caducidad y reclamación más importantes
@@ -54,7 +54,7 @@ export default function PlazosLegalesPage() {
       {/* Buscador */}
       <div className={styles.searchSection}>
         <div className={styles.searchBox}>
-          <span className={styles.searchIcon}>🔍</span>
+          <span className={styles.searchIcon} aria-hidden="true">🔍</span>
           <input
             type="text"
             className={styles.searchInput}
@@ -63,7 +63,7 @@ export default function PlazosLegalesPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           {(searchQuery || selectedCategory) && (
-            <button className={styles.clearButton} onClick={clearFilters}>
+            <button type="button" className={styles.clearButton} onClick={clearFilters}>
               ✕
             </button>
           )}
@@ -76,10 +76,12 @@ export default function PlazosLegalesPage() {
           {CATEGORIES.map((cat) => (
             <button
               key={cat.id}
+              type="button"
               className={`${styles.categoryButton} ${selectedCategory === cat.id ? styles.categoryActive : ''}`}
               onClick={() => handleCategoryClick(cat.id)}
+              aria-pressed={selectedCategory === cat.id}
             >
-              <span className={styles.categoryIcon}>{cat.icon}</span>
+              <span className={styles.categoryIcon} aria-hidden="true">{cat.icon}</span>
               <span className={styles.categoryName}>{cat.name}</span>
             </button>
           ))}
@@ -90,7 +92,7 @@ export default function PlazosLegalesPage() {
       {!searchQuery && !selectedCategory && (
         <section className={styles.importantSection}>
           <h2 className={styles.sectionTitle}>
-            <span>⭐</span> Plazos más consultados
+            <span aria-hidden="true">⭐</span> Plazos más consultados
           </h2>
           <div className={styles.importantGrid}>
             {importantPlazos.map((plazo) => (
@@ -98,6 +100,7 @@ export default function PlazosLegalesPage() {
                 <div className={styles.importantPlazo}>{plazo.plazo}</div>
                 <div className={styles.importantTitle}>{plazo.title}</div>
                 <button
+                  type="button"
                   className={styles.importantLink}
                   onClick={() => {
                     setExpandedPlazo(plazo.id);
@@ -131,7 +134,7 @@ export default function PlazosLegalesPage() {
           <div className={styles.noResults}>
             <span className={styles.noResultsIcon}>🔍</span>
             <p>No se encontraron plazos con esos criterios</p>
-            <button className={styles.clearFiltersButton} onClick={clearFilters}>
+            <button type="button" className={styles.clearFiltersButton} onClick={clearFilters}>
               Limpiar filtros
             </button>
           </div>
@@ -685,9 +688,9 @@ function PlazoCard({
 
   return (
     <div id={plazo.id} className={`${styles.plazoCard} ${isExpanded ? styles.plazoExpanded : ''}`}>
-      <button className={styles.plazoHeader} onClick={onToggle}>
+      <button type="button" className={styles.plazoHeader} onClick={onToggle} aria-expanded={isExpanded}>
         <div className={styles.plazoMain}>
-          <span className={styles.plazoCategoryIcon}>{category?.icon}</span>
+          <span className={styles.plazoCategoryIcon} aria-hidden="true">{category?.icon}</span>
           <div className={styles.plazoInfo}>
             <h3 className={styles.plazoTitle}>
               {plazo.title}
@@ -698,7 +701,7 @@ function PlazoCard({
         </div>
         <div className={styles.plazoPlazoContainer}>
           <span className={styles.plazoPlazo}>{plazo.plazo}</span>
-          <span className={styles.plazoExpandIcon}>{isExpanded ? '▲' : '▼'}</span>
+          <span className={styles.plazoExpandIcon} aria-hidden="true">{isExpanded ? '▲' : '▼'}</span>
         </div>
       </button>
 
