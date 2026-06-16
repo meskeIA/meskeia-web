@@ -440,10 +440,10 @@
 | [x] | El Carbono: Diamante, Grafeno y la Molécula de la Vida | `/visualizador-carbono/` | estudiantes, cultura |
 | [x] | El Ciclo del Agua - El Viaje Infinito de cada Gota | `/visualizador-ciclo-agua/` | estudiantes, cultura |
 | [x] | El Efecto Invernadero - Del Equilibrio al Cambio Climático | `/visualizador-efecto-invernadero/` | estudiantes, cultura |
-| [ ] | El Espectro Electromagnético - De Radio a Gamma | `/visualizador-espectro-electromagnetico/` | estudiantes, cultura |
-| [ ] | El Hidrógeno: Del Big Bang a la Pila de Combustible | `/visualizador-hidrogeno/` | estudiantes, cultura |
-| [ ] | El Niño y La Niña: ENSO Explicado | `/visualizador-el-nino/` | estudiantes, cultura |
-| [ ] | El Oído y el Equilibrio - De la Vibración al Cerebro | `/visualizador-oido-equilibrio/` | estudiantes, cultura, salud |
+| [x] | El Espectro Electromagnético - De Radio a Gamma | `/visualizador-espectro-electromagnetico/` | estudiantes, cultura |
+| [x] | El Hidrógeno: Del Big Bang a la Pila de Combustible | `/visualizador-hidrogeno/` | estudiantes, cultura |
+| [x] | El Niño y La Niña: ENSO Explicado | `/visualizador-el-nino/` | estudiantes, cultura |
+| [x] | El Oído y el Equilibrio - De la Vibración al Cerebro | `/visualizador-oido-equilibrio/` | estudiantes, cultura, salud |
 | [ ] | El Ojo Humano y la Visión - De la Córnea al Cerebro | `/visualizador-ojo-humano-vision/` | estudiantes, cultura, salud |
 | [ ] | El Oro: Por Qué la Relatividad Explica su Color y su Nobleza | `/visualizador-oro/` | estudiantes, cultura |
 | [ ] | El Reino Fungi — Ascomicetos, Basidiomicetos y Ciclo de Vida | `/visualizador-reino-fungi/` | estudiantes, cultura |

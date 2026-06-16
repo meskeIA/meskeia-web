@@ -271,6 +271,7 @@ export default function VisualizadorElNino() {
           {TABS.map((tab) => (
             <button
               key={tab.id}
+              type="button"
               className={`${styles.tab} ${tabActiva === tab.id ? styles.tabActive : ''}`}
               onClick={() => setTabActiva(tab.id)}
               aria-pressed={tabActiva === tab.id}

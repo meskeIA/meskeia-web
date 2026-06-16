@@ -212,6 +212,7 @@ export default function OidoEquilibrioPage() {
               tabIndex={0}
               onKeyDown={e => e.key === 'Enter' && setZonaActiva('externo')}
               aria-label="Oído externo: pabellón auricular, canal auditivo, tímpano"
+              aria-pressed={zonaActiva === 'externo'}
             >
               <rect x="10" y="30" width="260" height="340" rx="12" fill={zonaActiva === 'externo' ? 'rgba(46,134,171,0.12)' : 'rgba(46,134,171,0.04)'} stroke={zonaActiva === 'externo' ? '#2E86AB' : 'transparent'} strokeWidth="2" />
               {/* Pabellón auricular (forma de oreja simplificada) */}
@@ -237,6 +238,7 @@ export default function OidoEquilibrioPage() {
               tabIndex={0}
               onKeyDown={e => e.key === 'Enter' && setZonaActiva('medio')}
               aria-label="Oído medio: martillo, yunque, estribo, trompa de Eustaquio"
+              aria-pressed={zonaActiva === 'medio'}
             >
               <rect x="290" y="30" width="220" height="340" rx="12" fill={zonaActiva === 'medio' ? 'rgba(72,169,166,0.12)' : 'rgba(72,169,166,0.04)'} stroke={zonaActiva === 'medio' ? '#48A9A6' : 'transparent'} strokeWidth="2" />
               {/* Huesecillos */}
@@ -268,6 +270,7 @@ export default function OidoEquilibrioPage() {
               tabIndex={0}
               onKeyDown={e => e.key === 'Enter' && setZonaActiva('interno')}
               aria-label="Oído interno: cóclea, canales semicirculares, nervio auditivo"
+              aria-pressed={zonaActiva === 'interno'}
             >
               <rect x="530" y="30" width="260" height="340" rx="12" fill={zonaActiva === 'interno' ? 'rgba(230,126,34,0.12)' : 'rgba(230,126,34,0.04)'} stroke={zonaActiva === 'interno' ? '#E67E22' : 'transparent'} strokeWidth="2" />
               {/* Cóclea (espiral) */}

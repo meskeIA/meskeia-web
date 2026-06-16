@@ -371,6 +371,7 @@ export default function VisualizadorHidrogeno() {
           {PASOS_FUSION.map((p, i) => (
             <button
               key={p.paso}
+              type="button"
               className={`${styles.fusionStepBtn} ${i === pasoFusion ? styles.fusionStepActivo : ''}`}
               onClick={() => setPasoFusion(i)}
               aria-pressed={i === pasoFusion}
@@ -503,6 +504,7 @@ export default function VisualizadorHidrogeno() {
 
         <div className={styles.densidadToggle}>
           <button
+            type="button"
             className={`${styles.toggleBtn} ${graficoDensidad === 'masica' ? styles.toggleActivo : ''}`}
             onClick={() => setGraficoDensidad('masica')}
             aria-pressed={graficoDensidad === 'masica'}
@@ -510,6 +512,7 @@ export default function VisualizadorHidrogeno() {
             Por masa (kWh/kg)
           </button>
           <button
+            type="button"
             className={`${styles.toggleBtn} ${graficoDensidad === 'volumetrica' ? styles.toggleActivo : ''}`}
             onClick={() => setGraficoDensidad('volumetrica')}
             aria-pressed={graficoDensidad === 'volumetrica'}
