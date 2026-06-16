@@ -429,7 +429,7 @@ export default function SelectorSeguroCochePage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1>🚗 ¿Qué seguro de coche necesitas?</h1>
+        <h1><span aria-hidden="true">🚗</span> ¿Qué seguro de coche necesitas?</h1>
         <p>
           Responde 10 preguntas y descubre si te conviene terceros básico, terceros
           ampliado, todo riesgo con franquicia o todo riesgo sin franquicia.
@@ -457,7 +457,7 @@ export default function SelectorSeguroCochePage() {
           {/* Pregunta */}
           <div className={styles.pregunta}>
             <p className={styles.preguntaTexto}>
-              {pregunta.icono} {pregunta.texto}
+              <span aria-hidden="true">{pregunta.icono}</span> {pregunta.texto}
             </p>
 
             <div className={styles.opciones} role="radiogroup" aria-label={pregunta.texto}>
@@ -532,7 +532,7 @@ export default function SelectorSeguroCochePage() {
 
             {/* Warning box */}
             <div className={styles.warningBox} role="note">
-              <strong>⚠️</strong>
+              <strong aria-hidden="true">⚠️</strong>
               <span>{RESULTADOS[resultado].advertencia}</span>
             </div>
           </div>
@@ -543,7 +543,7 @@ export default function SelectorSeguroCochePage() {
             onClick={handleReiniciar}
             aria-label="Reiniciar el test"
           >
-            🔄 Repetir el test
+            <span aria-hidden="true">🔄</span> Repetir el test
           </button>
         </section>
       )}

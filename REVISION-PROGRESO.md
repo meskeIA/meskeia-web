@@ -670,11 +670,11 @@
 | [x] | Quiz Conceptos de Inversión — Sharpe, Beta, Duration y TER | `/quiz-conceptos-inversion/` | finanzas, estudiantes |
 | [x] | Seguros y Riesgo: Prima Actuarial, Pool de Riesgo y Mutualización | `/visualizador-seguros-riesgo/` | finanzas, cultura |
 | [x] | Selector de Coche Nuevo o Usado | `/selector-coche-nuevo-usado/` | finanzas, inmobiliaria |
-| [ ] | Selector de Cuenta Bancaria | `/selector-cuenta-bancaria/` | finanzas |
+| [x] | Selector de Cuenta Bancaria | `/selector-cuenta-bancaria/` | finanzas |
 | [x] | Selector de Plan de Pensiones | `/selector-plan-pensiones/` | finanzas, freelance |
-| [ ] | Selector de Seguro de Coche | `/selector-seguro-coche/` | finanzas, tecnicas |
-| [ ] | Selector de Seguro de Vida | `/selector-seguro-vida/` | finanzas, salud |
-| [ ] | Selector de Tipo de Ahorro | `/selector-tipo-ahorro/` | finanzas, productividad |
+| [x] | Selector de Seguro de Coche | `/selector-seguro-coche/` | finanzas, tecnicas |
+| [x] | Selector de Seguro de Vida | `/selector-seguro-vida/` | finanzas, salud |
+| [x] | Selector de Tipo de Ahorro | `/selector-tipo-ahorro/` | finanzas, productividad |
 | [x] | Selector de Tipo de Hipoteca | `/selector-tipo-hipoteca/` | finanzas, inmobiliaria |
 | [ ] | Selector de Tipo de Inversión | `/selector-inversiones/` | finanzas |
 | [ ] | Selector de Tipo de Préstamo | `/selector-tipo-prestamo/` | finanzas, inmobiliaria |

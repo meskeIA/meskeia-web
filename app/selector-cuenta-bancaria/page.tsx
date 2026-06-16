@@ -354,7 +354,7 @@ export default function SelectorCuentaBancariaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1>🏦 Selector de Cuenta Bancaria</h1>
+        <h1><span aria-hidden="true">🏦</span> Selector de Cuenta Bancaria</h1>
         <p>Responde 10 preguntas y descubre qué tipo de cuenta bancaria se adapta mejor a tu situación</p>
       </header>
 
@@ -442,7 +442,7 @@ export default function SelectorCuentaBancariaPage() {
               onClick={reiniciar}
               aria-label="Repetir el test desde el principio"
             >
-              🔄 Repetir el test
+              <span aria-hidden="true">🔄</span> Repetir el test
             </button>
           </section>
         )
@@ -464,19 +464,19 @@ export default function SelectorCuentaBancariaPage() {
 
           <div className={styles.comparativaGrid}>
             <div className={styles.comparativaItem}>
-              <h4>🏦 Cuenta corriente</h4>
+              <h4><span aria-hidden="true">🏦</span> Cuenta corriente</h4>
               <p>Operativa diaria sin requisitos especiales. Ideal para autónomos y quienes no quieren compromisos.</p>
             </div>
             <div className={styles.comparativaItem}>
-              <h4>💼 Cuenta nómina</h4>
+              <h4><span aria-hidden="true">💼</span> Cuenta nómina</h4>
               <p>Requiere domiciliar ingresos regulares. A cambio: sin comisiones, tarjeta gratuita y bonificaciones.</p>
             </div>
             <div className={styles.comparativaItem}>
-              <h4>🧑‍🎓 Cuenta joven</h4>
+              <h4><span aria-hidden="true">🧑‍🎓</span> Cuenta joven</h4>
               <p>Para menores de 25–30 años. Sin comisiones, ventajas en ocio y a veces mayor remuneración del ahorro.</p>
             </div>
             <div className={styles.comparativaItem}>
-              <h4>💰 Cuenta de ahorro</h4>
+              <h4><span aria-hidden="true">💰</span> Cuenta de ahorro</h4>
               <p>Diseñada para apartar dinero y generar intereses. No apta como cuenta operativa principal.</p>
             </div>
           </div>

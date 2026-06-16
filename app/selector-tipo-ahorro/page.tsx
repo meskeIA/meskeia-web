@@ -374,7 +374,7 @@ export default function SelectorTipoAhorro() {
                 disabled={preguntaActual === 0}
                 aria-label="Ir a la pregunta anterior"
               >
-                ← Anterior
+                <span aria-hidden="true">←</span> Anterior
               </button>
 
               {esUltimaPregunta ? (
@@ -385,7 +385,7 @@ export default function SelectorTipoAhorro() {
                   disabled={respuestaSeleccionada === undefined}
                   aria-label="Ver el resultado del test"
                 >
-                  Ver resultado →
+                  Ver resultado <span aria-hidden="true">→</span>
                 </button>
               ) : (
                 <button
@@ -395,7 +395,7 @@ export default function SelectorTipoAhorro() {
                   disabled={respuestaSeleccionada === undefined}
                   aria-label="Ir a la siguiente pregunta"
                 >
-                  Siguiente →
+                  Siguiente <span aria-hidden="true">→</span>
                 </button>
               )}
             </div>
