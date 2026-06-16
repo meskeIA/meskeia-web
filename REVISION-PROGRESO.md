@@ -1038,10 +1038,10 @@
 | [x] | Índice Glucémico vs. Carga Glucémica: La Paradoja de la Sandía | `/visualizador-indice-glucemico/` | salud, cultura, estudiantes |
 | [x] | Insulina y Glucosa - Cómo Regula tu Cuerpo el Azúcar | `/visualizador-insulina-glucosa/` | salud, cultura, estudiantes |
 | [x] | La Cicatrización - Las 4 Fases de Reparación de Heridas | `/visualizador-cicatrizacion/` | salud, estudiantes, cultura |
-| [ ] | La Huella de lo que Comes | `/visualizador-huella-alimentos/` | salud, cultura |
-| [ ] | La Piel - Capas, Funciones y Cicatrización | `/visualizador-piel/` | salud, estudiantes, cultura |
-| [ ] | Lactasa - La Enzima que Revolucionó la Historia Humana | `/visualizador-lactasa/` | salud, cultura, estudiantes |
-| [ ] | Lo que Cuesta Enfermarse | `/visualizador-coste-sanidad/` | salud, cultura |
+| [x] | La Huella de lo que Comes | `/visualizador-huella-alimentos/` | salud, cultura |
+| [x] | La Piel - Capas, Funciones y Cicatrización | `/visualizador-piel/` | salud, estudiantes, cultura |
+| [x] | Lactasa - La Enzima que Revolucionó la Historia Humana | `/visualizador-lactasa/` | salud, cultura, estudiantes |
+| [x] | Lo que Cuesta Enfermarse | `/visualizador-coste-sanidad/` | salud, cultura |
 | [ ] | Melatonina - La Hormona del Reloj Interno | `/visualizador-melatonina/` | salud, cultura, estudiantes |
 | [ ] | Metabolismo del Alcohol: El Acetaldehído Multi-Órgano | `/visualizador-metabolismo-alcohol/` | salud, cultura |
 | [ ] | Orientador Colesterol | `/orientador-colesterol/` | salud, legal-fiscal |

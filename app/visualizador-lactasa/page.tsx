@@ -184,9 +184,11 @@ export default function VisualizadorLactasa() {
             {PASOS.map((p, i) => (
               <button
                 key={i}
+                type="button"
                 className={`${styles.stepIndicador} ${i === paso ? styles.stepIndicadorActivo : ''} ${i < paso ? styles.stepIndicadorCompletado : ''}`}
                 onClick={() => setPaso(i)}
                 aria-label={`Ir al paso ${i + 1}`}
+                aria-pressed={i === paso}
               >
                 {i + 1}
               </button>
@@ -226,7 +228,7 @@ export default function VisualizadorLactasa() {
                   </div>
                   <div className={styles.flechaAbajo} aria-hidden="true">⬇</div>
                   <div className={styles.enzimaCaja}>
-                    <span className={styles.enzimaIcono}>⚙️</span>
+                    <span className={styles.enzimaIcono} aria-hidden="true">⚙️</span>
                     <span>LACTASA (anclada en enterocito)</span>
                   </div>
                 </div>
@@ -254,6 +256,7 @@ export default function VisualizadorLactasa() {
 
           <div className={styles.stepControls}>
             <button
+              type="button"
               className={styles.btnControl}
               onClick={() => setPaso((p) => Math.max(0, p - 1))}
               disabled={paso === 0}
@@ -263,6 +266,7 @@ export default function VisualizadorLactasa() {
             </button>
             <span className={styles.stepCounter}>{paso + 1} / {PASOS.length}</span>
             <button
+              type="button"
               className={styles.btnControl}
               onClick={() => setPaso((p) => Math.min(PASOS.length - 1, p + 1))}
               disabled={paso === PASOS.length - 1}

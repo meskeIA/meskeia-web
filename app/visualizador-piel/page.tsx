@@ -350,6 +350,7 @@ export default function VisualizadorPiel() {
           {SECCIONES.map((s) => (
             <button
               key={s.id}
+              type="button"
               className={`${styles.navBtn} ${seccionActiva === s.id ? styles.navBtnActivo : ''}`}
               onClick={() => setSeccionActiva(s.id)}
               aria-pressed={seccionActiva === s.id}
@@ -374,6 +375,7 @@ export default function VisualizadorPiel() {
                 {CAPAS.map((c, idx) => (
                   <button
                     key={c.id}
+                    type="button"
                     className={`${styles.capaBtn} ${capaSeleccionada === c.id ? styles.capaBtnActivo : ''}`}
                     style={
                       {
@@ -478,6 +480,7 @@ export default function VisualizadorPiel() {
                   className={`${styles.funcionCard} ${funcionExpandida === f.id ? styles.funcionCardExpandida : ''}`}
                 >
                   <button
+                    type="button"
                     className={styles.funcionBtn}
                     onClick={() => setFuncionExpandida(funcionExpandida === f.id ? null : f.id)}
                     aria-expanded={funcionExpandida === f.id}
@@ -516,6 +519,7 @@ export default function VisualizadorPiel() {
               {FASES_CICATRIZACION.map((f) => (
                 <button
                   key={f.id}
+                  type="button"
                   className={`${styles.faseBtn} ${faseActiva === f.id ? styles.faseBtnActiva : ''}`}
                   style={{ '--fase-color': f.color } as React.CSSProperties}
                   onClick={() => setFaseActiva(f.id)}
@@ -535,7 +539,7 @@ export default function VisualizadorPiel() {
                 <span aria-hidden="true">{fase.icono}</span>
                 <div>
                   <h3>Fase {fase.numero}: {fase.nombre}</h3>
-                  <span className={styles.faseDuracion}>⏱ {fase.duracion}</span>
+                  <span className={styles.faseDuracion}><span aria-hidden="true">⏱</span> {fase.duracion}</span>
                 </div>
               </div>
 
@@ -554,7 +558,7 @@ export default function VisualizadorPiel() {
             </div>
 
             <div className={styles.warningBox}>
-              <h3>⚠️ La cicatriz nunca es idéntica a la piel original</h3>
+              <h3><span aria-hidden="true">⚠️</span> La cicatriz nunca es idéntica a la piel original</h3>
               <p>
                 Incluso tras el remodelado completo, la cicatriz solo alcanza el 70–80% de la resistencia de la piel original. No contiene folículos pilosos ni glándulas sudoríparas y tiene menor elasticidad. En cicatrices queloides y cicatrices hipertróficas, la producción de colágeno se desregula generando un tejido elevado y duro.
               </p>
@@ -575,6 +579,7 @@ export default function VisualizadorPiel() {
               {FOTOTIPOS.map((ft) => (
                 <button
                   key={ft.numero}
+                  type="button"
                   className={`${styles.fototipoBtn} ${fototipoSeleccionado === ft.numero ? styles.fototipoBtnActivo : ''}`}
                   style={{ '--fototipo-color': ft.colorPiel } as React.CSSProperties}
                   onClick={() => setFototipoSeleccionado(ft.numero)}
@@ -600,19 +605,19 @@ export default function VisualizadorPiel() {
               <div className={styles.fototipoDetalleBody}>
                 <div className={styles.fototipoGrid}>
                   <div className={styles.fototipoItem}>
-                    <span className={styles.fototipoItemLabel}>👁️ Color de ojos</span>
+                    <span className={styles.fototipoItemLabel}><span aria-hidden="true">👁️</span> Color de ojos</span>
                     <span>{fototipo.ojos}</span>
                   </div>
                   <div className={styles.fototipoItem}>
-                    <span className={styles.fototipoItemLabel}>💇 Color de pelo</span>
+                    <span className={styles.fototipoItemLabel}><span aria-hidden="true">💇</span> Color de pelo</span>
                     <span>{fototipo.pelo}</span>
                   </div>
                   <div className={styles.fototipoItem}>
-                    <span className={styles.fototipoItemLabel}>☀️ Respuesta al sol</span>
+                    <span className={styles.fototipoItemLabel}><span aria-hidden="true">☀️</span> Respuesta al sol</span>
                     <span>{fototipo.respuestaSol}</span>
                   </div>
                   <div className={styles.fototipoItem}>
-                    <span className={styles.fototipoItemLabel}>🧴 Protección recomendada</span>
+                    <span className={styles.fototipoItemLabel}><span aria-hidden="true">🧴</span> Protección recomendada</span>
                     <span className={styles.spfBadge}>{fototipo.spf}</span>
                   </div>
                 </div>
