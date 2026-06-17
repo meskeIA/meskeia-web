@@ -322,6 +322,10 @@ interface CampoInputProps {
 }
 
 function CampoInput({ label, campo, valor, onChange, nota }: CampoInputProps) {
+  const [enfocado, setEnfocado] = useState(false);
+  const numerico = parseSpanishNumber(valor) || 0;
+  const displayValor = enfocado ? valor : (numerico > 0 ? formatNumber(numerico, 0) : '');
+
   return (
     <div className={styles.campoInput}>
       <label htmlFor={`input-${campo}`} className={styles.campoLabel}>
@@ -333,11 +337,17 @@ function CampoInput({ label, campo, valor, onChange, nota }: CampoInputProps) {
         <input
           id={`input-${campo}`}
           type="text"
-          inputMode="decimal"
+          inputMode="numeric"
           className={styles.campoInputField}
-          value={valor}
-          onChange={e => onChange(campo, e.target.value)}
+          value={displayValor}
           placeholder="0"
+          onFocus={() => setEnfocado(true)}
+          onBlur={(e) => {
+            setEnfocado(false);
+            const n = parseSpanishNumber(e.target.value) || 0;
+            onChange(campo, n.toString());
+          }}
+          onChange={e => onChange(campo, e.target.value)}
         />
       </div>
     </div>
@@ -398,18 +408,18 @@ export default function AnalizadorRatiosFinancierosPage() {
             <h3 className={styles.inputsSubtitulo}>Balance de Situación</h3>
             <div className={styles.inputsBloque}>
               <span className={styles.inputsBloqueLabel}>ACTIVO</span>
-              <CampoInput label="Activo Corriente" campo="activoCorriente" valor={datos.activoCorriente} onChange={actualizarCampo} />
-              <CampoInput label="Existencias" campo="existencias" valor={datos.existencias} onChange={actualizarCampo} nota="incluido en AC" />
-              <CampoInput label="Tesorería" campo="tesoreria" valor={datos.tesoreria} onChange={actualizarCampo} nota="incluido en AC" />
-              <CampoInput label="Clientes / Deudores" campo="clientes" valor={datos.clientes} onChange={actualizarCampo} nota="incluido en AC" />
               <CampoInput label="Activo Total" campo="activoTotal" valor={datos.activoTotal} onChange={actualizarCampo} />
+              <CampoInput label="Activo Corriente" campo="activoCorriente" valor={datos.activoCorriente} onChange={actualizarCampo} nota="dentro del AT" />
+              <CampoInput label="Existencias" campo="existencias" valor={datos.existencias} onChange={actualizarCampo} nota="dentro del AC" />
+              <CampoInput label="Clientes / Deudores" campo="clientes" valor={datos.clientes} onChange={actualizarCampo} nota="dentro del AC" />
+              <CampoInput label="Tesorería" campo="tesoreria" valor={datos.tesoreria} onChange={actualizarCampo} nota="dentro del AC" />
             </div>
             <div className={styles.inputsBloque}>
               <span className={styles.inputsBloqueLabel}>PASIVO Y PATRIMONIO NETO</span>
-              <CampoInput label="Pasivo Corriente" campo="pasivoCorriente" valor={datos.pasivoCorriente} onChange={actualizarCampo} />
-              <CampoInput label="Pasivo Total" campo="pasivoTotal" valor={datos.pasivoTotal} onChange={actualizarCampo} />
               <CampoInput label="Patrimonio Neto" campo="patrimonioNeto" valor={datos.patrimonioNeto} onChange={actualizarCampo} />
-              <CampoInput label="Proveedores" campo="proveedores" valor={datos.proveedores} onChange={actualizarCampo} nota="incluido en PC" />
+              <CampoInput label="Pasivo Total" campo="pasivoTotal" valor={datos.pasivoTotal} onChange={actualizarCampo} />
+              <CampoInput label="Pasivo Corriente" campo="pasivoCorriente" valor={datos.pasivoCorriente} onChange={actualizarCampo} nota="dentro del PT" />
+              <CampoInput label="Proveedores" campo="proveedores" valor={datos.proveedores} onChange={actualizarCampo} nota="dentro del PC" />
             </div>
           </div>
 
