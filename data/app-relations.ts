@@ -3597,8 +3597,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'quiz-conceptos-financieros': [
     { url: '/simulador-paga-ahorro/', icon: '🐷', name: 'Simulador de Paga', description: 'Gestiona tu paga y ahorra' },
     { url: '/juego-presupuesto-mensual/', icon: '🎮', name: 'Juego de Presupuesto', description: '¿Llegas a fin de mes?' },
-    { url: '/estimador-tiempo-ahorro/', icon: '🎯', name: '¿Cuánto tardo en ahorrar?', description: 'Plazo para tu objetivo' },
+    { url: '/simulador-contabilidad-basica/', icon: '📒', name: 'Contabilidad Básica', description: 'Partida doble y libro mayor' },
     { url: '/quiz-conceptos-inversion/', icon: '📈', name: 'Quiz Inversión Intermedio', description: 'El siguiente nivel — Sharpe, beta, TER' },
+  ],
+  'simulador-contabilidad-basica': [
+    { url: '/quiz-conceptos-financieros/', icon: '🧠', name: 'Quiz Financiero', description: '¿Cuánto sabes de finanzas básicas?' },
+    { url: '/generador-facturas/', icon: '🧾', name: 'Generador de Facturas', description: 'Crea facturas para autónomos' },
+    { url: '/planificador-cashflow/', icon: '💸', name: 'Planificador de Cashflow', description: 'Proyecta tu flujo de caja' },
+    { url: '/simulador-paga-ahorro/', icon: '🐷', name: 'Simulador de Paga y Ahorro', description: 'Educación financiera práctica' },
   ],
   'estimador-costas-judiciales': [
     { url: '/estimador-costes-divorcio/', icon: '📝', name: 'Costes de Divorcio', description: 'Mutuo acuerdo vs contencioso' },
