@@ -610,10 +610,22 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-escalas-tiempo/', icon: '⏳', name: 'Cuánto Tarda el Mundo', description: 'Escalas temporales' },
   ],
   'visualizador-oferta-demanda': [
+    { url: '/visualizador-microeconomia/', icon: '⚖️', name: 'Microeconomía Visual', description: '6 conceptos clave de microeconomía' },
     { url: '/visualizador-como-funciona-banco/', icon: '🏦', name: 'Cómo Funciona un Banco', description: 'Sistema bancario visual' },
     { url: '/visualizador-viaje-impuestos/', icon: '🏛️', name: 'El Viaje de tus Impuestos', description: 'A dónde va tu dinero' },
     { url: '/visualizador-precio-real-cosas/', icon: '⏰', name: 'El Precio Real de las Cosas', description: 'Horas de trabajo por compra' },
-    { url: '/visualizador-origen-camiseta/', icon: '👕', name: 'De dónde Viene tu Camiseta', description: 'Cadena global de producción' },
+  ],
+  'visualizador-microeconomia': [
+    { url: '/visualizador-macroeconomia/', icon: '📈', name: 'Macroeconomía Visual', description: 'La economía de un país, concepto a concepto' },
+    { url: '/visualizador-oferta-demanda/', icon: '📊', name: 'Oferta y Demanda', description: 'Por qué suben los precios' },
+    { url: '/visualizador-mercados-financieros/', icon: '📈', name: 'Mercados Financieros', description: 'Cómo funciona la bolsa' },
+    { url: '/quiz-conceptos-financieros/', icon: '🧠', name: 'Quiz de Conceptos Financieros', description: 'Pon a prueba lo aprendido' },
+  ],
+  'visualizador-macroeconomia': [
+    { url: '/visualizador-microeconomia/', icon: '⚖️', name: 'Microeconomía Visual', description: 'Cómo deciden personas y empresas' },
+    { url: '/estimador-inflacion/', icon: '📈', name: 'Estimador de Inflación', description: 'Tu poder adquisitivo en el tiempo' },
+    { url: '/visualizador-como-funciona-banco/', icon: '🏦', name: 'Cómo Funciona un Banco', description: 'Tipos de interés y creación de dinero' },
+    { url: '/visualizador-mercados-financieros/', icon: '📈', name: 'Mercados Financieros', description: 'Bolsa, órdenes y activos' },
   ],
   'visualizador-viaje-comida': [
     { url: '/visualizador-adn-numeros/', icon: '🧬', name: 'Tu ADN en Números', description: 'Cifras del genoma humano' },

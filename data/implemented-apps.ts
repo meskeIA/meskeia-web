@@ -33,6 +33,8 @@ export const implementedAppsUrls = [
   "/visualizador-fuerzas-invisibles/",
   "/visualizador-escala-universo/",
   "/visualizador-oferta-demanda/",
+  "/visualizador-microeconomia/",
+  "/visualizador-macroeconomia/",
   "/visualizador-viaje-comida/",
   "/visualizador-adn-numeros/",
   "/visualizador-historia-reloj/",
