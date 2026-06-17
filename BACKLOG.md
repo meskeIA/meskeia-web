@@ -66,6 +66,8 @@
 
 > Nota: `visualizador-cancer` sigue marcado como "urgente" por el script de auditoría (severity="critical" cuando el nivel esperado por sus suites sería "high"), pero es una **decisión intencional del usuario documentada en este mismo BACKLOG** (resuelto 2026-05-04 y 2026-05-11) — no constituye incidencia real, no reabrir.
 
+> Nota: `recordatorio-medicacion` (suites `[accesibilidad, salud, productividad]` → nivel esperado 2/high) mantiene `variant="medical" severity="critical" collapsible=false` por **decisión intencional del usuario** (2026-06-17). Es una app de adherencia a medicación: el riesgo real de un fallo de dosis/horario justifica el aviso más estricto. El script `audit-disclaimers.mjs --solo-criticos` lo marcará como "urgente" mecánicamente (critical > high), pero es sobre-protección deliberada, no incidencia — **no reabrir ni rebajar a `high`**.
+
 - [ ] **Actualizar dependencias (Fase 6)**: `npm outdated` → evaluar actualizaciones. Priorizar: Next.js, React, Chart.js. Sesión dedicada por alto riesgo de breaking changes.
   - *Impacto*: Rendimiento, seguridad, compatibilidad futura
   - *Complejidad*: Alta (sesión separada, con build verification)
