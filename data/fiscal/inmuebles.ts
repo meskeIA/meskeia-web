@@ -18,11 +18,11 @@
 
 export const FISCAL_INMUEBLES_META = {
   fuente: 'Ley 1/1993 ITP-AJD + Ley 35/2006 IRPF + Ley 37/1992 IVA + RDL 26/2021',
-  verificado: '2026-06-13',
-  vigencia: '2025',
+  verificado: '2026-06-17',
+  vigencia: '2026',
   urlOficialITP: 'https://sede.agenciatributaria.gob.es/Sede/itp-ajd.html',
   urlOficialIRPF: 'https://sede.agenciatributaria.gob.es/Sede/procedimientoini/GI01.shtml',
-  nota: 'El ITP varía por comunidad autónoma (6-11%). Los tipos indicados son orientativos. Consulta el tipo exacto de tu CCAA antes de calcular.',
+  nota: 'El ITP varía por comunidad autónoma (6-13%). Los tipos indicados son orientativos. Consulta el tipo exacto de tu CCAA antes de calcular.',
 };
 
 // ─── ITP (Impuesto Transmisiones Patrimoniales) — Vivienda de segunda mano ───
@@ -40,23 +40,23 @@ export interface TipoITPCCAA {
  * discapacitados u otras circunstancias. Verificar siempre en la hacienda autonómica.
  */
 export const TIPOS_ITP_CCAA_2025: TipoITPCCAA[] = [
-  { ccaa: 'Andalucía',          tipo: 7,    reducido: 3.5,  notaReducido: 'Familias numerosas, discapacidad ≥33%, jóvenes <35 años en zonas rurales' },
+  { ccaa: 'Andalucía',          tipo: 7,    reducido: 3.5,  notaReducido: 'Tipo general 7%. Vivienda habitual ≤150.000 €: 6%. Reducido 3,5%: jóvenes <35 (≤150.000 €), familia numerosa o discapacidad ≥33% (≤250.000 €), municipios despoblados' },
   { ccaa: 'Aragón',             tipo: 8,    reducido: 5,    notaReducido: 'Jóvenes <36 años, primera vivienda habitual. ⚠️ Dato orientativo: Aragón aplica bonificaciones sobre la cuota que varían según colectivo y municipio — verifica la tarifa vigente en aragon.es' },
   { ccaa: 'Asturias',           tipo: 8,    reducido: 4,    notaReducido: 'Jóvenes <35 años, familia numerosa, discapacidad ≥65% (vivienda habitual ≤150.000 €)' },
-  { ccaa: 'Baleares',           tipo: 8,    reducido: 4,    notaReducido: 'Primera vivienda habitual precio < 270.151 €' },
+  { ccaa: 'Baleares',           tipo: 8,    reducido: 4,    notaReducido: 'Escala progresiva 8/9/10/12/13% según valor. Reducido 4% vivienda habitual ≤270.151 €; menores de 30 años o discapacidad ≥33%: 0%; familia numerosa o VPO: 5%' },
   { ccaa: 'Canarias',           tipo: 6.5,  reducido: 5,    notaReducido: 'Vivienda habitual, valor ≤150.000 € (sin ser titular de otra vivienda)' },
   { ccaa: 'Cantabria',          tipo: 9,    reducido: 7,    notaReducido: 'Vivienda habitual valor < 200.000 €; jóvenes <36 años hasta 4%' },
   { ccaa: 'Castilla-La Mancha', tipo: 9,    reducido: 6,    notaReducido: 'Jóvenes <36 años, familia numerosa o discapacidad, vivienda habitual ≤180.000 €' },
-  { ccaa: 'Castilla y León',    tipo: 8,    reducido: 4,    notaReducido: 'Jóvenes <36 años vivienda habitual' },
+  { ccaa: 'Castilla y León',    tipo: 8,    reducido: 4,    notaReducido: 'Reducido 4% (≤150.000 €) o 6% (resto) para jóvenes <36, familia numerosa/monoparental, discapacidad ≥65%, VPO o zonas rurales. Jóvenes <36 en municipios <10.000 hab. (≤150.000 €): 0,01%' },
   { ccaa: 'Cataluña',           tipo: 10,   reducido: 5,    notaReducido: 'Jóvenes ≤32 años (≤35 desde 27/06/2026) con renta ≤36.000 €, familia numerosa/monoparental o discapacidad ≥65% (vivienda habitual). VPO: 7%' },
-  { ccaa: 'Extremadura',        tipo: 8,    reducido: 7 },
+  { ccaa: 'Extremadura',        tipo: 8,    reducido: 7,    notaReducido: 'Vivienda habitual (≤180.000 €, con límites de renta). ⚠️ Dato orientativo: escala progresiva (8/10/11%) y varios tipos para jóvenes/familia numerosa según valor y renta — verifica la tarifa vigente en gobiernodeextremadura.es' },
   { ccaa: 'Galicia',            tipo: 8,    reducido: 3,    notaReducido: 'Jóvenes <36 años, familias numerosas, discapacidad ≥65% (vivienda habitual ≤150.000 €)' },
   { ccaa: 'La Rioja',           tipo: 7,    reducido: 4,    notaReducido: 'Jóvenes <40 años, primera vivienda habitual (novedad 2025); familia numerosa o discapacidad ≥33%: 5%. ⚠️ Dato orientativo: existen varios escalones adicionales según colectivo y municipio — verifica la tarifa vigente en larioja.org' },
   { ccaa: 'Madrid',             tipo: 6,    reducido: 5.4,  notaReducido: 'Bonificación 10% sobre cuota, vivienda habitual ≤250.000 € (6% → 5,4% efectivo); familia numerosa: 4%; jóvenes <35 en municipios <2.500 hab.: exento 100%' },
-  { ccaa: 'Murcia',             tipo: 8,    reducido: 3,    notaReducido: 'Familias numerosas, discapacidad' },
+  { ccaa: 'Murcia',             tipo: 7.75, reducido: 3,    notaReducido: 'Tipo general 7,75% desde 25/07/2025 (Ley 3/2025, antes 8%). Reducido 3%: jóvenes <35 (≤150.000 €), familia numerosa, discapacidad ≥65%; VPO régimen especial: 4%' },
   { ccaa: 'Navarra',            tipo: 6,    reducido: 5,    notaReducido: 'Jóvenes <35 años, familias con 2+ hijos, discapacidad o VPO (vivienda habitual ≤180.304 €)' },
   { ccaa: 'País Vasco',         tipo: 4,    reducido: 2.5,  notaReducido: 'Jóvenes <35 años, familia numerosa, discapacidad ≥65% o VPO (vivienda habitual). Normativa foral: puede variar ligeramente entre Álava/Bizkaia/Gipuzkoa' },
-  { ccaa: 'Valencia',           tipo: 10,   reducido: 8,    notaReducido: 'Primera vivienda habitual precio < 1M €' },
+  { ccaa: 'Valencia',           tipo: 9,    reducido: 8,    notaReducido: 'Tipo general 9% desde 01/06/2026 (antes 10%) para vivienda usada ≤1.000.000 €; 11% por encima. Reducido 8% jóvenes <35/VPO; 6% jóvenes <35 (≤180.000 €); 4% familia numerosa/monoparental/discapacidad' },
   { ccaa: 'Media orientativa',  tipo: 8 },
 ];
 

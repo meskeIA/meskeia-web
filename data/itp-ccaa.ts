@@ -1,10 +1,17 @@
 /**
  * Datos del Impuesto de Transmisiones Patrimoniales (ITP) por Comunidad Autónoma
- * Actualizado: Diciembre 2024
+ * Actualizado: Junio 2026 (reconciliación 6 CCAA: Andalucía, Baleares, Castilla y León,
+ * Extremadura, Murcia, Valencia)
+ *
+ * Cambios verificados jun-2026:
+ * - Murcia: tipo general 8% → 7,75% (Ley 3/2025, efectos 25/07/2025) — ATRM oficial
+ * - Valencia: tipo general 10% → 9% (≤1M €; 11% por encima) desde 01/06/2026
+ * - Baleares: reducidos corregidos (jóvenes <30/discapacidad ≥33%: 0%; familia numerosa/VPO: 5%)
  *
  * Fuentes:
- * - OCU: https://www.ocu.org/fincas-y-casas/compraventa/fiscalidad/analisis/2024/06/tipos-itp-2024-por-ccaa
- * - Idealista: https://www.idealista.com/news/inmobiliario/vivienda/2024/09/18/819047-itp-por-comunidades-2024
+ * - ATRM Murcia: https://agenciatributaria.carm.es
+ * - Garrigues (Valencia 2026): https://www.garrigues.com
+ * - OCU / Idealista (referencia general por CCAA)
  */
 
 // ===== TIPOS =====
@@ -171,30 +178,30 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       {
         nombre: 'Vivienda habitual',
         tipo: 4,
-        condiciones: ['Vivienda habitual', 'Valor ≤ 270.151 €'],
+        condiciones: ['Vivienda habitual', 'No ser titular de otra vivienda', 'Valor ≤ 270.151 €'],
         valorMaximo: 270151,
       },
       {
-        nombre: 'Jóvenes < 36 años',
-        tipo: 2,
-        condiciones: ['Menor de 36 años', 'Vivienda habitual', 'Valor ≤ 270.151 €'],
+        nombre: 'Jóvenes < 30 años o discapacidad ≥33% (1ª vivienda)',
+        tipo: 0,
+        condiciones: ['Menor de 30 años o discapacidad ≥ 33%', 'Primera vivienda habitual', 'Residente en Baleares 3 años', 'Valor ≤ 270.151 €'],
         valorMaximo: 270151,
       },
       {
         nombre: 'Familia numerosa',
-        tipo: 2,
+        tipo: 5,
         condiciones: ['Familia numerosa', 'Vivienda habitual', 'Valor ≤ 270.151 €'],
         valorMaximo: 270151,
       },
       {
-        nombre: 'Discapacidad',
-        tipo: 2,
-        condiciones: ['Persona con discapacidad conviviente', 'Vivienda habitual'],
+        nombre: 'VPO',
+        tipo: 5,
+        condiciones: ['Vivienda de Protección Oficial', 'Valor ≤ 270.151 €'],
         valorMaximo: 270151,
       },
     ],
     ajd: 1.5,
-    notas: 'Una de las escalas más altas de España (hasta 13%). Bonificación 100% para menores de 30 años con condiciones.',
+    notas: 'Una de las escalas más altas de España (hasta 13%). Bonificación 100% (tipo 0%) para menores de 30 años o discapacidad ≥33% en primera vivienda habitual (valor ≤270.151 €).',
   },
 
   'canarias': {
@@ -388,9 +395,9 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
 
   'valencia': {
     nombre: 'Comunidad Valenciana',
-    tipoGeneral: 10,
+    tipoGeneral: 9,
     tramosProgresivos: [
-      { hasta: 1000000, tipo: 10 },
+      { hasta: 1000000, tipo: 9 },
       { hasta: Infinity, tipo: 11 },
     ],
     tiposReducidos: [
@@ -432,7 +439,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 1.5,
-    notas: 'ITP elevado pero con múltiples tipos reducidos para colectivos.',
+    notas: 'Tipo general 9% desde el 01/06/2026 (antes 10%) para vivienda usada ≤1.000.000 €; 11% por encima. Múltiples tipos reducidos para colectivos.',
   },
 
   'extremadura': {
@@ -467,7 +474,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 1.5,
-    notas: 'Nuevas bonificaciones desde octubre 2024. Escala progresiva hasta 11%.',
+    notas: 'Escala progresiva 8/10/11%. ⚠️ Dato orientativo: los tipos reducidos para jóvenes/familia numerosa varían entre fuentes (7%, 6,4% por bonificación 20% o 3%) según valor y límites de renta — verifica la tarifa vigente en gobiernodeextremadura.es',
   },
 
   'galicia': {
@@ -536,7 +543,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
 
   'murcia': {
     nombre: 'Región de Murcia',
-    tipoGeneral: 8,
+    tipoGeneral: 7.75,
     tiposReducidos: [
       {
         nombre: 'VPO régimen especial',
@@ -562,7 +569,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 1.5,
-    notas: 'Límite de edad generoso para jóvenes (40 años).',
+    notas: 'Tipo general 7,75% desde el 25/07/2025 (Ley 3/2025, antes 8%). Límite de edad generoso para jóvenes (40 años). Fuente: ATRM (agenciatributaria.carm.es).',
   },
 
   'navarra': {
