@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
-> **Última actualización**: 2026-06-08
-> **Apps totales**: 995 | **Suites**: 13
+> **Última actualización**: 2026-06-17
+> **Apps totales**: 868 (carpetas en app/) · 999 entradas en ai-index (incluye rutas dinámicas) | **Suites**: 13
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
@@ -59,6 +59,8 @@
 - [ ] **npm audit: vuln `uuid/exceljs` moderate pendiente** — `exceljs >=3.5.0` depende de `uuid <11.1.1` (GHSA-w5hq-g745-h8pq, buffer bounds check). Fix requiere `npm audit fix --force` con downgrade a `exceljs@3.4.0` (breaking change desde 4.4.0). Riesgo bajo para nuestro uso (lectura/escritura Excel, no generación UUID con buf). Pospuesto hasta que exceljs publique versión >=4.x con uuid corregido. *(detectado: 2026-05-25)*
 
 - [x] **npm audit: vuln `hono` moderate REAPARECIDA — corregida** — 4 CVEs moderados en `hono@4.12.18` (IP restriction bypass IPv6, Set-Cookie injection en cookie helper, JWT middleware acepta cualquier scheme, `app.mount()` enrutado incorrecto con paths percent-encoded). Llegaba transitivamente vía `@modelcontextprotocol/sdk@1.29.0` → `@hono/node-server`. Ya se había resuelto el 2026-05-11 (mismo patrón de reaparición que `brace-expansion` en 2026-05-17). Corregida con `npm audit fix` sin --force — solo `package-lock.json` modificado, build 1.161 páginas OK. De 5 a 4 vuln moderadas (las 4 restantes son deuda aceptada / ya trackeadas). *(detectado y resuelto: 2026-06-08)*
+
+- [x] **npm audit: `ws` + `hono` high + `@babel/core` + `dompurify` corregidas** — Auditoría 2026-06-17: 8 vuln (2 high, 5 moderate, 1 low) → 4 moderate. `npm audit fix` sin --force resolvió `ws@7.x` (Memory exhaustion DoS, GHSA-96hv-2xvq-fx4p), `hono` (Path traversal Windows %5C + 4 CVEs más, reaparición transitoria vía MCP SDK), `@babel/core` (Arbitrary File Read sourceMappingURL) y `dompurify` (7 CVEs IN_PLACE/XSS). Solo `package-lock.json` modificado, build 1.300 páginas OK. Las 4 moderate restantes son deuda aceptada (postcss vía Next) + `uuid/exceljs` ya trackeada. *(detectado y resuelto: 2026-06-17)*
 
 - [x] **Disclaimer `guia-productos-limpieza` corregido** — severity="high"→"critical" (suites `[inmobiliaria, salud]` exigen Nivel 1 CRÍTICO según DISCLAIMER-POLICY.md). `variant="general"` y `collapsible={false}` ya eran correctos (mismo patrón que `adaptacion-hogar`, `planificador-boda`). Detectado por `audit-disclaimers.mjs --solo-criticos`. *(detectado y resuelto: 2026-06-08)*
 
