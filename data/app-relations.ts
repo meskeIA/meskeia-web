@@ -2818,9 +2818,15 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-iva': [...fiscalApps.slice(1, 2), ...matematicasBasicasApps.slice(0, 2)],
   'orientador-iva-espana': [
     { url: '/calculadora-iva/', icon: '🧾', name: 'Calculadora IVA', description: 'Añade o quita IVA al 21/10/4 %' },
+    { url: '/orientador-tipos-renta-irpf/', icon: '🧭', name: 'Tipos de Renta IRPF', description: 'Cómo tributa cada ingreso' },
     { url: '/generador-facturas/', icon: '🧾', name: 'Generador Facturas', description: 'Facturas con IVA e IRPF' },
-    { url: '/orientador-facturacion-retencion/', icon: '📑', name: 'Retenciones en Factura', description: 'IRPF en tus facturas' },
     { url: '/estimador-cuota-autonomo/', icon: '💼', name: 'Cuota Autónomo', description: 'Tu cuota RETA mensual' },
+  ],
+  'orientador-tipos-renta-irpf': [
+    { url: '/estimador-irpf/', icon: '📊', name: 'Estimador de IRPF', description: 'Calcula tu cuota de IRPF' },
+    { url: '/estimador-plusvalias-irpf/', icon: '💹', name: 'Plusvalías IRPF', description: 'Ganancias por venta de activos' },
+    { url: '/orientador-iva-espana/', icon: '🧭', name: 'Orientador del IVA', description: 'Qué IVA aplicar en cada operación' },
+    { url: '/orientador-gastos-deducibles/', icon: '🧾', name: 'Gastos Deducibles', description: 'Qué puedes deducir como autónomo' },
   ],
   'calculadora-descuentos': [...matematicasBasicasApps.slice(0, 2), { url: '/calculadora-iva/', icon: '🧾', name: 'Calculadora IVA', description: 'Añadir o quitar IVA' }],
   'prueba-camara': [{ url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir luz para fotos' }, { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba Micrófono', description: 'Test de audio' }, { url: '/mi-ip/', icon: '🌐', name: 'Mi IP', description: 'Información de red' }],

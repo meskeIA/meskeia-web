@@ -34,6 +34,17 @@ export const TRAMOS_IRPF_2025: TramoIRPF[] = [
   { hasta: Infinity, tipo: 47 },
 ];
 
+// Tramos de la BASE DEL AHORRO IRPF 2025 (estatal, igual en todas las CCAA)
+// Aplica a rendimientos del capital mobiliario y a ganancias/pérdidas patrimoniales
+// derivadas de transmisiones. Escala vigente desde 2023 (Ley 31/2022).
+export const TRAMOS_AHORRO_IRPF_2025: TramoIRPF[] = [
+  { hasta: 6000,     tipo: 19 },
+  { hasta: 50000,    tipo: 21 },
+  { hasta: 200000,   tipo: 23 },
+  { hasta: 300000,   tipo: 27 },
+  { hasta: Infinity, tipo: 28 },
+];
+
 // Mínimos personales y familiares IRPF 2025
 export const MINIMOS_IRPF_2025 = {
   personal:          5550,
