@@ -1173,6 +1173,7 @@ export const implementedAppsUrls = [
   "/orientador-tramites-jubilacion/", // Wizard de trámites de jubilación: solicitud de pensión, cuantía, complementos, IRPF, viudedad y servicios para mayores
   "/analizador-ratios-financieros/",   // 12 ratios financieros con semáforo: liquidez, endeudamiento, rentabilidad, gestión. Datos precargados
   "/simulador-contabilidad-basica/",  // Partida doble, libro diario y libro mayor con cuentas T. Educación contable para principiantes
+  "/visualizador-beneficio-liquidez/", // Simulación 12 meses: beneficio contable vs caja real. PMC, PMP, stock, capex. Brecha de liquidez
 ];
 
 /**

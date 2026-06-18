@@ -3625,10 +3625,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/planificador-cashflow/', icon: '💸', name: 'Planificador de Cashflow', description: 'Proyecta tu flujo de caja' },
   ],
   'analizador-ratios-financieros': [
+    { url: '/visualizador-beneficio-liquidez/', icon: '💸', name: 'Beneficio vs Liquidez', description: 'Por qué tener beneficios no es tener caja' },
+    { url: '/simulador-contabilidad-basica/', icon: '📒', name: 'Contabilidad Básica', description: 'Partida doble y libro mayor' },
+    { url: '/planificador-cashflow/', icon: '💸', name: 'Planificador de Cashflow', description: 'Proyecta tu flujo de caja' },
+    { url: '/quiz-conceptos-financieros/', icon: '🧠', name: 'Quiz Financiero', description: '¿Cuánto sabes de finanzas básicas?' },
+  ],
+  'visualizador-beneficio-liquidez': [
+    { url: '/analizador-ratios-financieros/', icon: '📊', name: 'Analizador de Ratios', description: 'Analiza el balance con 12 ratios' },
     { url: '/simulador-contabilidad-basica/', icon: '📒', name: 'Contabilidad Básica', description: 'Partida doble y libro mayor' },
     { url: '/planificador-cashflow/', icon: '💸', name: 'Planificador de Cashflow', description: 'Proyecta tu flujo de caja' },
     { url: '/estimador-break-even/', icon: '⚖️', name: 'Break-Even', description: 'Punto de equilibrio del negocio' },
-    { url: '/quiz-conceptos-financieros/', icon: '🧠', name: 'Quiz Financiero', description: '¿Cuánto sabes de finanzas básicas?' },
   ],
   'estimador-costas-judiciales': [
     { url: '/estimador-costes-divorcio/', icon: '📝', name: 'Costes de Divorcio', description: 'Mutuo acuerdo vs contencioso' },
