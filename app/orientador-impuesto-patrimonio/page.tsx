@@ -22,7 +22,7 @@ import {
   getMinimoExentoPatrimonio,
   EXENCION_VIVIENDA_HABITUAL,
   UMBRAL_OBLIGACION_DECLARAR,
-  calcularCuotaPatrimonioEstatal,
+  calcularCuotaPatrimonioCCAA,
   ITSGF_UMBRAL,
   FISCAL_PATRIMONIO_META,
 } from '@/data/fiscal';
@@ -128,7 +128,10 @@ export default function OrientadorImpuestoPatrimonioPage() {
   const ccaa = BONIFICACIONES_CCAA_PATRIMONIO.find((c) => c.id === ccaaId);
   const minimoExento = ccaaId ? getMinimoExentoPatrimonio(ccaaId) : 0;
   const baseLiquidable = ccaaId ? Math.max(0, baseImponible - minimoExento) : 0;
-  const cuotaEstatal = calcularCuotaPatrimonioEstatal(baseLiquidable);
+  // Cuota por CCAA: null si no se ha seleccionado CCAA o es foral
+  const resultadoCuota = (ccaaId && !ccaa?.foral && baseLiquidable > 0)
+    ? calcularCuotaPatrimonioCCAA(ccaaId, baseLiquidable)
+    : null;
 
   const hayDatos = patrimonioBruto > 0;
 
@@ -362,23 +365,46 @@ export default function OrientadorImpuestoPatrimonioPage() {
               </div>
             </div>
 
-            {/* Cuota estatal orientativa */}
-            {baseLiquidable > 0 && (
+            {/* Cuota orientativa por CCAA */}
+            {resultadoCuota && (
               <div className={styles.cuotaBox}>
-                <div className={styles.cuotaCabecera}>
-                  <span>Cuota estatal orientativa</span>
-                  <strong className={styles.cuotaValor}>{formatCurrency(cuotaEstatal)}</strong>
+                <p className={styles.cuotaTitulo}>Cuota orientativa — {ccaa?.nombre}</p>
+                <div className={styles.cuotaFilas}>
+                  <div className={styles.cuotaFila}>
+                    <span>Cuota bruta (tarifa {resultadoCuota.escalaUsada})</span>
+                    <strong>{formatCurrency(resultadoCuota.cuotaBruta)}</strong>
+                  </div>
+                  {resultadoCuota.porcentajeBonificacion > 0 && (
+                    <div className={styles.cuotaFila}>
+                      <span>− Bonificación {ccaa?.nombre} ({resultadoCuota.porcentajeBonificacion} %)</span>
+                      <strong>
+                        −{formatCurrency(resultadoCuota.cuotaBruta * resultadoCuota.porcentajeBonificacion / 100)}
+                      </strong>
+                    </div>
+                  )}
+                  <div className={`${styles.cuotaFila} ${styles.cuotaFilaNeta}`}>
+                    <span>Cuota neta orientativa</span>
+                    <strong className={styles.cuotaValor}>{formatCurrency(resultadoCuota.cuotaNeta)}</strong>
+                  </div>
                 </div>
                 <p className={styles.cuotaAviso}>
-                  <span aria-hidden="true">⚠️</span> Cifra orientativa con la <strong>escala estatal</strong> (0,2 %–3,5 %).{' '}
-                  {ccaa?.bonificacion === 'total'
-                    ? `${ccaa.nombre} bonifica la cuota cerca del 100 %, por lo que tu cuota real podría ser prácticamente 0 €.`
-                    : ccaa?.bonificacion === 'parcial'
-                    ? `${ccaa?.nombre} aplica una bonificación parcial y su propia tarifa, así que tu cuota real diferirá.`
-                    : `${ccaa?.nombre} puede tener su propia tarifa, así que tu cuota real puede diferir.`}{' '}
-                  Consulta el{' '}
-                  <Link href="/orientador-limite-conjunto-patrimonio/" className={styles.enlaceInline}>límite conjunto IRPF-Patrimonio</Link>,
-                  que puede reducir la cuota.
+                  <span aria-hidden="true">⚠️</span>{' '}
+                  {resultadoCuota.itsgfInteraccion
+                    ? `La bonificación de ${ccaa?.nombre ?? ''} es variable — interactúa con el Impuesto Temporal de Solidaridad de las Grandes Fortunas (ITSGF). La cuota real puede diferir de esta orientación. `
+                    : resultadoCuota.porcentajeBonificacion === 100
+                    ? `${ccaa?.nombre ?? ''} aplica bonificación del 100% — la cuota es orientativa (sin ITSGF). `
+                    : ''
+                  }
+                  {resultadoCuota.porcentajeBonificacion < 100 && (
+                    <>
+                      Revisa el{' '}
+                      <Link href="/orientador-limite-conjunto-patrimonio/" className={styles.enlaceInline}>
+                        límite conjunto IRPF-Patrimonio
+                      </Link>
+                      {', que puede reducir adicionalmente la cuota. '}
+                    </>
+                  )}
+                  Cifra orientativa — consulta con un asesor fiscal para el cálculo exacto.
                 </p>
               </div>
             )}

@@ -376,6 +376,53 @@
   margin: 0;
 }
 
+/* Desglose de cuota autonómica */
+.cuotaTitulo {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-md) 0;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.cuotaFilas {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.cuotaFila {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  gap: 1rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-card);
+}
+
+.cuotaFila:last-child { border-bottom: none; }
+
+.cuotaFila span { color: var(--text-secondary); }
+.cuotaFila strong { color: var(--text-primary); white-space: nowrap; font-weight: 600; }
+
+.cuotaFilaNeta {
+  background: rgba(46, 134, 171, 0.07);
+  font-weight: 700;
+}
+
+.cuotaFilaNeta span { color: var(--text-primary); font-weight: 700; }
+
+[data-theme='dark'] .cuotaFilas { border-color: var(--border); }
+[data-theme='dark'] .cuotaFila { background: #222; border-color: var(--border); }
+[data-theme='dark'] .cuotaFilaNeta { background: #1a3a4a; }
+
 .enlaceInline {
   color: var(--primary);
   font-weight: 600;

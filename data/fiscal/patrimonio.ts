@@ -66,6 +66,7 @@ export interface CCAAPatrimonio {
   porcentajeBonificacion: number; // 0 a 100
   minimoExento: number;           // mínimo exento aplicable (€) — el general estatal es 700.000
   foral?: boolean;                // régimen foral (Navarra, País Vasco): normativa propia
+  itsgfInteraccion?: boolean;     // la bonificación es variable (depende del ITSGF, no es un % fijo)
   nota: string;
 }
 
@@ -81,23 +82,23 @@ export interface CCAAPatrimonio {
  * por leyes autonómicas. Verifica con tu CCAA o con un asesor.
  */
 export const BONIFICACIONES_CCAA_PATRIMONIO: CCAAPatrimonio[] = [
-  { id: 'andalucia',         nombre: 'Andalucía',           bonificacion: 'total',   porcentajeBonificacion: 100, minimoExento: 700000, nota: 'Bonificación 100% desde 2022 (alternativa al tipo del ITSGF)' },
-  { id: 'aragon',            nombre: 'Aragón',              bonificacion: 'normal',  porcentajeBonificacion: 0,   minimoExento: 400000, nota: 'Mínimo exento reducido a 400.000 €. Sin bonificación general' },
-  { id: 'asturias',          nombre: 'Asturias',            bonificacion: 'normal',  porcentajeBonificacion: 0,   minimoExento: 700000, nota: 'Sin bonificación general — tarifa autonómica propia' },
-  { id: 'baleares',          nombre: 'Baleares',            bonificacion: 'normal',  porcentajeBonificacion: 0,   minimoExento: 700000, nota: 'Sin bonificación general' },
-  { id: 'canarias',          nombre: 'Canarias',            bonificacion: 'normal',  porcentajeBonificacion: 0,   minimoExento: 700000, nota: 'Sin bonificación general' },
-  { id: 'cantabria',         nombre: 'Cantabria',           bonificacion: 'total',   porcentajeBonificacion: 100, minimoExento: 700000, nota: 'Bonificación general 100% desde 2024' },
-  { id: 'castilla-leon',     nombre: 'Castilla y León',     bonificacion: 'total',   porcentajeBonificacion: 100, minimoExento: 700000, nota: 'Bonificación 100% desde 2024' },
-  { id: 'castilla-la-mancha',nombre: 'Castilla-La Mancha',  bonificacion: 'normal',  porcentajeBonificacion: 0,   minimoExento: 700000, nota: 'Sin bonificación general' },
-  { id: 'cataluna',          nombre: 'Cataluña',            bonificacion: 'normal',  porcentajeBonificacion: 0,   minimoExento: 500000, nota: 'Mínimo exento reducido a 500.000 €. Tarifa autonómica propia, más alta que la estatal' },
-  { id: 'comunidad-valenciana', nombre: 'Comunidad Valenciana', bonificacion: 'normal', porcentajeBonificacion: 0, minimoExento: 500000, nota: 'Mínimo exento reducido a 500.000 €. Tarifa autonómica propia' },
-  { id: 'extremadura',       nombre: 'Extremadura',         bonificacion: 'total',   porcentajeBonificacion: 100, minimoExento: 500000, nota: 'Mínimo exento 500.000 € con bonificación 100% de la cuota desde 2023' },
-  { id: 'galicia',           nombre: 'Galicia',             bonificacion: 'total',   porcentajeBonificacion: 100, minimoExento: 700000, nota: 'Bonificación 100% desde 2023 (con matices)' },
-  { id: 'la-rioja',          nombre: 'La Rioja',            bonificacion: 'parcial', porcentajeBonificacion: 50,  minimoExento: 700000, nota: 'Bonificación parcial (deducción autonómica)' },
-  { id: 'madrid',            nombre: 'Madrid',              bonificacion: 'total',   porcentajeBonificacion: 100, minimoExento: 700000, nota: 'Bonificación 100% histórica' },
-  { id: 'murcia',            nombre: 'Murcia',              bonificacion: 'total',   porcentajeBonificacion: 100, minimoExento: 700000, nota: 'Bonificación 100% desde 2023' },
-  { id: 'navarra',           nombre: 'Navarra (foral)',     bonificacion: 'normal',  porcentajeBonificacion: 0,   minimoExento: 550000, foral: true, nota: 'Régimen foral propio (mínimo orientativo 550.000 €) — consulta la Hacienda Foral de Navarra' },
-  { id: 'pais-vasco',        nombre: 'País Vasco (foral)',  bonificacion: 'normal',  porcentajeBonificacion: 0,   minimoExento: 800000, foral: true, nota: 'Régimen foral propio (mínimo orientativo 800.000 €) — consulta la Diputación Foral correspondiente' },
+  { id: 'andalucia',         nombre: 'Andalucía',           bonificacion: 'total',   porcentajeBonificacion: 100, minimoExento: 700000, itsgfInteraccion: true,  nota: 'Bonificación ~100% coordinada con ITSGF (la cuota real depende de su interacción). Tarifa propia idéntica a la estatal.' },
+  { id: 'aragon',            nombre: 'Aragón',              bonificacion: 'normal',  porcentajeBonificacion: 0,   minimoExento: 400000, itsgfInteraccion: false, nota: 'Mínimo exento reducido a 400.000 €. Sin bonificación general. Tarifa estatal.' },
+  { id: 'asturias',          nombre: 'Asturias',            bonificacion: 'normal',  porcentajeBonificacion: 0,   minimoExento: 700000, itsgfInteraccion: false, nota: 'Sin bonificación general. Tarifa autonómica propia (tipos del 0,22% al 3,00%).' },
+  { id: 'baleares',          nombre: 'Baleares',            bonificacion: 'normal',  porcentajeBonificacion: 0,   minimoExento: 700000, itsgfInteraccion: false, nota: 'Sin bonificación general. Tarifa autonómica propia (tipos del 0,28% al 3,45%).' },
+  { id: 'canarias',          nombre: 'Canarias',            bonificacion: 'normal',  porcentajeBonificacion: 0,   minimoExento: 700000, itsgfInteraccion: false, nota: 'Sin bonificación general. Tarifa estatal.' },
+  { id: 'cantabria',         nombre: 'Cantabria',           bonificacion: 'total',   porcentajeBonificacion: 100, minimoExento: 700000, itsgfInteraccion: true,  nota: 'Bonificación ~100% coordinada con ITSGF (la cuota real varía según el impuesto de solidaridad). Tarifa autonómica propia.' },
+  { id: 'castilla-leon',     nombre: 'Castilla y León',     bonificacion: 'total',   porcentajeBonificacion: 100, minimoExento: 700000, itsgfInteraccion: true,  nota: 'Bonificación ~100% coordinada con ITSGF. Tarifa estatal.' },
+  { id: 'castilla-la-mancha',nombre: 'Castilla-La Mancha',  bonificacion: 'normal',  porcentajeBonificacion: 0,   minimoExento: 700000, itsgfInteraccion: false, nota: 'Sin bonificación general. Tarifa estatal.' },
+  { id: 'cataluna',          nombre: 'Cataluña',            bonificacion: 'normal',  porcentajeBonificacion: 0,   minimoExento: 500000, itsgfInteraccion: false, nota: 'Mínimo exento reducido a 500.000 €. Sin bonificación general. Tarifa propia más alta (0,21%–3,48%), con noveno tramo para patrimonios > 20 M€.' },
+  { id: 'comunidad-valenciana', nombre: 'Comunidad Valenciana', bonificacion: 'normal', porcentajeBonificacion: 0, minimoExento: 500000, itsgfInteraccion: false, nota: 'Mínimo exento reducido a 500.000 €. Sin bonificación general. Tarifa autonómica propia (0,25%–3,50%).' },
+  { id: 'extremadura',       nombre: 'Extremadura',         bonificacion: 'total',   porcentajeBonificacion: 100, minimoExento: 500000, itsgfInteraccion: false, nota: 'Mínimo exento 500.000 €. Bonificación del 100% de la cuota desde 2023 (sin dependencia del ITSGF). Tarifa propia (0,30%–3,75%).' },
+  { id: 'galicia',           nombre: 'Galicia',             bonificacion: 'parcial', porcentajeBonificacion: 50,  minimoExento: 700000, itsgfInteraccion: false, nota: 'Bonificación del 50% de la cuota. Tarifa propia idéntica a la estatal.' },
+  { id: 'la-rioja',          nombre: 'La Rioja',            bonificacion: 'total',   porcentajeBonificacion: 100, minimoExento: 700000, itsgfInteraccion: true,  nota: 'Bonificación ~100% coordinada con ITSGF para patrimonios bajo 3,7 M€ (variable por encima). Tarifa estatal.' },
+  { id: 'madrid',            nombre: 'Madrid',              bonificacion: 'total',   porcentajeBonificacion: 100, minimoExento: 700000, itsgfInteraccion: true,  nota: 'Bonificación ~100% coordinada con ITSGF (desde 2008; la cuota real depende de su interacción). Tarifa estatal.' },
+  { id: 'murcia',            nombre: 'Murcia',              bonificacion: 'total',   porcentajeBonificacion: 100, minimoExento: 700000, itsgfInteraccion: true,  nota: 'Bonificación ~100% coordinada con ITSGF para patrimonios bajo 3,7 M€. Tarifa propia idéntica a la estatal.' },
+  { id: 'navarra',           nombre: 'Navarra (foral)',     bonificacion: 'normal',  porcentajeBonificacion: 0,   minimoExento: 550000, foral: true, itsgfInteraccion: false, nota: 'Régimen foral propio (mínimo orientativo 550.000 €) — consulta la Hacienda Foral de Navarra.' },
+  { id: 'pais-vasco',        nombre: 'País Vasco (foral)',  bonificacion: 'normal',  porcentajeBonificacion: 0,   minimoExento: 800000, foral: true, itsgfInteraccion: false, nota: 'Régimen foral propio (mínimo orientativo 800.000 €) — consulta la Diputación Foral correspondiente.' },
 ];
 
 // ─── Datos estatales del Impuesto sobre el Patrimonio ──────────────────────────
@@ -121,6 +122,158 @@ export function getMinimoExentoPatrimonio(ccaaId: string): number {
   const ccaa = BONIFICACIONES_CCAA_PATRIMONIO.find(c => c.id === ccaaId);
   return ccaa ? ccaa.minimoExento : MINIMO_EXENTO_ESTATAL;
 }
+
+// ─── Escalas autonómicas detalladas ─────────────────────────────────────────
+
+/**
+ * Tramo de escala de Patrimonio con cuota fija acumulada y tipo marginal.
+ * Cálculo: cuota = cuotaFija + (base − desde) × tipoMarginal / 100
+ */
+export interface TramoPatrimonioDetallado {
+  desde: number;
+  hasta: number;
+  cuotaFija: number;    // cuota acumulada al inicio del tramo
+  tipoMarginal: number; // tipo marginal del tramo (%)
+}
+
+/**
+ * Escalas autonómicas propias del Impuesto sobre el Patrimonio (IP) 2025.
+ * Solo se almacenan las CCAA con tarifa diferente a la estatal.
+ * Las demás (Galicia, Andalucía, Murcia, Aragón, Canarias, CyL, CLM, La Rioja, Madrid)
+ * usan la escala estatal (con sus bonificaciones correspondientes).
+ *
+ * Fuente: Manual Práctico Impuesto sobre el Patrimonio 2025, AEAT
+ * Verificado: 2026-06-18
+ * URL: https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/patrimonio-2025/
+ */
+const ESCALAS_AUTONOMICAS_IP: Partial<Record<string, TramoPatrimonioDetallado[]>> = {
+  /** Cataluña: Decreto Legislativo 1/2024 — tipos del 0,21% al 3,48%, noveno tramo > 20 M€ */
+  cataluna: [
+    { desde: 0,             hasta: 167129.45,   cuotaFija: 0,         tipoMarginal: 0.21  },
+    { desde: 167129.45,     hasta: 334252.88,   cuotaFija: 350.97,    tipoMarginal: 0.315 },
+    { desde: 334252.88,     hasta: 668499.75,   cuotaFija: 877.41,    tipoMarginal: 0.525 },
+    { desde: 668499.75,     hasta: 1336999.75,  cuotaFija: 2632.21,   tipoMarginal: 0.945 },
+    { desde: 1336999.75,    hasta: 2673999.01,  cuotaFija: 8949.54,   tipoMarginal: 1.365 },
+    { desde: 2673999.01,    hasta: 5347998.03,  cuotaFija: 27199.58,  tipoMarginal: 1.785 },
+    { desde: 5347998.03,    hasta: 10695996.06, cuotaFija: 74930.46,  tipoMarginal: 2.205 },
+    { desde: 10695996.06,   hasta: 20000000,    cuotaFija: 192853.82, tipoMarginal: 2.75  },
+    { desde: 20000000,      hasta: Infinity,    cuotaFija: 448713.93, tipoMarginal: 3.48  },
+  ],
+  /** Asturias: Art. 15 TR tributos cedidos — tipos del 0,22% al 3,00% */
+  asturias: [
+    { desde: 0,             hasta: 167129.45,   cuotaFija: 0,         tipoMarginal: 0.22  },
+    { desde: 167129.45,     hasta: 334252.88,   cuotaFija: 367.68,    tipoMarginal: 0.33  },
+    { desde: 334252.88,     hasta: 668499.75,   cuotaFija: 919.19,    tipoMarginal: 0.56  },
+    { desde: 668499.75,     hasta: 1336999.51,  cuotaFija: 2790.97,   tipoMarginal: 1.02  },
+    { desde: 1336999.51,    hasta: 2673999.01,  cuotaFija: 9609.67,   tipoMarginal: 1.48  },
+    { desde: 2673999.01,    hasta: 5347998.03,  cuotaFija: 29397.26,  tipoMarginal: 1.97  },
+    { desde: 5347998.03,    hasta: 10695996.06, cuotaFija: 82075.05,  tipoMarginal: 2.48  },
+    { desde: 10695996.06,   hasta: Infinity,    cuotaFija: 214705.40, tipoMarginal: 3.00  },
+  ],
+  /** Baleares: tipos del 0,28% al 3,45% — tramos distintos a los estatales */
+  baleares: [
+    { desde: 0,             hasta: 170472.04,   cuotaFija: 0,         tipoMarginal: 0.28  },
+    { desde: 170472.04,     hasta: 340937.04,   cuotaFija: 477.32,    tipoMarginal: 0.41  },
+    { desde: 340937.04,     hasta: 681869.75,   cuotaFija: 1176.23,   tipoMarginal: 0.69  },
+    { desde: 681869.75,     hasta: 1336739.51,  cuotaFija: 3528.67,   tipoMarginal: 1.24  },
+    { desde: 1336739.51,    hasta: 2727479.00,  cuotaFija: 11649.06,  tipoMarginal: 1.79  },
+    { desde: 2727479.00,    hasta: 5454958.00,  cuotaFija: 36543.30,  tipoMarginal: 2.35  },
+    { desde: 5454958.00,    hasta: 10909915.99, cuotaFija: 100639.06, tipoMarginal: 2.90  },
+    { desde: 10909915.99,   hasta: Infinity,    cuotaFija: 258832.84, tipoMarginal: 3.45  },
+  ],
+  /** Extremadura: D.Leg. 1/2018 — tipos del 0,30% al 3,75% (bonif. 100%) */
+  extremadura: [
+    { desde: 0,             hasta: 167129.45,   cuotaFija: 0,         tipoMarginal: 0.30  },
+    { desde: 167129.45,     hasta: 334252.88,   cuotaFija: 501.39,    tipoMarginal: 0.45  },
+    { desde: 334252.88,     hasta: 668499.75,   cuotaFija: 1253.44,   tipoMarginal: 0.75  },
+    { desde: 668499.75,     hasta: 1336999.51,  cuotaFija: 3760.30,   tipoMarginal: 1.35  },
+    { desde: 1336999.51,    hasta: 2673999.01,  cuotaFija: 12785.04,  tipoMarginal: 1.95  },
+    { desde: 2673999.01,    hasta: 5347998.03,  cuotaFija: 38856.53,  tipoMarginal: 2.55  },
+    { desde: 5347998.03,    hasta: 10695996.06, cuotaFija: 107043.51, tipoMarginal: 3.15  },
+    { desde: 10695996.06,   hasta: Infinity,    cuotaFija: 275505.45, tipoMarginal: 3.75  },
+  ],
+  /** Cantabria: TR 2008 — tipos del 0,24% al 3,03% */
+  cantabria: [
+    { desde: 0,             hasta: 167129.45,   cuotaFija: 0,         tipoMarginal: 0.24  },
+    { desde: 167129.45,     hasta: 334252.88,   cuotaFija: 401.11,    tipoMarginal: 0.36  },
+    { desde: 334252.88,     hasta: 668499.75,   cuotaFija: 1002.75,   tipoMarginal: 0.61  },
+    { desde: 668499.75,     hasta: 1336999.51,  cuotaFija: 3041.66,   tipoMarginal: 1.09  },
+    { desde: 1336999.51,    hasta: 2673999.01,  cuotaFija: 10328.31,  tipoMarginal: 1.57  },
+    { desde: 2673999.01,    hasta: 5347998.03,  cuotaFija: 31319.20,  tipoMarginal: 2.06  },
+    { desde: 5347998.03,    hasta: 10695996.06, cuotaFija: 86403.58,  tipoMarginal: 2.54  },
+    { desde: 10695996.06,   hasta: Infinity,    cuotaFija: 222242.73, tipoMarginal: 3.03  },
+  ],
+  /** Comunitat Valenciana: Ley 13/1997 — tipos del 0,25% al 3,50% */
+  'comunidad-valenciana': [
+    { desde: 0,             hasta: 167129.45,   cuotaFija: 0,         tipoMarginal: 0.25  },
+    { desde: 167129.45,     hasta: 334252.88,   cuotaFija: 417.82,    tipoMarginal: 0.37  },
+    { desde: 334252.88,     hasta: 668499.75,   cuotaFija: 1036.18,   tipoMarginal: 0.62  },
+    { desde: 668499.75,     hasta: 1336999.51,  cuotaFija: 3108.51,   tipoMarginal: 1.12  },
+    { desde: 1336999.51,    hasta: 2673999.01,  cuotaFija: 10595.71,  tipoMarginal: 1.62  },
+    { desde: 2673999.01,    hasta: 5347998.03,  cuotaFija: 32255.10,  tipoMarginal: 2.12  },
+    { desde: 5347998.03,    hasta: 10695996.06, cuotaFija: 88943.88,  tipoMarginal: 2.62  },
+    { desde: 10695996.06,   hasta: Infinity,    cuotaFija: 229061.43, tipoMarginal: 3.50  },
+  ],
+};
+
+/** Calcula la cuota bruta con una escala detallada (cuotaFija + tipoMarginal). */
+function calcularCuotaConEscalaDetallada(
+  tramos: TramoPatrimonioDetallado[],
+  base: number,
+): number {
+  if (base <= 0) return 0;
+  for (let i = tramos.length - 1; i >= 0; i--) {
+    if (base > tramos[i].desde) {
+      return tramos[i].cuotaFija + (base - tramos[i].desde) * (tramos[i].tipoMarginal / 100);
+    }
+  }
+  return 0;
+}
+
+export interface ResultadoCuotaCCAA {
+  cuotaBruta: number;
+  porcentajeBonificacion: number; // 0–100
+  cuotaNeta: number;
+  escalaUsada: 'autonómica' | 'estatal';
+  itsgfInteraccion: boolean;
+  esForal: boolean;
+}
+
+/**
+ * Calcula la cuota orientativa del IP para una CCAA específica.
+ * Aplica la escala autonómica propia (si existe) o la estatal,
+ * seguida de la bonificación de la comunidad.
+ *
+ * ⚠️ Para CCAs con itsgfInteraccion: la bonificación real depende del ITSGF —
+ * el resultado orientativo muestra el 100% teórico, pero la cuota real puede
+ * diferir (el ITSGF actúa como suelo mínimo).
+ * ⚠️ Para CCAs forales: resultado según normativa estatal (orientativo).
+ */
+export function calcularCuotaPatrimonioCCAA(
+  ccaaId: string,
+  baseLiquidable: number,
+): ResultadoCuotaCCAA {
+  const ccaa = BONIFICACIONES_CCAA_PATRIMONIO.find((c) => c.id === ccaaId);
+  const escalaPropia = ESCALAS_AUTONOMICAS_IP[ccaaId];
+
+  const cuotaBruta = escalaPropia
+    ? calcularCuotaConEscalaDetallada(escalaPropia, baseLiquidable)
+    : calcularCuotaPatrimonioEstatal(baseLiquidable);
+
+  const bonif = ccaa?.porcentajeBonificacion ?? 0;
+  const cuotaNeta = Math.max(0, cuotaBruta * (1 - bonif / 100));
+
+  return {
+    cuotaBruta,
+    porcentajeBonificacion: bonif,
+    cuotaNeta,
+    escalaUsada: escalaPropia ? 'autonómica' : 'estatal',
+    itsgfInteraccion: ccaa?.itsgfInteraccion ?? false,
+    esForal: ccaa?.foral ?? false,
+  };
+}
+
+// ─── Escala estatal (mantenida para compatibilidad y como fallback) ───────────
 
 /**
  * Escala estatal del Impuesto sobre el Patrimonio (art. 30 Ley 19/1991).
