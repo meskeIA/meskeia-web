@@ -3622,7 +3622,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/analizador-ratios-financieros/', icon: '📊', name: 'Analizador de Ratios', description: 'Analiza el balance con 12 ratios' },
     { url: '/calculadora-valoracion-empresa/', icon: '🏢', name: 'Valoración de Empresa', description: 'Estima cuánto vale tu empresa' },
     { url: '/visualizador-beneficio-liquidez/', icon: '💸', name: 'Beneficio vs Liquidez', description: 'Por qué tener beneficios no es tener caja' },
-    { url: '/planificador-cashflow/', icon: '💰', name: 'Planificador de Cashflow', description: 'Proyecta tu flujo de caja' },
+    { url: '/calculadora-amortizacion-inmovilizado/', icon: '🏭', name: 'Amortización de Inmovilizado', description: 'Lineal, degresivo y suma de dígitos comparados' },
   ],
   'analizador-ratios-financieros': [
     { url: '/calculadora-z-score-altman/', icon: '📉', name: 'Z-Score de Altman', description: 'Riesgo de quiebra a partir del balance' },
@@ -3655,7 +3655,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/analizador-ratios-financieros/', icon: '📊', name: 'Analizador de Ratios', description: 'Mide tu endeudamiento antes de pedir deuda' },
     { url: '/calculadora-valoracion-empresa/', icon: '🏢', name: 'Valoración de Empresa', description: 'Cuánto vale tu empresa para una ampliación' },
     { url: '/simulador-ciclo-explotacion/', icon: '🔄', name: 'Ciclo de Explotación', description: 'PME, PMF y fondo de maniobra necesario' },
+    { url: '/calculadora-amortizacion-inmovilizado/', icon: '🏭', name: 'Amortización de Inmovilizado', description: 'Amortiza el activo que vas a financiar' },
     { url: '/visualizador-beneficio-liquidez/', icon: '💸', name: 'Beneficio vs Liquidez', description: 'El impacto de la financiación en tu caja' },
+  ],
+  'calculadora-amortizacion-inmovilizado': [
+    { url: '/simulador-contabilidad-basica/', icon: '📒', name: 'Contabilidad Básica', description: 'Partida doble, diario y libro mayor' },
+    { url: '/analizador-ratios-financieros/', icon: '📊', name: 'Analizador de Ratios', description: 'Analiza el balance con 12 ratios y DuPont' },
+    { url: '/simulador-financiacion-empresarial/', icon: '⚖️', name: 'Financiación Empresarial', description: 'Préstamo vs leasing vs ampliación de capital' },
+    { url: '/calculadora-valoracion-empresa/', icon: '🏢', name: 'Valoración de Empresa', description: 'Estima cuánto vale tu empresa' },
   ],
   'calculadora-z-score-altman': [
     { url: '/analizador-ratios-financieros/', icon: '📊', name: 'Analizador de Ratios', description: 'Los 12 ratios que alimentan el Z-Score' },

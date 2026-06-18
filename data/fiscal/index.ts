@@ -14,6 +14,7 @@
 export * from './autonomos';
 export * from './irpf';
 export * from './sociedades';
+export * from './amortizacion';
 export * from './inmuebles';
 export * from './sucesiones';
 export * from './donaciones';
