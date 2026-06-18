@@ -2828,6 +2828,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/orientador-iva-espana/', icon: '🧭', name: 'Orientador del IVA', description: 'Qué IVA aplicar en cada operación' },
     { url: '/orientador-gastos-deducibles/', icon: '🧾', name: 'Gastos Deducibles', description: 'Qué puedes deducir como autónomo' },
   ],
+  'orientador-impuesto-patrimonio': [
+    { url: '/orientador-limite-conjunto-patrimonio/', icon: '⚖️', name: 'Límite Conjunto IRPF-Patrimonio', description: 'Reducción de la cuota (regla del 60%)' },
+    { url: '/estimador-plusvalias-irpf/', icon: '💹', name: 'Plusvalías IRPF', description: 'Ganancias por venta de activos' },
+    { url: '/orientador-tipos-renta-irpf/', icon: '🧭', name: 'Tipos de Renta IRPF', description: 'Cómo tributa cada ingreso' },
+    { url: '/estimador-irpf/', icon: '📊', name: 'Estimador de IRPF', description: 'Calcula tu cuota de IRPF' },
+  ],
   'calculadora-descuentos': [...matematicasBasicasApps.slice(0, 2), { url: '/calculadora-iva/', icon: '🧾', name: 'Calculadora IVA', description: 'Añadir o quitar IVA' }],
   'prueba-camara': [{ url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir luz para fotos' }, { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba Micrófono', description: 'Test de audio' }, { url: '/mi-ip/', icon: '🌐', name: 'Mi IP', description: 'Información de red' }],
   'prueba-microfono': [{ url: '/sonometro/', icon: '🔊', name: 'Sonómetro', description: 'Medir decibelios' }, { url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir luz ambiente' }],
@@ -3134,9 +3140,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // ORIENTADOR PATRIMONIO — Art. 31 Ley 19/1991 (2026-05-08)
   'orientador-limite-conjunto-patrimonio': [
+    { url: '/orientador-impuesto-patrimonio/', icon: '🏛️', name: 'Impuesto sobre el Patrimonio', description: 'Valora tus bienes y si declaras' },
     { url: '/estimador-irpf/', icon: '📋', name: 'Estimador IRPF', description: 'Cuota íntegra de tu declaración' },
     { url: '/estimador-plusvalias-irpf/', icon: '💹', name: 'Plusvalías IRPF', description: 'Ganancia patrimonial en venta de activos' },
-    { url: '/simulador-heredar-vivienda/', icon: '🏠', name: 'Heredar Vivienda', description: 'ISD + plusvalía + IRPF al vender' },
     { url: '/estimador-impuesto-sucesiones/', icon: '⚖️', name: 'Impuesto de Sucesiones', description: 'ISD por CCAA y parentesco' },
   ],
 

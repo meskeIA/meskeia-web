@@ -64,6 +64,8 @@ export interface CCAAPatrimonio {
   nombre: string;
   bonificacion: BonificacionPatrimonio;
   porcentajeBonificacion: number; // 0 a 100
+  minimoExento: number;           // mínimo exento aplicable (€) — el general estatal es 700.000
+  foral?: boolean;                // régimen foral (Navarra, País Vasco): normativa propia
   nota: string;
 }
 
@@ -79,24 +81,83 @@ export interface CCAAPatrimonio {
  * por leyes autonómicas. Verifica con tu CCAA o con un asesor.
  */
 export const BONIFICACIONES_CCAA_PATRIMONIO: CCAAPatrimonio[] = [
-  { id: 'andalucia',         nombre: 'Andalucía',           bonificacion: 'total',   porcentajeBonificacion: 100, nota: 'Bonificación 100% desde 2022' },
-  { id: 'aragon',            nombre: 'Aragón',              bonificacion: 'normal',  porcentajeBonificacion: 0,   nota: 'Sin bonificación general — tarifa autonómica' },
-  { id: 'asturias',          nombre: 'Asturias',            bonificacion: 'normal',  porcentajeBonificacion: 0,   nota: 'Sin bonificación general — tarifa autonómica propia' },
-  { id: 'baleares',          nombre: 'Baleares',            bonificacion: 'normal',  porcentajeBonificacion: 0,   nota: 'Sin bonificación general' },
-  { id: 'canarias',          nombre: 'Canarias',            bonificacion: 'normal',  porcentajeBonificacion: 0,   nota: 'Sin bonificación general' },
-  { id: 'cantabria',         nombre: 'Cantabria',           bonificacion: 'total',   porcentajeBonificacion: 100, nota: 'Bonificación general 100% desde 2024' },
-  { id: 'castilla-leon',     nombre: 'Castilla y León',     bonificacion: 'total',   porcentajeBonificacion: 100, nota: 'Bonificación 100% desde 2024' },
-  { id: 'castilla-la-mancha',nombre: 'Castilla-La Mancha',  bonificacion: 'normal',  porcentajeBonificacion: 0,   nota: 'Sin bonificación general' },
-  { id: 'cataluna',          nombre: 'Cataluña',            bonificacion: 'normal',  porcentajeBonificacion: 0,   nota: 'Tarifa autonómica propia, más alta que la estatal' },
-  { id: 'comunidad-valenciana', nombre: 'Comunidad Valenciana', bonificacion: 'normal', porcentajeBonificacion: 0, nota: 'Tarifa autonómica propia' },
-  { id: 'extremadura',       nombre: 'Extremadura',         bonificacion: 'total',   porcentajeBonificacion: 100, nota: 'Bonificación 100% desde 2023' },
-  { id: 'galicia',           nombre: 'Galicia',             bonificacion: 'total',   porcentajeBonificacion: 100, nota: 'Bonificación 100% desde 2023 (con matices)' },
-  { id: 'la-rioja',          nombre: 'La Rioja',            bonificacion: 'parcial', porcentajeBonificacion: 50,  nota: 'Bonificación parcial (deducción autonómica)' },
-  { id: 'madrid',            nombre: 'Madrid',              bonificacion: 'total',   porcentajeBonificacion: 100, nota: 'Bonificación 100% histórica' },
-  { id: 'murcia',            nombre: 'Murcia',              bonificacion: 'total',   porcentajeBonificacion: 100, nota: 'Bonificación 100% desde 2023' },
-  { id: 'navarra',           nombre: 'Navarra (foral)',     bonificacion: 'normal',  porcentajeBonificacion: 0,   nota: 'Régimen foral propio — consulta normativa de Navarra' },
-  { id: 'pais-vasco',        nombre: 'País Vasco (foral)',  bonificacion: 'normal',  porcentajeBonificacion: 0,   nota: 'Régimen foral propio — consulta normativa de cada Diputación Foral' },
+  { id: 'andalucia',         nombre: 'Andalucía',           bonificacion: 'total',   porcentajeBonificacion: 100, minimoExento: 700000, nota: 'Bonificación 100% desde 2022 (alternativa al tipo del ITSGF)' },
+  { id: 'aragon',            nombre: 'Aragón',              bonificacion: 'normal',  porcentajeBonificacion: 0,   minimoExento: 400000, nota: 'Mínimo exento reducido a 400.000 €. Sin bonificación general' },
+  { id: 'asturias',          nombre: 'Asturias',            bonificacion: 'normal',  porcentajeBonificacion: 0,   minimoExento: 700000, nota: 'Sin bonificación general — tarifa autonómica propia' },
+  { id: 'baleares',          nombre: 'Baleares',            bonificacion: 'normal',  porcentajeBonificacion: 0,   minimoExento: 700000, nota: 'Sin bonificación general' },
+  { id: 'canarias',          nombre: 'Canarias',            bonificacion: 'normal',  porcentajeBonificacion: 0,   minimoExento: 700000, nota: 'Sin bonificación general' },
+  { id: 'cantabria',         nombre: 'Cantabria',           bonificacion: 'total',   porcentajeBonificacion: 100, minimoExento: 700000, nota: 'Bonificación general 100% desde 2024' },
+  { id: 'castilla-leon',     nombre: 'Castilla y León',     bonificacion: 'total',   porcentajeBonificacion: 100, minimoExento: 700000, nota: 'Bonificación 100% desde 2024' },
+  { id: 'castilla-la-mancha',nombre: 'Castilla-La Mancha',  bonificacion: 'normal',  porcentajeBonificacion: 0,   minimoExento: 700000, nota: 'Sin bonificación general' },
+  { id: 'cataluna',          nombre: 'Cataluña',            bonificacion: 'normal',  porcentajeBonificacion: 0,   minimoExento: 500000, nota: 'Mínimo exento reducido a 500.000 €. Tarifa autonómica propia, más alta que la estatal' },
+  { id: 'comunidad-valenciana', nombre: 'Comunidad Valenciana', bonificacion: 'normal', porcentajeBonificacion: 0, minimoExento: 500000, nota: 'Mínimo exento reducido a 500.000 €. Tarifa autonómica propia' },
+  { id: 'extremadura',       nombre: 'Extremadura',         bonificacion: 'total',   porcentajeBonificacion: 100, minimoExento: 500000, nota: 'Mínimo exento 500.000 € con bonificación 100% de la cuota desde 2023' },
+  { id: 'galicia',           nombre: 'Galicia',             bonificacion: 'total',   porcentajeBonificacion: 100, minimoExento: 700000, nota: 'Bonificación 100% desde 2023 (con matices)' },
+  { id: 'la-rioja',          nombre: 'La Rioja',            bonificacion: 'parcial', porcentajeBonificacion: 50,  minimoExento: 700000, nota: 'Bonificación parcial (deducción autonómica)' },
+  { id: 'madrid',            nombre: 'Madrid',              bonificacion: 'total',   porcentajeBonificacion: 100, minimoExento: 700000, nota: 'Bonificación 100% histórica' },
+  { id: 'murcia',            nombre: 'Murcia',              bonificacion: 'total',   porcentajeBonificacion: 100, minimoExento: 700000, nota: 'Bonificación 100% desde 2023' },
+  { id: 'navarra',           nombre: 'Navarra (foral)',     bonificacion: 'normal',  porcentajeBonificacion: 0,   minimoExento: 550000, foral: true, nota: 'Régimen foral propio (mínimo orientativo 550.000 €) — consulta la Hacienda Foral de Navarra' },
+  { id: 'pais-vasco',        nombre: 'País Vasco (foral)',  bonificacion: 'normal',  porcentajeBonificacion: 0,   minimoExento: 800000, foral: true, nota: 'Régimen foral propio (mínimo orientativo 800.000 €) — consulta la Diputación Foral correspondiente' },
 ];
+
+// ─── Datos estatales del Impuesto sobre el Patrimonio ──────────────────────────
+
+/** Mínimo exento general estatal (€). Algunas CCAA lo reducen (ver array). */
+export const MINIMO_EXENTO_ESTATAL = 700000;
+
+/** Exención de la vivienda habitual (€) por contribuyente. Estatal. */
+export const EXENCION_VIVIENDA_HABITUAL = 300000;
+
+/**
+ * Umbral de obligación de declarar por el valor BRUTO de bienes y derechos (€).
+ * Si se supera, hay obligación de declarar AUNQUE la cuota sea cero (p. ej. por
+ * bonificación autonómica) y con independencia de la comunidad autónoma.
+ * Art. 37 Ley 19/1991.
+ */
+export const UMBRAL_OBLIGACION_DECLARAR = 2000000;
+
+/** Obtiene el mínimo exento aplicable a una CCAA (o el estatal si no se encuentra). */
+export function getMinimoExentoPatrimonio(ccaaId: string): number {
+  const ccaa = BONIFICACIONES_CCAA_PATRIMONIO.find(c => c.id === ccaaId);
+  return ccaa ? ccaa.minimoExento : MINIMO_EXENTO_ESTATAL;
+}
+
+/**
+ * Escala estatal del Impuesto sobre el Patrimonio (art. 30 Ley 19/1991).
+ * Se aplica sobre la base liquidable (base imponible − mínimo exento).
+ * Es la escala por defecto; cada CCAA puede aprobar la suya.
+ */
+export interface TramoPatrimonio {
+  hasta: number;
+  tipo: number; // %
+}
+
+export const ESCALA_PATRIMONIO_ESTATAL: TramoPatrimonio[] = [
+  { hasta: 167129.45,   tipo: 0.2 },
+  { hasta: 334252.88,   tipo: 0.3 },
+  { hasta: 668499.75,   tipo: 0.5 },
+  { hasta: 1336999.51,  tipo: 0.9 },
+  { hasta: 2673999.01,  tipo: 1.3 },
+  { hasta: 5347998.03,  tipo: 1.7 },
+  { hasta: 10695996.06, tipo: 2.1 },
+  { hasta: Infinity,    tipo: 3.5 },
+];
+
+/** Calcula la cuota íntegra estatal (orientativa) sobre la base liquidable. */
+export function calcularCuotaPatrimonioEstatal(baseLiquidable: number): number {
+  let cuota = 0;
+  let restante = Math.max(0, baseLiquidable);
+  let limiteAnterior = 0;
+  for (const tramo of ESCALA_PATRIMONIO_ESTATAL) {
+    const anchura = tramo.hasta - limiteAnterior;
+    const base = Math.min(restante, anchura);
+    if (base <= 0) break;
+    cuota += base * (tramo.tipo / 100);
+    restante -= base;
+    limiteAnterior = tramo.hasta;
+  }
+  return cuota;
+}
 
 // ─── Lógica de orientación: ¿se beneficia del límite conjunto? ──
 

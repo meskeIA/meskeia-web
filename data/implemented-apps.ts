@@ -195,6 +195,7 @@ export const implementedAppsUrls = [
   "/orientador-facturacion-retencion/",  // Retenciones IRPF en facturas: porcentaje, cuándo aplica, modelo 111
   "/orientador-iva-espana/",             // Qué IVA aplicar en cada operación: nacional, intracomunitario, exportación, importación + simulador de factura
   "/orientador-tipos-renta-irpf/",       // Cómo tributa cada ingreso en el IRPF: trabajo, actividad, capital, ganancias — base general/ahorro
+  "/orientador-impuesto-patrimonio/",    // Valoración de bienes (cuentas/acciones/fondos/inmuebles) + obligación de declarar IP por CCAA
   "/checklist-cambio-regimen-autonomo/", // Pasos para cambiar de módulos a estimación directa: plazos y trámites
   "/comparador-transporte-viaje/", // Comparador avión, tren, autobús y coche: coste, tiempo, CO₂ y equipaje
   "/presupuesto-viaje/",           // Calculadora de presupuesto de viaje con división de gastos en grupo
