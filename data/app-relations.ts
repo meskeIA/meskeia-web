@@ -2570,10 +2570,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   // Cat.6: Emprendimiento — enlaza entre sí + cat.3 (carrera)
   'diagnostico-modelo-negocio': [
+    { url: '/visualizador-estrategia-empresarial/', icon: '♟️', name: 'Estrategia Empresarial Visual', description: 'Los 6 módulos de la estrategia' },
     { url: '/auditoria-propuesta-valor/', icon: '💎', name: 'Propuesta de Valor', description: '¿Tu oferta encaja con la necesidad?' },
     { url: '/test-validacion-idea/', icon: '🧪', name: 'Validación de Idea', description: '¿Tu idea resuelve un problema real?' },
     { url: '/mapa-riesgo-emprendedor/', icon: '🎲', name: 'Riesgo Emprendedor', description: '¿Qué pasa si no funciona?' },
-    { url: '/mapa-dependencia-clientes/', icon: '📊', name: 'Dependencia Clientes', description: '¿Tu negocio depende de pocos?' },
+  ],
+  'visualizador-estrategia-empresarial': [
+    { url: '/curso-estrategia-empresarial/', icon: '♟️', name: 'Curso de Estrategia Empresarial', description: 'Profundiza en 10 capítulos' },
+    { url: '/diagnostico-modelo-negocio/', icon: '🏛️', name: 'Diagnóstico de Modelo de Negocio', description: 'Aplica el Business Model Canvas a tu negocio' },
+    { url: '/auditoria-propuesta-valor/', icon: '💎', name: 'Auditoría de Propuesta de Valor', description: '¿Tu oferta encaja con la necesidad?' },
+    { url: '/test-validacion-idea/', icon: '🧪', name: 'Test de Validación de Idea', description: '¿Tu idea resuelve un problema real?' },
   ],
   'test-validacion-idea': [
     { url: '/diagnostico-modelo-negocio/', icon: '🏛️', name: 'Modelo de Negocio', description: '¿Tus pilares están equilibrados?' },
