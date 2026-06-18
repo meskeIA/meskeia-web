@@ -89,10 +89,12 @@ export interface TramoGananciasPatrimoniales {
 }
 
 /**
- * Tramos de ganancias y pérdidas patrimoniales en IRPF 2025
+ * Tramos de ganancias y pérdidas patrimoniales en IRPF 2025 (base del ahorro)
  * Se aplica a: venta de inmuebles, fondos, acciones, criptomonedas, etc.
- * Rendimientos > 1 año: base del ahorro (estos tramos)
- * Rendimientos < 1 año: base general (tramos normales del IRPF)
+ *
+ * TODA ganancia patrimonial por transmisión tributa en la base del ahorro con
+ * estos tramos, SEA CUAL SEA el plazo de tenencia: la distinción corto/largo
+ * plazo (base general si < 1 año) desapareció en 2015 (Ley 26/2014).
  */
 export const TRAMOS_GANANCIAS_PATRIMONIALES_2025: TramoGananciasPatrimoniales[] = [
   { hasta: 6000,     tipo: 19 },
@@ -101,6 +103,29 @@ export const TRAMOS_GANANCIAS_PATRIMONIALES_2025: TramoGananciasPatrimoniales[] 
   { hasta: 300000,   tipo: 27 },
   { hasta: Infinity, tipo: 30 },
 ];
+
+/**
+ * Calcula la cuota de la base del ahorro (IRPF) aplicando los tramos progresivos
+ * de TRAMOS_GANANCIAS_PATRIMONIALES_2025 sobre una base positiva.
+ *
+ * Fuente única del cálculo: la usan la app estimador-plusvalias-irpf y la
+ * calculadora compartida lib/calculadoras/plusvaliasIRPF.ts (tool MCP Delegum),
+ * para que ambas no puedan divergir. No redondea (cada consumidor decide).
+ */
+export function calcularCuotaBaseAhorro(base: number): number {
+  let cuota = 0;
+  let restante = Math.max(0, base);
+  let limiteAnterior = 0;
+  for (const tramo of TRAMOS_GANANCIAS_PATRIMONIALES_2025) {
+    const anchura = tramo.hasta - limiteAnterior;
+    const enTramo = Math.min(restante, anchura);
+    if (enTramo <= 0) break;
+    cuota += enTramo * (tramo.tipo / 100);
+    restante -= enTramo;
+    limiteAnterior = tramo.hasta;
+  }
+  return cuota;
+}
 
 // ─── Otros costes de compraventa ─────────────────────────────────────────────
 

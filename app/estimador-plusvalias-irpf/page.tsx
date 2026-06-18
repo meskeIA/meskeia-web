@@ -10,7 +10,7 @@ import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_INMUEBLES_META,
-  TRAMOS_GANANCIAS_PATRIMONIALES_2025,
+  calcularCuotaBaseAhorro,
 } from '@/data/fiscal';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -40,24 +40,9 @@ interface Resultado {
 
 // ─── Lógica de cálculo ────────────────────────────────────────────────────────
 
-// Todas las ganancias patrimoniales por transmisión tributan en la base del
-// ahorro, sea cual sea el plazo de tenencia (la distinción corto/largo plazo
-// desapareció en 2015, Ley 26/2014).
-function calcularCuotaBaseAhorro(ganancia: number): number {
-  let cuota = 0;
-  let restante = Math.max(0, ganancia);
-  let limiteAnterior = 0;
-
-  for (const tramo of TRAMOS_GANANCIAS_PATRIMONIALES_2025) {
-    const anchura = tramo.hasta - limiteAnterior;
-    const base = Math.min(restante, anchura);
-    if (base <= 0) break;
-    cuota += base * (tramo.tipo / 100);
-    restante -= base;
-    limiteAnterior = tramo.hasta;
-  }
-  return cuota;
-}
+// El cálculo de la cuota de la base del ahorro vive en data/fiscal (fuente única
+// compartida con la tool MCP). Todas las ganancias por transmisión tributan en
+// la base del ahorro, sea cual sea el plazo (desde 2015, Ley 26/2014).
 
 function mesesEntreEchas(fechaInicio: string, fechaFin: string): number {
   const inicio = new Date(fechaInicio);

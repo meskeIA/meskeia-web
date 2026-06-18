@@ -8,18 +8,14 @@
  * Fuente: Ley 35/2006 IRPF arts. 33-39 + LPGE 2025
  */
 
-import { FISCAL_IRPF_META } from '@/data/fiscal';
+import { FISCAL_IRPF_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
-// Tramos base del ahorro 2025 (Ley 35/2006 art. 66 + LPGE 2025)
-const TRAMOS_AHORRO_2025 = [
-  { hasta: 6000,     tipo: 19 },
-  { hasta: 50000,    tipo: 21 },
-  { hasta: 200000,   tipo: 23 },
-  { hasta: 300000,   tipo: 27 },
-  { hasta: Infinity, tipo: 30 },
-];
+// Tramos de la base del ahorro: fuente única en data/fiscal/inmuebles.ts
+// (TRAMOS_GANANCIAS_PATRIMONIALES_2025). NO duplicar aquí: si se hardcodean,
+// la tool MCP divergiría de las apps web cuando cambien los tipos.
+const TRAMOS_AHORRO_2025 = TRAMOS_GANANCIAS_PATRIMONIALES_2025;
 
 export type TipoActivo = 'acciones' | 'fondos' | 'inmueble' | 'otro';
 
