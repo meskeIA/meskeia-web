@@ -794,6 +794,150 @@
 [data-theme='dark'] .warningList li { color: #fcd34d; }
 
 /* ─── Responsive ──────────────────────────────────────────────────────────── */
+/* ─── Descomposición DuPont del ROE ───────────────────────────────────────── */
+.dupontSeccion {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.dupontIntro {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 var(--spacing-lg);
+}
+
+.dupontFlujo {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.dupontFactor {
+  flex: 1 1 150px;
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.2rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--secondary);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) 0.6rem;
+}
+
+[data-theme='dark'] .dupontFactor {
+  background: #333;
+}
+
+.dupontResultado {
+  border-top-color: var(--primary);
+  background: #e8f4fd;
+}
+
+[data-theme='dark'] .dupontResultado {
+  background: #1a3a4a;
+}
+
+.dupontFactorValor {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.dupontFactorNombre {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.dupontFactorFormula {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  background: var(--hover);
+  padding: 0.15rem 0.45rem;
+  border-radius: 5px;
+  margin-top: 0.15rem;
+}
+
+[data-theme='dark'] .dupontFactorFormula {
+  background: #404040;
+}
+
+.dupontFactorDesc {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.3;
+}
+
+.dupontOp {
+  display: flex;
+  align-items: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  flex: 0 0 auto;
+}
+
+.dupontInterpretacion {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--bg-primary);
+  border-left: 4px solid var(--secondary);
+  border-radius: var(--radius);
+}
+
+[data-theme='dark'] .dupontInterpretacion {
+  background: #333;
+}
+
+.dupontInterpretacion strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--secondary);
+  margin-bottom: 0.3rem;
+}
+
+.dupontInterpretacion p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.dupontAviso {
+  margin-top: 0.6rem !important;
+  font-size: 0.84rem !important;
+  color: #92400e !important;
+  background: #fff8e1;
+  border-radius: 6px;
+  padding: 0.5rem 0.7rem;
+}
+
+[data-theme='dark'] .dupontAviso {
+  color: #fbbf24 !important;
+  background: #2d2000;
+}
+
+.dupontVacio {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
+  padding: var(--spacing-lg);
+  margin: 0;
+}
+
 @media (max-width: 900px) {
   .ratiosGrid {
     grid-template-columns: repeat(2, 1fr);
@@ -816,6 +960,10 @@
 
   .escenariosGrid,
   .tipsGrid { grid-template-columns: 1fr; }
+
+  .dupontFlujo { flex-direction: column; align-items: stretch; }
+  .dupontFactor { min-width: 0; }
+  .dupontOp { justify-content: center; padding: 0.1rem 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

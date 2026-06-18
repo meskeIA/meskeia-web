@@ -91,6 +91,16 @@ const ESTADO_LABEL: Record<EstadoRatio, string> = {
   nd: 'Sin datos',
 };
 
+// ─── Interpretación DuPont (motor dominante del ROE) ───────────────────────────
+
+type MotorDuPont = 'margen' | 'rotacion' | 'apalancamiento';
+
+const INTERPRETACION_MOTOR: Record<MotorDuPont, string> = {
+  margen: 'El ROE se apoya sobre todo en el margen: la empresa obtiene un buen beneficio por cada euro vendido. Es un modelo de diferenciación o valor añadido, menos dependiente del volumen de ventas.',
+  rotacion: 'El ROE se apoya sobre todo en la rotación de activos: la empresa genera muchas ventas con relativamente pocos activos. Es un modelo de eficiencia o volumen, típico de la distribución y el retail.',
+  apalancamiento: 'El ROE se apoya sobre todo en el apalancamiento financiero: la deuda multiplica la rentabilidad de los socios. Amplifica el ROE en los años buenos, pero también el riesgo si caen las ventas.',
+};
+
 // ─── Cálculo de ratios ───────────────────────────────────────────────────────
 
 function seg(valor: number | null, umbC: number, umbH: number, meMejor: boolean): EstadoRatio {
@@ -429,6 +439,24 @@ export default function AnalizadorRatiosFinancierosPage() {
   const rai             = ebit - p('gastosFinancieros');
   const cuadra          = activoTotal > 0 && Math.abs(activoTotal - pnYPasivo) <= activoTotal * 0.005;
 
+  // ── Descomposición DuPont del ROE ──
+  // ROE = (Rdo. Neto / Ventas) × (Ventas / Activo) × (Activo / Patrimonio Neto) = Rdo. Neto / Patrimonio Neto
+  const ventas          = p('ventas');
+  const resultadoNeto   = p('resultadoNeto');
+  const dupontValido    = ventas > 0 && activoTotal > 0 && patrimonioNeto > 0;
+  const dpMargen        = dupontValido ? resultadoNeto / ventas : 0;        // decimal
+  const dpRotacion      = dupontValido ? ventas / activoTotal : 0;          // veces
+  const dpApalancamiento = dupontValido ? activoTotal / patrimonioNeto : 0; // veces
+  const dpRoe           = dpMargen * dpRotacion * dpApalancamiento;         // decimal
+  // Motor dominante: factor más por encima de su valor de referencia neutro
+  const motoresDuPont: { id: MotorDuPont; fuerza: number }[] = [
+    { id: 'margen', fuerza: dpMargen / 0.05 },
+    { id: 'rotacion', fuerza: dpRotacion / 1.0 },
+    { id: 'apalancamiento', fuerza: dpApalancamiento / 2.0 },
+  ];
+  const motorDominante = motoresDuPont.reduce((a, b) => (b.fuerza > a.fuerza ? b : a)).id;
+  const apalancamientoAlto = dpApalancamiento > 3;
+
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
@@ -557,6 +585,69 @@ export default function AnalizadorRatiosFinancierosPage() {
         </section>
       ))}
 
+      {/* ── Descomposición DuPont del ROE ── */}
+      <section className={styles.dupontSeccion} aria-label="Descomposición DuPont del ROE">
+        <div className={styles.grupoHeader} style={{ borderLeftColor: 'var(--secondary)' }}>
+          <span aria-hidden="true" className={styles.grupoIcono}>🧬</span>
+          <h2 className={styles.grupoTitulo}>Descomposición DuPont del ROE</h2>
+        </div>
+        <p className={styles.dupontIntro}>
+          El método DuPont desglosa la rentabilidad financiera (ROE) en tres palancas: cuánto ganas por cada venta
+          (<strong>margen</strong>), cuántas ventas generas con tus activos (<strong>rotación</strong>) y cuánto multiplica
+          la deuda tu rentabilidad (<strong>apalancamiento</strong>). Revela <em>de dónde</em> nace realmente el ROE.
+        </p>
+
+        {dupontValido ? (
+          <>
+            <div className={styles.dupontFlujo}>
+              <div className={styles.dupontFactor}>
+                <span className={styles.dupontFactorValor}>{formatNumber(dpMargen * 100, 1)} %</span>
+                <span className={styles.dupontFactorNombre}>Margen Neto</span>
+                <span className={styles.dupontFactorFormula}>Rdo. Neto / Ventas</span>
+                <span className={styles.dupontFactorDesc}>Beneficio por euro vendido</span>
+              </div>
+              <span className={styles.dupontOp} aria-hidden="true">×</span>
+              <div className={styles.dupontFactor}>
+                <span className={styles.dupontFactorValor}>{formatNumber(dpRotacion, 2)}x</span>
+                <span className={styles.dupontFactorNombre}>Rotación de Activos</span>
+                <span className={styles.dupontFactorFormula}>Ventas / Activo Total</span>
+                <span className={styles.dupontFactorDesc}>Eficiencia en el uso de activos</span>
+              </div>
+              <span className={styles.dupontOp} aria-hidden="true">×</span>
+              <div className={styles.dupontFactor}>
+                <span className={styles.dupontFactorValor}>{formatNumber(dpApalancamiento, 2)}x</span>
+                <span className={styles.dupontFactorNombre}>Apalancamiento</span>
+                <span className={styles.dupontFactorFormula}>Activo Total / Patrimonio Neto</span>
+                <span className={styles.dupontFactorDesc}>Multiplicador de la deuda</span>
+              </div>
+              <span className={styles.dupontOp} aria-hidden="true">=</span>
+              <div className={`${styles.dupontFactor} ${styles.dupontResultado}`}>
+                <span className={styles.dupontFactorValor}>{formatNumber(dpRoe * 100, 1)} %</span>
+                <span className={styles.dupontFactorNombre}>ROE</span>
+                <span className={styles.dupontFactorFormula}>Rdo. Neto / Patrimonio Neto</span>
+                <span className={styles.dupontFactorDesc}>Rentabilidad para los socios</span>
+              </div>
+            </div>
+
+            <div className={styles.dupontInterpretacion}>
+              <strong>¿De dónde viene este ROE?</strong>
+              <p>{INTERPRETACION_MOTOR[motorDominante]}</p>
+              {apalancamientoAlto && (
+                <p className={styles.dupontAviso}>
+                  <span aria-hidden="true">⚠️</span> El apalancamiento es elevado ({formatNumber(dpApalancamiento, 2)}x):
+                  un ROE alto sostenido por mucha deuda es más frágil. Contrástalo con el ratio de endeudamiento y la
+                  cobertura de intereses de arriba.
+                </p>
+              )}
+            </div>
+          </>
+        ) : (
+          <p className={styles.dupontVacio}>
+            Introduce ventas, activo total y patrimonio neto (todos mayores que cero) para ver la descomposición DuPont.
+          </p>
+        )}
+      </section>
+
       {/* ── Sección educativa ── */}
       <EducationalSection
         title="📚 Guía de ratios financieros"
@@ -652,6 +743,13 @@ export default function AnalizadorRatiosFinancierosPage() {
               <dt>¿Qué diferencia hay entre ROE y ROA?</dt>
               <dd>
                 El <strong>ROA</strong> mide la rentabilidad de todos los activos (propios y financiados con deuda), indicando qué tan bien usa la empresa sus recursos totales. El <strong>ROE</strong> mide solo la rentabilidad del capital de los accionistas. Si ROE {'>'} ROA, la deuda está "amplificando" la rentabilidad (apalancamiento positivo). Si ROA cae por debajo del coste de la deuda, el endeudamiento destruye valor.
+              </dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Qué es el análisis DuPont y para qué sirve?</dt>
+              <dd>
+                Es una técnica creada en los años 20 por la empresa DuPont que descompone el ROE en tres factores multiplicativos: <strong>margen neto</strong> (Rdo. Neto / Ventas), <strong>rotación de activos</strong> (Ventas / Activo) y <strong>apalancamiento financiero</strong> (Activo / Patrimonio Neto). Al multiplicarlos se recupera el ROE, pero ahora sabes <em>de dónde</em> nace: dos empresas con el mismo ROE del 15 % pueden lograrlo de formas opuestas, una con mucho margen y poca deuda y otra con margen ajustado pero mucho apalancamiento. Lo segundo rinde igual, pero con más riesgo.
+                <span className={styles.faqTip}>El bloque «Descomposición DuPont del ROE» de esta herramienta hace este desglose automáticamente con tus datos.</span>
               </dd>
             </div>
             <div className={styles.faqItem}>

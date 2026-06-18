@@ -87,5 +87,13 @@ export const faqJsonLd = {
         text: 'Los rangos son orientativos y válidos para la mayoría de empresas, pero varían significativamente según el sector. Por ejemplo, un ratio de endeudamiento del 80% es habitual en el sector bancario pero preocupante en manufactura. Un margen neto del 3% puede ser excelente en distribución minorista pero insuficiente en tecnología. Los rangos deben interpretarse siempre comparando con empresas del mismo sector y con la evolución histórica de la propia empresa.',
       },
     },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el análisis DuPont del ROE?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El análisis DuPont es una técnica creada en los años 20 por la empresa DuPont que descompone la rentabilidad financiera (ROE) en tres factores que se multiplican: el margen neto (Resultado Neto / Ventas), la rotación de activos (Ventas / Activo Total) y el apalancamiento financiero (Activo Total / Patrimonio Neto). Sirve para entender de dónde nace realmente la rentabilidad de una empresa: dos empresas con el mismo ROE pueden lograrlo de formas opuestas, una con mucho margen y poca deuda y otra con margen ajustado pero mucho apalancamiento, siendo esta segunda más rentable pero más arriesgada. Esta herramienta calcula la descomposición DuPont automáticamente.',
+      },
+    },
   ],
 };
