@@ -193,6 +193,7 @@ export const implementedAppsUrls = [
   "/conversor-divisas/",           // Conversor de divisas con tipos BCE (30+ divisas, actualización diaria)
   "/orientador-contrato-mercantil/",     // Qué tipo de contrato mercantil necesitas y cláusulas esenciales
   "/orientador-facturacion-retencion/",  // Retenciones IRPF en facturas: porcentaje, cuándo aplica, modelo 111
+  "/orientador-iva-espana/",             // Qué IVA aplicar en cada operación: nacional, intracomunitario, exportación, importación + simulador de factura
   "/checklist-cambio-regimen-autonomo/", // Pasos para cambiar de módulos a estimación directa: plazos y trámites
   "/comparador-transporte-viaje/", // Comparador avión, tren, autobús y coche: coste, tiempo, CO₂ y equipaje
   "/presupuesto-viaje/",           // Calculadora de presupuesto de viaje con división de gastos en grupo
