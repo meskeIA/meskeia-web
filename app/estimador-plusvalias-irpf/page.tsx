@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import Link from 'next/link';
 import styles from './EstimadorPlusvalias.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
   DataReference, RegionBadge
@@ -10,37 +11,44 @@ import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_INMUEBLES_META,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
-  TRAMOS_IRPF_2025,
 } from '@/data/fiscal';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
-type TipoActivo = 'inmueble' | 'fondos' | 'acciones' | 'cripto' | 'otros';
+type TipoActivo = 'inmueble' | 'fondos' | 'acciones' | 'cripto' | 'plan-pensiones' | 'otros';
+type Modo = 'calculo' | 'traspaso' | 'plan-pensiones';
+
+interface Resultado {
+  modo: Modo;
+  precioCompra: number;
+  gastosCompra: number;
+  precioVenta: number;
+  gastosVenta: number;
+  valorAdquisicion: number;
+  valorTransmision: number;
+  gananciaPatrimonial: number; // con signo
+  esGanancia: boolean;
+  mesesTenencia: number;
+  tieneFechas: boolean;
+  perdidaDiferida: boolean;          // regla de los 2 meses bloquea la pérdida
+  perdidasPreviasAplicadas: number;  // minusvalías de años anteriores aplicadas
+  perdidasPreviasRestantes: number;  // las que quedan pendientes
+  baseImponible: number;             // ganancia tras compensar (≥ 0)
+  cuotaIRPF: number;
+  tipoEfectivo: number;
+}
 
 // ─── Lógica de cálculo ────────────────────────────────────────────────────────
 
+// Todas las ganancias patrimoniales por transmisión tributan en la base del
+// ahorro, sea cual sea el plazo de tenencia (la distinción corto/largo plazo
+// desapareció en 2015, Ley 26/2014).
 function calcularCuotaBaseAhorro(ganancia: number): number {
   let cuota = 0;
   let restante = Math.max(0, ganancia);
   let limiteAnterior = 0;
 
   for (const tramo of TRAMOS_GANANCIAS_PATRIMONIALES_2025) {
-    const anchura = tramo.hasta - limiteAnterior;
-    const base = Math.min(restante, anchura);
-    if (base <= 0) break;
-    cuota += base * (tramo.tipo / 100);
-    restante -= base;
-    limiteAnterior = tramo.hasta;
-  }
-  return cuota;
-}
-
-function calcularCuotaBaseGeneral(ganancia: number): number {
-  let cuota = 0;
-  let restante = Math.max(0, ganancia);
-  let limiteAnterior = 0;
-
-  for (const tramo of TRAMOS_IRPF_2025) {
     const anchura = tramo.hasta - limiteAnterior;
     const base = Math.min(restante, anchura);
     if (base <= 0) break;
@@ -58,6 +66,14 @@ function mesesEntreEchas(fechaInicio: string, fechaFin: string): number {
   return meses;
 }
 
+const RESULTADO_VACIO = {
+  precioCompra: 0, gastosCompra: 0, precioVenta: 0, gastosVenta: 0,
+  valorAdquisicion: 0, valorTransmision: 0, gananciaPatrimonial: 0, esGanancia: false,
+  mesesTenencia: 0, tieneFechas: false, perdidaDiferida: false,
+  perdidasPreviasAplicadas: 0, perdidasPreviasRestantes: 0,
+  baseImponible: 0, cuotaIRPF: 0, tipoEfectivo: 0,
+};
+
 // ─── Componente ───────────────────────────────────────────────────────────────
 
 export default function EstimadorPlusvalidasIRPFPage() {
@@ -68,73 +84,89 @@ export default function EstimadorPlusvalidasIRPFPage() {
   const [gastosVenta, setGastosVenta] = useState('');
   const [fechaCompra, setFechaCompra] = useState('');
   const [fechaVenta, setFechaVenta] = useState('');
+  const [esTraspaso, setEsTraspaso] = useState(false);
+  const [recompra, setRecompra] = useState(false);
+  const [perdidasPreviasTexto, setPerdidasPreviasTexto] = useState('');
 
-  const [resultado, setResultado] = useState<{
-    precioCompra: number;
-    gastosCompra: number;
-    precioVenta: number;
-    gastosVenta: number;
-    valorAdquisicion: number;
-    valorTransmision: number;
-    gananciaPatrimonial: number;
-    esGanancia: boolean;
-    mesesTenencia: number;
-    esLargoPlazo: boolean;
-    cuotaIRPF: number;
-    tipoEfectivo: number;
-  } | null>(null);
+  const [resultado, setResultado] = useState<Resultado | null>(null);
+
+  const traspasoAplicable = tipoActivo === 'fondos';
+  const recompraAplicable = tipoActivo === 'acciones' || tipoActivo === 'fondos' || tipoActivo === 'cripto';
+  const esPlanPensiones = tipoActivo === 'plan-pensiones';
 
   const calcular = useCallback(() => {
+    if (tipoActivo === 'plan-pensiones') {
+      setResultado({ modo: 'plan-pensiones', ...RESULTADO_VACIO });
+      return;
+    }
+
     const vCompra = parseSpanishNumber(precioCompra) || 0;
     const gCompra = parseSpanishNumber(gastosCompra) || 0;
     const vVenta = parseSpanishNumber(precioVenta) || 0;
     const gVenta = parseSpanishNumber(gastosVenta) || 0;
+    const perdidasPrevias = parseSpanishNumber(perdidasPreviasTexto) || 0;
 
     if (vCompra <= 0 || vVenta <= 0) return;
-
-    const meses = fechaCompra && fechaVenta ? mesesEntreEchas(fechaCompra, fechaVenta) : 13; // Default > 1 año
-    const esLargoPlazo = meses > 12;
 
     const valorAdquisicion = vCompra + gCompra;
     const valorTransmision = vVenta - gVenta;
     const gananciaPatrimonial = valorTransmision - valorAdquisicion;
     const esGanancia = gananciaPatrimonial > 0;
+    const tieneFechas = !!(fechaCompra && fechaVenta);
+    const meses = tieneFechas ? mesesEntreEchas(fechaCompra, fechaVenta) : 0;
 
-    let cuotaIRPF = 0;
-    if (esGanancia) {
-      cuotaIRPF = esLargoPlazo
-        ? calcularCuotaBaseAhorro(gananciaPatrimonial)
-        : calcularCuotaBaseGeneral(gananciaPatrimonial);
+    // Traspaso de fondos: diferimiento, 0 € a pagar en el año
+    if (tipoActivo === 'fondos' && esTraspaso) {
+      setResultado({
+        modo: 'traspaso',
+        precioCompra: vCompra, gastosCompra: gCompra, precioVenta: vVenta, gastosVenta: gVenta,
+        valorAdquisicion, valorTransmision, gananciaPatrimonial, esGanancia,
+        mesesTenencia: meses, tieneFechas,
+        perdidaDiferida: false, perdidasPreviasAplicadas: 0, perdidasPreviasRestantes: perdidasPrevias,
+        baseImponible: 0, cuotaIRPF: 0, tipoEfectivo: 0,
+      });
+      return;
     }
 
-    const tipoEfectivo = gananciaPatrimonial > 0 ? (cuotaIRPF / gananciaPatrimonial) * 100 : 0;
+    // Regla de los dos meses: si hay pérdida y recompra, la pérdida se difiere
+    const perdidaDiferida = !esGanancia && recompra && recompraAplicable;
+
+    // Compensación con minusvalías de años anteriores (solo si hay ganancia)
+    let perdidasAplicadas = 0;
+    let baseImponible = 0;
+    let cuota = 0;
+    if (esGanancia) {
+      perdidasAplicadas = Math.min(gananciaPatrimonial, perdidasPrevias);
+      baseImponible = gananciaPatrimonial - perdidasAplicadas;
+      cuota = calcularCuotaBaseAhorro(baseImponible);
+    }
+    const perdidasRestantes = Math.max(0, perdidasPrevias - perdidasAplicadas);
+    const tipoEfectivo = gananciaPatrimonial > 0 ? (cuota / gananciaPatrimonial) * 100 : 0;
 
     setResultado({
-      precioCompra: vCompra,
-      gastosCompra: gCompra,
-      precioVenta: vVenta,
-      gastosVenta: gVenta,
-      valorAdquisicion,
-      valorTransmision,
-      gananciaPatrimonial,
-      esGanancia,
-      mesesTenencia: meses,
-      esLargoPlazo,
-      cuotaIRPF,
-      tipoEfectivo,
+      modo: 'calculo',
+      precioCompra: vCompra, gastosCompra: gCompra, precioVenta: vVenta, gastosVenta: gVenta,
+      valorAdquisicion, valorTransmision, gananciaPatrimonial, esGanancia,
+      mesesTenencia: meses, tieneFechas,
+      perdidaDiferida,
+      perdidasPreviasAplicadas: perdidasAplicadas,
+      perdidasPreviasRestantes: perdidasRestantes,
+      baseImponible, cuotaIRPF: cuota, tipoEfectivo,
     });
-  }, [precioCompra, gastosCompra, precioVenta, gastosVenta, fechaCompra, fechaVenta]);
+  }, [tipoActivo, precioCompra, gastosCompra, precioVenta, gastosVenta, fechaCompra, fechaVenta, esTraspaso, recompra, recompraAplicable, perdidasPreviasTexto]);
 
   const limpiar = () => {
     setPrecioCompra(''); setGastosCompra(''); setPrecioVenta(''); setGastosVenta('');
-    setFechaCompra(''); setFechaVenta(''); setResultado(null);
+    setFechaCompra(''); setFechaVenta(''); setEsTraspaso(false); setRecompra(false);
+    setPerdidasPreviasTexto(''); setResultado(null);
   };
 
   const tiposActivo: { value: TipoActivo; label: string; gastosTip: string }[] = [
     { value: 'inmueble', label: '🏠 Inmueble (piso, casa, local...)', gastosTip: 'Compra: ITP/IVA, notaría, registro. Venta: comisión inmobiliaria, plusvalía municipal, gestoría' },
-    { value: 'fondos', label: '📈 Fondos de inversión', gastosTip: 'Gastos de compra/venta: comisiones de suscripción/reembolso' },
-    { value: 'acciones', label: '📊 Acciones o ETFs', gastosTip: 'Comisiones de compra/venta del bróker' },
-    { value: 'cripto', label: '🪙 Criptomonedas', gastosTip: 'Comisiones de compra/venta en el exchange' },
+    { value: 'fondos', label: '📈 Fondo de inversión', gastosTip: 'Gastos de compra/venta: comisiones de suscripción y reembolso. Permite traspaso entre fondos sin tributar.' },
+    { value: 'acciones', label: '📊 Acciones o ETF', gastosTip: 'Comisiones de compra/venta del bróker. Los ETF tributan como acciones (no admiten traspaso).' },
+    { value: 'cripto', label: '🪙 Criptomonedas', gastosTip: 'Comisiones de compra/venta en el exchange. Cada intercambio cripto→cripto ya es una transmisión.' },
+    { value: 'plan-pensiones', label: '🏦 Plan de pensiones', gastosTip: 'El rescate NO es ganancia patrimonial: tributa como rendimiento del trabajo en la base general.' },
     { value: 'otros', label: '💼 Otros activos', gastosTip: 'Cualquier gasto directamente relacionado con la transmisión' },
   ];
 
@@ -148,7 +180,8 @@ export default function EstimadorPlusvalidasIRPFPage() {
         <span className={styles.heroIcon} aria-hidden="true">💹</span>
         <h1 className={styles.title}>Estimador de Plusvalías IRPF 2025</h1>
         <p className={styles.subtitle}>
-          Oriéntate sobre el IRPF por la venta de inmuebles, fondos, acciones u otros activos
+          Calcula el IRPF por la venta o el traspaso de inmuebles, fondos, acciones, ETF o criptomonedas, con
+          compensación de minusvalías y la regla de los dos meses
         </p>
       </header>
 
@@ -175,7 +208,7 @@ export default function EstimadorPlusvalidasIRPFPage() {
               <select
                 id="tipoActivo"
                 value={tipoActivo}
-                onChange={e => setTipoActivo(e.target.value as TipoActivo)}
+                onChange={e => { setTipoActivo(e.target.value as TipoActivo); setResultado(null); }}
                 className={styles.select}
               >
                 {tiposActivo.map(t => (
@@ -185,69 +218,115 @@ export default function EstimadorPlusvalidasIRPFPage() {
               <div className={styles.infoBox}>{activoSeleccionado.gastosTip}</div>
             </div>
 
-            <h3 style={{ fontSize: '0.95rem', fontWeight: 700, margin: '0 0 0.75rem', color: 'var(--text-primary)' }}>
-              <span aria-hidden="true">📥</span> Datos de adquisición (compra)
-            </h3>
-            <NumberInput
-              value={precioCompra}
-              onChange={setPrecioCompra}
-              label="Precio de compra"
-              placeholder="150000"
-              helperText="Precio pagado en la adquisición"
-              min={0}
-            />
-            <NumberInput
-              value={gastosCompra}
-              onChange={setGastosCompra}
-              label="Gastos de compra (ITP/IVA, notaría, etc.)"
-              placeholder="0"
-              helperText="Gastos e impuestos en la adquisición"
-              min={0}
-            />
-            <div className={styles.formGroup}>
-              <label className={styles.label} htmlFor="fechaCompra">Fecha de compra (para calcular plazo)</label>
-              <input
-                type="date"
-                id="fechaCompra"
-                value={fechaCompra}
-                onChange={e => setFechaCompra(e.target.value)}
-                className={styles.select}
-              />
-            </div>
+            {esPlanPensiones ? (
+              <div className={styles.infoBox} style={{ marginTop: 'var(--spacing-md)' }}>
+                Los planes de pensiones no generan ganancia patrimonial. El rescate tributa como
+                rendimiento del trabajo (base general). Pulsa «Estimar» para ver los detalles.
+              </div>
+            ) : (
+              <>
+                {traspasoAplicable && (
+                  <label className={styles.checkRow}>
+                    <input
+                      type="checkbox"
+                      checked={esTraspaso}
+                      onChange={e => setEsTraspaso(e.target.checked)}
+                    />
+                    <span className={styles.checkText}>
+                      <strong>Es un traspaso a otro fondo</strong> (no un reembolso a efectivo). El traspaso entre
+                      fondos no tributa: difiere la ganancia.
+                    </span>
+                  </label>
+                )}
 
-            <h3 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 'var(--spacing-md) 0 0.75rem', color: 'var(--text-primary)' }}>
-              <span aria-hidden="true">📤</span> Datos de transmisión (venta)
-            </h3>
-            <NumberInput
-              value={precioVenta}
-              onChange={setPrecioVenta}
-              label="Precio de venta"
-              placeholder="200000"
-              helperText="Precio recibido en la transmisión"
-              min={0}
-            />
-            <NumberInput
-              value={gastosVenta}
-              onChange={setGastosVenta}
-              label="Gastos de venta (comisión, plusvalía municipal...)"
-              placeholder="0"
-              helperText="Gastos directamente vinculados a la venta"
-              min={0}
-            />
-            <div className={styles.formGroup}>
-              <label className={styles.label} htmlFor="fechaVenta">Fecha de venta</label>
-              <input
-                type="date"
-                id="fechaVenta"
-                value={fechaVenta}
-                onChange={e => setFechaVenta(e.target.value)}
-                className={styles.select}
-              />
-            </div>
+                <h3 style={{ fontSize: '0.95rem', fontWeight: 700, margin: '0 0 0.75rem', color: 'var(--text-primary)' }}>
+                  <span aria-hidden="true">📥</span> Datos de adquisición (compra)
+                </h3>
+                <NumberInput
+                  value={precioCompra}
+                  onChange={setPrecioCompra}
+                  label="Precio de compra"
+                  placeholder="150000"
+                  helperText="Precio pagado en la adquisición"
+                  min={0}
+                />
+                <NumberInput
+                  value={gastosCompra}
+                  onChange={setGastosCompra}
+                  label="Gastos de compra (ITP/IVA, notaría, comisiones...)"
+                  placeholder="0"
+                  helperText="Gastos e impuestos en la adquisición"
+                  min={0}
+                />
+                <div className={styles.formGroup}>
+                  <label className={styles.label} htmlFor="fechaCompra">Fecha de compra (opcional, informativa)</label>
+                  <input
+                    type="date"
+                    id="fechaCompra"
+                    value={fechaCompra}
+                    onChange={e => setFechaCompra(e.target.value)}
+                    className={styles.select}
+                  />
+                </div>
+
+                <h3 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 'var(--spacing-md) 0 0.75rem', color: 'var(--text-primary)' }}>
+                  <span aria-hidden="true">📤</span> Datos de transmisión ({esTraspaso ? 'traspaso' : 'venta'})
+                </h3>
+                <NumberInput
+                  value={precioVenta}
+                  onChange={setPrecioVenta}
+                  label={esTraspaso ? 'Valor actual del fondo' : 'Precio de venta'}
+                  placeholder="200000"
+                  helperText={esTraspaso ? 'Valor de la participación al traspasar' : 'Precio recibido en la transmisión'}
+                  min={0}
+                />
+                <NumberInput
+                  value={gastosVenta}
+                  onChange={setGastosVenta}
+                  label="Gastos de venta (comisión, plusvalía municipal...)"
+                  placeholder="0"
+                  helperText="Gastos directamente vinculados a la venta"
+                  min={0}
+                />
+                <div className={styles.formGroup}>
+                  <label className={styles.label} htmlFor="fechaVenta">Fecha de venta (opcional, informativa)</label>
+                  <input
+                    type="date"
+                    id="fechaVenta"
+                    value={fechaVenta}
+                    onChange={e => setFechaVenta(e.target.value)}
+                    className={styles.select}
+                  />
+                </div>
+
+                {recompraAplicable && !esTraspaso && (
+                  <label className={styles.checkRow}>
+                    <input
+                      type="checkbox"
+                      checked={recompra}
+                      onChange={e => setRecompra(e.target.checked)}
+                    />
+                    <span className={styles.checkText}>
+                      <strong>Recompro el mismo valor (u homogéneo)</strong> dentro del plazo de la regla antielusión
+                      (2 meses en valores cotizados, 1 año en no cotizados). Solo afecta si la operación da pérdida.
+                    </span>
+                  </label>
+                )}
+
+                <NumberInput
+                  value={perdidasPreviasTexto}
+                  onChange={setPerdidasPreviasTexto}
+                  label="Minusvalías pendientes de años anteriores (opcional)"
+                  placeholder="0"
+                  helperText="Pérdidas patrimoniales de los últimos 4 ejercicios pendientes de compensar"
+                  min={0}
+                />
+              </>
+            )}
 
             <div className={styles.buttonGroup}>
               <button type="button" onClick={calcular} className={styles.btnPrimary}>
-                Estimar plusvalía
+                {esPlanPensiones ? 'Ver tributación' : 'Estimar plusvalía'}
               </button>
               <button type="button" onClick={limpiar} className={styles.btnSecondary} aria-label="Limpiar formulario">
                 Limpiar
@@ -258,15 +337,53 @@ export default function EstimadorPlusvalidasIRPFPage() {
 
         {/* Panel de resultados */}
         <div className={styles.resultsPanel}>
-          {resultado ? (
+          {!resultado ? (
+            <div className={styles.placeholder}>
+              <span className={styles.placeholderIcon} aria-hidden="true">💹</span>
+              <p>Introduce los datos de la operación y pulsa «Estimar plusvalía»</p>
+            </div>
+          ) : resultado.modo === 'plan-pensiones' ? (
+            <div className={styles.infoPanel}>
+              <span className={styles.infoPanelIcon} aria-hidden="true">🏦</span>
+              <h3>Un plan de pensiones no genera plusvalía</h3>
+              <p>
+                A diferencia de los fondos de inversión, el plan de pensiones <strong>no tributa como ganancia
+                patrimonial</strong>. El rescate se considera <strong>rendimiento del trabajo</strong> y se integra en la
+                base general del IRPF, junto a tu nómina o pensión.
+              </p>
+              <p>
+                Rescatar todo de golpe en forma de capital puede dispararte a un tramo marginal alto (hasta el 47 %).
+                Hacerlo en forma de renta suele ser más eficiente.
+              </p>
+              <p>
+                Para entender en qué base tributa cada ingreso, usa el{' '}
+                <Link href="/orientador-tipos-renta-irpf/">Orientador de tipos de renta del IRPF</Link>; para el cálculo
+                de la cuota, el <Link href="/estimador-irpf/">Estimador de IRPF</Link>.
+              </p>
+            </div>
+          ) : resultado.modo === 'traspaso' ? (
+            <div className={styles.infoPanel}>
+              <span className={styles.infoPanelIcon} aria-hidden="true">🔄</span>
+              <h3>Traspaso entre fondos: diferimiento fiscal</h3>
+              <span className={styles.infoPanelCuota}>0,00 €</span>
+              <p>
+                El traspaso de participaciones entre fondos de inversión <strong>no tributa en el año</strong>. La ganancia
+                latente {resultado.gananciaPatrimonial > 0 && (<>de <strong>{formatCurrency(resultado.gananciaPatrimonial)}</strong> </>)}
+                queda diferida: el nuevo fondo hereda el valor de adquisición original y solo tributarás cuando hagas el
+                reembolso definitivo a efectivo.
+              </p>
+              <p>
+                <strong>Ojo:</strong> esta ventaja NO aplica a los ETF ni a fondos fuera del régimen español/UE. Traspasar
+                a un ETF sí genera hecho imponible inmediato.
+              </p>
+            </div>
+          ) : (
             <>
               {/* Cuota principal */}
               <div className={styles.cuotaDestacada}>
                 <p className={styles.cuotaLabel}>
                   IRPF estimado a pagar por plusvalía
-                  <span className={resultado.esLargoPlazo ? styles.badgeLargoPlazo : styles.badgeCortoplazo}>
-                    {resultado.esLargoPlazo ? '> 1 año (base del ahorro)' : '< 1 año (base general)'}
-                  </span>
+                  <span className={styles.badgeLargoPlazo}>Base del ahorro</span>
                 </p>
                 <span className={styles.cuotaValor} role="status" aria-live="polite">
                   {resultado.esGanancia ? formatCurrency(resultado.cuotaIRPF) : '0,00 €'}
@@ -274,18 +391,28 @@ export default function EstimadorPlusvalidasIRPFPage() {
                 <p className={styles.cuotaTipoEfectivo}>
                   {resultado.esGanancia
                     ? `Tipo efectivo orientativo: ${formatNumber(resultado.tipoEfectivo, 2)}%`
-                    : <><span aria-hidden="true">⬇️</span>{' No hay ganancia patrimonial — posible pérdida deducible'}</>}
+                    : <><span aria-hidden="true">⬇️</span>{' No hay ganancia patrimonial — posible pérdida compensable'}</>}
                 </p>
               </div>
 
+              {/* Regla de los dos meses */}
+              {resultado.perdidaDiferida && (
+                <div className={styles.reglaBox}>
+                  <strong>⚠️ Regla de los dos meses (art. 33.5 LIRPF):</strong> al recomprar el mismo valor (u homogéneo)
+                  dentro del plazo, la pérdida de <strong>{formatCurrency(Math.abs(resultado.gananciaPatrimonial))}</strong>{' '}
+                  <strong>no es computable este año</strong>: queda diferida hasta que vendas definitivamente los valores
+                  recomprados. No podrás usarla ahora para compensar ganancias.
+                </div>
+              )}
+
               <div className={styles.resultsGrid}>
                 <ResultCard
-                  title="Ganancia patrimonial"
+                  title={resultado.esGanancia ? 'Ganancia patrimonial' : 'Pérdida patrimonial'}
                   value={formatNumber(Math.abs(resultado.gananciaPatrimonial), 2)}
                   unit="€"
                   variant={resultado.esGanancia ? 'highlight' : 'warning'}
                   icon={resultado.esGanancia ? '📈' : '📉'}
-                  description={resultado.esGanancia ? 'Beneficio de la operación' : 'Pérdida patrimonial'}
+                  description={resultado.esGanancia ? 'Beneficio de la operación' : 'Pérdida de la operación'}
                 />
                 <ResultCard
                   title="Valor de adquisición"
@@ -303,14 +430,14 @@ export default function EstimadorPlusvalidasIRPFPage() {
                   icon="💰"
                   description="Precio venta - gastos"
                 />
-                {fechaCompra && fechaVenta && (
+                {resultado.tieneFechas && (
                   <ResultCard
                     title="Periodo de tenencia"
                     value={formatNumber(Math.floor(resultado.mesesTenencia / 12), 0)}
                     unit={`años ${resultado.mesesTenencia % 12} meses`}
                     variant="success"
                     icon="📅"
-                    description={resultado.esLargoPlazo ? 'Base del ahorro' : 'Base general'}
+                    description="Informativo (no cambia la base)"
                   />
                 )}
               </div>
@@ -346,6 +473,18 @@ export default function EstimadorPlusvalidasIRPFPage() {
                   <span>{resultado.esGanancia ? 'Ganancia patrimonial' : 'Pérdida patrimonial'}</span>
                   <span className={styles.desgloseValor}>{formatCurrency(Math.abs(resultado.gananciaPatrimonial))}</span>
                 </div>
+                {resultado.esGanancia && resultado.perdidasPreviasAplicadas > 0 && (
+                  <>
+                    <div className={styles.desgloseRow}>
+                      <span>− Minusvalías de años anteriores</span>
+                      <span className={styles.desgloseValor}>−{formatCurrency(resultado.perdidasPreviasAplicadas)}</span>
+                    </div>
+                    <div className={styles.desgloseRow}>
+                      <span>= Base imponible del ahorro</span>
+                      <span className={styles.desgloseValor}>{formatCurrency(resultado.baseImponible)}</span>
+                    </div>
+                  </>
+                )}
                 {resultado.esGanancia && (
                   <div className={styles.desgloseRow} style={{ fontWeight: 700, color: '#e53e3e' }}>
                     <span>IRPF estimado</span>
@@ -353,12 +492,28 @@ export default function EstimadorPlusvalidasIRPFPage() {
                   </div>
                 )}
               </div>
+
+              {/* Compensación de minusvalías */}
+              {resultado.esGanancia && resultado.perdidasPreviasAplicadas > 0 && (
+                <div className={styles.reglaBox} style={{ background: 'rgba(46,134,171,0.08)', borderColor: 'var(--primary)', color: 'var(--text-primary)' }}>
+                  <strong>Compensación aplicada:</strong> has reducido la ganancia en{' '}
+                  {formatCurrency(resultado.perdidasPreviasAplicadas)} con minusvalías de años anteriores.
+                  {resultado.perdidasPreviasRestantes > 0
+                    ? <> Te quedan <strong>{formatCurrency(resultado.perdidasPreviasRestantes)}</strong> de minusvalías pendientes para los próximos ejercicios.</>
+                    : <> Has agotado las minusvalías pendientes que introdujiste.</>}
+                </div>
+              )}
+
+              {/* Pérdida del ejercicio compensable */}
+              {!resultado.esGanancia && !resultado.perdidaDiferida && (
+                <div className={styles.reglaBox} style={{ background: 'rgba(46,134,171,0.08)', borderColor: 'var(--primary)', color: 'var(--text-primary)' }}>
+                  <strong>Pérdida compensable:</strong> esta pérdida de{' '}
+                  {formatCurrency(Math.abs(resultado.gananciaPatrimonial))} puede compensar ganancias patrimoniales del
+                  mismo año y, lo que sobre, durante los <strong>4 ejercicios siguientes</strong>. Además, hasta el 25 % puede
+                  compensar rendimientos del capital mobiliario positivos (dividendos, intereses).
+                </div>
+              )}
             </>
-          ) : (
-            <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon} aria-hidden="true">💹</span>
-              <p>Introduce los datos de la operación y pulsa «Estimar plusvalía»</p>
-            </div>
           )}
         </div>
       </div>
@@ -375,9 +530,9 @@ export default function EstimadorPlusvalidasIRPFPage() {
         <ul>
           <li>Exenciones aplicables: reinversión en vivienda habitual, mayores de 65 años, dación en pago</li>
           <li>Coeficientes de abatimiento para activos adquiridos antes de 31/12/1994</li>
-          <li>Compensación de pérdidas de ejercicios anteriores</li>
-          <li>Tipo autonómico específico del IRPF</li>
-          <li>Gastos deducibles no incluidos (mejoras en inmuebles, comisiones específicas)</li>
+          <li>El método FIFO obligatorio cuando hay varias compras del mismo valor</li>
+          <li>El límite del 25 % en la compensación con rendimientos del capital mobiliario</li>
+          <li>Tipo autonómico específico del IRPF y gastos deducibles no incluidos (mejoras en inmuebles)</li>
         </ul>
         <p>
           <strong>NO constituye asesoramiento fiscal.</strong> Para el cálculo exacto, consulta con un asesor fiscal
@@ -393,7 +548,7 @@ export default function EstimadorPlusvalidasIRPFPage() {
 
       <EducationalSection
         title="¿Qué son las plusvalías y cómo tributan?"
-        subtitle="Guía sobre ganancias patrimoniales, base del ahorro y tramos IRPF 2025"
+        subtitle="Guía sobre ganancias patrimoniales, base del ahorro y planificación fiscal 2025"
         icon="📚"
       >
         <section className={styles.guideSection}>
@@ -414,11 +569,11 @@ export default function EstimadorPlusvalidasIRPFPage() {
               </p>
             </div>
             <div className={styles.guideCard}>
-              <h4><span aria-hidden="true">⏱️</span> Importancia del plazo</h4>
+              <h4><span aria-hidden="true">⏱️</span> ¿Importa el plazo de tenencia?</h4>
               <p>
-                Si el activo se tuvo <strong>más de 1 año</strong>, tributa en la base del ahorro (19-30%).
-                Si se tuvo <strong>menos de 1 año</strong>, tributa en la base general con el IRPF normal (hasta 47%).
-                Siempre conviene esperar al año si la diferencia es pequeña.
+                Desde 2015, <strong>todas las ganancias por transmisión tributan en la base del ahorro</strong>, tengas el
+                activo días o años. La distinción corto/largo plazo desapareció. El plazo solo importa para los coeficientes
+                de abatimiento de activos comprados antes de 1995.
               </p>
             </div>
             <div className={styles.guideCard}>
@@ -430,7 +585,7 @@ export default function EstimadorPlusvalidasIRPFPage() {
             </div>
           </div>
 
-          <h3>Tramos base del ahorro 2025 (activos &gt; 1 año)</h3>
+          <h3>Tramos de la base del ahorro 2025</h3>
           <table className={styles.tramosTable}>
             <thead>
               <tr><th>Desde</th><th>Hasta</th><th>Tipo</th></tr>
@@ -456,9 +611,9 @@ export default function EstimadorPlusvalidasIRPFPage() {
               <thead>
                 <tr>
                   <th>Activo</th>
-                  <th>Plazo para base del ahorro</th>
+                  <th>Tributa en</th>
                   <th>Gastos deducibles</th>
-                  <th>Exenciones principales</th>
+                  <th>Particularidad clave</th>
                   <th>Retención en origen</th>
                   <th>Complejidad declaración</th>
                 </tr>
@@ -466,35 +621,43 @@ export default function EstimadorPlusvalidasIRPFPage() {
               <tbody>
                 <tr>
                   <td><strong>Inmueble</strong></td>
-                  <td>&gt; 1 año desde escritura</td>
+                  <td>Base del ahorro (cualquier plazo)</td>
                   <td>ITP/AJD, notaría, registro, gestoría, reformas que aumentan valor, comisión agencia, plusvalía municipal</td>
-                  <td>Reinversión en vivienda habitual, mayores de 65 años, dación en pago</td>
+                  <td>Exenta por reinversión en vivienda habitual o mayores de 65 años</td>
                   <td>No aplica (el comprador no retiene)</td>
                   <td>Alta — muchos gastos y posibles exenciones</td>
                 </tr>
                 <tr>
                   <td><strong>Fondos de inversión</strong></td>
-                  <td>&gt; 1 año desde suscripción</td>
+                  <td>Base del ahorro (o 0 € si es traspaso)</td>
                   <td>Comisiones de suscripción y reembolso</td>
-                  <td>Régimen de traspasos entre fondos domiciliados en España/UE (no tributa hasta reembolso final)</td>
-                  <td>19% retención automática</td>
+                  <td>Traspaso entre fondos España/UE sin tributar hasta el reembolso final</td>
+                  <td>19% retención automática en el reembolso</td>
                   <td>Media — la gestora informa en el certificado fiscal</td>
                 </tr>
                 <tr>
-                  <td><strong>Acciones / ETFs</strong></td>
-                  <td>&gt; 1 año desde fecha de compra</td>
+                  <td><strong>Acciones / ETF</strong></td>
+                  <td>Base del ahorro (cualquier plazo)</td>
                   <td>Comisiones de compra y venta del bróker</td>
-                  <td>Ninguna específica (regla wash sale invalida pérdidas si recompra en 2 meses)</td>
+                  <td>Regla de los 2 meses invalida pérdidas si recompras; ETF NO admiten traspaso</td>
                   <td>19% retención automática (acciones españolas)</td>
                   <td>Media-alta — FIFO obligatorio con múltiples compras</td>
                 </tr>
                 <tr>
                   <td><strong>Criptomonedas</strong></td>
-                  <td>&gt; 1 año (cada unidad por separado)</td>
+                  <td>Base del ahorro (cada unidad por separado)</td>
                   <td>Comisiones del exchange por compra y venta</td>
-                  <td>Sin exenciones específicas en 2025</td>
+                  <td>Cada intercambio cripto→cripto es un hecho imponible independiente</td>
                   <td>No aplica (sin retención en origen)</td>
-                  <td>Muy alta — cada swap/intercambio es hecho imponible independiente</td>
+                  <td>Muy alta — exige registro de todas las operaciones</td>
+                </tr>
+                <tr>
+                  <td><strong>Plan de pensiones</strong></td>
+                  <td>Base general (rendimiento del trabajo)</td>
+                  <td>No aplica (no es ganancia patrimonial)</td>
+                  <td>El rescate tributa como trabajo; aportar reduce la base general</td>
+                  <td>Retención de trabajo al rescate</td>
+                  <td>Baja — pero el rescate en capital puede disparar el tipo</td>
                 </tr>
               </tbody>
             </table>
@@ -522,22 +685,22 @@ export default function EstimadorPlusvalidasIRPFPage() {
                 <em>(6.000 × 19% + 44.000 × 21% + 6.500 × 23%)</em>
               </div>
               <p className={styles.escenarioTip}>
-                Tenencia &gt; 1 año: tributa en base del ahorro (19–30%). Si fuera vivienda habitual y reinviertes en otra, la ganancia queda exenta.
+                Tributa en la base del ahorro (19–30%). Si fuera vivienda habitual y reinviertes en otra, la ganancia queda exenta.
               </p>
             </div>
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon} aria-hidden="true">📈</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔄</span>
                 <h4>Traspaso entre fondos de inversión</h4>
               </div>
               <div className={styles.escenarioExample}>
-                Tienes 30.000 € en el Fondo A (ganancia latente de 8.000 €). Traspassas al Fondo B domiciliado en España.<br /><br />
+                Tienes 30.000 € en el Fondo A (ganancia latente de 8.000 €). Traspasas al Fondo B domiciliado en España.<br /><br />
                 Resultado fiscal: <strong>0 € a pagar en el año del traspaso</strong><br />
                 El valor de adquisición del Fondo B hereda el coste original del Fondo A. La ganancia tributa cuando hagas el reembolso final.
               </div>
               <p className={styles.escenarioTip}>
-                Atención: esta ventaja NO aplica a ETFs ni a fondos domiciliados fuera de la UE. Un traspaso de Fondo A a un ETF sí genera hecho imponible inmediato.
+                Atención: esta ventaja NO aplica a ETF ni a fondos domiciliados fuera de la UE. Un traspaso de Fondo A a un ETF sí genera hecho imponible inmediato.
               </p>
             </div>
 
@@ -554,7 +717,7 @@ export default function EstimadorPlusvalidasIRPFPage() {
                 Si la pérdida hubiera sido mayor que la ganancia, el exceso puede compensarse en los 4 años siguientes.
               </div>
               <p className={styles.escenarioTip}>
-                Regla wash sale: si recompras las acciones de empresa B en los 2 meses siguientes a la venta, la pérdida de 2.500 € queda invalidada para compensar.
+                Regla de los 2 meses: si recompras las acciones de empresa B en los 2 meses siguientes a la venta, la pérdida de 2.500 € queda invalidada para compensar.
               </p>
             </div>
 
@@ -564,13 +727,12 @@ export default function EstimadorPlusvalidasIRPFPage() {
                 <h4>Criptomonedas: el intercambio BTC→ETH tributa</h4>
               </div>
               <div className={styles.escenarioExample}>
-                Compraste 1 BTC en enero 2024 por 35.000 €. En agosto 2024 lo intercambiaste por 20 ETH (valor de mercado en ese momento: 52.000 €).<br /><br />
+                Compraste 1 BTC en enero por 35.000 €. En agosto lo intercambiaste por 20 ETH (valor de mercado en ese momento: 52.000 €).<br /><br />
                 Ganancia realizada: <strong>17.000 €</strong><br />
-                Tenencia &lt; 1 año → <strong>base general</strong> (tipo marginal, hasta 47%).<br />
-                Si la operación se hubiera hecho en febrero 2025, base del ahorro (19–30%).
+                Tributa en la <strong>base del ahorro</strong> (19–30%), tanto si lo tuviste meses como años.
               </div>
               <p className={styles.escenarioTip}>
-                Cada intercambio crypto→crypto es una transmisión. No hace falta convertir a euros para que se genere el hecho imponible. Exporta el CSV del exchange para cada año.
+                Cada intercambio cripto→cripto es una transmisión. No hace falta convertir a euros para que se genere el hecho imponible. Exporta el CSV del exchange para cada año.
               </p>
             </div>
           </div>
@@ -593,6 +755,7 @@ export default function EstimadorPlusvalidasIRPFPage() {
               <p>
                 Sí. Las pérdidas patrimoniales pendientes de compensar pueden aplicarse durante los 4 ejercicios siguientes. En primer lugar se compensan con ganancias del mismo tipo (base del ahorro con base del ahorro). Si quedan pérdidas sin compensar en la base del ahorro, pueden aplicarse hasta el 25% de los rendimientos de capital mobiliario positivos del mismo año. La compensación cruzada entre base general y base del ahorro también está limitada al 25% desde 2021.
               </p>
+              <span className={styles.faqTip}>Esta herramienta aplica tus minusvalías pendientes sobre la ganancia actual</span>
             </div>
 
             <div className={styles.faqItem}>
@@ -611,9 +774,9 @@ export default function EstimadorPlusvalidasIRPFPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>¿Las plusvalías de fondos de pensiones tributan igual que las de fondos de inversión?</h4>
+              <h4>¿Las plusvalías de planes de pensiones tributan igual que las de fondos de inversión?</h4>
               <p>
-                No. Los fondos de pensiones no generan ganancia patrimonial: las aportaciones son deducibles en la base general del IRPF (hasta 1.500 €/año) y las prestaciones tributan como rendimientos del trabajo al rescate, no como ganancias patrimoniales en la base del ahorro. En cambio, los fondos de inversión (SICAV, FI) sí generan ganancias patrimoniales al reembolso, con los tipos de la base del ahorro (19–30%).
+                No. Los planes de pensiones no generan ganancia patrimonial: las aportaciones son deducibles en la base general del IRPF (hasta 1.500 €/año) y las prestaciones tributan como rendimientos del trabajo al rescate, no como ganancias patrimoniales en la base del ahorro. En cambio, los fondos de inversión sí generan ganancias patrimoniales al reembolso, con los tipos de la base del ahorro (19–30%).
               </p>
             </div>
 
@@ -625,17 +788,17 @@ export default function EstimadorPlusvalidasIRPFPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>¿Qué es la regla de los dos meses (wash sale) para compensar pérdidas?</h4>
+              <h4>¿Qué es la regla de los dos meses para compensar pérdidas?</h4>
               <p>
-                En España, si vendes valores con pérdida y adquieres los mismos valores (o valores homogéneos) en los 2 meses anteriores o posteriores a la venta, la pérdida no puede compensarse en ese ejercicio: queda diferida hasta que vendas los valores recomprados. Esta norma antiabuso está en el art. 33.5 LIRPF y aplica tanto a acciones como a participaciones en IIC (fondos y ETFs con la misma política de inversión).
+                En España, si vendes valores con pérdida y adquieres los mismos valores (o valores homogéneos) en los 2 meses anteriores o posteriores a la venta, la pérdida no puede compensarse en ese ejercicio: queda diferida hasta que vendas los valores recomprados. Esta norma antiabuso está en el art. 33.5 LIRPF y aplica a acciones y participaciones en fondos cotizados. Para valores no cotizados, el plazo se amplía a un año.
               </p>
-              <span className={styles.faqTip}>Para fondos de inversión, el plazo ampliado es de 2 meses antes y después</span>
+              <span className={styles.faqTip}>Activa la casilla de recompra en el simulador para verlo aplicado</span>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Cómo calculo el valor de adquisición de acciones compradas en varias veces (FIFO)?</h4>
               <p>
-                La normativa española obliga a usar el método FIFO (First In, First Out): cuando vendas, se considera que vendes primero las acciones más antiguas. Por ejemplo, si compraste 100 acciones en 2020 a 10 € y 100 en 2022 a 15 €, y vendes 100 en 2025, el coste asignado es 10 € por acción (las de 2020). Esto afecta al periodo de tenencia y al tipo impositivo aplicable. Tu bróker debe informarte del coste FIFO en el certificado fiscal anual.
+                La normativa española obliga a usar el método FIFO (First In, First Out): cuando vendas, se considera que vendes primero las acciones más antiguas. Por ejemplo, si compraste 100 acciones en 2020 a 10 € y 100 en 2022 a 15 €, y vendes 100 en 2025, el coste asignado es 10 € por acción (las de 2020). Tu bróker debe informarte del coste FIFO en el certificado fiscal anual.
               </p>
             </div>
           </div>
@@ -673,7 +836,7 @@ export default function EstimadorPlusvalidasIRPFPage() {
               <div className={styles.stepNumber}>4</div>
               <div className={styles.stepContent}>
                 <h4>Aplicar el método FIFO si tienes acciones o fondos con múltiples compras</h4>
-                <p>Ordena tus compras de más antigua a más reciente. Asigna las ventas empezando por las acciones o participaciones más antiguas. Esto determina tanto el coste de adquisición como el periodo de tenencia de cada unidad vendida, lo que puede cambiar si tributa en base del ahorro o base general.</p>
+                <p>Ordena tus compras de más antigua a más reciente. Asigna las ventas empezando por las acciones o participaciones más antiguas. Esto determina el coste de adquisición de cada unidad vendida y, por tanto, la ganancia o pérdida resultante.</p>
               </div>
             </div>
             <div className={styles.step}>
@@ -687,7 +850,7 @@ export default function EstimadorPlusvalidasIRPFPage() {
               <div className={styles.stepNumber}>6</div>
               <div className={styles.stepContent}>
                 <h4>Incluir en el modelo 100 (Declaración de la Renta)</h4>
-                <p>Las ganancias y pérdidas de la base del ahorro se declaran en las casillas de «Ganancias y pérdidas patrimoniales derivadas de transmisiones» (aproximadamente casillas 1624–1789 según el tipo de activo). Las operaciones con retención ya aparecen precargadas; revisa que los valores coincidan con tu certificado fiscal y añade las que falten (criptomonedas, inmuebles, etc.).</p>
+                <p>Las ganancias y pérdidas de la base del ahorro se declaran en las casillas de «Ganancias y pérdidas patrimoniales derivadas de transmisiones». Las operaciones con retención ya aparecen precargadas; revisa que los valores coincidan con tu certificado fiscal y añade las que falten (criptomonedas, inmuebles, etc.).</p>
               </div>
             </div>
           </div>
@@ -698,8 +861,8 @@ export default function EstimadorPlusvalidasIRPFPage() {
           <h2>Aspectos prácticos al declarar plusvalías</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon} aria-hidden="true">⏳</span>
-              <p>El plazo de tenencia determina la base aplicable. Los activos con más de 1 año tributan en la base del ahorro (19–30 %); por debajo, en la base general (hasta 47 %). Antes de adelantar o retrasar una venta solo por motivos fiscales, valora también el riesgo de variación del precio del activo.</p>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
+              <p><strong>Usa el traspaso en lugar de vender</strong> si tienes fondos de inversión con ganancia y quieres cambiar de estrategia: difieres la tributación hasta el reembolso final. Recuerda que los ETF no admiten traspaso.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">📉</span>
@@ -719,7 +882,7 @@ export default function EstimadorPlusvalidasIRPFPage() {
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🪙</span>
-              <p><strong>Para criptomonedas, exporta el historial completo del exchange</strong> al finalizar el año y calcula el precio medio FIFO de cada criptomoneda. Herramientas como Koinly o CoinTracking automatizan el cálculo. La falta de declaración es detectada por Hacienda mediante el modelo 721 (saldos en exchanges extranjeros &gt;50.000 €).</p>
+              <p><strong>Para criptomonedas, exporta el historial completo del exchange</strong> al finalizar el año y calcula el precio medio FIFO de cada criptomoneda. La falta de declaración es detectada por Hacienda mediante el modelo 721 (saldos en exchanges extranjeros &gt;50.000 €).</p>
             </div>
           </div>
         </section>
@@ -736,13 +899,13 @@ export default function EstimadorPlusvalidasIRPFPage() {
                 <strong>Olvidar las comisiones del bróker</strong> en el valor de adquisición y transmisión. Cada comisión reduce la ganancia computable. En operaciones frecuentes, pueden suponer cientos de euros deducibles que se pierden por no incluirlos.
               </li>
               <li>
-                <strong>Creer que un traspaso entre fondos nunca tributa.</strong> El régimen de traspasos aplica solo a fondos de inversión domiciliados en España o en la UE con convenio. Los ETFs y fondos extranjeros fuera del régimen sí generan ganancia patrimonial inmediata al traspaso.
+                <strong>Creer que un traspaso entre fondos nunca tributa.</strong> El régimen de traspasos aplica solo a fondos de inversión domiciliados en España o en la UE con convenio. Los ETF y fondos extranjeros fuera del régimen sí generan ganancia patrimonial inmediata al traspaso.
               </li>
               <li>
                 <strong>Compensar pérdidas de acciones recomprando los mismos títulos en los 2 meses siguientes.</strong> La Agencia Tributaria invalida la compensación de esa pérdida, que queda diferida hasta la venta definitiva. El plazo es 2 meses tanto antes como después de la venta con pérdida.
               </li>
               <li>
-                <strong>Confundir base del ahorro con base general.</strong> Activos con tenencia inferior a 1 año tributan al tipo marginal de la base general (hasta 47 %); con tenencia superior, en la base del ahorro (19–30 %). La diferencia de cuota entre ambos regímenes puede ser significativa: por ejemplo, sobre una ganancia de 30.000 €, la cuota varía aproximadamente en 9.000 € según el régimen aplicable.
+                <strong>Creer que vender antes de un año cambia la tributación.</strong> Desde 2015, todas las ganancias por transmisión van a la base del ahorro (19–30%) sea cual sea la antigüedad del activo. La distinción corto/largo plazo desapareció: esperar al año ya no reduce el tipo.
               </li>
               <li>
                 <strong>No declarar la venta de un inmueble aunque genere pérdida.</strong> Hacienda detecta las transmisiones inmobiliarias a través del Registro de la Propiedad y del modelo 600 (ITP). La omisión puede dar lugar a una liquidación paralela con recargo e intereses de demora.

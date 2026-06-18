@@ -60,7 +60,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre la base general y la base del ahorro del IRPF?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La base general agrupa rendimientos del trabajo, actividades económicas, capital inmobiliario (alquileres) e imputaciones, y tributa a la escala progresiva (del 19% al 47% en 2025). La base del ahorro agrupa la mayoría de rendimientos del capital mobiliario (dividendos, intereses) y las ganancias patrimoniales por transmisiones, y tributa a una escala propia más baja (del 19% al 28%).',
+        text: 'La base general agrupa rendimientos del trabajo, actividades económicas, capital inmobiliario (alquileres) e imputaciones, y tributa a la escala progresiva (del 19% al 47% en 2025). La base del ahorro agrupa la mayoría de rendimientos del capital mobiliario (dividendos, intereses) y las ganancias patrimoniales por transmisiones, y tributa a una escala propia más baja (del 19% al 30%).',
       },
     },
     {

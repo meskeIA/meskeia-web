@@ -18,10 +18,13 @@ import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   TRAMOS_IRPF_2025,
-  TRAMOS_AHORRO_IRPF_2025,
+  TRAMOS_GANANCIAS_PATRIMONIALES_2025,
   FISCAL_IRPF_META,
   type TramoIRPF,
 } from '@/data/fiscal';
+
+// Escala de la base del ahorro (capital mobiliario + ganancias por transmisión)
+const TRAMOS_AHORRO_IRPF_2025 = TRAMOS_GANANCIAS_PATRIMONIALES_2025;
 
 // ─── Tipos ───────────────────────────────────────────────────────────────────
 
@@ -393,7 +396,7 @@ export default function OrientadorTiposRentaIrpfPage() {
                   </table>
                   <p className={styles.datoNota}>
                     {base === 'ahorro'
-                      ? 'Escala propia de la base del ahorro (19 % – 28 %).'
+                      ? 'Escala propia de la base del ahorro (19 % – 30 %).'
                       : 'Escala general progresiva. El tipo final depende del conjunto de tus rentas de base general.'}
                   </p>
                 </>
@@ -497,8 +500,8 @@ export default function OrientadorTiposRentaIrpfPage() {
                 <tr><td><strong>Trabajo</strong></td><td>General</td><td>19 % – 47 %</td><td>Nómina, pensión, paro, plan de pensiones</td></tr>
                 <tr><td><strong>Actividad económica</strong></td><td>General</td><td>19 % – 47 %</td><td>Facturación de autónomos, creadores de contenido</td></tr>
                 <tr><td><strong>Capital inmobiliario</strong></td><td>General</td><td>19 % – 47 %</td><td>Alquiler de vivienda, local o garaje</td></tr>
-                <tr><td><strong>Capital mobiliario</strong></td><td>Ahorro</td><td>19 % – 28 %</td><td>Dividendos, intereses, staking de criptos</td></tr>
-                <tr><td><strong>Ganancia patrimonial</strong></td><td>Ahorro*</td><td>19 % – 28 %</td><td>Venta de acciones, criptos o vivienda</td></tr>
+                <tr><td><strong>Capital mobiliario</strong></td><td>Ahorro</td><td>19 % – 30 %</td><td>Dividendos, intereses, staking de criptos</td></tr>
+                <tr><td><strong>Ganancia patrimonial</strong></td><td>Ahorro*</td><td>19 % – 30 %</td><td>Venta de acciones, criptos o vivienda</td></tr>
                 <tr><td><strong>Imputación inmobiliaria</strong></td><td>General</td><td>19 % – 47 %</td><td>Segunda vivienda vacía</td></tr>
               </tbody>
             </table>
@@ -543,7 +546,7 @@ export default function OrientadorTiposRentaIrpfPage() {
               <dt>¿Por qué los dividendos tributan menos que mi sueldo?</dt>
               <dd>
                 Porque van a bases distintas. Tu sueldo está en la <strong>base general</strong>, con una escala que llega al 47 %.
-                Los dividendos están en la <strong>base del ahorro</strong>, con una escala propia que va del 19 % al 28 %. Por eso una
+                Los dividendos están en la <strong>base del ahorro</strong>, con una escala propia que va del 19 % al 30 %. Por eso una
                 misma cantidad puede tributar muy distinto según de dónde proceda.
                 <span className={styles.faqTip}>Esta es justo la idea que muestra el orientador: la categoría de la renta importa más que el importe.</span>
               </dd>
@@ -619,7 +622,7 @@ export default function OrientadorTiposRentaIrpfPage() {
               <span className={styles.stepNumber}>4</span>
               <div className={styles.stepContent}>
                 <strong>Aplica la escala correspondiente</strong>
-                <p>La base general usa la escala progresiva (19 % – 47 %); la del ahorro, su escala propia (19 % – 28 %).</p>
+                <p>La base general usa la escala progresiva (19 % – 47 %); la del ahorro, su escala propia (19 % – 30 %).</p>
               </div>
             </li>
             <li className={styles.step}>
