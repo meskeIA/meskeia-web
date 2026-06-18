@@ -1174,6 +1174,8 @@ export const implementedAppsUrls = [
   "/analizador-ratios-financieros/",   // 12 ratios financieros con semáforo: liquidez, endeudamiento, rentabilidad, gestión. Datos precargados
   "/simulador-contabilidad-basica/",  // Partida doble, libro diario y libro mayor con cuentas T. Educación contable para principiantes
   "/visualizador-beneficio-liquidez/", // Simulación 12 meses: beneficio contable vs caja real. PMC, PMP, stock, capex. Brecha de liquidez
+  "/calculadora-valoracion-empresa/",  // 4 métodos de valoración: EBITDA, ventas, capitalización, valor contable. Rangos por sector
+  "/simulador-ciclo-explotacion/",     // Ciclo operativo: PME, PMF, fondo de maniobra necesario. Diagrama Gantt proporcional
 ];
 
 /**
