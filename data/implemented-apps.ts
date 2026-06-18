@@ -1176,6 +1176,7 @@ export const implementedAppsUrls = [
   "/visualizador-beneficio-liquidez/", // Simulación 12 meses: beneficio contable vs caja real. PMC, PMP, stock, capex. Brecha de liquidez
   "/calculadora-valoracion-empresa/",  // 4 métodos de valoración: EBITDA, ventas, capitalización, valor contable. Rangos por sector
   "/simulador-ciclo-explotacion/",     // Ciclo operativo: PME, PMF, fondo de maniobra necesario. Diagrama Gantt proporcional
+  "/simulador-financiacion-empresarial/", // Préstamo vs leasing vs ampliación de capital: coste neto, escudo fiscal IS, tesorería, dilución
 ];
 
 /**
