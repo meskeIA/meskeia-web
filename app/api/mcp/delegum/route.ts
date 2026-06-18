@@ -72,6 +72,7 @@ import { calcularRetencionAlquiler } from '@/lib/calculadoras/retencionAlquiler'
 // ── Bolsa y criptomonedas (Bloque D) ──────────────────────────────────────────
 import { calcularPlusvaliasIRPF, type TipoActivo } from '@/lib/calculadoras/plusvaliasIRPF';
 import { calcularGananciaCriptomonedas, type TipoOperacionCripto } from '@/lib/calculadoras/gananciaCriptomonedas';
+import { calcularImpuestoPatrimonio } from '@/lib/calculadoras/impuestoPatrimonio';
 // ── Laboral familiar y bajas (Bloque E) ───────────────────────────────────────
 import {
   calcularPrestacionMaternidadPaternidad,
@@ -1984,6 +1985,85 @@ function crearServidorDelegum(): McpServer {
                 `📊 Rentabilidad neta: ${pct(r.rentabilidadNetaImpuestos)}%`,
               ].join('\n')
             : `✅ La pérdida patrimonial puede compensarse con ganancias de los próximos 4 ejercicios.`,
+          `📚 ${r.fuenteDatos}`,
+        ].filter(l => l !== '');
+        return conAviso(lineas.join('\n'), AVISO_FISCAL);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ── calcular_impuesto_patrimonio ─────────────────────────────────────────
+  servidor.tool(
+    'calcular_impuesto_patrimonio',
+    'Valora el patrimonio de una persona física con los criterios del Impuesto sobre el Patrimonio, determina si ' +
+    'hay obligación de declarar y estima la cuota orientativa aplicando la ESCALA y la BONIFICACIÓN de su comunidad ' +
+    'autónoma (Cataluña, Asturias, Baleares, Extremadura, Cantabria y C. Valenciana tienen escala propia; el resto ' +
+    'usan la estatal). Aplica la exención de 300.000 € de la vivienda habitual, el mínimo exento de cada CCAA ' +
+    '(700.000 € general; 500.000 € en Cataluña, C. Valenciana y Extremadura; 400.000 € en Aragón) y el umbral ' +
+    'universal de obligación de declarar por 2.000.000 € de bienes brutos. Los planes de pensiones están exentos ' +
+    '(no se incluyen). Para patrimonios SIN participaciones en empresas propias o no cotizadas. ' +
+    'No calcula la cuota en territorios forales (Navarra y País Vasco): remite a su Hacienda foral.',
+    {
+      comunidad_autonoma: z.enum(ENUM_CCAA).describe('Comunidad autónoma de residencia del contribuyente'),
+      vivienda_habitual: z.number().min(0).optional().describe('Valor TOTAL de la vivienda habitual (el mayor de catastral, comprobado o de adquisición con gastos), en euros. Exenta hasta 300.000 €. Por defecto 0.'),
+      otros_inmuebles: z.number().min(0).optional().describe('Suma del valor de otros inmuebles —segunda vivienda, locales, garajes— (mayor de catastral/comprobado/adquisición de cada uno), en euros. Por defecto 0.'),
+      cuentas_depositos: z.number().min(0).optional().describe('Cuentas y depósitos: el mayor entre el saldo a 31/12 y el saldo medio del 4.º trimestre, en euros. Por defecto 0.'),
+      acciones_fondos: z.number().min(0).optional().describe('Acciones cotizadas (cotización media del 4.º trimestre), ETF y fondos de inversión (valor liquidativo a 31/12), en euros. Por defecto 0.'),
+      seguros_vida: z.number().min(0).optional().describe('Seguros de vida por su valor de rescate a 31/12, en euros. Por defecto 0.'),
+      otros_bienes: z.number().min(0).optional().describe('Otros bienes por su valor de mercado: vehículos, joyas, arte, embarcaciones, efectivo... en euros. Por defecto 0.'),
+      deudas: z.number().min(0).optional().describe('Deudas deducibles: préstamos e hipotecas, salvo la parte vinculada a bienes exentos (vivienda habitual exenta), en euros. Por defecto 0.'),
+    },
+    { title: 'Valora el patrimonio, la obligación de declarar y la cuota del IP por CCAA', readOnlyHint: true },
+    async ({ comunidad_autonoma, vivienda_habitual, otros_inmuebles, cuentas_depositos, acciones_fondos, seguros_vida, otros_bienes, deudas }, extra) => {
+      await registrarUsoDelegum('calcular_impuesto_patrimonio', getCaller(extra));
+      try {
+        // El ENUM_CCAA de Delegum difiere en 3 ids de los de data/fiscal/patrimonio.ts
+        const MAPA_CCAA_PATRIMONIO: Record<string, string> = {
+          valencia: 'comunidad-valenciana',
+          rioja: 'la-rioja',
+          'castilla-mancha': 'castilla-la-mancha',
+        };
+        const ccaaId = MAPA_CCAA_PATRIMONIO[comunidad_autonoma] ?? comunidad_autonoma;
+        const r = calcularImpuestoPatrimonio({
+          ccaaId,
+          viviendaHabitual: vivienda_habitual,
+          otrosInmuebles: otros_inmuebles,
+          cuentasDepositos: cuentas_depositos,
+          accionesFondos: acciones_fondos,
+          segurosVida: seguros_vida,
+          otrosBienes: otros_bienes,
+          deudas,
+        });
+        const iconoObligacion = r.obligadoDeclarar ? '📋' : '✅';
+        const lineas = [
+          `🏛️ **Impuesto sobre el Patrimonio — ${r.nombreCCAA}**`,
+          '',
+          `💼 Patrimonio bruto: ${fmt(r.patrimonioBruto)} €`,
+          r.viviendaHabitualComputable > 0
+            ? `  • Vivienda habitual computable (tras exención de 300.000 €): ${fmt(r.viviendaHabitualComputable)} €`
+            : '',
+          `📊 Base imponible (patrimonio neto computable): ${fmt(r.baseImponible)} €`,
+          `➖ Mínimo exento (${r.nombreCCAA}): ${fmt(r.minimoExento)} €`,
+          `🧮 Base liquidable: **${fmt(r.baseLiquidable)} €**`,
+          '',
+          `${iconoObligacion} ${r.motivoObligacion}`,
+          '',
+          r.esForal
+            ? `⚖️ Régimen foral: la cuota se calcula con la normativa de tu Hacienda foral, no incluida aquí.`
+            : r.cuotaBruta !== null
+              ? [
+                  `💰 **Cuota orientativa** (escala ${r.escalaUsada}):`,
+                  `  • Cuota bruta: ${fmt(r.cuotaBruta)} €`,
+                  r.porcentajeBonificacion > 0
+                    ? `  • Bonificación ${r.nombreCCAA} (${r.porcentajeBonificacion}%): −${fmt(r.cuotaBruta * r.porcentajeBonificacion / 100)} €`
+                    : '',
+                  `  • **Cuota neta orientativa: ${fmt(r.cuotaNeta ?? 0)} €**`,
+                ].filter(l => l !== '').join('\n')
+              : '',
+          '',
+          ...r.advertencias.map(a => `⚠️ ${a}`),
           `📚 ${r.fuenteDatos}`,
         ].filter(l => l !== '');
         return conAviso(lineas.join('\n'), AVISO_FISCAL);
