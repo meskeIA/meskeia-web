@@ -1177,6 +1177,7 @@ export const implementedAppsUrls = [
   "/calculadora-valoracion-empresa/",  // 4 métodos de valoración: EBITDA, ventas, capitalización, valor contable. Rangos por sector
   "/simulador-ciclo-explotacion/",     // Ciclo operativo: PME, PMF, fondo de maniobra necesario. Diagrama Gantt proporcional
   "/simulador-financiacion-empresarial/", // Préstamo vs leasing vs ampliación de capital: coste neto, escudo fiscal IS, tesorería, dilución
+  "/calculadora-z-score-altman/",      // Z-Score de Altman: riesgo de insolvencia. 3 modelos (cotizada, pyme, servicios), zona segura/gris/insolvencia
 ];
 
 /**

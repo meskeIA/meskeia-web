@@ -3625,6 +3625,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/planificador-cashflow/', icon: '💰', name: 'Planificador de Cashflow', description: 'Proyecta tu flujo de caja' },
   ],
   'analizador-ratios-financieros': [
+    { url: '/calculadora-z-score-altman/', icon: '📉', name: 'Z-Score de Altman', description: 'Riesgo de quiebra a partir del balance' },
     { url: '/visualizador-beneficio-liquidez/', icon: '💸', name: 'Beneficio vs Liquidez', description: 'Por qué tener beneficios no es tener caja' },
     { url: '/calculadora-valoracion-empresa/', icon: '🏢', name: 'Valoración de Empresa', description: 'Estima cuánto vale tu empresa con ratios' },
     { url: '/simulador-ciclo-explotacion/', icon: '🔄', name: 'Ciclo de Explotación', description: 'PME, PMF y fondo de maniobra' },
@@ -3634,12 +3635,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-ciclo-explotacion/', icon: '🔄', name: 'Ciclo de Explotación', description: 'PME, PMF y fondo de maniobra necesario' },
     { url: '/analizador-ratios-financieros/', icon: '📊', name: 'Analizador de Ratios', description: 'Analiza el balance con 12 ratios' },
     { url: '/calculadora-valoracion-empresa/', icon: '🏢', name: 'Valoración de Empresa', description: 'Estima cuánto vale tu empresa' },
+    { url: '/calculadora-z-score-altman/', icon: '📉', name: 'Z-Score de Altman', description: 'Riesgo de insolvencia a partir del balance' },
     { url: '/simulador-financiacion-empresarial/', icon: '⚖️', name: 'Financiación Empresarial', description: 'Préstamo vs leasing vs ampliación de capital' },
   ],
   'calculadora-valoracion-empresa': [
     { url: '/analizador-ratios-financieros/', icon: '📊', name: 'Analizador de Ratios', description: 'Analiza el balance con 12 ratios clave' },
     { url: '/simulador-ciclo-explotacion/', icon: '🔄', name: 'Ciclo de Explotación', description: 'PME, PMF y fondo de maniobra' },
     { url: '/visualizador-beneficio-liquidez/', icon: '💸', name: 'Beneficio vs Liquidez', description: 'Por qué tener beneficios no es tener caja' },
+    { url: '/calculadora-z-score-altman/', icon: '📉', name: 'Z-Score de Altman', description: 'Riesgo de quiebra a partir del balance' },
     { url: '/simulador-financiacion-empresarial/', icon: '⚖️', name: 'Financiación Empresarial', description: 'Préstamo vs leasing vs ampliación de capital' },
   ],
   'simulador-ciclo-explotacion': [
@@ -3653,6 +3656,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-valoracion-empresa/', icon: '🏢', name: 'Valoración de Empresa', description: 'Cuánto vale tu empresa para una ampliación' },
     { url: '/simulador-ciclo-explotacion/', icon: '🔄', name: 'Ciclo de Explotación', description: 'PME, PMF y fondo de maniobra necesario' },
     { url: '/visualizador-beneficio-liquidez/', icon: '💸', name: 'Beneficio vs Liquidez', description: 'El impacto de la financiación en tu caja' },
+  ],
+  'calculadora-z-score-altman': [
+    { url: '/analizador-ratios-financieros/', icon: '📊', name: 'Analizador de Ratios', description: 'Los 12 ratios que alimentan el Z-Score' },
+    { url: '/visualizador-beneficio-liquidez/', icon: '💸', name: 'Beneficio vs Liquidez', description: 'Por qué se quiebra con beneficios pero sin caja' },
+    { url: '/calculadora-valoracion-empresa/', icon: '🏢', name: 'Valoración de Empresa', description: 'Cuánto vale tu empresa' },
+    { url: '/simulador-ciclo-explotacion/', icon: '🔄', name: 'Ciclo de Explotación', description: 'PME, PMF y fondo de maniobra necesario' },
   ],
   'estimador-costas-judiciales': [
     { url: '/estimador-costes-divorcio/', icon: '📝', name: 'Costes de Divorcio', description: 'Mutuo acuerdo vs contencioso' },
