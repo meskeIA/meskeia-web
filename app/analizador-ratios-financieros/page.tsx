@@ -17,18 +17,23 @@ import { getRelatedApps } from '@/data/app-relations';
 // ─── Tipos ───────────────────────────────────────────────────────────────────
 
 interface InputData {
-  activoCorriente: string;
+  // Activo
+  inmovilizado: string;
   existencias: string;
-  tesoreria: string;
-  clientes: string;
-  activoTotal: string;
-  pasivoCorriente: string;
-  pasivoTotal: string;
-  patrimonioNeto: string;
+  deudoresComerciales: string;
+  caja: string;
+  // Pasivo y Patrimonio Neto
+  capitalReservas: string;
+  resultadoEjercicio: string;
+  deudasLargoPlazo: string;
   proveedores: string;
+  deudasCortoPlazo: string;
+  acreedoresVarios: string;
+  // Cuenta de Resultados
   ventas: string;
   compras: string;
-  ebit: string;
+  otrosGastos: string;
+  amortizaciones: string;
   gastosFinancieros: string;
   resultadoNeto: string;
 }
@@ -55,21 +60,26 @@ interface GrupoRatios {
 }
 
 // ─── Datos de ejemplo ────────────────────────────────────────────────────────
-// Empresa manufacturera mediana (cifras en €)
+// Empresa manufacturera mediana (cifras en €). Balance cuadrado: AT = PN + PT = 2.400.000
 
 const DATOS_EJEMPLO: InputData = {
-  activoCorriente: '850000',
+  // Activo — AC = 860.000 / AT = 2.400.000
+  inmovilizado: '1540000',
   existencias: '320000',
-  tesoreria: '120000',
-  clientes: '420000',
-  activoTotal: '2400000',
-  pasivoCorriente: '480000',
-  pasivoTotal: '1150000',
-  patrimonioNeto: '1250000',
+  deudoresComerciales: '420000',
+  caja: '120000',
+  // Pasivo — TPN = 1.250.000 / PC = 480.000 / PT = 1.150.000
+  capitalReservas: '1070000',
+  resultadoEjercicio: '180000',
+  deudasLargoPlazo: '670000',
   proveedores: '280000',
+  deudasCortoPlazo: '140000',
+  acreedoresVarios: '60000',
+  // Cuenta de Resultados — EBITDA = 650.000 / EBIT = 290.000
   ventas: '3200000',
   compras: '1800000',
-  ebit: '290000',
+  otrosGastos: '750000',
+  amortizaciones: '360000',
   gastosFinancieros: '65000',
   resultadoNeto: '180000',
 };
@@ -114,33 +124,45 @@ function formatValor(valor: number | null, formato: ResultadoRatio['formatoValor
 
 function calcularRatios(datos: InputData): GrupoRatios[] {
   const p = (k: keyof InputData) => parseSpanishNumber(datos[k]) || 0;
-  const ac = p('activoCorriente');
-  const ex = p('existencias');
-  const te = p('tesoreria');
-  const cl = p('clientes');
-  const at = p('activoTotal');
-  const pc = p('pasivoCorriente');
-  const pt = p('pasivoTotal');
-  const pn = p('patrimonioNeto');
-  const pr = p('proveedores');
-  const ve = p('ventas');
-  const co = p('compras');
-  const eb = p('ebit');
-  const gf = p('gastosFinancieros');
-  const rn = p('resultadoNeto');
 
-  // Valores precalculados
+  // Magnitudes del balance (calculadas)
+  const inm = p('inmovilizado');
+  const ex  = p('existencias');
+  const dc  = p('deudoresComerciales');
+  const ca  = p('caja');
+  const ac  = ex + dc + ca;
+  const at  = inm + ac;
+
+  const cr  = p('capitalReservas');
+  const re  = p('resultadoEjercicio');
+  const pn  = cr + re;
+  const dlp = p('deudasLargoPlazo');
+  const pr  = p('proveedores');
+  const dcp = p('deudasCortoPlazo');
+  const av  = p('acreedoresVarios');
+  const pc  = pr + dcp + av;
+  const pt  = dlp + pc;
+
+  // Magnitudes de la CdR (calculadas)
+  const ve  = p('ventas');
+  const co  = p('compras');
+  const og  = p('otrosGastos');
+  const am  = p('amortizaciones');
+  const eb  = ve - co - og - am; // EBIT
+  const gf  = p('gastosFinancieros');
+  const rn  = p('resultadoNeto');
+
   const vLC = r(ac, pc);
   const vPA = r(ac - ex, pc);
-  const vTE = r(te, pc);
+  const vTE = r(ca, pc);
   const vRD = r(pt, pt + pn);
   const vAF = r(pn, pt);
   const vCI = r(eb, gf);
   const vROE = r(rn, pn) !== null ? r(rn, pn)! * 100 : null;
   const vROA = r(rn, at) !== null ? r(rn, at)! * 100 : null;
-  const vMN = r(rn, ve) !== null ? r(rn, ve)! * 100 : null;
-  const vRA = r(ve, at);
-  const vPMC = r(cl, ve) !== null ? r(cl, ve)! * 365 : null;
+  const vMN  = r(rn, ve) !== null ? r(rn, ve)! * 100 : null;
+  const vRA  = r(ve, at);
+  const vPMC = r(dc, ve) !== null ? r(dc, ve)! * 365 : null;
   const vPMP = r(pr, co) !== null ? r(pr, co)! * 365 : null;
 
   return [
@@ -175,7 +197,7 @@ function calcularRatios(datos: InputData): GrupoRatios[] {
         {
           id: 'te', nombre: 'Ratio de Tesorería',
           valor: vTE, estado: seg(vTE, 0.1, 0.3, true),
-          formula: 'Tesorería / Pasivo Corriente',
+          formula: 'Caja / Pasivo Corriente',
           rangoTexto: '< 0,1 crítico · 0,1–0,3 adecuado · > 0,3 holgado',
           interpretacion: vTE === null ? 'Sin datos suficientes.' :
             vTE < 0.1 ? 'Efectivo muy escaso en relación a las deudas inmediatas. Riesgo de tensiones de caja.' :
@@ -287,7 +309,7 @@ function calcularRatios(datos: InputData): GrupoRatios[] {
         {
           id: 'pmc', nombre: 'PMC — Período Medio de Cobro',
           valor: vPMC, estado: seg(vPMC, 90, 45, false),
-          formula: '(Clientes / Ventas) × 365',
+          formula: '(Deudores Comerciales / Ventas) × 365',
           rangoTexto: '> 90 días crítico · 45–90 días adecuado · < 45 días holgado',
           interpretacion: vPMC === null ? 'Sin datos suficientes.' :
             vPMC > 90 ? 'Los clientes tardan más de 3 meses en pagar. Posible necesidad de financiación adicional del ciclo de explotación.' :
@@ -311,6 +333,12 @@ function calcularRatios(datos: InputData): GrupoRatios[] {
   ];
 }
 
+// ─── Utilidades de presentación ──────────────────────────────────────────────
+
+function fmt(n: number) {
+  return n > 0 ? `${formatNumber(n, 0)} €` : '—';
+}
+
 // ─── Componente de campo de entrada ──────────────────────────────────────────
 
 interface CampoInputProps {
@@ -318,10 +346,10 @@ interface CampoInputProps {
   campo: keyof InputData;
   valor: string;
   onChange: (campo: keyof InputData, valor: string) => void;
-  nota?: string;
+  signo?: string;
 }
 
-function CampoInput({ label, campo, valor, onChange, nota }: CampoInputProps) {
+function CampoInput({ label, campo, valor, onChange, signo }: CampoInputProps) {
   const [enfocado, setEnfocado] = useState(false);
   const numerico = parseSpanishNumber(valor) || 0;
   const displayValor = enfocado ? valor : (numerico > 0 ? formatNumber(numerico, 0) : '');
@@ -329,8 +357,8 @@ function CampoInput({ label, campo, valor, onChange, nota }: CampoInputProps) {
   return (
     <div className={styles.campoInput}>
       <label htmlFor={`input-${campo}`} className={styles.campoLabel}>
+        {signo && <span className={styles.campoSigno}>{signo}</span>}
         {label}
-        {nota && <span className={styles.campoBadge}>{nota}</span>}
       </label>
       <div className={styles.campoInputWrapper}>
         <span className={styles.campoSufijo}>€</span>
@@ -354,6 +382,24 @@ function CampoInput({ label, campo, valor, onChange, nota }: CampoInputProps) {
   );
 }
 
+// ─── Fila de total calculado ──────────────────────────────────────────────────
+
+interface FilaCalculadaProps {
+  label: string;
+  valor: number;
+  variante?: 'normal' | 'subtotal' | 'total' | 'ebitda' | 'ebit' | 'rai';
+}
+
+function FilaCalculada({ label, valor, variante = 'normal' }: FilaCalculadaProps) {
+  const claseVariante = variante !== 'normal' ? (styles[`filaCalc_${variante}`] || '') : '';
+  return (
+    <div className={`${styles.filaCalculada} ${claseVariante}`}>
+      <span className={styles.filaCalcLabel}>{label}</span>
+      <span className={styles.filaCalcValor}>{fmt(valor)}</span>
+    </div>
+  );
+}
+
 // ─── Componente principal ────────────────────────────────────────────────────
 
 export default function AnalizadorRatiosFinancierosPage() {
@@ -369,6 +415,19 @@ export default function AnalizadorRatiosFinancierosPage() {
   const totalRatios = grupos.flatMap(g => g.ratios);
   const criticos = totalRatios.filter(r => r.estado === 'critico').length;
   const holgados = totalRatios.filter(r => r.estado === 'holgado').length;
+
+  // Magnitudes calculadas para mostrar en el panel de datos
+  const p = (k: keyof InputData) => parseSpanishNumber(datos[k]) || 0;
+  const activoCorriente = p('existencias') + p('deudoresComerciales') + p('caja');
+  const activoTotal     = p('inmovilizado') + activoCorriente;
+  const patrimonioNeto  = p('capitalReservas') + p('resultadoEjercicio');
+  const pasivoCorriente = p('proveedores') + p('deudasCortoPlazo') + p('acreedoresVarios');
+  const pasivoTotal     = p('deudasLargoPlazo') + pasivoCorriente;
+  const pnYPasivo       = patrimonioNeto + pasivoTotal;
+  const ebitda          = p('ventas') - p('compras') - p('otrosGastos');
+  const ebit            = ebitda - p('amortizaciones');
+  const rai             = ebit - p('gastosFinancieros');
+  const cuadra          = activoTotal > 0 && Math.abs(activoTotal - pnYPasivo) <= activoTotal * 0.005;
 
   return (
     <div className={styles.container}>
@@ -402,38 +461,58 @@ export default function AnalizadorRatiosFinancierosPage() {
           Los datos precargados corresponden a una empresa industrial mediana de ejemplo. Sustitúyelos por los de tu empresa para obtener el análisis real.
         </p>
 
-        <div className={styles.inputsGrid}>
-          {/* Columna: Balance */}
-          <div className={styles.inputsColumna}>
-            <h3 className={styles.inputsSubtitulo}>Balance de Situación</h3>
-            <div className={styles.inputsBloque}>
-              <span className={styles.inputsBloqueLabel}>ACTIVO</span>
-              <CampoInput label="Activo Total" campo="activoTotal" valor={datos.activoTotal} onChange={actualizarCampo} />
-              <CampoInput label="Activo Corriente" campo="activoCorriente" valor={datos.activoCorriente} onChange={actualizarCampo} nota="dentro del AT" />
-              <CampoInput label="Existencias" campo="existencias" valor={datos.existencias} onChange={actualizarCampo} nota="dentro del AC" />
-              <CampoInput label="Clientes / Deudores" campo="clientes" valor={datos.clientes} onChange={actualizarCampo} nota="dentro del AC" />
-              <CampoInput label="Tesorería" campo="tesoreria" valor={datos.tesoreria} onChange={actualizarCampo} nota="dentro del AC" />
-            </div>
-            <div className={styles.inputsBloque}>
-              <span className={styles.inputsBloqueLabel}>PASIVO Y PATRIMONIO NETO</span>
-              <CampoInput label="Patrimonio Neto" campo="patrimonioNeto" valor={datos.patrimonioNeto} onChange={actualizarCampo} />
-              <CampoInput label="Pasivo Total" campo="pasivoTotal" valor={datos.pasivoTotal} onChange={actualizarCampo} />
-              <CampoInput label="Pasivo Corriente" campo="pasivoCorriente" valor={datos.pasivoCorriente} onChange={actualizarCampo} nota="dentro del PT" />
-              <CampoInput label="Proveedores" campo="proveedores" valor={datos.proveedores} onChange={actualizarCampo} nota="dentro del PC" />
-            </div>
+        {/* Balance de Situación en 2 columnas */}
+        <div className={styles.balanceGrid}>
+          {/* ── Activo ── */}
+          <div className={styles.balanceColumna}>
+            <span className={styles.inputsBloqueLabel}>ACTIVO</span>
+            <CampoInput label="Inmovilizado" campo="inmovilizado" valor={datos.inmovilizado} onChange={actualizarCampo} />
+            <CampoInput label="Existencias" campo="existencias" valor={datos.existencias} onChange={actualizarCampo} />
+            <CampoInput label="Deudores comerciales" campo="deudoresComerciales" valor={datos.deudoresComerciales} onChange={actualizarCampo} />
+            <CampoInput label="Caja" campo="caja" valor={datos.caja} onChange={actualizarCampo} />
+            <FilaCalculada label="Total activo corriente" valor={activoCorriente} variante="subtotal" />
+            <FilaCalculada label="Total activo" valor={activoTotal} variante="total" />
           </div>
 
-          {/* Columna: Cuenta de Resultados */}
-          <div className={styles.inputsColumna}>
-            <h3 className={styles.inputsSubtitulo}>Cuenta de Resultados</h3>
-            <div className={styles.inputsBloque}>
-              <span className={styles.inputsBloqueLabel}>MAGNITUDES CLAVE</span>
-              <CampoInput label="Ventas / Cifra de Negocio" campo="ventas" valor={datos.ventas} onChange={actualizarCampo} />
-              <CampoInput label="Compras" campo="compras" valor={datos.compras} onChange={actualizarCampo} />
-              <CampoInput label="EBIT (Resultado Operativo)" campo="ebit" valor={datos.ebit} onChange={actualizarCampo} />
-              <CampoInput label="Gastos Financieros" campo="gastosFinancieros" valor={datos.gastosFinancieros} onChange={actualizarCampo} />
-              <CampoInput label="Resultado Neto" campo="resultadoNeto" valor={datos.resultadoNeto} onChange={actualizarCampo} />
-            </div>
+          {/* ── Pasivo y Patrimonio Neto ── */}
+          <div className={styles.balanceColumna}>
+            <span className={styles.inputsBloqueLabel}>PATRIMONIO NETO Y PASIVO</span>
+            <CampoInput label="Capital y Reservas" campo="capitalReservas" valor={datos.capitalReservas} onChange={actualizarCampo} />
+            <CampoInput label="Resultado del ejercicio" campo="resultadoEjercicio" valor={datos.resultadoEjercicio} onChange={actualizarCampo} />
+            <FilaCalculada label="Total Patrimonio Neto" valor={patrimonioNeto} variante="subtotal" />
+            <CampoInput label="Deudas a largo plazo" campo="deudasLargoPlazo" valor={datos.deudasLargoPlazo} onChange={actualizarCampo} />
+            <CampoInput label="Proveedores" campo="proveedores" valor={datos.proveedores} onChange={actualizarCampo} />
+            <CampoInput label="Deudas a corto plazo" campo="deudasCortoPlazo" valor={datos.deudasCortoPlazo} onChange={actualizarCampo} />
+            <CampoInput label="Acreedores varios" campo="acreedoresVarios" valor={datos.acreedoresVarios} onChange={actualizarCampo} />
+            <FilaCalculada label="Total pasivo corriente" valor={pasivoCorriente} variante="subtotal" />
+            <FilaCalculada label="Total Patrimonio Neto y Pasivo" valor={pnYPasivo} variante="total" />
+          </div>
+        </div>
+
+        {/* Verificación de cuadre */}
+        {activoTotal > 0 && (
+          <div className={`${styles.cuadreBadge} ${cuadra ? styles.cuadreOk : styles.cuadreKo}`}>
+            <span aria-hidden="true">{cuadra ? '✓' : '⚠'}</span>
+            {cuadra
+              ? `Balance cuadrado — Activo = PN + Pasivo = ${formatNumber(activoTotal, 0)} €`
+              : `Desajuste: Activo ${formatNumber(activoTotal, 0)} € ≠ PN + Pasivo ${formatNumber(pnYPasivo, 0)} €`}
+          </div>
+        )}
+
+        {/* Cuenta de Resultados — cascada completa */}
+        <div className={styles.plSection}>
+          <span className={styles.inputsBloqueLabel}>CUENTA DE RESULTADOS</span>
+
+          <div className={styles.plCascada}>
+            <CampoInput label="Ventas / Cifra de Negocio" campo="ventas" valor={datos.ventas} onChange={actualizarCampo} />
+            <CampoInput label="Compras / Coste de ventas" campo="compras" valor={datos.compras} onChange={actualizarCampo} signo="−" />
+            <CampoInput label="Otros Gastos de Explotación" campo="otrosGastos" valor={datos.otrosGastos} onChange={actualizarCampo} signo="−" />
+            <FilaCalculada label="= EBITDA" valor={ebitda} variante="ebitda" />
+            <CampoInput label="Amortizaciones" campo="amortizaciones" valor={datos.amortizaciones} onChange={actualizarCampo} signo="−" />
+            <FilaCalculada label="= EBIT — Resultado Operativo" valor={ebit} variante="ebit" />
+            <CampoInput label="Gastos Financieros" campo="gastosFinancieros" valor={datos.gastosFinancieros} onChange={actualizarCampo} signo="−" />
+            <FilaCalculada label="= Resultado antes de impuestos" valor={rai} variante="rai" />
+            <CampoInput label="Resultado Neto" campo="resultadoNeto" valor={datos.resultadoNeto} onChange={actualizarCampo} />
           </div>
         </div>
       </section>
@@ -501,7 +580,7 @@ export default function AnalizadorRatiosFinancierosPage() {
                 <tr><td colSpan={5} className={styles.tablaGrupo}>LIQUIDEZ</td></tr>
                 <tr><td>Liquidez Corriente</td><td>AC / PC</td><td>&lt; 1</td><td>1 – 2</td><td>&gt; 2</td></tr>
                 <tr><td>Prueba Ácida</td><td>(AC − Existencias) / PC</td><td>&lt; 0,8</td><td>0,8 – 1,2</td><td>&gt; 1,2</td></tr>
-                <tr><td>Ratio de Tesorería</td><td>Tesorería / PC</td><td>&lt; 0,1</td><td>0,1 – 0,3</td><td>&gt; 0,3</td></tr>
+                <tr><td>Ratio de Tesorería</td><td>Caja / PC</td><td>&lt; 0,1</td><td>0,1 – 0,3</td><td>&gt; 0,3</td></tr>
                 <tr><td colSpan={5} className={styles.tablaGrupo}>ENDEUDAMIENTO</td></tr>
                 <tr><td>Ratio de Endeudamiento</td><td>PT / (PT + PN)</td><td>&gt; 0,7</td><td>0,4 – 0,7</td><td>&lt; 0,4</td></tr>
                 <tr><td>Autonomía Financiera</td><td>PN / PT</td><td>&lt; 0,5</td><td>0,5 – 1,5</td><td>&gt; 1,5</td></tr>
@@ -512,7 +591,7 @@ export default function AnalizadorRatiosFinancierosPage() {
                 <tr><td>Margen Neto</td><td>Resultado Neto / Ventas × 100</td><td>&lt; 3 %</td><td>3 – 10 %</td><td>&gt; 10 %</td></tr>
                 <tr><td colSpan={5} className={styles.tablaGrupo}>GESTIÓN</td></tr>
                 <tr><td>Rotación de Activos</td><td>Ventas / AT</td><td>&lt; 0,5x</td><td>0,5 – 1,5x</td><td>&gt; 1,5x</td></tr>
-                <tr><td>PMC</td><td>(Clientes / Ventas) × 365</td><td>&gt; 90 días</td><td>45 – 90 días</td><td>&lt; 45 días</td></tr>
+                <tr><td>PMC</td><td>(Deudores / Ventas) × 365</td><td>&gt; 90 días</td><td>45 – 90 días</td><td>&lt; 45 días</td></tr>
                 <tr><td>PMP</td><td>(Proveedores / Compras) × 365</td><td>&gt; 90 días</td><td>30 – 60 días</td><td>30 – 60 días</td></tr>
               </tbody>
             </table>
@@ -599,21 +678,21 @@ export default function AnalizadorRatiosFinancierosPage() {
               <span className={styles.stepNumber}>2</span>
               <div className={styles.stepContent}>
                 <strong>Introduce los datos en la herramienta</strong>
-                <p>Rellena los 14 campos con las cifras del balance y la cuenta de resultados. Si algún dato no está disponible, deja el campo en 0 y ese ratio aparecerá como N/D.</p>
+                <p>Rellena los campos del Activo, el Pasivo y la Cuenta de Resultados. Los totales (Activo Total, Patrimonio Neto, EBITDA, EBIT…) se calculan automáticamente.</p>
               </div>
             </li>
             <li className={styles.step}>
               <span className={styles.stepNumber}>3</span>
               <div className={styles.stepContent}>
-                <strong>Analiza los ratios por grupos</strong>
-                <p>Empieza por liquidez (¿puede pagar a corto plazo?), sigue por endeudamiento (¿cuánta deuda tiene?) y cierra con rentabilidad y gestión.</p>
+                <strong>Verifica que el balance cuadra</strong>
+                <p>El indicador de cuadre confirma que Activo Total = Patrimonio Neto + Pasivo. Si no cuadra, revisa si has omitido alguna partida o introducido alguna cifra incorrecta.</p>
               </div>
             </li>
             <li className={styles.step}>
               <span className={styles.stepNumber}>4</span>
               <div className={styles.stepContent}>
-                <strong>Identifica los ratios críticos y sus causas</strong>
-                <p>Un ratio crítico tiene una causa concreta: stock excesivo, cobro lento a clientes, endeudamiento elevado, márgenes bajos. Busca la causa antes de concluir nada.</p>
+                <strong>Analiza los ratios por grupos</strong>
+                <p>Empieza por liquidez (¿puede pagar a corto plazo?), sigue por endeudamiento (¿cuánta deuda tiene?) y cierra con rentabilidad y gestión.</p>
               </div>
             </li>
             <li className={styles.step}>
@@ -660,7 +739,7 @@ export default function AnalizadorRatiosFinancierosPage() {
               <li><strong>Usar ratios sin contexto sectorial:</strong> un endeudamiento del 80 % es normal en banca pero preocupante en una empresa de servicios. Los rangos de esta herramienta son orientativos para empresas no financieras.</li>
               <li><strong>Confundir beneficio con liquidez:</strong> una empresa puede ser muy rentable y tener problemas de caja si cobra tarde y paga pronto. Beneficio y liquidez son dimensiones distintas.</li>
               <li><strong>Ignorar la estacionalidad:</strong> empresas turísticas, agrícolas o con picos de demanda tienen balances muy distintos según el momento del año. Un balance de diciembre puede no ser representativo.</li>
-              <li><strong>Tomar el PMC/PMP de ventas totales con IVA:</strong> los clientes y proveedores del balance incluyen IVA; las ventas y compras de la cuenta de resultados no. Usa cifras homogéneas (ambas con IVA o ambas sin IVA) para no distorsionar los períodos medios.</li>
+              <li><strong>Tomar el PMC/PMP de ventas totales con IVA:</strong> los deudores y proveedores del balance incluyen IVA; las ventas y compras de la cuenta de resultados no. Usa cifras homogéneas (ambas con IVA o ambas sin IVA) para no distorsionar los períodos medios.</li>
               <li><strong>Olvidar los pasivos contingentes:</strong> avales, litigios pendientes o deuda fuera de balance no aparecen en los ratios pero sí afectan al riesgo real de la empresa.</li>
             </ul>
           </div>
