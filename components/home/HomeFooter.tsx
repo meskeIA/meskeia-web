@@ -31,6 +31,14 @@ export default function HomeFooter() {
             Contacto
           </Link>
           <span className={styles.dot}>•</span>
+          <a
+            href="https://delegum.com/"
+            className={styles.link}
+            title="Delegum — plataforma de fiscalidad, derecho laboral y finanzas de España"
+          >
+            Delegum
+          </a>
+          <span className={styles.dot}>•</span>
           <button
             type="button"
             onClick={() => {
