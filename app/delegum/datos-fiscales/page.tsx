@@ -1,6 +1,13 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { FISCAL_INMUEBLES_META, FISCAL_IRPF_META } from '@/data/fiscal';
+import {
+  FISCAL_INMUEBLES_META,
+  FISCAL_IRPF_META,
+  FISCAL_IVA_META,
+  FISCAL_SMI_META,
+  FISCAL_INTERESES_META,
+  FISCAL_AUTONOMOS_META,
+} from '@/data/fiscal';
 import { formatDate } from '@/lib';
 import styles from './DatosFiscales.module.css';
 
@@ -21,11 +28,39 @@ const FICHAS = [
     verificado: FISCAL_IRPF_META.verificado,
   },
   {
+    icon: '🛒',
+    titulo: 'Tipos de IVA en España',
+    desc: 'General (21%), reducido (10%) y superreducido (4%) con ejemplos, exenciones y recargo de equivalencia.',
+    href: '/datos-fiscales/iva-tipos',
+    verificado: FISCAL_IVA_META.verificado,
+  },
+  {
+    icon: '💶',
+    titulo: 'Salario Mínimo Interprofesional (SMI)',
+    desc: 'Cuantías del SMI 2026 (mensual, anual, diario y por hora) y comparativa con 2025.',
+    href: '/datos-fiscales/smi-salario-minimo',
+    verificado: FISCAL_SMI_META.verificado,
+  },
+  {
+    icon: '💼',
+    titulo: 'Cuota de autónomos (RETA)',
+    desc: 'Tabla de cotización por ingresos reales 2026: tramos, base mínima y cuota mensual, más tarifa plana.',
+    href: '/datos-fiscales/cuota-autonomos-reta',
+    verificado: FISCAL_AUTONOMOS_META.verificado,
+  },
+  {
     icon: '🏠',
     titulo: 'Tipos de ITP por comunidad autónoma',
     desc: 'Impuesto de Transmisiones Patrimoniales en la compra de vivienda usada, con tipos generales y reducidos por CCAA.',
     href: '/datos-fiscales/itp-ccaa',
     verificado: FISCAL_INMUEBLES_META.verificado,
+  },
+  {
+    icon: '⚖️',
+    titulo: 'Interés legal del dinero y de demora',
+    desc: 'Interés legal, interés de demora comercial por semestre (Ley 3/2004) e interés de demora tributario.',
+    href: '/datos-fiscales/interes-legal-demora',
+    verificado: FISCAL_INTERESES_META.verificado,
   },
 ];
 
