@@ -1,0 +1,248 @@
+/* Home Delegum — marino #16244C · oro #BE9A4E */
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 5rem 1.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+/* ─── Hero ─── */
+.hero {
+  background: #16244C;
+  color: #fff;
+  border-radius: 14px;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.heroLockup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.heroWordmark {
+  font-family: var(--font-sora), system-ui, sans-serif;
+  font-size: 3rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #fff;
+  line-height: 1;
+}
+
+.heroSubtitle {
+  font-size: 1.1rem;
+  opacity: 0.92;
+  margin: 0 auto 1.5rem;
+  max-width: 640px;
+  line-height: 1.6;
+}
+
+.heroBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  padding: 0.4rem 1.1rem;
+  font-size: 0.875rem;
+}
+
+.heroBadgeDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4ade80;
+  flex-shrink: 0;
+}
+
+/* ─── Pilares ─── */
+.pilaresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+
+.pilarCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  background: var(--bg-card);
+  border: 1px solid #e2e8f0;
+  border-top: 4px solid #BE9A4E;
+  border-radius: 12px;
+  padding: 1.75rem 1.5rem;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pilarCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(22, 36, 76, 0.12);
+}
+
+.pilarCard:focus-visible {
+  outline: 2px solid #16244C;
+  outline-offset: 3px;
+}
+
+.pilarIcon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.pilarTitulo {
+  font-family: var(--font-sora), system-ui, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #16244C;
+  margin: 0;
+}
+
+.pilarDesc {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  flex-grow: 1;
+}
+
+.pilarCta {
+  font-weight: 600;
+  color: #16244C;
+  font-size: 0.92rem;
+}
+
+/* ─── Secciones de texto ─── */
+.sectionTitle {
+  font-family: var(--font-sora), system-ui, sans-serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 2px solid #16244C;
+  padding-bottom: 0.5rem;
+  margin: 0 0 1rem;
+}
+
+.queEs p,
+.calcIntro {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.link {
+  color: #16244C;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.link:hover {
+  color: #BE9A4E;
+}
+
+/* ─── Calculadoras ─── */
+.calcIntro {
+  margin-bottom: 1.25rem;
+}
+
+.calcGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.85rem;
+}
+
+.calcCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  background: var(--bg-card);
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1rem 1.15rem;
+  text-decoration: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.calcCard:hover {
+  border-color: #BE9A4E;
+  box-shadow: 0 4px 14px rgba(22, 36, 76, 0.08);
+}
+
+.calcCard:focus-visible {
+  outline: 2px solid #16244C;
+  outline-offset: 2px;
+}
+
+.calcIcon {
+  font-size: 1.5rem;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
+.calcName {
+  font-family: var(--font-sora), system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #16244C;
+  margin: 0 0 0.2rem;
+}
+
+.calcDesc {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.calcFoot {
+  margin: 1.5rem 0 0;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+/* ─── Dark mode ─── */
+[data-theme='dark'] .pilarCard,
+[data-theme='dark'] .calcCard {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .pilarTitulo,
+[data-theme='dark'] .pilarCta,
+[data-theme='dark'] .calcName {
+  color: var(--accent);
+}
+
+[data-theme='dark'] .sectionTitle {
+  color: var(--text-primary);
+  border-bottom-color: var(--accent);
+}
+
+[data-theme='dark'] .link {
+  color: var(--accent);
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding-top: 4.5rem;
+  }
+  .heroWordmark {
+    font-size: 2.3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pilarCard,
+  .calcCard {
+    transition: none;
+  }
+}

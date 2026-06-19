@@ -2,9 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import FixedHeader from '@/components/FixedHeader';
-import Footer from '@/components/Footer';
-import ShareCard from '@/components/ShareCard';
+import AnalyticsTracker from '@/components/AnalyticsTracker';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import DataReference from '@/components/DataReference';
 import { TIPOS_ITP_CCAA_2025, FISCAL_INMUEBLES_META } from '@/data/fiscal';
@@ -44,7 +42,7 @@ export default function ItpCcaaPage() {
 
   return (
     <>
-      <FixedHeader />
+      <AnalyticsTracker appName="delegum-datos-itp-ccaa" />
 
       <main className={styles.container}>
         <article className={styles.document}>
@@ -181,9 +179,6 @@ export default function ItpCcaaPage() {
 
         </article>
       </main>
-
-      <ShareCard appName="delegum" />
-      <Footer appName="delegum" />
     </>
   );
 }

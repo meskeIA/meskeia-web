@@ -1,0 +1,132 @@
+/* Índice de datos fiscales Delegum — marino #16244C · oro #BE9A4E */
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 5.5rem 1.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.hero {
+  text-align: center;
+}
+
+.kicker {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #BE9A4E;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+
+.title {
+  font-family: var(--font-sora), system-ui, sans-serif;
+  font-size: 2.1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+  line-height: 1.15;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.fichasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.fichaCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  background: var(--bg-card);
+  border: 1px solid #e2e8f0;
+  border-top: 4px solid #16244C;
+  border-radius: 12px;
+  padding: 1.5rem 1.4rem;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.fichaCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(22, 36, 76, 0.12);
+}
+
+.fichaCard:focus-visible {
+  outline: 2px solid #16244C;
+  outline-offset: 3px;
+}
+
+.fichaIcon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.fichaTitulo {
+  font-family: var(--font-sora), system-ui, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #16244C;
+  margin: 0;
+}
+
+.fichaDesc {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  flex-grow: 1;
+}
+
+.fichaMeta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.foot {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* Dark mode */
+[data-theme='dark'] .title {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .fichaCard {
+  border-color: #3a3a3a;
+  border-top-color: var(--accent);
+}
+
+[data-theme='dark'] .fichaTitulo {
+  color: var(--accent);
+}
+
+@media (max-width: 600px) {
+  .title {
+    font-size: 1.7rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fichaCard {
+    transition: none;
+  }
+}

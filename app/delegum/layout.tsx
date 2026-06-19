@@ -1,5 +1,7 @@
 import { Sora } from 'next/font/google';
-import { jsonLd, faqJsonLd } from './metadata';
+import DelegumHeader from '@/components/DelegumHeader';
+import DelegumFooter from '@/components/DelegumFooter';
+import { siteJsonLd } from './metadata';
 
 export { metadata } from './metadata';
 
@@ -11,16 +13,18 @@ const sora = Sora({
   display: 'swap',
 });
 
-// jsonLd y faqJsonLd son objetos internos generados por el propio código — no hay input externo
-const webAppScript = JSON.stringify(jsonLd);
-const faqScript = JSON.stringify(faqJsonLd);
+// JSON-LD de sitio (Organización Delegum) — objeto interno, sin input externo.
+// El JSON-LD específico de cada página (WebApplication, Dataset, FAQPage) lo inyecta
+// el layout de cada ruta, no este layout compartido.
+const siteScript = JSON.stringify(siteJsonLd);
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className={sora.variable}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: webAppScript }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqScript }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: siteScript }} />
+      <DelegumHeader />
       {children}
+      <DelegumFooter />
     </div>
   );
 }

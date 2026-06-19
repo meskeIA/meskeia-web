@@ -2,15 +2,13 @@
 // @disclaimer: exempt
 
 import Image from 'next/image';
-import FixedHeader from '@/components/FixedHeader';
-import Footer from '@/components/Footer';
-import ShareCard from '@/components/ShareCard';
+import AnalyticsTracker from '@/components/AnalyticsTracker';
 import styles from '../Delegum.module.css';
 
 export default function DelegumAvisoLegalPage() {
   return (
     <>
-      <FixedHeader />
+      <AnalyticsTracker appName="delegum-aviso-legal" />
 
       <main className={styles.container}>
         <article className={styles.document}>
@@ -166,9 +164,6 @@ export default function DelegumAvisoLegalPage() {
 
         </article>
       </main>
-
-      <ShareCard appName="meskeIA" />
-      <Footer appName="delegum" />
     </>
   );
 }

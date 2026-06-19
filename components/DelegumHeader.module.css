@@ -1,0 +1,118 @@
+/* Cabecera Delegum — marino #16244C · acento oro #BE9A4E */
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--bg-card, #fff);
+  border-bottom: 1px solid #e2e8f0;
+  backdrop-filter: saturate(180%) blur(8px);
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  height: 60px;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* Logo */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.symbol {
+  flex-shrink: 0;
+}
+
+.symbolDark {
+  display: none;
+}
+
+.wordmark {
+  font-family: var(--font-sora), system-ui, sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #16244C;
+}
+
+/* Navegación */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+}
+
+.navLink {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.15s ease;
+  white-space: nowrap;
+}
+
+.navLink:hover {
+  color: #16244C;
+}
+
+.navLink:focus-visible {
+  outline: 2px solid #BE9A4E;
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* Dark mode */
+[data-theme='dark'] .header {
+  background: var(--bg-card);
+  border-bottom-color: #3a3a3a;
+}
+
+[data-theme='dark'] .symbolLight {
+  display: none;
+}
+
+[data-theme='dark'] .symbolDark {
+  display: inline-block;
+}
+
+[data-theme='dark'] .wordmark {
+  color: #fff;
+}
+
+[data-theme='dark'] .navLink:hover {
+  color: var(--accent);
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 0 1rem;
+  }
+  .nav {
+    gap: 0.9rem;
+  }
+  .navLink {
+    font-size: 0.85rem;
+  }
+  /* En móvil ocultamos "Calculadoras" para no apretar la barra (sigue accesible en la home) */
+  .navLink:nth-of-type(3) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navLink {
+    transition: none;
+  }
+}
