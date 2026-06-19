@@ -63,7 +63,7 @@ export default function DelegumFooter() {
 
         {/* Legal */}
         <nav className={styles.legal} aria-label="Información legal de Delegum">
-          <Link href="/delegum/aviso-legal" className={styles.legalLink}>
+          <Link href="/aviso-legal" className={styles.legalLink}>
             Aviso legal y Términos
           </Link>
           <a href="https://meskeia.com/privacidad" className={styles.legalLink}>

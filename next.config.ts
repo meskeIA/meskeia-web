@@ -99,25 +99,33 @@ const nextConfig: NextConfig = {
 
   // ============================================================================
   // REWRITES POR HOST - delegum.com sirve la marca Delegum desde este mismo proyecto
-  //   delegum.com/          → landing /delegum
   //   delegum.com/api/mcp/  → servidor MCP Delegum (/api/mcp/delegum)
-  // La condición `host` garantiza que meskeia.com NO se ve afectado.
-  // Dormidos hasta que delegum.com apunte a Vercel; activos en cuanto resuelva el DNS.
+  // El enrutado de las PÁGINAS de delegum.com (/, /datos-fiscales, /asistente-ia,
+  // /calculadoras, /aviso-legal → /delegum/*) lo hace middleware.ts, que también
+  // cubre la navegación client-side. Aquí solo queda el endpoint MCP.
   // ============================================================================
   async rewrites() {
     const has = [{ type: 'host' as const, value: '(www\\.)?delegum\\.com' }];
     return {
       beforeFiles: [
-        { source: '/', has, destination: '/delegum' },
-        { source: '/aviso-legal', has, destination: '/delegum/aviso-legal' },
-        { source: '/asistente-ia', has, destination: '/delegum/asistente-ia' },
-        { source: '/calculadoras', has, destination: '/delegum/calculadoras' },
-        { source: '/datos-fiscales', has, destination: '/delegum/datos-fiscales' },
-        { source: '/datos-fiscales/:path*', has, destination: '/delegum/datos-fiscales/:path*' },
         { source: '/api/mcp', has, destination: '/api/mcp/delegum' },
         { source: '/api/mcp/', has, destination: '/api/mcp/delegum' },
       ],
     };
+  },
+
+  // ============================================================================
+  // REDIRECTS - Consolidación canónica de la marca Delegum
+  // En meskeia.com las páginas viven en /delegum/* por implementación, pero la URL
+  // canónica es delegum.com/*. Redirigimos meskeia.com/delegum/* → delegum.com/*
+  // para evitar contenido duplicado y URLs con prefijo. Solo afecta al host meskeia.com.
+  // ============================================================================
+  async redirects() {
+    const has = [{ type: 'host' as const, value: '(www\\.)?meskeia\\.com' }];
+    return [
+      { source: '/delegum', has, destination: 'https://delegum.com/', permanent: true },
+      { source: '/delegum/:path*', has, destination: 'https://delegum.com/:path*', permanent: true },
+    ];
   },
 
   // ============================================================================

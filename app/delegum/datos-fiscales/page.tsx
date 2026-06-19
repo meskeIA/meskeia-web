@@ -17,7 +17,7 @@ const FICHAS = [
     icon: '🏠',
     titulo: 'Tipos de ITP por comunidad autónoma',
     desc: 'Impuesto de Transmisiones Patrimoniales en la compra de vivienda usada, con tipos generales y reducidos por CCAA.',
-    href: '/delegum/datos-fiscales/itp-ccaa',
+    href: '/datos-fiscales/itp-ccaa',
     verificado: FISCAL_INMUEBLES_META.verificado,
   },
 ];

@@ -69,39 +69,11 @@ export default function RootLayout({
         {/* Preconnect para optimizar carga de fuentes */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* JSON-LD: WebSite schema (SEO - rich snippets en Google) */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'WebSite',
-              name: 'meskeIA',
-              url: 'https://meskeia.com',
-              description: 'Plataforma educativa gratuita en español: estudio, finanzas personales y herramientas prácticas. Sin registro ni publicidad.',
-              inLanguage: 'es',
-              publisher: {
-                '@type': 'Organization',
-                name: 'meskeIA',
-                url: 'https://meskeia.com',
-                logo: {
-                  '@type': 'ImageObject',
-                  url: 'https://meskeia.com/icon-512x512.png',
-                  width: 512,
-                  height: 512,
-                },
-              },
-              potentialAction: {
-                '@type': 'SearchAction',
-                target: {
-                  '@type': 'EntryPoint',
-                  urlTemplate: 'https://meskeia.com/herramientas?q={search_term_string}',
-                },
-                'query-input': 'required name=search_term_string',
-              },
-            }),
-          }}
-        />
+        {/*
+          El JSON-LD WebSite/SearchAction de meskeIA se inyecta solo en la home (app/page.tsx),
+          que es donde Google espera el sitelinks searchbox. No va en el layout raíz para no
+          contaminar subsitios con marca propia (p.ej. /delegum) ni el resto de páginas internas.
+        */}
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <Providers>

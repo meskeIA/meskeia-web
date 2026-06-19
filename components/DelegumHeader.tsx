@@ -17,7 +17,7 @@ export default function DelegumHeader() {
   return (
     <header className={styles.header}>
       <div className={styles.container}>
-        <Link href="/delegum" className={styles.logo} aria-label="Delegum — inicio">
+        <Link href="/" className={styles.logo} aria-label="Delegum — inicio">
           <Image
             src="/delegum/simbolo-marino.svg"
             alt=""
@@ -40,9 +40,9 @@ export default function DelegumHeader() {
         </Link>
 
         <nav className={styles.nav} aria-label="Secciones de Delegum">
-          <Link href="/delegum/datos-fiscales" className={styles.navLink}>Datos fiscales</Link>
-          <Link href="/delegum/asistente-ia" className={styles.navLink}>Asistente IA</Link>
-          <Link href="/delegum/calculadoras" className={styles.navLink}>Calculadoras</Link>
+          <Link href="/datos-fiscales" className={styles.navLink}>Datos fiscales</Link>
+          <Link href="/asistente-ia" className={styles.navLink}>Asistente IA</Link>
+          <Link href="/calculadoras" className={styles.navLink}>Calculadoras</Link>
           <ThemeToggle />
         </nav>
       </div>

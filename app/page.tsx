@@ -7,6 +7,37 @@ import HomeFooter from '@/components/home/HomeFooter';
 import { TOTAL_IMPLEMENTED_APPS } from '@/data/implemented-apps';
 import styles from './page.module.css';
 
+// JSON-LD WebSite + SearchAction de meskeIA (sitelinks searchbox).
+// Se inyecta solo aquí, en la home, no en el layout raíz, para no contaminar
+// subsitios con marca propia (/delegum) ni el resto de páginas internas.
+const WEBSITE_JSONLD = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'meskeIA',
+  url: 'https://meskeia.com',
+  description: 'Plataforma educativa gratuita en español: estudio, finanzas personales y herramientas prácticas. Sin registro ni publicidad.',
+  inLanguage: 'es',
+  publisher: {
+    '@type': 'Organization',
+    name: 'meskeIA',
+    url: 'https://meskeia.com',
+    logo: {
+      '@type': 'ImageObject',
+      url: 'https://meskeia.com/icon-512x512.png',
+      width: 512,
+      height: 512,
+    },
+  },
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: {
+      '@type': 'EntryPoint',
+      urlTemplate: 'https://meskeia.com/herramientas?q={search_term_string}',
+    },
+    'query-input': 'required name=search_term_string',
+  },
+});
+
 export default function Home() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -34,6 +65,7 @@ export default function Home() {
 
   return (
     <div className={styles.pageWrapper}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: WEBSITE_JSONLD }} />
       <Sidebar />
       <SidebarMobile />
 
