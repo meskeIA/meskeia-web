@@ -294,6 +294,7 @@ Fichas de datos (página humana + endpoint JSON):
 - [Cuota de autónomos (RETA)](https://delegum.com/datos-fiscales/cuota-autonomos-reta/) — JSON: https://delegum.com/api/datos/cuota-autonomos-reta/
 - [Tipos de ITP por comunidad autónoma](https://delegum.com/datos-fiscales/itp-ccaa/) — JSON: https://delegum.com/api/datos/itp-ccaa/
 - [Interés legal del dinero y de demora](https://delegum.com/datos-fiscales/interes-legal-demora/) — JSON: https://delegum.com/api/datos/interes-legal-demora/
+- [Impuesto de Sucesiones por comunidad autónoma](https://delegum.com/datos-fiscales/sucesiones-isd/) — JSON: https://delegum.com/api/datos/sucesiones-isd/
 - Índice JSON de datasets: https://delegum.com/api/datos/
 
 Asistente IA (MCP): https://delegum.com/api/mcp/ (Claude, ChatGPT, Mistral). Más información: https://delegum.com/asistente-ia/

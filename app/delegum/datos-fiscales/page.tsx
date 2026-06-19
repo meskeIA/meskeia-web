@@ -7,6 +7,7 @@ import {
   FISCAL_SMI_META,
   FISCAL_INTERESES_META,
   FISCAL_AUTONOMOS_META,
+  FISCAL_SUCESIONES_META,
 } from '@/data/fiscal';
 import { formatDate } from '@/lib';
 import styles from './DatosFiscales.module.css';
@@ -61,6 +62,13 @@ const FICHAS = [
     desc: 'Interés legal, interés de demora comercial por semestre (Ley 3/2004) e interés de demora tributario.',
     href: '/datos-fiscales/interes-legal-demora',
     verificado: FISCAL_INTERESES_META.verificado,
+  },
+  {
+    icon: '🏛️',
+    titulo: 'Impuesto de Sucesiones por comunidad autónoma',
+    desc: 'Bonificaciones del ISD por CCAA, grupos de parentesco, tarifa estatal por tramos y reducciones aplicables.',
+    href: '/datos-fiscales/sucesiones-isd',
+    verificado: FISCAL_SUCESIONES_META.verificado,
   },
 ];
 

@@ -1,6 +1,7 @@
 import {
   FISCAL_IRPF_META, FISCAL_IVA_META, FISCAL_SMI_META,
   FISCAL_AUTONOMOS_META, FISCAL_INMUEBLES_META, FISCAL_INTERESES_META,
+  FISCAL_SUCESIONES_META,
 } from '@/data/fiscal';
 
 /**
@@ -16,6 +17,7 @@ const DATASETS = [
   { slug: 'cuota-autonomos-reta', nombre: 'Cuota de autónomos (RETA)', meta: FISCAL_AUTONOMOS_META },
   { slug: 'itp-ccaa', nombre: 'Tipos de ITP por comunidad autónoma', meta: FISCAL_INMUEBLES_META },
   { slug: 'interes-legal-demora', nombre: 'Interés legal del dinero y de demora', meta: FISCAL_INTERESES_META },
+  { slug: 'sucesiones-isd', nombre: 'Impuesto de Sucesiones por comunidad autónoma', meta: FISCAL_SUCESIONES_META },
 ];
 
 export function GET() {

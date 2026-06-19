@@ -6,6 +6,7 @@ import {
   FISCAL_INMUEBLES_META, TIPOS_ITP_CCAA_2025,
   FISCAL_INTERESES_META, INTERES_LEGAL_DINERO_2025, TIPOS_DEMORA_COMERCIAL, INTERES_DEMORA_TRIBUTARIO_2025,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
+  FISCAL_SUCESIONES_META, TARIFA_ESTATAL_IS, COEFICIENTES_IS, REDUCCIONES_PARENTESCO_IS, BONIFICACIONES_CCAA_IS,
 } from '@/data/fiscal';
 
 /**
@@ -87,6 +88,20 @@ const DATASETS: Record<string, Dataset> = {
       interesLegalDinero: INTERES_LEGAL_DINERO_2025,
       demoraComercialPorSemestre: TIPOS_DEMORA_COMERCIAL,
       interesDemoraTributario: INTERES_DEMORA_TRIBUTARIO_2025,
+    },
+  },
+  'sucesiones-isd': {
+    meta: {
+      nombre: 'Impuesto de Sucesiones por comunidad autónoma',
+      descripcion: 'Bonificaciones autonómicas del ISD por CCAA, grupos de parentesco, tarifa estatal por tramos, coeficientes multiplicadores y reducciones por parentesco.',
+      fuente: FISCAL_SUCESIONES_META.fuente, verificado: FISCAL_SUCESIONES_META.verificado, vigencia: FISCAL_SUCESIONES_META.vigencia,
+      urlOficial: FISCAL_SUCESIONES_META.urlOficial, paginaHumana: `${BASE}/datos-fiscales/sucesiones-isd`,
+    },
+    datos: {
+      tarifaEstatal: TARIFA_ESTATAL_IS,
+      coeficientesMultiplicadores: COEFICIENTES_IS,
+      reduccionesPorParentesco: REDUCCIONES_PARENTESCO_IS,
+      bonificacionesPorCCAA: BONIFICACIONES_CCAA_IS,
     },
   },
 };
