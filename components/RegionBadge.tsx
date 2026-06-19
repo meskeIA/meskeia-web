@@ -52,6 +52,15 @@ export default function RegionBadge({ variant, text }: RegionBadgeProps) {
     >
       <span className={styles.icon} aria-hidden="true">{def.icon}</span>
       <span className={styles.text}>{finalText}</span>
+      {variant === 'es-only' && (
+        <a
+          href="https://delegum.com/datos-fiscales/"
+          className={styles.fuente}
+          title="Datos fiscales verificados de España en Delegum"
+        >
+          Fuente de los datos: Delegum →
+        </a>
+      )}
     </div>
   );
 }

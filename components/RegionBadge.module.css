@@ -8,6 +8,7 @@
 .badge {
   display: inline-flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-md);
   margin: var(--spacing-md) 0;
@@ -25,6 +26,27 @@
 
 .text {
   flex: 1;
+}
+
+/* Enlace a Delegum (solo es-only): fuente de los datos. Subordinado al badge:
+   mismo color, subrayado para señalar enlace. Con flex-wrap del badge, en móvil
+   cae a la línea siguiente sin romper el layout. */
+.fuente {
+  flex-shrink: 0;
+  font-weight: 600;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.fuente:hover {
+  opacity: 0.8;
+}
+
+.fuente:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  border-radius: 3px;
 }
 
 /* Variante es-only: ámbar/info — destaca pero no alarma */
