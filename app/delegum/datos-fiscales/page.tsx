@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { FISCAL_INMUEBLES_META } from '@/data/fiscal';
+import { FISCAL_INMUEBLES_META, FISCAL_IRPF_META } from '@/data/fiscal';
 import { formatDate } from '@/lib';
 import styles from './DatosFiscales.module.css';
 
@@ -13,6 +13,13 @@ export const metadata: Metadata = {
 
 // Fichas de datos disponibles (crece a medida que se publican)
 const FICHAS = [
+  {
+    icon: '🧾',
+    titulo: 'Tramos y mínimos del IRPF',
+    desc: 'Escala general por tramos, escala del ahorro y mínimos personales y familiares del IRPF 2025.',
+    href: '/datos-fiscales/irpf-tramos-minimos',
+    verificado: FISCAL_IRPF_META.verificado,
+  },
   {
     icon: '🏠',
     titulo: 'Tipos de ITP por comunidad autónoma',

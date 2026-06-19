@@ -1,0 +1,381 @@
+/* Estilos compartidos de las fichas de Datos Fiscales (Delegum) — marino #16244C · oro #BE9A4E */
+
+.container {
+  max-width: 980px;
+  margin: 0 auto;
+  /* Margen superior amplio: el header fijo de Delegum se solapaba con el hero marino */
+  padding: 5.5rem 1.5rem 4rem;
+}
+
+.document {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+/* ─── Hero ─── */
+.hero {
+  background: #16244C;
+  color: #fff;
+  border-radius: 12px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+}
+
+.heroLockup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.heroSymbol {
+  flex-shrink: 0;
+}
+
+.heroWordmark {
+  font-family: var(--font-sora), system-ui, sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #fff;
+  line-height: 1;
+}
+
+.heroKicker {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #BE9A4E;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+
+.heroTitle {
+  font-family: var(--font-sora), system-ui, sans-serif;
+  font-size: 2.1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0 0 1rem;
+  color: #fff;
+  line-height: 1.15;
+}
+
+.subtitle {
+  font-size: 1.02rem;
+  opacity: 0.92;
+  margin: 0 auto 1.25rem;
+  max-width: 640px;
+  line-height: 1.6;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  padding: 0.35rem 1rem;
+  font-size: 0.875rem;
+}
+
+.badgeDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4ade80;
+  flex-shrink: 0;
+}
+
+/* ─── Secciones ─── */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sectionTitle {
+  font-family: var(--font-sora), system-ui, sans-serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 2px solid #16244C;
+  padding-bottom: 0.5rem;
+  margin: 0;
+}
+
+.sectionIntro {
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ─── Tabla ─── */
+.tableWrapper {
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 480px;
+}
+
+.table thead th {
+  background: #16244C;
+  color: #fff;
+  font-family: var(--font-sora), system-ui, sans-serif;
+  font-weight: 600;
+  text-align: left;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.85rem;
+}
+
+.table tbody tr {
+  border-top: 1px solid #e2e8f0;
+}
+
+.table tbody tr:nth-child(even) {
+  background: #f8fafc;
+}
+
+.table td,
+.table th[scope='row'] {
+  padding: 0.7rem 0.9rem;
+  vertical-align: top;
+  line-height: 1.45;
+}
+
+.rowHead {
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: left;
+}
+
+.numCol {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.tipoTag {
+  display: inline-block;
+  font-weight: 700;
+  color: #16244C;
+  background: #eef1f7;
+  padding: 0.15rem 0.5rem;
+  border-radius: 5px;
+}
+
+.notaCell {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  min-width: 240px;
+}
+
+.tableFoot {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  background: #f8fafc;
+  border-left: 3px solid #BE9A4E;
+  padding: 0.75rem 1rem;
+  border-radius: 0 6px 6px 0;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ─── Cómo citar ─── */
+.citaBox {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  background: var(--bg-card);
+  border: 1px solid #e2e8f0;
+  border-left: 3px solid #16244C;
+  border-radius: 0 8px 8px 0;
+  padding: 1.1rem 1.25rem;
+}
+
+.citaTexto {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-style: italic;
+}
+
+.citaBtn {
+  align-self: flex-start;
+  background: #16244C;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.citaBtn:hover {
+  background: #1f3163;
+}
+
+.citaBtn:focus-visible {
+  outline: 2px solid #BE9A4E;
+  outline-offset: 2px;
+}
+
+/* ─── CTA calculadora ─── */
+.ctaBox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  background: #eef1f7;
+  border: 1px solid #d6deec;
+  border-radius: 12px;
+  padding: 1.5rem 1.75rem;
+}
+
+.ctaText {
+  flex: 1 1 320px;
+}
+
+.ctaTitle {
+  font-family: var(--font-sora), system-ui, sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #16244C;
+  margin: 0 0 0.4rem;
+}
+
+.ctaDesc {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.ctaBtn {
+  flex-shrink: 0;
+  display: inline-block;
+  background: #BE9A4E;
+  color: #16244C;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 0.75rem 1.4rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ctaBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(22, 36, 76, 0.18);
+}
+
+.ctaBtn:focus-visible {
+  outline: 2px solid #16244C;
+  outline-offset: 2px;
+}
+
+/* ─── Pertenencia a meskeIA ─── */
+.brandFoot {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  text-align: center;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 1.5rem;
+}
+
+.brandFoot p {
+  margin: 0;
+  max-width: 640px;
+  margin-inline: auto;
+}
+
+.link {
+  color: #16244C;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.link:hover {
+  color: #BE9A4E;
+}
+
+/* ─── Dark mode ─── */
+[data-theme='dark'] .sectionTitle,
+[data-theme='dark'] .rowHead {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .table tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme='dark'] .table td,
+[data-theme='dark'] .table th[scope='row'] {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .tableWrapper,
+[data-theme='dark'] .citaBox {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .tipoTag {
+  background: rgba(127, 179, 211, 0.18);
+  color: var(--accent);
+}
+
+[data-theme='dark'] .tableFoot,
+[data-theme='dark'] .citaTexto,
+[data-theme='dark'] .ctaDesc,
+[data-theme='dark'] .notaCell,
+[data-theme='dark'] .brandFoot {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .tableFoot {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme='dark'] .ctaBox {
+  background: rgba(127, 179, 211, 0.08);
+  border-color: rgba(127, 179, 211, 0.2);
+}
+
+[data-theme='dark'] .ctaTitle {
+  color: var(--accent);
+}
+
+[data-theme='dark'] .link {
+  color: var(--accent);
+}
+
+@media (max-width: 600px) {
+  .heroTitle {
+    font-size: 1.7rem;
+  }
+  .ctaBox {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ctaBtn,
+  .citaBtn {
+    transition: none;
+  }
+}
