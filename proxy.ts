@@ -26,13 +26,18 @@ export function proxy(req: NextRequest) {
   }
 
   const { pathname } = req.nextUrl;
-  // Si ya apunta al árbol real o es API, no tocar (evita doble reescritura)
+  // Si ya apunta al árbol real o es API, no tocar (evita doble reescritura).
+  // Nota: las URLs con prefijo (delegum.com/delegum/...) se sirven tal cual; no se
+  // redirigen porque (a) ningún enlace interno ni el redirect meskeia→delegum las
+  // produce —toda la navegación aterriza en URLs limpias— y (b) el canonical de
+  // cada página apunta ya a la URL limpia, así que Google las consolida.
   if (pathname === '/delegum' || pathname.startsWith('/delegum/') || pathname.startsWith('/api')) {
     return NextResponse.next();
   }
 
-  // Normalizamos a barra final (el proyecto usa trailingSlash: true) para que el
-  // destino coincida con la página estática y no dispare un redirect interno.
+  // Rutas limpias → reescritura interna a /delegum/*. Normalizamos a barra final
+  // (el proyecto usa trailingSlash: true) para que el destino coincida con la
+  // página estática y no dispare un redirect interno.
   const clean = pathname.endsWith('/') ? pathname : `${pathname}/`;
   const url = req.nextUrl.clone();
   url.pathname = clean === '/' ? '/delegum/' : `/delegum${clean}`;
