@@ -18,30 +18,17 @@ const PILARES = [
   {
     icon: '🤖',
     titulo: 'Asistente IA',
-    desc: 'Conecta Delegum (MCP) a Claude, ChatGPT o Mistral y resuelve consultas reales como una gestoría.',
+    desc: 'Conecta Delegum (MCP) a Claude, ChatGPT o Mistral y resuelve consultas reales como lo haría una gestoría.',
     href: '/delegum/asistente-ia',
     cta: 'Conectar',
   },
   {
     icon: '🧮',
     titulo: 'Calculadoras',
-    desc: 'Selección de calculadoras de fiscalidad, laboral y finanzas para hacer el número tú mismo.',
-    href: '#calculadoras',
+    desc: 'Selección de calculadoras de fiscalidad, derecho laboral y finanzas para hacer el número tú mismo.',
+    href: '/delegum/calculadoras',
     cta: 'Calcular',
   },
-];
-
-// Selección curada de calculadoras (viven en meskeIA, se enlazan)
-const CALCULADORAS = [
-  { icon: '💶', name: 'Sueldo neto', desc: 'Del bruto al neto con IRPF y Seguridad Social.', url: 'https://meskeia.com/estimador-sueldo-neto/' },
-  { icon: '💼', name: 'Cuota de autónomo', desc: 'Cuota RETA mensual por ingresos reales 2025.', url: 'https://meskeia.com/estimador-cuota-autonomo/' },
-  { icon: '🧭', name: 'Tipos de renta IRPF', desc: 'Cómo tributa cada ingreso: base general o del ahorro.', url: 'https://meskeia.com/orientador-tipos-renta-irpf/' },
-  { icon: '🧾', name: 'Orientador del IVA', desc: 'Qué IVA aplicar en cada operación, con simulador.', url: 'https://meskeia.com/orientador-iva-espana/' },
-  { icon: '📋', name: 'Gastos de compraventa', desc: 'ITP/IVA, notaría, registro y plusvalía del inmueble.', url: 'https://meskeia.com/estimador-compraventa-inmueble/' },
-  { icon: '💰', name: 'Hipoteca', desc: 'Cuota y cuadro de amortización completo.', url: 'https://meskeia.com/estimador-hipoteca/' },
-  { icon: '🏤', name: 'Jubilación pública', desc: 'Edad y pensión estimada con el sistema dual 2026.', url: 'https://meskeia.com/simulador-jubilacion-publica/' },
-  { icon: '💍', name: 'Pensión de viudedad', desc: 'Porcentaje, base reguladora y mínimos 2025.', url: 'https://meskeia.com/estimador-pension-viudedad/' },
-  { icon: '⚖️', name: 'Legítimas (herencia)', desc: 'Herencia forzosa según el régimen civil de tu CCAA.', url: 'https://meskeia.com/estimador-legitimas/' },
 ];
 
 export default function DelegumHome() {
@@ -65,8 +52,8 @@ export default function DelegumHome() {
             <span className={styles.heroWordmark}>Delegum</span>
           </div>
           <p className={styles.heroSubtitle}>
-            Tu asesoría digital <strong>fiscal, laboral y financiera</strong> para España.
-            Datos verificados, un asistente de IA y calculadoras, en un solo sitio.
+            Tu plataforma de <strong>fiscalidad, derecho laboral y finanzas</strong> en España.
+            Datos verificados, herramientas y un asistente de IA, en un solo sitio.
           </p>
           <div className={styles.heroBadge}>
             <span className={styles.heroBadgeDot}></span>
@@ -94,34 +81,10 @@ export default function DelegumHome() {
           <p>
             Delegum reúne en una sola marca todo lo que necesitas para entender la fiscalidad,
             el derecho laboral y las finanzas en España: una <strong>capa de datos normativos</strong>{' '}
-            verificados y citables, un <strong>asistente de IA</strong> que actúa como gestoría y una{' '}
-            <strong>selección de calculadoras</strong>. Es un servicio de{' '}
-            <a href="https://meskeia.com/" className={styles.link}>meskeIA</a> y comparte su
-            compromiso: herramientas claras, gratuitas y sin recopilar datos personales.
-          </p>
-        </section>
-
-        {/* Calculadoras curadas */}
-        <section id="calculadoras" className={styles.calcSection}>
-          <h2 className={styles.sectionTitle}>Calculadoras destacadas</h2>
-          <p className={styles.calcIntro}>
-            Una selección de las herramientas fiscales, laborales y financieras de meskeIA.
-            Se abren en meskeia.com, donde está el catálogo completo.
-          </p>
-          <div className={styles.calcGrid}>
-            {CALCULADORAS.map((c) => (
-              <a key={c.url} href={c.url} className={styles.calcCard}>
-                <span className={styles.calcIcon} aria-hidden="true">{c.icon}</span>
-                <div className={styles.calcText}>
-                  <h3 className={styles.calcName}>{c.name}</h3>
-                  <p className={styles.calcDesc}>{c.desc}</p>
-                </div>
-              </a>
-            ))}
-          </div>
-          <p className={styles.calcFoot}>
-            ¿Buscas otra herramienta?{' '}
-            <a href="https://meskeia.com/apps/" className={styles.link}>Ver todas en meskeIA →</a>
+            verificados y citables, un <strong>asistente de IA</strong> que orquesta los cálculos
+            como lo haría una gestoría y una <strong>selección de calculadoras</strong>. Es un
+            servicio de <a href="https://meskeia.com/" className={styles.link}>meskeIA</a> y comparte
+            su compromiso: herramientas claras, gratuitas y sin recopilar datos personales.
           </p>
         </section>
 

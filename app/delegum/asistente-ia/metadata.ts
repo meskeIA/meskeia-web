@@ -8,16 +8,16 @@ export const metadata: Metadata = {
   description:
     'Conecta Delegum a Claude, ChatGPT o Mistral mediante MCP y resuelve consultas reales de fiscalidad, laboral y finanzas con cálculos normativos de España: autónomos, nóminas, herencias, jubilación, despidos e hipotecas.',
   keywords:
-    'delegum, MCP fiscal, asesoría IA, autónomo, IRPF, herencia, jubilación, despido, hipoteca, gestoría digital, Model Context Protocol',
+    'delegum, MCP fiscal, asistente IA fiscal, autónomo, IRPF, herencia, jubilación, despido, hipoteca, Model Context Protocol',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'Delegum',
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Asistente IA de Delegum — tu asesoría fiscal para Claude, ChatGPT o Mistral',
+    title: 'Asistente IA de Delegum — fiscalidad, laboral y finanzas para Claude, ChatGPT o Mistral',
     description:
-      'Servidor MCP de asesoría fiscal, laboral y financiera para España. Sin registro, sin coste.',
+      'Servidor MCP de fiscalidad, derecho laboral y finanzas para España. Sin registro, sin coste.',
     url: URL_CANONICA,
     siteName: 'Delegum',
     locale: 'es_ES',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Asistente IA de Delegum',
     description:
-      'Servidor MCP de asesoría fiscal, laboral y financiera para España. Sin registro, sin coste.',
+      'Servidor MCP de fiscalidad, derecho laboral y finanzas para España. Sin registro, sin coste.',
   },
   alternates: {
     canonical: URL_CANONICA,
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
 export const jsonLd = generateWebAppSchema({
   name: 'Asistente IA de Delegum',
   description:
-    'Servidor MCP (Model Context Protocol) que actúa como asesoría digital fiscal, laboral y financiera para España. Orquesta varios cálculos en consultas de escenario (autónomo, nómina, vivienda, herencia, jubilación, despido) y devuelve análisis integrados con normativa 2025.',
+    'Servidor MCP (Model Context Protocol) de fiscalidad, derecho laboral y finanzas para España. Orquesta varios cálculos en consultas de escenario (autónomo, nómina, vivienda, herencia, jubilación, despido) y devuelve análisis integrados con normativa 2025.',
   url: URL_CANONICA,
   category: 'FinanceApplication',
   features: [
@@ -60,7 +60,7 @@ export const faqJsonLd = {
       name: '¿Qué es el Asistente IA de Delegum?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Es un servidor MCP (Model Context Protocol) que convierte un asistente de IA como Claude, ChatGPT o Mistral en una asesoría digital fiscal, laboral y financiera para España. En lugar de devolver un dato suelto, orquesta varios cálculos a la vez y entrega un análisis integrado, como haría una gestoría.',
+        text: 'Es un servidor MCP (Model Context Protocol) que conecta un asistente de IA como Claude, ChatGPT o Mistral con la biblioteca de cálculo fiscal, laboral y financiero de meskeIA para España. En lugar de devolver un dato suelto, orquesta varios cálculos a la vez y entrega un análisis integrado, como lo haría una gestoría.',
       },
     },
     {

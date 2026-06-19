@@ -131,8 +131,7 @@
   margin: 0 0 1rem;
 }
 
-.queEs p,
-.calcIntro {
+.queEs p {
   color: var(--text-secondary);
   line-height: 1.7;
   margin: 0;
@@ -149,76 +148,13 @@
   color: #BE9A4E;
 }
 
-/* ─── Calculadoras ─── */
-.calcIntro {
-  margin-bottom: 1.25rem;
-}
-
-.calcGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 0.85rem;
-}
-
-.calcCard {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.85rem;
-  background: var(--bg-card);
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 1rem 1.15rem;
-  text-decoration: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-.calcCard:hover {
-  border-color: #BE9A4E;
-  box-shadow: 0 4px 14px rgba(22, 36, 76, 0.08);
-}
-
-.calcCard:focus-visible {
-  outline: 2px solid #16244C;
-  outline-offset: 2px;
-}
-
-.calcIcon {
-  font-size: 1.5rem;
-  line-height: 1.2;
-  flex-shrink: 0;
-}
-
-.calcName {
-  font-family: var(--font-sora), system-ui, sans-serif;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #16244C;
-  margin: 0 0 0.2rem;
-}
-
-.calcDesc {
-  margin: 0;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  line-height: 1.45;
-}
-
-.calcFoot {
-  margin: 1.5rem 0 0;
-  text-align: center;
-  color: var(--text-secondary);
-  font-size: 0.92rem;
-}
-
 /* ─── Dark mode ─── */
-[data-theme='dark'] .pilarCard,
-[data-theme='dark'] .calcCard {
+[data-theme='dark'] .pilarCard {
   border-color: #3a3a3a;
 }
 
 [data-theme='dark'] .pilarTitulo,
-[data-theme='dark'] .pilarCta,
-[data-theme='dark'] .calcName {
+[data-theme='dark'] .pilarCta {
   color: var(--accent);
 }
 

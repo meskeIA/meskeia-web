@@ -111,6 +111,7 @@ const nextConfig: NextConfig = {
         { source: '/', has, destination: '/delegum' },
         { source: '/aviso-legal', has, destination: '/delegum/aviso-legal' },
         { source: '/asistente-ia', has, destination: '/delegum/asistente-ia' },
+        { source: '/calculadoras', has, destination: '/delegum/calculadoras' },
         { source: '/datos-fiscales', has, destination: '/delegum/datos-fiscales' },
         { source: '/datos-fiscales/:path*', has, destination: '/delegum/datos-fiscales/:path*' },
         { source: '/api/mcp', has, destination: '/api/mcp/delegum' },

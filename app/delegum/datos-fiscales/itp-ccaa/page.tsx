@@ -168,8 +168,8 @@ export default function ItpCcaaPage() {
           <section className={styles.section}>
             <div className={styles.brandFoot}>
               <p>
-                Esta página forma parte de <strong>Delegum</strong>, el servicio de asesoría fiscal,
-                laboral y financiera de{' '}
+                Esta página forma parte de <strong>Delegum</strong>, la plataforma de fiscalidad,
+                derecho laboral y finanzas de{' '}
                 <a href="https://meskeia.com/" className={styles.link}>meskeIA</a> — más de mil
                 herramientas gratuitas para el día a día. Consulta también el resto de{' '}
                 <a href="https://delegum.com/" className={styles.link}>Delegum</a>.

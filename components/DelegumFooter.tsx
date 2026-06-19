@@ -56,7 +56,7 @@ export default function DelegumFooter() {
             <span className={styles.brandName}>Delegum</span>
           </div>
           <p className={styles.brandTagline}>
-            Asesoría digital fiscal, laboral y financiera para España. Datos y cálculos
+            Plataforma de fiscalidad, derecho laboral y finanzas en España. Datos y cálculos
             orientativos con normativa verificada.
           </p>
         </div>

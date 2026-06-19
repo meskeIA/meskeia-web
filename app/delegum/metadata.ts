@@ -3,27 +3,27 @@ import { Metadata } from 'next';
 const URL_CANONICA = 'https://delegum.com/';
 
 export const metadata: Metadata = {
-  title: 'Delegum — Asesoría digital fiscal, laboral y financiera para España | meskeIA',
+  title: 'Delegum — Plataforma de fiscalidad, derecho laboral y finanzas en España | meskeIA',
   description:
     'Delegum reúne datos fiscales verificados, un asistente de IA (MCP) y calculadoras de fiscalidad, derecho laboral y finanzas para España. Sin registro y sin coste.',
   keywords:
-    'delegum, asesoría fiscal, datos fiscales España, ITP por comunidad, IRPF, autónomos, herencias, jubilación, MCP fiscal, calculadoras fiscales',
+    'delegum, plataforma fiscal, datos fiscales España, ITP por comunidad, IRPF, autónomos, herencias, jubilación, MCP fiscal, calculadoras fiscales',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Delegum — Asesoría digital fiscal, laboral y financiera para España',
+    title: 'Delegum — Plataforma de fiscalidad, derecho laboral y finanzas en España',
     description:
-      'Datos fiscales verificados, asistente de IA y calculadoras de fiscalidad, laboral y finanzas para España.',
+      'Datos fiscales verificados, asistente de IA y calculadoras de fiscalidad, derecho laboral y finanzas para España.',
     url: URL_CANONICA,
     siteName: 'Delegum',
     locale: 'es_ES',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Delegum — Asesoría digital fiscal, laboral y financiera',
+    title: 'Delegum — Plataforma de fiscalidad, derecho laboral y finanzas',
     description:
       'Datos fiscales verificados, asistente de IA y calculadoras para España. Sin registro, sin coste.',
   },
@@ -50,7 +50,7 @@ export const siteJsonLd = {
   name: 'Delegum',
   url: URL_CANONICA,
   description:
-    'Servicio de asesoría digital fiscal, laboral y financiera para España: datos fiscales verificados, asistente de IA (MCP) y calculadoras. Parte de meskeIA.',
+    'Plataforma digital de fiscalidad, derecho laboral y finanzas para España: datos fiscales verificados, asistente de IA (MCP) y calculadoras. Parte de meskeIA.',
   logo: 'https://delegum.com/delegum/app-icon-512.png',
   parentOrganization: {
     '@type': 'Organization',
