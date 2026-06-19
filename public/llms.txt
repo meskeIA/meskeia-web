@@ -283,6 +283,21 @@ Disponibles en la Store de ChatGPT (chatgpt.com/gpts), buscar "meskeIA":
 ### Índice máquina
 - JSON completo: https://meskeia.com/ai-index.json (catálogo con slugs, descripciones y suites de las 978 apps)
 
+## Delegum — datos fiscales citables (delegum.com)
+
+Delegum es la plataforma de fiscalidad, derecho laboral y finanzas de España de meskeIA: datos normativos verificados y citables, calculadoras y un asistente de IA (servidor MCP). Cada dato indica su fuente oficial y fecha de verificación. Orientativo, no asesoramiento profesional.
+
+Fichas de datos (página humana + endpoint JSON):
+- [Tramos y mínimos del IRPF](https://delegum.com/datos-fiscales/irpf-tramos-minimos/) — JSON: https://delegum.com/api/datos/irpf-tramos-minimos/
+- [Tipos de IVA en España](https://delegum.com/datos-fiscales/iva-tipos/) — JSON: https://delegum.com/api/datos/iva-tipos/
+- [Salario Mínimo Interprofesional (SMI)](https://delegum.com/datos-fiscales/smi-salario-minimo/) — JSON: https://delegum.com/api/datos/smi-salario-minimo/
+- [Cuota de autónomos (RETA)](https://delegum.com/datos-fiscales/cuota-autonomos-reta/) — JSON: https://delegum.com/api/datos/cuota-autonomos-reta/
+- [Tipos de ITP por comunidad autónoma](https://delegum.com/datos-fiscales/itp-ccaa/) — JSON: https://delegum.com/api/datos/itp-ccaa/
+- [Interés legal del dinero y de demora](https://delegum.com/datos-fiscales/interes-legal-demora/) — JSON: https://delegum.com/api/datos/interes-legal-demora/
+- Índice JSON de datasets: https://delegum.com/api/datos/
+
+Asistente IA (MCP): https://delegum.com/api/mcp/ (Claude, ChatGPT, Mistral). Más información: https://delegum.com/asistente-ia/
+
 ## Información legal y contacto
 
 - [Política de privacidad](https://meskeia.com/privacidad/)

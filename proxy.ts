@@ -27,10 +27,9 @@ export function proxy(req: NextRequest) {
 
   const { pathname } = req.nextUrl;
   // Si ya apunta al árbol real o es API, no tocar (evita doble reescritura).
-  // Nota: las URLs con prefijo (delegum.com/delegum/...) se sirven tal cual; no se
-  // redirigen porque (a) ningún enlace interno ni el redirect meskeia→delegum las
-  // produce —toda la navegación aterriza en URLs limpias— y (b) el canonical de
-  // cada página apunta ya a la URL limpia, así que Google las consolida.
+  // Los endpoints JSON viven en /api/datos/* (passthrough). Las URLs con prefijo
+  // (delegum.com/delegum/...) se sirven tal cual; no se redirigen porque ningún
+  // enlace interno las produce y el canonical de cada página ya apunta a la limpia.
   if (pathname === '/delegum' || pathname.startsWith('/delegum/') || pathname.startsWith('/api')) {
     return NextResponse.next();
   }
