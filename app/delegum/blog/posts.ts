@@ -33,15 +33,16 @@ export interface Post {
 
 export const POSTS: Post[] = [
   {
-    slug: 'bienvenida-al-blog-de-delegum',
-    titulo: 'Bienvenido al blog de Delegum',
+    slug: 'delegum-ya-esta-en-marcha',
+    titulo: 'Delegum ya está en marcha',
     fecha: '2026-06-20',
     resumen:
-      'Cada quincena, un resumen breve y claro de una novedad fiscal, laboral o financiera que te afecta, con su fuente y el enlace a nuestras herramientas.',
+      'Presentamos Delegum: la plataforma que reúne la fiscalidad, el derecho laboral y las finanzas de España en un solo sitio, con datos verificados y herramientas gratuitas para entender qué te afecta y por qué.',
     cuerpo: [
-      'Delegum reúne la fiscalidad, el derecho laboral y las finanzas de España en un solo sitio: datos verificados, calculadoras, guías paso a paso, un glosario y un asistente de IA. Este blog es la pieza que faltaba: la actualidad.',
-      'Cada día se publican decenas de noticias fiscales, laborales y financieras, y no siempre es fácil saber cuáles importan de verdad ni qué significan. Aquí elegiremos una cada quince días y la explicaremos en pocas líneas: qué ha cambiado, a quién afecta y dónde calcularlo o consultarlo.',
-      'Sin tecnicismos innecesarios y sin decidir por ti: solo información clara, con su fuente y, cuando proceda, el enlace a la ficha de datos o a la calculadora correspondiente. Nos vemos los días 1 y 15 de cada mes.',
+      'La fiscalidad, el derecho laboral y las finanzas se explican casi siempre en un idioma que solo entiende quien trabaja en ello. Saber qué impuesto te toca, cuánto vas a pagar, si un dato sigue vigente o qué significa un término concreto suele costar más de lo que debería. Delegum nace para cambiar eso.',
+      'Hemos reunido en un solo sitio todo lo necesario para orientarte: datos fiscales verificados con su fuente y su fecha, calculadoras para hacer el número tú mismo, guías que acompañan decisiones completas como comprar una casa o gestionar una herencia, un glosario que traduce la jerga del gremio y un asistente de IA que resuelve consultas reales conectándose a Claude, ChatGPT o Mistral.',
+      'Todo con el mismo compromiso: información clara y orientativa —nunca un sustituto del profesional cuando la decisión lo exige—, gratuita, sin registro y sin recopilar tus datos personales.',
+      'Y a partir de ahora, cada quince días publicaremos aquí una novedad fiscal, laboral o financiera explicada en pocas líneas. Bienvenido a Delegum.',
     ],
   },
 ];
