@@ -36,6 +36,13 @@ const PILARES = [
     href: '/guias',
     cta: 'Ver guías',
   },
+  {
+    icon: '📖',
+    titulo: 'Glosario',
+    desc: 'La terminología que más confunde, explicada en lenguaje claro: base imponible, IPREM, plusvalía, TAE…',
+    href: '/glosario',
+    cta: 'Consultar términos',
+  },
 ];
 
 export default function DelegumHome() {

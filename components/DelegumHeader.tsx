@@ -44,6 +44,7 @@ export default function DelegumHeader() {
           <Link href="/asistente-ia" className={styles.navLink}>Asistente IA</Link>
           <Link href="/calculadoras" className={styles.navLink}>Calculadoras</Link>
           <Link href="/guias" className={styles.navLink}>Guías</Link>
+          <Link href="/glosario" className={styles.navLink}>Glosario</Link>
           <ThemeToggle />
         </nav>
       </div>

@@ -56,6 +56,8 @@ export const config = {
     '/calculadoras/',
     '/guias',
     '/guias/',
+    '/glosario',
+    '/glosario/',
     '/aviso-legal',
     '/aviso-legal/',
   ],
