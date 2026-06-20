@@ -43,6 +43,7 @@ export default function DelegumHeader() {
           <Link href="/datos-fiscales" className={styles.navLink}>Datos fiscales</Link>
           <Link href="/asistente-ia" className={styles.navLink}>Asistente IA</Link>
           <Link href="/calculadoras" className={styles.navLink}>Calculadoras</Link>
+          <Link href="/guias" className={styles.navLink}>Guías</Link>
           <ThemeToggle />
         </nav>
       </div>

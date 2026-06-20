@@ -58,8 +58,10 @@ export default function CalculadorasPage() {
       </section>
 
       <p className={styles.foot}>
-        ¿Prefieres el dato en bruto?{' '}
-        <Link href="/datos-fiscales" className={styles.link}>Consulta las fichas de datos fiscales →</Link>
+        ¿Prefieres el dato en bruto o el proceso completo?{' '}
+        <Link href="/datos-fiscales" className={styles.link}>Datos fiscales</Link>
+        {' · '}
+        <Link href="/guias" className={styles.link}>Guías</Link>
       </p>
       <p className={styles.foot}>
         ¿Buscas otra herramienta?{' '}

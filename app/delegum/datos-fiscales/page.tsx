@@ -48,8 +48,10 @@ export default function DatosFiscalesIndex() {
         de tomar decisiones.
       </p>
       <p className={styles.foot}>
-        ¿Prefieres hacer el número?{' '}
-        <Link href="/calculadoras" className={styles.link}>Ir a las calculadoras de Delegum →</Link>
+        ¿Prefieres hacer el número o ver el proceso completo?{' '}
+        <Link href="/calculadoras" className={styles.link}>Calculadoras</Link>
+        {' · '}
+        <Link href="/guias" className={styles.link}>Guías</Link>
       </p>
     </main>
   );

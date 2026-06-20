@@ -54,6 +54,8 @@ export const config = {
     '/asistente-ia/',
     '/calculadoras',
     '/calculadoras/',
+    '/guias',
+    '/guias/',
     '/aviso-legal',
     '/aviso-legal/',
   ],
