@@ -63,7 +63,7 @@ export const jsonLd = {
   isBasedOn: FISCAL_AMORTIZACION_META.urlOficial,
   dateModified: FISCAL_AMORTIZACION_META.verificado,
   temporalCoverage: FISCAL_AMORTIZACION_META.vigencia,
-  spatialCoverage: { '@type': 'Country', name: 'España' },
+  spatialCoverage: { '@type': 'Place', name: 'España' },
   variableMeasured: [
     'Coeficiente lineal máximo (%)',
     'Período máximo (años)',

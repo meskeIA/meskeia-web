@@ -51,7 +51,7 @@ export const jsonLd = {
   isBasedOn: FISCAL_SMI_META.urlOficial,
   dateModified: FISCAL_SMI_META.verificado,
   temporalCoverage: FISCAL_SMI_META.vigencia,
-  spatialCoverage: { '@type': 'Country', name: 'España' },
+  spatialCoverage: { '@type': 'Place', name: 'España' },
   variableMeasured: ['SMI mensual (€)', 'SMI anual (€)', 'SMI por hora (€)'],
   keywords: ['SMI 2026', 'salario mínimo interprofesional'],
 };

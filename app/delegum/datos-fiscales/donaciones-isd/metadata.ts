@@ -63,7 +63,7 @@ export const jsonLd = {
   isBasedOn: FISCAL_DONACIONES_META.urlOficial,
   dateModified: FISCAL_DONACIONES_META.verificado,
   temporalCoverage: FISCAL_DONACIONES_META.vigencia,
-  spatialCoverage: { '@type': 'Country', name: 'España' },
+  spatialCoverage: { '@type': 'Place', name: 'España' },
   variableMeasured: [
     'Bonificación autonómica donaciones (%)',
     'Tarifa estatal donaciones (tipo %)',

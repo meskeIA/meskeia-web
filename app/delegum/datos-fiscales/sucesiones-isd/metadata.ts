@@ -63,7 +63,7 @@ export const jsonLd = {
   isBasedOn: FISCAL_SUCESIONES_META.urlOficial,
   dateModified: FISCAL_SUCESIONES_META.verificado,
   temporalCoverage: FISCAL_SUCESIONES_META.vigencia,
-  spatialCoverage: { '@type': 'Country', name: 'España' },
+  spatialCoverage: { '@type': 'Place', name: 'España' },
   variableMeasured: [
     'Bonificación autonómica ISD (%)',
     'Tarifa estatal ISD (tipo %)',

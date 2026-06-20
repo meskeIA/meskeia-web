@@ -63,7 +63,7 @@ export const jsonLd = {
   isBasedOn: PLUSVALIA_MUNICIPAL_META.urlReferencia,
   dateModified: PLUSVALIA_MUNICIPAL_META.verificado,
   temporalCoverage: PLUSVALIA_MUNICIPAL_META.vigencia,
-  spatialCoverage: { '@type': 'Country', name: 'España' },
+  spatialCoverage: { '@type': 'Place', name: 'España' },
   variableMeasured: [
     'Coeficiente IIVTNU por años de tenencia',
     'Tipo máximo legal (%)',

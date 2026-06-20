@@ -63,7 +63,7 @@ export const jsonLd = {
   isBasedOn: FISCAL_IPREM_META.urlOficial,
   dateModified: FISCAL_IPREM_META.verificado,
   temporalCoverage: FISCAL_IPREM_META.vigencia,
-  spatialCoverage: { '@type': 'Country', name: 'España' },
+  spatialCoverage: { '@type': 'Place', name: 'España' },
   variableMeasured: [
     'IPREM diario (€)',
     'IPREM mensual (€)',

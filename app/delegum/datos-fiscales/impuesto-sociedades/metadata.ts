@@ -63,7 +63,7 @@ export const jsonLd = {
   isBasedOn: FISCAL_SOCIEDADES_META.urlOficial,
   dateModified: FISCAL_SOCIEDADES_META.verificado,
   temporalCoverage: FISCAL_SOCIEDADES_META.vigencia,
-  spatialCoverage: { '@type': 'Country', name: 'España' },
+  spatialCoverage: { '@type': 'Place', name: 'España' },
   variableMeasured: [
     'Tipo general IS (%)',
     'Tipo nueva creación (%)',

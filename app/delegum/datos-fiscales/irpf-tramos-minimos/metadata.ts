@@ -63,7 +63,7 @@ export const jsonLd = {
   isBasedOn: FISCAL_IRPF_META.urlOficial,
   dateModified: FISCAL_IRPF_META.verificado,
   temporalCoverage: FISCAL_IRPF_META.vigencia,
-  spatialCoverage: { '@type': 'Country', name: 'España' },
+  spatialCoverage: { '@type': 'Place', name: 'España' },
   variableMeasured: ['Tipo IRPF por tramo (%)', 'Mínimo personal y familiar (€)'],
   keywords: TRAMOS_IRPF_2025.map((t) => `IRPF ${t.tipo}%`),
 };

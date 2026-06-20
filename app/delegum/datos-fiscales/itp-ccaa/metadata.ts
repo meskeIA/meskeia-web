@@ -63,7 +63,7 @@ export const jsonLd = {
   isBasedOn: FISCAL_INMUEBLES_META.urlOficialITP,
   dateModified: FISCAL_INMUEBLES_META.verificado,
   temporalCoverage: FISCAL_INMUEBLES_META.vigencia,
-  spatialCoverage: { '@type': 'Country', name: 'España' },
+  spatialCoverage: { '@type': 'Place', name: 'España' },
   variableMeasured: ['Tipo general ITP (%)', 'Tipo reducido ITP (%)'],
   keywords: TIPOS_ITP_CCAA_2025.map((t) => `ITP ${t.ccaa}`),
 };

@@ -51,7 +51,7 @@ export const jsonLd = {
   isBasedOn: FISCAL_IVA_META.urlOficial,
   dateModified: FISCAL_IVA_META.verificado,
   temporalCoverage: FISCAL_IVA_META.vigencia,
-  spatialCoverage: { '@type': 'Country', name: 'España' },
+  spatialCoverage: { '@type': 'Place', name: 'España' },
   variableMeasured: ['Tipo de IVA (%)'],
   keywords: TIPOS_IVA.map((t) => `IVA ${t.porcentaje}%`),
 };

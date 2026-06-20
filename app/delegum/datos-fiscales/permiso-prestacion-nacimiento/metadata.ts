@@ -63,7 +63,7 @@ export const jsonLd = {
   isBasedOn: FISCAL_MATERNIDAD_META.urlOficial,
   dateModified: FISCAL_MATERNIDAD_META.verificado,
   temporalCoverage: FISCAL_MATERNIDAD_META.vigencia,
-  spatialCoverage: { '@type': 'Country', name: 'España' },
+  spatialCoverage: { '@type': 'Place', name: 'España' },
   variableMeasured: [
     'Semanas de permiso por nacimiento',
     'Prestación (% base reguladora)',

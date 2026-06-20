@@ -63,7 +63,7 @@ export const jsonLd = {
   isBasedOn: FISCAL_PENSIONES_META.urlOficial,
   dateModified: FISCAL_PENSIONES_META.verificado,
   temporalCoverage: FISCAL_PENSIONES_META.vigencia,
-  spatialCoverage: { '@type': 'Country', name: 'España' },
+  spatialCoverage: { '@type': 'Place', name: 'España' },
   variableMeasured: [
     'Edad de jubilación (años)',
     'Años mínimos de cotización',

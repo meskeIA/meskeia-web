@@ -63,7 +63,7 @@ export const jsonLd = {
   isBasedOn: FISCAL_DEPENDENCIA_META.urlOficial,
   dateModified: FISCAL_DEPENDENCIA_META.verificado,
   temporalCoverage: FISCAL_DEPENDENCIA_META.vigencia,
-  spatialCoverage: { '@type': 'Country', name: 'España' },
+  spatialCoverage: { '@type': 'Place', name: 'España' },
   variableMeasured: [
     'Grado de dependencia',
     'Cuantía máxima prestación SAAD (€/mes)',

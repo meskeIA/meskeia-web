@@ -51,7 +51,7 @@ export const jsonLd = {
   isBasedOn: FISCAL_AUTONOMOS_META.urlOficial,
   dateModified: FISCAL_AUTONOMOS_META.verificado,
   temporalCoverage: FISCAL_AUTONOMOS_META.vigencia,
-  spatialCoverage: { '@type': 'Country', name: 'España' },
+  spatialCoverage: { '@type': 'Place', name: 'España' },
   variableMeasured: ['Rendimiento neto mensual (€)', 'Base mínima de cotización (€)', 'Cuota mensual (€)'],
   keywords: ['cuota autónomos 2026', 'tramos RETA', 'cotización ingresos reales'],
 };

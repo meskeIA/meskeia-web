@@ -51,7 +51,7 @@ export const jsonLd = {
   isBasedOn: FISCAL_INTERESES_META.urlOficialLey3,
   dateModified: FISCAL_INTERESES_META.verificado,
   temporalCoverage: FISCAL_INTERESES_META.vigencia,
-  spatialCoverage: { '@type': 'Country', name: 'España' },
+  spatialCoverage: { '@type': 'Place', name: 'España' },
   variableMeasured: ['Interés legal del dinero (%)', 'Interés de demora comercial (%)', 'Interés de demora tributario (%)'],
   keywords: ['interés legal del dinero', 'interés de demora comercial', 'Ley 3/2004'],
 };

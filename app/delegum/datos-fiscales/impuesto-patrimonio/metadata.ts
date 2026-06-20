@@ -63,7 +63,7 @@ export const jsonLd = {
   isBasedOn: FISCAL_PATRIMONIO_META.urlOficial,
   dateModified: FISCAL_PATRIMONIO_META.verificado,
   temporalCoverage: FISCAL_PATRIMONIO_META.vigencia,
-  spatialCoverage: { '@type': 'Country', name: 'España' },
+  spatialCoverage: { '@type': 'Place', name: 'España' },
   variableMeasured: [
     'Bonificación autonómica IP (%)',
     'Mínimo exento (€)',
