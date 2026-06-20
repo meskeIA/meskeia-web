@@ -13,6 +13,7 @@ import {
   FISCAL_MATERNIDAD_META,
 } from '@/data/fiscal';
 import { formatCurrency, formatDate } from '@/lib';
+import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
 
@@ -98,6 +99,8 @@ export default function PermisoPrestacionNacimientoPage() {
             urlOficial={FISCAL_MATERNIDAD_META.urlOficial}
             nota={FISCAL_MATERNIDAD_META.nota}
           />
+
+          <NovedadesFicha slug="permiso-prestacion-nacimiento" />
 
           {/* Duración del permiso */}
           <section className={styles.section}>

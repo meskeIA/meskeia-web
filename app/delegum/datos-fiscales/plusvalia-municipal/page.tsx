@@ -7,6 +7,7 @@ import DisclaimerCard from '@/components/DisclaimerCard';
 import DataReference from '@/components/DataReference';
 import { COEFICIENTES_IIVTNU_2025, PLUSVALIA_MUNICIPAL_META } from '@/data/fiscal';
 import { formatDate } from '@/lib';
+import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
 
@@ -85,6 +86,8 @@ export default function PlusvaliaMunicipalPage() {
             urlOficial={PLUSVALIA_MUNICIPAL_META.urlReferencia}
             nota={PLUSVALIA_MUNICIPAL_META.aviso}
           />
+
+          <NovedadesFicha slug="plusvalia-municipal" />
 
           {/* Qué es y quién paga */}
           <section className={styles.section}>

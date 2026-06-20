@@ -13,6 +13,7 @@ import {
   FISCAL_PENSIONES_META,
 } from '@/data/fiscal';
 import { formatCurrency, formatDate } from '@/lib';
+import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
 
@@ -108,6 +109,8 @@ export default function PensionesJubilacionPage() {
             urlOficial={FISCAL_PENSIONES_META.urlOficial}
             nota={FISCAL_PENSIONES_META.nota}
           />
+
+          <NovedadesFicha slug="pensiones-jubilacion" />
 
           {/* Edad de jubilación */}
           <section className={styles.section}>

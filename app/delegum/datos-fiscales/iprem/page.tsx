@@ -7,6 +7,7 @@ import DisclaimerCard from '@/components/DisclaimerCard';
 import DataReference from '@/components/DataReference';
 import { IPREM_2026, FISCAL_IPREM_META } from '@/data/fiscal';
 import { formatCurrency, formatDate } from '@/lib';
+import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
 
@@ -89,6 +90,8 @@ export default function IpremPage() {
             urlOficial={FISCAL_IPREM_META.urlOficial}
             nota={FISCAL_IPREM_META.nota}
           />
+
+          <NovedadesFicha slug="iprem" />
 
           {/* Cuantías */}
           <section className={styles.section}>

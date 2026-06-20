@@ -13,6 +13,7 @@ import {
   FISCAL_IVA_META,
 } from '@/data/fiscal';
 import { formatDate } from '@/lib';
+import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
 
@@ -87,6 +88,8 @@ export default function IvaTiposPage() {
             urlOficial={FISCAL_IVA_META.urlOficial}
             nota={FISCAL_IVA_META.nota}
           />
+
+          <NovedadesFicha slug="iva-tipos" />
 
           {/* Tipos de IVA */}
           <section className={styles.section}>

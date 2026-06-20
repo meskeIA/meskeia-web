@@ -7,6 +7,7 @@ import DisclaimerCard from '@/components/DisclaimerCard';
 import DataReference from '@/components/DataReference';
 import { SMI_2026, SMI_2025, FISCAL_SMI_META } from '@/data/fiscal';
 import { formatCurrency, formatDate } from '@/lib';
+import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
 
@@ -97,6 +98,8 @@ export default function SmiPage() {
             urlOficial={FISCAL_SMI_META.urlOficial}
             nota={SMI_2026.boe}
           />
+
+          <NovedadesFicha slug="smi-salario-minimo" />
 
           {/* Cuantías 2026 */}
           <section className={styles.section}>

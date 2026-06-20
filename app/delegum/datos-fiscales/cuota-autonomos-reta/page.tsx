@@ -12,6 +12,7 @@ import {
   FISCAL_AUTONOMOS_META,
 } from '@/data/fiscal';
 import { formatCurrency, formatDate } from '@/lib';
+import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
 
@@ -95,6 +96,8 @@ export default function CuotaAutonomosRetaPage() {
             urlOficial={FISCAL_AUTONOMOS_META.urlOficial}
             nota={FISCAL_AUTONOMOS_META.nota}
           />
+
+          <NovedadesFicha slug="cuota-autonomos-reta" />
 
           {/* Tramos */}
           <section className={styles.section}>

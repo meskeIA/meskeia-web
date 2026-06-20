@@ -13,6 +13,7 @@ import {
   FISCAL_DEPENDENCIA_META,
 } from '@/data/fiscal';
 import { formatCurrency, formatDate } from '@/lib';
+import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
 
@@ -92,6 +93,8 @@ export default function PrestacionesDependenciaPage() {
             urlOficial={FISCAL_DEPENDENCIA_META.urlOficial}
             nota={FISCAL_DEPENDENCIA_META.nota}
           />
+
+          <NovedadesFicha slug="prestaciones-dependencia" />
 
           {/* Grados */}
           <section className={styles.section}>

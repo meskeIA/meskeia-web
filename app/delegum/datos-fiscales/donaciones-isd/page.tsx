@@ -12,6 +12,7 @@ import {
   type BonificacionGrupoID,
 } from '@/data/fiscal';
 import { formatCurrency, formatDate } from '@/lib';
+import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
 
@@ -115,6 +116,8 @@ export default function DonacionesIsdPage() {
             urlOficial={FISCAL_DONACIONES_META.urlOficial}
             nota={FISCAL_DONACIONES_META.nota}
           />
+
+          <NovedadesFicha slug="donaciones-isd" />
 
           {/* Grupos de parentesco */}
           <section className={styles.section}>

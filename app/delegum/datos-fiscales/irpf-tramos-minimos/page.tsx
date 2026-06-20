@@ -12,6 +12,7 @@ import {
   FISCAL_IRPF_META,
 } from '@/data/fiscal';
 import { formatCurrency, formatDate } from '@/lib';
+import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
 
@@ -120,6 +121,8 @@ export default function IrpfTramosMinimosPage() {
             urlOficial={FISCAL_IRPF_META.urlOficial}
             nota={FISCAL_IRPF_META.nota}
           />
+
+          <NovedadesFicha slug="irpf-tramos-minimos" />
 
           {/* Escala general */}
           <section className={styles.section}>

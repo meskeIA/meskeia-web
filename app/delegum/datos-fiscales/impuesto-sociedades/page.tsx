@@ -12,6 +12,7 @@ import {
   FISCAL_SOCIEDADES_META,
 } from '@/data/fiscal';
 import { formatCurrency, formatDate } from '@/lib';
+import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
 
@@ -102,6 +103,8 @@ export default function ImpuestoSociedadesPage() {
             urlOficial={FISCAL_SOCIEDADES_META.urlOficial}
             nota={FISCAL_SOCIEDADES_META.nota}
           />
+
+          <NovedadesFicha slug="impuesto-sociedades" />
 
           {/* Tipos de gravamen */}
           <section className={styles.section}>

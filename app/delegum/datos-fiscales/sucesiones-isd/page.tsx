@@ -12,6 +12,7 @@ import {
   type BonificacionGrupoIS,
 } from '@/data/fiscal';
 import { formatCurrency, formatDate } from '@/lib';
+import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
 
@@ -120,6 +121,8 @@ export default function SucesionesIsdPage() {
             urlOficial={FISCAL_SUCESIONES_META.urlOficial}
             nota={FISCAL_SUCESIONES_META.nota}
           />
+
+          <NovedadesFicha slug="sucesiones-isd" />
 
           {/* Grupos de parentesco */}
           <section className={styles.section}>

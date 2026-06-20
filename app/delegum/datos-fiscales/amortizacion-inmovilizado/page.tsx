@@ -11,6 +11,7 @@ import {
   FISCAL_AMORTIZACION_META,
 } from '@/data/fiscal';
 import { formatDate } from '@/lib';
+import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
 
@@ -97,6 +98,8 @@ export default function AmortizacionInmovilizadoPage() {
             urlOficial={FISCAL_AMORTIZACION_META.urlOficial}
             nota={FISCAL_AMORTIZACION_META.nota}
           />
+
+          <NovedadesFicha slug="amortizacion-inmovilizado" />
 
           {/* Tabla de coeficientes lineales */}
           <section className={styles.section}>

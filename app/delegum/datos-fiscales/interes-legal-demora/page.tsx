@@ -13,6 +13,7 @@ import {
   FISCAL_INTERESES_META,
 } from '@/data/fiscal';
 import { formatDate } from '@/lib';
+import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
 
@@ -87,6 +88,8 @@ export default function InteresLegalDemoraPage() {
             urlOficial={FISCAL_INTERESES_META.urlOficialLey3}
             nota={FISCAL_INTERESES_META.nota}
           />
+
+          <NovedadesFicha slug="interes-legal-demora" />
 
           {/* Interés legal y tributario */}
           <section className={styles.section}>

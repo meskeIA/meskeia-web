@@ -7,6 +7,7 @@ import DisclaimerCard from '@/components/DisclaimerCard';
 import DataReference from '@/components/DataReference';
 import { TIPOS_ITP_CCAA_2025, FISCAL_INMUEBLES_META } from '@/data/fiscal';
 import { formatDate } from '@/lib';
+import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from './ItpCcaa.module.css';
 
@@ -84,6 +85,8 @@ export default function ItpCcaaPage() {
             urlOficial={FISCAL_INMUEBLES_META.urlOficialITP}
             nota={FISCAL_INMUEBLES_META.nota}
           />
+
+          <NovedadesFicha slug="itp-ccaa" />
 
           {/* Tabla de referencia */}
           <section className={styles.section}>

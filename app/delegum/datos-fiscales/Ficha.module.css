@@ -286,6 +286,71 @@
   outline-offset: 2px;
 }
 
+/* ─── Últimas novedades (changelog por ficha) ─── */
+.novedades {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-left: 3px solid #BE9A4E;
+  border-radius: 0 8px 8px 0;
+  padding: 0.9rem 1.1rem;
+}
+
+.novedadesTitulo {
+  font-family: var(--font-sora), system-ui, sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.novedadesList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.novedadItem {
+  display: flex;
+  gap: 0.7rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.novedadFecha {
+  flex-shrink: 0;
+  font-weight: 600;
+  color: #16244C;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+[data-theme='dark'] .novedades {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .novedadesTitulo {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .novedadFecha {
+  color: var(--accent);
+}
+
+@media (max-width: 480px) {
+  .novedadItem {
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+}
+
 /* ─── Fichas relacionadas (enlazado interno) ─── */
 .relacionadasGrid {
   display: grid;
