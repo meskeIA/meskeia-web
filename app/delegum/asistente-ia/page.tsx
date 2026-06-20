@@ -43,10 +43,10 @@ export default function AsistenteIaPage() {
             <h2 className={styles.sectionTitle}>Qué es</h2>
             <p className={styles.sectionIntro}>
               El Asistente IA de Delegum es un <strong>servidor MCP</strong> (Model Context Protocol)
-              diseñado para comportarse como una gestoría. Cuando le preguntas a tu asistente de IA algo como
+              diseñado para orientar en cuestiones fiscales, laborales y financieras. Cuando le preguntas a tu asistente de IA algo como
               «soy autónomo y facturo 45.000 €, ¿qué me queda?», Delegum no devuelve un número suelto:
               orquesta varios cálculos a la vez (cuota de la Seguridad Social, IRPF, neto disponible y
-              comparación autónomo vs sociedad) y entrega un análisis integrado, como haría un asesor.
+              comparación autónomo vs sociedad) y entrega un análisis integrado.
             </p>
             <p className={styles.sectionIntro}>
               Funciona sobre la biblioteca de cálculo de <a href="https://meskeia.com/" className={styles.link}>meskeIA</a>,

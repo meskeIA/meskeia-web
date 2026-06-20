@@ -18,7 +18,7 @@ const PILARES = [
   {
     icon: '🤖',
     titulo: 'Asistente IA',
-    desc: 'Conecta Delegum (MCP) a Claude, ChatGPT o Mistral y resuelve consultas reales como lo haría una gestoría.',
+    desc: 'Conecta Delegum (MCP) a Claude, ChatGPT o Mistral para orientar en cuestiones fiscales, laborales y financieras con cálculos reales.',
     href: '/asistente-ia',
     cta: 'Conectar',
   },
@@ -82,7 +82,7 @@ export default function DelegumHome() {
             Delegum reúne en una sola marca todo lo que necesitas para entender la fiscalidad,
             el derecho laboral y las finanzas en España: una <strong>capa de datos normativos</strong>{' '}
             verificados y citables, un <strong>asistente de IA</strong> que orquesta los cálculos
-            como lo haría una gestoría y una <strong>selección de calculadoras</strong>. Es un
+            para orientarte en cada caso y una <strong>selección de calculadoras</strong>. Es un
             servicio de <a href="https://meskeia.com/" className={styles.link}>meskeIA</a> y comparte
             su compromiso: herramientas claras, gratuitas y sin recopilar datos personales.
           </p>

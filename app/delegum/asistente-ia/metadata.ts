@@ -60,7 +60,7 @@ export const faqJsonLd = {
       name: '¿Qué es el Asistente IA de Delegum?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Es un servidor MCP (Model Context Protocol) que conecta un asistente de IA como Claude, ChatGPT o Mistral con la biblioteca de cálculo fiscal, laboral y financiero de meskeIA para España. En lugar de devolver un dato suelto, orquesta varios cálculos a la vez y entrega un análisis integrado, como lo haría una gestoría.',
+        text: 'Es un servidor MCP (Model Context Protocol) que conecta un asistente de IA como Claude, ChatGPT o Mistral con la biblioteca de cálculo fiscal, laboral y financiero de meskeIA para España. En lugar de devolver un dato suelto, orquesta varios cálculos a la vez y entrega un análisis integrado que orienta en cuestiones fiscales, laborales y financieras.',
       },
     },
     {
