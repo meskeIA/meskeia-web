@@ -88,6 +88,15 @@
   border-color: rgba(110, 231, 183, 0.3);
 }
 
+/* En pantallas estrechas, el enlace a la fuente (es-only) cae a su propia línea
+   en lugar de comprimir el texto a una columna estrecha. Con flex-wrap del badge,
+   flex-basis:100% obliga a que ocupe una fila entera bajo el texto. */
+@media (max-width: 600px) {
+  .fuente {
+    flex-basis: 100%;
+  }
+}
+
 @media (max-width: 480px) {
   .badge {
     font-size: 0.8125rem;
