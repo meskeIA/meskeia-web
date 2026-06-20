@@ -301,6 +301,9 @@ Fichas de datos (página humana + endpoint JSON):
 - [Tipos del Impuesto de Sociedades](https://delegum.com/datos-fiscales/impuesto-sociedades/) — JSON: https://delegum.com/api/datos/impuesto-sociedades/
 - [IPREM 2026](https://delegum.com/datos-fiscales/iprem/) — JSON: https://delegum.com/api/datos/iprem/
 - [Pensión de jubilación: edad, cotización y cuantías](https://delegum.com/datos-fiscales/pensiones-jubilacion/) — JSON: https://delegum.com/api/datos/pensiones-jubilacion/
+- [Permiso y prestación por nacimiento](https://delegum.com/datos-fiscales/permiso-prestacion-nacimiento/) — JSON: https://delegum.com/api/datos/permiso-prestacion-nacimiento/
+- [Plusvalía municipal (IIVTNU)](https://delegum.com/datos-fiscales/plusvalia-municipal/) — JSON: https://delegum.com/api/datos/plusvalia-municipal/
+- [Prestaciones por dependencia (SAAD)](https://delegum.com/datos-fiscales/prestaciones-dependencia/) — JSON: https://delegum.com/api/datos/prestaciones-dependencia/
 - Índice JSON de datasets: https://delegum.com/api/datos/
 
 Asistente IA (MCP): https://delegum.com/api/mcp/ (Claude, ChatGPT, Mistral). Más información: https://delegum.com/asistente-ia/

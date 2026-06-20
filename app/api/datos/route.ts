@@ -3,6 +3,7 @@ import {
   FISCAL_AUTONOMOS_META, FISCAL_INMUEBLES_META, FISCAL_INTERESES_META,
   FISCAL_SUCESIONES_META, FISCAL_DONACIONES_META, FISCAL_PATRIMONIO_META, FISCAL_AMORTIZACION_META,
   FISCAL_SOCIEDADES_META, FISCAL_IPREM_META, FISCAL_PENSIONES_META,
+  FISCAL_MATERNIDAD_META, PLUSVALIA_MUNICIPAL_META, FISCAL_DEPENDENCIA_META,
 } from '@/data/fiscal';
 
 /**
@@ -25,6 +26,9 @@ const DATASETS = [
   { slug: 'impuesto-sociedades', nombre: 'Tipos del Impuesto de Sociedades', meta: FISCAL_SOCIEDADES_META },
   { slug: 'iprem', nombre: 'IPREM 2026', meta: FISCAL_IPREM_META },
   { slug: 'pensiones-jubilacion', nombre: 'Pensión de jubilación: edad, cotización y cuantías', meta: FISCAL_PENSIONES_META },
+  { slug: 'permiso-prestacion-nacimiento', nombre: 'Permiso y prestación por nacimiento', meta: FISCAL_MATERNIDAD_META },
+  { slug: 'plusvalia-municipal', nombre: 'Plusvalía municipal (IIVTNU)', meta: PLUSVALIA_MUNICIPAL_META },
+  { slug: 'prestaciones-dependencia', nombre: 'Prestaciones por dependencia (SAAD)', meta: FISCAL_DEPENDENCIA_META },
 ];
 
 export function GET() {

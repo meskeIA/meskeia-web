@@ -91,6 +91,24 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://delegum.com/datos-fiscales/permiso-prestacion-nacimiento/</loc>
+    <lastmod>2026-06-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://delegum.com/datos-fiscales/plusvalia-municipal/</loc>
+    <lastmod>2026-06-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://delegum.com/datos-fiscales/prestaciones-dependencia/</loc>
+    <lastmod>2026-06-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://delegum.com/asistente-ia/</loc>
     <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>

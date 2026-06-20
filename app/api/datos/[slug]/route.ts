@@ -13,6 +13,9 @@ import {
   FISCAL_SOCIEDADES_META, TIPOS_IS_2025, TRAMOS_IS_MICROPYMES_2026, RETENCIONES_IS_2025, OBLIGACIONES_SL_2025,
   FISCAL_IPREM_META, IPREM_2026,
   FISCAL_PENSIONES_META, TABLA_EDAD_JUBILACION, COTIZACION_MINIMA, TRAMOS_PORCENTAJE_PENSION_2025, LIMITES_PENSION_2025, BASE_REGULADORA,
+  FISCAL_MATERNIDAD_META, PERMISO_NACIMIENTO_2025, AMPLIACIONES_PERMISO, PRESTACION_NACIMIENTO_2025, DEDUCCION_MATERNIDAD_IRPF_2025,
+  PLUSVALIA_MUNICIPAL_META, COEFICIENTES_IIVTNU_2025,
+  FISCAL_DEPENDENCIA_META, GRADOS_DEPENDENCIA, PRESTACIONES_DEPENDENCIA_2025, COTIZACION_CUIDADOR_NO_PROFESIONAL_2025, DEDUCCIONES_IRPF_DISCAPACIDAD_2025,
 } from '@/data/fiscal';
 
 /**
@@ -188,6 +191,47 @@ const DATASETS: Record<string, Dataset> = {
       porcentajePorAniosCotizados: TRAMOS_PORCENTAJE_PENSION_2025,
       limitesPension2026: LIMITES_PENSION_2025,
       baseReguladora: BASE_REGULADORA,
+    },
+  },
+  'permiso-prestacion-nacimiento': {
+    meta: {
+      nombre: 'Permiso y prestación por nacimiento',
+      descripcion: 'Semanas del permiso por nacimiento (RDL 9/2025) en familias biparentales y monoparentales, ampliaciones, prestación de la SS y deducción por maternidad en IRPF.',
+      fuente: FISCAL_MATERNIDAD_META.fuente, verificado: FISCAL_MATERNIDAD_META.verificado, vigencia: FISCAL_MATERNIDAD_META.vigencia,
+      urlOficial: FISCAL_MATERNIDAD_META.urlOficial, paginaHumana: `${BASE}/datos-fiscales/permiso-prestacion-nacimiento`,
+    },
+    datos: {
+      permisos: PERMISO_NACIMIENTO_2025,
+      ampliaciones: AMPLIACIONES_PERMISO,
+      prestacion: PRESTACION_NACIMIENTO_2025,
+      deduccionMaternidadIRPF: DEDUCCION_MATERNIDAD_IRPF_2025,
+    },
+  },
+  'plusvalia-municipal': {
+    meta: {
+      nombre: 'Plusvalía municipal (IIVTNU)',
+      descripcion: 'Coeficientes máximos por años de tenencia, tipo máximo legal y métodos de cálculo objetivo y real de la plusvalía municipal (RDL 26/2021).',
+      fuente: PLUSVALIA_MUNICIPAL_META.baseNormativa, verificado: PLUSVALIA_MUNICIPAL_META.verificado, vigencia: PLUSVALIA_MUNICIPAL_META.vigencia,
+      urlOficial: PLUSVALIA_MUNICIPAL_META.urlReferencia, paginaHumana: `${BASE}/datos-fiscales/plusvalia-municipal`,
+    },
+    datos: {
+      tipoMaximoLegal: PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal,
+      quienPaga: PLUSVALIA_MUNICIPAL_META.quien,
+      coeficientesPorAnios: COEFICIENTES_IIVTNU_2025,
+    },
+  },
+  'prestaciones-dependencia': {
+    meta: {
+      nombre: 'Prestaciones por dependencia (SAAD)',
+      descripcion: 'Grados de dependencia, cuantías de prestaciones económicas SAAD por grado, cotización del cuidador no profesional y deducciones por discapacidad en IRPF.',
+      fuente: FISCAL_DEPENDENCIA_META.fuente, verificado: FISCAL_DEPENDENCIA_META.verificado, vigencia: FISCAL_DEPENDENCIA_META.vigencia,
+      urlOficial: FISCAL_DEPENDENCIA_META.urlOficial, paginaHumana: `${BASE}/datos-fiscales/prestaciones-dependencia`,
+    },
+    datos: {
+      grados: GRADOS_DEPENDENCIA,
+      prestacionesEconomicas: PRESTACIONES_DEPENDENCIA_2025,
+      cotizacionCuidador: COTIZACION_CUIDADOR_NO_PROFESIONAL_2025,
+      deduccionesIRPFDiscapacidad: DEDUCCIONES_IRPF_DISCAPACIDAD_2025,
     },
   },
 };

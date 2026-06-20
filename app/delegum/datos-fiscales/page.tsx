@@ -14,6 +14,9 @@ import {
   FISCAL_SOCIEDADES_META,
   FISCAL_IPREM_META,
   FISCAL_PENSIONES_META,
+  FISCAL_MATERNIDAD_META,
+  PLUSVALIA_MUNICIPAL_META,
+  FISCAL_DEPENDENCIA_META,
 } from '@/data/fiscal';
 import { formatDate } from '@/lib';
 import styles from './DatosFiscales.module.css';
@@ -117,6 +120,27 @@ const FICHAS = [
     desc: 'Edad de jubilación, años mínimos de cotización, porcentaje por años cotizados y pensión máxima y mínima 2026.',
     href: '/datos-fiscales/pensiones-jubilacion',
     verificado: FISCAL_PENSIONES_META.verificado,
+  },
+  {
+    icon: '👶',
+    titulo: 'Permiso y prestación por nacimiento',
+    desc: 'Semanas de permiso (19/32, RDL 9/2025), prestación del 100%, requisitos de cotización y deducción por maternidad.',
+    href: '/datos-fiscales/permiso-prestacion-nacimiento',
+    verificado: FISCAL_MATERNIDAD_META.verificado,
+  },
+  {
+    icon: '🏘️',
+    titulo: 'Plusvalía municipal (IIVTNU)',
+    desc: 'Coeficientes por años de tenencia, quién la paga, tipo máximo legal y métodos de cálculo objetivo y real.',
+    href: '/datos-fiscales/plusvalia-municipal',
+    verificado: PLUSVALIA_MUNICIPAL_META.verificado,
+  },
+  {
+    icon: '♿',
+    titulo: 'Prestaciones por dependencia (SAAD)',
+    desc: 'Grados de dependencia, cuantías de prestaciones SAAD por grado, cotización del cuidador y deducciones IRPF.',
+    href: '/datos-fiscales/prestaciones-dependencia',
+    verificado: FISCAL_DEPENDENCIA_META.verificado,
   },
 ];
 
