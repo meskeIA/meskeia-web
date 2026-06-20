@@ -10,6 +10,9 @@ import {
   FISCAL_DONACIONES_META, TARIFA_ESTATAL_ID, COEFICIENTES_ID, REDUCCIONES_PARENTESCO_ID, BONIFICACIONES_CCAA_ID,
   FISCAL_PATRIMONIO_META, ESCALA_PATRIMONIO_ESTATAL, BONIFICACIONES_CCAA_PATRIMONIO, MINIMO_EXENTO_ESTATAL, EXENCION_VIVIENDA_HABITUAL, UMBRAL_OBLIGACION_DECLARAR, ITSGF_UMBRAL,
   FISCAL_AMORTIZACION_META, TABLA_AMORTIZACION_2026, MULTIPLICADORES_DEGRESIVO_2026,
+  FISCAL_SOCIEDADES_META, TIPOS_IS_2025, TRAMOS_IS_MICROPYMES_2026, RETENCIONES_IS_2025, OBLIGACIONES_SL_2025,
+  FISCAL_IPREM_META, IPREM_2026,
+  FISCAL_PENSIONES_META, TABLA_EDAD_JUBILACION, COTIZACION_MINIMA, TRAMOS_PORCENTAJE_PENSION_2025, LIMITES_PENSION_2025, BASE_REGULADORA,
 } from '@/data/fiscal';
 
 /**
@@ -147,6 +150,44 @@ const DATASETS: Record<string, Dataset> = {
     datos: {
       tablaAmortizacionLineal: TABLA_AMORTIZACION_2026,
       multiplicadoresDegresivo: MULTIPLICADORES_DEGRESIVO_2026,
+    },
+  },
+  'impuesto-sociedades': {
+    meta: {
+      nombre: 'Tipos del Impuesto de Sociedades',
+      descripcion: 'Tipos de gravamen del IS (general, nueva creación, escala de microempresas Ley 7/2024, cooperativas), retenciones y obligaciones periódicas.',
+      fuente: FISCAL_SOCIEDADES_META.fuente, verificado: FISCAL_SOCIEDADES_META.verificado, vigencia: FISCAL_SOCIEDADES_META.vigencia,
+      urlOficial: FISCAL_SOCIEDADES_META.urlOficial, paginaHumana: `${BASE}/datos-fiscales/impuesto-sociedades`,
+    },
+    datos: {
+      tipos: TIPOS_IS_2025,
+      escalaMicroempresas2026: TRAMOS_IS_MICROPYMES_2026,
+      retenciones: RETENCIONES_IS_2025,
+      obligaciones: OBLIGACIONES_SL_2025,
+    },
+  },
+  'iprem': {
+    meta: {
+      nombre: 'IPREM 2026',
+      descripcion: 'Cuantías del Indicador Público de Renta de Efectos Múltiples (diaria, mensual y anual con 12 y 14 pagas).',
+      fuente: FISCAL_IPREM_META.fuente, verificado: FISCAL_IPREM_META.verificado, vigencia: FISCAL_IPREM_META.vigencia,
+      urlOficial: FISCAL_IPREM_META.urlOficial, paginaHumana: `${BASE}/datos-fiscales/iprem`,
+    },
+    datos: { iprem2026: IPREM_2026 },
+  },
+  'pensiones-jubilacion': {
+    meta: {
+      nombre: 'Pensión de jubilación: edad, cotización y cuantías',
+      descripcion: 'Edad de jubilación por año, años mínimos de cotización, porcentaje de pensión según años cotizados y límites de la pensión pública 2026.',
+      fuente: FISCAL_PENSIONES_META.fuente, verificado: FISCAL_PENSIONES_META.verificado, vigencia: FISCAL_PENSIONES_META.vigencia,
+      urlOficial: FISCAL_PENSIONES_META.urlOficial, paginaHumana: `${BASE}/datos-fiscales/pensiones-jubilacion`,
+    },
+    datos: {
+      edadJubilacion: TABLA_EDAD_JUBILACION,
+      cotizacionMinima: COTIZACION_MINIMA,
+      porcentajePorAniosCotizados: TRAMOS_PORCENTAJE_PENSION_2025,
+      limitesPension2026: LIMITES_PENSION_2025,
+      baseReguladora: BASE_REGULADORA,
     },
   },
 };

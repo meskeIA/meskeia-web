@@ -2,6 +2,7 @@ import {
   FISCAL_IRPF_META, FISCAL_IVA_META, FISCAL_SMI_META,
   FISCAL_AUTONOMOS_META, FISCAL_INMUEBLES_META, FISCAL_INTERESES_META,
   FISCAL_SUCESIONES_META, FISCAL_DONACIONES_META, FISCAL_PATRIMONIO_META, FISCAL_AMORTIZACION_META,
+  FISCAL_SOCIEDADES_META, FISCAL_IPREM_META, FISCAL_PENSIONES_META,
 } from '@/data/fiscal';
 
 /**
@@ -21,6 +22,9 @@ const DATASETS = [
   { slug: 'donaciones-isd', nombre: 'Impuesto de Donaciones por comunidad autónoma', meta: FISCAL_DONACIONES_META },
   { slug: 'impuesto-patrimonio', nombre: 'Impuesto sobre el Patrimonio por comunidad autónoma', meta: FISCAL_PATRIMONIO_META },
   { slug: 'amortizacion-inmovilizado', nombre: 'Coeficientes de amortización del inmovilizado', meta: FISCAL_AMORTIZACION_META },
+  { slug: 'impuesto-sociedades', nombre: 'Tipos del Impuesto de Sociedades', meta: FISCAL_SOCIEDADES_META },
+  { slug: 'iprem', nombre: 'IPREM 2026', meta: FISCAL_IPREM_META },
+  { slug: 'pensiones-jubilacion', nombre: 'Pensión de jubilación: edad, cotización y cuantías', meta: FISCAL_PENSIONES_META },
 ];
 
 export function GET() {

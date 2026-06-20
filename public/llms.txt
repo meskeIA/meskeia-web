@@ -298,6 +298,9 @@ Fichas de datos (página humana + endpoint JSON):
 - [Impuesto de Donaciones por comunidad autónoma](https://delegum.com/datos-fiscales/donaciones-isd/) — JSON: https://delegum.com/api/datos/donaciones-isd/
 - [Impuesto sobre el Patrimonio por comunidad autónoma](https://delegum.com/datos-fiscales/impuesto-patrimonio/) — JSON: https://delegum.com/api/datos/impuesto-patrimonio/
 - [Coeficientes de amortización del inmovilizado](https://delegum.com/datos-fiscales/amortizacion-inmovilizado/) — JSON: https://delegum.com/api/datos/amortizacion-inmovilizado/
+- [Tipos del Impuesto de Sociedades](https://delegum.com/datos-fiscales/impuesto-sociedades/) — JSON: https://delegum.com/api/datos/impuesto-sociedades/
+- [IPREM 2026](https://delegum.com/datos-fiscales/iprem/) — JSON: https://delegum.com/api/datos/iprem/
+- [Pensión de jubilación: edad, cotización y cuantías](https://delegum.com/datos-fiscales/pensiones-jubilacion/) — JSON: https://delegum.com/api/datos/pensiones-jubilacion/
 - Índice JSON de datasets: https://delegum.com/api/datos/
 
 Asistente IA (MCP): https://delegum.com/api/mcp/ (Claude, ChatGPT, Mistral). Más información: https://delegum.com/asistente-ia/

@@ -11,6 +11,9 @@ import {
   FISCAL_DONACIONES_META,
   FISCAL_PATRIMONIO_META,
   FISCAL_AMORTIZACION_META,
+  FISCAL_SOCIEDADES_META,
+  FISCAL_IPREM_META,
+  FISCAL_PENSIONES_META,
 } from '@/data/fiscal';
 import { formatDate } from '@/lib';
 import styles from './DatosFiscales.module.css';
@@ -93,6 +96,27 @@ const FICHAS = [
     desc: 'Coeficientes de amortización lineal por tipo de activo (art. 12.1 LIS), período máximo y métodos degresivos.',
     href: '/datos-fiscales/amortizacion-inmovilizado',
     verificado: FISCAL_AMORTIZACION_META.verificado,
+  },
+  {
+    icon: '🏢',
+    titulo: 'Tipos del Impuesto de Sociedades',
+    desc: 'Tipo general, nueva creación, escala de microempresas (Ley 7/2024), cooperativas y obligaciones (modelos 200 y 202).',
+    href: '/datos-fiscales/impuesto-sociedades',
+    verificado: FISCAL_SOCIEDADES_META.verificado,
+  },
+  {
+    icon: '📊',
+    titulo: 'IPREM',
+    desc: 'Cuantías del IPREM (diaria, mensual y anual con 12 y 14 pagas), usos en ayudas y diferencia con el SMI.',
+    href: '/datos-fiscales/iprem',
+    verificado: FISCAL_IPREM_META.verificado,
+  },
+  {
+    icon: '👴',
+    titulo: 'Pensión de jubilación',
+    desc: 'Edad de jubilación, años mínimos de cotización, porcentaje por años cotizados y pensión máxima y mínima 2026.',
+    href: '/datos-fiscales/pensiones-jubilacion',
+    verificado: FISCAL_PENSIONES_META.verificado,
   },
 ];
 
