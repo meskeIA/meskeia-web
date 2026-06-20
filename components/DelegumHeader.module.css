@@ -105,10 +105,11 @@
   .navLink {
     font-size: 0.85rem;
   }
-  /* En móvil ocultamos "Calculadoras" y "Glosario" para no apretar la barra
-     (ambos siguen accesibles desde las tarjetas de la home) */
+  /* En móvil ocultamos "Calculadoras", "Glosario" y "Blog" para no apretar la
+     barra (los tres siguen accesibles desde las tarjetas de la home) */
   .navLink:nth-of-type(3),
-  .navLink:nth-of-type(5) {
+  .navLink:nth-of-type(5),
+  .navLink:nth-of-type(6) {
     display: none;
   }
 }

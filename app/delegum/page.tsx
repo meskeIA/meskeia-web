@@ -43,6 +43,13 @@ const PILARES = [
     href: '/glosario',
     cta: 'Consultar términos',
   },
+  {
+    icon: '📰',
+    titulo: 'Blog',
+    desc: 'Cada quincena, una novedad fiscal, laboral o financiera explicada en pocas líneas, con su fuente.',
+    href: '/blog',
+    cta: 'Leer el blog',
+  },
 ];
 
 export default function DelegumHome() {

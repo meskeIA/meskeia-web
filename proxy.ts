@@ -58,6 +58,8 @@ export const config = {
     '/guias/',
     '/glosario',
     '/glosario/',
+    '/blog',
+    '/blog/:path*',
     '/aviso-legal',
     '/aviso-legal/',
   ],
