@@ -295,6 +295,9 @@ Fichas de datos (página humana + endpoint JSON):
 - [Tipos de ITP por comunidad autónoma](https://delegum.com/datos-fiscales/itp-ccaa/) — JSON: https://delegum.com/api/datos/itp-ccaa/
 - [Interés legal del dinero y de demora](https://delegum.com/datos-fiscales/interes-legal-demora/) — JSON: https://delegum.com/api/datos/interes-legal-demora/
 - [Impuesto de Sucesiones por comunidad autónoma](https://delegum.com/datos-fiscales/sucesiones-isd/) — JSON: https://delegum.com/api/datos/sucesiones-isd/
+- [Impuesto de Donaciones por comunidad autónoma](https://delegum.com/datos-fiscales/donaciones-isd/) — JSON: https://delegum.com/api/datos/donaciones-isd/
+- [Impuesto sobre el Patrimonio por comunidad autónoma](https://delegum.com/datos-fiscales/impuesto-patrimonio/) — JSON: https://delegum.com/api/datos/impuesto-patrimonio/
+- [Coeficientes de amortización del inmovilizado](https://delegum.com/datos-fiscales/amortizacion-inmovilizado/) — JSON: https://delegum.com/api/datos/amortizacion-inmovilizado/
 - Índice JSON de datasets: https://delegum.com/api/datos/
 
 Asistente IA (MCP): https://delegum.com/api/mcp/ (Claude, ChatGPT, Mistral). Más información: https://delegum.com/asistente-ia/

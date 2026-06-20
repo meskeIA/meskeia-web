@@ -1,7 +1,7 @@
 import {
   FISCAL_IRPF_META, FISCAL_IVA_META, FISCAL_SMI_META,
   FISCAL_AUTONOMOS_META, FISCAL_INMUEBLES_META, FISCAL_INTERESES_META,
-  FISCAL_SUCESIONES_META,
+  FISCAL_SUCESIONES_META, FISCAL_DONACIONES_META, FISCAL_PATRIMONIO_META, FISCAL_AMORTIZACION_META,
 } from '@/data/fiscal';
 
 /**
@@ -18,6 +18,9 @@ const DATASETS = [
   { slug: 'itp-ccaa', nombre: 'Tipos de ITP por comunidad autónoma', meta: FISCAL_INMUEBLES_META },
   { slug: 'interes-legal-demora', nombre: 'Interés legal del dinero y de demora', meta: FISCAL_INTERESES_META },
   { slug: 'sucesiones-isd', nombre: 'Impuesto de Sucesiones por comunidad autónoma', meta: FISCAL_SUCESIONES_META },
+  { slug: 'donaciones-isd', nombre: 'Impuesto de Donaciones por comunidad autónoma', meta: FISCAL_DONACIONES_META },
+  { slug: 'impuesto-patrimonio', nombre: 'Impuesto sobre el Patrimonio por comunidad autónoma', meta: FISCAL_PATRIMONIO_META },
+  { slug: 'amortizacion-inmovilizado', nombre: 'Coeficientes de amortización del inmovilizado', meta: FISCAL_AMORTIZACION_META },
 ];
 
 export function GET() {

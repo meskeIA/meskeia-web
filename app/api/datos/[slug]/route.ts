@@ -7,6 +7,9 @@ import {
   FISCAL_INTERESES_META, INTERES_LEGAL_DINERO_2025, TIPOS_DEMORA_COMERCIAL, INTERES_DEMORA_TRIBUTARIO_2025,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
   FISCAL_SUCESIONES_META, TARIFA_ESTATAL_IS, COEFICIENTES_IS, REDUCCIONES_PARENTESCO_IS, BONIFICACIONES_CCAA_IS,
+  FISCAL_DONACIONES_META, TARIFA_ESTATAL_ID, COEFICIENTES_ID, REDUCCIONES_PARENTESCO_ID, BONIFICACIONES_CCAA_ID,
+  FISCAL_PATRIMONIO_META, ESCALA_PATRIMONIO_ESTATAL, BONIFICACIONES_CCAA_PATRIMONIO, MINIMO_EXENTO_ESTATAL, EXENCION_VIVIENDA_HABITUAL, UMBRAL_OBLIGACION_DECLARAR, ITSGF_UMBRAL,
+  FISCAL_AMORTIZACION_META, TABLA_AMORTIZACION_2026, MULTIPLICADORES_DEGRESIVO_2026,
 } from '@/data/fiscal';
 
 /**
@@ -102,6 +105,48 @@ const DATASETS: Record<string, Dataset> = {
       coeficientesMultiplicadores: COEFICIENTES_IS,
       reduccionesPorParentesco: REDUCCIONES_PARENTESCO_IS,
       bonificacionesPorCCAA: BONIFICACIONES_CCAA_IS,
+    },
+  },
+  'donaciones-isd': {
+    meta: {
+      nombre: 'Impuesto de Donaciones por comunidad autónoma',
+      descripcion: 'Bonificaciones autonómicas del ISD en donaciones por CCAA, grupos de parentesco, tarifa estatal por tramos, coeficientes multiplicadores y reducciones por parentesco.',
+      fuente: FISCAL_DONACIONES_META.fuente, verificado: FISCAL_DONACIONES_META.verificado, vigencia: FISCAL_DONACIONES_META.vigencia,
+      urlOficial: FISCAL_DONACIONES_META.urlOficial, paginaHumana: `${BASE}/datos-fiscales/donaciones-isd`,
+    },
+    datos: {
+      tarifaEstatal: TARIFA_ESTATAL_ID,
+      coeficientesMultiplicadores: COEFICIENTES_ID,
+      reduccionesPorParentesco: REDUCCIONES_PARENTESCO_ID,
+      bonificacionesPorCCAA: BONIFICACIONES_CCAA_ID,
+    },
+  },
+  'impuesto-patrimonio': {
+    meta: {
+      nombre: 'Impuesto sobre el Patrimonio por comunidad autónoma',
+      descripcion: 'Mínimo exento, escala estatal por tramos, bonificaciones autonómicas y umbral del Impuesto de Solidaridad de las Grandes Fortunas (ITSGF).',
+      fuente: FISCAL_PATRIMONIO_META.fuente, verificado: FISCAL_PATRIMONIO_META.verificado, vigencia: FISCAL_PATRIMONIO_META.vigencia,
+      urlOficial: FISCAL_PATRIMONIO_META.urlOficial, paginaHumana: `${BASE}/datos-fiscales/impuesto-patrimonio`,
+    },
+    datos: {
+      minimoExentoEstatal: MINIMO_EXENTO_ESTATAL,
+      exencionViviendaHabitual: EXENCION_VIVIENDA_HABITUAL,
+      umbralObligacionDeclarar: UMBRAL_OBLIGACION_DECLARAR,
+      umbralITSGF: ITSGF_UMBRAL,
+      escalaEstatal: ESCALA_PATRIMONIO_ESTATAL,
+      bonificacionesPorCCAA: BONIFICACIONES_CCAA_PATRIMONIO,
+    },
+  },
+  'amortizacion-inmovilizado': {
+    meta: {
+      nombre: 'Coeficientes de amortización del inmovilizado',
+      descripcion: 'Coeficientes de amortización lineal máximos y períodos máximos por tipo de activo (art. 12.1.a LIS) y multiplicadores de la amortización degresiva por porcentaje constante.',
+      fuente: FISCAL_AMORTIZACION_META.fuente, verificado: FISCAL_AMORTIZACION_META.verificado, vigencia: FISCAL_AMORTIZACION_META.vigencia,
+      urlOficial: FISCAL_AMORTIZACION_META.urlOficial, paginaHumana: `${BASE}/datos-fiscales/amortizacion-inmovilizado`,
+    },
+    datos: {
+      tablaAmortizacionLineal: TABLA_AMORTIZACION_2026,
+      multiplicadoresDegresivo: MULTIPLICADORES_DEGRESIVO_2026,
     },
   },
 };

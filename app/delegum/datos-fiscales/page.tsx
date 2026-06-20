@@ -8,6 +8,9 @@ import {
   FISCAL_INTERESES_META,
   FISCAL_AUTONOMOS_META,
   FISCAL_SUCESIONES_META,
+  FISCAL_DONACIONES_META,
+  FISCAL_PATRIMONIO_META,
+  FISCAL_AMORTIZACION_META,
 } from '@/data/fiscal';
 import { formatDate } from '@/lib';
 import styles from './DatosFiscales.module.css';
@@ -69,6 +72,27 @@ const FICHAS = [
     desc: 'Bonificaciones del ISD por CCAA, grupos de parentesco, tarifa estatal por tramos y reducciones aplicables.',
     href: '/datos-fiscales/sucesiones-isd',
     verificado: FISCAL_SUCESIONES_META.verificado,
+  },
+  {
+    icon: '🎁',
+    titulo: 'Impuesto de Donaciones por comunidad autónoma',
+    desc: 'Bonificaciones del ISD en donaciones por CCAA, grupos de parentesco, tarifa estatal y requisito de escritura.',
+    href: '/datos-fiscales/donaciones-isd',
+    verificado: FISCAL_DONACIONES_META.verificado,
+  },
+  {
+    icon: '💎',
+    titulo: 'Impuesto sobre el Patrimonio',
+    desc: 'Mínimo exento, escala estatal, bonificaciones autonómicas y umbral del Impuesto de Grandes Fortunas (ITSGF).',
+    href: '/datos-fiscales/impuesto-patrimonio',
+    verificado: FISCAL_PATRIMONIO_META.verificado,
+  },
+  {
+    icon: '🏭',
+    titulo: 'Coeficientes de amortización del inmovilizado',
+    desc: 'Coeficientes de amortización lineal por tipo de activo (art. 12.1 LIS), período máximo y métodos degresivos.',
+    href: '/datos-fiscales/amortizacion-inmovilizado',
+    verificado: FISCAL_AMORTIZACION_META.verificado,
   },
 ];
 
