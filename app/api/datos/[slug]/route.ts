@@ -16,6 +16,7 @@ import {
   FISCAL_MATERNIDAD_META, PERMISO_NACIMIENTO_2025, AMPLIACIONES_PERMISO, PRESTACION_NACIMIENTO_2025, DEDUCCION_MATERNIDAD_IRPF_2025,
   PLUSVALIA_MUNICIPAL_META, COEFICIENTES_IIVTNU_2025,
   FISCAL_DEPENDENCIA_META, GRADOS_DEPENDENCIA, PRESTACIONES_DEPENDENCIA_2025, COTIZACION_CUIDADOR_NO_PROFESIONAL_2025, DEDUCCIONES_IRPF_DISCAPACIDAD_2025,
+  FISCAL_CALENDARIO_META, CALENDARIO_FISCAL,
 } from '@/data/fiscal';
 
 /**
@@ -233,6 +234,15 @@ const DATASETS: Record<string, Dataset> = {
       cotizacionCuidador: COTIZACION_CUIDADOR_NO_PROFESIONAL_2025,
       deduccionesIRPFDiscapacidad: DEDUCCIONES_IRPF_DISCAPACIDAD_2025,
     },
+  },
+  'calendario-fiscal': {
+    meta: {
+      nombre: 'Calendario fiscal de España',
+      descripcion: 'Plazos recurrentes de presentación de los modelos tributarios (trimestrales, resúmenes anuales, Renta e Impuesto de Sociedades), con el perfil al que aplican.',
+      fuente: FISCAL_CALENDARIO_META.fuente, verificado: FISCAL_CALENDARIO_META.verificado, vigencia: FISCAL_CALENDARIO_META.vigencia,
+      urlOficial: FISCAL_CALENDARIO_META.urlOficial, paginaHumana: `${BASE}/datos-fiscales/calendario-fiscal`,
+    },
+    datos: { modelos: CALENDARIO_FISCAL },
   },
 };
 

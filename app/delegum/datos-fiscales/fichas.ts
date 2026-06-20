@@ -25,6 +25,7 @@ import {
   FISCAL_MATERNIDAD_META,
   PLUSVALIA_MUNICIPAL_META,
   FISCAL_DEPENDENCIA_META,
+  FISCAL_CALENDARIO_META,
 } from '@/data/fiscal';
 
 export interface Ficha {
@@ -52,7 +53,7 @@ export const FICHAS: Ficha[] = [
     titulo: 'Tipos de IVA en España',
     desc: 'General (21%), reducido (10%) y superreducido (4%) con ejemplos, exenciones y recargo de equivalencia.',
     verificado: FISCAL_IVA_META.verificado,
-    relacionadas: ['irpf-tramos-minimos', 'cuota-autonomos-reta', 'impuesto-sociedades'],
+    relacionadas: ['irpf-tramos-minimos', 'cuota-autonomos-reta', 'impuesto-sociedades', 'calendario-fiscal'],
   },
   {
     slug: 'smi-salario-minimo',
@@ -68,7 +69,7 @@ export const FICHAS: Ficha[] = [
     titulo: 'Cuota de autónomos (RETA)',
     desc: 'Tabla de cotización por ingresos reales 2026: tramos, base mínima y cuota mensual, más tarifa plana.',
     verificado: FISCAL_AUTONOMOS_META.verificado,
-    relacionadas: ['impuesto-sociedades', 'irpf-tramos-minimos', 'iva-tipos'],
+    relacionadas: ['impuesto-sociedades', 'irpf-tramos-minimos', 'iva-tipos', 'calendario-fiscal'],
   },
   {
     slug: 'itp-ccaa',
@@ -124,7 +125,7 @@ export const FICHAS: Ficha[] = [
     titulo: 'Tipos del Impuesto de Sociedades',
     desc: 'Tipo general, nueva creación, escala de microempresas (Ley 7/2024), cooperativas y obligaciones (modelos 200 y 202).',
     verificado: FISCAL_SOCIEDADES_META.verificado,
-    relacionadas: ['cuota-autonomos-reta', 'amortizacion-inmovilizado', 'iva-tipos'],
+    relacionadas: ['cuota-autonomos-reta', 'amortizacion-inmovilizado', 'iva-tipos', 'calendario-fiscal'],
   },
   {
     slug: 'iprem',
@@ -165,6 +166,14 @@ export const FICHAS: Ficha[] = [
     desc: 'Grados de dependencia, cuantías de prestaciones SAAD por grado, cotización del cuidador y deducciones IRPF.',
     verificado: FISCAL_DEPENDENCIA_META.verificado,
     relacionadas: ['iprem', 'permiso-prestacion-nacimiento', 'pensiones-jubilacion'],
+  },
+  {
+    slug: 'calendario-fiscal',
+    icon: '📅',
+    titulo: 'Calendario fiscal',
+    desc: 'Plazos recurrentes de los modelos trimestrales y anuales (303, 130, 111, 200…), la Renta y el Impuesto de Sociedades.',
+    verificado: FISCAL_CALENDARIO_META.verificado,
+    relacionadas: ['iva-tipos', 'cuota-autonomos-reta', 'impuesto-sociedades'],
   },
 ];
 

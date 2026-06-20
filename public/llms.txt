@@ -304,6 +304,7 @@ Fichas de datos (página humana + endpoint JSON):
 - [Permiso y prestación por nacimiento](https://delegum.com/datos-fiscales/permiso-prestacion-nacimiento/) — JSON: https://delegum.com/api/datos/permiso-prestacion-nacimiento/
 - [Plusvalía municipal (IIVTNU)](https://delegum.com/datos-fiscales/plusvalia-municipal/) — JSON: https://delegum.com/api/datos/plusvalia-municipal/
 - [Prestaciones por dependencia (SAAD)](https://delegum.com/datos-fiscales/prestaciones-dependencia/) — JSON: https://delegum.com/api/datos/prestaciones-dependencia/
+- [Calendario fiscal de España](https://delegum.com/datos-fiscales/calendario-fiscal/) — JSON: https://delegum.com/api/datos/calendario-fiscal/
 - Índice JSON de datasets: https://delegum.com/api/datos/
 
 Asistente IA (MCP): https://delegum.com/api/mcp/ (Claude, ChatGPT, Mistral). Más información: https://delegum.com/asistente-ia/
