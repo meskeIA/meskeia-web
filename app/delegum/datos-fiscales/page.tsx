@@ -176,9 +176,9 @@ export default function DatosFiscalesIndex() {
       </section>
 
       <p className={styles.foot}>
-        Estamos ampliando esta sección con más datos (IRPF, IVA, SMI, intereses…). Cada ficha se
-        genera desde la misma fuente que usan las calculadoras de meskeIA, por lo que se mantiene
-        siempre actualizada.
+        Cada ficha se genera desde la misma fuente que usan las calculadoras de meskeIA, con su
+        fuente oficial y su fecha de verificación a la vista. Consulta siempre la norma vigente antes
+        de tomar decisiones.
       </p>
     </main>
   );
