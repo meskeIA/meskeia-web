@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     'Plazos recurrentes de los modelos tributarios trimestrales y anuales (303, 130, 111, 115, 349, 200…), la campaña de la Renta y el Impuesto de Sociedades, con fuente oficial. Verificado el ' +
     FISCAL_CALENDARIO_META.verificado + '.',
   keywords:
-    'calendario fiscal, plazos modelo 303, plazos modelo 130, calendario del contribuyente, fechas declaraciones trimestrales, modelo 111, modelo 200, campaña de la renta, impuesto de sociedades plazo, calendario AEAT',
+    'calendario fiscal, plazos modelo 303, plazos modelo 130, calendario del contribuyente, fechas declaraciones trimestrales, modelo 111, modelo 200, modelo 714, declaración de patrimonio plazo, campaña de la renta, impuesto de sociedades plazo, calendario AEAT',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'Delegum',

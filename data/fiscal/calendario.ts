@@ -143,6 +143,14 @@ export const CALENDARIO_FISCAL: ModeloFiscal[] = [
     quien: 'Personas físicas contribuyentes del IRPF',
   },
   {
+    modelo: '714',
+    nombre: 'Impuesto sobre el Patrimonio',
+    categoria: 'renta-sociedades',
+    periodicidad: 'Anual (campaña)',
+    plazo: 'Misma campaña que la Renta: de abril a finales de junio. Se presenta junto a la declaración del IRPF.',
+    quien: 'Personas físicas obligadas a declarar Patrimonio (cuota a ingresar o bienes y derechos superiores a 2 M€)',
+  },
+  {
     modelo: '200',
     nombre: 'Impuesto sobre Sociedades (declaración anual)',
     categoria: 'renta-sociedades',

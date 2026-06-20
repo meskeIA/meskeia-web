@@ -97,8 +97,8 @@ export default function CalendarioFiscalPage() {
             <h1 className={styles.heroTitle}>Calendario fiscal</h1>
             <p className={styles.subtitle}>
               Los <strong>plazos recurrentes</strong> de los modelos tributarios en España —
-              trimestrales, resúmenes anuales, la Renta y el Impuesto de Sociedades— con el perfil
-              al que aplica cada uno.
+              trimestrales, resúmenes anuales, la Renta, el Patrimonio y el Impuesto de Sociedades—
+              con el perfil al que aplica cada uno.
             </p>
             <div className={styles.badge}>
               <span className={styles.badgeDot}></span>
@@ -138,12 +138,12 @@ export default function CalendarioFiscalPage() {
             <TablaModelos modelos={ANUALES} />
           </section>
 
-          {/* Renta y Sociedades */}
+          {/* Renta, Patrimonio y Sociedades */}
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>Renta y Sociedades</h2>
+            <h2 className={styles.sectionTitle}>Renta, Patrimonio y Sociedades</h2>
             <p className={styles.sectionIntro}>
-              Las dos grandes declaraciones anuales: la Renta de las personas físicas y el Impuesto
-              de Sociedades.
+              Las grandes declaraciones anuales: la Renta y el Patrimonio de las personas físicas
+              —que se presentan en la misma campaña— y el Impuesto de Sociedades.
             </p>
             <TablaModelos modelos={RENTA_SOCIEDADES} />
             <p className={styles.tableFoot}>
