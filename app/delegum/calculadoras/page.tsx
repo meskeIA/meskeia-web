@@ -20,7 +20,6 @@ const CALCULADORAS = [
   { icon: '📋', name: 'Gastos de compraventa', desc: 'ITP/IVA, notaría, registro y plusvalía del inmueble.', url: 'https://meskeia.com/estimador-compraventa-inmueble/', grupo: 'Vivienda' },
   { icon: '💰', name: 'Hipoteca', desc: 'Cuota y cuadro de amortización completo.', url: 'https://meskeia.com/estimador-hipoteca/', grupo: 'Vivienda' },
   { icon: '🏘️', name: 'Plusvalía municipal', desc: 'IIVTNU al vender o heredar: método objetivo vs real.', url: 'https://meskeia.com/estimador-plusvalia-municipal/', grupo: 'Vivienda' },
-  { icon: '📈', name: 'Plusvalía en el IRPF', desc: 'Ganancia por la venta en la base del ahorro del IRPF.', url: 'https://meskeia.com/estimador-plusvalias-irpf/', grupo: 'Vivienda' },
   // Jubilación y herencias
   { icon: '🏤', name: 'Jubilación pública', desc: 'Edad y pensión estimada con el sistema dual 2026.', url: 'https://meskeia.com/simulador-jubilacion-publica/', grupo: 'Jubilación y herencias' },
   { icon: '💍', name: 'Pensión de viudedad', desc: 'Porcentaje, base reguladora y mínimos 2025.', url: 'https://meskeia.com/estimador-pension-viudedad/', grupo: 'Jubilación y herencias' },
