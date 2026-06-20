@@ -151,6 +151,14 @@ export const CALENDARIO_FISCAL: ModeloFiscal[] = [
     quien: 'Personas físicas obligadas a declarar Patrimonio (cuota a ingresar o bienes y derechos superiores a 2 M€)',
   },
   {
+    modelo: '718',
+    nombre: 'Impuesto de Solidaridad de las Grandes Fortunas (ITSGF)',
+    categoria: 'renta-sociedades',
+    periodicidad: 'Anual',
+    plazo: 'Del 1 al 31 de julio, tras la campaña de la Renta y el Patrimonio.',
+    quien: 'Personas físicas con un patrimonio neto superior a 3 M€',
+  },
+  {
     modelo: '200',
     nombre: 'Impuesto sobre Sociedades (declaración anual)',
     categoria: 'renta-sociedades',
