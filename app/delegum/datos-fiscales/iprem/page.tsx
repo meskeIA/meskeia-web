@@ -7,6 +7,7 @@ import DisclaimerCard from '@/components/DisclaimerCard';
 import DataReference from '@/components/DataReference';
 import { IPREM_2026, FISCAL_IPREM_META } from '@/data/fiscal';
 import { formatCurrency, formatDate } from '@/lib';
+import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
 
 const URL_CANONICA = 'https://delegum.com/datos-fiscales/iprem/';
@@ -193,7 +194,9 @@ export default function IpremPage() {
             </div>
           </section>
 
-          {/* Pertenencia a meskeIA */}
+          <FichasRelacionadas slug="iprem" />
+
+          &
           <section className={styles.section}>
             <div className={styles.brandFoot}>
               <p>

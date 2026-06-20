@@ -105,6 +105,21 @@
   margin: 0 auto;
 }
 
+.link {
+  color: #16244C;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.link:hover {
+  color: #BE9A4E;
+}
+
+[data-theme='dark'] .link {
+  color: var(--accent);
+}
+
 /* Dark mode */
 [data-theme='dark'] .title {
   color: var(--text-primary);

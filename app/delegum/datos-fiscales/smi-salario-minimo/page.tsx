@@ -7,6 +7,7 @@ import DisclaimerCard from '@/components/DisclaimerCard';
 import DataReference from '@/components/DataReference';
 import { SMI_2026, SMI_2025, FISCAL_SMI_META } from '@/data/fiscal';
 import { formatCurrency, formatDate } from '@/lib';
+import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
 
 const URL_CANONICA = 'https://delegum.com/datos-fiscales/smi-salario-minimo/';
@@ -183,7 +184,9 @@ export default function SmiPage() {
             </div>
           </section>
 
-          {/* Pertenencia a meskeIA */}
+          <FichasRelacionadas slug="smi-salario-minimo" />
+
+          &
           <section className={styles.section}>
             <div className={styles.brandFoot}>
               <p>

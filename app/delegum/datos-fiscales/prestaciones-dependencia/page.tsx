@@ -13,6 +13,7 @@ import {
   FISCAL_DEPENDENCIA_META,
 } from '@/data/fiscal';
 import { formatCurrency, formatDate } from '@/lib';
+import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
 
 const URL_CANONICA = 'https://delegum.com/datos-fiscales/prestaciones-dependencia/';
@@ -272,7 +273,9 @@ export default function PrestacionesDependenciaPage() {
             </div>
           </section>
 
-          {/* Pertenencia a meskeIA */}
+          <FichasRelacionadas slug="prestaciones-dependencia" />
+
+          &
           <section className={styles.section}>
             <div className={styles.brandFoot}>
               <p>

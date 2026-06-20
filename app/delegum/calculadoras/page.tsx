@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
 import styles from './Calculadoras.module.css';
 
 export const metadata: Metadata = {
@@ -56,6 +57,10 @@ export default function CalculadorasPage() {
         ))}
       </section>
 
+      <p className={styles.foot}>
+        ¿Prefieres el dato en bruto?{' '}
+        <Link href="/datos-fiscales" className={styles.link}>Consulta las fichas de datos fiscales →</Link>
+      </p>
       <p className={styles.foot}>
         ¿Buscas otra herramienta?{' '}
         <a href="https://meskeia.com/apps/" className={styles.link}>Ver el catálogo completo en meskeIA →</a>

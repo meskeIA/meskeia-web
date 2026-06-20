@@ -13,6 +13,7 @@ import {
   FISCAL_INTERESES_META,
 } from '@/data/fiscal';
 import { formatDate } from '@/lib';
+import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
 
 const URL_CANONICA = 'https://delegum.com/datos-fiscales/interes-legal-demora/';
@@ -191,7 +192,9 @@ export default function InteresLegalDemoraPage() {
             </div>
           </section>
 
-          {/* Pertenencia a meskeIA */}
+          <FichasRelacionadas slug="interes-legal-demora" />
+
+          &
           <section className={styles.section}>
             <div className={styles.brandFoot}>
               <p>

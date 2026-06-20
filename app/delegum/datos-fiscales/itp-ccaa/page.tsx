@@ -7,6 +7,7 @@ import DisclaimerCard from '@/components/DisclaimerCard';
 import DataReference from '@/components/DataReference';
 import { TIPOS_ITP_CCAA_2025, FISCAL_INMUEBLES_META } from '@/data/fiscal';
 import { formatDate } from '@/lib';
+import FichasRelacionadas from '../FichasRelacionadas';
 import styles from './ItpCcaa.module.css';
 
 const URL_CANONICA = 'https://delegum.com/datos-fiscales/itp-ccaa/';
@@ -164,7 +165,9 @@ export default function ItpCcaaPage() {
             </div>
           </section>
 
-          {/* Pertenencia a meskeIA */}
+          <FichasRelacionadas slug="itp-ccaa" />
+
+          &
           <section className={styles.section}>
             <div className={styles.brandFoot}>
               <p>

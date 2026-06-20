@@ -13,6 +13,7 @@ import {
   FISCAL_PENSIONES_META,
 } from '@/data/fiscal';
 import { formatCurrency, formatDate } from '@/lib';
+import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
 
 const URL_CANONICA = 'https://delegum.com/datos-fiscales/pensiones-jubilacion/';
@@ -245,7 +246,9 @@ export default function PensionesJubilacionPage() {
             </div>
           </section>
 
-          {/* Pertenencia a meskeIA */}
+          <FichasRelacionadas slug="pensiones-jubilacion" />
+
+          &
           <section className={styles.section}>
             <div className={styles.brandFoot}>
               <p>

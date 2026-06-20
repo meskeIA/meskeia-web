@@ -11,6 +11,7 @@ import {
   FISCAL_AMORTIZACION_META,
 } from '@/data/fiscal';
 import { formatDate } from '@/lib';
+import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
 
 const URL_CANONICA = 'https://delegum.com/datos-fiscales/amortizacion-inmovilizado/';
@@ -201,7 +202,9 @@ export default function AmortizacionInmovilizadoPage() {
             </div>
           </section>
 
-          {/* Pertenencia a meskeIA */}
+          <FichasRelacionadas slug="amortizacion-inmovilizado" />
+
+          &
           <section className={styles.section}>
             <div className={styles.brandFoot}>
               <p>

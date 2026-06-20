@@ -13,6 +13,7 @@ import {
   FISCAL_IVA_META,
 } from '@/data/fiscal';
 import { formatDate } from '@/lib';
+import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
 
 const URL_CANONICA = 'https://delegum.com/datos-fiscales/iva-tipos/';
@@ -209,7 +210,9 @@ export default function IvaTiposPage() {
             </div>
           </section>
 
-          {/* Pertenencia a meskeIA */}
+          <FichasRelacionadas slug="iva-tipos" />
+
+          &
           <section className={styles.section}>
             <div className={styles.brandFoot}>
               <p>

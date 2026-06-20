@@ -13,6 +13,7 @@ import {
   FISCAL_MATERNIDAD_META,
 } from '@/data/fiscal';
 import { formatCurrency, formatDate } from '@/lib';
+import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
 
 const URL_CANONICA = 'https://delegum.com/datos-fiscales/permiso-prestacion-nacimiento/';
@@ -268,7 +269,9 @@ export default function PermisoPrestacionNacimientoPage() {
             </div>
           </section>
 
-          {/* Pertenencia a meskeIA */}
+          <FichasRelacionadas slug="permiso-prestacion-nacimiento" />
+
+          &
           <section className={styles.section}>
             <div className={styles.brandFoot}>
               <p>

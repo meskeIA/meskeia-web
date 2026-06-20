@@ -12,6 +12,7 @@ import {
   FISCAL_SOCIEDADES_META,
 } from '@/data/fiscal';
 import { formatCurrency, formatDate } from '@/lib';
+import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
 
 const URL_CANONICA = 'https://delegum.com/datos-fiscales/impuesto-sociedades/';
@@ -231,7 +232,9 @@ export default function ImpuestoSociedadesPage() {
             </div>
           </section>
 
-          {/* Pertenencia a meskeIA */}
+          <FichasRelacionadas slug="impuesto-sociedades" />
+
+          &
           <section className={styles.section}>
             <div className={styles.brandFoot}>
               <p>
