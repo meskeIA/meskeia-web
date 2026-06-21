@@ -95,6 +95,6 @@ Notas de fusión (decisión del autor): se unieron *Jubilación + Herencias* y *
 ### Fase 2 — redes de seguridad (posterior)
 - [ ] Buscador acotado al universo Delegum
 - [ ] Cross-linking contextual Delegum dentro de las herramientas
-- [ ] Campo `visualizadorUrl?` en `blog/posts.ts` (patrón Blog → Visualizador, ver §6) — al escribir el primer post que lo use
+- [x] Campo `visualizadorUrl?`/`visualizadorTitulo?` en `blog/posts.ts` + bloque "Para profundizar →" en la plantilla (commit 1cdd1f0d). Primer post: BCE → visualizador "Cómo Funciona un Banco".
 - [x] ~~Sección "Aprende"~~ → DESCARTADA; visualizadores vía Blog (§6)
 - [x] Dudas A/B/calendario de §7 → CERRADAS (2026-06-21); queda abierta solo "Puertas ↔ Guías"
