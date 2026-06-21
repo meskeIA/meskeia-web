@@ -29,9 +29,29 @@ export interface Post {
   fuenteUrl?: string;
   /** Slug de la ficha de datos-fiscales relacionada (opcional, enlazado interno). */
   fichaSlug?: string;
+  /** URL del visualizador interactivo de meskeIA para profundizar (opcional). */
+  visualizadorUrl?: string;
+  /** Título del visualizador, para el texto del enlace (opcional; si falta, texto genérico). */
+  visualizadorTitulo?: string;
 }
 
 export const POSTS: Post[] = [
+  {
+    slug: 'bce-sube-tipos-interes-junio-2026',
+    titulo: 'El BCE sube los tipos de interés un 0,25%',
+    fecha: '2026-06-21',
+    resumen:
+      'El Banco Central Europeo ha elevado sus tipos oficiales un 0,25%. Qué significa para hipotecas, préstamos, ahorro y euríbor, y por qué afecta a familias y empresas en España.',
+    cuerpo: [
+      'El 17 de junio de 2026, el Banco Central Europeo (BCE) elevó sus tipos de interés oficiales en 0,25 puntos. Subir o bajar esos tipos es la herramienta principal de su política monetaria: al cambiar el precio al que presta a los bancos, el BCE encarece o abarata el coste del dinero en el conjunto de la economía.',
+      'Cuando los tipos suben, ese encarecimiento se traslada en cadena a préstamos, hipotecas y financiación de empresas y familias. Los efectos más habituales son: hipotecas y préstamos más caros —sobre todo los de tipo variable—; menos consumo e inversión, porque financiarse cuesta más; una inflación que tiende a moderarse al enfriarse la demanda; un ahorro algo más rentable, aunque los depósitos suelen tardar en recoger la subida; y, a corto plazo, una posible desaceleración del crecimiento.',
+      'En España, el impacto más directo llega a través del euríbor, el tipo al que se prestan los bancos entre sí y la referencia de la mayoría de hipotecas variables. Cuando el BCE mueve sus tipos oficiales, el euríbor tiende a seguirlo, y con él la cuota mensual de quienes tienen una hipoteca a tipo variable o están a punto de firmarla.',
+      'Si quieres ver por dentro cómo un banco capta depósitos, presta ese dinero y gana margen con estos tipos, el visualizador interactivo de abajo lo explica paso a paso.',
+    ],
+    fuente: 'Banco Central Europeo (BCE)',
+    visualizadorUrl: 'https://meskeia.com/visualizador-como-funciona-banco/',
+    visualizadorTitulo: 'Cómo Funciona un Banco',
+  },
   {
     slug: 'delegum-ya-esta-en-marcha',
     titulo: 'Delegum ya está en marcha',

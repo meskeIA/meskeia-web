@@ -154,6 +154,17 @@
   margin: 0;
 }
 
+.profundizaBox {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  background: #f4f8fb;
+  border-left: 3px solid #16244C;
+  border-radius: 0 6px 6px 0;
+  padding: 0.7rem 1rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
 .volver {
   font-size: 0.9rem;
   margin: 0;
@@ -198,7 +209,8 @@
   border-bottom-color: #3a3a3a;
 }
 
-[data-theme='dark'] .fuenteBox {
+[data-theme='dark'] .fuenteBox,
+[data-theme='dark'] .profundizaBox {
   background: rgba(255, 255, 255, 0.03);
 }
 

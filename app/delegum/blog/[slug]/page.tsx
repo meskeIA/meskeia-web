@@ -102,6 +102,15 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             </Link>
           </p>
         )}
+
+        {post.visualizadorUrl && (
+          <p className={styles.profundizaBox}>
+            <span aria-hidden="true">🔎</span> Para profundizar:{' '}
+            <a href={post.visualizadorUrl} className={styles.link}>
+              {post.visualizadorTitulo ?? 'Ver el visualizador interactivo'} →
+            </a>
+          </p>
+        )}
       </article>
 
       <p className={styles.volver}>
