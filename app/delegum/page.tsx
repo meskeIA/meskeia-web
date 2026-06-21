@@ -23,11 +23,11 @@ const PILARES = [
     cta: 'Conectar',
   },
   {
-    icon: '🧮',
-    titulo: 'Calculadoras',
-    desc: 'Selección de calculadoras de fiscalidad, derecho laboral y finanzas para hacer el número tú mismo.',
-    href: '/calculadoras',
-    cta: 'Calcular',
+    icon: '🧭',
+    titulo: 'Soluciones',
+    desc: 'Entra por tu situación —trabajo, vivienda, ahorro, jubilación, familia o tu negocio— y te llevamos a la herramienta que resuelve tu caso.',
+    href: '/soluciones',
+    cta: 'Resolver',
   },
   {
     icon: '🗺️',
@@ -103,7 +103,7 @@ export default function DelegumHome() {
             Delegum reúne en una sola marca todo lo que necesitas para entender la fiscalidad,
             el derecho laboral y las finanzas en España: una <strong>capa de datos normativos</strong>{' '}
             verificados y citables, un <strong>asistente de IA</strong> que orquesta los cálculos
-            para orientarte en cada caso, una <strong>selección de calculadoras</strong> y{' '}
+            para orientarte en cada caso, <strong>soluciones organizadas por tu situación</strong> y{' '}
             <strong>guías paso a paso</strong> para las decisiones completas. Es un
             servicio de <a href="https://meskeia.com/" className={styles.link}>meskeIA</a> y comparte
             su compromiso: herramientas claras, gratuitas y sin recopilar datos personales.

@@ -34,6 +34,14 @@ export function proxy(req: NextRequest) {
     return NextResponse.next();
   }
 
+  // Renombrado 2026-06-21: "Calculadoras" → "Soluciones". Redirect permanente de
+  // la ruta antigua (preserva enlaces externos y la URL ya indexada).
+  if (pathname === '/calculadoras' || pathname === '/calculadoras/') {
+    const url = req.nextUrl.clone();
+    url.pathname = '/soluciones/';
+    return NextResponse.redirect(url, 301);
+  }
+
   // Rutas limpias → reescritura interna a /delegum/*. Normalizamos a barra final
   // (el proyecto usa trailingSlash: true) para que el destino coincida con la
   // página estática y no dispare un redirect interno.
@@ -52,6 +60,8 @@ export const config = {
     '/datos-fiscales/:path*',
     '/asistente-ia',
     '/asistente-ia/',
+    '/soluciones',
+    '/soluciones/',
     '/calculadoras',
     '/calculadoras/',
     '/guias',

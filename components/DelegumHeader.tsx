@@ -42,7 +42,7 @@ export default function DelegumHeader() {
         <nav className={styles.nav} aria-label="Secciones de Delegum">
           <Link href="/datos-fiscales" className={styles.navLink}>Datos fiscales</Link>
           <Link href="/asistente-ia" className={styles.navLink}>Asistente IA</Link>
-          <Link href="/calculadoras" className={styles.navLink}>Calculadoras</Link>
+          <Link href="/soluciones" className={styles.navLink}>Soluciones</Link>
           <Link href="/guias" className={styles.navLink}>Guías</Link>
           <Link href="/glosario" className={styles.navLink}>Glosario</Link>
           <Link href="/blog" className={styles.navLink}>Blog</Link>

@@ -83,7 +83,7 @@ export default function GuiasPage() {
         ¿Buscas un dato o un cálculo concreto?{' '}
         <Link href="/datos-fiscales" className={styles.link}>Datos fiscales</Link>
         {' · '}
-        <Link href="/calculadoras" className={styles.link}>Calculadoras</Link>
+        <Link href="/soluciones" className={styles.link}>Soluciones</Link>
       </p>
     </main>
   );

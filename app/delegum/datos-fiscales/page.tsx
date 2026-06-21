@@ -49,7 +49,7 @@ export default function DatosFiscalesIndex() {
       </p>
       <p className={styles.foot}>
         ¿Prefieres hacer el número o ver el proceso completo?{' '}
-        <Link href="/calculadoras" className={styles.link}>Calculadoras</Link>
+        <Link href="/soluciones" className={styles.link}>Soluciones</Link>
         {' · '}
         <Link href="/guias" className={styles.link}>Guías</Link>
       </p>

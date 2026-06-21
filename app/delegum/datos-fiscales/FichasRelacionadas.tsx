@@ -5,7 +5,7 @@ import styles from './Ficha.module.css';
 /**
  * Bloque de enlazado interno al pie de cada ficha de Datos Fiscales:
  *  - 2-4 fichas relacionadas del mismo clúster temático.
- *  - vuelta al índice de datos fiscales + cruce a Calculadoras.
+ *  - vuelta al índice de datos fiscales + cruce a Soluciones.
  *
  * Convierte las fichas (antes hojas sueltas que solo enlazaban a meskeIA) en un
  * clúster temático enlazado, reforzando rastreo, autoridad temática y descubrimiento.
@@ -28,7 +28,7 @@ export default function FichasRelacionadas({ slug }: { slug: string }) {
       <p className={styles.volverIndice}>
         <Link href="/datos-fiscales" className={styles.link}>← Todas las fichas de datos fiscales</Link>
         {' · '}
-        <Link href="/calculadoras" className={styles.link}>Ir a las calculadoras →</Link>
+        <Link href="/soluciones" className={styles.link}>Ir a las soluciones →</Link>
       </p>
     </section>
   );

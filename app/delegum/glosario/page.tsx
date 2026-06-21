@@ -86,7 +86,7 @@ export default function GlosarioPage() {
         ¿Buscas un dato, un cálculo o un proceso completo?{' '}
         <Link href="/datos-fiscales" className={styles.link}>Datos fiscales</Link>
         {' · '}
-        <Link href="/calculadoras" className={styles.link}>Calculadoras</Link>
+        <Link href="/soluciones" className={styles.link}>Soluciones</Link>
         {' · '}
         <Link href="/guias" className={styles.link}>Guías</Link>
       </p>
