@@ -40,6 +40,92 @@
   margin: 0 auto;
 }
 
+/* ── Buscador acotado ───────────────────────────────────────────────────── */
+.buscador {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.buscadorInput {
+  width: 100%;
+  font-size: 1rem;
+  font-family: inherit;
+  padding: 0.85rem 1.1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.buscadorInput::placeholder {
+  color: var(--text-muted);
+}
+
+.buscadorInput:focus-visible {
+  outline: 2px solid #16244C;
+  outline-offset: 1px;
+  border-color: #16244C;
+}
+
+.resultados {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0.35rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.resultadoItem {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #16244C;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.resultadoItem:hover {
+  background: #f4f8fb;
+  color: #BE9A4E;
+}
+
+.resultadoItem:focus-visible {
+  outline: 2px solid #16244C;
+  outline-offset: -2px;
+}
+
+.resultadoIcon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.resultadoVacio {
+  padding: 0.6rem 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .buscadorInput,
+[data-theme='dark'] .resultados {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .resultadoItem {
+  color: var(--accent);
+}
+
+[data-theme='dark'] .resultadoItem:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
 /* ── Índice de puertas (triaje) ─────────────────────────────────────────── */
 .indice {
   display: flex;

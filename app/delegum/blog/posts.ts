@@ -48,7 +48,9 @@ export const POSTS: Post[] = [
       'En España, el impacto más directo llega a través del euríbor, el tipo al que se prestan los bancos entre sí y la referencia de la mayoría de hipotecas variables. Cuando el BCE mueve sus tipos oficiales, el euríbor tiende a seguirlo, y con él la cuota mensual de quienes tienen una hipoteca a tipo variable o están a punto de firmarla.',
       'Si quieres ver por dentro cómo un banco capta depósitos, presta ese dinero y gana margen con estos tipos, el visualizador interactivo de abajo lo explica paso a paso.',
     ],
-    fuente: 'Banco Central Europeo (BCE)',
+    fuente: 'Banco Central Europeo (BCE) — comunicado vía Banco de España',
+    fuenteUrl:
+      'https://www.bde.es/f/webbe/GAP/Secciones/SalaPrensa/ComunicadosBCE/DecisionesPoliticaMonetaria/26/mp260611.pdf',
     visualizadorUrl: 'https://meskeia.com/visualizador-como-funciona-banco/',
     visualizadorTitulo: 'Cómo Funciona un Banco',
   },

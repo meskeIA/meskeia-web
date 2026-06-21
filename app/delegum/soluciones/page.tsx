@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { applicationsDatabase } from '@/data/applications';
 import { PUERTAS, type Puerta } from '@/data/delegum/soluciones';
+import BuscadorSoluciones, { type ItemBuscador } from './BuscadorSoluciones';
 import styles from './Soluciones.module.css';
 
 export const metadata: Metadata = {
@@ -40,9 +41,35 @@ function resolverApps(puerta: Puerta): AppResuelta[] {
   });
 }
 
+const normalize = (s: string): string =>
+  s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
+// Índice de búsqueda acotado al universo Delegum (las apps de las 6 puertas,
+// deduplicadas). Se construye en el servidor y se pasa al buscador cliente.
+function construirIndice(): ItemBuscador[] {
+  const vistos = new Set<string>();
+  const out: ItemBuscador[] = [];
+  for (const puerta of PUERTAS) {
+    for (const a of puerta.apps) {
+      if (vistos.has(a.url)) continue;
+      const meta = META_BY_URL.get(a.url);
+      if (!meta) continue;
+      vistos.add(a.url);
+      out.push({
+        name: meta.name,
+        icon: meta.icon,
+        href: `${MESKEIA}${a.url}`,
+        hay: normalize(`${meta.name} ${meta.description} ${meta.keywords.join(' ')}`),
+      });
+    }
+  }
+  return out;
+}
+
 export default function SolucionesPage() {
   const particular = PUERTAS.filter((p) => p.grupo === 'particular');
   const profesional = PUERTAS.filter((p) => p.grupo === 'profesional');
+  const indice = construirIndice();
 
   return (
     <main className={styles.container}>
@@ -50,12 +77,12 @@ export default function SolucionesPage() {
         <p className={styles.kicker}>Delegum · Soluciones</p>
         <h1 className={styles.title}>¿Qué necesitas resolver?</h1>
         <p className={styles.subtitle}>
-          Entra por tu situación y te llevamos a las herramientas que resuelven tu caso. ¿No
-          encuentras la tuya? Pregunta al{' '}
-          <Link href="/asistente-ia" className={styles.link}>asistente de IA</Link>, que conoce
-          todo el catálogo.
+          ¿Sabes qué necesitas? Búscalo aquí. Si no, entra por tu situación y te llevamos a la
+          herramienta que resuelve tu caso.
         </p>
       </header>
+
+      <BuscadorSoluciones items={indice} />
 
       {/* Índice de puertas (el "triaje": eliges tu situación) */}
       <nav className={styles.indice} aria-label="Situaciones">
