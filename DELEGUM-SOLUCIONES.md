@@ -63,7 +63,7 @@ Notas de fusión (decisión del autor): se unieron *Jubilación + Herencias* y *
 
 ## 6. Exclusiones aplicadas (defaults v1)
 
-- **Visualizadores educativos (~35)** → fuera de Soluciones; futura sección **"Aprende"** (fase 2). Siguen accesibles vía buscador/asistente/cross-link.
+- **Visualizadores educativos (~35)** → fuera de Soluciones. Sección **"Aprende" DESCARTADA (2026-06-21)**: Delegum es *resolver*, no *aprender* (eso ya lo cubren Glosario + Guías en su justa medida); un 7º pilar habría desenfocado la marca y recargado el nav. **Vía elegida: patrón Blog → Visualizador** — cada post quincenal puede enlazar "para profundizar →" al visualizador del tema (p.ej. post BCE → visualizador "Tipos de Interés BCE"). Descubrimiento contextual; el post es el gancho de actualidad (caduca), el visualizador la profundidad perenne. **No requieren tag, ni data file, ni página**: se referencian ad hoc desde el post. Fineza pendiente: añadir campo opcional `visualizadorUrl?` (gemelo de `fichaSlug?`) en `blog/posts.ts` para un bloque "profundiza" estructurado — implementar el día del primer post que lo use.
 - **Salud (E)**: colesterol, tensión, osteoporosis, fragilidad, chequeos, movilidad, adaptacion-hogar → fuera (la etiqueta legal-fiscal parece arrastre por dependencia).
 - **Legal puro no fiscal (F)**: costas-judiciales, contrato-mercantil, justicia-gratuita, plazos-legales, constitucion-asociacion → fuera v1.
 - **Becas/estudio (G)**: orientador-becas-ayudas-estudio → fuera v1.
@@ -92,8 +92,9 @@ Notas de fusión (decisión del autor): se unieron *Jubilación + Herencias* y *
 - [ ] `npm run build` OK + commit/push
 - [ ] Actualizar memoria
 
-### Fase 2 — redes de seguridad y "Aprende" (posterior)
+### Fase 2 — redes de seguridad (posterior)
 - [ ] Buscador acotado al universo Delegum
 - [ ] Cross-linking contextual Delegum dentro de las herramientas
-- [ ] Sección "Aprende" (hogar de los ~35 visualizadores)
-- [ ] Resolver dudas A/B/C de §7
+- [ ] Campo `visualizadorUrl?` en `blog/posts.ts` (patrón Blog → Visualizador, ver §6) — al escribir el primer post que lo use
+- [x] ~~Sección "Aprende"~~ → DESCARTADA; visualizadores vía Blog (§6)
+- [x] Dudas A/B/calendario de §7 → CERRADAS (2026-06-21); queda abierta solo "Puertas ↔ Guías"
