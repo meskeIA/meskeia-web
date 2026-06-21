@@ -59,7 +59,7 @@ Notas de fusión (decisión del autor): se unieron *Jubilación + Herencias* y *
 **5 · Familia**: estimacion-prestacion-nacimiento · estimacion-deduccion-maternidad · estimacion-prestaciones-dependencia · orientador-grado-dependencia · orientador-discapacidad · estimacion-deduccion-discapacidad · residencia-vs-cuidado-en-casa · checklist-tramites-dependencia · impuestos-divorcio · orientador-ayudas-personas-familias
 > Excluido por el autor: `planificador-gastos-bebe` (planificación de gasto doméstico, no prestación/fiscalidad).
 
-**6 · Mi actividad o negocio**: estimador-cuota-autonomo · orientador-iva-espana · orientador-gastos-deducibles · orientador-facturacion-retencion · selector-regimen-fiscal-autonomo · simulador-modulos-vs-directa · generador-facturas · orientador-tarifa-freelance · planificador-trimestres-freelance · asistente-alta-autonomo · checklist-preparar-verifactu · calendario-fiscal-emprendedor · comparador-autonomo-vs-sl · comparador-formas-juridicas · asistente-constitucion-sociedad · analizador-ratios-financieros · calculadora-valoracion-empresa · simulador-contabilidad-basica · simulador-financiacion-empresarial · orientador-ayudas-autonomos-pymes · calculadora-amortizacion-inmovilizado · estimador-tir-van · calculadora-z-score-altman
+**6 · Mi actividad o negocio**: estimador-cuota-autonomo · orientador-iva-espana · orientador-gastos-deducibles · orientador-facturacion-retencion · selector-regimen-fiscal-autonomo · simulador-modulos-vs-directa · generador-facturas · orientador-tarifa-freelance · planificador-trimestres-freelance · asistente-alta-autonomo · checklist-preparar-verifactu · comparador-autonomo-vs-sl · comparador-formas-juridicas · asistente-constitucion-sociedad · analizador-ratios-financieros · calculadora-valoracion-empresa · simulador-contabilidad-basica · simulador-financiacion-empresarial · orientador-ayudas-autonomos-pymes · calculadora-amortizacion-inmovilizado · estimador-tir-van · calculadora-z-score-altman
 
 ## 6. Exclusiones aplicadas (defaults v1)
 
@@ -69,14 +69,15 @@ Notas de fusión (decisión del autor): se unieron *Jubilación + Herencias* y *
 - **Becas/estudio (G)**: orientador-becas-ayudas-estudio → fuera v1.
 - **Lifestyle financiero (H)**: comparador-coste-vida, planificador-gastos-bebe, estimador-reformas-hogar, simulador-placas-solares → fuera.
 - **Duplicado simple vs profundo**: `calculadora-iva` (simple) fuera; `orientador-iva-espana` (profundo) dentro. Regla general: el tag va a la app profunda/España-específica; la simple/universal se queda en meskeIA.
+- **`calendario-fiscal-emprendedor`** → **fuera (decidido 2026-06-21)**: la app no está depurada (pendiente de migrarla a la misma base de datos que la ficha) y ya existe la **ficha oficial de Datos fiscales** (`calendario-fiscal`), mejor y más actualizada. Tenerla a medias en Soluciones resta. Reevaluar si algún día se depura.
 
-## 7. Dudas ABIERTAS (a resolver "sobre la marcha")
+## 7. Dudas — estado
 
-- **A · Duplicados** aún sin cerrar: estimador-irpf vs simulador-irpf-tramos/mito · orientador-alquiler-vs-compra vs selector-alquiler-vs-compra · selector-forma-juridica vs comparador-formas-juridicas · estimador-inversiones vs selector-inversiones vs estimador-cartera-inversion · selector-financiacion-empresa vs simulador-financiacion-empresarial · test-perfil-inversor vs test-tolerancia-riesgo-detallado · impuestos-divorcio vs estimador-costes-divorcio.
-- **B · Bloque SEGUROS** (~10 apps): sin puerta natural en el esquema de 6 → **excluido v1**. ¿Se abraza (¿nueva puerta? ¿repartido?) o se deja fuera?
-- **C · Granularidad inmuebles**: garaje/trastero/nave-industrial → fuera v1 (solo el genérico); accesibles por buscador.
-- **Posible duplicación entre superficies**: `calendario-fiscal-emprendedor` y `estimador-smi` podrían existir ya como *fichas de Datos fiscales* → enlazar, no repetir.
-- **Armonización Puertas ↔ Guías**: ambas entran "por situación"; revisar relación en fase posterior.
+- **A · Duplicados** → **CERRADA (2026-06-21)**: la selección actual se confirma como la más idónea. No se duplica con apps similares (irpf-tramos/mito, selector-alquiler-vs-compra, selector-forma-juridica, cluster inversión, tolerancia-riesgo-detallado, costes-divorcio) ni se sustituye ninguna. Las integradas se quedan.
+- **B · Bloque SEGUROS** (~10 apps) → **CERRADA: fuera (2026-06-21)**. Son orientadores/selectores no determinantes; además el mundo seguros (como el legal puro) tiene "trampas" en los condicionados que no se dominan → riesgo reputacional que no compensa. No reproponer salvo decisión expresa.
+- **C · Granularidad inmuebles**: garaje/trastero/nave-industrial → fuera v1 (solo el genérico); accesibles por buscador. *(sin cambio)*
+- **`calendario-fiscal-emprendedor`** → **CERRADA: eliminada de Soluciones** (ver §6). `estimador-smi` se mantiene (la ficha es el dato, la app calcula — superficies distintas, sin solape problemático).
+- **Armonización Puertas ↔ Guías**: ambas entran "por situación"; revisar relación en fase posterior. *(abierta, fase 2)*
 
 ## 8. Checklist de implementación
 

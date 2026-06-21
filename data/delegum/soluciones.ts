@@ -164,7 +164,6 @@ export const PUERTAS: Puerta[] = [
       { url: '/planificador-trimestres-freelance/' },
       { url: '/asistente-alta-autonomo/' },
       { url: '/checklist-preparar-verifactu/' },
-      { url: '/calendario-fiscal-emprendedor/' },
       { url: '/comparador-autonomo-vs-sl/', desc: 'Tributar por IRPF como autónomo o por Sociedades.' },
       { url: '/comparador-formas-juridicas/' },
       { url: '/asistente-constitucion-sociedad/' },
