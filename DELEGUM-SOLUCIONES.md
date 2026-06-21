@@ -93,8 +93,8 @@ Notas de fusión (decisión del autor): se unieron *Jubilación + Herencias* y *
 - [ ] Actualizar memoria
 
 ### Fase 2 — redes de seguridad (posterior)
-- [ ] Buscador acotado al universo Delegum
-- [ ] Cross-linking contextual Delegum dentro de las herramientas
+- [x] Buscador acotado al universo Delegum (commit 39955556): `BuscadorSoluciones.tsx` (cliente) en `/soluciones`, índice de las ~84 apps construido en servidor, filtro substring por tokens, top 6 → meskeia.com. Subtítulo reescrito; eliminado el enlace engañoso al Asistente IA.
+- [ ] Cross-linking contextual Delegum dentro de las herramientas — **el único pendiente real; es el invasivo (toca ~84 apps de meskeIA + cruza la frontera de marca). Proyecto aparte.**
 - [x] Campo `visualizadorUrl?`/`visualizadorTitulo?` en `blog/posts.ts` + bloque "Para profundizar →" en la plantilla (commit 1cdd1f0d). Primer post: BCE → visualizador "Cómo Funciona un Banco".
 - [x] ~~Sección "Aprende"~~ → DESCARTADA; visualizadores vía Blog (§6)
 - [x] Dudas A/B/calendario de §7 → CERRADAS (2026-06-21); queda abierta solo "Puertas ↔ Guías"
