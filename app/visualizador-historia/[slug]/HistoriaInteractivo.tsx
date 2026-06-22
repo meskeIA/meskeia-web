@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, type ReactNode } from 'react';
 import styles from './Historia.module.css';
 import type { HistoriaData, HitoHistoria } from '@/data/historias/types';
 import {
@@ -103,7 +103,17 @@ function PanelDetalle({
 // Componente principal
 // ─────────────────────────────────────────
 
-export default function HistoriaInteractivo({ data }: { data: HistoriaData }) {
+export default function HistoriaInteractivo({
+  data,
+  marca = 'meskeia',
+  topSlot,
+}: {
+  data: HistoriaData;
+  /** 'meskeia' (por defecto) renderiza el chrome de meskeIA; 'cronicum' lo omite
+   *  (la cabecera/footer las pone el layout de Cronicum) y usa `topSlot` arriba. */
+  marca?: 'meskeia' | 'cronicum';
+  topSlot?: ReactNode;
+}) {
   const [tab, setTab] = useState<Tab>('timeline');
   const [seleccionado, setSeleccionado] = useState<HitoHistoria | null>(null);
   const [detalleIdx, setDetalleIdx] = useState(0);
@@ -178,7 +188,7 @@ export default function HistoriaInteractivo({ data }: { data: HistoriaData }) {
 
   return (
     <div className={styles.container}>
-      <MeskeiaLogo />
+      {marca === 'cronicum' ? topSlot : <MeskeiaLogo />}
 
       <header className={styles.hero}>
         <h1 className={styles.heroTitle}>{data.titulo}</h1>
@@ -188,7 +198,7 @@ export default function HistoriaInteractivo({ data }: { data: HistoriaData }) {
         </div>
       </header>
 
-      <LegalNotice />
+      {marca === 'meskeia' && <LegalNotice />}
 
       <div className={styles.main}>
 
@@ -691,9 +701,13 @@ export default function HistoriaInteractivo({ data }: { data: HistoriaData }) {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps(appKey)} />
-        <ShareCard appName={appKey} />
-        <Footer appName={appKey} />
+        {marca === 'meskeia' && (
+          <>
+            <RelatedApps apps={getRelatedApps(appKey)} />
+            <ShareCard appName={appKey} />
+            <Footer appName={appKey} />
+          </>
+        )}
       </div>
     </div>
   );

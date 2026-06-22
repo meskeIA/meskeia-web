@@ -1,0 +1,43 @@
+/* Migas de pan de cronología — terracota #A24B2A */
+
+.migas {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 4.9rem 1.5rem 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.link {
+  color: #A24B2A;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link:hover {
+  color: #C9742E;
+  text-decoration: underline;
+}
+
+.sep {
+  color: var(--text-muted);
+}
+
+.actual {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .link {
+  color: #E0A06A;
+}
+
+@media (max-width: 600px) {
+  .migas {
+    padding-top: 4.4rem;
+    font-size: 0.82rem;
+  }
+}

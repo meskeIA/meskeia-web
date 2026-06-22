@@ -1,9 +1,11 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getHistoria, getAllHistoriaSlugs } from '@/data/historias/index';
-import { getPuerta, getAllPuertaSlugs } from '@/data/cronicum/puertas';
+import { getPuerta, getAllPuertaSlugs, getPuertaDeCronologia } from '@/data/cronicum/puertas';
+import AnalyticsTracker from '@/components/AnalyticsTracker';
 import HistoriaInteractivo from '../../visualizador-historia/[slug]/HistoriaInteractivo';
 import PuertaView, { type CronologiaItem } from './PuertaView';
+import Migas from './Migas';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -76,8 +78,19 @@ export default async function Page({ params }: Props) {
     return <PuertaView puerta={puerta} items={items} />;
   }
 
-  // 2) ¿Es una cronología? → mismo visualizador interactivo, bajo la marca Cronicum.
+  // 2) ¿Es una cronología? → mismo visualizador interactivo, bajo la marca Cronicum
+  //    (sin chrome de meskeIA) + migas de pan Cronicum / Puerta / Cronología.
   const data = getHistoria(slug);
   if (!data) notFound();
-  return <HistoriaInteractivo data={data} />;
+  const puertaDe = getPuertaDeCronologia(slug);
+  return (
+    <>
+      <AnalyticsTracker appName={`cronicum-${slug}`} />
+      <HistoriaInteractivo
+        data={data}
+        marca="cronicum"
+        topSlot={<Migas puerta={puertaDe} titulo={data.titulo} />}
+      />
+    </>
+  );
 }

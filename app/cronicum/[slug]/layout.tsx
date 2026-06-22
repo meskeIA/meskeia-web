@@ -1,5 +1,5 @@
 import { getHistoria } from '@/data/historias/index';
-import { getPuerta } from '@/data/cronicum/puertas';
+import { getPuerta, getPuertaDeCronologia } from '@/data/cronicum/puertas';
 
 interface Props {
   children: React.ReactNode;
@@ -64,12 +64,27 @@ export default async function Layout({ children, params }: Props) {
       }
     : null;
 
+  // Migas de pan estructuradas: Cronicum / [Puerta] / [Cronología].
+  const puertaDe = getPuertaDeCronologia(slug);
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Cronicum', item: 'https://cronicum.com/' },
+      ...(puertaDe
+        ? [{ '@type': 'ListItem', position: 2, name: puertaDe.titulo, item: `https://cronicum.com/${puertaDe.slug}/` }]
+        : []),
+      { '@type': 'ListItem', position: puertaDe ? 3 : 2, name: data.titulo, item: url },
+    ],
+  };
+
   return (
     <>
       <script type="application/ld+json">{JSON.stringify(webAppJsonLd)}</script>
       {faqJsonLd && (
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
       )}
+      <script type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</script>
       {children}
     </>
   );
