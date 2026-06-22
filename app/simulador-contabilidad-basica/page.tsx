@@ -233,9 +233,9 @@ export default function SimuladorContabilidadBasicaPage() {
 
       <DisclaimerCard
         variant="financial"
-        severity="medium"
+        severity="high"
         context="simulador-contabilidad-basica"
-        collapsible={true}
+        collapsible={false}
       />
 
       {/* Tabs de navegación */}

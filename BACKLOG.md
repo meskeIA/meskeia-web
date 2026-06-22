@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
-> **Última actualización**: 2026-06-17
-> **Apps totales**: 868 (carpetas en app/) · 999 entradas en ai-index (incluye rutas dinámicas) | **Suites**: 13
+> **Última actualización**: 2026-06-22
+> **Apps totales**: 882 (carpetas en app/) · 1013 entradas en ai-index (incluye rutas dinámicas) | **Suites**: 13
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
@@ -59,6 +59,12 @@
 - [ ] **npm audit: vuln `uuid/exceljs` moderate pendiente** — `exceljs >=3.5.0` depende de `uuid <11.1.1` (GHSA-w5hq-g745-h8pq, buffer bounds check). Fix requiere `npm audit fix --force` con downgrade a `exceljs@3.4.0` (breaking change desde 4.4.0). Riesgo bajo para nuestro uso (lectura/escritura Excel, no generación UUID con buf). Pospuesto hasta que exceljs publique versión >=4.x con uuid corregido. *(detectado: 2026-05-25)*
 
 - [x] **npm audit: vuln `hono` moderate REAPARECIDA — corregida** — 4 CVEs moderados en `hono@4.12.18` (IP restriction bypass IPv6, Set-Cookie injection en cookie helper, JWT middleware acepta cualquier scheme, `app.mount()` enrutado incorrecto con paths percent-encoded). Llegaba transitivamente vía `@modelcontextprotocol/sdk@1.29.0` → `@hono/node-server`. Ya se había resuelto el 2026-05-11 (mismo patrón de reaparición que `brace-expansion` en 2026-05-17). Corregida con `npm audit fix` sin --force — solo `package-lock.json` modificado, build 1.161 páginas OK. De 5 a 4 vuln moderadas (las 4 restantes son deuda aceptada / ya trackeadas). *(detectado y resuelto: 2026-06-08)*
+
+- [x] **npm audit: `dompurify` moderate REAPARECIDA — corregida** — Auditoría 2026-06-22: `dompurify <=3.4.10` (GHSA-cmwh-pvxp-8882, `ALLOWED_ATTR` pollution vía `setConfig()`, fix incompleto del parche 3.4.7). Reaparición transitiva (mismo patrón que `hono`/`brace-expansion`). Corregida con `npm audit fix` sin --force — solo `package-lock.json` modificado, build 1.340 páginas OK. De 5 a 4 vuln moderadas (las 4 restantes son deuda aceptada: 3 postcss vía Next + 1 uuid/exceljs ya trackeada). *(detectado y resuelto: 2026-06-22)*
+
+- [x] **Disclaimers: 2 apps infra-protegidas corregidas** — `analizador-ratios-financieros` y `simulador-contabilidad-basica` (ambas suites `[estudiantes, finanzas, freelance]` → Nivel 2/high): `severity="medium" collapsible={true}` → `severity="high" collapsible={false}`. Detectadas por `audit-disclaimers.mjs --solo-criticos`. Build 1.340 páginas OK. *(detectado y resuelto: 2026-06-22)*
+
+> Nota: `simulador-financiacion-empresarial` (suites `[finanzas, freelance]` → nivel esperado 2/high) usa `severity="critical"`. El script lo marca como "urgente" mecánicamente (critical > high), pero es **sobre-protección** (excede el mínimo de DISCLAIMER-POLICY.md, sin riesgo legal) — no constituye infra-protección. No rebajar sin decisión explícita del usuario; no reabrir en audits rutinarias.
 
 - [x] **npm audit: `ws` + `hono` high + `@babel/core` + `dompurify` corregidas** — Auditoría 2026-06-17: 8 vuln (2 high, 5 moderate, 1 low) → 4 moderate. `npm audit fix` sin --force resolvió `ws@7.x` (Memory exhaustion DoS, GHSA-96hv-2xvq-fx4p), `hono` (Path traversal Windows %5C + 4 CVEs más, reaparición transitoria vía MCP SDK), `@babel/core` (Arbitrary File Read sourceMappingURL) y `dompurify` (7 CVEs IN_PLACE/XSS). Solo `package-lock.json` modificado, build 1.300 páginas OK. Las 4 moderate restantes son deuda aceptada (postcss vía Next) + `uuid/exceljs` ya trackeada. *(detectado y resuelto: 2026-06-17)*
 

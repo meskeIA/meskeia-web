@@ -472,9 +472,9 @@ export default function AnalizadorRatiosFinancierosPage() {
 
       <DisclaimerCard
         variant="financial"
-        severity="medium"
+        severity="high"
         context="analizador-ratios-financieros"
-        collapsible={true}
+        collapsible={false}
       />
 
       {/* ── Panel de datos ── */}
