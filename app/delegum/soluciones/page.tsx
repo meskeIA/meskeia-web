@@ -13,7 +13,10 @@ export const metadata: Metadata = {
 };
 
 // Las herramientas viven físicamente en meskeia.com; Delegum enlaza en absoluto.
+// El parámetro ?from=delegum permite atribuir en el Analytics de meskeIA el
+// tráfico que llega desde Delegum (lo recoge AnalyticsTracker en datos_adicionales).
 const MESKEIA = 'https://meskeia.com';
+const FROM = '?from=delegum';
 
 // Índice de metadatos por URL canónica para resolver nombre/icono/descripción
 // sin duplicarlos (fuente única: data/applications.ts).
@@ -35,7 +38,7 @@ function resolverApps(puerta: Puerta): AppResuelta[] {
         icon: meta.icon,
         name: meta.name,
         desc: a.desc ?? meta.description,
-        href: `${MESKEIA}${a.url}`,
+        href: `${MESKEIA}${a.url}${FROM}`,
       },
     ];
   });
@@ -58,7 +61,7 @@ function construirIndice(): ItemBuscador[] {
       out.push({
         name: meta.name,
         icon: meta.icon,
-        href: `${MESKEIA}${a.url}`,
+        href: `${MESKEIA}${a.url}${FROM}`,
         hay: normalize(`${meta.name} ${meta.description} ${meta.keywords.join(' ')}`),
       });
     }
@@ -151,7 +154,7 @@ export default function SolucionesPage() {
       </p>
       <p className={styles.foot}>
         ¿Buscas otra herramienta?{' '}
-        <a href="https://meskeia.com/apps/" className={styles.link}>Ver el catálogo completo en meskeIA →</a>
+        <a href="https://meskeia.com/apps/?from=delegum" className={styles.link}>Ver el catálogo completo en meskeIA →</a>
       </p>
     </main>
   );
