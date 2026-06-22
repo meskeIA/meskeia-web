@@ -2,25 +2,27 @@ import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Selector de Smartphone — ¿Qué móvil me conviene? | meskeIA',
+  title: 'Selector de Smartphone — ¿Qué móvil o celular me conviene? | meskeIA',
   description:
-    'Test de 10 preguntas para saber qué smartphone te conviene según tu uso, presupuesto y prioridades. iOS o Android, gama alta, media o básica. Modelos de referencia actualizados.',
+    'Test de 10 preguntas para saber qué smartphone (móvil o celular) te conviene según tu uso, presupuesto y prioridades. iOS o Android, gama alta, media o básica. Modelos de referencia actualizados.',
   keywords: [
     'qué móvil comprar',
+    'qué celular comprar',
     'selector smartphone',
     'test móvil ideal',
     'iOS o Android',
     'gama alta o media',
     'mejor smartphone 2025',
-    'qué teléfono comprar España',
+    'qué teléfono comprar',
     'cuál es el mejor móvil para mí',
+    'cuál es el mejor celular para mí',
     'comparativa smartphones',
     'iPhone o Samsung',
   ],
   openGraph: {
     title: '¿Qué smartphone te conviene? Test en 10 preguntas | meskeIA',
     description:
-      'Descubre el tipo de móvil ideal para tu perfil: sistema operativo, gama y modelos de referencia. Sin marcas patrocinadas, solo tu uso real.',
+      'Descubre el tipo de móvil o celular ideal para tu perfil: sistema operativo, gama y modelos de referencia. Sin marcas patrocinadas, solo tu uso real.',
     type: 'website',
     locale: 'es_ES',
     url: 'https://meskeia.com/selector-smartphone/',
@@ -34,9 +36,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: '¿Qué móvil te conviene? Test gratuito | meskeIA',
+    title: '¿Qué móvil o celular te conviene? Test gratuito | meskeIA',
     description:
-      'Test de 10 preguntas para encontrar tu smartphone ideal según presupuesto, uso y prioridades.',
+      'Test de 10 preguntas para encontrar tu smartphone (móvil o celular) ideal según presupuesto, uso y prioridades.',
     images: ['https://meskeia.com/og-image.png']
   },
   alternates: {
@@ -47,7 +49,7 @@ export const metadata: Metadata = {
       generateWebAppSchema({
         name: 'Selector de Smartphone',
         description:
-          'Test orientativo de 10 preguntas para descubrir qué tipo de smartphone (sistema operativo, gama y perfil de uso) se adapta mejor a tus necesidades reales. Incluye modelos de referencia actualizados.',
+          'Test orientativo de 10 preguntas para descubrir qué tipo de smartphone, móvil o celular (sistema operativo, gama y perfil de uso) se adapta mejor a tus necesidades reales. Incluye modelos de referencia actualizados.',
         url: 'https://meskeia.com/selector-smartphone/',
         features: [
           'Test de 10 preguntas sobre uso y prioridades',
@@ -66,7 +68,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Selector de Smartphone",
-  description: "Test de 10 preguntas para saber qué smartphone te conviene según tu uso, presupuesto y prioridades. iOS o Android, gama alta, media o básica. Modelos de referencia actualizados.",
+  description: "Test de 10 preguntas para saber qué smartphone (móvil o celular) te conviene según tu uso, presupuesto y prioridades. iOS o Android, gama alta, media o básica. Modelos de referencia actualizados.",
   url: "https://meskeia.com/selector-smartphone/",
   category: 'UtilityApplication',
   features: [],
@@ -114,6 +116,14 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'En la mayoría de casos el teléfono libre resulta más económico a largo plazo. Los contratos con terminal subvencionado tienen el coste del dispositivo repartido en la tarifa mensual, que suele ser más cara. Comprar el móvil libre y contratar por separado la tarifa más ajustada a tu consumo real permite mayor flexibilidad y ahorro en contratos de 24 meses.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es lo mismo móvil, celular y smartphone?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, se refieren al mismo dispositivo. "Móvil" (o "teléfono móvil") es el término habitual en España, mientras que "celular" (o "teléfono celular") es el más usado en Hispanoamérica. "Smartphone" es el anglicismo común en ambas regiones para los teléfonos inteligentes actuales. Este selector funciona igual sea cual sea el nombre que uses.',
       },
     },
   ],

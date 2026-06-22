@@ -2,9 +2,9 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Comparador Compra Vehículo: Contado vs Financiación vs Renting vs Leasing | meskeIA',
-  description: 'Compara las 4 formas de adquirir un coche: contado, financiación, renting y leasing. Calcula el coste total real de cada opción y descubre cuál te conviene más.',
-  keywords: 'comparador coche, financiar coche, renting vs compra, leasing vehiculo, comprar coche contado, financiacion coche, calculadora renting, coste total vehiculo, TAE coche',
+  title: 'Comparador Compra Vehículo (Coche, Carro o Auto): Contado vs Financiación vs Renting vs Leasing | meskeIA',
+  description: 'Compara las 4 formas de adquirir un coche, carro o auto: contado, financiación, renting y leasing. Calcula el coste total real de cada opción y descubre cuál te conviene más.',
+  keywords: 'comparador coche, comparador carro, comparador auto, financiar coche, financiar auto, renting vs compra, leasing vehiculo, comprar coche contado, comprar carro, financiacion coche, calculadora renting, coste total vehiculo, TAE coche',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Comparador Compra Vehículo: Contado vs Financiación vs Renting vs Leasing',
-    description: 'Compara las 4 formas de adquirir un coche y descubre cuál te conviene más según tu situación.',
+    description: 'Compara las 4 formas de adquirir un coche, carro o auto y descubre cuál te conviene más según tu situación.',
     url: 'https://meskeia.com/comparador-vehiculos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Comparador Compra Vehículos",
-  description: "Compara las 4 formas de adquirir un coche: contado, financiación, renting y leasing. Calcula el coste total real de cada opción y descubre cuál te conviene más.",
+  description: "Compara las 4 formas de adquirir un coche, carro o auto: contado, financiación, renting y leasing. Calcula el coste total real de cada opción y descubre cuál te conviene más.",
   url: "https://meskeia.com/comparador-vehiculos/",
   category: 'FinanceApplication',
   features: [],
@@ -84,6 +84,14 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'En la mayoría de contratos de renting para particulares y empresas, la cuota mensual cubre el seguro a todo riesgo, el mantenimiento preventivo y correctivo, la gestión de neumáticos y, en algunos casos, un vehículo de sustitución. Hay que revisar el contrato concreto porque las coberturas varían entre compañías. Esto simplifica la gestión del vehículo, pero eleva la cuota mensual frente a la financiación tradicional.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es lo mismo coche, carro y auto?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, los tres términos designan el mismo vehículo. "Coche" es la palabra habitual en España, "carro" se usa en gran parte de Hispanoamérica (Colombia, México, Centroamérica, Caribe) y "auto" predomina en el Cono Sur (Argentina, Chile, Uruguay). Este comparador de contado, financiación, renting y leasing funciona igual con cualquiera de los tres nombres.',
       },
     },
   ],

@@ -2,17 +2,17 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Orientador Alquiler vs Compra - ¿Qué me conviene más? | meskeIA',
-  description: 'Compara alquilar vs comprar vivienda en España. Análisis a 10, 20 y 30 años con hipoteca, IBI, comunidad, seguros y coste de oportunidad de la entrada.',
-  keywords: 'alquiler vs compra, comprar piso, alquilar, hipoteca, vivienda, inversion, coste oportunidad, ibi, comunidad',
+  title: 'Orientador Alquiler (Arriendo) vs Compra - ¿Qué me conviene más? | meskeIA',
+  description: 'Compara alquilar (arrendar) vs comprar vivienda. Análisis a 10, 20 y 30 años con hipoteca, IBI, comunidad, seguros y coste de oportunidad de la entrada.',
+  keywords: 'alquiler vs compra, arriendo vs compra, comprar piso, alquilar, arrendar, hipoteca, vivienda, inversion, coste oportunidad, ibi, comunidad',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Orientador Alquiler vs Compra - meskeIA',
-    description: '¿Alquilar o comprar? Compara opciones con todos los gastos incluidos',
+    title: 'Orientador Alquiler (Arriendo) vs Compra - meskeIA',
+    description: '¿Alquilar/arrendar o comprar? Compara opciones con todos los gastos incluidos',
     url: 'https://meskeia.com/orientador-alquiler-vs-compra/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -25,15 +25,15 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Orientador Alquiler vs Compra - meskeIA',
-    description: '¿Alquilar o comprar vivienda? Descúbrelo con números reales',
+    title: 'Orientador Alquiler (Arriendo) vs Compra - meskeIA',
+    description: '¿Alquilar/arrendar o comprar vivienda? Descúbrelo con números reales',
     images: ['https://meskeia.com/og-image.png']
   },
 };
 
 export const jsonLd = generateWebAppSchema({
   name: "Orientador Alquiler vs Compra",
-  description: "Compara alquilar vs comprar vivienda en España. Análisis a 10, 20 y 30 años con hipoteca, IBI, comunidad, seguros y coste de oportunidad de la entrada.",
+  description: "Compara alquilar (arrendar) vs comprar vivienda. Análisis a 10, 20 y 30 años con hipoteca, IBI, comunidad, seguros y coste de oportunidad de la entrada.",
   url: "https://meskeia.com/orientador-alquiler-vs-compra/",
   category: 'FinanceApplication',
   features: [],
@@ -81,6 +81,14 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'El coste de oportunidad es el rendimiento que podrías obtener invirtiendo el dinero de la entrada (y gastos de compra) en lugar de inmovilizarlo en la vivienda. Si la entrada es de 60.000 € y ese dinero podría crecer al 5% anual en un fondo indexado, en 20 años representaría unos 159.000 €. Ignorar este factor lleva a sobrevalorar la rentabilidad de comprar.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es lo mismo alquilar que arrendar (alquiler o arriendo)?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, son equivalentes. "Alquilar" y "alquiler" son los términos habituales en España, mientras que "arrendar" y "arriendo" se usan más en Hispanoamérica (Chile, Colombia, México y otros). La comparativa de quedarte de inquilino frente a comprar con hipoteca —incluyendo IBI, comunidad y coste de oportunidad de la entrada— se plantea igual sea cual sea el término que utilices.',
       },
     },
   ],

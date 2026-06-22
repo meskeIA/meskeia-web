@@ -2,25 +2,27 @@ import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Selector de Coche Nuevo o Usado — ¿Qué te conviene? | meskeIA',
+  title: 'Selector de Coche/Carro/Auto Nuevo o Usado — ¿Qué te conviene? | meskeIA',
   description:
-    'Test de 10 preguntas para saber si te conviene más un coche nuevo, seminuevo (1-3 años) o de segunda mano. Análisis según presupuesto, uso, garantías y etiqueta DGT.',
+    'Test de 10 preguntas para saber si te conviene más un coche, carro o auto nuevo, seminuevo (1-3 años) o de segunda mano. Análisis según presupuesto, uso, garantías y etiqueta DGT.',
   keywords: [
     'coche nuevo o usado',
+    'carro nuevo o usado',
+    'auto nuevo o usado',
     'comprar coche nuevo o segunda mano',
+    'comprar auto nuevo o usado',
     'seminuevo o nuevo',
-    'segunda mano o nuevo coche España',
     'cuándo comprar coche usado',
     'ventajas coche nuevo',
     'coche de segunda mano fiable',
-    'comprar coche 2025',
+    'comprar carro 2025',
     'etiqueta DGT coche usado',
     'financiar coche nuevo o usado',
   ],
   openGraph: {
-    title: '¿Coche nuevo, seminuevo o segunda mano? Test en 10 preguntas | meskeIA',
+    title: '¿Coche/carro/auto nuevo, seminuevo o segunda mano? Test en 10 preguntas | meskeIA',
     description:
-      'Descubre qué tipo de coche te conviene comprar según presupuesto, km esperados, importancia de la garantía y etiqueta medioambiental.',
+      'Descubre qué tipo de coche, carro o auto te conviene comprar según presupuesto, km esperados, importancia de la garantía y etiqueta medioambiental.',
     type: 'website',
     locale: 'es_ES',
     url: 'https://meskeia.com/selector-coche-nuevo-usado/',
@@ -36,7 +38,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: '¿Nuevo, seminuevo o segunda mano? Test gratuito | meskeIA',
     description:
-      'Test de 10 preguntas para elegir entre coche nuevo, seminuevo o de segunda mano según tu perfil.',
+      'Test de 10 preguntas para elegir entre coche, carro o auto nuevo, seminuevo o de segunda mano según tu perfil.',
     images: ['https://meskeia.com/og-image.png']
   },
   alternates: {
@@ -47,7 +49,7 @@ export const metadata: Metadata = {
       generateWebAppSchema({
         name: 'Selector de Coche Nuevo o Usado',
         description:
-          'Test orientativo para saber si conviene comprar un coche nuevo, seminuevo o de segunda mano según presupuesto, uso y prioridades.',
+          'Test orientativo para saber si conviene comprar un coche, carro o auto nuevo, seminuevo o de segunda mano según presupuesto, uso y prioridades.',
         url: 'https://meskeia.com/selector-coche-nuevo-usado/',
         features: [
           'Test de 10 preguntas sobre perfil y prioridades',
@@ -66,7 +68,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Selector de Coche Nuevo o Usado",
-  description: "Test de 10 preguntas para saber si te conviene más un coche nuevo, seminuevo (1-3 años) o de segunda mano. Análisis según presupuesto, uso, garantías y etiqueta DGT.",
+  description: "Test de 10 preguntas para saber si te conviene más un coche, carro o auto nuevo, seminuevo (1-3 años) o de segunda mano. Análisis según presupuesto, uso, garantías y etiqueta DGT.",
   url: "https://meskeia.com/selector-coche-nuevo-usado/",
   category: 'FinanceApplication',
   features: [],
@@ -114,6 +116,14 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Para uso predominantemente urbano (menos de 15.000 km anuales, trayectos cortos), los motores híbridos y de gasolina ofrecen mejor rendimiento que el diésel, que necesita rodajes largos para funcionar eficientemente. El diésel sigue siendo rentable para conductores que hacen más de 25.000-30.000 km anuales con tramos de carretera, donde su menor consumo amortiza el mayor precio inicial. Los híbridos enchufables y eléctricos resultan más ventajosos cuanto mayor sea el acceso a carga doméstica nocturna y menores los trayectos habituales.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es lo mismo coche, carro y auto?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, son la misma cosa: "coche" se dice en España, "carro" en Colombia, México, Centroamérica y el Caribe, y "auto" en Argentina, Chile y Uruguay. El análisis de comprar nuevo, seminuevo o de segunda mano según presupuesto, kilómetros y garantía es válido sea cual sea el nombre que uses para el vehículo.',
       },
     },
   ],

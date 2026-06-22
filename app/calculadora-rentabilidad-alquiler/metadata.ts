@@ -2,17 +2,17 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Calculadora de Rentabilidad de Alquiler - ROI Inversión Inmobiliaria | meskeIA',
-  description: 'Calcula la rentabilidad bruta y neta de una inversión inmobiliaria en alquiler. ROI, cash flow mensual, payback y análisis completo de gastos: IBI, comunidad, seguro, reparaciones.',
-  keywords: 'rentabilidad alquiler, roi inmobiliario, inversion inmobiliaria, comprar para alquilar, yield alquiler, cash flow alquiler, rentabilidad piso, inversion vivienda, roi vivienda, retorno inversion inmueble',
+  title: 'Calculadora de Rentabilidad de Alquiler (Arriendo) - ROI Inversión Inmobiliaria | meskeIA',
+  description: 'Calcula la rentabilidad bruta y neta de una inversión inmobiliaria en alquiler o arriendo. ROI, cash flow mensual, payback y análisis completo de gastos: IBI, comunidad, seguro, reparaciones.',
+  keywords: 'rentabilidad alquiler, rentabilidad arriendo, roi inmobiliario, inversion inmobiliaria, comprar para alquilar, comprar para arrendar, yield alquiler, cash flow alquiler, rentabilidad piso, inversion vivienda, roi vivienda, retorno inversion inmueble',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Calculadora Rentabilidad Alquiler - meskeIA',
-    description: 'Calcula el ROI real de tu inversión inmobiliaria: bruto, neto y cash flow mensual',
+    title: 'Calculadora Rentabilidad Alquiler / Arriendo - meskeIA',
+    description: 'Calcula el ROI real de tu inversión inmobiliaria en alquiler o arriendo: bruto, neto y cash flow mensual',
     url: 'https://meskeia.com/calculadora-rentabilidad-alquiler/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -25,15 +25,15 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Calculadora Rentabilidad Alquiler - meskeIA',
-    description: '¿Es rentable comprar un piso para alquilar? Calcula el ROI real',
+    title: 'Calculadora Rentabilidad Alquiler / Arriendo - meskeIA',
+    description: '¿Es rentable comprar un piso para alquilar o arrendar? Calcula el ROI real',
     images: ['https://meskeia.com/og-image.png']
   },
 };
 
 export const jsonLd = generateWebAppSchema({
   name: "Rentabilidad de Inversión en Alquiler",
-  description: "Calcula la rentabilidad bruta y neta de una inversión inmobiliaria en alquiler. ROI, cash flow mensual, payback y análisis completo de gastos: IBI, comunidad, seguro, reparaciones.",
+  description: "Calcula la rentabilidad bruta y neta de una inversión inmobiliaria en alquiler o arriendo. ROI, cash flow mensual, payback y análisis completo de gastos: IBI, comunidad, seguro, reparaciones.",
   url: "https://meskeia.com/calculadora-rentabilidad-alquiler/",
   category: 'FinanceApplication',
   features: [],
@@ -81,6 +81,14 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'El payback o período de recuperación es el número de años necesarios para recuperar la inversión inicial únicamente con los ingresos netos del alquiler. Se calcula dividiendo el precio total de compra (incluidos impuestos y gastos de escritura) entre el beneficio neto anual. Un payback de 20 años equivale a una rentabilidad neta del 5%. Este indicador no tiene en cuenta la posible revalorización del inmueble ni la inflación.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es lo mismo alquiler que arriendo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí: "alquiler" es el término habitual en España y "arriendo" (verbo "arrendar") el más usado en gran parte de Hispanoamérica, especialmente en Chile, Colombia y México. Ambos designan el contrato por el que se cede el uso de una vivienda a cambio de una renta mensual. El cálculo de rentabilidad, ROI y cash flow es idéntico tanto si lo llamas alquiler como arriendo.',
       },
     },
   ],

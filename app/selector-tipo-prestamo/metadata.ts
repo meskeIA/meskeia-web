@@ -8,13 +8,15 @@ export const metadata: Metadata = {
   keywords: [
     'qué préstamo pedir',
     'préstamo personal o hipotecario',
-    'crédito al consumo España',
+    'crédito al consumo',
     'financiación sin aval',
     'línea de crédito o préstamo',
     'microcrédito autónomo',
-    'préstamo para coche o reforma',
+    'préstamo para coche, auto o reforma',
     'cómo financiar un proyecto',
-    'tipos de préstamos España',
+    'tipos de préstamos',
+    'tasa de interés préstamo',
+    'tipo de interés préstamo',
     'cuánto préstamo puedo pedir',
   ],
   openGraph: {
@@ -61,7 +63,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Selector de Tipo de Préstamo",
-  description: "Test de 10 preguntas para saber qué tipo de préstamo o financiación te conviene: personal, hipotecario, de consumo, línea de crédito o microcrédito. Análisis según finalidad, importe, garantías y situ",
+  description: "Test de 10 preguntas para saber qué tipo de préstamo o financiación te conviene: personal, hipotecario, de consumo, línea de crédito o microcrédito. Análisis según finalidad, importe, garantías, tasa de interés (tipo de interés) y situación económica.",
   url: "https://meskeia.com/selector-tipo-prestamo/",
   category: 'FinanceApplication',
   features: [],
@@ -109,6 +111,14 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'El TIN (Tipo de Interés Nominal) es el tipo base del préstamo, mientras que el TAE (Tasa Anual Equivalente) incluye además las comisiones, gastos de apertura y otros costes, expresando el coste real anual del préstamo. La ley española obliga a comunicar la TAE en toda publicidad de préstamos. Siempre hay que comparar préstamos usando la TAE, no el TIN, para obtener una comparativa justa del coste total.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es lo mismo "tipo de interés" que "tasa de interés"?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, son el mismo concepto: el porcentaje que cobra el banco por prestarte dinero. "Tipo de interés" es la forma habitual en España y "tasa de interés" la más usada en Hispanoamérica. En ambos casos conviene fijarse en la tasa anual equivalente (TAE), que refleja el coste real del préstamo incluyendo comisiones, y no solo en el tipo o tasa nominal (TIN).',
       },
     },
   ],

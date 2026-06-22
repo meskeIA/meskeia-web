@@ -2,25 +2,27 @@ import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Selector de Tipo de Vehículo — ¿Qué coche me conviene? | meskeIA',
+  title: 'Selector de Tipo de Vehículo — ¿Qué coche, carro o auto me conviene? | meskeIA',
   description:
-    'Test para saber qué tipo de coche te conviene según tu uso, presupuesto y estilo de vida. Compacto, SUV, familiar. Gasolina, híbrido o eléctrico. Comparativa de costes anuales incluida.',
+    'Test para saber qué tipo de coche, carro o auto te conviene según tu uso, presupuesto y estilo de vida. Compacto, SUV, familiar. Gasolina, híbrido o eléctrico. Comparativa de costes anuales incluida.',
   keywords: [
     'qué coche comprar',
+    'qué carro comprar',
+    'qué auto comprar',
     'selector coche',
     'test tipo de coche',
     'gasolina o eléctrico',
     'SUV o compacto',
     'qué motorización elegir',
     'coste anual coche',
-    'comparativa coches España',
     'cuál es el mejor coche para mí',
+    'cuál es el mejor auto para mí',
     'híbrido o gasolina',
   ],
   openGraph: {
-    title: '¿Qué tipo de coche te conviene? Test en 9 preguntas | meskeIA',
+    title: '¿Qué tipo de coche, carro o auto te conviene? Test en 9 preguntas | meskeIA',
     description:
-      'Descubre el segmento y motorización ideal para tu perfil real. Compacto, SUV, familiar. Gasolina, híbrido, eléctrico. Comparativa de costes anuales estimados.',
+      'Descubre el segmento y motorización ideal para tu perfil real (coche, carro o auto). Compacto, SUV, familiar. Gasolina, híbrido, eléctrico. Comparativa de costes anuales estimados.',
     type: 'website',
     locale: 'es_ES',
     url: 'https://meskeia.com/selector-vehiculo/',
@@ -34,9 +36,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: '¿Qué coche te conviene? Test gratuito | meskeIA',
+    title: '¿Qué coche, carro o auto te conviene? Test gratuito | meskeIA',
     description:
-      'Test de 9 preguntas para encontrar tu tipo de coche ideal según tus km, uso, presupuesto y estilo de vida.',
+      'Test de 9 preguntas para encontrar tu tipo de coche, carro o auto ideal según tus km, uso, presupuesto y estilo de vida.',
     images: ['https://meskeia.com/og-image.png']
   },
   alternates: {
@@ -47,7 +49,7 @@ export const metadata: Metadata = {
       generateWebAppSchema({
         name: 'Selector de Tipo de Vehículo',
         description:
-          'Test orientativo para descubrir qué tipo de coche (segmento y motorización) se adapta mejor a tu perfil de uso, presupuesto y estilo de vida. Incluye comparativa de costes anuales estimados.',
+          'Test orientativo para descubrir qué tipo de coche, carro o auto (segmento y motorización) se adapta mejor a tu perfil de uso, presupuesto y estilo de vida. Incluye comparativa de costes anuales estimados.',
         url: 'https://meskeia.com/selector-vehiculo/',
         features: [
           'Test de 9 preguntas sobre uso y perfil',
@@ -66,7 +68,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Selector de Tipo de Vehículo",
-  description: "Test para saber qué tipo de coche te conviene según tu uso, presupuesto y estilo de vida. Compacto, SUV, familiar. Gasolina, híbrido o eléctrico. Comparativa de costes anuales incluida.",
+  description: "Test para saber qué tipo de coche, carro o auto te conviene según tu uso, presupuesto y estilo de vida. Compacto, SUV, familiar. Gasolina, híbrido o eléctrico. Comparativa de costes anuales incluida.",
   url: "https://meskeia.com/selector-vehiculo/",
   category: 'FinanceApplication',
   features: [],
@@ -114,6 +116,14 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Según estimaciones habituales, el coste total anual de un vehículo de gama media en España (seguro, impuesto de circulación, revisiones, neumáticos, combustible y amortización) ronda los 5.000-8.000 € dependiendo del uso. El combustible representa entre el 20% y el 35% de ese total. Un eléctrico reduce el gasto en energía y mantenimiento preventivo (sin cambio de aceite ni embrague), pero incrementa la amortización por el mayor precio de compra inicial.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es lo mismo coche, carro y auto?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, son sinónimos del mismo vehículo. "Coche" es el término de España, "carro" el habitual en Colombia, México, Centroamérica y el Caribe, y "auto" el más usado en Argentina, Chile y Uruguay. El selector de segmento y motorización (compacto, SUV, gasolina, híbrido o eléctrico) funciona igual sea cual sea la palabra que utilices.',
       },
     },
   ],
