@@ -31,8 +31,9 @@ function handleDelegum(req: NextRequest) {
   if (pathname === '/delegum' || pathname.startsWith('/delegum/') || pathname.startsWith('/api')) {
     return NextResponse.next();
   }
-  // sitemap.xml y robots.txt: comportamiento previo intacto (los sirve meskeIA).
-  if (pathname === '/sitemap.xml' || pathname === '/robots.txt') {
+  // sitemap.xml, robots.txt y llms.txt: comportamiento previo intacto (los sirve
+  // meskeIA; delegum.com no tiene versiones propias).
+  if (pathname === '/sitemap.xml' || pathname === '/robots.txt' || pathname === '/llms.txt') {
     return NextResponse.next();
   }
 
@@ -73,6 +74,11 @@ function handleCronicum(req: NextRequest) {
     url.pathname = '/cronicum/robots-txt';
     return NextResponse.rewrite(url);
   }
+  if (pathname === '/llms.txt') {
+    const url = req.nextUrl.clone();
+    url.pathname = '/cronicum/llms-txt';
+    return NextResponse.rewrite(url);
+  }
 
   // Rutas limpias → reescritura interna a /cronicum/*. La home, las 12 puertas y
   // las 142 cronologías viven todas bajo /cronicum (la ruta /cronicum/[slug]
@@ -87,5 +93,5 @@ export const config = {
   // Todas las rutas de página, excepto API, internos de Next y ficheros con
   // extensión (assets, favicon, og-image…). sitemap.xml y robots.txt se añaden
   // explícitamente para poder enrutarlos por marca (Cronicum tiene los suyos).
-  matcher: ['/((?!api|_next|.*\\..*).*)', '/sitemap.xml', '/robots.txt'],
+  matcher: ['/((?!api|_next|.*\\..*).*)', '/sitemap.xml', '/robots.txt', '/llms.txt'],
 };
