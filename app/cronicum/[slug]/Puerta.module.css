@@ -1,0 +1,169 @@
+/* Puerta de Cronicum — terracota #A24B2A · ámbar #C9742E · tile cálido #13100D */
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 5rem 1.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ─── Migas de pan ─── */
+.breadcrumb {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.breadcrumbLink {
+  color: #A24B2A;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.breadcrumbLink:hover {
+  color: #C9742E;
+  text-decoration: underline;
+}
+
+/* ─── Hero de la puerta ─── */
+.hero {
+  background: linear-gradient(160deg, #241C18, #13100D);
+  color: #fff;
+  border-radius: 16px;
+  padding: 2.75rem 2rem;
+  text-align: center;
+}
+
+.heroIcon {
+  font-size: 3rem;
+  line-height: 1;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.heroTitle {
+  font-family: var(--font-lora), Georgia, serif;
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #FFF4E6;
+  margin: 0 0 0.85rem;
+  line-height: 1.1;
+}
+
+.heroDesc {
+  font-size: 1.05rem;
+  color: rgba(255, 244, 230, 0.92);
+  margin: 0 auto 1rem;
+  max-width: 660px;
+  line-height: 1.6;
+}
+
+.heroCount {
+  display: inline-block;
+  font-size: 0.875rem;
+  color: rgba(255, 244, 230, 0.95);
+  background: rgba(246, 194, 122, 0.14);
+  border: 1px solid rgba(246, 194, 122, 0.4);
+  border-radius: 20px;
+  padding: 0.35rem 1rem;
+  margin: 0;
+}
+
+/* ─── Rejilla de cronologías ─── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.1rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: var(--bg-card);
+  border: 1px solid #ecdfd4;
+  border-left: 4px solid #C46A3A;
+  border-radius: 10px;
+  padding: 1.25rem 1.35rem;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 22px rgba(162, 75, 42, 0.16);
+}
+
+.card:focus-visible {
+  outline: 2px solid #A24B2A;
+  outline-offset: 3px;
+}
+
+.cardTitulo {
+  font-family: var(--font-lora), Georgia, serif;
+  font-size: 1.12rem;
+  font-weight: 600;
+  color: #A24B2A;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.cardDesc {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  flex-grow: 1;
+}
+
+.cardCta {
+  font-weight: 600;
+  color: #A24B2A;
+  font-size: 0.85rem;
+}
+
+/* ─── Volver ─── */
+.volver {
+  margin: 0.5rem 0 0;
+}
+
+.volverLink {
+  color: #A24B2A;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.volverLink:hover {
+  color: #C9742E;
+  text-decoration: underline;
+}
+
+/* ─── Dark mode ─── */
+[data-theme='dark'] .card {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .cardTitulo,
+[data-theme='dark'] .cardCta,
+[data-theme='dark'] .breadcrumbLink,
+[data-theme='dark'] .volverLink {
+  color: #E0A06A;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 600px) {
+  .container {
+    padding-top: 4.5rem;
+  }
+  .heroTitle {
+    font-size: 1.9rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+}
