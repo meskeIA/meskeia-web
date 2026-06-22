@@ -125,6 +125,10 @@ const nextConfig: NextConfig = {
     return [
       { source: '/delegum', has, destination: 'https://delegum.com/', permanent: true },
       { source: '/delegum/:path*', has, destination: 'https://delegum.com/:path*', permanent: true },
+      // Consolidación canónica de Cronicum: el prefijo interno /cronicum/* vive en
+      // meskeia.com por implementación, pero la URL canónica es cronicum.com/*.
+      { source: '/cronicum', has, destination: 'https://cronicum.com/', permanent: true },
+      { source: '/cronicum/:path*', has, destination: 'https://cronicum.com/:path*', permanent: true },
     ];
   },
 
