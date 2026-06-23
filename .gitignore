@@ -65,6 +65,11 @@ scripts/cursos-generados/
 
 # Documentos estratégicos privados (no subir al repo público)
 _private/
+ESTRATEGIA-VERTICALES.md
+CRONICUM.md
+DELEGUM-SOLUCIONES.md
+NUEVASAPPSPARAMCP.md
+BACKLOG.md
 
 # Credenciales de service accounts (Google Cloud, etc.) - NUNCA subir al repo
 .credentials/
