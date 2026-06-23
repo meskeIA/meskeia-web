@@ -198,6 +198,7 @@
 /* Tabs */
 .tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 30px;
   background: var(--bg-card);
@@ -205,10 +206,13 @@
   border-radius: 12px;
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border);
-  overflow-x: auto;
 }
 
 .tabButton {
+  /* 4 botones por fila: con gap de 12px (3 huecos = 36px) cada uno mide
+     (100% - 36px) / 4 = calc(25% - 9px). Con 8 pestañas → 2 filas de 4. */
+  flex: 1 1 calc(25% - 9px);
+  box-sizing: border-box;
   background: transparent;
   border: 2px solid var(--border);
   padding: 12px 24px;
