@@ -152,13 +152,24 @@ export async function POST(request: NextRequest) {
       ? JSON.stringify(datos.datos_adicionales)
       : null;
 
+    // Dominio de entrada (vertical): se deriva en el SERVIDOR a partir de los
+    // headers, no del cliente (más fiable, no manipulable). x-forwarded-host es
+    // el dominio público real tras el proxy/rewrite de Vercel; host como fallback.
+    // Se normaliza a minúsculas y sin 'www.' para agrupar variantes.
+    const rawHost = (
+      request.headers.get('x-forwarded-host') ||
+      request.headers.get('host') ||
+      ''
+    ).split(',')[0].trim().toLowerCase().replace(/^www\./, '');
+    const host = rawHost ? rawHost.slice(0, 100) : null;
+
     // Insertar registro
     const result = await client.execute({
       sql: `INSERT INTO uso_aplicaciones
             (aplicacion, timestamp, navegador, sistema_operativo, resolucion,
              tipo_dispositivo, es_recurrente, ip_address, pais, ciudad,
-             modo, sesion_id, datos_adicionales)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+             modo, sesion_id, datos_adicionales, host)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
         aplicacion,
         timestamp,
@@ -173,6 +184,7 @@ export async function POST(request: NextRequest) {
         modo,
         sesion_id,
         datos_adicionales,
+        host,
       ],
     });
 

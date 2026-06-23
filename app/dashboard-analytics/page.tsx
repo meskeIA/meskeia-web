@@ -140,7 +140,7 @@ const NOMBRES_PAIS: Record<string, string> = {
 };
 
 export default function DashboardAnalyticsPage() {
-  const [tabActiva, setTabActiva] = useState<'general' | 'tecnico' | 'ranking' | 'aplicacion' | 'registros' | 'resumen' | 'navegacion'>('general');
+  const [tabActiva, setTabActiva] = useState<'general' | 'tecnico' | 'ranking' | 'aplicacion' | 'registros' | 'resumen' | 'navegacion' | 'dominios'>('general');
   const [appSeleccionada, setAppSeleccionada] = useState<string>('');
   const [filtroApp, setFiltroApp] = useState('');
   const [mostrarDropdown, setMostrarDropdown] = useState(false);
@@ -179,6 +179,12 @@ export default function DashboardAnalyticsPage() {
   const navegacionQuery = trpc.analytics.getNavegacion.useQuery(
     { dias: 14 },
     { enabled: tabActiva === 'navegacion' }
+  );
+
+  // tRPC: Tráfico por dominio (verticales) — lazy: solo cuando el tab está activo
+  const dominiosQuery = trpc.analytics.getPorDominio.useQuery(
+    {},
+    { enabled: tabActiva === 'dominios' }
   );
 
   // tRPC: Tendencias históricas (mensual 2026, canales, LATAM)
@@ -548,6 +554,12 @@ export default function DashboardAnalyticsPage() {
           onClick={() => setTabActiva('navegacion')}
         >
           🧭 Navegación
+        </button>
+        <button
+          className={`${styles.tabButton} ${tabActiva === 'dominios' ? styles.active : ''}`}
+          onClick={() => setTabActiva('dominios')}
+        >
+          🌐 Dominios
         </button>
       </nav>
 
@@ -1523,6 +1535,85 @@ export default function DashboardAnalyticsPage() {
             <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '1rem' }}>
               * Las visitas anteriores al 20/03/2026 aparecen en &quot;IA sin detalle&quot; (datos no disponibles antes de esa fecha).
             </p>
+          </section>
+        </div>
+      )}
+
+      {/* Tab: Tráfico por dominio (verticales) */}
+      {tabActiva === 'dominios' && (
+        <div className={styles.tabContent}>
+          <section className={styles.section}>
+            <h2>🌐 Tráfico por dominio</h2>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+              Visitas servidas bajo cada dominio vertical (meskeia.com, delegum.com, cronicum.com).
+              Excluye bots y tu propia IP. Mide las páginas de cada portal, no el embudo completo
+              (las apps enlazadas desde Delegum/Cronicum cargan ya bajo meskeia.com).
+            </p>
+
+            {dominiosQuery.isLoading && <p>Cargando tráfico por dominio...</p>}
+            {dominiosQuery.error && <p style={{ color: 'red' }}>Error al cargar el desglose por dominio</p>}
+
+            {dominiosQuery.data && (
+              <>
+                {dominiosQuery.data.filas.length === 0 ? (
+                  <p style={{ color: 'var(--text-muted)' }}>
+                    Aún no hay visitas registradas con dominio. Los datos empiezan a acumularse
+                    tras el despliegue (la captura del dominio se activó el {dominiosQuery.data.desde}).
+                  </p>
+                ) : (
+                  <div className={styles.tableContainer}>
+                    <table className={styles.table}>
+                      <thead>
+                        <tr>
+                          <th style={{ textAlign: 'left' }}>Dominio</th>
+                          <th style={{ textAlign: 'center' }}>Hoy</th>
+                          <th style={{ textAlign: 'center' }}>Ayer</th>
+                          <th style={{ textAlign: 'center' }}>7 días</th>
+                          <th style={{ textAlign: 'center' }}>Este mes</th>
+                          <th style={{ textAlign: 'center' }}>Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {dominiosQuery.data.filas.map((fila) => (
+                          <tr key={fila.host} style={{ opacity: fila.total === 0 ? 0.4 : 1 }}>
+                            <td>
+                              <span style={{ marginRight: '0.4rem' }}>{fila.icono}</span>
+                              {fila.label}
+                              <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginLeft: '0.5rem' }}>
+                                {fila.host}
+                              </span>
+                            </td>
+                            <td style={{ textAlign: 'center', fontWeight: fila.hoy > 0 ? 600 : 400 }}>
+                              {fila.hoy > 0 ? fila.hoy : '–'}
+                            </td>
+                            <td style={{ textAlign: 'center' }}>{fila.ayer > 0 ? fila.ayer : '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{fila.semana > 0 ? fila.semana : '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{fila.mes > 0 ? fila.mes : '–'}</td>
+                            <td style={{ textAlign: 'center', fontWeight: fila.total > 0 ? 600 : 400 }}>
+                              {fila.total > 0 ? fila.total : '–'}
+                            </td>
+                          </tr>
+                        ))}
+                        {/* Fila Total */}
+                        <tr style={{ borderTop: '2px solid var(--primary)', fontWeight: 700 }}>
+                          <td>✅ TOTAL</td>
+                          <td style={{ textAlign: 'center' }}>{dominiosQuery.data.total.hoy || '–'}</td>
+                          <td style={{ textAlign: 'center' }}>{dominiosQuery.data.total.ayer || '–'}</td>
+                          <td style={{ textAlign: 'center' }}>{dominiosQuery.data.total.semana || '–'}</td>
+                          <td style={{ textAlign: 'center' }}>{dominiosQuery.data.total.mes || '–'}</td>
+                          <td style={{ textAlign: 'center' }}>{dominiosQuery.data.total.total || '–'}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '1rem' }}>
+                  * Captura de dominio activada el {dominiosQuery.data.desde}. Las visitas anteriores
+                  no tienen dominio asignado y no se contabilizan aquí.
+                </p>
+              </>
+            )}
           </section>
         </div>
       )}

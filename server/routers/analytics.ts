@@ -1420,4 +1420,89 @@ export const analyticsRouter = router({
         topPorDuracion,
       };
     }),
+
+  /**
+   * Procedure: getPorDominio
+   * Desglose de visitas por dominio de entrada (vertical): meskeia.com,
+   * delegum.com y cronicum.com, servidos por host-rewrite sobre el mismo
+   * proyecto. Query EN VIVO sobre uso_aplicaciones (no rollup — opción simple
+   * de arranque). El campo `host` se empezó a capturar el 2026-06-23; los
+   * registros previos tienen host NULL y no aparecen aquí.
+   * Excluye bots y, si está configurada, la IP del propietario.
+   */
+  getPorDominio: publicProcedure
+    .input(z.object({}))
+    .query(async () => {
+      await initializeDatabase();
+      const client = getTursoClient();
+
+      // IP del propietario para excluir el tráfico propio (mismo criterio
+      // que el "Total Real" del resto del dashboard)
+      const ipExcluida = await leerIpExcluida(client);
+
+      // Rangos de fechas (ordinal YYYYMMDD, igual que getResumen)
+      const ahora = new Date();
+      const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+      const ayer = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
+      const hace7Dias = new Date(hoy); hace7Dias.setDate(hoy.getDate() - 7);
+      const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+      const ord = (d: Date) =>
+        `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+      const hoyOrd = ord(hoy), ayerOrd = ord(ayer), hace7Ord = ord(hace7Dias), iMesOrd = ord(inicioMes);
+
+      const res = await client.execute({
+        sql: `SELECT host,
+                COUNT(*) AS total,
+                SUM(CASE WHEN fo = ? THEN 1 ELSE 0 END) AS hoy,
+                SUM(CASE WHEN fo = ? THEN 1 ELSE 0 END) AS ayer,
+                SUM(CASE WHEN fo >= ? THEN 1 ELSE 0 END) AS semana,
+                SUM(CASE WHEN fo >= ? THEN 1 ELSE 0 END) AS mes
+              FROM (
+                SELECT host, ${FECHA_EXPR} AS fo
+                FROM uso_aplicaciones
+                WHERE host IS NOT NULL AND host != '' AND modo != 'bot'
+                  ${ipExcluida ? 'AND (ip_address != ? OR ip_address IS NULL)' : ''}
+              )
+              GROUP BY host
+              ORDER BY total DESC`,
+        args: ipExcluida
+          ? [hoyOrd, ayerOrd, hace7Ord, iMesOrd, ipExcluida]
+          : [hoyOrd, ayerOrd, hace7Ord, iMesOrd],
+      });
+
+      // Etiqueta e icono por dominio conocido; el resto se muestra tal cual
+      const META: Record<string, { label: string; icono: string }> = {
+        'meskeia.com': { label: 'meskeIA', icono: '🧩' },
+        'delegum.com': { label: 'Delegum', icono: '🏛️' },
+        'cronicum.com': { label: 'Cronicum', icono: '📜' },
+      };
+
+      const filas = res.rows.map((r) => {
+        const host = String(r.host);
+        const meta = META[host] || { label: host, icono: '🌐' };
+        return {
+          host,
+          label: meta.label,
+          icono: meta.icono,
+          hoy: Number(r.hoy),
+          ayer: Number(r.ayer),
+          semana: Number(r.semana),
+          mes: Number(r.mes),
+          total: Number(r.total),
+        };
+      });
+
+      const total = filas.reduce(
+        (acc, f) => ({
+          hoy: acc.hoy + f.hoy,
+          ayer: acc.ayer + f.ayer,
+          semana: acc.semana + f.semana,
+          mes: acc.mes + f.mes,
+          total: acc.total + f.total,
+        }),
+        { hoy: 0, ayer: 0, semana: 0, mes: 0, total: 0 }
+      );
+
+      return { filas, total, desde: '23/06/2026' };
+    }),
 });

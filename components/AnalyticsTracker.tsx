@@ -18,11 +18,19 @@ interface AnalyticsTrackerProps {
 export default function AnalyticsTracker({ applicationName, appName }: AnalyticsTrackerProps) {
   const finalAppName = applicationName || appName || 'unknown';
   useEffect(() => {
-    // NO ejecutar analytics en subdominios de desarrollo
+    // NO ejecutar analytics en subdominios de desarrollo (next.meskeia.com,
+    // previews de Vercel, localhost). Sí registramos los tres dominios de
+    // producción: meskeia.com y los verticales delegum.com / cronicum.com
+    // (servidos por host-rewrite sobre el mismo proyecto). El servidor deriva
+    // el dominio del header host para el cuadro "Tráfico por dominio".
+    const HOSTS_PRODUCCION = [
+      'meskeia.com', 'www.meskeia.com',
+      'delegum.com', 'www.delegum.com',
+      'cronicum.com', 'www.cronicum.com',
+    ];
     if (typeof window !== 'undefined') {
       const hostname = window.location.hostname;
-      // Solo ejecutar en producción (meskeia.com sin subdominios)
-      if (hostname !== 'meskeia.com' && hostname !== 'www.meskeia.com') {
+      if (!HOSTS_PRODUCCION.includes(hostname)) {
         console.log('[Analytics] Desactivado en entorno de desarrollo:', hostname);
         return;
       }

@@ -137,6 +137,21 @@ async function doInitializeDatabase(): Promise<boolean> {
     // Columna ya existe — ignorar
   }
 
+  // Migración: añadir columna host para distinguir el dominio de entrada
+  // (meskeia.com / delegum.com / cronicum.com — verticales servidos por
+  // host-rewrite sobre el mismo proyecto Vercel). NULL en registros previos
+  // a la migración. Permite el cuadro "Tráfico por dominio" del dashboard.
+  try {
+    await client.execute(
+      `ALTER TABLE uso_aplicaciones ADD COLUMN host TEXT`
+    );
+  } catch {
+    // Columna ya existe — ignorar
+  }
+  await client.execute(
+    'CREATE INDEX IF NOT EXISTS idx_host ON uso_aplicaciones(host)'
+  );
+
   // ─────────────────────────────────────────────────────────────────────────
   // Tablas de AGREGADOS (rollup) — pre-calculan métricas por día CERRADO.
   // Motivo: los GROUP BY/AVG sobre la tabla cruda cuestan 3-5 s cada uno
