@@ -1,0 +1,365 @@
+import type { HistoriaData } from './types';
+
+export const nuevaZelanda: HistoriaData = {
+  slug: 'nueva-zelanda',
+  titulo: 'Historia de Nueva Zelanda (Aotearoa): De los Maoríes a la Nación Bicultural',
+  subtitulo: 'La última gran tierra colonizada por el ser humano: de las canoas polinesias al Tratado de Waitangi y el renacimiento maorí',
+  descripcionSEO: 'Cronología interactiva de la historia de Nueva Zelanda (Aotearoa): del asentamiento polinesio (~1250) y la cultura maorí clásica al contacto con Cook (1769), el Tratado de Waitangi (1840), las Guerras de Nueva Zelanda, el voto femenino (1893) y el renacimiento maorí contemporáneo. 10 hitos y 6 eras con las dos perspectivas del pacto fundacional.',
+  keywords: [
+    'historia nueva zelanda aotearoa cronología',
+    'maoríes iwi waka asentamiento polinesio',
+    'tratado de waitangi 1840 dos versiones soberanía',
+    'guerras de nueva zelanda confiscaciones kingitanga',
+    'voto femenino 1893 primer país mundo',
+    'renacimiento maorí tribunal waitangi te reo',
+  ],
+  anioInicio: 1250,
+  anioFin: 2025,
+
+  hitos: [
+    {
+      id: 'asentamiento-polinesio',
+      nombre: 'Asentamiento Polinesio de Aotearoa',
+      anioInicio: 1250,
+      anioFin: 1350,
+      color: '#1B998B',
+      categoria: 'maori',
+      descripcion: 'Hacia 1250-1300, navegantes polinesios procedentes del Pacífico central (la región de Hawaiki en la tradición oral) alcanzaron las islas de Aotearoa en grandes canoas oceánicas (waka hourua). Fueron los últimos humanos en colonizar una gran masa de tierra habitable del planeta. De estos asentamientos surgieron los iwi (pueblos o tribus), cada uno con su whakapapa (genealogía) que enlaza con la waka fundadora. Adaptaron sus cultivos tropicales a un clima templado mucho más frío, desarrollando una cultura distintiva: la maorí.',
+      obraIconica: 'Las waka hourua: canoas de doble casco de la migración polinesia',
+      paises: ['Aotearoa', 'Polinesia central', 'Pacífico Sur'],
+    },
+    {
+      id: 'cultura-maori-clasica',
+      nombre: 'Cultura Maorí Clásica',
+      anioInicio: 1350,
+      anioFin: 1642,
+      color: '#0F7173',
+      categoria: 'maori',
+      descripcion: 'Durante siglos de aislamiento, los maoríes desarrollaron una cultura compleja organizada en iwi y hapū (subtribus). Construyeron pā: poblados fortificados en colinas con terrazas y empalizadas. El arte del tā moko (tatuaje facial) marcaba el linaje y el estatus; el mana (prestigio y autoridad espiritual) regía las relaciones sociales y la guerra. La caza intensiva contribuyó a la extinción del moa, ave gigante no voladora, y del águila de Haast. La sociedad combinaba agricultura del kūmara (boniato), pesca, caza y un sofisticado tejido del lino autóctono (harakeke).',
+      obraIconica: 'Los pā fortificados y el arte del tā moko',
+      paises: ['Aotearoa', 'Isla Norte', 'Isla Sur'],
+    },
+    {
+      id: 'primer-contacto-europeo',
+      nombre: 'Primer Contacto Europeo',
+      anioInicio: 1642,
+      anioFin: 1769,
+      color: '#5B8C5A',
+      categoria: 'exploracion',
+      descripcion: 'En 1642, el navegante neerlandés Abel Tasman avistó la costa occidental, pero un choque mortal con maoríes locales le impidió desembarcar; bautizó la tierra como "Nieuw Zeeland". Durante 127 años ningún europeo regresó. En 1769, el británico James Cook circunnavegó y cartografió ambas islas con notable precisión a bordo del Endeavour, estableciendo contactos —pacíficos y violentos— con diversos iwi. Sus mapas y diarios abrieron Aotearoa al mundo atlántico e iniciaron una era de encuentros sostenidos entre dos mundos hasta entonces ajenos.',
+      obraIconica: 'La cartografía de James Cook a bordo del Endeavour (1769)',
+      paises: ['Aotearoa', 'Provincias Unidas (Países Bajos)', 'Gran Bretaña'],
+    },
+    {
+      id: 'mosquetes-misioneros',
+      nombre: 'Comerciantes, Misioneros y Mosquetes',
+      anioInicio: 1769,
+      anioFin: 1840,
+      color: '#A1683A',
+      categoria: 'colonizacion',
+      descripcion: 'Tras Cook llegaron balleneros, cazadores de focas, comerciantes de lino y madera, y misioneros cristianos. El intercambio aportó metal, cultivos y la escritura, pero también enfermedades epidémicas (gripe, sarampión) ante las que los maoríes no tenían inmunidad, con una fuerte caída demográfica. La introducción del mosquete desató las "Guerras de los Mosquetes" (1807-1842), conflictos intertribales devastadores en los que los iwi que primero obtuvieron armas de fuego alteraron el equilibrio de poder, causando miles de muertes y grandes desplazamientos de población.',
+      obraIconica: 'Las Guerras de los Mosquetes entre iwi (1807-1842)',
+      paises: ['Aotearoa', 'Bahía de las Islas', 'Nueva Gales del Sur'],
+    },
+    {
+      id: 'tratado-waitangi',
+      nombre: 'Tratado de Waitangi',
+      anioInicio: 1840,
+      anioFin: 1845,
+      color: '#2E5EAA',
+      categoria: 'nacion',
+      descripcion: 'El 6 de febrero de 1840, representantes de la Corona británica y numerosos jefes maoríes firmaron en Waitangi el documento fundacional de Nueva Zelanda. Existen DOS versiones con discrepancias decisivas: en el texto inglés los jefes ceden la "soberanía" a la Corona; en el texto en te reo māori ceden el "kāwanatanga" (gobernanza), conservando el "tino rangatiratanga" (plena autoridad sobre sus tierras y tesoros). Muchos jefes firmaron entendiendo que mantenían su autoridad. Esta divergencia entre ambos textos es la raíz de litigios y debates constitucionales que continúan hasta hoy.',
+      obraIconica: 'Las dos versiones del Tratado de Waitangi (6 de febrero de 1840)',
+      paises: ['Nueva Zelanda', 'Imperio Británico', 'Aotearoa'],
+    },
+    {
+      id: 'colonizacion-britanica',
+      nombre: 'Colonización Británica y Conflicto por la Tierra',
+      anioInicio: 1845,
+      anioFin: 1860,
+      color: '#7D4E2D',
+      categoria: 'colonizacion',
+      descripcion: 'Tras el Tratado, compañías de colonización británicas trasladaron a decenas de miles de colonos (Pākehā). La demanda de tierra creció con rapidez y los métodos de compra y presión sobre los iwi generaron tensiones crecientes. Las diferencias entre la promesa del Tratado y la práctica colonial —ventas disputadas, malentendidos sobre la propiedad colectiva de la tierra y la pérdida de autoridad maorí— derivaron en conflictos armados. Para muchos maoríes, conservar el control de sus tierras se volvió una cuestión de supervivencia cultural y política.',
+      obraIconica: 'La expansión de los asentamientos Pākehā y la disputa por la tierra',
+      paises: ['Nueva Zelanda', 'Isla Norte', 'Imperio Británico'],
+    },
+    {
+      id: 'guerras-nzelanda',
+      nombre: 'Guerras de Nueva Zelanda',
+      anioInicio: 1860,
+      anioFin: 1872,
+      color: '#8B2E2E',
+      categoria: 'conflicto',
+      descripcion: 'Una serie de conflictos en la Isla Norte enfrentó a tropas imperiales británicas y aliados maoríes (kūpapa) contra iwi que defendían su tierra y autonomía. Surgió el Kīngitanga (Movimiento del Rey Maorí), que eligió un monarca para unir a las tribus y frenar la venta de tierras. Tras la guerra, el gobierno colonial confiscó vastas extensiones de tierra maorí como castigo (raupatu), incluso a iwi que no habían combatido. Estas confiscaciones empobrecieron a comunidades enteras y son hoy objeto central de las reclamaciones históricas ante el Tribunal de Waitangi.',
+      obraIconica: 'El Kīngitanga (Movimiento del Rey) y las confiscaciones de tierra (raupatu)',
+      paises: ['Nueva Zelanda', 'Waikato', 'Taranaki', 'Imperio Británico'],
+    },
+    {
+      id: 'colonia-reformas',
+      nombre: 'Colonia Próspera y Reformas Pioneras',
+      anioInicio: 1872,
+      anioFin: 1907,
+      color: '#3C8DAD',
+      categoria: 'reformas',
+      descripcion: 'A finales del siglo XIX, Nueva Zelanda se convirtió en un laboratorio social de vanguardia. En 1893 fue el primer país del mundo en conceder a las mujeres el derecho al voto en elecciones parlamentarias, impulsado por el movimiento sufragista que lideró Kate Sheppard. Gobiernos liberales introdujeron pensiones de vejez, arbitraje laboral obligatorio y reformas de la tierra, sentando las bases de un estado de bienestar pionero. La economía, basada en la lana, la carne refrigerada y los lácteos exportados a Gran Bretaña, sostuvo esta prosperidad.',
+      obraIconica: 'El sufragio femenino de 1893: primer país del mundo',
+      paises: ['Nueva Zelanda', 'Imperio Británico'],
+    },
+    {
+      id: 'dominio-siglo-xx',
+      nombre: 'Dominio Británico y Siglo XX',
+      anioInicio: 1907,
+      anioFin: 1970,
+      color: '#4A6FA5',
+      categoria: 'nacion',
+      descripcion: 'En 1907 Nueva Zelanda pasó de colonia a Dominio dentro del Imperio Británico. La participación en la Primera Guerra Mundial, y muy especialmente la campaña de Galípoli (1915), donde combatió el cuerpo ANZAC (Australia y Nueva Zelanda), forjó un poderoso sentido de identidad nacional; el Día de ANZAC sigue siendo conmemoración central. Tras la Gran Depresión, un gobierno laborista consolidó el estado de bienestar en 1938. La Segunda Guerra Mundial y la posterior reorientación comercial hacia el Pacífico y Asia, al debilitarse el vínculo con Gran Bretaña, transformaron el país.',
+      obraIconica: 'La campaña de Galípoli y el espíritu ANZAC (1915)',
+      paises: ['Nueva Zelanda', 'Imperio Británico', 'Imperio Otomano (Galípoli)', 'Pacífico'],
+    },
+    {
+      id: 'renacimiento-bicultural',
+      nombre: 'Renacimiento Maorí y Nación Bicultural',
+      anioInicio: 1970,
+      anioFin: 2025,
+      color: '#C8102E',
+      categoria: 'contemporanea',
+      descripcion: 'Desde los años 70, el Māori Renaissance reivindicó la lengua, la cultura y los derechos territoriales maoríes. En 1975 se creó el Tribunal de Waitangi para investigar las violaciones históricas del Tratado, lo que abrió un proceso de acuerdos de reparación (settlements) entre la Corona y los iwi, con disculpas formales y compensaciones. El te reo māori fue reconocido como lengua oficial en 1987. Hoy Nueva Zelanda se define como nación bicultural y crecientemente multicultural, con una población diversa que incluye comunidades del Pacífico y asiáticas, mientras debate de forma continua el lugar del Tratado en su constitución.',
+      obraIconica: 'El Tribunal de Waitangi (1975) y los acuerdos de reparación',
+      paises: ['Nueva Zelanda', 'Aotearoa', 'Pacífico'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'Aotearoa Maorí',
+      desde: 1250,
+      hasta: 1642,
+      icono: '🌀',
+      hitosDestacados: ['Asentamiento Polinesio de Aotearoa', 'Cultura Maorí Clásica'],
+      eventos: [
+        'Llegada de las waka hourua desde la Polinesia central (~1250-1300)',
+        'Formación de los iwi y hapū con su whakapapa fundadora',
+        'Construcción de los pā fortificados y desarrollo del tā moko',
+        'Extinción del moa y del águila de Haast por la caza intensiva',
+      ],
+    },
+    {
+      nombre: 'Encuentro de Dos Mundos',
+      desde: 1642,
+      hasta: 1769,
+      icono: '⛵',
+      hitosDestacados: ['Primer Contacto Europeo'],
+      eventos: [
+        'Abel Tasman avista la costa y bautiza "Nieuw Zeeland" (1642)',
+        '127 años sin nuevos contactos europeos sostenidos',
+        'James Cook circunnavega y cartografía ambas islas (1769)',
+        'Primeros encuentros, pacíficos y violentos, con los iwi',
+      ],
+    },
+    {
+      nombre: 'Comercio, Mosquetes y Tratado',
+      desde: 1769,
+      hasta: 1845,
+      icono: '📜',
+      hitosDestacados: ['Comerciantes, Misioneros y Mosquetes', 'Tratado de Waitangi'],
+      eventos: [
+        'Llegada de balleneros, comerciantes y misioneros cristianos',
+        'Epidemias devastan a una población sin inmunidad previa',
+        'Guerras de los Mosquetes entre iwi (1807-1842)',
+        'Firma del Tratado de Waitangi en sus dos versiones (1840)',
+      ],
+    },
+    {
+      nombre: 'Colonización y Guerras de la Tierra',
+      desde: 1845,
+      hasta: 1872,
+      icono: '⚔️',
+      hitosDestacados: ['Colonización Británica y Conflicto por la Tierra', 'Guerras de Nueva Zelanda'],
+      eventos: [
+        'Llegada masiva de colonos Pākehā y presión por la tierra',
+        'Surge el Kīngitanga (Movimiento del Rey Maorí)',
+        'Guerras de Nueva Zelanda en la Isla Norte (1860-1872)',
+        'Confiscaciones de tierra maorí (raupatu) por el gobierno colonial',
+      ],
+    },
+    {
+      nombre: 'Colonia Pionera y Dominio',
+      desde: 1872,
+      hasta: 1970,
+      icono: '🗳️',
+      hitosDestacados: ['Colonia Próspera y Reformas Pioneras', 'Dominio Británico y Siglo XX'],
+      eventos: [
+        'Primer país del mundo en conceder el voto a las mujeres (1893)',
+        'Reformas liberales: pensiones y arbitraje laboral',
+        'Nueva Zelanda se convierte en Dominio (1907)',
+        'Galípoli y el nacimiento del espíritu ANZAC (1915)',
+        'Consolidación del estado de bienestar laborista (1938)',
+      ],
+    },
+    {
+      nombre: 'Renacimiento Maorí y Biculturalismo',
+      desde: 1970,
+      hasta: 2025,
+      icono: '🌿',
+      hitosDestacados: ['Renacimiento Maorí y Nación Bicultural'],
+      eventos: [
+        'El Māori Renaissance reivindica lengua, cultura y tierra (años 70)',
+        'Creación del Tribunal de Waitangi (1975)',
+        'El te reo māori reconocido como lengua oficial (1987)',
+        'Acuerdos de reparación (settlements) entre la Corona y los iwi',
+        'Nueva Zelanda como nación bicultural y multicultural del Pacífico',
+      ],
+    },
+  ],
+
+  categorias: {
+    maori: 'Mundo Maorí',
+    exploracion: 'Exploración',
+    colonizacion: 'Colonización',
+    conflicto: 'Conflicto',
+    nacion: 'Construcción Nacional',
+    reformas: 'Reformas',
+    contemporanea: 'Contemporánea',
+  },
+
+  colores: {
+    maori: '#1B998B',
+    exploracion: '#5B8C5A',
+    colonizacion: '#A1683A',
+    conflicto: '#8B2E2E',
+    nacion: '#2E5EAA',
+    reformas: '#3C8DAD',
+    contemporanea: '#C8102E',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'Nueva Zelanda (Aotearoa en lengua maorí) fue la última gran tierra habitable colonizada por el ser humano: los navegantes polinesios no llegaron hasta alrededor del año 1250, cuando Europa ya vivía la Baja Edad Media. Su historia condensa en pocos siglos un arco intenso: el florecimiento de la cultura maorí en aislamiento, el encuentro abrupto con el mundo atlántico, un Tratado fundacional con dos versiones que aún hoy genera debate constitucional, guerras por la tierra, reformas sociales pioneras como el primer voto femenino del mundo, y un renacimiento maorí que ha convertido al país en una nación que se reconoce bicultural. Esta cronología presenta ese recorrido usando los nombres maoríes junto a los ingleses y mostrando las distintas perspectivas de un pasado colonial complejo.',
+
+    tablaComparativa: [
+      { hito: 'Asentamiento Polinesio', periodo: '~1250-1350', categoria: 'Mundo Maorí', personaje: 'Navegantes polinesios (tradición de Kupe)', aportacion: 'Última gran tierra colonizada por humanos; origen de los iwi' },
+      { hito: 'Cultura Maorí Clásica', periodo: '1350-1642', categoria: 'Mundo Maorí', personaje: 'Iwi y hapū', aportacion: 'Pā fortificados, tā moko, mana y organización tribal' },
+      { hito: 'Primer Contacto Europeo', periodo: '1642-1769', categoria: 'Exploración', personaje: 'Abel Tasman / James Cook', aportacion: 'Cartografía de las islas y apertura al mundo atlántico' },
+      { hito: 'Tratado de Waitangi', periodo: '1840', categoria: 'Construcción Nacional', personaje: 'Corona británica / jefes maoríes', aportacion: 'Pacto fundacional con dos versiones discrepantes' },
+      { hito: 'Guerras de Nueva Zelanda', periodo: '1860-1872', categoria: 'Conflicto', personaje: 'Kīngitanga / tropas imperiales', aportacion: 'Defensa de la tierra y confiscaciones (raupatu)' },
+      { hito: 'Reformas Pioneras', periodo: '1872-1907', categoria: 'Reformas', personaje: 'Kate Sheppard / gobiernos liberales', aportacion: 'Primer voto femenino del mundo (1893) y estado de bienestar' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiantes de historia',
+        perfil: 'Secundaria, preparatoria y universidad',
+        texto: 'Una visión cronológica completa de Aotearoa, ideal para entender los procesos de colonización del Pacífico, los tratados coloniales y la formación de identidades nacionales. El caso neozelandés ilustra con claridad cómo un mismo documento puede tener dos lecturas y consecuencias durante siglos.',
+      },
+      {
+        icono: '🌏',
+        titulo: 'Interesados en pueblos indígenas',
+        perfil: 'Derechos, lengua y cultura maorí',
+        texto: 'El renacimiento maorí y el Tribunal de Waitangi son referencias internacionales en la reparación de agravios históricos a pueblos originarios. Esta cronología muestra el largo camino desde las confiscaciones del siglo XIX hasta los acuerdos contemporáneos y el reconocimiento del te reo māori.',
+      },
+      {
+        icono: '⚖️',
+        titulo: 'Curiosos del derecho constitucional',
+        perfil: 'Tratados y derecho comparado',
+        texto: 'Nueva Zelanda carece de una constitución escrita única, y el Tratado de Waitangi —con sus dos versiones— ocupa un lugar central y debatido en su marco constitucional. Un caso fascinante para entender cómo conviven la tradición jurídica británica y un pacto bilingüe del siglo XIX.',
+      },
+      {
+        icono: '🗳️',
+        titulo: 'Interesados en historia social',
+        perfil: 'Sufragio, bienestar y reformas',
+        texto: 'Como primer país del mundo en conceder el voto femenino (1893) y pionero del estado de bienestar, Nueva Zelanda es un laboratorio histórico de innovación social. Esta cronología sitúa esas reformas en su contexto político y económico.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Por qué se dice que Nueva Zelanda fue la última gran tierra colonizada?',
+        respuesta: 'Porque los seres humanos no la habitaron hasta alrededor del año 1250-1300, cuando navegantes polinesios la alcanzaron en canoas oceánicas. Para entonces, casi todas las demás grandes masas de tierra habitables del planeta llevaban milenios pobladas. Su aislamiento extremo explica por qué tuvo una fauna tan singular, como el moa.',
+        tip: 'Aotearoa significa en maorí "tierra de la larga nube blanca".',
+      },
+      {
+        pregunta: '¿Qué dice realmente el Tratado de Waitangi y por qué hay polémica?',
+        respuesta: 'El Tratado de 1840 tiene dos versiones que no dicen lo mismo. En el texto inglés los jefes maoríes ceden la "soberanía" a la Corona británica; en el texto en te reo māori ceden solo el "kāwanatanga" (gobernanza), conservando el "tino rangatiratanga", su plena autoridad sobre tierras y tesoros. Muchos firmaron entendiendo que mantenían su poder. Esa diferencia es la raíz de litigios que siguen vigentes.',
+        tip: 'El 6 de febrero, aniversario de la firma, es fiesta nacional (Día de Waitangi).',
+      },
+      {
+        pregunta: '¿Quiénes son los maoríes y los Pākehā?',
+        respuesta: 'Los maoríes son el pueblo indígena de Aotearoa, descendientes de los navegantes polinesios, organizados en iwi (tribus) y hapū (subtribus). Pākehā es el término maorí para los neozelandeses de origen europeo, principalmente británico, que comenzaron a asentarse en el siglo XIX. Hoy la población incluye además importantes comunidades del Pacífico y asiáticas.',
+        tip: 'El whakapapa, o genealogía, conecta a cada persona maorí con la waka (canoa) de sus ancestros.',
+      },
+      {
+        pregunta: '¿Por qué fue Nueva Zelanda el primer país en dar el voto a las mujeres?',
+        respuesta: 'En 1893 Nueva Zelanda concedió el derecho al voto a las mujeres en elecciones parlamentarias, antes que cualquier otro país soberano, tras una intensa campaña sufragista liderada por Kate Sheppard. La sociedad colonial, relativamente joven y sin instituciones aristocráticas arraigadas, fue terreno fértil para reformas sociales de vanguardia que también incluyeron pensiones y arbitraje laboral.',
+        tip: 'Kate Sheppard aparece hoy en el billete neozelandés de 10 dólares.',
+      },
+      {
+        pregunta: '¿Qué es el renacimiento maorí y el Tribunal de Waitangi?',
+        respuesta: 'El renacimiento maorí (Māori Renaissance) es el movimiento, surgido sobre todo desde los años 70, que reivindicó la lengua, la cultura y los derechos territoriales maoríes. El Tribunal de Waitangi, creado en 1975, investiga las violaciones históricas del Tratado y ha impulsado acuerdos de reparación entre la Corona y los iwi, con disculpas oficiales y compensaciones. En 1987 el te reo māori fue reconocido como lengua oficial.',
+        tip: 'El haka, danza tradicional, es hoy un símbolo nacional conocido mundialmente por los All Blacks.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Observa primero el largo período maorí',
+        cuerpo: 'En la Línea del Tiempo, fíjate en que los dos primeros bloques (tonos verdes y teal) cubren cerca de cuatro siglos antes de cualquier contacto europeo. Antes de leer nada, comprende visualmente que la historia de Aotearoa es maorí mucho antes que colonial.',
+      },
+      {
+        titulo: 'Compara el contacto europeo con la colonización',
+        cuerpo: 'Haz clic en "Primer Contacto Europeo" y luego en "Comerciantes, Misioneros y Mosquetes". Observa cómo el encuentro pasó de exploraciones puntuales a una transformación profunda de la sociedad maorí por las enfermedades, el comercio y los mosquetes.',
+      },
+      {
+        titulo: 'Detente en el Tratado de Waitangi y sus dos versiones',
+        cuerpo: 'Abre el hito "Tratado de Waitangi" y lee con atención la diferencia entre el texto inglés (soberanía) y el texto en te reo māori (kāwanatanga). Esta divergencia es la clave para entender todo lo que vino después, desde las guerras hasta los acuerdos actuales.',
+      },
+      {
+        titulo: 'Sigue el hilo del conflicto por la tierra',
+        cuerpo: 'Encadena "Colonización Británica", "Guerras de Nueva Zelanda" y, ya en el bloque contemporáneo, los acuerdos de reparación. Verás cómo las confiscaciones del siglo XIX conectan directamente con las reclamaciones ante el Tribunal de Waitangi un siglo después.',
+      },
+      {
+        titulo: 'Cierra con el Contexto Histórico para el cuadro completo',
+        cuerpo: 'Las 6 eras muestran la lógica del conjunto: del mundo maorí aislado al encuentro de dos mundos, del pacto a las guerras, de las reformas pioneras al renacimiento bicultural. La última era reúne las claves del Aotearoa actual.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '🌀',
+        texto: 'Los maoríes no son una etnia llegada "antes" en abstracto: su asentamiento es muy reciente en términos globales (~1250). Aotearoa estuvo entre las últimas tierras grandes en ser pobladas, lo que la convierte en un caso único para estudiar cómo una cultura humana se desarrolla casi desde cero en aislamiento.',
+      },
+      {
+        icono: '📜',
+        texto: 'Cuando se habla del Tratado de Waitangi conviene recordar siempre que hay dos textos. No es un detalle menor de traducción: es el corazón de un debate constitucional vivo. Las palabras "soberanía" y "kāwanatanga" no significan lo mismo, y esa diferencia se firmó en 1840.',
+      },
+      {
+        icono: '🗳️',
+        texto: 'El voto femenino de 1893 fue parlamentario y nacional, lo que lo distingue de derechos locales o parciales concedidos antes en otros lugares. Nueva Zelanda suele citarse por ello como el primer país soberano con sufragio femenino, un hito de la historia social mundial.',
+      },
+      {
+        icono: '🌿',
+        texto: 'El biculturalismo neozelandés no es solo simbólico: el te reo māori es lengua oficial, los nombres de lugares aparecen en ambas lenguas y los acuerdos de reparación implican compensaciones reales. Es un modelo de referencia internacional en relaciones entre un Estado y su pueblo indígena.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Creer que el Tratado de Waitangi resolvió las cosas en 1840',
+        cuerpo: 'El Tratado no cerró el conflicto: lo configuró. Sus dos versiones discrepantes, las ventas de tierra disputadas y las posteriores confiscaciones generaron agravios que tardaron más de un siglo en empezar a abordarse, y que siguen siendo objeto de debate y reparación en la actualidad.',
+      },
+      {
+        titulo: 'Presentar la colonización como simple "progreso"',
+        cuerpo: 'La llegada europea trajo escritura, metal y nuevos cultivos, pero también epidemias devastadoras, guerras por la tierra y la pérdida de autoridad maorí. Reducir el proceso a un relato de progreso ignora a quienes perdieron tierras, población y poder. La historia colonial exige mostrar las distintas perspectivas.',
+      },
+      {
+        titulo: 'Confundir a Abel Tasman con quien cartografió las islas',
+        cuerpo: 'Abel Tasman avistó la costa en 1642, pero no desembarcó ni cartografió el país; fue James Cook, 127 años después (1769), quien circunnavegó y trazó mapas detallados de ambas islas. Atribuir a Tasman la exploración completa es un error frecuente.',
+      },
+      {
+        titulo: 'Tratar a los maoríes como un grupo homogéneo',
+        cuerpo: 'Los maoríes nunca fueron una entidad política única, sino muchos iwi y hapū con genealogías, territorios e intereses distintos. Algunos firmaron el Tratado y otros no; algunos combatieron contra la Corona y otros se aliaron con ella (kūpapa). Hablar de "los maoríes" como bloque uniforme simplifica una realidad mucho más diversa.',
+      },
+    ],
+  },
+};

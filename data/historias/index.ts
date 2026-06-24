@@ -141,6 +141,11 @@ import { urbanismo } from './urbanismo';
 import { higieneSaludPublica } from './higiene-salud-publica';
 import { vejezLongevidad } from './vejez-longevidad';
 import { vivienda } from './vivienda';
+import { imperiosAfricaOccidental } from './imperios-africa-occidental';
+import { etiopiaAksum } from './etiopia-aksum';
+import { nuevaZelanda } from './nueva-zelanda';
+import { granZimbabue } from './gran-zimbabue';
+import { pueblosPacifico } from './pueblos-pacifico';
 
 const registry: Record<string, HistoriaData> = {
   grecia,
@@ -255,6 +260,11 @@ const registry: Record<string, HistoriaData> = {
   polonia,
   corea,
   australia,
+  'imperios-africa-occidental': imperiosAfricaOccidental,
+  'etiopia-aksum': etiopiaAksum,
+  'nueva-zelanda': nuevaZelanda,
+  'gran-zimbabue': granZimbabue,
+  'pueblos-pacifico': pueblosPacifico,
   'sudeste-asiatico': sudeste_asiatico,
   'brasil-moderno': brasilModerno,
   'mexico-moderno': mexicoModerno,

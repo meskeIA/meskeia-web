@@ -89,7 +89,10 @@ export const PUERTAS: Puerta[] = [
     descripcion:
       'El continente africano y el mundo del Pacífico: una historia menos contada y en expansión.',
     grupo: 'mundo',
-    slugs: ['historia-africa', 'australia'],
+    slugs: [
+      'historia-africa', 'imperios-africa-occidental', 'etiopia-aksum', 'gran-zimbabue',
+      'australia', 'nueva-zelanda', 'pueblos-pacifico',
+    ],
   },
 
   // ─────────────────── Eje 2 — La historia de las cosas ───────────────────

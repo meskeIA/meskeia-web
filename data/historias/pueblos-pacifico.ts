@@ -1,0 +1,368 @@
+import type { HistoriaData } from './types';
+
+export const pueblosPacifico: HistoriaData = {
+  slug: 'pueblos-pacifico',
+  titulo: 'Los Pueblos del Pacífico: la Gran Expansión Polinesia',
+  subtitulo: 'De los navegantes austronesios a los moai de Rapa Nui: 3.500 años de la mayor colonización marítima de la historia',
+  descripcionSEO: 'Cronología interactiva de los pueblos del Pacífico: la expansión austronesia desde Taiwán, la cultura Lapita, la navegación polinesia (wayfinding), el Triángulo polinesio (Hawái, Rapa Nui, Aotearoa), los moai, el Imperio de Tonga, el Reino de Hawái, el contacto europeo y la descolonización. 10 hitos y 6 eras desde ~1500 a.C. hasta hoy.',
+  keywords: [
+    'expansión polinesia austronesia historia',
+    'cultura lapita colonización pacífico oceanía',
+    'navegación polinesia wayfinding piraguas dobles',
+    'rapa nui moai isla de pascua debate ecocidio',
+    'imperio tonga reino hawái kamehameha',
+    'descolonización pacífico hokulea renacimiento navegación',
+  ],
+  anioInicio: -3000,
+  anioFin: 9999,
+
+  hitos: [
+    {
+      id: 'expansion-austronesia',
+      nombre: 'Expansión austronesia',
+      anioInicio: -3000,
+      anioFin: -1500,
+      color: '#1E6091',
+      categoria: 'expansion',
+      descripcion: 'Desde Taiwán y el Sudeste Asiático insular, pueblos de lengua austronesia iniciaron hacia el 3000 a.C. la mayor expansión marítima de la prehistoria. Portadores de la agricultura, la cerámica, la piragua con balancín y un repertorio de plantas y animales domésticos (taro, ñame, cerdo, gallina, pollo), se desplazaron a lo largo de milenios por Filipinas e Indonesia. Las familias lingüísticas modernas confirman este origen común, que conecta a malayos, malgaches de Madagascar y polinesios bajo un mismo tronco austronesio.',
+      obraIconica: 'La piragua con balancín: la tecnología que abrió el océano',
+      paises: ['Taiwán', 'Filipinas', 'Indonesia', 'Sudeste Asiático insular'],
+    },
+    {
+      id: 'cultura-lapita',
+      nombre: 'Cultura Lapita',
+      anioInicio: -1500,
+      anioFin: -500,
+      color: '#E07856',
+      categoria: 'lapita',
+      descripcion: 'La cultura Lapita (~1500-500 a.C.), identificada por su cerámica de característicos motivos geométricos estampados, marca la entrada de los austronesios en el Pacífico remoto. En pocos siglos colonizaron Melanesia oriental, el archipiélago de Bismarck, las islas Salomón, Vanuatu, Nueva Caledonia y, hacia el 1000-900 a.C., Fiyi, Tonga y Samoa. Esta frontera oriental de la Lapita se considera la cuna de la cultura polinesia: allí se gestaron la lengua y las sociedades de las que descenderían todos los pueblos polinesios posteriores.',
+      obraIconica: 'Cerámica Lapita de motivos geométricos estampados',
+      paises: ['Bismarck', 'Islas Salomón', 'Vanuatu', 'Fiyi', 'Tonga', 'Samoa'],
+    },
+    {
+      id: 'pausa-larga',
+      nombre: 'La Pausa Larga y la Polinesia ancestral',
+      anioInicio: -500,
+      anioFin: 700,
+      color: '#228B22',
+      categoria: 'expansion',
+      descripcion: 'Tras alcanzar Tonga y Samoa, la expansión se detuvo durante más de un milenio: el fenómeno conocido como la "pausa larga". Durante este largo periodo, en Tonga y Samoa cuajó la sociedad polinesia ancestral, con su lengua, jefaturas, genealogías, sistema de prestigio y prácticas agrícolas y pesqueras. Lejos de ser un estancamiento, fue la fase en la que se desarrollaron las técnicas de navegación de altura y la cultura material que harían posible el salto posterior hacia el corazón del Pacífico.',
+      obraIconica: 'Las jefaturas de Tonga y Samoa: la matriz de la cultura polinesia',
+      paises: ['Tonga', 'Samoa', 'Polinesia occidental'],
+    },
+    {
+      id: 'navegacion-polinesia',
+      nombre: 'Navegación de altura y wayfinding',
+      anioInicio: 700,
+      anioFin: 1000,
+      color: '#2E86AB',
+      categoria: 'navegacion',
+      descripcion: 'Hacia el primer milenio de nuestra era, los navegantes polinesios dominaban la navegación de altura sin instrumentos: el wayfinding. Orientándose por la salida y puesta de las estrellas, la dirección y el patrón del oleaje, el vuelo de las aves marinas, las nubes y el color del agua, cruzaban miles de kilómetros en grandes piraguas dobles capaces de transportar familias, plantas y animales. Desde Samoa y Tonga colonizaron las islas de la Sociedad —incluida Tahití—, que se convirtieron en el nuevo centro de irradiación hacia los confines del océano.',
+      obraIconica: 'La piragua doble de altura y el arte del wayfinding',
+      paises: ['Islas de la Sociedad', 'Tahití', 'Islas Cook', 'Polinesia central'],
+    },
+    {
+      id: 'triangulo-polinesio',
+      nombre: 'Colonización del Triángulo polinesio',
+      anioInicio: 1000,
+      anioFin: 1300,
+      color: '#48A9A6',
+      categoria: 'navegacion',
+      descripcion: 'En apenas tres siglos, los polinesios completaron la colonización de los vértices del llamado Triángulo polinesio: Hawái al norte (hacia 1000-1200), Rapa Nui / Isla de Pascua al sureste (hacia 1200) y Aotearoa / Nueva Zelanda al suroeste (hacia 1250). Esta expansión fue intencional y planificada, fruto de un conocimiento náutico acumulado, y no producto del azar o la deriva: la evidencia arqueológica, lingüística y genética demuestra viajes de ida y vuelta, transporte deliberado de cultivos y reasentamientos organizados.',
+      obraIconica: 'El Triángulo polinesio: Hawái, Rapa Nui y Aotearoa colonizadas',
+      paises: ['Hawái', 'Rapa Nui', 'Aotearoa / Nueva Zelanda'],
+    },
+    {
+      id: 'rapa-nui',
+      nombre: 'Rapa Nui: los moai y la Isla de Pascua',
+      anioInicio: 1200,
+      anioFin: 1862,
+      color: '#4A4A4A',
+      categoria: 'monumentos',
+      descripcion: 'En Rapa Nui, la sociedad polinesia más aislada del planeta erigió los moai: estatuas monolíticas de toba volcánica colocadas sobre plataformas (ahu), expresión del culto a los ancestros y del prestigio de los linajes. Durante mucho tiempo se difundió el relato del "ecocidio" —un colapso autoinfligido por deforestación—, pero la historiografía reciente lo discute: muchos estudios apuntan a una población más estable de lo supuesto y a la rata polinesia y los cambios ambientales como factores complejos. La verdadera catástrofe demográfica llegó con el exterior: las razzias esclavistas peruanas de 1862-1863 y las enfermedades europeas redujeron la población a poco más de un centenar de personas.',
+      obraIconica: 'Los moai y los ahu de Rapa Nui',
+      paises: ['Rapa Nui / Isla de Pascua'],
+    },
+    {
+      id: 'imperio-tonga',
+      nombre: 'El Imperio de Tonga (Tuʻi Tonga)',
+      anioInicio: 950,
+      anioFin: 1500,
+      color: '#DEB887',
+      categoria: 'reino',
+      descripcion: 'La dinastía Tuʻi Tonga consolidó en Tonga una talasocracia —un poder basado en el control del mar— que llegó a ejercer influencia sobre Samoa, Fiyi, Wallis, Futuna y Niue mediante alianzas, tributos y matrimonios. En su capital, Muʻa, se levantaron grandes plataformas funerarias (langi) y el Haʻamonga ʻa Maui, un trilithon de coral de varias toneladas. Esta red de intercambio y prestigio convirtió a Tonga en uno de los Estados más complejos y duraderos de la Polinesia precolonial.',
+      obraIconica: 'El Haʻamonga ʻa Maui y los langi de Muʻa',
+      paises: ['Tonga', 'Samoa', 'Fiyi', 'Wallis y Futuna', 'Niue'],
+    },
+    {
+      id: 'reino-hawai',
+      nombre: 'El Reino de Hawái y Kamehameha I',
+      anioInicio: 1795,
+      anioFin: 1810,
+      color: '#2D7D46',
+      categoria: 'reino',
+      descripcion: 'Tras siglos de jefaturas (aliʻi) rivales, el jefe Kamehameha I unificó por las armas y la diplomacia el archipiélago hawaiano entre 1795 y 1810, integrando armas y consejeros europeos en una estrategia propia. Fundó así el Reino de Hawái, una monarquía que codificó leyes, mantuvo relaciones diplomáticas internacionales y perduró durante el siglo XIX. Fue uno de los pocos Estados polinesios reconocidos como soberanos por las potencias de la época, hasta su derrocamiento a finales de siglo.',
+      obraIconica: 'La unificación del archipiélago bajo Kamehameha I',
+      paises: ['Hawái'],
+    },
+    {
+      id: 'contacto-europeo',
+      nombre: 'Contacto europeo y reparto colonial',
+      anioInicio: 1521,
+      anioFin: 1900,
+      color: '#8B0000',
+      categoria: 'contacto-europeo',
+      descripcion: 'El Pacífico entró en la órbita europea con la travesía de Magallanes (1521) y, sobre todo, con los viajes de James Cook (1768-1779), que cartografiaron buena parte de la región. Tras los exploradores llegaron balleneros, comerciantes y misioneros. El impacto fue devastador: las enfermedades introducidas —viruela, sarampión, gripe— diezmaron a poblaciones sin inmunidad, mientras el comercio y las misiones transformaban las sociedades isleñas. A finales del siglo XIX, las potencias se repartieron Oceanía: Estados Unidos anexionó Hawái en 1898 y franceses, británicos, alemanes y estadounidenses dividieron archipiélagos enteros.',
+      obraIconica: 'Los viajes de Cook y el reparto colonial de Oceanía',
+      paises: ['Hawái', 'Tahití', 'Samoa', 'Fiyi', 'Pacífico'],
+    },
+    {
+      id: 'pacifico-contemporaneo',
+      nombre: 'Descolonización y Pacífico contemporáneo',
+      anioInicio: 1900,
+      anioFin: 9999,
+      color: '#1B9AAA',
+      categoria: 'contemporanea',
+      descripcion: 'A lo largo del siglo XX y XXI, los pueblos del Pacífico recuperaron su soberanía: Samoa (1962), Fiyi (1970), Tonga (que mantuvo su monarquía), Kiribati, Tuvalu, Vanuatu y otros Estados accedieron a la independencia. En paralelo se produjo un renacimiento cultural: la travesía de la piragua Hōkūleʻa (1976), navegada con técnicas tradicionales de wayfinding hasta Tahití, demostró la viabilidad de la navegación polinesia ancestral y reavivó el orgullo identitario. Hoy las naciones del Pacífico afrontan, además, el reto existencial del cambio climático y la subida del nivel del mar.',
+      obraIconica: 'La travesía de la Hōkūleʻa (1976) y el renacimiento de la navegación',
+      paises: ['Samoa', 'Fiyi', 'Tonga', 'Hawái', 'Pacífico'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'Orígenes austronesios',
+      desde: -3000,
+      hasta: -1500,
+      icono: '🛶',
+      hitosDestacados: ['Expansión austronesia'],
+      eventos: [
+        'Inicio de la expansión austronesia desde Taiwán (~3000 a.C.)',
+        'Difusión por Filipinas e Indonesia de la agricultura y la cerámica',
+        'Desarrollo de la piragua con balancín, clave para el océano',
+        'Tronco lingüístico común que une malayos, malgaches y polinesios',
+      ],
+    },
+    {
+      nombre: 'La frontera Lapita',
+      desde: -1500,
+      hasta: -500,
+      icono: '🏺',
+      hitosDestacados: ['Cultura Lapita'],
+      eventos: [
+        'Aparición de la cerámica Lapita de motivos estampados (~1500 a.C.)',
+        'Colonización del archipiélago de Bismarck, Salomón y Vanuatu',
+        'Llegada a Fiyi, Tonga y Samoa (~1000-900 a.C.)',
+        'La frontera oriental Lapita: cuna de la cultura polinesia',
+      ],
+    },
+    {
+      nombre: 'La Pausa Larga',
+      desde: -500,
+      hasta: 700,
+      icono: '🌺',
+      hitosDestacados: ['La Pausa Larga y la Polinesia ancestral'],
+      eventos: [
+        'Más de un milenio sin nueva expansión hacia el este',
+        'Consolidación de la sociedad polinesia ancestral en Tonga y Samoa',
+        'Desarrollo de jefaturas, genealogías y sistemas de prestigio',
+        'Perfeccionamiento de la navegación de altura',
+      ],
+    },
+    {
+      nombre: 'La gran expansión polinesia',
+      desde: 700,
+      hasta: 1300,
+      icono: '⭐',
+      hitosDestacados: ['Navegación de altura y wayfinding', 'Colonización del Triángulo polinesio'],
+      eventos: [
+        'Dominio del wayfinding: estrellas, oleaje y aves marinas',
+        'Colonización de las islas de la Sociedad y Tahití',
+        'Hawái colonizada (~1000-1200)',
+        'Rapa Nui colonizada (~1200)',
+        'Aotearoa / Nueva Zelanda colonizada (~1250)',
+        'Viajes intencionales de ida y vuelta, no deriva al azar',
+      ],
+    },
+    {
+      nombre: 'Reinos y monumentos polinesios',
+      desde: 950,
+      hasta: 1795,
+      icono: '🗿',
+      hitosDestacados: ['Rapa Nui: los moai y la Isla de Pascua', 'El Imperio de Tonga (Tuʻi Tonga)'],
+      eventos: [
+        'La dinastía Tuʻi Tonga articula una talasocracia (~950)',
+        'Construcción de los langi de Muʻa y el Haʻamonga ʻa Maui',
+        'Erección de los moai y ahu en Rapa Nui (desde ~1200)',
+        'Debate historiográfico sobre la transformación ecológica de Rapa Nui',
+        'Sociedades isleñas complejas en todo el Pacífico',
+      ],
+    },
+    {
+      nombre: 'Contacto, colonia y renacimiento',
+      desde: 1521,
+      hasta: 9999,
+      icono: '⛵',
+      hitosDestacados: ['El Reino de Hawái y Kamehameha I', 'Contacto europeo y reparto colonial', 'Descolonización y Pacífico contemporáneo'],
+      eventos: [
+        'Magallanes cruza el Pacífico (1521) y los viajes de Cook (1768-1779)',
+        'Epidemias europeas y razzias esclavistas peruanas (1862-1863)',
+        'Unificación del Reino de Hawái por Kamehameha I (1795-1810)',
+        'Anexión de Hawái por Estados Unidos (1898) y reparto colonial',
+        'Independencias: Samoa (1962), Fiyi (1970) y otros Estados',
+        'Travesía de la Hōkūleʻa (1976) y reto del cambio climático',
+      ],
+    },
+  ],
+
+  categorias: {
+    expansion: 'Expansión',
+    lapita: 'Cultura Lapita',
+    navegacion: 'Navegación',
+    reino: 'Reinos',
+    monumentos: 'Monumentos',
+    'contacto-europeo': 'Contacto Europeo',
+    contemporanea: 'Época Contemporánea',
+  },
+
+  colores: {
+    expansion: '#1E6091',
+    lapita: '#E07856',
+    navegacion: '#2E86AB',
+    reino: '#DEB887',
+    monumentos: '#4A4A4A',
+    'contacto-europeo': '#8B0000',
+    contemporanea: '#1B9AAA',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'La colonización de Oceanía fue la mayor empresa de exploración marítima de la historia anterior a la era moderna. Partiendo de Taiwán hace unos 5.000 años, pueblos de lengua austronesia cruzaron un océano que cubre un tercio de la superficie terrestre y poblaron miles de islas dispersas, desde Madagascar hasta Rapa Nui. Lo hicieron sin brújula ni cartas náuticas, guiándose por las estrellas, el oleaje y las aves, en grandes piraguas dobles. Esta cronología recorre 3.500 años: de la cerámica Lapita a los moai, del Imperio de Tonga al Reino de Hawái, del contacto europeo —con su devastador coste demográfico— a la descolonización y el renacimiento de la navegación tradicional. Una historia que rebate el viejo mito de la "deriva al azar" y reivindica la intencionalidad y la sofisticación de los navegantes del Pacífico.',
+
+    tablaComparativa: [
+      { hito: 'Expansión austronesia', periodo: '~3000-1500 a.C.', categoria: 'Expansión', personaje: 'Pueblos austronesios', aportacion: 'Piragua con balancín y tronco lingüístico común desde Taiwán' },
+      { hito: 'Cultura Lapita', periodo: '~1500-500 a.C.', categoria: 'Cultura Lapita', personaje: 'Comunidades Lapita', aportacion: 'Cerámica estampada y colonización de Fiyi, Tonga y Samoa' },
+      { hito: 'Navegación de altura', periodo: '~700-1000 d.C.', categoria: 'Navegación', personaje: 'Navegantes polinesios', aportacion: 'Wayfinding por estrellas, oleaje y aves; piraguas dobles' },
+      { hito: 'Triángulo polinesio', periodo: '~1000-1300 d.C.', categoria: 'Navegación', personaje: 'Colonos polinesios', aportacion: 'Hawái, Rapa Nui y Aotearoa pobladas de forma intencional' },
+      { hito: 'Imperio de Tonga', periodo: '~950-1500 d.C.', categoria: 'Reinos', personaje: 'Dinastía Tuʻi Tonga', aportacion: 'Talasocracia, langi de Muʻa y Haʻamonga ʻa Maui' },
+      { hito: 'Reino de Hawái', periodo: '1795-1810', categoria: 'Reinos', personaje: 'Kamehameha I', aportacion: 'Unificación del archipiélago y monarquía soberana' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiantes de Historia y Geografía',
+        perfil: 'Secundaria, preparatoria y universidad',
+        texto: 'Una visión panorámica de la colonización de Oceanía, útil para entender las grandes migraciones humanas y por qué los pueblos del Pacífico comparten lenguas, plantas y técnicas a lo largo de miles de kilómetros de océano.',
+      },
+      {
+        icono: '🧭',
+        titulo: 'Aficionados a la navegación',
+        perfil: 'Vela, náutica tradicional, exploración',
+        texto: 'El wayfinding polinesio —orientarse sin instrumentos por estrellas, oleaje y aves— es uno de los logros técnicos más impresionantes de la humanidad. Esta cronología sitúa cada avance náutico en su contexto y época.',
+      },
+      {
+        icono: '🗿',
+        titulo: 'Interesados en arqueología',
+        perfil: 'Monumentos megalíticos y culturas insulares',
+        texto: 'De los moai de Rapa Nui a los trilithon de Tonga, el Pacífico alberga monumentos extraordinarios. La cronología ayuda a entender quién los construyó, cuándo y por qué, y a separar los hechos de los mitos populares.',
+      },
+      {
+        icono: '🌏',
+        titulo: 'Lectores de divulgación',
+        perfil: 'Curiosos por las grandes historias humanas',
+        texto: 'Una narración accesible que conecta a malayos, hawaianos, maoríes y tonganos bajo un mismo origen, y que muestra el coste humano del contacto europeo sin caer en el tono romántico o folklórico.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿De dónde venían los polinesios?',
+        respuesta: 'Descienden de pueblos austronesios que partieron de Taiwán y el Sudeste Asiático insular hace unos 5.000 años. La evidencia lingüística, arqueológica y genética conecta a polinesios, melanesios costeros, malayos e incluso los malgaches de Madagascar bajo un mismo tronco austronesio. La cultura Lapita, hacia el 1500 a.C., marca su entrada en el Pacífico remoto.',
+        tip: 'El malgache de Madagascar y el hawaiano son lenguas emparentadas pese a estar separadas por medio planeta.',
+      },
+      {
+        pregunta: '¿Navegaban a propósito o llegaban por casualidad?',
+        respuesta: 'Navegaban de forma intencional y planificada. La vieja teoría de la "deriva al azar", popularizada por Thor Heyerdahl con la expedición Kon-Tiki, ha sido refutada: las islas se poblaron con cultivos y animales transportados deliberadamente, hubo viajes de ida y vuelta, y los navegantes dominaban el wayfinding. La travesía de la Hōkūleʻa en 1976 demostró que era posible navegar a Tahití solo con técnicas tradicionales.',
+        tip: 'La Hōkūleʻa navegó de Hawái a Tahití en 1976 sin instrumentos, solo con conocimiento ancestral.',
+      },
+      {
+        pregunta: '¿Es cierto que Rapa Nui se autodestruyó por un "ecocidio"?',
+        respuesta: 'Es un relato muy difundido pero discutido. La historiografía reciente cuestiona la idea de un colapso autoinfligido por deforestación: muchos estudios apuntan a una población más estable de lo supuesto y a factores complejos como la rata polinesia. La verdadera catástrofe demográfica fue externa: las razzias esclavistas peruanas de 1862-1863 y las enfermedades europeas redujeron la población a poco más de un centenar de personas.',
+        tip: 'El supuesto "colapso" es un debate abierto, no un hecho cerrado; el impacto externo del siglo XIX fue el golpe decisivo.',
+      },
+      {
+        pregunta: '¿Qué fue el Imperio de Tonga?',
+        respuesta: 'Fue una talasocracia —un poder basado en el control del mar— articulada por la dinastía Tuʻi Tonga entre los siglos X y XVI. Mediante alianzas, tributos y matrimonios extendió su influencia sobre Samoa, Fiyi, Wallis, Futuna y Niue. En su capital, Muʻa, se levantaron grandes plataformas funerarias (langi) y el monumental trilithon Haʻamonga ʻa Maui, hecho con bloques de coral de varias toneladas.',
+        tip: 'Tonga es el único Estado polinesio que conservó su monarquía sin ser colonizado formalmente.',
+      },
+      {
+        pregunta: '¿Qué efectos tuvo el contacto europeo en el Pacífico?',
+        respuesta: 'Fue profundamente destructivo. Tras Magallanes (1521) y los viajes de Cook (1768-1779) llegaron balleneros, comerciantes y misioneros. Las enfermedades introducidas —viruela, sarampión, gripe— diezmaron poblaciones sin inmunidad. A finales del siglo XIX las potencias se repartieron Oceanía: Estados Unidos anexionó Hawái en 1898 y europeos y estadounidenses dividieron archipiélagos enteros, que solo recuperaron su soberanía en el siglo XX.',
+        tip: 'La descolonización fue tardía: Samoa logró la independencia en 1962 y Fiyi en 1970.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Observa la enorme escala temporal en la Línea del Tiempo',
+        cuerpo: 'Esta cronología abarca más de 4.500 años, de la expansión austronesia (~3000 a.C.) al presente. Antes de leer, identifica visualmente las grandes fases: los largos siglos de expansión inicial, la rápida colonización del Triángulo polinesio y el impacto concentrado del contacto europeo.',
+      },
+      {
+        titulo: 'Compara la Lapita con la gran expansión',
+        cuerpo: 'Haz clic en "Cultura Lapita" y luego en "Colonización del Triángulo polinesio". Observa el contraste: la Lapita avanzó hasta Tonga y Samoa y luego se detuvo más de mil años (la Pausa Larga); la expansión final cubrió Hawái, Rapa Nui y Aotearoa en apenas tres siglos.',
+      },
+      {
+        titulo: 'Sigue la pista de la navegación',
+        cuerpo: 'La piragua con balancín abrió el Sudeste Asiático; la piragua doble y el wayfinding abrieron el océano abierto. Identifica en la línea cómo cada salto geográfico coincide con un avance náutico. La tecnología, no el azar, explica la expansión.',
+      },
+      {
+        titulo: 'Usa la Comparativa para distinguir reinos y monumentos',
+        cuerpo: 'En la tabla Comparativa, filtra por "Reinos" para ver el Imperio de Tonga y el Reino de Hawái, y por "Monumentos" para situar los moai. Verás que las grandes obras megalíticas surgen en sociedades complejas y jerarquizadas, no aisladas.',
+      },
+      {
+        titulo: 'Cierra con el Contexto Histórico para el cuadro completo',
+        cuerpo: 'Las 6 eras muestran el arco completo: de los orígenes austronesios al renacimiento contemporáneo. La última era, "Contacto, colonia y renacimiento", es la más densa: condensa epidemias, colonización, independencias y el resurgir de la navegación tradicional.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '📅',
+        texto: 'Las fechas "a.C." se cuentan hacia atrás: -3000 es anterior a -1500. En la línea de tiempo, la barra más a la izquierda es siempre la más antigua. El año 0 no existe: se pasa de 1 a.C. a 1 d.C.',
+      },
+      {
+        icono: '🌐',
+        texto: 'El "Triángulo polinesio" tiene como vértices Hawái (norte), Rapa Nui (sureste) y Aotearoa/Nueva Zelanda (suroeste). Dentro caben miles de islas y una superficie oceánica mayor que cualquier imperio terrestre de la antigüedad.',
+      },
+      {
+        icono: '🛶',
+        texto: 'Los polinesios transportaban en sus piraguas un "kit de colonización": taro, ñame, batata, coco, caña de azúcar, cerdos, gallinas, perros y la rata polinesia. Llevar la despensa a bordo era la clave para poblar islas vacías.',
+      },
+      {
+        icono: '⭐',
+        texto: 'El wayfinding usaba "estrellas guía" que salen y se ponen siempre en el mismo punto del horizonte, además del patrón del oleaje, que un navegante experto podía sentir incluso tumbado en el casco de la piragua.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Creer que los polinesios llegaron por azar o deriva',
+        cuerpo: 'La idea de marineros arrastrados por las corrientes, asociada a la expedición Kon-Tiki de Heyerdahl, está refutada. La colonización fue intencional: transportaron cultivos y animales, realizaron viajes de ida y vuelta y dominaban técnicas de navegación de altura transmitidas durante generaciones.',
+      },
+      {
+        titulo: 'Dar por hecho el "ecocidio" de Rapa Nui',
+        cuerpo: 'El relato del colapso autoinfligido por deforestación es discutido por la investigación reciente, que matiza el tamaño de la población y el papel de factores como la rata polinesia. Presentarlo como un hecho cerrado ignora que la catástrofe demográfica real vino de las razzias esclavistas y las enfermedades del siglo XIX.',
+      },
+      {
+        titulo: 'Confundir a todos los pueblos del Pacífico en uno solo',
+        cuerpo: 'Oceanía no es homogénea: melanesios, micronesios y polinesios tienen historias, lenguas y orígenes parcialmente distintos. Aunque comparten un sustrato austronesio, agruparlos sin matices borra siglos de trayectorias culturales diferenciadas.',
+      },
+      {
+        titulo: 'Idealizar las sociedades isleñas como paraísos intactos',
+        cuerpo: 'El relato romántico del "paraíso del Pacífico" omite que eran sociedades complejas, con jerarquías, guerras, esclavitud y transformaciones ambientales propias. También oculta el devastador impacto del contacto europeo. Una mirada rigurosa evita tanto el mito idílico como el catastrofista.',
+      },
+    ],
+  },
+};

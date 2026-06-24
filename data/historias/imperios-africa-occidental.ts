@@ -1,0 +1,367 @@
+import type { HistoriaData } from './types';
+
+export const imperiosAfricaOccidental: HistoriaData = {
+  slug: 'imperios-africa-occidental',
+  titulo: 'Imperios de África Occidental: Ghana, Mali y Songhai',
+  subtitulo: 'Trece siglos del oro y la sal del Sahel: de Wagadu a la batalla de Tondibi (c. 300 – 1591 d.C.)',
+  descripcionSEO: 'Cronología interactiva de los grandes imperios sahelianos: el Imperio de Ghana (Wagadu), el Imperio de Mali con Sundiata Keita y la peregrinación de Mansa Musa, y el Imperio Songhai de Sonni Ali y Askia Muhammad. Comercio transahariano del oro y la sal, Tombuctú y los manuscritos, hasta la caída en Tondibi (1591) en 10 hitos y 6 eras.',
+  keywords: [
+    'imperios africa occidental ghana mali songhai',
+    'comercio transahariano oro sal sahel',
+    'mansa musa peregrinacion la meca mali',
+    'sundiata keita kirina carta manden',
+    'tombuctu sankore manuscritos djenne',
+    'askia muhammad songhai tondibi 1591',
+  ],
+  anioInicio: 300,
+  anioFin: 1591,
+
+  hitos: [
+    {
+      id: 'imperio-ghana',
+      nombre: 'Imperio de Ghana (Wagadu)',
+      anioInicio: 300,
+      anioFin: 1076,
+      color: '#DAA520',
+      categoria: 'imperio',
+      descripcion: 'El reino soninké de Wagadu, conocido en las fuentes árabes como Ghana (el título de su soberano), controló la franja saheliana entre los ríos Senegal y Níger. Su poder se basaba en el control del comercio transahariano: el oro procedente de las minas de Bambuk y Buré al sur se intercambiaba por la sal de las minas saharianas del norte. El geógrafo Al-Bakri describió hacia 1068 una capital dual, con un barrio musulmán de mercaderes y otro real. El monopolio sobre las rutas y un impuesto sobre cada carga de sal y oro sostenían a la corte. Su capital se ha asociado tradicionalmente con el yacimiento de Kumbi Saleh, en la actual Mauritania.',
+      obraIconica: 'Descripción de la corte de Ghana por Al-Bakri (c. 1068)',
+      paises: ['Mauritania', 'Mali', 'Senegal'],
+    },
+    {
+      id: 'almoravides-declive-ghana',
+      nombre: 'Almorávides y declive de Ghana',
+      anioInicio: 1054,
+      anioFin: 1200,
+      color: '#228B22',
+      categoria: 'religion',
+      descripcion: 'En el siglo XI el movimiento reformista almorávide, surgido entre los bereberes sanhaya del Sahara, expandió un islam riguroso por el Magreb y al-Ándalus, y presionó las rutas saharianas del sur. La historiografía tradicional, siguiendo fuentes árabes posteriores, atribuyó a una conquista almorávide de la capital en 1076 el declive de Ghana; investigaciones recientes matizan ese relato y subrayan factores graduales: la desviación de las rutas comerciales, la desertización y la fragmentación interna. Sea como fuere, hacia 1200 Wagadu había perdido su hegemonía y el espacio quedó abierto a nuevos poderes, entre ellos el reino sosso de Sumanguru Kanté.',
+      obraIconica: 'Expansión almorávide y reordenación de las rutas del oro',
+      paises: ['Mauritania', 'Marruecos', 'Mali'],
+    },
+    {
+      id: 'fundacion-mali-sundiata',
+      nombre: 'Sundiata Keita funda Mali',
+      anioInicio: 1230,
+      anioFin: 1255,
+      color: '#CD853F',
+      categoria: 'imperio',
+      descripcion: 'Según la tradición oral transmitida por los griots (yelis), Sundiata Keita, príncipe mandinga, derrotó al rey sosso Sumanguru Kanté en la batalla de Kirina, fechada habitualmente hacia 1235, y unificó los clanes malinké. La asamblea de Kurukan Fuga proclamó la llamada "Carta de Manden", un conjunto de principios sociales y políticos transmitido oralmente que regulaba la convivencia entre clanes, oficios y castas. Sundiata adoptó el título de mansa (rey de reyes) y estableció las bases de un imperio que integró las antiguas tierras de Ghana y el control de los yacimientos auríferos de Buré.',
+      obraIconica: 'Batalla de Kirina (c. 1235) y la Carta de Kurukan Fuga',
+      paises: ['Mali', 'Guinea', 'Senegal'],
+    },
+    {
+      id: 'mansa-musa-peregrinacion',
+      nombre: 'Apogeo de Mali y Mansa Musa',
+      anioInicio: 1312,
+      anioFin: 1337,
+      color: '#FFD700',
+      categoria: 'comercio',
+      descripcion: 'Bajo Mansa Musa, Mali alcanzó su máxima extensión, abarcando del Atlántico al Níger medio. Su peregrinación a La Meca de 1324, atravesando El Cairo con una caravana descrita por cronistas árabes como portadora de grandes cantidades de oro, proyectó la riqueza del imperio por todo el Mediterráneo. Las crónicas relatan que la entrada de oro malí en los mercados egipcios alteró su valor durante años, aunque las cifras concretas proceden de fuentes posteriores y deben tomarse con cautela. A su regreso impulsó la construcción en Tombuctú y Gao y atrajo a sabios y arquitectos. El mapa catalán de Abraham Cresques (1375) lo representó como un soberano sentado sosteniendo una pepita de oro.',
+      obraIconica: 'Peregrinación de Mansa Musa a La Meca (1324)',
+      paises: ['Mali', 'Egipto', 'Arabia', 'Senegal', 'Guinea'],
+    },
+    {
+      id: 'tombuctu-djenne-saber',
+      nombre: 'Tombuctú y Djenné: centros del saber',
+      anioInicio: 1325,
+      anioFin: 1450,
+      color: '#B8860B',
+      categoria: 'cultura',
+      descripcion: 'Las ciudades caravaneras del Níger medio se convirtieron en focos de erudición islámica. En Tombuctú, la mezquita y madrasa de Sankoré articuló una red de enseñanza en derecho, teología, astronomía y gramática, sostenida por una comunidad de copistas y comerciantes de libros. Se produjeron y atesoraron decenas de miles de manuscritos, hoy conocidos como los manuscritos de Tombuctú, que documentan el pensamiento, la ciencia y el comercio sahelianos. En Djenné, la gran mezquita de adobe se erigió en símbolo de la arquitectura sudano-saheliana. Estas ciudades fueron también nudos del comercio del oro, la sal, el cobre y el cautiverio sahariano.',
+      obraIconica: 'Universidad de Sankoré y gran mezquita de Djenné',
+      paises: ['Mali'],
+    },
+    {
+      id: 'declive-mali',
+      nombre: 'Declive del Imperio de Mali',
+      anioInicio: 1400,
+      anioFin: 1490,
+      color: '#A0522D',
+      categoria: 'declive',
+      descripcion: 'Tras el apogeo del siglo XIV, Mali entró en una larga decadencia. Las disputas dinásticas por la sucesión al trono de mansa debilitaron la autoridad central. Pueblos periféricos como los tuareg, los mossi y los wolof presionaron las fronteras; los tuareg ocuparon Tombuctú hacia 1433. Las provincias orientales del Níger, encabezadas por Gao y el pueblo songhai, se emanciparon progresivamente del control malí. El comercio transahariano siguió fluyendo, pero su control pasó a manos de los nuevos poderes emergentes en el este del Sahel.',
+      obraIconica: 'Pérdida de Tombuctú y emancipación de Gao',
+      paises: ['Mali', 'Níger', 'Burkina Faso'],
+    },
+    {
+      id: 'ascenso-songhai-sonni-ali',
+      nombre: 'Ascenso de Songhai: Sonni Ali',
+      anioInicio: 1464,
+      anioFin: 1492,
+      color: '#8B4513',
+      categoria: 'expansion',
+      descripcion: 'Desde su base en Gao, Sonni Ali Ber transformó el reino songhai en una potencia militar. Organizó una flota fluvial en el Níger y una caballería con la que conquistó Tombuctú (1468) y, tras un largo asedio, Djenné (1473), arrebatando a sus rivales el control de las grandes ciudades comerciales. Las crónicas escritas por los ulemas de Tombuctú, como el Tarikh al-Sudan, lo retratan con hostilidad por sus tensiones con la élite religiosa, lo que matiza su imagen. Bajo su mando Songhai se convirtió en el mayor de los imperios sahelianos por extensión.',
+      obraIconica: 'Conquista de Tombuctú (1468) y Djenné (1473)',
+      paises: ['Mali', 'Níger', 'Nigeria'],
+    },
+    {
+      id: 'askia-muhammad-apogeo',
+      nombre: 'Askia Muhammad y el apogeo songhai',
+      anioInicio: 1493,
+      anioFin: 1528,
+      color: '#DAA520',
+      categoria: 'imperio',
+      descripcion: 'Askia Muhammad I (Muhammad Ture) tomó el poder en 1493 e inauguró la dinastía askia. Reorganizó el imperio con un aparato administrativo centralizado: provincias dirigidas por gobernadores, un sistema fiscal, una moneda de referencia y unidades de pesos y medidas. Realizó la peregrinación a La Meca (1496-1497), de la que regresó con el título de califa para el Sudán occidental, reforzando la legitimidad islámica de su gobierno. Promovió la erudición de Tombuctú y mantuvo correspondencia con juristas como Al-Maghili. Songhai alcanzó entonces su máxima organización institucional.',
+      obraIconica: 'Reforma administrativa y peregrinación de Askia Muhammad (1496-97)',
+      paises: ['Mali', 'Níger', 'Nigeria', 'Senegal'],
+    },
+    {
+      id: 'batalla-tondibi',
+      nombre: 'Batalla de Tondibi: caída de Songhai',
+      anioInicio: 1590,
+      anioFin: 1591,
+      color: '#B22222',
+      categoria: 'declive',
+      descripcion: 'En 1590 el sultán saadí de Marruecos, Ahmad al-Mansur, envió un ejército a través del Sahara para apoderarse de las minas de oro y de sal del Sahel. En la batalla de Tondibi (1591), una fuerza expedicionaria mucho menor pero equipada con arcabuces y artillería, mandada por el renegado Yuder Pachá, derrotó al numeroso ejército songhai, que combatía sin armas de fuego. La superioridad tecnológica decidió el choque. Gao, Tombuctú y Djenné fueron ocupadas y saqueadas; numerosos eruditos, entre ellos Ahmad Baba, fueron deportados a Marrakech. Songhai se fragmentó y ningún gran imperio volvió a unificar el Sahel occidental.',
+      obraIconica: 'Batalla de Tondibi: las armas de fuego saadíes vencen a Songhai (1591)',
+      paises: ['Mali', 'Marruecos', 'Níger'],
+    },
+    {
+      id: 'legado-sahel',
+      nombre: 'Legado del Sahel imperial',
+      anioInicio: 1591,
+      anioFin: 1591,
+      color: '#CD853F',
+      categoria: 'legado',
+      descripcion: 'La caída de Songhai cerró el ciclo de los grandes imperios sahelianos, pero su herencia perduró. El comercio transahariano del oro, la sal y otros bienes —incluido el comercio de personas esclavizadas, parte indisociable de aquella economía— había conectado durante siglos el África subsahariana con el Mediterráneo y Oriente Próximo. El islam, difundido por mercaderes y eruditos, se arraigó como religión mayoritaria en buena parte de África occidental. Los manuscritos de Tombuctú, en parte conservados hasta hoy, testimonian una tradición escrita propia, frente al tópico de una África sin escritura. Y la memoria oral de los griots mantuvo viva la epopeya de Sundiata y de los mansas.',
+      obraIconica: 'Manuscritos de Tombuctú y la epopeya de Sundiata transmitida por los griots',
+      paises: ['Mali', 'Senegal', 'Guinea', 'Níger', 'Mauritania'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'El oro de Ghana (Wagadu)',
+      desde: 300,
+      hasta: 1054,
+      icono: '🏜️',
+      hitosDestacados: ['Imperio de Ghana (Wagadu)'],
+      eventos: [
+        'El reino soninké de Wagadu controla la franja entre el Senegal y el Níger',
+        'Auge del comercio transahariano: oro de Bambuk y Buré por sal del Sahara',
+        'Introducción del camello consolida las rutas caravaneras saharianas',
+        'Al-Bakri describe la corte dual de la capital, con barrio musulmán y real (c. 1068)',
+      ],
+    },
+    {
+      nombre: 'Transición almorávide',
+      desde: 1054,
+      hasta: 1230,
+      icono: '🕌',
+      hitosDestacados: ['Almorávides y declive de Ghana'],
+      eventos: [
+        'El movimiento almorávide expande un islam reformista por el Magreb y al-Ándalus',
+        'Presión sobre las rutas del sur y reordenación del comercio sahariano',
+        'Declive gradual de Wagadu por desertización, rutas desviadas y fragmentación',
+        'Ascenso del reino sosso de Sumanguru Kanté en el espacio dejado por Ghana',
+      ],
+    },
+    {
+      nombre: 'Fundación y apogeo de Mali',
+      desde: 1230,
+      hasta: 1360,
+      icono: '👑',
+      hitosDestacados: ['Sundiata Keita funda Mali', 'Apogeo de Mali y Mansa Musa'],
+      eventos: [
+        'Sundiata Keita vence a Sumanguru en Kirina y unifica a los malinké (c. 1235)',
+        'La asamblea de Kurukan Fuga proclama la "Carta de Manden"',
+        'Mali integra las tierras de Ghana y los yacimientos de oro de Buré',
+        'Mansa Musa peregrina a La Meca y proyecta la riqueza de Mali (1324)',
+        'El mapa catalán de Cresques representa a Mansa Musa con una pepita de oro (1375)',
+      ],
+    },
+    {
+      nombre: 'Ciudades del saber y declive de Mali',
+      desde: 1360,
+      hasta: 1464,
+      icono: '📜',
+      hitosDestacados: ['Tombuctú y Djenné: centros del saber', 'Declive del Imperio de Mali'],
+      eventos: [
+        'Sankoré, en Tombuctú, articula una red de enseñanza islámica',
+        'Producción y atesoramiento de los manuscritos de Tombuctú',
+        'La gran mezquita de Djenné, símbolo de la arquitectura sudano-saheliana',
+        'Disputas dinásticas debilitan el poder central de Mali',
+        'Los tuareg ocupan Tombuctú (c. 1433) y Gao se emancipa',
+      ],
+    },
+    {
+      nombre: 'El Imperio Songhai',
+      desde: 1464,
+      hasta: 1590,
+      icono: '🚣',
+      hitosDestacados: ['Ascenso de Songhai: Sonni Ali', 'Askia Muhammad y el apogeo songhai'],
+      eventos: [
+        'Sonni Ali Ber organiza flota fluvial y caballería desde Gao',
+        'Conquista de Tombuctú (1468) y de Djenné (1473)',
+        'Askia Muhammad I inaugura la dinastía askia (1493)',
+        'Reforma administrativa: provincias, fiscalidad y pesos y medidas',
+        'Peregrinación de Askia a La Meca y título de califa del Sudán (1496-97)',
+      ],
+    },
+    {
+      nombre: 'Caída y legado',
+      desde: 1590,
+      hasta: 1591,
+      icono: '🔫',
+      hitosDestacados: ['Batalla de Tondibi: caída de Songhai', 'Legado del Sahel imperial'],
+      eventos: [
+        'Ahmad al-Mansur envía un ejército saadí a través del Sahara (1590)',
+        'En Tondibi, los arcabuces saadíes derrotan al ejército songhai (1591)',
+        'Saqueo de Gao, Tombuctú y Djenné; deportación de eruditos como Ahmad Baba',
+        'Fin de los grandes imperios unificados del Sahel occidental',
+        'Perduran el islam, los manuscritos de Tombuctú y la memoria oral de los griots',
+      ],
+    },
+  ],
+
+  categorias: {
+    imperio: 'Imperio',
+    comercio: 'Comercio',
+    religion: 'Religión e islam',
+    cultura: 'Cultura y saber',
+    expansion: 'Expansión militar',
+    declive: 'Declive y conquista',
+    legado: 'Legado',
+  },
+
+  colores: {
+    imperio: '#DAA520',
+    comercio: '#FFD700',
+    religion: '#228B22',
+    cultura: '#B8860B',
+    expansion: '#8B4513',
+    declive: '#B22222',
+    legado: '#CD853F',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'Entre los siglos IV y XVI, la franja del Sahel —la orilla del desierto, entre el Sahara y la sabana del Níger— fue escenario de tres grandes imperios sucesivos: Ghana (Wagadu), Mali y Songhai. Su prosperidad nació del comercio transahariano: el oro extraído en las minas del sur viajaba hacia el norte a lomos de caravanas de camellos, y la sal de las minas saharianas hacía el camino inverso, junto a cobre, telas, libros y personas esclavizadas. Sobre ese eje crecieron ciudades como Kumbi Saleh, Gao, Djenné y, sobre todo, Tombuctú, que llegó a ser un centro de erudición islámica con decenas de miles de manuscritos. Frente al viejo tópico de un África sin historia ni escritura, estos imperios dejaron crónicas, instituciones administrativas, una arquitectura propia de adobe y una rica tradición oral conservada por los griots. Esta cronología recorre ese arco, de la corte de Ghana descrita por Al-Bakri a la caída de Songhai en Tondibi (1591), cuando las armas de fuego marroquíes pusieron fin a la era imperial saheliana.',
+
+    tablaComparativa: [
+      { hito: 'Imperio de Ghana (Wagadu)', periodo: 'c. 300-1076', categoria: 'Imperio', personaje: 'Reyes soninké (título "ghana")', aportacion: 'Primer gran control del comercio oro-sal en el Sahel occidental' },
+      { hito: 'Almorávides y declive de Ghana', periodo: 's. XI-1200', categoria: 'Religión e islam', personaje: 'Movimiento almorávide / Sumanguru', aportacion: 'Difusión del islam reformista y reordenación de las rutas saharianas' },
+      { hito: 'Fundación de Mali', periodo: 'c. 1235', categoria: 'Imperio', personaje: 'Sundiata Keita', aportacion: 'Unificación malinké y "Carta de Manden" de Kurukan Fuga' },
+      { hito: 'Apogeo de Mali y Mansa Musa', periodo: '1312-1337', categoria: 'Comercio', personaje: 'Mansa Musa', aportacion: 'Máxima extensión y proyección internacional del oro de Mali' },
+      { hito: 'Apogeo de Songhai', periodo: '1493-1528', categoria: 'Imperio', personaje: 'Askia Muhammad I', aportacion: 'Administración centralizada, fiscalidad y legitimidad islámica' },
+      { hito: 'Batalla de Tondibi', periodo: '1591', categoria: 'Declive y conquista', personaje: 'Yuder Pachá / Ahmad al-Mansur', aportacion: 'Las armas de fuego saadíes ponen fin a los imperios sahelianos' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiantes de Historia',
+        perfil: 'Secundaria, preparatoria y universidad',
+        texto: 'Una panorámica clara de la historia africana medieval, a menudo ausente de los temarios. Permite situar Ghana, Mali y Songhai en su contexto y conectar el comercio transahariano con la economía mediterránea de la época.',
+      },
+      {
+        icono: '🪙',
+        titulo: 'Interesados en historia económica',
+        perfil: 'Comercio, rutas y monedas',
+        texto: 'El eje oro-sal del Sahel fue una de las grandes redes comerciales del mundo premoderno. Esta cronología muestra cómo el control de las rutas y los yacimientos determinó el auge y la caída de cada imperio.',
+      },
+      {
+        icono: '🕌',
+        titulo: 'Historia de las religiones',
+        perfil: 'Difusión del islam en África',
+        texto: 'De los almorávides a Askia Muhammad, el islam se entrelaza con el poder político y el comercio. Tombuctú y Sankoré ilustran cómo la fe articuló redes de enseñanza, derecho y producción de manuscritos.',
+      },
+      {
+        icono: '📚',
+        titulo: 'Curiosos del patrimonio',
+        perfil: 'Manuscritos, arquitectura y tradición oral',
+        texto: 'Los manuscritos de Tombuctú, la gran mezquita de adobe de Djenné y las epopeyas de los griots forman un patrimonio singular. Útil para entender el valor de la cultura escrita y oral sahelianas.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿El Imperio de Ghana es lo mismo que el país actual de Ghana?',
+        respuesta: 'No. El Imperio de Ghana medieval (Wagadu) se situaba en la actual Mauritania y Mali, muy al norte y al oeste de la República de Ghana de hoy. El país moderno adoptó ese nombre en 1957, al independizarse, como homenaje al prestigio del antiguo imperio, pese a no coincidir geográficamente con él.',
+        tip: '"Ghana" era originalmente el título del rey soninké, no el nombre del reino, que se llamaba Wagadu.',
+      },
+      {
+        pregunta: '¿En qué se basaba la riqueza de estos imperios?',
+        respuesta: 'En el comercio transahariano, sobre todo el intercambio de oro por sal. El oro procedía de minas del sur (Bambuk, Buré, y más tarde Akan); la sal, de minas saharianas como Taghaza. Los imperios no solían poseer las minas, pero controlaban las rutas y cobraban impuestos sobre las caravanas, lo que financiaba la corte, el ejército y las ciudades.',
+        tip: 'El comercio incluía también cobre, telas, libros y el comercio de personas esclavizadas a través del Sahara.',
+      },
+      {
+        pregunta: '¿Realmente Mansa Musa fue "el hombre más rico de la historia"?',
+        respuesta: 'Es una afirmación popular pero imposible de verificar: comparar fortunas a lo largo de los siglos no es riguroso. Lo documentado es que su peregrinación de 1324 impresionó a los cronistas árabes por la cantidad de oro que distribuyó en El Cairo. Las cifras concretas proceden de fuentes posteriores y conviene tomarlas con cautela, aunque reflejan el enorme prestigio económico de Mali.',
+        tip: 'El mapa catalán de Abraham Cresques (1375) lo dibujó sosteniendo una pepita de oro, signo de su fama en Europa.',
+      },
+      {
+        pregunta: '¿Por qué Tombuctú era tan importante?',
+        respuesta: 'Tombuctú fue a la vez un nudo del comercio caravanero y un gran centro de erudición islámica. Su madrasa de Sankoré y una comunidad de copistas produjeron y conservaron decenas de miles de manuscritos sobre derecho, teología, astronomía, medicina y comercio. Esos manuscritos demuestran que África occidental tuvo una rica tradición escrita propia.',
+        tip: 'Parte de los manuscritos se conserva hoy; muchos fueron puestos a salvo durante los conflictos del norte de Mali en 2012-2013.',
+      },
+      {
+        pregunta: '¿Cómo cayó el Imperio Songhai?',
+        respuesta: 'En 1591, en la batalla de Tondibi, un pequeño ejército saadí de Marruecos equipado con arcabuces y artillería, enviado por el sultán Ahmad al-Mansur para apoderarse del oro y la sal, derrotó al numeroso ejército songhai, que carecía de armas de fuego. La superioridad tecnológica fue decisiva. Tras el saqueo de las grandes ciudades, ningún imperio volvió a unificar el Sahel occidental.',
+        tip: 'Entre los deportados a Marrakech estuvo el erudito Ahmad Baba, una de las grandes figuras intelectuales de Tombuctú.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Observa la sucesión de los tres imperios',
+        cuerpo: 'En la Línea del Tiempo verás que Ghana, Mali y Songhai no coexistieron como rivales simultáneos, sino que se sucedieron: cada uno heredó y amplió el control del comercio del anterior. Identifica visualmente dónde termina uno y empieza el siguiente.',
+      },
+      {
+        titulo: 'Sigue el hilo del oro y la sal',
+        cuerpo: 'Haz clic en "Imperio de Ghana" y luego en "Apogeo de Mali y Mansa Musa". El motor económico es el mismo eje transahariano. Comprende que lo que cambia es quién controla las rutas y las ciudades, no la naturaleza del comercio.',
+      },
+      {
+        titulo: 'Distingue el poder militar del poder cultural',
+        cuerpo: 'Compara "Ascenso de Songhai: Sonni Ali", centrado en la conquista, con "Tombuctú y Djenné: centros del saber", centrado en la erudición. Verás que el esplendor saheliano combinó fuerza militar con vida intelectual y religiosa.',
+      },
+      {
+        titulo: 'Usa la Comparativa para agrupar por categoría',
+        cuerpo: 'En la tabla, filtra por "Imperio" para ver las fases de hegemonía y por "Declive y conquista" para los momentos de quiebre. El contraste entre apogeo y caída ayuda a entender el ciclo de cada imperio.',
+      },
+      {
+        titulo: 'Cierra con el Contexto Histórico',
+        cuerpo: 'Las 6 eras encadenan la historia sin huecos, de "El oro de Ghana" a "Caída y legado". Repasa los eventos de cada era para fijar el orden de los grandes hitos y entender qué quedó después de Tondibi.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '🗺️',
+        texto: 'El "Sahel" significa literalmente "orilla" o "costa" en árabe: es la orilla del desierto. Estos imperios prosperaron justo en esa frontera entre el Sahara y la sabana, donde se encontraban las caravanas del norte y las redes comerciales del sur.',
+      },
+      {
+        icono: '🐪',
+        texto: 'La introducción del camello (dromedario) en el Sahara, consolidada en los primeros siglos de nuestra era, hizo viable el comercio transahariano a gran escala. Sin él, difícilmente habrían existido imperios del oro y la sal como Ghana, Mali o Songhai.',
+      },
+      {
+        icono: '🎙️',
+        texto: 'Buena parte de lo que sabemos de Sundiata Keita procede de la tradición oral de los griots (yelis), transmitida durante siglos. Es una fuente valiosa, pero distinta de un documento de archivo: mezcla historia, genealogía y epopeya.',
+      },
+      {
+        icono: '📖',
+        texto: 'Las crónicas escritas en Tombuctú, como el Tarikh al-Sudan y el Tarikh al-Fattash (siglo XVII), son fuentes árabes locales fundamentales, pero reflejan el punto de vista de la élite religiosa, lo que conviene tener presente al leer sus juicios sobre gobernantes como Sonni Ali.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Creer que África subsahariana no tuvo historia ni escritura',
+        cuerpo: 'Es un tópico falso, heredado de prejuicios coloniales. Los imperios sahelianos tuvieron Estados organizados, fiscalidad, administración y una abundante producción escrita en árabe, como demuestran los manuscritos de Tombuctú. La tradición oral de los griots completa, no sustituye, esa cultura escrita.',
+      },
+      {
+        titulo: 'Confundir el Imperio de Ghana con la actual Ghana',
+        cuerpo: 'No coinciden ni geográfica ni cronológicamente. El imperio medieval (Wagadu) estaba en Mauritania y Mali; la república moderna está más al sur y tomó ese nombre en 1957 como símbolo de prestigio histórico, no por continuidad territorial.',
+      },
+      {
+        titulo: 'Idealizar el comercio omitiendo la trata sahariana',
+        cuerpo: 'El comercio transahariano que enriqueció a estos imperios incluyó, junto al oro y la sal, el comercio de personas esclavizadas. Reconocerlo como un hecho histórico —sin tono romántico ni folklórico— es necesario para una comprensión completa de aquella economía.',
+      },
+      {
+        titulo: 'Dar por exactas las cifras de oro de Mansa Musa',
+        cuerpo: 'Las cantidades concretas de oro atribuidas a la peregrinación de 1324 proceden de cronistas posteriores y son difíciles de verificar. El hecho histórico relevante es el impacto y el prestigio que causó, no las cifras redondas que circulan en relatos divulgativos.',
+      },
+    ],
+  },
+};
