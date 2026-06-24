@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './EstimadorIRPF.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
+import { MeskeiaLogo, LegalNotice, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
   DataReference, RegionBadge
 } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
@@ -205,6 +205,8 @@ export default function EstimadorIRPFPage() {
 
       <RegionBadge variant="es-only" />
 
+
+      <LegalNotice />
 
       <DisclaimerCard variant="financial" severity="critical" />
 

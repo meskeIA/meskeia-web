@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './EstimadorCuotaAutonomo.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
+import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
   DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
@@ -244,6 +244,8 @@ export default function EstimadorCuotaAutonomoPage() {
 
       <RegionBadge variant="es-only" />
 
+
+      <LegalNotice />
 
       <DisclaimerCard variant="financial" severity="critical" />
 

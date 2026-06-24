@@ -33,6 +33,16 @@
   --acento-shadow: rgba(162, 75, 42, 0.16);
 }
 
+/* Delegum: texto en marino (alto contraste) + acento/borde en oro (firma). */
+.delegum {
+  --acento-text: #16244C;
+  --acento-line: #BE9A4E;
+  --acento-bg: rgba(190, 154, 78, 0.08);
+  --acento-bg-hover: rgba(190, 154, 78, 0.14);
+  --acento-border: rgba(190, 154, 78, 0.3);
+  --acento-shadow: rgba(22, 36, 76, 0.14);
+}
+
 .enlace {
   display: flex;
   align-items: center;
@@ -94,6 +104,15 @@
   --acento-bg-hover: rgba(201, 116, 46, 0.18);
   --acento-border: rgba(201, 116, 46, 0.35);
   --acento-shadow: rgba(201, 116, 46, 0.18);
+}
+
+[data-theme='dark'] .delegum {
+  --acento-text: #D4B36A;
+  --acento-line: #BE9A4E;
+  --acento-bg: rgba(190, 154, 78, 0.12);
+  --acento-bg-hover: rgba(190, 154, 78, 0.18);
+  --acento-border: rgba(190, 154, 78, 0.35);
+  --acento-shadow: rgba(0, 0, 0, 0.3);
 }
 
 /* ─── Accesibilidad: movimiento reducido ─── */

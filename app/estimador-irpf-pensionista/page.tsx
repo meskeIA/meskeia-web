@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './EstimadorIrpfPensionista.module.css';
-import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
+import { MeskeiaLogo, LegalNotice, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
   DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
@@ -151,6 +151,8 @@ export default function EstimadorIrpfPensionista() {
 
       <RegionBadge variant="es-only" />
 
+
+      <LegalNotice />
 
       <DisclaimerCard variant="financial"
         severity="critical">

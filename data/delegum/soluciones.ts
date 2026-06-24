@@ -178,3 +178,21 @@ export const PUERTAS: Puerta[] = [
     ],
   },
 ];
+
+// Mapa inverso url-de-app → puerta. Si una app apareciera en varias puertas,
+// gana la primera aparición (su puerta primaria).
+const PUERTA_POR_APP = new Map<string, Puerta>();
+for (const p of PUERTAS) {
+  for (const a of p.apps) {
+    if (!PUERTA_POR_APP.has(a.url)) PUERTA_POR_APP.set(a.url, p);
+  }
+}
+
+/**
+ * Devuelve la puerta de Soluciones a la que pertenece una app (por su slug, sin
+ * barras), o null si la app no está en el universo Delegum. Lo consume el
+ * cross-link meskeIA → Delegum (componente DescubreVertical).
+ */
+export function getPuertaDeApp(slug: string): Puerta | null {
+  return PUERTA_POR_APP.get(`/${slug}/`) ?? null;
+}

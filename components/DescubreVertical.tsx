@@ -12,17 +12,20 @@
  * Verticales soportados:
  *  - Stemum   → apps STEM de primer nivel, vía STEMUM_APP_DISCIPLINA.
  *  - Cronicum → cronologías en /visualizador-historia/<slug>, vía las puertas.
+ *  - Delegum  → apps fiscales/laborales incluidas en las puertas de Soluciones,
+ *               vía getPuertaDeApp. Enlaza al ancla de la categoría.
  *
- * Es 100% automático (se apoya en los registros existentes; cubre todo el
- * catálogo del vertical sin editar página por página) y se inyecta una sola vez
- * desde LegalNotice.
+ * Es 100% automático (se apoya en los registros existentes; cubre el catálogo
+ * del vertical sin editar página por página) y se inyecta una sola vez desde
+ * LegalNotice.
  *
  * NO se muestra:
  *  - en apps que no pertenecen a ningún vertical (la mayoría del catálogo),
  *  - cuando la app ya se ve desde el dominio del vertical, donde el chrome de
  *    marca ya cumple esa función. En Stemum se detecta con useStemumHost; en
- *    Cronicum no hace falta, porque LegalNotice solo se renderiza en la variante
- *    meskeIA de la cronología (marca === 'meskeia').
+ *    Cronicum no hace falta (LegalNotice solo se renderiza en la variante
+ *    meskeIA, marca === 'meskeia'); en Delegum tampoco (las apps fiscales solo
+ *    viven en meskeia.com, no hay host-rewrite de la app).
  *
  * Pendiente (siguiente iteración): añadir Gastronomía cuando exista el portal.
  */
@@ -35,10 +38,11 @@ import {
   STEMUM_APPS_POR_DISCIPLINA,
 } from '@/data/stemum';
 import { getPuertaDeCronologia } from '@/data/cronicum/puertas';
+import { getPuertaDeApp } from '@/data/delegum/soluciones';
 import styles from './DescubreVertical.module.css';
 
 interface Banda {
-  vertical: 'stemum' | 'cronicum';
+  vertical: 'stemum' | 'cronicum' | 'delegum';
   icono: string;
   intro: string; // "Esta herramienta forma parte de"
   etiqueta: string; // disciplina o puerta (en negrita)
@@ -95,6 +99,28 @@ function resolverBanda(pathname: string, isStemum: boolean): Banda | null {
             : 'Explora esta sección →',
       };
     }
+  }
+
+  // ── Delegum ── app fiscal/laboral incluida en alguna puerta de Soluciones.
+  // Las apps fiscales viven solo en meskeia.com (Delegum enlaza en absoluto con
+  // ?from=delegum), así que no hay caso "vista desde delegum.com": sin hook de
+  // host. Enlazamos al ancla de su categoría en la página Soluciones.
+  const puertaDelegum = getPuertaDeApp(segs[0] ?? '');
+  if (puertaDelegum) {
+    const otras = puertaDelegum.apps.length - 1;
+    return {
+      vertical: 'delegum',
+      icono: '⚖️',
+      intro: 'Esta herramienta forma parte de',
+      etiqueta: puertaDelegum.titulo,
+      marca: 'Delegum',
+      descripcion: 'el portal de fiscalidad y derecho de meskeIA.',
+      href: `https://delegum.com/soluciones/?from=meskeia#${puertaDelegum.id}`,
+      cta:
+        otras >= 1
+          ? `Descubre ${otras} ${plural(otras, 'herramienta', 'herramientas')} más →`
+          : 'Explora esta categoría →',
+    };
   }
 
   return null;

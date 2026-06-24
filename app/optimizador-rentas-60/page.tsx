@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './OptimizadorRentas60.module.css';
-import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
+import { MeskeiaLogo, LegalNotice, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
   DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
@@ -247,6 +247,8 @@ export default function OptimizadorRentas60() {
 
       <RegionBadge variant="es-only" />
 
+
+      <LegalNotice />
 
       <DisclaimerCard variant="financial"
         severity="critical">

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './ResidenciaVsCuidadoCasa.module.css';
-import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
+import { MeskeiaLogo, LegalNotice, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -155,6 +155,8 @@ export default function ResidenciaVsCuidadoCasa() {
 
       <RegionBadge variant="es-only" />
 
+
+      <LegalNotice />
 
       <DisclaimerCard variant="financial"
         severity="critical">

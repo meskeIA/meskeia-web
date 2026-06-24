@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './OrientadorGradoDependencia.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Datos ────────────────────────────────────────────────────────────────────
@@ -180,6 +180,8 @@ export default function OrientadorGradoDependencia() {
         <h1 className={styles.title}>Orientador Grado de Dependencia</h1>
         <p className={styles.subtitle}>Baremo BVD orientativo · Ley 39/2006 LAPAD · Prestaciones del SAAD</p>
       </header>
+
+      <LegalNotice />
 
       <DisclaimerCard variant="general"
         severity="critical">

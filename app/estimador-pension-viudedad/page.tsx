@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './EstimadorPensionViudedad.module.css';
-import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
+import { MeskeiaLogo, LegalNotice, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
   DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
@@ -195,6 +195,8 @@ export default function EstimadorPensionViudedad() {
 
       <RegionBadge variant="es-only" />
 
+
+      <LegalNotice />
 
       <DisclaimerCard variant="financial"
         severity="critical">

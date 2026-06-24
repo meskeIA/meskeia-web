@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './ComparadorFormasJuridicas.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
+import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -496,6 +496,8 @@ export default function ComparadorFormasJuridicasPage() {
       </header>
 
       <RegionBadge variant="es-only" />
+
+      <LegalNotice />
 
       <DisclaimerCard variant="financial" severity="critical" />
 

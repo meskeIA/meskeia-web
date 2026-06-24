@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './AsistenteAltaAutonomo.module.css';
-import { MeskeiaLogo, Footer, NumberInput, RelatedApps, EducationalSection, ShareCard, DisclaimerCard,
+import { MeskeiaLogo, LegalNotice, Footer, NumberInput, RelatedApps, EducationalSection, ShareCard, DisclaimerCard,
   DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
@@ -440,6 +440,8 @@ export default function AsistenteAltaAutonomoPage() {
 
       <RegionBadge variant="es-only" />
 
+
+      <LegalNotice />
 
       <DisclaimerCard variant="financial" severity="critical" />
 

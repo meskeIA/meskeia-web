@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './OrientadorGastosDeducibles.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
+import { MeskeiaLogo, LegalNotice, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -187,6 +187,8 @@ export default function OrientadorGastosDeduciblesPage() {
 
       <RegionBadge variant="es-only" />
 
+
+      <LegalNotice />
 
       <DisclaimerCard variant="financial" severity="critical" />
 
