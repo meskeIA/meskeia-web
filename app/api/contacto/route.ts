@@ -1,10 +1,14 @@
 import { Resend } from 'resend';
 import { NextRequest, NextResponse } from 'next/server';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(request: NextRequest) {
   try {
+    // Instanciar Resend dentro del handler (no en el nivel del módulo): así el
+    // build local prebuilt no requiere la clave (que es Sensitive y no se
+    // descarga con `vercel pull`). En producción Vercel inyecta la clave real
+    // en runtime, por lo que el envío de emails funciona igual.
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
     const body = await request.json();
     const { asunto, mensaje, honeypot } = body;
 

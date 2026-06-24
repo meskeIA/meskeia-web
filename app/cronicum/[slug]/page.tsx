@@ -11,6 +11,11 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+// Catálogo cerrado: solo existen los slugs prerenderizados; cualquier otro → 404.
+// dynamicParams=false elimina la lambda de reserva (necesario para `vercel build`
+// prebuilt, que no la empaqueta correctamente para rutas dinámicas).
+export const dynamicParams = false;
+
 // Prerendera tanto las 12 puertas como las 142 cronologías bajo /cronicum/[slug].
 export async function generateStaticParams() {
   const puertas = getAllPuertaSlugs();

@@ -7,6 +7,10 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+// Catálogo cerrado: solo slugs prerenderizados; cualquier otro → 404.
+// dynamicParams=false elimina la lambda de reserva (necesario para `vercel build` prebuilt).
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   return getAllHistoriaSlugs().map(slug => ({ slug }));
 }

@@ -8,6 +8,10 @@ import styles from '../Blog.module.css';
 
 const BASE = 'https://delegum.com/blog/';
 
+// Catálogo cerrado: solo slugs prerenderizados; cualquier otro → 404.
+// dynamicParams=false elimina la lambda de reserva (necesario para `vercel build` prebuilt).
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return POSTS.map((p) => ({ slug: p.slug }));
 }
