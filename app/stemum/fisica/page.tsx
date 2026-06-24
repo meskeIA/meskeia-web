@@ -51,6 +51,96 @@ const APPS = [
     desc: 'Ondas comprimidas y expandidas según la velocidad de la fuente: radar, ecografía, SONAR y el corrimiento al rojo cósmico.',
     slug: 'visualizador-efecto-doppler',
   },
+  {
+    icon: '🎯',
+    titulo: 'Proyectiles',
+    desc: 'Movimiento parabólico 2D con alcance, altura máxima y tiempo de vuelo, gravedades planetarias y resistencia del aire.',
+    slug: 'simulador-proyectiles',
+  },
+  {
+    icon: '🔌',
+    titulo: 'Circuitos eléctricos',
+    desc: 'Circuitos en serie y paralelo con la Ley de Ohm y la potencia, con hasta seis resistencias.',
+    slug: 'simulador-circuitos-electricos',
+  },
+  {
+    icon: '⛰️',
+    titulo: 'Conservación de la energía',
+    desc: 'Pelota animada en cuatro pistas con barras dinámicas de energía cinética y potencial y fricción ajustable.',
+    slug: 'simulador-conservacion-energia',
+  },
+  {
+    icon: '🔍',
+    titulo: 'Lentes ópticas',
+    desc: 'Trazado de los tres rayos principales en lentes convergentes y divergentes, con imagen real o virtual.',
+    slug: 'simulador-lentes-opticas',
+  },
+  {
+    icon: '🚰',
+    titulo: 'Fluidos y Bernoulli',
+    desc: 'Tubería Venturi con partículas animadas y manómetros que aplican la continuidad y la ecuación de Bernoulli.',
+    slug: 'simulador-fluidos-bernoulli',
+  },
+  {
+    icon: '🌀',
+    titulo: 'Movimiento circular',
+    desc: 'MCU y MCNU con vectores de velocidad tangencial y aceleración centrípeta.',
+    slug: 'simulador-movimiento-circular',
+  },
+  {
+    icon: '🪀',
+    titulo: 'Masa y resorte',
+    desc: 'Movimiento armónico simple con resorte animado, gráfica x(t), energías y amortiguamiento.',
+    slug: 'simulador-mas-resorte',
+  },
+  {
+    icon: '✈️',
+    titulo: 'Vuelo del avión',
+    desc: 'Sustentación según el ángulo de ataque frente al mito de Bernoulli, con slider, pérdida y vuelo invertido.',
+    slug: 'visualizador-vuelo-avion',
+  },
+  {
+    icon: '🔋',
+    titulo: 'Motor eléctrico',
+    desc: 'Campo magnético rotante, inversor IGBT y regeneración, comparado con el motor de combustión.',
+    slug: 'visualizador-motor-electrico',
+  },
+  {
+    icon: '🌌',
+    titulo: 'Relatividad general',
+    desc: 'Malla del espacio-tiempo deformada por la masa con slider, geodésicas, LIGO y GPS.',
+    slug: 'visualizador-relatividad-general',
+  },
+  {
+    icon: '🧲',
+    titulo: 'Superconductividad',
+    desc: 'Efecto Meissner animado, pares de Cooper y temperatura crítica ajustable.',
+    slug: 'visualizador-superconductividad',
+  },
+  {
+    icon: '💡',
+    titulo: 'Óptica ondulatoria',
+    desc: 'Doble rendija de Young, difracción, polarización de Malus y coherencia láser.',
+    slug: 'visualizador-optica-ondulatoria',
+  },
+  {
+    icon: '📟',
+    titulo: 'Circuitos electrónicos',
+    desc: 'Impedancia R/L/C, carga y descarga RC, transistor BJT y puertas lógicas.',
+    slug: 'visualizador-circuitos-electronicos',
+  },
+  {
+    icon: '🏎️',
+    titulo: 'Motor de combustión',
+    desc: 'Ciclo Otto en diagrama, slider de compresión, diagrama Sankey de energía y comparativa con el eléctrico.',
+    slug: 'visualizador-motor-combustion',
+  },
+  {
+    icon: '☢️',
+    titulo: 'Radiactividad',
+    desc: 'Desintegración α/β/γ, ley N(t)=N₀e^(−λt), datación por carbono-14 y dosis.',
+    slug: 'visualizador-radioactividad',
+  },
 ];
 
 export default function StemumFisica() {
