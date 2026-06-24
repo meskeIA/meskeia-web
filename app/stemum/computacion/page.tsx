@@ -57,6 +57,84 @@ const APPS = [
     desc: 'INNER, LEFT, RIGHT y FULL OUTER con tablas editables, diagrama de Venn animado y el SQL generado.',
     slug: 'simulador-sql-join',
   },
+  {
+    icon: '📊',
+    titulo: 'Planificador de procesos',
+    desc: 'FCFS, SJF, SRTF, Round Robin y prioridades con diagrama de Gantt y métricas de espera y turnaround.',
+    slug: 'simulador-planificador-procesos',
+  },
+  {
+    icon: '📄',
+    titulo: 'Reemplazo de páginas',
+    desc: 'FIFO, LRU, Óptimo, Clock y LFU con tabla matricial, comparativa y detección de la anomalía de Belady.',
+    slug: 'simulador-reemplazo-paginas',
+  },
+  {
+    icon: '🌀',
+    titulo: 'Recursión paso a paso',
+    desc: 'Seis funciones recursivas como factorial, Fibonacci o Hanoi con la pila de llamadas viva en cada paso.',
+    slug: 'simulador-recursion',
+  },
+  {
+    icon: '📈',
+    titulo: 'Regresión',
+    desc: 'Regresión lineal, polinómica y logística con mínimos cuadrados o gradiente animado y métricas R², MSE y accuracy.',
+    slug: 'simulador-regresion',
+  },
+  {
+    icon: '🎯',
+    titulo: 'Clustering K-means',
+    desc: 'Animación de asignación y recálculo de centroides, inicialización k-means++ y método del codo para elegir k.',
+    slug: 'simulador-kmeans',
+  },
+  {
+    icon: '🔌',
+    titulo: 'Puertas lógicas',
+    desc: 'Puertas lógicas, tablas de verdad y circuitos digitales para construir y probar combinaciones.',
+    slug: 'simulador-puertas-logicas',
+  },
+  {
+    icon: '📚',
+    titulo: 'Estructuras de datos',
+    desc: 'Arrays, pilas, colas, listas enlazadas y árboles BST con operaciones visualizadas en tiempo real.',
+    slug: 'visualizador-estructuras-datos',
+  },
+  {
+    icon: '🧮',
+    titulo: 'Lógica proposicional',
+    desc: 'Tablas de verdad AND, OR, NOT y XOR, evaluador de fórmulas y mapas de Karnaugh para simplificar.',
+    slug: 'visualizador-logica-proposicional',
+  },
+  {
+    icon: '📡',
+    titulo: 'Teoría de la información',
+    desc: 'Entropía de Shannon con sliders, codificación Huffman animada y el teorema de Shannon-Hartley.',
+    slug: 'visualizador-teoria-informacion',
+  },
+  {
+    icon: '🖥️',
+    titulo: 'Arquitectura del computador',
+    desc: 'Modelo de Von Neumann, CPU con ALU y registros y el ciclo de instrucción animado paso a paso.',
+    slug: 'visualizador-arquitectura-computador',
+  },
+  {
+    icon: '🗂️',
+    titulo: 'Hashing y colisiones',
+    desc: 'Tabla hash con tres funciones, resolución por encadenamiento y sondeo lineal, y factor de carga.',
+    slug: 'simulador-hashing-colisiones',
+  },
+  {
+    icon: '🔐',
+    titulo: 'Cifrado César',
+    desc: 'Rueda del alfabeto con slider de desplazamiento, histograma de frecuencias y ataque automático.',
+    slug: 'simulador-cifrado-cesar',
+  },
+  {
+    icon: '🤝',
+    titulo: 'Handshake TCP',
+    desc: 'Diagrama de secuencia SYN, SYN-ACK y ACK y el cierre FIN, con números de secuencia configurables.',
+    slug: 'simulador-tcp-handshake',
+  },
 ];
 
 export default function StemumComputacion() {
