@@ -1,0 +1,258 @@
+/* Home Stemum — violeta #6B21A8 · violeta claro #A855F7 · tile profundo #1E1033 */
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 5rem 1.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+/* ─── Hero ─── */
+.hero {
+  background: linear-gradient(160deg, #2A1547, #1E1033);
+  color: #fff;
+  border-radius: 16px;
+  padding: 3.25rem 2rem;
+  text-align: center;
+}
+
+.heroLockup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  margin-bottom: 1.1rem;
+  flex-wrap: wrap;
+}
+
+.heroWordmark {
+  font-family: var(--font-stemum), 'Segoe UI', system-ui, sans-serif;
+  font-size: 3.25rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #F3EAFB;
+  line-height: 1;
+}
+
+/* Acrónimo STEM — micro-texto minimalista bajo el lockup */
+.acronimo {
+  list-style: none;
+  margin: 0 auto 1.6rem;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.4rem;
+}
+
+.acronimoItem {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.acronimoLetra {
+  font-family: var(--font-stemum), 'Segoe UI', system-ui, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #C99BF5;
+}
+
+.acronimoPalabra {
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(243, 234, 251, 0.62);
+}
+
+.heroSubtitle {
+  font-size: 1.12rem;
+  color: rgba(243, 234, 251, 0.92);
+  margin: 0 auto 1.5rem;
+  max-width: 660px;
+  line-height: 1.65;
+}
+
+.heroSubtitle strong {
+  color: #C99BF5;
+  font-weight: 600;
+}
+
+.heroBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(168, 85, 247, 0.16);
+  border: 1px solid rgba(168, 85, 247, 0.42);
+  border-radius: 20px;
+  padding: 0.4rem 1.1rem;
+  font-size: 0.875rem;
+  color: rgba(243, 234, 251, 0.95);
+}
+
+.heroBadgeDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #A855F7;
+  flex-shrink: 0;
+}
+
+/* ─── Sección de disciplinas ─── */
+.ejeSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.ejeTitle {
+  font-family: var(--font-stemum), 'Segoe UI', system-ui, sans-serif;
+  font-size: 1.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.ejeIntro {
+  margin: 0 0 1.25rem;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: 720px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  background: var(--bg-card);
+  border: 1px solid #ece3f7;
+  border-top: 4px solid #8B3FD4;
+  border-radius: 12px;
+  padding: 1.6rem 1.5rem;
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cardIcon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.cardCount {
+  font-family: var(--font-stemum), 'Segoe UI', system-ui, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6B21A8;
+  background: rgba(107, 33, 168, 0.08);
+  border-radius: 20px;
+  padding: 0.2rem 0.7rem;
+}
+
+.cardTitulo {
+  font-family: var(--font-stemum), 'Segoe UI', system-ui, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #6B21A8;
+  margin: 0;
+}
+
+.cardDesc {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  flex-grow: 1;
+}
+
+.cardCta {
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ─── Qué es ─── */
+.sectionTitle {
+  font-family: var(--font-stemum), 'Segoe UI', system-ui, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 2px solid #8B3FD4;
+  padding-bottom: 0.5rem;
+  margin: 0 0 1rem;
+}
+
+.queEs p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.queEs strong {
+  color: var(--text-primary);
+}
+
+.link {
+  color: #6B21A8;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.link:hover {
+  color: #A855F7;
+}
+
+/* ─── Dark mode (local: el Service Worker cachea globals.css) ─── */
+[data-theme='dark'] .card {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .cardTitulo {
+  color: #C99BF5;
+}
+
+[data-theme='dark'] .cardCount {
+  color: #C99BF5;
+  background: rgba(168, 85, 247, 0.16);
+}
+
+[data-theme='dark'] .sectionTitle {
+  color: var(--text-primary);
+  border-bottom-color: #8B3FD4;
+}
+
+[data-theme='dark'] .link {
+  color: #C99BF5;
+}
+
+[data-theme='dark'] .link:hover {
+  color: #D9BBFA;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 600px) {
+  .container {
+    padding-top: 4.5rem;
+  }
+  .heroWordmark {
+    font-size: 2.4rem;
+  }
+  .ejeTitle {
+    font-size: 1.55rem;
+  }
+}

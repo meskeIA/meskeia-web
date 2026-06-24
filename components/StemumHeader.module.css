@@ -1,0 +1,103 @@
+/* Cabecera Stemum — violeta #6B21A8 · violeta claro #A855F7 · tile #1E1033 */
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--bg-card, #fff);
+  border-bottom: 1px solid #ece3f7;
+  backdrop-filter: saturate(180%) blur(8px);
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  height: 60px;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* Logo */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.symbol {
+  flex-shrink: 0;
+  border-radius: 7px;
+}
+
+.wordmark {
+  font-family: var(--font-stemum), 'Segoe UI', system-ui, sans-serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #6B21A8;
+}
+
+/* Navegación */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+}
+
+.navLink {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.15s ease;
+  white-space: nowrap;
+}
+
+.navLink:hover {
+  color: #6B21A8;
+}
+
+.navLink:focus-visible {
+  outline: 2px solid #A855F7;
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* Dark mode */
+[data-theme='dark'] .header {
+  background: var(--bg-card);
+  border-bottom-color: #3a3a3a;
+}
+
+[data-theme='dark'] .wordmark {
+  color: #C99BF5;
+}
+
+[data-theme='dark'] .navLink:hover {
+  color: #C99BF5;
+}
+
+@media (max-width: 720px) {
+  .container {
+    padding: 0 1rem;
+  }
+  .nav {
+    gap: 0.9rem;
+  }
+  .navLink {
+    font-size: 0.85rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navLink {
+    transition: none;
+  }
+}

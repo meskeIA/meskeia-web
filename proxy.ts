@@ -17,11 +17,13 @@ import { NextResponse, type NextRequest } from 'next/server';
  */
 const DELEGUM_HOSTS = new Set(['delegum.com', 'www.delegum.com']);
 const CRONICUM_HOSTS = new Set(['cronicum.com', 'www.cronicum.com']);
+const STEMUM_HOSTS = new Set(['stemum.com', 'www.stemum.com']);
 
 export function proxy(req: NextRequest) {
   const host = (req.headers.get('host') ?? '').split(':')[0].toLowerCase();
   if (DELEGUM_HOSTS.has(host)) return handleDelegum(req);
   if (CRONICUM_HOSTS.has(host)) return handleCronicum(req);
+  if (STEMUM_HOSTS.has(host)) return handleStemum(req);
   return NextResponse.next();
 }
 
@@ -86,6 +88,26 @@ function handleCronicum(req: NextRequest) {
   const clean = pathname.endsWith('/') ? pathname : `${pathname}/`;
   const url = req.nextUrl.clone();
   url.pathname = clean === '/' ? '/cronicum/' : `/cronicum${clean}`;
+  return NextResponse.rewrite(url);
+}
+
+function handleStemum(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  // Passthrough del árbol real y de la API (mismo criterio que Delegum/Cronicum).
+  if (pathname === '/stemum' || pathname.startsWith('/stemum/') || pathname.startsWith('/api')) {
+    return NextResponse.next();
+  }
+  // sitemap.xml, robots.txt y llms.txt: por ahora los sirve meskeIA (Stemum aún no
+  // tiene versiones propias; se añadirán cuando crezca el portal).
+  if (pathname === '/sitemap.xml' || pathname === '/robots.txt' || pathname === '/llms.txt') {
+    return NextResponse.next();
+  }
+
+  // Rutas limpias → reescritura interna a /stemum/*. Normalizamos a barra final
+  // (trailingSlash: true) para que el destino coincida con la página estática.
+  const clean = pathname.endsWith('/') ? pathname : `${pathname}/`;
+  const url = req.nextUrl.clone();
+  url.pathname = clean === '/' ? '/stemum/' : `/stemum${clean}`;
   return NextResponse.rewrite(url);
 }
 
