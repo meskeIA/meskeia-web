@@ -39,6 +39,30 @@ const APPS = [
     desc: 'Seis reacciones con reactivo limitante, barras de moles y rendimiento configurable.',
     slug: 'simulador-estequiometria',
   },
+  {
+    icon: '💨',
+    titulo: 'Cinética y Arrhenius',
+    desc: 'Distribución de Maxwell-Boltzmann con energía de activación ajustable y la recta de Arrhenius.',
+    slug: 'simulador-cinetica-arrhenius',
+  },
+  {
+    icon: '🗺️',
+    titulo: 'Tabla periódica y tendencias',
+    desc: 'Mapa de calor de los 118 elementos con cinco propiedades y flechas que marcan las tendencias.',
+    slug: 'simulador-tabla-periodica-tendencias',
+  },
+  {
+    icon: '🔥',
+    titulo: 'Termodinámica química',
+    desc: 'Entalpía con catalizador ajustable, energía libre de Gibbs y constante de equilibrio.',
+    slug: 'visualizador-termodinamica-quimica',
+  },
+  {
+    icon: '🔋',
+    titulo: 'Electroquímica',
+    desc: 'Pila Daniell animada, serie electroquímica, electrólisis y baterías de litio.',
+    slug: 'visualizador-electroquimica',
+  },
 ];
 
 export default function StemumQuimica() {

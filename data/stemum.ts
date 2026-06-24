@@ -91,13 +91,29 @@ export const STEMUM_APP_DISCIPLINA: Record<string, string> = {
   'simulador-titulacion': 'quimica',
   'simulador-vsepr': 'quimica',
   'simulador-estequiometria': 'quimica',
+  'simulador-cinetica-arrhenius': 'quimica',
+  'simulador-tabla-periodica-tendencias': 'quimica',
+  'visualizador-termodinamica-quimica': 'quimica',
+  'visualizador-electroquimica': 'quimica',
   // Biología
   'simulador-lotka-volterra': 'biologia',
   'simulador-ecosistema-trofico': 'biologia',
   'visualizador-modelos-epidemiologicos': 'biologia',
+  'simulador-deriva-genetica': 'biologia',
+  'simulador-punnett': 'biologia',
+  'simulador-mitosis-meiosis': 'biologia',
+  'simulador-fotosintesis-factores': 'biologia',
+  'visualizador-crispr-cas9': 'biologia',
+  'visualizador-epigenetica': 'biologia',
+  'visualizador-embriogenesis': 'biologia',
+  'visualizador-microbiologia': 'biologia',
   // Tierra y Espacio
   'visualizador-exoplanetas': 'tierra-espacio',
   'visualizador-terremotos-tsunamis': 'tierra-espacio',
+  'visualizador-agujeros-negros': 'tierra-espacio',
+  'visualizador-cosmologia': 'tierra-espacio',
+  'visualizador-ciclo-carbono-completo': 'tierra-espacio',
+  'visualizador-el-nino': 'tierra-espacio',
 };
 
 // Slugs de apps servidas bajo stemum.com (passthrough en el proxy).

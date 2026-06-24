@@ -27,6 +27,30 @@ const APPS = [
     desc: 'Fallas y ondas P/S, escalas Richter y Mercalli, y la propagación de tsunamis con el sistema de alerta DART.',
     slug: 'visualizador-terremotos-tsunamis',
   },
+  {
+    icon: '🕳️',
+    titulo: 'Agujeros negros',
+    desc: 'Anatomía clicable con el radio de Schwarzschild, la espaguetización y la radiación de Hawking.',
+    slug: 'visualizador-agujeros-negros',
+  },
+  {
+    icon: '🌌',
+    titulo: 'Cosmología',
+    desc: 'Composición del universo, línea temporal del Big Bang, factor de escala a(t) y posibles destinos cósmicos.',
+    slug: 'visualizador-cosmologia',
+  },
+  {
+    icon: '🌳',
+    titulo: 'Ciclo del carbono',
+    desc: 'Cinco reservorios y sus flujos con un control de emisiones y distintos escenarios de mitigación.',
+    slug: 'visualizador-ciclo-carbono-completo',
+  },
+  {
+    icon: '🌊',
+    titulo: 'El Niño y La Niña',
+    desc: 'Circulación de Walker, fases El Niño y La Niña, teleconexiones e índices SOI y ONI.',
+    slug: 'visualizador-el-nino',
+  },
 ];
 
 export default function StemumTierraEspacio() {

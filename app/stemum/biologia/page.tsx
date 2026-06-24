@@ -33,6 +33,54 @@ const APPS = [
     desc: 'Simulador SIR/SEIR: ajusta Rₜ y compara la curva de cinco enfermedades resolviendo las ecuaciones por Euler.',
     slug: 'visualizador-modelos-epidemiologicos',
   },
+  {
+    icon: '🎲',
+    titulo: 'Deriva genética',
+    desc: 'Modelo de Wright-Fisher con deriva, selección, mutación y migración, y probabilidad de fijación.',
+    slug: 'simulador-deriva-genetica',
+  },
+  {
+    icon: '🟩',
+    titulo: 'Cuadro de Punnett',
+    desc: 'Cruces mono y dihíbridos con celdas coloreadas y proporciones 3:1 y 9:3:3:1.',
+    slug: 'simulador-punnett',
+  },
+  {
+    icon: '🔬',
+    titulo: 'Mitosis y meiosis',
+    desc: 'Fases de la mitosis y la meiosis en canvas 2D con crossing-over y reproducción automática.',
+    slug: 'simulador-mitosis-meiosis',
+  },
+  {
+    icon: '🌱',
+    titulo: 'Factores de la fotosíntesis',
+    desc: 'Ley de Blackman con luz, CO₂ y temperatura ajustables y factor limitante en tiempo real.',
+    slug: 'simulador-fotosintesis-factores',
+  },
+  {
+    icon: '✂️',
+    titulo: 'CRISPR-Cas9',
+    desc: 'Mecanismo de edición en 6 pasos con slider, reparación NHEJ frente a HDR y bioética.',
+    slug: 'visualizador-crispr-cas9',
+  },
+  {
+    icon: '🧪',
+    titulo: 'Epigenética',
+    desc: 'Nucleosoma con slider de metilación CpG, histonas clicables e imprinting genómico.',
+    slug: 'visualizador-epigenetica',
+  },
+  {
+    icon: '🥚',
+    titulo: 'Embriogénesis',
+    desc: 'Fecundación y segmentación con slider, gastrulación de tres capas y organogénesis.',
+    slug: 'visualizador-embriogenesis',
+  },
+  {
+    icon: '🧫',
+    titulo: 'Microbiología',
+    desc: 'Morfologías bacterianas clicables, curva de crecimiento logística y tinción de Gram.',
+    slug: 'visualizador-microbiologia',
+  },
 ];
 
 export default function StemumBiologia() {
