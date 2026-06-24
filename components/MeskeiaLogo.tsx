@@ -14,9 +14,11 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import { useEffect, useState, useId } from 'react';
 import { useStemumHost } from '@/lib/useStemumHost';
+import { STEMUM_APP_DISCIPLINA, STEMUM_DISCIPLINAS } from '@/data/stemum';
 import styles from './MeskeiaLogo.module.css';
 
 interface MeskeiaLogoProps {
@@ -29,6 +31,7 @@ export default function MeskeiaLogo({ disableLink = false, inline = false, showT
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const isStemum = useStemumHost();
+  const pathname = usePathname();
   const uid = useId().replace(/:/g, '');
   const bgId  = `msk-bg-${uid}`;
   const ray1Id = `msk-r1-${uid}`;
@@ -129,6 +132,45 @@ export default function MeskeiaLogo({ disableLink = false, inline = false, showT
   // Si es inline y no muestra toggle, devolver solo el logo sin wrapper
   if (inline && !showThemeToggle) {
     return logoElement;
+  }
+
+  // Bajo stemum.com (cabecera fija de una app), el logo se convierte en un
+  // breadcrumb "Stemum › Disciplina" para volver al portal o a la disciplina.
+  // Dos enlaces separados (no anidados) dentro de la píldora.
+  if (isStemum && !disableLink) {
+    const seg = (pathname || '').replace(/^\/+|\/+$/g, '').split('/')[0];
+    const discSlug = STEMUM_APP_DISCIPLINA[seg];
+    const discLabel = discSlug ? STEMUM_DISCIPLINAS[discSlug] : null;
+
+    return (
+      <div className={styles.headerBar}>
+        <div className={`${styles.logoContainer} ${styles.stemumPill}`}>
+          <Link href="/" className={styles.stemumCrumb} aria-label="Stemum — inicio">
+            <span className={styles.logoIcon}>
+              <Image
+                src="/stemum/icon.svg"
+                alt=""
+                aria-hidden="true"
+                width={34}
+                height={34}
+                className={styles.stemumIcon}
+                priority
+              />
+            </span>
+            <span className={styles.stemumWordmark}>Stemum</span>
+          </Link>
+          {discLabel && (
+            <>
+              <span className={styles.stemumSep} aria-hidden="true">›</span>
+              <Link href={`/${discSlug}`} className={styles.stemumDiscLink}>
+                {discLabel}
+              </Link>
+            </>
+          )}
+        </div>
+        {themeToggle}
+      </div>
+    );
   }
 
   // En otros casos, usar el headerBar wrapper

@@ -105,6 +105,53 @@
   color: #C99BF5;
 }
 
+/* Breadcrumb Stemum (Stemum › Disciplina) dentro de la píldora flotante */
+.stemumPill {
+  gap: 0.5rem;
+  cursor: default;
+}
+
+.stemumPill:hover {
+  transform: none;
+}
+
+.stemumCrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  text-decoration: none;
+}
+
+.stemumSep {
+  color: var(--text-muted, #999);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.stemumDiscLink {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #6B21A8;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+
+.stemumDiscLink:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.stemumCrumb:focus-visible,
+.stemumDiscLink:focus-visible {
+  outline: 2px solid #A855F7;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+[data-theme='dark'] .stemumDiscLink {
+  color: #C99BF5;
+}
+
 /* Toggle de tema */
 .themeToggle {
   display: flex;

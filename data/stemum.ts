@@ -1,0 +1,66 @@
+/**
+ * Catálogo del portal Stemum (stemum.com) — fuente única de verdad.
+ *
+ * Lo consumen:
+ * - `proxy.ts` (host-rewrite): qué slugs son apps del catálogo y qué rutas son
+ *   páginas de portal.
+ * - `MeskeiaLogo` (breadcrumb): a qué disciplina pertenece la app actual.
+ *
+ * Para añadir una app a una oleada: añade su slug a la disciplina correspondiente.
+ */
+
+// Disciplinas del portal: slug de ruta → etiqueta visible.
+export const STEMUM_DISCIPLINAS: Record<string, string> = {
+  'computacion': 'Computación',
+  'fisica': 'Física',
+  'matematicas': 'Matemáticas',
+  'quimica': 'Química',
+  'biologia': 'Biología',
+  'tierra-espacio': 'Tierra y Espacio',
+};
+
+// App (slug) → disciplina (slug). Las apps viven en meskeIA y se sirven bajo
+// stemum.com en passthrough; este mapa da la pertenencia para el breadcrumb.
+export const STEMUM_APP_DISCIPLINA: Record<string, string> = {
+  // Computación
+  'visualizador-algoritmos-ordenacion': 'computacion',
+  'simulador-automatas-finitos': 'computacion',
+  'simulador-maquina-turing': 'computacion',
+  'simulador-grafos': 'computacion',
+  'simulador-arboles-bst-avl': 'computacion',
+  'visualizador-llm-funcionamiento': 'computacion',
+  'simulador-sql-join': 'computacion',
+  // Física
+  'simulador-campo-electrico': 'fisica',
+  'simulador-pendulo': 'fisica',
+  'simulador-colisiones': 'fisica',
+  'simulador-ondas-interferencia': 'fisica',
+  'simulador-gas-ideal': 'fisica',
+  'visualizador-efecto-doppler': 'fisica',
+  // Matemáticas
+  'visualizador-calculo-visual': 'matematicas',
+  'simulador-derivada-pendiente': 'matematicas',
+  'simulador-integral-area': 'matematicas',
+  'simulador-distribucion-normal': 'matematicas',
+  'visualizador-transformada-fourier': 'matematicas',
+  'simulador-monty-hall': 'matematicas',
+  // Química
+  'simulador-equilibrio-quimico': 'quimica',
+  'simulador-titulacion': 'quimica',
+  'simulador-vsepr': 'quimica',
+  'simulador-estequiometria': 'quimica',
+  // Biología
+  'simulador-lotka-volterra': 'biologia',
+  'simulador-ecosistema-trofico': 'biologia',
+  'visualizador-modelos-epidemiologicos': 'biologia',
+  // Tierra y Espacio
+  'visualizador-exoplanetas': 'tierra-espacio',
+  'visualizador-terremotos-tsunamis': 'tierra-espacio',
+};
+
+// Slugs de apps servidas bajo stemum.com (passthrough en el proxy).
+export const STEMUM_APP_SLUGS = new Set(Object.keys(STEMUM_APP_DISCIPLINA));
+
+// Rutas de páginas del portal (home + disciplinas) que el proxy reescribe a
+// /stemum/*. La cadena vacía representa la home (stemum.com/).
+export const STEMUM_PORTAL_SLUGS = new Set(['', ...Object.keys(STEMUM_DISCIPLINAS)]);

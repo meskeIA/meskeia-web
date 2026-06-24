@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { STEMUM_APP_SLUGS, STEMUM_PORTAL_SLUGS } from './data/stemum';
 
 /**
  * Proxy de enrutado por host para las marcas verticales (antes "middleware",
@@ -91,51 +92,8 @@ function handleCronicum(req: NextRequest) {
   return NextResponse.rewrite(url);
 }
 
-// Páginas del portal Stemum (home + disciplinas publicadas). Se reescriben a
-// /stemum/*. Se amplía conforme se publican nuevas disciplinas por oleadas.
-const STEMUM_PORTAL_PAGES = new Set([
-  '', 'computacion', 'fisica', 'matematicas', 'quimica', 'biologia', 'tierra-espacio',
-]);
-
-// Apps STEM servidas bajo stemum.com. Viven físicamente en meskeIA (/<slug>) y
-// se sirven en passthrough; el chrome compartido (MeskeiaLogo) adapta la marca
-// por host. Se amplía a medida que se incorporan apps al portal.
-const STEMUM_APPS = new Set([
-  // Computación
-  'visualizador-algoritmos-ordenacion',
-  'simulador-automatas-finitos',
-  'simulador-maquina-turing',
-  'simulador-grafos',
-  'simulador-arboles-bst-avl',
-  'visualizador-llm-funcionamiento',
-  'simulador-sql-join',
-  // Física
-  'simulador-campo-electrico',
-  'simulador-pendulo',
-  'simulador-colisiones',
-  'simulador-ondas-interferencia',
-  'simulador-gas-ideal',
-  'visualizador-efecto-doppler',
-  // Matemáticas
-  'visualizador-calculo-visual',
-  'simulador-derivada-pendiente',
-  'simulador-integral-area',
-  'simulador-distribucion-normal',
-  'visualizador-transformada-fourier',
-  'simulador-monty-hall',
-  // Química
-  'simulador-equilibrio-quimico',
-  'simulador-titulacion',
-  'simulador-vsepr',
-  'simulador-estequiometria',
-  // Biología
-  'simulador-lotka-volterra',
-  'simulador-ecosistema-trofico',
-  'visualizador-modelos-epidemiologicos',
-  // Tierra y Espacio
-  'visualizador-exoplanetas',
-  'visualizador-terremotos-tsunamis',
-]);
+// El catálogo (apps + páginas de portal) vive en data/stemum.ts (fuente única,
+// compartida con el breadcrumb de MeskeiaLogo).
 
 function handleStemum(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -166,13 +124,13 @@ function handleStemum(req: NextRequest) {
 
   // App STEM del catálogo → passthrough a /<slug> (la app real se sirve tal cual;
   // MeskeiaLogo detecta el host y muestra la marca Stemum).
-  if (STEMUM_APPS.has(seg)) {
+  if (STEMUM_APP_SLUGS.has(seg)) {
     return NextResponse.next();
   }
 
   // Página del portal → reescritura interna a /stemum/*. Normalizamos a barra
   // final (trailingSlash: true) para que el destino coincida con la página.
-  if (STEMUM_PORTAL_PAGES.has(seg)) {
+  if (STEMUM_PORTAL_SLUGS.has(seg)) {
     const url = req.nextUrl.clone();
     url.pathname = seg === '' ? '/stemum/' : `/stemum/${seg}/`;
     return NextResponse.rewrite(url);
