@@ -114,7 +114,7 @@ function resolverBanda(pathname: string, isStemum: boolean): Banda | null {
       intro: 'Esta herramienta forma parte de',
       etiqueta: puertaDelegum.titulo,
       marca: 'Delegum',
-      descripcion: 'el portal de fiscalidad y derecho de meskeIA.',
+      descripcion: 'el portal de fiscalidad, derecho laboral y finanzas de meskeIA.',
       href: `https://delegum.com/soluciones/?from=meskeia#${puertaDelegum.id}`,
       cta:
         otras >= 1
