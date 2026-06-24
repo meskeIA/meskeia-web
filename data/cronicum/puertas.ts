@@ -203,3 +203,21 @@ for (const p of PUERTAS) {
 export function getPuertaDeCronologia(slug: string): Puerta | null {
   return PUERTA_POR_CRONOLOGIA.get(slug) ?? null;
 }
+
+/**
+ * Conteo de cronologías por puerta (slug de puerta → nº). Derivado del
+ * catálogo: al añadir una cronología a su puerta, el contador de la home se
+ * actualiza solo (mismo patrón que STEMUM_APPS_POR_DISCIPLINA).
+ */
+export const CRONOLOGIAS_POR_PUERTA: Record<string, number> = Object.fromEntries(
+  PUERTAS.map((p) => [p.slug, p.slugs.length]),
+);
+
+/**
+ * Total de cronologías ÚNICAS del portal (para el badge del hero). Se calcula
+ * sobre el conjunto de slugs sin duplicar: aunque cada cronología pertenece a
+ * una sola puerta, esto evita que el total mienta si eso cambiara.
+ */
+export const CRONICUM_TOTAL_CRONOLOGIAS = new Set(
+  PUERTAS.flatMap((p) => p.slugs),
+).size;

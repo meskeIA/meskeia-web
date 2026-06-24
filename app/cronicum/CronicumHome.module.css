@@ -121,9 +121,26 @@
   outline-offset: 3px;
 }
 
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .cardIcon {
   font-size: 2rem;
   line-height: 1;
+}
+
+.cardCount {
+  font-family: var(--font-lora), Georgia, serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #A24B2A;
+  background: rgba(162, 75, 42, 0.08);
+  border-radius: 20px;
+  padding: 0.2rem 0.7rem;
+  white-space: nowrap;
 }
 
 .cardTitulo {
@@ -179,6 +196,20 @@
   font-weight: 600;
   margin: 0 0 0.4rem;
   color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.bandaCount {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 20px;
+  padding: 0.18rem 0.7rem;
+  white-space: nowrap;
 }
 
 .bandaDesc {
@@ -246,6 +277,11 @@
 [data-theme='dark'] .cardTitulo,
 [data-theme='dark'] .cardCta {
   color: #E0A06A;
+}
+
+[data-theme='dark'] .cardCount {
+  color: #E0A06A;
+  background: rgba(224, 160, 106, 0.16);
 }
 
 [data-theme='dark'] .sectionTitle {

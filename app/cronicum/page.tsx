@@ -4,7 +4,17 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
+import {
+  CRONOLOGIAS_POR_PUERTA,
+  CRONICUM_TOTAL_CRONOLOGIAS,
+} from '@/data/cronicum/puertas';
 import styles from './CronicumHome.module.css';
+
+// Devuelve el texto del badge de una tarjeta a partir de su href (= /<slug-puerta>).
+function badgeCronologias(href: string): string {
+  const count = CRONOLOGIAS_POR_PUERTA[href.replace(/\//g, '')] ?? 0;
+  return `${count} ${count === 1 ? 'cronología' : 'cronologías'}`;
+}
 
 // Eje 1 — El mundo: civilizaciones, países y regiones
 const EL_MUNDO = [
@@ -107,7 +117,7 @@ export default function CronicumHome() {
           </p>
           <div className={styles.heroBadge}>
             <span className={styles.heroBadgeDot}></span>
-            Historia universal · Navegable · Sin registro · Sin coste
+            {CRONICUM_TOTAL_CRONOLOGIAS} cronologías · Navegable · Sin registro · Sin coste
           </div>
         </header>
 
@@ -121,7 +131,10 @@ export default function CronicumHome() {
           <div className={styles.grid}>
             {EL_MUNDO.map((p) => (
               <Link key={p.titulo} href={p.href} className={styles.card}>
-                <span className={styles.cardIcon} aria-hidden="true">{p.icon}</span>
+                <div className={styles.cardHead}>
+                  <span className={styles.cardIcon} aria-hidden="true">{p.icon}</span>
+                  <span className={styles.cardCount}>{badgeCronologias(p.href)}</span>
+                </div>
                 <h3 className={styles.cardTitulo}>{p.titulo}</h3>
                 <p className={styles.cardDesc}>{p.desc}</p>
                 <span className={styles.cardCta}>Explorar →</span>
@@ -140,7 +153,10 @@ export default function CronicumHome() {
           <div className={styles.grid}>
             {LAS_COSAS.map((p) => (
               <Link key={p.titulo} href={p.href} className={styles.card}>
-                <span className={styles.cardIcon} aria-hidden="true">{p.icon}</span>
+                <div className={styles.cardHead}>
+                  <span className={styles.cardIcon} aria-hidden="true">{p.icon}</span>
+                  <span className={styles.cardCount}>{badgeCronologias(p.href)}</span>
+                </div>
                 <h3 className={styles.cardTitulo}>{p.titulo}</h3>
                 <p className={styles.cardDesc}>{p.desc}</p>
                 <span className={styles.cardCta}>Explorar →</span>
@@ -154,7 +170,12 @@ export default function CronicumHome() {
           <div className={styles.bandaInner}>
             <span className={styles.bandaIcon} aria-hidden="true">📜</span>
             <div className={styles.bandaTexto}>
-              <h2 className={styles.bandaTitulo}>Grandes acontecimientos</h2>
+              <h2 className={styles.bandaTitulo}>
+                Grandes acontecimientos
+                <span className={styles.bandaCount}>
+                  {badgeCronologias('/grandes-acontecimientos')}
+                </span>
+              </h2>
               <p className={styles.bandaDesc}>
                 Los momentos que cambiaron el rumbo de la humanidad: la Revolución Francesa,
                 las guerras napoleónicas, las dos guerras mundiales, la Guerra Fría, el
