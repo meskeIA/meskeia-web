@@ -10,6 +10,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import DescubreVertical from './DescubreVertical';
 import styles from './LegalNotice.module.css';
 
 interface LegalNoticeProps {
@@ -38,6 +39,7 @@ export default function LegalNotice({ lastUpdated }: LegalNoticeProps) {
   };
 
   return (
+    <>
     <div className={styles.legalNotice}>
       <span className={styles.icon} aria-hidden="true">ℹ️</span>
 
@@ -82,5 +84,10 @@ export default function LegalNotice({ lastUpdated }: LegalNoticeProps) {
         <span className={styles.copyrightShort}>© {new Date().getFullYear()}</span>
       </span>
     </div>
+
+    {/* Descubrimiento cruzado hacia el portal vertical (se auto-oculta si la
+        app no pertenece a ninguno o si ya se ve desde el dominio del vertical). */}
+    <DescubreVertical />
+    </>
   );
 }

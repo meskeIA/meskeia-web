@@ -1,0 +1,88 @@
+/**
+ * DescubreVertical — banda de descubrimiento cruzado hacia un portal vertical.
+ * Paleta morada de Stemum (#6B21A8) para señalar "puerta a otro portal", bien
+ * diferenciada del azul del chrome meskeIA. Light + dark + reduced motion.
+ */
+
+.banda {
+  /* El bloque legal ya aporta su margen inferior; aquí solo el de separación
+     hacia el contenido siguiente, de modo que parezca un "segundo cuadro". */
+  margin: 0 0 var(--spacing-lg);
+}
+
+.enlace {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: var(--spacing-md);
+  border: 1px solid rgba(107, 33, 168, 0.25);
+  border-left: 4px solid #6B21A8;
+  border-radius: var(--radius);
+  background: rgba(107, 33, 168, 0.06);
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.enlace:hover {
+  background: rgba(107, 33, 168, 0.1);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(107, 33, 168, 0.14);
+}
+
+.enlace:focus-visible {
+  outline: 2px solid #6B21A8;
+  outline-offset: 2px;
+}
+
+.icono {
+  font-size: 1.4rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.texto strong {
+  color: #6B21A8;
+  font-weight: 600;
+}
+
+.cta {
+  color: #6B21A8;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ─── Dark mode ─── */
+[data-theme='dark'] .enlace {
+  border-color: rgba(168, 85, 247, 0.35);
+  border-left-color: #A855F7;
+  background: rgba(168, 85, 247, 0.1);
+}
+
+[data-theme='dark'] .enlace:hover {
+  background: rgba(168, 85, 247, 0.16);
+}
+
+[data-theme='dark'] .texto strong,
+[data-theme='dark'] .cta {
+  color: #C99BF5;
+}
+
+/* ─── Accesibilidad: movimiento reducido ─── */
+@media (prefers-reduced-motion: reduce) {
+  .enlace {
+    transition: none;
+  }
+  .enlace:hover {
+    transform: none;
+  }
+}
+
+/* ─── Móvil ─── */
+@media (max-width: 600px) {
+  .cta {
+    white-space: normal;
+  }
+}
