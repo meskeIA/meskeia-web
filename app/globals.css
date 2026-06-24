@@ -124,6 +124,13 @@
   --accent: #C99BF5;
 }
 
+/* Bajo stemum.com ocultamos elementos pensados para el contexto meskeIA cuyas
+   relaciones apuntan fuera del catálogo Stemum (p.ej. "Apps relacionadas").
+   El descubrimiento en Stemum se hace por sus páginas de disciplina. */
+[data-brand='stemum'] [data-hide-on-stemum] {
+  display: none;
+}
+
 /* Reset básico */
 * {
   box-sizing: border-box;
