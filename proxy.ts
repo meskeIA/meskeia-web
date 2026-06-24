@@ -91,6 +91,23 @@ function handleCronicum(req: NextRequest) {
   return NextResponse.rewrite(url);
 }
 
+// Páginas del portal Stemum (home + disciplinas publicadas). Se reescriben a
+// /stemum/*. Se amplía conforme se publican nuevas disciplinas por oleadas.
+const STEMUM_PORTAL_PAGES = new Set(['', 'computacion']);
+
+// Apps STEM servidas bajo stemum.com. Viven físicamente en meskeIA (/<slug>) y
+// se sirven en passthrough; el chrome compartido (MeskeiaLogo) adapta la marca
+// por host. Se amplía a medida que se incorporan apps al portal.
+const STEMUM_APPS = new Set([
+  'visualizador-algoritmos-ordenacion',
+  'simulador-automatas-finitos',
+  'simulador-maquina-turing',
+  'simulador-grafos',
+  'simulador-arboles-bst-avl',
+  'visualizador-llm-funcionamiento',
+  'simulador-sql-join',
+]);
+
 function handleStemum(req: NextRequest) {
   const { pathname } = req.nextUrl;
   // Passthrough del árbol real y de la API (mismo criterio que Delegum/Cronicum).
@@ -103,12 +120,28 @@ function handleStemum(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Rutas limpias → reescritura interna a /stemum/*. Normalizamos a barra final
-  // (trailingSlash: true) para que el destino coincida con la página estática.
-  const clean = pathname.endsWith('/') ? pathname : `${pathname}/`;
-  const url = req.nextUrl.clone();
-  url.pathname = clean === '/' ? '/stemum/' : `/stemum${clean}`;
-  return NextResponse.rewrite(url);
+  // Slug limpio (primer segmento sin barras) para clasificar la ruta.
+  const seg = pathname.replace(/^\/+|\/+$/g, '');
+
+  // App STEM del catálogo → passthrough a /<slug> (la app real se sirve tal cual;
+  // MeskeiaLogo detecta el host y muestra la marca Stemum).
+  if (STEMUM_APPS.has(seg)) {
+    return NextResponse.next();
+  }
+
+  // Página del portal → reescritura interna a /stemum/*. Normalizamos a barra
+  // final (trailingSlash: true) para que el destino coincida con la página.
+  if (STEMUM_PORTAL_PAGES.has(seg)) {
+    const url = req.nextUrl.clone();
+    url.pathname = seg === '' ? '/stemum/' : `/stemum/${seg}/`;
+    return NextResponse.rewrite(url);
+  }
+
+  // Cualquier otra ruta (p.ej. una app relacionada fuera del catálogo STEM,
+  // enlazada desde RelatedApps) se redirige a meskeIA para no dar 404 bajo
+  // stemum.com. Redirección temporal: el catálogo Stemum crece por oleadas.
+  const meskeiaUrl = new URL(pathname + req.nextUrl.search, 'https://meskeia.com');
+  return NextResponse.redirect(meskeiaUrl, 307);
 }
 
 export const config = {

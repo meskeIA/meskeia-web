@@ -204,6 +204,65 @@
   letter-spacing: 0.04em;
 }
 
+/* ─── Página de disciplina: tarjetas de app clicables ─── */
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  width: fit-content;
+}
+
+.backLink:hover {
+  color: #6B21A8;
+}
+
+.appCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  background: var(--bg-card);
+  border: 1px solid #ece3f7;
+  border-top: 4px solid #8B3FD4;
+  border-radius: 12px;
+  padding: 1.6rem 1.5rem;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.appCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(107, 33, 168, 0.16);
+}
+
+.appCard:focus-visible {
+  outline: 2px solid #6B21A8;
+  outline-offset: 3px;
+}
+
+.appCardCta {
+  font-weight: 600;
+  color: #6B21A8;
+  font-size: 0.9rem;
+}
+
+[data-theme='dark'] .appCard {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .appCardCta {
+  color: #C99BF5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .appCard {
+    transition: none;
+  }
+}
+
 /* ─── Qué es ─── */
 .sectionTitle {
   font-family: var(--font-stemum), 'Segoe UI', system-ui, sans-serif;

@@ -2,6 +2,7 @@
 // @disclaimer: exempt
 
 import Image from 'next/image';
+import Link from 'next/link';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import styles from './StemumHome.module.css';
 
@@ -13,6 +14,7 @@ const DISCIPLINAS = [
     titulo: 'Computación',
     desc: 'Algoritmos de ordenación, autómatas, máquinas de Turing, grafos, estructuras de datos y cómo funciona la IA.',
     n: '24+',
+    href: '/computacion',
   },
   {
     icon: '⚛️',
@@ -108,17 +110,29 @@ export default function StemumHome() {
             tiempo real. Mueve un control y observa cómo responde el sistema.
           </p>
           <div className={styles.grid}>
-            {DISCIPLINAS.map((d) => (
-              <article key={d.titulo} className={styles.card}>
-                <div className={styles.cardHead}>
-                  <span className={styles.cardIcon} aria-hidden="true">{d.icon}</span>
-                  <span className={styles.cardCount}>{d.n}</span>
-                </div>
-                <h3 className={styles.cardTitulo}>{d.titulo}</h3>
-                <p className={styles.cardDesc}>{d.desc}</p>
-                <span className={styles.cardCta}>Próximamente</span>
-              </article>
-            ))}
+            {DISCIPLINAS.map((d) =>
+              d.href ? (
+                <Link key={d.titulo} href={d.href} className={styles.appCard}>
+                  <div className={styles.cardHead}>
+                    <span className={styles.cardIcon} aria-hidden="true">{d.icon}</span>
+                    <span className={styles.cardCount}>{d.n}</span>
+                  </div>
+                  <h3 className={styles.cardTitulo}>{d.titulo}</h3>
+                  <p className={styles.cardDesc}>{d.desc}</p>
+                  <span className={styles.appCardCta}>Explorar →</span>
+                </Link>
+              ) : (
+                <article key={d.titulo} className={styles.card}>
+                  <div className={styles.cardHead}>
+                    <span className={styles.cardIcon} aria-hidden="true">{d.icon}</span>
+                    <span className={styles.cardCount}>{d.n}</span>
+                  </div>
+                  <h3 className={styles.cardTitulo}>{d.titulo}</h3>
+                  <p className={styles.cardDesc}>{d.desc}</p>
+                  <span className={styles.cardCta}>Próximamente</span>
+                </article>
+              )
+            )}
           </div>
         </section>
 

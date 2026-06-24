@@ -89,6 +89,22 @@
   color: #2E86AB;
 }
 
+/* Variante de marca Stemum (servida bajo stemum.com) */
+.stemumIcon {
+  border-radius: 8px;
+}
+
+.stemumWordmark {
+  font-family: var(--font-stemum), 'Segoe UI', system-ui, sans-serif;
+  font-weight: 600;
+  color: #6B21A8;
+  letter-spacing: -0.01em;
+}
+
+[data-theme='dark'] .stemumWordmark {
+  color: #C99BF5;
+}
+
 /* Toggle de tema */
 .themeToggle {
   display: flex;

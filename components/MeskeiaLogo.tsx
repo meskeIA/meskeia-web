@@ -13,8 +13,10 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useTheme } from 'next-themes';
 import { useEffect, useState, useId } from 'react';
+import { useStemumHost } from '@/lib/useStemumHost';
 import styles from './MeskeiaLogo.module.css';
 
 interface MeskeiaLogoProps {
@@ -26,6 +28,7 @@ interface MeskeiaLogoProps {
 export default function MeskeiaLogo({ disableLink = false, inline = false, showThemeToggle = true }: MeskeiaLogoProps) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const isStemum = useStemumHost();
   const uid = useId().replace(/:/g, '');
   const bgId  = `msk-bg-${uid}`;
   const ray1Id = `msk-r1-${uid}`;
@@ -36,7 +39,28 @@ export default function MeskeiaLogo({ disableLink = false, inline = false, showT
     setMounted(true);
   }, []);
 
-  const logoContent = (
+  // Variante de marca Stemum: cuando la app se sirve bajo stemum.com, el chrome
+  // compartido muestra el logo Stemum (onda + punto) en vez del de meskeIA.
+  const stemumContent = (
+    <>
+      <div className={styles.logoIcon}>
+        <Image
+          src="/stemum/icon.svg"
+          alt=""
+          aria-hidden="true"
+          width={40}
+          height={40}
+          className={styles.stemumIcon}
+          priority
+        />
+      </div>
+      <div className={styles.logoText}>
+        <span className={styles.stemumWordmark}>Stemum</span>
+      </div>
+    </>
+  );
+
+  const meskeiaContent = (
     <>
       <div className={styles.logoIcon}>
         <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" width="40" height="40" aria-hidden="true">
@@ -74,6 +98,8 @@ export default function MeskeiaLogo({ disableLink = false, inline = false, showT
       </div>
     </>
   );
+
+  const logoContent = isStemum ? stemumContent : meskeiaContent;
 
   const containerClass = `${styles.logoContainer} ${inline ? styles.logoInline : ''}`;
 
