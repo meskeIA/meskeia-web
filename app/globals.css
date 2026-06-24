@@ -98,6 +98,32 @@
   --shadow-strong: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
+/* ─────────────────────────────────────────────────────────────
+   Marca Stemum (vertical de ciencia interactiva).
+   Bajo stemum.com, un script en el layout pone data-brand="stemum"
+   en <html> antes del primer paint. Reasignamos las variables de
+   marca para "revestir" cualquier app de meskeIA con la paleta
+   violeta de Stemum, sin tocar el código de cada app. No tocamos
+   fondos/textos: el modo claro/oscuro sigue funcionando igual.
+   En meskeia.com el atributo no se pone → comportamiento idéntico.
+   ───────────────────────────────────────────────────────────── */
+[data-brand='stemum'] {
+  --primary: #6B21A8;
+  --primary-hover: #571a87;
+  --secondary: #A855F7;
+  --accent: #C99BF5;
+  --hero-bg: #2A1547;
+  --focus: rgba(107, 33, 168, 0.15);
+}
+
+/* En modo oscuro, violetas más claros para contraste sobre fondo oscuro */
+[data-theme='dark'][data-brand='stemum'] {
+  --primary: #C99BF5;
+  --primary-hover: #D9BBFA;
+  --secondary: #A855F7;
+  --accent: #C99BF5;
+}
+
 /* Reset básico */
 * {
   box-sizing: border-box;
