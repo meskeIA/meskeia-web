@@ -1,9 +1,16 @@
-'use client';
 // @disclaimer: exempt
 
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import styles from '../StemumHome.module.css';
+
+export const metadata: Metadata = {
+  title: 'Tierra y Espacio interactivo: exoplanetas y terremotos | Stemum',
+  description:
+    'Visualizadores de astronomía y geología: tránsitos de exoplanetas y zona habitable, terremotos, escalas Richter y Mercalli, y tsunamis.',
+  alternates: { canonical: 'https://stemum.com/tierra-espacio/' },
+};
 
 // Apps de la disciplina Tierra y Espacio. Viven en meskeIA y se sirven bajo
 // stemum.com mediante el host-rewrite (lista blanca en proxy.ts).

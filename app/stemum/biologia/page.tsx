@@ -1,9 +1,16 @@
-'use client';
 // @disclaimer: exempt
 
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import styles from '../StemumHome.module.css';
+
+export const metadata: Metadata = {
+  title: 'Biología interactiva: genética, ecología y epidemias | Stemum',
+  description:
+    'Simuladores de biología: modelo depredador-presa de Lotka-Volterra, ecosistemas tróficos y modelos epidemiológicos SIR/SEIR.',
+  alternates: { canonical: 'https://stemum.com/biologia/' },
+};
 
 // Apps de la disciplina Biología. Viven en meskeIA y se sirven bajo
 // stemum.com mediante el host-rewrite (lista blanca en proxy.ts).

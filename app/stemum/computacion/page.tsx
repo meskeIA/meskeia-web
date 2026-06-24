@@ -1,9 +1,16 @@
-'use client';
 // @disclaimer: exempt
 
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import styles from '../StemumHome.module.css';
+
+export const metadata: Metadata = {
+  title: 'Computación interactiva: algoritmos, autómatas y estructuras | Stemum',
+  description:
+    'Simuladores interactivos de computación: algoritmos de ordenación, autómatas finitos, máquina de Turing, grafos, árboles BST/AVL, JOINs de SQL y cómo funciona un LLM.',
+  alternates: { canonical: 'https://stemum.com/computacion/' },
+};
 
 // Apps de la disciplina Computación. Viven físicamente en meskeIA y se sirven
 // bajo stemum.com mediante el host-rewrite (lista blanca en proxy.ts).

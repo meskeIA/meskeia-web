@@ -143,9 +143,21 @@ function handleStemum(req: NextRequest) {
   if (pathname === '/stemum' || pathname.startsWith('/stemum/') || pathname.startsWith('/api')) {
     return NextResponse.next();
   }
-  // sitemap.xml, robots.txt y llms.txt: por ahora los sirve meskeIA (Stemum aún no
-  // tiene versiones propias; se añadirán cuando crezca el portal).
-  if (pathname === '/sitemap.xml' || pathname === '/robots.txt' || pathname === '/llms.txt') {
+  // sitemap.xml y robots.txt propios de Stemum (capitalizan el SEO de las
+  // páginas-índice: home + disciplinas). El sitemap se genera en
+  // /stemum/sitemap.xml; el robots en /stemum/robots-txt (robots.ts no se anida).
+  if (pathname === '/sitemap.xml') {
+    const url = req.nextUrl.clone();
+    url.pathname = '/stemum/sitemap.xml';
+    return NextResponse.rewrite(url);
+  }
+  if (pathname === '/robots.txt') {
+    const url = req.nextUrl.clone();
+    url.pathname = '/stemum/robots-txt';
+    return NextResponse.rewrite(url);
+  }
+  // llms.txt: por ahora lo sirve meskeIA (Stemum aún no tiene versión propia).
+  if (pathname === '/llms.txt') {
     return NextResponse.next();
   }
 

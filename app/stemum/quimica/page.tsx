@@ -1,9 +1,16 @@
-'use client';
 // @disclaimer: exempt
 
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import styles from '../StemumHome.module.css';
+
+export const metadata: Metadata = {
+  title: 'Química interactiva: equilibrio, titulación y moléculas | Stemum',
+  description:
+    'Simuladores de química: equilibrio químico y Le Chatelier, titulación ácido-base, geometría molecular VSEPR y estequiometría.',
+  alternates: { canonical: 'https://stemum.com/quimica/' },
+};
 
 // Apps de la disciplina Química. Viven en meskeIA y se sirven bajo
 // stemum.com mediante el host-rewrite (lista blanca en proxy.ts).

@@ -1,9 +1,16 @@
-'use client';
 // @disclaimer: exempt
 
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import styles from '../StemumHome.module.css';
+
+export const metadata: Metadata = {
+  title: 'Física interactiva: campos, ondas, mecánica y termodinámica | Stemum',
+  description:
+    'Simuladores de física para experimentar: campo eléctrico, péndulo, colisiones, ondas e interferencia, gas ideal y efecto Doppler.',
+  alternates: { canonical: 'https://stemum.com/fisica/' },
+};
 
 // Apps de la disciplina Física. Viven físicamente en meskeIA y se sirven bajo
 // stemum.com mediante el host-rewrite (lista blanca en proxy.ts).

@@ -1,9 +1,16 @@
-'use client';
 // @disclaimer: exempt
 
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import styles from '../StemumHome.module.css';
+
+export const metadata: Metadata = {
+  title: 'Matemáticas interactivas: cálculo, estadística y probabilidad | Stemum',
+  description:
+    'Visualizadores de matemáticas: cálculo visual, derivadas e integrales, distribución normal, transformada de Fourier y el problema de Monty Hall.',
+  alternates: { canonical: 'https://stemum.com/matematicas/' },
+};
 
 // Apps de la disciplina Matemáticas. Viven en meskeIA y se sirven bajo
 // stemum.com mediante el host-rewrite (lista blanca en proxy.ts).
