@@ -1475,6 +1475,7 @@ export const analyticsRouter = router({
         'meskeia.com': { label: 'meskeIA', icono: '🧩' },
         'delegum.com': { label: 'Delegum', icono: '🏛️' },
         'cronicum.com': { label: 'Cronicum', icono: '📜' },
+        'stemum.com': { label: 'STEMUM', icono: '🔬' },
       };
 
       const filas = res.rows.map((r) => {
