@@ -4,6 +4,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
+import { STEMUM_APPS_POR_DISCIPLINA, STEMUM_TOTAL_APPS } from '@/data/stemum';
 import styles from './StemumHome.module.css';
 
 // Las 6 disciplinas del portal. De momento son tarjetas de vista previa (maqueta):
@@ -13,42 +14,36 @@ const DISCIPLINAS = [
     icon: '💻',
     titulo: 'Computación',
     desc: 'Algoritmos de ordenación, autómatas, máquinas de Turing, grafos, estructuras de datos y cómo funciona la IA.',
-    n: '24+',
     href: '/computacion',
   },
   {
     icon: '⚛️',
     titulo: 'Física',
     desc: 'Campos eléctricos, ondas e interferencias, péndulos, colisiones, gases y el efecto Doppler en movimiento.',
-    n: '25+',
     href: '/fisica',
   },
   {
     icon: '📐',
     titulo: 'Matemáticas',
     desc: 'Cálculo visual, derivadas e integrales, distribución normal, transformada de Fourier y probabilidad.',
-    n: '22+',
     href: '/matematicas',
   },
   {
     icon: '🧪',
     titulo: 'Química',
     desc: 'Equilibrio químico, titulaciones ácido-base, geometría molecular VSEPR, estequiometría y cinética.',
-    n: '15+',
     href: '/quimica',
   },
   {
     icon: '🧬',
     titulo: 'Biología',
     desc: 'Genética de Punnett, depredador-presa, ecosistemas tróficos, modelos epidemiológicos y evolución.',
-    n: '12+',
     href: '/biologia',
   },
   {
     icon: '🌍',
     titulo: 'Tierra y Espacio',
     desc: 'Exoplanetas, terremotos y tsunamis, el ciclo del carbono, El Niño y los agujeros negros.',
-    n: '6+',
     href: '/tierra-espacio',
   },
 ];
@@ -103,7 +98,7 @@ export default function StemumHome() {
 
           <div className={styles.heroBadge}>
             <span className={styles.heroBadgeDot}></span>
-            100+ simuladores · En español · Sin registro · Sin coste
+            {STEMUM_TOTAL_APPS} simuladores · En español · Sin registro · Sin coste
           </div>
         </header>
 
@@ -115,12 +110,15 @@ export default function StemumHome() {
             tiempo real. Mueve un control y observa cómo responde el sistema.
           </p>
           <div className={styles.grid}>
-            {DISCIPLINAS.map((d) =>
-              d.href ? (
+            {DISCIPLINAS.map((d) => {
+              const slug = (d.href ?? '').replace(/\//g, '');
+              const count = STEMUM_APPS_POR_DISCIPLINA[slug] ?? 0;
+              const badge = `${count} ${count === 1 ? 'app' : 'apps'}`;
+              return d.href ? (
                 <Link key={d.titulo} href={d.href} className={styles.appCard}>
                   <div className={styles.cardHead}>
                     <span className={styles.cardIcon} aria-hidden="true">{d.icon}</span>
-                    <span className={styles.cardCount}>{d.n}</span>
+                    <span className={styles.cardCount}>{badge}</span>
                   </div>
                   <h3 className={styles.cardTitulo}>{d.titulo}</h3>
                   <p className={styles.cardDesc}>{d.desc}</p>
@@ -130,14 +128,14 @@ export default function StemumHome() {
                 <article key={d.titulo} className={styles.card}>
                   <div className={styles.cardHead}>
                     <span className={styles.cardIcon} aria-hidden="true">{d.icon}</span>
-                    <span className={styles.cardCount}>{d.n}</span>
+                    <span className={styles.cardCount}>{badge}</span>
                   </div>
                   <h3 className={styles.cardTitulo}>{d.titulo}</h3>
                   <p className={styles.cardDesc}>{d.desc}</p>
                   <span className={styles.cardCta}>Próximamente</span>
                 </article>
-              )
-            )}
+              );
+            })}
           </div>
         </section>
 

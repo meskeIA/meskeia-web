@@ -64,3 +64,15 @@ export const STEMUM_APP_SLUGS = new Set(Object.keys(STEMUM_APP_DISCIPLINA));
 // Rutas de páginas del portal (home + disciplinas) que el proxy reescribe a
 // /stemum/*. La cadena vacía representa la home (stemum.com/).
 export const STEMUM_PORTAL_SLUGS = new Set(['', ...Object.keys(STEMUM_DISCIPLINAS)]);
+
+// Conteos derivados automáticamente del catálogo (para los contadores de la
+// home y del hero). Al añadir una app a STEMUM_APP_DISCIPLINA se actualizan solos.
+export const STEMUM_APPS_POR_DISCIPLINA: Record<string, number> = Object.values(
+  STEMUM_APP_DISCIPLINA,
+).reduce<Record<string, number>>((acc, disciplina) => {
+  acc[disciplina] = (acc[disciplina] ?? 0) + 1;
+  return acc;
+}, {});
+
+// Total de apps publicadas en el portal.
+export const STEMUM_TOTAL_APPS = Object.keys(STEMUM_APP_DISCIPLINA).length;
