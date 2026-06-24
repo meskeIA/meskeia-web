@@ -28,24 +28,28 @@ const DISCIPLINAS = [
     titulo: 'Matemáticas',
     desc: 'Cálculo visual, derivadas e integrales, distribución normal, transformada de Fourier y probabilidad.',
     n: '22+',
+    href: '/matematicas',
   },
   {
     icon: '🧪',
     titulo: 'Química',
     desc: 'Equilibrio químico, titulaciones ácido-base, geometría molecular VSEPR, estequiometría y cinética.',
     n: '15+',
+    href: '/quimica',
   },
   {
     icon: '🧬',
     titulo: 'Biología',
     desc: 'Genética de Punnett, depredador-presa, ecosistemas tróficos, modelos epidemiológicos y evolución.',
     n: '12+',
+    href: '/biologia',
   },
   {
     icon: '🌍',
     titulo: 'Tierra y Espacio',
     desc: 'Exoplanetas, terremotos y tsunamis, el ciclo del carbono, El Niño y los agujeros negros.',
     n: '6+',
+    href: '/tierra-espacio',
   },
 ];
 
