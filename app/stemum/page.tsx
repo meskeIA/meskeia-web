@@ -21,6 +21,7 @@ const DISCIPLINAS = [
     titulo: 'Física',
     desc: 'Campos eléctricos, ondas e interferencias, péndulos, colisiones, gases y el efecto Doppler en movimiento.',
     n: '25+',
+    href: '/fisica',
   },
   {
     icon: '📐',

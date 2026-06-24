@@ -93,12 +93,13 @@ function handleCronicum(req: NextRequest) {
 
 // Páginas del portal Stemum (home + disciplinas publicadas). Se reescriben a
 // /stemum/*. Se amplía conforme se publican nuevas disciplinas por oleadas.
-const STEMUM_PORTAL_PAGES = new Set(['', 'computacion']);
+const STEMUM_PORTAL_PAGES = new Set(['', 'computacion', 'fisica']);
 
 // Apps STEM servidas bajo stemum.com. Viven físicamente en meskeIA (/<slug>) y
 // se sirven en passthrough; el chrome compartido (MeskeiaLogo) adapta la marca
 // por host. Se amplía a medida que se incorporan apps al portal.
 const STEMUM_APPS = new Set([
+  // Computación
   'visualizador-algoritmos-ordenacion',
   'simulador-automatas-finitos',
   'simulador-maquina-turing',
@@ -106,6 +107,13 @@ const STEMUM_APPS = new Set([
   'simulador-arboles-bst-avl',
   'visualizador-llm-funcionamiento',
   'simulador-sql-join',
+  // Física
+  'simulador-campo-electrico',
+  'simulador-pendulo',
+  'simulador-colisiones',
+  'simulador-ondas-interferencia',
+  'simulador-gas-ideal',
+  'visualizador-efecto-doppler',
 ]);
 
 function handleStemum(req: NextRequest) {
