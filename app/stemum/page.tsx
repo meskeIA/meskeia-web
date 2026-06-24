@@ -83,10 +83,15 @@ export default function StemumHome() {
             ))}
           </ul>
 
-          <p className={styles.heroSubtitle}>
+          <p className={styles.heroLead}>
             Visualizadores y simuladores <strong>interactivos</strong> para experimentar
-            con la ciencia. Física, matemáticas, química, computación y biología —
-            toca, ajusta y descubre cómo funciona el mundo.
+            con la ciencia.
+          </p>
+          <p className={styles.heroDisciplinas}>
+            Física, matemáticas, química, computación y biología
+          </p>
+          <p className={styles.heroClaim}>
+            Toca, ajusta y descubre cómo funciona el mundo.
           </p>
 
           <div className={styles.heroBadge}>

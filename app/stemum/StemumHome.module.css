@@ -67,17 +67,36 @@
   color: rgba(243, 234, 251, 0.62);
 }
 
-.heroSubtitle {
-  font-size: 1.12rem;
-  color: rgba(243, 234, 251, 0.92);
-  margin: 0 auto 1.5rem;
-  max-width: 660px;
-  line-height: 1.65;
+/* Subtítulo en tres líneas con jerarquía: qué · dónde · invitación */
+.heroLead {
+  font-size: 1.2rem;
+  color: rgba(243, 234, 251, 0.95);
+  margin: 0 auto 0.6rem;
+  max-width: 640px;
+  line-height: 1.55;
+  font-weight: 500;
 }
 
-.heroSubtitle strong {
+.heroLead strong {
   color: #C99BF5;
   font-weight: 600;
+}
+
+.heroDisciplinas {
+  font-size: 0.92rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: rgba(243, 234, 251, 0.6);
+  margin: 0 auto 0.9rem;
+}
+
+.heroClaim {
+  font-size: 1.08rem;
+  color: #C99BF5;
+  margin: 0 auto 1.6rem;
+  max-width: 640px;
+  line-height: 1.5;
+  font-weight: 500;
 }
 
 .heroBadge {
