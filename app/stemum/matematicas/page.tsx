@@ -51,6 +51,90 @@ const APPS = [
     desc: 'Modo manual y simulación de 10.000 partidas para ver por qué cambiar de puerta gana 2/3 de las veces.',
     slug: 'simulador-monty-hall',
   },
+  {
+    icon: '🎲',
+    titulo: 'Teorema central del límite',
+    desc: 'Simulación Monte Carlo con 5 distribuciones y tamaño muestral configurable comparado con la normal teórica.',
+    slug: 'simulador-teorema-central-limite',
+  },
+  {
+    icon: '📊',
+    titulo: 'Intervalos de confianza',
+    desc: '100 intervalos simulados y calculadora con nivel del 80-99 %, usando z o t de Student.',
+    slug: 'simulador-intervalos-confianza',
+  },
+  {
+    icon: '🧪',
+    titulo: 'Test de hipótesis',
+    desc: 'Curvas H₀ y H₁ superpuestas con regiones de rechazo y los valores α, β, p-valor y potencia.',
+    slug: 'simulador-test-hipotesis',
+  },
+  {
+    icon: '🎯',
+    titulo: 'Teorema de Bayes',
+    desc: 'Rectángulo proporcional y árbol de probabilidad con el cálculo del valor predictivo positivo y negativo.',
+    slug: 'simulador-teorema-bayes',
+  },
+  {
+    icon: '🎛️',
+    titulo: 'Transformaciones de funciones',
+    desc: 'Manipula a, b, c y d en f(x)=a·g(b·(x−c))+d con un canvas dual de función base y transformada.',
+    slug: 'simulador-funciones-transformaciones',
+  },
+  {
+    icon: '🧊',
+    titulo: 'Volúmenes de cuerpos',
+    desc: 'Esfera, cubo, cilindro, cono y pirámide en SVG isométrico con sliders y la fórmula en tiempo real.',
+    slug: 'visualizador-volumenes',
+  },
+  {
+    icon: '📡',
+    titulo: 'Trigonometría',
+    desc: 'Círculo unitario animado, gráficas con sliders, ángulos notables e identidades trigonométricas.',
+    slug: 'visualizador-trigonometria',
+  },
+  {
+    icon: '🥚',
+    titulo: 'Geometría analítica',
+    desc: 'Cónicas (elipse, parábola, hipérbola y circunferencia) con sus ecuaciones canónicas y polares.',
+    slug: 'visualizador-geometria-analitica',
+  },
+  {
+    icon: '➡️',
+    titulo: 'Álgebra lineal',
+    desc: 'Vectores 2D, transformaciones lineales, el determinante como área y los autovalores.',
+    slug: 'visualizador-algebra-lineal',
+  },
+  {
+    icon: '🦊',
+    titulo: 'Ecuaciones diferenciales',
+    desc: 'Campo de direcciones para Lotka-Volterra, el enfriamiento de Newton y el circuito RC.',
+    slug: 'visualizador-ecuaciones-diferenciales',
+  },
+  {
+    icon: '🌀',
+    titulo: 'Números complejos',
+    desc: 'Plano de Argand con operaciones geométricas, la forma polar y la identidad de Euler.',
+    slug: 'visualizador-numeros-complejos',
+  },
+  {
+    icon: '🥯',
+    titulo: 'Topología',
+    desc: '5 superficies con selector de género, nudos topológicos y la característica de Euler.',
+    slug: 'visualizador-topologia',
+  },
+  {
+    icon: '🔢',
+    titulo: 'Combinatoria',
+    desc: 'Permutaciones, triángulo de Pascal, binomio de Newton y el principio de multiplicación.',
+    slug: 'visualizador-combinatoria',
+  },
+  {
+    icon: '♾️',
+    titulo: 'Series y convergencia',
+    desc: 'Series de Taylor y Maclaurin, criterios de convergencia y aproximaciones de π.',
+    slug: 'visualizador-series-convergencia',
+  },
 ];
 
 export default function StemumMatematicas() {
