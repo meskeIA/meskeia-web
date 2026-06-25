@@ -1545,9 +1545,9 @@ export default function DashboardAnalyticsPage() {
           <section className={styles.section}>
             <h2>🌐 Tráfico por dominio</h2>
             <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-              Visitas servidas bajo cada dominio vertical (meskeia.com, delegum.com, cronicum.com).
-              Excluye bots y tu propia IP. Mide las páginas de cada portal, no el embudo completo
-              (las apps enlazadas desde Delegum/Cronicum cargan ya bajo meskeia.com).
+              Visitas servidas bajo cada dominio vertical. Excluye bots y tu propia IP.
+              Mide las páginas de cada portal, no el embudo completo (las apps enlazadas
+              desde los verticales cargan ya bajo meskeia.com).
             </p>
 
             {dominiosQuery.isLoading && <p>Cargando tráfico por dominio...</p>}
