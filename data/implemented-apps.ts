@@ -1082,6 +1082,9 @@ export const implementedAppsUrls = [
   "/visualizador-historia/colombia/",                      // Colombia: de la Independencia al Proceso de Paz
   "/visualizador-historia/chile/",                         // Chile: de la Independencia a Boric
   "/visualizador-historia/peru/",                          // Perú: de la Independencia al Perú contemporáneo
+  "/visualizador-historia/ecuador/",                       // Ecuador: de la Batalla de Pichincha a la crisis de seguridad
+  "/visualizador-historia/bolivia/",                       // Bolivia: de la Independencia al Estado Plurinacional
+  "/visualizador-historia/paraguay/",                      // Paraguay: de la Independencia al Paraguay contemporáneo
   "/visualizador-historia/cuba/",                          // Cuba: de la Guerra de los Diez Años al 11J
   "/visualizador-historia/venezuela/",                     // Venezuela: de Bolívar a la crisis contemporánea
   "/visualizador-historia/uruguay/",                       // Uruguay: del batllismo a la democracia plena

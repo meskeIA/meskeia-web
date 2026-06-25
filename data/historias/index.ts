@@ -146,6 +146,9 @@ import { etiopiaAksum } from './etiopia-aksum';
 import { nuevaZelanda } from './nueva-zelanda';
 import { granZimbabue } from './gran-zimbabue';
 import { pueblosPacifico } from './pueblos-pacifico';
+import { ecuador } from './ecuador';
+import { bolivia } from './bolivia';
+import { paraguay } from './paraguay';
 
 const registry: Record<string, HistoriaData> = {
   grecia,
@@ -265,6 +268,9 @@ const registry: Record<string, HistoriaData> = {
   'nueva-zelanda': nuevaZelanda,
   'gran-zimbabue': granZimbabue,
   'pueblos-pacifico': pueblosPacifico,
+  ecuador,
+  bolivia,
+  paraguay,
   'sudeste-asiatico': sudeste_asiatico,
   'brasil-moderno': brasilModerno,
   'mexico-moderno': mexicoModerno,

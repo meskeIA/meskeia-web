@@ -91,6 +91,8 @@ export const STEMUM_ADYACENTES: Record<string, string> = {
   'quiz-complejidad-algoritmos': 'computacion',
   'visualizador-criptografia': 'computacion',
   'visualizador-teoria-grafos': 'computacion',
+  'visualizador-redes-computadoras': 'computacion',
+  'visualizador-como-funciona-wifi': 'computacion',
   // ── Tierra y Espacio ──
   'constelaciones-del-cielo': 'tierra-espacio',
   'minerales-del-mundo': 'tierra-espacio',
