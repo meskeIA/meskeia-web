@@ -10,7 +10,11 @@
  * llevarlo al vertical, donde hallará más contenido del mismo tema.
  *
  * Verticales soportados:
- *  - Stemum   → apps STEM de primer nivel, vía STEMUM_APP_DISCIPLINA.
+ *  - Stemum   → dos modos: (1) simulador del portal (STEMUM_APP_DISCIPLINA) →
+ *               banner con nº de simuladores; (2) app STEM AFÍN no simulador
+ *               (quiz/calculadora/tabla/clic-revelar, STEMUM_ADYACENTES) →
+ *               banner que enlaza a su disciplina. Lista curada (sin señal
+ *               autodeclarada); excluye medicina/fisiología.
  *  - Cronicum → cronologías en /visualizador-historia/<slug>, vía las puertas.
  *  - Delegum  → dos modos:
  *               (1) app curada en una puerta de Soluciones (getPuertaDeApp):
@@ -45,6 +49,7 @@ import {
 import { getPuertaDeCronologia } from '@/data/cronicum/puertas';
 import { getPuertaDeApp } from '@/data/delegum/soluciones';
 import { APPS_REGION_ES } from '@/data/delegum/apps-region-es';
+import { STEMUM_ADYACENTES } from '@/data/stemum-adyacentes';
 import styles from './DescubreVertical.module.css';
 
 interface Banda {
@@ -83,6 +88,24 @@ function resolverBanda(pathname: string, isStemum: boolean): Banda | null {
         otras >= 1
           ? `Descubre ${otras} ${plural(otras, 'simulador', 'simuladores')} más →`
           : 'Explora la disciplina →',
+    };
+  }
+
+  // ── Stemum (afín) ── app STEM que NO es simulador del portal (quiz/
+  // calculadora/tabla/clic-revelar). No se mete en Stemum (curaduría de
+  // simuladores); solo enlaza a su disciplina. Lista curada en
+  // data/stemum-adyacentes.ts (sin señal autodeclarada, revisión periódica).
+  const discAfin = STEMUM_ADYACENTES[segs[0] ?? ''];
+  if (discAfin && !isStemum) {
+    const label = STEMUM_DISCIPLINAS[discAfin] ?? '';
+    return {
+      vertical: 'stemum',
+      icono: '🔬',
+      intro: `Esta herramienta es de ${label}.`,
+      marca: 'Stemum',
+      descripcion: ', el portal de ciencia interactiva de meskeIA.',
+      href: `https://stemum.com/${discAfin}/?from=meskeia`,
+      cta: `Explora ${label} →`,
     };
   }
 
