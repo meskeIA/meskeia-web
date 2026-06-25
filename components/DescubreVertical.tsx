@@ -12,8 +12,13 @@
  * Verticales soportados:
  *  - Stemum   → apps STEM de primer nivel, vía STEMUM_APP_DISCIPLINA.
  *  - Cronicum → cronologías en /visualizador-historia/<slug>, vía las puertas.
- *  - Delegum  → apps fiscales/laborales incluidas en las puertas de Soluciones,
- *               vía getPuertaDeApp. Enlaza al ancla de la categoría.
+ *  - Delegum  → dos modos:
+ *               (1) app curada en una puerta de Soluciones (getPuertaDeApp):
+ *                   enlaza al ancla de su categoría.
+ *               (2) app fiscal-España NO curada (APPS_REGION_ES, autogenerado
+ *                   del marcador RegionBadge es-only/es-data): enlaza a la home
+ *                   de Soluciones sin engordar la curaduría (ver
+ *                   DELEGUM-SOLUCIONES.md: fachada mínima, no exhaustiva).
  *
  * Es 100% automático (se apoya en los registros existentes; cubre el catálogo
  * del vertical sin editar página por página) y se inyecta una sola vez desde
@@ -39,14 +44,15 @@ import {
 } from '@/data/stemum';
 import { getPuertaDeCronologia } from '@/data/cronicum/puertas';
 import { getPuertaDeApp } from '@/data/delegum/soluciones';
+import { APPS_REGION_ES } from '@/data/delegum/apps-region-es';
 import styles from './DescubreVertical.module.css';
 
 interface Banda {
   vertical: 'stemum' | 'cronicum' | 'delegum';
   icono: string;
   intro: string; // "Esta herramienta forma parte de"
-  etiqueta: string; // disciplina o puerta (en negrita)
-  marca: string; // "Stemum" | "Cronicum"
+  etiqueta?: string; // disciplina o puerta (en negrita). Ausente → banda genérica.
+  marca: string; // "Stemum" | "Cronicum" | "Delegum"
   descripcion: string; // "el portal de ciencia interactiva de meskeIA."
   href: string; // URL absoluta al portal
   cta: string; // "Descubre N … más →"
@@ -123,6 +129,23 @@ function resolverBanda(pathname: string, isStemum: boolean): Banda | null {
     };
   }
 
+  // ── Delegum (genérico) ── app fiscal-España (RegionBadge es-only/es-data) que
+  // NO está en la curaduría de Soluciones. Para no engordar el directorio
+  // (decisión cerrada en DELEGUM-SOLUCIONES.md: fachada mínima, no exhaustiva),
+  // estas apps no se añaden a una puerta: solo invitan a descubrir el catálogo,
+  // enlazando a la home de Soluciones. APPS_REGION_ES se autogenera en el build.
+  if (APPS_REGION_ES.has(segs[0] ?? '')) {
+    return {
+      vertical: 'delegum',
+      icono: '⚖️',
+      intro: 'Esta herramienta aplica a España.',
+      marca: 'Delegum',
+      descripcion: ' reúne más herramientas de fiscalidad, derecho laboral y finanzas.',
+      href: 'https://delegum.com/soluciones/?from=meskeia',
+      cta: 'Descubre el catálogo →',
+    };
+  }
+
   return null;
 }
 
@@ -136,13 +159,25 @@ export default function DescubreVertical() {
   return (
     <aside
       className={`${styles.banda} ${styles[banda.vertical]}`}
-      aria-label={`Descubre ${banda.etiqueta} en ${banda.marca}`}
+      aria-label={
+        banda.etiqueta
+          ? `Descubre ${banda.etiqueta} en ${banda.marca}`
+          : `Descubre más herramientas en ${banda.marca}`
+      }
     >
       <a href={banda.href} className={styles.enlace}>
         <span className={styles.icono} aria-hidden="true">{banda.icono}</span>
         <span className={styles.texto}>
-          {banda.intro} <strong>{banda.etiqueta}</strong> en{' '}
-          <strong>{banda.marca}</strong>, {banda.descripcion}{' '}
+          {banda.etiqueta ? (
+            <>
+              {banda.intro} <strong>{banda.etiqueta}</strong> en{' '}
+              <strong>{banda.marca}</strong>, {banda.descripcion}{' '}
+            </>
+          ) : (
+            <>
+              {banda.intro} <strong>{banda.marca}</strong>{banda.descripcion}{' '}
+            </>
+          )}
           <span className={styles.cta}>{banda.cta}</span>
         </span>
       </a>
