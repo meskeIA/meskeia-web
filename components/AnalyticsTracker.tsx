@@ -28,6 +28,7 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
       'delegum.com', 'www.delegum.com',
       'cronicum.com', 'www.cronicum.com',
       'stemum.com', 'www.stemum.com',
+      'coquinum.com', 'www.coquinum.com',
     ];
     if (typeof window !== 'undefined') {
       const hostname = window.location.hostname;

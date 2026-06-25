@@ -1476,6 +1476,7 @@ export const analyticsRouter = router({
         'delegum.com': { label: 'Delegum', icono: '🏛️' },
         'cronicum.com': { label: 'Cronicum', icono: '📜' },
         'stemum.com': { label: 'STEMUM', icono: '🔬' },
+        'coquinum.com': { label: 'Coquinum', icono: '🍳' },
       };
 
       const filas = res.rows.map((r) => {
