@@ -1,7 +1,7 @@
 /**
  * Puertas de entrada de Cronicum (vertical de Historia).
  *
- * Doble eje de navegación sobre las 142 cronologías de `data/historias/`:
+ * Doble eje de navegación sobre las 148 cronologías de `data/historias/`:
  *  - grupo 'mundo'         → civilizaciones, países y regiones (6 puertas)
  *  - grupo 'cosas'         → la historia temática / "de las cosas" (5 puertas)
  *  - grupo 'acontecimientos' → banda transversal de grandes hechos (1 puerta)
@@ -70,6 +70,7 @@ export const PUERTAS: Puerta[] = [
     slugs: [
       'historia-eeuu', 'canada', 'historia-america-latina', 'historia-conquista-america',
       'brasil-moderno', 'mexico-moderno', 'argentina', 'colombia', 'chile', 'peru',
+      'ecuador', 'bolivia', 'paraguay',
       'cuba', 'venezuela', 'uruguay', 'centroamerica', 'republica-dominicana', 'puerto-rico',
     ],
   },
@@ -91,6 +92,7 @@ export const PUERTAS: Puerta[] = [
     grupo: 'mundo',
     slugs: [
       'historia-africa', 'imperios-africa-occidental', 'etiopia-aksum', 'gran-zimbabue',
+      'reino-kongo', 'reino-benin', 'imperio-oyo',
       'australia', 'nueva-zelanda', 'pueblos-pacifico',
     ],
   },
