@@ -149,6 +149,9 @@ import { pueblosPacifico } from './pueblos-pacifico';
 import { ecuador } from './ecuador';
 import { bolivia } from './bolivia';
 import { paraguay } from './paraguay';
+import { reinoKongo } from './reino-kongo';
+import { reinoBenin } from './reino-benin';
+import { imperioOyo } from './imperio-oyo';
 
 const registry: Record<string, HistoriaData> = {
   grecia,
@@ -271,6 +274,9 @@ const registry: Record<string, HistoriaData> = {
   ecuador,
   bolivia,
   paraguay,
+  'reino-kongo': reinoKongo,
+  'reino-benin': reinoBenin,
+  'imperio-oyo': imperioOyo,
   'sudeste-asiatico': sudeste_asiatico,
   'brasil-moderno': brasilModerno,
   'mexico-moderno': mexicoModerno,

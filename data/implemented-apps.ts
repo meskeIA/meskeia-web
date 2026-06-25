@@ -1077,6 +1077,9 @@ export const implementedAppsUrls = [
   "/visualizador-historia/gran-zimbabue/",                 // Gran Zimbabue y la Costa Swahili
   "/visualizador-historia/nueva-zelanda/",                 // Nueva Zelanda (Aotearoa): de los Maoríes a la Nación Bicultural
   "/visualizador-historia/pueblos-pacifico/",              // Pueblos del Pacífico: la Gran Expansión Polinesia
+  "/visualizador-historia/reino-kongo/",                   // Reino del Kongo: de Mbanza Kongo a la Angola portuguesa
+  "/visualizador-historia/reino-benin/",                   // Reino de Benín (Edo): de los obas a la expedición de 1897
+  "/visualizador-historia/imperio-oyo/",                   // Imperio de Oyó y los Estados Yoruba: de Ifé a las guerras del s.XIX
   // Roadmap v14 — Cronologías LATAM (2026-05-08)
   "/visualizador-historia/argentina/",                     // Argentina: de la Revolución de Mayo a Milei
   "/visualizador-historia/colombia/",                      // Colombia: de la Independencia al Proceso de Paz
