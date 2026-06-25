@@ -46,6 +46,7 @@ export const STEMUM_APP_DISCIPLINA: Record<string, string> = {
   'visualizador-ia-redes-neuronales': 'computacion',
   'visualizador-computacion-cuantica': 'computacion',
   'simulador-ordenacion': 'computacion',
+  'playground-sql': 'computacion',
   // Física
   'simulador-campo-electrico': 'fisica',
   'simulador-pendulo': 'fisica',
@@ -76,6 +77,7 @@ export const STEMUM_APP_DISCIPLINA: Record<string, string> = {
   'visualizador-relatividad-especial': 'fisica',
   'visualizador-mecanica-cuantica': 'fisica',
   'visualizador-particulas-subatomicas': 'fisica',
+  'simulador-termodinamica-carnot': 'fisica',
   // Matemáticas
   'visualizador-calculo-visual': 'matematicas',
   'simulador-derivada-pendiente': 'matematicas',

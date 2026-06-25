@@ -189,6 +189,12 @@ const APPS = [
     desc: 'Tabla clicable del Modelo Estándar con toggle de antipartículas y slider que liga la masa de cada partícula a su acoplamiento con el campo de Higgs.',
     slug: 'visualizador-particulas-subatomicas',
   },
+  {
+    icon: '♨️',
+    titulo: 'Ciclo de Carnot',
+    desc: 'El motor térmico ideal en un diagrama presión-volumen: dos isotermas y dos adiabáticas, con la eficiencia η = 1 − Tf/Tc y la 2.ª ley de la termodinámica.',
+    slug: 'simulador-termodinamica-carnot',
+  },
 ];
 
 export default function StemumFisica() {

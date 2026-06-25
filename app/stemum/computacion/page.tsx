@@ -153,6 +153,12 @@ const APPS = [
     desc: 'Introduce tu propio array y compara hasta 4 de los 7 algoritmos a la vez, con presets (inverso, casi ordenado, duplicados), slider de velocidad y conteo de operaciones.',
     slug: 'simulador-ordenacion',
   },
+  {
+    icon: '🗄️',
+    titulo: 'Playground SQL',
+    desc: 'Editor SQL que corre en el navegador con datasets de ejemplo, ejercicios guiados y resultados en vivo. Practica SELECT, JOIN y GROUP BY sin instalar nada.',
+    slug: 'playground-sql',
+  },
 ];
 
 export default function StemumComputacion() {
