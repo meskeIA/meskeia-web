@@ -51,6 +51,24 @@ const APPS = [
     desc: 'Circulación de Walker, fases El Niño y La Niña, teleconexiones e índices SOI y ONI.',
     slug: 'visualizador-el-nino',
   },
+  {
+    icon: '⭐',
+    titulo: 'Vida de una estrella',
+    desc: 'El slider de masa estelar recalcula vida, temperatura, color espectral y diagrama HR, y bifurca el destino entre enana blanca, neutrón o agujero negro.',
+    slug: 'visualizador-vida-estrella',
+  },
+  {
+    icon: '🪐',
+    titulo: 'Sistema solar',
+    desc: 'Fichas de planetas desplegables, slider de escala que reduce el Sol a un balón y línea del tiempo de la luz desde Mercurio a Neptuno.',
+    slug: 'visualizador-sistema-solar',
+  },
+  {
+    icon: '🌱',
+    titulo: 'Ciclo del nitrógeno',
+    desc: 'Diagrama SVG clicable de fijación, nitrificación y desnitrificación, con slider de año 1900-2025 que cuantifica la fijación humana frente a la biológica.',
+    slug: 'visualizador-ciclo-nitrogeno',
+  },
 ];
 
 export default function StemumTierraEspacio() {

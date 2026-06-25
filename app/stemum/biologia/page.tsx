@@ -81,6 +81,24 @@ const APPS = [
     desc: 'Morfologías bacterianas clicables, curva de crecimiento logística y tinción de Gram.',
     slug: 'visualizador-microbiologia',
   },
+  {
+    icon: '🦴',
+    titulo: 'Evolución humana',
+    desc: 'Línea del tiempo clicable de 8 homínidos, anatomía comparada con barra, mapa Out of Africa interactivo y slider de 70.000 años de hitos cognitivos.',
+    slug: 'visualizador-evolucion-humana',
+  },
+  {
+    icon: '🧬',
+    titulo: 'Evolución molecular',
+    desc: 'Muta una secuencia de ADN viendo si cambia el aminoácido, mueve el reloj molecular d=2μt y alinea especies para construir su árbol filogenético.',
+    slug: 'visualizador-evolucion-molecular',
+  },
+  {
+    icon: '⚡',
+    titulo: 'Potencial de acción',
+    desc: 'Ajusta intensidad, umbral y duración del estímulo y observa en vivo en el canvas si la neurona dispara y a qué frecuencia (ley del todo o nada).',
+    slug: 'simulador-potencial-accion',
+  },
 ];
 
 export default function StemumBiologia() {

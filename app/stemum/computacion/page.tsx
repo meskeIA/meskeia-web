@@ -135,6 +135,24 @@ const APPS = [
     desc: 'Diagrama de secuencia SYN, SYN-ACK y ACK y el cierre FIN, con números de secuencia configurables.',
     slug: 'simulador-tcp-handshake',
   },
+  {
+    icon: '🧠',
+    titulo: 'Redes neuronales',
+    desc: 'Ajusta pesos, bias y entradas de un perceptrón con 4 funciones de activación; explora capas clicables y simula épocas viendo caer la curva de pérdida.',
+    slug: 'visualizador-ia-redes-neuronales',
+  },
+  {
+    icon: '⚛️',
+    titulo: 'Computación cuántica',
+    desc: 'Esfera de Bloch con slider de superposición y medición que colapsa el qubit, paralelismo 2ⁿ, puertas cuánticas y línea temporal de la amenaza a RSA.',
+    slug: 'visualizador-computacion-cuantica',
+  },
+  {
+    icon: '🔀',
+    titulo: 'Ordenación a medida',
+    desc: 'Introduce tu propio array y compara hasta 4 de los 7 algoritmos a la vez, con presets (inverso, casi ordenado, duplicados), slider de velocidad y conteo de operaciones.',
+    slug: 'simulador-ordenacion',
+  },
 ];
 
 export default function StemumComputacion() {

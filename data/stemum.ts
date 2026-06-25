@@ -43,6 +43,9 @@ export const STEMUM_APP_DISCIPLINA: Record<string, string> = {
   'simulador-hashing-colisiones': 'computacion',
   'simulador-cifrado-cesar': 'computacion',
   'simulador-tcp-handshake': 'computacion',
+  'visualizador-ia-redes-neuronales': 'computacion',
+  'visualizador-computacion-cuantica': 'computacion',
+  'simulador-ordenacion': 'computacion',
   // Física
   'simulador-campo-electrico': 'fisica',
   'simulador-pendulo': 'fisica',
@@ -65,6 +68,14 @@ export const STEMUM_APP_DISCIPLINA: Record<string, string> = {
   'visualizador-circuitos-electronicos': 'fisica',
   'visualizador-motor-combustion': 'fisica',
   'visualizador-radioactividad': 'fisica',
+  'visualizador-optica': 'fisica',
+  'visualizador-maquinas-simples': 'fisica',
+  'visualizador-sonido-ondas': 'fisica',
+  'visualizador-espectro-electromagnetico': 'fisica',
+  'visualizador-energia-nuclear': 'fisica',
+  'visualizador-relatividad-especial': 'fisica',
+  'visualizador-mecanica-cuantica': 'fisica',
+  'visualizador-particulas-subatomicas': 'fisica',
   // Matemáticas
   'visualizador-calculo-visual': 'matematicas',
   'simulador-derivada-pendiente': 'matematicas',
@@ -86,6 +97,11 @@ export const STEMUM_APP_DISCIPLINA: Record<string, string> = {
   'visualizador-topologia': 'matematicas',
   'visualizador-combinatoria': 'matematicas',
   'visualizador-series-convergencia': 'matematicas',
+  'visualizador-geometria-fractales': 'matematicas',
+  'visualizador-numeros-primos': 'matematicas',
+  'visualizador-estadistica-cotidiana': 'matematicas',
+  'visualizador-estadistica-inferencial': 'matematicas',
+  'simulador-trigonometria-circulo-unitario': 'matematicas',
   // Química
   'simulador-equilibrio-quimico': 'quimica',
   'simulador-titulacion': 'quimica',
@@ -95,6 +111,8 @@ export const STEMUM_APP_DISCIPLINA: Record<string, string> = {
   'simulador-tabla-periodica-tendencias': 'quimica',
   'visualizador-termodinamica-quimica': 'quimica',
   'visualizador-electroquimica': 'quimica',
+  'visualizador-carbono': 'quimica',
+  'visualizador-cinetica-quimica': 'quimica',
   // Biología
   'simulador-lotka-volterra': 'biologia',
   'simulador-ecosistema-trofico': 'biologia',
@@ -107,6 +125,9 @@ export const STEMUM_APP_DISCIPLINA: Record<string, string> = {
   'visualizador-epigenetica': 'biologia',
   'visualizador-embriogenesis': 'biologia',
   'visualizador-microbiologia': 'biologia',
+  'visualizador-evolucion-humana': 'biologia',
+  'visualizador-evolucion-molecular': 'biologia',
+  'simulador-potencial-accion': 'biologia',
   // Tierra y Espacio
   'visualizador-exoplanetas': 'tierra-espacio',
   'visualizador-terremotos-tsunamis': 'tierra-espacio',
@@ -114,6 +135,9 @@ export const STEMUM_APP_DISCIPLINA: Record<string, string> = {
   'visualizador-cosmologia': 'tierra-espacio',
   'visualizador-ciclo-carbono-completo': 'tierra-espacio',
   'visualizador-el-nino': 'tierra-espacio',
+  'visualizador-vida-estrella': 'tierra-espacio',
+  'visualizador-sistema-solar': 'tierra-espacio',
+  'visualizador-ciclo-nitrogeno': 'tierra-espacio',
 };
 
 // Slugs de apps servidas bajo stemum.com (passthrough en el proxy).

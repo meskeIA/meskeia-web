@@ -63,6 +63,18 @@ const APPS = [
     desc: 'Pila Daniell animada, serie electroquímica, electrólisis y baterías de litio.',
     slug: 'visualizador-electroquimica',
   },
+  {
+    icon: '⚛️',
+    titulo: 'El carbono',
+    desc: 'Alterna entre los 4 alótropos con sus estructuras SVG, explora el ciclo del carbono y grupos funcionales, y data objetos con un slider de desintegración de C-14.',
+    slug: 'visualizador-carbono',
+  },
+  {
+    icon: '⚗️',
+    titulo: 'Cinética química',
+    desc: 'Mueve Ea, ΔH y catalizador sobre el perfil de energía, ve k crecer en la curva de Arrhenius y compara curvas de concentración y vida media de los órdenes 0, 1 y 2.',
+    slug: 'visualizador-cinetica-quimica',
+  },
 ];
 
 export default function StemumQuimica() {

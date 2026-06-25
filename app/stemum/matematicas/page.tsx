@@ -135,6 +135,36 @@ const APPS = [
     desc: 'Series de Taylor y Maclaurin, criterios de convergencia y aproximaciones de π.',
     slug: 'visualizador-series-convergencia',
   },
+  {
+    icon: '🔺',
+    titulo: 'Geometría de fractales',
+    desc: 'Sliders de iteración generan Sierpinski, Koch, alfombra y Hilbert en SVG, con sus conteos de elementos, perímetro y dimensión fractal.',
+    slug: 'visualizador-geometria-fractales',
+  },
+  {
+    icon: '🔢',
+    titulo: 'Números primos',
+    desc: 'Criba de Eratóstenes animada paso a paso o automática hasta 500, más espiral de Ulam, primos gemelos y reto de factorización RSA.',
+    slug: 'visualizador-numeros-primos',
+  },
+  {
+    icon: '📊',
+    titulo: 'Estadística cotidiana',
+    desc: 'Slider de prevalencia para Bayes, paradoja de Simpson conmutable y lanzador de hasta 1.000 monedas con curva en vivo hacia el 50%.',
+    slug: 'visualizador-estadistica-cotidiana',
+  },
+  {
+    icon: '📉',
+    titulo: 'Estadística inferencial',
+    desc: 'Sliders mueven el estadístico z, α y el efecto sobre curvas normales, y simulan 100 intervalos de confianza para ver p-valor y potencia.',
+    slug: 'visualizador-estadistica-inferencial',
+  },
+  {
+    icon: '📐',
+    titulo: 'Círculo unitario',
+    desc: 'Gira el ángulo θ con slider o animación sobre un canvas que proyecta seno, coseno y tangente, con valores y cuadrante en tiempo real.',
+    slug: 'simulador-trigonometria-circulo-unitario',
+  },
 ];
 
 export default function StemumMatematicas() {

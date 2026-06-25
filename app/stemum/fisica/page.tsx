@@ -141,6 +141,54 @@ const APPS = [
     desc: 'Desintegración α/β/γ, ley N(t)=N₀e^(−λt), datación por carbono-14 y dosis.',
     slug: 'visualizador-radioactividad',
   },
+  {
+    icon: '🔍',
+    titulo: 'Óptica de la luz',
+    desc: 'Diagramas SVG en vivo de reflexión, refracción con ley de Snell, lentes convergentes/divergentes y dispersión en prisma; ajustas ángulo, medio y distancia del objeto.',
+    slug: 'visualizador-optica',
+  },
+  {
+    icon: '⚙️',
+    titulo: 'Máquinas simples',
+    desc: 'Sliders de palanca y plano inclinado recalculan ventaja mecánica y fuerza sobre diagramas SVG; fulcro, ángulo y longitud se mueven en tiempo real.',
+    slug: 'visualizador-maquinas-simples',
+  },
+  {
+    icon: '🔊',
+    titulo: 'Sonido y ondas',
+    desc: 'Sliders de frecuencia y amplitud redibujan la onda y suenan vía Web Audio; explora notas, decibelios y la mezcla de armónicos de cada instrumento.',
+    slug: 'visualizador-sonido-ondas',
+  },
+  {
+    icon: '🌈',
+    titulo: 'Espectro electromagnético',
+    desc: 'Barra logarítmica de 7 bandas clicables más calculadora que convierte longitud de onda en frecuencia y energía por fotón con c=λ·f.',
+    slug: 'visualizador-espectro-electromagnetico',
+  },
+  {
+    icon: '💥',
+    titulo: 'Energía nuclear',
+    desc: 'Slider del factor k marca reactor subcrítico/crítico/supercrítico; selector de reactores y barras comparativas conmutables entre CO₂ y factor de capacidad.',
+    slug: 'visualizador-energia-nuclear',
+  },
+  {
+    icon: '🌌',
+    titulo: 'Relatividad especial',
+    desc: 'Sliders de velocidad recalculan factor gamma, dilatación temporal y contracción de longitud; selector de masa para E=mc² y paradoja de gemelos paso a paso.',
+    slug: 'visualizador-relatividad-especial',
+  },
+  {
+    icon: '⚛️',
+    titulo: 'Mecánica cuántica',
+    desc: 'Observas el colapso de la doble rendija, ajustas certeza posición/momento de Heisenberg, abres la caja de Schrödinger y varías la barrera del efecto túnel.',
+    slug: 'visualizador-mecanica-cuantica',
+  },
+  {
+    icon: '🧩',
+    titulo: 'Partículas subatómicas',
+    desc: 'Tabla clicable del Modelo Estándar con toggle de antipartículas y slider que liga la masa de cada partícula a su acoplamiento con el campo de Higgs.',
+    slug: 'visualizador-particulas-subatomicas',
+  },
 ];
 
 export default function StemumFisica() {
