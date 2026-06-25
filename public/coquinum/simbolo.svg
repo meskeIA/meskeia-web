@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Coquinum">
+  <defs>
+    <linearGradient id="coq-stroke" x1="0.15" y1="1" x2="0.7" y2="0">
+      <stop offset="0" stop-color="#FAF7F0"></stop>
+      <stop offset="0.5" stop-color="#F0C277"></stop>
+      <stop offset="1" stop-color="#E8A33D"></stop>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke="url(#coq-stroke)" stroke-width="6.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M42 88 C 35 81, 35 73, 42 66 C 49 59, 49 51, 42 44"></path>
+    <path d="M60 88 C 53 80, 53 69, 60 61 C 67 53, 67 42, 60 34"></path>
+    <path d="M78 88 C 71 81, 71 73, 78 66 C 85 59, 85 51, 78 44"></path>
+  </g>
+</svg>

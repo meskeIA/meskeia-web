@@ -19,13 +19,34 @@ import { STEMUM_APP_SLUGS, STEMUM_PORTAL_SLUGS } from './data/stemum';
 const DELEGUM_HOSTS = new Set(['delegum.com', 'www.delegum.com']);
 const CRONICUM_HOSTS = new Set(['cronicum.com', 'www.cronicum.com']);
 const STEMUM_HOSTS = new Set(['stemum.com', 'www.stemum.com']);
+const COQUINUM_HOSTS = new Set(['coquinum.com', 'www.coquinum.com']);
 
 export function proxy(req: NextRequest) {
   const host = (req.headers.get('host') ?? '').split(':')[0].toLowerCase();
   if (DELEGUM_HOSTS.has(host)) return handleDelegum(req);
   if (CRONICUM_HOSTS.has(host)) return handleCronicum(req);
   if (STEMUM_HOSTS.has(host)) return handleStemum(req);
+  if (COQUINUM_HOSTS.has(host)) return handleCoquinum(req);
   return NextResponse.next();
+}
+
+function handleCoquinum(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  // Passthrough del árbol real y de la API (mismo criterio que las demás marcas).
+  if (pathname === '/coquinum' || pathname.startsWith('/coquinum/') || pathname.startsWith('/api')) {
+    return NextResponse.next();
+  }
+  // sitemap.xml, robots.txt y llms.txt: por ahora los sirve meskeIA (Coquinum aún
+  // no tiene versiones propias; el portal arranca con la home como maqueta).
+  if (pathname === '/sitemap.xml' || pathname === '/robots.txt' || pathname === '/llms.txt') {
+    return NextResponse.next();
+  }
+  // Rutas limpias → reescritura interna a /coquinum/*. De momento solo existe la
+  // home; al publicar secciones/apps el árbol crecerá bajo /coquinum.
+  const clean = pathname.endsWith('/') ? pathname : `${pathname}/`;
+  const url = req.nextUrl.clone();
+  url.pathname = clean === '/' ? '/coquinum/' : `/coquinum${clean}`;
+  return NextResponse.rewrite(url);
 }
 
 function handleDelegum(req: NextRequest) {
