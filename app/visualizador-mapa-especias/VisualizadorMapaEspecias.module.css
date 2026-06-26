@@ -1,5 +1,5 @@
 .container {
-  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
   --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
   --border: #E5E5E5; --hover: #F5F5F5;
   --radius: 12px; --radius-large: 16px;
