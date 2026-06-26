@@ -96,6 +96,16 @@ export async function POST(request: NextRequest) {
 
     const esBot = botsPattern.test(userAgent);
 
+    // Señal adicional de automatización: los navegadores reales SIEMPRE envían
+    // la cabecera Accept-Language. Las granjas headless que rotan IP (decenas de
+    // IPs distintas, mismo User-Agent + resolución, concentradas en una sola app)
+    // suelen omitirla y hoy entran como modo='web', inflando "registros" sin subir
+    // "apps distintas". Marcarlas como bot las excluye de las métricas reales,
+    // porque el rollup ya ignora modo='bot'. Heurística barata y conservadora:
+    // ante dudas se puede afinar más adelante con un control por frecuencia.
+    const acceptLanguage = request.headers.get('accept-language') || '';
+    const sinIdioma = acceptLanguage.trim() === '';
+
     // Inicializar DB si es necesario
     await initializeDatabase();
 
@@ -138,7 +148,7 @@ export async function POST(request: NextRequest) {
 
     // Detección compuesta de bot: por user agent O por IP de datacenter cloud
     const esBotIP = esIpDatacenter(rawIP);
-    const modo = (esBot || esBotIP) ? 'bot' : (truncar(datos.modo, 20) || 'web');
+    const modo = (esBot || esBotIP || sinIdioma) ? 'bot' : (truncar(datos.modo, 20) || 'web');
 
     // RGPD: Geolocalización solo país, vía headers de Vercel (sin servicios externos)
     // Siempre código ISO alpha-2 (x-vercel-ip-country) para consistencia en DB

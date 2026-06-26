@@ -35,13 +35,21 @@ export async function POST(request: NextRequest) {
     }
 
     // H5/L1: Validar que la duración sea un número razonable (0s - 24h)
-    const duracion = Number(datos.duracion_segundos);
-    if (isNaN(duracion) || duracion < 0 || duracion > 86400) {
+    const duracionRaw = Number(datos.duracion_segundos);
+    if (isNaN(duracionRaw) || duracionRaw < 0 || duracionRaw > 86400) {
       return NextResponse.json(
         { status: 'error', message: 'Duración fuera de rango (0-86400 segundos)' },
         { status: 400, headers: getCorsHeaders('POST, OPTIONS', request.headers.get('origin')) }
       );
     }
+
+    // Cap a 30 min (mismo valor que CAP_DUR del rollup): las duraciones mayores
+    // casi siempre son pestañas olvidadas abiertas que disparan beforeunload horas
+    // después (se han visto valores de >50 h). Para una visión orientativa no
+    // aportan y distorsionan medias y máximos. Capamos ya en la ingesta para que
+    // la tabla cruda quede coherente con el rollup, sin perder utilidad real.
+    const CAP_DURACION = 1800;
+    const duracion = Math.min(duracionRaw, CAP_DURACION);
 
     const aplicacion = datos.aplicacion.slice(0, 100);
     const sesion_id = datos.sesion_id && typeof datos.sesion_id === 'string'
@@ -53,10 +61,17 @@ export async function POST(request: NextRequest) {
     // Buscar el último registro de esta aplicación/sesión para actualizar duración
     // Si hay sesion_id, usarlo para encontrar el registro exacto
     if (sesion_id) {
+      // Actualizar SOLO el registro de entrada (el último de esa sesión+app), no
+      // todas sus filas: si una sesión tuviera varias entradas de la misma app,
+      // el WHERE plano les ponía a todas la misma duración e inflaba las medias.
       await client.execute({
         sql: `UPDATE uso_aplicaciones
               SET duracion_segundos = ?
-              WHERE sesion_id = ? AND aplicacion = ?`,
+              WHERE id = (
+                SELECT id FROM uso_aplicaciones
+                WHERE sesion_id = ? AND aplicacion = ?
+                ORDER BY id DESC LIMIT 1
+              )`,
         args: [duracion, sesion_id, aplicacion],
       });
     } else {
