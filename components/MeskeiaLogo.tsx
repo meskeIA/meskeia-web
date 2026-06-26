@@ -18,7 +18,9 @@ import { usePathname } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import { useEffect, useState, useId } from 'react';
 import { useStemumHost } from '@/lib/useStemumHost';
+import { useCoquinumHost } from '@/lib/useCoquinumHost';
 import { STEMUM_APP_DISCIPLINA, STEMUM_DISCIPLINAS } from '@/data/stemum';
+import { COQUINUM_APP_CATEGORIA, COQUINUM_CATEGORIAS } from '@/data/coquinum';
 import styles from './MeskeiaLogo.module.css';
 
 interface MeskeiaLogoProps {
@@ -31,6 +33,7 @@ export default function MeskeiaLogo({ disableLink = false, inline = false, showT
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const isStemum = useStemumHost();
+  const isCoquinum = useCoquinumHost();
   const pathname = usePathname();
   const uid = useId().replace(/:/g, '');
   const bgId  = `msk-bg-${uid}`;
@@ -59,6 +62,27 @@ export default function MeskeiaLogo({ disableLink = false, inline = false, showT
       </div>
       <div className={styles.logoText}>
         <span className={styles.stemumWordmark}>Stemum</span>
+      </div>
+    </>
+  );
+
+  // Variante de marca Coquinum: cuando la app se sirve bajo coquinum.com, el
+  // chrome compartido muestra el logo Coquinum (las volutas de aroma).
+  const coquinumContent = (
+    <>
+      <div className={styles.logoIcon}>
+        <Image
+          src="/coquinum/icon.svg"
+          alt=""
+          aria-hidden="true"
+          width={40}
+          height={40}
+          className={styles.coquinumIcon}
+          priority
+        />
+      </div>
+      <div className={styles.logoText}>
+        <span className={styles.coquinumWordmark}>Coquinum</span>
       </div>
     </>
   );
@@ -102,7 +126,7 @@ export default function MeskeiaLogo({ disableLink = false, inline = false, showT
     </>
   );
 
-  const logoContent = isStemum ? stemumContent : meskeiaContent;
+  const logoContent = isStemum ? stemumContent : isCoquinum ? coquinumContent : meskeiaContent;
 
   const containerClass = `${styles.logoContainer} ${inline ? styles.logoInline : ''}`;
 
@@ -164,6 +188,44 @@ export default function MeskeiaLogo({ disableLink = false, inline = false, showT
               <span className={styles.stemumSep} aria-hidden="true">›</span>
               <Link href={`/${discSlug}`} className={styles.stemumDiscLink}>
                 {discLabel}
+              </Link>
+            </>
+          )}
+        </div>
+        {themeToggle}
+      </div>
+    );
+  }
+
+  // Bajo coquinum.com (cabecera fija de una app), el logo se convierte en un
+  // breadcrumb "Coquinum › Categoría" para volver al portal o a la categoría.
+  if (isCoquinum && !disableLink) {
+    const seg = (pathname || '').replace(/^\/+|\/+$/g, '').split('/')[0];
+    const catSlug = COQUINUM_APP_CATEGORIA[seg];
+    const catLabel = catSlug ? COQUINUM_CATEGORIAS[catSlug] : null;
+
+    return (
+      <div className={styles.headerBar}>
+        <div className={`${styles.logoContainer} ${styles.coquinumPill}`}>
+          <Link href="/" className={styles.coquinumCrumb} aria-label="Coquinum — inicio">
+            <span className={styles.logoIcon}>
+              <Image
+                src="/coquinum/icon.svg"
+                alt=""
+                aria-hidden="true"
+                width={34}
+                height={34}
+                className={styles.coquinumIcon}
+                priority
+              />
+            </span>
+            <span className={styles.coquinumWordmark}>Coquinum</span>
+          </Link>
+          {catLabel && (
+            <>
+              <span className={styles.coquinumSep} aria-hidden="true">›</span>
+              <Link href={`/${catSlug}`} className={styles.coquinumCatLink}>
+                {catLabel}
               </Link>
             </>
           )}

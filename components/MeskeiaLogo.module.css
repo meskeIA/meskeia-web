@@ -152,6 +152,69 @@
   color: #C99BF5;
 }
 
+/* Variante de marca Coquinum (servida bajo coquinum.com) */
+.coquinumIcon {
+  border-radius: 8px;
+}
+
+.coquinumWordmark {
+  font-family: var(--font-coquinum), Georgia, 'Times New Roman', serif;
+  font-weight: 600;
+  color: #4F7A3A;
+  letter-spacing: -0.01em;
+}
+
+[data-theme='dark'] .coquinumWordmark {
+  color: #A9CC85;
+}
+
+/* Breadcrumb Coquinum (Coquinum › Categoría) dentro de la píldora flotante */
+.coquinumPill {
+  gap: 0.5rem;
+  cursor: default;
+}
+
+.coquinumPill:hover {
+  transform: none;
+}
+
+.coquinumCrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  text-decoration: none;
+}
+
+.coquinumSep {
+  color: var(--text-muted, #999);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.coquinumCatLink {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #4F7A3A;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+
+.coquinumCatLink:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.coquinumCrumb:focus-visible,
+.coquinumCatLink:focus-visible {
+  outline: 2px solid #E8A33D;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+[data-theme='dark'] .coquinumCatLink {
+  color: #A9CC85;
+}
+
 /* Toggle de tema */
 .themeToggle {
   display: flex;

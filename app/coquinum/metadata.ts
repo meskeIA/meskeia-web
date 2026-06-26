@@ -5,9 +5,9 @@ const URL_CANONICA = 'https://coquinum.com/';
 export const metadata: Metadata = {
   title: 'Coquinum — Cocina y gastronomía: calculadoras y herramientas | meskeIA',
   description:
-    'Coquinum reúne las herramientas de cocina técnica de meskeIA: calculadoras de panadería y repostería, cocción y temperatura, conversiones (tazas a gramos, altitud), bebidas, conservación y food cost. En español, sin registro y sin coste.',
+    'Coquinum reúne las herramientas de cocina técnica de meskeIA: calculadoras de panadería y repostería, conversor y escalado de recetas, guías de ingredientes, bebidas y cultura gastronómica. En español, sin registro y sin coste.',
   keywords:
-    'coquinum, cocina técnica, calculadora panadería, porcentaje del panadero, hidratación masa, conversor tazas gramos, temperatura cocción, sous-vide, food cost, escandallo, gastronomía en español',
+    'coquinum, cocina técnica, calculadora panadería, porcentaje del panadero, hidratación masa, escalador de recetas, conversor de cocina, guía de ingredientes, maridaje, gastronomía en español',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Coquinum — Cocina y gastronomía con precisión',
     description:
-      'Calculadoras y herramientas de cocina técnica: panadería, repostería, cocción, conversiones, bebidas y food cost. Mide, convierte y cocina con precisión.',
+      'Calculadoras y herramientas de cocina técnica: panadería y repostería, recetas y medidas, ingredientes, bebidas y cultura gastronómica. Mide, convierte y cocina con precisión.',
     url: URL_CANONICA,
     siteName: 'Coquinum',
     locale: 'es_ES',
@@ -50,7 +50,7 @@ export const siteJsonLd = {
   name: 'Coquinum',
   url: URL_CANONICA,
   description:
-    'Portal de cocina y gastronomía con herramientas de cocina técnica: panadería, repostería, cocción, conversiones, bebidas, conservación y food cost. Parte de meskeIA.',
+    'Portal de cocina y gastronomía con herramientas de cocina técnica: panadería y repostería, recetas y medidas, ingredientes, bebidas y cultura gastronómica. Parte de meskeIA.',
   logo: 'https://coquinum.com/coquinum/app-icon-512.png',
   parentOrganization: {
     '@type': 'Organization',

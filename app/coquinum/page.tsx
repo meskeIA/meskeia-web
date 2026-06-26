@@ -2,41 +2,43 @@
 // @disclaimer: exempt
 
 import Image from 'next/image';
+import Link from 'next/link';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
+import { COQUINUM_APPS_POR_CATEGORIA, COQUINUM_TOTAL_APPS } from '@/data/coquinum';
 import styles from './CoquinumHome.module.css';
 
-// Secciones del portal. De momento son tarjetas de vista previa (maqueta): el
-// enlace a cada sección se activará cuando se publiquen las páginas y las apps.
+// Las 5 categorías pobladas del portal. Cada una enlaza a su página de categoría,
+// que sirve las apps gastro bajo coquinum.com (host-rewrite, lista en proxy.ts).
 const SECCIONES = [
   {
     icon: '🍞',
     titulo: 'Panadería y repostería',
-    desc: 'Hidratación, porcentaje del panadero, masa madre, temperatura de masa, ganache y punto de azúcar.',
+    desc: 'Porcentaje del panadero, hidratación de masa, masa madre, temperatura de masa, ganache, gelatina y punto de azúcar.',
+    href: '/panaderia-reposteria',
   },
   {
-    icon: '🌡️',
-    titulo: 'Cocción y temperatura',
-    desc: 'Temperaturas internas de carne y pescado, sous-vide por grosor y tiempos de cocción ajustables.',
+    icon: '🍽️',
+    titulo: 'Cocina y recetas',
+    desc: 'Convierte unidades de cocina, escala recetas por raciones, planifica el menú semanal y orienta tu dieta.',
+    href: '/cocina-recetas',
   },
   {
-    icon: '⚖️',
-    titulo: 'Conversiones y medidas',
-    desc: 'Tazas a gramos por ingrediente, ajuste de recetas por altitud, hornos en °C/°F y sustituciones.',
+    icon: '🥩',
+    titulo: 'Ingredientes y despensa',
+    desc: 'Guías para elegir y usar aceite, carne, especias, quesos, setas, arroces, pastas, vinagres y más.',
+    href: '/ingredientes-despensa',
   },
   {
     icon: '🍷',
     titulo: 'Bebidas',
-    desc: 'Café, coctelería y maridaje, más guías de vino, cerveza, té e infusiones.',
+    desc: 'Café, té e infusiones, coctelería, cerveza y vino, con selectores para acertar con la copa.',
+    href: '/bebidas',
   },
   {
-    icon: '🧊',
-    titulo: 'Conservación',
-    desc: 'Caducidad real en nevera y congelador, fermentados vegetales y descongelación segura.',
-  },
-  {
-    icon: '💼',
-    titulo: 'Hostelería y food cost',
-    desc: 'Escandallo, coste por ración, merma y precio de carta para cocina profesional.',
+    icon: '🌍',
+    titulo: 'Cultura gastronómica',
+    desc: 'Mapas de especias, el viaje de la comida por el mundo, la huella ambiental de los alimentos y la digestión.',
+    href: '/cultura-gastronomica',
   },
 ];
 
@@ -77,7 +79,7 @@ export default function CoquinumHome() {
             cada receta.
           </p>
           <p className={styles.heroSecciones}>
-            Panadería, repostería, cocción, conversiones, bebidas y food cost
+            Panadería, recetas, ingredientes, bebidas y cultura gastronómica
           </p>
           <p className={styles.heroClaim}>
             Mide, convierte y cocina con precisión.
@@ -85,7 +87,7 @@ export default function CoquinumHome() {
 
           <div className={styles.heroBadge}>
             <span className={styles.heroBadgeDot}></span>
-            Cocina y gastronomía · En español · Sin registro · Sin coste
+            {COQUINUM_TOTAL_APPS} herramientas · En español · Sin registro · Sin coste
           </div>
         </header>
 
@@ -97,16 +99,22 @@ export default function CoquinumHome() {
             a la primera: las cuentas exactas detrás de la cocina.
           </p>
           <div className={styles.grid}>
-            {SECCIONES.map((s) => (
-              <article key={s.titulo} className={styles.card}>
-                <div className={styles.cardHead}>
-                  <span className={styles.cardIcon} aria-hidden="true">{s.icon}</span>
-                </div>
-                <h3 className={styles.cardTitulo}>{s.titulo}</h3>
-                <p className={styles.cardDesc}>{s.desc}</p>
-                <span className={styles.cardCta}>Próximamente</span>
-              </article>
-            ))}
+            {SECCIONES.map((s) => {
+              const slug = s.href.replace(/\//g, '');
+              const count = COQUINUM_APPS_POR_CATEGORIA[slug] ?? 0;
+              const badge = `${count} ${count === 1 ? 'app' : 'apps'}`;
+              return (
+                <Link key={s.titulo} href={s.href} className={styles.appCard}>
+                  <div className={styles.cardHead}>
+                    <span className={styles.cardIcon} aria-hidden="true">{s.icon}</span>
+                    <span className={styles.cardCount}>{badge}</span>
+                  </div>
+                  <h3 className={styles.cardTitulo}>{s.titulo}</h3>
+                  <p className={styles.cardDesc}>{s.desc}</p>
+                  <span className={styles.appCardCta}>Explorar →</span>
+                </Link>
+              );
+            })}
           </div>
         </section>
 
@@ -115,10 +123,9 @@ export default function CoquinumHome() {
           <h2 className={styles.sectionTitle}>Qué es Coquinum</h2>
           <p>
             Coquinum reúne en una sola marca las <strong>herramientas de cocina técnica</strong> de
-            meskeIA: calculadoras de precisión para panadería, repostería y cocción,
-            conversiones que de verdad funcionan —tazas a gramos por ingrediente, ajuste
-            por altitud— y guías de producto. No son recetas: son <strong>las cuentas
-            exactas</strong> para que la receta salga. Es un servicio de{' '}
+            meskeIA: calculadoras de precisión para panadería y repostería, conversor y
+            escalado de recetas, y guías de ingredientes y bebidas. No son recetas: son{' '}
+            <strong>las cuentas exactas</strong> para que la receta salga. Es un servicio de{' '}
             <a href="https://meskeia.com/" className={styles.link}>meskeIA</a> y comparte su
             compromiso: contenido claro, gratuito y sin recopilar datos personales.
           </p>

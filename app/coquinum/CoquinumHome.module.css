@@ -172,6 +172,81 @@
   letter-spacing: 0.04em;
 }
 
+/* Píldora con el nº de apps de la categoría (en el cardHead de la home) */
+.cardCount {
+  font-family: var(--font-coquinum), Georgia, 'Times New Roman', serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #4F7A3A;
+  background: rgba(79, 122, 58, 0.1);
+  border-radius: 20px;
+  padding: 0.2rem 0.7rem;
+}
+
+/* ─── Tarjetas clicables (home → categoría, categoría → app) ─── */
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  width: fit-content;
+}
+
+.backLink:hover {
+  color: #4F7A3A;
+}
+
+.appCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  background: var(--bg-card);
+  border: 1px solid #e4ecd9;
+  border-top: 4px solid #6FA34C;
+  border-radius: 12px;
+  padding: 1.6rem 1.5rem;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.appCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(79, 122, 58, 0.16);
+}
+
+.appCard:focus-visible {
+  outline: 2px solid #4F7A3A;
+  outline-offset: 3px;
+}
+
+.appCardCta {
+  font-weight: 600;
+  color: #4F7A3A;
+  font-size: 0.9rem;
+}
+
+[data-theme='dark'] .appCard {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .appCardCta {
+  color: #A9CC85;
+}
+
+[data-theme='dark'] .cardCount {
+  color: #A9CC85;
+  background: rgba(169, 204, 133, 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .appCard {
+    transition: none;
+  }
+}
+
 /* ─── Qué es ─── */
 .sectionTitle {
   font-family: var(--font-coquinum), Georgia, 'Times New Roman', serif;

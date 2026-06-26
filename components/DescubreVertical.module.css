@@ -33,6 +33,16 @@
   --acento-shadow: rgba(162, 75, 42, 0.16);
 }
 
+/* Coquinum: verde oliva (firma) + acento azafrán, zona cromática del portal. */
+.coquinum {
+  --acento-text: #3F6B2F;
+  --acento-line: #4F7A3A;
+  --acento-bg: rgba(79, 122, 58, 0.06);
+  --acento-bg-hover: rgba(79, 122, 58, 0.1);
+  --acento-border: rgba(79, 122, 58, 0.25);
+  --acento-shadow: rgba(79, 122, 58, 0.16);
+}
+
 /* Delegum: texto en marino (alto contraste) + acento/borde en oro (firma). */
 .delegum {
   --acento-text: #16244C;
@@ -113,6 +123,15 @@
   --acento-bg-hover: rgba(190, 154, 78, 0.18);
   --acento-border: rgba(190, 154, 78, 0.35);
   --acento-shadow: rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .coquinum {
+  --acento-text: #9DC97E;
+  --acento-line: #6FA34C;
+  --acento-bg: rgba(111, 163, 76, 0.12);
+  --acento-bg-hover: rgba(111, 163, 76, 0.18);
+  --acento-border: rgba(111, 163, 76, 0.35);
+  --acento-shadow: rgba(111, 163, 76, 0.18);
 }
 
 /* ─── Accesibilidad: movimiento reducido ─── */

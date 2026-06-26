@@ -31,21 +31,25 @@
  * NO se muestra:
  *  - en apps que no pertenecen a ningún vertical (la mayoría del catálogo),
  *  - cuando la app ya se ve desde el dominio del vertical, donde el chrome de
- *    marca ya cumple esa función. En Stemum se detecta con useStemumHost; en
- *    Cronicum no hace falta (LegalNotice solo se renderiza en la variante
- *    meskeIA, marca === 'meskeia'); en Delegum tampoco (las apps fiscales solo
- *    viven en meskeia.com, no hay host-rewrite de la app).
- *
- * Pendiente (siguiente iteración): añadir Gastronomía cuando exista el portal.
+ *    marca ya cumple esa función. En Stemum se detecta con useStemumHost y en
+ *    Coquinum con useCoquinumHost; en Cronicum no hace falta (LegalNotice solo se
+ *    renderiza en la variante meskeIA, marca === 'meskeia'); en Delegum tampoco
+ *    (las apps fiscales solo viven en meskeia.com, no hay host-rewrite de la app).
  */
 
 import { usePathname } from 'next/navigation';
 import { useStemumHost } from '@/lib/useStemumHost';
+import { useCoquinumHost } from '@/lib/useCoquinumHost';
 import {
   STEMUM_APP_DISCIPLINA,
   STEMUM_DISCIPLINAS,
   STEMUM_APPS_POR_DISCIPLINA,
 } from '@/data/stemum';
+import {
+  COQUINUM_APP_CATEGORIA,
+  COQUINUM_CATEGORIAS,
+  COQUINUM_APPS_POR_CATEGORIA,
+} from '@/data/coquinum';
 import { getPuertaDeCronologia } from '@/data/cronicum/puertas';
 import { getPuertaDeApp } from '@/data/delegum/soluciones';
 import { APPS_REGION_ES } from '@/data/delegum/apps-region-es';
@@ -53,7 +57,7 @@ import { STEMUM_ADYACENTES } from '@/data/stemum-adyacentes';
 import styles from './DescubreVertical.module.css';
 
 interface Banda {
-  vertical: 'stemum' | 'cronicum' | 'delegum';
+  vertical: 'stemum' | 'cronicum' | 'delegum' | 'coquinum';
   icono: string;
   intro: string; // "Esta herramienta forma parte de"
   etiqueta?: string; // disciplina o puerta (en negrita). Ausente → banda genérica.
@@ -69,8 +73,27 @@ function plural(n: number, singular: string, plural: string): string {
 }
 
 /** Decide qué banda (si alguna) corresponde a la ruta actual. */
-function resolverBanda(pathname: string, isStemum: boolean): Banda | null {
+function resolverBanda(pathname: string, isStemum: boolean, isCoquinum: boolean): Banda | null {
   const segs = pathname.split('/').filter(Boolean);
+
+  // ── Coquinum ── app gastro de primer nivel mapeada a una categoría del portal.
+  const categoria = COQUINUM_APP_CATEGORIA[segs[0] ?? ''];
+  if (categoria && !isCoquinum) {
+    const otras = (COQUINUM_APPS_POR_CATEGORIA[categoria] ?? 1) - 1;
+    return {
+      vertical: 'coquinum',
+      icono: '🍳',
+      intro: 'Esta herramienta forma parte de',
+      etiqueta: COQUINUM_CATEGORIAS[categoria] ?? '',
+      marca: 'Coquinum',
+      descripcion: 'el portal de cocina y gastronomía de meskeIA.',
+      href: `https://coquinum.com/${categoria}/`,
+      cta:
+        otras >= 1
+          ? `Descubre ${otras} ${plural(otras, 'herramienta', 'herramientas')} más →`
+          : 'Explora la sección →',
+    };
+  }
 
   // ── Stemum ── app STEM de primer nivel mapeada a una disciplina.
   const disciplina = STEMUM_APP_DISCIPLINA[segs[0] ?? ''];
@@ -175,8 +198,9 @@ function resolverBanda(pathname: string, isStemum: boolean): Banda | null {
 export default function DescubreVertical() {
   const pathname = usePathname();
   const isStemum = useStemumHost();
+  const isCoquinum = useCoquinumHost();
 
-  const banda = resolverBanda(pathname ?? '', isStemum);
+  const banda = resolverBanda(pathname ?? '', isStemum, isCoquinum);
   if (!banda) return null;
 
   return (

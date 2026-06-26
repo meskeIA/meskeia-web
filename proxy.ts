@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { STEMUM_APP_SLUGS, STEMUM_PORTAL_SLUGS } from './data/stemum';
+import { COQUINUM_APP_SLUGS, COQUINUM_PORTAL_SLUGS } from './data/coquinum';
 
 /**
  * Proxy de enrutado por host para las marcas verticales (antes "middleware",
@@ -36,17 +37,46 @@ function handleCoquinum(req: NextRequest) {
   if (pathname === '/coquinum' || pathname.startsWith('/coquinum/') || pathname.startsWith('/api')) {
     return NextResponse.next();
   }
-  // sitemap.xml, robots.txt y llms.txt: por ahora los sirve meskeIA (Coquinum aún
-  // no tiene versiones propias; el portal arranca con la home como maqueta).
-  if (pathname === '/sitemap.xml' || pathname === '/robots.txt' || pathname === '/llms.txt') {
+  // sitemap.xml y robots.txt propios de Coquinum (capitalizan el SEO de las
+  // páginas-índice: home + categorías). El sitemap se genera en
+  // /coquinum/sitemap.xml; el robots en /coquinum/robots-txt (robots.ts no se anida).
+  if (pathname === '/sitemap.xml') {
+    const url = req.nextUrl.clone();
+    url.pathname = '/coquinum/sitemap.xml';
+    return NextResponse.rewrite(url);
+  }
+  if (pathname === '/robots.txt') {
+    const url = req.nextUrl.clone();
+    url.pathname = '/coquinum/robots-txt';
+    return NextResponse.rewrite(url);
+  }
+  // llms.txt: por ahora lo sirve meskeIA (Coquinum aún no tiene versión propia).
+  if (pathname === '/llms.txt') {
     return NextResponse.next();
   }
-  // Rutas limpias → reescritura interna a /coquinum/*. De momento solo existe la
-  // home; al publicar secciones/apps el árbol crecerá bajo /coquinum.
-  const clean = pathname.endsWith('/') ? pathname : `${pathname}/`;
-  const url = req.nextUrl.clone();
-  url.pathname = clean === '/' ? '/coquinum/' : `/coquinum${clean}`;
-  return NextResponse.rewrite(url);
+
+  // Slug limpio (primer segmento sin barras) para clasificar la ruta.
+  const seg = pathname.replace(/^\/+|\/+$/g, '');
+
+  // App gastro del catálogo → passthrough a /<slug> (la app real se sirve tal
+  // cual; MeskeiaLogo detecta el host y muestra la marca Coquinum).
+  if (COQUINUM_APP_SLUGS.has(seg)) {
+    return NextResponse.next();
+  }
+
+  // Página del portal (home + categorías) → reescritura interna a /coquinum/*.
+  // Normalizamos a barra final (trailingSlash: true) para que el destino coincida.
+  if (COQUINUM_PORTAL_SLUGS.has(seg)) {
+    const url = req.nextUrl.clone();
+    url.pathname = seg === '' ? '/coquinum/' : `/coquinum/${seg}/`;
+    return NextResponse.rewrite(url);
+  }
+
+  // Cualquier otra ruta (p.ej. una app relacionada fuera del catálogo gastro,
+  // enlazada desde RelatedApps) se redirige a meskeIA para no dar 404 bajo
+  // coquinum.com. Redirección temporal: el catálogo Coquinum crece por oleadas.
+  const meskeiaUrl = new URL(pathname + req.nextUrl.search, 'https://meskeia.com');
+  return NextResponse.redirect(meskeiaUrl, 307);
 }
 
 function handleDelegum(req: NextRequest) {
