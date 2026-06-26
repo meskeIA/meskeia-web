@@ -50,6 +50,7 @@ import {
   COQUINUM_CATEGORIAS,
   COQUINUM_APPS_POR_CATEGORIA,
 } from '@/data/coquinum';
+import { COQUINUM_ADYACENTES } from '@/data/coquinum-adyacentes';
 import { getPuertaDeCronologia } from '@/data/cronicum/puertas';
 import { getPuertaDeApp } from '@/data/delegum/soluciones';
 import { APPS_REGION_ES } from '@/data/delegum/apps-region-es';
@@ -92,6 +93,24 @@ function resolverBanda(pathname: string, isStemum: boolean, isCoquinum: boolean)
         otras >= 1
           ? `Descubre ${otras} ${plural(otras, 'herramienta', 'herramientas')} más →`
           : 'Explora la sección →',
+    };
+  }
+
+  // ── Coquinum (afín) ── app de comida/nutrición que NO está en el portal pero
+  // cuyo público se solapa con cocina y gastronomía. No se mete en Coquinum
+  // (curaduría cerrada); solo enlaza a su categoría. Lista curada en
+  // data/coquinum-adyacentes.ts (excluye frontera Salud/YMYL).
+  const catAfin = COQUINUM_ADYACENTES[segs[0] ?? ''];
+  if (catAfin && !isCoquinum) {
+    const label = COQUINUM_CATEGORIAS[catAfin] ?? '';
+    return {
+      vertical: 'coquinum',
+      icono: '🍳',
+      intro: `Esta herramienta también encaja en ${label}.`,
+      marca: 'Coquinum',
+      descripcion: ', el portal de cocina y gastronomía de meskeIA.',
+      href: `https://coquinum.com/${catAfin}/?from=meskeia`,
+      cta: `Explora ${label} →`,
     };
   }
 
