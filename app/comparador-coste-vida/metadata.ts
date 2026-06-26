@@ -1,13 +1,16 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Comparador de Coste de Vida entre Ciudades del Mundo | meskeIA',
-  description: 'Compara el coste de vida entre más de 55 ciudades: alquiler, restaurantes, supermercado, transporte e internet. Datos de referencia 2024-2025.',
+  title: 'Comparador de Coste de Vida (Costo de Vida) entre Ciudades del Mundo | meskeIA',
+  description: 'Compara el coste de vida —o costo de vida— entre más de 55 ciudades: alquiler, restaurantes, supermercado, transporte e internet. Datos de referencia 2024-2025.',
   keywords: [
     'coste de vida',
+    'costo de vida',
+    'comparar costo de vida ciudades',
     'comparador ciudades',
     'vivir en el extranjero',
     'alquiler ciudad',
+    'arriendo ciudad',
     'precio vida mundo',
     'nómada digital',
     'mudarse al extranjero',
@@ -15,8 +18,8 @@ export const metadata: Metadata = {
     'presupuesto expatriado',
   ],
   openGraph: {
-    title: 'Comparador de Coste de Vida | meskeIA',
-    description: 'Alquiler, comida, transporte e internet en 55+ ciudades del mundo. Compara y decide dónde vivir.',
+    title: 'Comparador de Coste de Vida (Costo de Vida) | meskeIA',
+    description: 'Alquiler, comida, transporte e internet en 55+ ciudades del mundo. Compara el coste —o costo— de vida y decide dónde vivir.',
     url: 'https://meskeia.com/comparador-coste-vida/',
     siteName: 'meskeIA',
     type: 'website',
@@ -35,8 +38,8 @@ export const metadata: Metadata = {
 export const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
-  name: 'Comparador de Coste de Vida entre Ciudades',
-  description: 'Compara el coste de vida entre más de 55 ciudades del mundo: alquiler, restaurantes, supermercado, transporte e internet.',
+  name: 'Comparador de Coste de Vida (Costo de Vida) entre Ciudades',
+  description: 'Compara el coste de vida —o costo de vida— entre más de 55 ciudades del mundo: alquiler (arriendo), restaurantes, supermercado, transporte e internet.',
   url: 'https://meskeia.com/comparador-coste-vida/',
   applicationCategory: 'UtilitiesApplication',
   operatingSystem: 'Any',
@@ -94,6 +97,14 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'El alquiler suele representar entre el 30% y el 50% del presupuesto mensual en la mayoría de grandes ciudades. Le siguen la alimentación (15-25%), el transporte (5-15%) y el ocio. En ciudades asiáticas como Tokio o Seúl, el transporte público es muy eficiente y barato; en ciudades norteamericanas, el coche propio puede añadir 400-600 € al mes en gastos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es lo mismo «coste de vida» que «costo de vida»?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, son exactamente lo mismo. «Coste de vida» es la forma habitual en España y «costo de vida» la más usada en Latinoamérica; ambas designan cuánto cuesta cubrir gastos básicos (vivienda o arriendo, alimentación, transporte y servicios) en una ciudad. Este comparador funciona igual escribas coste o costo, y permite comparar más de 55 ciudades de Europa y América.',
       },
     },
   ],

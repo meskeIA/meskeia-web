@@ -136,7 +136,7 @@ export default function ComparadorCosteVida() {
 
       <header className={styles.hero}>
         <h1>🏙️ Comparador de Coste de Vida</h1>
-        <p>Alquiler, comida, transporte e internet en 55+ ciudades del mundo</p>
+        <p>Compara el coste de vida —o «costo de vida»— de 55+ ciudades: alquiler, comida, transporte e internet</p>
       </header>
 
       <LegalNotice />
@@ -513,6 +513,10 @@ export default function ComparadorCosteVida() {
             <div className={styles.faqItem}>
               <dt>¿Cómo afecta el teletrabajo a la elección de ciudad?</dt>
               <dd>El teletrabajo ha desacoplado el salario del lugar de residencia. Un trabajador con sueldo de empresa madrileña que se traslada a Sevilla puede ahorrar 600-900 €/mes solo en vivienda, manteniendo el mismo ingreso. Esto ha generado una migración interna notable desde 2021.</dd>
+            </div>
+            <div className={styles.faqItem}>
+              <dt>¿Es lo mismo «coste de vida» que «costo de vida»?</dt>
+              <dd>Sí, son lo mismo. «Coste de vida» es la forma habitual en España y «costo de vida» la más usada en Latinoamérica; ambas miden cuánto cuesta cubrir gastos básicos (vivienda o arriendo, alimentación, transporte y servicios) en una ciudad. Este comparador funciona igual escribas coste o costo.</dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Qué diferencia hay entre coste de vida y poder adquisitivo?</dt>
