@@ -643,6 +643,13 @@
   background: linear-gradient(135deg, #1a5f7a 0%, #2a7a77 100%);
 }
 
+/* Bajo cronicum.com el hero conserva la paleta sepia también en modo oscuro:
+   el gradiente azul de arriba es el de meskeIA y aquí volvemos a var(--hero-bg),
+   que el bloque [data-brand='cronicum'] de globals.css fija en marrón. */
+[data-brand='cronicum'][data-theme='dark'] .hero {
+  background: var(--hero-bg);
+}
+
 [data-theme='dark'] .sectionCard {
   background: var(--bg-card);
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);

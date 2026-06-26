@@ -69,12 +69,12 @@ export default function RootLayout({
         {/*
           Marca por host: bajo un dominio vertical marcamos <html data-brand="…">
           antes del primer paint para que globals.css reviuta la app con la paleta
-          de la marca sin flash. stemum.com → violeta; coquinum.com → verde oliva.
-          En meskeia.com no hace nada. Patrón equivalente al script de tema de
-          next-themes.
+          de la marca sin flash. stemum.com → violeta; coquinum.com → verde oliva;
+          cronicum.com → terracota/sepia. En meskeia.com no hace nada. Patrón
+          equivalente al script de tema de next-themes.
         */}
         <script>
-          {`(function(){try{var h=location.hostname;if(h==='stemum.com'||h==='www.stemum.com'){document.documentElement.setAttribute('data-brand','stemum');}else if(h==='coquinum.com'||h==='www.coquinum.com'){document.documentElement.setAttribute('data-brand','coquinum');}}catch(e){}})();`}
+          {`(function(){try{var h=location.hostname;if(h==='stemum.com'||h==='www.stemum.com'){document.documentElement.setAttribute('data-brand','stemum');}else if(h==='coquinum.com'||h==='www.coquinum.com'){document.documentElement.setAttribute('data-brand','coquinum');}else if(h==='cronicum.com'||h==='www.cronicum.com'){document.documentElement.setAttribute('data-brand','cronicum');}}catch(e){}})();`}
         </script>
         {/* Preconnect para optimizar carga de fuentes */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />

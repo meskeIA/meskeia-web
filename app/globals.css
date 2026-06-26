@@ -150,6 +150,34 @@
   --accent: #F0B868;
 }
 
+/* ─────────────────────────────────────────────────────────────
+   Marca Cronicum (vertical de historia interactiva).
+   Mismo mecanismo que Stemum/Coquinum: bajo cronicum.com el layout
+   pone data-brand="cronicum" en <html> antes del primer paint y aquí
+   revestimos el hero (var(--hero-bg)) y los acentos (var(--primary)…)
+   de las cronologías con la paleta terracota/sepia de Cronicum, sin
+   tocar el código del template historia. Las cronologías ya traen su
+   propio chrome (CronicumHeader/Footer + breadcrumb Migas en terracota);
+   este bloque solo corrige la disonancia del hero azul meskeIA.
+   Tokens: terracota #A24B2A · ámbar #C9742E · dorado #F6C27A · tile #13100D.
+   ───────────────────────────────────────────────────────────── */
+[data-brand='cronicum'] {
+  --primary: #A24B2A;
+  --primary-hover: #8a3f23;
+  --secondary: #C9742E;
+  --accent: #F6C27A;
+  --hero-bg: #241C18;
+  --focus: rgba(162, 75, 42, 0.15);
+}
+
+/* En modo oscuro, terracota/ámbar más claros para contraste */
+[data-theme='dark'][data-brand='cronicum'] {
+  --primary: #E0A06A;
+  --primary-hover: #E9B488;
+  --secondary: #C9742E;
+  --accent: #F6C27A;
+}
+
 /* Bajo un dominio vertical (data-brand presente) ocultamos elementos pensados
    para el contexto meskeIA cuyas relaciones apuntan fuera del catálogo del
    portal (p.ej. "Apps relacionadas"): evitan que el visitante salga del circuito
