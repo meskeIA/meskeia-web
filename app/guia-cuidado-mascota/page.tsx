@@ -102,7 +102,7 @@ function GuideContent() {
             <div className={styles.appName}>Alimentación</div>
             <div className={styles.appDesc}>Cuánto debe comer</div>
           </Link>
-          <Link href="/calculadora-medicamentos-mascotas/" className={styles.appCard}>
+          <Link href="/orientador-medicamentos-mascotas/" className={styles.appCard}>
             <span className={styles.appIcon} aria-hidden="true">💊</span>
             <div className={styles.appName}>Medicamentos</div>
             <div className={styles.appDesc}>Dosis correctas</div>

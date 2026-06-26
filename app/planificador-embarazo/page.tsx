@@ -719,7 +719,7 @@ export default function CalculadoraFechaPartoPage() {
           {/* Enlace a Calculadora de Percentiles */}
           <div className={styles.enlaceRelacionado}>
             <p><span aria-hidden="true">📊</span> <strong>¿Tu bebé ya nació?</strong> Sigue su crecimiento con la{' '}
-              <a href="/calculadora-percentiles/">Calculadora de Percentiles Infantiles</a>
+              <a href="/orientador-percentiles/">Calculadora de Percentiles Infantiles</a>
               {' '}(peso y talla según tablas OMS)
             </p>
           </div>

@@ -40,7 +40,7 @@ export default function HerramientasPage() {
             <p className={styles.toolDesc}>Calcula la cantidad exacta de comida que necesita tu mascota diariamente</p>
             <p className={styles.toolWhen}>📅 Al cambiar de alimento, cuando tu mascota gana o pierde peso, o cada 6 meses para ajustar porciones</p>
           </Link>
-          <Link href="/calculadora-medicamentos-mascotas/" className={styles.toolCard}>
+          <Link href="/orientador-medicamentos-mascotas/" className={styles.toolCard}>
             <div className={styles.toolHeader}>
               <span className={styles.toolIcon}>💊</span>
               <span className={styles.toolName}>Calculadora de Medicamentos</span>

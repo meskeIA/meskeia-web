@@ -264,7 +264,7 @@ export default function VisualizadorSesgosCognitivosPage() {
         </div>
 
         <div className={styles.enlaceApp}>
-          <span aria-hidden="true">🔗</span> Más reflexión → <a href="/diagnostico-pensamiento-critico/">Pensamiento Crítico</a> · <a href="/visualizador-precio-real-cosas/">El Precio Real de las Cosas</a>
+          <span aria-hidden="true">🔗</span> Más reflexión → <a href="/visualizador-falacias-logicas/">Pensamiento Crítico</a> · <a href="/visualizador-precio-real-cosas/">El Precio Real de las Cosas</a>
         </div>
 
         <EducationalSection

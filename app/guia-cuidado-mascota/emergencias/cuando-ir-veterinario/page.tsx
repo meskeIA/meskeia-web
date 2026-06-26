@@ -107,7 +107,7 @@ export default function CuandoIrVeterinarioPage() {
       </section>
 
       {/* Herramienta Relacionada */}
-      <Link href="/calculadora-medicamentos-mascotas/" className={styles.relatedTool}>
+      <Link href="/orientador-medicamentos-mascotas/" className={styles.relatedTool}>
         <div className={styles.relatedToolHeader}>
           <span className={styles.relatedToolIcon}>🧰</span>
           <span className={styles.relatedToolName}>Calculadora de Medicamentos</span>

@@ -223,7 +223,7 @@ const conversionDatosApps: RelatedApp[] = [
   { url: '/conversor-formatos/', icon: '🔄', name: 'Conversor Formatos', description: 'JSON, CSV, Excel, XML' },
   { url: '/codificador-base64/', icon: '🔐', name: 'Base64', description: 'Codifica/decodifica' },
   { url: '/conversor-markdown-html/', icon: '📄', name: 'Markdown a HTML', description: 'Convierte formatos' },
-  { url: '/generador-json/', icon: '📋', name: 'Generador JSON', description: 'Crea estructuras JSON' },
+  { url: '/validador-json/', icon: '📋', name: 'Generador JSON', description: 'Crea estructuras JSON' },
 ];
 
 // ==========================================
@@ -547,7 +547,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'simulador-compraventa-inmueble': finanzasHipotecaApps.filter(a => a.url !== '/estimador-compraventa-inmueble/'),
   'estimador-compraventa-inmueble': [
     { url: '/estimador-hipoteca/', icon: '🏠', name: 'Simulador Hipoteca', description: 'Calcula la cuota mensual de tu préstamo' },
-    { url: '/calculadora-plusvalia-municipal/', icon: '🏛️', name: 'Plusvalía Municipal', description: 'Impuesto del vendedor en la transmisión' },
+    { url: '/estimador-plusvalia-municipal/', icon: '🏛️', name: 'Plusvalía Municipal', description: 'Impuesto del vendedor en la transmisión' },
     { url: '/orientador-alquiler-vs-compra/', icon: '⚖️', name: 'Alquiler vs Compra', description: 'Análisis financiero completo para decidir' },
     { url: '/calculadora-rentabilidad-alquiler/', icon: '🏘️', name: 'Rentabilidad Alquiler', description: 'ROI y cash flow si vas a alquilar' },
   ],
@@ -556,21 +556,21 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-gastos-compraventa-trastero/', icon: '📦', name: 'Gastos Trastero', description: 'Calcula los gastos de tu trastero' },
     { url: '/simulador-gastos-compraventa-nave-industrial/', icon: '🏭', name: 'Gastos Nave Industrial', description: 'IVA 21% y gastos de compra' },
     { url: '/estimador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
-    { url: '/calculadora-plusvalia-municipal/', icon: '🏛️', name: 'Plusvalía Municipal', description: 'Calcula el impuesto del vendedor' },
+    { url: '/estimador-plusvalia-municipal/', icon: '🏛️', name: 'Plusvalía Municipal', description: 'Calcula el impuesto del vendedor' },
   ],
   'simulador-gastos-compraventa-nave-industrial': [
     { url: '/estimador-compraventa-inmueble/', icon: '📋', name: 'Estimador Completo', description: 'Todos los tipos de inmueble' },
     { url: '/simulador-gastos-compraventa-garaje/', icon: '🚗', name: 'Gastos Garaje', description: 'Calcula los gastos de tu garaje' },
     { url: '/simulador-gastos-compraventa-trastero/', icon: '📦', name: 'Gastos Trastero', description: 'Calcula los gastos de tu trastero' },
     { url: '/estimador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
-    { url: '/calculadora-plusvalia-municipal/', icon: '🏛️', name: 'Plusvalía Municipal', description: 'Calcula el impuesto del vendedor' },
+    { url: '/estimador-plusvalia-municipal/', icon: '🏛️', name: 'Plusvalía Municipal', description: 'Calcula el impuesto del vendedor' },
   ],
   'simulador-gastos-compraventa-trastero': [
     { url: '/estimador-compraventa-inmueble/', icon: '📋', name: 'Estimador Completo', description: 'Todos los tipos de inmueble' },
     { url: '/simulador-gastos-compraventa-garaje/', icon: '🚗', name: 'Gastos Garaje', description: 'Calcula los gastos de tu garaje' },
     { url: '/simulador-gastos-compraventa-nave-industrial/', icon: '🏭', name: 'Gastos Nave Industrial', description: 'IVA 21% y gastos de compra' },
     { url: '/estimador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
-    { url: '/calculadora-plusvalia-municipal/', icon: '🏛️', name: 'Plusvalía Municipal', description: 'Calcula el impuesto del vendedor' },
+    { url: '/estimador-plusvalia-municipal/', icon: '🏛️', name: 'Plusvalía Municipal', description: 'Calcula el impuesto del vendedor' },
   ],
   'amortizacion-hipoteca': finanzasHipotecaApps.filter(a => a.url !== '/amortizacion-hipoteca/'),
   'simulador-prestamos': finanzasHipotecaApps.filter(a => a.url !== '/estimador-prestamos/'),
@@ -719,7 +719,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-precio-real-cosas/', icon: '⏰', name: 'El Precio Real de las Cosas', description: 'Horas de trabajo por compra' },
   ],
   'visualizador-sesgos-cognitivos': [
-    { url: '/diagnostico-pensamiento-critico/', icon: '🎯', name: 'Pensamiento Crítico', description: 'Evalúa tu capacidad analítica' },
+    { url: '/visualizador-falacias-logicas/', icon: '🎯', name: 'Pensamiento Crítico', description: 'Evalúa tu capacidad analítica' },
     { url: '/visualizador-precio-real-cosas/', icon: '⏰', name: 'El Precio Real de las Cosas', description: 'Precios en horas de trabajo' },
     { url: '/visualizador-mapa-tiempo/', icon: '🗺️', name: 'El Mapa de tu Tiempo', description: 'En qué gastas tu vida' },
     { url: '/test-sindrome-impostor/', icon: '🎭', name: 'Test Síndrome Impostor', description: 'Detecta si lo padeces' },
@@ -1407,7 +1407,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/planificador-vacaciones-autonomo/', icon: '🏖️', name: 'Vacaciones Autónomo', description: 'Impacto económico del descanso' },
     { url: '/planificador-cashflow/', icon: '💰', name: 'Cash Flow', description: 'Planifica tu flujo de caja' },
     { url: '/visualizador-estructura-costes-autonomo/', icon: '💼', name: 'Costes del Autónomo', description: 'De lo que facturas a lo que queda' },
-    { url: '/calculadora-fondo-emergencia/', icon: '🏦', name: 'Fondo de Emergencia', description: 'Versión general del cálculo' },
+    { url: '/estimador-fondo-emergencia/', icon: '🏦', name: 'Fondo de Emergencia', description: 'Versión general del cálculo' },
   ],
   'planificador-trimestres-freelance': [
     { url: '/calendario-fiscal-emprendedor/', icon: '📅', name: 'Calendario Fiscal', description: 'Todas las fechas clave' },
@@ -1429,9 +1429,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'visualizador-mercados-financieros': [
     { url: '/visualizador-deuda-publica/', icon: '🏛️', name: 'Deuda Pública', description: 'Bonos soberanos y prima de riesgo' },
-    { url: '/simulador-inversion/', icon: '📊', name: 'Simulador de Inversión', description: 'Cuánto crece tu dinero' },
-    { url: '/comparador-hipotecas/', icon: '🏦', name: 'Comparador Hipotecas', description: 'Tipos fijo vs variable' },
-    { url: '/calculadora-rentabilidad-inversion/', icon: '💹', name: 'Rentabilidad de Inversión', description: 'ROI e interés compuesto' },
+    { url: '/estimador-inversiones/', icon: '📊', name: 'Simulador de Inversión', description: 'Cuánto crece tu dinero' },
+    { url: '/selector-tipo-hipoteca/', icon: '🏦', name: 'Comparador Hipotecas', description: 'Tipos fijo vs variable' },
+    { url: '/estimador-inversiones/', icon: '💹', name: 'Rentabilidad de Inversión', description: 'ROI e interés compuesto' },
   ],
   'visualizador-cambio-climatico-tipping-points': [
     { url: '/visualizador-efecto-invernadero/', icon: '🌍', name: 'Efecto Invernadero', description: 'Gases y calentamiento' },
@@ -1441,9 +1441,8 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'visualizador-deuda-publica': [
     { url: '/visualizador-mercados-financieros/', icon: '📈', name: 'Mercados Financieros', description: 'Cómo se negocian los bonos' },
-    { url: '/calculadora-rentabilidad-inversion/', icon: '💹', name: 'Rentabilidad de Inversión', description: 'ROI e interés compuesto' },
-    { url: '/simulador-inversion/', icon: '📊', name: 'Simulador de Inversión', description: 'Cuánto rinde tu capital' },
-    { url: '/comparador-depositos/', icon: '🏦', name: 'Comparador de Depósitos', description: 'Alternativa a los bonos' },
+    { url: '/estimador-inversiones/', icon: '💹', name: 'Rentabilidad de Inversión', description: 'ROI e interés compuesto' },
+    { url: '/estimador-inversiones/', icon: '📊', name: 'Simulador de Inversión', description: 'Cuánto rinde tu capital' },
   ],
   'visualizador-farmacocinetica': [
     { url: '/visualizador-higado/', icon: '🫀', name: 'El Hígado', description: 'Metabolismo hepático y CYP450 en detalle' },
@@ -1496,8 +1495,8 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'visualizador-blockchain': [
     { url: '/visualizador-criptografia/', icon: '🔐', name: 'Criptografía', description: 'AES, RSA y SHA-256 que protegen la cadena' },
     { url: '/visualizador-ia-redes-neuronales/', icon: '🤖', name: 'IA y Redes Neuronales', description: 'Otra tecnología disruptiva del siglo XXI' },
-    { url: '/visualizador-internet-funcionamiento/', icon: '🌐', name: 'Cómo Funciona Internet', description: 'Infraestructura sobre la que opera blockchain' },
-    { url: '/simulador-inversion/', icon: '📊', name: 'Simulador de Inversión', description: 'Cripto como activo en cartera' },
+    { url: '/visualizador-internet-60-segundos/', icon: '🌐', name: 'Cómo Funciona Internet', description: 'Infraestructura sobre la que opera blockchain' },
+    { url: '/estimador-inversiones/', icon: '📊', name: 'Simulador de Inversión', description: 'Cripto como activo en cartera' },
   ],
   'visualizador-criptografia': [
     { url: '/visualizador-blockchain/', icon: '⛓️', name: 'Blockchain', description: 'La criptografía que protege la cadena de bloques' },
@@ -1508,8 +1507,8 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'visualizador-tipos-interes-bce': [
     { url: '/visualizador-mercados-financieros/', icon: '📈', name: 'Mercados Financieros', description: 'Cómo reaccionan bonos y bolsa a los tipos' },
     { url: '/visualizador-deuda-publica/', icon: '🏛️', name: 'Deuda Pública', description: 'Bonos soberanos y prima de riesgo' },
-    { url: '/comparador-hipotecas/', icon: '🏦', name: 'Comparador Hipotecas', description: 'Impacto real del Euríbor en tu cuota' },
-    { url: '/simulador-inversion/', icon: '📊', name: 'Simulador de Inversión', description: 'Renta fija más atractiva con tipos altos' },
+    { url: '/selector-tipo-hipoteca/', icon: '🏦', name: 'Comparador Hipotecas', description: 'Impacto real del Euríbor en tu cuota' },
+    { url: '/estimador-inversiones/', icon: '📊', name: 'Simulador de Inversión', description: 'Renta fija más atractiva con tipos altos' },
   ],
   'visualizador-relatividad-especial': [
     { url: '/visualizador-mecanica-cuantica/', icon: '🔮', name: 'Mecánica Cuántica', description: 'La otra gran revolución de la física del siglo XX' },
@@ -1567,27 +1566,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'visualizador-falacias-logicas': [
     { url: '/visualizador-sesgos-cognitivos/', icon: '🧠', name: 'Sesgos Cognitivos', description: 'Errores sistemáticos en el pensamiento' },
-    { url: '/test-pensamiento-critico/', icon: '🔍', name: 'Test Pensamiento Crítico', description: 'Evalúa tu razonamiento lógico' },
+    { url: '/visualizador-falacias-logicas/', icon: '🔍', name: 'Test Pensamiento Crítico', description: 'Evalúa tu razonamiento lógico' },
     { url: '/visualizador-evolucion-humana/', icon: '🦴', name: 'Evolución Humana', description: 'El origen cognitivo de nuestros razonamientos' },
     { url: '/visualizador-falacias-logicas/', icon: '❌', name: 'Falacias Lógicas', description: 'Guía visual de errores de razonamiento' },
   ],
   'visualizador-evolucion-humana': [
     { url: '/visualizador-falacias-logicas/', icon: '🧠', name: 'Falacias Lógicas', description: 'Cómo razona el cerebro humano' },
     { url: '/visualizador-adn-codigo-genetico/', icon: '🧬', name: 'ADN y Código Genético', description: 'La base molecular de la herencia' },
-    { url: '/visualizador-neurociencia-aprendizaje/', icon: '🧠', name: 'Neurociencia del Aprendizaje', description: 'El cerebro moderno que heredamos' },
-    { url: '/visualizador-ecosistemas/', icon: '🌿', name: 'Ecosistemas', description: 'El entorno que moldeó nuestra evolución' },
+    { url: '/visualizador-cerebro/', icon: '🧠', name: 'Neurociencia del Aprendizaje', description: 'El cerebro moderno que heredamos' },
+    { url: '/visualizador-ecosistema/', icon: '🌿', name: 'Ecosistemas', description: 'El entorno que moldeó nuestra evolución' },
   ],
   'visualizador-economia-circular': [
     { url: '/calculadora-huella-carbono/', icon: '🌍', name: 'Huella de Carbono', description: 'Tu impacto ambiental personal' },
     { url: '/visualizador-cambio-climatico-tipping-points/', icon: '🌡️', name: 'Cambio Climático', description: 'Los puntos de no retorno del planeta' },
     { url: '/visualizador-energia-nuclear/', icon: '⚛️', name: 'Energía Nuclear', description: 'Energía sin carbono en el mix energético' },
-    { url: '/calculadora-reciclaje-ahorro/', icon: '♻️', name: 'Reciclaje y Ahorro', description: 'El impacto económico de reciclar' },
   ],
   'visualizador-cortisol': [
     { url: '/visualizador-sistema-endocrino/', icon: '⚗️', name: 'Sistema Endocrino', description: 'Todas las hormonas y sus interacciones' },
-    { url: '/visualizador-neurociencia-aprendizaje/', icon: '🧠', name: 'Neurociencia del Aprendizaje', description: 'Cómo el estrés afecta la memoria' },
-    { url: '/visualizador-ciclo-sueno/', icon: '😴', name: 'Ciclos del Sueño', description: 'El cortisol y el ritmo circadiano del sueño' },
-    { url: '/visualizador-piel-barrera-cutanea/', icon: '🫁', name: 'Piel y Barrera Cutánea', description: 'El cortisol y su efecto en la piel' },
+    { url: '/visualizador-cerebro/', icon: '🧠', name: 'Neurociencia del Aprendizaje', description: 'Cómo el estrés afecta la memoria' },
+    { url: '/visualizador-ciclos-sueno/', icon: '😴', name: 'Ciclos del Sueño', description: 'El cortisol y el ritmo circadiano del sueño' },
+    { url: '/visualizador-piel/', icon: '🫁', name: 'Piel y Barrera Cutánea', description: 'El cortisol y su efecto en la piel' },
   ],
   'visualizador-geopolitica-recursos': [
     { url: '/visualizador-comercio-internacional/', icon: '🌍', name: 'Comercio Internacional', description: 'Los recursos son el núcleo del comercio global' },
@@ -1634,7 +1632,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'visualizador-dopamina': [
     { url: '/visualizador-oxitocina/', icon: '🤝', name: 'Oxitocina', description: 'La hormona del vínculo social que trabaja con la dopamina' },
     { url: '/visualizador-cortisol/', icon: '⚡', name: 'Cortisol', description: 'Estrés crónico y su efecto en el sistema dopaminérgico' },
-    { url: '/visualizador-neurociencia-aprendizaje/', icon: '🧠', name: 'Neurociencia del Aprendizaje', description: 'Dopamina y consolidación de memoria' },
+    { url: '/visualizador-cerebro/', icon: '🧠', name: 'Neurociencia del Aprendizaje', description: 'Dopamina y consolidación de memoria' },
     { url: '/visualizador-cerebro-emociones/', icon: '🧠', name: 'Cerebro y Emociones', description: 'Emociones y el circuito de recompensa' },
   ],
   'visualizador-testosterona': [
@@ -1659,7 +1657,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-dopamina/', icon: '⚡', name: 'Dopamina', description: 'El otro sistema del placer y la recompensa' },
     { url: '/visualizador-cortisol/', icon: '⚡', name: 'Cortisol', description: 'Ejercicio: endorfinas suben, cortisol se regula' },
     { url: '/visualizador-oxitocina/', icon: '🤝', name: 'Oxitocina', description: 'El contacto social activa tanto oxitocina como endorfinas' },
-    { url: '/visualizador-neurociencia-aprendizaje/', icon: '🧠', name: 'Neurociencia del Aprendizaje', description: 'El sistema opioide y la motivación de aprender' },
+    { url: '/visualizador-cerebro/', icon: '🧠', name: 'Neurociencia del Aprendizaje', description: 'El sistema opioide y la motivación de aprender' },
   ],
   'visualizador-serotonina': [
     { url: '/visualizador-dopamina/', icon: '⚡', name: 'Dopamina', description: 'El otro gran neurotransmisor del estado de ánimo y el placer' },
@@ -1767,13 +1765,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-aspirina/', icon: '💊', name: 'Aspirina', description: 'Control del dolor a nivel periférico (vs central en anestesia)' },
     { url: '/visualizador-sistema-nervioso/', icon: '🧠', name: 'Sistema Nervioso', description: 'La anestesia actúa sobre los canales iónicos de los nervios' },
     { url: '/visualizador-cerebro-emociones/', icon: '💭', name: 'Cerebro y Emociones', description: 'El enigma de la consciencia que la anestesia interrumpe' },
-    { url: '/visualizador-neurociencia-aprendizaje/', icon: '🎓', name: 'Neurociencia del Aprendizaje', description: 'Memoria implícita bajo anestesia: un fenómeno sorprendente' },
+    { url: '/visualizador-cerebro/', icon: '🎓', name: 'Neurociencia del Aprendizaje', description: 'Memoria implícita bajo anestesia: un fenómeno sorprendente' },
   ],
   'visualizador-lactasa': [
     { url: '/visualizador-enzimas-cuerpo-humano/', icon: '🧫', name: 'Enzimas del Cuerpo Humano', description: 'El panorama completo de las enzimas' },
     { url: '/visualizador-catalasa/', icon: '⚗️', name: 'Catalasa', description: 'Otra enzima espectacular: 40M reacciones/s' },
     { url: '/visualizador-evolucion-humana/', icon: '🦴', name: 'Evolución Humana', description: 'La mutación que permitió digerir leche en adultos' },
-    { url: '/visualizador-sistema-digestivo/', icon: '🍎', name: 'Sistema Digestivo', description: 'Cómo el aparato digestivo procesa los alimentos' },
   ],
   'visualizador-catalasa': [
     { url: '/visualizador-enzimas-cuerpo-humano/', icon: '🧫', name: 'Enzimas del Cuerpo Humano', description: 'El panorama completo de las enzimas' },
@@ -1803,7 +1800,6 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-microbioma/', icon: '🦠', name: 'Microbioma', description: 'El ayuno modifica la composición bacteriana intestinal' },
     { url: '/visualizador-insulina-glucosa/', icon: '💉', name: 'Insulina y Glucosa', description: 'La insulina cae durante el ayuno — el eje central del proceso' },
     { url: '/visualizador-indice-glucemico/', icon: '📊', name: 'Índice Glucémico', description: 'Cómo los alimentos afectan la glucemia al romper el ayuno' },
-    { url: '/visualizador-sistema-digestivo/', icon: '🍎', name: 'Sistema Digestivo', description: 'Lo que ocurre en el tracto digestivo durante el ayuno' },
   ],
   'visualizador-metabolismo-alcohol': [
     { url: '/visualizador-higado/', icon: '🫀', name: 'Hígado', description: 'Anatomía y funciones del órgano que metaboliza el alcohol' },
@@ -1815,13 +1811,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-insulina-glucosa/', icon: '💉', name: 'Insulina y Glucosa', description: 'La respuesta de insulina al IG: el eje del proceso glucémico' },
     { url: '/visualizador-ayuno-intermitente/', icon: '⏳', name: 'Ayuno Intermitente', description: 'Cómo el ayuno restablece la sensibilidad a la insulina' },
     { url: '/aditivos-e-alimentarios/', icon: '🏷️', name: 'Guía Aditivos E', description: 'Qué significan los códigos E de los alimentos procesados' },
-    { url: '/visualizador-sistema-digestivo/', icon: '🍎', name: 'Sistema Digestivo', description: 'El proceso de digestión y absorción de carbohidratos' },
   ],
   'visualizador-toma-decisiones': [
     { url: '/visualizador-sesgos-cognitivos/', icon: '🧠', name: 'Sesgos Cognitivos', description: 'Los sesgos individuales que el Sistema 1 introduce en cada decisión' },
     { url: '/analisis-decision-reversible/', icon: '🔄', name: 'Decisión Reversible', description: 'El marco Bezos para distinguir decisiones de alto y bajo riesgo' },
     { url: '/visualizador-cerebro-emociones/', icon: '💭', name: 'Cerebro y Emociones', description: 'Cómo la amígdala y la emoción secuestran al Sistema 2' },
-    { url: '/visualizador-memoria-humana/', icon: '🧩', name: 'Memoria', description: 'Cómo la memoria de trabajo limita la capacidad del Sistema 2' },
+    { url: '/visualizador-cerebro/', icon: '🧩', name: 'Memoria', description: 'Cómo la memoria de trabajo limita la capacidad del Sistema 2' },
   ],
   'visualizador-algoritmos-ordenacion': [
     { url: '/visualizador-base-datos-relacional/', icon: '🗄️', name: 'Base de Datos Relacional', description: 'Los algoritmos de ordenación son clave en la construcción de índices B-Tree' },
@@ -1929,14 +1924,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'selector-seguro-salud': [
     { url: '/selector-mascota/', icon: '🐾', name: 'Selector de Mascota', description: '¿Qué animal se adapta a tu vida?' },
     { url: '/comparador-tipos-seguros/', icon: '📊', name: 'Comparador de Seguros', description: 'Guía de todos los seguros en España' },
-    { url: '/calculadora-gastos-hogar/', icon: '🏠', name: 'Calculadora Gastos Hogar', description: 'Control de tu presupuesto mensual' },
-    { url: '/calculadora-salario-neto/', icon: '💰', name: 'Calculadora Salario Neto', description: 'Tu sueldo neto real tras IRPF y SS' },
+    { url: '/control-gastos/', icon: '🏠', name: 'Calculadora Gastos Hogar', description: 'Control de tu presupuesto mensual' },
+    { url: '/estimador-sueldo-neto/', icon: '💰', name: 'Calculadora Salario Neto', description: 'Tu sueldo neto real tras IRPF y SS' },
   ],
   'selector-seguro-hogar': [
     { url: '/selector-seguro-salud/', icon: '🏥', name: 'Selector Seguro de Salud', description: '¿Necesitas seguro médico privado?' },
     { url: '/comparador-tipos-seguros/', icon: '📊', name: 'Comparador de Seguros', description: 'Guía de todos los seguros en España' },
-    { url: '/calculadora-gastos-hogar/', icon: '🏠', name: 'Calculadora Gastos Hogar', description: 'Control de tu presupuesto mensual' },
-    { url: '/calculadora-hipoteca/', icon: '🏦', name: 'Calculadora de Hipoteca', description: 'Cuota mensual y coste total de tu préstamo' },
+    { url: '/control-gastos/', icon: '🏠', name: 'Calculadora Gastos Hogar', description: 'Control de tu presupuesto mensual' },
+    { url: '/estimador-hipoteca/', icon: '🏦', name: 'Calculadora de Hipoteca', description: 'Cuota mensual y coste total de tu préstamo' },
   ],
   'selector-alquiler-vs-compra': [
     { url: '/orientador-alquiler-vs-compra/', icon: '📊', name: 'Orientador Alquiler vs Compra', description: 'Cálculo financiero detallado con tus cifras reales' },
@@ -3567,8 +3562,8 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'test-madurez-digital': [
     { url: '/test-burnout-laboral/', icon: '🧘', name: 'Test Burnout Laboral', description: 'Detecta el agotamiento profesional' },
     { url: '/calculadora-costes-teletrabajo/', icon: '🏠', name: 'Costes Teletrabajo', description: 'Cuánto ahorras trabajando en casa' },
-    { url: '/calculadora-tarifa-hora/', icon: '💼', name: 'Calculadora Tarifa/Hora', description: 'Fija tu precio como freelance' },
-    { url: '/calculadora-roi/', icon: '📈', name: 'Calculadora ROI', description: 'Retorno sobre inversión' },
+    { url: '/orientador-tarifa-freelance/', icon: '💼', name: 'Calculadora Tarifa/Hora', description: 'Fija tu precio como freelance' },
+    { url: '/estimador-roi-marketing/', icon: '📈', name: 'Calculadora ROI', description: 'Retorno sobre inversión' },
   ],
   'estimador-pension-viudedad': [
     ...jubilacionApps.filter(a => a.url !== '/estimador-pension-viudedad/').slice(0, 4),
@@ -3600,7 +3595,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'planificador-estudio-oposiciones': [
     { url: '/orientador-tipo-oposicion/', icon: '🎯', name: 'Orientador de Oposición', description: '¿Qué oposición encaja contigo?' },
     { url: '/temporizador-pomodoro/', icon: '⏰', name: 'Pomodoro', description: 'Técnica de estudio 25+5 min' },
-    { url: '/planificador-habitos/', icon: '📋', name: 'Planificador de Hábitos', description: 'Crea rutinas de estudio' },
+    { url: '/seguimiento-habitos/', icon: '📋', name: 'Planificador de Hábitos', description: 'Crea rutinas de estudio' },
   ],
   'orientador-tipo-oposicion': [
     { url: '/planificador-estudio-oposiciones/', icon: '📅', name: 'Planificador de Estudio', description: 'Organiza tu temario en semanas' },
@@ -3750,9 +3745,8 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   'selector-vacaciones': [
     { url: '/orientador-jet-lag/', icon: '✈️', name: 'Orientador Jet Lag', description: 'Recupera tu ritmo tras un vuelo largo' },
-    { url: '/conversor-zonas-horarias/', icon: '🕐', name: 'Conversor Zonas Horarias', description: 'Calcula la hora en destino' },
     { url: '/requisitos-nomada-digital/', icon: '💻', name: 'Requisitos Nómada Digital', description: 'Visados y requisitos por país' },
-    { url: '/calculadora-gastos-hogar/', icon: '💰', name: 'Control Gastos', description: 'Planifica tu presupuesto de viaje' },
+    { url: '/control-gastos/', icon: '💰', name: 'Control Gastos', description: 'Planifica tu presupuesto de viaje' },
   ],
 
   // TRABAJO Y EMPLEO
@@ -3834,7 +3828,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'selector-estilo-decoracion': [
     { url: '/selector-tipo-vivienda/', icon: '🏠', name: 'Selector Tipo de Vivienda', description: 'Piso, casa, ático o estudio' },
     { url: '/selector-zona-residencia/', icon: '📍', name: 'Selector Zona de Residencia', description: 'Centro, extrarradio o pueblo' },
-    { url: '/presupuesto-reforma/', icon: '🔨', name: 'Presupuesto de Reforma', description: 'Estima el coste de tu reforma' },
+    { url: '/estimador-reformas-hogar/', icon: '🔨', name: 'Presupuesto de Reforma', description: 'Estima el coste de tu reforma' },
     { url: '/selector-alquiler-vs-compra/', icon: '🏘️', name: 'Selector Alquiler vs Compra', description: '¿Comprar o alquilar?' },
   ],
 
@@ -3889,7 +3883,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // Régimen fiscal autónomo
   'selector-regimen-fiscal-autonomo': [
     { url: '/selector-forma-juridica/', icon: '⚖️', name: 'Selector Forma Jurídica', description: '¿Autónomo o sociedad limitada?' },
-    { url: '/calculadora-cuota-autonomos/', icon: '💼', name: 'Calculadora Cuota Autónomos', description: 'Calcula tu cuota RETA mensual' },
+    { url: '/estimador-cuota-autonomo/', icon: '💼', name: 'Calculadora Cuota Autónomos', description: 'Calcula tu cuota RETA mensual' },
     { url: '/selector-cuenta-bancaria/', icon: '🏧', name: 'Selector Cuenta Bancaria', description: '¿Qué tipo de cuenta necesitas?' },
     { url: '/selector-contrato-trabajo/', icon: '📋', name: 'Selector Contrato de Trabajo', description: '¿Qué tipo de contrato te conviene?' },
   ],
@@ -4192,7 +4186,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'Cómo el sistema inmune detecta y combate los virus en sus distintas fases de infección' },
     { url: '/visualizador-vacunas/', icon: '💉', name: 'Vacunas', description: 'Las vacunas entrenan al sistema inmune antes de que el virus llegue a completar su ciclo de replicación' },
     { url: '/visualizador-proteinas-plegamiento/', icon: '🧬', name: 'Plegamiento de Proteínas', description: 'Las proteínas de la cápside y envoltura viral tienen estructuras 3D muy específicas que determinan el tropismo' },
-    { url: '/visualizador-adn-replicacion/', icon: '🔬', name: 'ADN y Replicación', description: 'Los virus ADN aprovechan la maquinaria de replicación celular; los ARN llevan su propia polimerasa' },
+    { url: '/visualizador-adn-polimerasa/', icon: '🔬', name: 'ADN y Replicación', description: 'Los virus ADN aprovechan la maquinaria de replicación celular; los ARN llevan su propia polimerasa' },
   ],
   'visualizador-diabetes-mecanismo': [
     { url: '/visualizador-sistema-endocrino/', icon: '⚗️', name: 'Sistema Endocrino', description: 'La insulina y el glucagón son las hormonas pancreáticas dentro del sistema endocrino completo' },
@@ -4202,12 +4196,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'visualizador-alzheimer-parkinson': [
     { url: '/visualizador-proteinas-plegamiento/', icon: '🧬', name: 'Plegamiento de Proteínas', description: 'Alzheimer y Parkinson son proteinopatías: enfermedades causadas por proteínas mal plegadas (Aβ, Tau, α-sinucleína)' },
-    { url: '/visualizador-neurona/', icon: '⚡', name: 'La Neurona', description: 'Cómo funciona una neurona sana: potencial de acción, sinapsis y neurotransmisores que se alteran en estas enfermedades' },
+    { url: '/visualizador-sistema-nervioso/', icon: '⚡', name: 'La Neurona', description: 'Cómo funciona una neurona sana: potencial de acción, sinapsis y neurotransmisores que se alteran en estas enfermedades' },
     { url: '/visualizador-sistema-nervioso/', icon: '🧠', name: 'Sistema Nervioso', description: 'La anatomía del sistema nervioso central donde se desarrollan los procesos neurodegenerativos' },
-    { url: '/visualizador-neurotransmisores/', icon: '💬', name: 'Neurotransmisores', description: 'La dopamina (Parkinson) y la acetilcolina (Alzheimer) son los neurotransmisores más afectados' },
+    { url: '/visualizador-sistema-nervioso/', icon: '💬', name: 'Neurotransmisores', description: 'La dopamina (Parkinson) y la acetilcolina (Alzheimer) son los neurotransmisores más afectados' },
   ],
   'visualizador-cancer': [
-    { url: '/visualizador-adn-replicacion/', icon: '🔬', name: 'ADN y Replicación', description: 'Los errores en la replicación del ADN y los fallos en su reparación son el origen de las mutaciones cancerígenas' },
+    { url: '/visualizador-adn-polimerasa/', icon: '🔬', name: 'ADN y Replicación', description: 'Los errores en la replicación del ADN y los fallos en su reparación son el origen de las mutaciones cancerígenas' },
     { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'La inmunoterapia activa el sistema inmune para que reconozca y destruya las células tumorales' },
     { url: '/visualizador-proteinas-plegamiento/', icon: '🧬', name: 'Plegamiento de Proteínas', description: 'Los oncogenes y genes supresores codifican proteínas cuya función depende de su plegamiento 3D correcto' },
     { url: '/visualizador-alzheimer-parkinson/', icon: '🧠', name: 'Alzheimer y Parkinson', description: 'Como el cáncer, son enfermedades de acumulación de proteínas disfuncionales, aunque con mecanismos distintos' },
@@ -4236,15 +4230,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // EJE B — Fisiología (2026-04-25)
   'visualizador-ciclo-menstrual': [
     { url: '/visualizador-estrogenos/', icon: '🟣', name: 'Estrógenos', description: 'Biología completa del estrógeno: hueso, cardiovascular, tejidos y menopausia' },
-    { url: '/visualizador-sistema-reproductor/', icon: '🫀', name: 'Sistema Reproductor', description: 'Anatomía del aparato reproductor femenino y masculino' },
     { url: '/visualizador-tiroides/', icon: '🦋', name: 'Tiroides', description: 'El tiroides regula el metabolismo basal e interactúa con el ciclo menstrual' },
     { url: '/seguimiento-ciclo-menstrual/', icon: '📅', name: 'Seguimiento de Ciclo', description: 'Predice tus próximos ciclos, ventana fértil y ovulación con tu tracker personal' },
   ],
   'visualizador-proteinas-plegamiento': [
-    { url: '/visualizador-adn-replicacion/', icon: '🧬', name: 'ADN y Replicación', description: 'El ADN codifica la secuencia de aminoácidos que determina el plegamiento proteínico' },
+    { url: '/visualizador-adn-polimerasa/', icon: '🧬', name: 'ADN y Replicación', description: 'El ADN codifica la secuencia de aminoácidos que determina el plegamiento proteínico' },
     { url: '/visualizador-alzheimer-parkinson/', icon: '🧠', name: 'Alzheimer y Parkinson', description: 'Ambas enfermedades están causadas por proteínas mal plegadas: Aβ/tau y α-sinucleína' },
     { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'Los anticuerpos son proteínas con plegamiento preciso que reconoce antígenos específicos' },
-    { url: '/visualizador-enzimas/', icon: '🧪', name: 'Enzimas', description: 'Las enzimas son proteínas cuya actividad catalítica depende de su plegamiento 3D exacto' },
+    { url: '/visualizador-enzimas-cuerpo-humano/', icon: '🧪', name: 'Enzimas', description: 'Las enzimas son proteínas cuya actividad catalítica depende de su plegamiento 3D exacto' },
   ],
 
   // EJE E — Física avanzada (2026-04-25)
@@ -4252,7 +4245,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-relatividad-especial/', icon: '⚡', name: 'Relatividad Especial', description: 'La relatividad especial (1905) es el punto de partida: sin gravedad, solo velocidad' },
     { url: '/visualizador-mecanica-cuantica/', icon: '⚛️', name: 'Mecánica Cuántica', description: 'Relatividad general y mecánica cuántica: las dos grandes teorías incompatibles' },
     { url: '/visualizador-caos-mariposa/', icon: '🦋', name: 'Caos y Mariposa', description: 'Los sistemas caóticos también surgen en la dinámica relativista de agujeros negros' },
-    { url: '/visualizador-astrofisica/', icon: '🌠', name: 'Astrofísica', description: 'La relatividad general describe la estructura y evolución del universo a gran escala' },
+    { url: '/visualizador-escala-universo/', icon: '🌠', name: 'Astrofísica', description: 'La relatividad general describe la estructura y evolución del universo a gran escala' },
   ],
   'visualizador-caos-mariposa': [
     { url: '/visualizador-geometria-fractales/', icon: '❄️', name: 'Geometría Fractal', description: 'Los fractales y el caos comparten la autosimilaridad y la sensibilidad a condiciones iniciales' },
@@ -5287,7 +5280,6 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-historia/civilizaciones-precolombinas/', icon: '🏛️', name: 'Civilizaciones Precolombinas', description: 'El cacao sagrado de los olmecas, mayas y aztecas forma parte del universo cultural de las civilizaciones precolombinas: el xocolatl era moneda, ofrenda ritual y privilegio de la élite guerrera mexica antes de que Hernán Cortés lo llevara a Europa en 1528.' },
     { url: '/visualizador-historia/historia-conquista-america/', icon: '⛵', name: 'Conquista de América', description: 'La conquista española de América es el puente entre el chocolate mesoamericano y el europeo: Cortés recibe xocolatl de Moctezuma en 1519 y lo lleva a la corte de Carlos I en 1528. El modelo de plantation economy colonial que hizo masiva la producción de cacao tiene sus raíces en la conquista.' },
     { url: '/visualizador-historia/azucar/', icon: '🎍', name: 'Historia del Azúcar', description: 'Chocolate y azúcar son inseparables en la historia: el xocolatl mesoamericano era amargo; fue la adición de azúcar de caña en la España del siglo XVI lo que creó el chocolate tal como lo conocemos hoy. La historia del cacao industrializado y la del azúcar colonial comparten la misma geografía atlántica.' },
-    { url: '/gastronomia/', icon: '🍽️', name: 'Historia de la Gastronomía', description: 'El chocolate es uno de los grandes protagonistas de la historia de la gastronomía: de bebida ritual mesoamericana a tableta victoriana, de producto colonial de lujo a ingrediente omnipresente. La gastronomía europea se transformó con la llegada del cacao, la vainilla y el azúcar de América.' },
   ],
   'visualizador-historia-azucar': [
     { url: '/visualizador-historia/historia-conquista-america/', icon: '⛵', name: 'Conquista de América', description: 'La expansión azucarera del Caribe es inseparable de la conquista: Colón llevó caña de azúcar en su segundo viaje (1493), y el modelo de plantation economy colonial transformó la demografía atlántica. La economía azucarera fue el motor económico que impulsó la explotación colonial del Nuevo Mundo.' },
@@ -5391,7 +5383,6 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias. El complemento natural a la lectura de etiquetas.' },
     { url: '/visualizador-huella-alimentos/', icon: '🌍', name: 'Huella de lo que Comes', description: 'Impacto ambiental de cada alimento: CO₂, agua y tierra consumidos. Complementa la lectura de etiquetas con el impacto ecológico.' },
     { url: '/visualizador-indice-glucemico/', icon: '📊', name: 'Índice Glucémico', description: 'Cómo los alimentos afectan tu glucemia: el IG y la carga glucémica de 26 alimentos comunes, incluidos muchos que contienen aditivos.' },
-    { url: '/visualizador-sistema-digestivo/', icon: '🍎', name: 'Sistema Digestivo', description: 'Cómo el aparato digestivo procesa los alimentos y sus aditivos: absorción, metabolismo y paso por el organismo.' },
   ],
   'guia-especias': [
     { url: '/guia-hierbas-aromaticas/', icon: '🌿', name: 'Guía de Hierbas Aromáticas', description: 'Hierbas aromáticas: familia, origen, aroma, cultivo y usos culinarios y medicinales' },
@@ -5845,9 +5836,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
 
   'developers': [
-    { url: '/calculadora-irpf/', icon: '🏛️', name: 'Calculadora IRPF', description: 'Ejemplo de herramienta fiscal disponible vía MCP' },
-    { url: '/calculadora-hipoteca/', icon: '🏦', name: 'Simulador de Hipoteca', description: 'Ejemplo de herramienta financiera disponible vía MCP' },
-    { url: '/calculadora-cuota-autonomo/', icon: '💼', name: 'Cuota de Autónomo', description: 'Ejemplo de herramienta laboral disponible vía MCP' },
+    { url: '/estimador-irpf/', icon: '🏛️', name: 'Calculadora IRPF', description: 'Ejemplo de herramienta fiscal disponible vía MCP' },
+    { url: '/estimador-hipoteca/', icon: '🏦', name: 'Simulador de Hipoteca', description: 'Ejemplo de herramienta financiera disponible vía MCP' },
+    { url: '/estimador-cuota-autonomo/', icon: '💼', name: 'Cuota de Autónomo', description: 'Ejemplo de herramienta laboral disponible vía MCP' },
     { url: '/developers/terminos/', icon: '⚖️', name: 'Términos de Uso MCP', description: 'Condiciones legales para integradores del servidor MCP' },
   ],
 

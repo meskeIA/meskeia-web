@@ -503,8 +503,8 @@ export default function ComparadorElectrico() {
                 ¿Aún no tienes claro qué tipo de coche te conviene? El Asesor de Vehículo te
                 orienta según tus necesidades reales antes de comparar precios.
               </p>
-              <Link href="/asesor-vehiculo/" className={styles.ctaLink}>
-                Ir al Asesor de Vehículo
+              <Link href="/selector-vehiculo/" className={styles.ctaLink}>
+                Ir al Selector de Vehículo
               </Link>
             </div>
           </section>

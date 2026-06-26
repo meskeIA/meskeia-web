@@ -1,15 +1,19 @@
 import { CourseProvider } from './CourseContext';
-import { metadata as pageMetadata } from './metadata';
+import { jsonLd } from './metadata';
 
-export const metadata = pageMetadata;
+export { metadata } from './metadata';
 
-export default function CursoEmprendimientoLayout({
+// jsonLd es un objeto interno generado por el propio código — no hay input externo
+const webAppScript = JSON.stringify(jsonLd);
+
+export default function CursoLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
     <CourseProvider>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: webAppScript }} />
       {children}
     </CourseProvider>
   );
