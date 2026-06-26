@@ -6005,6 +6005,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-gelatina/', icon: '🍮', name: 'Gelatina', description: 'Para fondant y trabajos de azúcar' },
     { url: '/conversor-tazas-gramos/', icon: '🥄', name: 'Tazas a Gramos por Ingrediente', description: 'Pesa el azúcar glas con precisión' },
   ],
+  'tiempos-asado': [
+    { url: '/temperatura-coccion-carne/', icon: '🌡️', name: 'Temperatura Interna de Cocción', description: 'Confirma el punto seguro de la carne' },
+    { url: '/calculadora-salmuera/', icon: '🧂', name: 'Salmuera (Brining)', description: 'Una salmuera previa deja el asado más jugoso' },
+    { url: '/conversor-temperatura-horno/', icon: '🌡️', name: 'Temperatura de Horno', description: 'Convierte entre °C, °F y gas mark' },
+    { url: '/tiempos-coccion/', icon: '⏱️', name: 'Tiempos de Cocción', description: 'Tiempos de huevos, arroz, legumbres y verduras' },
+  ],
+  'sous-vide': [
+    { url: '/temperatura-coccion-carne/', icon: '🌡️', name: 'Temperatura Interna de Cocción', description: 'Los puntos de la carne y su mínimo seguro' },
+    { url: '/tiempos-asado/', icon: '🍗', name: 'Tiempos de Asado', description: 'La alternativa al horno tradicional' },
+    { url: '/conversor-temperatura-horno/', icon: '🌡️', name: 'Temperatura de Horno', description: 'Convierte entre °C, °F y gas mark' },
+    { url: '/calculadora-salmuera/', icon: '🧂', name: 'Salmuera (Brining)', description: 'Sazona y da jugosidad antes de cocinar' },
+  ],
+  'calculadora-salmuera': [
+    { url: '/tiempos-asado/', icon: '🍗', name: 'Tiempos de Asado', description: 'Asa tu pieza tras la salmuera' },
+    { url: '/temperatura-coccion-carne/', icon: '🌡️', name: 'Temperatura Interna de Cocción', description: 'El punto seguro de carne y pescado' },
+    { url: '/sous-vide/', icon: '♨️', name: 'Sous-Vide', description: 'Otra técnica para máxima jugosidad' },
+    { url: '/conversor-tazas-gramos/', icon: '🥄', name: 'Tazas a Gramos por Ingrediente', description: 'Pesa la sal con precisión' },
+  ],
+  'huevo-perfecto': [
+    { url: '/tiempos-coccion/', icon: '⏱️', name: 'Tiempos de Cocción', description: 'Cuánto cocer arroz, pasta, legumbres y verduras' },
+    { url: '/sous-vide/', icon: '♨️', name: 'Sous-Vide', description: 'El huevo a baja temperatura, de yema sedosa' },
+    { url: '/temperatura-coccion-carne/', icon: '🌡️', name: 'Temperatura Interna de Cocción', description: 'El punto seguro de carne y pescado' },
+    { url: '/calculadora-cocina/', icon: '🍳', name: 'Calculadora de Cocina', description: 'Conversor general de unidades culinarias' },
+  ],
 };
 
 /**

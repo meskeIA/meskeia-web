@@ -33,6 +33,30 @@ const APPS = [
     desc: 'Adapta cualquier receta de horno a la air fryer: baja la temperatura y reduce el tiempo, con tabla de alimentos.',
     slug: 'conversor-horno-airfryer',
   },
+  {
+    icon: '🍗',
+    titulo: 'Tiempos de asado',
+    desc: 'Cuánto asar pollo, pavo, cordero, cerdo o ternera según el peso, con la temperatura interna objetivo.',
+    slug: 'tiempos-asado',
+  },
+  {
+    icon: '♨️',
+    titulo: 'Sous-vide',
+    desc: 'Temperaturas y tiempos de cocción al vacío para carne, pollo, pescado, huevo y verduras.',
+    slug: 'sous-vide',
+  },
+  {
+    icon: '🧂',
+    titulo: 'Salmuera (brining)',
+    desc: 'La sal y el agua para tu salmuera según la concentración, con tiempos por pieza.',
+    slug: 'calculadora-salmuera',
+  },
+  {
+    icon: '🥚',
+    titulo: 'El huevo perfecto',
+    desc: 'El tiempo exacto para el huevo en su punto, según el tamaño y si está frío de la nevera.',
+    slug: 'huevo-perfecto',
+  },
 ];
 
 export default function CoquinumCoccion() {

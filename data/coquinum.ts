@@ -64,6 +64,10 @@ export const COQUINUM_APP_CATEGORIA: Record<string, string> = {
   'temperatura-coccion-carne': 'coccion',
   'tiempos-coccion': 'coccion',
   'conversor-horno-airfryer': 'coccion',
+  'tiempos-asado': 'coccion',
+  'sous-vide': 'coccion',
+  'calculadora-salmuera': 'coccion',
+  'huevo-perfecto': 'coccion',
   // Conservación (seguridad alimentaria y duración)
   'calculadora-caducidad': 'conservacion',
   // Costes y escandallo (ala B2B / hostelería)
@@ -155,6 +159,10 @@ export const COQUINUM_APP_INFO: Record<string, CoquinumAppInfo> = {
   'temperatura-coccion-carne': { nombre: 'Temperatura de cocción', icon: '🌡️' },
   'tiempos-coccion': { nombre: 'Tiempos de cocción', icon: '⏱️' },
   'conversor-horno-airfryer': { nombre: 'Horno → freidora de aire', icon: '🌀' },
+  'tiempos-asado': { nombre: 'Tiempos de asado', icon: '🍗' },
+  'sous-vide': { nombre: 'Sous-vide', icon: '♨️' },
+  'calculadora-salmuera': { nombre: 'Salmuera (brining)', icon: '🧂' },
+  'huevo-perfecto': { nombre: 'El huevo perfecto', icon: '🥚' },
   'calculadora-caducidad': { nombre: 'Cuánto dura cada alimento', icon: '🧊' },
   'escandallo-food-cost': { nombre: 'Escandallo y food cost', icon: '💼' },
   'calculadora-merma': { nombre: 'Calculadora de merma', icon: '📉' },

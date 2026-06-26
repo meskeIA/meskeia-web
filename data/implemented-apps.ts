@@ -1183,6 +1183,10 @@ export const implementedAppsUrls = [
   "/calculadora-crema-pastelera/",        // Crema pastelera/inglesa por litro de leche — Coquinum panadería
   "/calculadora-macarons/",               // Macarons método francés (TPT) — Coquinum panadería
   "/calculadora-royal-icing/",            // Glaseado real por consistencia — Coquinum panadería
+  "/tiempos-asado/",                      // Tiempos de asado por peso (pollo/pavo/cordero…) — Coquinum cocción
+  "/sous-vide/",                          // Sous-vide: temperaturas y tiempos por alimento — Coquinum cocción
+  "/calculadora-salmuera/",               // Salmuera/brining: sal/agua por % + tiempos — Coquinum cocción
+  "/huevo-perfecto/",                     // Tiempo del huevo por punto/tamaño/temperatura — Coquinum cocción
   "/orientador-escritura-creativa/",      // Wizard 3 pasos: género → perspectiva → guía + kit de arranque + hoja de ruta
   "/visualizador-estilos-literarios/",   // Directorio interactivo de 10 movimientos literarios con filtros, autores y fragmentos
   "/visualizador-generos-novela/",       // 11 géneros narrativos: características, autores fundacionales y obras de entrada
