@@ -124,10 +124,38 @@
   --accent: #C99BF5;
 }
 
-/* Bajo stemum.com ocultamos elementos pensados para el contexto meskeIA cuyas
-   relaciones apuntan fuera del catálogo Stemum (p.ej. "Apps relacionadas").
-   El descubrimiento en Stemum se hace por sus páginas de disciplina. */
-[data-brand='stemum'] [data-hide-on-stemum] {
+/* ─────────────────────────────────────────────────────────────
+   Marca Coquinum (vertical de cocina y gastronomía).
+   Mismo mecanismo que Stemum: bajo coquinum.com el layout pone
+   data-brand="coquinum" en <html> antes del primer paint y aquí
+   revestimos cualquier app de meskeIA con la paleta verde oliva,
+   sin tocar el código de cada app. Las apps que usan var(--primary)
+   /var(--hero-bg)… se recolorean solas; las que hardcodean color se
+   quedan igual (degradación aceptable, migrable). Tokens: GASTRONOMIA.md §9.
+   ───────────────────────────────────────────────────────────── */
+[data-brand='coquinum'] {
+  --primary: #4F7A3A;
+  --primary-hover: #426830;
+  --secondary: #8FB36B;
+  --accent: #E8A33D;
+  --hero-bg: #2C4327;
+  --focus: rgba(79, 122, 58, 0.15);
+}
+
+/* En modo oscuro, verdes más claros para contraste sobre fondo oscuro */
+[data-theme='dark'][data-brand='coquinum'] {
+  --primary: #8FB36B;
+  --primary-hover: #9DC97E;
+  --secondary: #6F9A50;
+  --accent: #F0B868;
+}
+
+/* Bajo un dominio vertical (data-brand presente) ocultamos elementos pensados
+   para el contexto meskeIA cuyas relaciones apuntan fuera del catálogo del
+   portal (p.ej. "Apps relacionadas"): evitan que el visitante salga del circuito
+   meskeIA↔vertical. El descubrimiento dentro del portal se hace por sus páginas
+   de categoría/disciplina. Genérico = sirve a cualquier vertical futuro. */
+[data-brand] [data-hide-in-vertical] {
   display: none;
 }
 

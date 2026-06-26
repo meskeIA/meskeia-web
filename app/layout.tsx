@@ -67,13 +67,14 @@ export default function RootLayout({
     <html lang="es" suppressHydrationWarning>
       <head>
         {/*
-          Marca por host: bajo stemum.com marcamos <html data-brand="stemum">
-          antes del primer paint para que globals.css reviuta la app con la
-          paleta violeta de Stemum sin flash. En meskeia.com no hace nada.
-          Patrón equivalente al script de tema de next-themes.
+          Marca por host: bajo un dominio vertical marcamos <html data-brand="…">
+          antes del primer paint para que globals.css reviuta la app con la paleta
+          de la marca sin flash. stemum.com → violeta; coquinum.com → verde oliva.
+          En meskeia.com no hace nada. Patrón equivalente al script de tema de
+          next-themes.
         */}
         <script>
-          {`(function(){try{var h=location.hostname;if(h==='stemum.com'||h==='www.stemum.com'){document.documentElement.setAttribute('data-brand','stemum');}}catch(e){}})();`}
+          {`(function(){try{var h=location.hostname;if(h==='stemum.com'||h==='www.stemum.com'){document.documentElement.setAttribute('data-brand','stemum');}else if(h==='coquinum.com'||h==='www.coquinum.com'){document.documentElement.setAttribute('data-brand','coquinum');}}catch(e){}})();`}
         </script>
         {/* Preconnect para optimizar carga de fuentes */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />

@@ -78,11 +78,12 @@ export default function RelatedApps({ title = 'Apps relacionadas', apps, icon = 
   };
 
   return (
-    // data-hide-on-stemum: bajo stemum.com (html[data-brand=stemum]) esta sección
-    // se oculta por CSS. Las relaciones están curadas para el contexto meskeIA y
-    // muchas apuntan fuera del catálogo Stemum; el descubrimiento en Stemum se hace
-    // por sus páginas de disciplina. En meskeia.com se muestra con normalidad.
-    <section className={styles.relatedApps} aria-label="Aplicaciones relacionadas" data-hide-on-stemum="">
+    // data-hide-in-vertical: bajo un dominio vertical (html[data-brand], p.ej.
+    // stemum.com o coquinum.com) esta sección se oculta por CSS. Las relaciones
+    // están curadas para el contexto meskeIA y muchas apuntan fuera del catálogo
+    // del portal; el descubrimiento dentro del vertical se hace por sus páginas de
+    // categoría/disciplina. En meskeia.com se muestra con normalidad.
+    <section className={styles.relatedApps} aria-label="Aplicaciones relacionadas" data-hide-in-vertical="">
       <h3 className={styles.title}>
         <span className={styles.titleIcon}>{icon}</span>
         {title}
