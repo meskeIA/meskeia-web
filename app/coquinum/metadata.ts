@@ -20,12 +20,22 @@ export const metadata: Metadata = {
     url: URL_CANONICA,
     siteName: 'Coquinum',
     locale: 'es_ES',
+    images: [
+      {
+        // Servida como estático directo (sin el host-rewrite del proxy).
+        url: 'https://meskeia.com/coquinum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Coquinum — Cocina y gastronomía',
     description:
       'Herramientas de cocina técnica en español. Panadería, cocción, conversiones y food cost. Sin registro, sin coste.',
+    images: ['https://meskeia.com/coquinum/og-image.png'],
   },
   other: {
     'application-name': 'Coquinum',

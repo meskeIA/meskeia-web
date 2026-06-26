@@ -11,6 +11,7 @@
 import React, { useState } from 'react';
 import styles from './Footer.module.css';
 import AnalyticsTracker from './AnalyticsTracker';
+import CoquinumMasDeCategoria from './CoquinumMasDeCategoria';
 
 interface FooterProps {
   appName?: string; // Nombre de la app para compartir (opcional)
@@ -59,6 +60,9 @@ export default function Footer({ appName }: FooterProps) {
     <>
       {/* Analytics: Registra uso de la app en producción */}
       {appName && <AnalyticsTracker appName={appName} />}
+
+      {/* Bajo coquinum.com: navegación interna a la categoría (circuito verde) */}
+      <CoquinumMasDeCategoria appName={appName} />
 
       <footer className={styles.footer}>
         <div className={styles.shareSection}>
