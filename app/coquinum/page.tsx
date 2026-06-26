@@ -35,6 +35,12 @@ const SECCIONES = [
     href: '/coccion',
   },
   {
+    icon: '🧊',
+    titulo: 'Conservación',
+    desc: 'Cuánto dura cada alimento en la nevera, el congelador y la despensa, y cómo conservar con seguridad.',
+    href: '/conservacion',
+  },
+  {
     icon: '💼',
     titulo: 'Costes y escandallo',
     desc: 'El ala profesional: food cost y precio de venta de tus platos, y cálculo de merma para conocer el coste real de la materia prima.',
@@ -97,7 +103,7 @@ export default function CoquinumHome() {
             cada receta.
           </p>
           <p className={styles.heroSecciones}>
-            Panadería, recetas, medidas, cocción, costes, ingredientes, bebidas y cultura gastronómica
+            Panadería, recetas, medidas, cocción, conservación, costes, ingredientes, bebidas y cultura gastronómica
           </p>
           <p className={styles.heroClaim}>
             Mide, convierte y cocina con precisión.

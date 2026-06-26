@@ -39,6 +39,12 @@ const APPS = [
     desc: 'Con qué cambiar huevo, mantequilla, azúcar, leche o harina, con proporciones exactas y filtro vegano, sin gluten y sin lactosa.',
     slug: 'sustituciones-ingredientes',
   },
+  {
+    icon: '⭕',
+    titulo: 'Conversor de moldes',
+    desc: 'Adapta los ingredientes de una receta al molde que tengas según el área de la base, y ajusta el tiempo de horno.',
+    slug: 'conversor-moldes',
+  },
 ];
 
 export default function CoquinumMedidasConversiones() {

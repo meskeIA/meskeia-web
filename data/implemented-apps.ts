@@ -1174,6 +1174,10 @@ export const implementedAppsUrls = [
   "/tiempos-coccion/",                    // Tiempos de cocción en agua (huevos/arroz/legumbres/verduras) — Coquinum cocción
   "/escandallo-food-cost/",               // Escandallo + food cost + PVP (hostelería B2B) — Coquinum costes
   "/calculadora-merma/",                  // Merma/rendimiento + factor corrección + coste kg útil — Coquinum costes
+  "/conversor-moldes/",                   // Conversión de moldes por área + ajuste tiempo — Coquinum medidas
+  "/conversor-horno-airfryer/",           // Horno → freidora de aire (−20°C, −20% tiempo) — Coquinum cocción
+  "/calculadora-caducidad/",              // Tiempos conservación nevera/congelador/despensa — Coquinum conservación
+  "/ratio-cafe/",                         // Ratio café:agua por método (V60/prensa/espresso…) — Coquinum bebidas
   "/orientador-escritura-creativa/",      // Wizard 3 pasos: género → perspectiva → guía + kit de arranque + hoja de ruta
   "/visualizador-estilos-literarios/",   // Directorio interactivo de 10 movimientos literarios con filtros, autores y fragmentos
   "/visualizador-generos-novela/",       // 11 géneros narrativos: características, autores fundacionales y obras de entrada

@@ -27,6 +27,12 @@ const APPS = [
     desc: 'Cuánto cocer en agua huevos, arroz, pasta, legumbres y verduras, con notas prácticas y ajuste por altitud.',
     slug: 'tiempos-coccion',
   },
+  {
+    icon: '🌀',
+    titulo: 'Horno → freidora de aire',
+    desc: 'Adapta cualquier receta de horno a la air fryer: baja la temperatura y reduce el tiempo, con tabla de alimentos.',
+    slug: 'conversor-horno-airfryer',
+  },
 ];
 
 export default function CoquinumCoccion() {

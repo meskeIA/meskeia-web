@@ -5951,6 +5951,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/guia-cortes-carne/', icon: '🥩', name: 'Cortes de Carne', description: 'Cada corte rinde distinto según el despiece' },
     { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta las cantidades de una receta a más o menos raciones' },
   ],
+  'conversor-moldes': [
+    { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta la receta a más o menos raciones' },
+    { url: '/conversor-tazas-gramos/', icon: '🥄', name: 'Tazas a Gramos por Ingrediente', description: 'Pesa los ingredientes con precisión' },
+    { url: '/calculadora-masa-pizza/', icon: '🍕', name: 'Masa de Pizza', description: 'Calcula la masa para tus bases por % del panadero' },
+    { url: '/conversor-temperatura-horno/', icon: '🌡️', name: 'Temperatura de Horno', description: 'Convierte entre °C, °F y gas mark' },
+  ],
+  'conversor-horno-airfryer': [
+    { url: '/conversor-temperatura-horno/', icon: '🌡️', name: 'Temperatura de Horno', description: 'Convierte entre °C, °F y gas mark, con ajuste de ventilador' },
+    { url: '/tiempos-coccion/', icon: '⏱️', name: 'Tiempos de Cocción', description: 'Cuánto cocer huevos, arroz, legumbres y verduras' },
+    { url: '/temperatura-coccion-carne/', icon: '🌡️', name: 'Temperatura Interna de Cocción', description: 'El punto seguro de carne y pescado' },
+    { url: '/calculadora-cocina/', icon: '🍳', name: 'Calculadora de Cocina', description: 'Conversor general de unidades culinarias' },
+  ],
+  'calculadora-caducidad': [
+    { url: '/tiempos-coccion/', icon: '⏱️', name: 'Tiempos de Cocción', description: 'Cuánto cocer cada alimento en agua' },
+    { url: '/temperatura-coccion-carne/', icon: '🌡️', name: 'Temperatura Interna de Cocción', description: 'Cocina carne y pescado de forma segura' },
+    { url: '/planificador-menu/', icon: '🗓️', name: 'Planificador de Menú', description: 'Organiza la semana y aprovecha mejor la compra' },
+    { url: '/calculadora-merma/', icon: '📉', name: 'Calculadora de Merma', description: 'Cuánto se aprovecha de verdad de cada alimento' },
+  ],
+  'ratio-cafe': [
+    { url: '/guia-cafe/', icon: '☕', name: 'Guía del Café', description: 'Métodos, tuestes y orígenes para entender cada taza' },
+    { url: '/guia-te/', icon: '🍵', name: 'Guía del Té', description: 'Tipos de té y cómo prepararlos' },
+    { url: '/guia-infusiones/', icon: '🫖', name: 'Guía de Infusiones', description: 'Hierbas e infusiones y sus propiedades' },
+    { url: '/conversor-tazas-gramos/', icon: '🥄', name: 'Tazas a Gramos por Ingrediente', description: 'Pesa con precisión también en repostería' },
+  ],
 };
 
 /**

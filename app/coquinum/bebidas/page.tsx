@@ -17,6 +17,12 @@ export const metadata: Metadata = {
 const APPS = [
   {
     icon: '☕',
+    titulo: 'Ratio de café',
+    desc: 'Los gramos de café y el agua exactos según el método: V60, prensa, AeroPress, espresso, moka y cold brew.',
+    slug: 'ratio-cafe',
+  },
+  {
+    icon: '☕',
     titulo: 'Café',
     desc: 'Métodos de extracción, tuestes y orígenes para entender qué hay detrás de cada taza y preparar mejor café en casa.',
     slug: 'guia-cafe',
