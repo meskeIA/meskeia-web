@@ -5892,10 +5892,28 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-hidratacion-pan/', icon: '💧', name: 'Hidratación del Pan', description: 'Verifica la hidratación tras escalar tu masa' },
   ],
   'conversor-tazas-gramos': [
+    { url: '/ajuste-recetas-altitud/', icon: '⛰️', name: 'Ajuste de Recetas por Altitud', description: 'Adapta tu receta si cocinas en altura (CDMX, Bogotá, Quito…)' },
     { url: '/calculadora-cocina/', icon: '🍳', name: 'Calculadora de Cocina', description: 'Conversor general de unidades culinarias y temperaturas' },
     { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta las cantidades de una receta a más o menos raciones' },
     { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Porcentaje del Panadero', description: 'Proporciones en gramos para tus masas de pan' },
-    { url: '/calculadora-hidratacion-pan/', icon: '💧', name: 'Hidratación del Pan', description: 'Relación agua/harina en porcentaje del panadero' },
+  ],
+  'ajuste-recetas-altitud': [
+    { url: '/conversor-tazas-gramos/', icon: '🥄', name: 'Tazas a Gramos por Ingrediente', description: 'Pasa de tazas a gramos con el peso real de cada ingrediente' },
+    { url: '/conversor-temperatura-horno/', icon: '🌡️', name: 'Temperatura de Horno', description: 'Convierte entre °C, °F y gas mark, con ajuste de ventilador' },
+    { url: '/calculadora-temperatura-masa/', icon: '🌡️', name: 'Temperatura de la Masa', description: 'Calcula la temperatura del agua para una fermentación controlada' },
+    { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta las cantidades de una receta a más o menos raciones' },
+  ],
+  'conversor-temperatura-horno': [
+    { url: '/conversor-tazas-gramos/', icon: '🥄', name: 'Tazas a Gramos por Ingrediente', description: 'El peso real de cada taza: harina, azúcar, líquidos…' },
+    { url: '/ajuste-recetas-altitud/', icon: '⛰️', name: 'Ajuste de Recetas por Altitud', description: 'Sube el horno y ajusta el leudante si cocinas en altura' },
+    { url: '/sustituciones-ingredientes/', icon: '🔄', name: 'Sustituciones de Ingredientes', description: 'Con qué reemplazar huevo, mantequilla, azúcar o harina' },
+    { url: '/calculadora-cocina/', icon: '🍳', name: 'Calculadora de Cocina', description: 'Conversor general de unidades culinarias y temperaturas' },
+  ],
+  'sustituciones-ingredientes': [
+    { url: '/conversor-tazas-gramos/', icon: '🥄', name: 'Tazas a Gramos por Ingrediente', description: 'El peso real de cada taza para medir el sustituto' },
+    { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta las cantidades de una receta a más o menos raciones' },
+    { url: '/conversor-temperatura-horno/', icon: '🌡️', name: 'Temperatura de Horno', description: 'Convierte entre °C, °F y gas mark, con ajuste de ventilador' },
+    { url: '/selector-dieta/', icon: '🥗', name: 'Selector de Dieta', description: 'Compara patrones de alimentación según tus objetivos' },
   ],
 };
 

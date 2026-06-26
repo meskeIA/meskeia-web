@@ -21,6 +21,24 @@ const APPS = [
     desc: 'Pasa de tazas, cucharadas y cucharaditas a gramos con el peso real de cada ingrediente: la harina no pesa lo mismo que el azúcar ni que los líquidos.',
     slug: 'conversor-tazas-gramos',
   },
+  {
+    icon: '⛰️',
+    titulo: 'Ajuste de recetas por altitud',
+    desc: 'Adapta una receta de nivel del mar a la altura a la que cocinas: punto de ebullición del agua y ajustes de horno, leudante, líquido y cocción.',
+    slug: 'ajuste-recetas-altitud',
+  },
+  {
+    icon: '🌡️',
+    titulo: 'Conversor de temperatura de horno',
+    desc: 'Pasa la temperatura del horno entre grados Celsius, Fahrenheit y gas mark, con el equivalente para horno de ventilador y los usos de cada nivel.',
+    slug: 'conversor-temperatura-horno',
+  },
+  {
+    icon: '🔄',
+    titulo: 'Sustituciones de ingredientes',
+    desc: 'Con qué cambiar huevo, mantequilla, azúcar, leche o harina, con proporciones exactas y filtro vegano, sin gluten y sin lactosa.',
+    slug: 'sustituciones-ingredientes',
+  },
 ];
 
 export default function CoquinumMedidasConversiones() {

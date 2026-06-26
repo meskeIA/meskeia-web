@@ -1165,6 +1165,9 @@ export const implementedAppsUrls = [
   "/calculadora-ganache/",                // Proporciones chocolate:nata según tipo y textura (glaseado/trufa/firme)
   "/escalador-recetas/",                  // Escalado de recetas con ajuste no lineal para levadura, impulsores y especias
   "/conversor-tazas-gramos/",             // Tazas/cucharadas ↔ gramos por ingrediente (densidad real) — cuña LATAM Coquinum
+  "/ajuste-recetas-altitud/",             // Ajuste de horneado/cocción por altitud (CDMX, Bogotá, Quito, La Paz) — cuña LATAM Coquinum
+  "/conversor-temperatura-horno/",        // °C / °F / gas mark + ventilador — cuña LATAM Coquinum
+  "/sustituciones-ingredientes/",         // Sustitutos (huevo, mantequilla, azúcar…) con filtro vegano/sin gluten/sin lactosa — Coquinum
   "/orientador-escritura-creativa/",      // Wizard 3 pasos: género → perspectiva → guía + kit de arranque + hoja de ruta
   "/visualizador-estilos-literarios/",   // Directorio interactivo de 10 movimientos literarios con filtros, autores y fragmentos
   "/visualizador-generos-novela/",       // 11 géneros narrativos: características, autores fundacionales y obras de entrada

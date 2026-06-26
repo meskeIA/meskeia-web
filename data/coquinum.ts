@@ -46,6 +46,9 @@ export const COQUINUM_APP_CATEGORIA: Record<string, string> = {
   'selector-dieta': 'cocina-recetas',
   // Medidas y conversiones (la cuña LATAM: el foso técnico de precisión)
   'conversor-tazas-gramos': 'medidas-conversiones',
+  'ajuste-recetas-altitud': 'medidas-conversiones',
+  'conversor-temperatura-horno': 'medidas-conversiones',
+  'sustituciones-ingredientes': 'medidas-conversiones',
   // Ingredientes y despensa (producto: cómo elegir y usar)
   'guia-aceite-oliva': 'ingredientes-despensa',
   'guia-cortes-carne': 'ingredientes-despensa',
