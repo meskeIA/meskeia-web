@@ -52,6 +52,36 @@ const APPS = [
     slug: 'calculadora-masa-pizza',
   },
   {
+    icon: '🍯',
+    titulo: 'Almíbar',
+    desc: 'Azúcar y agua según el uso —emborrachar, sorbetes, cócteles— con el °Brix resultante.',
+    slug: 'calculadora-almibar',
+  },
+  {
+    icon: '🍥',
+    titulo: 'Merengue',
+    desc: 'Claras y azúcar para merengue francés, suizo o italiano, con la proporción 1:2.',
+    slug: 'calculadora-merengue',
+  },
+  {
+    icon: '🍮',
+    titulo: 'Crema pastelera',
+    desc: 'Yemas, azúcar y maicena según la leche, para crema pastelera, ligera o inglesa.',
+    slug: 'calculadora-crema-pastelera',
+  },
+  {
+    icon: '🌈',
+    titulo: 'Macarons',
+    desc: 'Almendra, azúcar glas, granulado y claras por el método francés (tant pour tant).',
+    slug: 'calculadora-macarons',
+  },
+  {
+    icon: '🎨',
+    titulo: 'Glaseado real',
+    desc: 'Azúcar glas y claras para tu glasa según la consistencia: contorno, media o relleno.',
+    slug: 'calculadora-royal-icing',
+  },
+  {
     icon: '🍫',
     titulo: 'Ganache',
     desc: 'Ratios de chocolate y nata según el uso —cobertura, relleno, trufa o batida— y el tipo de chocolate.',

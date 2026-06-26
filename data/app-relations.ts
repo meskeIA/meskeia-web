@@ -5975,6 +5975,36 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/guia-infusiones/', icon: '🫖', name: 'Guía de Infusiones', description: 'Hierbas e infusiones y sus propiedades' },
     { url: '/conversor-tazas-gramos/', icon: '🥄', name: 'Tazas a Gramos por Ingrediente', description: 'Pesa con precisión también en repostería' },
   ],
+  'calculadora-almibar': [
+    { url: '/calculadora-puntos-azucar/', icon: '🍬', name: 'Puntos del Azúcar', description: 'Hebra, bola y caramelo: el azúcar por temperatura' },
+    { url: '/calculadora-merengue/', icon: '🍥', name: 'Merengue', description: 'El merengue italiano usa un almíbar a 118 °C' },
+    { url: '/conversor-tazas-gramos/', icon: '🥄', name: 'Tazas a Gramos por Ingrediente', description: 'Pesa el azúcar con precisión' },
+    { url: '/guia-cocteles/', icon: '🍸', name: 'Guía de Cócteles', description: 'El sirope (gomme) en coctelería' },
+  ],
+  'calculadora-merengue': [
+    { url: '/calculadora-almibar/', icon: '🍯', name: 'Almíbar', description: 'El almíbar a 118 °C del merengue italiano' },
+    { url: '/calculadora-macarons/', icon: '🌈', name: 'Macarons', description: 'Llevan un merengue francés en su base' },
+    { url: '/calculadora-puntos-azucar/', icon: '🍬', name: 'Puntos del Azúcar', description: 'La temperatura del almíbar paso a paso' },
+    { url: '/calculadora-crema-pastelera/', icon: '🍮', name: 'Crema Pastelera', description: 'Otra crema clásica de repostería' },
+  ],
+  'calculadora-crema-pastelera': [
+    { url: '/calculadora-merengue/', icon: '🍥', name: 'Merengue', description: 'Para coronar tartas y postres' },
+    { url: '/calculadora-ganache/', icon: '🍫', name: 'Ganache', description: 'Otro relleno y cobertura clásico' },
+    { url: '/calculadora-gelatina/', icon: '🍮', name: 'Gelatina', description: 'Cuajar y dar firmeza a cremas y postres' },
+    { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta la receta a las raciones que necesitas' },
+  ],
+  'calculadora-macarons': [
+    { url: '/calculadora-merengue/', icon: '🍥', name: 'Merengue', description: 'La base de aire del macaron' },
+    { url: '/calculadora-ganache/', icon: '🍫', name: 'Ganache', description: 'El relleno más habitual de los macarons' },
+    { url: '/calculadora-crema-pastelera/', icon: '🍮', name: 'Crema Pastelera', description: 'Otro relleno cremoso para tus macarons' },
+    { url: '/conversor-tazas-gramos/', icon: '🥄', name: 'Tazas a Gramos por Ingrediente', description: 'Pesa la almendra y el azúcar al gramo' },
+  ],
+  'calculadora-royal-icing': [
+    { url: '/calculadora-merengue/', icon: '🍥', name: 'Merengue', description: 'Otra preparación de claras y azúcar' },
+    { url: '/calculadora-puntos-azucar/', icon: '🍬', name: 'Puntos del Azúcar', description: 'Para caramelos y dulces decorados' },
+    { url: '/calculadora-gelatina/', icon: '🍮', name: 'Gelatina', description: 'Para fondant y trabajos de azúcar' },
+    { url: '/conversor-tazas-gramos/', icon: '🥄', name: 'Tazas a Gramos por Ingrediente', description: 'Pesa el azúcar glas con precisión' },
+  ],
 };
 
 /**

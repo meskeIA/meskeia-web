@@ -1178,6 +1178,11 @@ export const implementedAppsUrls = [
   "/conversor-horno-airfryer/",           // Horno → freidora de aire (−20°C, −20% tiempo) — Coquinum cocción
   "/calculadora-caducidad/",              // Tiempos conservación nevera/congelador/despensa — Coquinum conservación
   "/ratio-cafe/",                         // Ratio café:agua por método (V60/prensa/espresso…) — Coquinum bebidas
+  "/calculadora-almibar/",                // Almíbar: azúcar/agua por uso + °Brix — Coquinum panadería
+  "/calculadora-merengue/",               // Merengue francés/suizo/italiano (1:2) — Coquinum panadería
+  "/calculadora-crema-pastelera/",        // Crema pastelera/inglesa por litro de leche — Coquinum panadería
+  "/calculadora-macarons/",               // Macarons método francés (TPT) — Coquinum panadería
+  "/calculadora-royal-icing/",            // Glaseado real por consistencia — Coquinum panadería
   "/orientador-escritura-creativa/",      // Wizard 3 pasos: género → perspectiva → guía + kit de arranque + hoja de ruta
   "/visualizador-estilos-literarios/",   // Directorio interactivo de 10 movimientos literarios con filtros, autores y fragmentos
   "/visualizador-generos-novela/",       // 11 géneros narrativos: características, autores fundacionales y obras de entrada
