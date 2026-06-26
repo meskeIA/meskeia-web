@@ -29,6 +29,12 @@ const SECCIONES = [
     href: '/medidas-conversiones',
   },
   {
+    icon: '🌡️',
+    titulo: 'Cocción y temperatura',
+    desc: 'El punto y la temperatura interna segura de la carne y el pescado, y los tiempos de cocción en agua de los alimentos del día a día.',
+    href: '/coccion',
+  },
+  {
     icon: '🥩',
     titulo: 'Ingredientes y despensa',
     desc: 'Guías para elegir y usar aceite, carne, especias, quesos, setas, arroces, pastas, vinagres y más.',
@@ -85,7 +91,7 @@ export default function CoquinumHome() {
             cada receta.
           </p>
           <p className={styles.heroSecciones}>
-            Panadería, recetas, medidas, ingredientes, bebidas y cultura gastronómica
+            Panadería, recetas, medidas, cocción, ingredientes, bebidas y cultura gastronómica
           </p>
           <p className={styles.heroClaim}>
             Mide, convierte y cocina con precisión.

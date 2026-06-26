@@ -40,6 +40,18 @@ const APPS = [
     slug: 'calculadora-temperatura-masa',
   },
   {
+    icon: '⏳',
+    titulo: 'Fermentación por temperatura',
+    desc: 'Calcula cuánto tarda el levado a la temperatura real de tu masa: la levadura va más rápido en verano y más lento en invierno.',
+    slug: 'fermentacion-temperatura',
+  },
+  {
+    icon: '🍕',
+    titulo: 'Masa de pizza',
+    desc: 'Harina, agua, sal, levadura y aceite en gramos para tus bolas, según el estilo: napolitana, romana, americana o focaccia.',
+    slug: 'calculadora-masa-pizza',
+  },
+  {
     icon: '🍫',
     titulo: 'Ganache',
     desc: 'Ratios de chocolate y nata según el uso —cobertura, relleno, trufa o batida— y el tipo de chocolate.',

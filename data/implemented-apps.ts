@@ -1168,6 +1168,10 @@ export const implementedAppsUrls = [
   "/ajuste-recetas-altitud/",             // Ajuste de horneado/cocción por altitud (CDMX, Bogotá, Quito, La Paz) — cuña LATAM Coquinum
   "/conversor-temperatura-horno/",        // °C / °F / gas mark + ventilador — cuña LATAM Coquinum
   "/sustituciones-ingredientes/",         // Sustitutos (huevo, mantequilla, azúcar…) con filtro vegano/sin gluten/sin lactosa — Coquinum
+  "/calculadora-masa-pizza/",             // Masa de pizza por % del panadero (napolitana/romana/americana) — Coquinum panadería
+  "/fermentacion-temperatura/",           // Tiempo de fermentación según temperatura (Q10≈2) — Coquinum panadería
+  "/temperatura-coccion-carne/",          // Temperaturas internas + mínimo seguro USDA — Coquinum cocción
+  "/tiempos-coccion/",                    // Tiempos de cocción en agua (huevos/arroz/legumbres/verduras) — Coquinum cocción
   "/orientador-escritura-creativa/",      // Wizard 3 pasos: género → perspectiva → guía + kit de arranque + hoja de ruta
   "/visualizador-estilos-literarios/",   // Directorio interactivo de 10 movimientos literarios con filtros, autores y fragmentos
   "/visualizador-generos-novela/",       // 11 géneros narrativos: características, autores fundacionales y obras de entrada

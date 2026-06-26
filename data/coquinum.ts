@@ -22,6 +22,7 @@ export const COQUINUM_CATEGORIAS: Record<string, string> = {
   'panaderia-reposteria': 'Panadería y repostería',
   'cocina-recetas': 'Cocina y recetas',
   'medidas-conversiones': 'Medidas y conversiones',
+  'coccion': 'Cocción y temperatura',
   'ingredientes-despensa': 'Ingredientes y despensa',
   'bebidas': 'Bebidas',
   'cultura-gastronomica': 'Cultura gastronómica',
@@ -38,6 +39,8 @@ export const COQUINUM_APP_CATEGORIA: Record<string, string> = {
   'calculadora-ganache': 'panaderia-reposteria',
   'calculadora-gelatina': 'panaderia-reposteria',
   'calculadora-puntos-azucar': 'panaderia-reposteria',
+  'calculadora-masa-pizza': 'panaderia-reposteria',
+  'fermentacion-temperatura': 'panaderia-reposteria',
   'guia-tipos-pan': 'panaderia-reposteria',
   // Cocina y recetas (calculadoras generales + planificación)
   'calculadora-cocina': 'cocina-recetas',
@@ -49,6 +52,9 @@ export const COQUINUM_APP_CATEGORIA: Record<string, string> = {
   'ajuste-recetas-altitud': 'medidas-conversiones',
   'conversor-temperatura-horno': 'medidas-conversiones',
   'sustituciones-ingredientes': 'medidas-conversiones',
+  // Cocción y temperatura (seguridad y punto)
+  'temperatura-coccion-carne': 'coccion',
+  'tiempos-coccion': 'coccion',
   // Ingredientes y despensa (producto: cómo elegir y usar)
   'guia-aceite-oliva': 'ingredientes-despensa',
   'guia-cortes-carne': 'ingredientes-despensa',

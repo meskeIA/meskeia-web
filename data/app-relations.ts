@@ -5862,10 +5862,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Escala toda la receta de pan, incluida la masa madre' },
   ],
   'calculadora-temperatura-masa': [
+    { url: '/fermentacion-temperatura/', icon: '⏳', name: 'Fermentación por Temperatura', description: 'Cuánto tarda el levado a la temperatura de tu masa' },
     { url: '/calculadora-hidratacion-pan/', icon: '💧', name: 'Hidratación del Pan', description: 'La temperatura afecta cómo se integra el agua en la masa' },
     { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Porcentaje del Panadero', description: 'Sistema profesional para formular cualquier receta de pan' },
     { url: '/calculadora-masa-madre/', icon: '🦠', name: 'Sustitución Masa Madre', description: 'El preferment a temperatura correcta mejora la fermentación' },
-    { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'La DDT no cambia al escalar, pero otros ingredientes sí' },
   ],
   'calculadora-puntos-azucar': [
     { url: '/calculadora-ganache/', icon: '🍫', name: 'Ganache de Chocolate', description: 'Proporciones exactas según tipo de chocolate y textura' },
@@ -5914,6 +5914,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta las cantidades de una receta a más o menos raciones' },
     { url: '/conversor-temperatura-horno/', icon: '🌡️', name: 'Temperatura de Horno', description: 'Convierte entre °C, °F y gas mark, con ajuste de ventilador' },
     { url: '/selector-dieta/', icon: '🥗', name: 'Selector de Dieta', description: 'Compara patrones de alimentación según tus objetivos' },
+  ],
+  'calculadora-masa-pizza': [
+    { url: '/fermentacion-temperatura/', icon: '⏳', name: 'Fermentación por Temperatura', description: 'Cuánto tarda en levar tu masa según la temperatura' },
+    { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Porcentaje del Panadero', description: 'El sistema de proporciones que usa esta calculadora' },
+    { url: '/calculadora-hidratacion-pan/', icon: '💧', name: 'Hidratación del Pan', description: 'Relación agua/harina en porcentaje del panadero' },
+    { url: '/conversor-tazas-gramos/', icon: '🥄', name: 'Tazas a Gramos por Ingrediente', description: 'Pesa la harina con precisión para tu masa' },
+  ],
+  'fermentacion-temperatura': [
+    { url: '/calculadora-temperatura-masa/', icon: '🌡️', name: 'Temperatura de la Masa', description: 'La temperatura del agua para llegar a la masa que quieres' },
+    { url: '/calculadora-masa-pizza/', icon: '🍕', name: 'Masa de Pizza', description: 'Calcula los ingredientes de tu masa por % del panadero' },
+    { url: '/calculadora-masa-madre/', icon: '🫙', name: 'Masa Madre', description: 'Sustituye levadura comercial por masa madre' },
+    { url: '/ajuste-recetas-altitud/', icon: '⛰️', name: 'Ajuste de Recetas por Altitud', description: 'En altura la fermentación también cambia' },
+  ],
+  'temperatura-coccion-carne': [
+    { url: '/tiempos-coccion/', icon: '⏱️', name: 'Tiempos de Cocción', description: 'Cuánto cocer huevos, arroz, legumbres y verduras' },
+    { url: '/conversor-temperatura-horno/', icon: '🌡️', name: 'Temperatura de Horno', description: 'Convierte entre °C, °F y gas mark, con ajuste de ventilador' },
+    { url: '/guia-cortes-carne/', icon: '🥩', name: 'Cortes de Carne', description: 'Qué corte usar y cómo cocinarlo mejor' },
+    { url: '/calculadora-cocina/', icon: '🍳', name: 'Calculadora de Cocina', description: 'Conversor general de unidades culinarias' },
+  ],
+  'tiempos-coccion': [
+    { url: '/temperatura-coccion-carne/', icon: '🌡️', name: 'Temperatura Interna de Cocción', description: 'El punto seguro de carne y pescado' },
+    { url: '/ajuste-recetas-altitud/', icon: '⛰️', name: 'Ajuste de Recetas por Altitud', description: 'En altura los tiempos de cocción se alargan' },
+    { url: '/calculadora-cocina/', icon: '🍳', name: 'Calculadora de Cocina', description: 'Conversor general de unidades culinarias' },
+    { url: '/planificador-menu/', icon: '🗓️', name: 'Planificador de Menú', description: 'Organiza las comidas de la semana' },
   ],
 };
 
