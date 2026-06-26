@@ -35,6 +35,12 @@ const SECCIONES = [
     href: '/coccion',
   },
   {
+    icon: '💼',
+    titulo: 'Costes y escandallo',
+    desc: 'El ala profesional: food cost y precio de venta de tus platos, y cálculo de merma para conocer el coste real de la materia prima.',
+    href: '/costes-cocina',
+  },
+  {
     icon: '🥩',
     titulo: 'Ingredientes y despensa',
     desc: 'Guías para elegir y usar aceite, carne, especias, quesos, setas, arroces, pastas, vinagres y más.',
@@ -91,7 +97,7 @@ export default function CoquinumHome() {
             cada receta.
           </p>
           <p className={styles.heroSecciones}>
-            Panadería, recetas, medidas, cocción, ingredientes, bebidas y cultura gastronómica
+            Panadería, recetas, medidas, cocción, costes, ingredientes, bebidas y cultura gastronómica
           </p>
           <p className={styles.heroClaim}>
             Mide, convierte y cocina con precisión.

@@ -23,6 +23,7 @@ export const COQUINUM_CATEGORIAS: Record<string, string> = {
   'cocina-recetas': 'Cocina y recetas',
   'medidas-conversiones': 'Medidas y conversiones',
   'coccion': 'Cocción y temperatura',
+  'costes-cocina': 'Costes y escandallo',
   'ingredientes-despensa': 'Ingredientes y despensa',
   'bebidas': 'Bebidas',
   'cultura-gastronomica': 'Cultura gastronómica',
@@ -55,6 +56,9 @@ export const COQUINUM_APP_CATEGORIA: Record<string, string> = {
   // Cocción y temperatura (seguridad y punto)
   'temperatura-coccion-carne': 'coccion',
   'tiempos-coccion': 'coccion',
+  // Costes y escandallo (ala B2B / hostelería)
+  'escandallo-food-cost': 'costes-cocina',
+  'calculadora-merma': 'costes-cocina',
   // Ingredientes y despensa (producto: cómo elegir y usar)
   'guia-aceite-oliva': 'ingredientes-despensa',
   'guia-cortes-carne': 'ingredientes-despensa',

@@ -1172,6 +1172,8 @@ export const implementedAppsUrls = [
   "/fermentacion-temperatura/",           // Tiempo de fermentación según temperatura (Q10≈2) — Coquinum panadería
   "/temperatura-coccion-carne/",          // Temperaturas internas + mínimo seguro USDA — Coquinum cocción
   "/tiempos-coccion/",                    // Tiempos de cocción en agua (huevos/arroz/legumbres/verduras) — Coquinum cocción
+  "/escandallo-food-cost/",               // Escandallo + food cost + PVP (hostelería B2B) — Coquinum costes
+  "/calculadora-merma/",                  // Merma/rendimiento + factor corrección + coste kg útil — Coquinum costes
   "/orientador-escritura-creativa/",      // Wizard 3 pasos: género → perspectiva → guía + kit de arranque + hoja de ruta
   "/visualizador-estilos-literarios/",   // Directorio interactivo de 10 movimientos literarios con filtros, autores y fragmentos
   "/visualizador-generos-novela/",       // 11 géneros narrativos: características, autores fundacionales y obras de entrada

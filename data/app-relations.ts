@@ -5939,6 +5939,18 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-cocina/', icon: '🍳', name: 'Calculadora de Cocina', description: 'Conversor general de unidades culinarias' },
     { url: '/planificador-menu/', icon: '🗓️', name: 'Planificador de Menú', description: 'Organiza las comidas de la semana' },
   ],
+  'escandallo-food-cost': [
+    { url: '/calculadora-merma/', icon: '📉', name: 'Calculadora de Merma', description: 'El coste real de la materia prima tras limpiar y cocinar' },
+    { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta la receta a las raciones que necesitas escandallar' },
+    { url: '/conversor-tazas-gramos/', icon: '🥄', name: 'Tazas a Gramos por Ingrediente', description: 'Pasa cantidades a gramos para costear con precisión' },
+    { url: '/orientador-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Pon precio también a tu tiempo y tus servicios' },
+  ],
+  'calculadora-merma': [
+    { url: '/escandallo-food-cost/', icon: '💼', name: 'Escandallo y Food Cost', description: 'Lleva el coste real al precio de venta de tus platos' },
+    { url: '/temperatura-coccion-carne/', icon: '🌡️', name: 'Temperatura Interna de Cocción', description: 'La cocción también influye en la merma de la carne' },
+    { url: '/guia-cortes-carne/', icon: '🥩', name: 'Cortes de Carne', description: 'Cada corte rinde distinto según el despiece' },
+    { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta las cantidades de una receta a más o menos raciones' },
+  ],
 };
 
 /**
