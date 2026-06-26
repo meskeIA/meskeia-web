@@ -1164,6 +1164,7 @@ export const implementedAppsUrls = [
   "/calculadora-gelatina/",               // Conversión entre hojas (bronce/plata/oro/platino), polvo y agar-agar
   "/calculadora-ganache/",                // Proporciones chocolate:nata según tipo y textura (glaseado/trufa/firme)
   "/escalador-recetas/",                  // Escalado de recetas con ajuste no lineal para levadura, impulsores y especias
+  "/conversor-tazas-gramos/",             // Tazas/cucharadas ↔ gramos por ingrediente (densidad real) — cuña LATAM Coquinum
   "/orientador-escritura-creativa/",      // Wizard 3 pasos: género → perspectiva → guía + kit de arranque + hoja de ruta
   "/visualizador-estilos-literarios/",   // Directorio interactivo de 10 movimientos literarios con filtros, autores y fragmentos
   "/visualizador-generos-novela/",       // 11 géneros narrativos: características, autores fundacionales y obras de entrada

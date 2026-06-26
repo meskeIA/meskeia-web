@@ -23,6 +23,12 @@ const SECCIONES = [
     href: '/cocina-recetas',
   },
   {
+    icon: '🥄',
+    titulo: 'Medidas y conversiones',
+    desc: 'Pasa de tazas y cucharadas a gramos con el peso real de cada ingrediente. Precisión para recetas que vienen en tazas.',
+    href: '/medidas-conversiones',
+  },
+  {
     icon: '🥩',
     titulo: 'Ingredientes y despensa',
     desc: 'Guías para elegir y usar aceite, carne, especias, quesos, setas, arroces, pastas, vinagres y más.',
@@ -79,7 +85,7 @@ export default function CoquinumHome() {
             cada receta.
           </p>
           <p className={styles.heroSecciones}>
-            Panadería, recetas, ingredientes, bebidas y cultura gastronómica
+            Panadería, recetas, medidas, ingredientes, bebidas y cultura gastronómica
           </p>
           <p className={styles.heroClaim}>
             Mide, convierte y cocina con precisión.

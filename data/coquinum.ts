@@ -21,6 +21,7 @@
 export const COQUINUM_CATEGORIAS: Record<string, string> = {
   'panaderia-reposteria': 'Panadería y repostería',
   'cocina-recetas': 'Cocina y recetas',
+  'medidas-conversiones': 'Medidas y conversiones',
   'ingredientes-despensa': 'Ingredientes y despensa',
   'bebidas': 'Bebidas',
   'cultura-gastronomica': 'Cultura gastronómica',
@@ -43,6 +44,8 @@ export const COQUINUM_APP_CATEGORIA: Record<string, string> = {
   'escalador-recetas': 'cocina-recetas',
   'planificador-menu': 'cocina-recetas',
   'selector-dieta': 'cocina-recetas',
+  // Medidas y conversiones (la cuña LATAM: el foso técnico de precisión)
+  'conversor-tazas-gramos': 'medidas-conversiones',
   // Ingredientes y despensa (producto: cómo elegir y usar)
   'guia-aceite-oliva': 'ingredientes-despensa',
   'guia-cortes-carne': 'ingredientes-despensa',

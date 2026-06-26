@@ -2716,10 +2716,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // HOGAR Y COCINA
   'calculadora-cocina': [
+    { url: '/conversor-tazas-gramos/', icon: '🥄', name: 'Tazas a Gramos por Ingrediente', description: 'El peso real de cada taza: harina, azúcar, líquidos…' },
     { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta cantidades a cualquier número de raciones' },
     { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Panadería: % del Panadero', description: 'Fórmulas profesionales para pan y masas fermentadas' },
     { url: '/calculadora-ganache/', icon: '🍫', name: 'Repostería: Ganache', description: 'Proporciones de chocolate y nata según textura' },
-    { url: '/calculadora-puntos-azucar/', icon: '🍬', name: 'Repostería: Puntos del Azúcar', description: 'Fases de cocción del azúcar de almíbar a caramelo' },
   ],
   'lista-compras': cocinaApps.filter(a => a.url !== '/lista-compras/'),
   'guia-productos-limpieza': [
@@ -5886,10 +5886,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-cocina/', icon: '🍳', name: 'Calculadora de Cocina', description: 'Conversiones de unidades y más herramientas culinarias' },
   ],
   'escalador-recetas': [
+    { url: '/conversor-tazas-gramos/', icon: '🥄', name: 'Tazas a Gramos por Ingrediente', description: 'Pasa una receta en tazas a gramos con el peso real de cada uno' },
     { url: '/calculadora-cocina/', icon: '🍳', name: 'Calculadora de Cocina', description: 'Conversiones de unidades culinarias para cualquier receta' },
     { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Porcentaje del Panadero', description: 'Sistema de proporciones para escalar recetas de pan sin errores' },
     { url: '/calculadora-hidratacion-pan/', icon: '💧', name: 'Hidratación del Pan', description: 'Verifica la hidratación tras escalar tu masa' },
-    { url: '/calculadora-ganache/', icon: '🍫', name: 'Ganache de Chocolate', description: 'Proporciones exactas para cualquier cantidad de ganache' },
+  ],
+  'conversor-tazas-gramos': [
+    { url: '/calculadora-cocina/', icon: '🍳', name: 'Calculadora de Cocina', description: 'Conversor general de unidades culinarias y temperaturas' },
+    { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta las cantidades de una receta a más o menos raciones' },
+    { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Porcentaje del Panadero', description: 'Proporciones en gramos para tus masas de pan' },
+    { url: '/calculadora-hidratacion-pan/', icon: '💧', name: 'Hidratación del Pan', description: 'Relación agua/harina en porcentaje del panadero' },
   ],
 };
 
