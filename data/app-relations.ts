@@ -3049,10 +3049,42 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // SIMULADORES INFORMÁTICA FP/UNIVERSIDAD — Tanda 2 (2026-05-07)
   'simulador-grafos': [
+    { url: '/simulador-pathfinding/', icon: '🎮', name: 'Pathfinding A*', description: 'Búsqueda de caminos en videojuegos' },
     { url: '/simulador-arboles-bst-avl/', icon: '🌳', name: 'Árboles BST y AVL', description: 'Inserción, borrado y rotaciones' },
     { url: '/simulador-ordenacion/', icon: '📊', name: 'Algoritmos Ordenación', description: '7 algoritmos paso a paso' },
     { url: '/visualizador-estructuras-datos/', icon: '🗂️', name: 'Estructuras de Datos', description: 'Pilas, colas, árboles y hash' },
-    { url: '/simulador-recursion/', icon: '🔁', name: 'Recursión', description: 'Pila de llamadas y árbol recursivo' },
+  ],
+  'simulador-pathfinding': [
+    { url: '/simulador-grafos/', icon: '🕸️', name: 'Algoritmos de Grafos', description: 'BFS, DFS, Dijkstra, A* en grafos' },
+    { url: '/simulador-boids/', icon: '🐦', name: 'Boids (Bandada)', description: 'IA de movimiento emergente' },
+    { url: '/visualizador-ruido-perlin/', icon: '🏔️', name: 'Ruido Perlin', description: 'Generación procedimental' },
+    { url: '/visualizador-estructuras-datos/', icon: '🗂️', name: 'Estructuras de Datos', description: 'Pilas, colas, árboles y hash' },
+  ],
+
+  // PROGRAMACIÓN DE VIDEOJUEGOS / GRÁFICOS — Tanda Stemum (2026-06-27)
+  'visualizador-ruido-perlin': [
+    { url: '/simulador-pathfinding/', icon: '🎮', name: 'Pathfinding A*', description: 'Búsqueda de caminos en videojuegos' },
+    { url: '/simulador-boids/', icon: '🐦', name: 'Boids (Bandada)', description: 'Comportamiento emergente' },
+    { url: '/visualizador-geometria-fractales/', icon: '🌀', name: 'Fractales', description: 'Geometría que se repite a escalas' },
+    { url: '/visualizador-espacios-color/', icon: '🎨', name: 'Espacios de Color', description: 'RGB, HSV, HSL y HEX' },
+  ],
+  'visualizador-curvas-bezier': [
+    { url: '/visualizador-trigonometria/', icon: '📐', name: 'Trigonometría', description: 'Senos, cosenos y ángulos' },
+    { url: '/visualizador-geometria-analitica/', icon: '📊', name: 'Geometría Analítica', description: 'Puntos, rectas y curvas' },
+    { url: '/simulador-pathfinding/', icon: '🎮', name: 'Pathfinding A*', description: 'Trayectorias en videojuegos' },
+    { url: '/visualizador-funciones-mundo/', icon: '🌍', name: 'Funciones del Mundo Real', description: 'Curvas que modelan la realidad' },
+  ],
+  'visualizador-espacios-color': [
+    { url: '/visualizador-ruido-perlin/', icon: '🏔️', name: 'Ruido Perlin', description: 'Texturas y terrenos procedurales' },
+    { url: '/simulador-pathfinding/', icon: '🎮', name: 'Pathfinding A*', description: 'IA de videojuegos' },
+    { url: '/visualizador-espectro-electromagnetico/', icon: '🌈', name: 'Espectro Electromagnético', description: 'La luz visible y el color' },
+    { url: '/simulador-boids/', icon: '🐦', name: 'Boids (Bandada)', description: 'Sistemas emergentes' },
+  ],
+  'simulador-boids': [
+    { url: '/simulador-pathfinding/', icon: '🎮', name: 'Pathfinding A*', description: 'Búsqueda de caminos en videojuegos' },
+    { url: '/visualizador-ruido-perlin/', icon: '🏔️', name: 'Ruido Perlin', description: 'Generación procedimental' },
+    { url: '/simulador-grafos/', icon: '🕸️', name: 'Algoritmos de Grafos', description: 'BFS, DFS, Dijkstra, A*' },
+    { url: '/simulador-lotka-volterra/', icon: '🦊', name: 'Depredador-Presa', description: 'Otra dinámica colectiva' },
   ],
   'simulador-arboles-bst-avl': [
     { url: '/simulador-grafos/', icon: '🕸️', name: 'Algoritmos de Grafos', description: 'BFS, DFS, Dijkstra, A*' },

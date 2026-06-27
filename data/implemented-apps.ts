@@ -419,6 +419,11 @@ export const implementedAppsUrls = [
 
   // Tanda 2 simuladores Informática FP/Universidad (2026-05-07)
   "/simulador-grafos/",             // Editor visual de grafos + BFS/DFS/Dijkstra/A* con cola/pila/heap viva y 4 presets
+  "/simulador-pathfinding/",        // Búsqueda de caminos en rejilla (A*/Dijkstra/BFS) con muros, terreno costoso y diagonales — enfoque videojuegos
+  "/visualizador-ruido-perlin/",    // Ruido Perlin en canvas: octavas/persistencia/semilla + mapa de biomas — generación procedimental
+  "/visualizador-curvas-bezier/",   // Curvas de Bézier cuadrática/cúbica con puntos arrastrables y construcción De Casteljau animada
+  "/visualizador-espacios-color/",  // Selector RGB/HSV/HSL/HEX con rueda de tono + cuadrado saturación/valor y copiar formatos
+  "/simulador-boids/",              // Bandada de Reynolds (separación/alineación/cohesión) animada con rAF — comportamiento emergente
   "/simulador-arboles-bst-avl/",    // BST y AVL: insertar/eliminar/buscar con rotaciones LL/RR/LR/RL y 4 recorridos
   "/simulador-recursion/",          // 6 funciones recursivas (factorial, Fibonacci, Hanoi, MCD, suma dígitos, búsqueda binaria) con pila viva
 

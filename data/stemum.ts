@@ -47,6 +47,10 @@ export const STEMUM_APP_DISCIPLINA: Record<string, string> = {
   'visualizador-computacion-cuantica': 'computacion',
   'simulador-ordenacion': 'computacion',
   'playground-sql': 'computacion',
+  'simulador-pathfinding': 'computacion',
+  'visualizador-ruido-perlin': 'computacion',
+  'visualizador-espacios-color': 'computacion',
+  'simulador-boids': 'computacion',
   // Física
   'simulador-campo-electrico': 'fisica',
   'simulador-pendulo': 'fisica',
@@ -104,6 +108,7 @@ export const STEMUM_APP_DISCIPLINA: Record<string, string> = {
   'visualizador-estadistica-cotidiana': 'matematicas',
   'visualizador-estadistica-inferencial': 'matematicas',
   'simulador-trigonometria-circulo-unitario': 'matematicas',
+  'visualizador-curvas-bezier': 'matematicas',
   // Química
   'simulador-equilibrio-quimico': 'quimica',
   'simulador-titulacion': 'quimica',
