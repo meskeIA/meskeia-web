@@ -6089,6 +6089,36 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/temperatura-coccion-carne/', icon: '🌡️', name: 'Temperatura Interna de Cocción', description: 'El punto seguro de la carne' },
     { url: '/guia-cortes-carne/', icon: '🥩', name: 'Cortes de Carne', description: 'Qué corte usar para cada cosa' },
   ],
+  'guia-chiles': [
+    { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'El mundo de las especias y sus usos' },
+    { url: '/guia-hierbas-aromaticas/', icon: '🌿', name: 'Hierbas Aromáticas', description: 'Qué hierba va con cada plato' },
+    { url: '/visualizador-mapa-especias/', icon: '🌶️', name: 'El Mapa de las Especias', description: 'De dónde viene cada especia' },
+    { url: '/guia-tipos-sal/', icon: '🧂', name: 'Tipos de Sal', description: 'Otra pieza clave de la despensa' },
+  ],
+  'guia-harinas': [
+    { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Porcentaje del Panadero', description: 'Formula tu pan con la harina elegida' },
+    { url: '/calculadora-hidratacion-pan/', icon: '💧', name: 'Hidratación del Pan', description: 'Ajusta el agua a tu harina' },
+    { url: '/guia-tipos-pan/', icon: '🍞', name: 'Tipos de Pan', description: 'Panes del mundo y sus masas' },
+    { url: '/guia-tipos-pasta/', icon: '🍝', name: 'Tipos de Pasta', description: 'La sémola y la pasta' },
+  ],
+  'guia-tipos-sal': [
+    { url: '/calculadora-salmuera/', icon: '🧂', name: 'Salmuera (Brining)', description: 'Sal y agua para carnes jugosas' },
+    { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Sazonar más allá de la sal' },
+    { url: '/guia-chiles/', icon: '🌶️', name: 'Chiles y Pimientos', description: 'El picante de la despensa' },
+    { url: '/guia-vinagres-mundo/', icon: '🧪', name: 'Guía de Vinagres', description: 'Acidez para tus platos' },
+  ],
+  'guia-chocolate': [
+    { url: '/calculadora-ganache/', icon: '🍫', name: 'Ganache', description: 'Chocolate y nata en su proporción' },
+    { url: '/guia-cafe/', icon: '☕', name: 'Guía del Café', description: 'Otro placer amargo y aromático' },
+    { url: '/calculadora-puntos-azucar/', icon: '🍬', name: 'Puntos del Azúcar', description: 'Para trabajar dulces y caramelo' },
+    { url: '/guia-azucares/', icon: '🍬', name: 'Azúcares y Endulzantes', description: 'Con qué endulzar tus postres' },
+  ],
+  'guia-azucares': [
+    { url: '/calculadora-almibar/', icon: '🍯', name: 'Almíbar', description: 'Azúcar y agua para tus siropes' },
+    { url: '/calculadora-puntos-azucar/', icon: '🍬', name: 'Puntos del Azúcar', description: 'Las fases de cocción del azúcar' },
+    { url: '/guia-chocolate/', icon: '🍫', name: 'Chocolate y Cacao', description: 'El otro pilar de la repostería' },
+    { url: '/calculadora-mermelada/', icon: '🍓', name: 'Mermelada', description: 'El azúcar como conservante' },
+  ],
 };
 
 /**

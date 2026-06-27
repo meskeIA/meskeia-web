@@ -1197,6 +1197,11 @@ export const implementedAppsUrls = [
   "/maridaje/",                           // Maridaje comida↔vino/cerveza — Coquinum bebidas
   "/cantidades-evento/",                  // Comida/bebida por invitado (evento) — Coquinum cocina-recetas
   "/asado-personas/",                     // Carne por persona para asado/barbacoa — Coquinum cocina-recetas
+  "/guia-chiles/",                        // Chiles/pimientos por Scoville (LATAM) — Coquinum ingredientes
+  "/guia-harinas/",                       // Harinas por fuerza W y usos — Coquinum ingredientes
+  "/guia-tipos-sal/",                     // Tipos de sal y usos — Coquinum ingredientes
+  "/guia-chocolate/",                     // Chocolate/cacao por % y usos — Coquinum ingredientes
+  "/guia-azucares/",                      // Azúcares y endulzantes — Coquinum ingredientes
   "/orientador-escritura-creativa/",      // Wizard 3 pasos: género → perspectiva → guía + kit de arranque + hoja de ruta
   "/visualizador-estilos-literarios/",   // Directorio interactivo de 10 movimientos literarios con filtros, autores y fragmentos
   "/visualizador-generos-novela/",       // 11 géneros narrativos: características, autores fundacionales y obras de entrada

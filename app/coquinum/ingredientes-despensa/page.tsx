@@ -87,6 +87,36 @@ const APPS = [
     desc: 'Qué significan los números E de las etiquetas: conservantes, colorantes y espesantes explicados con claridad.',
     slug: 'aditivos-e-alimentarios',
   },
+  {
+    icon: '🌶️',
+    titulo: 'Chiles y pimientos',
+    desc: 'Los chiles del mundo ordenados por picor (escala Scoville), con su origen y usos. Filtro por nivel de picante.',
+    slug: 'guia-chiles',
+  },
+  {
+    icon: '🌾',
+    titulo: 'Harinas',
+    desc: 'Qué harina usar para cada cosa, con su fuerza (W), su proteína y sus mejores usos.',
+    slug: 'guia-harinas',
+  },
+  {
+    icon: '🧂',
+    titulo: 'Tipos de sal',
+    desc: 'De la sal fina a la flor de sal: texturas, usos y diferencias para acertar con cada una.',
+    slug: 'guia-tipos-sal',
+  },
+  {
+    icon: '🍫',
+    titulo: 'Chocolate y cacao',
+    desc: 'Qué significa el porcentaje y qué chocolate usar para cada cosa en repostería.',
+    slug: 'guia-chocolate',
+  },
+  {
+    icon: '🍬',
+    titulo: 'Azúcares y endulzantes',
+    desc: 'Tipos de endulzante, su poder dulce y sus usos. Filtro por tipo.',
+    slug: 'guia-azucares',
+  },
 ];
 
 export default function CoquinumIngredientesDespensa() {
