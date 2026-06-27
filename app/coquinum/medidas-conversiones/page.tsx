@@ -45,6 +45,18 @@ const APPS = [
     desc: 'Adapta los ingredientes de una receta al molde que tengas según el área de la base, y ajusta el tiempo de horno.',
     slug: 'conversor-moldes',
   },
+  {
+    icon: '💧',
+    titulo: 'Conversor de líquidos (ml ↔ g)',
+    desc: 'Convierte mililitros y gramos según el líquido: cada uno pesa distinto por su densidad (aceite, miel, leche…).',
+    slug: 'densidad-liquidos',
+  },
+  {
+    icon: '🤏',
+    titulo: 'Medidas «a ojo»',
+    desc: 'Cuánto es una pizca, un chorro, un vaso o un puñado: traduce las medidas imprecisas de las recetas.',
+    slug: 'medidas-a-ojo',
+  },
 ];
 
 export default function CoquinumMedidasConversiones() {

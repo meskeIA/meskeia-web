@@ -117,6 +117,24 @@ const APPS = [
     desc: 'Tipos de endulzante, su poder dulce y sus usos. Filtro por tipo.',
     slug: 'guia-azucares',
   },
+  {
+    icon: '🥔',
+    titulo: 'Tubérculos de Latinoamérica',
+    desc: 'Yuca, boniato, malanga, papas andinas y más: qué son y cómo cocinarlos, con avisos de seguridad.',
+    slug: 'guia-tuberculos-latam',
+  },
+  {
+    icon: '🌽',
+    titulo: 'Maíces y nixtamal',
+    desc: 'Tipos de maíz y derivados, de la tortilla a la arepa, y qué es la nixtamalización.',
+    slug: 'guia-maices',
+  },
+  {
+    icon: '📅',
+    titulo: 'Calendario de temporada',
+    desc: 'Qué frutas y verduras son de temporada cada mes del año, para comer mejor y más sostenible.',
+    slug: 'calendario-temporada',
+  },
 ];
 
 export default function CoquinumIngredientesDespensa() {

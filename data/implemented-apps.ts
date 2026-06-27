@@ -1202,6 +1202,11 @@ export const implementedAppsUrls = [
   "/guia-tipos-sal/",                     // Tipos de sal y usos — Coquinum ingredientes
   "/guia-chocolate/",                     // Chocolate/cacao por % y usos — Coquinum ingredientes
   "/guia-azucares/",                      // Azúcares y endulzantes — Coquinum ingredientes
+  "/guia-tuberculos-latam/",              // Tubérculos y raíces LATAM (yuca, papas andinas…) — Coquinum ingredientes
+  "/guia-maices/",                        // Maíces y nixtamal — Coquinum ingredientes
+  "/calendario-temporada/",               // Frutas/verduras de temporada por mes — Coquinum ingredientes
+  "/medidas-a-ojo/",                      // Pizca/chorro/vaso → cantidades aprox — Coquinum medidas
+  "/densidad-liquidos/",                  // ml↔g por densidad de líquido — Coquinum medidas
   "/orientador-escritura-creativa/",      // Wizard 3 pasos: género → perspectiva → guía + kit de arranque + hoja de ruta
   "/visualizador-estilos-literarios/",   // Directorio interactivo de 10 movimientos literarios con filtros, autores y fragmentos
   "/visualizador-generos-novela/",       // 11 géneros narrativos: características, autores fundacionales y obras de entrada

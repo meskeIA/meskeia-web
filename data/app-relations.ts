@@ -6119,6 +6119,36 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/guia-chocolate/', icon: '🍫', name: 'Chocolate y Cacao', description: 'El otro pilar de la repostería' },
     { url: '/calculadora-mermelada/', icon: '🍓', name: 'Mermelada', description: 'El azúcar como conservante' },
   ],
+  'guia-tuberculos-latam': [
+    { url: '/guia-maices/', icon: '🌽', name: 'Maíces y Nixtamal', description: 'El otro pilar de la despensa americana' },
+    { url: '/tiempos-coccion/', icon: '⏱️', name: 'Tiempos de Cocción', description: 'Cuánto cocer cada tubérculo' },
+    { url: '/guia-frutas-exoticas/', icon: '🍑', name: 'Frutas Exóticas', description: 'Más despensa tropical' },
+    { url: '/guia-tipos-arroz/', icon: '🍚', name: 'Tipos de Arroz', description: 'Otro básico que acompaña' },
+  ],
+  'guia-maices': [
+    { url: '/guia-tuberculos-latam/', icon: '🥔', name: 'Tubérculos de Latinoamérica', description: 'La despensa de raíces de América' },
+    { url: '/guia-harinas/', icon: '🌾', name: 'Guía de Harinas', description: 'Incluida la harina de maíz' },
+    { url: '/guia-tipos-pan/', icon: '🍞', name: 'Tipos de Pan', description: 'Panes del mundo, también de maíz' },
+    { url: '/guia-chiles/', icon: '🌶️', name: 'Chiles y Pimientos', description: 'Compañero del maíz en la cocina mexicana' },
+  ],
+  'calendario-temporada': [
+    { url: '/planificador-menu/', icon: '🗓️', name: 'Planificador de Menú', description: 'Planifica con productos de temporada' },
+    { url: '/guia-frutas-exoticas/', icon: '🍑', name: 'Frutas Exóticas', description: 'Más frutas para tu cocina' },
+    { url: '/guia-setas/', icon: '🍄', name: 'Guía de Setas', description: 'La temporada de las setas' },
+    { url: '/calculadora-mermelada/', icon: '🍓', name: 'Mermelada', description: 'Aprovecha la fruta de temporada' },
+  ],
+  'medidas-a-ojo': [
+    { url: '/conversor-tazas-gramos/', icon: '🥄', name: 'Tazas a Gramos por Ingrediente', description: 'Pasa las tazas a peso exacto' },
+    { url: '/densidad-liquidos/', icon: '💧', name: 'Conversor de Líquidos', description: 'ml a gramos según el líquido' },
+    { url: '/calculadora-cocina/', icon: '🍳', name: 'Calculadora de Cocina', description: 'Conversor general de unidades' },
+    { url: '/conversor-temperatura-horno/', icon: '🌡️', name: 'Temperatura de Horno', description: '°C, °F y gas mark' },
+  ],
+  'densidad-liquidos': [
+    { url: '/conversor-tazas-gramos/', icon: '🥄', name: 'Tazas a Gramos por Ingrediente', description: 'El peso real de cada ingrediente' },
+    { url: '/medidas-a-ojo/', icon: '🤏', name: 'Medidas a Ojo', description: 'Pizca, chorro, vaso… en cantidades' },
+    { url: '/calculadora-cocina/', icon: '🍳', name: 'Calculadora de Cocina', description: 'Conversor general de unidades' },
+    { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta las cantidades por raciones' },
+  ],
 };
 
 /**
