@@ -159,6 +159,30 @@ const APPS = [
     desc: 'Editor SQL que corre en el navegador con datasets de ejemplo, ejercicios guiados y resultados en vivo. Practica SELECT, JOIN y GROUP BY sin instalar nada.',
     slug: 'playground-sql',
   },
+  {
+    icon: '🎮',
+    titulo: 'Pathfinding A*',
+    desc: 'Simula cómo los enemigos de un videojuego encuentran el camino. Compara A*, Dijkstra y BFS paso a paso sobre una rejilla con muros, terreno costoso y diagonales.',
+    slug: 'simulador-pathfinding',
+  },
+  {
+    icon: '🏔️',
+    titulo: 'Ruido Perlin',
+    desc: 'Genera ruido de Perlin en tiempo real con octavas, persistencia y semilla, y pinta un mapa de biomas. La base de los terrenos y texturas procedimentales tipo Minecraft.',
+    slug: 'visualizador-ruido-perlin',
+  },
+  {
+    icon: '🎨',
+    titulo: 'Espacios de color',
+    desc: 'Selector interactivo que muestra el mismo color en RGB, HSV, HSL y HEX a la vez. Elige tono y saturación/valor o ajusta los canales RGB y copia cualquier formato.',
+    slug: 'visualizador-espacios-color',
+  },
+  {
+    icon: '🐦',
+    titulo: 'Boids (bandada)',
+    desc: 'Simulación animada de bandada: cada agente sigue tres reglas (separación, alineación y cohesión) y de ellas emerge el movimiento colectivo. Ajusta los pesos y obsérvalo.',
+    slug: 'simulador-boids',
+  },
 ];
 
 export default function StemumComputacion() {

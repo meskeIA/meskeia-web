@@ -165,6 +165,12 @@ const APPS = [
     desc: 'Gira el ángulo θ con slider o animación sobre un canvas que proyecta seno, coseno y tangente, con valores y cuadrante en tiempo real.',
     slug: 'simulador-trigonometria-circulo-unitario',
   },
+  {
+    icon: '✏️',
+    titulo: 'Curvas de Bézier',
+    desc: 'Arrastra los puntos de control de una curva cuadrática o cúbica y anima el parámetro t para ver la construcción de De Casteljau paso a paso.',
+    slug: 'visualizador-curvas-bezier',
+  },
 ];
 
 export default function StemumMatematicas() {
