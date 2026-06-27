@@ -20,12 +20,22 @@ export const metadata: Metadata = {
     url: URL_CANONICA,
     siteName: 'Stemum',
     locale: 'es_ES',
+    images: [
+      {
+        // Servida como estático directo (sin el host-rewrite del proxy).
+        url: 'https://meskeia.com/stemum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Stemum — Ciencia interactiva',
     description:
       'Visualizadores y simuladores interactivos de ciencia. En español, sin registro, sin coste.',
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
   other: {
     'application-name': 'Stemum',

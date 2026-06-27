@@ -20,12 +20,22 @@ export const metadata: Metadata = {
     url: URL_CANONICA,
     siteName: 'Delegum',
     locale: 'es_ES',
+    images: [
+      {
+        // Servida como estático directo (sin el host-rewrite del proxy).
+        url: 'https://meskeia.com/delegum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Delegum — el portal de fiscalidad y derecho de meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Delegum — Plataforma de fiscalidad, derecho laboral y finanzas',
     description:
       'Datos fiscales verificados, asistente de IA y calculadoras para España. Sin registro, sin coste.',
+    images: ['https://meskeia.com/delegum/og-image.png'],
   },
   other: {
     'application-name': 'Delegum',
