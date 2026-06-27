@@ -50,9 +50,12 @@ function handleCoquinum(req: NextRequest) {
     url.pathname = '/coquinum/robots-txt';
     return NextResponse.rewrite(url);
   }
-  // llms.txt: por ahora lo sirve meskeIA (Coquinum aún no tiene versión propia).
+  // llms.txt propio de Coquinum: mapa del portal para LLMs (Route Handler en
+  // /coquinum/llms-txt; un .txt en public/ sería el de meskeIA).
   if (pathname === '/llms.txt') {
-    return NextResponse.next();
+    const url = req.nextUrl.clone();
+    url.pathname = '/coquinum/llms-txt';
+    return NextResponse.rewrite(url);
   }
 
   // Slug limpio (primer segmento sin barras) para clasificar la ruta.
@@ -85,10 +88,16 @@ function handleDelegum(req: NextRequest) {
   if (pathname === '/delegum' || pathname.startsWith('/delegum/') || pathname.startsWith('/api')) {
     return NextResponse.next();
   }
-  // sitemap.xml, robots.txt y llms.txt: comportamiento previo intacto (los sirve
-  // meskeIA; delegum.com no tiene versiones propias).
-  if (pathname === '/sitemap.xml' || pathname === '/robots.txt' || pathname === '/llms.txt') {
+  // sitemap.xml y robots.txt: los sirve meskeIA (delegum.com no tiene propios).
+  if (pathname === '/sitemap.xml' || pathname === '/robots.txt') {
     return NextResponse.next();
+  }
+  // llms.txt propio de Delegum: mapa del portal para LLMs (Route Handler en
+  // /delegum/llms-txt).
+  if (pathname === '/llms.txt') {
+    const url = req.nextUrl.clone();
+    url.pathname = '/delegum/llms-txt';
+    return NextResponse.rewrite(url);
   }
 
   // Renombrado 2026-06-21: "Calculadoras" → "Soluciones". Redirect permanente de
@@ -165,9 +174,12 @@ function handleStemum(req: NextRequest) {
     url.pathname = '/stemum/robots-txt';
     return NextResponse.rewrite(url);
   }
-  // llms.txt: por ahora lo sirve meskeIA (Stemum aún no tiene versión propia).
+  // llms.txt propio de Stemum: mapa del portal para LLMs (Route Handler en
+  // /stemum/llms-txt).
   if (pathname === '/llms.txt') {
-    return NextResponse.next();
+    const url = req.nextUrl.clone();
+    url.pathname = '/stemum/llms-txt';
+    return NextResponse.rewrite(url);
   }
 
   // Slug limpio (primer segmento sin barras) para clasificar la ruta.
