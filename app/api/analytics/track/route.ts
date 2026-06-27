@@ -148,7 +148,61 @@ export async function POST(request: NextRequest) {
 
     // Detección compuesta de bot: por user agent O por IP de datacenter cloud
     const esBotIP = esIpDatacenter(rawIP);
-    const modo = (esBot || esBotIP || sinIdioma) ? 'bot' : (truncar(datos.modo, 20) || 'web');
+    let modo = (esBot || esBotIP || sinIdioma) ? 'bot' : (truncar(datos.modo, 20) || 'web');
+
+    // Control de frecuencia anti-granja headless.
+    //
+    // El Chrome headless moderno SÍ envía Accept-Language y usa IPs residenciales
+    // rotadas (no datacenter), por lo que las tres señales anteriores no lo atrapan.
+    // Su firma real es otra: una MISMA huella (app + user-agent + resolución) llegando
+    // desde MUCHÍSIMAS IPs distintas el mismo día. Ejemplo detectado en producción:
+    // 'simulador-circuitos-electricos' con 213 IPs distintas, todas con la huella
+    // idéntica «X11; Linux x86_64 · 1920x1080 · Chrome», repartidas por 18 países.
+    //
+    // Umbral calibrado con datos reales (2026-06-27): el tráfico humano legítimo no
+    // supera ~9 IPs por huella/app/día, mientras las granjas arrancan en 20+. Con
+    // UMBRAL_GRANJA=15 queda un margen cómodo por ambos lados. Solo se evalúa cuando
+    // la petición entraría como 'web' y la huella está completa (navegador+resolución),
+    // para no marcar registros con huella parcial ni reclasificar mcp/pwa/etc.
+    const UMBRAL_GRANJA = 15;
+    if (modo === 'web' && navegador && resolucion && rawIP) {
+      // Prefijo de fecha de hoy en el MISMO formato que `timestamp` (DD/MM/YYYY)
+      const fechaHoy = new Date().toLocaleDateString('es-ES', {
+        timeZone: 'Europe/Madrid',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      });
+      try {
+        // IPs distintas de hoy con esta huella exacta (cualquier modo: una vez que la
+        // huella cruza el umbral debe seguir contándose aunque ya esté marcada 'bot',
+        // o el contador se reiniciaría y la granja se colaría en oleadas).
+        const conteo = await client.execute({
+          sql: `SELECT COUNT(DISTINCT ip_address) AS ips
+                FROM uso_aplicaciones
+                WHERE aplicacion = ? AND navegador = ? AND resolucion = ?
+                  AND timestamp LIKE ?`,
+          args: [aplicacion, navegador, resolucion, fechaHoy + '%'],
+        });
+        const ipsDistintas = Number(conteo.rows[0]?.ips ?? 0);
+        if (ipsDistintas >= UMBRAL_GRANJA) {
+          modo = 'bot';
+          // Reclasificar las filas de hoy de ESTA misma huella que se colaron como
+          // 'web' antes de cruzar el umbral. Acotado a la huella exacta (app+UA+resol),
+          // no a la sesión: no arrastra registros de usuarios reales distintos.
+          await client.execute({
+            sql: `UPDATE uso_aplicaciones SET modo = 'bot'
+                  WHERE aplicacion = ? AND navegador = ? AND resolucion = ?
+                    AND modo = 'web' AND timestamp LIKE ?`,
+            args: [aplicacion, navegador, resolucion, fechaHoy + '%'],
+          });
+        }
+      } catch (errFrecuencia) {
+        // Si el control de frecuencia falla, no bloquear el registro: se inserta
+        // como 'web' y se reevaluará en el siguiente hit de la misma huella.
+        console.error('Control de frecuencia anti-granja falló:', errFrecuencia);
+      }
+    }
 
     // RGPD: Geolocalización solo país, vía headers de Vercel (sin servicios externos)
     // Siempre código ISO alpha-2 (x-vercel-ip-country) para consistencia en DB
