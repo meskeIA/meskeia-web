@@ -1,0 +1,82 @@
+.container { max-width: 1000px; margin: 0 auto; padding: 20px; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+.hero { background: var(--hero-bg); color: white; padding: 40px 30px; text-align: center; border-radius: 16px; margin-top: 80px; }
+.title { font-size: 2.1rem; font-weight: 600; margin-bottom: 10px; }
+.subtitle { font-size: 1.1rem; opacity: 0.9; max-width: 640px; margin: 0 auto; line-height: 1.5; }
+.mainContent { margin-bottom: 30px; }
+.panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 28px; margin-top: 24px; box-shadow: var(--shadow-sm); }
+.bloqueLabel { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 10px; }
+
+.tipoBtns { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+.tipoBtn { text-align: left; padding: 14px 16px; border: 2px solid var(--border); border-radius: 12px; background: var(--bg-primary); color: var(--text-primary); cursor: pointer; transition: all 0.18s; }
+.tipoBtn:hover { border-color: var(--secondary); }
+.tipoBtnActivo { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 10%, var(--bg-card)); }
+.tipoBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.tipoBtnNombre { display: block; font-size: 0.95rem; font-weight: 700; }
+.tipoBtnNota { display: block; font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.4; }
+.chipGrid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.chip { padding: 10px 16px; border: 2px solid var(--border); border-radius: 20px; background: var(--bg-primary); color: var(--text-primary); font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.18s; }
+.chip:hover { border-color: var(--secondary); }
+.chipActivo { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 10%, var(--bg-card)); color: var(--primary); }
+.chip:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+.campo { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.label { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
+.input, .select { width: 100%; padding: 13px 14px; font-size: 1.05rem; border: 2px solid var(--border); border-radius: 12px; background: var(--bg-primary); color: var(--text-primary); transition: border-color 0.2s; }
+.input:focus, .select:focus { outline: none; border-color: var(--primary); }
+.select { cursor: pointer; }
+.checkboxRow { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; font-size: 0.92rem; color: var(--text-secondary); cursor: pointer; }
+.checkboxRow input { width: 18px; height: 18px; accent-color: var(--primary); }
+
+.resultadoGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+.resCard { background: var(--bg-primary); border: 1px solid var(--border); border-radius: 12px; padding: 18px 12px; text-align: center; }
+.resCardDestacado { border: 2px solid var(--primary); background: color-mix(in srgb, var(--primary) 8%, var(--bg-card)); }
+.resValor { display: block; font-size: 1.5rem; font-weight: 700; color: var(--primary); line-height: 1.1; }
+.resLabel { display: block; font-size: 0.78rem; color: var(--text-secondary); margin-top: 6px; }
+.resultadoBig { margin-top: 4px; padding: 26px; background: color-mix(in srgb, var(--primary) 8%, var(--bg-card)); border: 2px solid color-mix(in srgb, var(--primary) 30%, transparent); border-radius: 16px; text-align: center; }
+.resBigValor { display: block; font-size: 2.4rem; font-weight: 700; color: var(--primary); line-height: 1.1; }
+.resBigTexto { display: block; font-size: 0.92rem; color: var(--text-secondary); margin-top: 6px; }
+.ingredientesBox { margin-top: 4px; }
+.ingRow { display: flex; justify-content: space-between; align-items: center; padding: 13px 4px; border-bottom: 1px solid var(--border); gap: 12px; }
+.ingRow:last-child { border-bottom: none; }
+.ingNombre { font-size: 0.95rem; color: var(--text-primary); font-weight: 500; }
+.ingCantidad { font-size: 1.05rem; font-weight: 700; color: var(--primary); white-space: nowrap; }
+
+.maridajeGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 4px; }
+.maridajeCard { background: var(--bg-primary); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+.maridajeIcon { font-size: 1.7rem; }
+.maridajeTipo { display: block; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--secondary); margin: 6px 0; }
+.maridajeTexto { font-size: 0.95rem; color: var(--text-primary); font-weight: 600; line-height: 1.4; }
+.maridajePorque { margin-top: 12px; padding: 14px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.55; }
+
+.placeholder { font-size: 0.95rem; color: var(--text-muted); text-align: center; padding: 16px; }
+.notaBox { margin-top: 14px; padding: 13px 15px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; }
+.fuenteNota { margin-top: 16px; font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; }
+
+.educationalContent { padding: 8px 0; }
+.conceptoSection { margin-bottom: 40px; }
+.conceptoSection h2 { font-size: 1.25rem; font-weight: 600; color: var(--primary); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid color-mix(in srgb, var(--primary) 15%, transparent); }
+.conceptoSection p { color: var(--text-secondary); line-height: 1.65; font-size: 0.95rem; }
+.comparativaTable { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-top: 12px; }
+.comparativaTable th, .comparativaTable td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+.comparativaTable th { background: var(--bg-primary); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; }
+.comparativaTable tbody tr:hover { background: var(--hover); }
+.tipsGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }
+.tipCard { background: var(--bg-primary); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+.tipCard h4 { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+.tipCard p { font-size: 0.83rem; color: var(--text-secondary); line-height: 1.55; }
+.tipIcon { display: block; font-size: 1.7rem; margin-bottom: 8px; }
+
+.warningBox { background: color-mix(in srgb, #f59e0b 8%, var(--bg-card)); border: 1px solid color-mix(in srgb, #f59e0b 35%, transparent); border-radius: 12px; padding: 20px 24px; margin-top: 8px; }
+.warningHeader { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.warningIcon { font-size: 1.4rem; }
+.warningHeader strong { font-size: 1rem; color: var(--text-primary); }
+.warningList { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.warningList li { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.55; padding-left: 14px; border-left: 3px solid color-mix(in srgb, #f59e0b 50%, transparent); }
+.warningList li strong { color: var(--text-primary); }
+
+[data-theme='dark'] .input, [data-theme='dark'] .select, [data-theme='dark'] .tipoBtn, [data-theme='dark'] .chip, [data-theme='dark'] .resCard, [data-theme='dark'] .notaBox, [data-theme='dark'] .tipCard, [data-theme='dark'] .maridajeCard { background: var(--bg-card); }
+[data-theme='dark'] .tipoBtnActivo, [data-theme='dark'] .chipActivo, [data-theme='dark'] .resCardDestacado, [data-theme='dark'] .resultadoBig { background: color-mix(in srgb, var(--primary) 12%, var(--bg-card)); }
+[data-theme='dark'] .warningBox { background: color-mix(in srgb, #f59e0b 10%, var(--bg-card)); }
+
+@media (max-width: 640px) { .hero { padding: 28px 20px; margin-top: 70px; } .title { font-size: 1.6rem; } .resBigValor { font-size: 2rem; } .maridajeGrid { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .input, .select, .tipoBtn, .chip { transition: none; } }

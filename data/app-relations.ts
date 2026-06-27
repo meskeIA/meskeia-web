@@ -6059,6 +6059,36 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-caducidad/', icon: '🧊', name: 'Cuánto Dura Cada Alimento', description: 'Conservación de los alimentos' },
     { url: '/guia-superalimentos/', icon: '🥗', name: 'Guía de Superalimentos', description: 'Los fermentados y la alimentación' },
   ],
+  'escalado-cocteles': [
+    { url: '/guia-cocteles/', icon: '🍸', name: 'Guía de Cócteles', description: 'Recetas y técnicas de coctelería clásica' },
+    { url: '/calculadora-almibar/', icon: '🍯', name: 'Almíbar', description: 'El sirope (gomme) para tus cócteles' },
+    { url: '/maridaje/', icon: '🍷', name: 'Maridaje de Comida', description: 'Qué beber con cada plato' },
+    { url: '/cantidades-evento/', icon: '🎉', name: 'Cantidades para un Evento', description: 'Cuánta bebida y comida por invitado' },
+  ],
+  'aguas-frescas': [
+    { url: '/ratio-cafe/', icon: '☕', name: 'Ratio de Café', description: 'Otra bebida con su proporción exacta' },
+    { url: '/guia-infusiones/', icon: '🫖', name: 'Guía de Infusiones', description: 'Hierbas e infusiones frías y calientes' },
+    { url: '/calculadora-almibar/', icon: '🍯', name: 'Almíbar', description: 'Para endulzar tus bebidas sin que quede azúcar al fondo' },
+    { url: '/cantidades-evento/', icon: '🎉', name: 'Cantidades para un Evento', description: 'Cuánta bebida preparar para un grupo' },
+  ],
+  'maridaje': [
+    { url: '/que-vino-elegir/', icon: '🍷', name: '¿Qué Vino Elegir?', description: 'Encuentra el vino para cada ocasión' },
+    { url: '/que-cerveza-elegir/', icon: '🍺', name: '¿Qué Cerveza Elegir?', description: 'El estilo de cerveza que buscas' },
+    { url: '/guia-quesos/', icon: '🧀', name: 'Guía de Quesos', description: 'Qué beber con cada tipo de queso' },
+    { url: '/escalado-cocteles/', icon: '🍸', name: 'Escalado de Cócteles', description: 'Prepara cócteles para acompañar' },
+  ],
+  'cantidades-evento': [
+    { url: '/asado-personas/', icon: '🍖', name: 'Carne para un Asado', description: 'Cuánta carne comprar para la barbacoa' },
+    { url: '/escalado-cocteles/', icon: '🍸', name: 'Escalado de Cócteles', description: 'Cócteles para tu evento' },
+    { url: '/planificador-menu/', icon: '🗓️', name: 'Planificador de Menú', description: 'Organiza el menú del evento' },
+    { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Multiplica las recetas a las raciones que necesitas' },
+  ],
+  'asado-personas': [
+    { url: '/cantidades-evento/', icon: '🎉', name: 'Cantidades para un Evento', description: 'Comida y bebida completas por invitado' },
+    { url: '/tiempos-asado/', icon: '🍗', name: 'Tiempos de Asado', description: 'Cuánto asar cada pieza según el peso' },
+    { url: '/temperatura-coccion-carne/', icon: '🌡️', name: 'Temperatura Interna de Cocción', description: 'El punto seguro de la carne' },
+    { url: '/guia-cortes-carne/', icon: '🥩', name: 'Cortes de Carne', description: 'Qué corte usar para cada cosa' },
+  ],
 };
 
 /**

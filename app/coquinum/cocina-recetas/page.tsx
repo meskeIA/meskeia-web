@@ -39,6 +39,18 @@ const APPS = [
     desc: 'Compara patrones de alimentación según tus objetivos y preferencias para orientarte sobre cuál encaja contigo.',
     slug: 'selector-dieta',
   },
+  {
+    icon: '🎉',
+    titulo: 'Cantidades para un evento',
+    desc: 'Cuánta comida y bebida preparar por invitado según el tipo de evento: aperitivo, comida sentada o barbacoa.',
+    slug: 'cantidades-evento',
+  },
+  {
+    icon: '🍖',
+    titulo: 'Carne para un asado',
+    desc: 'Cuánta carne comprar para tu asado o barbacoa según las personas y el apetito, con desglose por tipo.',
+    slug: 'asado-personas',
+  },
 ];
 
 export default function CoquinumCocinaRecetas() {

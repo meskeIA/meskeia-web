@@ -1192,6 +1192,11 @@ export const implementedAppsUrls = [
   "/calculadora-mermelada/",              // Mermelada: fruta/azúcar/limón + pectina — Coquinum conservación
   "/calculadora-encurtidos/",             // Encurtido rápido: vinagre/agua/sal/azúcar — Coquinum conservación
   "/fermentados-vegetales/",              // Fermentados: sal % (chucrut/kimchi/salmuera) — Coquinum conservación
+  "/escalado-cocteles/",                  // Escala cócteles + graduación de la mezcla — Coquinum bebidas
+  "/aguas-frescas/",                      // Aguas frescas/limonada/horchata por litros — Coquinum bebidas
+  "/maridaje/",                           // Maridaje comida↔vino/cerveza — Coquinum bebidas
+  "/cantidades-evento/",                  // Comida/bebida por invitado (evento) — Coquinum cocina-recetas
+  "/asado-personas/",                     // Carne por persona para asado/barbacoa — Coquinum cocina-recetas
   "/orientador-escritura-creativa/",      // Wizard 3 pasos: género → perspectiva → guía + kit de arranque + hoja de ruta
   "/visualizador-estilos-literarios/",   // Directorio interactivo de 10 movimientos literarios con filtros, autores y fragmentos
   "/visualizador-generos-novela/",       // 11 géneros narrativos: características, autores fundacionales y obras de entrada

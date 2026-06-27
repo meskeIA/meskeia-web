@@ -22,6 +22,24 @@ const APPS = [
     slug: 'ratio-cafe',
   },
   {
+    icon: '🍸',
+    titulo: 'Escalado de cócteles',
+    desc: 'Escala un cóctel a las copas que necesites y calcula la graduación de la mezcla. Consumo responsable.',
+    slug: 'escalado-cocteles',
+  },
+  {
+    icon: '🍋',
+    titulo: 'Aguas frescas y limonada',
+    desc: 'Las proporciones para limonada, naranjada, agua de jamaica, horchata o agua de fruta según los litros.',
+    slug: 'aguas-frescas',
+  },
+  {
+    icon: '🍷',
+    titulo: 'Maridaje de comida',
+    desc: 'Qué vino y qué cerveza van mejor con cada plato, y por qué combinan. Orientación, no regla.',
+    slug: 'maridaje',
+  },
+  {
     icon: '☕',
     titulo: 'Café',
     desc: 'Métodos de extracción, tuestes y orígenes para entender qué hay detrás de cada taza y preparar mejor café en casa.',
