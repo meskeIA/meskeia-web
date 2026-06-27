@@ -70,6 +70,11 @@ export const COQUINUM_APP_CATEGORIA: Record<string, string> = {
   'huevo-perfecto': 'coccion',
   // Conservación (seguridad alimentaria y duración)
   'calculadora-caducidad': 'conservacion',
+  'calculadora-congelacion': 'conservacion',
+  'descongelacion-segura': 'conservacion',
+  'calculadora-mermelada': 'conservacion',
+  'calculadora-encurtidos': 'conservacion',
+  'fermentados-vegetales': 'conservacion',
   // Costes y escandallo (ala B2B / hostelería)
   'escandallo-food-cost': 'costes-cocina',
   'calculadora-merma': 'costes-cocina',
@@ -164,6 +169,11 @@ export const COQUINUM_APP_INFO: Record<string, CoquinumAppInfo> = {
   'calculadora-salmuera': { nombre: 'Salmuera (brining)', icon: '🧂' },
   'huevo-perfecto': { nombre: 'El huevo perfecto', icon: '🥚' },
   'calculadora-caducidad': { nombre: 'Cuánto dura cada alimento', icon: '🧊' },
+  'calculadora-congelacion': { nombre: 'Qué se puede congelar', icon: '❄️' },
+  'descongelacion-segura': { nombre: 'Descongelación segura', icon: '🧊' },
+  'calculadora-mermelada': { nombre: 'Mermelada', icon: '🍓' },
+  'calculadora-encurtidos': { nombre: 'Encurtidos', icon: '🥒' },
+  'fermentados-vegetales': { nombre: 'Fermentados vegetales', icon: '🥬' },
   'escandallo-food-cost': { nombre: 'Escandallo y food cost', icon: '💼' },
   'calculadora-merma': { nombre: 'Calculadora de merma', icon: '📉' },
   'ratio-cafe': { nombre: 'Ratio de café', icon: '☕' },

@@ -1187,6 +1187,11 @@ export const implementedAppsUrls = [
   "/sous-vide/",                          // Sous-vide: temperaturas y tiempos por alimento — Coquinum cocción
   "/calculadora-salmuera/",               // Salmuera/brining: sal/agua por % + tiempos — Coquinum cocción
   "/huevo-perfecto/",                     // Tiempo del huevo por punto/tamaño/temperatura — Coquinum cocción
+  "/calculadora-congelacion/",            // Qué congelar/cuánto dura (tabla+filtro) — Coquinum conservación
+  "/descongelacion-segura/",              // Tiempo descongelación por peso/método seguro — Coquinum conservación
+  "/calculadora-mermelada/",              // Mermelada: fruta/azúcar/limón + pectina — Coquinum conservación
+  "/calculadora-encurtidos/",             // Encurtido rápido: vinagre/agua/sal/azúcar — Coquinum conservación
+  "/fermentados-vegetales/",              // Fermentados: sal % (chucrut/kimchi/salmuera) — Coquinum conservación
   "/orientador-escritura-creativa/",      // Wizard 3 pasos: género → perspectiva → guía + kit de arranque + hoja de ruta
   "/visualizador-estilos-literarios/",   // Directorio interactivo de 10 movimientos literarios con filtros, autores y fragmentos
   "/visualizador-generos-novela/",       // 11 géneros narrativos: características, autores fundacionales y obras de entrada

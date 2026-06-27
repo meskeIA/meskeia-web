@@ -6029,6 +6029,36 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/temperatura-coccion-carne/', icon: '🌡️', name: 'Temperatura Interna de Cocción', description: 'El punto seguro de carne y pescado' },
     { url: '/calculadora-cocina/', icon: '🍳', name: 'Calculadora de Cocina', description: 'Conversor general de unidades culinarias' },
   ],
+  'calculadora-congelacion': [
+    { url: '/calculadora-caducidad/', icon: '🧊', name: 'Cuánto Dura Cada Alimento', description: 'Tiempos en nevera, congelador y despensa' },
+    { url: '/descongelacion-segura/', icon: '🧊', name: 'Descongelación Segura', description: 'Cómo descongelar sin riesgos lo que congelaste' },
+    { url: '/planificador-menu/', icon: '🗓️', name: 'Planificador de Menú', description: 'Organiza la semana y cocina para congelar' },
+    { url: '/calculadora-merma/', icon: '📉', name: 'Calculadora de Merma', description: 'Aprovecha mejor lo que compras' },
+  ],
+  'descongelacion-segura': [
+    { url: '/calculadora-congelacion/', icon: '❄️', name: 'Qué se Puede Congelar', description: 'Qué congelar, qué no y cuánto dura' },
+    { url: '/calculadora-caducidad/', icon: '🧊', name: 'Cuánto Dura Cada Alimento', description: 'Tiempos de conservación por alimento' },
+    { url: '/temperatura-coccion-carne/', icon: '🌡️', name: 'Temperatura Interna de Cocción', description: 'Cocina la pieza descongelada de forma segura' },
+    { url: '/tiempos-asado/', icon: '🍗', name: 'Tiempos de Asado', description: 'Asa tu pieza ya descongelada' },
+  ],
+  'calculadora-mermelada': [
+    { url: '/calculadora-encurtidos/', icon: '🥒', name: 'Encurtidos', description: 'Otra forma de conservar la cosecha' },
+    { url: '/calculadora-puntos-azucar/', icon: '🍬', name: 'Puntos del Azúcar', description: 'El punto de cocción del azúcar' },
+    { url: '/calculadora-caducidad/', icon: '🧊', name: 'Cuánto Dura Cada Alimento', description: 'Cuánto aguanta cada conserva' },
+    { url: '/conversor-tazas-gramos/', icon: '🥄', name: 'Tazas a Gramos por Ingrediente', description: 'Pesa fruta y azúcar con precisión' },
+  ],
+  'calculadora-encurtidos': [
+    { url: '/fermentados-vegetales/', icon: '🥬', name: 'Fermentados Vegetales', description: 'Conservar verduras por fermentación' },
+    { url: '/calculadora-mermelada/', icon: '🍓', name: 'Mermelada', description: 'Conservar fruta en mermelada' },
+    { url: '/guia-vinagres-mundo/', icon: '🧪', name: 'Guía de Vinagres', description: 'Qué vinagre usar para tus encurtidos' },
+    { url: '/calculadora-salmuera/', icon: '🧂', name: 'Salmuera (Brining)', description: 'Otra técnica con sal y agua' },
+  ],
+  'fermentados-vegetales': [
+    { url: '/calculadora-encurtidos/', icon: '🥒', name: 'Encurtidos', description: 'Conservar verduras en vinagre' },
+    { url: '/calculadora-salmuera/', icon: '🧂', name: 'Salmuera (Brining)', description: 'Otra preparación con agua y sal' },
+    { url: '/calculadora-caducidad/', icon: '🧊', name: 'Cuánto Dura Cada Alimento', description: 'Conservación de los alimentos' },
+    { url: '/guia-superalimentos/', icon: '🥗', name: 'Guía de Superalimentos', description: 'Los fermentados y la alimentación' },
+  ],
 };
 
 /**
