@@ -171,6 +171,12 @@ const APPS = [
     desc: 'Arrastra los puntos de control de una curva cuadrática o cúbica y anima el parámetro t para ver la construcción de De Casteljau paso a paso.',
     slug: 'visualizador-curvas-bezier',
   },
+  {
+    icon: '📈',
+    titulo: 'Funciones de easing',
+    desc: 'Visualiza las curvas de interpolación (ease-in/out, back, elastic, bounce) y una caja que se mueve con cada una. La matemática de las animaciones.',
+    slug: 'visualizador-funciones-easing',
+  },
 ];
 
 export default function StemumMatematicas() {

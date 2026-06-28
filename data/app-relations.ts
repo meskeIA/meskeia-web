@@ -3083,8 +3083,40 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'simulador-boids': [
     { url: '/simulador-pathfinding/', icon: '🎮', name: 'Pathfinding A*', description: 'Búsqueda de caminos en videojuegos' },
     { url: '/visualizador-ruido-perlin/', icon: '🏔️', name: 'Ruido Perlin', description: 'Generación procedimental' },
-    { url: '/simulador-grafos/', icon: '🕸️', name: 'Algoritmos de Grafos', description: 'BFS, DFS, Dijkstra, A*' },
+    { url: '/simulador-automatas-celulares/', icon: '🦠', name: 'Autómatas Celulares', description: 'Juego de la Vida y emergencia' },
     { url: '/simulador-lotka-volterra/', icon: '🦊', name: 'Depredador-Presa', description: 'Otra dinámica colectiva' },
+  ],
+
+  // PROGRAMACIÓN DE VIDEOJUEGOS / GRÁFICOS — Tanda Stemum 2 (2026-06-27)
+  'visualizador-funciones-easing': [
+    { url: '/visualizador-curvas-bezier/', icon: '✏️', name: 'Curvas de Bézier', description: 'Las easing se definen con Bézier' },
+    { url: '/simulador-pathfinding/', icon: '🎮', name: 'Pathfinding A*', description: 'IA de videojuegos' },
+    { url: '/visualizador-trigonometria/', icon: '📐', name: 'Trigonometría', description: 'Senos y cosenos en la animación' },
+    { url: '/visualizador-funciones-mundo/', icon: '🌍', name: 'Funciones del Mundo Real', description: 'Curvas que modelan la realidad' },
+  ],
+  'simulador-automatas-celulares': [
+    { url: '/visualizador-ruido-perlin/', icon: '🏔️', name: 'Ruido Perlin', description: 'Otra vía de generación procedimental' },
+    { url: '/simulador-boids/', icon: '🐦', name: 'Boids (Bandada)', description: 'Comportamiento emergente' },
+    { url: '/simulador-pathfinding/', icon: '🎮', name: 'Pathfinding A*', description: 'IA de videojuegos' },
+    { url: '/simulador-grafos/', icon: '🕸️', name: 'Algoritmos de Grafos', description: 'BFS, DFS, Dijkstra, A*' },
+  ],
+  'visualizador-convolucion-kernels': [
+    { url: '/visualizador-espacios-color/', icon: '🎨', name: 'Espacios de Color', description: 'RGB, HSV, HSL y HEX' },
+    { url: '/visualizador-ia-redes-neuronales/', icon: '🧠', name: 'Redes Neuronales', description: 'La convolución en las CNN' },
+    { url: '/visualizador-ruido-perlin/', icon: '🏔️', name: 'Ruido Perlin', description: 'Texturas procedurales' },
+    { url: '/visualizador-iluminacion-phong/', icon: '💡', name: 'Iluminación (Phong)', description: 'Gráficos y render' },
+  ],
+  'visualizador-iluminacion-phong': [
+    { url: '/visualizador-espacios-color/', icon: '🎨', name: 'Espacios de Color', description: 'RGB, HSV, HSL y HEX' },
+    { url: '/visualizador-convolucion-kernels/', icon: '🖼️', name: 'Convolución y Kernels', description: 'Filtros de imagen' },
+    { url: '/visualizador-optica/', icon: '🔬', name: 'Óptica', description: 'Reflexión y refracción de la luz' },
+    { url: '/simulador-pathfinding/', icon: '🎮', name: 'Pathfinding A*', description: 'IA de videojuegos' },
+  ],
+  'visualizador-quadtree': [
+    { url: '/visualizador-estructuras-datos/', icon: '🗂️', name: 'Estructuras de Datos', description: 'Pilas, colas, árboles y hash' },
+    { url: '/simulador-pathfinding/', icon: '🎮', name: 'Pathfinding A*', description: 'Colisiones e IA en videojuegos' },
+    { url: '/simulador-boids/', icon: '🐦', name: 'Boids (Bandada)', description: 'Vecindad espacial de agentes' },
+    { url: '/simulador-arboles-bst-avl/', icon: '🌳', name: 'Árboles BST y AVL', description: 'Otras estructuras de árbol' },
   ],
   'simulador-arboles-bst-avl': [
     { url: '/simulador-grafos/', icon: '🕸️', name: 'Algoritmos de Grafos', description: 'BFS, DFS, Dijkstra, A*' },

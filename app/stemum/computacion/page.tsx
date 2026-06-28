@@ -183,6 +183,30 @@ const APPS = [
     desc: 'Simulación animada de bandada: cada agente sigue tres reglas (separación, alineación y cohesión) y de ellas emerge el movimiento colectivo. Ajusta los pesos y obsérvalo.',
     slug: 'simulador-boids',
   },
+  {
+    icon: '🦠',
+    titulo: 'Autómatas celulares',
+    desc: 'El Juego de la Vida de Conway y la generación de cuevas. Pinta células, carga patrones clásicos y observa cómo de reglas simples emerge un comportamiento complejo.',
+    slug: 'simulador-automatas-celulares',
+  },
+  {
+    icon: '🖼️',
+    titulo: 'Convolución y kernels',
+    desc: 'Aplica kernels 3×3 a una imagen (desenfoque, enfoque, bordes, Sobel) y compara antes y después. La operación que está detrás de los filtros y de las redes neuronales.',
+    slug: 'visualizador-convolucion-kernels',
+  },
+  {
+    icon: '💡',
+    titulo: 'Iluminación (Phong)',
+    desc: 'Ilumina una esfera en tiempo real con el modelo de Phong: ajusta las componentes ambiente, difusa y especular y mueve la luz. La base del render 3D y los shaders.',
+    slug: 'visualizador-iluminacion-phong',
+  },
+  {
+    icon: '🗂️',
+    titulo: 'Quadtree',
+    desc: 'Añade puntos y observa cómo el espacio se subdivide en cuadrantes. Lanza una consulta de rango y compara el coste frente a la fuerza bruta. Acelera las colisiones.',
+    slug: 'visualizador-quadtree',
+  },
 ];
 
 export default function StemumComputacion() {

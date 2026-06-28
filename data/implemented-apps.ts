@@ -424,6 +424,11 @@ export const implementedAppsUrls = [
   "/visualizador-curvas-bezier/",   // Curvas de Bézier cuadrática/cúbica con puntos arrastrables y construcción De Casteljau animada
   "/visualizador-espacios-color/",  // Selector RGB/HSV/HSL/HEX con rueda de tono + cuadrado saturación/valor y copiar formatos
   "/simulador-boids/",              // Bandada de Reynolds (separación/alineación/cohesión) animada con rAF — comportamiento emergente
+  "/visualizador-funciones-easing/",   // Curvas de easing + caja animada (lerp/ease/back/elastic/bounce) — interpolación de animación
+  "/simulador-automatas-celulares/",   // Juego de la Vida de Conway + generación de cuevas (cellular automata)
+  "/visualizador-convolucion-kernels/",// Kernels 3×3 sobre imagen generada (blur/sharpen/Sobel/bordes) — puente a CNN
+  "/visualizador-iluminacion-phong/",  // Esfera sombreada por píxel con modelo de Phong (ambiente/difuso/especular)
+  "/visualizador-quadtree/",           // Quadtree interactivo: subdivisión + consulta de rango vs fuerza bruta
   "/simulador-arboles-bst-avl/",    // BST y AVL: insertar/eliminar/buscar con rotaciones LL/RR/LR/RL y 4 recorridos
   "/simulador-recursion/",          // 6 funciones recursivas (factorial, Fibonacci, Hanoi, MCD, suma dígitos, búsqueda binaria) con pila viva
 
