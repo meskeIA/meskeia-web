@@ -28,6 +28,15 @@ export function proxy(req: NextRequest) {
   if (CRONICUM_HOSTS.has(host)) return handleCronicum(req);
   if (STEMUM_HOSTS.has(host)) return handleStemum(req);
   if (COQUINUM_HOSTS.has(host)) return handleCoquinum(req);
+
+  // meskeIA (dominio madre): llms.txt lo sirve un Route Handler en /llms-txt, no
+  // un .txt estático en public/. Así el total de apps, los counts por suite, la
+  // fecha y los contadores de los verticales se autogeneran en build y no caducan.
+  if (req.nextUrl.pathname === '/llms.txt') {
+    const url = req.nextUrl.clone();
+    url.pathname = '/llms-txt';
+    return NextResponse.rewrite(url);
+  }
   return NextResponse.next();
 }
 

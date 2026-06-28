@@ -1,6 +1,35 @@
-# meskeIA
+import { applicationsDatabase } from '@/data/applications';
+import { STEMUM_TOTAL_APPS } from '@/data/stemum';
+import { COQUINUM_TOTAL_APPS } from '@/data/coquinum';
+import { CRONICUM_TOTAL_CRONOLOGIAS } from '@/data/cronicum/puertas';
 
-> Biblioteca gratuita de 1013+ aplicaciones web en español: calculadoras, simuladores, visualizadores, quizzes y herramientas de productividad. Sin registro, sin publicidad, 100% privacidad (procesamiento local en navegador).
+// llms.txt de meskeIA (meskeia.com/llms.txt).
+//
+// Mapa curado del catálogo para LLMs (ChatGPT, Perplexity, Claude, Gemini…).
+// El proxy reescribe meskeia.com/llms.txt → /llms-txt (un .txt estático en
+// public/ no podía auto-refrescar las cifras y caducaba: ahora el total de apps,
+// los counts por suite, la fecha y los contadores de los verticales se calculan
+// en build desde los datos. Las cifras de MCP (185 tools) y GPTs (12) siguen
+// siendo manuales: no se derivan del catálogo de apps.
+export const dynamic = 'force-static';
+
+// Total de apps = mismo origen que ai-index.json (applicationsDatabase.length),
+// para que ambas piezas no se contradigan nunca.
+const TOTAL = applicationsDatabase.length;
+
+// Fecha de la última generación = fecha del build. Refresca en cada deploy.
+const FECHA = new Date().toISOString().slice(0, 10);
+
+// Counts por suite (clasificación no excluyente: una app puede estar en varias).
+const suiteCount: Record<string, number> = {};
+for (const app of applicationsDatabase) {
+  for (const s of app.suites ?? []) suiteCount[s] = (suiteCount[s] ?? 0) + 1;
+}
+const n = (id: string): number => suiteCount[id] ?? 0;
+
+const BODY = `# meskeIA
+
+> Biblioteca gratuita de ${TOTAL}+ aplicaciones web en español: calculadoras, simuladores, visualizadores, quizzes y herramientas de productividad. Sin registro, sin publicidad, 100% privacidad (procesamiento local en navegador).
 
 meskeIA es una plataforma hispanohablante (España + Latinoamérica) con herramientas organizadas en 13 suites temáticas. Las apps funcionan directamente en el navegador sin cuenta ni registro. Los datos no se envían a servidores externos. Formato español: números con punto de miles y coma decimal (1.234,56 €), fechas DD/MM/AAAA, moneda en euros.
 
@@ -9,7 +38,7 @@ Idioma: Español (España y Latinoamérica)
 Patrón de URLs: https://meskeia.com/{slug}/
 Índice completo máquina: https://meskeia.com/ai-index.json
 Sitemap: https://meskeia.com/sitemap.xml
-Última actualización del catálogo: 2026-06-22
+Última actualización del catálogo: ${FECHA}
 
 ## Preguntas frecuentes que meskeIA puede responder
 
@@ -72,7 +101,7 @@ meskeIA calcula, simula y visualiza directamente en el navegador sin enviar dato
 - **¿Cuánto tiempo de exposición máximo en astrofotografía sin trepidación estelar?** → [Regla 500/NPF astrofoto](https://meskeia.com/calculadora-regla-500-npf-astrofoto/): tiempo máximo según sensor, focal y montura.
 - **¿Cuánta profundidad de campo tengo con este objetivo y apertura?** → [Profundidad de campo](https://meskeia.com/calculadora-profundidad-campo/): DOF según cámara, focal, apertura y distancia.
 
-## Finanzas e Inversión (145 herramientas)
+## Finanzas e Inversión (${n('finanzas')} herramientas)
 
 Ahorro, inversión y planificación financiera personal.
 
@@ -88,7 +117,7 @@ Ahorro, inversión y planificación financiera personal.
 - [Alquiler vs compra](https://meskeia.com/alquiler-vs-compra/): Comparar coste total de alquilar frente a comprar vivienda a largo plazo
 - [Calculadora de propinas](https://meskeia.com/calculadora-propinas/): División de cuenta con propina entre comensales
 
-## Legal, Fiscal y Patrimonio (74 herramientas)
+## Legal, Fiscal y Patrimonio (${n('legal-fiscal')} herramientas)
 
 Impuestos, herencias, jubilación, pensiones y planificación patrimonial. Datos normativos España 2025.
 
@@ -106,7 +135,7 @@ Impuestos, herencias, jubilación, pensiones y planificación patrimonial. Datos
 - [Jubilación anticipada](https://meskeia.com/jubilacion-anticipada/): Coeficientes reductores por jubilación antes de la edad legal
 - [Planificador de pensiones](https://meskeia.com/planificador-pensiones/): Plan de ahorro complementario para cubrir brecha de jubilación
 
-## Freelance y Autónomo (83 herramientas)
+## Freelance y Autónomo (${n('freelance')} herramientas)
 
 Herramientas para profesionales independientes en España.
 
@@ -118,7 +147,7 @@ Herramientas para profesionales independientes en España.
 - [Horas facturables](https://meskeia.com/horas-facturables/): Calcular horas reales productivas descontando vacaciones y baja
 - [Checklist Verifactu](https://meskeia.com/checklist-verifactu/): Verificar cumplimiento del sistema de facturación electrónica
 
-## Inmobiliaria y Hogar (60 herramientas)
+## Inmobiliaria y Hogar (${n('inmobiliaria')} herramientas)
 
 Hipotecas, alquiler, compraventa y gestión del hogar.
 
@@ -131,7 +160,7 @@ Hipotecas, alquiler, compraventa y gestión del hogar.
 - [Calculadora de mudanza](https://meskeia.com/calculadora-mudanza/): Estimación de costes de mudanza según distancia y volumen
 - [Coste de vida por ciudades](https://meskeia.com/coste-vida-ciudades/): Comparar coste de vida entre ciudades españolas
 
-## Salud y Bienestar (183 herramientas)
+## Salud y Bienestar (${n('salud')} herramientas)
 
 Salud personal, nutrición, ejercicio y cuidado de mascotas.
 
@@ -143,7 +172,7 @@ Salud personal, nutrición, ejercicio y cuidado de mascotas.
 - [Coste de fumar](https://meskeia.com/coste-fumar/): Impacto económico y sanitario del tabaquismo a largo plazo
 - [Hidratación diaria](https://meskeia.com/hidratacion-diaria/): Cantidad de agua recomendada según peso, actividad y clima
 
-## Estudiantes (414 herramientas)
+## Estudiantes (${n('estudiantes')} herramientas)
 
 Matemáticas, física, química, biología, informática y herramientas de estudio.
 
@@ -161,18 +190,18 @@ Matemáticas, física, química, biología, informática y herramientas de estud
 - [Calculadora de notas](https://meskeia.com/calculadora-notas/): Media ponderada de calificaciones con equivalencias entre sistemas de notas (español, europeo, internacional)
 - Simuladores de Bachillerato: física (cinemática, dinámica, óptica), química, biología, informática, estadística y cálculo
 
-## Cultura General (508 herramientas)
+## Cultura General (${n('cultura')} herramientas)
 
 Conocimiento, cronologías históricas, arte, música, geografía y divulgación.
 
-- [Visualizador historia](https://meskeia.com/visualizador-historia/): 142 cronologías históricas (Grecia, Roma, Egipto, Imperio Otomano, Mongol, Renacimiento, Revolución Industrial y más)
+- [Visualizador historia](https://meskeia.com/visualizador-historia/): ${CRONICUM_TOTAL_CRONOLOGIAS} cronologías históricas (Grecia, Roma, Egipto, Imperio Otomano, Mongol, Renacimiento, Revolución Industrial y más)
 - [Cronologías de filosofía](https://meskeia.com/visualizador-filosofia/): Corrientes filosóficas desde la Antigüedad hasta hoy
 - [Movimientos musicales](https://meskeia.com/visualizador-musica-movimientos/): Historia de los movimientos musicales con contexto
 - [Quiz de banderas](https://meskeia.com/quiz-banderas/): Identificar banderas del mundo
 - [Quiz de capitales](https://meskeia.com/quiz-capitales/): Adivinar capitales del mundo
 - Visualizadores de ciencia, cosmos, geología, sociedad y economía
 
-## Diseño y Contenido (65 herramientas)
+## Diseño y Contenido (${n('diseno')} herramientas)
 
 Diseñadores, desarrolladores web y creadores de contenido.
 
@@ -185,7 +214,7 @@ Diseñadores, desarrolladores web y creadores de contenido.
 - [Analizador de legibilidad](https://meskeia.com/analizador-legibilidad/): Índice Flesch-Szigriszt adaptado al español
 - [Calculadora de engagement](https://meskeia.com/calculadora-engagement/): Tasa de engagement para Instagram, TikTok y YouTube
 
-## Herramientas Técnicas (172 herramientas)
+## Herramientas Técnicas (${n('tecnicas')} herramientas)
 
 Herramientas especializadas para fotografía, vídeo, programación y conversión.
 
@@ -197,7 +226,7 @@ Herramientas especializadas para fotografía, vídeo, programación y conversió
 - [Generador de hashes](https://meskeia.com/generador-hashes/): MD5, SHA-1, SHA-256, SHA-512
 - [Generador de QR](https://meskeia.com/generador-qr/): Códigos QR para URLs, texto, WiFi y vCard
 
-## Productividad (120 herramientas)
+## Productividad (${n('productividad')} herramientas)
 
 Organización personal y herramientas del día a día.
 
@@ -208,7 +237,7 @@ Organización personal y herramientas del día a día.
 - [Calculadora de días](https://meskeia.com/calculadora-dias/): Días entre dos fechas, días hábiles y festivos
 - Apps de reflexión personal, gestión de objetivos y toma de decisiones
 
-## Accesibilidad e Inclusión (18 herramientas)
+## Accesibilidad e Inclusión (${n('accesibilidad')} herramientas)
 
 Herramientas adaptadas para personas con TDAH, dislexia, autismo o discapacidad visual.
 
@@ -218,7 +247,7 @@ Herramientas adaptadas para personas con TDAH, dislexia, autismo o discapacidad 
 - [Calculadora accesible](https://meskeia.com/calculadora-accesible/): Calculadora con alto contraste y navegación completa por teclado
 - [Guía de accesibilidad](https://meskeia.com/guia/accesibilidad/): Journey de 6 etapas con test de 3 perfiles de necesidades
 
-## Juegos y Ocio (40 herramientas)
+## Juegos y Ocio (${n('juegos')} herramientas)
 
 Diversión, entretenimiento y juegos de conocimiento.
 
@@ -228,7 +257,7 @@ Diversión, entretenimiento y juegos de conocimiento.
 - [Quiz de banderas](https://meskeia.com/quiz-banderas/): Adivinar banderas de todos los países del mundo
 - [Quiz de capitales](https://meskeia.com/quiz-capitales/): Adivinar capitales del mundo por continente
 
-## Viajes y Turismo (16 herramientas)
+## Viajes y Turismo (${n('viajes')} herramientas)
 
 Planificación de viajes, divisas y presupuestos.
 
@@ -259,6 +288,15 @@ Guías de referencia sobre gastronomía, naturaleza y materiales:
 
 Especias, infusiones, café, té, quesos, aceite de oliva, cócteles, setas, superalimentos, cortes de carne, varietales de vino, estilos de cerveza, tipos de pan, tipos de pasta, tipos de arroz, vinagres del mundo, plantas de interior, frutas exóticas, frutos secos, hierbas aromáticas, tejidos y fibras, maderas, aves comunes, insectos de jardín, razas de perros, razas de gatos, productos de limpieza.
 
+## Portales verticales de meskeIA
+
+meskeIA concentra sus clústers temáticos en portales de marca propia, cada uno con dominio e identidad propios pero la misma garantía: gratis, sin registro, en español y con procesamiento local. Cada portal publica su propio llms.txt con el mapa completo de sus herramientas:
+
+- **Delegum** — Fiscalidad, derecho laboral y finanzas de España: datos normativos verificados y citables, calculadoras y asistente de IA (MCP). https://delegum.com — llms.txt: https://delegum.com/llms.txt
+- **Stemum** — Aprender STEM visualizando: ${STEMUM_TOTAL_APPS} visualizadores y simuladores interactivos de física, matemáticas, química, biología, computación y ciencias de la Tierra y el espacio. https://stemum.com — llms.txt: https://stemum.com/llms.txt
+- **Cronicum** — Historia interactiva: ${CRONICUM_TOTAL_CRONOLOGIAS} cronologías navegables por civilización y por tema, con grandes acontecimientos. https://cronicum.com — llms.txt: https://cronicum.com/llms.txt
+- **Coquinum** — Cocina y gastronomía: ${COQUINUM_TOTAL_APPS} calculadoras y guías de cocina, repostería, conservación, medidas, cocción y costes. https://coquinum.com — llms.txt: https://coquinum.com/llms.txt
+
 ## API para asistentes IA
 
 meskeIA ofrece integración nativa con los principales asistentes de IA:
@@ -285,7 +323,7 @@ Disponibles en la Store de ChatGPT (chatgpt.com/gpts), buscar "meskeIA":
 - [meskeIA — Cocina Técnica](https://chatgpt.com/g/g-6a0dce6f24d8819199d6617ab066d1b6-meskeia-cocina-tecnica): porcentaje panadero, hidratación, masa madre, DDT, ganache, escalar recetas
 
 ### Índice máquina
-- JSON completo: https://meskeia.com/ai-index.json (catálogo con slugs, descripciones y suites de las 1013 apps)
+- JSON completo: https://meskeia.com/ai-index.json (catálogo con slugs, descripciones y suites de las ${TOTAL} apps)
 
 ## Delegum — datos fiscales citables (delegum.com)
 
@@ -319,3 +357,10 @@ Asistente IA (MCP): https://delegum.com/api/mcp/ (Claude, ChatGPT, Mistral). Má
 - [Términos de uso](https://meskeia.com/terminos/)
 - [Acerca de meskeIA](https://meskeia.com/acerca/)
 - Contacto: https://meskeia.com/contacto/
+`;
+
+export function GET() {
+  return new Response(BODY, {
+    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+  });
+}

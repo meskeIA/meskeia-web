@@ -10,8 +10,8 @@ export const dynamic = 'force-static';
  * Incluye referencias al sitemap y API de herramientas para indexación.
  *
  * User-Agents de LLMs soportados:
- * - GPTBot (OpenAI/ChatGPT)
- * - Claude-Web (Anthropic/Claude)
+ * - GPTBot + OAI-SearchBot (OpenAI: entrenamiento + búsqueda de ChatGPT)
+ * - ClaudeBot + anthropic-ai + Claude-User (Anthropic/Claude)
  * - PerplexityBot (Perplexity AI)
  * - Google-Extended (Gemini/Bard)
  * - Amazonbot (Amazon/Alexa)
@@ -33,14 +33,18 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
         disallow: ['/api/', '/*?from=', '/*?ref='],
       },
-      // GPTBot (ChatGPT/OpenAI) - Permitir acceso completo + índice de herramientas
+      // OpenAI - GPTBot (entrenamiento) + OAI-SearchBot (búsqueda de ChatGPT, el que
+      // cita y devuelve clics). Acceso completo + índice de herramientas.
       {
-        userAgent: 'GPTBot',
+        userAgent: ['GPTBot', 'OAI-SearchBot'],
         allow: ['/', '/api/', '/ai-index.json'],
       },
-      // Claude-Web (Anthropic) - Permitir acceso completo + índice de herramientas
+      // Anthropic - ClaudeBot (rastreo), anthropic-ai (legacy) y Claude-User (Claude
+      // accediendo a la web por encargo del usuario). Acceso completo + índice.
+      // Antes solo figuraba 'Claude-Web', nombre legacy que ya no coincide con el
+      // crawler real → caía bajo la regla '*' y se quedaba sin /api/.
       {
-        userAgent: 'Claude-Web',
+        userAgent: ['ClaudeBot', 'anthropic-ai', 'Claude-User'],
         allow: ['/', '/api/', '/ai-index.json'],
       },
       // PerplexityBot - Permitir acceso completo + índice de herramientas
