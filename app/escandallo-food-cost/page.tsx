@@ -77,7 +77,7 @@ export default function EscandalloFoodCostPage() {
 
       <LegalNotice />
 
-      <DisclaimerCard variant="financial" severity="medium" />
+      <DisclaimerCard variant="financial" severity="high" collapsible={false} />
 
       <main className={styles.mainContent}>
         {/* Ingredientes */}
