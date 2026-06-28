@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { POSTS, getPost } from '../posts';
+import { POSTS, getPost, estaPublicado } from '../posts';
 import { getFicha } from '../../datos-fiscales/fichas';
 import { formatDate } from '@/lib';
 import styles from '../Blog.module.css';
@@ -12,6 +12,13 @@ const BASE = 'https://delegum.com/blog/';
 // dynamicParams=false elimina la lambda de reserva (necesario para `vercel build` prebuilt).
 export const dynamicParams = false;
 
+// ISR: regeneración periódica. Junto con dynamicParams=false, mantiene el catálogo
+// cerrado pero permite que un post con fecha futura (ya prerenderizado como 404)
+// pase a 200 al llegar su día, sin necesidad de un rebuild manual.
+export const revalidate = 3600;
+
+// Se prerenderizan TODOS los slugs (incluidos los de fecha futura) para que la
+// página exista y ISR pueda activarla cuando llegue su fecha de publicación.
 export function generateStaticParams() {
   return POSTS.map((p) => ({ slug: p.slug }));
 }
@@ -23,7 +30,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const post = getPost(slug);
-  if (!post) return {};
+  // Aún no publicado (fecha futura) → sin metadata, coherente con el 404 de la página.
+  if (!post || !estaPublicado(post)) return {};
   return {
     title: `${post.titulo} | Blog de Delegum`,
     description: post.resumen,
@@ -43,7 +51,8 @@ export async function generateMetadata({
 export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const post = getPost(slug);
-  if (!post) notFound();
+  // 404 si no existe o si aún no ha llegado su fecha de publicación (post programado).
+  if (!post || !estaPublicado(post)) notFound();
 
   let fecha = post.fecha;
   try {

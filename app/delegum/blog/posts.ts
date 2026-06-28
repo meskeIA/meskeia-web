@@ -37,6 +37,24 @@ export interface Post {
 
 export const POSTS: Post[] = [
   {
+    slug: 'euro-digital-paso-clave-parlamento-europeo',
+    titulo: 'El euro digital da un paso clave en el Parlamento Europeo',
+    fecha: '2026-07-01',
+    resumen:
+      'La comisión de Asuntos Económicos del Parlamento Europeo ha aprobado el texto legislativo del euro digital. Qué es, qué cambiaría para el ciudadano y por qué todavía no está aprobado del todo.',
+    cuerpo: [
+      'La Comisión de Asuntos Económicos y Monetarios del Parlamento Europeo aprobó el 23 de junio de 2026 el texto legislativo del euro digital. Es uno de los pasos más relevantes del proyecto: abre las negociaciones finales entre el Parlamento, el Consejo de la UE y la Comisión Europea. Conviene subrayarlo desde el principio: todavía no está aprobado. Si todo avanza según lo previsto, el marco legal podría quedar cerrado antes de finales de 2026.',
+      'El euro digital sería una versión electrónica del efectivo emitida por el Banco Central Europeo (BCE). En la práctica, dispondrías de un monedero de euros digitales ofrecido por tu banco u otro intermediario autorizado para pagar en comercios, comprar por internet o enviar dinero a otra persona al instante. No sustituye a nada: seguirías usando tus cuentas, tarjetas y efectivo como hasta ahora.',
+      'Las instituciones europeas han fijado varios compromisos que afectan directamente al ciudadano. El efectivo seguirá existiendo y siendo de curso legal; el euro digital será un complemento, no un sustituto; los servicios básicos serán gratuitos; y no pagará intereses, para que no se convierta en un instrumento de ahorro que compita con los depósitos bancarios. También habrá límites al saldo que cada persona —y, con más restricciones, cada empresa— podrá mantener, revisables con el tiempo, precisamente para evitar fugas masivas de dinero desde los bancos. Una de las funciones más destacadas serán los pagos sin conexión a internet, entre dispositivos, de forma parecida al efectivo.',
+      'Más allá de modernizar los pagos, uno de los argumentos centrales del BCE es la autonomía estratégica: reducir la dependencia europea de redes de pago y plataformas tecnológicas extranjeras, disponiendo de una infraestructura de pago propia y pública.',
+      'El calendario orientativo, si la legislación se aprueba este año, contempla cerrar el marco legal en 2026, un programa piloto con usuarios y entidades en 2027 y un posible lanzamiento al público en 2029, siempre que cada fase resulte satisfactoria. Hasta entonces, el proyecto sigue su curso pero aún depende de las negociaciones finales y de la aprobación formal de la legislación europea. Para situarlo en perspectiva, el visualizador interactivo de abajo recorre la evolución del dinero —del trueque a las criptomonedas y el euro digital— a lo largo de la historia.',
+    ],
+    fuente: 'Banco Central Europeo (BCE) — Euro digital',
+    fuenteUrl: 'https://www.ecb.europa.eu/euro/digital_euro/html/index.en.html',
+    visualizadorUrl: 'https://meskeia.com/visualizador-historia-dinero/',
+    visualizadorTitulo: 'La Evolución del Dinero',
+  },
+  {
     slug: 'bce-sube-tipos-interes-junio-2026',
     titulo: 'El BCE sube los tipos de interés un 0,25%',
     fecha: '2026-06-21',
@@ -70,12 +88,41 @@ export const POSTS: Post[] = [
   },
 ];
 
-/** Posts ordenados del más reciente al más antiguo. */
-export function getPostsOrdenados(): Post[] {
-  return [...POSTS].sort((a, b) => b.fecha.localeCompare(a.fecha));
+/**
+ * Fecha de hoy en la zona horaria de España (Europe/Madrid), en ISO YYYY-MM-DD.
+ * El locale 'en-CA' produce directamente ese formato.
+ */
+function fechaHoyISO(): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Madrid',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
 }
 
-/** Devuelve un post por su slug, o undefined si no existe. */
+/**
+ * Un post está publicado si su fecha es hoy o anterior. Permite dejar entradas
+ * redactadas con fecha futura: no aparecerán hasta que llegue su día (programación
+ * editorial). La comparación es de strings ISO, que ordenan cronológicamente.
+ */
+export function estaPublicado(post: Post, hoy: string = fechaHoyISO()): boolean {
+  return post.fecha <= hoy;
+}
+
+/**
+ * Posts publicados (fecha <= hoy), ordenados del más reciente al más antiguo.
+ * IMPORTANTE: llamar siempre dentro del render del componente, no a nivel de
+ * módulo, para que con ISR la fecha se recalcule en cada regeneración.
+ */
+export function getPostsOrdenados(): Post[] {
+  const hoy = fechaHoyISO();
+  return POSTS.filter((p) => estaPublicado(p, hoy)).sort((a, b) =>
+    b.fecha.localeCompare(a.fecha),
+  );
+}
+
+/** Devuelve un post por su slug, o undefined si no existe (incluye los no publicados aún). */
 export function getPost(slug: string): Post | undefined {
   return POSTS.find((p) => p.slug === slug);
 }

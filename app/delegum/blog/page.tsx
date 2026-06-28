@@ -13,28 +13,34 @@ export const metadata: Metadata = {
   alternates: { canonical: URL_CANONICA },
 };
 
-// Blog JSON-LD — listado de publicaciones (objeto interno generado por el código).
-const posts = getPostsOrdenados();
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Blog',
-  name: 'Blog de Delegum',
-  description:
-    'Actualidad fiscal, laboral y financiera de España, en resúmenes breves y claros.',
-  url: URL_CANONICA,
-  publisher: { '@type': 'Organization', name: 'Delegum', url: 'https://delegum.com/' },
-  blogPost: posts.map((p) => ({
-    '@type': 'BlogPosting',
-    headline: p.titulo,
-    datePublished: p.fecha,
-    description: p.resumen,
-    url: `${URL_CANONICA}${p.slug}/`,
-  })),
-};
-
-const jsonLdScript = JSON.stringify(jsonLd);
+// ISR: la página se regenera periódicamente para que los posts con fecha futura
+// (redactados por adelantado) aparezcan al llegar su día sin necesidad de un rebuild.
+export const revalidate = 3600;
 
 export default function BlogIndexPage() {
+  // Se calcula dentro del componente para que con ISR la fecha de "hoy" se
+  // recalcule en cada regeneración (no se quede congelada en la fecha del build).
+  const posts = getPostsOrdenados();
+
+  // Blog JSON-LD — listado de publicaciones (objeto interno generado por el código).
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    name: 'Blog de Delegum',
+    description:
+      'Actualidad fiscal, laboral y financiera de España, en resúmenes breves y claros.',
+    url: URL_CANONICA,
+    publisher: { '@type': 'Organization', name: 'Delegum', url: 'https://delegum.com/' },
+    blogPost: posts.map((p) => ({
+      '@type': 'BlogPosting',
+      headline: p.titulo,
+      datePublished: p.fecha,
+      description: p.resumen,
+      url: `${URL_CANONICA}${p.slug}/`,
+    })),
+  };
+  const jsonLdScript = JSON.stringify(jsonLd);
+
   return (
     <main className={styles.container}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript }} />
