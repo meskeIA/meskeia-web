@@ -423,7 +423,7 @@ export default function ComoFuncionaElDolorPage() {
 
         {/* ═══════ CONTENIDO EDUCATIVO ═══════ */}
         <EducationalSection
-          title="📚 Profundiza en la fisiología del dolor"
+          title="Profundiza en la fisiología del dolor"
           subtitle="Conceptos clave para estudiantes, pacientes y cuidadores"
         >
           <section className={styles.guideSection}>

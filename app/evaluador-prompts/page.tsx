@@ -424,7 +424,7 @@ export default function EvaluadorPromptsPage() {
         )}
 
         <EducationalSection
-          title="📚 Prompt engineering: el arte de preguntar bien a las máquinas"
+          title="Prompt engineering: el arte de preguntar bien a las máquinas"
           subtitle="Por qué lo que escribes importa tanto como la IA que usas"
         >
           <section className={styles.guideSection}>

@@ -390,7 +390,7 @@ export default function LectorTextoVozPage() {
       </div>
 
       <EducationalSection
-        title="📚 ¿Para quién es útil la lectura en voz alta?"
+        title="¿Para quién es útil la lectura en voz alta?"
         subtitle="Información sobre síntesis de voz y accesibilidad"
       >
         <section className={styles.guiaSeccion}>

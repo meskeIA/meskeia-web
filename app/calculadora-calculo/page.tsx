@@ -565,7 +565,7 @@ export default function CalculadoraCalculoPage() {
       </div>
 
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre Cálculo?"
+        title="¿Quieres aprender más sobre Cálculo?"
         subtitle="Derivadas, integrales, límites y sus aplicaciones"
       >
         <div className={styles.tableWrapper}>

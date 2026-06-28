@@ -436,7 +436,7 @@ export default function DiagnosticoExplotacionExploracionPage() {
 
         {/* Contenido educativo */}
         <EducationalSection
-          title="📚 El modelo de March: explotación vs exploración"
+          title="El modelo de March: explotación vs exploración"
           subtitle="El marco teórico detrás de este diagnóstico"
         >
           <section className={styles.guideSection}>

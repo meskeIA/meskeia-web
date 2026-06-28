@@ -370,7 +370,7 @@ export default function TableroComunicacionPage() {
       </section>
 
       <EducationalSection
-        title="📚 ¿Qué es la Comunicación Aumentativa y Alternativa (AAC)?"
+        title="¿Qué es la Comunicación Aumentativa y Alternativa (AAC)?"
         subtitle="Información sobre tableros de comunicación y sistemas AAC"
       >
         <section className={styles.guiaSeccion}>

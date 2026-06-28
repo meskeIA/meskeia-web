@@ -577,7 +577,7 @@ export default function SimuladorMasResortePage() {
 
         {/* ── Sección educativa v2.0 ───────────────────────────────────── */}
         <EducationalSection
-          title="📚 Aprende sobre el MAS"
+          title="Aprende sobre el MAS"
           subtitle="El resorte como modelo oscilatorio fundamental de la física"
           icon="🌀"
         >

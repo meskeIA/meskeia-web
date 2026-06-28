@@ -460,7 +460,7 @@ export default function VisualizadorArbolVidaPage() {
 
         {/* Contenido educativo colapsable */}
         <EducationalSection
-          title="📚 ¿Quieres aprender más?"
+          title="¿Quieres aprender más?"
           subtitle="Conceptos clave sobre clasificación animal"
         >
           <section>

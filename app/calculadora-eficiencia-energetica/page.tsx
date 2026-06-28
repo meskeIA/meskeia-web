@@ -366,7 +366,7 @@ export default function EficienciaEnergeticaPage() {
         />
 
         <EducationalSection
-          title="📚 Guía de eficiencia energética en el hogar"
+          title="Guía de eficiencia energética en el hogar"
           subtitle="Qué mejoras tienen mayor impacto y cómo aprovechar las ayudas públicas"
         >
           <section className={styles.guideSection}>

@@ -354,7 +354,7 @@ export default function AfinadorInstrumentosPage() {
 
       {/* Contenido educativo */}
       <EducationalSection
-        title="📚 ¿Quieres dominar la afinación de instrumentos?"
+        title="¿Quieres dominar la afinación de instrumentos?"
         subtitle="Aprende técnicas profesionales y cómo funciona la detección automática de tono"
       >
         {/* Tabla comparativa */}

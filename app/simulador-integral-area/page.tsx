@@ -632,7 +632,7 @@ export default function SimuladorIntegralAreaPage() {
           BLOQUE EDUCATIVO v2.0
           ============================================ */}
       <EducationalSection
-        title="📚 Aprende qué es una integral definida"
+        title="Aprende qué es una integral definida"
         subtitle="De las sumas de Riemann al teorema fundamental del cálculo"
       >
         {/* INTRO */}

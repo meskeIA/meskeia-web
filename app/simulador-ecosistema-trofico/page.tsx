@@ -411,7 +411,7 @@ export default function SimuladorEcosistemaTroficoPage() {
 
         {/* BLOQUE EDUCATIVO v2.0 */}
         <EducationalSection
-          title="📚 Aprende sobre cadenas tróficas y ecosistemas"
+          title="Aprende sobre cadenas tróficas y ecosistemas"
           subtitle="La regla del 10%, las cascadas tróficas y las especies clave explicadas"
         >
           <section>

@@ -444,7 +444,7 @@ export default function MapaDecisionesUrgentesImportantesPage() {
 
         {/* Contenido educativo */}
         <EducationalSection
-          title="📚 Eisenhower, Covey y la trampa de la urgencia"
+          title="Eisenhower, Covey y la trampa de la urgencia"
           subtitle="Por qué lo urgente siempre gana (y cómo evitarlo)"
         >
           <section className={styles.guideSection}>

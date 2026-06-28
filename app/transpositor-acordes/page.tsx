@@ -304,7 +304,7 @@ export default function TranspositorAcordesPage() {
       </div>
 
       {/* Sección educativa v2.0 */}
-      <EducationalSection title="📚 Guía de transposición musical" subtitle="Todo lo que necesitas saber para cambiar de tono con confianza">
+      <EducationalSection title="Guía de transposición musical" subtitle="Todo lo que necesitas saber para cambiar de tono con confianza">
 
         {/* 1. Tabla comparativa: notaciones */}
         <div className={styles.guideSection}>

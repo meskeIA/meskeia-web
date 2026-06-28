@@ -312,7 +312,7 @@ export default function ValidadorJSONPage() {
 
       {/* Contenido educativo profesional */}
       <EducationalSection
-        title="📚 ¿Quieres dominar JSON y XML?"
+        title="¿Quieres dominar JSON y XML?"
         subtitle="Descubre cuándo usar cada formato, casos de uso reales y mejores prácticas profesionales"
         icon="📚"
       >

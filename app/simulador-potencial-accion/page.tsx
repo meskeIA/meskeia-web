@@ -544,7 +544,7 @@ export default function SimuladorPotencialAccionPage() {
           BLOQUE EDUCATIVO v2.0
           ============================================ */}
       <EducationalSection
-        title="📚 Aprende cómo dispara una neurona"
+        title="Aprende cómo dispara una neurona"
         subtitle="Canales iónicos, el potencial de membrana y la ley del &quot;todo o nada&quot;"
       >
         <section>

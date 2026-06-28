@@ -398,7 +398,7 @@ export default function AnalizadorDensidadSeoPage() {
 
       {/* Contenido educativo */}
       <EducationalSection
-        title="📚 Guía de Densidad de Palabras Clave"
+        title="Guía de Densidad de Palabras Clave"
         subtitle="Todo lo que necesitas saber sobre keyword density y SEO on-page"
       >
         <div className={styles.educationalContent}>

@@ -425,7 +425,7 @@ export default function TestDependenciaTecnologicaPage() {
         )}
 
         <EducationalSection
-          title="📚 Antifragilidad digital: más allá de la resiliencia"
+          title="Antifragilidad digital: más allá de la resiliencia"
           subtitle="Por qué la autonomía y la adaptabilidad son habilidades, no rasgos de personalidad"
         >
           <section className={styles.guideSection}>

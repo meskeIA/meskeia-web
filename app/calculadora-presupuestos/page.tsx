@@ -761,7 +761,7 @@ export default function CalculadoraPresupuestosPage() {
 
       {/* Sección educativa */}
       <EducationalSection
-        title="📚 Guía completa para crear presupuestos comerciales profesionales"
+        title="Guía completa para crear presupuestos comerciales profesionales"
         subtitle="Aprende a estructurar, presentar y negociar presupuestos que cierren más ventas y protejan tu negocio"
         icon="📚"
       >

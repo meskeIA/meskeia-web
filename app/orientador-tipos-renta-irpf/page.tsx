@@ -480,7 +480,7 @@ export default function OrientadorTiposRentaIrpfPage() {
 
       {/* ── Sección educativa v2.0 ── */}
       <EducationalSection
-        title="📚 Guía de los tipos de renta en el IRPF"
+        title="Guía de los tipos de renta en el IRPF"
         subtitle="Entiende cómo se clasifica y tributa cada ingreso"
       >
         {/* Tabla comparativa de categorías */}

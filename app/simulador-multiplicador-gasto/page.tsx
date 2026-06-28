@@ -439,7 +439,7 @@ export default function SimuladorMultiplicadorGastoPage() {
             BLOQUE EDUCATIVO v2.0
             ============================================================ */}
         <EducationalSection
-          title="📚 El multiplicador keynesiano: teoría y aplicación"
+          title="El multiplicador keynesiano: teoría y aplicación"
           subtitle="Por qué 1 € de gasto público puede generar más de 1 € de actividad económica"
         >
           {/* INTRO */}

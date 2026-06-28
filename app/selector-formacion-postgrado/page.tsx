@@ -468,7 +468,7 @@ export default function SelectorFormacionPostgradoPage() {
 
       {/* Sección educativa v2.0 */}
       <EducationalSection
-        title="📚 Guía completa de formación postgrado en España"
+        title="Guía completa de formación postgrado en España"
         subtitle="Todo lo que necesitas saber para elegir la mejor vía formativa según tu perfil"
       >
         <section className={styles.guideSection}>

@@ -496,7 +496,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
           BLOQUE EDUCATIVO v2.0
           ============================================ */}
       <EducationalSection
-        title="📚 Aprende sobre las Transformaciones de Funciones"
+        title="Aprende sobre las Transformaciones de Funciones"
         subtitle="Cómo a, b, c y d modifican cualquier gráfica"
       >
         {/* INTRO */}

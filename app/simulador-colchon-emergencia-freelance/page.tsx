@@ -453,7 +453,7 @@ export default function SimuladorColchonEmergenciaFreelancePage() {
         />
 
         <EducationalSection
-          title="📚 Todo sobre el fondo de emergencia freelance"
+          title="Todo sobre el fondo de emergencia freelance"
           subtitle="Por que es imprescindible y como construirlo"
         >
           <section className={styles.guideSection}>

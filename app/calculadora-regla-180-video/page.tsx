@@ -174,7 +174,8 @@ export default function CalculadoraRegla180VideoPage() {
 
         {/* Sección educativa */}
         <EducationalSection
-          title={<><span aria-hidden="true">📐</span> ¿Qué es la regla de los 180°?</>}
+          icon="📐"
+          title="¿Qué es la regla de los 180°?"
           subtitle="Fundamentos del motion blur cinematográfico"
         >
           <div className={styles.educativo}>

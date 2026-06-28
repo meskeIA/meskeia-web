@@ -287,7 +287,7 @@ export default function CalculadoraPuntosAzucarPage() {
       </section>
 
       <EducationalSection
-        title="📚 Las fases del azúcar: guía completa"
+        title="Las fases del azúcar: guía completa"
         subtitle="Todo lo que necesitas saber sobre la cocción del almíbar"
       >
         <section className={styles.guideSection}>

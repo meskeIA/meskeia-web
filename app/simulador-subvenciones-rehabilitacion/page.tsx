@@ -476,7 +476,7 @@ export default function SimuladorSubvencionesRehabilitacionPage() {
 
         {/* Sección educativa v2.0 */}
         <EducationalSection
-          title="📚 Guía completa de subvenciones para rehabilitación energética"
+          title="Guía completa de subvenciones para rehabilitación energética"
           subtitle="Todo sobre los fondos Next Generation EU y las ayudas disponibles en España"
         >
           {/* Cómo funciona Next Generation */}

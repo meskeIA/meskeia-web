@@ -333,7 +333,7 @@ export default function InteresCompuestoPage() {
 
       {/* Contenido Educativo */}
       <EducationalSection
-        title="📚 ¿Quieres entender el poder del interés compuesto?"
+        title="¿Quieres entender el poder del interés compuesto?"
         subtitle="Descubre por qué Einstein lo llamó 'la octava maravilla del mundo'"
       >
         {/* Tabla Comparativa */}

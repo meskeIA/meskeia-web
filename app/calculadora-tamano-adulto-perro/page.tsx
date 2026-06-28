@@ -396,7 +396,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
       />
 
       <EducationalSection
-        title="📚 ¿Cómo crecen los cachorros?"
+        title="¿Cómo crecen los cachorros?"
         subtitle="Información sobre las fases de crecimiento y factores que influyen"
       >
         <section className={styles.guideSection}>

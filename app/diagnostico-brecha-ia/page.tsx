@@ -426,7 +426,7 @@ export default function DiagnosticoBrechaIAPage() {
         )}
 
         <EducationalSection
-          title="📚 La IA amplifica lo que ya eres"
+          title="La IA amplifica lo que ya eres"
           subtitle="Por qué el criterio propio es más importante que nunca"
         >
           <section className={styles.guideSection}>

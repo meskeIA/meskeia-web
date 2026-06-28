@@ -687,7 +687,7 @@ export default function SimuladorDistribucionNormalPage() {
           BLOQUE EDUCATIVO v2.0
           ============================================ */}
       <EducationalSection
-        title="📚 Aprende sobre la Distribución Normal"
+        title="Aprende sobre la Distribución Normal"
         subtitle="De qué hablamos cuando hablamos de la curva de Gauss"
       >
         {/* INTRO */}

@@ -240,7 +240,7 @@ export default function OrientadorBecasAyudasEstudioPage() {
       </section>
 
       <EducationalSection
-        title="📚 Guía: becas y ayudas al estudio en España"
+        title="Guía: becas y ayudas al estudio en España"
         subtitle="Tipos de beca, ejemplos prácticos y consejos antes de solicitar"
       >
         {/* Tabla comparativa */}

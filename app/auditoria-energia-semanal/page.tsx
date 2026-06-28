@@ -422,7 +422,7 @@ export default function AuditoriaEnergiaSemanalPage() {
         )}
 
         <EducationalSection
-          title="📚 Gestionar energía, no tiempo"
+          title="Gestionar energía, no tiempo"
           subtitle="El modelo de Loehr y Schwartz"
         >
           <section className={styles.guideSection}>

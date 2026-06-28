@@ -633,7 +633,7 @@ export default function EjerciciosVocalizacionPage() {
       )}
 
       <EducationalSection
-        title="📚 Sobre la voz en la enfermedad de Parkinson"
+        title="Sobre la voz en la enfermedad de Parkinson"
         subtitle="Información sobre logopedia y rehabilitación vocal"
       >
         <section className={styles.guiaSeccion}>

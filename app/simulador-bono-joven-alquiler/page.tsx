@@ -301,7 +301,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
       </section>
 
       <EducationalSection
-        title="📚 Guía completa del Bono Joven al Alquiler"
+        title="Guía completa del Bono Joven al Alquiler"
         subtitle="Todo lo que necesitas saber sobre esta ayuda estatal"
       >
         {/* Tabla comparativa */}

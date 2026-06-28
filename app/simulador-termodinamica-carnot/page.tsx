@@ -552,7 +552,7 @@ export default function SimuladorTermodinamicaCarnotPage() {
           BLOQUE EDUCATIVO v2.0
           ============================================ */}
       <EducationalSection
-        title="📚 Aprende termodinámica con Carnot"
+        title="Aprende termodinámica con Carnot"
         subtitle="Por qué ningún motor convierte el 100% del calor en trabajo"
       >
         <section>

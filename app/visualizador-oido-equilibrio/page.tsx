@@ -702,7 +702,7 @@ export default function OidoEquilibrioPage() {
 
         {/* Contenido educativo */}
         <EducationalSection
-          title="📚 ¿Quieres profundizar?"
+          title="¿Quieres profundizar?"
           subtitle="Conceptos avanzados sobre audición y equilibrio"
         >
           <section>

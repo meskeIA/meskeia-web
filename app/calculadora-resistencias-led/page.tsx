@@ -358,7 +358,7 @@ export default function CalculadoraResistenciasLedPage() {
         </div>
       )}
 
-      <EducationalSection title="📚 Electrónica práctica: resistencias y LEDs" subtitle="Todo lo que necesitas saber para no quemar tus componentes">
+      <EducationalSection title="Electrónica práctica: resistencias y LEDs" subtitle="Todo lo que necesitas saber para no quemar tus componentes">
         <div className={styles.guideSection}>
           <h2>Cómo funciona el código de colores</h2>
           <p>

@@ -684,7 +684,7 @@ export default function VisualizadorReaccionesQuimicasPage() {
 
         {/* Contenido educativo */}
         <EducationalSection
-          title="📚 La química que mueve el mundo"
+          title="La química que mueve el mundo"
           subtitle="Conceptos clave sobre reacciones químicas"
         >
           <section className={styles.guideSection}>

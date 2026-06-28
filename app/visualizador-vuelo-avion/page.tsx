@@ -423,7 +423,7 @@ export default function VueloAvionPage() {
       )}
 
       <EducationalSection
-        title="📚 Aerodinámica: guía completa del vuelo"
+        title="Aerodinámica: guía completa del vuelo"
         subtitle="Física, historia y aplicaciones del vuelo desde los hermanos Wright hasta los aviones hipersónicos"
       >
         <h3>La historia de la explicación incorrecta</h3>

@@ -419,7 +419,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
       </div>
 
       <EducationalSection
-        title="📚 ¿Qué es la Plusvalía Municipal y cómo funciona?"
+        title="¿Qué es la Plusvalía Municipal y cómo funciona?"
         subtitle="Conceptos clave para entender el IIVTNU"
       >
         <section className={styles.guideSection}>

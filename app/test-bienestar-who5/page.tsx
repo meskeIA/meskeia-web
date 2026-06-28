@@ -239,7 +239,7 @@ export default function TestBienestarWho5Page() {
         )}
 
         <EducationalSection
-          title="📚 Sobre el WHO-5 y el bienestar"
+          title="Sobre el WHO-5 y el bienestar"
           subtitle="Qué mide esta escala y cómo mejorar tu bienestar"
         >
           <section className={styles.guideSection}>

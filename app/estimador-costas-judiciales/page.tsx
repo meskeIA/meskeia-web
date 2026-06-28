@@ -309,7 +309,7 @@ export default function EstimadorCostasJudicialesPage() {
         </div>
 
         <EducationalSection
-          title="📚 ¿Cómo funcionan las costas judiciales?"
+          title="¿Cómo funcionan las costas judiciales?"
           subtitle="Conceptos clave antes de ir a juicio"
         >
           <section className={styles.guideSection}>

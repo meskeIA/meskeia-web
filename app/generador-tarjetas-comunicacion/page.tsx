@@ -498,7 +498,7 @@ export default function GeneradorTarjetasPage() {
 
       <div className="noPrint">
         <EducationalSection
-          title="📚 Sobre las tarjetas de comunicación"
+          title="Sobre las tarjetas de comunicación"
           subtitle="Pictogramas y comunicación aumentativa y alternativa"
         >
           <section className={styles.guiaSeccion}>

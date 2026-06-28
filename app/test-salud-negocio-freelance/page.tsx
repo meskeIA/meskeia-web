@@ -566,7 +566,7 @@ export default function TestSaludNegocioFreelance() {
         })()}
 
         <EducationalSection
-          title="📚 Las 5 dimensiones de un negocio freelance sano"
+          title="Las 5 dimensiones de un negocio freelance sano"
           subtitle="Entiende qué evalúa cada dimensión y cómo mejorar"
         >
           <section className={styles.guideSection}>

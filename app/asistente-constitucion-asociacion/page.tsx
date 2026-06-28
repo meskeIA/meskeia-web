@@ -1525,7 +1525,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
 
       {/* Contenido educativo */}
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre Asociaciones?"
+        title="¿Quieres aprender más sobre Asociaciones?"
         subtitle="Guía completa sobre constitución, gestión y fiscalidad de asociaciones sin ánimo de lucro"
       >
         <section className={styles.guideSection}>

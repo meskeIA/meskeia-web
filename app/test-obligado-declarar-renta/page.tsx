@@ -499,7 +499,7 @@ export default function TestObligadoDeclararRentaPage() {
 
         {/* Contenido educativo v2.0 */}
         <EducationalSection
-          title="📚 Todo sobre la obligación de declarar"
+          title="Todo sobre la obligación de declarar"
           subtitle="Umbrales, excepciones y preguntas frecuentes"
         >
           <section className={styles.guideSection}>

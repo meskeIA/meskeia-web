@@ -299,7 +299,7 @@ export default function EstimadorCostesDivorcioPage() {
         </div>
 
         <EducationalSection
-          title="📚 Todo sobre los costes del divorcio"
+          title="Todo sobre los costes del divorcio"
           subtitle="Tipos, requisitos y cómo reducir costes innecesarios"
         >
           <section className={styles.guideSection}>

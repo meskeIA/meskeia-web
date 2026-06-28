@@ -13,8 +13,8 @@ import React, { useState } from 'react';
 import styles from './EducationalSection.module.css';
 
 interface EducationalSectionProps {
-  title: string;
-  subtitle: string;
+  title: React.ReactNode;
+  subtitle: React.ReactNode;
   icon?: string;
   children: React.ReactNode;
   defaultOpen?: boolean;
@@ -39,7 +39,7 @@ export default function EducationalSection({
     <div className={`${styles.container} ${className}`}>
       <div className={styles.header}>
         <h3 className={styles.title}>
-          <span className={styles.icon}>{icon}</span>
+          <span className={styles.icon} aria-hidden="true">{icon}</span>
           {title}
         </h3>
         <p className={styles.subtitle}>{subtitle}</p>

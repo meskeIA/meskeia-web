@@ -706,7 +706,7 @@ export default function CalculadoraInversionesPage() {
 
       {/* Contenido Educativo */}
       <EducationalSection
-        title="📚 ¿Quieres entender mejor la asignación de activos?"
+        title="¿Quieres entender mejor la asignación de activos?"
         subtitle="Aprende los fundamentos de la diversificación y cómo construir una cartera equilibrada"
       >
         <section className={styles.guideSection}>

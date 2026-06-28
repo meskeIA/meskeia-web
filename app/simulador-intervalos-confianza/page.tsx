@@ -729,7 +729,7 @@ export default function SimuladorIntervalosConfianzaPage() {
           BLOQUE EDUCATIVO v2.0
           ============================================ */}
       <EducationalSection
-        title="📚 Aprende qué es un intervalo de confianza"
+        title="Aprende qué es un intervalo de confianza"
         subtitle="Por qué &quot;95 % de confianza&quot; NO es lo que la mayoría de la gente cree"
       >
         {/* INTRO */}

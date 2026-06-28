@@ -197,7 +197,7 @@ export default function MapaRiesgoEmprendedorPage() {
           </section>
         )}
 
-        <EducationalSection title="📚 Gestión de riesgo para emprendedores" subtitle="Arriesgar bien no es arriesgar mucho">
+        <EducationalSection title="Gestión de riesgo para emprendedores" subtitle="Arriesgar bien no es arriesgar mucho">
           <section className={styles.guideSection}>
             <h2>El mito del emprendedor temerario</h2>
             <p>La narrativa popular presenta a los emprendedores exitosos como visionarios que &quot;lo apostaron todo&quot;. Pero la investigación cuenta una historia diferente: estudios como el de Raffiee y Feng (<em>Academy of Management Journal</em>, 2014) sugieren que <strong>los emprendedores que combinan inicialmente el empleo con su proyecto tienen mejores tasas de supervivencia que los que dejan el empleo bruscamente</strong>, especialmente en sectores intensivos en conocimiento.</p>

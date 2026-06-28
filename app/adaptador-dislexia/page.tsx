@@ -378,7 +378,7 @@ export default function AdaptadorDislexiaPage() {
       </div>
 
       <EducationalSection
-        title="📚 ¿Qué es la dislexia y cómo ayuda este adaptador?"
+        title="¿Qué es la dislexia y cómo ayuda este adaptador?"
         subtitle="Información sobre dislexia y accesibilidad lectora"
       >
         <section className={styles.guiaSeccion}>

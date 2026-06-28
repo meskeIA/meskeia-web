@@ -310,7 +310,7 @@ export default function VisualizadorMicrobiomaPage() {
 
         {/* Sección educativa */}
         <EducationalSection
-          title="📚 ¿Quieres aprender más sobre el microbioma?"
+          title="¿Quieres aprender más sobre el microbioma?"
           subtitle="Tablas, preguntas frecuentes y pasos prácticos para cuidar tu microbiota"
         >
           <section className={styles.guideSection}>

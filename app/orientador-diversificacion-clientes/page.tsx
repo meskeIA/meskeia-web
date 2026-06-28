@@ -462,7 +462,7 @@ export default function OrientadorDiversificacionClientesPage() {
 
         {/* ─── Contenido educativo ─── */}
         <EducationalSection
-          title="📚 Concentración de clientes y el índice HHI"
+          title="Concentración de clientes y el índice HHI"
           subtitle="Conceptos clave, legislación TRADE y preguntas frecuentes"
         >
           <section className={styles.guideSection}>

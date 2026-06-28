@@ -676,7 +676,7 @@ export default function CalculadoraIMCPage() {
       </DisclaimerCard>
 
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre el IMC?"
+        title="¿Quieres aprender más sobre el IMC?"
         subtitle="Descubre cómo interpretar tu resultado, estrategias para alcanzar un peso saludable y respuestas a las preguntas más frecuentes"
         icon="📚"
       >

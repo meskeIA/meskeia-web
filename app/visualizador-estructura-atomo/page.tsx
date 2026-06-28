@@ -700,7 +700,7 @@ export default function EstructuraAtomoPage() {
 
         {/* Contenido educativo colapsable */}
         <EducationalSection
-          title="📚 Más sobre la estructura atómica"
+          title="Más sobre la estructura atómica"
           subtitle="Curiosidades y conceptos avanzados"
         >
           <section className={styles.guideSection}>

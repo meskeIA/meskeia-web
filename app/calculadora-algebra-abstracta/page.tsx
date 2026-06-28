@@ -629,7 +629,7 @@ export default function CalculadoraAlgebraAbstractaPage() {
       </DisclaimerCard>
 
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre Álgebra Abstracta?"
+        title="¿Quieres aprender más sobre Álgebra Abstracta?"
         subtitle="Grupos, anillos, cuerpos y estructuras algebraicas"
       >
         <section className={styles.guideSection}>

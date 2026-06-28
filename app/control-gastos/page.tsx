@@ -414,7 +414,7 @@ export default function ControlGastosPage() {
 
       {/* Contenido Educativo */}
       <EducationalSection
-        title="📚 ¿Quieres mejorar tus finanzas personales?"
+        title="¿Quieres mejorar tus finanzas personales?"
         subtitle="Aprende estrategias de ahorro y gestión del presupuesto familiar"
       >
         <section className={styles.guideSection}>

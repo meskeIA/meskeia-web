@@ -424,7 +424,7 @@ export default function MapaDependenciaClientesPage() {
         )}
 
         <EducationalSection
-          title="📚 La concentración de clientes como riesgo empresarial"
+          title="La concentración de clientes como riesgo empresarial"
           subtitle="Por qué importa y cómo gestionarlo"
         >
           <section className={styles.guideSection}>

@@ -525,7 +525,7 @@ export default function SeleccionNaturalPage() {
 
         {/* Contenido educativo colapsable */}
         <EducationalSection
-          title="📚 ¿Quieres profundizar más?"
+          title="¿Quieres profundizar más?"
           subtitle="Conceptos clave sobre evolución y selección natural"
         >
           <section className={styles.guideSection}>

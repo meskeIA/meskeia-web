@@ -593,7 +593,7 @@ export default function PlanificadorRutinasPage() {
       </section>
 
       <EducationalSection
-        title="📚 Sobre el apoyo visual en rutinas"
+        title="Sobre el apoyo visual en rutinas"
         subtitle="Beneficios de las agendas visuales para el día a día"
       >
         <section className={styles.guiaSeccion}>

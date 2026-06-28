@@ -424,7 +424,7 @@ export default function DetectorSesgosCognitivosPage() {
         )}
 
         <EducationalSection
-          title="📚 Kahneman y los dos sistemas del pensamiento"
+          title="Kahneman y los dos sistemas del pensamiento"
           subtitle="Cómo funcionan los sesgos cognitivos"
         >
           <section className={styles.guideSection}>

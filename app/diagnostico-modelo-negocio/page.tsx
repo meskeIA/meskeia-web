@@ -353,7 +353,7 @@ export default function DiagnosticoModeloNegocioPage() {
           </section>
         )}
 
-        <EducationalSection title="📚 El Business Model Canvas simplificado" subtitle="Cómo pensar en tu negocio como un sistema">
+        <EducationalSection title="El Business Model Canvas simplificado" subtitle="Cómo pensar en tu negocio como un sistema">
           <section className={styles.guideSection}>
             <h2>¿Qué es el Business Model Canvas?</h2>
             <p>Alexander Osterwalder e Yves Pigneur publicaron en 2010 <em>Business Model Generation</em>, donde presentaron una herramienta visual para describir, analizar y diseñar modelos de negocio en un solo lienzo con 9 bloques.</p>

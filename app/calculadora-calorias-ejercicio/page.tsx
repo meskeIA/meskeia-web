@@ -281,7 +281,7 @@ export default function CalculadoraCaloriasPage() {
       </DisclaimerCard>
 
       <EducationalSection
-        title="📚 Guía completa de calorías, ejercicio y gasto energético"
+        title="Guía completa de calorías, ejercicio y gasto energético"
         subtitle="Aprende cómo funcionan los MET, el EPOC y cómo optimizar tu entrenamiento para tus objetivos reales"
       >
         {/* TABLA COMPARATIVA */}

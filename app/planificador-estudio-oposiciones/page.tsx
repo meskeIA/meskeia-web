@@ -239,7 +239,7 @@ export default function PlanificadorEstudioOposicionesPage() {
         )}
 
         <EducationalSection
-          title="📚 Técnicas de estudio para opositores"
+          title="Técnicas de estudio para opositores"
           subtitle="Métodos probados para maximizar tu rendimiento"
         >
           <section className={styles.guideSection}>

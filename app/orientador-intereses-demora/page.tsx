@@ -349,7 +349,7 @@ export default function OrientadorInteresesDemoraPage() {
       </div>
 
       <EducationalSection
-        title="📚 ¿Qué son los intereses de demora y cómo funcionan?"
+        title="¿Qué son los intereses de demora y cómo funcionan?"
         subtitle="Conceptos clave sobre la Ley de Morosidad y el Código Civil"
       >
         <section className={styles.guideSection}>

@@ -192,7 +192,7 @@ export default function AuditoriaPropuestaValorPage() {
           </section>
         )}
 
-        <EducationalSection title="📚 Value Proposition Canvas: encaje oferta-cliente" subtitle="El marco que conecta lo que haces con lo que necesitan">
+        <EducationalSection title="Value Proposition Canvas: encaje oferta-cliente" subtitle="El marco que conecta lo que haces con lo que necesitan">
           <section className={styles.guideSection}>
             <h2>¿Qué es el Value Proposition Canvas?</h2>
             <p>Alexander Osterwalder publicó en 2014 <em>Value Proposition Design</em>, un complemento al Business Model Canvas centrado exclusivamente en la relación entre <strong>lo que el cliente necesita</strong> y <strong>lo que tú ofreces</strong>.</p>

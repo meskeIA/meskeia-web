@@ -437,7 +437,7 @@ export default function AuditoriaReunionesPage() {
 
         {/* Contenido educativo */}
         <EducationalSection
-          title="📚 La ciencia detrás de las reuniones ineficientes"
+          title="La ciencia detrás de las reuniones ineficientes"
           subtitle="Por qué nos reunimos tanto y cómo cambiarlo"
         >
           <section className={styles.guideSection}>

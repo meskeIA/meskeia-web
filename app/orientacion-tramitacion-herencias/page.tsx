@@ -659,7 +659,7 @@ export default function OrientacionTramitacionHerenciasPage() {
 
       {/* Contenido educativo colapsable */}
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre herencias?"
+        title="¿Quieres aprender más sobre herencias?"
         subtitle="Conceptos clave, preguntas frecuentes y situaciones especiales"
       >
         <section className={styles.guideSection}>

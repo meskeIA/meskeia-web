@@ -423,7 +423,7 @@ export default function ChecklistSegundaOpinionPage() {
         )}
 
         <EducationalSection
-          title="📚 El principio de red team y por qué funciona"
+          title="El principio de red team y por qué funciona"
           subtitle="Buscar fallos antes de que te encuentren"
         >
           <section className={styles.guideSection}>

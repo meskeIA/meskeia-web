@@ -543,7 +543,7 @@ export default function PlaygroundSQLPage() {
 
       {/* Sección educativa */}
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre SQL?"
+        title="¿Quieres aprender más sobre SQL?"
         subtitle="Conceptos clave y referencia rápida"
       >
         {/* 1. Tabla comparativa de dialectos SQL */}

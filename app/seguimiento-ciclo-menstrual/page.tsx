@@ -321,7 +321,7 @@ export default function SeguimientoCicloMenstrualPage() {
 
       {/* CONTENIDO EDUCATIVO */}
       <EducationalSection
-        title="📚 Guía completa del ciclo menstrual"
+        title="Guía completa del ciclo menstrual"
         subtitle="Todo lo que necesitas saber sobre las fases, fertilidad y seguimiento"
       >
         {/* Tabla comparativa: fases del ciclo */}

@@ -603,7 +603,7 @@ export default function CalculadoraMatematicaPage() {
       </div>
 
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre Matemáticas Avanzadas?"
+        title="¿Quieres aprender más sobre Matemáticas Avanzadas?"
         subtitle="Descubre conceptos clave y aplicaciones prácticas"
       >
         <section className={styles.guideSection}>

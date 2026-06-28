@@ -288,7 +288,7 @@ export default function CalculadoraCostesTeletrabajoPage() {
       )}
 
       <EducationalSection
-        title="📚 Teletrabajo: impacto económico real"
+        title="Teletrabajo: impacto económico real"
         subtitle="Todo lo que necesitas saber sobre los costes y beneficios del trabajo remoto"
       >
         {/* Tabla comparativa */}

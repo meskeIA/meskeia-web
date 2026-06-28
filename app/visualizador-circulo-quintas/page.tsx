@@ -557,7 +557,7 @@ export default function VisualizadorCirculoQuintasPage() {
 
       {/* Sección educativa v2.0 */}
       <EducationalSection
-        title="📚 Guía del Círculo de Quintas"
+        title="Guía del Círculo de Quintas"
         subtitle="Teoría musical para compositores e intérpretes"
       >
         <section className={styles.guideSection}>

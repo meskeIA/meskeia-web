@@ -1035,7 +1035,7 @@ export default function GeneradorActasPage() {
 
       {/* Contenido Educativo */}
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre actas de reunión?"
+        title="¿Quieres aprender más sobre actas de reunión?"
         subtitle="Descubre cómo redactar actas efectivas y gestionar reuniones productivas"
         icon="📚"
       >

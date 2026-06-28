@@ -731,7 +731,7 @@ export default function CartografiaProyeccionesPage() {
 
         {/* Contenido educativo colapsable */}
         <EducationalSection
-          title="📚 ¿Quieres aprender más sobre cartografía?"
+          title="¿Quieres aprender más sobre cartografía?"
           subtitle="Historia, matemáticas y curiosidades de los mapas"
         >
           <section className={styles.guideSection}>

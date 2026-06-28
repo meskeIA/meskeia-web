@@ -240,7 +240,7 @@ export default function CalculadoraFiltroNdVideoPage() {
 
       {/* Sección educativa */}
       <EducationalSection
-        title="📚 ¿Qué es un filtro ND y para qué sirve en vídeo?"
+        title="¿Qué es un filtro ND y para qué sirve en vídeo?"
         subtitle="Todo lo que necesitas saber sobre la densidad neutra en videografía"
       >
         <section className={styles.guideSection}>

@@ -167,7 +167,7 @@ export default function CalculadoraMasaMadrePage() {
       </div>
 
       <EducationalSection
-        title="📚 Todo sobre la masa madre y la sustitución de levadura"
+        title="Todo sobre la masa madre y la sustitución de levadura"
         subtitle="Entiende el proceso y consigue mejores resultados en tus panes"
       >
         <div className={styles.guideSection}>

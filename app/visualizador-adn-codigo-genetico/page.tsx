@@ -694,7 +694,7 @@ export default function AdnCodigoGeneticoPage() {
 
         {/* Contenido educativo colapsable */}
         <EducationalSection
-          title="📚 ¿Quieres profundizar más?"
+          title="¿Quieres profundizar más?"
           subtitle="Conceptos clave de biología molecular"
         >
           <section className={styles.guideSection}>

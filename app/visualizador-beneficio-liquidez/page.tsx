@@ -215,7 +215,7 @@ export default function VisualizadorBeneficioLiquidezPage() {
             callbacks: {
               label: (ctx) => {
                 if (ctx.dataset.label === 'Referencia 0 €') return '';
-                const val = ctx.parsed.y;
+                const val = ctx.parsed.y ?? 0;
                 return ` ${ctx.dataset.label}: ${fmtEur(val)}`;
               },
               afterBody: (items) => {
@@ -492,7 +492,7 @@ export default function VisualizadorBeneficioLiquidezPage() {
 
       {/* ── Sección educativa ── */}
       <EducationalSection
-        title="📚 Guía: Beneficio contable vs liquidez real"
+        title="Guía: Beneficio contable vs liquidez real"
         subtitle="Entiende por qué estos dos conceptos no son lo mismo y cómo gestionarlos"
       >
         {/* Tabla comparativa */}

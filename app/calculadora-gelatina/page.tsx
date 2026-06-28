@@ -273,7 +273,7 @@ export default function CalculadoraGelatinaPage() {
       </main>
 
       <EducationalSection
-        title="📚 Todo sobre la gelatina en repostería"
+        title="Todo sobre la gelatina en repostería"
         subtitle="Bloom strength, tipos de hoja, agar-agar e hidratación correcta"
       >
         <section className={styles.guideSection}>

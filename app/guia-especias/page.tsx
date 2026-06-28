@@ -917,7 +917,7 @@ export default function GuiaEspeciasPage() {
 
         {/* Sección educativa v2.0 */}
         <EducationalSection
-          title="📚 Todo sobre las especias en cocina"
+          title="Todo sobre las especias en cocina"
           subtitle="Mezclas clásicas, conservación y cómo aprovecharlas al máximo"
         >
           {/* 1. Tabla: mezclas clásicas */}

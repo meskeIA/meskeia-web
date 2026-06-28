@@ -674,7 +674,7 @@ export default function SimuladorFluidosBernoulliPage() {
           BLOQUE EDUCATIVO v2.0
           ============================================ */}
       <EducationalSection
-        title="📚 Aprende mecánica de fluidos con Bernoulli"
+        title="Aprende mecánica de fluidos con Bernoulli"
         subtitle="La ecuación que explica desde aviones hasta la circulación sanguínea"
       >
         <section>

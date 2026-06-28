@@ -511,7 +511,7 @@ export default function TimeTrackerPage() {
 
       {/* Contenido educativo */}
       <EducationalSection
-        title="📚 Guía de Gestión del Tiempo para Freelancers"
+        title="Guía de Gestión del Tiempo para Freelancers"
         subtitle="Mejora tu productividad y facturación con estos consejos"
       >
         <div className={styles.educationalContent}>

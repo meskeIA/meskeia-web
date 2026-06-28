@@ -628,7 +628,7 @@ export default function AsistenteConstitucionSociedadPage() {
 
       {/* Contenido educativo */}
       <EducationalSection
-        title="📚 ¿Por qué constituir una sociedad?"
+        title="¿Por qué constituir una sociedad?"
         subtitle="Ventajas, diferencias y preguntas frecuentes"
       >
         <section className={styles.guideSection}>

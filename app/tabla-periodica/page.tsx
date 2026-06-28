@@ -372,7 +372,7 @@ export default function TablaPerodicaPage() {
 
       {/* Contenido educativo */}
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre la Tabla Periódica?"
+        title="¿Quieres aprender más sobre la Tabla Periódica?"
         subtitle="Descubre la historia, organización y patrones de los elementos químicos"
       >
         {/* ========== SECCIÓN 1: TABLA COMPARATIVA ========== */}

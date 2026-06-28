@@ -340,7 +340,7 @@ export default function SelectorActividadesMovilidadPage() {
 
         {/* ── Contenido educativo ── */}
         <EducationalSection
-          title="📚 Envejecimiento activo: guía práctica"
+          title="Envejecimiento activo: guía práctica"
           subtitle="Consejos y evidencia para mantenerte activo/a"
         >
           <section className={styles.guideSection}>

@@ -281,7 +281,7 @@ export default function CalculadoraIvaPage() {
 
       {/* ========== CONTENIDO EDUCATIVO COLAPSABLE (v2.0) ========== */}
       <EducationalSection
-        title="📚 ¿Quieres dominar el IVA en España?"
+        title="¿Quieres dominar el IVA en España?"
         subtitle="Descubre tipos de IVA, casos de uso, declaraciones, mejores prácticas y errores comunes a evitar"
         icon="📚"
       >

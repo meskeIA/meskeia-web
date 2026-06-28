@@ -301,7 +301,7 @@ export default function CalculadoraPiscinasPage() {
         />
 
         <EducationalSection
-          title="📚 Guía de mantenimiento de piscinas"
+          title="Guía de mantenimiento de piscinas"
           subtitle="Todo lo que necesitas saber para mantener el agua en perfectas condiciones todo el año"
         >
           <section className={styles.guideSection}>

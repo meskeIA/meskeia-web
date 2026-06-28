@@ -704,7 +704,7 @@ export default function SimuladorConservacionEnergiaPage() {
           BLOQUE EDUCATIVO v2.0
           ============================================ */}
       <EducationalSection
-        title="📚 Aprende sobre la conservación de la energía"
+        title="Aprende sobre la conservación de la energía"
         subtitle="El principio que gobierna desde montañas rusas hasta centrales eléctricas"
       >
         {/* INTRO */}

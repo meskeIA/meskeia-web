@@ -244,7 +244,7 @@ export default function OrientadorDeduccionObrasEnergeticasPage() {
 
         {/* Contenido educativo v2.0 */}
         <EducationalSection
-          title="📚 Todo sobre las deducciones por obras energéticas"
+          title="Todo sobre las deducciones por obras energéticas"
           subtitle="Normativa, requisitos y preguntas frecuentes"
         >
           <section className={styles.guideSection}>

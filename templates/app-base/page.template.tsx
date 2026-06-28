@@ -87,8 +87,14 @@ export default function [NombreApp]Page(): JSX.Element {
         */}
 
         {/* Contenido educativo colapsable */}
+        {/*
+          El prop `icon` (por defecto 📚) ya pinta el emoji con aria-hidden.
+          NO repitas el emoji dentro de `title`. Para un icono distinto usa icon="🎬".
+          `title` y `subtitle` aceptan ReactNode, por si necesitas JSX.
+        */}
         <EducationalSection
-          title="📚 ¿Quieres aprender más?"
+          icon="📚"
+          title="¿Quieres aprender más?"
           subtitle="Descubre conceptos clave"
         >
           <section className={styles.guideSection}>

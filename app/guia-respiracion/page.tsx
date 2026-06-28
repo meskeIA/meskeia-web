@@ -357,7 +357,7 @@ export default function GuiaRespiracionPage() {
       </section>
 
       <EducationalSection
-        title="📚 ¿Por qué funciona la respiración consciente?"
+        title="¿Por qué funciona la respiración consciente?"
         subtitle="Ciencia y beneficios de las técnicas de respiración"
       >
         <section className={styles.guiaSeccion}>

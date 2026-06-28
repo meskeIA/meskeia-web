@@ -673,7 +673,7 @@ export default function VisualizadorPhAcidosBases() {
 
         {/* Contenido educativo colapsable */}
         <EducationalSection
-          title="📚 ¿Quieres aprender más?"
+          title="¿Quieres aprender más?"
           subtitle="Profundiza en la química del pH"
         >
           <section className={styles.guideSection}>

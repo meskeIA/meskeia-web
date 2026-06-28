@@ -627,7 +627,7 @@ export default function ConversorUnidadesRFPage() {
 
       {/* Sección educativa */}
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre unidades RF?"
+        title="¿Quieres aprender más sobre unidades RF?"
         subtitle="Conceptos clave de radiofrecuencia y telecomunicaciones"
       >
         <section className={styles.guideSection}>

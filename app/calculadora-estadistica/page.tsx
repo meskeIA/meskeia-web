@@ -353,7 +353,7 @@ Ejemplo: 5, 7, 8, 6, 9, 7, 8"
       </DisclaimerCard>
 
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre Estadística Descriptiva?"
+        title="¿Quieres aprender más sobre Estadística Descriptiva?"
         subtitle="Descubre conceptos clave, fórmulas y cuándo usar cada medida"
       >
 

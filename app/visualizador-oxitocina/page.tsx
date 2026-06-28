@@ -462,7 +462,7 @@ export default function VisualizadorOxitocinaPage() {
 
       {/* Sección educativa */}
       <EducationalSection
-        title="📚 Profundiza en la Neurociencia de la Oxitocina"
+        title="Profundiza en la Neurociencia de la Oxitocina"
         subtitle="Conceptos clave para entender la hormona del vínculo"
       >
         <section>

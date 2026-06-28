@@ -784,7 +784,7 @@ export default function GuiaTejidosFibrasPage() {
 
         {/* Sección educativa v2.0 */}
         <EducationalSection
-          title="📚 Todo sobre tejidos y fibras"
+          title="Todo sobre tejidos y fibras"
           subtitle="Propiedades, sostenibilidad y cómo elegir el material adecuado"
         >
           {/* 1. Tabla comparativa */}

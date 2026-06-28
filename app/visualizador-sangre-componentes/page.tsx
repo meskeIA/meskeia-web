@@ -756,7 +756,7 @@ export default function SangreComponentesPage() {
 
         {/* Contenido educativo colapsable */}
         <EducationalSection
-          title="📚 ¿Quieres aprender más sobre la sangre?"
+          title="¿Quieres aprender más sobre la sangre?"
           subtitle="Conceptos clave de hematología"
         >
           <section className={styles.guideSection}>

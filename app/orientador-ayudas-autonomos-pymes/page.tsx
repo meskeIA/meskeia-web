@@ -234,7 +234,7 @@ export default function OrientadorAyudasAutonomosPymesPage() {
       </section>
 
       <EducationalSection
-        title="📚 Guía: ayudas y financiación para autónomos y pymes"
+        title="Guía: ayudas y financiación para autónomos y pymes"
         subtitle="Tipos de ayuda, ejemplos prácticos y consejos antes de solicitar"
       >
         {/* Tabla comparativa */}

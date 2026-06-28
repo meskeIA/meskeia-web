@@ -560,7 +560,7 @@ export default function SimuladorLentesOpticasPage() {
           BLOQUE EDUCATIVO v2.0
           ============================================ */}
       <EducationalSection
-        title="📚 Aprende óptica geométrica con lentes"
+        title="Aprende óptica geométrica con lentes"
         subtitle="De la ecuación de Gauss a las gafas, cámaras y microscopios"
       >
         {/* INTRO */}

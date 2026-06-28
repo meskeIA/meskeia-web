@@ -303,7 +303,7 @@ export default function GlosarioFisicaQuimicaPage() {
 
       {/* Sección educativa */}
       <EducationalSection
-        title="📚 Guía completa de Física y Química"
+        title="Guía completa de Física y Química"
         subtitle="Todo lo que necesitas saber para estudiar ciencias exactas en secundaria, preparatoria y universidad"
       >
         {/* Contenido original mantenido */}

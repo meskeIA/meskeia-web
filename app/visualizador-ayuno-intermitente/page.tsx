@@ -435,7 +435,7 @@ export default function AyunoIntermitentePage() {
       )}
 
       <EducationalSection
-        title="📚 Fisiología del ayuno: guía completa"
+        title="Fisiología del ayuno: guía completa"
         subtitle="Metabolismo, hormonas y mecanismos celulares explicados"
       >
         <h3>El papel de las hormonas durante el ayuno</h3>

@@ -426,7 +426,7 @@ export default function DiagnosticoComunicacionInternaPage() {
         )}
 
         <EducationalSection
-          title="📚 La dictadura de lo urgente en la comunicación"
+          title="La dictadura de lo urgente en la comunicación"
           subtitle="Por qué comunicamos más pero nos entendemos menos"
         >
           <section className={styles.guideSection}>

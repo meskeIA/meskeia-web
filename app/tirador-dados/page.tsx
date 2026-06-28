@@ -461,7 +461,7 @@ export default function TiradorDadosPage() {
       )}
 
       <EducationalSection
-        title="📚 ¿Quieres saber más sobre dados de rol?"
+        title="¿Quieres saber más sobre dados de rol?"
         subtitle="Tipos de dados, probabilidades y usos en juegos de mesa"
       >
         <div className={styles.eduContent}>

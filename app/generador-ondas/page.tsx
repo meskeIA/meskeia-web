@@ -699,7 +699,7 @@ export default function GeneradorOndasPage() {
 
       {/* Contenido educativo */}
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre ondas sonoras?"
+        title="¿Quieres aprender más sobre ondas sonoras?"
         subtitle="Descubre la física del sonido y cómo funcionan las ondas"
       >
         {/* Tabla comparativa */}

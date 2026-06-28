@@ -526,7 +526,7 @@ export default function PlanificadorTrimestresFreelancePage() {
 
         {/* Contenido educativo */}
         <EducationalSection
-          title="📚 Todo sobre los trimestres fiscales del autónomo"
+          title="Todo sobre los trimestres fiscales del autónomo"
           subtitle="Modelos, plazos y consejos prácticos"
         >
           <section className={styles.guideSection}>

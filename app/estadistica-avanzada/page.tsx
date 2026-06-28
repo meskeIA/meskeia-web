@@ -1061,7 +1061,7 @@ export default function EstadisticaAvanzadaPage() {
 
       {/* Contenido educativo */}
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre estadística inferencial?"
+        title="¿Quieres aprender más sobre estadística inferencial?"
         subtitle="Descubre cuándo usar cada test y cómo interpretar los resultados"
       >
         <section className={styles.guideSection}>

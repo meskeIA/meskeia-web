@@ -551,7 +551,7 @@ export default function OrientadorContratoMercantilPage() {
 
         {/* Sección educativa v2.0 */}
         <EducationalSection
-          title="📚 Todo sobre contratos mercantiles"
+          title="Todo sobre contratos mercantiles"
           subtitle="Guía práctica para autónomos y empresas en España"
         >
           {/* Tabla comparativa educativa */}

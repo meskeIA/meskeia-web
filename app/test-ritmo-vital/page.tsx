@@ -417,7 +417,7 @@ export default function TestRitmoVitalPage() {
         )}
 
         <EducationalSection
-          title="📚 Kletskassa y la ciencia de ir despacio"
+          title="Kletskassa y la ciencia de ir despacio"
           subtitle="Por qué la velocidad no siempre es productividad"
         >
           <section className={styles.guideSection}>

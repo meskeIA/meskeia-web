@@ -774,7 +774,7 @@ export default function SimuladorHipotecaPage() {
 
       {/* Contenido Educativo */}
       <EducationalSection
-        title="📚 Guía completa sobre hipotecas"
+        title="Guía completa sobre hipotecas"
         subtitle="Aprende sobre tipos de interés, amortización, negociación y preguntas frecuentes"
       >
         {/* Tabla comparativa Fija vs Variable vs Mixta */}

@@ -466,7 +466,7 @@ export default function MetabolismoAlcoholPage() {
       )}
 
       <EducationalSection
-        title="📚 Fisiología completa del metabolismo del alcohol"
+        title="Fisiología completa del metabolismo del alcohol"
         subtitle="Bioquímica, epidemiología y mecanismos de daño tisular"
       >
         <h3>El concepto de Unidad de Bebida Estándar (UBE)</h3>

@@ -313,7 +313,7 @@ export default function CalculadoraHidratacionPanPage() {
 
       {/* Sección educativa */}
       <EducationalSection
-        title="📚 Todo sobre la hidratación del pan"
+        title="Todo sobre la hidratación del pan"
         subtitle="Entiende qué cambia en tu masa según la cantidad de agua"
       >
         <section className={styles.guideSection}>

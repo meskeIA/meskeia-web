@@ -565,7 +565,7 @@ export default function SimuladorPunnettPage() {
           BLOQUE EDUCATIVO v2.0
           ============================================================ */}
       <EducationalSection
-        title="📚 Aprende Genética Mendeliana"
+        title="Aprende Genética Mendeliana"
         subtitle="Leyes de Mendel, cuadro de Punnett y herencia genética explicados paso a paso"
       >
         {/* INTRO */}

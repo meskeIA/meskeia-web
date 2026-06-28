@@ -535,7 +535,7 @@ export default function ExtractorAudioVideoPage() {
       </div>
 
       <EducationalSection
-        title="📚 Cómo funciona el extractor de audio"
+        title="Cómo funciona el extractor de audio"
         subtitle="Tecnología WebAssembly, formatos de audio y privacidad"
       >
         {/* Sección 1: Tabla comparativa de formatos */}

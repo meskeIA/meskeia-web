@@ -676,7 +676,7 @@ export default function EstimadorImpuestoSucesionesPage() {
 
       {/* Contenido educativo */}
       <EducationalSection
-        title="📚 ¿Quieres entender el Impuesto de Sucesiones?"
+        title="¿Quieres entender el Impuesto de Sucesiones?"
         subtitle="Guía completa: cómo funciona, plazos y diferencias entre CCAA"
       >
         <section className={styles.guideSection}>

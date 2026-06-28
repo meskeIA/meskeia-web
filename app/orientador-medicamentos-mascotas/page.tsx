@@ -521,7 +521,7 @@ export default function CalculadoraMedicamentosMascotasPage() {
       />
 
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre parásitos en mascotas?"
+        title="¿Quieres aprender más sobre parásitos en mascotas?"
         subtitle="Información sobre prevención, tratamiento y cuidados"
       >
         {/* Tabla comparativa */}

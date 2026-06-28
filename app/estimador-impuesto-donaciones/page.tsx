@@ -478,7 +478,7 @@ export default function EstimadorImpuestoDonacionesPage() {
 
       {/* Contenido educativo */}
       <EducationalSection
-        title="📚 ¿Quieres entender el Impuesto de Donaciones?"
+        title="¿Quieres entender el Impuesto de Donaciones?"
         subtitle="Guía completa con bonificaciones por comunidad autónoma"
       >
         <section className={styles.guideSection}>

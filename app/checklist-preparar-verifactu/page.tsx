@@ -322,7 +322,7 @@ export default function ChecklistPrepararVerifactuPage() {
 
         {/* Contenido educativo */}
         <EducationalSection
-          title="📚 Todo sobre VeriFactu"
+          title="Todo sobre VeriFactu"
           subtitle="Guía completa sobre la facturación electrónica en España"
         >
           <section className={styles.guideSection}>

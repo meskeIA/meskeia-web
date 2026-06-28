@@ -211,7 +211,7 @@ export default function SimuladorFisicaPage() {
 
       {/* Sección educativa */}
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre Física?"
+        title="¿Quieres aprender más sobre Física?"
         subtitle="Conceptos fundamentales de mecánica y ondas"
       >
         {/* Sección 1: Tabla Comparativa */}

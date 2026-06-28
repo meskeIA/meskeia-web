@@ -689,7 +689,7 @@ export default function SimuladorCineticaArrheniusPage() {
           BLOQUE EDUCATIVO v2.0
           ============================================ */}
       <EducationalSection
-        title="📚 Aprende cinética química con Arrhenius"
+        title="Aprende cinética química con Arrhenius"
         subtitle="Por qué subir 10 °C duplica las velocidades y por qué los catalizadores son magia"
       >
         <section>

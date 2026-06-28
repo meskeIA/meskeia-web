@@ -191,7 +191,7 @@ export default function QuizConceptosFinancierosPage() {
         )}
 
         <EducationalSection
-          title="📚 Glosario financiero básico"
+          title="Glosario financiero básico"
           subtitle="Los conceptos clave que todo joven debería conocer"
         >
           <section className={styles.guideSection}>

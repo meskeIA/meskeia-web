@@ -274,7 +274,7 @@ export default function RecordatorioMedicacionPage() {
 
         {/* Sección educativa */}
         <EducationalSection
-          title="📚 Guía para familias y cuidadores"
+          title="Guía para familias y cuidadores"
           subtitle="Aprende a sacar el máximo partido al recordatorio visual"
         >
           {/* 1. Tabla comparativa */}

@@ -553,7 +553,7 @@ export default function CalculadoraGeometriaPage() {
       </div>
 
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre Geometría?"
+        title="¿Quieres aprender más sobre Geometría?"
         subtitle="Descubre fórmulas, propiedades y aplicaciones de las figuras geométricas"
       >
         {/* SECCIÓN 1: Tabla Comparativa 2D vs 3D */}

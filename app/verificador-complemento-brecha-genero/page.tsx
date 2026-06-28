@@ -441,7 +441,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
 
       {/* ─── Contenido educativo v2.0 ─── */}
       <EducationalSection
-        title="📚 Guía completa del complemento por brecha de género"
+        title="Guía completa del complemento por brecha de género"
         subtitle="Qué es, quién puede pedirlo, cuánto se cobra y cómo reclamar"
       >
         <section className={styles.guideSection}>

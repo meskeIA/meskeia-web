@@ -424,7 +424,7 @@ export default function CalculadoraMaterialesPage() {
 
         {/* Sección educativa */}
         <EducationalSection
-          title="📚 Guía de materiales para reformas"
+          title="Guía de materiales para reformas"
           subtitle="Consejos y referencias para calcular bien antes de ir a la tienda"
         >
           <section className={styles.guideSection}>

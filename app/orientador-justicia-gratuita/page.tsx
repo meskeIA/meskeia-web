@@ -299,7 +299,7 @@ export default function OrientadorJusticiaGratuitaPage() {
         </div>
 
         <EducationalSection
-          title="📚 Todo sobre la justicia gratuita"
+          title="Todo sobre la justicia gratuita"
           subtitle="Requisitos, trámites y preguntas frecuentes"
         >
           <section className={styles.guideSection}>

@@ -422,7 +422,7 @@ export default function MapaCompromisosCapacidadPage() {
         )}
 
         <EducationalSection
-          title="📚 El arte de decir no (y de decir sí mejor)"
+          title="El arte de decir no (y de decir sí mejor)"
           subtitle="Por qué tus compromisos definen tu vida"
         >
           <section className={styles.guideSection}>

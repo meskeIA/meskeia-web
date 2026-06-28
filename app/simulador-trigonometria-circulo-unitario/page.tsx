@@ -548,7 +548,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
           BLOQUE EDUCATIVO v2.0
           ============================================ */}
       <EducationalSection
-        title="📚 Aprende sobre el Círculo Trigonométrico"
+        title="Aprende sobre el Círculo Trigonométrico"
         subtitle="Geometría y razones trigonométricas desde cero"
       >
         {/* INTRO */}

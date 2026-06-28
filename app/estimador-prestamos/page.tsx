@@ -1061,7 +1061,7 @@ export default function SimuladorPrestamosPage() {
 
       {/* Contenido educativo colapsable - Patrón Profesional v2.0 */}
       <EducationalSection
-        title="📚 ¿Quieres entender préstamos personales en profundidad?"
+        title="¿Quieres entender préstamos personales en profundidad?"
         subtitle="Aprende a elegir el mejor sistema, comparar ofertas, evitar errores comunes y gestionar tu préstamo de forma inteligente"
         icon="📚"
       >

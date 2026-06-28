@@ -358,7 +358,7 @@ export default function EstimadorComplementoMinimosPage() {
 
         {/* ── Contenido educativo ── */}
         <EducationalSection
-          title="📚 Todo sobre el complemento a mínimos"
+          title="Todo sobre el complemento a mínimos"
           subtitle="Requisitos, trámites y preguntas frecuentes"
         >
           <section className={styles.guideSection}>

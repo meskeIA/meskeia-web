@@ -553,7 +553,7 @@ export default function SimuladorEstequiometriaPage() {
 
         {/* BLOQUE EDUCATIVO v2.0 */}
         <EducationalSection
-          title="📚 Aprende sobre Estequiometría"
+          title="Aprende sobre Estequiometría"
           subtitle="El reactivo limitante y el método de los moles explicados paso a paso"
         >
           {/* INTRO */}

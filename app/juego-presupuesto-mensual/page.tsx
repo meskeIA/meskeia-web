@@ -288,7 +288,7 @@ export default function JuegoPresupuestoMensualPage() {
         )}
 
         <EducationalSection
-          title="📚 Lecciones de presupuesto"
+          title="Lecciones de presupuesto"
           subtitle="Lo que este juego te enseña sobre el dinero real"
         >
           <section className={styles.guideSection}>

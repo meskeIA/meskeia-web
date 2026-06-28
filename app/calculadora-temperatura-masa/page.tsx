@@ -268,7 +268,7 @@ export default function CalculadoraTemperaturaMasaPage() {
       </div>
 
       <EducationalSection
-        title="📚 DDT: la técnica profesional de control de temperatura del pan"
+        title="DDT: la técnica profesional de control de temperatura del pan"
         subtitle="Por qué los panaderos profesionales calculan la temperatura del agua antes de amasar"
       >
         <div className={styles.guideSection}>

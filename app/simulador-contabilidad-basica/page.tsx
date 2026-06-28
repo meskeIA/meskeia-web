@@ -550,7 +550,7 @@ export default function SimuladorContabilidadBasicaPage() {
 
       {/* Sección educativa */}
       <EducationalSection
-        title="📚 Fundamentos de contabilidad"
+        title="Fundamentos de contabilidad"
         subtitle="Comprende la partida doble, el libro diario y el libro mayor"
       >
         {/* ── Tabla comparativa ── */}

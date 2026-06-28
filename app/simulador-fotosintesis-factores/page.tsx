@@ -499,7 +499,7 @@ export default function SimuladorFotosintesisFactoresPage() {
 
         {/* Bloque educativo v2.0 */}
         <EducationalSection
-          title="📚 Guía completa: Fotosíntesis y Factores Limitantes"
+          title="Guía completa: Fotosíntesis y Factores Limitantes"
           subtitle="Ley de Blackman, modelo cinético y estrategias para el examen"
           icon="🌿"
         >

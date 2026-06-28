@@ -376,7 +376,7 @@ export default function TestZaritCuidadorPage() {
 
         {/* Sección educativa v2.0 */}
         <EducationalSection
-          title="📚 Guía sobre la sobrecarga del cuidador"
+          title="Guía sobre la sobrecarga del cuidador"
           subtitle="Información, señales de alerta y estrategias de autocuidado"
         >
           {/* Qué es la Escala Zarit */}

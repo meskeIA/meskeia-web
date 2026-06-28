@@ -466,7 +466,7 @@ export default function SimuladorCicloExplotacionPage() {
 
       {/* Sección educativa v2.0 */}
       <EducationalSection
-        title="📚 Aprende sobre el ciclo de explotación"
+        title="Aprende sobre el ciclo de explotación"
         subtitle="Conceptos clave de gestión del circulante"
       >
         <div className={styles.eduContent}>

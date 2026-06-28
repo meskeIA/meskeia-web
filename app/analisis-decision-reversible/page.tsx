@@ -430,7 +430,7 @@ export default function AnalisisDecisionReversiblePage() {
         )}
 
         <EducationalSection
-          title="📚 Puertas tipo 1 y tipo 2: el framework de Bezos"
+          title="Puertas tipo 1 y tipo 2: el framework de Bezos"
           subtitle="Decidir bien no es decidir lento — es decidir con el nivel correcto de análisis"
         >
           <section className={styles.guideSection}>

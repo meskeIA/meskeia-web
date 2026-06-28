@@ -750,7 +750,7 @@ export default function ImpuestosDivorcioPage() {
 
       {/* Contenido educativo colapsable */}
       <EducationalSection
-        title="📚 Todo lo que debes saber sobre fiscalidad del divorcio"
+        title="Todo lo que debes saber sobre fiscalidad del divorcio"
         subtitle="Guía completa para entender y optimizar el impacto fiscal de tu divorcio"
       >
         {/* Tabla comparativa */}

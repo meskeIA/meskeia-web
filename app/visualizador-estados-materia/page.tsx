@@ -673,7 +673,7 @@ export default function VisualizadorEstadosMateria() {
 
         {/* Contenido educativo */}
         <EducationalSection
-          title="📚 Entendiendo la materia"
+          title="Entendiendo la materia"
           subtitle="Conceptos clave sobre los estados de la materia"
         >
           <section className={styles.guideSection}>

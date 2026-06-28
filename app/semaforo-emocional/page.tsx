@@ -249,7 +249,7 @@ export default function SemaforoEmocionalPage() {
 
       {/* ---- SECCIÓN EDUCATIVA ---- */}
       <EducationalSection
-        title="📚 Guía para familias, educadores y terapeutas"
+        title="Guía para familias, educadores y terapeutas"
         subtitle="Cómo usar el semáforo emocional con eficacia"
       >
         {/* 1. Tabla comparativa */}

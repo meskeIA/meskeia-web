@@ -373,7 +373,7 @@ export default function CalculadoraGastosComunidadPage() {
 
       {/* CONTENIDO EDUCATIVO */}
       <EducationalSection
-        title="📚 Guía de gastos de comunidad"
+        title="Guía de gastos de comunidad"
         subtitle="Todo lo que necesitas saber como propietario"
       >
         <section>

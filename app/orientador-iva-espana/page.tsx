@@ -681,7 +681,7 @@ export default function OrientadorIvaEspanaPage() {
 
       {/* ── Sección educativa v2.0 ── */}
       <EducationalSection
-        title="📚 Guía del IVA para autónomos y nuevas empresas"
+        title="Guía del IVA para autónomos y nuevas empresas"
         subtitle="Conceptos clave para no equivocarte al facturar"
       >
         {/* Tabla comparativa de tipos */}

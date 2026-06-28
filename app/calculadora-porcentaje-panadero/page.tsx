@@ -278,7 +278,7 @@ export default function CalculadoraPorcentajePanaderoPage() {
 
       {/* Sección educativa */}
       <EducationalSection
-        title="📚 ¿Qué es el porcentaje del panadero?"
+        title="¿Qué es el porcentaje del panadero?"
         subtitle="El sistema que usan los profesionales para formular recetas con precisión"
       >
         <section className={styles.guideSection}>

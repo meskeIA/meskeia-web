@@ -422,7 +422,7 @@ export default function GeneradorGitignorePage() {
       />
 
       <EducationalSection
-        title="📚 ¿Quieres dominar .gitignore y el control de versiones?"
+        title="¿Quieres dominar .gitignore y el control de versiones?"
         subtitle="Descubre por qué es esencial, cuándo usarlo, errores comunes y mejores prácticas profesionales"
         icon="📚"
       >

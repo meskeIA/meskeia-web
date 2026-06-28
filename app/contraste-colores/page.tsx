@@ -450,7 +450,7 @@ export default function ContrasteColoresPage() {
 
       {/* Contenido educativo profesional */}
       <EducationalSection
-        title="📚 Guía Completa de Contraste y Accesibilidad WCAG"
+        title="Guía Completa de Contraste y Accesibilidad WCAG"
         subtitle="Domina los principios de contraste, comprende los niveles WCAG, y aprende a crear diseños accesibles desde el primer momento"
         icon="📚"
       >

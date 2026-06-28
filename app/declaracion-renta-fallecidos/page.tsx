@@ -550,7 +550,7 @@ export default function DeclaracionRentaFallecidosPage() {
 
         {/* Contenido educativo colapsable */}
         <EducationalSection
-          title="📚 Más sobre la Renta de personas fallecidas"
+          title="Más sobre la Renta de personas fallecidas"
           subtitle="Preguntas frecuentes y conceptos clave"
         >
           <section className={styles.guideSection}>

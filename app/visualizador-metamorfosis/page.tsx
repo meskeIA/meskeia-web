@@ -661,7 +661,7 @@ export default function MetamorfosisPage() {
 
         {/* Contenido educativo colapsable */}
         <EducationalSection
-          title="📚 ¿Quieres aprender más sobre metamorfosis?"
+          title="¿Quieres aprender más sobre metamorfosis?"
           subtitle="Conceptos clave de biología animal"
         >
           <section className={styles.guideSection}>

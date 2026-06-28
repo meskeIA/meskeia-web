@@ -423,7 +423,7 @@ export default function MotorCombustionPage() {
       )}
 
       <EducationalSection
-        title="📚 Termodinámica del motor de combustión"
+        title="Termodinámica del motor de combustión"
         subtitle="Del ciclo de Carnot al motor híbrido: física aplicada a la movilidad"
       >
         <h3>El ciclo de Carnot y el límite teórico</h3>

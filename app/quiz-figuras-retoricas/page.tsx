@@ -357,7 +357,7 @@ export default function QuizFigurasRetoricaPage() {
       )}
 
       <EducationalSection
-        title="📚 ¿Quieres dominar las figuras retóricas?"
+        title="¿Quieres dominar las figuras retóricas?"
         subtitle="Guía completa con tabla comparativa, casos de uso, FAQ y método para exámenes de selectividad"
       >
 

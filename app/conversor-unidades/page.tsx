@@ -557,7 +557,7 @@ export default function ConversorUnidadesPage() {
 
       {/* Sección educativa colapsable - INCLUYE TODAS LAS SECCIONES PROFESIONALES */}
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre conversión de unidades?"
+        title="¿Quieres aprender más sobre conversión de unidades?"
         subtitle="Descubre el Sistema Internacional, casos de uso, mejores prácticas y errores comunes"
       >
         {/* CONTENIDO EDUCATIVO COMPLETO */}

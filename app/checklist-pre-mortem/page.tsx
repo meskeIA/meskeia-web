@@ -428,7 +428,7 @@ export default function ChecklistPreMortemPage() {
         )}
 
         <EducationalSection
-          title="📚 El pre-mortem: pensar hacia atrás para avanzar mejor"
+          title="El pre-mortem: pensar hacia atrás para avanzar mejor"
           subtitle="Gary Klein y la psicología de la anticipación"
         >
           <section className={styles.guideSection}>

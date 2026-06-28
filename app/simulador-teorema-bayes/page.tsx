@@ -557,7 +557,7 @@ export default function SimuladorTeoremaBayesPage() {
           BLOQUE EDUCATIVO v2.0
           ============================================ */}
       <EducationalSection
-        title="📚 Aprende el teorema de Bayes"
+        title="Aprende el teorema de Bayes"
         subtitle="La fórmula que cambia tu intuición sobre tests, evidencia y diagnóstico"
       >
         <section>

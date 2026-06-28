@@ -670,7 +670,7 @@ export default function EnzimasCuerpoHumanoPage() {
 
         {/* Contenido educativo colapsable */}
         <EducationalSection
-          title="📚 ¿Quieres profundizar?"
+          title="¿Quieres profundizar?"
           subtitle="Conceptos clave sobre enzimología"
         >
           <section className={styles.guideSection}>

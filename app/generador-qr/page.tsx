@@ -1070,7 +1070,7 @@ export default function GeneradorQRPage() {
 
       {/* Contenido educativo */}
       <EducationalSection
-        title="📚 Guía completa de códigos QR"
+        title="Guía completa de códigos QR"
         subtitle="Aprende sobre tipos, mejores prácticas, implementación y preguntas frecuentes"
       >
         {/* Tabla de casos de uso */}

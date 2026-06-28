@@ -712,7 +712,7 @@ export default function CalculadoraInflacionPage() {
       />
 {/* Contenido educativo */}
       <EducationalSection
-        title="📚 ¿Quieres entender mejor la inflación?"
+        title="¿Quieres entender mejor la inflación?"
         subtitle="Aprende cómo afecta a tu economía personal y estrategias para protegerte"
       >
         {/* TABLA COMPARATIVA */}

@@ -581,7 +581,7 @@ export default function ConvertidorColoresPage() {
 
       {/* Contenido Educativo */}
       <EducationalSection
-        title="📚 Guía completa sobre formatos de color"
+        title="Guía completa sobre formatos de color"
         subtitle="Aprende cuándo usar cada formato, diferencias técnicas, casos de uso y mejores prácticas"
       >
         <section className={styles.guideSection}>

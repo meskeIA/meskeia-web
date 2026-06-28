@@ -460,7 +460,7 @@ export default function OrientadorDiscapacidadPage() {
 
       {/* SECCIÓN EDUCATIVA V2.0 */}
       <EducationalSection
-        title="📚 ¿Qué es el grado de discapacidad?"
+        title="¿Qué es el grado de discapacidad?"
         subtitle="Entiende el sistema de reconocimiento en España"
       >
         {/* EXPLICACIÓN GENERAL */}

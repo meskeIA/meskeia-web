@@ -337,7 +337,7 @@ export default function OrientadorAvalIcoPage() {
       </section>
 
       <EducationalSection
-        title="📚 Guía completa: Aval ICO Vivienda"
+        title="Guía completa: Aval ICO Vivienda"
         subtitle="Todo lo que necesitas saber sobre el aval estatal para comprar casa"
       >
         {/* Tabla comparativa */}

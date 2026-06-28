@@ -414,7 +414,7 @@ export default function PlanificadorVacacionesAutonomoPage() {
 
         {/* Contenido educativo */}
         <EducationalSection
-          title="📚 Todo sobre vacaciones para autónomos"
+          title="Todo sobre vacaciones para autónomos"
           subtitle="Estadísticas, consejos y preguntas frecuentes"
         >
           {/* Estadísticas */}

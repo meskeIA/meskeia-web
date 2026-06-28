@@ -532,7 +532,7 @@ export default function HistoriasSocialesPage() {
 
       {/* Sección educativa */}
       <EducationalSection
-        title="📚 Guía sobre historias sociales"
+        title="Guía sobre historias sociales"
         subtitle="Qué son, cómo funcionan y cómo crearlas"
       >
         {/* 1. Tabla comparativa */}

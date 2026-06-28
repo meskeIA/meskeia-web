@@ -289,7 +289,7 @@ export default function AdditivosEAlimentariosPage() {
 
         {/* Sección educativa v2.0 */}
         <EducationalSection
-          title="📚 Todo lo que debes saber sobre los aditivos E"
+          title="Todo lo que debes saber sobre los aditivos E"
           subtitle="Entiende qué son, por qué se usan y cómo leer las etiquetas"
         >
           {/* 1. Tabla comparativa de categorías */}

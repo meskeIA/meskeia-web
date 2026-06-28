@@ -612,7 +612,7 @@ export default function OrientadorEscrituraCreativaPage() {
 
       {/* Sección educativa v2.0 */}
       <EducationalSection
-        title="📚 Todo lo que necesitas saber antes de escribir"
+        title="Todo lo que necesitas saber antes de escribir"
         subtitle="Guía completa para el escritor que empieza desde cero"
       >
         {/* 1. Tabla Comparativa: los 6 géneros */}

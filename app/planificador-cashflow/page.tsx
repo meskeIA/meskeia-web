@@ -600,7 +600,7 @@ export default function PlanificadorCashFlowPage() {
 
       {/* Contenido educativo */}
       <EducationalSection
-        title="📚 Guía completa de gestión de tesorería y cash flow"
+        title="Guía completa de gestión de tesorería y cash flow"
         subtitle="Aprende a planificar la liquidez de tu negocio, evitar la temida quiebra técnica y optimizar tus cobros y pagos"
       >
         {/* TABLA COMPARATIVA */}

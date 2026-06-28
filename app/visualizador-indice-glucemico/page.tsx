@@ -569,7 +569,7 @@ export default function IndiceGlucemicoPage() {
       )}
 
       <EducationalSection
-        title="📚 Guía completa de índice glucémico y nutrición"
+        title="Guía completa de índice glucémico y nutrición"
         subtitle="Más allá del IG: contexto, limitaciones y aplicaciones reales"
       >
         <h3>Las limitaciones del índice glucémico</h3>

@@ -427,7 +427,7 @@ export default function MapaAutomatizacionPersonalPage() {
         )}
 
         <EducationalSection
-          title="📚 La matriz rutinario vs creativo: dónde poner tu energía"
+          title="La matriz rutinario vs creativo: dónde poner tu energía"
           subtitle="No todo merece el mismo tipo de atención"
         >
           <section className={styles.guideSection}>

@@ -324,7 +324,7 @@ export default function QuizHistoriaEspanaPage() {
       )}
 
       <EducationalSection
-        title="📚 Historia de España: guía de estudio"
+        title="Historia de España: guía de estudio"
         subtitle="Repasa las épocas clave de la historia española"
       >
         {/* Tabla cronológica */}

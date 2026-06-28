@@ -515,7 +515,7 @@ export default function TestBurnoutLaboralPage() {
 
       {/* SECCIÓN EDUCATIVA V2.0 */}
       <EducationalSection
-        title="📚 ¿Qué es el Burnout Laboral?"
+        title="¿Qué es el Burnout Laboral?"
         subtitle="Entiende el síndrome de desgaste profesional"
       >
         {/* GUÍA PASO A PASO */}

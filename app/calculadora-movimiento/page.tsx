@@ -431,7 +431,7 @@ export default function CalculadoraMovimientoPage() {
 
       {/* Sección educativa */}
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre Cinemática?"
+        title="¿Quieres aprender más sobre Cinemática?"
         subtitle="Descubre los tipos de movimiento, fórmulas clave y ejemplos prácticos"
       >
         <section className={styles.guideSection}>

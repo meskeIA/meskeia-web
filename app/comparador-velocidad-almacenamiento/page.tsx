@@ -394,7 +394,7 @@ export default function ComparadorVelocidadAlmacenamientoPage() {
 
       {/* ---- SECCIÓN EDUCATIVA v2.0 ---- */}
       <EducationalSection
-        title="📚 Guía completa de tecnologías de almacenamiento"
+        title="Guía completa de tecnologías de almacenamiento"
         subtitle="Por qué hay tanta diferencia de velocidad y cómo elegir la tecnología adecuada"
       >
         {/* 1. TABLA COMPARATIVA */}

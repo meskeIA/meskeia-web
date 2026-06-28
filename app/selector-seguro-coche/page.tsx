@@ -553,7 +553,7 @@ export default function SelectorSeguroCochePage() {
 
       {/* Sección educativa v2.0 */}
       <EducationalSection
-        title="📚 Todo sobre los seguros de coche en España"
+        title="Todo sobre los seguros de coche en España"
         subtitle="Guía completa para entender coberturas, precios y cómo elegir bien"
       >
         <section>

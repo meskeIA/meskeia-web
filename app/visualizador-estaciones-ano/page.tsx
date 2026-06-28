@@ -681,7 +681,7 @@ export default function VisualizadorEstacionesAno() {
 
         {/* Contenido educativo */}
         <EducationalSection
-          title="📚 ¿Quieres aprender más?"
+          title="¿Quieres aprender más?"
           subtitle="Conceptos clave sobre la Tierra y sus estaciones"
         >
           <section className={styles.guideSection}>

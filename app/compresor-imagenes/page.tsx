@@ -836,7 +836,7 @@ export default function CompresorImagenesPage() {
 
       {/* Contenido educativo */}
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre compresión de imágenes?"
+        title="¿Quieres aprender más sobre compresión de imágenes?"
         subtitle="Descubre cómo optimizar tus fotos y los mejores formatos para cada uso"
       >
         <section className={styles.guideSection}>

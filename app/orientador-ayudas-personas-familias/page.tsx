@@ -245,7 +245,7 @@ export default function OrientadorAyudasPersonasFamiliasPage() {
       </section>
 
       <EducationalSection
-        title="📚 Guía: ayudas y prestaciones sociales para personas y familias"
+        title="Guía: ayudas y prestaciones sociales para personas y familias"
         subtitle="Tipos de ayuda, ejemplos prácticos y consejos antes de solicitar"
       >
         {/* Tabla comparativa */}

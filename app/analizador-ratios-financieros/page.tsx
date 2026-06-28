@@ -650,7 +650,7 @@ export default function AnalizadorRatiosFinancierosPage() {
 
       {/* ── Sección educativa ── */}
       <EducationalSection
-        title="📚 Guía de ratios financieros"
+        title="Guía de ratios financieros"
         subtitle="Aprende a interpretar los indicadores clave de un balance"
       >
         {/* Tabla comparativa */}

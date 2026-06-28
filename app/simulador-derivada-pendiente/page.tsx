@@ -586,7 +586,7 @@ export default function SimuladorDerivadaPendientePage() {
           BLOQUE EDUCATIVO v2.0
           ============================================ */}
       <EducationalSection
-        title="📚 Aprende qué es la derivada"
+        title="Aprende qué es la derivada"
         subtitle="De la recta tangente al cálculo diferencial"
       >
         {/* INTRO */}

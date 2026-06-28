@@ -509,7 +509,7 @@ export default function EstimadorSMIPage() {
 
         {/* Contenido educativo v2.0 */}
         <EducationalSection
-          title="📚 Todo sobre el SMI 2026"
+          title="Todo sobre el SMI 2026"
           subtitle="Datos, derechos y preguntas frecuentes"
         >
           <section className={styles.guideSection}>

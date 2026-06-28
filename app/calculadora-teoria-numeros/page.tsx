@@ -660,7 +660,7 @@ export default function CalculadoraTeoriaNumerosPage() {
       </div>
 
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre Teoría de Números?"
+        title="¿Quieres aprender más sobre Teoría de Números?"
         subtitle="Descubre la belleza de los números enteros"
       >
         <section className={styles.guideSection}>

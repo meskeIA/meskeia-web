@@ -207,7 +207,7 @@ export default function EstimadorTiempoAhorroPage() {
         </div>
 
         <EducationalSection
-          title="📚 Trucos para ahorrar más rápido"
+          title="Trucos para ahorrar más rápido"
           subtitle="Consejos prácticos para acelerar tu ahorro"
         >
           <section className={styles.guideSection}>

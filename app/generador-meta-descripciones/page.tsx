@@ -385,7 +385,7 @@ export default function GeneradorMetaDescripcionesPage() {
 
       {/* Contenido educativo */}
       <EducationalSection
-        title="📚 Guía para Meta Descripciones Perfectas"
+        title="Guía para Meta Descripciones Perfectas"
         subtitle="Mejores prácticas SEO para aumentar tu CTR en Google"
       >
         <div className={styles.educationalContent}>

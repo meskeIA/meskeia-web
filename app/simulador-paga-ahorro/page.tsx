@@ -282,7 +282,7 @@ export default function SimuladorPagaAhorroPage() {
         </div>
 
         <EducationalSection
-          title="📚 Aprende a gestionar tu dinero"
+          title="Aprende a gestionar tu dinero"
           subtitle="Consejos prácticos para empezar a ahorrar"
         >
           <section className={styles.guideSection}>

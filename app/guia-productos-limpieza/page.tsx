@@ -641,7 +641,7 @@ export default function GuiaProductosLimpiezaPage() {
       {/* CONTENIDO EDUCATIVO v2.0 */}
       {/* ========================================================= */}
       <EducationalSection
-        title="📚 Guía completa de productos de limpieza domésticos"
+        title="Guía completa de productos de limpieza domésticos"
         subtitle="Química, denominaciones, comparativa y errores frecuentes que debes conocer"
       >
         {/* 1. TABLA COMPARATIVA */}

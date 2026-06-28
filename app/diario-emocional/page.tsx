@@ -273,7 +273,7 @@ export default function DiarioEmocionalPage() {
         )}
 
         <EducationalSection
-          title="📚 ¿Por qué llevar un diario emocional?"
+          title="¿Por qué llevar un diario emocional?"
           subtitle="Beneficios y consejos de uso"
         >
           <section className={styles.guideSection}>

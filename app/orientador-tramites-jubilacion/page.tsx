@@ -236,7 +236,7 @@ export default function OrientadorTramitesJubilacionPage() {
       </section>
 
       <EducationalSection
-        title="📚 Guía: trámites de jubilación en España"
+        title="Guía: trámites de jubilación en España"
         subtitle="Qué solicitar, en qué orden y dónde gestionar cada trámite"
       >
         {/* Tabla comparativa */}

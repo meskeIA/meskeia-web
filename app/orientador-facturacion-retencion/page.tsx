@@ -401,7 +401,7 @@ export default function OrientadorFacturacionRetencionPage() {
           </section>
 
           {/* Sección educativa v2.0 */}
-          <EducationalSection title="📚 Guía completa de retenciones para autónomos" subtitle="Todo lo que necesitas saber sobre retenciones IRPF en facturas: tipos, cálculo, modelos 111 y 190, y errores frecuentes.">
+          <EducationalSection title="Guía completa de retenciones para autónomos" subtitle="Todo lo que necesitas saber sobre retenciones IRPF en facturas: tipos, cálculo, modelos 111 y 190, y errores frecuentes.">
             <div className={styles.educativo}>
 
               {/* Intro */}

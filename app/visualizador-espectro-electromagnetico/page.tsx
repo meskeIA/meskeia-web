@@ -737,7 +737,7 @@ export default function EspectroElectromagneticoPage() {
 
         {/* Contenido educativo */}
         <EducationalSection
-          title="📚 ¿Quieres profundizar?"
+          title="¿Quieres profundizar?"
           subtitle="Conceptos avanzados sobre ondas electromagnéticas"
         >
           <section>

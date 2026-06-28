@@ -761,7 +761,7 @@ export default function RecortadorAudioPage() {
 
       {/* Contenido educativo */}
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre edición de audio?"
+        title="¿Quieres aprender más sobre edición de audio?"
         subtitle="Descubre técnicas y formatos para optimizar tus archivos de audio"
       >
         {/* Sección 1: Tabla comparativa de formatos */}

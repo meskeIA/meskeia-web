@@ -713,7 +713,7 @@ export default function EditorExifPage() {
 
       {/* Sección educativa */}
       <EducationalSection
-        title="📚 ¿Qué son los metadatos EXIF y por qué importan?"
+        title="¿Qué son los metadatos EXIF y por qué importan?"
         subtitle="Aprende sobre seguridad digital y protege tu privacidad"
       >
         {/* Tabla comparativa */}

@@ -518,7 +518,7 @@ export default function EstimacionCertificacionEnergeticaPage() {
 
         {/* Contenido educativo v2.0 */}
         <EducationalSection
-          title="📚 Todo sobre el certificado energetico"
+          title="Todo sobre el certificado energetico"
           subtitle="Que es, cuando lo necesitas y como mejorar la eficiencia de tu hogar"
         >
           {/* Que es */}

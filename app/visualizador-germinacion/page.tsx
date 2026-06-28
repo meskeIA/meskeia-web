@@ -700,7 +700,7 @@ export default function GerminacionPage() {
 
         {/* Contenido educativo */}
         <EducationalSection
-          title="📚 ¿Quieres saber más sobre germinación?"
+          title="¿Quieres saber más sobre germinación?"
           subtitle="Conceptos clave de biología vegetal"
         >
           <section className={styles.guideSection}>

@@ -245,7 +245,7 @@ export default function OrientadorAlquilerHabitacionesPage() {
 
         {/* Contenido educativo v2.0 */}
         <EducationalSection
-          title="📚 Todo sobre el alquiler por habitaciones"
+          title="Todo sobre el alquiler por habitaciones"
           subtitle="Normativa, derechos y preguntas frecuentes"
         >
           <section className={styles.guideSection}>

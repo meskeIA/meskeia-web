@@ -449,7 +449,7 @@ export default function RequisitosNomadaDigitalPage() {
 
       {/* Sección educativa v2.0 */}
       <EducationalSection
-        title="📚 Todo sobre la Visa Nómada Digital"
+        title="Todo sobre la Visa Nómada Digital"
         subtitle="Guía completa para trabajar en remoto desde España"
       >
         {/* Tabla comparativa */}

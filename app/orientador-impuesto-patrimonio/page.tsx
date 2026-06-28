@@ -422,7 +422,7 @@ export default function OrientadorImpuestoPatrimonioPage() {
 
       {/* ── Sección educativa v2.0 ── */}
       <EducationalSection
-        title="📚 Guía del Impuesto sobre el Patrimonio"
+        title="Guía del Impuesto sobre el Patrimonio"
         subtitle="Cómo se valora cada bien y quién está obligado a declarar"
       >
         {/* Tabla comparativa de criterios */}

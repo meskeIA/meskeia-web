@@ -167,7 +167,7 @@ export default function Calculadora1RMGimnasioPage() {
 
       {/* Contenido educativo colapsable */}
       <EducationalSection
-        title="📚 Aprende más sobre el 1RM y el entrenamiento de fuerza"
+        title="Aprende más sobre el 1RM y el entrenamiento de fuerza"
         subtitle="Conceptos clave para optimizar tu rendimiento"
       >
         <section className={styles.guideSection}>

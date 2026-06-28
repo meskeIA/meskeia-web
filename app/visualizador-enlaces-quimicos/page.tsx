@@ -526,7 +526,7 @@ export default function VisualizadorEnlacesQuimicosPage() {
         </main>
 
         <EducationalSection
-          title="📚 Profundiza en enlaces químicos"
+          title="Profundiza en enlaces químicos"
           subtitle="Conceptos avanzados y contexto científico"
         >
           <section className={styles.guideSection}>

@@ -258,7 +258,7 @@ export default function DiapasonPage() {
 
       {/* Contenido educativo */}
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre afinación musical?"
+        title="¿Quieres aprender más sobre afinación musical?"
         subtitle="Descubre la historia del La 440Hz y los estándares de afinación"
       >
         {/* Tabla comparativa */}

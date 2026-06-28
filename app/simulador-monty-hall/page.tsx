@@ -446,7 +446,7 @@ export default function SimuladorMontyHallPage() {
           BLOQUE EDUCATIVO v2.0
       ================================================ */}
       <EducationalSection
-        title="📚 Aprende sobre el Problema de Monty Hall"
+        title="Aprende sobre el Problema de Monty Hall"
         subtitle="Por qué la intuición nos engaña y cómo la probabilidad condicional lo explica"
       >
         {/* INTRO */}

@@ -433,7 +433,7 @@ export default function CalculadoraTIRVANPage() {
 
       {/* Contenido Educativo */}
       <EducationalSection
-        title="📚 Guía completa de análisis de inversiones: VAN, TIR y Payback"
+        title="Guía completa de análisis de inversiones: VAN, TIR y Payback"
         subtitle="Aprende a evaluar proyectos de inversión con los indicadores más usados en finanzas y toma decisiones con datos reales"
       >
         {/* TABLA COMPARATIVA */}

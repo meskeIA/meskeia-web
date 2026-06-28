@@ -726,7 +726,7 @@ export default function ConversorFormatosPage() {
 
       {/* Contenido educativo profesional */}
       <EducationalSection
-        title="📚 ¿Quieres dominar la conversión de formatos de datos?"
+        title="¿Quieres dominar la conversión de formatos de datos?"
         subtitle="Descubre cuándo usar cada formato, casos de uso reales y mejores prácticas profesionales"
         icon="📚"
       >

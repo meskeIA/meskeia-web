@@ -486,7 +486,7 @@ export default function CalculadoraAlimentacionMascotasPage() {
       />
 
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre nutrición de mascotas?"
+        title="¿Quieres aprender más sobre nutrición de mascotas?"
         subtitle="Consejos de alimentación, errores comunes y preguntas frecuentes"
       >
         {/* Tabla comparativa */}

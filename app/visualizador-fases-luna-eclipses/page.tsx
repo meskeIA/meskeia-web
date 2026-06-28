@@ -689,7 +689,7 @@ export default function VisualizadorFasesLunaEclipsesPage() {
 
         {/* Contenido educativo */}
         <EducationalSection
-          title="📚 ¿Quieres aprender más?"
+          title="¿Quieres aprender más?"
           subtitle="La Luna y su influencia en la Tierra"
         >
           <section className={styles.guideSection}>

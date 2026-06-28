@@ -400,7 +400,7 @@ export default function PlanificadorTurnosCuidadoresPage() {
 
         {/* Contenido educativo */}
         <EducationalSection
-          title="📚 Guía de organización del cuidado familiar"
+          title="Guía de organización del cuidado familiar"
           subtitle="Consejos, recursos y señales de alerta para cuidadores"
         >
           {/* Comparativa */}

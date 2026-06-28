@@ -345,7 +345,7 @@ export default function QuizSimbolosQuimicosPage() {
 
       {/* Sección educativa v2.0 */}
       <EducationalSection
-        title="📚 Todo sobre la tabla periódica"
+        title="Todo sobre la tabla periódica"
         subtitle="Historia, curiosidades y datos de los elementos químicos"
       >
         {/* Tabla comparativa por grupos */}

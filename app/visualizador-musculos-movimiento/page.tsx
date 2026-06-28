@@ -743,7 +743,7 @@ export default function MusculosMovimientoPage() {
 
         {/* Contenido educativo colapsable */}
         <EducationalSection
-          title="📚 ¿Quieres profundizar más?"
+          title="¿Quieres profundizar más?"
           subtitle="Conceptos avanzados y conexiones"
         >
           <section className={styles.seccionContent}>

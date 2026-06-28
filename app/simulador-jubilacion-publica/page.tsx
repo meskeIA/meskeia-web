@@ -855,7 +855,7 @@ export default function SimuladorJubilacionPublicaPage() {
 
         {/* ═══════ CONTENIDO EDUCATIVO v2.0 ═══════ */}
         <EducationalSection
-          title="📚 Todo sobre la jubilación pública en España"
+          title="Todo sobre la jubilación pública en España"
           subtitle="Pensión, edad, anticipada, parcial — Normativa y preguntas frecuentes"
         >
           <h2><span aria-hidden="true">🎯</span> 4 situaciones frecuentes</h2>

@@ -552,7 +552,7 @@ export default function CalculadoraRentabilidadAlquilerPage() {
 
       {/* CONTENIDO EDUCATIVO */}
       <EducationalSection
-        title="📚 Guía: Invertir en inmobiliario para alquilar"
+        title="Guía: Invertir en inmobiliario para alquilar"
         subtitle="Métricas, ejemplos reales, errores frecuentes y pasos para evaluar una inversión"
         defaultOpen={false}
       >

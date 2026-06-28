@@ -481,7 +481,7 @@ export default function PlanificadorChequeosMedicos() {
       </div>
 
       <EducationalSection
-        title="📚 Guía completa de medicina preventiva"
+        title="Guía completa de medicina preventiva"
         subtitle="Chequeos recomendados por edad, cribados del SNS y cómo organizarte"
         icon="🏥"
       >

@@ -737,7 +737,7 @@ export default function SimuladorTeoremaCentralLimitePage() {
           BLOQUE EDUCATIVO v2.0
           ============================================ */}
       <EducationalSection
-        title="📚 Aprende el Teorema Central del Límite"
+        title="Aprende el Teorema Central del Límite"
         subtitle="Por qué la curva normal aparece en todas partes"
       >
         {/* INTRO */}

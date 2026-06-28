@@ -382,7 +382,7 @@ export default function EstimacionAhorroHidricoPage() {
 
         {/* Contenido educativo v2.0 */}
         <EducationalSection
-          title="📚 Todo sobre el ahorro de agua en España"
+          title="Todo sobre el ahorro de agua en España"
           subtitle="Contexto, comparativas, escenarios y consejos prácticos"
         >
           {/* Contexto */}

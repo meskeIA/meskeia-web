@@ -423,7 +423,7 @@ export default function TestPensamientoGrupoPage() {
         )}
 
         <EducationalSection
-          title="📚 Groupthink: cuando el grupo piensa peor que el individuo"
+          title="Groupthink: cuando el grupo piensa peor que el individuo"
           subtitle="El trabajo de Irving Janis y cómo prevenirlo"
         >
           <section className={styles.guideSection}>

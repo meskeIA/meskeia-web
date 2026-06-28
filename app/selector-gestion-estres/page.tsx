@@ -567,7 +567,7 @@ export default function SelectorGestionEstresPage() {
 
       {/* Sección educativa v2.0 */}
       <EducationalSection
-        title="📚 Todo sobre la gestión del estrés"
+        title="Todo sobre la gestión del estrés"
         subtitle="Qué es, por qué importa y cómo cada método actúa en el organismo"
       >
         <section className={styles.guideSection}>

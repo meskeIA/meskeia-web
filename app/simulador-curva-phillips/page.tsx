@@ -523,7 +523,7 @@ export default function SimuladorCurvaPhillipsPage() {
 
       {/* BLOQUE EDUCATIVO v2.0 */}
       <EducationalSection
-        title="📚 Aprende la curva de Phillips"
+        title="Aprende la curva de Phillips"
         subtitle="El modelo que explica el dilema permanente entre inflación y desempleo"
       >
         <section>

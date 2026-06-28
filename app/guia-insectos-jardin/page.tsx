@@ -863,7 +863,7 @@ export default function GuiaInsectosJardinPage() {
 
         {/* Contenido educativo v2.0 */}
         <EducationalSection
-          title="📚 Guía del jardinero: control biológico y más"
+          title="Guía del jardinero: control biológico y más"
           subtitle="Todo lo que necesitas saber para gestionar insectos en tu jardín de forma ecológica"
         >
           {/* 1. Tabla comparativa */}

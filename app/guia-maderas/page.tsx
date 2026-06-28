@@ -979,7 +979,7 @@ export default function GuiaMaderasPage() {
 
         {/* Sección educativa */}
         <EducationalSection
-          title="📚 Guía completa para elegir madera"
+          title="Guía completa para elegir madera"
           subtitle="Todo lo que necesitas saber antes de comprar o trabajar madera"
           icon="🪵"
         >

@@ -233,7 +233,7 @@ export default function PlanificadorGastosBebePage(): React.JSX.Element {
 
         {/* Contenido educativo v2.0 */}
         <EducationalSection
-          title="📚 Todo sobre los gastos del primer año"
+          title="Todo sobre los gastos del primer año"
           subtitle="Consejos prácticos, escenarios y preguntas frecuentes"
         >
           <section className={styles.guideSection}>

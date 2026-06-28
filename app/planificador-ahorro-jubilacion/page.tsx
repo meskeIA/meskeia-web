@@ -496,7 +496,7 @@ export default function PlanificadorAhorroJubilacionPage() {
 
         {/* ═══════ CONTENIDO EDUCATIVO v2.0 ═══════ */}
         <EducationalSection
-          title="📚 Planificar el ahorro para la jubilación"
+          title="Planificar el ahorro para la jubilación"
           subtitle="Brecha, instrumentos de ahorro, plan de pensiones y errores frecuentes"
         >
           <h2><span aria-hidden="true">🎯</span> 4 perfiles de ahorro</h2>

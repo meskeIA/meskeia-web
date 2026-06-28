@@ -765,7 +765,7 @@ export default function CalculadoraFechaPartoPage() {
 
       {/* Contenido Educativo Colapsable */}
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre el embarazo y los cuidados del bebé?"
+        title="¿Quieres aprender más sobre el embarazo y los cuidados del bebé?"
         subtitle="Descubre consejos, errores comunes a evitar y listas completas para prepararte"
       >
         <section className={styles.guideSection}>

@@ -570,7 +570,7 @@ export default function SelectorEnergiaHogarPage() {
 
       {/* Sección educativa v2.0 */}
       <EducationalSection
-        title="📚 Sistemas de calefacción y energía para el hogar"
+        title="Sistemas de calefacción y energía para el hogar"
         subtitle="Comparativa técnica y económica de las principales opciones"
       >
         <div className={styles.educativo}>

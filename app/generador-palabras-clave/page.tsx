@@ -347,7 +347,7 @@ export default function GeneradorPalabrasClavePage() {
 
       {/* Contenido educativo */}
       <EducationalSection
-        title="📚 Guía de Investigación de Palabras Clave"
+        title="Guía de Investigación de Palabras Clave"
         subtitle="Aprende a encontrar las mejores keywords para tu estrategia SEO"
       >
         <div className={styles.educationalContent}>

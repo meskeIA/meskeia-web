@@ -605,7 +605,7 @@ RESULTADOS DE SIMULACIÓN
 
       {/* Contenido educativo colapsable */}
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre Teoría de Colas?"
+        title="¿Quieres aprender más sobre Teoría de Colas?"
         subtitle="Descubre conceptos clave, fórmulas y aplicaciones prácticas"
       >
         <section className={styles.guideSection}>

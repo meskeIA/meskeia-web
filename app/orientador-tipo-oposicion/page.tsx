@@ -287,7 +287,7 @@ export default function OrientadorTipoOposicionPage() {
         )}
 
         <EducationalSection
-          title="📚 Guía básica para opositores"
+          title="Guía básica para opositores"
           subtitle="Lo que debes saber antes de empezar"
         >
           <section className={styles.guideSection}>

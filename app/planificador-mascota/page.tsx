@@ -867,7 +867,7 @@ export default function PlanificadorMascotaPage() {
 
       {/* Contenido Educativo Colapsable */}
       <EducationalSection
-        title="📚 ¿Quieres aprender más sobre el cuidado de tu mascota?"
+        title="¿Quieres aprender más sobre el cuidado de tu mascota?"
         subtitle="Consejos, errores comunes a evitar y preguntas frecuentes"
       >
         <section className={styles.guideSection}>
