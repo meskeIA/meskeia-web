@@ -150,10 +150,10 @@ Declara al ecosistema MCP:
 
 | Directorio | Canal de alta (igual que meskeIA) | Estado |
 |-----------|-----------------------------------|--------|
-| **mcp.so** | GitHub @meskeIA / formulario submit | ⬜ Pendiente |
-| **Glama.ai** | GitHub @meskeIA (autoindexa por server-card) | ⬜ Pendiente |
-| **Smithery.ai** | GitHub @meskeIA | ⬜ Pendiente (ojo 502 gateway stateless, igual que meskeIA) |
-| **PulseMCP** | Email a hello@pulsemcp.com | ⬜ Pendiente |
+| **mcp.so** | GitHub @meskeIA / formulario submit | ✅ Alta 2026-06-29 (slug `delegum`) |
+| **Glama.ai** | GitHub @meskeIA → pestaña **Connector** (remote endpoint, no Server/GitHub) | ✅ **LIVE** 2026-06-29 (aprobado mismo día, namespace `com.delegum`) |
+| **Smithery.ai** | GitHub @meskeIA → Publish ▸ MCP (URL remota, Skip parámetros) | ✅ Alta 2026-06-29 (`meskeia/delegum`, público, **42 tools escaneadas OK** — sin 502 esta vez, mejor que meskeIA; icono propio) |
+| **PulseMCP** | Email a hello@pulsemcp.com (desde delegum@proton.me) | ✅ Email enviado 2026-06-29 (procesan semanalmente) |
 
 ---
 
