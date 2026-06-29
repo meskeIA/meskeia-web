@@ -11,7 +11,10 @@ export default async function Layout({ children, params }: Props) {
 
   if (!data) return <>{children}</>;
 
-  const url = `https://meskeia.com/visualizador-historia/${slug}/`;
+  // Misma URL que el canonical de page.tsx: Cronicum es el hogar canónico de las
+  // cronologías. El JSON-LD describe la entidad apuntando a cronicum.com para no
+  // emitir señales contradictorias (canonical → cronicum, structured data → meskeIA).
+  const url = `https://cronicum.com/${slug}/`;
 
   const webAppJsonLd = {
     '@context': 'https://schema.org',

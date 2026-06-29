@@ -20,7 +20,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const data = getHistoria(slug);
   if (!data) return {};
 
-  const url = `https://meskeia.com/visualizador-historia/${slug}/`;
+  // Canonical cross-domain → Cronicum es el hogar canónico de las cronologías.
+  // Esta copia en meskeIA sigue sirviéndose con estado 200 (no se rompe nada para
+  // el usuario), pero le indica a Google que indexe la versión de cronicum.com y
+  // así no competir consigo misma por el mismo contenido durante la ventana de
+  // primera indexación de Cronicum. Es el paso previo (señal blanda, reversible)
+  // al 301 definitivo, que se hará cuando cronicum.com esté plenamente indexado.
+  const canonicalUrl = `https://cronicum.com/${slug}/`;
 
   return {
     title: `${data.titulo} | meskeIA`,
@@ -29,8 +35,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: data.titulo,
       description: data.descripcionSEO,
-      url,
-      siteName: 'meskeIA',
+      url: canonicalUrl,
+      siteName: 'Cronicum',
       type: 'website',
       locale: 'es_ES',
       images: [{
@@ -46,7 +52,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: data.descripcionSEO,
       images: ['https://meskeia.com/og-image.png'],
     },
-    alternates: { canonical: url },
+    alternates: { canonical: canonicalUrl },
   };
 }
 
