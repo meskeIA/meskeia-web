@@ -12,6 +12,8 @@ import React, { useState } from 'react';
 import styles from './Footer.module.css';
 import AnalyticsTracker from './AnalyticsTracker';
 import CoquinumMasDeCategoria from './CoquinumMasDeCategoria';
+import { VERTICALES } from '@/data/verticales';
+import { TOTAL_IMPLEMENTED_APPS } from '@/data/implemented-apps';
 
 interface FooterProps {
   appName?: string; // Nombre de la app para compartir (opcional)
@@ -63,6 +65,30 @@ export default function Footer({ appName }: FooterProps) {
 
       {/* Bajo coquinum.com: navegación interna a la categoría (circuito verde) */}
       <CoquinumMasDeCategoria appName={appName} />
+
+      {/* Constelación meskeIA: invitación a explorar el catálogo + portales
+          temáticos (below-fold, informativo). Estático de ancho completo, va
+          antes de la píldora de compartir en el DOM para quedar por encima de
+          ella en móvil. Da contexto a los enlaces: qué son y qué esperar. */}
+      <aside className={styles.constelacion} aria-label="Explora meskeIA y sus portales temáticos">
+        <p className={styles.invitacionCatalogo}>
+          El{' '}
+          <a href="https://meskeia.com/" className={styles.marcaMadre}>catálogo de meskeIA</a>
+          {' '}reúne {TOTAL_IMPLEMENTED_APPS} apps gratuitas
+        </p>
+        <p className={styles.invitacionPortales}>Nuestras webs temáticas:</p>
+        <div className={styles.portalesGrid}>
+          {VERTICALES.map((v) => (
+            <a key={v.id} href={v.url} className={styles.portalCard}>
+              <img src={v.favicon} alt="" width={28} height={28} className={styles.portalIcon} loading="lazy" />
+              <span className={styles.portalText}>
+                <span className={styles.portalMarca}>{v.marca}</span>
+                <span className={styles.portalTema}>{v.tema}</span>
+              </span>
+            </a>
+          ))}
+        </div>
+      </aside>
 
       <footer className={styles.footer}>
         <div className={styles.shareSection}>

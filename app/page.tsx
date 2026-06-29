@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Sidebar, SidebarMobile, DailyApps, MeskeiaLogo } from '@/components';
 import SearchBar from '@/components/SearchBar';
 import HomeFooter from '@/components/home/HomeFooter';
+import VerticalesPortales from '@/components/home/VerticalesPortales';
 import { TOTAL_IMPLEMENTED_APPS } from '@/data/implemented-apps';
 import styles from './page.module.css';
 
@@ -88,6 +89,8 @@ export default function Home() {
         <section className={styles.dailySection}>
           <DailyApps count={4} />
         </section>
+
+        <VerticalesPortales />
 
         <HomeFooter />
       </main>

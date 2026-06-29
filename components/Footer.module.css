@@ -60,6 +60,130 @@
   font-size: 0.85rem;
 }
 
+/* ─── Constelación meskeIA (invitación + portales, below-fold) ─── */
+.constelacion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  max-width: 820px;
+  margin: 2.5rem auto 1rem;
+  padding: 1.1rem 1rem 0;
+  border-top: 1px solid rgba(46, 134, 171, 0.15);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-align: center;
+}
+
+.invitacionCatalogo {
+  margin: 0;
+  font-size: 1.12rem;
+  font-weight: 500;
+  color: var(--text-primary, #1a1a1a);
+}
+
+.invitacionPortales {
+  margin: 0.2rem 0 0;
+  font-size: 0.82rem;
+  color: var(--text-muted, #999);
+}
+
+.marcaMadre {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.marcaMadre:hover {
+  text-decoration: underline;
+}
+
+.portalesGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.6rem;
+  width: 100%;
+  margin-top: 0.2rem;
+}
+
+.portalCard {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  background: var(--bg-card, #fff);
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.portalCard:hover {
+  background: rgba(46, 134, 171, 0.06);
+  border-color: rgba(46, 134, 171, 0.3);
+  transform: translateY(-1px);
+}
+
+.portalCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.portalIcon {
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.portalText {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+  text-align: left;
+  min-width: 0;
+}
+
+.portalMarca {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary, #1a1a1a);
+}
+
+.portalTema {
+  font-size: 0.75rem;
+  color: var(--text-muted, #999);
+}
+
+[data-theme='dark'] .constelacion {
+  border-top-color: rgba(127, 179, 211, 0.18);
+}
+
+[data-theme='dark'] .portalCard {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: var(--bg-card, #2A2A2A);
+}
+
+[data-theme='dark'] .portalCard:hover {
+  background: rgba(127, 179, 211, 0.1);
+  border-color: rgba(127, 179, 211, 0.35);
+}
+
+[data-theme='dark'] .portalMarca {
+  color: var(--text-primary, #E5E5E5);
+}
+
+@media (max-width: 640px) {
+  .portalesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portalCard,
+  .portalCard:hover {
+    transition: none;
+    transform: none;
+  }
+}
+
 /* Toast de notificación */
 .toast {
   position: fixed;
