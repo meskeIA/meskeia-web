@@ -99,10 +99,13 @@ const nextConfig: NextConfig = {
 
   // ============================================================================
   // REWRITES POR HOST - delegum.com sirve la marca Delegum desde este mismo proyecto
-  //   delegum.com/api/mcp/  → servidor MCP Delegum (/api/mcp/delegum)
+  //   delegum.com/api/mcp/                        → servidor MCP Delegum (/api/mcp/delegum)
+  //   delegum.com/.well-known/mcp/server-card.json → tarjeta de discovery propia de Delegum
   // El enrutado de las PÁGINAS de delegum.com (/, /datos-fiscales, /asistente-ia,
   // /calculadoras, /aviso-legal → /delegum/*) lo hace middleware.ts, que también
-  // cubre la navegación client-side. Aquí solo queda el endpoint MCP.
+  // cubre la navegación client-side. Aquí solo queda el endpoint MCP y su server-card.
+  // El server-card se sirve por host porque public/.well-known/... es estático (mismo
+  // contenido para todos los dominios) y meskeIA ya usa esa ruta estática.
   // ============================================================================
   async rewrites() {
     const has = [{ type: 'host' as const, value: '(www\\.)?delegum\\.com' }];
@@ -110,6 +113,7 @@ const nextConfig: NextConfig = {
       beforeFiles: [
         { source: '/api/mcp', has, destination: '/api/mcp/delegum' },
         { source: '/api/mcp/', has, destination: '/api/mcp/delegum' },
+        { source: '/.well-known/mcp/server-card.json', has, destination: '/delegum/well-known-mcp' },
       ],
     };
   },

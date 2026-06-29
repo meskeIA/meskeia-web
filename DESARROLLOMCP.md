@@ -129,6 +129,34 @@ Declara al ecosistema MCP:
 
 ---
 
+## Delegum como servidor MCP propio (discovery + registros)
+
+> Iniciado 2026-06-29. Delegum ya funcionaba como conector MCP (delegum.com/api/mcp,
+> 42 tools, usado en Claude/ChatGPT/Mistral), pero su descubrimiento público estaba
+> solo bajo el paraguas meskeIA. Este bloque le da entidad propia en discovery + registros.
+
+### Server-card propio
+
+| Campo | Valor |
+|-------|-------|
+| **URL discovery** | `https://delegum.com/.well-known/mcp/server-card.json` |
+| **Implementación** | Route Handler `app/delegum/well-known-mcp/route.ts` (el estático de public/ no varía por host) |
+| **Rewrite por host** | `next.config.ts` → `delegum.com/.well-known/mcp/server-card.json` → `/delegum/well-known-mcp` |
+| **Endpoint MCP** | `https://delegum.com/api/mcp/` (rewrite host → `/api/mcp/delegum`) |
+| **Nombre registro** | `delegum-mcp` / título «Delegum MCP» |
+| **Tools** | 42 (7 de escenario `consulta_*` / `comparar_*` + 35 individuales) |
+
+### Registros públicos — estado del alta Delegum
+
+| Directorio | Canal de alta (igual que meskeIA) | Estado |
+|-----------|-----------------------------------|--------|
+| **mcp.so** | GitHub @meskeIA / formulario submit | ⬜ Pendiente |
+| **Glama.ai** | GitHub @meskeIA (autoindexa por server-card) | ⬜ Pendiente |
+| **Smithery.ai** | GitHub @meskeIA | ⬜ Pendiente (ojo 502 gateway stateless, igual que meskeIA) |
+| **PulseMCP** | Email a hello@pulsemcp.com | ⬜ Pendiente |
+
+---
+
 ## Scripts de migración (referencia histórica)
 
 Los scripts en `scripts/` se usaron para la migración masiva de avisos en mayo 2026. Para nuevas tools, aplicar `conAviso()` manualmente al escribir el código.
