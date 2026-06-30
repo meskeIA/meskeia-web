@@ -87,7 +87,7 @@ export default function EspejoPage() {
       <header className={styles.hero}>
         <h1 className={styles.title}>Espejo Digital</h1>
         <p className={styles.subtitle}>
-          Tu espejo de bolsillo en el móvil
+          Tu espejo de bolsillo en el móvil (celular) u ordenador (computadora)
         </p>
       </header>
 
@@ -242,7 +242,8 @@ export default function EspejoPage() {
         <section className={styles.guideSection}>
           <h2>Cuándo usar el espejo digital: 4 situaciones</h2>
           <p>
-            La cámara frontal puede sustituir a un espejo físico en muchos contextos.
+            La cámara frontal de tu móvil (celular) u ordenador (computadora) puede
+            sustituir a un espejo físico en muchos contextos.
             Esta tabla resume la configuración óptima para cada situación.
           </p>
           <div className={styles.tableWrapper}>
@@ -396,7 +397,8 @@ export default function EspejoPage() {
                 <p>
                   No. El espejo digital muestra la imagen de la cámara en tiempo real
                   pero no captura, almacena ni envía ninguna imagen o vídeo. Todo el
-                  procesamiento ocurre localmente en tu dispositivo. Al cerrar la app
+                  procesamiento ocurre localmente en tu dispositivo, ya sea móvil
+                  (celular) u ordenador (computadora). Al cerrar la app
                   o apagar la cámara, no queda ningún archivo guardado.
                 </p>
                 <p className={styles.faqTip}>

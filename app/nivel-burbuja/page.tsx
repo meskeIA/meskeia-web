@@ -153,7 +153,7 @@ export default function NivelBurbujaPage() {
         <span className={styles.heroIcon}>📐</span>
         <h1 className={styles.title}>Nivel de Burbuja</h1>
         <p className={styles.subtitle}>
-          Mide inclinaciones y ángulos con el sensor de tu dispositivo.
+          Mide inclinaciones y ángulos con el sensor de tu móvil o celular.
           Ideal para bricolaje, colgar cuadros o medir pendientes.
         </p>
       </header>
@@ -498,8 +498,9 @@ export default function NivelBurbujaPage() {
             <div className={styles.contentCard}>
               <h4>📱 Versión digital</h4>
               <p>
-                Los dispositivos móviles usan acelerómetros MEMS (Sistemas Microelectromecánicos)
-                que detectan la aceleración gravitatoria en 3 ejes para calcular la orientación.
+                Los dispositivos móviles (en Latinoamérica, el celular) usan acelerómetros MEMS
+                (Sistemas Microelectromecánicos) que detectan la aceleración gravitatoria en 3 ejes
+                para calcular la orientación.
               </p>
             </div>
           </div>
@@ -659,7 +660,7 @@ export default function NivelBurbujaPage() {
               <p className={styles.faqTip}>Para colgar cuadros y montar muebles, la precisión del móvil es más que suficiente.</p>
             </li>
             <li className={styles.faqItem}>
-              <h4>¿Cómo calibro el nivel del móvil?</h4>
+              <h4>¿Cómo calibro el nivel del móvil o celular?</h4>
               <p>Coloca el teléfono sobre una superficie que sepas que es perfectamente plana (como un azulejo recién colocado o el cristal de una mesa de nivel). Pulsa el botón &quot;Calibrar&quot; para establecer esa posición como referencia 0°. Repite la calibración cada vez que cambies de superficie.</p>
             </li>
             <li className={styles.faqItem}>

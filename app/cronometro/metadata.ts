@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Cronómetro y Temporizador Online | meskeIA',
-  description: 'Cronómetro online con vueltas, temporizador de cuenta atrás y alarma. Herramienta gratuita para medir tiempo, entrenamientos, cocina y productividad.',
-  keywords: 'cronometro online, temporizador, cuenta atras, stopwatch, timer, alarma, vueltas, laps, reloj, medidor tiempo',
+  description: 'Cronómetro online con vueltas, temporizador de cuenta atrás y alarma. Herramienta gratuita para medir tiempo en el móvil (celular), tableta u ordenador: entrenamientos, cocina y productividad.',
+  keywords: 'cronometro online, temporizador, cuenta atras, stopwatch, timer, alarma, vueltas, laps, reloj, medidor tiempo, cronometro movil, cronometro celular',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Cronómetro y Temporizador",
-  description: "Cronómetro online con vueltas, temporizador de cuenta atrás y alarma. Herramienta gratuita para medir tiempo, entrenamientos, cocina y productividad.",
+  description: "Cronómetro online con vueltas, temporizador de cuenta atrás y alarma. Herramienta gratuita para medir tiempo desde el móvil (celular), tableta u ordenador: entrenamientos, cocina y productividad.",
   url: "https://meskeia.com/cronometro/",
   category: 'UtilityApplication',
   features: [],
@@ -72,10 +72,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Puedo usar el cronómetro en el móvil?',
+      name: '¿Puedo usar el cronómetro en el móvil o celular?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí, la herramienta funciona en cualquier dispositivo con navegador web moderno: móvil, tableta u ordenador. No requiere instalación ni registro. En móvil, mantén la pantalla activa para evitar que el sistema operativo pause el contador en segundo plano.',
+        text: 'Sí, la herramienta funciona en cualquier dispositivo con navegador web moderno: móvil (celular), tableta u ordenador. No requiere instalación ni registro. En el móvil o celular, mantén la pantalla activa para evitar que el sistema operativo pause el contador en segundo plano.',
       },
     },
     {

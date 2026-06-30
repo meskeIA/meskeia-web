@@ -2,17 +2,17 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Luxómetro Online - Mide la Intensidad de Luz | meskeIA',
-  description: 'Mide la intensidad de luz en lux con tu dispositivo. Ideal para fotógrafos: incluye recomendaciones de ISO, apertura y velocidad según la iluminación.',
-  keywords: 'luxometro, fotometro, medir luz, intensidad luminosa, lux, fotografia, exposicion, iso, apertura, velocidad obturacion, iluminacion',
+  title: 'Luxómetro Online - Mide la Intensidad de Luz con tu Móvil o Celular | meskeIA',
+  description: 'Mide la intensidad de luz en lux con tu móvil o celular usando el sensor del dispositivo. Ideal para fotógrafos: incluye recomendaciones de ISO, apertura y velocidad según la iluminación.',
+  keywords: 'luxometro, luxometro celular, fotometro, medir luz, intensidad luminosa, lux, luxometro movil, fotografia, exposicion, iso, apertura, velocidad obturacion, iluminacion',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Luxómetro Online - Mide la Intensidad de Luz',
-    description: 'Mide la luz ambiente con tu dispositivo. Recomendaciones fotográficas incluidas.',
+    title: 'Luxómetro Online - Mide la Intensidad de Luz con tu Móvil o Celular',
+    description: 'Mide la luz ambiente con tu móvil o celular. Recomendaciones fotográficas incluidas.',
     url: 'https://meskeia.com/luxometro/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Luxómetro Online - meskeIA',
-    description: 'Mide la intensidad de luz y obtén recomendaciones para fotografía.',
+    description: 'Mide la intensidad de luz con tu móvil o celular y obtén recomendaciones para fotografía.',
     images: ['https://meskeia.com/og-image.png']
   },
   other: {
@@ -68,8 +68,8 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Es fiable un luxómetro de móvil frente a uno profesional?',
-      acceptedAnswer: { '@type': 'Answer', text: 'Un luxómetro de móvil ofrece mediciones orientativas, no de laboratorio. Los sensores de los smartphones no están calibrados para medición científica precisa, por lo que el margen de error puede ser del 20-40% respecto a un luxómetro profesional calibrado. Para usos cotidianos (fotografía amateur, revisión de iluminación de oficina o plantas) la precisión es más que suficiente; para mediciones normativas o industriales es preferible usar un fotómetro certificado.' },
+      name: '¿Es fiable un luxómetro de móvil o celular frente a uno profesional?',
+      acceptedAnswer: { '@type': 'Answer', text: 'Un luxómetro de móvil o celular ofrece mediciones orientativas, no de laboratorio. Los sensores de los smartphones no están calibrados para medición científica precisa, por lo que el margen de error puede ser del 20-40% respecto a un luxómetro profesional calibrado. Para usos cotidianos (fotografía amateur, revisión de iluminación de oficina o plantas) la precisión es más que suficiente; para mediciones normativas o industriales es preferible usar un fotómetro certificado.' },
     },
   ],
 };

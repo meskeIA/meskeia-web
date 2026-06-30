@@ -286,7 +286,7 @@ export default function LuxometroPage() {
         <span className={styles.heroIcon} aria-hidden="true">💡</span>
         <h1 className={styles.title}>Luxómetro / Fotómetro</h1>
         <p className={styles.subtitle}>
-          Mide la intensidad de luz en lux. Ideal para fotógrafos: obtén recomendaciones de exposición según la iluminación.
+          Mide la intensidad de luz en lux con tu móvil (celular) usando el sensor del dispositivo. Ideal para fotógrafos: obtén recomendaciones de exposición según la iluminación.
         </p>
       </header>
 
@@ -620,7 +620,7 @@ export default function LuxometroPage() {
         <ul className={styles.faqList}>
           <li className={styles.faqItem}>
             <h3>¿Es preciso el luxómetro del navegador comparado con uno profesional?</h3>
-            <p>Depende del dispositivo. Los sensores de luz ambiente integrados en móviles y portátiles tienen una respuesta espectral y rango limitados. Son útiles para estimaciones orientativas pero no para mediciones certificadas. Un luxómetro profesional calibrado (como los de Konica Minolta o Testo) tiene precisión de ±3-5%.</p>
+            <p>Depende del dispositivo. Los sensores de luz ambiente integrados en móviles (celulares) y portátiles tienen una respuesta espectral y rango limitados. Son útiles para estimaciones orientativas pero no para mediciones certificadas. Un luxómetro profesional calibrado (como los de Konica Minolta o Testo) tiene precisión de ±3-5%.</p>
           </li>
           <li className={styles.faqItem}>
             <h3>¿Qué diferencia hay entre lux, lumen y candela?</h3>
@@ -657,8 +657,8 @@ export default function LuxometroPage() {
           <div className={styles.step}>
             <div className={styles.stepNumber}>1</div>
             <div className={styles.stepContent}>
-              <h3>Abre el luxómetro en tu dispositivo</h3>
-              <p>El sensor de luz ambiente debe estar disponible en tu dispositivo. El navegador puede pedir permiso para acceder al sensor. Concédelo.</p>
+              <h3>Abre el luxómetro en tu móvil o celular</h3>
+              <p>El sensor de luz ambiente debe estar disponible en tu dispositivo (móvil o celular). El navegador puede pedir permiso para acceder al sensor. Concédelo.</p>
             </div>
           </div>
           <div className={styles.step}>

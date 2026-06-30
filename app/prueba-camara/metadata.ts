@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Prueba de Cámara Web Online - Test Webcam Gratis | meskeIA',
-  description: 'Prueba tu cámara web antes de videollamadas. Verifica resolución, brillo, contraste y toma fotos. Sin registro ni instalación. Totalmente privado.',
-  keywords: 'prueba camara, test webcam, probar camara web, verificar camara, videollamada, zoom, meet, teams, camara ordenador, webcam test',
+  description: 'Prueba tu cámara web antes de videollamadas, en el ordenador (computadora), móvil o celular. Verifica resolución, brillo, contraste y toma fotos. Sin registro ni instalación. Totalmente privado.',
+  keywords: 'prueba camara, test webcam, probar camara web, verificar camara, videollamada, zoom, meet, teams, camara ordenador, camara computadora, camara movil, camara celular, webcam test',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Prueba de Cámara Web",
-  description: "Prueba tu cámara web antes de videollamadas. Verifica resolución, brillo, contraste y toma fotos. Sin registro ni instalación. Totalmente privado.",
+  description: "Prueba tu cámara web antes de videollamadas, tanto en el ordenador (computadora) como en el móvil o celular. Verifica resolución, brillo, contraste y toma fotos. Sin registro ni instalación. Totalmente privado.",
   url: "https://meskeia.com/prueba-camara/",
   category: 'UtilityApplication',
   features: [],
@@ -65,8 +65,8 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Puedo probar la cámara en móvil o tablet?',
-      acceptedAnswer: { '@type': 'Answer', text: 'Sí. Los navegadores modernos en Android (Chrome) e iOS (Safari 14.3 o superior) soportan acceso a cámara vía WebRTC. En móvil, la herramienta suele ofrecer la opción de elegir entre la cámara frontal y la trasera. El comportamiento es idéntico al de escritorio: sin instalación, sin registro y sin almacenamiento de datos.' },
+      name: '¿Puedo probar la cámara en móvil (celular) o tablet?',
+      acceptedAnswer: { '@type': 'Answer', text: 'Sí. Los navegadores modernos en Android (Chrome) e iOS (Safari 14.3 o superior) soportan acceso a cámara vía WebRTC. En el móvil o celular, la herramienta suele ofrecer la opción de elegir entre la cámara frontal y la trasera. El comportamiento es idéntico al del ordenador o computadora: sin instalación, sin registro y sin almacenamiento de datos.' },
     },
   ],
 };

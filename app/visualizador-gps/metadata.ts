@@ -2,9 +2,9 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Cómo Funciona el GPS - Satélites, Trilateración y Relatividad | meskeIA',
-  description: 'Descubre cómo el GPS localiza tu posición: 31 satélites, trilateración por señales de radio, la corrección de Einstein y los sistemas de navegación mundial. Explicador visual interactivo.',
-  keywords: 'GPS, satélites, trilateración, relatividad, Einstein, navegación, GNSS, Galileo, GLONASS, BeiDou, precisión GPS, explicador visual',
+  title: 'Cómo Funciona el GPS del Móvil (Celular) - Satélites, Trilateración y Relatividad | meskeIA',
+  description: 'Descubre cómo el GPS de tu móvil o celular localiza tu posición: 31 satélites, trilateración por señales de radio, la corrección de Einstein y los sistemas de navegación mundial. Explicador visual interactivo.',
+  keywords: 'GPS, GPS del celular, GPS del móvil, satélites, trilateración, relatividad, Einstein, navegación, GNSS, Galileo, GLONASS, BeiDou, precisión GPS, explicador visual',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Cómo Funciona el GPS - Satélites, Trilateración y Relatividad',
-    description: '31 satélites, la velocidad de la luz y la relatividad de Einstein: todo lo que hace posible que tu móvil sepa dónde estás.',
+    description: '31 satélites, la velocidad de la luz y la relatividad de Einstein: todo lo que hace posible que tu móvil o celular sepa dónde estás.',
     url: 'https://meskeia.com/visualizador-gps/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -79,7 +79,7 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Cuál es la precisión real del GPS en un teléfono móvil?',
+      name: '¿Cuál es la precisión real del GPS en un teléfono móvil o celular?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'En condiciones normales, un smartphone consigue una precisión de entre 3 y 5 metros con GPS estándar, que mejora a 1-2 metros cuando combina GPS con Galileo y GLONASS. Bajo árboles, en calles estrechas o en interiores la señal se degrada y el error puede superar los 20 metros. La tecnología GPS diferencial (DGBS) alcanza el metro, y el RTK (Real-Time Kinematic) llega a pocos centímetros, pero requiere receptores profesionales y una estación de referencia cercana.',

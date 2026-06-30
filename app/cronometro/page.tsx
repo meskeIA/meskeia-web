@@ -196,7 +196,7 @@ export default function CronometroPage() {
       <header className={styles.hero}>
         <h1 className={styles.title}>Cronómetro y Temporizador</h1>
         <p className={styles.subtitle}>
-          Mide el tiempo con precisión
+          Mide el tiempo con precisión desde el móvil (celular), tableta u ordenador
         </p>
       </header>
 
@@ -568,7 +568,8 @@ export default function CronometroPage() {
                   No se detiene, pero algunos navegadores reducen la frecuencia de actualización de
                   pestañas en segundo plano (throttling). El tiempo final sigue siendo correcto porque
                   se basa en <code>Date.now()</code>, no en el número de ticks del intervalo. La
-                  pantalla puede dejar de actualizarse, pero el cálculo es preciso al volver.
+                  pantalla puede dejar de actualizarse, pero el cálculo es preciso al volver. En el
+                  móvil (celular) ocurre lo mismo si bloqueas la pantalla durante una medición larga.
                 </p>
               </details>
             </li>

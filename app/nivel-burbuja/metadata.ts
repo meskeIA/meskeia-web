@@ -2,9 +2,9 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Nivel de Burbuja Digital + Inclinómetro - Mide ángulos con tu móvil | meskeIA',
-  description: 'Nivel de burbuja digital gratuito con inclinómetro. Mide inclinaciones y ángulos con el sensor de tu móvil. Ideal para bricolaje, colgar cuadros y medir pendientes.',
-  keywords: 'nivel burbuja, inclinómetro, nivel digital, medir ángulos, nivel construcción, spirit level, clinómetro, pendiente, bricolaje',
+  title: 'Nivel de Burbuja Digital + Inclinómetro - Mide ángulos con tu móvil o celular | meskeIA',
+  description: 'Nivel de burbuja digital gratuito con inclinómetro. Mide inclinaciones y ángulos con el sensor de tu móvil o celular. Ideal para bricolaje, colgar cuadros y medir pendientes.',
+  keywords: 'nivel burbuja, inclinómetro, nivel digital, medir ángulos, nivel construcción, spirit level, clinómetro, pendiente, bricolaje, nivel celular, nivel móvil',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Nivel de Burbuja Digital + Inclinómetro - meskeIA',
-    description: 'Mide inclinaciones y ángulos con el sensor de tu móvil. Herramienta gratuita para bricolaje.',
+    description: 'Mide inclinaciones y ángulos con el sensor de tu móvil o celular. Herramienta gratuita para bricolaje.',
     url: 'https://meskeia.com/nivel-burbuja/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Nivel de Burbuja Digital",
-  description: "Nivel de burbuja digital gratuito con inclinómetro. Mide inclinaciones y ángulos con el sensor de tu móvil. Ideal para bricolaje, colgar cuadros y medir pendientes.",
+  description: "Nivel de burbuja digital gratuito con inclinómetro. Mide inclinaciones y ángulos con el sensor de tu móvil o celular. Ideal para bricolaje, colgar cuadros y medir pendientes.",
   url: "https://meskeia.com/nivel-burbuja/",
   category: 'UtilityApplication',
   features: [],
@@ -45,10 +45,10 @@ export const faqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿Cómo funciona un nivel de burbuja digital en el móvil?',
+      name: '¿Cómo funciona un nivel de burbuja digital en el móvil o celular?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El nivel digital usa el acelerómetro integrado en el smartphone para detectar la inclinación del dispositivo respecto a la horizontal. La aplicación lee los valores del sensor en tiempo real y los convierte en grados de ángulo y en la posición visual de la burbuja. No requiere calibración previa en la mayoría de teléfonos modernos.',
+        text: 'El nivel digital usa el acelerómetro integrado en el smartphone (móvil o celular) para detectar la inclinación del dispositivo respecto a la horizontal. La aplicación lee los valores del sensor en tiempo real y los convierte en grados de ángulo y en la posición visual de la burbuja. No requiere calibración previa en la mayoría de teléfonos modernos.',
       },
     },
     {

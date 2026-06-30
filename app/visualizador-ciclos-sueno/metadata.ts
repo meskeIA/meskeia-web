@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Qué Pasa Cuando Duermes - Ciclos y Fases del Sueño | meskeIA',
-  description: 'Explora la ciencia del sueño de forma visual: fases N1-N2-N3-REM, hipnograma interactivo, horas necesarias por edad, enemigos del sueño con consejos basados en ciencia. Explicador visual interactivo.',
-  keywords: 'ciclos sueno, fases sueno, REM, sueno profundo, hipnograma, higiene sueno, horas dormir, N1 N2 N3, ondas cerebrales, ciencia del sueño',
+  description: 'Explora la ciencia del sueño de forma visual: fases N1-N2-N3-REM, hipnograma interactivo, horas necesarias por edad, enemigos del sueño (luz azul del móvil o celular) con consejos basados en ciencia. Explicador visual interactivo.',
+  keywords: 'ciclos sueno, fases sueno, REM, sueno profundo, hipnograma, higiene sueno, horas dormir, N1 N2 N3, ondas cerebrales, ciencia del sueño, luz azul movil celular',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -75,10 +75,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Por qué la pantalla del móvil afecta al sueño?',
+      name: '¿Por qué la pantalla del móvil o celular afecta al sueño?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La luz azul emitida por pantallas (móviles, tabletas, ordenadores) suprime la producción de melatonina, la hormona que regula el ritmo circadiano y señala al cerebro que es hora de dormir. Estudios muestran que el uso de pantallas en la hora previa al sueño puede retrasar el inicio del sueño entre 30 y 60 minutos y reducir la fase REM. Se recomienda evitar pantallas al menos 30-60 minutos antes de acostarse.',
+        text: 'La luz azul emitida por pantallas (móviles o celulares, tabletas, ordenadores) suprime la producción de melatonina, la hormona que regula el ritmo circadiano y señala al cerebro que es hora de dormir. Estudios muestran que el uso de pantallas en la hora previa al sueño puede retrasar el inicio del sueño entre 30 y 60 minutos y reducir la fase REM. Se recomienda evitar pantallas al menos 30-60 minutos antes de acostarse.',
       },
     },
     {

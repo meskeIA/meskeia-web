@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Prueba de Micrófono Online - Test Audio Gratis | meskeIA',
-  description: 'Prueba tu micrófono antes de videollamadas. Visualiza niveles de audio, graba tu voz y reproduce. Sin registro ni instalación. 100% privado.',
-  keywords: 'prueba microfono, test microfono, probar micro, verificar audio, videollamada, zoom, meet, teams, micrófono ordenador, audio test, grabar voz',
+  description: 'Prueba tu micrófono antes de videollamadas, en el ordenador (computadora) o en el móvil (celular). Visualiza niveles de audio, graba tu voz y reproduce. Sin registro ni instalación. 100% privado.',
+  keywords: 'prueba microfono, test microfono, probar micro, probar microfono celular, verificar audio, videollamada, zoom, meet, teams, micrófono ordenador, micrófono computadora, micrófono celular, audio test, grabar voz',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Prueba de Micrófono Online - Test Audio Gratis',
-    description: 'Verifica tu micrófono antes de videollamadas. Visualización de audio y grabación.',
+    description: 'Verifica tu micrófono antes de videollamadas, desde el ordenador (computadora) o el móvil (celular). Visualización de audio y grabación.',
     url: 'https://meskeia.com/prueba-microfono/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Prueba de Micrófono",
-  description: "Prueba tu micrófono antes de videollamadas. Visualiza niveles de audio, graba tu voz y reproduce. Sin registro ni instalación. 100% privado.",
+  description: "Prueba tu micrófono antes de videollamadas, en el ordenador (computadora) o en el móvil (celular). Visualiza niveles de audio, graba tu voz y reproduce. Sin registro ni instalación. 100% privado.",
   url: "https://meskeia.com/prueba-microfono/",
   category: 'UtilityApplication',
   features: [],
@@ -65,8 +65,8 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Puedo probar el micrófono del móvil desde el navegador?',
-      acceptedAnswer: { '@type': 'Answer', text: 'Sí. Los navegadores modernos en Android (Chrome 60 o superior) y en iOS (Safari 14.3 o superior) permiten acceder al micrófono del dispositivo a través de la API getUserMedia. El funcionamiento es idéntico al de escritorio: el navegador solicita permiso explícito al usuario y el audio se procesa localmente. En iPhone, asegúrate de usar Safari, ya que otros navegadores en iOS tienen restricciones de acceso al micrófono.' },
+      name: '¿Puedo probar el micrófono del móvil o celular desde el navegador?',
+      acceptedAnswer: { '@type': 'Answer', text: 'Sí. Los navegadores modernos del móvil o celular en Android (Chrome 60 o superior) y en iOS (Safari 14.3 o superior) permiten acceder al micrófono del dispositivo a través de la API getUserMedia. El funcionamiento es idéntico al del ordenador o computadora de escritorio: el navegador solicita permiso explícito al usuario y el audio se procesa localmente. En iPhone, asegúrate de usar Safari, ya que otros navegadores en iOS tienen restricciones de acceso al micrófono.' },
     },
   ],
 };

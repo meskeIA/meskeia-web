@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Contador Manual Online - Tally Counter Digital Gratis | meskeIA',
-  description: 'Contador manual digital gratuito. Cuenta personas, objetos, repeticiones de ejercicio o cualquier cosa con un clic. Múltiples contadores, sonido y vibración.',
-  keywords: 'contador manual, tally counter, contador digital, contador de personas, contador de clicks, contador online, contador gratis, clicker counter',
+  description: 'Contador manual digital gratuito desde el móvil (celular) o el ordenador. Cuenta personas, objetos, repeticiones de ejercicio o cualquier cosa con un clic. Múltiples contadores, sonido y vibración.',
+  keywords: 'contador manual, tally counter, contador digital, contador de personas, contador de clicks, contador online, contador gratis, clicker counter, contador para celular, contador para móvil',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Contador Manual (Tally Counter)",
-  description: "Contador manual digital gratuito. Cuenta personas, objetos, repeticiones de ejercicio o cualquier cosa con un clic. Múltiples contadores, sonido y vibración.",
+  description: "Contador manual digital gratuito desde el móvil (celular) o el ordenador. Cuenta personas, objetos, repeticiones de ejercicio o cualquier cosa con un clic. Múltiples contadores, sonido y vibración.",
   url: "https://meskeia.com/contador-manual/",
   category: 'UtilityApplication',
   features: [],
@@ -48,7 +48,7 @@ export const faqJsonLd = {
       name: '¿Para qué se usa un contador manual digital?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un contador manual digital (o tally counter) sirve para contar cualquier cosa con un simple clic: personas que entran a un local, repeticiones de ejercicio en el gimnasio, asistentes a un evento, vueltas en una piscina, inventario de artículos o marcadores en partidas de juegos. Sustituye al contador mecánico de bolsillo y funciona sin instalar nada desde el móvil o el ordenador.',
+        text: 'Un contador manual digital (o tally counter) sirve para contar cualquier cosa con un simple clic: personas que entran a un local, repeticiones de ejercicio en el gimnasio, asistentes a un evento, vueltas en una piscina, inventario de artículos o marcadores en partidas de juegos. Sustituye al contador mecánico de bolsillo y funciona sin instalar nada desde el móvil o celular y el ordenador.',
       },
     },
     {
@@ -77,10 +77,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Funciona en el móvil para contar personas en aforos?',
+      name: '¿Funciona en el móvil o celular para contar personas en aforos?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí, la herramienta está optimizada para móviles con botones grandes fáciles de pulsar con el pulgar. Es habitual usarla en la puerta de establecimientos, eventos o clases para controlar el aforo en tiempo real. La confirmación por vibración permite contar sin mirar la pantalla y mantener la vista en las personas que pasan.',
+        text: 'Sí, la herramienta está optimizada para móviles y celulares con botones grandes fáciles de pulsar con el pulgar. Es habitual usarla en la puerta de establecimientos, eventos o clases para controlar el aforo en tiempo real. La confirmación por vibración permite contar sin mirar la pantalla y mantener la vista en las personas que pasan.',
       },
     },
   ],

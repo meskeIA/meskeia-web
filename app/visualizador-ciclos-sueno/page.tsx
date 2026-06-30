@@ -195,7 +195,7 @@ const ENEMIGOS: EnemigoSueno[] = [
     icono: '📱',
     impacto: 5,
     colorImpacto: '#EF4444',
-    descripcion: 'Las pantallas emiten luz azul (450-490 nm) que tu cerebro interpreta como luz diurna.',
+    descripcion: 'Las pantallas del móvil o celular, la tableta y el ordenador emiten luz azul (450-490 nm) que tu cerebro interpreta como luz diurna.',
     ciencia: 'Algunas pantallas emiten luz azul que puede reducir la producción de melatonina y retrasar el inicio del sueño, aunque la magnitud del efecto varía según la intensidad, el tiempo de exposición y la sensibilidad individual.',
     consejo: 'Activar modo noche 2h antes de dormir. Mejor aún: dejar las pantallas 1h antes de acostarte y leer en papel o libro electrónico sin retroiluminación.',
   },
@@ -704,7 +704,9 @@ export default function VisualizadorCiclosSuenoPage() {
           <p>
             Tu cerebro tiene un reloj interno (núcleo supraquiasmático) sincronizado con la luz solar.
             Produce melatonina cuando oscurece y cortisol al amanecer. Este ritmo de ~24 horas regula
-            no solo el sueño, sino la temperatura corporal, el apetito y la presión arterial.
+            no solo el sueño, sino la temperatura corporal, el apetito y la presión arterial. Por eso la
+            luz azul de la pantalla del móvil o celular justo antes de acostarte puede engañar a este reloj
+            y retrasar el inicio del sueño.
           </p>
 
           <h3>¿Qué son los sueños lúcidos?</h3>

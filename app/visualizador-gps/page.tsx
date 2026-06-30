@@ -51,7 +51,7 @@ function SeccionSatelites() {
   return (
     <div className={styles.seccionContent}>
       <div className={styles.contexto}>
-        <p>El GPS (Global Positioning System) es una constelación de <strong>31 satélites</strong> orbitando la Tierra. Cada uno lleva un reloj atómico ultrapreciso y emite señales de radio constantemente. Tu móvil necesita captar al menos 4 para saber dónde estás.</p>
+        <p>El GPS (Global Positioning System) es una constelación de <strong>31 satélites</strong> orbitando la Tierra. Cada uno lleva un reloj atómico ultrapreciso y emite señales de radio constantemente. Tu móvil (o celular, en Latinoamérica) necesita captar al menos 4 para saber dónde estás.</p>
       </div>
 
       {/* Visualización orbital */}
@@ -435,7 +435,7 @@ export default function VisualizadorGpsPage() {
 
         <header className={styles.hero}>
           <h1 className={styles.title}>Cómo Funciona el GPS</h1>
-          <p className={styles.subtitle}>31 satélites, la velocidad de la luz y Einstein en tu bolsillo</p>
+          <p className={styles.subtitle}>31 satélites, la velocidad de la luz y Einstein en el GPS de tu móvil (celular)</p>
         </header>
 
         <LegalNotice />
@@ -482,7 +482,7 @@ export default function VisualizadorGpsPage() {
 
           <h3>¿Funciona el GPS sin internet?</h3>
           <p>
-            Sí. El GPS es un sistema <strong>completamente pasivo</strong>: tu móvil solo recibe señales de los
+            Sí. El GPS es un sistema <strong>completamente pasivo</strong>: tu móvil o celular solo recibe señales de los
             satélites, no envía nada. No necesita Wi-Fi, datos móviles ni cobertura telefónica. Lo que sí necesita
             internet es descargar los mapas — por eso apps como Google Maps permiten descargar mapas offline.
           </p>

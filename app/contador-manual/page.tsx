@@ -151,7 +151,7 @@ export default function ContadorManualPage() {
       <header className={styles.hero}>
         <h1 className={styles.title}>Contador Manual</h1>
         <p className={styles.subtitle}>
-          Tally counter digital - Cuenta cualquier cosa con un clic
+          Tally counter digital desde el móvil (celular) - Cuenta cualquier cosa con un clic
         </p>
       </header>
 
@@ -336,7 +336,7 @@ export default function ContadorManualPage() {
               <span className={styles.escenarioIcon} aria-hidden="true">🏋️</span>
               <strong>Deportistas y entrenadores</strong>
             </div>
-            <p>Cuenta series, repeticiones o vueltas sin perder el ritmo ni mirar el móvil.</p>
+            <p>Cuenta series, repeticiones o vueltas sin perder el ritmo ni mirar el móvil (celular).</p>
             <div className={styles.escenarioExample}>Ejemplo: 3 contadores para press banca, sentadillas y dominadas</div>
             <div className={styles.escenarioTip}>Activa la vibración para no distraerte con el sonido</div>
           </div>
@@ -431,7 +431,7 @@ export default function ContadorManualPage() {
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">📱</span>
             <strong>Añade a pantalla de inicio</strong>
-            <p>Guarda la página como acceso directo para abrir el contador con un solo toque.</p>
+            <p>Guarda la página en tu móvil o celular como acceso directo para abrir el contador con un solo toque.</p>
           </div>
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">🔄</span>

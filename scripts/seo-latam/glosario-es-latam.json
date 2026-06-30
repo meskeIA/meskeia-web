@@ -41,7 +41,7 @@
       "dominio": "tecnologia",
       "es": ["movil", "telefono movil"],
       "latam": ["celular", "telefono celular"],
-      "nota": "mobile phone. 'movil' choca con otros sentidos; usar con contexto telefono. RESUELTO en lupa-digital (2026-06-30): H1/subtitulo/body con movil o celular (query GSC 'lupa movil online' pos 5,7)."
+      "nota": "mobile phone. 'movil' choca con otros sentidos; usar con contexto telefono. RESUELTO en lupa-digital (2026-06-30): H1/subtitulo/body con movil o celular (query GSC 'lupa movil online' pos 5,7). RESUELTO tambien (2026-06-30): espejo, prueba-camara, prueba-microfono, contador-manual, cronometro, luxometro, nivel-burbuja, visualizador-ciclos-sueno, visualizador-gps."
     },
     {
       "dominio": "tecnologia",

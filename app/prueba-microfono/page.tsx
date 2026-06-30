@@ -345,7 +345,7 @@ export default function PruebaMicrofonoPage() {
         <span className={styles.heroIcon}>🎙️</span>
         <h1 className={styles.title}>Prueba de Micrófono</h1>
         <p className={styles.subtitle}>
-          Verifica tu micrófono antes de videollamadas. Visualiza niveles, graba y reproduce. Sin registro, 100% privado.
+          Verifica tu micrófono antes de videollamadas, en el ordenador (computadora) o en el móvil (celular). Visualiza niveles, graba y reproduce. Sin registro, 100% privado.
         </p>
       </header>
 
@@ -588,7 +588,8 @@ export default function PruebaMicrofonoPage() {
         <section className={styles.guideSection}>
           <h2>Tipos de micrófono: comparativa rápida</h2>
           <p>
-            No todos los micrófonos ofrecen la misma calidad ni se adaptan igual a cada situación.
+            No todos los micrófonos ofrecen la misma calidad ni se adaptan igual a cada situación,
+            ya pruebes el micrófono del ordenador (computadora) o el del móvil (celular).
             Elige el que mejor encaje con tu uso habitual.
           </p>
           <div className={styles.tableWrapper}>
@@ -734,7 +735,8 @@ export default function PruebaMicrofonoPage() {
               <details>
                 <summary>¿Por qué el micro funciona aquí pero no en Teams/Zoom?</summary>
                 <p>
-                  Cada aplicación gestiona el micrófono de forma independiente. Puede
+                  Cada aplicación gestiona el micrófono de forma independiente, tanto en
+                  el ordenador (computadora) como en el móvil (celular). Puede
                   que Teams o Zoom tengan seleccionado un dispositivo diferente, o que
                   sus propios permisos estén bloqueados. Ve a Configuración dentro de
                   la app de videollamada → Audio → y selecciona el mismo micrófono que

@@ -212,7 +212,7 @@ export default function PruebaCamaraPage() {
         <span className={styles.heroIcon}>📷</span>
         <h1 className={styles.title}>Prueba de Cámara Web</h1>
         <p className={styles.subtitle}>
-          Verifica tu webcam antes de videollamadas. Toma fotos, ajusta configuración. Sin registro, 100% privado.
+          Verifica tu webcam antes de videollamadas, en el ordenador (computadora) o en el móvil (celular). Toma fotos, ajusta configuración. Sin registro, 100% privado.
         </p>
       </header>
 
@@ -454,7 +454,8 @@ export default function PruebaCamaraPage() {
           <p>
             La resolución determina la calidad de imagen que verán tus interlocutores. Conocer
             las diferencias te ayuda a elegir el equipo adecuado y a entender las limitaciones
-            de tu conexión.
+            de tu conexión, ya uses la webcam de un ordenador (computadora) o la cámara de un
+            móvil (celular).
           </p>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
@@ -642,9 +643,10 @@ export default function PruebaCamaraPage() {
               <div className={styles.stepContent}>
                 <strong>Verificar que se ve la imagen en tiempo real</strong>
                 <p>
-                  Deberías ver tu imagen en directo en el área de video. La resolución
-                  detectada aparece justo debajo. Si la imagen no aparece, revisa los
-                  permisos o si otra app está usando la cámara.
+                  Deberías ver tu imagen en directo en el área de video, tanto en el ordenador
+                  (computadora) como en el móvil (celular). La resolución detectada aparece justo
+                  debajo. Si la imagen no aparece, revisa los permisos o si otra app está usando
+                  la cámara.
                 </p>
               </div>
             </li>
