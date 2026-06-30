@@ -375,7 +375,7 @@ export default function SelectorTabletPage() {
 
             <h3>¿Cuándo elegir una tablet Windows?</h3>
             <p>
-              Una tablet Windows (o 2 en 1) es la mejor opción cuando necesitas ejecutar programas de escritorio completos: Adobe Photoshop, AutoCAD, software de contabilidad, etc. También es ideal si quieres un único dispositivo que reemplace al portátil con la flexibilidad de la pantalla táctil.
+              Una tablet Windows (o 2 en 1) es la mejor opción cuando necesitas ejecutar programas de escritorio completos: Adobe Photoshop, AutoCAD, software de contabilidad, etc. También es ideal si quieres un único dispositivo que reemplace al portátil (laptop o notebook) con la flexibilidad de la pantalla táctil.
             </p>
 
             <h3>eReaders: la opción olvidada</h3>
@@ -383,9 +383,9 @@ export default function SelectorTabletPage() {
               Si tu uso principal es leer libros y artículos largos, un eReader como el Kindle Paperwhite ofrece ventajas que ninguna tablet puede igualar: pantalla de tinta electrónica sin reflejos, batería de semanas, peso mínimo y ausencia de distracciones. Son perfectos para lectores habituales.
             </p>
 
-            <h3>¿Necesitas realmente una tablet?</h3>
+            <h3>¿Tablet o portátil (laptop/notebook)?</h3>
             <p>
-              Muchos usuarios descubren que su smartphone grande (6,5&quot; o más) y su portátil cubren todas sus necesidades sin necesidad de un dispositivo intermedio. Una tablet aporta valor real cuando lees mucho en pantalla grande, dibujas digitalmente, tienes hijos en edad escolar o necesitas un segundo dispositivo más ligero para viajar.
+              Muchos usuarios descubren que su smartphone grande (6,5&quot; o más) y su portátil (laptop o notebook) cubren todas sus necesidades sin necesidad de un dispositivo intermedio. Una tablet aporta valor real cuando lees mucho en pantalla grande, dibujas digitalmente, tienes hijos en edad escolar o necesitas un segundo dispositivo más ligero para viajar. Si tu prioridad es escribir documentos largos o usar software profesional, un portátil sigue siendo más versátil que cualquier tablet.
             </p>
 
             <h3>Tamaño: ¿compacta o grande?</h3>

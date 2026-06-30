@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Selector de Tablet | ¿Qué Tablet Necesitas? | meskeIA',
   description:
-    'Test de 10 preguntas para saber qué tipo de tablet se adapta mejor a tus necesidades: tablet Android, iPad/iOS, tablet Windows, eReader o prescindir de tablet.',
+    'Test de 10 preguntas para saber qué tipo de tablet se adapta mejor a tus necesidades: tablet Android, iPad/iOS, tablet Windows, eReader o prescindir de tablet. Incluye comparativa tablet vs portátil (laptop/notebook).',
   keywords: [
     'qué tablet comprar',
     'iPad o tablet Android',
@@ -16,6 +16,8 @@ export const metadata: Metadata = {
     'tablet para trabajar',
     'mejor tablet según uso',
     'tablet o portátil',
+    'tablet o laptop',
+    'tablet vs notebook',
   ],
   openGraph: {
     title: 'Selector de Tablet — ¿Qué Tipo de Tablet Necesitas?',
@@ -80,10 +82,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Merece la pena comprar una tablet o es mejor un portátil?',
+      name: '¿Merece la pena comprar una tablet o es mejor un portátil (laptop/notebook)?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Una tablet es más cómoda para consumir contenido (vídeo, lectura, redes sociales) y trabajar en movilidad con tareas ligeras. Un portátil es más versátil para crear documentos largos, programar o usar software profesional. Muchos usuarios optan por la combinación de un smartphone potente más un portátil, prescindiendo de la tablet, salvo que tengan un caso de uso muy concreto.',
+        text: 'Una tablet es más cómoda para consumir contenido (vídeo, lectura, redes sociales) y trabajar en movilidad con tareas ligeras. Un portátil (laptop o notebook) es más versátil para crear documentos largos, programar o usar software profesional. Muchos usuarios optan por la combinación de un smartphone potente más un portátil, prescindiendo de la tablet, salvo que tengan un caso de uso muy concreto.',
       },
     },
   ],
