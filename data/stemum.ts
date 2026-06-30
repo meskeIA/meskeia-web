@@ -124,6 +124,7 @@ export const STEMUM_APP_DISCIPLINA: Record<string, string> = {
   // Química
   'simulador-equilibrio-quimico': 'quimica',
   'simulador-titulacion': 'quimica',
+  'simulador-disoluciones': 'quimica',
   'simulador-vsepr': 'quimica',
   'simulador-estequiometria': 'quimica',
   'simulador-cinetica-arrhenius': 'quimica',

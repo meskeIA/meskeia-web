@@ -436,6 +436,7 @@ export const implementedAppsUrls = [
   "/simulador-programacion-dinamica/", // DP paso a paso: mochila 0/1, LCS y Fibonacci editables, resalta celdas de origen y reconstruye solución
   "/simulador-backtracking/",       // Backtracking N reinas: probar/conflicto/colocar/retroceder paso a paso, 4-8, recuento de soluciones
   "/simulador-git-ramas/",          // Git visual: commits, ramas, checkout y merge sobre grafo en vivo, con comandos equivalentes — control de versiones
+  "/simulador-disoluciones/",       // Química: molaridad/concentración/ppm en vivo con vaso coloreado + dilución C1V1=C2V2 — Stemum química
   "/simulador-recursion/",          // 6 funciones recursivas (factorial, Fibonacci, Hanoi, MCD, suma dígitos, búsqueda binaria) con pila viva
 
   // Tanda 3 simuladores Informática FP/Universidad (2026-05-07)

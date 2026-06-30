@@ -3007,10 +3007,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // SIMULADORES BACHILLERATO/UNIVERSIDAD — Tanda 3 (2026-05-07)
   'simulador-titulacion': [
-    { url: '/simulador-equilibrio-quimico/', icon: '⚖️', name: 'Equilibrio Químico', description: 'Le Chatelier y constante Kc' },
+    { url: '/simulador-disoluciones/', icon: '🧪', name: 'Disoluciones', description: 'Molaridad, concentración y dilución' },
     { url: '/visualizador-ph-acidos-bases/', icon: '🧫', name: 'pH, Ácidos y Bases', description: 'Escala pH y reacciones' },
     { url: '/simulador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Estequiometría y reactivo limitante' },
     { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica', description: 'Elementos químicos completos' },
+  ],
+  'simulador-disoluciones': [
+    { url: '/simulador-titulacion/', icon: '🧫', name: 'Titulación ácido-base', description: 'Bureta, curva de pH e indicadores' },
+    { url: '/simulador-estequiometria/', icon: '⚗️', name: 'Estequiometría', description: 'Moles, masa y reactivo limitante' },
+    { url: '/visualizador-ph-acidos-bases/', icon: '🧪', name: 'pH, Ácidos y Bases', description: 'Escala pH y concentración' },
+    { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica', description: 'Masas molares de los elementos' },
   ],
   'simulador-vsepr': [
     { url: '/simulador-equilibrio-quimico/', icon: '⚖️', name: 'Equilibrio Químico', description: 'Le Chatelier y reacciones reversibles' },

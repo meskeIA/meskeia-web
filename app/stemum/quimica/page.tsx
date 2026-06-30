@@ -28,6 +28,12 @@ const APPS = [
     slug: 'simulador-titulacion',
   },
   {
+    icon: '🧪',
+    titulo: 'Disoluciones (molaridad y dilución)',
+    desc: 'Ajusta soluto y volumen y observa la molaridad, g/L, % m/v y ppm en vivo, con el color del vaso según la concentración. Incluye dilución C₁·V₁ = C₂·V₂.',
+    slug: 'simulador-disoluciones',
+  },
+  {
     icon: '🔷',
     titulo: 'Geometría molecular (VSEPR)',
     desc: 'Geometría 3D rotable según VSEPR: átomo central con pares enlazantes y libres, e hibridación.',
