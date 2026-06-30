@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Simulador de Puertas Lógicas (Compuertas) - AND, OR, NOT, XOR | meskeIA',
+  title: 'Simulador de Compuertas Lógicas (Puertas) - AND, OR, NOT, XOR | meskeIA',
   description: 'Simulador de puertas lógicas y compuertas lógicas online: tablas de verdad, circuitos predefinidos (Half Adder, Full Adder, Multiplexor) y expresiones booleanas. Para electrónica digital.',
   keywords: 'simulador de compuertas lógicas, simulador de puertas lógicas, compuertas lógicas, puertas lógicas, AND, OR, NOT, NAND, NOR, XOR, XNOR, tabla de verdad, circuitos digitales, electrónica digital, álgebra booleana, half adder, full adder, multiplexor, simulador, universidad',
   authors: [{ name: 'meskeIA' }],

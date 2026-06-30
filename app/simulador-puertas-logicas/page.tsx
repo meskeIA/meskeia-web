@@ -292,7 +292,7 @@ export default function SimuladorPuertasLogicasPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <h1 className={styles.title}>Simulador de Puertas Lógicas</h1>
+        <h1 className={styles.title}>Simulador de Puertas y Compuertas Lógicas</h1>
         <p className={styles.subtitle}>
           Tablas de verdad, circuitos digitales y expresiones booleanas. Puertas
           lógicas (también llamadas <strong>compuertas lógicas</strong>): AND, OR,
@@ -978,6 +978,45 @@ export default function SimuladorPuertasLogicasPage() {
           </ul>
         </div>
       </EducationalSection>
+
+      {/* Conceptos relacionados — FUERA de la EducationalSection a propósito: ese componente
+          solo monta sus hijos tras el clic (isOpen && children), así que su contenido no llega
+          al HTML servido ni al crawler. Estos enlaces internos van visibles para que cuenten. */}
+      <section className={styles.relatedConcepts}>
+        <h2>Sigue explorando lógica y computación</h2>
+        <p>
+          Las puertas (o compuertas) lógicas son el ladrillo con el que se construye toda la
+          informática. Si quieres ver cómo encajan en el panorama completo:
+        </p>
+        <ul>
+          <li>
+            Detrás de cada puerta hay una proposición verdadera o falsa: practica con el{' '}
+            <a href="/visualizador-logica-proposicional/">visualizador de lógica proposicional</a>{' '}
+            para dominar el álgebra de Boole que simplifica estos circuitos.
+          </li>
+          <li>
+            Millones de estas compuertas forman un procesador: descubre cómo en el{' '}
+            <a href="/visualizador-arquitectura-computador/">visualizador de la arquitectura del computador</a>.
+          </li>
+          <li>
+            Las puertas viven en circuitos reales: experimenta con el{' '}
+            <a href="/visualizador-circuitos-electronicos/">visualizador de circuitos electrónicos</a>{' '}
+            para conectar la lógica con la electrónica digital.
+          </li>
+          <li>
+            La lógica binaria es la base de la teoría de la información: mide bits y paridad en el{' '}
+            <a href="/visualizador-teoria-informacion/">visualizador de teoría de la información</a>, o
+            sube un nivel hasta la computación teórica con el{' '}
+            <a href="/simulador-maquina-turing/">simulador de la máquina de Turing</a>.
+          </li>
+        </ul>
+        <p className={styles.relatedConceptsTip}>
+          💡 ¿Buscabas una <strong>calculadora de compuertas lógicas</strong> o un{' '}
+          <strong>sumador binario</strong>? Es esta misma herramienta: usa el modo «Expresiones»
+          para evaluar cualquier fórmula booleana, y el modo «Circuitos» para los sumadores
+          (half adder y full adder).
+        </p>
+      </section>
 
       <RelatedApps apps={getRelatedApps('simulador-puertas-logicas')} />
       <ShareCard appName="simulador-puertas-logicas" />
