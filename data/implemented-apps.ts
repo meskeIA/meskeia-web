@@ -435,6 +435,7 @@ export const implementedAppsUrls = [
   "/simulador-modelo-osi/",         // Modelo OSI: encapsulación/desencapsulación de las 7 capas paso a paso, escenarios, comparativa TCP/IP — redes
   "/simulador-programacion-dinamica/", // DP paso a paso: mochila 0/1, LCS y Fibonacci editables, resalta celdas de origen y reconstruye solución
   "/simulador-backtracking/",       // Backtracking N reinas: probar/conflicto/colocar/retroceder paso a paso, 4-8, recuento de soluciones
+  "/simulador-git-ramas/",          // Git visual: commits, ramas, checkout y merge sobre grafo en vivo, con comandos equivalentes — control de versiones
   "/simulador-recursion/",          // 6 funciones recursivas (factorial, Fibonacci, Hanoi, MCD, suma dígitos, búsqueda binaria) con pila viva
 
   // Tanda 3 simuladores Informática FP/Universidad (2026-05-07)

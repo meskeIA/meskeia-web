@@ -94,6 +94,12 @@ const APPS = [
     slug: 'simulador-backtracking',
   },
   {
+    icon: '🌿',
+    titulo: 'Git: ramas y merge',
+    desc: 'Crea commits, abre ramas, cambia entre ellas y fusiónalas viendo crecer el grafo de commits en tiempo real, con HEAD y los comandos de Git equivalentes.',
+    slug: 'simulador-git-ramas',
+  },
+  {
     icon: '📄',
     titulo: 'Reemplazo de páginas',
     desc: 'FIFO, LRU, Óptimo, Clock y LFU con tabla matricial, comparativa y detección de la anomalía de Belady.',
