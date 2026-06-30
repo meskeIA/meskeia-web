@@ -3,8 +3,8 @@ import { generateWebAppSchema, generateFAQSchema, combineSchemas } from '@/lib/s
 
 export const metadata: Metadata = {
   title: 'Comparador de Velocidad de Almacenamiento - HDD vs SSD vs USB vs NVMe - meskeIA',
-  description: 'Calcula en tiempo real cuánto tarda en transferirse tu archivo en HDD, SSD SATA, NVMe Gen 4, USB 2.0, USB 3.2, USB4, UFS 4.0 y tarjeta SD. Slider de tamaño y presets de foto, vídeo, película 4K y más.',
-  keywords: 'velocidad almacenamiento comparar, HDD vs SSD tiempo transferencia, NVMe velocidad, USB 3.0 vs 3.2 velocidad, cuánto tarda copiar archivo, velocidad disco duro SSD comparativa, tiempo transferencia 4K',
+  description: 'Calcula en tiempo real cuánto tarda en transferirse tu archivo en HDD, SSD SATA, NVMe Gen 4, USB 2.0, USB 3.2, USB4, UFS 4.0 y tarjeta SD. Compara la velocidad del disco duro (disco rígido) frente al SSD con slider de tamaño y presets de foto, vídeo, película 4K y más.',
+  keywords: 'velocidad almacenamiento comparar, HDD vs SSD tiempo transferencia, NVMe velocidad, USB 3.0 vs 3.2 velocidad, cuánto tarda copiar archivo, velocidad disco duro SSD comparativa, velocidad disco rígido vs SSD, tiempo transferencia 4K',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 
 const webAppSchema = generateWebAppSchema({
   name: 'Comparador de Velocidad de Almacenamiento',
-  description: 'Calculadora interactiva que muestra cuánto tarda en transferirse un archivo en 10 tecnologías de almacenamiento: HDD, SSD SATA, NVMe Gen 3 y 4, USB 2.0, USB 3.0, USB 3.2 Gen 2, USB4/Thunderbolt, UFS 4.0 y Tarjeta SD. Slider de tamaño logarítmico con presets de foto, vídeo, juego y backup.',
+  description: 'Calculadora interactiva que muestra cuánto tarda en transferirse un archivo en 10 tecnologías de almacenamiento: HDD (disco duro o disco rígido), SSD SATA, NVMe Gen 3 y 4, USB 2.0, USB 3.0, USB 3.2 Gen 2, USB4/Thunderbolt, UFS 4.0 y Tarjeta SD. Slider de tamaño logarítmico con presets de foto, vídeo, juego y backup.',
   url: 'https://meskeia.com/comparador-velocidad-almacenamiento/',
   category: 'EducationalApplication',
   features: [

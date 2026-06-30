@@ -3,8 +3,8 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Conversor Binario Online - Texto a Binario y Binario a Texto | meskeIA',
-  description: 'Conversor binario gratuito. Convierte texto a código binario (0 y 1) y viceversa. Incluye hexadecimal, octal y ASCII. Aprende sistemas numéricos.',
-  keywords: 'conversor binario, texto a binario, binario a texto, codigo binario, ascii, hexadecimal, octal, sistemas numericos',
+  description: 'Conversor binario gratuito. Convierte texto a código binario (0 y 1) y viceversa. Incluye hexadecimal, octal y ASCII. Aprende cómo representan la información los ordenadores (computadoras) con los sistemas numéricos.',
+  keywords: 'conversor binario, texto a binario, binario a texto, codigo binario, ascii, hexadecimal, octal, sistemas numericos, binario ordenador, binario computadora',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -49,10 +49,10 @@ export const faqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿Qué es el sistema binario y por qué lo usan los ordenadores?',
+      name: '¿Qué es el sistema binario y por qué lo usan los ordenadores (computadoras)?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El sistema binario es un sistema de numeración que usa solo dos dígitos: 0 y 1. Los ordenadores lo utilizan porque sus componentes electrónicos (transistores) tienen dos estados físicos distinguibles: apagado (0) y encendido (1). Cada 0 o 1 es un "bit" (binary digit), y 8 bits forman un byte, la unidad básica de información.',
+        text: 'El sistema binario es un sistema de numeración que usa solo dos dígitos: 0 y 1. Los ordenadores (computadoras) lo utilizan porque sus componentes electrónicos (transistores) tienen dos estados físicos distinguibles: apagado (0) y encendido (1). Cada 0 o 1 es un "bit" (binary digit), y 8 bits forman un byte, la unidad básica de información.',
       },
     },
     {

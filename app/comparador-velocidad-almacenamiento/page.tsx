@@ -41,7 +41,7 @@ const TECNOLOGIAS: Tecnologia[] = [
     velocidadEscritura: 110,
     icono: '💿',
     color: '#6B7280',
-    descripcion: 'Disco duro tradicional con platos magnéticos giratorios (7200 rpm)',
+    descripcion: 'Disco duro o disco rígido tradicional con platos magnéticos giratorios (7200 rpm)',
     tipico: 'PCs de sobremesa, almacenamiento masivo, NAS, portátiles antiguos',
   },
   {
@@ -559,7 +559,7 @@ export default function ComparadorVelocidadAlmacenamientoPage() {
             <div className={styles.faqItem}>
               <h4>❓ ¿Por qué los SSD son tan más rápidos que los HDD?</h4>
               <p>
-                Los HDD almacenan datos en platos magnéticos giratorios que necesitan que el cabezal
+                Los HDD (disco duro o disco rígido) almacenan datos en platos magnéticos giratorios que necesitan que el cabezal
                 lector se desplace físicamente hasta la posición correcta. Esto introduce una latencia
                 mecánica de 5-10 ms por operación. Los SSD usan memoria flash NAND, sin partes móviles,
                 con latencias de 0,05-0,1 ms. Para archivos secuenciales la diferencia es de 4-5×,

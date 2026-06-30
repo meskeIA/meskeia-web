@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Selector de Cuenta Bancaria | ¿Qué Tipo de Cuenta Necesitas? | meskeIA',
-  description: 'Test de 10 preguntas para saber qué tipo de cuenta bancaria se adapta mejor a tu situación: cuenta corriente estándar, cuenta nómina, cuenta joven, cuenta de ahorro remunerada o mantener la actual.',
-  keywords: ['qué cuenta bancaria elegir', 'cuenta nómina o corriente', 'cuenta joven banco España', 'cuenta ahorro remunerada', 'cambiar de banco España', 'cuenta sin comisiones España', 'mejor tipo de cuenta bancaria', 'cuenta bancaria según perfil', 'banco digital o tradicional', 'cuenta bancaria para jóvenes España'],
+  description: 'Test de 10 preguntas para saber qué tipo de cuenta bancaria se adapta mejor a tu situación: cuenta corriente estándar, cuenta nómina (cuenta para domiciliar tu sueldo o planilla), cuenta joven, cuenta de ahorro remunerada o mantener la actual.',
+  keywords: ['qué cuenta bancaria elegir', 'cuenta nómina o corriente', 'cuenta para domiciliar el sueldo', 'cuenta para depositar el salario', 'cuenta para recibir la planilla', 'cuenta joven banco', 'cuenta ahorro remunerada', 'cambiar de banco', 'cuenta sin comisiones', 'mejor tipo de cuenta bancaria', 'cuenta bancaria según perfil', 'banco digital o tradicional'],
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -48,7 +48,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre una cuenta corriente y una cuenta nómina?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Una cuenta corriente estándar permite domiciliar pagos y realizar transferencias sin condiciones. Una cuenta nómina exige domiciliar los ingresos del trabajo (habitualmente a partir de 600-1.000 € mensuales) y a cambio ofrece ventajas como ausencia de comisiones, tarjeta gratuita o incluso remuneración por el saldo. Si recibes nómina regular, la cuenta nómina suele ser más rentable.',
+        text: 'Una cuenta corriente estándar permite domiciliar pagos y realizar transferencias sin condiciones. Una cuenta nómina exige domiciliar los ingresos del trabajo —el sueldo, salario o planilla, según el país— habitualmente a partir de 600-1.000 € mensuales, y a cambio ofrece ventajas como ausencia de comisiones, tarjeta gratuita o incluso remuneración por el saldo. Si recibes un ingreso regular por tu trabajo, la cuenta nómina suele ser más rentable.',
       },
     },
     {

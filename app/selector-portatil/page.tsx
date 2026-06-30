@@ -508,10 +508,10 @@ export default function SelectorPortatil() {
 
       {pantalla !== 'resultado' ? (
         <header className={styles.hero}>
-          <h1 className={styles.heroTitle}><span aria-hidden="true">💻</span> Asesor de Portátil y PC</h1>
+          <h1 className={styles.heroTitle}><span aria-hidden="true">💻</span> Asesor de Portátil, Laptop o Notebook</h1>
           <p className={styles.heroSubtitle}>
             {pantalla === 'intro'
-              ? '10 preguntas para saber qué ordenador te conviene de verdad'
+              ? '10 preguntas para saber qué computadora te conviene de verdad: portátil (laptop), sobremesa, Mac o Windows'
               : `Pregunta ${paso + 1} de ${totalPreguntas} · ${preguntaActual.categoria}`}
           </p>
         </header>
@@ -535,11 +535,11 @@ export default function SelectorPortatil() {
               <span className={styles.introIcon}>🪟</span>
               <span className={styles.introIcon}>🐧</span>
             </div>
-            <h2 className={styles.introTitulo}>¿Portátil, sobremesa, Mac o Windows?</h2>
+            <h2 className={styles.introTitulo}>¿Portátil (laptop), sobremesa, Mac o Windows?</h2>
             <p className={styles.introDesc}>
-              El mercado de ordenadores tiene más opciones que nunca: chips Apple Silicon, portátiles ultraligeros,
-              mini PCs, 2 en 1 táctiles… y una brecha enorme entre la oferta de entrada y la gama pro.
-              Este test te orienta hacia el formato, sistema operativo y gama que mejor encajan con tu uso real.
+              El mercado de computadoras tiene más opciones que nunca: chips Apple Silicon, portátiles (laptops y
+              notebooks) ultraligeros, mini PCs, 2 en 1 táctiles… y una brecha enorme entre la oferta de entrada y la
+              gama pro. Este test te orienta hacia el formato, sistema operativo y gama que mejor encajan con tu uso real.
             </p>
             <ul className={styles.introFeatures} aria-label="Qué obtendrás">
               <li><span aria-hidden="true">✅</span> Formato recomendado (portátil, sobremesa, 2 en 1…)</li>
@@ -684,11 +684,13 @@ export default function SelectorPortatil() {
             subtitle="Formato, OS, gama, qué especificaciones importan y cuándo comprar"
             defaultOpen={false}
           >
-            <h3>Portátil vs sobremesa: la primera decisión</h3>
+            <h3>Portátil (laptop o notebook) vs sobremesa: la primera decisión</h3>
             <p>
-              Un <strong>portátil</strong> es la elección correcta si te mueves con frecuencia, estudias o trabajas en
-              distintos lugares. A igual precio, un sobremesa ofrece más rendimiento, mejor ergonomía y es más fácil
-              de actualizar. Si siempre trabajas en casa u oficina, el sobremesa + monitor externo es más rentable.
+              Un <strong>portátil</strong> —conocido como <strong>laptop</strong> o <strong>notebook</strong> en
+              gran parte de Latinoamérica— es la elección correcta si te mueves con frecuencia, estudias o trabajas en
+              distintos lugares. A igual precio, un sobremesa (computadora de escritorio) ofrece más rendimiento, mejor
+              ergonomía y es más fácil de actualizar. Si siempre trabajas en casa u oficina, el sobremesa + monitor
+              externo es más rentable.
             </p>
             <p>
               Los <strong>2 en 1</strong> (bisagra 360° con pantalla táctil) son ideales para estudiantes que toman

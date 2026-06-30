@@ -17,13 +17,13 @@
       "dominio": "informatica",
       "es": ["puerta logica", "puertas logicas"],
       "latam": ["compuerta logica", "compuertas logicas"],
-      "nota": "logic gate. RESUELTO completo en simulador-puertas-logicas: 884248b4 (description) + e46cc46c (H1 y title con ambos terminos, liderando compuertas por mas demanda GSC)"
+      "nota": "logic gate. RESUELTO completo en simulador-puertas-logicas: 884248b4 (description) + e46cc46c (H1 y title con ambos terminos, liderando compuertas por mas demanda GSC). RESUELTO tambien en visualizador-circuitos-electronicos (2026-06-30)."
     },
     {
       "dominio": "informatica",
       "es": ["ordenador", "ordenadores"],
       "latam": ["computadora", "computadoras", "computador", "computadores"],
-      "nota": "computer. RESUELTO en lupa-digital (2026-06-30): ordenador/computadora en title, body y JSON-LD."
+      "nota": "computer. RESUELTO en lupa-digital, espejo, prueba-camara, prueba-microfono, conversor-binario, selector-portatil (2026-06-30): ordenador/computadora en title, body y JSON-LD."
     },
     {
       "dominio": "informatica",
@@ -35,7 +35,13 @@
       "dominio": "informatica",
       "es": ["disco duro"],
       "latam": ["disco rigido"],
-      "nota": "hard disk"
+      "nota": "hard disk. RESUELTO en comparador-velocidad-almacenamiento (2026-06-30)."
+    },
+    {
+      "dominio": "informatica",
+      "es": ["portatil", "ordenador portatil"],
+      "latam": ["laptop", "notebook", "computadora portatil"],
+      "nota": "laptop. Par anadido 2026-06-30 a raiz de selector-portatil: en Latam se busca 'que laptop comprar'/'mejor notebook'. RESUELTO en selector-portatil."
     },
     {
       "dominio": "tecnologia",
@@ -131,7 +137,7 @@
       "dominio": "trabajo",
       "es": ["nomina", "nominas"],
       "latam": ["planilla", "recibo de pago", "recibo de sueldo"],
-      "nota": "payslip. nomina es-only estructural en apps fiscales; revisar es-only"
+      "nota": "payslip. nomina es-only estructural en apps fiscales; revisar es-only. RESUELTO en selector-cuenta-bancaria (2026-06-30, no-fiscal). El resto (estimador-sueldo-neto, simulador-desglose-nomina, etc.) es es-only: NO tocar."
     },
     {
       "dominio": "trabajo",
@@ -185,7 +191,7 @@
       "dominio": "cocina",
       "es": ["tarta", "tartas"],
       "latam": ["torta", "tortas", "pastel", "pasteles", "queque"],
-      "nota": "cake. muchas variantes; revisar contexto reposteria"
+      "nota": "cake. muchas variantes; revisar contexto reposteria. RESUELTO en calculadora-merengue (2026-06-30)."
     },
     {
       "dominio": "salud",

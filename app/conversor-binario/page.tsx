@@ -283,7 +283,7 @@ export default function ConversorBinarioPage() {
             <div className="edu-escenario-card">
               <span className="edu-escenario-icon" aria-hidden="true">⚙️</span>
               <h4>Programación de bajo nivel</h4>
-              <p>En ensamblador, drivers y firmware trabajas directamente con bits y bytes. Entender binario es esencial para manipular registros de CPU y puertos de E/S.</p>
+              <p>En ensamblador, drivers y firmware trabajas directamente con bits y bytes. Entender el binario es esencial para manipular registros de CPU y puertos de E/S, sin importar si el equipo se llama ordenador o computadora.</p>
             </div>
             <div className="edu-escenario-card">
               <span className="edu-escenario-icon" aria-hidden="true">🌐</span>
@@ -308,7 +308,7 @@ export default function ConversorBinarioPage() {
           <h3 className="edu-section-title"><span aria-hidden="true">❓</span> Preguntas Frecuentes</h3>
           <div className="edu-faq-list">
             <details className="edu-faq-item">
-              <summary className="edu-faq-question">¿Por qué los ordenadores usan binario y no decimal?</summary>
+              <summary className="edu-faq-question">¿Por qué los ordenadores (computadoras) usan binario y no decimal?</summary>
               <div className="edu-faq-answer">
                 <p>Los transistores, el componente básico de los chips, tienen dos estados estables: conducen corriente (1) o no (0). El sistema binario se mapea perfectamente a esta realidad física. Representar 10 estados distintos (decimal) con transistores sería mucho más difícil, propenso a errores y consumiría más energía.</p>
               </div>

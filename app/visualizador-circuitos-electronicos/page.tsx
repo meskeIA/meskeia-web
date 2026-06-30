@@ -369,7 +369,7 @@ export default function VisualizadorCircuitosElectronicos() {
         <header className={styles.hero}>
           <h1 className={styles.heroTitle}>⚡ Circuitos Electrónicos</h1>
           <p className={styles.heroSubtitle}>
-            De los componentes básicos al chip moderno: R, L, C, transistores, puertas lógicas y la jerarquía que hace posible la computación
+            De los componentes básicos al chip moderno: R, L, C, transistores, puertas lógicas (compuertas lógicas) y la jerarquía que hace posible la computación
           </p>
         </header>
 
@@ -675,7 +675,7 @@ export default function VisualizadorCircuitosElectronicos() {
           <section className={styles.seccion} aria-labelledby="titulo-puertas">
             <h2 id="titulo-puertas" className={styles.seccionTitulo}>Puertas Lógicas</h2>
             <p className={styles.seccionDesc}>
-              Las puertas lógicas son los bloques de la electrónica digital. Implementan el álgebra booleana: operan con 0 (falso) y 1 (verdadero).
+              Las puertas lógicas (también llamadas compuertas lógicas en gran parte de Latinoamérica) son los bloques de la electrónica digital. Implementan el álgebra booleana: operan con 0 (falso) y 1 (verdadero).
               Elige una puerta, activa las entradas A y B y observa la salida.
             </p>
 
@@ -997,7 +997,7 @@ export default function VisualizadorCircuitosElectronicos() {
             </div>
             <div className={styles.escenarioCard}>
               <h4>💻 Diseñador Digital</h4>
-              <p>Las puertas NAND son universales: combinándolas puedes construir cualquier función lógica. El visualizador muestra cómo 4 NAND implementan un flip-flop RS, base de la memoria SRAM.</p>
+              <p>Las puertas lógicas (compuertas lógicas) NAND son universales: combinándolas puedes construir cualquier función lógica. El visualizador muestra cómo 4 NAND implementan un flip-flop RS, base de la memoria SRAM.</p>
             </div>
             <div className={styles.escenarioCard}>
               <h4>🖥️ Arquitecto de CPUs</h4>

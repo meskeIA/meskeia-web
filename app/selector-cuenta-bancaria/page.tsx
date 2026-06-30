@@ -469,7 +469,7 @@ export default function SelectorCuentaBancariaPage() {
             </div>
             <div className={styles.comparativaItem}>
               <h4><span aria-hidden="true">💼</span> Cuenta nómina</h4>
-              <p>Requiere domiciliar ingresos regulares. A cambio: sin comisiones, tarjeta gratuita y bonificaciones.</p>
+              <p>Requiere domiciliar ingresos regulares —la nómina, el depósito de tu sueldo o la planilla, según el país—. A cambio: sin comisiones, tarjeta gratuita y bonificaciones.</p>
             </div>
             <div className={styles.comparativaItem}>
               <h4><span aria-hidden="true">🧑‍🎓</span> Cuenta joven</h4>
@@ -496,7 +496,7 @@ export default function SelectorCuentaBancariaPage() {
         <section className={styles.guideSection}>
           <h2>Cuenta nómina vs. cuenta corriente sin requisitos</h2>
           <p>
-            La principal diferencia está en los compromisos adquiridos. Una cuenta nómina ofrece mayores beneficios, pero si pierdes el empleo o cambias de banco, puede pasar a cobrar comisiones automáticamente. Una cuenta corriente sin requisitos no cambia de condiciones aunque varíe tu situación laboral.
+            La principal diferencia está en los compromisos adquiridos. Una cuenta nómina —la pensada para domiciliar el sueldo, salario o planilla del trabajo— ofrece mayores beneficios, pero si pierdes el empleo o cambias de banco, puede pasar a cobrar comisiones automáticamente. Una cuenta corriente sin requisitos no cambia de condiciones aunque varíe tu situación laboral.
           </p>
           <p>
             Para ingresos irregulares (autónomos, freelances, trabajos eventuales), la cuenta corriente estándar suele ser más adecuada.

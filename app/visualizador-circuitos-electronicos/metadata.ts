@@ -2,13 +2,14 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Circuitos Electrónicos: R, L, C, Transistores y Puertas Lógicas — meskeIA',
-  description: 'Visualizador interactivo de circuitos electrónicos. Aprende cómo funcionan resistores, inductores y condensadores, el transistor BJT como interruptor y amplificador, puertas lógicas AND/OR/NOT/NAND y la jerarquía del transistor al chip.',
+  title: 'Circuitos Electrónicos: R, L, C, Transistores y Puertas (Compuertas) Lógicas — meskeIA',
+  description: 'Visualizador interactivo de circuitos electrónicos. Aprende cómo funcionan resistores, inductores y condensadores, el transistor BJT como interruptor y amplificador, puertas lógicas (compuertas lógicas) AND/OR/NOT/NAND y la jerarquía del transistor al chip.',
   keywords: [
     'circuitos electrónicos interactivos',
     'resistor inductor condensador RLC',
     'transistor BJT NPN interruptor amplificador',
     'puertas lógicas AND OR NOT NAND NOR XOR',
+    'compuertas lógicas',
     'circuito RC carga descarga',
     'tabla de verdad puertas lógicas',
     'del transistor al chip procesador',
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     title: 'Circuitos Electrónicos: R, L, C, Transistores y Puertas Lógicas — meskeIA',
-    description: 'Explora la electrónica desde sus fundamentos. Visualiza componentes R/L/C, simula un transistor BJT, juega con puertas lógicas y descubre cómo 50.000 millones de transistores forman un procesador moderno.',
+    description: 'Explora la electrónica desde sus fundamentos. Visualiza componentes R/L/C, simula un transistor BJT, juega con puertas lógicas (compuertas lógicas) y descubre cómo 50.000 millones de transistores forman un procesador moderno.',
     type: 'website',
     url: 'https://meskeia.com/visualizador-circuitos-electronicos/',
     siteName: 'meskeIA',
@@ -44,15 +45,15 @@ export const metadata: Metadata = {
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'Circuitos Electrónicos: R, L, C, Transistores y Puertas Lógicas',
-  description: 'Visualizador interactivo de electrónica: componentes pasivos R/L/C con gráficas de impedancia, circuito RC con curva de carga, transistor BJT en modo interruptor y amplificador, puertas lógicas IEEE con tablas de verdad, y jerarquía del transistor al chip moderno.',
+  name: 'Circuitos Electrónicos: R, L, C, Transistores y Puertas Lógicas (Compuertas Lógicas)',
+  description: 'Visualizador interactivo de electrónica: componentes pasivos R/L/C con gráficas de impedancia, circuito RC con curva de carga, transistor BJT en modo interruptor y amplificador, puertas lógicas (compuertas lógicas) IEEE con tablas de verdad, y jerarquía del transistor al chip moderno.',
   url: 'https://meskeia.com/visualizador-circuitos-electronicos/',
   category: 'EducationalApplication',
   features: [
     'Componentes R, L, C: símbolos SVG, leyes (V=IR, V=L·dI/dt, I=C·dV/dt) y gráficas de impedancia',
     'Circuito RC: sliders de R y C, cálculo de τ=RC y frecuencia de corte, curva de carga SVG',
     'Transistor BJT NPN: modo interruptor con umbral V_BE=0.7V y modo amplificador con ganancia β',
-    'Puertas lógicas AND/OR/NOT/NAND/NOR/XOR/XNOR: símbolos IEEE, tablas de verdad y toggles interactivos',
+    'Puertas lógicas (compuertas lógicas) AND/OR/NOT/NAND/NOR/XOR/XNOR: símbolos IEEE, tablas de verdad y toggles interactivos',
     'Half adder: suma de 1 bit con XOR+AND, muestra suma y acarreo',
     'Jerarquía del chip: de transistor MOSFET a puerta CMOS a flip-flop a registro de 8 bits',
     'Timeline de densidad de transistores: Intel 4004 (1971) a Apple M2 (2023)',
@@ -86,7 +87,7 @@ export const faqJsonLd = {
       name: '¿Cuál es la diferencia entre una puerta NAND y una puerta AND?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La puerta AND produce salida 1 solo cuando todas sus entradas son 1. La puerta NAND es su complementaria: produce 0 solo cuando todas las entradas son 1 y 1 en cualquier otro caso. La NAND es especialmente importante porque es una puerta lógica universal: cualquier función booleana puede implementarse usando únicamente puertas NAND, lo que simplifica el diseño de circuitos integrados.',
+        text: 'La puerta AND produce salida 1 solo cuando todas sus entradas son 1. La puerta NAND es su complementaria: produce 0 solo cuando todas las entradas son 1 y 1 en cualquier otro caso. La NAND es especialmente importante porque es una puerta lógica universal: cualquier función booleana puede implementarse usando únicamente puertas NAND, lo que simplifica el diseño de circuitos integrados. En muchos países de habla hispana, las puertas lógicas se conocen también como compuertas lógicas; ambos términos designan exactamente el mismo elemento de la electrónica digital.',
       },
     },
     {

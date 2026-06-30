@@ -79,7 +79,9 @@ export default function CalculadoraMerenguePage() {
                 francés lo hace en frío y es el más delicado; el suizo calienta la mezcla al baño
                 maría, lo que lo vuelve más denso y estable; y el italiano cuece las claras con un
                 almíbar caliente, dando el merengue más resistente de todos. En los tres, la
-                proporción de referencia es el doble de azúcar que de claras.
+                proporción de referencia es el doble de azúcar que de claras. Es la base ideal
+                para cubrir o decorar una tarta (torta o pastel), hacer suspiros o coronar un
+                postre.
               </p>
             </div>
             <div className={styles.conceptoSection}>
@@ -88,7 +90,7 @@ export default function CalculadoraMerenguePage() {
                 <thead><tr><th scope="col">Tipo</th><th scope="col">Estabilidad</th><th scope="col">Uso típico</th></tr></thead>
                 <tbody>
                   <tr><td>Francés</td><td>Baja</td><td>Hornear: suspiros, macarons</td></tr>
-                  <tr><td>Suizo</td><td>Media</td><td>Coberturas y buttercream</td></tr>
+                  <tr><td>Suizo</td><td>Media</td><td>Coberturas de tarta (torta o pastel) y buttercream</td></tr>
                   <tr><td>Italiano</td><td>Alta</td><td>Mousses, decoración, flamear</td></tr>
                 </tbody>
               </table>
