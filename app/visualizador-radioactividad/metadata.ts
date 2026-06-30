@@ -15,6 +15,8 @@ export const metadata: Metadata = {
     'radiación ionizante efectos biológicos',
     'desintegración nuclear visualizador',
     'física nuclear bachillerato',
+    'física nuclear preparatoria',
+    'radioactividad secundaria',
   ],
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -103,7 +105,7 @@ export const faqJsonLd = {
       name: '¿Para quién es útil este visualizador de radioactividad?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Es especialmente útil para estudiantes de Bachillerato (Física de 2.º) y primeros cursos universitarios de Física, Química o Medicina que necesiten entender la desintegración nuclear, los tipos de radiación y sus aplicaciones prácticas. También sirve a cualquier persona que quiera comprender conceptos de física nuclear que aparecen en noticias sobre energía nuclear, medicina nuclear o gestión de residuos radiactivos. Funciona en el navegador sin instalación.',
+        text: 'Es especialmente útil para estudiantes de Bachillerato (Física de 2.º), preparatoria o educación media secundaria, así como primeros cursos universitarios de Física, Química o Medicina que necesiten entender la desintegración nuclear, los tipos de radiación y sus aplicaciones prácticas. También sirve a cualquier persona que quiera comprender conceptos de física nuclear que aparecen en noticias sobre energía nuclear, medicina nuclear o gestión de residuos radiactivos. Funciona en el navegador sin instalación.',
       },
     },
   ],

@@ -121,7 +121,7 @@ export default function MotorCombustionPage() {
       <header className={styles.hero}>
         <div className={styles.heroIcon}>🔧</div>
         <h1>Motor de Combustión Interna</h1>
-        <p>El ciclo Otto en 4 tiempos y por qué el 65% de la energía de la gasolina nunca mueve tu coche</p>
+        <p>El ciclo Otto en 4 tiempos y por qué el 65% de la energía de la gasolina nunca mueve tu coche (carro o auto)</p>
       </header>
 
       <LegalNotice />
@@ -319,7 +319,7 @@ export default function MotorCombustionPage() {
       {tabActiva === 'perdidas' && (
         <section className={styles.seccion}>
           <h2 className={styles.seccionTitulo}>Dónde va la energía de la gasolina</h2>
-          <p className={styles.seccionSubtitulo}>Por cada 100 € gastados en gasolina en ciudad, solo ~20 € mueven el coche.</p>
+          <p className={styles.seccionSubtitulo}>Por cada 100 € gastados en gasolina en ciudad, solo ~20 € mueven el coche (carro o auto).</p>
 
           {/* Diagrama Sankey simplificado */}
           <div className={styles.sankeyWrapper} role="img" aria-label="Diagrama de pérdidas de energía del motor">

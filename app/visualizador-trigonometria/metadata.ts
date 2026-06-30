@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Trigonometría: Círculo Unitario Interactivo — meskeIA',
   description: 'Explora la trigonometría de forma visual e interactiva: círculo unitario animado, gráficas de seno, coseno y tangente con sliders de amplitud, frecuencia y fase, tabla de valores exactos en ángulos notables e identidades pitagóricas.',
-  keywords: 'trigonometría, círculo unitario, seno, coseno, tangente, funciones trigonométricas, identidades pitagóricas, ángulos notables, bachillerato, matemáticas, visualizador interactivo, radianes, grados, ondas, amplitud, frecuencia, fase',
+  keywords: 'trigonometría, círculo unitario, seno, coseno, tangente, funciones trigonométricas, identidades pitagóricas, ángulos notables, bachillerato, preparatoria, secundaria, educación media, matemáticas, visualizador interactivo, radianes, grados, ondas, amplitud, frecuencia, fase',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -92,7 +92,7 @@ export const faqJsonLd = {
       name: '¿En qué materias y situaciones reales se utiliza la trigonometría?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La trigonometría es fundamental en geometría y álgebra de bachillerato, cálculo diferencial e integral, física (movimiento armónico, óptica, mecánica de ondas), ingeniería eléctrica (corriente alterna, señales), arquitectura, navegación, cartografía y procesamiento de señales digitales (transformada de Fourier). En la vida cotidiana aparece en GPS, compresión de audio MP3, diseño estructural de puentes y prácticamente cualquier fenómeno oscilatorio o periódico.',
+        text: 'La trigonometría es fundamental en geometría y álgebra de la educación media (bachillerato, preparatoria o secundaria), cálculo diferencial e integral, física (movimiento armónico, óptica, mecánica de ondas), ingeniería eléctrica (corriente alterna, señales), arquitectura, navegación, cartografía y procesamiento de señales digitales (transformada de Fourier). En la vida cotidiana aparece en GPS, compresión de audio MP3, diseño estructural de puentes y prácticamente cualquier fenómeno oscilatorio o periódico.',
       },
     },
   ],

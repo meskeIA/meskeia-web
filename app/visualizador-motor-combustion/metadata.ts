@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Motor de Combustión — Ciclo Otto y Por Qué Solo Aprovecha el 35% | meskeIA',
   description: 'Cómo funciona el motor de combustión interna: ciclo Otto 4 tiempos, eficiencia real del 30-35%, pérdidas de energía y comparativa con el motor eléctrico.',
-  keywords: ['motor combustion interna', 'ciclo otto', 'como funciona motor gasolina', 'eficiencia motor termico', 'fisica bachillerato', 'termodinámica motor', 'motor electrico vs gasolina'],
+  keywords: ['motor combustion interna', 'ciclo otto', 'como funciona motor gasolina', 'eficiencia motor termico', 'fisica bachillerato', 'fisica preparatoria', 'fisica secundaria', 'termodinámica motor', 'motor electrico vs gasolina', 'como funciona el motor de un carro', 'motor de explosion'],
   openGraph: {
     title: 'Motor de Combustión — Ciclo Otto y Por Qué Solo Aprovecha el 35%',
     description: 'El 65% de la energía de la gasolina se pierde en calor y fricción. Entiende por qué y cómo funciona el ciclo de 4 tiempos.',
@@ -57,10 +57,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Para qué sirve estudiar el motor de combustión interna en Bachillerato?',
+      name: '¿Para qué sirve estudiar el motor de combustión interna en Bachillerato, preparatoria o secundaria?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El motor de combustión es la aplicación práctica más directa de la termodinámica clásica: en él confluyen los conceptos de trabajo termodinámico, calor, eficiencia de ciclos (ciclo Otto ideal vs real) y el Segundo Principio de la Termodinámica. También ilustra conceptos de mecánica como conversión de movimiento lineal en rotativo a través de la biela-manivela. Es tema habitual en las pruebas de acceso a la universidad en asignaturas de Física y Tecnología Industrial.',
+        text: 'El motor de combustión es la aplicación práctica más directa de la termodinámica clásica: en él confluyen los conceptos de trabajo termodinámico, calor, eficiencia de ciclos (ciclo Otto ideal vs real) y el Segundo Principio de la Termodinámica. También ilustra conceptos de mecánica como conversión de movimiento lineal en rotativo a través de la biela-manivela. Es tema habitual en Física y Tecnología Industrial tanto en Bachillerato y EBAU (España) como en la preparatoria, el bachillerato tecnológico y la educación media en Latinoamérica (México, Colombia, Argentina), así como en los exámenes de admisión universitaria.',
       },
     },
     {

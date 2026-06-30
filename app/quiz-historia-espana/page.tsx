@@ -401,8 +401,8 @@ export default function QuizHistoriaEspanaPage() {
             </div>
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">🎓</span>
-              <h3>Selectividad (EBAU)</h3>
-              <p>Historia de España es materia troncal en 2º de Bachillerato y en la EvAU/ABAU. Los temas de este quiz son los más habituales en los exámenes.</p>
+              <h3>Selectividad y exámenes de admisión</h3>
+              <p>Historia de España es materia troncal en 2º de Bachillerato y en la EvAU/ABAU. También es útil para estudiantes de preparatoria o secundaria en Hispanoamérica que repasan historia de España de cara a un examen de admisión universitaria. Los temas de este quiz son los más habituales en los exámenes.</p>
             </div>
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">🌍</span>

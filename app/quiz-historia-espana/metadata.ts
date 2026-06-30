@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description:
     'Pon a prueba tus conocimientos de historia española: 81 preguntas verificables desde la época romana hasta la Constitución de 1978. 3 dificultades, 9 épocas históricas.',
   keywords:
-    'quiz historia españa, test historia española, preguntas historia españa, historia de españa quiz, reconquista quiz, guerra civil quiz, transicion democratica, reyes catolicos, carlos I, felipe II, constitucion 1978',
+    'quiz historia españa, test historia española, preguntas historia españa, historia de españa quiz, reconquista quiz, guerra civil quiz, transicion democratica, reyes catolicos, carlos I, felipe II, constitucion 1978, bachillerato, selectividad, preparatoria, secundaria, examen de admisión universitaria',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -68,7 +68,7 @@ export const faqJsonLd = {
       name: '¿Para qué exámenes o asignaturas sirve este quiz?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Es especialmente útil para preparar la asignatura de Historia de España de 2.º de Bachillerato y el examen de Selectividad (EBAU/EvAU), que incluye obligatoriamente Historia de España. También sirve para repasar en la ESO (3.º y 4.º), para oposiciones que incluyen cultura general española, y para cualquier persona interesada en conocer la historia del país.',
+        text: 'Es especialmente útil para preparar la asignatura de Historia de España de 2.º de Bachillerato y el examen de Selectividad (EBAU/EvAU), que incluye obligatoriamente Historia de España. También sirve para estudiantes hispanoamericanos de preparatoria, secundaria o que preparan un examen de admisión universitaria con contenidos de historia de España, para oposiciones que incluyen cultura general española, y para cualquier persona interesada en conocer la historia del país.',
       },
     },
     {

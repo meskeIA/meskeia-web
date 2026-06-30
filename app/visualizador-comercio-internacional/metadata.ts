@@ -17,6 +17,9 @@ export const metadata: Metadata = {
     'OMC',
     'libre comercio',
     'economia bachillerato',
+    'economia preparatoria',
+    'economia secundaria',
+    'economia educacion media',
   ],
   openGraph: {
     title: 'Comercio Internacional | meskeIA',
@@ -81,7 +84,7 @@ export const faqJsonLd = {
       name: '¿Para qué nivel educativo está pensado este visualizador de comercio internacional?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El visualizador está diseñado para estudiantes de economía de bachillerato y primeros cursos universitarios, así como para cualquier persona que quiera entender los conceptos básicos del comercio global sin necesidad de conocimientos previos avanzados. Los cuatro módulos (ventaja comparativa, balanza comercial, tipos de cambio y aranceles) cubren los contenidos habituales del temario de Economía de 2.º de Bachillerato.',
+        text: 'El visualizador está diseñado para estudiantes de economía de bachillerato, preparatoria, secundaria o educación media y primeros cursos universitarios, así como para cualquier persona que quiera entender los conceptos básicos del comercio global sin necesidad de conocimientos previos avanzados. Los cuatro módulos (ventaja comparativa, balanza comercial, tipos de cambio y aranceles) cubren los contenidos habituales del temario de Economía de bachillerato y preparatoria.',
       },
     },
   ],

@@ -11,11 +11,13 @@ export const metadata = {
     'briófitos pteridófitos',
     'clasificación plantas',
     'biología bachillerato',
+    'biología preparatoria',
+    'biología secundaria',
   ],
   openGraph: {
     title: 'El Reino Vegetal — Clasificación Interactiva | meskeIA',
     description:
-      'Árbol interactivo del reino vegetal: algas, briófitos, pteridófitos, gimnospermas y angiospermas. Para estudiantes de ESO y Bachillerato.',
+      'Árbol interactivo del reino vegetal: algas, briófitos, pteridófitos, gimnospermas y angiospermas. Para estudiantes de secundaria, preparatoria y Bachillerato.',
   },
 };
 
@@ -72,10 +74,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Para qué sirve estudiar la clasificación del reino vegetal en Bachillerato?',
+      name: '¿Para qué sirve estudiar la clasificación del reino vegetal en secundaria o preparatoria?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La clasificación vegetal es un contenido central de Biología en ESO y Bachillerato y aparece habitualmente en las pruebas de acceso a la universidad. Comprender la jerarquía de grupos permite identificar plantas por sus características morfológicas, entender su ciclo de vida y relacionar su evolución con la conquista del medio terrestre. Además, es la base para disciplinas aplicadas como la agronomía, la farmacognosia y la ecología.',
+        text: 'La clasificación vegetal es un contenido central de Biología en la educación secundaria, la preparatoria y el Bachillerato, y aparece habitualmente en los exámenes de admisión universitaria. Comprender la jerarquía de grupos permite identificar plantas por sus características morfológicas, entender su ciclo de vida y relacionar su evolución con la conquista del medio terrestre. Además, es la base para disciplinas aplicadas como la agronomía, la farmacognosia y la ecología.',
       },
     },
   ],

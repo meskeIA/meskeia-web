@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Geometría Analítica: Cónicas Interactivas — meskeIA',
   description: 'Explora las cónicas (circunferencia, elipse, parábola, hipérbola) con gráficas SVG interactivas. Sliders en tiempo real, ecuaciones canónicas, focos, vértices y coordenadas polares.',
-  keywords: 'geometría analítica, cónicas, circunferencia, elipse, parábola, hipérbola, ecuaciones canónicas, focos, coordenadas polares, secciones cónicas, matemáticas interactivas, visualizador matemático',
+  keywords: 'geometría analítica, cónicas, circunferencia, elipse, parábola, hipérbola, ecuaciones canónicas, focos, coordenadas polares, secciones cónicas, matemáticas interactivas, visualizador matemático, preparatoria, secundaria, educación media',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -86,10 +86,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Las cónicas aparecen en los exámenes de selectividad?',
+      name: '¿Las cónicas aparecen en los exámenes de admisión universitaria?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí, las secciones cónicas forman parte del temario de matemáticas de segundo de bachillerato y son materia habitual en las pruebas de acceso a la universidad en muchos países hispanohablantes. Los ejercicios suelen pedir identificar el tipo de cónica a partir de su ecuación, calcular focos y vértices, o trazar la gráfica con sus elementos.',
+        text: 'Sí, las secciones cónicas forman parte del temario de matemáticas del último curso de educación media (bachillerato o preparatoria) y son materia habitual en los exámenes de admisión a la universidad y en la selectividad o EBAU en muchos países hispanohablantes. Los ejercicios suelen pedir identificar el tipo de cónica a partir de su ecuación, calcular focos y vértices, o trazar la gráfica con sus elementos.',
       },
     },
   ],

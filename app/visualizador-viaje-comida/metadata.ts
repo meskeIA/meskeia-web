@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'El Viaje de tu Comida — Sistema Digestivo Explicado | meskeIA',
-  description: 'De la boca al intestino grueso: 6 etapas del sistema digestivo con tiempos reales, enzimas, y datos sorprendentes. Biología para Bachillerato.',
-  keywords: 'sistema digestivo, digestión, boca, estómago, intestino delgado, intestino grueso, amilasa, pepsina, peristaltismo, absorción nutrientes, biología bachillerato',
+  description: 'De la boca al intestino grueso: 6 etapas del sistema digestivo con tiempos reales, enzimas, y datos sorprendentes. Biología para secundaria, preparatoria y Bachillerato.',
+  keywords: 'sistema digestivo, digestión, aparato digestivo, viaje de la comida, boca, estómago, intestino delgado, intestino grueso, amilasa, pepsina, peristaltismo, absorción nutrientes, biología, secundaria, preparatoria, bachillerato',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'El Viaje de tu Comida — Sistema Digestivo',
-  description: 'Explicador visual del sistema digestivo humano. Desde que metes comida en la boca hasta la eliminación: masticación, peristaltismo, ácido clorhídrico, pepsina, vellosidades intestinales, microbiota. Ideal para Biología de Bachillerato.',
+  description: 'Explicador visual del sistema digestivo humano. Desde que metes comida en la boca hasta la eliminación: masticación, peristaltismo, ácido clorhídrico, pepsina, vellosidades intestinales, microbiota. Ideal para Biología de secundaria, preparatoria y Bachillerato.',
   url: 'https://meskeia.com/visualizador-viaje-comida/',
   features: [
     'Timeline visual de 6 etapas del sistema digestivo',

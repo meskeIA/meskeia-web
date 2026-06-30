@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'De dónde Viene tu Camiseta - Cadena de Producción Global | meskeIA',
-  description: 'Descubre el recorrido de una camiseta de 15€: 6 etapas, 4 países, costes reales y el impacto humano y ambiental de cada paso. Ideal para Bachillerato.',
-  keywords: 'origen camiseta, cadena producción textil, moda rápida geografía, economía bachillerato, coste mano obra textil, impacto ambiental ropa',
+  description: 'Descubre el recorrido de una camiseta de 15€: 6 etapas, 4 países, costes reales y el impacto humano y ambiental de cada paso. Ideal para Bachillerato, preparatoria y secundaria.',
+  keywords: 'origen camiseta, cadena producción textil, moda rápida geografía, economía bachillerato, economía preparatoria, economía secundaria, coste mano obra textil, impacto ambiental ropa',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -41,7 +41,7 @@ export const jsonLd = generateWebAppSchema({
     'Desglose visual de costes por etapa (barra de composición del precio)',
     'País con bandera, coste, tiempo e impacto por cada fase',
     'Datos sobre condiciones laborales e impacto ambiental',
-    'Enfocado para Geografía y Economía de Bachillerato',
+    'Enfocado para Geografía y Economía de Bachillerato, preparatoria y educación media',
   ],
 });
 

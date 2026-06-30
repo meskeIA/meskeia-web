@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Lógica Proposicional: Tablas de Verdad, Karnaugh y Formas Normales | meskeIA',
   description: 'Visualizador interactivo de lógica proposicional. Tablas de verdad para AND/OR/NOT/XOR, evaluador de fórmulas con 3 variables, mapas de Karnaugh SVG y formas normales FNC/FND.',
-  keywords: 'lógica proposicional, tablas de verdad AND OR NOT, mapa de Karnaugh simplificación, FNC FND forma normal, lógica matemática bachillerato, conectores lógicos tautología',
+  keywords: 'lógica proposicional, tablas de verdad AND OR NOT, mapa de Karnaugh simplificación, FNC FND forma normal, lógica matemática bachillerato preparatoria secundaria, conectores lógicos tautología',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Lógica Proposicional Interactiva | meskeIA',
-    description: 'Tablas de verdad, mapas de Karnaugh y formas normales FNC/FND en un visualizador interactivo para bachillerato y universidad.',
+    description: 'Tablas de verdad, mapas de Karnaugh y formas normales FNC/FND en un visualizador interactivo para bachillerato, preparatoria y universidad.',
     images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Lógica Proposicional meskeIA' },

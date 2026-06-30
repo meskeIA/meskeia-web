@@ -942,9 +942,9 @@ export default function VisualizadorGeometriaAnalitica() {
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
               <span className={styles.escenarioIcon} aria-hidden="true">📐</span>
-              <h3>Estudiante (Bachillerato / Acceso)</h3>
+              <h3>Estudiante (Bachillerato, preparatoria o educación media)</h3>
             </div>
-            <p>Las cónicas aparecen en exámenes de bachillerato y pruebas de acceso a la universidad. Reconocer ecuaciones, identificar tipo, calcular focos y excentricidad son ejercicios habituales.</p>
+            <p>Las cónicas aparecen en exámenes de secundaria, bachillerato y preparatoria, y en las pruebas de acceso o exámenes de admisión universitaria (selectividad o EBAU en España). Reconocer ecuaciones, identificar tipo, calcular focos y excentricidad son ejercicios habituales.</p>
             <p className={styles.escenarioTip}>El signo entre los términos cuadráticos es la clave: (+/+) elipse, (+/−) hipérbola, sin uno → parábola.</p>
           </div>
         </div>

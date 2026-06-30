@@ -812,7 +812,7 @@ export default function VisualizadorTrigonometria() {
         <h3>Tabla de ángulos notables</h3>
         <p>
           Los ángulos 0°, 30°, 45°, 60° y 90° (y sus simétricos) tienen valores exactos expresables con radicales simples:
-          √2/2 ≈ 0,707 y √3/2 ≈ 0,866. Memorizar estos valores facilita el cálculo mental en bachillerato y universidad.
+          √2/2 ≈ 0,707 y √3/2 ≈ 0,866. Memorizar estos valores facilita el cálculo mental en la educación media (bachillerato, preparatoria o secundaria) y la universidad.
         </p>
 
         <h3>Aplicaciones reales</h3>
@@ -888,9 +888,9 @@ export default function VisualizadorTrigonometria() {
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
               <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
-              <h3>Estudiante de Bachillerato</h3>
+              <h3>Estudiante de educación media</h3>
             </div>
-            <p>Comprende seno y coseno geométricamente para el examen de acceso a la universidad. El círculo unitario es la herramienta clave para memorizar ángulos notables.</p>
+            <p>Comprende seno y coseno geométricamente para el examen de admisión a la universidad (selectividad/EBAU en España, examen de admisión en preparatoria o secundaria en Latinoamérica). El círculo unitario es la herramienta clave para memorizar ángulos notables.</p>
             <p className={styles.escenarioTip}>Tip: los ángulos notables se derivan de dos triángulos simples.</p>
           </div>
           <div className={styles.escenarioCard}>

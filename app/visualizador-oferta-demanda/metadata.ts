@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Oferta, Demanda y por qué Suben los Precios - Economía Visual | meskeIA',
-  description: 'Entiende las curvas de oferta y demanda con ejemplos interactivos. 5 escenarios reales: petróleo, sequía, iPhone, tipos de interés y subvenciones. Visualiza cómo se desplazan las curvas y cambia el precio de equilibrio.',
-  keywords: 'oferta demanda, curvas oferta demanda, precio equilibrio, economía bachillerato, precio petróleo, subida precios, tipos de interés, subvención, mercado, microeconomía',
+  description: 'Entiende las curvas de oferta y demanda con ejemplos interactivos. 5 escenarios reales: petróleo, sequía, iPhone, tipos (tasas) de interés y subvenciones. Visualiza cómo se desplazan las curvas y cambia el precio de equilibrio.',
+  keywords: 'oferta demanda, curvas oferta demanda, precio equilibrio, economía bachillerato, economía preparatoria, economía secundaria, educación media, precio petróleo, subida precios, tipos de interés, tasa de interés, subvención, mercado, microeconomía',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -42,12 +42,14 @@ export const jsonLd = generateWebAppSchema({
     'Visualización del desplazamiento de curvas de oferta y demanda',
     'Precio y cantidad de equilibrio antes y después del shock',
     'Explicación intuitiva de cada mecanismo económico',
+    'Útil para economía de bachillerato, preparatoria, secundaria y educación media',
     'Sin gráficos externos — visualización CSS pura',
   ],
   keywords: [
     'oferta demanda', 'curvas oferta demanda', 'precio equilibrio',
-    'economía bachillerato', 'microeconomía', 'mercados', 'precio petróleo',
-    'tipos de interés', 'subvención', 'sequía precios',
+    'economía bachillerato', 'economía preparatoria', 'economía secundaria',
+    'educación media', 'microeconomía', 'mercados', 'precio petróleo',
+    'tipos de interés', 'tasa de interés', 'subvención', 'sequía precios',
   ],
 });
 
@@ -89,10 +91,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Qué pasa con los precios cuando sube el tipo de interés?',
+      name: '¿Qué pasa con los precios cuando sube el tipo (la tasa) de interés?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Cuando el banco central sube los tipos de interés, el crédito se encarece y los consumidores y empresas piden menos préstamos. Esto reduce la demanda de bienes como viviendas o coches, desplazando la curva de demanda hacia la izquierda y bajando el precio de equilibrio. Es precisamente el mecanismo que usan los bancos centrales para controlar la inflación.',
+        text: 'Cuando el banco central sube los tipos de interés (la tasa de interés en gran parte de Latinoamérica), el crédito se encarece y los consumidores y empresas piden menos préstamos. Esto reduce la demanda de bienes como viviendas o coches, desplazando la curva de demanda hacia la izquierda y bajando el precio de equilibrio. Es precisamente el mecanismo que usan los bancos centrales para controlar la inflación.',
       },
     },
   ],

@@ -284,7 +284,7 @@ export default function VisualizadorOrigenCamisetaPage() {
 
         <EducationalSection
           title="La economía detrás de la moda rápida"
-          subtitle="Geografía y Economía para Bachillerato"
+          subtitle="Geografía y Economía para Bachillerato, preparatoria y educación media"
           defaultOpen={false}
         >
           <h3>¿Por qué la producción textil está tan dispersa?</h3>

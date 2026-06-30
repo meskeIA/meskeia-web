@@ -3,7 +3,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata = {
   title: 'El Sistema Nervioso - Neurona, Sinapsis y Neurotransmisores | meskeIA',
   description:
-    'Visualiza el sistema nervioso: neurona interactiva, SNC vs SNP, sinapsis química y los 6 neurotransmisores principales. Bachillerato y anatomía básica.',
+    'Visualiza el sistema nervioso: neurona interactiva, SNC vs SNP, sinapsis química y los 6 neurotransmisores principales. Biología de secundaria, Bachillerato y preparatoria, y anatomía básica.',
   keywords: [
     'sistema nervioso',
     'neurona interactiva',
@@ -12,12 +12,15 @@ export const metadata = {
     'SNC SNP',
     'arco reflejo',
     'biología bachillerato',
+    'biología secundaria',
+    'preparatoria',
+    'educación media',
     'anatomía',
   ],
   openGraph: {
     title: 'El Sistema Nervioso — Neurona, Sinapsis y Neurotransmisores | meskeIA',
     description:
-      'Neurona interactiva con partes clicables, SNC vs SNP, sinapsis química paso a paso y 6 neurotransmisores principales. Ideal para Bachillerato.',
+      'Neurona interactiva con partes clicables, SNC vs SNP, sinapsis química paso a paso y 6 neurotransmisores principales. Ideal para secundaria, Bachillerato y preparatoria.',
   },
 };
 

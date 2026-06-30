@@ -1025,7 +1025,7 @@ export default function VisualizadorReinoVegetal() {
           <h3 className={styles.eduSubtitulo}>¿Para quién es útil este visualizador?</h3>
           <div className={styles.scenariosGrid}>
             {[
-              { titulo: 'Estudiante de Bachillerato', desc: 'Repasa la clasificación sistemática para Biología y Geología de 1º Bach. Los 4 grupos de criptógamas y los 2 de fanerógamas son el esquema básico.', emoji: '📚' },
+              { titulo: 'Estudiante de secundaria, preparatoria o Bachillerato', desc: 'Repasa la clasificación sistemática para Biología (educación media, preparatoria o 1º de Bachillerato). Los 4 grupos de criptógamas y los 2 de fanerógamas son el esquema básico.', emoji: '📚' },
               { titulo: 'Opositor o universitario', desc: 'Profundiza en características diagnósticas: vasculatura, tipo de gametofito, heterosporia, endospermia.', emoji: '🎓' },
               { titulo: 'Aficionado a la naturaleza', desc: 'Aprende a identificar qué tipo de planta tienes delante: ¿tiene flor? ¿produce fruto? ¿crece en lugares húmedos?', emoji: '🌿' },
               { titulo: 'Docente', desc: 'Recurso visual para explicar la evolución de las plantas desde el agua hasta los ecosistemas terrestres más complejos.', emoji: '👩‍🏫' },

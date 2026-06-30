@@ -14,6 +14,8 @@ export const metadata: Metadata = {
     'ley lenz',
     'ondas electromagneticas',
     'fisica bachillerato',
+    'fisica preparatoria',
+    'fisica secundaria',
   ],
   openGraph: {
     title: 'Electromagnetismo | meskeIA',
@@ -74,10 +76,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Es útil este visualizador para estudiar física de bachillerato o universitaria?',
+      name: '¿Es útil este visualizador para estudiar física de secundaria, preparatoria, bachillerato o universidad?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. El visualizador cubre los cuatro conceptos principales del temario de electromagnetismo: campo eléctrico de cargas puntuales, dipolo magnético, inducción de Faraday-Lenz y espectro EM. Las simulaciones interactivas permiten modificar parámetros y observar el efecto en tiempo real, lo que facilita la comprensión conceptual antes de abordar las ecuaciones de Maxwell.',
+        text: 'Sí. El visualizador cubre los cuatro conceptos principales del temario de electromagnetismo: campo eléctrico de cargas puntuales, dipolo magnético, inducción de Faraday-Lenz y espectro EM. Sirve para estudiantes de educación media, preparatoria, bachillerato o primeros cursos universitarios. Las simulaciones interactivas permiten modificar parámetros y observar el efecto en tiempo real, lo que facilita la comprensión conceptual antes de abordar las ecuaciones de Maxwell.',
       },
     },
   ],

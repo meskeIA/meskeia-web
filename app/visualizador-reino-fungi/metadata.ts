@@ -12,6 +12,9 @@ export const metadata = {
     'biología hongos',
     'importancia ecológica hongos',
     'micología bachillerato',
+    'micología preparatoria',
+    'reino fungi secundaria',
+    'biología hongos educación media',
   ],
   openGraph: {
     title: 'El Reino Fungi — Clasificación Interactiva de los Hongos | meskeIA',

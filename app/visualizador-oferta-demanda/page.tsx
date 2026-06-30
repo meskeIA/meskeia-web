@@ -99,7 +99,7 @@ const ESCENARIOS: Escenario[] = [
     icono: '🏦',
     titulo: 'El BCE sube los tipos de interés',
     subtitulo: 'Shock de demanda negativo',
-    descripcion: 'El Banco Central Europeo sube los tipos al 4%. Las hipotecas y los préstamos se encarecen. Menos gente puede permitirse comprar una casa.',
+    descripcion: 'El Banco Central Europeo sube los tipos de interés (la tasa de interés en gran parte de Latinoamérica) al 4%. Las hipotecas y los préstamos se encarecen. Menos gente puede permitirse comprar una casa.',
     curvaAfectada: 'demanda',
     oferta: { desplazamiento: 'ninguno', label: 'La oferta de viviendas no cambia de golpe' },
     demanda: { desplazamiento: 'baja', label: 'La demanda de vivienda CAE — la financiación es más cara' },

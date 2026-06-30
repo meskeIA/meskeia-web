@@ -320,7 +320,7 @@ export default function VisualizadorViajeComidaPage() {
 
         <EducationalSection
           title="Biología del sistema digestivo"
-          subtitle="Conceptos clave para Bachillerato y Selectividad"
+          subtitle="Conceptos clave para secundaria, preparatoria y Bachillerato"
           defaultOpen={false}
         >
           <h3>Las enzimas digestivas: las herramientas moleculares</h3>

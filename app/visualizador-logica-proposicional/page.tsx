@@ -734,8 +734,8 @@ const contenidoEducativo = (
     <div className={styles.escenariosGrid}>
       <div className={styles.escenarioCard}>
         <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
-        <strong>Estudiante de bachillerato</strong>
-        <p>Usa tablas de verdad en matemáticas e informática para demostrar equivalencias y analizar fórmulas en los exámenes de selectividad.</p>
+        <strong>Estudiante de bachillerato o preparatoria</strong>
+        <p>Usa tablas de verdad en matemáticas e informática para demostrar equivalencias y analizar fórmulas en los exámenes de admisión universitaria (selectividad en España, preparatoria o educación media en Latinoamérica).</p>
       </div>
       <div className={styles.escenarioCard}>
         <span className={styles.escenarioIcon} aria-hidden="true">💻</span>
