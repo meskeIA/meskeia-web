@@ -52,3 +52,27 @@ mencionar "compuertas" en ningún sitio **sí** lo es.
   cubierto por la regla Latam-friendly del `CLAUDE.md` para apps nuevas. Baja prioridad.
 - Términos polisémicos (`móvil`, `papa`, `matrícula`...) pueden dar algún falso positivo;
   por eso el último filtro siempre es humano + datos de GSC.
+
+---
+
+## Prompt de revisión periódica
+
+Pega esto para disparar una tanda de revisión LATAM. Ejecutar por tandas según
+tiempo y tokens disponibles (no hace falta acabarlo de una vez). Método validado en
+`simulador-puertas-logicas` (commits `884248b4` + `e46cc46c`).
+
+```
+Revisión SEO LATAM de meskeIA. Trabaja una tanda de 5 apps (o las que te indique según tiempo/tokens).
+
+1. Ejecuta `node scripts/seo-latam/detectar-candidatas-latam.mjs --falta-latam` para listar apps que usan solo el término de España y pierden el mercado LATAM.
+2. Cruza esas candidatas con Search Console (`node scripts/gsc-stats.mjs 90`, o consulta por página) y PRIORIZA las que tengan impresiones reales en posición 5-15 (las "casi-top", a un empujón del top-3). Ignora las apps `⚠ es-only` (fiscales-España).
+3. Para cada app de la tanda, aplica el patrón validado:
+   - H1 y title con AMBOS términos regionales, LIDERANDO con el de más demanda según GSC. No reemplazar el de España: incluir los dos. (El H1 es la señal más fuerte; omitir el término LATAM ahí es el fallo típico.)
+   - Reforzar ambos términos de forma natural en la intro y el cuerpo visible (sin keyword stuffing). El cuerpo de la EducationalSection ya se sirve en SSR, así que cuenta.
+   - Mantener canonical, estructura y JSON-LD intactos.
+   - Si descubres un par de términos nuevo, añádelo a `scripts/seo-latam/glosario-es-latam.json`.
+4. UN solo build. Verifica que ambos términos aparecen en el HTML servido (`.next/server/app/<slug>.html`). Commit por tanda. NO push salvo que lo pida.
+5. Reporta cuántas candidatas quedan y marca en el glosario las apps RESUELTAS.
+
+Si no indico tamaño de tanda, usa 5 apps.
+```

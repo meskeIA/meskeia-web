@@ -17,7 +17,7 @@
       "dominio": "informatica",
       "es": ["puerta logica", "puertas logicas"],
       "latam": ["compuerta logica", "compuertas logicas"],
-      "nota": "logic gate. RESUELTO en simulador-puertas-logicas (884248b4)"
+      "nota": "logic gate. RESUELTO completo en simulador-puertas-logicas: 884248b4 (description) + e46cc46c (H1 y title con ambos terminos, liderando compuertas por mas demanda GSC)"
     },
     {
       "dominio": "informatica",
