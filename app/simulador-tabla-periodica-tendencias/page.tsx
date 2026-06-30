@@ -790,7 +790,7 @@ export default function SimuladorTablaPeriodica() {
           <ul className={styles.warningList}>
             <li><strong>Confundir radio atómico con radio iónico:</strong> el catión siempre es más pequeño que el átomo neutral, el anión siempre es más grande. Las tendencias de radio iónico siguen reglas diferentes.</li>
             <li><strong>Creer que todos los gases nobles tienen AE negativa:</strong> He, Ne, Ar, Kr tienen AE = 0 o ligeramente positiva (no ganan electrones). Solo algunos gases nobles pesados como Xe tienen compuestos estables bajo condiciones extremas.</li>
-            <li><strong>No recordar las anomalías de N y Be en IE:</strong> N (2p³ semilleno) tiene IE mayor que O (2p⁴), y Be (2s² lleno) mayor que B (2p¹). Estas excepciones aparecen en el EBAU.</li>
+            <li><strong>No recordar las anomalías de N y Be en IE:</strong> N (2p³ semilleno) tiene IE mayor que O (2p⁴), y Be (2s² lleno) mayor que B (2p¹). Estas excepciones aparecen tanto en el EBAU (España) como en los exámenes de admisión de preparatoria y secundaria en Latinoamérica.</li>
             <li><strong>Confundir electronegatividad con afinidad electrónica:</strong> la EN describe la atracción de electrones en un enlace (concepto de molécula); la AE describe la energía al ganar un electrón libre (concepto de átomo aislado). No son iguales: el Cl tiene mayor AE que el F, pero menor EN.</li>
             <li><strong>Ignorar la contracción lantánida:</strong> los elementos del período 6 después de los lantánidos (Hf, Ta, W...) tienen radios casi iguales a sus análogos del período 5, rompiendo la tendencia normal. Esto afecta a muchas propiedades de los metales pesados.</li>
           </ul>

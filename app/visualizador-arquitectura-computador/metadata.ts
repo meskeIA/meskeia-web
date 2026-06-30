@@ -4,9 +4,9 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Arquitectura del Computador — CPU, Ciclo Fetch-Decode-Execute y Memoria | meskeIA',
   description:
-    'Visualiza cómo funciona un computador: arquitectura Von Neumann, CPU con ALU y registros, ciclo fetch-decode-execute animado y jerarquía de memoria. Para estudiantes de informática.',
+    'Visualiza cómo funciona un computador: arquitectura Von Neumann, CPU con ALU y registros, ciclo fetch-decode-execute animado y jerarquía de memoria. Para estudiantes de informática, preparatoria y secundaria.',
   keywords:
-    'arquitectura computador, Von Neumann, CPU, ALU, fetch decode execute, registros, jerarquía memoria, caché, RAM, informática bachillerato',
+    'arquitectura computador, Von Neumann, CPU, ALU, fetch decode execute, registros, jerarquía memoria, caché, RAM, informática bachillerato, informática preparatoria, informática secundaria',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -34,14 +34,14 @@ export const metadata: Metadata = {
 export const jsonLd = generateWebAppSchema({
   name: 'Arquitectura del Computador',
   description:
-    'Visualizador interactivo de la arquitectura Von Neumann: CPU con ALU y registros, ciclo fetch-decode-execute animado paso a paso y jerarquía de memoria con latencias reales. Para estudiantes de informática y Bachillerato tecnológico.',
+    'Visualizador interactivo de la arquitectura Von Neumann: CPU con ALU y registros, ciclo fetch-decode-execute animado paso a paso y jerarquía de memoria con latencias reales. Para estudiantes de informática, Bachillerato tecnológico (España), preparatoria y secundaria (Latinoamérica).',
   url: 'https://meskeia.com/visualizador-arquitectura-computador/',
   features: [
     'Diagrama Von Neumann interactivo: CPU, RAM, ROM, buses y dispositivos E/S',
     'Componentes de la CPU: ALU, Unidad de Control, PC, IR, MAR, MDR, ACC',
     'Ciclo fetch-decode-execute animado paso a paso con mini-programa de ejemplo',
     'Jerarquía de memoria: de registros a HDD con velocidad, tamaño y latencia reales',
-    'Ideal para 1º de carrera de informática y Bachillerato tecnológico',
+    'Ideal para 1º de carrera de informática, Bachillerato tecnológico, preparatoria y secundaria',
     'Gratuito, sin registro, 100% en el navegador',
   ],
 });

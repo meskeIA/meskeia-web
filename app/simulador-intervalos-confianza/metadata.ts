@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Simulador de Intervalos de Confianza | meskeIA',
   description: 'Visualiza qué significa realmente un intervalo de confianza al 95%. Simula 100 IC sobre muestras y comprueba que ~95 contienen μ. Modo conceptual y calculadora con z y t de Student.',
-  keywords: 'intervalo de confianza, IC, nivel de confianza, t de Student, z, error estándar, margen de error, estadística inferencial, EBAU, Bachillerato, universidad',
+  keywords: 'intervalo de confianza, IC, nivel de confianza, t de Student, z, error estándar, margen de error, estadística inferencial, EBAU, Bachillerato, preparatoria, secundaria, universidad',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Simulador de Intervalos de Confianza',
-  description: 'Simulador interactivo para entender visualmente los intervalos de confianza para la media μ. En modo Conceptual genera 100 muestras de una población N(μ, σ) y dibuja 100 IC verticales, contando cuántos contienen μ (debe ser ~95% al nivel 95%). En modo Calculadora introduce X̄, s y n para obtener un IC concreto. Soporta z (σ conocido) y t de Student (σ desconocido), niveles 80/90/95/99% y tamaños muestrales de 5 a 500. Ideal para EBAU, Bachillerato y estadística inferencial universitaria.',
+  description: 'Simulador interactivo para entender visualmente los intervalos de confianza para la media μ. En modo Conceptual genera 100 muestras de una población N(μ, σ) y dibuja 100 IC verticales, contando cuántos contienen μ (debe ser ~95% al nivel 95%). En modo Calculadora introduce X̄, s y n para obtener un IC concreto. Soporta z (σ conocido) y t de Student (σ desconocido), niveles 80/90/95/99% y tamaños muestrales de 5 a 500. Ideal para Bachillerato y EBAU (España), preparatoria y secundaria (Latinoamérica), y estadística inferencial universitaria.',
   url: 'https://meskeia.com/simulador-intervalos-confianza/',
   category: 'EducationalApplication',
   features: [
@@ -48,7 +48,7 @@ export const jsonLd = generateWebAppSchema({
     'Visualización clara: IC que contienen μ vs IC que NO lo contienen',
     'Cálculo automático de error estándar y margen de error',
   ],
-  keywords: ['intervalo de confianza', 'IC', 't de Student', 'z', 'inferencia estadística', 'EBAU', 'Bachillerato'],
+  keywords: ['intervalo de confianza', 'IC', 't de Student', 'z', 'inferencia estadística', 'EBAU', 'Bachillerato', 'preparatoria', 'secundaria'],
 });
 
 export const faqJsonLd = {
@@ -84,7 +84,7 @@ export const faqJsonLd = {
       name: '¿Para qué nivel educativo está pensado este simulador?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Está diseñado principalmente para estudiantes de Bachillerato y universitarios de primer ciclo que estudian estadística inferencial. También resulta útil para preparar la EBAU, asignaturas de Métodos Estadísticos en Ciencias o Sociales, y para cualquier persona que quiera entender de forma visual un concepto que suele resultar contraintuitivo en los libros de texto.',
+        text: 'Está diseñado principalmente para estudiantes de Bachillerato, preparatoria, secundaria y universitarios de primer ciclo que estudian estadística inferencial. También resulta útil para preparar la EBAU, asignaturas de Métodos Estadísticos en Ciencias o Sociales, y para cualquier persona que quiera entender de forma visual un concepto que suele resultar contraintuitivo en los libros de texto.',
       },
     },
     {

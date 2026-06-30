@@ -4,9 +4,9 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Simulador de Mitosis y Meiosis - División Celular Interactiva | meskeIA',
   description:
-    'Simulador visual animado de mitosis (6 fases) y meiosis (8 fases). Observa cómo se dividen las células con cromosomas, huso acromático y crossing-over. Ideal para Bachillerato y biología universitaria.',
+    'Simulador visual animado de mitosis (6 fases) y meiosis (8 fases). Observa cómo se dividen las células con cromosomas, huso acromático y crossing-over. Ideal para Bachillerato (España), preparatoria y secundaria (Latinoamérica) y biología universitaria.',
   keywords:
-    'mitosis, meiosis, división celular, cromosomas, crossing-over, gametos, célula, fases mitosis, fases meiosis, EBAU, Bachillerato, biología, haploide, diploide',
+    'mitosis, meiosis, división celular, cromosomas, crossing-over, gametos, célula, fases mitosis, fases meiosis, EBAU, Bachillerato, preparatoria, secundaria, biología, haploide, diploide',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -55,6 +55,8 @@ export const jsonLd = generateWebAppSchema({
     'cromosomas',
     'crossing-over',
     'biología bachillerato',
+    'biología preparatoria',
+    'biología secundaria',
     'gametos',
     'célula',
   ],
@@ -93,7 +95,7 @@ export const faqJsonLd = {
       name: '¿Para qué sirve aprender mitosis y meiosis en el examen de acceso a la universidad?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La división celular es uno de los temas centrales de biología en los exámenes de acceso a la universidad (EBAU/Selectividad). Las preguntas suelen pedir identificar fases, explicar la formación de gametos, calcular el número de cromosomas resultantes o comparar ambos procesos. Dominar las diferencias entre mitosis y meiosis, y el papel del crossing-over, es fundamental para obtener buena puntuación.',
+        text: 'La división celular es uno de los temas centrales de biología en los exámenes de acceso a la universidad (EBAU/Selectividad, o examen de admisión universitaria en Latinoamérica). Las preguntas suelen pedir identificar fases, explicar la formación de gametos, calcular el número de cromosomas resultantes o comparar ambos procesos. Dominar las diferencias entre mitosis y meiosis, y el papel del crossing-over, es fundamental para obtener buena puntuación.',
       },
     },
     {

@@ -818,8 +818,8 @@ export default function SimuladorMitosisMeiosis() {
           células hijas. Existen dos tipos fundamentales: la <strong>mitosis</strong>, que produce
           dos células genéticamente idénticas a la madre, y la <strong>meiosis</strong>, que produce
           cuatro células haploides genéticamente únicas destinadas a la reproducción sexual. Conocer
-          sus diferencias es clave en biología de Bachillerato y en cualquier carrera de ciencias de
-          la salud o biológicas.
+          sus diferencias es clave en biología de Bachillerato (España), preparatoria y secundaria
+          (Latinoamérica), y en cualquier carrera de ciencias de la salud o biológicas.
         </p>
 
         {/* Tabla comparativa */}

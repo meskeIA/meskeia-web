@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Simulador de la Curva de Phillips: Inflación y Desempleo | meskeIA',
   description: 'Visualiza el trade-off inflación-desempleo con la curva de Phillips aumentada con expectativas. Ajusta desempleo, inflación esperada y shocks de oferta. Modela estanflación, recesión y equilibrio.',
-  keywords: 'curva de Phillips, inflación, desempleo, NAIRU, estanflación, expectativas adaptativas, política monetaria, macroeconomía, Bachillerato, economía, Friedman, Phelps',
+  keywords: 'curva de Phillips, inflación, desempleo, NAIRU, estanflación, expectativas adaptativas, política monetaria, macroeconomía, Bachillerato, preparatoria, secundaria, economía, Friedman, Phelps',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -48,7 +48,7 @@ export const jsonLd = generateWebAppSchema({
     'Zonas sombreadas de estanflación y equilibrio ideal',
     'Toggle corto plazo / largo plazo',
   ],
-  keywords: ['curva de Phillips', 'inflación', 'desempleo', 'NAIRU', 'estanflación', 'macroeconomía', 'Bachillerato'],
+  keywords: ['curva de Phillips', 'inflación', 'desempleo', 'NAIRU', 'estanflación', 'macroeconomía', 'Bachillerato', 'preparatoria', 'secundaria'],
 });
 
 export const faqJsonLd = {
@@ -92,7 +92,7 @@ export const faqJsonLd = {
       name: '¿Para qué sirve este simulador en la preparación de un examen de economía?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Permite visualizar de forma interactiva los cuatro cuadrantes económicos (recesión, estanflación, sobrecalentamiento y equilibrio ideal), mover los sliders de desempleo e inflación esperada y reproducir episodios históricos reales como la estanflación de 1973 o la crisis española de 2013. Facilita entender de forma intuitiva conceptos abstractos del temario de macroeconomía de Bachillerato y universidad.',
+        text: 'Permite visualizar de forma interactiva los cuatro cuadrantes económicos (recesión, estanflación, sobrecalentamiento y equilibrio ideal), mover los sliders de desempleo e inflación esperada y reproducir episodios históricos reales como la estanflación de 1973 o la crisis española de 2013. Facilita entender de forma intuitiva conceptos abstractos del temario de macroeconomía de Bachillerato (España), preparatoria y secundaria (Latinoamérica) y universidad.',
       },
     },
   ],

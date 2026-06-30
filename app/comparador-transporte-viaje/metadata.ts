@@ -2,14 +2,15 @@ import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Comparador de Transporte para Viajes — Avión, Tren, Bus o Coche | meskeIA',
-  description: 'Compara avión, tren, autobús y coche para tu trayecto: coste total, tiempo de viaje, emisiones CO₂ y equipaje. Elige el transporte más adecuado según tu presupuesto y preferencias.',
+  title: 'Comparador de Transporte para Viajes — Avión, Tren, Bus o Coche (carro/auto) | meskeIA',
+  description: 'Compara avión, tren, autobús y coche (carro o auto) para tu trayecto: coste total, tiempo de viaje, emisiones CO₂ y equipaje. Elige el transporte más adecuado según tu presupuesto y preferencias.',
   keywords: [
     'comparar transporte viaje',
     'avión o tren España',
     'cuánto cuesta ir en tren vs avión',
     'autobús interurbano precio',
     'viaje en coche o avión',
+    'viaje en carro o auto',
     'coste transporte por persona',
     'CO2 transporte viaje',
     'comparar medios transporte',
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
     'presupuesto transporte vacaciones',
   ],
   openGraph: {
-    title: '¿Avión, tren, bus o coche? Compara transporte para tu viaje | meskeIA',
+    title: '¿Avión, tren, bus o coche (carro/auto)? Compara transporte para tu viaje | meskeIA',
     description: 'Introduce la distancia y el número de personas y compara al instante coste, tiempo y emisiones de cada medio de transporte.',
     type: 'website',
     locale: 'es_ES',
@@ -56,7 +57,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Comparador de Transporte para Viajes",
-  description: "Compara avión, tren, autobús y coche para tu trayecto: coste total, tiempo de viaje, emisiones CO₂ y equipaje. Elige el transporte más adecuado según tu presupuesto y preferencias.",
+  description: "Compara avión, tren, autobús y coche (carro o auto) para tu trayecto: coste total, tiempo de viaje, emisiones CO₂ y equipaje. Elige el transporte más adecuado según tu presupuesto y preferencias.",
   url: "https://meskeia.com/comparador-transporte-viaje/",
   category: 'UtilityApplication',
   features: [],
@@ -68,8 +69,8 @@ export const faqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿Cómo comparo avión, tren y coche para un viaje?',
-      acceptedAnswer: { '@type': 'Answer', text: 'Introduce la distancia del trayecto y el número de personas. La herramienta calcula automáticamente el coste estimado, el tiempo total de desplazamiento (incluyendo traslados al aeropuerto o estación) y las emisiones de CO₂ para avión, tren, autobús y coche, permitiéndote elegir según tu prioridad: precio, tiempo o impacto ambiental.' },
+      name: '¿Cómo comparo avión, tren y coche (carro o auto) para un viaje?',
+      acceptedAnswer: { '@type': 'Answer', text: 'Introduce la distancia del trayecto y el número de personas. La herramienta calcula automáticamente el coste estimado, el tiempo total de desplazamiento (incluyendo traslados al aeropuerto o estación) y las emisiones de CO₂ para avión, tren, autobús y coche (también llamado carro o auto en Latinoamérica), permitiéndote elegir según tu prioridad: precio, tiempo o impacto ambiental.' },
     },
     {
       '@type': 'Question',

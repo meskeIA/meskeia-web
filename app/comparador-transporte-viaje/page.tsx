@@ -252,7 +252,7 @@ export default function ComparadorTransporteViaje() {
       <header className={styles.hero}>
         <h1 className={styles.heroTitle}>🚄 Comparador de Transporte</h1>
         <p className={styles.heroSubtitle}>
-          Avión, tren, autobús o coche — elige el transporte ideal para tu trayecto
+          Avión, tren, autobús o coche (carro o auto) — elige el transporte ideal para tu trayecto
         </p>
       </header>
 
@@ -499,7 +499,7 @@ export default function ComparadorTransporteViaje() {
         icon="🗺️"
       >
         <h3>Comparativa de medios por distancia</h3>
-        <p>La elección del transporte depende mucho de la distancia. Aquí tienes la guía rápida:</p>
+        <p>La elección del transporte depende mucho de la distancia. En esta guía comparamos avión, tren, autobús y coche (carro o auto, según el país) para que veas qué opción rinde mejor en cada tramo de kilómetros:</p>
 
         <div className={styles.tableWrapper}>
           <table className={styles.tablaComparativa}>

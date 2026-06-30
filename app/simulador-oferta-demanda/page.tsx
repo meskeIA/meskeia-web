@@ -1026,9 +1026,11 @@ export default function SimuladorOfertaDemandaPage() {
               <span className={styles.tipIcon}>🎯</span>
               <strong>Piensa en desplazamientos, no en movimientos</strong>
               <p>
-                El error más frecuente en exámenes es confundir &quot;el precio sube&quot; (movimiento
-                a lo largo de la curva) con &quot;la demanda sube&quot; (desplazamiento de la curva). La
-                curva de demanda solo se desplaza cuando cambia algo distinto al precio del propio bien.
+                El error más frecuente en exámenes (selectividad o EBAU en España, examen de
+                admisión universitaria tras la preparatoria o la secundaria en Latinoamérica) es
+                confundir &quot;el precio sube&quot; (movimiento a lo largo de la curva) con &quot;la demanda
+                sube&quot; (desplazamiento de la curva). La curva de demanda solo se desplaza cuando
+                cambia algo distinto al precio del propio bien.
               </p>
             </div>
             <div className={styles.tipCard}>

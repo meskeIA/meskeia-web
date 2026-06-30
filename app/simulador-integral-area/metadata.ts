@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Simulador de Integrales: Área bajo la Curva | meskeIA',
   description: 'Visualiza la integral definida como sumas de Riemann interactivas. Ajusta el número de rectángulos n, los límites a y b, y compara izquierda, derecha, punto medio y trapecio con el valor exacto.',
-  keywords: 'integral definida, suma de Riemann, área bajo la curva, integración numérica, regla del trapecio, punto medio, primitiva, teorema fundamental del cálculo, EBAU, Bachillerato, cálculo integral',
+  keywords: 'integral definida, suma de Riemann, área bajo la curva, integración numérica, regla del trapecio, punto medio, primitiva, teorema fundamental del cálculo, EBAU, Bachillerato, preparatoria, secundaria, cálculo integral',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -48,7 +48,7 @@ export const jsonLd = generateWebAppSchema({
     'Cálculo de error absoluto y relativo de la aproximación',
     'Distinción visual entre áreas positivas y negativas',
   ],
-  keywords: ['integral definida', 'suma de Riemann', 'área', 'cálculo integral', 'trapecio', 'punto medio', 'EBAU', 'Bachillerato'],
+  keywords: ['integral definida', 'suma de Riemann', 'área', 'cálculo integral', 'trapecio', 'punto medio', 'EBAU', 'Bachillerato', 'preparatoria', 'secundaria'],
 });
 
 export const faqJsonLd = {

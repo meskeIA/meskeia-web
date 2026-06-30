@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Simulador de Cifrado César | meskeIA',
   description: 'Cifra y descifra texto con el cifrado César. Rueda del alfabeto animada, histograma de frecuencias y ataque automático por análisis de frecuencias.',
-  keywords: ['cifrado César', 'criptografía', 'sustitución monoalfabética', 'análisis de frecuencias', 'ROT-13', 'Julio César', 'informática', 'Bachillerato'],
+  keywords: ['cifrado César', 'criptografía', 'sustitución monoalfabética', 'análisis de frecuencias', 'ROT-13', 'Julio César', 'informática', 'Bachillerato', 'preparatoria', 'secundaria'],
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -83,7 +83,7 @@ export const faqJsonLd = {
       name: '¿Para qué sirve estudiar el cifrado César hoy en día?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Aunque el cifrado César no tiene aplicación práctica en seguridad moderna, es fundamental para introducir conceptos clave de criptografía: sustitución, desplazamiento, análisis de frecuencias y la idea de espacio de clave pequeño como debilidad. Es parte del currículo de informática en Bachillerato, FP de DAM/DAW y cursos universitarios de seguridad informática.',
+        text: 'Aunque el cifrado César no tiene aplicación práctica en seguridad moderna, es fundamental para introducir conceptos clave de criptografía: sustitución, desplazamiento, análisis de frecuencias y la idea de espacio de clave pequeño como debilidad. Es parte del currículo de informática en Bachillerato (España), preparatoria o secundaria (Latinoamérica), FP de DAM/DAW y cursos universitarios de seguridad informática.',
       },
     },
   ],

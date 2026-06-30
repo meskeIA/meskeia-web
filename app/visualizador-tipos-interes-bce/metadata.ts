@@ -2,11 +2,14 @@ import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Tipos de Interés BCE - Cómo Afectan a Hipotecas, Bolsa y Ahorro | meskeIA',
+  title: 'Tipos o Tasas de Interés del BCE - Cómo Afectan a Hipotecas, Bolsa y Ahorro | meskeIA',
   description:
-    'Entiende cómo el BCE sube o baja tipos y la cadena de transmisión monetaria: hipotecas variables, crédito, bolsa y ahorro. Diagrama interactivo.',
+    'Entiende cómo el BCE sube o baja los tipos de interés (o tasas de interés) y la cadena de transmisión monetaria: hipotecas variables, crédito, bolsa y ahorro. Diagrama interactivo.',
   keywords: [
     'tipos interes BCE',
+    'tasa de interes BCE',
+    'tasas de interes',
+    'que es la tasa de interes',
     'banco central europeo',
     'euribor',
     'politica monetaria',
@@ -17,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Tipos de Interés BCE | meskeIA',
     description:
-      'Cómo el BCE sube tipos y afecta a hipotecas, bolsa, crédito y economía real',
+      'Cómo el BCE sube los tipos de interés (tasas de interés) y afecta a hipotecas, bolsa, crédito y economía real',
     url: 'https://meskeia.com/visualizador-tipos-interes-bce/',
     images: [{
       url: 'https://meskeia.com/og-image.png',
@@ -30,7 +33,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Tipos de Interés BCE - Transmisión Monetaria",
-  description: "Entiende cómo el BCE sube o baja tipos y la cadena de transmisión monetaria: hipotecas variables, crédito, bolsa y ahorro. Diagrama interactivo.",
+  description: "Entiende cómo el BCE sube o baja los tipos de interés (o tasas de interés) y la cadena de transmisión monetaria: hipotecas variables, crédito, bolsa y ahorro. Diagrama interactivo.",
   url: "https://meskeia.com/visualizador-tipos-interes-bce/",
   category: 'FinanceApplication',
   features: [],
@@ -45,7 +48,7 @@ export const faqJsonLd = {
       name: '¿Qué son los tipos de interés del BCE y para qué sirven?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El Banco Central Europeo (BCE) fija tres tipos de interés oficiales que determinan el coste al que los bancos comerciales pueden pedir o depositar dinero en el banco central. El más relevante es el tipo de las operaciones principales de financiación (MRO). Cuando el BCE los sube, encarece el crédito para frenar la inflación; cuando los baja, abarata la financiación para estimular la economía.',
+        text: 'El Banco Central Europeo (BCE) fija tres tipos de interés oficiales (también llamados tasas de interés en Latinoamérica) que determinan el coste al que los bancos comerciales pueden pedir o depositar dinero en el banco central. El más relevante es el tipo de las operaciones principales de financiación (MRO). Cuando el BCE los sube, encarece el crédito para frenar la inflación; cuando los baja, abarata la financiación para estimular la economía. "Tipo de interés" y "tasa de interés" son sinónimos: el primero es el término habitual en España y el segundo en Latinoamérica.',
       },
     },
     {
@@ -61,7 +64,7 @@ export const faqJsonLd = {
       name: '¿Qué relación tienen los tipos de interés del BCE con la bolsa?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Tipos más altos reducen el atractivo relativo de las acciones frente a los bonos (que ofrecen más rentabilidad), encarecen la deuda corporativa y comprimen los márgenes de las empresas muy endeudadas, lo que suele presionar a la baja las cotizaciones bursátiles. Por el contrario, bajadas de tipos suelen impulsar la renta variable al abaratar el capital y aumentar el valor presente de los flujos futuros de las empresas.',
+        text: 'Tipos de interés (o tasas de interés) más altos reducen el atractivo relativo de las acciones frente a los bonos (que ofrecen más rentabilidad), encarecen la deuda corporativa y comprimen los márgenes de las empresas muy endeudadas, lo que suele presionar a la baja las cotizaciones bursátiles. Por el contrario, bajadas de tipos suelen impulsar la renta variable al abaratar el capital y aumentar el valor presente de los flujos futuros de las empresas.',
       },
     },
     {

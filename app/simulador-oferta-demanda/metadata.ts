@@ -4,9 +4,9 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Simulador de Oferta y Demanda — Equilibrio, Excedente y Controles de Precio | meskeIA',
   description:
-    'Visualiza en tiempo real las curvas de oferta y demanda, el punto de equilibrio, el excedente del consumidor y del productor. Experimenta con desplazadores y controles de precio. Ideal para Bachillerato, universitarios y curiosos de la economía.',
+    'Visualiza en tiempo real las curvas de oferta y demanda, el punto de equilibrio, el excedente del consumidor y del productor. Experimenta con desplazadores y controles de precio. Ideal para Bachillerato y EBAU (España), preparatoria y secundaria (Latinoamérica), universitarios y curiosos de la economía.',
   keywords:
-    'oferta y demanda, equilibrio de mercado, precio de equilibrio, excedente del consumidor, excedente del productor, desplazadores demanda, precio máximo, precio mínimo, curva de demanda, curva de oferta, economía, Bachillerato, EBAU, bienestar social',
+    'oferta y demanda, equilibrio de mercado, precio de equilibrio, excedente del consumidor, excedente del productor, desplazadores demanda, precio máximo, precio mínimo, curva de demanda, curva de oferta, economía, Bachillerato, EBAU, preparatoria, secundaria, bienestar social',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
 export const jsonLd = generateWebAppSchema({
   name: 'Simulador de Oferta y Demanda',
   description:
-    'Simulador interactivo de oferta y demanda para Bachillerato y universidad. Mueve desplazadores (renta, costes, tecnología) y controla precios máximos y mínimos para observar el efecto sobre el equilibrio, el excedente del consumidor y del productor.',
+    'Simulador interactivo de oferta y demanda para Bachillerato y EBAU (España), preparatoria y secundaria (Latinoamérica) y universidad. Mueve desplazadores (renta, costes, tecnología) y controla precios máximos y mínimos para observar el efecto sobre el equilibrio, el excedente del consumidor y del productor.',
   url: 'https://meskeia.com/simulador-oferta-demanda/',
   category: 'EducationalApplication',
   features: [
@@ -54,6 +54,8 @@ export const jsonLd = generateWebAppSchema({
     'excedente consumidor',
     'economía Bachillerato',
     'EBAU economía',
+    'economía preparatoria',
+    'economía secundaria',
     'precio máximo',
     'precio mínimo',
     'desplazadores demanda',

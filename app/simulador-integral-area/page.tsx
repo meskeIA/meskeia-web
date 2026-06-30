@@ -811,7 +811,7 @@ export default function SimuladorIntegralAreaPage() {
               <div className={styles.stepNumber}>5</div>
               <div className={styles.stepContent}>
                 <strong>Verifica numéricamente con Riemann</strong>
-                <p>Especialmente en exámenes: aproxima con n = 10 rectángulos por punto medio. Si tu resultado analítico difiere mucho del numérico, hay un error. Es la forma más rápida de detectar fallos de signo o de cálculo.</p>
+                <p>Especialmente en exámenes (EBAU y Bachillerato en España, preparatoria y secundaria en Latinoamérica, o cálculo en la universidad): aproxima con n = 10 rectángulos por punto medio. Si tu resultado analítico difiere mucho del numérico, hay un error. Es la forma más rápida de detectar fallos de signo o de cálculo.</p>
               </div>
             </div>
           </div>

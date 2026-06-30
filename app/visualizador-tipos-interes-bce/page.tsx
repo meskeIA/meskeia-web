@@ -208,9 +208,9 @@ export default function VisualizadorTiposInteresBce() {
       <header className={styles.hero}>
         <div className={styles.heroContent}>
           <div className={styles.heroBadge}><span aria-hidden="true">🏛️</span> Banco Central Europeo</div>
-          <h1 className={styles.heroTitle}>Tipos de Interés del BCE</h1>
+          <h1 className={styles.heroTitle}>Tipos de Interés (Tasas de Interés) del BCE</h1>
           <p className={styles.heroSubtitle}>
-            Cómo una decisión en Fráncfort se transmite a tu hipoteca, tu crédito, tu bolsa y tu cuenta de ahorro
+            Cómo una decisión sobre los tipos de interés (tasas de interés) en Fráncfort se transmite a tu hipoteca, tu crédito, tu bolsa y tu cuenta de ahorro
           </p>
         </div>
       </header>
@@ -639,7 +639,8 @@ export default function VisualizadorTiposInteresBce() {
         <p>
           El Banco Central Europeo (BCE) es la institución que gestiona la política monetaria de los 20 países
           de la zona euro. Su mandato principal es mantener la inflación cerca del 2% a medio plazo. Para ello,
-          su principal herramienta es el tipo de interés de referencia.
+          su principal herramienta es el tipo de interés de referencia (lo que en Latinoamérica se conoce como
+          tasa de interés de referencia).
         </p>
 
         <h3>Los tres tipos de interés del BCE</h3>

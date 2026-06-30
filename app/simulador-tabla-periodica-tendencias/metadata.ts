@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Tendencias de la Tabla Periódica: Heatmap Interactivo | meskeIA',
-  description: 'Explora las tendencias periódicas con un heatmap visual: radio atómico, electronegatividad, energía de ionización, afinidad electrónica y punto de fusión para los 118 elementos. Ideal para Bachillerato y EBAU.',
-  keywords: 'tabla periódica, electronegatividad, radio atómico, energía de ionización, afinidad electrónica, punto de fusión, tendencias periódicas, Bachillerato, EBAU, química, heatmap, elementos',
+  description: 'Explora las tendencias periódicas con un heatmap visual: radio atómico, electronegatividad, energía de ionización, afinidad electrónica y punto de fusión para los 118 elementos. Ideal para Bachillerato, EBAU, preparatoria y secundaria.',
+  keywords: 'tabla periódica, electronegatividad, radio atómico, energía de ionización, afinidad electrónica, punto de fusión, tendencias periódicas, Bachillerato, EBAU, preparatoria, secundaria, química, heatmap, elementos',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Tendencias de la Tabla Periódica: Heatmap Interactivo',
-  description: 'Simulador visual que muestra las tendencias periódicas mediante un mapa de calor (heatmap) sobre los 118 elementos de la tabla periódica. Selecciona entre 5 propiedades: radio atómico (pm), electronegatividad Pauling, primera energía de ionización (kJ/mol), afinidad electrónica (kJ/mol) y punto de fusión (°C). Cada celda se colorea automáticamente de azul frío a rojo caliente según el valor de la propiedad. Incluye flechas de tendencia, leyenda de color, tooltip detallado por elemento y sección educativa con explicaciones de carga nuclear efectiva, apantallamiento y excepciones notables. Ideal para Bachillerato, EBAU y primer año de Universidad.',
+  description: 'Simulador visual que muestra las tendencias periódicas mediante un mapa de calor (heatmap) sobre los 118 elementos de la tabla periódica. Selecciona entre 5 propiedades: radio atómico (pm), electronegatividad Pauling, primera energía de ionización (kJ/mol), afinidad electrónica (kJ/mol) y punto de fusión (°C). Cada celda se colorea automáticamente de azul frío a rojo caliente según el valor de la propiedad. Incluye flechas de tendencia, leyenda de color, tooltip detallado por elemento y sección educativa con explicaciones de carga nuclear efectiva, apantallamiento y excepciones notables. Ideal para Bachillerato y EBAU (España), preparatoria y secundaria (Latinoamérica), y primer año de Universidad.',
   url: 'https://meskeia.com/simulador-tabla-periodica-tendencias/',
   category: 'EducationalApplication',
   features: [
@@ -49,7 +49,7 @@ export const jsonLd = generateWebAppSchema({
     'Sección educativa v2.0 con FAQ, escenarios reales y errores frecuentes',
     'Compatible con modo oscuro, gratuito y 100% en el navegador',
   ],
-  keywords: ['tabla periódica', 'electronegatividad', 'radio atómico', 'energía de ionización', 'afinidad electrónica', 'tendencias periódicas', 'EBAU', 'Bachillerato', 'química'],
+  keywords: ['tabla periódica', 'electronegatividad', 'radio atómico', 'energía de ionización', 'afinidad electrónica', 'tendencias periódicas', 'EBAU', 'Bachillerato', 'preparatoria', 'secundaria', 'química'],
 });
 
 export const faqJsonLd = {
@@ -93,7 +93,7 @@ export const faqJsonLd = {
       name: '¿Qué propiedad de la tabla periódica es más importante para Bachillerato y selectividad?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las cinco propiedades más frecuentes en exámenes de selectividad (EBAU/EVAU) son radio atómico, electronegatividad, primera energía de ionización, afinidad electrónica y punto de fusión. La electronegatividad y la energía de ionización suelen aparecer en preguntas de razonamiento sobre tipo de enlace y reactividad, mientras que el radio atómico es clave para explicar variaciones de tamaño y densidad.',
+        text: 'Las cinco propiedades más frecuentes en exámenes de admisión universitaria (selectividad/EBAU/EVAU en España, y los exámenes de preparatoria y secundaria en Latinoamérica) son radio atómico, electronegatividad, primera energía de ionización, afinidad electrónica y punto de fusión. La electronegatividad y la energía de ionización suelen aparecer en preguntas de razonamiento sobre tipo de enlace y reactividad, mientras que el radio atómico es clave para explicar variaciones de tamaño y densidad.',
       },
     },
   ],
