@@ -42,6 +42,7 @@ export const STEMUM_APP_DISCIPLINA: Record<string, string> = {
   'simulador-regresion': 'computacion',
   'simulador-kmeans': 'computacion',
   'simulador-puertas-logicas': 'computacion',
+  'calculadora-algebra-booleana': 'computacion',
   'visualizador-estructuras-datos': 'computacion',
   'visualizador-logica-proposicional': 'computacion',
   'visualizador-teoria-informacion': 'computacion',

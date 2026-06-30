@@ -130,6 +130,12 @@ const APPS = [
     slug: 'simulador-puertas-logicas',
   },
   {
+    icon: '🔢',
+    titulo: 'Álgebra de Boole y Karnaugh',
+    desc: 'Simplifica expresiones booleanas con mapas de Karnaugh de 2-4 variables: pulsa las celdas y observa las agrupaciones y la forma mínima SOP/POS al instante.',
+    slug: 'calculadora-algebra-booleana',
+  },
+  {
     icon: '📚',
     titulo: 'Estructuras de datos',
     desc: 'Arrays, pilas, colas, listas enlazadas y árboles BST con operaciones visualizadas en tiempo real.',

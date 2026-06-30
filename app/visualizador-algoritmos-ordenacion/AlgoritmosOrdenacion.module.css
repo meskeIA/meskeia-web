@@ -162,6 +162,35 @@
   outline-offset: 2px;
 }
 
+.arrayPropio {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.arrayInput {
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.9rem;
+  width: 170px;
+  max-width: 50vw;
+}
+
+.arrayInput:focus {
+  outline: none;
+  border-color: var(--secondary);
+}
+
+.arrayError {
+  color: rgb(220, 38, 38);
+  font-size: 0.82rem;
+  margin-top: 0.5rem;
+}
+
 /* ─── Barras ─────────────────────────────────────────────────────────────── */
 
 .barrasContainer {

@@ -415,6 +415,10 @@ export default function VisualizadorAlgoritmosOrdenacionPage() {
   const [reproduciendo, setReproduciendo] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Array propio del usuario
+  const [arrayInput, setArrayInput] = useState('');
+  const [errorInput, setErrorInput] = useState('');
+
   // Slider Big O
   const [nSlider, setNSlider] = useState(100);
 
@@ -443,6 +447,28 @@ export default function VisualizadorAlgoritmosOrdenacionPage() {
     setPasos(nuevosPasos);
     setPasoActual(0);
   }, [algoritmo]);
+
+  // Ordenar la lista propia del usuario
+  const usarArrayPropio = useCallback(() => {
+    const nums = arrayInput
+      .split(/[\s,;]+/)
+      .map(s => s.trim())
+      .filter(Boolean)
+      .map(Number)
+      .filter(n => Number.isFinite(n))
+      .map(n => Math.max(1, Math.min(99, Math.round(n))));
+    if (nums.length < 2) {
+      setErrorInput('Introduce al menos 2 números entre 1 y 99, separados por comas o espacios.');
+      return;
+    }
+    setReproduciendo(false);
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    const arr = nums.slice(0, 14);
+    setErrorInput('');
+    setArrayBase(arr);
+    setPasos(generarPasos(algoritmo, arr));
+    setPasoActual(0);
+  }, [arrayInput, algoritmo]);
 
   // Paso anterior / siguiente
   const pasoAnterior = useCallback(() => {
@@ -536,12 +562,30 @@ export default function VisualizadorAlgoritmosOrdenacionPage() {
               ))}
             </div>
 
-            {/* Botón nuevo array */}
+            {/* Controles del array: aleatorio o propio */}
             <div className={styles.controles}>
               <button type="button" className={styles.btnSecundario} onClick={nuevoArray}>
                 <span aria-hidden="true">🔀</span> Nuevo array aleatorio
               </button>
+              <div className={styles.arrayPropio}>
+                <input
+                  type="text"
+                  className={styles.arrayInput}
+                  value={arrayInput}
+                  onChange={e => setArrayInput(e.target.value)}
+                  placeholder="Tu lista: 5, 2, 9, 1…"
+                  inputMode="numeric"
+                  aria-label="Introduce tu propia lista de números separados por comas"
+                  onKeyDown={e => { if (e.key === 'Enter') usarArrayPropio(); }}
+                />
+                <button type="button" className={styles.btnSecundario} onClick={usarArrayPropio}>
+                  <span aria-hidden="true">✏️</span> Ordenar mi lista
+                </button>
+              </div>
             </div>
+            {errorInput && (
+              <div className={styles.arrayError} role="alert">{errorInput}</div>
+            )}
 
             {/* Visualizador */}
             <VisualizadorBarras paso={paso} />
