@@ -76,6 +76,12 @@ const APPS = [
     slug: 'simulador-concurrencia',
   },
   {
+    icon: '🌐',
+    titulo: 'Modelo OSI',
+    desc: 'Recorre las 7 capas de red paso a paso y observa cómo un mensaje se encapsula y desencapsula, con comparativa frente al modelo TCP/IP.',
+    slug: 'simulador-modelo-osi',
+  },
+  {
     icon: '📄',
     titulo: 'Reemplazo de páginas',
     desc: 'FIFO, LRU, Óptimo, Clock y LFU con tabla matricial, comparativa y detección de la anomalía de Belady.',

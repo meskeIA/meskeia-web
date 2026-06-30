@@ -33,6 +33,7 @@ export const STEMUM_APP_DISCIPLINA: Record<string, string> = {
   'simulador-sql-join': 'computacion',
   'simulador-planificador-procesos': 'computacion',
   'simulador-concurrencia': 'computacion',
+  'simulador-modelo-osi': 'computacion',
   'simulador-reemplazo-paginas': 'computacion',
   'simulador-recursion': 'computacion',
   'simulador-regresion': 'computacion',
