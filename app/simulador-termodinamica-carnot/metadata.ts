@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Simulador del Ciclo de Carnot: Diagrama PV y Eficiencia | meskeIA',
   description: 'Visualiza el ciclo de Carnot ideal en un diagrama presión-volumen. 2 isotermas + 2 adiabáticas. Eficiencia η = 1 - Tf/Tc. La 2.ª ley de la termodinámica al alcance.',
-  keywords: 'ciclo de Carnot, diagrama PV, eficiencia térmica, segunda ley termodinámica, isoterma, adiabática, máquina térmica, EBAU, Bachillerato, física',
+  keywords: 'ciclo de Carnot, diagrama PV, eficiencia térmica, segunda ley termodinámica, isoterma, adiabática, máquina térmica, EBAU, Bachillerato, preparatoria, secundaria, física',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Simulador del Ciclo de Carnot',
-  description: 'Simulador interactivo del ciclo de Carnot, el motor térmico ideal compuesto por dos isotermas y dos adiabáticas. Permite ajustar las temperaturas del foco caliente Tc y del foco frío Tf, el volumen inicial V1 y el ratio de compresión, y muestra el ciclo trazado en un diagrama PV con las cuatro etapas en colores distintos. Calcula la eficiencia η = 1 − Tf/Tc, los calores absorbido y cedido, y el trabajo neto producido. Incluye animación de un punto recorriendo el ciclo y comparación con motores reales (gasolina, diesel, central térmica). Ideal para EBAU de Física, Bachillerato y termodinámica universitaria.',
+  description: 'Simulador interactivo del ciclo de Carnot, el motor térmico ideal compuesto por dos isotermas y dos adiabáticas. Permite ajustar las temperaturas del foco caliente Tc y del foco frío Tf, el volumen inicial V1 y el ratio de compresión, y muestra el ciclo trazado en un diagrama PV con las cuatro etapas en colores distintos. Calcula la eficiencia η = 1 − Tf/Tc, los calores absorbido y cedido, y el trabajo neto producido. Incluye animación de un punto recorriendo el ciclo y comparación con motores reales (gasolina, diesel, central térmica). Ideal para Física de Bachillerato y EBAU (España), preparatoria y secundaria (Latinoamérica), y termodinámica universitaria.',
   url: 'https://meskeia.com/simulador-termodinamica-carnot/',
   category: 'EducationalApplication',
   features: [
@@ -48,7 +48,7 @@ export const jsonLd = generateWebAppSchema({
     'Comparación con motores reales (gasolina, diesel, central térmica)',
     'Visualización del área del ciclo (= trabajo neto)',
   ],
-  keywords: ['ciclo de Carnot', 'eficiencia térmica', '2.ª ley termodinámica', 'EBAU', 'Bachillerato', 'física'],
+  keywords: ['ciclo de Carnot', 'eficiencia térmica', '2.ª ley termodinámica', 'EBAU', 'Bachillerato', 'preparatoria', 'secundaria', 'física'],
 });
 
 export const faqJsonLd = {

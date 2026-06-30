@@ -532,7 +532,7 @@ export default function SimuladorColisionesPage() {
                 <p>
                   El momento lineal se conserva en sistemas aislados como consecuencia directa de la tercera ley de Newton: la fuerza que A ejerce sobre B es igual y opuesta a la que B ejerce sobre A. Al integrar en el tiempo, los impulsos se cancelan → el momento total no cambia. La energía cinética, en cambio, puede transformarse en calor, sonido o deformación durante el impacto (siempre se pierde o mantiene, nunca se gana en colisiones ordinarias).
                 </p>
-                <p className={styles.faqTip}>💡 En selectividad: "conservación del momento lineal" = siempre. "conservación de energía cinética" = solo en colisiones elásticas.</p>
+                <p className={styles.faqTip}>💡 En selectividad o examen de admisión universitaria (preparatoria, secundaria): "conservación del momento lineal" = siempre. "conservación de energía cinética" = solo en colisiones elásticas.</p>
               </div>
               <div className={styles.faqItem}>
                 <h4>❓ ¿Puede la energía cinética total aumentar en una colisión?</h4>

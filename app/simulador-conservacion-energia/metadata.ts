@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Simulador de Conservación de la Energía Mecánica | meskeIA',
   description: 'Visualiza el intercambio entre energía cinética y potencial en una pista interactiva. 4 perfiles, fricción ajustable, animación en tiempo real con barras de energía.',
-  keywords: 'conservación de la energía, energía cinética, energía potencial, energía mecánica, principio de conservación, fricción, gravedad, física, EBAU, Bachillerato, simulador',
+  keywords: 'conservación de la energía, energía cinética, energía potencial, energía mecánica, principio de conservación, fricción, gravedad, física, EBAU, Bachillerato, preparatoria, secundaria, educación media, simulador',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Simulador de Conservación de la Energía Mecánica',
-  description: 'Simulador interactivo de la conservación de la energía mecánica. Selecciona entre 4 perfiles de pista (rampa, valle, montaña rusa, looping suave), ajusta masa, altura inicial, gravedad y coeficiente de fricción, y observa la animación en tiempo real con barras de energía cinética y potencial. Si la fricción es cero, la suma E_c + E_p permanece constante (conservación); si es positiva, la energía mecánica disminuye y se transforma en calor. Ideal para EBAU de Física, Bachillerato y primero de Universidad.',
+  description: 'Simulador interactivo de la conservación de la energía mecánica. Selecciona entre 4 perfiles de pista (rampa, valle, montaña rusa, looping suave), ajusta masa, altura inicial, gravedad y coeficiente de fricción, y observa la animación en tiempo real con barras de energía cinética y potencial. Si la fricción es cero, la suma E_c + E_p permanece constante (conservación); si es positiva, la energía mecánica disminuye y se transforma en calor. Ideal para Física de Bachillerato y EBAU (España), preparatoria y secundaria (Latinoamérica), y primero de Universidad.',
   url: 'https://meskeia.com/simulador-conservacion-energia/',
   category: 'EducationalApplication',
   features: [
@@ -48,7 +48,7 @@ export const jsonLd = generateWebAppSchema({
     'Comparación con la energía total inicial (línea de referencia)',
     'Botones de play/pausa/reset y velocidad de simulación',
   ],
-  keywords: ['conservación de la energía', 'energía mecánica', 'cinética', 'potencial', 'fricción', 'EBAU', 'Bachillerato', 'física'],
+  keywords: ['conservación de la energía', 'energía mecánica', 'cinética', 'potencial', 'fricción', 'EBAU', 'Bachillerato', 'preparatoria', 'secundaria', 'física'],
 });
 
 export const faqJsonLd = {
@@ -84,7 +84,7 @@ export const faqJsonLd = {
       name: '¿En qué nivel educativo se estudia la conservación de la energía mecánica?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Es un contenido central de la Física de 2.º de Bachillerato y aparece habitualmente en el bloque de mecánica de la EBAU. También se trata en primero de carrera en asignaturas de Mecánica o Física General. El concepto de trabajo, energía cinética y potencial suele introducirse antes, en 4.º de ESO, como base para el desarrollo posterior.',
+        text: 'Es un contenido central de la Física de 2.º de Bachillerato (preparatoria o educación media en Latinoamérica) y aparece habitualmente en el bloque de mecánica de la EBAU. También se trata en primero de carrera en asignaturas de Mecánica o Física General. El concepto de trabajo, energía cinética y potencial suele introducirse antes, en 4.º de ESO o en los últimos cursos de secundaria, como base para el desarrollo posterior.',
       },
     },
     {

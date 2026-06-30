@@ -752,7 +752,7 @@ export default function SimuladorDistribucionNormalPage() {
                   <td>500</td>
                   <td>100</td>
                   <td>[300, 700]</td>
-                  <td>Selectividad, SAT</td>
+                  <td>Examen de admisión universitaria, SAT</td>
                 </tr>
                 <tr>
                   <td>Error de medida (laboratorio)</td>
@@ -795,7 +795,7 @@ export default function SimuladorDistribucionNormalPage() {
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">📈</span>
               <strong>Test estandarizados</strong>
-              <p>Notas de selectividad, EBAU, SAT, GMAT, CI: se diseñan para que sigan una normal con media y σ fijas, lo que permite comparar candidatos de distintas convocatorias.</p>
+              <p>Notas de selectividad o EBAU, exámenes de admisión universitaria en preparatoria y secundaria, SAT, GMAT, CI: se diseñan para que sigan una normal con media y σ fijas, lo que permite comparar candidatos de distintas convocatorias.</p>
             </div>
           </div>
         </section>

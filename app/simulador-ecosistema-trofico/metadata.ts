@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Simulador de Ecosistema: Cadena Trófica | meskeIA',
   description: 'Simula el impacto de perturbaciones en un ecosistema. Observa cómo una sequía, una plaga o la caza excesiva desencadena cascadas tróficas en pradera, bosque, océano y sabana.',
-  keywords: 'cadena trófica, niveles tróficos, regla del 10%, ecosistema, depredadores, herbívoros, productores, cascada trófica, especie clave, EBAU, Bachillerato, biología',
+  keywords: 'cadena trófica, niveles tróficos, regla del 10%, ecosistema, depredadores, herbívoros, productores, cascada trófica, especie clave, EBAU, Bachillerato, preparatoria, secundaria, educación media, biología',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -41,6 +41,8 @@ export const jsonLd = generateWebAppSchema({
     'especie clave',
     'EBAU biología',
     'Bachillerato',
+    'preparatoria',
+    'secundaria',
   ],
   features: [
     '4 ecosistemas simulados: pradera, bosque templado, océano y sabana',

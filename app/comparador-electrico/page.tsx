@@ -171,11 +171,11 @@ export default function ComparadorElectrico() {
 
       <header className={styles.hero}>
         <h1 className={styles.heroTitle}>
-          ¿Cuándo compensa el coche eléctrico?
+          ¿Cuándo compensa el coche, carro o auto eléctrico?
         </h1>
         <p className={styles.heroSubtitle}>
-          Calcula el punto de equilibrio entre un eléctrico y su equivalente de gasolina,
-          incluyendo el subsidio MOVES III y el cargador doméstico.
+          Calcula el punto de equilibrio entre un coche (carro o auto) eléctrico y su equivalente
+          de gasolina, incluyendo el subsidio MOVES III y el cargador doméstico.
         </p>
       </header>
 
@@ -549,7 +549,7 @@ export default function ComparadorElectrico() {
             <strong> menos de 8.000 km/año</strong>, raramente se alcanza el punto de equilibrio en 10 años,
             porque el ahorro acumulado no llega a cubrir la sobrecarga inicial del EV. Con
             <strong> más de 20.000 km/año</strong>, el eléctrico casi siempre compensa antes del año 6.
-            Este es el factor más determinante: no el precio del coche, sino los kilómetros que vas a recorrer.
+            Este es el factor más determinante: no el precio del coche (carro o auto), sino los kilómetros que vas a recorrer.
           </p>
 
           <div className={styles.warningBox} role="note">

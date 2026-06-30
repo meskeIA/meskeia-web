@@ -100,9 +100,9 @@ export default function CalculadoraPiscinasPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🏊 Calculadora de Piscinas</h1>
+          <h1 className={styles.title}>🏊 Calculadora de Piscinas, Albercas y Piletas</h1>
           <p className={styles.subtitle}>
-            Volumen y dosis de cloro, pH, alguicida y sal — todo en un clic
+            Volumen y dosis de cloro, pH, alguicida y sal para tu piscina, alberca o pileta — todo en un clic
           </p>
         </header>
 
@@ -305,10 +305,12 @@ export default function CalculadoraPiscinasPage() {
           subtitle="Todo lo que necesitas saber para mantener el agua en perfectas condiciones todo el año"
         >
           <section className={styles.guideSection}>
-            <h2>Todo lo que necesitas saber para mantener el agua de tu piscina</h2>
+            <h2>Todo lo que necesitas saber para mantener el agua de tu piscina, alberca o pileta</h2>
             <p>
-              El mantenimiento del agua no es complicado si conoces el orden correcto y las dosis adecuadas.
-              Un agua bien equilibrada protege la salud de los bañistas y alarga la vida de los equipos.
+              La piscina se conoce como <strong>alberca</strong> en México y como <strong>pileta</strong> en
+              Argentina y Uruguay, pero el cuidado del agua es el mismo en todos los casos. El mantenimiento
+              no es complicado si conoces el orden correcto y las dosis adecuadas. Un agua bien equilibrada
+              protege la salud de los bañistas y alarga la vida de los equipos de tu pileta o alberca.
             </p>
 
             {/* Guía paso a paso: apertura de temporada */}

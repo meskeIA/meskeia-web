@@ -2,12 +2,16 @@ import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Comparador Eléctrico vs Gasolina — ¿Cuándo compensa el eléctrico? | meskeIA',
-  description: 'Calcula el punto de equilibrio entre un coche eléctrico y uno de gasolina. Introduce los precios, km anuales, consumos y subsidio MOVES III. Muestra el año en que el eléctrico empieza a ser más barato.',
+  title: 'Coche, Carro o Auto Eléctrico vs Gasolina: ¿Cuándo Compensa? Calculadora | meskeIA',
+  description: 'Calcula el punto de equilibrio entre un coche (carro o auto) eléctrico y uno de gasolina. Introduce los precios, km anuales, consumos y subsidio MOVES III. Muestra el año en que el eléctrico empieza a ser más barato.',
   keywords: [
     'eléctrico vs gasolina',
     'cuando compensa el eléctrico',
     'punto de equilibrio coche eléctrico',
+    'carro eléctrico vs gasolina',
+    'auto eléctrico vs gasolina',
+    'cuando compensa el carro eléctrico',
+    'cuando compensa el auto eléctrico',
     'MOVES III subsidio',
     'ahorro coche eléctrico',
     'comparador eléctrico gasolina diesel',
@@ -41,7 +45,7 @@ export const metadata: Metadata = {
     'schema:WebApplication': JSON.stringify(
       generateWebAppSchema({
         name: 'Comparador Eléctrico vs Combustión',
-        description: 'Calculadora de punto de equilibrio entre vehículo eléctrico y de combustión. Compara costes reales incluyendo precio de compra, subsidios MOVES III, consumo eléctrico, precio de gasolina, cargador doméstico y proyección a N años.',
+        description: 'Calculadora de punto de equilibrio entre un vehículo (coche, carro o auto) eléctrico y de combustión. Compara costes reales incluyendo precio de compra, subsidios MOVES III, consumo eléctrico, precio de gasolina, cargador doméstico y proyección a N años.',
         url: 'https://meskeia.com/comparador-electrico/',
         features: [
           'Cálculo del año de break-even (punto de equilibrio)',
@@ -60,7 +64,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Comparador Eléctrico vs Combustión",
-  description: "Calcula el punto de equilibrio entre un coche eléctrico y uno de gasolina. Introduce los precios, km anuales, consumos y subsidio MOVES III. Muestra el año en que el eléctrico empieza a ser más barato",
+  description: "Calcula el punto de equilibrio entre un coche (carro o auto) eléctrico y uno de gasolina. Introduce los precios, km anuales, consumos y subsidio MOVES III. Muestra el año en que el eléctrico empieza a ser más barato",
   url: "https://meskeia.com/comparador-electrico/",
   category: 'FinanceApplication',
   features: [],
@@ -72,7 +76,7 @@ export const faqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿Cuándo es más barato un coche eléctrico que uno de gasolina en total?',
+      name: '¿Cuándo es más barato un coche (carro o auto) eléctrico que uno de gasolina en total?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'El punto de equilibrio (break-even) entre un eléctrico y un equivalente de gasolina depende fundamentalmente de tres variables: la diferencia de precio de compra, los kilómetros anuales recorridos y el coste de la electricidad doméstica frente al precio de la gasolina. En condiciones típicas españolas (precio eléctrico nocturno ~0,10-0,12 €/kWh, gasolina ~1,60 €/litro, 15.000 km anuales), el break-even suele producirse entre los 5 y 9 años si se aplica el subsidio MOVES III. Con más kilómetros anuales o precios de combustible altos, el plazo se acorta significativamente.',

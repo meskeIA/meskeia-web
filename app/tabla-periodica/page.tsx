@@ -478,7 +478,7 @@ export default function TablaPerodicaPage() {
                 <h3>Estudiante de química (preuniversitario)</h3>
               </div>
               <p className={styles.escenarioDesc}>
-                La configuración electrónica del Fe (Z=26) determina sus 2 estados de oxidación (+2 y +3). [Ar] 3d⁶ 4s² pierde primero 4s, luego 3d. Pregunta típica en exámenes preuniversitarios.
+                La configuración electrónica del Fe (Z=26) determina sus 2 estados de oxidación (+2 y +3). [Ar] 3d⁶ 4s² pierde primero 4s, luego 3d. Pregunta típica en exámenes preuniversitarios, tanto en bachillerato (España) como en preparatoria, secundaria o educación media (Latinoamérica).
               </p>
               <div className={styles.escenarioTip}>
                 <strong>Tip:</strong> Los metales de transición tienen configuraciones electrónicas irregulares: Cr([Ar]3d⁵4s¹) y Cu([Ar]3d¹⁰4s¹) por estabilidad de semilleno y lleno.

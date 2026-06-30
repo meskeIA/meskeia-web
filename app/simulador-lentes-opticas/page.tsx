@@ -774,7 +774,7 @@ export default function SimuladorLentesOpticasPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>🎯</span>
               <strong>Recuerda la convención de signos</strong>
-              <p>Hay varias convenciones; en este simulador y en EBAU se suele usar: s &gt; 0 a la izquierda, s&apos; &gt; 0 a la derecha (real), f &gt; 0 convergente. Lo importante es ser <em>consistente</em>.</p>
+              <p>Hay varias convenciones; en este simulador y en exámenes como la EBAU (Bachillerato en España) o las pruebas de Física de preparatoria y secundaria en Latinoamérica se suele usar: s &gt; 0 a la izquierda, s&apos; &gt; 0 a la derecha (real), f &gt; 0 convergente. Lo importante es ser <em>consistente</em>.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>✅</span>

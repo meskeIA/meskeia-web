@@ -2,17 +2,17 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Calculadora de Piscinas - Cloro, pH, Alguicida y Volumen | meskeIA',
-  description: 'Calcula el volumen de tu piscina y las dosis de productos químicos: cloro, corrector de pH, alguicida y sal. Para mantenimiento regular y tratamiento de choque. Gratis.',
-  keywords: 'calculadora piscina, cuanto cloro piscina, volumen piscina, dosis alguicida, corrector ph piscina, tratamiento quimico piscina, mantenimiento piscina, piscina sal cloracion',
+  title: 'Calculadora de Piscinas, Albercas y Piletas - Cloro, pH, Alguicida y Volumen | meskeIA',
+  description: 'Calcula el volumen de tu piscina, alberca o pileta y las dosis de productos químicos: cloro, corrector de pH, alguicida y sal. Para mantenimiento regular y tratamiento de choque. Gratis.',
+  keywords: 'calculadora piscina, calculadora de alberca, litros de pileta, cuanto cloro piscina, volumen piscina alberca pileta, dosis alguicida, corrector ph piscina, tratamiento quimico alberca, mantenimiento piscina pileta, piscina sal cloracion',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Calculadora de Piscinas - Productos Químicos y Volumen | meskeIA',
-    description: 'Calcula el volumen de tu piscina y las dosis exactas de cloro, pH y alguicida.',
+    title: 'Calculadora de Piscinas, Albercas y Piletas - Productos Químicos y Volumen | meskeIA',
+    description: 'Calcula el volumen de tu piscina (alberca o pileta) y las dosis exactas de cloro, pH y alguicida.',
     url: 'https://meskeia.com/calculadora-piscinas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -25,8 +25,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Calculadora de Piscinas | meskeIA',
-    description: 'Calcula cuánto cloro, alguicida y corrector de pH necesita tu piscina según su volumen.',
+    title: 'Calculadora de Piscinas, Albercas y Piletas | meskeIA',
+    description: 'Calcula cuánto cloro, alguicida y corrector de pH necesita tu piscina, alberca o pileta según su volumen.',
     images: ['https://meskeia.com/og-image.png']
   },
   other: {
@@ -35,11 +35,11 @@ export const metadata: Metadata = {
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'Calculadora de Piscinas',
-  description: 'Herramienta gratuita para calcular el volumen de una piscina (rectangular, circular u ovalada) y las dosis de productos químicos necesarios: cloro granulado o líquido, corrector de pH, alguicida y sal para sistemas de cloración salina.',
+  name: 'Calculadora de Piscinas, Albercas y Piletas',
+  description: 'Herramienta gratuita para calcular el volumen de una piscina (conocida como alberca en México y pileta en Argentina y Uruguay) en forma rectangular, circular u ovalada, y las dosis de productos químicos necesarios: cloro granulado o líquido, corrector de pH, alguicida y sal para sistemas de cloración salina.',
   url: 'https://meskeia.com/calculadora-piscinas/',
   features: [
-    'Cálculo de volumen para piscinas rectangulares, circulares y ovaladas',
+    'Cálculo de volumen para piscinas, albercas y piletas rectangulares, circulares y ovaladas',
     'Dosis de cloro granulado y líquido (mantenimiento y choque)',
     'Dosis de corrector de pH (elevador y reductor)',
     'Dosis de alguicida preventivo y de choque',
@@ -64,7 +64,7 @@ export const faqJsonLd = {
       name: '¿Cómo se calcula el volumen de una piscina rectangular?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El volumen de una piscina rectangular se calcula multiplicando largo × ancho × profundidad media (en metros), obteniendo el resultado en metros cúbicos (m³), equivalente a 1.000 litros. Si la piscina tiene profundidad variable, se promedia la zona poco profunda y la zona de más profundidad: (prof. mínima + prof. máxima) / 2.',
+        text: 'El volumen de una piscina rectangular (alberca en México, pileta en Argentina y Uruguay) se calcula multiplicando largo × ancho × profundidad media (en metros), obteniendo el resultado en metros cúbicos (m³), equivalente a 1.000 litros. Si la piscina tiene profundidad variable, se promedia la zona poco profunda y la zona de más profundidad: (prof. mínima + prof. máxima) / 2.',
       },
     },
     {

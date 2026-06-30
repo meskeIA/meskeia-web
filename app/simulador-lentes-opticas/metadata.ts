@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Simulador de Lentes Ópticas: Trazado de Rayos | meskeIA',
   description: 'Visualiza el trazado de rayos a través de lentes convergentes y divergentes. Mueve el objeto y mira cómo cambian la imagen, su tamaño y si es real o virtual.',
-  keywords: 'lentes ópticas, lente convergente, lente divergente, trazado de rayos, imagen real, imagen virtual, distancia focal, aumento, óptica geométrica, EBAU, Bachillerato, física',
+  keywords: 'lentes ópticas, lente convergente, lente divergente, trazado de rayos, imagen real, imagen virtual, distancia focal, aumento, óptica geométrica, EBAU, Bachillerato, preparatoria, secundaria, examen de admisión universitaria, física',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Simulador de Lentes Ópticas',
-  description: 'Simulador interactivo de óptica geométrica para lentes delgadas convergentes y divergentes. Visualiza los tres rayos principales (paralelo→F2, centro sin desviar, F1→paralelo) atravesando la lente y formando la imagen del objeto. Permite ajustar la distancia focal f, la distancia objeto s, la altura del objeto h y el tipo de lente. Calcula automáticamente la distancia imagen, el aumento y clasifica la imagen (real/virtual, derecha/invertida, mayor/menor). Ideal para EBAU de Física, Bachillerato y primero de universidad.',
+  description: 'Simulador interactivo de óptica geométrica para lentes delgadas convergentes y divergentes. Visualiza los tres rayos principales (paralelo→F2, centro sin desviar, F1→paralelo) atravesando la lente y formando la imagen del objeto. Permite ajustar la distancia focal f, la distancia objeto s, la altura del objeto h y el tipo de lente. Calcula automáticamente la distancia imagen, el aumento y clasifica la imagen (real/virtual, derecha/invertida, mayor/menor). Ideal para Física de Bachillerato y EBAU (España), preparatoria y secundaria (Latinoamérica), y primero de universidad.',
   url: 'https://meskeia.com/simulador-lentes-opticas/',
   category: 'EducationalApplication',
   features: [
@@ -46,9 +46,9 @@ export const jsonLd = generateWebAppSchema({
     'Sliders interactivos de distancia focal, distancia objeto y altura',
     'Cálculo automático de aumento y clasificación de la imagen',
     'Aplicación de la ecuación de Gauss (1/s + 1/s\' = 1/f)',
-    'Ideal para EBAU, Bachillerato y óptica universitaria',
+    'Ideal para EBAU y Bachillerato (España), preparatoria y secundaria (Latinoamérica) y óptica universitaria',
   ],
-  keywords: ['lentes ópticas', 'trazado de rayos', 'óptica', 'imagen real', 'imagen virtual', 'EBAU', 'Bachillerato', 'física'],
+  keywords: ['lentes ópticas', 'trazado de rayos', 'óptica', 'imagen real', 'imagen virtual', 'EBAU', 'Bachillerato', 'preparatoria', 'secundaria', 'física'],
 });
 
 export const faqJsonLd = {
@@ -92,7 +92,7 @@ export const faqJsonLd = {
       name: '¿En qué asignaturas se estudia la óptica geométrica de lentes?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La óptica geométrica con lentes delgadas forma parte del currículo de Física de 2.º de Bachillerato y es contenido frecuente en la EBAU. También aparece en Física General universitaria y en asignaturas de Instrumentación Óptica o Fotónica. La ecuación de Gauss y el trazado de rayos son las herramientas básicas tanto para resolver problemas de examen como para entender el funcionamiento de cámaras, microscopios y telescopios.',
+        text: 'La óptica geométrica con lentes delgadas forma parte del currículo de Física de 2.º de Bachillerato y es contenido frecuente en la EBAU en España; en Latinoamérica se estudia en preparatoria y secundaria, y entra en el examen de admisión universitaria. También aparece en Física General universitaria y en asignaturas de Instrumentación Óptica o Fotónica. La ecuación de Gauss y el trazado de rayos son las herramientas básicas tanto para resolver problemas de examen como para entender el funcionamiento de cámaras, microscopios y telescopios.',
       },
     },
   ],

@@ -4,9 +4,9 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Simulador de Colisiones — Elásticas e Inelásticas en 1D | meskeIA',
   description:
-    'Simula colisiones elásticas e inelásticas en 1D: ajusta masas, velocidades y coeficiente de restitución. Visualiza la conservación del momento lineal y la variación de energía cinética. Para Bachillerato y selectividad.',
+    'Simula colisiones elásticas e inelásticas en 1D: ajusta masas, velocidades y coeficiente de restitución. Visualiza la conservación del momento lineal y la variación de energía cinética. Para Bachillerato y selectividad (España), o preparatoria y secundaria (Latinoamérica).',
   keywords:
-    'simulador colisiones, colisión elástica inelástica, momento lineal, coeficiente de restitución, conservación momento, energía cinética colisión, física bachillerato',
+    'simulador colisiones, colisión elástica inelástica, momento lineal, coeficiente de restitución, conservación momento, energía cinética colisión, física bachillerato, física preparatoria, física secundaria',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -88,6 +88,6 @@ export const jsonLd = generateWebAppSchema({
     'Coeficiente de restitución ajustable con clasificación automática del tipo de colisión',
     'Animación SVG del choque con fases pre-colisión, impacto y post-colisión',
     'Cálculo de momento lineal total y energía cinética antes y después',
-    'Ideal para Bachillerato Física y preparación de selectividad',
+    'Ideal para Física de Bachillerato y selectividad (España) o preparatoria y secundaria (Latinoamérica)',
   ],
 });

@@ -137,9 +137,9 @@ export default function LupaDigitalPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>Lupa Digital</h1>
+        <h1 className={styles.title}>Lupa Digital Online</h1>
         <p className={styles.subtitle}>
-          Amplía texto y objetos con la cámara
+          Convierte tu móvil o celular en una lupa: amplía texto y objetos con la cámara
         </p>
       </header>
 
@@ -401,8 +401,9 @@ export default function LupaDigitalPage() {
         <section>
           <h2>¿Para quién es útil la lupa digital?</h2>
           <p>
-            Cualquier persona puede beneficiarse, pero estos son los tres perfiles que
-            más la usan en el día a día.
+            Cualquier persona con un móvil (celular) o un ordenador (computadora) con
+            cámara puede beneficiarse, pero estos son los tres perfiles que la usan más
+            en el día a día.
           </p>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
@@ -518,7 +519,7 @@ export default function LupaDigitalPage() {
               <div className={styles.stepContent}>
                 <strong>Apuntar la cámara al texto u objeto</strong>
                 <p>
-                  Coloca el teléfono a unos 15–20 cm del objeto. La cámara trasera
+                  Coloca el móvil (celular) a unos 15–20 cm del objeto. La cámara trasera
                   ofrece mejor resolución. Activa la lupa y enfoca el área que quieres
                   leer o examinar.
                 </p>

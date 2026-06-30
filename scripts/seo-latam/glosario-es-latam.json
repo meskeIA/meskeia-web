@@ -1,7 +1,7 @@
 {
   "_meta": {
     "descripcion": "Glosario de dualidad terminologica espanol de Espana <-> espanol de Latam para deteccion de candidatas SEO. Cada par recoge un termino de DOMINIO (probable nombre o keyword de una app meskeIA) que se dice distinto a cada lado del Atlantico. Sirve para 2 cosas: (1) detectar apps existentes que solo usan una variante y pierden el otro mercado, (2) escribir apps NUEVAS ya con ambos terminos desde el origen.",
-    "actualizado": "2026-06-07",
+    "actualizado": "2026-06-30",
     "origen": "Descubierto a raiz de simulador-puertas-logicas: rankeaba por 'simulador de compuertas logicas' (Latam) pese a usar solo 'puertas logicas' (Espana) en el contenido visible. Ver commit 884248b4.",
     "como_ampliar": "Anadir un par cuando en Search Console aparezca una consulta con impresiones reales que use una variante regional distinta a la del title/H1 de la app. No anadir terminos universales (hipoteca, IMC, porcentaje) ni inventar pares sin evidencia de busqueda.",
     "regla_de_aplicacion": "El fix es BARATO y aditivo: anadir el sinonimo en title, subtitulo, keywords, JSON-LD y una FAQ de terminologia. NUNCA reemplazar el H1 ni machacar el texto (keyword stuffing). NO aplicar a apps fiscales-Espana (RegionBadge es-only): ahi el publico correcto es Espana.",
@@ -23,7 +23,7 @@
       "dominio": "informatica",
       "es": ["ordenador", "ordenadores"],
       "latam": ["computadora", "computadoras", "computador", "computadores"],
-      "nota": "computer"
+      "nota": "computer. RESUELTO en lupa-digital (2026-06-30): ordenador/computadora en title, body y JSON-LD."
     },
     {
       "dominio": "informatica",
@@ -41,7 +41,7 @@
       "dominio": "tecnologia",
       "es": ["movil", "telefono movil"],
       "latam": ["celular", "telefono celular"],
-      "nota": "mobile phone. 'movil' choca con otros sentidos; usar con contexto telefono"
+      "nota": "mobile phone. 'movil' choca con otros sentidos; usar con contexto telefono. RESUELTO en lupa-digital (2026-06-30): H1/subtitulo/body con movil o celular (query GSC 'lupa movil online' pos 5,7)."
     },
     {
       "dominio": "tecnologia",
@@ -83,13 +83,13 @@
       "dominio": "vivienda",
       "es": ["piscina"],
       "latam": ["alberca", "pileta"],
-      "nota": "swimming pool"
+      "nota": "swimming pool. RESUELTO en calculadora-piscinas (2026-06-30): H1/title/body con piscina, alberca (MX) y pileta (AR/UY)."
     },
     {
       "dominio": "vehiculos",
       "es": ["coche", "coches"],
       "latam": ["carro", "carros", "auto", "autos"],
-      "nota": "car"
+      "nota": "car. PARCIAL: RESUELTO en comparador-electrico (2026-06-30): coche/carro/auto electrico en H1/title/body. Quedan otras apps con 'coche' (calculadora-combustible, selector-seguro-coche, simulador-monty-hall, visualizador-efecto-doppler, etc.)."
     },
     {
       "dominio": "vehiculos",
@@ -203,7 +203,7 @@
       "dominio": "educacion",
       "es": ["bachillerato", "eso", "selectividad", "ebau", "evau"],
       "latam": ["preparatoria", "secundaria", "educacion media", "examen de admision"],
-      "nota": "ya cubierto por la regla Latam-friendly del CLAUDE.md; incluido para deteccion en apps antiguas"
+      "nota": "ya cubierto por la regla Latam-friendly del CLAUDE.md; incluido para deteccion en apps antiguas. PARCIAL: en estas STEM 'bachillerato' es DESCRIPTOR DE AUDIENCIA, no la keyword de busqueda (universal). Fix = anadir nivel LATAM solo donde aparece el termino Espana, sin tocar el H1. RESUELTAS (2026-06-30): tabla-periodica, simulador-lentes-opticas, simulador-termodinamica-carnot, simulador-colisiones, simulador-conservacion-energia, simulador-distribucion-normal, simulador-ecosistema-trofico. calculadora-notas ya tenia cobertura LATAM previa (conversor escalas + 6 paises)."
     }
   ]
 }

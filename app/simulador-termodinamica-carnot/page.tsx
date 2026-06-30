@@ -708,6 +708,11 @@ export default function SimuladorTermodinamicaCarnotPage() {
 
         <section>
           <h3>Cómo resolver un problema de Carnot paso a paso</h3>
+          <p>
+            Este método sirve igual para los ejercicios de Física de Bachillerato y la EBAU en España
+            como para la preparatoria, la secundaria y la educación media en Latinoamérica, y también
+            como repaso en termodinámica universitaria.
+          </p>
           <div className={styles.stepGuide}>
             <div className={styles.step}>
               <div className={styles.stepNumber}>1</div>

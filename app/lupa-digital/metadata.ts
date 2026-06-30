@@ -2,17 +2,17 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Lupa Digital Online - Amplía con la Cámara Gratis | meskeIA',
-  description: 'Lupa digital gratuita que usa la cámara de tu dispositivo para ampliar texto, objetos pequeños y detalles. Ideal para leer letra pequeña y accesibilidad.',
-  keywords: 'lupa digital, lupa online, ampliar cámara, lupa gratis, magnificador, zoom cámara, accesibilidad, leer letra pequeña',
+  title: 'Lupa Digital Online - Amplía con tu Móvil o Celular Gratis | meskeIA',
+  description: 'Lupa digital gratuita que usa la cámara de tu móvil o celular para ampliar texto, objetos pequeños y detalles. Funciona también en ordenador o computadora. Ideal para leer letra pequeña y accesibilidad.',
+  keywords: 'lupa digital, lupa online, lupa celular, lupa móvil, ampliar cámara, lupa gratis, magnificador, zoom cámara, accesibilidad, leer letra pequeña',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Lupa Digital Online - Amplía con la Cámara',
-    description: 'Lupa digital gratuita que usa la cámara para ampliar texto y objetos pequeños.',
+    title: 'Lupa Digital Online - Amplía con tu Móvil o Celular',
+    description: 'Lupa digital gratuita que usa la cámara de tu móvil o celular para ampliar texto y objetos pequeños.',
     url: 'https://meskeia.com/lupa-digital/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -25,19 +25,19 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Lupa Digital Online - Amplía con la Cámara',
-    description: 'Lupa digital gratuita que usa la cámara para ampliar texto y objetos pequeños.',
+    title: 'Lupa Digital Online - Amplía con tu Móvil o Celular',
+    description: 'Lupa digital gratuita que usa la cámara de tu móvil o celular para ampliar texto y objetos pequeños.',
     images: ['https://meskeia.com/og-image.png']
   },
 };
 
 export const jsonLd = generateWebAppSchema({
   name: "Lupa Digital con Cámara",
-  description: "Lupa digital gratuita que usa la cámara de tu dispositivo para ampliar texto, objetos pequeños y detalles. Ideal para leer letra pequeña y accesibilidad.",
+  description: "Lupa digital gratuita que usa la cámara de tu móvil o celular para ampliar texto, objetos pequeños y detalles. Funciona también en ordenador o computadora. Ideal para leer letra pequeña y accesibilidad.",
   url: "https://meskeia.com/lupa-digital/",
   category: 'UtilityApplication',
   features: [
-    'Ampliación digital de 1× a 5× con la cámara del dispositivo',
+    'Ampliación digital de 1× a 5× con la cámara del móvil o celular',
     'Filtros de accesibilidad: alto contraste, inversión, escala de grises y sepia',
     'Ajuste independiente de brillo y contraste en tiempo real',
     'Modo congelado para leer sin mantener el pulso',
@@ -56,7 +56,7 @@ export const faqJsonLd = {
       name: '¿Cómo funciona la lupa digital online?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La lupa digital accede a la cámara de tu dispositivo (móvil, tablet u ordenador con webcam) y muestra la imagen en pantalla con el nivel de ampliación que elijas. A diferencia del zoom óptico de una lupa física, aplica ampliación digital sobre la imagen de la cámara en tiempo real, permitiendo ver con mayor detalle textos pequeños, etiquetas, componentes electrónicos o cualquier objeto que coloquen frente al objetivo.',
+        text: 'La lupa digital accede a la cámara de tu dispositivo (móvil o celular, tablet, u ordenador o computadora con webcam) y muestra la imagen en pantalla con el nivel de ampliación que elijas. A diferencia del zoom óptico de una lupa física, aplica ampliación digital sobre la imagen de la cámara en tiempo real, permitiendo ver con mayor detalle textos pequeños, etiquetas, componentes electrónicos o cualquier objeto que coloquen frente al objetivo.',
       },
     },
     {
@@ -69,10 +69,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Necesito instalar algo en mi móvil u ordenador?',
+      name: '¿Necesito instalar algo en mi móvil, celular u ordenador?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'No requiere instalación. Funciona directamente desde el navegador web en cualquier dispositivo con cámara. Solo tienes que abrir la herramienta y aceptar el permiso de acceso a la cámara. Es compatible con Chrome, Firefox, Safari y Edge en versiones recientes, tanto en Android e iOS como en ordenadores de escritorio.',
+        text: 'No requiere instalación. Funciona directamente desde el navegador web en cualquier dispositivo con cámara. Solo tienes que abrir la herramienta y aceptar el permiso de acceso a la cámara. Es compatible con Chrome, Firefox, Safari y Edge en versiones recientes, tanto en Android e iOS como en ordenadores o computadoras de escritorio.',
       },
     },
     {

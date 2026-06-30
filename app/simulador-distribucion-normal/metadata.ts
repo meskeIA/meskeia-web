@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Simulador de Distribución Normal — Curva de Gauss Interactiva | meskeIA',
   description: 'Visualiza la distribución normal moviendo media (μ) y desviación típica (σ). Calcula probabilidades, áreas, puntuaciones Z y la regla 68-95-99.7 paso a paso.',
-  keywords: 'distribución normal, curva de Gauss, campana de Gauss, media, desviación típica, puntuación Z, tipificación, regla 68-95-99.7, estadística, probabilidad, EBAU, selectividad',
+  keywords: 'distribución normal, curva de Gauss, campana de Gauss, media, desviación típica, puntuación Z, tipificación, regla 68-95-99.7, estadística, probabilidad, EBAU, selectividad, preparatoria, secundaria',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -49,7 +49,7 @@ export const jsonLd = generateWebAppSchema({
     'Indicador del valor de densidad f(x) en cualquier punto de la campana de Gauss',
     'Tabla de ángulos notables y porcentajes exactos de las reglas 1σ, 2σ y 3σ',
   ],
-  keywords: ['distribución normal', 'Gauss', 'estadística', 'probabilidad', 'puntuación Z', 'EBAU', 'Bachillerato'],
+  keywords: ['distribución normal', 'Gauss', 'estadística', 'probabilidad', 'puntuación Z', 'EBAU', 'Bachillerato', 'preparatoria', 'secundaria'],
 });
 
 export const faqJsonLd = {
@@ -93,7 +93,7 @@ export const faqJsonLd = {
       name: '¿Para quién es útil un simulador interactivo de distribución normal?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Es especialmente útil para estudiantes de Bachillerato, ciclos formativos o universidad que aprenden estadística y probabilidad. También ayuda a docentes a visualizar conceptos en clase. Permite experimentar cómo cambia la forma de la curva al modificar μ y σ, calcular probabilidades de tramos concretos y comprender visualmente conceptos que resultan abstractos con solo fórmulas.',
+        text: 'Es especialmente útil para estudiantes de Bachillerato, preparatoria, secundaria, ciclos formativos o universidad que aprenden estadística y probabilidad. También ayuda a docentes a visualizar conceptos en clase. Permite experimentar cómo cambia la forma de la curva al modificar μ y σ, calcular probabilidades de tramos concretos y comprender visualmente conceptos que resultan abstractos con solo fórmulas.',
       },
     },
   ],
