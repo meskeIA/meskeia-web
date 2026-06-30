@@ -10,6 +10,13 @@
  * NO modifica nada. Solo informa. La priorizacion final (que candidatas tocar)
  * se hace cruzando esta lista con las impresiones reales de Search Console.
  *
+ * ROL ACTUAL (desde 2026-06-30): la campana de retrofit global ya esta cerrada
+ * (>70 apps cubiertas). Este script YA NO se usa como auditoria periodica sobre
+ * todo el catalogo. Su rol vigente es ser el GATE de apps nuevas: el skill
+ * /nueva-app-meskeia lo ejecuta sobre el slug recien creado
+ * (... --falta-latam | grep "/<slug>/") antes del commit. El glosario se amplia
+ * en la auditoria SEO mensual /audit-seo-meskeia cuando GSC revela un par nuevo.
+ *
  * Uso:
  *   node scripts/seo-latam/detectar-candidatas-latam.mjs              (todo)
  *   node scripts/seo-latam/detectar-candidatas-latam.mjs --falta-latam (solo apps ES sin variante Latam)

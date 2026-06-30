@@ -1,6 +1,25 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
+// ─────────────────────────────────────────────────────────────────────────
+// 🌎 LENGUAJE LATAM-FRIENDLY (OBLIGATORIO — nacer bien desde el origen)
+// meskeIA sirve a todo el público hispanohablante (~50% del tráfico es Latam).
+// Si tu app usa algún término que se dice distinto a cada lado del Atlántico,
+// incluye AMBAS variantes de forma aditiva (nunca reemplaces la de España).
+// Pares frecuentes en scripts/seo-latam/glosario-es-latam.json:
+//   coche→carro/auto · móvil→celular · ordenador→computadora · portátil→laptop/notebook
+//   piscina→alberca/pileta · alquiler→arriendo · tipo de interés→tasa de interés
+//   tarta→torta/pastel · puerta lógica→compuerta lógica · nómina→planilla
+// REGLA DE ORO — distingue dónde va cada término:
+//   • Término-NÚCLEO (la keyword que la gente busca): ambas variantes en title/H1,
+//     liderando por demanda. Ej. "Seguro de Coche, Carro o Auto".
+//   • Descriptor-de-AUDIENCIA (bachillerato/EBAU/selectividad → preparatoria/
+//     secundaria/educación media): NO lo metas en el H1; basta en keywords,
+//     description y cuerpo. La keyword núcleo de un simulador STEM es universal.
+// Apps fiscales-España estructurales (IRPF, RETA, nómina, ITP…): NO aplicar
+// (público correcto = España; ver <RegionBadge variant="es-only" />).
+// ─────────────────────────────────────────────────────────────────────────
+
 export const metadata: Metadata = {
   title: '[Nombre App] - [Descripción Corta] | meskeIA',
   description: '[Descripción detallada 150-160 caracteres]',
