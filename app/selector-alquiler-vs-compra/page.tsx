@@ -298,10 +298,10 @@ export default function SelectorAlquilerVsCompra() {
 
       {pantalla !== 'resultado' ? (
         <header className={styles.hero}>
-          <h1 className={styles.heroTitle}>¿Alquilar o comprar?</h1>
+          <h1 className={styles.heroTitle}>¿Alquilar (arrendar) o comprar?</h1>
           <p className={styles.heroSubtitle}>
             {pantalla === 'inicio'
-              ? 'Descubre qué opción se adapta mejor a tu situación vital real'
+              ? 'Alquilar o arrendar frente a comprar: descubre qué opción se adapta mejor a tu situación vital real'
               : `Pregunta ${paso + 1} de ${totalPreguntas} · ${preguntaActual.categoria}`}
           </p>
         </header>
@@ -486,8 +486,8 @@ export default function SelectorAlquilerVsCompra() {
           </button>
 
           <EducationalSection
-            title="Alquilar vs Comprar: lo que nadie te cuenta"
-            subtitle="Más allá de los números, los factores que realmente importan"
+            title="Alquilar (arrendar) vs Comprar: lo que nadie te cuenta"
+            subtitle="Más allá de los números, los factores que realmente importan al decidir entre arriendo y compra"
             defaultOpen={false}
           >
             <h3>La regla del break-even: cuántos años necesitas</h3>
@@ -511,9 +511,10 @@ export default function SelectorAlquilerVsCompra() {
               <li><strong>Gastos de venta:</strong> si vendes, pagarás agencia (3-5%), plusvalía municipal e IRPF por la ganancia.</li>
             </ul>
 
-            <h3>Las ventajas reales del alquiler</h3>
+            <h3>Las ventajas reales del alquiler (arriendo)</h3>
             <p>
-              El alquiler no es tirar el dinero. Te ofrece cosas que la compra no puede darte:
+              El alquiler —arriendo, como se conoce en gran parte de Latinoamérica— no es tirar el dinero.
+              Te ofrece cosas que la compra no puede darte:
             </p>
             <ul>
               <li><strong>Liquidez:</strong> el dinero de la entrada sigue siendo tuyo e invertible.</li>

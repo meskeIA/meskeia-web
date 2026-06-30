@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Macroeconomía Visual: 6 Conceptos Clave Explicados | meskeIA',
   description: 'Recorrido visual e interactivo por la macroeconomía: PIB y crecimiento, inflación, empleo y desempleo, política monetaria, política fiscal y ciclo económico. Con ejemplos cotidianos y actuales.',
-  keywords: 'macroeconomía, PIB, inflación, desempleo, tasa de paro, política monetaria, tipos de interés, banco central, política fiscal, déficit público, deuda pública, ciclo económico, economía fácil',
+  keywords: 'macroeconomía, PIB, inflación, desempleo, tasa de paro, política monetaria, tipos de interés, tasas de interés, banco central, política fiscal, déficit público, deuda pública, ciclo económico, economía fácil',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Macroeconomía Visual: 6 Conceptos Clave',
-    description: 'Entiende cómo funciona la economía de un país: PIB, inflación, empleo, tipos de interés, gasto público y ciclo económico. Visuales interactivos y ejemplos reales.',
+    description: 'Entiende cómo funciona la economía de un país: PIB, inflación, empleo, tipos de interés (tasas de interés), gasto público y ciclo económico. Visuales interactivos y ejemplos reales.',
     url: 'https://meskeia.com/visualizador-macroeconomia/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -48,7 +48,7 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: [
     'macroeconomía', 'PIB', 'inflación', 'desempleo', 'política monetaria',
-    'tipos de interés', 'banco central', 'política fiscal', 'déficit público',
+    'tipos de interés', 'tasas de interés', 'banco central', 'política fiscal', 'déficit público',
     'ciclo económico',
   ],
 });
@@ -86,7 +86,7 @@ export const faqJsonLd = {
       name: '¿Para qué sirve que el banco central suba o baje los tipos de interés?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los tipos de interés son la principal herramienta de la política monetaria. Cuando el banco central los sube, el crédito se encarece, familias y empresas gastan e invierten menos, y eso reduce la presión sobre los precios: sirve para frenar la inflación. Cuando los baja, el crédito se abarata y la economía se estimula. Es como un termostato para regular la temperatura de la economía.',
+        text: 'Los tipos de interés (también llamados tasas de interés en Latinoamérica) son la principal herramienta de la política monetaria. Cuando el banco central los sube, el crédito se encarece, familias y empresas gastan e invierten menos, y eso reduce la presión sobre los precios: sirve para frenar la inflación. Cuando los baja, el crédito se abarata y la economía se estimula. Es como un termostato para regular la temperatura de la economía.',
       },
     },
     {

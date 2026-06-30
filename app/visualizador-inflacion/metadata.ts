@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Inflación: Por Qué Suben los Precios | meskeIA',
   description: 'Las 3 causas mecánicas de la inflación (demanda, costes, monetaria), la espiral salarios-precios, los sesgos del IPC y cómo el BCE la controla. Educativo sobre macroeconomía, no calculadora.',
-  keywords: ['por qué sube la inflación', 'inflación de demanda', 'inflación de costes', 'teoría cuantitativa dinero', 'espiral salarios precios', 'IPC sesgos', 'BCE tipos de interés inflación', 'hiperinflación causas'],
+  keywords: ['por qué sube la inflación', 'inflación de demanda', 'inflación de costes', 'teoría cuantitativa dinero', 'espiral salarios precios', 'IPC sesgos', 'BCE tipos de interés inflación', 'tasas de interés e inflación', 'hiperinflación causas'],
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -43,7 +43,7 @@ export const jsonLd = generateWebAppSchema({
     'Sesgos del IPC y por qué puede no reflejar tu inflación real',
     'Tipos de inflación: deflación, moderada, hiperinflación',
     'Mecanismo de transmisión de la política monetaria del BCE',
-    'Slider interactivo de tipos de interés',
+    'Slider interactivo de tipos de interés (tasas de interés)',
   ],
 });
 
@@ -80,7 +80,7 @@ export const faqJsonLd = {
       name: '¿Cómo controla el BCE la inflación subiendo los tipos de interés?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Cuando el BCE sube el tipo de interés de referencia, encarece el crédito bancario: las hipotecas, los préstamos empresariales y el consumo financiado se vuelven más caros. Esto reduce la demanda agregada y frena la espiral salarial. Sin embargo, la transmisión tarda 12-18 meses en afectar plenamente a la economía real. Además, este mecanismo es eficaz contra la inflación de demanda y monetaria, pero poco eficaz contra la inflación de costes (como una crisis energética).',
+        text: 'Cuando el BCE sube el tipo de interés de referencia (la tasa de interés de referencia, como se dice en Latinoamérica), encarece el crédito bancario: las hipotecas, los préstamos empresariales y el consumo financiado se vuelven más caros. Esto reduce la demanda agregada y frena la espiral salarial. Sin embargo, la transmisión tarda 12-18 meses en afectar plenamente a la economía real. Además, este mecanismo es eficaz contra la inflación de demanda y monetaria, pero poco eficaz contra la inflación de costes (como una crisis energética).',
       },
     },
     {

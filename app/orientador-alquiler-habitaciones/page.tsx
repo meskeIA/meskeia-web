@@ -73,10 +73,10 @@ export default function OrientadorAlquilerHabitacionesPage() {
 
         <header className={styles.hero}>
           <h1 className={styles.title}>
-            <span aria-hidden="true">🏠</span> Orientador Alquiler por Habitaciones
+            <span aria-hidden="true">🏠</span> Orientador Alquiler (Arriendo) por Habitaciones
           </h1>
           <p className={styles.subtitle}>
-            Reglas del alquiler por habitaciones en zona tensionada — España 2026
+            Reglas del alquiler (arriendo) por habitaciones en zona tensionada — España 2026
           </p>
         </header>
 
@@ -245,7 +245,7 @@ export default function OrientadorAlquilerHabitacionesPage() {
 
         {/* Contenido educativo v2.0 */}
         <EducationalSection
-          title="Todo sobre el alquiler por habitaciones"
+          title="Todo sobre el alquiler (arriendo) por habitaciones"
           subtitle="Normativa, derechos y preguntas frecuentes"
         >
           <section className={styles.guideSection}>
@@ -308,8 +308,8 @@ export default function OrientadorAlquilerHabitacionesPage() {
 
             <h2><span aria-hidden="true">❓</span> Preguntas frecuentes</h2>
 
-            <h3>¿Qué normativa regula el alquiler por habitaciones?</h3>
-            <p>La Ley 12/2023 de Vivienda (zonas tensionadas), la Proposición de Ley de regulación de alquileres temporales y de habitaciones (en vigor desde enero 2026), y el RDL 8/2026 (tope del 2% y prórroga extraordinaria).</p>
+            <h3>¿Qué normativa regula el alquiler (arriendo) por habitaciones?</h3>
+            <p>En España, el alquiler por habitaciones (lo que en buena parte de Latinoamérica se conoce como arriendo o arrendamiento de habitaciones) se rige por la Ley 12/2023 de Vivienda (zonas tensionadas), la Proposición de Ley de regulación de alquileres temporales y de habitaciones (en vigor desde enero 2026), y el RDL 8/2026 (tope del 2% y prórroga extraordinaria).</p>
 
             <h3>¿Puedo cobrar más por una habitación grande?</h3>
             <p>Sí, puedes distribuir la renta total entre habitaciones como prefieras (por ejemplo, más por las exteriores o con baño propio). Lo que no puedes es que la suma supere el techo del piso completo.</p>

@@ -895,7 +895,7 @@ export default function CalculadoraInflacionPage() {
             <div className={styles.faqItem}>
               <h4>❓ ¿Cuándo es mejor pedir una hipoteca: con inflación alta o baja?</h4>
               <p>
-                Con inflación alta, los tipos de interés suben (el BCE sube el euríbor para frenar la inflación), lo que encarece las hipotecas. Sin embargo, si la inflación es persistente y tu salario sube con ella, la cuota hipotecaria se vuelve relativamente más barata en términos reales con el tiempo. La lección del 2022: pedir hipoteca variable justo antes de una subida inflacionaria es muy arriesgado. Una hipoteca fija protege de este escenario.
+                Con inflación alta, los tipos de interés (la tasa de interés que pagas por el crédito) suben (el BCE sube el euríbor para frenar la inflación), lo que encarece las hipotecas. Sin embargo, si la inflación es persistente y tu salario sube con ella, la cuota hipotecaria se vuelve relativamente más barata en términos reales con el tiempo. La lección del 2022: pedir hipoteca variable justo antes de una subida inflacionaria es muy arriesgado. Una hipoteca fija protege de este escenario.
               </p>
               <p className={styles.faqTip}>💡 <strong>Estrategia:</strong> En momentos de inflación baja y tipos bajos = hipoteca fija para asegurar condiciones. En momentos de tipos altos = hipoteca variable apostando a que bajen (más riesgo).</p>
             </div>
@@ -1003,8 +1003,8 @@ export default function CalculadoraInflacionPage() {
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>🔄</span>
-              <h4>Inflación y tipos van juntos</h4>
-              <p>Inflación alta → BCE sube tipos → euríbor sube → hipotecas variables más caras. Inflación baja → BCE baja tipos → mejores condiciones de crédito. El ciclo inflacionario impacta directamente en el coste de tu deuda.</p>
+              <h4>Inflación y tipos de interés van juntos</h4>
+              <p>Inflación alta → BCE sube el tipo de interés (también llamado tasa de interés) → euríbor sube → hipotecas variables más caras. Inflación baja → BCE baja tipos → mejores condiciones de crédito. El ciclo inflacionario impacta directamente en el coste de tu deuda.</p>
             </div>
           </div>
         </section>

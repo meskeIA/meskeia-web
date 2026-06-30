@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description:
     'Pon a prueba tus conocimientos de inversión con 25 preguntas intermedias: ratio de Sharpe, beta, duration de bonos, TER de fondos, rebalanceo y valoración. Con explicaciones detalladas.',
   keywords:
-    'quiz inversión, ratio sharpe, beta acción, duration bonos, TER fondos, rebalanceo cartera, gestión activa pasiva, PER valoración, conceptos inversión avanzados',
+    'quiz inversión, conceptos de inversión, ratio sharpe, beta acción, duration bonos, TER fondos, rebalanceo cartera, gestión activa pasiva, PER valoración, conceptos inversión avanzados, tipos de interés, tasas de interés',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -84,10 +84,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Qué es la duration de un bono y por qué importa cuando suben los tipos de interés?',
+      name: '¿Qué es la duration de un bono y por qué importa cuando suben los tipos de interés (tasas de interés)?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La duration mide la sensibilidad del precio de un bono ante cambios en los tipos de interés, expresada en años. Si la duration es 7, un alza de 1 punto porcentual en los tipos reduce el precio del bono aproximadamente un 7%. Bonos con duration alta son más volátiles ante cambios en tipos; los de duration corta son más estables. Por eso, cuando suben los tipos, los fondos de renta fija a largo plazo sufren más pérdidas.',
+        text: 'La duration mide la sensibilidad del precio de un bono ante cambios en los tipos de interés (tasas de interés en Latinoamérica), expresada en años. Si la duration es 7, un alza de 1 punto porcentual en los tipos reduce el precio del bono aproximadamente un 7%. Bonos con duration alta son más volátiles ante cambios en tipos; los de duration corta son más estables. Por eso, cuando suben los tipos, los fondos de renta fija a largo plazo sufren más pérdidas.',
       },
     },
   ],

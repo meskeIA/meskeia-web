@@ -476,8 +476,9 @@ export default function VisualizadorMercadoInmobiliario() {
         <section className={styles.seccion}>
           <h2 className={styles.tituloSeccion}>Alquiler vs compra — ¿qué compensa?</h2>
           <p className={styles.descripcionSeccion}>
-            No existe una respuesta universal. Depende del mercado local, horizonte temporal y
-            situación personal. Aquí los factores clave de cada opción.
+            El alquiler (arriendo) frente a la compra no tiene una respuesta universal. Depende del
+            mercado local, el horizonte temporal y la situación personal. Aquí los factores clave de
+            cada opción.
           </p>
 
           <div className={styles.vsGrid}>
@@ -548,8 +549,8 @@ export default function VisualizadorMercadoInmobiliario() {
 
           <div className={styles.warningBox} role="note">
             Los datos de precios mostrados en este visualizador son aproximaciones representativas con
-            fines exclusivamente educativos. Antes de tomar cualquier decisión de compra, alquiler o
-            inversión inmobiliaria, consulta fuentes oficiales (INE, Banco de España, Ministerio de
+            fines exclusivamente educativos. Antes de tomar cualquier decisión de compra, alquiler
+            (arriendo) o inversión inmobiliaria, consulta fuentes oficiales (INE, Banco de España, Ministerio de
             Vivienda) y asesórate con profesionales del sector.
           </div>
         </EducationalSection>

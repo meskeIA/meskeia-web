@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Estimador de Inflación - Poder Adquisitivo Histórico | meskeIA',
   description: 'Calcula cómo la inflación afecta tu dinero. Datos del IPC del INE desde 1961. Descubre cuánto valían tus euros en el pasado y cuánto necesitas hoy.',
-  keywords: 'inflacion, ipc, poder adquisitivo, ine, precios, coste vida, devaluacion, calculadora inflacion, españa, historico',
+  keywords: 'inflacion, ipc, poder adquisitivo, ine, precios, coste vida, devaluacion, calculadora inflacion, tipo de interes, tasa de interes, españa, historico',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -80,10 +80,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Por qué mis ahorros en el banco pierden valor si la inflación supera al tipo de interés?',
+      name: '¿Por qué mis ahorros en el banco pierden valor si la inflación supera al tipo de interés (tasa de interés)?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Cuando la inflación es mayor que la rentabilidad de tu depósito o cuenta, el rendimiento real es negativo: aunque el saldo nominal crece, la capacidad de compra de ese dinero disminuye. Por ejemplo, si tienes un depósito al 1% pero la inflación es del 4%, pierdes en términos reales un 3% de poder adquisitivo cada año. Por eso los ahorradores buscan inversiones con rendimiento real positivo (por encima de la inflación).',
+        text: 'Cuando la inflación es mayor que la rentabilidad de tu depósito o cuenta, el rendimiento real es negativo: aunque el saldo nominal crece, la capacidad de compra de ese dinero disminuye. Por ejemplo, si tienes un depósito al 1% (ese tipo de interés o tasa de interés) pero la inflación es del 4%, pierdes en términos reales un 3% de poder adquisitivo cada año. Por eso los ahorradores buscan inversiones con rendimiento real positivo (por encima de la inflación).',
       },
     },
   ],

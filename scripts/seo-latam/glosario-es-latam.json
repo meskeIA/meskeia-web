@@ -53,7 +53,7 @@
       "dominio": "finanzas",
       "es": ["tipo de interes", "tipos de interes"],
       "latam": ["tasa de interes", "tasas de interes"],
-      "nota": "interest rate. ALTA PRIORIDAD: afecta a muchas apps de finanzas. RESUELTO en visualizador-tipos-interes-bce (2026-06-30): tipo/tasa de interes en H1/title/body/FAQ ('BCE' intacto). Quedan: quiz-conceptos-inversion, visualizador-inflacion, visualizador-macroeconomia, visualizador-oferta-demanda."
+      "nota": "interest rate. ALTA PRIORIDAD: afecta a muchas apps de finanzas. RESUELTO (2026-06-30) en visualizador-tipos-interes-bce, estimador-inflacion, quiz-conceptos-inversion, visualizador-inflacion, visualizador-macroeconomia. Queda solo visualizador-oferta-demanda (pendiente tanda STEM)."
     },
     {
       "dominio": "finanzas",
@@ -65,7 +65,7 @@
       "dominio": "vivienda",
       "es": ["alquiler", "alquilar"],
       "latam": ["arriendo", "arrendar"],
-      "nota": "rent. Se omite 'renta/rentar' porque choca con renta=ingreso/IRPF (declaracion de la renta)"
+      "nota": "rent. Se omite 'renta/rentar' porque choca con renta=ingreso/IRPF (declaracion de la renta). RESUELTO (2026-06-30) en orientador-alquiler-habitaciones, selector-alquiler-vs-compra, selector-seguro-hogar, selector-tipo-vivienda, visualizador-mercado-inmobiliario. Resto con 'alquiler' es es-only (fiscal)."
     },
     {
       "dominio": "vivienda",

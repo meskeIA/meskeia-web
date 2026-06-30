@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Selector de Tipo de Vivienda — ¿Piso, casa, ático o estudio? | meskeIA',
-  description: 'Test de 10 preguntas para saber qué tipo de vivienda se adapta mejor a tu situación: piso estándar, casa unifamiliar, ático/dúplex, estudio/apartamento o piso compartido. Análisis según familia, presupuesto y estilo de vida.',
-  keywords: ['qué tipo de vivienda comprar', 'piso o casa unifamiliar', 'ático o piso estándar', 'estudio o piso', 'vivienda para familia España', 'piso compartido o propio', 'casa con jardín o piso', 'tipo de vivienda según presupuesto', 'dónde vivir con hijos España', 'comprar o alquilar qué tipo'],
+  description: 'Test de 10 preguntas para saber qué tipo de vivienda se adapta mejor a tu situación: piso estándar, casa unifamiliar, ático/dúplex, estudio/apartamento o piso compartido. Análisis según familia, presupuesto y estilo de vida, tanto si vas a comprar como a alquilar (arrendar).',
+  keywords: ['qué tipo de vivienda comprar', 'piso o casa unifamiliar', 'ático o piso estándar', 'estudio o piso', 'vivienda para familia España', 'piso compartido o propio', 'casa con jardín o piso', 'tipo de vivienda según presupuesto', 'dónde vivir con hijos España', 'comprar o alquilar qué tipo', 'qué tipo de vivienda arrendar', 'piso o casa en arriendo'],
   openGraph: {
     title: '¿Piso, casa o ático? Test de tipo de vivienda | meskeIA',
     description: 'Descubre qué tipo de vivienda se adapta mejor a tu familia, presupuesto y estilo de vida con este test de 10 preguntas.',
@@ -88,10 +88,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Qué hay que tener en cuenta al elegir entre comprar y alquilar según el tipo de vivienda?',
+      name: '¿Qué hay que tener en cuenta al elegir entre comprar y alquilar (arrendar) según el tipo de vivienda?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Al comprar, el tipo de vivienda condiciona la hipoteca, los gastos de mantenimiento y la revalorización futura. Las casas unifamiliares suelen revalorizarse más en zonas en crecimiento, pero son menos líquidas. Los pisos en ciudades medianas o grandes tienen mayor demanda en el mercado de alquiler y venta. Al alquilar, la elección del tipo de vivienda depende principalmente del presupuesto mensual y de la duración prevista de la estancia en esa ciudad.',
+        text: 'Al comprar, el tipo de vivienda condiciona la hipoteca, los gastos de mantenimiento y la revalorización futura. Las casas unifamiliares suelen revalorizarse más en zonas en crecimiento, pero son menos líquidas. Los pisos en ciudades medianas o grandes tienen mayor demanda en el mercado de alquiler (arriendo) y venta. Al alquilar o arrendar, la elección del tipo de vivienda depende principalmente del presupuesto mensual y de la duración prevista de la estancia en esa ciudad.',
       },
     },
   ],

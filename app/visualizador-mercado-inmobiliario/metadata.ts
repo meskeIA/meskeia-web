@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Mercado Inmobiliario: Burbuja, Accesibilidad y Ciudades — meskeIA',
   description:
-    'Visualizador del mercado de vivienda español. Curvas oferta/demanda interactivas, burbuja 2008, ratio precio/renta por ciudad, accesibilidad generacional y alquiler vs compra.',
+    'Visualizador del mercado de vivienda español. Curvas oferta/demanda interactivas, burbuja 2008, ratio precio/renta por ciudad, accesibilidad generacional y alquiler (arriendo) vs compra.',
   keywords: [
     'mercado inmobiliario España',
     'burbuja inmobiliaria 2008',
@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     'ratio precio renta vivienda',
     'accesibilidad vivienda millennials',
     'alquiler vs compra España',
+    'arriendo vs compra vivienda',
     'oferta demanda vivienda',
     'precio vivienda Madrid Barcelona',
   ],
@@ -70,7 +71,7 @@ export const faqJsonLd = {
       name: '¿Cuándo es mejor alquilar que comprar una vivienda?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Financieramente, el alquiler puede ser más ventajoso cuando el precio de compra supera 20-25 veces el alquiler anual equivalente (ratio precio/alquiler), cuando el horizonte de permanencia es inferior a 5-7 años, o cuando el capital para la entrada tiene una rentabilidad alternativa clara. La compra suele ser más favorable en zonas con alta revalorización esperada, tipos hipotecarios bajos y estabilidad laboral a largo plazo.',
+        text: 'Financieramente, el alquiler (arriendo) puede ser más ventajoso cuando el precio de compra supera 20-25 veces el alquiler anual equivalente (ratio precio/alquiler), cuando el horizonte de permanencia es inferior a 5-7 años, o cuando el capital para la entrada tiene una rentabilidad alternativa clara. La compra suele ser más favorable en zonas con alta revalorización esperada, tipos hipotecarios bajos y estabilidad laboral a largo plazo.',
       },
     },
     {

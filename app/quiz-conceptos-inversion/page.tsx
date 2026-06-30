@@ -123,7 +123,7 @@ const PREGUNTAS: Pregunta[] = [
   // ── Renta Fija y Bonos ──
   {
     id: 6, categoria: 'renta-fija',
-    pregunta: '¿Qué ocurre con el precio de un bono cuando suben los tipos de interés?',
+    pregunta: '¿Qué ocurre con el precio de un bono cuando suben los tipos de interés (tasas de interés)?',
     opciones: [
       'El precio sube, porque el bono paga más cupón',
       'El precio no cambia, porque el cupón está fijado',
@@ -131,7 +131,7 @@ const PREGUNTAS: Pregunta[] = [
       'El precio sube o baja según el rating del emisor',
     ],
     correcta: 2,
-    explicacion: 'Precio y tipos de interés de los bonos se mueven en direcciones opuestas. Si suben los tipos, los nuevos bonos ofrecen mayor cupón que el tuyo → tu bono pierde atractivo → su precio de mercado cae. Esta relación inversa es fundamental en renta fija. Los bonos de mayor duración son más sensibles a los movimientos de tipos.',
+    explicacion: 'Precio y tipos de interés (tasas de interés) de los bonos se mueven en direcciones opuestas. Si suben los tipos, los nuevos bonos ofrecen mayor cupón que el tuyo → tu bono pierde atractivo → su precio de mercado cae. Esta relación inversa es fundamental en renta fija. Los bonos de mayor duración son más sensibles a los movimientos de tipos.',
   },
   {
     id: 7, categoria: 'renta-fija',
@@ -662,7 +662,7 @@ export default function QuizConceptosInversionPage() {
               <tbody>
                 <tr><td><strong>Ratio de Sharpe</strong></td><td>Rentabilidad por unidad de riesgo total</td><td>&gt; 1 es bueno, &gt; 2 es excelente</td></tr>
                 <tr><td><strong>Beta</strong></td><td>Sensibilidad al mercado</td><td>1 = mercado, &gt;1 más volátil, &lt;1 menos volátil</td></tr>
-                <tr><td><strong>Duration</strong></td><td>Sensibilidad del bono a tipos de interés</td><td>A más duración, más riesgo de tipo</td></tr>
+                <tr><td><strong>Duration</strong></td><td>Sensibilidad del bono a tipos de interés (tasas de interés)</td><td>A más duración, más riesgo de tipo</td></tr>
                 <tr><td><strong>TER</strong></td><td>Coste anual total del fondo</td><td>ETF indexado: 0,05–0,20%; activo: 1–2%</td></tr>
                 <tr><td><strong>Tracking error</strong></td><td>Fidelidad de réplica al índice</td><td>Cuanto menor, mejor réplica</td></tr>
                 <tr><td><strong>PER</strong></td><td>Años de beneficios para recuperar el precio</td><td>Depende del sector y crecimiento esperado</td></tr>

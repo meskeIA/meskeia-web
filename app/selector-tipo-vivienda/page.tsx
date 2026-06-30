@@ -488,12 +488,12 @@ export default function SelectorTipoVivienda() {
 
         <h3>Estudio y apartamento: eficiencia para personas solas</h3>
         <p>
-          Los estudios (habitualmente entre 20 y 45 m²) son la opción más económica para una persona que vive sola, trabaja fuera de casa y no necesita espacio adicional. Su menor superficie reduce la factura energética y los gastos de comunidad. En contrapartida, la falta de espacio puede resultar limitante si la situación familiar cambia o si se necesita trabajar regularmente desde casa.
+          Los estudios (habitualmente entre 20 y 45 m²) son la opción más económica para una persona que vive sola, trabaja fuera de casa y no necesita espacio adicional, tanto en compra como en alquiler (arriendo). Su menor superficie reduce la factura energética y los gastos de comunidad. En contrapartida, la falta de espacio puede resultar limitante si la situación familiar cambia o si se necesita trabajar regularmente desde casa.
         </p>
 
         <h3>Cómo cambian las necesidades según el ciclo vital</h3>
         <p>
-          Las necesidades de vivienda evolucionan: un estudiante puede comenzar con una habitación en piso compartido, saltar a un estudio al independizarse, mudarse a un piso estándar con su pareja y plantearse una casa unifamiliar al tener hijos. Con la llegada del «nido vacío» (hijos independizados), muchas familias vuelven a un piso más pequeño o a un ático con buenas vistas. Anticipar este recorrido vital ayuda a tomar decisiones más acertadas.
+          Las necesidades de vivienda evolucionan: un estudiante puede comenzar alquilando (arrendando) una habitación en piso compartido, saltar a un estudio al independizarse, mudarse a un piso estándar con su pareja y plantearse una casa unifamiliar al tener hijos. Con la llegada del «nido vacío» (hijos independizados), muchas familias vuelven a un piso más pequeño o a un ático con buenas vistas. Anticipar este recorrido vital ayuda a tomar decisiones más acertadas.
         </p>
 
         <h3>Gastos adicionales al comprar cualquier tipo de vivienda</h3>

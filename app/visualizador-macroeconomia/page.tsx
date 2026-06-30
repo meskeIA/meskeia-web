@@ -107,7 +107,7 @@ const CONCEPTOS: Concepto[] = [
     ejemploActual:
       'Entre 2022 y 2023 el BCE subió los tipos del 0 % a más del 4 % en poco más de un año para combatir la inflación. Las hipotecas variables se encarecieron de golpe y el mercado inmobiliario se enfrió.',
     paraLlevar:
-      'Los tipos de interés que decide un banco central acaban llegando a tu hipoteca, tus ahorros y tu empleo.',
+      'Los tipos de interés (o tasas de interés) que decide un banco central acaban llegando a tu hipoteca, tus ahorros y tu empleo.',
     enlace: { texto: 'Cómo crea dinero un banco: Cómo Funciona un Banco', url: '/visualizador-como-funciona-banco/' },
   },
   {
@@ -578,7 +578,8 @@ export default function VisualizadorMacroeconomiaPage() {
           <h3 className={styles.eduTitulo}>Las dos grandes palancas: monetaria y fiscal</h3>
           <p className={styles.eduTexto}>
             Para influir en la economía hay dos grandes herramientas. La <strong>política monetaria</strong> la maneja
-            el banco central a través de los tipos de interés y la cantidad de dinero. La <strong>política fiscal</strong>{' '}
+            el banco central a través de los tipos de interés (las tasas de interés, como se las conoce en buena parte
+            de Latinoamérica) y la cantidad de dinero. La <strong>política fiscal</strong>{' '}
             la maneja el Gobierno mediante impuestos y gasto público. Suelen coordinarse, pero responden a instituciones
             distintas y a veces tiran en direcciones opuestas.
           </p>

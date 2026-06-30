@@ -246,7 +246,7 @@ const VEREDICTOS: Record<VeredictoKey, {
     coberturaRecomendada: [
       'Valoración pericial del continente y contenido',
       'Cobertura específica de equipos electrónicos portátiles',
-      'Seguro de segunda residencia o de alquiler si procede',
+      'Seguro de segunda residencia o de alquiler (arriendo) si procede',
     ],
     razones: [
       'Tu vivienda o contenido tienen valor elevado',
@@ -534,6 +534,8 @@ export default function SelectorSeguroHogar() {
               continente es responsabilidad del propietario; tú solo necesitas asegurar tu contenido y una
               buena responsabilidad civil por daños que puedas causar. Un seguro de inquilino puede costar
               desde 60-100 €/año y te protege de situaciones como una fuga tuya que inunde al vecino de abajo.
+              Tanto si hablamos de alquiler como de arriendo, el reparto es el mismo: el dueño asegura el
+              inmueble y quien arrienda protege sus propias pertenencias y su responsabilidad civil.
             </p>
 
             <h3>Cómo comparar seguros sin caer en trampas</h3>

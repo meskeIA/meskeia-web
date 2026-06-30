@@ -624,7 +624,7 @@ export default function VisualizadorInflacion() {
           {/* Slider interactivo */}
           <div className={styles.sliderSection}>
             <h3 className={styles.sliderT}>Tradeoff: tipos de interés vs economía real</h3>
-            <p className={styles.sliderSub}>Mueve el slider para ver el tradeoff entre inflación y crecimiento</p>
+            <p className={styles.sliderSub}>Mueve el slider para ver el tradeoff entre inflación y crecimiento al variar los tipos de interés (las tasas de interés, como se conocen en Latinoamérica)</p>
 
             <label htmlFor="slider-tipos" className={styles.sliderLabel}>
               Subida de tipos del BCE: <strong>{tiposSlider}%</strong>
@@ -684,7 +684,7 @@ export default function VisualizadorInflacion() {
               Cero inflación parece el ideal, pero tiene problemas: (1) Los precios y salarios son rígidos
               a la baja — es más fácil congelarlos que bajarlos. Un colchón del 2% permite ajustes relativos
               sin recortes nominales. (2) Si la inflación está en 0%, cualquier shock deflacionario la lleva
-              a negativo, territorio muy difícil de abandonar (problema del límite inferior del 0% de tipos).
+              a negativo, territorio muy difícil de abandonar (problema del límite inferior del 0% de los tipos de interés, también llamados tasas de interés en Latinoamérica).
             </p>
           </div>
           <div className={styles.eduBloque}>

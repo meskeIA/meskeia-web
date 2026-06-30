@@ -2,10 +2,12 @@ import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Selector de Alquiler o Compra — ¿Qué te conviene? | meskeIA',
-  description: 'Test de 10 preguntas para saber si te conviene más alquilar o comprar vivienda según tu situación personal, laboral y vital. Sin cálculos, solo tu contexto real.',
+  title: 'Selector de Alquiler (Arriendo) o Compra — ¿Qué te conviene? | meskeIA',
+  description: 'Test de 10 preguntas para saber si te conviene más alquilar (arrendar) o comprar vivienda según tu situación personal, laboral y vital. Sin cálculos, solo tu contexto real.',
   keywords: [
     'alquilar o comprar vivienda',
+    'arrendar vs comprar',
+    'arriendo vs compra',
     'me conviene comprar piso',
     'test alquiler vs compra',
     'cuándo comprar casa España',
@@ -17,7 +19,7 @@ export const metadata: Metadata = {
     'alquiler vs hipoteca España',
   ],
   openGraph: {
-    title: '¿Alquilar o comprar? Test en 10 preguntas | meskeIA',
+    title: '¿Alquilar (arrendar) o comprar? Test en 10 preguntas | meskeIA',
     description: 'Antes de los números, analiza tu situación vital real. Estabilidad laboral, horizonte temporal, mercado local y más. Resultado: alquila, compra o espera.',
     type: 'website',
     locale: 'es_ES',
@@ -57,8 +59,8 @@ export const metadata: Metadata = {
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: "Selector de Alquiler o Compra",
-  description: "Test de 10 preguntas para saber si te conviene más alquilar o comprar vivienda según tu situación personal, laboral y vital. Sin cálculos, solo tu contexto real.",
+  name: "Selector de Alquiler (Arriendo) o Compra",
+  description: "Test de 10 preguntas para saber si te conviene más alquilar (arrendar) o comprar vivienda según tu situación personal, laboral y vital. Sin cálculos, solo tu contexto real.",
   url: "https://meskeia.com/selector-alquiler-vs-compra/",
   category: 'FinanceApplication',
   features: [],
@@ -70,10 +72,10 @@ export const faqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿Cuándo conviene más alquilar que comprar una vivienda?',
+      name: '¿Cuándo conviene más alquilar (arrendar) que comprar una vivienda?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Alquilar suele ser más conveniente cuando tu situación laboral o personal es inestable, cuando planeas cambiar de ciudad en los próximos 5 años, cuando no tienes ahorros suficientes para la entrada (generalmente el 20-30% del precio más gastos), o cuando los precios de compra en tu zona son muy elevados respecto a los alquileres. La flexibilidad del alquiler tiene un valor real que los cálculos puramente financieros no siempre capturan.',
+        text: 'Alquilar (lo que en buena parte de Latinoamérica se denomina arrendar) suele ser más conveniente cuando tu situación laboral o personal es inestable, cuando planeas cambiar de ciudad en los próximos 5 años, cuando no tienes ahorros suficientes para la entrada (generalmente el 20-30% del precio más gastos), o cuando los precios de compra en tu zona son muy elevados respecto a los alquileres. La flexibilidad del alquiler tiene un valor real que los cálculos puramente financieros no siempre capturan.',
       },
     },
     {

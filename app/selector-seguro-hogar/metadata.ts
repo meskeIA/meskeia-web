@@ -3,7 +3,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Selector de Seguro de Hogar — ¿Qué cobertura necesitas? | meskeIA',
-  description: 'Test de 10 preguntas para saber qué tipo de seguro de hogar te conviene: cobertura básica, multirriesgo estándar o completa. Según vivienda, zona, contenido y prioridades.',
+  description: 'Test de 10 preguntas para saber qué tipo de seguro de hogar te conviene: cobertura básica, multirriesgo estándar o completa. Según vivienda, zona, contenido y prioridades. Útil seas propietario o estés de alquiler (arriendo).',
   keywords: [
     'qué seguro de hogar contratar',
     'selector seguro hogar',
@@ -11,6 +11,7 @@ export const metadata: Metadata = {
     'multirriesgo hogar España',
     'cobertura seguro vivienda',
     'seguro hogar propietario inquilino',
+    'seguro hogar alquiler arriendo',
     'qué cubre el seguro de hogar',
     'seguro hogar piso',
     'contratar seguro hogar España',
@@ -78,10 +79,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿El seguro de hogar es obligatorio si vivo de alquiler?',
+      name: '¿El seguro de hogar es obligatorio si vivo de alquiler (arriendo)?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'No es legalmente obligatorio para el inquilino en España, aunque muchos contratos de arrendamiento lo exigen. El propietario suele tener su propio seguro de continente; el inquilino es responsable del contenido de la vivienda y de su responsabilidad civil frente a terceros. Contratar un seguro de hogar para inquilinos (que cubre contenido + RC) es muy recomendable porque protege los bienes propios y cubre daños accidentales a la vivienda o a vecinos.',
+        text: 'No es legalmente obligatorio para el inquilino en España, aunque muchos contratos de arrendamiento (arriendo) lo exigen. El propietario suele tener su propio seguro de continente; el inquilino es responsable del contenido de la vivienda y de su responsabilidad civil frente a terceros. Contratar un seguro de hogar para inquilinos (que cubre contenido + RC) es muy recomendable porque protege los bienes propios y cubre daños accidentales a la vivienda o a vecinos.',
       },
     },
     {
