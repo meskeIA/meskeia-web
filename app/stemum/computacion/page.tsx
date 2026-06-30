@@ -70,6 +70,12 @@ const APPS = [
     slug: 'simulador-planificador-procesos',
   },
   {
+    icon: '🔀',
+    titulo: 'Concurrencia y semáforos',
+    desc: 'Ejecuta hilos paso a paso: provoca condiciones de carrera, resuelve el productor-consumidor y reproduce el deadlock de los filósofos comensales.',
+    slug: 'simulador-concurrencia',
+  },
+  {
     icon: '📄',
     titulo: 'Reemplazo de páginas',
     desc: 'FIFO, LRU, Óptimo, Clock y LFU con tabla matricial, comparativa y detección de la anomalía de Belady.',

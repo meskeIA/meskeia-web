@@ -3023,10 +3023,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // SIMULADORES INFORMÁTICA FP/UNIVERSIDAD — Tanda 1 (2026-05-07)
   'simulador-planificador-procesos': [
+    { url: '/simulador-concurrencia/', icon: '🔀', name: 'Concurrencia', description: 'Semáforos, carreras y deadlock' },
     { url: '/simulador-reemplazo-paginas/', icon: '🧩', name: 'Reemplazo de Páginas', description: 'FIFO, LRU, Optimal, Clock, LFU' },
     { url: '/visualizador-sistemas-operativos/', icon: '💻', name: 'Sistemas Operativos', description: 'Procesos, hilos, memoria y E/S' },
-    { url: '/simulador-puertas-logicas/', icon: '🔌', name: 'Puertas Lógicas', description: 'Circuitos digitales y álgebra booleana' },
     { url: '/simulador-ordenacion/', icon: '📊', name: 'Algoritmos Ordenación', description: '7 algoritmos paso a paso' },
+  ],
+  'simulador-concurrencia': [
+    { url: '/simulador-planificador-procesos/', icon: '⏱️', name: 'Planificador de Procesos', description: 'FCFS, SJF, Round Robin, Priority' },
+    { url: '/visualizador-sistemas-operativos/', icon: '💻', name: 'Sistemas Operativos', description: 'Procesos, hilos, memoria y E/S' },
+    { url: '/simulador-reemplazo-paginas/', icon: '🧩', name: 'Reemplazo de Páginas', description: 'FIFO, LRU, Optimal, Clock, LFU' },
+    { url: '/glosario-programacion/', icon: '📖', name: 'Glosario Programación', description: 'Términos clave A-Z' },
   ],
   'simulador-reemplazo-paginas': [
     { url: '/simulador-planificador-procesos/', icon: '⏱️', name: 'Planificador de Procesos', description: 'FCFS, SJF, Round Robin, Priority' },
