@@ -89,7 +89,7 @@
       "dominio": "vehiculos",
       "es": ["coche", "coches"],
       "latam": ["carro", "carros", "auto", "autos"],
-      "nota": "car. PARCIAL: RESUELTO en comparador-electrico (2026-06-30): coche/carro/auto electrico en H1/title/body. RESUELTO tambien en comparador-transporte-viaje (2026-06-30): coche/carro/auto en title/H1/body/FAQ. Quedan otras apps con 'coche' (calculadora-combustible, selector-seguro-coche, simulador-monty-hall, visualizador-efecto-doppler, comparador-electrico hecho, etc.)."
+      "nota": "car. PARCIAL: RESUELTO en comparador-electrico (2026-06-30): coche/carro/auto electrico en H1/title/body. RESUELTO tambien (2026-06-30) en comparador-transporte-viaje, comparador-electrico, calculadora-combustible, checklist-coberturas-seguros, selector-movilidad-urbana, selector-seguro-coche, simulador-monty-hall, visualizador-efecto-doppler, visualizador-motor-electrico. Clúster 'coche' AGOTADO."
     },
     {
       "dominio": "vehiculos",

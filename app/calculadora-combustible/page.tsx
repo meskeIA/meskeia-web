@@ -100,7 +100,7 @@ export default function CalculadoraCombustiblePage() {
       <header className={styles.hero}>
         <h1 className={styles.title}>Calculadora de Consumo de Combustible</h1>
         <p className={styles.subtitle}>
-          Calcula el consumo de tu vehículo y el coste de tus viajes
+          Calcula el consumo de tu coche (carro o auto) y el coste de tus viajes
         </p>
       </header>
 
@@ -350,7 +350,7 @@ export default function CalculadoraCombustiblePage() {
         </div>
       </div>
 
-      <EducationalSection title="Todo sobre el consumo de combustible" subtitle="Aprende a calcular el gasto real de tu vehículo, comparar combustibles y reducir el coste por kilómetro">
+      <EducationalSection title="Todo sobre el consumo de combustible" subtitle="Aprende a calcular el gasto real de tu coche, carro o auto, comparar combustibles y reducir el coste por kilómetro">
 
         {/* Tabla comparativa combustibles */}
         <h3 className={styles.eduSectionTitle}>⚖️ Gasolina vs Diésel vs GLP vs Eléctrico</h3>
@@ -436,9 +436,9 @@ export default function CalculadoraCombustiblePage() {
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
               <span className={styles.escenarioIcon}>🚗</span>
-              <h4>Comparar dos coches</h4>
+              <h4>Comparar dos coches (carros o autos)</h4>
             </div>
-            <p className={styles.escenarioDesc}>Coche A consume 5 L/100km, coche B consume 9 L/100km. Si recorres 15.000 km/año, la diferencia es <strong>600 L × 1,50 € = 900 €/año</strong>. En 5 años, 4.500 € de diferencia solo en combustible.</p>
+            <p className={styles.escenarioDesc}>El coche, carro o auto A consume 5 L/100km, el B consume 9 L/100km. Si recorres 15.000 km/año, la diferencia es <strong>600 L × 1,50 € = 900 €/año</strong>. En 5 años, 4.500 € de diferencia solo en combustible.</p>
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>

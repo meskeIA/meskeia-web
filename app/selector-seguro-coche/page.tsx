@@ -429,10 +429,11 @@ export default function SelectorSeguroCochePage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1><span aria-hidden="true">🚗</span> ¿Qué seguro de coche necesitas?</h1>
+        <h1><span aria-hidden="true">🚗</span> ¿Qué seguro de coche, carro o auto necesitas?</h1>
         <p>
-          Responde 10 preguntas y descubre si te conviene terceros básico, terceros
-          ampliado, todo riesgo con franquicia o todo riesgo sin franquicia.
+          Responde 10 preguntas y descubre qué seguro de coche (carro o auto) te conviene:
+          terceros básico, terceros ampliado, todo riesgo con franquicia o todo riesgo sin
+          franquicia.
         </p>
       </header>
 
@@ -553,16 +554,19 @@ export default function SelectorSeguroCochePage() {
 
       {/* Sección educativa v2.0 */}
       <EducationalSection
-        title="Todo sobre los seguros de coche en España"
+        title="Todo sobre los seguros de coche, carro o auto"
         subtitle="Guía completa para entender coberturas, precios y cómo elegir bien"
       >
         <section>
-          <h2>¿Qué tipos de seguro de coche existen en España?</h2>
+          <h2>¿Qué tipos de seguro de coche (carro o auto) existen?</h2>
           <p>
-            En España la ley obliga a tener contratado como mínimo un seguro de
-            responsabilidad civil (RC) obligatoria, que cubre los daños que puedas causar
-            a otras personas o sus bienes. A partir de ahí, cada compañía estructura sus
-            productos en cuatro grandes modalidades:
+            El seguro del vehículo recibe distintos nombres según el país (seguro de coche
+            en España, seguro de carro en Colombia o México, seguro de auto en Argentina o
+            Chile), pero la estructura de coberturas es muy similar. Normalmente se exige
+            por ley contratar como mínimo un seguro de responsabilidad civil (RC)
+            obligatoria, que cubre los daños que puedas causar a otras personas o sus
+            bienes. A partir de ahí, cada compañía estructura sus productos en cuatro
+            grandes modalidades:
           </p>
           <ul>
             <li>

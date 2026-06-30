@@ -455,7 +455,7 @@ export default function SimuladorMontyHallPage() {
           <p>
             El <strong>Problema de Monty Hall</strong> toma su nombre del presentador del concurso
             televisivo estadounidense <em>Let&apos;s Make a Deal</em>. La situación es aparentemente sencilla:
-            hay tres puertas, detrás de una hay un coche y detrás de las otras dos hay cabras.
+            hay tres puertas, detrás de una hay un coche (en Latinoamérica también se le llama <em>carro</em> o <em>auto</em>) y detrás de las otras dos hay cabras.
             El concursante elige una puerta; después, el presentador (que sabe dónde está el coche)
             abre <em>otra</em> puerta revelando una cabra; finalmente el concursante puede quedarse
             con su elección o cambiar a la puerta que queda cerrada.
@@ -517,7 +517,7 @@ export default function SimuladorMontyHallPage() {
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">🚪</span>
               <strong>Con 100 puertas</strong>
-              <p>Imagina 100 puertas, solo una con coche. Eliges la número 37. Monty abre 98 puertas con cabras y deja cerrada la número 82. ¿Cambiarías? La probabilidad de que el coche esté en la 82 es del 99 %. Con solo 3 puertas el efecto es idéntico, aunque menos obvio.</p>
+              <p>Imagina 100 puertas, solo una con el coche (carro o auto). Eliges la número 37. Monty abre 98 puertas con cabras y deja cerrada la número 82. ¿Cambiarías? La probabilidad de que el coche esté en la 82 es del 99 %. Con solo 3 puertas el efecto es idéntico, aunque menos obvio.</p>
             </div>
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">🎲</span>

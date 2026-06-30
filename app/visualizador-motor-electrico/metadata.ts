@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Motor Eléctrico: Cómo Funciona | meskeIA',
-  description: 'Visualiza el motor eléctrico: campo magnético rotante, estátor y rotor, inversor trifásico, frenado regenerativo y ventajas termodinámicas frente al motor de combustión.',
-  keywords: ['motor eléctrico', 'campo magnético', 'estátor', 'rotor', 'inversor', 'regeneración', 'coche eléctrico'],
+  description: 'Visualiza el motor eléctrico: campo magnético rotante, estátor y rotor, inversor trifásico, frenado regenerativo y ventajas termodinámicas frente al motor de combustión. Aplicado al coche eléctrico (carro o auto eléctrico).',
+  keywords: ['motor eléctrico', 'campo magnético', 'estátor', 'rotor', 'inversor', 'regeneración', 'coche eléctrico', 'carro eléctrico', 'auto eléctrico'],
   openGraph: {
     title: 'Motor Eléctrico: Cómo Funciona | meskeIA',
     description: 'Del campo magnético rotante al frenado regenerativo: todos los principios del motor eléctrico visualizados.',
@@ -40,7 +40,7 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Qué es el frenado regenerativo en un coche eléctrico?',
+      name: '¿Qué es el frenado regenerativo en un coche eléctrico (carro o auto eléctrico)?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'El frenado regenerativo invierte el papel del motor: en lugar de consumir electricidad para mover el vehículo, usa la inercia del vehículo para generar electricidad y recargar la batería. Este proceso puede recuperar hasta el 20-30% de la energía cinética que de otro modo se perdería como calor en los frenos convencionales.',

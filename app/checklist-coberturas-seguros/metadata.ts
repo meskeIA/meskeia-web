@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Checklist de Coberturas de Seguros por Perfil | meskeIA',
-  description: 'Descubre qué seguros necesitas según tu perfil: autónomo, familia, jubilado, propietario o inquilino. Coberturas obligatorias vs recomendables en España.',
-  keywords: 'checklist seguros, coberturas recomendadas, seguros obligatorios España, seguros familia, seguros autónomo, seguros jubilado, qué seguros contratar',
+  description: 'Descubre qué seguros necesitas según tu perfil: autónomo, familia, jubilado, propietario o inquilino. Incluye seguro de coche (carro/auto), hogar, vida y salud. Coberturas obligatorias vs recomendables.',
+  keywords: 'checklist seguros, coberturas recomendadas, seguros obligatorios, seguros familia, seguros autónomo, seguros jubilado, qué seguros contratar, seguro de coche, seguro de carro, seguro de auto',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Checklist de Coberturas de Seguros por Perfil | meskeIA',
-    description: 'Descubre qué seguros necesitas según tu perfil. Guía de coberturas obligatorias y recomendables en España.',
+    description: 'Descubre qué seguros necesitas según tu perfil: coche (carro/auto), hogar, vida y salud. Coberturas obligatorias y recomendables.',
     url: 'https://meskeia.com/checklist-coberturas-seguros/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -64,10 +64,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Cuál es la diferencia entre seguro a todo riesgo y terceros ampliado en el coche?',
+      name: '¿Cuál es la diferencia entre seguro a todo riesgo y terceros ampliado en el coche (carro o auto)?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El seguro a terceros básico solo cubre los daños que causes a otros; el terceros ampliado añade coberturas como robo, incendio, cristales y asistencia en carretera. El todo riesgo incluye además los daños propios del vehículo aunque el accidente sea culpa tuya. Para coches de más de 8-10 años con valor de mercado bajo, el todo riesgo suele ser menos rentable que terceros ampliado bien configurado.',
+        text: 'En el seguro de coche (también llamado seguro de carro o de auto en Latinoamérica), el seguro a terceros básico solo cubre los daños que causes a otros; el terceros ampliado añade coberturas como robo, incendio, cristales y asistencia en carretera. El todo riesgo incluye además los daños propios del vehículo aunque el accidente sea culpa tuya. Para coches de más de 8-10 años con valor de mercado bajo, el todo riesgo suele ser menos rentable que terceros ampliado bien configurado.',
       },
     },
     {

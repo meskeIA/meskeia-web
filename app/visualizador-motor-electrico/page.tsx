@@ -467,6 +467,7 @@ export default function VisualizadorMotorElectrico(): React.ReactNode {
 
           <h3>Motor síncrono vs. asíncrono</h3>
           <p>
+            Es el mismo motor que mueve cualquier coche eléctrico (también llamado carro eléctrico o auto eléctrico en Latinoamérica).
             En el <strong>motor síncrono</strong> (Tesla Model 3, la mayoría de VEs modernos) el rotor lleva imanes permanentes y
             gira exactamente a la velocidad del campo rotante. En el <strong>motor asíncrono</strong> (Tesla Model S) el rotor
             tiene barras conductoras; el campo rotante induce corriente en ellas que crea su propio campo, con un pequeño
@@ -483,8 +484,8 @@ export default function VisualizadorMotorElectrico(): React.ReactNode {
           <h3>Densidad de par y refrigeración</h3>
           <p>
             Los motores eléctricos de alto rendimiento usan imanes de neodimio-hierro-boro (NdFeB), los más potentes conocidos.
-            La refrigeración es crítica: en motores de automoción se usa refrigeración líquida del estátor. El rotor, al no llevar
-            corriente (motores síncronos), genera mucho menos calor.
+            La refrigeración es crítica: en motores de automoción (los de un coche, carro o auto eléctrico) se usa refrigeración
+            líquida del estátor. El rotor, al no llevar corriente (motores síncronos), genera mucho menos calor.
           </p>
         </div>
       </EducationalSection>

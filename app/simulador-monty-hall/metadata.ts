@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Simulador del Problema de Monty Hall — Probabilidad Interactiva | meskeIA',
-  description: 'Simula el Problema de Monty Hall y descubre por qué cambiar de puerta gana 2 de cada 3 veces. Modo manual y automático con hasta 10.000 partidas.',
-  keywords: 'problema de Monty Hall, probabilidad condicional, simulador Monty Hall, cambiar de puerta, paradoja Monty Hall, estadística, probabilidad, Bayes, tres puertas, coche o cabra, Bachillerato, divulgación matemática',
+  description: 'Simula el Problema de Monty Hall y descubre por qué cambiar de puerta gana 2 de cada 3 veces. El premio es un coche (carro o auto) y detrás de las otras puertas hay cabras. Modo manual y automático con hasta 10.000 partidas.',
+  keywords: 'problema de Monty Hall, probabilidad condicional, simulador Monty Hall, cambiar de puerta, paradoja Monty Hall, estadística, probabilidad, Bayes, tres puertas, coche o cabra, carro o cabra, auto o cabra, Bachillerato, divulgación matemática',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -67,7 +67,7 @@ export const faqJsonLd = {
       name: '¿En qué consiste el Problema de Monty Hall?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El Problema de Monty Hall es un clásico de probabilidad condicional. Un concursante elige una de tres puertas: detrás de una hay un coche y detrás de las otras dos hay cabras. El presentador (que sabe dónde está el coche) abre una de las puertas no elegidas revelando una cabra y ofrece cambiar de puerta. La pregunta es: ¿conviene cambiar? La respuesta contraintuitiva es que cambiar dobla la probabilidad de ganar, pasando de 1/3 a 2/3.',
+        text: 'El Problema de Monty Hall es un clásico de probabilidad condicional. Un concursante elige una de tres puertas: detrás de una hay un coche (también llamado carro o auto en Latinoamérica) y detrás de las otras dos hay cabras. El presentador (que sabe dónde está el coche) abre una de las puertas no elegidas revelando una cabra y ofrece cambiar de puerta. La pregunta es: ¿conviene cambiar? La respuesta contraintuitiva es que cambiar dobla la probabilidad de ganar, pasando de 1/3 a 2/3.',
       },
     },
     {

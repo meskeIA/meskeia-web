@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Consumo de Combustible - Litros/100km y Coste | meskeIA',
-  description: 'Calcula el consumo de combustible de tu vehículo en L/100km. Conoce el coste por kilómetro y planifica tus viajes con precisión.',
-  keywords: 'calculadora consumo combustible, litros 100km, coste por kilómetro, consumo coche, gasolina, diesel, calculadora viaje',
+  description: 'Calcula el consumo de combustible de tu coche, carro o auto en L/100km. Conoce el coste por kilómetro y el gasto de gasolina de tus viajes con precisión.',
+  keywords: 'calculadora consumo combustible, litros 100km, coste por kilómetro, consumo coche, consumo carro, consumo auto, gasolina, diesel, gasto de gasolina, calculadora viaje',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Calculadora de Consumo de Combustible - meskeIA',
-    description: 'Calcula el consumo de tu vehículo y el coste de tus viajes',
+    description: 'Calcula el consumo de tu coche, carro o auto y el coste de tus viajes',
     url: 'https://meskeia.com/calculadora-combustible/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -26,14 +26,14 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Calculadora de Consumo de Combustible - meskeIA',
-    description: 'Calcula el consumo de tu vehículo y el coste de tus viajes',
+    description: 'Calcula el consumo de tu coche, carro o auto y el coste de tus viajes',
     images: ['https://meskeia.com/og-image.png']
   },
 };
 
 export const jsonLd = generateWebAppSchema({
   name: "Calculadora Consumo Combustible",
-  description: "Calcula el consumo de combustible de tu vehículo en L/100km. Conoce el coste por kilómetro y planifica tus viajes con precisión.",
+  description: "Calcula el consumo de combustible de tu coche, carro o auto en L/100km. Conoce el coste por kilómetro y el gasto de gasolina de tus viajes con precisión.",
   url: "https://meskeia.com/calculadora-combustible/",
   category: 'FinanceApplication',
   features: [],
@@ -61,10 +61,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Cómo calculo el coste de un viaje en coche con gasolina?',
+      name: '¿Cómo calculo el coste de un viaje en coche (carro o auto) con gasolina?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Multiplica la distancia del viaje (en km) por el consumo de tu vehículo (L/100km) y divide entre 100 para obtener los litros necesarios. Luego multiplica por el precio del combustible por litro. Por ejemplo, 600 km × 7 L/100km / 100 × 1,65 €/L = 69,30 € de combustible.',
+        text: 'Multiplica la distancia del viaje (en km) por el consumo de tu coche, carro o auto (L/100km) y divide entre 100 para obtener los litros necesarios. Luego multiplica por el precio del combustible por litro. Por ejemplo, 600 km × 7 L/100km / 100 × 1,65 €/L = 69,30 € de gasto de gasolina.',
       },
     },
     {

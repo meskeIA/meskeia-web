@@ -3,17 +3,20 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Selector de Movilidad Urbana | ¿Coche, Transporte Público o Bici? | meskeIA',
-  description: 'Test de 10 preguntas para saber qué medio de transporte se adapta mejor a tu estilo de vida: coche propio, transporte público, moto o escúter, bicicleta o patinete eléctrico, o una combinación.',
+  description: 'Test de 10 preguntas para saber qué medio de transporte se adapta mejor a tu estilo de vida: coche (carro o auto) propio, transporte público, moto o escúter, bicicleta o patinete eléctrico, o una combinación.',
   keywords: [
     'qué transporte usar en ciudad',
     'coche o transporte público',
+    'carro o transporte público',
+    'auto o transporte público',
     'bicicleta o moto ciudad',
     'movilidad urbana sostenible',
     'patinete eléctrico o bici',
-    'coste transporte urbano España',
+    'coste transporte urbano',
     'moto o coche ciudad',
+    'moto o carro ciudad',
     'dejar el coche ciudad',
-    'movilidad sostenible España',
+    'movilidad sostenible',
     'qué medio de transporte elegir',
   ],
   openGraph: {
@@ -34,7 +37,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Selector de Movilidad Urbana",
-  description: "Test de 10 preguntas para saber qué medio de transporte se adapta mejor a tu estilo de vida: coche propio, transporte público, moto o escúter, bicicleta o patinete eléctrico, o una combinación.",
+  description: "Test de 10 preguntas para saber qué medio de transporte se adapta mejor a tu estilo de vida: coche (carro o auto) propio, transporte público, moto o escúter, bicicleta o patinete eléctrico, o una combinación.",
   url: "https://meskeia.com/selector-movilidad-urbana/",
   category: 'UtilityApplication',
   features: [],
@@ -46,10 +49,10 @@ export const faqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿Qué medio de transporte urbano es más barato: coche, moto o transporte público?',
+      name: '¿Qué medio de transporte urbano es más barato: coche (carro o auto), moto o transporte público?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El transporte público suele ser la opción más económica en ciudades con red bien desarrollada, con costes medios de 400-700 € al año en abono. El coche propio puede superar los 5.000-8.000 € anuales sumando seguro, combustible, mantenimiento y aparcamiento. La bicicleta y el patinete eléctrico tienen los costes más bajos a largo plazo, aunque requieren una inversión inicial.',
+        text: 'El transporte público suele ser la opción más económica en ciudades con red bien desarrollada, con costes medios de 400-700 € al año en abono. El coche propio (también llamado carro o auto en Latinoamérica) puede superar los 5.000-8.000 € anuales sumando seguro, combustible, mantenimiento y aparcamiento. La bicicleta y el patinete eléctrico tienen los costes más bajos a largo plazo, aunque requieren una inversión inicial.',
       },
     },
     {

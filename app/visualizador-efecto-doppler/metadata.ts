@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Efecto Doppler: Visualizador Interactivo | meskeIA',
   description: 'Visualiza el efecto Doppler: ondas sonoras comprimidas y expandidas, fórmula matemática, radar de velocidad, ecografía Doppler y redshift de galaxias.',
-  keywords: ['efecto Doppler', 'ondas sonoras', 'frecuencia', 'redshift', 'radar velocidad', 'ecografía Doppler', 'física'],
+  keywords: ['efecto Doppler', 'ondas sonoras', 'frecuencia', 'redshift', 'radar velocidad', 'radar de velocidad de carros', 'velocidad de autos', 'ecografía Doppler', 'física'],
   openGraph: {
     title: 'Efecto Doppler: Visualizador Interactivo | meskeIA',
     description: 'Por qué suenan diferente las sirenas cuando se acercan y se alejan — y cómo esto mide galaxias.',
@@ -48,10 +48,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Cómo usa la policía el efecto Doppler para medir la velocidad de los coches?',
+      name: '¿Cómo usa la policía el efecto Doppler para medir la velocidad de los coches (carros o autos)?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los radares de velocidad emiten microondas y miden el cambio de frecuencia de la señal reflejada por el vehículo. Aplicando la fórmula Doppler, el radar calcula con precisión la velocidad a la que se mueve el coche. La velocidad se obtiene de la diferencia entre la frecuencia emitida y la frecuencia reflejada recibida.',
+        text: 'Los radares de velocidad emiten microondas y miden el cambio de frecuencia de la señal reflejada por el vehículo. Aplicando la fórmula Doppler, el radar calcula con precisión la velocidad a la que se mueve el coche (carro o auto). La velocidad se obtiene de la diferencia entre la frecuencia emitida y la frecuencia reflejada recibida.',
       },
     },
     {

@@ -305,7 +305,7 @@ export default function VisualizadorEfectoDoppler(): React.ReactNode {
               <div className={styles.casosRapidos}>
                 {[
                   { label: 'Reposo', v: 0 },
-                  { label: 'Coche (100 km/h)', v: 28 },
+                  { label: 'Coche/carro (100 km/h)', v: 28 },
                   { label: 'Avión subsónico', v: 200 },
                   { label: 'Límite sónico', v: 342 },
                 ].map(c => (
@@ -381,11 +381,11 @@ export default function VisualizadorEfectoDoppler(): React.ReactNode {
                 <p className={styles.appDesc}>
                   Emite microondas a <strong>24,1 GHz</strong> (longitud de onda ~12 mm). Las ondas rebotan en el vehículo
                   en movimiento y regresan con una frecuencia ligeramente diferente. La diferencia
-                  <strong> Δf = 2 × v<sub>coche</sub> / λ</strong> permite calcular la velocidad del coche al instante.
+                  <strong> Δf = 2 × v<sub>coche</sub> / λ</strong> permite calcular la velocidad del coche (carro o auto) al instante.
                   A 120 km/h, la diferencia es de unos 2.156 Hz — imperceptible al oído, pero medible electrónicamente.
                 </p>
                 <div className={styles.appDato}>
-                  Dato: un coche a 120 km/h produce un Doppler de 2.156 Hz sobre los 24,1 GHz emitidos.
+                  Dato: un coche (carro o auto) a 120 km/h produce un Doppler de 2.156 Hz sobre los 24,1 GHz emitidos.
                 </div>
               </div>
 

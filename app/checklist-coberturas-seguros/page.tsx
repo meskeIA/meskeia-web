@@ -317,7 +317,7 @@ export default function ChecklistCoberturasSeguroPage() {
         <section className={styles.comparativaSection}>
           <h2>📊 Los 8 seguros principales: comparativa rápida</h2>
           <p className={styles.comparativaSubtitle}>
-            Referencia orientativa de seguros en España. Los precios varían según edad, perfil y aseguradora.
+            Referencia orientativa de seguros (incluido el seguro de coche, también llamado carro o auto). Los precios varían según edad, perfil y aseguradora.
           </p>
           <div className={styles.comparativaTableWrapper}>
             <table className={styles.comparativaTable}>
@@ -331,7 +331,7 @@ export default function ChecklistCoberturasSeguroPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>Seguro de coche (RC)</td>
+                  <td>Seguro de coche / carro / auto (RC)</td>
                   <td><span className={styles.badgeObl}>⚠️ Sí (RC)</span></td>
                   <td>300 – 800 €</td>
                   <td>Cualquier conductor</td>

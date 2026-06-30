@@ -544,7 +544,7 @@ export default function SelectorMovilidadUrbana() {
           <h3>Los 5 medios de transporte urbano en España</h3>
           <ul>
             <li>
-              <strong>Coche propio:</strong> Necesario fuera de grandes ciudades o con cargas
+              <strong>Coche propio (también llamado carro o auto en Latinoamérica):</strong> Necesario fuera de grandes ciudades o con cargas
               frecuentes, pero el más caro (400–700 €/mes en ciudad). Las ZBE (Zonas de Bajas
               Emisiones) restringen el acceso de vehículos contaminantes en ciudades de más de
               50.000 habitantes desde 2023.
@@ -580,8 +580,8 @@ export default function SelectorMovilidadUrbana() {
               interurbano suele ser la mejor opción precio-tiempo.
             </li>
             <li>
-              <strong>Coste total de propiedad:</strong> Un coche de ciudad puede costar más de
-              7.000 €/año contando todo. La bicicleta, menos de 150 €/año.
+              <strong>Coste total de propiedad:</strong> Un coche (carro o auto) de ciudad puede costar
+              más de 7.000 €/año contando todo. La bicicleta, menos de 150 €/año.
             </li>
             <li>
               <strong>Infraestructura local:</strong> Verifica el Plan de Movilidad Urbana

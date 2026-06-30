@@ -2,12 +2,12 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Selector de Seguro de Coche | ¿Terceros o Todo Riesgo? | meskeIA',
-  description: 'Test de 10 preguntas para saber qué modalidad de seguro de coche necesitas: terceros básico, terceros ampliado, todo riesgo con franquicia o todo riesgo sin franquicia.',
-  keywords: ['qué seguro de coche elegir', 'terceros o todo riesgo', 'seguro coche todo riesgo con franquicia', 'terceros ampliado', 'seguro coche según valor', 'modalidad seguro automóvil España', 'seguro coche nuevo o usado', 'cuánto vale asegurar coche', 'cobertura seguro coche', 'seguro coche joven España'],
+  title: 'Selector de Seguro de Coche, Carro o Auto | ¿Terceros o Todo Riesgo? | meskeIA',
+  description: 'Test de 10 preguntas para saber qué modalidad de seguro de coche (carro o auto) necesitas: terceros básico, terceros ampliado, todo riesgo con franquicia o todo riesgo sin franquicia.',
+  keywords: ['qué seguro de coche elegir', 'seguro de carro', 'seguro de auto', 'terceros o todo riesgo', 'seguro coche todo riesgo con franquicia', 'terceros ampliado', 'seguro coche según valor', 'modalidad seguro automóvil', 'seguro carro nuevo o usado', 'cuánto vale asegurar el carro', 'cobertura seguro auto', 'seguro coche joven'],
   openGraph: {
-    title: 'Selector de Seguro de Coche — ¿Terceros o Todo Riesgo?',
-    description: 'Descubre qué modalidad de seguro de coche se adapta mejor a tu situación en 10 preguntas.',
+    title: 'Selector de Seguro de Coche, Carro o Auto — ¿Terceros o Todo Riesgo?',
+    description: 'Descubre qué modalidad de seguro de coche, carro o auto se adapta mejor a tu situación en 10 preguntas.',
     url: 'https://meskeia.com/selector-seguro-coche/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -22,8 +22,8 @@ export const metadata: Metadata = {
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: "Selector de Seguro de Coche",
-  description: "Test de 10 preguntas para saber qué modalidad de seguro de coche necesitas: terceros básico, terceros ampliado, todo riesgo con franquicia o todo riesgo sin franquicia.",
+  name: "Selector de Seguro de Coche, Carro o Auto",
+  description: "Test de 10 preguntas para saber qué modalidad de seguro de coche (carro o auto) necesitas: terceros básico, terceros ampliado, todo riesgo con franquicia o todo riesgo sin franquicia.",
   url: "https://meskeia.com/selector-seguro-coche/",
   category: 'FinanceApplication',
   features: [],
@@ -38,7 +38,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre seguro a terceros y todo riesgo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El seguro a terceros cubre los daños que tú causas a otros vehículos o personas, pero no repara tu propio coche. El todo riesgo, además, cubre los daños de tu vehículo independientemente de quién tenga la culpa, incluidos los provocados por ti mismo. La diferencia de precio puede superar los 500 € anuales dependiendo del valor del vehículo.',
+        text: 'En el seguro de coche (también llamado seguro de carro o seguro de auto según el país), el de terceros cubre los daños que tú causas a otros vehículos o personas, pero no repara tu propio coche. El todo riesgo, además, cubre los daños de tu vehículo independientemente de quién tenga la culpa, incluidos los provocados por ti mismo. La diferencia de precio puede superar los 500 € anuales dependiendo del valor del vehículo.',
       },
     },
     {
