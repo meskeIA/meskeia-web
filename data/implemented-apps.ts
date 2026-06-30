@@ -430,6 +430,7 @@ export const implementedAppsUrls = [
   "/visualizador-iluminacion-phong/",  // Esfera sombreada por píxel con modelo de Phong (ambiente/difuso/especular)
   "/visualizador-quadtree/",           // Quadtree interactivo: subdivisión + consulta de rango vs fuerza bruta
   "/simulador-arboles-bst-avl/",    // BST y AVL: insertar/eliminar/buscar con rotaciones LL/RR/LR/RL y 4 recorridos
+  "/simulador-arboles-b/",          // Árbol B (B-Tree): inserción con división, borrado con préstamo/fusión, orden 3/4/5 — índices de BD
   "/simulador-recursion/",          // 6 funciones recursivas (factorial, Fibonacci, Hanoi, MCD, suma dígitos, búsqueda binaria) con pila viva
 
   // Tanda 3 simuladores Informática FP/Universidad (2026-05-07)

@@ -46,6 +46,12 @@ const APPS = [
     slug: 'simulador-arboles-bst-avl',
   },
   {
+    icon: '🌲',
+    titulo: 'Árbol B (B-Tree)',
+    desc: 'Inserción con división de nodos, borrado con préstamo y fusión, y orden configurable: la estructura que indexa las bases de datos.',
+    slug: 'simulador-arboles-b',
+  },
+  {
     icon: '🤖',
     titulo: 'Cómo funciona un LLM',
     desc: 'Tokens, embeddings, el mecanismo de atención de los transformers y el efecto de la temperatura, explicados al detalle.',

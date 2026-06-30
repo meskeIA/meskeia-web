@@ -28,6 +28,7 @@ export const STEMUM_APP_DISCIPLINA: Record<string, string> = {
   'simulador-maquina-turing': 'computacion',
   'simulador-grafos': 'computacion',
   'simulador-arboles-bst-avl': 'computacion',
+  'simulador-arboles-b': 'computacion',
   'visualizador-llm-funcionamiento': 'computacion',
   'simulador-sql-join': 'computacion',
   'simulador-planificador-procesos': 'computacion',

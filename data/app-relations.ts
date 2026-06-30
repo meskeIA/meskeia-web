@@ -3119,9 +3119,15 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-arboles-bst-avl/', icon: '🌳', name: 'Árboles BST y AVL', description: 'Otras estructuras de árbol' },
   ],
   'simulador-arboles-bst-avl': [
+    { url: '/simulador-arboles-b/', icon: '🌲', name: 'Árbol B (B-Tree)', description: 'Índices de bases de datos' },
     { url: '/simulador-grafos/', icon: '🕸️', name: 'Algoritmos de Grafos', description: 'BFS, DFS, Dijkstra, A*' },
     { url: '/visualizador-estructuras-datos/', icon: '🗂️', name: 'Estructuras de Datos', description: 'Pilas, colas, árboles y hash' },
     { url: '/simulador-ordenacion/', icon: '📊', name: 'Algoritmos Ordenación', description: '7 algoritmos paso a paso' },
+  ],
+  'simulador-arboles-b': [
+    { url: '/simulador-arboles-bst-avl/', icon: '🌳', name: 'Árboles BST y AVL', description: 'Árboles binarios y rotaciones' },
+    { url: '/simulador-sql-join/', icon: '🔗', name: 'JOINs de SQL', description: 'Cómo consultan las bases de datos' },
+    { url: '/visualizador-estructuras-datos/', icon: '🗂️', name: 'Estructuras de Datos', description: 'Pilas, colas, árboles y hash' },
     { url: '/glosario-programacion/', icon: '📖', name: 'Glosario Programación', description: 'Términos clave A-Z' },
   ],
   'simulador-recursion': [
