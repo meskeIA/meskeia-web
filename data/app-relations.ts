@@ -3139,9 +3139,15 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/glosario-programacion/', icon: '📖', name: 'Glosario Programación', description: 'Términos clave A-Z' },
   ],
   'simulador-recursion': [
+    { url: '/simulador-programacion-dinamica/', icon: '📐', name: 'Programación Dinámica', description: 'De la recursión a la tabla DP' },
     { url: '/simulador-arboles-bst-avl/', icon: '🌳', name: 'Árboles BST y AVL', description: 'Estructuras recursivas' },
     { url: '/simulador-grafos/', icon: '🕸️', name: 'Algoritmos de Grafos', description: 'DFS recursivo y otros' },
     { url: '/simulador-ordenacion/', icon: '📊', name: 'Algoritmos Ordenación', description: 'Merge Sort y Quick Sort recursivos' },
+  ],
+  'simulador-programacion-dinamica': [
+    { url: '/simulador-recursion/', icon: '🔁', name: 'Recursión y Pila', description: 'El punto de partida de la DP' },
+    { url: '/simulador-ordenacion/', icon: '📊', name: 'Algoritmos Ordenación', description: 'Divide y vencerás' },
+    { url: '/quiz-complejidad-algoritmos/', icon: '⏱️', name: 'Quiz Complejidad', description: 'Big O y coste temporal' },
     { url: '/glosario-programacion/', icon: '📖', name: 'Glosario Programación', description: 'Términos clave A-Z' },
   ],
 

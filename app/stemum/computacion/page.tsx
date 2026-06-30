@@ -82,6 +82,12 @@ const APPS = [
     slug: 'simulador-modelo-osi',
   },
   {
+    icon: '📐',
+    titulo: 'Programación dinámica',
+    desc: 'Rellena la tabla DP celda a celda en la mochila 0/1, la LCS y Fibonacci, viendo de qué celdas depende cada valor y reconstruyendo la solución.',
+    slug: 'simulador-programacion-dinamica',
+  },
+  {
     icon: '📄',
     titulo: 'Reemplazo de páginas',
     desc: 'FIFO, LRU, Óptimo, Clock y LFU con tabla matricial, comparativa y detección de la anomalía de Belady.',

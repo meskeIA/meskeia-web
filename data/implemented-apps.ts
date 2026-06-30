@@ -433,6 +433,7 @@ export const implementedAppsUrls = [
   "/simulador-arboles-b/",          // Árbol B (B-Tree): inserción con división, borrado con préstamo/fusión, orden 3/4/5 — índices de BD
   "/simulador-concurrencia/",       // Concurrencia: semáforos, sección crítica/carrera, productor-consumidor, deadlock filósofos — sistemas operativos
   "/simulador-modelo-osi/",         // Modelo OSI: encapsulación/desencapsulación de las 7 capas paso a paso, escenarios, comparativa TCP/IP — redes
+  "/simulador-programacion-dinamica/", // DP paso a paso: mochila 0/1, LCS y Fibonacci editables, resalta celdas de origen y reconstruye solución
   "/simulador-recursion/",          // 6 funciones recursivas (factorial, Fibonacci, Hanoi, MCD, suma dígitos, búsqueda binaria) con pila viva
 
   // Tanda 3 simuladores Informática FP/Universidad (2026-05-07)
