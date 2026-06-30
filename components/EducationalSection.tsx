@@ -55,11 +55,18 @@ export default function EducationalSection({
         </button>
       </div>
 
-      {isOpen && (
-        <div className={styles.content} aria-live="polite">
-          {children}
-        </div>
-      )}
+      {/*
+        El contenido se monta SIEMPRE en el DOM (clave para SEO: Googlebot no hace
+        clic, así que un `isOpen && children` dejaba todo el contenido educativo
+        invisible al crawler en el catálogo entero). Se oculta por CSS cuando está
+        colapsado — mismo comportamiento visual (REGLA #7), pero ya es rastreable.
+      */}
+      <div
+        className={`${styles.content} ${isOpen ? '' : styles.contentHidden}`}
+        aria-live="polite"
+      >
+        {children}
+      </div>
     </div>
   );
 }

@@ -167,3 +167,12 @@
     width: 100%;
   }
 }
+
+/*
+ * Colapsado: el contenido sigue en el DOM (rastreable por buscadores) pero oculto.
+ * Sustituye al antiguo desmontaje condicional `isOpen && children`, que dejaba el
+ * contenido educativo invisible para Google en todo el catálogo.
+ */
+.contentHidden {
+  display: none;
+}
