@@ -35,6 +35,7 @@ export const STEMUM_APP_DISCIPLINA: Record<string, string> = {
   'simulador-concurrencia': 'computacion',
   'simulador-modelo-osi': 'computacion',
   'simulador-programacion-dinamica': 'computacion',
+  'simulador-backtracking': 'computacion',
   'simulador-reemplazo-paginas': 'computacion',
   'simulador-recursion': 'computacion',
   'simulador-regresion': 'computacion',

@@ -88,6 +88,12 @@ const APPS = [
     slug: 'simulador-programacion-dinamica',
   },
   {
+    icon: '♛',
+    titulo: 'Backtracking (N reinas)',
+    desc: 'El algoritmo de vuelta atrás resolviendo las N reinas: prueba, descarta por conflicto, coloca y retrocede, con recuento de intentos y soluciones.',
+    slug: 'simulador-backtracking',
+  },
+  {
     icon: '📄',
     titulo: 'Reemplazo de páginas',
     desc: 'FIFO, LRU, Óptimo, Clock y LFU con tabla matricial, comparativa y detección de la anomalía de Belady.',

@@ -3146,8 +3146,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'simulador-programacion-dinamica': [
     { url: '/simulador-recursion/', icon: '🔁', name: 'Recursión y Pila', description: 'El punto de partida de la DP' },
+    { url: '/simulador-backtracking/', icon: '♛', name: 'Backtracking', description: 'La otra cara de la recursión' },
     { url: '/simulador-ordenacion/', icon: '📊', name: 'Algoritmos Ordenación', description: 'Divide y vencerás' },
     { url: '/quiz-complejidad-algoritmos/', icon: '⏱️', name: 'Quiz Complejidad', description: 'Big O y coste temporal' },
+  ],
+  'simulador-backtracking': [
+    { url: '/simulador-recursion/', icon: '🔁', name: 'Recursión y Pila', description: 'La base del backtracking' },
+    { url: '/simulador-programacion-dinamica/', icon: '📐', name: 'Programación Dinámica', description: 'Cuando hay subproblemas solapados' },
+    { url: '/simulador-grafos/', icon: '🕸️', name: 'Algoritmos de Grafos', description: 'DFS y búsqueda de caminos' },
     { url: '/glosario-programacion/', icon: '📖', name: 'Glosario Programación', description: 'Términos clave A-Z' },
   ],
 
