@@ -1137,3 +1137,27 @@
 [data-theme='dark'] .rowBot {
   background: rgba(150, 150, 150, 0.07);
 }
+
+/* Compartido (emisión: clic en WhatsApp/Copiar/Email) — teal meskeIA */
+.filtroModoActivoShare {
+  background: #48A9A6;
+  color: #fff;
+  border-color: #48A9A6;
+}
+
+.badgeShare {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  background: rgba(72, 169, 166, 0.12);
+  color: #48A9A6;
+}
+
+.rowShare {
+  background: rgba(72, 169, 166, 0.05);
+}
+
+[data-theme='dark'] .rowShare {
+  background: rgba(72, 169, 166, 0.09);
+}

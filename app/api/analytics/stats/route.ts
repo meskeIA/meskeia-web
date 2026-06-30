@@ -115,6 +115,7 @@ export async function GET(request: NextRequest) {
         SUM(CASE WHEN es_recurrente = 1 THEN 1 ELSE 0 END) as total_recurrentes,
         SUM(CASE WHEN es_recurrente = 0 THEN 1 ELSE 0 END) as total_nuevos
       FROM uso_aplicaciones WHERE 1=1
+        AND (modo IS NULL OR modo != 'share-emit')
     `;
     const statsArgs: string[] = [];
 
@@ -158,6 +159,7 @@ export async function GET(request: NextRequest) {
         AVG(CASE WHEN duracion_segundos IS NOT NULL THEN duracion_segundos END) as duracion_promedio_segundos
       FROM uso_aplicaciones
       WHERE 1=1
+        AND (modo IS NULL OR modo != 'share-emit')
     `;
     const rankingArgs: string[] = [];
     if (ipExcluida) {
@@ -239,6 +241,7 @@ export async function GET(request: NextRequest) {
         COUNT(*) as total
       FROM uso_aplicaciones
       WHERE pais IS NOT NULL AND pais != ''
+        AND (modo IS NULL OR modo != 'share-emit')
     `;
     const paisesArgs: string[] = [];
     if (ipExcluida) {
@@ -252,6 +255,7 @@ export async function GET(request: NextRequest) {
       SELECT ciudad, COUNT(*) as total
       FROM uso_aplicaciones
       WHERE ciudad IS NOT NULL AND ciudad != ''
+        AND (modo IS NULL OR modo != 'share-emit')
     `;
     const ciudadesArgs: string[] = [];
     if (ipExcluida) {
@@ -308,6 +312,7 @@ export async function GET(request: NextRequest) {
         FROM uso_aplicaciones
         WHERE substr(timestamp, 7, 4) || substr(timestamp, 4, 2) || substr(timestamp, 1, 2) >= ?
           AND substr(timestamp, 7, 4) || substr(timestamp, 4, 2) || substr(timestamp, 1, 2) <= ?
+          AND (modo IS NULL OR modo != 'share-emit')
       `;
       const argsCount: string[] = [
         `${fechaInicio.getFullYear()}${String(fechaInicio.getMonth() + 1).padStart(2, '0')}${String(fechaInicio.getDate()).padStart(2, '0')}`,

@@ -6,7 +6,9 @@
  * - Cooldown por app: no se muestra más de una vez cada 24h en la misma app
  * - Cada app es independiente — no bloquea otras apps
  * - URL con ?ref=share para medir impacto en analytics
- * - Sin tracking de resultados ni datos del usuario (localStorage local)
+ * - Registra la EMISIÓN del compartido (clic en WhatsApp/Copiar/Email) como
+ *   evento modo='share-emit', para medir el origen del embudo, no solo los
+ *   aterrizajes (?ref=share). No guarda datos personales: solo app + método.
  */
 
 'use client';
@@ -99,6 +101,52 @@ function registrarMostrado(appName: string): void {
   }
 }
 
+// ─── Tracking de emisión ──────────────────────────────────────────────────────
+
+// Solo registramos en los dominios de producción (mismos que AnalyticsTracker).
+// En localhost / previews de Vercel no contaminamos las métricas.
+const HOSTS_PRODUCCION = new Set([
+  'meskeia.com', 'www.meskeia.com',
+  'delegum.com', 'www.delegum.com',
+  'cronicum.com', 'www.cronicum.com',
+  'stemum.com', 'www.stemum.com',
+  'coquinum.com', 'www.coquinum.com',
+]);
+
+/**
+ * Registra el clic en un botón de compartir (la EMISIÓN del compartido).
+ * Evento independiente del aterrizaje: modo='share-emit' para que las stats
+ * lo excluyan del tráfico real y la pestaña "Últimos Registros" lo aísle.
+ */
+function registrarEmision(appName: string, metodo: 'whatsapp' | 'copy' | 'email'): void {
+  try {
+    if (typeof window === 'undefined') return;
+    if (!HOSTS_PRODUCCION.has(window.location.hostname)) return;
+    if (navigator.webdriver) return; // bots
+
+    let sesionId: string | null = null;
+    try {
+      sesionId = sessionStorage.getItem('meskeia_session_id');
+    } catch {
+      // sessionStorage no disponible
+    }
+
+    fetch('/api/analytics/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        aplicacion: appName,
+        modo: 'share-emit',
+        sesion_id: sesionId,
+        datos_adicionales: { share_emit: metodo },
+      }),
+      keepalive: true,
+    }).catch(() => {});
+  } catch {
+    // nunca bloquear la acción de compartir por un fallo de tracking
+  }
+}
+
 // ─── Componente ───────────────────────────────────────────────────────────────
 
 export default function ShareCard({ appName }: ShareCardProps) {
@@ -152,14 +200,16 @@ export default function ShareCard({ appName }: ShareCardProps) {
   }, []);
 
   const compartirWhatsApp = useCallback(() => {
+    registrarEmision(appName, 'whatsapp');
     const url = getShareUrl();
     const mensaje = encodeURIComponent(
       `Te paso esta herramienta gratuita, sin registro: ${url}`
     );
     window.open(`https://wa.me/?text=${mensaje}`, '_blank', 'noopener,noreferrer');
-  }, [getShareUrl]);
+  }, [getShareUrl, appName]);
 
   const copiarEnlace = useCallback(async () => {
+    registrarEmision(appName, 'copy');
     const url = getShareUrl();
     try {
       await navigator.clipboard.writeText(url);
@@ -168,16 +218,17 @@ export default function ShareCard({ appName }: ShareCardProps) {
     } catch {
       prompt('Copia este enlace para compartir:', url);
     }
-  }, [getShareUrl]);
+  }, [getShareUrl, appName]);
 
   const compartirEmail = useCallback(() => {
+    registrarEmision(appName, 'email');
     const url = getShareUrl();
     const asunto = encodeURIComponent('Te paso una herramienta gratuita de meskeIA');
     const cuerpo = encodeURIComponent(
       `Hola,\n\nTe paso este enlace que puede interesarte. Es gratis, sin registro y sin publicidad:\n\n${url}`
     );
     window.open(`mailto:?subject=${asunto}&body=${cuerpo}`);
-  }, [getShareUrl]);
+  }, [getShareUrl, appName]);
 
   if (cerrado || !visible) return null;
 

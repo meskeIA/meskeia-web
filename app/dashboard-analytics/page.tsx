@@ -146,7 +146,7 @@ export default function DashboardAnalyticsPage() {
   const [mostrarDropdown, setMostrarDropdown] = useState(false);
   const comboboxRef = useRef<HTMLDivElement>(null);
   const [filtroIPActivo, setFiltroIPActivo] = useState(true);
-  const [filtroModo, setFiltroModo] = useState<'todos' | 'web' | 'referral-ia' | 'chatgpt' | 'mcp' | 'bot'>('todos');
+  const [filtroModo, setFiltroModo] = useState<'todos' | 'web' | 'referral-ia' | 'chatgpt' | 'mcp' | 'bot' | 'share-emit'>('todos');
 
   // Ref para control de inicialización
   const iniciado = useRef(false);
@@ -1362,7 +1362,7 @@ export default function DashboardAnalyticsPage() {
                   className={`${styles.filtroModoBtn} ${filtroModo === 'web' ? styles.filtroModoActivo : ''}`}
                   onClick={() => setFiltroModo('web')}
                 >
-                  🌐 Web ({datos.data.filter((r: any) => r.modo !== 'mcp' && r.modo !== 'referral-ia' && r.modo !== 'bot' && r.modo !== 'chatgpt').length})
+                  🌐 Web ({datos.data.filter((r: any) => r.modo !== 'mcp' && r.modo !== 'referral-ia' && r.modo !== 'bot' && r.modo !== 'chatgpt' && r.modo !== 'share-emit').length})
                 </button>
                 <button
                   type="button"
@@ -1392,6 +1392,13 @@ export default function DashboardAnalyticsPage() {
                 >
                   🕷️ Bots ({datos.data.filter((r: any) => r.modo === 'bot').length})
                 </button>
+                <button
+                  type="button"
+                  className={`${styles.filtroModoBtn} ${filtroModo === 'share-emit' ? styles.filtroModoActivoShare : ''}`}
+                  onClick={() => setFiltroModo('share-emit')}
+                >
+                  🔗 Compartido ({datos.data.filter((r: any) => r.modo === 'share-emit').length})
+                </button>
               </div>
             </div>
             <div className={styles.tableContainer}>
@@ -1410,11 +1417,12 @@ export default function DashboardAnalyticsPage() {
                 <tbody>
                   {datos.data
                     .filter((r: any) => {
-                      if (filtroModo === 'web') return r.modo !== 'mcp' && r.modo !== 'referral-ia' && r.modo !== 'bot' && r.modo !== 'chatgpt';
+                      if (filtroModo === 'web') return r.modo !== 'mcp' && r.modo !== 'referral-ia' && r.modo !== 'bot' && r.modo !== 'chatgpt' && r.modo !== 'share-emit';
                       if (filtroModo === 'referral-ia') return r.modo === 'referral-ia';
                       if (filtroModo === 'chatgpt') return r.modo === 'chatgpt';
                       if (filtroModo === 'mcp') return r.modo === 'mcp';
                       if (filtroModo === 'bot') return r.modo === 'bot';
+                      if (filtroModo === 'share-emit') return r.modo === 'share-emit';
                       return true;
                     })
                     .slice(0, 100)
@@ -1423,7 +1431,8 @@ export default function DashboardAnalyticsPage() {
                         registro.modo === 'mcp' ? styles.rowMCP :
                         registro.modo === 'chatgpt' ? styles.rowChatGPT :
                         registro.modo === 'referral-ia' ? styles.rowReferral :
-                        registro.modo === 'bot' ? styles.rowBot : ''
+                        registro.modo === 'bot' ? styles.rowBot :
+                        registro.modo === 'share-emit' ? styles.rowShare : ''
                       }>
                         <td>{registro.id}</td>
                         <td><strong>{registro.aplicacion}</strong></td>
@@ -1436,6 +1445,8 @@ export default function DashboardAnalyticsPage() {
                             ? <span className={styles.badgeReferral}>🔗 Desde IA</span>
                             : registro.modo === 'bot'
                             ? <span className={styles.badgeBot}>🕷️ Bot</span>
+                            : registro.modo === 'share-emit'
+                            ? <span className={styles.badgeShare}>🔗 Compartido{registro.datos_adicionales?.share_emit ? ` · ${registro.datos_adicionales.share_emit}` : ''}</span>
                             : <span className={styles.badgeWeb}>🌐 Web</span>}
                         </td>
                         <td>{registro.timestamp}</td>
