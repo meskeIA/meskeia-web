@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Simulador del Teorema Central del Límite | meskeIA',
   description: 'Visualiza cómo la media muestral converge a una normal sea cual sea la distribución original. Simulación Monte Carlo en directo con 5 distribuciones (uniforme, exponencial, Bernoulli, bimodal).',
-  keywords: 'teorema central del límite, TCL, CLT, distribución muestral, media muestral, Monte Carlo, estadística inferencial, ley de los grandes números, intervalo de confianza, EBAU, Bachillerato, universidad',
+  keywords: 'teorema central del límite, TCL, CLT, distribución muestral, media muestral, Monte Carlo, estadística inferencial, ley de los grandes números, intervalo de confianza, EBAU, Bachillerato, preparatoria, secundaria, educación media, universidad',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -47,7 +47,7 @@ export const jsonLd = generateWebAppSchema({
     'Estadísticos empíricos: media, desviación, asimetría y curtosis',
     'Visualiza la velocidad de convergencia según la asimetría original',
   ],
-  keywords: ['teorema central del límite', 'TCL', 'CLT', 'Monte Carlo', 'estadística', 'distribución muestral', 'EBAU', 'Bachillerato'],
+  keywords: ['teorema central del límite', 'TCL', 'CLT', 'Monte Carlo', 'estadística', 'distribución muestral', 'EBAU', 'Bachillerato', 'preparatoria', 'secundaria', 'educación media'],
 });
 
 export const faqJsonLd = {

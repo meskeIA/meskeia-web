@@ -442,6 +442,11 @@ export default function SimuladorMovimientoCircularPage() {
             una <strong>aceleración</strong>.
           </p>
           <p>
+            Es un tema clásico de física en Bachillerato y EBAU (España) y en preparatoria,
+            secundaria y educación media (Latinoamérica), y suele aparecer en los exámenes de
+            admisión universitaria.
+          </p>
+          <p>
             Esta aceleración, llamada <strong>aceleración centrípeta</strong>, siempre apunta hacia el
             <em> centro</em> de la circunferencia y es perpendicular a la velocidad. Por eso no modifica
             la rapidez (no hace trabajo), solo cambia la dirección del movimiento.

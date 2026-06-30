@@ -4,9 +4,9 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Simulador de Fotosíntesis: Factores Limitantes - Ley de Blackman | meskeIA',
   description:
-    'Simula la fotosíntesis y descubre qué factor limita la tasa: luz, CO₂ o temperatura. Basado en la Ley de Blackman y funciones Michaelis-Menten. Ideal para Bachillerato y EBAU.',
+    'Simula la fotosíntesis y descubre qué factor limita la tasa: luz, CO₂ o temperatura. Basado en la Ley de Blackman y funciones Michaelis-Menten. Ideal para Bachillerato y EBAU (España), preparatoria, secundaria y examen de admisión universitaria (Latinoamérica).',
   keywords:
-    'fotosíntesis, factores limitantes, ley de Blackman, luz, CO2, temperatura, cloroplasto, EBAU, Bachillerato, biología, tasa fotosíntesis, Michaelis-Menten, simulador biología',
+    'fotosíntesis, factores limitantes, ley de Blackman, luz, CO2, temperatura, cloroplasto, EBAU, Bachillerato, preparatoria, secundaria, biología, tasa fotosíntesis, Michaelis-Menten, simulador biología',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Simulador de Fotosíntesis: Factores Limitantes | meskeIA',
     description:
-      'Descubre qué limita la fotosíntesis: luz, CO₂ o temperatura. Simulador interactivo basado en la Ley de Blackman para Bachillerato y EBAU.',
+      'Descubre qué limita la fotosíntesis: luz, CO₂ o temperatura. Simulador interactivo basado en la Ley de Blackman para Bachillerato y EBAU (España), preparatoria y secundaria (Latinoamérica).',
   },
   other: {
     'application-name': 'Simulador Fotosíntesis Factores meskeIA',
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
 export const jsonLd = generateWebAppSchema({
   name: 'Simulador de Fotosíntesis: Factores Limitantes',
   description:
-    'Simulador interactivo que modela la tasa de fotosíntesis según los tres factores limitantes principales: intensidad lumínica, concentración de CO₂ y temperatura. Basado en la Ley de Blackman y funciones de saturación Michaelis-Menten. Ideal para estudiantes de Biología de Bachillerato y preparación de EBAU.',
+    'Simulador interactivo que modela la tasa de fotosíntesis según los tres factores limitantes principales: intensidad lumínica, concentración de CO₂ y temperatura. Basado en la Ley de Blackman y funciones de saturación Michaelis-Menten. Ideal para estudiantes de Biología de Bachillerato y preparación de EBAU (España), o de preparatoria, secundaria y examen de admisión universitaria (Latinoamérica).',
   url: 'https://meskeia.com/simulador-fotosintesis-factores/',
   category: 'EducationalApplication',
   keywords: [
@@ -46,6 +46,8 @@ export const jsonLd = generateWebAppSchema({
     'temperatura',
     'Bachillerato',
     'EBAU',
+    'preparatoria',
+    'secundaria',
     'biología',
   ],
   features: [

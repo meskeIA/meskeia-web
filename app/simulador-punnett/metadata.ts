@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description:
     'Simula cruces genéticos monohíbridos y dihíbridos con el cuadro de Punnett. Calcula proporciones genotípicas y fenotípicas. Herramienta interactiva para aprender las leyes de Mendel.',
   keywords:
-    'cuadro de Punnett, genética, Mendel, genotipo, fenotipo, herencia, alelos, dominante, recesivo, monohíbrido, dihíbrido, EBAU, Bachillerato, biología, leyes de Mendel',
+    'cuadro de Punnett, genética, Mendel, genotipo, fenotipo, herencia, alelos, dominante, recesivo, monohíbrido, dihíbrido, EBAU, Bachillerato, preparatoria, secundaria, educación media, biología, leyes de Mendel',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -54,6 +54,8 @@ export const jsonLd = generateWebAppSchema({
     'leyes de Mendel',
     'herencia biológica',
     'Bachillerato biología',
+    'preparatoria',
+    'secundaria',
   ],
 });
 
@@ -66,7 +68,7 @@ export const faqJsonLd = {
       name: '¿Qué es el cuadro de Punnett y para qué sirve?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El cuadro de Punnett es una tabla cuadrada que permite predecir las proporciones de genotipos y fenotipos esperados en la descendencia de un cruce genético. Se coloca en las filas y columnas los gametos posibles de cada progenitor y en las celdas interiores se anotan las combinaciones. Es la herramienta estándar para aplicar las leyes de Mendel en genética de Bachillerato y universidad.',
+        text: 'El cuadro de Punnett es una tabla cuadrada que permite predecir las proporciones de genotipos y fenotipos esperados en la descendencia de un cruce genético. Se coloca en las filas y columnas los gametos posibles de cada progenitor y en las celdas interiores se anotan las combinaciones. Es la herramienta estándar para aplicar las leyes de Mendel en genética de educación media —Bachillerato (España), preparatoria y secundaria (Latinoamérica)— y universidad.',
       },
     },
     {

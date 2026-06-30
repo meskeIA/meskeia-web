@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Simulador VSEPR - Geometría Molecular 3D | meskeIA',
-  description: 'Construye moléculas con la teoría VSEPR: ajusta pares enlazantes y libres del átomo central y observa la geometría 3D rotable. Lineal, tetraédrica, octaédrica y más. Química Bachillerato.',
-  keywords: 'VSEPR, geometría molecular, geometría 3D molecular, pares libres, AX2 AX3 AX4 AX5 AX6, hibridación, química bachillerato, ángulo enlace',
+  description: 'Construye moléculas con la teoría VSEPR: ajusta pares enlazantes y libres del átomo central y observa la geometría 3D rotable. Lineal, tetraédrica, octaédrica y más. Química de Bachillerato (España), preparatoria y secundaria (Latinoamérica).',
+  keywords: 'VSEPR, geometría molecular, TRePEV, geometría 3D molecular, pares libres, AX2 AX3 AX4 AX5 AX6, hibridación, química bachillerato, química preparatoria, química secundaria, ángulo enlace',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -42,7 +42,7 @@ export const jsonLd = generateWebAppSchema({
     'Ejemplos famosos para cada geometría (H2O, NH3, CH4, PCl5, SF6, XeF4...)',
     'En español',
   ],
-  keywords: ['VSEPR', 'geometría molecular', 'pares libres', 'química bachillerato'],
+  keywords: ['VSEPR', 'geometría molecular', 'pares libres', 'química bachillerato', 'química preparatoria', 'química secundaria'],
 });
 
 export const faqJsonLd = {

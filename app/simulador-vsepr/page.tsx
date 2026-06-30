@@ -750,9 +750,12 @@ export default function SimuladorVseprPage() {
           <h3>Tabla VSEPR Completa</h3>
           <p>
             La teoría VSEPR (Valence Shell Electron Pair Repulsion, repulsión de pares de electrones
-            de la capa de valencia) predice la geometría 3D de una molécula contando los pares de
-            electrones (enlazantes y libres) alrededor del átomo central. La regla básica: los pares
-            de electrones se repelen entre sí y adoptan la disposición que minimiza esa repulsión.
+            de la capa de valencia, también llamada TRePEV en español) predice la geometría 3D de
+            una molécula contando los pares de electrones (enlazantes y libres) alrededor del átomo
+            central. La regla básica: los pares de electrones se repelen entre sí y adoptan la
+            disposición que minimiza esa repulsión. Es un contenido clásico de la química de
+            Bachillerato y la EBAU en España, y de la preparatoria, la secundaria y la educación
+            media en Latinoamérica.
           </p>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>

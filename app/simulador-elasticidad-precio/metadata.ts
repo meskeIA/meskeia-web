@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description:
     'Simula la elasticidad-precio de la demanda para 6 bienes reales. Visualiza los rectángulos de ingreso total, clasifica la demanda y aprende cómo el precio afecta a los ingresos empresariales.',
   keywords:
-    'elasticidad precio demanda, Ed, inelástica, elástica, ingreso total, excedente, bien de primera necesidad, Bachillerato, economía, EBAU, elasticidad oferta',
+    'elasticidad precio demanda, Ed, inelástica, elástica, ingreso total, excedente, bien de primera necesidad, economía, elasticidad oferta, Bachillerato, EBAU, preparatoria, secundaria, examen de admisión universitaria',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -52,7 +52,8 @@ export const jsonLd = generateWebAppSchema({
     'Ed coeficiente elasticidad',
     'inelástica elástica',
     'ingreso total precio',
-    'economía Bachillerato EBAU',
+    'economía Bachillerato EBAU España',
+    'economía preparatoria secundaria Latinoamérica',
     'simulador economía',
   ],
 });

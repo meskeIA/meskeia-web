@@ -876,7 +876,8 @@ export default function SimuladorEstequiometriaPage() {
             <ul className={styles.warningList}>
               <li>
                 <strong>Comparar moles directamente sin dividir por el coeficiente</strong> — El error más
-                común en EBAU. Si N₂ + 3 H₂ y tienes 2 mol N₂ y 5 mol H₂, NO es limitante el H₂ por
+                común en los exámenes de admisión universitaria, tanto en la EBAU/selectividad (España) como
+                en preparatoria y educación media (Latinoamérica). Si N₂ + 3 H₂ y tienes 2 mol N₂ y 5 mol H₂, NO es limitante el H₂ por
                 &quot;tener menos moles que 3×2=6&quot;: el ratio de H₂ = 5/3 ≈ 1,67 &lt; 2/1 = 2, así que
                 sí es limitante, pero hay que hacer la división.
               </li>

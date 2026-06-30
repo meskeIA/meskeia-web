@@ -593,6 +593,9 @@ export default function SimuladorPunnettPage() {
           <p>
             Cada celda del cuadro representa una combinación igualmente probable de gametos. En un
             monohíbrido obtienes <strong>4 celdas</strong>; en un dihíbrido, <strong>16 celdas</strong>.
+            Es uno de los contenidos clásicos de biología en la educación media —Bachillerato y EBAU
+            en España, preparatoria y secundaria en Latinoamérica— y aparece con frecuencia en el
+            examen de admisión universitaria.
           </p>
           <div className={styles.formulaBox}>
             Nº de combinaciones = (nº gametos P1) × (nº gametos P2)

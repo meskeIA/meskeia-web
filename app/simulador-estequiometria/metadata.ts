@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Simulador de Estequiometría: Reactivo Limitante | meskeIA',
-  description: 'Calcula el reactivo limitante, la masa del producto y el reactivo en exceso para 6 reacciones reales. Visualiza las barras de moles y el efecto del rendimiento. Ideal para Bachillerato y EBAU.',
-  keywords: 'estequiometría, reactivo limitante, moles, masa molar, rendimiento, ecuación balanceada, EBAU, Bachillerato, química, cálculo estequiométrico, exceso, producto',
+  description: 'Calcula el reactivo limitante, la masa del producto y el reactivo en exceso para 6 reacciones reales. Visualiza las barras de moles y el efecto del rendimiento. Ideal para Bachillerato y EBAU (España), preparatoria y secundaria (Latinoamérica).',
+  keywords: 'estequiometría, reactivo limitante, moles, masa molar, rendimiento, ecuación balanceada, EBAU, Bachillerato, preparatoria, secundaria, química, cálculo estequiométrico, exceso, producto',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Simulador de Estequiometría: Reactivo Limitante',
-  description: 'Simulador interactivo de estequiometría que calcula el reactivo limitante, la masa teórica y real del producto principal, y los gramos de reactivo en exceso para 6 reacciones reales: combustión del metano, síntesis del agua, neutralización ácido-base, proceso Haber-Bosch, oxidación del hierro y fermentación alcohólica. Incluye barras de moles comparativas y slider de rendimiento. Pensado para estudiantes de Bachillerato, EBAU y primero de Universidad.',
+  description: 'Simulador interactivo de estequiometría que calcula el reactivo limitante, la masa teórica y real del producto principal, y los gramos de reactivo en exceso para 6 reacciones reales: combustión del metano, síntesis del agua, neutralización ácido-base, proceso Haber-Bosch, oxidación del hierro y fermentación alcohólica. Incluye barras de moles comparativas y slider de rendimiento. Pensado para estudiantes de Bachillerato y EBAU (España), preparatoria, secundaria y educación media (Latinoamérica), y primero de Universidad.',
   url: 'https://meskeia.com/simulador-estequiometria/',
   category: 'EducationalApplication',
   features: [
@@ -48,7 +48,7 @@ export const jsonLd = generateWebAppSchema({
     'Ecuación balanceada con reactivo limitante resaltado en rojo',
     'Soporte para catalizadores (fermentación alcohólica)',
   ],
-  keywords: ['estequiometría', 'reactivo limitante', 'moles', 'masa molar', 'rendimiento', 'EBAU', 'Bachillerato', 'química'],
+  keywords: ['estequiometría', 'reactivo limitante', 'moles', 'masa molar', 'rendimiento', 'EBAU', 'Bachillerato', 'preparatoria', 'secundaria', 'química'],
 });
 
 export const faqJsonLd = {
@@ -81,10 +81,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Cuáles son los pasos para resolver un problema de estequiometría en el examen de selectividad?',
+      name: '¿Cuáles son los pasos para resolver un problema de estequiometría en el examen de selectividad o de admisión universitaria?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El procedimiento estándar es: 1) ajustar la ecuación balanceada con sus coeficientes estequiométricos; 2) convertir los gramos de cada reactivo a moles (n = m/M); 3) identificar el reactivo limitante comparando n/coeficiente para cada reactivo; 4) calcular los moles de producto usando la proporción estequiométrica del limitante; 5) convertir moles de producto a gramos con su masa molar.',
+        text: 'El procedimiento estándar, válido tanto para la EBAU/selectividad (España) como para los exámenes de admisión universitaria de preparatoria y educación media (Latinoamérica), es: 1) ajustar la ecuación balanceada con sus coeficientes estequiométricos; 2) convertir los gramos de cada reactivo a moles (n = m/M); 3) identificar el reactivo limitante comparando n/coeficiente para cada reactivo; 4) calcular los moles de producto usando la proporción estequiométrica del limitante; 5) convertir moles de producto a gramos con su masa molar.',
       },
     },
     {

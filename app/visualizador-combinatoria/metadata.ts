@@ -3,7 +3,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Combinatoria: Permutaciones, Combinaciones y Triángulo de Pascal — meskeIA',
-  description: 'Visualizador interactivo de combinatoria: permutaciones y combinaciones con árboles animados, triángulo de Pascal con patrones ocultos (Fibonacci, potencias de 2, Sierpinski), principio de multiplicación y binomio de Newton. Ideal para estudiantes de matemáticas.',
+  description: 'Visualizador interactivo de combinatoria: permutaciones y combinaciones con árboles animados, triángulo de Pascal con patrones ocultos (Fibonacci, potencias de 2, Sierpinski), principio de multiplicación y binomio de Newton. Ideal para estudiantes de matemáticas de secundaria, preparatoria, bachillerato y universidad.',
   keywords: [
     'combinatoria',
     'permutaciones',
@@ -18,6 +18,8 @@ export const metadata: Metadata = {
     'matemáticas discretas',
     'matemáticas universitarias',
     'bachillerato matemáticas',
+    'preparatoria',
+    'secundaria',
     'visualizador matemáticas',
     'factorial',
     'teoría de la probabilidad',
@@ -71,6 +73,8 @@ export const jsonLd = generateWebAppSchema({
     'combinaciones',
     'triángulo de pascal',
     'binomio de newton',
+    'preparatoria',
+    'secundaria',
   ],
 });
 

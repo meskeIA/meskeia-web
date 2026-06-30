@@ -841,7 +841,7 @@ export default function VisualizadorAdaptacionesPlantas() {
             {
               titulo: 'Estudiante de Biología',
               descripcion:
-                'Comprende las estrategias adaptativas que se preguntan en exámenes: CAM, C4, xerofitia, halofitia y adaptaciones morfológicas. Cada mecanismo explicado desde la fisiología.',
+                'Comprende las estrategias adaptativas que se preguntan en exámenes de secundaria, bachillerato o preparatoria: CAM, C4, xerofitia, halofitia y adaptaciones morfológicas. Cada mecanismo explicado desde la fisiología.',
               icono: '📚',
             },
             {

@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Simulador Masa-Resorte (MAS) - Movimiento Armónico Simple con Amortiguamiento | meskeIA',
   description: 'Simula el movimiento armónico simple masa-resorte: ajusta masa, constante del resorte, amplitud y amortiguamiento. Calcula período, frecuencia, energías y observa la oscilación en tiempo real.',
-  keywords: 'masa-resorte, MAS, movimiento armónico simple, período, frecuencia angular, amortiguamiento, energía cinética, energía potencial, EBAU, Bachillerato, física',
+  keywords: 'masa-resorte, MAS, movimiento armónico simple, período, frecuencia angular, amortiguamiento, energía cinética, energía potencial, EBAU, Bachillerato, preparatoria, secundaria, educación media, física',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -87,7 +87,7 @@ export const faqJsonLd = {
       name: '¿Para qué sirve simular el sistema masa-resorte frente a resolver las ecuaciones a mano?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La simulación permite cambiar parámetros (masa, k, amplitud, amortiguamiento) y ver al instante cómo varía la gráfica x(t) y las barras de energía, lo que facilita desarrollar la intuición física antes de los exámenes de selectividad (EBAU/EVAU). Además permite explorar casos límite como el sobreamortiguamiento o la resonancia que son difíciles de visualizar con cálculo manual.',
+        text: 'La simulación permite cambiar parámetros (masa, k, amplitud, amortiguamiento) y ver al instante cómo varía la gráfica x(t) y las barras de energía, lo que facilita desarrollar la intuición física antes de los exámenes de física de Bachillerato y selectividad (EBAU/EVAU) en España, o de preparatoria, secundaria y el examen de admisión universitaria en Latinoamérica. Además permite explorar casos límite como el sobreamortiguamiento o la resonancia que son difíciles de visualizar con cálculo manual.',
       },
     },
   ],

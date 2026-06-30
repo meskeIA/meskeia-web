@@ -582,6 +582,11 @@ export default function SimuladorElasticidadPrecio() {
               importa porque determina si subir el precio incrementa o reduce el ingreso total de la
               empresa, y para diseñar políticas fiscales eficaces.
             </p>
+            <p>
+              Es un concepto clave en los programas de economía de Bachillerato y EBAU (España), así
+              como de preparatoria, secundaria y educación media (Latinoamérica), y suele aparecer en
+              el examen de admisión universitaria.
+            </p>
           </div>
 
           {/* Tabla comparativa */}

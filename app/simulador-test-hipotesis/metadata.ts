@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Simulador de Test de Hipótesis: α, β, p-valor y Potencia | meskeIA',
   description: 'Visualiza simultáneamente las distribuciones bajo H₀ y H₁, las regiones de rechazo, errores tipo I (α) y tipo II (β), p-valor y potencia. Tests bilateral y unilateral.',
-  keywords: 'test de hipótesis, contraste de hipótesis, p-valor, alfa, beta, potencia, error tipo I, error tipo II, H0, H1, región de rechazo, estadística inferencial, EBAU, Bachillerato',
+  keywords: 'test de hipótesis, contraste de hipótesis, prueba de hipótesis, p-valor, alfa, beta, potencia, error tipo I, error tipo II, H0, H1, región de rechazo, estadística inferencial, EBAU, Bachillerato, preparatoria, secundaria',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Simulador de Test de Hipótesis',
-  description: 'Simulador interactivo de contraste de hipótesis para la media. Muestra simultáneamente la distribución de X̄ bajo H₀ (N(μ₀, σ/√n)) y bajo H₁ (N(μ₁, σ/√n)), con regiones de rechazo, p-valor sombreado, área α (riesgo de rechazar H₀ siendo cierta) y área β (riesgo de no rechazar H₀ siendo falsa). Permite elegir test bilateral o unilateral, ajustar μ₀, μ₁, σ, n, α y X̄ observado, y entender visualmente la potencia del contraste (1 − β). Ideal para EBAU, Bachillerato y estadística inferencial universitaria.',
+  description: 'Simulador interactivo de contraste de hipótesis para la media. Muestra simultáneamente la distribución de X̄ bajo H₀ (N(μ₀, σ/√n)) y bajo H₁ (N(μ₁, σ/√n)), con regiones de rechazo, p-valor sombreado, área α (riesgo de rechazar H₀ siendo cierta) y área β (riesgo de no rechazar H₀ siendo falsa). Permite elegir test bilateral o unilateral, ajustar μ₀, μ₁, σ, n, α y X̄ observado, y entender visualmente la potencia del contraste (1 − β). Ideal para Bachillerato y EBAU (España), preparatoria y educación media (Latinoamérica) y estadística inferencial universitaria.',
   url: 'https://meskeia.com/simulador-test-hipotesis/',
   category: 'EducationalApplication',
   features: [
@@ -48,7 +48,7 @@ export const jsonLd = generateWebAppSchema({
     'Cálculo de potencia (1 − β) bajo diferentes escenarios',
     'Comprensión visual del trade-off α ↔ β',
   ],
-  keywords: ['test de hipótesis', 'p-valor', 'alfa', 'beta', 'potencia', 'EBAU', 'Bachillerato', 'estadística'],
+  keywords: ['test de hipótesis', 'prueba de hipótesis', 'p-valor', 'alfa', 'beta', 'potencia', 'EBAU', 'Bachillerato', 'preparatoria', 'secundaria', 'estadística'],
 });
 
 export const faqJsonLd = {
@@ -92,7 +92,7 @@ export const faqJsonLd = {
       name: '¿Para quién está pensado este simulador de test de hipótesis?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Está orientado a estudiantes de Bachillerato y universitarios que cursan estadística inferencial, a candidatos a la EBAU con bloque de estadística y a profesores que buscan material visual para explicar conceptos abstractos como α, β y potencia. También es útil para investigadores que quieren intuir el efecto de cambiar el tamaño muestral o el nivel de significación antes de diseñar un experimento.',
+        text: 'Está orientado a estudiantes de secundaria, Bachillerato o preparatoria y a universitarios que cursan estadística inferencial, a quienes preparan exámenes de admisión universitaria (la EBAU en España) con bloque de estadística y a profesores que buscan material visual para explicar conceptos abstractos como α, β y potencia. También es útil para investigadores que quieren intuir el efecto de cambiar el tamaño muestral o el nivel de significación antes de diseñar un experimento.',
       },
     },
   ],

@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Simulador de Movimiento Circular - MCU y MCNU | meskeIA',
-  description: 'Simula el movimiento circular uniforme (MCU) y no uniforme (MCNU). Visualiza velocidad tangencial, aceleración centrípeta y fuerza centrípeta en tiempo real. Física Bachillerato.',
-  keywords: 'movimiento circular, MCU, MCNU, velocidad angular, aceleración centrípeta, período, frecuencia, fuerza centrípeta, EBAU, Bachillerato, física',
+  description: 'Simula el movimiento circular uniforme (MCU) y no uniforme (MCNU). Visualiza velocidad tangencial, aceleración centrípeta y fuerza centrípeta en tiempo real. Física para Bachillerato y EBAU (España) y para preparatoria, secundaria y educación media (Latinoamérica).',
+  keywords: 'movimiento circular, MCU, MCNU, velocidad angular, aceleración centrípeta, período, frecuencia, fuerza centrípeta, EBAU, Bachillerato, preparatoria, secundaria, educación media, física',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -43,7 +43,7 @@ export const jsonLd = generateWebAppSchema({
     'Escala Retina/HiDPI para pantallas de alta resolución',
     'En español',
   ],
-  keywords: ['movimiento circular', 'MCU', 'MCNU', 'aceleración centrípeta', 'física bachillerato'],
+  keywords: ['movimiento circular', 'MCU', 'MCNU', 'aceleración centrípeta', 'física bachillerato', 'física preparatoria', 'física secundaria'],
 });
 
 export const faqJsonLd = {
@@ -68,10 +68,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Para qué sirve un simulador de movimiento circular en Bachillerato?',
+      name: '¿Para qué sirve un simulador de movimiento circular en Bachillerato, preparatoria o secundaria?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Permite visualizar en tiempo real los vectores de velocidad tangencial y aceleración centrípeta, lo que resulta difícil de intuir solo con fórmulas. El simulador ayuda a entender por qué la velocidad es perpendicular al radio y cómo cambian período y frecuencia al variar la velocidad angular, conceptos habituales en selectividad (EBAU/EVAU).',
+        text: 'Permite visualizar en tiempo real los vectores de velocidad tangencial y aceleración centrípeta, lo que resulta difícil de intuir solo con fórmulas. El simulador ayuda a entender por qué la velocidad es perpendicular al radio y cómo cambian período y frecuencia al variar la velocidad angular, conceptos habituales en selectividad (EBAU/EVAU) en España y en los exámenes de admisión universitaria de preparatoria, secundaria y educación media en Latinoamérica.',
       },
     },
     {

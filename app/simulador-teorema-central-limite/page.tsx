@@ -810,7 +810,7 @@ export default function SimuladorTeoremaCentralLimitePage() {
                 </tr>
                 <tr>
                   <td>Educación</td>
-                  <td>Nota de un alumno en EBAU</td>
+                  <td>Nota de un alumno en el examen de admisión universitaria (EBAU en España; examen de preparatoria o educación media en Latinoamérica)</td>
                   <td>Nota media por centro</td>
                   <td>Rankings y comparaciones</td>
                 </tr>

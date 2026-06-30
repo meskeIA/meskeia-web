@@ -812,6 +812,10 @@ export default function SimuladorMasResortePage() {
 
           {/* Tips */}
           <h3 className={styles.eduSubtitle}>Consejos para el examen</h3>
+          <p style={{ fontSize: '0.92rem', color: 'var(--text-secondary)', lineHeight: 1.65, marginBottom: '1rem' }}>
+            Útiles para preparar física en Bachillerato y selectividad (EBAU/EVAU) en España, o en
+            preparatoria, secundaria, educación media y el examen de admisión universitaria en Latinoamérica.
+          </p>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🔍</span>

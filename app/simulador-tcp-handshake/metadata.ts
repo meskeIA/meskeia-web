@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Simulador del Handshake TCP | meskeIA',
   description: 'Visualiza el three-way handshake de TCP (SYN→SYN-ACK→ACK) y el cierre de conexión con diagrama de secuencia animado y números de secuencia reales.',
-  keywords: ['TCP handshake', 'three-way handshake', 'SYN', 'SYN-ACK', 'protocolo TCP', 'redes de computadoras', 'informática', 'Bachillerato', 'número de secuencia', 'ISN'],
+  keywords: ['TCP handshake', 'three-way handshake', 'SYN', 'SYN-ACK', 'protocolo TCP', 'redes de computadoras', 'informática', 'Bachillerato', 'preparatoria', 'secundaria', 'número de secuencia', 'ISN'],
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',

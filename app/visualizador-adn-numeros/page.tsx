@@ -354,7 +354,8 @@ export default function VisualizadorAdnNumerosPage() {
             <strong>Nota pedagógica:</strong> algunos porcentajes de similitud genética varían
             según el estudio y el método de comparación utilizado (secuencias codificantes, genoma
             completo, ortólogos directos). Los valores indicados son las estimaciones más citadas
-            en literatura científica de referencia y son adecuados para Bachillerato y Selectividad.
+            en literatura científica de referencia y son adecuados para Bachillerato, preparatoria
+            y educación media (Selectividad, EBAU o examen de admisión universitaria).
           </div>
         </EducationalSection>
 

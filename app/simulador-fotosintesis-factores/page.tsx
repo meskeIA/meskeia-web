@@ -237,7 +237,7 @@ export default function SimuladorFotosintesisFactoresPage() {
       icono: '🔍',
       titulo: 'Identifica el factor limitante',
       descripcion:
-        'En un problema de EBAU busca cuál de los tres factores está en su nivel más bajo relativo a su punto de saturación. Ese es el limitante. Si te dan una gráfica, el factor que se varía es el del eje X; el limitante es el que sube la curva.',
+        'En un problema de examen (EBAU en España, examen de admisión universitaria en Latinoamérica) busca cuál de los tres factores está en su nivel más bajo relativo a su punto de saturación. Ese es el limitante. Si te dan una gráfica, el factor que se varía es el del eje X; el limitante es el que sube la curva.',
     },
     {
       icono: '📈',
@@ -601,7 +601,7 @@ export default function SimuladorFotosintesisFactoresPage() {
 
           {/* Tips para el examen */}
           <section className={styles.guideSection}>
-            <h2>Tips para identificar el factor limitante en EBAU</h2>
+            <h2>Tips para identificar el factor limitante en el examen (EBAU, preparatoria y admisión universitaria)</h2>
             <div className={styles.tipsGrid}>
               {tips.map((t) => (
                 <div key={t.titulo} className={styles.tipCard}>

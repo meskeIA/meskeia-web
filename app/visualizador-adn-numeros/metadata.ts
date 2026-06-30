@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Tu ADN en Números — Biología del Genoma Humano | meskeIA',
-  description: 'Cifras fascinantes sobre el ADN humano: 3.200 millones de pares de bases, 99,9% idéntico entre humanos, 60% compartido con el plátano. Explicador visual interactivo para Bachillerato.',
-  keywords: 'ADN números, genoma humano, pares de bases, genes, similitud genética, biología bachillerato, explicador visual, cromosomas, secuencia genética',
+  description: 'Cifras fascinantes sobre el ADN humano: 3.200 millones de pares de bases, 99,9% idéntico entre humanos, 60% compartido con el plátano. Explicador visual interactivo para estudiantes de Bachillerato, preparatoria y secundaria.',
+  keywords: 'ADN números, genoma humano, pares de bases, genes, similitud genética, biología bachillerato, biología preparatoria, biología secundaria, explicador visual, cromosomas, secuencia genética',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -40,7 +40,7 @@ export const jsonLd = generateWebAppSchema({
     'Bloques visuales interactivos con 7 cifras clave del ADN humano',
     'Barra de similitud genética comparada con 6 organismos',
     'Escala visual del ADN: desde la célula hasta el Sistema Solar',
-    'Contenido educativo orientado a Bachillerato y Selectividad',
+    'Contenido educativo orientado a Bachillerato, preparatoria y educación media (Selectividad / examen de admisión)',
   ],
   category: 'EducationalApplication',
 });

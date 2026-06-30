@@ -12,6 +12,8 @@ export const metadata: Metadata = {
     'fotosíntesis CAM C4',
     'micorrizas',
     'biología bachillerato',
+    'biología preparatoria',
+    'biología secundaria',
   ],
   openGraph: {
     title: 'Adaptaciones de las Plantas — Hábitats Extremos | meskeIA',

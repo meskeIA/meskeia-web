@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Simulador del Multiplicador del Gasto - Keynes y Política Fiscal | meskeIA',
-  description: 'Simula el efecto multiplicador del gasto público: PMC, impuestos e importaciones. Calcula cómo 1€ de estímulo fiscal genera más de 1€ de PIB. Macroeconomía Bachillerato.',
-  keywords: 'multiplicador keynesiano, gasto público, propensión marginal a consumir, PMC, política fiscal, multiplicador fiscal, Keynes, macroeconomía, Bachillerato, economía',
+  description: 'Simula el efecto multiplicador del gasto público: PMC, impuestos e importaciones. Calcula cómo 1€ de estímulo fiscal genera más de 1€ de PIB. Macroeconomía para Bachillerato (España), preparatoria y secundaria (Latinoamérica).',
+  keywords: 'multiplicador keynesiano, gasto público, propensión marginal a consumir, PMC, política fiscal, multiplicador fiscal, Keynes, macroeconomía, Bachillerato, preparatoria, secundaria, economía',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
