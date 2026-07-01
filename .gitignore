@@ -78,3 +78,6 @@ DESARROLLOMCP.md
 
 # Credenciales de service accounts (Google Cloud, etc.) - NUNCA subir al repo
 .credentials/
+
+# Dumps de la base de datos Turso (backup local, contienen datos de analytics)
+_backups/
