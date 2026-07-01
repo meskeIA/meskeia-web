@@ -979,6 +979,8 @@ export const implementedAppsUrls = [
   "/visualizador-historia/caida-imperio-romano/", // Caída del Imperio Romano 180→476, 10 hitos, 6 eras
   "/visualizador-historia/caida-constantinopla/", // Caída de Constantinopla 1202→1461, 10 hitos, 6 eras
   "/visualizador-historia/revoluciones-1848/", // Revoluciones de 1848 1815→1852, 10 hitos, 6 eras
+  "/visualizador-historia/independencia-eeuu/", // Independencia de EE.UU. 1763→1789, 10 hitos, 6 eras
+  "/visualizador-historia/guerra-civil-espanola/", // Guerra Civil Española 1931→1945, 10 hitos, 6 eras
   "/visualizador-historia/imperio-persa/",       // Imperio Persa Aqueménida -550→-330, 10 hitos, 6 eras
   "/visualizador-historia/japon/",               // Historia de Japón 710→1868, 10 hitos, 6 eras
   "/visualizador-historia/china-dinastias/",     // Grandes Dinastías Chinas -221→1912, 10 hitos, 6 eras

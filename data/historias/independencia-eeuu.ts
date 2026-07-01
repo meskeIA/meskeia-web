@@ -1,0 +1,367 @@
+import type { HistoriaData } from './types';
+
+export const independenciaEeuu: HistoriaData = {
+  slug: 'independencia-eeuu',
+  titulo: 'La Independencia de Estados Unidos: De la Ley del Timbre a la Constitución',
+  subtitulo: 'De las tensiones tras la Guerra de los Siete Años al nacimiento de un nuevo Estado: 26 años que redibujaron el mapa político del Atlántico',
+  descripcionSEO: 'Cronología interactiva de la Independencia de Estados Unidos (1763-1789): del fin de la Guerra Franco-India y la deuda británica a la Ley del Timbre, el Motín del Té de Boston, la Declaración de Independencia (1776), Saratoga, la alianza con Francia, Yorktown, el Tratado de París y la Constitución de 1787 en 10 hitos y 6 eras.',
+  keywords: [
+    'independencia estados unidos cronología historia',
+    'ley del timbre leyes townshend motín té boston',
+    'declaración independencia 1776 revolución americana',
+    'saratoga yorktown guerra independencia francia españa',
+    'tratado de parís 1783 trece colonias',
+    'artículos confederación constitución 1787 washington',
+  ],
+  anioInicio: 1763,
+  anioFin: 1789,
+
+  hitos: [
+    {
+      id: 'posguerra-siete-anos',
+      nombre: 'La posguerra de los Siete Años',
+      anioInicio: 1763,
+      anioFin: 1765,
+      color: '#5D6D7E',
+      categoria: 'tensiones',
+      descripcion: 'La Guerra de los Siete Años (llamada Guerra Franco-India en Norteamérica) terminó en 1763 con la victoria británica y la expulsión de Francia del continente por el Tratado de París. El coste dejó a Gran Bretaña con una enorme deuda y con nuevos territorios que administrar y defender. El Gobierno de Londres consideró razonable que las colonias contribuyeran a sufragar su propia defensa. La Proclamación Real de 1763 prohibió la expansión al oeste de los Apalaches para evitar conflictos con los pueblos indígenas, medida que muchos colonos vieron como una limitación a sus intereses.',
+      obraIconica: 'Tratado de París de 1763 y la Proclamación Real que fija la frontera de los Apalaches',
+      paises: ['Gran Bretaña', 'Trece Colonias', 'Francia'],
+    },
+    {
+      id: 'ley-timbre',
+      nombre: 'La Ley del Timbre',
+      anioInicio: 1765,
+      anioFin: 1766,
+      color: '#7D6608',
+      categoria: 'protesta',
+      descripcion: 'En 1765 el Parlamento aprobó la Stamp Act, un impuesto directo sobre documentos, periódicos y naipes en las colonias. La reacción fue intensa: se articuló la consigna "no taxation without representation" (ningún impuesto sin representación), pues las colonias no elegían diputados en Westminster. Se formaron los Hijos de la Libertad y se reunió el Congreso de la Ley del Timbre. Desde Londres se sostenía la doctrina de la "representación virtual", según la cual el Parlamento representaba a todos los súbditos. La presión de comerciantes británicos afectados por el boicot llevó a su derogación en 1766, aunque la Declaratory Act reafirmó la autoridad del Parlamento.',
+      obraIconica: 'La consigna "no taxation without representation" y el Congreso de la Ley del Timbre (1765)',
+      paises: ['Gran Bretaña', 'Trece Colonias'],
+    },
+    {
+      id: 'leyes-townshend',
+      nombre: 'Las Leyes Townshend',
+      anioInicio: 1767,
+      anioFin: 1770,
+      color: '#7D6608',
+      categoria: 'protesta',
+      descripcion: 'En 1767 el ministro Charles Townshend impulsó nuevos aranceles sobre importaciones como el té, el vidrio, el papel y la pintura. Las colonias respondieron con acuerdos de no importación y boicots comerciales. La tensión aumentó con la llegada de tropas a Boston. El 5 de marzo de 1770, un altercado terminó con soldados británicos disparando contra una multitud: cinco personas murieron en lo que la propaganda colonial llamó la "Masacre de Boston". Los soldados fueron defendidos en el juicio por John Adams, futuro presidente, y la mayoría absueltos. Ese mismo año se derogaron casi todos los aranceles Townshend, salvo el del té.',
+      obraIconica: 'El incidente de la calle King, difundido como "Masacre de Boston" (1770)',
+      paises: ['Gran Bretaña', 'Trece Colonias'],
+    },
+    {
+      id: 'motin-te',
+      nombre: 'El Motín del Té y las Leyes Intolerables',
+      anioInicio: 1773,
+      anioFin: 1774,
+      color: '#922B21',
+      categoria: 'ruptura',
+      descripcion: 'La Tea Act de 1773 concedió a la Compañía de las Indias Orientales una ventaja fiscal en la venta de té, lo que muchos colonos interpretaron como un intento de imponer el impuesto por otra vía. La noche del 16 de diciembre de 1773, un grupo del que participaron Hijos de la Libertad arrojó al puerto de Boston el cargamento de té de tres barcos. Como respuesta, el Parlamento aprobó en 1774 las Coercive Acts, apodadas "Leyes Intolerables" en las colonias: cerraron el puerto de Boston, reformaron el gobierno de Massachusetts y ampliaron el acuartelamiento de tropas. Lejos de aislar a Massachusetts, endurecieron la solidaridad entre colonias.',
+      obraIconica: 'El Motín del Té de Boston (Boston Tea Party, 16 de diciembre de 1773)',
+      paises: ['Gran Bretaña', 'Massachusetts', 'Trece Colonias'],
+    },
+    {
+      id: 'primer-congreso',
+      nombre: 'El Primer Congreso Continental',
+      anioInicio: 1774,
+      anioFin: 1775,
+      color: '#1F618D',
+      categoria: 'ruptura',
+      descripcion: 'En septiembre de 1774, delegados de doce colonias (Georgia no acudió) se reunieron en Filadelfia en el Primer Congreso Continental. No buscaban aún la independencia, sino coordinar una respuesta a las Leyes Intolerables y reclamar sus derechos como súbditos británicos. Acordaron un boicot comercial mediante la Asociación Continental y enviaron una petición al rey Jorge III. La postura estaba dividida entre quienes deseaban la reconciliación y quienes defendían medidas más firmes. Al no obtener respuesta satisfactoria, se convocó un Segundo Congreso para mayo de 1775, que acabaría asumiendo funciones de gobierno.',
+      obraIconica: 'La Asociación Continental y la petición al rey Jorge III (1774)',
+      paises: ['Trece Colonias', 'Gran Bretaña'],
+    },
+    {
+      id: 'lexington-independencia',
+      nombre: 'Lexington, Concord y la Declaración',
+      anioInicio: 1775,
+      anioFin: 1776,
+      color: '#B03A2E',
+      categoria: 'guerra',
+      descripcion: 'El conflicto armado estalló el 19 de abril de 1775 en los combates de Lexington y Concord, cuando tropas británicas intentaron confiscar armas de la milicia colonial. El Segundo Congreso Continental nombró a George Washington comandante del Ejército Continental. El panfleto "Common Sense" de Thomas Paine (1776) popularizó la idea de la independencia. El 4 de julio de 1776 el Congreso aprobó la Declaración de Independencia, redactada principalmente por Thomas Jefferson, que proclamaba que "todos los hombres son creados iguales". Esta afirmación convivió con la esclavitud legal en las colonias y con la exclusión política de mujeres, personas esclavizadas e indígenas, contradicción que marcaría la historia posterior del país.',
+      obraIconica: 'La Declaración de Independencia (4 de julio de 1776)',
+      paises: ['Trece Colonias', 'Massachusetts', 'Pensilvania'],
+    },
+    {
+      id: 'saratoga-alianza',
+      nombre: 'Saratoga y la alianza internacional',
+      anioInicio: 1777,
+      anioFin: 1778,
+      color: '#B03A2E',
+      categoria: 'internacional',
+      descripcion: 'Tras un inicio adverso, la victoria estadounidense en Saratoga (octubre de 1777) marcó un punto de inflexión: la rendición del ejército británico de Burgoyne demostró que la causa colonial era viable. Ese resultado facilitó la gestión diplomática de Benjamin Franklin en París y llevó a Francia a firmar en 1778 una alianza formal, aportando ejército, flota y financiación. España entró en la guerra en 1779 como aliada de Francia, y la República de los Países Bajos también acabó en conflicto con Gran Bretaña. Lo que había empezado como una rebelión colonial se convirtió en un conflicto internacional que tensó los recursos británicos en varios frentes.',
+      obraIconica: 'La rendición de Burgoyne en Saratoga (1777) y la alianza franco-estadounidense (1778)',
+      paises: ['Estados Unidos', 'Francia', 'España', 'Provincias Unidas', 'Gran Bretaña'],
+    },
+    {
+      id: 'yorktown-paris',
+      nombre: 'De Valley Forge a Yorktown y la paz',
+      anioInicio: 1778,
+      anioFin: 1783,
+      color: '#873600',
+      categoria: 'guerra',
+      descripcion: 'El durísimo invierno de Valley Forge (1777-1778) puso a prueba al Ejército Continental, que salió reorganizado gracias, entre otros, a la instrucción del oficial prusiano Von Steuben. Con el apoyo militar y naval francés, las fuerzas de Washington y Rochambeau sitiaron al ejército de Cornwallis en Yorktown; el bloqueo de la flota francesa impidió su evacuación y forzó su rendición en octubre de 1781, la última gran batalla del conflicto. Las negociaciones culminaron en el Tratado de París de 1783, por el que Gran Bretaña reconoció la independencia de Estados Unidos y fijó sus fronteras hasta el río Misisipi. Miles de leales (tories) emigraron a Canadá y otros territorios británicos.',
+      obraIconica: 'La rendición de Cornwallis en Yorktown (1781) y el Tratado de París (1783)',
+      paises: ['Estados Unidos', 'Francia', 'Gran Bretaña'],
+    },
+    {
+      id: 'articulos-confederacion',
+      nombre: 'Los Artículos de la Confederación',
+      anioInicio: 1781,
+      anioFin: 1787,
+      color: '#117A65',
+      categoria: 'fundacion',
+      descripcion: 'Tras la guerra, los nuevos Estados se rigieron por los Artículos de la Confederación, ratificados en 1781, que establecían una unión débil con un gobierno central sin poder para recaudar impuestos ni regular el comercio de forma efectiva. Los problemas económicos de posguerra, la deuda y las tensiones entre Estados evidenciaron las limitaciones del sistema. La Rebelión de Shays (1786-1787), una revuelta de agricultores endeudados en Massachusetts, reforzó entre parte de la élite política la convicción de que hacía falta un gobierno nacional más fuerte. Este diagnóstico —discutido en su momento— impulsó la convocatoria de una convención para revisar los Artículos.',
+      obraIconica: 'Los Artículos de la Confederación (1781) y la Rebelión de Shays (1786-1787)',
+      paises: ['Estados Unidos'],
+    },
+    {
+      id: 'constitucion-gobierno',
+      nombre: 'La Constitución y el nuevo gobierno',
+      anioInicio: 1787,
+      anioFin: 1789,
+      color: '#1E8449',
+      categoria: 'fundacion',
+      descripcion: 'La Convención de Filadelfia de 1787, en lugar de reformar los Artículos, redactó una nueva Constitución que creaba un gobierno federal con división de poderes y un sistema de equilibrios. El texto incorporó compromisos controvertidos, como la fórmula de los "tres quintos" para contar a la población esclavizada a efectos de representación. El proceso de ratificación enfrentó a federalistas y antifederalistas; los primeros defendieron el texto en los ensayos de "El Federalista". La Constitución entró en vigor en 1789 y George Washington asumió como primer presidente. La demanda de garantías individuales cristalizó poco después en la Carta de Derechos (Bill of Rights).',
+      obraIconica: 'La Constitución de Estados Unidos (1787) y la toma de posesión de Washington (1789)',
+      paises: ['Estados Unidos'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'Tensiones de posguerra',
+      desde: 1763,
+      hasta: 1766,
+      icono: '🗺️',
+      hitosDestacados: ['La posguerra de los Siete Años', 'La Ley del Timbre'],
+      eventos: [
+        'El Tratado de París de 1763 expulsa a Francia de Norteamérica continental',
+        'La deuda de guerra impulsa a Londres a buscar ingresos coloniales',
+        'La Proclamación Real limita la expansión al oeste de los Apalaches (1763)',
+        'La Ley del Timbre desata protestas y el boicot comercial (1765)',
+        'Se deroga la Ley del Timbre, pero la Declaratory Act reafirma el poder del Parlamento (1766)',
+      ],
+    },
+    {
+      nombre: 'Escalada del conflicto',
+      desde: 1766,
+      hasta: 1774,
+      icono: '☕',
+      hitosDestacados: ['Las Leyes Townshend', 'El Motín del Té y las Leyes Intolerables'],
+      eventos: [
+        'Las Leyes Townshend gravan té, vidrio y papel (1767)',
+        'Acuerdos de no importación y llegada de tropas a Boston',
+        'El incidente de la calle King, difundido como "Masacre de Boston" (1770)',
+        'El Motín del Té de Boston arroja el cargamento al puerto (1773)',
+        'Las Leyes Intolerables cierran el puerto de Boston (1774)',
+      ],
+    },
+    {
+      nombre: 'De la protesta a la ruptura',
+      desde: 1774,
+      hasta: 1776,
+      icono: '📜',
+      hitosDestacados: ['El Primer Congreso Continental', 'Lexington, Concord y la Declaración'],
+      eventos: [
+        'El Primer Congreso Continental se reúne en Filadelfia (1774)',
+        'Los combates de Lexington y Concord inician la guerra (abril de 1775)',
+        'El Segundo Congreso nombra a Washington jefe del Ejército Continental',
+        '"Common Sense" de Thomas Paine populariza la independencia (1776)',
+        'El Congreso aprueba la Declaración de Independencia (4 de julio de 1776)',
+      ],
+    },
+    {
+      nombre: 'Internacionalización de la guerra',
+      desde: 1776,
+      hasta: 1779,
+      icono: '⚓',
+      hitosDestacados: ['Saratoga y la alianza internacional'],
+      eventos: [
+        'Fase inicial adversa para el Ejército Continental',
+        'La victoria de Saratoga marca un punto de inflexión (1777)',
+        'Benjamin Franklin negocia la alianza en la corte francesa',
+        'Francia firma la alianza formal con Estados Unidos (1778)',
+        'España entra en la guerra como aliada de Francia (1779)',
+      ],
+    },
+    {
+      nombre: 'Victoria e independencia reconocida',
+      desde: 1779,
+      hasta: 1783,
+      icono: '⚔️',
+      hitosDestacados: ['De Valley Forge a Yorktown y la paz'],
+      eventos: [
+        'El invierno de Valley Forge reorganiza y disciplina al ejército (1777-1778)',
+        'La flota francesa da superioridad naval a la causa aliada',
+        'El asedio de Yorktown fuerza la rendición de Cornwallis (1781)',
+        'El Tratado de París reconoce la independencia de Estados Unidos (1783)',
+        'Miles de leales (tories) emigran a Canadá y otros territorios',
+      ],
+    },
+    {
+      nombre: 'Construcción del nuevo Estado',
+      desde: 1783,
+      hasta: 1789,
+      icono: '🏛️',
+      hitosDestacados: ['Los Artículos de la Confederación', 'La Constitución y el nuevo gobierno'],
+      eventos: [
+        'Los Artículos de la Confederación muestran las debilidades de la unión',
+        'La Rebelión de Shays reaviva el debate sobre un gobierno central fuerte (1786-1787)',
+        'La Convención de Filadelfia redacta una nueva Constitución (1787)',
+        'Federalistas y antifederalistas debaten la ratificación',
+        'La Constitución entra en vigor y Washington asume la presidencia (1789)',
+      ],
+    },
+  ],
+
+  categorias: {
+    tensiones: 'Tensiones de posguerra',
+    protesta: 'Impuestos y protesta',
+    ruptura: 'Ruptura política',
+    guerra: 'Guerra de Independencia',
+    internacional: 'Dimensión internacional',
+    fundacion: 'Fundación del Estado',
+  },
+
+  colores: {
+    tensiones: '#5D6D7E',
+    protesta: '#7D6608',
+    ruptura: '#922B21',
+    guerra: '#B03A2E',
+    internacional: '#873600',
+    fundacion: '#1E8449',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'La independencia de Estados Unidos no fue un acontecimiento aislado, sino un proceso de un cuarto de siglo que enlazó una disputa fiscal con la creación de un nuevo tipo de Estado. Todo arrancó tras la Guerra de los Siete Años (1763): Gran Bretaña, endeudada y con un imperio ampliado, buscó que las colonias contribuyeran a los costes de su defensa; las colonias, que no elegían diputados en el Parlamento, respondieron con la reivindicación de que no debían pagar impuestos aprobados sin su representación. De esa tensión se pasó al boicot, al enfrentamiento armado (1775), a la Declaración de Independencia (1776) y a una guerra que, con la entrada de Francia y España, se volvió internacional. El Tratado de París (1783) reconoció la independencia, pero el proceso no terminó ahí: los Artículos de la Confederación resultaron insuficientes y la Constitución de 1787 dio forma al gobierno federal que echó a andar en 1789. Esta cronología recorre ese arco tratando de presentar tanto los motivos fiscales y estratégicos británicos como las reivindicaciones coloniales, sin ocultar las contradicciones del proceso, como la coexistencia de la proclama "todos los hombres son creados iguales" con la esclavitud legal.',
+
+    tablaComparativa: [
+      { hito: 'La posguerra de los Siete Años', periodo: '1763-1765', categoria: 'Tensiones de posguerra', personaje: 'Jorge III / George Grenville', aportacion: 'Deuda de guerra y Proclamación de 1763 que fija la frontera de los Apalaches' },
+      { hito: 'La Ley del Timbre', periodo: '1765-1766', categoria: 'Impuestos y protesta', personaje: 'Patrick Henry / Hijos de la Libertad', aportacion: 'Consigna "no taxation without representation" y primer boicot coordinado' },
+      { hito: 'El Motín del Té y las Leyes Intolerables', periodo: '1773-1774', categoria: 'Ruptura política', personaje: 'Samuel Adams / Lord North', aportacion: 'Escalada que une a las colonias frente al castigo a Massachusetts' },
+      { hito: 'Lexington, Concord y la Declaración', periodo: '1775-1776', categoria: 'Guerra de Independencia', personaje: 'Thomas Jefferson / George Washington', aportacion: 'Inicio de la guerra y proclamación formal de la independencia' },
+      { hito: 'Saratoga y la alianza internacional', periodo: '1777-1778', categoria: 'Dimensión internacional', personaje: 'Benjamin Franklin / Horatio Gates', aportacion: 'Punto de inflexión militar y alianza con Francia' },
+      { hito: 'La Constitución y el nuevo gobierno', periodo: '1787-1789', categoria: 'Fundación del Estado', personaje: 'James Madison / George Washington', aportacion: 'Gobierno federal con división de poderes e inicio del sistema presidencial' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiantes de Historia',
+        perfil: 'Secundaria, preparatoria y universidad',
+        texto: 'Visión ordenada de cómo una disputa fiscal derivó en una guerra internacional y en la creación de un Estado. Útil para entender el paso del súbdito al ciudadano, el concepto de representación política y el contexto atlántico del siglo XVIII.',
+      },
+      {
+        icono: '⚖️',
+        titulo: 'Interesados en el derecho constitucional',
+        perfil: 'Origen del constitucionalismo moderno',
+        texto: 'La Constitución de 1787 introdujo la división de poderes, el sistema de equilibrios y el federalismo escritos en un solo documento. Esta cronología sitúa cómo se llegó a ese texto y qué compromisos, incluidos los más controvertidos, contuvo.',
+      },
+      {
+        icono: '🌍',
+        titulo: 'Relaciones internacionales',
+        perfil: 'Diplomacia y equilibrio de potencias',
+        texto: 'La entrada de Francia, España y los Países Bajos convirtió una rebelión colonial en un conflicto entre potencias europeas. Un caso claro para estudiar alianzas, intereses estratégicos y el papel de la diplomacia en el resultado de una guerra.',
+      },
+      {
+        icono: '📰',
+        titulo: 'Comunicación y opinión pública',
+        perfil: 'Propaganda y movilización política',
+        texto: 'Del grabado de la "Masacre de Boston" al panfleto "Common Sense", el conflicto muestra cómo la imprenta, los símbolos y los relatos moldearon la opinión de ambos bandos. Ideal para analizar la construcción de discursos políticos.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Por qué quisieron independizarse las Trece Colonias?',
+        respuesta: 'El detonante fue fiscal y político. Tras la Guerra de los Siete Años, Gran Bretaña quiso que las colonias ayudaran a pagar la deuda y la defensa mediante impuestos como la Ley del Timbre. Las colonias objetaron que no debían tributar sin tener diputados en el Parlamento ("no taxation without representation"). Londres respondía con la doctrina de la "representación virtual". El desencuentro sobre quién tenía autoridad para legislar y gravar, más que un único agravio, fue escalando hasta la ruptura.',
+        tip: 'Al principio la mayoría de los colonos no buscaba la independencia, sino que se respetaran sus derechos como súbditos británicos.',
+      },
+      {
+        pregunta: '¿Qué fue el Motín del Té de Boston?',
+        respuesta: 'El 16 de diciembre de 1773, en protesta por la Tea Act, un grupo en el que participaron los Hijos de la Libertad arrojó al puerto de Boston el cargamento de té de tres barcos de la Compañía de las Indias Orientales. La Tea Act no subía el impuesto, pero se percibió como un intento de imponerlo por otra vía. La respuesta británica fueron las Leyes Coercitivas ("Intolerables"), que en lugar de aislar a Massachusetts unieron a las colonias.',
+        tip: 'El té destruido pertenecía a una compañía privada; el acto fue tanto una protesta fiscal como un ataque a un privilegio comercial.',
+      },
+      {
+        pregunta: '¿Fue decisiva la ayuda extranjera?',
+        respuesta: 'Sí, fue muy importante. La victoria de Saratoga (1777) convenció a Francia de firmar una alianza formal en 1778, aportando ejército, flota y financiación; España entró en 1779 y los Países Bajos también acabaron en guerra con Gran Bretaña. En Yorktown (1781), la superioridad naval francesa impidió la evacuación de Cornwallis y forzó su rendición. La independencia fue una empresa estadounidense, pero difícilmente habría triunfado sin ese apoyo internacional.',
+        tip: 'La guerra tensó las finanzas de todos los implicados; la deuda contraída por Francia influiría en su propia crisis posterior.',
+      },
+      {
+        pregunta: '¿Cómo se explica la esclavitud junto a la Declaración de Independencia?',
+        respuesta: 'Es una de las grandes contradicciones del proceso. La Declaración de 1776 afirmaba que "todos los hombres son creados iguales", pero la esclavitud era legal en las colonias y varios de los redactores poseían personas esclavizadas. Las mujeres, los indígenas y las personas esclavizadas quedaron excluidos de los derechos proclamados. La Constitución de 1787 incluso incorporó la fórmula de los "tres quintos". Esa tensión entre los principios enunciados y la realidad marcó buena parte de la historia posterior del país.',
+        tip: 'La contradicción no pasó desapercibida en su época: algunos contemporáneos, dentro y fuera de las colonias, ya la señalaron.',
+      },
+      {
+        pregunta: '¿Por qué no bastó con ganar la guerra?',
+        respuesta: 'La independencia reconocida en 1783 dejó a los Estados unidos por los Artículos de la Confederación, un pacto débil sin capacidad para recaudar impuestos ni regular bien el comercio. Los problemas económicos de posguerra y episodios como la Rebelión de Shays llevaron a parte de la élite política a considerar necesario un gobierno central más fuerte. Ese diagnóstico —discutido entonces— desembocó en la Convención de Filadelfia y en la Constitución de 1787, que entró en vigor en 1789.',
+        tip: 'La Constitución fue una segunda fundación: cambió por completo la arquitectura del gobierno acordada apenas unos años antes.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Observa los bloques de color en la Línea del Tiempo',
+        cuerpo: 'El gris son las tensiones iniciales, el ocre las disputas fiscales, el rojo la ruptura y la guerra, el marrón la dimensión internacional y el verde la construcción del Estado. Antes de leer, fíjate en cómo el conflicto se concentra en pocos años y cómo la fase de guerra ocupa el centro de la línea.',
+      },
+      {
+        titulo: 'Sigue la lógica de la escalada fiscal',
+        cuerpo: 'Haz clic en "La Ley del Timbre" y luego en "Las Leyes Townshend" y "El Motín del Té". Verás una secuencia: cada impuesto genera protesta, cada protesta una respuesta más dura, y cada respuesta refuerza la unión entre colonias. La ruptura no fue un salto, sino una acumulación.',
+      },
+      {
+        titulo: 'Distingue la rebelión de la guerra internacional',
+        cuerpo: 'Compara "Lexington, Concord y la Declaración" con "Saratoga y la alianza internacional". El primero es una rebelión colonial; el segundo, el momento en que Francia, España y los Países Bajos convierten el conflicto en una guerra entre potencias. Es la clave para entender por qué Gran Bretaña acabó cediendo.',
+      },
+      {
+        titulo: 'Usa la Comparativa para ver los dos bandos',
+        cuerpo: 'En la tabla Comparativa aparecen figuras de ambos lados (Jorge III, Lord North, Grenville frente a Jefferson, Washington, Franklin). Léelas en conjunto para no reducir el proceso a un solo punto de vista: había motivos, cálculos y divisiones internas en los dos bandos.',
+      },
+      {
+        titulo: 'Termina con el Contexto Histórico para el cuadro completo',
+        cuerpo: 'Las 6 eras muestran cómo se pasó de la disputa fiscal a un nuevo Estado. La era "Construcción del nuevo Estado" es clave: la independencia militar (1783) no resolvió cómo gobernarse, y solo la Constitución de 1787 cerró ese interrogante.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '📅',
+        texto: 'La fecha del 4 de julio de 1776 se refiere a la aprobación del texto de la Declaración por el Congreso; la votación por la independencia se había producido el 2 de julio. La celebración anual se fijó en el día del texto, no en el de la decisión.',
+      },
+      {
+        icono: '🤝',
+        texto: 'No todos los colonos apoyaron la independencia. Los leales o "tories" —quizá una parte relevante de la población, según distintas estimaciones— permanecieron fieles a la Corona, y muchos emigraron a Canadá tras la guerra. También hubo indígenas y personas esclavizadas que apoyaron a uno u otro bando según sus intereses.',
+      },
+      {
+        icono: '🌐',
+        texto: 'La Guerra de Independencia fue, en la práctica, un conflicto global: hubo combates en el Caribe, el Mediterráneo (asedio de Gibraltar por España), la India y las aguas europeas. Verla solo como una guerra en Norteamérica deja fuera buena parte de su alcance.',
+      },
+      {
+        icono: '📖',
+        texto: 'El Federalista, la serie de ensayos de Hamilton, Madison y Jay a favor de la Constitución, se escribió como propaganda política para la ratificación. Hoy se estudia como una de las principales fuentes para interpretar el texto constitucional.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Pensar que fue una revuelta contra impuestos altos',
+        cuerpo: 'La carga fiscal británica sobre las colonias era, en términos comparados, moderada. El conflicto no fue tanto por la cuantía como por el principio: quién tenía autoridad para imponer tributos y si podía hacerlo sin representación colonial en el Parlamento. Reducirlo a "no querían pagar" simplifica un debate político y constitucional de fondo.',
+      },
+      {
+        titulo: 'Presentar a un bando como héroe y al otro como tirano',
+        cuerpo: 'Desde Londres, pedir que las colonias contribuyeran a su defensa tras una guerra costosa tenía lógica financiera; desde las colonias, la reivindicación de representación también era coherente. Hubo divisiones y matices en ambos lados, incluidos parlamentarios británicos favorables a las colonias. El relato épico o el de la "tiranía" deforman esa complejidad.',
+      },
+      {
+        titulo: 'Creer que la independencia se ganó en solitario',
+        cuerpo: 'La aportación de Francia y España —tropas, flota, dinero y frentes abiertos en otras partes del mundo— fue determinante en el desenlace, especialmente en Yorktown. Contar la guerra solo como una gesta interna omite la dimensión internacional que explica por qué Gran Bretaña acabó negociando la paz.',
+      },
+      {
+        titulo: 'Confundir la Declaración con la Constitución',
+        cuerpo: 'Son dos documentos distintos y separados por más de una década. La Declaración de Independencia (1776) proclamó la ruptura con Gran Bretaña y unos principios generales; la Constitución (1787) diseñó el sistema de gobierno federal. Entre ambas estuvieron los Artículos de la Confederación, un primer ensayo que resultó insuficiente.',
+      },
+    ],
+  },
+};

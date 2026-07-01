@@ -162,6 +162,8 @@ import { pesteNegra } from './peste-negra';
 import { caidaImperioRomano } from './caida-imperio-romano';
 import { caidaConstantinopla } from './caida-constantinopla';
 import { revoluciones1848 } from './revoluciones-1848';
+import { independenciaEeuu } from './independencia-eeuu';
+import { guerraCivilEspanola } from './guerra-civil-espanola';
 
 const registry: Record<string, HistoriaData> = {
   grecia,
@@ -297,6 +299,8 @@ const registry: Record<string, HistoriaData> = {
   'caida-imperio-romano': caidaImperioRomano,
   'caida-constantinopla': caidaConstantinopla,
   'revoluciones-1848': revoluciones1848,
+  'independencia-eeuu': independenciaEeuu,
+  'guerra-civil-espanola': guerraCivilEspanola,
   'sudeste-asiatico': sudeste_asiatico,
   'brasil-moderno': brasilModerno,
   'mexico-moderno': mexicoModerno,

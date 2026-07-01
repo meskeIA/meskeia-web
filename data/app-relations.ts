@@ -4821,6 +4821,18 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-historia/historia-italia/', icon: '🍝', name: 'Historia de Italia', description: 'Las Cinco Jornadas de Milán y la República Romana de 1848-1849 son un episodio clave del Risorgimento: la semilla de la unificación italiana' },
     { url: '/visualizador-historia/historia-austria-hungria/', icon: '👑', name: 'Historia de Austria-Hungría', description: 'La caída de Metternich y la revolución húngara de Kossuth (1848) sacudieron el Imperio austríaco hasta sus cimientos y anticiparon el compromiso de 1867' },
   ],
+  'visualizador-historia-independencia-eeuu': [
+    { url: '/visualizador-historia/ilustracion/', icon: '💡', name: 'La Ilustración', description: 'La Declaración de Independencia y la Constitución beben de la Ilustración: la soberanía popular de Locke, la división de poderes de Montesquieu y el contrato social se convierten aquí en un Estado' },
+    { url: '/visualizador-historia/revolucion-francesa/', icon: '🗽', name: 'La Revolución Francesa', description: 'La Revolución Americana (1776) precedió e influyó en la Francesa (1789): oficiales franceses como Lafayette llevaron a Francia la experiencia y las ideas del proceso americano' },
+    { url: '/visualizador-historia/independencias-hispanoamericanas/', icon: '✊', name: 'Las Independencias Hispanoamericanas', description: 'El precedente de 1776 inspiró a los libertadores hispanoamericanos: la idea de que unas colonias podían emanciparse de su metrópoli europea recorrió todo el continente' },
+    { url: '/visualizador-historia/historia-eeuu/', icon: '🇺🇸', name: 'Historia de Estados Unidos', description: 'Para el arco completo del país tras su fundación: esta cronología se centra solo en el proceso de independencia (1763-1789), su punto de partida' },
+  ],
+  'visualizador-historia-guerra-civil-espanola': [
+    { url: '/visualizador-historia/espana-contemporanea/', icon: '📜', name: 'La España Contemporánea', description: 'La guerra se enmarca en el convulso siglo XX español: aquí está el arco largo que va de la Restauración a la democracia, con la República y el franquismo en su contexto' },
+    { url: '/visualizador-historia/segunda-guerra-mundial/', icon: '✈️', name: 'Segunda Guerra Mundial', description: 'Muchos historiadores ven la guerra española como un "ensayo general" de la Segunda Guerra Mundial: Alemania e Italia probaron en ella aviación y tácticas que emplearían después' },
+    { url: '/visualizador-historia/revolucion-rusa/', icon: '🚩', name: 'La Revolución Rusa', description: 'La URSS surgida de 1917 fue el principal apoyo exterior de la República; el peso del comunismo en el bando republicano solo se entiende a la luz de la Revolución Rusa' },
+    { url: '/visualizador-historia/historia-italia/', icon: '🍝', name: 'Historia de Italia', description: 'La Italia fascista de Mussolini envió tropas y aviación al bando sublevado; su derrota en Guadalajara (1937) fue uno de los reveses italianos de la guerra' },
+  ],
   'visualizador-historia-imperio-persa': [
     { url: '/visualizador-historia/grecia/', icon: '🏛️', name: 'Historia de la Antigua Grecia', description: 'Las Guerras Médicas —Maratón, Termópilas, Salamina— son el eje del conflicto entre Persia y Grecia: sin Persia, no hay narrativa griega del siglo V a.C.' },
     { url: '/visualizador-historia/mesopotamia/', icon: '🏺', name: 'Historia de Mesopotamia', description: 'Ciro el Grande conquistó Babilonia sin batalla (539 a.C.) y liberó a los judíos: Persia heredó el legado mesopotámico y lo administró durante dos siglos' },

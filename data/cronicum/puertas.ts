@@ -182,7 +182,7 @@ export const PUERTAS: Puerta[] = [
       'revolucion-industrial', 'revolucion-cientifica', 'descolonizacion',
       'revolucion-rusa', 'gran-depresion', 'independencias-hispanoamericanas',
       'peste-negra', 'caida-imperio-romano', 'caida-constantinopla',
-      'revoluciones-1848',
+      'revoluciones-1848', 'independencia-eeuu', 'guerra-civil-espanola',
     ],
   },
 ];

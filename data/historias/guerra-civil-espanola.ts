@@ -1,0 +1,375 @@
+import type { HistoriaData } from './types';
+
+export const guerraCivilEspanola: HistoriaData = {
+  slug: 'guerra-civil-espanola',
+  titulo: 'La Guerra Civil Española: De la República a la Posguerra',
+  subtitulo: 'Una cronología factual del conflicto de 1936-1939: los hechos datados, la violencia de ambas retaguardias y las cifras tal como las estiman los historiadores, sin tomar partido',
+  descripcionSEO: 'Cronología interactiva y neutral de la Guerra Civil Española (1936-1939): de la Segunda República al golpe de Estado de julio de 1936, la internacionalización del conflicto, la defensa de Madrid, la represión en las dos retaguardias, Guernica, la revolución social, la batalla del Ebro, el final de la guerra y el exilio. Hechos datados y cifras atribuidas a historiadores, en 10 hitos y 6 eras.',
+  keywords: [
+    'guerra civil española cronología historia 1936 1939',
+    'segunda república golpe de estado julio 1936 sublevación',
+    'bando republicano bando sublevado nacional frente',
+    'guernica legión cóndor brigadas internacionales no intervención',
+    'batalla del ebro madrid represión retaguardia víctimas',
+    'final guerra civil exilio posguerra republicano franquista',
+  ],
+  anioInicio: 1931,
+  anioFin: 1945,
+
+  hitos: [
+    {
+      id: 'segunda-republica',
+      nombre: 'La Segunda República',
+      anioInicio: 1931,
+      anioFin: 1936,
+      color: '#6D8B74',
+      categoria: 'contexto',
+      descripcion: 'La Segunda República se proclamó el 14 de abril de 1931 tras las elecciones municipales y la marcha de Alfonso XIII. El nuevo régimen emprendió reformas de gran calado (agraria, educativa, militar, autonómica y de separación Iglesia-Estado) en un contexto de fuerte polarización política y social, agravada por la crisis económica de los años treinta. Se alternaron gobiernos de distinto signo (el bienio reformista, el bienio de centro-derecha, la Revolución de Asturias de 1934) hasta la victoria del Frente Popular en febrero de 1936. La primavera de 1936 vivió una espiral de violencia política que los historiadores debaten como uno de los factores del estallido posterior.',
+      obraIconica: 'Proclamación de la Segunda República el 14 de abril de 1931',
+      paises: ['España'],
+    },
+    {
+      id: 'golpe-julio-1936',
+      nombre: 'El golpe de Estado de julio de 1936',
+      anioInicio: 1936,
+      anioFin: 1936,
+      color: '#A0522D',
+      categoria: 'sublevacion',
+      descripcion: 'Entre el 17 y el 18 de julio de 1936, una parte del ejército se sublevó contra el gobierno de la República. El golpe triunfó en cerca de la mitad del territorio, pero fracasó en las principales ciudades (Madrid, Barcelona, Valencia, Bilbao), donde el gobierno y las organizaciones obreras lo contuvieron. Ese éxito parcial fue precisamente lo que transformó el golpe en una guerra civil prolongada: el país quedó partido en dos zonas. Murió pronto el general Sanjurjo, previsto como líder, y Francisco Franco trasladó el Ejército de África a la Península con apoyo aéreo italiano y alemán.',
+      obraIconica: 'La sublevación militar del 17-18 de julio de 1936 divide España en dos',
+      paises: ['España', 'Marruecos español'],
+    },
+    {
+      id: 'internacionalizacion',
+      nombre: 'La internacionalización del conflicto',
+      anioInicio: 1936,
+      anioFin: 1939,
+      color: '#4682B4',
+      categoria: 'internacional',
+      descripcion: 'La guerra adquirió pronto dimensión internacional. El bando sublevado recibió ayuda militar decisiva de Italia y Alemania (aviones, carros, la Legión Cóndor). El bando republicano contó con el apoyo de la Unión Soviética —que cobró en oro— y de México, además de las Brigadas Internacionales, unos 35.000 voluntarios de decenas de países. Reino Unido y Francia impulsaron un Comité de No Intervención que, en la práctica, no impidió la ayuda del Eje y sí limitó el abastecimiento de la República. Muchos historiadores consideran la guerra un "ensayo general" de la Segunda Guerra Mundial.',
+      obraIconica: 'Brigadas Internacionales, Legión Cóndor y el Comité de No Intervención',
+      paises: ['España', 'Alemania', 'Italia', 'Unión Soviética', 'Reino Unido', 'Francia', 'México'],
+    },
+    {
+      id: 'defensa-madrid',
+      nombre: 'La defensa de Madrid',
+      anioInicio: 1936,
+      anioFin: 1937,
+      color: '#8B0000',
+      categoria: 'guerra',
+      descripcion: 'Tras el rápido avance de las columnas sublevadas desde el sur, en noviembre de 1936 el frente llegó a Madrid. La ciudad resistió el asalto directo bajo el lema "No pasarán", con la ayuda de las primeras Brigadas Internacionales. El gobierno se trasladó a Valencia. Los sublevados renunciaron al asalto frontal y buscaron rodear la capital: las batallas del Jarama (febrero de 1937) y de Guadalajara (marzo de 1937) —esta última un revés para las tropas italianas— estabilizaron un frente que se mantendría casi hasta el final de la guerra.',
+      obraIconica: 'La resistencia de Madrid en noviembre de 1936 ("No pasarán")',
+      paises: ['España'],
+    },
+    {
+      id: 'represion-retaguardias',
+      nombre: 'La represión en las dos retaguardias',
+      anioInicio: 1936,
+      anioFin: 1939,
+      color: '#4A4A4A',
+      categoria: 'represion',
+      descripcion: 'Lejos de los frentes, ambas zonas vivieron una intensa violencia contra los considerados enemigos internos. En la zona republicana hubo asesinatos extrajudiciales ("paseos"), una fuerte violencia anticlerical (miles de religiosos muertos) y episodios como las sacas de presos de Paracuellos (finales de 1936). En la zona sublevada la represión, según la mayoría de los estudios, se prolongó más en el tiempo por la larga duración de la posguerra, con episodios como los de Badajoz (1936) o la muerte del poeta Federico García Lorca. Los historiadores estiman en torno a 50.000 las víctimas en la retaguardia republicana y una cifra mayor —revisada al alza por las investigaciones y exhumaciones— en la sublevada; las cifras exactas siguen siendo objeto de estudio.',
+      obraIconica: 'La violencia en la retaguardia de ambos bandos (1936-1939)',
+      paises: ['España'],
+    },
+    {
+      id: 'caida-norte-guernica',
+      nombre: 'La caída del Norte y el bombardeo de Guernica',
+      anioInicio: 1937,
+      anioFin: 1937,
+      color: '#8B0000',
+      categoria: 'guerra',
+      descripcion: 'En 1937 el bando sublevado conquistó la franja cantábrica, aislada del resto de la zona republicana. Durante la campaña, el 26 de abril de 1937 la Legión Cóndor alemana y la Aviación Legionaria italiana bombardearon la villa vasca de Guernica, un episodio de gran repercusión internacional que Picasso convertiría en su cuadro más célebre; las cifras de víctimas están muy discutidas, desde unos cientos hasta más de mil quinientos según la fuente. Cayeron Bilbao, Santander y Asturias. En paralelo, las ofensivas republicanas de Brunete y Belchite no lograron aliviar la presión sobre el Norte.',
+      obraIconica: 'El bombardeo de Guernica (26 de abril de 1937) y el "Guernica" de Picasso',
+      paises: ['España', 'País Vasco', 'Cantabria', 'Asturias'],
+    },
+    {
+      id: 'revolucion-jornadas-mayo',
+      nombre: 'La revolución social y las Jornadas de Mayo',
+      anioInicio: 1936,
+      anioFin: 1937,
+      color: '#B8860B',
+      categoria: 'revolucion',
+      descripcion: 'En buena parte de la zona republicana, el golpe desencadenó una revolución social espontánea: colectivizaciones de tierras y fábricas impulsadas sobre todo por anarquistas (CNT-FAI) y otros sectores obreros. Esa revolución convivió en tensión con la prioridad de ganar la guerra que defendían comunistas y republicanos moderados. El choque estalló en las Jornadas de Mayo de 1937 en Barcelona, con enfrentamientos internos entre fuerzas del propio bando y la posterior persecución del POUM. El gobierno de Juan Negrín reforzó el poder central y el peso del Partido Comunista en el esfuerzo de guerra.',
+      obraIconica: 'Las colectivizaciones de 1936 y las Jornadas de Mayo de 1937 en Barcelona',
+      paises: ['España', 'Cataluña', 'Aragón'],
+    },
+    {
+      id: 'batalla-ebro',
+      nombre: 'La batalla del Ebro',
+      anioInicio: 1938,
+      anioFin: 1938,
+      color: '#8B0000',
+      categoria: 'guerra',
+      descripcion: 'Tras la llegada de los sublevados al Mediterráneo (abril de 1938), que partió en dos la zona republicana, el Ejército Popular lanzó en julio de 1938 una gran ofensiva cruzando el río Ebro. Fue la batalla más larga y sangrienta de la guerra: más de cien días de combate y decenas de miles de bajas en ambos bandos. El desgaste agotó las últimas reservas materiales y humanas de la República. La retirada republicana en noviembre de 1938 dejó el camino abierto hacia Cataluña y selló, en la práctica, la suerte del conflicto.',
+      obraIconica: 'La batalla del Ebro (julio-noviembre de 1938), la más larga de la guerra',
+      paises: ['España', 'Cataluña'],
+    },
+    {
+      id: 'final-guerra',
+      nombre: 'El final de la guerra',
+      anioInicio: 1939,
+      anioFin: 1939,
+      color: '#4B0082',
+      categoria: 'desenlace',
+      descripcion: 'A comienzos de 1939 el bando sublevado ocupó Cataluña y provocó el éxodo de cientos de miles de personas hacia Francia (la "Retirada"). En marzo, dentro de la zona republicana ya sin salida militar, el golpe del coronel Casado contra el gobierno de Negrín buscó una paz negociada que Franco rechazó, exigiendo la rendición sin condiciones. El 28 de marzo cayó Madrid y el 1 de abril de 1939 el último parte de guerra declaró terminado el conflicto. Se abría una dictadura que se prolongaría hasta 1975.',
+      obraIconica: 'El último parte de guerra: fin del conflicto el 1 de abril de 1939',
+      paises: ['España'],
+    },
+    {
+      id: 'exilio-posguerra',
+      nombre: 'El exilio y la posguerra',
+      anioInicio: 1939,
+      anioFin: 1945,
+      color: '#4B0082',
+      categoria: 'desenlace',
+      descripcion: 'El final de la guerra abrió un exilio masivo: alrededor de medio millón de personas cruzaron a Francia en 1939, muchas internadas en campos; una parte permaneció en el extranjero durante décadas (México, Francia, la URSS y otros países). En España, la posguerra estuvo marcada por la represión política del nuevo régimen (tribunales, cárceles y trabajos forzados), el hambre de los años del racionamiento y el aislamiento internacional. La memoria del conflicto siguió siendo objeto de debate político y social; ya en democracia, leyes de 2007 y 2022 abordaron el reconocimiento de las víctimas y las exhumaciones.',
+      obraIconica: 'La "Retirada" de 1939: el exilio de cientos de miles de españoles',
+      paises: ['España', 'Francia', 'México'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'La Segunda República',
+      desde: 1931,
+      hasta: 1936,
+      icono: '🗳️',
+      hitosDestacados: ['La Segunda República'],
+      eventos: [
+        'Proclamación de la Segunda República (14 de abril de 1931)',
+        'Reformas agraria, educativa, militar y autonómica; fuerte polarización',
+        'Revolución de Asturias y sucesos de octubre de 1934',
+        'Victoria del Frente Popular en las elecciones de febrero de 1936',
+        'Espiral de violencia política en la primavera de 1936',
+      ],
+    },
+    {
+      nombre: 'El estallido de la guerra',
+      desde: 1936,
+      hasta: 1937,
+      icono: '🔥',
+      hitosDestacados: [
+        'El golpe de Estado de julio de 1936',
+        'La internacionalización del conflicto',
+        'La defensa de Madrid',
+      ],
+      eventos: [
+        'Sublevación militar del 17-18 de julio de 1936',
+        'El golpe fracasa en las grandes ciudades y el país queda dividido',
+        'Ayuda de Alemania e Italia a los sublevados; de la URSS y las Brigadas Internacionales a la República',
+        'El Comité de No Intervención de Reino Unido y Francia',
+        'Resistencia de Madrid en noviembre de 1936; batallas del Jarama y Guadalajara',
+      ],
+    },
+    {
+      nombre: 'La guerra se generaliza',
+      desde: 1937,
+      hasta: 1938,
+      icono: '⚔️',
+      hitosDestacados: [
+        'La caída del Norte y el bombardeo de Guernica',
+        'La revolución social y las Jornadas de Mayo',
+        'La represión en las dos retaguardias',
+      ],
+      eventos: [
+        'Bombardeo de Guernica (26 de abril de 1937)',
+        'Conquista sublevada de Bilbao, Santander y Asturias',
+        'Jornadas de Mayo de 1937 en Barcelona; persecución del POUM',
+        'Gobierno de Negrín y creciente peso del Partido Comunista',
+        'Violencia en la retaguardia de ambos bandos',
+      ],
+    },
+    {
+      nombre: 'El punto de inflexión: el Ebro',
+      desde: 1938,
+      hasta: 1939,
+      icono: '🌊',
+      hitosDestacados: ['La batalla del Ebro'],
+      eventos: [
+        'Los sublevados llegan al Mediterráneo y parten en dos la zona republicana (abril de 1938)',
+        'Ofensiva republicana del Ebro (julio de 1938)',
+        'Más de cien días de combate y decenas de miles de bajas',
+        'La retirada republicana de noviembre de 1938 agota a la República',
+      ],
+    },
+    {
+      nombre: 'El final de la guerra',
+      desde: 1939,
+      hasta: 1940,
+      icono: '🏳️',
+      hitosDestacados: ['El final de la guerra'],
+      eventos: [
+        'Ocupación de Cataluña y éxodo hacia Francia (enero-febrero de 1939)',
+        'Golpe de Casado contra Negrín en busca de una paz negociada',
+        'Caída de Madrid (28 de marzo de 1939)',
+        'Último parte de guerra: fin del conflicto (1 de abril de 1939)',
+      ],
+    },
+    {
+      nombre: 'El exilio y la posguerra',
+      desde: 1940,
+      hasta: 1945,
+      icono: '✈️',
+      hitosDestacados: ['El exilio y la posguerra'],
+      eventos: [
+        'Exilio de alrededor de medio millón de personas; campos de internamiento en Francia',
+        'Represión política del nuevo régimen: tribunales, cárceles y trabajos forzados',
+        'Los años del hambre y el racionamiento',
+        'Aislamiento internacional de España tras la Segunda Guerra Mundial',
+        'La memoria del conflicto, objeto de debate hasta la actualidad',
+      ],
+    },
+  ],
+
+  categorias: {
+    contexto: 'La Segunda República',
+    sublevacion: 'La sublevación',
+    internacional: 'Dimensión internacional',
+    guerra: 'Frentes y batallas',
+    represion: 'La represión',
+    revolucion: 'Revolución y tensiones internas',
+    desenlace: 'Final y exilio',
+  },
+
+  colores: {
+    contexto: '#6D8B74',
+    sublevacion: '#A0522D',
+    internacional: '#4682B4',
+    guerra: '#8B0000',
+    represion: '#4A4A4A',
+    revolucion: '#B8860B',
+    desenlace: '#4B0082',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'La Guerra Civil Española (1936-1939) fue el conflicto que marcó más profundamente la España del siglo XX. Esta cronología adopta un enfoque estrictamente factual: data los hechos, describe el desarrollo militar y político, y nombra la violencia de las dos retaguardias con el mismo tono, recurriendo a las cifras tal como las estiman los historiadores (con horquillas y atribución), sin adjudicar culpas ni redimir a ningún bando. Donde hay debate historiográfico abierto —las causas del estallido, el número exacto de víctimas o el carácter del conflicto— se señala como tal en lugar de zanjarlo. El objetivo es ofrecer una base cronológica clara y equilibrada sobre la que cada persona pueda seguir informándose.',
+
+    tablaComparativa: [
+      { hito: 'La Segunda República', periodo: '1931-1936', categoria: 'La Segunda República', personaje: 'Alcalá-Zamora / Azaña', aportacion: 'Reformas, polarización y Frente Popular como antesala del conflicto' },
+      { hito: 'El golpe de Estado de julio de 1936', periodo: '1936', categoria: 'La sublevación', personaje: 'Mola / Franco', aportacion: 'Sublevación militar que, al triunfar solo a medias, deriva en guerra' },
+      { hito: 'La internacionalización', periodo: '1936-1939', categoria: 'Dimensión internacional', personaje: 'Legión Cóndor / Brigadas Internacionales', aportacion: 'Ayuda del Eje y de la URSS; No Intervención de Londres y París' },
+      { hito: 'La defensa de Madrid', periodo: '1936-1937', categoria: 'Frentes y batallas', personaje: 'Miaja / Varela', aportacion: 'La capital resiste; la guerra se hace larga (Jarama, Guadalajara)' },
+      { hito: 'La batalla del Ebro', periodo: '1938', categoria: 'Frentes y batallas', personaje: 'Rojo / Yagüe', aportacion: 'La batalla más larga; agota las reservas de la República' },
+      { hito: 'El final de la guerra', periodo: '1939', categoria: 'Final y exilio', personaje: 'Casado / Negrín', aportacion: 'Caída de Cataluña y Madrid; fin del conflicto el 1 de abril' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiantes de Historia',
+        perfil: 'Secundaria, preparatoria y universidad',
+        texto: 'Una secuencia clara de causas, fases militares y desenlace para situar el conflicto en el contexto europeo de entreguerras. Útil para distinguir los hechos datados de las interpretaciones, que siguen siendo objeto de debate historiográfico.',
+      },
+      {
+        icono: '🌍',
+        titulo: 'Interesados en el contexto internacional',
+        perfil: 'Entreguerras y antesala de 1939',
+        texto: 'La guerra como cruce de intereses europeos: la ayuda de Alemania e Italia, el apoyo soviético, las Brigadas Internacionales y la política de No Intervención de Reino Unido y Francia. Muchos la han leído como preludio de la Segunda Guerra Mundial.',
+      },
+      {
+        icono: '🕊️',
+        titulo: 'Memoria y convivencia',
+        perfil: 'Comprender sin reabrir heridas',
+        texto: 'Conocer los hechos de las dos retaguardias con el mismo rigor ayuda a una memoria serena. Esta cronología presenta la violencia de ambos bandos con cifras atribuidas, sin equidistancia falsa ni instrumentalización política.',
+      },
+      {
+        icono: '🎨',
+        titulo: 'Cultura y arte del periodo',
+        perfil: 'La huella cultural del conflicto',
+        texto: 'De "Guernica" de Picasso a la poesía de Miguel Hernández o la literatura del exilio, la guerra dejó una honda huella cultural. Situar cada obra en su momento ayuda a entender su significado.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Cuántas víctimas causó la Guerra Civil?',
+        respuesta: 'Las cifras están debatidas y se han revisado con el tiempo. Los historiadores suelen situar el total de muertes en torno a las 500.000 (algunos rebajan la cifra a unas 300.000), sumando combates, represión en ambas retaguardias, bombardeos y hambre. La represión en la zona republicana se estima en torno a 50.000 víctimas y la de la zona sublevada en una cifra mayor, que las exhumaciones e investigaciones siguen precisando. Conviene desconfiar de las cifras cerradas ofrecidas sin fuente.',
+        tip: 'La obra colectiva "Víctimas de la guerra civil" (coord. Santos Juliá, 1999) es una referencia habitual para estas estimaciones.',
+      },
+      {
+        pregunta: '¿Cómo hay que llamar a cada bando?',
+        respuesta: 'La historiografía suele hablar de "bando sublevado" o "nacional" (los militares que se alzaron el 18 de julio y sus apoyos) y de "bando republicano" o "gubernamental" (el gobierno legalmente constituido de la República y quienes lo defendieron). Términos como "alzamiento glorioso" o "golpe fascista", "rojos" o "fascistas" pertenecen al lenguaje propagandístico de la época y de cada bando, no al análisis histórico.',
+        tip: 'Usar la terminología neutral es el primer paso para hablar del tema sin reproducir la propaganda de 1936.',
+      },
+      {
+        pregunta: '¿Fue un golpe de Estado o una guerra desde el principio?',
+        respuesta: 'Fue un golpe de Estado militar (17-18 de julio de 1936) que solo triunfó en parte del territorio. Precisamente ese éxito parcial —fracasó en Madrid, Barcelona y otras grandes ciudades— es lo que impidió una toma rápida del poder y transformó el golpe en una guerra civil de casi tres años. Si el golpe hubiera triunfado del todo, o hubiera fracasado del todo, no habría habido guerra.',
+        tip: 'La división casi por la mitad del país y del propio ejército explica la duración del conflicto.',
+      },
+      {
+        pregunta: '¿Qué papel jugaron las potencias extranjeras?',
+        respuesta: 'Fue determinante. Alemania e Italia aportaron aviación, carros y tropas al bando sublevado desde el inicio. La Unión Soviética suministró material al bando republicano (pagado con las reservas de oro del Banco de España) y las Brigadas Internacionales aportaron unos 35.000 voluntarios. Reino Unido y Francia promovieron la No Intervención, que sobre el papel prohibía la ayuda pero en la práctica perjudicó más a la República. Por eso a menudo se habla de la guerra como un "ensayo" de la Segunda Guerra Mundial.',
+        tip: 'La ayuda exterior no fue simétrica ni en cantidad ni en continuidad, un factor clave del resultado.',
+      },
+      {
+        pregunta: '¿Por qué terminó ganando el bando sublevado?',
+        respuesta: 'Los historiadores señalan varios factores concurrentes: una ayuda exterior más constante y coordinada (Alemania e Italia frente a una URSS más lejana e intermitente), el control temprano de zonas agrícolas y de recursos, una unidad de mando más firme frente a las tensiones internas del bando republicano (entre revolución y esfuerzo de guerra), y el efecto de la No Intervención. No hay una única causa, sino la combinación de todas.',
+        tip: 'La falta de cohesión interna en el bando republicano suele citarse como una de sus mayores debilidades.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Empieza por el contexto de la República',
+        cuerpo: 'Antes de la guerra hay cinco años de República (1931-1936) con reformas intensas y creciente polarización. Haz clic en "La Segunda República" para entender el punto de partida: sin ese contexto, el golpe de julio de 1936 queda descolgado.',
+      },
+      {
+        titulo: 'Distingue el golpe de la guerra',
+        cuerpo: 'Observa que "El golpe de Estado de julio de 1936" dura apenas unos días, pero al fracasar a medias abre un conflicto de casi tres años. Es la clave para entender por qué hubo guerra y no un cambio de gobierno rápido.',
+      },
+      {
+        titulo: 'Sigue en paralelo los frentes y las retaguardias',
+        cuerpo: 'La categoría "Frentes y batallas" (Madrid, el Norte, el Ebro) cuenta la guerra militar; "La represión" cuenta lo que ocurría lejos del frente. Léelas juntas: son dos caras simultáneas del mismo conflicto.',
+      },
+      {
+        titulo: 'Fíjate en la dimensión internacional',
+        cuerpo: 'El hito "La internacionalización del conflicto" atraviesa toda la guerra. Comprender quién ayudó a cada bando —y quién se inhibió— explica buena parte del desarrollo y del desenlace.',
+      },
+      {
+        titulo: 'Cierra con el final y la posguerra',
+        cuerpo: 'La guerra no acabó el 1 de abril de 1939 para quienes la vivieron: el exilio, la represión y los años del hambre son parte del relato. La era "El exilio y la posguerra" enlaza el conflicto con las décadas siguientes.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '⚖️',
+        texto: 'Ambos bandos ejercieron una violencia grave en su retaguardia. Reconocerlo no es "equidistancia": es el punto de partida factual. Según la mayoría de los estudios, la represión en la zona sublevada se prolongó más en el tiempo por la larga duración de la posguerra.',
+      },
+      {
+        icono: '🔢',
+        texto: 'Desconfía de las cifras redondas y sin fuente sobre víctimas: han sido utilizadas por todos los bandos. Las estimaciones serias siempre dan horquillas y citan a los historiadores que las calculan.',
+      },
+      {
+        icono: '🗣️',
+        texto: 'El vocabulario delata el sesgo. "Alzamiento" y "cruzada" son términos del bando sublevado; "fascistas" a secas, del republicano. La terminología neutral ("bando sublevado" y "bando republicano") permite hablar del tema sin tomar partido de entrada.',
+      },
+      {
+        icono: '🌐',
+        texto: 'La guerra española se siguió con enorme atención en toda Europa: intelectuales, periodistas y voluntarios de decenas de países participaron o tomaron partido. Fue, en muchos sentidos, un conflicto internacional librado en suelo español.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Creer que fue una guerra entre "buenos" y "malos"',
+        cuerpo: 'Los dos bandos incluían sensibilidades muy diversas y ambos cometieron atrocidades. Reducir el conflicto a un relato de héroes y villanos —en cualquiera de las dos direcciones— impide entender su complejidad. La historia rigurosa describe hechos y contextos, no reparte medallas.',
+      },
+      {
+        titulo: 'Usar sin darse cuenta el lenguaje de un bando',
+        cuerpo: 'Palabras como "alzamiento", "cruzada", "liberación", "rojos" o "fascistas" no son descripciones neutrales, sino términos cargados de la propaganda de la época. Emplearlas —aunque sea sin intención— ya introduce un sesgo. La terminología historiográfica estándar existe precisamente para evitarlo.',
+      },
+      {
+        titulo: 'Tomar cualquier cifra de víctimas como definitiva',
+        cuerpo: 'Las cifras de muertos y represaliados se han manipulado políticamente desde 1936 y siguen revisándose con las exhumaciones y la investigación. Cualquier número debe darse con horquilla, con fuente y con la advertencia de que es una estimación, no un dato cerrado.',
+      },
+      {
+        titulo: 'Pensar que la guerra terminó el 1 de abril de 1939',
+        cuerpo: 'La fecha marca el final de los combates, pero no de sus consecuencias: el exilio de cientos de miles de personas, la represión de la posguerra y los años del hambre se prolongaron durante décadas. Separar la guerra de su posguerra da una imagen incompleta del conflicto.',
+      },
+    ],
+  },
+};
