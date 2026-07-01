@@ -1,0 +1,365 @@
+import type { HistoriaData } from './types';
+
+export const caidaImperioRomano: HistoriaData = {
+  slug: 'caida-imperio-romano',
+  titulo: 'La Caída del Imperio Romano de Occidente: Cómo y Por Qué Cayó Roma',
+  subtitulo: 'De la muerte de Marco Aurelio (180) a la deposición de Rómulo Augústulo (476): tres siglos de crisis, reformas, migraciones y transformación del mundo antiguo',
+  descripcionSEO: 'Cronología interactiva de la caída del Imperio Romano de Occidente (180-476 d.C.): fin de la Pax Romana, Crisis del Siglo III, reformas de Diocleciano y Constantino, división del Imperio, Adrianópolis (378), saqueos de Roma (410 y 455) y la deposición de Rómulo Augústulo por Odoacro (476). Las causas debatidas del colapso en 10 hitos y 6 eras.',
+  keywords: [
+    'caída imperio romano occidente causas cronología',
+    'crisis del siglo iii anarquía militar inflación roma',
+    'diocleciano tetrarquía constantino constantinopla reformas',
+    'adrianópolis 378 alarico saqueo roma 410 vándalos 455',
+    'rómulo augústulo odoacro 476 fin imperio occidente',
+    'por qué cayó roma gibbon heather ward-perkins debate',
+  ],
+  anioInicio: 180,
+  anioFin: 476,
+
+  hitos: [
+    {
+      id: 'fin-pax-romana',
+      nombre: 'El fin de la Pax Romana',
+      anioInicio: 180,
+      anioFin: 235,
+      color: '#C9A227',
+      categoria: 'fin-pax-romana',
+      descripcion: 'La muerte de Marco Aurelio en el 180 suele señalarse como el fin del largo período de estabilidad y prosperidad conocido como Pax Romana. Su hijo Cómodo abandonó la política de fronteras de sus predecesores y su reinado errático terminó en asesinato (192). La dinastía de los Severos (193-235) militarizó el Estado y elevó las pagas del ejército; Caracalla concedió la ciudadanía a casi todos los habitantes libres del Imperio (212), un hito jurídico con efectos fiscales. Ya en estas décadas se aprecian tensiones que se agravarían después: peso creciente del ejército en la sucesión, presión en el Danubio y el Rin, y una economía tensada por el gasto militar.',
+      obraIconica: 'Las "Meditaciones" de Marco Aurelio y la Constitutio Antoniniana de Caracalla (212)',
+      paises: ['Imperio Romano', 'Danubio', 'Rin', 'Oriente Próximo'],
+    },
+    {
+      id: 'crisis-siglo-iii',
+      nombre: 'La Crisis del Siglo III',
+      anioInicio: 235,
+      anioFin: 284,
+      color: '#6E7B8B',
+      categoria: 'crisis-siglo-iii',
+      descripcion: 'Tras el asesinato de Alejandro Severo (235), el Imperio entró en medio siglo de "anarquía militar": más de cincuenta emperadores y usurpadores, la mayoría proclamados por sus tropas y derrocados con violencia. La presión externa se multiplicó: los pueblos germánicos cruzaban el Rin y el Danubio y el renovado Imperio sasánida persa amenazaba en Oriente (el emperador Valeriano fue capturado en el 260). La moneda se devaluó hasta provocar una fuerte inflación y el Imperio llegó a fragmentarse de facto en tres bloques (el Imperio Galo en Occidente y el reino de Palmira en Oriente). Emperadores "ilirios" como Aureliano lograron reunificarlo antes de las grandes reformas.',
+      obraIconica: 'La reunificación del Imperio por Aureliano tras el Imperio Galo y Palmira (270-274)',
+      paises: ['Imperio Romano', 'Galia', 'Palmira', 'Renania', 'Danubio', 'Persia sasánida'],
+    },
+    {
+      id: 'reformas-diocleciano',
+      nombre: 'Diocleciano y la Tetrarquía',
+      anioInicio: 284,
+      anioFin: 305,
+      color: '#2E7D32',
+      categoria: 'reformas',
+      descripcion: 'Diocleciano (284-305) refundó el Estado para hacerlo gobernable. Instauró la Tetrarquía —dos emperadores mayores (Augustos) y dos menores (Césares)— para repartir la defensa de las fronteras y ordenar la sucesión. Transformó el poder imperial en un dominado de corte ceremonial y sacralizado, muy alejado del antiguo Principado. Reorganizó las provincias en unidades más pequeñas agrupadas en diócesis, separó el mando civil del militar y reformó la fiscalidad con un nuevo sistema de censo (capitatio-iugatio). Su Edicto de Precios (301) intentó frenar la inflación sin éxito duradero. También emprendió la última y más dura persecución de los cristianos.',
+      obraIconica: 'La Tetrarquía y el Edicto de Precios Máximos de Diocleciano (301)',
+      paises: ['Imperio Romano', 'Balcanes', 'Oriente', 'Egipto', 'Occidente'],
+    },
+    {
+      id: 'constantino',
+      nombre: 'Constantino y el giro cristiano',
+      anioInicio: 306,
+      anioFin: 337,
+      color: '#1565C0',
+      categoria: 'reformas',
+      descripcion: 'Constantino I reunificó el Imperio bajo un solo mando tras vencer a sus rivales (batalla del Puente Milvio, 312). El Edicto de Milán (313) estableció la tolerancia religiosa y puso fin a la persecución del cristianismo, que pasó a gozar del favor imperial; el Concilio de Nicea (325) buscó unificar la doctrina. En el 330 fundó Constantinopla sobre la antigua Bizancio como nueva capital, desplazando el centro de gravedad político y económico hacia el Oriente más rico y poblado. Estabilizó la moneda con el sólido de oro y consolidó reformas administrativas y militares. Su reinado marca el paso de la crisis a un orden nuevo, cristiano y de doble eje.',
+      obraIconica: 'El Edicto de Milán (313) y la fundación de Constantinopla (330)',
+      paises: ['Imperio Romano', 'Constantinopla', 'Italia', 'Balcanes', 'Oriente'],
+    },
+    {
+      id: 'presion-frontera',
+      nombre: 'Fronteras, foederati y cristianismo de Estado',
+      anioInicio: 337,
+      anioFin: 376,
+      color: '#8D6E63',
+      categoria: 'presion-barbara',
+      descripcion: 'Tras Constantino, el Imperio alternó reunificaciones y divisiones entre sus sucesores mientras crecía la presión en las fronteras. Roma dependía cada vez más de contingentes germánicos reclutados como aliados (foederati) y de generales de origen no romano integrados en el ejército. La derrota y muerte del emperador Juliano frente a los persas (363) mostró la fragilidad oriental. Teodosio I hizo del cristianismo niceno la religión oficial del Estado con el Edicto de Tesalónica (380). En estas décadas la distinción entre "romano" y "germánico" se difuminó: buena parte de quienes defendían el Imperio ya procedían de los pueblos del otro lado del limes y estaban plenamente romanizados.',
+      obraIconica: 'El Edicto de Tesalónica: el cristianismo niceno, religión oficial (380)',
+      paises: ['Imperio Romano', 'Rin', 'Danubio', 'Persia', 'Balcanes'],
+    },
+    {
+      id: 'adrianopolis',
+      nombre: 'Los hunos, los godos y Adrianópolis',
+      anioInicio: 376,
+      anioFin: 395,
+      color: '#8E24AA',
+      categoria: 'presion-barbara',
+      descripcion: 'Hacia el 375 el avance de los hunos desde las estepas empujó a los godos hacia el interior del Imperio. En el 376 Roma autorizó a los tervingios de Fritigerno a cruzar el Danubio como refugiados, pero el maltrato y el hambre provocaron una revuelta. En el 378, en la batalla de Adrianópolis, el ejército oriental fue aniquilado y murió el propio emperador Valente: una de las derrotas más graves de la historia romana, que evidenció la dificultad de contener a grupos armados ya asentados dentro de las fronteras. Teodosio I pactó con los godos y fue el último en gobernar todo el Imperio; a su muerte, en el 395, quedó dividido de forma permanente entre sus hijos Arcadio (Oriente) y Honorio (Occidente).',
+      obraIconica: 'La batalla de Adrianópolis: muerte del emperador Valente (378)',
+      paises: ['Imperio Romano de Oriente', 'Balcanes', 'Tracia', 'Danubio'],
+    },
+    {
+      id: 'saqueo-alarico',
+      nombre: 'El saqueo de Roma por Alarico',
+      anioInicio: 395,
+      anioFin: 410,
+      color: '#5E35B1',
+      categoria: 'caida',
+      descripcion: 'La división de 395 dejó a Occidente más débil y expuesto. El general Estilicón, de origen vándalo, defendió Italia hasta que fue ejecutado por intrigas cortesanas (408), lo que privó al Imperio de su mejor mando. En el invierno del 406-407 varios pueblos cruzaron el Rin helado y se adentraron en la Galia e Hispania, y Britania fue prácticamente abandonada por las legiones. Sin acuerdo con el gobierno de Rávena, los visigodos de Alarico saquearon Roma en el 410: la primera vez en unos ochocientos años que la ciudad caía ante un enemigo. El impacto psicológico fue enorme en todo el mundo mediterráneo, aunque la ciudad ya no era la capital efectiva.',
+      obraIconica: 'El saqueo de Roma por los visigodos de Alarico (410)',
+      paises: ['Imperio Romano de Occidente', 'Italia', 'Galia', 'Hispania', 'Britania'],
+    },
+    {
+      id: 'reinos-federados',
+      nombre: 'Reinos federados en suelo romano',
+      anioInicio: 410,
+      anioFin: 451,
+      color: '#7B1FA2',
+      categoria: 'presion-barbara',
+      descripcion: 'En las décadas siguientes, el mapa de Occidente se recompuso en torno a reinos germánicos asentados dentro del Imperio como aliados formales: los visigodos en el suroeste de la Galia (Tolosa, 418), los vándalos que atravesaron Hispania y tomaron el norte de África —el granero de Roma— con capital en Cartago (439), y los suevos en el noroeste de Hispania. El poder efectivo recaía en generales como Aecio, que sostuvo Occidente mediante alianzas cambiantes. En el 451, una coalición romano-visigoda dirigida por Aecio frenó a Atila y los hunos en la batalla de los Campos Cataláunicos (Galia), una de las últimas grandes victorias del ejército occidental.',
+      obraIconica: 'La batalla de los Campos Cataláunicos: Aecio detiene a Atila (451)',
+      paises: ['Imperio Romano de Occidente', 'Galia', 'Hispania', 'África del Norte', 'Italia'],
+    },
+    {
+      id: 'saqueo-vandalos',
+      nombre: 'El saqueo vándalo y los generales del poder',
+      anioInicio: 451,
+      anioFin: 476,
+      color: '#4527A0',
+      categoria: 'caida',
+      descripcion: 'La muerte de Atila (453) y el asesinato de Aecio (454) dejaron a Occidente sin sus figuras rectoras. En el 455 los vándalos de Genserico, dueños del norte de África y de una flota, saquearon Roma de forma más metódica que Alarico. En las dos décadas finales, el trono occidental se convirtió en un títere de generales de origen germánico —como Ricimero— que nombraban y deponían emperadores efímeros. La pérdida de las provincias africanas privó al Estado de los recursos fiscales y del grano que necesitaba para mantener su ejército, acelerando el desmoronamiento del aparato imperial en Occidente.',
+      obraIconica: 'El saqueo de Roma por los vándalos de Genserico (455)',
+      paises: ['Imperio Romano de Occidente', 'Italia', 'África del Norte', 'Galia'],
+    },
+    {
+      id: 'deposicion-476',
+      nombre: 'La deposición de Rómulo Augústulo (476)',
+      anioInicio: 475,
+      anioFin: 476,
+      color: '#311B92',
+      categoria: 'caida',
+      descripcion: 'En el 476 Odoacro, jefe de tropas germánicas al servicio del Imperio, depuso al joven emperador Rómulo Augústulo y, en lugar de nombrar a otro, devolvió las insignias imperiales a Constantinopla y gobernó Italia como rey reconociendo formalmente la autoridad del emperador oriental. Por convención historiográfica, esta fecha marca el fin del Imperio Romano de Occidente, aunque para muchos contemporáneos no fue un corte dramático: los reinos germánicos llevaban décadas administrando el territorio. El Imperio Romano de Oriente, con capital en Constantinopla, sobrevivió y se transformó en lo que hoy llamamos Imperio bizantino, perdurando casi mil años más hasta la conquista otomana de Constantinopla en 1453.',
+      obraIconica: 'Odoacro depone a Rómulo Augústulo y devuelve las insignias a Oriente (476)',
+      paises: ['Italia', 'Imperio Romano de Occidente', 'Constantinopla', 'Reinos germánicos'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'El ocaso de la Pax Romana',
+      desde: 180,
+      hasta: 235,
+      icono: '🏛️',
+      hitosDestacados: ['El fin de la Pax Romana'],
+      eventos: [
+        'Muerte de Marco Aurelio y reinado errático de Cómodo (180-192)',
+        'La dinastía de los Severos militariza el Estado (193-235)',
+        'Caracalla concede la ciudadanía a casi todos los libres del Imperio (212)',
+        'Aumenta la presión en el Rin y el Danubio y el peso político del ejército',
+      ],
+    },
+    {
+      nombre: 'La Crisis del Siglo III',
+      desde: 235,
+      hasta: 284,
+      icono: '⚔️',
+      hitosDestacados: ['La Crisis del Siglo III'],
+      eventos: [
+        'Anarquía militar: más de cincuenta emperadores y usurpadores (235-284)',
+        'Presión simultánea de pueblos germánicos y del Imperio sasánida persa',
+        'El emperador Valeriano es capturado por los persas (260)',
+        'El Imperio se fragmenta de facto: Imperio Galo y reino de Palmira',
+        'Devaluación monetaria e inflación; Aureliano reunifica el Imperio (270-274)',
+      ],
+    },
+    {
+      nombre: 'Refundación: Diocleciano y Constantino',
+      desde: 284,
+      hasta: 337,
+      icono: '👑',
+      hitosDestacados: ['Diocleciano y la Tetrarquía', 'Constantino y el giro cristiano'],
+      eventos: [
+        'Diocleciano instaura la Tetrarquía y el dominado (293)',
+        'Reforma fiscal, provincial y militar; Edicto de Precios Máximos (301)',
+        'Constantino vence en el Puente Milvio (312) y reunifica el Imperio',
+        'Edicto de Milán: tolerancia y favor al cristianismo (313)',
+        'Concilio de Nicea (325) y fundación de Constantinopla (330)',
+      ],
+    },
+    {
+      nombre: 'Fronteras bajo presión y cristianismo de Estado',
+      desde: 337,
+      hasta: 376,
+      icono: '✝️',
+      hitosDestacados: ['Fronteras, foederati y cristianismo de Estado'],
+      eventos: [
+        'Divisiones y reunificaciones entre los sucesores de Constantino',
+        'Muerte del emperador Juliano en campaña contra los persas (363)',
+        'Dependencia creciente de foederati y generales de origen germánico',
+        'Edicto de Tesalónica: el cristianismo niceno, religión oficial (380)',
+        'Se difumina la frontera entre "romano" y "germánico"',
+      ],
+    },
+    {
+      nombre: 'Migraciones y división definitiva',
+      desde: 376,
+      hasta: 410,
+      icono: '🐎',
+      hitosDestacados: ['Los hunos, los godos y Adrianópolis', 'El saqueo de Roma por Alarico'],
+      eventos: [
+        'Los hunos empujan a los godos, que cruzan el Danubio como refugiados (376)',
+        'Batalla de Adrianópolis: muere el emperador Valente (378)',
+        'A la muerte de Teodosio, el Imperio se divide de forma permanente (395)',
+        'Cruce del Rin por varios pueblos y abandono de Britania (406-407)',
+        'Ejecución de Estilicón (408) y saqueo de Roma por Alarico (410)',
+      ],
+    },
+    {
+      nombre: 'El desmoronamiento de Occidente',
+      desde: 410,
+      hasta: 476,
+      icono: '🌅',
+      hitosDestacados: ['Reinos federados en suelo romano', 'El saqueo vándalo y los generales del poder', 'La deposición de Rómulo Augústulo (476)'],
+      eventos: [
+        'Asentamiento de visigodos, vándalos y suevos como reinos federados',
+        'Los vándalos toman el norte de África, granero de Roma (439)',
+        'Aecio detiene a Atila en los Campos Cataláunicos (451)',
+        'Segundo saqueo de Roma, esta vez por los vándalos (455)',
+        'Odoacro depone a Rómulo Augústulo: fin del Imperio Occidental (476)',
+        'El Imperio de Oriente (Bizancio) sobrevive hasta 1453',
+      ],
+    },
+  ],
+
+  categorias: {
+    'fin-pax-romana': 'Fin de la Pax Romana',
+    'crisis-siglo-iii': 'Crisis del Siglo III',
+    reformas: 'Reformas del Bajo Imperio',
+    'presion-barbara': 'Migraciones y presión externa',
+    caida: 'Caída de Occidente',
+  },
+
+  colores: {
+    'fin-pax-romana': '#C9A227',
+    'crisis-siglo-iii': '#6E7B8B',
+    reformas: '#2E7D32',
+    'presion-barbara': '#8D6E63',
+    caida: '#4527A0',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'La caída del Imperio Romano de Occidente no fue un acontecimiento único, sino un proceso de casi tres siglos. Esta cronología se centra en el "cómo" y el "por qué" cayó Roma: arranca con el fin de la Pax Romana a la muerte de Marco Aurelio (180), atraviesa la Crisis del Siglo III, las grandes reformas de Diocleciano y Constantino, la división definitiva del Imperio (395), las migraciones de godos, hunos y vándalos, los saqueos de Roma (410 y 455) y termina con la deposición de Rómulo Augústulo por Odoacro (476). Las causas de la caída son uno de los debates más largos de la historiografía: conviene distinguir los hechos —que están razonablemente establecidos— de las interpretaciones, que siguen abiertas. Importa recordar dos matices: el Imperio de Oriente sobrevivió casi mil años más, y muchos de los llamados "bárbaros" estaban profundamente romanizados.',
+
+    tablaComparativa: [
+      { hito: 'El fin de la Pax Romana', periodo: '180-235 d.C.', categoria: 'Fin de la Pax Romana', personaje: 'Cómodo / Septimio Severo', aportacion: 'Fin de la estabilidad antonina y militarización del Estado' },
+      { hito: 'La Crisis del Siglo III', periodo: '235-284 d.C.', categoria: 'Crisis del Siglo III', personaje: 'Valeriano / Aureliano', aportacion: 'Anarquía militar, inflación y fragmentación del Imperio' },
+      { hito: 'Diocleciano y la Tetrarquía', periodo: '284-305 d.C.', categoria: 'Reformas', personaje: 'Diocleciano', aportacion: 'Tetrarquía, dominado, reforma fiscal, provincial y militar' },
+      { hito: 'Constantino y el giro cristiano', periodo: '306-337 d.C.', categoria: 'Reformas', personaje: 'Constantino I', aportacion: 'Tolerancia al cristianismo y fundación de Constantinopla' },
+      { hito: 'Los hunos, los godos y Adrianópolis', periodo: '376-395 d.C.', categoria: 'Migraciones y presión externa', personaje: 'Fritigerno / Valente / Teodosio', aportacion: 'Adrianópolis (378) y división permanente del Imperio (395)' },
+      { hito: 'La deposición de Rómulo Augústulo', periodo: '475-476 d.C.', categoria: 'Caída de Occidente', personaje: 'Rómulo Augústulo / Odoacro', aportacion: 'Fin convencional del Imperio Romano de Occidente' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiantes de Historia',
+        perfil: 'Secundaria, preparatoria y universidad',
+        texto: 'Visión ordenada del proceso de decadencia y caída de Roma, clave para entender la transición del mundo antiguo al medieval y el nacimiento de la Europa de los reinos germánicos. Útil para distinguir hechos comprobados de interpretaciones en un tema donde ambos se mezclan a menudo.',
+      },
+      {
+        icono: '📉',
+        titulo: 'Interesados en el declive de las civilizaciones',
+        perfil: 'Comprender cómo colapsan los grandes sistemas',
+        texto: 'Roma es el caso más estudiado de declive de un gran Estado. Aquí se ven interactuar crisis fiscal, presión militar, inestabilidad política y movimientos de población: un laboratorio histórico para pensar la fragilidad de los sistemas complejos, sin extraer lecciones simplistas.',
+      },
+      {
+        icono: '🗺️',
+        titulo: 'Aficionados a la Antigüedad tardía',
+        perfil: 'Migraciones, godos, hunos y vándalos',
+        texto: 'La llamada Antigüedad tardía es un período apasionante y a menudo mal conocido. Esta cronología sitúa las grandes migraciones y los reinos germánicos en su contexto, mostrando que muchos de sus protagonistas actuaban dentro del sistema romano, no solo contra él.',
+      },
+      {
+        icono: '⚖️',
+        titulo: 'Debate historiográfico',
+        perfil: 'Las causas discutidas de la caída',
+        texto: 'De Edward Gibbon a los historiadores actuales, explicar la caída de Roma ha dividido a los especialistas durante siglos. Aquí se presentan las principales tesis —desde el énfasis en el cristianismo hasta las lecturas multicausales y el debate "transformación" frente a "colapso"— atribuidas a sus autores y sin zanjar el asunto.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Por qué cayó el Imperio Romano de Occidente?',
+        respuesta: 'No hay una única respuesta aceptada. Los factores citados con más frecuencia son la inestabilidad política crónica (décadas de anarquía militar en el siglo III), la presión externa y las grandes migraciones, la carga fiscal y militar sobre una economía tensada, la dependencia de tropas germánicas que acabaron controlando el poder, y la pérdida de provincias clave como el norte de África. La mayoría de los historiadores actuales prefiere explicaciones multicausales antes que una sola causa dominante.',
+        tip: 'Conviene separar los hechos (fechas y batallas, bien documentados) de sus interpretaciones (por qué ocurrieron), que siguen en debate.',
+      },
+      {
+        pregunta: '¿Qué papel se atribuyó al cristianismo en la caída?',
+        respuesta: 'En "Historia de la decadencia y caída del Imperio Romano" (1776-1789), Edward Gibbon sostuvo que el cristianismo debilitó las virtudes cívicas y militares tradicionales de Roma. Esta tesis fue muy influyente pero hoy la mayoría de los especialistas la considera insuficiente: el Imperio de Oriente era igual de cristiano y sobrevivió mil años más. Es un ejemplo de interpretación histórica muy citada que la investigación posterior ha matizado considerablemente.',
+        tip: 'La supervivencia del cristianísimo Imperio de Oriente es el principal argumento contra la tesis de Gibbon.',
+      },
+      {
+        pregunta: '¿Fue una caída violenta o una transformación gradual?',
+        respuesta: 'Es uno de los grandes debates actuales. Historiadores como Peter Heather y Bryan Ward-Perkins subrayan un colapso real y traumático, con retroceso económico y demográfico. Otros, en la línea de Walter Goffart y los estudios sobre la Antigüedad tardía, hablan más de "transformación" y de una integración negociada de los pueblos germánicos que de una destrucción. Ambas lecturas se apoyan en evidencia distinta (arqueológica, textual) y conviven en la investigación.',
+        tip: 'La arqueología de la cultura material (cerámica, comercio, edificios) es central en el debate colapso frente a transformación.',
+      },
+      {
+        pregunta: '¿Por qué se dice que Roma "cayó" en el 476?',
+        respuesta: 'Es una convención historiográfica: en el 476 Odoacro depuso al último emperador de Occidente, Rómulo Augústulo, y devolvió las insignias imperiales a Constantinopla. Otros autores prefieren fechas como el 410 (saqueo de Alarico) o el 395 (división definitiva). Para muchos contemporáneos el 476 no fue un corte dramático: los reinos germánicos ya administraban el territorio y reconocían formalmente la autoridad imperial oriental.',
+        tip: 'La fecha de 476 la fijó como hito el historiador del siglo VI Marcelino Comes, y se popularizó mucho después.',
+      },
+      {
+        pregunta: '¿Y qué pasó con el Imperio Romano de Oriente?',
+        respuesta: 'No cayó. El Imperio de Oriente, con capital en Constantinopla, sobrevivió a la crisis de Occidente y perduró casi mil años más, hasta la conquista otomana de Constantinopla en 1453. Los historiadores modernos lo llaman "Imperio bizantino", aunque sus habitantes se consideraban romanos. Preservó el derecho romano, la administración y buena parte de la cultura clásica y griega durante toda la Edad Media.',
+        tip: 'Hablar de "la caída de Roma" en el 476 describe solo la mitad occidental del Imperio.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Observa las fases de color en la Línea del Tiempo',
+        cuerpo: 'El dorado es el fin de la Pax Romana; el gris, la Crisis del Siglo III; el verde y el azul, las reformas de Diocleciano y Constantino; el marrón, la presión en las fronteras; y el índigo, la caída final. Antes de leer, identifica cuánto duró cada fase: verás que la crisis y la refundación ocupan casi tanto espacio como la caída propiamente dicha.',
+      },
+      {
+        titulo: 'Compara la crisis con la refundación',
+        cuerpo: 'Haz clic en "La Crisis del Siglo III" y luego en "Diocleciano y la Tetrarquía". Observa el contraste: décadas de anarquía militar seguidas de una profunda reorganización del Estado. Roma no cayó en el siglo III precisamente porque logró reformarse; la caída llegaría dos siglos después.',
+      },
+      {
+        titulo: 'Sigue el hilo de las fronteras y las migraciones',
+        cuerpo: 'Enlaza "Fronteras, foederati y cristianismo de Estado", "Los hunos, los godos y Adrianópolis" y "Reinos federados en suelo romano". Verás cómo la relación con los pueblos germánicos evoluciona de defensa a integración y luego a sustitución del poder imperial en Occidente.',
+      },
+      {
+        titulo: 'Usa la Comparativa para separar hechos de causas',
+        cuerpo: 'En la tabla Comparativa distingue las columnas de fechas y protagonistas (los hechos, bien establecidos) de la de aportación (que resume interpretaciones). Es la mejor forma de no confundir lo que ocurrió con por qué se cree que ocurrió, algo esencial en este tema.',
+      },
+      {
+        titulo: 'Termina con el Contexto Histórico para el cuadro completo',
+        cuerpo: 'Las 6 eras muestran cómo cada fase tuvo sus protagonistas y tensiones. La era "El desmoronamiento de Occidente" es la más densa: agrupa los reinos federados, el saqueo vándalo, la contención de Atila y la deposición del 476, además del recordatorio de que Oriente siguió en pie.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '🕰️',
+        texto: 'La "caída de Roma" no tiene una fecha única. Según el criterio, puede situarse en el 395 (división definitiva), el 410 (saqueo de Alarico) o el 476 (deposición de Rómulo Augústulo). La cifra de 476 es una convención cómoda, no un corte que los contemporáneos percibieran como tal.',
+      },
+      {
+        icono: '🗣️',
+        texto: 'La palabra "bárbaro" viene del griego "bárbaros", que designaba a quien no hablaba griego, y no significaba "salvaje". Muchos de los "bárbaros" que protagonizan esta historia hablaban latín, eran cristianos y servían en el ejército romano; conviene usar el término en su sentido histórico y no como insulto.',
+      },
+      {
+        icono: '🌾',
+        texto: 'La pérdida del norte de África a manos de los vándalos (439) fue un golpe decisivo. Era el granero de Roma y una de sus provincias más ricas; sin sus impuestos y su trigo, al Estado occidental le resultó mucho más difícil pagar y alimentar a su ejército.',
+      },
+      {
+        icono: '📜',
+        texto: 'El Imperio de Oriente se consideró siempre romano, no "bizantino": ese nombre es una etiqueta acuñada por eruditos muy posteriores. Sus habitantes se llamaban a sí mismos "rhōmaîoi" (romanos) hasta 1453.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Creer que Roma cayó de repente en el 476',
+        cuerpo: 'La caída fue un proceso de siglos, no un derrumbe súbito. En el 476 el Imperio occidental llevaba décadas fragmentado en reinos germánicos y su capital efectiva ya no era Roma. La deposición de Rómulo Augústulo cierra convencionalmente ese proceso, pero no lo desencadena.',
+      },
+      {
+        titulo: 'Reducir la caída a una sola causa',
+        cuerpo: 'Atribuir el colapso únicamente a las invasiones, al cristianismo, a la corrupción o a la crisis económica simplifica en exceso. Las explicaciones más sólidas combinan varios factores que se refuerzan entre sí. Desconfía de las respuestas de una sola línea a una de las preguntas más complejas de la historia.',
+      },
+      {
+        titulo: 'Presentar a los "bárbaros" como salvajes ajenos a Roma',
+        cuerpo: 'Muchos pueblos germánicos llevaban generaciones en contacto con el Imperio, servían en sus ejércitos, hablaban latín y eran cristianos. Figuras como Estilicón o Aecio, que defendieron Occidente, tenían orígenes germánicos. La frontera entre "romano" y "bárbaro" era mucho más porosa de lo que sugiere el tópico.',
+      },
+      {
+        titulo: 'Olvidar que el Imperio Romano de Oriente sobrevivió',
+        cuerpo: 'Hablar del "fin del Imperio Romano" en el 476 ignora que la mitad oriental siguió en pie casi mil años, hasta 1453. Cayó Occidente, no "Roma" en abstracto. Oriente conservó la administración, el derecho y la cultura clásica durante toda la Edad Media.',
+      },
+    ],
+  },
+};

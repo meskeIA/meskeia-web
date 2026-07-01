@@ -179,6 +179,10 @@ export const PUERTAS: Puerta[] = [
       'revolucion-francesa', 'guerras-napoleonicas', 'primera-guerra-mundial',
       'segunda-guerra-mundial', 'historia-guerra-fria', 'renacimiento', 'la-reforma',
       'las-cruzadas', 'ilustracion', 'historia-union-europea', 'exploracion',
+      'revolucion-industrial', 'revolucion-cientifica', 'descolonizacion',
+      'revolucion-rusa', 'gran-depresion', 'independencias-hispanoamericanas',
+      'peste-negra', 'caida-imperio-romano', 'caida-constantinopla',
+      'revoluciones-1848',
     ],
   },
 ];

@@ -1,0 +1,368 @@
+import type { HistoriaData } from './types';
+
+export const descolonizacion: HistoriaData = {
+  slug: 'descolonizacion',
+  titulo: 'La Descolonización del Siglo XX: De la India a Hong Kong',
+  subtitulo: 'Medio siglo que redibujó el mapa del mundo: cómo los imperios coloniales europeos dieron paso a más de un centenar de Estados independientes',
+  descripcionSEO: 'Cronología interactiva de la descolonización (1945-1997): del debilitamiento de las potencias tras la Segunda Guerra Mundial y la Carta de la ONU a la independencia de India y Pakistán (1947), la guerra de Argelia, la crisis de Suez, la Conferencia de Bandung, el "Año de África" (1960), la descolonización portuguesa tras la Revolución de los Claveles y la retrocesión de Hong Kong (1997), en 10 hitos y 6 eras.',
+  keywords: [
+    'descolonización siglo xx cronología historia',
+    'independencia india pakistán partición 1947 gandhi nehru',
+    'guerra de argelia 1954 1962 fln independencia',
+    'conferencia bandung 1955 países no alineados tercer mundo',
+    'año de áfrica 1960 diecisiete países independientes',
+    'revolución claveles portugal angola mozambique retrocesión hong kong 1997',
+  ],
+  anioInicio: 1945,
+  anioFin: 1997,
+
+  hitos: [
+    {
+      id: 'posguerra-carta-onu',
+      nombre: 'Posguerra y Carta de la ONU',
+      anioInicio: 1945,
+      anioFin: 1947,
+      color: '#607D8B',
+      categoria: 'contexto',
+      descripcion: 'La Segunda Guerra Mundial dejó exhaustas a las principales potencias coloniales —Reino Unido, Francia, Países Bajos— tanto económica como militarmente. La ocupación japonesa de vastas zonas de Asia había roto el mito de la invencibilidad europea, y muchos pueblos colonizados que combatieron en el conflicto reclamaron después el derecho a decidir su propio destino. La Carta de las Naciones Unidas (1945) recogió el principio de "libre determinación de los pueblos", y las dos nuevas superpotencias, Estados Unidos y la Unión Soviética, se mostraban por distintos motivos poco favorables a la perpetuación de los imperios europeos. Se abría así el marco internacional en el que, en apenas tres décadas, decenas de territorios accederían a la independencia.',
+      obraIconica: 'Firma de la Carta de las Naciones Unidas en San Francisco (1945)',
+      paises: ['Reino Unido', 'Francia', 'Estados Unidos', 'Unión Soviética'],
+    },
+    {
+      id: 'independencia-india',
+      nombre: 'Independencia de India y Pakistán',
+      anioInicio: 1947,
+      anioFin: 1948,
+      color: '#FF9800',
+      categoria: 'asia',
+      descripcion: 'El Raj británico, la posesión colonial más poblada del mundo, accedió a la independencia el 15 de agosto de 1947. Tras décadas de movilización del Congreso Nacional Indio y las campañas de desobediencia civil no violenta impulsadas por Mahatma Gandhi, y ante la presión de la Liga Musulmana liderada por Muhammad Ali Jinnah, el territorio se dividió en dos Estados: la India, de mayoría hindú, y Pakistán, de mayoría musulmana. La Partición provocó uno de los mayores desplazamientos de población de la historia —entre 10 y 15 millones de personas cruzaron las nuevas fronteras— y una oleada de violencia intercomunitaria cuyas víctimas mortales los historiadores estiman entre varios centenares de miles y hasta cerca de dos millones. Gandhi fue asesinado en enero de 1948.',
+      obraIconica: 'Discurso "Tryst with Destiny" de Nehru y la Partición de 1947',
+      paises: ['India', 'Pakistán', 'Reino Unido'],
+    },
+    {
+      id: 'asia-sudeste',
+      nombre: 'Independencias del sudeste asiático',
+      anioInicio: 1945,
+      anioFin: 1954,
+      color: '#FFB74D',
+      categoria: 'asia',
+      descripcion: 'La retirada japonesa de 1945 dejó un vacío de poder que los movimientos nacionalistas asiáticos aprovecharon. Sukarno proclamó la independencia de Indonesia en agosto de 1945, aunque los Países Bajos solo la reconocieron en 1949 tras cuatro años de guerra. En Indochina, Ho Chi Minh declaró la República Democrática de Vietnam, lo que desembocó en la guerra de Indochina contra Francia; la derrota francesa en Dien Bien Phu (1954) y los Acuerdos de Ginebra pusieron fin al dominio francés y dividieron Vietnam. Birmania alcanzó la independencia en 1948 y Filipinas, la suya de Estados Unidos en 1946. En pocos años, buena parte del sudeste asiático dejó de estar bajo administración europea o estadounidense.',
+      obraIconica: 'Batalla de Dien Bien Phu y los Acuerdos de Ginebra (1954)',
+      paises: ['Indonesia', 'Vietnam', 'Birmania', 'Filipinas', 'Países Bajos', 'Francia'],
+    },
+    {
+      id: 'bandung-no-alineados',
+      nombre: 'Bandung y el No Alineamiento',
+      anioInicio: 1955,
+      anioFin: 1961,
+      color: '#009688',
+      categoria: 'no-alineados',
+      descripcion: 'En abril de 1955, veintinueve Estados de Asia y África, muchos recién independizados, se reunieron en la Conferencia de Bandung (Indonesia). Figuras como Sukarno, Nehru, el egipcio Nasser, el chino Zhou Enlai y el ghanés Nkrumah sentaron las bases de una solidaridad afroasiática contra el colonialismo y el racismo, y afirmaron la voluntad de no alinearse con ninguno de los dos bloques de la Guerra Fría. Ese impulso cristalizó en 1961 con la fundación en Belgrado del Movimiento de Países No Alineados. Bandung suele considerarse el momento de aparición del llamado "Tercer Mundo" como actor político, aunque los historiadores subrayan que sus miembros mantenían intereses y alineamientos muy diversos.',
+      obraIconica: 'Conferencia Afroasiática de Bandung (1955)',
+      paises: ['Indonesia', 'India', 'Egipto', 'China', 'Ghana', 'Yugoslavia'],
+    },
+    {
+      id: 'suez',
+      nombre: 'La crisis de Suez',
+      anioInicio: 1956,
+      anioFin: 1957,
+      color: '#00796B',
+      categoria: 'mundo-arabe',
+      descripcion: 'En julio de 1956, el presidente egipcio Gamal Abdel Nasser nacionalizó el Canal de Suez, hasta entonces controlado por capital británico y francés. En respuesta, Reino Unido y Francia, en connivencia secreta con Israel, lanzaron una intervención militar en octubre. La operación fue un éxito militar pero un fracaso político: la presión conjunta de Estados Unidos y la Unión Soviética, junto a la condena de la ONU, obligó a los tres países a retirarse. La crisis se interpreta habitualmente como la evidencia de que las antiguas potencias coloniales europeas ya no podían actuar en el mundo sin el respaldo de las superpotencias, y reforzó el prestigio de Nasser en el mundo árabe y entre los movimientos anticoloniales.',
+      obraIconica: 'Nacionalización del Canal de Suez por Nasser (1956)',
+      paises: ['Egipto', 'Reino Unido', 'Francia', 'Israel', 'Estados Unidos'],
+    },
+    {
+      id: 'guerra-argelia',
+      nombre: 'La guerra de Argelia',
+      anioInicio: 1954,
+      anioFin: 1962,
+      color: '#C62828',
+      categoria: 'mundo-arabe',
+      descripcion: 'Argelia no era para Francia una colonia ordinaria, sino un territorio jurídicamente integrado y con una numerosa población de colonos europeos (los pieds-noirs). El levantamiento del Frente de Liberación Nacional (FLN) el 1 de noviembre de 1954 inició una guerra prolongada y especialmente dura, marcada por la guerrilla, la represión y el recurso a la tortura, denunciada por diversos observadores. El conflicto provocó la caída de la Cuarta República francesa y el regreso al poder de Charles de Gaulle en 1958. Tras los Acuerdos de Evián, Argelia accedió a la independencia en 1962. Las cifras de víctimas siguen siendo objeto de debate historiográfico: las estimaciones oscilan entre varios cientos de miles y cifras muy superiores según las fuentes francesas y argelinas.',
+      obraIconica: 'Acuerdos de Evián y la independencia de Argelia (1962)',
+      paises: ['Argelia', 'Francia'],
+    },
+    {
+      id: 'ano-africa',
+      nombre: 'El "Año de África"',
+      anioInicio: 1957,
+      anioFin: 1965,
+      color: '#8BC34A',
+      categoria: 'africa',
+      descripcion: 'Ghana, con Kwame Nkrumah, fue en 1957 la primera colonia del África subsahariana en independizarse. El proceso se aceleró de forma espectacular en 1960, conocido como el "Año de África": diecisiete países accedieron a la independencia en un solo año, la mayoría antiguas colonias francesas, además del Congo Belga y Nigeria. La descolonización africana fue mayoritariamente pacífica en las colonias francesas y británicas, pero en algunos casos derivó en violencia: la independencia del Congo (1960) fue seguida de una grave crisis política, la secesión de Katanga y el asesinato del primer ministro Patrice Lumumba en 1961. Las fronteras heredadas del reparto colonial de finales del siglo XIX condicionaron a muchos de los nuevos Estados.',
+      obraIconica: 'El "Año de África": diecisiete independencias en 1960',
+      paises: ['Ghana', 'Nigeria', 'Congo', 'Senegal', 'Costa de Marfil', 'Camerún'],
+    },
+    {
+      id: 'descolonizacion-portuguesa',
+      nombre: 'La descolonización portuguesa',
+      anioInicio: 1961,
+      anioFin: 1975,
+      color: '#6A1B9A',
+      categoria: 'tardia',
+      descripcion: 'Portugal, gobernado por el régimen autoritario del Estado Novo, se resistió a descolonizar cuando el resto de Europa ya lo hacía. Desde comienzos de los años sesenta libró guerras coloniales prolongadas en Angola, Mozambique y Guinea-Bisáu contra movimientos de liberación como el MPLA, el FRELIMO y el PAIGC. El desgaste de estas guerras contribuyó de manera decisiva a la Revolución de los Claveles del 25 de abril de 1974, que derribó la dictadura en Lisboa. El nuevo gobierno reconoció rápidamente la independencia de las colonias en 1975. En Angola, sin embargo, la retirada portuguesa dio paso a una larga guerra civil entre facciones rivales, prolongada por la Guerra Fría.',
+      obraIconica: 'La Revolución de los Claveles en Lisboa (25 de abril de 1974)',
+      paises: ['Portugal', 'Angola', 'Mozambique', 'Guinea-Bisáu', 'Cabo Verde'],
+    },
+    {
+      id: 'africa-austral',
+      nombre: 'El cierre del África austral',
+      anioInicio: 1975,
+      anioFin: 1994,
+      color: '#7B1FA2',
+      categoria: 'tardia',
+      descripcion: 'Los últimos grandes procesos de descolonización se concentraron en el sur de África, donde el peso de las minorías blancas y el régimen del apartheid sudafricano complicaron y retrasaron las transiciones. La colonia británica de Rodesia, tras una declaración unilateral de independencia de la minoría blanca en 1965 y una larga guerra, se convirtió en la Zimbabue independiente en 1980 bajo Robert Mugabe. Namibia, administrada por Sudáfrica pese a las resoluciones de la ONU, alcanzó la independencia en 1990 tras años de conflicto y negociación. El fin del apartheid en Sudáfrica y las primeras elecciones multirraciales de 1994, con la victoria de Nelson Mandela, se consideran a menudo el broche del ciclo descolonizador en el continente.',
+      obraIconica: 'Independencia de Namibia (1990) y fin del apartheid en Sudáfrica (1994)',
+      paises: ['Zimbabue', 'Namibia', 'Sudáfrica'],
+    },
+    {
+      id: 'hong-kong',
+      nombre: 'La retrocesión de Hong Kong',
+      anioInicio: 1984,
+      anioFin: 1997,
+      color: '#3949AB',
+      categoria: 'cierre',
+      descripcion: 'El 1 de julio de 1997, Reino Unido devolvió Hong Kong a la República Popular China, poniendo fin a más de siglo y medio de administración británica del territorio, cedido y arrendado tras las Guerras del Opio del siglo XIX. La transferencia se había pactado en la Declaración Conjunta Sino-Británica de 1984, que estableció el principio de "un país, dos sistemas": Hong Kong conservaría durante cincuenta años su sistema económico y jurídico bajo soberanía china. La retrocesión de Hong Kong —seguida en 1999 por la de Macao portugués— suele señalarse como el cierre simbólico del gran ciclo de descolonización iniciado tras la Segunda Guerra Mundial, aunque a diferencia de la mayoría de los casos no dio lugar a un nuevo Estado independiente.',
+      obraIconica: 'Ceremonia de retrocesión de Hong Kong a China (1 de julio de 1997)',
+      paises: ['Hong Kong', 'Reino Unido', 'China'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'La posguerra y el nuevo orden',
+      desde: 1945,
+      hasta: 1947,
+      icono: '🕊️',
+      hitosDestacados: ['Posguerra y Carta de la ONU'],
+      eventos: [
+        'La Segunda Guerra Mundial deja exhaustas a las potencias coloniales europeas',
+        'La Carta de la ONU recoge el principio de libre determinación de los pueblos (1945)',
+        'Estados Unidos y la URSS emergen como superpotencias poco favorables a los imperios',
+        'La ocupación japonesa había quebrado el prestigio europeo en Asia',
+      ],
+    },
+    {
+      nombre: 'La ola asiática',
+      desde: 1947,
+      hasta: 1954,
+      icono: '🌏',
+      hitosDestacados: ['Independencia de India y Pakistán', 'Independencias del sudeste asiático'],
+      eventos: [
+        'Independencia de India y Pakistán y la Partición (1947)',
+        'Asesinato de Mahatma Gandhi (1948)',
+        'Sukarno logra el reconocimiento de la independencia de Indonesia (1949)',
+        'Guerra de Indochina entre Francia y el Viet Minh',
+        'Derrota francesa en Dien Bien Phu y Acuerdos de Ginebra (1954)',
+      ],
+    },
+    {
+      nombre: 'El Tercer Mundo toma la palabra',
+      desde: 1954,
+      hasta: 1960,
+      icono: '🤝',
+      hitosDestacados: ['Bandung y el No Alineamiento', 'La crisis de Suez', 'La guerra de Argelia'],
+      eventos: [
+        'Inicio del levantamiento del FLN en Argelia (1954)',
+        'Conferencia Afroasiática de Bandung (1955)',
+        'Nasser nacionaliza el Canal de Suez y estalla la crisis (1956)',
+        'Ghana, primera colonia subsahariana independiente (1957)',
+        'De Gaulle regresa al poder en Francia en plena guerra de Argelia (1958)',
+      ],
+    },
+    {
+      nombre: 'La descolonización africana',
+      desde: 1960,
+      hasta: 1965,
+      icono: '🌍',
+      hitosDestacados: ['El "Año de África"'],
+      eventos: [
+        'El "Año de África": diecisiete países independientes (1960)',
+        'Crisis del Congo, secesión de Katanga y asesinato de Lumumba (1960-1961)',
+        'Fundación del Movimiento de Países No Alineados en Belgrado (1961)',
+        'Independencia de Argelia tras los Acuerdos de Evián (1962)',
+        'Creación de la Organización para la Unidad Africana (1963)',
+      ],
+    },
+    {
+      nombre: 'La descolonización tardía',
+      desde: 1965,
+      hasta: 1984,
+      icono: '🌺',
+      hitosDestacados: ['La descolonización portuguesa', 'El cierre del África austral'],
+      eventos: [
+        'Guerras coloniales de Portugal en Angola, Mozambique y Guinea-Bisáu',
+        'La Revolución de los Claveles derriba la dictadura en Lisboa (1974)',
+        'Independencia de las colonias portuguesas de África (1975)',
+        'Guerra civil en Angola prolongada por la Guerra Fría',
+        'Zimbabue accede a la independencia tras una larga guerra (1980)',
+      ],
+    },
+    {
+      nombre: 'Los últimos capítulos',
+      desde: 1984,
+      hasta: 1997,
+      icono: '🏙️',
+      hitosDestacados: ['La retrocesión de Hong Kong'],
+      eventos: [
+        'Declaración Conjunta Sino-Británica sobre Hong Kong (1984)',
+        'Independencia de Namibia tras años de administración sudafricana (1990)',
+        'Fin del apartheid y primeras elecciones multirraciales en Sudáfrica (1994)',
+        'Retrocesión de Hong Kong a China bajo "un país, dos sistemas" (1997)',
+        'La descolonización de Macao (1999) cierra el ciclo europeo en Asia',
+      ],
+    },
+  ],
+
+  categorias: {
+    contexto: 'Contexto de posguerra',
+    asia: 'Descolonización de Asia',
+    'no-alineados': 'No Alineados y Tercer Mundo',
+    'mundo-arabe': 'Mundo árabe y Norte de África',
+    africa: 'Descolonización de África',
+    tardia: 'Descolonización tardía',
+    cierre: 'Cierre del ciclo',
+  },
+
+  colores: {
+    contexto: '#607D8B',
+    asia: '#FF9800',
+    'no-alineados': '#009688',
+    'mundo-arabe': '#C62828',
+    africa: '#8BC34A',
+    tardia: '#7B1FA2',
+    cierre: '#3949AB',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'La descolonización fue uno de los procesos que más transformó el mapa político del mundo en el siglo XX. Entre el final de la Segunda Guerra Mundial y el cierre de la centuria, los grandes imperios coloniales europeos —británico, francés, neerlandés, portugués, belga— se disolvieron y dieron paso a más de un centenar de nuevos Estados soberanos en Asia, África y otras regiones. No fue un proceso único ni homogéneo: en unos lugares la independencia llegó de forma negociada y pacífica, y en otros tras guerras prolongadas y costosas en vidas humanas. Esta cronología recorre el proceso desde el debilitamiento de las potencias en la posguerra y el principio de libre determinación de la Carta de la ONU, pasando por la independencia de la India, las guerras de Indochina y Argelia, la Conferencia de Bandung y el "Año de África", hasta la descolonización portuguesa tardía y la retrocesión de Hong Kong en 1997.',
+
+    tablaComparativa: [
+      { hito: 'Posguerra y Carta de la ONU', periodo: '1945-1947', categoria: 'Contexto de posguerra', personaje: 'Roosevelt / potencias aliadas', aportacion: 'El principio de libre determinación entra en el orden internacional' },
+      { hito: 'Independencia de India y Pakistán', periodo: '1947-1948', categoria: 'Descolonización de Asia', personaje: 'Gandhi / Nehru / Jinnah', aportacion: 'Fin del Raj y la Partición, con enormes desplazamientos de población' },
+      { hito: 'Independencias del sudeste asiático', periodo: '1945-1954', categoria: 'Descolonización de Asia', personaje: 'Sukarno / Ho Chi Minh', aportacion: 'Indonesia, Vietnam, Birmania y Filipinas dejan el dominio colonial' },
+      { hito: 'Bandung y el No Alineamiento', periodo: '1955-1961', categoria: 'No Alineados y Tercer Mundo', personaje: 'Nasser / Nehru / Nkrumah', aportacion: 'El "Tercer Mundo" se afirma como actor político frente a los bloques' },
+      { hito: 'La guerra de Argelia', periodo: '1954-1962', categoria: 'Mundo árabe y Norte de África', personaje: 'FLN / De Gaulle', aportacion: 'Independencia tras una guerra que hizo caer la Cuarta República francesa' },
+      { hito: 'El "Año de África"', periodo: '1957-1965', categoria: 'Descolonización de África', personaje: 'Nkrumah / Lumumba', aportacion: 'Diecisiete países independientes en 1960; nace el África poscolonial' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiantes de Historia',
+        perfil: 'Secundaria, preparatoria y universidad',
+        texto: 'Visión ordenada de un proceso global que suele estudiarse fragmentado. Ayuda a entender cómo, en apenas medio siglo, el mundo pasó de estar dominado por unos pocos imperios europeos a un sistema de más de un centenar de Estados, y por qué unas independencias fueron pacíficas y otras violentas.',
+      },
+      {
+        icono: '🌐',
+        titulo: 'Relaciones internacionales',
+        perfil: 'Origen del sistema internacional actual',
+        texto: 'La descolonización multiplicó el número de Estados de la ONU y dio origen al "Tercer Mundo" y al Movimiento de Países No Alineados. Es imprescindible para comprender la geopolítica contemporánea, las relaciones Norte-Sur y muchos conflictos posteriores.',
+      },
+      {
+        icono: '🗺️',
+        titulo: 'Interesados en geografía política',
+        perfil: 'Cómo se dibujaron las fronteras actuales',
+        texto: 'Muchas fronteras de Asia y África proceden del reparto colonial y se mantuvieron al independizarse los territorios. Esta cronología ayuda a entender el origen de los mapas actuales y por qué algunas fronteras siguen siendo fuente de tensiones.',
+      },
+      {
+        icono: '⚖️',
+        titulo: 'Debate sobre el legado colonial',
+        perfil: 'Comprender un tema sensible con rigor',
+        texto: 'El colonialismo y su fin son objeto de debate historiográfico y político. Aquí se presentan los hechos datables —independencias, guerras, acuerdos— con horquillas de víctimas atribuidas a los historiadores, como base factual para una discusión informada.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Qué es exactamente la descolonización?',
+        respuesta: 'Es el proceso por el que los territorios sometidos a dominio colonial accedieron a la independencia y se convirtieron en Estados soberanos. Aplicado al siglo XX, se refiere sobre todo a la disolución de los imperios coloniales europeos tras la Segunda Guerra Mundial, principalmente en Asia y África. No fue un acontecimiento único, sino un conjunto de procesos con ritmos, formas y grados de violencia muy distintos según el territorio y la potencia colonial.',
+        tip: 'La Carta de la ONU (1945) consagró la "libre determinación de los pueblos", que se convirtió en el argumento jurídico central del proceso.',
+      },
+      {
+        pregunta: '¿Por qué se aceleró la descolonización después de 1945?',
+        respuesta: 'Varias causas coincidieron. Las potencias coloniales salieron de la Segunda Guerra Mundial exhaustas y endeudadas. La ocupación japonesa de Asia había mostrado que los europeos podían ser derrotados. Las dos superpotencias emergentes, Estados Unidos y la Unión Soviética, eran, por razones distintas, poco favorables a los imperios europeos. Y los movimientos nacionalistas de las colonias estaban ya organizados y decididos. La combinación de estos factores hizo que un proceso previsible se acelerara enormemente.',
+        tip: 'Algunos historiadores insisten en que la iniciativa de los propios movimientos coloniales fue tan decisiva como la debilidad de las metrópolis.',
+      },
+      {
+        pregunta: '¿Fue la descolonización un proceso pacífico?',
+        respuesta: 'Dependió mucho del caso. Buena parte de las colonias británicas y francesas de África accedieron a la independencia de forma relativamente negociada. Pero hubo guerras prolongadas y muy costosas: la de Indochina, la de Argelia (1954-1962) y las guerras coloniales portuguesas en Angola, Mozambique y Guinea-Bisáu. También hubo violencia intensa en procesos formalmente pacíficos, como la Partición de la India. Presentar la descolonización solo como pacífica o solo como violenta deforma un panorama muy diverso.',
+        tip: 'Las cifras de víctimas de conflictos como la guerra de Argelia siguen siendo objeto de debate entre historiadores.',
+      },
+      {
+        pregunta: '¿Qué fue la Conferencia de Bandung y el No Alineamiento?',
+        respuesta: 'Bandung (1955) fue una reunión de Estados asiáticos y africanos, muchos recién independizados, que afirmaron su solidaridad frente al colonialismo y su voluntad de no alinearse con ninguno de los dos bloques de la Guerra Fría. De ese impulso surgió en 1961 el Movimiento de Países No Alineados. Suele considerarse el momento en que el llamado "Tercer Mundo" apareció como actor político, aunque sus miembros mantenían intereses y alineamientos internos muy variados.',
+        tip: 'El término "Tercer Mundo" fue acuñado por el demógrafo francés Alfred Sauvy en 1952, en analogía con el "tercer estado".',
+      },
+      {
+        pregunta: '¿Cuándo terminó la descolonización?',
+        respuesta: 'No hay una fecha única. El grueso del proceso se concentró entre 1947 y 1965, con el pico en el "Año de África" (1960). Pero hubo capítulos tardíos: las colonias portuguesas se independizaron en 1975, Zimbabue en 1980 y Namibia en 1990. La retrocesión de Hong Kong a China en 1997 —seguida por la de Macao en 1999— suele señalarse como el cierre simbólico del ciclo, aunque en rigor no dio lugar a un nuevo Estado independiente, sino a un cambio de soberanía.',
+        tip: 'La ONU mantiene todavía una lista de "territorios no autónomos" pendientes, por lo que jurídicamente el proceso no está del todo cerrado.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Observa los bloques de color en la Línea del Tiempo',
+        cuerpo: 'El gris es el contexto de posguerra, el naranja la ola asiática, el verde el no alineamiento, el rojo el mundo árabe, el verde claro África y el morado la descolonización tardía. Antes de leer, fíjate en cómo el proceso se concentra sobre todo entre 1947 y 1965 y deja algunos capítulos rezagados hasta 1997.',
+      },
+      {
+        titulo: 'Compara Asia con África',
+        cuerpo: 'Haz clic en "Independencia de India y Pakistán" y luego en "El Año de África". Observa el desfase temporal: Asia se descolonizó primero, a partir de 1947; el grueso de África, más de una década después. El continente asiático abrió el camino que África recorrería con rapidez.',
+      },
+      {
+        titulo: 'Sigue el hilo de la violencia y la negociación',
+        cuerpo: 'Compara los hitos "El Año de África" (mayoritariamente pacífico) con "La guerra de Argelia" o "La descolonización portuguesa" (guerras prolongadas). Identifica por qué unas independencias fueron negociadas y otras, armadas: el peso de los colonos y la rigidez de la metrópoli fueron factores clave.',
+      },
+      {
+        titulo: 'Usa la Comparativa para agrupar procesos',
+        cuerpo: 'En la tabla Comparativa, filtra por "Descolonización de Asia" para ver la primera oleada y luego por "Descolonización tardía" para ver los casos rezagados. El contraste entre ambos grupos muestra que la descolonización fue un proceso escalonado, no un único momento.',
+      },
+      {
+        titulo: 'Termina con el Contexto Histórico para el cuadro completo',
+        cuerpo: 'Las 6 eras muestran cómo cada fase tuvo sus protagonistas y su lógica. La era "El Tercer Mundo toma la palabra" es especialmente densa: reúne Bandung, la crisis de Suez y el arranque de las independencias africanas en apenas seis años.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '🗓️',
+        texto: '1960 es la fecha clave: en un solo año, diecisiete territorios accedieron a la independencia, sobre todo antiguas colonias francesas más el Congo Belga y Nigeria. Por eso se conoce como el "Año de África". Ningún otro año concentró tantas independencias.',
+      },
+      {
+        icono: '🌸',
+        texto: 'La descolonización portuguesa no llegó por una decisión colonial, sino por una revolución en la propia metrópoli: la Revolución de los Claveles de 1974 derribó la dictadura de Lisboa, agotada por las guerras de África, y el nuevo gobierno reconoció las independencias al año siguiente.',
+      },
+      {
+        icono: '🕊️',
+        texto: 'La crisis de Suez de 1956 fue un punto de inflexión: Reino Unido y Francia ganaron militarmente pero tuvieron que retirarse ante la presión de Estados Unidos y la URSS. Marcó de forma nítida el fin de la capacidad de las viejas potencias para actuar solas en el mundo.',
+      },
+      {
+        icono: '🏙️',
+        texto: 'Hong Kong no se convirtió en un Estado independiente en 1997: pasó del Reino Unido a China bajo la fórmula "un país, dos sistemas". Es un caso singular dentro del ciclo descolonizador, más un cambio de soberanía que una independencia.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Creer que la descolonización fue un único acontecimiento',
+        cuerpo: 'No lo fue. Se extendió a lo largo de medio siglo, con oleadas sucesivas: primero Asia (a partir de 1947), luego África (con el pico en 1960) y finalmente los casos tardíos hasta 1997. Cada territorio siguió su propio ritmo según la potencia colonial y las circunstancias locales.',
+      },
+      {
+        titulo: 'Pensar que toda la descolonización fue violenta (o toda pacífica)',
+        cuerpo: 'La realidad fue muy diversa. Junto a guerras prolongadas como las de Indochina, Argelia o las colonias portuguesas, hubo numerosas independencias negociadas de forma relativamente pacífica. Y procesos formalmente pacíficos, como la Partición de la India, provocaron una violencia intercomunitaria enorme. Generalizar en cualquiera de los dos sentidos deforma la historia.',
+      },
+      {
+        titulo: 'Atribuir la independencia solo a la generosidad de las metrópolis',
+        cuerpo: 'La descolonización no fue una simple concesión desde arriba. Fue el resultado de la interacción entre la debilidad de las potencias tras la guerra, el nuevo contexto internacional y, sobre todo, la movilización organizada de los propios pueblos colonizados. Reducirla a una decisión europea ignora el papel decisivo de los movimientos nacionalistas.',
+      },
+      {
+        titulo: 'Suponer que la independencia resolvió todos los problemas',
+        cuerpo: 'La independencia política no siempre trajo estabilidad ni bienestar inmediatos. Muchos nuevos Estados heredaron fronteras trazadas en época colonial, economías dependientes y tensiones internas, y algunos vivieron guerras civiles, golpes de Estado o conflictos posteriores. La descolonización abrió una etapa nueva, con sus propios y complejos desafíos.',
+      },
+    ],
+  },
+};

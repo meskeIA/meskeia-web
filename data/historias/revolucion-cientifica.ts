@@ -1,0 +1,367 @@
+import type { HistoriaData } from './types';
+
+export const revolucionCientifica: HistoriaData = {
+  slug: 'revolucion-cientifica',
+  titulo: 'La Revolución Científica: De Copérnico a Newton',
+  subtitulo: 'Siglo y medio en que Europa aprendió a interrogar a la naturaleza con matemáticas y experimentos, y cambió para siempre la forma de conocer el mundo',
+  descripcionSEO: 'Cronología interactiva de la Revolución Científica (1543-1687): del heliocentrismo de Copérnico y la anatomía de Vesalio a las observaciones de Tycho Brahe, las leyes de Kepler, el telescopio de Galileo, el método de Bacon y Descartes, la circulación de la sangre de Harvey, las primeras sociedades científicas y la síntesis de Newton en los Principia. Astronomía, física, método y anatomía en 10 hitos y 6 eras.',
+  keywords: [
+    'revolución científica cronología historia ciencia',
+    'copérnico heliocentrismo galileo telescopio kepler',
+    'newton principia gravitación universal física',
+    'método científico bacon descartes empirismo racionalismo',
+    'tycho brahe harvey circulación sangre vesalio anatomía',
+    'royal society académie sciences sociedades científicas siglo xvii',
+  ],
+  anioInicio: 1543,
+  anioFin: 1727,
+
+  hitos: [
+    {
+      id: 'heliocentrismo-copernico',
+      nombre: 'El heliocentrismo de Copérnico',
+      anioInicio: 1543,
+      anioFin: 1580,
+      color: '#2C3E7B',
+      categoria: 'astronomia',
+      descripcion: 'El canónigo y astrónomo polaco Nicolás Copérnico publicó en 1543, poco antes de morir, "De revolutionibus orbium coelestium", donde situaba el Sol —y no la Tierra— en el centro del cosmos. La propuesta rompía con el modelo geocéntrico de Ptolomeo, vigente durante catorce siglos. Copérnico conservó las órbitas circulares y los epiciclos, por lo que su sistema no era más preciso que el antiguo, pero desplazaba a la Tierra de su lugar central. Un prólogo anónimo añadido por el teólogo Andreas Osiander presentaba el modelo como una mera hipótesis de cálculo, lo que amortiguó su recepción inicial.',
+      obraIconica: '"De revolutionibus orbium coelestium" de Copérnico (1543)',
+      paises: ['Polonia', 'Prusia', 'Sacro Imperio'],
+    },
+    {
+      id: 'anatomia-vesalio',
+      nombre: 'La anatomía de Vesalio',
+      anioInicio: 1543,
+      anioFin: 1590,
+      color: '#8E44AD',
+      categoria: 'anatomia',
+      descripcion: 'El mismo año de la obra de Copérnico, el médico flamenco Andrés Vesalio publicó "De humani corporis fabrica" (1543), un tratado de anatomía basado en la disección directa de cadáveres humanos, con láminas de gran calidad. Vesalio corrigió numerosos errores heredados de Galeno, cuya autoridad había dominado la medicina durante más de mil años, y estableció que el conocimiento del cuerpo debía apoyarse en la observación propia y no solo en los textos antiguos. Su obra desplazó el centro de la enseñanza médica desde la lectura de autoridades hacia la observación anatómica.',
+      obraIconica: '"De humani corporis fabrica" de Vesalio (1543)',
+      paises: ['Flandes', 'Italia', 'Padua'],
+    },
+    {
+      id: 'observaciones-tycho',
+      nombre: 'Las observaciones de Tycho Brahe',
+      anioInicio: 1572,
+      anioFin: 1601,
+      color: '#2C3E7B',
+      categoria: 'astronomia',
+      descripcion: 'El astrónomo danés Tycho Brahe reunió, desde su observatorio de Uraniborg, la serie de observaciones planetarias más precisa lograda a simple vista, antes de la invención del telescopio. La aparición de una nueva estrella (supernova) en 1572 y el cometa de 1577 le sirvieron para cuestionar la idea aristotélica de que los cielos eran inmutables. Tycho propuso un modelo intermedio en el que el Sol y la Luna giraban en torno a la Tierra, y el resto de planetas en torno al Sol. Sus datos, heredados por Kepler, resultaron decisivos para el avance posterior de la astronomía.',
+      obraIconica: 'El observatorio de Uraniborg y el catálogo estelar de Tycho Brahe',
+      paises: ['Dinamarca', 'Sacro Imperio', 'Bohemia'],
+    },
+    {
+      id: 'leyes-kepler',
+      nombre: 'Las leyes de Kepler',
+      anioInicio: 1609,
+      anioFin: 1619,
+      color: '#2C3E7B',
+      categoria: 'astronomia',
+      descripcion: 'El astrónomo alemán Johannes Kepler, discípulo y sucesor de Tycho Brahe, analizó los datos de este sobre Marte y formuló las leyes del movimiento planetario. En "Astronomia nova" (1609) enunció que las órbitas son elipses con el Sol en uno de sus focos y que los planetas barren áreas iguales en tiempos iguales; en "Harmonices mundi" (1619) añadió la relación entre el periodo orbital y la distancia al Sol. Kepler abandonó así las órbitas circulares heredadas de la Antigüedad y describió el movimiento celeste mediante relaciones matemáticas precisas, sentando una base cuantitativa para la astronomía.',
+      obraIconica: '"Astronomia nova" de Kepler y las tres leyes del movimiento planetario',
+      paises: ['Sacro Imperio', 'Bohemia', 'Austria'],
+    },
+    {
+      id: 'galileo-telescopio',
+      nombre: 'Galileo y el telescopio',
+      anioInicio: 1609,
+      anioFin: 1632,
+      color: '#C0392B',
+      categoria: 'fisica',
+      descripcion: 'El italiano Galileo Galilei perfeccionó el telescopio en 1609 y lo dirigió al cielo, publicando en 1610 "Sidereus Nuncius": describió montañas en la Luna, incontables estrellas nuevas y cuatro satélites de Júpiter. Más tarde observó las fases de Venus y las manchas solares, hechos difíciles de encajar en el modelo geocéntrico. Galileo también estudió la caída de los cuerpos y el movimiento, aplicando la matemática a la física terrestre. Defensor del copernicanismo, expuso sus argumentos en el "Diálogo sobre los dos máximos sistemas del mundo" (1632).',
+      obraIconica: '"Sidereus Nuncius" de Galileo (1610) y los satélites de Júpiter',
+      paises: ['Italia', 'Toscana', 'República de Venecia'],
+    },
+    {
+      id: 'metodo-bacon-descartes',
+      nombre: 'El método: Bacon y Descartes',
+      anioInicio: 1620,
+      anioFin: 1637,
+      color: '#16A085',
+      categoria: 'metodo',
+      descripcion: 'Dos filósofos formularon las bases metodológicas de la nueva ciencia. El inglés Francis Bacon, en "Novum Organum" (1620), propuso el método inductivo y experimental: acumular observaciones para inferir leyes generales, desconfiando de los prejuicios (los "ídolos") que distorsionan el conocimiento. El francés René Descartes, en el "Discurso del método" (1637), defendió la duda metódica y el razonamiento deductivo a partir de principios ciertos, e impulsó la geometría analítica. Empirismo y racionalismo se presentaron como vías complementarias que la ciencia posterior acabaría combinando.',
+      obraIconica: '"Novum Organum" de Bacon (1620) y el "Discurso del método" de Descartes (1637)',
+      paises: ['Inglaterra', 'Francia', 'Provincias Unidas'],
+    },
+    {
+      id: 'harvey-circulacion',
+      nombre: 'Harvey y la circulación de la sangre',
+      anioInicio: 1628,
+      anioFin: 1660,
+      color: '#8E44AD',
+      categoria: 'anatomia',
+      descripcion: 'El médico inglés William Harvey publicó en 1628 "Exercitatio anatomica de motu cordis et sanguinis", donde describió la circulación de la sangre impulsada por el corazón como una bomba, en un circuito cerrado. Combinó la disección con mediciones cuantitativas —calculando el volumen de sangre bombeado— para refutar la teoría galénica, según la cual el hígado producía continuamente sangre que los órganos consumían. El trabajo de Harvey ilustró cómo el método experimental y la medida podían aplicarse también a los seres vivos, no solo a los astros y los cuerpos en movimiento.',
+      obraIconica: '"De motu cordis" de William Harvey (1628)',
+      paises: ['Inglaterra', 'Italia', 'Padua'],
+    },
+    {
+      id: 'proceso-galileo',
+      nombre: 'El proceso a Galileo',
+      anioInicio: 1616,
+      anioFin: 1642,
+      color: '#C0392B',
+      categoria: 'fisica',
+      descripcion: 'En 1616 la Iglesia católica declaró contraria a las Escrituras la afirmación del movimiento de la Tierra y advirtió a Galileo. Tras la publicación del "Diálogo sobre los dos máximos sistemas del mundo" (1632), el Santo Oficio lo procesó en 1633: Galileo fue obligado a abjurar del heliocentrismo y condenado a arresto domiciliario, en el que permaneció hasta su muerte en 1642. El episodio se ha convertido en símbolo de la tensión entre la nueva ciencia y la autoridad establecida, aunque los historiadores subrayan que confluyeron también factores personales, teológicos y políticos propios de la Europa de la Contrarreforma.',
+      obraIconica: 'La abjuración de Galileo ante el Santo Oficio (1633)',
+      paises: ['Estados Pontificios', 'Italia', 'Toscana'],
+    },
+    {
+      id: 'sociedades-cientificas',
+      nombre: 'Las sociedades científicas',
+      anioInicio: 1660,
+      anioFin: 1687,
+      color: '#D68910',
+      categoria: 'instituciones',
+      descripcion: 'La nueva ciencia dejó de ser una tarea de individuos aislados para organizarse en instituciones. En Londres se fundó la Royal Society (1660), que adoptó el lema "Nullius in verba" (no creer en la palabra de nadie sin prueba) y comenzó a publicar en 1665 las "Philosophical Transactions", una de las primeras revistas científicas. En París, con apoyo real, se creó la Académie des Sciences (1666). Estas academias institucionalizaron la experimentación, la comunicación de resultados y la revisión por pares, y consolidaron una comunidad científica internacional que compartía métodos y hallazgos.',
+      obraIconica: 'La Royal Society (1660) y las "Philosophical Transactions" (1665)',
+      paises: ['Inglaterra', 'Francia', 'Italia'],
+    },
+    {
+      id: 'sintesis-newton',
+      nombre: 'La síntesis newtoniana',
+      anioInicio: 1687,
+      anioFin: 1727,
+      color: '#1F618D',
+      categoria: 'sintesis',
+      descripcion: 'El inglés Isaac Newton culminó la Revolución Científica con "Philosophiæ naturalis principia mathematica" (1687), donde formuló las tres leyes del movimiento y la ley de gravitación universal. La misma fuerza que hacía caer una manzana mantenía a la Luna en su órbita: física terrestre y celeste quedaban unificadas por una sola ley matemática. Newton, que desarrolló también el cálculo infinitesimal (en paralelo a Leibniz) y estudió la naturaleza de la luz, ofreció un sistema del mundo coherente y predictivo. Su obra cerró el ciclo abierto por Copérnico y abrió el camino a la Ilustración.',
+      obraIconica: '"Philosophiæ naturalis principia mathematica" de Newton (1687)',
+      paises: ['Inglaterra', 'Reino Unido'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'El doble amanecer de 1543',
+      desde: 1543,
+      hasta: 1571,
+      icono: '📖',
+      hitosDestacados: ['El heliocentrismo de Copérnico', 'La anatomía de Vesalio'],
+      eventos: [
+        'Copérnico publica "De revolutionibus" y propone el modelo heliocéntrico (1543)',
+        'Vesalio publica "De humani corporis fabrica" y renueva la anatomía (1543)',
+        'La autoridad de Ptolomeo en astronomía y de Galeno en medicina empieza a cuestionarse',
+        'La imprenta difunde con rapidez las nuevas obras por toda Europa',
+        'Persisten las órbitas circulares y buena parte del marco aristotélico',
+      ],
+    },
+    {
+      nombre: 'La astronomía de precisión',
+      desde: 1571,
+      hasta: 1609,
+      icono: '🔭',
+      hitosDestacados: ['Las observaciones de Tycho Brahe'],
+      eventos: [
+        'La supernova de 1572 y el cometa de 1577 cuestionan la inmutabilidad de los cielos',
+        'Tycho Brahe reúne en Uraniborg observaciones muy precisas a simple vista',
+        'Se acumulan datos planetarios que la teoría aún no explica bien',
+        'Tycho propone un modelo mixto entre el geocéntrico y el heliocéntrico',
+        'Kepler hereda los datos de Tycho tras su muerte (1601)',
+      ],
+    },
+    {
+      nombre: 'El cielo matematizado y observado',
+      desde: 1609,
+      hasta: 1620,
+      icono: '🪐',
+      hitosDestacados: ['Las leyes de Kepler', 'Galileo y el telescopio'],
+      eventos: [
+        'Kepler publica "Astronomia nova" con las órbitas elípticas (1609)',
+        'Galileo dirige el telescopio al cielo y publica "Sidereus Nuncius" (1610)',
+        'Se descubren los satélites de Júpiter y las fases de Venus',
+        'La física terrestre empieza a describirse con matemáticas',
+        'La observación instrumental se suma al cálculo astronómico',
+      ],
+    },
+    {
+      nombre: 'El método y el cuerpo humano',
+      desde: 1620,
+      hasta: 1642,
+      icono: '⚗️',
+      hitosDestacados: ['El método: Bacon y Descartes', 'Harvey y la circulación de la sangre', 'El proceso a Galileo'],
+      eventos: [
+        'Bacon publica "Novum Organum" y defiende el método inductivo (1620)',
+        'Harvey describe la circulación de la sangre en "De motu cordis" (1628)',
+        'El Santo Oficio procesa a Galileo, que abjura del heliocentrismo (1633)',
+        'Descartes publica el "Discurso del método" y la geometría analítica (1637)',
+        'Empirismo y racionalismo perfilan las bases de la nueva ciencia',
+      ],
+    },
+    {
+      nombre: 'La ciencia se institucionaliza',
+      desde: 1642,
+      hasta: 1687,
+      icono: '🏛️',
+      hitosDestacados: ['Las sociedades científicas'],
+      eventos: [
+        'Se funda la Royal Society de Londres con el lema "Nullius in verba" (1660)',
+        'Aparecen las "Philosophical Transactions", revista científica pionera (1665)',
+        'Se crea la Académie des Sciences de París con apoyo real (1666)',
+        'La experimentación y la comunicación de resultados se organizan formalmente',
+        'Se consolida una comunidad científica internacional',
+      ],
+    },
+    {
+      nombre: 'La síntesis newtoniana',
+      desde: 1687,
+      hasta: 1727,
+      icono: '🍎',
+      hitosDestacados: ['La síntesis newtoniana'],
+      eventos: [
+        'Newton publica los "Principia mathematica" con las leyes del movimiento (1687)',
+        'La ley de gravitación universal unifica la física terrestre y celeste',
+        'El cálculo infinitesimal se desarrolla en paralelo con Leibniz',
+        'El modelo mecánico del universo se convierte en referencia científica',
+        'La Revolución Científica desemboca en la Ilustración del siglo XVIII',
+      ],
+    },
+  ],
+
+  categorias: {
+    astronomia: 'Astronomía y cosmos',
+    anatomia: 'Anatomía y medicina',
+    fisica: 'Física y movimiento',
+    metodo: 'Método y filosofía',
+    instituciones: 'Instituciones científicas',
+    sintesis: 'Síntesis newtoniana',
+  },
+
+  colores: {
+    astronomia: '#2C3E7B',
+    anatomia: '#8E44AD',
+    fisica: '#C0392B',
+    metodo: '#16A085',
+    instituciones: '#D68910',
+    sintesis: '#1F618D',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'La Revolución Científica es el nombre que la historiografía da al periodo, aproximadamente entre 1543 y 1687, en que Europa desarrolló una forma nueva de conocer la naturaleza, basada en la observación cuidadosa, el experimento y la descripción matemática, frente al peso de las autoridades antiguas como Aristóteles, Ptolomeo y Galeno. Suele fecharse su inicio en 1543, cuando aparecieron a la vez la obra astronómica de Copérnico y el tratado de anatomía de Vesalio, y su culminación en 1687 con los "Principia" de Newton. No fue un cambio brusco ni la obra de una sola persona: fue un proceso de siglo y medio protagonizado por astrónomos, médicos, matemáticos y filósofos de varios países. Esta cronología recorre sus hitos principales, del heliocentrismo a la gravitación universal, y sitúa la ciencia moderna como el tercer eslabón de la Modernidad temprana, entre el Renacimiento y la Ilustración.',
+
+    tablaComparativa: [
+      { hito: 'El heliocentrismo de Copérnico', periodo: '1543-1580', categoria: 'Astronomía y cosmos', personaje: 'Nicolás Copérnico', aportacion: 'Sitúa el Sol en el centro y desplaza a la Tierra del cosmos' },
+      { hito: 'Las leyes de Kepler', periodo: '1609-1619', categoria: 'Astronomía y cosmos', personaje: 'Johannes Kepler', aportacion: 'Órbitas elípticas y leyes matemáticas del movimiento planetario' },
+      { hito: 'Galileo y el telescopio', periodo: '1609-1632', categoria: 'Física y movimiento', personaje: 'Galileo Galilei', aportacion: 'Observación telescópica del cielo y estudio del movimiento' },
+      { hito: 'El método: Bacon y Descartes', periodo: '1620-1637', categoria: 'Método y filosofía', personaje: 'Bacon y Descartes', aportacion: 'Formulan el método inductivo experimental y el deductivo racional' },
+      { hito: 'Harvey y la circulación de la sangre', periodo: '1628-1660', categoria: 'Anatomía y medicina', personaje: 'William Harvey', aportacion: 'Describe la circulación sanguínea con observación y medida' },
+      { hito: 'La síntesis newtoniana', periodo: '1687-1727', categoria: 'Síntesis newtoniana', personaje: 'Isaac Newton', aportacion: 'Unifica física terrestre y celeste con la gravitación universal' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiantes de Historia y Ciencia',
+        perfil: 'Secundaria, preparatoria y universidad',
+        texto: 'Visión ordenada de cómo nació la ciencia moderna: quién propuso qué, en qué orden y por qué cada avance dependía de los anteriores. Útil para entender el paso del mundo antiguo al pensamiento científico y para conectar astronomía, física, medicina y filosofía.',
+      },
+      {
+        icono: '🔬',
+        titulo: 'Interesados en la ciencia',
+        perfil: 'Curiosidad por los orígenes del método',
+        texto: 'La Revolución Científica es donde se forjaron las herramientas que aún usamos: hipótesis, experimento, medida y revisión por pares. Aquí se ve nacer el método científico y la comunidad que lo sostiene, no como abstracción sino a través de casos concretos.',
+      },
+      {
+        icono: '📜',
+        titulo: 'Filosofía y epistemología',
+        perfil: 'Cómo sabemos lo que sabemos',
+        texto: 'El choque entre empirismo (Bacon) y racionalismo (Descartes), y la tensión entre la nueva ciencia y las autoridades religiosas y académicas, hacen de este periodo un caso central para estudiar la teoría del conocimiento y el cambio de paradigmas.',
+      },
+      {
+        icono: '🧭',
+        titulo: 'Docentes y divulgadores',
+        perfil: 'Contexto para explicar la modernidad',
+        texto: 'Un mapa claro para situar la Revolución Científica entre el Renacimiento y la Ilustración. Facilita explicar por qué 1543 y 1687 son fechas clave y cómo se enlazan Copérnico, Galileo, Kepler y Newton en una misma historia.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Qué fue la Revolución Científica y cuándo ocurrió?',
+        respuesta: 'Es el nombre que la historiografía da al periodo, aproximadamente de 1543 a 1687, en que Europa desarrolló la ciencia moderna basada en la observación, el experimento y las matemáticas. Suele fecharse su inicio en 1543 (obras de Copérnico y Vesalio) y su cierre en 1687 (los "Principia" de Newton). El propio término se popularizó en el siglo XX, sobre todo a partir del historiador Alexandre Koyré.',
+        tip: 'El adjetivo "revolución" es posterior: los protagonistas no eran conscientes de vivir un cambio de época con ese nombre.',
+      },
+      {
+        pregunta: '¿Por qué son importantes los dos libros de 1543?',
+        respuesta: '"De revolutionibus orbium coelestium" de Copérnico propuso que la Tierra gira alrededor del Sol, rompiendo con el modelo geocéntrico de Ptolomeo; "De humani corporis fabrica" de Vesalio renovó la anatomía a partir de la disección directa, corrigiendo a Galeno. Ambos, publicados el mismo año, simbolizan el paso de confiar en las autoridades antiguas a confiar en la observación propia.',
+        tip: 'Copérnico conservó las órbitas circulares: su modelo no era más preciso que el de Ptolomeo, pero cambiaba el centro del sistema.',
+      },
+      {
+        pregunta: '¿Qué papel tuvo Galileo y qué pasó en su proceso?',
+        respuesta: 'Galileo perfeccionó el telescopio (1609), descubrió los satélites de Júpiter y las fases de Venus, y estudió el movimiento con matemáticas. Al defender el heliocentrismo, fue procesado por el Santo Oficio en 1633, obligado a abjurar y condenado a arresto domiciliario. Los historiadores señalan que en el episodio confluyeron factores científicos, teológicos, personales y políticos de la Europa de la Contrarreforma.',
+        tip: 'La Iglesia ya había advertido a Galileo en 1616; el proceso llegó tras publicar el "Diálogo sobre los dos máximos sistemas" en 1632.',
+      },
+      {
+        pregunta: '¿Qué diferencia hay entre el método de Bacon y el de Descartes?',
+        respuesta: 'Francis Bacon defendió el método inductivo y experimental: partir de muchas observaciones para inferir leyes generales, desconfiando de los prejuicios. René Descartes propuso la duda metódica y el razonamiento deductivo a partir de principios ciertos, y desarrolló la geometría analítica. Se suelen presentar como empirismo frente a racionalismo, dos vías que la ciencia posterior acabó combinando.',
+        tip: 'La ciencia moderna no eligió entre ambos: usa observación y experimento (Bacon) junto con modelos matemáticos deductivos (Descartes).',
+      },
+      {
+        pregunta: '¿Por qué se considera a Newton el punto culminante?',
+        respuesta: 'En los "Principia mathematica" (1687), Newton formuló las tres leyes del movimiento y la ley de gravitación universal, unificando en una sola descripción matemática la física de la Tierra y la de los cielos. Recogió y sintetizó los avances de Copérnico, Kepler y Galileo en un sistema coherente y predictivo, lo que cerró el ciclo de la Revolución Científica y preparó el camino de la Ilustración.',
+        tip: 'Newton reconoció esa herencia con la frase de que veía más lejos "por estar sobre los hombros de gigantes".',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Empieza por el doble arranque de 1543',
+        cuerpo: 'Haz clic en "El heliocentrismo de Copérnico" y en "La anatomía de Vesalio". Fíjate en que ambos aparecen el mismo año y en dos campos distintos, astronomía y medicina: es la señal de que empezaba a cambiar la forma misma de conocer, no solo una teoría concreta.',
+      },
+      {
+        titulo: 'Sigue la línea de la astronomía',
+        cuerpo: 'Ordena en tu cabeza la secuencia Copérnico → Tycho Brahe → Kepler → Galileo. Cada uno resolvió un límite del anterior: Copérnico cambió el centro, Tycho aportó datos precisos, Kepler halló las órbitas reales y Galileo miró el cielo con el telescopio.',
+      },
+      {
+        titulo: 'Distingue el "qué" del "cómo"',
+        cuerpo: 'Compara los hitos astronómicos con "El método: Bacon y Descartes". Los primeros aportan descubrimientos; el segundo aporta las reglas para descubrir. La Revolución Científica no fue solo nuevos hechos, sino una nueva manera de buscarlos y validarlos.',
+      },
+      {
+        titulo: 'No te saltes las instituciones',
+        cuerpo: 'Revisa "Las sociedades científicas". La Royal Society y la Académie des Sciences convirtieron la ciencia de esfuerzo individual en tarea colectiva, con revistas y revisión por pares. Sin esa organización, muchos hallazgos no se habrían difundido ni comprobado.',
+      },
+      {
+        titulo: 'Cierra con Newton y mira al Contexto Histórico',
+        cuerpo: 'Termina en "La síntesis newtoniana" y abre las 6 eras del Contexto Histórico. Verás cómo el ritmo se acelera: del lento arranque de 1543 a la avalancha del siglo XVII, que desemboca en la Ilustración.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '📅',
+        texto: 'El año 1543 es doblemente simbólico: en él se publicaron a la vez la obra astronómica de Copérnico y el tratado de anatomía de Vesalio. Por eso suele tomarse como fecha de inicio convencional de la Revolución Científica.',
+      },
+      {
+        icono: '🤝',
+        texto: 'Kepler no habría formulado sus leyes sin los datos de Tycho Brahe. La ciencia de este periodo avanzó encadenando el trabajo de unos sobre el de otros: la colaboración y la herencia de datos fueron tan importantes como el genio individual.',
+      },
+      {
+        icono: '📰',
+        texto: 'La Royal Society empezó a publicar las "Philosophical Transactions" en 1665, una de las primeras revistas científicas. La idea de comunicar los resultados por escrito para que otros los comprobaran es una de las herencias más duraderas de esta época.',
+      },
+      {
+        icono: '🍎',
+        texto: 'La anécdota de la manzana de Newton, difundida por él mismo en su vejez, ilustra una idea real: la misma fuerza que hace caer una manzana mantiene a la Luna en órbita. Esa unificación de lo terrestre y lo celeste fue su gran aportación.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Creer que la ciencia moderna surgió de golpe',
+        cuerpo: 'La Revolución Científica fue un proceso de siglo y medio, no un acontecimiento súbito. Convivió durante décadas con ideas antiguas: el propio Copérnico mantuvo las órbitas circulares y muchos autores combinaron elementos nuevos y tradicionales. El cambio fue gradual y desigual según el país y la disciplina.',
+      },
+      {
+        titulo: 'Reducir el periodo al enfrentamiento entre ciencia y religión',
+        cuerpo: 'El proceso a Galileo es real e importante, pero no resume toda la época. Muchos científicos eran creyentes y varios eran clérigos (Copérnico era canónigo). Presentar el periodo solo como un duelo entre razón y fe simplifica en exceso una relación mucho más matizada.',
+      },
+      {
+        titulo: 'Atribuir cada avance a un único genio aislado',
+        cuerpo: 'Kepler trabajó sobre los datos de Tycho; Newton reconoció apoyarse en Copérnico, Kepler y Galileo. Las sociedades científicas institucionalizaron el trabajo colectivo. Contar la historia solo como una sucesión de genios solitarios oculta el carácter acumulativo y comunitario de la ciencia.',
+      },
+      {
+        titulo: 'Confundir Renacimiento, Revolución Científica e Ilustración',
+        cuerpo: 'Son fases distintas y encadenadas de la Modernidad temprana. El Renacimiento (siglos XV-XVI) recuperó la Antigüedad y las artes; la Revolución Científica (1543-1687) creó la ciencia moderna; la Ilustración (siglo XVIII) extendió la razón a la sociedad y la política. Se solapan e influyen entre sí, pero no son lo mismo.',
+      },
+    ],
+  },
+};

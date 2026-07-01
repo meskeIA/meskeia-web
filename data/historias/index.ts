@@ -152,6 +152,16 @@ import { paraguay } from './paraguay';
 import { reinoKongo } from './reino-kongo';
 import { reinoBenin } from './reino-benin';
 import { imperioOyo } from './imperio-oyo';
+import { revolucionIndustrial } from './revolucion-industrial';
+import { revolucionCientifica } from './revolucion-cientifica';
+import { descolonizacion } from './descolonizacion';
+import { revolucionRusa } from './revolucion-rusa';
+import { granDepresion } from './gran-depresion';
+import { independenciasHispanoamericanas } from './independencias-hispanoamericanas';
+import { pesteNegra } from './peste-negra';
+import { caidaImperioRomano } from './caida-imperio-romano';
+import { caidaConstantinopla } from './caida-constantinopla';
+import { revoluciones1848 } from './revoluciones-1848';
 
 const registry: Record<string, HistoriaData> = {
   grecia,
@@ -277,6 +287,16 @@ const registry: Record<string, HistoriaData> = {
   'reino-kongo': reinoKongo,
   'reino-benin': reinoBenin,
   'imperio-oyo': imperioOyo,
+  'revolucion-industrial': revolucionIndustrial,
+  'revolucion-cientifica': revolucionCientifica,
+  'descolonizacion': descolonizacion,
+  'revolucion-rusa': revolucionRusa,
+  'gran-depresion': granDepresion,
+  'independencias-hispanoamericanas': independenciasHispanoamericanas,
+  'peste-negra': pesteNegra,
+  'caida-imperio-romano': caidaImperioRomano,
+  'caida-constantinopla': caidaConstantinopla,
+  'revoluciones-1848': revoluciones1848,
   'sudeste-asiatico': sudeste_asiatico,
   'brasil-moderno': brasilModerno,
   'mexico-moderno': mexicoModerno,

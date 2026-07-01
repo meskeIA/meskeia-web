@@ -1,0 +1,365 @@
+import type { HistoriaData } from './types';
+
+export const independenciasHispanoamericanas: HistoriaData = {
+  slug: 'independencias-hispanoamericanas',
+  titulo: 'Las Independencias Hispanoamericanas: El Nacimiento de las Repúblicas',
+  subtitulo: 'De la crisis de la monarquía española (1808) a la batalla de Ayacucho (1824): dos décadas que dieron origen a cerca de dieciocho naciones hispanohablantes',
+  descripcionSEO: 'Cronología interactiva de las independencias hispanoamericanas: de los antecedentes (reformas borbónicas, Ilustración, Túpac Amaru II, Miranda) y la crisis de 1808 a las campañas de Bolívar en el norte y San Martín en el sur, la independencia de México y Centroamérica, la entrevista de Guayaquil, la batalla de Ayacucho (1824) y la fragmentación posterior de la Gran Colombia. Diez hitos y seis eras.',
+  keywords: [
+    'independencias hispanoamericanas cronología historia',
+    'simón bolívar josé de san martín libertadores américa',
+    'juntas de gobierno 1808 crisis monarquía española',
+    'boyacá carabobo chacabuco maipú ayacucho batallas',
+    'grito de dolores hidalgo méxico iturbide centroamérica',
+    'gran colombia fragmentación repúblicas hispanoamérica',
+  ],
+  anioInicio: 1765,
+  anioFin: 1839,
+
+  hitos: [
+    {
+      id: 'antecedentes-reformas',
+      nombre: 'Reformas borbónicas y precursores',
+      anioInicio: 1765,
+      anioFin: 1808,
+      color: '#795548',
+      categoria: 'antecedentes',
+      descripcion: 'Durante el siglo XVIII, las reformas borbónicas reorganizaron la administración colonial, aumentaron la presión fiscal y desplazaron a los criollos de los cargos de gobierno en favor de peninsulares, generando malestar. La difusión de las ideas de la Ilustración y el eco de la independencia de las Trece Colonias (1776) y de la Revolución francesa (1789) aportaron un lenguaje político nuevo. Las tensiones estallaron en revueltas como la gran rebelión andina de Túpac Amaru II (1780-1783) y la de los comuneros de Nueva Granada (1781). El caraqueño Francisco de Miranda, veterano de tres continentes, promovió sin éxito expediciones emancipadoras (1806) y proyectó una Hispanoamérica unida.',
+      obraIconica: 'La rebelión de Túpac Amaru II en el Perú (1780) y los proyectos de Francisco de Miranda',
+      paises: ['Virreinato del Perú', 'Nueva Granada', 'Venezuela', 'Nueva España'],
+    },
+    {
+      id: 'crisis-1808-juntas',
+      nombre: 'Crisis de 1808 y primeras juntas',
+      anioInicio: 1808,
+      anioFin: 1810,
+      color: '#607D8B',
+      categoria: 'juntas',
+      descripcion: 'La invasión napoleónica de la península en 1808, las abdicaciones de Bayona y la imposición de José Bonaparte dejaron un vacío de soberanía. En América, siguiendo el ejemplo de las juntas peninsulares, se formaron juntas de gobierno que en un primer momento decían gobernar "en nombre de Fernando VII" (la llamada máscara de Fernando). En 1810 surgieron juntas en Caracas, Buenos Aires, Bogotá, Santiago y otras ciudades. El debate enfrentó a quienes defendían la autonomía dentro de la monarquía y a quienes empezaban a plantear la independencia plena; la fractura entre criollos y peninsulares se hizo cada vez más profunda.',
+      obraIconica: 'La Junta Suprema de Caracas y la Primera Junta de Buenos Aires (1810)',
+      paises: ['Venezuela', 'Río de la Plata', 'Nueva Granada', 'Chile'],
+    },
+    {
+      id: 'grito-dolores-mexico',
+      nombre: 'El Grito de Dolores y la insurgencia mexicana',
+      anioInicio: 1810,
+      anioFin: 1815,
+      color: '#43A047',
+      categoria: 'mexico-centroamerica',
+      descripcion: 'En Nueva España, el proceso adquirió un fuerte componente social y popular. El cura Miguel Hidalgo proclamó en septiembre de 1810 el llamado Grito de Dolores, movilizando a miles de indígenas y campesinos; tras su captura y ejecución (1811), el también sacerdote José María Morelos dirigió una segunda fase más organizada y convocó el Congreso de Chilpancingo (1813), que redactó los "Sentimientos de la Nación" y una primera constitución (Apatzingán, 1814). La ejecución de Morelos en 1815 debilitó la insurgencia, que quedó reducida a la resistencia guerrillera de líderes como Vicente Guerrero.',
+      obraIconica: 'El Grito de Dolores de Miguel Hidalgo (1810) y el Congreso de Chilpancingo de Morelos (1813)',
+      paises: ['Nueva España', 'México'],
+    },
+    {
+      id: 'campana-norte-bolivar',
+      nombre: 'La campaña del norte de Bolívar',
+      anioInicio: 1813,
+      anioFin: 1819,
+      color: '#E53935',
+      categoria: 'campana-norte',
+      descripcion: 'En el norte del continente, tras el fracaso de la Primera República de Venezuela y la reconquista española encabezada por Pablo Morillo (1815-1816), Simón Bolívar reorganizó la lucha desde los Llanos, apoyado en jefes como José Antonio Páez y en la caballería llanera. La cruenta guerra incluyó episodios como el decreto de "guerra a muerte" (1813), que endureció el conflicto. En 1819 Bolívar cruzó los Andes con su ejército y venció en la batalla de Boyacá, que aseguró la liberación de la Nueva Granada y sentó las bases para la creación de la Gran Colombia.',
+      obraIconica: 'La batalla de Boyacá (7 de agosto de 1819) y la liberación de la Nueva Granada',
+      paises: ['Venezuela', 'Nueva Granada', 'Colombia'],
+    },
+    {
+      id: 'campana-sur-san-martin',
+      nombre: 'La campaña del sur de San Martín',
+      anioInicio: 1816,
+      anioFin: 1821,
+      color: '#1E88E5',
+      categoria: 'campana-sur',
+      descripcion: 'En el sur, el Congreso de Tucumán declaró la independencia de las Provincias Unidas del Río de la Plata en 1816. José de San Martín concibió una estrategia continental: en lugar de avanzar por el Alto Perú, organizó en Mendoza el Ejército de los Andes y realizó un difícil cruce de la cordillera (1817). Con el apoyo de patriotas chilenos como Bernardo O\'Higgins, venció en Chacabuco (1817) y, tras un revés, selló la independencia de Chile en la batalla de Maipú (1818). Desde allí embarcó una expedición naval que desembarcó en el Perú y proclamó su independencia en Lima en 1821.',
+      obraIconica: 'El cruce de los Andes (1817) y la batalla de Maipú (1818)',
+      paises: ['Provincias Unidas del Río de la Plata', 'Argentina', 'Chile', 'Perú'],
+    },
+    {
+      id: 'gran-colombia-carabobo',
+      nombre: 'La Gran Colombia y Carabobo',
+      anioInicio: 1819,
+      anioFin: 1822,
+      color: '#D81B60',
+      categoria: 'consolidacion',
+      descripcion: 'El Congreso de Angostura (1819) proclamó la unión de Venezuela y la Nueva Granada en la República de Colombia, conocida más tarde como Gran Colombia, a la que se sumaría después Quito. La independencia de Venezuela quedó asegurada en la batalla de Carabobo (1821), donde fue decisiva la actuación de la caballería llanera y de la Legión Británica de voluntarios extranjeros. El proyecto de Bolívar aspiraba a una gran federación de repúblicas hispanoamericanas, idea que quedaría plasmada más tarde en la convocatoria del Congreso Anfictiónico de Panamá (1826).',
+      obraIconica: 'La batalla de Carabobo (24 de junio de 1821) y la fundación de la Gran Colombia',
+      paises: ['Gran Colombia', 'Venezuela', 'Nueva Granada', 'Ecuador'],
+    },
+    {
+      id: 'mexico-iturbide-centroamerica',
+      nombre: 'Consumación en México y Centroamérica',
+      anioInicio: 1820,
+      anioFin: 1823,
+      color: '#66BB6A',
+      categoria: 'mexico-centroamerica',
+      descripcion: 'El restablecimiento de la Constitución liberal española de 1812, tras el pronunciamiento de Riego (1820), llevó a sectores conservadores novohispanos a apoyar la separación de la metrópoli. El militar Agustín de Iturbide y el insurgente Vicente Guerrero pactaron el Plan de Iguala (1821), que unía a antiguos rivales bajo la idea de una nación independiente, y la independencia se consumó ese mismo año. Iturbide se coronó brevemente emperador (1822-1823). La Capitanía General de Guatemala proclamó su independencia en 1821 y, tras una fugaz anexión a México, se constituyó como las Provincias Unidas del Centro de América (1823).',
+      obraIconica: 'El Plan de Iguala (1821) y la independencia de Centroamérica (1821-1823)',
+      paises: ['México', 'Guatemala', 'Provincias Unidas del Centro de América'],
+    },
+    {
+      id: 'guayaquil-encuentro',
+      nombre: 'La entrevista de Guayaquil',
+      anioInicio: 1822,
+      anioFin: 1822,
+      color: '#8E24AA',
+      categoria: 'consolidacion',
+      descripcion: 'La batalla de Pichincha (mayo de 1822), ganada por Antonio José de Sucre, aseguró la independencia de Quito. En julio de ese año, Bolívar y San Martín se reunieron en Guayaquil en una entrevista privada cuyo contenido exacto sigue siendo objeto de debate historiográfico. Poco después, San Martín renunció al mando y se retiró de la vida pública, dejando en manos de Bolívar y sus lugartenientes la campaña final por la liberación del Perú, el último gran bastión del poder realista en el continente. El encuentro simboliza el paso del relevo entre las dos grandes corrientes emancipadoras.',
+      obraIconica: 'La entrevista de Guayaquil entre Bolívar y San Martín (26-27 de julio de 1822)',
+      paises: ['Ecuador', 'Perú'],
+    },
+    {
+      id: 'junin-ayacucho',
+      nombre: 'Junín y Ayacucho: el sello continental',
+      anioInicio: 1823,
+      anioFin: 1826,
+      color: '#F4511E',
+      categoria: 'consolidacion',
+      descripcion: 'La campaña final del Perú combinó fuerzas de todo el continente. Tras la victoria de Junín (agosto de 1824), el ejército al mando de Antonio José de Sucre derrotó al grueso del ejército realista en la batalla de Ayacucho (9 de diciembre de 1824), con la capitulación del virrey La Serna. Ayacucho suele considerarse el fin de la dominación española continental en la América hispana. Los últimos reductos realistas, como la fortaleza del Callao, resistieron hasta 1826. Del Alto Perú surgió una nueva república que adoptó el nombre de Bolivia (1825) en homenaje a Bolívar.',
+      obraIconica: 'La batalla de Ayacucho (9 de diciembre de 1824) dirigida por Sucre',
+      paises: ['Perú', 'Alto Perú', 'Bolivia'],
+    },
+    {
+      id: 'consolidacion-fragmentacion',
+      nombre: 'Consolidación y fragmentación',
+      anioInicio: 1826,
+      anioFin: 1839,
+      color: '#5E35B1',
+      categoria: 'consolidacion',
+      descripcion: 'Lograda la independencia, el proyecto de grandes uniones chocó con los intereses regionales, las distancias, las diferencias económicas y las rivalidades entre caudillos. El Congreso Anfictiónico de Panamá (1826), que buscaba una liga de repúblicas, tuvo escaso resultado práctico. La Gran Colombia se disolvió hacia 1830 en Venezuela, Nueva Granada y Ecuador; las Provincias Unidas del Centro de América se fragmentaron en cinco Estados hacia 1838-1839. El resultado fue un mosaico de repúblicas independientes, marcadas por guerras civiles y por el largo debate entre modelos centralistas y federalistas. Cuba y Puerto Rico permanecieron bajo soberanía española hasta 1898.',
+      obraIconica: 'La disolución de la Gran Colombia (1830) y de la Federación Centroamericana (1838-1839)',
+      paises: ['Venezuela', 'Nueva Granada', 'Ecuador', 'Centroamérica'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'Antecedentes y precursores',
+      desde: 1765,
+      hasta: 1808,
+      icono: '📜',
+      hitosDestacados: ['Reformas borbónicas y precursores'],
+      eventos: [
+        'Reformas borbónicas: más impuestos y desplazamiento de los criollos del gobierno',
+        'Difusión de la Ilustración y eco de las revoluciones de EE. UU. (1776) y Francia (1789)',
+        'Rebelión de Túpac Amaru II en el Perú (1780-1783)',
+        'Revuelta de los comuneros de Nueva Granada (1781)',
+        'Expediciones y proyecto continental de Francisco de Miranda (1806)',
+      ],
+    },
+    {
+      nombre: 'La crisis de 1808 y las juntas',
+      desde: 1808,
+      hasta: 1813,
+      icono: '⚖️',
+      hitosDestacados: ['Crisis de 1808 y primeras juntas', 'El Grito de Dolores y la insurgencia mexicana'],
+      eventos: [
+        'Invasión napoleónica de España y abdicaciones de Bayona (1808)',
+        'Formación de juntas de gobierno en Caracas, Buenos Aires, Bogotá y Santiago (1810)',
+        'El Grito de Dolores de Hidalgo inicia la insurgencia en Nueva España (1810)',
+        'Debate entre autonomía dentro de la monarquía e independencia plena',
+        'Morelos convoca el Congreso de Chilpancingo y los "Sentimientos de la Nación" (1813)',
+      ],
+    },
+    {
+      nombre: 'Guerra, reconquista y campañas',
+      desde: 1813,
+      hasta: 1819,
+      icono: '⚔️',
+      hitosDestacados: ['La campaña del norte de Bolívar', 'La campaña del sur de San Martín'],
+      eventos: [
+        'Reconquista española de Pablo Morillo en Nueva Granada y Venezuela (1815-1816)',
+        'El Congreso de Tucumán declara la independencia del Río de la Plata (1816)',
+        'San Martín cruza los Andes y vence en Chacabuco (1817)',
+        'Batalla de Maipú: se asegura la independencia de Chile (1818)',
+        'Bolívar cruza los Andes y triunfa en Boyacá (1819)',
+      ],
+    },
+    {
+      nombre: 'Las grandes victorias del norte y el sur',
+      desde: 1819,
+      hasta: 1822,
+      icono: '🏛️',
+      hitosDestacados: ['La Gran Colombia y Carabobo', 'Consumación en México y Centroamérica'],
+      eventos: [
+        'El Congreso de Angostura funda la República de Colombia (1819)',
+        'Batalla de Carabobo: independencia de Venezuela (1821)',
+        'San Martín proclama la independencia del Perú en Lima (1821)',
+        'Plan de Iguala: consumación de la independencia de México (1821)',
+        'Independencia de Centroamérica de la Capitanía de Guatemala (1821)',
+      ],
+    },
+    {
+      nombre: 'El relevo y el sello continental',
+      desde: 1822,
+      hasta: 1826,
+      icono: '🤝',
+      hitosDestacados: ['La entrevista de Guayaquil', 'Junín y Ayacucho: el sello continental'],
+      eventos: [
+        'Batalla de Pichincha: Sucre asegura la independencia de Quito (1822)',
+        'Entrevista de Guayaquil entre Bolívar y San Martín (1822)',
+        'Retiro de San Martín de la vida pública',
+        'Victoria de Junín y batalla decisiva de Ayacucho (1824)',
+        'Creación de la República de Bolivia a partir del Alto Perú (1825)',
+      ],
+    },
+    {
+      nombre: 'Consolidación y fragmentación',
+      desde: 1826,
+      hasta: 1839,
+      icono: '🗺️',
+      hitosDestacados: ['Consolidación y fragmentación'],
+      eventos: [
+        'Congreso Anfictiónico de Panamá: proyecto de liga de repúblicas (1826)',
+        'Capitulación de los últimos reductos realistas, como el Callao (1826)',
+        'Disolución de la Gran Colombia en tres repúblicas (hacia 1830)',
+        'Fragmentación de la Federación Centroamericana en cinco Estados (1838-1839)',
+        'Cuba y Puerto Rico permanecen bajo soberanía española hasta 1898',
+      ],
+    },
+  ],
+
+  categorias: {
+    antecedentes: 'Antecedentes',
+    juntas: 'Crisis y juntas',
+    'campana-norte': 'Campaña del norte',
+    'campana-sur': 'Campaña del sur',
+    'mexico-centroamerica': 'México y Centroamérica',
+    consolidacion: 'Consolidación y fragmentación',
+  },
+
+  colores: {
+    antecedentes: '#795548',
+    juntas: '#607D8B',
+    'campana-norte': '#E53935',
+    'campana-sur': '#1E88E5',
+    'mexico-centroamerica': '#43A047',
+    consolidacion: '#8E24AA',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'Entre 1808 y 1826, la mayor parte de la América hispana dejó de formar parte de la monarquía española y dio origen a cerca de dieciocho repúblicas independientes. No fue un proceso único ni homogéneo, sino un conjunto de procesos regionales con ritmos, protagonistas y motivaciones distintos, encadenados por un mismo detonante: la crisis de la monarquía española tras la invasión napoleónica de 1808. En el norte del continente destacó la campaña asociada a Simón Bolívar; en el sur, la de José de San Martín; en Nueva España, un proceso con fuerte componente social iniciado por Miguel Hidalgo y consumado años después por Agustín de Iturbide. Esta cronología recorre esas dos décadas evitando tanto la mitificación de los libertadores como la simplificación del conflicto: hubo criollos y peninsulares, indígenas, mestizos y esclavos, autonomistas e independentistas, y guerras civiles que se prolongaron mucho después de la última batalla contra el ejército realista.',
+
+    tablaComparativa: [
+      { hito: 'Reformas borbónicas y precursores', periodo: 'c. 1765-1808', categoria: 'Antecedentes', personaje: 'Túpac Amaru II / Francisco de Miranda', aportacion: 'Malestar fiscal criollo, ideas ilustradas y primeros proyectos emancipadores' },
+      { hito: 'Crisis de 1808 y primeras juntas', periodo: '1808-1810', categoria: 'Crisis y juntas', personaje: 'Cabildos y juntas americanas', aportacion: 'Vacío de soberanía y formación de juntas de gobierno autónomas' },
+      { hito: 'El Grito de Dolores y la insurgencia mexicana', periodo: '1810-1815', categoria: 'México y Centroamérica', personaje: 'Miguel Hidalgo / José María Morelos', aportacion: 'Insurgencia popular y primeros textos constitucionales en Nueva España' },
+      { hito: 'La campaña del norte de Bolívar', periodo: '1813-1819', categoria: 'Campaña del norte', personaje: 'Simón Bolívar / José Antonio Páez', aportacion: 'Cruce de los Andes y victoria de Boyacá; liberación de Nueva Granada' },
+      { hito: 'La campaña del sur de San Martín', periodo: '1816-1821', categoria: 'Campaña del sur', personaje: 'José de San Martín / Bernardo O\'Higgins', aportacion: 'Cruce de los Andes, independencia de Chile y expedición al Perú' },
+      { hito: 'Junín y Ayacucho: el sello continental', periodo: '1823-1826', categoria: 'Consolidación y fragmentación', personaje: 'Antonio José de Sucre', aportacion: 'Ayacucho (1824) pone fin a la dominación española continental' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiantes de Historia',
+        perfil: 'Secundaria, preparatoria y universidad',
+        texto: 'Visión ordenada de un proceso que suele estudiarse de forma fragmentada por países. Permite ver a la vez las campañas del norte, del sur y de México, sus conexiones y sus diferencias, y entender por qué de un mismo imperio surgieron tantas repúblicas distintas.',
+      },
+      {
+        icono: '🌎',
+        titulo: 'Público hispanoamericano',
+        perfil: 'Interesados en la historia común de la región',
+        texto: 'Cada país conmemora su propia independencia, pero el proceso fue continental e interconectado. Esta cronología ayuda a situar la historia nacional dentro del conjunto hispanoamericano y a comprender los orígenes compartidos de las repúblicas actuales.',
+      },
+      {
+        icono: '🏛️',
+        titulo: 'Ciencias políticas',
+        perfil: 'Origen de los Estados hispanoamericanos',
+        texto: 'De la independencia surgieron los debates que marcarían el siglo XIX: centralismo frente a federalismo, república frente a monarquía, unión frente a fragmentación. Entender ese punto de partida ayuda a comprender la formación de los Estados y sus tensiones posteriores.',
+      },
+      {
+        icono: '⚖️',
+        titulo: 'Interesados en historia social',
+        perfil: 'Papel de indígenas, mestizos y esclavos',
+        texto: 'La independencia no afectó por igual a todos los grupos sociales. Esta cronología permite observar la participación de indígenas, mestizos, libertos y esclavos, así como el hecho de que la abolición de la esclavitud y la igualdad legal fueron procesos posteriores y desiguales.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Por qué se independizó Hispanoamérica entre 1808 y 1826?',
+        respuesta: 'El detonante fue la crisis de la monarquía española de 1808: la invasión napoleónica y las abdicaciones de Bayona dejaron un vacío de soberanía que llevó a formar juntas de gobierno en América. A ese detonante se sumaron causas de fondo previas: el malestar de los criollos por las reformas borbónicas, la difusión de las ideas ilustradas y el ejemplo de las independencias de Estados Unidos y de la Revolución francesa. No hubo una única causa, sino la coincidencia de una crisis coyuntural con tensiones acumuladas.',
+        tip: 'Muchas juntas se formaron al principio diciendo gobernar "en nombre de Fernando VII": la ruptura con la monarquía fue gradual, no inmediata.',
+      },
+      {
+        pregunta: '¿Quiénes fueron los principales protagonistas de las campañas militares?',
+        respuesta: 'En el norte del continente destacó la campaña asociada a Simón Bolívar, apoyado por jefes como José Antonio Páez y por Antonio José de Sucre. En el sur, José de San Martín organizó el Ejército de los Andes con el apoyo de patriotas como Bernardo O\'Higgins. En Nueva España el proceso lo iniciaron los sacerdotes Miguel Hidalgo y José María Morelos y lo consumó Agustín de Iturbide. Fueron figuras con funciones históricas concretas, no héroes ni villanos absolutos: sus decisiones han sido objeto de análisis y debate.',
+        tip: 'La entrevista de Guayaquil (1822) entre Bolívar y San Martín marcó el relevo entre las dos grandes corrientes emancipadoras.',
+      },
+      {
+        pregunta: '¿Qué papel tuvieron los indígenas, mestizos y esclavos?',
+        respuesta: 'Su participación fue amplia pero desigual según la región. En Nueva España la insurgencia inicial tuvo un fuerte componente indígena y campesino. En el norte del continente, la caballería llanera fue decisiva, y algunos líderes ofrecieron la libertad a esclavos que se unieran a las filas patriotas. Sin embargo, la independencia no supuso de inmediato la igualdad legal ni el fin de la esclavitud: la abolición fue un proceso posterior y gradual, que en varios países no culminó hasta décadas después.',
+      },
+      {
+        pregunta: '¿Cuándo terminó realmente la dominación española en América?',
+        respuesta: 'La batalla de Ayacucho (9 de diciembre de 1824), dirigida por Sucre, suele considerarse el fin de la dominación española continental, con la capitulación del virrey del Perú. Aun así, algunos reductos realistas resistieron hasta 1826, como la fortaleza del Callao. En el Caribe, Cuba y Puerto Rico permanecieron bajo soberanía española hasta 1898. Por tanto, no hubo una fecha única de fin: dependió del territorio.',
+        tip: 'La campaña final del Perú combinó tropas y recursos de varias regiones del continente, no de un solo país.',
+      },
+      {
+        pregunta: '¿Por qué no surgió una única gran nación hispanoamericana?',
+        respuesta: 'Algunos proyectos, como la Gran Colombia de Bolívar o el Congreso Anfictiónico de Panamá (1826), buscaron unir a las nuevas repúblicas. Fracasaron por las enormes distancias, las diferencias económicas y de intereses regionales, las rivalidades entre caudillos y el debate entre modelos centralistas y federalistas. La Gran Colombia se disolvió hacia 1830 y la Federación Centroamericana hacia 1838-1839. El resultado fue el mosaico de repúblicas independientes que existe hoy.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Observa los bloques de color en la Línea del Tiempo',
+        cuerpo: 'El marrón son los antecedentes, el gris azulado la crisis y las juntas, el rojo la campaña del norte, el azul la del sur, el verde México y Centroamérica y el morado la consolidación. Antes de leer, fíjate en cómo casi todo el proceso se concentra en apenas dos décadas.',
+      },
+      {
+        titulo: 'Compara la campaña del norte con la del sur',
+        cuerpo: 'Haz clic en "La campaña del norte de Bolívar" y luego en "La campaña del sur de San Martín". Observa que ambas incluyeron un cruce de los Andes y una convergencia final en el Perú, pero partieron de extremos opuestos del continente.',
+      },
+      {
+        titulo: 'Sigue el caso de México por separado',
+        cuerpo: 'La categoría "México y Centroamérica" muestra un proceso distinto: empezó como insurgencia popular con Hidalgo y Morelos y se consumó años después, en 1821, con un pacto entre antiguos rivales. No siguió el mismo patrón que las campañas de Bolívar y San Martín.',
+      },
+      {
+        titulo: 'Usa la Comparativa para ver los protagonistas',
+        cuerpo: 'En la tabla Comparativa puedes contrastar los períodos, categorías y figuras de cada fase. Filtra por categoría para agrupar los hitos del norte, del sur o de México y ver cómo encajan en la cronología general.',
+      },
+      {
+        titulo: 'Termina con el Contexto Histórico',
+        cuerpo: 'Las 6 eras ordenan el proceso: de los antecedentes a la crisis de 1808, de la guerra a las grandes victorias, del relevo en Guayaquil a la fragmentación posterior. La última era muestra que la independencia no trajo estabilidad inmediata, sino nuevas tensiones.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '📅',
+        texto: 'Casi todo el proceso ocurrió en apenas dos décadas (1808-1826), pero sus raíces son más antiguas y sus consecuencias se prolongaron durante todo el siglo XIX. La independencia fue el comienzo de un largo periodo de construcción —y disputa— de los nuevos Estados.',
+      },
+      {
+        icono: '🗺️',
+        texto: 'La actual división de Hispanoamérica en repúblicas no fue el objetivo inicial de todos los líderes. Proyectos como la Gran Colombia o la Federación Centroamericana intentaron mantener unidades mayores, y su fragmentación fue tan importante para el mapa actual como la propia independencia.',
+      },
+      {
+        icono: '🤝',
+        texto: 'El proceso fue continental e interconectado: recursos, tropas y voluntarios —incluidos extranjeros, como la Legión Británica en Carabobo— circularon entre regiones. Estudiar cada independencia nacional por separado da una imagen incompleta de un fenómeno compartido.',
+      },
+      {
+        icono: '⚖️',
+        texto: 'Independencia no fue sinónimo inmediato de igualdad. La abolición de la esclavitud, el reconocimiento de derechos a indígenas y mestizos y la ampliación de la ciudadanía fueron procesos posteriores, graduales y desiguales según cada país.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Ver la independencia como obra de unos pocos héroes',
+        cuerpo: 'Bolívar, San Martín, Hidalgo o Sucre fueron figuras clave, pero la independencia fue un proceso colectivo en el que participaron cabildos, ejércitos con miles de soldados de distintos orígenes, milicias populares, jefes regionales y sectores muy diversos. Reducirla a la biografía de unos "libertadores" simplifica una realidad mucho más compleja y colectiva.',
+      },
+      {
+        titulo: 'Pensar que fue un proceso único y homogéneo',
+        cuerpo: 'No hubo una sola independencia, sino varios procesos regionales con ritmos y motivaciones distintos: la insurgencia social de México, las campañas militares del norte y del sur, la separación relativamente tardía y conservadora de 1821 en Nueva España. Tratarlos como un bloque uniforme borra diferencias esenciales.',
+      },
+      {
+        titulo: 'Confundir independencia con estabilidad o unidad',
+        cuerpo: 'Tras la victoria militar llegaron guerras civiles, disputas entre centralistas y federalistas y la disolución de grandes proyectos como la Gran Colombia. La independencia abrió una etapa de conflictos internos, no una paz automática. Muchas fronteras y sistemas políticos actuales se definieron en esas décadas posteriores.',
+      },
+      {
+        titulo: 'Creer que toda la América hispana se independizó a la vez',
+        cuerpo: 'El proceso continental culminó en gran medida hacia 1824-1826, pero Cuba y Puerto Rico permanecieron bajo soberanía española hasta 1898. Suponer que en 1826 no quedaban territorios hispanos en América ignora casi tres cuartos de siglo de historia colonial en el Caribe.',
+      },
+    ],
+  },
+};

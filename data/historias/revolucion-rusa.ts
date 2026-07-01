@@ -1,0 +1,367 @@
+import type { HistoriaData } from './types';
+
+export const revolucionRusa: HistoriaData = {
+  slug: 'revolucion-rusa',
+  titulo: 'La Revolución Rusa: Del Zar a la URSS (1905-1924)',
+  subtitulo: 'Dos décadas que derribaron una dinastía de tres siglos y alumbraron el primer Estado socialista del mundo, entre esperanzas de emancipación y un altísimo coste humano',
+  descripcionSEO: 'Cronología interactiva de la Revolución Rusa: de la Revolución de 1905 y el Domingo Sangriento al impacto de la Primera Guerra Mundial, la Revolución de Febrero de 1917 (caída de los Romanov), el doble poder, las Tesis de Abril de Lenin, la Revolución de Octubre, la paz de Brest-Litovsk, la Guerra Civil (Rojos contra Blancos), el Terror Rojo y Blanco, el Comunismo de Guerra, la NEP, la creación de la URSS (1922) y la muerte de Lenin (1924) en 10 hitos y 6 eras.',
+  keywords: [
+    'revolución rusa cronología historia 1917',
+    'domingo sangriento revolución 1905 duma nicolás ii',
+    'revolución de febrero abdicación romanov gobierno provisional',
+    'lenin tesis de abril revolución de octubre bolcheviques sóviets',
+    'guerra civil rusa ejército rojo blancos terror rojo terror blanco',
+    'comunismo de guerra nep creación urss muerte de lenin 1924',
+  ],
+  anioInicio: 1905,
+  anioFin: 1924,
+
+  hitos: [
+    {
+      id: 'revolucion-1905',
+      nombre: 'La Revolución de 1905',
+      anioInicio: 1905,
+      anioFin: 1907,
+      color: '#7D6608',
+      categoria: 'antecedentes',
+      descripcion: 'El 9 de enero de 1905 (calendario juliano), una manifestación pacífica encabezada por el pope Gapón que acudía al Palacio de Invierno a entregar una petición al zar fue disparada por las tropas: el "Domingo Sangriento". El suceso, unido a la humillante derrota en la guerra ruso-japonesa (1904-1905), desató huelgas, motines campesinos y el amotinamiento del acorazado Potemkin. Bajo presión, Nicolás II promulgó el Manifiesto de Octubre, que reconocía libertades civiles y creaba una asamblea legislativa electa, la Duma. La revolución no derribó el régimen —Lenin la llamaría más tarde "el ensayo general" de 1917— pero sí mostró la fragilidad de la autocracia y dejó una experiencia organizativa: los sóviets (consejos) de obreros.',
+      obraIconica: 'El Domingo Sangriento ante el Palacio de Invierno (9 de enero de 1905)',
+      paises: ['Imperio ruso', 'San Petersburgo', 'Moscú'],
+    },
+    {
+      id: 'crisis-guerra-mundial',
+      nombre: 'Tensiones sociales y Gran Guerra',
+      anioInicio: 1907,
+      anioFin: 1917,
+      color: '#935116',
+      categoria: 'antecedentes',
+      descripcion: 'Tras 1905, el ministro Piotr Stolypin combinó represión y reformas agrarias que buscaban crear un campesinado propietario, con resultados parciales antes de su asesinato en 1911. La sociedad rusa seguía marcada por la desigualdad extrema entre una minoría terrateniente y una vasta población campesina y obrera. La entrada en la Primera Guerra Mundial en 1914 agravó la crisis: millones de bajas, derrotas militares, colapso del transporte, inflación y escasez de pan. La marcha de Nicolás II al frente en 1915 dejó el gobierno en manos de la zarina Alejandra, cuya cercanía al enigmático Rasputín erosionó aún más el prestigio de la corona.',
+      obraIconica: 'Colas del pan y desabastecimiento en las ciudades durante la guerra (1915-1917)',
+      paises: ['Imperio ruso', 'Frente oriental', 'Petrogrado'],
+    },
+    {
+      id: 'revolucion-febrero',
+      nombre: 'La Revolución de Febrero',
+      anioInicio: 1917,
+      anioFin: 1917,
+      color: '#1F618D',
+      categoria: 'febrero',
+      descripcion: 'En febrero de 1917 (marzo en el calendario gregoriano), las protestas por el pan y las huelgas en Petrogrado confluyeron con manifestaciones del Día Internacional de la Mujer. Cuando la guarnición de la capital se negó a disparar y se unió a los manifestantes, el régimen quedó sin apoyo. El 2 de marzo (juliano), Nicolás II abdicó; su hermano Miguel declinó el trono, poniendo fin a más de tres siglos de dinastía Romanov y a la monarquía rusa. Fue una revolución en buena medida espontánea, sin un partido que la dirigiera. Los historiadores subrayan que la autocracia se derrumbó por su propia deslegitimación antes que por la acción de los revolucionarios profesionales, muchos de ellos en el exilio o la cárcel.',
+      obraIconica: 'La abdicación de Nicolás II y el fin de la dinastía Romanov (marzo de 1917)',
+      paises: ['Imperio ruso', 'Petrogrado'],
+    },
+    {
+      id: 'doble-poder',
+      nombre: 'Gobierno Provisional y doble poder',
+      anioInicio: 1917,
+      anioFin: 1917,
+      color: '#2874A6',
+      categoria: 'febrero',
+      descripcion: 'Del vacío de poder surgieron dos autoridades paralelas: el Gobierno Provisional, formado por diputados liberales de la Duma, y el Sóviet de Petrogrado de diputados obreros y soldados. El Gobierno controlaba la administración; el Sóviet, la lealtad efectiva de tropas y trabajadores (su Orden nº 1 subordinaba las órdenes militares al Sóviet). Esta situación, que León Trotski describió como "doble poder", generó parálisis. La decisión del Gobierno de continuar la guerra —bajo la creciente influencia de Aleksandr Kérenski— chocó con el cansancio popular y minó su autoridad, sobre todo tras el fracaso de la ofensiva de junio y la crisis de las "Jornadas de Julio".',
+      obraIconica: 'El Sóviet de Petrogrado y su Orden nº 1 frente al Gobierno Provisional (1917)',
+      paises: ['Rusia', 'Petrogrado'],
+    },
+    {
+      id: 'lenin-tesis-abril',
+      nombre: 'Regreso de Lenin y Tesis de Abril',
+      anioInicio: 1917,
+      anioFin: 1917,
+      color: '#922B21',
+      categoria: 'octubre',
+      descripcion: 'En abril de 1917, Lenin regresó del exilio suizo cruzando Alemania en un tren sellado, un tránsito facilitado por el alto mando alemán con la esperanza de debilitar a Rusia. A su llegada proclamó las Tesis de Abril: fin del apoyo al Gobierno Provisional, "todo el poder a los sóviets", paz inmediata, tierra para los campesinos y control obrero. El programa, resumido en la consigna "Paz, Pan y Tierra", conectaba con las demandas más urgentes de la población y radicalizó al Partido Bolchevique. A lo largo del verano y el otoño, y pese a la persecución tras las Jornadas de Julio, los bolcheviques ganaron mayoría en los sóviets de Petrogrado y Moscú.',
+      obraIconica: 'Las Tesis de Abril y la consigna "Paz, Pan y Tierra" (abril de 1917)',
+      paises: ['Rusia', 'Petrogrado', 'Suiza', 'Alemania'],
+    },
+    {
+      id: 'revolucion-octubre',
+      nombre: 'La Revolución de Octubre',
+      anioInicio: 1917,
+      anioFin: 1917,
+      color: '#B03A2E',
+      categoria: 'octubre',
+      descripcion: 'En la noche del 25 al 26 de octubre de 1917 (7-8 de noviembre gregoriano), las fuerzas del Comité Militar Revolucionario del Sóviet de Petrogrado, dirigido por Trotski, tomaron los puntos clave de la capital y el Palacio de Invierno, deteniendo al Gobierno Provisional. El II Congreso de los Sóviets aprobó los primeros decretos: el Decreto sobre la Paz y el Decreto sobre la Tierra. Persiste un debate historiográfico central: interpretaciones como la de Richard Pipes la describen como un golpe de Estado minoritario y bien planificado, mientras que otras, en la línea de Sheila Fitzpatrick, la sitúan dentro de un proceso revolucionario más amplio con genuino apoyo popular urbano. Ambas lecturas coinciden en que la toma del poder fue relativamente incruenta comparada con lo que vendría después.',
+      obraIconica: 'La toma del Palacio de Invierno por el Comité Militar Revolucionario (octubre de 1917)',
+      paises: ['Rusia', 'Petrogrado', 'Moscú'],
+    },
+    {
+      id: 'brest-litovsk',
+      nombre: 'Consolidación bolchevique y Brest-Litovsk',
+      anioInicio: 1917,
+      anioFin: 1918,
+      color: '#6C3483',
+      categoria: 'consolidacion',
+      descripcion: 'El nuevo gobierno (Consejo de Comisarios del Pueblo) tomó medidas rápidas: nacionalización de la banca, control obrero de la industria y creación de la policía política, la Checa (diciembre de 1917). La Asamblea Constituyente, elegida por sufragio y con mayoría de socialistas revolucionarios, se reunió en enero de 1918 y fue disuelta por la fuerza al día siguiente, marcando el rumbo hacia el partido único. En marzo de 1918, el Tratado de Brest-Litovsk selló la paz con las Potencias Centrales a un precio altísimo: Rusia cedió Polonia, los países bálticos, Ucrania y Finlandia, perdiendo territorios con gran parte de su población, industria y grano. La firma dividió a los propios bolcheviques, pero permitió al régimen concentrarse en su supervivencia interna.',
+      obraIconica: 'El Tratado de Brest-Litovsk y la disolución de la Asamblea Constituyente (1918)',
+      paises: ['Rusia soviética', 'Ucrania', 'Bálticos', 'Alemania'],
+    },
+    {
+      id: 'guerra-civil',
+      nombre: 'La Guerra Civil Rusa',
+      anioInicio: 1918,
+      anioFin: 1922,
+      color: '#7B241C',
+      categoria: 'guerra-civil',
+      descripcion: 'Entre 1918 y 1922, el Ejército Rojo organizado por Trotski combatió a los Ejércitos Blancos (una coalición heterogénea de monárquicos, liberales y militares como Kolchak, Denikin y Wrangel), a nacionalismos periféricos y a fuerzas de intervención extranjera. El conflicto fue extraordinariamente violento por ambos bandos: el Terror Rojo, decretado por la Checa en 1918 tras el atentado contra Lenin, y el Terror Blanco incluyeron ejecuciones sumarias, rehenes y represalias masivas; las guerras también trajeron pogromos, sobre todo en Ucrania, con centenares de miles de víctimas judías. La familia imperial fue ejecutada en Ekaterimburgo en julio de 1918. Historiadores como Orlando Figes cifran las muertes totales del periodo, sumando combates, terror, hambruna y epidemias, en varios millones de personas.',
+      obraIconica: 'Ejército Rojo contra Ejércitos Blancos y la intervención extranjera (1918-1922)',
+      paises: ['Rusia soviética', 'Siberia', 'Ucrania', 'Cáucaso', 'Crimea'],
+    },
+    {
+      id: 'comunismo-guerra-nep',
+      nombre: 'Comunismo de Guerra y NEP',
+      anioInicio: 1918,
+      anioFin: 1922,
+      color: '#B9770E',
+      categoria: 'consolidacion',
+      descripcion: 'Para sostener el esfuerzo bélico, el gobierno impuso el "Comunismo de Guerra": requisa forzosa de grano a los campesinos, nacionalización total de la industria, trabajo obligatorio y supresión del comercio privado. El sistema aseguró el abastecimiento del Ejército Rojo pero hundió la producción y contribuyó, junto a la sequía de 1921, a una hambruna que causó millones de muertos en el Volga. El descontento estalló en revueltas campesinas y, sobre todo, en la rebelión de los marineros de Kronstadt (marzo de 1921), reprimida con dureza. En respuesta, Lenin lanzó la Nueva Política Económica (NEP): sustituyó la requisa por un impuesto en especie y reintrodujo cierto mercado y pequeña propiedad privada, un repliegue pragmático que reactivó la economía y que se debatió como concesión temporal al capitalismo.',
+      obraIconica: 'La rebelión de Kronstadt y el giro a la Nueva Política Económica (1921)',
+      paises: ['Rusia soviética', 'Volga', 'Kronstadt', 'Petrogrado'],
+    },
+    {
+      id: 'urss-muerte-lenin',
+      nombre: 'Nace la URSS y muere Lenin',
+      anioInicio: 1922,
+      anioFin: 1924,
+      color: '#5B2C6F',
+      categoria: 'urss',
+      descripcion: 'El 30 de diciembre de 1922 se proclamó la Unión de Repúblicas Socialistas Soviéticas (URSS), que unía a Rusia, Ucrania, Bielorrusia y la Federación Transcaucásica bajo un mismo Estado federal de partido único. Lenin, gravemente enfermo tras varios derrames, dictó su llamado "Testamento", donde advertía sobre la concentración de poder de Iósif Stalin —secretario general del partido— y recomendaba destituirlo. Lenin murió el 21 de enero de 1924; Petrogrado fue rebautizada Leningrado y su cuerpo, embalsamado y expuesto en un mausoleo. Su desaparición abrió una pugna sucesoria entre Stalin, Trotski y otros dirigentes que se resolvería a lo largo de la década con el ascenso de Stalin, marcando el fin del periodo revolucionario y el inicio de otra etapa de la historia soviética.',
+      obraIconica: 'La proclamación de la URSS (1922) y la muerte de Lenin (1924)',
+      paises: ['URSS', 'Rusia', 'Ucrania', 'Bielorrusia', 'Transcaucasia'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'El ocaso del zarismo',
+      desde: 1905,
+      hasta: 1914,
+      icono: '👑',
+      hitosDestacados: ['La Revolución de 1905'],
+      eventos: [
+        'Domingo Sangriento ante el Palacio de Invierno (enero de 1905)',
+        'Derrota en la guerra ruso-japonesa (1904-1905)',
+        'Motín del acorazado Potemkin y primeros sóviets de obreros (1905)',
+        'Manifiesto de Octubre: libertades civiles y creación de la Duma (1905)',
+        'Reformas agrarias de Stolypin y su asesinato (1906-1911)',
+      ],
+    },
+    {
+      nombre: 'La Gran Guerra y la crisis del régimen',
+      desde: 1914,
+      hasta: 1917,
+      icono: '💥',
+      hitosDestacados: ['Tensiones sociales y Gran Guerra'],
+      eventos: [
+        'Rusia entra en la Primera Guerra Mundial (1914)',
+        'Grandes derrotas militares y millones de bajas en el frente oriental',
+        'Nicolás II marcha al frente y deja el gobierno a la zarina (1915)',
+        'Inflación, colapso del transporte y escasez de pan en las ciudades',
+        'Descrédito de la corona y asesinato de Rasputín (diciembre de 1916)',
+      ],
+    },
+    {
+      nombre: 'La Revolución de Febrero y el doble poder',
+      desde: 1917,
+      hasta: 1917,
+      icono: '🕊️',
+      hitosDestacados: ['La Revolución de Febrero', 'Gobierno Provisional y doble poder'],
+      eventos: [
+        'Huelgas por el pan y protestas del Día de la Mujer en Petrogrado (febrero)',
+        'La guarnición de la capital se une a los manifestantes',
+        'Abdicación de Nicolás II: fin de la dinastía Romanov (marzo)',
+        'Gobierno Provisional y Sóviet de Petrogrado: el doble poder',
+        'La Orden nº 1 del Sóviet y la continuidad en la guerra generan parálisis',
+      ],
+    },
+    {
+      nombre: 'De las Tesis de Abril a Octubre',
+      desde: 1917,
+      hasta: 1918,
+      icono: '🚩',
+      hitosDestacados: ['Regreso de Lenin y Tesis de Abril', 'La Revolución de Octubre'],
+      eventos: [
+        'Lenin regresa del exilio y proclama las Tesis de Abril (abril)',
+        'Consigna "Paz, Pan y Tierra" y crecimiento bolchevique en los sóviets',
+        'Fracaso de la ofensiva de junio y crisis de las Jornadas de Julio',
+        'Toma del Palacio de Invierno por el Comité Militar Revolucionario (octubre)',
+        'Decretos sobre la Paz y la Tierra del II Congreso de los Sóviets',
+      ],
+    },
+    {
+      nombre: 'Consolidación, paz y Guerra Civil',
+      desde: 1918,
+      hasta: 1921,
+      icono: '⚔️',
+      hitosDestacados: ['Consolidación bolchevique y Brest-Litovsk', 'La Guerra Civil Rusa'],
+      eventos: [
+        'Disolución de la Asamblea Constituyente y creación de la Checa (1918)',
+        'Tratado de Brest-Litovsk: paz con las Potencias Centrales (marzo de 1918)',
+        'Ejército Rojo de Trotski frente a los Ejércitos Blancos e intervención extranjera',
+        'Terror Rojo y Terror Blanco; ejecución de la familia imperial (julio de 1918)',
+        'Pogromos en Ucrania y desplazamientos masivos de población',
+      ],
+    },
+    {
+      nombre: 'Del Comunismo de Guerra a la URSS',
+      desde: 1921,
+      hasta: 1924,
+      icono: '🏛️',
+      hitosDestacados: ['Comunismo de Guerra y NEP', 'Nace la URSS y muere Lenin'],
+      eventos: [
+        'Requisas del Comunismo de Guerra y hambruna del Volga (1921)',
+        'Rebelión de los marineros de Kronstadt y su represión (marzo de 1921)',
+        'Lenin lanza la Nueva Política Económica (NEP) (1921)',
+        'Proclamación de la Unión de Repúblicas Socialistas Soviéticas (diciembre de 1922)',
+        'Testamento de Lenin, su muerte y el inicio de la pugna sucesoria (1924)',
+      ],
+    },
+  ],
+
+  categorias: {
+    antecedentes: 'Antecedentes',
+    febrero: 'Revolución de Febrero',
+    octubre: 'Revolución de Octubre',
+    consolidacion: 'Consolidación del poder',
+    'guerra-civil': 'Guerra Civil',
+    urss: 'Nacimiento de la URSS',
+  },
+
+  colores: {
+    antecedentes: '#7D6608',
+    febrero: '#1F618D',
+    octubre: '#B03A2E',
+    consolidacion: '#6C3483',
+    'guerra-civil': '#7B241C',
+    urss: '#5B2C6F',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'La Revolución Rusa no fue un único acontecimiento, sino un proceso de casi dos décadas que transformó por completo el mapa político del siglo XX. Entre la Revolución de 1905 y la muerte de Lenin en 1924, un imperio autocrático de tres siglos se derrumbó, atravesó una guerra mundial, dos revoluciones en un solo año (1917) y una guerra civil devastadora, y dio lugar al primer Estado que se declaró socialista, la URSS. Es un tema de enorme carga política, y la historiografía lo ha interpretado de formas muy distintas: para unos fue una emancipación popular truncada, para otros un golpe minoritario que abrió la puerta a la dictadura. Esta cronología intenta presentar los hechos datables —esperanzas y costes por igual—, atribuir las cifras y las controversias a los historiadores que las sostienen, y dejar los debates abiertos donde la historiografía sigue sin acuerdo.',
+
+    tablaComparativa: [
+      { hito: 'La Revolución de 1905', periodo: '1905-1907', categoria: 'Antecedentes', personaje: 'Nicolás II / pope Gapón', aportacion: 'Domingo Sangriento, Manifiesto de Octubre, Duma y primeros sóviets' },
+      { hito: 'La Revolución de Febrero', periodo: '1917', categoria: 'Revolución de Febrero', personaje: 'Nicolás II / Kérenski', aportacion: 'Caída de los Romanov y fin de la monarquía; revolución espontánea' },
+      { hito: 'Gobierno Provisional y doble poder', periodo: '1917', categoria: 'Revolución de Febrero', personaje: 'Kérenski / Sóviet de Petrogrado', aportacion: 'Autoridad dividida entre Gobierno y Sóviet; parálisis por la guerra' },
+      { hito: 'Regreso de Lenin y Tesis de Abril', periodo: '1917', categoria: 'Revolución de Octubre', personaje: 'Lenin', aportacion: '"Todo el poder a los sóviets" y consigna "Paz, Pan y Tierra"' },
+      { hito: 'La Revolución de Octubre', periodo: '1917', categoria: 'Revolución de Octubre', personaje: 'Lenin / Trotski', aportacion: 'Toma del poder bolchevique y decretos sobre la Paz y la Tierra' },
+      { hito: 'La Guerra Civil Rusa', periodo: '1918-1922', categoria: 'Guerra Civil', personaje: 'Trotski / Kolchak / Denikin', aportacion: 'Rojos contra Blancos, terror por ambos bandos y millones de muertos' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiantes de Historia',
+        perfil: 'Secundaria, preparatoria y universidad',
+        texto: 'Visión ordenada de un proceso complejo que suele confundirse: distinguir la Revolución de 1905 de las dos de 1917 (Febrero y Octubre) y de la Guerra Civil posterior es esencial para entender el siglo XX, la Guerra Fría y la geopolítica contemporánea.',
+      },
+      {
+        icono: '🌍',
+        titulo: 'Ciencias políticas y sociales',
+        perfil: 'Estudio de revoluciones y regímenes',
+        texto: 'La Revolución Rusa es un caso central para analizar cómo se derrumban los regímenes, cómo una minoría organizada puede tomar el poder en un vacío de autoridad y cómo un proceso emancipador puede derivar en un Estado de partido único. Un laboratorio para el debate sobre revolución y poder.',
+      },
+      {
+        icono: '📖',
+        titulo: 'Lectores de literatura e ideas',
+        perfil: 'Contexto de grandes obras y debates',
+        texto: 'Comprender el trasfondo histórico enriquece la lectura de autores marcados por estos años y ayuda a situar los debates ideológicos —marxismo, liberalismo, nacionalismos— que atravesaron Europa en el primer tercio del siglo XX.',
+      },
+      {
+        icono: '⚖️',
+        titulo: 'Lectura crítica de la historia',
+        perfil: 'Historiografía y memoria',
+        texto: 'Pocos episodios generan interpretaciones tan opuestas. Esta cronología permite ver dónde los historiadores coinciden (la cronología de los hechos) y dónde discrepan (las causas, el carácter de Octubre, las cifras del terror), un buen ejercicio para distinguir hecho de interpretación.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Por qué hubo dos revoluciones en 1917: Febrero y Octubre?',
+        respuesta: 'La de Febrero fue una revuelta en buena medida espontánea que, ante la negativa de las tropas a reprimir, provocó la abdicación de Nicolás II y el fin de la monarquía, dando paso a un Gobierno Provisional. La de Octubre fue la toma del poder por los bolcheviques, que derrocaron a ese Gobierno Provisional. Entre ambas medió el llamado "doble poder", meses de creciente inestabilidad marcados por la continuación de la guerra.',
+        tip: 'Reciben nombres de mes por el calendario juliano vigente en Rusia; en el gregoriano actual corresponden a marzo y noviembre.',
+      },
+      {
+        pregunta: '¿Fue la Revolución de Octubre un golpe de Estado o una revolución popular?',
+        respuesta: 'Es una de las controversias historiográficas más vivas y no está zanjada. Historiadores como Richard Pipes la describen como un golpe minoritario cuidadosamente planificado por una vanguardia bolchevique. Otros, en la línea de Sheila Fitzpatrick, la enmarcan en un proceso revolucionario más amplio con apoyo popular urbano real, sobre todo entre obreros y soldados. Ambas lecturas se apoyan en evidencia distinta y conviene conocer las dos.',
+        tip: 'Que la toma del poder fuera relativamente incruenta no zanja el debate: lo discutido es su carácter y su base social, no el número de bajas de aquella noche.',
+      },
+      {
+        pregunta: '¿Qué papel tuvo la Primera Guerra Mundial?',
+        respuesta: 'Fue un factor decisivo. La guerra provocó millones de bajas, colapsó el transporte y la economía y generó una escasez de alimentos que alimentó el descontento. También desprestigió a la corona y radicalizó a soldados y obreros. La promesa bolchevique de "paz" fue una de las claves de su ascenso, y el Tratado de Brest-Litovsk (1918) sacó a Rusia del conflicto a costa de enormes cesiones territoriales.',
+        tip: 'Sin la Gran Guerra, muchos historiadores dudan de que el régimen zarista se hubiera derrumbado en 1917.',
+      },
+      {
+        pregunta: '¿Qué fueron el Terror Rojo y el Terror Blanco?',
+        respuesta: 'Fueron las campañas de violencia política durante la Guerra Civil (1918-1922). El Terror Rojo lo ejerció el bando bolchevique a través de la Checa, con ejecuciones y toma de rehenes, intensificado tras el atentado contra Lenin en 1918. El Terror Blanco fue la violencia equivalente de los Ejércitos Blancos y fuerzas asociadas, que incluyó ejecuciones y numerosos pogromos, sobre todo en Ucrania. Ambos causaron muertes masivas y son atribuibles a los dos bandos, no a uno solo.',
+        tip: 'Historiadores como Orlando Figes documentan atrocidades por ambas partes; presentar solo una es incompleto.',
+      },
+      {
+        pregunta: '¿Cuándo y cómo nació la URSS?',
+        respuesta: 'La Unión de Repúblicas Socialistas Soviéticas se proclamó el 30 de diciembre de 1922, uniendo a Rusia, Ucrania, Bielorrusia y la Federación Transcaucásica en un Estado federal de partido único, tras el triunfo bolchevique en la Guerra Civil. Poco después, la enfermedad y muerte de Lenin (enero de 1924) abrieron una pugna sucesoria entre Stalin, Trotski y otros dirigentes que se resolvería a lo largo de la década.',
+        tip: 'En su "Testamento", Lenin advirtió sobre la concentración de poder de Stalin y recomendó destituirlo del cargo de secretario general.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Distingue los bloques de color en la Línea del Tiempo',
+        cuerpo: 'El ocre marca los antecedentes (1905 y la Gran Guerra), el azul la Revolución de Febrero, el rojo la de Octubre, el granate la Guerra Civil y el morado la consolidación y el nacimiento de la URSS. Antes de leer nada, fíjate en lo comprimido que está 1917: en un solo año se concentran varios hitos decisivos.',
+      },
+      {
+        titulo: 'Separa Febrero de Octubre',
+        cuerpo: 'Haz clic en "La Revolución de Febrero" y luego en "La Revolución de Octubre". Son dos hechos distintos: la primera derriba al zar y crea un gobierno liberal-moderado; la segunda derriba a ese gobierno y lleva al poder a los bolcheviques. Confundirlas es el error más frecuente.',
+      },
+      {
+        titulo: 'Sigue el hilo de la guerra',
+        cuerpo: 'La Primera Guerra Mundial atraviesa toda la primera mitad de la cronología. Observa cómo el desgaste bélico erosiona al zarismo, luego al Gobierno Provisional (que insistió en seguir combatiendo) y cómo la salida de la guerra vía Brest-Litovsk es una de las primeras decisiones del nuevo régimen.',
+      },
+      {
+        titulo: 'Lee el terror y sus cifras con atención',
+        cuerpo: 'En el hito "La Guerra Civil Rusa" verás mencionados tanto el Terror Rojo como el Terror Blanco, con horquillas atribuidas a historiadores concretos. Fíjate en que las cifras se presentan como estimaciones debatidas, no como datos cerrados: así funciona la historiografía de un tema tan sensible.',
+      },
+      {
+        titulo: 'Termina con el Contexto Histórico',
+        cuerpo: 'Las 6 eras ordenan el proceso completo, del ocaso del zarismo al nacimiento de la URSS. La era "De las Tesis de Abril a Octubre" es la más densa: concentra en pocos meses el regreso de Lenin, la radicalización de los sóviets y la toma del poder.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '📅',
+        texto: 'Los nombres "Febrero" y "Octubre" corresponden al calendario juliano que usaba Rusia, trece días por detrás del gregoriano. Por eso la "Revolución de Octubre" se conmemoraba el 7 de noviembre. Rusia adoptó el calendario gregoriano precisamente en 1918.',
+      },
+      {
+        icono: '🚂',
+        texto: 'El regreso de Lenin en 1917 se produjo en un tren sellado que cruzó Alemania. El alto mando alemán facilitó el viaje con la esperanza de que un revolucionario antibelicista debilitara a su enemigo en el frente oriental: un cálculo geopolítico que tuvo consecuencias enormes e imprevistas.',
+      },
+      {
+        icono: '⚖️',
+        texto: 'Las cifras de víctimas de la Guerra Civil, la hambruna y el terror varían mucho según la fuente. Ante cualquier número redondo sin autor, conviene desconfiar: los historiadores serios ofrecen horquillas y explican de dónde salen sus estimaciones.',
+      },
+      {
+        icono: '🏛️',
+        texto: 'La Nueva Política Económica (NEP) de 1921 fue un giro pragmático: reintrodujo mercado y pequeña propiedad privada tras el Comunismo de Guerra. Muestra que el rumbo económico del nuevo Estado no estuvo fijado de antemano, sino que se ajustó ante crisis como la hambruna y Kronstadt.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Confundir la Revolución de Febrero con la de Octubre',
+        cuerpo: 'Son dos revoluciones distintas del mismo año 1917. Febrero acabó con la monarquía y llevó al poder a un Gobierno Provisional liberal-moderado; Octubre derrocó a ese Gobierno y llevó al poder a los bolcheviques. Hablar de "la Revolución Rusa" en singular oculta que fueron procesos diferentes con protagonistas y objetivos distintos.',
+      },
+      {
+        titulo: 'Creer que Lenin dirigió la caída del zar',
+        cuerpo: 'La Revolución de Febrero, que derribó a Nicolás II, fue en gran medida espontánea y sorprendió a los propios revolucionarios profesionales, muchos en el exilio. Lenin no regresó a Rusia hasta abril de 1917, cuando el zar ya había abdicado. Atribuirle la caída de la monarquía es un anacronismo frecuente.',
+      },
+      {
+        titulo: 'Presentar el terror como obra de un solo bando',
+        cuerpo: 'Durante la Guerra Civil hubo un Terror Rojo y un Terror Blanco, con atrocidades documentadas por ambas partes. Contar solo la violencia de un bando —sea cual sea— deforma la realidad histórica. Lo riguroso es reconocer que fue una guerra civil brutal por los dos lados y atribuir las cifras a historiadores concretos.',
+      },
+      {
+        titulo: 'Identificar 1917 con el régimen estalinista posterior',
+        cuerpo: 'El estalinismo de los años 30 (colectivización forzosa, Gran Purga, gulag a gran escala) fue una etapa posterior y distinta. Proyectarlo hacia atrás sobre 1917-1924, o bien negar toda continuidad, son dos simplificaciones opuestas. La relación entre la Revolución y el estalinismo es precisamente uno de los grandes debates historiográficos abiertos.',
+      },
+    ],
+  },
+};

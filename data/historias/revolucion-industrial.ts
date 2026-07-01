@@ -1,0 +1,366 @@
+import type { HistoriaData } from './types';
+
+export const revolucionIndustrial: HistoriaData = {
+  slug: 'revolucion-industrial',
+  titulo: 'La Revolución Industrial: De la Máquina de Vapor a la Industria 4.0',
+  subtitulo: 'Tres siglos de máquinas, fábricas y energía que transformaron la vida humana más que ningún otro cambio desde el Neolítico',
+  descripcionSEO: 'Cronología interactiva de la Revolución Industrial: de la protoindustria y la máquina de vapor de Watt (1769) al ferrocarril, la Segunda Revolución Industrial (electricidad y acero), la producción en masa de Ford y la Industria 4.0. Textil, carbón, cuestión social, movimiento obrero y automatización en 10 hitos y 6 eras.',
+  keywords: [
+    'revolución industrial cronología historia',
+    'máquina de vapor watt fábrica textil arkwright',
+    'ferrocarril stephenson carbón hierro reino unido',
+    'segunda revolución industrial electricidad acero petróleo',
+    'producción en masa fordismo taylorismo cadena montaje',
+    'cuestión social movimiento obrero ludismo industria 4.0',
+  ],
+  anioInicio: 1700,
+  anioFin: 9999,
+
+  hitos: [
+    {
+      id: 'protoindustria',
+      nombre: 'La protoindustria',
+      anioInicio: 1700,
+      anioFin: 1760,
+      color: '#8B7355',
+      categoria: 'precursores',
+      descripcion: 'Antes de las fábricas, la producción se organizaba mediante el "sistema doméstico" (putting-out): comerciantes repartían materia prima a familias que hilaban y tejían en sus casas. En paralelo, la revolución agrícola británica —rotación de cultivos, cercamientos (Enclosure Acts) y mejoras ganaderas— aumentó la producción de alimentos, liberó mano de obra del campo e hizo crecer la población. Gran Bretaña reunió una combinación singular de factores: reservas de carbón, colonias y mercados, capital acumulado por el comercio, estabilidad institucional tras 1688 y una cultura de patentes que premiaba la invención.',
+      obraIconica: 'El sistema doméstico (putting-out) y los cercamientos agrícolas',
+      paises: ['Gran Bretaña', 'Inglaterra', 'Países Bajos'],
+    },
+    {
+      id: 'textil',
+      nombre: 'La revolución textil',
+      anioInicio: 1733,
+      anioFin: 1790,
+      color: '#B7410E',
+      categoria: 'primera',
+      descripcion: 'El algodón fue el motor del despegue. Una cadena de inventos multiplicó la productividad: la lanzadera volante de John Kay (1733), la spinning jenny de Hargreaves (1764), la water frame de Arkwright (1769) —movida por agua— y la mule de Crompton (1779), que combinaba ambas. Richard Arkwright levantó en Cromford (1771) la primera fábrica moderna: producción concentrada, maquinaria, disciplina horaria y trabajo asalariado bajo un mismo techo. El algodón barato de Lancashire inundó los mercados mundiales y ligó la industria británica a las plantaciones esclavistas que suministraban la materia prima.',
+      obraIconica: 'La fábrica textil de Cromford de Arkwright (1771), primera fábrica moderna',
+      paises: ['Gran Bretaña', 'Lancashire', 'Manchester'],
+    },
+    {
+      id: 'vapor',
+      nombre: 'La máquina de vapor',
+      anioInicio: 1769,
+      anioFin: 1810,
+      color: '#B7410E',
+      categoria: 'primera',
+      descripcion: 'La máquina atmosférica de Newcomen (1712) ya achicaba agua de las minas, pero era muy ineficiente. James Watt patentó en 1769 el condensador separado, que cuadruplicó su rendimiento, y con el empresario Matthew Boulton la convirtió en una fuente de energía universal y transportable. Por primera vez la potencia dejaba de depender del agua, el viento o la fuerza animal: una fábrica podía instalarse en cualquier lugar. El vapor movió telares, fraguas, bombas y, pronto, locomotoras y barcos. Fue la tecnología que hizo posible todo lo demás.',
+      obraIconica: 'La máquina de vapor de James Watt con condensador separado (1769)',
+      paises: ['Gran Bretaña', 'Escocia', 'Birmingham'],
+    },
+    {
+      id: 'carbon-hierro',
+      nombre: 'Carbón, hierro y canales',
+      anioInicio: 1780,
+      anioFin: 1830,
+      color: '#B7410E',
+      categoria: 'primera',
+      descripcion: 'La industria pesada nació de dos innovaciones metalúrgicas: la fundición con coque de Abraham Darby (que sustituyó al carbón vegetal) y el pudelado de Henry Cort (1784), que permitió producir hierro dúctil en masa. El símbolo de la época fue el Puente de Hierro de Coalbrookdale (Ironbridge, 1779), la primera gran estructura de este metal. Para mover carbón y mineral, Gran Bretaña tejió una red de canales que abarató el transporte antes de la llegada del ferrocarril. Carbón, hierro y vapor formaron el triángulo energético de la primera industrialización.',
+      obraIconica: 'El Puente de Hierro de Coalbrookdale (Ironbridge, 1779)',
+      paises: ['Gran Bretaña', 'Gales', 'Shropshire'],
+    },
+    {
+      id: 'ferrocarril',
+      nombre: 'La era del ferrocarril',
+      anioInicio: 1825,
+      anioFin: 1870,
+      color: '#34495E',
+      categoria: 'expansion',
+      descripcion: 'El ferrocarril fusionó el vapor, el hierro y el carbón en la máquina que encogió el mundo. George Stephenson inauguró la línea Stockton-Darlington (1825) y su locomotora Rocket (1829) ganó las pruebas de Rainhill, abriendo la línea Liverpool-Manchester (1830), primera de pasajeros con tracción a vapor. Siguió la "fiebre del ferrocarril" (railway mania) de los años 1840. Los trenes desplomaron el coste del transporte terrestre, integraron mercados nacionales, sincronizaron el tiempo (nació la hora estándar) y crearon una demanda colosal de acero y carbón que realimentó la industria.',
+      obraIconica: 'La locomotora Rocket de Stephenson gana las pruebas de Rainhill (1829)',
+      paises: ['Gran Bretaña', 'Estados Unidos', 'Europa'],
+    },
+    {
+      id: 'difusion',
+      nombre: 'Difusión continental',
+      anioInicio: 1830,
+      anioFin: 1880,
+      color: '#34495E',
+      categoria: 'expansion',
+      descripcion: 'Lo que empezó como monopolio británico se extendió al continente y a América. Bélgica fue la primera en industrializarse fuera de las islas; Francia, los estados alemanes (unificados económicamente por el Zollverein de 1834) y Estados Unidos siguieron con rapidez. La Gran Exposición de Londres de 1851, celebrada en el Crystal Palace de hierro y vidrio, escenificó ante el mundo el poderío industrial británico. La difusión no fue homogénea: cada país adaptó el modelo a sus recursos, y algunos —como Alemania y EE. UU.— acabarían superando a Gran Bretaña a finales de siglo.',
+      obraIconica: 'El Crystal Palace y la Gran Exposición de Londres (1851)',
+      paises: ['Bélgica', 'Francia', 'Alemania', 'Estados Unidos'],
+    },
+    {
+      id: 'cuestion-social',
+      nombre: 'La cuestión social',
+      anioInicio: 1811,
+      anioFin: 1880,
+      color: '#922B21',
+      categoria: 'sociedad',
+      descripcion: 'La industrialización disparó la riqueza, pero su reparto fue profundamente desigual y su coste humano, alto. Las ciudades fabriles crecieron sin higiene ni planificación; jornadas de 12-16 horas, trabajo infantil y salarios de subsistencia marcaron las primeras décadas. La respuesta fue múltiple: el ludismo (destrucción de máquinas, 1811-1816), el cartismo británico, los primeros sindicatos y las Factory Acts que limitaron el trabajo de menores. Karl Marx y Friedrich Engels publicaron el Manifiesto Comunista (1848) y El Capital (1867). Los historiadores aún debaten si el nivel de vida obrero mejoró o empeoró en la primera mitad del siglo XIX.',
+      obraIconica: 'El Manifiesto Comunista de Marx y Engels (1848)',
+      paises: ['Gran Bretaña', 'Alemania', 'Francia'],
+    },
+    {
+      id: 'segunda-revolucion',
+      nombre: 'Segunda Revolución Industrial',
+      anioInicio: 1870,
+      anioFin: 1914,
+      color: '#D4AC0D',
+      categoria: 'segunda',
+      descripcion: 'Una segunda oleada tecnológica cambió de nuevo las reglas. El convertidor Bessemer (1856) abarató el acero; la electricidad pasó del laboratorio a la industria con la dinamo, la central de Pearl Street de Edison (1882) y la corriente alterna de Tesla y Westinghouse. Nacieron la química industrial (colorantes, fertilizantes, explosivos), el petróleo y el motor de combustión interna, el telégrafo y el teléfono. La ciencia se integró en la producción y aparecieron las grandes corporaciones. Alemania y Estados Unidos lideraron esta fase, desplazando el centro de gravedad industrial fuera de Gran Bretaña.',
+      obraIconica: 'La central eléctrica de Pearl Street de Edison en Nueva York (1882)',
+      paises: ['Alemania', 'Estados Unidos', 'Gran Bretaña'],
+    },
+    {
+      id: 'produccion-masa',
+      nombre: 'Producción en masa',
+      anioInicio: 1908,
+      anioFin: 1945,
+      color: '#D4AC0D',
+      categoria: 'segunda',
+      descripcion: 'Frederick Taylor sistematizó la "organización científica del trabajo" (1911) y Henry Ford llevó la idea al extremo con la cadena de montaje móvil del Ford T (1913): el tiempo de fabricación de un automóvil cayó de horas a minutos y su precio se puso al alcance de la clase media. El fordismo asoció producción masiva y consumo masivo: salarios más altos para que los propios obreros comprasen lo que fabricaban. La electrificación total de las fábricas y la estandarización de piezas consolidaron el modelo, que las dos guerras mundiales llevaron a su máxima escala.',
+      obraIconica: 'La cadena de montaje móvil del Ford T (1913)',
+      paises: ['Estados Unidos', 'Alemania', 'Europa'],
+    },
+    {
+      id: 'automatizacion',
+      nombre: 'De la automatización a la Industria 4.0',
+      anioInicio: 1945,
+      anioFin: 9999,
+      color: '#1ABC9C',
+      categoria: 'contemporanea',
+      descripcion: 'Tras 1945, la electrónica, la informática y la robótica abrieron la llamada Tercera Revolución Industrial: automatización de líneas, control numérico, primeros robots industriales (Unimate, 1961) y una economía crecientemente globalizada y de servicios. Desde los años 2010 se habla de una Cuarta Revolución Industrial o Industria 4.0: fábricas conectadas (internet de las cosas), sensores, big data, fabricación aditiva (impresión 3D) e inteligencia artificial aplicada a la producción. El debate de fondo sigue siendo el mismo que en 1811: cómo se reparten las enormes ganancias de productividad y qué pasa con el empleo que las máquinas transforman.',
+      obraIconica: 'El robot industrial Unimate y la fábrica conectada de la Industria 4.0',
+      paises: ['Estados Unidos', 'Japón', 'Alemania', 'China'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'La protoindustria',
+      desde: 1700,
+      hasta: 1760,
+      icono: '🌾',
+      hitosDestacados: ['La protoindustria'],
+      eventos: [
+        'Auge del sistema doméstico (putting-out) en la industria textil',
+        'Revolución agrícola británica: rotación de cultivos y cercamientos',
+        'Crecimiento demográfico y liberación de mano de obra del campo',
+        'Gran Bretaña acumula carbón, capital, colonias e instituciones estables',
+      ],
+    },
+    {
+      nombre: 'Primera Revolución Industrial',
+      desde: 1760,
+      hasta: 1830,
+      icono: '⚙️',
+      hitosDestacados: ['La revolución textil', 'La máquina de vapor', 'Carbón, hierro y canales'],
+      eventos: [
+        'Spinning jenny (1764) y water frame (1769) revolucionan el hilado',
+        'Arkwright levanta la primera fábrica moderna en Cromford (1771)',
+        'James Watt patenta el condensador separado del vapor (1769)',
+        'Puente de Hierro de Coalbrookdale: la edad del hierro (1779)',
+        'Pudelado de Cort: producción de hierro dúctil en masa (1784)',
+      ],
+    },
+    {
+      nombre: 'La era del vapor y el ferrocarril',
+      desde: 1830,
+      hasta: 1870,
+      icono: '🚂',
+      hitosDestacados: ['La era del ferrocarril', 'Difusión continental', 'La cuestión social'],
+      eventos: [
+        'Línea Liverpool-Manchester: primer ferrocarril de pasajeros a vapor (1830)',
+        'La "fiebre del ferrocarril" tiende miles de kilómetros de vía (años 1840)',
+        'El Zollverein unifica el mercado alemán (1834)',
+        'Manifiesto Comunista de Marx y Engels (1848)',
+        'La Gran Exposición del Crystal Palace de Londres (1851)',
+      ],
+    },
+    {
+      nombre: 'La Segunda Revolución Industrial',
+      desde: 1870,
+      hasta: 1914,
+      icono: '⚡',
+      hitosDestacados: ['Segunda Revolución Industrial'],
+      eventos: [
+        'El acero Bessemer abarata la construcción y las máquinas',
+        'Central eléctrica de Pearl Street de Edison (1882)',
+        '"Guerra de las corrientes": la alterna de Tesla y Westinghouse se impone',
+        'Auge de la química industrial, el petróleo y el motor de combustión',
+        'Alemania y EE. UU. superan la producción industrial británica',
+      ],
+    },
+    {
+      nombre: 'Producción en masa y guerras mundiales',
+      desde: 1914,
+      hasta: 1945,
+      icono: '🏭',
+      hitosDestacados: ['Producción en masa'],
+      eventos: [
+        'Taylor publica los principios de la organización científica del trabajo (1911)',
+        'La cadena de montaje del Ford T populariza el automóvil (1913)',
+        'Fordismo: producción de masas y consumo de masas',
+        'Las dos guerras mundiales llevan la industria a su máxima escala',
+        'Electrificación total de las fábricas y estandarización de piezas',
+      ],
+    },
+    {
+      nombre: 'De la automatización a la Industria 4.0',
+      desde: 1945,
+      hasta: 9999,
+      icono: '🤖',
+      hitosDestacados: ['De la automatización a la Industria 4.0'],
+      eventos: [
+        'Primer robot industrial Unimate en una fábrica de General Motors (1961)',
+        'Automatización, control numérico y electrónica en la producción',
+        'Globalización de las cadenas de suministro y auge de los servicios',
+        'Industria 4.0: internet de las cosas, sensores y fabricación aditiva',
+        'La inteligencia artificial se aplica a la producción y la logística',
+      ],
+    },
+  ],
+
+  categorias: {
+    precursores: 'Precursores',
+    primera: 'Primera Revolución',
+    expansion: 'Expansión y ferrocarril',
+    sociedad: 'Cuestión social',
+    segunda: 'Segunda Revolución',
+    contemporanea: 'Automatización y era digital',
+  },
+
+  colores: {
+    precursores: '#8B7355',
+    primera: '#B7410E',
+    expansion: '#34495E',
+    sociedad: '#922B21',
+    segunda: '#D4AC0D',
+    contemporanea: '#1ABC9C',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'La Revolución Industrial fue el cambio más profundo en las condiciones de vida humana desde la revolución neolítica. En apenas dos siglos, la energía dejó de depender de los músculos, el agua y el viento; la producción pasó del taller doméstico a la fábrica; y sociedades mayoritariamente agrarias se volvieron urbanas e industriales. El resultado fue una explosión sin precedentes de productividad, población y riqueza, pero también desigualdad, hacinamiento urbano, trabajo infantil y un impacto ambiental cuyas consecuencias —el cambio climático incluido— seguimos afrontando. Esta cronología recorre ese proceso desde la protoindustria británica hasta la Industria 4.0, mostrando que no fue un único acontecimiento sino varias oleadas tecnológicas encadenadas.',
+
+    tablaComparativa: [
+      { hito: 'La protoindustria', periodo: '1700-1760', categoria: 'Precursores', personaje: 'Jethro Tull / Townshend', aportacion: 'Revolución agrícola y sistema doméstico que preparan el despegue' },
+      { hito: 'La revolución textil', periodo: '1733-1790', categoria: 'Primera Revolución', personaje: 'Arkwright / Hargreaves', aportacion: 'Spinning jenny, water frame y la primera fábrica moderna' },
+      { hito: 'La máquina de vapor', periodo: '1769-1810', categoria: 'Primera Revolución', personaje: 'James Watt / Boulton', aportacion: 'Energía transportable e independiente del agua y el viento' },
+      { hito: 'La era del ferrocarril', periodo: '1825-1870', categoria: 'Expansión y ferrocarril', personaje: 'George Stephenson', aportacion: 'Transporte barato, mercados integrados y demanda de acero' },
+      { hito: 'Segunda Revolución Industrial', periodo: '1870-1914', categoria: 'Segunda Revolución', personaje: 'Edison / Bessemer / Tesla', aportacion: 'Electricidad, acero, química, petróleo y grandes corporaciones' },
+      { hito: 'Producción en masa', periodo: '1908-1945', categoria: 'Segunda Revolución', personaje: 'Henry Ford / Taylor', aportacion: 'Cadena de montaje, consumo de masas y estandarización' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiantes de Historia',
+        perfil: 'Secundaria, preparatoria y universidad',
+        texto: 'Visión ordenada de las oleadas industriales, esencial para entender el mundo contemporáneo: por qué unos países se desarrollaron antes que otros, cómo surgieron las clases sociales modernas y de dónde vienen el capitalismo industrial y el movimiento obrero.',
+      },
+      {
+        icono: '📈',
+        titulo: 'Economía y empresa',
+        perfil: 'Comprender el crecimiento y la productividad',
+        texto: 'La Revolución Industrial es el punto de partida del crecimiento económico sostenido. Aquí se ve nacer la fábrica, la corporación, la producción en masa y la organización científica del trabajo: los cimientos de la economía moderna.',
+      },
+      {
+        icono: '⚙️',
+        titulo: 'Ingeniería y tecnología',
+        perfil: 'Historia de la técnica',
+        texto: 'De la máquina de vapor a la robótica, cada oleada resolvió el cuello de botella de la anterior. Ideal para situar cada invención en su contexto y entender cómo unas tecnologías habilitan a las siguientes.',
+      },
+      {
+        icono: '🌍',
+        titulo: 'Interesados en el clima',
+        perfil: 'Origen de la era de los combustibles fósiles',
+        texto: 'La quema masiva de carbón que arrancó en la industrialización marca el inicio de la era de los combustibles fósiles y del aumento de CO₂ atmosférico. Esta cronología ayuda a entender la raíz histórica de la crisis climática actual.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Por qué empezó la Revolución Industrial en Gran Bretaña?',
+        respuesta: 'Por una combinación de factores que no se dio junta en ningún otro sitio: abundante carbón accesible, capital acumulado por el comercio colonial, un gran mercado interior y colonial, estabilidad política e instituciones que protegían la propiedad y las patentes tras 1688, una revolución agrícola previa que liberó mano de obra y una cultura práctica de la invención. No hubo una única causa, sino la coincidencia de todas.',
+        tip: 'La revolución agrícola fue la condición previa: sin excedente de alimentos y de brazos, no hay obreros para las fábricas.',
+      },
+      {
+        pregunta: '¿Cuántas revoluciones industriales ha habido?',
+        respuesta: 'Suele hablarse de cuatro. La Primera (c. 1760-1840): vapor, textil, carbón y hierro. La Segunda (c. 1870-1914): electricidad, acero, química y petróleo. La Tercera (desde 1945): electrónica, informática y automatización. La Cuarta o Industria 4.0 (desde c. 2010): fábricas conectadas, datos e inteligencia artificial. Son etapas de un mismo proceso continuo, no acontecimientos aislados.',
+        tip: 'El término "Cuarta Revolución Industrial" lo popularizó Klaus Schwab (Foro de Davos) hacia 2016.',
+      },
+      {
+        pregunta: '¿Mejoró o empeoró la vida de los obreros?',
+        respuesta: 'Es uno de los grandes debates de la historia económica. A largo plazo, la industrialización elevó enormemente el nivel de vida medio. Pero en las primeras décadas (aproximadamente 1780-1840) muchos trabajadores sufrieron jornadas extenuantes, trabajo infantil, salarios de subsistencia y ciudades insalubres. Los historiadores "optimistas" y "pesimistas" siguen discrepando sobre ese periodo concreto; la mayoría coincide en que la mejora clara llegó a partir de mediados del siglo XIX.',
+        tip: 'Las primeras Factory Acts británicas (1833 en adelante) empezaron a limitar el trabajo de los menores.',
+      },
+      {
+        pregunta: '¿Qué relación tiene con el cambio climático?',
+        respuesta: 'Directa. La Revolución Industrial inauguró el uso masivo de combustibles fósiles, primero carbón y luego petróleo y gas. Esa quema es la principal fuente del aumento de CO₂ en la atmósfera desde el siglo XVIII. Por eso muchos científicos sitúan en la industrialización el inicio del calentamiento global de origen humano.',
+        tip: 'La concentración de CO₂ atmosférico ha pasado de unas 280 ppm preindustriales a más de 420 ppm actuales.',
+      },
+      {
+        pregunta: '¿En qué se diferencia la Primera de la Segunda Revolución Industrial?',
+        respuesta: 'La Primera se basó en el vapor, el carbón, el hierro y el textil, y tuvo a Gran Bretaña como protagonista casi exclusiva. La Segunda se apoyó en la electricidad, el acero barato, la química y el petróleo, integró la ciencia en la producción y dio el liderazgo a Alemania y Estados Unidos. La Segunda fue más rápida, más global y más ligada a laboratorios y grandes empresas.',
+        tip: 'El acero barato del convertidor Bessemer hizo posibles los rascacielos, los grandes puentes y las redes ferroviarias modernas.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Observa las oleadas de color en la Línea del Tiempo',
+        cuerpo: 'El marrón es la protoindustria, el óxido la Primera Revolución, el gris acero el ferrocarril, el dorado la Segunda Revolución y el teal la era digital. Antes de leer, fíjate en cómo el ritmo del cambio se acelera: las primeras etapas duran décadas, las últimas se solapan.',
+      },
+      {
+        titulo: 'Compara la Primera con la Segunda Revolución',
+        cuerpo: 'Haz clic en "La máquina de vapor" y luego en "Segunda Revolución Industrial". Observa el salto: del vapor y el carbón a la electricidad y el acero, y del liderazgo británico al alemán y estadounidense.',
+      },
+      {
+        titulo: 'Sigue el hilo de la energía',
+        cuerpo: 'Cada oleada resolvió el límite de la anterior: el vapor liberó a las fábricas del agua, la electricidad permitió motores en cada máquina, el petróleo movió el transporte. Identifica en la línea cómo cambia la fuente de energía dominante.',
+      },
+      {
+        titulo: 'No te saltes la cuestión social',
+        cuerpo: 'La categoría "Cuestión social" recorre casi todo el siglo XIX. Léela junto a los hitos técnicos: la misma máquina que multiplicaba la producción transformaba —para bien y para mal— la vida de millones de trabajadores.',
+      },
+      {
+        titulo: 'Termina con el Contexto Histórico',
+        cuerpo: 'Las 6 eras muestran cómo cada fase tuvo su energía, sus protagonistas y sus tensiones. La era "De la automatización a la Industria 4.0" conecta el pasado con los debates de hoy sobre robots, IA y empleo.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '⚙️',
+        texto: 'La máquina de vapor no la "inventó" Watt de la nada: mejoró la de Newcomen, que llevaba funcionando medio siglo en las minas. Casi ninguna gran innovación industrial fue obra de un solo genio; casi todas fueron mejoras encadenadas sobre inventos previos.',
+      },
+      {
+        icono: '🕰️',
+        texto: 'El ferrocarril creó la hora estándar. Antes, cada ciudad tenía su hora solar local; para que los trenes no chocaran hizo falta unificar el tiempo. La sincronización horaria del mundo moderno nació de una necesidad ferroviaria.',
+      },
+      {
+        icono: '🏭',
+        texto: 'El fordismo no consistía solo en fabricar barato: Ford pagaba salarios altos (los famosos 5 dólares al día en 1914) para que sus propios obreros pudieran comprar los coches que montaban. Producción de masas y consumo de masas iban de la mano.',
+      },
+      {
+        icono: '🌫️',
+        texto: 'La quema de carbón que despegó con la industria es el punto de partida de la era de los combustibles fósiles. El aumento del CO₂ atmosférico que hoy preocupa a los climatólogos empezó, literalmente, en las chimeneas de las primeras fábricas.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Creer que la Revolución Industrial fue un acontecimiento rápido',
+        cuerpo: 'El nombre engaña: no fue una revolución súbita, sino un proceso gradual de más de un siglo, con distintas oleadas y ritmos según el país. Los contemporáneos rara vez percibieron vivir un cambio de época; el término "Revolución Industrial" se popularizó mucho después.',
+      },
+      {
+        titulo: 'Atribuir cada invento a un único genio',
+        cuerpo: 'La spinning jenny, la máquina de vapor o el ferrocarril fueron el resultado de cadenas de mejoras hechas por muchas personas. Watt perfeccionó a Newcomen; Stephenson se apoyó en décadas de locomotoras previas. La innovación industrial fue acumulativa y colectiva.',
+      },
+      {
+        titulo: 'Pensar que solo trajo progreso',
+        cuerpo: 'La industrialización elevó la riqueza y la esperanza de vida a largo plazo, pero en sus primeras décadas trajo hacinamiento urbano, trabajo infantil, jornadas extenuantes y contaminación. Contar solo la cara del progreso, o solo la del sufrimiento, deforma la historia: hubo ambas cosas a la vez.',
+      },
+      {
+        titulo: 'Confundir la Revolución Industrial con la Revolución Francesa',
+        cuerpo: 'Son procesos distintos y paralelos: la Francesa (1789) fue una revolución política; la Industrial, económica y tecnológica. Coincidieron en el tiempo e interactuaron —el nacionalismo y el liberalismo del XIX se alimentan de ambas—, pero no son lo mismo.',
+      },
+    ],
+  },
+};

@@ -1,0 +1,367 @@
+import type { HistoriaData } from './types';
+
+export const granDepresion: HistoriaData = {
+  slug: 'gran-depresion',
+  titulo: 'La Gran Depresión: Del Crac de 1929 a la Economía de Guerra',
+  subtitulo: 'La crisis económica más profunda del siglo XX: dos décadas que van del optimismo de los "felices años veinte" al hundimiento global y el rearme',
+  descripcionSEO: 'Cronología interactiva de la Gran Depresión: de los "felices años veinte" y la burbuja bursátil al Crac de Wall Street (octubre de 1929), las quiebras bancarias en cadena, el paro masivo y la deflación, la propagación global vía patrón oro y aranceles, el New Deal de Roosevelt (1933), la crisis en Europa y el ascenso del nazismo, la "Teoría general" de Keynes (1936) y la salida por el rearme. 10 hitos y 6 eras, c. 1920-1939.',
+  keywords: [
+    'gran depresión crisis 1929 cronología historia económica',
+    'crac wall street jueves negro martes negro octubre 1929',
+    'quiebras bancarias deflación paro masivo años treinta',
+    'new deal roosevelt hoover patrón oro smoot-hawley',
+    'keynes teoría general debate monetaristas keynesianos',
+    'crisis europa alemania nazismo rearme economía de guerra',
+  ],
+  anioInicio: 1920,
+  anioFin: 1939,
+
+  hitos: [
+    {
+      id: 'felices-anios-veinte',
+      nombre: 'Los felices años veinte',
+      anioInicio: 1920,
+      anioFin: 1929,
+      color: '#D4AC0D',
+      categoria: 'antecedentes',
+      descripcion: 'Tras la Primera Guerra Mundial, Estados Unidos vivió una década de fuerte crecimiento (los "Roaring Twenties"). Se generalizaron el automóvil, la electricidad doméstica, la radio y la compra a plazos, y la producción industrial creció con rapidez. Bajo la superficie se acumulaban desequilibrios: sobreproducción agrícola e industrial, una distribución de la renta muy desigual y un endeudamiento creciente. La prosperidad no fue universal: la agricultura estadounidense ya estaba deprimida y buena parte de Europa arrastraba las secuelas de la guerra y las reparaciones.',
+      obraIconica: 'El automóvil, la radio y la compra a plazos como símbolos de la prosperidad',
+      paises: ['Estados Unidos', 'Canadá'],
+    },
+    {
+      id: 'burbuja-bursatil',
+      nombre: 'La burbuja bursátil',
+      anioInicio: 1927,
+      anioFin: 1929,
+      color: '#D4AC0D',
+      categoria: 'antecedentes',
+      descripcion: 'En los últimos años de la década, la Bolsa de Nueva York entró en una espiral especulativa. Cada vez más pequeños inversores compraban acciones "al margen" (a crédito), aportando solo una fracción del precio y financiando el resto con préstamos de los corredores. La creencia de que las cotizaciones solo podían subir alimentó una burbuja desconectada de los beneficios reales de las empresas. Los historiadores económicos discuten hasta qué punto la política monetaria de la Reserva Federal contribuyó a inflar y luego a pinchar esa burbuja.',
+      obraIconica: 'La compra de acciones "al margen" (a crédito) en la Bolsa de Nueva York',
+      paises: ['Estados Unidos'],
+    },
+    {
+      id: 'crac-wall-street',
+      nombre: 'El Crac de Wall Street',
+      anioInicio: 1929,
+      anioFin: 1929,
+      color: '#C0392B',
+      categoria: 'crac',
+      descripcion: 'En octubre de 1929 la burbuja estalló. El "Jueves Negro" (24 de octubre) desató ventas masivas, y tras un intento fallido de estabilización los días clave fueron el "Lunes Negro" (28) y el "Martes Negro" (29 de octubre), cuando el índice se desplomó y millones de acciones cambiaron de manos. En pocas semanas se evaporó una parte enorme del valor bursátil. El crac no fue por sí solo la causa de la Depresión —la economía real ya se enfriaba—, pero destruyó riqueza, confianza y crédito, y marcó el inicio simbólico de la crisis.',
+      obraIconica: 'El "Martes Negro" del 29 de octubre de 1929 en la Bolsa de Nueva York',
+      paises: ['Estados Unidos'],
+    },
+    {
+      id: 'crisis-bancaria',
+      nombre: 'Quiebras bancarias y contracción monetaria',
+      anioInicio: 1930,
+      anioFin: 1933,
+      color: '#922B21',
+      categoria: 'crisis-bancaria',
+      descripcion: 'Entre 1930 y 1933 se sucedieron oleadas de pánicos bancarios: los depositantes corrieron a retirar su dinero y miles de bancos estadounidenses quebraron. Al desaparecer los bancos se destruyó crédito y la oferta monetaria se contrajo con fuerza. Los economistas Milton Friedman y Anna Schwartz sostuvieron después que esa contracción, no impedida por la Reserva Federal, fue un factor decisivo en la profundidad de la crisis; otras corrientes subrayan el papel de la caída de la demanda y del patrón oro. La quiebra del banco austriaco Creditanstalt (1931) propagó el pánico a Europa.',
+      obraIconica: 'Las colas de depositantes ante los bancos en quiebra (pánicos bancarios)',
+      paises: ['Estados Unidos', 'Austria', 'Alemania'],
+    },
+    {
+      id: 'paro-deflacion',
+      nombre: 'Paro masivo y deflación',
+      anioInicio: 1930,
+      anioFin: 1933,
+      color: '#922B21',
+      categoria: 'crisis-bancaria',
+      descripcion: 'La producción industrial y los precios cayeron durante varios años (deflación), lo que agravó el peso real de las deudas. El desempleo alcanzó cotas extremas: en Estados Unidos las estimaciones habituales lo sitúan en torno al 25 % en 1933, y en Alemania en cifras similares; el PIB estadounidense se contrajo cerca de una cuarta parte entre 1929 y 1933 según las series históricas. Aparecieron los poblados de chabolas apodados "Hoovervilles", las colas del pan y las migraciones internas. Las cifras exactas varían según la fuente y la metodología de la época, pero todas coinciden en una caída sin precedentes.',
+      obraIconica: 'Las colas del pan y los "Hoovervilles" de la América en paro',
+      paises: ['Estados Unidos', 'Alemania', 'Reino Unido'],
+    },
+    {
+      id: 'propagacion-global',
+      nombre: 'Propagación global y proteccionismo',
+      anioInicio: 1930,
+      anioFin: 1933,
+      color: '#7D6608',
+      categoria: 'crisis-global',
+      descripcion: 'La crisis se hizo mundial a través de los canales del comercio y las finanzas internacionales. El arancel Smoot-Hawley aprobado en Estados Unidos (1930) elevó los derechos de importación y provocó represalias; el comercio internacional se hundió (algunas estimaciones lo cifran en torno a dos tercios de su valor entre 1929 y 1933). El patrón oro, que muchos países mantenían, transmitió la deflación de unas economías a otras y limitó el margen de respuesta: los países que abandonaron antes el oro tendieron a recuperarse antes. Las reparaciones de guerra alemanas y los préstamos estadounidenses habían entrelazado las economías atlánticas.',
+      obraIconica: 'El arancel Smoot-Hawley (1930) y el hundimiento del comercio mundial',
+      paises: ['Estados Unidos', 'Reino Unido', 'Francia', 'Alemania'],
+    },
+    {
+      id: 'hoover-new-deal',
+      nombre: 'De Hoover al New Deal',
+      anioInicio: 1932,
+      anioFin: 1936,
+      color: '#1F618D',
+      categoria: 'respuestas',
+      descripcion: 'El presidente Herbert Hoover intentó respuestas limitadas y confió en buena medida en la recuperación espontánea y en el equilibrio presupuestario, política hoy muy discutida. En 1932 los votantes eligieron a Franklin D. Roosevelt, que en 1933 lanzó el New Deal: un amplio programa de regulación financiera, obras públicas, ayuda a los agricultores y creación de organismos (como la seguridad de los depósitos bancarios y agencias de empleo). Estados Unidos abandonó el patrón oro en 1933. Los historiadores debaten cuánto contribuyó realmente el New Deal a la recuperación frente a otros factores, pero coinciden en su enorme impacto institucional y social.',
+      obraIconica: 'Roosevelt firma las primeras leyes del New Deal (1933)',
+      paises: ['Estados Unidos'],
+    },
+    {
+      id: 'crisis-europa',
+      nombre: 'Crisis en Europa y ascenso del nazismo',
+      anioInicio: 1930,
+      anioFin: 1936,
+      color: '#4A235A',
+      categoria: 'crisis-global',
+      descripcion: 'Europa vivió su propia versión de la Depresión, con matices nacionales. Alemania, aún marcada por la memoria de la hiperinflación de 1923 y dependiente de los créditos estadounidenses, sufrió un paro devastador y una crisis política que erosionó la República de Weimar. En ese contexto de desempleo y desesperación, el partido nazi ganó apoyo y Adolf Hitler llegó al poder en 1933. No fue la única respuesta europea —Suecia, Reino Unido o Francia siguieron caminos distintos—, pero la relación entre la crisis económica y el auge de los autoritarismos es uno de los legados más graves de la Depresión.',
+      obraIconica: 'La caída de la República de Weimar y el ascenso del nazismo (1933)',
+      paises: ['Alemania', 'Reino Unido', 'Francia', 'Suecia'],
+    },
+    {
+      id: 'keynes-teoria-general',
+      nombre: 'Keynes y la Teoría general',
+      anioInicio: 1936,
+      anioFin: 1936,
+      color: '#117A65',
+      categoria: 'respuestas',
+      descripcion: 'En 1936 el economista británico John Maynard Keynes publicó la "Teoría general del empleo, el interés y el dinero", donde propuso que las economías pueden quedar atrapadas en un equilibrio de paro elevado por falta de demanda agregada, y que el Estado puede impulsar la economía con gasto público. Su obra ofreció un marco teórico para justificar la intervención pública y transformó la ciencia económica durante décadas. El keynesianismo no fue aceptado sin discusión: escuelas rivales (austriaca, y más tarde monetarista) cuestionaron sus diagnósticos y sus remedios. El debate sobre las causas y la salida de la Depresión sigue abierto entre historiadores económicos.',
+      obraIconica: 'La "Teoría general del empleo, el interés y el dinero" de Keynes (1936)',
+      paises: ['Reino Unido', 'Estados Unidos'],
+    },
+    {
+      id: 'rearme-guerra',
+      nombre: 'Rearme y economía de guerra',
+      anioInicio: 1936,
+      anioFin: 1939,
+      color: '#7B241C',
+      categoria: 'consecuencias',
+      descripcion: 'La recuperación fue desigual y, en muchos casos, incompleta antes de finalizar la década; en Estados Unidos una recaída en 1937-1938 mostró su fragilidad. La salida definitiva de la Depresión se asocia habitualmente con el gasto militar masivo previo y durante la Segunda Guerra Mundial: el rearme de Alemania desde mediados de los años treinta y, después, la movilización industrial de las potencias reabsorbieron el paro y dispararon la producción. Que la guerra "resolviera" la Depresión es una observación económica, no una valoración positiva: fue la expresión más extrema de gasto público, con un coste humano inmenso.',
+      obraIconica: 'La movilización industrial del rearme y la economía de guerra',
+      paises: ['Estados Unidos', 'Alemania', 'Reino Unido'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'Los felices años veinte',
+      desde: 1920,
+      hasta: 1929,
+      icono: '🎷',
+      hitosDestacados: ['Los felices años veinte', 'La burbuja bursátil'],
+      eventos: [
+        'Expansión del automóvil, la radio, la electricidad y la compra a plazos',
+        'Crecimiento industrial y consumo de masas en Estados Unidos',
+        'Desigualdad de la renta, sobreproducción y agricultura ya deprimida',
+        'Auge de la especulación bursátil y la compra de acciones al margen',
+        'Europa arrastra la posguerra, las reparaciones y las deudas de guerra',
+      ],
+    },
+    {
+      nombre: 'El Crac de Wall Street',
+      desde: 1929,
+      hasta: 1930,
+      icono: '📉',
+      hitosDestacados: ['El Crac de Wall Street'],
+      eventos: [
+        '"Jueves Negro": ventas masivas en la Bolsa de Nueva York (24 oct. 1929)',
+        '"Lunes Negro" y "Martes Negro": el mercado se desploma (28-29 oct. 1929)',
+        'Se evapora en semanas una gran parte del valor bursátil',
+        'Colapso de la confianza y del crédito tras el crac',
+        'La economía real ya se enfriaba antes del hundimiento de la Bolsa',
+      ],
+    },
+    {
+      nombre: 'La contracción bancaria',
+      desde: 1930,
+      hasta: 1933,
+      icono: '🏦',
+      hitosDestacados: ['Quiebras bancarias y contracción monetaria', 'Paro masivo y deflación'],
+      eventos: [
+        'Oleadas de pánicos bancarios y quiebra de miles de bancos',
+        'Contracción de la oferta monetaria y destrucción de crédito',
+        'Deflación de precios que agrava el peso real de las deudas',
+        'El paro se dispara hacia el 25 % en EE. UU. hacia 1933 (estimaciones)',
+        'Aparecen las colas del pan y los "Hoovervilles"',
+      ],
+    },
+    {
+      nombre: 'La crisis se hace global',
+      desde: 1933,
+      hasta: 1934,
+      icono: '🌍',
+      hitosDestacados: ['Propagación global y proteccionismo', 'Crisis en Europa y ascenso del nazismo'],
+      eventos: [
+        'El arancel Smoot-Hawley (1930) desata represalias comerciales',
+        'El comercio internacional se hunde en cadena',
+        'El patrón oro transmite la deflación entre países',
+        'Quiebra del Creditanstalt austriaco (1931) y contagio a Europa',
+        'La crisis erosiona Weimar; Hitler llega al poder en Alemania (1933)',
+      ],
+    },
+    {
+      nombre: 'Las respuestas: New Deal',
+      desde: 1934,
+      hasta: 1936,
+      icono: '🛠️',
+      hitosDestacados: ['De Hoover al New Deal'],
+      eventos: [
+        'Hoover confía en el equilibrio presupuestario; política hoy discutida',
+        'Roosevelt gana las elecciones de 1932 y lanza el New Deal en 1933',
+        'Regulación financiera, obras públicas y ayuda a los agricultores',
+        'Estados Unidos abandona el patrón oro (1933)',
+        'Seguro de depósitos y nuevas agencias de empleo público',
+      ],
+    },
+    {
+      nombre: 'Teoría, rearme y salida de la crisis',
+      desde: 1936,
+      hasta: 1939,
+      icono: '⚙️',
+      hitosDestacados: ['Keynes y la Teoría general', 'Rearme y economía de guerra'],
+      eventos: [
+        'Keynes publica la "Teoría general" (1936) y propone impulsar la demanda',
+        'Debate abierto entre escuelas sobre las causas y la salida de la crisis',
+        'Recaída económica de 1937-1938 en Estados Unidos',
+        'El rearme alemán reabsorbe el paro desde mediados de los treinta',
+        'La movilización industrial de la guerra cierra la Depresión',
+      ],
+    },
+  ],
+
+  categorias: {
+    antecedentes: 'Antecedentes',
+    crac: 'El crac de 1929',
+    'crisis-bancaria': 'Crisis bancaria y paro',
+    'crisis-global': 'Crisis global',
+    respuestas: 'Respuestas y teoría',
+    consecuencias: 'Consecuencias',
+  },
+
+  colores: {
+    antecedentes: '#D4AC0D',
+    crac: '#C0392B',
+    'crisis-bancaria': '#922B21',
+    'crisis-global': '#7D6608',
+    respuestas: '#1F618D',
+    consecuencias: '#7B241C',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'La Gran Depresión fue la crisis económica más profunda y prolongada del siglo XX. Comenzó en Estados Unidos a finales de los años veinte y se extendió por buena parte del mundo durante la década de 1930, provocando paro masivo, deflación, quiebras bancarias y un hundimiento del comercio internacional. Su relato suele contarse desde la óptica estadounidense —el Crac de Wall Street, el New Deal—, pero fue un fenómeno global con expresiones muy distintas en Europa, América Latina y Asia. Esta cronología recorre el proceso desde los "felices años veinte" hasta el rearme y la economía de guerra, presentando los grandes debates —monetaristas frente a keynesianos, patrón oro frente a devaluación— como cuestiones todavía abiertas entre los historiadores económicos, no como respuestas cerradas.',
+
+    tablaComparativa: [
+      { hito: 'Los felices años veinte', periodo: '1920-1929', categoria: 'Antecedentes', personaje: 'Sociedad de consumo de EE. UU.', aportacion: 'Prosperidad y consumo de masas sobre desequilibrios ocultos' },
+      { hito: 'El Crac de Wall Street', periodo: 'Octubre de 1929', categoria: 'El crac de 1929', personaje: 'Bolsa de Nueva York', aportacion: 'Desplome bursátil que colapsa la confianza y el crédito' },
+      { hito: 'Quiebras bancarias', periodo: '1930-1933', categoria: 'Crisis bancaria y paro', personaje: 'Reserva Federal / bancos', aportacion: 'Pánicos bancarios y contracción monetaria que agravan la crisis' },
+      { hito: 'Propagación global', periodo: '1930-1933', categoria: 'Crisis global', personaje: 'Patrón oro / Smoot-Hawley', aportacion: 'Proteccionismo y patrón oro que transmiten la deflación al mundo' },
+      { hito: 'De Hoover al New Deal', periodo: '1932-1936', categoria: 'Respuestas y teoría', personaje: 'Franklin D. Roosevelt', aportacion: 'Regulación, obras públicas y fin del patrón oro en EE. UU.' },
+      { hito: 'Keynes y la Teoría general', periodo: '1936', categoria: 'Respuestas y teoría', personaje: 'John Maynard Keynes', aportacion: 'Marco teórico de la demanda agregada y el gasto público' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiantes de Historia y Economía',
+        perfil: 'Secundaria, preparatoria y universidad',
+        texto: 'Visión ordenada de la mayor crisis económica del siglo XX: del crac de 1929 al New Deal y la salida por la guerra. Útil para entender el periodo de entreguerras, el origen de la política económica moderna y la conexión entre crisis económica y ascenso de los autoritarismos.',
+      },
+      {
+        icono: '📈',
+        titulo: 'Interesados en la economía',
+        perfil: 'Ciclos, crisis financieras y política monetaria',
+        texto: 'La Gran Depresión es el caso de estudio de referencia sobre burbujas, pánicos bancarios, deflación y trampas de liquidez. Muchas herramientas de política económica actuales —seguro de depósitos, banca central activa, estímulo fiscal— nacieron o se popularizaron como respuesta a esta crisis.',
+      },
+      {
+        icono: '🏛️',
+        titulo: 'Ciencias políticas',
+        perfil: 'Entreguerras y crisis de las democracias',
+        texto: 'La Depresión muestra cómo una crisis económica prolongada puede desestabilizar sistemas políticos: la caída de la República de Weimar y el ascenso del nazismo son el ejemplo más citado, pero no el único. Ideal para analizar la relación entre economía, desempleo y radicalización política.',
+      },
+      {
+        icono: '🌎',
+        titulo: 'Público general y curiosos',
+        perfil: 'Entender las crisis actuales por comparación',
+        texto: 'Cada crisis financiera moderna se compara con la de 1929. Conocer qué pasó realmente —y qué siguen debatiendo los expertos sobre sus causas y su salida— ayuda a leer con criterio los paralelismos que se hacen en la prensa con la de 2008 o las siguientes.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿El Crac de 1929 causó la Gran Depresión?',
+        respuesta: 'El crac fue el detonante simbólico y agravó la crisis, pero la mayoría de los historiadores económicos no lo considera la única causa. La economía real ya se estaba enfriando antes de octubre de 1929, y factores como las quiebras bancarias, la contracción monetaria, el patrón oro, el proteccionismo y la caída de la demanda tuvieron un peso decisivo en que una recesión se convirtiera en una depresión larga y global.',
+        tip: 'Distinguir "crac bursátil" (octubre de 1929) de "Gran Depresión" (la crisis de toda la década) evita el error más común.',
+      },
+      {
+        pregunta: '¿Cuánta gente se quedó sin trabajo?',
+        respuesta: 'Las cifras varían según la fuente y la metodología de la época, pero las estimaciones más citadas sitúan el paro estadounidense en torno al 25 % en 1933, con niveles comparables en Alemania. El PIB de Estados Unidos se habría contraído cerca de una cuarta parte entre 1929 y 1933. Conviene tomar estos números como órdenes de magnitud: no había estadísticas de empleo tan sistemáticas como las actuales.',
+        tip: 'Las series históricas de paro anteriores a los años cuarenta son reconstrucciones posteriores; por eso los expertos usan horquillas.',
+      },
+      {
+        pregunta: '¿Por qué se convirtió en una crisis mundial?',
+        respuesta: 'Porque las economías estaban entrelazadas por el comercio, los préstamos internacionales y, sobre todo, el patrón oro, que transmitía la deflación de unos países a otros. El arancel estadounidense Smoot-Hawley (1930) desató una guerra comercial que hundió el comercio internacional. Además, Europa dependía de los créditos de Estados Unidos y de las reparaciones de guerra, de modo que la crisis se propagó por el Atlántico con rapidez.',
+        tip: 'Los países que abandonaron antes el patrón oro tendieron a recuperarse antes, una de las pocas regularidades en que coinciden los estudios.',
+      },
+      {
+        pregunta: '¿El New Deal sacó a Estados Unidos de la Depresión?',
+        respuesta: 'Es un debate abierto. El New Deal transformó las instituciones (regulación bancaria, seguro de depósitos, obras públicas, ayudas), redujo el sufrimiento social y cambió el papel del Estado en la economía. Pero los economistas discrepan sobre cuánto aceleró la recuperación: la recaída de 1937-1938 sugiere que fue incompleta, y muchos atribuyen la salida definitiva al gasto militar de finales de los treinta y de la guerra.',
+        tip: 'La pregunta separa a las grandes escuelas económicas; no hay una respuesta consensuada, sino interpretaciones enfrentadas.',
+      },
+      {
+        pregunta: '¿Qué relación hay entre la crisis y el ascenso del nazismo?',
+        respuesta: 'La Depresión provocó en Alemania un paro devastador y una crisis política que debilitó la República de Weimar, ya marcada por el recuerdo de la hiperinflación de 1923 y por las reparaciones de guerra. En ese clima de desempleo y desesperación, el partido nazi ganó apoyo y Hitler alcanzó el poder en 1933. La crisis económica no "causó" mecánicamente el nazismo, pero fue un factor central que otros países afrontaron por vías democráticas distintas.',
+        tip: 'La comparación entre respuestas nacionales (Alemania, Reino Unido, Suecia, EE. UU.) muestra que la crisis no llevaba a un único desenlace político.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Observa las fases de color en la Línea del Tiempo',
+        cuerpo: 'El dorado marca los antecedentes de prosperidad y burbuja; el rojo, el crac de 1929; los tonos granate, la crisis bancaria y el paro; el ocre y el morado, la dimensión global; el azul, las respuestas; y el granate oscuro, la salida por el rearme. Fíjate en lo rápido que se encadenan los hitos entre 1929 y 1933.',
+      },
+      {
+        titulo: 'Separa el crac de la Depresión',
+        cuerpo: 'Haz clic en "El Crac de Wall Street" y luego en "Quiebras bancarias y contracción monetaria". Verás que el hundimiento bursátil de octubre de 1929 fue un episodio breve, mientras que la crisis bancaria y el paro se prolongaron durante años: eso es lo que convierte una caída en una depresión.',
+      },
+      {
+        titulo: 'Sigue el hilo de la dimensión global',
+        cuerpo: 'Lee juntos "Propagación global y proteccionismo" y "Crisis en Europa y ascenso del nazismo". La misma crisis tuvo caras muy distintas según el país: el patrón oro y los aranceles la transmitieron, pero cada nación respondió de una manera.',
+      },
+      {
+        titulo: 'Compara las respuestas',
+        cuerpo: 'Contrasta "De Hoover al New Deal" con "Keynes y la Teoría general". Uno es la política concreta de un gobierno; el otro, el marco teórico que intentó explicar por qué las economías pueden quedar atrapadas en el paro. Observa que Keynes "propuso" un enfoque, no lo "demostró" de forma cerrada.',
+      },
+      {
+        titulo: 'Termina con el Contexto Histórico',
+        cuerpo: 'Las 6 eras muestran la secuencia completa: prosperidad, crac, contracción bancaria, crisis global, respuestas y salida. La última era conecta la Depresión con el rearme y la Segunda Guerra Mundial, recordando que el final de la crisis vino acompañado de la mayor catástrofe del siglo.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '📉',
+        texto: 'El Crac de 1929 y la Gran Depresión no son lo mismo. El crac fue un desplome bursátil de unas semanas en octubre de 1929; la Depresión fue la crisis económica de toda la década de 1930. Confundirlos lleva a atribuir toda la tragedia a la Bolsa, cuando los bancos, la deflación y el patrón oro pesaron tanto o más.',
+      },
+      {
+        icono: '⚖️',
+        texto: 'Las causas de la Depresión siguen debatiéndose. Monetaristas (Friedman y Schwartz) subrayan la contracción monetaria y los errores de la Reserva Federal; keynesianos, la caída de la demanda; otros, el patrón oro. No hay un veredicto único: es uno de los grandes debates abiertos de la historia económica.',
+      },
+      {
+        icono: '🥇',
+        texto: 'El patrón oro fue clave para entender la crisis. Ataba las monedas al oro y transmitía la deflación de país en país; abandonarlo daba margen para devaluar y estimular la economía. Por eso los estudios observan que quienes salieron antes del oro solieron recuperarse antes.',
+      },
+      {
+        icono: '🕊️',
+        texto: 'Decir que "la guerra sacó al mundo de la Depresión" es una constatación económica, no un elogio. El gasto militar masivo reabsorbió el paro, pero al precio de la mayor catástrofe humana del siglo. Es un ejemplo extremo —y trágico— de estímulo público, no un modelo a imitar.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Creer que el crac bursátil fue la causa única',
+        cuerpo: 'El desplome de Wall Street fue el detonante visible, pero la economía ya se enfriaba antes y la crisis se profundizó por las quiebras bancarias, la contracción del crédito, la deflación, el patrón oro y el proteccionismo. Reducir la Gran Depresión a "la Bolsa cayó" simplifica en exceso un proceso de muchas causas.',
+      },
+      {
+        titulo: 'Contar la Depresión solo desde Estados Unidos',
+        cuerpo: 'La mayor parte de la narrativa popular es estadounidense (crac, Hoovervilles, New Deal), pero la crisis fue global y tuvo formas distintas en Europa, América Latina y Asia. Alemania, Reino Unido, Francia o Suecia la vivieron y la afrontaron de maneras muy diferentes, con consecuencias políticas dispares.',
+      },
+      {
+        titulo: 'Dar por zanjado el debate sobre las causas y la salida',
+        cuerpo: 'Todavía no hay consenso pleno sobre qué pesó más en la crisis ni sobre qué la resolvió. Presentar como hecho cerrado que "el New Deal la solucionó" o que "todo fue culpa de la Reserva Federal" ignora que se trata de interpretaciones en disputa entre escuelas económicas.',
+      },
+      {
+        titulo: 'Fiarse de cifras redondas sin fuente',
+        cuerpo: 'Circulan datos muy precisos ("el paro fue del 25 %", "el comercio cayó dos tercios") como si fueran incuestionables. Son estimaciones útiles, pero reconstruidas a posteriori y con márgenes de error; conviene tomarlas como órdenes de magnitud y citar la fuente cuando se usen.',
+      },
+    ],
+  },
+};

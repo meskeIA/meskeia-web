@@ -1,0 +1,366 @@
+import type { HistoriaData } from './types';
+
+export const pesteNegra: HistoriaData = {
+  slug: 'peste-negra',
+  titulo: 'La Peste Negra: La Mayor Catástrofe Demográfica de Europa',
+  subtitulo: 'De la crisis del siglo XIV a la pandemia que cambió Europa para siempre: origen, expansión y consecuencias de la Muerte Negra',
+  descripcionSEO: 'Cronología interactiva de la Peste Negra (c. 1330-1400): el contexto de crisis del siglo XIV, el origen en Asia Central de Yersinia pestis, el sitio de Caffa (1346), la llegada a Mesina (1347), la expansión imparable (1348-1351), la mortandad estimada por los historiadores, las respuestas sociales (cuarentenas, flagelantes, pogromos) y las consecuencias que transformaron la Europa medieval, en 10 hitos y 6 eras.',
+  keywords: [
+    'peste negra cronología historia siglo XIV',
+    'yersinia pestis muerte negra pandemia medieval',
+    'sitio de caffa mesina 1347 barcos genoveses',
+    'mortandad peste negra estimaciones benedictow',
+    'flagelantes pogromos antijudíos chivo expiatorio',
+    'consecuencias peste negra feudalismo salarios campesinos',
+  ],
+  anioInicio: 1300,
+  anioFin: 1400,
+
+  hitos: [
+    {
+      id: 'crisis-siglo-xiv',
+      nombre: 'La crisis del siglo XIV',
+      anioInicio: 1300,
+      anioFin: 1340,
+      color: '#8B7355',
+      categoria: 'contexto',
+      descripcion: 'Antes de la peste, Europa vivía ya una época frágil. Tras siglos de crecimiento, la población había alcanzado los límites que la agricultura medieval podía sostener, un fenómeno que los historiadores relacionan con una situación de sobrepoblación relativa. La Pequeña Edad de Hielo enfrió el clima y acortó las cosechas. La Gran Hambruna de 1315-1317 —provocada por lluvias torrenciales y malas cosechas encadenadas— mató de hambre a una parte importante de la población del norte de Europa. Una sociedad debilitada, malnutrida y densamente poblada era terreno propicio para una catástrofe sanitaria.',
+      obraIconica: 'La Gran Hambruna de 1315-1317 y la Pequeña Edad de Hielo',
+      paises: ['Europa', 'Norte de Europa', 'Inglaterra', 'Francia', 'Sacro Imperio'],
+    },
+    {
+      id: 'origen-asia',
+      nombre: 'El origen en Asia Central',
+      anioInicio: 1330,
+      anioFin: 1345,
+      color: '#7D6608',
+      categoria: 'origen',
+      descripcion: 'El agente causante fue la bacteria Yersinia pestis, identificada científicamente solo en 1894 por Alexandre Yersin. Los estudios genéticos y paleomicrobiológicos actuales sitúan el foco de origen probable en Asia Central, en torno a la región de Tian Shan; hallazgos en cementerios cercanos al lago Issyk-Kul (actual Kirguistán) fechados hacia 1338-1339 apuntan a un brote temprano. La bacteria circulaba entre roedores y se transmitía sobre todo por la picadura de pulgas infectadas. Las rutas comerciales que atravesaban el Imperio mongol, más seguras y transitadas que nunca, facilitaron que la enfermedad viajara hacia el oeste.',
+      obraIconica: 'Yersinia pestis y los focos de roedores de Asia Central',
+      paises: ['Asia Central', 'Kirguistán', 'Estepa mongola', 'China'],
+    },
+    {
+      id: 'rutas-mongolas',
+      nombre: 'Difusión por las rutas mongolas',
+      anioInicio: 1340,
+      anioFin: 1346,
+      color: '#7D6608',
+      categoria: 'origen',
+      descripcion: 'La llamada Pax Mongolica había unificado buena parte de Eurasia bajo un mismo sistema de rutas comerciales que conectaban China con el mar Negro. Por esas rutas viajaban seda, especias y metales preciosos, pero también, sin saberlo, roedores y pulgas portadoras del bacilo. La enfermedad avanzó a lo largo de la Ruta de la Seda y sus ramificaciones caravaneras hasta alcanzar los puertos comerciales del mar Negro y del Caspio, donde mercaderes italianos —sobre todo genoveses y venecianos— tenían colonias activas. El comercio que había enriquecido a Europa se convirtió en la vía de entrada de la pandemia.',
+      obraIconica: 'La Ruta de la Seda bajo la Pax Mongolica',
+      paises: ['Asia Central', 'Persia', 'Crimea', 'Mar Negro', 'Horda de Oro'],
+    },
+    {
+      id: 'caffa',
+      nombre: 'El sitio de Caffa',
+      anioInicio: 1346,
+      anioFin: 1347,
+      color: '#B03A2E',
+      categoria: 'llegada',
+      descripcion: 'La colonia genovesa de Caffa (actual Feodosia, en Crimea) fue asediada por las tropas mongolas de la Horda de Oro. Según el relato del notario Gabriele de Mussis, escrito años después y no como testigo directo, los sitiadores habrían catapultado cadáveres apestados por encima de las murallas, en lo que a veces se cita como un temprano episodio de guerra biológica. Los historiadores tratan este relato con cautela: la transmisión pudo deberse más a las pulgas y los roedores del campamento que al lanzamiento de cuerpos. En cualquier caso, los mercaderes genoveses huyeron por mar llevando la enfermedad a bordo de sus galeras.',
+      obraIconica: 'El asedio de Caffa y la huida de las galeras genovesas (1346-1347)',
+      paises: ['Crimea', 'Génova', 'Horda de Oro', 'Mar Negro'],
+    },
+    {
+      id: 'llegada-europa',
+      nombre: 'La llegada a Europa: Mesina',
+      anioInicio: 1347,
+      anioFin: 1348,
+      color: '#B03A2E',
+      categoria: 'llegada',
+      descripcion: 'En octubre de 1347, una flotilla de galeras genovesas procedentes de Oriente atracó en el puerto de Mesina, en Sicilia. La crónica del franciscano Michele da Piazza describe a marineros moribundos y una enfermedad que se propagó con rapidez espeluznante entre la población. Las autoridades expulsaron los barcos, pero era demasiado tarde: la peste ya había desembarcado. Desde Sicilia y los puertos italianos, y a través de otras vías marítimas como Marsella, la enfermedad penetró en el continente. Europa entraba en la mayor emergencia sanitaria de su historia sin comprender qué la causaba ni cómo detenerla.',
+      obraIconica: 'La llegada de las galeras genovesas a Mesina (octubre de 1347)',
+      paises: ['Sicilia', 'Italia', 'Francia', 'Génova', 'Marsella'],
+    },
+    {
+      id: 'expansion',
+      nombre: 'La expansión imparable',
+      anioInicio: 1348,
+      anioFin: 1351,
+      color: '#943126',
+      categoria: 'expansion',
+      descripcion: 'En apenas cuatro años la peste barrió casi toda Europa siguiendo las rutas comerciales y los ríos. En 1348 asoló Italia, el sur de Francia y la Península Ibérica; ese mismo año Giovanni Boccaccio situó en la Florencia apestada el marco de su Decamerón. En 1349 alcanzó el norte de Francia, Inglaterra y los Países Bajos; en 1350-1351 llegó a Escandinavia, el Sacro Imperio, Polonia y Rusia. Las formas bubónica, neumónica y septicémica de la enfermedad se combinaron para dar una letalidad extrema. Ciudades enteras quedaron semivacías y muchas aldeas fueron abandonadas por completo.',
+      obraIconica: 'El "Decamerón" de Boccaccio, ambientado en la Florencia de 1348',
+      paises: ['Italia', 'Francia', 'España', 'Inglaterra', 'Sacro Imperio', 'Escandinavia', 'Rusia'],
+    },
+    {
+      id: 'mortandad',
+      nombre: 'La gran mortandad',
+      anioInicio: 1347,
+      anioFin: 1353,
+      color: '#641E16',
+      categoria: 'mortandad',
+      descripcion: 'La cifra de víctimas es objeto de estudio y revisión constante. Las estimaciones de los historiadores para el conjunto de Europa oscilan habitualmente entre un 30% y un 60% de la población: el historiador noruego Ole J. Benedictow ha defendido cifras en la parte alta de esa horquilla, mientras que otros investigadores manejan valores más moderados y subrayan las grandes diferencias regionales. En términos absolutos suele hablarse de decenas de millones de muertos en Europa y aún más en el conjunto de Eurasia. Fuera cual fuera la cifra exacta, fue con diferencia la mayor catástrofe demográfica documentada en la historia europea.',
+      obraIconica: 'Las estimaciones demográficas de historiadores como Ole J. Benedictow',
+      paises: ['Europa', 'Norte de África', 'Oriente Próximo', 'Eurasia'],
+    },
+    {
+      id: 'respuestas',
+      nombre: 'Las respuestas de la época',
+      anioInicio: 1348,
+      anioFin: 1360,
+      color: '#5B2C6F',
+      categoria: 'respuestas',
+      descripcion: 'Sin conocer la causa real, la sociedad medieval reaccionó de formas muy diversas. La medicina, guiada por la teoría de los miasmas (aires corrompidos), recomendaba huir, purificar el aire y evitar el contagio. Algunas ciudades italianas ensayaron las primeras medidas de aislamiento: Ragusa (Dubrovnik) impuso en 1377 un periodo de retención de barcos y viajeros, la trentina de treinta días que después se ampliaría a cuarenta —origen de la palabra "cuarentena". En paralelo surgieron respuestas religiosas y sociales extremas: procesiones de flagelantes que se azotaban en penitencia, y, trágicamente, pogromos contra las comunidades judías, acusadas sin fundamento de envenenar los pozos.',
+      obraIconica: 'La cuarentena de Ragusa (1377) y las procesiones de flagelantes',
+      paises: ['Italia', 'Ragusa', 'Sacro Imperio', 'Francia', 'Europa'],
+    },
+    {
+      id: 'pogromos',
+      nombre: 'Chivos expiatorios: los pogromos',
+      anioInicio: 1348,
+      anioFin: 1351,
+      color: '#5B2C6F',
+      categoria: 'respuestas',
+      descripcion: 'La búsqueda desesperada de un culpable derivó en una de las páginas más oscuras de la Edad Media. Corrió el rumor infundado de que las comunidades judías habían envenenado los pozos para propagar la enfermedad. A pesar de que el papa Clemente VI publicó bulas (1348) defendiendo su inocencia y señalando que los propios judíos morían de peste, en numerosas ciudades del Sacro Imperio se produjeron matanzas: la masacre de Estrasburgo de febrero de 1349, previa incluso a la llegada de la peste a la ciudad, es uno de los casos mejor documentados. Estos pogromos son hechos históricos que reflejan cómo el miedo colectivo puede convertirse en violencia contra una minoría señalada como chivo expiatorio.',
+      obraIconica: 'Las bulas de Clemente VI y la masacre de Estrasburgo (1349)',
+      paises: ['Sacro Imperio', 'Estrasburgo', 'Renania', 'Suiza', 'Francia'],
+    },
+    {
+      id: 'consecuencias-rebrotes',
+      nombre: 'Consecuencias y rebrotes',
+      anioInicio: 1351,
+      anioFin: 1400,
+      color: '#1F618D',
+      categoria: 'consecuencias',
+      descripcion: 'La peste no desapareció tras la gran oleada: volvió en brotes recurrentes (1361, 1369, 1374 y muchos más) durante siglos, lo que frenó la recuperación demográfica hasta bien entrado el siglo XVI. Sus consecuencias reconfiguraron Europa. La drástica escasez de mano de obra dio a los supervivientes un poder de negociación inédito: los salarios subieron y muchos señores intentaron frenarlo con leyes como el Estatuto de Trabajadores inglés (1351), lo que alimentó tensiones. Historiadores debaten el peso relativo de la peste, pero suele vincularse al debilitamiento gradual de la servidumbre en Europa occidental y a revueltas campesinas como la Jacquerie francesa (1358) y la Revuelta de los Campesinos inglesa (1381).',
+      obraIconica: 'El Estatuto de Trabajadores (1351) y la Revuelta Campesina inglesa (1381)',
+      paises: ['Inglaterra', 'Francia', 'Italia', 'Europa occidental'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'Vísperas de la catástrofe',
+      desde: 1300,
+      hasta: 1340,
+      icono: '🌧️',
+      hitosDestacados: ['La crisis del siglo XIV'],
+      eventos: [
+        'La población europea alcanza los límites de la agricultura medieval',
+        'La Pequeña Edad de Hielo enfría el clima y reduce las cosechas',
+        'La Gran Hambruna de 1315-1317 golpea al norte de Europa',
+        'Una sociedad malnutrida y densamente poblada, vulnerable a la epidemia',
+      ],
+    },
+    {
+      nombre: 'Origen y camino hacia Occidente',
+      desde: 1340,
+      hasta: 1347,
+      icono: '🐀',
+      hitosDestacados: ['El origen en Asia Central', 'Difusión por las rutas mongolas'],
+      eventos: [
+        'Brote temprano documentado cerca del lago Issyk-Kul (c. 1338-1339)',
+        'Yersinia pestis circula entre roedores y pulgas de Asia Central',
+        'La Pax Mongolica mantiene abiertas las rutas comerciales de Eurasia',
+        'La enfermedad avanza por la Ruta de la Seda hacia el mar Negro',
+      ],
+    },
+    {
+      nombre: 'La llegada a Europa',
+      desde: 1347,
+      hasta: 1348,
+      icono: '⛵',
+      hitosDestacados: ['El sitio de Caffa', 'La llegada a Europa: Mesina'],
+      eventos: [
+        'Asedio de la colonia genovesa de Caffa en Crimea (1346-1347)',
+        'Las galeras genovesas huyen por mar con la enfermedad a bordo',
+        'Octubre de 1347: la flota atraca en Mesina (Sicilia)',
+        'La peste penetra en Italia y por puertos como Marsella',
+      ],
+    },
+    {
+      nombre: 'La gran pandemia',
+      desde: 1348,
+      hasta: 1353,
+      icono: '💀',
+      hitosDestacados: ['La expansión imparable', 'La gran mortandad'],
+      eventos: [
+        '1348: la peste asola Italia, el sur de Francia y la Península Ibérica',
+        'Boccaccio ambienta el "Decamerón" en la Florencia apestada (1348)',
+        '1349: alcanza Inglaterra, el norte de Francia y los Países Bajos',
+        '1350-1351: llega a Escandinavia, el Sacro Imperio, Polonia y Rusia',
+        'Los historiadores estiman entre un 30% y un 60% de mortandad europea',
+      ],
+    },
+    {
+      nombre: 'Miedo, penitencia y violencia',
+      desde: 1348,
+      hasta: 1360,
+      icono: '⚖️',
+      hitosDestacados: ['Las respuestas de la época', 'Chivos expiatorios: los pogromos'],
+      eventos: [
+        'La medicina, guiada por la teoría miasmática, recomienda huir y purificar el aire',
+        'Ragusa (Dubrovnik) ensaya el aislamiento de barcos: origen de la cuarentena (1377)',
+        'Procesiones de flagelantes recorren Europa como penitencia colectiva',
+        'Bulas de Clemente VI defienden la inocencia de las comunidades judías (1348)',
+        'Pogromos antijudíos: la masacre de Estrasburgo (1349)',
+      ],
+    },
+    {
+      nombre: 'Secuelas y transformación',
+      desde: 1353,
+      hasta: 1400,
+      icono: '🌾',
+      hitosDestacados: ['Consecuencias y rebrotes'],
+      eventos: [
+        'Rebrotes recurrentes (1361, 1369, 1374...) frenan la recuperación demográfica',
+        'La escasez de mano de obra impulsa una subida general de los salarios',
+        'El Estatuto de Trabajadores inglés intenta congelar los salarios (1351)',
+        'Debilitamiento gradual de la servidumbre en Europa occidental',
+        'Revueltas campesinas: la Jacquerie (1358) y la Revuelta inglesa (1381)',
+      ],
+    },
+  ],
+
+  categorias: {
+    contexto: 'Contexto de crisis',
+    origen: 'Origen y difusión',
+    llegada: 'Llegada a Europa',
+    expansion: 'Expansión',
+    mortandad: 'Mortandad',
+    respuestas: 'Respuestas de la época',
+    consecuencias: 'Consecuencias',
+  },
+
+  colores: {
+    contexto: '#8B7355',
+    origen: '#7D6608',
+    llegada: '#B03A2E',
+    expansion: '#943126',
+    mortandad: '#641E16',
+    respuestas: '#5B2C6F',
+    consecuencias: '#1F618D',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'La Peste Negra que asoló Europa entre 1347 y 1351 fue la mayor catástrofe demográfica documentada de la historia europea. Causada por la bacteria Yersinia pestis —cuyo papel solo se comprendería siglos después—, llegó desde Asia Central a través de las rutas comerciales y, en apenas cuatro años, mató a una proporción de la población que los historiadores sitúan habitualmente entre el 30% y el 60%. Pero la peste fue mucho más que una cifra de muertos: transformó la economía, la sociedad y la mentalidad del Occidente medieval. Esta cronología recorre el proceso completo, desde la frágil Europa anterior a la pandemia hasta las profundas secuelas que reconfiguraron el mundo feudal, tratando con rigor tanto la enfermedad como las respuestas —algunas solidarias, otras trágicas— que provocó.',
+
+    tablaComparativa: [
+      { hito: 'La crisis del siglo XIV', periodo: 'c. 1300-1340', categoria: 'Contexto de crisis', personaje: 'Sociedad rural europea', aportacion: 'Sobrepoblación, Pequeña Edad de Hielo y Gran Hambruna preparan el desastre' },
+      { hito: 'El origen en Asia Central', periodo: 'c. 1330-1345', categoria: 'Origen y difusión', personaje: 'Yersinia pestis', aportacion: 'Foco probable en la región de Tian Shan; hallazgos en Issyk-Kul' },
+      { hito: 'La llegada a Europa: Mesina', periodo: '1347', categoria: 'Llegada a Europa', personaje: 'Galeras genovesas', aportacion: 'Puerta de entrada de la pandemia al continente por el Mediterráneo' },
+      { hito: 'La expansión imparable', periodo: '1348-1351', categoria: 'Expansión', personaje: 'Rutas comerciales y fluviales', aportacion: 'En cuatro años la peste recorre casi toda Europa' },
+      { hito: 'Chivos expiatorios: los pogromos', periodo: '1348-1351', categoria: 'Respuestas de la época', personaje: 'Comunidades judías / Clemente VI', aportacion: 'El miedo colectivo desata violencia contra una minoría inocente' },
+      { hito: 'Consecuencias y rebrotes', periodo: '1351-1400', categoria: 'Consecuencias', personaje: 'Campesinos y señores', aportacion: 'Subida de salarios, tensiones feudales y revueltas campesinas' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiantes de Historia',
+        perfil: 'Secundaria, preparatoria y universidad',
+        texto: 'Visión ordenada de la mayor pandemia de la Edad Media, clave para entender la crisis del siglo XIV y la transición hacia el fin del mundo feudal. Útil para situar causas, expansión y consecuencias sin caer en tópicos ni cifras redondas sin fuente.',
+      },
+      {
+        icono: '🦠',
+        titulo: 'Interesados en la historia de la medicina',
+        perfil: 'Epidemias, salud pública y ciencia',
+        texto: 'La Peste Negra muestra el choque entre la medicina medieval (teoría de los miasmas) y lo que hoy sabemos por la bacteriología. Ilustra el origen histórico de medidas de salud pública como la cuarentena, mucho antes de conocerse el agente causante.',
+      },
+      {
+        icono: '📈',
+        titulo: 'Economía e historia social',
+        perfil: 'Cambio económico y estructuras sociales',
+        texto: 'Un caso de manual sobre cómo un shock demográfico altera una economía: escasez de mano de obra, subida de salarios, tensiones entre señores y campesinos y debilitamiento gradual de la servidumbre en Europa occidental.',
+      },
+      {
+        icono: '📚',
+        titulo: 'Lectores de literatura e historia cultural',
+        perfil: 'Mentalidades y cultura medieval',
+        texto: 'De la Florencia del "Decamerón" a las danzas de la muerte, la peste dejó una huella profunda en el arte y la mentalidad. Esta cronología ayuda a contextualizar por qué la muerte se volvió tan central en la cultura del Occidente tardomedieval.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Qué causó realmente la Peste Negra?',
+        respuesta: 'La causa fue la bacteria Yersinia pestis, transmitida sobre todo por pulgas asociadas a roedores. Sin embargo, esto solo se descubrió en 1894, cuando Alexandre Yersin la identificó. Los europeos del siglo XIV no conocían el agente y la explicaban mediante la teoría de los miasmas (aires corrompidos) o como castigo divino. Los estudios genéticos modernos han confirmado la presencia de esta bacteria en restos de víctimas de la época.',
+        tip: 'La palabra "peste" se usaba entonces para muchas epidemias; el nombre "Peste Negra" se popularizó siglos después.',
+      },
+      {
+        pregunta: '¿Cuánta gente murió en la Peste Negra?',
+        respuesta: 'No hay una cifra exacta, y los historiadores manejan un rango. Para el conjunto de Europa, las estimaciones oscilan habitualmente entre el 30% y el 60% de la población. El historiador Ole J. Benedictow ha defendido cifras en la parte alta; otros investigadores prefieren valores más moderados y subrayan las diferencias entre regiones. En cifras absolutas suele hablarse de decenas de millones de muertos en pocos años.',
+        tip: 'Desconfía de las cifras redondas sueltas: cualquier dato serio va acompañado de una horquilla y de la fuente que lo propone.',
+      },
+      {
+        pregunta: '¿De dónde vino la peste y cómo llegó a Europa?',
+        respuesta: 'Los estudios actuales sitúan su origen probable en Asia Central, con un brote temprano documentado hacia 1338-1339 cerca del lago Issyk-Kul. Viajó hacia el oeste por las rutas comerciales de la Pax Mongolica hasta el mar Negro. Desde la colonia genovesa de Caffa, en Crimea, las galeras la llevaron por mar hasta Mesina (Sicilia) en octubre de 1347, y desde allí se extendió por todo el continente.',
+        tip: 'El mismo comercio que había enriquecido a las ciudades italianas fue la vía de entrada de la pandemia.',
+      },
+      {
+        pregunta: '¿Por qué se persiguió a las comunidades judías?',
+        respuesta: 'Ante una catástrofe incomprensible, se buscó un culpable. Corrió el bulo, sin ningún fundamento, de que los judíos habían envenenado los pozos. Esto derivó en pogromos, especialmente en el Sacro Imperio, como la matanza de Estrasburgo de 1349. Es un hecho histórico bien documentado que ilustra cómo el miedo colectivo puede transformarse en violencia contra una minoría. El propio papa Clemente VI publicó bulas defendiendo su inocencia, señalando que los judíos también morían de peste.',
+        tip: 'Estos episodios se estudian hoy como ejemplo de mecanismo de chivo expiatorio en tiempos de crisis.',
+      },
+      {
+        pregunta: '¿Qué consecuencias tuvo a largo plazo?',
+        respuesta: 'La brusca caída de población dejó escasez de mano de obra, lo que dio a los supervivientes mayor poder de negociación: los salarios subieron y muchos señores intentaron frenarlo por ley. Los historiadores debaten su peso exacto, pero la peste suele vincularse al debilitamiento gradual de la servidumbre en Europa occidental y a revueltas campesinas como la inglesa de 1381. Los rebrotes recurrentes frenaron la recuperación demográfica durante más de un siglo.',
+        tip: 'La peste no explica por sí sola el fin del feudalismo, pero fue un acelerador de cambios que ya estaban en marcha.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Empieza por el contexto en la Línea del Tiempo',
+        cuerpo: 'Antes de la peste hay una Europa ya en crisis. Fíjate en el primer bloque, "La crisis del siglo XIV": la Pequeña Edad de Hielo y la Gran Hambruna de 1315-1317 dejaron una población debilitada. La catástrofe no cayó sobre una sociedad sana.',
+      },
+      {
+        titulo: 'Sigue el camino de la enfermedad hacia el oeste',
+        cuerpo: 'Haz clic en "El origen en Asia Central" y luego en "Difusión por las rutas mongolas". Observa cómo la enfermedad viajó desde los focos de roedores de Asia hasta el mar Negro aprovechando las rutas comerciales de la época.',
+      },
+      {
+        titulo: 'Identifica la puerta de entrada a Europa',
+        cuerpo: 'Los hitos "El sitio de Caffa" y "La llegada a Europa: Mesina" marcan el momento clave: octubre de 1347. Distingue el relato del contagio de Caffa (que los historiadores tratan con cautela) del hecho comprobado de la llegada de las galeras a Sicilia.',
+      },
+      {
+        titulo: 'Observa la velocidad de la expansión',
+        cuerpo: 'Compara las fechas de "La expansión imparable": en apenas cuatro años (1348-1351) la peste recorrió casi toda Europa. Cruza este dato con la categoría "Mortandad" para dimensionar el impacto, siempre recordando que las cifras son estimaciones con horquilla.',
+      },
+      {
+        titulo: 'Termina con las respuestas y las secuelas',
+        cuerpo: 'La era "Miedo, penitencia y violencia" reúne las cuarentenas, los flagelantes y los pogromos. La era "Secuelas y transformación" muestra cómo la peste alteró la economía y la sociedad. Léelas juntas para entender que la pandemia cambió Europa mucho más allá del número de víctimas.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '🦠',
+        texto: 'El agente de la peste, Yersinia pestis, no se identificó hasta 1894. Durante siglos, la enfermedad se combatió a ciegas: los remedios de la época partían de la teoría de los miasmas, no de los gérmenes, que aún no se conocían.',
+      },
+      {
+        icono: '⚓',
+        texto: 'La palabra "cuarentena" viene del aislamiento de barcos y viajeros durante cuaranta días. Ragusa (la actual Dubrovnik) fue pionera en 1377 con un periodo de treinta días (trentina), luego ampliado a cuarenta. Fue una de las primeras medidas de salud pública organizada.',
+      },
+      {
+        icono: '📖',
+        texto: 'Giovanni Boccaccio ambientó su "Decamerón" en la Florencia de 1348: diez jóvenes se refugian del contagio en el campo y se cuentan historias. Es una de las fuentes literarias más valiosas para conocer cómo se vivió la peste desde dentro.',
+      },
+      {
+        icono: '💰',
+        texto: 'Tras la peste, la falta de trabajadores hizo subir los salarios. Leyes como el Estatuto de Trabajadores inglés (1351) trataron de congelarlos, generando un malestar que desembocó en revueltas campesinas. Una catástrofe demográfica puede reconfigurar toda una economía.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Dar una cifra exacta de muertos como si fuera un dato cerrado',
+        cuerpo: 'No existe una cifra única y verificable. Los historiadores manejan un rango amplio (habitualmente 30%-60% para Europa) con grandes diferencias regionales. Afirmar "murió un tercio de Europa" o "murió la mitad" sin matiz simplifica un debate que sigue abierto y que depende de fuentes fragmentarias.',
+      },
+      {
+        titulo: 'Ridiculizar la medicina medieval',
+        cuerpo: 'Los médicos del siglo XIV no conocían las bacterias porque el microscopio y la teoría microbiana llegarían siglos después. Trabajaban con el marco de la teoría de los miasmas, coherente con el conocimiento de su tiempo. Distinguir lo que sabían de lo que sabemos hoy es más honesto que juzgarlos con criterios anacrónicos.',
+      },
+      {
+        titulo: 'Presentar el contagio de Caffa como un hecho probado',
+        cuerpo: 'El relato de los cadáveres catapultados sobre Caffa procede de una única fuente tardía (Gabriele de Mussis) que no fue testigo directo. Muchos historiadores dudan de que fuera así la transmisión, que pudo deberse a las pulgas y roedores del campamento. Conviene presentarlo como relato debatido, no como certeza.',
+      },
+      {
+        titulo: 'Convertir los pogromos en una anécdota o en sensacionalismo',
+        cuerpo: 'Las matanzas de comunidades judías son un hecho histórico grave que merece contexto, no espectáculo ni omisión. Explicarlas como un mecanismo de chivo expiatorio en tiempos de miedo, y recordar que autoridades como el papa Clemente VI las condenaron, es más riguroso que narrarlas con tono morboso o pasarlas por alto.',
+      },
+    ],
+  },
+};

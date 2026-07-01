@@ -969,6 +969,16 @@ export const implementedAppsUrls = [
   "/visualizador-historia/otomano/",             // Imperio Otomano 1299→1922, 10 hitos, 6 eras
   "/visualizador-historia/mongol/",              // Imperio Mongol 1206→1368, 10 hitos, 6 eras
   "/visualizador-historia/revolucion-francesa/", // Revolución Francesa 1789→1815, 10 hitos, 6 eras
+  "/visualizador-historia/revolucion-industrial/", // Revolución Industrial 1700→presente, 10 hitos, 6 eras
+  "/visualizador-historia/revolucion-cientifica/", // Revolución Científica 1543→1727, 10 hitos, 6 eras
+  "/visualizador-historia/descolonizacion/", // Descolonización 1945→1997, 10 hitos, 6 eras
+  "/visualizador-historia/revolucion-rusa/", // Revolución Rusa 1905→1924, 10 hitos, 6 eras
+  "/visualizador-historia/gran-depresion/", // Gran Depresión 1920→1939, 10 hitos, 6 eras
+  "/visualizador-historia/independencias-hispanoamericanas/", // Independencias hispanoamericanas 1765→1839, 10 hitos, 6 eras
+  "/visualizador-historia/peste-negra/", // Peste Negra 1300→1400, 10 hitos, 6 eras
+  "/visualizador-historia/caida-imperio-romano/", // Caída del Imperio Romano 180→476, 10 hitos, 6 eras
+  "/visualizador-historia/caida-constantinopla/", // Caída de Constantinopla 1202→1461, 10 hitos, 6 eras
+  "/visualizador-historia/revoluciones-1848/", // Revoluciones de 1848 1815→1852, 10 hitos, 6 eras
   "/visualizador-historia/imperio-persa/",       // Imperio Persa Aqueménida -550→-330, 10 hitos, 6 eras
   "/visualizador-historia/japon/",               // Historia de Japón 710→1868, 10 hitos, 6 eras
   "/visualizador-historia/china-dinastias/",     // Grandes Dinastías Chinas -221→1912, 10 hitos, 6 eras

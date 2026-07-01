@@ -1,0 +1,372 @@
+import type { HistoriaData } from './types';
+
+export const revoluciones1848: HistoriaData = {
+  slug: 'revoluciones-1848',
+  titulo: 'Las Revoluciones de 1848: La Primavera de los Pueblos',
+  subtitulo: 'La mayor ola revolucionaria de la historia europea: liberalismo, nacionalismo y cuestión social sacuden casi todo un continente en un solo año',
+  descripcionSEO: 'Cronología interactiva de las Revoluciones de 1848, la "Primavera de los Pueblos": del orden de la Restauración y el sistema de Metternich a la crisis agraria de 1846-1847, el estallido de febrero en Francia (Segunda República), el Parlamento de Frankfurt, la revolución húngara de Kossuth, las Cinco Jornadas de Milán y la República Romana de Mazzini y Garibaldi, la reacción conservadora de 1849 y sus consecuencias a medio plazo. Diez hitos y seis eras entre 1830 y 1852.',
+  keywords: [
+    'revoluciones 1848 primavera de los pueblos cronología',
+    'restauración congreso de viena metternich sistema conservador',
+    'revolución de 1830 francia bélgica liberalismo nacionalismo',
+    'segunda república francesa luis felipe estallido febrero 1848',
+    'parlamento de frankfurt kossuth hungría imperio austríaco',
+    'república romana mazzini garibaldi cinco jornadas milán reacción',
+  ],
+  anioInicio: 1815,
+  anioFin: 1852,
+
+  hitos: [
+    {
+      id: 'orden-restauracion',
+      nombre: 'El orden de la Restauración',
+      anioInicio: 1815,
+      anioFin: 1830,
+      color: '#4A5D6B',
+      categoria: 'restauracion',
+      descripcion: 'Tras la derrota de Napoleón, el Congreso de Viena (1814-1815) reorganizó Europa buscando estabilidad y equilibrio entre las grandes potencias. El canciller austríaco Klemens von Metternich se convirtió en la figura más visible de un sistema conservador que aspiraba a contener las ideas de la Revolución Francesa: legitimidad dinástica, orden y freno a los movimientos liberales y nacionales. La Santa Alianza y los congresos coordinaron intervenciones para sofocar levantamientos, como el trienio liberal español (1820-1823). Bajo esa aparente calma, las corrientes liberales, nacionalistas y del primer socialismo fueron ganando fuerza en universidades, prensa y sociedades secretas.',
+      obraIconica: 'El Congreso de Viena (1814-1815) y el sistema de Metternich',
+      paises: ['Imperio austríaco', 'Prusia', 'Rusia', 'Reino Unido', 'Francia'],
+    },
+    {
+      id: 'revolucion-1830',
+      nombre: 'La Revolución de 1830',
+      anioInicio: 1830,
+      anioFin: 1831,
+      color: '#6B8CAE',
+      categoria: 'precedentes',
+      descripcion: 'El primer gran embate contra el orden de la Restauración llegó en 1830. En Francia, las Tres Gloriosas jornadas de julio derrocaron a Carlos X y llevaron al trono a Luis Felipe de Orleans, el "rey burgués" de la Monarquía de Julio. Casi en paralelo, Bélgica se separó del Reino de los Países Bajos y proclamó su independencia, reconocida como Estado neutral. Hubo también levantamientos en los estados italianos, en algunos estados alemanes y en la Polonia bajo dominio ruso, estos últimos reprimidos. La oleada de 1830 mostró que las demandas liberales y nacionales seguían vivas y sirvió de precedente directo a 1848.',
+      obraIconica: 'Las Tres Gloriosas de julio y "La Libertad guiando al pueblo" de Delacroix',
+      paises: ['Francia', 'Bélgica', 'Estados italianos', 'Polonia'],
+    },
+    {
+      id: 'ideologias',
+      nombre: 'Liberalismo, nacionalismo y primer socialismo',
+      anioInicio: 1830,
+      anioFin: 1847,
+      color: '#C0894A',
+      categoria: 'ideologias',
+      descripcion: 'En las décadas previas a 1848 maduraron las grandes corrientes ideológicas del siglo XIX. El liberalismo reclamaba constituciones, libertades civiles, parlamentos y, en sus versiones más avanzadas, ampliación del sufragio. El nacionalismo aspiraba a que cada pueblo tuviera su Estado, lo que amenazaba tanto a los imperios multinacionales (Austria, otomano) como a la fragmentación de Alemania e Italia. El primer socialismo —con autores como Louis Blanc, Pierre-Joseph Proudhon o los llamados socialistas utópicos— planteaba la "cuestión social" surgida de la industrialización. En 1848 Karl Marx y Friedrich Engels publicaron el "Manifiesto Comunista". Estas corrientes convivían y a veces chocaban entre sí.',
+      obraIconica: 'El "Manifiesto Comunista" de Marx y Engels (1848)',
+      paises: ['Francia', 'Estados alemanes', 'Estados italianos', 'Reino Unido'],
+    },
+    {
+      id: 'crisis-1846',
+      nombre: 'La crisis de 1846-1847',
+      anioInicio: 1845,
+      anioFin: 1847,
+      color: '#8A6D3B',
+      categoria: 'ideologias',
+      descripcion: 'El detonante inmediato de 1848 fue una grave crisis económica de fondo agrario. Las malas cosechas y la enfermedad de la patata (que en Irlanda causó una hambruna devastadora) dispararon el precio del pan y de los alimentos entre 1845 y 1847. A la crisis agraria se sumó una crisis financiera e industrial que aumentó el paro urbano. El malestar social se acumuló sobre las tensiones políticas ya existentes: campesinos empobrecidos, artesanos arruinados por la competencia industrial y clases medias frustradas por la falta de derechos políticos. Los historiadores suelen describir esta "crisis de subsistencias" como la última gran crisis de tipo antiguo y el caldo de cultivo de la revolución.',
+      obraIconica: 'La crisis de subsistencias y la enfermedad de la patata (1845-1847)',
+      paises: ['Irlanda', 'Francia', 'Estados alemanes', 'Imperio austríaco'],
+    },
+    {
+      id: 'febrero-francia',
+      nombre: 'Febrero de 1848 en Francia',
+      anioInicio: 1848,
+      anioFin: 1848,
+      color: '#B22222',
+      categoria: 'estallido',
+      descripcion: 'La chispa saltó en París. La "campaña de los banquetes" con la que la oposición reclamaba reforma electoral fue prohibida, y las protestas derivaron en insurrección. Entre el 22 y el 24 de febrero de 1848 se levantaron barricadas, el rey Luis Felipe abdicó y huyó, y se proclamó la Segunda República Francesa. El gobierno provisional decretó el sufragio universal masculino, abolió la esclavitud en las colonias y creó los Talleres Nacionales para dar trabajo a los parados. La noticia de la caída de la monarquía francesa se extendió por telégrafo y prensa, actuando como señal para movimientos en el resto del continente.',
+      obraIconica: 'La proclamación de la Segunda República Francesa (febrero de 1848)',
+      paises: ['Francia'],
+    },
+    {
+      id: 'primavera-alemania',
+      nombre: 'La primavera alemana y el Parlamento de Frankfurt',
+      anioInicio: 1848,
+      anioFin: 1849,
+      color: '#D4A017',
+      categoria: 'primavera-pueblos',
+      descripcion: 'En marzo de 1848 la ola alcanzó los estados alemanes. Hubo levantamientos en Berlín, Viena y numerosas capitales que obligaron a los príncipes a conceder constituciones y gobiernos liberales. En mayo se reunió en Frankfurt un Parlamento (la Asamblea Nacional de Frankfurt), elegido para elaborar una constitución que unificara Alemania. El debate enfrentó a partidarios de una "Gran Alemania" con Austria y de una "Pequeña Alemania" liderada por Prusia. En 1849 la Asamblea ofreció la corona imperial al rey de Prusia Federico Guillermo IV, que la rechazó por proceder de una asamblea popular y no de los príncipes. El proyecto unificador liberal fracasó, pero dejó un precedente decisivo.',
+      obraIconica: 'La Asamblea Nacional de Frankfurt en la iglesia de San Pablo (1848-1849)',
+      paises: ['Estados alemanes', 'Prusia'],
+    },
+    {
+      id: 'imperio-austriaco',
+      nombre: 'El Imperio austríaco y Hungría',
+      anioInicio: 1848,
+      anioFin: 1849,
+      color: '#E08E0B',
+      categoria: 'primavera-pueblos',
+      descripcion: 'El multinacional Imperio austríaco fue uno de los escenarios más intensos. En marzo de 1848, las revueltas en Viena forzaron la caída y el exilio del canciller Metternich, símbolo del viejo orden. En Hungría, un movimiento nacional liderado por figuras como Lajos Kossuth reclamó autonomía y reformas, y llegó a proclamar la independencia en 1849. También hubo movimientos entre checos y otras nacionalidades del imperio. Las tensiones entre distintos grupos nacionales —a veces enfrentados entre sí— debilitaron la revolución. La monarquía de los Habsburgo, con ayuda militar rusa en Hungría, logró recuperar el control en 1849.',
+      obraIconica: 'La caída de Metternich y la revolución húngara de Kossuth (1848-1849)',
+      paises: ['Imperio austríaco', 'Hungría', 'Bohemia'],
+    },
+    {
+      id: 'estados-italianos',
+      nombre: 'Los estados italianos y la República Romana',
+      anioInicio: 1848,
+      anioFin: 1849,
+      color: '#C0392B',
+      categoria: 'primavera-pueblos',
+      descripcion: 'En la península italiana, dividida en varios estados, la revolución combinó demandas liberales y nacionales frente al dominio austríaco. En marzo de 1848, las Cinco Jornadas de Milán expulsaron temporalmente a las tropas austríacas, y el reino de Piamonte-Cerdeña declaró la guerra a Austria (Primera Guerra de Independencia italiana). En Roma, tras la huida del papa Pío IX, se proclamó en 1849 la República Romana, con Giuseppe Mazzini entre sus dirigentes y Giuseppe Garibaldi en su defensa militar. La derrota del Piamonte ante Austria y la intervención de tropas francesas en Roma pusieron fin a estas experiencias, pero alimentaron el ideal del Risorgimento.',
+      obraIconica: 'Las Cinco Jornadas de Milán y la República Romana de Mazzini (1848-1849)',
+      paises: ['Estados italianos', 'Piamonte-Cerdeña', 'Estados Pontificios', 'Lombardía'],
+    },
+    {
+      id: 'reaccion-1849',
+      nombre: 'La reacción conservadora',
+      anioInicio: 1848,
+      anioFin: 1850,
+      color: '#5D3A3A',
+      categoria: 'reaccion',
+      descripcion: 'A partir del verano de 1848, las fuerzas conservadoras recuperaron la iniciativa. En Francia, el cierre de los Talleres Nacionales provocó la insurrección obrera de las Jornadas de Junio de 1848, reprimida por el ejército con miles de víctimas y detenidos; el episodio marcó la ruptura entre la burguesía liberal y los movimientos obreros. A lo largo de 1849, los ejércitos de Austria, Prusia, Rusia y Francia sofocaron los focos revolucionarios en Italia, Hungría y los estados alemanes. Los monarcas revocaron muchas de las concesiones arrancadas en primavera. Salvo excepciones, el mapa político volvió en apariencia a la situación anterior, aunque no del todo.',
+      obraIconica: 'Las Jornadas de Junio en París y la represión europea de 1849',
+      paises: ['Francia', 'Imperio austríaco', 'Hungría', 'Estados italianos', 'Estados alemanes'],
+    },
+    {
+      id: 'consecuencias',
+      nombre: 'Consecuencias a medio plazo',
+      anioInicio: 1850,
+      anioFin: 1852,
+      color: '#2E8B7A',
+      categoria: 'consecuencias',
+      descripcion: 'Aunque las revoluciones de 1848 fracasaron en sus objetivos inmediatos, dejaron consecuencias duraderas. En el Imperio austríaco se abolió la servidumbre campesina, un cambio social que no se revirtió. En Francia, Luis Napoleón Bonaparte, elegido presidente de la República en 1848, dio un golpe de Estado en 1851 y en 1852 se proclamó emperador como Napoleón III, iniciando el Segundo Imperio. Los proyectos de unificación de Alemania e Italia, frustrados en 1848-1849, se retomaron en las décadas siguientes por vías más pragmáticas y estatales, culminando en la unidad italiana (1861-1870) y la alemana (1871). Muchos exiliados difundieron ideas liberales y nacionales por todo el mundo. 1848 quedó como un punto de inflexión, más por lo que sembró que por lo que logró de inmediato.',
+      obraIconica: 'La abolición de la servidumbre en Austria y el Segundo Imperio de Napoleón III (1852)',
+      paises: ['Francia', 'Imperio austríaco', 'Estados alemanes', 'Estados italianos'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'El orden de la Restauración',
+      desde: 1815,
+      hasta: 1830,
+      icono: '🏛️',
+      hitosDestacados: ['El orden de la Restauración'],
+      eventos: [
+        'El Congreso de Viena reorganiza Europa tras Napoleón (1814-1815)',
+        'Metternich y la Santa Alianza defienden el orden conservador',
+        'Represión de levantamientos liberales, como el trienio liberal español',
+        'Crecen en silencio el liberalismo, el nacionalismo y el primer socialismo',
+      ],
+    },
+    {
+      nombre: 'El precedente de 1830',
+      desde: 1830,
+      hasta: 1845,
+      icono: '🚩',
+      hitosDestacados: ['La Revolución de 1830', 'Liberalismo, nacionalismo y primer socialismo'],
+      eventos: [
+        'Las Tres Gloriosas derrocan a Carlos X y llega la Monarquía de Julio',
+        'Bélgica se independiza y es reconocida como Estado neutral',
+        'Levantamientos reprimidos en Italia, estados alemanes y Polonia',
+        'Maduran las corrientes liberal, nacional y socialista',
+        'Se debate la "cuestión social" nacida de la industrialización',
+      ],
+    },
+    {
+      nombre: 'La crisis previa',
+      desde: 1845,
+      hasta: 1848,
+      icono: '🌾',
+      hitosDestacados: ['La crisis de 1846-1847'],
+      eventos: [
+        'Malas cosechas y enfermedad de la patata disparan el precio del pan',
+        'La hambruna golpea con especial dureza a Irlanda',
+        'Crisis financiera e industrial que aumenta el paro urbano',
+        'Campesinos, artesanos y clases medias acumulan malestar',
+      ],
+    },
+    {
+      nombre: 'La Primavera de los Pueblos',
+      desde: 1848,
+      hasta: 1849,
+      icono: '🌱',
+      hitosDestacados: [
+        'Febrero de 1848 en Francia',
+        'La primavera alemana y el Parlamento de Frankfurt',
+        'El Imperio austríaco y Hungría',
+        'Los estados italianos y la República Romana',
+      ],
+      eventos: [
+        'París: caída de Luis Felipe y proclamación de la Segunda República',
+        'La Asamblea de Frankfurt intenta unificar Alemania',
+        'La caída de Metternich y la revolución húngara de Kossuth',
+        'Las Cinco Jornadas de Milán y la República Romana de Mazzini',
+        'La revolución se extiende por casi todo el continente',
+      ],
+    },
+    {
+      nombre: 'La reacción conservadora',
+      desde: 1849,
+      hasta: 1850,
+      icono: '⚔️',
+      hitosDestacados: ['La reacción conservadora'],
+      eventos: [
+        'Las Jornadas de Junio de 1848 se reprimen en París',
+        'Austria recupera el control en Italia y, con ayuda rusa, en Hungría',
+        'Prusia y los príncipes revocan concesiones liberales',
+        'Federico Guillermo IV rechaza la corona ofrecida por Frankfurt',
+        'El mapa político vuelve, en apariencia, a la situación anterior',
+      ],
+    },
+    {
+      nombre: 'Consecuencias a medio plazo',
+      desde: 1850,
+      hasta: 1852,
+      icono: '🌍',
+      hitosDestacados: ['Consecuencias a medio plazo'],
+      eventos: [
+        'Se abole la servidumbre campesina en el Imperio austríaco',
+        'Golpe de Estado de Luis Napoleón Bonaparte (1851)',
+        'Napoleón III proclama el Segundo Imperio francés (1852)',
+        'Las unificaciones de Alemania e Italia se aplazan a décadas siguientes',
+        'Exiliados difunden ideas liberales y nacionales por el mundo',
+      ],
+    },
+  ],
+
+  categorias: {
+    restauracion: 'La Restauración',
+    precedentes: 'Precedentes de 1830',
+    ideologias: 'Ideologías y crisis',
+    estallido: 'El estallido',
+    'primavera-pueblos': 'La Primavera de los Pueblos',
+    reaccion: 'La reacción',
+    consecuencias: 'Consecuencias',
+  },
+
+  colores: {
+    restauracion: '#4A5D6B',
+    precedentes: '#6B8CAE',
+    ideologias: '#C0894A',
+    estallido: '#B22222',
+    'primavera-pueblos': '#D4A017',
+    reaccion: '#5D3A3A',
+    consecuencias: '#2E8B7A',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'Las Revoluciones de 1848, conocidas como la "Primavera de los Pueblos", fueron la mayor ola revolucionaria que ha vivido Europa: en pocos meses estallaron levantamientos en Francia, los estados alemanes e italianos, el Imperio austríaco y otros territorios. No fue un movimiento único ni idéntico en cada lugar, sino un fenómeno paneuropeo diverso en el que se entremezclaron tres grandes fuerzas: el liberalismo, que reclamaba constituciones y libertades; el nacionalismo, que pedía Estados basados en cada pueblo; y la "cuestión social", nacida de la industrialización y de la crisis económica de 1846-1847. Casi todas las revoluciones fueron derrotadas por la reacción conservadora en 1849, y por ello a veces se habla del "año de las revoluciones fallidas". Sin embargo, sus efectos a medio plazo —la abolición de la servidumbre en Austria, el impulso a las futuras unificaciones alemana e italiana, el Segundo Imperio en Francia— fueron profundos. Esta cronología recorre el proceso desde el orden de la Restauración hasta las consecuencias posteriores, mostrando las distintas corrientes con su función histórica y sin tomar partido.',
+
+    tablaComparativa: [
+      { hito: 'El orden de la Restauración', periodo: '1815-1830', categoria: 'La Restauración', personaje: 'Klemens von Metternich', aportacion: 'Sistema conservador que buscaba contener las ideas revolucionarias' },
+      { hito: 'La Revolución de 1830', periodo: '1830-1831', categoria: 'Precedentes de 1830', personaje: 'Luis Felipe de Orleans', aportacion: 'Monarquía de Julio en Francia e independencia de Bélgica' },
+      { hito: 'Febrero de 1848 en Francia', periodo: '1848', categoria: 'El estallido', personaje: 'Gobierno provisional', aportacion: 'Segunda República, sufragio universal masculino y Talleres Nacionales' },
+      { hito: 'Parlamento de Frankfurt', periodo: '1848-1849', categoria: 'La Primavera de los Pueblos', personaje: 'Asamblea de Frankfurt', aportacion: 'Intento de constitución para unificar Alemania, finalmente frustrado' },
+      { hito: 'República Romana', periodo: '1848-1849', categoria: 'La Primavera de los Pueblos', personaje: 'Mazzini y Garibaldi', aportacion: 'Experiencia republicana en Roma y empuje al Risorgimento italiano' },
+      { hito: 'Consecuencias a medio plazo', periodo: '1850-1852', categoria: 'Consecuencias', personaje: 'Napoleón III', aportacion: 'Segundo Imperio, fin de la servidumbre en Austria y unificaciones aplazadas' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiantes de Historia',
+        perfil: 'Secundaria, preparatoria y universidad',
+        texto: 'Una visión ordenada de un momento clave del siglo XIX europeo. Ayuda a entender cómo se relacionan liberalismo, nacionalismo y cuestión social, por qué las revoluciones fracasaron a corto plazo y por qué, pese a ello, marcaron el rumbo posterior de Europa.',
+      },
+      {
+        icono: '🗺️',
+        titulo: 'Interesados en política e ideologías',
+        perfil: 'Historia de las ideas',
+        texto: 'En 1848 se ven en acción las grandes corrientes ideológicas que aún estructuran el debate político: liberales, nacionalistas, socialistas y conservadores. La cronología permite situar cada una en su contexto sin caricaturizarlas.',
+      },
+      {
+        icono: '🌍',
+        titulo: 'Docentes y divulgadores',
+        perfil: 'Preparar clases y contenidos',
+        texto: 'Un recorrido con hitos, mapas mentales por eras y tablas comparativas listo para explicar un tema complejo. Útil para mostrar que 1848 fue un fenómeno paneuropeo diverso y no un único acontecimiento.',
+      },
+      {
+        icono: '🏛️',
+        titulo: 'Curiosos por los orígenes de Europa',
+        perfil: 'Entender el mundo contemporáneo',
+        texto: 'Las unificaciones de Italia y Alemania, el Segundo Imperio francés y muchos rasgos de la Europa actual hunden sus raíces en 1848. Esta cronología conecta aquel año con procesos posteriores.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Qué fueron las Revoluciones de 1848?',
+        respuesta: 'Fueron una ola de levantamientos que recorrió gran parte de Europa en 1848, por lo que se las conoce como la "Primavera de los Pueblos". No fue un movimiento unificado, sino muchas revoluciones distintas que compartían demandas liberales (constituciones y libertades), nacionales (Estados basados en cada pueblo) y sociales. Afectaron a Francia, los estados alemanes e italianos, el Imperio austríaco y otros territorios, aunque con formas y objetivos diferentes en cada lugar.',
+        tip: 'El término "Primavera de los Pueblos" resalta el carácter esperanzado y masivo del movimiento en sus primeros meses.',
+      },
+      {
+        pregunta: '¿Por qué estallaron precisamente en 1848?',
+        respuesta: 'Se combinaron causas de largo plazo y detonantes inmediatos. De fondo estaban el descontento con el orden conservador de la Restauración y el auge del liberalismo y el nacionalismo. El detonante inmediato fue la crisis económica de 1846-1847: malas cosechas y enfermedad de la patata que dispararon el precio del pan, junto a una crisis financiera e industrial que aumentó el paro. La caída de la monarquía en Francia en febrero de 1848 actuó como señal para el resto del continente.',
+        tip: 'La crisis de 1846-1847 suele describirse como la última gran crisis de subsistencias de tipo antiguo en Europa occidental.',
+      },
+      {
+        pregunta: '¿Por qué se dice que las revoluciones "fracasaron"?',
+        respuesta: 'Porque casi todas fueron derrotadas por la reacción conservadora entre 1848 y 1849: los ejércitos de Austria, Prusia, Rusia y Francia sofocaron los levantamientos y muchos monarcas revocaron las concesiones arrancadas en primavera. Sin embargo, "fracaso" es matizable: 1848 dejó consecuencias duraderas, como la abolición de la servidumbre en Austria y el impulso posterior a las unificaciones de Alemania e Italia.',
+        tip: 'Por eso muchos historiadores dicen que 1848 fue importante más por lo que sembró que por lo que logró de inmediato.',
+      },
+      {
+        pregunta: '¿Qué papel tuvieron el nacionalismo y el liberalismo?',
+        respuesta: 'El liberalismo pedía constituciones, parlamentos y libertades civiles; el nacionalismo, que cada pueblo tuviera su propio Estado. En algunos lugares ambas ideas se reforzaban, pero en otros chocaban: en el Imperio austríaco, por ejemplo, distintos grupos nacionales llegaron a enfrentarse entre sí, lo que debilitó la revolución. Esa tensión entre proyectos liberales y nacionales, y entre distintos nacionalismos, ayuda a explicar por qué el movimiento no logró consolidarse.',
+        tip: 'El nacionalismo amenazaba por igual a los imperios multinacionales y a la fragmentación de Alemania e Italia.',
+      },
+      {
+        pregunta: '¿Qué consecuencias tuvieron a largo plazo?',
+        respuesta: 'Aunque fueron derrotadas a corto plazo, dejaron huella. En el Imperio austríaco se abolió la servidumbre campesina de forma permanente. En Francia, Luis Napoleón Bonaparte pasó de presidente de la República a emperador (Napoleón III) en 1852. Los proyectos de unificación alemana e italiana, frustrados en 1848-1849, se retomaron después por vías más estatales y pragmáticas, culminando en las décadas siguientes. Y muchos exiliados difundieron ideas liberales y nacionales por otros países.',
+        tip: 'Las unificaciones de Italia (1861-1870) y Alemania (1871) recogieron, transformadas, aspiraciones nacidas en 1848.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Empieza por el contexto de la Restauración',
+        cuerpo: 'Antes de la revolución, revisa el hito "El orden de la Restauración". Entender el sistema conservador de Metternich y el Congreso de Viena es clave para comprender contra qué se rebelaron los movimientos de 1848.',
+      },
+      {
+        titulo: 'Identifica el precedente de 1830',
+        cuerpo: 'Haz clic en "La Revolución de 1830". Las jornadas de julio en Francia y la independencia de Bélgica muestran que las demandas liberales y nacionales ya venían de antes: 1848 no salió de la nada.',
+      },
+      {
+        titulo: 'Fíjate en la crisis económica previa',
+        cuerpo: 'Antes del estallido político, consulta "La crisis de 1846-1847". La subida del precio del pan y el paro conectan el malestar social con la revolución: las causas no fueron solo ideológicas.',
+      },
+      {
+        titulo: 'Recorre la ola país por país',
+        cuerpo: 'En la era "La Primavera de los Pueblos" verás cuatro hitos: Francia, los estados alemanes, el Imperio austríaco y los estados italianos. Compáralos para ver que 1848 fue diverso, no idéntico en cada lugar.',
+      },
+      {
+        titulo: 'Termina con la reacción y las consecuencias',
+        cuerpo: 'Cierra con "La reacción conservadora" y "Consecuencias a medio plazo". Así verás cómo se derrotó la revolución en 1849 y qué efectos duraderos dejó pese a ese fracaso inmediato.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '🌐',
+        texto: '1848 no fue una sola revolución, sino muchas a la vez y distintas entre sí. Compartían un ambiente común, pero las demandas y los desenlaces variaron mucho de Francia a Hungría o Italia. Hablar de "la revolución de 1848" en singular simplifica un fenómeno muy diverso.',
+      },
+      {
+        icono: '🍞',
+        texto: 'Detrás de las ideas estaba el precio del pan. La crisis agraria de 1846-1847, con malas cosechas y la enfermedad de la patata, encareció los alimentos y multiplicó el descontento. Las revoluciones tuvieron un fuerte componente económico y social, no solo político.',
+      },
+      {
+        icono: '⚖️',
+        texto: 'Liberales, nacionalistas, socialistas y conservadores tuvieron cada uno su función histórica. Las Jornadas de Junio de 1848 en París mostraron que incluso dentro del bando revolucionario había fracturas profundas entre la burguesía liberal y los movimientos obreros.',
+      },
+      {
+        icono: '🌱',
+        texto: 'El "fracaso" de 1848 fue relativo. Aunque la reacción venció en 1849, la abolición de la servidumbre en Austria no se revirtió, y las aspiraciones nacionales de Alemania e Italia se hicieron realidad, transformadas, en las décadas siguientes.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Ver 1848 como una revolución única y homogénea',
+        cuerpo: 'Fue un fenómeno paneuropeo, pero muy diverso: las causas, los protagonistas y los resultados fueron distintos en Francia, los estados alemanes, el Imperio austríaco o Italia. Tratarlo como un solo acontecimiento idéntico en todas partes deforma la realidad.',
+      },
+      {
+        titulo: 'Reducirlo todo a la política',
+        cuerpo: 'Las demandas de constituciones y naciones fueron centrales, pero la crisis económica de 1846-1847 —hambruna, paro, subida del pan— fue un detonante decisivo. Ignorar la "cuestión social" y el componente económico da una imagen incompleta.',
+      },
+      {
+        titulo: 'Presentar a un bando como "bueno" y a otro como "malo"',
+        cuerpo: 'Liberales, nacionalistas, socialistas y conservadores respondían a intereses e ideas legítimas de su tiempo. Tanto la revolución como la reacción pueden analizarse con el mismo tono factual, sin convertir la historia en un relato de héroes y villanos.',
+      },
+      {
+        titulo: 'Concluir que 1848 no sirvió para nada',
+        cuerpo: 'Es cierto que las revoluciones fueron derrotadas a corto plazo, pero dejaron consecuencias duraderas: fin de la servidumbre en Austria, impulso a las unificaciones alemana e italiana y difusión de ideas por Europa. Su fracaso inmediato no equivale a irrelevancia histórica.',
+      },
+    ],
+  },
+};

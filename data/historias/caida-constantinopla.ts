@@ -1,0 +1,367 @@
+import type { HistoriaData } from './types';
+
+export const caidaConstantinopla: HistoriaData = {
+  slug: 'caida-constantinopla',
+  titulo: 'La Caída de Constantinopla: Del Declive Bizantino al Fin de Roma en Oriente',
+  subtitulo: 'De la Cuarta Cruzada (1204) a la conquista otomana de 1453: los dos siglos y medio en que el Imperio Romano de Oriente se apagó y nació una nueva potencia',
+  descripcionSEO: 'Cronología interactiva de la caída de Constantinopla (1453): del saqueo de la Cuarta Cruzada (1204) y el Imperio Latino a la restauración de los Paleólogos, el ascenso otomano en los Balcanes, la interrupción de Tamerlán, el cerco de Mehmed II y la muerte de Constantino XI. Consecuencias: fin del Imperio bizantino, capital otomana, huida de eruditos griegos y era de los descubrimientos. En 10 hitos y 6 eras.',
+  keywords: [
+    'caída constantinopla 1453 cronología historia',
+    'imperio bizantino paleólogos declive romano oriente',
+    'cuarta cruzada 1204 imperio latino saqueo',
+    'ascenso otomano balcanes kosovo nicópolis mehmed II',
+    'cerco constantinopla murallas teodosianas cañón urbano',
+    'constantino XI giustiniani cuerno de oro trebisonda 1461',
+  ],
+  anioInicio: 1202,
+  anioFin: 1461,
+
+  hitos: [
+    {
+      id: 'cuarta-cruzada',
+      nombre: 'La Cuarta Cruzada y el saqueo',
+      anioInicio: 1202,
+      anioFin: 1204,
+      color: '#8B0000',
+      categoria: 'cuarta-cruzada',
+      descripcion: 'Una cruzada convocada para recuperar Jerusalén se desvió hacia Constantinopla por una combinación de deudas con Venecia, disputas dinásticas bizantinas y el interés comercial veneciano. En abril de 1204 los cruzados tomaron y saquearon durante tres días la mayor ciudad cristiana de la época, hasta entonces nunca conquistada por un enemigo extranjero. Se destruyeron y expoliaron reliquias, iglesias y obras de arte; parte del botín, como los caballos de bronce de San Marcos, sigue hoy en Venecia. El episodio dejó una fractura duradera entre las iglesias latina y griega.',
+      obraIconica: 'El saqueo de Constantinopla y el expolio de los caballos de San Marcos (1204)',
+      paises: ['Imperio bizantino', 'República de Venecia', 'Constantinopla'],
+    },
+    {
+      id: 'imperio-latino',
+      nombre: 'El Imperio Latino y los estados griegos',
+      anioInicio: 1204,
+      anioFin: 1261,
+      color: '#A0522D',
+      categoria: 'cuarta-cruzada',
+      descripcion: 'Tras la conquista, los cruzados repartieron el territorio y fundaron el Imperio Latino de Constantinopla, con Balduino de Flandes como emperador. El antiguo Imperio quedó fragmentado: surgieron estados griegos en el exilio, sobre todo el Imperio de Nicea, el Despotado de Epiro y el Imperio de Trebisonda, que se disputaron la herencia bizantina. Nicea, bajo la dinastía Láscaris, se consolidó como el más fuerte y reorganizó la administración y el ejército con vistas a recuperar la capital. Este medio siglo de dominio latino debilitó de forma estructural la economía y las defensas de la región.',
+      obraIconica: 'La fundación del Imperio Latino y el Imperio griego de Nicea en el exilio',
+      paises: ['Imperio Latino', 'Imperio de Nicea', 'Epiro', 'Trebisonda'],
+    },
+    {
+      id: 'restauracion-paleologa',
+      nombre: 'La restauración de los Paleólogos',
+      anioInicio: 1261,
+      anioFin: 1300,
+      color: '#4682B4',
+      categoria: 'declive-bizantino',
+      descripcion: 'En 1261, tropas de Nicea al mando del general Alejo Estrategópulo entraron casi sin resistencia en Constantinopla, y Miguel VIII Paleólogo restauró el Imperio bizantino y su propia dinastía, que gobernaría hasta el final. La restauración fue más simbólica que efectiva: la ciudad estaba despoblada y empobrecida tras el dominio latino, y el territorio se había reducido drásticamente. Miguel VIII gastó enormes recursos en diplomacia para conjurar intentos de reconquista occidental, e intentó sin éxito duradero la unión de las iglesias en el Concilio de Lyon (1274) para ganar aliados.',
+      obraIconica: 'Miguel VIII Paleólogo recupera Constantinopla y restaura el Imperio (1261)',
+      paises: ['Imperio bizantino', 'Constantinopla', 'Asia Menor'],
+    },
+    {
+      id: 'declive-territorial',
+      nombre: 'Declive territorial y guerras civiles',
+      anioInicio: 1300,
+      anioFin: 1370,
+      color: '#5F9EA0',
+      categoria: 'declive-bizantino',
+      descripcion: 'A lo largo del siglo XIV el Imperio se contrajo hasta convertirse en poco más que una ciudad-estado con algunas posesiones dispersas. Las posesiones de Asia Menor se perdieron progresivamente frente a los principados turcos, entre ellos el emergente beylicato otomano. Las guerras civiles paleólogas —en especial la de 1341-1347 entre Juan V y Juan VI Cantacuceno— agotaron el tesoro y llevaron a contratar mercenarios turcos, que así conocieron y se afianzaron en territorio europeo. La peste negra (hacia 1347) diezmó la población. La economía quedó en gran medida en manos de las repúblicas comerciales italianas, Venecia y Génova.',
+      obraIconica: 'Las guerras civiles paleólogas y la pérdida de Asia Menor (siglo XIV)',
+      paises: ['Imperio bizantino', 'Asia Menor', 'Génova', 'Venecia'],
+    },
+    {
+      id: 'expansion-otomana-balcanes',
+      nombre: 'La expansión otomana por los Balcanes',
+      anioInicio: 1354,
+      anioFin: 1396,
+      color: '#556B2F',
+      categoria: 'ascenso-otomano',
+      descripcion: 'Los otomanos pasaron a Europa por Galípoli hacia 1354 y en pocas décadas dominaron gran parte de los Balcanes. Trasladaron su capital a Adrianópolis (Edirne), en suelo europeo, rodeando a Constantinopla. En la batalla de Kosovo (1389) se enfrentaron a una coalición serbia; el resultado, muy mitificado en la memoria posterior, consolidó la preeminencia otomana en la región pese a la muerte del sultán Murad I. En 1396, una cruzada europea liderada por Segismundo de Hungría fue derrotada en Nicópolis por Bayaceto I. Constantinopla quedó reducida a un enclave casi aislado dentro de territorio otomano.',
+      obraIconica: 'Las batallas de Kosovo (1389) y Nicópolis (1396)',
+      paises: ['Imperio otomano', 'Serbia', 'Bulgaria', 'Hungría'],
+    },
+    {
+      id: 'interrupcion-tamerlan',
+      nombre: 'Tamerlán y la interrupción otomana',
+      anioInicio: 1402,
+      anioFin: 1413,
+      color: '#8B4513',
+      categoria: 'ascenso-otomano',
+      descripcion: 'Cuando la caída de Constantinopla parecía inminente, la expansión otomana se frenó de golpe desde el este. En la batalla de Ankara (1402), el conquistador centroasiático Tamerlán (Timur) derrotó y capturó al sultán Bayaceto I. El Imperio otomano quedó sumido en una guerra civil entre los hijos del sultán, conocida como el Interregno (1402-1413), que le dio a Bizancio un respiro de unas décadas. La recuperación otomana fue rápida: Mehmed I reunificó el Estado y sus sucesores retomaron la presión sobre los territorios balcánicos y sobre la propia capital bizantina.',
+      obraIconica: 'La batalla de Ankara: Tamerlán captura al sultán Bayaceto I (1402)',
+      paises: ['Imperio otomano', 'Imperio timúrida', 'Anatolia'],
+    },
+    {
+      id: 'murad-ii-ascenso-mehmed',
+      nombre: 'Murad II y el ascenso de Mehmed II',
+      anioInicio: 1421,
+      anioFin: 1451,
+      color: '#6B8E23',
+      categoria: 'ascenso-otomano',
+      descripcion: 'Murad II restableció el poder otomano tras el Interregno: sitió Constantinopla sin éxito en 1422, consolidó el dominio en los Balcanes y venció a una coalición cristiana en la batalla de Varna (1444), que puso fin a los últimos esfuerzos de cruzada de gran escala. Su hijo Mehmed II accedió al trono definitivamente en 1451, con poco más de diecinueve años y una determinación temprana de tomar Constantinopla. Preparó el cerco con recursos considerables: construyó la fortaleza de Rumeli Hisarı en el Bósforo (1452) para cortar el suministro por mar y reunió un gran parque de artillería.',
+      obraIconica: 'La fortaleza de Rumeli Hisarı en el Bósforo (1452)',
+      paises: ['Imperio otomano', 'Balcanes', 'Constantinopla'],
+    },
+    {
+      id: 'cerco-1453',
+      nombre: 'El cerco de 1453',
+      anioInicio: 1453,
+      anioFin: 1453,
+      color: '#B22222',
+      categoria: 'cerco',
+      descripcion: 'El asedio comenzó a principios de abril de 1453. La defensa se apoyaba en las murallas teodosianas, un triple sistema defensivo que había protegido la ciudad durante mil años, pero los defensores eran muy pocos: las estimaciones habituales hablan de unos 7.000-10.000 hombres —incluida una destacada compañía genovesa al mando de Giovanni Giustiniani Longo— frente a un ejército otomano estimado en decenas de miles (las cifras exactas están muy discutidas). Los grandes cañones fundidos por el ingeniero Urbano batieron las murallas. Los defensores cerraron el Cuerno de Oro con una gran cadena; Mehmed II respondió haciendo transportar barcos por tierra para sortearla. Los ataques por mar y por tierra se sucedieron durante casi dos meses.',
+      obraIconica: 'Las murallas teodosianas, el gran cañón de Urbano y la cadena del Cuerno de Oro',
+      paises: ['Imperio bizantino', 'Imperio otomano', 'Génova', 'Venecia'],
+    },
+    {
+      id: 'asalto-final',
+      nombre: 'El asalto final y la muerte de Constantino XI',
+      anioInicio: 1453,
+      anioFin: 1453,
+      color: '#8B008B',
+      categoria: 'asalto',
+      descripcion: 'En la madrugada del 29 de mayo de 1453, tras semanas de asedio, Mehmed II lanzó el asalto general en oleadas sucesivas. La herida de Giovanni Giustiniani y su retirada del combate contribuyeron a quebrar la moral de los defensores; los otomanos hallaron entradas en las defensas y penetraron en la ciudad. El emperador Constantino XI Paleólogo, el último soberano bizantino, murió combatiendo; las circunstancias exactas de su muerte no se conocen con certeza y pronto se envolvieron en la leyenda. Siguió el saqueo previsto por la costumbre de la época. Mehmed II entró en la ciudad y ordenó su repoblación como nueva capital, convirtiendo Santa Sofía en mezquita.',
+      obraIconica: 'El asalto del 29 de mayo de 1453 y la muerte de Constantino XI',
+      paises: ['Imperio bizantino', 'Imperio otomano', 'Constantinopla'],
+    },
+    {
+      id: 'consecuencias-trebisonda',
+      nombre: 'Consecuencias y la caída de Trebisonda',
+      anioInicio: 1453,
+      anioFin: 1461,
+      color: '#4B0082',
+      categoria: 'consecuencias',
+      descripcion: 'La conquista puso fin al Imperio Romano de Oriente tras unos mil cien años desde la fundación de Constantinopla por Constantino I. La ciudad, rebautizada de forma progresiva como Estambul, pasó a ser la capital otomana y recuperó población y prosperidad. La caída aceleró el flujo de eruditos griegos y manuscritos hacia Italia, un factor que contribuyó al Renacimiento, aunque este proceso venía de antes y tuvo múltiples causas. El bloqueo de las rutas terrestres tradicionales hacia Asia estimuló la búsqueda de nuevas vías marítimas, en el trasfondo de la posterior era de los descubrimientos. Los últimos vestigios bizantinos cayeron después: el Despotado de Morea en 1460 y el Imperio de Trebisonda en 1461.',
+      obraIconica: 'La caída del Imperio de Trebisonda, último Estado bizantino (1461)',
+      paises: ['Imperio otomano', 'Trebisonda', 'Morea', 'Italia'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'Fractura: la Cuarta Cruzada',
+      desde: 1204,
+      hasta: 1261,
+      icono: '🗡️',
+      hitosDestacados: ['La Cuarta Cruzada y el saqueo', 'El Imperio Latino y los estados griegos'],
+      eventos: [
+        'La Cuarta Cruzada se desvía hacia Constantinopla (1202-1203)',
+        'Saqueo de Constantinopla por los cruzados y venecianos (1204)',
+        'Fundación del Imperio Latino con Balduino de Flandes',
+        'Surgen los estados griegos en el exilio: Nicea, Epiro y Trebisonda',
+        'El Imperio de Nicea se consolida como principal heredero bizantino',
+      ],
+    },
+    {
+      nombre: 'La restauración paleóloga',
+      desde: 1261,
+      hasta: 1300,
+      icono: '👑',
+      hitosDestacados: ['La restauración de los Paleólogos'],
+      eventos: [
+        'Nicea recupera Constantinopla casi sin resistencia (1261)',
+        'Miguel VIII Paleólogo restaura el Imperio y su dinastía',
+        'La ciudad recuperada está despoblada y empobrecida',
+        'Intento de unión de las iglesias en el Concilio de Lyon (1274)',
+        'Diplomacia costosa para evitar una reconquista latina',
+      ],
+    },
+    {
+      nombre: 'Declive bizantino en el siglo XIV',
+      desde: 1300,
+      hasta: 1354,
+      icono: '📉',
+      hitosDestacados: ['Declive territorial y guerras civiles'],
+      eventos: [
+        'Pérdida progresiva de las posesiones en Asia Menor',
+        'Guerra civil entre Juan V y Juan VI Cantacuceno (1341-1347)',
+        'Uso de mercenarios turcos en las luchas internas bizantinas',
+        'La peste negra diezma la población (hacia 1347)',
+        'Génova y Venecia controlan buena parte del comercio',
+      ],
+    },
+    {
+      nombre: 'El ascenso otomano en los Balcanes',
+      desde: 1354,
+      hasta: 1413,
+      icono: '🌙',
+      hitosDestacados: ['La expansión otomana por los Balcanes', 'Tamerlán y la interrupción otomana'],
+      eventos: [
+        'Los otomanos pasan a Europa por Galípoli (hacia 1354)',
+        'Adrianópolis (Edirne) se convierte en capital otomana europea',
+        'Batalla de Kosovo: muere el sultán Murad I (1389)',
+        'Derrota de la cruzada europea en Nicópolis (1396)',
+        'Batalla de Ankara: Tamerlán captura a Bayaceto I (1402)',
+        'Interregno otomano y reunificación con Mehmed I (1402-1413)',
+      ],
+    },
+    {
+      nombre: 'Recuperación otomana y preparativos',
+      desde: 1413,
+      hasta: 1453,
+      icono: '🏰',
+      hitosDestacados: ['Murad II y el ascenso de Mehmed II'],
+      eventos: [
+        'Murad II asedia Constantinopla sin éxito (1422)',
+        'Victoria otomana sobre una coalición cristiana en Varna (1444)',
+        'Mehmed II accede definitivamente al trono (1451)',
+        'Construcción de la fortaleza de Rumeli Hisarı en el Bósforo (1452)',
+        'Reunión de un gran parque de artillería para el asedio',
+      ],
+    },
+    {
+      nombre: 'El cerco, la caída y sus consecuencias',
+      desde: 1453,
+      hasta: 1461,
+      icono: '🕌',
+      hitosDestacados: ['El cerco de 1453', 'El asalto final y la muerte de Constantino XI', 'Consecuencias y la caída de Trebisonda'],
+      eventos: [
+        'Comienza el asedio de Constantinopla (abril de 1453)',
+        'Los cañones de Urbano baten las murallas teodosianas',
+        'Mehmed II hace transportar barcos por tierra hasta el Cuerno de Oro',
+        'Asalto final y muerte de Constantino XI (29 de mayo de 1453)',
+        'Constantinopla se convierte en capital otomana; Santa Sofía, en mezquita',
+        'Caen el Despotado de Morea (1460) y el Imperio de Trebisonda (1461)',
+      ],
+    },
+  ],
+
+  categorias: {
+    'cuarta-cruzada': 'Cuarta Cruzada e Imperio Latino',
+    'declive-bizantino': 'Declive bizantino',
+    'ascenso-otomano': 'Ascenso otomano',
+    'cerco': 'El cerco de 1453',
+    'asalto': 'El asalto final',
+    'consecuencias': 'Consecuencias',
+  },
+
+  colores: {
+    'cuarta-cruzada': '#8B0000',
+    'declive-bizantino': '#4682B4',
+    'ascenso-otomano': '#556B2F',
+    'cerco': '#B22222',
+    'asalto': '#8B008B',
+    'consecuencias': '#4B0082',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'La caída de Constantinopla en 1453 suele señalarse como una de las fechas que cierran la Edad Media, pero fue el final de un proceso largo. El Imperio Romano de Oriente, heredero directo de Roma y con capital en Constantinopla desde el año 330, había sido durante siglos la mayor potencia del Mediterráneo oriental. El saqueo de la Cuarta Cruzada en 1204 lo dejó fracturado y empobrecido; la restauración de los Paleólogos en 1261 no logró revertir un declive territorial y económico que lo redujo casi a una ciudad-estado. Mientras tanto, los otomanos construyeron un Estado en expansión que acabó rodeando la capital. Esta cronología recorre esos dos siglos y medio con criterio factual, distinguiendo los hechos documentados de las leyendas que rodean al célebre asedio.',
+
+    tablaComparativa: [
+      { hito: 'La Cuarta Cruzada y el saqueo', periodo: '1202-1204', categoria: 'Cuarta Cruzada e Imperio Latino', personaje: 'Enrico Dandolo / Balduino de Flandes', aportacion: 'Primera conquista extranjera de Constantinopla; fractura entre latinos y griegos' },
+      { hito: 'El Imperio Latino y los estados griegos', periodo: '1204-1261', categoria: 'Cuarta Cruzada e Imperio Latino', personaje: 'Dinastía Láscaris (Nicea)', aportacion: 'Fragmentación bizantina; Nicea se prepara para recuperar la capital' },
+      { hito: 'La restauración de los Paleólogos', periodo: '1261-1300', categoria: 'Declive bizantino', personaje: 'Miguel VIII Paleólogo', aportacion: 'Recuperación de Constantinopla e inicio de la última dinastía bizantina' },
+      { hito: 'La expansión otomana por los Balcanes', periodo: '1354-1396', categoria: 'Ascenso otomano', personaje: 'Murad I / Bayaceto I', aportacion: 'Dominio otomano de los Balcanes; Constantinopla queda aislada' },
+      { hito: 'El cerco de 1453', periodo: '1453', categoria: 'El cerco de 1453', personaje: 'Mehmed II / Giovanni Giustiniani', aportacion: 'Artillería pesada contra las murallas milenarias; asedio de casi dos meses' },
+      { hito: 'El asalto final', periodo: '29 de mayo de 1453', categoria: 'El asalto final', personaje: 'Mehmed II / Constantino XI', aportacion: 'Fin del Imperio Romano de Oriente; nueva capital otomana' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiantes de historia',
+        perfil: 'Secundaria, preparatoria y universidad',
+        texto: 'La caída de Constantinopla es una de las fechas de referencia para el paso de la Edad Media a la Edad Moderna. Esta cronología permite entender por qué fue el final de un proceso de siglos y no un episodio aislado, y sitúa en su contexto tanto al Imperio bizantino como al otomano.',
+      },
+      {
+        icono: '🏛️',
+        titulo: 'Interesados en el legado romano',
+        perfil: 'Continuidad entre Roma y Bizancio',
+        texto: 'El Imperio bizantino se consideraba a sí mismo romano y preservó durante mil años el derecho, la lengua griega y buena parte de la cultura clásica. Ver su final ayuda a entender que la "caída de Roma" del 476 solo afectó a la mitad occidental del mundo romano.',
+      },
+      {
+        icono: '🌍',
+        titulo: 'Historia global y descubrimientos',
+        perfil: 'Rutas comerciales y era de la exploración',
+        texto: 'El nuevo control otomano de los estrechos y las rutas terrestres hacia Asia forma parte del trasfondo que impulsó la búsqueda de vías marítimas alternativas. Esta cronología conecta un hecho del Mediterráneo oriental con los procesos que abrieron la era de los descubrimientos.',
+      },
+      {
+        icono: '⚔️',
+        titulo: 'Aficionados a la historia militar',
+        perfil: 'Fortificación y artillería de pólvora',
+        texto: 'El asedio de 1453 es un caso clásico de transición militar: las murallas teodosianas, que habían resistido durante mil años, se enfrentaron por primera vez a artillería pesada de pólvora. Aquí se explica el papel de los cañones, la cadena del Cuerno de Oro y la defensa de Giustiniani, separando el hecho de la leyenda.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Por qué se considera 1453 el fin de la Edad Media?',
+        respuesta: 'Es una convención historiográfica, no una frontera exacta. La caída de Constantinopla puso fin al Imperio Romano de Oriente, el último Estado que enlazaba de forma continua con la Roma antigua, y coincidió con otros cambios de época (imprenta, descubrimientos, Renacimiento). Otros historiadores prefieren fechas como 1492. Cualquiera de estas divisiones es una herramienta didáctica, no un corte real en el tiempo.',
+        tip: 'Las fronteras entre épocas históricas son acuerdos posteriores; los contemporáneos no vivieron 1453 como un cambio de era.',
+      },
+      {
+        pregunta: '¿Fue el saqueo de 1204 más grave que la caída de 1453?',
+        respuesta: 'Para el Imperio bizantino, el saqueo de la Cuarta Cruzada en 1204 fue en muchos sentidos un golpe estructural del que nunca se recuperó del todo: fragmentó el Estado, arruinó su economía y debilitó sus defensas durante generaciones. En 1453 el Imperio ya era una sombra de sí mismo. Por eso muchos historiadores señalan 1204 como el verdadero inicio del declive irreversible.',
+      },
+      {
+        pregunta: '¿Cuántos hombres había en cada bando durante el asedio?',
+        respuesta: 'Las cifras están muy discutidas y las fuentes suelen exagerar. Las estimaciones más habituales sitúan a los defensores en unos 7.000-10.000 hombres, incluidos contingentes genoveses y venecianos, frente a un ejército otomano de varias decenas de miles. Conviene tratar todas estas cifras como aproximaciones: la desproporción numérica es clara, pero los números redondos que circulan deben tomarse con cautela.',
+        tip: 'Ante cualquier cifra de un asedio medieval, pregúntate qué fuente la da y con qué intención se escribió.',
+      },
+      {
+        pregunta: '¿Cómo murió el último emperador, Constantino XI?',
+        respuesta: 'Se sabe que Constantino XI Paleólogo murió durante el asalto final del 29 de mayo de 1453, pero las circunstancias exactas no están documentadas con certeza y su cuerpo no fue identificado de forma fiable. Con el tiempo surgieron numerosas leyendas, como la del "emperador petrificado" que volverá algún día. Es un buen ejemplo de cómo un hecho histórico verificable (su muerte en combate) se rodea de tradiciones no comprobables.',
+      },
+      {
+        pregunta: '¿Qué consecuencias tuvo la caída de Constantinopla?',
+        respuesta: 'La ciudad se convirtió en capital otomana y recuperó población y prosperidad. La caída aceleró la llegada de eruditos y manuscritos griegos a Italia, un factor que contribuyó al Renacimiento, aunque este proceso ya estaba en marcha. El nuevo dominio otomano de las rutas hacia Asia forma parte del trasfondo de la búsqueda de vías marítimas alternativas. Todas estas consecuencias fueron graduales y de causas múltiples, no efectos automáticos de una sola fecha.',
+        tip: 'Desconfía de las explicaciones que atribuyen grandes cambios históricos a una única causa o a un único año.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Observa los bloques de color en la Línea del Tiempo',
+        cuerpo: 'El rojo oscuro marca la fractura de la Cuarta Cruzada, los azules el declive bizantino, los verdes el ascenso otomano y los tonos púrpura la caída y sus consecuencias. Antes de leer, fíjate en cuánto espacio ocupa cada fase: el declive fue largo; la caída, muy concentrada en el tiempo.',
+      },
+      {
+        titulo: 'Compara el saqueo de 1204 con la caída de 1453',
+        cuerpo: 'Haz clic en "La Cuarta Cruzada y el saqueo" y luego en "El asalto final". Verás dos conquistas de la misma ciudad con 249 años de diferencia: la primera, por cristianos occidentales; la segunda, por los otomanos. Comparar ambas ayuda a entender por qué el Imperio ya estaba muy debilitado en 1453.',
+      },
+      {
+        titulo: 'Sigue el ascenso otomano en paralelo al declive bizantino',
+        cuerpo: 'Alterna entre los hitos azules (Bizancio) y los verdes (otomanos). Notarás que el crecimiento de un Estado coincide con la contracción del otro. La interrupción de Tamerlán en 1402 es la única gran pausa: un factor externo que dio a Bizancio unas décadas más.',
+      },
+      {
+        titulo: 'Usa la Comparativa para ordenar a los protagonistas',
+        cuerpo: 'En la tabla Comparativa puedes ver de un vistazo las figuras clave de cada fase, de los Láscaris de Nicea a Mehmed II y Constantino XI. Filtrar por categoría permite separar el bando bizantino del otomano sin perder de vista que ambos actuaron por intereses concretos, no como héroes o villanos.',
+      },
+      {
+        titulo: 'Termina con el Contexto Histórico para el cuadro completo',
+        cuerpo: 'Las 6 eras muestran cómo encadenaron fractura, restauración, declive, ascenso otomano, preparativos y caída. La última era, "El cerco, la caída y sus consecuencias", concentra en pocos años los acontecimientos más citados, desde los cañones de Urbano hasta la caída de Trebisonda en 1461.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '🏛️',
+        texto: 'El Imperio "bizantino" es un nombre acuñado por historiadores posteriores: sus habitantes se llamaban a sí mismos romanos (rhomaioi). Constantinopla se consideraba la continuación directa de Roma, no un imperio nuevo.',
+      },
+      {
+        icono: '🧱',
+        texto: 'Las murallas teodosianas, construidas en el siglo V, protegieron la ciudad durante unos mil años y resistieron numerosos asedios. En 1453 se enfrentaron por primera vez a artillería pesada de pólvora, un cambio técnico que ayuda a entender el desenlace.',
+      },
+      {
+        icono: '⛓️',
+        texto: 'Los defensores cerraron la entrada del Cuerno de Oro con una gran cadena para impedir el paso de la flota otomana. Mehmed II sorteó el obstáculo haciendo transportar barcos por tierra sobre rodillos engrasados, una maniobra tan citada como discutida en sus detalles.',
+      },
+      {
+        icono: '📜',
+        texto: 'Muchas de las escenas más famosas del asedio proceden de crónicas escritas después y con intención política o religiosa. Al leer sobre 1453 conviene distinguir siempre entre lo documentado por varias fuentes y lo que pertenece a la leyenda.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Creer que Bizancio era un imperio ajeno a Roma',
+        cuerpo: 'El Imperio bizantino era la mitad oriental del Imperio Romano, que sobrevivió casi mil años a la caída de Occidente en el 476. Sus habitantes se consideraban romanos y conservaron el derecho romano y las instituciones imperiales. El término "bizantino" es una etiqueta posterior, cómoda pero potencialmente engañosa.',
+      },
+      {
+        titulo: 'Reducir 1453 a un choque de religiones',
+        cuerpo: 'Presentar la caída como un simple enfrentamiento entre cristianismo e islam simplifica en exceso. En 1204 fueron cristianos occidentales quienes saquearon la ciudad; en 1453 había mercenarios y aliados cristianos en el ejército otomano y contingentes italianos en la defensa. Los intereses políticos, comerciales y dinásticos pesaron tanto como los religiosos.',
+      },
+      {
+        titulo: 'Dar por buenas las cifras de las crónicas',
+        cuerpo: 'Las fuentes medievales tienden a exagerar el tamaño de los ejércitos y las poblaciones, a menudo para engrandecer la gesta o justificar la derrota. Tanto el número de defensores como el del ejército otomano deben manejarse como estimaciones con horquillas amplias, no como datos exactos.',
+      },
+      {
+        titulo: 'Atribuir el Renacimiento solo a la caída de Constantinopla',
+        cuerpo: 'La llegada de eruditos y manuscritos griegos a Italia contribuyó al Renacimiento, pero este movimiento había comenzado antes de 1453 y tuvo causas económicas, sociales y culturales muy diversas. Convertir una sola fecha en la explicación de un fenómeno de siglos es un error frecuente de simplificación.',
+      },
+    ],
+  },
+};
