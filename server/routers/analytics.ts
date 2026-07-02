@@ -1167,6 +1167,18 @@ export const analyticsRouter = router({
       const continuaciones: Map<string, number> = new Map();
       const incInc = (m: Map<string, number>, k: string) => m.set(k, (m.get(k) || 0) + 1);
 
+      // Descubrimiento interno (KPI honesto): cuenta cada clic de navegación entre apps
+      // a través del atributo ?from=, INDEPENDIENTEMENTE de si la sesión se fragmenta.
+      // apps/sesión infravalora este dato porque el sesion_id no sobrevive a los saltos
+      // en webviews in-app (app de Google, ChatGPT, redes) ni a las aperturas en pestaña nueva.
+      let clicsInternos = 0;
+      const clicsPorCategoria: Record<string, number> = {};
+      const categoriaDe = (from: string): string => {
+        if (from.startsWith('related-')) return 'related';
+        if (['home-daily', 'sidebar-recent', 'catalog', 'catalog-guides', 'search'].includes(from)) return from;
+        return 'otro';
+      };
+
       for (const [, visitas] of sesiones) {
         const appsUnicas = new Set(visitas.map(v => v.app));
         totalVisitas += visitas.length;
@@ -1197,6 +1209,13 @@ export const analyticsRouter = router({
           // Continuación: si hay siguiente visita y es app distinta, esta es app puente
           const tieneSiguiente = visitas.slice(i + 1).some(s => s.app !== v.app);
           if (tieneSiguiente) incInc(continuaciones, v.app);
+
+          // Clic de descubrimiento interno: cualquier visita con ?from= explícito
+          if (v.from) {
+            clicsInternos++;
+            const cat = categoriaDe(v.from);
+            clicsPorCategoria[cat] = (clicsPorCategoria[cat] || 0) + 1;
+          }
 
           // Par from→to: priorizar el `from` explícito (RelatedApps, home-daily, search...)
           let origen: string | null = null;
@@ -1251,6 +1270,11 @@ export const analyticsRouter = router({
           pctConHome: Math.round(pctConHome * 10) / 10,
           pctOrigenHome: Math.round(pctOrigenHome * 10) / 10,
           pctOrigenDirecto: Math.round(pctOrigenDirecto * 10) / 10,
+        },
+        descubrimientoInterno: {
+          total: clicsInternos,
+          pctDeVisitas: totalVisitas > 0 ? Math.round((clicsInternos / totalVisitas) * 1000) / 10 : 0,
+          porCategoria: clicsPorCategoria,
         },
         distribucionLongitud: distribLongitud,
         topPares,

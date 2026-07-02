@@ -1634,10 +1634,16 @@ export default function DashboardAnalyticsPage() {
         <div className={styles.tabContent}>
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>🧭 Navegación entre apps</h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem' }}>
               Análisis del recorrido de los usuarios por sesión. Ventana: últimos {navegacionQuery.data?.ventanaDias ?? 14} días.
-              Excluye bots, MCP y Mi IP. Para ver el origen exacto del clic (RelatedApps, home, búsqueda, catálogo, sidebar)
-              hay que esperar 3-5 días tras el deploy del tracking <code>?from=</code>.
+              Excluye bots, MCP y Mi IP.
+            </p>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '1.5rem', background: 'var(--bg-primary)', borderLeft: '3px solid var(--primary)', padding: '0.75rem 1rem', borderRadius: '0 6px 6px 0' }}>
+              <strong>KPI principal: Descubrimiento interno (<code>?from=</code>).</strong> Cuenta cada clic real de navegación
+              entre apps. Es la métrica honesta porque <em>apps/sesión</em> y <em>single-app</em> <strong>infravaloran</strong> el
+              descubrimiento: el <code>sesion_id</code> no sobrevive a los saltos en webviews in-app (app de Google, ChatGPT,
+              redes) ni a las aperturas en pestaña nueva, así que muchos viajes de 2 apps se registran como 2 sesiones single-app
+              distintas. Un mismo clic de RelatedApps puede aparecer en <code>?from=</code> y no verse en apps/sesión.
             </p>
 
             {navegacionQuery.isLoading && <p>⏳ Cargando análisis de navegación…</p>}
@@ -1646,6 +1652,13 @@ export default function DashboardAnalyticsPage() {
               <>
                 {/* KPIs */}
                 <div className={styles.statsGrid}>
+                  <div className={`${styles.statCard} ${styles.highlight}`}>
+                    <div className={styles.statContent}>
+                      <h3>🎯 Descubrimiento interno</h3>
+                      <p>{navegacionQuery.data.descubrimientoInterno.total}</p>
+                      <small>clics <code>?from=</code> · {navegacionQuery.data.descubrimientoInterno.pctDeVisitas}% de las visitas continúan a otra app</small>
+                    </div>
+                  </div>
                   <div className={styles.statCard}>
                     <div className={styles.statContent}>
                       <h3>Sesiones únicas</h3>
@@ -1653,25 +1666,18 @@ export default function DashboardAnalyticsPage() {
                       <small style={{ color: 'var(--text-muted)' }}>{navegacionQuery.data.kpis.totalVisitas} visitas totales</small>
                     </div>
                   </div>
-                  <div className={`${styles.statCard} ${styles.highlight}`}>
+                  <div className={styles.statCard}>
                     <div className={styles.statContent}>
                       <h3>Apps por sesión (medio)</h3>
                       <p>{navegacionQuery.data.kpis.appsPorSesionMedio}</p>
-                      <small>Objetivo REPOSICIONAMIENTO: 2,0+</small>
+                      <small style={{ color: 'var(--text-muted)' }}>⚠️ Infravalora (sesión fragmentada en webviews)</small>
                     </div>
                   </div>
                   <div className={styles.statCard}>
                     <div className={styles.statContent}>
                       <h3>Sesiones single-app</h3>
                       <p>{navegacionQuery.data.kpis.pctSingleApp}%</p>
-                      <small style={{ color: 'var(--text-muted)' }}>Entran a 1 app y se van</small>
-                    </div>
-                  </div>
-                  <div className={styles.statCard}>
-                    <div className={styles.statContent}>
-                      <h3>Sesiones multi-app</h3>
-                      <p>{navegacionQuery.data.kpis.pctMultiApp}%</p>
-                      <small style={{ color: 'var(--text-muted)' }}>Visitan 2+ apps en la misma pestaña</small>
+                      <small style={{ color: 'var(--text-muted)' }}>⚠️ Infla por fragmentación de sesión</small>
                     </div>
                   </div>
                   <div className={styles.statCard}>
@@ -1688,6 +1694,41 @@ export default function DashboardAnalyticsPage() {
                       <small style={{ color: 'var(--text-muted)' }}>En algún momento de la sesión</small>
                     </div>
                   </div>
+                </div>
+
+                {/* Desglose del descubrimiento interno por origen */}
+                <h3 style={{ marginTop: '2rem', fontSize: '1.05rem' }}>
+                  Descubrimiento interno por origen del clic
+                </h3>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>
+                  De dónde salió cada clic que llevó a una segunda app: <code>related</code> (RelatedApps),
+                  <code>sidebar-recent</code>, <code>home-daily</code>, <code>catalog</code>, <code>search</code>.
+                </p>
+                <div className={styles.tableContainer}>
+                  <table className={styles.table}>
+                    <thead>
+                      <tr>
+                        <th>Origen del clic</th>
+                        <th style={{ textAlign: 'right' }}>Clics</th>
+                        <th style={{ textAlign: 'right' }}>%</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.entries(navegacionQuery.data.descubrimientoInterno.porCategoria)
+                        .sort((a, b) => b[1] - a[1])
+                        .map(([origen, clics]) => {
+                          const tot = navegacionQuery.data!.descubrimientoInterno.total;
+                          const pct = tot > 0 ? (clics / tot) * 100 : 0;
+                          return (
+                            <tr key={origen}>
+                              <td><code>{origen}</code></td>
+                              <td style={{ textAlign: 'right' }}><strong>{clics}</strong></td>
+                              <td style={{ textAlign: 'right' }}>{pct.toFixed(1)}%</td>
+                            </tr>
+                          );
+                        })}
+                    </tbody>
+                  </table>
                 </div>
 
                 {/* Distribución longitud de sesión */}
