@@ -1,0 +1,367 @@
+import type { HistoriaData } from './types';
+
+export const guerraSucesionEspanola: HistoriaData = {
+  slug: 'guerra-sucesion-espanola',
+  titulo: 'La Guerra de Sucesión Española: Un Conflicto Europeo y una Guerra Civil (1700-1715)',
+  subtitulo: 'De la muerte sin heredero de Carlos II a los Tratados de Utrecht y los Decretos de Nueva Planta: quince años que redibujaron el mapa de Europa y la organización interna de España',
+  descripcionSEO: 'Cronología interactiva de la Guerra de Sucesión Española (1700-1715): la muerte sin descendencia de Carlos II, el testamento a favor de Felipe de Anjou, la Gran Alianza de La Haya, la doble dimensión de conflicto europeo y guerra civil (Felipe V frente al archiduque Carlos), las batallas de Almansa, Blenheim, Brihuega y Villaviciosa, el giro de 1711, los Tratados de Utrecht y Rastatt, la caída de Barcelona (11 de septiembre de 1714) y los Decretos de Nueva Planta, en 10 hitos y 6 eras.',
+  keywords: [
+    'guerra de sucesión española cronología 1700 1714',
+    'carlos ii testamento felipe de anjou borbón',
+    'archiduque carlos austria corona de aragón',
+    'gran alianza la haya batalla almansa blenheim',
+    'tratados de utrecht rastatt gibraltar menorca',
+    'caída de barcelona 1714 decretos de nueva planta',
+  ],
+  anioInicio: 1700,
+  anioFin: 1715,
+
+  hitos: [
+    {
+      id: 'muerte-carlos-ii',
+      nombre: 'La muerte de Carlos II y el testamento',
+      anioInicio: 1700,
+      anioFin: 1700,
+      color: '#8B5E3C',
+      categoria: 'sucesion',
+      descripcion: 'Carlos II de Habsburgo, último rey de la dinastía en España, murió el 1 de noviembre de 1700 sin descendencia, dejando abierta la sucesión de una monarquía que abarcaba España, buena parte de Italia, los Países Bajos meridionales y un vasto imperio en América. Durante años, las potencias europeas habían negociado en secreto tratados de reparto para evitar que la herencia recayese entera en un solo candidato. En su testamento, Carlos II designó heredero universal a Felipe de Anjou, nieto de Luis XIV de Francia, con la condición de que las coronas de Francia y España nunca se unieran. La alternativa principal era el archiduque Carlos de Austria, de la rama vienesa de los Habsburgo. La decisión buscaba mantener íntegros los territorios de la monarquía, pero encendió el temor europeo a una hegemonía francesa.',
+      obraIconica: 'El testamento de Carlos II a favor de Felipe de Anjou (1700)',
+      paises: ['España', 'Francia', 'Sacro Imperio', 'Italia', 'Países Bajos'],
+    },
+    {
+      id: 'felipe-v-anjou',
+      nombre: 'Felipe de Anjou, rey de España',
+      anioInicio: 1700,
+      anioFin: 1701,
+      color: '#8B5E3C',
+      categoria: 'sucesion',
+      descripcion: 'Luis XIV aceptó el testamento en nombre de su nieto, que fue proclamado rey de España como Felipe V y entró en Madrid en 1701. La frase atribuida por la tradición ("ya no hay Pirineos") resume el temor que la elección provocó: una alianza dinástica entre las dos grandes coronas borbónicas. Los primeros movimientos de Luis XIV agravaron ese recelo: mantuvo los derechos sucesorios de Felipe al trono francés, ocupó plazas fuertes en los Países Bajos españoles y concedió a comerciantes franceses el asiento de esclavos hacia América. Cada uno de estos pasos fue interpretado por las potencias marítimas como una amenaza al equilibrio europeo y al comercio atlántico.',
+      obraIconica: 'Proclamación de Felipe V y su entrada en Madrid (1701)',
+      paises: ['España', 'Francia', 'Países Bajos', 'América'],
+    },
+    {
+      id: 'gran-alianza',
+      nombre: 'La Gran Alianza de La Haya',
+      anioInicio: 1701,
+      anioFin: 1702,
+      color: '#1F6F8B',
+      categoria: 'diplomacia',
+      descripcion: 'En septiembre de 1701 se firmó en La Haya la Gran Alianza entre el Sacro Imperio (Austria), Inglaterra y las Provincias Unidas de los Países Bajos, a la que se sumaron después Portugal, Saboya y varios estados alemanes. Su objetivo declarado no era, en principio, arrebatar el trono a Felipe V, sino impedir la unión de las coronas francesa y española y garantizar las plazas comerciales y estratégicas de las potencias marítimas. El impulsor diplomático fue Guillermo III de Inglaterra. La guerra se declaró formalmente en 1702, con el emperador Leopoldo I reclamando la herencia española para su hijo, el archiduque Carlos. El conflicto quedó así planteado como una contienda por el equilibrio de poder en Europa.',
+      obraIconica: 'Firma de la Gran Alianza de La Haya (1701)',
+      paises: ['Sacro Imperio', 'Inglaterra', 'Provincias Unidas', 'Portugal', 'Saboya'],
+    },
+    {
+      id: 'dos-espanas',
+      nombre: 'Dos reyes, dos Españas',
+      anioInicio: 1701,
+      anioFin: 1705,
+      color: '#B03A2E',
+      categoria: 'guerra-civil',
+      descripcion: 'La guerra no fue solo internacional: dentro de la península, la población y las élites se dividieron entre los partidarios de Felipe V (borbónicos) y los del archiduque Carlos (austracistas), que se proclamó rey como Carlos III. A grandes rasgos, la Corona de Castilla se mantuvo mayoritariamente fiel a Felipe V, mientras que amplios sectores de la Corona de Aragón —Aragón, Cataluña, Valencia y Mallorca— apoyaron al archiduque, aunque hubo partidarios de ambos bandos en todos los territorios. Las motivaciones combinaban lealtades dinásticas, intereses económicos, tensiones internas y el deseo de preservar los fueros y las instituciones propias. La entrada de Portugal en la Gran Alianza (1703) abrió un frente terrestre en el oeste peninsular.',
+      obraIconica: 'El archiduque Carlos proclamado Carlos III de España (1703)',
+      paises: ['España', 'Corona de Castilla', 'Corona de Aragón', 'Portugal'],
+    },
+    {
+      id: 'archiduque-aragon',
+      nombre: 'El archiduque Carlos y la Corona de Aragón',
+      anioInicio: 1705,
+      anioFin: 1706,
+      color: '#B03A2E',
+      categoria: 'guerra-civil',
+      descripcion: 'En 1704 una flota anglo-neerlandesa tomó Gibraltar en nombre del archiduque Carlos. En 1705, el Pacto de Génova entre representantes catalanes y la Alianza facilitó el desembarco del archiduque, que entró en Barcelona y fue reconocido en gran parte de la Corona de Aragón. Sus tropas llegaron a ocupar Madrid brevemente en 1706, aunque no lograron consolidar el control de Castilla y hubieron de retirarse. Durante estos años coexistieron dos cortes y dos administraciones rivales en la península. El apoyo territorial no fue homogéneo ni permanente: las lealtades cambiaron según el curso militar y los intereses locales.',
+      obraIconica: 'Entrada del archiduque Carlos en Barcelona (1705)',
+      paises: ['Cataluña', 'Aragón', 'Valencia', 'Mallorca', 'Gibraltar'],
+    },
+    {
+      id: 'frentes-europeos',
+      nombre: 'Los grandes frentes europeos',
+      anioInicio: 1702,
+      anioFin: 1709,
+      color: '#7D3C98',
+      categoria: 'guerra-europea',
+      descripcion: 'Mientras se combatía en España, la guerra se libró simultáneamente en Alemania, los Países Bajos, Italia y el mar. Los ejércitos aliados, mandados por el duque de Marlborough y el príncipe Eugenio de Saboya, infligieron duras derrotas a Francia: Blenheim (Höchstädt, 1704) frenó el avance francobávaro hacia Viena, y siguieron Ramillies (1706), Oudenarde (1708) y la sangrienta Malplaquet (1709). Estas campañas desgastaron enormemente los recursos de Francia y España. Aun así, ni una parte ni la otra lograba una victoria decisiva que impusiera la paz, y el coste humano y económico crecía año tras año en todos los frentes.',
+      obraIconica: 'La batalla de Blenheim (Höchstädt), 1704',
+      paises: ['Sacro Imperio', 'Francia', 'Países Bajos', 'Baviera', 'Italia'],
+    },
+    {
+      id: 'almansa',
+      nombre: 'La batalla de Almansa',
+      anioInicio: 1707,
+      anioFin: 1707,
+      color: '#566573',
+      categoria: 'batallas',
+      descripcion: 'El 25 de abril de 1707, el ejército borbónico venció en Almansa (actual provincia de Albacete) al ejército aliado que apoyaba al archiduque Carlos. La batalla tuvo una nota singular: las tropas borbónicas estaban mandadas por el duque de Berwick, de origen inglés al servicio de Francia, mientras que las aliadas las dirigía el marqués de Ruvigny, de origen francés al servicio de Inglaterra. Almansa abrió las puertas de Valencia y Aragón a Felipe V y marcó un punto de inflexión en el frente peninsular. A raíz de esta victoria, Felipe V promulgó los primeros Decretos de Nueva Planta para Valencia y Aragón (1707), aboliendo sus fueros e instituciones propias.',
+      obraIconica: 'La batalla de Almansa (25 de abril de 1707)',
+      paises: ['España', 'Valencia', 'Aragón', 'Francia', 'Inglaterra'],
+    },
+    {
+      id: 'brihuega-villaviciosa',
+      nombre: 'Brihuega y Villaviciosa',
+      anioInicio: 1710,
+      anioFin: 1710,
+      color: '#566573',
+      categoria: 'batallas',
+      descripcion: '1710 fue un año de vaivenes en el frente peninsular. Tras las victorias aliadas de Almenar y Zaragoza, las tropas del archiduque volvieron a ocupar Madrid, pero de nuevo no consiguieron sostenerse en una Castilla mayoritariamente hostil y emprendieron la retirada. En diciembre, las fuerzas borbónicas, con el duque de Vendôme al mando, capturaron un contingente británico en Brihuega y libraron al día siguiente la batalla de Villaviciosa (Tajuña). Estas acciones consolidaron el control borbónico sobre el centro de la península y debilitaron de forma duradera la posición militar del archiduque en Castilla.',
+      obraIconica: 'Las batallas de Brihuega y Villaviciosa (diciembre de 1710)',
+      paises: ['España', 'Corona de Castilla', 'Francia', 'Inglaterra', 'Portugal'],
+    },
+    {
+      id: 'giro-1711',
+      nombre: 'El giro de 1711 y la paz de Utrecht',
+      anioInicio: 1711,
+      anioFin: 1713,
+      color: '#1F6F8B',
+      categoria: 'diplomacia',
+      descripcion: 'En 1711 murió el emperador José I y le sucedió su hermano, el archiduque Carlos, que pasó a ser el emperador Carlos VI. El motivo original de la guerra se invirtió: si vencía, Carlos reuniría en una sola persona el Sacro Imperio y la monarquía española, un poder Habsburgo que Inglaterra juzgó tan peligroso como la hegemonía borbónica. Un nuevo gobierno tory en Londres, partidario de la paz, abrió negociaciones. Entre 1713 y 1714 se firmaron los Tratados de Utrecht: Felipe V fue reconocido como rey de España y las Indias a cambio de renunciar a cualquier derecho al trono francés. España cedió a Gran Bretaña Gibraltar y Menorca, y a Austria y Saboya sus posesiones europeas en Italia y los Países Bajos.',
+      obraIconica: 'Los Tratados de Utrecht (1713)',
+      paises: ['Sacro Imperio', 'Gran Bretaña', 'Francia', 'España', 'Provincias Unidas', 'Saboya'],
+    },
+    {
+      id: 'barcelona-nueva-planta',
+      nombre: 'Barcelona 1714 y la Nueva Planta',
+      anioInicio: 1713,
+      anioFin: 1715,
+      color: '#4A235A',
+      categoria: 'consecuencias',
+      descripcion: 'Con las potencias retiradas de la guerra, la resistencia austracista quedó reducida a Cataluña y Mallorca. El Tratado de Rastatt (1714) selló la paz entre Francia y el emperador Carlos VI, que no reconoció a Felipe V pero cesó las hostilidades. Barcelona, sitiada durante más de un año, capituló el 11 de septiembre de 1714 tras un asalto final; Mallorca se rindió en 1715. A continuación, Felipe V extendió los Decretos de Nueva Planta a Cataluña (1716) y ya antes a Mallorca, tras haberlos aplicado a Valencia y Aragón: estas normas abolieron los fueros e instituciones propias de la Corona de Aragón y unificaron la administración según el modelo castellano. El 11 de septiembre es hoy la Diada, fiesta oficial de Cataluña.',
+      obraIconica: 'La capitulación de Barcelona (11 de septiembre de 1714)',
+      paises: ['Cataluña', 'Mallorca', 'España', 'Francia', 'Sacro Imperio'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'El vacío sucesorio',
+      desde: 1700,
+      hasta: 1701,
+      icono: '👑',
+      hitosDestacados: ['La muerte de Carlos II y el testamento', 'Felipe de Anjou, rey de España'],
+      eventos: [
+        'Muerte de Carlos II sin descendencia (1 de noviembre de 1700)',
+        'El testamento designa heredero a Felipe de Anjou, nieto de Luis XIV',
+        'Luis XIV acepta la herencia en nombre de su nieto',
+        'Felipe V es proclamado rey y entra en Madrid (1701)',
+        'Francia ocupa plazas en los Países Bajos y obtiene el asiento de esclavos',
+      ],
+    },
+    {
+      nombre: 'La formación de los bandos',
+      desde: 1701,
+      hasta: 1704,
+      icono: '🤝',
+      hitosDestacados: ['La Gran Alianza de La Haya', 'Dos reyes, dos Españas'],
+      eventos: [
+        'Se firma la Gran Alianza de La Haya: Austria, Inglaterra y Provincias Unidas (1701)',
+        'Declaración formal de guerra (1702)',
+        'El archiduque Carlos es proclamado Carlos III por sus partidarios (1703)',
+        'Portugal se une a la Gran Alianza y abre el frente occidental (1703)',
+        'Toma anglo-neerlandesa de Gibraltar (1704)',
+      ],
+    },
+    {
+      nombre: 'La ofensiva aliada',
+      desde: 1704,
+      hasta: 1707,
+      icono: '⚔️',
+      hitosDestacados: ['El archiduque Carlos y la Corona de Aragón', 'Los grandes frentes europeos'],
+      eventos: [
+        'Batalla de Blenheim (Höchstädt): derrota francobávara (1704)',
+        'Pacto de Génova y desembarco del archiduque en Barcelona (1705)',
+        'Victoria aliada en Ramillies en los Países Bajos (1706)',
+        'Ocupación aliada temporal de Madrid (1706)',
+        'Apoyo mayoritario a Felipe V en Castilla y al archiduque en la Corona de Aragón',
+      ],
+    },
+    {
+      nombre: 'El punto de inflexión peninsular',
+      desde: 1707,
+      hasta: 1710,
+      icono: '🏰',
+      hitosDestacados: ['La batalla de Almansa'],
+      eventos: [
+        'Victoria borbónica en Almansa (25 de abril de 1707)',
+        'Primeros Decretos de Nueva Planta para Valencia y Aragón (1707)',
+        'Victoria aliada en Oudenarde en los Países Bajos (1708)',
+        'La sangrienta batalla de Malplaquet agota a ambos bandos (1709)',
+        'Ambos bandos sufren un enorme desgaste económico y humano',
+      ],
+    },
+    {
+      nombre: 'El giro de la guerra',
+      desde: 1710,
+      hasta: 1713,
+      icono: '🔄',
+      hitosDestacados: ['Brihuega y Villaviciosa', 'El giro de 1711 y la paz de Utrecht'],
+      eventos: [
+        'Victorias aliadas en Almenar y Zaragoza y nueva ocupación de Madrid (1710)',
+        'Batallas de Brihuega y Villaviciosa: consolidación borbónica en el centro (1710)',
+        'El archiduque Carlos hereda el Imperio como Carlos VI (1711)',
+        'Inglaterra teme un poder Habsburgo excesivo e impulsa la paz',
+        'Tratados de Utrecht: Felipe V reconocido; cesión de Gibraltar y Menorca (1713)',
+      ],
+    },
+    {
+      nombre: 'La paz y la Nueva Planta',
+      desde: 1713,
+      hasta: 1715,
+      icono: '📜',
+      hitosDestacados: ['Barcelona 1714 y la Nueva Planta'],
+      eventos: [
+        'Tratado de Rastatt entre Francia y el emperador Carlos VI (1714)',
+        'Capitulación de Barcelona tras un largo asedio (11 de septiembre de 1714)',
+        'Rendición de Mallorca (1715)',
+        'Decretos de Nueva Planta: abolición de los fueros de la Corona de Aragón',
+        'España pierde sus posesiones europeas y se reorganiza internamente',
+      ],
+    },
+  ],
+
+  categorias: {
+    sucesion: 'Crisis sucesoria',
+    diplomacia: 'Diplomacia y alianzas',
+    'guerra-civil': 'Guerra civil peninsular',
+    'guerra-europea': 'Guerra europea',
+    batallas: 'Grandes batallas',
+    consecuencias: 'Consecuencias',
+  },
+
+  colores: {
+    sucesion: '#8B5E3C',
+    diplomacia: '#1F6F8B',
+    'guerra-civil': '#B03A2E',
+    'guerra-europea': '#7D3C98',
+    batallas: '#566573',
+    consecuencias: '#4A235A',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'La Guerra de Sucesión Española (1700-1715) fue, al mismo tiempo, dos guerras entrelazadas. Por un lado, un gran conflicto internacional por el equilibrio de poder en Europa: la muerte sin heredero de Carlos II dejó vacante una de las mayores monarquías del mundo, y las potencias se enfrentaron para impedir tanto una hegemonía francesa como, más tarde, una hegemonía austríaca. Por otro, una guerra civil dentro de la península entre los partidarios de Felipe de Borbón y los del archiduque Carlos de Habsburgo, con apoyos que se repartieron de forma desigual entre la Corona de Castilla y la Corona de Aragón. El conflicto terminó con los Tratados de Utrecht y Rastatt, que reconocieron a Felipe V a cambio de importantes pérdidas territoriales, y con los Decretos de Nueva Planta, que reorganizaron la administración interna de España. Esta cronología recorre esos quince años como lo que fueron: un proceso de guerra, diplomacia y transformación institucional con múltiples protagonistas y ninguna lectura única.',
+
+    tablaComparativa: [
+      { hito: 'La muerte de Carlos II', periodo: '1700', categoria: 'Crisis sucesoria', personaje: 'Carlos II de Habsburgo', aportacion: 'Testamento a favor de Felipe de Anjou que abre la crisis sucesoria' },
+      { hito: 'La Gran Alianza de La Haya', periodo: '1701-1702', categoria: 'Diplomacia y alianzas', personaje: 'Guillermo III / Leopoldo I', aportacion: 'Coalición para frenar la unión de coronas Francia-España' },
+      { hito: 'El archiduque en la Corona de Aragón', periodo: '1705-1706', categoria: 'Guerra civil peninsular', personaje: 'Archiduque Carlos', aportacion: 'Desembarco en Barcelona y reconocimiento en gran parte de Aragón' },
+      { hito: 'La batalla de Almansa', periodo: '1707', categoria: 'Grandes batallas', personaje: 'Duque de Berwick', aportacion: 'Victoria borbónica que abre Valencia y Aragón a Felipe V' },
+      { hito: 'El giro de 1711 y Utrecht', periodo: '1711-1713', categoria: 'Diplomacia y alianzas', personaje: 'Carlos VI / gobierno tory inglés', aportacion: 'Carlos hereda el Imperio; Inglaterra impulsa la paz de Utrecht' },
+      { hito: 'Barcelona 1714 y la Nueva Planta', periodo: '1713-1715', categoria: 'Consecuencias', personaje: 'Felipe V', aportacion: 'Fin de la resistencia y reorganización administrativa de España' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiantes de Historia',
+        perfil: 'Secundaria, preparatoria y universidad',
+        texto: 'Visión ordenada de un conflicto que suele estudiarse de forma fragmentada. Permite distinguir con claridad su doble naturaleza —guerra europea y guerra civil— y situar en el tiempo las batallas, los tratados y las consecuencias institucionales sin mezclarlas.',
+      },
+      {
+        icono: '🌍',
+        titulo: 'Interesados en las relaciones internacionales',
+        perfil: 'Equilibrio de poder y diplomacia',
+        texto: 'La guerra es un caso de manual del principio del "equilibrio de poder": las alianzas cambiaron según quién amenazaba con acumular demasiado poder, primero Francia y luego Austria. Los Tratados de Utrecht se consideran un hito en la historia del derecho internacional europeo.',
+      },
+      {
+        icono: '🏛️',
+        titulo: 'Estudio de las instituciones',
+        perfil: 'Del modelo foral al Estado unificado',
+        texto: 'Los Decretos de Nueva Planta transformaron la organización política de España, sustituyendo el modelo de coronas con instituciones propias por una administración más unificada. Útil para entender el origen histórico de debates territoriales posteriores, presentados aquí como hechos, no como juicios.',
+      },
+      {
+        icono: '🗺️',
+        titulo: 'Curiosos de la historia local',
+        perfil: 'España, Cataluña, Gibraltar, Menorca',
+        texto: 'Muchos lugares conservan memoria de esta guerra: Gibraltar y Menorca pasaron a manos británicas, y el 11 de septiembre marca la Diada de Cataluña. Esta cronología aporta el contexto factual para entender por qué estos episodios siguen presentes.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Por qué estalló la Guerra de Sucesión Española?',
+        respuesta: 'Carlos II murió en 1700 sin hijos y dejó en testamento la corona a Felipe de Anjou, nieto de Luis XIV de Francia. Otras potencias, sobre todo Austria, Inglaterra y las Provincias Unidas, temieron que Francia y España acabaran unidas bajo la dinastía borbónica y rompieran el equilibrio de poder europeo. Por eso formaron la Gran Alianza y apoyaron al candidato rival, el archiduque Carlos de Austria.',
+        tip: 'Antes de la muerte de Carlos II ya se habían firmado tratados secretos de reparto de la herencia española entre las potencias.',
+      },
+      {
+        pregunta: '¿Fue una guerra internacional o una guerra civil?',
+        respuesta: 'Fue las dos cosas a la vez. En el plano internacional, los grandes ejércitos europeos combatieron en Alemania, los Países Bajos, Italia y el mar. En el plano interno, la población y las élites españolas se dividieron entre los partidarios de Felipe V y los del archiduque Carlos, con enfrentamientos armados dentro de la propia península. Ambas dimensiones estuvieron entrelazadas durante todo el conflicto.',
+        tip: 'A grandes rasgos, Castilla apoyó mayoritariamente a Felipe V y buena parte de la Corona de Aragón al archiduque, pero hubo partidarios de ambos en todos los territorios.',
+      },
+      {
+        pregunta: '¿Qué cambió con el giro de 1711?',
+        respuesta: 'En 1711 murió el emperador José I y le sucedió su hermano, el archiduque Carlos, convertido en emperador Carlos VI. Si ganaba la guerra, reuniría el Sacro Imperio y la monarquía española en una sola persona, un poder que Inglaterra consideró tan peligroso como la hegemonía francesa que se quería evitar. Ese cambio de escenario llevó a Inglaterra a negociar la paz y precipitó los Tratados de Utrecht.',
+        tip: 'La lógica del equilibrio de poder explica que Inglaterra cambiara de estrategia: no buscaba un ganador, sino que ningún bloque fuera demasiado fuerte.',
+      },
+      {
+        pregunta: '¿Qué perdió y qué mantuvo España en los tratados?',
+        respuesta: 'En los Tratados de Utrecht (1713) y Rastatt (1714), Felipe V fue reconocido como rey de España y las Indias a cambio de renunciar a cualquier derecho al trono francés. España conservó su imperio americano, pero cedió Gibraltar y Menorca a Gran Bretaña y perdió sus posesiones europeas: los Países Bajos meridionales y territorios en Italia pasaron a Austria y Saboya.',
+        tip: 'Gran Bretaña obtuvo además ventajas comerciales con América, como el asiento de esclavos y el llamado navío de permiso.',
+      },
+      {
+        pregunta: '¿Qué fueron los Decretos de Nueva Planta?',
+        respuesta: 'Fueron una serie de disposiciones con las que Felipe V reorganizó la administración de los territorios de la Corona de Aragón. Aplicados a Valencia y Aragón tras Almansa (1707) y después a Mallorca y Cataluña, abolieron sus fueros e instituciones propias y unificaron el gobierno según el modelo de Castilla. La Corona de Castilla conservó en cambio sus instituciones. Es un hecho histórico central del reinado, con interpretaciones diversas según la perspectiva.',
+        tip: 'La capitulación de Barcelona, el 11 de septiembre de 1714, es hoy la fecha de la Diada, fiesta oficial de Cataluña.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Observa las dos dimensiones en la Línea del Tiempo',
+        cuerpo: 'Los colores separan la crisis sucesoria (marrón), la diplomacia (azul), la guerra civil peninsular (rojo), la guerra europea (violeta), las grandes batallas (gris) y las consecuencias (púrpura). Fíjate en cómo se solapan en el tiempo: el conflicto interno y el internacional ocurrieron a la vez.',
+      },
+      {
+        titulo: 'Distingue a los dos candidatos',
+        cuerpo: 'Haz clic en "Felipe de Anjou, rey de España" y luego en "El archiduque Carlos y la Corona de Aragón". Verás que ambos tenían apoyos internos y externos legítimos: la guerra no fue un enfrentamiento entre un héroe y un villano, sino entre dos pretendientes con respaldos distintos.',
+      },
+      {
+        titulo: 'Sigue el hilo del equilibrio de poder',
+        cuerpo: 'Compara "La Gran Alianza de La Haya" con "El giro de 1711 y la paz de Utrecht". La misma lógica —impedir que nadie acumule demasiado poder— explica primero la guerra contra Francia y después la paz cuando el peligro pasó a ser Austria.',
+      },
+      {
+        titulo: 'Usa la Comparativa para ordenar las batallas',
+        cuerpo: 'En la tabla Comparativa, filtra por "Grandes batallas" para situar Almansa (1707) y Brihuega-Villaviciosa (1710) en su contexto, y por "Diplomacia y alianzas" para ver cómo las negociaciones enmarcaron el desenlace militar.',
+      },
+      {
+        titulo: 'Termina con el Contexto Histórico',
+        cuerpo: 'Las 6 eras muestran la progresión completa: del vacío sucesorio a la Nueva Planta. La era "La paz y la Nueva Planta" reúne los tratados, el final de la resistencia y la reorganización institucional, el legado más duradero del conflicto.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '⚖️',
+        texto: 'La guerra ilustra el principio del "equilibrio de poder": las alianzas no dependían de simpatías, sino del cálculo de qué potencia amenazaba con volverse demasiado fuerte. Por eso Inglaterra combatió primero a Francia y luego buscó la paz cuando Austria pudo unir Imperio y España.',
+      },
+      {
+        icono: '🌐',
+        texto: 'Fue un conflicto verdaderamente europeo y atlántico: se combatió en España, Alemania, los Países Bajos, Italia, el Mediterráneo y las colonias americanas. En América del Norte, la contienda paralela se conoció como la "Guerra de la Reina Ana".',
+      },
+      {
+        icono: '🏴',
+        texto: 'En Almansa (1707) las tropas borbónicas las mandaba un general de origen inglés (el duque de Berwick) y las aliadas un general de origen francés. Las lealtades dinásticas y personales de la época no coincidían siempre con la nacionalidad de origen.',
+      },
+      {
+        icono: '📅',
+        texto: 'La caída de Barcelona el 11 de septiembre de 1714 se conmemora hoy como la Diada, fiesta oficial de Cataluña. Es un dato factual: la cronología recoge el hecho histórico sin entrar en sus interpretaciones políticas actuales.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Reducirla a una guerra solo entre España y Francia',
+        cuerpo: 'No fue un conflicto entre España y Francia, sino una guerra europea sobre quién heredaría la monarquía española, con Francia y la España borbónica de un lado y una amplia coalición del otro. Y dentro de la propia España hubo bandos enfrentados. Verla como un enfrentamiento nacional simple deforma su naturaleza.',
+      },
+      {
+        titulo: 'Presentar a un candidato como héroe y al otro como villano',
+        cuerpo: 'Tanto Felipe de Borbón como el archiduque Carlos tenían títulos, apoyos internos y aliados externos. La guerra se decidió por factores militares, dinásticos y diplomáticos, no por la superioridad moral de un bando. Cualquier relato que convierta a uno en salvador y al otro en usurpador simplifica en exceso.',
+      },
+      {
+        titulo: 'Cargar de épica o de agravio los Decretos de Nueva Planta',
+        cuerpo: 'Los Decretos de Nueva Planta abolieron los fueros e instituciones propias de la Corona de Aragón y unificaron la administración según el modelo castellano: eso es un hecho. Interpretarlo únicamente como "unidad de España" o únicamente como "pérdida de libertades nacionales" son lecturas posteriores; conviene distinguir el hecho histórico de sus usos políticos actuales.',
+      },
+      {
+        titulo: 'Creer que la guerra terminó de golpe en 1713',
+        cuerpo: 'Los Tratados de Utrecht (1713) pusieron fin a la guerra internacional, pero la lucha continuó en la península. El Tratado de Rastatt se firmó en 1714, Barcelona no capituló hasta el 11 de septiembre de ese año y Mallorca resistió hasta 1715. El final fue escalonado, no un único acontecimiento.',
+      },
+    ],
+  },
+};

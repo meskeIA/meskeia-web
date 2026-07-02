@@ -4833,6 +4833,36 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-historia/revolucion-rusa/', icon: '🚩', name: 'La Revolución Rusa', description: 'La URSS surgida de 1917 fue el principal apoyo exterior de la República; el peso del comunismo en el bando republicano solo se entiende a la luz de la Revolución Rusa' },
     { url: '/visualizador-historia/historia-italia/', icon: '🍝', name: 'Historia de Italia', description: 'La Italia fascista de Mussolini envió tropas y aviación al bando sublevado; su derrota en Guadalajara (1937) fue uno de los reveses italianos de la guerra' },
   ],
+  'visualizador-historia-guerra-treinta-anios': [
+    { url: '/visualizador-historia/la-reforma/', icon: '📜', name: 'La Reforma Protestante', description: 'La fractura religiosa abierta por la Reforma (1517) es el trasfondo del conflicto: la Paz de Augsburgo de 1555 no resolvió la convivencia entre católicos y protestantes en el Imperio' },
+    { url: '/visualizador-historia/espana-austrias/', icon: '🏰', name: 'La España de los Austrias', description: 'Los Tercios españoles combatieron del lado de los Habsburgo; la derrota de Rocroi (1643) se ha visto tradicionalmente como símbolo del declive militar de la Monarquía Hispánica' },
+    { url: '/visualizador-historia/historia-alemania/', icon: '🦅', name: 'Historia de Alemania', description: 'La guerra se libró sobre todo en el Sacro Imperio y causó una enorme mortandad en las tierras alemanas: su recuerdo marcó durante siglos la historia de Alemania' },
+    { url: '/visualizador-historia/renacimiento/', icon: '🎨', name: 'El Renacimiento', description: 'El conflicto cierra la larga crisis religiosa y política que siguió al Renacimiento y la Reforma, y abre la Europa moderna de los Estados soberanos' },
+  ],
+  'visualizador-historia-guerra-secesion-eeuu': [
+    { url: '/visualizador-historia/historia-eeuu/', icon: '🇺🇸', name: 'Historia de Estados Unidos', description: 'La Guerra de Secesión es el punto de inflexión de la historia estadounidense: definió si el país seguiría siendo esclavista y si la Unión era indisoluble' },
+    { url: '/visualizador-historia/independencia-eeuu/', icon: '🎆', name: 'La Independencia de Estados Unidos', description: 'La contradicción entre la Declaración de 1776 ("todos los hombres son creados iguales") y la esclavitud quedó sin resolver en la fundación; la Guerra de Secesión fue su ajuste de cuentas' },
+    { url: '/visualizador-historia/historia-derechos-humanos/', icon: '⚖️', name: 'Historia de los Derechos Humanos', description: 'La abolición de la esclavitud (Enmienda XIII) y las Enmiendas XIV y XV son un hito en la historia de los derechos, aunque la segregación posterior mostró sus límites' },
+    { url: '/visualizador-historia/revolucion-industrial/', icon: '⚙️', name: 'La Revolución Industrial', description: 'El choque entre un Norte industrial y un Sur agrario y esclavista está en la raíz del conflicto: dos modelos económicos incompatibles dentro de un mismo país' },
+  ],
+  'visualizador-historia-revolucion-mexicana': [
+    { url: '/visualizador-historia/mexico-moderno/', icon: '🇲🇽', name: 'Historia de México', description: 'Para el arco completo de la historia mexicana; esta cronología se centra en la década revolucionaria (1910-1920), uno de sus periodos fundacionales' },
+    { url: '/visualizador-historia/historia-america-latina/', icon: '🌎', name: 'Historia de América Latina', description: 'La Revolución Mexicana fue la primera gran revolución social del siglo XX en América Latina e influyó en los movimientos agrarios y sociales de todo el continente' },
+    { url: '/visualizador-historia/independencias-hispanoamericanas/', icon: '✊', name: 'Las Independencias Hispanoamericanas', description: 'Un siglo después de la independencia, la Revolución replanteó qué tipo de país debía ser México: la cuestión de la tierra y la justicia social que la emancipación dejó pendiente' },
+    { url: '/visualizador-historia/revolucion-rusa/', icon: '🚩', name: 'La Revolución Rusa', description: 'Casi simultánea a la mexicana, la Revolución Rusa (1917) es la otra gran revolución social de la década: comparar ambas ayuda a entender el convulso comienzo del siglo XX' },
+  ],
+  'visualizador-historia-guerra-sucesion-espanola': [
+    { url: '/visualizador-historia/espana-borbones/', icon: '⚜️', name: 'La España de los Borbones', description: 'La guerra instaura la dinastía borbónica en España: Felipe V es el primer Borbón, y los Decretos de Nueva Planta inauguran el modelo de Estado centralizado del siglo XVIII' },
+    { url: '/visualizador-historia/espana-austrias/', icon: '🏰', name: 'La España de los Austrias', description: 'La muerte sin descendencia de Carlos II, último Austria español, es el detonante del conflicto: el fin de una dinastía de dos siglos abre la disputa por el trono' },
+    { url: '/visualizador-historia/historia-constituciones/', icon: '📜', name: 'Historia de las Constituciones', description: 'Los Decretos de Nueva Planta reorganizaron el Estado aboliendo los fueros de la Corona de Aragón: un precedente clave en la larga historia de la organización territorial de España' },
+    { url: '/visualizador-historia/guerras-napoleonicas/', icon: '⚔️', name: 'Guerras Napoleónicas', description: 'Un siglo después, otra crisis dinástica —la invasión napoleónica de 1808— volvería a partir España en dos: los conflictos por el trono jalonan el siglo XVIII y XIX españoles' },
+  ],
+  'visualizador-historia-disolucion-yugoslavia': [
+    { url: '/visualizador-historia/historia-guerra-fria/', icon: '❄️', name: 'La Guerra Fría', description: 'El fin de la Guerra Fría y el hundimiento del comunismo en Europa del Este quitaron a Yugoslavia el marco que la mantenía unida: su disolución es una de las consecuencias de 1989' },
+    { url: '/visualizador-historia/segunda-guerra-mundial/', icon: '✈️', name: 'Segunda Guerra Mundial', description: 'Las guerras yugoslavas fueron el conflicto más sangriento en Europa desde 1945 y trajeron de vuelta términos como "limpieza étnica" y "genocidio" al continente' },
+    { url: '/visualizador-historia/historia-derechos-humanos/', icon: '⚖️', name: 'Historia de los Derechos Humanos', description: 'El conflicto dio lugar al primer gran tribunal penal internacional desde Núremberg (el TPIY) y a jurisprudencia decisiva sobre genocidio y crímenes de lesa humanidad' },
+    { url: '/visualizador-historia/historia-union-europea/', icon: '🇪🇺', name: 'Historia de la Unión Europea', description: 'La incapacidad de Europa para frenar la guerra en su propio continente marcó a la UE e impulsó el desarrollo posterior de su política exterior y de defensa común' },
+  ],
   'visualizador-historia-imperio-persa': [
     { url: '/visualizador-historia/grecia/', icon: '🏛️', name: 'Historia de la Antigua Grecia', description: 'Las Guerras Médicas —Maratón, Termópilas, Salamina— son el eje del conflicto entre Persia y Grecia: sin Persia, no hay narrativa griega del siglo V a.C.' },
     { url: '/visualizador-historia/mesopotamia/', icon: '🏺', name: 'Historia de Mesopotamia', description: 'Ciro el Grande conquistó Babilonia sin batalla (539 a.C.) y liberó a los judíos: Persia heredó el legado mesopotámico y lo administró durante dos siglos' },

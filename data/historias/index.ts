@@ -164,6 +164,11 @@ import { caidaConstantinopla } from './caida-constantinopla';
 import { revoluciones1848 } from './revoluciones-1848';
 import { independenciaEeuu } from './independencia-eeuu';
 import { guerraCivilEspanola } from './guerra-civil-espanola';
+import { guerraTreintaAnios } from './guerra-treinta-anios';
+import { guerraSecesionEeuu } from './guerra-secesion-eeuu';
+import { revolucionMexicana } from './revolucion-mexicana';
+import { guerraSucesionEspanola } from './guerra-sucesion-espanola';
+import { disolucionYugoslavia } from './disolucion-yugoslavia';
 
 const registry: Record<string, HistoriaData> = {
   grecia,
@@ -301,6 +306,11 @@ const registry: Record<string, HistoriaData> = {
   'revoluciones-1848': revoluciones1848,
   'independencia-eeuu': independenciaEeuu,
   'guerra-civil-espanola': guerraCivilEspanola,
+  'guerra-treinta-anios': guerraTreintaAnios,
+  'guerra-secesion-eeuu': guerraSecesionEeuu,
+  'revolucion-mexicana': revolucionMexicana,
+  'guerra-sucesion-espanola': guerraSucesionEspanola,
+  'disolucion-yugoslavia': disolucionYugoslavia,
   'sudeste-asiatico': sudeste_asiatico,
   'brasil-moderno': brasilModerno,
   'mexico-moderno': mexicoModerno,

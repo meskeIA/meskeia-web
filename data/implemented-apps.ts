@@ -981,6 +981,11 @@ export const implementedAppsUrls = [
   "/visualizador-historia/revoluciones-1848/", // Revoluciones de 1848 1815→1852, 10 hitos, 6 eras
   "/visualizador-historia/independencia-eeuu/", // Independencia de EE.UU. 1763→1789, 10 hitos, 6 eras
   "/visualizador-historia/guerra-civil-espanola/", // Guerra Civil Española 1931→1945, 10 hitos, 6 eras
+  "/visualizador-historia/guerra-treinta-anios/", // Guerra de los Treinta Años 1618→1648, 10 hitos, 6 eras
+  "/visualizador-historia/guerra-secesion-eeuu/", // Guerra de Secesión EE.UU. 1850→1877, 10 hitos, 6 eras
+  "/visualizador-historia/revolucion-mexicana/", // Revolución Mexicana 1910→1920, 10 hitos, 6 eras
+  "/visualizador-historia/guerra-sucesion-espanola/", // Guerra de Sucesión Española 1700→1715, 10 hitos, 6 eras
+  "/visualizador-historia/disolucion-yugoslavia/", // Disolución de Yugoslavia 1980→2008, 10 hitos, 6 eras
   "/visualizador-historia/imperio-persa/",       // Imperio Persa Aqueménida -550→-330, 10 hitos, 6 eras
   "/visualizador-historia/japon/",               // Historia de Japón 710→1868, 10 hitos, 6 eras
   "/visualizador-historia/china-dinastias/",     // Grandes Dinastías Chinas -221→1912, 10 hitos, 6 eras
