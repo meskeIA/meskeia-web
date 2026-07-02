@@ -1095,6 +1095,11 @@ export const analyticsRouter = router({
       const ahora = new Date();
       const limite = new Date(ahora);
       limite.setDate(limite.getDate() - input.dias);
+      // Sub-ventanas anidadas para el pulso del descubrimiento interno: 24 h y 7 días
+      const limite7 = new Date(ahora); limite7.setDate(limite7.getDate() - 7);
+      const limite1 = new Date(ahora); limite1.setDate(limite1.getDate() - 1);
+      // Contadores de clics ?from= y visitas por sub-ventana (24 h / 7 d); la quincena reutiliza los KPIs de 14 d
+      let visitas24h = 0, visitas7d = 0, clics24h = 0, clics7d = 0;
 
       // Cargar visitas relevantes ordenadas por sesión y momento
       // Excluimos bot, mcp y mi-ip ya en SQL para reducir ruido
@@ -1138,6 +1143,10 @@ export const analyticsRouter = router({
             if (datos && typeof datos.from === 'string') from = datos.from;
           }
         } catch { /* ignorar */ }
+
+        // Pulso por sub-ventana (ventanas anidadas: 24 h ⊂ 7 d ⊂ 14 d)
+        if (fecha >= limite1) { visitas24h++; if (from) clics24h++; }
+        if (fecha >= limite7) { visitas7d++; if (from) clics7d++; }
 
         if (!sesiones.has(sesionId)) sesiones.set(sesionId, []);
         sesiones.get(sesionId)!.push({ app, from, modo });
@@ -1275,6 +1284,12 @@ export const analyticsRouter = router({
           total: clicsInternos,
           pctDeVisitas: totalVisitas > 0 ? Math.round((clicsInternos / totalVisitas) * 1000) / 10 : 0,
           porCategoria: clicsPorCategoria,
+          // Pulso en 3 ventanas anidadas: mide si la TASA de descubrimiento interno acelera o frena
+          ventanas: {
+            hoy: { clics: clics24h, visitas: visitas24h, pct: visitas24h > 0 ? Math.round((clics24h / visitas24h) * 1000) / 10 : 0 },
+            semana: { clics: clics7d, visitas: visitas7d, pct: visitas7d > 0 ? Math.round((clics7d / visitas7d) * 1000) / 10 : 0 },
+            quincena: { clics: clicsInternos, visitas: totalVisitas, pct: totalVisitas > 0 ? Math.round((clicsInternos / totalVisitas) * 1000) / 10 : 0 },
+          },
         },
         distribucionLongitud: distribLongitud,
         topPares,

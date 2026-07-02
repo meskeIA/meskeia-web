@@ -1650,48 +1650,56 @@ export default function DashboardAnalyticsPage() {
             {navegacionQuery.error && <p style={{ color: '#dc2626' }}>Error: {navegacionQuery.error.message}</p>}
             {navegacionQuery.data && (
               <>
-                {/* KPIs */}
-                <div className={styles.statsGrid}>
+                {/* KPIs — Descubrimiento interno protagonista + Contexto refundido */}
+                <div className={styles.statsGrid} style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
+                  {/* Card protagonista — pulso en 3 ventanas */}
                   <div className={`${styles.statCard} ${styles.highlight}`}>
-                    <div className={styles.statContent}>
-                      <h3>🎯 Descubrimiento interno</h3>
-                      <p>{navegacionQuery.data.descubrimientoInterno.total}</p>
-                      <small>clics <code>?from=</code> · {navegacionQuery.data.descubrimientoInterno.pctDeVisitas}% de las visitas continúan a otra app</small>
+                    <div className={styles.statContent} style={{ width: '100%' }}>
+                      <h3 style={{ marginBottom: '2px' }}>🎯 Descubrimiento interno</h3>
+                      <small style={{ opacity: 0.9 }}>clics <code>?from=</code> que llevan a una 2ª app · % = de las visitas de esa ventana</small>
+                      <div style={{ display: 'flex', gap: '8px', margin: '14px 0 10px' }}>
+                        {([
+                          { label: 'Hoy (24 h)', w: navegacionQuery.data.descubrimientoInterno.ventanas.hoy },
+                          { label: '7 días', w: navegacionQuery.data.descubrimientoInterno.ventanas.semana },
+                          { label: '14 días', w: navegacionQuery.data.descubrimientoInterno.ventanas.quincena, ref: true },
+                        ]).map((v) => (
+                          <div key={v.label} style={{
+                            flex: 1, textAlign: 'center', padding: '10px 4px', borderRadius: '10px',
+                            background: v.ref ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.12)',
+                          }}>
+                            <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.03em', opacity: 0.9 }}>{v.label}</div>
+                            <div style={{ fontSize: '2.1rem', fontWeight: 700, lineHeight: 1.1, margin: '2px 0' }}>{v.w.pct}%</div>
+                            <div style={{ fontSize: '0.8rem', opacity: 0.85 }}>{v.w.clics} clics</div>
+                          </div>
+                        ))}
+                      </div>
+                      <small style={{ opacity: 0.9 }}>
+                        {Math.round((navegacionQuery.data.descubrimientoInterno.porCategoria['related'] || 0) / Math.max(1, navegacionQuery.data.descubrimientoInterno.total) * 100)}% del descubrimiento viene de RelatedApps · ventana de referencia: 14 días
+                      </small>
                     </div>
                   </div>
+
+                  {/* Card contexto — refunde las 5 métricas heredadas */}
                   <div className={styles.statCard}>
-                    <div className={styles.statContent}>
-                      <h3>Sesiones únicas</h3>
-                      <p>{navegacionQuery.data.kpis.totalSesiones}</p>
-                      <small style={{ color: 'var(--text-muted)' }}>{navegacionQuery.data.kpis.totalVisitas} visitas totales</small>
-                    </div>
-                  </div>
-                  <div className={styles.statCard}>
-                    <div className={styles.statContent}>
-                      <h3>Apps por sesión (medio)</h3>
-                      <p>{navegacionQuery.data.kpis.appsPorSesionMedio}</p>
-                      <small style={{ color: 'var(--text-muted)' }}>⚠️ Infravalora (sesión fragmentada en webviews)</small>
-                    </div>
-                  </div>
-                  <div className={styles.statCard}>
-                    <div className={styles.statContent}>
-                      <h3>Sesiones single-app</h3>
-                      <p>{navegacionQuery.data.kpis.pctSingleApp}%</p>
-                      <small style={{ color: 'var(--text-muted)' }}>⚠️ Infla por fragmentación de sesión</small>
-                    </div>
-                  </div>
-                  <div className={styles.statCard}>
-                    <div className={styles.statContent}>
-                      <h3>Empieza por home</h3>
-                      <p>{navegacionQuery.data.kpis.pctOrigenHome}%</p>
-                      <small style={{ color: 'var(--text-muted)' }}>Resto: directo desde Google/IA</small>
-                    </div>
-                  </div>
-                  <div className={styles.statCard}>
-                    <div className={styles.statContent}>
-                      <h3>Pasa por home</h3>
-                      <p>{navegacionQuery.data.kpis.pctConHome}%</p>
-                      <small style={{ color: 'var(--text-muted)' }}>En algún momento de la sesión</small>
+                    <div style={{ width: '100%' }}>
+                      <div style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em', color: 'var(--text-muted)', marginBottom: '10px' }}>
+                        Contexto de la ventana (14 días)
+                      </div>
+                      {[
+                        { label: 'Sesiones únicas', value: navegacionQuery.data.kpis.totalSesiones.toLocaleString('es-ES') },
+                        { label: 'Visitas totales', value: navegacionQuery.data.kpis.totalVisitas.toLocaleString('es-ES') },
+                        { label: 'Apps por sesión ⚠️', value: navegacionQuery.data.kpis.appsPorSesionMedio },
+                        { label: 'Sesiones single-app ⚠️', value: `${navegacionQuery.data.kpis.pctSingleApp}%` },
+                      ].map((row) => (
+                        <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+                          <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{row.label}</span>
+                          <strong style={{ fontSize: '1.15rem', color: 'var(--text-primary)' }}>{row.value}</strong>
+                        </div>
+                      ))}
+                      <small style={{ display: 'block', marginTop: '10px', color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                        ⚠️ apps/sesión y single-app <strong>infravaloran</strong>: la sesión se fragmenta en webviews (ver KPI de la izquierda).
+                        Home: {navegacionQuery.data.kpis.pctOrigenHome}% origen · {navegacionQuery.data.kpis.pctConHome}% paso.
+                      </small>
                     </div>
                   </div>
                 </div>
