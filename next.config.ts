@@ -48,7 +48,7 @@ const securityHeaders = [
       "img-src 'self' data: blob:",
       "font-src 'self'",
       "connect-src 'self' https://meskeia.com https://ipapi.co https://api64.ipify.org https://api.openweathermap.org",
-      "media-src 'self'",
+      "media-src 'self' blob:",
       "worker-src 'self' blob:",
       "frame-src 'self' https://www.openstreetmap.org",
       "frame-ancestors 'none'",

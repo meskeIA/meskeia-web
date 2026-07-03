@@ -419,6 +419,7 @@ const imagenesApps: RelatedApp[] = [
 const audioApps: RelatedApp[] = [
   { url: '/extractor-audio-video/', icon: '🎬', name: 'Extractor Audio Vídeo', description: 'De vídeo AVI/MP4 a MP3/WAV' },
   { url: '/recortador-audio/', icon: '✂️', name: 'Recortador Audio', description: 'Corta y edita audio' },
+  { url: '/recortador-video/', icon: '🎞️', name: 'Recortador Vídeo', description: 'Corta vídeos MP4 en local' },
   { url: '/generador-ondas/', icon: '🌊', name: 'Generador Ondas', description: 'Visualizador audio' },
   { url: '/radio-meskeia/', icon: '📻', name: 'Radio meskeIA', description: 'Emisoras online' },
 ];
@@ -2687,6 +2688,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'generador-iconos': imagenesApps.filter(a => a.url !== '/generador-iconos/'),
   'extractor-audio-video': audioApps.filter(a => a.url !== '/extractor-audio-video/'),
   'recortador-audio': audioApps.filter(a => a.url !== '/recortador-audio/'),
+  'recortador-video': audioApps.filter(a => a.url !== '/recortador-video/'),
   'generador-ondas': audioApps.filter(a => a.url !== '/generador-ondas/'),
   'radio-meskeia': audioApps.filter(a => a.url !== '/radio-meskeia/'),
 

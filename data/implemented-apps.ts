@@ -298,6 +298,7 @@ export const implementedAppsUrls = [
   "/conversor-imagenes/",
   "/compresor-imagenes/",       // Compresor de imágenes por lotes sin límites
   "/recortador-audio/",        // Recortador de audio con fade in/out
+  "/recortador-video/",        // Recortador de vídeo MP4 local (WebCodecs) — modos rápido/exacto
   "/extractor-audio-video/",   // Extractor de audio de vídeo (AVI, MP4 → MP3/WAV) — procesamiento local
   "/generador-ondas/",         // Generador de ondas y visualizador de audio
   "/generador-iconos/",
