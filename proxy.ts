@@ -97,9 +97,20 @@ function handleDelegum(req: NextRequest) {
   if (pathname === '/delegum' || pathname.startsWith('/delegum/') || pathname.startsWith('/api')) {
     return NextResponse.next();
   }
-  // sitemap.xml y robots.txt: los sirve meskeIA (delegum.com no tiene propios).
-  if (pathname === '/sitemap.xml' || pathname === '/robots.txt') {
-    return NextResponse.next();
+  // sitemap.xml y robots.txt propios de Delegum. El sitemap se genera en
+  // /delegum/sitemap.xml (app/delegum/sitemap.ts); el robots lo sirve un Route
+  // Handler en /delegum/robots-txt (robots.ts no se puede anidar). Antes ambos
+  // los servía meskeIA, dejando las páginas de portal de Delegum fuera de todo
+  // sitemap bajo su dominio.
+  if (pathname === '/sitemap.xml') {
+    const url = req.nextUrl.clone();
+    url.pathname = '/delegum/sitemap.xml';
+    return NextResponse.rewrite(url);
+  }
+  if (pathname === '/robots.txt') {
+    const url = req.nextUrl.clone();
+    url.pathname = '/delegum/robots-txt';
+    return NextResponse.rewrite(url);
   }
   // llms.txt propio de Delegum: mapa del portal para LLMs (Route Handler en
   // /delegum/llms-txt).
