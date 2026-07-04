@@ -542,7 +542,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-sesgos-inversor/', icon: '🧠', name: 'Sesgos del Inversor', description: 'Los errores cognitivos que destrozan carteras' },
     { url: '/test-tolerancia-riesgo-detallado/', icon: '📊', name: 'Test Riesgo Detallado', description: 'Evaluación profunda en 5 dimensiones' },
   ],
-  'simulador-cartera-inversion': finanzasInversionApps.filter(a => a.url !== '/estimador-cartera-inversion/'),
+  'estimador-cartera-inversion': finanzasInversionApps.filter(a => a.url !== '/estimador-cartera-inversion/'),
   'calculadora-tir-van': finanzasInversionApps.filter(a => a.url !== '/estimador-tir-van/'),
 
   // FINANZAS - HIPOTECA / INMOBILIARIA
@@ -1119,10 +1119,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula por Dentro', description: 'Célula vegetal' },
   ],
   'visualizador-ecosistema': [
+    { url: '/simulador-ecosistema-trofico/', icon: '🌍', name: 'Ecosistema Trófico', description: 'Simula productores, consumidores y la pirámide trófica' },
     { url: '/visualizador-cadena-alimentaria/', icon: '🌾', name: 'De la Granja a tu Mesa', description: 'Cadena alimentaria' },
     { url: '/visualizador-ciclo-agua/', icon: '💧', name: 'El Ciclo del Agua', description: 'Ciclo hidrológico' },
     { url: '/visualizador-ciclo-nitrogeno/', icon: '🔄', name: 'Ciclo del Nitrógeno', description: 'El nitrógeno disponible en el suelo es el factor limitante de la productividad primaria del ecosistema' },
-    { url: '/visualizador-biomas-terrestres/', icon: '🌿', name: 'Biomas Terrestres', description: 'Cada bioma es un ecosistema a escala global — mismas reglas tróficas, distintos climas y latitudes' },
   ],
   'visualizador-fosiles-tiempo-geologico': [
     { url: '/visualizador-capas-tierra/', icon: '🌎', name: 'Capas de la Tierra', description: 'Del suelo al núcleo' },
@@ -1532,10 +1532,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-piel/', icon: '🧬', name: 'La Piel', description: 'Otro órgano vital del cuerpo humano' },
   ],
   'visualizador-electromagnetismo': [
+    { url: '/simulador-campo-electrico/', icon: '⚡', name: 'Campo Eléctrico', description: 'Cargas, líneas y equipotenciales' },
     { url: '/visualizador-mecanica-cuantica/', icon: '🔮', name: 'Mecánica Cuántica', description: 'La física que explica las cargas eléctricas' },
-    { url: '/visualizador-relatividad-especial/', icon: '⚡', name: 'Relatividad Especial', description: 'Einstein y el electromagnetismo' },
+    { url: '/visualizador-relatividad-especial/', icon: '🌌', name: 'Relatividad Especial', description: 'Einstein y el electromagnetismo' },
     { url: '/visualizador-estructura-atomo/', icon: '⚛️', name: 'Estructura del Átomo', description: 'Cargas eléctricas en el átomo' },
-    { url: '/visualizador-energia-nuclear/', icon: '☢️', name: 'Energía Nuclear', description: 'Física de campos aplicada' },
   ],
   'visualizador-computacion-cuantica': [
     { url: '/visualizador-mecanica-cuantica/', icon: '🔮', name: 'Mecánica Cuántica', description: 'Los principios físicos detrás de los qubits' },
@@ -2786,7 +2786,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'simulador-circuitos-electricos': [
     { url: '/calculadora-electricidad/', icon: '⚡', name: 'Electricidad', description: 'Ley de Ohm y potencia básica' },
     { url: '/calculadora-resistencias-led/', icon: '🔴', name: 'Resistencias y LED', description: 'Código de colores y circuito LED' },
-    { url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Simulaciones visuales interactivas' },
+    { url: '/simulador-campo-electrico/', icon: '🧲', name: 'Campo Eléctrico', description: 'Cargas, líneas y equipotenciales' },
     { url: '/simulador-puertas-logicas/', icon: '🔌', name: 'Puertas Lógicas', description: 'Circuitos digitales y álgebra booleana' },
   ],
   'calculadora-electricidad': [
@@ -2847,7 +2847,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/cronometro/', icon: '⏱️', name: 'Cronómetro', description: 'Medir tiempo' },
   ],
   'calculadora-inflacion': finanzasPersonalesApps,
-  'analizador-espectro': [{ url: '/sonometro/', icon: '🔊', name: 'Sonómetro', description: 'Medir decibelios' }, { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba Micrófono', description: 'Test de audio' }, { url: '/metronomo/', icon: '🎵', name: 'Metrónomo', description: 'Tempo musical' }],
+  'analizador-espectro': [{ url: '/generador-tonos/', icon: '🔊', name: 'Generador Tonos', description: 'Frecuencias de audio' }, { url: '/sonometro/', icon: '🔊', name: 'Sonómetro', description: 'Medir decibelios' }, { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba Micrófono', description: 'Test de audio' }, { url: '/metronomo/', icon: '🎵', name: 'Metrónomo', description: 'Tempo musical' }],
   'nivel-burbuja': [{ url: '/conversor-unidades/', icon: '📏', name: 'Conversor Unidades', description: 'Longitud y ángulos' }, { url: '/calculadora-pintura/', icon: '🎨', name: 'Calculadora Pintura', description: 'Litros necesarios' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir intensidad de luz' }],
 
   // INSTRUMENTOS DIGITALES (sustituyen aparatos físicos)
@@ -2944,7 +2944,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'simulador-git-ramas': informaticaApps.filter(a => a.url !== '/simulador-git-ramas/'),
   'visualizador-estructuras-datos': informaticaApps.filter(a => a.url !== '/visualizador-estructuras-datos/'),
   'conversor-ieee754': informaticaApps.filter(a => a.url !== '/conversor-ieee754/'),
-  'calculadora-algebra-booleana': informaticaApps.filter(a => a.url !== '/calculadora-algebra-booleana/'),
+  'calculadora-algebra-booleana': [
+    { url: '/simulador-puertas-logicas/', icon: '🔌', name: 'Puertas Lógicas', description: 'Circuitos digitales y álgebra booleana' },
+    ...informaticaApps.filter(a => a.url !== '/calculadora-algebra-booleana/' && a.url !== '/simulador-puertas-logicas/'),
+  ],
 
   // BIOMEDICINA Y CIENCIAS DE LA SALUD
   'simulador-genetica': [
