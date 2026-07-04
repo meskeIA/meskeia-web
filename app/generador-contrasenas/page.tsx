@@ -6,7 +6,6 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import ResultCard from '@/components/ResultCard';
-import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { jsonLd } from './metadata';
 import styles from './GeneradorContrasenas.module.css';
 import { getRelatedApps } from '@/data/app-relations';
@@ -267,9 +266,6 @@ export default function GeneradorContrasenas() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-
-      {/* Analytics */}
-      <AnalyticsTracker applicationName="generador-contrasenas" />
 
       {/* Header meskeIA */}
       <MeskeiaLogo />
@@ -792,9 +788,9 @@ export default function GeneradorContrasenas() {
       </main>
 
       {/* Footer meskeIA */}
-      <RelatedApps apps={getRelatedApps('Generador de Contraseñas Seguras')} />
-      <ShareCard appName="Generador de Contraseñas Seguras" />
-      <Footer appName="Generador de Contraseñas Seguras" />
+      <RelatedApps apps={getRelatedApps('generador-contrasenas')} />
+      <ShareCard appName="generador-contrasenas" />
+      <Footer appName="generador-contrasenas" />
     </>
   );
 }
