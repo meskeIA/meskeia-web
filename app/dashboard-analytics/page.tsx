@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './DashboardAnalytics.module.css';
 import { MeskeiaLogo, LegalNotice } from '@/components';
 import { trpc } from '@/lib/trpc';
@@ -139,7 +139,85 @@ const NOMBRES_PAIS: Record<string, string> = {
   ZA: 'Sudáfrica',
 };
 
+// Clave con la que se guarda el acceso en el navegador del propietario
+const STORAGE_KEY = 'meskeia_analytics_key';
+
+/**
+ * Puerta de entrada al dashboard. Pide la clave de acceso una sola vez por
+ * navegador; se guarda en localStorage y viaja en cada petición tRPC como
+ * cabecera x-analytics-key. Sin cookies ni cuentas.
+ */
+function AnalyticsGate({ onUnlock }: { onUnlock: () => void }) {
+  const [valor, setValor] = useState('');
+
+  const entrar = (e: React.FormEvent) => {
+    e.preventDefault();
+    const clave = valor.trim();
+    if (!clave) return;
+    localStorage.setItem(STORAGE_KEY, clave);
+    onUnlock();
+  };
+
+  return (
+    <div className={styles.container}>
+      <MeskeiaLogo />
+      <div className={styles.gateContainer}>
+        <h1 className={styles.gateTitle}>
+          <span aria-hidden="true">🔒</span> Panel privado
+        </h1>
+        <p className={styles.gateText}>
+          Este panel muestra datos internos de uso. Introduce la clave de acceso para continuar.
+        </p>
+        <form onSubmit={entrar} className={styles.gateForm}>
+          <label htmlFor="clave-analytics" className={styles.gateLabel}>
+            Clave de acceso
+          </label>
+          <input
+            id="clave-analytics"
+            type="password"
+            autoComplete="current-password"
+            value={valor}
+            onChange={(e) => setValor(e.target.value)}
+            className={styles.gateInput}
+            autoFocus
+          />
+          <button type="submit" className={styles.btnPrimary}>
+            Entrar
+          </button>
+        </form>
+      </div>
+      <LegalNotice />
+    </div>
+  );
+}
+
+/**
+ * Componente raíz de la ruta. Decide entre la puerta de entrada y el
+ * dashboard según haya o no clave guardada en este navegador.
+ */
 export default function DashboardAnalyticsPage() {
+  const [autenticado, setAutenticado] = useState(false);
+  const [comprobado, setComprobado] = useState(false);
+
+  useEffect(() => {
+    setAutenticado(!!localStorage.getItem(STORAGE_KEY));
+    setComprobado(true);
+  }, []);
+
+  // Si el servidor rechaza la clave (inválida/ausente), volver a la puerta
+  const salirPorClaveInvalida = useCallback(() => setAutenticado(false), []);
+
+  // Evita el parpadeo hasta saber si hay clave (localStorage solo en cliente)
+  if (!comprobado) return null;
+
+  if (!autenticado) {
+    return <AnalyticsGate onUnlock={() => setAutenticado(true)} />;
+  }
+
+  return <DashboardContent onAuthError={salirPorClaveInvalida} />;
+}
+
+function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
   const [tabActiva, setTabActiva] = useState<'general' | 'tecnico' | 'ranking' | 'aplicacion' | 'registros' | 'resumen' | 'navegacion' | 'dominios'>('general');
   const [appSeleccionada, setAppSeleccionada] = useState<string>('');
   const [filtroApp, setFiltroApp] = useState('');
@@ -220,6 +298,15 @@ export default function DashboardAnalyticsPage() {
   const error = statsQuery.error?.message || null;
   const ipConfig = ipConfigQuery.data?.data || null;
   const actualizandoIP = updateIPMutation.isPending;
+
+  // Si la clave es inválida o falta, el servidor responde UNAUTHORIZED:
+  // borramos la clave guardada y volvemos a la puerta de entrada.
+  useEffect(() => {
+    if (statsQuery.error?.data?.code === 'UNAUTHORIZED') {
+      localStorage.removeItem(STORAGE_KEY);
+      onAuthError();
+    }
+  }, [statsQuery.error, onAuthError]);
 
   // Última actualización
   const ultimaActualizacion = statsQuery.dataUpdatedAt

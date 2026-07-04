@@ -1161,3 +1161,60 @@
 [data-theme='dark'] .rowShare {
   background: rgba(72, 169, 166, 0.09);
 }
+
+/* ============================================
+   PUERTA DE ENTRADA (acceso privado)
+   ============================================ */
+.gateContainer {
+  max-width: 440px;
+  margin: 3rem auto;
+  padding: 2.5rem 2rem;
+  background: var(--bg-card);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.gateTitle {
+  color: var(--primary);
+  font-size: 1.6rem;
+  margin: 0 0 0.75rem;
+}
+
+.gateText {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 0 1.5rem;
+}
+
+.gateForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-align: left;
+}
+
+.gateLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.gateInput {
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 2px solid var(--text-muted);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.gateInput:focus-visible {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.gateForm .btnPrimary {
+  margin-top: 0.5rem;
+}

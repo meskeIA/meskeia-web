@@ -3,7 +3,7 @@
  * Define los procedimientos públicos y el contexto del servidor
  */
 
-import { initTRPC } from '@trpc/server';
+import { initTRPC, TRPCError } from '@trpc/server';
 import { ZodError } from 'zod';
 
 /**
@@ -38,3 +38,30 @@ export const router = t.router;
  * Usar para endpoints que no requieren login
  */
 export const publicProcedure = t.procedure;
+
+/**
+ * Procedure protegido (solo el propietario)
+ *
+ * Verifica la cabecera `x-analytics-key` contra la variable de entorno
+ * ANALYTICS_SECRET. Sin cookies ni cuentas: la clave se guarda en el
+ * localStorage del navegador del propietario y se envía en cada petición
+ * tRPC. Se usa para el dashboard de analytics, cuyos datos son
+ * confidenciales (uso interno, no expuestos al público).
+ *
+ * Fail-closed: si ANALYTICS_SECRET no está definida en el servidor, o la
+ * clave no coincide, se deniega el acceso. Debe estar configurada en
+ * .env.local (desarrollo) y en las variables de entorno de Vercel (producción).
+ */
+export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
+  const secret = process.env.ANALYTICS_SECRET;
+  const provided = ctx.req?.headers.get('x-analytics-key') ?? null;
+
+  if (!secret || !provided || provided !== secret) {
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: 'Acceso restringido al panel de analytics.',
+    });
+  }
+
+  return next();
+});

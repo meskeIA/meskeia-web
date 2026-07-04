@@ -32,7 +32,15 @@ export function Providers({ children }: { children: React.ReactNode }) {
       links: [
         httpBatchLink({
           url: '/api/trpc',
-          // Puedes añadir headers aquí si es necesario
+          // Clave de acceso al panel de analytics. Solo el navegador del
+          // propietario la tiene (guardada en localStorage tras introducirla
+          // en la puerta de entrada del dashboard). Las apps públicas no usan
+          // tRPC, así que esta cabecera solo viaja desde el dashboard.
+          headers() {
+            if (typeof window === 'undefined') return {};
+            const key = window.localStorage.getItem('meskeia_analytics_key');
+            return key ? { 'x-analytics-key': key } : {};
+          },
         }),
       ],
     })

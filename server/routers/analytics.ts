@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { router, publicProcedure } from '../trpc';
+import { router, protectedProcedure } from '../trpc';
 import { getTursoClient, initializeDatabase, formatearDuracion } from '@/lib/turso';
 import {
   agregarRegistros,
@@ -316,7 +316,7 @@ export const analyticsRouter = router({
    * Obtiene estadísticas de uso con filtros opcionales
    * Reemplaza: GET /api/analytics/stats
    */
-  getStats: publicProcedure
+  getStats: protectedProcedure
     .input(
       z.object({
         aplicacion: z.string().optional(),
@@ -729,7 +729,7 @@ export const analyticsRouter = router({
    * Estadísticas completas de una app específica (sin límite de 500 registros)
    * Reemplaza el filtrado client-side de datos.data en la pestaña Por Aplicación
    */
-  getAppStats: publicProcedure
+  getAppStats: protectedProcedure
     .input(z.object({
       aplicacion: z.string(),
       excluir_mi_ip: z.boolean().default(false),
@@ -790,7 +790,7 @@ export const analyticsRouter = router({
    * Devuelve tabla de usos desglosada por origen (Web, IA por plataforma, MCP, Bots, Mi IP)
    * y período (Hoy, Ayer, 7 días, Este mes, Total)
    */
-  getResumen: publicProcedure
+  getResumen: protectedProcedure
     .input(z.object({}))
     .query(async () => {
       await initializeDatabase();
@@ -911,7 +911,7 @@ export const analyticsRouter = router({
    * Calcula usos agrupados por día para los últimos 30 días directamente en DB.
    * Devuelve un array completo de 30 entradas (días sin datos tienen usos=0).
    */
-  getTendencia30Dias: publicProcedure
+  getTendencia30Dias: protectedProcedure
     .input(z.object({ excluir_mi_ip: z.boolean().default(false) }))
     .query(async ({ input }) => {
       await initializeDatabase();
@@ -974,7 +974,7 @@ export const analyticsRouter = router({
    * Obtiene configuración de IP excluida
    * Reemplaza: GET /api/analytics/ip-filter
    */
-  getIPConfig: publicProcedure
+  getIPConfig: protectedProcedure
     .input(z.object({ ip_actual: z.string() }))
     .query(async ({ ctx, input }) => {
       await initializeDatabase();
@@ -1017,7 +1017,7 @@ export const analyticsRouter = router({
    * Guarda la IP actual como excluida
    * Reemplaza: POST /api/analytics/ip-filter
    */
-  updateIPFilter: publicProcedure
+  updateIPFilter: protectedProcedure
     .input(
       z.object({
         ip_actual: z.string(),
@@ -1071,7 +1071,7 @@ export const analyticsRouter = router({
    *
    * Excluye bots, mcp y mi-ip por defecto.
    */
-  getNavegacion: publicProcedure
+  getNavegacion: protectedProcedure
     .input(
       z.object({
         dias: z.number().int().positive().default(14), // ventana de análisis
@@ -1301,7 +1301,7 @@ export const analyticsRouter = router({
    * Procedure: getTendencias
    * Devuelve tendencia mensual 2026, desglose por canal y % LATAM mes actual vs anterior.
    */
-  getTendencias: publicProcedure
+  getTendencias: protectedProcedure
     .input(z.object({ excluir_mi_ip: z.boolean().default(false) }))
     .query(async () => {
       await initializeDatabase();
@@ -1386,7 +1386,7 @@ export const analyticsRouter = router({
    * Distribución de duraciones de visita
    * Buckets: sin registro (NULL) / 2-30s / 30s-2min / 2-10min / >10min
    */
-  getDistribucionDuraciones: publicProcedure
+  getDistribucionDuraciones: protectedProcedure
     .input(z.object({ excluir_mi_ip: z.boolean().default(false) }))
     .query(async ({ input }) => {
       await initializeDatabase();
@@ -1469,7 +1469,7 @@ export const analyticsRouter = router({
    * registros previos tienen host NULL y no aparecen aquí.
    * Excluye bots y, si está configurada, la IP del propietario.
    */
-  getPorDominio: publicProcedure
+  getPorDominio: protectedProcedure
     .input(z.object({}))
     .query(async () => {
       await initializeDatabase();
