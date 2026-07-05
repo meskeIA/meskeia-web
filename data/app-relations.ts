@@ -202,18 +202,28 @@ const seoExtraApps: RelatedApp[] = [
 // ==========================================
 // FAMILIA: TEXTO Y DOCUMENTOS
 // ==========================================
+// Nota SEO (P1 enlazado interno, 2026-07-05): textoApps lo referencian 9 apps →
+// es el grupo con más "autoridad interna". Se incluyen aquí las dos apps con
+// demanda probada y ancladas en pos 6-9 (contador-sílabas 3.958 impr,
+// generador-anagramas 1.652 impr) para multiplicar sus enlaces entrantes.
+// slice(0,2) se conserva = [contador-palabras, conversor-texto].
 const textoApps: RelatedApp[] = [
   { url: '/contador-palabras/', icon: '🔢', name: 'Contador Palabras', description: 'Palabras y caracteres' },
   { url: '/conversor-texto/', icon: '🔄', name: 'Conversor Texto', description: 'Mayúsculas y más' },
+  { url: '/contador-silabas/', icon: '📐', name: 'Contador Sílabas', description: 'Separa y cuenta sílabas' },
+  { url: '/generador-anagramas/', icon: '🔀', name: 'Generador Anagramas', description: 'Reordena letras' },
   { url: '/limpiador-texto/', icon: '🧹', name: 'Limpiador Texto', description: 'Elimina formato' },
-  { url: '/comparador-textos/', icon: '🔍', name: 'Comparador Textos', description: 'Diferencias entre textos' },
 ];
 
+// [0] contador-silabas · [1] conversor-markdown-html · [2] generador-lorem-ipsum
+// se preservan (hay referencias posicionales textoExtraApps[0/1/2]). comparador-textos
+// se mueve aquí desde textoApps para no perder su enlazado.
 const textoExtraApps: RelatedApp[] = [
   { url: '/contador-silabas/', icon: '📐', name: 'Contador Sílabas', description: 'Separa y cuenta' },
   { url: '/conversor-markdown-html/', icon: '📄', name: 'Markdown a HTML', description: 'Convierte formatos' },
   { url: '/generador-lorem-ipsum/', icon: '📝', name: 'Lorem Ipsum', description: 'Texto de prueba' },
   { url: '/generador-anagramas/', icon: '🔀', name: 'Generador Anagramas', description: 'Reordena letras' },
+  { url: '/comparador-textos/', icon: '🔍', name: 'Comparador Textos', description: 'Diferencias entre textos' },
 ];
 
 // ==========================================
@@ -2269,13 +2279,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'conversor-texto': [...textoApps.filter(a => a.url !== '/conversor-texto/'), textoExtraApps[1]],
   'limpiador-texto': [...textoApps.filter(a => a.url !== '/limpiador-texto/'), textoExtraApps[2]],
   'comparador-textos': [...textoApps.filter(a => a.url !== '/comparador-textos/'), textoExtraApps[1]],
-  'contador-silabas': textoApps,
+  'contador-silabas': [...textoApps.filter(a => a.url !== '/contador-silabas/'), textoExtraApps[1]],
   'conversor-markdown-html': [...textoApps.slice(0, 2), ...webDevApps.slice(0, 2)],
-  'generador-lorem-ipsum': textoApps,
+  'generador-lorem-ipsum': [...textoApps.filter(a => a.url !== '/generador-lorem-ipsum/')],
   'generador-anagramas': [
+    { url: '/contador-silabas/', icon: '📐', name: 'Contador Sílabas', description: 'Separa y cuenta sílabas' },
     { url: '/buscador-palabras-patron/', icon: '🔍', name: 'Buscador por Patrón', description: 'Palabras con huecos para crucigramas' },
     { url: '/juego-wordle/', icon: '🔤', name: 'Wordle', description: 'Adivina la palabra del día' },
-    { url: '/juego-ahorcado/', icon: '🎯', name: 'Ahorcado', description: 'Adivina la palabra letra a letra' },
+    { url: '/limpiador-texto/', icon: '🧹', name: 'Limpiador Texto', description: 'Elimina formato' },
     { url: '/contador-palabras/', icon: '🔢', name: 'Contador Palabras', description: 'Palabras y caracteres' },
   ],
   'buscador-palabras-patron': [
@@ -2836,7 +2847,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-descuentos': [...matematicasBasicasApps.slice(0, 2), { url: '/calculadora-iva/', icon: '🧾', name: 'Calculadora IVA', description: 'Añadir o quitar IVA' }],
   'prueba-camara': [{ url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir luz para fotos' }, { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba Micrófono', description: 'Test de audio' }, { url: '/mi-ip/', icon: '🌐', name: 'Mi IP', description: 'Información de red' }],
   'prueba-microfono': [{ url: '/sonometro/', icon: '🔊', name: 'Sonómetro', description: 'Medir decibelios' }, { url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir luz ambiente' }],
-  'sonometro': [{ url: '/analizador-espectro/', icon: '📊', name: 'Analizador Espectro', description: 'Visualiza frecuencias' }, { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba Micrófono', description: 'Test de audio' }, { url: '/metronomo/', icon: '🎵', name: 'Metrónomo', description: 'Tempo musical' }],
+  'sonometro': [{ url: '/generador-tonos/', icon: '🔊', name: 'Generador Tonos', description: 'Frecuencias de audio' }, { url: '/analizador-espectro/', icon: '📊', name: 'Analizador Espectro', description: 'Visualiza frecuencias' }, { url: '/diapason/', icon: '🎼', name: 'Diapasón', description: 'La 440 Hz de referencia' }, { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba Micrófono', description: 'Test de audio' }],
   'luxometro': [{ url: '/golden-hour/', icon: '🌅', name: 'Golden Hour', description: 'Hora dorada y azul' }, { url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/conversor-colores/', icon: '🎨', name: 'Conversor Colores', description: 'HEX, RGB, HSL' }],
   'golden-hour': [{ url: '/visualizador-colores-cielo/', icon: '🌈', name: 'Colores del Cielo', description: 'Paleta HEX y física de cada fase: golden hour, hora azul, amanecer' }, { url: '/simulador-fotografia/', icon: '📷', name: 'Simulador de Fotografía', description: 'Triángulo de exposición: ISO, apertura, velocidad' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir intensidad de luz' }, { url: '/informacion-tiempo/', icon: '🌤️', name: 'Info Tiempo', description: 'Previsión meteorológica' }],
   'mi-ip': [{ url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba Micrófono', description: 'Test de audio' }],
@@ -2854,9 +2865,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'contador-manual': [{ url: '/cronometro/', icon: '⏱️', name: 'Cronómetro', description: 'Medir tiempo' }, { url: '/temporizador-pomodoro/', icon: '🍅', name: 'Pomodoro', description: 'Técnica productividad' }, { url: '/seguimiento-habitos/', icon: '✅', name: 'Seguimiento Hábitos', description: 'Rastrea tus hábitos' }],
   'diapason': [
     { url: '/afinador-instrumentos/', icon: '🎸', name: 'Afinador', description: 'Afina tu instrumento' },
-    { url: '/transpositor-acordes/', icon: '🎵', name: 'Transpositor de Acordes', description: 'Cambia la tonalidad de tu canción' },
-    { url: '/metronomo/', icon: '🎵', name: 'Metrónomo', description: 'Tempo musical' },
     { url: '/generador-tonos/', icon: '🔊', name: 'Generador Tonos', description: 'Frecuencias de audio' },
+    { url: '/sonometro/', icon: '🔊', name: 'Sonómetro', description: 'Medir decibelios' },
+    { url: '/metronomo/', icon: '🎵', name: 'Metrónomo', description: 'Tempo musical' },
+    { url: '/transpositor-acordes/', icon: '🎵', name: 'Transpositor de Acordes', description: 'Cambia la tonalidad de tu canción' },
   ],
   'generador-tonos': [{ url: '/analizador-espectro/', icon: '📊', name: 'Analizador Espectro', description: 'Visualiza frecuencias' }, { url: '/afinador-instrumentos/', icon: '🎸', name: 'Afinador', description: 'Afina tu instrumento' }, { url: '/diapason/', icon: '🎼', name: 'Diapasón', description: 'La 440Hz' }, { url: '/sonometro/', icon: '🔊', name: 'Sonómetro', description: 'Medir decibelios' }],
   'transpositor-acordes': [
