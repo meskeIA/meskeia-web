@@ -2,9 +2,9 @@ import { Metadata } from 'next';
 import { generateWebAppSchema, generateFAQSchema, combineSchemas } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Calculadora de Media Ponderada Universidad - Notas por Créditos ECTS',
-  description: 'Calculadora de notas: media ponderada por créditos ECTS, simulador EvAU, conversor de escalas Latam y «¿qué nota necesito para aprobar?». Gratis.',
-  keywords: 'calculadora notas, media ponderada, ECTS, EvAU, selectividad, GPA, conversor notas, expediente académico, universidad',
+  title: 'Calculadora de Media Ponderada (Promedio Ponderado) - Notas por Créditos ECTS',
+  description: 'Calculadora de notas: media ponderada o promedio ponderado por créditos ECTS, simulador EvAU, conversor de escalas Latam y «¿qué nota necesito para aprobar?». Gratis.',
+  keywords: 'calculadora notas, media ponderada, promedio ponderado, calcular promedio, ECTS, EvAU, selectividad, examen de admisión universitaria, GPA, conversor notas, universidad',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    title: 'Calculadora de Media Ponderada Universidad - Créditos ECTS',
-    description: 'Calcula tu media ponderada del expediente con créditos ECTS. Simulador EvAU y conversor de escalas Latam. Gratis.',
+    title: 'Calculadora de Media Ponderada y Promedio Ponderado - Créditos ECTS',
+    description: 'Calcula tu media ponderada (promedio ponderado) del expediente con créditos ECTS. Simulador EvAU y conversor de escalas Latam. Gratis.',
     url: 'https://meskeia.com/calculadora-notas/',
     siteName: 'meskeIA',
     locale: 'es_ES',

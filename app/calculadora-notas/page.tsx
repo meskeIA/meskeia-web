@@ -388,9 +388,9 @@ export default function CalculadoraNotasPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>Calculadora de Notas Académicas</h1>
+        <h1 className={styles.title}>Calculadora de Notas: Media Ponderada y Promedio Ponderado</h1>
         <p className={styles.subtitle}>
-          Media ponderada, simulador EvAU (España) y conversor de escalas entre España, México, Argentina, Chile, Colombia, Perú, Venezuela, GPA USA y porcentaje
+          Media ponderada (promedio ponderado), simulador EvAU (España) y conversor de escalas entre España, México, Argentina, Chile, Colombia, Perú, Venezuela, GPA USA y porcentaje
         </p>
       </header>
 
