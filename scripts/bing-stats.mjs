@@ -112,6 +112,31 @@ async function analizarSitio(siteUrl) {
     `  TOTAL → ${nf.format(totalClicks)} clics · ${nf.format(totalImpr)} impresiones  [${rango}]`,
   );
 
+  // Rastreo e indexación (GetCrawlStats): InIndex es el termómetro de cobertura
+  // — cuántas páginas mantiene Bing en su índice (el que alimenta el grounding IA).
+  try {
+    const crawl = await bing('GetCrawlStats', siteUrl);
+    const conFecha = crawl
+      .map((r) => ({ ...r, d: parseMsDate(r.Date) }))
+      .filter((r) => r.d)
+      .sort((a, b) => a.d - b.d);
+    if (conFecha.length) {
+      const prim = conFecha[0];
+      const ult = conFecha[conFecha.length - 1];
+      const crawledTot = crawl.reduce((a, r) => a + (r.CrawledPages ?? 0), 0);
+      const errTot = crawl.reduce((a, r) => a + (r.CrawlErrors ?? 0), 0);
+      const delta = ult.InIndex != null && prim.InIndex != null ? ult.InIndex - prim.InIndex : null;
+      const flecha = delta == null ? '' : delta > 0 ? ' ▲' : delta < 0 ? ' ▼' : ' =';
+      console.log(
+        `  ÍNDICE → ${nf.format(ult.InIndex ?? 0)} págs en índice` +
+          (delta != null ? ` (${delta >= 0 ? '+' : ''}${nf.format(delta)}${flecha} desde ${prim.d.toLocaleDateString('es-ES')})` : '') +
+          `  ·  rastreadas ${nf.format(crawledTot)} · errores ${nf.format(errTot)}`,
+      );
+    }
+  } catch {
+    /* GetCrawlStats puede no estar disponible en alguna propiedad; se omite en silencio */
+  }
+
   if (totalImpr === 0) {
     console.log('  (sin actividad en Bing todavía)');
     return;
