@@ -84,3 +84,11 @@ ALGORITMOS.md
 
 # Dumps de la base de datos Turso (backup local, contienen datos de analytics)
 _backups/
+
+# Scripts de análisis interno + scratch (consultan analytics privado, no para repo público)
+scratch/
+scripts/cuadrante-stem.mjs
+scripts/detectar-eventos-aula.mjs
+
+# Detector foso-IA (analisis interno)
+scripts/detectar-foso-ia.mjs
