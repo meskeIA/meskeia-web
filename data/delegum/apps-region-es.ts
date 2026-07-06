@@ -21,6 +21,7 @@ export const APPS_REGION_ES: ReadonlySet<string> = new Set([
   'estimador-actualizacion-alquiler',
   'estimador-complemento-minimos',
   'estimador-compraventa-inmueble',
+  'estimador-costes-divorcio',
   'estimador-cuota-autonomo',
   'estimador-impuesto-donaciones',
   'estimador-impuesto-sucesiones',
