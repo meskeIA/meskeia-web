@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styles from './EstimadorCostesDivorcio.module.css';
 import {
   MeskeiaLogo, Footer, LegalNotice, EducationalSection, RelatedApps,
-  ShareCard, DisclaimerCard,
+  ShareCard, DisclaimerCard, RegionBadge,
 } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -138,12 +138,14 @@ export default function EstimadorCostesDivorcioPage() {
 
         <header className={styles.hero}>
           <span className={styles.heroIcon} aria-hidden="true">📝</span>
-          <h1 className={styles.title}>Estimador de Costes de Divorcio</h1>
+          <h1 className={styles.title}>Estimador de Costes de Divorcio en España 2026</h1>
           <p className={styles.subtitle}>
-            Cuánto puede costar divorciarse en España según el tipo de procedimiento, hijos y bienes
+            Cuánto cuesta divorciarse en España: precio del abogado, procurador y tarifa notarial según el
+            tipo de procedimiento (mutuo acuerdo vs contencioso), hijos y bienes comunes
           </p>
         </header>
 
+        <RegionBadge variant="es-only" />
         <LegalNotice />
         <DisclaimerCard variant="financial" severity="critical" context="estimador-costes-divorcio" />
 
@@ -311,6 +313,14 @@ export default function EstimadorCostesDivorcioPage() {
             </p>
 
             <div className={styles.faqList}>
+              <details className={styles.faqItem}>
+                <summary>¿Cuánto cobra un abogado por un divorcio en España?</summary>
+                <p>Los honorarios del abogado son la partida más importante. En un mutuo acuerdo sin bienes rondan los 500-1.500 € (compartido entre ambos cónyuges); en un contencioso suelen ir de 1.500 a 6.000 € por cónyuge, más si hay patrimonio complejo o peritajes. El procurador se suma aparte (unos 250-800 €). Con ingresos bajo el límite IPREM puedes pedir justicia gratuita.</p>
+              </details>
+              <details className={styles.faqItem}>
+                <summary>¿Cuánto cuesta un divorcio notarial?</summary>
+                <p>El divorcio notarial (Ley 15/2015) es la vía más rápida y económica, posible solo sin hijos menores ni personas con discapacidad a cargo. El coste total ronda los 650-2.550 €: un único abogado para ambos, la tarifa notarial de la escritura (150-250 €) y la inscripción en el Registro Civil (unos 50 €). No hay procurador ni tasas judiciales.</p>
+              </details>
               <details className={styles.faqItem}>
                 <summary>¿Puedo compartir abogado en un divorcio de mutuo acuerdo?</summary>
                 <p>Sí. En el divorcio de mutuo acuerdo (tanto judicial como notarial), un solo abogado puede representar a ambos cónyuges. Esto reduce significativamente los costes.</p>

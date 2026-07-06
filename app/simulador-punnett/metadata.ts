@@ -2,11 +2,11 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Cuadro de Punnett: Genética Mendeliana | meskeIA',
+  title: 'Cuadro de Punnett Online: Genética Mendeliana | meskeIA',
   description:
-    'Simula cruces genéticos monohíbridos y dihíbridos con el cuadro de Punnett. Calcula proporciones genotípicas y fenotípicas. Herramienta interactiva para aprender las leyes de Mendel.',
+    'Cuadro (tabla) de Punnett online para cruces monohíbrido, dihíbrido y trihíbrido (3 genes). Calcula proporciones fenotípicas (3:1, 9:3:3:1) y genotípicas, y pasa de genotipo a fenotipo aplicando las leyes de Mendel.',
   keywords:
-    'cuadro de Punnett, genética, Mendel, genotipo, fenotipo, herencia, alelos, dominante, recesivo, monohíbrido, dihíbrido, EBAU, Bachillerato, preparatoria, secundaria, educación media, biología, leyes de Mendel',
+    'cuadro de Punnett, tabla de Punnett, cuadro de Punnett online, genética mendeliana, Mendel, genotipo, fenotipo, proporciones fenotípicas, cruce monohíbrido, cruce dihíbrido, trihíbrido, 3 genes, herencia, alelos, dominante, recesivo, leyes de Mendel, secundaria, preparatoria, educación media, biología',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -16,9 +16,9 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    title: 'Cuadro de Punnett: Genética Mendeliana | meskeIA',
+    title: 'Cuadro de Punnett Online: Genética Mendeliana | meskeIA',
     description:
-      'Simula cruces genéticos monohíbridos y dihíbridos. Proporciones genotípicas y fenotípicas instantáneas.',
+      'Tabla de Punnett online para cruces monohíbrido, dihíbrido y trihíbrido. Proporciones fenotípicas (3:1, 9:3:3:1) y genotípicas al instante.',
     url: 'https://meskeia.com/simulador-punnett/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -33,15 +33,16 @@ export const metadata: Metadata = {
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'Simulador Cuadro de Punnett — Genética Mendeliana',
+  name: 'Cuadro de Punnett Online — Genética Mendeliana',
   description:
-    'Simulador interactivo del cuadro de Punnett para cruces monohíbridos y dihíbridos. Calcula proporciones genotípicas y fenotípicas, visualiza gametos y explora escenarios predefinidos de las leyes de Mendel.',
+    'Cuadro (tabla) de Punnett online para cruces monohíbrido, dihíbrido y trihíbrido (3 genes). Calcula proporciones fenotípicas (3:1, 9:3:3:1) y genotípicas, pasa de genotipo a fenotipo, visualiza los gametos y explora escenarios de las leyes de Mendel.',
   url: 'https://meskeia.com/simulador-punnett/',
   category: 'EducationalApplication',
   features: [
     'Cruce monohíbrido (4 celdas) y dihíbrido (16 celdas)',
-    'Cuadro de Punnett renderizado con colores por fenotipo',
-    'Proporciones genotípicas y fenotípicas automáticas',
+    'Tabla de Punnett renderizada con colores por fenotipo',
+    'Proporciones fenotípicas (3:1, 9:3:3:1) y genotípicas automáticas',
+    'Conversión de genotipo a fenotipo con alelos dominante/recesivo',
     'Escenarios predefinidos: Mendel clásico, portador, puro × recesivo',
     'Botón de caso aleatorio para explorar combinaciones',
     'Interpretación en texto natural de los resultados',
@@ -49,13 +50,15 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: [
     'cuadro de Punnett',
+    'tabla de Punnett',
+    'cuadro de Punnett online',
     'genética mendeliana',
-    'genotipo fenotipo',
+    'genotipo y fenotipo',
+    'proporciones fenotípicas',
+    'cruce monohíbrido',
+    'cruce dihíbrido',
+    'trihíbrido 3 genes',
     'leyes de Mendel',
-    'herencia biológica',
-    'Bachillerato biología',
-    'preparatoria',
-    'secundaria',
   ],
 });
 
@@ -101,6 +104,38 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Se construye el cuadro de Punnett combinando los gametos de cada progenitor y se cuentan las frecuencias de cada genotipo resultante. Las proporciones genotípicas indican cuántos individuos tienen cada combinación de alelos (AA, Aa, aa). Las proporciones fenotípicas agrupan los genotipos que producen el mismo aspecto observable: en herencia dominante completa, AA y Aa tienen el mismo fenotipo, mientras que aa tiene el fenotipo recesivo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se hace un cuadro de Punnett paso a paso?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Primero determina el genotipo de cada progenitor (por ejemplo Aa × Aa) y escribe sus gametos posibles. En un monohíbrido, coloca los gametos de un progenitor en las filas (A, a) y los del otro en las columnas (A, a). Rellena cada celda combinando el gameto de su fila con el de su columna, ordenando la mayúscula primero (AA, Aa, aa). Por último cuenta los genotipos y agrúpalos por fenotipo para obtener las proporciones. Esta calculadora dibuja la tabla de Punnett online y hace el recuento automáticamente.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué proporciones da un cruce monohíbrido (3:1) y uno dihíbrido (9:3:3:1)?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un cruce monohíbrido Aa × Aa da en la F2 una proporción fenotípica de 3:1 (3 dominantes por cada recesivo) y una proporción genotípica 1:2:1 (1 AA : 2 Aa : 1 aa). Un cruce dihíbrido AaBb × AaBb da la proporción fenotípica clásica 9:3:3:1 en sus 16 celdas: 9 doble dominante, 3 dominante-recesivo, 3 recesivo-dominante y 1 doble recesivo. Estas razones son la base de las leyes de Mendel.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Se puede hacer un cuadro de Punnett de 3 genes (trihíbrido)?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. Un cruce trihíbrido AaBbCc × AaBbCc implica 3 genes: cada progenitor produce 2³ = 8 tipos de gametos, por lo que el cuadro de Punnett completo tiene 8 × 8 = 64 celdas. La proporción fenotípica resultante en la F2 es 27:9:9:9:3:3:3:1. Por su tamaño, en la práctica el trihíbrido suele resolverse por el método de la probabilidad (multiplicando las proporciones 3:1 de cada gen) en lugar de dibujar las 64 celdas a mano.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se pasa de genotipo a fenotipo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El fenotipo se deduce del genotipo aplicando la relación de dominancia entre alelos. En dominancia completa, basta con que el genotipo tenga un alelo dominante para expresar el fenotipo dominante: AA y Aa muestran el mismo carácter, y solo el homocigoto recesivo aa muestra el fenotipo recesivo. Por eso la proporción genotípica 1:2:1 se convierte en una proporción fenotípica 3:1. En dominancia incompleta o codominancia, en cambio, el heterocigoto Aa presenta su propio fenotipo intermedio o mixto.',
       },
     },
   ],

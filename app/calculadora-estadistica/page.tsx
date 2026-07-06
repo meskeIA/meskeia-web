@@ -69,6 +69,9 @@ export default function CalculadoraEstadisticaPage() {
     // Suma de cuadrados
     const sumaCuadrados = valores.reduce((acc, v) => acc + Math.pow(v - media, 2), 0);
 
+    // Desviación media (desviación absoluta media respecto a la media)
+    const desviacionMedia = valores.reduce((acc, v) => acc + Math.abs(v - media), 0) / n;
+
     return {
       n,
       suma,
@@ -88,7 +91,8 @@ export default function CalculadoraEstadisticaPage() {
       iqr,
       coefVariacion,
       errorEstandar,
-      sumaCuadrados
+      sumaCuadrados,
+      desviacionMedia
     };
   }, [valores]);
 
@@ -113,9 +117,9 @@ export default function CalculadoraEstadisticaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📊 Calculadora Estadística</h1>
+        <h1 className={styles.title}>📊 Calculadora de Estadística Descriptiva</h1>
         <p className={styles.subtitle}>
-          Análisis estadístico completo: media, mediana, moda, varianza, desviación y más
+          Pega tus datos y obtén al instante todas las medidas descriptivas: media, mediana, moda, desviación típica y cuasidesviación (n−1), desviación media, coeficiente de variación, cuartiles y valores atípicos
         </p>
       </header>
 
@@ -226,18 +230,32 @@ Ejemplo: 5, 7, 8, 6, 9, 7, 8"
                 <h3>Medidas de Dispersión</h3>
                 <div className={styles.resultsGrid}>
                   <ResultCard
-                    title="Desviación Estándar (s)"
+                    title="Cuasidesviación típica (s)"
                     value={formatNumber(estadisticas.desviacionMuestral, 4)}
                     variant="highlight"
                     icon="📉"
-                    description="Muestral"
+                    description="Muestral · divide entre n−1"
+                  />
+                  <ResultCard
+                    title="Desviación típica (σ)"
+                    value={formatNumber(estadisticas.desviacionPoblacional, 4)}
+                    variant="info"
+                    icon="📉"
+                    description="Poblacional · divide entre n"
                   />
                   <ResultCard
                     title="Varianza (s²)"
                     value={formatNumber(estadisticas.varianzaMuestral, 4)}
                     variant="default"
                     icon="📐"
-                    description="Muestral"
+                    description="Muestral · n−1"
+                  />
+                  <ResultCard
+                    title="Desviación media (DM)"
+                    value={formatNumber(estadisticas.desviacionMedia, 4)}
+                    variant="default"
+                    icon="📊"
+                    description="Σ|x − x̄| / n"
                   />
                   <ResultCard
                     title="Rango"
@@ -363,7 +381,7 @@ Ejemplo: 5, 7, 8, 6, 9, 7, 8"
           <p className={styles.introParagraph}>
             Cada medida estadística responde a una pregunta diferente. Esta tabla compara las
             principales medidas de tendencia central y dispersión con ejemplos numéricos reales
-            usando el conjunto de datos: <strong>salarios mensuales (€): 1.200, 1.400, 1.400, 1.600, 1.800, 1.800, 1.800, 2.100, 2.500, 8.000</strong>.
+            usando el conjunto de datos: <strong>salarios mensuales: 1.200, 1.400, 1.400, 1.600, 1.800, 1.800, 1.800, 2.100, 2.500, 8.000</strong> (en la moneda que uses).
           </p>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
@@ -384,7 +402,7 @@ Ejemplo: 5, 7, 8, 6, 9, 7, 8"
                   <td>x̄ = Σx / n</td>
                   <td>Datos simétricos sin valores extremos</td>
                   <td><span className={styles.sensibilidadAlta}>Alta</span></td>
-                  <td>2.360 € (distorsionada por 8.000 €)</td>
+                  <td>2.360 (distorsionada por 8.000)</td>
                 </tr>
                 <tr>
                   <td><strong>Mediana</strong></td>
@@ -392,7 +410,7 @@ Ejemplo: 5, 7, 8, 6, 9, 7, 8"
                   <td>Valor en posición (n+1)/2</td>
                   <td>Datos asimétricos, ingresos, precios</td>
                   <td><span className={styles.sensibilidadBaja}>Baja</span></td>
-                  <td>1.800 € (representa mejor al trabajador típico)</td>
+                  <td>1.800 (representa mejor al trabajador típico)</td>
                 </tr>
                 <tr>
                   <td><strong>Moda</strong></td>
@@ -400,7 +418,7 @@ Ejemplo: 5, 7, 8, 6, 9, 7, 8"
                   <td>argmax(frecuencia)</td>
                   <td>Datos discretos o categóricos</td>
                   <td><span className={styles.sensibilidadBaja}>Baja</span></td>
-                  <td>1.800 € (aparece 3 veces)</td>
+                  <td>1.800 (aparece 3 veces)</td>
                 </tr>
                 <tr>
                   <td><strong>Varianza (s²)</strong></td>
@@ -408,15 +426,15 @@ Ejemplo: 5, 7, 8, 6, 9, 7, 8"
                   <td>Σ(x−x̄)² / (n−1)</td>
                   <td>Base para otros cálculos estadísticos</td>
                   <td><span className={styles.sensibilidadAlta}>Alta</span></td>
-                  <td>4.067.111 €² (unidades al cuadrado, difícil de interpretar)</td>
+                  <td>4.067.111 unidades² (unidades al cuadrado, difícil de interpretar)</td>
                 </tr>
                 <tr>
-                  <td><strong>Desv. Estándar (s)</strong></td>
+                  <td><strong>Desv. típica / cuasidesviación (s)</strong></td>
                   <td>Raíz cuadrada de la varianza; dispersión en las mismas unidades que los datos</td>
                   <td>√[Σ(x−x̄)² / (n−1)]</td>
                   <td>Cuantificar variabilidad; reportar junto a la media</td>
                   <td><span className={styles.sensibilidadAlta}>Alta</span></td>
-                  <td>2.016,71 € — indica dispersión muy elevada</td>
+                  <td>2.016,71 — indica dispersión muy elevada</td>
                 </tr>
                 <tr>
                   <td><strong>Rango</strong></td>
@@ -424,7 +442,7 @@ Ejemplo: 5, 7, 8, 6, 9, 7, 8"
                   <td>máx − mín</td>
                   <td>Primera inspección rápida de la amplitud</td>
                   <td><span className={styles.sensibilidadAlta}>Muy alta</span></td>
-                  <td>6.800 € (de 1.200 € a 8.000 €)</td>
+                  <td>6.800 (de 1.200 a 8.000)</td>
                 </tr>
               </tbody>
             </table>
@@ -468,12 +486,12 @@ Ejemplo: 5, 7, 8, 6, 9, 7, 8"
                 </div>
               </div>
               <p className={styles.escenarioExample}>
-                <strong>Situación:</strong> Salarios del departamento de ventas (n=8): 1.800, 1.900, 2.000, 2.100, 2.200, 2.300, 2.400, 5.500 €.
-                Media = 2.525 €, mediana = 2.150 €, desv. típica = 1.182 €, CV = 46,8%.
+                <strong>Situación:</strong> Salarios del departamento de ventas (n=8): 1.800, 1.900, 2.000, 2.100, 2.200, 2.300, 2.400, 5.500.
+                Media = 2.525, mediana = 2.150, desv. típica = 1.182, CV = 46,8%.
               </p>
               <p className={styles.escenarioTip}>
-                El CV de 46,8% alerta sobre alta desigualdad interna. El salario del director (5.500 €) infla la media;
-                la mediana de 2.150 € es el indicador justo para negociación colectiva.
+                El CV de 46,8% alerta sobre alta desigualdad interna. El salario del director (5.500) infla la media;
+                la mediana de 2.150 es el indicador justo para negociación colectiva.
               </p>
             </div>
 
@@ -504,12 +522,12 @@ Ejemplo: 5, 7, 8, 6, 9, 7, 8"
                 </div>
               </div>
               <p className={styles.escenarioExample}>
-                <strong>Situación:</strong> Ventas diarias en euros durante enero (n=31): media = 847 €,
-                mediana = 720 €, moda = 680 € (10 días), desv. típica = 312 €, máximo = 2.100 € (reyes).
+                <strong>Situación:</strong> Ventas diarias durante enero (n=31): media = 847,
+                mediana = 720, moda = 680 (10 días), desv. típica = 312, máximo = 2.100 (pico de temporada alta).
               </p>
               <p className={styles.escenarioTip}>
-                La moda de 680 € marca el nivel de ventas habitual. La desviación de 312 € indica variabilidad
-                manejable. El máximo de 2.100 € es un outlier (Reyes Magos) que no debe usarse para proyecciones.
+                La moda de 680 marca el nivel de ventas habitual. La desviación de 312 indica variabilidad
+                manejable. El máximo de 2.100 es un outlier (día festivo puntual) que no debe usarse para proyecciones.
               </p>
             </div>
 
@@ -524,7 +542,7 @@ Ejemplo: 5, 7, 8, 6, 9, 7, 8"
               <div className={styles.faqPregunta}>¿Cuándo es mejor usar la mediana que la media?</div>
               <div className={styles.faqRespuesta}>
                 Usa la <strong>mediana</strong> cuando los datos están sesgados o contienen outliers. Ejemplo clásico:
-                si 9 personas ganan 1.500 € y 1 gana 15.000 €, la media es 3.000 € pero la mediana es 1.500 €.
+                si 9 personas ganan 1.500 y 1 gana 15.000, la media es 3.000 pero la mediana es 1.500.
                 La mediana describe mejor la realidad de las 9 personas. Regla práctica: si media &gt; mediana en más
                 de un 10%, usa la mediana como medida de centro.
               </div>
@@ -553,7 +571,7 @@ Ejemplo: 5, 7, 8, 6, 9, 7, 8"
               <div className={styles.faqRespuesta}>
                 El <strong>CV = (s / x̄) × 100%</strong> es la desviación típica expresada como porcentaje de la media.
                 Permite comparar la variabilidad de series con distintas unidades o escalas. Ejemplo: comparas dos
-                inversiones — Fondo A (media 1.000 €, s=50 €, CV=5%) vs Fondo B (media 50.000 €, s=3.000 €, CV=6%).
+                inversiones — Fondo A (media 1.000, s=50, CV=5%) vs Fondo B (media 50.000, s=3.000, CV=6%).
                 Aunque s del Fondo B es mayor, ambos tienen variabilidad relativa similar. No es válido si la
                 media es 0 o negativa (como temperaturas en °C que cruzan el 0).
               </div>
@@ -596,6 +614,26 @@ Ejemplo: 5, 7, 8, 6, 9, 7, 8"
                 Con n &lt; 10 la media es muy inestable — un solo dato atípico puede cambiarla drásticamente. El
                 <strong> error estándar (s/√n)</strong> cuantifica esta incertidumbre: con n=10, s=5 → SE=1,58; con n=100 → SE=0,5.
                 Duplicar el tamaño muestral reduce el error a la mitad.
+              </div>
+            </li>
+            <li className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Qué son las medidas descriptivas?</div>
+              <div className={styles.faqRespuesta}>
+                Las <strong>medidas descriptivas</strong> resumen un conjunto de datos en pocos números: las de
+                <strong> tendencia central</strong> (media, mediana, moda) indican el valor típico, y las de
+                <strong> dispersión</strong> (rango, varianza, desviación típica, desviación media y coeficiente de
+                variación) indican cuánto varían los datos. Los cuartiles y percentiles describen la posición de los
+                valores. Esta calculadora las obtiene todas a la vez pegando tus datos.
+              </div>
+            </li>
+            <li className={styles.faqItem}>
+              <div className={styles.faqPregunta}>¿Qué es la cuasidesviación típica (n−1)?</div>
+              <div className={styles.faqRespuesta}>
+                Es la <strong>desviación típica muestral</strong>: la raíz de la suma de desviaciones al cuadrado
+                dividida entre <strong>n−1</strong> en lugar de entre n. Se usa cuando los datos son una muestra de un
+                grupo mayor, porque la corrección de Bessel (÷ n−1) evita subestimar la variabilidad real. Si tienes
+                todos los datos del universo, usa la <strong>desviación típica poblacional (σ)</strong>, que divide
+                entre n. Esta herramienta muestra las dos por separado para que uses la correcta.
               </div>
             </li>
           </ul>
@@ -719,12 +757,12 @@ Ejemplo: 5, 7, 8, 6, 9, 7, 8"
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💶</span>
+              <span className={styles.tipIcon}>💰</span>
               <strong>Usa mediana para ingresos y precios</strong>
               <p>
                 Los datos de salarios, precios inmobiliarios, rentas o tiempos de espera suelen
                 tener distribuciones asimétricas. La mediana es siempre más honesta que la media
-                en estos contextos. El INE y Eurostat la usan por defecto.
+                en estos contextos. Las oficinas nacionales de estadística (INE, INEGI, DANE…) la usan por defecto.
               </p>
             </div>
             <div className={styles.tipCard}>
@@ -740,7 +778,7 @@ Ejemplo: 5, 7, 8, 6, 9, 7, 8"
               <span className={styles.tipIcon}>📐</span>
               <strong>Usa el CV para comparar series distintas</strong>
               <p>
-                Si comparas la variabilidad de salarios (en euros) con la de temperaturas (en °C),
+                Si comparas la variabilidad de salarios (en tu moneda) con la de temperaturas (en °C),
                 el CV elimina el problema de escala. Dos series son comparables en variabilidad
                 relativa aunque sus unidades sean completamente distintas.
               </p>
@@ -792,7 +830,7 @@ Ejemplo: 5, 7, 8, 6, 9, 7, 8"
               </li>
               <li>
                 <strong>Presentar la varianza como medida de dispersión final.</strong> La varianza está
-                en unidades al cuadrado (€², cm², etc.), lo que la hace difícil de interpretar directamente.
+                en unidades al cuadrado (unidades², cm², etc.), lo que la hace difícil de interpretar directamente.
                 Usa siempre la desviación típica (raíz de la varianza) para comunicar resultados al público general.
               </li>
             </ul>

@@ -310,10 +310,11 @@ export default function SimuladorPunnettPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}><span aria-hidden="true">🧬</span> Cuadro de Punnett</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🧬</span> Cuadro de Punnett online</h1>
         <p className={styles.subtitle}>
-          Simula cruces genéticos mendelianos, visualiza proporciones genotípicas y fenotípicas
-          en monohíbrido y dihíbrido
+          Tabla de Punnett para cruces monohíbrido, dihíbrido y trihíbrido (3 genes):
+          pasa de genotipo a fenotipo y obtén las proporciones fenotípicas (3:1, 9:3:3:1)
+          aplicando las leyes de Mendel
         </p>
       </header>
 
@@ -593,9 +594,9 @@ export default function SimuladorPunnettPage() {
           <p>
             Cada celda del cuadro representa una combinación igualmente probable de gametos. En un
             monohíbrido obtienes <strong>4 celdas</strong>; en un dihíbrido, <strong>16 celdas</strong>.
-            Es uno de los contenidos clásicos de biología en la educación media —Bachillerato y EBAU
-            en España, preparatoria y secundaria en Latinoamérica— y aparece con frecuencia en el
-            examen de admisión universitaria.
+            Es uno de los contenidos clásicos de biología en la educación media —secundaria,
+            preparatoria y Bachillerato— y aparece con frecuencia en los exámenes de admisión
+            universitaria de todo el mundo hispanohablante.
           </p>
           <div className={styles.formulaBox}>
             Nº de combinaciones = (nº gametos P1) × (nº gametos P2)
@@ -701,6 +702,36 @@ export default function SimuladorPunnettPage() {
         <section>
           <h3>Preguntas frecuentes</h3>
           <ul className={styles.faqList} aria-label="Preguntas frecuentes sobre genética">
+            <li className={styles.faqItem}>
+              <strong>¿Cómo se hace un cuadro de Punnett paso a paso?</strong>
+              <p className={styles.faqTip}>
+                Escribe el genotipo de cada progenitor (ej: Aa × Aa) y sus gametos posibles.
+                Coloca los de un progenitor en las <strong>filas</strong> y los del otro en las
+                <strong> columnas</strong>, rellena cada celda combinando ambos gametos (ordenando
+                la mayúscula primero) y cuenta los genotipos para agruparlos por fenotipo. Esta
+                <strong> tabla de Punnett online</strong> dibuja el cuadro y hace el recuento
+                automáticamente al elegir los genotipos.
+              </p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Qué proporciones da un cruce monohíbrido (3:1) y uno dihíbrido (9:3:3:1)?</strong>
+              <p className={styles.faqTip}>
+                Un <strong>cruce monohíbrido</strong> Aa × Aa da una proporción fenotípica
+                <strong> 3:1</strong> (y genotípica 1:2:1). Un <strong>cruce dihíbrido</strong>
+                {' '}AaBb × AaBb da la proporción fenotípica clásica <strong>9:3:3:1</strong> en sus
+                16 celdas. Un <strong>trihíbrido</strong> (3 genes) AaBbCc × AaBbCc implica 8 × 8 = 64
+                combinaciones y produce la razón 27:9:9:9:3:3:3:1.
+              </p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Cómo se pasa de genotipo a fenotipo?</strong>
+              <p className={styles.faqTip}>
+                En dominancia completa basta un alelo dominante para expresar el fenotipo dominante:
+                AA y Aa muestran el mismo carácter y solo aa muestra el recesivo. Por eso la
+                proporción genotípica 1:2:1 se convierte en la fenotípica 3:1. En dominancia
+                incompleta o codominancia, el heterocigoto Aa presenta su propio fenotipo intermedio o mixto.
+              </p>
+            </li>
             <li className={styles.faqItem}>
               <strong>¿Qué diferencia hay entre genotipo y fenotipo?</strong>
               <p className={styles.faqTip}>

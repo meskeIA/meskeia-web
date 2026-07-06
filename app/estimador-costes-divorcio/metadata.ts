@@ -1,12 +1,12 @@
 import { Metadata } from 'next';
 
 const title = 'Estimador de Costes de Divorcio 2026 — Cuánto cuesta divorciarse en España | meskeIA';
-const description = 'Estima el coste orientativo de un divorcio en España según el tipo (mutuo acuerdo o contencioso): abogado, procurador, notario, registro y tasas. Con o sin hijos, bienes comunes.';
+const description = 'Cuánto cuesta divorciarse en España en 2026: estima el precio orientativo del divorcio según el tipo (mutuo acuerdo vs contencioso), con el desglose de honorarios de abogado y procurador, tarifa notarial, registro y tasas judiciales. Con o sin hijos y con bienes comunes.';
 
 export const metadata: Metadata = {
   title,
   description,
-  keywords: 'cuanto cuesta divorciarse españa, coste divorcio mutuo acuerdo, precio divorcio contencioso, abogado divorcio precio, divorcio notarial coste, gastos divorcio 2026',
+  keywords: 'cuanto cuesta divorciarse en españa, precio divorcio españa, precio abogado divorcio, coste divorcio mutuo acuerdo vs contencioso, coste divorcio juzgado, honorarios abogado y procurador divorcio, tarifa notarial divorcio, coste divorcio notarial, tasas judiciales divorcio, coste divorcio con hijos, gastos divorcio 2026',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -52,26 +52,34 @@ export const faqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿Cuánto cuesta divorciarse en España en 2026?',
+      name: '¿Cuánto cuesta un divorcio en España en 2026?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El coste de un divorcio en España depende principalmente de si es de mutuo acuerdo o contencioso. Un divorcio de mutuo acuerdo sin hijos ni bienes puede costar entre 400-900 € (abogado + notaría si es extrajudicial). Con contencioso, los honorarios del abogado pueden oscilar entre 1.500-6.000 € o más, a los que se suman los aranceles del procurador y, en su caso, los gastos de perito tasador si hay bienes comunes.',
+        text: 'El precio de un divorcio en España depende sobre todo de si es de mutuo acuerdo o contencioso. Un divorcio de mutuo acuerdo sin hijos ni bienes suele costar entre 600 y 1.500 € (abogado y procurador, o notaría si es extrajudicial), al compartirse un único abogado. Un divorcio contencioso es mucho más caro: cada cónyuge paga su propio abogado y procurador, con un coste por parte que suele ir de 2.000 a 12.000 € o más según los bienes y la disputa por los hijos. Las personas físicas están exentas de tasas judiciales desde 2015.',
       },
     },
     {
       '@type': 'Question',
-      name: '¿Cuál es la diferencia entre divorcio de mutuo acuerdo y contencioso?',
+      name: '¿Qué diferencia de coste hay entre un divorcio de mutuo acuerdo y uno contencioso?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En el divorcio de mutuo acuerdo ambas partes se ponen de acuerdo en todas las condiciones (custodia, pensiones, reparto de bienes) y presentan un convenio regulador ante el juzgado o ante notario. Es más rápido y económico. El divorcio contencioso ocurre cuando no hay acuerdo y un juez decide: implica mayor litigiosidad, plazos más largos y costes significativamente más elevados para ambas partes.',
+        text: 'En el divorcio de mutuo acuerdo ambos comparten un solo abogado y un solo procurador, por lo que el coste total suele quedar entre 750 y 3.750 €. En el contencioso no hay acuerdo y decide el juez: cada parte contrata su propio abogado y procurador, de forma que el gasto se duplica y el coste total familiar puede superar fácilmente los 4.000-20.000 €. Además el contencioso dura más (de 6 meses a varios años), lo que encarece los honorarios.',
       },
     },
     {
       '@type': 'Question',
-      name: '¿Se puede divorciar sin abogado en España?',
+      name: '¿Cuánto cobra un abogado por un divorcio?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'No. En España, aunque el divorcio sea de mutuo acuerdo, la ley exige que cada cónyuge cuente con su propio abogado si hay hijos menores. Cuando no hay hijos menores ni bienes que repartir, es posible el divorcio notarial con un solo abogado para ambos, lo que abarata el proceso. En cualquier caso, la asistencia letrada es obligatoria en todos los procedimientos de divorcio judicial.',
+        text: 'Los honorarios del abogado son la partida principal del divorcio. En un mutuo acuerdo sin bienes rondan los 500-1.500 €, y aumentan si hay hijos o patrimonio que repartir. En un divorcio contencioso el abogado suele cobrar entre 1.500 y 6.000 € por cónyuge, o más si hay bienes complejos o peritajes. Los aranceles del procurador (unos 250-800 €) se suman aparte. Si tus ingresos están por debajo del límite IPREM puedes solicitar justicia gratuita y no pagar abogado ni procurador.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cuesta un divorcio notarial?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El divorcio notarial (Ley 15/2015) es la vía más rápida y económica, pero solo es posible cuando no hay hijos menores ni personas con discapacidad a cargo. El coste total ronda los 650-2.550 €: incluye un único abogado para ambos cónyuges, la tarifa notarial de la escritura (unos 150-250 € según el patrimonio) y la inscripción en el Registro Civil (unos 50 €). No hay procurador ni tasas judiciales. La escritura notarial tiene la misma validez que una sentencia de divorcio.',
       },
     },
     {
@@ -80,14 +88,6 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Un divorcio de mutuo acuerdo ante notario puede resolverse en pocas semanas; ante el juzgado, en 2-6 meses dependiendo de la carga del tribunal. Un divorcio contencioso puede durar entre 1 y 3 años si hay recursos o conflictos sobre hijos y bienes. El plazo legal mínimo para poder solicitar el divorcio es de 3 meses desde la celebración del matrimonio, salvo riesgo para alguno de los cónyuges o los hijos.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: '¿Quién paga las costas en un divorcio contencioso?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'En los procedimientos de divorcio contencioso los jueces suelen no imponer costas a ninguna de las partes, ya que se entiende que el conflicto familiar no tiene "ganador" estricto. Cada parte asume sus propios gastos de abogado y procurador. No obstante, si una parte actúa con temeridad procesal o mala fe, el tribunal puede condenarla en costas de manera excepcional.',
       },
     },
   ],

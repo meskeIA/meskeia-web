@@ -2,9 +2,9 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Calculadora Estadística Online - Media, Mediana, Desviación | meskeIA',
-  description: 'Calcula media, mediana, moda, varianza, desviación estándar y más. Análisis estadístico completo de conjuntos de datos con gráficos.',
-  keywords: 'estadística, media, mediana, moda, varianza, desviación estándar, cuartiles, percentiles, datos',
+  title: 'Calculadora de Estadística Descriptiva - Media, Mediana, Desviación Típica y Cuasidesviación | meskeIA',
+  description: 'Calcula todas las medidas descriptivas de tus datos: media, mediana, moda, varianza, desviación típica y cuasidesviación (n−1), desviación media, coeficiente de variación, cuartiles y valores atípicos. Análisis descriptivo online, sin instalar nada.',
+  keywords: 'medidas descriptivas, estadística descriptiva, análisis descriptivo, media, mediana, moda, varianza, desviación típica, cuasidesviación típica, desviación media, coeficiente de variación, cuartiles, percentiles, valores atípicos',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -36,18 +36,18 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Calculadora Estadística',
-  description: 'Calculadora estadística online para análisis descriptivo: media, mediana, moda, varianza, desviación estándar, cuartiles y percentiles. Visualización gráfica de los datos.',
+  description: 'Calculadora de estadística descriptiva online: media, mediana, moda, varianza, desviación típica y cuasidesviación (n−1), desviación media, coeficiente de variación, cuartiles y detección de valores atípicos.',
   url: 'https://meskeia.com/calculadora-estadistica/',
   category: 'EducationalApplication',
   features: [
-    'Estadísticos descriptivos: media, mediana, moda',
-    'Medidas de dispersión: varianza, desviación estándar, rango',
-    'Cuartiles, deciles y percentiles',
-    'Gráfico de distribución de datos',
-    'Detección de valores atípicos (outliers)',
-    'En español',
+    'Medidas de tendencia central: media, mediana, moda',
+    'Dispersión: desviación típica (σ) y cuasidesviación típica (s, n−1)',
+    'Varianza, desviación media, rango y coeficiente de variación',
+    'Cuartiles, rango intercuartílico y percentiles',
+    'Detección de valores atípicos (outliers) con la regla IQR',
+    'En español, para España y Latinoamérica',
   ],
-  keywords: ['estadística', 'media mediana moda', 'desviación estándar', 'análisis datos', 'estudiantes'],
+  keywords: ['medidas descriptivas', 'estadística descriptiva', 'cuasidesviación típica', 'media mediana moda', 'desviación típica', 'coeficiente de variación', 'análisis descriptivo de datos'],
 });
 
 export const faqJsonLd = {
@@ -92,6 +92,30 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Un valor atípico es un dato que se aleja notablemente del resto del conjunto. El método más común para detectarlos usa el rango intercuartílico: se consideran atípicos los valores inferiores a Q1 − 1,5×IQR o superiores a Q3 + 1,5×IQR (criterio de Tukey). Los outliers pueden deberse a errores de medición, datos reales excepcionales o variabilidad natural; antes de eliminarlos conviene investigar su causa.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué son las medidas descriptivas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las medidas descriptivas son los valores que resumen un conjunto de datos en pocos números. Se agrupan en medidas de tendencia central (media, mediana y moda), que indican el valor típico, y medidas de dispersión (rango, varianza, desviación típica, desviación media y coeficiente de variación), que indican cuánto varían los datos. Los cuartiles y percentiles completan el resumen describiendo la posición de los valores. Esta calculadora las obtiene todas a la vez pegando tus datos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la cuasidesviación típica y cómo se calcula?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La cuasidesviación típica (s) es la desviación típica muestral: es la raíz cuadrada de la suma de las desviaciones al cuadrado dividida entre n−1, en lugar de entre n. Se usa cuando tus datos son una muestra de un conjunto mayor, porque dividir entre n−1 (corrección de Bessel) corrige el sesgo al estimar la variabilidad de toda la población. La desviación típica poblacional (σ) divide entre n y se usa cuando tienes todos los datos del universo. Esta herramienta muestra ambas por separado.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se hace el análisis descriptivo de un conjunto de datos paso a paso?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Primero se ordenan los datos y se revisa que no haya errores. Después se calculan las medidas de tendencia central (media, mediana y moda) y las de dispersión (desviación típica, cuasidesviación, desviación media y coeficiente de variación). A continuación se obtienen los cuartiles y se detectan los valores atípicos con la regla del rango intercuartílico (Q1 − 1,5·IQR y Q3 + 1,5·IQR). Por último se interpreta la forma de la distribución comparando media y mediana. Pegando los datos en esta calculadora obtienes todos estos valores en un paso.',
       },
     },
   ],

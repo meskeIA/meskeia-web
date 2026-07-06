@@ -144,9 +144,10 @@ export default function SimuladorGeneticaPage() {
       {/* Hero Section */}
       <header className={styles.hero}>
         <span className={styles.heroIcon}>🧬</span>
-        <h1 className={styles.title}>Simulador de Genética Mendeliana</h1>
+        <h1 className={styles.title}>Simulador de Cruces Genéticos y Leyes de Mendel</h1>
         <p className={styles.subtitle}>
-          Visualiza cruces genéticos, cuadros de Punnett y herencia paso a paso
+          Cruces genéticos y herencia mendeliana paso a paso: cuadro de Punnett, cruce
+          monohíbrido (3:1) y dihíbrido (9:3:3:1) con sus proporciones fenotípicas
         </p>
       </header>
 
@@ -732,8 +733,38 @@ Hija portadora × marido sano:
 
         {/* ── FAQ AMPLIADO ──────────────────────────────────────────── */}
         <div className={styles.faqSection}>
-          <h2>❓ Preguntas Frecuentes sobre Genética Mendeliana</h2>
+          <h2>❓ Preguntas Frecuentes sobre Cruces Genéticos y Leyes de Mendel</h2>
           <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Qué proporciones fenotípicas da un cruce monohíbrido? ¿Y un cruce dihíbrido?</h4>
+              <p>
+                Un <strong>cruce monohíbrido</strong> entre dos heterocigotos (Aa × Aa) con
+                dominancia completa da una proporción fenotípica de <strong>3:1</strong>
+                (3 dominantes por cada 1 recesivo), con proporción genotípica 1:2:1. Un{' '}
+                <strong>cruce dihíbrido</strong> (AaBb × AaBb) da una proporción fenotípica de{' '}
+                <strong>9:3:3:1</strong> cuando los dos genes están en cromosomas distintos y se
+                transmiten de forma independiente. Estas son las proporciones que Mendel obtuvo con
+                sus guisantes y las que reproduce el simulador en la pestaña Estadísticas.
+              </p>
+              <p className={styles.faqTip}>
+                💡 <strong>Tip:</strong> El 9:3:3:1 del dihíbrido es simplemente el resultado de
+                combinar dos cruces 3:1 independientes (3/4 × 3/4 = 9/16, etc.).
+              </p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Cómo se hace un cruce genético paso a paso?</h4>
+              <p>
+                1) Identifica el modo de herencia y asigna símbolos a los alelos (mayúscula para el
+                dominante, minúscula para el recesivo). 2) Determina el genotipo de cada progenitor.
+                3) Escribe los gametos posibles de cada uno. 4) Combínalos en el cuadro de Punnett.
+                5) Cuenta las proporciones genotípicas y agrúpalas por fenotipo para leer las
+                proporciones fenotípicas. Es el método de las leyes de Mendel, y este simulador
+                construye el cuadro y calcula las proporciones automáticamente al elegir los
+                genotipos.
+              </p>
+            </div>
+
             <div className={styles.faqItem}>
               <h4>❓ ¿Por qué en algunos cruces no obtengo la proporción 3:1?</h4>
               <p>
