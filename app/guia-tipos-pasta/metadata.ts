@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Guía de Tipos de Pasta Italiana | meskeIA',
+  title: 'Tipos de Pasta Italiana: 40 Formas y sus Nombres (Guía) | meskeIA',
   description:
     'Guía de referencia de 40 tipos de pasta: spaghetti, penne, fusilli, ravioli y más. Forma, región, tiempo de cocción y salsa ideal.',
   keywords: [
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     'regiones italia',
   ],
   openGraph: {
-    title: 'Guía de Tipos de Pasta Italiana',
+    title: 'Tipos de Pasta Italiana: 40 Formas y sus Nombres',
     description:
       'Descubre 40 tipos de pasta italiana: forma, región, tiempo de cocción y salsa ideal. La guía definitiva para cocinar pasta.',
     type: 'website',
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Guía de Tipos de Pasta Italiana',
+    title: 'Tipos de Pasta Italiana: 40 Formas y sus Nombres',
     description:
       'Descubre 40 tipos de pasta italiana: forma, región, tiempo de cocción y salsa ideal.',
     images: ['https://meskeia.com/og-image.png']

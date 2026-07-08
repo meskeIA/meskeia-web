@@ -336,6 +336,9 @@ const productividadApps: RelatedApp[] = [
 const viajesApps: RelatedApp[] = [
   { url: '/guia-seguro-viaje/', icon: '🛡️', name: 'Seguro de Viaje', description: 'Qué cobertura necesitas' },
   { url: '/comparador-transporte-viaje/', icon: '🚄', name: 'Comparador Transporte', description: 'Avión, tren, bus o coche' },
+  // P2 enlazado interno (2026-07-08): comparador-coste-vida sube al top-4 (estaba en pos 11 → invisible por slice(0,4))
+  // por demanda probada (495 impr, pos 8, huérfana de enlaces entrantes). lista-equipaje baja de visibilidad.
+  { url: '/comparador-coste-vida/', icon: '🏙️', name: 'Coste de Vida', description: 'Compara ciudades del mundo' },
   { url: '/planificador-itinerario/', icon: '🗓️', name: 'Planificador Itinerario', description: 'Organiza días y actividades' },
   { url: '/lista-equipaje/', icon: '🧳', name: 'Lista Equipaje', description: 'Checklist de viaje' },
   { url: '/checklist-documentos-viaje/', icon: '📋', name: 'Documentos de Viaje', description: 'Pasaporte, visado y más' },
@@ -344,7 +347,6 @@ const viajesApps: RelatedApp[] = [
   { url: '/conversor-divisas/', icon: '💱', name: 'Conversor Divisas', description: 'Tipos de cambio BCE' },
   { url: '/presupuesto-viaje/', icon: '🗺️', name: 'Presupuesto Viaje', description: 'Planifica y divide gastos' },
   { url: '/enchufes-por-pais/', icon: '🔌', name: 'Enchufes por País', description: 'Qué adaptador llevar' },
-  { url: '/comparador-coste-vida/', icon: '🏙️', name: 'Coste de Vida', description: 'Compara ciudades del mundo' },
   { url: '/calculadora-combustible/', icon: '⛽', name: 'Combustible', description: 'Coste del viaje' },
   { url: '/calculadora-propinas/', icon: '🧮', name: 'Calculadora Propinas', description: 'Divide la cuenta' },
   { url: '/paises-del-mundo/', icon: '🌍', name: 'Países del Mundo', description: 'Monedas, idiomas, banderas' },
@@ -430,6 +432,9 @@ const audioApps: RelatedApp[] = [
   { url: '/extractor-audio-video/', icon: '🎬', name: 'Extractor Audio Vídeo', description: 'De vídeo AVI/MP4 a MP3/WAV' },
   { url: '/recortador-audio/', icon: '✂️', name: 'Recortador Audio', description: 'Corta y edita audio' },
   { url: '/recortador-video/', icon: '🎞️', name: 'Recortador Vídeo', description: 'Corta vídeos MP4 en local' },
+  // P2 enlazado interno (2026-07-08): generador-tonos al top-4 por demanda probada (7.052 impr, 149 clics, pos 7,8)
+  // e infra-enlazado (3 entrantes). generador-ondas baja de visibilidad.
+  { url: '/generador-tonos/', icon: '🎵', name: 'Generador de Tonos', description: 'Frecuencias y tonos de prueba' },
   { url: '/generador-ondas/', icon: '🌊', name: 'Generador Ondas', description: 'Visualizador audio' },
   { url: '/radio-meskeia/', icon: '📻', name: 'Radio meskeIA', description: 'Emisoras online' },
 ];

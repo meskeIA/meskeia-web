@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Guía de Tipos de Arroz del Mundo | meskeIA',
+  title: 'Tipos de Arroz del Mundo: 30 Variedades Explicadas (Guía) | meskeIA',
   description:
     'Guía de referencia de 30 variedades de arroz: basmati, jazmín, bomba, arborio, sushi y más. Tipo de grano, origen, cocción y uso ideal.',
   keywords: [
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     'arroz paella',
   ],
   openGraph: {
-    title: 'Guía de Tipos de Arroz del Mundo | meskeIA',
+    title: 'Tipos de Arroz del Mundo: 30 Variedades Explicadas (Guía) | meskeIA',
     description:
       'Guía de referencia de 30 variedades de arroz del mundo: tipo de grano, origen, tiempo de cocción, proporción de agua y uso culinario ideal.',
     type: 'website',
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Guía de Tipos de Arroz del Mundo',
+    title: 'Tipos de Arroz del Mundo: 30 Variedades Explicadas',
     description:
       'Aprende a elegir el arroz correcto para cada plato: 30 variedades del mundo, su origen, características y uso ideal.',
     images: ['https://meskeia.com/og-image.png']

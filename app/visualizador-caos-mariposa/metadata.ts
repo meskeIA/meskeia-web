@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Caos y Efecto Mariposa: El Atractor de Lorenz | meskeIA',
+  title: 'Atractor de Lorenz: Visualizador del Caos y el Efecto Mariposa | meskeIA',
   description:
     'Visualiza el atractor de Lorenz y el efecto mariposa: dos trayectorias casi idénticas que divergen completamente. Caos determinista, sensibilidad a condiciones iniciales y sistemas caóticos reales.',
   keywords: [
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     'predicción meteorología límites',
   ],
   openGraph: {
-    title: 'Caos y Efecto Mariposa: El Atractor de Lorenz',
+    title: 'Atractor de Lorenz: Visualizador del Caos y el Efecto Mariposa',
     description:
       'Dos trayectorias separadas por 0.01 que acaban en lugares completamente distintos. El caos visualizado.',
     type: 'website',

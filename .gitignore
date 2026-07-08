@@ -92,3 +92,11 @@ scripts/detectar-eventos-aula.mjs
 
 # Detector foso-IA (analisis interno)
 scripts/detectar-foso-ia.mjs
+
+# Digest diario analytics (analisis interno)
+scripts/digest-diario.mjs
+
+# Correlacion posicion-clics (analisis interno)
+scripts/corr-pos-clics.mjs
+scripts/corr-analisis.mjs
+scripts/corr-queries.mjs
