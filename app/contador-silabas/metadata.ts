@@ -2,9 +2,9 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Contador de Sílabas Online - Cuenta y Separa Sílabas en Español',
-  description: 'Cuenta sílabas y sepáralas con guiones al instante. Para poesía (versos, métrica), ortografía y deberes escolares. Reconoce diptongos, hiatos y triptongos. Gratis.',
-  keywords: 'contador sílabas, separar sílabas, silabeador español, división silábica, sílabas online, poesía, métrica',
+  title: 'Contador de Sílabas y Métrica de Versos - Sinalefas',
+  description: 'Cuenta sílabas y analiza la métrica de tus versos: sinalefas, tipos de verso (octosílabo, endecasílabo, alejandrino), diptongos e hiatos. Ideal para poesía y escansión. Gratis.',
+  keywords: 'métrica de versos, sinalefas, escansión poética, contador sílabas poéticas, medida de versos, contador sílabas, separar sílabas, silabeador español',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    title: 'Contador de Sílabas Online - Cuenta y Separa Sílabas',
-    description: 'Cuenta sílabas y sepáralas con guiones al instante. Para poesía, ortografía y deberes escolares. Diptongos, hiatos y triptongos.',
+    title: 'Contador de Sílabas y Métrica de Versos - Sinalefas',
+    description: 'Cuenta sílabas y analiza la métrica de tus versos: sinalefas, tipos de verso, diptongos e hiatos. Ideal para poesía y escansión.',
     url: 'https://meskeia.com/contador-silabas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -28,8 +28,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Contador de Sílabas Online',
-    description: 'Cuenta sílabas y sepáralas con guiones. Para poesía, ortografía y escolares.',
+    title: 'Contador de Sílabas y Métrica de Versos',
+    description: 'Cuenta sílabas y analiza la métrica de versos: sinalefas, tipos de verso, diptongos e hiatos.',
     images: ['https://meskeia.com/og-image.png']
   },
 };

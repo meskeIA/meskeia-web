@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Generador de Tonos y Frecuencias Hz Online (20-20000 Hz) - Audio Test',
+  title: 'Generador de Frecuencias Hz y Tonos Online (20-20000 Hz)',
   description: 'Genera tonos puros y frecuencias de audio entre 20 Hz y 20.000 Hz. Ondas senoidal, cuadrada, triangular y sierra. Para test de oído, tinnitus y calibrar altavoces.',
   keywords: 'generador de tonos, generador de frecuencias, test de audio, frecuencia Hz, onda senoidal, calibración altavoces, tono puro, audio test',
   authors: [{ name: 'meskeIA' }],
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    title: 'Generador de Tonos y Frecuencias Hz Online (20-20000 Hz)',
+    title: 'Generador de Frecuencias Hz y Tonos Online (20-20000 Hz)',
     description: 'Tonos puros entre 20 Hz y 20.000 Hz. Ondas senoidal, cuadrada, triangular y sierra. Test de oído, tinnitus, calibrar altavoces.',
     url: 'https://meskeia.com/generador-tonos/',
     siteName: 'meskeIA',
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Generador de Tonos y Frecuencias Hz Online',
+    title: 'Generador de Frecuencias Hz y Tonos Online',
     description: '20 Hz a 20.000 Hz. Test de oído, tinnitus y calibrar altavoces.',
     images: ['https://meskeia.com/og-image.png']
   },

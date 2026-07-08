@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Calculadora de Tamaño Adulto para Cachorros | meskeIA',
+  title: 'Calculadora de Peso y Tamaño Adulto del Cachorro por Raza',
   description: 'Predice el peso adulto de tu cachorro según su edad, peso actual y tamaño de raza. Curvas de crecimiento y tabla de razas de referencia.',
   keywords: 'peso adulto cachorro, tamaño perro adulto, crecimiento cachorro, predicción peso perro, raza perro, cuánto pesará mi perro',
   authors: [{ name: 'meskeIA' }],
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Calculadora de Tamaño Adulto para Cachorros',
+    title: 'Calculadora de Peso y Tamaño Adulto del Cachorro',
     description: 'Predice cuánto pesará tu cachorro cuando sea adulto',
     url: 'https://meskeia.com/calculadora-tamano-adulto-perro/',
     siteName: 'meskeIA',
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Predictor de Tamaño Adulto para Cachorros',
+    title: 'Predictor de Peso y Tamaño Adulto del Cachorro',
     description: 'Calcula el peso final de tu cachorro según su raza y peso actual',
     images: ['https://meskeia.com/og-image.png']
   },

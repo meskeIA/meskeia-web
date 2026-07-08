@@ -100,3 +100,4 @@ scripts/digest-diario.mjs
 scripts/corr-pos-clics.mjs
 scripts/corr-analisis.mjs
 scripts/corr-queries.mjs
+scripts/corr-residuos.mjs
