@@ -37,6 +37,25 @@ export interface Post {
 
 export const POSTS: Post[] = [
   {
+    slug: 'interes-demora-comercial-segundo-semestre-2026',
+    titulo: 'El interés de demora comercial sube al 10,40% en el segundo semestre de 2026',
+    fecha: '2026-07-15',
+    resumen:
+      'El BOE fija el interés de demora comercial en el 10,40% para el segundo semestre de 2026, frente al 10,15% anterior. Qué es, a quién afecta y cómo se aplica al reclamar facturas impagadas entre empresas y autónomos.',
+    cuerpo: [
+      'El Boletín Oficial del Estado ha publicado el tipo de interés de demora comercial que rige durante el segundo semestre de 2026: el 10,40%. La cifra procede de la Resolución de 30 de junio de 2026 de la Secretaría General del Tesoro y Financiación Internacional (BOE-A-2026-14327) y se aplica a las operaciones comerciales entre el 1 de julio y el 31 de diciembre de 2026. Sube desde el 10,15% que estuvo vigente en el primer semestre.',
+      'El motivo del alza está en el tipo de referencia del Banco Central Europeo. Este interés de demora se calcula, por ley, sumando 8 puntos porcentuales al tipo de las operaciones principales de financiación del BCE vigente el primer día del semestre. Como esa referencia pasó del 2,15% al 2,40%, el total sube del 10,15% al 10,40% (2,40% + 8 puntos).',
+      'El interés de demora comercial regulado por la Ley 3/2004 es el que puede reclamar una empresa o un autónomo cuando otra empresa —o una Administración pública— le paga una factura fuera de plazo. No se aplica a los consumidores particulares, ni a las deudas con Hacienda, que tienen su propio interés de demora tributario, ni a las deudas civiles sin pacto expreso, a las que corresponde el interés legal del dinero (3,25%).',
+      'Su efecto práctico es doble. Para quien no cobra a tiempo funciona como compensación: los intereses se devengan de forma automática desde el día siguiente al vencimiento de la factura, sin necesidad de avisar al deudor ni de haberlo pactado en el contrato. Para quien paga tarde es un coste añadido que crece cuanto más se demora el pago. El plazo legal de pago por defecto en operaciones comerciales es de 30 días y la deuda prescribe a los tres años.',
+      'Como este tipo cambia cada semestre, conviene comprobar cuál estaba vigente en el periodo exacto de la mora antes de reclamar. Si tienes una factura vencida y quieres estimar a cuánto ascienden los intereses, el enlace de abajo permite calcularlos indicando el importe y las fechas.',
+    ],
+    fuente: 'BOE — Resolución de 30 de junio de 2026 (Tesoro), BOE-A-2026-14327',
+    fuenteUrl: 'https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-14327',
+    fichaSlug: 'interes-legal-demora',
+    visualizadorUrl: 'https://meskeia.com/orientador-intereses-demora/',
+    visualizadorTitulo: 'Orientador de Intereses de Demora',
+  },
+  {
     slug: 'euro-digital-paso-clave-parlamento-europeo',
     titulo: 'El euro digital da un paso clave en el Parlamento Europeo',
     fecha: '2026-07-01',

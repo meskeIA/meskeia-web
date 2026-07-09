@@ -197,7 +197,6 @@ export default function InteresLegalDemoraPage() {
 
           <FichasRelacionadas slug="interes-legal-demora" />
 
-          &
           <section className={styles.section}>
             <div className={styles.brandFoot}>
               <p>

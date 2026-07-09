@@ -23,6 +23,12 @@ export interface Novedad {
 // Sembrado con los cambios normativos reales recientes. Ampliar al mantener fichas.
 export const NOVEDADES: Novedad[] = [
   {
+    fecha: '2026-07-01',
+    fichaSlug: 'interes-legal-demora',
+    texto:
+      'El interés de demora comercial sube al 10,40% para el segundo semestre de 2026 (2,40% del BCE + 8 puntos), desde el 10,15% del primer semestre, tras elevar el BCE su tipo de referencia (Resolución de 30/06/2026 del Tesoro, BOE-A-2026-14327).',
+  },
+  {
     fecha: '2026-06-17',
     fichaSlug: 'itp-ccaa',
     texto:
