@@ -11,7 +11,7 @@
  *   - Tipos BCE:         https://www.ecb.europa.eu/stats/policy_and_exchange_rates
  *   - BOE publicación:   https://www.boe.es
  *
- * Verificado: 2026-03-16
+ * Verificado: 2026-07-09
  * Vigencia: 2026 (H1 y H2 con tipos BCE vigentes)
  *
  * ⚠️ ACTUALIZACIÓN NECESARIA:
@@ -22,7 +22,7 @@
 
 export const FISCAL_INTERESES_META = {
   fuente: 'Ley 3/2004 (morosidad) + Ley de Presupuestos (interés legal)',
-  verificado: '2026-03-16',
+  verificado: '2026-07-09',
   vigencia: '2026',
   urlOficialLey3: 'https://www.boe.es/buscar/act.php?id=BOE-A-2004-21830',
   urlOficialBCE: 'https://www.ecb.europa.eu/stats/policy_and_exchange_rates',
@@ -60,6 +60,14 @@ export interface TipoDemoraComercial {
  * y actualizar 'vigenciaHasta' del semestre anterior si es necesario.
  */
 export const TIPOS_DEMORA_COMERCIAL: TipoDemoraComercial[] = [
+  {
+    semestre: 'H2 2026',
+    tipoBCE: 2.40,
+    incremento: 8,
+    tipoTotal: 10.40,
+    vigenciaDesde: '2026-07-01',
+    vigenciaHasta: '2026-12-31',
+  },
   {
     semestre: 'H1 2026',
     tipoBCE: 2.15,
