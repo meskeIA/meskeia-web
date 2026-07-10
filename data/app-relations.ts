@@ -2409,8 +2409,15 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-productividad': [...productividadApps.filter(a => a.url !== '/calculadora-productividad/').slice(0, 2), ...freelanceApps.slice(0, 2)],
   'planificador-turnos': productividadApps.filter(a => a.url !== '/planificador-turnos/'),
   'preparar-entrevista-competencias': [
-    ...productividadApps.filter(a => a.url !== '/preparar-entrevista-competencias/').slice(0, 3),
+    { url: '/test-competencias-digitales/', icon: '📊', name: 'Test de Competencias Digitales', description: 'Autoevaluación DigComp con plan de desarrollo' },
+    ...productividadApps.filter(a => a.url !== '/preparar-entrevista-competencias/').slice(0, 2),
     { url: '/quiz-complejidad-algoritmos/', icon: '⏱️', name: 'Quiz Complejidad', description: 'Prepara entrevistas técnicas de programación' },
+  ],
+  'test-competencias-digitales': [
+    { url: '/preparar-entrevista-competencias/', icon: '🌟', name: 'Entrevista por Competencias', description: 'Prepara respuestas con el método STAR' },
+    { url: '/test-madurez-digital/', icon: '🤖', name: 'Test Madurez Digital', description: 'Nivel de digitalización de tu empresa' },
+    { url: '/glosario-programacion/', icon: '📖', name: 'Glosario Programación', description: '100+ términos de programación' },
+    { url: '/quiz-complejidad-algoritmos/', icon: '⏱️', name: 'Quiz Complejidad', description: 'Big O, ordenación y estructuras' },
   ],
   // ==========================================
   // FAMILIA: APPS DE REFLEXIÓN (cross-linking por afinidad temática)
@@ -3685,10 +3692,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/quiz-reinos-naturaleza/', icon: '🔬', name: 'Quiz Reinos Naturaleza', description: '43 organismos sorprendentes' },
   ],
   'test-madurez-digital': [
+    { url: '/test-competencias-digitales/', icon: '📊', name: 'Test de Competencias Digitales', description: 'Tu nivel personal DigComp y plan de mejora' },
     { url: '/test-burnout-laboral/', icon: '🧘', name: 'Test Burnout Laboral', description: 'Detecta el agotamiento profesional' },
     { url: '/calculadora-costes-teletrabajo/', icon: '🏠', name: 'Costes Teletrabajo', description: 'Cuánto ahorras trabajando en casa' },
     { url: '/orientador-tarifa-freelance/', icon: '💼', name: 'Calculadora Tarifa/Hora', description: 'Fija tu precio como freelance' },
-    { url: '/estimador-roi-marketing/', icon: '📈', name: 'Calculadora ROI', description: 'Retorno sobre inversión' },
   ],
   'estimador-pension-viudedad': [
     ...jubilacionApps.filter(a => a.url !== '/estimador-pension-viudedad/').slice(0, 4),

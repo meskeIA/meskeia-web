@@ -179,6 +179,7 @@ export const implementedAppsUrls = [
   "/matriz-eisenhower/",          // Matriz urgente/importante para priorizar tareas
   "/planificador-turnos/",
   "/preparar-entrevista-competencias/",  // Método STAR: banco de respuestas para entrevistas por competencias
+  "/test-competencias-digitales/",       // Autoevaluación DigComp: 21 competencias, gaps y plan de desarrollo
   "/notas/",
   "/generador-contrasenas/",
   "/generador-gitignore/",        // Plantillas .gitignore para Node, Python, Java, React+
