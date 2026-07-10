@@ -2409,15 +2409,21 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-productividad': [...productividadApps.filter(a => a.url !== '/calculadora-productividad/').slice(0, 2), ...freelanceApps.slice(0, 2)],
   'planificador-turnos': productividadApps.filter(a => a.url !== '/planificador-turnos/'),
   'preparar-entrevista-competencias': [
+    { url: '/generador-curriculum/', icon: '📄', name: 'Crear Currículum', description: 'CV / hoja de vida ATS-friendly con vista previa' },
     { url: '/test-competencias-digitales/', icon: '📊', name: 'Test de Competencias Digitales', description: 'Autoevaluación DigComp con plan de desarrollo' },
-    ...productividadApps.filter(a => a.url !== '/preparar-entrevista-competencias/').slice(0, 2),
+    ...productividadApps.filter(a => a.url !== '/preparar-entrevista-competencias/').slice(0, 1),
     { url: '/quiz-complejidad-algoritmos/', icon: '⏱️', name: 'Quiz Complejidad', description: 'Prepara entrevistas técnicas de programación' },
   ],
   'test-competencias-digitales': [
+    { url: '/generador-curriculum/', icon: '📄', name: 'Crear Currículum', description: 'Vuelca tus competencias en tu CV' },
     { url: '/preparar-entrevista-competencias/', icon: '🌟', name: 'Entrevista por Competencias', description: 'Prepara respuestas con el método STAR' },
     { url: '/test-madurez-digital/', icon: '🤖', name: 'Test Madurez Digital', description: 'Nivel de digitalización de tu empresa' },
     { url: '/glosario-programacion/', icon: '📖', name: 'Glosario Programación', description: '100+ términos de programación' },
-    { url: '/quiz-complejidad-algoritmos/', icon: '⏱️', name: 'Quiz Complejidad', description: 'Big O, ordenación y estructuras' },
+  ],
+  'generador-curriculum': [
+    { url: '/preparar-entrevista-competencias/', icon: '🌟', name: 'Entrevista por Competencias', description: 'Prepara la entrevista con el método STAR' },
+    { url: '/test-competencias-digitales/', icon: '📊', name: 'Test de Competencias Digitales', description: 'Descubre tu nivel digital para el CV' },
+    ...productividadApps.filter(a => a.url !== '/preparar-entrevista-competencias/').slice(0, 2),
   ],
   // ==========================================
   // FAMILIA: APPS DE REFLEXIÓN (cross-linking por afinidad temática)
