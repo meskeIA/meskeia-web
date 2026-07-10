@@ -2425,6 +2425,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/test-competencias-digitales/', icon: '📊', name: 'Test de Competencias Digitales', description: 'Descubre tu nivel digital para el CV' },
     ...productividadApps.filter(a => a.url !== '/preparar-entrevista-competencias/').slice(0, 2),
   ],
+  'guia-primer-empleo': [
+    { url: '/test-competencias-digitales/', icon: '📊', name: 'Test de Competencias Digitales', description: 'Autoevaluación DigComp con plan de desarrollo' },
+    { url: '/generador-curriculum/', icon: '📄', name: 'Crear Currículum', description: 'CV / hoja de vida ATS-friendly con vista previa' },
+    { url: '/preparar-entrevista-competencias/', icon: '🌟', name: 'Entrevista por Competencias', description: 'Prepara respuestas con el método STAR' },
+    { url: '/visualizador-sueldo-neto/', icon: '💶', name: 'Tu Sueldo al Desnudo', description: 'De bruto a neto explicado paso a paso' },
+  ],
   // ==========================================
   // FAMILIA: APPS DE REFLEXIÓN (cross-linking por afinidad temática)
   // ==========================================

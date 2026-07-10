@@ -663,6 +663,7 @@ export const implementedAppsUrls = [
   "/comparador-asistentes-codigo/",      // Claude Code vs Copilot
   "/comparador-ides-ia/",               // Cursor vs Windsurf vs VS Code vs Zed vs JetBrains
   "/guia/programar-con-ia/",            // Journey: primera app/web/script con IA — 6 herramientas, 5 pasos, caso real — 4 tabs con cross-link a asistentes vs Gemini Code Assist vs Codex — 4 tabs: comparativa, acceso, perfiles, combinaciones IDE + algoritmo Gini/ID3 + 3 datasets editables + clasificador
+  "/guia/primer-empleo/",               // Journey carrera/empleo: competencias, CV, entrevista y primer sueldo — 5 herramientas
   "/constructor-prompts/",               // Wizard 5 pasos: construye prompts efectivos para cualquier IA (modelo, objetivo, rol, formato, restricciones)
   "/tokenizador-ia/",                    // Tokenizador visual BPE + stats en tiempo real + calculadora de costes con precios editables (6 modelos)
   "/test-dependencia-tecnologica/",        // Reflexión: dependencia tecnológica — autonomía real + adaptabilidad, 10 preguntas, perfil + acciones

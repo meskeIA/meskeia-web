@@ -124,4 +124,13 @@ export const guidesJourney: GuideJourney[] = [
     toolsCount: 6,
     available: true,
   },
+  {
+    id: 'primer-empleo',
+    name: 'Del Estudio al Primer Empleo',
+    icon: '🎓',
+    description: 'Terminaste los exámenes y toca buscar trabajo: competencias, currículum, entrevista y primer sueldo, paso a paso',
+    url: '/guia/primer-empleo/',
+    toolsCount: 5,
+    available: true,
+  },
 ];

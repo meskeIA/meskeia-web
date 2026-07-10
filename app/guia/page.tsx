@@ -101,6 +101,14 @@ const guias = [
       'Tengo una idea para una web, app o script. Nunca lo he hecho solo. ¿Por dónde empiezo? Elige tus herramientas, aprende a dar instrucciones y construye algo real paso a paso.',
     tools: 6,
   },
+  {
+    slug: 'primer-empleo',
+    icon: '🎓',
+    title: 'Del Estudio al Primer Empleo',
+    description:
+      'Terminaste los exámenes y toca buscar trabajo. Mide tus competencias, crea tu currículum, prepara la entrevista y entiende tu primer sueldo, paso a paso.',
+    tools: 5,
+  },
 ];
 
 export default function GuiasIndexPage() {
