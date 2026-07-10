@@ -1020,10 +1020,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-anatomia-smartphone/', icon: '📱', name: 'Anatomía de un Smartphone', description: 'Lo que hay dentro' },
   ],
   'visualizador-matrices': [
+    { url: '/visualizador-algebra-lineal/', icon: '🔢', name: 'Álgebra Lineal', description: 'Las matrices son la representación algebraica de las transformaciones lineales: vectores, determinante y eigenvalores' },
+    { url: '/visualizador-numeros-complejos/', icon: '𝕚', name: 'Números Complejos', description: 'Rotaciones y escalados del plano se expresan también con números complejos' },
+    { url: '/visualizador-geometria-analitica/', icon: '📉', name: 'Geometría Analítica', description: 'Las transformaciones matriciales actúan sobre cónicas y curvas del plano' },
     { url: '/visualizador-funciones-mundo/', icon: '📈', name: 'Funciones del Mundo', description: '4 funciones fundamentales' },
-    { url: '/visualizador-fibonacci-naturaleza/', icon: '🌻', name: 'Fibonacci en la Naturaleza', description: 'La secuencia áurea' },
-    { url: '/visualizador-probabilidad/', icon: '🎲', name: 'Probabilidad en la Vida', description: 'Azar y decisiones' },
-    { url: '/visualizador-peso-numeros/', icon: '🔢', name: 'El Peso de los Números', description: 'Escalas numéricas' },
   ],
   'simulador-reacciones-quimicas': [
     { url: '/simulador-equilibrio-quimico/', icon: '⚖️', name: 'Equilibrio Químico', description: 'Reacciones reversibles, Le Chatelier y constante Kc' },
