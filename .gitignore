@@ -101,3 +101,6 @@ scripts/corr-pos-clics.mjs
 scripts/corr-analisis.mjs
 scripts/corr-queries.mjs
 scripts/corr-residuos.mjs
+
+# Estudio de residuos CTR (documento interno)
+ESTUDIO-RESIDUOS-CTR.md
