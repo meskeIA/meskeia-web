@@ -331,6 +331,7 @@ const productividadApps: RelatedApp[] = [
   { url: '/calculadora-productividad/', icon: '📊', name: 'Productividad', description: 'Ingresos por hora real' },
   { url: '/temporizador-pomodoro/', icon: '🍅', name: 'Pomodoro', description: 'Técnica 25/5' },
   { url: '/planificador-turnos/', icon: '📅', name: 'Planificador Turnos', description: 'Organiza horarios' },
+  { url: '/preparar-entrevista-competencias/', icon: '🌟', name: 'Entrevista por Competencias', description: 'Prepara respuestas con el método STAR' },
 ];
 
 const viajesApps: RelatedApp[] = [
@@ -2407,6 +2408,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'time-tracker': productividadApps.filter(a => a.url !== '/time-tracker/'),
   'calculadora-productividad': [...productividadApps.filter(a => a.url !== '/calculadora-productividad/').slice(0, 2), ...freelanceApps.slice(0, 2)],
   'planificador-turnos': productividadApps.filter(a => a.url !== '/planificador-turnos/'),
+  'preparar-entrevista-competencias': [
+    ...productividadApps.filter(a => a.url !== '/preparar-entrevista-competencias/').slice(0, 3),
+    { url: '/quiz-complejidad-algoritmos/', icon: '⏱️', name: 'Quiz Complejidad', description: 'Prepara entrevistas técnicas de programación' },
+  ],
   // ==========================================
   // FAMILIA: APPS DE REFLEXIÓN (cross-linking por afinidad temática)
   // ==========================================

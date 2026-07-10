@@ -178,6 +178,7 @@ export const implementedAppsUrls = [
   "/calculadora-productividad/",  // Productividad real: ingresos por hora efectiva
   "/matriz-eisenhower/",          // Matriz urgente/importante para priorizar tareas
   "/planificador-turnos/",
+  "/preparar-entrevista-competencias/",  // Método STAR: banco de respuestas para entrevistas por competencias
   "/notas/",
   "/generador-contrasenas/",
   "/generador-gitignore/",        // Plantillas .gitignore para Node, Python, Java, React+
