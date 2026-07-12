@@ -1,0 +1,582 @@
+/* Paleta meskeIA + variables locales */
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --accent: #7FB3D3;
+  --hero-bg: #1a5278;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --border: #E5E5E5;
+  --hover: #F5F5F5;
+  --danger: #C0392B;
+  --success: #27AE60;
+  --radius: 12px;
+  --radius-large: 16px;
+
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --border: #404040;
+  --hover: #333333;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  margin-top: 80px;
+  margin-bottom: 1.5rem;
+  padding: 2rem;
+  background: var(--hero-bg);
+  border-radius: var(--radius-large);
+  color: #fff;
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 1.15rem;
+  opacity: 0.95;
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+/* Quiz */
+.quiz {
+  margin-bottom: 2rem;
+}
+
+.progress {
+  margin-bottom: 1.25rem;
+}
+
+.progressText {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+}
+
+.progressTrack {
+  height: 8px;
+  background: var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  background: var(--primary);
+  transition: width 0.3s ease;
+}
+
+/* Tarjeta del caso */
+.casoCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: 1.25rem 1.4rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.casoTipo {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  margin-bottom: 0.9rem;
+}
+
+.casoMeta {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.metaRow {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  margin: 0.2rem 0;
+  word-break: break-word;
+}
+
+.metaLabel {
+  color: var(--text-secondary);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.metaValue {
+  color: var(--text-primary);
+}
+
+.casoBody {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.casoEnlace {
+  margin-top: 0.85rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: var(--primary);
+  background: var(--hover);
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+  word-break: break-all;
+}
+
+/* Caso web (barra de navegador) */
+.urlBar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--hover);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.5rem 0.9rem;
+  margin-bottom: 0.85rem;
+}
+
+.urlLock {
+  font-size: 0.95rem;
+}
+
+.urlText {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  word-break: break-all;
+}
+
+/* Botones de respuesta */
+.answerButtons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+.btnPhishing,
+.btnLegit {
+  padding: 1rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border: 2px solid;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--bg-card);
+}
+
+.btnPhishing {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.btnPhishing:hover {
+  background: var(--danger);
+  color: #fff;
+}
+
+.btnLegit {
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.btnLegit:hover {
+  background: var(--success);
+  color: #fff;
+}
+
+.btnPhishing:focus-visible,
+.btnLegit:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Feedback */
+.feedback {
+  border-radius: var(--radius);
+  padding: 1.1rem 1.3rem;
+  border: 1px solid;
+}
+
+.feedbackOk {
+  background: rgba(39, 174, 96, 0.08);
+  border-color: rgba(39, 174, 96, 0.4);
+}
+
+.feedbackKo {
+  background: rgba(192, 57, 43, 0.08);
+  border-color: rgba(192, 57, 43, 0.4);
+}
+
+.feedbackTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.feedbackVeredicto {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.feedbackSub {
+  margin: 0.5rem 0 0.3rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.senalesList {
+  margin: 0 0 1rem;
+  padding-left: 1.25rem;
+}
+
+.senalesList li {
+  margin: 0.4rem 0;
+  font-size: 0.93rem;
+  line-height: 1.5;
+}
+
+.nextBtn {
+  width: 100%;
+  padding: 0.85rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nextBtn:hover {
+  background: #256a8a;
+}
+
+.nextBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Resultado */
+.resultsScreen {
+  text-align: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: 2.5rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.scoreCircle {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: var(--hero-bg);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.scoreValue {
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.scoreLabel {
+  font-size: 0.95rem;
+  opacity: 0.9;
+  margin-top: 0.4rem;
+}
+
+.perfil {
+  max-width: 520px;
+  margin: 0 auto 1.5rem;
+}
+
+.perfil h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.perfil p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.restartBtn {
+  padding: 0.9rem 1.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.restartBtn:hover {
+  background: #256a8a;
+  transform: translateY(-2px);
+}
+
+.restartBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ───────── Contenido educativo v2.0 ───────── */
+.eduSection {
+  margin-bottom: 2rem;
+}
+
+.eduSection h2 {
+  font-size: 1.4rem;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+}
+
+.eduSection h3 {
+  color: var(--text-primary);
+}
+
+.eduSection p {
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  margin: 0.5rem 0 1rem;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.comparativaTable th,
+.comparativaTable td {
+  padding: 0.7rem 0.85rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.comparativaTable th {
+  background: var(--hover);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.comparativaTable td:first-child {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Tipos de fraude */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1rem;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius);
+  padding: 1.1rem;
+}
+
+.escenarioCard h3 {
+  font-size: 1.05rem;
+  margin: 0 0 0.4rem;
+}
+
+.escenarioCard p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+}
+
+.faqItem h3 {
+  font-size: 1.02rem;
+  margin: 0 0 0.4rem;
+}
+
+.faqItem p {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+/* Guía paso a paso */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepContent h3 {
+  font-size: 1.05rem;
+  margin: 0 0 0.25rem;
+}
+
+.stepContent p {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+/* Tips */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.tipCard {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.tipCard p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Warning box */
+.warningBox {
+  background: rgba(230, 126, 34, 0.08);
+  border: 1px solid rgba(230, 126, 34, 0.4);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.warningHeader h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.warningIcon {
+  font-size: 1.5rem;
+}
+
+.warningList {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.warningList li {
+  margin: 0.45rem 0;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero {
+    margin-top: 60px;
+    padding: 1.5rem;
+  }
+
+  .title {
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .answerButtons {
+    grid-template-columns: 1fr;
+  }
+
+  .scoreCircle {
+    width: 140px;
+    height: 140px;
+  }
+}

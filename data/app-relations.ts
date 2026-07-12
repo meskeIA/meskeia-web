@@ -253,6 +253,16 @@ const criptografiaModernaApps: RelatedApp[] = [
   { url: '/generador-contrasenas/', icon: '🔒', name: 'Generador Contraseñas', description: 'Contraseñas seguras' },
 ];
 
+// SEGURIDAD DIGITAL PRÁCTICA (contraseñas, phishing, privacidad del usuario)
+const seguridadDigitalApps: RelatedApp[] = [
+  { url: '/evaluador-fortaleza-contrasena/', icon: '🔒', name: 'Fortaleza de Contraseñas', description: '¿Es segura tu clave?' },
+  { url: '/generador-contrasenas/', icon: '🔑', name: 'Generador Contraseñas', description: 'Contraseñas seguras' },
+  { url: '/test-phishing/', icon: '🎣', name: 'Test ¿Es Phishing?', description: 'Detecta estafas y fraudes' },
+  { url: '/generador-hashes/', icon: '#️⃣', name: 'Generador Hashes', description: 'MD5, SHA-256, SHA-512' },
+  { url: '/editor-exif/', icon: '📷', name: 'Editor EXIF', description: 'Privacidad de tus fotos' },
+  { url: '/curso-criptografia-seguridad/', icon: '🔐', name: 'Curso Criptografía', description: 'Seguridad de la A a la Z' },
+];
+
 // ==========================================
 // FAMILIA: DISEÑO Y COLORES
 // ==========================================
@@ -2321,8 +2331,13 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'cifrado-transposicion': criptografiaClasicaApps.filter(a => a.url !== '/cifrado-transposicion/'),
   'cifrado-playfair': criptografiaClasicaApps.filter(a => a.url !== '/cifrado-playfair/'),
   'cifrado-aes': criptografiaModernaApps.filter(a => a.url !== '/cifrado-aes/'),
-  'generador-hashes': criptografiaModernaApps.filter(a => a.url !== '/generador-hashes/'),
+  'generador-hashes': seguridadDigitalApps.filter(a => a.url !== '/generador-hashes/'),
   'codificador-base64': criptografiaModernaApps.filter(a => a.url !== '/codificador-base64/'),
+
+  // SEGURIDAD DIGITAL PRÁCTICA
+  'evaluador-fortaleza-contrasena': seguridadDigitalApps.filter(a => a.url !== '/evaluador-fortaleza-contrasena/'),
+  'test-phishing': seguridadDigitalApps.filter(a => a.url !== '/test-phishing/'),
+  'curso-criptografia-seguridad': seguridadDigitalApps.filter(a => a.url !== '/curso-criptografia-seguridad/'),
 
   // CONVERSIÓN DE DATOS
   'conversor-formatos': conversionDatosApps.filter(a => a.url !== '/conversor-formatos/'),
@@ -2724,7 +2739,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'generador-utm': webDevApps.filter(a => a.url !== '/generador-utm/'),
   'conversor-imagenes': imagenesApps.filter(a => a.url !== '/conversor-imagenes/'),
   'compresor-imagenes': imagenesApps.filter(a => a.url !== '/compresor-imagenes/'),
-  'editor-exif': imagenesApps.filter(a => a.url !== '/editor-exif/'),
+  'editor-exif': [...imagenesApps.filter(a => a.url !== '/editor-exif/'), { url: '/test-phishing/', icon: '🎣', name: 'Test ¿Es Phishing?', description: 'Detecta estafas' }, { url: '/evaluador-fortaleza-contrasena/', icon: '🔒', name: 'Fortaleza de Contraseñas', description: '¿Es segura tu clave?' }],
   'generador-iconos': imagenesApps.filter(a => a.url !== '/generador-iconos/'),
   'extractor-audio-video': audioApps.filter(a => a.url !== '/extractor-audio-video/'),
   'recortador-audio': audioApps.filter(a => a.url !== '/recortador-audio/'),
@@ -2754,7 +2769,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // CÓDIGOS
   'generador-qr': codigosApps.filter(a => a.url !== '/generador-qr/'),
   'generador-codigos-barras': codigosApps.filter(a => a.url !== '/generador-codigos-barras/'),
-  'generador-contrasenas': [...criptografiaModernaApps.filter(a => a.url !== '/generador-contrasenas/').slice(0, 2), ...codigosApps.slice(0, 2)],
+  'generador-contrasenas': seguridadDigitalApps.filter(a => a.url !== '/generador-contrasenas/'),
   'generador-gitignore': webDevApps,
   'generador-firma-email': codigosApps.filter(a => a.url !== '/generador-firma-email/'),
 
@@ -6472,6 +6487,9 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     // Criptografía
     'cifrado-clasico': { title: 'Más cifrados clásicos', icon: '🔐' },
     'cifrado-aes': { title: 'Herramientas de seguridad', icon: '🛡️' },
+    'evaluador-fortaleza-contrasena': { title: 'Seguridad y contraseñas', icon: '🔒' },
+    'test-phishing': { title: 'Seguridad digital', icon: '🛡️' },
+    'curso-criptografia-seguridad': { title: 'Seguridad y contraseñas', icon: '🔐' },
 
     // Diseño
     'conversor-colores': { title: 'Herramientas de diseño', icon: '🎨' },

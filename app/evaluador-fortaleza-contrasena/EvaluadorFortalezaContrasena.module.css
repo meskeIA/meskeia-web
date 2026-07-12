@@ -1,0 +1,483 @@
+/* Paleta meskeIA + variables locales */
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --accent: #7FB3D3;
+  --hero-bg: #1a5278;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --border: #E5E5E5;
+  --hover: #F5F5F5;
+  --radius: 12px;
+  --radius-large: 16px;
+
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --border: #404040;
+  --hover: #333333;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  margin-top: 80px;
+  margin-bottom: 1.5rem;
+  padding: 2rem;
+  background: var(--hero-bg);
+  border-radius: var(--radius-large);
+  color: #fff;
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 1.15rem;
+  opacity: 0.95;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* Aviso de privacidad */
+.privacyBox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: rgba(72, 169, 166, 0.12);
+  border: 1px solid var(--secondary);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.privacyIcon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.privacyBox p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+/* Herramienta */
+.tool {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: 1.75rem;
+  margin-bottom: 2rem;
+}
+
+.label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+  color: var(--text-primary);
+}
+
+.inputRow {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.input {
+  flex: 1 1 240px;
+  padding: 0.85rem 1rem;
+  font-size: 1.1rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Courier New', monospace;
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-color: var(--primary);
+}
+
+.toggleBtn {
+  padding: 0.85rem 1.1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--hover);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.toggleBtn:hover {
+  border-color: var(--primary);
+}
+
+.toggleBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Barra de fortaleza */
+.barWrap {
+  margin: 1.25rem 0 0.5rem;
+}
+
+.barTrack {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+
+.barSeg {
+  height: 10px;
+  border-radius: 6px;
+  background: var(--border);
+  transition: background 0.3s ease;
+}
+
+/* Resultados */
+.results {
+  margin-top: 1rem;
+}
+
+.placeholder {
+  color: var(--text-secondary);
+  font-style: italic;
+  margin: 0.5rem 0 0;
+}
+
+.nivelHeader {
+  text-align: center;
+  margin: 0.75rem 0 1.25rem;
+}
+
+.nivelLabel {
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.metric {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.9rem 0.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.metricValue {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.2;
+}
+
+.metricLabel {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.blockTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 1.25rem 0 0.6rem;
+  color: var(--text-primary);
+}
+
+/* Tablas */
+.tableWrapper {
+  overflow-x: auto;
+  margin: 0.5rem 0 1rem;
+}
+
+.escenariosTable,
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.escenariosTable th,
+.escenariosTable td,
+.comparativaTable th,
+.comparativaTable td {
+  padding: 0.7rem 0.85rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.escenariosTable th,
+.comparativaTable th {
+  background: var(--hover);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.escDetalle {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.escTiempo {
+  font-weight: 700;
+  color: var(--primary);
+  white-space: nowrap;
+}
+
+/* Cajas de problemas / aciertos / sugerencias */
+.problemasBox,
+.aciertosBox,
+.sugerenciasBox {
+  border-radius: var(--radius);
+  padding: 0.5rem 1rem 1rem;
+  margin-top: 1rem;
+}
+
+.problemasBox { background: rgba(192, 57, 43, 0.08); border: 1px solid rgba(192, 57, 43, 0.35); }
+.aciertosBox { background: rgba(39, 174, 96, 0.08); border: 1px solid rgba(39, 174, 96, 0.35); }
+.sugerenciasBox { background: rgba(46, 134, 171, 0.08); border: 1px solid rgba(46, 134, 171, 0.3); }
+
+.problemasList,
+.aciertosList,
+.sugerenciasList {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.problemasList li,
+.aciertosList li,
+.sugerenciasList li {
+  margin: 0.4rem 0;
+  font-size: 0.93rem;
+}
+
+/* ───────── Contenido educativo v2.0 ───────── */
+.eduSection {
+  margin-bottom: 2rem;
+}
+
+.eduSection h2 {
+  font-size: 1.4rem;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+}
+
+.eduSection h3 {
+  color: var(--text-primary);
+}
+
+.eduSection p {
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.comparativaTable td:first-child {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Casos de uso */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1rem;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius);
+  padding: 1.1rem;
+}
+
+.escenarioCard h3 {
+  font-size: 1.05rem;
+  margin: 0 0 0.4rem;
+}
+
+.escenarioCard p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+}
+
+.faqItem h3 {
+  font-size: 1.02rem;
+  margin: 0 0 0.4rem;
+}
+
+.faqItem p {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+/* Guía paso a paso */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepContent h3 {
+  font-size: 1.05rem;
+  margin: 0 0 0.25rem;
+}
+
+.stepContent p {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+/* Tips */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.tipCard {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.tipCard p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Warning box */
+.warningBox {
+  background: rgba(230, 126, 34, 0.08);
+  border: 1px solid rgba(230, 126, 34, 0.4);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.warningHeader h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.warningIcon {
+  font-size: 1.5rem;
+}
+
+.warningList {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.warningList li {
+  margin: 0.45rem 0;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero {
+    margin-top: 60px;
+    padding: 1.5rem;
+  }
+
+  .title {
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .metricsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .toggleBtn {
+    flex: 1 1 100%;
+  }
+}

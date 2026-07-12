@@ -251,6 +251,8 @@ export const implementedAppsUrls = [
   "/cifrado-aes/",              // AES-256 GCM/CBC moderno
   "/generador-hashes/",         // MD5, SHA-256, SHA-512
   "/codificador-base64/",       // Base64, URL encode, Hexadecimal
+  "/evaluador-fortaleza-contrasena/", // Entropía, tiempo de descifrado y patrones débiles (100% local)
+  "/test-phishing/",            // Quiz interactivo: detectar correos, SMS y webs fraudulentas
 
   // Juegos y Entretenimiento (15 implementadas)
   "/test-velocidad-escritura/",
