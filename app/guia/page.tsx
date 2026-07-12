@@ -109,6 +109,14 @@ const guias = [
       'Terminaste los exámenes y toca buscar trabajo. Mide tus competencias, crea tu currículum, prepara la entrevista y entiende tu primer sueldo, paso a paso.',
     tools: 5,
   },
+  {
+    slug: 'seguridad-internet',
+    icon: '🛡️',
+    title: 'Seguridad y Privacidad en Internet',
+    description:
+      'Protege tus cuentas y tu privacidad sin ser un experto: contraseñas fuertes, verificación en dos pasos, detectar el phishing, cuidar tus datos y qué hacer si te hackean.',
+    tools: 6,
+  },
 ];
 
 export default function GuiasIndexPage() {

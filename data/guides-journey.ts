@@ -133,4 +133,13 @@ export const guidesJourney: GuideJourney[] = [
     toolsCount: 5,
     available: true,
   },
+  {
+    id: 'seguridad-internet',
+    name: 'Seguridad y Privacidad en Internet',
+    icon: '🛡️',
+    description: 'Protege tus cuentas y tu privacidad paso a paso: contraseñas fuertes, doble factor, detectar el phishing, cuidar tus datos y qué hacer si te hackean',
+    url: '/guia/seguridad-internet/',
+    toolsCount: 6,
+    available: true,
+  },
 ];

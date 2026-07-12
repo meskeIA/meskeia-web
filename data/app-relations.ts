@@ -255,6 +255,7 @@ const criptografiaModernaApps: RelatedApp[] = [
 
 // SEGURIDAD DIGITAL PRÁCTICA (contraseñas, phishing, privacidad del usuario)
 const seguridadDigitalApps: RelatedApp[] = [
+  { url: '/guia/seguridad-internet/', icon: '🛡️', name: 'Guía de Seguridad', description: 'Protégete paso a paso' },
   { url: '/evaluador-fortaleza-contrasena/', icon: '🔒', name: 'Fortaleza de Contraseñas', description: '¿Es segura tu clave?' },
   { url: '/generador-contrasenas/', icon: '🔑', name: 'Generador Contraseñas', description: 'Contraseñas seguras' },
   { url: '/test-phishing/', icon: '🎣', name: 'Test ¿Es Phishing?', description: 'Detecta estafas y fraudes' },
@@ -2445,6 +2446,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/generador-curriculum/', icon: '📄', name: 'Crear Currículum', description: 'CV / hoja de vida ATS-friendly con vista previa' },
     { url: '/preparar-entrevista-competencias/', icon: '🌟', name: 'Entrevista por Competencias', description: 'Prepara respuestas con el método STAR' },
     { url: '/visualizador-sueldo-neto/', icon: '💶', name: 'Tu Sueldo al Desnudo', description: 'De bruto a neto explicado paso a paso' },
+  ],
+  'guia-seguridad-internet': [
+    { url: '/evaluador-fortaleza-contrasena/', icon: '🔒', name: 'Fortaleza de Contraseñas', description: '¿Es segura tu clave?' },
+    { url: '/generador-contrasenas/', icon: '🔑', name: 'Generador Contraseñas', description: 'Claves largas y únicas' },
+    { url: '/test-phishing/', icon: '🎣', name: 'Test ¿Es Phishing?', description: 'Detecta correos y SMS falsos' },
+    { url: '/editor-exif/', icon: '📷', name: 'Editor EXIF', description: 'Limpia metadatos de tus fotos' },
+    { url: '/generador-hashes/', icon: '#️⃣', name: 'Generador Hashes', description: 'Verifica tus descargas' },
+    { url: '/curso-criptografia-seguridad/', icon: '🔐', name: 'Curso Criptografía', description: 'Seguridad de la A a la Z' },
   ],
   // ==========================================
   // FAMILIA: APPS DE REFLEXIÓN (cross-linking por afinidad temática)

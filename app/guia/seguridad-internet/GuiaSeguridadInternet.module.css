@@ -1,0 +1,491 @@
+/* Guía Programar con IA - meskeIA */
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  margin-bottom: 2rem;
+  margin-top: 80px;
+  padding: 2.5rem 1.5rem;
+  background: var(--hero-bg);
+  border-radius: 16px;
+  color: white;
+}
+
+.heroIcon {
+  font-size: 3.5rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.title {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 1.15rem;
+  opacity: 0.95;
+  max-width: 600px;
+  margin: 0 auto 1.5rem;
+  line-height: 1.6;
+}
+
+.heroStats {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.heroStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  backdrop-filter: blur(4px);
+}
+
+.heroStatNumber {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.heroStatLabel {
+  font-size: 0.82rem;
+  opacity: 0.9;
+}
+
+/* Aviso */
+.avisoBox {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  background: rgba(46, 134, 171, 0.06);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 2rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666);
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .avisoBox {
+  background: rgba(46, 134, 171, 0.1);
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+/* Secciones */
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.sectionIcon {
+  font-size: 1.4rem;
+}
+
+/* Journey Steps */
+.journeySection {
+  margin-bottom: 3rem;
+}
+
+.journeyGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+
+.journeyCard {
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border, #E5E5E5);
+  border-radius: 12px;
+  padding: 1.5rem;
+  position: relative;
+}
+
+[data-theme='dark'] .journeyCard {
+  background: var(--bg-card, #2A2A2A);
+  border-color: var(--border, #404040);
+}
+
+.journeyNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  background: var(--primary, #2E86AB);
+  color: white;
+  border-radius: 50%;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.journeyTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+  margin: 0 0 0.5rem;
+  line-height: 1.4;
+}
+
+.journeyDescription {
+  font-size: 0.88rem;
+  color: var(--text-secondary, #666);
+  margin: 0 0 0.75rem;
+  line-height: 1.6;
+}
+
+.journeyTip {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  background: rgba(46, 134, 171, 0.06);
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary, #666);
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .journeyTip {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.tipIcon { font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
+
+/* Tools */
+.toolsSection { margin-bottom: 3rem; }
+
+.toolsIntro {
+  text-align: center;
+  font-size: 0.92rem;
+  color: var(--text-secondary, #666);
+  margin-bottom: 1.5rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.toolsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+
+.toolCard {
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border, #E5E5E5);
+  border-radius: 12px;
+  padding: 1.25rem;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.toolCard:hover {
+  border-color: var(--primary, #2E86AB);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .toolCard {
+  background: var(--bg-card, #2A2A2A);
+  border-color: var(--border, #404040);
+}
+
+[data-theme='dark'] .toolCard:hover {
+  border-color: var(--primary, #2E86AB);
+}
+
+.toolHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.toolStep {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  background: var(--primary, #2E86AB);
+  color: white;
+  border-radius: 50%;
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.toolIcon { font-size: 1.2rem; }
+
+.toolQuestion {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.toolName {
+  font-size: 0.78rem;
+  color: var(--primary, #2E86AB);
+  font-weight: 600;
+  margin: 0;
+}
+
+.toolDescription {
+  font-size: 0.82rem;
+  color: var(--text-secondary, #666);
+  margin: 0;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.toolRecomendacion {
+  font-size: 0.78rem;
+  color: var(--secondary, #48A9A6);
+  font-weight: 600;
+  border-top: 1px solid var(--border, #E5E5E5);
+  padding-top: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+[data-theme='dark'] .toolRecomendacion { border-color: var(--border, #404040); }
+
+/* Caso de estudio */
+.caseStudySection { margin-bottom: 3rem; }
+
+.caseStudyCard {
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border, #E5E5E5);
+  border-radius: 16px;
+  padding: 2rem;
+  border-left: 4px solid var(--primary, #2E86AB);
+}
+
+[data-theme='dark'] .caseStudyCard {
+  background: var(--bg-card, #2A2A2A);
+  border-color: var(--border, #404040);
+  border-left-color: var(--primary, #2E86AB);
+}
+
+.caseStudyTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary, #2E86AB);
+  margin: 0 0 0.75rem;
+}
+
+.caseStudySituation {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666);
+  margin: 0 0 1.25rem;
+  line-height: 1.6;
+}
+
+.caseStudySteps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.caseStudyStep {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  font-size: 0.88rem;
+  color: var(--text-secondary, #666);
+  line-height: 1.6;
+}
+
+.caseStudyStepNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  background: rgba(46, 134, 171, 0.15);
+  color: var(--primary, #2E86AB);
+  border-radius: 50%;
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.caseStudyConclusion {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  background: rgba(39, 174, 96, 0.07);
+  border: 1px solid rgba(39, 174, 96, 0.2);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary, #666);
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .caseStudyConclusion {
+  background: rgba(39, 174, 96, 0.06);
+  border-color: rgba(39, 174, 96, 0.2);
+}
+
+/* FAQ */
+.faqSection { margin-bottom: 3rem; }
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.faqItem {
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border, #E5E5E5);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card, #2A2A2A);
+  border-color: var(--border, #404040);
+}
+
+.faqItemOpen {
+  border-color: var(--primary, #2E86AB);
+}
+
+.faqQuestion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 1rem 1.25rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-primary, #1A1A1A);
+  text-align: left;
+  gap: 1rem;
+  transition: background 0.15s;
+}
+
+.faqQuestion:hover { background: rgba(46, 134, 171, 0.04); }
+[data-theme='dark'] .faqQuestion:hover { background: rgba(46, 134, 171, 0.08); }
+.faqQuestion:focus-visible { outline: 2px solid var(--primary, #2E86AB); outline-offset: -2px; }
+
+.faqArrow { font-size: 0.72rem; color: var(--primary, #2E86AB); flex-shrink: 0; }
+
+.faqAnswer {
+  padding: 0 1.25rem 1rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary, #666);
+  line-height: 1.7;
+}
+
+/* CTA */
+.ctaSection {
+  text-align: center;
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border, #E5E5E5);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+}
+
+[data-theme='dark'] .ctaSection {
+  background: var(--bg-card, #2A2A2A);
+  border-color: var(--border, #404040);
+}
+
+.ctaTitulo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+  margin: 0 0 0.5rem;
+}
+
+.ctaDesc {
+  font-size: 0.92rem;
+  color: var(--text-secondary, #666);
+  margin: 0 0 1.25rem;
+}
+
+.ctaBotones {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ctaBtn {
+  padding: 0.75rem 1.5rem;
+  background: var(--primary, #2E86AB);
+  color: white;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 700;
+  transition: background 0.2s;
+}
+
+.ctaBtn:hover { background: #256a8a; }
+.ctaBtn:focus-visible { outline: 2px solid var(--primary, #2E86AB); outline-offset: 2px; }
+
+.ctaBtnSecundario {
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  color: var(--primary, #2E86AB);
+  border: 2px solid var(--primary, #2E86AB);
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+
+.ctaBtnSecundario:hover { background: rgba(46, 134, 171, 0.08); }
+.ctaBtnSecundario:focus-visible { outline: 2px solid var(--primary, #2E86AB); outline-offset: 2px; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: 1.75rem 1rem; }
+  .title { font-size: 1.8rem; }
+  .subtitle { font-size: 1rem; }
+  .heroStats { gap: 0.75rem; }
+  .journeyGrid, .toolsGrid { grid-template-columns: 1fr; }
+  .ctaBotones { flex-direction: column; align-items: center; }
+  .ctaBtn, .ctaBtnSecundario { width: 100%; text-align: center; }
+  .caseStudyCard { padding: 1.25rem; }
+}
