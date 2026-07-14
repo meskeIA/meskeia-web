@@ -54,6 +54,32 @@ export function hoyFechaOrd(d: Date = new Date()): string {
   return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
 }
 
+/**
+ * Fecha-hora ACTUAL en Europe/Madrid como Date "naive" (componentes Madrid
+ * en la zona local del runtime). Los timestamps de uso_aplicaciones se escriben
+ * en hora Madrid (track/route.ts), pero Vercel corre en UTC: sin esta conversión,
+ * entre las 00:00 y las 01:00/02:00 hora española las ventanas "hoy"/"ayer" del
+ * dashboard apuntaban al día anterior. Todas las ventanas temporales del router
+ * deben partir de aquí, nunca de `new Date()` directo.
+ */
+export function ahoraMadrid(): Date {
+  const partes = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Madrid',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
+  }).formatToParts(new Date());
+  const v = (t: string) => Number(partes.find(p => p.type === t)?.value ?? 0);
+  // Algunos motores devuelven "24" para medianoche con hour12:false
+  const hora = v('hour') === 24 ? 0 : v('hour');
+  return new Date(v('year'), v('month') - 1, v('day'), hora, v('minute'), v('second'));
+}
+
+/** Inicio del día de hoy en Europe/Madrid (00:00, Date naive). */
+export function hoyMadrid(): Date {
+  const a = ahoraMadrid();
+  return new Date(a.getFullYear(), a.getMonth(), a.getDate());
+}
+
 /** Cap único de duración para todas las medias (30 min). Evita que pestañas
  *  olvidadas (hasta 51 h registradas) distorsionen los promedios. */
 export const CAP_DUR = 1800;
@@ -348,12 +374,12 @@ function enumerarDias(desdeOrd: string, hastaOrd: string): string[] {
 
 /**
  * Límite superior de días que se consideran "cerrados" para el rollup.
- * Es ANTEAYER (hoy-2), no ayer: deja un margen de 1 día que absorbe cualquier
- * desfase de zona horaria entre el runtime que escribe el timestamp (Vercel/UTC)
- * y el que computa el rollup (cron Vercel/UTC o backfill local/Madrid). El router
- * consulta [ayer, hoy] en vivo, así que el usuario siempre ve esos dos días al día.
+ * Es ANTEAYER (hoy-2), no ayer: aunque las fechas ya se calculan en hora Madrid
+ * (ahoraMadrid), el margen de 1 día se mantiene como defensa ante cualquier
+ * registro rezagado (beforeunload tardío, reintentos). El router consulta
+ * [ayer, hoy] en vivo, así que el usuario siempre ve esos dos días al día.
  */
-export function limiteCerradoOrd(d: Date = new Date()): string {
+export function limiteCerradoOrd(d: Date = hoyMadrid()): string {
   const x = new Date(d);
   x.setDate(x.getDate() - 2);
   return hoyFechaOrd(x);

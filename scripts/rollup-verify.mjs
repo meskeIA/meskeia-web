@@ -36,7 +36,10 @@ const cmp = (n, ref, got, tol = 0) => { (Math.abs(Number(ref) - Number(got)) <= 
 
 async function trpc(proc, payload) {
   const input = encodeURIComponent(JSON.stringify({ '0': payload }));
-  const res = await fetch(`${BASE}/api/trpc/analytics.${proc}?batch=1&input=${input}`);
+  // Los procedures del dashboard son protectedProcedure: requieren la clave
+  const res = await fetch(`${BASE}/api/trpc/analytics.${proc}?batch=1&input=${input}`, {
+    headers: { 'x-analytics-key': process.env.ANALYTICS_SECRET || '' },
+  });
   if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
   return (await res.json())[0].result.data;
 }
@@ -91,29 +94,42 @@ async function verificarStats(excluir) {
   }
   rf === 0 ? ok(`ranking (${gotRank.size} apps)`) : fallos++;
 
-  // Comparativa (usos por período)
+  // Comparativa (usos por período). Ventanas SIN solape (2026-07-14):
+  // semana = [hoy-6, hoy] y semana anterior = [hoy-13, hoy-7], 7 días cada una.
   const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
   const ayer = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
   const ante = new Date(hoy); ante.setDate(hoy.getDate() - 2);
+  const h6 = new Date(hoy); h6.setDate(hoy.getDate() - 6);
   const h7 = new Date(hoy); h7.setDate(hoy.getDate() - 7);
-  const h14 = new Date(hoy); h14.setDate(hoy.getDate() - 14);
+  const h13 = new Date(hoy); h13.setDate(hoy.getDate() - 13);
   const iMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
   const iMesA = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
   const fMesA = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
   const cont = async (a, b) => num(`SELECT COUNT(*) n FROM uso_aplicaciones WHERE ${ordExpr}>='${ord(a)}' AND ${ordExpr}<='${ord(b)}' AND ${w}`);
   cmp('comp.hoy', await cont(hoy, hoy), got.comparativa.hoy.usos);
-  cmp('comp.semana', await cont(h7, hoy), got.comparativa.semana.usos);
+  cmp('comp.semana', await cont(h6, hoy), got.comparativa.semana.usos);
   cmp('comp.mes', await cont(iMes, hoy), got.comparativa.mes.usos);
   cmp('comp.detalles.anteayer', await cont(ante, ante), got.comparativa.detalles.anteayer);
-  cmp('comp.detalles.semAnt', await cont(h14, h7), got.comparativa.detalles.semanaAnterior);
+  cmp('comp.detalles.semAnt', await cont(h13, h7), got.comparativa.detalles.semanaAnterior);
   cmp('comp.detalles.mesAnt', await cont(iMesA, fMesA), got.comparativa.detalles.mesAnterior);
+
+  // Ranking usos_30d: ventana [hoy-29, hoy]
+  const h29 = new Date(hoy); h29.setDate(hoy.getDate() - 29);
+  const rk30 = await client.execute(`SELECT aplicacion, COUNT(*) usos FROM uso_aplicaciones WHERE ${ordExpr}>='${ord(h29)}' AND ${w} GROUP BY aplicacion`);
+  const ref30 = new Map(rk30.rows.map(r => [String(r.aplicacion), Number(r.usos)]));
+  let rf30 = 0;
+  for (const a of got.ranking_aplicaciones) {
+    const ref = ref30.get(a.aplicacion) || 0;
+    if (ref !== a.usos_30d) { rf30++; if (rf30 <= 4) console.log(`  ❌ usos_30d ${a.aplicacion}: ref=${ref} got=${a.usos_30d}`); }
+  }
+  rf30 === 0 ? ok('ranking usos_30d') : fallos++;
 }
 
 async function verificarResumen() {
   console.log(`\n═══ getResumen (origen × período) ═══`);
   const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
   const ayer = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
-  const h7 = new Date(hoy); h7.setDate(hoy.getDate() - 7);
+  const h7 = new Date(hoy); h7.setDate(hoy.getDate() - 6); // "7 días" = [hoy-6, hoy]
   const iMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
   const parse = (ts) => { const m = String(ts).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/); return m ? new Date(+m[3], +m[2] - 1, +m[1]) : null; };
   const rows = (await client.execute(`SELECT timestamp, modo, datos_adicionales, ip_address, es_propio FROM uso_aplicaciones`)).rows;

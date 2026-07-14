@@ -2,9 +2,11 @@
 // @disclaimer: exempt
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import type { inferRouterOutputs } from '@trpc/server';
 import styles from './DashboardAnalytics.module.css';
 import { MeskeiaLogo, LegalNotice } from '@/components';
 import { trpc } from '@/lib/trpc';
+import type { AppRouter } from '@/server/routers/_app';
 
 // Importar Chart.js
 import {
@@ -36,83 +38,28 @@ ChartJS.register(
   Filler
 );
 
-interface ComparativaItem {
-  usos: number;
-  comparacion: {
-    porcentaje: number;
-    tendencia: 'up' | 'down' | 'neutral';
-  };
-  etiqueta: string;
-  fecha?: string;
-}
+// Tipos inferidos del router tRPC: una sola fuente de verdad (server/routers/analytics.ts).
+// Las antiguas interfaces locales estaban muertas y habían divergido del servidor.
+type RouterOutputs = inferRouterOutputs<AppRouter>;
+type StatsData = RouterOutputs['analytics']['getStats'];
 
-interface EstadisticasData {
-  status: string;
-  version: string;
-  filtros: {
-    excluir_mi_ip: boolean;
-    ip_excluida: string | null;
-  };
-  estadisticas: {
-    total_usos: number;
-    total_aplicaciones: number;
-    primer_uso: string | null;
-    ultimo_uso: string | null;
-    duracion_promedio_formato: string;
-    dispositivos: {
-      movil: { total: number; porcentaje: number };
-      escritorio: { total: number; porcentaje: number };
-    };
-    usuarios: {
-      nuevos: { total: number; porcentaje: number };
-      recurrentes: { total: number; porcentaje: number };
-    };
-    por_compartir: number;
-    geografia: {
-      paises: Array<{ pais: string; total: number }>;
-      ciudades: Array<{ ciudad: string; total: number }>;
-    };
-  };
-  comparativa?: {
-    hoy: ComparativaItem;
-    ayer: ComparativaItem;
-    semana: ComparativaItem;
-    mes: ComparativaItem;
-    detalles: {
-      ayer: number;
-      anteayer: number;
-      semanaAnterior: number;
-      mesAnterior: number;
-    };
-  };
-  ranking_aplicaciones: Array<{
-    aplicacion: string;
-    total_usos: number;
-    ultimo_uso: string;
-    duracion_promedio_formato: string;
-    estado: string;
-  }>;
-  data: Array<{
-    id: number;
-    aplicacion: string;
-    timestamp: string;
-    duracion_segundos: number | null;
-    pais: string | null;
-    ciudad: string | null;
-    tipo_dispositivo: string | null;
-    navegador: string | null;
-    sistema_operativo: string | null;
-    resolucion: string | null;
-    modo: string | null;
-    datos_adicionales?: any;
-  }>;
-}
+// Modos que NO cuentan como visita web "pura" (deben coincidir con el modelo
+// unificado de orígenes del servidor: clasificarOrigenReal en analytics-rollup.ts)
+const MODOS_NO_WEB = ['mcp', 'referral-ia', 'chatgpt', 'bot', 'share-emit', 'pwa', 'referral-social'];
+const esModoWeb = (modo: string | null) => !MODOS_NO_WEB.includes(modo ?? 'web');
 
-interface IPConfig {
-  ip_actual: string;
-  ip_excluida: string;
-  activo: boolean;
-}
+// Filtro de la pestaña Últimos Registros. 'redes' agrupa el modo 'referral-social'.
+type FiltroModo = 'todos' | 'web' | 'referral-ia' | 'chatgpt' | 'mcp' | 'pwa' | 'redes' | 'bot' | 'share-emit';
+const coincideFiltroModo = (r: { modo: string | null }, filtro: FiltroModo): boolean => {
+  if (filtro === 'todos') return true;
+  if (filtro === 'web') return esModoWeb(r.modo);
+  if (filtro === 'redes') return r.modo === 'referral-social';
+  return r.modo === filtro;
+};
+
+// "YYYYMMDD" → "DD/MM/YYYY" (formato de las claves fecha_ord del rollup)
+const formatearOrd = (ord: string): string =>
+  ord.length === 8 ? `${ord.slice(6, 8)}/${ord.slice(4, 6)}/${ord.slice(0, 4)}` : ord;
 
 const NOMBRES_PAIS: Record<string, string> = {
   AD: 'Andorra', AE: 'Emiratos Árabes', AF: 'Afganistán', AL: 'Albania',
@@ -200,6 +147,9 @@ export default function DashboardAnalyticsPage() {
   const [comprobado, setComprobado] = useState(false);
 
   useEffect(() => {
+    // localStorage solo existe en cliente: leerlo en el initializer de useState
+    // provocaría hydration mismatch. Este efecto corre una única vez al montar.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setAutenticado(!!localStorage.getItem(STORAGE_KEY));
     setComprobado(true);
   }, []);
@@ -217,14 +167,27 @@ export default function DashboardAnalyticsPage() {
   return <DashboardContent onAuthError={salirPorClaveInvalida} />;
 }
 
+// Pestañas del dashboard (id + icono decorativo + etiqueta)
+const TABS = [
+  { id: 'general', icono: '📊', label: 'Visión General' },
+  { id: 'tecnico', icono: '💻', label: 'Análisis Técnico' },
+  { id: 'ranking', icono: '🏆', label: 'Ranking Apps' },
+  { id: 'aplicacion', icono: '🔍', label: 'Por Aplicación' },
+  { id: 'resumen', icono: '📈', label: 'Resumen IA' },
+  { id: 'registros', icono: '📋', label: 'Últimos Registros' },
+  { id: 'navegacion', icono: '🧭', label: 'Navegación' },
+  { id: 'dominios', icono: '🌐', label: 'Dominios' },
+] as const;
+type TabId = (typeof TABS)[number]['id'];
+
 function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
-  const [tabActiva, setTabActiva] = useState<'general' | 'tecnico' | 'ranking' | 'aplicacion' | 'registros' | 'resumen' | 'navegacion' | 'dominios'>('general');
+  const [tabActiva, setTabActiva] = useState<TabId>('general');
   const [appSeleccionada, setAppSeleccionada] = useState<string>('');
   const [filtroApp, setFiltroApp] = useState('');
   const [mostrarDropdown, setMostrarDropdown] = useState(false);
   const comboboxRef = useRef<HTMLDivElement>(null);
   const [filtroIPActivo, setFiltroIPActivo] = useState(true);
-  const [filtroModo, setFiltroModo] = useState<'todos' | 'web' | 'referral-ia' | 'chatgpt' | 'mcp' | 'bot' | 'share-emit'>('todos');
+  const [filtroModo, setFiltroModo] = useState<FiltroModo>('todos');
 
   // Ref para control de inicialización
   const iniciado = useRef(false);
@@ -265,8 +228,9 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
     { enabled: tabActiva === 'dominios' }
   );
 
-  // tRPC: Tendencias históricas (mensual 2026, canales, LATAM)
-  const tendenciasQuery = trpc.analytics.getTendencias.useQuery({ excluir_mi_ip: filtroIPActivo });
+  // tRPC: Tendencias históricas (mensual 2026, canales, LATAM).
+  // Sin input: siempre excluye tráfico propio y bots (el toggle de IP no le aplica)
+  const tendenciasQuery = trpc.analytics.getTendencias.useQuery(undefined);
 
   // tRPC: Distribución de duraciones — lazy: solo carga cuando el tab está activo
   const distribucionQuery = trpc.analytics.getDistribucionDuraciones.useQuery(
@@ -293,7 +257,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
   });
 
   // Variables derivadas de los queries
-  const datos = statsQuery.data || null;
+  const datos: StatsData | null = statsQuery.data || null;
   const loading = statsQuery.isLoading || statsQuery.isFetching || tendencia30Query.isFetching;
   const error = statsQuery.error?.message || null;
   const ipConfig = ipConfigQuery.data?.data || null;
@@ -338,9 +302,11 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
     if (iniciado.current) return;
     iniciado.current = true;
 
-    // Cargar preferencia de localStorage
+    // Cargar preferencia de localStorage (solo cliente; una vez al montar —
+    // el initializer de useState no puede leerla sin hydration mismatch)
     const prefLocal = localStorage.getItem('filtroMiIPActivo');
     if (prefLocal !== null) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFiltroIPActivo(prefLocal === 'true');
     }
   }, []);
@@ -409,7 +375,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
     if (!datos?.data) return null;
 
     const navegadores: { [key: string]: number } = {};
-    datos.data.forEach((registro: any) => {
+    datos.data.forEach((registro) => {
       const nav = extraerNavegador(registro.navegador);
       navegadores[nav] = (navegadores[nav] || 0) + 1;
     });
@@ -434,7 +400,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
     if (!datos?.data) return null;
 
     const sistemas: { [key: string]: number } = {};
-    datos.data.forEach((registro: any) => {
+    datos.data.forEach((registro) => {
       const so = extraerSO(registro.sistema_operativo);
       sistemas[so] = (sistemas[so] || 0) + 1;
     });
@@ -459,7 +425,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
     if (!datos?.data) return null;
 
     const resoluciones: { [key: string]: number } = {};
-    datos.data.forEach((registro: any) => {
+    datos.data.forEach((registro) => {
       if (registro.resolucion) {
         resoluciones[registro.resolucion] = (resoluciones[registro.resolucion] || 0) + 1;
       }
@@ -531,7 +497,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
           <span className={styles.errorIcon}>❌</span>
           <h2>Error al cargar datos</h2>
           <p>{error}</p>
-          <button onClick={() => statsQuery.refetch()} className={styles.btnPrimary}>
+          <button type="button" onClick={() => statsQuery.refetch()} className={styles.btnPrimary}>
             Reintentar
           </button>
         </div>
@@ -553,17 +519,18 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
       <header className={styles.header}>
         <h1 className={styles.title}>
           Dashboard meskeIA Analytics
-          <span className={styles.versionBadge}>v3.0 Turso</span>
+          <span className={styles.versionBadge}>{datos?.version ?? 'v4-rollup'}</span>
         </h1>
         <p className={styles.subtitle}>Sistema de métricas de uso de aplicaciones web</p>
 
         <div className={styles.headerControls}>
           <button
+            type="button"
             onClick={() => { statsQuery.refetch(); resumenQuery.refetch(); }}
             className={styles.btnRefresh}
             disabled={loading}
           >
-            <span className={loading ? styles.spinning : ''}>↻</span>
+            <span className={loading ? styles.spinning : ''} aria-hidden="true">↻</span>
             {loading ? 'Actualizando...' : 'Actualizar Datos'}
           </button>
 
@@ -575,7 +542,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                 checked={filtroIPActivo}
                 onChange={toggleFiltroIP}
               />
-              <span>🧪 Excluir mi IP de desarrollo</span>
+              <span><span aria-hidden="true">🧪</span> Excluir mi IP de desarrollo</span>
             </label>
             <div className={styles.ipInfo}>
               <span className={styles.ipText}>
@@ -586,6 +553,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                   : 'IP: No configurada'}
               </span>
               <button
+                type="button"
                 onClick={guardarMiIP}
                 className={styles.btnUpdateIP}
                 disabled={actualizandoIP}
@@ -595,59 +563,36 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
               </button>
             </div>
           </div>
+
+          {/* Aviso: la IP actual no coincide con la excluida (IP dinámica que cambió).
+              Sin este aviso, el toggle "Excluir mi IP" da falsa sensación de datos
+              limpios mientras las visitas propias se cuentan como tráfico real. */}
+          {ipConfig?.ip_excluida &&
+            ipConfig?.ip_actual &&
+            !['unknown', 'anonymous'].includes(ipConfig.ip_actual) &&
+            ipConfig.ip_actual !== ipConfig.ip_excluida && (
+            <div className={styles.ipMismatch} role="alert">
+              <span aria-hidden="true">⚠️</span> <strong>Tu IP actual ({ipConfig.ip_actual}) no coincide
+              con la excluida ({ipConfig.ip_excluida}).</strong> Tus visitas se están contando como tráfico
+              real desde el cambio de IP — pulsa «Actualizar IP» para corregirlo.
+            </div>
+          )}
         </div>
       </header>
 
       {/* Tabs */}
       <nav className={styles.tabs}>
-        <button
-          className={`${styles.tabButton} ${tabActiva === 'general' ? styles.active : ''}`}
-          onClick={() => setTabActiva('general')}
-        >
-          📊 Visión General
-        </button>
-        <button
-          className={`${styles.tabButton} ${tabActiva === 'tecnico' ? styles.active : ''}`}
-          onClick={() => setTabActiva('tecnico')}
-        >
-          💻 Análisis Técnico
-        </button>
-        <button
-          className={`${styles.tabButton} ${tabActiva === 'ranking' ? styles.active : ''}`}
-          onClick={() => setTabActiva('ranking')}
-        >
-          🏆 Ranking Apps
-        </button>
-        <button
-          className={`${styles.tabButton} ${tabActiva === 'aplicacion' ? styles.active : ''}`}
-          onClick={() => setTabActiva('aplicacion')}
-        >
-          🔍 Por Aplicación
-        </button>
-        <button
-          className={`${styles.tabButton} ${tabActiva === 'resumen' ? styles.active : ''}`}
-          onClick={() => setTabActiva('resumen')}
-        >
-          📈 Resumen IA
-        </button>
-        <button
-          className={`${styles.tabButton} ${tabActiva === 'registros' ? styles.active : ''}`}
-          onClick={() => setTabActiva('registros')}
-        >
-          📋 Últimos Registros
-        </button>
-        <button
-          className={`${styles.tabButton} ${tabActiva === 'navegacion' ? styles.active : ''}`}
-          onClick={() => setTabActiva('navegacion')}
-        >
-          🧭 Navegación
-        </button>
-        <button
-          className={`${styles.tabButton} ${tabActiva === 'dominios' ? styles.active : ''}`}
-          onClick={() => setTabActiva('dominios')}
-        >
-          🌐 Dominios
-        </button>
+        {TABS.map(({ id, icono, label }) => (
+          <button
+            key={id}
+            type="button"
+            aria-pressed={tabActiva === id}
+            className={`${styles.tabButton} ${tabActiva === id ? styles.active : ''}`}
+            onClick={() => setTabActiva(id)}
+          >
+            <span aria-hidden="true">{icono}</span> {label}
+          </button>
+        ))}
       </nav>
 
       {/* Tab: Visión General */}
@@ -656,7 +601,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
           {/* Comparativa Temporal con Alertas Visuales */}
           {datos.comparativa && (
             <section className={styles.comparativaSection}>
-              <h2 className={styles.sectionTitle}>📈 Comparativa Temporal</h2>
+              <h2 className={styles.sectionTitle}><span aria-hidden="true">📈</span> Comparativa Temporal</h2>
               <div className={styles.comparativaGrid}>
                 {/* Hoy vs Ayer */}
                 <div className={`${styles.comparativaCard} ${styles.cardHoy}`}>
@@ -834,7 +779,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
           {/* Evolución mensual 2026 */}
           {tendenciasQuery.data && tendenciasQuery.data.mensual.length > 0 && (
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>📊 Evolución Mensual {new Date().getFullYear()}</h2>
+              <h2 className={styles.sectionTitle}><span aria-hidden="true">📊</span> Evolución Mensual {new Date().getFullYear()}</h2>
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
                   <thead>
@@ -849,14 +794,29 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                   <tbody>
                     {tendenciasQuery.data.mensual.map((fila, idx) => {
                       const prev = tendenciasQuery.data!.mensual[idx - 1];
+                      // Mes en curso: la tendencia se calcula PRO-RATA (proyección a mes
+                      // completo según los días transcurridos). Comparar el parcial contra
+                      // un mes completo mostraba una falsa caída hasta fin de mes.
+                      const ahora = new Date();
+                      const mesActualStr = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}`;
+                      const esMesEnCurso = fila.mes === mesActualStr;
+                      const diasDelMes = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 0).getDate();
+                      const visitasComparables = esMesEnCurso && ahora.getDate() > 0
+                        ? (fila.visitas / ahora.getDate()) * diasDelMes
+                        : fila.visitas;
                       const pct = prev && prev.visitas > 0
-                        ? Math.round(((fila.visitas - prev.visitas) / prev.visitas) * 100)
+                        ? Math.round(((visitasComparables - prev.visitas) / prev.visitas) * 100)
                         : null;
                       const max = Math.max(...tendenciasQuery.data!.mensual.map(m => m.visitas));
                       const barWidth = Math.round((fila.visitas / max) * 100);
                       return (
                         <tr key={fila.mes} style={{ borderBottom: '1px solid var(--bg-primary)' }}>
-                          <td style={{ padding: '8px 12px', fontWeight: 600 }}>{fila.mes}</td>
+                          <td style={{ padding: '8px 12px', fontWeight: 600 }}>
+                            {fila.mes}
+                            {esMesEnCurso && (
+                              <span style={{ fontWeight: 400, fontSize: '0.8rem', color: 'var(--text-muted)' }}> (en curso)</span>
+                            )}
+                          </td>
                           <td style={{ textAlign: 'right', padding: '8px 12px' }}>{fila.visitas.toLocaleString('es-ES')}</td>
                           <td style={{ textAlign: 'right', padding: '8px 12px', color: 'var(--text-secondary)' }}>{fila.sesiones.toLocaleString('es-ES')}</td>
                           <td style={{ textAlign: 'right', padding: '8px 12px', color: 'var(--text-secondary)' }}>{fila.paises}</td>
@@ -866,8 +826,11 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                                 <div style={{ width: `${barWidth}%`, height: '100%', background: 'var(--primary)', borderRadius: '4px' }} />
                               </div>
                               {pct !== null && (
-                                <span style={{ fontSize: '0.8rem', color: pct >= 0 ? '#22c55e' : '#ef4444', fontWeight: 600, minWidth: '45px' }}>
-                                  {pct >= 0 ? '+' : '-'}{Math.abs(pct)}%
+                                <span
+                                  style={{ fontSize: '0.8rem', color: pct >= 0 ? '#22c55e' : '#ef4444', fontWeight: 600, minWidth: '45px' }}
+                                  title={esMesEnCurso ? 'Proyección pro-rata del mes en curso' : undefined}
+                                >
+                                  {esMesEnCurso ? '≈' : ''}{pct >= 0 ? '+' : '-'}{Math.abs(pct)}%
                                 </span>
                               )}
                             </div>
@@ -878,13 +841,17 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                   </tbody>
                 </table>
               </div>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+                * El mes en curso muestra sus visitas reales (parciales); su tendencia (≈) es una
+                proyección proporcional a los días transcurridos.
+              </p>
             </section>
           )}
 
           {/* Canal de tráfico + LATAM */}
           {tendenciasQuery.data && (
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>📡 Canal de Tráfico y Alcance LATAM</h2>
+              <h2 className={styles.sectionTitle}><span aria-hidden="true">📡</span> Canal de Tráfico y Alcance LATAM</h2>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
 
                 {/* Canal de tráfico */}
@@ -955,7 +922,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
           {/* Gráfico de Tendencia */}
           {tendenciaData && (
             <section className={styles.section}>
-              <h2>📈 Tendencia de Uso (Últimos 30 Días)</h2>
+              <h2><span aria-hidden="true">📈</span> Tendencia de Uso (Últimos 30 Días)</h2>
               <div className={styles.chartContainer}>
                 <Line
                   data={tendenciaData}
@@ -972,7 +939,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
 
           {/* Dispositivos */}
           <section className={styles.section}>
-            <h2>📱 Distribución por Dispositivo</h2>
+            <h2><span aria-hidden="true">📱</span> Distribución por Dispositivo</h2>
             <div className={styles.deviceStats}>
               <div className={styles.deviceCard}>
                 <span className={styles.deviceIcon}>📱</span>
@@ -1002,7 +969,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
           {/* Geografía */}
           {datos.estadisticas.geografia.paises.length > 0 && (
             <section className={styles.section}>
-              <h2>🌍 Top Países</h2>
+              <h2><span aria-hidden="true">🌍</span> Top Países</h2>
               <div className={styles.geoGrid}>
                 <div className={styles.geoList}>
                   {datos.estadisticas.geografia.paises.slice(0, 10).map((p: { pais: string; total: number }, idx) => (
@@ -1066,10 +1033,15 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
           </section>
 
           {/* Gráficos técnicos */}
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '0 0 1rem' }}>
+            Las tarjetas superiores son totales históricos. Los gráficos siguientes (dispositivo,
+            navegadores, sistemas y resoluciones) se calculan sobre la <strong>muestra de los
+            últimos 500 registros</strong>, no sobre el histórico completo.
+          </p>
           <div className={styles.chartsGrid}>
             {dispositivosData && (
               <section className={styles.chartSection}>
-                <h2>📱 Tipo de Dispositivo</h2>
+                <h2><span aria-hidden="true">📱</span> Tipo de Dispositivo</h2>
                 <div className={styles.chartContainerSmall}>
                   <Doughnut
                     data={dispositivosData}
@@ -1085,7 +1057,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
 
             {navegadoresData && (
               <section className={styles.chartSection}>
-                <h2>🌐 Navegadores</h2>
+                <h2><span aria-hidden="true">🌐</span> Navegadores</h2>
                 <div className={styles.chartContainerSmall}>
                   <Doughnut
                     data={navegadoresData}
@@ -1101,7 +1073,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
 
             {soData && (
               <section className={styles.chartSection}>
-                <h2>💻 Sistemas Operativos</h2>
+                <h2><span aria-hidden="true">💻</span> Sistemas Operativos</h2>
                 <div className={styles.chartContainerSmall}>
                   <Doughnut
                     data={soData}
@@ -1117,7 +1089,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
 
             {resolucionesData && (
               <section className={styles.chartSection}>
-                <h2>📐 Resoluciones</h2>
+                <h2><span aria-hidden="true">📐</span> Resoluciones</h2>
                 <div className={styles.chartContainerSmall}>
                   <Bar
                     data={resolucionesData}
@@ -1136,7 +1108,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
           {/* Distribución de duraciones */}
           {distribucionQuery.data && (
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>⏱️ Distribución de Duración de Visitas</h2>
+              <h2 className={styles.sectionTitle}><span aria-hidden="true">⏱️</span> Distribución de Duración de Visitas</h2>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1.25rem' }}>
                 Total: <strong>{formatearNumero(distribucionQuery.data.total)}</strong> visitas —{' '}
                 <strong style={{ color: '#10b981' }}>
@@ -1220,7 +1192,11 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
       {tabActiva === 'ranking' && datos && (
         <div className={styles.tabContent}>
           <section className={styles.section}>
-            <h2>🏆 Ranking de Aplicaciones</h2>
+            <h2><span aria-hidden="true">🏆</span> Ranking de Aplicaciones</h2>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '0 0 1rem' }}>
+              El <strong>Estado</strong> se calcula sobre los usos de los últimos 30 días (✅ ≥ 10 ·
+              ⚠️ 1–9 · 💤 sin uso), no sobre el total histórico: refleja qué apps están vivas ahora.
+            </p>
             <div className={styles.tableContainer}>
               <table className={styles.table}>
                 <thead>
@@ -1228,19 +1204,23 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                     <th>#</th>
                     <th>Aplicación</th>
                     <th>Usos</th>
+                    <th>Usos 30d</th>
                     <th>Último Uso</th>
                     <th>Tiempo Promedio</th>
                     <th>Estado</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {datos.ranking_aplicaciones.map((app: any, idx) => (
-                    <tr key={String(app.aplicacion)}>
+                  {datos.ranking_aplicaciones.map((app, idx) => (
+                    <tr key={app.aplicacion}>
                       <td>{idx + 1}</td>
                       <td>
                         <strong>{app.aplicacion}</strong>
                       </td>
                       <td>{formatearNumero(app.total_usos)}</td>
+                      <td style={{ fontWeight: app.usos_30d > 0 ? 600 : 400 }}>
+                        {app.usos_30d > 0 ? formatearNumero(app.usos_30d) : '–'}
+                      </td>
                       <td>{app.ultimo_uso?.split(' ')[0] || '-'}</td>
                       <td>{app.duracion_promedio_formato}</td>
                       <td>
@@ -1259,7 +1239,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
       {tabActiva === 'aplicacion' && datos && (
         <div className={styles.tabContent}>
           <section className={styles.section}>
-            <h2>🔍 Estadísticas por Aplicación</h2>
+            <h2><span aria-hidden="true">🔍</span> Estadísticas por Aplicación</h2>
 
             {/* Combobox con búsqueda integrada */}
             <div className={styles.appSelector}>
@@ -1276,6 +1256,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                 />
                 {appSeleccionada && !filtroApp && (
                   <button
+                    type="button"
                     className={styles.comboboxClear}
                     onClick={() => { setAppSeleccionada(''); setFiltroApp(''); }}
                     aria-label="Limpiar selección"
@@ -1284,11 +1265,11 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                 {mostrarDropdown && (
                   <div className={styles.comboboxDropdown}>
                     {datos.ranking_aplicaciones
-                      .filter((app: any) =>
+                      .filter((app) =>
                         !filtroApp || String(app.aplicacion).toLowerCase().includes(filtroApp.toLowerCase())
                       )
                       .slice(0, 50)
-                      .map((app: any) => (
+                      .map((app) => (
                         <div
                           key={String(app.aplicacion)}
                           className={`${styles.comboboxOption} ${appSeleccionada === app.aplicacion ? styles.comboboxOptionActive : ''}`}
@@ -1302,7 +1283,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                           <span className={styles.comboboxOptionUsos}>{app.total_usos} usos</span>
                         </div>
                       ))}
-                    {datos.ranking_aplicaciones.filter((app: any) =>
+                    {datos.ranking_aplicaciones.filter((app) =>
                       !filtroApp || String(app.aplicacion).toLowerCase().includes(filtroApp.toLowerCase())
                     ).length === 0 && (
                       <div className={styles.comboboxEmpty}>Sin resultados para &ldquo;{filtroApp}&rdquo;</div>
@@ -1316,7 +1297,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
             {appSeleccionada ? (
               <>
                 {(() => {
-                  const appData = datos.ranking_aplicaciones.find((a: any) => a.aplicacion === appSeleccionada);
+                  const appData = datos.ranking_aplicaciones.find((a) => a.aplicacion === appSeleccionada);
                   const appStats = appStatsQuery.data;
                   const registrosApp = appStats?.registros ?? [];
                   const usosHoy = appStats?.usos_hoy ?? 0;
@@ -1386,7 +1367,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                       </div>
 
                       {/* Últimos registros de esta app */}
-                      <h3 className={styles.appRegistrosTitle}>📋 Últimos 100 registros de {appSeleccionada}</h3>
+                      <h3 className={styles.appRegistrosTitle}><span aria-hidden="true">📋</span> Últimos 100 registros de {appSeleccionada}</h3>
                       <div className={styles.tableContainer}>
                         <table className={styles.table}>
                           <thead>
@@ -1400,17 +1381,17 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                             </tr>
                           </thead>
                           <tbody>
-                            {registrosApp.map((registro: any) => (
-                              <tr key={String(registro.id)}>
-                                <td>{String(registro.id)}</td>
-                                <td>{String(registro.timestamp)}</td>
+                            {registrosApp.map((registro) => (
+                              <tr key={registro.id}>
+                                <td>{registro.id}</td>
+                                <td>{registro.timestamp}</td>
                                 <td>
                                   {registro.duracion_segundos
-                                    ? `${Math.floor(Number(registro.duracion_segundos) / 60)}m ${Number(registro.duracion_segundos) % 60}s`
+                                    ? `${Math.floor(registro.duracion_segundos / 60)}m ${registro.duracion_segundos % 60}s`
                                     : '-'}
                                 </td>
-                                <td>{String(registro.pais || '-')}</td>
-                                <td>{String(registro.ciudad || '-')}</td>
+                                <td>{registro.pais || '-'}</td>
+                                <td>{registro.ciudad || '-'}</td>
                                 <td>{registro.tipo_dispositivo === 'movil' ? '📱' : '🖥️'}</td>
                               </tr>
                             ))}
@@ -1435,57 +1416,29 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
         <div className={styles.tabContent}>
           <section className={styles.section}>
             <div className={styles.registrosHeader}>
-              <h2>📋 Últimos 100 Registros</h2>
+              <h2><span aria-hidden="true">📋</span> Últimos 100 Registros</h2>
               <div className={styles.filtroModoGroup}>
-                <button
-                  type="button"
-                  className={`${styles.filtroModoBtn} ${filtroModo === 'todos' ? styles.filtroModoActivo : ''}`}
-                  onClick={() => setFiltroModo('todos')}
-                >
-                  Todos ({datos.data.length})
-                </button>
-                <button
-                  type="button"
-                  className={`${styles.filtroModoBtn} ${filtroModo === 'web' ? styles.filtroModoActivo : ''}`}
-                  onClick={() => setFiltroModo('web')}
-                >
-                  🌐 Web ({datos.data.filter((r: any) => r.modo !== 'mcp' && r.modo !== 'referral-ia' && r.modo !== 'bot' && r.modo !== 'chatgpt' && r.modo !== 'share-emit').length})
-                </button>
-                <button
-                  type="button"
-                  className={`${styles.filtroModoBtn} ${filtroModo === 'referral-ia' ? styles.filtroModoActivoReferral : ''}`}
-                  onClick={() => setFiltroModo('referral-ia')}
-                >
-                  🔗 Desde IA ({datos.data.filter((r: any) => r.modo === 'referral-ia').length})
-                </button>
-                <button
-                  type="button"
-                  className={`${styles.filtroModoBtn} ${filtroModo === 'chatgpt' ? styles.filtroModoActivoChatGPT : ''}`}
-                  onClick={() => setFiltroModo('chatgpt')}
-                >
-                  💬 ChatGPT ({datos.data.filter((r: any) => r.modo === 'chatgpt').length})
-                </button>
-                <button
-                  type="button"
-                  className={`${styles.filtroModoBtn} ${filtroModo === 'mcp' ? styles.filtroModoActivoMCP : ''}`}
-                  onClick={() => setFiltroModo('mcp')}
-                >
-                  🤖 IA / MCP ({datos.data.filter((r: any) => r.modo === 'mcp').length})
-                </button>
-                <button
-                  type="button"
-                  className={`${styles.filtroModoBtn} ${filtroModo === 'bot' ? styles.filtroModoActivoBot : ''}`}
-                  onClick={() => setFiltroModo('bot')}
-                >
-                  🕷️ Bots ({datos.data.filter((r: any) => r.modo === 'bot').length})
-                </button>
-                <button
-                  type="button"
-                  className={`${styles.filtroModoBtn} ${filtroModo === 'share-emit' ? styles.filtroModoActivoShare : ''}`}
-                  onClick={() => setFiltroModo('share-emit')}
-                >
-                  🔗 Compartido ({datos.data.filter((r: any) => r.modo === 'share-emit').length})
-                </button>
+                {([
+                  { id: 'todos', etiqueta: 'Todos', claseActiva: styles.filtroModoActivo },
+                  { id: 'web', etiqueta: '🌐 Web', claseActiva: styles.filtroModoActivo },
+                  { id: 'referral-ia', etiqueta: '🔗 Desde IA', claseActiva: styles.filtroModoActivoReferral },
+                  { id: 'chatgpt', etiqueta: '💬 ChatGPT', claseActiva: styles.filtroModoActivoChatGPT },
+                  { id: 'mcp', etiqueta: '🤖 IA / MCP', claseActiva: styles.filtroModoActivoMCP },
+                  { id: 'pwa', etiqueta: '📲 PWA', claseActiva: styles.filtroModoActivoPWA },
+                  { id: 'redes', etiqueta: '📣 Redes', claseActiva: styles.filtroModoActivoRedes },
+                  { id: 'bot', etiqueta: '🕷️ Bots', claseActiva: styles.filtroModoActivoBot },
+                  { id: 'share-emit', etiqueta: '🔗 Compartido', claseActiva: styles.filtroModoActivoShare },
+                ] as Array<{ id: FiltroModo; etiqueta: string; claseActiva: string }>).map((f) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    aria-pressed={filtroModo === f.id}
+                    className={`${styles.filtroModoBtn} ${filtroModo === f.id ? f.claseActiva : ''}`}
+                    onClick={() => setFiltroModo(f.id)}
+                  >
+                    {f.etiqueta} ({datos.data.filter((r) => coincideFiltroModo(r, f.id)).length})
+                  </button>
+                ))}
               </div>
             </div>
             <div className={styles.tableContainer}>
@@ -1503,17 +1456,9 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                 </thead>
                 <tbody>
                   {datos.data
-                    .filter((r: any) => {
-                      if (filtroModo === 'web') return r.modo !== 'mcp' && r.modo !== 'referral-ia' && r.modo !== 'bot' && r.modo !== 'chatgpt' && r.modo !== 'share-emit';
-                      if (filtroModo === 'referral-ia') return r.modo === 'referral-ia';
-                      if (filtroModo === 'chatgpt') return r.modo === 'chatgpt';
-                      if (filtroModo === 'mcp') return r.modo === 'mcp';
-                      if (filtroModo === 'bot') return r.modo === 'bot';
-                      if (filtroModo === 'share-emit') return r.modo === 'share-emit';
-                      return true;
-                    })
+                    .filter((r) => coincideFiltroModo(r, filtroModo))
                     .slice(0, 100)
-                    .map((registro: any) => (
+                    .map((registro) => (
                       <tr key={registro.id} className={
                         registro.modo === 'mcp' ? styles.rowMCP :
                         registro.modo === 'chatgpt' ? styles.rowChatGPT :
@@ -1530,6 +1475,10 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                             ? <span className={styles.badgeChatGPT}>💬 ChatGPT</span>
                             : registro.modo === 'referral-ia'
                             ? <span className={styles.badgeReferral}>🔗 Desde IA</span>
+                            : registro.modo === 'pwa'
+                            ? <span className={styles.badgePWA}>📲 PWA</span>
+                            : registro.modo === 'referral-social'
+                            ? <span className={styles.badgeRedes}>📣 Redes</span>
                             : registro.modo === 'bot'
                             ? <span className={styles.badgeBot}>🕷️ Bot</span>
                             : registro.modo === 'share-emit'
@@ -1557,7 +1506,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
       {tabActiva === 'resumen' && (
         <div className={styles.tabContent}>
           <section className={styles.section}>
-            <h2>📈 Resumen por Origen</h2>
+            <h2><span aria-hidden="true">📈</span> Resumen por Origen</h2>
             <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
               Desglose completo de visitas por origen y período. Total Real excluye Bots y Mi IP.
             </p>
@@ -1582,18 +1531,13 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                     {resumenQuery.data.filas.map((fila) => {
                       const esCero = fila.total === 0;
                       const esGrupoIA = fila.grupo === 'ia';
-                      const esBot = fila.grupo === 'bot';
-                      const esMiIP = fila.grupo === 'miip';
-                      const rowStyle: React.CSSProperties = {
-                        opacity: esCero ? 0.4 : 1,
-                        backgroundColor: esGrupoIA
-                          ? 'rgba(72, 169, 166, 0.05)'
-                          : esBot || esMiIP
-                          ? 'rgba(0,0,0,0.03)'
-                          : undefined,
-                      };
+                      const esGris = fila.grupo === 'bot' || fila.grupo === 'miip';
                       return (
-                        <tr key={fila.origen} style={rowStyle}>
+                        <tr
+                          key={fila.origen}
+                          className={esGrupoIA ? styles.rowGrupoIA : esGris ? styles.rowGrupoGris : undefined}
+                          style={{ opacity: esCero ? 0.4 : 1 }}
+                        >
                           <td>
                             <span style={{ marginRight: '0.4rem' }}>{fila.icono}</span>
                             {fila.origen}
@@ -1631,7 +1575,8 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
             )}
 
             <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '1rem' }}>
-              * Las visitas anteriores al 20/03/2026 aparecen en &quot;IA sin detalle&quot; (datos no disponibles antes de esa fecha).
+              * Las visitas anteriores al 20/03/2026 no tienen plataforma IA identificada
+              (la captura del referrer se activó en esa fecha) y se agrupan en &quot;IA · Otras&quot;.
             </p>
           </section>
         </div>
@@ -1641,7 +1586,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
       {tabActiva === 'dominios' && (
         <div className={styles.tabContent}>
           <section className={styles.section}>
-            <h2>🌐 Tráfico por dominio</h2>
+            <h2><span aria-hidden="true">🌐</span> Tráfico por dominio</h2>
             <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
               Visitas servidas bajo cada dominio vertical. Excluye bots y tu propia IP.
               Mide las páginas de cada portal, no el embudo completo (las apps enlazadas
@@ -1720,7 +1665,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
       {tabActiva === 'navegacion' && (
         <div className={styles.tabContent}>
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>🧭 Navegación entre apps</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">🧭</span> Navegación entre apps</h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem' }}>
               Análisis del recorrido de los usuarios por sesión. Ventana: últimos {navegacionQuery.data?.ventanaDias ?? 14} días.
               Excluye bots, MCP y Mi IP.
@@ -1742,7 +1687,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                   {/* Card protagonista — pulso en 3 ventanas */}
                   <div className={`${styles.statCard} ${styles.highlight}`}>
                     <div className={styles.statContent} style={{ width: '100%' }}>
-                      <h3 style={{ marginBottom: '2px' }}>🎯 Descubrimiento interno</h3>
+                      <h3 style={{ marginBottom: '2px' }}><span aria-hidden="true">🎯</span> Descubrimiento interno</h3>
                       <small style={{ opacity: 0.9 }}>clics <code>?from=</code> que llevan a una 2ª app · % = de las visitas de esa ventana</small>
                       <div style={{ display: 'flex', gap: '8px', margin: '14px 0 10px' }}>
                         {([
@@ -1949,6 +1894,16 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
         </span>
         {filtroIPActivo && ipConfig?.ip_excluida && (
           <span className={styles.filterActive}>🧪 Filtro IP activo</span>
+        )}
+        {/* Estado del rollup: hasta qué día están los agregados. Si va por detrás
+            de anteayer, el cron ha fallado y conviene saberlo (los números de días
+            cerrados podrían estar incompletos hasta el on-demand defensivo). */}
+        {datos?.rollup && (
+          <span className={datos.rollup.hasta && datos.rollup.hasta >= datos.rollup.esperado ? styles.lastUpdate : styles.rollupWarn}>
+            {datos.rollup.hasta && datos.rollup.hasta >= datos.rollup.esperado
+              ? `📦 Agregados al día (hasta ${formatearOrd(datos.rollup.hasta)})`
+              : `⚠️ Rollup atrasado (hasta ${datos.rollup.hasta ? formatearOrd(datos.rollup.hasta) : 'nunca'}, esperado ${formatearOrd(datos.rollup.esperado)})`}
+          </span>
         )}
         <span className={styles.lastUpdate}>
           Última actualización: {ultimaActualizacion || '-'}

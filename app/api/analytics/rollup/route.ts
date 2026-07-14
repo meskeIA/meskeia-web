@@ -18,7 +18,14 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
-import { computarRollupPendientes, leerIpExcluida } from '@/lib/analytics-rollup';
+import {
+  computarRollupPendientes,
+  computarRollupRango,
+  derivarAcumulados,
+  hoyFechaOrd,
+  leerIpExcluida,
+  limiteCerradoOrd,
+} from '@/lib/analytics-rollup';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -58,11 +65,30 @@ export async function GET(request: NextRequest) {
     const t0 = Date.now();
     const { procesados, desde, hasta } = await computarRollupPendientes(client, ipExcluida, max);
 
+    // Refresco de cola: recomputar los últimos N días cerrados AUNQUE ya estén
+    // en rollup_control. Las duraciones llegan tarde (una pestaña abandonada
+    // dispara beforeunload días después y actualiza duracion_segundos de una
+    // fila cuyo día ya estaba agregado) → sin esto, el rollup deriva del crudo.
+    // Idempotente (DELETE+INSERT por rango) y barato (~7 días de filas).
+    // Solo corre por esta ruta (cron diario / manual), NUNCA en el on-demand
+    // del dashboard, que llama a computarRollupPendientes directamente.
+    const refrescar = Math.min(Math.max(parseInt(searchParams.get('refrescar') || '7', 10) || 0, 0), 60);
+    let refrescados = 0;
+    if (refrescar > 0) {
+      const tope = limiteCerradoOrd();
+      const desdeD = new Date(Number(tope.slice(0, 4)), Number(tope.slice(4, 6)) - 1, Number(tope.slice(6, 8)));
+      desdeD.setDate(desdeD.getDate() - (refrescar - 1));
+      await computarRollupRango(client, hoyFechaOrd(desdeD), tope, ipExcluida);
+      await derivarAcumulados(client);
+      refrescados = refrescar;
+    }
+
     return NextResponse.json({
       status: 'success',
       procesados,
       desde,
       hasta,
+      refrescados,
       // quedan: true si pudo haber más pendientes (procesó el lote completo)
       quedan: procesados >= max,
       ms: Date.now() - t0,

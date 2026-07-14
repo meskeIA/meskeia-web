@@ -11,10 +11,37 @@ import {
   computarRollupPendientes,
   leerIpExcluida,
   nuevoGlobal,
+  ahoraMadrid,
+  hoyMadrid,
   CAMPOS_ROLLUP,
   FECHA_EXPR,
   type GlobalAcc,
 } from '@/lib/analytics-rollup';
+
+/**
+ * Convierte una fila cruda de uso_aplicaciones en un registro tipado para el
+ * frontend (sin `any`, con parse seguro de datos_adicionales).
+ */
+function mapearRegistro(row: Record<string, unknown>) {
+  let datosAd: (Record<string, unknown> & { share_emit?: string }) | null = null;
+  if (row.datos_adicionales) {
+    try { datosAd = JSON.parse(String(row.datos_adicionales)); } catch { datosAd = null; }
+  }
+  return {
+    id: Number(row.id),
+    aplicacion: String(row.aplicacion ?? ''),
+    timestamp: String(row.timestamp ?? ''),
+    duracion_segundos: row.duracion_segundos == null ? null : Number(row.duracion_segundos),
+    pais: row.pais == null ? null : String(row.pais),
+    ciudad: row.ciudad == null ? null : String(row.ciudad),
+    tipo_dispositivo: row.tipo_dispositivo == null ? null : String(row.tipo_dispositivo),
+    navegador: row.navegador == null ? null : String(row.navegador),
+    sistema_operativo: row.sistema_operativo == null ? null : String(row.sistema_operativo),
+    resolucion: row.resolucion == null ? null : String(row.resolucion),
+    modo: row.modo == null ? 'web' : String(row.modo),
+    datos_adicionales: datosAd,
+  };
+}
 
 /**
  * Helper: Anonimizar IP (RGPD compliance)
@@ -61,7 +88,7 @@ function getClientIPFromRequest(req: Request | undefined): string {
  */
 async function getStatsPorRollup(
   client: ReturnType<typeof getTursoClient>,
-  input: { aplicacion?: string; desde?: string; hasta?: string; limite: number; excluir_mi_ip: boolean },
+  input: { limite: number; excluir_mi_ip: boolean },
   ipConfigurada: string
 ) {
   const { limite, excluir_mi_ip } = input;
@@ -73,13 +100,16 @@ async function getStatsPorRollup(
   // On-demand defensivo: rellenar huecos de días cerrados (acotado para no bloquear)
   try { await computarRollupPendientes(client, ipConfigurada, 7); } catch { /* no bloquear la lectura */ }
 
-  // Fechas (idénticas al cálculo original)
-  const ahora = new Date();
-  const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+  // Fechas en hora Madrid (los timestamps se escriben en Europe/Madrid).
+  // Ventanas semanales SIN solape: "últimos 7 días" = [hoy-6, hoy] y
+  // "semana anterior" = [hoy-13, hoy-7] — 7 días naturales cada una.
+  const hoy = hoyMadrid();
   const ayer = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
   const anteayer = new Date(hoy); anteayer.setDate(hoy.getDate() - 2);
+  const hace6 = new Date(hoy); hace6.setDate(hoy.getDate() - 6);
   const hace7 = new Date(hoy); hace7.setDate(hoy.getDate() - 7);
-  const hace14 = new Date(hoy); hace14.setDate(hoy.getDate() - 14);
+  const hace13 = new Date(hoy); hace13.setDate(hoy.getDate() - 13);
+  const hace29 = new Date(hoy); hace29.setDate(hoy.getDate() - 29); // ventana 30d del ranking
   const iMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
   const iMesAnt = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
   const fMesAnt = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
@@ -87,9 +117,11 @@ async function getStatsPorRollup(
   const ord = (d: Date) =>
     `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
   const hoyOrd = ord(hoy), ayerOrd = ord(ayer), anteayerOrd = ord(anteayer);
-  const hace7Ord = ord(hace7), hace14Ord = ord(hace14);
+  const hace6Ord = ord(hace6), hace7Ord = ord(hace7), hace13Ord = ord(hace13), hace29Ord = ord(hace29);
   const iMesOrd = ord(iMes), iMesAntOrd = ord(iMesAnt), fMesAntOrd = ord(fMesAnt);
   const fechasVivas = [ayerOrd, hoyOrd];
+  // Si hoy es día 1, "ayer" pertenece al mes anterior: no debe sumar a "Este mes"
+  const ayerEnMes = ayerOrd >= iMesOrd;
 
   const formatoEspanol = (f: Date): string =>
     `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`;
@@ -108,7 +140,7 @@ async function getStatsPorRollup(
   if (ipExcluida) { regSql += propioSql; regArgs.push(ipExcluida); }
   regSql += ' ORDER BY id DESC LIMIT ?'; regArgs.push(limite);
 
-  const [vivoRes, gcRes, appsAcumRes, muRes, rankRes, paisRes, ciudadRes, compRes, appsSemCerrRes, appsMesCerrRes, registrosResult] = await Promise.all([
+  const [vivoRes, gcRes, appsAcumRes, muRes, rankRes, rank30Res, ctrlRes, paisRes, ciudadRes, compRes, appsSemCerrRes, appsMesCerrRes, registrosResult] = await Promise.all([
     client.execute({ sql: `SELECT ${CAMPOS_ROLLUP} FROM uso_aplicaciones WHERE ${FECHA_EXPR} >= ?`, args: [ayerOrd] }),
     client.execute(
       `SELECT COALESCE(SUM(usos),0) usos, COALESCE(SUM(movil),0) movil, COALESCE(SUM(escritorio),0) escritorio,
@@ -123,6 +155,10 @@ async function getStatsPorRollup(
       `SELECT aplicacion, SUM(usos) usos, SUM(suma_dur_cap) sdc, SUM(count_dur_cap) cdc, MAX(ultimo_ord) ult
        FROM rollup_app_acum WHERE 1=1${miipWhere} GROUP BY aplicacion`
     ),
+    // Usos por app en los últimos 30 días (días cerrados; la ventana viva se suma después)
+    client.execute({ sql: `SELECT aplicacion, SUM(usos) usos FROM rollup_dia_app WHERE fecha_ord >= ?${miipWhere} GROUP BY aplicacion`, args: [hace29Ord] }),
+    // Último día agregado (estado del rollup para la status bar del dashboard)
+    client.execute(`SELECT MAX(fecha_ord) m FROM rollup_control`),
     client.execute(`SELECT pais, SUM(usos) usos FROM rollup_pais_acum WHERE 1=1${miipWhere} GROUP BY pais`),
     client.execute(`SELECT ciudad, SUM(usos) usos FROM rollup_ciudad_acum WHERE 1=1${miipWhere} GROUP BY ciudad`),
     client.execute({
@@ -133,9 +169,9 @@ async function getStatsPorRollup(
           COALESCE(SUM(CASE WHEN fecha_ord BETWEEN ? AND ? THEN usos END),0) mes_cerr,
           COALESCE(SUM(CASE WHEN fecha_ord BETWEEN ? AND ? THEN usos END),0) mes_ant
         FROM rollup_dia WHERE 1=1${miipWhere}`,
-      args: [anteayerOrd, hace7Ord, anteayerOrd, hace14Ord, hace7Ord, iMesOrd, anteayerOrd, iMesAntOrd, fMesAntOrd],
+      args: [anteayerOrd, hace6Ord, anteayerOrd, hace13Ord, hace7Ord, iMesOrd, anteayerOrd, iMesAntOrd, fMesAntOrd],
     }),
-    client.execute({ sql: `SELECT DISTINCT aplicacion FROM rollup_dia_app WHERE fecha_ord BETWEEN ? AND ?${miipWhere}`, args: [hace7Ord, anteayerOrd] }),
+    client.execute({ sql: `SELECT DISTINCT aplicacion FROM rollup_dia_app WHERE fecha_ord BETWEEN ? AND ?${miipWhere}`, args: [hace6Ord, anteayerOrd] }),
     client.execute({ sql: `SELECT DISTINCT aplicacion FROM rollup_dia_app WHERE fecha_ord BETWEEN ? AND ?${miipWhere}`, args: [iMesOrd, anteayerOrd] }),
     client.execute({ sql: regSql, args: regArgs }),
   ]);
@@ -211,16 +247,31 @@ async function getStatsPorRollup(
       if (f > acc.ult) acc.ult = f;
     }
   }
+
+  // Usos por app en los últimos 30 días: cerrado (rank30Res) + ventana viva.
+  // Base del "estado" del ranking: refleja actividad ACTUAL, no histórica
+  // (con all-time, una app muerta con usos antiguos aparecía como Activa).
+  const usos30Map = new Map<string, number>();
+  for (const r of rank30Res.rows) usos30Map.set(String(r.aplicacion), Number(r.usos));
+  for (const f of fechasVivas) {
+    const pair = vivo.appMap.get(f); if (!pair) continue;
+    for (const m of miipList) for (const [app, a] of pair[m]) {
+      usos30Map.set(app, (usos30Map.get(app) || 0) + a.usos);
+    }
+  }
+
   const rankingAplicaciones = [...rankMap.entries()]
     .map(([aplicacion, a]) => {
       const usos = a.usos;
-      let estado = '⚠️ Muy bajo';
-      if (usos >= 50) estado = '✅ Activa'; else if (usos >= 10) estado = '⚠️ Bajo uso';
+      const usos30 = usos30Map.get(aplicacion) || 0;
+      let estado = '💤 Sin uso 30d';
+      if (usos30 >= 10) estado = '✅ Activa';
+      else if (usos30 >= 1) estado = '⚠️ Bajo uso';
       const raw = a.ult;
       const ultimoUso = raw.length === 8 ? `${raw.slice(6, 8)}/${raw.slice(4, 6)}/${raw.slice(0, 4)}` : raw;
       const durProm = a.cdc > 0 ? a.sdc / a.cdc : 0;
       return {
-        aplicacion, total_usos: usos, ultimo_uso: ultimoUso,
+        aplicacion, total_usos: usos, usos_30d: usos30, ultimo_uso: ultimoUso,
         duracion_promedio_segundos: durProm,
         duracion_promedio_formato: formatearDuracion(Math.round(durProm)),
         estado,
@@ -245,16 +296,17 @@ async function getStatsPorRollup(
   const usosHoy = vivoUsos([hoyOrd]);
   const usosAyer = vivoUsos([ayerOrd]);
   const usosAnteayer = Number(cc.anteayer);
-  const usosSemana = Number(cc.sem_cerr) + vivoUsos([ayerOrd, hoyOrd]);
+  const usosSemana = Number(cc.sem_cerr) + usosHoy + usosAyer;
   const usosSemanaAnt = Number(cc.sem_ant);
-  const usosMes = Number(cc.mes_cerr) + vivoUsos([ayerOrd, hoyOrd]);
-  const usosMesAnt = Number(cc.mes_ant);
+  // Si hoy es día 1, "ayer" (día vivo) pertenece al mes anterior: suma allí, no aquí
+  const usosMes = Number(cc.mes_cerr) + usosHoy + (ayerEnMes ? usosAyer : 0);
+  const usosMesAnt = Number(cc.mes_ant) + (ayerEnMes ? 0 : usosAyer);
 
   // apps_distintas por período (cerrado por rango ya leído en paralelo + vivo)
   const appsHoy = appsVivo([hoyOrd]).size;
   const appsAyer = appsVivo([ayerOrd]).size;
   const setSem = appsVivo([ayerOrd, hoyOrd]); for (const r of appsSemCerrRes.rows) setSem.add(String(r.aplicacion));
-  const setMes = appsVivo([ayerOrd, hoyOrd]); for (const r of appsMesCerrRes.rows) setMes.add(String(r.aplicacion));
+  const setMes = appsVivo(ayerEnMes ? [ayerOrd, hoyOrd] : [hoyOrd]); for (const r of appsMesCerrRes.rows) setMes.add(String(r.aplicacion));
 
   const calcularVariacion = (actual: number, anterior: number) => {
     if (anterior === 0) return { porcentaje: actual > 0 ? 100 : 0, tendencia: actual > 0 ? ('up' as const) : ('neutral' as const) };
@@ -272,19 +324,16 @@ async function getStatsPorRollup(
   };
 
   // ── Registros recientes (ya leídos en paralelo, usan PK — baratos) ──
-  const registros = registrosResult.rows.map((row) => ({
-    ...row,
-    modo: (row.modo as string | null) ?? 'web',
-    datos_adicionales: row.datos_adicionales ? JSON.parse(row.datos_adicionales as string) : null,
-  }));
+  const registros = registrosResult.rows.map(mapearRegistro);
+
+  // Estado del rollup para la status bar: último día agregado vs esperado (anteayer)
+  const rollupHasta = ctrlRes.rows[0]?.m ? String(ctrlRes.rows[0].m) : null;
 
   return {
     status: 'success',
     version: 'v4-rollup',
-    filtros: {
-      aplicacion: input.aplicacion, desde: input.desde, hasta: input.hasta,
-      limite, excluir_mi_ip, ip_excluida: ipExcluida || null,
-    },
+    rollup: { hasta: rollupHasta, esperado: anteayerOrd },
+    filtros: { limite, excluir_mi_ip, ip_excluida: ipExcluida || null },
     estadisticas: {
       total_usos: total,
       total_aplicaciones: totalAplicaciones,
@@ -313,15 +362,15 @@ async function getStatsPorRollup(
 export const analyticsRouter = router({
   /**
    * Procedure: getStats
-   * Obtiene estadísticas de uso con filtros opcionales
-   * Reemplaza: GET /api/analytics/stats
+   * Estadísticas globales del dashboard, siempre vía rollup (días cerrados
+   * pre-agregados + ventana viva [ayer, hoy]).
+   * El antiguo camino 'en vivo' con filtros de aplicación/fecha se eliminó el
+   * 2026-07-14: el dashboard nunca enviaba esos filtros y la lógica duplicada
+   * había empezado a divergir del rollup (normalización de países, ventanas).
    */
   getStats: protectedProcedure
     .input(
       z.object({
-        aplicacion: z.string().optional(),
-        desde: z.string().optional(),
-        hasta: z.string().optional(),
         limite: z.number().int().positive().default(100),
         excluir_mi_ip: z.boolean().default(false),
       })
@@ -329,399 +378,8 @@ export const analyticsRouter = router({
     .query(async ({ input }) => {
       await initializeDatabase();
       const client = getTursoClient();
-
-      const { aplicacion, desde, hasta, limite, excluir_mi_ip } = input;
-
-      // RUTA RÁPIDA: sin filtros de app/fecha (caso del dashboard) → vía rollup.
-      // Con filtros, se mantiene el cálculo en vivo de más abajo (fallback).
-      if (!aplicacion && !desde && !hasta) {
-        const ipConfigurada = await leerIpExcluida(client);
-        return await getStatsPorRollup(client, input, ipConfigurada);
-      }
-
-      // Obtener IP excluida si el filtro está activo
-      let ipExcluida = '';
-      if (excluir_mi_ip) {
-        try {
-          const configResult = await client.execute({
-            sql: `SELECT valor FROM analytics_config WHERE clave = 'ip_excluida'`,
-            args: [],
-          });
-          if (configResult.rows.length > 0) {
-            ipExcluida = String(configResult.rows[0].valor);
-          }
-        } catch {
-          // Ignorar error si la tabla no existe aún
-        }
-      }
-
-      // Construir query con filtros
-      let sql = 'SELECT * FROM uso_aplicaciones WHERE 1=1';
-      const args: (string | number)[] = [];
-
-      if (aplicacion) {
-        sql += ' AND aplicacion = ?';
-        args.push(aplicacion);
-      }
-      if (desde) {
-        sql += ' AND timestamp >= ?';
-        args.push(desde);
-      }
-      if (hasta) {
-        sql += ' AND timestamp <= ?';
-        args.push(hasta);
-      }
-      if (ipExcluida) {
-        sql += ' AND (ip_address IS NULL OR ip_address != ?)';
-        args.push(ipExcluida);
-      }
-
-      sql += ' ORDER BY id DESC LIMIT ?';
-      args.push(limite);
-
-      const registrosResult = await client.execute({ sql, args });
-      const registros = registrosResult.rows.map((row) => ({
-        ...row,
-        modo: (row.modo as string | null) ?? 'web',
-        datos_adicionales: row.datos_adicionales
-          ? JSON.parse(row.datos_adicionales as string)
-          : null,
-      }));
-
-      // Estadísticas agregadas
-      let sqlStats = `
-        SELECT
-          COUNT(*) as total_usos,
-          COUNT(DISTINCT aplicacion) as total_aplicaciones,
-          MIN(timestamp) as primer_uso,
-          MAX(timestamp) as ultimo_uso,
-          AVG(CASE WHEN duracion_segundos IS NOT NULL THEN duracion_segundos END) as duracion_promedio,
-          SUM(CASE WHEN tipo_dispositivo = 'movil' THEN 1 ELSE 0 END) as total_movil,
-          SUM(CASE WHEN tipo_dispositivo = 'escritorio' THEN 1 ELSE 0 END) as total_escritorio,
-          SUM(CASE WHEN es_recurrente = 1 THEN 1 ELSE 0 END) as total_recurrentes,
-          SUM(CASE WHEN es_recurrente = 0 THEN 1 ELSE 0 END) as total_nuevos
-        FROM uso_aplicaciones WHERE 1=1
-      `;
-      const statsArgs: string[] = [];
-
-      if (aplicacion) {
-        sqlStats += ' AND aplicacion = ?';
-        statsArgs.push(aplicacion);
-      }
-      if (desde) {
-        sqlStats += ' AND timestamp >= ?';
-        statsArgs.push(desde);
-      }
-      if (hasta) {
-        sqlStats += ' AND timestamp <= ?';
-        statsArgs.push(hasta);
-      }
-      if (ipExcluida) {
-        sqlStats += ' AND (ip_address IS NULL OR ip_address != ?)';
-        statsArgs.push(ipExcluida);
-      }
-
-      const statsResult = await client.execute({ sql: sqlStats, args: statsArgs });
-      const stats = statsResult.rows[0];
-
-      const total = Number(stats.total_usos) || 0;
-      const totalMovil = Number(stats.total_movil) || 0;
-      const totalEscritorio = Number(stats.total_escritorio) || 0;
-      const totalRecurrentes = Number(stats.total_recurrentes) || 0;
-      const totalNuevos = Number(stats.total_nuevos) || 0;
-      const duracionPromedio = Number(stats.duracion_promedio) || 0;
-
-      const porcentajeMovil = total > 0 ? Math.round((totalMovil / total) * 1000) / 10 : 0;
-      const porcentajeEscritorio = total > 0 ? Math.round((totalEscritorio / total) * 1000) / 10 : 0;
-      const porcentajeRecurrentes = total > 0 ? Math.round((totalRecurrentes / total) * 1000) / 10 : 0;
-
-      // Ranking de aplicaciones (con filtro de IP si está activo)
-      // - ultimo_uso: MAX sobre "YYYYMMDD" (reordenando substr) → ordena correctamente entre meses
-      //   sin subconsulta correlacionada (que causaba N queries por app → lentitud crítica)
-      // - duracion_promedio excluye sesiones > 2h (7200s) para evitar distorsión por tabs abandonadas
-      let rankingSql = `
-        SELECT
-          u1.aplicacion,
-          COUNT(*) as total_usos,
-          MAX(substr(u1.timestamp,7,4) || substr(u1.timestamp,4,2) || substr(u1.timestamp,1,2)) as ultimo_uso,
-          AVG(CASE WHEN u1.duracion_segundos IS NOT NULL AND u1.duracion_segundos <= 7200
-              THEN u1.duracion_segundos END) as duracion_promedio_segundos
-        FROM uso_aplicaciones u1
-        WHERE 1=1
-      `;
-      const rankingArgs: string[] = [];
-      if (ipExcluida) {
-        rankingSql += ' AND (u1.ip_address IS NULL OR u1.ip_address != ?)';
-        rankingArgs.push(ipExcluida);
-      }
-      rankingSql += ' GROUP BY u1.aplicacion ORDER BY total_usos DESC';
-
-      const rankingResult = await client.execute({ sql: rankingSql, args: rankingArgs });
-
-      const rankingAplicaciones = rankingResult.rows.map((app) => {
-        const usos = Number(app.total_usos);
-        let estado = '⚠️ Muy bajo';
-        if (usos >= 50) estado = '✅ Activa';
-        else if (usos >= 10) estado = '⚠️ Bajo uso';
-
-        // Convertir "20260602" (YYYYMMDD) → "02/06/2026" para mostrar
-        const raw = String(app.ultimo_uso || '');
-        const ultimo_uso = raw.length === 8
-          ? `${raw.slice(6, 8)}/${raw.slice(4, 6)}/${raw.slice(0, 4)}`
-          : raw;
-
-        return {
-          aplicacion: app.aplicacion,
-          total_usos: usos,
-          ultimo_uso,
-          duracion_promedio_segundos: Number(app.duracion_promedio_segundos) || 0,
-          duracion_promedio_formato: formatearDuracion(
-            Math.round(Number(app.duracion_promedio_segundos) || 0)
-          ),
-          estado,
-        };
-      });
-
-      // Estadísticas geográficas (con filtro de IP si está activo)
-      // CASE normaliza nombres completos históricos ("Spain") a código ISO ("ES")
-      let paisesSql = `
-        SELECT
-          CASE pais
-            WHEN 'Spain' THEN 'ES'
-            WHEN 'United States' THEN 'US'
-            WHEN 'Mexico' THEN 'MX'
-            WHEN 'Argentina' THEN 'AR'
-            WHEN 'Colombia' THEN 'CO'
-            WHEN 'Bolivia' THEN 'BO'
-            WHEN 'Ecuador' THEN 'EC'
-            WHEN 'Chile' THEN 'CL'
-            WHEN 'Peru' THEN 'PE'
-            WHEN 'Venezuela' THEN 'VE'
-            WHEN 'Guatemala' THEN 'GT'
-            WHEN 'Costa Rica' THEN 'CR'
-            WHEN 'Honduras' THEN 'HN'
-            WHEN 'El Salvador' THEN 'SV'
-            WHEN 'Nicaragua' THEN 'NI'
-            WHEN 'Panama' THEN 'PA'
-            WHEN 'Cuba' THEN 'CU'
-            WHEN 'Dominican Republic' THEN 'DO'
-            WHEN 'Puerto Rico' THEN 'PR'
-            WHEN 'Uruguay' THEN 'UY'
-            WHEN 'Paraguay' THEN 'PY'
-            WHEN 'Brazil' THEN 'BR'
-            WHEN 'Portugal' THEN 'PT'
-            WHEN 'France' THEN 'FR'
-            WHEN 'Germany' THEN 'DE'
-            WHEN 'United Kingdom' THEN 'GB'
-            WHEN 'Italy' THEN 'IT'
-            WHEN 'Netherlands' THEN 'NL'
-            WHEN 'Belgium' THEN 'BE'
-            WHEN 'Switzerland' THEN 'CH'
-            WHEN 'Sweden' THEN 'SE'
-            WHEN 'Norway' THEN 'NO'
-            WHEN 'Denmark' THEN 'DK'
-            WHEN 'Finland' THEN 'FI'
-            WHEN 'Poland' THEN 'PL'
-            WHEN 'Russia' THEN 'RU'
-            WHEN 'Turkey' THEN 'TR'
-            WHEN 'Canada' THEN 'CA'
-            WHEN 'Australia' THEN 'AU'
-            WHEN 'Japan' THEN 'JP'
-            WHEN 'China' THEN 'CN'
-            WHEN 'India' THEN 'IN'
-            WHEN 'South Korea' THEN 'KR'
-            ELSE pais
-          END as pais,
-          COUNT(*) as total
-        FROM uso_aplicaciones
-        WHERE pais IS NOT NULL AND pais != ''
-      `;
-      const paisesArgs: string[] = [];
-      if (ipExcluida) {
-        paisesSql += ' AND (ip_address IS NULL OR ip_address != ?)';
-        paisesArgs.push(ipExcluida);
-      }
-      paisesSql += ' GROUP BY 1 ORDER BY total DESC LIMIT 20';
-      const paisesResult = await client.execute({ sql: paisesSql, args: paisesArgs });
-      const paises = paisesResult.rows.map(r => ({ pais: String(r.pais), total: Number(r.total) }));
-
-      let ciudadesSql = `
-        SELECT ciudad, COUNT(*) as total
-        FROM uso_aplicaciones
-        WHERE ciudad IS NOT NULL AND ciudad != ''
-      `;
-      const ciudadesArgs: string[] = [];
-      if (ipExcluida) {
-        ciudadesSql += ' AND (ip_address IS NULL OR ip_address != ?)';
-        ciudadesArgs.push(ipExcluida);
-      }
-      ciudadesSql += ' GROUP BY ciudad ORDER BY total DESC LIMIT 10';
-      const ciudadesResult = await client.execute({ sql: ciudadesSql, args: ciudadesArgs });
-      const ciudades = ciudadesResult.rows.map(r => ({ ciudad: String(r.ciudad), total: Number(r.total) }));
-
-      // Comparativa temporal
-      const formatoEspanol = (fecha: Date): string => {
-        const dia = String(fecha.getDate()).padStart(2, '0');
-        const mes = String(fecha.getMonth() + 1).padStart(2, '0');
-        const anio = fecha.getFullYear();
-        return `${dia}/${mes}/${anio}`;
-      };
-
-      const ahora = new Date();
-      const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
-      const ayer = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
-      const hace7Dias = new Date(hoy); hace7Dias.setDate(hoy.getDate() - 7);
-      const hace14Dias = new Date(hoy); hace14Dias.setDate(hoy.getDate() - 14);
-      const inicioMesActual = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-      const inicioMesAnterior = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
-      const finMesAnterior = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
-
-      // Comparativa temporal consolidada en UNA sola consulta (antes eran 7 round-trips).
-      // Agregación condicional sobre la fecha reordenada a YYYYMMDD. Las claves de fecha
-      // son valores generados en servidor (8 dígitos), seguras para embeber en el SQL.
-      // El WHERE fo >= inicioMesAnterior limita el escaneo al rango necesario.
-      const anteayer = new Date(hoy); anteayer.setDate(hoy.getDate() - 2);
-      const fmtOrd = (f: Date) =>
-        `${f.getFullYear()}${String(f.getMonth() + 1).padStart(2, '0')}${String(f.getDate()).padStart(2, '0')}`;
-      const hoyS = fmtOrd(hoy), ayerS = fmtOrd(ayer), anteayerS = fmtOrd(anteayer);
-      const hace7S = fmtOrd(hace7Dias), hace14S = fmtOrd(hace14Dias);
-      const iMesS = fmtOrd(inicioMesActual), iMesAntS = fmtOrd(inicioMesAnterior), fMesAntS = fmtOrd(finMesAnterior);
-
-      let compSql = `
-        SELECT
-          SUM(CASE WHEN fo = '${hoyS}' THEN 1 ELSE 0 END) as usos_hoy,
-          SUM(CASE WHEN fo = '${ayerS}' THEN 1 ELSE 0 END) as usos_ayer,
-          SUM(CASE WHEN fo = '${anteayerS}' THEN 1 ELSE 0 END) as usos_anteayer,
-          SUM(CASE WHEN fo >= '${hace7S}' AND fo <= '${hoyS}' THEN 1 ELSE 0 END) as usos_semana,
-          SUM(CASE WHEN fo >= '${hace14S}' AND fo <= '${hace7S}' THEN 1 ELSE 0 END) as usos_semana_ant,
-          SUM(CASE WHEN fo >= '${iMesS}' AND fo <= '${hoyS}' THEN 1 ELSE 0 END) as usos_mes,
-          SUM(CASE WHEN fo >= '${iMesAntS}' AND fo <= '${fMesAntS}' THEN 1 ELSE 0 END) as usos_mes_ant,
-          COUNT(DISTINCT CASE WHEN fo = '${hoyS}' THEN aplicacion END) as apps_hoy,
-          COUNT(DISTINCT CASE WHEN fo = '${ayerS}' THEN aplicacion END) as apps_ayer,
-          COUNT(DISTINCT CASE WHEN fo >= '${hace7S}' AND fo <= '${hoyS}' THEN aplicacion END) as apps_semana,
-          COUNT(DISTINCT CASE WHEN fo >= '${iMesS}' AND fo <= '${hoyS}' THEN aplicacion END) as apps_mes
-        FROM (
-          SELECT
-            substr(timestamp,7,4) || substr(timestamp,4,2) || substr(timestamp,1,2) as fo,
-            aplicacion, ip_address
-          FROM uso_aplicaciones
-        )
-        WHERE fo >= '${iMesAntS}'
-      `;
-      const compArgs: string[] = [];
-      if (ipExcluida) {
-        compSql += ' AND (ip_address IS NULL OR ip_address != ?)';
-        compArgs.push(ipExcluida);
-      }
-      const compRes = await client.execute({ sql: compSql, args: compArgs });
-      const cmp = compRes.rows[0];
-
-      const rHoy = { usos: Number(cmp.usos_hoy) || 0, apps: Number(cmp.apps_hoy) || 0 };
-      const rAyer = { usos: Number(cmp.usos_ayer) || 0, apps: Number(cmp.apps_ayer) || 0 };
-      const rSemana = { usos: Number(cmp.usos_semana) || 0, apps: Number(cmp.apps_semana) || 0 };
-      const rMes = { usos: Number(cmp.usos_mes) || 0, apps: Number(cmp.apps_mes) || 0 };
-      const usosHoy = rHoy.usos;
-      const usosAyer = rAyer.usos;
-      const usosUltimos7Dias = rSemana.usos;
-      const usosSemanaAnterior = Number(cmp.usos_semana_ant) || 0;
-      const usosMesActual = rMes.usos;
-      const usosMesAnterior = Number(cmp.usos_mes_ant) || 0;
-      const usosAnteayer = Number(cmp.usos_anteayer) || 0;
-
-      const calcularVariacion = (actual: number, anterior: number) => {
-        if (anterior === 0) {
-          return { porcentaje: actual > 0 ? 100 : 0, tendencia: actual > 0 ? ('up' as const) : ('neutral' as const) };
-        }
-        const porcentaje = Math.round(((actual - anterior) / anterior) * 100);
-        const tendencia = porcentaje > 0 ? ('up' as const) : porcentaje < 0 ? ('down' as const) : ('neutral' as const);
-        return { porcentaje: Math.abs(porcentaje), tendencia };
-      };
-
-      // Visitas que llegaron por un enlace compartido (?ref=share)
-      let sharesSql = `
-        SELECT COUNT(*) as total
-        FROM uso_aplicaciones
-        WHERE datos_adicionales LIKE '%"ref":"share"%'
-      `;
-      const sharesArgs: string[] = [];
-      if (ipExcluida) {
-        sharesSql += ' AND (ip_address IS NULL OR ip_address != ?)';
-        sharesArgs.push(ipExcluida);
-      }
-      const sharesResult = await client.execute({ sql: sharesSql, args: sharesArgs });
-      const totalPorCompartir = Number(sharesResult.rows[0]?.total) || 0;
-
-      const comparativa = {
-        hoy: {
-          usos: usosHoy,
-          apps_distintas: rHoy.apps,
-          comparacion: calcularVariacion(usosHoy, usosAyer),
-          etiqueta: 'vs ayer',
-        },
-        ayer: {
-          usos: usosAyer,
-          apps_distintas: rAyer.apps,
-          comparacion: calcularVariacion(usosAyer, usosAnteayer),
-          etiqueta: 'vs anteayer',
-          fecha: formatoEspanol(ayer),
-        },
-        semana: {
-          usos: usosUltimos7Dias,
-          apps_distintas: rSemana.apps,
-          comparacion: calcularVariacion(usosUltimos7Dias, usosSemanaAnterior),
-          etiqueta: 'vs semana anterior',
-        },
-        mes: {
-          usos: usosMesActual,
-          apps_distintas: rMes.apps,
-          comparacion: calcularVariacion(usosMesActual, usosMesAnterior),
-          etiqueta: 'vs mes anterior',
-        },
-        detalles: {
-          ayer: usosAyer,
-          anteayer: usosAnteayer,
-          semanaAnterior: usosSemanaAnterior,
-          mesAnterior: usosMesAnterior,
-        },
-      };
-
-      return {
-        status: 'success',
-        version: 'v3.2-trpc',
-        filtros: {
-          aplicacion,
-          desde,
-          hasta,
-          limite,
-          excluir_mi_ip,
-          ip_excluida: ipExcluida || null,
-        },
-        estadisticas: {
-          total_usos: total,
-          total_aplicaciones: Number(stats.total_aplicaciones) || 0,
-          primer_uso: stats.primer_uso,
-          ultimo_uso: stats.ultimo_uso,
-          duracion_promedio_segundos: Math.round(duracionPromedio * 10) / 10,
-          duracion_promedio_formato: formatearDuracion(Math.round(duracionPromedio)),
-          dispositivos: {
-            movil: { total: totalMovil, porcentaje: porcentajeMovil },
-            escritorio: { total: totalEscritorio, porcentaje: porcentajeEscritorio },
-          },
-          usuarios: {
-            nuevos: { total: totalNuevos, porcentaje: Math.round((100 - porcentajeRecurrentes) * 10) / 10 },
-            recurrentes: { total: totalRecurrentes, porcentaje: porcentajeRecurrentes },
-          },
-          por_compartir: totalPorCompartir,
-          geografia: {
-            paises,
-            ciudades,
-          },
-        },
-        comparativa,
-        registros_mostrados: registros.length,
-        ranking_aplicaciones: rankingAplicaciones,
-        data: registros,
-      };
+      const ipConfigurada = await leerIpExcluida(client);
+      return await getStatsPorRollup(client, input, ipConfigurada);
     }),
 
   /**
@@ -753,9 +411,9 @@ export const analyticsRouter = router({
       const ipWhere = ipExcluida ? ' AND (ip_address IS NULL OR ip_address != ?)' : '';
       const ipArgs: string[] = ipExcluida ? [ipExcluida] : [];
 
-      // Fecha de hoy en formato DD/MM/YYYY para filtrar con LIKE (evita el bug de MAX string)
-      const ahora = new Date();
-      const fechaHoy = `${String(ahora.getDate()).padStart(2, '0')}/${String(ahora.getMonth() + 1).padStart(2, '0')}/${ahora.getFullYear()}`;
+      // Fecha de hoy (Madrid) en formato DD/MM/YYYY para filtrar con LIKE
+      const hoyApp = hoyMadrid();
+      const fechaHoy = `${String(hoyApp.getDate()).padStart(2, '0')}/${String(hoyApp.getMonth() + 1).padStart(2, '0')}/${hoyApp.getFullYear()}`;
 
       const [todayResult, deviceResult, registrosResult] = await Promise.all([
         // Usos de hoy (sin límite, exacto)
@@ -778,10 +436,20 @@ export const analyticsRouter = router({
       const movil = Number(deviceResult.rows.find(r => r.tipo_dispositivo === 'movil')?.total) || 0;
       const escritorio = Number(deviceResult.rows.find(r => r.tipo_dispositivo === 'escritorio')?.total) || 0;
 
+      // Registros tipados (evita exponer filas crudas de libsql al frontend)
+      const registros = registrosResult.rows.map((row) => ({
+        id: Number(row.id),
+        timestamp: String(row.timestamp ?? ''),
+        duracion_segundos: row.duracion_segundos == null ? null : Number(row.duracion_segundos),
+        tipo_dispositivo: row.tipo_dispositivo == null ? null : String(row.tipo_dispositivo),
+        pais: row.pais == null ? null : String(row.pais),
+        ciudad: row.ciudad == null ? null : String(row.ciudad),
+      }));
+
       return {
         usos_hoy: Number(todayResult.rows[0]?.total) || 0,
         dispositivos: { movil, escritorio },
-        registros: registrosResult.rows,
+        registros,
       };
     }),
 
@@ -810,15 +478,15 @@ export const analyticsRouter = router({
         // Ignorar si la tabla no existe
       }
 
-      // Rangos de fechas (inicio del día, sin hora)
-      const ahora = new Date();
-      const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+      // Rangos de fechas en hora Madrid. "7 días" = [hoy-6, hoy] (7 días naturales,
+      // misma definición que la comparativa de getStats — sin solape con la anterior)
+      const hoy = hoyMadrid();
       const ayer = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
-      const hace7Dias = new Date(hoy); hace7Dias.setDate(hoy.getDate() - 7);
+      const hace6Dias = new Date(hoy); hace6Dias.setDate(hoy.getDate() - 6);
       const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
       const ord = (d: Date) =>
         `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
-      const hoyOrd = ord(hoy), ayerOrd = ord(ayer), hace7Ord = ord(hace7Dias), iMesOrd = ord(inicioMes);
+      const hoyOrd = ord(hoy), ayerOrd = ord(ayer), hace6Ord = ord(hace6Dias), iMesOrd = ord(inicioMes);
 
       type Conteo = { hoy: number; ayer: number; semana: number; mes: number; total: number };
       const conteos: Record<string, Conteo> = {};
@@ -837,7 +505,7 @@ export const analyticsRouter = router({
                   SUM(CASE WHEN fecha_ord >= ? THEN usos ELSE 0 END) mes,
                   SUM(CASE WHEN fecha_ord >= ? THEN usos ELSE 0 END) sem
                 FROM rollup_dia_origen GROUP BY origen`,
-          args: [iMesOrd, hace7Ord],
+          args: [iMesOrd, hace6Ord],
         }),
         client.execute({ sql: `SELECT ${CAMPOS_ROLLUP} FROM uso_aplicaciones WHERE ${FECHA_EXPR} >= ?`, args: [ayerOrd] }),
       ]);
@@ -864,7 +532,7 @@ export const analyticsRouter = router({
         const vAyer = oAyer.get(origen) || 0;
         c.hoy += vHoy;
         c.ayer += vAyer;
-        c.semana += vHoy + vAyer;               // ayer y hoy siempre ≥ hace7
+        c.semana += vHoy + vAyer;               // ayer y hoy siempre caen en [hoy-6, hoy]
         c.mes += vHoy + (ayerEnMes ? vAyer : 0);
         c.total += vHoy + vAyer;
       }
@@ -926,8 +594,7 @@ export const analyticsRouter = router({
       try { await computarRollupPendientes(client, ipConfigurada, 7); } catch { /* no bloquear */ }
 
       // Fecha de hace 29 días (para incluir hoy = 30 días en total), en formato YYYYMMDD
-      const hoy = new Date();
-      hoy.setHours(0, 0, 0, 0);
+      const hoy = hoyMadrid();
       const inicio = new Date(hoy);
       inicio.setDate(hoy.getDate() - 29);
       const inicioStr = `${inicio.getFullYear()}${String(inicio.getMonth() + 1).padStart(2, '0')}${String(inicio.getDate()).padStart(2, '0')}`;
@@ -1091,8 +758,8 @@ export const analyticsRouter = router({
         if (cfg.rows.length > 0) ipExcluida = String(cfg.rows[0].valor);
       } catch { /* tabla aún no existe */ }
 
-      // Calcular fecha límite (hace N días)
-      const ahora = new Date();
+      // Calcular fecha límite (hace N días) en hora Madrid (los timestamps son Madrid)
+      const ahora = ahoraMadrid();
       const limite = new Date(ahora);
       limite.setDate(limite.getDate() - input.dias);
       // Sub-ventanas anidadas para el pulso del descubrimiento interno: 24 h y 7 días
@@ -1101,16 +768,21 @@ export const analyticsRouter = router({
       // Contadores de clics ?from= y visitas por sub-ventana (24 h / 7 d); la quincena reutiliza los KPIs de 14 d
       let visitas24h = 0, visitas7d = 0, clics24h = 0, clics7d = 0;
 
-      // Cargar visitas relevantes ordenadas por sesión y momento
-      // Excluimos bot, mcp y mi-ip ya en SQL para reducir ruido
+      // Cargar visitas relevantes ordenadas por sesión y momento.
+      // Excluimos bot, mcp y mi-ip ya en SQL, y ACOTAMOS por fecha en SQL
+      // (FECHA_EXPR ≥ día del límite): antes se escaneaba y transfería la tabla
+      // entera y se descartaba por fecha en JS — se degradaba con el histórico.
+      // El corte fino por hora exacta se mantiene en JS (limite incluye la hora).
+      const limiteOrd = `${limite.getFullYear()}${String(limite.getMonth() + 1).padStart(2, '0')}${String(limite.getDate()).padStart(2, '0')}`;
       const result = await client.execute({
         sql: `SELECT id, aplicacion, sesion_id, modo, datos_adicionales, ip_address, timestamp
               FROM uso_aplicaciones
               WHERE sesion_id IS NOT NULL AND sesion_id != ''
                 AND modo NOT IN ('bot', 'mcp')
+                AND ${FECHA_EXPR} >= ?
                 ${ipExcluida ? 'AND (ip_address != ? OR ip_address IS NULL)' : ''}
               ORDER BY sesion_id ASC, id ASC`,
-        args: ipExcluida ? [ipExcluida] : [],
+        args: ipExcluida ? [limiteOrd, ipExcluida] : [limiteOrd],
       });
 
       // Parsear timestamp español "DD/MM/YYYY, HH:MM:SS" → Date
@@ -1300,9 +972,11 @@ export const analyticsRouter = router({
   /**
    * Procedure: getTendencias
    * Devuelve tendencia mensual 2026, desglose por canal y % LATAM mes actual vs anterior.
+   * Sin input: SIEMPRE excluye tráfico propio y bots (el toggle de IP del dashboard
+   * no le aplica — antes declaraba excluir_mi_ip y lo ignoraba, provocando refetches
+   * sin efecto al cambiar el toggle).
    */
   getTendencias: protectedProcedure
-    .input(z.object({ excluir_mi_ip: z.boolean().default(false) }))
     .query(async () => {
       await initializeDatabase();
       const client = getTursoClient();
@@ -1313,13 +987,12 @@ export const analyticsRouter = router({
       // Universo: web+ia+pwa+redes (excluye mcp, como el cálculo original).
       // Sesiones por mes: APROXIMACIÓN (suma de sesiones-únicas-por-día); el error
       // por sesiones que cruzan medianoche es despreciable para una tendencia visual.
-      const ahora = new Date();
-      const anio = String(ahora.getFullYear());
-      const mesAct = `${anio}-${String(ahora.getMonth() + 1).padStart(2, '0')}`;
-      const mAnt = new Date(ahora.getFullYear(), ahora.getMonth() - 1, 1);
+      const hoy = hoyMadrid();
+      const anio = String(hoy.getFullYear());
+      const mesAct = `${anio}-${String(hoy.getMonth() + 1).padStart(2, '0')}`;
+      const mAnt = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
       const mesAnt = `${mAnt.getFullYear()}-${String(mAnt.getMonth() + 1).padStart(2, '0')}`;
 
-      const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
       const ayer = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
       const ordF = (d: Date) => `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
       const ayerOrd = ordF(ayer);
@@ -1399,8 +1072,7 @@ export const analyticsRouter = router({
       // On-demand defensivo (1 query si está al día)
       try { await computarRollupPendientes(client, ipConfigurada, 7); } catch { /* no bloquear */ }
 
-      const ahora = new Date();
-      const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+      const hoy = hoyMadrid();
       const ayer = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
       const ordF = (d: Date) => `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
       const hoyOrd = ordF(hoy), ayerOrd = ordF(ayer);
@@ -1479,15 +1151,15 @@ export const analyticsRouter = router({
       // que el "Total Real" del resto del dashboard)
       const ipExcluida = await leerIpExcluida(client);
 
-      // Rangos de fechas (ordinal YYYYMMDD, igual que getResumen)
-      const ahora = new Date();
-      const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+      // Rangos de fechas en hora Madrid (ordinal YYYYMMDD, igual que getResumen).
+      // "7 días" = [hoy-6, hoy]: misma definición que el resto del dashboard.
+      const hoy = hoyMadrid();
       const ayer = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
-      const hace7Dias = new Date(hoy); hace7Dias.setDate(hoy.getDate() - 7);
+      const hace6Dias = new Date(hoy); hace6Dias.setDate(hoy.getDate() - 6);
       const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
       const ord = (d: Date) =>
         `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
-      const hoyOrd = ord(hoy), ayerOrd = ord(ayer), hace7Ord = ord(hace7Dias), iMesOrd = ord(inicioMes);
+      const hoyOrd = ord(hoy), ayerOrd = ord(ayer), hace6Ord = ord(hace6Dias), iMesOrd = ord(inicioMes);
 
       const res = await client.execute({
         sql: `SELECT host,
@@ -1505,8 +1177,8 @@ export const analyticsRouter = router({
               GROUP BY host
               ORDER BY total DESC`,
         args: ipExcluida
-          ? [hoyOrd, ayerOrd, hace7Ord, iMesOrd, ipExcluida]
-          : [hoyOrd, ayerOrd, hace7Ord, iMesOrd],
+          ? [hoyOrd, ayerOrd, hace6Ord, iMesOrd, ipExcluida]
+          : [hoyOrd, ayerOrd, hace6Ord, iMesOrd],
       });
 
       // Etiqueta e icono por dominio conocido; el resto se muestra tal cual

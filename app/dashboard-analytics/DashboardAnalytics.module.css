@@ -1218,3 +1218,82 @@
 .gateForm .btnPrimary {
   margin-top: 0.5rem;
 }
+
+/* ============================================
+   AVISO IP DESINCRONIZADA (filtro "mi IP")
+   ============================================ */
+.ipMismatch {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  color: #92400e;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+[data-theme='dark'] .ipMismatch {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.5);
+  color: #fbbf24;
+}
+
+/* Filas agrupadas del Resumen por Origen (antes inline, invisible en dark) */
+.rowGrupoIA {
+  background: rgba(72, 169, 166, 0.05);
+}
+
+[data-theme='dark'] .rowGrupoIA {
+  background: rgba(72, 169, 166, 0.09);
+}
+
+.rowGrupoGris {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme='dark'] .rowGrupoGris {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* PWA instalada */
+.filtroModoActivoPWA {
+  background: #0ea5e9;
+  color: #fff;
+  border-color: #0ea5e9;
+}
+
+.badgePWA {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  background: rgba(14, 165, 233, 0.12);
+  color: #0ea5e9;
+}
+
+/* Redes sociales (referral-social) */
+.filtroModoActivoRedes {
+  background: #ec4899;
+  color: #fff;
+  border-color: #ec4899;
+}
+
+.badgeRedes {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  background: rgba(236, 72, 153, 0.12);
+  color: #ec4899;
+}
+
+/* Estado del rollup en la status bar */
+.rollupWarn {
+  color: #b45309;
+  font-weight: 600;
+}
+
+[data-theme='dark'] .rollupWarn {
+  color: #fbbf24;
+}
