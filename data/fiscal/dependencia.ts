@@ -9,7 +9,8 @@
  * Fuente: Ley 39/2006 LAPAD + RD 1051/2013 copago + LPGE 2025
  *         Orden ISM/835/2023 (cotización cuidadores no profesionales)
  *         IRPF: Ley 35/2006 art. 60-65 (mínimos discapacidad)
- * Verificado: 2026-03-30
+ *         RDL 17/2026 (Grado III+ y nivel mínimo de protección, BOE-A-2026-13643)
+ * Verificado: 2026-07-14
  * URL oficial IMSERSO: https://imserso.es/el-saad/prestaciones
  * URL oficial SS cuidadores: https://www.seg-social.es
  */
@@ -17,8 +18,8 @@
 // ─── Metadatos del módulo ────────────────────────────────────────────────────
 
 export const FISCAL_DEPENDENCIA_META = {
-  fuente: 'Ley 39/2006 LAPAD + LPGE 2025 + RD 1051/2013 + Orden ISM/835/2023',
-  verificado: '2026-03-30',
+  fuente: 'Ley 39/2006 LAPAD + LPGE 2025 + RD 1051/2013 + Orden ISM/835/2023 + RDL 17/2026',
+  verificado: '2026-07-14',
   vigencia: '2025-2026',
   urlOficial: 'https://imserso.es/el-saad/prestaciones',
   nota: 'Las cuantías son máximas estatales. Cada CCAA puede complementar con importes adicionales. El copago reduce la prestación según capacidad económica. Datos orientativos.',
@@ -57,6 +58,37 @@ export const GRADOS_DEPENDENCIA: GradoDependencia[] = [
     puntuacionBVDHasta: 100,
   },
 ];
+
+// ─── Grado III+ «dependencia extrema» (RDL 17/2026) ─────────────────────────
+// Nueva categoría ADICIONAL a los Grados I-III, en vigor desde el 25/06/2026.
+// El RDL NO define su baremo de valoración (pendiente de desarrollo
+// reglamentario), por lo que NO se integra en GRADOS_DEPENDENCIA: no hay
+// puntuación BVD oficial que asignarle todavía.
+
+export const GRADO_III_PLUS = {
+  nombre: 'Grado III+ — Dependencia Extrema',
+  baseNormativa: 'RDL 17/2026, de 23 de junio (BOE-A-2026-13643), art. primero',
+  enVigorDesde: '2026-06-25',
+  descripcion:
+    'Categoría adicional a los Grados I-III para situaciones de dependencia extrema (p. ej. ELA y enfermedades de alta complejidad). Criterios de valoración pendientes de desarrollo reglamentario.',
+  nota: 'Algunas CCAA lo despliegan en paralelo con prestación directa propia (p. ej. Extremadura, DL 2/2026: 3.200-9.859 €/mes para ELA y alta complejidad, con procedimiento acelerado de 2 meses).',
+};
+
+// ─── Nivel mínimo de protección garantizado (RDL 17/2026, desde 01/07/2026) ──
+// Financiación que el Estado transfiere a las CCAA por beneficiario y grado.
+// ⚠️ Concepto DISTINTO de las prestaciones directas al beneficiario
+// (PRESTACIONES_DEPENDENCIA_2025), que el RDL 17/2026 NO modifica.
+
+export const NIVEL_MINIMO_PROTECCION_2026 = {
+  vigenteDesde: '2026-07-01',
+  baseNormativa: 'RDL 17/2026 (BOE-A-2026-13643), art. primero',
+  cuantiaMensualPorGrado: {
+    grado1: 90.0,
+    grado2: 260.0,
+    grado3: 660.0,
+    grado3Plus: 4930.0,
+  },
+};
 
 // ─── Prestaciones económicas SAAD 2025 (cuantías máximas €/mes) ──────────────
 // Cuantías máximas estatales. El copago reduce según capacidad económica.

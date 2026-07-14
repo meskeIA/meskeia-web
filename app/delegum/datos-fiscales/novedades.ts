@@ -23,6 +23,12 @@ export interface Novedad {
 // Sembrado con los cambios normativos reales recientes. Ampliar al mantener fichas.
 export const NOVEDADES: Novedad[] = [
   {
+    fecha: '2026-07-14',
+    fichaSlug: 'prestaciones-dependencia',
+    texto:
+      'Creado el Grado III+ de dependencia extrema, con un nivel mínimo de protección garantizado de 4.930 €/mes —frente a 90/260/660 € de los Grados I-III— desde el 1 de julio de 2026. Las cuantías de las prestaciones directas al beneficiario (PEVS/PECEF/PAP) no varían (RDL 17/2026, BOE-A-2026-13643).',
+  },
+  {
     fecha: '2026-07-01',
     fichaSlug: 'interes-legal-demora',
     texto:

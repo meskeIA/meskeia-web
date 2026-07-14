@@ -25,7 +25,7 @@
 | Resolución Secretaría Gral. del Tesoro | vía BOE | Tipo de demora comercial (Ley 3/2004) | **Semestral** (~ene y ~jul) |
 | AEAT — Novedades y calendario | https://sede.agenciatributaria.gob.es | Calendario del contribuyente, criterios, modelos | Anual + continua |
 | Seguridad Social — Revalorización | https://www.seg-social.es | RD de revalorización de pensiones, cuantías mín/máx | Anual (ene) |
-| INE — Tabla 25171 (IRAV) | https://www.ine.es/jaxiT3/Tabla.htm?t=25171 | Índice de referencia de actualización de alquileres + IPC | **Trimestral/mensual** |
+| INE — Tabla 72975 (IRAV) | https://www.ine.es/jaxiT3/Tabla.htm?t=72975 | Índice de referencia de arrendamientos de vivienda (mensual). IPC interanual: calculadora varipc (https://www.ine.es/varipc/), sistema base 2025. ⚠️ La antigua tabla 25171 sirve hoy el IPV (corregido 2026-07-14) | **Mensual** |
 | Ministerio de Educación — Becas | https://www.becaseducacion.gob.es | RD de umbrales y cuantías por curso académico | Anual (~jun-ago) |
 | IMSERSO / SAAD | https://imserso.es/el-saad/prestaciones | Cuantías de prestaciones de dependencia | Anual |
 | Consejo de Ministros (referencias) | https://www.lamoncloa.gob.es | Anticipa RDL antes de su publicación en BOE | Semanal (martes) |
@@ -53,10 +53,10 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 #### `alquiler.ts` — Actualización de rentas de alquiler
 - **Contiene**: `IRAV_POR_TRIMESTRE`, `IPC_INTERANUAL_POR_MES`, fecha de corte Ley 12/2023, helpers de conversión.
 - **Normativa**: Ley 12/2023 de Vivienda; índices INE.
-- **Vigilar**: INE tabla 25171 — publicación de nuevo dato trimestral IRAV y del IPC mensual. **Este módulo caduca solo con el paso del tiempo** aunque no cambie ninguna ley.
-- **Cadencia**: trimestral (IRAV) + mensual (IPC).
+- **Vigilar**: INE tabla 72975 (IRAV mensual) + calculadora varipc para el IPC interanual (sistema base 2025). **Este módulo caduca solo con el paso del tiempo** aunque no cambie ninguna ley. ⚠️ Ojo a las reorganizaciones de tablas del INE (jun-2026 dejó congeladas la 25171→IPV histórico y la 50902).
+- **Cadencia**: mensual (IRAV e IPC).
 - **Alerta metodológica**: cambio del índice legal de referencia (precedente real: IPC → IRAV con la Ley 12/2023; contratos pre-26/05/2023 siguen con IPC). Una nueva ley de vivienda que toque el art. de actualización de rentas es alerta máxima.
-- **Verificado**: 2026-04-01 · vigencia 2026.
+- **Verificado**: 2026-07-14 · vigencia 2026 (corregida serie IPC jun25-feb26 y fuente IRAV).
 
 #### `intereses.ts` — Interés legal, demora comercial y demora tributario
 - **Contiene**: interés legal del dinero, tipo de demora comercial por semestre (histórico), demora tributario, plazos de reclamación Ley 3/2004.
@@ -125,12 +125,12 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 - **Verificado**: 2026-06-20 · vigencia 2026.
 
 #### `dependencia.ts` — SAAD, copago y cuidadores
-- **Contiene**: grados (BVD), cuantías máximas por prestación, catálogo de servicios, copago (RD 1051/2013), convenio especial de cuidadores, deducciones IRPF por discapacidad, escala Zarit, recursos.
-- **Normativa**: Ley 39/2006 + LPGE + RD 1051/2013 + Orden ISM/835/2023.
-- **Vigilar**: cuantías SAAD en LPGE/acuerdos del Consejo Territorial; **reforma de la Ley 39/2006 en tramitación** (anteproyecto en curso — seguir su iter parlamentario).
+- **Contiene**: grados (BVD), **Grado III+ dependencia extrema (RDL 17/2026, sin baremo aún)**, **nivel mínimo de protección garantizado 2026 (90/260/660/4.930 €/mes)**, cuantías máximas por prestación, catálogo de servicios, copago (RD 1051/2013), convenio especial de cuidadores, deducciones IRPF por discapacidad, escala Zarit, recursos.
+- **Normativa**: Ley 39/2006 + LPGE + RD 1051/2013 + Orden ISM/835/2023 + RDL 17/2026.
+- **Vigilar**: cuantías SAAD en LPGE/acuerdos del Consejo Territorial; **desarrollo reglamentario del baremo del Grado III+** (el RDL 17/2026 no lo definió — cuando se publique habrá que integrarlo en GRADOS_DEPENDENCIA); despliegues autonómicos del III+ (precedente: Extremadura DL 2/2026); **reforma de la Ley 39/2006 en tramitación** (anteproyecto en curso — seguir su iter parlamentario).
 - **Cadencia**: anual + reforma legislativa pendiente.
-- **Alerta metodológica**: la reforma en tramitación puede cambiar grados, catálogo y copago → alerta máxima cuando se publique en BOE.
-- **Verificado**: 2026-03-30 · vigencia 2025-2026.
+- **Alerta metodológica**: precedente reciente = RDL 17/2026 (creó el Grado III+, detectado por el vigía en su primera pasada, 13/07/2026). La reforma en tramitación puede cambiar grados, catálogo y copago → alerta máxima cuando se publique en BOE.
+- **Verificado**: 2026-07-14 · vigencia 2025-2026.
 
 ### 3.3 Cadencia anual — bloque CCAA (leyes de medidas, dic-ene y sorpresas a mitad de año)
 
