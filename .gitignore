@@ -93,8 +93,9 @@ scripts/detectar-eventos-aula.mjs
 # Detector foso-IA (analisis interno)
 scripts/detectar-foso-ia.mjs
 
-# Digest diario analytics (analisis interno)
+# Digest diario analytics (analisis interno) + serie histórica generada
 scripts/digest-diario.mjs
+digests/
 
 # Cruce SEO — medición externa Analytics × GSC × BWT (analisis interno, skill /cruce-seo)
 scripts/cruce-seo.mjs
