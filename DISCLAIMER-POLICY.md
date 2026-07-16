@@ -2,7 +2,7 @@
 
 > **Versión**: 1.0.0 (2026-03-19)
 > **Autor**: Claude Code
-> **Aplicación**: Todas las apps de meskeIA (300+)
+> **Aplicación**: Todas las apps de meskeIA (catálogo completo)
 > **Estado**: Política oficial — aplicar en nuevas apps y en la revisión global
 
 ---

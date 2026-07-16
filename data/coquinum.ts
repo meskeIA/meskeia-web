@@ -14,7 +14,7 @@
  *
  * Curaduría Fase 1 (2026-06-26): 5 categorías pobladas con apps existentes (36).
  * Los bloques roadmap (cocción/temperatura, conservación, food cost) se añadirán
- * cuando existan las apps; ver GASTRONOMIA.md.
+ * cuando existan las apps; ver _private/GASTRONOMIA.md.
  */
 
 // Categorías del portal: slug de ruta → etiqueta visible.

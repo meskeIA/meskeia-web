@@ -14,7 +14,7 @@
  * futura vertical de Salud, igual que Stemum dejó fuera la medicina. Tampoco las
  * cronologías gastro de historia (azúcar, gastronomía…): pertenecen a Cronicum.
  * Criterio: comida como cocina/alimento = Coquinum; comida como intervención
- * clínica = Salud. Worksheet: GASTRONOMIA.md §10. Revisión periódica.
+ * clínica = Salud. Worksheet: _private/GASTRONOMIA.md §10. Revisión periódica.
  */
 export const COQUINUM_ADYACENTES: Record<string, string> = {
   'calculadora-macros': 'cocina-recetas',

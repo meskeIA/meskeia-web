@@ -63,21 +63,10 @@ desktop.ini
 scripts/generate-curso.js
 scripts/cursos-generados/
 
-# Documentos estratégicos privados (no subir al repo público)
+# Documentos estratégicos privados (no subir al repo público).
+# Regla: TODO documento interno nuevo nace en _private/ (protección por
+# ubicación, no por archivo — así no hay que recordar añadirlo aquí).
 _private/
-ESTRATEGIA-VERTICALES.md
-PLAN-ESTRATEGICO.md
-PROBE-IA-DELEGUM.md
-CRONICUM.md
-DELEGUM-SOLUCIONES.md
-NUEVASAPPSPARAMCP.md
-BACKLOG.md
-STEM.md
-GASTRONOMIA.md
-STEMUM-ADYACENTES.md
-SEO-VERTICALES.md
-DESARROLLOMCP.md
-ALGORITMOS.md
 
 # Credenciales de service accounts (Google Cloud, etc.) - NUNCA subir al repo
 .credentials/
@@ -105,6 +94,3 @@ scripts/corr-pos-clics.mjs
 scripts/corr-analisis.mjs
 scripts/corr-queries.mjs
 scripts/corr-residuos.mjs
-
-# Estudio de residuos CTR (documento interno)
-ESTUDIO-RESIDUOS-CTR.md

@@ -1,74 +1,52 @@
-# meskeIA - Next.js 16.0.3 Migration Project
+# meskeIA
 
-Proyecto de migración de 84 aplicaciones web de meskeIA desde HTML estático a Next.js con infraestructura completa pre-implementada.
+Plataforma de aplicaciones web gratuitas en español: calculadoras, conversores, simuladores, visualizadores y herramientas del día a día. Más de 1.100 aplicaciones en producción (julio 2026), sin registro y sin publicidad.
 
----
-
-## 📊 Estado Actual del Proyecto
-
-### ✅ Infraestructura Completada (5/5 Sistemas)
-
-- [x] **Dark Mode Global** - Botón flotante, persistencia localStorage
-- [x] **Componentes UI Reutilizables** - 6 componentes + Logo + Footer
-- [x] **Sistema Responsive** - 4 breakpoints, 100+ utilidades CSS, hooks React
-- [x] **PWA** - Manifest, Service Worker, 8 iconos instalados
-- [x] **Analytics v2.1** - Page Visibility API, detección PWA, BD actualizada
-
-**Inversión**: 12 horas | **Ahorro proyectado**: 294 horas (ROI: 2350%)
-
-### ✅ Aplicaciones Migradas (2/84)
-
-- [x] **calculadora-propinas** (60 min) - Template con componentes reutilizables
-- [x] **generador-contrasenas** (20 min) - Validación de protocolo optimizado
-
-**Próximas**: calculadora-fechas, calculadora-cocina, conversor-divisas
-
-### 🔄 En Progreso
-
-- [ ] Migración masiva de 82 apps restantes (~20-30 min c/u)
-- [ ] Optimización de builds estáticos
-- [ ] Dashboard Analytics v2.1 (opcional)
+**Producción**: [meskeia.com](https://meskeia.com)
 
 ---
 
-## 🚀 Comandos Disponibles
+## Ecosistema
 
-### Desarrollo Local
+Además de la web principal (horizontal), el catálogo alimenta portales verticales temáticos servidos desde el mismo repositorio mediante host-rewrite:
+
+| Portal | Dominio | Temática |
+|---|---|---|
+| Delegum | delegum.com | Fiscal, laboral y finanzas (España) |
+| Cronicum | cronicum.com | Historia interactiva (cronologías) |
+| Stemum | stemum.com | Simuladores y visualizadores STEM |
+| Coquinum | coquinum.com | Gastronomía y cocina técnica |
+
+También se exponen herramientas vía [MCP](https://meskeia.com/developers/) para asistentes de IA.
+
+## Stack
+
+- **Next.js 16** (App Router) + **React 19** + **TypeScript**
+- **CSS Modules** con dark mode completo
+- **Turso** (libSQL) para analytics propio, anónimo y agregado
+- Despliegue automático en **Vercel** (push a `main`)
+
+## Comandos
+
 ```bash
-npm run dev
+npm run dev        # desarrollo (http://localhost:3050)
+npm run build      # build de producción
+npm run lint       # ESLint
+npm run test:unit  # tests de formatters
 ```
-Servidor en http://localhost:3000
 
-### Build para Producción
-```bash
-npm run build
+## Estructura
+
 ```
-Genera archivos HTML estáticos en `out/`
+app/           # una carpeta por aplicación (App Router)
+components/    # componentes compartidos (ver components/README.md)
+data/          # catálogo, suites, relaciones, datos normativos (data/fiscal/)
+lib/           # utilidades (formato español, schema-templates)
+templates/     # plantilla base para apps nuevas
+```
+
+Las guías de desarrollo del proyecto viven en `CLAUDE.md`; la política de avisos legales en `DISCLAIMER-POLICY.md`.
 
 ---
 
-## 📚 Documentación Clave
-
-### Para Migrar Apps
-- `MIGRACION_CALCULADORA_PROPINAS.md` - Template paso a paso (checklist de 6 pasos)
-- `components/README_COMPONENTES.md` - Uso de componentes base
-
-### Deployment
-- `DEPLOYMENT_BETA.md` - Guía completa de deployment en /beta/ subdirectory
-
-### Estado del Proyecto
-- `ESTADO_PROYECTO_COMPLETO.md` - Resumen ejecutivo + métricas + ROI
-
-### Referencias Técnicas
-- `COMPONENTES_UI_README.md` - Biblioteca de 6 componentes UI
-- `RESPONSIVE_SYSTEM_README.md` - Sistema responsive completo
-- `DARK_MODE_IMPLEMENTACION.md` - Sistema de temas
-- `PWA_ANALYTICS_README.md` - PWA + Analytics v2.1
-- `FASE_5_SEO_OPTIMIZACION.md` - SEO y metadata
-- `DOCS_INDEX.md` - Índice completo de documentación
-
----
-
-**Última actualización**: 27 de febrero de 2026
-**Estado**: Web operativa en producción (meskeia.com)
-**Servidor**: http://localhost:3000 (activo)
+**Última actualización**: julio 2026

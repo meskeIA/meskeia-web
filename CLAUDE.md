@@ -589,7 +589,7 @@ git push origin main
 - **Disclaimers**: `DISCLAIMER-POLICY.md` (política completa — niveles, textos, colapsabilidad)
 - **Componentes**: `components/README.md`
 - **Templates**: `templates/README.md`
-- **CHANGELOG**: `CHANGELOG.md` (historial completo)
+- **Historial de cambios**: `git log` (CHANGELOG.md congelado en feb-2026)
 
 ---
 
@@ -597,7 +597,7 @@ git push origin main
 
 **Versión actual**: 1.7.0 (2026-07-16) - Homogeneización del ecosistema .claude (cifras vivas, timeout único 600000ms, TypeScript real, CSP enforced)
 
-**Ver historial completo**: `CHANGELOG.md`
+**Historial completo**: `git log` (CHANGELOG.md congelado en feb-2026)
 
 ---
 

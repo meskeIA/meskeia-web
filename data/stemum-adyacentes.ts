@@ -11,7 +11,7 @@
  * CURADO MANUAL (no hay señal autodeclarada como el RegionBadge de Delegum).
  * Excluida a propósito la temática médica/fisiológica (Stemum no tiene contenido
  * de medicina; iría a una futura vertical de Salud) y el ruido no-STEM.
- * Worksheet de selección: STEMUM-ADYACENTES.md (local). Revisión periódica.
+ * Worksheet de selección: _private/archivo/STEMUM-ADYACENTES.md (local). Revisión periódica.
  */
 export const STEMUM_ADYACENTES: Record<string, string> = {
   // ── Química ──

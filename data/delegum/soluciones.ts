@@ -12,7 +12,7 @@
  *
  * Catálogo curado: marca pertenencia al universo Delegum. NO es exhaustivo por
  * diseño (lo no cubierto se alcanza por buscador / asistente / cross-links).
- * Decisiones y dudas abiertas: ver DELEGUM-SOLUCIONES.md.
+ * Decisiones y dudas abiertas: ver _private/archivo/DELEGUM-SOLUCIONES.md.
  */
 
 export type GrupoPuerta = 'particular' | 'profesional';

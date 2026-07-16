@@ -42,7 +42,7 @@ const out = `// AUTO-GENERADO por scripts/generate-delegum-es.mjs — NO editar 
 // Apps que se autodeclaran "fiscal-España" mediante <RegionBadge es-only|es-data>.
 // Se regenera en cada build. Lo consume DescubreVertical para mostrar la banda
 // de descubrimiento de Delegum en apps ES que NO están en la curaduría de
-// Soluciones (enlace a soluciones home). Ver DELEGUM-SOLUCIONES.md.
+// Soluciones (enlace a soluciones home). Ver _private/archivo/DELEGUM-SOLUCIONES.md.
 export const APPS_REGION_ES: ReadonlySet<string> = new Set([
 ${body}
 ]);

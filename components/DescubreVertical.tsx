@@ -22,7 +22,7 @@
  *               (2) app fiscal-España NO curada (APPS_REGION_ES, autogenerado
  *                   del marcador RegionBadge es-only/es-data): enlaza a la home
  *                   de Soluciones sin engordar la curaduría (ver
- *                   DELEGUM-SOLUCIONES.md: fachada mínima, no exhaustiva).
+ *                   _private/archivo/DELEGUM-SOLUCIONES.md: fachada mínima, no exhaustiva).
  *
  * Es 100% automático (se apoya en los registros existentes; cubre el catálogo
  * del vertical sin editar página por página) y se inyecta una sola vez desde
@@ -196,7 +196,7 @@ function resolverBanda(pathname: string, isStemum: boolean, isCoquinum: boolean)
 
   // ── Delegum (genérico) ── app fiscal-España (RegionBadge es-only/es-data) que
   // NO está en la curaduría de Soluciones. Para no engordar el directorio
-  // (decisión cerrada en DELEGUM-SOLUCIONES.md: fachada mínima, no exhaustiva),
+  // (decisión cerrada en _private/archivo/DELEGUM-SOLUCIONES.md: fachada mínima, no exhaustiva),
   // estas apps no se añaden a una puerta: solo invitan a descubrir el catálogo,
   // enlazando a la home de Soluciones. APPS_REGION_ES se autogenera en el build.
   if (APPS_REGION_ES.has(segs[0] ?? '')) {

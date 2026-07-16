@@ -1,6 +1,11 @@
 # CHANGELOG - meskeIA Web
 
-Historial completo de cambios del proyecto meskeia-web (Next.js 16.0.3).
+> ⚠️ **CONGELADO (2026-07-16)**: este changelog se mantuvo hasta febrero de 2026 y no
+> registra los hitos posteriores (verticales Delegum/Cronicum/Stemum/Coquinum, MCP,
+> analytics con rollup, +1.100 apps). Desde entonces la fuente del historial es
+> **`git log`** — los mensajes de commit siguen la convención feat/fix/refactor/docs/chore.
+
+Historial de cambios del proyecto meskeia-web hasta 2026-02 (entonces Next.js 16.0.3).
 
 ---
 
