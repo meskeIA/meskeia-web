@@ -84,9 +84,9 @@ Cuando los datos no existan aún, **crear el módulo correspondiente** en `data/
 
 Ruta dinámica para cronologías históricas. Cada historia = un archivo `data/historias/[slug].ts` + registro en `data/historias/index.ts`.
 
-### Slugs activos (2026-05-03)
+### Slugs activos
 
-`grecia`, `roma`, `egipto`, `mesopotamia`, `otomano`, `mongol`
+Catálogo cerrado (2026-05-09) con ~170 archivos en `data/historias/` — la lista viva está en `data/historias/index.ts`, NO mantener listas de slugs en docs. Las cronologías se sirven también en el vertical CRONICUM (`cronicum.com`, host-rewrite); una cronología nueva requiere además registrar su slug en `data/cronicum/puertas.ts` o no aparece en el portal.
 
 ### Workflow óptimo: crear múltiples historias en paralelo
 
@@ -150,13 +150,11 @@ Las Guías son **landing pages** que agrupan herramientas para un **proceso de d
 - **5-7 herramientas**: Apps meskeIA existentes que cubren el proceso
 - **Audiencia amplia**: No nichos técnicos específicos
 
-### Guías implementadas (3)
+### Guías implementadas
 
-| Guía | URL | Herramientas |
-|------|-----|--------------|
-| Comprar Casa | `/guia/comprar-casa/` | 5 |
-| Freelance | `/guia/freelance/` | 3 |
-| Invertir | `/guia/invertir/` | 4 |
+15 guías-journey en `app/guia/*/` — la lista viva está en `data/guides-journey.ts`, NO mantener tablas de guías en docs.
+
+**Registro de una guía nueva (2 archivos OBLIGATORIOS)**: `app/guia/page.tsx` (array `guias`) + `data/guides-journey.ts` (array `guidesJourney`). Olvidar el segundo = la guía no aparece.
 
 **Ver**: `app/guia/*/` para ejemplos completos
 
@@ -328,9 +326,9 @@ Las nuevas apps se crean **siempre en dos fases**. La fase 2 es inmediata, no op
 [ ] 10. Build final, commit y push a GitHub
 ```
 
-**Excepción**: Cursos (`/curso-*`) y Guías (`/guia/*`) están excluidos del patrón v2.0 por tener estructura propia. Juegos y ocio → patrón lite (ver `PROFESIONALIZACION.md`).
+**Excepción**: Cursos (`/curso-*`) y Guías (`/guia/*`) están excluidos del patrón v2.0 por tener estructura propia. Juegos y ocio → patrón lite (ver `_private/PROFESIONALIZACION.md`).
 
-**Instrucciones técnicas completas del patrón v2.0**: `PROFESIONALIZACION.md`
+**Instrucciones técnicas completas del patrón v2.0**: `_private/PROFESIONALIZACION.md` (carpeta local, excluida del deploy)
 
 ### 3. Creación de múltiples apps en paralelo (agentes)
 
@@ -450,9 +448,8 @@ cp templates/trpc-router.template.ts server/routers/mi-router.ts
 
 ### Ejemplo Real: dashboard-analytics
 
-**Migrado a tRPC** como prueba de concepto:
-- ✅ Build sin errores (434 páginas)
-- ✅ Funcionando en producción
+**Migrado a tRPC** como prueba de concepto (2026):
+- ✅ Funcionando en producción (protegido con `protectedProcedure` + clave `x-analytics-key`)
 - ✅ Type-safety completo
 - ✅ Reducción código ~40%
 
@@ -460,11 +457,13 @@ cp templates/trpc-router.template.ts server/routers/mi-router.ts
 
 ## Seguridad y Calidad del Código
 
-### TypeScript Estricto (desde 2026-02-06)
+### TypeScript
 
-- `ignoreBuildErrors: false` en `next.config.ts`
-- 0 errores TypeScript en todo el proyecto
+- ⚠️ `ignoreBuildErrors: true` en `next.config.ts` — el build de producción NO type-chequea (limitación de RAM en Vercel: el type-check de +1.100 apps agota los 8 GB)
+- Validación de tipos SIEMPRE en local: `npx tsc --noEmit` antes de commitear cambios sustanciales
+- Objetivo: 0 errores TypeScript en todo el proyecto
 - Archivos de tipos custom en `types/`
+- Casts conocidos: Chart.js → `as never`, jStat → `Record`, libs sin tipos → `.d.ts` en `types/`
 
 ### Cabeceras de Seguridad HTTP
 
@@ -476,9 +475,9 @@ Configuradas en **dos capas** (`next.config.ts` + `vercel.json`):
 | `X-Content-Type-Options: nosniff` | Anti-MIME sniffing |
 | `Referrer-Policy` | Control de referrer |
 | `Permissions-Policy` | Bloquear APIs innecesarias |
-| `CSP-Report-Only` | Monitor CSP (pendiente enforcement) |
+| `Content-Security-Policy` | **CSP ENFORCED** (bloquea; `media-src` incluye `blob:`) |
 
-**PENDIENTE**: Cambiar CSP de report-only a enforcement tras verificar sin violaciones.
+⚠️ La CSP está en modo enforcement desde 2026 — cualquier recurso externo nuevo debe añadirse a la política o será bloqueado en producción.
 
 ### CORS en API Routes
 
@@ -495,8 +494,8 @@ Todas las API routes restringidas a `meskeia.com` (no `*`).
 ### Protocolo correcto
 
 ```bash
-# UN solo build, con timeout de 3 minutos (180000ms)
-npm run build  # timeout: 180000
+# UN solo build, con timeout de 10 minutos (600000ms) — valor canónico único
+npm run build  # timeout: 600000
 
 # Si falla → diagnosticar error → corregir → UN solo rebuild
 # Si el build se queda "colgado" → verificar si .next/lock existe sin proceso node activo
@@ -504,11 +503,11 @@ npm run build  # timeout: 180000
 
 ### Reglas estrictas
 
-1. **Timeout de 3 minutos** (180000ms) para `npm run build`. El proyecto (535 apps, 792 páginas) tarda ~80 segundos en el PC actual (i7-14700/32GB). NO asumir que ha fallado antes de ese tiempo.
+1. **Timeout de 10 minutos** (600000ms) para `npm run build` — valor canónico en todo el ecosistema (docs, skills, memoria). El proyecto (+1.100 apps) tarda ~1-2 minutos en el PC actual (i7-14700/32GB); el margen extra cubre builds fríos. NO asumir que ha fallado antes de ese tiempo.
 2. **NUNCA lanzar builds en paralelo** — ni siquiera `npx tsc --noEmit` mientras un build está corriendo.
 3. **NUNCA reintentar un build sin verificar primero** que el anterior ha terminado (comprobar si `.next/lock` existe).
 4. **Si hay lock stale** (lock existe pero no hay proceso `next build` activo): eliminar con `rm -f .next/lock` y ENTONCES hacer UN solo build.
-5. **No usar `run_in_background`** para builds — ejecutar siempre en foreground con timeout de 180000ms para poder ver el resultado directamente.
+5. **No usar `run_in_background`** para builds — ejecutar siempre en foreground con timeout de 600000ms para poder ver el resultado directamente.
 
 ---
 
@@ -521,12 +520,15 @@ npm run build  # timeout: 180000
 
 ### Proceso
 
+> Política vigente (2026-07-16): commit + push + deploy automático en el mismo flujo.
+> No agrupar pushes salvo petición expresa del usuario.
+
 ```bash
-# 1. Verificar build (timeout 10 min)
+# 1. Verificar build (timeout 10 min / 600000ms)
 npm run build
 
-# 2. Commit
-git add .
+# 2. Commit — staging selectivo, NUNCA git add . ni git add -A
+git add app/ components/ data/ lib/ public/ types/ server/ templates/
 git commit -m "feat: descripción del cambio"
 
 # 3. Push (Vercel despliega automáticamente)
@@ -544,6 +546,8 @@ git push origin main
 - `/api/analytics/stats` - Obtener estadísticas
 - `/api/analytics/duration` - Actualizar duración
 - `/api/analytics/ip-filter` - Gestionar IP excluida
+- `/api/analytics/csp-violations` - Recibir informes CSP
+- `/api/analytics/rollup` - Rollup/agregación Turso
 
 ---
 
@@ -591,11 +595,11 @@ git push origin main
 
 ## Control de versiones
 
-**Versión actual**: 1.6.0 (2026-03-19) - Política de Disclaimers
+**Versión actual**: 1.7.0 (2026-07-16) - Homogeneización del ecosistema .claude (cifras vivas, timeout único 600000ms, TypeScript real, CSP enforced)
 
 **Ver historial completo**: `CHANGELOG.md`
 
 ---
 
-**Última actualización**: 2026-03-19
+**Última actualización**: 2026-07-16
 **Proyecto**: meskeIA Web (https://meskeia.com)
