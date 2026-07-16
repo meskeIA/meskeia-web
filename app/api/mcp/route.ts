@@ -10,6 +10,7 @@
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js';
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { z } from 'zod';
 import { calcularPropina, obtenerPorcentajePais, PROPINAS_POR_PAIS } from '@/lib/calculadoras/propinas';
 import { calcularPorcentaje, type ModoPorcentaje } from '@/lib/calculadoras/porcentajes';
@@ -65,11 +66,50 @@ import {
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
 // ---------------------------------------------------------------------------
+// Contexto por petición con los datos del CLIENTE real (User-Agent, IP
+// anonimizada, país). El fetch interno de analytics sale con la IP de la
+// propia función Vercel (AWS us-east-1), así que sin este contexto es
+// imposible saber quién llama al MCP. AsyncLocalStorage propaga el dato
+// hasta las tools sin cambiar sus firmas y es seguro con concurrencia.
+interface ClienteMcp {
+  ua: string | null;
+  ip: string | null;
+  pais: string | null;
+}
+const contextoCliente = new AsyncLocalStorage<ClienteMcp>();
+
+// RGPD: truncar último octeto (IPv4) o últimos 80 bits (IPv6),
+// mismo criterio que /api/analytics/track.
+function anonimizarIpCliente(ip: string): string {
+  if (ip.includes('.') && !ip.includes(':')) {
+    const partes = ip.split('.');
+    if (partes.length === 4) {
+      partes[3] = '0';
+      return partes.join('.');
+    }
+  }
+  if (ip.includes(':')) {
+    const partes = ip.split(':');
+    if (partes.length >= 4) return partes.slice(0, 3).join(':') + '::';
+  }
+  return 'anonymous';
+}
+
+function extraerCliente(req: Request): ClienteMcp {
+  const rawIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || null;
+  return {
+    ua: req.headers.get('user-agent')?.slice(0, 200) ?? null,
+    pais: req.headers.get('x-vercel-ip-country'),
+    ip: rawIp ? anonimizarIpCliente(rawIp) : null,
+  };
+}
+
 async function registrarUsoMCP(tool: string, aiCaller: string): Promise<void> {
   try {
     // Usamos el dominio canónico — VERCEL_URL devuelve la URL del deployment, no el custom domain
     const baseUrl = 'https://meskeia.com';
 
+    const cliente = contextoCliente.getStore();
     await fetch(`${baseUrl}/api/analytics/track`, {
       method: 'POST',
       headers: {
@@ -80,7 +120,12 @@ async function registrarUsoMCP(tool: string, aiCaller: string): Promise<void> {
       body: JSON.stringify({
         aplicacion: `mcp:${tool}`,   // campo correcto que espera el endpoint
         modo: 'mcp',
-        datos_adicionales: { aiCaller },
+        datos_adicionales: {
+          aiCaller,
+          uaCliente: cliente?.ua ?? null,
+          ipCliente: cliente?.ip ?? null,
+          paisCliente: cliente?.pais ?? null,
+        },
       }),
     });
   } catch {
@@ -2242,15 +2287,19 @@ function crearServidorMCP(): McpServer {
 // Handler Next.js App Router — stateless (una instancia por petición)
 // ---------------------------------------------------------------------------
 async function handler(req: Request): Promise<Response> {
-  const transport = new WebStandardStreamableHTTPServerTransport({
-    sessionIdGenerator: undefined, // stateless: sin gestión de sesión
-    enableJsonResponse: true,      // respuesta JSON simple (sin SSE)
+  // El contexto del cliente queda disponible para registrarUsoMCP
+  // durante toda la ejecución de la petición (incluidas las tools).
+  return contextoCliente.run(extraerCliente(req), async () => {
+    const transport = new WebStandardStreamableHTTPServerTransport({
+      sessionIdGenerator: undefined, // stateless: sin gestión de sesión
+      enableJsonResponse: true,      // respuesta JSON simple (sin SSE)
+    });
+
+    const servidor = crearServidorMCP();
+    await servidor.connect(transport);
+
+    return transport.handleRequest(req);
   });
-
-  const servidor = crearServidorMCP();
-  await servidor.connect(transport);
-
-  return transport.handleRequest(req);
 }
 
 // GET abre SSE stream — incompatible con Vercel serverless (timeout). Devolver 405

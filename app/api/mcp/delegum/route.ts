@@ -16,6 +16,7 @@
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js';
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { z } from 'zod';
 
 // ── Calculadoras compartidas (fiscal / laboral / financiero) ──────────────────
@@ -96,8 +97,47 @@ import {
 // Analytics: reutilizamos el mismo sistema que las apps web y el MCP meskeIA.
 // Prefijamos con «delegum:» para distinguir el tráfico de Delegum en el panel.
 // ---------------------------------------------------------------------------
+// Contexto por petición con los datos del CLIENTE real (User-Agent, IP
+// anonimizada, país). El fetch interno de analytics sale con la IP de la
+// propia función Vercel (AWS us-east-1), así que sin este contexto es
+// imposible saber quién llama al MCP. AsyncLocalStorage propaga el dato
+// hasta las tools sin cambiar sus firmas y es seguro con concurrencia.
+interface ClienteMcp {
+  ua: string | null;
+  ip: string | null;
+  pais: string | null;
+}
+const contextoCliente = new AsyncLocalStorage<ClienteMcp>();
+
+// RGPD: truncar último octeto (IPv4) o últimos 80 bits (IPv6),
+// mismo criterio que /api/analytics/track.
+function anonimizarIpCliente(ip: string): string {
+  if (ip.includes('.') && !ip.includes(':')) {
+    const partes = ip.split('.');
+    if (partes.length === 4) {
+      partes[3] = '0';
+      return partes.join('.');
+    }
+  }
+  if (ip.includes(':')) {
+    const partes = ip.split(':');
+    if (partes.length >= 4) return partes.slice(0, 3).join(':') + '::';
+  }
+  return 'anonymous';
+}
+
+function extraerCliente(req: Request): ClienteMcp {
+  const rawIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || null;
+  return {
+    ua: req.headers.get('user-agent')?.slice(0, 200) ?? null,
+    pais: req.headers.get('x-vercel-ip-country'),
+    ip: rawIp ? anonimizarIpCliente(rawIp) : null,
+  };
+}
+
 async function registrarUsoDelegum(tool: string, aiCaller: string): Promise<void> {
   try {
+    const cliente = contextoCliente.getStore();
     const baseUrl = 'https://meskeia.com';
     await fetch(`${baseUrl}/api/analytics/track`, {
       method: 'POST',
@@ -108,7 +148,13 @@ async function registrarUsoDelegum(tool: string, aiCaller: string): Promise<void
       body: JSON.stringify({
         aplicacion: `mcp:delegum:${tool}`,
         modo: 'mcp',
-        datos_adicionales: { aiCaller, servidor: 'delegum' },
+        datos_adicionales: {
+          aiCaller,
+          servidor: 'delegum',
+          uaCliente: cliente?.ua ?? null,
+          ipCliente: cliente?.ip ?? null,
+          paisCliente: cliente?.pais ?? null,
+        },
       }),
     });
   } catch {
@@ -2490,15 +2536,19 @@ function crearServidorDelegum(): McpServer {
 // Handler HTTP — mismo patrón stateless que el MCP meskeIA (apto Vercel).
 // ---------------------------------------------------------------------------
 async function handler(req: Request): Promise<Response> {
-  const transport = new WebStandardStreamableHTTPServerTransport({
-    sessionIdGenerator: undefined, // stateless: sin gestión de sesión
-    enableJsonResponse: true,      // respuesta JSON simple (sin SSE)
+  // El contexto del cliente queda disponible para registrarUsoDelegum
+  // durante toda la ejecución de la petición (incluidas las tools).
+  return contextoCliente.run(extraerCliente(req), async () => {
+    const transport = new WebStandardStreamableHTTPServerTransport({
+      sessionIdGenerator: undefined, // stateless: sin gestión de sesión
+      enableJsonResponse: true,      // respuesta JSON simple (sin SSE)
+    });
+
+    const servidor = crearServidorDelegum();
+    await servidor.connect(transport);
+
+    return transport.handleRequest(req);
   });
-
-  const servidor = crearServidorDelegum();
-  await servidor.connect(transport);
-
-  return transport.handleRequest(req);
 }
 
 // GET abre SSE stream — incompatible con Vercel serverless. Devolver 405.
