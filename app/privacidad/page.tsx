@@ -44,7 +44,7 @@ export default function PrivacidadPage() {
         <article className={styles.legalDocument}>
           <div className={styles.documentHeader}>
             <h1 className={styles.documentTitle}>Política de Privacidad</h1>
-            <p className={styles.lastUpdated}>Última actualización: 4 de junio de 2026</p>
+            <p className={styles.lastUpdated}>Última actualización: 16 de julio de 2026</p>
           </div>
 
           <InfoBox type="success" title="COMPROMISO DE PRIVACIDAD" icon="🔒">
@@ -146,14 +146,33 @@ export default function PrivacidadPage() {
 
           <h2>6. Terceros y Procesadores</h2>
 
-          <InfoBox type="info" title="ÚNICO PROCESADOR EXTERNO" icon="🔗">
-            <p><strong>Turso</strong> (turso.tech) es el único servicio externo que procesa datos en nombre de meskeIA. Actúa como base de datos para las estadísticas de uso anónimas descritas en la sección 4.</p>
+          <InfoBox type="info" title="PROCESADORES EXTERNOS" icon="🔗">
+            <p><strong>meskeIA utiliza únicamente dos proveedores externos que procesan datos en su nombre</strong>, cada uno con una finalidad concreta y limitada:</p>
             <ul>
-              <li>Los datos transferidos a Turso son <strong>exclusivamente estadísticas anónimas y agregadas</strong></li>
+              <li>
+                <strong>Turso</strong> (turso.tech, datos alojados en la Unión Europea — región EU West):
+                base de datos de las estadísticas de uso <strong>anónimas y agregadas</strong> descritas
+                en la sección 4. Los datos transferidos son exclusivamente estadísticas anónimas, nunca
+                información personal identificable.
+              </li>
+              <li>
+                <strong>Resend, Inc.</strong> (resend.com, EE. UU.) <strong>y sus subencargados</strong>:
+                proveedor de envío de correo electrónico. Interviene <strong>únicamente</strong> cuando
+                usted utiliza el <a href="/contacto">formulario de contacto</a>, para hacer llegar su
+                mensaje a nuestro buzón. El formulario <strong>no solicita nombre ni dirección de correo</strong>:
+                solo se transmiten el asunto y el texto que usted escribe voluntariamente.
+              </li>
+            </ul>
+            <p><strong>Garantías comunes a ambos:</strong></p>
+            <ul>
               <li>meskeIA <strong>no vende, cede ni comparte</strong> ningún dato con terceros con fines comerciales o publicitarios</li>
               <li>No se utilizan servicios de analítica de terceros (Google Analytics u otros) que instalen scripts en su navegador</li>
               <li>El servidor MCP no transfiere datos de usuario a ningún servicio externo adicional</li>
             </ul>
+          </InfoBox>
+
+          <InfoBox type="info" title="TRANSFERENCIAS INTERNACIONALES" icon="🌍">
+            <p>El proveedor de envío de correo (Resend) está ubicado en <strong>Estados Unidos</strong> y puede apoyarse en sus propios subencargados. Estas transferencias fuera del Espacio Económico Europeo se amparan en las <strong>garantías previstas en el RGPD</strong> (cláusulas contractuales tipo de la Comisión Europea y, en su caso, el marco EU-US Data Privacy Framework). El resto del tratamiento (estadísticas en Turso) se realiza con alojamiento de datos dentro de la Unión Europea.</p>
           </InfoBox>
 
           <h2>7. Sus Derechos (RGPD)</h2>
