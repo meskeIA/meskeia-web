@@ -14,7 +14,7 @@ interface DisclaimerCardProps {
   children?: ReactNode;
   showTermsLink?: boolean;
   /**
-   * Política de disclaimers meskeIA (DISCLAIMER-POLICY.md):
+   * Política de disclaimers meskeIA (_private/DISCLAIMER-POLICY.md):
    * - severity "critical" o "high" → collapsible ignorado, siempre expandido
    * - severity "medium" → si true, usa sessionStorage (se expande en cada sesión)
    * - severity "low" → si true, usa localStorage (persiste entre sesiones)
@@ -142,7 +142,7 @@ export default function DisclaimerCard({
   );
 }
 
-// Contenido estándar según variante y severidad (DISCLAIMER-POLICY.md)
+// Contenido estándar según variante y severidad (_private/DISCLAIMER-POLICY.md)
 function DefaultContent({
   variant,
   severity,

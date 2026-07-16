@@ -162,7 +162,7 @@ Las Guías son **landing pages** que agrupan herramientas para un **proceso de d
 
 ## Política de Disclaimers (OBLIGATORIO)
 
-**Documento completo**: `DISCLAIMER-POLICY.md` — leer SIEMPRE antes de crear una app.
+**Documento completo**: `_private/DISCLAIMER-POLICY.md` — leer SIEMPRE antes de crear una app.
 
 ### Resumen ejecutivo
 
@@ -200,7 +200,7 @@ import { FISCAL_IRPF_META } from '@/data/fiscal';
 />
 ```
 
-**Nivel por defecto de cada suite** → ver tabla completa en `DISCLAIMER-POLICY.md`.
+**Nivel por defecto de cada suite** → ver tabla completa en `_private/DISCLAIMER-POLICY.md`.
 
 ---
 
@@ -299,7 +299,7 @@ Tras revisión global de 189 apps en 2026-05-12 (~400 correcciones aplicadas en 
 
 9. **Glamourización del alcohol como saludable** ("paradoja francesa", "vino cardioprotector", "una copa al día"). Refutado por WHO 2023; el alcohol es carcinógeno Grupo 1 IARC. Si aparece como dato histórico, matizar inmediatamente.
 
-10. **Disclaimer incoherente con el riesgo real**. Ej: melatonina con `severity="low"` (es medicamento >1,9mg en España); guía de cócteles sin DisclaimerCard de alcohol cuando vino y cerveza sí lo tienen. Antes de decidir severity, releer `DISCLAIMER-POLICY.md`.
+10. **Disclaimer incoherente con el riesgo real**. Ej: melatonina con `severity="low"` (es medicamento >1,9mg en España); guía de cócteles sin DisclaimerCard de alcohol cuando vino y cerveza sí lo tienen. Antes de decidir severity, releer `_private/DISCLAIMER-POLICY.md`.
 
 **Cómo usarlo**: autocontrol al generar contenido. No es checklist obligatorio sino señales de alerta. Si algún antipatrón aplica al texto que estás escribiendo, formúlalo de forma neutra desde el inicio — es más fácil que corregirlo después.
 
@@ -586,10 +586,10 @@ git push origin main
 ## Para instrucciones completas
 
 - **Global**: `~/.claude/CLAUDE.md` (reglas universales)
-- **Disclaimers**: `DISCLAIMER-POLICY.md` (política completa — niveles, textos, colapsabilidad)
+- **Disclaimers**: `_private/DISCLAIMER-POLICY.md` (política completa — niveles, textos, colapsabilidad)
 - **Componentes**: `components/README.md`
 - **Templates**: `templates/README.md`
-- **Historial de cambios**: `git log` (CHANGELOG.md congelado en feb-2026)
+- **Historial de cambios**: `git log` (CHANGELOG histórico archivado en `_private/archivo/`)
 
 ---
 
@@ -597,7 +597,7 @@ git push origin main
 
 **Versión actual**: 1.7.0 (2026-07-16) - Homogeneización del ecosistema .claude (cifras vivas, timeout único 600000ms, TypeScript real, CSP enforced)
 
-**Historial completo**: `git log` (CHANGELOG.md congelado en feb-2026)
+**Historial completo**: `git log` (CHANGELOG histórico archivado en `_private/archivo/`)
 
 ---
 

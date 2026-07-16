@@ -31,7 +31,7 @@ interface DataReferenceProps {
  *     urlOficial={FISCAL_IRPF_META.urlOficial}
  *   />
  *
- * Ver: DISCLAIMER-POLICY.md — sección 6
+ * Ver: _private/DISCLAIMER-POLICY.md — sección 6
  */
 export default function DataReference({
   normativa,

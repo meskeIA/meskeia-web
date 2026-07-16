@@ -9,7 +9,7 @@
  *   node scripts/audit-disclaimers.mjs --solo-criticos
  *   node scripts/audit-disclaimers.mjs --json > informe.json
  *
- * Referencia: DISCLAIMER-POLICY.md
+ * Referencia: _private/DISCLAIMER-POLICY.md
  */
 
 import fs from 'fs';
@@ -25,7 +25,7 @@ const soloCriticos = process.argv.includes('--solo-criticos');
 const modoJSON = process.argv.includes('--json');
 
 // ============================================================
-// POLÍTICA DE NIVELES (DISCLAIMER-POLICY.md)
+// POLÍTICA DE NIVELES (_private/DISCLAIMER-POLICY.md)
 // ============================================================
 
 // Nivel por defecto de cada suite
@@ -47,7 +47,7 @@ const SUITE_LEVEL = {
 };
 
 // ============================================================
-// EXCEPCIONES REVISADAS MANUALMENTE (DISCLAIMER-POLICY.md)
+// EXCEPCIONES REVISADAS MANUALMENTE (_private/DISCLAIMER-POLICY.md)
 // ============================================================
 
 // Apps con nivel aprobado manualmente (distinto del cálculo automático por suites)
@@ -378,7 +378,7 @@ function main() {
 
   console.log('\n═══════════════════════════════════════════════════════════');
   console.log('  AUDITORÍA DE DISCLAIMERS — meskeIA');
-  console.log(`  ${new Date().toLocaleDateString('es-ES')}  ·  Política: DISCLAIMER-POLICY.md`);
+  console.log(`  ${new Date().toLocaleDateString('es-ES')}  ·  Política: _private/DISCLAIMER-POLICY.md`);
   console.log('═══════════════════════════════════════════════════════════\n');
 
   console.log(`📊 RESUMEN`);
