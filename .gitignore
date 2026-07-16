@@ -89,8 +89,3 @@ digests/
 # Cruce SEO — medición externa Analytics × GSC × BWT (analisis interno, skill /cruce-seo)
 scripts/cruce-seo.mjs
 
-# Correlacion posicion-clics (analisis interno)
-scripts/corr-pos-clics.mjs
-scripts/corr-analisis.mjs
-scripts/corr-queries.mjs
-scripts/corr-residuos.mjs
