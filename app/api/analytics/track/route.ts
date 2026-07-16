@@ -204,6 +204,33 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // ── Canal MCP: separar clientes de IA reales de escáneres/scripts ──
+    //
+    // Las tools MCP (meskeIA y Delegum) se registran vía fetch interno con
+    // modo='mcp' y guardan en datos_adicionales.uaCliente el User-Agent HTTP REAL
+    // del cliente que llamó a /api/mcp/*. Los asistentes de IA legítimos se
+    // identifican con un UA de producto (openai-mcp, MistralAI-MCPClient, claude…);
+    // los escáneres de directorios y los scripts de evaluación llegan SIN UA o con
+    // el de una librería HTTP genérica (python-httpx, curl, Go-http-client…). Estos
+    // NO son adopción real: se marcan como 'bot' para que el rollup y la tabla de
+    // dominios los excluyan de TOTAL REAL, igual que la granja headless web.
+    //
+    // Verificado en datos reales (2026-07-16): un escáner recorrió las 42 tools de
+    // Delegum ~424 veces (python-httpx desde 1 IP + una oleada previa sin UA) frente
+    // a 2 llamadas reales (openai-mcp desde ES, MistralAI-MCPClient desde SE). El
+    // discriminador fiable es uaCliente (el handshake aiCaller viene "desconocido").
+    // Vigilancia: si aparece una firma de automatización nueva, añadirla al regex.
+    const MCP_AUTOMATION_UA =
+      /python-httpx|python-requests|aiohttp|urllib|libwww|^curl|Wget|Go-http-client|okhttp|axios|node-fetch|undici|Apache-HttpClient|^Java\/|Scrapy|PostmanRuntime|insomnia|HTTPie/i;
+    if (modo === 'mcp' && datos.datos_adicionales && typeof datos.datos_adicionales === 'object') {
+      const dad = datos.datos_adicionales as Record<string, unknown>;
+      const uaCliente = typeof dad.uaCliente === 'string' ? dad.uaCliente : '';
+      if (!uaCliente.trim() || MCP_AUTOMATION_UA.test(uaCliente)) {
+        modo = 'bot';
+        dad.botReason = 'mcp-automation'; // rastro para auditar sin confundir con la granja web
+      }
+    }
+
     // RGPD: Geolocalización solo país, vía headers de Vercel (sin servicios externos)
     // Siempre código ISO alpha-2 (x-vercel-ip-country) para consistencia en DB
     const pais = request.headers.get('x-vercel-ip-country') || null;
