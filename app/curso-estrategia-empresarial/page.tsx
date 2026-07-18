@@ -186,7 +186,7 @@ export default function CursoEstrategiaEmpresarialPage() {
       <section className={styles.resourcesSection}>
         <h2 className={styles.sectionTitle}><span aria-hidden="true">🔧</span> Herramientas Relacionadas</h2>
         <div className={styles.resourcesGrid}>
-          <Link href="/calculadora-roi-marketing" className={styles.resourceCard}>
+          <Link href="/estimador-roi-marketing/" className={styles.resourceCard}>
             <span className={styles.resourceIcon} aria-hidden="true">📊</span>
             <div className={styles.resourceName}>Calculadora ROI</div>
             <div className={styles.resourceDesc}>Mide el retorno de tus inversiones</div>

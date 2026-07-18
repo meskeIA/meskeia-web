@@ -330,16 +330,16 @@ export default function GuiaAccesibilidadPage() {
           <span aria-hidden="true">📚</span> Más recursos de accesibilidad
         </h2>
         <div className={styles.resourcesGrid}>
-          <Link href="/suite/accesibilidad/" className={styles.resourceCard}>
+          <div className={styles.resourceCard}>
             <span className={styles.resourceIcon} aria-hidden="true">♿</span>
             <div>
               <h3 className={styles.resourceTitle}>Suite Accesibilidad e Inclusión</h3>
               <p className={styles.resourceDescription}>
-                Catálogo completo con las 15 herramientas de accesibilidad disponibles en meskeIA.
+                Herramientas de accesibilidad e inclusión disponibles en meskeIA para
+                autismo, TDAH, dislexia y discapacidad.
               </p>
-              <span className={styles.resourceCta}>Ver todas →</span>
             </div>
-          </Link>
+          </div>
           <div className={styles.resourceCard}>
             <span className={styles.resourceIcon} aria-hidden="true">🔒</span>
             <div>

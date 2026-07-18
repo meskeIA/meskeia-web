@@ -202,7 +202,7 @@ export default function CursoMarketingDigitalPage() {
             <div className={styles.resourceName}>Analizador GEO/AEO</div>
             <div className={styles.resourceDesc}>Optimiza para ChatGPT, Perplexity y Gemini</div>
           </Link>
-          <Link href="/calculadora-roi-marketing" className={styles.resourceCard}>
+          <Link href="/estimador-roi-marketing/" className={styles.resourceCard}>
             <span className={styles.resourceIcon} aria-hidden="true">📊</span>
             <div className={styles.resourceName}>Calculadora ROI Marketing</div>
             <div className={styles.resourceDesc}>Mide el retorno de tus campañas</div>
