@@ -133,6 +133,21 @@ const nextConfig: NextConfig = {
       // meskeia.com por implementación, pero la URL canónica es cronicum.com/*.
       { source: '/cronicum', has, destination: 'https://cronicum.com/', permanent: true },
       { source: '/cronicum/:path*', has, destination: 'https://cronicum.com/:path*', permanent: true },
+
+      // Recuperación de 404 por apps renombradas (detectado en GSC 2026-07-18).
+      // Slugs antiguos (calculadora-*/simulador-*/convertidor-*) que Google aún
+      // rastrea y que conservan posición; el 301 traspasa ese ranking a la app
+      // vigente en lugar de dejar la nueva URL empezar de cero. Traffic bajo pero
+      // real y con posiciones de página 1 en varios casos (p.ej. jet-lag pos 4,7).
+      { source: '/simulador-jet-lag', has, destination: '/orientador-jet-lag/', permanent: true },
+      { source: '/convertidor-markdown-html', has, destination: '/conversor-markdown-html/', permanent: true },
+      { source: '/calculadora-coste-vivienda', has, destination: '/estimador-coste-vivienda/', permanent: true },
+      { source: '/calculadora-fire', has, destination: '/estimador-fire/', permanent: true },
+      { source: '/simulador-cartera-inversion', has, destination: '/estimador-cartera-inversion/', permanent: true },
+      { source: '/calculadora-tension-arterial', has, destination: '/orientador-tension-arterial/', permanent: true },
+      { source: '/calculadora-percentiles', has, destination: '/orientador-percentiles/', permanent: true },
+      { source: '/calculadora-imc', has, destination: '/orientador-imc/', permanent: true },
+      { source: '/test-habitos', has, destination: '/test-habitos-saludables/', permanent: true },
     ];
   },
 
