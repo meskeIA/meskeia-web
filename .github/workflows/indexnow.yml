@@ -1,0 +1,48 @@
+# Notifica a Bing (IndexNow) las URLs de meskeIA y sus 4 verticales tras cada
+# deploy de contenido. Se dispara con cada push a main que toque apps o datos,
+# espera a que Vercel publique el nuevo deploy y ejecuta el envío.
+#
+# No necesita secretos: IndexNow se autentica con el fichero público
+# public/<KEY>.txt, que ya se sirve en los 5 dominios.
+name: IndexNow (Bing) tras deploy
+
+on:
+  push:
+    branches: [main]
+    # Solo cuando cambia contenido real (evita pings inútiles al tocar docs,
+    # scripts o config). Toda app/cronología/ficha nueva pasa por app/ o data/.
+    paths:
+      - 'app/**'
+      - 'data/**'
+      - 'public/ai-index.json'
+  # Permite lanzarlo a mano desde la pestaña Actions de GitHub.
+  workflow_dispatch:
+
+# Si llegan varios deploys seguidos, solo interesa el envío del último: cancela
+# los anteriores en curso (evita pings duplicados).
+concurrency:
+  group: indexnow
+  cancel-in-progress: true
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Vercel tarda ~2-3 min en construir y publicar. Esperamos un margen para
+      # que el sitemap en vivo ya incluya las páginas nuevas antes de enviarlas.
+      # Ajustable si algún build fuese más lento (ver memoria del cuelgue de heap).
+      - name: Esperar a que Vercel publique el nuevo deploy
+        env:
+          WAIT_SECONDS: '300'
+        run: |
+          echo "Esperando ${WAIT_SECONDS}s a que Vercel termine el deploy..."
+          sleep "${WAIT_SECONDS}"
+
+      - name: Enviar URLs a Bing IndexNow
+        run: node scripts/indexnow-submit.mjs
