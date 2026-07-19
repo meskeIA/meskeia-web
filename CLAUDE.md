@@ -457,6 +457,35 @@ cp templates/trpc-router.template.ts server/routers/mi-router.ts
 
 ## Seguridad y Calidad del Código
 
+### Guardián de secretos (hook pre-commit)
+
+Un hook `pre-commit` bloquea el commit si detecta credenciales o rutas privadas
+(`_private/`, `_backups/`, `.credentials/`, `scratch/`, `digests/`) en las líneas añadidas.
+
+- `npm run check:secrets` — analiza lo que hay en staging (lo que ejecuta el hook)
+- `npm run audit:secrets` — auditoría de todo el repositorio
+- Falso positivo: añadir `pragma: allowlist-secret` en la línea · escape puntual: `git commit --no-verify`
+
+> ⚠️ **Tras clonar el repositorio en otra máquina: `npm run hooks:install`.**
+> `.git/hooks/` no se versiona, así que el hook no viaja y la protección desaparece sin avisar.
+
+### Backups y recuperación de Turso
+
+Turso es el **único dato de producción no reproducible desde GitHub**.
+
+| Control | Cadencia | Qué valida |
+|---------|----------|------------|
+| `scripts/backup-turso.mjs` | Diaria 08:06 | Genera el dump (tablas + datos + índices/vistas/disparadores) |
+| Verificador de Backups | Diaria 08:12 | Que el dump carga y sus cifras son coherentes |
+| `npm run ensayo:restauracion` | **Semestral** | La vuelta atrás completa: esquema, índices, integridad y la app operando sobre la copia |
+
+**Antes de ejecutar el ensayo, leer `_private/RUNBOOK-RESTAURACION-TURSO.md`** — contiene
+la restauración a base desechable y el procedimiento de desastre real. La cadencia vive en
+la Agenda Operativa del Centro de Mando (`restauracion-turso-semestral`).
+
+> Gotcha de datos: `uso_aplicaciones.timestamp` es TEXT en formato español (`31/05/2026, 23:34:51`);
+> `MIN`/`MAX` lo ordenan alfabéticamente y devuelven un rango falso. Usar `created_at` (ISO).
+
 ### TypeScript
 
 - ⚠️ `ignoreBuildErrors: true` en `next.config.ts` — el build de producción NO type-chequea (limitación de RAM en Vercel: el type-check de +1.100 apps agota los 8 GB)
