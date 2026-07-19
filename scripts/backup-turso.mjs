@@ -94,12 +94,32 @@ async function main() {
     console.log(`  · ${nombre}: ${datos.rows.length} filas`);
   }
 
+  // Índices, vistas y disparadores. Van DESPUÉS de los INSERT: crear los
+  // índices sobre la tabla ya poblada es más rápido que mantenerlos durante
+  // la carga. Sin este bloque la base restaurada funciona pero recorre las
+  // tablas enteras en cada consulta (detectado en el ensayo de restauración
+  // del 19/07/2026: producción tenía 7 índices y el dump ninguno).
+  const objetos = await cliente.execute(
+    `SELECT type, name, sql FROM sqlite_master
+      WHERE type IN ('index', 'view', 'trigger')
+        AND name NOT LIKE 'sqlite_%'
+        AND sql IS NOT NULL
+      ORDER BY CASE type WHEN 'view' THEN 1 WHEN 'index' THEN 2 ELSE 3 END, name`
+  );
+
+  if (objetos.rows.length > 0) {
+    partes.push('\n-- Índices, vistas y disparadores');
+    for (const objeto of objetos.rows) {
+      partes.push(`${objeto.sql};`);
+    }
+  }
+
   partes.push('COMMIT;');
   partes.push('PRAGMA foreign_keys=ON;');
 
   writeFileSync(ficheroSalida, partes.join('\n'), 'utf8');
   console.log(`\n✅ Dump completado: ${ficheroSalida}`);
-  console.log(`   ${tablas.rows.length} tablas · ${totalFilas} filas`);
+  console.log(`   ${tablas.rows.length} tablas · ${totalFilas} filas · ${objetos.rows.length} índices/vistas/disparadores`);
 
   // Rotación: conservar solo los últimos MAX_DUMPS
   const dumps = readdirSync(DIR_DESTINO)
