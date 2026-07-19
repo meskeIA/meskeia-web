@@ -12,6 +12,9 @@
     "test:unit": "npx playwright test tests/formatters.spec.ts",
     "test:calc": "npx playwright test --config playwright.calc.config.ts",
     "test:a11y": "npx playwright test tests/accessibility.spec.ts",
+    "check:secrets": "git -c core.quotepath=false diff --cached --unified=0 --no-color --no-renames --diff-filter=ACM | node scripts/check-secrets.mjs",
+    "audit:secrets": "git -c core.quotepath=false diff --unified=0 --no-color --no-renames 4b825dc642cb6eb9a060e54bf8d69288fbee4904 | node scripts/check-secrets.mjs",
+    "hooks:install": "node scripts/install-hooks.mjs",
     "generate:llm-index": "node scripts/generate-llm-index.js",
     "generate:delegum-es": "node scripts/generate-delegum-es.mjs",
     "analyze": "set ANALYZE=true && npm run build"
