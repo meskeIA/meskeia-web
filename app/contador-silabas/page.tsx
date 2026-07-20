@@ -107,12 +107,182 @@ const contarSilabasTexto = (texto: string): { palabra: string; silabas: string[]
   });
 };
 
+// ==========================================
+// MÉTRICA DEL VERSO (escansión automática)
+// ==========================================
+
+type Acentuacion = 'aguda' | 'llana' | 'esdrujula';
+
+interface Sinalefa {
+  /** Índice de la palabra que abre la fusión (se une con la siguiente) */
+  indice: number;
+  /** Texto de la fusión, p. ej. «o_e» */
+  texto: string;
+  /** Hay un signo de puntuación entre ambas palabras: podría deshacerse (dialefa) */
+  conPausa: boolean;
+}
+
+interface AnalisisVerso {
+  texto: string;
+  palabras: { palabra: string; silabas: string[] }[];
+  silabasFoneticas: number;
+  sinalefas: Sinalefa[];
+  acentuacion: Acentuacion;
+  ajuste: number;
+  silabasMetricas: number;
+  nombre: string;
+  arte: 'menor' | 'mayor';
+}
+
+const VOCALES_METRICA = 'aeiouáéíóúü';
+const esVocalMetrica = (c: string): boolean => VOCALES_METRICA.includes(c.toLowerCase());
+
+/**
+ * ¿La palabra termina en sonido vocálico?
+ * La «y» final suena /i/ («hoy», «rey»), así que también permite sinalefa.
+ */
+const terminaEnVocal = (palabra: string): boolean => {
+  const p = palabra.toLowerCase();
+  if (!p) return false;
+  const ultima = p[p.length - 1];
+  return esVocalMetrica(ultima) || ultima === 'y';
+};
+
+/**
+ * ¿La palabra empieza por sonido vocálico?
+ * La «h» es muda («la hoja» → sinalefa), salvo cuando encabeza los diptongos
+ * «hue-», «hui-», «hie-», que se pronuncian con sonido consonántico (/gwe/, /ye/)
+ * y bloquean la fusión: «la huella» NO hace sinalefa.
+ */
+const empiezaPorVocal = (palabra: string): boolean => {
+  const p = palabra.toLowerCase();
+  if (!p) return false;
+  if (esVocalMetrica(p[0])) return true;
+  // «y» conjunción: funciona como vocal
+  if (p === 'y') return true;
+  if (p[0] === 'h') {
+    if (p.startsWith('hue') || p.startsWith('hui') || p.startsWith('hie')) return false;
+    return p.length > 1 && esVocalMetrica(p[1]);
+  }
+  return false;
+};
+
+/**
+ * Clasifica la acentuación de la última palabra del verso, que determina
+ * el ajuste métrico final (aguda +1 · llana ±0 · esdrújula −1).
+ */
+const acentuacionDe = (palabra: string, silabas: string[]): Acentuacion => {
+  const p = palabra.toLowerCase();
+  // Los monosílabos se computan como agudos
+  if (silabas.length <= 1) return 'aguda';
+
+  // Si lleva tilde, la tilde manda: buscamos en qué sílaba cae
+  const indiceTilde = silabas.findIndex(s => /[áéíóú]/.test(s));
+  if (indiceTilde !== -1) {
+    const desdeElFinal = silabas.length - 1 - indiceTilde;
+    if (desdeElFinal === 0) return 'aguda';
+    if (desdeElFinal === 1) return 'llana';
+    return 'esdrujula';
+  }
+
+  // Sin tilde: termina en vocal, «n» o «s» → llana; en cualquier otra letra → aguda
+  const ultima = p[p.length - 1];
+  if (esVocalMetrica(ultima) || ultima === 'n' || ultima === 's') return 'llana';
+  return 'aguda';
+};
+
+const NOMBRES_VERSO: Record<number, string> = {
+  2: 'bisílabo',
+  3: 'trisílabo',
+  4: 'tetrasílabo',
+  5: 'pentasílabo',
+  6: 'hexasílabo',
+  7: 'heptasílabo',
+  8: 'octosílabo',
+  9: 'eneasílabo',
+  10: 'decasílabo',
+  11: 'endecasílabo',
+  12: 'dodecasílabo',
+  13: 'tridecasílabo',
+  14: 'alejandrino',
+  15: 'pentadecasílabo',
+  16: 'hexadecasílabo',
+  17: 'heptadecasílabo',
+  18: 'octodecasílabo',
+  19: 'eneadecasílabo',
+  20: 'veinte sílabas',
+};
+
+const nombreDelVerso = (silabas: number): string => NOMBRES_VERSO[silabas] || `${silabas} sílabas`;
+
+/**
+ * Escansión de un verso: sílabas fonéticas − sinalefas + ajuste por acento final.
+ * Devuelve null si la línea no contiene palabras.
+ */
+const analizarVerso = (linea: string): AnalisisVerso | null => {
+  const encontradas = Array.from(linea.matchAll(/[a-záéíóúüñ]+/gi)).map(m => ({
+    palabra: m[0],
+    inicio: m.index,
+    fin: m.index + m[0].length,
+  }));
+  if (encontradas.length === 0) return null;
+
+  const palabras = encontradas.map(e => ({ palabra: e.palabra, silabas: separarSilabas(e.palabra) }));
+  const silabasFoneticas = palabras.reduce((acc, p) => acc + p.silabas.length, 0);
+
+  // Sinalefas: vocal final de una palabra + vocal inicial de la siguiente.
+  // No se encadenan: si una palabra ya se ha fundido con la anterior, no vuelve a
+  // fundirse con la siguiente. La sinalefa triple existe pero es excepcional, y la
+  // escansión tradicional no la aplica — «de rosa y azucena» es endecasílabo (una
+  // sola fusión), no decasílabo (dos).
+  const sinalefas: Sinalefa[] = [];
+  for (let i = 0; i < encontradas.length - 1; i++) {
+    const actual = encontradas[i];
+    const siguiente = encontradas[i + 1];
+    if (terminaEnVocal(actual.palabra) && empiezaPorVocal(siguiente.palabra)) {
+      const entreMedias = linea.slice(actual.fin, siguiente.inicio);
+      sinalefas.push({
+        indice: i,
+        texto: `${actual.palabra.slice(-1)}_${siguiente.palabra[0]}`,
+        conPausa: /[,;:.…!?—)]/.test(entreMedias),
+      });
+      i++; // la palabra fundida no encadena con la siguiente
+    }
+  }
+
+  const ultima = palabras[palabras.length - 1];
+  const acentuacion = acentuacionDe(ultima.palabra, ultima.silabas);
+  const ajuste = acentuacion === 'aguda' ? 1 : acentuacion === 'esdrujula' ? -1 : 0;
+
+  const silabasMetricas = Math.max(0, silabasFoneticas - sinalefas.length + ajuste);
+
+  return {
+    texto: linea.trim(),
+    palabras,
+    silabasFoneticas,
+    sinalefas,
+    acentuacion,
+    ajuste,
+    silabasMetricas,
+    nombre: nombreDelVerso(silabasMetricas),
+    arte: silabasMetricas >= 9 ? 'mayor' : 'menor',
+  };
+};
+
+/** Analiza cada línea no vacía del texto como un verso independiente */
+const analizarVersos = (texto: string): AnalisisVerso[] =>
+  texto
+    .split('\n')
+    .map(linea => analizarVerso(linea))
+    .filter((v): v is AnalisisVerso => v !== null);
+
 export default function ContadorSilabasPage() {
   const [texto, setTexto] = useState('');
   const [resultado, setResultado] = useState<{
     palabras: { palabra: string; silabas: string[]; total: number }[];
     totalSilabas: number;
     totalPalabras: number;
+    versos: AnalisisVerso[];
   } | null>(null);
 
   const analizar = () => {
@@ -125,6 +295,7 @@ export default function ContadorSilabasPage() {
       palabras: palabrasAnalizadas,
       totalSilabas,
       totalPalabras: palabrasAnalizadas.length,
+      versos: analizarVersos(texto),
     });
   };
 
@@ -139,6 +310,13 @@ export default function ContadorSilabasPage() {
     'comunicación',
     'poesía',
     'aeropuerto',
+  ];
+
+  // Versos clásicos (dominio público) que muestran sinalefa y ajuste por acento final
+  const ejemplosVerso = [
+    { etiqueta: 'Endecasílabo (Bécquer)', texto: 'Volverán las oscuras golondrinas' },
+    { etiqueta: 'Octosílabo agudo (Calderón)', texto: '¿Qué es la vida? Un frenesí' },
+    { etiqueta: 'Alejandrino (Darío)', texto: 'La princesa está triste, ¿qué tendrá la princesa?' },
   ];
 
   const cargarEjemplo = (ejemplo: string) => {
@@ -176,15 +354,32 @@ export default function ContadorSilabasPage() {
           </div>
 
           <div className={styles.ejemplos}>
-            <span className={styles.ejemplosLabel}>Ejemplos:</span>
+            <span className={styles.ejemplosLabel}>Palabras:</span>
             {ejemplos.map((ej) => (
               <button
                 key={ej}
+                type="button"
                 onClick={() => cargarEjemplo(ej)}
                 className={styles.ejemploBtn}
                 aria-label={`Cargar ejemplo: ${ej}`}
               >
                 {ej}
+              </button>
+            ))}
+          </div>
+
+          <div className={styles.ejemplos}>
+            <span className={styles.ejemplosLabel}>Versos:</span>
+            {ejemplosVerso.map((ej) => (
+              <button
+                key={ej.texto}
+                type="button"
+                onClick={() => cargarEjemplo(ej.texto)}
+                className={styles.ejemploBtn}
+                aria-label={`Cargar verso de ejemplo: ${ej.etiqueta}`}
+                title={ej.texto}
+              >
+                {ej.etiqueta}
               </button>
             ))}
           </div>
@@ -222,6 +417,78 @@ export default function ContadorSilabasPage() {
                   <span className={styles.resumenLabel}>Media por palabra</span>
                 </div>
               </div>
+
+              {/* Métrica del verso: solo tiene sentido con más de una palabra */}
+              {resultado.versos.some((v) => v.palabras.length > 1) && (
+                <div className={styles.metricaBloque}>
+                  <h3>
+                    <span aria-hidden="true">🎼</span> Métrica del verso
+                  </h3>
+                  <p className={styles.metricaIntro}>
+                    Sílabas fonéticas menos las sinalefas, más el ajuste por acento final.
+                  </p>
+
+                  {resultado.versos.map((v, index) => (
+                    <div key={index} className={styles.versoCard}>
+                      <div className={styles.versoTexto}>{v.texto}</div>
+
+                      <div className={styles.versoResultado}>
+                        <span className={styles.versoSilabas}>{v.silabasMetricas}</span>
+                        <span className={styles.versoNombre}>
+                          {v.nombre}
+                          <span className={styles.versoArte}>
+                            arte {v.arte}
+                          </span>
+                        </span>
+                      </div>
+
+                      <div className={styles.versoDesglose}>
+                        <span className={styles.versoOperando}>
+                          {v.silabasFoneticas} fonéticas
+                        </span>
+                        {v.sinalefas.length > 0 && (
+                          <span className={styles.versoOperando}>
+                            − {v.sinalefas.length}{' '}
+                            {v.sinalefas.length === 1 ? 'sinalefa' : 'sinalefas'}
+                          </span>
+                        )}
+                        <span className={styles.versoOperando}>
+                          {v.ajuste > 0 ? '+ 1' : v.ajuste < 0 ? '− 1' : '± 0'} (última palabra{' '}
+                          {v.acentuacion === 'esdrujula' ? 'esdrújula' : v.acentuacion})
+                        </span>
+                        <span className={styles.versoIgual}>= {v.silabasMetricas}</span>
+                      </div>
+
+                      {v.sinalefas.length > 0 && (
+                        <div className={styles.sinalefasLista}>
+                          {v.sinalefas.map((s, i) => (
+                            <span
+                              key={i}
+                              className={`${styles.sinalefaTag} ${s.conPausa ? styles.sinalefaPausa : ''}`}
+                              title={
+                                s.conPausa
+                                  ? 'Hay un signo de puntuación entre las dos palabras: el poeta puede deshacer esta fusión (dialefa)'
+                                  : 'Fusión de la vocal final con la vocal inicial de la palabra siguiente'
+                              }
+                            >
+                              {v.palabras[s.indice].palabra} <span aria-hidden="true">⌣</span>{' '}
+                              {v.palabras[s.indice + 1].palabra}
+                              {s.conPausa && <span className={styles.sinalefaAviso}> · con pausa</span>}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+
+                  <p className={styles.metricaNota}>
+                    <strong>Cómo leerlo:</strong> el cómputo aplica la norma general. El poeta puede
+                    romper una sinalefa (dialefa) o unir vocales en hiato (sinéresis) cuando lo pide el
+                    ritmo, sobre todo en las fusiones marcadas <em>con pausa</em>. Si el verso no te
+                    cuadra, prueba a deshacer una de ellas.
+                  </p>
+                </div>
+              )}
 
               {/* Lista de palabras */}
               <div className={styles.palabrasLista}>
@@ -436,22 +703,22 @@ export default function ContadorSilabasPage() {
             <li className={styles.eduPaso}>
               <span className={styles.eduPasoNum}>2</span>
               <div>
-                <strong>Silabea cada verso por separado</strong>
-                <p>Introduce cada verso en el contador y anota las sílabas. Marca con guiones: &quot;En el prin-ci-pio e-ra el a-mor&quot;. Recuerda que la herramienta cuenta sílabas fonéticas; las métricas pueden diferir por sinalefas entre palabras, que ocurren en el verso completo.</p>
+                <strong>Pega el poema con un verso por línea</strong>
+                <p>La herramienta analiza cada línea como un verso independiente, así que puedes pegar una estrofa entera de una vez. En el bloque «Métrica del verso» verás el cómputo de cada línea por separado.</p>
               </div>
             </li>
             <li className={styles.eduPaso}>
               <span className={styles.eduPasoNum}>3</span>
               <div>
-                <strong>Aplica las sinalefas manualmente</strong>
-                <p>Identifica los puntos de contacto vocal-vocal entre palabras consecutivas: &quot;la_era&quot;, &quot;de_amor&quot;. Cada sinalefa resta una sílaba al cómputo del verso. Marca las sinalefas con un arco o subrayado entre las dos vocales que se fusionan.</p>
+                <strong>Revisa las sinalefas detectadas</strong>
+                <p>El contador localiza automáticamente los contactos vocal-vocal entre palabras («la_era», «de_amor») y resta una sílaba por cada uno. Las fusiones marcadas <em>con pausa</em> —las que tienen una coma o un punto en medio— son las candidatas a deshacerse (dialefa) si el verso no te cuadra.</p>
               </div>
             </li>
             <li className={styles.eduPaso}>
               <span className={styles.eduPasoNum}>4</span>
               <div>
-                <strong>Ajusta por la sílaba final tónica</strong>
-                <p>Identifica la última palabra del verso e indica si es aguda (+1), llana (±0) o esdrújula (-1). Suma o resta según corresponda al total de sílabas del verso para obtener las sílabas métricas definitivas.</p>
+                <strong>Comprueba el ajuste por la sílaba final tónica</strong>
+                <p>El cómputo aplica solo la regla del acento final: aguda (+1), llana (±0) o esdrújula (−1). La herramienta indica cuál ha detectado, para que puedas verificarlo si la última palabra es ambigua.</p>
               </div>
             </li>
             <li className={styles.eduPaso}>
@@ -491,8 +758,8 @@ export default function ContadorSilabasPage() {
             </div>
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcono}>✍️</span>
-              <h4>Para poesía: cuenta sílabas métricas, no fonéticas</h4>
-              <p>Esta herramienta cuenta sílabas fonéticas (de una palabra aislada). Para la métrica real de un verso necesitas aplicar además las sinalefas entre palabras y el ajuste por acento final. Úsala para contar sílabas de palabras, luego aplica manualmente los fenómenos del verso completo.</p>
+              <h4>Para poesía: fíjate en las sílabas métricas, no en las fonéticas</h4>
+              <p>Son dos cuentas distintas y la herramienta te da las dos. Las <strong>fonéticas</strong> salen de silabear cada palabra aislada; las <strong>métricas</strong> son las que cuentan en el verso, y resultan de restar las sinalefas y aplicar el ajuste por acento final. Un verso de 11 sílabas métricas puede tener 13 fonéticas.</p>
             </div>
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcono}>🎯</span>
@@ -513,7 +780,9 @@ export default function ContadorSilabasPage() {
             <div>
               <strong>Limitaciones del algoritmo de silabeo automático</strong>
               <ul>
-                <li><strong>Sinalefas entre palabras no se calculan:</strong> Esta herramienta silabea cada palabra de forma aislada. Las sinalefas (fusión vocal final + vocal inicial de la siguiente palabra) ocurren en el verso completo y deben aplicarse manualmente para obtener sílabas métricas correctas.</li>
+                <li><strong>Las sinalefas se detectan, pero la última palabra la tienes tú:</strong> el cómputo métrico aplica la norma general (toda sinalefa posible se realiza). El poeta puede romperla (dialefa) o unir un hiato (sinéresis) por motivos de ritmo; esas licencias no son predecibles por algoritmo. Las fusiones señaladas <em>con pausa</em> son las primeras candidatas a revisar si el verso no cuadra.</li>
+                <li><strong>Sinéresis y diéresis no se aplican solas:</strong> el análisis parte del silabeo estándar de cada palabra. Si el poeta trató &quot;poeta&quot; como bisílabo (sinéresis) o &quot;suave&quot; como trisílabo (diéresis), el resultado diferirá en una sílaba.</li>
+                <li><strong>Las sinalefas no se encadenan:</strong> cuando tres vocales entran en contacto («de ro-sa y a-zu-ce-na»), el cómputo aplica una sola fusión, que es el criterio de la escansión tradicional. La sinalefa triple existe en español, pero es excepcional; si estás analizando un verso donde el poeta sí la usa, réstale una sílaba más.</li>
                 <li><strong>Palabras compuestas y prefijadas:</strong> En palabras como &quot;subrayar&quot;, &quot;deshacer&quot; o &quot;transatlántico&quot;, el silabeo puede variar según se considere la morfología o solo la fonética. La RAE y las distintas tradiciones gramaticales no siempre coinciden.</li>
                 <li><strong>Nombres propios y extranjerismos:</strong> El algoritmo puede fallar con nombres como &quot;Shakespeare&quot;, &quot;Nietzsche&quot; o topónimos poco frecuentes cuya pronunciación en español no sigue las reglas estándar.</li>
                 <li><strong>Secuencias &quot;ui&quot;/&quot;iu&quot; en verbos como &quot;construir&quot;:</strong> la RAE admite tanto el diptongo (cons-truir, 2 sílabas) como el hiato (cons-tru-ir, 3 sílabas) según la pronunciación. El algoritmo aplica siempre el criterio de diptongo.</li>

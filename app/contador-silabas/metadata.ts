@@ -78,6 +78,14 @@ export const faqJsonLd = {
         text: 'Un verso endecasílabo tiene 11 sílabas métricas. Es el verso más usado en la poesía española clásica y renacentista, empleado por Garcilaso de la Vega y en los sonetos. Ejemplo: "En el principio de tus años tiernos" tiene 11 sílabas métricas contando la sinalefa entre palabras.',
       },
     },
+    {
+      '@type': 'Question',
+      name: '¿Se pueden contar las sílabas poéticas de un verso automáticamente?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. Basta con escribir el verso (o pegar una estrofa con un verso por línea) para obtener las sílabas métricas ya calculadas: se detectan las sinalefas entre palabras, se aplica el ajuste por acento final (aguda +1, llana ±0, esdrújula −1) y se identifica el tipo de verso. Por ejemplo, "¿Qué es la vida? Un frenesí" tiene 9 sílabas fonéticas, pero 2 sinalefas y un final agudo lo dejan en 8 sílabas métricas: un octosílabo.',
+      },
+    },
   ],
 };
 
@@ -89,7 +97,10 @@ export const jsonLd = generateWebAppSchema({
   features: [
     'Separación silábica de palabras y textos',
     'Conteo automático de sílabas',
-    'Análisis métrico para poesía',
+    'Escansión automática del verso: sílabas métricas',
+    'Detección de sinalefas entre palabras',
+    'Ajuste por acento final (aguda, llana, esdrújula)',
+    'Identificación del tipo de verso (octosílabo, endecasílabo, alejandrino…)',
     'Identificación de diptongos, hiatos y triptongos',
     'En español',
   ],
