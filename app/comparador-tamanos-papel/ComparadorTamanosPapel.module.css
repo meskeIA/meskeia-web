@@ -1,0 +1,841 @@
+/* ═══════════════════════════════════════════════════════════════
+   Comparador de Tamaños de Papel — paleta meskeIA
+   ═══════════════════════════════════════════════════════════════ */
+
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --accent: #7FB3D3;
+  --hero-bg: #1a5278;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --border: #E5E5E5;
+  --guia: #B0B0B0;
+  --hover: #F5F5F5;
+  --radius: 12px;
+  --radius-large: 16px;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --border: #404040;
+  --guia: #5A5A5A;
+  --hover: #333333;
+}
+
+/* ─── Hero ─────────────────────────────────────────────────── */
+.hero {
+  text-align: center;
+  margin-top: 80px;
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-xl);
+  background: var(--hero-bg);
+  border-radius: var(--radius-large);
+  color: #fff;
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: var(--spacing-md);
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  opacity: 0.95;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* ─── Bloques de herramienta ───────────────────────────────── */
+.bloque {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.bloqueTitulo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.6rem;
+}
+
+.bloqueIntro {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-lg);
+  max-width: 780px;
+}
+
+/* ─── Chips / botones de selección ─────────────────────────── */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: var(--spacing-md);
+  align-items: center;
+}
+
+.chip {
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.chip:hover:not(:disabled) {
+  background: var(--hover);
+  border-color: var(--accent);
+}
+
+.chipActivo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.chip:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.chip:focus-visible,
+.btnSecundario:focus-visible,
+.btnMini:focus-visible,
+.btnQuitar:focus-visible,
+.select:focus-visible,
+.input:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ─── Campos de formulario ─────────────────────────────────── */
+.selectorFila,
+.filaControles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  align-items: flex-end;
+  margin-bottom: var(--spacing-lg);
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 220px;
+  min-width: 180px;
+}
+
+.etiqueta {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.etiquetaEnLinea {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.select,
+.input {
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: 100%;
+}
+
+.input {
+  max-width: 140px;
+}
+
+.selectorFila .select {
+  max-width: 460px;
+}
+
+/* ─── Lista de formatos seleccionados ──────────────────────── */
+.listaSeleccion {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--spacing-lg);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.itemSeleccion {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px 7px 8px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.muestraColor {
+  width: 14px;
+  height: 18px;
+  border-radius: 3px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.itemNombre {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.itemMedida {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.btnQuitar {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1;
+  padding: 2px 4px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.btnQuitar:hover:not(:disabled) {
+  color: #C0392B;
+  background: var(--hover);
+}
+
+.btnQuitar:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ─── Lienzo SVG ───────────────────────────────────────────── */
+.lienzo {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  overflow: hidden;
+}
+
+.svgComparador {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 62vh;
+  margin: 0 auto;
+}
+
+.svgDoblado {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 46vh;
+  margin: 0 auto;
+}
+
+.svgGuia {
+  stroke: var(--guia);
+}
+
+.svgCota {
+  font-weight: 600;
+  font-family: inherit;
+}
+
+.svgNombre {
+  font-weight: 700;
+  font-family: inherit;
+}
+
+.svgLamina {
+  fill: none;
+  stroke: var(--guia);
+}
+
+/* ─── Tablas ───────────────────────────────────────────────── */
+.tablaWrapper {
+  overflow-x: auto;
+  margin-bottom: var(--spacing-lg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+  min-width: 560px;
+  background: var(--bg-card);
+}
+
+.tablaCaption {
+  caption-side: top;
+  text-align: left;
+  padding: 12px 14px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  background: var(--bg-primary);
+}
+
+.tabla th,
+.tabla td {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+.tabla thead th {
+  background: linear-gradient(135deg, #2E86AB, #48A9A6);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.82rem;
+  border-bottom: none;
+}
+
+.tabla tbody th {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tabla tbody tr:hover {
+  background: var(--hover);
+}
+
+.tabla tbody tr:last-child th,
+.tabla tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.notaCelda {
+  display: block;
+  font-weight: 400;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin-top: 4px;
+  white-space: normal;
+  max-width: 260px;
+}
+
+.deltaPos {
+  color: #B45309;
+  font-weight: 600;
+}
+
+.deltaNeg {
+  color: #2E86AB;
+  font-weight: 600;
+}
+
+.si {
+  color: #2F855A;
+  font-weight: 600;
+}
+
+.no {
+  color: #C0392B;
+  font-weight: 600;
+}
+
+/* ─── Notas informativas ───────────────────────────────────── */
+.notas {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.notas li {
+  font-size: 0.83rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.notas strong {
+  color: var(--text-primary);
+}
+
+/* ─── Resultados ───────────────────────────────────────────── */
+.resultadosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.resultado {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--secondary);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.resultadoPrincipal {
+  border-left-color: var(--primary);
+  background: rgba(46, 134, 171, 0.07);
+}
+
+.resultadoEtiqueta {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-secondary);
+}
+
+.resultadoValor {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.25;
+}
+
+.resultadoNota {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.aclaracion {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  background: var(--bg-primary);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin: 0;
+}
+
+/* ─── Selector de DPI ──────────────────────────────────────── */
+.dpiFila {
+  margin-bottom: var(--spacing-md);
+}
+
+.dpiLibre {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btnSecundario {
+  padding: 8px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--secondary);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btnSecundario:hover {
+  background: #3b8c8a;
+}
+
+.btnMini {
+  padding: 5px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: transparent;
+  border: 1px solid var(--primary);
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.btnMini:hover:not(:disabled) {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btnMini:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ─── Demostración √2 ──────────────────────────────────────── */
+.demostracion {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+.demoTitulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.8rem;
+}
+
+.demoLista {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.demoLista li {
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+.demoLista strong {
+  color: var(--text-primary);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CONTENIDO EDUCATIVO v2.0
+   ═══════════════════════════════════════════════════════════════ */
+
+.edu {
+  padding: var(--spacing-md) 0;
+}
+
+.eduSeccion {
+  margin-bottom: var(--spacing-xl);
+}
+
+.eduSeccion h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.7rem;
+}
+
+.eduSeccion p {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin: 0 0 0.9rem;
+}
+
+.eduSeccion strong {
+  color: var(--text-primary);
+}
+
+/* Escenarios */
+.eduEscenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-top: var(--spacing-md);
+}
+
+.eduEscenarioCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--secondary);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.eduEscenarioCard h4 {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 8px;
+}
+
+.eduEscenarioCard p {
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* FAQ */
+.eduFaq {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: var(--spacing-md);
+}
+
+.eduFaqItem {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-card);
+}
+
+.eduFaqPregunta {
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  background: var(--bg-primary);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.eduFaqPregunta::-webkit-details-marker {
+  display: none;
+}
+
+.eduFaqPregunta::before {
+  content: '▶';
+  font-size: 0.65rem;
+  color: var(--primary);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.eduFaqItem[open] .eduFaqPregunta::before {
+  transform: rotate(90deg);
+}
+
+.eduFaqRespuesta {
+  padding: 12px 16px;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border);
+  background: var(--bg-card);
+  margin: 0;
+}
+
+/* Pasos */
+.eduPasos {
+  margin: var(--spacing-md) 0 0;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.eduPasos li {
+  font-size: 0.87rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  padding-left: 4px;
+}
+
+.eduPasos li::marker {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* Tips */
+.eduTipsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: var(--spacing-md);
+}
+
+.eduTipCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.eduTipIcono {
+  font-size: 1.6rem;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.eduTipCard h4 {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 6px;
+  line-height: 1.4;
+}
+
+.eduTipCard p {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Warning box — marcador del patrón v2.0 */
+.warningBox {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-top: var(--spacing-lg);
+  display: flex;
+  gap: 14px;
+}
+
+.warningIcono {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  line-height: 1.2;
+}
+
+.warningBox strong {
+  color: var(--text-primary);
+}
+
+.warningBox > div > strong {
+  display: block;
+  font-size: 0.98rem;
+  margin-bottom: 10px;
+}
+
+.warningBox ul {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.warningBox li {
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(245, 158, 11, 0.06);
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+[data-theme='dark'] .resultadoPrincipal {
+  background: rgba(46, 134, 171, 0.14);
+}
+
+[data-theme='dark'] .deltaNeg {
+  color: #7FB3D3;
+}
+
+[data-theme='dark'] .deltaPos {
+  color: #F0B45A;
+}
+
+[data-theme='dark'] .si {
+  color: #6EC49A;
+}
+
+[data-theme='dark'] .no {
+  color: #E88A7D;
+}
+
+/* ─── Responsive ───────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .eduTipsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .hero {
+    margin-top: 60px;
+    padding: var(--spacing-lg);
+  }
+
+  .title {
+    font-size: 1.55rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .bloque {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .bloqueTitulo {
+    font-size: 1.2rem;
+  }
+
+  .lienzo {
+    padding: var(--spacing-md);
+  }
+
+  .svgComparador {
+    max-height: 70vh;
+  }
+
+  .eduEscenariosGrid,
+  .eduTipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .warningBox {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .input {
+    max-width: 110px;
+  }
+}
+
+/* ─── Movimiento reducido ──────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .chip,
+  .btnSecundario,
+  .btnMini,
+  .eduFaqPregunta::before {
+    transition-duration: 0.01ms;
+  }
+}
