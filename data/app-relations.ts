@@ -6426,7 +6426,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'validador-dni-nif-cif': [
     { url: '/calculadora-iban/', icon: '🏦', name: 'Calculadora de IBAN', description: 'Calcula y valida el número de cuenta' },
     { url: '/validador-rfc-curp/', icon: '🇲🇽', name: 'Validador de RFC y CURP', description: 'El equivalente mexicano' },
-    { url: '/conversor-cnae-iae/', icon: '🧾', name: 'Buscador CNAE ⇄ IAE', description: 'El código de actividad para tu alta' },
+    { url: '/conversor-cnae-iae/', icon: '🧾', name: 'Códigos CNAE e IAE', description: 'El código de actividad para tu alta' },
     { url: '/generador-hashes/', icon: '🔐', name: 'Generador de Hashes', description: 'MD5, SHA-1, SHA-256 y más' },
   ],
   'calculadora-iban': [

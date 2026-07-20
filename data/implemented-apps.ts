@@ -1283,7 +1283,7 @@ export const implementedAppsUrls = [
   "/validador-dni-nif-cif/",           // DNI/NIE/NIF/CIF: validación módulo 23, cálculo de letra y generador de datos de prueba
   "/calculadora-iban/",                // IBAN desde CCC (módulo 97), validación multipaís, entidad emisora y estructura del BIC
   "/validador-rfc-curp/",              // México: valida RFC y CURP con su dígito verificador, calcula las 10 primeras posiciones del RFC
-  "/conversor-cnae-iae/",              // Busca tu actividad en lenguaje natural y devuelve CNAE + epígrafes IAE candidatos con su confianza
+  "/conversor-cnae-iae/",              // Buscadores de los catálogos oficiales completos: CNAE-2025 (INE) y epígrafes del IAE (BOE)
 
   // Formularios de consulta STEM (2026-07)
   "/tabla-derivadas/",                 // 38 derivadas buscables con regla de la cadena, demostración y ejemplo

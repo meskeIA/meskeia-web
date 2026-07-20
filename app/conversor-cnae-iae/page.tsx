@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './ConversorCnaeIae.module.css';
 import {
   MeskeiaLogo,
@@ -15,190 +15,458 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import {
-  ACTIVIDADES_CNAE_IAE,
-  CNAE_IAE_META,
-  COBERTURA_CATALOGO,
-  SECCIONES_IAE,
-  buscarActividades,
-  buscarPorCnae,
-  buscarPorEpigrafeIae,
-  normalizarTexto,
-  type ActividadCnaeIae,
-  type EpigrafeIAE,
-  type SeccionIAE,
-} from '@/data/fiscal/cnae-iae';
 
-// ─── Modos de consulta ───────────────────────────────────────────────────────
+// ─── Tipos del catálogo oficial (public/datos/cnae-iae-catalogo.json) ────────
 
-type ModoBusqueda = 'actividad' | 'cnae' | 'iae';
+type NivelCnae = 'seccion' | 'division' | 'grupo' | 'clase';
+type TipoIae = 'division' | 'agrupacion' | 'grupo' | 'epigrafe';
+type SeccionIae = '1ª' | '2ª' | '3ª';
 
-interface ConfiguracionModo {
-  id: ModoBusqueda;
-  etiqueta: string;
-  icono: string;
+interface EntradaCnae {
+  codigo: string;
   titulo: string;
-  ayuda: string;
-  placeholder: string;
+  nivel: NivelCnae;
 }
 
-const MODOS: ConfiguracionModo[] = [
-  {
-    id: 'actividad',
-    etiqueta: 'Por actividad',
-    icono: '🔎',
-    titulo: 'Describe tu actividad con tus palabras',
-    ayuda:
-      'No hace falta que uses el nombre oficial: escribe cómo se lo contarías a alguien. Buscamos también sobre términos coloquiales.',
-    placeholder: 'hago páginas web, corto el pelo, vendo ropa por internet...',
-  },
-  {
-    id: 'cnae',
-    etiqueta: 'Desde un CNAE',
-    icono: '🏷️',
-    titulo: 'Introduce un código CNAE-2009',
-    ayuda:
-      'Escribe el código de 4 dígitos (o solo sus primeras cifras) y verás los epígrafes de IAE que suelen corresponderle.',
-    placeholder: '6201',
-  },
-  {
-    id: 'iae',
-    etiqueta: 'Desde un epígrafe IAE',
-    icono: '⚖️',
-    titulo: 'Introduce un epígrafe del IAE',
-    ayuda:
-      'Escribe el epígrafe o grupo tal y como figura en las Tarifas (por ejemplo 763 o 505.6) y verás a qué CNAE se asocia.',
-    placeholder: '763',
-  },
-];
+interface EntradaIae {
+  seccion: SeccionIae;
+  codigo: string;
+  tipo: TipoIae;
+  titulo: string;
+}
 
-const EJEMPLOS_BUSQUEDA: string[] = [
+interface FuenteMeta {
+  fuente: string;
+  urlOficial: string;
+  nota: string;
+}
+
+interface MetaCatalogo {
+  generado: string;
+  iae: FuenteMeta;
+  cnae: FuenteMeta;
+  advertencia: string;
+}
+
+interface Catalogo {
+  meta: MetaCatalogo;
+  iae: EntradaIae[];
+  cnae: EntradaCnae[];
+  correspondencia: Record<string, string[]>;
+  correspondenciaInversa: Record<string, string[]>;
+  sinonimos: Record<string, string[]>;
+}
+
+interface CnaeIndexada extends EntradaCnae {
+  seccionLetra: string;
+  codigoDigitos: string;
+  sinonimos: string[];
+  textoBusqueda: string;
+}
+
+interface IaeIndexada extends EntradaIae {
+  codigoDigitos: string;
+  textoBusqueda: string;
+}
+
+interface PasoJerarquia {
+  etiqueta: string;
+  texto: string;
+}
+
+type EstadoCarga = 'cargando' | 'listo' | 'error';
+type Pestana = 'cnae' | 'iae';
+
+// ─── Constantes ──────────────────────────────────────────────────────────────
+
+const LIMITE_RESULTADOS = 50;
+const RUTA_CATALOGO = '/datos/cnae-iae-catalogo.json';
+
+const EJEMPLOS_CNAE: string[] = [
   'hago páginas web',
-  'corto el pelo',
-  'vendo ropa por internet',
-  'soy fotógrafo',
-  'clases particulares',
+  'peluquería',
+  'tienda de barrio',
+  'fotógrafo',
   'reformas',
-  'traductora',
-  'transportista',
+  '4711',
 ];
 
-const SECCION_POR_ID: Record<SeccionIAE, (typeof SECCIONES_IAE)[number]> = SECCIONES_IAE.reduce(
-  (mapa, s) => {
-    mapa[s.seccion] = s;
-    return mapa;
-  },
-  {} as Record<SeccionIAE, (typeof SECCIONES_IAE)[number]>
-);
+const EJEMPLOS_IAE: string[] = [
+  'peluquería',
+  'comercio al por menor',
+  'enseñanza',
+  'pintura',
+  '505.6',
+];
 
-/** Clase CSS del distintivo de color de cada sección del IAE */
-function claseDeSeccion(seccion: SeccionIAE): string {
-  if (seccion === '1ª') return styles.seccion1;
-  if (seccion === '2ª') return styles.seccion2;
-  return styles.seccion3;
+const NIVEL_ETIQUETA: Record<NivelCnae, string> = {
+  seccion: 'Sección',
+  division: 'División',
+  grupo: 'Grupo',
+  clase: 'Clase',
+};
+
+const TIPO_ETIQUETA: Record<TipoIae, string> = {
+  division: 'División',
+  agrupacion: 'Agrupación',
+  grupo: 'Grupo',
+  epigrafe: 'Epígrafe',
+};
+
+const PESO_NIVEL_CNAE: Record<NivelCnae, number> = {
+  clase: 0,
+  grupo: 1,
+  division: 2,
+  seccion: 3,
+};
+
+const PESO_TIPO_IAE: Record<TipoIae, number> = {
+  epigrafe: 0,
+  grupo: 1,
+  agrupacion: 2,
+  division: 3,
+};
+
+interface DescripcionSeccionIae {
+  seccion: SeccionIae;
+  nombre: string;
+  quienes: string;
+  retencion: string;
+  clase: string;
 }
 
-// ─── Ordenación de candidatos ────────────────────────────────────────────────
+const SECCIONES_IAE: DescripcionSeccionIae[] = [
+  {
+    seccion: '1ª',
+    nombre: 'Actividades empresariales',
+    quienes:
+      'Ganadería independiente, minería, industria, comercio y servicios organizados con medios materiales o personal. Es la sección de comercios, talleres, bares, obras y de buena parte de los servicios.',
+    retencion:
+      'Las facturas de una actividad empresarial, con carácter general, no llevan retención de IRPF.',
+    clase: styles.seccion1,
+  },
+  {
+    seccion: '2ª',
+    nombre: 'Actividades profesionales',
+    quienes:
+      'Ejercicio individual de una profesión: abogacía, arquitectura, ingeniería, medicina, traducción, consultoría, diseño y demás profesiones ejercidas por cuenta propia.',
+    retencion:
+      'Las facturas a empresas y a otros profesionales llevan retención de IRPF: 15 % con carácter general y 7 % durante el año de inicio de la actividad y los dos siguientes.',
+    clase: styles.seccion2,
+  },
+  {
+    seccion: '3ª',
+    nombre: 'Actividades artísticas',
+    quienes:
+      'Cine, teatro, circo, música, danza, deporte y espectáculos taurinos ejercidos por cuenta propia.',
+    retencion:
+      'Tratamiento análogo al profesional: las facturas a empresas y a otros profesionales llevan retención de IRPF.',
+    clase: styles.seccion3,
+  },
+];
 
-/**
- * Ordena los candidatos por proximidad al término escrito: primero aquellos
- * cuyo sinónimo o denominación empieza por la consulta. No decide nada: solo
- * evita que lo más próximo quede sepultado al final de la lista.
- */
-function ordenarPorProximidad(
-  actividades: ActividadCnaeIae[],
-  consulta: string
-): ActividadCnaeIae[] {
-  const q = normalizarTexto(consulta);
-  if (!q) return actividades;
+// ─── Utilidades de texto ─────────────────────────────────────────────────────
 
-  const puntuar = (a: ActividadCnaeIae): number => {
-    const sinonimos = a.sinonimos.map(normalizarTexto);
-    if (sinonimos.includes(q)) return 0;
-    if (sinonimos.some((s) => s.startsWith(q))) return 1;
-    if (normalizarTexto(a.descripcionCnae).startsWith(q)) return 2;
-    if (sinonimos.some((s) => s.includes(q))) return 3;
-    return 4;
-  };
+/** Minúsculas y sin acentos, para que «diseño gráfico» encuentre «Diseno Grafico». */
+function normalizarTexto(texto: string): string {
+  return texto
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
-  return [...actividades].sort((a, b) => puntuar(a) - puntuar(b));
+/** Deja solo los dígitos: «47.11» → «4711». */
+function soloDigitos(texto: string): string {
+  return texto.replace(/\D/g, '');
 }
 
 // ─── Página ──────────────────────────────────────────────────────────────────
 
 export default function ConversorCnaeIaePage() {
-  const [modo, setModo] = useState<ModoBusqueda>('actividad');
-  const [consulta, setConsulta] = useState('');
-  const [abiertas, setAbiertas] = useState<string[]>([]);
-  const campoRef = useRef<HTMLInputElement>(null);
+  const [catalogo, setCatalogo] = useState<Catalogo | null>(null);
+  const [estado, setEstado] = useState<EstadoCarga>('cargando');
+  const [pestana, setPestana] = useState<Pestana>('cnae');
 
-  const modoActual = MODOS.find((m) => m.id === modo) ?? MODOS[0];
+  const [consultaCnae, setConsultaCnae] = useState('');
+  const [seccionCnae, setSeccionCnae] = useState<string>('todas');
+  const [consultaIae, setConsultaIae] = useState('');
+  const [seccionIae, setSeccionIae] = useState<'todas' | SeccionIae>('todas');
 
-  const resultados = useMemo<ActividadCnaeIae[]>(() => {
-    const termino = consulta.trim();
-    if (termino.length < 2) return [];
+  const inputCnaeRef = useRef<HTMLInputElement>(null);
+  const inputIaeRef = useRef<HTMLInputElement>(null);
 
-    if (modo === 'cnae') {
-      const digitos = termino.replace(/\D/g, '');
-      if (digitos.length < 2) return [];
-      const exacta = buscarPorCnae(digitos);
-      if (exacta) return [exacta];
-      return ACTIVIDADES_CNAE_IAE.filter((a) => a.cnae.startsWith(digitos));
+  // Carga diferida del catálogo (más de 300 KB): nunca dentro del bundle
+  useEffect(() => {
+    let cancelado = false;
+
+    async function cargar(): Promise<void> {
+      try {
+        const respuesta = await fetch(RUTA_CATALOGO);
+        if (!respuesta.ok) {
+          throw new Error(`HTTP ${respuesta.status}`);
+        }
+        const datos = (await respuesta.json()) as Catalogo;
+        if (!cancelado) {
+          setCatalogo(datos);
+          setEstado('listo');
+        }
+      } catch {
+        if (!cancelado) {
+          setEstado('error');
+        }
+      }
     }
 
-    if (modo === 'iae') {
-      const codigo = termino.replace(/[^0-9.]/g, '');
-      if (codigo.length < 2) return [];
-      const exactas = buscarPorEpigrafeIae(codigo);
-      if (exactas.length > 0) return exactas;
-      return ACTIVIDADES_CNAE_IAE.filter((a) =>
-        a.iae.some((e) => e.epigrafe.startsWith(codigo))
-      );
+    void cargar();
+    return () => {
+      cancelado = true;
+    };
+  }, []);
+
+  // Foco en el buscador de la pestaña activa una vez cargado el catálogo
+  useEffect(() => {
+    if (estado !== 'listo') return;
+    const destino = pestana === 'cnae' ? inputCnaeRef.current : inputIaeRef.current;
+    destino?.focus();
+  }, [estado, pestana]);
+
+  // ─── Índices de búsqueda ───────────────────────────────────────────────────
+
+  const cnaeIndexado = useMemo<CnaeIndexada[]>(() => {
+    if (!catalogo) return [];
+    let seccionActual = '';
+    const seccionPorDivision: Record<string, string> = {};
+
+    // El catálogo va en orden jerárquico: cada división hereda la última sección leída
+    for (const entrada of catalogo.cnae) {
+      if (entrada.nivel === 'seccion') {
+        seccionActual = entrada.codigo;
+      } else if (entrada.nivel === 'division') {
+        seccionPorDivision[entrada.codigo] = seccionActual;
+      }
     }
 
-    return ordenarPorProximidad(buscarActividades(termino), termino);
-  }, [consulta, modo]);
+    return catalogo.cnae.map((entrada) => {
+      const division = entrada.nivel === 'seccion' ? '' : entrada.codigo.slice(0, 2);
+      const seccionLetra =
+        entrada.nivel === 'seccion' ? entrada.codigo : seccionPorDivision[division] ?? '';
+      const sinonimos = catalogo.sinonimos[entrada.codigo] ?? [];
+      return {
+        ...entrada,
+        seccionLetra,
+        codigoDigitos: soloDigitos(entrada.codigo),
+        sinonimos,
+        textoBusqueda: normalizarTexto(
+          `${entrada.codigo} ${entrada.titulo} ${sinonimos.join(' ')}`
+        ),
+      };
+    });
+  }, [catalogo]);
 
-  const hayConsulta = consulta.trim().length >= 2;
+  const mapaCnae = useMemo<Record<string, EntradaCnae>>(() => {
+    const mapa: Record<string, EntradaCnae> = {};
+    for (const entrada of cnaeIndexado) {
+      mapa[entrada.codigo] = entrada;
+    }
+    return mapa;
+  }, [cnaeIndexado]);
 
-  const cambiarModo = (nuevo: ModoBusqueda) => {
-    setModo(nuevo);
-    setConsulta('');
-    setAbiertas([]);
-    campoRef.current?.focus();
+  const seccionesCnae = useMemo<EntradaCnae[]>(
+    () => cnaeIndexado.filter((entrada) => entrada.nivel === 'seccion'),
+    [cnaeIndexado]
+  );
+
+  const iaeIndexado = useMemo<IaeIndexada[]>(() => {
+    if (!catalogo) return [];
+    return catalogo.iae.map((entrada) => ({
+      ...entrada,
+      codigoDigitos: soloDigitos(entrada.codigo),
+      textoBusqueda: normalizarTexto(`${entrada.codigo} ${entrada.titulo}`),
+    }));
+  }, [catalogo]);
+
+  const mapaIae = useMemo<Record<string, EntradaIae>>(() => {
+    const mapa: Record<string, EntradaIae> = {};
+    for (const entrada of iaeIndexado) {
+      mapa[`${entrada.seccion}|${entrada.codigo}`] = entrada;
+    }
+    return mapa;
+  }, [iaeIndexado]);
+
+  // ─── Búsqueda en la CNAE-2025 ──────────────────────────────────────────────
+
+  const consultaCnaeNormalizada = normalizarTexto(consultaCnae);
+  const digitosConsultaCnae = soloDigitos(consultaCnae);
+
+  /** Código anterior: 4 dígitos presentes en la tabla oficial CNAE-2009 → CNAE-2025. */
+  const equivalenciaAntigua = useMemo<string[] | null>(() => {
+    if (!catalogo) return null;
+    if (digitosConsultaCnae.length !== 4) return null;
+    return catalogo.correspondencia[digitosConsultaCnae] ?? null;
+  }, [catalogo, digitosConsultaCnae]);
+
+  const resultadosCnae = useMemo<CnaeIndexada[]>(() => {
+    if (cnaeIndexado.length === 0) return [];
+
+    const relevancia = (entrada: CnaeIndexada): number => {
+      if (consultaCnaeNormalizada.length === 0) return 0;
+      if (digitosConsultaCnae.length > 0 && entrada.codigoDigitos === digitosConsultaCnae) return 0;
+      if (digitosConsultaCnae.length > 0 && entrada.codigoDigitos.startsWith(digitosConsultaCnae)) {
+        return 1;
+      }
+      const titulo = normalizarTexto(entrada.titulo);
+      if (titulo.startsWith(consultaCnaeNormalizada)) return 2;
+      if (titulo.includes(consultaCnaeNormalizada)) return 3;
+      return 4;
+    };
+
+    let base: CnaeIndexada[];
+
+    if (equivalenciaAntigua) {
+      // Código antiguo reconocido: mostramos las clases CNAE-2025 equivalentes
+      const equivalentes = new Set(equivalenciaAntigua);
+      base = cnaeIndexado.filter((entrada) => equivalentes.has(entrada.codigo));
+    } else if (consultaCnaeNormalizada.length === 0) {
+      base = cnaeIndexado;
+    } else {
+      base = cnaeIndexado.filter((entrada) => {
+        if (
+          digitosConsultaCnae.length > 0 &&
+          entrada.codigoDigitos.startsWith(digitosConsultaCnae)
+        ) {
+          return true;
+        }
+        return entrada.textoBusqueda.includes(consultaCnaeNormalizada);
+      });
+    }
+
+    if (seccionCnae !== 'todas') {
+      base = base.filter((entrada) => entrada.seccionLetra === seccionCnae);
+    }
+
+    return [...base].sort((a, b) => {
+      const porNivel = PESO_NIVEL_CNAE[a.nivel] - PESO_NIVEL_CNAE[b.nivel];
+      if (porNivel !== 0) return porNivel;
+      const porRelevancia = relevancia(a) - relevancia(b);
+      if (porRelevancia !== 0) return porRelevancia;
+      return a.codigo.localeCompare(b.codigo, 'es');
+    });
+  }, [cnaeIndexado, consultaCnaeNormalizada, digitosConsultaCnae, equivalenciaAntigua, seccionCnae]);
+
+  const cnaeMostrados = resultadosCnae.slice(0, LIMITE_RESULTADOS);
+
+  // ─── Búsqueda en las Tarifas del IAE ───────────────────────────────────────
+
+  const consultaIaeNormalizada = normalizarTexto(consultaIae);
+  const digitosConsultaIae = soloDigitos(consultaIae);
+
+  const resultadosIae = useMemo<IaeIndexada[]>(() => {
+    if (iaeIndexado.length === 0) return [];
+
+    const relevancia = (entrada: IaeIndexada): number => {
+      if (consultaIaeNormalizada.length === 0) return 0;
+      if (entrada.codigo === consultaIae.trim()) return 0;
+      if (digitosConsultaIae.length > 0 && entrada.codigoDigitos.startsWith(digitosConsultaIae)) {
+        return 1;
+      }
+      if (normalizarTexto(entrada.titulo).startsWith(consultaIaeNormalizada)) return 2;
+      return 3;
+    };
+
+    let base = iaeIndexado;
+
+    if (consultaIaeNormalizada.length > 0) {
+      base = base.filter((entrada) => {
+        if (digitosConsultaIae.length > 0 && entrada.codigoDigitos.startsWith(digitosConsultaIae)) {
+          return true;
+        }
+        return entrada.textoBusqueda.includes(consultaIaeNormalizada);
+      });
+    }
+
+    if (seccionIae !== 'todas') {
+      base = base.filter((entrada) => entrada.seccion === seccionIae);
+    }
+
+    return [...base].sort((a, b) => {
+      const porTipo = PESO_TIPO_IAE[a.tipo] - PESO_TIPO_IAE[b.tipo];
+      if (porTipo !== 0) return porTipo;
+      const porRelevancia = relevancia(a) - relevancia(b);
+      if (porRelevancia !== 0) return porRelevancia;
+      if (a.seccion !== b.seccion) return a.seccion.localeCompare(b.seccion, 'es');
+      return a.codigo.localeCompare(b.codigo, 'es', { numeric: true });
+    });
+  }, [iaeIndexado, consultaIae, consultaIaeNormalizada, digitosConsultaIae, seccionIae]);
+
+  const iaeMostrados = resultadosIae.slice(0, LIMITE_RESULTADOS);
+
+  // ─── Jerarquías ────────────────────────────────────────────────────────────
+
+  const jerarquiaCnae = (entrada: CnaeIndexada): PasoJerarquia[] => {
+    const camino: PasoJerarquia[] = [];
+    const seccion = mapaCnae[entrada.seccionLetra];
+    if (seccion && entrada.nivel !== 'seccion') {
+      camino.push({ etiqueta: `Sección ${seccion.codigo}`, texto: seccion.titulo });
+    }
+    if (entrada.nivel === 'grupo' || entrada.nivel === 'clase') {
+      const division = mapaCnae[entrada.codigo.slice(0, 2)];
+      if (division) camino.push({ etiqueta: `División ${division.codigo}`, texto: division.titulo });
+    }
+    if (entrada.nivel === 'clase') {
+      const grupo = mapaCnae[entrada.codigo.slice(0, 4)];
+      if (grupo) camino.push({ etiqueta: `Grupo ${grupo.codigo}`, texto: grupo.titulo });
+    }
+    return camino;
   };
 
-  const usarEjemplo = (texto: string) => {
-    setModo('actividad');
-    setConsulta(texto);
-    setAbiertas([]);
-    campoRef.current?.focus();
+  const jerarquiaIae = (entrada: IaeIndexada): PasoJerarquia[] => {
+    const camino: PasoJerarquia[] = [];
+    const raiz = entrada.codigo.split('.')[0];
+
+    const division = mapaIae[`${entrada.seccion}|${raiz.slice(0, 1)}`];
+    if (division && division.codigo !== entrada.codigo) {
+      camino.push({ etiqueta: `División ${division.codigo}`, texto: division.titulo });
+    }
+    if (raiz.length >= 2) {
+      const agrupacion = mapaIae[`${entrada.seccion}|${raiz.slice(0, 2)}`];
+      if (agrupacion && agrupacion.codigo !== entrada.codigo) {
+        camino.push({ etiqueta: `Agrupación ${agrupacion.codigo}`, texto: agrupacion.titulo });
+      }
+    }
+    if (entrada.tipo === 'epigrafe') {
+      const grupo = mapaIae[`${entrada.seccion}|${raiz}`];
+      if (grupo) camino.push({ etiqueta: `Grupo ${grupo.codigo}`, texto: grupo.titulo });
+    }
+    return camino;
   };
 
-  const alternarFicha = (cnae: string) => {
-    setAbiertas((previas) =>
-      previas.includes(cnae) ? previas.filter((c) => c !== cnae) : [...previas, cnae]
-    );
+  /** Códigos de la CNAE-2009 de los que procede una clase de la CNAE-2025. */
+  const equivalenciaCnae2009 = (codigo: string): string[] => {
+    if (!catalogo) return [];
+    return catalogo.correspondenciaInversa[soloDigitos(codigo)] ?? [];
   };
 
-  const mensajeResultados = !hayConsulta
-    ? 'Escribe al menos dos caracteres para ver candidatos.'
-    : resultados.length === 0
-      ? 'Ninguna actividad del catálogo encaja con lo que has escrito.'
-      : `${formatNumber(resultados.length, 0)} ${
-          resultados.length === 1 ? 'actividad encaja' : 'actividades encajan'
-        } con tu búsqueda.`;
+  const descripcionSeccion = (seccion: SeccionIae): DescripcionSeccionIae | undefined =>
+    SECCIONES_IAE.find((item) => item.seccion === seccion);
+
+  // ─── Render ────────────────────────────────────────────────────────────────
+
+  const relacionadas = getRelatedApps('conversor-cnae-iae');
+  const meta = catalogo?.meta;
 
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
 
-      {/* Hero */}
       <header className={styles.hero}>
-        <h1 className={styles.title}>Conversor CNAE ⇄ IAE</h1>
+        <h1 className={styles.title}>Códigos CNAE-2025 y epígrafes del IAE: buscador oficial</h1>
         <p className={styles.subtitle}>
-          Busca tu código CNAE y tu epígrafe de IAE describiendo tu actividad con tus
-          palabras. Convierte en ambos sentidos y consulta qué implica cada sección.
+          Dos catálogos completos y literales para localizar tu actividad: la CNAE-2025 del INE
+          (la que sustituyó a la CNAE-2009 en enero de 2026) y las Tarifas del Impuesto sobre
+          Actividades Económicas. Búsqueda por palabras corrientes, por código y también por
+          códigos antiguos de la CNAE-2009.
         </p>
       </header>
 
@@ -206,942 +474,796 @@ export default function ConversorCnaeIaePage() {
 
       <RegionBadge variant="es-only" />
 
-      <DisclaimerCard
-        variant="financial"
-        severity="high"
-        collapsible={false}
-        title="Antes de usar estos códigos en tu alta"
-      >
+      <DisclaimerCard variant="financial" severity="high" collapsible={false}>
         <p>
-          Esta herramienta <strong>orienta, no decide</strong>. La correspondencia entre el
-          CNAE y el IAE no es oficial ni biunívoca: no existe una tabla de equivalencia
-          publicada, un mismo CNAE admite varios epígrafes y un mismo epígrafe puede
-          corresponder a varios CNAE. Lo que verás son <strong>candidatos</strong>, nunca un
-          veredicto.
-        </p>
-        <p>
-          Elegir el epígrafe equivocado tiene consecuencias reales: afecta a la retención de
-          IRPF de tus facturas, al régimen de IVA y a tus obligaciones censales. Antes de
-          presentar el modelo 036 o 037, contrasta el resultado con la Agencia Tributaria o
-          con un asesor fiscal.
+          Esta herramienta reproduce el literal de dos catálogos oficiales para que puedas
+          consultarlos, pero no decide qué código corresponde a tu actividad ni sustituye al
+          criterio de un asesor fiscal o al de la propia AEAT. Elegir mal un epígrafe del IAE tiene
+          efectos reales sobre retenciones, IVA y obligaciones censales.
         </p>
       </DisclaimerCard>
 
-      <DataReference
-        normativa="CNAE-2009 e IAE (Tarifas vigentes)"
-        fuente={CNAE_IAE_META.fuente}
-        verificado={CNAE_IAE_META.verificado}
-        urlOficial={CNAE_IAE_META.urlOficialIae}
-        nota="Catálogo curado de las actividades más frecuentes en altas de autónomo, no el listado completo del INE ni de las Tarifas del IAE."
-      />
-
-      {/* ─── Buscador / conversor ─────────────────────────────────────────── */}
-      <section className={styles.buscadorPanel} aria-labelledby="titulo-buscador">
-        <h2 id="titulo-buscador" className={styles.buscadorTitulo}>
-          <span aria-hidden="true">🧭</span> Localiza tu actividad
-        </h2>
-
-        <div className={styles.modos} role="group" aria-label="Forma de búsqueda">
-          {MODOS.map((m) => (
-            <button
-              key={m.id}
-              type="button"
-              className={`${styles.modoBtn} ${modo === m.id ? styles.modoBtnActivo : ''}`}
-              aria-pressed={modo === m.id}
-              onClick={() => cambiarModo(m.id)}
-            >
-              <span aria-hidden="true">{m.icono}</span> {m.etiqueta}
-            </button>
-          ))}
-        </div>
-
-        <div className={styles.campo}>
-          <label className={styles.label} htmlFor="campo-consulta">
-            {modoActual.titulo}
-          </label>
-          <input
-            id="campo-consulta"
-            ref={campoRef}
-            className={styles.input}
-            type="search"
-            autoFocus
-            autoComplete="off"
-            inputMode={modo === 'actividad' ? 'text' : 'numeric'}
-            value={consulta}
-            placeholder={modoActual.placeholder}
-            aria-describedby="ayuda-consulta"
-            onChange={(e) => setConsulta(e.target.value)}
+      {meta && (
+        <>
+          <DataReference
+            normativa="CNAE-2025"
+            fuente={meta.cnae.fuente}
+            verificado={meta.generado}
+            urlOficial={meta.cnae.urlOficial}
+            nota={meta.cnae.nota}
           />
-          <p id="ayuda-consulta" className={styles.ayuda}>
-            {modoActual.ayuda}
-          </p>
+          <DataReference
+            normativa="Tarifas del IAE"
+            fuente={meta.iae.fuente}
+            verificado={meta.generado}
+            urlOficial={meta.iae.urlOficial}
+            nota={meta.iae.nota}
+          />
+        </>
+      )}
+
+      {/* Aviso principal — fuera de EducationalSection, nunca colapsable */}
+      <section className={styles.warningBox} aria-labelledby="aviso-sin-tabla">
+        <div className={styles.warningHeader}>
+          <span className={styles.warningIcon} aria-hidden="true">
+            🧭
+          </span>
+          <h2 id="aviso-sin-tabla">
+            Aquí no hay conversión automática de CNAE a IAE, y es a propósito
+          </h2>
+        </div>
+        <ul className={styles.warningList}>
+          <li>
+            <strong>
+              No existe una tabla oficial que traduzca un código CNAE en un epígrafe del IAE.
+            </strong>{' '}
+            La CNAE la mantiene el INE con finalidad estadística; las Tarifas del IAE son de la
+            AEAT y tienen finalidad tributaria. Son dos clasificaciones de organismos distintos,
+            escritas en momentos distintos y con criterios distintos.
+          </li>
+          <li>
+            <strong>Cualquier equivalencia entre ambas es un criterio, no un dato.</strong> Puede
+            ser un criterio razonable y útil, pero es de quien lo elabora y no de la
+            Administración; y equivocarse de epígrafe tiene consecuencias fiscales concretas.
+          </li>
+          <li>
+            <strong>Por eso aquí tienes los dos catálogos completos y literales.</strong> Localiza
+            tu actividad en cada uno con el texto oficial delante: es la forma de decidir con
+            información en lugar de con una equivalencia improvisada.
+          </li>
+        </ul>
+      </section>
+
+      {/* ─── Buscadores ─────────────────────────────────────────────────── */}
+
+      <section className={styles.buscadorPanel} aria-label="Buscadores de códigos">
+        <div className={styles.tabs} role="tablist" aria-label="Elige qué catálogo consultar">
+          <button
+            type="button"
+            role="tab"
+            id="tab-cnae"
+            aria-selected={pestana === 'cnae'}
+            aria-controls="panel-cnae"
+            className={`${styles.tab} ${pestana === 'cnae' ? styles.tabActiva : ''}`}
+            onClick={() => setPestana('cnae')}
+          >
+            <span aria-hidden="true">🏷️</span> CNAE-2025
+          </button>
+          <button
+            type="button"
+            role="tab"
+            id="tab-iae"
+            aria-selected={pestana === 'iae'}
+            aria-controls="panel-iae"
+            className={`${styles.tab} ${pestana === 'iae' ? styles.tabActiva : ''}`}
+            onClick={() => setPestana('iae')}
+          >
+            <span aria-hidden="true">⚖️</span> Epígrafes del IAE
+          </button>
         </div>
 
-        {modo === 'actividad' && (
-          <div className={styles.ejemplos}>
-            <span className={styles.ejemplosEtiqueta}>Prueba con:</span>
-            {EJEMPLOS_BUSQUEDA.map((ejemplo) => (
-              <button
-                key={ejemplo}
-                type="button"
-                className={styles.ejemploBtn}
-                onClick={() => usarEjemplo(ejemplo)}
-              >
-                {ejemplo}
-              </button>
-            ))}
-          </div>
+        {estado === 'cargando' && (
+          <p className={styles.estadoCarga} role="status" aria-live="polite">
+            Cargando los catálogos oficiales…
+          </p>
         )}
 
-        <p className={styles.contador} role="status" aria-live="polite">
-          {mensajeResultados}
-        </p>
+        {estado === 'error' && (
+          <p className={styles.estadoError} role="alert">
+            No se han podido cargar los catálogos. Comprueba tu conexión y vuelve a cargar la
+            página; si el problema persiste, puedes consultar directamente las fuentes oficiales
+            del INE y del BOE enlazadas más arriba.
+          </p>
+        )}
 
-        {hayConsulta && resultados.length === 0 && (
-          <div className={styles.sinResultados}>
-            <p>
-              <strong>Que no aparezca no significa que no exista.</strong> Este catálogo
-              recoge {formatNumber(COBERTURA_CATALOGO.totalActividades, 0)} actividades, las
-              más frecuentes en altas de autónomo; la CNAE-2009 completa tiene alrededor de
-              700 clases y las Tarifas del IAE, miles de epígrafes.
+        {/* Panel CNAE-2025 */}
+        {estado === 'listo' && pestana === 'cnae' && (
+          <div id="panel-cnae" role="tabpanel" aria-labelledby="tab-cnae">
+            <h2 className={styles.buscadorTitulo}>Buscador de la CNAE-2025</h2>
+            <p className={styles.panelIntro}>
+              Escribe cómo describirías tu trabajo («hago páginas web», «peluquería»), el nombre
+              oficial o un código. También reconoce los códigos de cuatro dígitos de la{' '}
+              <strong>CNAE-2009</strong> y muestra a qué equivalen hoy.
             </p>
-            <ul>
-              <li>Prueba con una palabra más corta o con otro término coloquial.</li>
-              <li>
-                Consulta el listado completo en el{' '}
-                <a href={CNAE_IAE_META.urlOficialCnae} target="_blank" rel="noopener noreferrer">
-                  buscador de la CNAE-2009 del INE
-                </a>{' '}
-                y en la{' '}
-                <a href={CNAE_IAE_META.urlOficialIae} target="_blank" rel="noopener noreferrer">
-                  sede electrónica de la AEAT
-                </a>
-                .
-              </li>
-            </ul>
-          </div>
-        )}
 
-        {/* Fichas de resultado */}
-        {resultados.length > 0 && (
-          <ul className={styles.listaResultados}>
-            {resultados.map((actividad) => (
-              <li key={actividad.cnae}>
-                <FichaActividad
-                  actividad={actividad}
-                  abierta={abiertas.includes(actividad.cnae)}
-                  onToggle={() => alternarFicha(actividad.cnae)}
-                />
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      {/* ─── Secciones del IAE ─────────────────────────────────────────────── */}
-      <section className={styles.seccionesPanel} aria-labelledby="titulo-secciones">
-        <h2 id="titulo-secciones" className={styles.panelTitulo}>
-          <span aria-hidden="true">📑</span> Qué significan las secciones del IAE
-        </h2>
-        <p className={styles.panelIntro}>
-          Las Tarifas del IAE se dividen en tres secciones. La sección de tu epígrafe no es
-          un detalle administrativo: determina si tus facturas llevan retención de IRPF.
-        </p>
-        <div className={styles.seccionesGrid}>
-          {SECCIONES_IAE.map((s) => (
-            <article key={s.seccion} className={styles.seccionCard}>
-              <h3 className={styles.seccionCardTitulo}>
-                <span className={`${styles.badgeSeccion} ${claseDeSeccion(s.seccion)}`}>
-                  Sección {s.seccion}
-                </span>
-                {s.nombre}
-              </h3>
-              <p className={styles.seccionQuienes}>{s.quienes}</p>
-              <p className={styles.seccionImplicacion}>
-                <strong>En tus facturas:</strong> {s.implicacion}
+            <div className={styles.campo}>
+              <label className={styles.label} htmlFor="buscador-cnae">
+                Actividad o código CNAE
+              </label>
+              <input
+                id="buscador-cnae"
+                ref={inputCnaeRef}
+                type="search"
+                className={styles.input}
+                value={consultaCnae}
+                onChange={(evento) => setConsultaCnae(evento.target.value)}
+                placeholder="hago páginas web, peluquería, 4711…"
+                autoComplete="off"
+              />
+              <p className={styles.ayuda}>
+                La búsqueda tolera acentos y mayúsculas, y recorre también los términos coloquiales
+                asociados a cada clase.
               </p>
-            </article>
-          ))}
-        </div>
+            </div>
+
+            <div className={styles.ejemplos}>
+              <span className={styles.ejemplosEtiqueta}>Prueba con:</span>
+              {EJEMPLOS_CNAE.map((ejemplo) => (
+                <button
+                  key={ejemplo}
+                  type="button"
+                  className={styles.ejemploBtn}
+                  onClick={() => setConsultaCnae(ejemplo)}
+                >
+                  {ejemplo}
+                </button>
+              ))}
+            </div>
+
+            <div
+              className={styles.filtros}
+              role="group"
+              aria-label="Filtrar por sección de la CNAE"
+            >
+              <button
+                type="button"
+                className={`${styles.filtroBtn} ${seccionCnae === 'todas' ? styles.filtroActivo : ''}`}
+                aria-pressed={seccionCnae === 'todas'}
+                onClick={() => setSeccionCnae('todas')}
+              >
+                Todas
+              </button>
+              {seccionesCnae.map((seccion) => (
+                <button
+                  key={seccion.codigo}
+                  type="button"
+                  className={`${styles.filtroBtn} ${seccionCnae === seccion.codigo ? styles.filtroActivo : ''}`}
+                  aria-pressed={seccionCnae === seccion.codigo}
+                  onClick={() => setSeccionCnae(seccion.codigo)}
+                  title={seccion.titulo}
+                >
+                  {seccion.codigo}
+                </button>
+              ))}
+            </div>
+
+            {equivalenciaAntigua && (
+              <div className={styles.avisoAntiguo} role="note">
+                <p>
+                  <strong>{digitosConsultaCnae}</strong> es un código de la{' '}
+                  <strong>CNAE-2009</strong>, la clasificación anterior. Desde enero de 2026 rige
+                  la CNAE-2025 (RD 10/2025). Estas son las clases actuales que recogen esa
+                  actividad:
+                </p>
+              </div>
+            )}
+
+            <p className={styles.contador} role="status" aria-live="polite">
+              {formatNumber(resultadosCnae.length, 0)}{' '}
+              {resultadosCnae.length === 1 ? 'resultado' : 'resultados'}
+              {resultadosCnae.length > LIMITE_RESULTADOS && (
+                <>
+                  {' '}
+                  · se muestran los {LIMITE_RESULTADOS} primeros; afina la búsqueda para ver el
+                  resto
+                </>
+              )}
+            </p>
+
+            {resultadosCnae.length === 0 ? (
+              <div className={styles.sinResultados}>
+                <p>No hay ninguna entrada que encaje con lo que has escrito.</p>
+                <ul>
+                  <li>
+                    Prueba con una palabra más corta o con la raíz del término («fontaner» en vez
+                    de «fontanería industrial»).
+                  </li>
+                  <li>
+                    Si tienes un código antiguo, escríbelo con sus cuatro dígitos y sin puntos.
+                  </li>
+                  <li>Quita el filtro de sección: puede estar dejando fuera tu actividad.</li>
+                </ul>
+              </div>
+            ) : (
+              <ul className={styles.listaResultados}>
+                {cnaeMostrados.map((entrada) => {
+                  const camino = jerarquiaCnae(entrada);
+                  const antiguos =
+                    entrada.nivel === 'clase' ? equivalenciaCnae2009(entrada.codigo) : [];
+                  return (
+                    <li key={`${entrada.nivel}-${entrada.codigo}`} className={styles.ficha}>
+                      <div className={styles.fichaCabecera}>
+                        <div className={styles.fichaIdentidad}>
+                          <span className={styles.codigoCnae}>{entrada.codigo}</span>
+                          <p className={styles.denominacion}>{entrada.titulo}</p>
+                        </div>
+                        <span className={styles.badgeNivel}>{NIVEL_ETIQUETA[entrada.nivel]}</span>
+                      </div>
+
+                      {camino.length > 0 && (
+                        <ul className={styles.jerarquia}>
+                          {camino.map((paso) => (
+                            <li key={paso.etiqueta}>
+                              <strong>{paso.etiqueta}:</strong> {paso.texto}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+
+                      {entrada.sinonimos.length > 0 && (
+                        <p className={styles.sinonimosLinea}>
+                          <strong>También se encuentra buscando:</strong>{' '}
+                          {entrada.sinonimos.join(' · ')}
+                        </p>
+                      )}
+
+                      {antiguos.length > 0 && (
+                        <p className={styles.nota2009}>
+                          En la CNAE-2009 esto correspondía a{' '}
+                          {antiguos.map((codigo) => soloDigitos(codigo)).join(', ')}.
+                        </p>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        )}
+
+        {/* Panel IAE */}
+        {estado === 'listo' && pestana === 'iae' && (
+          <div id="panel-iae" role="tabpanel" aria-labelledby="tab-iae">
+            <h2 className={styles.buscadorTitulo}>Buscador de epígrafes del IAE</h2>
+            <p className={styles.panelIntro}>
+              El epígrafe del IAE es el que se declara a la AEAT en el modelo 036 o 037 al darse de
+              alta. Busca por denominación o por código, y fíjate en la sección: es la distinción
+              con más efecto práctico sobre tus facturas.
+            </p>
+
+            <div className={styles.campo}>
+              <label className={styles.label} htmlFor="buscador-iae">
+                Actividad o código del epígrafe
+              </label>
+              <input
+                id="buscador-iae"
+                ref={inputIaeRef}
+                type="search"
+                className={styles.input}
+                value={consultaIae}
+                onChange={(evento) => setConsultaIae(evento.target.value)}
+                placeholder="peluquería, enseñanza, 505.6…"
+                autoComplete="off"
+              />
+              <p className={styles.ayuda}>
+                El texto que se muestra es el literal de las Tarifas, tal y como figuran en el BOE.
+              </p>
+            </div>
+
+            <div className={styles.ejemplos}>
+              <span className={styles.ejemplosEtiqueta}>Prueba con:</span>
+              {EJEMPLOS_IAE.map((ejemplo) => (
+                <button
+                  key={ejemplo}
+                  type="button"
+                  className={styles.ejemploBtn}
+                  onClick={() => setConsultaIae(ejemplo)}
+                >
+                  {ejemplo}
+                </button>
+              ))}
+            </div>
+
+            <div className={styles.filtros} role="group" aria-label="Filtrar por sección del IAE">
+              <button
+                type="button"
+                className={`${styles.filtroBtn} ${seccionIae === 'todas' ? styles.filtroActivo : ''}`}
+                aria-pressed={seccionIae === 'todas'}
+                onClick={() => setSeccionIae('todas')}
+              >
+                Todas las secciones
+              </button>
+              {SECCIONES_IAE.map((descripcion) => (
+                <button
+                  key={descripcion.seccion}
+                  type="button"
+                  className={`${styles.filtroBtn} ${seccionIae === descripcion.seccion ? styles.filtroActivo : ''}`}
+                  aria-pressed={seccionIae === descripcion.seccion}
+                  onClick={() => setSeccionIae(descripcion.seccion)}
+                >
+                  Sección {descripcion.seccion} · {descripcion.nombre}
+                </button>
+              ))}
+            </div>
+
+            <div className={styles.seccionesGrid}>
+              {SECCIONES_IAE.map((descripcion) => (
+                <article key={descripcion.seccion} className={styles.seccionCard}>
+                  <h3 className={styles.seccionCardTitulo}>
+                    <span className={`${styles.badgeSeccion} ${descripcion.clase}`}>
+                      Sección {descripcion.seccion}
+                    </span>
+                    {descripcion.nombre}
+                  </h3>
+                  <p className={styles.seccionQuienes}>{descripcion.quienes}</p>
+                  <p className={styles.seccionImplicacion}>{descripcion.retencion}</p>
+                </article>
+              ))}
+            </div>
+
+            <p className={styles.contador} role="status" aria-live="polite">
+              {formatNumber(resultadosIae.length, 0)}{' '}
+              {resultadosIae.length === 1 ? 'resultado' : 'resultados'}
+              {resultadosIae.length > LIMITE_RESULTADOS && (
+                <>
+                  {' '}
+                  · se muestran los {LIMITE_RESULTADOS} primeros; afina la búsqueda para ver el
+                  resto
+                </>
+              )}
+            </p>
+
+            {resultadosIae.length === 0 ? (
+              <div className={styles.sinResultados}>
+                <p>Ningún epígrafe coincide con esa búsqueda.</p>
+                <ul>
+                  <li>
+                    Las Tarifas usan el lenguaje de 1990: prueba con «peluquería» antes que con
+                    «barbería moderna», o con «comercio al por menor» antes que con «tienda».
+                  </li>
+                  <li>Busca por la raíz de la palabra; se admiten coincidencias parciales.</li>
+                  <li>Comprueba que el filtro de sección no esté excluyendo tu actividad.</li>
+                </ul>
+              </div>
+            ) : (
+              <ul className={styles.listaResultados}>
+                {iaeMostrados.map((entrada) => {
+                  const camino = jerarquiaIae(entrada);
+                  const descripcion = descripcionSeccion(entrada.seccion);
+                  return (
+                    <li
+                      key={`${entrada.seccion}-${entrada.tipo}-${entrada.codigo}`}
+                      className={styles.ficha}
+                    >
+                      <div className={styles.fichaCabecera}>
+                        <div className={styles.fichaIdentidad}>
+                          <span className={styles.codigoCnae}>{entrada.codigo}</span>
+                          <p className={styles.denominacion}>{entrada.titulo}</p>
+                        </div>
+                        <div className={styles.badgesFicha}>
+                          <span
+                            className={`${styles.badgeSeccion} ${descripcion ? descripcion.clase : styles.seccion1}`}
+                          >
+                            Sección {entrada.seccion}
+                          </span>
+                          <span className={styles.badgeNivel}>{TIPO_ETIQUETA[entrada.tipo]}</span>
+                        </div>
+                      </div>
+
+                      {camino.length > 0 && (
+                        <ul className={styles.jerarquia}>
+                          {camino.map((paso) => (
+                            <li key={paso.etiqueta}>
+                              <strong>{paso.etiqueta}:</strong> {paso.texto}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+
+                      {descripcion && (
+                        <p className={styles.epigrafeImplicacion}>{descripcion.retencion}</p>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+
+            <div className={styles.notaCuotas} role="note">
+              <p>
+                <strong>Por qué no aparecen las cuotas.</strong> Las cuotas del texto consolidado
+                de las Tarifas siguen expresadas en pesetas de 1990, y lo que realmente se paga
+                depende de coeficientes de ponderación y de los índices y recargos que fija cada
+                ayuntamiento. Publicar aquí una cifra sería aparentar una precisión que el texto
+                oficial no tiene. Además, la mayoría de quienes se dan de alta están exentos del
+                pago por su cifra de negocio (se explica más abajo).
+              </p>
+            </div>
+          </div>
+        )}
       </section>
 
-      {/* ─── Transparencia sobre la cobertura ──────────────────────────────── */}
-      <section className={styles.transparencia} aria-labelledby="titulo-transparencia">
-        <h2 id="titulo-transparencia" className={styles.panelTitulo}>
-          <span aria-hidden="true">🔍</span> Qué cubre este catálogo y qué no
-        </h2>
+      {/* ─── Contenido educativo v2.0 ───────────────────────────────────── */}
 
-        <div className={styles.statGrid}>
-          <div className={styles.stat}>
-            <span className={styles.statNum}>
-              {formatNumber(COBERTURA_CATALOGO.totalActividades, 0)}
-            </span>
-            <span className={styles.statLabel}>actividades con código CNAE</span>
-          </div>
-          <div className={styles.stat}>
-            <span className={styles.statNum}>
-              {formatNumber(COBERTURA_CATALOGO.totalEpigrafes, 0)}
-            </span>
-            <span className={styles.statLabel}>epígrafes de IAE asociados</span>
-          </div>
-          <div className={styles.stat}>
-            <span className={styles.statNum}>
-              {formatNumber(COBERTURA_CATALOGO.epigrafesAltaConfianza, 0)}
-            </span>
-            <span className={styles.statLabel}>epígrafes contrastados</span>
-          </div>
-          <div className={styles.stat}>
-            <span className={styles.statNum}>
-              {formatNumber(COBERTURA_CATALOGO.epigrafesMediaConfianza, 0)}
-            </span>
-            <span className={styles.statLabel}>epígrafes que conviene verificar</span>
-          </div>
-          <div className={styles.stat}>
-            <span className={styles.statNum}>
-              {formatNumber(COBERTURA_CATALOGO.sinEpigrafeIae, 0)}
-            </span>
-            <span className={styles.statLabel}>actividades sin epígrafe verificado</span>
-          </div>
-        </div>
-
-        <div className={styles.transparenciaTexto}>
-          <p>
-            <strong>Es un subconjunto curado, no el catálogo completo.</strong>{' '}
-            {CNAE_IAE_META.cobertura}
-          </p>
-          <p>
-            <strong>No hay equivalencia oficial.</strong> {CNAE_IAE_META.nota}
-          </p>
-          <p>
-            <strong>Lo dudoso se declara como dudoso.</strong> Cada epígrafe lleva su nivel
-            de certeza a la vista: los marcados como <em>conviene verificar</em> explican
-            exactamente qué no está contrastado. {CNAE_IAE_META.escalaConfianza}
-          </p>
-          <p>
-            Hay {formatNumber(COBERTURA_CATALOGO.sinEpigrafeIae, 0)} actividades para las que
-            se conoce el CNAE pero <strong>no se incluye ningún epígrafe</strong>: entre
-            ellas, el diseño gráfico y varias profesiones sanitarias no médicas. Aparecen en
-            el buscador y se dice abiertamente que falta el dato, porque una ficha incompleta
-            es preferible a una correspondencia inventada.
-          </p>
-        </div>
-      </section>
-
-      {/* ─── Contenido educativo v2.0 ──────────────────────────────────────── */}
       <EducationalSection
+        title="CNAE, IAE y el alta de actividad: lo que conviene saber"
+        subtitle="Qué es cada clasificación, en qué trámite aparece y cómo elegir correctamente"
         icon="📚"
-        title="CNAE e IAE: guía completa para el alta"
-        subtitle="Qué es cada código, dónde te lo piden, qué implica la sección y cómo se corrige un error"
       >
-        <section className={styles.guideSection}>
-          <h2>Dos códigos, dos organismos, dos finalidades</h2>
+        <div className={styles.guideSection}>
+          <h2>Dos códigos distintos para dos trámites distintos</h2>
           <p className={styles.introText}>
-            Casi todo el lío viene de tratarlos como si fueran lo mismo. El{' '}
-            <strong>CNAE</strong> es la Clasificación Nacional de Actividades Económicas que
-            mantiene el INE (versión CNAE-2009, aprobada por el RD 475/2007). Su finalidad es{' '}
-            <strong>estadística</strong>: sirve para saber cuánta gente hace qué en el país,
-            y aparece en el alta en el RETA, en el Registro Mercantil o al abrir una cuenta
-            bancaria de empresa. El <strong>epígrafe del IAE</strong> procede de las Tarifas
-            del Impuesto sobre Actividades Económicas (RD Legislativo 1175/1990) y su
-            finalidad es <strong>censal y tributaria</strong>: es el código que declaras a la
-            AEAT en el modelo 036 o 037 y el que define, de hecho, cómo tributa tu actividad.
+            Quien empieza una actividad por cuenta propia se topa con dos códigos que se parecen
+            pero no lo son. El <strong>CNAE</strong> es la Clasificación Nacional de Actividades
+            Económicas, la mantiene el INE y su finalidad es estadística: sirve para saber cuánta
+            gente hace qué en el país. El <strong>epígrafe del IAE</strong> procede de las Tarifas
+            del Impuesto sobre Actividades Económicas (RD Legislativo 1175/1990), es de la AEAT y
+            su finalidad es censal y tributaria: identifica qué actividad has declarado ejercer.
           </p>
           <p className={styles.introText}>
-            No existe una tabla oficial que traduzca uno en otro. Por eso ninguna herramienta
-            —esta tampoco— puede decirte «tu epígrafe es el X»: lo que se puede hacer es
-            enseñarte los candidatos habituales para tu tipo de actividad y explicarte qué
-            distingue a unos de otros para que la decisión final la tomes con criterio, o la
-            contrastes con quien tenga responsabilidad profesional sobre ella.
+            La CNAE vigente es la <strong>CNAE-2025</strong>, aprobada por el RD 10/2025, que
+            sustituye a la CNAE-2009 desde enero de 2026. Muchos formularios, escrituras y
+            contratos anteriores siguen citando códigos de la CNAE-2009: por eso este buscador los
+            reconoce y muestra a qué clase equivalen hoy. Las Tarifas del IAE, en cambio, siguen
+            siendo las de 1990 con sus modificaciones posteriores, y su lenguaje refleja esa fecha.
           </p>
 
-          {/* 1. Tabla comparativa */}
-          <h2>CNAE frente a IAE, de un vistazo</h2>
+          <h2>Comparativa rápida</h2>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
               <thead>
                 <tr>
-                  <th scope="col">Criterio</th>
-                  <th scope="col">CNAE-2009</th>
-                  <th scope="col">Epígrafe IAE</th>
+                  <th scope="col">Aspecto</th>
+                  <th scope="col">CNAE-2025</th>
+                  <th scope="col">Epígrafe del IAE</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td>
-                    <strong>Quién lo mantiene</strong>
+                    <strong>Quién la mantiene</strong>
                   </td>
-                  <td>INE (RD 475/2007)</td>
-                  <td>AEAT (RD Legislativo 1175/1990)</td>
+                  <td>INE (Instituto Nacional de Estadística)</td>
+                  <td>AEAT, sobre las Tarifas aprobadas por ley</td>
                 </tr>
                 <tr>
                   <td>
                     <strong>Para qué sirve</strong>
                   </td>
-                  <td>Clasificar la actividad con fines estadísticos</td>
-                  <td>Registrar la actividad a efectos censales y tributarios</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>Formato</strong>
-                  </td>
-                  <td>4 dígitos de clase (por ejemplo, 6201)</td>
-                  <td>Grupo o epígrafe con posible sufijo (763, 505.6)</td>
+                  <td>Clasificación estadística de la actividad</td>
+                  <td>Censo de empresarios, profesionales y retenedores</td>
                 </tr>
                 <tr>
                   <td>
                     <strong>Dónde te lo piden</strong>
                   </td>
-                  <td>Alta en el RETA, bancos, subvenciones, mutua</td>
-                  <td>Modelo 036 / 037, facturación, censo de empresarios</td>
+                  <td>Alta en la Seguridad Social, Registro Mercantil, bancos, subvenciones</td>
+                  <td>Modelo 036 o 037 de declaración censal ante la AEAT</td>
                 </tr>
                 <tr>
                   <td>
-                    <strong>Efecto sobre tus facturas</strong>
+                    <strong>Formato</strong>
+                  </td>
+                  <td>Letra de sección y hasta cuatro dígitos: 47.11</td>
+                  <td>Sección 1ª, 2ª o 3ª y hasta epígrafe: 505.6</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Norma de referencia</strong>
+                  </td>
+                  <td>RD 10/2025 (sustituye al RD 475/2007)</td>
+                  <td>RD Legislativo 1175/1990 y modificaciones</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Efecto en tus facturas</strong>
                   </td>
                   <td>Ninguno directo</td>
                   <td>La sección determina si procede retención de IRPF</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>¿Se paga algo por él?</strong>
-                  </td>
-                  <td>No, es una clasificación</td>
-                  <td>Es un impuesto, aunque la mayoría de autónomos está exenta</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>¿Puedes tener varios?</strong>
-                  </td>
-                  <td>Se declara el principal de cada registro</td>
-                  <td>Sí: tantos epígrafes como actividades ejerzas</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          {/* 2. Casos de uso */}
-          <h2>Cuatro situaciones reales</h2>
+          <h2>Situaciones habituales</h2>
           <div className={styles.escenariosGrid}>
-            <div className={styles.escenarioCard}>
+            <article className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioIcon} aria-hidden="true">
                   💻
                 </span>
-                <h3>Desarrollo web por cuenta propia</h3>
+                <h3>Desarrollo de software por cuenta propia</h3>
               </div>
               <div className={styles.escenarioExample}>
-                <p>
-                  <strong>Situación:</strong>
-                </p>
-                <code>
-                  CNAE 6201 · Candidatos IAE: 763 (Sección 2ª) o 845 (Sección 1ª)
-                </code>
+                <p>Búsqueda:</p>
+                <code>hago páginas web → CNAE 62.10 Actividades de programación informática</code>
               </div>
               <p className={styles.escenarioTip}>
-                <strong>Qué está en juego:</strong> el mismo trabajo admite dos encuadres. Sin
-                estructura empresarial, el epígrafe 763 de la Sección 2ª; con local, equipo o
-                personal organizado, el 845 de la Sección 1ª. La diferencia aparece en cada
-                factura: con el 763 tus clientes empresa te retienen IRPF; con el 845, no.
+                <strong>A tener en cuenta:</strong> en el IAE, programar para terceros se declara
+                con frecuencia en la Sección 2ª cuando se ejerce individualmente, lo que implica
+                retención en las facturas a empresas. Si hay organización empresarial (local,
+                personal, reventa de licencias), el encaje puede estar en la Sección 1ª.
               </p>
-            </div>
+            </article>
 
-            <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon} aria-hidden="true">
-                  🛒
-                </span>
-                <h3>Tienda online</h3>
-              </div>
-              <div className={styles.escenarioExample}>
-                <p>
-                  <strong>Situación:</strong>
-                </p>
-                <code>CNAE 4791 · IAE 665 (Sección 1ª)</code>
-              </div>
-              <p className={styles.escenarioTip}>
-                <strong>Qué está en juego:</strong> el 665 cubre la venta por correo o
-                catálogo, y es el epígrafe habitual del comercio electrónico. Si además
-                vendes en un local físico, esa venta es otra actividad y procede alta
-                adicional en el epígrafe de comercio que corresponda.
-              </p>
-            </div>
-
-            <div className={styles.escenarioCard}>
+            <article className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioIcon} aria-hidden="true">
                   ✂️
                 </span>
-                <h3>Peluquería con servicios de estética</h3>
+                <h3>Peluquería con local abierto</h3>
               </div>
               <div className={styles.escenarioExample}>
-                <p>
-                  <strong>Situación:</strong>
-                </p>
-                <code>CNAE 9602 · IAE 972.1 (peluquería) + 972.2 (estética)</code>
+                <p>Búsqueda:</p>
+                <code>peluquería → clase CNAE de servicios personales · IAE Sección 1ª</code>
               </div>
               <p className={styles.escenarioTip}>
-                <strong>Qué está en juego:</strong> son dos epígrafes distintos. Quien corta
-                el pelo y además hace manicura o depilación ejerce dos actividades y procede
-                el alta en las dos; no es una elección entre una y otra.
+                <strong>A tener en cuenta:</strong> es una actividad empresarial típica de la
+                Sección 1ª, de modo que sus facturas no llevan retención de IRPF. Si además se
+                venden productos, conviene comprobar si procede un alta adicional de comercio al
+                por menor.
               </p>
-            </div>
+            </article>
 
-            <div className={styles.escenarioCard}>
+            <article className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioIcon} aria-hidden="true">
-                  🎨
+                  📄
                 </span>
-                <h3>Diseño gráfico</h3>
+                <h3>Llegas con un código antiguo</h3>
               </div>
               <div className={styles.escenarioExample}>
-                <p>
-                  <strong>Situación:</strong>
-                </p>
-                <code>CNAE 7410 · Sin epígrafe claro en las Tarifas</code>
+                <p>Búsqueda:</p>
+                <code>4711 → clases CNAE-2025 equivalentes</code>
               </div>
               <p className={styles.escenarioTip}>
-                <strong>Qué está en juego:</strong> no hay un epígrafe de «diseñador gráfico»
-                claramente identificado. En la práctica se recurre al 844 (publicidad,
-                Sección 1ª) o a un epígrafe profesional de la Sección 2ª, y la elección
-                determina si tus facturas llevan retención. Es de los casos en los que más
-                merece la pena preguntar antes de presentar el alta.
+                <strong>A tener en cuenta:</strong> una clase de la CNAE-2009 puede repartirse
+                entre varias de la CNAE-2025. Cuando aparezcan varias equivalencias hay que leer
+                los literales y quedarse con la que describa lo que realmente haces.
               </p>
-            </div>
+            </article>
+
+            <article className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">
+                  🧱
+                </span>
+                <h3>Reformas y acabados de obra</h3>
+              </div>
+              <div className={styles.escenarioExample}>
+                <p>Búsqueda:</p>
+                <code>pintura → IAE 505.6 Pintura de cualquier tipo y clase…</code>
+              </div>
+              <p className={styles.escenarioTip}>
+                <strong>A tener en cuenta:</strong> las Tarifas separan mucho los oficios de obra
+                (albañilería, solados, carpintería, pintura). Quien hace varios de esos trabajos
+                suele necesitar alta en varios epígrafes.
+              </p>
+            </article>
           </div>
 
-          {/* 3. FAQ */}
           <h2>Preguntas frecuentes</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>
-                <span aria-hidden="true">❓</span> ¿Por qué me piden los dos códigos si
-                describen lo mismo?
-              </h4>
+              <h4>¿Puedo deducir mi epígrafe del IAE a partir de mi código CNAE?</h4>
               <p>
-                Porque los pide gente distinta para cosas distintas. La AEAT necesita el
-                epígrafe del IAE para el censo de empresarios, profesionales y retenedores:
-                de ahí deduce qué obligaciones de IVA y de retenciones te corresponden. La
-                Seguridad Social necesita el CNAE al inscribirte en el RETA, entre otras
-                razones porque el código de actividad se relaciona con la cobertura de
-                accidentes de trabajo. Ninguno de los dos organismos consulta el código del
-                otro.
-              </p>
-              <p className={styles.faqTip}>
-                <span aria-hidden="true">💡</span> <strong>En la práctica:</strong> localiza
-                primero el epígrafe del IAE, que es el que tiene consecuencias fiscales, y
-                elige después el CNAE de la clase que mejor describa esa misma actividad.
+                No de forma oficial: no hay ninguna tabla publicada por la AEAT ni por el INE que
+                enlace ambas clasificaciones. Lo que sí puedes hacer es localizar tu actividad en
+                cada catálogo por separado, leyendo los literales. Si dudas entre dos epígrafes,
+                preguntar a la AEAT o a un asesor cuesta mucho menos que rectificar después.
               </p>
             </div>
-
             <div className={styles.faqItem}>
-              <h4>
-                <span aria-hidden="true">❓</span> ¿Tengo que pagar el IAE?
-              </h4>
+              <h4>¿Desde cuándo rige la CNAE-2025 y qué pasa con mi código antiguo?</h4>
               <p>
-                Con toda probabilidad, no. Están exentas las personas físicas y quienes
-                tengan un importe neto de la cifra de negocios inferior a 1.000.000 de euros,
-                lo que deja fuera de la cuota a la inmensa mayoría de autónomos. Ahora bien,
-                la exención es del pago, no de la declaración: el alta en el epígrafe sigue
-                siendo obligatoria, porque es la forma en que la AEAT sabe qué actividad
-                ejerces.
-              </p>
-              <p className={styles.faqTip}>
-                <span aria-hidden="true">💡</span> <strong>Ojo con la confusión:</strong>{' '}
-                «estoy exento del IAE» no equivale a «no tengo epígrafe». Todo el mundo que
-                se da de alta tiene epígrafe.
+                La CNAE-2025 fue aprobada por el RD 10/2025 y se aplica desde enero de 2026, en
+                sustitución de la CNAE-2009. Los códigos antiguos siguen apareciendo en documentos
+                previos; para saber a qué corresponden hoy basta con escribir los cuatro dígitos en
+                el buscador de esta página. En muchos casos la equivalencia es uno a uno, pero
+                algunas clases se han dividido o fusionado.
               </p>
             </div>
-
             <div className={styles.faqItem}>
-              <h4>
-                <span aria-hidden="true">❓</span> ¿Puedo estar dado de alta en varios
-                epígrafes a la vez?
-              </h4>
+              <h4>¿Qué cambia según la sección del IAE en la que me dé de alta?</h4>
               <p>
-                Sí, y es más común de lo que parece. Cada actividad económica distinta exige
-                su propia alta: quien fabrica joyas y además las vende al por menor ejerce dos
-                actividades; quien tiene una academia y además da clases particulares por su
-                cuenta, también. Se declaran todas en el mismo modelo 036 o 037, y puedes
-                añadir o retirar epígrafes después mediante una declaración de modificación.
+                La Sección 1ª recoge las actividades empresariales y la 2ª el ejercicio individual
+                de una profesión. La diferencia práctica está en la factura: un profesional de la
+                Sección 2ª aplica retención de IRPF en sus facturas a empresas y a otros
+                profesionales (15 % con carácter general y 7 % el año de inicio de la actividad y
+                los dos siguientes), mientras que una actividad empresarial de la Sección 1ª, con
+                carácter general, no la aplica. La Sección 3ª, artística, tiene tratamiento
+                análogo al profesional.
               </p>
               <p className={styles.faqTip}>
-                <span aria-hidden="true">💡</span> <strong>Cuidado:</strong> facturar de forma
-                habitual por una actividad para la que no tienes epígrafe es precisamente el
-                supuesto que conviene evitar. Si el trabajo cambia, actualiza el alta.
+                <strong>Dato útil:</strong> una misma actividad puede encajar en una sección o en
+                otra según cómo se ejerza; lo determinante es si hay organización empresarial de
+                medios o ejercicio personal de la profesión.
               </p>
             </div>
-
             <div className={styles.faqItem}>
-              <h4>
-                <span aria-hidden="true">❓</span> ¿Cómo sé si mi actividad es empresarial o
-                profesional?
-              </h4>
+              <h4>¿Tengo que pagar el IAE siendo autónomo?</h4>
               <p>
-                La frontera está en la organización de medios. Si trabajas por tu cuenta
-                aportando fundamentalmente tu propia cualificación, la actividad tiende a ser
-                profesional (Sección 2ª). Si hay una estructura organizada —local abierto al
-                público, personal contratado, medios materiales significativos— la actividad
-                se acerca a lo empresarial (Sección 1ª). No es una etiqueta que elijas a
-                voluntad: debe reflejar cómo ejerces realmente.
-              </p>
-              <p className={styles.faqTip}>
-                <span aria-hidden="true">💡</span> <strong>Comprobación rápida:</strong> si tu
-                cliente te pregunta «¿tu factura lleva retención?», está preguntando en el
-                fondo por tu sección.
+                Con carácter general, no. Están exentas del pago las personas físicas y quienes
+                tengan un importe neto de la cifra de negocios inferior a un millón de euros, lo
+                que deja fuera del pago a la inmensa mayoría de autónomos y de pequeñas empresas.
+                Otra cosa distinta es <strong>declarar</strong> el epígrafe: el alta censal es
+                obligatoria aunque no se pague cuota, porque es la forma en que la AEAT registra
+                qué actividad ejerces.
               </p>
             </div>
-
             <div className={styles.faqItem}>
-              <h4>
-                <span aria-hidden="true">❓</span> ¿Qué es exactamente la retención de IRPF de
-                la Sección 2ª?
-              </h4>
+              <h4>¿Puedo estar dado de alta en varios epígrafes a la vez?</h4>
               <p>
-                Cuando un profesional factura a una empresa o a otro profesional, quien paga
-                está obligado a retener una parte del importe e ingresarla en Hacienda a
-                cuenta del IRPF del profesional. El tipo general es el 15 %, reducido al 7 %
-                durante el año de inicio de actividad y los dos siguientes. No es un coste
-                añadido: es un anticipo de tu propio impuesto, que se descuenta al presentar
-                la declaración anual. En facturas a particulares no se practica retención.
-              </p>
-              <p className={styles.faqTip}>
-                <span aria-hidden="true">💡</span> <strong>Efecto de caja:</strong> con
-                retención cobras menos cada mes y regularizas en la renta, lo que conviene
-                tener presente al planificar la tesorería del primer año.
-              </p>
-            </div>
-
-            <div className={styles.faqItem}>
-              <h4>
-                <span aria-hidden="true">❓</span> Mi actividad no aparece en el buscador, ¿es
-                que no existe?
-              </h4>
-              <p>
-                No. Este catálogo recoge las actividades más habituales en altas de autónomo,
-                mientras que la CNAE-2009 tiene alrededor de 700 clases y las Tarifas del IAE,
-                miles de epígrafes. Que algo falte aquí solo significa que no está entre las
-                correspondencias curadas. El listado completo de la CNAE está publicado por el
-                INE y las Tarifas del IAE, en la sede electrónica de la AEAT.
-              </p>
-              <p className={styles.faqTip}>
-                <span aria-hidden="true">💡</span> <strong>Antes de rendirte:</strong> prueba
-                con una palabra distinta. «Rider», «mensajería» y «reparto» llevan a la misma
-                ficha, pero solo si escribes alguna de ellas.
-              </p>
-            </div>
-
-            <div className={styles.faqItem}>
-              <h4>
-                <span aria-hidden="true">❓</span> ¿Qué significa que un epígrafe aparezca
-                marcado como «conviene verificar»?
-              </h4>
-              <p>
-                Que la correspondencia orienta bien, pero algo concreto no está contrastado:
-                puede ser el número exacto del epígrafe, su literal en las Tarifas o el encaje
-                de tu actividad en él. En cada caso se dice qué es lo dudoso. Los epígrafes
-                marcados como contrastados tienen número y denominación verificados, lo que
-                tampoco los convierte en una decisión cerrada: sigue siendo el criterio de la
-                AEAT el que manda.
-              </p>
-              <p className={styles.faqTip}>
-                <span aria-hidden="true">💡</span> <strong>Uso recomendado:</strong> lleva el
-                candidato a la consulta con tu asesor o a la sede de la AEAT y verifica el
-                literal; ir con un número concreto acorta mucho la conversación.
-              </p>
-            </div>
-
-            <div className={styles.faqItem}>
-              <h4>
-                <span aria-hidden="true">❓</span> ¿Cambia el CNAE con la nueva clasificación?
-              </h4>
-              <p>
-                La clasificación en vigor en España para estos trámites es la CNAE-2009. Las
-                clasificaciones estadísticas se revisan periódicamente y una revisión implica
-                recodificar actividades, pero mientras la Administración siga pidiendo el
-                código CNAE-2009 es el que corresponde declarar. Si en tu trámite concreto te
-                piden otra versión, el propio formulario lo indica.
-              </p>
-              <p className={styles.faqTip}>
-                <span aria-hidden="true">💡</span> <strong>Comprobación:</strong> el código
-                CNAE-2009 tiene siempre 4 dígitos de clase; si el formulario te pide más
-                dígitos o un formato distinto, no estás ante una CNAE-2009.
+                Sí, y es lo habitual en cuanto una actividad tiene varias patas: quien da clases y
+                además vende material, o quien ejecuta obra y también redacta proyectos. Cada
+                actividad efectivamente ejercida debe tener su alta en el epígrafe que le
+                corresponda, y todas se declaran en el mismo modelo 036 o 037. Estar en varios
+                epígrafes no multiplica las obligaciones formales, pero sí obliga a aplicar a cada
+                factura el régimen propio de su actividad.
               </p>
             </div>
           </div>
 
-          {/* 4. Guía paso a paso */}
-          <h2>Cómo localizar tus códigos, paso a paso</h2>
+          <h2>Cómo localizar tu código paso a paso</h2>
           <div className={styles.stepGuide}>
             <div className={styles.step}>
-              <div className={styles.stepNumber}>1</div>
+              <span className={styles.stepNumber} aria-hidden="true">
+                1
+              </span>
               <div className={styles.stepContent}>
-                <h4>Describe tu actividad en una frase corta</h4>
+                <h4>Describe tu actividad real, no la que te gustaría tener</h4>
                 <p>
-                  Escríbela como se la contarías a un amigo: «hago páginas web», «arreglo
-                  tuberías», «doy clases de inglés». El nombre oficial ya lo pondrá la
-                  clasificación; tu trabajo aquí es describir el trabajo real, incluyendo lo
-                  que haces de forma habitual aunque no sea lo principal.
+                  Parte de lo que vas a facturar desde el primer mes. Escríbelo con tus palabras en
+                  el buscador de la CNAE: los términos coloquiales están indexados junto al literal
+                  oficial.
                 </p>
               </div>
             </div>
-
             <div className={styles.step}>
-              <div className={styles.stepNumber}>2</div>
+              <span className={styles.stepNumber} aria-hidden="true">
+                2
+              </span>
               <div className={styles.stepContent}>
-                <h4>Revisa todos los candidatos, no solo el primero</h4>
+                <h4>Lee el literal completo de la clase, no solo su título</h4>
                 <p>
-                  La correspondencia no es uno a uno. Abre las fichas y compara: es habitual
-                  que dos o tres clases describan matices distintos de lo mismo (fabricar
-                  frente a vender, instalar frente a reparar, academia frente a clase
-                  particular). Quédate con la que describa lo que de verdad ocupa tu jornada.
+                  Fíjate en la jerarquía que aparece bajo cada resultado: la división y el grupo
+                  suelen aclarar si tu caso entra ahí o en la clase de al lado.
                 </p>
               </div>
             </div>
-
             <div className={styles.step}>
-              <div className={styles.stepNumber}>3</div>
+              <span className={styles.stepNumber} aria-hidden="true">
+                3
+              </span>
               <div className={styles.stepContent}>
-                <h4>Decide si ejerces de forma empresarial o profesional</h4>
+                <h4>Busca tu actividad en las Tarifas del IAE empezando de cero</h4>
                 <p>
-                  Pregúntate si hay local abierto al público, personal contratado o medios
-                  materiales organizados. Si los hay, apunta a la Sección 1ª; si trabajas
-                  aportando sobre todo tu cualificación, a la Sección 2ª. Esta decisión, no el
-                  número del epígrafe, es la que más consecuencias tiene.
+                  No traslades el CNAE: inicia otra búsqueda con las palabras de tu actividad. El
+                  lenguaje de las Tarifas es de 1990, así que a veces hay que probar términos más
+                  antiguos.
                 </p>
               </div>
             </div>
-
             <div className={styles.step}>
-              <div className={styles.stepNumber}>4</div>
+              <span className={styles.stepNumber} aria-hidden="true">
+                4
+              </span>
               <div className={styles.stepContent}>
-                <h4>Comprueba si necesitas más de un epígrafe</h4>
+                <h4>Decide la sección y anticipa su efecto en las facturas</h4>
                 <p>
-                  Repasa tus fuentes de ingresos previstas. Fabricar y vender, dar clases y
-                  vender cursos grabados, cortar el pelo y hacer estética: en cada uno de esos
-                  pares hay dos actividades. Añadir un epígrafe extra en el alta inicial no
-                  cuesta nada; regularizar después, sí cuesta tiempo.
+                  Comprueba si tu encaje es empresarial (Sección 1ª) o profesional (Sección 2ª) y
+                  ten claro, antes de emitir la primera factura, si procede retención de IRPF.
                 </p>
               </div>
             </div>
-
             <div className={styles.step}>
-              <div className={styles.stepNumber}>5</div>
+              <span className={styles.stepNumber} aria-hidden="true">
+                5
+              </span>
               <div className={styles.stepContent}>
-                <h4>Verifica el literal exacto en la fuente oficial</h4>
+                <h4>Cumplimenta el modelo 036 o 037 y guarda el justificante</h4>
                 <p>
-                  Con el número candidato en la mano, contrasta la denominación en las Tarifas
-                  del IAE de la sede de la AEAT y el código CNAE en el buscador del INE. Es el
-                  paso que convierte un candidato en una decisión: los literales oficiales
-                  contienen matices y salvedades que ningún resumen recoge completo.
-                </p>
-              </div>
-            </div>
-
-            <div className={styles.step}>
-              <div className={styles.stepNumber}>6</div>
-              <div className={styles.stepContent}>
-                <h4>Presenta el modelo 036 o 037 con la actividad declarada</h4>
-                <p>
-                  La declaración censal se presenta antes de iniciar la actividad, en la sede
-                  electrónica de la AEAT. Ahí figuran el epígrafe o epígrafes, la fecha de
-                  inicio y el régimen de IVA e IRPF aplicable. El modelo 037 es la versión
-                  simplificada, disponible solo si se cumplen determinados requisitos.
-                </p>
-              </div>
-            </div>
-
-            <div className={styles.step}>
-              <div className={styles.stepNumber}>7</div>
-              <div className={styles.stepContent}>
-                <h4>Da de alta el RETA con el CNAE correspondiente</h4>
-                <p>
-                  El alta en el Régimen Especial de Trabajadores Autónomos se tramita en la
-                  Seguridad Social, dentro de los 60 días naturales anteriores al inicio de la
-                  actividad, y ahí es donde se usa el CNAE. Conserva ambos justificantes: te
-                  los pedirán en bancos, mutuas y subvenciones durante años.
+                  Declara todos los epígrafes en los que vayas a operar. Si más adelante cambia la
+                  actividad, se presenta una declaración censal de modificación: no hay que esperar
+                  a fin de año.
                 </p>
               </div>
             </div>
           </div>
 
-          {/* 5. Mejores prácticas */}
-          <h2>Buenas prácticas al elegir tus códigos</h2>
+          <h2>Buenas prácticas</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">
-                ✅
+                📌
               </span>
-              <h4>Empieza por el epígrafe, no por el CNAE</h4>
+              <h4>Prioriza la clase específica</h4>
               <p>
-                El epígrafe es el que tiene efectos fiscales. Una vez fijado, el CNAE se elige
-                casi solo.
+                Las clases residuales («otros servicios…») existen para lo que no encaja en ningún
+                sitio. Si hay una clase que describe tu actividad, esa es la correcta.
               </p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">
-                ✅
+                🧾
               </span>
-              <h4>Huye de los cajones de sastre si puedes</h4>
+              <h4>Contrasta con el literal del BOE</h4>
               <p>
-                Los epígrafes residuales (849.9, 979.9) solo encajan cuando no existe ninguno
-                específico para tu actividad.
+                Antes de presentar el 036, abre la fuente oficial enlazada arriba y lee la
+                redacción completa del epígrafe, incluidas sus notas.
               </p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">
-                ✅
+                🗂️
               </span>
-              <h4>Anota el literal completo, no solo el número</h4>
+              <h4>Declara todas tus actividades</h4>
               <p>
-                El literal de las Tarifas es lo que delimita qué cubre el epígrafe; el número
-                por sí solo no discute nada ante la AEAT.
+                Si facturas dos cosas distintas, dos altas. Facturar bajo un epígrafe que no cubre
+                lo que haces complica cualquier comprobación posterior.
               </p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">
-                ✅
+                📅
               </span>
-              <h4>Declara todas tus actividades desde el principio</h4>
+              <h4>Revísalo cuando cambie tu negocio</h4>
               <p>
-                Añadir un segundo epígrafe en el alta inicial es gratis y evita facturar por
-                una actividad no declarada.
-              </p>
-            </div>
-            <div className={styles.tipCard}>
-              <span className={styles.tipIcon} aria-hidden="true">
-                ✅
-              </span>
-              <h4>Avisa a tus clientes de si llevas retención</h4>
-              <p>
-                Un profesional de la Sección 2ª que factura sin retención a una empresa genera
-                un problema al cliente, no solo a sí mismo.
-              </p>
-            </div>
-            <div className={styles.tipCard}>
-              <span className={styles.tipIcon} aria-hidden="true">
-                ✅
-              </span>
-              <h4>Revisa tus códigos cuando cambie tu trabajo</h4>
-              <p>
-                Muchos autónomos siguen con el epígrafe de 2015 haciendo algo distinto desde
-                hace años. La modificación es un trámite menor.
+                Un giro de actividad, la apertura de un local o el paso de servicios a venta de
+                producto son motivos para revisar el epígrafe declarado.
               </p>
             </div>
           </div>
 
-          {/* 6. Warning box */}
+          <h2>Errores frecuentes al elegir código</h2>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
               <span className={styles.warningIcon} aria-hidden="true">
                 ⚠️
               </span>
-              <h3>Errores comunes al elegir CNAE y epígrafe</h3>
+              <h3>Cuatro tropiezos que salen caros</h3>
             </div>
             <ul className={styles.warningList}>
               <li>
-                <strong>
-                  <span aria-hidden="true">❌</span> Copiar el epígrafe de otro autónomo del
-                  sector:
-                </strong>{' '}
-                dos personas que hacen lo mismo pueden tener secciones distintas si una tiene
-                local y personal y la otra no. Copiar arrastra el criterio ajeno a tu
-                facturación.
+                <strong>Copiar el epígrafe de un conocido.</strong> Dos personas que hacen «lo
+                mismo» pueden encajar en secciones distintas según cómo organicen la actividad, y
+                con ello cambia la retención aplicable.
               </li>
               <li>
-                <strong>
-                  <span aria-hidden="true">❌</span> Confundir estar exento del IAE con no
-                  tener epígrafe:
-                </strong>{' '}
-                la exención por cifra de negocios inferior a 1.000.000 de euros libera del
-                pago, no de la declaración. El alta censal en el epígrafe sigue siendo
-                obligatoria.
+                <strong>Dar por buena una equivalencia CNAE → IAE encontrada en una web.</strong>{' '}
+                No es un dato oficial. Puede orientar, pero la responsabilidad de lo declarado es
+                de quien firma el modelo 036.
               </li>
               <li>
-                <strong>
-                  <span aria-hidden="true">❌</span> Facturar una actividad no declarada:
-                </strong>{' '}
-                empezar a vender cursos grabados estando de alta solo como consultor deja
-                ingresos fuera de lo declarado. Añadir el epígrafe cuesta un trámite;
-                regularizarlo después, bastante más.
+                <strong>Confundir exención con no declarar.</strong> Estar exento del pago del IAE
+                por cifra de negocio inferior a un millón de euros no exime del alta censal en el
+                epígrafe.
               </li>
               <li>
-                <strong>
-                  <span aria-hidden="true">❌</span> Elegir Sección 1ª para evitar la
-                  retención:
-                </strong>{' '}
-                la sección debe reflejar cómo ejerces realmente. Declarar una estructura
-                empresarial que no existe es una incorrección censal, y las retenciones no
-                practicadas se reclaman al pagador.
-              </li>
-              <li>
-                <strong>
-                  <span aria-hidden="true">❌</span> Usar un epígrafe residual habiendo uno
-                  específico:
-                </strong>{' '}
-                el 849.9 y el 979.9 son cajones de sastre. Si existe un epígrafe concreto para
-                tu actividad, el residual no procede y puede dar lugar a una regularización.
-              </li>
-              <li>
-                <strong>
-                  <span aria-hidden="true">❌</span> Presentar el alta después de empezar a
-                  trabajar:
-                </strong>{' '}
-                la declaración censal se presenta con carácter previo al inicio de la
-                actividad. Facturar antes del alta deja un rastro difícil de explicar después.
-              </li>
-              <li>
-                <strong>
-                  <span aria-hidden="true">❌</span> Dar por buena una correspondencia sin
-                  verificar el literal:
-                </strong>{' '}
-                los números de epígrafe circulan por foros con erratas frecuentes. Comprueba
-                siempre la denominación en las Tarifas oficiales antes de presentar el
-                modelo.
-              </li>
-              <li>
-                <strong>
-                  <span aria-hidden="true">❌</span> No revisar los códigos al cambiar de
-                  actividad:
-                </strong>{' '}
-                un alta de hace años puede describir un trabajo que ya no haces. Eso afecta a
-                tu régimen de IVA, a tus retenciones y a la coherencia de tu declaración
-                anual.
+                <strong>Usar un código de la CNAE-2009 como si siguiera vigente.</strong> Desde
+                enero de 2026 la clasificación aplicable es la CNAE-2025, y algunas clases antiguas
+                se han dividido en varias nuevas.
               </li>
             </ul>
           </div>
-        </section>
+        </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('conversor-cnae-iae')} />
+      <RelatedApps apps={relacionadas} />
 
       <ShareCard appName="conversor-cnae-iae" />
 
       <Footer appName="conversor-cnae-iae" />
-    </div>
-  );
-}
-
-// ─── Ficha de actividad ──────────────────────────────────────────────────────
-
-interface FichaActividadProps {
-  actividad: ActividadCnaeIae;
-  abierta: boolean;
-  onToggle: () => void;
-}
-
-function FichaActividad({ actividad, abierta, onToggle }: FichaActividadProps) {
-  const idDetalle = `ficha-${actividad.cnae}`;
-  const sinEpigrafes = actividad.iae.length === 0;
-
-  return (
-    <article className={styles.ficha}>
-      <div className={styles.fichaCabecera}>
-        <div className={styles.fichaIdentidad}>
-          <span className={styles.codigoCnae}>CNAE {actividad.cnae}</span>
-          <h3 className={styles.denominacion}>{actividad.descripcionCnae}</h3>
-        </div>
-        <button
-          type="button"
-          className={styles.btnDetalle}
-          aria-expanded={abierta}
-          aria-controls={idDetalle}
-          onClick={onToggle}
-        >
-          {abierta ? 'Ocultar detalle' : 'Ver detalle'}
-        </button>
-      </div>
-
-      <div className={styles.resumenEpigrafes}>
-        {sinEpigrafes ? (
-          <p className={styles.sinEpigrafe}>
-            <span aria-hidden="true">🔎</span> <strong>Sin epígrafe de IAE verificado.</strong>{' '}
-            Conocemos el código CNAE de esta actividad, pero no incluimos ningún epígrafe
-            porque no hay certeza suficiente. Consúltalo en las Tarifas del IAE de la{' '}
-            <a href={CNAE_IAE_META.urlOficialIae} target="_blank" rel="noopener noreferrer">
-              sede electrónica de la AEAT
-            </a>
-            .
-          </p>
-        ) : (
-          <p className={styles.resumenTexto}>
-            <span aria-hidden="true">⚖️</span> Posibles epígrafes de IAE:{' '}
-            {actividad.iae.map((e, i) => (
-              <span key={e.epigrafe}>
-                {i > 0 && ' · '}
-                <strong>{e.epigrafe}</strong> (Sección {e.seccion})
-              </span>
-            ))}
-          </p>
-        )}
-      </div>
-
-      <div id={idDetalle} className={styles.fichaDetalle} hidden={!abierta}>
-        {actividad.notas && (
-          <p className={styles.notaActividad}>
-            <span aria-hidden="true">📝</span> {actividad.notas}
-          </p>
-        )}
-
-        {!sinEpigrafes && (
-          <ul className={styles.epigrafesLista}>
-            {actividad.iae.map((epigrafe) => (
-              <li key={`${actividad.cnae}-${epigrafe.epigrafe}`}>
-                <TarjetaEpigrafe epigrafe={epigrafe} />
-              </li>
-            ))}
-          </ul>
-        )}
-
-        <p className={styles.sinonimosLinea}>
-          <strong>También se busca como:</strong> {actividad.sinonimos.join(' · ')}
-        </p>
-      </div>
-    </article>
-  );
-}
-
-// ─── Tarjeta de epígrafe ─────────────────────────────────────────────────────
-
-function TarjetaEpigrafe({ epigrafe }: { epigrafe: EpigrafeIAE }) {
-  const seccion = SECCION_POR_ID[epigrafe.seccion];
-  const esMedia = epigrafe.confianza === 'media';
-  const claseSeccion = claseDeSeccion(epigrafe.seccion);
-
-  return (
-    <div className={`${styles.epigrafeCard} ${esMedia ? styles.epigrafeCardMedia : ''}`}>
-      <div className={styles.epigrafeCabecera}>
-        <span className={styles.epigrafeCodigo}>{epigrafe.epigrafe}</span>
-        <span className={`${styles.badgeSeccion} ${claseSeccion}`}>
-          Sección {epigrafe.seccion} · {seccion?.nombre}
-        </span>
-        <span
-          className={`${styles.badgeConfianza} ${esMedia ? styles.confianzaMedia : styles.confianzaAlta}`}
-        >
-          <span aria-hidden="true">{esMedia ? '🔍' : '✔️'}</span>{' '}
-          {esMedia ? 'Conviene verificar' : 'Correspondencia contrastada'}
-        </span>
-      </div>
-
-      <p className={styles.epigrafeDesc}>{epigrafe.descripcion}</p>
-
-      {seccion && (
-        <p className={styles.epigrafeImplicacion}>
-          <strong>Qué implica esta sección:</strong> {seccion.implicacion}
-        </p>
-      )}
-
-      {esMedia && epigrafe.notaConfianza && (
-        <p className={styles.notaConfianza}>
-          <strong>Qué no está verificado:</strong> {epigrafe.notaConfianza}
-        </p>
-      )}
-
-      {!esMedia && (
-        <p className={styles.notaAlta}>
-          Número y denominación contrastados. Aun así es un candidato, no una decisión:
-          confírmalo antes de presentar el alta.
-        </p>
-      )}
     </div>
   );
 }

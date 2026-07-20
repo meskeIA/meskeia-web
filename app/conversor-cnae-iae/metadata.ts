@@ -1,24 +1,24 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
-// App estructuralmente española (clasificación CNAE-2009 del INE y Tarifas del IAE
-// de la AEAT): no procede lenguaje dual ES/Latam. Ver <RegionBadge variant="es-only" />.
+// App estructuralmente española (CNAE-2025 del INE y Tarifas del IAE de la AEAT):
+// no procede lenguaje dual ES/Latam. Ver <RegionBadge variant="es-only" />.
 
 export const metadata: Metadata = {
-  title: 'Conversor CNAE ⇄ IAE - Busca tu Código CNAE y Epígrafe IAE | meskeIA',
+  title: 'Códigos CNAE-2025 y epígrafes del IAE: buscador oficial | meskeIA',
   description:
-    'Conversor CNAE-2009 ⇄ epígrafes IAE. Describe tu actividad en lenguaje corriente ("hago páginas web", "corto el pelo") y localiza los códigos CNAE y epígrafes de IAE que encajan, con su sección y su efecto en la retención de IRPF.',
+    'Busca tu código CNAE-2025 (INE) y tu epígrafe del IAE (Tarifas de la AEAT) en los catálogos oficiales completos. Búsqueda por actividad en lenguaje corriente, por código y por códigos antiguos de la CNAE-2009, con su jerarquía y la sección del IAE.',
   keywords:
-    'conversor cnae iae, conversor iae-cnae, conversor iae, conversor cnae, conversor cnae 2009, código cnae, epígrafe iae, qué cnae me corresponde, buscar epígrafe iae, cnae 2009, tarifas iae, modelo 036, modelo 037, alta autónomo, sección 1ª iae, sección 2ª iae',
+    'conversor cnae iae, codigo cnae, cnae 2025, buscar cnae, que cnae me corresponde, epigrafe iae, buscar epigrafe iae, tarifas iae, conversor cnae 2009 a 2025, cnae 2009, modelo 036, modelo 037, alta autónomo, sección 1ª iae, sección 2ª iae, retención irpf autónomo',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Conversor CNAE ⇄ IAE - Busca tu código y tu epígrafe',
+    title: 'Códigos CNAE-2025 y epígrafes del IAE: buscador oficial',
     description:
-      'Describe tu actividad y localiza los códigos CNAE-2009 y los epígrafes del IAE que encajan, con su sección y lo que implica en tus facturas.',
+      'Dos catálogos oficiales completos: la CNAE-2025 del INE y las Tarifas del IAE. Busca por actividad, por código o por un código antiguo de la CNAE-2009.',
     url: 'https://meskeia.com/conversor-cnae-iae/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -33,32 +33,32 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Conversor CNAE ⇄ IAE - meskeIA',
+    title: 'Buscador de códigos CNAE-2025 y epígrafes del IAE - meskeIA',
     description:
-      'Busca tu código CNAE y tu epígrafe de IAE describiendo tu actividad con tus palabras.',
+      'Localiza tu actividad en los catálogos oficiales del INE y de la AEAT, con su jerarquía y su sección.',
     images: ['https://meskeia.com/og-image.png'],
   },
   other: {
-    'application-name': 'Conversor CNAE IAE meskeIA',
+    'application-name': 'Buscador CNAE 2025 e IAE meskeIA',
   },
 };
 
 // Schema.org JSON-LD para indexación por buscadores e IAs
 export const jsonLd = generateWebAppSchema({
-  name: 'Conversor CNAE ⇄ IAE',
+  name: 'Buscador de códigos CNAE-2025 y epígrafes del IAE',
   description:
-    'Buscador y conversor entre códigos CNAE-2009 (clasificación estadística del INE) y epígrafes del Impuesto sobre Actividades Económicas (Tarifas de la AEAT). Permite localizar la actividad describiéndola en lenguaje corriente y muestra los candidatos con su sección del IAE y su efecto sobre la retención de IRPF en factura.',
+    'Buscador sobre dos catálogos oficiales completos: la Clasificación Nacional de Actividades Económicas CNAE-2025 (RD 10/2025, INE) y las Tarifas del Impuesto sobre Actividades Económicas (RD Legislativo 1175/1990, AEAT). Permite localizar una actividad describiéndola en lenguaje corriente, buscar por código, resolver códigos antiguos de la CNAE-2009 y consultar la sección del IAE y su efecto sobre la retención de IRPF.',
   url: 'https://meskeia.com/conversor-cnae-iae/',
   category: 'BusinessApplication',
   features: [
-    'Búsqueda en lenguaje natural: escribe cómo describirías tu trabajo',
-    'Conversión en ambos sentidos: de CNAE a epígrafes IAE y de epígrafe IAE a CNAE',
-    'Sección del IAE de cada epígrafe (1ª empresarial, 2ª profesional, 3ª artística)',
-    'Aviso de la retención de IRPF asociada a cada sección',
-    'Nivel de certeza declarado epígrafe por epígrafe, sin ocultar lo dudoso',
-    'Catálogo curado de las actividades más frecuentes en altas de autónomo',
-    'Funciona 100 % en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
+    'Catálogo completo de la CNAE-2025 con secciones, divisiones, grupos y clases',
+    'Catálogo completo de las Tarifas del IAE con divisiones, agrupaciones, grupos y epígrafes',
+    'Búsqueda en lenguaje corriente: escribe cómo describirías tu trabajo',
+    'Reconoce códigos de la CNAE-2009 y muestra su equivalencia en la CNAE-2025',
+    'Equivalencia inversa: de qué código de la CNAE-2009 procede cada clase actual',
+    'Filtro por sección del IAE (1ª empresarial, 2ª profesional, 3ª artística) y su efecto en la retención de IRPF',
+    'Texto literal oficial, sin correspondencias inventadas entre clasificaciones',
+    'Funciona en el navegador, sin registro, gratis y sin publicidad',
   ],
 });
 
@@ -72,15 +72,15 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre el código CNAE y el epígrafe del IAE?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El CNAE es la Clasificación Nacional de Actividades Económicas del INE (versión CNAE-2009, aprobada por el RD 475/2007) y tiene finalidad estadística: sirve para clasificar la actividad en registros como el alta en el RETA. El epígrafe del IAE procede de las Tarifas del Impuesto sobre Actividades Económicas (RD Legislativo 1175/1990) y tiene finalidad censal y tributaria: es el que se declara a la AEAT en el modelo 036 o 037. Son códigos distintos, de organismos distintos, y no existe una tabla oficial de equivalencia entre ellos.',
+        text: 'El CNAE es la Clasificación Nacional de Actividades Económicas del INE y tiene finalidad estadística: aparece en el alta en la Seguridad Social, en el Registro Mercantil o al pedir financiación. El epígrafe del IAE procede de las Tarifas del Impuesto sobre Actividades Económicas (RD Legislativo 1175/1990) y tiene finalidad censal y tributaria: es el que se declara a la AEAT en el modelo 036 o 037. Son códigos distintos, de organismos distintos, y no existe una tabla oficial de equivalencia entre ellos.',
       },
     },
     {
       '@type': 'Question',
-      name: '¿Cómo sé qué CNAE me corresponde si no encuentro mi actividad?',
+      name: '¿Desde cuándo se aplica la CNAE-2025 y a qué equivale mi código CNAE-2009?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Lo práctico es buscar por cómo describirías tu trabajo, no por el nombre oficial: quien hace webs no busca "actividades de programación informática", busca "hago páginas web". Este conversor busca sobre términos coloquiales además de sobre la denominación oficial. Si aun así no aparece nada, existen clases residuales como la 7490 (otras actividades profesionales, científicas y técnicas) y la 9609 (otros servicios personales), pero conviene usarlas solo cuando ninguna clase específica describa la actividad.',
+        text: 'La CNAE-2025 fue aprobada por el Real Decreto 10/2025 y sustituye a la CNAE-2009 desde enero de 2026. Los códigos antiguos de cuatro dígitos siguen apareciendo en documentos anteriores; la tabla de correspondencia oficial del INE permite saber a qué clase o clases de la CNAE-2025 equivalen. En muchos casos la equivalencia es uno a uno, pero algunas clases antiguas se han dividido entre varias nuevas y hay que leer los literales para elegir.',
       },
     },
     {
@@ -88,7 +88,7 @@ export const faqJsonLd = {
       name: '¿Qué significa que un epígrafe del IAE sea de la Sección 1ª o de la Sección 2ª?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La Sección 1ª agrupa las actividades empresariales (con local, medios materiales o personal organizado) y la Sección 2ª el ejercicio individual de una profesión. La consecuencia práctica está en la factura: las facturas de un profesional de la Sección 2ª a empresas y a otros profesionales llevan retención de IRPF (15 %, o 7 % durante los tres primeros años de actividad), mientras que las de una actividad empresarial de la Sección 1ª, con carácter general, no la llevan. La Sección 3ª recoge las actividades artísticas, con tratamiento análogo al profesional.',
+        text: 'La Sección 1ª agrupa las actividades empresariales (organizadas con local, medios materiales o personal) y la Sección 2ª el ejercicio individual de una profesión. La consecuencia práctica está en la factura: las facturas de un profesional de la Sección 2ª a empresas y a otros profesionales llevan retención de IRPF (15 % con carácter general y 7 % el año de inicio de la actividad y los dos siguientes), mientras que las de una actividad empresarial de la Sección 1ª, con carácter general, no la llevan. La Sección 3ª recoge las actividades artísticas, con tratamiento análogo al profesional.',
       },
     },
     {
@@ -96,15 +96,15 @@ export const faqJsonLd = {
       name: '¿Se paga el IAE siendo autónomo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La mayoría de autónomos declara el epígrafe pero no paga cuota: están exentas del IAE las personas físicas y quienes tengan un importe neto de la cifra de negocios inferior a 1.000.000 de euros. Declarar el epígrafe y pagar la cuota son cosas distintas: el alta censal en el epígrafe es obligatoria aunque exista exención, porque es la forma en que la AEAT registra qué actividad se ejerce.',
+        text: 'Con carácter general, no: están exentas del pago las personas físicas y quienes tengan un importe neto de la cifra de negocios inferior a un millón de euros, lo que deja fuera del pago a la mayoría de autónomos y pequeñas empresas. Declarar el epígrafe es otra cosa distinta: el alta censal en el epígrafe es obligatoria aunque exista exención, porque es la forma en que la AEAT registra qué actividad se ejerce.',
       },
     },
     {
       '@type': 'Question',
-      name: '¿Qué pasa si me doy de alta en un epígrafe equivocado y cómo se corrige?',
+      name: '¿Puedo darme de alta en varios epígrafes del IAE a la vez?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un epígrafe incorrecto puede arrastrar consecuencias reales: retención de IRPF aplicada o no aplicada donde no correspondía, régimen de IVA inadecuado u obligaciones censales que no encajan con la actividad real. Se corrige presentando una declaración censal de modificación (modelo 036 o 037) marcando la baja en el epígrafe erróneo y el alta en el correcto. Cuanto antes se rectifique, menor es el volumen de facturas emitidas bajo el criterio equivocado que habrá que revisar.',
+        text: 'Sí. Cada actividad que se ejerce efectivamente debe tener su alta en el epígrafe que le corresponda, y todas se declaran en el mismo modelo 036 o 037. Es lo habitual cuando el negocio tiene varias patas: dar clases y vender material, ejecutar obra y redactar proyectos, prestar servicios y revender producto. Estar en varios epígrafes no multiplica las obligaciones formales, pero obliga a aplicar a cada factura el régimen propio de su actividad.',
       },
     },
   ],

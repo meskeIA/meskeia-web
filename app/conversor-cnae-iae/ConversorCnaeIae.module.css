@@ -1,4 +1,4 @@
-/* ─── Conversor CNAE ⇄ IAE — paleta meskeIA ──────────────────────────────── */
+/* ─── Buscador CNAE-2025 e IAE — paleta meskeIA ──────────────────────────── */
 
 .container {
   --primary: #2E86AB;
@@ -18,6 +18,9 @@
   --ok-bg: #EAF6F5;
   --ok-borde: #48A9A6;
   --ok-texto: #206B68;
+  --error-bg: #FDECEC;
+  --error-borde: #C0392B;
+  --error-texto: #A03127;
   --radius: 12px;
   --radius-large: 16px;
   --spacing-sm: 0.5rem;
@@ -48,6 +51,9 @@
   --ok-bg: #1E3634;
   --ok-borde: #48A9A6;
   --ok-texto: #8FD6D3;
+  --error-bg: #3A1E1B;
+  --error-borde: #E07A6E;
+  --error-texto: #F0A79C;
 }
 
 /* ─── Hero ───────────────────────────────────────────────────────────────── */
@@ -79,9 +85,7 @@
 
 /* ─── Paneles ────────────────────────────────────────────────────────────── */
 
-.buscadorPanel,
-.seccionesPanel,
-.transparencia {
+.buscadorPanel {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-large);
@@ -89,8 +93,7 @@
   margin-bottom: var(--spacing-lg);
 }
 
-.buscadorTitulo,
-.panelTitulo {
+.buscadorTitulo {
   font-size: 1.4rem;
   font-weight: 700;
   color: var(--primary);
@@ -103,41 +106,63 @@
   margin-bottom: var(--spacing-lg);
 }
 
-/* ─── Selector de modo ───────────────────────────────────────────────────── */
+/* ─── Pestañas ───────────────────────────────────────────────────────────── */
 
-.modos {
+.tabs {
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-lg);
+  border-bottom: 2px solid var(--border);
+  padding-bottom: var(--spacing-sm);
 }
 
-.modoBtn {
-  padding: 0.6rem 1rem;
-  font-size: 0.95rem;
+.tab {
+  padding: 0.7rem 1.2rem;
+  font-size: 1rem;
   font-weight: 600;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--bg-soft);
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
-.modoBtn:hover {
+.tab:hover {
   border-color: var(--primary);
   color: var(--primary);
 }
 
-.modoBtnActivo {
+.tabActiva {
   background: var(--primary);
   border-color: var(--primary);
   color: #FFFFFF;
 }
 
-.modoBtn:focus-visible {
+.tab:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
+}
+
+/* ─── Estados de carga ───────────────────────────────────────────────────── */
+
+.estadoCarga {
+  background: var(--bg-soft);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.estadoError {
+  background: var(--error-bg);
+  border-left: 4px solid var(--error-borde);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  color: var(--error-texto);
+  line-height: 1.6;
 }
 
 /* ─── Campo de búsqueda ──────────────────────────────────────────────────── */
@@ -210,7 +235,7 @@
   background: transparent;
   color: var(--secondary);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s ease, border-style 0.2s ease;
 }
 
 .ejemploBtn:hover {
@@ -221,6 +246,59 @@
 .ejemploBtn:focus-visible {
   outline: 2px solid var(--secondary);
   outline-offset: 2px;
+}
+
+/* ─── Filtros ────────────────────────────────────────────────────────────── */
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.filtroBtn {
+  padding: 0.4rem 0.85rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-soft);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.filtroBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.filtroActivo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #FFFFFF;
+}
+
+.filtroBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ─── Aviso de código antiguo ────────────────────────────────────────────── */
+
+.avisoAntiguo {
+  background: var(--ok-bg);
+  border-left: 4px solid var(--ok-borde);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+.avisoAntiguo p {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--ok-texto);
 }
 
 /* ─── Contador y estado vacío ────────────────────────────────────────────── */
@@ -250,13 +328,7 @@
   margin-bottom: var(--spacing-sm);
 }
 
-.sinResultados a,
-.sinEpigrafe a {
-  color: var(--primary);
-  text-decoration: underline;
-}
-
-/* ─── Lista de fichas ────────────────────────────────────────────────────── */
+/* ─── Fichas de resultado ────────────────────────────────────────────────── */
 
 .listaResultados {
   list-style: none;
@@ -287,10 +359,17 @@
   min-width: 0;
 }
 
+.badgesFicha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
 .codigoCnae {
   display: inline-block;
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   color: #FFFFFF;
@@ -307,114 +386,16 @@
   line-height: 1.4;
 }
 
-.btnDetalle {
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  font-weight: 600;
-  border: 1px solid var(--primary);
-  border-radius: var(--radius);
-  background: transparent;
-  color: var(--primary);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.2s ease;
-}
-
-.btnDetalle:hover {
-  background: var(--primary);
-  color: #FFFFFF;
-}
-
-.btnDetalle:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-.resumenEpigrafes {
-  margin-top: var(--spacing-md);
-}
-
-.resumenTexto {
-  font-size: 0.95rem;
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-
-.sinEpigrafe {
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: var(--alerta-texto);
-  background: var(--alerta-bg);
-  border-left: 4px solid var(--alerta-borde);
-  border-radius: var(--radius);
-  padding: var(--spacing-md);
-}
-
-.sinEpigrafe a {
-  color: inherit;
-}
-
-.fichaDetalle {
-  margin-top: var(--spacing-lg);
-  border-top: 1px dashed var(--border);
-  padding-top: var(--spacing-lg);
-}
-
-.notaActividad {
-  font-size: 0.93rem;
-  line-height: 1.6;
-  color: var(--text-secondary);
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: var(--spacing-md);
-  margin-bottom: var(--spacing-md);
-}
-
-.sinonimosLinea {
-  margin-top: var(--spacing-md);
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-
-/* ─── Epígrafes ──────────────────────────────────────────────────────────── */
-
-.epigrafesLista {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-}
-
-.epigrafeCard {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-left: 4px solid var(--secondary);
-  border-radius: var(--radius);
-  padding: var(--spacing-md);
-}
-
-.epigrafeCardMedia {
-  border-left-color: var(--alerta-borde);
-  background: var(--alerta-bg);
-}
-
-.epigrafeCabecera {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-sm);
-}
-
-.epigrafeCodigo {
-  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
-  font-size: 1.15rem;
+.badgeNivel {
+  display: inline-block;
+  font-size: 0.78rem;
   font-weight: 700;
-  color: var(--text-primary);
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  white-space: nowrap;
 }
 
 .badgeSeccion {
@@ -424,6 +405,7 @@
   padding: 0.2rem 0.6rem;
   border-radius: 999px;
   color: #FFFFFF;
+  white-space: nowrap;
 }
 
 .seccion1 {
@@ -438,58 +420,46 @@
   background: #7A5EA8;
 }
 
-.badgeConfianza {
-  display: inline-block;
-  font-size: 0.78rem;
-  font-weight: 700;
-  padding: 0.2rem 0.6rem;
-  border-radius: 999px;
-  border: 1px solid transparent;
+/* Jerarquía del código */
+.jerarquia {
+  list-style: none;
+  padding: var(--spacing-md) 0 0 0;
+  margin: var(--spacing-md) 0 0 0;
+  border-top: 1px dashed var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
 }
 
-.confianzaAlta {
-  background: var(--ok-bg);
-  border-color: var(--ok-borde);
-  color: var(--ok-texto);
-}
-
-.confianzaMedia {
-  background: #FFFFFF;
-  border-color: var(--alerta-borde);
-  color: var(--alerta-texto);
-}
-
-[data-theme='dark'] .container .confianzaMedia {
-  background: #2A2A2A;
-}
-
-.epigrafeDesc {
-  font-size: 0.98rem;
-  line-height: 1.6;
-  color: var(--text-primary);
-  margin-bottom: var(--spacing-sm);
-}
-
-.epigrafeImplicacion,
-.notaAlta {
+.jerarquia li {
   font-size: 0.9rem;
-  line-height: 1.6;
+  line-height: 1.55;
   color: var(--text-secondary);
 }
 
-.notaAlta {
+.jerarquia li strong {
+  color: var(--text-primary);
+}
+
+.sinonimosLinea {
+  margin-top: var(--spacing-md);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.nota2009 {
   margin-top: var(--spacing-sm);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
   font-style: italic;
 }
 
-.notaConfianza {
-  margin-top: var(--spacing-sm);
+.epigrafeImplicacion {
+  margin-top: var(--spacing-md);
   font-size: 0.9rem;
   line-height: 1.6;
-  color: var(--alerta-texto);
-  background: rgba(224, 162, 44, 0.14);
-  border-radius: 8px;
-  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--text-secondary);
 }
 
 /* ─── Secciones del IAE ──────────────────────────────────────────────────── */
@@ -498,6 +468,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
 }
 
 .seccionCard {
@@ -533,44 +504,23 @@
   padding-top: var(--spacing-md);
 }
 
-/* ─── Transparencia ──────────────────────────────────────────────────────── */
-
-.statGrid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-lg);
-}
-
-.stat {
+/* Nota sobre las cuotas */
+.notaCuotas {
+  margin-top: var(--spacing-lg);
   background: var(--bg-soft);
-  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
   border-radius: var(--radius);
-  padding: var(--spacing-md);
-  text-align: center;
+  padding: var(--spacing-lg);
 }
 
-.statNum {
-  display: block;
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--primary);
-  line-height: 1.2;
-}
-
-.statLabel {
-  display: block;
-  margin-top: 0.25rem;
-  font-size: 0.82rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-}
-
-.transparenciaTexto p {
-  font-size: 0.95rem;
+.notaCuotas p {
+  font-size: 0.93rem;
   line-height: 1.7;
   color: var(--text-secondary);
-  margin-bottom: var(--spacing-md);
+}
+
+.notaCuotas strong {
+  color: var(--text-primary);
 }
 
 /* ─── Contenido educativo v2.0 ───────────────────────────────────────────── */
@@ -800,7 +750,7 @@
 /* Mejores prácticas */
 .tipsGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
 }
@@ -832,12 +782,14 @@
   color: var(--text-secondary);
 }
 
-/* Warning box */
+/* ─── Caja de aviso (también la principal, fuera del contenido educativo) ── */
+
 .warningBox {
   background: var(--alerta-bg);
   border: 1px solid var(--alerta-borde);
   border-radius: var(--radius);
   padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
 }
 
 .warningHeader {
@@ -852,10 +804,12 @@
   line-height: 1;
 }
 
+.warningHeader h2,
 .warningHeader h3 {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 700;
   color: var(--alerta-texto);
+  line-height: 1.35;
 }
 
 .warningList {
@@ -884,14 +838,6 @@
 /* ─── Responsive ─────────────────────────────────────────────────────────── */
 
 @media (max-width: 1024px) {
-  .statGrid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .tipsGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
   .seccionesGrid {
     grid-template-columns: 1fr;
   }
@@ -915,28 +861,21 @@
     font-size: 1rem;
   }
 
-  .buscadorPanel,
-  .seccionesPanel,
-  .transparencia {
+  .buscadorPanel {
     padding: var(--spacing-lg);
   }
 
-  .modos {
+  .tabs {
     flex-direction: column;
   }
 
-  .modoBtn {
+  .tab {
     width: 100%;
     text-align: left;
   }
 
-  .btnDetalle {
-    width: 100%;
-  }
-
   .escenariosGrid,
-  .tipsGrid,
-  .statGrid {
+  .tipsGrid {
     grid-template-columns: 1fr;
   }
 
