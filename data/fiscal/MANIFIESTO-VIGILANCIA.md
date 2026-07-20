@@ -224,6 +224,34 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 #### `jubilacion-tramites.ts` — Catálogo de trámites al jubilarse
 - **Vigilar**: cambios en trámites INSS/IMSERSO y complementos (sigue a `pensiones.ts`). Cadencia: baja. **Verificado**: 2026-06-11.
 
+### 3.6 Clasificaciones de actividad (catálogo externo, verificación automatizada)
+
+#### `cnae-iae.ts` — CNAE-2025 e IAE (metadatos) + `public/datos/cnae-iae-catalogo.json` (catálogo)
+- **Contiene**: el módulo TS solo guarda **metadatos** (fuente, URL oficial, sello) más tres datos
+  normativos citables: `SECCIONES_IAE` (con los porcentajes de retención de IRPF), `IAE_EXENCION`
+  (umbral de cifra de negocio) y `CNAE_VIGENCIA`. El catálogo en sí —~1.430 códigos IAE y ~1.060
+  CNAE-2025— vive en `public/datos/` porque no cabe en el bundle, y se **genera**, no se edita.
+- **Normativa**: RD Legislativo 1175/1990 (Tarifas e Instrucción del IAE) · RD 10/2025 (CNAE-2025) ·
+  art. 82.1.c) RDL 2/2004 (exención por cifra de negocio).
+- **Vigilar**: no hace falta vigilancia manual. **Basta con reejecutar
+  `node scripts/generar-catalogos-cnae-iae.mjs`**: descarga las fuentes oficiales, compara con el
+  catálogo publicado y enumera altas, bajas y títulos modificados. Si no hay diferencias, lo dice y
+  no toca nada. Ventana natural: **enero**, junto al resto del bloque, porque las leyes de
+  acompañamiento de diciembre son la vía histórica por la que se han reescrito epígrafes del IAE
+  (precedentes reales: Ley 21/1993 y Ley 12/1996 sobre el grupo 505).
+- **Cadencia**: muy baja. La CNAE se sustituyó en 2025 tras **dieciséis años** de vigencia de la
+  CNAE-2009; el IAE es de 1990 con reformas esporádicas. La expectativa correcta es "casi nunca
+  cambia, y cuando cambia es grande".
+- **Alerta metodológica**: **una clasificación nueva que sustituya a la vigente** (precedente
+  exacto: CNAE-2009 → CNAE-2025, RD 10/2025, operativa desde enero de 2026, que dejó desalineadas
+  67 de las 110 entradas del dataset anterior). No es un cambio de cifras: obliga a remapear todo lo
+  que dependa de los códigos. Señal de aviso: el INE publica la tabla de correspondencia entre
+  versiones antes de la entrada en vigor.
+- **Trampa conocida**: NO existe tabla oficial de equivalencia CNAE ⇄ IAE (organismos y finalidades
+  distintas). Cualquier presión para "convertir" entre ambas produce criterio disfrazado de dato;
+  `FISCAL_CNAE_IAE_META.sinEquivalenciaOficial` lo deja sellado en el propio módulo.
+- **Verificado**: 2026-07-20.
+
 ---
 
 ## 4. Precedentes de cambio de metodología (la vara de medir)

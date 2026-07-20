@@ -15,6 +15,7 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
+import { SECCIONES_IAE, IAE_EXENCION } from '@/data/fiscal';
 
 // ─── Tipos del catálogo oficial (public/datos/cnae-iae-catalogo.json) ────────
 
@@ -127,43 +128,14 @@ const PESO_TIPO_IAE: Record<TipoIae, number> = {
   division: 3,
 };
 
-interface DescripcionSeccionIae {
-  seccion: SeccionIae;
-  nombre: string;
-  quienes: string;
-  retencion: string;
-  clase: string;
-}
-
-const SECCIONES_IAE: DescripcionSeccionIae[] = [
-  {
-    seccion: '1ª',
-    nombre: 'Actividades empresariales',
-    quienes:
-      'Ganadería independiente, minería, industria, comercio y servicios organizados con medios materiales o personal. Es la sección de comercios, talleres, bares, obras y de buena parte de los servicios.',
-    retencion:
-      'Las facturas de una actividad empresarial, con carácter general, no llevan retención de IRPF.',
-    clase: styles.seccion1,
-  },
-  {
-    seccion: '2ª',
-    nombre: 'Actividades profesionales',
-    quienes:
-      'Ejercicio individual de una profesión: abogacía, arquitectura, ingeniería, medicina, traducción, consultoría, diseño y demás profesiones ejercidas por cuenta propia.',
-    retencion:
-      'Las facturas a empresas y a otros profesionales llevan retención de IRPF: 15 % con carácter general y 7 % durante el año de inicio de la actividad y los dos siguientes.',
-    clase: styles.seccion2,
-  },
-  {
-    seccion: '3ª',
-    nombre: 'Actividades artísticas',
-    quienes:
-      'Cine, teatro, circo, música, danza, deporte y espectáculos taurinos ejercidos por cuenta propia.',
-    retencion:
-      'Tratamiento análogo al profesional: las facturas a empresas y a otros profesionales llevan retención de IRPF.',
-    clase: styles.seccion3,
-  },
-];
+// Las secciones del IAE son dato normativo: viven en data/fiscal/cnae-iae.ts para
+// que su contrato de vigilancia sea el mismo que el del resto de datos fiscales.
+// Aquí solo se les añade la clase de color que usa esta interfaz.
+const CLASE_SECCION: Record<SeccionIae, string> = {
+  '1ª': styles.seccion1,
+  '2ª': styles.seccion2,
+  '3ª': styles.seccion3,
+};
 
 // ─── Utilidades de texto ─────────────────────────────────────────────────────
 
@@ -448,7 +420,7 @@ export default function ConversorCnaeIaePage() {
     return catalogo.correspondenciaInversa[soloDigitos(codigo)] ?? [];
   };
 
-  const descripcionSeccion = (seccion: SeccionIae): DescripcionSeccionIae | undefined =>
+  const descripcionSeccion = (seccion: SeccionIae) =>
     SECCIONES_IAE.find((item) => item.seccion === seccion);
 
   // ─── Render ────────────────────────────────────────────────────────────────
@@ -800,7 +772,7 @@ export default function ConversorCnaeIaePage() {
               {SECCIONES_IAE.map((descripcion) => (
                 <article key={descripcion.seccion} className={styles.seccionCard}>
                   <h3 className={styles.seccionCardTitulo}>
-                    <span className={`${styles.badgeSeccion} ${descripcion.clase}`}>
+                    <span className={`${styles.badgeSeccion} ${CLASE_SECCION[descripcion.seccion]}`}>
                       Sección {descripcion.seccion}
                     </span>
                     {descripcion.nombre}
@@ -852,7 +824,7 @@ export default function ConversorCnaeIaePage() {
                         </div>
                         <div className={styles.badgesFicha}>
                           <span
-                            className={`${styles.badgeSeccion} ${descripcion ? descripcion.clase : styles.seccion1}`}
+                            className={`${styles.badgeSeccion} ${descripcion ? CLASE_SECCION[descripcion.seccion] : styles.seccion1}`}
                           >
                             Sección {entrada.seccion}
                           </span>
@@ -1094,7 +1066,8 @@ export default function ConversorCnaeIaePage() {
               <h4>¿Tengo que pagar el IAE siendo autónomo?</h4>
               <p>
                 Con carácter general, no. Están exentas del pago las personas físicas y quienes
-                tengan un importe neto de la cifra de negocios inferior a un millón de euros, lo
+                tengan un importe neto de la cifra de negocios inferior a{' '}
+                {formatNumber(IAE_EXENCION.umbralCifraNegocio, 0)} €, lo
                 que deja fuera del pago a la inmensa mayoría de autónomos y de pequeñas empresas.
                 Otra cosa distinta es <strong>declarar</strong> el epígrafe: el alta censal es
                 obligatoria aunque no se pague cuota, porque es la forma en que la AEAT registra
@@ -1246,7 +1219,7 @@ export default function ConversorCnaeIaePage() {
               </li>
               <li>
                 <strong>Confundir exención con no declarar.</strong> Estar exento del pago del IAE
-                por cifra de negocio inferior a un millón de euros no exime del alta censal en el
+                por cifra de negocio inferior a {formatNumber(IAE_EXENCION.umbralCifraNegocio, 0)} € no exime del alta censal en el
                 epígrafe.
               </li>
               <li>
