@@ -80,7 +80,10 @@ type Pestana = 'cnae' | 'iae';
 
 // ─── Constantes ──────────────────────────────────────────────────────────────
 
-const LIMITE_RESULTADOS = 50;
+// Con criterio de búsqueda, 10 resultados bastan para reconocer la actividad; más
+// solo alarga el scroll. Y SIN criterio no se lista nada: el catálogo entero por
+// orden alfabético empieza en "Cultivo de cereales", que no le sirve a nadie.
+const LIMITE_RESULTADOS = 10;
 const RUTA_CATALOGO = '/datos/cnae-iae-catalogo.json';
 
 const EJEMPLOS_CNAE: string[] = [
@@ -327,7 +330,10 @@ export default function ConversorCnaeIaePage() {
     });
   }, [cnaeIndexado, consultaCnaeNormalizada, digitosConsultaCnae, equivalenciaAntigua, seccionCnae]);
 
-  const cnaeMostrados = resultadosCnae.slice(0, LIMITE_RESULTADOS);
+  // Sin texto ni filtro de sección no hay nada que mostrar: la pantalla inicial son
+  // los ejemplos clicables, no un volcado del catálogo.
+  const sinCriterioCnae = consultaCnaeNormalizada.length === 0 && seccionCnae === 'todas';
+  const cnaeMostrados = sinCriterioCnae ? [] : resultadosCnae.slice(0, LIMITE_RESULTADOS);
 
   // ─── Búsqueda en las Tarifas del IAE ───────────────────────────────────────
 
@@ -372,7 +378,8 @@ export default function ConversorCnaeIaePage() {
     });
   }, [iaeIndexado, consultaIae, consultaIaeNormalizada, digitosConsultaIae, seccionIae]);
 
-  const iaeMostrados = resultadosIae.slice(0, LIMITE_RESULTADOS);
+  const sinCriterioIae = consultaIaeNormalizada.length === 0 && seccionIae === 'todas';
+  const iaeMostrados = sinCriterioIae ? [] : resultadosIae.slice(0, LIMITE_RESULTADOS);
 
   // ─── Jerarquías ────────────────────────────────────────────────────────────
 
@@ -630,19 +637,28 @@ export default function ConversorCnaeIaePage() {
               </div>
             )}
 
-            <p className={styles.contador} role="status" aria-live="polite">
-              {formatNumber(resultadosCnae.length, 0)}{' '}
-              {resultadosCnae.length === 1 ? 'resultado' : 'resultados'}
-              {resultadosCnae.length > LIMITE_RESULTADOS && (
-                <>
-                  {' '}
-                  · se muestran los {LIMITE_RESULTADOS} primeros; afina la búsqueda para ver el
-                  resto
-                </>
-              )}
-            </p>
+            {!sinCriterioCnae && (
+              <p className={styles.contador} role="status" aria-live="polite">
+                {formatNumber(resultadosCnae.length, 0)}{' '}
+                {resultadosCnae.length === 1 ? 'resultado' : 'resultados'}
+                {resultadosCnae.length > LIMITE_RESULTADOS && (
+                  <>
+                    {' '}
+                    · se muestran los {LIMITE_RESULTADOS} primeros; afina la búsqueda para ver el
+                    resto
+                  </>
+                )}
+              </p>
+            )}
 
-            {resultadosCnae.length === 0 ? (
+            {sinCriterioCnae ? (
+              <div className={styles.sinResultados}>
+                <p>
+                  Escribe arriba a qué te dedicas para localizar tu código, o filtra por sección
+                  si prefieres explorar la clasificación.
+                </p>
+              </div>
+            ) : resultadosCnae.length === 0 ? (
               <div className={styles.sinResultados}>
                 <p>No hay ninguna entrada que encaje con lo que has escrito.</p>
                 <ul>
@@ -783,19 +799,28 @@ export default function ConversorCnaeIaePage() {
               ))}
             </div>
 
-            <p className={styles.contador} role="status" aria-live="polite">
-              {formatNumber(resultadosIae.length, 0)}{' '}
-              {resultadosIae.length === 1 ? 'resultado' : 'resultados'}
-              {resultadosIae.length > LIMITE_RESULTADOS && (
-                <>
-                  {' '}
-                  · se muestran los {LIMITE_RESULTADOS} primeros; afina la búsqueda para ver el
-                  resto
-                </>
-              )}
-            </p>
+            {!sinCriterioIae && (
+              <p className={styles.contador} role="status" aria-live="polite">
+                {formatNumber(resultadosIae.length, 0)}{' '}
+                {resultadosIae.length === 1 ? 'resultado' : 'resultados'}
+                {resultadosIae.length > LIMITE_RESULTADOS && (
+                  <>
+                    {' '}
+                    · se muestran los {LIMITE_RESULTADOS} primeros; afina la búsqueda para ver el
+                    resto
+                  </>
+                )}
+              </p>
+            )}
 
-            {resultadosIae.length === 0 ? (
+            {sinCriterioIae ? (
+              <div className={styles.sinResultados}>
+                <p>
+                  Escribe arriba la actividad o el epígrafe que buscas, o filtra por sección para
+                  ver las actividades empresariales, profesionales o artísticas.
+                </p>
+              </div>
+            ) : resultadosIae.length === 0 ? (
               <div className={styles.sinResultados}>
                 <p>Ningún epígrafe coincide con esa búsqueda.</p>
                 <ul>
