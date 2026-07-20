@@ -1278,6 +1278,21 @@ export const implementedAppsUrls = [
   "/simulador-financiacion-empresarial/", // Préstamo vs leasing vs ampliación de capital: coste neto, escudo fiscal IS, tesorería, dilución
   "/calculadora-z-score-altman/",      // Z-Score de Altman: riesgo de insolvencia. 3 modelos (cotizada, pyme, servicios), zona segura/gris/insolvencia
   "/calculadora-amortizacion-inmovilizado/", // Amortización inmovilizado: lineal, degresivo y suma de dígitos. Cuadro año a año + gráfico VNC + coef. AEAT
+
+  // Identificadores y códigos administrativos (2026-07)
+  "/validador-dni-nif-cif/",           // DNI/NIE/NIF/CIF: validación módulo 23, cálculo de letra y generador de datos de prueba
+  "/calculadora-iban/",                // IBAN desde CCC (módulo 97), validación multipaís, entidad emisora y estructura del BIC
+  "/validador-rfc-curp/",              // México: valida RFC y CURP con su dígito verificador, calcula las 10 primeras posiciones del RFC
+  "/conversor-cnae-iae/",              // Busca tu actividad en lenguaje natural y devuelve CNAE + epígrafes IAE candidatos con su confianza
+
+  // Formularios de consulta STEM (2026-07)
+  "/tabla-derivadas/",                 // 38 derivadas buscables con regla de la cadena, demostración y ejemplo
+  "/tabla-integrales/",                // 40 integrales y métodos, con + C siempre presente y regla de Barrow
+  "/tabla-valencias/",                 // 51 elementos con números de oxidación, 3 nomenclaturas IUPAC y formulador binario
+
+  // Utilidades académicas y de formato (2026-07)
+  "/generador-citas-apa/",             // Referencias y citas en APA 7, ISO 690, Vancouver e ICONTEC, con lista exportable
+  "/comparador-tamanos-papel/",        // A4 vs Carta a escala real en SVG, conversor mm/pulgadas/píxeles y comprobador de impresión
 ];
 
 /**

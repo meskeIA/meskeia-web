@@ -6419,6 +6419,72 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-cocina/', icon: '🍳', name: 'Calculadora de Cocina', description: 'Conversor general de unidades' },
     { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta las cantidades por raciones' },
   ],
+
+  // ==========================================
+  // FAMILIA: IDENTIFICADORES Y CÓDIGOS ADMINISTRATIVOS
+  // ==========================================
+  'validador-dni-nif-cif': [
+    { url: '/calculadora-iban/', icon: '🏦', name: 'Calculadora de IBAN', description: 'Calcula y valida el número de cuenta' },
+    { url: '/validador-rfc-curp/', icon: '🇲🇽', name: 'Validador de RFC y CURP', description: 'El equivalente mexicano' },
+    { url: '/conversor-cnae-iae/', icon: '🧾', name: 'Buscador CNAE ⇄ IAE', description: 'El código de actividad para tu alta' },
+    { url: '/generador-hashes/', icon: '🔐', name: 'Generador de Hashes', description: 'MD5, SHA-1, SHA-256 y más' },
+  ],
+  'calculadora-iban': [
+    { url: '/validador-dni-nif-cif/', icon: '🪪', name: 'Validador de DNI, NIE y CIF', description: 'Calcula y comprueba la letra' },
+    { url: '/validador-json/', icon: '📋', name: 'Validador JSON', description: 'Valida y formatea estructuras JSON' },
+    { url: '/generador-facturas/', icon: '🧾', name: 'Generador de Facturas', description: 'Donde vas a necesitar ese IBAN' },
+    { url: '/validador-rfc-curp/', icon: '🇲🇽', name: 'Validador de RFC y CURP', description: 'Identificadores de México' },
+  ],
+  'validador-rfc-curp': [
+    { url: '/validador-dni-nif-cif/', icon: '🪪', name: 'Validador de DNI, NIE y CIF', description: 'Los identificadores de España' },
+    { url: '/calculadora-iban/', icon: '🏦', name: 'Calculadora de IBAN', description: 'Calcula y valida cuentas bancarias' },
+    { url: '/generador-hashes/', icon: '🔐', name: 'Generador de Hashes', description: 'MD5, SHA-1, SHA-256 y más' },
+    { url: '/generador-contrasenas/', icon: '🔑', name: 'Generador de Contraseñas', description: 'Claves seguras al instante' },
+  ],
+  'conversor-cnae-iae': [
+    { url: '/asistente-alta-autonomo/', icon: '🚀', name: 'Asistente de Alta de Autónomo', description: 'El proceso completo, paso a paso' },
+    { url: '/estimador-cuota-autonomo/', icon: '💶', name: 'Cuota de Autónomo', description: 'Cuánto pagarás según tus ingresos' },
+    { url: '/orientador-iva-espana/', icon: '🧭', name: 'Orientador del IVA', description: 'Qué IVA aplicar en cada operación' },
+    { url: '/validador-dni-nif-cif/', icon: '🪪', name: 'Validador de DNI, NIE y CIF', description: 'Comprueba el NIF de tu alta' },
+  ],
+
+  // ==========================================
+  // FAMILIA: FORMULARIOS DE CONSULTA STEM
+  // ==========================================
+  'tabla-derivadas': [
+    { url: '/tabla-integrales/', icon: '∫', name: 'Tabla de Integrales', description: 'La operación inversa, en formulario' },
+    { url: '/simulador-derivada-pendiente/', icon: '📈', name: 'Derivada y Pendiente', description: 'Visualiza qué significa derivar' },
+    { url: '/simulador-integral-area/', icon: '📊', name: 'La Integral como Área', description: 'El significado geométrico' },
+    { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'Formulario de química' },
+  ],
+  'tabla-integrales': [
+    { url: '/tabla-derivadas/', icon: '📐', name: 'Tabla de Derivadas', description: 'La operación inversa, en formulario' },
+    { url: '/simulador-integral-area/', icon: '📊', name: 'La Integral como Área', description: 'Visualiza qué significa integrar' },
+    { url: '/simulador-derivada-pendiente/', icon: '📈', name: 'Derivada y Pendiente', description: 'El significado de la derivada' },
+    { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'Formulario de química' },
+  ],
+  'tabla-valencias': [
+    { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica Interactiva', description: 'Los 118 elementos y sus propiedades' },
+    { url: '/simulador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Ajusta y simula reacciones' },
+    { url: '/tabla-derivadas/', icon: '📐', name: 'Tabla de Derivadas', description: 'Formulario de matemáticas' },
+    { url: '/quiz-tabla-periodica/', icon: '🎯', name: 'Quiz de la Tabla Periódica', description: 'Pon a prueba lo que sabes' },
+  ],
+
+  // ==========================================
+  // FAMILIA: UTILIDADES ACADÉMICAS Y DE FORMATO
+  // ==========================================
+  'generador-citas-apa': [
+    { url: '/contador-palabras/', icon: '🔢', name: 'Contador de Palabras', description: 'Controla la extensión de tu trabajo' },
+    { url: '/calculadora-notas/', icon: '📊', name: 'Calculadora de Notas', description: 'Calcula tu nota media ponderada' },
+    { url: '/comparador-tamanos-papel/', icon: '📄', name: 'Tamaños de Papel', description: 'A4, Carta y márgenes de impresión' },
+    { url: '/creador-flashcards/', icon: '🎴', name: 'Creador de Flashcards', description: 'Estudia lo que has investigado' },
+  ],
+  'comparador-tamanos-papel': [
+    { url: '/conversor-unidades/', icon: '📏', name: 'Conversor de Unidades', description: 'Longitud, peso, volumen y más' },
+    { url: '/generador-citas-apa/', icon: '📚', name: 'Generador de Citas', description: 'APA, ISO 690, Vancouver e ICONTEC' },
+    { url: '/creador-paletas/', icon: '🎨', name: 'Creador de Paletas', description: 'Para tus diseños impresos' },
+    { url: '/validador-dni-nif-cif/', icon: '🪪', name: 'Validador de DNI y CIF', description: 'Otra utilidad de uso diario' },
+  ],
 };
 
 /**
