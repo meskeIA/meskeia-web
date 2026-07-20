@@ -204,6 +204,20 @@ import { FISCAL_IRPF_META } from '@/data/fiscal';
 
 ---
 
+## Material de apoyo de Stemum (tablas de consulta)
+
+Las tablas de consulta STEM (`app/tabla-*`) son un **contenedor subordinado** del portal Stemum: no son simuladores, no cuentan en el hero (`130 simuladores`) ni en los contadores de disciplina, y no entran en las parrillas de `/stemum/[disciplina]/`. Viven en la sección `stemum.com/material-apoyo/`.
+
+**Criterio de admisión**: buscador SIEMPRE + al menos una capa que un PDF no pueda dar. Esa capa cambia por disciplina — demostración en matemáticas, ejemplo real o formulador en química, equivalencias y orden de magnitud en física. Una lista plana se queda en meskeIA y no entra en Stemum.
+
+**Registro de una tabla nueva (4 archivos OBLIGATORIOS)**: `data/applications.ts` + `data/implemented-apps.ts` + `data/app-relations.ts` + **`STEMUM_MATERIAL_APOYO` en `data/stemum.ts`**. Olvidar el cuarto = la tabla existe en meskeIA pero **no aparece en Stemum y no da error**. Mismo agujero silencioso que `data/cronicum/puertas.ts` en las cronologías.
+
+**Cross-linking bidireccional**: además de que la tabla enlace a sus simuladores, el simulador equivalente DEBE enlazar de vuelta a la tabla en `app-relations.ts`. Es el circuito que convierte una visita de consulta en una visita de exploración y al revés.
+
+**Referencia para copiar**: `app/tabla-derivadas/` (buscador con foco automático, filtros por categoría con `aria-pressed`, filas desplegables con `aria-expanded` y ejemplo resuelto en cada una).
+
+---
+
 ## Reglas OBLIGATORIAS al crear nuevas apps
 
 ### 1. Cada app DEBE tener al menos una Suite
