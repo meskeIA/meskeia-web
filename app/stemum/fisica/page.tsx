@@ -3,6 +3,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
+import MaterialApoyoPie from '../MaterialApoyoPie';
 import styles from '../StemumHome.module.css';
 
 export const metadata: Metadata = {
@@ -224,6 +225,10 @@ export default function StemumFisica() {
               </Link>
             ))}
           </div>
+
+          {/* Material de apoyo de la disciplina: enlace al pie para no mezclar
+              piezas de consulta con los simuladores de la parrilla. */}
+          <MaterialApoyoPie disciplina="fisica" pregunta="¿Buscas el dato concreto?" />
         </section>
       </main>
     </>

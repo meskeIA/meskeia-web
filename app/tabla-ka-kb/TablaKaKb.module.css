@@ -1,0 +1,972 @@
+/* Tabla de Constantes de Acidez y Basicidad (Ka, Kb) — meskeIA
+   Consulta rápida + calculadoras. Paleta meskeIA y dark mode completo. */
+
+.container {
+  --radius-large: 16px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  min-height: 100vh;
+}
+
+/* ============================================
+   HERO
+============================================ */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+  margin-top: 80px;
+  padding: var(--spacing-xl);
+  background: var(--hero-bg);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.title {
+  font-size: 1.9rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  opacity: 0.95;
+  max-width: 760px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* ============================================
+   PANEL DE BÚSQUEDA
+============================================ */
+.buscadorPanel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  box-shadow: var(--shadow-light);
+}
+
+.buscadorLabel {
+  display: block;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+  font-size: 1rem;
+}
+
+.buscadorWrap {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.buscadorInput {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  font-size: 1.05rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border-color 0.2s;
+}
+
+.buscadorInput:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.buscadorInput:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.limpiarBtn {
+  padding: 0.7rem 1rem;
+  border: 2px solid var(--border);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.limpiarBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.limpiarBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.ayudaBusqueda {
+  margin: var(--spacing-sm) 0 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* ============================================
+   FILTROS POR CATEGORÍA
+============================================ */
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.filtroBtn {
+  padding: 0.45rem 0.85rem;
+  background: var(--bg-primary);
+  border: 2px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  transition: all 0.2s;
+}
+
+.filtroBtn:hover {
+  border-color: var(--primary);
+}
+
+.filtroBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.filtroBtnActivo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.contador {
+  margin: var(--spacing-md) 0 0 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* ============================================
+   LISTA DE ESPECIES
+============================================ */
+.lista {
+  list-style: none;
+  margin: 0 0 var(--spacing-xl) 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.fila {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.filaBtn {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(180px, 1.2fr) minmax(0, 2fr) auto;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: transparent;
+  border: none;
+  border-left: 4px solid var(--primary);
+  cursor: pointer;
+  text-align: left;
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+
+.filaBtn:hover {
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.filaBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+.filaNombre {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.filaFormula {
+  font-family: var(--font-mono, 'Cambria Math', Georgia, serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.filaTexto {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.filaCategoria {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.filaValores {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.par {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.etq {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  white-space: nowrap;
+}
+
+.expr {
+  font-family: var(--font-mono, 'Cambria Math', Georgia, serif);
+  font-size: 1.05rem;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.exprSecundario {
+  color: var(--secondary);
+}
+
+.chevron {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ── Indicador de fuerza (texto + barra, nunca solo color) ── */
+.fuerzaBloque {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 170px;
+}
+
+.fuerzaEtiqueta {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.fuerzaBarra {
+  display: block;
+  width: 100%;
+  height: 6px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.fuerzaRelleno {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--secondary), var(--primary));
+}
+
+/* ============================================
+   DETALLE DESPLEGADO
+============================================ */
+.detalle {
+  padding: var(--spacing-lg);
+  border-top: 1px solid var(--border);
+  background: var(--bg-primary);
+}
+
+.detalle h3 {
+  font-size: 0.95rem;
+  color: var(--primary);
+  margin: var(--spacing-md) 0 var(--spacing-xs) 0;
+}
+
+.detalle h3:first-child {
+  margin-top: 0;
+}
+
+.detalle p {
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--text-primary);
+  line-height: 1.65;
+}
+
+.equilibrio {
+  font-family: var(--font-mono, 'Cambria Math', Georgia, serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--secondary);
+  border-radius: var(--radius);
+  padding: var(--spacing-sm) var(--spacing-md);
+  overflow-x: auto;
+}
+
+.gridConstantes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--spacing-sm);
+  margin: var(--spacing-md) 0;
+}
+
+.constanteCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.constanteEtq {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.constanteCard strong {
+  font-family: var(--font-mono, 'Cambria Math', Georgia, serif);
+  font-size: 1.2rem;
+  color: var(--primary);
+}
+
+.constanteSub {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.kwBox {
+  background: rgba(72, 169, 166, 0.1);
+  border-left: 4px solid var(--secondary);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.kwBox h4 {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: 0.95rem;
+  color: var(--primary);
+}
+
+.kwFormula {
+  font-family: var(--font-mono, 'Cambria Math', Georgia, serif);
+  font-size: 0.98rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-xs) 0 !important;
+  overflow-x: auto;
+}
+
+.avisoFuerte {
+  background: rgba(224, 122, 31, 0.08);
+  border-left: 4px solid #e07a1f;
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.avisoFuerteCierre {
+  margin-bottom: 0 !important;
+  font-family: var(--font-mono, 'Cambria Math', Georgia, serif);
+  font-size: 0.95rem;
+}
+
+.aplicacionBox {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--text-primary);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.sinResultados {
+  background: var(--bg-card);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-xl);
+  text-align: center;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* ============================================
+   CALCULADORAS
+============================================ */
+.calculadora {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  box-shadow: var(--shadow-light);
+}
+
+.calcTitulo {
+  color: var(--primary);
+  font-size: 1.3rem;
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.calcIntro {
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.calcGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.campo label {
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+}
+
+.select,
+.input {
+  padding: 0.6rem 0.75rem;
+  font-size: 1rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border-color 0.2s;
+  width: 100%;
+}
+
+.select:focus,
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.select:focus-visible,
+.input:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.campoAyuda {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.resultadoPanel {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+.resultadoVacio {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.resultadoPrincipal {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--spacing-md);
+}
+
+.resultadoEtq {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.resultadoValor {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.1;
+}
+
+.resultadoSub {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  font-family: var(--font-mono, 'Cambria Math', Georgia, serif);
+}
+
+.detalleCalculo {
+  margin: 0 0 var(--spacing-md) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.detalleCalculo dt {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.detalleCalculo dd {
+  margin: 0;
+  color: var(--text-primary);
+  font-family: var(--font-mono, 'Cambria Math', Georgia, serif);
+  font-size: 0.98rem;
+  line-height: 1.5;
+  overflow-x: auto;
+}
+
+.notaOk,
+.notaAviso,
+.notaNeutra {
+  border-radius: var(--radius);
+  padding: var(--spacing-sm) var(--spacing-md);
+  line-height: 1.65;
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: 0.95rem;
+}
+
+.notaOk {
+  background: rgba(72, 169, 166, 0.12);
+  border-left: 4px solid var(--secondary);
+  color: var(--text-primary);
+}
+
+.notaAviso {
+  background: rgba(224, 122, 31, 0.1);
+  border-left: 4px solid #e07a1f;
+  color: var(--text-primary);
+}
+
+.notaNeutra {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  margin-bottom: 0;
+}
+
+/* ============================================
+   CAJA DE FÓRMULA DESTACADA
+============================================ */
+.formulaBox {
+  background: var(--bg-primary);
+  border-left: 4px solid var(--primary);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin: var(--spacing-md) 0;
+  border-radius: var(--radius);
+  font-family: var(--font-mono, 'Cambria Math', Georgia, serif);
+  font-size: 1.05rem;
+  text-align: center;
+  color: var(--text-primary);
+  overflow-x: auto;
+}
+
+/* ============================================
+   EDUCATIVO — SECCIONES
+============================================ */
+.guideSection {
+  padding: var(--spacing-md) 0;
+}
+
+.guideSection h2 {
+  color: var(--primary);
+  font-size: 1.25rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.guideSection h3 {
+  color: var(--text-primary);
+  font-size: 1.05rem;
+  margin: var(--spacing-md) 0 var(--spacing-xs) 0;
+}
+
+.guideSection p {
+  color: var(--text-primary);
+  line-height: 1.7;
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Tabla comparativa */
+.tablaWrapper {
+  overflow-x: auto;
+  margin: var(--spacing-md) 0;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  font-size: 0.95rem;
+}
+
+.tabla thead {
+  background: var(--primary);
+  color: white;
+}
+
+.tabla th,
+.tabla td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  color: inherit;
+}
+
+.tabla tbody td {
+  color: var(--text-primary);
+}
+
+.tabla tbody tr:hover {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+/* Escenarios */
+.scenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.scenarioCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.scenarioIcon {
+  font-size: 2rem;
+}
+
+.scenarioCard strong {
+  color: var(--primary);
+  font-size: 1.05rem;
+}
+
+.scenarioCard p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.faqItem {
+  background: var(--bg-primary);
+  border-left: 4px solid var(--secondary);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius);
+}
+
+.faqItem h4 {
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--primary);
+  font-size: 1.05rem;
+}
+
+.faqItem p {
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--text-primary);
+  line-height: 1.65;
+}
+
+.faqTip {
+  background: rgba(72, 169, 166, 0.12);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0 !important;
+}
+
+/* Pasos */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.step {
+  display: flex;
+  gap: var(--spacing-md);
+  background: var(--bg-primary);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.stepContent strong {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  color: var(--primary);
+  font-size: 1.05rem;
+}
+
+.stepContent p {
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* Tips */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.tipCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--secondary);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.tipIcon {
+  font-size: 1.6rem;
+}
+
+.tipCard strong {
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+.tipCard p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* Warning box (marcador v2.0) */
+.warningBox {
+  background: rgba(224, 122, 31, 0.08);
+  border-left: 4px solid #e07a1f;
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin: var(--spacing-lg) 0;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  color: #b45309;
+  font-size: 1.1rem;
+}
+
+.warningHeader h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: inherit;
+}
+
+.warningIcon {
+  font-size: 1.4rem;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: var(--spacing-lg);
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+
+.warningList li {
+  margin-bottom: var(--spacing-sm);
+}
+
+.warningList li strong {
+  color: #b45309;
+}
+
+/* ============================================
+   DARK MODE
+============================================ */
+[data-theme='dark'] .filaBtn:hover {
+  background: rgba(46, 134, 171, 0.14);
+}
+
+[data-theme='dark'] .tabla tbody tr:hover {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .kwBox,
+[data-theme='dark'] .faqTip,
+[data-theme='dark'] .notaOk {
+  background: rgba(72, 169, 166, 0.16);
+}
+
+[data-theme='dark'] .warningBox,
+[data-theme='dark'] .avisoFuerte,
+[data-theme='dark'] .notaAviso {
+  background: rgba(224, 122, 31, 0.14);
+}
+
+[data-theme='dark'] .warningHeader,
+[data-theme='dark'] .warningList li strong {
+  color: #f0a85c;
+}
+
+[data-theme='dark'] .buscadorInput,
+[data-theme='dark'] .limpiarBtn,
+[data-theme='dark'] .filtroBtn,
+[data-theme='dark'] .select,
+[data-theme='dark'] .input {
+  background: #1f1f1f;
+}
+
+[data-theme='dark'] .filtroBtnActivo {
+  background: var(--primary);
+}
+
+[data-theme='dark'] .fuerzaBarra {
+  background: #1f1f1f;
+}
+
+/* ============================================
+   RESPONSIVE
+============================================ */
+@media (max-width: 900px) {
+  .filaBtn {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'nombre chevron'
+      'valores valores';
+    row-gap: var(--spacing-sm);
+  }
+
+  .filaNombre {
+    grid-area: nombre;
+  }
+
+  .filaValores {
+    grid-area: valores;
+  }
+
+  .chevron {
+    grid-area: chevron;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .hero {
+    margin-top: 60px;
+    padding: var(--spacing-lg);
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .buscadorWrap {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .expr {
+    font-size: 1rem;
+  }
+
+  .resultadoValor {
+    font-size: 2rem;
+  }
+}
+
+/* ============================================
+   ACCESIBILIDAD — movimiento reducido
+============================================ */
+@media (prefers-reduced-motion: reduce) {
+  .filaBtn,
+  .filtroBtn,
+  .limpiarBtn,
+  .buscadorInput,
+  .select,
+  .input {
+    transition: none !important;
+  }
+}

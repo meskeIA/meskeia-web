@@ -1717,7 +1717,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-tabla-periodica-interactiva/', icon: '🧪', name: 'Tabla Periódica', description: 'El carbono (C, nº 6) en el contexto de todos los elementos' },
     { url: '/visualizador-silicio/', icon: '💻', name: 'Silicio', description: 'El semiconductor que comparte grupo con el carbono' },
     { url: '/visualizador-cambio-climatico-tipping-points/', icon: '🌡️', name: 'Cambio Climático', description: 'El ciclo del carbono perturbado: el motor del calentamiento global' },
-    { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula', description: 'La vida = química del carbono: ADN, proteínas, lípidos' },
+    { url: '/tabla-grupos-funcionales/', icon: '⚛️', name: 'Tabla de Grupos Funcionales', description: 'Los grupos de la química del carbono, con prioridad IUPAC' },
   ],
   'visualizador-silicio': [
     { url: '/visualizador-tabla-periodica-interactiva/', icon: '🧪', name: 'Tabla Periódica', description: 'El silicio (Si, nº 14) en el contexto de todos los elementos' },
@@ -2868,7 +2868,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/quiz-tabla-periodica/', icon: '🧪', name: 'Quiz Tabla Periódica', description: 'Pon a prueba tus conocimientos de química' },
     { url: '/simulador-estequiometria/', icon: '⚗️', name: 'Estequiometría', description: 'Reacciones, masas molares y reactivo limitante' },
     { url: '/simulador-equilibrio-quimico/', icon: '⚖️', name: 'Equilibrio Químico', description: 'Le Chatelier y constante Kc' },
-    { url: '/glosario-fisica-quimica/', icon: '📖', name: 'Glosario Física-Química', description: 'Términos clave de química y física' },
+    { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'Con qué números de oxidación actúa cada elemento' },
   ],
   'glosario-fisica-quimica': [{ url: '/tabla-periodica/', icon: '⚗️', name: 'Tabla Periódica', description: 'Elementos químicos' }, { url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Simulaciones visuales' }, ...matematicasBasicasApps.slice(0, 1)],
 
@@ -3079,7 +3079,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'simulador-titulacion': [
     { url: '/simulador-disoluciones/', icon: '🧪', name: 'Disoluciones', description: 'Molaridad, concentración y dilución' },
     { url: '/visualizador-ph-acidos-bases/', icon: '🧫', name: 'pH, Ácidos y Bases', description: 'Escala pH y reacciones' },
-    { url: '/simulador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Estequiometría y reactivo limitante' },
+    { url: '/tabla-ka-kb/', icon: '🧫', name: 'Tabla de Ka y Kb', description: 'Las constantes que gobiernan la curva de pH' },
     { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica', description: 'Elementos químicos completos' },
   ],
   'simulador-disoluciones': [
@@ -4137,7 +4137,8 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-funciones-mundo/', icon: '📈', name: 'Funciones que Gobiernan el Mundo', description: 'Las funciones que el cálculo analiza: lineales, exponenciales, logarítmicas' },
     { url: '/calculadora-calculo/', icon: '🧮', name: 'Calculadora de Cálculo', description: 'Calcula derivadas, integrales y límites exactos de cualquier función' },
     { url: '/visualizador-numeros-complejos/', icon: '𝕚', name: 'Números Complejos', description: 'Las derivadas de funciones complejas y la transformada de Fourier usan el cálculo' },
-    { url: '/visualizador-teoria-juegos/', icon: '🎲', name: 'Teoría de Juegos', description: 'El equilibrio de Nash se encuentra optimizando funciones con derivadas' },
+    { url: '/tabla-derivadas/', icon: '📄', name: 'Tabla de Derivadas', description: 'Todas las fórmulas de derivación, con buscador' },
+    { url: '/tabla-limites-notables/', icon: '♾️', name: 'Tabla de Límites Notables', description: 'De donde nace la derivada' },
   ],
   'visualizador-numeros-complejos': [
     { url: '/visualizador-matrices/', icon: '🔢', name: 'Matrices y Transformaciones', description: 'Las matrices también representan rotaciones y escalados en el plano' },
@@ -4216,7 +4217,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-geometria/', icon: '📏', name: 'Geometría', description: 'Áreas, perímetros y volúmenes de figuras planas y sólidos' },
     { url: '/visualizador-geometria-analitica/', icon: '📉', name: 'Geometría Analítica', description: 'Las secciones cónicas (elipse, parábola) dan lugar a las figuras de revolución' },
     { url: '/visualizador-trigonometria/', icon: '📐', name: 'Trigonometría', description: 'Sin y cos relacionan ángulos con las proporciones de esferas y cilindros' },
-    { url: '/visualizador-geometria-fractales/', icon: '🌀', name: 'Geometría Fractal', description: 'Cuando el volumen fractal supera la dimensión euclidiana clásica' },
+    { url: '/tabla-areas-volumenes/', icon: '📐', name: 'Tabla de Áreas y Volúmenes', description: 'Todas las fórmulas con diagrama y ejemplo resuelto' },
   ],
   'visualizador-algebra-lineal': [
     { url: '/visualizador-matrices/', icon: '📊', name: 'Matrices y Transformaciones', description: 'Las matrices son la representación algebraica de las transformaciones lineales' },
@@ -4286,7 +4287,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-termodinamica-quimica/', icon: '⚗️', name: 'Termodinámica Química', description: 'FEM > 0 equivale a ΔG < 0 — la electroquímica y la termodinámica están matemáticamente conectadas' },
     { url: '/visualizador-hidrogeno/', icon: '💧', name: 'Hidrógeno', description: 'La electrólisis del agua produce hidrógeno verde — el coste energético explicado por el sobrepotencial' },
     { url: '/visualizador-estructura-atomo/', icon: '⚛️', name: 'Estructura del Átomo', description: 'Los electrones que fluyen en la pila son los mismos que estudias en la estructura electrónica' },
-    { url: '/visualizador-polimeros-materiales/', icon: '🧪', name: 'Polímeros y Materiales', description: 'La electroquímica explica la corrosión metálica, clave para entender la durabilidad de los materiales poliméricos' },
+    { url: '/tabla-potenciales-redox/', icon: '🔋', name: 'Tabla de Potenciales Redox', description: 'Los E° de la serie electroquímica, con constructor de pilas' },
   ],
 
   // EJE C — Química orgánica y nuclear (Roadmap v4, 2026-04-30)
@@ -5854,7 +5855,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-integral-area/', icon: '📐', name: 'Simulador Integrales', description: 'Área bajo la curva con sumas de Riemann' },
     { url: '/simulador-distribucion-normal/', icon: '📊', name: 'Distribución Normal', description: 'Curva de Gauss interactiva' },
     { url: '/visualizador-calculo-visual/', icon: '🔬', name: 'Cálculo Visual', description: 'Límites, tangentes y áreas en canvas' },
-    { url: '/calculadora-trigonometria/', icon: '📐', name: 'Trigonometría', description: 'Funciones, identidades y ecuaciones' },
+    { url: '/tabla-derivadas/', icon: '📄', name: 'Tabla de Derivadas', description: 'Ya lo entiendes: ahora la fórmula concreta' },
   ],
   'simulador-teorema-central-limite': [
     { url: '/simulador-intervalos-confianza/', icon: '📏', name: 'Intervalos de Confianza', description: 'Aplicación directa del TCL: IC para μ' },
@@ -5865,7 +5866,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'simulador-integral-area': [
     { url: '/simulador-derivada-pendiente/', icon: '📈', name: 'Simulador Derivadas', description: 'Pendiente de la tangente: el otro lado del cálculo' },
     { url: '/visualizador-calculo-visual/', icon: '🔬', name: 'Cálculo Visual', description: 'Límites, tangentes y áreas en canvas' },
-    { url: '/calculadora-trigonometria/', icon: '📐', name: 'Trigonometría', description: 'Funciones, identidades y ecuaciones' },
+    { url: '/tabla-integrales/', icon: '📄', name: 'Tabla de Integrales', description: 'Ya lo entiendes: ahora la primitiva concreta' },
     { url: '/simulador-distribucion-normal/', icon: '📊', name: 'Distribución Normal', description: 'Áreas bajo la curva de Gauss = probabilidades' },
   ],
   'simulador-intervalos-confianza': [
@@ -5966,7 +5967,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-estequiometria/', icon: '🧪', name: 'Estequiometría', description: 'Las masas molares que usas en estequiometría vienen de la tabla' },
     { url: '/simulador-cinetica-arrhenius/', icon: '⚗️', name: 'Cinética Arrhenius', description: 'La reactividad química depende de las tendencias periódicas' },
     { url: '/visualizador-tabla-periodica/', icon: '🔬', name: 'Tabla Periódica', description: 'Visualizador de la tabla periódica con información de cada elemento' },
-    { url: '/visualizador-tabla-periodica-interactiva/', icon: '⚗️', name: 'Tabla Periódica Interactiva', description: 'Tendencias, mapas de calor y datos ampliados' },
+    { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'Números de oxidación y nomenclatura IUPAC' },
   ],
   'simulador-estequiometria': [
     { url: '/simulador-tabla-periodica-tendencias/', icon: '⚗️', name: 'Tendencias Periódicas', description: 'Masas molares y reactividad explicadas desde la tabla periódica' },
@@ -6466,8 +6467,56 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'tabla-valencias': [
     { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica Interactiva', description: 'Los 118 elementos y sus propiedades' },
     { url: '/simulador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Ajusta y simula reacciones' },
-    { url: '/tabla-derivadas/', icon: '📐', name: 'Tabla de Derivadas', description: 'Todas las fórmulas de derivación' },
+    { url: '/tabla-solubilidad/', icon: '🧪', name: 'Tabla de Solubilidad', description: 'Qué compuestos precipitan y cuáles no' },
     { url: '/quiz-tabla-periodica/', icon: '🎯', name: 'Quiz de la Tabla Periódica', description: 'Pon a prueba lo que sabes' },
+  ],
+  'tabla-unidades-si': [
+    { url: '/tabla-constantes-fisicas/', icon: '🔬', name: 'Tabla de Constantes Físicas', description: 'Las constantes que fijan hoy las unidades' },
+    { url: '/conversor-unidades/', icon: '📏', name: 'Conversor de Unidades', description: 'Convierte entre unidades al instante' },
+    { url: '/simulador-gas-ideal/', icon: '💨', name: 'Gas Ideal', description: 'PV=nRT con presión en pascales y temperatura en kelvin' },
+    { url: '/tabla-areas-volumenes/', icon: '📐', name: 'Tabla de Áreas y Volúmenes', description: 'Fórmulas geométricas con ejemplo resuelto' },
+  ],
+  'tabla-constantes-fisicas': [
+    { url: '/tabla-unidades-si/', icon: '📏', name: 'Tabla de Unidades del SI', description: 'Las unidades en las que se miden estas constantes' },
+    { url: '/visualizador-particulas-subatomicas/', icon: '⚛️', name: 'Partículas Subatómicas', description: 'Las masas y cargas que aquí consultas, en acción' },
+    { url: '/simulador-campo-electrico/', icon: '⚡', name: 'Campo Eléctrico', description: 'Donde entra en juego la carga elemental' },
+    { url: '/tabla-potenciales-redox/', icon: '🔋', name: 'Tabla de Potenciales Redox', description: 'La constante de Faraday aplicada' },
+  ],
+  'tabla-areas-volumenes': [
+    { url: '/visualizador-volumenes/', icon: '🧊', name: 'Volúmenes de Cuerpos', description: 'Ve el cuerpo en 3D mientras cambias sus medidas' },
+    { url: '/visualizador-geometria-analitica/', icon: '🥚', name: 'Geometría Analítica', description: 'Cónicas y sus ecuaciones' },
+    { url: '/tabla-derivadas/', icon: '📐', name: 'Tabla de Derivadas', description: 'Cuando la geometría se hace cálculo' },
+    { url: '/tabla-unidades-si/', icon: '📏', name: 'Tabla de Unidades del SI', description: 'En qué unidades van área y volumen' },
+  ],
+  'tabla-limites-notables': [
+    { url: '/tabla-derivadas/', icon: '📐', name: 'Tabla de Derivadas', description: 'La derivada nace de un límite' },
+    { url: '/tabla-integrales/', icon: '∫', name: 'Tabla de Integrales', description: 'La otra mitad del cálculo' },
+    { url: '/visualizador-calculo-visual/', icon: '📈', name: 'Cálculo Visual', description: 'Ve el límite acercarse en la gráfica' },
+    { url: '/simulador-derivada-pendiente/', icon: '📈', name: 'Derivada y Pendiente', description: 'El límite del cociente incremental' },
+  ],
+  'tabla-solubilidad': [
+    { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'Formula bien antes de ver si precipita' },
+    { url: '/simulador-disoluciones/', icon: '🧪', name: 'Disoluciones', description: 'Molaridad, concentración y dilución' },
+    { url: '/tabla-ka-kb/', icon: '🧫', name: 'Tabla de Ka y Kb', description: 'El otro gran equilibrio en disolución' },
+    { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica', description: 'Los elementos de cada ion' },
+  ],
+  'tabla-grupos-funcionales': [
+    { url: '/visualizador-carbono/', icon: '⚛️', name: 'El Carbono', description: 'Alótropos, ciclo y grupos funcionales en 3D' },
+    { url: '/visualizador-quimica-organica/', icon: '🧬', name: 'Química Orgánica', description: 'Las reacciones de estos grupos' },
+    { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'Nomenclatura de compuestos inorgánicos' },
+    { url: '/tabla-ka-kb/', icon: '🧫', name: 'Tabla de Ka y Kb', description: 'Acidez de ácidos carboxílicos y aminas' },
+  ],
+  'tabla-potenciales-redox': [
+    { url: '/visualizador-electroquimica/', icon: '🔋', name: 'Electroquímica', description: 'Pila Daniell, serie electroquímica y electrólisis' },
+    { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'Los números de oxidación que cambian' },
+    { url: '/tabla-constantes-fisicas/', icon: '🔬', name: 'Tabla de Constantes Físicas', description: 'La constante de Faraday para ΔG°' },
+    { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica', description: 'Metales y su reactividad' },
+  ],
+  'tabla-ka-kb': [
+    { url: '/simulador-titulacion/', icon: '🧫', name: 'Titulación ácido-base', description: 'La curva de pH gota a gota' },
+    { url: '/tabla-solubilidad/', icon: '🧪', name: 'Tabla de Solubilidad', description: 'El equilibrio de precipitación' },
+    { url: '/tabla-potenciales-redox/', icon: '🔋', name: 'Tabla de Potenciales Redox', description: 'El otro gran equilibrio, el redox' },
+    { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'Formula los ácidos y las bases' },
   ],
 
   // ==========================================

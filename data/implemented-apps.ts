@@ -1289,6 +1289,14 @@ export const implementedAppsUrls = [
   "/tabla-derivadas/",                 // 38 derivadas buscables con regla de la cadena, demostración y ejemplo
   "/tabla-integrales/",                // 40 integrales y métodos, con + C siempre presente y regla de Barrow
   "/tabla-valencias/",                 // 51 elementos con números de oxidación, 3 nomenclaturas IUPAC y formulador binario
+  "/tabla-unidades-si/",               // 7 básicas + 22 derivadas + 24 prefijos + aceptadas, descomposición a básicas y orden de magnitud
+  "/tabla-constantes-fisicas/",        // 52 constantes CODATA 2022, exactas vs medidas, fórmula donde aparecen
+  "/tabla-areas-volumenes/",           // 48 figuras con diagrama SVG, letras explicadas y ejemplo numérico
+  "/tabla-limites-notables/",          // 59 entradas: 7 indeterminaciones, equivalencias infinitesimales, jerarquía de infinitos
+  "/tabla-solubilidad/",               // Reglas + 40 iones poliatómicos + Kps + comprobador de precipitación catión×anión
+  "/tabla-grupos-funcionales/",        // 31 grupos con IUPAC, diagrama y orden de prioridad ordenable
+  "/tabla-potenciales-redox/",         // 69 semirreacciones E°, serie de actividad y constructor de pilas galvánicas
+  "/tabla-ka-kb/",                     // 64 entradas Ka/Kb/pKa/pKb + calculadora de pH y de disolución reguladora
 
   // Utilidades académicas y de formato (2026-07)
   "/generador-citas-apa/",             // Referencias y citas en APA 7, ISO 690, Vancouver e ICONTEC, con lista exportable

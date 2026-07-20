@@ -3,7 +3,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
-import { materialDeDisciplina } from '@/data/stemum';
+import MaterialApoyoPie from '../MaterialApoyoPie';
 import styles from '../StemumHome.module.css';
 
 export const metadata: Metadata = {
@@ -114,17 +114,7 @@ export default function StemumQuimica() {
 
           {/* Material de apoyo de la disciplina: enlace al pie para no mezclar
               piezas de consulta con los simuladores de la parrilla. */}
-          <p className={styles.apoyoPie}>
-            ¿Buscas el dato concreto?{' '}
-            {materialDeDisciplina('quimica').map((m, i, arr) => (
-              <span key={m.slug}>
-                <Link href={`/${m.slug}`} className={styles.link}>{m.titulo}</Link>
-                {i < arr.length - 2 ? ', ' : i === arr.length - 2 ? ' y ' : ''}
-              </span>
-            ))}
-            {' '}en{' '}
-            <Link href="/material-apoyo" className={styles.link}>Material de apoyo</Link>.
-          </p>
+          <MaterialApoyoPie disciplina="quimica" pregunta="¿Buscas el dato concreto?" />
         </section>
       </main>
     </>

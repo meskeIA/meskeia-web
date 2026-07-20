@@ -169,9 +169,11 @@ export const STEMUM_APP_DISCIPLINA: Record<string, string> = {
  * cuentan como simuladores en el hero ni ensucian las páginas de disciplina,
  * que prometen manipulación en tiempo real.
  *
- * Criterio de admisión: solo entra la pieza que hace algo que un PDF no puede
- * (buscador, demostración desplegable, ejemplo resuelto). Una lista plana se
- * queda en meskeIA.
+ * Criterio de admisión: buscador SIEMPRE, más al menos una capa que un PDF no
+ * puede dar. Esa capa cambia según la disciplina — demostración en matemáticas,
+ * ejemplo real o formulador en química, equivalencias y orden de magnitud en
+ * física— así que no se exige "demostración" literalmente. Una lista plana sin
+ * ninguna de esas capas se queda en meskeIA y no entra aquí.
  *
  * `disciplina` no sirve para clasificar la sección (es una lista única), solo
  * para el breadcrumb de MeskeiaLogo y el enlace al pie de cada disciplina.
@@ -204,6 +206,62 @@ export const STEMUM_MATERIAL_APOYO: MaterialApoyo[] = [
     icon: '⚗️',
     titulo: 'Tabla de valencias',
     desc: 'Números de oxidación de cada elemento, las tres nomenclaturas IUPAC y formulador de compuestos.',
+    disciplina: 'quimica',
+  },
+  {
+    slug: 'tabla-areas-volumenes',
+    icon: '📐',
+    titulo: 'Tabla de áreas y volúmenes',
+    desc: '48 figuras planas y cuerpos geométricos con su diagrama, las letras explicadas y un ejemplo numérico resuelto.',
+    disciplina: 'matematicas',
+  },
+  {
+    slug: 'tabla-limites-notables',
+    icon: '♾️',
+    titulo: 'Tabla de límites notables',
+    desc: 'Límites notables, las 7 indeterminaciones y las equivalencias infinitesimales, con justificación y ejemplo.',
+    disciplina: 'matematicas',
+  },
+  {
+    slug: 'tabla-unidades-si',
+    icon: '📏',
+    titulo: 'Tabla de unidades del SI',
+    desc: 'Las 7 básicas, las 22 derivadas descompuestas a unidades básicas, los 24 prefijos y las unidades aceptadas.',
+    disciplina: 'fisica',
+  },
+  {
+    slug: 'tabla-constantes-fisicas',
+    icon: '🔬',
+    titulo: 'Tabla de constantes físicas',
+    desc: 'Constantes fundamentales con valores CODATA 2022, la fórmula donde aparecen y si son exactas o medidas.',
+    disciplina: 'fisica',
+  },
+  {
+    slug: 'tabla-solubilidad',
+    icon: '🧪',
+    titulo: 'Tabla de solubilidad',
+    desc: 'Reglas y excepciones, iones poliatómicos, valores de Kps y un comprobador de precipitación catión×anión.',
+    disciplina: 'quimica',
+  },
+  {
+    slug: 'tabla-grupos-funcionales',
+    icon: '⚛️',
+    titulo: 'Tabla de grupos funcionales',
+    desc: 'Fórmula, sufijo y prefijo IUPAC, diagrama y orden de prioridad ordenable para saber cuál manda al nombrar.',
+    disciplina: 'quimica',
+  },
+  {
+    slug: 'tabla-potenciales-redox',
+    icon: '🔋',
+    titulo: 'Tabla de potenciales redox',
+    desc: '69 semirreacciones E°, serie de actividad de los metales y constructor de pilas que calcula E°pila, ΔG° y K.',
+    disciplina: 'quimica',
+  },
+  {
+    slug: 'tabla-ka-kb',
+    icon: '🧫',
+    titulo: 'Tabla de Ka y Kb',
+    desc: 'Constantes de acidez y basicidad a 25 °C, con calculadora de pH y de disolución reguladora.',
     disciplina: 'quimica',
   },
 ];

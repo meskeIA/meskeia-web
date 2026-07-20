@@ -1,0 +1,1024 @@
+/* Tabla de Potenciales Redox Estándar — meskeIA
+   Consulta rápida + constructor de pilas. Paleta meskeIA y dark mode completo. */
+
+.container {
+  --radius-large: 16px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  min-height: 100vh;
+}
+
+/* ============================================
+   HERO
+============================================ */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+  margin-top: 80px;
+  padding: var(--spacing-xl);
+  background: var(--hero-bg);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.title {
+  font-size: 1.9rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  opacity: 0.95;
+  max-width: 760px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* ============================================
+   CONSTRUCTOR DE PILAS
+============================================ */
+.pilaPanel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--secondary);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  box-shadow: var(--shadow-light);
+}
+
+.pilaTitulo {
+  font-size: 1.3rem;
+  color: var(--primary);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.pilaIntro {
+  margin: 0 0 var(--spacing-md) 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.selectores {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.selectorCampo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.selectorCampo label {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.select {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.95rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.select:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.avisoSelector {
+  margin: var(--spacing-md) 0 0 0;
+  padding: var(--spacing-md);
+  background: rgba(46, 134, 171, 0.08);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.pilaResultado {
+  margin-top: var(--spacing-lg);
+}
+
+/* Veredicto de espontaneidad */
+.veredicto {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm) var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius);
+  border-left: 5px solid var(--primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.veredictoSi {
+  background: rgba(72, 169, 166, 0.14);
+  border-left-color: var(--secondary);
+}
+
+.veredictoNo {
+  background: rgba(224, 122, 31, 0.12);
+  border-left-color: #e07a1f;
+}
+
+.veredictoValor {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--primary);
+  font-family: var(--font-mono, 'Cambria Math', Georgia, serif);
+}
+
+.veredictoTexto {
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  flex: 1;
+  min-width: 220px;
+}
+
+/* Tarjetas de electrodo */
+.electrodosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.electrodoCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.electrodoAnodo {
+  border-top: 4px solid #e07a1f;
+}
+
+.electrodoCatodo {
+  border-top: 4px solid var(--secondary);
+}
+
+.electrodoEtiqueta {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-secondary);
+}
+
+.electrodoCard strong {
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+.semiTexto {
+  margin: 0;
+  font-family: var(--font-mono, 'Cambria Math', Georgia, serif);
+  font-size: 1rem;
+  color: var(--text-primary);
+  overflow-x: auto;
+}
+
+.electrodoDato {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* Bloque de cálculos */
+.bloqueCalculo {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+.bloqueCalculo h3 {
+  font-size: 0.95rem;
+  color: var(--primary);
+  margin: var(--spacing-md) 0 var(--spacing-xs) 0;
+}
+
+.bloqueCalculo h3:first-child {
+  margin-top: 0;
+}
+
+.formulaLinea {
+  margin: 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-card);
+  border-left: 3px solid var(--secondary);
+  border-radius: var(--radius);
+  font-family: var(--font-mono, 'Cambria Math', Georgia, serif);
+  font-size: 1rem;
+  color: var(--text-primary);
+  line-height: 1.7;
+  overflow-x: auto;
+}
+
+.notaCalculo {
+  margin: var(--spacing-xs) 0 0 0;
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ============================================
+   AVISO DESTACADO (error nº 1)
+============================================ */
+.avisoDestacado {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+  background: rgba(224, 122, 31, 0.1);
+  border-left: 5px solid #e07a1f;
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.avisoIcono {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.avisoDestacado strong {
+  display: block;
+  color: #b45309;
+  margin-bottom: var(--spacing-xs);
+  font-size: 1.05rem;
+}
+
+.avisoDestacado p {
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.65;
+}
+
+/* ============================================
+   PANEL DE BÚSQUEDA
+============================================ */
+.buscadorPanel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  box-shadow: var(--shadow-light);
+}
+
+.buscadorLabel {
+  display: block;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+  font-size: 1rem;
+}
+
+.buscadorWrap {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.buscadorInput {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  font-size: 1.05rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border-color 0.2s;
+}
+
+.buscadorInput:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.buscadorInput:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.limpiarBtn {
+  padding: 0.7rem 1rem;
+  border: 2px solid var(--border);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.limpiarBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.limpiarBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.ayudaBusqueda {
+  margin: var(--spacing-sm) 0 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* ============================================
+   FILTROS POR CATEGORÍA
+============================================ */
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.filtroBtn {
+  padding: 0.45rem 0.85rem;
+  background: var(--bg-primary);
+  border: 2px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  transition: all 0.2s;
+}
+
+.filtroBtn:hover {
+  border-color: var(--primary);
+}
+
+.filtroBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.filtroBtnActivo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.filtroRango {
+  font-size: 0.78rem;
+  opacity: 0.75;
+}
+
+.contador {
+  margin: var(--spacing-md) 0 0 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* ============================================
+   LISTA DE SEMIRREACCIONES
+============================================ */
+.lista {
+  list-style: none;
+  margin: 0 0 var(--spacing-xl) 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.fila {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.filaBtn {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(170px, 1.1fr) minmax(0, 1.9fr) auto auto;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: transparent;
+  border: none;
+  border-left: 4px solid var(--primary);
+  cursor: pointer;
+  text-align: left;
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+
+.filaBtn:hover {
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.filaBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+.filaNombre {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.filaCategoria {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.filaSemi {
+  font-family: var(--font-mono, 'Cambria Math', Georgia, serif);
+  font-size: 1rem;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.filaPotencial {
+  font-family: var(--font-mono, 'Cambria Math', Georgia, serif);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--secondary);
+  white-space: nowrap;
+}
+
+.chevron {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ============================================
+   DETALLE DESPLEGADO
+============================================ */
+.detalle {
+  padding: var(--spacing-lg);
+  border-top: 1px solid var(--border);
+  background: var(--bg-primary);
+}
+
+.detalle h3 {
+  font-size: 0.95rem;
+  color: var(--primary);
+  margin: var(--spacing-md) 0 var(--spacing-xs) 0;
+}
+
+.detalle p {
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--text-primary);
+  line-height: 1.65;
+}
+
+/* El color siempre va acompañado de icono y texto explícito */
+.badge {
+  display: inline-block;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.badgeOxidante {
+  background: rgba(224, 122, 31, 0.14);
+  color: #b45309;
+}
+
+.badgeReductor {
+  background: rgba(72, 169, 166, 0.18);
+  color: #2b6f6d;
+}
+
+.badgeNeutro {
+  background: rgba(46, 134, 171, 0.12);
+  color: var(--primary);
+}
+
+.datosLista {
+  margin: 0 0 var(--spacing-md) 0;
+  padding-left: 1.2rem;
+  color: var(--text-primary);
+  line-height: 1.8;
+}
+
+.datosLista li {
+  margin-bottom: 0.2rem;
+}
+
+.usarBtn {
+  padding: 0.55rem 1rem;
+  border: 2px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.usarBtn:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.usarBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.sinResultados {
+  background: var(--bg-card);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-xl);
+  text-align: center;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* ============================================
+   SERIE DE ACTIVIDAD DE LOS METALES
+============================================ */
+.seriePanel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.serieTitulo {
+  font-size: 1.25rem;
+  color: var(--primary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.serieIntro {
+  margin: 0 0 var(--spacing-md) 0;
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+
+.serieLista {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin: 0 0 var(--spacing-md) 0;
+  padding: 0;
+}
+
+.serieItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 66px;
+  padding: 0.45rem 0.5rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.serieSimbolo {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 1.05rem;
+}
+
+.serieValor {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-family: var(--font-mono, 'Cambria Math', Georgia, serif);
+}
+
+.serieReferencia {
+  border: 2px solid var(--secondary);
+  background: rgba(72, 169, 166, 0.14);
+}
+
+.serieNota {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+/* ============================================
+   CAJA DE FÓRMULA DESTACADA
+============================================ */
+.formulaBox {
+  background: var(--bg-card);
+  border-left: 4px solid var(--primary);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin: var(--spacing-md) 0;
+  border-radius: var(--radius);
+  font-family: var(--font-mono, 'Cambria Math', Georgia, serif);
+  font-size: 1.05rem;
+  text-align: center;
+  color: var(--text-primary);
+  overflow-x: auto;
+}
+
+/* ============================================
+   EDUCATIVO — SECCIONES
+============================================ */
+.guideSection {
+  padding: var(--spacing-md) 0;
+}
+
+.guideSection h2 {
+  color: var(--primary);
+  font-size: 1.25rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.guideSection h3 {
+  color: var(--text-primary);
+  font-size: 1.05rem;
+  margin: var(--spacing-md) 0 var(--spacing-xs) 0;
+}
+
+.guideSection p {
+  color: var(--text-primary);
+  line-height: 1.7;
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Tabla comparativa */
+.tablaWrapper {
+  overflow-x: auto;
+  margin: var(--spacing-md) 0;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  font-size: 0.95rem;
+}
+
+.tabla thead {
+  background: var(--primary);
+  color: white;
+}
+
+.tabla th,
+.tabla td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  color: inherit;
+}
+
+.tabla tbody td {
+  color: var(--text-primary);
+}
+
+.tabla tbody tr:hover {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+/* Escenarios */
+.scenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.scenarioCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.scenarioIcon {
+  font-size: 2rem;
+}
+
+.scenarioCard strong {
+  color: var(--primary);
+  font-size: 1.05rem;
+}
+
+.scenarioCard p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.faqItem {
+  background: var(--bg-primary);
+  border-left: 4px solid var(--secondary);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius);
+}
+
+.faqItem h4 {
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--primary);
+  font-size: 1.05rem;
+}
+
+.faqItem p {
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--text-primary);
+  line-height: 1.65;
+}
+
+.faqTip {
+  background: rgba(72, 169, 166, 0.12);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0 !important;
+}
+
+/* Pasos */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.step {
+  display: flex;
+  gap: var(--spacing-md);
+  background: var(--bg-primary);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.stepContent strong {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  color: var(--primary);
+  font-size: 1.05rem;
+}
+
+.stepContent p {
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* Tips */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.tipCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--secondary);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.tipIcon {
+  font-size: 1.6rem;
+}
+
+.tipCard strong {
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+.tipCard p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* Warning box (marcador v2.0) */
+.warningBox {
+  background: rgba(224, 122, 31, 0.08);
+  border-left: 4px solid #e07a1f;
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin: var(--spacing-lg) 0;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  color: #b45309;
+  font-size: 1.1rem;
+}
+
+.warningHeader h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: inherit;
+}
+
+.warningIcon {
+  font-size: 1.4rem;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: var(--spacing-lg);
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+
+.warningList li {
+  margin-bottom: var(--spacing-sm);
+}
+
+.warningList li strong {
+  color: #b45309;
+}
+
+/* ============================================
+   DARK MODE
+============================================ */
+[data-theme='dark'] .filaBtn:hover {
+  background: rgba(46, 134, 171, 0.14);
+}
+
+[data-theme='dark'] .tabla tbody tr:hover {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .faqTip,
+[data-theme='dark'] .serieReferencia {
+  background: rgba(72, 169, 166, 0.18);
+}
+
+[data-theme='dark'] .warningBox,
+[data-theme='dark'] .avisoDestacado {
+  background: rgba(224, 122, 31, 0.16);
+}
+
+[data-theme='dark'] .warningHeader,
+[data-theme='dark'] .warningList li strong,
+[data-theme='dark'] .avisoDestacado strong,
+[data-theme='dark'] .badgeOxidante {
+  color: #f0a85c;
+}
+
+[data-theme='dark'] .badgeReductor {
+  color: #7fd6d3;
+}
+
+[data-theme='dark'] .veredictoNo {
+  background: rgba(224, 122, 31, 0.18);
+}
+
+[data-theme='dark'] .veredictoSi {
+  background: rgba(72, 169, 166, 0.18);
+}
+
+[data-theme='dark'] .avisoSelector {
+  background: rgba(46, 134, 171, 0.16);
+}
+
+[data-theme='dark'] .buscadorInput,
+[data-theme='dark'] .limpiarBtn,
+[data-theme='dark'] .filtroBtn,
+[data-theme='dark'] .select {
+  background: #1f1f1f;
+}
+
+[data-theme='dark'] .filtroBtnActivo {
+  background: var(--primary);
+}
+
+/* ============================================
+   RESPONSIVE
+============================================ */
+@media (max-width: 900px) {
+  .filaBtn {
+    grid-template-columns: 1fr auto auto;
+    grid-template-areas:
+      'nombre potencial chevron'
+      'semi semi semi';
+    row-gap: var(--spacing-sm);
+  }
+
+  .filaNombre {
+    grid-area: nombre;
+  }
+
+  .filaSemi {
+    grid-area: semi;
+  }
+
+  .filaPotencial {
+    grid-area: potencial;
+  }
+
+  .chevron {
+    grid-area: chevron;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .hero {
+    margin-top: 60px;
+    padding: var(--spacing-lg);
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .buscadorWrap {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .veredictoValor {
+    font-size: 1.35rem;
+  }
+
+  .filaSemi,
+  .formulaLinea,
+  .semiTexto {
+    font-size: 0.92rem;
+  }
+}
+
+/* ============================================
+   ACCESIBILIDAD — movimiento reducido
+============================================ */
+@media (prefers-reduced-motion: reduce) {
+  .filaBtn,
+  .filtroBtn,
+  .limpiarBtn,
+  .buscadorInput,
+  .usarBtn {
+    transition: none !important;
+  }
+}
