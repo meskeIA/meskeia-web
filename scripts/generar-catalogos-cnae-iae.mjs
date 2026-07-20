@@ -292,7 +292,67 @@ const salida = {
   sinonimos,
 };
 
-if (!existsSync('public/datos')) mkdirSync('public/datos', { recursive: true });
+// ─── Comparación con el catálogo publicado ───────────────────────────────────
+// Es lo que permite que la revisión anual sea barata: se reejecuta el script y,
+// si las fuentes oficiales han cambiado algo, aparece aquí enumerado. Sin esto,
+// una reforma de epígrafes o una clasificación nueva pasarían inadvertidas.
+
 const destino = 'public/datos/cnae-iae-catalogo.json';
+
+function compararConPublicado(nuevo) {
+  if (!existsSync(destino)) {
+    console.log('\n📋 No hay catálogo previo: primera generación.');
+    return true;
+  }
+  let previo;
+  try {
+    previo = JSON.parse(readFileSync(destino, 'utf8'));
+  } catch {
+    console.log('\n⚠️ El catálogo publicado no se puede leer; se regenera.');
+    return true;
+  }
+
+  const cambios = [];
+
+  for (const [nombre, clave] of [['IAE', (e) => `${e.seccion}|${e.codigo}`], ['CNAE-2025', (e) => e.codigo]]) {
+    const lista = nombre === 'IAE' ? 'iae' : 'cnae';
+    const antes = new Map((previo[lista] || []).map((e) => [clave(e), e.titulo]));
+    const ahora = new Map((nuevo[lista] || []).map((e) => [clave(e), e.titulo]));
+
+    const altas = [...ahora.keys()].filter((k) => !antes.has(k));
+    const bajas = [...antes.keys()].filter((k) => !ahora.has(k));
+    const modificados = [...ahora.keys()].filter((k) => antes.has(k) && antes.get(k) !== ahora.get(k));
+
+    if (altas.length || bajas.length || modificados.length) {
+      cambios.push({ nombre, altas, bajas, modificados, antes, ahora });
+    }
+  }
+
+  if (!cambios.length) {
+    console.log('\n📋 Sin cambios respecto al catálogo publicado: las fuentes oficiales siguen igual.');
+    return false;
+  }
+
+  console.log('\n📋 CAMBIOS DETECTADOS respecto al catálogo publicado:');
+  for (const c of cambios) {
+    console.log(`\n  ${c.nombre}: ${c.altas.length} altas · ${c.bajas.length} bajas · ${c.modificados.length} títulos modificados`);
+    for (const k of c.altas.slice(0, 15)) console.log(`    + ${k}  ${c.ahora.get(k).slice(0, 70)}`);
+    if (c.altas.length > 15) console.log(`    … y ${c.altas.length - 15} altas más`);
+    for (const k of c.bajas.slice(0, 15)) console.log(`    - ${k}  ${c.antes.get(k).slice(0, 70)}`);
+    if (c.bajas.length > 15) console.log(`    … y ${c.bajas.length - 15} bajas más`);
+    for (const k of c.modificados.slice(0, 15)) {
+      console.log(`    ~ ${k}`);
+      console.log(`        antes: ${c.antes.get(k).slice(0, 70)}`);
+      console.log(`        ahora: ${c.ahora.get(k).slice(0, 70)}`);
+    }
+    if (c.modificados.length > 15) console.log(`    … y ${c.modificados.length - 15} modificaciones más`);
+  }
+  console.log('\n  ⚠️ Revisa los cambios y actualiza el sello `verificado` de data/fiscal/cnae-iae.ts.');
+  return true;
+}
+
+const hayCambios = compararConPublicado(salida);
+
+if (!existsSync('public/datos')) mkdirSync('public/datos', { recursive: true });
 writeFileSync(destino, JSON.stringify(salida));
-console.log(`\n✅ ${destino} (${(readFileSync(destino).length / 1024).toFixed(0)} KB)\n`);
+console.log(`\n✅ ${destino} (${(readFileSync(destino).length / 1024).toFixed(0)} KB)${hayCambios ? ' · actualizado' : ' · sin novedades'}\n`);
