@@ -26,6 +26,7 @@ import {
   PLUSVALIA_MUNICIPAL_META,
   FISCAL_DEPENDENCIA_META,
   FISCAL_CALENDARIO_META,
+  FISCAL_CNAE_IAE_META,
 } from '@/data/fiscal';
 
 export interface Ficha {
@@ -45,7 +46,7 @@ export const FICHAS: Ficha[] = [
     titulo: 'Tramos y mínimos del IRPF',
     desc: 'Escala general por tramos, escala del ahorro y mínimos personales y familiares del IRPF 2025.',
     verificado: FISCAL_IRPF_META.verificado,
-    relacionadas: ['iva-tipos', 'cuota-autonomos-reta', 'smi-salario-minimo'],
+    relacionadas: ['iva-tipos', 'cuota-autonomos-reta', 'smi-salario-minimo', 'cnae-iae'],
   },
   {
     slug: 'iva-tipos',
@@ -53,7 +54,7 @@ export const FICHAS: Ficha[] = [
     titulo: 'Tipos de IVA en España',
     desc: 'General (21%), reducido (10%) y superreducido (4%) con ejemplos, exenciones y recargo de equivalencia.',
     verificado: FISCAL_IVA_META.verificado,
-    relacionadas: ['irpf-tramos-minimos', 'cuota-autonomos-reta', 'impuesto-sociedades', 'calendario-fiscal'],
+    relacionadas: ['irpf-tramos-minimos', 'cuota-autonomos-reta', 'impuesto-sociedades', 'calendario-fiscal', 'cnae-iae'],
   },
   {
     slug: 'smi-salario-minimo',
@@ -69,7 +70,7 @@ export const FICHAS: Ficha[] = [
     titulo: 'Cuota de autónomos (RETA)',
     desc: 'Tabla de cotización por ingresos reales 2026: tramos, base mínima y cuota mensual, más tarifa plana.',
     verificado: FISCAL_AUTONOMOS_META.verificado,
-    relacionadas: ['impuesto-sociedades', 'irpf-tramos-minimos', 'iva-tipos', 'calendario-fiscal'],
+    relacionadas: ['impuesto-sociedades', 'irpf-tramos-minimos', 'iva-tipos', 'calendario-fiscal', 'cnae-iae'],
   },
   {
     slug: 'itp-ccaa',
@@ -125,7 +126,7 @@ export const FICHAS: Ficha[] = [
     titulo: 'Tipos del Impuesto de Sociedades',
     desc: 'Tipo general, nueva creación, escala de microempresas (Ley 7/2024), cooperativas y obligaciones (modelos 200 y 202).',
     verificado: FISCAL_SOCIEDADES_META.verificado,
-    relacionadas: ['cuota-autonomos-reta', 'amortizacion-inmovilizado', 'iva-tipos', 'calendario-fiscal'],
+    relacionadas: ['cuota-autonomos-reta', 'amortizacion-inmovilizado', 'iva-tipos', 'calendario-fiscal', 'cnae-iae'],
   },
   {
     slug: 'iprem',
@@ -174,6 +175,14 @@ export const FICHAS: Ficha[] = [
     desc: 'Plazos recurrentes de los modelos trimestrales y anuales (303, 130, 111, 200…), la Renta y el Impuesto de Sociedades.',
     verificado: FISCAL_CALENDARIO_META.verificado,
     relacionadas: ['iva-tipos', 'cuota-autonomos-reta', 'impuesto-sociedades'],
+  },
+  {
+    slug: 'cnae-iae',
+    icon: '🏷️',
+    titulo: 'Códigos de actividad: CNAE-2025 e IAE',
+    desc: 'Qué código pide cada organismo, secciones del IAE y retención de IRPF, exención por cifra de negocio y vigencia de la CNAE-2025.',
+    verificado: FISCAL_CNAE_IAE_META.verificado,
+    relacionadas: ['cuota-autonomos-reta', 'iva-tipos', 'irpf-tramos-minimos', 'impuesto-sociedades'],
   },
 ];
 

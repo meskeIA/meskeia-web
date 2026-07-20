@@ -23,6 +23,12 @@ export interface Novedad {
 // Sembrado con los cambios normativos reales recientes. Ampliar al mantener fichas.
 export const NOVEDADES: Novedad[] = [
   {
+    fecha: '2026-07-20',
+    fichaSlug: 'cnae-iae',
+    texto:
+      'Publicada la ficha de códigos de actividad, con los catálogos oficiales completos de CNAE-2025 (RD 10/2025, INE) y de epígrafes del IAE (RD Legislativo 1175/1990, texto consolidado) consultables desde el buscador enlazado.',
+  },
+  {
     fecha: '2026-07-14',
     fichaSlug: 'prestaciones-dependencia',
     texto:
