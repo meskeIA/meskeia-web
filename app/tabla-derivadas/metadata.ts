@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Tabla de Derivadas Completa — Formulario de Consulta Rápida | meskeIA',
+  title: 'Tabla de Derivadas Completa — Todas las Fórmulas con Ejemplos | meskeIA',
   description:
     'Tabla de derivadas con buscador instantáneo: potencias, raíces, exponenciales, logaritmos, trigonométricas, inversas, hiperbólicas y reglas de derivación, con regla de la cadena y ejemplos.',
   keywords:

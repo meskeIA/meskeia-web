@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Tabla de Valencias y Números de Oxidación - Consulta Rápida | meskeIA',
+  title: 'Tabla de Valencias y Números de Oxidación — Todos los Elementos | meskeIA',
   description: 'Tabla de valencias y números de oxidación de los elementos químicos, con buscador, ejemplos de compuestos, iones poliatómicos, las tres nomenclaturas IUPAC y formulador de compuestos binarios.',
   keywords: 'tabla de valencias, valencias, numeros de oxidacion, numero de oxidacion, valencias quimica, tabla de valencias quimica, nomenclatura inorganica, nomenclatura quimica, formular compuestos, formulacion inorganica, nomenclatura stock, nomenclatura sistematica, nomenclatura tradicional, iones poliatomicos, oxidos, hidruros, sales binarias, quimica secundaria, bachillerato, preparatoria, educacion media',
   authors: [{ name: 'meskeIA' }],

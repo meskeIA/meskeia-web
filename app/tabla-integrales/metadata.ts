@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Tabla de Integrales Completa — Formulario de Consulta Rápida | meskeIA',
+  title: 'Tabla de Integrales Completa — Todas las Fórmulas con Ejemplos | meskeIA',
   description:
     'Tabla de integrales con buscador instantáneo: inmediatas, exponenciales, logarítmicas, trigonométricas, tipo arcoseno y arcotangente, hiperbólicas y métodos de integración, con + C y ejemplos.',
   keywords:

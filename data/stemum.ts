@@ -160,12 +160,79 @@ export const STEMUM_APP_DISCIPLINA: Record<string, string> = {
   'visualizador-ciclo-nitrogeno': 'tierra-espacio',
 };
 
-// Slugs de apps servidas bajo stemum.com (passthrough en el proxy).
-export const STEMUM_APP_SLUGS = new Set(Object.keys(STEMUM_APP_DISCIPLINA));
+/**
+ * MATERIAL DE APOYO — contenedor subordinado del portal.
+ *
+ * Piezas de CONSULTA (tablas, formularios y, en el futuro, glosarios) que
+ * acompañan a los simuladores sin formar parte del catálogo: no se tocan ni se
+ * ajustan, se consultan. Por eso viven fuera de STEMUM_APP_DISCIPLINA — no
+ * cuentan como simuladores en el hero ni ensucian las páginas de disciplina,
+ * que prometen manipulación en tiempo real.
+ *
+ * Criterio de admisión: solo entra la pieza que hace algo que un PDF no puede
+ * (buscador, demostración desplegable, ejemplo resuelto). Una lista plana se
+ * queda en meskeIA.
+ *
+ * `disciplina` no sirve para clasificar la sección (es una lista única), solo
+ * para el breadcrumb de MeskeiaLogo y el enlace al pie de cada disciplina.
+ */
+export type MaterialApoyo = {
+  slug: string;
+  icon: string;
+  titulo: string;
+  desc: string;
+  disciplina: string;
+};
 
-// Rutas de páginas del portal (home + disciplinas) que el proxy reescribe a
-// /stemum/*. La cadena vacía representa la home (stemum.com/).
-export const STEMUM_PORTAL_SLUGS = new Set(['', ...Object.keys(STEMUM_DISCIPLINAS)]);
+export const STEMUM_MATERIAL_APOYO: MaterialApoyo[] = [
+  {
+    slug: 'tabla-derivadas',
+    icon: '📐',
+    titulo: 'Tabla de derivadas',
+    desc: 'Todas las fórmulas con buscador, regla de la cadena y un ejemplo resuelto en cada una.',
+    disciplina: 'matematicas',
+  },
+  {
+    slug: 'tabla-integrales',
+    icon: '∫',
+    titulo: 'Tabla de integrales',
+    desc: 'Integrales inmediatas y métodos de integración, con la constante siempre presente.',
+    disciplina: 'matematicas',
+  },
+  {
+    slug: 'tabla-valencias',
+    icon: '⚗️',
+    titulo: 'Tabla de valencias',
+    desc: 'Números de oxidación de cada elemento, las tres nomenclaturas IUPAC y formulador de compuestos.',
+    disciplina: 'quimica',
+  },
+];
+
+// Slug → disciplina, para el breadcrumb del material de apoyo.
+export const STEMUM_MATERIAL_DISCIPLINA: Record<string, string> =
+  Object.fromEntries(STEMUM_MATERIAL_APOYO.map((m) => [m.slug, m.disciplina]));
+
+// Material de apoyo de una disciplina (enlace al pie de su página).
+export function materialDeDisciplina(disciplina: string): MaterialApoyo[] {
+  return STEMUM_MATERIAL_APOYO.filter((m) => m.disciplina === disciplina);
+}
+
+// Slugs de apps servidas bajo stemum.com (passthrough en el proxy). Incluye el
+// material de apoyo: se sirve bajo el dominio aunque no cuente como simulador.
+export const STEMUM_APP_SLUGS = new Set([
+  ...Object.keys(STEMUM_APP_DISCIPLINA),
+  ...STEMUM_MATERIAL_APOYO.map((m) => m.slug),
+]);
+
+// Rutas de páginas del portal (home + disciplinas + material de apoyo) que el
+// proxy reescribe a /stemum/*. La cadena vacía representa la home (stemum.com/).
+export const STEMUM_MATERIAL_SLUG = 'material-apoyo';
+
+export const STEMUM_PORTAL_SLUGS = new Set([
+  '',
+  ...Object.keys(STEMUM_DISCIPLINAS),
+  STEMUM_MATERIAL_SLUG,
+]);
 
 // Conteos derivados automáticamente del catálogo (para los contadores de la
 // home y del hero). Al añadir una app a STEMUM_APP_DISCIPLINA se actualizan solos.

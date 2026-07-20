@@ -6449,24 +6449,24 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
 
   // ==========================================
-  // FAMILIA: FORMULARIOS DE CONSULTA STEM
+  // FAMILIA: TABLAS DE CONSULTA STEM (Material de apoyo de Stemum)
   // ==========================================
   'tabla-derivadas': [
-    { url: '/tabla-integrales/', icon: '∫', name: 'Tabla de Integrales', description: 'La operación inversa, en formulario' },
+    { url: '/tabla-integrales/', icon: '∫', name: 'Tabla de Integrales', description: 'La operación inversa, con todas las fórmulas' },
     { url: '/simulador-derivada-pendiente/', icon: '📈', name: 'Derivada y Pendiente', description: 'Visualiza qué significa derivar' },
     { url: '/simulador-integral-area/', icon: '📊', name: 'La Integral como Área', description: 'El significado geométrico' },
-    { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'Formulario de química' },
+    { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'Números de oxidación y nomenclatura' },
   ],
   'tabla-integrales': [
-    { url: '/tabla-derivadas/', icon: '📐', name: 'Tabla de Derivadas', description: 'La operación inversa, en formulario' },
+    { url: '/tabla-derivadas/', icon: '📐', name: 'Tabla de Derivadas', description: 'La operación inversa, con todas las fórmulas' },
     { url: '/simulador-integral-area/', icon: '📊', name: 'La Integral como Área', description: 'Visualiza qué significa integrar' },
     { url: '/simulador-derivada-pendiente/', icon: '📈', name: 'Derivada y Pendiente', description: 'El significado de la derivada' },
-    { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'Formulario de química' },
+    { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'Números de oxidación y nomenclatura' },
   ],
   'tabla-valencias': [
     { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica Interactiva', description: 'Los 118 elementos y sus propiedades' },
     { url: '/simulador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Ajusta y simula reacciones' },
-    { url: '/tabla-derivadas/', icon: '📐', name: 'Tabla de Derivadas', description: 'Formulario de matemáticas' },
+    { url: '/tabla-derivadas/', icon: '📐', name: 'Tabla de Derivadas', description: 'Todas las fórmulas de derivación' },
     { url: '/quiz-tabla-periodica/', icon: '🎯', name: 'Quiz de la Tabla Periódica', description: 'Pon a prueba lo que sabes' },
   ],
 

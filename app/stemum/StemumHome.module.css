@@ -263,6 +263,119 @@
   }
 }
 
+/* ─── Material de apoyo ─── Franja subordinada que enlaza a su propia página.
+   A diferencia de la banda de Cronicum (degradado saturado, protagonista), aquí
+   el fondo es neutro y el único acento violeta está en la llamada: acompaña al
+   catálogo, no compite con él. Su altura no crece aunque crezca el contenedor. */
+.apoyoBanda {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.5rem 1.75rem;
+  border: 1px solid #ece3f7;
+  border-radius: 12px;
+  text-decoration: none;
+  flex-wrap: wrap;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.apoyoBanda:hover {
+  background: #faf6ff;
+  box-shadow: 0 4px 16px rgba(107, 33, 168, 0.08);
+}
+
+.apoyoBanda:focus-visible {
+  outline: 2px solid #6B21A8;
+  outline-offset: 3px;
+}
+
+.apoyoIcon {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.apoyoTexto {
+  flex: 1 1 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.apoyoTitle {
+  font-family: var(--font-stemum), 'Segoe UI', system-ui, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.apoyoCount {
+  font-family: var(--font-stemum), 'Segoe UI', system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6B21A8;
+  background: #f3e9fd;
+  border-radius: 20px;
+  padding: 0.18rem 0.7rem;
+  white-space: nowrap;
+}
+
+.apoyoIntro {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.apoyoCta {
+  flex-shrink: 0;
+  color: #6B21A8;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* Enlace al pie de una página de disciplina hacia su material de apoyo. */
+.apoyoPie {
+  margin: 1.75rem 0 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid #ece3f7;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .apoyoBanda {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .apoyoBanda:hover {
+  background: #2f2440;
+}
+
+[data-theme='dark'] .apoyoCount {
+  color: #C99BF5;
+  background: #3a2a52;
+}
+
+[data-theme='dark'] .apoyoCta {
+  color: #C99BF5;
+}
+
+[data-theme='dark'] .apoyoPie {
+  border-top-color: #3a3a3a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .apoyoBanda {
+    transition: none;
+  }
+}
+
 /* ─── Qué es ─── */
 .sectionTitle {
   font-family: var(--font-stemum), 'Segoe UI', system-ui, sans-serif;

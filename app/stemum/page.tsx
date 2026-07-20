@@ -4,7 +4,11 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
-import { STEMUM_APPS_POR_DISCIPLINA, STEMUM_TOTAL_APPS } from '@/data/stemum';
+import {
+  STEMUM_APPS_POR_DISCIPLINA,
+  STEMUM_TOTAL_APPS,
+  STEMUM_MATERIAL_APOYO,
+} from '@/data/stemum';
 import styles from './StemumHome.module.css';
 
 // Las 6 disciplinas del portal. De momento son tarjetas de vista previa (maqueta):
@@ -137,6 +141,28 @@ export default function StemumHome() {
               );
             })}
           </div>
+        </section>
+
+        {/* Material de apoyo — contenedor subordinado: piezas de consulta que
+            acompañan a los simuladores sin competir con ellos. Peso visual menor
+            y posición final, deliberadamente. */}
+        <section id="material-apoyo" aria-labelledby="titulo-material-apoyo">
+          <Link href="/material-apoyo" className={styles.apoyoBanda}>
+            <span className={styles.apoyoIcon} aria-hidden="true">📋</span>
+            <span className={styles.apoyoTexto}>
+              <h2 id="titulo-material-apoyo" className={styles.apoyoTitle}>
+                Material de apoyo
+                <span className={styles.apoyoCount}>
+                  {STEMUM_MATERIAL_APOYO.length} tablas
+                </span>
+              </h2>
+              <span className={styles.apoyoIntro}>
+                Tablas y formularios de consulta para tener a mano mientras estudias o
+                resuelves problemas.
+              </span>
+            </span>
+            <span className={styles.apoyoCta}>Ver todo →</span>
+          </Link>
         </section>
 
         {/* Qué es Stemum */}

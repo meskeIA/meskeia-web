@@ -44,6 +44,7 @@ import {
   STEMUM_APP_DISCIPLINA,
   STEMUM_DISCIPLINAS,
   STEMUM_APPS_POR_DISCIPLINA,
+  STEMUM_MATERIAL_DISCIPLINA,
 } from '@/data/stemum';
 import {
   COQUINUM_APP_CATEGORIA,
@@ -130,6 +131,23 @@ function resolverBanda(pathname: string, isStemum: boolean, isCoquinum: boolean)
         otras >= 1
           ? `Descubre ${otras} ${plural(otras, 'simulador', 'simuladores')} más →`
           : 'Explora la disciplina →',
+    };
+  }
+
+  // ── Stemum (material de apoyo) ── tabla de consulta que sí se sirve bajo
+  // stemum.com pero no es simulador. Enlaza a su disciplina: quien viene a
+  // buscar una fórmula es el público de esos simuladores.
+  const discApoyo = STEMUM_MATERIAL_DISCIPLINA[segs[0] ?? ''];
+  if (discApoyo && !isStemum) {
+    const label = STEMUM_DISCIPLINAS[discApoyo] ?? '';
+    return {
+      vertical: 'stemum',
+      icono: '🔬',
+      intro: `Esta tabla es el material de apoyo de ${label} en`,
+      marca: 'Stemum',
+      descripcion: ', el portal de ciencia interactiva de meskeIA.',
+      href: `https://stemum.com/${discApoyo}/?from=meskeia`,
+      cta: `Explora ${label} →`,
     };
   }
 

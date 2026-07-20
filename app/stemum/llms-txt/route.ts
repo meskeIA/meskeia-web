@@ -1,4 +1,10 @@
-import { STEMUM_DISCIPLINAS, STEMUM_APP_DISCIPLINA, STEMUM_TOTAL_APPS } from '@/data/stemum';
+import {
+  STEMUM_DISCIPLINAS,
+  STEMUM_APP_DISCIPLINA,
+  STEMUM_TOTAL_APPS,
+  STEMUM_MATERIAL_APOYO,
+  STEMUM_MATERIAL_SLUG,
+} from '@/data/stemum';
 import { applicationsDatabase } from '@/data/applications';
 
 // llms.txt de Stemum (stemum.com/llms.txt).
@@ -57,6 +63,22 @@ function construir(): string {
     }
     l.push('');
   }
+
+  // Material de apoyo: piezas de consulta (no simuladores) que acompañan al
+  // catálogo. Se listan aparte para no confundirlas con las apps del portal.
+  l.push('## Material de apoyo');
+  l.push(`Sección: ${BASE}/${STEMUM_MATERIAL_SLUG}/`);
+  l.push('');
+  l.push(
+    'Tablas y formularios de consulta rápida, con buscador y ejemplo resuelto. ' +
+      'No son simuladores: complementan el catálogo.',
+  );
+  l.push('');
+  for (const m of STEMUM_MATERIAL_APOYO) {
+    const app = APP_POR_URL.get(`/${m.slug}/`);
+    l.push(`- [${app?.name ?? m.titulo}](${BASE}/${m.slug}/): ${m.desc}`);
+  }
+  l.push('');
 
   return l.join('\n');
 }

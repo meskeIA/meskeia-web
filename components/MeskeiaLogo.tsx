@@ -19,7 +19,11 @@ import { useTheme } from 'next-themes';
 import { useEffect, useState, useId } from 'react';
 import { useStemumHost } from '@/lib/useStemumHost';
 import { useCoquinumHost } from '@/lib/useCoquinumHost';
-import { STEMUM_APP_DISCIPLINA, STEMUM_DISCIPLINAS } from '@/data/stemum';
+import {
+  STEMUM_APP_DISCIPLINA,
+  STEMUM_DISCIPLINAS,
+  STEMUM_MATERIAL_DISCIPLINA,
+} from '@/data/stemum';
 import { COQUINUM_APP_CATEGORIA, COQUINUM_CATEGORIAS } from '@/data/coquinum';
 import styles from './MeskeiaLogo.module.css';
 
@@ -163,7 +167,9 @@ export default function MeskeiaLogo({ disableLink = false, inline = false, showT
   // Dos enlaces separados (no anidados) dentro de la píldora.
   if (isStemum && !disableLink) {
     const seg = (pathname || '').replace(/^\/+|\/+$/g, '').split('/')[0];
-    const discSlug = STEMUM_APP_DISCIPLINA[seg];
+    // El material de apoyo no es un simulador del catálogo, pero sí tiene una
+    // disciplina de referencia para el breadcrumb.
+    const discSlug = STEMUM_APP_DISCIPLINA[seg] ?? STEMUM_MATERIAL_DISCIPLINA[seg];
     const discLabel = discSlug ? STEMUM_DISCIPLINAS[discSlug] : null;
 
     return (
