@@ -33,3 +33,4 @@ export * from './ayudas-personas';
 export * from './becas-estudio';
 export * from './jubilacion-tramites';
 export * from './iprem';
+export * from './cnae-iae';
