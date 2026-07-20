@@ -1,0 +1,1058 @@
+{
+ "01.11": [
+  "agricultor",
+  "agricultura",
+  "campo",
+  "cebada",
+  "cereal",
+  "chacarero",
+  "finca",
+  "girasol",
+  "labrador",
+  "secano",
+  "trigo"
+ ],
+ "01.13": [
+  "agricultura ecológica",
+  "hortalizas",
+  "horticultor",
+  "huerta",
+  "invernadero",
+  "patata",
+  "tomate",
+  "verduras"
+ ],
+ "01.21": [
+  "bodega de uva",
+  "uva",
+  "vendimia",
+  "viña",
+  "viñedo",
+  "viticultor"
+ ],
+ "01.45": [
+  "cabras",
+  "ganadería",
+  "ganadero",
+  "leche de oveja",
+  "ovejas",
+  "pastor",
+  "rebaño"
+ ],
+ "01.61": [
+  "fumigación",
+  "maquinaria agrícola a terceros",
+  "poda",
+  "recolección para terceros",
+  "servicios agrícolas",
+  "trabajos con tractor"
+ ],
+ "10.71": [
+  "bollería",
+  "hacer pan",
+  "horno",
+  "masa madre",
+  "obrador",
+  "panadería",
+  "panadero",
+  "pastelero",
+  "repostería artesanal"
+ ],
+ "14.10": [
+  "confección",
+  "coser",
+  "costurera",
+  "diseño de moda",
+  "marca de ropa propia",
+  "modista",
+  "ropa",
+  "sastre",
+  "taller de costura"
+ ],
+ "14.21": [
+  "confección"
+ ],
+ "18.12": [
+  "asistente virtual",
+  "bodas",
+  "book de fotos",
+  "copistería",
+  "estudio fotográfico",
+  "fotógrafa",
+  "fotógrafo",
+  "imprenta digital",
+  "reportaje",
+  "reprografía",
+  "retrato",
+  "secretaria virtual",
+  "transcripción"
+ ],
+ "31.00": [
+  "carpintero de muebles",
+  "ebanista",
+  "mobiliario",
+  "muebles a medida",
+  "restaurar muebles",
+  "taller de madera"
+ ],
+ "32.12": [
+  "bisutería artesanal",
+  "hacer anillos",
+  "joyería artesanal",
+  "joyero",
+  "orfebre",
+  "plata",
+  "platero"
+ ],
+ "41.01": [
+  "constructor",
+  "constructora",
+  "edificación",
+  "hacer casas",
+  "obra nueva",
+  "promotor de obra",
+  "reformas integrales"
+ ],
+ "42.99": [
+  "albañil",
+  "chapuzas",
+  "maestro de obra",
+  "manitas",
+  "obrero",
+  "pequeñas obras",
+  "reformas",
+  "reformista"
+ ],
+ "43.11": [
+  "demoler",
+  "demolición",
+  "derribos",
+  "desescombro",
+  "tirar tabiques"
+ ],
+ "43.21": [
+  "boletín eléctrico",
+  "cuadro eléctrico",
+  "domótica",
+  "electricista",
+  "instalaciones de luz",
+  "instalador eléctrico",
+  "poner enchufes"
+ ],
+ "43.22": [
+  "aire acondicionado",
+  "arreglar tuberías",
+  "calderas",
+  "calefacción",
+  "climatización",
+  "fontanero",
+  "gasista",
+  "instalador de gas",
+  "plomero"
+ ],
+ "43.23": [
+  "aislamientos",
+  "escayolista",
+  "falso techo",
+  "instalador industrial",
+  "molduras",
+  "montaje de maquinaria",
+  "pladur",
+  "tabiquería seca",
+  "yeso"
+ ],
+ "43.24": [
+  "instalaciones industriales"
+ ],
+ "43.31": [
+  "enfoscado",
+  "enlucido",
+  "estucado",
+  "monocapa",
+  "revoco",
+  "yesero"
+ ],
+ "43.32": [
+  "aluminio",
+  "armarios empotrados",
+  "carpintero",
+  "cerrajero",
+  "instalar tarima",
+  "montador de muebles",
+  "puertas",
+  "PVC",
+  "ventanas"
+ ],
+ "43.33": [
+  "alicatador",
+  "azulejos",
+  "embaldosar",
+  "gres",
+  "parquet",
+  "poner baldosas",
+  "solador",
+  "suelos"
+ ],
+ "43.34": [
+  "cristalero",
+  "decorador de interiores",
+  "empapelar",
+  "pintar pisos",
+  "pintor",
+  "pintura de fachadas"
+ ],
+ "43.60": [
+  "back office",
+  "externalización",
+  "gestión administrativa",
+  "servicios auxiliares",
+  "trámites"
+ ],
+ "46.18": [
+  "bicicletería",
+  "ciclos",
+  "motos",
+  "reparar bicicletas",
+  "taller de motos",
+  "tienda de motos"
+ ],
+ "47.11": [
+  "abarrotes",
+  "autoservicio",
+  "colmado",
+  "feriante",
+  "food truck",
+  "mercadillo",
+  "mercado de abastos",
+  "minimarket",
+  "puesto de mercado",
+  "supermercado",
+  "tienda de alimentación",
+  "tienda de barrio",
+  "ultramarinos",
+  "venta ambulante"
+ ],
+ "47.12": [
+  "mercadillo artesanía",
+  "mercadillo de ropa",
+  "puesto de feria",
+  "puesto de ropa",
+  "rastrillo",
+  "rastro",
+  "stand en ferias",
+  "venta ambulante",
+  "venta ambulante de ropa"
+ ],
+ "47.21": [
+  "frutería",
+  "puesto de fruta",
+  "vender fruta",
+  "verdulería",
+  "verdulero"
+ ],
+ "47.22": [
+  "carnicería",
+  "carnicero",
+  "charcutería",
+  "pollería",
+  "vender carne"
+ ],
+ "47.23": [
+  "marisco",
+  "pescadería",
+  "pescadero",
+  "vender pescado"
+ ],
+ "47.24": [
+  "bombonería",
+  "confitería",
+  "despacho de pan",
+  "panadería",
+  "pastelería",
+  "vender pan"
+ ],
+ "47.25": [
+  "bodega",
+  "cerveza artesana",
+  "distribuidora de bebidas",
+  "licorería",
+  "tienda de vinos",
+  "vinoteca"
+ ],
+ "47.40": [
+  "computación",
+  "material informático",
+  "tienda de informática",
+  "vender ordenadores",
+  "venta de PCs"
+ ],
+ "47.51": [
+  "cortinas",
+  "mercería",
+  "ropa de cama",
+  "tapicería",
+  "textil hogar",
+  "tienda de telas"
+ ],
+ "47.52": [
+  "decoración del hogar",
+  "droguería de pinturas",
+  "ferretería",
+  "herramientas",
+  "lámparas",
+  "materiales de construcción",
+  "menaje",
+  "mueblería",
+  "pinturas",
+  "tienda de bricolaje"
+ ],
+ "47.54": [
+  "electrodomésticos",
+  "lavadoras",
+  "línea blanca",
+  "pequeño electrodoméstico",
+  "tienda de electro"
+ ],
+ "47.55": [
+  "iluminación",
+  "tienda de muebles"
+ ],
+ "47.62": [
+  "copistería y papelería",
+  "librería-papelería",
+  "material escolar",
+  "papelería",
+  "prensa",
+  "quiosco"
+ ],
+ "47.63": [
+  "bicis y deporte",
+  "material deportivo",
+  "ropa deportiva",
+  "suplementos y deporte",
+  "tienda de deportes"
+ ],
+ "47.71": [
+  "boutique",
+  "moda",
+  "multimarca",
+  "ropa infantil",
+  "tienda de ropa",
+  "vender ropa"
+ ],
+ "47.72": [
+  "artículos de viaje",
+  "bolsos",
+  "calzado",
+  "marroquinería",
+  "vender zapatos",
+  "zapatería"
+ ],
+ "47.73": [
+  "botica",
+  "farmacéutico",
+  "farmacia",
+  "oficina de farmacia"
+ ],
+ "47.75": [
+  "cosmética",
+  "droguería",
+  "parafarmacia",
+  "perfumería",
+  "productos de belleza",
+  "vender cremas"
+ ],
+ "47.76": [
+  "florista",
+  "floristería",
+  "jardinería venta",
+  "pet shop",
+  "semillas",
+  "tienda de mascotas",
+  "tienda de plantas",
+  "vivero"
+ ],
+ "47.77": [
+  "bisutería",
+  "joyería",
+  "plata y relojes",
+  "relojería",
+  "vender joyas"
+ ],
+ "47.79": [
+  "antigüedades",
+  "compraventa",
+  "reventa",
+  "ropa usada",
+  "segunda mano",
+  "usados",
+  "vintage"
+ ],
+ "47.82": [
+  "accesorios de coche",
+  "autopartes",
+  "recambios",
+  "repuestos",
+  "tienda de piezas"
+ ],
+ "47.91": [
+  "amazon fba",
+  "dropshipping",
+  "e-commerce",
+  "ecommerce",
+  "marketplace",
+  "servicios auxiliares",
+  "shopify",
+  "tienda online",
+  "tienda virtual",
+  "vender por internet",
+  "venta online"
+ ],
+ "47.92": [
+  "servicios auxiliares"
+ ],
+ "49.31": [
+  "autobús",
+  "autocar",
+  "furgoneta de pasajeros",
+  "microbús",
+  "transporte de viajeros",
+  "transporte escolar"
+ ],
+ "49.32": [
+  "furgoneta de pasajeros",
+  "transporte de viajeros",
+  "transporte escolar"
+ ],
+ "49.33": [
+  "auto taxi",
+  "licencia de taxi",
+  "taxi",
+  "taxista"
+ ],
+ "49.34": [
+  "furgoneta de pasajeros",
+  "transporte de viajeros",
+  "transporte escolar"
+ ],
+ "49.39": [
+  "furgoneta de pasajeros",
+  "transporte de viajeros",
+  "transporte escolar"
+ ],
+ "49.41": [
+  "camionero",
+  "fletes",
+  "furgoneta",
+  "paquetería",
+  "reparto",
+  "trailero",
+  "transporte de mercancías",
+  "transportista",
+  "última milla"
+ ],
+ "49.42": [
+  "empresa de mudanzas",
+  "mudanzas",
+  "portes",
+  "traslados",
+  "vaciado de pisos"
+ ],
+ "52.24": [
+  "transporte de mercancías"
+ ],
+ "52.32": [
+  "paquetes turísticos",
+  "travel planner",
+  "vender vuelos"
+ ],
+ "53.20": [
+  "autoservicio de lavandería",
+  "courier",
+  "delivery",
+  "lavandería",
+  "lavar ropa",
+  "mensajería",
+  "planchado",
+  "recadería",
+  "repartidor",
+  "reparto de paquetes",
+  "rider",
+  "tintorería"
+ ],
+ "53.30": [
+  "servicios auxiliares"
+ ],
+ "55.10": [
+  "alojamiento",
+  "casa rural con servicios",
+  "hostal",
+  "hotel",
+  "motel",
+  "pensión"
+ ],
+ "55.20": [
+  "airbnb",
+  "alquiler por días",
+  "alquiler vacacional",
+  "apartamento turístico",
+  "casa rural",
+  "vivienda de uso turístico",
+  "VUT"
+ ],
+ "55.90": [
+  "alquilar pisos",
+  "arrendador",
+  "casero",
+  "rentista inmobiliario"
+ ],
+ "56.11": [
+  "bar restaurante",
+  "cocina",
+  "comida para llevar",
+  "dark kitchen",
+  "hostelería",
+  "menú del día",
+  "restaurante",
+  "take away"
+ ],
+ "56.12": [
+  "comidas"
+ ],
+ "56.21": [
+  "banquetes",
+  "bodas",
+  "cáterin",
+  "catering",
+  "chef a domicilio",
+  "comidas para eventos",
+  "servicio de comidas a domicilio"
+ ],
+ "56.30": [
+  "bar",
+  "café",
+  "cafetería",
+  "cervecería",
+  "chiringuito",
+  "coctelería",
+  "poner un bar",
+  "pub",
+  "taberna"
+ ],
+ "58.21": [
+  "desarrollo de juegos",
+  "estudio de videojuegos",
+  "game dev",
+  "indie",
+  "unity",
+  "unreal",
+  "videojuegos"
+ ],
+ "59.20": [
+  "doblaje",
+  "estudio de grabación",
+  "locución",
+  "mezcla y master",
+  "podcast",
+  "productor musical",
+  "sonido"
+ ],
+ "60.31": [
+  "agencia de noticias",
+  "copywriter periodístico",
+  "corresponsal",
+  "periodista",
+  "redacción freelance",
+  "redactor",
+  "reportero"
+ ],
+ "60.39": [
+  "adsense",
+  "blog",
+  "buscador",
+  "directorio online",
+  "marketplace propio",
+  "monetizar una web",
+  "portal web",
+  "web de contenidos"
+ ],
+ "61.20": [
+  "servicios auxiliares"
+ ],
+ "62.10": [
+  "apps móviles",
+  "backend",
+  "codear",
+  "desarrollador",
+  "desarrollador web",
+  "developer",
+  "devops",
+  "freelance informático",
+  "frontend",
+  "full stack",
+  "hago páginas web",
+  "ingeniero de software",
+  "programador",
+  "software a medida"
+ ],
+ "62.20": [
+  "analista",
+  "arquitecto de software",
+  "asesor tecnológico",
+  "consultor informático",
+  "consultoría IT",
+  "CRM",
+  "ERP",
+  "implantación de software"
+ ],
+ "62.90": [
+  "administrador de sistemas",
+  "ciberseguridad",
+  "help desk",
+  "informático a domicilio",
+  "mantenimiento informático",
+  "redes",
+  "soporte informático",
+  "técnico de sistemas"
+ ],
+ "63.10": [
+  "alojamiento web",
+  "centro de datos",
+  "cloud",
+  "data",
+  "hosting",
+  "nube",
+  "procesamiento de datos",
+  "servidores"
+ ],
+ "66.22": [
+  "agente de seguros",
+  "corredor de seguros",
+  "correduría",
+  "mediador de seguros",
+  "vender seguros"
+ ],
+ "68.20": [
+  "alquiler de locales",
+  "poner en alquiler"
+ ],
+ "68.31": [
+  "agente inmobiliario",
+  "API",
+  "corredor de propiedades",
+  "inmobiliaria",
+  "intermediación inmobiliaria",
+  "personal shopper inmobiliario",
+  "vender pisos"
+ ],
+ "68.32": [
+  "administrador de fincas",
+  "administrar alquileres",
+  "gestión de comunidades",
+  "gestión de pisos turísticos",
+  "property manager"
+ ],
+ "69.10": [
+  "abogada",
+  "abogado",
+  "asesoría jurídica",
+  "consultoría legal",
+  "despacho de abogados",
+  "jurista",
+  "letrado",
+  "procurador"
+ ],
+ "69.20": [
+  "asesor fiscal",
+  "asesoría",
+  "auditor",
+  "contable",
+  "contador",
+  "declaraciones de renta",
+  "economista",
+  "gestoría",
+  "llevar contabilidades"
+ ],
+ "70.20": [
+  "asesor de empresas",
+  "business consultant",
+  "coach de negocio",
+  "consultor",
+  "consultoría",
+  "consultoría estratégica",
+  "mentor de empresas",
+  "recursos humanos"
+ ],
+ "71.11": [
+  "arquitecta",
+  "arquitecto",
+  "certificado energético",
+  "diseño de edificios",
+  "estudio de arquitectura",
+  "licencia de obra",
+  "proyectos"
+ ],
+ "71.12": [
+  "cálculo de estructuras",
+  "delineante",
+  "ingeniera",
+  "ingeniería",
+  "ingeniero",
+  "ingeniero industrial",
+  "perito",
+  "proyectos técnicos",
+  "topógrafo"
+ ],
+ "73.11": [
+  "agencia de publicidad",
+  "anuncios",
+  "campañas",
+  "growth",
+  "marketing",
+  "marketing digital",
+  "publicidad",
+  "publicista",
+  "SEM",
+  "SEO"
+ ],
+ "73.30": [
+  "community manager",
+  "comunicación",
+  "gabinete de prensa",
+  "influencer",
+  "marketing de contenidos",
+  "redes sociales",
+  "relaciones públicas",
+  "social media"
+ ],
+ "74.11": [
+  "diseñador de producto"
+ ],
+ "74.12": [
+  "artes gráficas",
+  "branding",
+  "diseñador gráfico",
+  "diseñadora",
+  "diseño gráfico",
+  "diseño web",
+  "ilustrador",
+  "logotipos",
+  "maquetación",
+  "UI",
+  "UX"
+ ],
+ "74.13": [
+  "interiorismo"
+ ],
+ "74.20": [
+  "fotografía",
+  "fotografía de producto"
+ ],
+ "74.30": [
+  "intérprete",
+  "localización",
+  "subtitulado",
+  "traducción",
+  "traducir textos",
+  "traductor",
+  "traductor jurado",
+  "traductora"
+ ],
+ "74.91": [
+  "freelance",
+  "gestor de proyectos",
+  "no encuentro mi actividad",
+  "otras actividades",
+  "perito tasador",
+  "servicios profesionales varios"
+ ],
+ "74.99": [
+  "otras actividades",
+  "servicios profesionales varios"
+ ],
+ "75.00": [
+  "animales",
+  "clínica veterinaria",
+  "consulta veterinaria",
+  "mascotas",
+  "veterinaria",
+  "veterinario"
+ ],
+ "77.11": [
+  "alquilar furgonetas",
+  "alquiler de coches",
+  "car sharing",
+  "rent a car",
+  "renting"
+ ],
+ "77.51": [
+  "servicios auxiliares"
+ ],
+ "77.52": [
+  "servicios auxiliares"
+ ],
+ "79.11": [
+  "agencia de viajes",
+  "agente de viajes",
+  "viajes"
+ ],
+ "80.09": [
+  "servicios profesionales varios"
+ ],
+ "81.21": [
+  "aseo",
+  "empresa de limpieza",
+  "limpiadora",
+  "limpiar oficinas",
+  "limpieza",
+  "limpieza de comunidades",
+  "limpieza de pisos turísticos",
+  "servicio de limpieza"
+ ],
+ "81.23": [
+  "desatascos",
+  "desinfección",
+  "limpieza de coches",
+  "limpieza de cristales",
+  "limpieza fin de obra",
+  "limpieza industrial"
+ ],
+ "81.30": [
+  "césped",
+  "cuidar jardines",
+  "jardinería",
+  "jardinero",
+  "mantenimiento de jardines",
+  "paisajismo",
+  "podar"
+ ],
+ "82.10": [
+  "servicios de oficina"
+ ],
+ "82.30": [
+  "bodas y eventos",
+  "congresos",
+  "event planner",
+  "eventos",
+  "ferias",
+  "organizador de eventos",
+  "wedding planner"
+ ],
+ "82.40": [
+  "apoyo a empresas",
+  "servicios auxiliares"
+ ],
+ "82.99": [
+  "apoyo a empresas"
+ ],
+ "85.10": [
+  "canguro",
+  "centro infantil",
+  "escuela infantil",
+  "guardería",
+  "ludoteca",
+  "niñera"
+ ],
+ "85.33": [
+  "academia de FP",
+  "certificados de profesionalidad",
+  "cursos profesionales",
+  "formación para el empleo",
+  "formación profesional"
+ ],
+ "85.51": [
+  "clases de tenis",
+  "clases de yoga",
+  "entrenador personal",
+  "escuela de natación",
+  "monitor deportivo",
+  "personal trainer",
+  "pilates",
+  "preparador físico",
+  "profesor de padel"
+ ],
+ "85.52": [
+  "academia de baile",
+  "clases de música",
+  "clases de pintura",
+  "escuela de arte",
+  "profesor de guitarra",
+  "talleres creativos",
+  "teatro para niños"
+ ],
+ "85.53": [
+  "autoescuela",
+  "carnet de conducir",
+  "clases de conducir",
+  "escuela náutica",
+  "profesor de autoescuela"
+ ],
+ "85.59": [
+  "academia",
+  "clases particulares",
+  "cursos online",
+  "dar clases",
+  "formación online",
+  "infoproductos",
+  "preparador de oposiciones",
+  "profe particular",
+  "profesor de inglés",
+  "repaso escolar",
+  "tutor"
+ ],
+ "85.61": [
+  "servicios auxiliares"
+ ],
+ "86.21": [
+  "consulta médica",
+  "doctora",
+  "medicina general",
+  "médico",
+  "médico de familia",
+  "pasar consulta"
+ ],
+ "86.22": [
+  "consulta privada",
+  "dermatólogo",
+  "especialista",
+  "ginecólogo",
+  "médico especialista",
+  "psiquiatra",
+  "traumatólogo"
+ ],
+ "86.23": [
+  "clínica dental",
+  "dentista",
+  "estomatólogo",
+  "higienista dental",
+  "odontólogo",
+  "ortodoncia"
+ ],
+ "86.91": [
+  "enfermera",
+  "fisioterapeuta",
+  "logopeda",
+  "matrona",
+  "nutricionista",
+  "óptico",
+  "osteópata",
+  "podólogo",
+  "psicólogo",
+  "terapeuta"
+ ],
+ "86.95": [
+  "fisioterapia"
+ ],
+ "86.97": [
+  "servicios auxiliares"
+ ],
+ "87.91": [
+  "servicios auxiliares"
+ ],
+ "88.91": [
+  "cuidado de niños"
+ ],
+ "90.11": [
+  "artesanía",
+  "artesano",
+  "artista",
+  "ceramista",
+  "escritor",
+  "escultor",
+  "grabador",
+  "ilustrador",
+  "obra propia",
+  "pintor",
+  "vender arte"
+ ],
+ "90.20": [
+  "actor",
+  "actriz",
+  "animador de fiestas",
+  "artista",
+  "bailarín",
+  "cantante",
+  "DJ",
+  "espectáculos",
+  "humorista",
+  "mago",
+  "músico",
+  "teatro"
+ ],
+ "93.13": [
+  "box de crossfit",
+  "centro deportivo",
+  "estudio de pilates",
+  "gimnasio",
+  "gym",
+  "sala de fitness"
+ ],
+ "95.10": [
+  "arreglar móviles",
+  "reparación de portátiles",
+  "reparar impresoras",
+  "reparar ordenadores",
+  "servicio técnico",
+  "técnico informático"
+ ],
+ "95.21": [
+  "arreglar equipos de sonido",
+  "reparar televisores",
+  "servicio técnico de electrónica"
+ ],
+ "95.22": [
+  "arreglar neveras",
+  "reparar cortacésped",
+  "reparar lavadoras",
+  "servicio técnico a domicilio",
+  "técnico de electrodomésticos"
+ ],
+ "95.29": [
+  "afilador",
+  "arreglos de ropa",
+  "arreglos varios",
+  "reparar bicicletas",
+  "restaurar objetos",
+  "zapatero remendón"
+ ],
+ "95.31": [
+  "arreglar coches",
+  "chapa y pintura",
+  "electricidad del automóvil",
+  "mecánico",
+  "neumáticos",
+  "taller de coches",
+  "taller mecánico"
+ ],
+ "96.10": [
+  "limpieza en seco"
+ ],
+ "96.21": [
+  "barbería",
+  "barbero",
+  "depilación",
+  "estética",
+  "esteticista",
+  "manicura",
+  "maquilladora",
+  "peluquería",
+  "peluquero",
+  "uñas"
+ ],
+ "96.22": [
+  "centro de belleza",
+  "salón de belleza"
+ ],
+ "96.40": [
+  "servicios auxiliares"
+ ],
+ "96.99": [
+  "acompañamiento",
+  "organizador de armarios",
+  "paseador de perros",
+  "peluquería canina",
+  "servicios personales",
+  "servicios varios",
+  "tatuador"
+ ]
+}
