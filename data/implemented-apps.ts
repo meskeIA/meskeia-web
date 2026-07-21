@@ -1249,6 +1249,10 @@ export const implementedAppsUrls = [
   "/calendario-temporada/",               // Frutas/verduras de temporada por mes — Coquinum ingredientes
   "/medidas-a-ojo/",                      // Pizca/chorro/vaso → cantidades aprox — Coquinum medidas
   "/densidad-liquidos/",                  // ml↔g por densidad de líquido — Coquinum medidas
+  "/puntos-humo-aceites/",                // Punto de humo de aceites/grasas por temperatura — Coquinum cocción
+  "/alergenos-alimentarios/",             // Los 14 alérgenos UE (Reglamento 1169/2011) + dónde se esconden — Coquinum cocina-recetas
+  "/glosario-tecnicas-cocina/",           // Glosario de técnicas culinarias con buscador — Coquinum cocina-recetas
+  "/tipos-corte-cocina/",                 // Tipos de corte (brunoise, juliana…) + dimensiones — Coquinum cocina-recetas
   "/orientador-escritura-creativa/",      // Wizard 3 pasos: género → perspectiva → guía + kit de arranque + hoja de ruta
   "/visualizador-estilos-literarios/",   // Directorio interactivo de 10 movimientos literarios con filtros, autores y fragmentos
   "/visualizador-generos-novela/",       // 11 géneros narrativos: características, autores fundacionales y obras de entrada

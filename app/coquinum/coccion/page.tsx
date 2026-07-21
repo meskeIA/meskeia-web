@@ -57,6 +57,12 @@ const APPS = [
     desc: 'El tiempo exacto para el huevo en su punto, según el tamaño y si está frío de la nevera.',
     slug: 'huevo-perfecto',
   },
+  {
+    icon: '🔥',
+    titulo: 'Puntos de humo de los aceites',
+    desc: 'Con qué aceite freír, saltear o aliñar según su punto de humo, del aliño en crudo a la fritura. Con buscador y filtro por temperatura.',
+    slug: 'puntos-humo-aceites',
+  },
 ];
 
 export default function CoquinumCoccion() {

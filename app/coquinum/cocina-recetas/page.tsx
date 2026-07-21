@@ -51,6 +51,24 @@ const APPS = [
     desc: 'Cuánta carne comprar para tu asado o barbacoa según las personas y el apetito, con desglose por tipo.',
     slug: 'asado-personas',
   },
+  {
+    icon: '🥜',
+    titulo: 'Los 14 alérgenos alimentarios',
+    desc: 'Los alérgenos de declaración obligatoria en la UE, con ejemplos y dónde se esconden en los platos. Con buscador.',
+    slug: 'alergenos-alimentarios',
+  },
+  {
+    icon: '📖',
+    titulo: 'Glosario de técnicas de cocina',
+    desc: 'Qué significan blanquear, pochar, bresar, confitar o desglasar, agrupados por tipo de cocción. Con buscador.',
+    slug: 'glosario-tecnicas-cocina',
+  },
+  {
+    icon: '🔪',
+    titulo: 'Tipos de corte en cocina',
+    desc: 'Brunoise, juliana, mirepoix, bastón o chiffonade: qué mide cada corte y para qué se usa. Con buscador.',
+    slug: 'tipos-corte-cocina',
+  },
 ];
 
 export default function CoquinumCocinaRecetas() {

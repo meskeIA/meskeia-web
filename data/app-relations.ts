@@ -1985,7 +1985,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/orientador-imc/', icon: '⚖️', name: 'Orientador IMC', description: 'Calcula tu índice de masa corporal' },
     { url: '/selector-ejercicio/', icon: '🏋️', name: 'Selector de Ejercicio', description: '¿Qué tipo de actividad física te conviene?' },
     { url: '/test-habitos-saludables/', icon: '💚', name: 'Test Hábitos Saludables', description: 'Evalúa tus hábitos de vida' },
-    { url: '/orientador-tension-arterial/', icon: '🩺', name: 'Orientador Tensión Arterial', description: 'Interpreta tus cifras de tensión' },
+    { url: '/alergenos-alimentarios/', icon: '🥜', name: 'Los 14 Alérgenos Alimentarios', description: 'Los alérgenos de declaración obligatoria en la UE' },
   ],
   'calculadora-zonas-entrenamiento': saludApps.filter(a => a.url !== '/calculadora-zonas-entrenamiento/').slice(0, 4),
 
@@ -2787,7 +2787,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/conversor-tazas-gramos/', icon: '🥄', name: 'Tazas a Gramos por Ingrediente', description: 'El peso real de cada taza: harina, azúcar, líquidos…' },
     { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta cantidades a cualquier número de raciones' },
     { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Panadería: % del Panadero', description: 'Fórmulas profesionales para pan y masas fermentadas' },
-    { url: '/calculadora-ganache/', icon: '🍫', name: 'Repostería: Ganache', description: 'Proporciones de chocolate y nata según textura' },
+    { url: '/glosario-tecnicas-cocina/', icon: '📖', name: 'Glosario de Técnicas de Cocina', description: 'Qué significan los verbos de las recetas' },
   ],
   'lista-compras': cocinaApps.filter(a => a.url !== '/lista-compras/'),
   'guia-productos-limpieza': [
@@ -5688,7 +5688,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'guia-aceite-oliva': [
     { url: '/guia-quesos/', icon: '🧀', name: 'Guía de Quesos', description: '55 quesos del mundo: tipo de leche, maduración, maridaje y denominación de origen' },
     { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },
-    { url: '/guia-cocteles/', icon: '🍸', name: 'Guía de Cócteles Clásicos', description: '45 cócteles clásicos: ingredientes, método, copa y maridaje ideal' },
+    { url: '/puntos-humo-aceites/', icon: '🔥', name: 'Puntos de Humo de los Aceites', description: 'Hasta qué temperatura aguanta cada aceite antes de humear' },
     { url: '/aditivos-e-alimentarios/', icon: '🏷️', name: 'Guía Aditivos E', description: 'Qué significan los códigos E de las etiquetas alimentarias' },
   ],
   'guia-cocteles': [
@@ -5716,7 +5716,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/aditivos-e-alimentarios/', icon: '🏷️', name: 'Guía Aditivos E', description: 'Qué significan los códigos E de las etiquetas alimentarias' },
   ],
   'guia-cortes-carne': [
-    { url: '/guia-superalimentos/', icon: '🥗', name: 'Guía de Superalimentos', description: '40 superalimentos: nutrientes, beneficios, cómo consumirlos y contraindicaciones' },
+    { url: '/tipos-corte-cocina/', icon: '🔪', name: 'Tipos de Corte en Cocina', description: 'Brunoise, juliana, mirepoix… qué mide cada corte y para qué' },
     { url: '/guia-quesos/', icon: '🧀', name: 'Guía de Quesos', description: '55 quesos del mundo: tipo de leche, maduración, maridaje y denominación de origen' },
     { url: '/guia-tipos-pan/', icon: '🍞', name: 'Guía de Tipos de Pan', description: '35 panes del mundo: harina, fermentación, textura y acompañamientos' },
     { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },
@@ -6419,6 +6419,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/medidas-a-ojo/', icon: '🤏', name: 'Medidas a Ojo', description: 'Pizca, chorro, vaso… en cantidades' },
     { url: '/calculadora-cocina/', icon: '🍳', name: 'Calculadora de Cocina', description: 'Conversor general de unidades' },
     { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta las cantidades por raciones' },
+  ],
+  'puntos-humo-aceites': [
+    { url: '/guia-aceite-oliva/', icon: '🫒', name: 'Guía del Aceite de Oliva', description: 'Virgen extra, refinado y suave: cuál usar y para qué' },
+    { url: '/temperatura-coccion-carne/', icon: '🌡️', name: 'Temperatura Interna de Cocción', description: 'El punto seguro de carnes y pescados' },
+    { url: '/tiempos-asado/', icon: '🍗', name: 'Tiempos de Asado', description: 'Cuánto asar cada pieza según el peso' },
+    { url: '/glosario-tecnicas-cocina/', icon: '📖', name: 'Glosario de Técnicas de Cocina', description: 'Freír, saltear, confitar… qué es cada técnica' },
+  ],
+  'alergenos-alimentarios': [
+    { url: '/aditivos-e-alimentarios/', icon: '🏷️', name: 'Aditivos E Alimentarios', description: 'Qué significan los códigos E de las etiquetas' },
+    { url: '/sustituciones-ingredientes/', icon: '🔄', name: 'Sustituciones de Ingredientes', description: 'Alternativas sin gluten, sin lactosa o veganas' },
+    { url: '/selector-dieta/', icon: '🥗', name: 'Selector de Dieta', description: 'Qué patrón de alimentación encaja contigo' },
+    { url: '/planificador-menu/', icon: '🗓️', name: 'Planificador de Menú', description: 'Organiza las comidas de la semana' },
+  ],
+  'glosario-tecnicas-cocina': [
+    { url: '/tipos-corte-cocina/', icon: '🔪', name: 'Tipos de Corte en Cocina', description: 'Brunoise, juliana, mirepoix… qué mide cada corte' },
+    { url: '/calculadora-cocina/', icon: '🍳', name: 'Calculadora de Cocina', description: 'Conversor general de unidades culinarias' },
+    { url: '/temperatura-coccion-carne/', icon: '🌡️', name: 'Temperatura Interna de Cocción', description: 'El punto seguro de carne y pescado' },
+    { url: '/puntos-humo-aceites/', icon: '🔥', name: 'Puntos de Humo de los Aceites', description: 'Con qué aceite freír o saltear sin quemarlo' },
+  ],
+  'tipos-corte-cocina': [
+    { url: '/glosario-tecnicas-cocina/', icon: '📖', name: 'Glosario de Técnicas de Cocina', description: 'Los verbos de las recetas, explicados' },
+    { url: '/guia-cortes-carne/', icon: '🥩', name: 'Cortes de Carne', description: 'Qué corte de carne usar para cada plato' },
+    { url: '/calculadora-cocina/', icon: '🍳', name: 'Calculadora de Cocina', description: 'Conversor general de unidades culinarias' },
+    { url: '/guia-hierbas-aromaticas/', icon: '🌿', name: 'Hierbas Aromáticas', description: 'Perfectas para cortar en chiffonade' },
   ],
 
   // ==========================================
