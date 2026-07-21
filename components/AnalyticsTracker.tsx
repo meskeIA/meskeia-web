@@ -82,6 +82,31 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
       }
     }
 
+    // Atribución cross-dominio entre los verticales propios (fallback estructural
+    // al parámetro ?from=, que depende de cablearlo a mano en cada CTA). Guardamos
+    // SOLO el hostname —sin ruta ni query, y es un dominio propio → RGPD nulo—
+    // cuando el referrer es uno de nuestros dominios de producción Y difiere del
+    // host actual. La condición "distinto del host" descarta el ruido de navegación
+    // interna dentro del mismo dominio (meskeia→meskeia, stemum→stemum…), que ya
+    // cubren sesion_id y la columna host; nos quedamos con el salto que de verdad
+    // importa: delegum.com → app en meskeia.com, meskeia.com → stemum.com, etc.
+    // De momento solo se captura (queda consultable en el dump de Turso); NO se
+    // cablea en getNavegacion para no tocar el motor de Analytics. Ver memoria
+    // project_delegum_atribucion_from.
+    const DOMINIOS_PROPIOS = /^(meskeia|delegum|cronicum|stemum|coquinum)\.com$/i;
+    let refDominio: string | null = null;
+    if (referrer) {
+      try {
+        const refHost = new URL(referrer).hostname.replace(/^www\./, '');
+        const hostActual = window.location.hostname.replace(/^www\./, '');
+        if (DOMINIOS_PROPIOS.test(refHost) && refHost !== hostActual) {
+          refDominio = refHost;
+        }
+      } catch {
+        // Si el referrer no es una URL válida, ignorar
+      }
+    }
+
     // Detectar visita recurrente usando localStorage
     const storageKey = `meskeia_${finalAppName}`;
     const isRecurrent = localStorage.getItem(storageKey) !== null;
@@ -121,6 +146,7 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
         const extra: Record<string, string> = {};
         if (refParam) extra.ref = refParam;
         if (referrerHostname) extra.referrer_ia = referrerHostname;
+        if (refDominio) extra.ref_dominio = refDominio;
         if (fromParam) extra.from = fromParam.slice(0, 80);
         return Object.keys(extra).length > 0 ? extra : undefined;
       })(),

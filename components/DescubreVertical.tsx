@@ -89,7 +89,7 @@ function resolverBanda(pathname: string, isStemum: boolean, isCoquinum: boolean)
       etiqueta: COQUINUM_CATEGORIAS[categoria] ?? '',
       marca: 'Coquinum',
       descripcion: 'el portal de cocina y gastronomía de meskeIA.',
-      href: `https://coquinum.com/${categoria}/`,
+      href: `https://coquinum.com/${categoria}/?from=meskeia`,
       cta:
         otras >= 1
           ? `Descubre ${otras} ${plural(otras, 'herramienta', 'herramientas')} más →`
@@ -126,7 +126,7 @@ function resolverBanda(pathname: string, isStemum: boolean, isCoquinum: boolean)
       etiqueta: STEMUM_DISCIPLINAS[disciplina] ?? '',
       marca: 'Stemum',
       descripcion: 'el portal de ciencia interactiva de meskeIA.',
-      href: `https://stemum.com/${disciplina}/`,
+      href: `https://stemum.com/${disciplina}/?from=meskeia`,
       cta:
         otras >= 1
           ? `Descubre ${otras} ${plural(otras, 'simulador', 'simuladores')} más →`
@@ -181,7 +181,7 @@ function resolverBanda(pathname: string, isStemum: boolean, isCoquinum: boolean)
         etiqueta: puerta.titulo,
         marca: 'Cronicum',
         descripcion: 'el portal de historia interactiva de meskeIA.',
-        href: `https://cronicum.com/${puerta.slug}/`,
+        href: `https://cronicum.com/${puerta.slug}/?from=meskeia`,
         cta:
           otras >= 1
             ? `Descubre ${otras} ${plural(otras, 'cronología', 'cronologías')} más →`
