@@ -8,7 +8,7 @@
  *
  * A diferencia de la tarjeta de meskeIA (catálogo amplio, modelo «biblioteca»),
  * esta describe Delegum como vertical fiscal/laboral/financiero de España
- * (modelo «gestoría»): 42 herramientas, 7 de ellas de escenario.
+ * (modelo «gestoría»): 48 herramientas, 7 de ellas de escenario.
  *
  * El endpoint real es delegum.com/api/mcp/ (rewrite por host → /api/mcp/delegum).
  */
@@ -23,7 +23,7 @@ const SERVER_CARD = {
     title: 'Delegum MCP',
     version: '1.0.0',
     description:
-      '42 herramientas de fiscalidad, derecho laboral y finanzas en España. IRPF, ' +
+      '48 herramientas de fiscalidad, derecho laboral y finanzas en España. IRPF, ' +
       'autónomos (cuota RETA, modelos 130 y 303, gastos deducibles), nóminas (bruto → neto), ' +
       'despidos (indemnización, finiquito, paro), herencias y donaciones por comunidad autónoma, ' +
       'jubilación y pensiones, hipotecas y compraventa de vivienda. Incluye herramientas de ' +
@@ -33,7 +33,7 @@ const SERVER_CARD = {
   },
   description:
     'Servidor MCP público de Delegum, asistente orientativo de fiscalidad, derecho laboral y ' +
-    'finanzas en España. 42 herramientas especializadas, incluidas 7 consultas de escenario tipo ' +
+    'finanzas en España. 48 herramientas especializadas, incluidas 7 consultas de escenario tipo ' +
     'gestoría (autónomo, nómina, despido, herencia, jubilación, compra y venta de vivienda) que ' +
     'combinan varios cálculos en un único análisis integrado. Compatible con Claude, ChatGPT, ' +
     'Mistral y cualquier cliente MCP estándar. Gratuito, sin registro, sin API key. Cada respuesta ' +

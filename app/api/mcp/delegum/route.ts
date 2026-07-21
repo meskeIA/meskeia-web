@@ -92,6 +92,24 @@ import {
   type GradoIncapacidad,
   type OrigenContingencia,
 } from '@/lib/calculadoras/pensionIncapacidad';
+// ── Grupo C: herencia civil, deducciones familiares, dependencia, divorcio, módulos ──
+import { calcularLegitimas, type RegimenId } from '@/lib/calculadoras/legitimas';
+import { calcularDeduccionMaternidadIRPF } from '@/lib/calculadoras/deduccionMaternidadIRPF';
+import { calcularPrestacionesDependencia } from '@/lib/calculadoras/prestacionesDependencia';
+import {
+  calcularDeduccionDiscapacidadIRPF,
+  type TitularDiscapacidad,
+  type GradoDiscapacidad,
+} from '@/lib/calculadoras/deduccionDiscapacidadIRPF';
+import {
+  calcularImpuestosDivorcio,
+  type RegimenDivorcio,
+  type CustodiaDivorcio,
+  type PosViviendaDivorcio,
+  type RolPensionDivorcio,
+  type PosHipotecaDivorcio,
+} from '@/lib/calculadoras/impuestosDivorcio';
+import { compararModulosVsDirecta, type ActividadModulos } from '@/lib/calculadoras/modulosVsDirecta';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que las apps web y el MCP meskeIA.
@@ -187,6 +205,12 @@ const AVISO_FINANCIERO =
   '\n\n---\n⚖️ *Delegum es un asistente orientativo, no un asesor financiero registrado. ' +
   'Resultado generado automáticamente. No constituye recomendación de inversión ni de contratación. ' +
   'Consulte a un profesional antes de tomar decisiones económicas.*';
+
+const AVISO_SOCIAL =
+  '\n\n---\n⚖️ *Delegum es un asistente orientativo, no un organismo oficial. ' +
+  'Las cuantías son máximos estatales orientativos del ejercicio 2025 y no incluyen el copago ni los ' +
+  'complementos que fija cada comunidad autónoma. No sustituye la resolución de tu expediente ni la ' +
+  'consulta a los Servicios Sociales o al IMSERSO (imserso.es).*';
 
 function conAviso(texto: string, aviso: string) {
   return { content: [{ type: 'text' as const, text: texto + aviso }] };
@@ -2523,6 +2547,323 @@ function crearServidorDelegum(): McpServer {
           `📚 ${r.fuenteDatos}`,
         ].filter(l => l !== '');
         return conAviso(lineas.join('\n'), AVISO_LABORAL);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ════════════════════════════════════════════════════════════════════════
+  // GRUPO C — Herencia civil, deducciones familiares, dependencia, divorcio y
+  // régimen de autónomos. Calculadoras deterministas que faltaban en el MCP.
+  // ════════════════════════════════════════════════════════════════════════
+
+  // ── calcular_legitimas ───────────────────────────────────────────────────
+  servidor.tool(
+    'calcular_legitimas',
+    'Calcula la herencia forzosa (legítima) que corresponde por ley a los descendientes según el régimen civil ' +
+    'aplicable en España (Derecho Común, Cataluña, Aragón, Galicia, Baleares, País Vasco o Navarra). Devuelve la ' +
+    'legítima total, la parte por hijo, el tercio de mejora, la parte de libre disposición y el derecho del cónyuge ' +
+    'viudo. No calcula el Impuesto de Sucesiones (para eso usa "calcular_sucesiones").',
+    {
+      patrimonio_neto: z.number().nonnegative().describe('Patrimonio neto hereditario (caudal relicto) en euros'),
+      regimen: z.enum(['comun', 'cataluna', 'aragon', 'galicia', 'baleares', 'pais-vasco', 'navarra']).describe('Régimen civil aplicable. "comun" = Código Civil (mayoría de CCAA); el resto son derechos forales.'),
+      num_hijos: z.number().int().min(0).max(20).describe('Número de hijos o descendientes'),
+      tiene_conyuge: z.boolean().optional().describe('¿Hay cónyuge viudo con derecho a usufructo/cuota vidual? Por defecto false.'),
+    },
+    { title: 'Calcula la legítima (herencia forzosa) por régimen civil', readOnlyHint: true },
+    async ({ patrimonio_neto, regimen, num_hijos, tiene_conyuge }, extra) => {
+      await registrarUsoDelegum('calcular_legitimas', getCaller(extra));
+      try {
+        const r = calcularLegitimas({
+          patrimonioNeto: patrimonio_neto,
+          regimen: regimen as RegimenId,
+          numHijos: num_hijos,
+          tieneConyuge: tiene_conyuge,
+        });
+        const lineas = [
+          `⚖️ **Legítima — ${r.nombreRegimen}**`,
+          `📍 ${r.ccaas}`,
+          `📚 ${r.fuenteNormativa}`,
+          '',
+          `💰 Patrimonio: ${fmt(r.patrimonioNeto)} €`,
+          r.esNavarra
+            ? '📝 En Navarra la legítima es **formal** (no hay reserva de cuota material): puede disponerse del 100% del patrimonio.'
+            : `🔒 **Legítima total de los descendientes: ${fmt(r.legitimaTotal)} €** — ${r.fraccionLegitima}`,
+          r.legitimaPorHijo !== null
+            ? `  • Por hijo: ${fmt(r.legitimaPorHijo)} €`
+            : (r.esLegitivaColectiva ? '  • Legítima colectiva (Aragón): reparto libre entre los descendientes' : ''),
+          r.tercioMejora !== null ? `  • Tercio de mejora: ${fmt(r.tercioMejora)} €` : '',
+          `🟢 Libre disposición: ${fmt(r.libreDisposicion)} €`,
+          r.derechoConyuge !== null ? `👤 Derecho del cónyuge viudo: ${fmt(r.derechoConyuge)} € — ${r.descripcionDerechoConyuge}` : '',
+          ...r.notas.map(n => `ℹ️ ${n}`),
+        ].filter(l => l !== '');
+        return conAviso(lineas.join('\n'), AVISO_FISCAL);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ── calcular_deduccion_maternidad_irpf ───────────────────────────────────
+  servidor.tool(
+    'calcular_deduccion_maternidad_irpf',
+    'Calcula la deducción por maternidad en el IRPF (art. 81 LIRPF): 1.200 €/año por hijo menor de 3 años para ' +
+    'madres que trabajen por cuenta propia o ajena, más el incremento por gastos de guardería (hasta 1.000 €/año). ' +
+    'Aplica el límite por cotizaciones a la Seguridad Social y descuenta el abono anticipado ya cobrado.',
+    {
+      hijos: z.array(z.object({
+        edad_meses_inicio_ejercicio: z.number().int().min(0).describe('Edad del hijo en MESES al inicio del ejercicio. 36 o más = sin derecho (se descarta).'),
+        meses_con_derecho: z.number().int().min(0).max(12).describe('Meses del año con derecho a la deducción (1-12)'),
+        gastos_guarderia_anuales: z.number().nonnegative().optional().describe('Gastos anuales de guardería o centro autorizado de este hijo (€). Por defecto 0.'),
+      })).min(1).describe('Lista de hijos menores de 3 años'),
+      cotizaciones_ss_anuales: z.number().nonnegative().describe('Suma de las cotizaciones de la madre a la Seguridad Social en el año (€) — límite de la deducción base'),
+      madre_en_activo: z.boolean().optional().describe('¿La madre está de alta como trabajadora o cobrando prestación contributiva? Por defecto true.'),
+      importe_abono_anticipado_cobrado: z.number().nonnegative().optional().describe('Importe ya cobrado por abono anticipado (modelo 140) en €. Por defecto 0.'),
+    },
+    { title: 'Calcula la deducción por maternidad en el IRPF', readOnlyHint: true },
+    async ({ hijos, cotizaciones_ss_anuales, madre_en_activo, importe_abono_anticipado_cobrado }, extra) => {
+      await registrarUsoDelegum('calcular_deduccion_maternidad_irpf', getCaller(extra));
+      try {
+        const r = calcularDeduccionMaternidadIRPF({
+          hijos: hijos.map(h => ({
+            edadMesesInicioEjercicio: h.edad_meses_inicio_ejercicio,
+            mesesConDerechoEjercicio: h.meses_con_derecho,
+            gastosGuarderiaAnuales: h.gastos_guarderia_anuales,
+          })),
+          cotizacionesSSTotalesAnio: cotizaciones_ss_anuales,
+          madreEnActivoOPrestacion: madre_en_activo,
+          importeAbonoAnticipadoCobrado: importe_abono_anticipado_cobrado,
+        });
+        const lineas = [
+          `👶 **Deducción por maternidad (IRPF)**`,
+          `👧 Hijos con derecho (menores de 3 años): ${r.numHijosConDerecho}`,
+          '',
+          `💶 Deducción por maternidad: ${fmt(r.deduccionMaternidadEfectiva)} €`,
+          r.incrementoGuarderiaEfectivo > 0 ? `➕ Incremento por gastos de guardería: ${fmt(r.incrementoGuarderiaEfectivo)} €` : '',
+          `💰 **Total deducción: ${fmt(r.totalDeduccionEfectiva)} €**`,
+          r.abonoAnticipadoCobrado > 0
+            ? `🔄 Abono anticipado ya cobrado: ${fmt(r.abonoAnticipadoCobrado)} € → ${r.resultadoDeclaracion >= 0 ? `pendiente en la renta: ${fmt(r.resultadoDeclaracion)} €` : `a regularizar (devolver): ${fmt(Math.abs(r.resultadoDeclaracion))} €`}`
+            : '',
+          ...r.advertencias.map(a => `⚠️ ${a}`),
+          `📚 ${r.fuenteDatos}`,
+        ].filter(l => l !== '');
+        return conAviso(lineas.join('\n'), AVISO_FISCAL);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ── calcular_prestaciones_dependencia ────────────────────────────────────
+  servidor.tool(
+    'calcular_prestaciones_dependencia',
+    'Muestra las prestaciones económicas y los servicios del SAAD (Sistema de Atención a la Dependencia) a los que ' +
+    'da acceso un grado de dependencia reconocido (I moderada, II severa o III gran dependencia): cuantías máximas ' +
+    'mensuales de cada prestación, servicios disponibles y régimen orientativo de copago. Las cuantías son máximos ' +
+    'estatales antes de copago y de los complementos autonómicos.',
+    {
+      grado: z.union([z.literal(1), z.literal(2), z.literal(3)]).describe('Grado de dependencia reconocido: 1 (moderada), 2 (severa) o 3 (gran dependencia)'),
+    },
+    { title: 'Prestaciones y servicios del SAAD por grado de dependencia', readOnlyHint: true },
+    async ({ grado }, extra) => {
+      await registrarUsoDelegum('calcular_prestaciones_dependencia', getCaller(extra));
+      try {
+        const r = calcularPrestacionesDependencia({ grado: grado as 1 | 2 | 3 });
+        const lineas = [
+          `♿ **${r.gradoInfo.nombre}**`,
+          `📊 Puntuación BVD: ${r.gradoInfo.puntuacionBVDDesde}–${r.gradoInfo.puntuacionBVDHasta} · ${r.gradoInfo.descripcion}`,
+          '',
+          `💶 **Prestaciones económicas (máximo mensual, antes de copago):**`,
+          ...r.prestaciones.map(p => `  • ${p.nombre}: hasta ${fmt(p.cuantiaMaximaMensual)} €/mes — ${p.descripcion}`),
+          '',
+          `🛠️ **Servicios disponibles:** ${r.serviciosDisponibles.map(s => s.nombre).join(', ')}`,
+          r.serviciosNoDisponibles.length > 0 ? `🚫 No disponibles en este grado: ${r.serviciosNoDisponibles.map(s => s.nombre).join(', ')}` : '',
+          '',
+          `💳 **Copago:** no se calcula automáticamente (depende de renta y patrimonio, con tramos que varían por CCAA). Por debajo del ${r.copago.umbralExencionPorcentajeIPREM}% del IPREM (${fmt(r.copago.ipremMensual)} €/mes) no se aplica copago; el máximo es el ${r.copago.porcentajeMaximoCopago}% del coste del servicio.`,
+          `📚 ${r.fuente} · verificado ${r.verificado}`,
+        ].filter(l => l !== '');
+        return conAviso(lineas.join('\n'), AVISO_SOCIAL);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ── calcular_deduccion_discapacidad ──────────────────────────────────────
+  servidor.tool(
+    'calcular_deduccion_discapacidad',
+    'Calcula el mínimo por discapacidad en el IRPF (Ley 35/2006, arts. 60-65) del contribuyente o de un ascendiente/' +
+    'descendiente a cargo: 3.000 € (grado 33%-64%) o 9.000 € (≥65%), más 3.000 € adicionales por gastos de asistencia ' +
+    'si se acredita ayuda de terceros o movilidad reducida. Estima el ahorro aplicando el tipo marginal. El mínimo ' +
+    'reduce la base liquidable, no la cuota directamente.',
+    {
+      titular: z.enum(['contribuyente', 'ascendiente', 'descendiente']).optional().describe('Quién tiene la discapacidad. Por defecto "contribuyente".'),
+      grado: z.enum(['33a65', '65oMas']).optional().describe('Grado de discapacidad: "33a65" (entre 33% y 64%) o "65oMas" (65% o más). Por defecto "33a65".'),
+      necesita_asistencia: z.boolean().optional().describe('¿Acredita necesidad de ayuda de terceros o movilidad reducida? (añade 3.000 €). Por defecto false.'),
+      tipo_marginal: z.number().min(0).max(100).optional().describe('Tipo marginal de IRPF para estimar el ahorro (%). Valores habituales: 19, 24, 30, 37, 45, 47. Por defecto 24.'),
+    },
+    { title: 'Calcula el mínimo por discapacidad en el IRPF', readOnlyHint: true },
+    async ({ titular, grado, necesita_asistencia, tipo_marginal }, extra) => {
+      await registrarUsoDelegum('calcular_deduccion_discapacidad', getCaller(extra));
+      try {
+        const r = calcularDeduccionDiscapacidadIRPF({
+          titular: (titular ?? 'contribuyente') as TitularDiscapacidad,
+          grado: (grado ?? '33a65') as GradoDiscapacidad,
+          necesitaAsistencia: necesita_asistencia,
+          tipoMarginal: tipo_marginal ?? 24,
+        });
+        const lineas = [
+          `♿ **Mínimo por discapacidad (IRPF)**`,
+          `📦 Mínimo por discapacidad: ${fmt(r.minimoDiscapacidad)} €`,
+          r.gastosAsistencia > 0 ? `➕ Gastos de asistencia: ${fmt(r.gastosAsistencia)} €` : '',
+          `🔢 **Reducción total de la base liquidable: ${fmt(r.totalMinimo)} €**`,
+          `💶 Ahorro fiscal estimado (al ${pct(r.tipoMarginal)}%): **${fmt(r.ahorroEstimado)} €**`,
+          '',
+          `ℹ️ El mínimo reduce la base liquidable, no la cuota. El ahorro real depende de tu tipo marginal exacto y puede repartirse entre dos tramos.`,
+          `📚 ${r.fuente} · verificado ${r.verificado}`,
+        ].filter(l => l !== '');
+        return conAviso(lineas.join('\n'), AVISO_FISCAL);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ── calcular_impuestos_divorcio ──────────────────────────────────────────
+  servidor.tool(
+    'calcular_impuestos_divorcio',
+    'Estima el impacto en el IRPF de un divorcio o separación en España: reducción por pensión compensatoria al ' +
+    'cónyuge (para quien la paga) o su tributación (para quien la cobra), mínimo por descendientes según la custodia, ' +
+    'imputación de renta inmobiliaria si sales de la vivienda, y deducción por hipoteca anterior a 2013. La liquidación ' +
+    'de la sociedad de gananciales no está sujeta a IRPF. No calcula ITP/AJD ni plusvalía municipal. Modelo estatal ' +
+    'orientativo (sin variaciones por CCAA ni regímenes forales).',
+    {
+      regimen: z.enum(['gananciales', 'separacion', 'participacion']).describe('Régimen económico matrimonial'),
+      ingresos_brutos_anuales: z.number().nonnegative().describe('Ingresos brutos anuales del trabajo (€)'),
+      tiene_hijos: z.boolean().optional().describe('¿Hay hijos a cargo? Por defecto false.'),
+      num_hijos: z.number().int().min(1).max(4).optional().describe('Número de hijos (1-4; 4 = "4 o más"). Solo si tiene_hijos.'),
+      custodia: z.enum(['exclusiva-tengo', 'exclusiva-otro', 'compartida']).optional().describe('Tipo de custodia: "exclusiva-tengo" (100% del mínimo), "compartida" (50%), "exclusiva-otro" (0%).'),
+      tiene_vivienda: z.boolean().optional().describe('¿Hay vivienda familiar en propiedad? Por defecto false.'),
+      posicion_vivienda: z.enum(['me-quedo', 'salgo', 'vendemos']).optional().describe('Qué pasa con la vivienda. Solo "salgo" genera imputación de renta inmobiliaria.'),
+      valor_catastral: z.number().nonnegative().optional().describe('Valor catastral de la vivienda (€). Solo relevante si sales de ella.'),
+      porcentaje_propiedad: z.number().min(0).max(100).optional().describe('Tu porcentaje de propiedad de la vivienda (%). Por defecto 50.'),
+      catastro_revisado: z.boolean().optional().describe('¿El valor catastral se ha revisado en los últimos 10 años? true → tipo 1,1%; false → 2%. Por defecto false.'),
+      vivienda_asignada_hijos: z.boolean().optional().describe('¿El uso de la vivienda se asigna a los hijos? (exime la imputación de renta). Por defecto false.'),
+      tiene_pension_conyuge: z.boolean().optional().describe('¿Hay pensión compensatoria al ex cónyuge? Por defecto false.'),
+      rol_pension: z.enum(['pago', 'cobro']).optional().describe('"pago" (la pagas, reduce tu base) o "cobro" (la recibes, tributa como renta).'),
+      pension_mensual: z.number().nonnegative().optional().describe('Importe mensual de la pensión compensatoria (€)'),
+      tiene_hipoteca_antigua: z.boolean().optional().describe('¿Hipoteca sobre la vivienda habitual anterior a 2013? (deducción transitoria). Por defecto false.'),
+      posicion_hipoteca: z.enum(['me-quedo', 'otro-paga']).optional().describe('"me-quedo" (sigues pagándola y deduces) u "otro-paga".'),
+      cuota_hipoteca_anual: z.number().nonnegative().optional().describe('Cuota anual de la hipoteca que pagas tú (€)'),
+    },
+    { title: 'Estima el impacto en el IRPF de un divorcio', readOnlyHint: true },
+    async (a, extra) => {
+      await registrarUsoDelegum('calcular_impuestos_divorcio', getCaller(extra));
+      try {
+        const r = calcularImpuestosDivorcio({
+          regimen: a.regimen as RegimenDivorcio,
+          ingresos: a.ingresos_brutos_anuales,
+          tieneHijos: a.tiene_hijos,
+          numHijos: a.num_hijos,
+          custodia: a.custodia as CustodiaDivorcio | undefined,
+          tieneVivienda: a.tiene_vivienda,
+          posVivienda: a.posicion_vivienda as PosViviendaDivorcio | undefined,
+          valorCatastral: a.valor_catastral,
+          porcPropiedad: a.porcentaje_propiedad,
+          catastroRevisado: a.catastro_revisado,
+          viviendaAsignadaHijos: a.vivienda_asignada_hijos,
+          tienePensionConyuge: a.tiene_pension_conyuge,
+          rolPension: a.rol_pension as RolPensionDivorcio | undefined,
+          pensionMensual: a.pension_mensual,
+          tieneHipotecaAntigua: a.tiene_hipoteca_antigua,
+          posHipoteca: a.posicion_hipoteca as PosHipotecaDivorcio | undefined,
+          cuotaHipoteca: a.cuota_hipoteca_anual,
+        });
+        const lineas = [`💔 **Impacto fiscal del divorcio (IRPF)**`, ''];
+        lineas.push(r.gananciales
+          ? '🏛️ Régimen de gananciales: la liquidación de la sociedad conyugal (reparto 50/50) **no está sujeta a IRPF**.'
+          : '🏛️ Régimen de separación/participación: el reparto de bienes privativos no genera ganancia sujeta salvo exceso de adjudicación.');
+        if (r.pensionConyuge) {
+          lineas.push('');
+          lineas.push(r.pensionConyuge.tipo === 'ahorro'
+            ? `💶 Pensión compensatoria (${fmt(r.pensionConyuge.pensionAnual)} €/año): reduce tu base → **ahorro estimado ${fmt(r.pensionConyuge.importe)} €/año**.`
+            : `💶 Pensión compensatoria (${fmt(r.pensionConyuge.pensionAnual)} €/año): tributa como renta → **coste estimado ${fmt(r.pensionConyuge.importe)} €/año**.`);
+        }
+        if (r.hijos) {
+          lineas.push('');
+          lineas.push(`👧 Mínimo por descendientes: ${fmt(r.hijos.minimoTotal)} € (te corresponde el ${r.hijos.porcentaje}% = ${fmt(r.hijos.minimoAplicable)} €) → ahorro estimado ${fmt(r.hijos.ahorroEstimado)} €.`);
+        }
+        if (r.vivienda) {
+          lineas.push('');
+          lineas.push(r.vivienda.exenta
+            ? '🏠 Vivienda: uso asignado a los hijos → **sin imputación de renta inmobiliaria**.'
+            : `🏠 Vivienda (sales de ella): imputación de renta ${fmt(r.vivienda.imputacionAnual)} €/año → coste fiscal estimado ${fmt(r.vivienda.costeFiscal)} €/año.`);
+        }
+        if (r.hipoteca) {
+          lineas.push('');
+          lineas.push(r.hipoteca.tipo === 'mantiene'
+            ? `🏦 Hipoteca anterior a 2013: mantienes la deducción → **${fmt(r.hipoteca.deduccionAnual)} €/año**.`
+            : '🏦 Hipoteca anterior a 2013: si deja de pagarla, se pierde la deducción por esa parte.');
+        }
+        return conAviso(lineas.join('\n'), AVISO_FISCAL);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ── comparar_modulos_vs_directa ──────────────────────────────────────────
+  servidor.tool(
+    'comparar_modulos_vs_directa',
+    'Compara de forma orientativa qué régimen de IRPF conviene a un autónomo: Estimación Directa Simplificada ' +
+    '(tributa por ingresos reales menos gastos) o Estimación Objetiva por módulos (tributa por parámetros de la ' +
+    'actividad: superficie, personal, vehículos…). Devuelve el coste anual total (IRPF + cuota RETA) en cada régimen ' +
+    'y cuál sale más barato. ⚠️ Los coeficientes de módulos son DIDÁCTICOS/orientativos, no los importes reales de la ' +
+    'Orden HFP anual: sirven para entender la lógica de decisión, no como cálculo definitivo.',
+    {
+      ingresos_anuales: z.number().nonnegative().describe('Ingresos anuales de la actividad (€)'),
+      gastos_anuales: z.number().nonnegative().describe('Gastos deducibles anuales (€) — solo cuentan en Estimación Directa'),
+      cuota_reta_mensual: z.number().positive().describe('Cuota mensual de autónomo (RETA) en €'),
+      actividad: z.enum(['bar', 'comercio_menor', 'transporte', 'peluqueria', 'taxi']).describe('Tipo de actividad (determina la fórmula de módulos)'),
+      personal_asalariado: z.number().int().min(0).optional().describe('Nº de trabajadores asalariados. Por defecto 0.'),
+      personal_no_asalariado: z.number().int().min(0).optional().describe('Nº de personas no asalariadas (titular, familiares colaboradores). Por defecto 0.'),
+      superficie_m2: z.number().nonnegative().optional().describe('Superficie del local en m². Por defecto 0.'),
+      kwh_anuales: z.number().nonnegative().optional().describe('Consumo eléctrico anual en kWh (relevante en hostelería). Por defecto 0.'),
+      mesas: z.number().int().min(0).optional().describe('Nº de mesas (bares y restaurantes). Por defecto 0.'),
+      vehiculos: z.number().int().min(0).optional().describe('Nº de vehículos (transporte/taxi). Por defecto 0.'),
+    },
+    { title: 'Compara Estimación Directa vs Módulos para un autónomo', readOnlyHint: true },
+    async (a, extra) => {
+      await registrarUsoDelegum('comparar_modulos_vs_directa', getCaller(extra));
+      try {
+        const r = compararModulosVsDirecta({
+          ingresos: a.ingresos_anuales,
+          gastos: a.gastos_anuales,
+          retaMensual: a.cuota_reta_mensual,
+          actividad: a.actividad as ActividadModulos,
+          personalAsalariado: a.personal_asalariado,
+          personalNoAsalariado: a.personal_no_asalariado,
+          superficie: a.superficie_m2,
+          kwh: a.kwh_anuales,
+          mesas: a.mesas,
+          vehiculo: a.vehiculos,
+        });
+        const dif = Math.abs(r.diferencia);
+        const lineas = [
+          `📊 **Módulos vs Estimación Directa** (coste anual = IRPF + cuota RETA)`,
+          '',
+          `🅰️ **Estimación Directa Simplificada: ${fmt(r.estimacionDirecta.costeAnualTotal)} €/año**`,
+          `  • Rendimiento neto: ${fmt(r.estimacionDirecta.rendimientoNetoReducido)} € · IRPF: ${fmt(r.estimacionDirecta.irpf)} € · RETA: ${fmt(r.estimacionDirecta.cuotaReta)} €`,
+          `🅱️ **Estimación Objetiva (Módulos): ${fmt(r.modulos.costeAnualTotal)} €/año**`,
+          `  • Rendimiento por módulos: ${fmt(r.modulos.rendimientoNetoPrevio)} € · IRPF: ${fmt(r.modulos.irpf)} € · RETA: ${fmt(r.modulos.cuotaReta)} €`,
+          !r.modulos.esApta ? '  ⚠️ Con estos parámetros tu actividad probablemente NO sea elegible para módulos.' : '',
+          '',
+          `✅ **Sale más barato: ${r.regimenRecomendado}** (diferencia ${fmt(dif)} €/año)`,
+          '',
+          `📝 Los coeficientes de módulos usados aquí son orientativos/didácticos; los reales los fija la Orden HFP anual. Verifica con un asesor antes de elegir régimen.`,
+        ].filter(l => l !== '');
+        return conAviso(lineas.join('\n'), AVISO_FISCAL);
       } catch (err) {
         return errorMcp(err);
       }
