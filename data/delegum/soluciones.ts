@@ -163,6 +163,7 @@ export const PUERTAS: Puerta[] = [
       { url: '/orientador-tarifa-freelance/' },
       { url: '/planificador-trimestres-freelance/' },
       { url: '/asistente-alta-autonomo/' },
+      { url: '/conversor-cnae-iae/', desc: 'Tu código CNAE y tu epígrafe del IAE para el alta, en los catálogos oficiales.' },
       { url: '/checklist-preparar-verifactu/' },
       { url: '/comparador-autonomo-vs-sl/', desc: 'Tributar por IRPF como autónomo o por Sociedades.' },
       { url: '/comparador-formas-juridicas/' },

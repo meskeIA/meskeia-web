@@ -3,6 +3,13 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 // App estructuralmente española (CNAE-2025 del INE y Tarifas del IAE de la AEAT):
 // no procede lenguaje dual ES/Latam. Ver <RegionBadge variant="es-only" />.
+//
+// Nota de identidad (decidido 2026-07-21): el slug /conversor-cnae-iae/ conserva
+// "conversor" de forma DELIBERADA para captar la búsqueda real "conversor cnae iae"
+// (alta intención: quien cree que existe una conversión directa). El producto es un
+// BUSCADOR dual —así se llama en todas las superficies visibles (title, H1, nombre de
+// catálogo)— y la propia página corrige esa expectativa. No renombrar el slug "por
+// coherencia": es captura SEO intencionada, no un descuido.
 
 export const metadata: Metadata = {
   title: 'Códigos CNAE-2025 y epígrafes del IAE: buscador oficial | meskeIA',
