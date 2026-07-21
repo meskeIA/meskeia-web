@@ -210,6 +210,7 @@ export const implementedAppsUrls = [
   "/luxometro/",                   // Luxómetro/fotómetro para medir intensidad de luz
   "/golden-hour/",                 // Calculadora hora dorada y azul para fotografía
   "/sonometro/",                   // Sonómetro/decibelímetro para medir nivel de ruido
+  "/amplificador-sonido/",         // Amplificador de escucha en vivo (accesibilidad auditiva)
   "/metronomo/",                   // Metrónomo online con tap tempo
   "/mi-ip/",                       // IP pública, geolocalización, ISP, conexión
   "/analizador-espectro/",         // Analizador de espectro de audio FFT

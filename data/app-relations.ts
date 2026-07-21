@@ -2899,8 +2899,8 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'calculadora-descuentos': [...matematicasBasicasApps.slice(0, 2), { url: '/calculadora-iva/', icon: '🧾', name: 'Calculadora IVA', description: 'Añadir o quitar IVA' }],
   'prueba-camara': [{ url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir luz para fotos' }, { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba Micrófono', description: 'Test de audio' }, { url: '/mi-ip/', icon: '🌐', name: 'Mi IP', description: 'Información de red' }],
-  'prueba-microfono': [{ url: '/sonometro/', icon: '🔊', name: 'Sonómetro', description: 'Medir decibelios' }, { url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir luz ambiente' }],
-  'sonometro': [{ url: '/generador-tonos/', icon: '🔊', name: 'Generador Tonos', description: 'Frecuencias de audio' }, { url: '/analizador-espectro/', icon: '📊', name: 'Analizador Espectro', description: 'Visualiza frecuencias' }, { url: '/diapason/', icon: '🎼', name: 'Diapasón', description: 'La 440 Hz de referencia' }, { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba Micrófono', description: 'Test de audio' }],
+  'prueba-microfono': [{ url: '/sonometro/', icon: '🔊', name: 'Sonómetro', description: 'Medir decibelios' }, { url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir luz ambiente' }, { url: '/amplificador-sonido/', icon: '🦻', name: 'Amplificador de Sonido', description: 'Escucha amplificada en vivo' }],
+  'sonometro': [{ url: '/generador-tonos/', icon: '🔊', name: 'Generador Tonos', description: 'Frecuencias de audio' }, { url: '/analizador-espectro/', icon: '📊', name: 'Analizador Espectro', description: 'Visualiza frecuencias' }, { url: '/amplificador-sonido/', icon: '🦻', name: 'Amplificador de Sonido', description: 'Escucha amplificada en vivo' }, { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba Micrófono', description: 'Test de audio' }],
   'luxometro': [{ url: '/golden-hour/', icon: '🌅', name: 'Golden Hour', description: 'Hora dorada y azul' }, { url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/conversor-colores/', icon: '🎨', name: 'Conversor Colores', description: 'HEX, RGB, HSL' }],
   'golden-hour': [{ url: '/visualizador-colores-cielo/', icon: '🌈', name: 'Colores del Cielo', description: 'Paleta HEX y física de cada fase: golden hour, hora azul, amanecer' }, { url: '/simulador-fotografia/', icon: '📷', name: 'Simulador de Fotografía', description: 'Triángulo de exposición: ISO, apertura, velocidad' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir intensidad de luz' }, { url: '/informacion-tiempo/', icon: '🌤️', name: 'Info Tiempo', description: 'Previsión meteorológica' }],
   'mi-ip': [{ url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba Micrófono', description: 'Test de audio' }],
@@ -2952,9 +2952,15 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-baja-vision/', icon: '👁️', name: 'Simulador de Baja Visión', description: 'Entiende por qué necesitas magnificación: cataratas, glaucoma, miopía severa' },
     { url: '/conversor-braille/', icon: '⠃', name: 'Traductor de Braille', description: 'Alternativa para casos donde la lupa ya no basta' },
     { url: '/adaptador-dislexia/', icon: '📖', name: 'Adaptador Dislexia', description: 'Otro apoyo de lectura: tipografías y espaciado adaptado' },
-    { url: '/espejo/', icon: '🪞', name: 'Espejo Digital', description: 'Otra herramienta que aprovecha la cámara del móvil' },
+    { url: '/amplificador-sonido/', icon: '🦻', name: 'Amplificador de Sonido', description: 'La versión auditiva de una lupa: oye amplificado' },
   ],
   'espejo': [{ url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/lupa-digital/', icon: '🔍', name: 'Lupa Digital', description: 'Amplía con la cámara' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir luz ambiente' }],
+  'amplificador-sonido': [
+    { url: '/sonometro/', icon: '🔊', name: 'Sonómetro', description: 'Mide el ruido en decibelios' },
+    { url: '/lupa-digital/', icon: '🔍', name: 'Lupa Digital', description: 'Amplía con la cámara: la versión visual' },
+    { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba de Micrófono', description: 'Comprueba tu micrófono' },
+    { url: '/analizador-espectro/', icon: '📊', name: 'Analizador de Espectro', description: 'Visualiza las frecuencias' },
+  ],
 
   // REFERENCIA Y CULTURA GENERAL
   'paises-del-mundo': [

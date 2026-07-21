@@ -38,7 +38,7 @@
         { "key": "X-XSS-Protection", "value": "1; mode=block" },
         {
           "key": "Permissions-Policy",
-          "value": "camera=(), geolocation=(self), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()"
+          "value": "camera=(self), microphone=(self), geolocation=(self), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()"
         },
         {
           "key": "Content-Security-Policy",
