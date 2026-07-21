@@ -67,6 +67,7 @@ export const COQUINUM_APP_CATEGORIA: Record<string, string> = {
   'conversor-moldes': 'medidas-conversiones',
   'medidas-a-ojo': 'medidas-conversiones',
   'densidad-liquidos': 'medidas-conversiones',
+  'conversor-onzas': 'medidas-conversiones',
   // Cocción y temperatura (seguridad y punto)
   'temperatura-coccion-carne': 'coccion',
   'tiempos-coccion': 'coccion',
@@ -190,6 +191,7 @@ export const COQUINUM_APP_INFO: Record<string, CoquinumAppInfo> = {
   'conversor-moldes': { nombre: 'Conversor de moldes', icon: '⭕' },
   'medidas-a-ojo': { nombre: 'Medidas a ojo', icon: '🤏' },
   'densidad-liquidos': { nombre: 'Conversor de líquidos', icon: '💧' },
+  'conversor-onzas': { nombre: 'Conversor de onzas', icon: '⚖️' },
   'temperatura-coccion-carne': { nombre: 'Temperatura de cocción', icon: '🌡️' },
   'tiempos-coccion': { nombre: 'Tiempos de cocción', icon: '⏱️' },
   'conversor-horno-airfryer': { nombre: 'Horno → freidora de aire', icon: '🌀' },

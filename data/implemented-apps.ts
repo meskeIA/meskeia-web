@@ -1249,6 +1249,7 @@ export const implementedAppsUrls = [
   "/calendario-temporada/",               // Frutas/verduras de temporada por mes — Coquinum ingredientes
   "/medidas-a-ojo/",                      // Pizca/chorro/vaso → cantidades aprox — Coquinum medidas
   "/densidad-liquidos/",                  // ml↔g por densidad de líquido — Coquinum medidas
+  "/conversor-onzas/",                    // Onzas peso/líquidas → g/ml/lb/tazas (US/UK) — Coquinum medidas
   "/puntos-humo-aceites/",                // Punto de humo de aceites/grasas por temperatura — Coquinum cocción
   "/alergenos-alimentarios/",             // Los 14 alérgenos UE (Reglamento 1169/2011) + dónde se esconden — Coquinum cocina-recetas
   "/glosario-tecnicas-cocina/",           // Glosario de técnicas culinarias con buscador — Coquinum cocina-recetas

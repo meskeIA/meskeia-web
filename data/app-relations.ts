@@ -6165,7 +6165,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'conversor-tazas-gramos': [
     { url: '/ajuste-recetas-altitud/', icon: '⛰️', name: 'Ajuste de Recetas por Altitud', description: 'Adapta tu receta si cocinas en altura (CDMX, Bogotá, Quito…)' },
     { url: '/calculadora-cocina/', icon: '🍳', name: 'Calculadora de Cocina', description: 'Conversor general de unidades culinarias y temperaturas' },
-    { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta las cantidades de una receta a más o menos raciones' },
+    { url: '/conversor-onzas/', icon: '⚖️', name: 'Conversor de Onzas', description: 'Onzas a gramos y mililitros, para recetas anglosajonas' },
     { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Porcentaje del Panadero', description: 'Proporciones en gramos para tus masas de pan' },
   ],
   'ajuste-recetas-altitud': [
@@ -6418,7 +6418,13 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/conversor-tazas-gramos/', icon: '🥄', name: 'Tazas a Gramos por Ingrediente', description: 'El peso real de cada ingrediente' },
     { url: '/medidas-a-ojo/', icon: '🤏', name: 'Medidas a Ojo', description: 'Pizca, chorro, vaso… en cantidades' },
     { url: '/calculadora-cocina/', icon: '🍳', name: 'Calculadora de Cocina', description: 'Conversor general de unidades' },
-    { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta las cantidades por raciones' },
+    { url: '/conversor-onzas/', icon: '⚖️', name: 'Conversor de Onzas', description: 'Onzas a gramos, ml, libras y tazas' },
+  ],
+  'conversor-onzas': [
+    { url: '/conversor-tazas-gramos/', icon: '🥄', name: 'Tazas a Gramos por Ingrediente', description: 'El peso real de cada taza de ingrediente' },
+    { url: '/densidad-liquidos/', icon: '💧', name: 'Conversor de Líquidos', description: 'ml a gramos según el líquido' },
+    { url: '/calculadora-cocina/', icon: '🍳', name: 'Calculadora de Cocina', description: 'Conversor general de unidades culinarias' },
+    { url: '/escalado-cocteles/', icon: '🍸', name: 'Escalado de Cócteles', description: 'La coctelería mide en onzas líquidas' },
   ],
   'puntos-humo-aceites': [
     { url: '/guia-aceite-oliva/', icon: '🫒', name: 'Guía del Aceite de Oliva', description: 'Virgen extra, refinado y suave: cuál usar y para qué' },

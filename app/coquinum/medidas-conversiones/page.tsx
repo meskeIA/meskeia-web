@@ -57,6 +57,12 @@ const APPS = [
     desc: 'Cuánto es una pizca, un chorro, un vaso o un puñado: traduce las medidas imprecisas de las recetas.',
     slug: 'medidas-a-ojo',
   },
+  {
+    icon: '⚖️',
+    titulo: 'Conversor de onzas',
+    desc: 'De onzas a gramos, mililitros, libras y tazas, separando la onza de peso de la onza líquida, con la diferencia entre EE. UU. y Reino Unido.',
+    slug: 'conversor-onzas',
+  },
 ];
 
 export default function CoquinumMedidasConversiones() {
