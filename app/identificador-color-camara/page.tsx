@@ -197,10 +197,8 @@ export default function IdentificadorColorPage() {
         audio: false,
       });
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play().catch(() => { /* autoplay bloqueado, se reintenta al interactuar */ });
-      }
+      // El <video> aún no está montado (aparece al pasar camaraActiva a true).
+      // El stream se adjunta en un efecto cuando el elemento ya existe en el DOM.
       setCamaraActiva(true);
       setCongelado(false);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -216,6 +214,17 @@ export default function IdentificadorColorPage() {
       }
     }
   }, [muestrearCentro]);
+
+  // Adjuntar el stream al <video> una vez montado. Se ejecuta cuando camaraActiva
+  // pasa a true (el elemento ya existe), evitando el ref null al pulsar "Activar".
+  useEffect(() => {
+    const video = videoRef.current;
+    if (camaraActiva && video && streamRef.current) {
+      video.srcObject = streamRef.current;
+      video.muted = true;
+      video.play().catch(() => { /* si el navegador lo bloquea, se reintenta al tocar */ });
+    }
+  }, [camaraActiva]);
 
   const detenerCamara = useCallback(() => {
     if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
@@ -353,7 +362,7 @@ export default function IdentificadorColorPage() {
           ) : (
             <>
               <div className={styles.visorWrapper}>
-                <video ref={videoRef} className={styles.video} playsInline muted aria-label="Imagen de la cámara" />
+                <video ref={videoRef} className={styles.video} autoPlay playsInline muted aria-label="Imagen de la cámara" />
                 <div className={styles.mira} aria-hidden="true">
                   <div className={styles.miraCentro} style={{ backgroundColor: hex ?? 'transparent' }} />
                 </div>
