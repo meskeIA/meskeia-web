@@ -17,6 +17,28 @@ import {
   FECHA_EXPR,
   type GlobalAcc,
 } from '@/lib/analytics-rollup';
+import { applicationsDatabase } from '@/data/applications';
+import { STEMUM_APP_SLUGS } from '@/data/stemum';
+import { COQUINUM_APP_SLUGS } from '@/data/coquinum';
+
+// ── Adjudicación app → vertical temático (para la subdivisión de meskeia.com en
+// getPorDominio). Cada app cae en UN solo cubo, por prioridad: las listas curadas
+// de los portales con dominio propio ganan a la clasificación por suite de Delegum
+// (que no trasladó sus apps y se identifica por la suite 'legal-fiscal'). El slug
+// de app = url sin barras ('/conversor-cnae-iae/' → 'conversor-cnae-iae'). ──
+const DELEGUM_APP_SLUGS = new Set(
+  applicationsDatabase
+    .filter((a) => a.suites.includes('legal-fiscal'))
+    .map((a) => a.url.replace(/^\/+|\/+$/g, '')),
+);
+
+function verticalDe(app: string): 'cronicum' | 'stemum' | 'coquinum' | 'delegum' | 'resto' {
+  if (app.startsWith('visualizador-historia-')) return 'cronicum';
+  if (STEMUM_APP_SLUGS.has(app)) return 'stemum';
+  if (COQUINUM_APP_SLUGS.has(app)) return 'coquinum';
+  if (DELEGUM_APP_SLUGS.has(app)) return 'delegum';
+  return 'resto';
+}
 
 /**
  * Convierte una fila cruda de uso_aplicaciones en un registro tipado para el
@@ -1216,6 +1238,65 @@ export const analyticsRouter = router({
         { hoy: 0, ayer: 0, semana: 0, mes: 0, total: 0 }
       );
 
-      return { filas, total, desde: '23/06/2026' };
+      // ── Subdivisión de meskeia.com por vertical temático ──
+      // Adjudica cada app servida bajo meskeia.com a UN vertical (exclusivo) para
+      // ver el peso de cada portal AUNQUE el usuario entrara por la marca madre.
+      // No mueve nada: es solo un contador. Cuadra con el total de meskeia.com y
+      // comparte universo temporal con las filas por host (host≠NULL ⇒ desde 23/06).
+      const subRes = await client.execute({
+        sql: `SELECT aplicacion,
+                COUNT(*) AS total,
+                SUM(CASE WHEN fo = ? THEN 1 ELSE 0 END) AS hoy,
+                SUM(CASE WHEN fo = ? THEN 1 ELSE 0 END) AS ayer,
+                SUM(CASE WHEN fo >= ? THEN 1 ELSE 0 END) AS semana,
+                SUM(CASE WHEN fo >= ? THEN 1 ELSE 0 END) AS mes
+              FROM (
+                SELECT aplicacion, ${FECHA_EXPR} AS fo
+                FROM uso_aplicaciones
+                WHERE host = 'meskeia.com' AND modo != 'bot'
+                  ${ipExcluida ? 'AND (ip_address != ? OR ip_address IS NULL)' : ''}
+              )
+              GROUP BY aplicacion`,
+        args: ipExcluida
+          ? [hoyOrd, ayerOrd, hace6Ord, iMesOrd, ipExcluida]
+          : [hoyOrd, ayerOrd, hace6Ord, iMesOrd],
+      });
+
+      type Periodos = { hoy: number; ayer: number; semana: number; mes: number; total: number };
+      const nuevoP = (): Periodos => ({ hoy: 0, ayer: 0, semana: 0, mes: 0, total: 0 });
+      const cubos: Record<string, Periodos> = {
+        delegum: nuevoP(), stemum: nuevoP(), coquinum: nuevoP(), cronicum: nuevoP(), resto: nuevoP(),
+      };
+      for (const r of subRes.rows) {
+        const c = cubos[verticalDe(String(r.aplicacion))];
+        c.hoy += Number(r.hoy); c.ayer += Number(r.ayer); c.semana += Number(r.semana);
+        c.mes += Number(r.mes); c.total += Number(r.total);
+      }
+
+      // % penetración del portal: cuánto del tráfico del vertical entra ya por su
+      // dominio propio vs por meskeia.com. Sube con el tiempo si el portal gana
+      // autoridad y Google empieza a servir la versión del dominio propio.
+      const totalHost = (h: string) => filas.find((f) => f.host === h)?.total ?? 0;
+      const SUB_META: Array<{ key: string; label: string; icono: string; host: string | null }> = [
+        { key: 'delegum',  label: 'Delegum',       icono: '🏛️', host: 'delegum.com' },
+        { key: 'stemum',   label: 'Stemum',        icono: '🔬', host: 'stemum.com' },
+        { key: 'coquinum', label: 'Coquinum',      icono: '🍳', host: 'coquinum.com' },
+        { key: 'cronicum', label: 'Cronicum',      icono: '📜', host: 'cronicum.com' },
+        { key: 'resto',    label: 'Resto meskeIA', icono: '🧩', host: null },
+      ];
+      const subFilas = SUB_META.map((m) => {
+        const c = cubos[m.key];
+        const portal = m.host ? totalHost(m.host) : 0;
+        const pctPortal = m.host && portal + c.total > 0
+          ? Math.round((portal / (portal + c.total)) * 1000) / 10
+          : null;
+        return { key: m.key, label: m.label, icono: m.icono, portalHost: m.host, ...c, pctPortal };
+      });
+      const subtotal = Object.values(cubos).reduce((a, c) => ({
+        hoy: a.hoy + c.hoy, ayer: a.ayer + c.ayer, semana: a.semana + c.semana,
+        mes: a.mes + c.mes, total: a.total + c.total,
+      }), nuevoP());
+
+      return { filas, total, desde: '23/06/2026', subdivision: { filas: subFilas, subtotal } };
     }),
 });

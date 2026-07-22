@@ -1655,6 +1655,76 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                   * Captura de dominio activada el {dominiosQuery.data.desde}. Las visitas anteriores
                   no tienen dominio asignado y no se contabilizan aquí.
                 </p>
+
+                {/* Desglose de meskeIA por vertical temático (adjudicación, no host) */}
+                {dominiosQuery.data.subdivision && dominiosQuery.data.filas.length > 0 && (
+                  <div style={{ marginTop: '2.5rem' }}>
+                    <h3 style={{ fontSize: '1.05rem', marginBottom: '0.4rem' }}>
+                      <span aria-hidden="true">🧩</span> Desglose de meskeIA por vertical
+                    </h3>
+                    <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem', fontSize: '0.9rem' }}>
+                      Reparte el tráfico de meskeia.com entre los temas de cada portal, aunque el usuario
+                      entrara por la marca madre. No mueve nada: solo cuenta por dónde entró. La columna{' '}
+                      <strong>% portal</strong> es cuánto de cada vertical llega ya por su dominio propio
+                      (sube si el portal gana autoridad y Google empieza a servir su versión).
+                    </p>
+                    <div className={styles.tableContainer}>
+                      <table className={styles.table}>
+                        <thead>
+                          <tr>
+                            <th style={{ textAlign: 'left' }}>Vertical (dentro de meskeIA)</th>
+                            <th style={{ textAlign: 'center' }}>Hoy</th>
+                            <th style={{ textAlign: 'center' }}>Ayer</th>
+                            <th style={{ textAlign: 'center' }}>7 días</th>
+                            <th style={{ textAlign: 'center' }}>Este mes</th>
+                            <th style={{ textAlign: 'center' }}>Total</th>
+                            <th style={{ textAlign: 'center' }}>% portal</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {dominiosQuery.data.subdivision.filas.map((s) => (
+                            <tr key={s.key} style={{ opacity: s.total === 0 ? 0.4 : 1 }}>
+                              <td>
+                                <span style={{ marginRight: '0.4rem' }}>{s.icono}</span>
+                                meskeia-{s.key}
+                                {s.portalHost && (
+                                  <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginLeft: '0.5rem' }}>
+                                    ↔ {s.portalHost}
+                                  </span>
+                                )}
+                              </td>
+                              <td style={{ textAlign: 'center' }}>{s.hoy > 0 ? s.hoy : '–'}</td>
+                              <td style={{ textAlign: 'center' }}>{s.ayer > 0 ? s.ayer : '–'}</td>
+                              <td style={{ textAlign: 'center' }}>{s.semana > 0 ? s.semana : '–'}</td>
+                              <td style={{ textAlign: 'center' }}>{s.mes > 0 ? s.mes : '–'}</td>
+                              <td style={{ textAlign: 'center', fontWeight: s.total > 0 ? 600 : 400 }}>
+                                {s.total > 0 ? s.total : '–'}
+                              </td>
+                              <td style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
+                                {s.pctPortal == null ? '–' : `${s.pctPortal.toLocaleString('es-ES')}%`}
+                              </td>
+                            </tr>
+                          ))}
+                          {/* Fila Total — debe cuadrar con la fila meskeIA de la tabla superior */}
+                          <tr style={{ borderTop: '2px solid var(--primary)', fontWeight: 700 }}>
+                            <td>✅ TOTAL meskeIA</td>
+                            <td style={{ textAlign: 'center' }}>{dominiosQuery.data.subdivision.subtotal.hoy || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{dominiosQuery.data.subdivision.subtotal.ayer || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{dominiosQuery.data.subdivision.subtotal.semana || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{dominiosQuery.data.subdivision.subtotal.mes || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{dominiosQuery.data.subdivision.subtotal.total || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>–</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '0.75rem' }}>
+                      Adjudicación (1 app = 1 vertical): Cronicum = cronologías; Stemum/Coquinum = apps de su
+                      portal; Delegum = apps de suite fiscal (aprox., sus herramientas no se trasladaron a
+                      delegum.com). El TOTAL cuadra con la fila meskeIA de arriba.
+                    </p>
+                  </div>
+                )}
               </>
             )}
           </section>
