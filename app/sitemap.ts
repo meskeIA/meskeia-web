@@ -35,13 +35,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  // Generar entradas para todas las aplicaciones (automático)
-  const appPages: MetadataRoute.Sitemap = applicationsDatabase.map((app) => ({
-    url: `${baseUrl}${app.url}`,
-    lastModified: new Date(),
-    changeFrequency: 'monthly',
-    priority: 0.8,
-  }));
+  // Generar entradas para todas las aplicaciones (automático).
+  // Excluimos las cronologías del sistema dinámico (/visualizador-historia/[slug]/):
+  // desde el 301 de migración esas URLs redirigen a cronicum.com/[slug], y un sitemap
+  // no debe anunciar URLs que redirigen (GSC las marcaría como "Página con redirección").
+  // El filtro casa solo con la barra final del prefijo, así que NO excluye las 3 apps
+  // custom hifenadas (/visualizador-historia-reloj|dinero|escritura/), que siguen siendo
+  // apps propias de meskeIA y deben permanecer indexadas.
+  const appPages: MetadataRoute.Sitemap = applicationsDatabase
+    .filter((app) => !app.url.startsWith('/visualizador-historia/'))
+    .map((app) => ({
+      url: `${baseUrl}${app.url}`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    }));
 
   // Combinar: páginas principales + aplicaciones
   return [...mainPages, ...appPages];

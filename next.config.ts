@@ -134,6 +134,19 @@ const nextConfig: NextConfig = {
       { source: '/cronicum', has, destination: 'https://cronicum.com/', permanent: true },
       { source: '/cronicum/:path*', has, destination: 'https://cronicum.com/:path*', permanent: true },
 
+      // 301 DE MIGRACIÓN de las cronologías (distinto del canónico de arriba): las
+      // cronologías del sistema dinámico vivían en meskeia.com/visualizador-historia/[slug]
+      // y a la vez en cronicum.com/[slug] (mismo dato, misma componente). Cronicum ya está
+      // plenamente indexado (GSC 2026-07-22: cronologías "Enviada e indexada", canónica
+      // aceptada por Google); el canonical blando no bastaba para consolidar las páginas
+      // fuertes (p.ej. roma seguía coronada en meskeia pese al canonical → cronicum), así
+      // que este 301 fuerza la mudanza definitiva a cronicum.com. El query string se
+      // reenvía automáticamente, preservando la atribución ?from= a través del salto.
+      // NO captura las 3 apps custom hifenadas (/visualizador-historia-reloj|dinero|
+      // escritura/): son apps propias de meskeIA con formato distinto, no cronologías, y
+      // no existen en Cronicum — su path no casa con /visualizador-historia/:path* (barra).
+      { source: '/visualizador-historia/:path*', has, destination: 'https://cronicum.com/:path*', permanent: true },
+
       // Recuperación de 404 por apps renombradas (detectado en GSC 2026-07-18).
       // Slugs antiguos (calculadora-*/simulador-*/convertidor-*) que Google aún
       // rastrea y que conservan posición; el 301 traspasa ese ranking a la app
