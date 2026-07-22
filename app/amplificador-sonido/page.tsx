@@ -7,7 +7,7 @@ import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
 // Parámetros del amplificador
-const GAIN_MAX = 4;         // ganancia máxima (x4 sobre la señal del micrófono)
+const GAIN_MAX = 12;        // ganancia máxima (×12 sobre la señal del micrófono)
 const VOICE_FREQ = 1800;    // Hz — centro del realce de voz (banda de inteligibilidad del habla)
 const VOICE_Q = 0.9;        // anchura del filtro peaking
 const VOICE_BOOST_DB = 9;   // realce aplicado a la banda de voz cuando está activo
@@ -15,15 +15,16 @@ const VOICE_BOOST_DB = 9;   // realce aplicado a la banda de voz cuando está ac
 export default function AmplificadorSonidoPage() {
   const [isActive, setIsActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [gainPct, setGainPct] = useState(55);
+  const [gainPct, setGainPct] = useState(50);
   const [voiceBoost, setVoiceBoost] = useState(true);
-  const [noiseSuppress, setNoiseSuppress] = useState(true);
+  const [noiseSuppress, setNoiseSuppress] = useState(false);
   const [level, setLevel] = useState(0);
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const gainRef = useRef<GainNode | null>(null);
   const filterRef = useRef<BiquadFilterNode | null>(null);
+  const compressorRef = useRef<DynamicsCompressorNode | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animationRef = useRef<number | null>(null);
 
@@ -46,6 +47,7 @@ export default function AmplificadorSonidoPage() {
     }
     gainRef.current = null;
     filterRef.current = null;
+    compressorRef.current = null;
     analyserRef.current = null;
     setLevel(0);
     setIsActive(false);
@@ -78,8 +80,8 @@ export default function AmplificadorSonidoPage() {
 
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
-          echoCancellation: true,
-          noiseSuppression: noiseSuppress,
+          echoCancellation: false, // audio crudo: sin cancelación que atenúe el ambiente
+          noiseSuppression: noiseSuppress, // off por defecto: no silenciar la tele de fondo
           autoGainControl: false, // la ganancia la controla el usuario, no el navegador
         },
       });
@@ -102,15 +104,26 @@ export default function AmplificadorSonidoPage() {
       filter.gain.value = voiceBoost ? VOICE_BOOST_DB : 0;
       filterRef.current = filter;
 
+      // Compresor: levanta los sonidos flojos hasta hacerlos audibles y frena los
+      // picos fuertes (limitador), lo que además protege el oído.
+      const compressor = ctx.createDynamicsCompressor();
+      compressor.threshold.value = -45; // umbral bajo: entra en acción pronto
+      compressor.knee.value = 30;
+      compressor.ratio.value = 6;
+      compressor.attack.value = 0.003;
+      compressor.release.value = 0.25;
+      compressorRef.current = compressor;
+
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 1024;
       analyser.smoothingTimeConstant = 0.6;
       analyserRef.current = analyser;
 
-      // Cadena: micrófono → ganancia → realce de voz → medidor → auriculares
+      // Cadena: micrófono → ganancia → realce de voz → compresor → medidor → auriculares
       source.connect(gain);
       gain.connect(filter);
-      filter.connect(analyser);
+      filter.connect(compressor);
+      compressor.connect(analyser);
       analyser.connect(ctx.destination);
 
       setIsActive(true);
@@ -309,7 +322,8 @@ export default function AmplificadorSonidoPage() {
               <h4><span aria-hidden="true">🔊</span> Ganancia</h4>
               <ul>
                 <li>Sube el volumen general de todo lo que entra por el micrófono</li>
-                <li>Ajustable con el deslizador (hasta ×4)</li>
+                <li>Ajustable con el deslizador (hasta ×12)</li>
+                <li>Un compresor levanta los sonidos flojos y frena los golpes fuertes</li>
                 <li>Empieza baja y sube poco a poco</li>
               </ul>
             </div>
