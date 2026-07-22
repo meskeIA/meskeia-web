@@ -127,6 +127,18 @@ function textoSobre(r: number, g: number, b: number): string {
   return lum > 0.6 ? '#1A1A1A' : '#FFFFFF';
 }
 
+interface Calibracion { gR: number; gG: number; gB: number; }
+
+// Corrección de balance de blancos (Von Kries): aplica una ganancia por canal
+// al color medido para compensar la dominante de color de la luz ambiente.
+function aplicarGanancia(c: RGB, cal: Calibracion): RGB {
+  return {
+    r: Math.round(Math.min(255, c.r * cal.gR)),
+    g: Math.round(Math.min(255, c.g * cal.gG)),
+    b: Math.round(Math.min(255, c.b * cal.gB)),
+  };
+}
+
 type Modo = 'camara' | 'imagen';
 
 const MAX_ANCHO_IMAGEN = 900;
@@ -140,6 +152,8 @@ export default function IdentificadorColorPage() {
   const [copiado, setCopiado] = useState(false);
   const [historial, setHistorial] = useState<string[]>([]);
   const [hayImagen, setHayImagen] = useState(false);
+  const [calibracion, setCalibracion] = useState<Calibracion | null>(null);
+  const [avisoCalib, setAvisoCalib] = useState<string | null>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -234,10 +248,13 @@ export default function IdentificadorColorPage() {
     setCongelado(false);
   }, []);
 
-  // Al fijar (congelar) una lectura, se guarda en el historial
+  // Al fijar (congelar) una lectura, se guarda en el historial (ya corregida)
   useEffect(() => {
-    if (congelado && color) anadirHistorial(rgbAHex(color.r, color.g, color.b));
-  }, [congelado, color, anadirHistorial]);
+    if (congelado && color) {
+      const c = calibracion ? aplicarGanancia(color, calibracion) : color;
+      anadirHistorial(rgbAHex(c.r, c.g, c.b));
+    }
+  }, [congelado, color, calibracion, anadirHistorial]);
 
   // Limpieza al desmontar
   useEffect(() => {
@@ -253,6 +270,8 @@ export default function IdentificadorColorPage() {
     if (nuevo === 'imagen') detenerCamara();
     setModo(nuevo);
     setColor(null);
+    setCalibracion(null);
+    setAvisoCalib(null);
   }, [modo, detenerCamara]);
 
   // Modo imagen: cargar archivo
@@ -287,8 +306,9 @@ export default function IdentificadorColorPage() {
     const d = ctx.getImageData(x, y, 1, 1).data;
     const nuevo = { r: d[0], g: d[1], b: d[2] };
     setColor(nuevo);
-    anadirHistorial(rgbAHex(nuevo.r, nuevo.g, nuevo.b));
-  }, [anadirHistorial]);
+    const c = calibracion ? aplicarGanancia(nuevo, calibracion) : nuevo;
+    anadirHistorial(rgbAHex(c.r, c.g, c.b));
+  }, [anadirHistorial, calibracion]);
 
   const copiar = useCallback((texto: string) => {
     navigator.clipboard?.writeText(texto).then(() => {
@@ -297,11 +317,39 @@ export default function IdentificadorColorPage() {
     }).catch(() => { /* portapapeles no disponible */ });
   }, []);
 
-  // Datos derivados del color actual
-  const hex = color ? rgbAHex(color.r, color.g, color.b) : null;
-  const hsl = color ? rgbAHsl(color.r, color.g, color.b) : null;
-  const nombre = color ? nombreDeColor(color.r, color.g, color.b) : null;
-  const textoContraste = color ? textoSobre(color.r, color.g, color.b) : '#FFFFFF';
+  // Calibrar el balance de blancos con la lectura actual (que debe ser un blanco/gris)
+  const calibrar = useCallback(() => {
+    if (!color) return;
+    const { r, g, b } = color;
+    const media = (r + g + b) / 3;
+    if (media < 45) {
+      setAvisoCalib('Demasiado oscuro para calibrar. Apunta a un blanco bien iluminado.');
+      window.setTimeout(() => setAvisoCalib(null), 2800);
+      return;
+    }
+    // Ganancia que lleva el blanco de referencia a gris neutro, acotada para
+    // evitar correcciones extremas por una referencia poco fiable.
+    const acota = (x: number) => Math.max(0.4, Math.min(2.6, x));
+    setCalibracion({
+      gR: acota(media / (r || 1)),
+      gG: acota(media / (g || 1)),
+      gB: acota(media / (b || 1)),
+    });
+    setAvisoCalib('✓ Luz calibrada con este blanco');
+    window.setTimeout(() => setAvisoCalib(null), 2200);
+  }, [color]);
+
+  const quitarCalibracion = useCallback(() => {
+    setCalibracion(null);
+    setAvisoCalib(null);
+  }, []);
+
+  // Color mostrado = color medido con la corrección de balance de blancos aplicada
+  const colorMostrado = color ? (calibracion ? aplicarGanancia(color, calibracion) : color) : null;
+  const hex = colorMostrado ? rgbAHex(colorMostrado.r, colorMostrado.g, colorMostrado.b) : null;
+  const hsl = colorMostrado ? rgbAHsl(colorMostrado.r, colorMostrado.g, colorMostrado.b) : null;
+  const nombre = colorMostrado ? nombreDeColor(colorMostrado.r, colorMostrado.g, colorMostrado.b) : null;
+  const textoContraste = colorMostrado ? textoSobre(colorMostrado.r, colorMostrado.g, colorMostrado.b) : '#FFFFFF';
 
   return (
     <div className={styles.container}>
@@ -413,7 +461,7 @@ export default function IdentificadorColorPage() {
       )}
 
       {/* RESULTADO */}
-      {color && hex && hsl && nombre && (
+      {colorMostrado && hex && hsl && nombre && (
         <section className={styles.resultado} aria-live="polite" aria-label="Color identificado">
           <div className={styles.muestraGrande} style={{ backgroundColor: hex, color: textoContraste }}>
             <span className={styles.muestraNombre}>{nombre}</span>
@@ -425,9 +473,9 @@ export default function IdentificadorColorPage() {
               <span className={styles.codigoValor}>{hex}</span>
               <span className={styles.codigoCopiar} aria-hidden="true">📋</span>
             </button>
-            <button type="button" className={styles.codigoFila} onClick={() => copiar(`rgb(${color.r}, ${color.g}, ${color.b})`)} aria-label={`Copiar código RGB ${color.r}, ${color.g}, ${color.b}`}>
+            <button type="button" className={styles.codigoFila} onClick={() => copiar(`rgb(${colorMostrado.r}, ${colorMostrado.g}, ${colorMostrado.b})`)} aria-label={`Copiar código RGB ${colorMostrado.r}, ${colorMostrado.g}, ${colorMostrado.b}`}>
               <span className={styles.codigoEtiqueta}>RGB</span>
-              <span className={styles.codigoValor}>{color.r}, {color.g}, {color.b}</span>
+              <span className={styles.codigoValor}>{colorMostrado.r}, {colorMostrado.g}, {colorMostrado.b}</span>
               <span className={styles.codigoCopiar} aria-hidden="true">📋</span>
             </button>
             <button type="button" className={styles.codigoFila} onClick={() => copiar(`hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`)} aria-label={`Copiar código HSL ${hsl.h}, ${hsl.s}%, ${hsl.l}%`}>
@@ -436,6 +484,29 @@ export default function IdentificadorColorPage() {
               <span className={styles.codigoCopiar} aria-hidden="true">📋</span>
             </button>
           </div>
+
+          {/* CALIBRACIÓN DE BLANCO */}
+          <div className={styles.calibracion}>
+            {calibracion ? (
+              <div className={styles.calibActiva}>
+                <span className={styles.calibBadge}><span aria-hidden="true">✓</span> Luz calibrada</span>
+                <button type="button" className={styles.calibQuitar} onClick={quitarCalibracion}>
+                  Quitar calibración
+                </button>
+              </div>
+            ) : (
+              <button type="button" className={styles.calibBtn} onClick={calibrar}>
+                <span aria-hidden="true">⚪</span> Usar este blanco para calibrar la luz
+              </button>
+            )}
+            <p className={styles.calibAyuda}>
+              {calibracion
+                ? 'Se está compensando la dominante de color de la luz. Quítala si cambias de iluminación.'
+                : 'Apunta a algo blanco o gris neutro bajo la misma luz y pulsa para corregir la dominante de color.'}
+            </p>
+            <div className={styles.calibAviso} role="status" aria-live="polite">{avisoCalib ?? ' '}</div>
+          </div>
+
           <div className={styles.copiadoAviso} role="status" aria-live="polite">
             {copiado ? '✓ Copiado al portapapeles' : ' '}
           </div>
@@ -628,6 +699,10 @@ export default function IdentificadorColorPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcono} aria-hidden="true">🖼️</span>
               <p><strong>El modo foto lee un solo píxel.</strong> Si la imagen tiene ruido o compresión, toca varias veces la misma zona para confirmar el color dominante.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcono} aria-hidden="true">⚪</span>
+              <p><strong>Calibra con un blanco.</strong> Si la luz tiñe el resultado, apunta a un folio o una pared blanca bajo esa misma luz y pulsa &quot;Usar este blanco para calibrar&quot;: la app compensará la dominante de color en las siguientes lecturas.</p>
             </div>
           </div>
         </section>
