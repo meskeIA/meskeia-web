@@ -265,7 +265,7 @@ Planificación de viajes, divisas y presupuestos.
 - [Calculadora de viaje](https://meskeia.com/calculadora-viaje/): Presupuesto completo para un viaje
 - [Buscador de enchufes](https://meskeia.com/tipos-enchufes/): Tipos de enchufes y voltajes por país
 
-## Guías de decisión (12 guías)
+## Guías de decisión (14 guías)
 
 Landing pages que agrupan herramientas para procesos de decisión a corto-medio plazo con implicaciones económicas o legales en España:
 
@@ -281,6 +281,8 @@ Landing pages que agrupan herramientas para procesos de decisión a corto-medio 
 - [Guía: Gestionar una herencia](https://meskeia.com/guia/herencias/): Documentos, impuestos y plazos (sucesiones por CCAA, donaciones, plusvalía municipal)
 - [Guía: Pensar mejor](https://meskeia.com/guia/pensar-mejor/): Herramientas de reflexión para conocerse, decidir mejor y emprender con criterio
 - [Guía: Programar con IA](https://meskeia.com/guia/programar-con-ia/): Empezar a construir webs, apps o scripts con asistentes de IA paso a paso
+- [Guía: Primer empleo](https://meskeia.com/guia/primer-empleo/): Del estudio al primer trabajo (competencias digitales DigComp, currículum ATS-friendly, entrevista por competencias STAR y primer sueldo)
+- [Guía: Seguridad en internet](https://meskeia.com/guia/seguridad-internet/): Proteger cuentas y privacidad online (contraseñas fuertes, verificación en dos pasos, detectar phishing y qué hacer si te hackean)
 
 ## Guías directorio (27 guías)
 
@@ -308,15 +310,15 @@ meskeIA ofrece integración nativa con los principales asistentes de IA:
 - Uso: calculadoras de IRPF, hipotecas, herencias, autónomos, nóminas, finiquitos, inversión, jubilación, fotografía y más
 
 ### Custom GPTs en ChatGPT (12 GPTs publicados)
-Disponibles en la Store de ChatGPT (chatgpt.com/gpts), buscar "meskeIA":
-- [meskeIA — Salario e IRPF España](https://chatgpt.com/g/g-69c54d1b83e481918c466289cc586106-meskeia-salario-e-irpf-espana): sueldo neto, IRPF, segundo pagador, devolución
-- [meskeIA — Freelance España](https://chatgpt.com/g/g-69c4f49b5048819192920bd94355a2d5-meskeia-freelance-espana): tarifa hora/proyecto, modelo 130, gastos deducibles, IVA, break-even
-- [meskeIA — Emprender en España](https://chatgpt.com/g/g-69c5194e2084819194ce20df6da5b265-meskeia-emprender-en-espana): autónomo vs SL, impuesto sociedades, coste empleado, TIR/VAN
-- [meskeIA — Inversión y Ahorro España](https://chatgpt.com/g/g-69c54099dbc8819181c10c8144dac9b7-meskeia-inversion-y-ahorro-espana): interés compuesto, plusvalías IRPF, plan pensiones, dividendos
-- [meskeIA — Jubilación España](https://chatgpt.com/g/g-69c546bbabd481919d5b076d2c07bfc1-meskeia-jubilacion-espana): pensión pública, jubilación anticipada, brecha de jubilación
-- [meskeIA — Herencias y Donaciones España](https://chatgpt.com/g/g-69c3c2a0187c8191b3cf62df7098f042-meskeia-herencias-y-donaciones-espana): ISD por CCAA, legítimas, impuesto donaciones
-- [meskeIA — Hipotecas España](https://chatgpt.com/g/g-69c3cc3d85888191bf16a1443c65f99b-meskeia-hipotecas-espana): hipoteca, capacidad hipotecaria, amortización anticipada, gastos compraventa
-- [meskeIA — Inmobiliaria y Alquiler España](https://chatgpt.com/g/g-69c5590a4e488191b236b572fd5a87b0-meskeia-inmobiliaria-y-alquiler-espana): rentabilidad alquiler, plusvalía municipal, imputación rentas
+8 con marca «Delegum —» (fiscalidad, derecho laboral y finanzas de España) y 4 con marca «meskeIA —» (día a día). Disponibles en la Store de ChatGPT (chatgpt.com/gpts), buscar "Delegum" o "meskeIA":
+- [Delegum — Salario e IRPF España](https://chatgpt.com/g/g-69c54d1b83e481918c466289cc586106-meskeia-salario-e-irpf-espana): sueldo neto, IRPF, segundo pagador, devolución
+- [Delegum — Freelance España](https://chatgpt.com/g/g-69c4f49b5048819192920bd94355a2d5-meskeia-freelance-espana): tarifa hora/proyecto, modelo 130, gastos deducibles, IVA, break-even
+- [Delegum — Emprender en España](https://chatgpt.com/g/g-69c5194e2084819194ce20df6da5b265-meskeia-emprender-en-espana): autónomo vs SL, impuesto sociedades, coste empleado, TIR/VAN
+- [Delegum — Inversión y Ahorro España](https://chatgpt.com/g/g-69c54099dbc8819181c10c8144dac9b7-meskeia-inversion-y-ahorro-espana): interés compuesto, plusvalías IRPF, plan pensiones, dividendos
+- [Delegum — Jubilación España](https://chatgpt.com/g/g-69c546bbabd481919d5b076d2c07bfc1-meskeia-jubilacion-espana): pensión pública, jubilación anticipada, brecha de jubilación
+- [Delegum — Herencias y Donaciones España](https://chatgpt.com/g/g-69c3c2a0187c8191b3cf62df7098f042-meskeia-herencias-y-donaciones-espana): ISD por CCAA, legítimas, impuesto donaciones
+- [Delegum — Hipotecas España](https://chatgpt.com/g/g-69c3cc3d85888191bf16a1443c65f99b-meskeia-hipotecas-espana): hipoteca, capacidad hipotecaria, amortización anticipada, gastos compraventa
+- [Delegum — Inmobiliaria y Alquiler España](https://chatgpt.com/g/g-69c5590a4e488191b236b572fd5a87b0-meskeia-inmobiliaria-y-alquiler-espana): rentabilidad alquiler, plusvalía municipal, imputación rentas
 - [meskeIA — Coches España](https://chatgpt.com/g/g-69c65f8e11fc8191bae04f1729439950-meskeia-coches-espana): recomendador tipo vehículo, break-even eléctrico, etiqueta DGT
 - [meskeIA — Fotografía y Videografía Técnica](https://chatgpt.com/g/g-6a0c8112f5f881918722c59fb762853c-meskeia-fotografia-y-videografia-tecnica): profundidad de campo, astrofoto, regla 180, cámara lenta, filtros ND, bitrate, FOV
 - [meskeIA — Deporte y Rendimiento](https://chatgpt.com/g/g-6a0d687e916c8191864990bb83318dcc-meskeia-deporte-y-rendimiento): predicción tiempos running (Riegel), zonas cardíacas (Karvonen), 1RM gimnasio (Epley/Brzycki), potencia ciclismo (W/kg y VAM), pace running, eficiencia natación (SWOLF)
