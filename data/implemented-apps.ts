@@ -223,6 +223,7 @@ export const implementedAppsUrls = [
   "/visualizador-escalas-musicales/", // Escalas mayor, menor, pentatónica, blues y modos griegos en teclado de piano
   "/visualizador-circulo-quintas/",   // Círculo de quintas interactivo con acordes diatónicos y armaduras
   "/lupa-digital/",                // Lupa digital con zoom y filtros
+  "/identificador-color-camara/",  // Identificador de color con nombre + HEX/RGB/HSL (cámara o foto)
   "/espejo/",                      // Espejo digital con cámara frontal
 
   // Texto y Documentos (14 implementadas)
@@ -536,6 +537,7 @@ export const implementedAppsUrls = [
   "/lector-texto-voz/",                 // Lector TTS con resaltado de palabras en tiempo real
   "/tablero-comunicacion/",             // Tablero AAC con símbolos visuales y voz para personas no verbales
   "/ejercicios-vocalizacion/",          // Ejercicios de vocalización para Parkinson con medidor de voz en tiempo real
+  "/daf-retroalimentacion-auditiva/",   // DAF: retroalimentación auditiva retardada para la fluidez del habla
   "/planificador-rutinas/",             // Planificador visual de rutinas con pictogramas para autismo y TDAH
   "/generador-tarjetas-comunicacion/",  // Crea e imprime tarjetas pictográficas para AAC y comunicación aumentativa
   "/semaforo-emocional/",               // Regulación emocional visual con tres estados y estrategias adaptadas

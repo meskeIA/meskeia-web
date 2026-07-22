@@ -2950,9 +2950,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'lupa-digital': [
     { url: '/simulador-baja-vision/', icon: '👁️', name: 'Simulador de Baja Visión', description: 'Entiende por qué necesitas magnificación: cataratas, glaucoma, miopía severa' },
+    { url: '/identificador-color-camara/', icon: '🎨', name: 'Identificador de Color', description: 'Con la misma cámara: nombre y código del color al que apuntas' },
     { url: '/conversor-braille/', icon: '⠃', name: 'Traductor de Braille', description: 'Alternativa para casos donde la lupa ya no basta' },
     { url: '/adaptador-dislexia/', icon: '📖', name: 'Adaptador Dislexia', description: 'Otro apoyo de lectura: tipografías y espaciado adaptado' },
     { url: '/amplificador-sonido/', icon: '🦻', name: 'Amplificador de Sonido', description: 'La versión auditiva de una lupa: oye amplificado' },
+  ],
+  'identificador-color-camara': [
+    { url: '/lupa-digital/', icon: '🔍', name: 'Lupa Digital', description: 'La misma cámara para ampliar texto y objetos hasta 5x' },
+    { url: '/simulador-daltonismo/', icon: '🌈', name: 'Simulador de Daltonismo', description: 'Cómo se percibe una imagen con distintos tipos de daltonismo' },
+    { url: '/conversor-colores/', icon: '🎨', name: 'Conversor de Colores', description: 'Convierte el HEX que captas entre RGB, HSL, CMYK y paletas' },
+    { url: '/contraste-colores/', icon: '🌗', name: 'Contraste de Colores', description: 'Comprueba si dos colores cumplen contraste accesible WCAG' },
   ],
   'espejo': [{ url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/lupa-digital/', icon: '🔍', name: 'Lupa Digital', description: 'Amplía con la cámara' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir luz ambiente' }],
   'amplificador-sonido': [
@@ -3387,10 +3394,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/semaforo-emocional/', icon: '🚦', name: 'Semáforo Emocional', description: 'Expresa tu estado emocional visualmente' },
   ],
   'ejercicios-vocalizacion': [
+    { url: '/daf-retroalimentacion-auditiva/', icon: '🎧', name: 'DAF (Retardo Auditivo)', description: 'Otra herramienta de voz: fluidez del habla con retardo auditivo' },
     { url: '/guia-respiracion/', icon: '🫁', name: 'Guía de Respiración', description: 'Técnicas de respiración consciente' },
     { url: '/planificador-rutinas/', icon: '📅', name: 'Planificador de Rutinas', description: 'Estructura el día visualmente' },
     { url: '/tablero-comunicacion/', icon: '💬', name: 'Tablero Comunicación', description: 'Símbolos AAC con voz' },
-    { url: '/temporizador-visual/', icon: '⏱️', name: 'Temporizador Visual', description: 'Timer para los ejercicios' },
+  ],
+  'daf-retroalimentacion-auditiva': [
+    { url: '/ejercicios-vocalizacion/', icon: '🎙️', name: 'Ejercicios de Vocalización', description: 'Otra herramienta de voz: proyección y volumen con medidor en vivo' },
+    { url: '/amplificador-sonido/', icon: '🦻', name: 'Amplificador de Sonido', description: 'Micrófono y auriculares para oír mejor tu entorno' },
+    { url: '/lector-texto-voz/', icon: '🔊', name: 'Lector de Texto a Voz', description: 'Convierte texto escrito en voz para practicar la lectura' },
+    { url: '/tablero-comunicacion/', icon: '💬', name: 'Tablero Comunicación', description: 'Símbolos AAC con voz para la comunicación aumentativa' },
   ],
   'planificador-rutinas': [
     { url: '/guia/accesibilidad/', icon: '♿', name: 'Guía de Accesibilidad', description: 'Kit completo de apoyos visuales en casa' },

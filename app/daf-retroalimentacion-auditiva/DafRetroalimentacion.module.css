@@ -1,0 +1,755 @@
+/* ============================================
+   DAF - Retroalimentación Auditiva Retardada
+   meskeIA - Paleta oficial
+   ============================================ */
+
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #555555;
+  --text-muted: #888888;
+  --border: #E0E0E0;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.13);
+
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .container {
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #808080;
+  --border: #404040;
+  --shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* ============================================
+   HERO
+   ============================================ */
+.hero {
+  text-align: center;
+  margin: 80px 0 2rem;
+  padding: 2.5rem 2rem;
+  background: var(--hero-bg);
+  border-radius: var(--radius-lg);
+  color: white;
+}
+
+.title {
+  font-size: clamp(1.6rem, 4.5vw, 2.4rem);
+  font-weight: 800;
+  margin: 0 0 0.65rem;
+  line-height: 1.15;
+}
+
+.subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.15rem);
+  opacity: 0.94;
+  margin: 0;
+  line-height: 1.65;
+}
+
+.subtitle strong { color: #fff; }
+
+/* ============================================
+   AVISO DE AURICULARES
+   ============================================ */
+.avisoAuriculares {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+  background: rgba(46, 134, 171, 0.08);
+  border: 2px solid rgba(46, 134, 171, 0.3);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.avisoAuriculares strong { color: var(--text-primary); }
+
+.avisoIcono {
+  font-size: 1.8rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+[data-theme='dark'] .avisoAuriculares {
+  background: rgba(46, 134, 171, 0.14);
+  border-color: rgba(46, 134, 171, 0.35);
+}
+
+/* ============================================
+   PANEL PRINCIPAL
+   ============================================ */
+.panel {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.panelInactivo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+  text-align: center;
+}
+
+.checkAuriculares {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  cursor: pointer;
+  max-width: 520px;
+  text-align: left;
+}
+
+.checkAuriculares input {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  accent-color: var(--primary);
+  margin-top: 0.1rem;
+  cursor: pointer;
+}
+
+.errorMic {
+  background: #FEF2F2;
+  border: 2px solid #EF4444;
+  border-radius: var(--radius);
+  padding: 0.85rem 1.1rem;
+  font-size: 0.9rem;
+  color: #991B1B;
+  text-align: left;
+  max-width: 520px;
+  width: 100%;
+}
+
+[data-theme='dark'] .errorMic {
+  background: rgba(239, 68, 68, 0.12);
+  color: #FCA5A5;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.btnActivar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 60px;
+  min-width: 210px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  padding: 0 2rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.4);
+}
+
+.btnActivar:hover:not(:disabled) {
+  background: #256a8a;
+  transform: translateY(-2px);
+}
+
+.btnActivar:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btnActivar:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+
+.panelAyuda {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 480px;
+}
+
+.panelAyuda strong { color: var(--text-secondary); }
+
+/* Panel activo */
+.panelActivo {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.medidorWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.medidorLabel {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.medidorBarra {
+  position: relative;
+  height: 34px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.medidorRelleno {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  transition: width 0.08s linear;
+  min-width: 3px;
+}
+
+.medidorEstado {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.vozOk { color: #16A34A; }
+.vozBaja { color: var(--text-muted); }
+
+.btnDetener {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 52px;
+  min-width: 180px;
+  font-size: 1rem;
+  font-weight: 700;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  padding: 0 1.5rem;
+  transition: all 0.18s ease;
+}
+
+.btnDetener:hover {
+  border-color: #EF4444;
+  color: #EF4444;
+}
+
+.btnDetener:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   CONTROL DE RETARDO
+   ============================================ */
+.controlRetardo {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.controlLabel {
+  display: block;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.controlLabel strong {
+  color: var(--primary);
+  font-size: 1.15rem;
+}
+
+.slider {
+  width: 100%;
+  height: 8px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--border);
+  border-radius: 999px;
+  outline: none;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+.slider:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 4px;
+}
+
+.sliderEscala {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.sliderEscala span:nth-child(2) {
+  text-align: center;
+  font-style: italic;
+}
+
+/* ============================================
+   ENMASCARAMIENTO
+   ============================================ */
+.toggleEnmasc {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  cursor: pointer;
+}
+
+.toggleEnmasc input {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  accent-color: var(--secondary);
+  margin-top: 0.1rem;
+  cursor: pointer;
+}
+
+.toggleEnmasc strong { color: var(--text-primary); }
+
+/* ============================================
+   TEXTOS DE PRÁCTICA
+   ============================================ */
+.textosSeccion {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.textosTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 1rem;
+}
+
+.textoCard {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.06) 0%, rgba(72, 169, 166, 0.06) 100%);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem 1.5rem;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+[data-theme='dark'] .textoCard {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.12) 0%, rgba(72, 169, 166, 0.12) 100%);
+}
+
+.textoContenido {
+  font-size: clamp(1.15rem, 3vw, 1.4rem);
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.7;
+  margin: 0 0 0.75rem;
+}
+
+.textoEtiqueta {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.textosNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.textoCounter {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.btnNavTexto {
+  padding: 0.6rem 1.2rem;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  min-height: 46px;
+}
+
+.btnNavTexto:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btnNavTexto:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   CONTENIDO EDUCATIVO
+   ============================================ */
+.guiaSeccion h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 1.4rem 0 0.5rem;
+}
+
+.guiaSeccion h2:first-child { margin-top: 0; }
+
+.guiaSeccion p {
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+}
+
+.guiaSeccion ul {
+  padding-left: 1.25rem;
+  margin: 0 0 0.75rem;
+}
+
+.guiaSeccion li {
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+  margin-bottom: 0.45rem;
+}
+
+.guiaSeccion strong { color: var(--text-primary); }
+
+/* ============================================
+   PROFESIONALIZACIÓN - TABLA COMPARATIVA
+   ============================================ */
+.tableWrapper {
+  overflow-x: auto;
+  margin: 1rem 0;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.comparativaTable th {
+  background: rgba(46, 134, 171, 0.1);
+  color: var(--primary);
+  font-weight: 700;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 2px solid rgba(46, 134, 171, 0.2);
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+.comparativaTable tr:last-child td { border-bottom: none; }
+
+.comparativaTable tr:hover td { background: rgba(46, 134, 171, 0.04); }
+
+.celdaDestacada {
+  color: var(--primary) !important;
+  font-weight: 700;
+}
+
+[data-theme='dark'] .comparativaTable th { background: rgba(46, 134, 171, 0.15); }
+[data-theme='dark'] .comparativaTable tr:hover td { background: rgba(46, 134, 171, 0.08); }
+
+/* ============================================
+   PROFESIONALIZACIÓN - CASOS DE USO
+   ============================================ */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+}
+
+.escenarioCard h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0.4rem 0 0.5rem;
+}
+
+.escenarioCard p {
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.escenarioIcono {
+  font-size: 2rem;
+  display: block;
+}
+
+/* ============================================
+   PROFESIONALIZACIÓN - FAQ
+   ============================================ */
+.faqList { margin: 0.5rem 0 0; }
+
+.faqItem {
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 0;
+}
+
+.faqItem:last-child { border-bottom: none; }
+
+.faqItem dt {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+}
+
+.faqItem dd {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ============================================
+   PROFESIONALIZACIÓN - GUÍA PASO A PASO
+   ============================================ */
+.stepGuide {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.9rem;
+  margin-top: 0.1rem;
+}
+
+.step > div { flex: 1; }
+
+.step > div strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.step > div p {
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ============================================
+   PROFESIONALIZACIÓN - MEJORES PRÁCTICAS
+   ============================================ */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.tipCard {
+  background: rgba(72, 169, 166, 0.06);
+  border: 1px solid rgba(72, 169, 166, 0.2);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tipIcono {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.tipCard p {
+  font-size: 0.88rem !important;
+  line-height: 1.65 !important;
+  color: var(--text-secondary) !important;
+  margin: 0 !important;
+}
+
+[data-theme='dark'] .tipCard {
+  background: rgba(72, 169, 166, 0.08);
+  border-color: rgba(72, 169, 166, 0.15);
+}
+
+/* ============================================
+   PROFESIONALIZACIÓN - WARNING BOX
+   ============================================ */
+.warningBox {
+  background: #FFF8E7;
+  border: 2px solid #F59E0B;
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+}
+
+.warningBox h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #92400E;
+  margin: 0 0 0.85rem;
+}
+
+.warningBox ul {
+  padding-left: 1.25rem;
+  margin: 0;
+}
+
+.warningBox li {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: #78350F;
+  margin-bottom: 0.5rem;
+}
+
+.warningBox li:last-child { margin-bottom: 0; }
+
+.warningBox strong { color: #92400E; }
+
+[data-theme='dark'] .warningBox {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+[data-theme='dark'] .warningBox h3 { color: #FCD34D; }
+[data-theme='dark'] .warningBox li { color: #FDE68A; }
+[data-theme='dark'] .warningBox strong { color: #FCD34D; }
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 700px) {
+  .hero {
+    margin-top: 70px;
+    padding: 1.75rem 1.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .escenariosGrid,
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   ANIMACIONES RESPETUOSAS
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  :global(*),
+  :global(*::before),
+  :global(*::after) {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
