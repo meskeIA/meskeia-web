@@ -197,3 +197,14 @@ for (const p of PUERTAS) {
 export function getPuertaDeApp(slug: string): Puerta | null {
   return PUERTA_POR_APP.get(`/${slug}/`) ?? null;
 }
+
+/**
+ * Slugs (sin barras) de todas las apps del universo Delegum, derivados de la
+ * lista curada de Soluciones. Es la definición canónica de "apps asimiladas al
+ * dominio Delegum" — equivalente a STEMUM_APP_SLUGS / COQUINUM_APP_SLUGS para sus
+ * portales. Lo consume el desglose por vertical del dashboard-analytics
+ * (getPorDominio), más preciso que clasificar por la suite 'legal-fiscal'.
+ */
+export const DELEGUM_APP_SLUGS = new Set(
+  PUERTAS.flatMap((p) => p.apps.map((a) => a.url.replace(/^\/+|\/+$/g, ''))),
+);

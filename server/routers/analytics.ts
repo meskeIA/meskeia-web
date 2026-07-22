@@ -17,21 +17,16 @@ import {
   FECHA_EXPR,
   type GlobalAcc,
 } from '@/lib/analytics-rollup';
-import { applicationsDatabase } from '@/data/applications';
 import { STEMUM_APP_SLUGS } from '@/data/stemum';
 import { COQUINUM_APP_SLUGS } from '@/data/coquinum';
+import { DELEGUM_APP_SLUGS } from '@/data/delegum/soluciones';
 
 // ── Adjudicación app → vertical temático (para la subdivisión de meskeia.com en
-// getPorDominio). Cada app cae en UN solo cubo, por prioridad: las listas curadas
-// de los portales con dominio propio ganan a la clasificación por suite de Delegum
-// (que no trasladó sus apps y se identifica por la suite 'legal-fiscal'). El slug
-// de app = url sin barras ('/conversor-cnae-iae/' → 'conversor-cnae-iae'). ──
-const DELEGUM_APP_SLUGS = new Set(
-  applicationsDatabase
-    .filter((a) => a.suites.includes('legal-fiscal'))
-    .map((a) => a.url.replace(/^\/+|\/+$/g, '')),
-);
-
+// getPorDominio). Cada app cae en UN solo cubo, por prioridad. Los cuatro
+// verticales usan su LISTA CURADA propia (el conjunto de apps que cada portal
+// reclama como suyas): Cronicum por el prefijo de ruta de las cronologías;
+// Stemum/Coquinum por sus sets de portal; Delegum por la lista de su página de
+// Soluciones (data/delegum/soluciones.ts). ──
 function verticalDe(app: string): 'cronicum' | 'stemum' | 'coquinum' | 'delegum' | 'resto' {
   if (app.startsWith('visualizador-historia-')) return 'cronicum';
   if (STEMUM_APP_SLUGS.has(app)) return 'stemum';

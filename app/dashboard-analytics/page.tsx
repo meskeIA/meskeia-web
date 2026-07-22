@@ -1720,8 +1720,8 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                     </div>
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '0.75rem' }}>
                       Adjudicación (1 app = 1 vertical): Cronicum = cronologías; Stemum/Coquinum = apps de su
-                      portal; Delegum = apps de suite fiscal (aprox., sus herramientas no se trasladaron a
-                      delegum.com). El TOTAL cuadra con la fila meskeIA de arriba.
+                      portal; Delegum = apps de su página de Soluciones. El TOTAL cuadra con la fila meskeIA
+                      de arriba.
                     </p>
                   </div>
                 )}
