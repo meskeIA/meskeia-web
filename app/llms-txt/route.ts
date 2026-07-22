@@ -2,15 +2,17 @@ import { applicationsDatabase } from '@/data/applications';
 import { STEMUM_TOTAL_APPS } from '@/data/stemum';
 import { COQUINUM_TOTAL_APPS } from '@/data/coquinum';
 import { CRONICUM_TOTAL_CRONOLOGIAS } from '@/data/cronicum/puertas';
+import { guidesJourney } from '@/data/guides-journey';
 
 // llms.txt de meskeIA (meskeia.com/llms.txt).
 //
 // Mapa curado del catálogo para LLMs (ChatGPT, Perplexity, Claude, Gemini…).
 // El proxy reescribe meskeia.com/llms.txt → /llms-txt (un .txt estático en
 // public/ no podía auto-refrescar las cifras y caducaba: ahora el total de apps,
-// los counts por suite, la fecha y los contadores de los verticales se calculan
-// en build desde los datos. Las cifras de MCP (185 tools) y GPTs (12) siguen
-// siendo manuales: no se derivan del catálogo de apps.
+// los counts por suite, la fecha, los contadores de los verticales y la sección
+// de guías-journey (cuenta + lista) se calculan en build desde los datos. Las
+// cifras de MCP (185 tools) y GPTs (12) siguen siendo manuales: no se derivan
+// del catálogo de apps (revisadas en la auditoría mensual /audit-meskeia).
 export const dynamic = 'force-static';
 
 // Total de apps = mismo origen que ai-index.json (applicationsDatabase.length),
@@ -26,6 +28,14 @@ for (const app of applicationsDatabase) {
   for (const s of app.suites ?? []) suiteCount[s] = (suiteCount[s] ?? 0) + 1;
 }
 const n = (id: string): number => suiteCount[id] ?? 0;
+
+// Guías-journey: cuenta y lista se generan desde el registro (data/guides-journey.ts)
+// para que no se queden atrás al añadir guías nuevas — mismo criterio que las suites.
+const guiasJourney = guidesJourney.filter((g) => g.available);
+const GUIAS_JOURNEY_COUNT = guiasJourney.length;
+const GUIAS_JOURNEY_LISTA = guiasJourney
+  .map((g) => `- [${g.name}](https://meskeia.com${g.url}): ${g.description}`)
+  .join('\n');
 
 const BODY = `# meskeIA
 
@@ -265,24 +275,11 @@ Planificación de viajes, divisas y presupuestos.
 - [Calculadora de viaje](https://meskeia.com/calculadora-viaje/): Presupuesto completo para un viaje
 - [Buscador de enchufes](https://meskeia.com/tipos-enchufes/): Tipos de enchufes y voltajes por país
 
-## Guías de decisión (14 guías)
+## Guías de decisión (${GUIAS_JOURNEY_COUNT} guías)
 
 Landing pages que agrupan herramientas para procesos de decisión a corto-medio plazo con implicaciones económicas o legales en España:
 
-- [Guía: Comprar casa](https://meskeia.com/guia/comprar-casa/): Proceso completo de compra de vivienda (hipoteca, gastos, ITP, reforma)
-- [Guía: Invertir](https://meskeia.com/guia/invertir/): Primeros pasos en inversión (interés compuesto, perfil de riesgo, cartera, plusvalías)
-- [Guía: Jubilación](https://meskeia.com/guia/jubilacion/): Pensión pública, brecha de ingresos, ahorro complementario, plan de pensiones e IRPF como pensionista
-- [Guía: Freelance](https://meskeia.com/guia/freelance/): Todo para darte de alta como autónomo (cuota RETA, tarifa, modelo 130)
-- [Guía: Ahorrar dinero](https://meskeia.com/guia/ahorrar-dinero/): Estrategias de ahorro y control de gastos (regla 50/30/20, fondo de emergencia)
-- [Guía: Montar negocio](https://meskeia.com/guia/montar-negocio/): Emprender en España (forma jurídica, costes, impuestos)
-- [Guía: Comprar coche](https://meskeia.com/guia/comprar-coche/): Decisión de compra: contado, financiación o renting; consumo y seguro
-- [Guía: Vivir sano](https://meskeia.com/guia/vivir-sano/): Herramientas de salud y bienestar integradas (IMC, macros, sueño, hábitos)
-- [Guía: Accesibilidad](https://meskeia.com/guia/accesibilidad/): Herramientas para neurodivergencia y discapacidad
-- [Guía: Gestionar una herencia](https://meskeia.com/guia/herencias/): Documentos, impuestos y plazos (sucesiones por CCAA, donaciones, plusvalía municipal)
-- [Guía: Pensar mejor](https://meskeia.com/guia/pensar-mejor/): Herramientas de reflexión para conocerse, decidir mejor y emprender con criterio
-- [Guía: Programar con IA](https://meskeia.com/guia/programar-con-ia/): Empezar a construir webs, apps o scripts con asistentes de IA paso a paso
-- [Guía: Primer empleo](https://meskeia.com/guia/primer-empleo/): Del estudio al primer trabajo (competencias digitales DigComp, currículum ATS-friendly, entrevista por competencias STAR y primer sueldo)
-- [Guía: Seguridad en internet](https://meskeia.com/guia/seguridad-internet/): Proteger cuentas y privacidad online (contraseñas fuertes, verificación en dos pasos, detectar phishing y qué hacer si te hackean)
+${GUIAS_JOURNEY_LISTA}
 
 ## Guías directorio (27 guías)
 
@@ -303,11 +300,11 @@ meskeIA concentra sus clústers temáticos en portales de marca propia, cada uno
 
 meskeIA ofrece integración nativa con los principales asistentes de IA:
 
-### Servidor MCP (Model Context Protocol)
-- URL: https://meskeia.com/api/mcp
-- 185 herramientas de cálculo disponibles: 163 fiscal/financieras + 8 cocina técnica + 6 deporte + 5 videografía + 3 fotografía
-- Compatible con Claude Desktop, Perplexity Pro y cualquier cliente MCP
-- Uso: calculadoras de IRPF, hipotecas, herencias, autónomos, nóminas, finiquitos, inversión, jubilación, fotografía y más
+### Servidores MCP (Model Context Protocol)
+meskeIA expone dos servidores MCP, uno por dominio de uso:
+- **https://meskeia.com/api/mcp** — 42 herramientas del día a día: cocina y repostería, deporte y entrenamiento, salud y nutrición, fotografía y vídeo, mascotas, vehículos y utilidades (unidades, porcentajes, fechas, estadística). Sin fiscalidad.
+- **https://delegum.com/api/mcp/** — 48 herramientas de fiscalidad, derecho laboral y finanzas de España: IRPF, IVA, hipotecas, herencias, autónomos, nóminas, finiquitos, inversión y jubilación (ver sección Delegum más abajo).
+- Compatibles con Claude Desktop, Mistral, el conector MCP de ChatGPT y cualquier cliente MCP estándar.
 
 ### Custom GPTs en ChatGPT (12 GPTs publicados)
 8 con marca «Delegum —» (fiscalidad, derecho laboral y finanzas de España) y 4 con marca «meskeIA —» (día a día). Disponibles en la Store de ChatGPT (chatgpt.com/gpts), buscar "Delegum" o "meskeIA":
