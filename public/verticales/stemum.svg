@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="32" height="32" role="img" aria-label="Stemum">
+  <defs>
+    <linearGradient id="stemum-fav-stroke" x1="14" y1="30" x2="82" y2="70" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"></stop>
+      <stop offset="1" stop-color="#E9D5FF"></stop>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="96" height="96" rx="18" fill="#6B21A8"></rect>
+  <path fill="none" stroke="url(#stemum-fav-stroke)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" d="M 13 56 L 14 57.61 L 15 59.19 L 16 60.72 L 17 62.15 L 18 63.48 L 19 64.67 L 20 65.71 L 21 66.57 L 22 67.23 L 23 67.7 L 24 67.95 L 25 67.99 L 26 67.81 L 27 67.41 L 28 66.81 L 29 66.01 L 30 65.04 L 31 63.9 L 32 62.61 L 33 61.21 L 34 59.71 L 35 58.14 L 36 56.54 L 37 54.92 L 38 53.33 L 39 51.78 L 40 50.31 L 41 48.95 L 42 47.71 L 43 46.62 L 44 45.7 L 45 44.97 L 46 44.43 L 47 44.11 L 48 44 L 49 44.11 L 50 44.43 L 51 44.97 L 52 45.7 L 53 46.62 L 54 47.71 L 55 48.95 L 56 50.31 L 57 51.78 L 58 53.33 L 59 54.92 L 60 56.54 L 61 58.14 L 62 59.71 L 63 61.21 L 64 62.61 L 65 63.9 L 66 65.04 L 67 66.01 L 68 66.81 L 69 67.41 L 70 67.81 L 71 67.99 L 72 67.95 L 73 67.7 L 74 67.23 L 75 66.57 L 76 65.71 L 77 64.67 L 78 63.48 L 79 62.15 L 80 60.72 L 81 59.19 L 82 57.61 L 83 56"></path>
+  <circle cx="48" cy="33" r="6.4" fill="#ffffff"></circle>
+</svg>

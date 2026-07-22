@@ -5,9 +5,15 @@
  * Pensada para reutilizarse también en el footer global (opción B) sin duplicar:
  * añadir un 5º vertical = una entrada aquí + su paleta en el .module.css.
  *
- * El favicon es local (public/<id>/favicon.svg): nítido y sin peticiones
+ * El favicon es local (public/verticales/<id>.svg): nítido y sin peticiones
  * cross-domain. `?from=meskeia` permite atribuir en el portal destino el tráfico
  * que llega desde la marca madre.
+ *
+ * ⚠️ Los iconos viven en public/verticales/ y NO en public/<id>/favicon.svg a
+ * propósito: en meskeia.com los prefijos /delegum/* y /cronicum/* se redirigen
+ * (301) a sus dominios canónicos (next.config.ts → redirects()), así que
+ * <img src="/cronicum/favicon.svg"> saltaba fuera del sitio y devolvía 404.
+ * Sirviéndolos desde /verticales/* las cards quedan inmunes a esos redirects.
  */
 export interface VerticalPortal {
   /** id = clave de paleta en el CSS module y carpeta del favicon en public/. */
@@ -30,7 +36,7 @@ export const VERTICALES: VerticalPortal[] = [
     descripcion: 'Fiscal, laboral y financiero de España',
     tema: 'Fiscalidad',
     url: 'https://delegum.com/?from=meskeia',
-    favicon: '/delegum/favicon.svg',
+    favicon: '/verticales/delegum.svg',
   },
   {
     id: 'cronicum',
@@ -38,7 +44,7 @@ export const VERTICALES: VerticalPortal[] = [
     descripcion: 'La historia de la humanidad, contada de forma interactiva',
     tema: 'Historia',
     url: 'https://cronicum.com/?from=meskeia',
-    favicon: '/cronicum/favicon.svg',
+    favicon: '/verticales/cronicum.svg',
   },
   {
     id: 'stemum',
@@ -46,7 +52,7 @@ export const VERTICALES: VerticalPortal[] = [
     descripcion: 'Ciencia y tecnología para entender visualizando',
     tema: 'Ciencia',
     url: 'https://stemum.com/?from=meskeia',
-    favicon: '/stemum/favicon.svg',
+    favicon: '/verticales/stemum.svg',
   },
   {
     id: 'coquinum',
@@ -54,6 +60,6 @@ export const VERTICALES: VerticalPortal[] = [
     descripcion: 'Cocina y gastronomía con precisión',
     tema: 'Gastronomía',
     url: 'https://coquinum.com/?from=meskeia',
-    favicon: '/coquinum/favicon.svg',
+    favicon: '/verticales/coquinum.svg',
   },
 ];
