@@ -871,9 +871,14 @@ export const analyticsRouter = router({
       // en webviews in-app (app de Google, ChatGPT, redes) ni a las aperturas en pestaña nueva.
       let clicsInternos = 0;
       const clicsPorCategoria: Record<string, number> = {};
+      // Portales verticales que emiten `?from=<portal>` al enlazar de vuelta a meskeIA.
+      const PORTALES_VERTICALES = ['delegum', 'cronicum', 'stemum', 'coquinum'];
       const categoriaDe = (from: string): string => {
         if (from.startsWith('related-')) return 'related';
         if (['home-daily', 'sidebar-recent', 'catalog', 'catalog-guides', 'search'].includes(from)) return from;
+        // Saltos cross-dominio (antes caían todos en "otro"):
+        if (from === 'meskeia') return 'a-vertical';                        // meskeIA → portal vertical
+        if (PORTALES_VERTICALES.includes(from)) return 'portal-a-meskeia';  // portal vertical → meskeIA
         return 'otro';
       };
 

@@ -1813,6 +1813,8 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>
                   De dónde salió cada clic que llevó a una segunda app: <code>related</code> (RelatedApps),
                   <code>sidebar-recent</code>, <code>home-daily</code>, <code>catalog</code>, <code>search</code>.
+                  Y los saltos cross-dominio: <code>meskeIA → vertical</code> (marca madre empujando a los portales)
+                  y <code>portal → meskeIA</code>. El cajón <code>otro</code> queda ya como residual (bots / <code>from=</code> espurios).
                 </p>
                 <div className={styles.tableContainer}>
                   <table className={styles.table}>
@@ -1829,9 +1831,14 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                         .map(([origen, clics]) => {
                           const tot = navegacionQuery.data!.descubrimientoInterno.total;
                           const pct = tot > 0 ? (clics / tot) * 100 : 0;
+                          const ETIQUETAS_ORIGEN: Record<string, string> = {
+                            'a-vertical': 'meskeIA → vertical',
+                            'portal-a-meskeia': 'portal → meskeIA',
+                          };
+                          const etiqueta = ETIQUETAS_ORIGEN[origen] || origen;
                           return (
                             <tr key={origen}>
-                              <td><code>{origen}</code></td>
+                              <td><code>{etiqueta}</code></td>
                               <td style={{ textAlign: 'right' }}><strong>{clics}</strong></td>
                               <td style={{ textAlign: 'right' }}>{pct.toFixed(1)}%</td>
                             </tr>
