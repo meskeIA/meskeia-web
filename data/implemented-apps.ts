@@ -148,6 +148,8 @@ export const implementedAppsUrls = [
   "/conversor-tallas/",
   "/calculadora-gasto-energetico/",
   "/calculadora-pintura/",           // Calcular litros de pintura
+  "/elegir-pintura-paredes/",        // Orientador: qué pintura, imprimación y rodillo por superficie
+  "/elegir-barniz-madera/",          // Orientador: barniz, lasur, aceite o esmalte para madera
   "/calculadora-combustible/",       // Consumo L/100km y coste viajes
   "/calculadora-edad-mascotas/",     // Edad perros/gatos en años humanos
   "/planificador-boda/",             // Wedding planner: checklist, presupuesto, timeline

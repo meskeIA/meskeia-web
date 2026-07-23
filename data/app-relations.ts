@@ -483,6 +483,8 @@ const cocinaApps: RelatedApp[] = [
 
 const hogarApps: RelatedApp[] = [
   { url: '/calculadora-pintura/', icon: '🎨', name: 'Calculadora Pintura', description: 'Litros necesarios' },
+  { url: '/elegir-pintura-paredes/', icon: '🖌️', name: 'Qué Pintura Elegir', description: 'Tipo, imprimación y rodillo por superficie' },
+  { url: '/elegir-barniz-madera/', icon: '🪵', name: 'Barniz o Pintura para Madera', description: 'Barniz, lasur, aceite o esmalte' },
   { url: '/calculadora-gasto-energetico/', icon: '⚡', name: 'Gasto Energético', description: 'Consumo eléctrico' },
   { url: '/calculadora-huella-carbono/', icon: '🌍', name: 'Huella de Carbono', description: 'Tu impacto ambiental' },
   { url: '/planificador-mudanzas/', icon: '📦', name: 'Planificador Mudanzas', description: 'Organiza tu mudanza' },
@@ -509,6 +511,8 @@ const sostenibilidadApps: RelatedApp[] = [
 // ==========================================
 const bricolajeApps: RelatedApp[] = [
   { url: '/calculadora-materiales-construccion/', icon: '🧱', name: 'Materiales de Construcción', description: 'Azulejos, pintura, tarima y mortero' },
+  { url: '/elegir-pintura-paredes/', icon: '🖌️', name: 'Qué Pintura Elegir', description: 'Tipo, imprimación y rodillo por superficie' },
+  { url: '/elegir-barniz-madera/', icon: '🪵', name: 'Barniz o Pintura para Madera', description: 'Barniz, lasur, aceite o esmalte' },
   { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
   { url: '/calculadora-pintura/', icon: '🎨', name: 'Calculadora Pintura', description: 'Litros necesarios para pintar' },
   { url: '/estimador-reformas-hogar/', icon: '🏗️', name: 'Estimador Reformas', description: 'Presupuesto por tipo de reforma' },
@@ -2797,6 +2801,18 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-piscinas/', icon: '🏊', name: 'Calculadora Piscinas', description: 'Dosis de cloro, pH y mantenimiento del agua' },
   ],
   'calculadora-pintura': hogarApps.filter(a => a.url !== '/calculadora-pintura/'),
+  'elegir-pintura-paredes': [
+    { url: '/calculadora-pintura/', icon: '🎨', name: 'Calculadora Pintura', description: 'Cuántos litros necesitas por m²' },
+    { url: '/elegir-barniz-madera/', icon: '🪵', name: 'Barniz o Pintura para Madera', description: 'Puertas, muebles, vallas y parquet' },
+    { url: '/calculadora-materiales-construccion/', icon: '🧱', name: 'Materiales de Construcción', description: 'Azulejos, pintura, tarima y mortero' },
+    { url: '/estimador-reformas-hogar/', icon: '🏗️', name: 'Estimador Reformas', description: 'Presupuesto por tipo de reforma' },
+  ],
+  'elegir-barniz-madera': [
+    { url: '/elegir-pintura-paredes/', icon: '🖌️', name: 'Qué Pintura Elegir', description: 'Paredes, techos, cocina, baño y fachada' },
+    { url: '/calculadora-pintura/', icon: '🎨', name: 'Calculadora Pintura', description: 'Cuántos litros necesitas por m²' },
+    { url: '/estimador-reformas-hogar/', icon: '🏗️', name: 'Estimador Reformas', description: 'Presupuesto por tipo de reforma' },
+    { url: '/calculadora-materiales-construccion/', icon: '🧱', name: 'Materiales de Construcción', description: 'Azulejos, tarima y mortero' },
+  ],
   'calculadora-gasto-energetico': hogarApps.filter(a => a.url !== '/calculadora-gasto-energetico/'),
   'calculadora-huella-carbono': hogarApps.filter(a => a.url !== '/calculadora-huella-carbono/'),
   'planificador-boda': [...hogarApps.filter(a => a.url !== '/planificador-boda/'), ...productividadApps.slice(0, 1)],
