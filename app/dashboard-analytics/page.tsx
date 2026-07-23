@@ -1735,17 +1735,18 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
       {tabActiva === 'navegacion' && (
         <div className={styles.tabContent}>
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}><span aria-hidden="true">🧭</span> Navegación entre apps</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">🧭</span> Motor de descubrimiento interno</h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem' }}>
-              Análisis del recorrido de los usuarios por sesión. Ventana: últimos {navegacionQuery.data?.ventanaDias ?? 14} días.
-              Excluye bots, MCP y Mi IP.
+              Lo que esta página mide y ninguna otra: los clics <code>?from=</code> de navegación entre apps
+              (descubrimiento interno) y los saltos cross-dominio meskeIA ↔ verticales. Es la <strong>única palanca de
+              crecimiento endógena</strong> — la que sí controlas, frente a Google/Bing/IA que son exógenos.
+              Ventana: últimos {navegacionQuery.data?.ventanaDias ?? 14} días. Excluye bots, MCP y Mi IP.
             </p>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '1.5rem', background: 'var(--bg-primary)', borderLeft: '3px solid var(--primary)', padding: '0.75rem 1rem', borderRadius: '0 6px 6px 0' }}>
-              <strong>KPI principal: Descubrimiento interno (<code>?from=</code>).</strong> Cuenta cada clic real de navegación
-              entre apps. Es la métrica honesta porque <em>apps/sesión</em> y <em>single-app</em> <strong>infravaloran</strong> el
-              descubrimiento: el <code>sesion_id</code> no sobrevive a los saltos en webviews in-app (app de Google, ChatGPT,
-              redes) ni a las aperturas en pestaña nueva, así que muchos viajes de 2 apps se registran como 2 sesiones single-app
-              distintas. Un mismo clic de RelatedApps puede aparecer en <code>?from=</code> y no verse en apps/sesión.
+              <strong>Por qué el clic <code>?from=</code> y no «apps por sesión».</strong> El <code>sesion_id</code> no
+              sobrevive a los saltos en webviews in-app (app de Google, ChatGPT, redes) ni a las aperturas en pestaña nueva,
+              así que las métricas de sesión <strong>infravaloran</strong> el descubrimiento. El clic <code>?from=</code> lo
+              cuenta directo, sobreviva o no la sesión. Se lee en <strong>absoluto y tendencia, sin suelos</strong>.
             </p>
 
             {navegacionQuery.isLoading && <p>⏳ Cargando análisis de navegación…</p>}
@@ -1776,7 +1777,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                         ))}
                       </div>
                       <small style={{ opacity: 0.9 }}>
-                        {Math.round((navegacionQuery.data.descubrimientoInterno.porCategoria['related'] || 0) / Math.max(1, navegacionQuery.data.descubrimientoInterno.total) * 100)}% del descubrimiento viene de RelatedApps · ventana de referencia: 14 días
+                        Tasa = clics de descubrimiento ÷ visitas de la ventana. Se lee la <strong>dirección</strong> (14 días = referencia), sin suelos ni alarmas.
                       </small>
                     </div>
                   </div>
@@ -1785,22 +1786,23 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                   <div className={styles.statCard}>
                     <div style={{ width: '100%' }}>
                       <div style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em', color: 'var(--text-muted)', marginBottom: '10px' }}>
-                        Contexto de la ventana (14 días)
+                        Composición del descubrimiento (14 días)
                       </div>
                       {[
-                        { label: 'Sesiones únicas', value: navegacionQuery.data.kpis.totalSesiones.toLocaleString('es-ES') },
-                        { label: 'Visitas totales', value: navegacionQuery.data.kpis.totalVisitas.toLocaleString('es-ES') },
-                        { label: 'Apps por sesión ⚠️', value: navegacionQuery.data.kpis.appsPorSesionMedio },
-                        { label: 'Sesiones single-app ⚠️', value: `${navegacionQuery.data.kpis.pctSingleApp}%` },
+                        { label: 'Visitas de la ventana', value: navegacionQuery.data.kpis.totalVisitas.toLocaleString('es-ES'), sub: 'denominador' },
+                        { label: 'Clics de descubrimiento', value: navegacionQuery.data.descubrimientoInterno.total.toLocaleString('es-ES'), sub: `${navegacionQuery.data.descubrimientoInterno.pctDeVisitas}% de las visitas` },
+                        { label: '— vía RelatedApps', value: (navegacionQuery.data.descubrimientoInterno.porCategoria['related'] || 0).toLocaleString('es-ES'), sub: 'palanca que curas a mano' },
+                        { label: '— meskeIA → verticales', value: (navegacionQuery.data.descubrimientoInterno.porCategoria['a-vertical'] || 0).toLocaleString('es-ES'), sub: 'marca madre empujando' },
+                        { label: '— verticales → meskeIA', value: (navegacionQuery.data.descubrimientoInterno.porCategoria['portal-a-meskeia'] || 0).toLocaleString('es-ES'), sub: 'retorno de los portales' },
                       ].map((row) => (
                         <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
-                          <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{row.label}</span>
+                          <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{row.label}<span style={{ display: 'block', fontSize: '0.72rem', color: 'var(--text-muted)' }}>{row.sub}</span></span>
                           <strong style={{ fontSize: '1.15rem', color: 'var(--text-primary)' }}>{row.value}</strong>
                         </div>
                       ))}
                       <small style={{ display: 'block', marginTop: '10px', color: 'var(--text-muted)', lineHeight: 1.4 }}>
-                        ⚠️ apps/sesión y single-app <strong>infravaloran</strong>: la sesión se fragmenta en webviews (ver KPI de la izquierda).
-                        Home: {navegacionQuery.data.kpis.pctOrigenHome}% origen · {navegacionQuery.data.kpis.pctConHome}% paso.
+                        Todo en <strong>absoluto</strong>. El cross-dominio (meskeIA ↔ verticales) no aparece en ninguna otra pestaña:
+                        es el termómetro de si la marca madre alimenta a los portales por dentro.
                       </small>
                     </div>
                   </div>
@@ -1848,116 +1850,81 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                   </table>
                 </div>
 
-                {/* Distribución longitud de sesión */}
-                <h3 style={{ marginTop: '2rem', fontSize: '1.05rem' }}>
-                  Distribución de longitud de sesión
-                </h3>
-                <div className={styles.tableContainer}>
-                  <table className={styles.table}>
-                    <thead>
-                      <tr>
-                        <th>Apps únicas en la sesión</th>
-                        <th style={{ textAlign: 'right' }}>Sesiones</th>
-                        <th style={{ textAlign: 'right' }}>%</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {(['1', '2', '3', '4-5', '6+'] as const).map((bucket) => {
-                        const c = navegacionQuery.data!.distribucionLongitud[bucket] || 0;
-                        const total = navegacionQuery.data!.kpis.totalSesiones;
-                        const pct = total > 0 ? (c / total) * 100 : 0;
-                        return (
-                          <tr key={bucket}>
-                            <td><strong>{bucket}</strong></td>
-                            <td style={{ textAlign: 'right' }}>{c}</td>
-                            <td style={{ textAlign: 'right' }}>{pct.toFixed(1)}%</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+                {/* Detalle forense (plegado): material de contraste con GSC/BWT, no señal de vistazo diario.
+                    Se apoya en el orden dentro de la sesión, que los webviews fragmentan → tomar con pinzas. */}
+                <details style={{ marginTop: '2rem' }}>
+                  <summary style={{ cursor: 'pointer', fontSize: '1.05rem', fontWeight: 700 }}>
+                    Detalle forense: transiciones y apps puente (top 10)
+                  </summary>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', margin: '0.75rem 0 1.25rem' }}>
+                    Plegado a propósito: es material de contraste (cruce con GSC/BWT), no señal de vistazo diario. Las
+                    transiciones y el ratio puente/puerta se apoyan en el orden dentro de la sesión, que los webviews fragmentan.
+                  </p>
 
-                {/* Top pares from→to */}
-                <h3 style={{ marginTop: '2rem', fontSize: '1.05rem' }}>
-                  Top transiciones (origen → destino)
-                </h3>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>
-                  Origen explícito: <code>related-…</code> (RelatedApps), <code>home-daily</code>, <code>search</code>, <code>catalog</code>,
-                  <code>sidebar-recent</code>. Si el origen es <code>prev:slug</code>, es una transición sin atributo <code>?from=</code>
-                  inferida por orden temporal en la misma sesión.
-                </p>
-                {navegacionQuery.data.topPares.length === 0 ? (
-                  <p style={{ color: 'var(--text-muted)' }}>Aún no hay transiciones registradas en esta ventana.</p>
-                ) : (
-                  <div className={styles.tableContainer}>
-                    <table className={styles.table}>
-                      <thead>
-                        <tr>
-                          <th>Origen</th>
-                          <th>Destino</th>
-                          <th style={{ textAlign: 'right' }}>Veces</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {navegacionQuery.data.topPares.map((par, i) => (
-                          <tr key={`${par.origen}-${par.destino}-${i}`}>
-                            <td><code>{par.origen}</code></td>
-                            <td><code>{par.destino}</code></td>
-                            <td style={{ textAlign: 'right' }}><strong>{par.count}</strong></td>
+                  <h3 style={{ fontSize: '1rem' }}>Top 10 transiciones (origen → destino)</h3>
+                  {navegacionQuery.data.topPares.length === 0 ? (
+                    <p style={{ color: 'var(--text-muted)' }}>Aún no hay transiciones registradas en esta ventana.</p>
+                  ) : (
+                    <div className={styles.tableContainer}>
+                      <table className={styles.table}>
+                        <thead>
+                          <tr>
+                            <th>Origen</th>
+                            <th>Destino</th>
+                            <th style={{ textAlign: 'right' }}>Veces</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
+                        </thead>
+                        <tbody>
+                          {navegacionQuery.data.topPares.slice(0, 10).map((par, i) => (
+                            <tr key={`${par.origen}-${par.destino}-${i}`}>
+                              <td><code>{par.origen}</code></td>
+                              <td><code>{par.destino}</code></td>
+                              <td style={{ textAlign: 'right' }}><strong>{par.count}</strong></td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
 
-                {/* Apps puente vs puerta */}
-                <h3 style={{ marginTop: '2rem', fontSize: '1.05rem' }}>
-                  Apps puente vs puerta (top 20 por apariciones)
-                </h3>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>
-                  <strong>Ratio de continuación</strong> = % de visitas a esa app que continúan a otra app distinta dentro de la misma sesión.
-                  Alto = app &quot;puente&quot; (conduce a más exploración). Bajo = app &quot;puerta&quot; (los usuarios entran y salen).
-                  Mínimo 3 apariciones para aparecer en la tabla.
-                </p>
-                {navegacionQuery.data.tablaPuente.length === 0 ? (
-                  <p style={{ color: 'var(--text-muted)' }}>Sin datos suficientes en la ventana.</p>
-                ) : (
-                  <div className={styles.tableContainer}>
-                    <table className={styles.table}>
-                      <thead>
-                        <tr>
-                          <th>App</th>
-                          <th style={{ textAlign: 'right' }}>Apariciones</th>
-                          <th style={{ textAlign: 'right' }}>Continuaciones</th>
-                          <th style={{ textAlign: 'right' }}>Ratio</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {navegacionQuery.data.tablaPuente.map((row) => (
-                          <tr key={row.app}>
-                            <td><code>{row.app}</code></td>
-                            <td style={{ textAlign: 'right' }}>{row.apariciones}</td>
-                            <td style={{ textAlign: 'right' }}>{row.continuaciones}</td>
-                            <td style={{
-                              textAlign: 'right',
-                              color: row.ratio >= 0.5 ? '#16a34a' : row.ratio >= 0.25 ? '#f59e0b' : '#dc2626',
-                              fontWeight: 700,
-                            }}>
-                              {(row.ratio * 100).toFixed(1)}%
-                            </td>
+                  <h3 style={{ fontSize: '1rem', marginTop: '1.5rem' }}>Top 10 apps puente vs puerta</h3>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '0.75rem' }}>
+                    <strong>Ratio de continuación</strong> = % de visitas a esa app que siguen a otra app en la misma sesión.
+                    Alto = «puente» (conduce a explorar); bajo = «puerta» (entran y salen). Mínimo 3 apariciones.
+                  </p>
+                  {navegacionQuery.data.tablaPuente.length === 0 ? (
+                    <p style={{ color: 'var(--text-muted)' }}>Sin datos suficientes en la ventana.</p>
+                  ) : (
+                    <div className={styles.tableContainer}>
+                      <table className={styles.table}>
+                        <thead>
+                          <tr>
+                            <th>App</th>
+                            <th style={{ textAlign: 'right' }}>Apariciones</th>
+                            <th style={{ textAlign: 'right' }}>Continuaciones</th>
+                            <th style={{ textAlign: 'right' }}>Ratio</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '1.5rem' }}>
-                  💡 La métrica clave del REPOSICIONAMIENTO es <strong>apps por sesión ≥ 2,0</strong>. Si está por debajo,
-                  las palancas son: cross-linking en RelatedApps, descubrimiento desde home y búsqueda interna.
-                </p>
+                        </thead>
+                        <tbody>
+                          {navegacionQuery.data.tablaPuente.slice(0, 10).map((row) => (
+                            <tr key={row.app}>
+                              <td><code>{row.app}</code></td>
+                              <td style={{ textAlign: 'right' }}>{row.apariciones}</td>
+                              <td style={{ textAlign: 'right' }}>{row.continuaciones}</td>
+                              <td style={{
+                                textAlign: 'right',
+                                color: row.ratio >= 0.5 ? '#16a34a' : row.ratio >= 0.25 ? '#f59e0b' : '#dc2626',
+                                fontWeight: 700,
+                              }}>
+                                {(row.ratio * 100).toFixed(1)}%
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </details>
               </>
             )}
           </section>
