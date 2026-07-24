@@ -2305,10 +2305,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'generador-lorem-ipsum': [...textoApps.filter(a => a.url !== '/generador-lorem-ipsum/')],
   'generador-anagramas': [
     { url: '/contador-silabas/', icon: '📐', name: 'Contador Sílabas', description: 'Separa y cuenta sílabas' },
-    { url: '/buscador-palabras-patron/', icon: '🔍', name: 'Buscador por Patrón', description: 'Palabras con huecos para crucigramas' },
+    { url: '/buscador-palabras-patron/', icon: '🔍', name: 'Buscador por Patrón', description: 'Palabras con huecos para crucigramas, Wordle y Scrabble' },
     { url: '/juego-wordle/', icon: '🔤', name: 'Wordle', description: 'Adivina la palabra del día' },
-    { url: '/limpiador-texto/', icon: '🧹', name: 'Limpiador Texto', description: 'Elimina formato' },
-    { url: '/contador-palabras/', icon: '🔢', name: 'Contador Palabras', description: 'Palabras y caracteres' },
+    { url: '/juego-ahorcado/', icon: '🎯', name: 'Ahorcado', description: 'Adivina la palabra letra a letra' },
   ],
   'buscador-palabras-patron': [
     { url: '/generador-anagramas/', icon: '🔤', name: 'Generador Anagramas', description: 'Palabras con letras sueltas' },
@@ -2773,10 +2772,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'conversor-morse': [...conversoresApps.filter(a => a.url !== '/conversor-morse/').slice(0, 2), ...criptografiaClasicaApps.slice(0, 2)],
   'conversor-binario': [...conversoresApps.slice(0, 2), ...criptografiaModernaApps.slice(2, 4)],
   'conversor-braille': [
+    { url: '/lupa-digital/', icon: '🔍', name: 'Lupa Digital', description: 'Amplía texto y objetos con la cámara hasta 5x' },
+    { url: '/conversor-morse/', icon: '📡', name: 'Conversor de Código Morse', description: 'Otro código: convierte texto a Morse y viceversa' },
     { url: '/simulador-baja-vision/', icon: '👁️', name: 'Simulador de Baja Visión', description: 'Entiende cataratas, glaucoma y daltonismo: cuándo el Braille es esencial' },
     { url: '/adaptador-dislexia/', icon: '📖', name: 'Adaptador Dislexia', description: 'Otra forma de hacer accesible el texto: tipografía y espaciado' },
-    { url: '/lupa-digital/', icon: '🔍', name: 'Lupa Digital', description: 'Amplía texto y objetos con la cámara hasta 5x' },
-    { url: '/lector-texto-voz/', icon: '🔊', name: 'Lector de Texto a Voz', description: 'Alternativa auditiva para baja visión severa' },
   ],
 
   // CÓDIGOS
