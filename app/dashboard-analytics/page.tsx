@@ -276,21 +276,29 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
       (f) => f.host !== 'meskeia.com' && !usados.has(f.host)
     );
 
-    // Memos: bajo meskeia.com (= subtotal de la subdivisión) y bajo dominios propios
-    // (= TOTAL ecosistema − subtotal). Su % es el peso del tráfico ya migrado.
-    const bajoMeskeia = data.subdivision.subtotal;
-    const bajoPropios = {
-      hoy: data.total.hoy - bajoMeskeia.hoy,
-      ayer: data.total.ayer - bajoMeskeia.ayer,
-      semana: data.total.semana - bajoMeskeia.semana,
-      mes: data.total.mes - bajoMeskeia.mes,
-      total: data.total.total - bajoMeskeia.total,
-    };
-    const pctGlobal = data.total.total > 0
-      ? Math.round((bajoPropios.total / data.total.total) * 1000) / 10
+    // Recap del tráfico de PORTALES (excluye meskeia-resto) según su vía de entrada:
+    // por la marca madre (meskeia.com) vs ya por su dominio propio. Su % es el
+    // termómetro de migración: agregado ponderado de los % portal por tema.
+    const accesoMeskeia = temas.reduce(
+      (a, t) => ({
+        hoy: a.hoy + t.meskeia.hoy, ayer: a.ayer + t.meskeia.ayer,
+        semana: a.semana + t.meskeia.semana, mes: a.mes + t.meskeia.mes, total: a.total + t.meskeia.total,
+      }),
+      { hoy: 0, ayer: 0, semana: 0, mes: 0, total: 0 }
+    );
+    const accesoPropios = temas.reduce(
+      (a, t) => ({
+        hoy: a.hoy + t.propio.hoy, ayer: a.ayer + t.propio.ayer,
+        semana: a.semana + t.propio.semana, mes: a.mes + t.propio.mes, total: a.total + t.propio.total,
+      }),
+      { hoy: 0, ayer: 0, semana: 0, mes: 0, total: 0 }
+    );
+    const totalPortales = accesoMeskeia.total + accesoPropios.total;
+    const pctPortalGlobal = totalPortales > 0
+      ? Math.round((accesoPropios.total / totalPortales) * 1000) / 10
       : null;
 
-    return { temas, resto, huerfanos, totalEco: data.total, bajoMeskeia, bajoPropios, pctGlobal, desde: data.desde };
+    return { temas, resto, huerfanos, totalEco: data.total, accesoMeskeia, accesoPropios, pctPortalGlobal, desde: data.desde };
   }, [dominiosQuery.data]);
 
   // tRPC: Tendencias históricas (mensual 2026, canales, LATAM).
@@ -1657,8 +1665,9 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
               líneas —servido bajo meskeia.com (la marca madre) y bajo su dominio propio— más un subtotal.
               El <strong>% portal</strong>, en la línea del dominio propio, es cuánto del tráfico de ese
               tema entra ya por su dominio; sube si el portal gana autoridad y Google empieza a servir su
-              versión. El <strong>TOTAL ecosistema</strong> reconcilia con los subtotales y se desglosa
-              debajo en tráfico bajo meskeia.com vs bajo dominios propios. Excluye bots y tu propia IP.
+              versión. El <strong>TOTAL ecosistema</strong> (al final) reconcilia con los subtotales;
+              encima, dos líneas reparten el tráfico de portales según entre por meskeia.com o ya por su
+              dominio propio. Excluye bots y tu propia IP.
             </p>
 
             {dominiosQuery.isLoading && <p>Cargando tráfico por dominio...</p>}
@@ -1771,7 +1780,28 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                             </tr>
                           ))}
 
-                          {/* TOTAL ecosistema — reconcilia con los subtotales de tema + resto */}
+                          {/* Recap del tráfico de portales por vía de entrada (reparto de los subtotales) */}
+                          <tr style={{ borderTop: '1px solid var(--border)', color: 'var(--text-secondary)' }}>
+                            <td style={{ paddingLeft: '1.75rem' }}>↳ Acceso a portales desde meskeia.com</td>
+                            <td style={{ textAlign: 'center' }}>{dominioFusion.accesoMeskeia.hoy || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{dominioFusion.accesoMeskeia.ayer || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{dominioFusion.accesoMeskeia.semana || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{dominioFusion.accesoMeskeia.mes || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{dominioFusion.accesoMeskeia.total || '–'}</td>
+                            <td></td>
+                          </tr>
+                          <tr style={{ color: 'var(--text-secondary)' }}>
+                            <td style={{ paddingLeft: '1.75rem' }}>↳ Acceso a portales desde dominios propios</td>
+                            <td style={{ textAlign: 'center' }}>{dominioFusion.accesoPropios.hoy || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{dominioFusion.accesoPropios.ayer || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{dominioFusion.accesoPropios.semana || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{dominioFusion.accesoPropios.mes || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{dominioFusion.accesoPropios.total || '–'}</td>
+                            <td style={{ textAlign: 'center', fontWeight: 700, color: 'var(--primary)' }}>
+                              {dominioFusion.pctPortalGlobal == null ? '–' : `${dominioFusion.pctPortalGlobal.toLocaleString('es-ES')}%`}
+                            </td>
+                          </tr>
+                          {/* TOTAL ecosistema — al final; = subtotales de tema + resto (+ huérfanos) */}
                           <tr style={{ borderTop: '2px solid var(--primary)', fontWeight: 700 }}>
                             <td>✅ TOTAL ecosistema</td>
                             <td style={{ textAlign: 'center' }}>{dominioFusion.totalEco.hoy || '–'}</td>
@@ -1779,38 +1809,19 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                             <td style={{ textAlign: 'center' }}>{dominioFusion.totalEco.semana || '–'}</td>
                             <td style={{ textAlign: 'center' }}>{dominioFusion.totalEco.mes || '–'}</td>
                             <td style={{ textAlign: 'center' }}>{dominioFusion.totalEco.total || '–'}</td>
-                            <td style={{ textAlign: 'center' }}>
-                              {dominioFusion.pctGlobal == null ? '–' : `${dominioFusion.pctGlobal.toLocaleString('es-ES')}%`}
-                            </td>
-                          </tr>
-                          {/* Memos — desglose del TOTAL por procedencia del host */}
-                          <tr style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                            <td style={{ paddingLeft: '1.75rem' }}>↳ bajo meskeia.com</td>
-                            <td style={{ textAlign: 'center' }}>{dominioFusion.bajoMeskeia.hoy || '–'}</td>
-                            <td style={{ textAlign: 'center' }}>{dominioFusion.bajoMeskeia.ayer || '–'}</td>
-                            <td style={{ textAlign: 'center' }}>{dominioFusion.bajoMeskeia.semana || '–'}</td>
-                            <td style={{ textAlign: 'center' }}>{dominioFusion.bajoMeskeia.mes || '–'}</td>
-                            <td style={{ textAlign: 'center' }}>{dominioFusion.bajoMeskeia.total || '–'}</td>
-                            <td></td>
-                          </tr>
-                          <tr style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                            <td style={{ paddingLeft: '1.75rem' }}>↳ bajo dominios propios</td>
-                            <td style={{ textAlign: 'center' }}>{dominioFusion.bajoPropios.hoy || '–'}</td>
-                            <td style={{ textAlign: 'center' }}>{dominioFusion.bajoPropios.ayer || '–'}</td>
-                            <td style={{ textAlign: 'center' }}>{dominioFusion.bajoPropios.semana || '–'}</td>
-                            <td style={{ textAlign: 'center' }}>{dominioFusion.bajoPropios.mes || '–'}</td>
-                            <td style={{ textAlign: 'center' }}>{dominioFusion.bajoPropios.total || '–'}</td>
                             <td></td>
                           </tr>
                         </tbody>
                       </table>
                     </div>
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '1rem' }}>
-                      Captura de dominio activa desde el {dominioFusion.desde}; las visitas anteriores no
+                      Las dos líneas «Acceso a portales» reparten el tráfico de portales (la suma de los
+                      cuatro subtotales, sin meskeia-resto) según su vía de entrada; su <strong>% portal</strong>{' '}
+                      global es el termómetro de migración a dominios propios, agregado ponderado de los % por
+                      tema. Captura de dominio activa desde el {dominioFusion.desde}; las visitas anteriores no
                       tienen dominio asignado y no se contabilizan. Adjudicación (1 app = 1 vertical):
                       Cronicum = cronologías; Stemum/Coquinum = apps de su portal; Delegum = apps de su
-                      página de Soluciones. El <strong>% portal</strong> del TOTAL es el termómetro global
-                      del desplazamiento buscador → portal.
+                      página de Soluciones.
                     </p>
                   </>
                 )}
