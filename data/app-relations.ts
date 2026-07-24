@@ -2965,11 +2965,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/metronomo/', icon: '🎵', name: 'Metrónomo', description: 'Tempo musical' },
   ],
   'lupa-digital': [
-    { url: '/simulador-baja-vision/', icon: '👁️', name: 'Simulador de Baja Visión', description: 'Entiende por qué necesitas magnificación: cataratas, glaucoma, miopía severa' },
-    { url: '/identificador-color-camara/', icon: '🎨', name: 'Identificador de Color', description: 'Con la misma cámara: nombre y código del color al que apuntas' },
-    { url: '/conversor-braille/', icon: '⠃', name: 'Traductor de Braille', description: 'Alternativa para casos donde la lupa ya no basta' },
+    { url: '/espejo/', icon: '🪞', name: 'Espejo Digital', description: 'Usa la cámara frontal como espejo de bolsillo' },
+    { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: '¿Poca luz para leer? Mide la luz ambiente' },
     { url: '/adaptador-dislexia/', icon: '📖', name: 'Adaptador Dislexia', description: 'Otro apoyo de lectura: tipografías y espaciado adaptado' },
-    { url: '/amplificador-sonido/', icon: '🦻', name: 'Amplificador de Sonido', description: 'La versión auditiva de una lupa: oye amplificado' },
+    { url: '/conversor-braille/', icon: '⠃', name: 'Traductor de Braille', description: 'Alternativa para casos donde la lupa ya no basta' },
   ],
   'identificador-color-camara': [
     { url: '/lupa-digital/', icon: '🔍', name: 'Lupa Digital', description: 'La misma cámara para ampliar texto y objetos hasta 5x' },
@@ -6509,9 +6508,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'conversor-cnae-iae': [
     { url: '/asistente-alta-autonomo/', icon: '🚀', name: 'Asistente de Alta de Autónomo', description: 'El proceso completo, paso a paso' },
+    { url: '/selector-regimen-fiscal-autonomo/', icon: '🧾', name: 'Selector Régimen Fiscal Autónomo', description: '¿Módulos, directa o SL? Elige tu régimen' },
     { url: '/estimador-cuota-autonomo/', icon: '💶', name: 'Cuota de Autónomo', description: 'Cuánto pagarás según tus ingresos' },
     { url: '/orientador-iva-espana/', icon: '🧭', name: 'Orientador del IVA', description: 'Qué IVA aplicar en cada operación' },
-    { url: '/validador-dni-nif-cif/', icon: '🪪', name: 'Validador de DNI, NIE y CIF', description: 'Comprueba el NIF de tu alta' },
   ],
 
   // ==========================================
