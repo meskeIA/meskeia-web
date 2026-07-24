@@ -960,7 +960,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias' },
     { url: '/visualizador-historia-dinero/', icon: '🪙', name: 'La Evolución del Dinero', description: 'Del trueque al bitcoin' },
     { url: '/visualizador-origen-camiseta/', icon: '👕', name: 'De dónde Viene tu Camiseta', description: 'Cadena global' },
-    { url: '/visualizador-historia-escritura/', icon: '✍️', name: 'Evolución de la Escritura', description: '5.000 años de escritura' },
+    { url: '/visualizador-historia/especias-rutas-comerciales/', icon: '🫚', name: 'Historia de las Especias', description: '5.000 años de rutas comerciales, de Arabia a los mercados globales' },
   ],
   'visualizador-clima': [
     { url: '/visualizador-agua-virtual/', icon: '💧', name: 'Cuánta Agua Gastas sin Saberlo', description: 'Huella hídrica' },
@@ -3048,10 +3048,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // BIOMEDICINA Y CIENCIAS DE LA SALUD
   'simulador-genetica': [
+    { url: '/simulador-punnett/', icon: '🧬', name: 'Cuadro de Punnett', description: 'La versión enfocada de los cruces mono y dihíbridos (EBAU/Bachillerato)' },
     { url: '/simulador-deriva-genetica/', icon: '🧬', name: 'Deriva Genética', description: 'Cambios aleatorios en frecuencias alélicas por azar' },
     { url: '/visualizador-seleccion-natural/', icon: '🦎', name: 'Selección Natural', description: 'Evolución y adaptación de poblaciones' },
     { url: '/visualizador-evolucion-molecular/', icon: '🔬', name: 'Evolución Molecular', description: 'Mutaciones y árboles filogenéticos' },
-    { url: '/calculadora-probabilidad/', icon: '🎲', name: 'Calculadora de Probabilidad', description: 'Herramienta complementaria para los cruces de Punnett' },
   ],
   'calculadora-estadistica-medica': biomedicinaApps.filter(a => a.url !== '/calculadora-estadistica-medica/'),
 
@@ -5976,10 +5976,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-ecosistema/', icon: '🌱', name: 'Ecosistema', description: 'Ciclos biogeoquímicos y flujo de energía en el ecosistema' },
   ],
   'simulador-punnett': [
+    { url: '/simulador-genetica/', icon: '🧬', name: 'Simulador de Genética Mendeliana', description: 'La versión avanzada: herencia ligada al sexo, genealogías, poblaciones y chi-cuadrado' },
     { url: '/simulador-mitosis-meiosis/', icon: '🧬', name: 'Mitosis y Meiosis', description: 'La meiosis genera los gametos con los alelos que combina el cuadro de Punnett' },
     { url: '/visualizador-adn-codigo-genetico/', icon: '🧬', name: 'ADN y Código Genético', description: 'Los alelos son secuencias de ADN en el mismo locus cromosómico' },
     { url: '/visualizador-evolucion-molecular/', icon: '🔬', name: 'Evolución Molecular', description: 'Las mutaciones generan nuevos alelos que Mendel no podía predecir' },
-    { url: '/visualizador-adn-polimerasa/', icon: '🔬', name: 'ADN Polimerasa', description: 'La replicación del ADN que copia los alelos antes de la división' },
   ],
   'simulador-ecosistema-trofico': [
     { url: '/simulador-fotosintesis-factores/', icon: '🌿', name: 'Fotosíntesis: Factores Limitantes', description: 'Los productores de la base de la pirámide fijan energía mediante fotosíntesis' },
