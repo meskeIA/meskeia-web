@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, Fragment } from 'react';
 import type { inferRouterOutputs } from '@trpc/server';
 import styles from './DashboardAnalytics.module.css';
 import { MeskeiaLogo, LegalNotice } from '@/components';
@@ -227,6 +227,71 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
     {},
     { enabled: tabActiva === 'dominios' }
   );
+
+  // Modelo fusionado de la pestaña "Tráfico por dominio": una sola tabla por TEMA.
+  // Cada vertical = 2 líneas (bajo meskeia.com + bajo su dominio propio) + subtotal.
+  // El % portal vive en la línea del dominio propio; el TOTAL ecosistema reconcilia
+  // con los subtotales y se desglosa en dos memos (bajo meskeia.com / dominios propios).
+  // Rediseño 2026-07-24: elimina el cruce mental entre las dos cards antiguas.
+  const dominioFusion = useMemo(() => {
+    const data = dominiosQuery.data;
+    if (!data || !data.subdivision || data.filas.length === 0) return null;
+
+    const porHost = new Map(data.filas.map((f) => [f.host, f]));
+    const cero = { hoy: 0, ayer: 0, semana: 0, mes: 0, total: 0 };
+
+    // Un grupo por tema adjudicado (todo menos "resto"), en el orden del servidor.
+    const temas = data.subdivision.filas
+      .filter((s) => s.key !== 'resto')
+      .map((s) => {
+        const dom = (s.portalHost ? porHost.get(s.portalHost) : null) || null;
+        const propio = dom ?? cero;
+        return {
+          key: s.key,
+          label: s.label,
+          icono: s.icono,
+          portalHost: s.portalHost,
+          propioLabel: dom?.label ?? s.label,
+          meskeia: { hoy: s.hoy, ayer: s.ayer, semana: s.semana, mes: s.mes, total: s.total },
+          propio,
+          subtotal: {
+            hoy: s.hoy + propio.hoy,
+            ayer: s.ayer + propio.ayer,
+            semana: s.semana + propio.semana,
+            mes: s.mes + propio.mes,
+            total: s.total + propio.total,
+          },
+          pctPortal: s.pctPortal,
+        };
+      });
+
+    const resto = data.subdivision.filas.find((s) => s.key === 'resto') ?? null;
+
+    // Dominios con tráfico pero sin tema adjudicado (p.ej. hosts de preview). Se
+    // muestran aparte para que el TOTAL ecosistema siga cuadrando con lo visible.
+    const usados = new Set(
+      temas.map((t) => t.portalHost).filter((h): h is string => Boolean(h))
+    );
+    const huerfanos = data.filas.filter(
+      (f) => f.host !== 'meskeia.com' && !usados.has(f.host)
+    );
+
+    // Memos: bajo meskeia.com (= subtotal de la subdivisión) y bajo dominios propios
+    // (= TOTAL ecosistema − subtotal). Su % es el peso del tráfico ya migrado.
+    const bajoMeskeia = data.subdivision.subtotal;
+    const bajoPropios = {
+      hoy: data.total.hoy - bajoMeskeia.hoy,
+      ayer: data.total.ayer - bajoMeskeia.ayer,
+      semana: data.total.semana - bajoMeskeia.semana,
+      mes: data.total.mes - bajoMeskeia.mes,
+      total: data.total.total - bajoMeskeia.total,
+    };
+    const pctGlobal = data.total.total > 0
+      ? Math.round((bajoPropios.total / data.total.total) * 1000) / 10
+      : null;
+
+    return { temas, resto, huerfanos, totalEco: data.total, bajoMeskeia, bajoPropios, pctGlobal, desde: data.desde };
+  }, [dominiosQuery.data]);
 
   // tRPC: Tendencias históricas (mensual 2026, canales, LATAM).
   // Sin input: siempre excluye tráfico propio y bots (el toggle de IP no le aplica)
@@ -1588,9 +1653,12 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
           <section className={styles.section}>
             <h2><span aria-hidden="true">🌐</span> Tráfico por dominio</h2>
             <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-              Visitas servidas bajo cada dominio vertical. Excluye bots y tu propia IP.
-              Mide las páginas de cada portal, no el embudo completo (las apps enlazadas
-              desde los verticales cargan ya bajo meskeia.com).
+              Todo el tráfico del ecosistema en una tabla, organizado por tema. Cada vertical tiene dos
+              líneas —servido bajo meskeia.com (la marca madre) y bajo su dominio propio— más un subtotal.
+              El <strong>% portal</strong>, en la línea del dominio propio, es cuánto del tráfico de ese
+              tema entra ya por su dominio; sube si el portal gana autoridad y Google empieza a servir su
+              versión. El <strong>TOTAL ecosistema</strong> reconcilia con los subtotales y se desglosa
+              debajo en tráfico bajo meskeia.com vs bajo dominios propios. Excluye bots y tu propia IP.
             </p>
 
             {dominiosQuery.isLoading && <p>Cargando tráfico por dominio...</p>}
@@ -1598,81 +1666,18 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
 
             {dominiosQuery.data && (
               <>
-                {dominiosQuery.data.filas.length === 0 ? (
+                {dominioFusion === null ? (
                   <p style={{ color: 'var(--text-muted)' }}>
                     Aún no hay visitas registradas con dominio. Los datos empiezan a acumularse
                     tras el despliegue (la captura del dominio se activó el {dominiosQuery.data.desde}).
                   </p>
                 ) : (
-                  <div className={styles.tableContainer}>
-                    <table className={styles.table}>
-                      <thead>
-                        <tr>
-                          <th style={{ textAlign: 'left' }}>Dominio</th>
-                          <th style={{ textAlign: 'center' }}>Hoy</th>
-                          <th style={{ textAlign: 'center' }}>Ayer</th>
-                          <th style={{ textAlign: 'center' }}>7 días</th>
-                          <th style={{ textAlign: 'center' }}>Este mes</th>
-                          <th style={{ textAlign: 'center' }}>Total</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {dominiosQuery.data.filas.map((fila) => (
-                          <tr key={fila.host} style={{ opacity: fila.total === 0 ? 0.4 : 1 }}>
-                            <td>
-                              <span style={{ marginRight: '0.4rem' }}>{fila.icono}</span>
-                              {fila.label}
-                              <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginLeft: '0.5rem' }}>
-                                {fila.host}
-                              </span>
-                            </td>
-                            <td style={{ textAlign: 'center', fontWeight: fila.hoy > 0 ? 600 : 400 }}>
-                              {fila.hoy > 0 ? fila.hoy : '–'}
-                            </td>
-                            <td style={{ textAlign: 'center' }}>{fila.ayer > 0 ? fila.ayer : '–'}</td>
-                            <td style={{ textAlign: 'center' }}>{fila.semana > 0 ? fila.semana : '–'}</td>
-                            <td style={{ textAlign: 'center' }}>{fila.mes > 0 ? fila.mes : '–'}</td>
-                            <td style={{ textAlign: 'center', fontWeight: fila.total > 0 ? 600 : 400 }}>
-                              {fila.total > 0 ? fila.total : '–'}
-                            </td>
-                          </tr>
-                        ))}
-                        {/* Fila Total */}
-                        <tr style={{ borderTop: '2px solid var(--primary)', fontWeight: 700 }}>
-                          <td>✅ TOTAL</td>
-                          <td style={{ textAlign: 'center' }}>{dominiosQuery.data.total.hoy || '–'}</td>
-                          <td style={{ textAlign: 'center' }}>{dominiosQuery.data.total.ayer || '–'}</td>
-                          <td style={{ textAlign: 'center' }}>{dominiosQuery.data.total.semana || '–'}</td>
-                          <td style={{ textAlign: 'center' }}>{dominiosQuery.data.total.mes || '–'}</td>
-                          <td style={{ textAlign: 'center' }}>{dominiosQuery.data.total.total || '–'}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '1rem' }}>
-                  * Captura de dominio activada el {dominiosQuery.data.desde}. Las visitas anteriores
-                  no tienen dominio asignado y no se contabilizan aquí.
-                </p>
-
-                {/* Desglose de meskeIA por vertical temático (adjudicación, no host) */}
-                {dominiosQuery.data.subdivision && dominiosQuery.data.filas.length > 0 && (
-                  <div style={{ marginTop: '2.5rem' }}>
-                    <h3 style={{ fontSize: '1.05rem', marginBottom: '0.4rem' }}>
-                      <span aria-hidden="true">🧩</span> Desglose de meskeIA por vertical
-                    </h3>
-                    <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem', fontSize: '0.9rem' }}>
-                      Reparte el tráfico de meskeia.com entre los temas de cada portal, aunque el usuario
-                      entrara por la marca madre. No mueve nada: solo cuenta por dónde entró. La columna{' '}
-                      <strong>% portal</strong> es cuánto de cada vertical llega ya por su dominio propio
-                      (sube si el portal gana autoridad y Google empieza a servir su versión).
-                    </p>
+                  <>
                     <div className={styles.tableContainer}>
                       <table className={styles.table}>
                         <thead>
                           <tr>
-                            <th style={{ textAlign: 'left' }}>Vertical (dentro de meskeIA)</th>
+                            <th style={{ textAlign: 'left' }}>Tema / línea</th>
                             <th style={{ textAlign: 'center' }}>Hoy</th>
                             <th style={{ textAlign: 'center' }}>Ayer</th>
                             <th style={{ textAlign: 'center' }}>7 días</th>
@@ -1682,48 +1687,132 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                           </tr>
                         </thead>
                         <tbody>
-                          {dominiosQuery.data.subdivision.filas.map((s) => (
-                            <tr key={s.key} style={{ opacity: s.total === 0 ? 0.4 : 1 }}>
-                              <td>
-                                <span style={{ marginRight: '0.4rem' }}>{s.icono}</span>
-                                meskeia-{s.key}
-                                {s.portalHost && (
+                          {dominioFusion.temas.map((t) => (
+                            <Fragment key={t.key}>
+                              {/* Línea 1 — tráfico del tema servido bajo meskeia.com */}
+                              <tr style={{ opacity: t.subtotal.total === 0 ? 0.4 : 1 }}>
+                                <td style={{ paddingLeft: '1.75rem' }}>
+                                  <span style={{ marginRight: '0.4rem' }} aria-hidden="true">{t.icono}</span>
+                                  meskeia-{t.key}
                                   <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginLeft: '0.5rem' }}>
-                                    ↔ {s.portalHost}
+                                    ↔ {t.portalHost}
                                   </span>
-                                )}
+                                </td>
+                                <td style={{ textAlign: 'center' }}>{t.meskeia.hoy > 0 ? t.meskeia.hoy : '–'}</td>
+                                <td style={{ textAlign: 'center' }}>{t.meskeia.ayer > 0 ? t.meskeia.ayer : '–'}</td>
+                                <td style={{ textAlign: 'center' }}>{t.meskeia.semana > 0 ? t.meskeia.semana : '–'}</td>
+                                <td style={{ textAlign: 'center' }}>{t.meskeia.mes > 0 ? t.meskeia.mes : '–'}</td>
+                                <td style={{ textAlign: 'center' }}>{t.meskeia.total > 0 ? t.meskeia.total : '–'}</td>
+                                <td></td>
+                              </tr>
+                              {/* Línea 2 — tráfico del tema servido bajo su dominio propio (+ % portal) */}
+                              <tr style={{ opacity: t.subtotal.total === 0 ? 0.4 : 1 }}>
+                                <td style={{ paddingLeft: '1.75rem' }}>
+                                  <span style={{ marginRight: '0.4rem' }} aria-hidden="true">{t.icono}</span>
+                                  {t.propioLabel}
+                                  <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginLeft: '0.5rem' }}>
+                                    {t.portalHost}
+                                  </span>
+                                </td>
+                                <td style={{ textAlign: 'center' }}>{t.propio.hoy > 0 ? t.propio.hoy : '–'}</td>
+                                <td style={{ textAlign: 'center' }}>{t.propio.ayer > 0 ? t.propio.ayer : '–'}</td>
+                                <td style={{ textAlign: 'center' }}>{t.propio.semana > 0 ? t.propio.semana : '–'}</td>
+                                <td style={{ textAlign: 'center' }}>{t.propio.mes > 0 ? t.propio.mes : '–'}</td>
+                                <td style={{ textAlign: 'center' }}>{t.propio.total > 0 ? t.propio.total : '–'}</td>
+                                <td style={{ textAlign: 'center', fontWeight: 600, color: 'var(--primary)' }}>
+                                  {t.pctPortal == null ? '–' : `${t.pctPortal.toLocaleString('es-ES')}%`}
+                                </td>
+                              </tr>
+                              {/* Línea 3 — subtotal del tema (suma de las dos anteriores) */}
+                              <tr style={{ background: 'var(--focus)', fontWeight: 600 }}>
+                                <td>Total {t.label}</td>
+                                <td style={{ textAlign: 'center' }}>{t.subtotal.hoy > 0 ? t.subtotal.hoy : '–'}</td>
+                                <td style={{ textAlign: 'center' }}>{t.subtotal.ayer > 0 ? t.subtotal.ayer : '–'}</td>
+                                <td style={{ textAlign: 'center' }}>{t.subtotal.semana > 0 ? t.subtotal.semana : '–'}</td>
+                                <td style={{ textAlign: 'center' }}>{t.subtotal.mes > 0 ? t.subtotal.mes : '–'}</td>
+                                <td style={{ textAlign: 'center' }}>{t.subtotal.total > 0 ? t.subtotal.total : '–'}</td>
+                                <td></td>
+                              </tr>
+                            </Fragment>
+                          ))}
+
+                          {/* Resto meskeIA — apps propias sin vertical, solo bajo meskeia.com */}
+                          {dominioFusion.resto && (
+                            <tr style={{ opacity: dominioFusion.resto.total === 0 ? 0.4 : 1 }}>
+                              <td>
+                                <span style={{ marginRight: '0.4rem' }} aria-hidden="true">{dominioFusion.resto.icono}</span>
+                                meskeia-resto
                               </td>
-                              <td style={{ textAlign: 'center' }}>{s.hoy > 0 ? s.hoy : '–'}</td>
-                              <td style={{ textAlign: 'center' }}>{s.ayer > 0 ? s.ayer : '–'}</td>
-                              <td style={{ textAlign: 'center' }}>{s.semana > 0 ? s.semana : '–'}</td>
-                              <td style={{ textAlign: 'center' }}>{s.mes > 0 ? s.mes : '–'}</td>
-                              <td style={{ textAlign: 'center', fontWeight: s.total > 0 ? 600 : 400 }}>
-                                {s.total > 0 ? s.total : '–'}
+                              <td style={{ textAlign: 'center' }}>{dominioFusion.resto.hoy > 0 ? dominioFusion.resto.hoy : '–'}</td>
+                              <td style={{ textAlign: 'center' }}>{dominioFusion.resto.ayer > 0 ? dominioFusion.resto.ayer : '–'}</td>
+                              <td style={{ textAlign: 'center' }}>{dominioFusion.resto.semana > 0 ? dominioFusion.resto.semana : '–'}</td>
+                              <td style={{ textAlign: 'center' }}>{dominioFusion.resto.mes > 0 ? dominioFusion.resto.mes : '–'}</td>
+                              <td style={{ textAlign: 'center' }}>{dominioFusion.resto.total > 0 ? dominioFusion.resto.total : '–'}</td>
+                              <td style={{ textAlign: 'center' }}>–</td>
+                            </tr>
+                          )}
+
+                          {/* Dominios con tráfico pero sin tema adjudicado (raro; mantiene la reconciliación) */}
+                          {dominioFusion.huerfanos.map((h) => (
+                            <tr key={h.host} style={{ opacity: h.total === 0 ? 0.4 : 1 }}>
+                              <td>
+                                <span style={{ marginRight: '0.4rem' }} aria-hidden="true">{h.icono}</span>
+                                {h.label}
+                                <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginLeft: '0.5rem' }}>
+                                  {h.host}
+                                </span>
                               </td>
-                              <td style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
-                                {s.pctPortal == null ? '–' : `${s.pctPortal.toLocaleString('es-ES')}%`}
-                              </td>
+                              <td style={{ textAlign: 'center' }}>{h.hoy > 0 ? h.hoy : '–'}</td>
+                              <td style={{ textAlign: 'center' }}>{h.ayer > 0 ? h.ayer : '–'}</td>
+                              <td style={{ textAlign: 'center' }}>{h.semana > 0 ? h.semana : '–'}</td>
+                              <td style={{ textAlign: 'center' }}>{h.mes > 0 ? h.mes : '–'}</td>
+                              <td style={{ textAlign: 'center' }}>{h.total > 0 ? h.total : '–'}</td>
+                              <td style={{ textAlign: 'center' }}>–</td>
                             </tr>
                           ))}
-                          {/* Fila Total — debe cuadrar con la fila meskeIA de la tabla superior */}
+
+                          {/* TOTAL ecosistema — reconcilia con los subtotales de tema + resto */}
                           <tr style={{ borderTop: '2px solid var(--primary)', fontWeight: 700 }}>
-                            <td>✅ TOTAL meskeIA</td>
-                            <td style={{ textAlign: 'center' }}>{dominiosQuery.data.subdivision.subtotal.hoy || '–'}</td>
-                            <td style={{ textAlign: 'center' }}>{dominiosQuery.data.subdivision.subtotal.ayer || '–'}</td>
-                            <td style={{ textAlign: 'center' }}>{dominiosQuery.data.subdivision.subtotal.semana || '–'}</td>
-                            <td style={{ textAlign: 'center' }}>{dominiosQuery.data.subdivision.subtotal.mes || '–'}</td>
-                            <td style={{ textAlign: 'center' }}>{dominiosQuery.data.subdivision.subtotal.total || '–'}</td>
-                            <td style={{ textAlign: 'center' }}>–</td>
+                            <td>✅ TOTAL ecosistema</td>
+                            <td style={{ textAlign: 'center' }}>{dominioFusion.totalEco.hoy || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{dominioFusion.totalEco.ayer || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{dominioFusion.totalEco.semana || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{dominioFusion.totalEco.mes || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{dominioFusion.totalEco.total || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>
+                              {dominioFusion.pctGlobal == null ? '–' : `${dominioFusion.pctGlobal.toLocaleString('es-ES')}%`}
+                            </td>
+                          </tr>
+                          {/* Memos — desglose del TOTAL por procedencia del host */}
+                          <tr style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                            <td style={{ paddingLeft: '1.75rem' }}>↳ bajo meskeia.com</td>
+                            <td style={{ textAlign: 'center' }}>{dominioFusion.bajoMeskeia.hoy || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{dominioFusion.bajoMeskeia.ayer || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{dominioFusion.bajoMeskeia.semana || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{dominioFusion.bajoMeskeia.mes || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{dominioFusion.bajoMeskeia.total || '–'}</td>
+                            <td></td>
+                          </tr>
+                          <tr style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                            <td style={{ paddingLeft: '1.75rem' }}>↳ bajo dominios propios</td>
+                            <td style={{ textAlign: 'center' }}>{dominioFusion.bajoPropios.hoy || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{dominioFusion.bajoPropios.ayer || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{dominioFusion.bajoPropios.semana || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{dominioFusion.bajoPropios.mes || '–'}</td>
+                            <td style={{ textAlign: 'center' }}>{dominioFusion.bajoPropios.total || '–'}</td>
+                            <td></td>
                           </tr>
                         </tbody>
                       </table>
                     </div>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '0.75rem' }}>
-                      Adjudicación (1 app = 1 vertical): Cronicum = cronologías; Stemum/Coquinum = apps de su
-                      portal; Delegum = apps de su página de Soluciones. El TOTAL cuadra con la fila meskeIA
-                      de arriba.
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '1rem' }}>
+                      Captura de dominio activa desde el {dominioFusion.desde}; las visitas anteriores no
+                      tienen dominio asignado y no se contabilizan. Adjudicación (1 app = 1 vertical):
+                      Cronicum = cronologías; Stemum/Coquinum = apps de su portal; Delegum = apps de su
+                      página de Soluciones. El <strong>% portal</strong> del TOTAL es el termómetro global
+                      del desplazamiento buscador → portal.
                     </p>
-                  </div>
+                  </>
                 )}
               </>
             )}
