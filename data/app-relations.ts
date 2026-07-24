@@ -2769,7 +2769,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'conversor-tallas': conversoresApps.filter(a => a.url !== '/conversor-tallas/'),
   'conversor-numeros-romanos': conversoresApps.filter(a => a.url !== '/conversor-numeros-romanos/'),
-  'conversor-morse': [...conversoresApps.filter(a => a.url !== '/conversor-morse/').slice(0, 2), ...criptografiaClasicaApps.slice(0, 2)],
+  'conversor-morse': [
+    { url: '/conversor-braille/', icon: '⠃', name: 'Traductor de Braille', description: 'Otro sistema por puntos: texto ↔ Braille' },
+    { url: '/cifrado-clasico/', icon: '🔐', name: 'Cifrado Clásico', description: 'César, ROT13, Atbash' },
+    { url: '/cifrado-vigenere/', icon: '🔑', name: 'Cifrado Vigenère', description: 'Polialfabético' },
+    { url: '/conversor-unidades/', icon: '📏', name: 'Conversor Unidades', description: 'Longitud, peso, etc.' },
+  ],
   'conversor-binario': [...conversoresApps.slice(0, 2), ...criptografiaModernaApps.slice(2, 4)],
   'conversor-braille': [
     { url: '/lupa-digital/', icon: '🔍', name: 'Lupa Digital', description: 'Amplía texto y objetos con la cámara hasta 5x' },
