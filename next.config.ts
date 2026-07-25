@@ -31,7 +31,9 @@ const securityHeaders = [
   // Restringir APIs del navegador innecesarias
   {
     key: 'Permissions-Policy',
-    value: 'camera=(self), microphone=(self), geolocation=(self), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()',
+    // magnetometer/gyroscope/accelerometer en (self): los necesita nivel-burbuja
+    // (evento deviceorientation). Con =() Chrome los bloqueaba en silencio.
+    value: 'camera=(self), microphone=(self), geolocation=(self), payment=(), usb=(), magnetometer=(self), gyroscope=(self), accelerometer=(self)',
   },
   // CSP enforcement activo desde 23/02/2026 (período report-only superado sin incidencias)
   // Dominios adicionales identificados en auditoría de seguridad:
