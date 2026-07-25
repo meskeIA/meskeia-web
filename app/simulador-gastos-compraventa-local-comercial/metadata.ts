@@ -2,9 +2,9 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Simulador Gastos Compra Local Comercial - IVA, ITP, Renuncia Exención | meskeIA',
-  description: 'Calcula los gastos de compra de un local comercial en España: IVA 21% en obra nueva, ITP por comunidad autónoma en segunda mano, renuncia a la exención de IVA (inversión del sujeto pasivo), AJD, notaría y registro. Gratis y sin registro.',
-  keywords: 'simulador gastos compra local comercial, gastos compraventa local, IVA local comercial, ITP local comercial, renuncia exencion IVA local, inversion sujeto pasivo local, comprar local impuestos, calculadora local comercial españa',
+  title: 'Simulador Gastos Compraventa Local Comercial - IVA, ITP, Plusvalía e IRPF | meskeIA',
+  description: 'Calcula los gastos de compra y venta de un local comercial en España. Si compras: IVA 21% en obra nueva, ITP en segunda mano, renuncia a la exención de IVA (inversión del sujeto pasivo), AJD, notaría y registro. Si vendes: plusvalía municipal, IRPF de la ganancia y neto que recibes. Gratis y sin registro.',
+  keywords: 'simulador gastos compra local comercial, simulador gastos venta local comercial, calculadora gastos venta local comercial, gastos compraventa local, IVA local comercial, ITP local comercial, renuncia exencion IVA local, inversion sujeto pasivo local, plusvalia venta local comercial, irpf venta local, calculadora local comercial españa',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    title: 'Simulador Gastos Compra Local Comercial | meskeIA',
-    description: 'Calcula el IVA 21%, ITP, renuncia a la exención de IVA y gastos de compraventa de un local comercial en España.',
+    title: 'Simulador Gastos Compraventa Local Comercial | meskeIA',
+    description: 'Calcula el IVA, ITP y la renuncia a la exención si compras; la plusvalía municipal y el IRPF si vendes un local comercial en España.',
     url: 'https://meskeia.com/simulador-gastos-compraventa-local-comercial/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -23,15 +23,15 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Simulador Gastos Compra Local Comercial | meskeIA',
-    description: 'IVA 21%, ITP, renuncia a la exención de IVA, notaría y registro en la compraventa de un local comercial. Calcula gratis.',
+    title: 'Simulador Gastos Compraventa Local Comercial | meskeIA',
+    description: 'IVA, ITP, renuncia a la exención, plusvalía municipal e IRPF en la compraventa de un local comercial. Calcula gratis.',
     images: ['https://meskeia.com/og-image.png'],
   },
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'Simulador Gastos Compra Local Comercial',
-  description: 'Calculadora de gastos de compra de local comercial en España. Incluye IVA 21% en obra nueva, ITP por comunidad autónoma en segunda mano, renuncia a la exención de IVA con inversión del sujeto pasivo, AJD, notaría y registro de la propiedad.',
+  name: 'Simulador Gastos Compraventa Local Comercial',
+  description: 'Calculadora de gastos de compra y venta de local comercial en España. Para el comprador: IVA 21% en obra nueva, ITP por comunidad autónoma en segunda mano, renuncia a la exención de IVA con inversión del sujeto pasivo, AJD, notaría y registro. Para el vendedor: plusvalía municipal, IRPF sobre la ganancia patrimonial (con corrección por amortizaciones si el local estuvo afecto a una actividad) y neto resultante.',
   url: 'https://meskeia.com/simulador-gastos-compraventa-local-comercial/',
   category: 'FinanceApplication',
   features: [
@@ -41,9 +41,12 @@ export const jsonLd = generateWebAppSchema({
     'AJD (Actos Jurídicos Documentados)',
     'Gastos de notaría y registro de la propiedad',
     'Nota sobre deducibilidad del IVA para empresas y autónomos',
+    'Vendedor: plusvalía municipal (IIVTNU) por método objetivo y real',
+    'Vendedor: IRPF de la ganancia patrimonial y neto tras impuestos',
+    'Corrección del valor de adquisición por amortizaciones (local afecto a actividad)',
     'Gratuito, sin registro, en español',
   ],
-  keywords: ['gastos local comercial', 'IVA local comercial', 'ITP local comercial', 'renuncia exención IVA', 'compraventa local', 'España'],
+  keywords: ['gastos local comercial', 'IVA local comercial', 'ITP local comercial', 'renuncia exención IVA', 'gastos venta local comercial', 'plusvalía venta local', 'compraventa local', 'España'],
 });
 
 export const faqJsonLd = {
@@ -80,6 +83,14 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Sí, siempre que el comprador sea sujeto pasivo de IVA (empresa o autónomo) y el local se destine a una actividad económica sujeta y no exenta de IVA. El IVA soportado en la compra se deduce en el modelo 303, en el porcentaje de afectación a la actividad. Si la actividad está exenta de IVA (por ejemplo enseñanza o sanidad), el IVA no es deducible.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué gastos e impuestos paga el vendedor de un local comercial?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El vendedor paga la plusvalía municipal (IIVTNU), porque el local está sobre suelo urbano, y tributa en el IRPF por la ganancia patrimonial en la base del ahorro (tipos del 19% al 30% en 2025). A diferencia de la vivienda habitual, no existe exención por reinversión ni por tener más de 65 años. Si el local estuvo afecto a una actividad económica, el valor de adquisición se minora en las amortizaciones deducidas, lo que aumenta la ganancia. A esto se suman la comisión de la inmobiliaria y la gestoría.',
       },
     },
     {

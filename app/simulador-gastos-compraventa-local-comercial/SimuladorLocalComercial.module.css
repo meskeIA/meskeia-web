@@ -372,3 +372,85 @@
   border-color: #f59e0b;
   color: #e0c070;
 }
+
+/* =====================================================
+   PESTAÑAS COMPRADOR / VENDEDOR
+   ===================================================== */
+.tabs {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 2px solid var(--border);
+}
+
+.tab {
+  flex: 1;
+  padding: var(--spacing-md);
+  background: transparent;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.tab.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.resultsInner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Formulario adicional del vendedor */
+.formVendedor {
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  border: 1px solid var(--border);
+}
+
+.formVendedorTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-md);
+  color: var(--text-primary);
+}
+
+.perfilGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+@media (max-width: 480px) {
+  .perfilGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.notaVendedor {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: var(--spacing-sm) 0 0;
+}

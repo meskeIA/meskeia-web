@@ -17,6 +17,7 @@ import {
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
+import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -24,11 +25,13 @@ import {
   calcularAJD,
   calcularNotario,
   calcularRegistro,
+  calcularPlusvaliaMunicipal,
   ENLACE_CATASTRO,
 } from '@/data/itp-ccaa';
 
 // ===== TIPOS =====
 type TipoTransmision = 'segunda-mano' | 'primera-mano' | 'segunda-mano-renuncia';
+type PerfilVendedor = 'particular' | 'afecto-actividad';
 
 interface ResultadosComprador {
   precioInmueble: number;
@@ -42,6 +45,21 @@ interface ResultadosComprador {
   totalGastos: number;
   totalOperacion: number;
   ivaRecuperable: boolean; // true si el impuesto principal es IVA (deducible si el comprador es sujeto pasivo)
+}
+
+interface ResultadosVendedor {
+  precioVenta: number;
+  plusvaliaMunicipal: number;
+  metodoPlusvalia: string;
+  exentoPlusvalia: boolean;
+  comisionInmobiliaria: number;
+  gastosGestoria: number;
+  valorAdquisicionCorregido: number;
+  amortizacionesRestadas: number;
+  gananciaPatrimonial: number;
+  irpfGanancia: number;
+  totalGastos: number;
+  netoVendedor: number;
 }
 
 // ===== CONSTANTES =====
@@ -75,6 +93,16 @@ export default function SimuladorLocalComercialPage() {
   const [ccaa, setCcaa] = useState<ComunidadAutonoma>('madrid');
   const [tipoTransmision, setTipoTransmision] = useState<TipoTransmision>('segunda-mano');
   const [gastosGestoria, setGastosGestoria] = useState('500');
+
+  // Datos del vendedor
+  const [precioCompraOriginal, setPrecioCompraOriginal] = useState('');
+  const [aniosPropiedad, setAniosPropiedad] = useState('');
+  const [valorCatastralSuelo, setValorCatastralSuelo] = useState('');
+  const [comisionInmobiliaria, setComisionInmobiliaria] = useState('3');
+  const [perfilVendedor, setPerfilVendedor] = useState<PerfilVendedor>('particular');
+  const [amortizacionesAcumuladas, setAmortizacionesAcumuladas] = useState('');
+
+  const [pestanaActiva, setPestanaActiva] = useState<'comprador' | 'vendedor'>('comprador');
 
   const esRenuncia = tipoTransmision === 'segunda-mano-renuncia';
 
@@ -136,6 +164,89 @@ export default function SimuladorLocalComercialPage() {
     };
   }, [precioVenta, ccaa, tipoTransmision, gastosGestoria]);
 
+  // ===== CÁLCULOS VENDEDOR =====
+  // El vendedor de un local paga plusvalía municipal (es suelo urbano) e IRPF sobre la
+  // ganancia patrimonial. La diferencia con la vivienda: no hay exención por reinversión
+  // ni por mayores de 65 años, y si el local estuvo AFECTO a una actividad económica hay
+  // que minorar el valor de adquisición en las amortizaciones deducidas (art. 40 RIRPF).
+  const resultadosVendedor = useMemo((): ResultadosVendedor | null => {
+    const precioV = parseSpanishNumber(precioVenta);
+    const precioC = parseSpanishNumber(precioCompraOriginal);
+    const anios = parseInt(aniosPropiedad) || 0;
+    const valorSuelo = parseSpanishNumber(valorCatastralSuelo);
+
+    if (precioV <= 0) return null;
+
+    const comisionPct = parseSpanishNumber(comisionInmobiliaria) / 100;
+    const gestoria = parseSpanishNumber(gastosGestoria);
+    const comision = precioV * comisionPct;
+
+    // Plusvalía municipal (IIVTNU): el local está en suelo urbano, sí tributa
+    let plusvalia = 0;
+    let metodoPlusvalia = 'No calculada (faltan valor catastral del suelo, años y precio de compra)';
+    let exentoPlusvalia = false;
+
+    if (valorSuelo > 0 && anios > 0 && precioC > 0) {
+      const resultadoPlusvalia = calcularPlusvaliaMunicipal({
+        valorCatastralSuelo: valorSuelo,
+        aniosPropiedad: anios,
+        precioCompra: precioC,
+        precioVenta: precioV,
+      });
+      plusvalia = resultadoPlusvalia.recomendado;
+      exentoPlusvalia = resultadoPlusvalia.exento;
+      metodoPlusvalia = resultadoPlusvalia.exento
+        ? 'Exento (sin ganancia de valor)'
+        : resultadoPlusvalia.metodoReal < resultadoPlusvalia.metodoObjetivo
+          ? 'Método real (más favorable)'
+          : 'Método objetivo';
+    }
+
+    // Valor de adquisición corregido: si el local estuvo afecto a actividad, se resta la
+    // amortización deducida (o la mínima), lo que AUMENTA la ganancia patrimonial.
+    const amortizaciones = perfilVendedor === 'afecto-actividad'
+      ? Math.max(0, parseSpanishNumber(amortizacionesAcumuladas))
+      : 0;
+    const valorAdquisicionCorregido = precioC > 0 ? Math.max(0, precioC - amortizaciones) : 0;
+
+    const ganancia = precioC > 0
+      ? Math.max(0, precioV - valorAdquisicionCorregido - comision - gestoria)
+      : 0;
+
+    let irpf = 0;
+    if (ganancia > 0) {
+      let gananciaRestante = ganancia;
+      let limiteAnterior = 0;
+      for (const tramo of TRAMOS_GANANCIAS_PATRIMONIALES_2025) {
+        const baseTramo = Math.min(gananciaRestante, tramo.hasta - limiteAnterior);
+        if (baseTramo <= 0) break;
+        irpf += baseTramo * (tramo.tipo / 100);
+        gananciaRestante -= baseTramo;
+        limiteAnterior = tramo.hasta;
+      }
+    }
+
+    const totalGastos = plusvalia + comision + gestoria + irpf;
+
+    return {
+      precioVenta: precioV,
+      plusvaliaMunicipal: plusvalia,
+      metodoPlusvalia,
+      exentoPlusvalia,
+      comisionInmobiliaria: comision,
+      gastosGestoria: gestoria,
+      valorAdquisicionCorregido,
+      amortizacionesRestadas: amortizaciones,
+      gananciaPatrimonial: ganancia,
+      irpfGanancia: irpf,
+      totalGastos,
+      netoVendedor: precioV - totalGastos,
+    };
+  }, [
+    precioVenta, precioCompraOriginal, aniosPropiedad, valorCatastralSuelo,
+    comisionInmobiliaria, gastosGestoria, perfilVendedor, amortizacionesAcumuladas,
+  ]);
+
   const datosCcaaActual = ITP_CCAA[ccaa];
 
   return (
@@ -145,10 +256,10 @@ export default function SimuladorLocalComercialPage() {
       {/* Hero Section */}
       <header className={styles.hero}>
         <span aria-hidden="true" className={styles.heroIcon}>🏪</span>
-        <h1 className={styles.title}>Simulador de Gastos de Compra de Local Comercial</h1>
+        <h1 className={styles.title}>Simulador de Gastos de Compraventa de Local Comercial</h1>
         <p className={styles.subtitle}>
-          Calcula el IVA, ITP, AJD, notaría y registro al comprar un local comercial en España — incluida la
-          renuncia a la exención de IVA con inversión del sujeto pasivo
+          Si compras: IVA, ITP, AJD, notaría y registro, incluida la renuncia a la exención de IVA con
+          inversión del sujeto pasivo. Si vendes: plusvalía municipal, IRPF de la ganancia y neto que recibes
         </p>
       </header>
 
@@ -228,7 +339,7 @@ export default function SimuladorLocalComercialPage() {
           <NumberInput
             value={precioVenta}
             onChange={setPrecioVenta}
-            label="Precio de compra del local comercial"
+            label="Precio del local comercial"
             placeholder="200000"
             helperText="Precio escriturado o valor de referencia catastral (el mayor de ambos)"
             min={0}
@@ -309,8 +420,28 @@ export default function SimuladorLocalComercialPage() {
 
         {/* Panel de resultados */}
         <div className={styles.resultados}>
-          {resultadosComprador ? (
-            <>
+          {/* Pestañas comprador / vendedor */}
+          <div className={styles.tabs}>
+            <button
+              type="button"
+              aria-pressed={pestanaActiva === 'comprador'}
+              className={`${styles.tab} ${pestanaActiva === 'comprador' ? styles.active : ''}`}
+              onClick={() => setPestanaActiva('comprador')}
+            >
+              <span aria-hidden="true">🛒</span> Comprador
+            </button>
+            <button
+              type="button"
+              aria-pressed={pestanaActiva === 'vendedor'}
+              className={`${styles.tab} ${pestanaActiva === 'vendedor' ? styles.active : ''}`}
+              onClick={() => setPestanaActiva('vendedor')}
+            >
+              <span aria-hidden="true">💰</span> Vendedor
+            </button>
+          </div>
+
+          {pestanaActiva === 'comprador' && (resultadosComprador ? (
+            <div className={styles.resultsInner}>
               <ResultCard
                 title="Precio del local comercial"
                 value={formatCurrency(resultadosComprador.precioInmueble)}
@@ -386,11 +517,178 @@ export default function SimuladorLocalComercialPage() {
                     : 'Precio + todos los gastos de la operación'
                 }
               />
-            </>
+            </div>
           ) : (
             <div className={styles.placeholder}>
               <span className={styles.placeholderIcon} aria-hidden="true">📊</span>
               <p>Introduce el precio del local comercial para ver el desglose de gastos</p>
+            </div>
+          ))}
+
+          {/* ===== VENDEDOR ===== */}
+          {pestanaActiva === 'vendedor' && (
+            <div className={styles.resultsInner}>
+              <div className={styles.formVendedor}>
+                <h3 className={styles.formVendedorTitle}>Datos para calcular plusvalía e IRPF</h3>
+
+                <div className={styles.perfilGrid}>
+                  <button
+                    type="button"
+                    aria-pressed={perfilVendedor === 'particular'}
+                    className={`${styles.transmisionBtn} ${perfilVendedor === 'particular' ? styles.active : ''}`}
+                    onClick={() => setPerfilVendedor('particular')}
+                  >
+                    <span className={styles.transmisionIcon} aria-hidden="true">🙋</span>
+                    <span>Local no afecto</span>
+                    <span className={styles.transmisionSub}>Patrimonio particular</span>
+                  </button>
+                  <button
+                    type="button"
+                    aria-pressed={perfilVendedor === 'afecto-actividad'}
+                    className={`${styles.transmisionBtn} ${perfilVendedor === 'afecto-actividad' ? styles.active : ''}`}
+                    onClick={() => setPerfilVendedor('afecto-actividad')}
+                  >
+                    <span className={styles.transmisionIcon} aria-hidden="true">🏪</span>
+                    <span>Local afecto a actividad</span>
+                    <span className={styles.transmisionSub}>Con amortizaciones</span>
+                  </button>
+                </div>
+
+                <NumberInput
+                  value={precioCompraOriginal}
+                  onChange={setPrecioCompraOriginal}
+                  label="Precio de compra original"
+                  placeholder="150000"
+                  helperText="Lo que pagaste al adquirir el local (incluidos gastos e impuestos de aquella compra)"
+                  min={0}
+                />
+
+                {perfilVendedor === 'afecto-actividad' && (
+                  <NumberInput
+                    value={amortizacionesAcumuladas}
+                    onChange={setAmortizacionesAcumuladas}
+                    label="Amortizaciones acumuladas deducidas (€)"
+                    placeholder="20000"
+                    helperText="Suma de la amortización deducida en tu actividad. Se resta del valor de adquisición y aumenta la ganancia."
+                    min={0}
+                  />
+                )}
+
+                <NumberInput
+                  value={aniosPropiedad}
+                  onChange={setAniosPropiedad}
+                  label="Años de propiedad"
+                  placeholder="10"
+                  helperText="Años completos desde la compra (máximo 20 para la plusvalía municipal)"
+                  min={0}
+                />
+
+                <NumberInput
+                  value={valorCatastralSuelo}
+                  onChange={setValorCatastralSuelo}
+                  label="Valor catastral del suelo (€)"
+                  placeholder="40000"
+                  helperText="Solo la parte de suelo, no la construcción. Aparece en el recibo del IBI."
+                  min={0}
+                />
+
+                <NumberInput
+                  value={comisionInmobiliaria}
+                  onChange={setComisionInmobiliaria}
+                  label="Comisión de la inmobiliaria (%)"
+                  placeholder="3"
+                  helperText="Habitual en locales: 3-5% del precio de venta"
+                  min={0}
+                />
+
+                <div className={styles.enlaceCatastro}>
+                  <a href={ENLACE_CATASTRO} target="_blank" rel="noopener noreferrer" className={styles.catastroLink}>
+                    <span aria-hidden="true">🔗</span> Consultar el valor catastral del suelo en la Sede del Catastro
+                  </a>
+                </div>
+              </div>
+
+              {resultadosVendedor ? (
+                <>
+                  <ResultCard
+                    title="Precio de venta"
+                    value={formatCurrency(resultadosVendedor.precioVenta)}
+                    variant="default"
+                    icon="🏪"
+                  />
+
+                  <ResultCard
+                    title="Plusvalía municipal (IIVTNU)"
+                    value={formatCurrency(resultadosVendedor.plusvaliaMunicipal)}
+                    variant={resultadosVendedor.exentoPlusvalia ? 'info' : 'warning'}
+                    icon="🏛️"
+                    description={resultadosVendedor.metodoPlusvalia}
+                  />
+
+                  {resultadosVendedor.amortizacionesRestadas > 0 && (
+                    <ResultCard
+                      title="Valor de adquisición corregido"
+                      value={formatCurrency(resultadosVendedor.valorAdquisicionCorregido)}
+                      variant="default"
+                      icon="📉"
+                      description={`Precio de compra menos ${formatCurrency(resultadosVendedor.amortizacionesRestadas)} de amortizaciones deducidas`}
+                    />
+                  )}
+
+                  <ResultCard
+                    title="Ganancia patrimonial"
+                    value={formatCurrency(resultadosVendedor.gananciaPatrimonial)}
+                    variant="default"
+                    icon="📈"
+                    description="Venta menos valor de adquisición corregido y gastos de la transmisión"
+                  />
+
+                  <ResultCard
+                    title="IRPF sobre la ganancia"
+                    value={formatCurrency(resultadosVendedor.irpfGanancia)}
+                    variant="warning"
+                    icon="🧾"
+                    description="Base del ahorro 2025. Un local no tiene exención por reinversión ni por edad."
+                  />
+
+                  <ResultCard
+                    title="Comisión de la inmobiliaria"
+                    value={formatCurrency(resultadosVendedor.comisionInmobiliaria)}
+                    variant="default"
+                    icon="🤝"
+                  />
+
+                  <div className={styles.separador} />
+
+                  <ResultCard
+                    title="Total gastos de la venta"
+                    value={formatCurrency(resultadosVendedor.totalGastos)}
+                    variant="info"
+                    icon="➖"
+                    description={`${formatNumber((resultadosVendedor.totalGastos / resultadosVendedor.precioVenta) * 100, 2)}% sobre el precio de venta`}
+                  />
+
+                  <ResultCard
+                    title="NETO QUE RECIBES"
+                    value={formatCurrency(resultadosVendedor.netoVendedor)}
+                    variant="highlight"
+                    icon="💰"
+                    description="Precio de venta menos impuestos, comisión y gestoría"
+                  />
+
+                  <p className={styles.notaVendedor}>
+                    Si el vendedor es una <strong>sociedad</strong>, la ganancia no tributa en el IRPF sino
+                    en el <strong>Impuesto sobre Sociedades</strong>. Y si el local se vende con{' '}
+                    <strong>renuncia a la exención de IVA</strong>, el vendedor no repercute el impuesto:
+                    lo autoliquida el comprador por inversión del sujeto pasivo.
+                  </p>
+                </>
+              ) : (
+                <div className={styles.placeholder}>
+                  <span className={styles.placeholderIcon} aria-hidden="true">📊</span>
+                  <p>Introduce el precio de venta del local para ver lo que te queda tras impuestos</p>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -525,6 +823,44 @@ export default function SimuladorLocalComercialPage() {
           </div>
         </section>
 
+        {/* Qué paga el vendedor */}
+        <section>
+          <h2>Si eres tú quien vende: lo que se lleva Hacienda</h2>
+          <p>
+            La compra y la venta de un local son dos operaciones fiscales distintas. El comprador
+            soporta IVA o ITP; el vendedor responde de otros dos impuestos y, a diferencia de la
+            vivienda habitual, sin ninguna de sus exenciones.
+          </p>
+          <ul>
+            <li>
+              <strong>Plusvalía municipal (IIVTNU).</strong> El local está sobre suelo urbano, así que
+              la transmisión sí genera este impuesto. Puedes elegir entre el método objetivo (coeficientes
+              sobre el valor catastral del suelo) y el real (ganancia efectiva del suelo): se aplica el
+              que salga menor, y si vendes con pérdida no hay impuesto.
+            </li>
+            <li>
+              <strong>IRPF de la ganancia patrimonial.</strong> Tributa en la base del ahorro con los
+              tramos del 19% al 30% de 2025. <strong>No hay exención por reinversión ni por tener más
+              de 65 años</strong>: esas dos ventajas son exclusivas de la vivienda habitual.
+            </li>
+            <li>
+              <strong>Amortizaciones si el local estuvo afecto a una actividad.</strong> Si lo usaste en
+              tu negocio o lo tuviste alquilado y deduciste amortización, el valor de adquisición se
+              minora en la amortización deducida —o en la mínima, aunque no la dedujeras— según el
+              artículo 40 del Reglamento del IRPF. La ganancia sube, y con ella el impuesto.
+            </li>
+            <li>
+              <strong>Si el vendedor es una sociedad</strong>, la ganancia no va al IRPF sino al
+              Impuesto sobre Sociedades, integrada en la base imponible del ejercicio.
+            </li>
+          </ul>
+          <p>
+            Un matiz frecuente: cuando la venta se hace con <strong>renuncia a la exención de IVA</strong>,
+            el vendedor no repercute ni ingresa ese IVA. Lo autoliquida el comprador por inversión del
+            sujeto pasivo, de modo que para el vendedor no supone ni coste ni cobro.
+          </p>
+        </section>
+
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
@@ -536,6 +872,8 @@ export default function SimuladorLocalComercialPage() {
             <li>En la renuncia, muchas CCAA aplican un tipo de AJD incrementado; este simulador usa el AJD general, así que el coste real de AJD puede ser mayor.</li>
             <li>El IVA solo es deducible si el comprador es sujeto pasivo de IVA con actividad sujeta y no exenta.</li>
             <li>El valor de referencia catastral puede ser la base imponible real del ITP si supera el precio escriturado.</li>
+            <li>En la pestaña de vendedor, el tipo municipal del IIVTNU se estima con un valor orientativo: cada ayuntamiento fija el suyo, así que confirma el de tu municipio.</li>
+            <li>Si el local estuvo afecto a una actividad, la amortización que debe restarse es la deducida o la mínima, aunque no se hubiera deducido; el simulador usa la cifra que introduzcas.</li>
             <li>Los tipos de ITP y AJD pueden variar; verifica la normativa vigente de tu comunidad autónoma y consulta con tu asesor fiscal antes de cerrar la operación.</li>
           </ul>
         </div>

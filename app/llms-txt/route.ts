@@ -303,7 +303,7 @@ meskeIA ofrece integración nativa con los principales asistentes de IA:
 ### Servidores MCP (Model Context Protocol)
 meskeIA expone dos servidores MCP, uno por dominio de uso:
 - **https://meskeia.com/api/mcp** — 42 herramientas del día a día: cocina y repostería, deporte y entrenamiento, salud y nutrición, fotografía y vídeo, mascotas, vehículos y utilidades (unidades, porcentajes, fechas, estadística). Sin fiscalidad.
-- **https://delegum.com/api/mcp/** — 48 herramientas de fiscalidad, derecho laboral y finanzas de España: IRPF, IVA, hipotecas, herencias, autónomos, nóminas, finiquitos, inversión y jubilación (ver sección Delegum más abajo).
+- **https://delegum.com/api/mcp/** — 49 herramientas de fiscalidad, derecho laboral y finanzas de España: IRPF, IVA, hipotecas, herencias, autónomos, nóminas, finiquitos, inversión y jubilación (ver sección Delegum más abajo).
 - Compatibles con Claude Desktop, Mistral, el conector MCP de ChatGPT y cualquier cliente MCP estándar.
 
 ### Custom GPTs en ChatGPT (12 GPTs publicados)

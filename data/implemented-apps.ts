@@ -79,7 +79,7 @@ export const implementedAppsUrls = [
   "/simulador-gastos-compraventa-garaje/", // Gastos compraventa garaje: ITP, notaría, registro, plusvalía
   "/simulador-gastos-compraventa-nave-industrial/", // Gastos compra nave industrial: IVA 21%, ITP, AJD
   "/simulador-gastos-compraventa-trastero/", // Gastos compraventa trastero: ITP, notaría, registro
-  "/simulador-gastos-compraventa-local-comercial/", // Gastos compra local comercial: IVA/ITP, renuncia exención IVA (ISP), AJD, notaría, registro
+  "/simulador-gastos-compraventa-local-comercial/", // Gastos compraventa local comercial: comprador IVA/ITP + renuncia exención IVA (ISP), AJD, notaría, registro · vendedor plusvalía municipal + IRPF
   "/simulador-gastos-compraventa-terreno-rustico/", // Gastos compra finca/terreno rústico: ITP (exento IVA), sin plusvalía municipal, renuncia exención IVA
   "/simulador-gastos-compraventa-solar/", // Gastos compra solar/terreno edificable: IVA 21%+AJD (empresario) o ITP (particular), plusvalía municipal vendedor
   "/estimador-prestamos/",           // Compara sistemas francés, alemán, americano

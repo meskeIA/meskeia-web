@@ -17,7 +17,7 @@ import {
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
-import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
+import { TRAMOS_GANANCIAS_PATRIMONIALES_2025, IVA_INMUEBLES_2025 } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -123,10 +123,14 @@ export default function SimuladorTrasteroCompraventaPage() {
     let tipoImpuesto = '';
     let porcentaje = 0;
 
-    // El trastero es siempre residencial (IVA 10%)
     if (tipoTransmision === 'primera-mano') {
+      // Trastero nuevo: IVA reducido (10%) solo si se transmite CONJUNTAMENTE con la
+      // vivienda como anejo (art. 91.Uno.1.7º LIVA). El trastero independiente —finca
+      // registral propia, comprado por separado— tributa al tipo general del 21%.
       tipoImpuesto = 'IVA';
-      porcentaje = 10; // Trastero: 10% (mismo que vivienda y garaje)
+      porcentaje = modalidadTrastero === 'vinculado'
+        ? IVA_INMUEBLES_2025.garageCon
+        : IVA_INMUEBLES_2025.garaje;
       impuesto = precio * (porcentaje / 100);
     } else {
       // ITP para segunda mano
@@ -171,7 +175,7 @@ export default function SimuladorTrasteroCompraventaPage() {
       totalGastos,
       totalOperacion: precio + totalGastos,
     };
-  }, [precioVenta, ccaa, tipoTransmision, perfilComprador, gastosGestoria]);
+  }, [precioVenta, ccaa, tipoTransmision, perfilComprador, gastosGestoria, modalidadTrastero]);
 
   // ===== CÁLCULOS VENDEDOR =====
   const resultadosVendedor = useMemo((): ResultadosVendedor | null => {
@@ -289,6 +293,8 @@ export default function SimuladorTrasteroCompraventaPage() {
             <label className={styles.label}>Modalidad del trastero</label>
             <div className={styles.transmisionGrid}>
               <button
+                type="button"
+                aria-pressed={modalidadTrastero === 'vinculado'}
                 className={`${styles.transmisionBtn} ${modalidadTrastero === 'vinculado' ? styles.active : ''}`}
                 onClick={() => setModalidadTrastero('vinculado')}
               >
@@ -297,6 +303,8 @@ export default function SimuladorTrasteroCompraventaPage() {
                 <span className={styles.transmisionSub}>Anejo residencial</span>
               </button>
               <button
+                type="button"
+                aria-pressed={modalidadTrastero === 'independiente'}
                 className={`${styles.transmisionBtn} ${modalidadTrastero === 'independiente' ? styles.active : ''}`}
                 onClick={() => setModalidadTrastero('independiente')}
               >
@@ -307,7 +315,11 @@ export default function SimuladorTrasteroCompraventaPage() {
             </div>
             {modalidadTrastero === 'independiente' && (
               <p className={styles.infoCcaaNote} style={{ marginTop: '0.5rem', color: '#856404' }}>
-                ⚠️ La fiscalidad del trastero independiente puede variar por CCAA. Consulta con tu asesor fiscal.
+                <span aria-hidden="true">⚠️</span> En obra nueva, el trastero independiente tributa al{' '}
+                <strong>IVA general del 21%</strong>, no al 10%: el tipo reducido solo se aplica a los anejos
+                transmitidos junto con la vivienda. En segunda mano paga ITP, pero los tipos reducidos por
+                perfil (joven, familia numerosa) suelen exigir que la compra sea de vivienda habitual.
+                Confirma tu caso con un asesor fiscal.
               </p>
             )}
           </div>
@@ -317,6 +329,8 @@ export default function SimuladorTrasteroCompraventaPage() {
             <label className={styles.label}>Tipo de transmisión</label>
             <div className={styles.transmisionGrid}>
               <button
+                type="button"
+                aria-pressed={tipoTransmision === 'segunda-mano'}
                 className={`${styles.transmisionBtn} ${tipoTransmision === 'segunda-mano' ? styles.active : ''}`}
                 onClick={() => setTipoTransmision('segunda-mano')}
               >
@@ -325,12 +339,16 @@ export default function SimuladorTrasteroCompraventaPage() {
                 <span className={styles.transmisionSub}>Paga ITP</span>
               </button>
               <button
+                type="button"
+                aria-pressed={tipoTransmision === 'primera-mano'}
                 className={`${styles.transmisionBtn} ${tipoTransmision === 'primera-mano' ? styles.active : ''}`}
                 onClick={() => setTipoTransmision('primera-mano')}
               >
                 <span className={styles.transmisionIcon}>🆕</span>
                 <span>Primera mano</span>
-                <span className={styles.transmisionSub}>Paga IVA 10%</span>
+                <span className={styles.transmisionSub}>
+                  Paga IVA {modalidadTrastero === 'vinculado' ? '10%' : '21%'}
+                </span>
               </button>
             </div>
           </div>
@@ -427,12 +445,16 @@ export default function SimuladorTrasteroCompraventaPage() {
           {/* Pestañas */}
           <div className={styles.tabs}>
             <button
+              type="button"
+              aria-pressed={pestanaActiva === 'comprador'}
               className={`${styles.tab} ${pestanaActiva === 'comprador' ? styles.active : ''}`}
               onClick={() => setPestanaActiva('comprador')}
             >
               🛒 Comprador
             </button>
             <button
+              type="button"
+              aria-pressed={pestanaActiva === 'vendedor'}
               className={`${styles.tab} ${pestanaActiva === 'vendedor' ? styles.active : ''}`}
               onClick={() => setPestanaActiva('vendedor')}
             >
@@ -459,7 +481,9 @@ export default function SimuladorTrasteroCompraventaPage() {
                     icon="📋"
                     description={
                       tipoTransmision === 'primera-mano'
-                        ? 'IVA 10% — trastero residencial (obra nueva)'
+                        ? (modalidadTrastero === 'vinculado'
+                            ? 'IVA 10% — anejo transmitido con la vivienda (obra nueva)'
+                            : 'IVA 21% — trastero independiente (obra nueva)')
                         : `ITP ${datosCcaaActual.nombre}`
                     }
                   />
@@ -671,9 +695,9 @@ export default function SimuladorTrasteroCompraventaPage() {
               <tbody>
                 <tr>
                   <td>IVA en obra nueva</td>
-                  <td>10% (residencial)</td>
-                  <td>10% (residencial)</td>
-                  <td>10% (residencial)</td>
+                  <td>10% (anejo de la vivienda)</td>
+                  <td>21% (tipo general)</td>
+                  <td>10% con la vivienda (máx. 2 plazas) · 21% independiente</td>
                 </tr>
                 <tr>
                   <td>ITP en segunda mano</td>
@@ -763,17 +787,20 @@ export default function SimuladorTrasteroCompraventaPage() {
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
               <h4>¿Qué IVA paga un trastero nuevo?</h4>
-              <p>Un trastero de obra nueva (primera transmisión del promotor) paga IVA al <strong>10%</strong>,
-              igual que una vivienda o garaje residencial. Este tipo se aplica tanto si va vinculado a una vivienda
-              como si se vende de forma independiente, siempre que sea la primera transmisión. Si fuese un local
-              de uso mixto o con finalidad no residencial, podría aplicar el 21%.</p>
+              <p>Depende de si se compra con la vivienda o por separado. Si el promotor lo transmite
+              <strong> conjuntamente con la vivienda</strong> como anejo, se aplica el tipo reducido del
+              <strong> 10%</strong> (art. 91.Uno.1.7º de la Ley del IVA). Si se compra de forma
+              <strong> independiente</strong> —finca registral propia, operación separada— tributa al tipo
+              general del <strong>21%</strong>. Es el mismo criterio que rige para las plazas de garaje.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Qué diferencia hay entre trastero vinculado y trastero independiente?</h4>
               <p>El <strong>trastero vinculado</strong> forma parte de la misma finca registral que la vivienda y se vende
               junto a ella como anejo. El <strong>trastero independiente</strong> tiene su propia referencia catastral
-              y escritura y puede venderse por separado. La diferencia fiscal es que el trastero independiente puede
-              recibir un tratamiento distinto en algunas comunidades autónomas, especialmente en ITP de segunda mano.
+              y escritura y puede venderse por separado. La diferencia fiscal principal está en la obra nueva:
+              el vinculado paga <strong>IVA al 10%</strong> como anejo de la vivienda y el independiente al
+              <strong> 21%</strong>. En segunda mano ambos pagan ITP al tipo de la comunidad autónoma, aunque los
+              tipos reducidos por perfil del comprador suelen exigir que la compra sea de vivienda habitual.
               Consulta siempre con un asesor fiscal antes de la operación.</p>
             </div>
             <div className={styles.faqItem}>

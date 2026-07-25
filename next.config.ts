@@ -155,6 +155,10 @@ const nextConfig: NextConfig = {
       // vigente en lugar de dejar la nueva URL empezar de cero. Traffic bajo pero
       // real y con posiciones de página 1 en varios casos (p.ej. jet-lag pos 4,7).
       { source: '/simulador-jet-lag', has, destination: '/orientador-jet-lag/', permanent: true },
+      // Slug antiguo del estimador de compraventa: seguía en el índice de Google con
+      // 333 impresiones y 14 clics en 180 días (posición media 8,9) devolviendo 404
+      // (verificado en GSC 2026-07-25). El 301 recupera esos clics y traspasa la señal.
+      { source: '/simulador-compraventa-inmueble', has, destination: '/estimador-compraventa-inmueble/', permanent: true },
       { source: '/convertidor-markdown-html', has, destination: '/conversor-markdown-html/', permanent: true },
       { source: '/calculadora-coste-vivienda', has, destination: '/estimador-coste-vivienda/', permanent: true },
       { source: '/calculadora-fire', has, destination: '/estimador-fire/', permanent: true },

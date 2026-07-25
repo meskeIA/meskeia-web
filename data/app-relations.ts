@@ -579,11 +579,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // FINANZAS - HIPOTECA / INMOBILIARIA
   'simulador-hipoteca': finanzasHipotecaApps.filter(a => a.url !== '/estimador-hipoteca/'),
   'simulador-compraventa-inmueble': finanzasHipotecaApps.filter(a => a.url !== '/estimador-compraventa-inmueble/'),
+  // El estimador es el hub del clúster: recibe buena parte de las impresiones de las
+  // queries de nicho (garaje, trastero, local…) y debe repartirlas hacia la app que
+  // calcula esa rama fiscal completa. RelatedApps solo pinta 4, así que aquí van las
+  // dos de más demanda; el reparto a las 6 se hace de forma contextual en la propia
+  // página, al elegir el tipo de inmueble.
   'estimador-compraventa-inmueble': [
-    { url: '/estimador-hipoteca/', icon: '🏠', name: 'Simulador Hipoteca', description: 'Calcula la cuota mensual de tu préstamo' },
+    { url: '/simulador-gastos-compraventa-garaje/', icon: '🚗', name: 'Gastos Garaje', description: 'Cálculo específico para plaza de garaje' },
+    { url: '/simulador-gastos-compraventa-trastero/', icon: '📦', name: 'Gastos Trastero', description: 'Cálculo específico para trastero' },
     { url: '/estimador-plusvalia-municipal/', icon: '🏛️', name: 'Plusvalía Municipal', description: 'Impuesto del vendedor en la transmisión' },
-    { url: '/orientador-alquiler-vs-compra/', icon: '⚖️', name: 'Alquiler vs Compra', description: 'Análisis financiero completo para decidir' },
-    { url: '/calculadora-rentabilidad-alquiler/', icon: '🏘️', name: 'Rentabilidad Alquiler', description: 'ROI y cash flow si vas a alquilar' },
+    { url: '/estimador-hipoteca/', icon: '🏠', name: 'Simulador Hipoteca', description: 'Calcula la cuota mensual de tu préstamo' },
   ],
   'simulador-gastos-compraventa-garaje': [
     { url: '/estimador-compraventa-inmueble/', icon: '📋', name: 'Estimador Completo', description: 'Todos los tipos de inmueble' },

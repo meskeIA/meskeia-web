@@ -90,6 +90,49 @@ const TIPOS_INMUEBLE: { value: TipoInmueble; label: string; icon: string; grupo:
   { value: 'terreno', label: 'Terreno', icon: '🌍', grupo: 'comercial' },
 ];
 
+/**
+ * Derivación a la calculadora especializada de cada tipo.
+ *
+ * Este estimador es el hub del clúster y cubre el caso general, pero cada tipo de
+ * inmueble tiene ramas fiscales que aquí se simplifican (renuncia a la exención de
+ * IVA, exención del suelo rústico, IVA del anejo independiente…). En lugar de
+ * duplicar esas ramas, se avisa del matiz y se enlaza a la app que sí lo calcula.
+ */
+const DERIVACIONES: Partial<Record<TipoInmueble, { url: string; nombre: string; matiz: string }[]>> = {
+  garaje: [{
+    url: '/simulador-gastos-compraventa-garaje/',
+    nombre: 'Simulador de gastos de compraventa de garaje',
+    matiz: 'en obra nueva distingue el garaje transmitido con la vivienda (IVA 10%, hasta 2 plazas) del garaje independiente (IVA 21%). Aquí se aplica siempre el 10%.',
+  }],
+  trastero: [{
+    url: '/simulador-gastos-compraventa-trastero/',
+    nombre: 'Simulador de gastos de compraventa de trastero',
+    matiz: 'en obra nueva distingue el trastero transmitido con la vivienda (IVA 10%) del trastero independiente (IVA 21%). Aquí se aplica siempre el 10%.',
+  }],
+  local: [{
+    url: '/simulador-gastos-compraventa-local-comercial/',
+    nombre: 'Simulador de gastos de compra de local comercial',
+    matiz: 'contempla la renuncia a la exención de IVA con inversión del sujeto pasivo (art. 20.Dos LIVA) cuando comprador y vendedor son empresarios con derecho a deducción. Aquí la segunda mano se calcula siempre por ITP.',
+  }],
+  nave: [{
+    url: '/simulador-gastos-compraventa-nave-industrial/',
+    nombre: 'Simulador de gastos de compra de nave industrial',
+    matiz: 'contempla la renuncia a la exención de IVA con inversión del sujeto pasivo (art. 20.Dos LIVA) entre empresarios. Aquí la segunda mano se calcula siempre por ITP.',
+  }],
+  terreno: [
+    {
+      url: '/simulador-gastos-compraventa-terreno-rustico/',
+      nombre: 'Simulador de gastos de compra de finca rústica',
+      matiz: 'el suelo rústico está exento de IVA (art. 20.Uno.20º LIVA): paga ITP incluso cuando el vendedor es un empresario, y no genera plusvalía municipal, porque el IIVTNU solo grava suelo urbano.',
+    },
+    {
+      url: '/simulador-gastos-compraventa-solar/',
+      nombre: 'Simulador de gastos de compra de solar',
+      matiz: 'en el suelo edificable el impuesto depende de quién vende: IVA 21% + AJD si vende un promotor o empresario, ITP si vende un particular.',
+    },
+  ],
+};
+
 const PERFILES_COMPRADOR: { value: PerfilComprador; label: string }[] = [
   { value: 'general', label: 'General (sin bonificaciones)' },
   { value: 'joven', label: 'Joven (< 35 años)' },
@@ -310,10 +353,12 @@ export default function SimuladorCompraventaPage() {
               {TIPOS_INMUEBLE.filter(t => t.grupo === 'residencial').map(tipo => (
                 <button
                   key={tipo.value}
+                  type="button"
+                  aria-pressed={tipoInmueble === tipo.value}
                   className={`${styles.tipoInmuebleBtn} ${tipoInmueble === tipo.value ? styles.active : ''}`}
                   onClick={() => setTipoInmueble(tipo.value)}
                 >
-                  <span className={styles.tipoIcon}>{tipo.icon}</span>
+                  <span className={styles.tipoIcon} aria-hidden="true">{tipo.icon}</span>
                   <span>{tipo.label}</span>
                 </button>
               ))}
@@ -323,14 +368,36 @@ export default function SimuladorCompraventaPage() {
               {TIPOS_INMUEBLE.filter(t => t.grupo === 'comercial').map(tipo => (
                 <button
                   key={tipo.value}
+                  type="button"
+                  aria-pressed={tipoInmueble === tipo.value}
                   className={`${styles.tipoInmuebleBtn} ${tipoInmueble === tipo.value ? styles.active : ''}`}
                   onClick={() => setTipoInmueble(tipo.value)}
                 >
-                  <span className={styles.tipoIcon}>{tipo.icon}</span>
+                  <span className={styles.tipoIcon} aria-hidden="true">{tipo.icon}</span>
                   <span>{tipo.label}</span>
                 </button>
               ))}
             </div>
+
+            {/* Derivación a la calculadora especializada del tipo elegido */}
+            {DERIVACIONES[tipoInmueble] && (
+              <div className={styles.derivacionBox}>
+                <p className={styles.derivacionTitulo}>
+                  <span aria-hidden="true">🎯</span> Hay una calculadora específica para este caso
+                </p>
+                <ul className={styles.derivacionLista}>
+                  {DERIVACIONES[tipoInmueble]!.map(d => (
+                    <li key={d.url}>
+                      <a href={d.url} className={styles.derivacionEnlace}>{d.nombre}</a>: {d.matiz}
+                    </li>
+                  ))}
+                </ul>
+                <p className={styles.derivacionPie}>
+                  Este estimador te da el orden de magnitud del caso general. Para la operación
+                  concreta, usa la calculadora especializada.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Tipo de transmisión */}
@@ -338,18 +405,22 @@ export default function SimuladorCompraventaPage() {
             <label className={styles.label}>Tipo de transmisión</label>
             <div className={styles.transmisionGrid}>
               <button
+                type="button"
+                aria-pressed={tipoTransmision === 'segunda-mano'}
                 className={`${styles.transmisionBtn} ${tipoTransmision === 'segunda-mano' ? styles.active : ''}`}
                 onClick={() => setTipoTransmision('segunda-mano')}
               >
-                <span className={styles.transmisionIcon}>🔄</span>
+                <span className={styles.transmisionIcon} aria-hidden="true">🔄</span>
                 <span>Segunda mano</span>
                 <span className={styles.transmisionSub}>Paga ITP</span>
               </button>
               <button
+                type="button"
+                aria-pressed={tipoTransmision === 'primera-mano'}
                 className={`${styles.transmisionBtn} ${tipoTransmision === 'primera-mano' ? styles.active : ''}`}
                 onClick={() => setTipoTransmision('primera-mano')}
               >
-                <span className={styles.transmisionIcon}>🆕</span>
+                <span className={styles.transmisionIcon} aria-hidden="true">🆕</span>
                 <span>Primera mano</span>
                 <span className={styles.transmisionSub}>Paga IVA</span>
               </button>
@@ -458,16 +529,20 @@ export default function SimuladorCompraventaPage() {
           {/* Pestañas */}
           <div className={styles.tabs}>
             <button
+              type="button"
+              aria-pressed={pestanaActiva === 'comprador'}
               className={`${styles.tab} ${pestanaActiva === 'comprador' ? styles.active : ''}`}
               onClick={() => setPestanaActiva('comprador')}
             >
-              🛒 Comprador
+              <span aria-hidden="true">🛒</span> Comprador
             </button>
             <button
+              type="button"
+              aria-pressed={pestanaActiva === 'vendedor'}
               className={`${styles.tab} ${pestanaActiva === 'vendedor' ? styles.active : ''}`}
               onClick={() => setPestanaActiva('vendedor')}
             >
-              💰 Vendedor
+              <span aria-hidden="true">💰</span> Vendedor
             </button>
           </div>
 
@@ -555,6 +630,19 @@ export default function SimuladorCompraventaPage() {
               {/* Formulario adicional vendedor */}
               <div className={styles.formVendedor}>
                 <h3 className={styles.formVendedorTitle}>Datos para calcular plusvalía e IRPF</h3>
+
+                {/* La plusvalía municipal (IIVTNU) solo grava el suelo urbano */}
+                {tipoInmueble === 'terreno' && (
+                  <p className={styles.derivacionPie} role="note">
+                    <span aria-hidden="true">⚠️</span> La plusvalía municipal que se calcula aquí
+                    solo procede si el terreno es <strong>suelo urbano o urbanizable</strong>. La
+                    venta de una <strong>finca rústica no genera IIVTNU</strong>, aunque sí tributa
+                    en el IRPF del vendedor. Para ese caso usa el{' '}
+                    <a href="/simulador-gastos-compraventa-terreno-rustico/" className={styles.derivacionEnlace}>
+                      simulador de finca rústica
+                    </a>.
+                  </p>
+                )}
 
                 <NumberInput
                   value={precioCompraOriginal}

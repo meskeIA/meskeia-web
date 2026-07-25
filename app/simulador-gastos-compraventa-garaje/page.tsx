@@ -284,7 +284,7 @@ export default function SimuladorGarajeCompraventaPage() {
             <label className={styles.label}>Tipo de transmisión</label>
             <div className={styles.transmisionGrid}>
               <button
-                className={`${styles.transmisionBtn} ${tipoTransmision === 'segunda-mano' ? styles.active : ''}`}
+                type="button"                className={`${styles.transmisionBtn} ${tipoTransmision === 'segunda-mano' ? styles.active : ''}`}
                 onClick={() => setTipoTransmision('segunda-mano')}
                 aria-pressed={tipoTransmision === 'segunda-mano'}
               >
@@ -293,7 +293,7 @@ export default function SimuladorGarajeCompraventaPage() {
                 <span className={styles.transmisionSub}>Paga ITP</span>
               </button>
               <button
-                className={`${styles.transmisionBtn} ${tipoTransmision === 'primera-mano' ? styles.active : ''}`}
+                type="button"                className={`${styles.transmisionBtn} ${tipoTransmision === 'primera-mano' ? styles.active : ''}`}
                 onClick={() => setTipoTransmision('primera-mano')}
                 aria-pressed={tipoTransmision === 'primera-mano'}
               >
@@ -310,7 +310,7 @@ export default function SimuladorGarajeCompraventaPage() {
               <label className={styles.label}>Tipo de garaje</label>
               <div className={styles.transmisionGrid}>
                 <button
-                  className={`${styles.transmisionBtn} ${tipoGaraje === 'vinculado' ? styles.active : ''}`}
+                  type="button"                  className={`${styles.transmisionBtn} ${tipoGaraje === 'vinculado' ? styles.active : ''}`}
                   onClick={() => setTipoGaraje('vinculado')}
                   aria-pressed={tipoGaraje === 'vinculado'}
                 >
@@ -319,7 +319,7 @@ export default function SimuladorGarajeCompraventaPage() {
                   <span className={styles.transmisionSub}>IVA {IVA_INMUEBLES_2025.garageCon}%</span>
                 </button>
                 <button
-                  className={`${styles.transmisionBtn} ${tipoGaraje === 'independiente' ? styles.active : ''}`}
+                  type="button"                  className={`${styles.transmisionBtn} ${tipoGaraje === 'independiente' ? styles.active : ''}`}
                   onClick={() => setTipoGaraje('independiente')}
                   aria-pressed={tipoGaraje === 'independiente'}
                 >
@@ -449,7 +449,7 @@ export default function SimuladorGarajeCompraventaPage() {
           {/* Pestañas */}
           <div className={styles.tabs} role="tablist">
             <button
-              role="tab"
+              type="button"              role="tab"
               aria-selected={pestanaActiva === 'comprador'}
               className={`${styles.tab} ${pestanaActiva === 'comprador' ? styles.active : ''}`}
               onClick={() => setPestanaActiva('comprador')}
@@ -457,7 +457,7 @@ export default function SimuladorGarajeCompraventaPage() {
               Comprador
             </button>
             <button
-              role="tab"
+              type="button"              role="tab"
               aria-selected={pestanaActiva === 'vendedor'}
               className={`${styles.tab} ${pestanaActiva === 'vendedor' ? styles.active : ''}`}
               onClick={() => setPestanaActiva('vendedor')}

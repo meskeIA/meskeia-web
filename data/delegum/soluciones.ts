@@ -64,6 +64,8 @@ export const PUERTAS: Puerta[] = [
       { url: '/estimador-hipoteca/', desc: 'Cuota y cuadro de amortización completo.' },
       { url: '/amortizacion-hipoteca/', desc: 'Cuánto ahorras amortizando anticipadamente.' },
       { url: '/estimador-compraventa-inmueble/', desc: 'ITP/IVA, notaría, registro y plusvalía.' },
+      { url: '/simulador-gastos-compraventa-garaje/', desc: 'Plaza de garaje: ITP, IVA del anejo, notaría y plusvalía.' },
+      { url: '/simulador-gastos-compraventa-trastero/', desc: 'Trastero vinculado o independiente: cambia el IVA.' },
       { url: '/estimador-plusvalia-municipal/', desc: 'IIVTNU al vender o heredar: objetivo vs real.' },
       { url: '/selector-tipo-hipoteca/', desc: 'Fija, variable o mixta según tu perfil.' },
       { url: '/selector-tipo-prestamo/' },
@@ -176,6 +178,12 @@ export const PUERTAS: Puerta[] = [
       { url: '/calculadora-amortizacion-inmovilizado/' },
       { url: '/estimador-tir-van/' },
       { url: '/calculadora-z-score-altman/' },
+      // Inmuebles de uso profesional: la fiscalidad no es la de la vivienda (renuncia a
+      // la exención de IVA, exención del suelo rústico, IVA/ITP según quién vende).
+      { url: '/simulador-gastos-compraventa-local-comercial/', desc: 'Local comercial: IVA o ITP, renuncia a la exención y lo que paga el vendedor.' },
+      { url: '/simulador-gastos-compraventa-nave-industrial/', desc: 'Nave industrial: IVA 21%, ITP, AJD, notaría y registro.' },
+      { url: '/simulador-gastos-compraventa-solar/', desc: 'Solar edificable: IVA + AJD si vende un promotor, ITP si vende un particular.' },
+      { url: '/simulador-gastos-compraventa-terreno-rustico/', desc: 'Finca rústica: exenta de IVA y sin plusvalía municipal.' },
     ],
   },
 ];

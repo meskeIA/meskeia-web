@@ -31,12 +31,12 @@ export const metadata: Metadata = {
 
 const webAppSchema = generateWebAppSchema({
   name: 'Simulador Gastos Compraventa Trastero',
-  description: 'Calculadora de gastos de compra y venta de trastero en España. Incluye ITP por comunidad autónoma, IVA 10% en obra nueva, notaría, registro de la propiedad y plusvalía municipal.',
+  description: 'Calculadora de gastos de compra y venta de trastero en España. Incluye ITP por comunidad autónoma, IVA en obra nueva (10% como anejo de la vivienda o 21% independiente), notaría, registro de la propiedad y plusvalía municipal.',
   url: 'https://meskeia.com/simulador-gastos-compraventa-trastero/',
   category: 'FinanceApplication',
   features: [
     'ITP por comunidad autónoma para trastero (tipo residencial)',
-    'IVA 10% en trastero de obra nueva vinculado a vivienda',
+    'IVA 10% si va con la vivienda como anejo, 21% si es independiente (obra nueva)',
     'Gastos de notaría y registro de la propiedad',
     'Plusvalía municipal del vendedor',
     'IRPF sobre ganancia patrimonial',
@@ -51,11 +51,11 @@ const faqSchema = generateFAQSchema({
   mainEntity: [
     {
       question: '¿Qué IVA paga un trastero nuevo?',
-      answer: 'Un trastero de obra nueva (primera transmisión del promotor) paga IVA al 10%, igual que una vivienda o garaje residencial. Este tipo se aplica tanto si va vinculado a una vivienda como si se vende de forma independiente, siempre que sea la primera transmisión. Si fuese un local de uso mixto o con finalidad no residencial, podría aplicar el 21%.',
+      answer: 'Depende de cómo se compre. Si el promotor transmite el trastero conjuntamente con la vivienda como anejo, se aplica el IVA reducido del 10% (art. 91.Uno.1.7º de la Ley del IVA). Si el trastero se adquiere de forma independiente, con su propia finca registral y en operación separada, tributa al tipo general del 21%. Es el mismo criterio que se aplica a las plazas de garaje.',
     },
     {
       question: '¿Qué diferencia hay entre trastero vinculado y trastero independiente?',
-      answer: 'El trastero vinculado forma parte de la misma finca registral que la vivienda y se vende junto a ella como anejo. El trastero independiente tiene su propia referencia catastral y escritura y puede venderse por separado. La diferencia fiscal es que el trastero independiente puede recibir un tratamiento distinto en algunas comunidades autónomas, especialmente en ITP de segunda mano. Consulta siempre con un asesor fiscal antes de la operación.',
+      answer: 'El trastero vinculado forma parte de la misma finca registral que la vivienda y se vende junto a ella como anejo. El trastero independiente tiene su propia referencia catastral y escritura y puede venderse por separado. La diferencia fiscal principal está en la obra nueva: el vinculado paga IVA al 10% como anejo y el independiente al 21%. En segunda mano ambos pagan ITP al tipo de la comunidad autónoma, aunque los tipos reducidos por perfil del comprador suelen exigir que la compra sea de vivienda habitual. Consulta siempre con un asesor fiscal antes de la operación.',
     },
     {
       question: '¿Se puede comprar un trastero sin comprar también la vivienda?',
@@ -83,7 +83,7 @@ export const faqJsonLd = {
       name: '¿Qué IVA paga un trastero nuevo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un trastero de obra nueva (primera transmisión del promotor) paga IVA al 10%, igual que una vivienda o garaje residencial. Este tipo se aplica tanto si va vinculado a una vivienda como si se vende de forma independiente, siempre que sea la primera transmisión. Si fuese un local de uso mixto o con finalidad no residencial, podría aplicar el 21%.',
+        text: 'Depende de cómo se compre. Si el promotor transmite el trastero conjuntamente con la vivienda como anejo, se aplica el IVA reducido del 10% (art. 91.Uno.1.7º de la Ley del IVA). Si el trastero se adquiere de forma independiente, con su propia finca registral y en operación separada, tributa al tipo general del 21%. Es el mismo criterio que se aplica a las plazas de garaje.',
       },
     },
     {
@@ -91,7 +91,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre trastero vinculado y trastero independiente?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El trastero vinculado forma parte de la misma finca registral que la vivienda y se vende junto a ella como anejo. El trastero independiente tiene su propia referencia catastral y escritura y puede venderse por separado. La diferencia fiscal es que el trastero independiente puede recibir un tratamiento distinto en algunas comunidades autónomas, especialmente en ITP de segunda mano. Consulta siempre con un asesor fiscal antes de la operación.',
+        text: 'El trastero vinculado forma parte de la misma finca registral que la vivienda y se vende junto a ella como anejo. El trastero independiente tiene su propia referencia catastral y escritura y puede venderse por separado. La diferencia fiscal principal está en la obra nueva: el vinculado paga IVA al 10% como anejo y el independiente al 21%. En segunda mano ambos pagan ITP al tipo de la comunidad autónoma, aunque los tipos reducidos por perfil del comprador suelen exigir que la compra sea de vivienda habitual. Consulta siempre con un asesor fiscal antes de la operación.',
       },
     },
     {
