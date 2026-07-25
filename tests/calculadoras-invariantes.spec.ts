@@ -28,6 +28,7 @@ import { calcularCuotaAutonomo } from '../lib/calculadoras/cuotaAutonomo';
 import { calcularIRPF } from '../lib/calculadoras/irpf';
 import { compararAutonomoVsSL } from '../lib/calculadoras/autonomoVsSL';
 import { calcularCompraventa } from '../lib/calculadoras/compraventa';
+import { calcularGastosCompraInmueble } from '../lib/calculadoras/gastosCompraInmueble';
 import { calcularHipoteca } from '../lib/calculadoras/hipoteca';
 import { calcularSucesion } from '../lib/calculadoras/sucesiones';
 import { calcularPensionPublica } from '../lib/calculadoras/pensionPublica';
@@ -2387,4 +2388,73 @@ test.describe('Golden — calcularComplementoBrechaGenero (Capa 1 · art. 60 LGS
     expect(cb.complementoAnual).toBe(0);
   });
 
+});
+
+
+// ────────────────────────────────────────────────────────────────────────────
+// RAMAS FISCALES — calcular_gastos_compra_inmueble
+// El riesgo de esta calculadora no es aritmético sino de ENRUTADO: aplicar la regla
+// de la vivienda a un inmueble que no lo es. Cada test fija una rama que diverge.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Invariantes de ramas fiscales — calcular_gastos_compra_inmueble', () => {
+  const base = { precio: 100000, ccaa: 'madrid' } as const;
+
+  test('ESTRUCTURAL: total de gastos = impuesto + AJD + notaría + registro + gestoría', () => {
+    const g = calcularGastosCompraInmueble({ ...base, tipoInmueble: 'local_comercial' });
+    expect(g.totalGastos).toBeCloseTo(g.importeImpuesto + g.ajd + g.notaria + g.registro + g.gestoria, 2);
+    expect(g.totalOperacion).toBeCloseTo(g.precio + g.totalGastos, 2);
+  });
+
+  test('ANEJO: garaje de obra nueva con la vivienda paga IVA 10%; independiente, 21%', () => {
+    const conVivienda = calcularGastosCompraInmueble({ ...base, tipoInmueble: 'garaje', obraNueva: true, anejoDeVivienda: true });
+    const aparte = calcularGastosCompraInmueble({ ...base, tipoInmueble: 'garaje', obraNueva: true, anejoDeVivienda: false });
+    expect(conVivienda.porcentajeImpuesto).toBe(10);
+    expect(aparte.porcentajeImpuesto).toBe(21);
+    expect(aparte.importeImpuesto).toBeGreaterThan(conVivienda.importeImpuesto);
+  });
+
+  test('REGRESIÓN: el trastero independiente NO hereda el IVA reducido del anejo', () => {
+    // Bug corregido el 25/07/2026: la app aplicaba 10% aunque se marcara "independiente".
+    const g = calcularGastosCompraInmueble({ ...base, tipoInmueble: 'trastero', obraNueva: true, anejoDeVivienda: false });
+    expect(g.porcentajeImpuesto).toBe(21);
+  });
+
+  test('RÚSTICA: exenta de IVA → paga ITP y no genera plusvalía municipal', () => {
+    const g = calcularGastosCompraInmueble({ ...base, tipoInmueble: 'finca_rustica' });
+    expect(g.tipoImpuesto).toContain('ITP');
+    expect(g.ajd).toBe(0); // ITP y AJD gradual son incompatibles (art. 31.2 TRLITP)
+    expect(g.vendedorPagaPlusvaliaMunicipal).toBe(false);
+  });
+
+  test('SOLAR: quien vende decide el impuesto — promotor IVA + AJD, particular ITP', () => {
+    const dePromotor = calcularGastosCompraInmueble({ ...base, tipoInmueble: 'solar_edificable', vendedorEsEmpresario: true });
+    const deParticular = calcularGastosCompraInmueble({ ...base, tipoInmueble: 'solar_edificable', vendedorEsEmpresario: false });
+    expect(dePromotor.porcentajeImpuesto).toBe(21);
+    expect(dePromotor.ajd).toBeGreaterThan(0);
+    expect(deParticular.tipoImpuesto).toContain('ITP');
+    expect(deParticular.ajd).toBe(0);
+    // A diferencia de la rústica, el solar es suelo urbano
+    expect(dePromotor.vendedorPagaPlusvaliaMunicipal).toBe(true);
+  });
+
+  test('RENUNCIA: local en segunda mano con renuncia pasa de ITP a IVA deducible + AJD', () => {
+    const sinRenuncia = calcularGastosCompraInmueble({ ...base, tipoInmueble: 'local_comercial' });
+    const conRenuncia = calcularGastosCompraInmueble({ ...base, tipoInmueble: 'local_comercial', renunciaExencionIva: true });
+    expect(sinRenuncia.tipoImpuesto).toContain('ITP');
+    expect(sinRenuncia.ivaDeducible).toBe(false);
+    expect(conRenuncia.porcentajeImpuesto).toBe(21);
+    expect(conRenuncia.ivaDeducible).toBe(true);
+    expect(conRenuncia.ajd).toBeGreaterThan(0);
+  });
+
+  test('REDUCIDOS: los tipos de ITP por perfil no alcanzan a local, nave ni suelo', () => {
+    const conPerfil = calcularGastosCompraInmueble({ ...base, tipoInmueble: 'nave_industrial', perfilComprador: 'joven' });
+    const general = calcularGastosCompraInmueble({ ...base, tipoInmueble: 'nave_industrial', perfilComprador: 'general' });
+    expect(conPerfil.porcentajeImpuesto).toBe(general.porcentajeImpuesto);
+  });
+
+  test('ESTRUCTURAL: precio no positivo lanza error en lugar de devolver ceros', () => {
+    expect(() => calcularGastosCompraInmueble({ ...base, precio: 0, tipoInmueble: 'vivienda' })).toThrow();
+  });
 });
