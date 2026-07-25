@@ -1977,7 +1977,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/guia-razas-perros/', icon: '🐕', name: 'Guía de Razas de Perros', description: '40 razas: tamaño, energía, temperamento y compatibilidad' },
     { url: '/guia-razas-gatos/', icon: '🐈', name: 'Guía de Razas de Gatos', description: '35 razas: pelo, energía, temperamento y compatibilidad' },
     { url: '/guia-cuidado-mascota/', icon: '📚', name: 'Guía Cuidado Mascota', description: 'Todo lo que necesitas saber para cuidar a tu mascota' },
-    { url: '/calculadora-alimentacion-mascotas/', icon: '🍖', name: 'Alimentación Mascotas', description: 'Raciones diarias según peso y edad' },
+    { url: '/calculadora-tamano-adulto-perro/', icon: '📏', name: 'Tamaño Adulto Perro', description: 'Predice cuánto pesará tu cachorro de adulto' },
   ],
   'selector-seguro-salud': [
     { url: '/selector-mascota/', icon: '🐾', name: 'Selector de Mascota', description: '¿Qué animal se adapta a tu vida?' },
@@ -2158,7 +2158,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-alimentacion-mascotas': [...mascotasApps.filter(a => a.url !== '/calculadora-alimentacion-mascotas/').slice(0, 3), mascotasExtraApps[0]],
   'calculadora-medicamentos-mascotas': [...mascotasApps.filter(a => a.url !== '/orientador-medicamentos-mascotas/').slice(0, 3), mascotasExtraApps[1]],
   'calculadora-edad-mascotas': [...mascotasApps.filter(a => a.url !== '/calculadora-edad-mascotas/').slice(0, 3), mascotasExtraApps[0]],
-  'calculadora-tamano-adulto-perro': mascotasApps,
+  'calculadora-tamano-adulto-perro': [...mascotasApps.slice(0, 3), { url: '/selector-mascota/', icon: '🐾', name: 'Selector de Mascota', description: '¿Qué animal se adapta a tu vida?' }],
   'guia-cuidado-mascota': [
     { url: '/guia-razas-perros/', icon: '🐕', name: 'Guía de Razas de Perros', description: '40 razas: tamaño, energía, temperamento y compatibilidad' },
     { url: '/guia-razas-gatos/', icon: '🐈', name: 'Guía de Razas de Gatos', description: '35 razas: pelo, energía, temperamento y compatibilidad' },
@@ -2910,9 +2910,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'tabla-periodica': [
     { url: '/quiz-tabla-periodica/', icon: '🧪', name: 'Quiz Tabla Periódica', description: 'Pon a prueba tus conocimientos de química' },
+    { url: '/quiz-simbolos-quimicos/', icon: '⚗️', name: 'Quiz Símbolos Químicos', description: 'Símbolo ↔ nombre de 85 elementos' },
     { url: '/simulador-estequiometria/', icon: '⚗️', name: 'Estequiometría', description: 'Reacciones, masas molares y reactivo limitante' },
     { url: '/simulador-equilibrio-quimico/', icon: '⚖️', name: 'Equilibrio Químico', description: 'Le Chatelier y constante Kc' },
-    { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'Con qué números de oxidación actúa cada elemento' },
   ],
   'glosario-fisica-quimica': [{ url: '/tabla-periodica/', icon: '⚗️', name: 'Tabla Periódica', description: 'Elementos químicos' }, { url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Simulaciones visuales' }, ...matematicasBasicasApps.slice(0, 1)],
 
