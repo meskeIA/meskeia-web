@@ -75,7 +75,7 @@ export const implementedAppsUrls = [
   "/control-gastos/",
   "/estimador-interes-compuesto/",
   "/estimador-hipoteca/",
-  "/estimador-compraventa-inmueble/", // Gastos de compraventa: ITP/IVA, notaría, registro, plusvalía
+  "/estimador-compraventa-inmueble/", // Gastos de compraventa de VIVIENDA (+ orientación a los otros tipos): ITP/IVA, notaría, registro, plusvalía, IRPF
   "/simulador-gastos-compraventa-garaje/", // Gastos compraventa garaje: ITP, notaría, registro, plusvalía
   "/simulador-gastos-compraventa-nave-industrial/", // Gastos compra nave industrial: IVA 21%, ITP, AJD
   "/simulador-gastos-compraventa-trastero/", // Gastos compraventa trastero: ITP, notaría, registro

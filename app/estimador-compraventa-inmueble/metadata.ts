@@ -2,9 +2,9 @@ import { Metadata } from 'next';
 import { generateWebAppSchema, generateFAQSchema, combineSchemas } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Gastos de Compraventa Inmobiliaria - Calculadora | meskeIA',
-  description: 'Calcula gastos de compraventa de vivienda, local comercial, nave industrial y terreno en España. ITP/IVA por comunidad autónoma, notaría, registro y plusvalía.',
-  keywords: 'simulador compraventa, gastos compra vivienda, ITP por comunidad, gastos notario, registro propiedad, plusvalía municipal, impuestos vivienda, calculadora inmobiliaria, compra local comercial, nave industrial, compra terreno, IVA inmuebles',
+  title: 'Gastos de Compraventa de Vivienda - Calculadora ITP, Notaría y Plusvalía | meskeIA',
+  description: 'Calcula los gastos de comprar o vender una vivienda en España: ITP o IVA por comunidad autónoma, notaría, registro, plusvalía municipal e IRPF del vendedor. También orienta sobre garaje, trastero, local, nave y terreno.',
+  keywords: 'gastos compra vivienda, simulador gastos compraventa vivienda, calculadora gastos compra piso, gastos venta vivienda, ITP por comunidad, gastos notario, registro propiedad, plusvalía municipal, impuestos compra casa, gastos compra vivienda segunda mano, calculadora inmobiliaria',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    title: 'Estimador Compraventa Inmobiliaria - meskeIA',
-    description: 'Calcula todos los gastos de compra y venta de inmuebles en España: ITP, IVA, notaría, registro, plusvalía municipal y comisiones.',
+    title: 'Estimador de Gastos de Compraventa de Vivienda - meskeIA',
+    description: 'Cuánto cuesta comprar o vender un piso o una casa en España: ITP o IVA, notaría, registro, plusvalía municipal e IRPF del vendedor.',
     url: 'https://meskeia.com/estimador-compraventa-inmueble/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -28,18 +28,18 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Estimador Compraventa Inmobiliaria',
-    description: 'Calcula todos los gastos de compra y venta de inmuebles en España.',
+    title: 'Estimador de Gastos de Compraventa de Vivienda',
+    description: 'Cuánto cuesta comprar o vender un piso o una casa en España, con todos los impuestos y gastos.',
     images: ['https://meskeia.com/og-image.png']
   },
   other: {
-    'application-name': 'Simulador Compraventa Inmobiliaria meskeIA',
+    'application-name': 'Estimador Gastos Compraventa Vivienda meskeIA',
   },
 };
 
 const webAppSchema = generateWebAppSchema({
-  name: 'Estimador Gastos Compraventa Inmobiliaria',
-  description: 'Calculadora de gastos de compraventa de vivienda, local comercial, nave industrial y terreno en España. Incluye ITP/AJD por comunidad autónoma, IVA en obra nueva, gastos de notaría, registro de la propiedad, plusvalía municipal y comisiones.',
+  name: 'Estimador Gastos Compraventa Vivienda',
+  description: 'Calculadora de los gastos de comprar o vender una vivienda en España: ITP o IVA por comunidad autónoma, AJD, notaría, registro de la propiedad, plusvalía municipal, IRPF del vendedor y comisión de la inmobiliaria. Cubre además, de forma orientativa, garaje, trastero, local comercial, nave industrial y terreno, con enlace a la calculadora especializada de cada tipo.',
   url: 'https://meskeia.com/estimador-compraventa-inmueble/',
   category: 'FinanceApplication',
   features: [
@@ -48,9 +48,11 @@ const webAppSchema = generateWebAppSchema({
     'Gastos de notaría y registro de la propiedad',
     'Plusvalía municipal (IIVTNU)',
     'Comisiones de inmobiliaria configurables',
-    'Cuatro tipos de inmueble: vivienda, local, nave, terreno',
+    'Tipos reducidos de ITP: joven, familia numerosa, discapacidad y VPO',
+    'Pestaña de vendedor: plusvalía municipal, IRPF de la ganancia y neto resultante',
+    'Orientación sobre garaje, trastero, local, nave y terreno con enlace a su calculadora',
   ],
-  keywords: ['compraventa inmueble', 'ITP', 'IVA', 'plusvalía municipal', 'gastos vivienda España', 'inmobiliaria'],
+  keywords: ['gastos compra vivienda', 'gastos venta vivienda', 'compraventa vivienda', 'ITP', 'IVA', 'plusvalía municipal', 'España'],
 });
 
 const faqSchema = generateFAQSchema({
@@ -59,6 +61,14 @@ const faqSchema = generateFAQSchema({
     {
       question: '¿Qué diferencia hay entre ITP e IVA en la compra de una vivienda?',
       answer: 'El ITP se aplica a viviendas de segunda mano (transmisiones entre particulares), mientras que el IVA al 10% se paga en viviendas nuevas (primera entrega del promotor). No pueden coexistir en la misma operación: o se paga uno u otro, nunca ambos.',
+    },
+    {
+      question: '¿Cuánto hay que sumar al precio de una vivienda por gastos e impuestos?',
+      answer: 'La horquilla habitual en España es del 10% al 14% del precio para una vivienda de segunda mano y del 12% al 15% en obra nueva. El grueso es el impuesto: ITP entre el 4% y el 11% según la comunidad autónoma en segunda mano, o IVA al 10% más AJD en obra nueva. A eso se suman notaría, registro de la propiedad y gestoría, que en conjunto rondan el 1%-2%. Conviene tener ese dinero ahorrado aparte, porque no se financia con la hipoteca.',
+    },
+    {
+      question: '¿Qué paga el vendedor de una vivienda?',
+      answer: 'El vendedor asume la plusvalía municipal (IIVTNU), el IRPF sobre la ganancia patrimonial (del 19% al 30% en la base del ahorro) y, si la hubo, la comisión de la inmobiliaria. Existen dos exenciones importantes en el IRPF que no se aplican a otros inmuebles: la reinversión del importe en otra vivienda habitual y la de los mayores de 65 años que venden su vivienda habitual.',
     },
     {
       question: '¿Puedo negociar quién paga cada gasto?',

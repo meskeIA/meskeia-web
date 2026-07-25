@@ -63,7 +63,7 @@ export const PUERTAS: Puerta[] = [
     apps: [
       { url: '/estimador-hipoteca/', desc: 'Cuota y cuadro de amortización completo.' },
       { url: '/amortizacion-hipoteca/', desc: 'Cuánto ahorras amortizando anticipadamente.' },
-      { url: '/estimador-compraventa-inmueble/', desc: 'ITP/IVA, notaría, registro y plusvalía.' },
+      { url: '/estimador-compraventa-inmueble/', desc: 'Comprar o vender una vivienda: ITP/IVA, notaría, registro, plusvalía e IRPF.' },
       { url: '/simulador-gastos-compraventa-garaje/', desc: 'Plaza de garaje: ITP, IVA del anejo, notaría y plusvalía.' },
       { url: '/simulador-gastos-compraventa-trastero/', desc: 'Trastero vinculado o independiente: cambia el IVA.' },
       { url: '/estimador-plusvalia-municipal/', desc: 'IIVTNU al vender o heredar: objetivo vs real.' },

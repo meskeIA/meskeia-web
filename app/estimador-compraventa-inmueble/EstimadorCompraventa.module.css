@@ -78,6 +78,15 @@
   line-height: 1.6;
 }
 
+/* Segunda línea del hero: el alcance más allá de la vivienda, en menor jerarquía */
+.subtitleSecundario {
+  font-size: 0.95rem;
+  opacity: 0.8;
+  max-width: 640px;
+  margin: 0.85rem auto 0;
+  line-height: 1.55;
+}
+
 /* Main Content */
 .mainContent {
   display: grid;
@@ -122,15 +131,6 @@
   gap: var(--spacing-sm);
 }
 
-/* Separador visual entre residenciales y comerciales */
-.tipoInmuebleGrid::after {
-  content: '';
-  grid-column: 1 / -1;
-  height: 1px;
-  background: var(--border);
-  margin: var(--spacing-xs) 0;
-}
-
 .tipoSeparador {
   grid-column: 1 / -1;
   font-size: 0.75rem;
@@ -139,6 +139,27 @@
   letter-spacing: 0.5px;
   padding: var(--spacing-xs) 0;
   text-align: center;
+  border-top: 1px solid var(--border);
+  margin-top: var(--spacing-xs);
+}
+
+/* La vivienda es el caso principal: ocupa toda la fila y se destaca del resto */
+.tipoPrincipal {
+  grid-column: 1 / -1;
+  flex-direction: row !important;
+  justify-content: center;
+  gap: 0.6rem;
+  border-color: var(--primary);
+  font-weight: 600;
+}
+
+.tipoPrincipal .tipoIcon {
+  font-size: 1.6rem;
+}
+
+/* Los dos anejos comparten fila (quedan a la izquierda del grid de 3 columnas) */
+.tipoAnejo {
+  grid-column: span 1;
 }
 
 .tipoInmuebleBtn {

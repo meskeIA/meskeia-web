@@ -79,12 +79,15 @@ const COMUNIDADES: { value: ComunidadAutonoma; label: string }[] = [
   { value: 'melilla', label: 'Melilla' },
 ];
 
-const TIPOS_INMUEBLE: { value: TipoInmueble; label: string; icon: string; grupo: 'residencial' | 'comercial' }[] = [
-  // Residenciales (IVA 10%)
-  { value: 'vivienda', label: 'Vivienda', icon: '🏠', grupo: 'residencial' },
-  { value: 'garaje', label: 'Garaje/Parking', icon: '🚗', grupo: 'residencial' },
-  { value: 'trastero', label: 'Trastero', icon: '📦', grupo: 'residencial' },
-  // Comerciales/Industriales (IVA 21%)
+// El grupo determina la jerarquía VISUAL del selector, no la fiscal: la vivienda es
+// el caso principal de esta calculadora y ocupa su propio bloque; el resto se ofrece
+// como alcance secundario con derivación a su app especializada.
+const TIPOS_INMUEBLE: { value: TipoInmueble; label: string; icon: string; grupo: 'principal' | 'anejo' | 'comercial' }[] = [
+  { value: 'vivienda', label: 'Vivienda (piso o casa)', icon: '🏠', grupo: 'principal' },
+  // Anejos residenciales (IVA 10% si se transmiten con la vivienda)
+  { value: 'garaje', label: 'Garaje/Parking', icon: '🚗', grupo: 'anejo' },
+  { value: 'trastero', label: 'Trastero', icon: '📦', grupo: 'anejo' },
+  // Comerciales/Industriales y suelo (IVA 21%)
   { value: 'local', label: 'Local comercial', icon: '🏪', grupo: 'comercial' },
   { value: 'nave', label: 'Nave industrial', icon: '🏭', grupo: 'comercial' },
   { value: 'terreno', label: 'Terreno', icon: '🌍', grupo: 'comercial' },
@@ -313,11 +316,15 @@ export default function SimuladorCompraventaPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🏠</span>
-        <h1 className={styles.title}>Estimador de Gastos de Compraventa Inmobiliaria</h1>
+        <span className={styles.heroIcon} aria-hidden="true">🏠</span>
+        <h1 className={styles.title}>Estimador de Gastos de Compraventa de Vivienda</h1>
         <p className={styles.subtitle}>
-          Oriéntate sobre los gastos de compra y venta de inmuebles en España: vivienda, garaje, trastero,
-          local comercial, nave industrial y terreno. ITP/IVA por comunidad autónoma, notaría, registro y plusvalía.
+          Cuánto cuesta comprar o vender un piso o una casa en España: ITP o IVA por comunidad autónoma,
+          notaría, registro, plusvalía municipal e IRPF del vendedor.
+        </p>
+        <p className={styles.subtitleSecundario}>
+          También te orienta sobre garaje, trastero, local comercial, nave industrial y terreno, con enlace
+          a la calculadora especializada de cada uno.
         </p>
       </header>
 
@@ -349,22 +356,35 @@ export default function SimuladorCompraventaPage() {
           <div className={styles.inputGroup}>
             <label className={styles.label}>Tipo de inmueble</label>
             <div className={styles.tipoInmuebleGrid}>
-              {/* Residenciales (IVA 10%) */}
-              {TIPOS_INMUEBLE.filter(t => t.grupo === 'residencial').map(tipo => (
+              {/* Caso principal: la vivienda, a ancho completo */}
+              {TIPOS_INMUEBLE.filter(t => t.grupo === 'principal').map(tipo => (
                 <button
                   key={tipo.value}
                   type="button"
                   aria-pressed={tipoInmueble === tipo.value}
-                  className={`${styles.tipoInmuebleBtn} ${tipoInmueble === tipo.value ? styles.active : ''}`}
+                  className={`${styles.tipoInmuebleBtn} ${styles.tipoPrincipal} ${tipoInmueble === tipo.value ? styles.active : ''}`}
                   onClick={() => setTipoInmueble(tipo.value)}
                 >
                   <span className={styles.tipoIcon} aria-hidden="true">{tipo.icon}</span>
                   <span>{tipo.label}</span>
                 </button>
               ))}
-              {/* Separador */}
-              <span className={styles.tipoSeparador}>Comercial / Industrial</span>
-              {/* Comerciales (IVA 21%) */}
+
+              <span className={styles.tipoSeparador}>Anejos de la vivienda</span>
+              {TIPOS_INMUEBLE.filter(t => t.grupo === 'anejo').map(tipo => (
+                <button
+                  key={tipo.value}
+                  type="button"
+                  aria-pressed={tipoInmueble === tipo.value}
+                  className={`${styles.tipoInmuebleBtn} ${styles.tipoAnejo} ${tipoInmueble === tipo.value ? styles.active : ''}`}
+                  onClick={() => setTipoInmueble(tipo.value)}
+                >
+                  <span className={styles.tipoIcon} aria-hidden="true">{tipo.icon}</span>
+                  <span>{tipo.label}</span>
+                </button>
+              ))}
+
+              <span className={styles.tipoSeparador}>Comercial, industrial y suelo</span>
               {TIPOS_INMUEBLE.filter(t => t.grupo === 'comercial').map(tipo => (
                 <button
                   key={tipo.value}
@@ -431,7 +451,7 @@ export default function SimuladorCompraventaPage() {
           <NumberInput
             value={precioVenta}
             onChange={setPrecioVenta}
-            label="Precio de venta del inmueble"
+            label={tipoInmueble === 'vivienda' ? 'Precio de la vivienda' : 'Precio del inmueble'}
             placeholder="200000"
             helperText="Precio escriturado o valor de referencia catastral (el mayor)"
             min={0}
@@ -828,7 +848,7 @@ export default function SimuladorCompraventaPage() {
 
       {/* Contenido educativo */}
       <EducationalSection
-        title="¿Quieres entender mejor los gastos de compraventa?"
+        title="¿Quieres entender mejor los gastos de comprar o vender una vivienda?"
         subtitle="Descubre qué impuestos se pagan, cómo funcionan los aranceles y las bonificaciones disponibles"
         icon="📚"
       >
