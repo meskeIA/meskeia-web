@@ -37,6 +37,8 @@ const RUTAS_PROHIBIDAS = [
   { patron: /^\.credentials\//, motivo: 'Credenciales de service accounts' },
   { patron: /^scratch\//, motivo: 'Directorio de trabajo temporal' },
   { patron: /^digests\//, motivo: 'Serie histórica de analytics' },
+  { patron: /^cruce-seo\//, motivo: 'Serie histórica de medición SEO externa' },
+  { patron: /^semillas\//, motivo: 'Bitácora de ideas de la semilla diaria' },
 ];
 
 /**

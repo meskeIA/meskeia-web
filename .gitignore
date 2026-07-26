@@ -88,6 +88,7 @@ digests/
 
 # Cruce SEO — medición externa Analytics × GSC × BWT (analisis interno, skill /cruce-seo)
 scripts/cruce-seo.mjs
+cruce-seo/
 
 # Semilla diaria — generador de ideas (analisis interno, skill /semilla-diaria) + bitácora
 scripts/semilla-diaria.mjs
