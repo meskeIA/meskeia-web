@@ -382,6 +382,15 @@ const juegosPuzzleApps: RelatedApp[] = [
   { url: '/juego-puzzle-matematico/', icon: '➕', name: 'Puzzle Matemático', description: 'Retos numéricos' },
 ];
 
+// Rutina de práctica: organiza en una sesión las herramientas de habla y voz
+// que hasta ahora vivían sueltas (DAF, vocalización, respiración, lectura).
+const rutinaHablaApp: RelatedApp = {
+  url: '/rutina-practica-habla/',
+  icon: '🗣️',
+  name: 'Rutina de Práctica del Habla',
+  description: 'Sesión guiada de 10, 20 o 30 minutos',
+};
+
 // Calculadora de jugada: puente entre el cluster de juegos de palabras y las
 // herramientas léxicas (comparte el lemario con el buscador por patrón).
 const scrabbleApp: RelatedApp = {
@@ -3442,12 +3451,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/temporizador-pomodoro/', icon: '🍅', name: 'Pomodoro', description: 'Productividad por ciclos' },
   ],
   'guia-respiracion': [
+    rutinaHablaApp,
     { url: '/guia/accesibilidad/', icon: '♿', name: 'Guía de Accesibilidad', description: 'Kit completo de apoyos visuales en casa' },
     { url: '/temporizador-visual/', icon: '⏱️', name: 'Temporizador Visual', description: 'Timer con círculo de colores' },
     { url: '/ejercicios-vocalizacion/', icon: '🎙️', name: 'Vocalización Parkinson', description: 'Ejercicios de voz guiados' },
     { url: '/calculadora-sueno/', icon: '😴', name: 'Calculadora Sueño', description: 'Ciclos de sueño óptimos' },
   ],
   'lector-texto-voz': [
+    rutinaHablaApp,
     { url: '/guia/accesibilidad/', icon: '♿', name: 'Guía de Accesibilidad', description: 'Kit completo de apoyos visuales en casa' },
     { url: '/adaptador-dislexia/', icon: '📖', name: 'Adaptador Dislexia', description: 'Lee textos con más facilidad' },
     { url: '/tablero-comunicacion/', icon: '💬', name: 'Tablero Comunicación', description: 'Símbolos AAC con voz' },
@@ -3460,16 +3471,24 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/semaforo-emocional/', icon: '🚦', name: 'Semáforo Emocional', description: 'Expresa tu estado emocional visualmente' },
   ],
   'ejercicios-vocalizacion': [
+    rutinaHablaApp,
     { url: '/daf-retroalimentacion-auditiva/', icon: '🎧', name: 'DAF (Retardo Auditivo)', description: 'Otra herramienta de voz: fluidez del habla con retardo auditivo' },
     { url: '/guia-respiracion/', icon: '🫁', name: 'Guía de Respiración', description: 'Técnicas de respiración consciente' },
     { url: '/planificador-rutinas/', icon: '📅', name: 'Planificador de Rutinas', description: 'Estructura el día visualmente' },
     { url: '/tablero-comunicacion/', icon: '💬', name: 'Tablero Comunicación', description: 'Símbolos AAC con voz' },
   ],
   'daf-retroalimentacion-auditiva': [
+    rutinaHablaApp,
     { url: '/ejercicios-vocalizacion/', icon: '🎙️', name: 'Ejercicios de Vocalización', description: 'Otra herramienta de voz: proyección y volumen con medidor en vivo' },
     { url: '/amplificador-sonido/', icon: '🦻', name: 'Amplificador de Sonido', description: 'Micrófono y auriculares para oír mejor tu entorno' },
     { url: '/lector-texto-voz/', icon: '🔊', name: 'Lector de Texto a Voz', description: 'Convierte texto escrito en voz para practicar la lectura' },
     { url: '/tablero-comunicacion/', icon: '💬', name: 'Tablero Comunicación', description: 'Símbolos AAC con voz para la comunicación aumentativa' },
+  ],
+  'rutina-practica-habla': [
+    { url: '/daf-retroalimentacion-auditiva/', icon: '🎧', name: 'DAF (Retardo Auditivo)', description: 'Oye tu voz con retardo para trabajar la fluidez' },
+    { url: '/ejercicios-vocalizacion/', icon: '🎙️', name: 'Ejercicios de Vocalización', description: 'Vocales sostenidas con medidor en vivo' },
+    { url: '/guia-respiracion/', icon: '🫁', name: 'Guía de Respiración', description: 'El apoyo respiratorio de cada sesión' },
+    { url: '/lector-texto-voz/', icon: '🔊', name: 'Lector de Texto a Voz', description: 'Escucha el modelo antes de leer tú' },
   ],
   'planificador-rutinas': [
     { url: '/guia/accesibilidad/', icon: '♿', name: 'Guía de Accesibilidad', description: 'Kit completo de apoyos visuales en casa' },

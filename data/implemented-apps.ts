@@ -544,6 +544,7 @@ export const implementedAppsUrls = [
   "/tablero-comunicacion/",             // Tablero AAC con símbolos visuales y voz para personas no verbales
   "/ejercicios-vocalizacion/",          // Ejercicios de vocalización para Parkinson con medidor de voz en tiempo real
   "/daf-retroalimentacion-auditiva/",   // DAF: retroalimentación auditiva retardada para la fluidez del habla
+  "/rutina-practica-habla/",            // Sesión guiada por bloques que encadena las herramientas de habla y voz
   "/planificador-rutinas/",             // Planificador visual de rutinas con pictogramas para autismo y TDAH
   "/generador-tarjetas-comunicacion/",  // Crea e imprime tarjetas pictográficas para AAC y comunicación aumentativa
   "/semaforo-emocional/",               // Regulación emocional visual con tres estados y estrategias adaptadas
