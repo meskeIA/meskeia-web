@@ -626,6 +626,31 @@ git push origin main
 
 ---
 
+## 📅 Agenda Operativa — dónde viven las fechas (OBLIGATORIO)
+
+**Toda decisión con fecha futura se anota en la Agenda Operativa, en la MISMA sesión en que se toma.**
+
+`C:\Users\jaceb\Mis Desarrollos\Vigilancia\Centro de Mando\agenda.json` — fuente **única** del
+"cuándo" de todo lo tutelado por Claude (meskeIA + programas del PC). Dos lectores: la tarjeta 📅
+del panel (vista diaria del usuario) y la skill `/agenda` (ejecutar y actualizar).
+
+Aplica a: revisiones periódicas, mediciones diferidas ("medir a los 3 meses"), hitos, ensayos,
+auditorías anuales. Si en una sesión decides que algo se revisa más adelante, **la sesión no termina
+sin crear su entrada**.
+
+Cuatro reglas:
+1. La agenda **no contiene instrucciones**, solo un puntero `donde` al documento vivo (doc, memoria
+   o skill) y una línea de nota. Si el procedimiento cambia, se corrige **allí**, nunca duplicándolo.
+2. Al completar: `ultimaVez` con la fecha real (cadencias) · borrar o reprogramar (hitos).
+3. Nunca acumular notas encima de notas: se **corrige** lo anterior. Una entrada que contradice a
+   otra es exactamente el fallo que este sistema evita.
+4. **No crear recordatorios en ningún otro sitio** (ni en docs, ni sueltos en memoria, ni pidiendo
+   al usuario que lo apunte). Si no está en la agenda, no existe.
+
+Detalle completo y formato de entrada: skill `/agenda`.
+
+---
+
 ## Para instrucciones completas
 
 - **Global**: `~/.claude/CLAUDE.md` (reglas universales)
