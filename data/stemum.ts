@@ -264,6 +264,13 @@ export const STEMUM_MATERIAL_APOYO: MaterialApoyo[] = [
     desc: 'Constantes de acidez y basicidad a 25 °C, con calculadora de pH y de disolución reguladora.',
     disciplina: 'quimica',
   },
+  {
+    slug: 'tabla-periodica',
+    icon: '🧪',
+    titulo: 'Tabla periódica',
+    desc: 'Los 118 elementos con buscador por nombre, símbolo o número, filtros por familia y estado, y calculadora de masa molar a partir de la fórmula.',
+    disciplina: 'quimica',
+  },
 ];
 
 // Slug → disciplina, para el breadcrumb del material de apoyo.

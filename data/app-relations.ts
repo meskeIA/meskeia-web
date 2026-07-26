@@ -3108,6 +3108,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-termodinamica-quimica/', icon: '🌡️', name: 'Termodinámica Química', description: 'ΔG, espontaneidad y la base teórica de Le Chatelier' },
     { url: '/simulador-cinetica-arrhenius/', icon: '⚗️', name: 'Cinética Arrhenius', description: 'La cinética dice a qué velocidad se alcanza el equilibrio' },
     { url: '/simulador-estequiometria/', icon: '🧪', name: 'Estequiometría', description: 'Reactivo limitante y masas molares de las mismas reacciones' },
+    { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica', description: 'Consulta los elementos y calcula masas molares de la reacción' },
   ],
   'simulador-lotka-volterra': [
     { url: '/simulador-genetica/', icon: '🧬', name: 'Genética Mendeliana', description: 'Cruces, Punnett y poblaciones' },
