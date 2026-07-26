@@ -244,6 +244,7 @@ export const implementedAppsUrls = [
   "/conversor-braille/",
   "/generador-anagramas/",
   "/buscador-palabras-patron/", // Palabras por patrón con huecos (crucigramas)
+  "/calculadora-jugada-scrabble/", // Mejor palabra por puntuación con tu atril y la letra del tablero
   "/generador-lorem-ipsum/",    // Generador de texto de prueba
   "/contador-silabas/",         // Separar y contar sílabas en español
   "/conversor-formatos/",       // JSON, CSV, Excel, XML, YAML

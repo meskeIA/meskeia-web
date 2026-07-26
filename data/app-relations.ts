@@ -382,6 +382,15 @@ const juegosPuzzleApps: RelatedApp[] = [
   { url: '/juego-puzzle-matematico/', icon: '➕', name: 'Puzzle Matemático', description: 'Retos numéricos' },
 ];
 
+// Calculadora de jugada: puente entre el cluster de juegos de palabras y las
+// herramientas léxicas (comparte el lemario con el buscador por patrón).
+const scrabbleApp: RelatedApp = {
+  url: '/calculadora-jugada-scrabble/',
+  icon: '🔠',
+  name: 'Jugada Óptima Scrabble',
+  description: 'La palabra que más puntúa con tus fichas',
+};
+
 const juegosCasualApps: RelatedApp[] = [
   { url: '/juego-tres-en-raya/', icon: '⭕', name: 'Tres en Raya', description: 'Tic-tac-toe' },
   { url: '/juego-piedra-papel-tijera/', icon: '✂️', name: 'Piedra Papel Tijera', description: 'Clásico' },
@@ -2329,20 +2338,28 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'conversor-texto': [...textoApps.filter(a => a.url !== '/conversor-texto/'), textoExtraApps[1]],
   'limpiador-texto': [...textoApps.filter(a => a.url !== '/limpiador-texto/'), textoExtraApps[2]],
   'comparador-textos': [...textoApps.filter(a => a.url !== '/comparador-textos/'), textoExtraApps[1]],
-  'contador-silabas': [...textoApps.filter(a => a.url !== '/contador-silabas/'), textoExtraApps[1]],
+  'contador-silabas': [scrabbleApp, ...textoApps.filter(a => a.url !== '/contador-silabas/'), textoExtraApps[1]],
   'conversor-markdown-html': [...textoApps.slice(0, 2), ...webDevApps.slice(0, 2)],
   'generador-lorem-ipsum': [...textoApps.filter(a => a.url !== '/generador-lorem-ipsum/')],
   'generador-anagramas': [
-    { url: '/contador-silabas/', icon: '📐', name: 'Contador Sílabas', description: 'Separa y cuenta sílabas' },
+    scrabbleApp,
     { url: '/buscador-palabras-patron/', icon: '🔍', name: 'Buscador por Patrón', description: 'Palabras con huecos para crucigramas, Wordle y Scrabble' },
+    { url: '/contador-silabas/', icon: '📐', name: 'Contador Sílabas', description: 'Separa y cuenta sílabas' },
     { url: '/juego-wordle/', icon: '🔤', name: 'Wordle', description: 'Adivina la palabra del día' },
     { url: '/juego-ahorcado/', icon: '🎯', name: 'Ahorcado', description: 'Adivina la palabra letra a letra' },
   ],
   'buscador-palabras-patron': [
+    scrabbleApp,
     { url: '/generador-anagramas/', icon: '🔤', name: 'Generador Anagramas', description: 'Palabras con letras sueltas' },
     { url: '/juego-wordle/', icon: '🔤', name: 'Wordle', description: 'Adivina la palabra del día' },
     { url: '/juego-ahorcado/', icon: '🎯', name: 'Ahorcado', description: 'Adivina la palabra letra a letra' },
     { url: '/conjugador-verbos/', icon: '🔁', name: 'Conjugador Verbos', description: 'Conjugaciones del español' },
+  ],
+  'calculadora-jugada-scrabble': [
+    { url: '/generador-anagramas/', icon: '🔤', name: 'Generador Anagramas', description: 'Todas las palabras con tus letras' },
+    { url: '/buscador-palabras-patron/', icon: '🔍', name: 'Buscador por Patrón', description: 'Palabras con huecos para crucigramas' },
+    { url: '/juego-wordle/', icon: '🔤', name: 'Wordle', description: 'Adivina la palabra del día' },
+    { url: '/contador-silabas/', icon: '📐', name: 'Contador Sílabas', description: 'Separa y cuenta sílabas' },
   ],
   'detector-idioma': textoApps,
   'conjugador-verbos': [
@@ -2716,8 +2733,8 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'juego-platform-runner': juegosArcadeApps.filter(a => a.url !== '/juego-platform-runner/'),
   'juego-2048': [...juegosPuzzleApps.slice(0, 2), ...juegosArcadeApps.slice(0, 2)],
   'juego-sudoku': juegosPuzzleApps.filter(a => a.url !== '/juego-sudoku/').slice(0, 4),
-  'juego-wordle': juegosPuzzleApps.filter(a => a.url !== '/juego-wordle/').slice(0, 4),
-  'juego-ahorcado': juegosPuzzleApps.filter(a => a.url !== '/juego-ahorcado/').slice(0, 4),
+  'juego-wordle': [scrabbleApp, ...juegosPuzzleApps.filter(a => a.url !== '/juego-wordle/').slice(0, 3)],
+  'juego-ahorcado': [scrabbleApp, ...juegosPuzzleApps.filter(a => a.url !== '/juego-ahorcado/').slice(0, 3)],
   'quiz-paises-capitales': [
     { url: '/paises-del-mundo/', icon: '🌍', name: 'Países del Mundo', description: 'Buscador de 196 países' },
     { url: '/quiz-verbos-irregulares/', icon: '📝', name: 'Quiz Verbos Inglés', description: 'Aprende verbos irregulares' },
