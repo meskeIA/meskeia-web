@@ -16,7 +16,7 @@
  */
 
 import { createClient } from '@libsql/client';
-import { readFileSync, writeFileSync, mkdirSync, readdirSync, unlinkSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, readdirSync, unlinkSync, renameSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -117,7 +117,16 @@ async function main() {
   partes.push('COMMIT;');
   partes.push('PRAGMA foreign_keys=ON;');
 
-  writeFileSync(ficheroSalida, partes.join('\n'), 'utf8');
+  // Escritura ATÓMICA (.tmp + rename). Sin esto, cualquier consumidor que leyera
+  // durante el writeFileSync de ~19 MB veía un fichero truncado y —como un dump son
+  // INSERTs sueltos— lo cargaba SIN ERROR, con menos filas y sin avisar de nada.
+  // Ocurrió el 26/07/2026: el digest diario salió con 2 h de datos de menos. El
+  // rename es atómico, así que el dump o existe entero o no existe. Afecta a todos
+  // los lectores (digest, verificador de backups 08:12, backup-critico 08:07).
+  // El .tmp no lo recoge la rotación de abajo, que filtra por terminación .sql.
+  const ficheroTmp = `${ficheroSalida}.tmp`;
+  writeFileSync(ficheroTmp, partes.join('\n'), 'utf8');
+  renameSync(ficheroTmp, ficheroSalida);
   console.log(`\n✅ Dump completado: ${ficheroSalida}`);
   console.log(`   ${tablas.rows.length} tablas · ${totalFilas} filas · ${objetos.rows.length} índices/vistas/disparadores`);
 
