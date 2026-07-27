@@ -2956,7 +2956,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-iva': [...fiscalApps.slice(1, 2), ...matematicasBasicasApps.slice(0, 2)],
   'orientador-iva-espana': [
     { url: '/calculadora-iva/', icon: '🧾', name: 'Calculadora IVA', description: 'Añade o quita IVA al 21/10/4 %' },
-    { url: '/orientador-tipos-renta-irpf/', icon: '🧭', name: 'Tipos de Renta IRPF', description: 'Cómo tributa cada ingreso' },
+    { url: '/conversor-cnae-iae/', icon: '🧾', name: 'Códigos CNAE e IAE', description: 'El tipo de IVA depende de tu actividad' },
     { url: '/generador-facturas/', icon: '🧾', name: 'Generador Facturas', description: 'Facturas con IVA e IRPF' },
     { url: '/estimador-cuota-autonomo/', icon: '💼', name: 'Cuota Autónomo', description: 'Tu cuota RETA mensual' },
   ],
@@ -3555,9 +3555,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // FAMILIA: FISCAL AUTÓNOMOS
   // ==========================================
   'estimador-cuota-autonomo': [
-    { url: '/estimador-sueldo-neto/', icon: '💶', name: 'Estimador Sueldo Neto', description: 'Bruto a neto con IRPF y SS' },
-    { url: '/orientador-gastos-deducibles/', icon: '🧾', name: 'Orientador Gastos Deducibles', description: 'Qué puedes deducir como autónomo' },
     { url: '/asistente-alta-autonomo/', icon: '📋', name: 'Asistente Alta Autónomo', description: 'Trámites para darte de alta' },
+    { url: '/conversor-cnae-iae/', icon: '🧾', name: 'Códigos CNAE e IAE', description: 'El código de actividad para tu alta' },
+    { url: '/orientador-gastos-deducibles/', icon: '🧾', name: 'Orientador Gastos Deducibles', description: 'Qué puedes deducir como autónomo' },
     { url: '/calendario-fiscal-emprendedor/', icon: '📅', name: 'Calendario Fiscal', description: 'Plazos y obligaciones fiscales' },
   ],
   'estimador-smi': [
@@ -3585,10 +3585,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/comparador-formas-juridicas/', icon: '⚖️', name: 'Comparador Formas Jurídicas', description: 'Autónomo, SL, cooperativa...' },
   ],
   'asistente-alta-autonomo': [
+    { url: '/conversor-cnae-iae/', icon: '🧾', name: 'Códigos CNAE e IAE', description: 'El epígrafe de actividad que pide el modelo 036/037' },
     { url: '/estimador-cuota-autonomo/', icon: '💼', name: 'Estimador Cuota Autónomo', description: 'Cuánto pagarás a la Seguridad Social' },
     { url: '/calendario-fiscal-emprendedor/', icon: '📅', name: 'Calendario Fiscal', description: 'Tus obligaciones fiscales como autónomo' },
     { url: '/orientador-gastos-deducibles/', icon: '🧾', name: 'Orientador Gastos Deducibles', description: 'Qué puedes deducir' },
-    { url: '/comparador-autonomo-vs-sl/', icon: '⚖️', name: 'Comparador Autónomo vs SL', description: '¿Cuándo conviene una SL?' },
   ],
   'orientador-ayudas-autonomos-pymes': [
     { url: '/asistente-alta-autonomo/', icon: '📋', name: 'Asistente Alta Autónomo', description: 'Trámites para darte de alta' },
@@ -4154,10 +4154,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // Régimen fiscal autónomo
   'selector-regimen-fiscal-autonomo': [
+    { url: '/conversor-cnae-iae/', icon: '🧾', name: 'Códigos CNAE e IAE', description: 'Tu epígrafe condiciona si puedes ir por módulos' },
     { url: '/selector-forma-juridica/', icon: '⚖️', name: 'Selector Forma Jurídica', description: '¿Autónomo o sociedad limitada?' },
     { url: '/estimador-cuota-autonomo/', icon: '💼', name: 'Calculadora Cuota Autónomos', description: 'Calcula tu cuota RETA mensual' },
     { url: '/selector-cuenta-bancaria/', icon: '🏧', name: 'Selector Cuenta Bancaria', description: '¿Qué tipo de cuenta necesitas?' },
-    { url: '/selector-contrato-trabajo/', icon: '📋', name: 'Selector Contrato de Trabajo', description: '¿Qué tipo de contrato te conviene?' },
   ],
 
   // Gestión del estrés
@@ -6781,6 +6781,7 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     'orientador-gastos-deducibles': { title: 'Más herramientas fiscales', icon: '🧾' },
     'calendario-fiscal-emprendedor': { title: 'Herramientas para emprendedores', icon: '📅' },
     'asistente-alta-autonomo': { title: 'Más herramientas para autónomos', icon: '📋' },
+    'conversor-cnae-iae': { title: 'Más herramientas para autónomos', icon: '🧾' },
     'estimador-irpf': { title: 'Más herramientas fiscales', icon: '📊' },
     'estimador-plusvalias-irpf': { title: 'Herramientas de fiscalidad patrimonial', icon: '💹' },
     'comparador-autonomo-vs-sl': { title: 'Herramientas para emprendedores', icon: '⚖️' },
