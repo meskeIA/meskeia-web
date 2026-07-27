@@ -453,7 +453,7 @@ export default function ConversorCnaeIaePage() {
 
       <RegionBadge variant="es-only" />
 
-      <DisclaimerCard variant="financial" severity="high" collapsible={false}>
+      <DisclaimerCard variant="financial" severity="critical" collapsible={false}>
         <p>
           Esta herramienta reproduce el literal de dos catálogos oficiales para que puedas
           consultarlos, pero no decide qué código corresponde a tu actividad ni sustituye al

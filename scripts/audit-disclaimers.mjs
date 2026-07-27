@@ -89,6 +89,14 @@ const NIVEL_MANUAL = {
   'simulador-subvenciones-rehabilitacion': 2, // elegibilidad subvenciones — financiero, no fiscal
   'estimacion-ahorro-hidrico':    3,  // cálculo informativo de ahorro de agua — sin consejo profesional
   'estimacion-certificacion-energetica': 3,  // estimador orientativo de certificación energética
+  // Orientadores de producto para bricolaje (suite inmobiliaria por el contexto hogar,
+  // sin ninguna implicación financiera, fiscal ni legal) — revisado 2026-07-27
+  'elegir-pintura-paredes':       3,  // qué pintura, imprimación y rodillo usar
+  'elegir-barniz-madera':         3,  // qué barniz, lasur, aceite o esmalte usar
+  // Sobre-protección deliberada del usuario (BACKLOG §4 — no rebajar)
+  'recordatorio-medicacion':            1,  // medicación = nivel 1 por decisión explícita
+  'simulador-financiacion-empresarial': 1,  // sobre-protección deliberada
+  'visualizador-cancer':                1,  // sobre-protección deliberada
 };
 
 // Palabras en URL/nombre que elevan a Nivel 1 CRÍTICO
@@ -210,10 +218,14 @@ function calcularNivelEsperado(slug, suites) {
   // Inmobiliaria o legal-fiscal → siempre 1
   if (suites.includes('inmobiliaria') || suites.includes('legal-fiscal')) nivel = 1;
 
-  // Disparadores de crítico por nombre de slug
+  // Disparadores de crítico por nombre de slug.
+  // El disparador debe ocupar un segmento completo del slug (admitiendo sufijos de plural
+  // o derivación: "impuesto" → "impuestos", "pension" → "pensiones"). Si se buscara como
+  // simple substring, "iva" dispararía dentro de "auditiva", "deriva" o "activa".
   const slugLower = slug.toLowerCase();
   for (const disparador of DISPARADORES_CRITICO) {
-    if (slugLower.includes(disparador)) {
+    const patron = new RegExp(`(^|-)${disparador}[a-z]*(-|$)`);
+    if (patron.test(slugLower)) {
       nivel = 1;
       break;
     }
