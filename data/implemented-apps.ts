@@ -1316,6 +1316,10 @@ export const implementedAppsUrls = [
   // Utilidades académicas y de formato (2026-07)
   "/generador-citas-apa/",             // Referencias y citas en APA 7, ISO 690, Vancouver e ICONTEC, con lista exportable
   "/comparador-tamanos-papel/",        // A4 vs Carta a escala real en SVG, conversor mm/pulgadas/píxeles y comprobador de impresión
+
+  // Simuladores STEM (2026-07)
+  "/simulador-logica-secuencial/",     // Biestables D/JK/T/SR, contador 4 bits, registro de desplazamiento y máquina de estados con cronograma
+  "/ajustar-ecuaciones-quimicas/",     // Ajuste por álgebra exacta, números de oxidación y método del ion-electrón en medio ácido y básico
 ];
 
 /**

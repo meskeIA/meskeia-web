@@ -1091,7 +1091,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-equilibrio-quimico/', icon: '⚖️', name: 'Equilibrio Químico', description: 'Reacciones reversibles, Le Chatelier y constante Kc' },
     { url: '/simulador-titulacion/', icon: '🧪', name: 'Titulación Ácido-Base', description: 'Caso práctico de reacción controlada gota a gota' },
     { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas Visual', description: 'Tipos, balanceo y átomos animados' },
-    { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica', description: 'Masas atómicas y propiedades' },
+    { url: '/ajustar-ecuaciones-quimicas/', icon: '⚖️', name: 'Ajustar Ecuaciones', description: 'Los coeficientes de cualquier reacción, comprobados' },
   ],
   'visualizador-reacciones-quimicas': [
     { url: '/simulador-reacciones-quimicas/', icon: '⚗️', name: 'Calculadora de Reacciones', description: 'Estequiometría y reactivo limitante' },
@@ -3084,10 +3084,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'visualizador-algoritmos': informaticaApps.filter(a => a.url !== '/visualizador-algoritmos/'),
   'playground-sql': informaticaApps.filter(a => a.url !== '/playground-sql/'),
   'simulador-puertas-logicas': [
+    { url: '/simulador-logica-secuencial/', icon: '⏱️', name: 'Lógica Secuencial', description: 'El paso siguiente: biestables, contadores y registros' },
     { url: '/calculadora-algebra-booleana/', icon: '🔢', name: 'Álgebra Booleana', description: 'Karnaugh, SOP, POS y simplificación lógica' },
     { url: '/calculadora-sistemas-numericos/', icon: '🔢', name: 'Sistemas Numéricos', description: 'Binario, hexadecimal y octal' },
     { url: '/simulador-circuitos-electricos/', icon: '⚡', name: 'Circuitos Eléctricos', description: 'Serie, paralelo y Ley de Ohm' },
-    { url: '/visualizador-estructuras-datos/', icon: '📦', name: 'Estructuras de Datos', description: 'Arrays, pilas, colas y árboles' },
   ],
   'glosario-programacion': informaticaApps.filter(a => a.url !== '/glosario-programacion/'),
   'calculadora-sistemas-numericos': informaticaApps.filter(a => a.url !== '/calculadora-sistemas-numericos/'),
@@ -3098,6 +3098,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'conversor-ieee754': informaticaApps.filter(a => a.url !== '/conversor-ieee754/'),
   'calculadora-algebra-booleana': [
     { url: '/simulador-puertas-logicas/', icon: '🔌', name: 'Puertas Lógicas', description: 'Circuitos digitales y álgebra booleana' },
+    { url: '/simulador-logica-secuencial/', icon: '⏱️', name: 'Lógica Secuencial', description: 'Biestables y contadores: la lógica que recuerda' },
     ...informaticaApps.filter(a => a.url !== '/calculadora-algebra-booleana/' && a.url !== '/simulador-puertas-logicas/'),
   ],
 
@@ -6074,9 +6075,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'Números de oxidación y nomenclatura IUPAC' },
   ],
   'simulador-estequiometria': [
+    { url: '/ajustar-ecuaciones-quimicas/', icon: '⚖️', name: 'Ajustar Ecuaciones', description: 'El paso previo: coeficientes y método del ion-electrón' },
     { url: '/simulador-tabla-periodica-tendencias/', icon: '⚗️', name: 'Tendencias Periódicas', description: 'Masas molares y reactividad explicadas desde la tabla periódica' },
     { url: '/simulador-cinetica-arrhenius/', icon: '⚗️', name: 'Cinética Arrhenius', description: 'Velocidad de las mismas reacciones que calculas aquí' },
-    { url: '/visualizador-quimica-organica/', icon: '🧬', name: 'Química Orgánica', description: 'Grupos funcionales y reacciones de compuestos orgánicos' },
     { url: '/visualizador-termodinamica-quimica/', icon: '🌡️', name: 'Termodinámica Química', description: 'ΔH y ΔG de las reacciones estequiométricas' },
   ],
 
@@ -6602,7 +6603,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica Interactiva', description: 'Los 118 elementos y sus propiedades' },
     { url: '/simulador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Ajusta y simula reacciones' },
     { url: '/tabla-solubilidad/', icon: '🧪', name: 'Tabla de Solubilidad', description: 'Qué compuestos precipitan y cuáles no' },
-    { url: '/quiz-tabla-periodica/', icon: '🎯', name: 'Quiz de la Tabla Periódica', description: 'Pon a prueba lo que sabes' },
+    { url: '/ajustar-ecuaciones-quimicas/', icon: '⚖️', name: 'Ajustar Ecuaciones', description: 'Calcula el número de oxidación de cualquier fórmula' },
   ],
   'tabla-unidades-si': [
     { url: '/tabla-constantes-fisicas/', icon: '🔬', name: 'Tabla de Constantes Físicas', description: 'Las constantes que fijan hoy las unidades' },
@@ -6644,7 +6645,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-electroquimica/', icon: '🔋', name: 'Electroquímica', description: 'Pila Daniell, serie electroquímica y electrólisis' },
     { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'Los números de oxidación que cambian' },
     { url: '/tabla-constantes-fisicas/', icon: '🔬', name: 'Tabla de Constantes Físicas', description: 'La constante de Faraday para ΔG°' },
-    { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica', description: 'Metales y su reactividad' },
+    { url: '/ajustar-ecuaciones-quimicas/', icon: '⚖️', name: 'Ajustar Ecuaciones Redox', description: 'Desarrolla el ion-electrón de estas semirreacciones' },
   ],
   'tabla-ka-kb': [
     { url: '/simulador-titulacion/', icon: '🧫', name: 'Titulación ácido-base', description: 'La curva de pH gota a gota' },
@@ -6667,6 +6668,20 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/generador-citas-apa/', icon: '📚', name: 'Generador de Citas', description: 'APA, ISO 690, Vancouver e ICONTEC' },
     { url: '/creador-paletas/', icon: '🎨', name: 'Creador de Paletas', description: 'Para tus diseños impresos' },
     { url: '/validador-dni-nif-cif/', icon: '🪪', name: 'Validador de DNI y CIF', description: 'Otra utilidad de uso diario' },
+  ],
+
+  // SIMULADORES STEM (2026-07)
+  'simulador-logica-secuencial': [
+    { url: '/simulador-puertas-logicas/', icon: '🔌', name: 'Puertas Lógicas', description: 'La parte combinacional: AND, OR, XOR y sumadores' },
+    { url: '/calculadora-algebra-booleana/', icon: '🔢', name: 'Álgebra Booleana', description: 'Simplifica las ecuaciones de excitación del circuito' },
+    { url: '/visualizador-logica-proposicional/', icon: '🔣', name: 'Lógica Proposicional', description: 'Tablas de verdad, Karnaugh y formas normales' },
+    { url: '/calculadora-sistemas-numericos/', icon: '🔢', name: 'Sistemas Numéricos', description: 'Binario y hexadecimal para leer la cuenta del contador' },
+  ],
+  'ajustar-ecuaciones-quimicas': [
+    { url: '/simulador-estequiometria/', icon: '🧪', name: 'Estequiometría', description: 'El paso siguiente: moles, reactivo limitante y rendimiento' },
+    { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'Números de oxidación y nomenclatura de cada elemento' },
+    { url: '/tabla-potenciales-redox/', icon: '🔋', name: 'Potenciales Redox', description: 'Qué semirreacción se impone sobre cuál y con qué E°' },
+    { url: '/simulador-titulacion/', icon: '🧪', name: 'Titulación Ácido-Base', description: 'La reacción ajustada, llevada al laboratorio' },
   ],
 };
 

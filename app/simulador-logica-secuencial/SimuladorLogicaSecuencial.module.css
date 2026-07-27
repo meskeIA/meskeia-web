@@ -1,0 +1,1024 @@
+/* Simulador de Lógica Secuencial — meskeIA */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  min-height: 100vh;
+}
+
+/* ============================================
+   HERO
+   ============================================ */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 80px;
+  padding: var(--spacing-xl);
+  background: var(--hero-bg);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.title {
+  font-size: 1.9rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  opacity: 0.95;
+  max-width: 760px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+.subtitle strong {
+  font-weight: 700;
+}
+
+/* ============================================
+   SELECTOR DE CIRCUITO
+   ============================================ */
+.circuitoSelector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+  justify-content: center;
+}
+
+.circuitoBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 175px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.circuitoBtn:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.circuitoBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.circuitoBtnActive {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.familiaBadge {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  color: var(--secondary);
+}
+
+.circuitoBtnActive .familiaBadge {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.circuitoNombre {
+  font-weight: 600;
+}
+
+/* ============================================
+   FICHA DEL CIRCUITO
+   ============================================ */
+.fichaPanel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+.ecuacionLabel {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: var(--spacing-xs);
+}
+
+.ecuacionText {
+  font-family: var(--font-mono, monospace);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.descripcionCircuito {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+/* ============================================
+   PANEL DE CONTROL
+   ============================================ */
+.controlPanel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+}
+
+.controlBloque {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.controlTitulo {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.sinEntradas {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-style: italic;
+  margin: 0;
+}
+
+.entradasRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.entradaToggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 78px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-primary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-primary);
+}
+
+.entradaToggle:hover {
+  border-color: var(--secondary);
+}
+
+.entradaToggle:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.entradaAlta {
+  background: var(--secondary);
+  border-color: var(--secondary);
+  color: white;
+}
+
+.entradaEtiqueta {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.entradaValor {
+  font-family: var(--font-mono, monospace);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.configRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--spacing-md);
+}
+
+.configLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.inputNumero {
+  width: 96px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-family: var(--font-mono, monospace);
+}
+
+.inputNumero:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.sentidoGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sentidoBtn {
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: var(--bg-primary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+.sentidoBtn:hover {
+  border-color: var(--primary);
+}
+
+.sentidoBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.sentidoActivo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+/* ============================================
+   RELOJ
+   ============================================ */
+.relojRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.btnPulso,
+.btnAuto,
+.btnReset {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius);
+  border: 2px solid transparent;
+  cursor: pointer;
+  font-size: 0.92rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btnPulso {
+  background: var(--primary);
+  color: white;
+}
+
+.btnPulso:hover {
+  filter: brightness(1.08);
+}
+
+.btnAuto {
+  background: var(--bg-primary);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+.btnAutoActivo {
+  background: var(--secondary);
+  border-color: var(--secondary);
+  color: white;
+}
+
+.btnReset {
+  background: var(--bg-primary);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+.btnPulso:focus-visible,
+.btnAuto:focus-visible,
+.btnReset:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.slider {
+  width: 100%;
+  max-width: 320px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border);
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 2px solid white;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 2px solid white;
+  cursor: pointer;
+}
+
+.slider:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+}
+
+.cicloContador {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* ============================================
+   AVISO
+   ============================================ */
+.avisoProhibido {
+  background: rgba(192, 57, 43, 0.1);
+  border-left: 4px solid #C0392B;
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+/* ============================================
+   ESTADO ACTUAL
+   ============================================ */
+.estadoPanel,
+.cronogramaPanel,
+.tablaPanel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+}
+
+.panelTitulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.salidasRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.salidaChip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 92px;
+  padding: var(--spacing-md);
+  background: var(--bg-primary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.salidaAlta {
+  background: rgba(46, 134, 171, 0.12);
+  border-color: var(--primary);
+}
+
+.salidaNombre {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.salidaValor {
+  font-family: var(--font-mono, monospace);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.celdasRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.celda {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 74px;
+  padding: var(--spacing-md);
+  background: var(--bg-primary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.celdaAlta {
+  background: rgba(72, 169, 166, 0.14);
+  border-color: var(--secondary);
+}
+
+.celdaNombre {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.celdaValor {
+  font-family: var(--font-mono, monospace);
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.lecturaValor {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  margin: var(--spacing-sm) 0 0 0;
+}
+
+.lecturaValor code {
+  font-family: var(--font-mono, monospace);
+  background: var(--bg-primary);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--primary);
+}
+
+.estadosRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.estadoNodo {
+  flex: 1 1 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--spacing-md);
+  background: var(--bg-primary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.estadoActivo {
+  background: rgba(46, 134, 171, 0.12);
+  border-color: var(--primary);
+}
+
+.estadoNombre {
+  font-family: var(--font-mono, monospace);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.estadoDesc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+/* ============================================
+   CRONOGRAMA
+   ============================================ */
+.cronogramaWrapper {
+  overflow-x: auto;
+  padding-bottom: var(--spacing-xs);
+}
+
+.cronogramaSvg {
+  display: block;
+  min-width: 100%;
+}
+
+.lineaFlanco {
+  stroke: var(--border);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.etiquetaSenal {
+  fill: var(--text-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+}
+
+.ondaReloj {
+  fill: none;
+  stroke: var(--text-muted);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.ondaEntrada {
+  fill: none;
+  stroke: var(--secondary);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+.ondaSalida {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+.numeroCiclo {
+  fill: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.cicloProhibido {
+  fill: #C0392B;
+  font-weight: 700;
+}
+
+.leyendaCronograma,
+.leyendaTabla {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  margin: var(--spacing-md) 0 0 0;
+}
+
+.mensajeEspera {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: var(--spacing-xl);
+  background: var(--bg-primary);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-large);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* ============================================
+   TABLA CARACTERÍSTICA + BLOQUE EDUCATIVO v2.0
+   ============================================ */
+.formulaBox {
+  background: var(--bg-primary);
+  border-left: 4px solid var(--primary);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin: var(--spacing-md) 0;
+  border-radius: var(--radius);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.95rem;
+  text-align: center;
+  color: var(--text-primary);
+  overflow-x: auto;
+}
+
+.tablaWrapper {
+  overflow-x: auto;
+  margin: var(--spacing-md) 0;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  font-size: 0.88rem;
+}
+
+.tabla thead {
+  background: var(--primary);
+  color: white;
+}
+
+.tabla th,
+.tabla td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.tabla tbody tr:hover {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.filaActiva {
+  background: rgba(72, 169, 166, 0.15);
+  font-weight: 600;
+}
+
+.scenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.scenarioCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.scenarioIcon {
+  font-size: 2rem;
+}
+
+.scenarioCard strong {
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+.scenarioCard p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.faqItem {
+  background: var(--bg-primary);
+  border-left: 4px solid var(--secondary);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius);
+}
+
+.faqItem h4 {
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+.faqItem p {
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--text-primary);
+  line-height: 1.6;
+  font-size: 0.9rem;
+}
+
+.faqItem p:last-child {
+  margin-bottom: 0;
+}
+
+.faqTip {
+  background: rgba(72, 169, 166, 0.1);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius);
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-top: var(--spacing-xs) !important;
+  font-style: italic;
+}
+
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.step {
+  display: flex;
+  gap: var(--spacing-md);
+  background: var(--bg-primary);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.stepContent strong {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+.stepContent p {
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.5;
+  font-size: 0.9rem;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.tipCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--secondary);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.tipIcon {
+  font-size: 1.6rem;
+}
+
+.tipCard strong {
+  color: var(--primary);
+  font-size: 0.95rem;
+}
+
+.tipCard p {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.warningBox {
+  background: rgba(224, 122, 31, 0.08);
+  border-left: 4px solid #E07A1F;
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin: var(--spacing-lg) 0;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  color: #E07A1F;
+  font-size: 1.05rem;
+}
+
+.warningIcon {
+  font-size: 1.4rem;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: var(--spacing-lg);
+  color: var(--text-primary);
+  line-height: 1.7;
+  font-size: 0.9rem;
+}
+
+.warningList li {
+  margin-bottom: var(--spacing-sm);
+}
+
+.warningList li strong {
+  color: #E07A1F;
+}
+
+/* ============================================
+   DARK MODE
+   ============================================ */
+[data-theme='dark'] .circuitoBtn {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .entradaToggle,
+[data-theme='dark'] .sentidoBtn,
+[data-theme='dark'] .btnAuto,
+[data-theme='dark'] .btnReset,
+[data-theme='dark'] .inputNumero {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .entradaAlta {
+  background: var(--secondary);
+  color: white;
+}
+
+[data-theme='dark'] .btnAutoActivo {
+  background: var(--secondary);
+  color: white;
+}
+
+[data-theme='dark'] .sentidoActivo {
+  background: var(--primary);
+  color: white;
+}
+
+[data-theme='dark'] .salidaChip,
+[data-theme='dark'] .celda,
+[data-theme='dark'] .estadoNodo,
+[data-theme='dark'] .scenarioCard,
+[data-theme='dark'] .faqItem,
+[data-theme='dark'] .step,
+[data-theme='dark'] .tipCard,
+[data-theme='dark'] .mensajeEspera {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .salidaAlta {
+  background: rgba(46, 134, 171, 0.22);
+}
+
+[data-theme='dark'] .celdaAlta {
+  background: rgba(72, 169, 166, 0.22);
+}
+
+[data-theme='dark'] .estadoActivo {
+  background: rgba(46, 134, 171, 0.22);
+}
+
+[data-theme='dark'] .formulaBox {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .lecturaValor code {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .tabla tbody tr:hover {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .filaActiva {
+  background: rgba(72, 169, 166, 0.22);
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(72, 169, 166, 0.15);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(224, 122, 31, 0.12);
+}
+
+[data-theme='dark'] .avisoProhibido {
+  background: rgba(192, 57, 43, 0.18);
+}
+
+[data-theme='dark'] .slider::-webkit-slider-thumb,
+[data-theme='dark'] .slider::-moz-range-thumb {
+  border-color: #2A2A2A;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .hero {
+    margin-top: 60px;
+    padding: var(--spacing-lg);
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .controlPanel {
+    grid-template-columns: 1fr;
+    padding: var(--spacing-lg);
+  }
+
+  .estadoPanel,
+  .cronogramaPanel,
+  .tablaPanel {
+    padding: var(--spacing-lg);
+  }
+
+  .ecuacionText {
+    font-size: 1.1rem;
+  }
+
+  .circuitoBtn {
+    min-width: 150px;
+    font-size: 0.85rem;
+  }
+
+  .salidaValor {
+    font-size: 1.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .circuitoSelector {
+    gap: 6px;
+  }
+
+  .circuitoBtn {
+    min-width: 100%;
+  }
+
+  .relojRow {
+    flex-direction: column;
+  }
+
+  .btnPulso,
+  .btnAuto,
+  .btnReset {
+    width: 100%;
+  }
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  .circuitoBtn,
+  .entradaToggle,
+  .sentidoBtn,
+  .btnPulso,
+  .btnAuto,
+  .btnReset {
+    transition: none !important;
+  }
+
+  .circuitoBtn:hover {
+    transform: none !important;
+  }
+}
