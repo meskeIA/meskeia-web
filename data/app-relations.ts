@@ -410,6 +410,41 @@ const juegosCasualApps: RelatedApp[] = [
 ];
 
 // ==========================================
+// FAMILIA: GENERADORES IMPRIMIBLES
+// Producen un artefacto para el papel (cuadrícula, cartón, hoja de operaciones)
+// ==========================================
+const sopaLetrasApp: RelatedApp = {
+  url: '/generador-sopa-letras/',
+  icon: '🔡',
+  name: 'Sopas de Letras',
+  description: 'Crea la tuya con tus palabras e imprímela',
+};
+const laberintosApp: RelatedApp = {
+  url: '/generador-laberintos/',
+  icon: '🌀',
+  name: 'Laberintos',
+  description: 'Salida única garantizada, listos para imprimir',
+};
+const bingoApp: RelatedApp = {
+  url: '/generador-cartones-bingo/',
+  icon: '🎱',
+  name: 'Cartones de Bingo',
+  description: 'Cartones únicos y bombo digital',
+};
+const ligaApp: RelatedApp = {
+  url: '/generador-calendario-liga/',
+  icon: '🏆',
+  name: 'Calendario de Liga',
+  description: 'Todos contra todos en jornadas equilibradas',
+};
+const fichasCalculoApp: RelatedApp = {
+  url: '/generador-fichas-calculo/',
+  icon: '➗',
+  name: 'Fichas de Cálculo',
+  description: 'Operaciones por nivel con hoja de soluciones',
+};
+
+// ==========================================
 // FAMILIA: HERRAMIENTAS WEB
 // ==========================================
 const webDevApps: RelatedApp[] = [
@@ -2354,14 +2389,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     scrabbleApp,
     { url: '/buscador-palabras-patron/', icon: '🔍', name: 'Buscador por Patrón', description: 'Palabras con huecos para crucigramas, Wordle y Scrabble' },
     { url: '/contador-silabas/', icon: '📐', name: 'Contador Sílabas', description: 'Separa y cuenta sílabas' },
-    { url: '/juego-wordle/', icon: '🔤', name: 'Wordle', description: 'Adivina la palabra del día' },
+    sopaLetrasApp,
     { url: '/juego-ahorcado/', icon: '🎯', name: 'Ahorcado', description: 'Adivina la palabra letra a letra' },
   ],
   'buscador-palabras-patron': [
     scrabbleApp,
     { url: '/generador-anagramas/', icon: '🔤', name: 'Generador Anagramas', description: 'Palabras con letras sueltas' },
+    sopaLetrasApp,
     { url: '/juego-wordle/', icon: '🔤', name: 'Wordle', description: 'Adivina la palabra del día' },
-    { url: '/juego-ahorcado/', icon: '🎯', name: 'Ahorcado', description: 'Adivina la palabra letra a letra' },
     { url: '/conjugador-verbos/', icon: '🔁', name: 'Conjugador Verbos', description: 'Conjugaciones del español' },
   ],
   'calculadora-jugada-scrabble': [
@@ -2381,7 +2416,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-notas/', icon: '📊', name: 'Calculadora Notas', description: 'Calcula tu nota media' },
     { url: '/juego-puzzle-matematico/', icon: '➕', name: 'Puzzle Matemático', description: 'Retos numéricos' },
     { url: '/calculadora-matematica/', icon: '🔢', name: 'Calculadora Matemática', description: 'Operaciones básicas' },
-    { url: '/creador-flashcards/', icon: '🎴', name: 'Flashcards', description: 'Tarjetas de memoria' },
+    fichasCalculoApp,
   ],
 
   // CRIPTOGRAFÍA
@@ -2741,9 +2776,41 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'juego-space-invaders': juegosArcadeApps.filter(a => a.url !== '/juego-space-invaders/'),
   'juego-platform-runner': juegosArcadeApps.filter(a => a.url !== '/juego-platform-runner/'),
   'juego-2048': [...juegosPuzzleApps.slice(0, 2), ...juegosArcadeApps.slice(0, 2)],
-  'juego-sudoku': juegosPuzzleApps.filter(a => a.url !== '/juego-sudoku/').slice(0, 4),
+  'juego-sudoku': [laberintosApp, ...juegosPuzzleApps.filter(a => a.url !== '/juego-sudoku/').slice(0, 3)],
   'juego-wordle': [scrabbleApp, ...juegosPuzzleApps.filter(a => a.url !== '/juego-wordle/').slice(0, 3)],
-  'juego-ahorcado': [scrabbleApp, ...juegosPuzzleApps.filter(a => a.url !== '/juego-ahorcado/').slice(0, 3)],
+  'juego-ahorcado': [sopaLetrasApp, ...juegosPuzzleApps.filter(a => a.url !== '/juego-ahorcado/').slice(0, 3)],
+
+  // GENERADORES IMPRIMIBLES
+  'generador-sopa-letras': [
+    laberintosApp,
+    { url: '/generador-anagramas/', icon: '🔤', name: 'Generador Anagramas', description: 'Palabras con letras sueltas' },
+    { url: '/buscador-palabras-patron/', icon: '🔍', name: 'Buscador por Patrón', description: 'Palabras con huecos para crucigramas' },
+    { url: '/juego-ahorcado/', icon: '🎯', name: 'Ahorcado', description: 'Adivina la palabra letra a letra' },
+  ],
+  'generador-laberintos': [
+    sopaLetrasApp,
+    fichasCalculoApp,
+    { url: '/juego-sudoku/', icon: '🔢', name: 'Sudoku', description: 'Puzzle clásico de lógica' },
+    { url: '/juego-memoria/', icon: '🧠', name: 'Memoria', description: 'Encuentra parejas' },
+  ],
+  'generador-cartones-bingo': [
+    ligaApp,
+    { url: '/ruleta-aleatoria/', icon: '🎰', name: 'Ruleta', description: 'Sorteos y decisiones al azar' },
+    { url: '/generador-loteria/', icon: '🎲', name: 'Lotería', description: 'Combinaciones aleatorias' },
+    { url: '/tirador-dados/', icon: '🎲', name: 'Tirador de Dados', description: 'Dados para rol y mesa' },
+  ],
+  'generador-calendario-liga': [
+    bingoApp,
+    { url: '/ruleta-aleatoria/', icon: '🎰', name: 'Ruleta', description: 'Sorteos y decisiones al azar' },
+    { url: '/tirador-dados/', icon: '🎲', name: 'Tirador de Dados', description: 'Dados para rol y mesa' },
+    { url: '/calculadora-porcentajes/', icon: '％', name: 'Calculadora de Porcentajes', description: 'Porcentajes de victorias y medias' },
+  ],
+  'generador-fichas-calculo': [
+    { url: '/tablas-multiplicar/', icon: '✖️', name: 'Tablas de Multiplicar', description: 'Practica las tablas' },
+    { url: '/juego-puzzle-matematico/', icon: '➕', name: 'Puzzle Matemático', description: 'Retos numéricos' },
+    laberintosApp,
+    sopaLetrasApp,
+  ],
   'quiz-paises-capitales': [
     { url: '/paises-del-mundo/', icon: '🌍', name: 'Países del Mundo', description: 'Buscador de 196 países' },
     { url: '/quiz-verbos-irregulares/', icon: '📝', name: 'Quiz Verbos Inglés', description: 'Aprende verbos irregulares' },
@@ -2793,10 +2860,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'juego-tres-en-raya': juegosCasualApps.filter(a => a.url !== '/juego-tres-en-raya/'),
   'juego-piedra-papel-tijera': juegosCasualApps.filter(a => a.url !== '/juego-piedra-papel-tijera/'),
-  'ruleta-aleatoria': juegosCasualApps.filter(a => a.url !== '/ruleta-aleatoria/'),
-  'generador-loteria': juegosCasualApps.filter(a => a.url !== '/generador-loteria/'),
+  'ruleta-aleatoria': [bingoApp, ...juegosCasualApps.filter(a => a.url !== '/ruleta-aleatoria/').slice(0, 3)],
+  'generador-loteria': [bingoApp, ...juegosCasualApps.filter(a => a.url !== '/generador-loteria/').slice(0, 3)],
   'cara-o-cruz': juegosCasualApps.filter(a => a.url !== '/cara-o-cruz/'),
-  'tirador-dados': juegosCasualApps.filter(a => a.url !== '/tirador-dados/'),
+  'tirador-dados': [bingoApp, ligaApp, ...juegosCasualApps.filter(a => a.url !== '/tirador-dados/').slice(0, 2)],
   'test-velocidad-escritura': [...productividadApps.slice(0, 2), ...juegosPuzzleApps.slice(0, 2)],
 
   // HERRAMIENTAS WEB

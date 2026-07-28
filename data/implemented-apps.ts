@@ -525,6 +525,11 @@ export const implementedAppsUrls = [
 
   // Nuevas apps (2026-02-23)
   "/juego-ahorcado/",                    // Juego del ahorcado en español: 4 categorías, 100% local
+  "/generador-sopa-letras/",             // Sopas de letras con palabras propias, imprimibles y con solución
+  "/generador-laberintos/",              // Laberintos de solución única en SVG, listos para imprimir
+  "/generador-cartones-bingo/",          // Cartones de bingo 90/75 únicos + bombo digital
+  "/generador-calendario-liga/",          // Calendario de liga todos contra todos + clasificación imprimible
+  "/generador-fichas-calculo/",          // Fichas de operaciones por nivel con hoja de soluciones
   "/checklist-documentos-viaje/",        // Checklist documentos de viaje: España, Europa, internacional
   "/orientador-jet-lag/",                 // Calculadora jet lag: diferencia horaria, días adaptación, recomendaciones
   "/quiz-paises-capitales/",             // Quiz geografía: capitales, países por capital, identificar banderas
