@@ -3,6 +3,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
+import { appsDeCategoria } from '@/data/coquinum';
 import styles from '../CoquinumHome.module.css';
 
 export const metadata: Metadata = {
@@ -12,60 +13,9 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://coquinum.com/medidas-conversiones/' },
 };
 
-// Apps de la categoría Medidas y conversiones. Viven físicamente en meskeIA y se
-// sirven bajo coquinum.com mediante el host-rewrite (lista blanca en proxy.ts).
-const APPS = [
-  {
-    icon: '🥄',
-    titulo: 'Conversor de tazas a gramos',
-    desc: 'Pasa de tazas, cucharadas y cucharaditas a gramos con el peso real de cada ingrediente: la harina no pesa lo mismo que el azúcar ni que los líquidos.',
-    slug: 'conversor-tazas-gramos',
-  },
-  {
-    icon: '⛰️',
-    titulo: 'Ajuste de recetas por altitud',
-    desc: 'Adapta una receta de nivel del mar a la altura a la que cocinas: punto de ebullición del agua y ajustes de horno, leudante, líquido y cocción.',
-    slug: 'ajuste-recetas-altitud',
-  },
-  {
-    icon: '🌡️',
-    titulo: 'Conversor de temperatura de horno',
-    desc: 'Pasa la temperatura del horno entre grados Celsius, Fahrenheit y gas mark, con el equivalente para horno de ventilador y los usos de cada nivel.',
-    slug: 'conversor-temperatura-horno',
-  },
-  {
-    icon: '🔄',
-    titulo: 'Sustituciones de ingredientes',
-    desc: 'Con qué cambiar huevo, mantequilla, azúcar, leche o harina, con proporciones exactas y filtro vegano, sin gluten y sin lactosa.',
-    slug: 'sustituciones-ingredientes',
-  },
-  {
-    icon: '⭕',
-    titulo: 'Conversor de moldes',
-    desc: 'Adapta los ingredientes de una receta al molde que tengas según el área de la base, y ajusta el tiempo de horno.',
-    slug: 'conversor-moldes',
-  },
-  {
-    icon: '💧',
-    titulo: 'Conversor de líquidos (ml ↔ g)',
-    desc: 'Convierte mililitros y gramos según el líquido: cada uno pesa distinto por su densidad (aceite, miel, leche…).',
-    slug: 'densidad-liquidos',
-  },
-  {
-    icon: '🤏',
-    titulo: 'Medidas «a ojo»',
-    desc: 'Cuánto es una pizca, un chorro, un vaso o un puñado: traduce las medidas imprecisas de las recetas.',
-    slug: 'medidas-a-ojo',
-  },
-  {
-    icon: '⚖️',
-    titulo: 'Conversor de onzas',
-    desc: 'De onzas a gramos, mililitros, libras y tazas, separando la onza de peso de la onza líquida, con la diferencia entre EE. UU. y Reino Unido.',
-    slug: 'conversor-onzas',
-  },
-];
-
 export default function CoquinumMedidasConversiones() {
+  const APPS = appsDeCategoria('medidas-conversiones');
+
   return (
     <>
       <AnalyticsTracker appName="coquinum-medidas-conversiones" />

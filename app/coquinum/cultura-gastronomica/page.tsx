@@ -3,6 +3,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
+import { appsDeCategoria } from '@/data/coquinum';
 import styles from '../CoquinumHome.module.css';
 
 export const metadata: Metadata = {
@@ -12,36 +13,9 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://coquinum.com/cultura-gastronomica/' },
 };
 
-// Apps de la categoría Cultura gastronómica. Viven físicamente en meskeIA y se
-// sirven bajo coquinum.com mediante el host-rewrite (lista blanca en proxy.ts).
-const APPS = [
-  {
-    icon: '🗺️',
-    titulo: 'Mapa de las especias',
-    desc: 'De dónde viene cada especia y cómo las rutas comerciales movieron sabores por todo el planeta.',
-    slug: 'visualizador-mapa-especias',
-  },
-  {
-    icon: '🌍',
-    titulo: 'El viaje de la comida',
-    desc: 'Recorrido por el origen y la difusión de alimentos cotidianos: cómo llegaron a tu plato desde el otro lado del mundo.',
-    slug: 'visualizador-viaje-comida',
-  },
-  {
-    icon: '🌱',
-    titulo: 'Huella de los alimentos',
-    desc: 'Compara el impacto ambiental —agua, CO₂, tierra— de lo que comemos para decidir con más información.',
-    slug: 'visualizador-huella-alimentos',
-  },
-  {
-    icon: '🧬',
-    titulo: 'Digestión de nutrientes',
-    desc: 'Visualiza el camino de hidratos, grasas y proteínas por el aparato digestivo y cómo se aprovechan.',
-    slug: 'visualizador-digestion-nutrientes',
-  },
-];
-
 export default function CoquinumCulturaGastronomica() {
+  const APPS = appsDeCategoria('cultura-gastronomica');
+
   return (
     <>
       <AnalyticsTracker appName="coquinum-cultura-gastronomica" />

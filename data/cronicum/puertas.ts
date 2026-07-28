@@ -1,13 +1,15 @@
 /**
  * Puertas de entrada de Cronicum (vertical de Historia).
  *
- * Doble eje de navegación sobre las 148 cronologías de `data/historias/`:
+ * Doble eje de navegación sobre las cronologías de `data/historias/`:
  *  - grupo 'mundo'         → civilizaciones, países y regiones (6 puertas)
  *  - grupo 'cosas'         → la historia temática / "de las cosas" (5 puertas)
  *  - grupo 'acontecimientos' → banda transversal de grandes hechos (1 puerta)
  *
- * Cada cronología (slug de `data/historias/index.ts`) se asigna a EXACTLY una
- * puerta. Si se añade una cronología nueva, asígnala aquí a su puerta.
+ * Cada cronología (slug de `data/historias/index.ts`) se asigna a EXACTAMENTE una
+ * puerta. Si se añade una cronología nueva, asígnala aquí a su puerta: si se
+ * queda fuera, existe en meskeIA pero es inalcanzable desde cronicum.com.
+ * `npm run check:verticales` (y el propio build) lo comprueban.
  */
 
 export interface Puerta {

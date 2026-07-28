@@ -3,6 +3,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
+import { appsDeCategoria } from '@/data/coquinum';
 import styles from '../CoquinumHome.module.css';
 
 export const metadata: Metadata = {
@@ -12,66 +13,9 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://coquinum.com/cocina-recetas/' },
 };
 
-// Apps de la categoría Cocina y recetas. Viven físicamente en meskeIA y se
-// sirven bajo coquinum.com mediante el host-rewrite (lista blanca en proxy.ts).
-const APPS = [
-  {
-    icon: '⚖️',
-    titulo: 'Conversor de cocina',
-    desc: 'Pasa entre gramos, mililitros, tazas y cucharadas, y entre °C y °F, para seguir cualquier receta sin liarte con las medidas.',
-    slug: 'calculadora-cocina',
-  },
-  {
-    icon: '🍽️',
-    titulo: 'Escalador de recetas',
-    desc: 'Ajusta las cantidades de una receta al número de raciones que necesitas, manteniendo las proporciones.',
-    slug: 'escalador-recetas',
-  },
-  {
-    icon: '🗓️',
-    titulo: 'Planificador de menú',
-    desc: 'Organiza las comidas de la semana de forma equilibrada y variada para llegar con todo previsto a la compra.',
-    slug: 'planificador-menu',
-  },
-  {
-    icon: '🥗',
-    titulo: 'Selector de dieta',
-    desc: 'Compara patrones de alimentación según tus objetivos y preferencias para orientarte sobre cuál encaja contigo.',
-    slug: 'selector-dieta',
-  },
-  {
-    icon: '🎉',
-    titulo: 'Cantidades para un evento',
-    desc: 'Cuánta comida y bebida preparar por invitado según el tipo de evento: aperitivo, comida sentada o barbacoa.',
-    slug: 'cantidades-evento',
-  },
-  {
-    icon: '🍖',
-    titulo: 'Carne para un asado',
-    desc: 'Cuánta carne comprar para tu asado o barbacoa según las personas y el apetito, con desglose por tipo.',
-    slug: 'asado-personas',
-  },
-  {
-    icon: '🥜',
-    titulo: 'Los 14 alérgenos alimentarios',
-    desc: 'Los alérgenos de declaración obligatoria en la UE, con ejemplos y dónde se esconden en los platos. Con buscador.',
-    slug: 'alergenos-alimentarios',
-  },
-  {
-    icon: '📖',
-    titulo: 'Glosario de técnicas de cocina',
-    desc: 'Qué significan blanquear, pochar, bresar, confitar o desglasar, agrupados por tipo de cocción. Con buscador.',
-    slug: 'glosario-tecnicas-cocina',
-  },
-  {
-    icon: '🔪',
-    titulo: 'Tipos de corte en cocina',
-    desc: 'Brunoise, juliana, mirepoix, bastón o chiffonade: qué mide cada corte y para qué se usa. Con buscador.',
-    slug: 'tipos-corte-cocina',
-  },
-];
-
 export default function CoquinumCocinaRecetas() {
+  const APPS = appsDeCategoria('cocina-recetas');
+
   return (
     <>
       <AnalyticsTracker appName="coquinum-cocina-recetas" />

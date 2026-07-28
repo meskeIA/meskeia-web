@@ -86,7 +86,7 @@ Ruta dinámica para cronologías históricas. Cada historia = un archivo `data/h
 
 ### Slugs activos
 
-Catálogo cerrado (2026-05-09) con ~170 archivos en `data/historias/` — la lista viva está en `data/historias/index.ts`, NO mantener listas de slugs en docs. Las cronologías se sirven también en el vertical CRONICUM (`cronicum.com`, host-rewrite); una cronología nueva requiere además registrar su slug en `data/cronicum/puertas.ts` o no aparece en el portal.
+Catálogo cerrado (2026-05-09) con ~170 archivos en `data/historias/` — la lista viva está en `data/historias/index.ts`, NO mantener listas de slugs en docs. Las cronologías se sirven también en el vertical CRONICUM (`cronicum.com`, host-rewrite); una cronología nueva requiere además asignar su slug a una puerta en `data/cronicum/puertas.ts` o no aparece en el portal — lo comprueba `npm run check:verticales` desde el 2026-07-28.
 
 ### Workflow óptimo: crear múltiples historias en paralelo
 
@@ -204,13 +204,21 @@ import { FISCAL_IRPF_META } from '@/data/fiscal';
 
 ---
 
-## Registro de un simulador en Stemum
+## Registro de una app en un portal vertical
 
-**Un solo sitio**: una entrada en `STEMUM_APPS` (`data/stemum.ts`), en la disciplina que le toque. Esa entrada es a la vez la pertenencia (breadcrumb, host-rewrite del proxy, contadores del hero) **y la tarjeta** que pinta la parrilla de `/stemum/[disciplina]/`. El orden dentro de la disciplina es el orden de la parrilla. Además, como cualquier app: `data/applications.ts` + `data/implemented-apps.ts` + `data/app-relations.ts`.
+Cada vertical tiene **un solo sitio** donde se registra, además de los tres de cualquier app (`data/applications.ts` + `data/implemented-apps.ts` + `data/app-relations.ts`):
 
-> **Histórico (2026-07-28)**: la parrilla era un array `APPS` hardcodeado en cada `app/stemum/[disciplina]/page.tsx`, así que registrar una app pedía DOS listas. Olvidar la segunda dejaba la app contada en el hero pero **sin tarjeta que la enlazase, y sin dar ningún error** — le pasó a `simulador-logica-secuencial` y a `ajustar-ecuaciones-quimicas`. Ahora cada parrilla se deriva de `appsDeDisciplina(disciplina)`.
+| Vertical | Dónde se registra | Qué aporta esa entrada |
+|---|---|---|
+| **Stemum** | `STEMUM_APPS` en `data/stemum.ts` | Pertenencia a disciplina (breadcrumb, proxy, contadores) **y** la tarjeta de la parrilla `/stemum/[disciplina]/` |
+| **Coquinum** | `COQUINUM_APPS` en `data/coquinum.ts` | Pertenencia a categoría **y** la tarjeta de la parrilla **y** el nombre/icono del bloque «Más de [categoría]» |
+| **Cronicum** | el array `slugs` de una puerta en `data/cronicum/puertas.ts` | La puerta por la que se llega a la cronología (el título, icono y descripción salen de `data/historias/[slug].ts`) |
 
-**Candado**: `npm run check:stemum` — lo ejecuta también `npm run build`, y **rompe el build** si falla. Verifica que cada slug del catálogo tenga su carpeta en `app/`, esté en `implemented-apps.ts` y en `applications.ts`, que la disciplina exista, y que ninguna parrilla vuelva a listar apps a mano.
+En Stemum y Coquinum el orden dentro de la sección **es** el orden de la parrilla. En Cronicum cada cronología va en **exactamente una** puerta.
+
+> **Histórico (2026-07-28)**: las parrillas eran arrays `APPS` hardcodeados en cada `app/{stemum,coquinum}/[seccion]/page.tsx`, así que registrar una app pedía DOS listas (TRES en Coquinum, con `COQUINUM_APP_INFO`). Consecuencias reales: `simulador-logica-secuencial` y `ajustar-ecuaciones-quimicas` quedaron contadas en el hero de Stemum pero **sin tarjeta que las enlazase y sin dar ningún error**; en Coquinum 21 títulos y 17 iconos habían divergido, y la misma app se presentaba distinta en la parrilla y en el pie. Ahora las parrillas se derivan de `appsDeDisciplina()` / `appsDeCategoria()`, y `COQUINUM_APP_INFO` del catálogo.
+
+**Candado**: `npm run check:verticales` — lo ejecuta también `npm run build`, y **rompe el build** si falla. Verifica, en los tres portales: que cada slug tenga su carpeta en `app/`, esté en `implemented-apps.ts` y en `applications.ts`, que la disciplina/categoría exista, que ninguna parrilla vuelva a listar apps a mano, y que ninguna cronología se quede sin puerta (ni aparezca en dos, ni una puerta apunte a una cronología inexistente).
 
 ---
 
@@ -220,7 +228,7 @@ Las tablas de consulta STEM (`app/tabla-*`) son un **contenedor subordinado** de
 
 **Criterio de admisión**: buscador SIEMPRE + al menos una capa que un PDF no pueda dar. Esa capa cambia por disciplina — demostración en matemáticas, ejemplo real o formulador en química, equivalencias y orden de magnitud en física. Una lista plana se queda en meskeIA y no entra en Stemum.
 
-**Registro de una tabla nueva (4 archivos OBLIGATORIOS)**: `data/applications.ts` + `data/implemented-apps.ts` + `data/app-relations.ts` + **`STEMUM_MATERIAL_APOYO` en `data/stemum.ts`**. Olvidar el cuarto = la tabla existe en meskeIA pero no aparece en Stemum (aquí sí es silencioso: el candado comprueba las entradas que existen, no puede echar de menos una tabla que nadie declaró). Mismo agujero que `data/cronicum/puertas.ts` en las cronologías.
+**Registro de una tabla nueva (4 archivos OBLIGATORIOS)**: `data/applications.ts` + `data/implemented-apps.ts` + `data/app-relations.ts` + **`STEMUM_MATERIAL_APOYO` en `data/stemum.ts`**. Olvidar el cuarto = la tabla existe en meskeIA pero no aparece en Stemum, y esto sí sigue siendo silencioso: el candado comprueba las entradas declaradas, no puede echar de menos una tabla que nadie declaró.
 
 **Cross-linking bidireccional**: además de que la tabla enlace a sus simuladores, el simulador equivalente DEBE enlazar de vuelta a la tabla en `app-relations.ts`. Es el circuito que convierte una visita de consulta en una visita de exploración y al revés.
 

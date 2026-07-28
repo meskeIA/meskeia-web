@@ -3,6 +3,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
+import { appsDeCategoria } from '@/data/coquinum';
 import styles from '../CoquinumHome.module.css';
 
 export const metadata: Metadata = {
@@ -12,84 +13,9 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://coquinum.com/bebidas/' },
 };
 
-// Apps de la categoría Bebidas. Viven físicamente en meskeIA y se sirven bajo
-// coquinum.com mediante el host-rewrite (lista blanca en proxy.ts).
-const APPS = [
-  {
-    icon: '☕',
-    titulo: 'Ratio de café',
-    desc: 'Los gramos de café y el agua exactos según el método: V60, prensa, AeroPress, espresso, moka y cold brew.',
-    slug: 'ratio-cafe',
-  },
-  {
-    icon: '🍸',
-    titulo: 'Escalado de cócteles',
-    desc: 'Escala un cóctel a las copas que necesites y calcula la graduación de la mezcla. Consumo responsable.',
-    slug: 'escalado-cocteles',
-  },
-  {
-    icon: '🍋',
-    titulo: 'Aguas frescas y limonada',
-    desc: 'Las proporciones para limonada, naranjada, agua de jamaica, horchata o agua de fruta según los litros.',
-    slug: 'aguas-frescas',
-  },
-  {
-    icon: '🍷',
-    titulo: 'Maridaje de comida',
-    desc: 'Qué vino y qué cerveza van mejor con cada plato, y por qué combinan. Orientación, no regla.',
-    slug: 'maridaje',
-  },
-  {
-    icon: '☕',
-    titulo: 'Café',
-    desc: 'Métodos de extracción, tuestes y orígenes para entender qué hay detrás de cada taza y preparar mejor café en casa.',
-    slug: 'guia-cafe',
-  },
-  {
-    icon: '🍵',
-    titulo: 'Té',
-    desc: 'Verde, negro, oolong o blanco: temperaturas y tiempos de infusión para que cada té dé lo mejor de sí.',
-    slug: 'guia-te',
-  },
-  {
-    icon: '🌼',
-    titulo: 'Infusiones',
-    desc: 'Hierbas e infusiones más allá del té, sus aromas y para qué momento del día va cada una.',
-    slug: 'guia-infusiones',
-  },
-  {
-    icon: '🍸',
-    titulo: 'Coctelería',
-    desc: 'Cócteles clásicos, sus proporciones y técnicas para prepararlos bien. Con consumo responsable.',
-    slug: 'guia-cocteles',
-  },
-  {
-    icon: '🍺',
-    titulo: 'Estilos de cerveza',
-    desc: 'Lager, IPA, stout y compañía: qué define a cada estilo, su intensidad y con qué comida combinan.',
-    slug: 'guia-estilos-cerveza',
-  },
-  {
-    icon: '🍇',
-    titulo: 'Variedades de vino',
-    desc: 'Las principales uvas y sus perfiles, para reconocer qué esperar de cada vino por su varietal.',
-    slug: 'guia-varietales-vino',
-  },
-  {
-    icon: '🍷',
-    titulo: 'Qué vino elegir',
-    desc: 'Selector que te sugiere el vino según el plato, el momento y tus preferencias para acertar con el maridaje.',
-    slug: 'que-vino-elegir',
-  },
-  {
-    icon: '🍻',
-    titulo: 'Qué cerveza elegir',
-    desc: 'Selector que orienta hacia el estilo de cerveza que mejor encaja con lo que vas a comer o el momento.',
-    slug: 'que-cerveza-elegir',
-  },
-];
-
 export default function CoquinumBebidas() {
+  const APPS = appsDeCategoria('bebidas');
+
   return (
     <>
       <AnalyticsTracker appName="coquinum-bebidas" />

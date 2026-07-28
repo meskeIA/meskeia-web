@@ -3,6 +3,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
+import { appsDeCategoria } from '@/data/coquinum';
 import styles from '../CoquinumHome.module.css';
 
 export const metadata: Metadata = {
@@ -12,60 +13,9 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://coquinum.com/coccion/' },
 };
 
-// Apps de la categoría Cocción y temperatura. Viven físicamente en meskeIA y se
-// sirven bajo coquinum.com mediante el host-rewrite (lista blanca en proxy.ts).
-const APPS = [
-  {
-    icon: '🌡️',
-    titulo: 'Temperatura interna de cocción',
-    desc: 'El punto exacto de vacuno, cerdo, pollo, carne picada y pescado, con la temperatura mínima segura del USDA. En °C y °F.',
-    slug: 'temperatura-coccion-carne',
-  },
-  {
-    icon: '⏱️',
-    titulo: 'Tiempos de cocción',
-    desc: 'Cuánto cocer en agua huevos, arroz, pasta, legumbres y verduras, con notas prácticas y ajuste por altitud.',
-    slug: 'tiempos-coccion',
-  },
-  {
-    icon: '🌀',
-    titulo: 'Horno → freidora de aire',
-    desc: 'Adapta cualquier receta de horno a la air fryer: baja la temperatura y reduce el tiempo, con tabla de alimentos.',
-    slug: 'conversor-horno-airfryer',
-  },
-  {
-    icon: '🍗',
-    titulo: 'Tiempos de asado',
-    desc: 'Cuánto asar pollo, pavo, cordero, cerdo o ternera según el peso, con la temperatura interna objetivo.',
-    slug: 'tiempos-asado',
-  },
-  {
-    icon: '♨️',
-    titulo: 'Sous-vide',
-    desc: 'Temperaturas y tiempos de cocción al vacío para carne, pollo, pescado, huevo y verduras.',
-    slug: 'sous-vide',
-  },
-  {
-    icon: '🧂',
-    titulo: 'Salmuera (brining)',
-    desc: 'La sal y el agua para tu salmuera según la concentración, con tiempos por pieza.',
-    slug: 'calculadora-salmuera',
-  },
-  {
-    icon: '🥚',
-    titulo: 'El huevo perfecto',
-    desc: 'El tiempo exacto para el huevo en su punto, según el tamaño y si está frío de la nevera.',
-    slug: 'huevo-perfecto',
-  },
-  {
-    icon: '🔥',
-    titulo: 'Puntos de humo de los aceites',
-    desc: 'Con qué aceite freír, saltear o aliñar según su punto de humo, del aliño en crudo a la fritura. Con buscador y filtro por temperatura.',
-    slug: 'puntos-humo-aceites',
-  },
-];
-
 export default function CoquinumCoccion() {
+  const APPS = appsDeCategoria('coccion');
+
   return (
     <>
       <AnalyticsTracker appName="coquinum-coccion" />

@@ -3,6 +3,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
+import { appsDeCategoria } from '@/data/coquinum';
 import styles from '../CoquinumHome.module.css';
 
 export const metadata: Metadata = {
@@ -12,132 +13,9 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://coquinum.com/ingredientes-despensa/' },
 };
 
-// Apps de la categoría Ingredientes y despensa. Viven físicamente en meskeIA y se
-// sirven bajo coquinum.com mediante el host-rewrite (lista blanca en proxy.ts).
-const APPS = [
-  {
-    icon: '🫒',
-    titulo: 'Aceite de oliva',
-    desc: 'Virgen extra, virgen, refinado y variedades de aceituna: cómo distinguirlos, leer la etiqueta y elegir según el uso.',
-    slug: 'guia-aceite-oliva',
-  },
-  {
-    icon: '🥩',
-    titulo: 'Cortes de carne',
-    desc: 'Mapa de los cortes de vacuno, cerdo, cordero y aves, con la cocción que mejor le va a cada pieza.',
-    slug: 'guia-cortes-carne',
-  },
-  {
-    icon: '🌶️',
-    titulo: 'Especias',
-    desc: 'Aromas, usos y combinaciones de las especias del mundo para condimentar con criterio y sin desperdiciar.',
-    slug: 'guia-especias',
-  },
-  {
-    icon: '🌿',
-    titulo: 'Hierbas aromáticas',
-    desc: 'Albahaca, tomillo, cilantro y compañía: con qué platos casan y cuándo añadirlas para que aporten al máximo.',
-    slug: 'guia-hierbas-aromaticas',
-  },
-  {
-    icon: '🧀',
-    titulo: 'Quesos',
-    desc: 'Familias de queso por leche, curación y textura, con ideas de maridaje y de tabla.',
-    slug: 'guia-quesos',
-  },
-  {
-    icon: '🍄',
-    titulo: 'Setas',
-    desc: 'Variedades comestibles, temporada y cómo cocinarlas para sacarles sabor sin estropear la textura.',
-    slug: 'guia-setas',
-  },
-  {
-    icon: '🥭',
-    titulo: 'Frutas exóticas',
-    desc: 'Qué son, cómo elegirlas en su punto y cómo prepararlas, de la pitaya al maracuyá.',
-    slug: 'guia-frutas-exoticas',
-  },
-  {
-    icon: '🍶',
-    titulo: 'Vinagres del mundo',
-    desc: 'De Módena al de arroz: perfiles de acidez y aroma y para qué brilla cada vinagre en la cocina.',
-    slug: 'guia-vinagres-mundo',
-  },
-  {
-    icon: '🍚',
-    titulo: 'Tipos de arroz',
-    desc: 'Redondo, bomba, basmati, jazmín o arborio: qué arroz pide cada plato según su almidón y su grano.',
-    slug: 'guia-tipos-arroz',
-  },
-  {
-    icon: '🍝',
-    titulo: 'Tipos de pasta',
-    desc: 'Formas de pasta y la salsa que mejor agarra cada una, para que el plato funcione de verdad.',
-    slug: 'guia-tipos-pasta',
-  },
-  {
-    icon: '🥑',
-    titulo: 'Superalimentos',
-    desc: 'Qué aportan realmente los alimentos de moda y cómo incorporarlos sin caer en exageraciones.',
-    slug: 'guia-superalimentos',
-  },
-  {
-    icon: '🧪',
-    titulo: 'Aditivos E',
-    desc: 'Qué significan los números E de las etiquetas: conservantes, colorantes y espesantes explicados con claridad.',
-    slug: 'aditivos-e-alimentarios',
-  },
-  {
-    icon: '🌶️',
-    titulo: 'Chiles y pimientos',
-    desc: 'Los chiles del mundo ordenados por picor (escala Scoville), con su origen y usos. Filtro por nivel de picante.',
-    slug: 'guia-chiles',
-  },
-  {
-    icon: '🌾',
-    titulo: 'Harinas',
-    desc: 'Qué harina usar para cada cosa, con su fuerza (W), su proteína y sus mejores usos.',
-    slug: 'guia-harinas',
-  },
-  {
-    icon: '🧂',
-    titulo: 'Tipos de sal',
-    desc: 'De la sal fina a la flor de sal: texturas, usos y diferencias para acertar con cada una.',
-    slug: 'guia-tipos-sal',
-  },
-  {
-    icon: '🍫',
-    titulo: 'Chocolate y cacao',
-    desc: 'Qué significa el porcentaje y qué chocolate usar para cada cosa en repostería.',
-    slug: 'guia-chocolate',
-  },
-  {
-    icon: '🍬',
-    titulo: 'Azúcares y endulzantes',
-    desc: 'Tipos de endulzante, su poder dulce y sus usos. Filtro por tipo.',
-    slug: 'guia-azucares',
-  },
-  {
-    icon: '🥔',
-    titulo: 'Tubérculos de Latinoamérica',
-    desc: 'Yuca, boniato, malanga, papas andinas y más: qué son y cómo cocinarlos, con avisos de seguridad.',
-    slug: 'guia-tuberculos-latam',
-  },
-  {
-    icon: '🌽',
-    titulo: 'Maíces y nixtamal',
-    desc: 'Tipos de maíz y derivados, de la tortilla a la arepa, y qué es la nixtamalización.',
-    slug: 'guia-maices',
-  },
-  {
-    icon: '📅',
-    titulo: 'Calendario de temporada',
-    desc: 'Qué frutas y verduras son de temporada cada mes del año, para comer mejor y más sostenible.',
-    slug: 'calendario-temporada',
-  },
-];
-
 export default function CoquinumIngredientesDespensa() {
+  const APPS = appsDeCategoria('ingredientes-despensa');
+
   return (
     <>
       <AnalyticsTracker appName="coquinum-ingredientes-despensa" />

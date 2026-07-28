@@ -3,6 +3,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
+import { appsDeCategoria } from '@/data/coquinum';
 import styles from '../CoquinumHome.module.css';
 
 export const metadata: Metadata = {
@@ -12,24 +13,9 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://coquinum.com/costes-cocina/' },
 };
 
-// Apps de la categoría Costes y escandallo. Viven físicamente en meskeIA y se
-// sirven bajo coquinum.com mediante el host-rewrite (lista blanca en proxy.ts).
-const APPS = [
-  {
-    icon: '💼',
-    titulo: 'Escandallo y food cost',
-    desc: 'Coste de la receta por ingredientes, coste por ración y precio de venta según tu food cost objetivo, con el margen bruto. Para hostelería y catering.',
-    slug: 'escandallo-food-cost',
-  },
-  {
-    icon: '📉',
-    titulo: 'Calculadora de merma',
-    desc: 'Peso neto, rendimiento, factor de corrección y coste real por kilo útil tras limpiar y cocinar. El coste que el precio de compra no refleja.',
-    slug: 'calculadora-merma',
-  },
-];
-
 export default function CoquinumCostesCocina() {
+  const APPS = appsDeCategoria('costes-cocina');
+
   return (
     <>
       <AnalyticsTracker appName="coquinum-costes-cocina" />

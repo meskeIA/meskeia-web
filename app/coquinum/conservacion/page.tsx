@@ -3,6 +3,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
+import { appsDeCategoria } from '@/data/coquinum';
 import styles from '../CoquinumHome.module.css';
 
 export const metadata: Metadata = {
@@ -12,46 +13,9 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://coquinum.com/conservacion/' },
 };
 
-const APPS = [
-  {
-    icon: '🧊',
-    titulo: 'Cuánto dura cada alimento',
-    desc: 'Tiempos de conservación en nevera, congelador y despensa para carnes, pescados, lácteos, verduras y sobras, con buscador y filtro.',
-    slug: 'calculadora-caducidad',
-  },
-  {
-    icon: '❄️',
-    titulo: 'Qué se puede congelar',
-    desc: 'Qué alimentos aguantan bien el congelador, cuáles no y cuánto duran, con buscador y filtro por categoría.',
-    slug: 'calculadora-congelacion',
-  },
-  {
-    icon: '🧊',
-    titulo: 'Descongelación segura',
-    desc: 'Cuánto tarda en descongelarse un alimento según el peso y el método: nevera, agua fría o microondas. Nunca al ambiente.',
-    slug: 'descongelacion-segura',
-  },
-  {
-    icon: '🍓',
-    titulo: 'Mermelada',
-    desc: 'Azúcar y limón para tu mermelada según la fruta y el dulzor, con aviso de cuándo necesita pectina.',
-    slug: 'calculadora-mermelada',
-  },
-  {
-    icon: '🥒',
-    titulo: 'Encurtidos',
-    desc: 'Vinagre, agua, sal y azúcar para tu líquido de encurtido según el estilo y el volumen.',
-    slug: 'calculadora-encurtidos',
-  },
-  {
-    icon: '🥬',
-    titulo: 'Fermentados vegetales',
-    desc: 'La sal exacta para fermentar verduras en seco (chucrut, kimchi) o en salmuera, la clave de una fermentación segura.',
-    slug: 'fermentados-vegetales',
-  },
-];
-
 export default function CoquinumConservacion() {
+  const APPS = appsDeCategoria('conservacion');
+
   return (
     <>
       <AnalyticsTracker appName="coquinum-conservacion" />
