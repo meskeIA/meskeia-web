@@ -69,12 +69,16 @@ export default function RelatedApps({ title = 'Apps relacionadas', apps, icon = 
       .replace(/\//g, '-') || 'home';
 
   /**
-   * Añade ?from=related-{origen} al href para medir el embudo de descubrimiento.
-   * El AnalyticsTracker lee este parámetro y lo guarda en datos_adicionales.from.
+   * Añade #from=related-{origen} al href para medir el embudo de descubrimiento.
+   * El AnalyticsTracker lee esta marca y la guarda en datos_adicionales.from.
+   *
+   * Va en el FRAGMENTO, no en un parámetro: así el enlace que ve Googlebot es la
+   * URL limpia y puede seguirlo. Con `?from=` estos ~3.900 enlaces internos
+   * apuntaban a URLs prohibidas en robots.txt. Ver lib/trackingFrom.ts.
    */
   const buildHref = (url: string): string => {
-    const separator = url.includes('?') ? '&' : '?';
-    return `${url}${separator}from=related-${originSlug}`;
+    if (url.includes('#')) return url;
+    return `${url}#from=related-${originSlug}`;
   };
 
   return (

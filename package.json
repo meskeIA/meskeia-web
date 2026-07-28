@@ -5,7 +5,7 @@
   "scripts": {
     "predev": "npx kill-port 3050 || exit 0",
     "dev": "next dev -p 3050",
-    "build": "node scripts/check-verticales.mjs && node scripts/generate-llm-index.js && node scripts/generate-delegum-es.mjs && next build --turbopack",
+    "build": "node scripts/check-verticales.mjs && node scripts/check-enlaces-internos.mjs && node scripts/generate-app-dates.mjs && node scripts/generate-llm-index.js && node scripts/generate-delegum-es.mjs && next build --turbopack",
     "start": "next start -p 3050",
     "lint": "eslint",
     "test": "npx playwright test",
@@ -14,6 +14,8 @@
     "test:a11y": "npx playwright test tests/accessibility.spec.ts",
     "ensayo:restauracion": "node scripts/ensayo-restauracion.mjs",
     "check:verticales": "node scripts/check-verticales.mjs",
+    "check:enlaces": "node scripts/check-enlaces-internos.mjs",
+    "generate:app-dates": "node scripts/generate-app-dates.mjs",
     "check:secrets": "git -c core.quotepath=false diff --cached --unified=0 --no-color --no-renames --diff-filter=ACM | node scripts/check-secrets.mjs",
     "audit:secrets": "git -c core.quotepath=false diff --unified=0 --no-color --no-renames 4b825dc642cb6eb9a060e54bf8d69288fbee4904 | node scripts/check-secrets.mjs",
     "hooks:install": "node scripts/install-hooks.mjs",

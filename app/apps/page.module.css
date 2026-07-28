@@ -267,6 +267,13 @@
   gap: 1rem;
 }
 
+/* El cuerpo se renderiza siempre para que el enlace de cada app viaje en el HTML
+   (ver comentario en app/apps/page.tsx). Sin esta regla, el display:flex de arriba
+   ganaría al atributo [hidden] y las tarjetas aparecerían todas abiertas. */
+.appCardBody[hidden] {
+  display: none;
+}
+
 .appCardDescription {
   font-size: 0.95rem;
   color: var(--text-secondary);

@@ -183,25 +183,35 @@ export default function AppsPage() {
                         </span>
                       </button>
 
-                      {isExpanded && (
-                        <div className={styles.appCardBody}>
-                          <p className={styles.appCardDescription}>{app.description}</p>
-                          <div className={styles.appCardSuiteTags}>
-                            {app.suites.map((suiteId) => {
-                              const suite = suites.find((s) => s.id === suiteId);
-                              if (!suite) return null;
-                              return (
-                                <span key={suiteId} className={styles.appCardSuiteTag}>
-                                  {suite.icon} {suite.name}
-                                </span>
-                              );
-                            })}
-                          </div>
-                          <Link href={withFrom(app.url, 'catalog')} className={styles.appCardCta}>
-                            Abrir aplicación →
-                          </Link>
-                        </div>
-                      )}
+                      {/* El cuerpo se renderiza SIEMPRE y se oculta con [hidden] en vez de
+                          montarse solo al expandir. Motivo (2026-07-28): con el montaje
+                          condicional este catálogo servía 1.149 tarjetas y CERO <a href>,
+                          así que para Googlebot era una página sin salidas y las apps solo
+                          existían vía sitemap. Ahora el enlace viaja siempre en el HTML.
+                          La descripción y las etiquetas siguen montándose solo al abrir,
+                          para no inflar el peso de la página. La UX no cambia: colapsado
+                          no se ve ni recibe foco (lo garantiza .appCardBody[hidden]). */}
+                      <div className={styles.appCardBody} hidden={!isExpanded}>
+                        {isExpanded && (
+                          <>
+                            <p className={styles.appCardDescription}>{app.description}</p>
+                            <div className={styles.appCardSuiteTags}>
+                              {app.suites.map((suiteId) => {
+                                const suite = suites.find((s) => s.id === suiteId);
+                                if (!suite) return null;
+                                return (
+                                  <span key={suiteId} className={styles.appCardSuiteTag}>
+                                    {suite.icon} {suite.name}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          </>
+                        )}
+                        <Link href={withFrom(app.url, 'catalog')} className={styles.appCardCta}>
+                          Abrir aplicación →
+                        </Link>
+                      </div>
                     </li>
                   );
                 })}

@@ -128,9 +128,19 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
     const urlParams = new URLSearchParams(window.location.search);
     const refParam = urlParams.get('ref');
 
-    // Detectar origen de navegación interna (?from=related-{slug}, ?from=continua-{slug}, etc.)
-    // Permite medir el embudo de descubrimiento entre apps
-    const fromParam = urlParams.get('from');
+    // Detectar origen de navegación (from=related-{slug}, from=continua-{slug}, etc.)
+    // Permite medir el embudo de descubrimiento entre apps.
+    //
+    // Se leen LAS DOS FORMAS, y es permanente por diseño (no es transitorio):
+    //   · #from=…  → navegación INTERNA entre apps. Va en el fragmento para que el
+    //                enlace que ve Googlebot sea la URL limpia (ver lib/trackingFrom.ts).
+    //   · ?from=…  → saltos CROSS-DOMINIO (meskeia ↔ verticales). Siguen en parámetro
+    //                a propósito. Este mismo componente sirve a los 5 dominios vía
+    //                Footer, así que dejar de leer el parámetro rompería esa medición.
+    // El hash también recoge enlaces antiguos ya compartidos con ?from=.
+    // URLSearchParams sobre un ancla normal (#etapas) devuelve null en 'from': inocuo.
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    const fromParam = urlParams.get('from') || hashParams.get('from');
 
     // Datos de entrada (registro inicial)
     const entryData = {
