@@ -443,6 +443,24 @@ const fichasCalculoApp: RelatedApp = {
   name: 'Fichas de Cálculo',
   description: 'Operaciones por nivel con hoja de soluciones',
 };
+const sudokusApp: RelatedApp = {
+  url: '/generador-sudokus/',
+  icon: '🔢',
+  name: 'Generador de Sudokus',
+  description: 'Cuatro niveles con solución única garantizada',
+};
+const nonogramasApp: RelatedApp = {
+  url: '/generador-nonogramas/',
+  icon: '🎨',
+  name: 'Nonogramas',
+  description: 'Convierte tu dibujo en crucigrama japonés',
+};
+const crucigramasApp: RelatedApp = {
+  url: '/generador-crucigramas/',
+  icon: '📝',
+  name: 'Crucigramas',
+  description: 'Tus palabras y definiciones, entrelazadas',
+};
 
 // ==========================================
 // FAMILIA: HERRAMIENTAS WEB
@@ -2776,20 +2794,22 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'juego-space-invaders': juegosArcadeApps.filter(a => a.url !== '/juego-space-invaders/'),
   'juego-platform-runner': juegosArcadeApps.filter(a => a.url !== '/juego-platform-runner/'),
   'juego-2048': [...juegosPuzzleApps.slice(0, 2), ...juegosArcadeApps.slice(0, 2)],
-  'juego-sudoku': [laberintosApp, ...juegosPuzzleApps.filter(a => a.url !== '/juego-sudoku/').slice(0, 3)],
+  'juego-sudoku': [sudokusApp, laberintosApp, ...juegosPuzzleApps.filter(a => a.url !== '/juego-sudoku/').slice(0, 2)],
   'juego-wordle': [scrabbleApp, ...juegosPuzzleApps.filter(a => a.url !== '/juego-wordle/').slice(0, 3)],
   'juego-ahorcado': [sopaLetrasApp, ...juegosPuzzleApps.filter(a => a.url !== '/juego-ahorcado/').slice(0, 3)],
 
   // GENERADORES IMPRIMIBLES
   'generador-sopa-letras': [
+    crucigramasApp,
     laberintosApp,
     { url: '/generador-anagramas/', icon: '🔤', name: 'Generador Anagramas', description: 'Palabras con letras sueltas' },
     { url: '/buscador-palabras-patron/', icon: '🔍', name: 'Buscador por Patrón', description: 'Palabras con huecos para crucigramas' },
     { url: '/juego-ahorcado/', icon: '🎯', name: 'Ahorcado', description: 'Adivina la palabra letra a letra' },
   ],
   'generador-laberintos': [
+    sudokusApp,
     sopaLetrasApp,
-    fichasCalculoApp,
+    nonogramasApp,
     { url: '/juego-sudoku/', icon: '🔢', name: 'Sudoku', description: 'Puzzle clásico de lógica' },
     { url: '/juego-memoria/', icon: '🧠', name: 'Memoria', description: 'Encuentra parejas' },
   ],
@@ -2807,9 +2827,27 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'generador-fichas-calculo': [
     { url: '/tablas-multiplicar/', icon: '✖️', name: 'Tablas de Multiplicar', description: 'Practica las tablas' },
+    sudokusApp,
     { url: '/juego-puzzle-matematico/', icon: '➕', name: 'Puzzle Matemático', description: 'Retos numéricos' },
     laberintosApp,
+  ],
+  'generador-sudokus': [
+    { url: '/juego-sudoku/', icon: '🔢', name: 'Sudoku', description: 'Juega en pantalla, sin imprimir' },
+    nonogramasApp,
+    laberintosApp,
+    crucigramasApp,
+  ],
+  'generador-nonogramas': [
+    sudokusApp,
+    crucigramasApp,
+    laberintosApp,
     sopaLetrasApp,
+  ],
+  'generador-crucigramas': [
+    sopaLetrasApp,
+    { url: '/buscador-palabras-patron/', icon: '🔍', name: 'Buscador por Patrón', description: 'Encuentra palabras que encajen en un hueco' },
+    { url: '/generador-anagramas/', icon: '🔤', name: 'Generador Anagramas', description: 'Palabras con letras sueltas' },
+    nonogramasApp,
   ],
   'quiz-paises-capitales': [
     { url: '/paises-del-mundo/', icon: '🌍', name: 'Países del Mundo', description: 'Buscador de 196 países' },

@@ -530,6 +530,9 @@ export const implementedAppsUrls = [
   "/generador-cartones-bingo/",          // Cartones de bingo 90/75 únicos + bombo digital
   "/generador-calendario-liga/",          // Calendario de liga todos contra todos + clasificación imprimible
   "/generador-fichas-calculo/",          // Fichas de operaciones por nivel con hoja de soluciones
+  "/generador-sudokus/",                 // Sudokus con unicidad verificada y nivel medido por técnicas
+  "/generador-nonogramas/",              // Nonogramas con verificación de solución única por lógica
+  "/generador-crucigramas/",             // Crucigramas entrelazados con definiciones propias
   "/checklist-documentos-viaje/",        // Checklist documentos de viaje: España, Europa, internacional
   "/orientador-jet-lag/",                 // Calculadora jet lag: diferencia horaria, días adaptación, recomendaciones
   "/quiz-paises-capitales/",             // Quiz geografía: capitales, países por capital, identificar banderas
