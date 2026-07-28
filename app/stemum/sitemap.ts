@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next';
+import { STEMUM_DISCIPLINAS } from '@/data/stemum';
 
 // Configuración para static export
 export const dynamic = 'force-static';
@@ -17,14 +18,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://stemum.com';
   const now = new Date();
 
-  const disciplinas = [
-    'computacion',
-    'fisica',
-    'matematicas',
-    'quimica',
-    'biologia',
-    'tierra-espacio',
-  ];
+  // Derivadas del catálogo: una disciplina nueva entra en el sitemap sola.
+  const disciplinas = Object.keys(STEMUM_DISCIPLINAS);
 
   const home: MetadataRoute.Sitemap = [
     {

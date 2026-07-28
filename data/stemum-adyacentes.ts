@@ -1,6 +1,6 @@
 /**
- * Apps STEM-afines a Stemum que NO son simuladores del portal (no entran en las
- * 110 de STEMUM_APP_DISCIPLINA) pero cuyo público es el de Stemum: quizzes,
+ * Apps STEM-afines a Stemum que NO son simuladores del portal (no entran en
+ * STEMUM_APPS) pero cuyo público es el de Stemum: quizzes,
  * calculadoras, tablas, conversores, cifrados y visualizadores "clic-revelar"
  * (sin la mecánica slider→gráfica que define el catálogo).
  *

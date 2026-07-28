@@ -204,13 +204,23 @@ import { FISCAL_IRPF_META } from '@/data/fiscal';
 
 ---
 
+## Registro de un simulador en Stemum
+
+**Un solo sitio**: una entrada en `STEMUM_APPS` (`data/stemum.ts`), en la disciplina que le toque. Esa entrada es a la vez la pertenencia (breadcrumb, host-rewrite del proxy, contadores del hero) **y la tarjeta** que pinta la parrilla de `/stemum/[disciplina]/`. El orden dentro de la disciplina es el orden de la parrilla. Además, como cualquier app: `data/applications.ts` + `data/implemented-apps.ts` + `data/app-relations.ts`.
+
+> **Histórico (2026-07-28)**: la parrilla era un array `APPS` hardcodeado en cada `app/stemum/[disciplina]/page.tsx`, así que registrar una app pedía DOS listas. Olvidar la segunda dejaba la app contada en el hero pero **sin tarjeta que la enlazase, y sin dar ningún error** — le pasó a `simulador-logica-secuencial` y a `ajustar-ecuaciones-quimicas`. Ahora cada parrilla se deriva de `appsDeDisciplina(disciplina)`.
+
+**Candado**: `npm run check:stemum` — lo ejecuta también `npm run build`, y **rompe el build** si falla. Verifica que cada slug del catálogo tenga su carpeta en `app/`, esté en `implemented-apps.ts` y en `applications.ts`, que la disciplina exista, y que ninguna parrilla vuelva a listar apps a mano.
+
+---
+
 ## Material de apoyo de Stemum (tablas de consulta)
 
-Las tablas de consulta STEM (`app/tabla-*`) son un **contenedor subordinado** del portal Stemum: no son simuladores, no cuentan en el hero (`130 simuladores`) ni en los contadores de disciplina, y no entran en las parrillas de `/stemum/[disciplina]/`. Viven en la sección `stemum.com/material-apoyo/`.
+Las tablas de consulta STEM (`app/tabla-*`) son un **contenedor subordinado** del portal Stemum: no son simuladores, no cuentan en el hero ni en los contadores de disciplina, y no entran en las parrillas de `/stemum/[disciplina]/`. Viven en la sección `stemum.com/material-apoyo/`.
 
 **Criterio de admisión**: buscador SIEMPRE + al menos una capa que un PDF no pueda dar. Esa capa cambia por disciplina — demostración en matemáticas, ejemplo real o formulador en química, equivalencias y orden de magnitud en física. Una lista plana se queda en meskeIA y no entra en Stemum.
 
-**Registro de una tabla nueva (4 archivos OBLIGATORIOS)**: `data/applications.ts` + `data/implemented-apps.ts` + `data/app-relations.ts` + **`STEMUM_MATERIAL_APOYO` en `data/stemum.ts`**. Olvidar el cuarto = la tabla existe en meskeIA pero **no aparece en Stemum y no da error**. Mismo agujero silencioso que `data/cronicum/puertas.ts` en las cronologías.
+**Registro de una tabla nueva (4 archivos OBLIGATORIOS)**: `data/applications.ts` + `data/implemented-apps.ts` + `data/app-relations.ts` + **`STEMUM_MATERIAL_APOYO` en `data/stemum.ts`**. Olvidar el cuarto = la tabla existe en meskeIA pero no aparece en Stemum (aquí sí es silencioso: el candado comprueba las entradas que existen, no puede echar de menos una tabla que nadie declaró). Mismo agujero que `data/cronicum/puertas.ts` en las cronologías.
 
 **Cross-linking bidireccional**: además de que la tabla enlace a sus simuladores, el simulador equivalente DEBE enlazar de vuelta a la tabla en `app-relations.ts`. Es el circuito que convierte una visita de consulta en una visita de exploración y al revés.
 
