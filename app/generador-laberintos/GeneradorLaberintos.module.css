@@ -531,32 +531,19 @@
 
 /* ── Impresión ──────────────────────────────────────── */
 @media print {
-  .noPrint {
-    display: none !important;
+  .tituloHoja {
+    font-size: 6mm;
   }
 
-  .container {
-    max-width: none;
-    min-height: 0;
-    margin: 0;
-    padding: 0;
-    background: #ffffff;
+  .leyenda {
+    font-size: 3.2mm;
   }
 
-  .printArea {
-    border: none;
-    border-radius: 0;
-    padding: 0;
-    margin: 0;
-    background: #ffffff;
-  }
-
-  .tituloHoja,
-  .leyenda,
   .pieHoja {
-    color: #000000;
+    font-size: 2.6mm;
   }
 
+  /* El laberinto aprovecha el ancho útil de la hoja */
   .lienzo {
     max-width: 100%;
   }

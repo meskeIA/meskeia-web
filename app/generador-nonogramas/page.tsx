@@ -3,6 +3,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import styles from './GeneradorNonogramas.module.css';
+import impresion from '@/styles/impresion.module.css';
 import {
   MeskeiaLogo,
   Footer,
@@ -336,8 +337,8 @@ export default function GeneradorNonogramasPage() {
   const densidadActual = Math.round((pintadas / (lado * lado)) * 100);
 
   return (
-    <div className={styles.container}>
-      <div className={styles.noPrint}>
+    <div className={`${styles.container} ${impresion.lienzo}`}>
+      <div className={impresion.noImprimir}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -554,11 +555,11 @@ export default function GeneradorNonogramasPage() {
       </div>
 
       {/* Área imprimible */}
-      <div className={styles.printArea}>
+      <div className={`${styles.printArea} ${impresion.hoja}`}>
         <h2 className={styles.tituloHoja}>{titulo || 'Nonograma'}</h2>
 
         <div className={styles.envoltorioPuzzle}>
-          <table className={styles.tablaPuzzle}>
+          <table className={`${styles.tablaPuzzle} ${impresion.rejilla}`}>
             <caption className={styles.srOnly}>
               Nonograma de {lado} por {lado} casillas con las pistas de cada fila y columna
             </caption>
@@ -604,7 +605,9 @@ export default function GeneradorNonogramasPage() {
                     <td
                       key={c}
                       className={`${
-                        mostrarSolucion && pintada ? styles.celdaSolucion : styles.celdaPuzzle
+                        mostrarSolucion && pintada
+                          ? `${styles.celdaSolucion} ${impresion.relleno}`
+                          : styles.celdaPuzzle
                       } ${(f + 1) % 5 === 0 && f !== lado - 1 ? styles.guiaInferior : ''} ${
                         (c + 1) % 5 === 0 && c !== lado - 1 ? styles.guiaDerecha : ''
                       }`}
@@ -622,7 +625,7 @@ export default function GeneradorNonogramasPage() {
         </p>
       </div>
 
-      <div className={styles.noPrint}>
+      <div className={impresion.noImprimir}>
         <EducationalSection
           icon="📚"
           title="Cómo se resuelve un nonograma"

@@ -1,0 +1,142 @@
+/**
+ * Base común de impresión — familia de generadores de material imprimible
+ * ─────────────────────────────────────────────────────────────────────────
+ * Uso VOLUNTARIO: solo lo importan las apps que producen una hoja para el
+ * papel (sopa de letras, laberintos, bingo, liga, fichas, sudokus,
+ * nonogramas, crucigramas). No es una capa sobre el catálogo: al importarse
+ * como CSS Module, únicamente se sirve en las rutas que lo usan.
+ *
+ * NO aplicar a apps cuya impresión es una TABLA PARA LEER (financieras,
+ * fiscales, informes): sus necesidades son opuestas — allí interesa apretar
+ * filas para que quepan; aquí, dejar sitio para escribir a mano.
+ *
+ * Cómo se usa desde una app:
+ *   import impresion from '@/styles/impresion.module.css';
+ *   <div className={`${styles.container} ${impresion.lienzo}`}>
+ *     <div className={impresion.noImprimir}> … controles … </div>
+ *     <div className={`${styles.printArea} ${impresion.hoja}`}> … la hoja … </div>
+ *   </div>
+ *
+ * Las apps consumen las medidas con var(--casilla), var(--linea) y
+ * var(--linea-fuerte), definiendo sus propios valores para pantalla.
+ *
+ * ⚠️ TRAMPA A VIGILAR EN CADA APP: al imprimir, las media queries de ancho
+ * se evalúan contra el ancho de la PÁGINA, no de la ventana. Un A4 con
+ * márgenes deja unos 718 px útiles, por debajo del corte habitual de 768 px,
+ * así que **se activa la maquetación de móvil**: rejillas que se apilan en
+ * una columna, tarjetas a lo alto y hojas que se van a dos páginas. Cada app
+ * debe reponer en su @media print la disposición de escritorio que necesite.
+ */
+
+/* ─────────────────────────────────────────────────────────────
+   La página.
+
+   No se declara `size`: forzar A4 penalizaría a quien imprime en Carta,
+   que es el formato habitual en buena parte de Latinoamérica.
+
+   El margen se pide aquí, PERO el navegador puede ignorarlo: si el usuario
+   tiene «Márgenes: Ninguno» en el diálogo de impresión, esta regla se
+   descarta y el contenido acabaría pegado al filo del papel. Por eso la
+   hoja lleva además su propio relleno interno (ver .hoja), que ninguna
+   opción del navegador puede anular. Entre ambos suman un margen cómodo
+   cuando se respeta, y uno suficiente cuando no.
+   ───────────────────────────────────────────────────────────── */
+@page {
+  margin: 10mm;
+}
+
+@media print {
+  /* Todo lo que no forma parte de la hoja desaparece: logo, controles,
+     contenido educativo, apps relacionadas y pie de la web. */
+  .noImprimir {
+    display: none !important;
+  }
+
+  /* El contenedor de la app deja de maquetar para pantalla */
+  .lienzo {
+    max-width: none !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+
+  /* La hoja: sin tarjeta, sin sombra, sin fondo. Solo el contenido.
+     ─────────────────────────────────────────────────────────────
+     DECISIONES DE LA FAMILIA (los tres números que importan):
+
+     --casilla        9mm   Lo que necesita una letra o cifra escrita a
+                            lápiz. Por debajo de 8mm la hoja se vuelve
+                            incómoda de rellenar aunque se lea bien.
+     --linea        0.35mm  Grosor mínimo que sobrevive al escalado del
+                            navegador. Las líneas de 1px desaparecen al
+                            imprimir al 90% u 80%.
+     --linea-fuerte  0.7mm  Separadores destacados: regiones del sudoku,
+                            guías cada cinco casillas, marcos.           */
+  .hoja {
+    /* !important para que ganen a los valores de pantalla que declara cada
+       app en el mismo elemento, sin depender del orden de carga de los CSS */
+    --casilla: 9mm !important;
+    --linea: 0.35mm !important;
+    --linea-fuerte: 0.7mm !important;
+    --tinta: #000000;
+
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    /* Colchón propio de la hoja: es el único margen garantizado, porque el
+       de @page desaparece si el usuario elige «Márgenes: Ninguno» */
+    padding: 8mm !important;
+    background: #ffffff !important;
+    color: var(--tinta) !important;
+  }
+
+  /* Tinta negra en todo el contenido de la hoja: los colores de marca
+     son para la pantalla, no para el papel ni para el tóner. */
+  .hoja h1,
+  .hoja h2,
+  .hoja h3,
+  .hoja h4,
+  .hoja p,
+  .hoja li,
+  .hoja span,
+  .hoja td,
+  .hoja th,
+  .hoja caption {
+    color: var(--tinta) !important;
+  }
+
+  /* En papel no hay scroll, así que un contenedor con overflow no oculta:
+     RECORTA. Y lo primero que se come es lo que queda justo en su límite,
+     como el borde exterior de la primera fila de una tabla centrada. Los
+     envoltorios con scroll horizontal para móvil deben soltar el contenido
+     al imprimir. */
+  .hoja,
+  .hoja * {
+    overflow: visible !important;
+  }
+
+  /* Bloques que no deben partirse entre páginas: un cartón de bingo, un
+     sudoku o una jornada de liga cortados por la mitad estropean la hoja. */
+  .bloque {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Rejillas para rellenar a mano */
+  .rejilla {
+    border-collapse: collapse;
+  }
+
+  .rejilla td,
+  .rejilla th {
+    border-color: var(--tinta) !important;
+  }
+
+  /* Zonas que SÍ deben salir con tinta: casillas pintadas del nonograma,
+     palabras marcadas en la sopa de letras, huecos del cartón de bingo. */
+  .relleno {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

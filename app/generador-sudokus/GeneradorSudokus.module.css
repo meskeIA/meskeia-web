@@ -311,6 +311,11 @@
 
 /* ── Hoja imprimible ────────────────────────────────── */
 .printArea {
+  /* Medidas para PANTALLA; al imprimir manda la base común */
+  --casilla: 2.3rem;
+  --linea: 1px;
+  --linea-fuerte: 3px;
+
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-large);
@@ -357,18 +362,18 @@
 
 .tablaSudoku {
   border-collapse: collapse;
-  border: 3px solid var(--text-primary);
+  border: var(--linea-fuerte) solid var(--text-primary);
   margin: 0 auto;
 }
 
 .celdaPista,
 .celdaVacia {
-  width: 2.3rem;
-  height: 2.3rem;
+  width: var(--casilla);
+  height: var(--casilla);
   text-align: center;
   vertical-align: middle;
   font-size: 1.15rem;
-  border: 1px solid var(--border);
+  border: var(--linea) solid var(--border);
   color: var(--text-primary);
 }
 
@@ -382,11 +387,11 @@
 }
 
 .bordeDerecho {
-  border-right: 3px solid var(--text-primary);
+  border-right: var(--linea-fuerte) solid var(--text-primary);
 }
 
 .bordeInferior {
-  border-bottom: 3px solid var(--text-primary);
+  border-bottom: var(--linea-fuerte) solid var(--text-primary);
 }
 
 .pieHoja {
@@ -610,10 +615,12 @@
     grid-template-columns: 1fr;
   }
 
+  .printArea {
+    --casilla: 1.9rem;
+  }
+
   .celdaPista,
   .celdaVacia {
-    width: 1.9rem;
-    height: 1.9rem;
     font-size: 0.95rem;
   }
 }
@@ -633,36 +640,19 @@
 
 /* ── Impresión ──────────────────────────────────────── */
 @media print {
-  .noPrint {
-    display: none !important;
-  }
-
-  .container {
-    max-width: none;
-    min-height: 0;
-    margin: 0;
-    padding: 0;
-    background: #ffffff;
-  }
-
-  .printArea {
-    border: none;
-    border-radius: 0;
-    padding: 0;
-    margin: 0;
-    background: #ffffff;
-  }
-
   .rejillaDos,
   .rejillaCuatro {
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
   }
 
-  .tituloHoja,
+  .tituloHoja {
+    font-size: 6mm;
+  }
+
   .cabeceraSudoku,
   .pieHoja {
-    color: #000000;
+    font-size: 2.8mm;
   }
 
   .tablaSudoku {
@@ -671,8 +661,8 @@
 
   .celdaPista,
   .celdaVacia {
-    color: #000000;
-    border-color: #999999;
+    border-color: #777777;
+    font-size: 5mm;
   }
 
   .bordeDerecho {

@@ -3,6 +3,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './GeneradorSopaLetras.module.css';
+import impresion from '@/styles/impresion.module.css';
 import {
   MeskeiaLogo,
   Footer,
@@ -298,8 +299,8 @@ export default function GeneradorSopaLetrasPage() {
   const numPalabras = palabrasNormalizadas().length;
 
   return (
-    <div className={styles.container}>
-      <div className={styles.noPrint}>
+    <div className={`${styles.container} ${impresion.lienzo}`}>
+      <div className={impresion.noImprimir}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -478,10 +479,10 @@ export default function GeneradorSopaLetrasPage() {
 
       {/* Área imprimible */}
       {sopa && (
-        <div className={styles.printArea}>
+        <div className={`${styles.printArea} ${impresion.hoja}`}>
           <h2 className={styles.tituloHoja}>{titulo || 'Sopa de letras'}</h2>
 
-          <table className={styles.cuadricula}>
+          <table className={`${styles.cuadricula} ${impresion.rejilla}`}>
             <caption className={styles.srOnly}>
               Cuadrícula de {lado} por {lado} letras con {sopa.colocadas.length} palabras escondidas
             </caption>
@@ -491,7 +492,7 @@ export default function GeneradorSopaLetrasPage() {
                   {fila.map((letra, c) => {
                     const marcada = celdasSolucion.has(`${f}-${c}`);
                     return (
-                      <td key={c} className={marcada ? styles.celdaMarcada : styles.celda}>
+                      <td key={c} className={marcada ? `${styles.celdaMarcada} ${impresion.relleno}` : styles.celda}>
                         {letra}
                       </td>
                     );
@@ -516,7 +517,7 @@ export default function GeneradorSopaLetrasPage() {
         </div>
       )}
 
-      <div className={styles.noPrint}>
+      <div className={impresion.noImprimir}>
         <EducationalSection
           icon="📚"
           title="Cómo sacarle partido a una sopa de letras"

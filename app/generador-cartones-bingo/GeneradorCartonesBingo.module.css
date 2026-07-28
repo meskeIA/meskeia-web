@@ -293,6 +293,10 @@
 
 /* ── Cartones imprimibles ───────────────────────────── */
 .printArea {
+  /* Medidas para PANTALLA; al imprimir manda la base común */
+  --casilla: 2.4rem;
+  --linea: 1px;
+
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-large);
@@ -345,13 +349,13 @@
 .casilla,
 .casillaVacia,
 .casillaLibre {
-  height: 2.4rem;
+  height: var(--casilla);
   text-align: center;
   vertical-align: middle;
   font-size: 1.05rem;
   font-weight: 600;
   color: var(--text-primary);
-  border: 1px solid var(--border);
+  border: var(--linea) solid var(--border);
 }
 
 .casillaVacia {
@@ -582,10 +586,13 @@
     grid-template-columns: 1fr;
   }
 
+  .printArea {
+    --casilla: 2rem;
+  }
+
   .casilla,
   .casillaVacia,
   .casillaLibre {
-    height: 2rem;
     font-size: 0.9rem;
   }
 
@@ -608,35 +615,18 @@
 
 /* ── Impresión ──────────────────────────────────────── */
 @media print {
-  .noPrint {
-    display: none !important;
-  }
-
-  .container {
-    max-width: none;
-    min-height: 0;
-    margin: 0;
-    padding: 0;
-    background: #ffffff;
-  }
-
-  .printArea {
-    border: none;
-    border-radius: 0;
-    padding: 0;
-    margin: 0;
-    background: #ffffff;
-  }
-
   .rejillaCartones {
     grid-template-columns: repeat(2, 1fr);
     gap: 0.8rem;
   }
 
-  .tituloHoja,
+  .tituloHoja {
+    font-size: 5.5mm;
+  }
+
   .cartonCabecera,
   .pieHoja {
-    color: #000000;
+    font-size: 2.8mm;
   }
 
   .carton {
@@ -646,8 +636,8 @@
   .casilla,
   .casillaVacia,
   .casillaLibre {
-    color: #000000;
     border-color: #000000;
+    font-size: 4.5mm;
   }
 
   .casillaVacia {

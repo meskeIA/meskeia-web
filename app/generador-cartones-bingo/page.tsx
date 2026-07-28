@@ -3,6 +3,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './GeneradorCartonesBingo.module.css';
+import impresion from '@/styles/impresion.module.css';
 import {
   MeskeiaLogo,
   Footer,
@@ -224,8 +225,8 @@ export default function GeneradorCartonesBingoPage() {
   const columnasCarton = modalidad === '90' ? 9 : 5;
 
   return (
-    <div className={styles.container}>
-      <div className={styles.noPrint}>
+    <div className={`${styles.container} ${impresion.lienzo}`}>
+      <div className={impresion.noImprimir}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -375,20 +376,20 @@ export default function GeneradorCartonesBingoPage() {
 
       {/* Área imprimible */}
       {cartones.length > 0 && (
-        <div className={styles.printArea}>
+        <div className={`${styles.printArea} ${impresion.hoja}`}>
           <h2 className={styles.tituloHoja}>
             {titulo || 'Bingo'} · partida n.º {semilla}
           </h2>
 
           <div className={styles.rejillaCartones}>
             {cartones.map((carton) => (
-              <div key={carton.numero} className={styles.carton}>
+              <div key={carton.numero} className={`${styles.carton} ${impresion.bloque}`}>
                 <div className={styles.cartonCabecera}>
                   <span>{titulo || 'Bingo'}</span>
                   <span>Cartón {carton.numero}</span>
                 </div>
 
-                <table className={styles.tablaCarton}>
+                <table className={`${styles.tablaCarton} ${impresion.rejilla}`}>
                   <caption className={styles.srOnly}>
                     Cartón número {carton.numero} de la partida {semilla}
                   </caption>
@@ -411,9 +412,9 @@ export default function GeneradorCartonesBingoPage() {
                             key={c}
                             className={
                               casilla === null
-                                ? styles.casillaVacia
+                                ? `${styles.casillaVacia} ${impresion.relleno}`
                                 : casilla === 'LIBRE'
-                                  ? styles.casillaLibre
+                                  ? `${styles.casillaLibre} ${impresion.relleno}`
                                   : styles.casilla
                             }
                           >
@@ -435,7 +436,7 @@ export default function GeneradorCartonesBingoPage() {
         </div>
       )}
 
-      <div className={styles.noPrint}>
+      <div className={impresion.noImprimir}>
         <EducationalSection
           icon="📚"
           title="Cómo funciona un cartón de bingo por dentro"

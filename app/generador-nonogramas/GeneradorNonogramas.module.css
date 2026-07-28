@@ -305,6 +305,10 @@
 
 /* ── Hoja imprimible ────────────────────────────────── */
 .printArea {
+  /* Medidas para PANTALLA; al imprimir las sustituye la base común */
+  --casilla: 1.7rem;
+  --linea: 1px;
+
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-large);
@@ -367,9 +371,9 @@
 
 .celdaPuzzle,
 .celdaSolucion {
-  width: 1.7rem;
-  height: 1.7rem;
-  border: 1px solid var(--border);
+  width: var(--casilla);
+  height: var(--casilla);
+  border: var(--linea) solid var(--border);
   padding: 0;
 }
 
@@ -596,10 +600,8 @@
     padding: var(--spacing-md);
   }
 
-  .celdaPuzzle,
-  .celdaSolucion {
-    width: 1.3rem;
-    height: 1.3rem;
+  .printArea {
+    --casilla: 1.3rem;
   }
 
   .numeroPista {
@@ -623,30 +625,17 @@
 
 /* ── Impresión ──────────────────────────────────────── */
 @media print {
-  .noPrint {
-    display: none !important;
+  .numeroPista {
+    font-size: 3mm;
+    min-width: 3.4mm;
   }
 
-  .container {
-    max-width: none;
-    min-height: 0;
-    margin: 0;
-    padding: 0;
-    background: #ffffff;
+  .tituloHoja {
+    font-size: 6mm;
   }
 
-  .printArea {
-    border: none;
-    border-radius: 0;
-    padding: 0;
-    margin: 0;
-    background: #ffffff;
-  }
-
-  .tituloHoja,
-  .numeroPista,
   .pieHoja {
-    color: #000000;
+    font-size: 2.6mm;
   }
 
   .celdaPuzzle {

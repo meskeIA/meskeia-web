@@ -291,6 +291,9 @@
 
 /* ── Hoja imprimible ────────────────────────────────── */
 .printArea {
+  /* Alto del hueco donde se escribe el resultado */
+  --casilla: 1.6rem;
+
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-large);
@@ -382,7 +385,7 @@
 
 .huecoSolucion {
   display: block;
-  height: 1.6rem;
+  height: var(--casilla);
 }
 
 .solucion {
@@ -634,44 +637,37 @@
 
 /* ── Impresión ──────────────────────────────────────── */
 @media print {
-  .noPrint {
-    display: none !important;
+  .tituloHoja {
+    font-size: 6mm;
   }
 
-  .container {
-    max-width: none;
-    min-height: 0;
-    margin: 0;
-    padding: 0;
-    background: #ffffff;
+  .datosAlumno {
+    font-size: 3.4mm;
   }
 
-  .printArea {
-    border: none;
-    border-radius: 0;
-    padding: 0;
-    margin: 0;
-    background: #ffffff;
+  .numeroCuenta {
+    font-size: 2.6mm;
   }
 
-  .tituloHoja,
-  .datosAlumno,
-  .numeroCuenta,
   .operacionColumna,
-  .operacionHorizontal,
-  .huecoLinea,
+  .operacionHorizontal {
+    font-size: 4.2mm;
+  }
+
   .pieHoja {
-    color: #000000;
+    font-size: 2.6mm;
   }
 
   .lineaOperacion {
     border-bottom-color: #000000;
   }
 
-  .solucion,
-  .restoSolucion {
-    color: #000000;
+  .solucion {
     font-weight: 700;
+  }
+
+  .restoSolucion {
+    font-size: 2.6mm;
   }
 
   .rejillaColumna {

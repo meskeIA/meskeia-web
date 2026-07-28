@@ -3,6 +3,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './GeneradorLaberintos.module.css';
+import impresion from '@/styles/impresion.module.css';
 import {
   MeskeiaLogo,
   Footer,
@@ -256,8 +257,8 @@ export default function GeneradorLaberintosPage() {
     : '';
 
   return (
-    <div className={styles.container}>
-      <div className={styles.noPrint}>
+    <div className={`${styles.container} ${impresion.lienzo}`}>
+      <div className={impresion.noImprimir}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -421,7 +422,7 @@ export default function GeneradorLaberintosPage() {
 
       {/* Área imprimible */}
       {laberinto && (
-        <div className={styles.printArea}>
+        <div className={`${styles.printArea} ${impresion.hoja}`}>
           <h2 className={styles.tituloHoja}>{titulo || 'Laberinto'}</h2>
 
           <div className={styles.lienzo}>
@@ -470,7 +471,7 @@ export default function GeneradorLaberintosPage() {
         </div>
       )}
 
-      <div className={styles.noPrint}>
+      <div className={impresion.noImprimir}>
         <EducationalSection
           icon="📚"
           title="Cómo se construye un laberinto y cómo se resuelve"

@@ -3,6 +3,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './GeneradorCrucigramas.module.css';
+import impresion from '@/styles/impresion.module.css';
 import {
   MeskeiaLogo,
   Footer,
@@ -405,8 +406,8 @@ export default function GeneradorCrucigramasPage() {
     : [];
 
   return (
-    <div className={styles.container}>
-      <div className={styles.noPrint}>
+    <div className={`${styles.container} ${impresion.lienzo}`}>
+      <div className={impresion.noImprimir}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -537,11 +538,11 @@ export default function GeneradorCrucigramasPage() {
 
       {/* Área imprimible */}
       {crucigrama && (
-        <div className={styles.printArea}>
+        <div className={`${styles.printArea} ${impresion.hoja}`}>
           <h2 className={styles.tituloHoja}>{titulo || 'Crucigrama'}</h2>
 
           <div className={styles.envoltorioRejilla}>
-            <table className={styles.rejilla}>
+            <table className={`${styles.rejilla} ${impresion.rejilla}`}>
               <caption className={styles.srOnly}>
                 Crucigrama de {crucigrama.columnas} por {crucigrama.filas} casillas con{' '}
                 {crucigrama.entradas.length} palabras
@@ -556,8 +557,12 @@ export default function GeneradorCrucigramasPage() {
                       const numero = numeroDeCelda(f, c);
                       return (
                         <td key={c} className={styles.celdaLetra}>
-                          {numero && <span className={styles.numeroCasilla}>{numero}</span>}
-                          {mostrarSolucion && <span className={styles.letraSolucion}>{letra}</span>}
+                          {/* El posicionamiento vive en este div, no en el <td>: una celda
+                              posicionada rompe el pintado de los bordes colapsados al imprimir */}
+                          <div className={styles.contenidoCasilla}>
+                            {numero && <span className={styles.numeroCasilla}>{numero}</span>}
+                            {mostrarSolucion && <span className={styles.letraSolucion}>{letra}</span>}
+                          </div>
                         </td>
                       );
                     })}
@@ -567,7 +572,7 @@ export default function GeneradorCrucigramasPage() {
             </table>
           </div>
 
-          <div className={styles.definiciones}>
+          <div className={`${styles.definiciones} ${impresion.bloque}`}>
             <div className={styles.columnaDefiniciones}>
               <h3>Horizontales</h3>
               <ol className={styles.listaDefiniciones}>
@@ -597,7 +602,7 @@ export default function GeneradorCrucigramasPage() {
         </div>
       )}
 
-      <div className={styles.noPrint}>
+      <div className={impresion.noImprimir}>
         <EducationalSection
           icon="📚"
           title="Cómo se arma un crucigrama"

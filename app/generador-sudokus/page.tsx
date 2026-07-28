@@ -3,6 +3,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './GeneradorSudokus.module.css';
+import impresion from '@/styles/impresion.module.css';
 import {
   MeskeiaLogo,
   Footer,
@@ -469,8 +470,8 @@ export default function GeneradorSudokusPage() {
     cantidad === 1 ? styles.rejillaUno : cantidad === 2 ? styles.rejillaDos : styles.rejillaCuatro;
 
   return (
-    <div className={styles.container}>
-      <div className={styles.noPrint}>
+    <div className={`${styles.container} ${impresion.lienzo}`}>
+      <div className={impresion.noImprimir}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -637,18 +638,18 @@ export default function GeneradorSudokusPage() {
 
       {/* Área imprimible */}
       {sudokus.length > 0 && (
-        <div className={styles.printArea}>
+        <div className={`${styles.printArea} ${impresion.hoja}`}>
           <h2 className={styles.tituloHoja}>{titulo || 'Sudoku'}</h2>
 
           <div className={`${styles.rejillaSudokus} ${claseCantidad}`}>
             {sudokus.map((sudoku, indice) => (
-              <div key={indice} className={styles.bloqueSudoku}>
+              <div key={indice} className={`${styles.bloqueSudoku} ${impresion.bloque}`}>
                 <p className={styles.cabeceraSudoku}>
                   Sudoku {indice + 1} · {NIVELES.find((n) => n.id === sudoku.nivelReal)?.nombre} ·{' '}
                   {sudoku.numPistas} pistas
                 </p>
 
-                <table className={styles.tablaSudoku}>
+                <table className={`${styles.tablaSudoku} ${impresion.rejilla}`}>
                   <caption className={styles.srOnly}>
                     Sudoku número {sudoku.semilla}, nivel{' '}
                     {NIVELES.find((n) => n.id === sudoku.nivelReal)?.nombre}, con {sudoku.numPistas}{' '}
@@ -694,7 +695,7 @@ export default function GeneradorSudokusPage() {
         </div>
       )}
 
-      <div className={styles.noPrint}>
+      <div className={impresion.noImprimir}>
         <EducationalSection
           icon="📚"
           title="Qué hace difícil a un sudoku"

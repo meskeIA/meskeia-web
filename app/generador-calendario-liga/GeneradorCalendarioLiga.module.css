@@ -288,6 +288,9 @@
 
 /* ── Hoja imprimible ────────────────────────────────── */
 .printArea {
+  /* Alto de fila para escribir el resultado a mano */
+  --casilla: 2rem;
+
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-large);
@@ -394,7 +397,7 @@
 }
 
 .tablaClasificacion td {
-  height: 2rem;
+  height: var(--casilla);
   padding: 0.3rem 0.4rem;
   font-size: 0.88rem;
   text-align: center;
@@ -638,41 +641,30 @@
 
 /* ── Impresión ──────────────────────────────────────── */
 @media print {
-  .noPrint {
-    display: none !important;
-  }
-
-  .container {
-    max-width: none;
-    min-height: 0;
-    margin: 0;
-    padding: 0;
-    background: #ffffff;
-  }
-
-  .printArea {
-    border: none;
-    border-radius: 0;
-    padding: 0;
-    margin: 0;
-    background: #ffffff;
-  }
-
   .jornadasGrid {
     grid-template-columns: repeat(3, 1fr);
     gap: 0.6rem;
   }
 
-  .tituloHoja,
-  .tituloClasificacion,
-  .partido,
+  .tituloHoja {
+    font-size: 6mm;
+  }
+
+  .tituloClasificacion {
+    font-size: 4.5mm;
+  }
+
+  .partido {
+    font-size: 3mm;
+  }
+
   .descansa,
   .pieHoja {
-    color: #000000;
+    font-size: 2.6mm;
   }
 
   .jornadaTitulo {
-    color: #000000;
+    font-size: 3.4mm;
     border-bottom-color: #000000;
   }
 
@@ -682,12 +674,12 @@
 
   .tablaClasificacion th {
     background: #ffffff;
-    color: #000000;
     border-color: #000000;
+    font-size: 2.8mm;
   }
 
   .tablaClasificacion td {
-    color: #000000;
     border-color: #000000;
+    font-size: 3mm;
   }
 }

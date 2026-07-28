@@ -3,6 +3,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './GeneradorCalendarioLiga.module.css';
+import impresion from '@/styles/impresion.module.css';
 import {
   MeskeiaLogo,
   Footer,
@@ -168,8 +169,8 @@ export default function GeneradorCalendarioLigaPage() {
   const numParticipantes = participantes().length;
 
   return (
-    <div className={styles.container}>
-      <div className={styles.noPrint}>
+    <div className={`${styles.container} ${impresion.lienzo}`}>
+      <div className={impresion.noImprimir}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -320,12 +321,12 @@ export default function GeneradorCalendarioLigaPage() {
 
       {/* Área imprimible */}
       {calendario && (
-        <div className={styles.printArea}>
+        <div className={`${styles.printArea} ${impresion.hoja}`}>
           <h2 className={styles.tituloHoja}>{titulo || 'Liga'}</h2>
 
           <div className={styles.jornadasGrid}>
             {calendario.jornadas.map((jornada) => (
-              <div key={`${jornada.vuelta}-${jornada.numero}`} className={styles.jornada}>
+              <div key={`${jornada.vuelta}-${jornada.numero}`} className={`${styles.jornada} ${impresion.bloque}`}>
                 <h3 className={styles.jornadaTitulo}>
                   Jornada {jornada.numero}
                   {idaYVuelta && <span className={styles.vueltaEtiqueta}> · {jornada.vuelta}ª vuelta</span>}
@@ -345,7 +346,7 @@ export default function GeneradorCalendarioLigaPage() {
           </div>
 
           <h3 className={styles.tituloClasificacion}>Clasificación</h3>
-          <table className={styles.tablaClasificacion}>
+          <table className={`${styles.tablaClasificacion} ${impresion.bloque} ${impresion.rejilla}`}>
             <thead>
               <tr>
                 <th scope="col">#</th>
@@ -383,7 +384,7 @@ export default function GeneradorCalendarioLigaPage() {
         </div>
       )}
 
-      <div className={styles.noPrint}>
+      <div className={impresion.noImprimir}>
         <EducationalSection
           icon="📚"
           title="Cómo se arma una liga que no se atasque"

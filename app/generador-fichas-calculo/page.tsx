@@ -3,6 +3,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './GeneradorFichasCalculo.module.css';
+import impresion from '@/styles/impresion.module.css';
 import {
   MeskeiaLogo,
   Footer,
@@ -266,8 +267,8 @@ export default function GeneradorFichasCalculoPage() {
   }, [operaciones, nivel, cantidad, conLlevadas, divisionConResto, semillaManual]);
 
   return (
-    <div className={styles.container}>
-      <div className={styles.noPrint}>
+    <div className={`${styles.container} ${impresion.lienzo}`}>
+      <div className={impresion.noImprimir}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -456,7 +457,7 @@ export default function GeneradorFichasCalculoPage() {
 
       {/* Área imprimible */}
       {ficha.length > 0 && (
-        <div className={styles.printArea}>
+        <div className={`${styles.printArea} ${impresion.hoja}`}>
           <div className={styles.cabeceraHoja}>
             <h2 className={styles.tituloHoja}>{titulo || 'Ficha de cálculo'}</h2>
             <div className={styles.datosAlumno}>
@@ -467,7 +468,7 @@ export default function GeneradorFichasCalculoPage() {
 
           <ol className={presentacion === 'columna' ? styles.rejillaColumna : styles.rejillaHorizontal}>
             {ficha.map((cuenta, i) => (
-              <li key={i} className={styles.cuenta}>
+              <li key={i} className={`${styles.cuenta} ${impresion.bloque}`}>
                 <span className={styles.numeroCuenta}>{i + 1}.</span>
 
                 {presentacion === 'columna' ? (
@@ -508,7 +509,7 @@ export default function GeneradorFichasCalculoPage() {
         </div>
       )}
 
-      <div className={styles.noPrint}>
+      <div className={impresion.noImprimir}>
         <EducationalSection
           icon="📚"
           title="Cómo diseñar una ficha de cálculo que sirva de algo"

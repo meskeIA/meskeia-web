@@ -237,6 +237,11 @@
 
 /* ── Hoja imprimible ────────────────────────────────── */
 .printArea {
+  /* Medidas de la rejilla para PANTALLA. En impresión las sustituye la base
+     común (styles/impresion.module.css) por 9mm de casilla y 0,35mm de línea */
+  --casilla: 1.9rem;
+  --linea: 1px;
+
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-large);
@@ -263,27 +268,38 @@
 }
 
 .celdaBloque {
-  width: 1.9rem;
-  height: 1.9rem;
+  width: var(--casilla);
+  height: var(--casilla);
   border: none;
 }
 
+/* Sin position aquí: con border-collapse, una celda posicionada pierde los
+   bordes al imprimir. El posicionamiento va en .contenidoCasilla */
 .celdaLetra {
-  position: relative;
-  width: 1.9rem;
-  height: 1.9rem;
-  border: 1px solid var(--text-primary);
+  width: var(--casilla);
+  height: var(--casilla);
+  padding: 0;
+  border: var(--linea) solid var(--text-primary);
   text-align: center;
   vertical-align: middle;
   background: var(--bg-card);
 }
 
+.contenidoCasilla {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: var(--casilla);
+}
+
 .numeroCasilla {
   position: absolute;
-  top: 1px;
-  left: 2px;
+  top: 0;
+  left: 1px;
   font-size: 0.55rem;
-  line-height: 1;
+  line-height: 1.2;
   color: var(--text-secondary);
 }
 
@@ -538,17 +554,14 @@
 
   .printArea {
     padding: var(--spacing-md);
+    /* Se ajusta la VARIABLE, no las medidas: así la casilla se encoge en
+       móvil pero al imprimir gana el valor de la base común (9 mm) */
+    --casilla: 1.5rem;
   }
 
   .definiciones {
     grid-template-columns: 1fr;
     gap: var(--spacing-lg);
-  }
-
-  .celdaLetra,
-  .celdaBloque {
-    width: 1.5rem;
-    height: 1.5rem;
   }
 
   .metricaValor {
@@ -567,55 +580,45 @@
   }
 }
 
-/* ── Impresión ──────────────────────────────────────── */
+/* ── Impresión ──────────────────────────────────────────────────────
+   Los márgenes de página, la ocultación de la web, la tinta negra, el
+   grosor de línea y el tamaño de casilla los aporta la base común
+   (styles/impresion.module.css). Aquí solo lo propio del crucigrama. */
 @media print {
-  .noPrint {
-    display: none !important;
-  }
-
-  .container {
-    max-width: none;
-    min-height: 0;
-    margin: 0;
-    padding: 0;
-    background: #ffffff;
-  }
-
-  .printArea {
-    border: none;
-    border-radius: 0;
-    padding: 0;
-    margin: 0;
-    background: #ffffff;
-  }
-
-  .tituloHoja,
-  .listaDefiniciones li,
-  .pieHoja,
-  .numeroCasilla {
-    color: #000000;
+  /* Un A4 con márgenes baja de 768 px útiles y activaría la maquetación de
+     móvil: las definiciones se apilarían y la hoja se iría a dos páginas */
+  .definiciones {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-xl);
   }
 
   .celdaLetra {
-    border-color: #000000;
     background: #ffffff;
   }
 
-  .letraSolucion {
-    color: #000000;
+  /* Tamaños en unidades de papel: proporcionados a la casilla de 9 mm */
+  .numeroCasilla {
+    font-size: 2.2mm;
   }
 
-  .columnaDefiniciones h3,
-  .listaDefiniciones strong {
-    color: #000000;
+  .letraSolucion {
+    font-size: 4.5mm;
   }
 
   .columnaDefiniciones h3 {
     border-bottom-color: #000000;
   }
 
-  .definiciones {
-    break-inside: avoid;
-    page-break-inside: avoid;
+  .listaDefiniciones li {
+    font-size: 3.2mm;
+    line-height: 1.45;
+  }
+
+  .tituloHoja {
+    font-size: 6mm;
+  }
+
+  .pieHoja {
+    font-size: 2.6mm;
   }
 }
