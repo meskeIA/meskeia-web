@@ -78,6 +78,9 @@ _backups/
 scratch/
 scripts/cuadrante-stem.mjs
 scripts/detectar-eventos-aula.mjs
+# Lógica compartida por digest-diario y detectar-eventos-aula (firma de reparto por IP):
+# va con ellos, no al repo público. Al quedar ignorada, backup-critico.mjs sí la respalda.
+scripts/lib/
 
 # Detector foso-IA (analisis interno)
 scripts/detectar-foso-ia.mjs
