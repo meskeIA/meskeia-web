@@ -809,6 +809,13 @@ export const STEMUM_APPS: StemumApp[] = [
     disciplina: 'quimica',
   },
   {
+    slug: 'nombrador-compuestos-organicos',
+    icon: '🧪',
+    titulo: 'Nomenclatura orgánica',
+    desc: 'Monta la cadena y devuelve el nombre IUPAC explicando por qué extremo se numera; en sentido inverso, corrige nombres mal formulados.',
+    disciplina: 'quimica',
+  },
+  {
     slug: 'visualizador-cinetica-quimica',
     icon: '⚗️',
     titulo: 'Cinética química',

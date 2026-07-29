@@ -2246,7 +2246,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'analizador-titulos-seo': [...seoApps.filter(a => a.url !== '/analizador-titulos-seo/'), seoExtraApps[0]],
   'generador-meta-descripciones': [...seoApps.filter(a => a.url !== '/generador-meta-descripciones/'), seoExtraApps[1]],
   'analizador-densidad-seo': [...seoApps.filter(a => a.url !== '/analizador-densidad-seo/'), seoExtraApps[1]],
-  'calculadora-legibilidad': [...seoApps.filter(a => a.url !== '/calculadora-legibilidad/'), seoExtraApps[0]],
+  'calculadora-legibilidad': [
+    { url: '/revisor-lectura-facil/', icon: '📖', name: 'Revisor de Lectura Fácil', description: 'Del índice numérico a la frase concreta: qué corregir y por qué' },
+    ...seoApps.filter(a => a.url !== '/calculadora-legibilidad/').slice(0, 3),
+  ],
   'calculadora-tiempo-lectura': seoApps,
   'generador-palabras-clave': seoApps,
   'generador-schema-markup': [...seoApps.slice(0, 2), ...seoExtraApps.slice(2, 4)],
@@ -3548,7 +3551,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/guia/accesibilidad/', icon: '♿', name: 'Guía de Accesibilidad', description: 'Kit completo de apoyos visuales en casa' },
     { url: '/lector-texto-voz/', icon: '🔊', name: 'Lector de Texto', description: 'Alternativa auditiva para la lectura' },
     { url: '/lupa-digital/', icon: '🔍', name: 'Lupa Digital', description: 'Magnificación con cámara para texto pequeño' },
-    { url: '/temporizador-visual/', icon: '⏱️', name: 'Temporizador Visual', description: 'Timer con círculo de colores para organización' },
+    { url: '/revisor-lectura-facil/', icon: '📖', name: 'Revisor de Lectura Fácil', description: 'La otra capa: qué frase del texto hay que reescribir y por qué' },
   ],
   'temporizador-visual': [
     { url: '/guia/accesibilidad/', icon: '♿', name: 'Guía de Accesibilidad', description: 'Kit completo de apoyos visuales en casa' },
@@ -3568,7 +3571,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/guia/accesibilidad/', icon: '♿', name: 'Guía de Accesibilidad', description: 'Kit completo de apoyos visuales en casa' },
     { url: '/adaptador-dislexia/', icon: '📖', name: 'Adaptador Dislexia', description: 'Lee textos con más facilidad' },
     { url: '/tablero-comunicacion/', icon: '💬', name: 'Tablero Comunicación', description: 'Símbolos AAC con voz' },
-    { url: '/calculadora-legibilidad/', icon: '📊', name: 'Calculadora Legibilidad', description: 'Facilidad de lectura de textos' },
+    { url: '/revisor-lectura-facil/', icon: '📖', name: 'Revisor de Lectura Fácil', description: 'Qué frase falla antes de leerla en voz alta' },
   ],
   'tablero-comunicacion': [
     { url: '/guia/accesibilidad/', icon: '♿', name: 'Guía de Accesibilidad', description: 'Kit completo de apoyos visuales en casa' },
@@ -4505,7 +4508,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-termodinamica-quimica/', icon: '⚗️', name: 'Termodinámica Química', description: 'La esterificación y las reacciones orgánicas en equilibrio se rigen por el mismo ΔG que estudias aquí' },
     { url: '/visualizador-cinetica-quimica/', icon: '⚡', name: 'Cinética Química', description: 'Las reacciones de sustitución nucleófila tienen perfiles de energía de activación explicados por la cinética' },
     { url: '/visualizador-estructura-atomo/', icon: '⚛️', name: 'Estructura del Átomo', description: 'Los orbitales atómicos y la hibridación sp³/sp² del carbono son la base de la geometría orgánica' },
-    { url: '/visualizador-polimeros-materiales/', icon: '🧪', name: 'Polímeros y Materiales', description: 'La polimerización por condensación (nylon, PET) aplica directamente las reacciones de esterificación y amidación' },
+    { url: '/nombrador-compuestos-organicos/', icon: '🧪', name: 'Nomenclatura Orgánica', description: 'Ponle nombre IUPAC a estas moléculas, con la numeración explicada' },
   ],
   'visualizador-radioactividad': [
     { url: '/visualizador-estructura-atomo/', icon: '⚛️', name: 'Estructura del Átomo', description: 'La radioactividad es una propiedad nuclear — entender el núcleo atómico es el punto de partida' },
@@ -6708,7 +6711,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica Interactiva', description: 'Los 118 elementos y sus propiedades' },
     { url: '/simulador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Ajusta y simula reacciones' },
     { url: '/tabla-solubilidad/', icon: '🧪', name: 'Tabla de Solubilidad', description: 'Qué compuestos precipitan y cuáles no' },
-    { url: '/ajustar-ecuaciones-quimicas/', icon: '⚖️', name: 'Ajustar Ecuaciones', description: 'Calcula el número de oxidación de cualquier fórmula' },
+    { url: '/nombrador-compuestos-organicos/', icon: '🧪', name: 'Nomenclatura Orgánica', description: 'El equivalente para compuestos de carbono, con la numeración razonada' },
   ],
   'tabla-unidades-si': [
     { url: '/tabla-constantes-fisicas/', icon: '🔬', name: 'Tabla de Constantes Físicas', description: 'Las constantes que fijan hoy las unidades' },
@@ -6744,7 +6747,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-carbono/', icon: '⚛️', name: 'El Carbono', description: 'Alótropos, ciclo y grupos funcionales en 3D' },
     { url: '/visualizador-quimica-organica/', icon: '🧬', name: 'Química Orgánica', description: 'Las reacciones de estos grupos' },
     { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'Nomenclatura de compuestos inorgánicos' },
-    { url: '/tabla-ka-kb/', icon: '🧫', name: 'Tabla de Ka y Kb', description: 'Acidez de ácidos carboxílicos y aminas' },
+    { url: '/nombrador-compuestos-organicos/', icon: '🧪', name: 'Nomenclatura Orgánica', description: 'Pon en práctica esta prioridad: nombra una cadena y ve qué grupo manda' },
   ],
   'tabla-potenciales-redox': [
     { url: '/visualizador-electroquimica/', icon: '🔋', name: 'Electroquímica', description: 'Pila Daniell, serie electroquímica y electrólisis' },
@@ -6781,6 +6784,18 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-algebra-booleana/', icon: '🔢', name: 'Álgebra Booleana', description: 'Simplifica las ecuaciones de excitación del circuito' },
     { url: '/visualizador-logica-proposicional/', icon: '🔣', name: 'Lógica Proposicional', description: 'Tablas de verdad, Karnaugh y formas normales' },
     { url: '/calculadora-sistemas-numericos/', icon: '🔢', name: 'Sistemas Numéricos', description: 'Binario y hexadecimal para leer la cuenta del contador' },
+  ],
+  'nombrador-compuestos-organicos': [
+    { url: '/tabla-grupos-funcionales/', icon: '⚛️', name: 'Tabla de Grupos Funcionales', description: 'El orden de prioridad completo, con sufijo y prefijo de cada grupo' },
+    { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'La otra mitad de la formulación: nomenclatura inorgánica' },
+    { url: '/visualizador-quimica-organica/', icon: '🧬', name: 'Química Orgánica', description: 'Qué hacen esos grupos: reacciones, isomería y aromaticidad' },
+    { url: '/ajustar-ecuaciones-quimicas/', icon: '⚖️', name: 'Ajustar Ecuaciones', description: 'Cuando el compuesto ya tiene nombre, toca ajustar la reacción' },
+  ],
+  'revisor-lectura-facil': [
+    { url: '/adaptador-dislexia/', icon: '📖', name: 'Adaptador Dislexia', description: 'La otra capa: tipografía y espaciado del mismo texto' },
+    { url: '/calculadora-legibilidad/', icon: '📊', name: 'Calculadora de Legibilidad', description: 'El índice numérico Flesch-Szigriszt del texto' },
+    { url: '/lector-texto-voz/', icon: '🔊', name: 'Lector de Texto', description: 'Escuchar el texto adaptado para comprobar cómo suena' },
+    { url: '/guia/accesibilidad/', icon: '♿', name: 'Guía de Accesibilidad', description: 'Kit completo de apoyos para el día a día' },
   ],
   'ajustar-ecuaciones-quimicas': [
     { url: '/simulador-estequiometria/', icon: '🧪', name: 'Estequiometría', description: 'El paso siguiente: moles, reactivo limitante y rendimiento' },
