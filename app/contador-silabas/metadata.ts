@@ -2,9 +2,9 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Contador de Sílabas y Métrica de Versos - Sinalefas',
-  description: 'Cuenta sílabas y analiza la métrica de tus versos: sinalefas, tipos de verso (octosílabo, endecasílabo, alejandrino), diptongos e hiatos. Ideal para poesía y escansión. Gratis.',
-  keywords: 'métrica de versos, sinalefas, escansión poética, contador sílabas poéticas, medida de versos, contador sílabas, separar sílabas, silabeador español',
+  title: 'Contador de Sílabas, Rimas y Métrica de Versos - Analiza tu Poema',
+  description: 'Cuenta sílabas, detecta la rima (consonante o asonante) y reconoce la estrofa: soneto, romance, redondilla, lira, cuarteto. Con sinalefas, esquema ABBA y tipo de verso. Gratis.',
+  keywords: 'contador de rimas, esquema de rima, rima consonante y asonante, tipo de estrofa, analizar un poema, métrica de versos, sinalefas, escansión poética, contador sílabas poéticas, medida de versos, contador sílabas, separar sílabas, silabeador español, soneto romance redondilla lira',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    title: 'Contador de Sílabas y Métrica de Versos - Sinalefas',
-    description: 'Cuenta sílabas y analiza la métrica de tus versos: sinalefas, tipos de verso, diptongos e hiatos. Ideal para poesía y escansión.',
+    title: 'Contador de Sílabas, Rimas y Métrica de Versos',
+    description: 'Cuenta sílabas, detecta la rima y reconoce la estrofa: soneto, romance, redondilla, lira. Con sinalefas, esquema de rima y tipo de verso.',
     url: 'https://meskeia.com/contador-silabas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -86,6 +86,30 @@ export const faqJsonLd = {
         text: 'Sí. Basta con escribir el verso (o pegar una estrofa con un verso por línea) para obtener las sílabas métricas ya calculadas: se detectan las sinalefas entre palabras, se aplica el ajuste por acento final (aguda +1, llana ±0, esdrújula −1) y se identifica el tipo de verso. Por ejemplo, "¿Qué es la vida? Un frenesí" tiene 9 sílabas fonéticas, pero 2 sinalefas y un final agudo lo dejan en 8 sílabas métricas: un octosílabo.',
       },
     },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre rima consonante y asonante?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En la rima consonante coinciden todos los sonidos a partir de la vocal acentuada de la última palabra: "cielo" rima con "pelo" o con "consuelo". En la asonante coinciden solo las vocales: "sombra" rima con "hoja" (o-a), aunque las consonantes sean distintas. La rima siempre empieza en la vocal tónica, no en la última sílaba: por eso "cantar" y "amar" riman en consonante, pero "cántaro" y "amar" no.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el esquema de rima y cómo se anota?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es la fórmula que resume qué versos riman entre sí: a cada rima distinta se le asigna una letra por orden de aparición. Se escribe en mayúscula cuando el verso es de arte mayor (nueve sílabas o más) y en minúscula si es de arte menor (ocho o menos); un guion marca un verso suelto, que no rima con ninguno. Así, un soneto se anota ABBA ABBA CDC DCD y una redondilla, abba.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se reconoce si un poema es un soneto, un romance o una redondilla?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Por la combinación de número de versos, medida y esquema de rima. El soneto son catorce endecasílabos en dos cuartetos y dos tercetos (ABBA ABBA y dos tercetos variables). El romance es una serie indefinida de octosílabos con rima asonante solo en los versos pares, quedando los impares sueltos. La redondilla son cuatro octosílabos abba, y la cuarteta, cuatro octosílabos abab. La lira combina heptasílabos y endecasílabos en el orden 7a 11B 7a 7b 11B.',
+      },
+    },
   ],
 };
 
@@ -101,6 +125,10 @@ export const jsonLd = generateWebAppSchema({
     'Detección de sinalefas entre palabras',
     'Ajuste por acento final (aguda, llana, esdrújula)',
     'Identificación del tipo de verso (octosílabo, endecasílabo, alejandrino…)',
+    'Análisis de rima consonante y asonante',
+    'Esquema de rima con letras (ABBA, abab, -a-a)',
+    'Reconocimiento de la estrofa: soneto, romance, redondilla, lira, cuarteto, décima',
+    'Modo composición: mide el verso mientras lo escribes',
     'Identificación de diptongos, hiatos y triptongos',
     'En español',
   ],

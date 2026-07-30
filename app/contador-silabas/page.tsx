@@ -9,272 +9,24 @@ import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/compo
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
-// Algoritmo de silabeo en español
-const separarSilabas = (palabra: string): string[] => {
-  const vocales = 'aeiouáéíóúü';
-  const vocalesFuertes = 'aeoáéó';
-  const vocalesDebiles = 'iuíúü';
-  const consonantes = 'bcdfghjklmnñpqrstvwxyz';
+// La escansión (silabeo, sinalefas, acentuación) vive en metrica.ts y el análisis
+// de rima y estrofas en rima.ts: son lógica pura y así pueden verificarse contra
+// poemas reales sin arrancar el navegador.
+import {
+  type AnalisisVerso,
+  analizarPoema,
+  contarSilabasTexto,
+  nombreDelVerso,
+} from './metrica';
+import {
+  type AnalisisRima,
+  analizarRimas,
+  esquemaLegible,
+} from './rima';
 
-  palabra = palabra.toLowerCase().trim();
-  if (!palabra) return [];
 
-  const silabas: string[] = [];
-  let silabaActual = '';
-
-  const esVocal = (c: string) => vocales.includes(c);
-  const esConsonante = (c: string) => consonantes.includes(c);
-  const esVocalFuerte = (c: string) => vocalesFuertes.includes(c);
-  const esVocalDebil = (c: string) => vocalesDebiles.includes(c);
-
-  // Grupos consonánticos inseparables
-  const gruposInseparables = ['bl', 'br', 'cl', 'cr', 'dr', 'fl', 'fr', 'gl', 'gr', 'pl', 'pr', 'tr', 'ch', 'll', 'rr'];
-
-  for (let i = 0; i < palabra.length; i++) {
-    const char = palabra[i];
-    const siguiente = palabra[i + 1] || '';
-    const siguiente2 = palabra[i + 2] || '';
-
-    silabaActual += char;
-
-    // Si es vocal, verificamos si debemos cortar
-    if (esVocal(char)) {
-      // Si la siguiente es consonante
-      if (esConsonante(siguiente)) {
-        // Ver si hay grupo consonántico
-        const grupo = siguiente + siguiente2;
-        const esGrupoInseparable = gruposInseparables.includes(grupo.toLowerCase());
-
-        // Si hay dos consonantes seguidas
-        if (esConsonante(siguiente2)) {
-          if (esGrupoInseparable) {
-            // El grupo va con la siguiente sílaba
-            silabas.push(silabaActual);
-            silabaActual = '';
-          } else {
-            // Primera consonante va con esta sílaba, segunda con la siguiente
-            silabaActual += siguiente;
-            silabas.push(silabaActual);
-            silabaActual = '';
-            i++; // Saltamos la consonante que ya añadimos
-          }
-        } else if (esVocal(siguiente2) || !siguiente2) {
-          // Consonante simple entre vocales: va con la siguiente
-          silabas.push(silabaActual);
-          silabaActual = '';
-        }
-      }
-      // Si la siguiente es vocal
-      else if (esVocal(siguiente)) {
-        // Verificar diptongos e hiatos
-        const esDiptongo =
-          (esVocalDebil(char) && esVocalFuerte(siguiente)) ||
-          (esVocalFuerte(char) && esVocalDebil(siguiente)) ||
-          (esVocalDebil(char) && esVocalDebil(siguiente));
-
-        // Las vocales acentuadas en débiles rompen el diptongo (hiato)
-        const tieneAcentoDebil = 'íú'.includes(char) || 'íú'.includes(siguiente);
-
-        if (!esDiptongo || tieneAcentoDebil) {
-          // Hiato: cortar aquí
-          silabas.push(silabaActual);
-          silabaActual = '';
-        }
-        // Si es diptongo, continúan juntas
-      }
-    }
-  }
-
-  // Añadir última sílaba si queda algo
-  if (silabaActual) {
-    silabas.push(silabaActual);
-  }
-
-  return silabas;
-};
-
-const contarSilabasTexto = (texto: string): { palabra: string; silabas: string[]; total: number }[] => {
-  // Extraer solo palabras (ignorar números y símbolos)
-  const palabras = texto.match(/[a-záéíóúüñ]+/gi) || [];
-
-  return palabras.map(palabra => {
-    const silabas = separarSilabas(palabra);
-    return {
-      palabra,
-      silabas,
-      total: silabas.length,
-    };
-  });
-};
-
-// ==========================================
-// MÉTRICA DEL VERSO (escansión automática)
-// ==========================================
-
-type Acentuacion = 'aguda' | 'llana' | 'esdrujula';
-
-interface Sinalefa {
-  /** Índice de la palabra que abre la fusión (se une con la siguiente) */
-  indice: number;
-  /** Texto de la fusión, p. ej. «o_e» */
-  texto: string;
-  /** Hay un signo de puntuación entre ambas palabras: podría deshacerse (dialefa) */
-  conPausa: boolean;
-}
-
-interface AnalisisVerso {
-  texto: string;
-  palabras: { palabra: string; silabas: string[] }[];
-  silabasFoneticas: number;
-  sinalefas: Sinalefa[];
-  acentuacion: Acentuacion;
-  ajuste: number;
-  silabasMetricas: number;
-  nombre: string;
-  arte: 'menor' | 'mayor';
-}
-
-const VOCALES_METRICA = 'aeiouáéíóúü';
-const esVocalMetrica = (c: string): boolean => VOCALES_METRICA.includes(c.toLowerCase());
-
-/**
- * ¿La palabra termina en sonido vocálico?
- * La «y» final suena /i/ («hoy», «rey»), así que también permite sinalefa.
- */
-const terminaEnVocal = (palabra: string): boolean => {
-  const p = palabra.toLowerCase();
-  if (!p) return false;
-  const ultima = p[p.length - 1];
-  return esVocalMetrica(ultima) || ultima === 'y';
-};
-
-/**
- * ¿La palabra empieza por sonido vocálico?
- * La «h» es muda («la hoja» → sinalefa), salvo cuando encabeza los diptongos
- * «hue-», «hui-», «hie-», que se pronuncian con sonido consonántico (/gwe/, /ye/)
- * y bloquean la fusión: «la huella» NO hace sinalefa.
- */
-const empiezaPorVocal = (palabra: string): boolean => {
-  const p = palabra.toLowerCase();
-  if (!p) return false;
-  if (esVocalMetrica(p[0])) return true;
-  // «y» conjunción: funciona como vocal
-  if (p === 'y') return true;
-  if (p[0] === 'h') {
-    if (p.startsWith('hue') || p.startsWith('hui') || p.startsWith('hie')) return false;
-    return p.length > 1 && esVocalMetrica(p[1]);
-  }
-  return false;
-};
-
-/**
- * Clasifica la acentuación de la última palabra del verso, que determina
- * el ajuste métrico final (aguda +1 · llana ±0 · esdrújula −1).
- */
-const acentuacionDe = (palabra: string, silabas: string[]): Acentuacion => {
-  const p = palabra.toLowerCase();
-  // Los monosílabos se computan como agudos
-  if (silabas.length <= 1) return 'aguda';
-
-  // Si lleva tilde, la tilde manda: buscamos en qué sílaba cae
-  const indiceTilde = silabas.findIndex(s => /[áéíóú]/.test(s));
-  if (indiceTilde !== -1) {
-    const desdeElFinal = silabas.length - 1 - indiceTilde;
-    if (desdeElFinal === 0) return 'aguda';
-    if (desdeElFinal === 1) return 'llana';
-    return 'esdrujula';
-  }
-
-  // Sin tilde: termina en vocal, «n» o «s» → llana; en cualquier otra letra → aguda
-  const ultima = p[p.length - 1];
-  if (esVocalMetrica(ultima) || ultima === 'n' || ultima === 's') return 'llana';
-  return 'aguda';
-};
-
-const NOMBRES_VERSO: Record<number, string> = {
-  2: 'bisílabo',
-  3: 'trisílabo',
-  4: 'tetrasílabo',
-  5: 'pentasílabo',
-  6: 'hexasílabo',
-  7: 'heptasílabo',
-  8: 'octosílabo',
-  9: 'eneasílabo',
-  10: 'decasílabo',
-  11: 'endecasílabo',
-  12: 'dodecasílabo',
-  13: 'tridecasílabo',
-  14: 'alejandrino',
-  15: 'pentadecasílabo',
-  16: 'hexadecasílabo',
-  17: 'heptadecasílabo',
-  18: 'octodecasílabo',
-  19: 'eneadecasílabo',
-  20: 'veinte sílabas',
-};
-
-const nombreDelVerso = (silabas: number): string => NOMBRES_VERSO[silabas] || `${silabas} sílabas`;
-
-/**
- * Escansión de un verso: sílabas fonéticas − sinalefas + ajuste por acento final.
- * Devuelve null si la línea no contiene palabras.
- */
-const analizarVerso = (linea: string): AnalisisVerso | null => {
-  const encontradas = Array.from(linea.matchAll(/[a-záéíóúüñ]+/gi)).map(m => ({
-    palabra: m[0],
-    inicio: m.index,
-    fin: m.index + m[0].length,
-  }));
-  if (encontradas.length === 0) return null;
-
-  const palabras = encontradas.map(e => ({ palabra: e.palabra, silabas: separarSilabas(e.palabra) }));
-  const silabasFoneticas = palabras.reduce((acc, p) => acc + p.silabas.length, 0);
-
-  // Sinalefas: vocal final de una palabra + vocal inicial de la siguiente.
-  // No se encadenan: si una palabra ya se ha fundido con la anterior, no vuelve a
-  // fundirse con la siguiente. La sinalefa triple existe pero es excepcional, y la
-  // escansión tradicional no la aplica — «de rosa y azucena» es endecasílabo (una
-  // sola fusión), no decasílabo (dos).
-  const sinalefas: Sinalefa[] = [];
-  for (let i = 0; i < encontradas.length - 1; i++) {
-    const actual = encontradas[i];
-    const siguiente = encontradas[i + 1];
-    if (terminaEnVocal(actual.palabra) && empiezaPorVocal(siguiente.palabra)) {
-      const entreMedias = linea.slice(actual.fin, siguiente.inicio);
-      sinalefas.push({
-        indice: i,
-        texto: `${actual.palabra.slice(-1)}_${siguiente.palabra[0]}`,
-        conPausa: /[,;:.…!?—)]/.test(entreMedias),
-      });
-      i++; // la palabra fundida no encadena con la siguiente
-    }
-  }
-
-  const ultima = palabras[palabras.length - 1];
-  const acentuacion = acentuacionDe(ultima.palabra, ultima.silabas);
-  const ajuste = acentuacion === 'aguda' ? 1 : acentuacion === 'esdrujula' ? -1 : 0;
-
-  const silabasMetricas = Math.max(0, silabasFoneticas - sinalefas.length + ajuste);
-
-  return {
-    texto: linea.trim(),
-    palabras,
-    silabasFoneticas,
-    sinalefas,
-    acentuacion,
-    ajuste,
-    silabasMetricas,
-    nombre: nombreDelVerso(silabasMetricas),
-    arte: silabasMetricas >= 9 ? 'mayor' : 'menor',
-  };
-};
-
-/** Analiza cada línea no vacía del texto como un verso independiente */
-const analizarVersos = (texto: string): AnalisisVerso[] =>
-  texto
-    .split('\n')
-    .map(linea => analizarVerso(linea))
-    .filter((v): v is AnalisisVerso => v !== null);
+/** Metros a los que se puede ajustar un verso en el modo composición */
+const METROS_OBJETIVO = [7, 8, 11, 14] as const;
 
 export default function ContadorSilabasPage() {
   const [texto, setTexto] = useState('');
@@ -283,19 +35,28 @@ export default function ContadorSilabasPage() {
     totalSilabas: number;
     totalPalabras: number;
     versos: AnalisisVerso[];
+    bloques: number[][];
+    rima: AnalisisRima | null;
   } | null>(null);
+
+  // Modo composición: mide en vivo mientras se escribe, contra un metro elegido
+  const [metroObjetivo, setMetroObjetivo] = useState<number | null>(null);
 
   const analizar = () => {
     if (!texto.trim()) return;
 
     const palabrasAnalizadas = contarSilabasTexto(texto);
     const totalSilabas = palabrasAnalizadas.reduce((acc, p) => acc + p.total, 0);
+    const { versos, bloques } = analizarPoema(texto);
 
     setResultado({
       palabras: palabrasAnalizadas,
       totalSilabas,
       totalPalabras: palabrasAnalizadas.length,
-      versos: analizarVersos(texto),
+      versos,
+      bloques,
+      // La rima solo tiene sentido a partir de dos versos
+      rima: versos.length >= 2 ? analizarRimas(versos, bloques) : null,
     });
   };
 
@@ -303,6 +64,9 @@ export default function ContadorSilabasPage() {
     setTexto('');
     setResultado(null);
   };
+
+  // Medición en vivo para el modo composición (no depende del botón «Analizar»)
+  const versosEnVivo = metroObjetivo !== null ? analizarPoema(texto).versos : [];
 
   const ejemplos = [
     'murciélago',
@@ -317,6 +81,54 @@ export default function ContadorSilabasPage() {
     { etiqueta: 'Endecasílabo (Bécquer)', texto: 'Volverán las oscuras golondrinas' },
     { etiqueta: 'Octosílabo agudo (Calderón)', texto: '¿Qué es la vida? Un frenesí' },
     { etiqueta: 'Alejandrino (Darío)', texto: 'La princesa está triste, ¿qué tendrá la princesa?' },
+  ];
+
+  // Estrofas completas (dominio público) para probar el análisis de rima
+  const ejemplosEstrofa = [
+    {
+      etiqueta: 'Redondilla (Sor Juana)',
+      texto: `Hombres necios que acusáis
+a la mujer sin razón,
+sin ver que sois la ocasión
+de lo mismo que culpáis`,
+    },
+    {
+      etiqueta: 'Romance viejo',
+      texto: `Que por mayo era por mayo
+cuando hace la calor
+cuando los trigos encañan
+y están los campos en flor
+cuando canta la calandria
+y responde el ruiseñor`,
+    },
+    {
+      etiqueta: 'Lira (Fray Luis)',
+      texto: `Qué descansada vida
+la del que huye del mundanal ruido,
+y sigue la escondida
+senda por donde han ido
+los pocos sabios que en el mundo han sido`,
+    },
+    {
+      etiqueta: 'Soneto (Quevedo)',
+      texto: `Érase un hombre a una nariz pegado,
+érase una nariz superlativa,
+érase una nariz sayón y escriba,
+érase un peje espada muy barbado.
+
+Era un reloj de sol mal encarado,
+érase una alquitara pensativa,
+érase un elefante boca arriba,
+era Ovidio Nasón más narizado.
+
+Érase el espolón de una galera,
+érase una pirámide de Egipto,
+las doce tribus de narices era.
+
+Érase un naricísimo infinito,
+frisón archinariz, caratulera,
+sabañón garrafal, morado y frito.`,
+    },
   ];
 
   const cargarEjemplo = (ejemplo: string) => {
@@ -382,6 +194,87 @@ export default function ContadorSilabasPage() {
                 {ej.etiqueta}
               </button>
             ))}
+          </div>
+
+          <div className={styles.ejemplos}>
+            <span className={styles.ejemplosLabel}>Estrofas:</span>
+            {ejemplosEstrofa.map((ej) => (
+              <button
+                key={ej.etiqueta}
+                type="button"
+                onClick={() => cargarEjemplo(ej.texto)}
+                className={styles.ejemploBtn}
+                aria-label={`Cargar estrofa de ejemplo: ${ej.etiqueta}`}
+              >
+                {ej.etiqueta}
+              </button>
+            ))}
+          </div>
+
+          {/* Modo composición: mide mientras escribes contra un metro fijo */}
+          <div className={styles.composicion}>
+            <div className={styles.composicionCabecera}>
+              <span className={styles.ejemplosLabel}>Escribiendo un poema:</span>
+              {METROS_OBJETIVO.map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  className={`${styles.ejemploBtn} ${metroObjetivo === m ? styles.ejemploBtnActivo : ''}`}
+                  aria-pressed={metroObjetivo === m}
+                  onClick={() => setMetroObjetivo(metroObjetivo === m ? null : m)}
+                >
+                  {nombreDelVerso(m)}
+                </button>
+              ))}
+              {metroObjetivo !== null && (
+                <button
+                  type="button"
+                  className={styles.ejemploBtn}
+                  onClick={() => setMetroObjetivo(null)}
+                >
+                  Desactivar
+                </button>
+              )}
+            </div>
+
+            {metroObjetivo !== null && (
+              <div className={styles.medidorVivo} role="status" aria-live="polite">
+                {versosEnVivo.length === 0 ? (
+                  <p className={styles.medidorPista}>
+                    Escribe un verso por línea: te iré diciendo cuántas sílabas te faltan o te
+                    sobran para el {nombreDelVerso(metroObjetivo)}.
+                  </p>
+                ) : (
+                  versosEnVivo.map((v, i) => {
+                    const diferencia = v.silabasMetricas - metroObjetivo;
+                    const estado =
+                      diferencia === 0 ? 'exacto' : diferencia > 0 ? 'sobra' : 'falta';
+                    return (
+                      <div key={i} className={`${styles.medidorFila} ${styles[`medidor_${estado}`]}`}>
+                        <span className={styles.medidorBarra} aria-hidden="true">
+                          <span
+                            className={styles.medidorRelleno}
+                            style={{
+                              width: `${Math.min(100, (v.silabasMetricas / metroObjetivo) * 100)}%`,
+                            }}
+                          />
+                        </span>
+                        <span className={styles.medidorCuenta}>
+                          {v.silabasMetricas}/{metroObjetivo}
+                        </span>
+                        <span className={styles.medidorMensaje}>
+                          {diferencia === 0
+                            ? '✓ justo'
+                            : diferencia > 0
+                              ? `sobran ${diferencia}`
+                              : `faltan ${Math.abs(diferencia)}`}
+                        </span>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            )}
           </div>
 
           <div className={styles.botones}>
@@ -486,6 +379,102 @@ export default function ContadorSilabasPage() {
                     romper una sinalefa (dialefa) o unir vocales en hiato (sinéresis) cuando lo pide el
                     ritmo, sobre todo en las fusiones marcadas <em>con pausa</em>. Si el verso no te
                     cuadra, prueba a deshacer una de ellas.
+                  </p>
+                </div>
+              )}
+
+              {/* Rima y estrofa */}
+              {resultado.rima && (
+                <div className={styles.rimaBloque}>
+                  <h3 className={styles.rimaTitulo}>Rima y estrofa</h3>
+
+                  {resultado.rima.composicion && (
+                    <div className={styles.estrofaDestacada}>
+                      <span className={styles.estrofaNombre}>
+                        {resultado.rima.composicion.nombre}
+                      </span>
+                      <span className={styles.estrofaDescripcion}>
+                        {resultado.rima.composicion.descripcion}
+                      </span>
+                      {resultado.rima.composicion.confianza === 'aproximada' && (
+                        <span className={styles.estrofaAproximada}>
+                          Encaja en lo esencial, aunque algún verso se aparta del patrón.
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  <div className={styles.rimaResumen}>
+                    <div className={styles.rimaDato}>
+                      <span className={styles.rimaValor}>
+                        {esquemaLegible(
+                          resultado.rima.versos.map((v) => v.letra),
+                          resultado.bloques
+                        )}
+                      </span>
+                      <span className={styles.rimaEtiqueta}>Esquema de rima</span>
+                    </div>
+                    <div className={styles.rimaDato}>
+                      <span className={styles.rimaValor}>
+                        {resultado.rima.tipo === 'consonante'
+                          ? 'Consonante'
+                          : resultado.rima.tipo === 'asonante'
+                            ? 'Asonante'
+                            : 'Verso libre'}
+                      </span>
+                      <span className={styles.rimaEtiqueta}>
+                        {resultado.rima.tipo === 'consonante'
+                          ? 'Coinciden todos los sonidos'
+                          : resultado.rima.tipo === 'asonante'
+                            ? 'Coinciden solo las vocales'
+                            : 'Sin rima reconocible'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Estrofas sueltas, solo cuando la detección es firme */}
+                  {resultado.rima.estrofas.some((e) => e?.confianza === 'exacta') &&
+                    !resultado.rima.composicion && (
+                      <ul className={styles.estrofasLista}>
+                        {resultado.rima.estrofas.map((e, i) =>
+                          e && e.confianza === 'exacta' ? (
+                            <li key={i}>
+                              <strong>{e.nombre}</strong> ({e.esquema}) — {e.descripcion}
+                            </li>
+                          ) : null
+                        )}
+                      </ul>
+                    )}
+
+                  <div className={styles.rimaVersos}>
+                    {resultado.rima.versos.map((v, i) => (
+                      <div key={i} className={styles.rimaVerso}>
+                        <span
+                          className={`${styles.rimaLetra} ${
+                            v.letra === '-' ? styles.rimaSuelto : ''
+                          }`}
+                          data-letra={v.letra.toUpperCase()}
+                        >
+                          {v.letra}
+                        </span>
+                        <span className={styles.rimaTexto}>
+                          {resultado.versos[i].texto.replace(
+                            new RegExp(`${v.terminacion}\\W*$`, 'i'),
+                            ''
+                          )}
+                          <strong className={styles.rimaTerminacion}>{v.terminacion}</strong>
+                        </span>
+                        <span className={styles.rimaMedida}>{v.silabasMetricas}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <p className={styles.metricaNota}>
+                    <strong>Cómo se lee:</strong> cada letra marca una rima distinta;{' '}
+                    <em>mayúscula</em> para los versos de arte mayor (nueve sílabas o más) y{' '}
+                    <em>minúscula</em> para los de arte menor. Un guion señala un verso suelto,
+                    que no rima con ningún otro. La rima empieza en la vocal acentuada de la
+                    última palabra.
                   </p>
                 </div>
               )}
