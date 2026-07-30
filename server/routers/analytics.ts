@@ -1193,7 +1193,14 @@ export const analyticsRouter = router({
               FROM (
                 SELECT host, ${FECHA_EXPR} AS fo
                 FROM uso_aplicaciones
-                WHERE host IS NOT NULL AND host != '' AND modo != 'bot'
+                -- Excluye mcp además de bot (30/07/2026), igual que getNavegacion y que
+                -- el universo U2 del rollup: una llamada MCP no es una visita a un
+                -- dominio (no hay página) y ADEMÁS se registra siempre con
+                -- host='meskeia.com', porque registrarUsoDelegum hace un fetch interno a
+                -- meskeia.com/api/analytics/track. O sea que inflaba meskeia.com con
+                -- tráfico que ni era visita ni era de ese dominio: el 30/07 el sondeador
+                -- mcp-schema-probe/0.1 metió 68 llamadas ahí en un solo día.
+                WHERE host IS NOT NULL AND host != '' AND modo NOT IN ('bot', 'mcp')
                   ${ipExcluida ? 'AND (ip_address != ? OR ip_address IS NULL)' : ''}
               )
               GROUP BY host

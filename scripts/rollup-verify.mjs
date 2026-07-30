@@ -54,7 +54,19 @@ const NORM = { Spain: 'ES', 'United States': 'US', Mexico: 'MX', Argentina: 'AR'
 // "no propio" maneja NULL como el código real: NOT(0 OR NULL)=NULL excluiría mal
 // las filas con ip NULL, por eso se escribe con IS NULL explícito.
 const noPropio = () => `(es_propio IS NULL OR es_propio=0) AND (ip_address IS NULL OR ip_address!='${IPX.replace(/'/g, "''")}')`;
-const whereU1 = (excluir) => `(modo IS NULL OR modo!='bot')${excluir ? ` AND ${noPropio()}` : ''}`;
+// MCP anónimo = bot desde el 30/07/2026 (ver clasificarOrigenReal más abajo y el mismo
+// criterio en lib/analytics-rollup.ts). La referencia se calcula en SQL sobre la columna
+// `modo` CRUDA, que sigue diciendo 'mcp' —la reclasificación es de la capa derivada, a
+// propósito, para no destruir el dato—, así que hay que replicar aquí la lista blanca o
+// la referencia cuenta filas que el rollup ya no cuenta. Sin esto salían 20 descuadres
+// falsos, todos de esta única causa.
+const NO_MCP_ANON =
+  `NOT (modo='mcp' AND NOT (` +
+  ['Claude-User', 'openai-mcp', 'MistralAI-MCPClient']
+    .map(c => `COALESCE(json_extract(datos_adicionales,'$.uaCliente'),'') LIKE '${c}%'`)
+    .join(' OR ') +
+  `))`;
+const whereU1 = (excluir) => `(modo IS NULL OR modo!='bot') AND ${NO_MCP_ANON}${excluir ? ` AND ${noPropio()}` : ''}`;
 const whereU2 = (excluir) => `(modo IS NULL OR modo NOT IN ('bot','mcp'))${excluir ? ` AND ${noPropio()}` : ''}`;
 const num = async (sql) => Number((await client.execute(sql)).rows[0].n);
 
