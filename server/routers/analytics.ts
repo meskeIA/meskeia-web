@@ -1260,7 +1260,13 @@ export const analyticsRouter = router({
               FROM (
                 SELECT aplicacion, ${FECHA_EXPR} AS fo
                 FROM uso_aplicaciones
-                WHERE host = 'meskeia.com' AND modo != 'bot'
+                -- Excluye mcp igual que la fila por host de arriba. OBLIGATORIO que
+                -- ambas coincidan: si una cuenta las llamadas MCP y la otra no, las dos
+                -- mitades de la MISMA tabla dejan de cuadrar y el descuadre aterriza
+                -- entero en el cubo 'resto' (las pseudo-apps mcp:<servidor>:<tool> no se
+                -- adjudican a ningún vertical). El 29/07/2026 eso inflaba meskeia-resto
+                -- en 53: 312 en vez de 259, con el TOTAL ecosistema diciendo 527.
+                WHERE host = 'meskeia.com' AND modo NOT IN ('bot', 'mcp')
                   ${ipExcluida ? 'AND (ip_address != ? OR ip_address IS NULL)' : ''}
               )
               GROUP BY aplicacion`,
