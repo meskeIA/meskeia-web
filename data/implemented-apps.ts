@@ -1330,6 +1330,9 @@ export const implementedAppsUrls = [
   // Simuladores STEM (2026-07)
   "/simulador-logica-secuencial/",     // Biestables D/JK/T/SR, contador 4 bits, registro de desplazamiento y máquina de estados con cronograma
   "/ajustar-ecuaciones-quimicas/",     // Ajuste por álgebra exacta, números de oxidación y método del ion-electrón en medio ácido y básico
+
+  // Aritmética de tiempo (2026-07)
+  "/calculadora-horas/",               // Suma/resta hh:mm mezclando formatos, decimal para facturar y parte semanal con pausas
 ];
 
 /**

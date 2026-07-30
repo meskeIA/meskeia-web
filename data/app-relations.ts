@@ -2535,8 +2535,8 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'lista-tareas': productividadApps.filter(a => a.url !== '/lista-tareas/'),
   'matriz-eisenhower': productividadApps.filter(a => a.url !== '/matriz-eisenhower/'),
   'notas': productividadApps.filter(a => a.url !== '/notas/'),
-  'time-tracker': productividadApps.filter(a => a.url !== '/time-tracker/'),
-  'calculadora-productividad': [...productividadApps.filter(a => a.url !== '/calculadora-productividad/').slice(0, 2), ...freelanceApps.slice(0, 2)],
+  'time-tracker': [{ url: '/calculadora-horas/', icon: '🕒', name: 'Calculadora de Horas', description: 'Suma tiempos y pásalos a decimal' }, ...productividadApps.filter(a => a.url !== '/time-tracker/').slice(0, 3)],
+  'calculadora-productividad': [{ url: '/calculadora-horas/', icon: '🕒', name: 'Calculadora de Horas', description: 'Horas efectivas en decimal para facturar' }, ...productividadApps.filter(a => a.url !== '/calculadora-productividad/').slice(0, 1), ...freelanceApps.slice(0, 2)],
   'planificador-turnos': productividadApps.filter(a => a.url !== '/planificador-turnos/'),
   'preparar-entrevista-competencias': [
     { url: '/generador-curriculum/', icon: '📄', name: 'Crear Currículum', description: 'CV / hoja de vida ATS-friendly con vista previa' },
@@ -2776,7 +2776,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/mapa-dependencia-clientes/', icon: '📊', name: 'Dependencia Clientes', description: '¿Tu negocio depende de pocos?' },
     { url: '/auditoria-habilidades-mercado/', icon: '🎯', name: 'Habilidades vs Mercado', description: '¿Lo que ofreces es lo que se necesita?' },
   ],
-  'cronometro': productividadApps,
+  'cronometro': [{ url: '/calculadora-horas/', icon: '🕒', name: 'Calculadora de Horas', description: 'Suma y resta horas y minutos' }, ...productividadApps.slice(0, 3)],
   'comparador-transporte-viaje': viajesApps.filter(a => a.url !== '/comparador-transporte-viaje/').slice(0, 4),
   'guia-seguro-viaje': viajesApps.filter(a => a.url !== '/guia-seguro-viaje/').slice(0, 4),
   'lista-equipaje': viajesApps.filter(a => a.url !== '/lista-equipaje/').slice(0, 4),
@@ -3025,7 +3025,15 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // SALUD FEMENINA
   'seguimiento-ciclo-menstrual': saludFemeninaApps.filter(a => a.url !== '/seguimiento-ciclo-menstrual/'),
-  'calculadora-fechas': [...familiaApps.filter(a => a.url !== '/calculadora-fechas/'), ...productividadApps.slice(0, 2)],
+  'calculadora-fechas': [{ url: '/calculadora-horas/', icon: '🕒', name: 'Calculadora de Horas', description: 'Suma y resta horas y minutos' }, ...familiaApps.filter(a => a.url !== '/calculadora-fechas/').slice(0, 2), ...productividadApps.slice(0, 1)],
+
+  // ARITMÉTICA DE TIEMPO
+  'calculadora-horas': [
+    { url: '/calculadora-fechas/', icon: '🧮', name: 'Calculadora de Fechas', description: 'Días entre fechas, sumar y restar días' },
+    { url: '/time-tracker/', icon: '⏱️', name: 'Time Tracker', description: 'Registra el tiempo por proyecto y cliente' },
+    { url: '/calculadora-productividad/', icon: '📊', name: 'Productividad Real', description: 'Ingresos por hora efectiva' },
+    { url: '/orientador-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Qué precio por hora te sale a cuenta' },
+  ],
 
   // FÍSICA Y QUÍMICA
   'calculadora-movimiento': [{ url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Simulaciones visuales interactivas' }, ...matematicasAvanzadasApps.slice(0, 2), { url: '/conversor-unidades/', icon: '📏', name: 'Conversor Unidades', description: 'Longitud, peso, etc.' }],
