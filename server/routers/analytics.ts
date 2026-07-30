@@ -13,6 +13,7 @@ import {
   nuevoGlobal,
   ahoraMadrid,
   hoyMadrid,
+  mcpEsClienteIdentificado,
   CAMPOS_ROLLUP,
   FECHA_EXPR,
   type GlobalAcc,
@@ -55,9 +56,22 @@ function mapearRegistro(row: Record<string, unknown>) {
     navegador: row.navegador == null ? null : String(row.navegador),
     sistema_operativo: row.sistema_operativo == null ? null : String(row.sistema_operativo),
     resolucion: row.resolucion == null ? null : String(row.resolucion),
-    modo: row.modo == null ? 'web' : String(row.modo),
+    // MCP anónimo se presenta como 'bot', la MISMA clasificación que usa el resto del
+    // dashboard (Resumen IA, por dominio, subdivisión por tema). Antes esta tabla era el
+    // único sitio que mostraba el `modo` CRUDO, y el 30/07/2026 eso llevó al usuario a
+    // leer «IA / MCP (68)» en el chip de filtro como 68 adopciones de IA cuando el
+    // Resumen IA decía 3: las 68 eran una ráfaga del sondeador mcp-schema-probe/0.1.
+    // La columna se llama «Origen», no «modo»: debe decir de dónde viene de verdad. El
+    // dato crudo sigue intacto en Turso y en datos_adicionales.uaCliente, que viaja aquí.
+    modo: modoOrigen(row.modo == null ? 'web' : String(row.modo), datosAd),
     datos_adicionales: datosAd,
   };
+}
+
+/** 'mcp' solo si el cliente se identifica; si no, es un agente anónimo → 'bot'. */
+function modoOrigen(modo: string, datosAd: Record<string, unknown> | null): string {
+  if (modo === 'mcp' && !mcpEsClienteIdentificado(datosAd)) return 'bot';
+  return modo;
 }
 
 /**

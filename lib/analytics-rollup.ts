@@ -116,17 +116,26 @@ const U2_SET = new Set(['web', 'chatgpt', 'copilot', 'otras-ia', 'pwa', 'redes']
 const MCP_CLIENTES_IA = /^(Claude-User|openai-mcp|MistralAI-MCPClient)/i;
 
 /**
+ * true si una fila con modo='mcp' viene de un cliente IA identificado.
+ * Exportada para que TODO el lado TypeScript comparta una sola implementación:
+ * la usan clasificarOrigenReal (agregados) y mapearRegistro (tabla de registros
+ * del dashboard). Si divergieran, el dashboard contaría una cosa en el Resumen IA
+ * y otra en Últimos Registros — que es exactamente lo que pasó el 30/07/2026.
+ */
+export function mcpEsClienteIdentificado(datosAd: Record<string, unknown> | null): boolean {
+  const ua = typeof datosAd?.uaCliente === 'string' ? datosAd.uaCliente : '';
+  return MCP_CLIENTES_IA.test(ua);
+}
+
+/**
  * Clasifica el origen REAL del registro (sin considerar si es propio).
  * Modelo unificado: web / chatgpt / copilot / otras-ia / mcp / pwa / redes / bot.
  * Limpia el modo espurio 'chatgpt' y agrupa las plataformas IA sin volumen en 'otras-ia'.
  */
 function clasificarOrigenReal(modo: string, datosAd: Record<string, unknown> | null): string {
   if (modo === 'bot') return 'bot';
-  if (modo === 'mcp') {
-    // Solo cuenta como canal IA si el cliente dice quién es (ver MCP_CLIENTES_IA).
-    const ua = typeof datosAd?.uaCliente === 'string' ? datosAd.uaCliente : '';
-    return MCP_CLIENTES_IA.test(ua) ? 'mcp' : 'bot';
-  }
+  // Solo cuenta como canal IA si el cliente dice quién es (ver MCP_CLIENTES_IA).
+  if (modo === 'mcp') return mcpEsClienteIdentificado(datosAd) ? 'mcp' : 'bot';
   if (modo === 'chatgpt') return 'chatgpt'; // modo espurio legacy → IA ChatGPT
   if (modo === 'referral-ia') {
     const ref = (datosAd?.referrer_ia as string) || null;
