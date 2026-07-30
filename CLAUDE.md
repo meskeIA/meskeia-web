@@ -592,9 +592,29 @@ npm run build
 git add app/ components/ data/ lib/ public/ types/ server/ templates/
 git commit -m "feat: descripción del cambio"
 
-# 3. Push (Vercel despliega automáticamente)
+# 3. Si el commit ha tocado app/: refrescar app-dates.json ANTES del push
+node scripts/generate-app-dates.mjs
+git add data/app-dates.json
+git commit --amend --no-edit      # aún sin pushear: enmendar es seguro
+
+# 4. Push (Vercel despliega automáticamente)
 git push origin main
 ```
+
+### ⚠️ El paso 3 no es opcional (y es fácil de olvidar)
+
+`data/app-dates.json` alimenta el `lastModified` del sitemap, y su generador deduce la
+fecha de cada app del `git log` de `app/<slug>/`. Como el build del paso 1 se ejecuta
+**antes de que el commit exista**, el JSON que genera no puede contener ese cambio: sin
+el paso 3, el `lastmod` va siempre un commit por detrás y hay que corregirlo después con
+un commit extra (ocurrió en `9472e33a` y `83227161` antes de documentarse esto).
+
+El fichero **se commitea a propósito**: en Vercel el clon es shallow y `git log` daría
+fechas falsas para todo el catálogo, así que allí el build solo lee este JSON.
+
+> Ojo al usarlo para otra cosa: guarda fechas de **última modificación**, no de
+> publicación. Para saber la antigüedad real de una app, la primera visita en Turso
+> (`MIN(created_at)`).
 
 ### Variables de Entorno (Vercel Dashboard)
 
