@@ -127,6 +127,139 @@
   box-shadow: var(--shadow-medium);
 }
 
+/* Festivos propios (afectan al recuento de días laborables) */
+.festivosBox {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.festivosTitulo {
+  font-size: 1em;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.festivosAyuda {
+  font-size: 0.85em;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-bottom: 12px;
+}
+
+.festivosForm {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.festivosForm .input {
+  flex: 1 1 auto;
+  margin: 0;
+}
+
+.btnAnadirFestivo {
+  flex: 0 0 auto;
+  padding: 10px 16px;
+  background: var(--secondary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.9em;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.btnAnadirFestivo:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btnAnadirFestivo:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.festivosLista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.festivoChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 6px 5px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.88em;
+  color: var(--text-primary);
+}
+
+.btnQuitarFestivo {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  color: var(--text-secondary);
+  font-size: 0.85em;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnQuitarFestivo:hover {
+  background: var(--hover);
+  color: #b3402f;
+}
+
+.btnQuitarFestivo:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.festivosVacio {
+  font-size: 0.85em;
+  color: var(--text-muted, var(--text-secondary));
+  margin: 0;
+}
+
+/* Etiqueta visible solo para lectores de pantalla */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btnAnadirFestivo,
+  .btnQuitarFestivo {
+    transition: none;
+  }
+}
+
 /* Sección de resultados */
 .resultsSection {
   display: grid;

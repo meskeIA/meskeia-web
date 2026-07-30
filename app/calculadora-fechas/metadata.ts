@@ -5,12 +5,16 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Calculadora de Fechas Online | Diferencia entre Fechas y Edad - meskeIA',
+  title: 'Calculadora de Fechas y Días Hábiles | Diferencia y Edad - meskeIA',
   description:
-    'Calculadora de fechas profesional: diferencia entre fechas, suma/resta días, edad exacta y día de la semana. Herramienta gratuita con resultados precisos en español.',
+    'Calcula la diferencia entre dos fechas en días naturales y en días laborables, con tus propios festivos. Suma y resta días, edad exacta y día de la semana, en español.',
   keywords: [
     'calculadora fechas',
     'diferencia entre fechas',
+    'días hábiles',
+    'calcular días hábiles',
+    'días laborables entre fechas',
+    'contador de días hábiles',
     'calcular edad',
     'sumar días',
     'restar fechas',
@@ -19,9 +23,9 @@ export const metadata: Metadata = {
     'calculadora temporal',
   ],
   openGraph: {
-    title: 'Calculadora de Fechas Online | meskeIA',
+    title: 'Calculadora de Fechas y Días Hábiles | meskeIA',
     description:
-      'Calcula diferencias entre fechas, suma/resta días, determina edades exactas y días de la semana',
+      'Diferencia entre fechas en días naturales y laborables con tus festivos, suma y resta de días, edad exacta y día de la semana',
     type: 'website',
     locale: 'es_ES',
     images: [{
@@ -45,6 +49,8 @@ export const jsonLd = {
   operatingSystem: 'Any',
   featureList: [
     'Diferencia exacta entre dos fechas en días, semanas, meses y años',
+    'Días laborables entre dos fechas, descontando sábados, domingos y tus festivos',
+    'Lista de festivos propios guardada en el navegador y reutilizable en cada cálculo',
     'Suma y resta de días, semanas, meses o años a una fecha',
     'Día de la semana de cualquier fecha desde 1900',
     'Cálculo de edad exacta en años, meses y días',
@@ -74,6 +80,22 @@ export const faqSchema = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Selecciona la fecha inicial y la fecha final en la primera calculadora. La herramienta te mostrará la diferencia en días, semanas, meses y años con precisión.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo calculo los días hábiles o laborables entre dos fechas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Al calcular la diferencia aparecen dos cifras: los días naturales y los días laborables. Los laborables descuentan siempre sábados y domingos, y además los festivos que añadas en el bloque "Tus festivos", que quedan guardados en tu navegador para los siguientes cálculos. El criterio de conteo es el mismo que el de los días naturales: no se cuenta el día inicial y sí el final. Ten en cuenta que "día hábil" no significa lo mismo en el ámbito administrativo, en el laboral y en el judicial, así que conviene confirmar el criterio aplicable a cada trámite.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué tengo que añadir los festivos a mano?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Porque los festivos dependen del país, de la región y del municipio: en España, por ejemplo, cada ayuntamiento fija dos días locales propios, de modo que no existe un único calendario válido para todo el mundo. Añadiéndolos una vez al empezar el año, el recuento de días laborables ya los descuenta en todos tus cálculos posteriores sin volver a tocarlos.',
       },
     },
     {

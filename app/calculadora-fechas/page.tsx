@@ -9,27 +9,78 @@ import { getRelatedApps } from '@/data/app-relations';
 type TimeUnit = 'days' | 'weeks' | 'months' | 'years';
 type Operation = 'add' | 'subtract';
 
+interface DiffResult {
+  /** Fechas realmente usadas en el cálculo, en ISO, para recalcular los laborables */
+  desde: string;
+  hasta: string;
+  diffDays: number;
+  diffWeeks: number;
+  diffMonths: number;
+  exactYears: number;
+  exactMonths: number;
+  exactDays: number;
+}
+
+interface AddSubResult {
+  baseDate: Date;
+  resultDate: Date;
+  operationText: string;
+  timeValue: number;
+  unitText: string;
+}
+
+interface DayResult {
+  date: Date;
+  dayOfWeek: string;
+  timeAgoText: string;
+}
+
+interface AgeResult {
+  birth: Date;
+  years: number;
+  months: number;
+  days: number;
+  totalDays: number;
+  daysToNext: number;
+  nextBirthday: Date;
+}
+
+/** Días laborables de un intervalo, con el desglose de lo que se ha descontado */
+interface DiasLaborables {
+  laborables: number;
+  finesDeSemana: number;
+  festivos: number;
+}
+
+/** Clave de almacenamiento de los festivos propios (solo en este navegador) */
+const CLAVE_FESTIVOS = 'meskeia-calculadora-fechas-festivos';
+
 export default function CalculadoraFechas() {
   // Estados para calculadora 1: Diferencia entre fechas
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
-  const [diffResult, setDiffResult] = useState<any>(null);
+  const [diffResult, setDiffResult] = useState<DiffResult | null>(null);
+
+  // Festivos propios del usuario (ISO YYYY-MM-DD), usados en los días laborables
+  const [festivos, setFestivos] = useState<string[]>([]);
+  const [nuevoFestivo, setNuevoFestivo] = useState<string>('');
+  const [festivosCargados, setFestivosCargados] = useState(false);
 
   // Estados para calculadora 2: Sumar/Restar
   const [baseDate, setBaseDate] = useState<string>('');
   const [operation, setOperation] = useState<Operation>('add');
   const [timeValue, setTimeValue] = useState<number>(1);
   const [timeUnit, setTimeUnit] = useState<TimeUnit>('days');
-  const [addSubResult, setAddSubResult] = useState<any>(null);
+  const [addSubResult, setAddSubResult] = useState<AddSubResult | null>(null);
 
   // Estados para calculadora 3: Día de la semana
   const [dayDate, setDayDate] = useState<string>('');
-  const [dayResult, setDayResult] = useState<any>(null);
+  const [dayResult, setDayResult] = useState<DayResult | null>(null);
 
   // Estados para calculadora 4: Edad
   const [birthDate, setBirthDate] = useState<string>('');
   const [referenceDate, setReferenceDate] = useState<string>('');
-  const [ageResult, setAgeResult] = useState<any>(null);
+  const [ageResult, setAgeResult] = useState<AgeResult | null>(null);
 
 
   // Inicializar fechas
@@ -49,11 +100,87 @@ export default function CalculadoraFechas() {
     setReferenceDate(formatLocalDate(today));
   }, []);
 
+  // Los festivos propios se guardan solo en el navegador de quien los escribe
+  useEffect(() => {
+    try {
+      const guardados = window.localStorage.getItem(CLAVE_FESTIVOS);
+      if (guardados) {
+        const datos: unknown = JSON.parse(guardados);
+        if (Array.isArray(datos)) {
+          setFestivos(datos.filter((f): f is string => typeof f === 'string').sort());
+        }
+      }
+    } catch {
+      // Un almacén ilegible no debe impedir usar la calculadora
+    }
+    setFestivosCargados(true);
+  }, []);
+
+  useEffect(() => {
+    if (!festivosCargados) return;
+    try {
+      window.localStorage.setItem(CLAVE_FESTIVOS, JSON.stringify(festivos));
+    } catch {
+      // Navegación privada o almacén lleno: se sigue calculando igual
+    }
+  }, [festivos, festivosCargados]);
+
   /** Parsea ISO YYYY-MM-DD como fecha LOCAL para evitar desfase UTC en zonas UTC- */
   const parseLocalDate = (iso: string): Date => {
     const [y, m, d] = iso.split('-').map(Number);
     return new Date(y, m - 1, d);
   };
+
+  /** Fecha local a ISO YYYY-MM-DD (sin pasar por UTC) */
+  const toIsoDate = (d: Date): string =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+  /**
+   * Cuenta los días laborables entre dos fechas: descarta sábados, domingos y
+   * los festivos que haya añadido el usuario. Criterio de conteo: no se cuenta
+   * el día inicial y sí el final, igual que la diferencia en días naturales.
+   */
+  const contarDiasLaborables = (desde: string, hasta: string, propios: string[]): DiasLaborables => {
+    const inicio = parseLocalDate(desde);
+    const fin = parseLocalDate(hasta);
+    const conjuntoFestivos = new Set(propios);
+
+    let laborables = 0;
+    let finesDeSemana = 0;
+    let festivosContados = 0;
+
+    const cursor = new Date(inicio);
+    cursor.setDate(cursor.getDate() + 1); // el día inicial no cuenta
+
+    while (cursor <= fin) {
+      const diaSemana = cursor.getDay();
+      if (diaSemana === 0 || diaSemana === 6) {
+        finesDeSemana++;
+      } else if (conjuntoFestivos.has(toIsoDate(cursor))) {
+        festivosContados++;
+      } else {
+        laborables++;
+      }
+      cursor.setDate(cursor.getDate() + 1);
+    }
+
+    return { laborables, finesDeSemana, festivos: festivosContados };
+  };
+
+  const anadirFestivo = () => {
+    if (!nuevoFestivo || festivos.includes(nuevoFestivo)) return;
+    setFestivos((previos) => [...previos, nuevoFestivo].sort());
+    setNuevoFestivo('');
+  };
+
+  const quitarFestivo = (fecha: string) => {
+    setFestivos((previos) => previos.filter((f) => f !== fecha));
+  };
+
+  // Se recalcula al cambiar los festivos, sin necesidad de volver a pulsar Calcular
+  const laborablesResult: DiasLaborables | null = diffResult
+    ? contarDiasLaborables(diffResult.desde, diffResult.hasta, festivos)
+    : null;
 
   /**
    * Formatea fecha a formato largo español
@@ -116,6 +243,8 @@ export default function CalculadoraFechas() {
     }
 
     setDiffResult({
+      desde: startDate,
+      hasta: endDate,
       diffDays,
       diffWeeks,
       diffMonths,
@@ -325,8 +454,65 @@ export default function CalculadoraFechas() {
               🔢 Calcular Diferencia
             </button>
 
+            {/* Festivos propios: afectan al recuento de días laborables */}
+            <div className={styles.festivosBox}>
+              <h3 className={styles.festivosTitulo}>
+                <span aria-hidden="true">🎌</span> Tus festivos
+              </h3>
+              <p className={styles.festivosAyuda}>
+                Los días laborables descuentan siempre sábados y domingos. Añade aquí los festivos
+                que se apliquen en tu región o municipio: se guardan solo en este navegador y no se
+                envían a ningún sitio.
+              </p>
+
+              <div className={styles.festivosForm}>
+                <label htmlFor="nuevoFestivo" className={styles.srOnly}>
+                  Fecha del festivo que quieres añadir
+                </label>
+                <input
+                  type="date"
+                  id="nuevoFestivo"
+                  className={styles.input}
+                  value={nuevoFestivo}
+                  onChange={(e) => setNuevoFestivo(e.target.value)}
+                  min="1900-01-01"
+                />
+                <button
+                  type="button"
+                  onClick={anadirFestivo}
+                  className={styles.btnAnadirFestivo}
+                  disabled={!nuevoFestivo || festivos.includes(nuevoFestivo)}
+                >
+                  Añadir
+                </button>
+              </div>
+
+              {festivos.length > 0 ? (
+                <ul className={styles.festivosLista}>
+                  {festivos.map((fecha) => (
+                    <li key={fecha} className={styles.festivoChip}>
+                      <span>{formatDateShort(parseLocalDate(fecha))}</span>
+                      <button
+                        type="button"
+                        onClick={() => quitarFestivo(fecha)}
+                        className={styles.btnQuitarFestivo}
+                        aria-label={`Quitar el festivo del ${formatDateShort(parseLocalDate(fecha))}`}
+                      >
+                        ✕
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className={styles.festivosVacio}>
+                  Todavía no has añadido ninguno: por ahora solo se descuentan los fines de semana.
+                </p>
+              )}
+            </div>
+
             <div role="status" aria-live="polite" aria-atomic="true">
             {diffResult && (
+              <>
               <div className={styles.resultsSection}>
                 <ResultCard
                   title="Días totales"
@@ -351,6 +537,25 @@ export default function CalculadoraFechas() {
                   variant="default"
                 />
               </div>
+
+              {laborablesResult && (
+                <div className={styles.resultsSection}>
+                  <ResultCard
+                    title="Días laborables"
+                    value={laborablesResult.laborables.toLocaleString('es-ES')}
+                    description="Sin contar el día inicial"
+                    variant="highlight"
+                    icon="💼"
+                  />
+                  <ResultCard
+                    title="Descontados"
+                    value={`${(laborablesResult.finesDeSemana + laborablesResult.festivos).toLocaleString('es-ES')} días`}
+                    description={`${laborablesResult.finesDeSemana} de fin de semana y ${laborablesResult.festivos} festivo${laborablesResult.festivos === 1 ? '' : 's'} tuyo${laborablesResult.festivos === 1 ? '' : 's'}`}
+                    variant="info"
+                  />
+                </div>
+              )}
+              </>
             )}
             </div>
           </article>
@@ -622,8 +827,9 @@ export default function CalculadoraFechas() {
                   </code>
                 </div>
                 <p className={styles.escenarioTip}>
-                  <strong>Consejo:</strong> Los plazos administrativos en muchos países suelen ser días hábiles.
-                  Resta sábados, domingos y festivos del resultado.
+                  <strong>Consejo:</strong> los plazos administrativos suelen contarse en días
+                  hábiles. Mira la tarjeta &quot;Días laborables&quot;, que ya descuenta sábados y
+                  domingos, y añade tus festivos para afinar el vencimiento.
                 </p>
               </div>
 
@@ -748,16 +954,25 @@ export default function CalculadoraFechas() {
               <div className={styles.faqItem}>
                 <h3>¿Cómo calculo plazos legales en días hábiles (excluyendo fines de semana y festivos)?</h3>
                 <p>
-                  La calculadora actual muestra <strong>días naturales (calendario completo)</strong>. Para días hábiles:
+                  La primera calculadora muestra a la vez los <strong>días naturales</strong> y los{' '}
+                  <strong>días laborables</strong>: estos últimos descuentan siempre sábados y
+                  domingos, y además los festivos que hayas añadido en el bloque
+                  &quot;Tus festivos&quot;. El recuento sigue el mismo criterio que la diferencia en
+                  días naturales: no cuenta el día inicial y sí el final.
                 </p>
                 <ol>
-                  <li>Calcula la diferencia en días naturales.</li>
-                  <li><strong>Resta fines de semana:</strong> Aproximadamente 2 días por cada 7 (28-29% del total).</li>
-                  <li><strong>Resta festivos:</strong> Consulta el calendario oficial de tu país (suelen ser entre 10 y 18 días al año entre nacionales y regionales).</li>
-                  <li><strong>Usa la calculadora de día de la semana:</strong> Verifica si la fecha límite cae en fin de semana.</li>
+                  <li><strong>Añade tus festivos:</strong> los nacionales, los de tu región y los dos locales de tu municipio, que varían de un sitio a otro.</li>
+                  <li><strong>Calcula la diferencia:</strong> el resultado se actualiza solo cada vez que añades o quitas un festivo.</li>
+                  <li><strong>Comprueba el desglose:</strong> la tarjeta &quot;Descontados&quot; dice cuántos días se han quitado por fin de semana y cuántos por festivo.</li>
+                  <li><strong>Verifica el vencimiento:</strong> usa la calculadora de día de la semana para ver en qué día cae la fecha límite.</li>
                 </ol>
                 <p className={styles.faqTip}>
-                  <strong>Ejemplo:</strong> 30 días naturales = ~21 días hábiles (restando 8-9 días de fines de semana y festivos).
+                  <strong>Importante:</strong> &quot;día hábil&quot; no significa lo mismo en todos
+                  los ámbitos ni en todos los países. En el procedimiento administrativo español los
+                  sábados son inhábiles desde la Ley 39/2015, mientras que en el ámbito laboral el
+                  sábado suele contar como hábil salvo que el convenio diga otra cosa, y en el
+                  judicial hay reglas propias. Para un plazo con consecuencias, confirma siempre el
+                  criterio que aplica a tu trámite.
                 </p>
               </div>
 
@@ -921,10 +1136,12 @@ export default function CalculadoraFechas() {
               <div className={styles.step}>
                 <div className={styles.stepNumber}>4</div>
                 <div className={styles.stepContent}>
-                  <h3>Ajusta manualmente si trabajas con días hábiles</h3>
+                  <h3>Usa los días laborables si el plazo no cuenta fines de semana</h3>
                   <p>
-                    Si necesitas excluir fines de semana: divide el resultado entre 7, multiplica por 5 (días laborables
-                    por semana) y resta los festivos nacionales y regionales aplicables.
+                    El recuento de días laborables aparece junto al de días naturales y descuenta
+                    sábados y domingos sin que tengas que hacer nada. Si en tu plazo también cuentan
+                    los festivos, añádelos en &quot;Tus festivos&quot; y el resultado se recalcula al
+                    momento.
                   </p>
                 </div>
               </div>
@@ -1022,10 +1239,11 @@ export default function CalculadoraFechas() {
               {/* Tip 6 */}
               <div className={styles.tipCard}>
                 <span className={styles.tipIcon}>📆</span>
-                <h3>Considera festivos nacionales y regionales</h3>
+                <h3>Añade tus festivos una sola vez</h3>
                 <p>
-                  La mayoría de países hispanohablantes tienen entre 8 y 16 festivos nacionales más algunos regionales.
-                  Para días hábiles, resta todos los festivos aplicables según el país y la región del trámite.
+                  La mayoría de países hispanohablantes tienen entre 8 y 16 festivos nacionales, más
+                  los regionales y locales. Guárdalos en &quot;Tus festivos&quot; al empezar el año y
+                  el recuento de días laborables ya los descontará en todos tus cálculos.
                 </p>
               </div>
             </div>
@@ -1039,8 +1257,10 @@ export default function CalculadoraFechas() {
             </div>
             <ul className={styles.warningList}>
               <li>
-                <strong>No confundir días naturales con días hábiles:</strong> Los plazos legales/administrativos
-                en muchos países suelen contarse en días hábiles (excluyen fines de semana y festivos). Esta calculadora muestra días naturales por defecto.
+                <strong>No confundir días naturales con días hábiles:</strong> los plazos legales y
+                administrativos suelen contarse en días hábiles. Aquí tienes las dos cifras a la
+                vez, pero los días laborables solo descuentan los festivos que tú hayas añadido: si
+                falta alguno, el plazo saldrá más largo de lo que es.
               </li>
               <li>
                 <strong>No asumir que todos los meses tienen 30 días:</strong> Febrero tiene 28/29, y 7 meses tienen 31 días.
