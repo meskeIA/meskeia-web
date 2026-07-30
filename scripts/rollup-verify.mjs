@@ -58,10 +58,18 @@ const whereU1 = (excluir) => `(modo IS NULL OR modo!='bot')${excluir ? ` AND ${n
 const whereU2 = (excluir) => `(modo IS NULL OR modo NOT IN ('bot','mcp'))${excluir ? ` AND ${noPropio()}` : ''}`;
 const num = async (sql) => Number((await client.execute(sql)).rows[0].n);
 
-function clasificarOrigenReal(modo, ref) {
+// Réplica EXACTA de lib/analytics-rollup.ts::clasificarOrigenReal. Si divergen, este
+// verificador reporta descuadres que no existen. Al tocar una, tocar la otra.
+const MCP_CLIENTES_IA = /^(Claude-User|openai-mcp|MistralAI-MCPClient)/i;
+function clasificarOrigenReal(modo, datosAd) {
   if (modo === 'bot') return 'bot';
-  if (modo === 'mcp') return 'mcp';
+  if (modo === 'mcp') {
+    // Lista blanca: MCP anónimo (sondeadores/escáneres) cuenta como bot, no como IA.
+    const ua = typeof datosAd?.uaCliente === 'string' ? datosAd.uaCliente : '';
+    return MCP_CLIENTES_IA.test(ua) ? 'mcp' : 'bot';
+  }
   if (modo === 'chatgpt') return 'chatgpt';
+  const ref = datosAd?.referrer_ia ?? null;
   if (modo === 'referral-ia') return ref === 'chatgpt.com' ? 'chatgpt' : ref === 'copilot.microsoft.com' ? 'copilot' : 'otras-ia';
   if (modo === 'pwa') return 'pwa';
   if (modo === 'referral-social') return 'redes';
@@ -138,7 +146,7 @@ async function verificarResumen() {
     const f = parse(r.timestamp); if (!f) continue;
     let dAd = null; try { if (r.datos_adicionales) dAd = JSON.parse(String(r.datos_adicionales)); } catch {}
     const propio = Number(r.es_propio) === 1 || String(r.ip_address || '') === IPX;
-    const oReal = clasificarOrigenReal(String(r.modo || 'web'), dAd?.referrer_ia);
+    const oReal = clasificarOrigenReal(String(r.modo || 'web'), dAd);
     const o = propio ? 'propio' : oReal;
     if (!ref[o]) ref[o] = nf();
     const c = ref[o];

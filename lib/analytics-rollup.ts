@@ -89,13 +89,44 @@ export const CAP_DUR = 1800;
 const U2_SET = new Set(['web', 'chatgpt', 'copilot', 'otras-ia', 'pwa', 'redes']);
 
 /**
+ * Clientes MCP que se identifican con nombre y por tanto cuentan como canal IA real.
+ * Lo que no esté aquí se clasifica como 'bot': sondeadores, escáneres y scrapers.
+ *
+ * Lista BLANCA y no lista negra de UA sospechosos (30/07/2026): el 29/07 un sondeador
+ * hizo 53 tools/call a Delegum en 17 min con UA `Mozilla/5.0 (compatible;
+ * mcp-schema-probe/0.1)` —egress de Cloudflare rotando PoPs, argumentos válidos
+ * generados del JSON Schema de cada tool— y esquivó `MCP_AUTOMATION_UA` del endpoint
+ * de ingesta, que caza LIBRERÍAS (python-httpx, curl, axios…) pero no un nombre
+ * inventado con envoltorio Mozilla. Una lista negra cerraría ese caso y dejaría abierta
+ * la clase: el próximo escáner llamado `helper/1.0` volvería a colarse. Los clientes
+ * reales SÍ se presentan — el 16/07/2026 quedaron registrados los tres de abajo.
+ *
+ * Se clasifica AQUÍ y no en la ingesta a propósito: el rollup es una capa derivada y
+ * reconstruible (?rebuild=1), así que la tabla cruda conserva `uaCliente` intacto y
+ * cualquier lectura futura puede seguir distinguiendo. Marcarlo en el INSERT sería
+ * irreversible, y con una lista blanca en escritura el primer uso de un cliente MCP
+ * nuevo quedaría sellado como bot para siempre: justo la adopción que se quiere medir.
+ *
+ * ⚠️ Esta lista está REPLICADA a mano en tres sitios más (no hay forma limpia de
+ * compartirla entre .ts y los .mjs de análisis). Al añadir un cliente, actualizar:
+ *   · scripts/rollup-verify.mjs   (si no, el verificador reporta descuadre falso)
+ *   · scripts/analizar-ia-paginas.mjs
+ *   · scripts/digest-diario.mjs   (const MCP_CLIENTES_IA — fuera del repo, gitignored)
+ */
+const MCP_CLIENTES_IA = /^(Claude-User|openai-mcp|MistralAI-MCPClient)/i;
+
+/**
  * Clasifica el origen REAL del registro (sin considerar si es propio).
  * Modelo unificado: web / chatgpt / copilot / otras-ia / mcp / pwa / redes / bot.
  * Limpia el modo espurio 'chatgpt' y agrupa las plataformas IA sin volumen en 'otras-ia'.
  */
 function clasificarOrigenReal(modo: string, datosAd: Record<string, unknown> | null): string {
   if (modo === 'bot') return 'bot';
-  if (modo === 'mcp') return 'mcp';
+  if (modo === 'mcp') {
+    // Solo cuenta como canal IA si el cliente dice quién es (ver MCP_CLIENTES_IA).
+    const ua = typeof datosAd?.uaCliente === 'string' ? datosAd.uaCliente : '';
+    return MCP_CLIENTES_IA.test(ua) ? 'mcp' : 'bot';
+  }
   if (modo === 'chatgpt') return 'chatgpt'; // modo espurio legacy → IA ChatGPT
   if (modo === 'referral-ia') {
     const ref = (datosAd?.referrer_ia as string) || null;

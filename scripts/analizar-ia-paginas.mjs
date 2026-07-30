@@ -24,8 +24,14 @@ const client = createClient({
 });
 
 // Clasificador IA idéntico a lib/analytics-rollup.ts::clasificarOrigenReal
+// (lista blanca de clientes MCP incluida: al tocar una, tocar la otra)
+const MCP_CLIENTES_IA = /^(Claude-User|openai-mcp|MistralAI-MCPClient)/i;
 function clasificarIA(modo, datosAd) {
-  if (modo === 'mcp') return 'mcp';
+  if (modo === 'mcp') {
+    // MCP anónimo (sondeadores/escáneres) no es una IA leyendo páginas: fuera del análisis.
+    const ua = (datosAd && typeof datosAd.uaCliente === 'string') ? datosAd.uaCliente : '';
+    return MCP_CLIENTES_IA.test(ua) ? 'mcp' : null;
+  }
   if (modo === 'chatgpt') return 'chatgpt';
   if (modo === 'referral-ia') {
     const ref = (datosAd && datosAd.referrer_ia) || null;
