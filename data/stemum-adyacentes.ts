@@ -121,7 +121,9 @@ export const STEMUM_ADYACENTES: Record<string, string> = {
   'visualizador-teoria-grafos': 'computacion',
   'visualizador-redes-computadoras': 'computacion',
   'visualizador-como-funciona-wifi': 'computacion',
-  'visualizador-algoritmos': 'computacion',
+  // 'visualizador-algoritmos' promovido a STEMUM_APPS (31/07/2026): canvas
+  // animado + sliders de velocidad y tamaño. Absorbe simulador-ordenacion y
+  // visualizador-algoritmos-ordenacion, que hacían lo mismo.
   'calculadora-subredes': 'computacion',
   'visualizador-base-datos-relacional': 'computacion',
   'visualizador-sistemas-operativos': 'computacion',

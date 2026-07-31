@@ -67,6 +67,13 @@ export type StemumApp = {
 export const STEMUM_APPS: StemumApp[] = [
   // Computación
   {
+    slug: 'visualizador-algoritmos',
+    icon: '📊',
+    titulo: 'Algoritmos de ordenación',
+    desc: 'Los 7 algoritmos animados en canvas con el pseudocódigo resaltado línea a línea, y un modo comparativa que los hace correr en paralelo sobre el mismo array.',
+    disciplina: 'computacion',
+  },
+  {
     slug: 'visualizador-algoritmos-ordenacion',
     icon: '🔢',
     titulo: 'Algoritmos de ordenación',

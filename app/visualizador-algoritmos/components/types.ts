@@ -7,7 +7,7 @@ export type BarState = 'normal' | 'comparing' | 'swapping' | 'sorted' | 'pivot';
 export type AnimationState = 'idle' | 'running' | 'paused' | 'finished';
 
 // Algoritmos de ordenación disponibles
-export type SortingAlgorithm = 'bubble' | 'selection' | 'insertion' | 'quick' | 'merge';
+export type SortingAlgorithm = 'bubble' | 'selection' | 'insertion' | 'quick' | 'merge' | 'heap' | 'counting';
 
 // Representación de una barra en el array
 export interface ArrayBar {
@@ -191,6 +191,64 @@ export const ALGORITHMS_INFO: Record<SortingAlgorithm, AlgorithmInfo> = {
       '  copiar A[izq..medio] a L',
       '  copiar A[medio+1..der] a R',
       '  fusionar L y R de vuelta a A',
+      'fin procedimiento',
+    ],
+  },
+  heap: {
+    id: 'heap',
+    name: 'Heap Sort',
+    icon: '🌲',
+    complexity: {
+      best: 'O(n log n)',
+      average: 'O(n log n)',
+      worst: 'O(n log n)',
+      space: 'O(1)',
+    },
+    description: 'Convierte el array en un montículo máximo y va sacando la raíz al final. Es el único que garantiza O(n log n) sin memoria extra, aunque en la práctica suele ir más lento que Quick Sort.',
+    pseudocode: [
+      'procedimiento heapSort(A)',
+      '  para i desde n/2-1 hasta 0',
+      '    hundir(A, n, i)',
+      '  para i desde n-1 hasta 1',
+      '    intercambiar(A[0], A[i])',
+      '    hundir(A, i, 0)',
+      'fin procedimiento',
+      '',
+      'procedimiento hundir(A, tamaño, raíz)',
+      '  mayor = raíz',
+      '  si A[2*raíz+1] > A[mayor] entonces',
+      '    mayor = 2*raíz+1',
+      '  si A[2*raíz+2] > A[mayor] entonces',
+      '    mayor = 2*raíz+2',
+      '  si mayor != raíz entonces',
+      '    intercambiar(A[raíz], A[mayor])',
+      '    hundir(A, tamaño, mayor)',
+      'fin procedimiento',
+    ],
+  },
+  counting: {
+    id: 'counting',
+    name: 'Counting Sort',
+    icon: '🔢',
+    complexity: {
+      best: 'O(n + k)',
+      average: 'O(n + k)',
+      worst: 'O(n + k)',
+      space: 'O(k)',
+    },
+    description: 'No compara elementos: cuenta cuántas veces aparece cada valor y reconstruye el array con ese recuento. Por eso esquiva el límite O(n log n) de los algoritmos por comparación, pero solo sirve para enteros con un rango k acotado.',
+    pseudocode: [
+      'procedimiento countingSort(A, k)',
+      '  recuento = array de k+1 ceros',
+      '  para cada valor v en A',
+      '    recuento[v] = recuento[v] + 1',
+      '  fin para',
+      '  posición = 0',
+      '  para v desde 0 hasta k',
+      '    repetir recuento[v] veces',
+      '      A[posición] = v',
+      '      posición = posición + 1',
+      '  fin para',
       'fin procedimiento',
     ],
   },

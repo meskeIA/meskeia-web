@@ -10,6 +10,7 @@ import {
   AlgorithmCode,
   MetricsPanel,
   useAlgorithmAnimation,
+  useComparativa,
   SortingAlgorithm,
   ALGORITHMS_INFO,
 } from './components';
@@ -22,12 +23,53 @@ function generateRandomArray(size: number): number[] {
 // Tamaños disponibles
 const ARRAY_SIZES = [10, 15, 20, 25, 30, 40, 50];
 
+// Arrays característicos: cada uno saca a la luz un comportamiento distinto
+// (Quick Sort degrada con el inverso, Insertion Sort brilla con el casi ordenado).
+const PRESETS: { id: string; etiqueta: string; construir: () => number[] }[] = [
+  {
+    id: 'inverso',
+    etiqueta: 'Inverso',
+    construir: () => Array.from({ length: 20 }, (_, i) => (20 - i) * 5),
+  },
+  {
+    id: 'casi',
+    etiqueta: 'Casi ordenado',
+    construir: () => {
+      const arr = Array.from({ length: 20 }, (_, i) => (i + 1) * 5);
+      [arr[3], arr[4]] = [arr[4], arr[3]];
+      [arr[12], arr[15]] = [arr[15], arr[12]];
+      return arr;
+    },
+  },
+  {
+    id: 'duplicados',
+    etiqueta: 'Con duplicados',
+    construir: () => {
+      const valores = [15, 40, 15, 75, 40, 90, 15, 40, 75, 25, 90, 15, 40, 60, 25, 75, 90, 25, 60, 40];
+      return valores;
+    },
+  },
+  {
+    id: 'ordenado',
+    etiqueta: 'Ya ordenado',
+    construir: () => Array.from({ length: 20 }, (_, i) => (i + 1) * 5),
+  },
+];
+
+// Selección por defecto del modo comparativa: dos cuadráticos y dos O(n log n)
+const COMPARATIVA_POR_DEFECTO: SortingAlgorithm[] = ['bubble', 'insertion', 'quick', 'merge'];
+
 export default function VisualizadorAlgoritmosPage() {
   // Estado del array y algoritmo
   const [arraySize, setArraySize] = useState(25);
   const [array, setArray] = useState<number[]>(() => generateRandomArray(25));
   const [algorithm, setAlgorithm] = useState<SortingAlgorithm>('bubble');
   const [speed, setSpeed] = useState(50);
+  const [arrayPropio, setArrayPropio] = useState('');
+  const [errorArray, setErrorArray] = useState('');
+  const [modoComparativa, setModoComparativa] = useState(false);
+  const [algoritmosComparados, setAlgoritmosComparados] =
+    useState<SortingAlgorithm[]>(COMPARATIVA_POR_DEFECTO);
 
   // Hook de animación
   const {
@@ -49,8 +91,29 @@ export default function VisualizadorAlgoritmosPage() {
     speed,
   });
 
+  // Modo comparativa: varios algoritmos en paralelo sobre el mismo array
+  const comparativa = useComparativa(array, algoritmosComparados, speed, modoComparativa);
+
   // Valor máximo para escalar barras
   const maxValue = useMemo(() => Math.max(...array, 100), [array]);
+
+  // Marcar o desmarcar un algoritmo de la comparativa (mínimo 2, máximo 4)
+  const toggleComparado = useCallback((alg: SortingAlgorithm) => {
+    setAlgoritmosComparados((prev) => {
+      if (prev.includes(alg)) {
+        return prev.length > 2 ? prev.filter((a) => a !== alg) : prev;
+      }
+      return prev.length < 4 ? [...prev, alg] : prev;
+    });
+  }, []);
+
+  // Cargar un array característico
+  const aplicarPreset = useCallback((construir: () => number[]) => {
+    const nuevo = construir();
+    setArraySize(nuevo.length);
+    setArray(nuevo);
+    setErrorArray('');
+  }, []);
 
   // Info del algoritmo actual
   const algorithmInfo = ALGORITHMS_INFO[algorithm];
@@ -79,7 +142,28 @@ export default function VisualizadorAlgoritmosPage() {
   }, [updateSpeed]);
 
   // Lista de algoritmos para el selector
-  const algorithms: SortingAlgorithm[] = ['bubble', 'selection', 'insertion', 'quick', 'merge'];
+  const algorithms: SortingAlgorithm[] = ['bubble', 'selection', 'insertion', 'quick', 'merge', 'heap', 'counting'];
+
+  // Aplicar un array escrito por el usuario (separado por comas o espacios)
+  const handleAplicarArray = useCallback(() => {
+    const numeros = arrayPropio
+      .split(/[\s,;]+/)
+      .map((t) => parseInt(t, 10))
+      .filter((v) => Number.isFinite(v) && v >= 1 && v <= 100);
+
+    if (numeros.length < 2) {
+      setErrorArray('Escribe al menos 2 números enteros entre 1 y 100, separados por comas.');
+      return;
+    }
+    if (numeros.length > 50) {
+      setErrorArray('El máximo son 50 elementos para que la animación se siga bien.');
+      return;
+    }
+
+    setErrorArray('');
+    setArraySize(numeros.length);
+    setArray(numeros);
+  }, [arrayPropio]);
 
   return (
     <div className={styles.container}>
@@ -87,32 +171,142 @@ export default function VisualizadorAlgoritmosPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>📊</span>
-        <h1 className={styles.title}>Visualizador de Algoritmos</h1>
+        <span className={styles.heroIcon} aria-hidden="true">📊</span>
+        <h1 className={styles.title}>Visualizador de Algoritmos de Ordenación</h1>
         <p className={styles.subtitle}>
-          Aprende cómo funcionan los algoritmos de ordenación paso a paso con visualizaciones interactivas
+          Siete algoritmos animados paso a paso, con el pseudocódigo resaltado línea a
+          línea y el recuento de comparaciones e intercambios en vivo
         </p>
       </header>
 
       <LegalNotice />
 
-      {/* Selector de Algoritmos */}
-      <div className={styles.algorithmSelector} role="group" aria-label="Selección de algoritmo">
-        {algorithms.map((algo) => (
-          <button
-            key={algo}
-            className={`${styles.algorithmBtn} ${algorithm === algo ? styles.active : ''}`}
-            aria-pressed={algorithm === algo}
-            onClick={() => handleAlgorithmChange(algo)}
-            disabled={animationState === 'running'}
-          >
-            <span className={styles.algorithmIcon} aria-hidden="true">{ALGORITHMS_INFO[algo].icon}</span>
-            <span className={styles.algorithmName}>{ALGORITHMS_INFO[algo].name}</span>
-          </button>
-        ))}
+      {/* Modo: estudiar UN algoritmo a fondo o COMPARAR varios sobre el mismo array */}
+      <div className={styles.modoSelector} role="group" aria-label="Modo de visualización">
+        <button
+          type="button"
+          className={`${styles.modoBtn} ${!modoComparativa ? styles.modoBtnActivo : ''}`}
+          aria-pressed={!modoComparativa}
+          onClick={() => setModoComparativa(false)}
+        >
+          <span aria-hidden="true">🔍</span> Un algoritmo en detalle
+          <span className={styles.modoDesc}>Con pseudocódigo paso a paso</span>
+        </button>
+        <button
+          type="button"
+          className={`${styles.modoBtn} ${modoComparativa ? styles.modoBtnActivo : ''}`}
+          aria-pressed={modoComparativa}
+          onClick={() => setModoComparativa(true)}
+        >
+          <span aria-hidden="true">⚖️</span> Comparar varios a la vez
+          <span className={styles.modoDesc}>Mismo array, carrera en paralelo</span>
+        </button>
       </div>
 
+      {/* Selector de Algoritmos */}
+      {!modoComparativa && (
+        <div className={styles.algorithmSelector} role="group" aria-label="Selección de algoritmo">
+          {algorithms.map((algo) => (
+            <button
+              key={algo}
+              type="button"
+              className={`${styles.algorithmBtn} ${algorithm === algo ? styles.active : ''}`}
+              aria-pressed={algorithm === algo}
+              onClick={() => handleAlgorithmChange(algo)}
+              disabled={animationState === 'running'}
+            >
+              <span className={styles.algorithmIcon} aria-hidden="true">{ALGORITHMS_INFO[algo].icon}</span>
+              <span className={styles.algorithmName}>{ALGORITHMS_INFO[algo].name}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Modo comparativa */}
+      {modoComparativa && (
+        <section className={styles.comparativaSection} aria-label="Comparativa de algoritmos">
+          <div className={styles.algorithmSelector} role="group" aria-label="Algoritmos a comparar">
+            {algorithms.map((algo) => (
+              <button
+                key={algo}
+                type="button"
+                className={`${styles.algorithmBtn} ${algoritmosComparados.includes(algo) ? styles.active : ''}`}
+                aria-pressed={algoritmosComparados.includes(algo)}
+                onClick={() => toggleComparado(algo)}
+                disabled={comparativa.enMarcha}
+              >
+                <span className={styles.algorithmIcon} aria-hidden="true">{ALGORITHMS_INFO[algo].icon}</span>
+                <span className={styles.algorithmName}>{ALGORITHMS_INFO[algo].name}</span>
+              </button>
+            ))}
+          </div>
+          <p className={styles.comparativaAyuda}>
+            Entre 2 y 4 algoritmos. Todos parten del mismo array y avanzan un paso a la vez:
+            el que antes se queda quieto es el que menos operaciones necesita.
+          </p>
+
+          <div className={styles.animationControls}>
+            <div className={styles.controlButtons}>
+              {!comparativa.enMarcha ? (
+                <button type="button" className={`${styles.controlBtn} ${styles.play}`} onClick={comparativa.play}>
+                  ▶️ Empezar carrera
+                </button>
+              ) : (
+                <button type="button" className={`${styles.controlBtn} ${styles.pause}`} onClick={comparativa.pause}>
+                  ⏸️ Pausa
+                </button>
+              )}
+              <button type="button" className={`${styles.controlBtn} ${styles.reset}`} onClick={comparativa.reset}>
+                🔄 Reiniciar
+              </button>
+            </div>
+            <div className={styles.speedControl}>
+              <label htmlFor="velocidad-comparativa">Velocidad:</label>
+              <input
+                id="velocidad-comparativa"
+                type="range"
+                min="1"
+                max="100"
+                value={speed}
+                onChange={(e) => handleSpeedChange(parseInt(e.target.value))}
+                className={styles.speedSlider}
+              />
+            </div>
+            <div className={styles.stepCounter}>
+              Paso {comparativa.progreso} / {comparativa.maxPasos}
+            </div>
+          </div>
+
+          <div className={styles.comparativaGrid}>
+            {algoritmosComparados.map((alg) => {
+              const estado = comparativa.estados[alg];
+              const total = comparativa.totales[alg] ?? 0;
+              const terminado = total > 0 && comparativa.progreso >= total;
+              if (!estado) return null;
+              return (
+                <div key={alg} className={`${styles.comparativaCard} ${terminado ? styles.comparativaTerminado : ''}`}>
+                  <h2 className={styles.comparativaTitulo}>
+                    <span aria-hidden="true">{ALGORITHMS_INFO[alg].icon}</span> {ALGORITHMS_INFO[alg].name}
+                    {terminado && <span className={styles.comparativaBadge}>terminado</span>}
+                  </h2>
+                  <div className={styles.comparativaCanvas}>
+                    <SortingCanvas bars={estado.bars} maxValue={maxValue} />
+                  </div>
+                  <div className={styles.comparativaStats}>
+                    <span>Comparaciones: <strong>{estado.comparaciones}</strong></span>
+                    <span>Movimientos: <strong>{estado.movimientos}</strong></span>
+                    <span>Pasos: <strong>{Math.min(comparativa.progreso, total)}/{total}</strong></span>
+                    <span className={styles.comparativaComplejidad}>{ALGORITHMS_INFO[alg].complexity.average}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       {/* Contenido Principal */}
+      {!modoComparativa && (
       <div className={styles.mainContent}>
         {/* Panel de Visualización */}
         <div className={styles.visualizationPanel}>
@@ -240,6 +434,7 @@ export default function VisualizadorAlgoritmosPage() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Configuración del Array */}
       <div className={styles.configSection}>
@@ -258,12 +453,69 @@ export default function VisualizadorAlgoritmosPage() {
         </select>
 
         <button
+          type="button"
           className={styles.generateBtn}
           onClick={handleGenerateArray}
           disabled={animationState === 'running'}
         >
           🎲 Generar Array Aleatorio
         </button>
+      </div>
+
+      {/* Arrays característicos: donde se ve que la complejidad media no lo es todo */}
+      <div className={styles.presetsSection}>
+        <span className={styles.configLabel}>Casos clásicos:</span>
+        {PRESETS.map((preset) => (
+          <button
+            key={preset.id}
+            type="button"
+            className={styles.presetBtn}
+            onClick={() => aplicarPreset(preset.construir)}
+            disabled={animationState === 'running' || comparativa.enMarcha}
+          >
+            {preset.etiqueta}
+          </button>
+        ))}
+        <p className={styles.presetsAyuda}>
+          Prueba <strong>Inverso</strong> con Quick Sort para ver su peor caso, o
+          <strong> Casi ordenado</strong> con Insertion Sort para ver por qué a veces gana
+          a los O(n log n).
+        </p>
+      </div>
+
+      {/* Array propio: probar el algoritmo con tus datos, no solo con aleatorios */}
+      <div className={styles.arrayPropioSection}>
+        <label className={styles.arrayPropioLabel} htmlFor="array-propio">
+          O escribe tu propio array
+        </label>
+        <p className={styles.arrayPropioAyuda}>
+          Números enteros del 1 al 100 separados por comas. Útil para probar casos
+          concretos: un array ya ordenado, uno al revés o con valores repetidos.
+        </p>
+        <div className={styles.arrayPropioFila}>
+          <input
+            id="array-propio"
+            type="text"
+            inputMode="numeric"
+            className={styles.arrayPropioInput}
+            value={arrayPropio}
+            onChange={(e) => { setArrayPropio(e.target.value); setErrorArray(''); }}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleAplicarArray(); }}
+            placeholder="Ej: 42, 7, 91, 15, 63, 28"
+            disabled={animationState === 'running'}
+          />
+          <button
+            type="button"
+            className={styles.generateBtn}
+            onClick={handleAplicarArray}
+            disabled={animationState === 'running'}
+          >
+            Usar este array
+          </button>
+        </div>
+        {errorArray && (
+          <p className={styles.arrayPropioError} role="alert">{errorArray}</p>
+        )}
       </div>
 
       {/* Sección Educativa */}
@@ -334,6 +586,24 @@ export default function VisualizadorAlgoritmosPage() {
                   <td>O(n)</td>
                   <td>Sí</td>
                   <td>Ordenación garantizada, objetos</td>
+                </tr>
+                <tr>
+                  <td><strong>Heap Sort</strong></td>
+                  <td>O(n log n)</td>
+                  <td>O(n log n)</td>
+                  <td>O(n log n)</td>
+                  <td>O(1)</td>
+                  <td>No</td>
+                  <td>Garantía O(n log n) sin memoria extra</td>
+                </tr>
+                <tr>
+                  <td><strong>Counting Sort</strong></td>
+                  <td>O(n + k)</td>
+                  <td>O(n + k)</td>
+                  <td>O(n + k)</td>
+                  <td>O(k)</td>
+                  <td>Sí</td>
+                  <td>Enteros con rango k acotado</td>
                 </tr>
               </tbody>
             </table>

@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Visualizador de Algoritmos de Ordenación Paso a Paso | meskeIA',
-  description: 'Visualiza paso a paso cómo funcionan los algoritmos: Bubble, Selection, Insertion, Quick y Merge Sort. Herramienta interactiva para estudiantes de informática.',
-  keywords: 'algoritmos ordenación, bubble sort, quick sort, merge sort, selection sort, insertion sort, visualizador algoritmos, estructuras datos, informática, programación, universidad, aprender algoritmos, complejidad algoritmos',
+  description: 'Visualiza paso a paso los 7 algoritmos de ordenación: Bubble, Selection, Insertion, Quick, Merge, Heap y Counting Sort. Con el pseudocódigo resaltado línea a línea, contador de comparaciones e intercambios y tu propio array.',
+  keywords: 'algoritmos ordenación, metodos de ordenamiento, bubble sort, quick sort, merge sort, selection sort, insertion sort, heap sort, counting sort, visualizador algoritmos, simulador ordenacion, estructuras datos, informática, programación, universidad, aprender algoritmos, complejidad algoritmos, big O',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Visualizador de Algoritmos de Ordenación - meskeIA',
-    description: 'Aprende algoritmos de ordenación con visualizaciones interactivas paso a paso. Bubble Sort, Quick Sort, Merge Sort y más.',
+    description: 'Aprende los 7 algoritmos de ordenación con animaciones paso a paso: Bubble, Quick, Merge, Heap, Counting y más, con el pseudocódigo resaltado.',
     url: 'https://meskeia.com/visualizador-algoritmos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -39,18 +39,20 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Visualizador de Algoritmos de Ordenación',
-  description: 'Visualizador interactivo paso a paso de algoritmos de ordenación: Bubble Sort, Selection Sort, Insertion Sort, Quick Sort y Merge Sort. Herramienta educativa para estudiantes de informática y programación.',
+  description: 'Visualizador interactivo paso a paso de los 7 algoritmos de ordenación: Bubble, Selection, Insertion, Quick, Merge, Heap y Counting Sort. Muestra el pseudocódigo resaltado línea a línea mientras se anima, cuenta comparaciones e intercambios, y admite tu propio array. Para estudiantes de informática y programación.',
   url: 'https://meskeia.com/visualizador-algoritmos/',
   category: 'EducationalApplication',
   features: [
-    'Visualización paso a paso de 5 algoritmos de ordenación',
-    'Bubble Sort, Selection Sort, Insertion Sort, Quick Sort, Merge Sort',
-    'Control de velocidad de la animación',
-    'Comparación de complejidad temporal de cada algoritmo',
-    'Conjuntos de datos personalizables',
+    'Visualización paso a paso de 7 algoritmos de ordenación',
+    'Bubble, Selection, Insertion, Quick, Merge, Heap y Counting Sort',
+    'Pseudocódigo resaltado línea a línea mientras avanza la animación',
+    'Contador en vivo de comparaciones, intercambios y accesos al array',
+    'Control de velocidad, modo paso a paso y pausa',
+    'Tu propio array: prueba casos ya ordenados, invertidos o con repetidos',
+    'Tabla comparativa de complejidad, memoria y estabilidad de los 7',
     'En español',
   ],
-  keywords: ['algoritmos', 'ordenación', 'sorting', 'estructuras de datos', 'informática', 'universidad', 'FP'],
+  keywords: ['algoritmos', 'ordenación', 'sorting', 'estructuras de datos', 'informática', 'universidad', 'FP', 'heap sort', 'counting sort', 'big O'],
 });
 
 export const faqJsonLd = {
