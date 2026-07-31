@@ -15,7 +15,8 @@
  */
 export const STEMUM_ADYACENTES: Record<string, string> = {
   // ── Química ──
-  'tabla-periodica': 'quimica',
+  // OJO: 'tabla-periodica' NO va aquí — es material de apoyo del portal
+  // (STEMUM_MATERIAL_APOYO). Un slug solo puede estar en una capa.
   'quiz-tabla-periodica': 'quimica',
   'quiz-simbolos-quimicos': 'quimica',
   'glosario-fisica-quimica': 'quimica',
@@ -40,7 +41,8 @@ export const STEMUM_ADYACENTES: Record<string, string> = {
   'generador-tonos': 'fisica',
   'analizador-espectro': 'fisica',
   'simulador-fisica': 'fisica',
-  'visualizador-leyes-newton': 'fisica',
+  // 'visualizador-leyes-newton' promovido a STEMUM_APPS (31/07/2026): tiene la
+  // mecánica slider→gráfica que define el catálogo del portal.
   'visualizador-electromagnetismo': 'fisica',
   'visualizador-estados-materia': 'fisica',
   'visualizador-termodinamica': 'fisica',
@@ -52,7 +54,8 @@ export const STEMUM_ADYACENTES: Record<string, string> = {
   'calculadora-calculo': 'matematicas',
   'algebra-ecuaciones': 'matematicas',
   'calculadora-algebra-abstracta': 'matematicas',
-  'calculadora-algebra-booleana': 'matematicas',
+  // 'calculadora-algebra-booleana' NO va aquí: está en STEMUM_APPS como
+  // Computación. Estuvo en ambas capas, y con disciplinas distintas.
   'calculadora-geometria': 'matematicas',
   'calculadora-trigonometria': 'matematicas',
   'calculadora-probabilidad': 'matematicas',

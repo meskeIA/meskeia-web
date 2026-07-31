@@ -189,6 +189,45 @@ revisarPortalDeParrillas({
   ],
 });
 
+/**
+ * Stemum tiene TRES capas y un slug solo puede estar en una:
+ *   1. STEMUM_APPS          — simuladores del portal (parrilla, breadcrumb, contadores)
+ *   2. STEMUM_MATERIAL_APOYO — tablas de consulta, sección material-apoyo
+ *   3. STEMUM_ADYACENTES    — apps STEM-afines que solo muestran la banda hacia su disciplina
+ *
+ * DescubreVertical las consulta en ese orden, así que una app en dos capas no
+ * rompe la página: simplemente la entrada de la capa inferior queda muerta y las
+ * disciplinas pueden divergir sin que nadie se entere. Pasó con
+ * `calculadora-algebra-booleana` (portal como Computación, adyacente como
+ * Matemáticas) y con `tabla-periodica` (material y adyacente a la vez).
+ */
+{
+  const stemumSrc = leer('data/stemum.ts');
+  const slugsDe = (desde, hasta) =>
+    [...trozo(stemumSrc, desde, hasta, 'data/stemum.ts').matchAll(/slug: '([^']+)'/g)].map((m) => m[1]);
+
+  const capas = [
+    ['STEMUM_APPS', slugsDe('export const STEMUM_APPS', 'export function appsDeDisciplina')],
+    ['STEMUM_MATERIAL_APOYO', slugsDe('export const STEMUM_MATERIAL_APOYO', 'export const STEMUM_MATERIAL_DISCIPLINA')],
+    ['STEMUM_ADYACENTES', [...leer('data/stemum-adyacentes.ts').matchAll(/^\s*'([a-z0-9-]+)':\s*'[a-z-]+'/gm)].map((m) => m[1])],
+  ];
+
+  const donde = new Map();
+  for (const [capa, slugs] of capas) {
+    for (const slug of slugs) {
+      if (donde.has(slug)) {
+        errores.push(
+          `Stemum: "${slug}" está en ${donde.get(slug)} y en ${capa}. ` +
+          `Un slug pertenece a UNA sola capa — elige la que corresponde a su naturaleza y bórralo de la otra.`
+        );
+      } else {
+        donde.set(slug, capa);
+      }
+    }
+  }
+  resumen.push(`Stemum capas: ${capas.map(([c, s]) => `${c.replace('STEMUM_', '').toLowerCase()} ${s.length}`).join(' · ')} (sin solapes)`);
+}
+
 // ─── Coquinum ───────────────────────────────────────────────────────────────
 revisarPortalDeParrillas({
   nombre: 'Coquinum',

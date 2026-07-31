@@ -10,6 +10,23 @@
  *
  * Para añadir una app a una oleada: una entrada en STEMUM_APPS, nada más.
  * `npm run check:stemum` (y el propio build) avisan si algo queda descosido.
+ *
+ * ─── LAS TRES CAPAS (un slug pertenece a UNA sola) ───────────────────────────
+ * 1. STEMUM_APPS (aquí)           Simuladores del portal: el usuario mueve algo
+ *                                 (slider, parámetro, caso) y ve la consecuencia.
+ *                                 Salen en la parrilla, el breadcrumb y los contadores.
+ * 2. STEMUM_MATERIAL_APOYO (aquí) Tablas de consulta. Sección material-apoyo; no
+ *                                 cuentan en el hero ni entran en las parrillas.
+ * 3. STEMUM_ADYACENTES            `data/stemum-adyacentes.ts`. Apps STEM-afines que
+ *                                 NO son simuladores (calculadoras, quizzes,
+ *                                 conversores, cifrados, visualizadores de
+ *                                 clic-revelar). No entran al portal: solo muestran
+ *                                 la banda de descubrimiento hacia su disciplina.
+ *
+ * Repetir un slug en dos capas no rompe la página —DescubreVertical las consulta
+ * en ese orden y se queda con la primera— pero deja una entrada muerta y permite
+ * que las disciplinas diverjan en silencio. Lo comprueba `check:verticales`, que
+ * corre en el build y rompe si encuentra un slug en dos capas.
  */
 
 // Disciplinas del portal: slug de ruta → etiqueta visible.
@@ -926,20 +943,6 @@ export const STEMUM_APPS: StemumApp[] = [
     icon: '⚡',
     titulo: 'Potencial de acción',
     desc: 'Ajusta intensidad, umbral y duración del estímulo y observa en vivo en el canvas si la neurona dispara y a qué frecuencia (ley del todo o nada).',
-    disciplina: 'biologia',
-  },
-  {
-    slug: 'simulador-genetica',
-    icon: '🧬',
-    titulo: 'Genética mendeliana',
-    desc: 'Elige genotipos de los progenitores y obtén el cuadro de Punnett con las proporciones: cruces mono y dihíbridos, herencia ligada al sexo, árbol genealógico y poblaciones con chi-cuadrado.',
-    disciplina: 'biologia',
-  },
-  {
-    slug: 'visualizador-enzimas-cuerpo-humano',
-    icon: '🧫',
-    titulo: 'Enzimas del cuerpo humano',
-    desc: 'Trece enzimas digestivas, metabólicas y hepáticas con el modelo llave-cerradura, y sliders de pH y temperatura para ver dónde trabajan mejor y cuándo se desnaturalizan.',
     disciplina: 'biologia',
   },
   // Tierra y Espacio
