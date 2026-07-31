@@ -3,8 +3,8 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Calculadora de Álgebra Booleana con Mapas de Karnaugh | meskeIA',
-  description: 'Simplifica expresiones booleanas usando mapas de Karnaugh de 2, 3 y 4 variables. Genera tablas de verdad, obtén la forma mínima SOP/POS y visualiza las agrupaciones.',
-  keywords: 'álgebra booleana, mapa de karnaugh, k-map, tabla de verdad, simplificación, SOP, POS, mintérminos, maxtérminos, lógica digital, circuitos digitales, universidad, ingeniería',
+  description: 'Simplifica expresiones booleanas con mapas de Karnaugh de 2, 3 y 4 variables. Tablas de verdad, don\'t cares y forma mínima SOP/POS garantizada por Quine-McCluskey, con los implicantes primos esenciales marcados.',
+  keywords: 'álgebra booleana, mapa de karnaugh, k-map, tabla de verdad, simplificación, SOP, POS, mintérminos, maxtérminos, implicantes primos esenciales, quine-mccluskey, lógica digital, circuitos digitales, universidad, ingeniería',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -36,17 +36,18 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Calculadora de Álgebra Booleana con Mapas de Karnaugh",
-  description: "Simplifica expresiones booleanas usando mapas de Karnaugh de 2, 3 y 4 variables. Genera tablas de verdad, obtén la forma mínima SOP/POS y visualiza las agrupaciones.",
+  description: "Simplifica expresiones booleanas con mapas de Karnaugh de 2, 3 y 4 variables. Tablas de verdad, don't cares y forma mínima SOP/POS calculada por Quine-McCluskey, con los implicantes primos esenciales marcados sobre el mapa.",
   url: 'https://meskeia.com/calculadora-algebra-booleana/',
   category: 'EducationalApplication',
   features: [
     'Mapas de Karnaugh de 2, 3 y 4 variables con visualización de grupos en colores',
-    'Simplificación automática a forma mínima SOP (suma de productos) y POS (producto de sumas)',
+    'Minimización exacta por Quine-McCluskey: la expresión con menos términos y menos literales',
+    'Implicantes primos esenciales marcados, y los descartados por redundantes a la vista',
+    'Forma mínima en SOP (suma de productos) y POS (producto de sumas)',
     'Tabla de verdad completa e interactiva: activa/desactiva celdas con un clic',
     'Soporte de celdas don\'t care (X) para simplificaciones con condiciones de indiferencia',
     'Ejemplos predefinidos: XOR, votación por mayoría, paridad y BCD inválido',
-    'Proceso de simplificación paso a paso con agrupaciones explicadas',
-    'Equivalencias con puertas NAND, NOR y XOR',
+    'Proceso paso a paso: mintérminos, implicantes primos, cobertura mínima y expresión final',
   ],
 });
 
@@ -80,18 +81,18 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Cómo se introducen los mintérminos en la calculadora?',
+      name: '¿Qué es un implicante primo esencial?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Puedes introducir los mintérminos haciendo clic directamente en las celdas de la tabla de verdad o del mapa de Karnaugh. La calculadora actualiza automáticamente las agrupaciones y muestra la expresión mínima resultante en formato SOP y POS junto con el proceso de simplificación paso a paso.',
+        text: 'Un implicante primo es un grupo que ya no se puede agrandar sin incluir ceros. Es esencial cuando es el único que cubre algún mintérmino: entonces tiene que aparecer sí o sí en la expresión mínima. El resto de mintérminos se cubren eligiendo entre los implicantes primos no esenciales, y ahí es donde dos personas pueden llegar a expresiones distintas igual de cortas. La calculadora marca cuáles son esenciales y cuáles descarta por redundantes.',
       },
     },
     {
       '@type': 'Question',
-      name: '¿En qué se diferencia esta herramienta de otros simplificadores booleanos en línea?',
+      name: '¿La expresión que devuelve es realmente la mínima?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Además de calcular la expresión mínima, esta herramienta visualiza las agrupaciones sobre el propio mapa de Karnaugh con colores diferenciados, genera la tabla de verdad completa y muestra tanto la forma SOP como la POS. Funciona completamente en el navegador sin necesidad de registro, instalación ni conexión a una API externa.',
+        text: 'Sí. En lugar de ir tomando los grupos más grandes uno a uno (heurística que suele dejar términos de sobra), la calculadora obtiene todos los implicantes primos por el algoritmo de Quine-McCluskey y después resuelve la cobertura mínima: no existe otra expresión con menos términos, ni con los mismos términos y menos literales. Con 4 variables, casi la mitad de las funciones tienen soluciones aparentemente válidas pero no mínimas, así que la diferencia se nota al corregir un ejercicio.',
       },
     },
   ],

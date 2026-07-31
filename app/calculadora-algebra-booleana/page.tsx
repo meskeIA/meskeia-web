@@ -5,14 +5,25 @@ import { useState, useCallback, useMemo } from 'react';
 import styles from './CalculadoraAlgebraBooleana.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import {
+  minimizar,
+  terminoDeImplicante,
+  expresionMinima,
+  totalLiterales,
+  type ModoSalida,
+} from '@/lib/calculadoras/karnaugh';
 
 type NumVariables = 2 | 3 | 4;
-type OutputMode = 'sop' | 'pos';
+type OutputMode = ModoSalida;
 
 interface KarnaughGroup {
   cells: number[];
   term: string;
   color: string;
+  /** Implicante primo esencial: es el único que cubre alguna celda */
+  esencial: boolean;
+  /** Nº de variables que sobreviven en el término */
+  literales: number;
 }
 
 // Colores para grupos
@@ -113,9 +124,14 @@ export default function CalculadoraAlgebraBooleanaPage() {
     }
   }, [numVariables]);
 
-  // Obtener mintérminos (donde f=1) y don't cares (donde f=X)
+  // Obtener mintérminos (donde f=1), maxtérminos (donde f=0) y don't cares (donde f=X)
   const minterms = useMemo(() =>
     truthTable.map((v, i) => v === 1 ? i : -1).filter(i => i !== -1),
+    [truthTable]
+  );
+
+  const maxterms = useMemo(() =>
+    truthTable.map((v, i) => v === 0 ? i : -1).filter(i => i !== -1),
     [truthTable]
   );
 
@@ -124,232 +140,44 @@ export default function CalculadoraAlgebraBooleanaPage() {
     [truthTable]
   );
 
-  // Algoritmo de Quine-McCluskey simplificado para encontrar grupos
-  const findKarnaughGroups = useCallback((
-    terms: number[],
-    dontCareTerms: number[],
-    numVars: number,
-    mode: OutputMode
-  ): KarnaughGroup[] => {
-    // Para POS, trabajamos con maxtérminos (donde f=0)
-    const allTerms = mode === 'sop'
-      ? [...terms, ...dontCareTerms]
-      : [...truthTable.map((v, i) => v === 0 ? i : -1).filter(i => i !== -1), ...dontCareTerms];
-
-    const primaryTerms = mode === 'sop' ? terms :
-      truthTable.map((v, i) => v === 0 ? i : -1).filter(i => i !== -1);
-
-    if (primaryTerms.length === 0) return [];
-
-    const groups: KarnaughGroup[] = [];
-    const totalCells = Math.pow(2, numVars);
-
-    // Verificar si todos son 1 o todos son 0
-    if (allTerms.length === totalCells) {
-      return [{
-        cells: primaryTerms,
-        term: mode === 'sop' ? '1' : '0',
-        color: GROUP_COLORS[0]
-      }];
-    }
-
-    // Encontrar grupos de potencia de 2 (1, 2, 4, 8, 16)
-    const covered = new Set<number>();
-    const possibleGroupSizes = [16, 8, 4, 2, 1].filter(s => s <= totalCells);
-
-    for (const size of possibleGroupSizes) {
-      if (size > allTerms.length) continue;
-
-      // Generar todas las combinaciones posibles de grupos de este tamaño
-      const groupCandidates = findValidGroups(allTerms, size, numVars);
-
-      for (const candidate of groupCandidates) {
-        // Verificar si este grupo cubre algún término primario no cubierto
-        const uncoveredPrimary = candidate.filter(c =>
-          primaryTerms.includes(c) && !covered.has(c)
-        );
-
-        if (uncoveredPrimary.length > 0) {
-          // Generar el término simplificado
-          const term = generateTerm(candidate, numVars, variableNames, mode);
-          groups.push({
-            cells: candidate.filter(c => primaryTerms.includes(c)),
-            term,
-            color: GROUP_COLORS[groups.length % GROUP_COLORS.length]
-          });
-
-          // Marcar como cubiertos
-          candidate.forEach(c => {
-            if (primaryTerms.includes(c)) covered.add(c);
-          });
-        }
-      }
-    }
-
-    return groups;
-  }, [truthTable, variableNames]);
-
-  // Encontrar grupos válidos de un tamaño específico
-  const findValidGroups = (terms: number[], size: number, numVars: number): number[][] => {
-    const results: number[][] = [];
-    const totalCells = Math.pow(2, numVars);
-
-    // Para cada celda como punto de partida
-    for (let start = 0; start < totalCells; start++) {
-      // Generar grupos válidos que incluyan esta celda
-      const groupsFromHere = generateGroupsFromCell(start, size, numVars, terms);
-      results.push(...groupsFromHere);
-    }
-
-    // Eliminar duplicados
-    const unique = results.filter((group, index) => {
-      const sorted = [...group].sort((a, b) => a - b).join(',');
-      return index === results.findIndex(g =>
-        [...g].sort((a, b) => a - b).join(',') === sorted
-      );
-    });
-
-    return unique;
-  };
-
-  // Generar grupos válidos desde una celda
-  const generateGroupsFromCell = (
-    start: number,
-    size: number,
-    numVars: number,
-    validTerms: number[]
-  ): number[][] => {
-    const results: number[][] = [];
-
-    // Los grupos válidos en Karnaugh son hipercubos (varían en ciertos bits)
-    // Para un grupo de tamaño 2^k, debemos variar k bits
-    const bitsToVary = Math.log2(size);
-    if (!Number.isInteger(bitsToVary)) return [];
-
-    // Generar todas las combinaciones de bits a variar
-    const bitCombinations = getCombinations(numVars, bitsToVary);
-
-    for (const bits of bitCombinations) {
-      const group = generateGroupFromBits(start, bits, numVars);
-
-      // Verificar que todos los miembros del grupo estén en los términos válidos
-      if (group.every(cell => validTerms.includes(cell))) {
-        results.push(group);
-      }
-    }
-
-    return results;
-  };
-
-  // Generar grupo variando bits específicos
-  const generateGroupFromBits = (base: number, bitsToVary: number[], numVars: number): number[] => {
-    const size = Math.pow(2, bitsToVary.length);
-    const group: number[] = [];
-
-    for (let i = 0; i < size; i++) {
-      let cell = base;
-      for (let j = 0; j < bitsToVary.length; j++) {
-        const bit = bitsToVary[j];
-        const bitValue = (i >> j) & 1;
-        if (bitValue === 1) {
-          cell ^= (1 << (numVars - 1 - bit)); // Toggle bit
-        } else {
-          cell &= ~(1 << (numVars - 1 - bit)); // Clear bit
-          cell |= ((base >> (numVars - 1 - bit)) & 1) << (numVars - 1 - bit); // Restore original
-        }
-      }
-      // Recalcular celda correctamente
-      cell = base;
-      for (let j = 0; j < bitsToVary.length; j++) {
-        const bit = bitsToVary[j];
-        const bitValue = (i >> j) & 1;
-        // Set or clear the bit
-        cell = (cell & ~(1 << (numVars - 1 - bit))) | (bitValue << (numVars - 1 - bit));
-      }
-      if (!group.includes(cell)) {
-        group.push(cell);
-      }
-    }
-
-    return group;
-  };
-
-  // Obtener combinaciones de k elementos de n
-  const getCombinations = (n: number, k: number): number[][] => {
-    const result: number[][] = [];
-    const combine = (start: number, combo: number[]) => {
-      if (combo.length === k) {
-        result.push([...combo]);
-        return;
-      }
-      for (let i = start; i < n; i++) {
-        combo.push(i);
-        combine(i + 1, combo);
-        combo.pop();
-      }
-    };
-    combine(0, []);
-    return result;
-  };
-
-  // Generar término algebraico desde un grupo
-  const generateTerm = (
-    cells: number[],
-    numVars: number,
-    varNames: string[],
-    mode: OutputMode
-  ): string => {
-    if (cells.length === 0) return mode === 'sop' ? '0' : '1';
-    if (cells.length === Math.pow(2, numVars)) return mode === 'sop' ? '1' : '0';
-
-    // Encontrar qué bits son constantes en el grupo
-    const constantBits: { bit: number; value: number }[] = [];
-
-    for (let bit = 0; bit < numVars; bit++) {
-      const bitValues = cells.map(c => (c >> (numVars - 1 - bit)) & 1);
-      const allSame = bitValues.every(v => v === bitValues[0]);
-      if (allSame) {
-        constantBits.push({ bit, value: bitValues[0] });
-      }
-    }
-
-    if (constantBits.length === 0) return mode === 'sop' ? '1' : '0';
-
-    if (mode === 'sop') {
-      // SOP: producto de literales
-      return constantBits.map(({ bit, value }) =>
-        value === 1 ? varNames[bit] : `${varNames[bit]}'`
-      ).join('');
-    } else {
-      // POS: suma de literales (complementados)
-      return '(' + constantBits.map(({ bit, value }) =>
-        value === 0 ? varNames[bit] : `${varNames[bit]}'`
-      ).join(' + ') + ')';
-    }
-  };
-
-  // Calcular grupos de Karnaugh
-  const karnaughGroups = useMemo(() =>
-    findKarnaughGroups(minterms, dontCares, numVariables, outputMode),
-    [minterms, dontCares, numVariables, outputMode, findKarnaughGroups]
+  // Minimización exacta: Quine-McCluskey + cobertura mínima (lib/calculadoras/karnaugh.ts).
+  // Garantiza la expresión con menos términos y, a igualdad, menos literales.
+  const resultado = useMemo(
+    () => minimizar(truthTable, numVariables, outputMode),
+    [truthTable, numVariables, outputMode]
   );
 
+  // Grupos del mapa, listos para pintar
+  const karnaughGroups: KarnaughGroup[] = useMemo(() =>
+    resultado.grupos.map((grupo, i) => ({
+      cells: grupo.celdas,
+      term: terminoDeImplicante(grupo.patron, variableNames, outputMode),
+      color: GROUP_COLORS[i % GROUP_COLORS.length],
+      esencial: grupo.esencial,
+      literales: grupo.literales,
+    })),
+    [resultado, variableNames, outputMode]
+  );
+
+  // Implicantes primos NO seleccionados: existen, pero no hacen falta para la mínima
+  const primosDescartados = useMemo(() => {
+    const elegidos = new Set(resultado.grupos.map(g => g.patron));
+    return resultado.primos
+      .filter(p => !elegidos.has(p.patron))
+      .map(p => terminoDeImplicante(p.patron, variableNames, outputMode));
+  }, [resultado, variableNames, outputMode]);
+
   // Expresión simplificada final
-  const simplifiedExpression = useMemo(() => {
-    if (karnaughGroups.length === 0) {
-      return outputMode === 'sop' ? 'F = 0' : 'F = 1';
-    }
+  const simplifiedExpression = useMemo(
+    () => expresionMinima(resultado, variableNames, outputMode),
+    [resultado, variableNames, outputMode]
+  );
 
-    const terms = karnaughGroups.map(g => g.term);
-
-    if (outputMode === 'sop') {
-      if (terms.includes('1')) return 'F = 1';
-      return `F = ${terms.join(' + ')}`;
-    } else {
-      if (terms.includes('0')) return 'F = 0';
-      return `F = ${terms.join('')}`;
-    }
-  }, [karnaughGroups, outputMode]);
+  // Coste de la expresión: nº de términos y de literales
+  const costeExpresion = useMemo(() => ({
+    terminos: resultado.grupos.length,
+    literales: totalLiterales(resultado),
+  }), [resultado]);
 
   // Verificar si una celda está en un grupo
   const getCellGroups = useCallback((cellIndex: number): KarnaughGroup[] => {
@@ -385,6 +213,15 @@ export default function CalculadoraAlgebraBooleanaPage() {
               truthTable[i] === 'X' ? styles.outputX : styles.outputZero
             }`}
             onClick={() => toggleTruthValue(i)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleTruthValue(i);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label={`Fila ${i}: F vale ${truthTable[i]}. Pulsa para cambiar`}
           >
             {truthTable[i]}
           </td>
@@ -429,6 +266,15 @@ export default function CalculadoraAlgebraBooleanaPage() {
                       }`}
                       style={{ backgroundColor: background }}
                       onClick={() => toggleTruthValue(cellIndex)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          toggleTruthValue(cellIndex);
+                        }
+                      }}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Celda ${cellIndex}: vale ${value}${groups.length > 0 ? `, en el grupo ${groups.map(g => g.term).join(' y ')}` : ''}. Pulsa para cambiar`}
                       title={groups.length > 0 ? `Grupos: ${groups.map(g => g.term).join(', ')}` : ''}
                     >
                       <span className={styles.cellValue}>{value}</span>
@@ -495,6 +341,7 @@ export default function CalculadoraAlgebraBooleanaPage() {
             <div className={styles.variableSelector}>
               {([2, 3, 4] as NumVariables[]).map(num => (
                 <button
+                  type="button"
                   key={num}
                   className={`${styles.variableBtn} ${numVariables === num ? styles.variableBtnActive : ''}`}
                   onClick={() => handleNumVariablesChange(num)}
@@ -513,6 +360,7 @@ export default function CalculadoraAlgebraBooleanaPage() {
             <label className={styles.configLabel}>Forma de Salida</label>
             <div className={styles.modeSelector}>
               <button
+                type="button"
                 className={`${styles.modeBtn} ${outputMode === 'sop' ? styles.modeBtnActive : ''}`}
                 onClick={() => setOutputMode('sop')}
                 aria-pressed={outputMode === 'sop'}
@@ -521,6 +369,7 @@ export default function CalculadoraAlgebraBooleanaPage() {
                 <span className={styles.modeDesc}>Suma de Productos</span>
               </button>
               <button
+                type="button"
                 className={`${styles.modeBtn} ${outputMode === 'pos' ? styles.modeBtnActive : ''}`}
                 onClick={() => setOutputMode('pos')}
                 aria-pressed={outputMode === 'pos'}
@@ -534,16 +383,16 @@ export default function CalculadoraAlgebraBooleanaPage() {
 
         <div className={styles.examplesRow}>
           <span className={styles.examplesLabel}>Ejemplos:</span>
-          <button className={styles.exampleBtn} onClick={() => loadExample('xor')}>
+          <button type="button" className={styles.exampleBtn} onClick={() => loadExample('xor')}>
             XOR (2 vars)
           </button>
-          <button className={styles.exampleBtn} onClick={() => loadExample('majority')}>
+          <button type="button" className={styles.exampleBtn} onClick={() => loadExample('majority')}>
             Mayoría (3 vars)
           </button>
-          <button className={styles.exampleBtn} onClick={() => loadExample('bcd')}>
+          <button type="button" className={styles.exampleBtn} onClick={() => loadExample('bcd')}>
             BCD inválido (4 vars)
           </button>
-          <button className={styles.exampleBtn} onClick={() => loadExample('parity')}>
+          <button type="button" className={styles.exampleBtn} onClick={() => loadExample('parity')}>
             Paridad (4 vars)
           </button>
         </div>
@@ -589,14 +438,14 @@ export default function CalculadoraAlgebraBooleanaPage() {
         {/* Mapa de Karnaugh */}
         <section className={styles.karnaughSection}>
           <h2 className={styles.sectionTitle}>Mapa de Karnaugh</h2>
-          <p className={styles.hint}>Los grupos coloreados muestran las agrupaciones óptimas</p>
+          <p className={styles.hint}>Los grupos coloreados son los de la expresión mínima: los esenciales van marcados</p>
 
           {renderKarnaughMap()}
 
           {/* Leyenda de grupos */}
           {karnaughGroups.length > 0 && (
             <div className={styles.groupsLegend}>
-              <h4>Grupos encontrados:</h4>
+              <h4>Grupos de la expresión mínima:</h4>
               <div className={styles.groupsList}>
                 {karnaughGroups.map((group, i) => (
                   <div key={i} className={styles.groupItem}>
@@ -605,12 +454,22 @@ export default function CalculadoraAlgebraBooleanaPage() {
                       style={{ backgroundColor: group.color }}
                     ></span>
                     <span className={styles.groupTerm}>{group.term}</span>
+                    {group.esencial && (
+                      <span className={styles.groupEssential} title="Es el único implicante primo que cubre alguna de sus celdas: tiene que estar en la solución">
+                        esencial
+                      </span>
+                    )}
                     <span className={styles.groupCells}>
-                      [{group.cells.join(', ')}]
+                      [{group.cells.map(c => dontCares.includes(c) ? `${c}(X)` : c).join(', ')}]
                     </span>
                   </div>
                 ))}
               </div>
+              <p className={styles.groupsNote}>
+                Un implicante primo es <strong>esencial</strong> cuando es el único que cubre
+                alguna celda: no hay solución mínima sin él. Los don&apos;t care usados en un
+                grupo aparecen marcados con <code>(X)</code>.
+              </p>
             </div>
           )}
         </section>
@@ -630,12 +489,23 @@ export default function CalculadoraAlgebraBooleanaPage() {
             {dontCares.length > 0 && (
               <span>Don&apos;t Cares: {dontCares.join(', ')}</span>
             )}
+            {costeExpresion.terminos > 0 && (
+              <span>
+                Coste: {costeExpresion.terminos} {costeExpresion.terminos === 1 ? 'término' : 'términos'}
+                {' · '}{costeExpresion.literales} {costeExpresion.literales === 1 ? 'literal' : 'literales'}
+              </span>
+            )}
           </div>
+          <p className={styles.resultNote}>
+            Minimización exacta por Quine-McCluskey: no existe otra expresión con menos
+            términos, ni con los mismos términos y menos literales.
+          </p>
         </div>
 
         {/* Pasos detallados */}
         <div className={styles.stepsSection}>
           <button
+            type="button"
             className={styles.stepsToggle}
             onClick={() => setShowSteps(!showSteps)}
             aria-expanded={showSteps}
@@ -650,23 +520,48 @@ export default function CalculadoraAlgebraBooleanaPage() {
                 <br />
                 {outputMode === 'sop'
                   ? `Mintérminos: m(${minterms.join(', ')})${dontCares.length > 0 ? ` + d(${dontCares.join(', ')})` : ''}`
-                  : `Maxtérminos: M(${truthTable.map((v, i) => v === 0 ? i : -1).filter(i => i !== -1).join(', ')})${dontCares.length > 0 ? ` + d(${dontCares.join(', ')})` : ''}`
+                  : `Maxtérminos: M(${maxterms.join(', ')})${dontCares.length > 0 ? ` + d(${dontCares.join(', ')})` : ''}`
                 }
               </div>
 
               <div className={styles.step}>
-                <strong>Paso 2:</strong> Agrupar celdas adyacentes en potencias de 2
+                <strong>Paso 2:</strong> Obtener todos los implicantes primos
                 <br />
-                {karnaughGroups.length > 0
-                  ? karnaughGroups.map((g, i) => `Grupo ${i + 1}: celdas [${g.cells.join(', ')}] → ${g.term}`).join('\n')
-                  : 'No hay grupos que formar'
+                Se combinan las celdas que difieren en un solo bit, y se repite mientras
+                queden fusiones posibles. Lo que ya no se puede agrandar es un implicante primo.
+                <br />
+                {resultado.primos.length > 0
+                  ? `${resultado.primos.length} implicantes primos: ${resultado.primos.map(p => terminoDeImplicante(p.patron, variableNames, outputMode)).join(', ')}`
+                  : 'La función es constante: no hay implicantes que calcular'
                 }
               </div>
 
               <div className={styles.step}>
-                <strong>Paso 3:</strong> Generar expresión {outputMode === 'sop' ? 'SOP' : 'POS'}
+                <strong>Paso 3:</strong> Elegir la cobertura mínima
+                <br />
+                {karnaughGroups.length > 0 ? (
+                  <>
+                    {karnaughGroups.filter(g => g.esencial).length > 0
+                      ? `Esenciales (obligatorios): ${karnaughGroups.filter(g => g.esencial).map(g => g.term).join(', ')}`
+                      : 'No hay implicantes esenciales: la elección se resuelve por búsqueda exacta'}
+                    <br />
+                    {karnaughGroups.filter(g => !g.esencial).length > 0 && (
+                      <>Añadidos para cubrir el resto: {karnaughGroups.filter(g => !g.esencial).map(g => g.term).join(', ')}<br /></>
+                    )}
+                    {primosDescartados.length > 0 && (
+                      <>Descartados por redundantes: {primosDescartados.join(', ')}</>
+                    )}
+                  </>
+                ) : 'No hay grupos que formar'}
+              </div>
+
+              <div className={styles.step}>
+                <strong>Paso 4:</strong> Escribir la expresión {outputMode === 'sop' ? 'SOP' : 'POS'}
                 <br />
                 {simplifiedExpression}
+                {costeExpresion.terminos > 0 && (
+                  <> — {costeExpresion.terminos} {costeExpresion.terminos === 1 ? 'término' : 'términos'}, {costeExpresion.literales} {costeExpresion.literales === 1 ? 'literal' : 'literales'}</>
+                )}
               </div>
             </div>
           )}
@@ -974,8 +869,8 @@ export default function CalculadoraAlgebraBooleanaPage() {
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <div className={styles.tipIcon}>🗺️</div>
-              <h4 className={styles.tipTitle}>Grupos máximos en Karnaugh</h4>
-              <p className={styles.tipDesc}>Siempre busca el grupo más grande posible, aunque ya hayas cubierto esa celda. Grupos más grandes = menos literales = circuito más simple.</p>
+              <h4 className={styles.tipTitle}>Grupos máximos, pero sin redundancia</h4>
+              <p className={styles.tipDesc}>Agranda cada grupo todo lo posible (menos literales = circuito más simple), pero descarta el grupo cuyas celdas ya cubren otros: un término redundante añade puertas sin cambiar la función.</p>
             </div>
 
             <div className={styles.tipCard}>

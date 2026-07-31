@@ -2,17 +2,17 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Lógica Proposicional: Tablas de Verdad, Karnaugh y Formas Normales | meskeIA',
-  description: 'Visualizador interactivo de lógica proposicional. Tablas de verdad para AND/OR/NOT/XOR, evaluador de fórmulas con 3 variables, mapas de Karnaugh SVG y formas normales FNC/FND.',
-  keywords: 'lógica proposicional, tablas de verdad AND OR NOT, mapa de Karnaugh simplificación, FNC FND forma normal, lógica matemática bachillerato preparatoria secundaria, conectores lógicos tautología',
+  title: 'Lógica Proposicional: Tablas de Verdad, Tautologías y Formas Normales | meskeIA',
+  description: 'Visualizador interactivo de lógica proposicional. Tablas de verdad para AND/OR/NOT/XOR, evaluador de fórmulas con 3 variables, clasificador de tautología, contradicción y contingencia, y formas normales FNC/FND.',
+  keywords: 'lógica proposicional, tablas de verdad AND OR NOT, tautología contradicción contingencia, FNC FND forma normal, lógica matemática bachillerato preparatoria secundaria, conectores lógicos implicación equivalencia',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Lógica Proposicional: Tablas de Verdad, Karnaugh y Formas Normales',
-    description: '¿Cómo funcionan los conectores lógicos? Explora AND, OR, NOT, XOR, implicación y equivalencia con tablas de verdad interactivas, mapas de Karnaugh SVG y formas normales FNC/FND.',
+    title: 'Lógica Proposicional: Tablas de Verdad, Tautologías y Formas Normales',
+    description: '¿Cómo funcionan los conectores lógicos? Explora AND, OR, NOT, XOR, implicación y equivalencia con tablas de verdad interactivas, clasificación de fórmulas y formas normales FNC/FND.',
     url: 'https://meskeia.com/visualizador-logica-proposicional/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Lógica Proposicional Interactiva | meskeIA',
-    description: 'Tablas de verdad, mapas de Karnaugh y formas normales FNC/FND en un visualizador interactivo para bachillerato, preparatoria y universidad.',
+    description: 'Tablas de verdad, tautologías y formas normales FNC/FND en un visualizador interactivo para bachillerato, preparatoria y universidad.',
     images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Lógica Proposicional meskeIA' },
@@ -34,16 +34,15 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Visualizador de Lógica Proposicional',
-  description: 'Visualizador interactivo de lógica proposicional: tablas de verdad para los 6 conectores lógicos, evaluador de fórmulas con hasta 3 variables, mapas de Karnaugh SVG interactivos y formas normales FNC/FND con ejemplos clásicos.',
+  description: 'Visualizador interactivo de lógica proposicional: tablas de verdad para los 6 conectores lógicos, evaluador de fórmulas con hasta 3 variables, clasificación en tautología, contradicción o contingencia, y formas normales FNC/FND con ejemplos clásicos.',
   url: 'https://meskeia.com/visualizador-logica-proposicional/',
   features: [
     'Tabla de verdad interactiva para AND, OR, NOT, XOR, implicación y equivalencia',
     'Toggles P/Q/R para ver resultados en tiempo real con colores V/F',
     'Evaluador de fórmulas con tabla de verdad completa de hasta 8 filas',
     'Ejemplos predefinidos: tautología, contradicción y contingencia',
-    'Mapa de Karnaugh SVG de 2 y 3 variables con clic en celdas',
-    'Agrupación automática de 1s y expresión SOP simplificada',
     'Formas Normales Conjuntiva (FNC) y Disyuntiva (FND) para 3 variables',
+    'Construcción de la forma canónica a partir de las filas verdaderas',
   ],
   category: 'EducationalApplication',
 });
@@ -78,10 +77,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Para qué sirve un mapa de Karnaugh?',
+      name: '¿Qué diferencia hay entre la forma canónica y la expresión mínima?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El mapa de Karnaugh es una herramienta gráfica para simplificar expresiones booleanas minimizando el número de términos. Las celdas adyacentes difieren en exactamente un bit (código Gray), por lo que agrupar 1s en grupos de potencia de 2 (1, 2, 4, 8…) permite eliminar variables y obtener la expresión SOP (suma de productos) mínima. Es muy usado en diseño de circuitos lógicos para reducir el número de puertas necesarias.',
+        text: 'La forma canónica (FND o FNC) enumera un término por cada fila de la tabla de verdad: con 4 filas verdaderas salen 4 términos, todos con el mismo número de literales. La expresión mínima agrupa esos términos para eliminar variables y dejar la fórmula más corta que sigue siendo equivalente. Ambas describen la misma función, pero la mínima necesita menos puertas al construir el circuito; se obtiene con mapas de Karnaugh o con el algoritmo de Quine-McCluskey.',
       },
     },
     {

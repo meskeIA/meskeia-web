@@ -3215,6 +3215,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-algebra-booleana': [
     { url: '/simulador-puertas-logicas/', icon: '🔌', name: 'Puertas Lógicas', description: 'Circuitos digitales y álgebra booleana' },
     { url: '/simulador-logica-secuencial/', icon: '⏱️', name: 'Lógica Secuencial', description: 'Biestables y contadores: la lógica que recuerda' },
+    { url: '/visualizador-logica-proposicional/', icon: '🔣', name: 'Lógica Proposicional', description: 'El paso previo: conectores, tablas de verdad y formas normales FND/FNC antes de minimizar' },
     ...informaticaApps.filter(a => a.url !== '/calculadora-algebra-booleana/' && a.url !== '/simulador-puertas-logicas/'),
   ],
 
@@ -4652,6 +4653,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // EJE E — Tecnología y computación (Roadmap v4, 2026-04-30)
   'visualizador-logica-proposicional': [
+    { url: '/calculadora-algebra-booleana/', icon: '🔢', name: 'Álgebra Booleana', description: 'Aquí construyes la forma canónica; allí la minimizas con mapa de Karnaugh hasta la expresión más corta' },
     { url: '/visualizador-circuitos-electronicos/', icon: '⚡', name: 'Circuitos Electrónicos', description: 'Las puertas AND/OR/NOT físicas son la implementación hardware de los conectores lógicos proposicionales' },
     { url: '/visualizador-falacias-logicas/', icon: '🧠', name: 'Falacias Lógicas', description: 'La lógica formal (tablas de verdad) vs la lógica informal (falacias): dos caras del razonamiento correcto' },
     { url: '/visualizador-criptografia/', icon: '🔐', name: 'Criptografía', description: 'AES, RSA y SHA-256 usan álgebra booleana — la operación XOR es el corazón del cifrado simétrico' },
@@ -6790,7 +6792,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'simulador-logica-secuencial': [
     { url: '/simulador-puertas-logicas/', icon: '🔌', name: 'Puertas Lógicas', description: 'La parte combinacional: AND, OR, XOR y sumadores' },
     { url: '/calculadora-algebra-booleana/', icon: '🔢', name: 'Álgebra Booleana', description: 'Simplifica las ecuaciones de excitación del circuito' },
-    { url: '/visualizador-logica-proposicional/', icon: '🔣', name: 'Lógica Proposicional', description: 'Tablas de verdad, Karnaugh y formas normales' },
+    { url: '/visualizador-logica-proposicional/', icon: '🔣', name: 'Lógica Proposicional', description: 'Tablas de verdad, tautologías y formas normales' },
     { url: '/calculadora-sistemas-numericos/', icon: '🔢', name: 'Sistemas Numéricos', description: 'Binario y hexadecimal para leer la cuenta del contador' },
   ],
   'nombrador-compuestos-organicos': [

@@ -204,6 +204,12 @@
   transition: all 0.2s ease;
 }
 
+.outputCell:focus-visible,
+.karnaughCell:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
 .outputCell:hover {
   background: var(--hover);
 }
@@ -385,6 +391,34 @@
   color: var(--text-muted);
 }
 
+/* Distintivo de implicante primo esencial */
+.groupEssential {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: var(--radius);
+  background: rgba(46, 134, 171, 0.15);
+  color: var(--primary);
+  border: 1px solid rgba(46, 134, 171, 0.35);
+}
+
+.groupsNote {
+  margin-top: var(--spacing-md);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.groupsNote code {
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 0.8rem;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: rgba(46, 134, 171, 0.1);
+}
+
 /* Result Section */
 .resultSection {
   background: var(--bg-card);
@@ -417,6 +451,14 @@
   flex-wrap: wrap;
   font-size: 0.9rem;
   opacity: 0.9;
+}
+
+.resultNote {
+  margin-top: var(--spacing-md);
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
 }
 
 /* Steps Section */

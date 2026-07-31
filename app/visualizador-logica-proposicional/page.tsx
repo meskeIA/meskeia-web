@@ -17,7 +17,7 @@ import { getRelatedApps } from '@/data/app-relations';
 // Tipos
 // ─────────────────────────────────────────────
 
-type TabActiva = 'conectores' | 'evaluador' | 'karnaugh' | 'formas';
+type TabActiva = 'conectores' | 'evaluador' | 'formas';
 type Conector = 'AND' | 'OR' | 'XOR' | 'IMPL' | 'EQUIV';
 
 interface FilaTruth {
@@ -94,15 +94,6 @@ for (let i = 0; i < 8; i++) {
     r: !!(i & 1),
   });
 }
-
-// Karnaugh 2x4 para 3 variables (orden Gray: 00,01,11,10 para QR, P en filas)
-// Filas: P=0, P=1 | Columnas: QR=00,01,11,10
-const KARNAUGH_ORDEN: number[][] = [
-  [0, 1, 3, 2],   // P=0
-  [4, 5, 7, 6],   // P=1
-];
-const KARNAUGH_HEADERS_COL = ['QR=00', 'QR=01', 'QR=11', 'QR=10'];
-const KARNAUGH_HEADERS_ROW = ['P=0', 'P=1'];
 
 // ─────────────────────────────────────────────
 // Subcomponentes
@@ -356,139 +347,6 @@ function TabEvaluador({
 // Helper necesario para TabEvaluador (evita captura de closure con TODAS_COMBINACIONES)
 function TODAS_KOMBINACIONES_PQR(): { p: boolean; q: boolean; r: boolean }[] {
   return TODAS_COMBINACIONES;
-}
-
-// ─────────────────────────────────────────────
-// Tab 3: Mapa de Karnaugh
-// ─────────────────────────────────────────────
-
-function TabKarnaugh() {
-  // 8 minterms para 3 variables (índices 0-7)
-  const [celdas, setCeldas] = useState<boolean[]>(Array(8).fill(false));
-
-  const toggleCelda = useCallback((minterm: number) => {
-    setCeldas(prev => {
-      const next = [...prev];
-      next[minterm] = !next[minterm];
-      return next;
-    });
-  }, []);
-
-  // Calcular expresión SOP: OR de minterms activos
-  const mintermsActivos = celdas
-    .map((v, i) => (v ? i : -1))
-    .filter(i => i >= 0);
-
-  function mintermASOP(minterm: number): string {
-    const p = !!(minterm & 4) ? 'P' : "P'";
-    const q = !!(minterm & 2) ? 'Q' : "Q'";
-    const r = !!(minterm & 1) ? 'R' : "R'";
-    return `${p}${q}${r}`;
-  }
-
-  const expresionSOP = mintermsActivos.length === 0
-    ? '0 (función siempre falsa)'
-    : mintermsActivos.length === 8
-    ? '1 (función siempre verdadera — tautología)'
-    : mintermsActivos.map(mintermASOP).join(' + ');
-
-  // Detectar grupos simples (pares adyacentes en el mapa de Karnaugh)
-  const gruposDetectados: string[] = [];
-  // Verificar pares de columnas adyacentes (en orden Gray)
-  const ordenGray = [[0,1,3,2],[4,5,7,6]];
-  for (let fila = 0; fila < 2; fila++) {
-    for (let col = 0; col < 4; col++) {
-      const colSig = (col + 1) % 4;
-      const m1 = ordenGray[fila][col];
-      const m2 = ordenGray[fila][colSig];
-      if (celdas[m1] && celdas[m2]) {
-        gruposDetectados.push(`Grupo par: m${m1}+m${m2}`);
-      }
-    }
-  }
-
-  return (
-    <div className={styles.tabContent}>
-      <div className={styles.sectionCard}>
-        <h3 className={styles.sectionTitle}>Mapa de Karnaugh — 3 variables (P, Q, R)</h3>
-        <p className={styles.notaTexto}>Haz clic en las celdas para marcar minterms (1). El orden de columnas sigue el código Gray.</p>
-        <div className={styles.karnaughWrapper}>
-          <table className={styles.karnaughTable}>
-            <thead>
-              <tr>
-                <th className={styles.karnaughCorner}>P＼QR</th>
-                {KARNAUGH_HEADERS_COL.map(h => (
-                  <th key={h} className={styles.karnaughHeader}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {KARNAUGH_ORDEN.map((fila, rowIdx) => (
-                <tr key={rowIdx}>
-                  <td className={styles.karnaughRowHeader}>{KARNAUGH_HEADERS_ROW[rowIdx]}</td>
-                  {fila.map((minterm) => (
-                    <td
-                      key={minterm}
-                      className={`${styles.karnaughCelda} ${celdas[minterm] ? styles.karnaughCeldaActiva : ''}`}
-                      onClick={() => toggleCelda(minterm)}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={e => e.key === 'Enter' && toggleCelda(minterm)}
-                      aria-pressed={celdas[minterm]}
-                      aria-label={`Minterm ${minterm}: ${celdas[minterm] ? '1' : '0'}`}
-                    >
-                      <span className={styles.karnaughMinterm}>{minterm}</span>
-                      <span className={styles.karnaughVal}>{celdas[minterm] ? '1' : '0'}</span>
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <button
-          type="button"
-          className={styles.btnSecundario}
-          onClick={() => setCeldas(Array(8).fill(false))}
-        >
-          Limpiar mapa
-        </button>
-      </div>
-
-      <div className={styles.sectionCard}>
-        <h3 className={styles.sectionTitle}>Expresión SOP (Suma de Productos)</h3>
-        <div className={styles.formulaVis}>
-          <span aria-live="polite">{expresionSOP}</span>
-        </div>
-        {mintermsActivos.length > 0 && mintermsActivos.length < 8 && (
-          <ul className={styles.mintermsList}>
-            {mintermsActivos.map(m => (
-              <li key={m}>m{m} = {mintermASOP(m)}</li>
-            ))}
-          </ul>
-        )}
-        {gruposDetectados.length > 0 && (
-          <div className={styles.gruposInfo}>
-            <strong>Grupos adyacentes detectados:</strong>
-            <ul>
-              {gruposDetectados.map((g, i) => <li key={i}>{g}</li>)}
-            </ul>
-          </div>
-        )}
-      </div>
-
-      <div className={styles.sectionCard}>
-        <h3 className={styles.sectionTitle}>¿Por qué se agrupan potencias de 2?</h3>
-        <p className={styles.parrafoExpl}>
-          En el mapa de Karnaugh, los grupos de 1, 2, 4 u 8 celdas adyacentes corresponden
-          a que una o más variables <strong>se cancelan</strong> en el álgebra booleana.
-          Un grupo de 2 elimina una variable, un grupo de 4 elimina dos, y un grupo de 8
-          elimina las tres (tautología). Agrupar siempre potencias de 2 garantiza que
-          la simplificación sea válida y la expresión resultante sea mínima.
-        </p>
-      </div>
-    </div>
-  );
 }
 
 // ─────────────────────────────────────────────
@@ -782,6 +640,10 @@ const contenidoEducativo = (
           Organizando los minterms en un cuadrícula con código Gray (donde celdas adyacentes difieren en un solo bit),
           los grupos de 1, 2, 4 u 8 celdas contiguas permiten cancelar variables y obtener la expresión mínima.
           Es especialmente útil en diseño de circuitos para reducir el número de puertas lógicas necesarias.
+          Puedes construirlo paso a paso en la{' '}
+          <a href="/calculadora-algebra-booleana/#from=visualizador-logica-proposicional">
+            Calculadora de Álgebra Booleana
+          </a>.
         </p>
         <p className={styles.faqTip}>Siempre agrupa potencias de 2: 1, 2, 4 u 8 celdas.</p>
       </li>
@@ -870,8 +732,8 @@ const contenidoEducativo = (
       </div>
       <div className={styles.tipCard}>
         <span className={styles.tipIcon} aria-hidden="true">🗺️</span>
-        <strong>En Karnaugh, agrupa siempre el mayor grupo posible</strong>
-        <p>Un grupo de 4 celdas elimina 2 variables; uno de 8 las elimina todas. Empieza por los grupos más grandes aunque se solapen; los solapamientos son válidos y ayudan a simplificar.</p>
+        <strong>En Karnaugh, grupos grandes pero sin sobras</strong>
+        <p>Un grupo de 4 celdas elimina 2 variables; uno de 8 las elimina todas. Empieza por los más grandes y no temas los solapamientos, pero al final descarta todo grupo cuyas celdas ya cubran los demás: sobra en la expresión.</p>
       </div>
       <div className={styles.tipCard}>
         <span className={styles.tipIcon} aria-hidden="true">🔄</span>
@@ -917,7 +779,6 @@ export default function VisualizadorLogicaProposicional() {
   const tabs: { id: TabActiva; label: string }[] = [
     { id: 'conectores', label: 'Conectores' },
     { id: 'evaluador', label: 'Evaluador' },
-    { id: 'karnaugh', label: 'Karnaugh' },
     { id: 'formas', label: 'Formas Normales' },
   ];
 
@@ -929,7 +790,7 @@ export default function VisualizadorLogicaProposicional() {
       <header className={styles.hero}>
         <h1 className={styles.heroTitle}>Lógica Proposicional</h1>
         <p className={styles.heroSubtitle}>
-          Tablas de verdad, evaluador de fórmulas, mapas de Karnaugh y formas normales FNC/FND
+          Tablas de verdad, evaluador de fórmulas, tautologías y formas normales FNC/FND
         </p>
       </header>
 
@@ -972,13 +833,30 @@ export default function VisualizadorLogicaProposicional() {
             setValorR={toggleR}
           />
         )}
-        {tabActiva === 'karnaugh' && <TabKarnaugh />}
         {tabActiva === 'formas' && <TabFormasNormales />}
+
+        {/* Remisión a la herramienta que sí minimiza: aquí se construyen las formas
+            normales; la simplificación por Karnaugh vive en su propia calculadora */}
+        <aside className={styles.remisionCard}>
+          <h2 className={styles.remisionTitulo}>
+            <span aria-hidden="true">🗺️</span> ¿Buscas simplificar con un mapa de Karnaugh?
+          </h2>
+          <p className={styles.remisionTexto}>
+            Aquí construyes la <strong>forma normal canónica</strong> (FND/FNC), que enumera
+            todos los mintérminos sin reducirlos. Para obtener la <strong>expresión mínima</strong>
+            {' '}—agrupar celdas, ver los implicantes primos esenciales y quedarte con la
+            expresión más corta— usa la calculadora dedicada: admite 2, 3 y 4 variables,
+            don&apos;t cares y salida en SOP o POS.
+          </p>
+          <a href="/calculadora-algebra-booleana/#from=visualizador-logica-proposicional" className={styles.remisionEnlace}>
+            Ir a la Calculadora de Álgebra Booleana →
+          </a>
+        </aside>
 
         {/* Sección educativa */}
         <EducationalSection
           title="Fundamentos de la lógica proposicional"
-          subtitle="Conectores lógicos, tablas de verdad, mapas de Karnaugh y formas normales"
+          subtitle="Conectores lógicos, tablas de verdad, tautologías y formas normales"
         >
           {contenidoEducativo}
         </EducationalSection>
