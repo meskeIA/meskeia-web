@@ -540,6 +540,13 @@ export const STEMUM_APPS: StemumApp[] = [
     desc: 'El motor térmico ideal en un diagrama presión-volumen: dos isotermas y dos adiabáticas, con la eficiencia η = 1 − Tf/Tc y la 2.ª ley de la termodinámica.',
     disciplina: 'fisica',
   },
+  {
+    slug: 'visualizador-leyes-newton',
+    icon: '🍎',
+    titulo: 'Las tres leyes de Newton',
+    desc: 'Inercia, F = m·a y acción-reacción con sliders de masa y fuerza: los vectores se animan y muestran la aceleración que resulta de cada combinación.',
+    disciplina: 'fisica',
+  },
   // Matemáticas
   {
     slug: 'visualizador-calculo-visual',
@@ -919,6 +926,20 @@ export const STEMUM_APPS: StemumApp[] = [
     icon: '⚡',
     titulo: 'Potencial de acción',
     desc: 'Ajusta intensidad, umbral y duración del estímulo y observa en vivo en el canvas si la neurona dispara y a qué frecuencia (ley del todo o nada).',
+    disciplina: 'biologia',
+  },
+  {
+    slug: 'simulador-genetica',
+    icon: '🧬',
+    titulo: 'Genética mendeliana',
+    desc: 'Elige genotipos de los progenitores y obtén el cuadro de Punnett con las proporciones: cruces mono y dihíbridos, herencia ligada al sexo, árbol genealógico y poblaciones con chi-cuadrado.',
+    disciplina: 'biologia',
+  },
+  {
+    slug: 'visualizador-enzimas-cuerpo-humano',
+    icon: '🧫',
+    titulo: 'Enzimas del cuerpo humano',
+    desc: 'Trece enzimas digestivas, metabólicas y hepáticas con el modelo llave-cerradura, y sliders de pH y temperatura para ver dónde trabajan mejor y cuándo se desnaturalizan.',
     disciplina: 'biologia',
   },
   // Tierra y Espacio
