@@ -1952,14 +1952,8 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-cerebro-emociones/', icon: '💭', name: 'Cerebro y Emociones', description: 'Cómo la amígdala y la emoción secuestran al Sistema 2' },
     { url: '/visualizador-cerebro/', icon: '🧩', name: 'Memoria', description: 'Cómo la memoria de trabajo limita la capacidad del Sistema 2' },
   ],
-  'visualizador-algoritmos-ordenacion': [
-    { url: '/visualizador-base-datos-relacional/', icon: '🗄️', name: 'Base de Datos Relacional', description: 'Los algoritmos de ordenación son clave en la construcción de índices B-Tree' },
-    { url: '/visualizador-criptografia/', icon: '🔒', name: 'Criptografía', description: 'Los algoritmos de búsqueda binaria son la base de las estructuras criptográficas' },
-    { url: '/visualizador-ia-redes-neuronales/', icon: '🤖', name: 'IA y Redes Neuronales', description: 'El backpropagation también depende de algoritmos eficientes de búsqueda y ordenación' },
-    { url: '/visualizador-llm-funcionamiento/', icon: '💬', name: 'LLMs', description: 'Los transformers usan atención que requiere operaciones de ordenación eficiente' },
-  ],
   'visualizador-base-datos-relacional': [
-    { url: '/visualizador-algoritmos-ordenacion/', icon: '📊', name: 'Algoritmos de Ordenación', description: 'Los índices B-Tree se construyen con algoritmos de ordenación eficientes' },
+    { url: '/visualizador-algoritmos/', icon: '📊', name: 'Algoritmos de Ordenación', description: 'Los índices B-Tree se construyen con algoritmos de ordenación eficientes' },
     { url: '/visualizador-criptografia/', icon: '🔒', name: 'Criptografía', description: 'Las BD usan hashing y cifrado para proteger contraseñas y datos sensibles' },
     { url: '/visualizador-llm-funcionamiento/', icon: '💬', name: 'LLMs', description: 'Los grandes modelos de lenguaje almacenan embeddings en bases de datos vectoriales' },
     { url: '/visualizador-blockchain/', icon: '⛓️', name: 'Blockchain', description: 'Una blockchain es una BD distribuida con propiedades de inmutabilidad' },
@@ -3312,7 +3306,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-concurrencia/', icon: '🔀', name: 'Concurrencia', description: 'Semáforos, carreras y deadlock' },
     { url: '/simulador-reemplazo-paginas/', icon: '🧩', name: 'Reemplazo de Páginas', description: 'FIFO, LRU, Optimal, Clock, LFU' },
     { url: '/visualizador-sistemas-operativos/', icon: '💻', name: 'Sistemas Operativos', description: 'Procesos, hilos, memoria y E/S' },
-    { url: '/simulador-ordenacion/', icon: '📊', name: 'Algoritmos Ordenación', description: '7 algoritmos paso a paso' },
+    { url: '/visualizador-algoritmos/', icon: '📊', name: 'Algoritmos de Ordenación', description: '7 algoritmos paso a paso' },
   ],
   'simulador-concurrencia': [
     { url: '/simulador-planificador-procesos/', icon: '⏱️', name: 'Planificador de Procesos', description: 'FCFS, SJF, Round Robin, Priority' },
@@ -3324,7 +3318,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-planificador-procesos/', icon: '⏱️', name: 'Planificador de Procesos', description: 'FCFS, SJF, Round Robin, Priority' },
     { url: '/visualizador-sistemas-operativos/', icon: '💻', name: 'Sistemas Operativos', description: 'Procesos, hilos, memoria y E/S' },
     { url: '/visualizador-estructuras-datos/', icon: '🗂️', name: 'Estructuras de Datos', description: 'Pilas, colas, árboles y hash' },
-    { url: '/simulador-ordenacion/', icon: '📊', name: 'Algoritmos Ordenación', description: '7 algoritmos paso a paso' },
+    { url: '/visualizador-algoritmos/', icon: '📊', name: 'Algoritmos de Ordenación', description: '7 algoritmos paso a paso' },
   ],
   'simulador-sql-join': [
     { url: '/playground-sql/', icon: '🗄️', name: 'Playground SQL', description: 'Editor SQL interactivo con ejercicios' },
@@ -3332,18 +3326,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-estructuras-datos/', icon: '🗂️', name: 'Estructuras de Datos', description: 'Pilas, colas, árboles y hash' },
     { url: '/glosario-programacion/', icon: '📖', name: 'Glosario Programación', description: 'Términos clave A-Z' },
   ],
-  'simulador-ordenacion': [
-    { url: '/visualizador-algoritmos-ordenacion/', icon: '📈', name: 'Visualizador Algoritmos', description: 'Algoritmos clásicos animados' },
-    { url: '/simulador-grafos/', icon: '🕸️', name: 'Algoritmos de Grafos', description: 'BFS, DFS, Dijkstra, A*' },
-    { url: '/simulador-arboles-bst-avl/', icon: '🌳', name: 'Árboles BST y AVL', description: 'Inserción, borrado y rotaciones' },
-    { url: '/glosario-programacion/', icon: '📖', name: 'Glosario Programación', description: 'Términos clave A-Z' },
-  ],
 
   // SIMULADORES INFORMÁTICA FP/UNIVERSIDAD — Tanda 2 (2026-05-07)
   'simulador-grafos': [
     { url: '/simulador-pathfinding/', icon: '🎮', name: 'Pathfinding A*', description: 'Búsqueda de caminos en videojuegos' },
     { url: '/simulador-arboles-bst-avl/', icon: '🌳', name: 'Árboles BST y AVL', description: 'Inserción, borrado y rotaciones' },
-    { url: '/simulador-ordenacion/', icon: '📊', name: 'Algoritmos Ordenación', description: '7 algoritmos paso a paso' },
+    { url: '/visualizador-algoritmos/', icon: '📊', name: 'Algoritmos de Ordenación', description: '7 algoritmos paso a paso' },
     { url: '/visualizador-estructuras-datos/', icon: '🗂️', name: 'Estructuras de Datos', description: 'Pilas, colas, árboles y hash' },
   ],
   'simulador-pathfinding': [
@@ -3414,7 +3402,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-arboles-b/', icon: '🌲', name: 'Árbol B (B-Tree)', description: 'Índices de bases de datos' },
     { url: '/simulador-grafos/', icon: '🕸️', name: 'Algoritmos de Grafos', description: 'BFS, DFS, Dijkstra, A*' },
     { url: '/visualizador-estructuras-datos/', icon: '🗂️', name: 'Estructuras de Datos', description: 'Pilas, colas, árboles y hash' },
-    { url: '/simulador-ordenacion/', icon: '📊', name: 'Algoritmos Ordenación', description: '7 algoritmos paso a paso' },
+    { url: '/visualizador-algoritmos/', icon: '📊', name: 'Algoritmos de Ordenación', description: '7 algoritmos paso a paso' },
   ],
   'simulador-arboles-b': [
     { url: '/simulador-arboles-bst-avl/', icon: '🌳', name: 'Árboles BST y AVL', description: 'Árboles binarios y rotaciones' },
@@ -3426,12 +3414,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-programacion-dinamica/', icon: '📐', name: 'Programación Dinámica', description: 'De la recursión a la tabla DP' },
     { url: '/simulador-arboles-bst-avl/', icon: '🌳', name: 'Árboles BST y AVL', description: 'Estructuras recursivas' },
     { url: '/simulador-grafos/', icon: '🕸️', name: 'Algoritmos de Grafos', description: 'DFS recursivo y otros' },
-    { url: '/simulador-ordenacion/', icon: '📊', name: 'Algoritmos Ordenación', description: 'Merge Sort y Quick Sort recursivos' },
+    { url: '/visualizador-algoritmos/', icon: '📊', name: 'Algoritmos de Ordenación', description: 'Merge Sort y Quick Sort recursivos' },
   ],
   'simulador-programacion-dinamica': [
     { url: '/simulador-recursion/', icon: '🔁', name: 'Recursión y Pila', description: 'El punto de partida de la DP' },
     { url: '/simulador-backtracking/', icon: '♛', name: 'Backtracking', description: 'La otra cara de la recursión' },
-    { url: '/simulador-ordenacion/', icon: '📊', name: 'Algoritmos Ordenación', description: 'Divide y vencerás' },
+    { url: '/visualizador-algoritmos/', icon: '📊', name: 'Algoritmos de Ordenación', description: 'Divide y vencerás' },
     { url: '/quiz-complejidad-algoritmos/', icon: '⏱️', name: 'Quiz Complejidad', description: 'Big O y coste temporal' },
   ],
   'simulador-backtracking': [
@@ -4383,7 +4371,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-caos-mariposa/', icon: '🦋', name: 'Caos y el Atractor de Lorenz', description: 'Los sistemas caóticos se analizan en el dominio de frecuencias con Fourier' },
   ],
   'visualizador-teoria-grafos': [
-    { url: '/visualizador-algoritmos-ordenacion/', icon: '⚡', name: 'Algoritmos de Ordenación', description: 'Dijkstra y los algoritmos de ordenación comparten el lenguaje de la complejidad Big O' },
+    { url: '/visualizador-algoritmos/', icon: '⚡', name: 'Algoritmos de Ordenación', description: 'Dijkstra y los algoritmos de ordenación comparten el lenguaje de la complejidad Big O' },
     { url: '/visualizador-base-datos-relacional/', icon: '🗄️', name: 'Bases de Datos', description: 'Los índices B-Tree y el query optimizer usan grafos internamente para el plan de ejecución' },
     { url: '/visualizador-teoria-juegos/', icon: '🎲', name: 'Teoría de Juegos', description: 'Las redes sociales como grafos y el comportamiento estratégico entre nodos conectados' },
     { url: '/visualizador-calculo-visual/', icon: '∫', name: 'Cálculo Visual', description: 'El flujo máximo y algunos algoritmos de grafos se formulan como problemas de optimización' },
@@ -4657,11 +4645,11 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-circuitos-electronicos/', icon: '⚡', name: 'Circuitos Electrónicos', description: 'Las puertas AND/OR/NOT físicas son la implementación hardware de los conectores lógicos proposicionales' },
     { url: '/visualizador-falacias-logicas/', icon: '🧠', name: 'Falacias Lógicas', description: 'La lógica formal (tablas de verdad) vs la lógica informal (falacias): dos caras del razonamiento correcto' },
     { url: '/visualizador-criptografia/', icon: '🔐', name: 'Criptografía', description: 'AES, RSA y SHA-256 usan álgebra booleana — la operación XOR es el corazón del cifrado simétrico' },
-    { url: '/visualizador-algoritmos-ordenacion/', icon: '⚙️', name: 'Algoritmos de Ordenación', description: 'El problema SAT es NP-completo — el nexo entre lógica proposicional y la teoría de la complejidad computacional' },
+    { url: '/visualizador-algoritmos/', icon: '⚙️', name: 'Algoritmos de Ordenación', description: 'El problema SAT es NP-completo — el nexo entre lógica proposicional y la teoría de la complejidad computacional' },
   ],
   'visualizador-teoria-informacion': [
     { url: '/visualizador-criptografia/', icon: '🔐', name: 'Criptografía', description: 'La entropía de Shannon mide la aleatoriedad: un buen cifrado maximiza la entropía de la salida' },
-    { url: '/visualizador-algoritmos-ordenacion/', icon: '⚙️', name: 'Algoritmos de Ordenación', description: 'La complejidad de los algoritmos de compresión (Huffman es O(n log n)) conecta con el análisis Big O' },
+    { url: '/visualizador-algoritmos/', icon: '⚙️', name: 'Algoritmos de Ordenación', description: 'La complejidad de los algoritmos de compresión (Huffman es O(n log n)) conecta con el análisis Big O' },
     { url: '/visualizador-circuitos-electronicos/', icon: '⚡', name: 'Circuitos Electrónicos', description: 'Las señales digitales son bits — y la capacidad del canal determina cuántos bits por segundo puede transmitir el hardware' },
     { url: '/visualizador-redes-computadoras/', icon: '🌐', name: 'Redes de Computadoras', description: 'Shannon-Hartley calcula el límite teórico de velocidad de cualquier red: WiFi, fibra o 5G' },
   ],

@@ -167,6 +167,14 @@ const nextConfig: NextConfig = {
       { source: '/calculadora-percentiles', has, destination: '/orientador-percentiles/', permanent: true },
       { source: '/calculadora-imc', has, destination: '/orientador-imc/', permanent: true },
       { source: '/test-habitos', has, destination: '/test-habitos-saludables/', permanent: true },
+
+      // Fusión de las tres apps de algoritmos de ordenación (31/07/2026). Las tres
+      // hacían lo mismo con títulos casi idénticos y se canibalizaban entre sí: 1
+      // impresión en Google en 90 días ENTRE LAS TRES. visualizador-algoritmos
+      // absorbió lo que tenían de propio (Heap y Counting Sort, modo comparativa,
+      // presets y array propio), así que estas dos ya no aportan nada que no esté allí.
+      { source: '/simulador-ordenacion', has, destination: '/visualizador-algoritmos/', permanent: true },
+      { source: '/visualizador-algoritmos-ordenacion', has, destination: '/visualizador-algoritmos/', permanent: true },
     ];
   },
 

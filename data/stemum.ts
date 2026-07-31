@@ -74,13 +74,6 @@ export const STEMUM_APPS: StemumApp[] = [
     disciplina: 'computacion',
   },
   {
-    slug: 'visualizador-algoritmos-ordenacion',
-    icon: '🔢',
-    titulo: 'Algoritmos de ordenación',
-    desc: 'Burbuja, inserción, quicksort y mergesort animados paso a paso, con su complejidad Big O y cuándo usar cada uno.',
-    disciplina: 'computacion',
-  },
-  {
     slug: 'simulador-automatas-finitos',
     icon: '🔁',
     titulo: 'Autómatas finitos',
@@ -281,13 +274,6 @@ export const STEMUM_APPS: StemumApp[] = [
     icon: '⚛️',
     titulo: 'Computación cuántica',
     desc: 'Esfera de Bloch con slider de superposición y medición que colapsa el qubit, paralelismo 2ⁿ, puertas cuánticas y línea temporal de la amenaza a RSA.',
-    disciplina: 'computacion',
-  },
-  {
-    slug: 'simulador-ordenacion',
-    icon: '🔀',
-    titulo: 'Ordenación a medida',
-    desc: 'Introduce tu propio array y compara hasta 4 de los 7 algoritmos a la vez, con presets (inverso, casi ordenado, duplicados), slider de velocidad y conteo de operaciones.',
     disciplina: 'computacion',
   },
   {

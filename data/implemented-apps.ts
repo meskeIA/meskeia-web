@@ -429,7 +429,6 @@ export const implementedAppsUrls = [
   "/simulador-planificador-procesos/", // FCFS/SJF/SRTF/Round Robin/Priority con diagrama de Gantt y métricas (espera, turnaround, throughput)
   "/simulador-reemplazo-paginas/",  // FIFO/LRU/Optimal/Clock/LFU con tabla matricial, modo comparativa y detección anomalía Belady
   "/simulador-sql-join/",           // INNER/LEFT/RIGHT/FULL OUTER/CROSS con tablas editables, diagrama Venn animado y SQL generado
-  "/simulador-ordenacion/",         // 7 algoritmos paso a paso (Bubble/Selection/Insertion/Merge/Quick/Heap/Counting) con array personalizado
 
   // Tanda 2 simuladores Informática FP/Universidad (2026-05-07)
   "/simulador-grafos/",             // Editor visual de grafos + BFS/DFS/Dijkstra/A* con cola/pila/heap viva y 4 presets
@@ -854,7 +853,6 @@ export const implementedAppsUrls = [
   "/visualizador-burbuja-especulativa/", // 5 fases Minsky, 5 casos históricos, 6 sesgos, checklist alerta
   "/visualizador-fondo-inversion/",      // NAV, activa vs indexada, SPIVA, slider comisiones 30 años, diversificación
   "/visualizador-toma-decisiones/",      // Sistema 1/2 Kahneman, fatiga decisional, 4 heurísticos, nudges y arquitectura elección
-  "/visualizador-algoritmos-ordenacion/", // Burbuja/Inserción/Quicksort/Mergesort animados, Big O, guía de cuándo usar
   "/visualizador-base-datos-relacional/", // Tablas FK/PK, 4 tipos JOIN, índices B-Tree, ACID, SQL vs NoSQL
   "/visualizador-piramide-poblacion/",    // Pirámide España 1950→2100 animada, tasa dependencia, edad mediana, INE/EUROSTAT
   "/visualizador-desinformacion/",        // Ciclo bulo 4 etapas, 6 sesgos cognitivos, 5 pasos verificación, DSA 2023
