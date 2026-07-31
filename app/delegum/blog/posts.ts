@@ -37,6 +37,24 @@ export interface Post {
 
 export const POSTS: Post[] = [
   {
+    slug: 'medidas-laborales-incendios-forestales-2026',
+    titulo: 'Nuevas medidas laborales y de Seguridad Social por los incendios forestales',
+    fecha: '2026-08-01',
+    resumen:
+      'El Real Decreto-ley 20/2026 crea una prestación extraordinaria para quienes no pueden trabajar por los incendios, abre el cese de actividad a los autónomos afectados y exonera de cuotas a las empresas con ERTE. Qué cubre cada medida y desde cuándo se aplica.',
+    cuerpo: [
+      'El Boletín Oficial del Estado publicó el 30 de julio de 2026 el Real Decreto-ley 20/2026, de 29 de julio, con medidas urgentes de protección laboral y social frente a los incendios forestales. Entró en vigor el 31 de julio, pero sus efectos se retrotraen al 22 de julio (disposición transitoria única). El ámbito no es una lista cerrada de municipios: el artículo 1.2 incluye «todos los municipios ubicados en las zonas afectadas por los incendios», y son las autoridades competentes las que determinan cuáles lo están en función de las medidas de protección civil adoptadas —evacuaciones, restricciones de acceso y similares—.',
+      'La medida principal es una prestación extraordinaria para las personas asalariadas cuyo contrato queda en suspenso porque no pueden acceder a su domicilio, deben ocuparse de recuperarlo o tienen que atender deberes de cuidado familiar derivados de la emergencia. Consiste en el 70% de la base reguladora de los últimos 180 días cotizados, con los topes máximos y mínimos del artículo 270.3 de la Ley General de la Seguridad Social, y dura como máximo cuatro meses (artículo 3.11). No exige periodo mínimo de cotización (artículo 3.6), pero sí que la persona lo comunique a la empresa de forma expresa y con documentación que lo acredite (artículo 3.1).',
+      'Los trabajadores por cuenta propia tienen su vía en el artículo 6: pueden solicitar la prestación por cese de actividad —total o parcial, definitivo o temporal— sin acreditar la fuerza mayor que se exige en el régimen ordinario, hasta un máximo de cuatro meses. Ese periodo no consume el máximo ordinario, de modo que, agotado, se puede acceder después a la prestación común si se reúnen los requisitos.',
+      'Para las empresas, el artículo 7 establece la exención del 100% de la aportación empresarial a la Seguridad Social durante los meses de agosto a noviembre de 2026, aplicable a las que tengan domicilio en municipios afectados, cuenten con un expediente de regulación temporal de empleo autorizado y solo respecto de la jornada suspendida o reducida. La norma incorpora además un permiso ampliado por fallecimiento relacionado con los incendios, que se extiende desde el hecho causante hasta los cinco días hábiles siguientes al sepelio (artículo 4), y declara nula cualquier medida desfavorable que se adopte contra quien ejerza estos derechos (artículo 5).',
+      'Se completa con medidas de acompañamiento: la suspensión de plazos procesales entre el 27 y el 31 de julio en los juzgados de las zonas afectadas, y asesoramiento notarial y notas de localización de patrimonio gratuitos para quien haya perdido su documentación. Como el alcance territorial depende de la declaración que hagan las autoridades, el primer paso antes de solicitar nada es comprobar si el municipio está incluido. Si buscas una visión general de qué prestaciones existen según tu situación y a qué organismo se piden, el orientador enlazado abajo las recorre una por una.',
+    ],
+    fuente: 'BOE — Real Decreto-ley 20/2026, de 29 de julio (BOE núm. 185, de 30 de julio de 2026)',
+    fuenteUrl: 'https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-16543',
+    visualizadorUrl: 'https://meskeia.com/orientador-ayudas-personas-familias/',
+    visualizadorTitulo: 'Orientador de Ayudas y Prestaciones',
+  },
+  {
     slug: 'interes-demora-comercial-segundo-semestre-2026',
     titulo: 'El interés de demora comercial sube al 10,40% en el segundo semestre de 2026',
     fecha: '2026-07-15',
