@@ -147,6 +147,15 @@ function convertirTemperatura(valor: number, origen: string, destino: string): n
   }
 }
 
+/** Número en formato español, para las fórmulas que se muestran al usuario. */
+function fmtEs(n: number): string {
+  if (n === 0) return '0';
+  if (Math.abs(n) >= 1e-4 && Math.abs(n) < 1e12) {
+    return n.toLocaleString('es-ES', { maximumSignificantDigits: 12 });
+  }
+  return n.toExponential(6).replace('.', ',');
+}
+
 // ─── Función principal ─────────────────────────────────────────────────────────
 
 export function convertirUnidades(p: ParametrosConversorUnidades): ResultadoConversorUnidades {
@@ -159,7 +168,7 @@ export function convertirUnidades(p: ParametrosConversorUnidades): ResultadoConv
 
   if (p.categoria === 'temperatura') {
     const valorDestino = convertirTemperatura(p.valor, p.unidadOrigen, p.unidadDestino);
-    const formula = `${p.valor} ${p.unidadOrigen} → ${redP(valorDestino)} ${p.unidadDestino}`;
+    const formula = `${fmtEs(p.valor)} ${p.unidadOrigen} → ${fmtEs(redP(valorDestino))} ${p.unidadDestino}`;
     return {
       valorOrigen: p.valor,
       unidadOrigen: p.unidadOrigen,
@@ -183,7 +192,7 @@ export function convertirUnidades(p: ParametrosConversorUnidades): ResultadoConv
   const factorConversion = factorOrigen / factorDestino;
   const valorDestino = redP(p.valor * factorConversion);
 
-  const formula = `${p.valor} ${p.unidadOrigen} × ${factorConversion} = ${valorDestino} ${p.unidadDestino}`;
+  const formula = `${fmtEs(p.valor)} ${p.unidadOrigen} × ${fmtEs(factorConversion)} = ${fmtEs(valorDestino)} ${p.unidadDestino}`;
 
   return {
     valorOrigen: p.valor,
