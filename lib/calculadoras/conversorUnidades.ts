@@ -195,3 +195,13 @@ export function convertirUnidades(p: ParametrosConversorUnidades): ResultadoConv
     formula,
   };
 }
+
+/**
+ * Devuelve las unidades disponibles de una categoría, en el orden en que
+ * están declaradas en su tabla. Usada por la UI interactiva del MCP para
+ * pintar la tabla de equivalencias sin llamar al servidor unidad por unidad.
+ */
+export function unidadesDeCategoria(categoria: CategoriaUnidad): string[] {
+  if (categoria === 'temperatura') return ['C', 'F', 'K', 'R'];
+  return Object.keys(TABLAS[categoria] ?? {});
+}

@@ -5,7 +5,7 @@
   "scripts": {
     "predev": "npx kill-port 3050 || exit 0",
     "dev": "next dev -p 3050",
-    "build": "node scripts/check-verticales.mjs && node scripts/check-enlaces-internos.mjs && node scripts/generate-app-dates.mjs && node scripts/generate-llm-index.js && node scripts/generate-delegum-es.mjs && next build --turbopack",
+    "build": "node scripts/check-verticales.mjs && node scripts/check-enlaces-internos.mjs && node scripts/generate-app-dates.mjs && node scripts/generate-llm-index.js && node scripts/generate-delegum-es.mjs && node scripts/build-mcp-ui.mjs && next build --turbopack",
     "start": "next start -p 3050",
     "lint": "eslint",
     "test": "npx playwright test",
@@ -21,13 +21,15 @@
     "hooks:install": "node scripts/install-hooks.mjs",
     "generate:llm-index": "node scripts/generate-llm-index.js",
     "generate:delegum-es": "node scripts/generate-delegum-es.mjs",
+    "generate:mcp-ui": "node scripts/build-mcp-ui.mjs",
     "analyze": "set ANALYZE=true && npm run build"
   },
   "dependencies": {
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "^0.12.2",
     "@libsql/client": "^0.17.3",
-    "@modelcontextprotocol/sdk": "^1.28.0",
+    "@modelcontextprotocol/ext-apps": "^1.7.5",
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "@tanstack/react-query": "^5.101.4",
     "@trpc/client": "^11.17.0",
     "@trpc/next": "^11.17.0",

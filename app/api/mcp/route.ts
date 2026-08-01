@@ -10,6 +10,8 @@
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js';
+import { registerAppTool, registerAppResource, RESOURCE_MIME_TYPE } from '@modelcontextprotocol/ext-apps/server';
+import { HTML_CONVERSOR_UNIDADES } from '@/lib/mcp/ui/generado/conversor-unidades';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { z } from 'zod';
 import { calcularPropina, obtenerPorcentajePais, PROPINAS_POR_PAIS } from '@/lib/calculadoras/propinas';
@@ -27,7 +29,7 @@ import {
 import { calcularGastoEnergetico, type Electrodomestico } from '@/lib/calculadoras/gastoEnergetico';
 import { convertirEdadMascota, type TipoMascota, type TamanoPerro } from '@/lib/calculadoras/edadMascota';
 import { calcularReglaTres, type TipoRegla, type TipoRelacion } from '@/lib/calculadoras/reglaTres';
-import { convertirUnidades, type CategoriaUnidad } from '@/lib/calculadoras/conversorUnidades';
+import { convertirUnidades, unidadesDeCategoria, type CategoriaUnidad } from '@/lib/calculadoras/conversorUnidades';
 import { calcularMacros, type SexoBiologico, type NivelActividad, type ObjetivoNutricional } from '@/lib/calculadoras/macros';
 import { calcularInflacion } from '@/lib/calculadoras/inflacion';
 import { calcularMcdMcm } from '@/lib/calculadoras/mcdMcm';
@@ -162,6 +164,9 @@ const AVISO_TECNICO =
 function conAviso(texto: string, aviso: string) {
   return { content: [{ type: 'text' as const, text: texto + aviso }] };
 }
+
+// URI de la interfaz de la extensión MCP Apps (piloto: solo convertir_unidades).
+const URI_UI_CONVERSOR = 'ui://meskeia/conversor-unidades.html';
 
 // Instrucciones a nivel de servidor: la IA cliente las recibe en `initialize`.
 // Refuerzan que el aviso legal de cada respuesta se muestre SIEMPRE en pantalla,
@@ -700,10 +705,31 @@ function crearServidorMCP(): McpServer {
   );
 
   // ------------------------------------------------------------------
-  // TOOL: convertir_unidades
+  // TOOL: convertir_unidades  ── piloto de la extensión MCP Apps ──
+  //
+  // Además del texto de siempre, esta tool declara una interfaz HTML que los
+  // hosts compatibles (Claude, ChatGPT, VS Code…) renderizan en un iframe
+  // aislado. Los que no la soporten siguen recibiendo solo el texto, idéntico.
+  // El HTML se genera con `node scripts/build-mcp-ui.mjs`.
   // ------------------------------------------------------------------
-  servidor.tool(
+  registerAppResource(
+    servidor,
+    'Conversor de unidades',
+    URI_UI_CONVERSOR,
+    { mimeType: RESOURCE_MIME_TYPE },
+    async () => ({
+      contents: [{ uri: URI_UI_CONVERSOR, mimeType: RESOURCE_MIME_TYPE, text: HTML_CONVERSOR_UNIDADES }],
+    })
+  );
+
+  registerAppTool(
+    servidor,
     'convertir_unidades',
+    {
+      title: 'Convierte entre unidades de medida en 12 categorías',
+      annotations: { readOnlyHint: true },
+      _meta: { ui: { resourceUri: URI_UI_CONVERSOR } },
+      description:
     'Convierte entre unidades de medida en 12 categorías: ' +
     'longitud (m, km, cm, mm, mi, yd, ft, in, nmi, au, ly), ' +
     'masa (kg, g, mg, t, lb, oz, st), ' +
@@ -717,19 +743,32 @@ function crearServidorMCP(): McpServer {
     'energia (J, kJ, cal, kcal, Wh, kWh, BTU, eV), ' +
     'fuerza (N, kN, lbf, kgf), ' +
     'potencia (W, kW, MW, hp, cv).',
-    {
-      valor: z.number()
-        .describe('Valor numérico a convertir'),
-      categoria: z.enum([
-        'longitud', 'masa', 'temperatura', 'area', 'volumen',
-        'tiempo', 'velocidad', 'datos', 'presion', 'energia', 'fuerza', 'potencia',
-      ]).describe('Categoría de la conversión'),
-      unidadOrigen: z.string()
-        .describe('Unidad de origen (ver listado en la descripción). Ejemplos: "km", "lb", "C", "ha", "kWh"'),
-      unidadDestino: z.string()
-        .describe('Unidad destino. Ejemplos: "mi", "kg", "F", "acre", "BTU"'),
+      inputSchema: {
+        valor: z.number()
+          .describe('Valor numérico a convertir'),
+        categoria: z.enum([
+          'longitud', 'masa', 'temperatura', 'area', 'volumen',
+          'tiempo', 'velocidad', 'datos', 'presion', 'energia', 'fuerza', 'potencia',
+        ]).describe('Categoría de la conversión'),
+        unidadOrigen: z.string()
+          .describe('Unidad de origen (ver listado en la descripción). Ejemplos: "km", "lb", "C", "ha", "kWh"'),
+        unidadDestino: z.string()
+          .describe('Unidad destino. Ejemplos: "mi", "kg", "F", "acre", "BTU"'),
+      },
+      // La interfaz se pinta con estos datos: sin structuredContent tendría que
+      // volver a parsear el texto.
+      outputSchema: {
+        categoria: z.string(),
+        valorOrigen: z.number(),
+        unidadOrigen: z.string(),
+        valorDestino: z.number(),
+        unidadDestino: z.string(),
+        factorConversion: z.number(),
+        formula: z.string(),
+        unidades: z.array(z.string()),
+        equivalencias: z.array(z.object({ unidad: z.string(), valor: z.number() })),
+      },
     },
-    { title: 'Convierte entre unidades de medida en 12 categorías', readOnlyHint: true },
     async ({ valor, categoria, unidadOrigen, unidadDestino }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('convertir_unidades', aiCaller);
@@ -738,7 +777,8 @@ function crearServidorMCP(): McpServer {
       try {
         r = convertirUnidades({ valor, categoria: categoria as CategoriaUnidad, unidadOrigen, unidadDestino });
       } catch (err) {
-        return { content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
+        // isError exime de devolver structuredContent pese al outputSchema.
+        return { isError: true, content: [{ type: 'text', text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }] };
       }
 
       const fmtNum = (n: number) => {
@@ -749,6 +789,19 @@ function crearServidorMCP(): McpServer {
         return n.toExponential(4);
       };
 
+      // El mismo valor en todas las unidades de su categoría: es lo que la
+      // interfaz enseña de más frente a la respuesta de texto.
+      const unidades = unidadesDeCategoria(categoria as CategoriaUnidad);
+      const equivalencias: { unidad: string; valor: number }[] = [];
+      for (const unidad of unidades) {
+        try {
+          const conv = convertirUnidades({ valor, categoria: categoria as CategoriaUnidad, unidadOrigen, unidadDestino: unidad });
+          equivalencias.push({ unidad, valor: conv.valorDestino });
+        } catch {
+          // Unidad sin equivalencia directa: se omite de la tabla.
+        }
+      }
+
       const lineas = [
         `📐 **Conversión de ${r.categoria}**`,
         '',
@@ -757,7 +810,11 @@ function crearServidorMCP(): McpServer {
         r.factorConversion !== 0 ? `🔢 Factor de conversión: ${fmtNum(r.factorConversion)}` : '',
         `📌 ${r.formula}`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+
+      return {
+        content: [{ type: 'text', text: lineas.join('\n') }],
+        structuredContent: { ...r, unidades, equivalencias },
+      };
     }
   );
 
