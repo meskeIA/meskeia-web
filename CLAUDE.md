@@ -572,6 +572,52 @@ npm run build  # timeout: 600000
 
 ---
 
+## Candados de juicio (OBLIGATORIO)
+
+Tres reglas derivadas de clasificar las 29 entradas `feedback_*` de memoria (2026-08-01). No sustituyen al criterio: cubren **formas de fallo ya observadas y repetidas** en este proyecto. Cada una nombra el caso del que salió, porque de eso trata precisamente la segunda.
+
+### 1. Candado tras cambio a escala
+
+**Cuándo se dispara**: un cambio aplicado por script o de forma repetitiva a **más de 20 apps**, o que **renombre, mueva o retire una URL** (slug, ruta, entrada de `sitemap.ts`, enlace interno).
+
+**Qué hacer antes del commit**:
+1. **Verificar la salida, no la ejecución.** "El script terminó sin error" no dice nada sobre si las N salidas son correctas. Contar producidas vs esperadas y abrir 3 al azar.
+2. **Grepear la condición negativa**: lo que NO debe existir tras el cambio (la ruta vieja, el patrón antiguo, el archivo que falta). Un grep que devuelve 0 es la prueba; que el build pase, no.
+3. **Si la invariante puede repetirse** → dejarla como `scripts/check-*.mjs` enganchado a `npm run build`, igual que `check:verticales`, `check:enlaces` y `check:secrets`. Un candado que rompe el build vale más que cualquier recordatorio.
+
+**De dónde sale**: 2026-05-26 — 438 apps (52% del catálogo) eran client components sin `layout.tsx`, así que su `metadata` se ignoraba y todas servían el title de la home; Google las trató como contenido duplicado y salieron 125 "rastreadas sin indexar" en Search Console. **El fallo fue silencioso durante meses.** Agravante que motiva el punto 1: el script que creó los 438 layouts introdujo su propio defecto (26 apps sin `jsonLd`), y también pasó desapercibido. Segundo caso, 2026-07-18: renombrados que dejaron 3 404 internos (una URL anunciada en `sitemap.ts` sin ruta detrás, dos enlaces obsoletos en cursos).
+
+### 2. Nombrar el caso de origen de la regla que da luz verde
+
+**Cuándo se dispara**: cuando parte de la justificación para proponer, construir o descartar algo sea *"cumple el criterio X"*, *"pasa el filtro Y"* o *"esto ya lo decidimos"*.
+
+**Qué hacer**: no basta con invocar la regla. Hay que decir **de qué caso concreto nació** y **de qué trataba ese caso**, y solo entonces si aplica aquí.
+
+- ❌ "Es una API nativa, así que pasa el filtro."
+- ✅ "Pasa el filtro de APIs nativas, que salió del caso Tesseract (2026-07-24), donde el problema era **el peso de la descarga**. Aquí el peso no es el problema, así que ese filtro no dice nada sobre esta app."
+
+**Si no se puede nombrar el caso de origen, la regla no se está aplicando: se está invocando.** Parar y verificar antes de seguir.
+
+**De dónde sale**: tres fallos con la misma forma en ocho días, los tres por aplicar una regla del usuario fuera del caso que la generó.
+
+| Fecha | La regla dio luz verde por... | Lo que quedaba fuera de esa regla |
+|---|---|---|
+| 24/07 | ser un hueco real de demanda | descarga de 5-15 MB al móvil (S0010, OCR) |
+| 26/07 | ser "primera aproximación honesta" | el resultado era un juicio binario sobre la persona (S0014, rango auditivo) |
+| 01/08 | ser una API nativa del navegador | Chrome envía el audio a Google (S0042, transcripción) |
+
+Cada regla se escribió para su caso; el parecido superficial con el caso siguiente es exactamente la trampa.
+
+### 3. Contador de veredicto repetido
+
+**Cuándo se dispara**: en cualquier ritual recurrente que emita un veredicto (digest diario, semáforos del Centro de Mando, auditorías periódicas).
+
+**Qué hacer**: el veredicto sale **acompañado del número de lecturas consecutivas que lleva diciendo lo mismo**. A partir de **5 iguales seguidas**, la lectura por defecto es *"el indicador está roto"*, no *"todo sigue bien"*, y se dice así en vez de repetirlo una vez más. El contador va **impreso en la salida**, no confiado a la memoria de nadie.
+
+**De dónde sale**: el semáforo de la sección 9 del digest marcó ✅ durante **21 lecturas seguidas** mientras la métrica caía, y *Apps activas* llevaba 30 lecturas subiendo sin que su suelo llegara a hablar nunca. El principio ya estaba escrito ("un color que sale siempre deja de informar"); lo que faltaba era volverlo **mecánico**, porque un principio depende de que alguien lo recuerde y un contador no.
+
+---
+
 ## Flujo de Despliegue (Vercel + GitHub)
 
 ### Hosting
@@ -701,11 +747,13 @@ Detalle completo y formato de entrada: skill `/agenda`.
 
 ## Control de versiones
 
-**Versión actual**: 1.7.0 (2026-07-16) - Homogeneización del ecosistema .claude (cifras vivas, timeout único 600000ms, TypeScript real, CSP enforced)
+**Versión actual**: 1.8.0 (2026-08-01) - Candados de juicio (3 reglas derivadas de clasificar las 29 entradas `feedback_*` de memoria: verificación tras cambio a escala, caso de origen de la regla invocada, contador de veredicto repetido)
+
+**Anterior**: 1.7.0 (2026-07-16) - Homogeneización del ecosistema .claude (cifras vivas, timeout único 600000ms, TypeScript real, CSP enforced)
 
 **Historial completo**: `git log` (CHANGELOG histórico archivado en `_private/archivo/`)
 
 ---
 
-**Última actualización**: 2026-07-16
+**Última actualización**: 2026-08-01
 **Proyecto**: meskeIA Web (https://meskeia.com)
