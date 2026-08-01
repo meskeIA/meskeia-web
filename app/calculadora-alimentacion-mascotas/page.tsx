@@ -11,6 +11,26 @@ type TipoMascota = 'perro' | 'gato';
 type EdadMascota = 'cachorro' | 'adulto' | 'senior';
 type ActividadMascota = 'baja' | 'normal' | 'alta' | 'muy_alta';
 type TamanoPerro = 'mini' | 'pequeno' | 'mediano' | 'grande' | 'gigante';
+type CondicionCorporal = 'muy_delgado' | 'delgado' | 'ideal' | 'sobrepeso' | 'obeso';
+
+interface CondicionInfo {
+  id: CondicionCorporal;
+  label: string;
+  bcs: number;
+  escala: string;
+  senal: string;
+}
+
+// Escala de condición corporal (BCS) de 9 puntos, el estándar en clínica veterinaria.
+// Regla aceptada: cada punto por encima o por debajo del 5 equivale a un 10 % de
+// desviación sobre el peso ideal.
+const condicionesCorporales: CondicionInfo[] = [
+  { id: 'muy_delgado', label: 'Muy delgado', bcs: 3, escala: '3/9', senal: 'Costillas y caderas visibles a simple vista, sin grasa palpable' },
+  { id: 'delgado', label: 'Delgado', bcs: 4, escala: '4/9', senal: 'Costillas fáciles de palpar, cintura muy marcada' },
+  { id: 'ideal', label: 'Ideal', bcs: 5, escala: '5/9', senal: 'Costillas se palpan sin apretar, cintura visible desde arriba' },
+  { id: 'sobrepeso', label: 'Sobrepeso', bcs: 7, escala: '7/9', senal: 'Cuesta palpar las costillas, cintura poco marcada' },
+  { id: 'obeso', label: 'Obesidad', bcs: 9, escala: '9/9', senal: 'No se palpan las costillas, abdomen distendido y depósitos de grasa' },
+];
 
 interface AlimentoToxico {
   nombre: string;
@@ -43,12 +63,24 @@ export default function CalculadoraAlimentacionMascotasPage() {
   const [actividad, setActividad] = useState<ActividadMascota>('normal');
   const [tamanoPerro, setTamanoPerro] = useState<TamanoPerro>('mediano');
   const [esterilizado, setEsterilizado] = useState(false);
+  const [condicion, setCondicion] = useState<CondicionCorporal>('ideal');
   const [resultado, setResultado] = useState<{
     kcalDiarias: number;
     gramosPienso: number;
     gramosPiensoMin: number;
     gramosPiensoMax: number;
     racionesRecomendadas: number;
+    pesoIntroducido: number;
+    pesoIdeal: number;
+    bcs: number;
+    // Solo cuando hay exceso de peso: pauta de pérdida gradual
+    planPerdida: {
+      kcal: number;
+      gramos: number;
+      exceso: number;
+      semanasMin: number;
+      semanasMax: number;
+    } | null;
   } | null>(null);
 
   // Calcular RER (Resting Energy Requirement)
@@ -86,11 +118,26 @@ export default function CalculadoraAlimentacionMascotasPage() {
     }
   };
 
+  // Peso ideal a partir del peso actual y la condición corporal.
+  // Cada punto de BCS por encima o por debajo de 5 supone un 10 % de desviación.
+  const calcularPesoIdeal = (pesoActual: number, bcs: number): number => {
+    return pesoActual / (1 + 0.1 * (bcs - 5));
+  };
+
   const calcular = () => {
     const pesoNum = parseFloat(peso.replace(',', '.'));
     if (isNaN(pesoNum) || pesoNum <= 0 || pesoNum > 100) return;
 
-    const rer = calcularRER(pesoNum);
+    // En cachorros no se corrige por condición corporal: están creciendo y no
+    // se les restringe la comida. El peso de referencia es el actual.
+    const esCachorro = edad === 'cachorro';
+    const infoCondicion = condicionesCorporales.find((c) => c.id === condicion);
+    const bcs = esCachorro || !infoCondicion ? 5 : infoCondicion.bcs;
+    const pesoIdeal = esCachorro ? pesoNum : calcularPesoIdeal(pesoNum, bcs);
+
+    // Las necesidades energéticas se calculan sobre el peso ideal, no sobre el
+    // actual: hacerlo sobre el actual perpetúa el sobrepeso.
+    const rer = calcularRER(pesoIdeal);
     let kcal = rer * getFactorActividad() * getFactorEdad();
 
     // Ajuste por esterilización (-20%)
@@ -110,12 +157,35 @@ export default function CalculadoraAlimentacionMascotasPage() {
       raciones = pesoNum < 5 ? 4 : 3;
     }
 
+    // Pauta de pérdida gradual cuando hay exceso de peso. Se parte del RER del
+    // peso ideal (sin factores de actividad) y se aplica el ajuste habitual en
+    // clínica: 1,0 en perros y 0,8 en gatos.
+    let planPerdida = null;
+    if (!esCachorro && bcs > 5) {
+      const kcalPerdida = calcularRER(pesoIdeal) * (tipoMascota === 'perro' ? 1.0 : 0.8);
+      // Ritmo seguro: 1-2 % del peso por semana en perros, 0,5-1 % en gatos.
+      const ritmoMin = tipoMascota === 'perro' ? 0.01 : 0.005;
+      const ritmoMax = tipoMascota === 'perro' ? 0.02 : 0.01;
+      const exceso = pesoNum - pesoIdeal;
+      planPerdida = {
+        kcal: Math.round(kcalPerdida),
+        gramos: Math.round((kcalPerdida / kcalPor100g) * 100),
+        exceso,
+        semanasMin: Math.ceil(exceso / (pesoNum * ritmoMax)),
+        semanasMax: Math.ceil(exceso / (pesoNum * ritmoMin)),
+      };
+    }
+
     setResultado({
       kcalDiarias: Math.round(kcal),
       gramosPienso: Math.round(gramosPienso),
       gramosPiensoMin: Math.round(gramosPiensoMin),
       gramosPiensoMax: Math.round(gramosPiensoMax),
       racionesRecomendadas: raciones,
+      pesoIntroducido: pesoNum,
+      pesoIdeal,
+      bcs,
+      planPerdida,
     });
   };
 
@@ -255,6 +325,35 @@ export default function CalculadoraAlimentacionMascotasPage() {
               </div>
             </div>
 
+            {/* Condición corporal — no aplica a cachorros en crecimiento */}
+            {edad !== 'cachorro' && (
+              <div className={styles.inputGroup}>
+                <label>Condición corporal</label>
+                <p className={styles.ayudaCondicion}>
+                  Pálpale las costillas con la mano abierta y mírale la cintura desde arriba.
+                  De esto depende que la ración se calcule sobre su peso real y no sobre el que tiene ahora.
+                </p>
+                <div className={styles.tamanoGrid}>
+                  {condicionesCorporales.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      className={`${styles.tamanoBtn} ${condicion === c.id ? styles.active : ''}`}
+                      onClick={() => setCondicion(c.id)}
+                      aria-pressed={condicion === c.id}
+                      title={c.senal}
+                    >
+                      <span className={styles.tamanoLabel}>{c.label}</span>
+                      <span className={styles.tamanoPeso}>{c.escala}</span>
+                    </button>
+                  ))}
+                </div>
+                <p className={styles.senalCondicion}>
+                  {condicionesCorporales.find((c) => c.id === condicion)?.senal}
+                </p>
+              </div>
+            )}
+
             {/* Actividad */}
             <div className={styles.inputGroup}>
               <label>Nivel de actividad</label>
@@ -346,6 +445,45 @@ export default function CalculadoraAlimentacionMascotasPage() {
                     <span className={styles.detalleLabel}>g por ración</span>
                   </div>
                 </div>
+
+                {/* Peso ideal: solo si difiere del introducido */}
+                {Math.abs(resultado.pesoIdeal - resultado.pesoIntroducido) >= 0.1 && (
+                  <div className={styles.pesoIdealBox}>
+                    <h4><span aria-hidden="true">⚖️</span> Peso de referencia</h4>
+                    <p className={styles.pesoIdealCifra}>
+                      {formatNumber(resultado.pesoIntroducido, 1)} kg ahora →{' '}
+                      <strong>{formatNumber(resultado.pesoIdeal, 1)} kg de referencia</strong>
+                    </p>
+                    <p className={styles.pesoIdealNota}>
+                      Con una condición corporal de {resultado.bcs}/9, la desviación estimada es del{' '}
+                      {formatNumber(Math.abs(resultado.bcs - 5) * 10, 0)} %. La ración de arriba está
+                      calculada sobre ese peso de referencia, no sobre el actual: calcularla sobre el
+                      peso de ahora mantendría a tu {tipoMascota} donde está.
+                    </p>
+                  </div>
+                )}
+
+                {/* Pauta de pérdida gradual */}
+                {resultado.planPerdida && (
+                  <div className={styles.perdidaBox}>
+                    <h4><span aria-hidden="true">📉</span> Si quieres que baje de peso</h4>
+                    <p className={styles.perdidaCifra}>
+                      <strong>{formatNumber(resultado.planPerdida.gramos, 0)} g/día</strong>{' '}
+                      ({formatNumber(resultado.planPerdida.kcal, 0)} kcal)
+                    </p>
+                    <p className={styles.perdidaNota}>
+                      Sobran unos {formatNumber(resultado.planPerdida.exceso, 1)} kg. A un ritmo seguro
+                      ({tipoMascota === 'perro' ? '1-2' : '0,5-1'} % del peso por semana) serían entre{' '}
+                      {resultado.planPerdida.semanasMin} y {resultado.planPerdida.semanasMax} semanas.
+                      Bajar más deprisa es peligroso, sobre todo en gatos.
+                    </p>
+                    <p className={styles.perdidaAviso}>
+                      <span aria-hidden="true">⚠️</span> Antes de poner a dieta a tu {tipoMascota},
+                      que lo vea el veterinario: el sobrepeso puede venir de un problema hormonal
+                      (hipotiroidismo, Cushing) que ninguna ración corrige.
+                    </p>
+                  </div>
+                )}
 
                 <div className={styles.rangoInfo}>
                   <h4><span aria-hidden="true">📊</span> Rango según tipo de pienso</h4>

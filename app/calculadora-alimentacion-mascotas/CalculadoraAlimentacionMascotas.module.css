@@ -760,6 +760,90 @@
   line-height: 1.6;
 }
 
+/* Condición corporal */
+.ayudaCondicion {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0 0 10px;
+}
+
+.senalCondicion {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 10px 0 0;
+  padding: 8px 12px;
+  background: rgba(72, 169, 166, 0.1);
+  border-left: 3px solid var(--secondary, #48A9A6);
+  border-radius: 0 8px 8px 0;
+}
+
+/* Peso de referencia */
+.pesoIdealBox {
+  background: rgba(72, 169, 166, 0.1);
+  border: 1px solid rgba(72, 169, 166, 0.3);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.pesoIdealBox h4 {
+  font-size: 0.9rem;
+  color: #48A9A6;
+  margin: 0 0 8px;
+}
+
+.pesoIdealCifra {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+}
+
+.pesoIdealNota {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* Pauta de pérdida gradual */
+.perdidaBox {
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.35);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.perdidaBox h4 {
+  font-size: 0.9rem;
+  color: #B8860B;
+  margin: 0 0 8px;
+}
+
+.perdidaCifra {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+}
+
+.perdidaNota {
+  margin: 0 0 10px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.perdidaAviso {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  line-height: 1.55;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 193, 7, 0.3);
+}
+
 /* Dark Mode */
 [data-theme='dark'] .inputPanel,
 [data-theme='dark'] .resultsPanel,
@@ -1044,4 +1128,23 @@
 
 @media (prefers-reduced-motion: reduce) {
   .casoCard, .tipCard, .step { transition: none !important; }
+}
+
+/* Dark Mode — bloques de condición corporal y peso de referencia */
+[data-theme='dark'] .senalCondicion {
+  background: rgba(72, 169, 166, 0.15);
+}
+
+[data-theme='dark'] .pesoIdealBox {
+  background: rgba(72, 169, 166, 0.15);
+  border-color: rgba(72, 169, 166, 0.35);
+}
+
+[data-theme='dark'] .perdidaBox {
+  background: rgba(255, 193, 7, 0.12);
+  border-color: rgba(255, 193, 7, 0.3);
+}
+
+[data-theme='dark'] .perdidaBox h4 {
+  color: #FFD54F;
 }
