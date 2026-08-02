@@ -1331,6 +1331,9 @@ export const implementedAppsUrls = [
 
   // Aritmética de tiempo (2026-07)
   "/calculadora-horas/",               // Suma/resta hh:mm mezclando formatos, decimal para facturar y parte semanal con pausas
+
+  // Ruido de banda ancha (2026-08)
+  "/generador-ruido-blanco/",          // Blanco, rosa, marrón, azul y violeta sintetizados; ambientes y temporizador con fundido
 ];
 
 /**

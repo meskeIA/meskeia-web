@@ -3085,7 +3085,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-descuentos': [...matematicasBasicasApps.slice(0, 2), { url: '/calculadora-iva/', icon: '🧾', name: 'Calculadora IVA', description: 'Añadir o quitar IVA' }],
   'prueba-camara': [{ url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir luz para fotos' }, { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba Micrófono', description: 'Test de audio' }, { url: '/mi-ip/', icon: '🌐', name: 'Mi IP', description: 'Información de red' }],
   'prueba-microfono': [{ url: '/sonometro/', icon: '🔊', name: 'Sonómetro', description: 'Medir decibelios' }, { url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir luz ambiente' }, { url: '/amplificador-sonido/', icon: '🦻', name: 'Amplificador de Sonido', description: 'Escucha amplificada en vivo' }],
-  'sonometro': [{ url: '/generador-tonos/', icon: '🔊', name: 'Generador Tonos', description: 'Frecuencias de audio' }, { url: '/analizador-espectro/', icon: '📊', name: 'Analizador Espectro', description: 'Visualiza frecuencias' }, { url: '/amplificador-sonido/', icon: '🦻', name: 'Amplificador de Sonido', description: 'Escucha amplificada en vivo' }, { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba Micrófono', description: 'Test de audio' }],
+  'sonometro': [{ url: '/generador-tonos/', icon: '🔊', name: 'Generador Tonos', description: 'Frecuencias de audio' }, { url: '/analizador-espectro/', icon: '📊', name: 'Analizador Espectro', description: 'Visualiza frecuencias' }, { url: '/amplificador-sonido/', icon: '🦻', name: 'Amplificador de Sonido', description: 'Escucha amplificada en vivo' }, { url: '/generador-ruido-blanco/', icon: '🌫️', name: 'Ruido Blanco, Rosa y Marrón', description: 'Sonido de fondo para dormir o concentrarte' }],
   'luxometro': [{ url: '/golden-hour/', icon: '🌅', name: 'Golden Hour', description: 'Hora dorada y azul' }, { url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/conversor-colores/', icon: '🎨', name: 'Conversor Colores', description: 'HEX, RGB, HSL' }],
   'golden-hour': [{ url: '/visualizador-colores-cielo/', icon: '🌈', name: 'Colores del Cielo', description: 'Paleta HEX y física de cada fase: golden hour, hora azul, amanecer' }, { url: '/simulador-fotografia/', icon: '📷', name: 'Simulador de Fotografía', description: 'Triángulo de exposición: ISO, apertura, velocidad' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir intensidad de luz' }, { url: '/informacion-tiempo/', icon: '🌤️', name: 'Info Tiempo', description: 'Previsión meteorológica' }],
   'mi-ip': [{ url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba Micrófono', description: 'Test de audio' }],
@@ -3096,7 +3096,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/cronometro/', icon: '⏱️', name: 'Cronómetro', description: 'Medir tiempo' },
   ],
   'calculadora-inflacion': finanzasPersonalesApps,
-  'analizador-espectro': [{ url: '/generador-tonos/', icon: '🔊', name: 'Generador Tonos', description: 'Frecuencias de audio' }, { url: '/sonometro/', icon: '🔊', name: 'Sonómetro', description: 'Medir decibelios' }, { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba Micrófono', description: 'Test de audio' }, { url: '/metronomo/', icon: '🎵', name: 'Metrónomo', description: 'Tempo musical' }],
+  'analizador-espectro': [{ url: '/generador-tonos/', icon: '🔊', name: 'Generador Tonos', description: 'Frecuencias de audio' }, { url: '/sonometro/', icon: '🔊', name: 'Sonómetro', description: 'Medir decibelios' }, { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba Micrófono', description: 'Test de audio' }, { url: '/generador-ruido-blanco/', icon: '🌫️', name: 'Ruido Blanco, Rosa y Marrón', description: 'Ruido de banda ancha sintetizado' }],
   'nivel-burbuja': [{ url: '/conversor-unidades/', icon: '📏', name: 'Conversor Unidades', description: 'Longitud y ángulos' }, { url: '/calculadora-pintura/', icon: '🎨', name: 'Calculadora Pintura', description: 'Litros necesarios' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir intensidad de luz' }],
 
   // INSTRUMENTOS DIGITALES (sustituyen aparatos físicos)
@@ -3108,7 +3108,13 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/metronomo/', icon: '🎵', name: 'Metrónomo', description: 'Tempo musical' },
     { url: '/transpositor-acordes/', icon: '🎵', name: 'Transpositor de Acordes', description: 'Cambia la tonalidad de tu canción' },
   ],
-  'generador-tonos': [{ url: '/analizador-espectro/', icon: '📊', name: 'Analizador Espectro', description: 'Visualiza frecuencias' }, { url: '/afinador-instrumentos/', icon: '🎸', name: 'Afinador', description: 'Afina tu instrumento' }, { url: '/diapason/', icon: '🎼', name: 'Diapasón', description: 'La 440Hz' }, { url: '/sonometro/', icon: '🔊', name: 'Sonómetro', description: 'Medir decibelios' }],
+  'generador-tonos': [{ url: '/analizador-espectro/', icon: '📊', name: 'Analizador Espectro', description: 'Visualiza frecuencias' }, { url: '/afinador-instrumentos/', icon: '🎸', name: 'Afinador', description: 'Afina tu instrumento' }, { url: '/generador-ruido-blanco/', icon: '🌫️', name: 'Ruido Blanco, Rosa y Marrón', description: 'Sonido de fondo con temporizador' }, { url: '/sonometro/', icon: '🔊', name: 'Sonómetro', description: 'Medir decibelios' }],
+  'generador-ruido-blanco': [
+    { url: '/generador-tonos/', icon: '🔊', name: 'Generador de Tonos', description: 'Frecuencias puras de 20 Hz a 20 kHz' },
+    { url: '/sonometro/', icon: '🔊', name: 'Sonómetro', description: 'Comprueba a cuántos decibelios lo estás usando' },
+    { url: '/calculadora-sueno/', icon: '😴', name: 'Calculadora de Sueño', description: 'A qué hora acostarte según tus ciclos' },
+    { url: '/analizador-espectro/', icon: '📊', name: 'Analizador de Espectro', description: 'Mira el reparto de frecuencias en vivo' },
+  ],
   'transpositor-acordes': [
     { url: '/visualizador-escalas-musicales/', icon: '🎼', name: 'Escalas Musicales', description: 'Notas, intervalos y piano interactivo' },
     { url: '/visualizador-circulo-quintas/', icon: '🎶', name: 'Círculo de Quintas', description: 'Acordes diatónicos y tonalidades vecinas' },
