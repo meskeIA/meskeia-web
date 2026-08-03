@@ -6713,7 +6713,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'tabla-valencias': [
     { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica Interactiva', description: 'Los 118 elementos y sus propiedades' },
-    { url: '/simulador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Ajusta y simula reacciones' },
+    { url: '/formulador-compuestos-inorganicos/', icon: '⚗️', name: 'Formulación Inorgánica', description: 'Aplica estas valencias: da los tres nombres y razona cada número' },
     { url: '/tabla-solubilidad/', icon: '🧪', name: 'Tabla de Solubilidad', description: 'Qué compuestos precipitan y cuáles no' },
     { url: '/nombrador-compuestos-organicos/', icon: '🧪', name: 'Nomenclatura Orgánica', description: 'El equivalente para compuestos de carbono, con la numeración razonada' },
   ],
@@ -6745,7 +6745,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'Formula bien antes de ver si precipita' },
     { url: '/simulador-disoluciones/', icon: '🧪', name: 'Disoluciones', description: 'Molaridad, concentración y dilución' },
     { url: '/tabla-ka-kb/', icon: '🧫', name: 'Tabla de Ka y Kb', description: 'El otro gran equilibrio en disolución' },
-    { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica', description: 'Los elementos de cada ion' },
+    { url: '/formulador-compuestos-inorganicos/', icon: '⚗️', name: 'Formulación Inorgánica', description: 'Escribe bien la sal antes de mirar si precipita' },
   ],
   'tabla-grupos-funcionales': [
     { url: '/visualizador-carbono/', icon: '⚛️', name: 'El Carbono', description: 'Alótropos, ciclo y grupos funcionales en 3D' },
@@ -6789,9 +6789,15 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-logica-proposicional/', icon: '🔣', name: 'Lógica Proposicional', description: 'Tablas de verdad, tautologías y formas normales' },
     { url: '/calculadora-sistemas-numericos/', icon: '🔢', name: 'Sistemas Numéricos', description: 'Binario y hexadecimal para leer la cuenta del contador' },
   ],
+  'formulador-compuestos-inorganicos': [
+    { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'La chuleta de números de oxidación que este formulador aplica' },
+    { url: '/nombrador-compuestos-organicos/', icon: '🧪', name: 'Nomenclatura Orgánica', description: 'La otra mitad de la formulación: los compuestos del carbono' },
+    { url: '/ajustar-ecuaciones-quimicas/', icon: '⚖️', name: 'Ajustar Ecuaciones', description: 'Ya tienes las fórmulas: el paso siguiente es igualar la reacción' },
+    { url: '/tabla-solubilidad/', icon: '🧪', name: 'Tabla de Solubilidad', description: 'De esas sales, cuáles se disuelven y cuáles precipitan' },
+  ],
   'nombrador-compuestos-organicos': [
     { url: '/tabla-grupos-funcionales/', icon: '⚛️', name: 'Tabla de Grupos Funcionales', description: 'El orden de prioridad completo, con sufijo y prefijo de cada grupo' },
-    { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'La otra mitad de la formulación: nomenclatura inorgánica' },
+    { url: '/formulador-compuestos-inorganicos/', icon: '⚗️', name: 'Formulación Inorgánica', description: 'La otra mitad de la formulación, con el mismo razonamiento paso a paso' },
     { url: '/visualizador-quimica-organica/', icon: '🧬', name: 'Química Orgánica', description: 'Qué hacen esos grupos: reacciones, isomería y aromaticidad' },
     { url: '/ajustar-ecuaciones-quimicas/', icon: '⚖️', name: 'Ajustar Ecuaciones', description: 'Cuando el compuesto ya tiene nombre, toca ajustar la reacción' },
   ],
@@ -6803,7 +6809,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'ajustar-ecuaciones-quimicas': [
     { url: '/simulador-estequiometria/', icon: '🧪', name: 'Estequiometría', description: 'El paso siguiente: moles, reactivo limitante y rendimiento' },
-    { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'Números de oxidación y nomenclatura de cada elemento' },
+    { url: '/formulador-compuestos-inorganicos/', icon: '⚗️', name: 'Formulación Inorgánica', description: 'Antes de ajustar: de dónde sale cada fórmula de la reacción' },
     { url: '/tabla-potenciales-redox/', icon: '🔋', name: 'Potenciales Redox', description: 'Qué semirreacción se impone sobre cuál y con qué E°' },
     { url: '/simulador-titulacion/', icon: '🧪', name: 'Titulación Ácido-Base', description: 'La reacción ajustada, llevada al laboratorio' },
   ],

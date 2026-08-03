@@ -1310,6 +1310,7 @@ export const implementedAppsUrls = [
   "/tabla-derivadas/",                 // 38 derivadas buscables con regla de la cadena, demostración y ejemplo
   "/tabla-integrales/",                // 40 integrales y métodos, con + C siempre presente y regla de Barrow
   "/tabla-valencias/",                 // 51 elementos con números de oxidación, 3 nomenclaturas IUPAC y formulador binario
+  "/formulador-compuestos-inorganicos/",  // Fórmula ⇄ nombre en las tres nomenclaturas + modo práctica
   "/nombrador-compuestos-organicos/",  // Nombre IUPAC con la numeración razonada + corrector de nombres
   "/revisor-lectura-facil/",           // 13 comprobaciones de lectura fácil frase a frase, con alternativa
   "/tabla-unidades-si/",               // 7 básicas + 22 derivadas + 24 prefijos + aceptadas, descomposición a básicas y orden de magnitud

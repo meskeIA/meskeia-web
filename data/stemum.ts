@@ -826,6 +826,13 @@ export const STEMUM_APPS: StemumApp[] = [
     disciplina: 'quimica',
   },
   {
+    slug: 'formulador-compuestos-inorganicos',
+    icon: '⚗️',
+    titulo: 'Formulación inorgánica',
+    desc: 'Da los tres nombres de un compuesto y de dónde sale cada número de oxidación; funciona también del nombre a la fórmula y trae ejercicios que se corrigen solos.',
+    disciplina: 'quimica',
+  },
+  {
     slug: 'nombrador-compuestos-organicos',
     icon: '🧪',
     titulo: 'Nomenclatura orgánica',
