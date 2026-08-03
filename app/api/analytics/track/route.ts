@@ -78,6 +78,46 @@ function esIpDatacenter(ip: string | null): boolean {
   return DATACENTER_PATTERNS.some(p => p.test(ip));
 }
 
+/**
+ * IP propia del desarrollador, cacheada en memoria del módulo.
+ *
+ * Vive en `analytics_config.ip_excluida` (una sola fila, que cambia de Pascuas a
+ * Ramos) y se cachea porque este endpoint es el hot path de todo el catálogo:
+ * consultarla en cada visita añadiría un viaje a Turso por registro.
+ *
+ * Por qué hace falta marcarla aquí (2026-08-03): hasta hoy el INSERT no escribía
+ * `es_propio` en absoluto, así que TODA fila nacía con el DEFAULT 0. La columna solo
+ * llegaba a 1 por el UPDATE retroactivo de /api/analytics/ip-filter, que se dispara
+ * únicamente al CAMBIAR de IP y marca las de la IP vieja — la IP actual no se marcaba
+ * nunca. El dashboard lo disimulaba porque filtra en lectura comparando con
+ * `analytics_config`, pero el dump crudo no lleva esa lógica: `/digest-diario` y
+ * cualquier script que lea `es_propio` estaban contando 2.202 visitas propias (749
+ * apps, 192 de ellas PWA) como tráfico real, inflando además recurrencia y
+ * descubrimiento interno.
+ */
+let cacheIpPropia: { valor: string | null; expira: number } = { valor: null, expira: 0 };
+const TTL_IP_PROPIA_MS = 10 * 60 * 1000;
+
+async function getIpPropia(client: ReturnType<typeof getTursoClient>): Promise<string | null> {
+  const ahora = Date.now();
+  if (ahora < cacheIpPropia.expira) return cacheIpPropia.valor;
+  try {
+    const res = await client.execute({
+      sql: `SELECT valor FROM analytics_config WHERE clave = 'ip_excluida'`,
+      args: [],
+    });
+    const valor = res.rows.length > 0 && res.rows[0].valor ? String(res.rows[0].valor) : null;
+    cacheIpPropia = { valor, expira: ahora + TTL_IP_PROPIA_MS };
+    return valor;
+  } catch (err) {
+    // Nunca bloquear el registro por esto: se inserta como no-propio y se reintenta en
+    // un minuto. El UPDATE retroactivo de ip-filter sigue siendo la red de seguridad.
+    console.error('No se pudo leer la IP propia de analytics_config:', err);
+    cacheIpPropia = { valor: null, expira: ahora + 60 * 1000 };
+    return null;
+  }
+}
+
 export async function OPTIONS() {
   return NextResponse.json({}, { headers: getCorsHeaders('POST, OPTIONS') });
 }
@@ -145,6 +185,15 @@ export async function POST(request: NextRequest) {
       request.headers.get('x-real-ip') ||
       null;
     const ip_address = rawIP ? anonymizeIP(rawIP) : null;
+
+    // Marcar en origen las visitas del propietario (ver getIpPropia). Se compara IP
+    // anonimizada contra IP anonimizada: `ip-filter` guarda `ip_excluida` ya truncada.
+    // `filtro_ip_activo` NO se consulta a propósito: `es_propio` describe un HECHO —la
+    // visita es del propietario— mientras que el checkbox del dashboard es una decisión
+    // de visualización, y se aplica al leer. Así el dato queda correcto en el dump aunque
+    // el filtro esté desactivado.
+    const ipPropia = ip_address ? await getIpPropia(client) : null;
+    const es_propio = ipPropia !== null && ip_address === ipPropia ? 1 : 0;
 
     // Detección compuesta de bot: por user agent O por IP de datacenter cloud
     const esBotIP = esIpDatacenter(rawIP);
@@ -259,8 +308,8 @@ export async function POST(request: NextRequest) {
       sql: `INSERT INTO uso_aplicaciones
             (aplicacion, timestamp, navegador, sistema_operativo, resolucion,
              tipo_dispositivo, es_recurrente, ip_address, pais, ciudad,
-             modo, sesion_id, datos_adicionales, host)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+             modo, sesion_id, datos_adicionales, host, es_propio)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
         aplicacion,
         timestamp,
@@ -276,6 +325,7 @@ export async function POST(request: NextRequest) {
         sesion_id,
         datos_adicionales,
         host,
+        es_propio,
       ],
     });
 
