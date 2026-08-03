@@ -34,8 +34,10 @@ export default function Footer({ appName }: FooterProps) {
       try {
         await navigator.share({ title: titulo, text: texto, url: url });
         console.log('✅ Compartido exitosamente');
-      } catch (err: any) {
-        if (err.name !== 'AbortError') {
+      } catch (err) {
+        // AbortError = el usuario cerró el diálogo de compartir; no es un fallo.
+        // Lo que no sea un Error se registra igual, como hacía la versión con `any`.
+        if (!(err instanceof Error) || err.name !== 'AbortError') {
           console.error('Error al compartir:', err);
         }
       }

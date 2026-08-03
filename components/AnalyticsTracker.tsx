@@ -63,9 +63,13 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
       sessionStorage.setItem(SESSION_KEY, sessionId);
     }
 
-    // Detectar si está instalada como PWA
+    // Detectar si está instalada como PWA.
+    // `navigator.standalone` es propiedad no estándar de Safari en iOS (el único
+    // sitio donde `display-mode: standalone` no basta), así que no está en los
+    // tipos del DOM: se declara aquí en vez de apagar el chequeo con `any`.
+    const navegador = window.navigator as Navigator & { standalone?: boolean };
     const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
-                  (window.navigator as any).standalone === true;
+                  navegador.standalone === true;
 
     // Detectar si la visita viene referida desde una plataforma de IA
     const referrer = document.referrer;

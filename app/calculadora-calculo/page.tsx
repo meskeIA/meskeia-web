@@ -9,6 +9,64 @@ import { getRelatedApps } from '@/data/app-relations';
 
 type TipoCalculo = 'derivadas' | 'integrales' | 'limites' | 'series';
 
+/**
+ * Resultado del cálculo, como unión discriminada por `tipo`.
+ *
+ * Sin este tipo explícito, TypeScript infiere la unión de los `return` del
+ * useMemo pero deja `tipo` como `string` y rellena las propiedades ausentes con
+ * `?: undefined`. Consecuencia: `resultados.tipo === 'limite'` no estrechaba
+ * nada y cada rama podía leer campos de las demás sin queja del compilador
+ * (devolvían `undefined` en pantalla, en silencio). De ahí venían los siete
+ * `as any` que había en el bloque de límites.
+ */
+type ResultadoCalculo =
+  | {
+      tipo: 'derivada';
+      punto: number;
+      valorFuncion: number;
+      primeraDerivada: number;
+      segundaDerivada: number;
+      esCreciente: boolean;
+      esConcavaArriba: boolean;
+    }
+  | {
+      tipo: 'integral';
+      resultado: number;
+      valorEnA: number;
+      valorEnB: number;
+      intervalo: string;
+      precision: number;
+    }
+  | {
+      tipo: 'limite';
+      punto: number;
+      izquierda: number;
+      derecha: number;
+      /** null cuando los límites laterales no coinciden: el límite no existe */
+      limite: number | null;
+      valorEnPunto: number;
+      existe: boolean;
+    }
+  | {
+      tipo: 'serie';
+      subtipo: 'aritmetica';
+      suma: number;
+      ultimoTermino: number;
+      terminos: number[];
+      formula: string;
+    }
+  | {
+      tipo: 'serie';
+      subtipo: 'geometrica';
+      suma: number;
+      ultimoTermino: number;
+      /** null si |r| ≥ 1: la serie diverge y no hay suma infinita */
+      sumaInfinita: number | null;
+      converge: boolean;
+      terminos: number[];
+      formula: string;
+    };
+
 interface FuncionBase {
   nombre: string;
   funcion: string;
@@ -113,7 +171,7 @@ export default function CalculadoraCalculoPage() {
     return { izquierda, derecha, limite };
   };
 
-  const resultados = useMemo(() => {
+  const resultados = useMemo<ResultadoCalculo | null>(() => {
     switch (tipoCalculo) {
       case 'derivadas': {
         const x = parseSpanishNumber(puntoDerivada);
@@ -473,25 +531,25 @@ export default function CalculadoraCalculoPage() {
                 <>
                   <ResultCard
                     title={`lim x→${formatNumber(resultados.punto ?? 0, 2)}`}
-                    value={(resultados as any).existe ? formatNumber((resultados as any).limite ?? 0, 6) : 'No existe'}
-                    variant={(resultados as any).existe ? 'highlight' : 'warning'}
+                    value={resultados.existe ? formatNumber(resultados.limite ?? 0, 6) : 'No existe'}
+                    variant={resultados.existe ? 'highlight' : 'warning'}
                     icon="lim"
                   />
                   <ResultCard
                     title="Límite por izquierda"
-                    value={formatNumber((resultados as any).izquierda ?? 0, 6)}
+                    value={formatNumber(resultados.izquierda, 6)}
                     variant="default"
                     icon="←"
                   />
                   <ResultCard
                     title="Límite por derecha"
-                    value={formatNumber((resultados as any).derecha ?? 0, 6)}
+                    value={formatNumber(resultados.derecha, 6)}
                     variant="default"
                     icon="→"
                   />
                   <ResultCard
                     title={`f(${formatNumber(resultados.punto ?? 0, 2)})`}
-                    value={isNaN((resultados as any).valorEnPunto) ? 'Indefinido' : formatNumber((resultados as any).valorEnPunto ?? 0, 6)}
+                    value={isNaN(resultados.valorEnPunto) ? 'Indefinido' : formatNumber(resultados.valorEnPunto, 6)}
                     variant="info"
                     icon="f"
                     description="Valor en el punto"

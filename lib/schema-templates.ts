@@ -12,6 +12,13 @@ import { WithContext, WebApplication, SoftwareApplication, FAQPage, HowTo } from
 // TIPOS DE CONFIGURACIÓN
 // ============================================================================
 
+/**
+ * Un objeto JSON-LD ya construido, tal y como lo reciben los helpers genéricos
+ * del final del fichero. Es deliberadamente laxo —cada app monta el suyo— pero
+ * `unknown` obliga a comprobar antes de usar el valor, cosa que `any` no hacía.
+ */
+export type SchemaObject = Record<string, unknown>;
+
 export interface BaseAppConfig {
   name: string;
   description: string;
@@ -197,7 +204,7 @@ export function generateHowToSchema(config: {
  * Combinar múltiples schemas en un solo objeto
  * Útil cuando una página tiene múltiples tipos de contenido estructurado
  */
-export function combineSchemas(...schemas: any[]) {
+export function combineSchemas(...schemas: SchemaObject[]) {
   return {
     '@context': 'https://schema.org',
     '@graph': schemas,
@@ -352,7 +359,7 @@ export function generateEducationalGameSchema(config: {
  * Valida que un schema tenga los campos mínimos requeridos
  * Útil en desarrollo para evitar errores
  */
-export function validateSchema(schema: any): { valid: boolean; errors: string[] } {
+export function validateSchema(schema: SchemaObject): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
 
   if (!schema['@context']) errors.push('Falta @context');
@@ -370,7 +377,7 @@ export function validateSchema(schema: any): { valid: boolean; errors: string[] 
 /**
  * Pretty print de schema para debugging
  */
-export function debugSchema(schema: any): void {
+export function debugSchema(schema: SchemaObject): void {
   console.group('🔍 Schema.org Debug');
   console.log('Type:', schema['@type']);
   console.log('Name:', schema.name);
