@@ -693,10 +693,10 @@ export default function CalculadoraHorasPage() {
 
       <DisclaimerCard
         variant="general"
-        severity="medium"
+        severity="high"
         title="Qué calcula esta herramienta y qué no"
         context="calculadora-horas"
-        collapsible={true}
+        collapsible={false}
       >
         <p>
           Esta calculadora hace aritmética de tiempo: suma, resta y convierte entre horas y minutos.
