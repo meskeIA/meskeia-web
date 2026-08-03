@@ -237,6 +237,12 @@ interface CourseContextType {
   getProgressPercentage: () => number;
   resetProgress: () => void;
   hasAcceptedConsent: boolean;
+  /**
+   * false hasta que se ha leído localStorage. Imprescindible antes de decidir
+   * nada sobre el consentimiento: en el primer render `hasAcceptedConsent` es
+   * `false` incluso para quien sí aceptó, porque la lectura ocurre en un efecto.
+   */
+  isLoaded: boolean;
   acceptConsent: () => void;
   declineConsent: () => void;
 }
@@ -331,6 +337,7 @@ export function CourseProvider({ children }: { children: ReactNode }) {
         getProgressPercentage,
         resetProgress,
         hasAcceptedConsent,
+        isLoaded,
         acceptConsent,
         declineConsent,
       }}

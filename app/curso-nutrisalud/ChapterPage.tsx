@@ -1,7 +1,8 @@
 'use client';
 
-import { ReactNode, useRef } from 'react';
+import { ReactNode, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import styles from './CursoNutrisalud.module.css';
 import { MeskeiaLogo, Footer, TextToSpeech } from '@/components';
 import { CHAPTERS, useCourse } from './CourseContext';
@@ -18,14 +19,28 @@ interface ChapterPageProps {
 }
 
 export default function ChapterPage({ slug, sections }: ChapterPageProps) {
-  const { markChapterComplete, isChapterCompleted, hasAcceptedConsent } = useCourse();
+  const { markChapterComplete, isChapterCompleted, hasAcceptedConsent, isLoaded } = useCourse();
   const contentRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
-  // Redirigir si no ha aceptado el consentimiento
-  if (!hasAcceptedConsent) {
-    if (typeof window !== 'undefined') {
-      window.location.href = '/curso-nutrisalud';
+  // Redirigir a la portada del curso si no se ha aceptado el consentimiento.
+  //
+  // Va en un efecto y espera a `isLoaded` por dos motivos distintos:
+  // 1. Navegar es un efecto secundario: hacerlo durante el render se ejecuta dos
+  //    veces en StrictMode y dejaría de ocurrir si el componente se memoizara,
+  //    y un control de acceso que falla debe hacerlo cerrando, no abriendo.
+  // 2. `hasAcceptedConsent` es `false` en el primer render hasta que se lee
+  //    localStorage. Sin esperar a `isLoaded`, quien ya había aceptado y entraba
+  //    a un capítulo por URL directa (marcador, buscador, recarga) era devuelto a
+  //    la portada; solo se libraba al navegar con <Link>, porque entonces el
+  //    provider del layout no se remonta y el estado ya estaba cargado.
+  useEffect(() => {
+    if (isLoaded && !hasAcceptedConsent) {
+      router.replace('/curso-nutrisalud');
     }
+  }, [isLoaded, hasAcceptedConsent, router]);
+
+  if (!isLoaded || !hasAcceptedConsent) {
     return null;
   }
 
