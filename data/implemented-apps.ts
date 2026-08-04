@@ -247,6 +247,7 @@ export const implementedAppsUrls = [
   "/calculadora-jugada-scrabble/", // Mejor palabra por puntuación con tu atril y la letra del tablero
   "/generador-lorem-ipsum/",    // Generador de texto de prueba
   "/contador-silabas/",         // Separar y contar sílabas en español
+  "/diccionario-rimas/",        // Rimario: rima consonante y asonante del español
   "/conversor-formatos/",       // JSON, CSV, Excel, XML, YAML
   "/conjugador-verbos/",        // Conjugador de verbos español con irregulares
   "/tablas-multiplicar/",       // Entrenador tablas multiplicar gamificado
