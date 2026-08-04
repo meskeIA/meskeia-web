@@ -487,42 +487,108 @@
   margin: 0 !important;
 }
 
-/* Info Section */
-.infoSection {
+/* Fichas por modalidad (una sección propia por lotería) */
+.modalidadesSection {
   margin-bottom: var(--spacing-xl);
 }
 
-.infoSection h3 {
-  font-size: 1.2rem;
-  color: var(--text-primary);
-  margin-bottom: var(--spacing-lg);
+.modalidadesIntro {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 var(--spacing-lg);
   text-align: center;
 }
 
-.infoGrid {
+.modalidadesGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: var(--spacing-md);
 }
 
-.infoCard {
+.modalidadCard {
+  scroll-margin-top: var(--spacing-xl);
   background: var(--bg-card);
   border-radius: var(--radius);
   padding: var(--spacing-lg);
   box-shadow: var(--shadow-sm);
+  border-top: 3px solid var(--primary);
+  display: flex;
+  flex-direction: column;
 }
 
-.infoCard h4 {
+.modalidadTitulo {
   margin: 0 0 var(--spacing-sm);
   color: var(--text-primary);
-  font-size: 1rem;
+  font-size: 1.05rem;
+  line-height: 1.35;
 }
 
-.infoCard p {
-  margin: 0;
+.modalidadTexto {
+  margin: 0 0 var(--spacing-md);
   font-size: 0.85rem;
   color: var(--text-secondary);
-  line-height: 1.5;
+  line-height: 1.55;
+}
+
+.modalidadDatos {
+  margin: 0 0 var(--spacing-md);
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+}
+
+.modalidadDatos > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  border-bottom: 1px dashed var(--border-color, #e5e5e5);
+  padding-bottom: 0.3rem;
+}
+
+.modalidadDatos dt {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.modalidadDatos dd {
+  margin: 0;
+  color: var(--text-primary);
+  font-weight: 600;
+  text-align: right;
+}
+
+.modalidadBoton {
+  margin-top: auto;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.modalidadBoton:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.modalidadBoton:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+[data-theme='dark'] .modalidadDatos > div {
+  border-bottom-color: #3a3a3a;
+}
+
+[data-theme='dark'] .modalidadBoton:hover {
+  background: var(--primary);
+  color: #fff;
 }
 
 /* ── EducationalSection: Guía Educativa ── */
@@ -956,8 +1022,17 @@
     gap: var(--spacing-xs);
   }
 
-  .infoGrid {
+  .modalidadesGrid {
     grid-template-columns: 1fr;
+  }
+
+  .modalidadDatos > div {
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .modalidadDatos dd {
+    text-align: left;
   }
 
   /* EducationalSection responsive */

@@ -87,6 +87,22 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
+      name: '¿Cómo se genera una combinación de Euromillones?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una combinación de Euromillones son 5 números del 1 al 50 más 2 estrellas del 1 al 12, y los dos bloques se sortean por separado. El generador produce ambos a la vez sin repetir números dentro de cada bloque. Acertar los 5 números y las 2 estrellas tiene una probabilidad de 1 entre 139.838.160, la más baja de las cinco loterías disponibles.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿En qué se diferencian Bonoloto y La Primitiva al generar números?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En nada desde el punto de vista de la combinación: ambas son 6 números del 1 al 49 más el Reintegro, con la misma probabilidad de acertar los 6 (1 entre 13.983.816). Las diferencias están fuera del bombo: la Bonoloto se sortea de lunes a sábado y la apuesta cuesta 0,50 €, mientras que La Primitiva se sortea jueves y sábados a 1,00 € la apuesta.',
+      },
+    },
+    {
+      '@type': 'Question',
       name: '¿Puedo generar combinaciones para Lototurf con esta herramienta?',
       acceptedAnswer: {
         '@type': 'Answer',

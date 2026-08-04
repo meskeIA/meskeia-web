@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import styles from './GeneradorLoteria.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
@@ -18,6 +18,14 @@ interface LotteryConfig {
   description: string;
   drawDays: string;
   price: string;
+  /** Ancla de la sección propia de esta modalidad (enlazable desde fuera). */
+  anchor: string;
+  /** Probabilidad del primer premio, calculada sobre las reglas de la propia modalidad. */
+  odds: string;
+  /** Qué combinación hay que acertar para esa probabilidad. */
+  oddsLabel: string;
+  /** Párrafo funcional de la sección propia: reglas y uso, sin hablar de botes. */
+  blurb: string;
 }
 
 interface GeneratedResult {
@@ -39,7 +47,11 @@ const LOTTERY_CONFIG: Record<LotteryType, LotteryConfig> = {
     extraName: 'Reintegro',
     description: '6 números del 1 al 49 + Reintegro (0-9)',
     drawDays: 'Jueves y Sábados',
-    price: '1,00 €'
+    price: '1,00 €',
+    anchor: 'generador-primitiva',
+    odds: '1 entre 13.983.816',
+    oddsLabel: 'acertar los 6 números',
+    blurb: 'Genera combinaciones de 6 números del 1 al 49 para La Primitiva, más el Reintegro (un dígito del 0 al 9). Puedes producir varias apuestas de golpe si juegas boleto múltiple y guardar las que quieras conservar. El sorteo se celebra jueves y sábados.'
   },
   euromillones: {
     name: 'Euromillones',
@@ -51,7 +63,11 @@ const LOTTERY_CONFIG: Record<LotteryType, LotteryConfig> = {
     extraName: 'Estrellas',
     description: '5 números del 1 al 50 + 2 Estrellas (1-12)',
     drawDays: 'Martes y Viernes',
-    price: '2,50 €'
+    price: '2,50 €',
+    anchor: 'generador-euromillones',
+    odds: '1 entre 139.838.160',
+    oddsLabel: 'acertar los 5 números y las 2 estrellas',
+    blurb: 'Genera combinaciones de Euromillones: 5 números del 1 al 50 y 2 estrellas del 1 al 12, los dos bloques a la vez y sin repetir números dentro de cada uno. Es la modalidad con más combinaciones posibles de las cinco, porque hay que acertar dos sorteos independientes. Se juega martes y viernes.'
   },
   bonoloto: {
     name: 'Bonoloto',
@@ -63,7 +79,11 @@ const LOTTERY_CONFIG: Record<LotteryType, LotteryConfig> = {
     extraName: 'Reintegro',
     description: '6 números del 1 al 49 + Reintegro (0-9)',
     drawDays: 'Lunes a Sábado',
-    price: '0,50 €'
+    price: '0,50 €',
+    anchor: 'generador-bonoloto',
+    odds: '1 entre 13.983.816',
+    oddsLabel: 'acertar los 6 números',
+    blurb: 'Genera combinaciones de Bonoloto: 6 números del 1 al 49 y Reintegro, con las mismas reglas que La Primitiva pero sorteo de lunes a sábado. Como hay sorteo casi a diario, aquí es donde más sentido tiene generar varias combinaciones seguidas y guardarlas para la semana.'
   },
   gordo: {
     name: 'El Gordo de la Primitiva',
@@ -75,7 +95,11 @@ const LOTTERY_CONFIG: Record<LotteryType, LotteryConfig> = {
     extraName: 'Clave',
     description: '5 números del 1 al 54 + Clave (0-9)',
     drawDays: 'Domingos',
-    price: '1,50 €'
+    price: '1,50 €',
+    anchor: 'generador-gordo-primitiva',
+    odds: '1 entre 31.625.100',
+    oddsLabel: 'acertar los 5 números y la clave',
+    blurb: 'Genera combinaciones de El Gordo de la Primitiva: 5 números del 1 al 54 más la Clave (un dígito del 0 al 9). Al pedir solo 5 aciertos sobre 54 bolas, tiene menos combinaciones posibles que La Primitiva pese a usar más números. Sorteo los domingos.'
   },
   lototurf: {
     name: 'Lototurf',
@@ -87,7 +111,11 @@ const LOTTERY_CONFIG: Record<LotteryType, LotteryConfig> = {
     extraName: 'Caballo',
     description: '6 números del 1 al 31 + Caballo ganador (1-12)',
     drawDays: 'Domingos',
-    price: '1,00 €'
+    price: '1,00 €',
+    anchor: 'generador-lototurf',
+    odds: '1 entre 8.835.372',
+    oddsLabel: 'acertar los 6 números y el caballo',
+    blurb: 'Genera combinaciones de Lototurf: 6 números del 1 al 31 más el Caballo ganador (del 1 al 12). Es la modalidad con menos combinaciones posibles de las cinco, porque solo entran 31 bolas en el bombo principal. Se sortea los domingos, ligado a una carrera hípica.'
   }
 };
 
@@ -97,6 +125,13 @@ export default function GeneradorLoteriaPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [favorites, setFavorites] = useState<GeneratedResult[]>([]);
+  const generadorRef = useRef<HTMLDivElement>(null);
+
+  // Desde la ficha de cada modalidad: seleccionarla y subir al generador
+  const irAlGenerador = useCallback((type: LotteryType) => {
+    setSelectedLottery(type);
+    generadorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, []);
 
   // Generar números aleatorios únicos
   const generateUniqueNumbers = (count: number, max: number, startFrom: number = 1): number[] => {
@@ -175,10 +210,11 @@ export default function GeneradorLoteriaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🎲</span>
+        <span className={styles.heroIcon} aria-hidden="true">🎲</span>
         <h1 className={styles.title}>Generador de Lotería</h1>
         <p className={styles.subtitle}>
-          Genera números aleatorios para las principales loterías españolas. ¡Prueba tu suerte!
+          Genera combinaciones aleatorias de Primitiva, Euromillones, Bonoloto,
+          El Gordo de la Primitiva y Lototurf.
         </p>
       </header>
 
@@ -190,10 +226,12 @@ export default function GeneradorLoteriaPage() {
           {(Object.keys(LOTTERY_CONFIG) as LotteryType[]).map(type => (
             <button
               key={type}
+              type="button"
               onClick={() => setSelectedLottery(type)}
+              aria-pressed={selectedLottery === type}
               className={`${styles.lotteryButton} ${selectedLottery === type ? styles.active : ''}`}
             >
-              <span className={styles.lotteryIcon}>{LOTTERY_CONFIG[type].icon}</span>
+              <span className={styles.lotteryIcon} aria-hidden="true">{LOTTERY_CONFIG[type].icon}</span>
               <span className={styles.lotteryName}>{LOTTERY_CONFIG[type].name}</span>
             </button>
           ))}
@@ -202,25 +240,27 @@ export default function GeneradorLoteriaPage() {
         {/* Info de la lotería seleccionada */}
         <div className={styles.lotteryInfo}>
           <div className={styles.infoHeader}>
-            <span className={styles.infoBigIcon}>{config.icon}</span>
+            <span className={styles.infoBigIcon} aria-hidden="true">{config.icon}</span>
             <h2>{config.name}</h2>
           </div>
           <div className={styles.infoDetails}>
-            <span className={styles.infoItem}>📋 {config.description}</span>
-            <span className={styles.infoItem}>📅 {config.drawDays}</span>
-            <span className={styles.infoItem}>💰 {config.price} / apuesta</span>
+            <span className={styles.infoItem}><span aria-hidden="true">📋</span> {config.description}</span>
+            <span className={styles.infoItem}><span aria-hidden="true">📅</span> {config.drawDays}</span>
+            <span className={styles.infoItem}><span aria-hidden="true">💰</span> {config.price} / apuesta</span>
           </div>
         </div>
 
         {/* Generador */}
-        <div className={styles.generatorPanel}>
+        <div className={styles.generatorPanel} ref={generadorRef}>
           <div className={styles.quantitySelector}>
             <label>Combinaciones a generar:</label>
             <div className={styles.quantityButtons}>
               {[1, 3, 5, 10].map(num => (
                 <button
                   key={num}
+                  type="button"
                   onClick={() => setQuantity(num)}
+                  aria-pressed={quantity === num}
                   className={`${styles.quantityBtn} ${quantity === num ? styles.active : ''}`}
                 >
                   {num}
@@ -230,11 +270,14 @@ export default function GeneradorLoteriaPage() {
           </div>
 
           <button
+            type="button"
             onClick={generateCombination}
             className={styles.generateButton}
             disabled={isGenerating}
           >
-            {isGenerating ? '🎲 Generando...' : `🎯 Generar ${quantity} combinación${quantity > 1 ? 'es' : ''}`}
+            {isGenerating
+              ? <><span aria-hidden="true">🎲</span> Generando...</>
+              : <><span aria-hidden="true">🎯</span> {`Generar ${quantity} combinación${quantity > 1 ? 'es' : ''} de ${config.name}`}</>}
           </button>
         </div>
 
@@ -242,9 +285,9 @@ export default function GeneradorLoteriaPage() {
         {results.length > 0 && (
           <div className={styles.resultsSection}>
             <div className={styles.resultsSectionHeader}>
-              <h2>🎰 Combinaciones generadas</h2>
-              <button onClick={clearHistory} className={styles.btnSmall}>
-                🗑️ Limpiar
+              <h2><span aria-hidden="true">🎰</span> Combinaciones generadas</h2>
+              <button type="button" onClick={clearHistory} className={styles.btnSmall}>
+                <span aria-hidden="true">🗑️</span> Limpiar
               </button>
             </div>
 
@@ -260,7 +303,7 @@ export default function GeneradorLoteriaPage() {
                   >
                     <div className={styles.resultHeader}>
                       <span className={styles.resultType}>
-                        {resultConfig.icon} {resultConfig.name}
+                        <span aria-hidden="true">{resultConfig.icon}</span> {resultConfig.name}
                       </span>
                       <span className={styles.resultTime}>
                         {result.timestamp.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
@@ -289,16 +332,21 @@ export default function GeneradorLoteriaPage() {
 
                     <div className={styles.resultActions}>
                       <button
+                        type="button"
                         onClick={() => copyToClipboard(result)}
                         className={styles.actionBtn}
                         title="Copiar"
+                        aria-label="Copiar combinación"
                       >
                         📋
                       </button>
                       <button
+                        type="button"
                         onClick={() => isFavorite ? removeFromFavorites(result.id) : addToFavorites(result)}
                         className={`${styles.actionBtn} ${isFavorite ? styles.favorited : ''}`}
                         title={isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+                        aria-label={isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+                        aria-pressed={Boolean(isFavorite)}
                       >
                         {isFavorite ? '⭐' : '☆'}
                       </button>
@@ -313,13 +361,13 @@ export default function GeneradorLoteriaPage() {
         {/* Favoritos */}
         {favorites.length > 0 && (
           <div className={styles.favoritesSection}>
-            <h2>⭐ Mis combinaciones favoritas</h2>
+            <h2><span aria-hidden="true">⭐</span> Mis combinaciones favoritas</h2>
             <div className={styles.favoritesList}>
               {favorites.map(result => {
                 const resultConfig = LOTTERY_CONFIG[result.type];
                 return (
                   <div key={result.id} className={styles.favoriteCard}>
-                    <span className={styles.favoriteType}>{resultConfig.icon}</span>
+                    <span className={styles.favoriteType} aria-hidden="true">{resultConfig.icon}</span>
                     <div className={styles.favoriteNumbers}>
                       {result.mainNumbers.join(' - ')}
                       {result.extraNumbers && (
@@ -329,8 +377,10 @@ export default function GeneradorLoteriaPage() {
                       )}
                     </div>
                     <button
+                      type="button"
                       onClick={() => removeFromFavorites(result.id)}
                       className={styles.removeFavorite}
+                      aria-label="Quitar de favoritos"
                     >
                       ×
                     </button>
@@ -352,26 +402,51 @@ export default function GeneradorLoteriaPage() {
 
       
 
-      {/* Info adicional */}
-      <div className={styles.infoSection}>
-        <h3>💡 Sobre las loterías</h3>
-        <div className={styles.infoGrid}>
-          <div className={styles.infoCard}>
-            <h4>🎱 La Primitiva</h4>
-            <p>La lotería más antigua de España (desde 1763). Sorteos jueves y sábados con bote acumulado que puede superar los 100 millones de euros.</p>
-          </div>
-          <div className={styles.infoCard}>
-            <h4>⭐ Euromillones</h4>
-            <p>Lotería europea con participantes de 9 países. Los botes pueden superar los 200 millones de euros. Sorteos martes y viernes.</p>
-          </div>
-          <div className={styles.infoCard}>
-            <h4>🍀 Bonoloto</h4>
-            <p>Sorteo diario (lunes a sábado) con apuestas desde 0,50€. Ideal para jugar más frecuentemente con menor inversión.</p>
-          </div>
-          <div className={styles.infoCard}>
-            <h4>🎰 El Gordo</h4>
-            <p>Bote mínimo garantizado de 5 millones de euros todos los domingos. Mayor probabilidad de premio que La Primitiva.</p>
-          </div>
+      {/* Ficha propia de cada modalidad. Visible (no colapsable) a propósito: es el
+          contenido que asocia la página a cada lotería concreta, no solo a La Primitiva. */}
+      <div className={styles.modalidadesSection}>
+        <p className={styles.modalidadesIntro}>
+          El generador cubre cinco loterías españolas, cada una con sus propias reglas de
+          combinación. Estas son las diferencias y el enlace directo para generar en cada una.
+        </p>
+
+        <div className={styles.modalidadesGrid}>
+          {(Object.keys(LOTTERY_CONFIG) as LotteryType[]).map(type => {
+            const c = LOTTERY_CONFIG[type];
+            return (
+              <section key={type} id={c.anchor} className={styles.modalidadCard}>
+                <h2 className={styles.modalidadTitulo}>
+                  <span aria-hidden="true">{c.icon}</span> {`Generador de ${c.name}`}
+                </h2>
+                <p className={styles.modalidadTexto}>{c.blurb}</p>
+                <dl className={styles.modalidadDatos}>
+                  <div>
+                    <dt>Combinación</dt>
+                    <dd>{c.description}</dd>
+                  </div>
+                  <div>
+                    <dt>Sorteos</dt>
+                    <dd>{c.drawDays}</dd>
+                  </div>
+                  <div>
+                    <dt>Precio por apuesta</dt>
+                    <dd>{c.price}</dd>
+                  </div>
+                  <div>
+                    <dt>Probabilidad de {c.oddsLabel}</dt>
+                    <dd>{c.odds}</dd>
+                  </div>
+                </dl>
+                <button
+                  type="button"
+                  onClick={() => irAlGenerador(type)}
+                  className={styles.modalidadBoton}
+                >
+                  {`Generar números de ${c.name}`}
+                </button>
+              </section>
+            );
+          })}
         </div>
       </div>
 
