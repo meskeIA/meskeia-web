@@ -418,6 +418,181 @@
   }
 }
 
+/* ===== HOJA IMPRIMIBLE A ESCALA REAL ===== */
+
+.hojaSection {
+  background: var(--bg-card);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--border);
+  margin-bottom: var(--spacing-xl);
+}
+
+.hojaSection h2 {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.hojaIntro {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin-bottom: var(--spacing-lg);
+}
+
+.hojaControles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.hojaCampo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.hojaEtiqueta {
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.hojaInput {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.hojaInput:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.hojaGrupo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.hojaBtn {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.hojaBtn:hover {
+  border-color: var(--primary);
+}
+
+.hojaBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.hojaBtnActivo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+}
+
+.hojaAyuda {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.hojaAccion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.hojaAviso {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.hojaNota {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  background: rgba(46, 134, 171, 0.06);
+  border: 1px solid rgba(46, 134, 171, 0.18);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+}
+
+.hojaNota p {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* La hoja propiamente dicha: en pantalla es una tarjeta blanca; al imprimir,
+   impresion.module.css la deja sin marco, sin fondo y con su propio margen. */
+.hojaPapel {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  overflow-x: auto;
+}
+
+.hojaPapelTitulo {
+  color: #000000;
+  font-size: 1.05rem;
+  margin: 0 0 var(--spacing-md);
+}
+
+.hojaSvg {
+  display: block;
+  max-width: 100%;
+}
+
+.hojaRegla {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-md);
+  border-top: 1px dashed #cccccc;
+}
+
+.hojaReglaTexto {
+  color: #444444;
+  font-size: 0.72rem;
+}
+
+@media print {
+  /* El SVG lleva sus medidas en mm: lo único que hay que impedir es que una
+     regla de ancho máximo lo encoja al activarse la maquetación de móvil. */
+  .hojaSvg {
+    max-width: none;
+  }
+
+  .hojaPapelTitulo,
+  .hojaReglaTexto {
+    color: #000000;
+  }
+}
+
 /* ===== SECCIONES EDUCATIVAS PROFESIONALES ===== */
 
 .eduComparativaSection {

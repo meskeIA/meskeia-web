@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import styles from './ConversorBraille.module.css';
+import impresion from '@/styles/impresion.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection,
@@ -59,11 +60,169 @@ const brailleDots: { [key: string]: number[] } = {
 const NUMBER_INDICATOR = '⠼';
 const CAPITAL_INDICATOR = '⠨';
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Hoja imprimible a escala real
+//
+// El Braille es un sistema físico: sus medidas están normalizadas en milímetros
+// y una celda impresa a otro tamaño deja de ser legible al tacto y de encajar en
+// una regleta. Por eso la hoja se dibuja en SVG con unidades en mm (nunca en px)
+// y lleva su propia regla de calibración: el navegador escala al imprimir con
+// mucha más frecuencia de lo que la gente supone.
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface NormaBraille {
+  id: string;
+  nombre: string;
+  /** Diámetro de la base del punto (mm) */
+  diametroPunto: number;
+  /** Distancia entre centros de dos puntos contiguos de la MISMA celda (mm) */
+  entrePuntos: number;
+  /** Distancia entre centros del punto 1 de dos celdas contiguas (mm) */
+  entreCeldas: number;
+  /** Distancia entre centros del punto 1 de dos líneas contiguas (mm) */
+  entreLineas: number;
+  fuente: string;
+}
+
+const NORMAS: NormaBraille[] = [
+  {
+    id: 'marburg',
+    nombre: 'Marburg Medium',
+    diametroPunto: 1.5,
+    entrePuntos: 2.5,
+    entreCeldas: 6.0,
+    entreLineas: 10.0,
+    fuente: 'Medida de referencia en Europa y la usada por la ONCE en España.',
+  },
+  {
+    id: 'ada',
+    nombre: 'ADA 703.3 (EE. UU.)',
+    diametroPunto: 1.5,
+    entrePuntos: 2.4,
+    entreCeldas: 6.2,
+    entreLineas: 10.2,
+    fuente:
+      'Norma de señalización estadounidense (2010 ADA Standards): celdas algo más separadas.',
+  },
+];
+
+/** Ancho útil considerado para la hoja: A4 (210 mm) menos márgenes de página e interior. */
+const ANCHO_UTIL_MM = 172;
+
+/** Espejo horizontal de la celda: al escribir con punzón, la columna izquierda pasa a ser la derecha. */
+const PUNTO_ESPEJO: Record<number, number> = { 1: 4, 2: 5, 3: 6, 4: 1, 5: 2, 6: 3 };
+
+/** Posición del punto dentro de la celda: columna (0 izquierda, 1 derecha) y fila (0 arriba). */
+const POSICION_PUNTO: Record<number, { columna: number; fila: number }> = {
+  1: { columna: 0, fila: 0 },
+  2: { columna: 0, fila: 1 },
+  3: { columna: 0, fila: 2 },
+  4: { columna: 1, fila: 0 },
+  5: { columna: 1, fila: 1 },
+  6: { columna: 1, fila: 2 },
+};
+
 export default function ConversorBraillePage() {
   const [mode, setMode] = useState<'textToBraille' | 'brailleToText'>('textToBraille');
   const [input, setInput] = useState('');
   const [result, setResult] = useState('');
   const [showVisual, setShowVisual] = useState(true);
+  const [normaId, setNormaId] = useState('marburg');
+  const [modoEspejo, setModoEspejo] = useState(false);
+  const [mostrarGuia, setMostrarGuia] = useState(true);
+  const [tituloHoja, setTituloHoja] = useState('');
+
+  const norma = NORMAS.find((n) => n.id === normaId) ?? NORMAS[0];
+
+  /**
+   * Reparte el Braille en líneas del ancho de la página y calcula la posición en
+   * milímetros de cada punto. En modo espejo el orden de las celdas se invierte y
+   * cada celda se refleja: así se punza con la regleta por el reverso y, al dar la
+   * vuelta a la hoja, el texto se lee del derecho.
+   */
+  const hoja = useMemo(() => {
+    // Solo celdas Braille (bloque Unicode U+2800–U+28FF): un carácter sin equivalente
+    // dibujaría una celda fantasma en la hoja
+    const origen = (mode === 'textToBraille' ? result : input).replace(/[^⠀-⣿]/g, '');
+    const celdasPorLinea = Math.max(
+      8,
+      Math.floor((ANCHO_UTIL_MM - norma.entrePuntos - norma.diametroPunto) / norma.entreCeldas) + 1,
+    );
+
+    // Reparto por palabras; una palabra más larga que la línea se parte
+    const lineas: string[][] = [];
+    let actual: string[] = [];
+    const palabras = origen.split('⠀').filter((p) => p.length > 0);
+
+    for (const palabra of palabras) {
+      let restante = [...palabra];
+      while (restante.length > 0) {
+        const hueco = celdasPorLinea - actual.length - (actual.length > 0 ? 1 : 0);
+        if (hueco <= 0) {
+          lineas.push(actual);
+          actual = [];
+          continue;
+        }
+        if (actual.length > 0 && restante.length <= hueco) actual.push('⠀');
+        const trozo = restante.slice(0, Math.max(1, Math.min(restante.length, hueco)));
+        if (restante.length > hueco && actual.length > 0) {
+          lineas.push(actual);
+          actual = [];
+          continue;
+        }
+        actual.push(...trozo);
+        restante = restante.slice(trozo.length);
+        if (restante.length > 0) {
+          lineas.push(actual);
+          actual = [];
+        }
+      }
+    }
+    if (actual.length > 0) lineas.push(actual);
+
+    const lineasLimitadas = lineas.slice(0, 200);
+    const puntos: { x: number; y: number; activo: boolean }[] = [];
+    const radio = norma.diametroPunto / 2;
+
+    lineasLimitadas.forEach((linea, indiceLinea) => {
+      const celdas = modoEspejo ? [...linea].reverse() : linea;
+      // En espejo la línea se alinea a la derecha: al voltear la hoja queda a la izquierda
+      const desplazamiento = modoEspejo ? (celdasPorLinea - linea.length) * norma.entreCeldas : 0;
+
+      celdas.forEach((caracter, indiceCelda) => {
+        const activos = brailleDots[caracter] ?? [];
+        const activosFinales = modoEspejo ? activos.map((p) => PUNTO_ESPEJO[p]) : activos;
+        for (let punto = 1; punto <= 6; punto++) {
+          const { columna, fila } = POSICION_PUNTO[punto];
+          puntos.push({
+            x:
+              desplazamiento +
+              indiceCelda * norma.entreCeldas +
+              columna * norma.entrePuntos +
+              radio,
+            y: indiceLinea * norma.entreLineas + fila * norma.entrePuntos + radio,
+            activo: activosFinales.includes(punto),
+          });
+        }
+      });
+    });
+
+    const ancho = (celdasPorLinea - 1) * norma.entreCeldas + norma.entrePuntos + norma.diametroPunto;
+    const alto =
+      lineasLimitadas.length > 0
+        ? (lineasLimitadas.length - 1) * norma.entreLineas + 2 * norma.entrePuntos + norma.diametroPunto
+        : 0;
+
+    return {
+      puntos,
+      radio,
+      ancho: Number(ancho.toFixed(2)),
+      alto: Number(alto.toFixed(2)),
+      numeroLineas: lineasLimitadas.length,
+      celdasPorLinea,
+      recortada: lineas.length > lineasLimitadas.length,
+    };
+  }, [input, mode, modoEspejo, norma, result]);
 
   const convertTextToBraille = (text: string): string => {
     let result = '';
@@ -220,7 +379,8 @@ export default function ConversorBraillePage() {
   ];
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${impresion.lienzo}`}>
+      <div className={impresion.noImprimir}>
       <MeskeiaLogo />
 
       <header className={styles.hero}>
@@ -242,13 +402,17 @@ export default function ConversorBraillePage() {
       <div className={styles.mainContent}>
         <div className={styles.modeSelector}>
           <button
+            type="button"
             className={`${styles.modeBtn} ${mode === 'textToBraille' ? styles.active : ''}`}
+            aria-pressed={mode === 'textToBraille'}
             onClick={() => setMode('textToBraille')}
           >
             Texto → Braille
           </button>
           <button
+            type="button"
             className={`${styles.modeBtn} ${mode === 'brailleToText' ? styles.active : ''}`}
+            aria-pressed={mode === 'brailleToText'}
             onClick={() => setMode('brailleToText')}
           >
             Braille → Texto
@@ -273,6 +437,7 @@ export default function ConversorBraillePage() {
             {examples.map((ex) => (
               <button
                 key={ex.text}
+                type="button"
                 className={styles.exampleBtn}
                 onClick={() => setInput(ex.text)}
               >
@@ -283,13 +448,13 @@ export default function ConversorBraillePage() {
         </div>
 
         <div className={styles.buttonRow}>
-          <button onClick={handleConvert} className={styles.btnPrimary}>
+          <button type="button" onClick={handleConvert} className={styles.btnPrimary}>
             Convertir
           </button>
-          <button onClick={handleSwap} className={styles.btnSwap} title="Intercambiar" aria-label="Intercambiar dirección de conversión">
+          <button type="button" onClick={handleSwap} className={styles.btnSwap} title="Intercambiar" aria-label="Intercambiar dirección de conversión">
             <span aria-hidden="true">⇄</span>
           </button>
-          <button onClick={handleClear} className={styles.btnSecondary}>
+          <button type="button" onClick={handleClear} className={styles.btnSecondary}>
             Limpiar
           </button>
         </div>
@@ -301,34 +466,250 @@ export default function ConversorBraillePage() {
               {result}
             </div>
 
-            {mode === 'textToBraille' && showVisual && (
+            {mode === 'textToBraille' && (
               <div className={styles.visualSection}>
                 <div className={styles.visualHeader}>
                   <span>Vista con celdas Braille:</span>
+                  {/* El botón vive fuera del bloque que oculta: dentro, al ocultar
+                      desaparecía con él y no había forma de volver a mostrar la vista */}
                   <button
+                    type="button"
                     className={styles.toggleBtn}
+                    aria-expanded={showVisual}
                     onClick={() => setShowVisual(!showVisual)}
                   >
                     {showVisual ? 'Ocultar' : 'Mostrar'}
                   </button>
                 </div>
-                <div className={styles.visualGrid}>
-                  {result.split('').map((char, i) => (
-                    <div key={i}>
-                      {renderBrailleCell(char)}
-                    </div>
-                  ))}
-                </div>
+                {showVisual && (
+                  <div className={styles.visualGrid}>
+                    {result.split('').map((char, i) => (
+                      <div key={i}>
+                        {renderBrailleCell(char)}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
-            <button onClick={handleCopy} className={styles.btnCopy}>
+            <button type="button" onClick={handleCopy} className={styles.btnCopy}>
               Copiar resultado
             </button>
           </div>
         )}
       </div>
 
+      {/* ── Hoja imprimible a escala real ───────────────────────────────── */}
+      <section className={styles.hojaSection} aria-labelledby="titulo-hoja">
+        <h2 id="titulo-hoja">
+          <span aria-hidden="true">🖨️</span> Hoja imprimible a escala real
+        </h2>
+        <p className={styles.hojaIntro}>
+          El Braille no es un tipo de letra: es un sistema de medidas físicas. Esta hoja dibuja el
+          texto convertido con las distancias normalizadas en milímetros, de modo que cada celda
+          coincide con la de una regleta y con la de un texto embosado. Sirve como plantilla para
+          punzón, como material de aula y como guía para colocar pegatinas de relieve.
+        </p>
+
+        <div className={styles.hojaControles}>
+          <div className={styles.hojaCampo}>
+            <label className={styles.hojaEtiqueta} htmlFor="titulo-de-la-hoja">
+              Título de la hoja (opcional)
+            </label>
+            <input
+              id="titulo-de-la-hoja"
+              type="text"
+              className={styles.hojaInput}
+              value={tituloHoja}
+              onChange={(e) => setTituloHoja(e.target.value)}
+              maxLength={60}
+              placeholder="Ej.: Etiquetas de la cocina"
+            />
+          </div>
+
+          <div className={styles.hojaCampo}>
+            <span className={styles.hojaEtiqueta} id="etiqueta-norma">
+              Medidas
+            </span>
+            <div className={styles.hojaGrupo} role="group" aria-labelledby="etiqueta-norma">
+              {NORMAS.map((n) => (
+                <button
+                  key={n.id}
+                  type="button"
+                  className={`${styles.hojaBtn} ${normaId === n.id ? styles.hojaBtnActivo : ''}`}
+                  aria-pressed={normaId === n.id}
+                  onClick={() => setNormaId(n.id)}
+                >
+                  {n.nombre}
+                </button>
+              ))}
+            </div>
+            <span className={styles.hojaAyuda}>{norma.fuente}</span>
+          </div>
+
+          <div className={styles.hojaCampo}>
+            <span className={styles.hojaEtiqueta} id="etiqueta-modo">
+              Orientación
+            </span>
+            <div className={styles.hojaGrupo} role="group" aria-labelledby="etiqueta-modo">
+              <button
+                type="button"
+                className={`${styles.hojaBtn} ${!modoEspejo ? styles.hojaBtnActivo : ''}`}
+                aria-pressed={!modoEspejo}
+                onClick={() => setModoEspejo(false)}
+              >
+                Lectura
+              </button>
+              <button
+                type="button"
+                className={`${styles.hojaBtn} ${modoEspejo ? styles.hojaBtnActivo : ''}`}
+                aria-pressed={modoEspejo}
+                onClick={() => setModoEspejo(true)}
+              >
+                Espejo (regleta y punzón)
+              </button>
+            </div>
+            <span className={styles.hojaAyuda}>
+              {modoEspejo
+                ? 'Cada línea va de derecha a izquierda y las celdas están reflejadas: se punza por el reverso y, al dar la vuelta a la hoja, el texto se lee del derecho.'
+                : 'Los puntos aparecen tal como se leen. Es la orientación para material de aula, para calcar o para pegar puntos en relieve.'}
+            </span>
+          </div>
+
+          <div className={styles.hojaCampo}>
+            <span className={styles.hojaEtiqueta} id="etiqueta-guia">
+              Puntos vacíos
+            </span>
+            <div className={styles.hojaGrupo} role="group" aria-labelledby="etiqueta-guia">
+              <button
+                type="button"
+                className={`${styles.hojaBtn} ${mostrarGuia ? styles.hojaBtnActivo : ''}`}
+                aria-pressed={mostrarGuia}
+                onClick={() => setMostrarGuia(true)}
+              >
+                Mostrar retícula
+              </button>
+              <button
+                type="button"
+                className={`${styles.hojaBtn} ${!mostrarGuia ? styles.hojaBtnActivo : ''}`}
+                aria-pressed={!mostrarGuia}
+                onClick={() => setMostrarGuia(false)}
+              >
+                Solo puntos activos
+              </button>
+            </div>
+            <span className={styles.hojaAyuda}>
+              La retícula dibuja en gris los seis puntos de cada celda. Ayuda a situar el punzón y a
+              aprender la posición, pero gasta más tinta.
+            </span>
+          </div>
+        </div>
+
+        <div className={styles.hojaAccion}>
+          <button
+            type="button"
+            className={styles.btnPrimary}
+            onClick={() => window.print()}
+            disabled={hoja.numeroLineas === 0}
+          >
+            <span aria-hidden="true">🖨️</span> Imprimir la hoja
+          </button>
+          {hoja.numeroLineas === 0 ? (
+            <span className={styles.hojaAviso} role="status">
+              Convierte primero un texto: la hoja se genera con el resultado de arriba.
+            </span>
+          ) : (
+            <span className={styles.hojaAviso} role="status">
+              {hoja.numeroLineas} línea{hoja.numeroLineas === 1 ? '' : 's'} de{' '}
+              {hoja.celdasPorLinea} celdas · celda de {norma.entreCeldas} mm ·{' '}
+              {norma.entreLineas} mm entre líneas
+              {hoja.recortada ? ' · texto recortado a 200 líneas' : ''}
+            </span>
+          )}
+        </div>
+
+        <div className={styles.hojaNota}>
+          <p>
+            <strong>Comprueba la escala antes de usarla.</strong> Los navegadores imprimen a menudo
+            al 90 % o ajustan al papel sin avisar, y una celda encogida deja de encajar en la
+            regleta. La hoja lleva una regla de 100 mm: mídela con una regla de verdad y, si no da
+            100 mm, pon la escala de impresión al 100 % y desactiva &laquo;ajustar al área
+            imprimible&raquo;.
+          </p>
+          <p>
+            <strong>El papel corriente no da relieve.</strong> Esta hoja es una plantilla, no
+            Braille legible al tacto: para eso hacen falta una embosadora, o una regleta y un punzón
+            sobre papel de unos 150 g/m². Como material didáctico para videntes, en cambio, funciona
+            tal cual.
+          </p>
+        </div>
+      </section>
+      </div>
+
+      {/* Única parte que sale por la impresora (ver styles/impresion.module.css) */}
+      {hoja.numeroLineas > 0 && (
+        <div className={`${styles.hojaPapel} ${impresion.hoja} ${impresion.bloque}`}>
+          {tituloHoja.trim() !== '' && <h3 className={styles.hojaPapelTitulo}>{tituloHoja}</h3>}
+
+          <svg
+            className={`${styles.hojaSvg} ${impresion.relleno}`}
+            width={`${hoja.ancho}mm`}
+            height={`${hoja.alto}mm`}
+            viewBox={`0 0 ${hoja.ancho} ${hoja.alto}`}
+            role="img"
+            aria-label={`Hoja de ${hoja.numeroLineas} líneas en Braille a escala real, orientación ${
+              modoEspejo ? 'en espejo para regleta y punzón' : 'de lectura'
+            }`}
+          >
+            {hoja.puntos.map((punto, i) =>
+              punto.activo ? (
+                <circle key={i} cx={punto.x} cy={punto.y} r={hoja.radio} fill="#000000" />
+              ) : mostrarGuia ? (
+                <circle
+                  key={i}
+                  cx={punto.x}
+                  cy={punto.y}
+                  r={hoja.radio}
+                  fill="none"
+                  stroke="#bbbbbb"
+                  strokeWidth={0.15}
+                />
+              ) : null,
+            )}
+          </svg>
+
+          {/* Regla de calibración: el único modo honesto de garantizar la escala real */}
+          <div className={styles.hojaRegla}>
+            <svg
+              className={impresion.relleno}
+              width="100mm"
+              height="8mm"
+              viewBox="0 0 100 8"
+              role="img"
+              aria-label="Regla de calibración de 100 milímetros"
+            >
+              <line x1="0.25" y1="6" x2="99.75" y2="6" stroke="#000000" strokeWidth="0.4" />
+              {Array.from({ length: 11 }, (_, i) => i * 10).map((mm) => (
+                <line
+                  key={mm}
+                  x1={mm === 0 ? 0.25 : mm === 100 ? 99.75 : mm}
+                  y1={mm % 50 === 0 ? 1 : 3}
+                  x2={mm === 0 ? 0.25 : mm === 100 ? 99.75 : mm}
+                  y2="6"
+                  stroke="#000000"
+                  strokeWidth="0.4"
+                />
+              ))}
+            </svg>
+            <span className={styles.hojaReglaTexto}>
+              Esta barra debe medir exactamente 100 mm. Si no, imprime al 100 % de escala.
+            </span>
+          </div>
+        </div>
+      )}
+
+      <div className={impresion.noImprimir}>
       <div className={styles.alphabetSection}>
         <h2>Alfabeto Braille Español</h2>
 
@@ -614,6 +995,7 @@ export default function ConversorBraillePage() {
 
       <ShareCard appName="conversor-braille" />
       <Footer appName="conversor-braille" />
+      </div>
     </div>
   );
 }

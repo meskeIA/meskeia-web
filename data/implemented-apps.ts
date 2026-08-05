@@ -223,6 +223,7 @@ export const implementedAppsUrls = [
   "/contador-manual/",             // Tally counter digital múltiple
   "/diapason/",                    // Diapasón digital La 440Hz
   "/generador-tonos/",             // Generador de frecuencias de audio
+  "/comprobador-altavoces/",       // Canales L/R, fase, barrido 20 Hz-20 kHz y graves: diagnostica el equipo
   "/afinador-instrumentos/",       // Afinador cromático para instrumentos
   "/transpositor-acordes/",        // Transponer acordes a cualquier tonalidad al instante
   "/visualizador-escalas-musicales/", // Escalas mayor, menor, pentatónica, blues y modos griegos en teclado de piano
