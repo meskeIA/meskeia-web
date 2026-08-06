@@ -347,6 +347,136 @@
   color: var(--text-secondary);
 }
 
+/* El LAeq es el dato con valor normativo: se destaca sobre mínimo y máximo */
+.statCardLaeq {
+  background: color-mix(in srgb, var(--primary) 10%, var(--bg-card));
+  border: 1px solid color-mix(in srgb, var(--primary) 35%, transparent);
+}
+
+[data-theme='dark'] .statCardLaeq {
+  background: color-mix(in srgb, var(--primary) 22%, var(--bg-card));
+}
+
+.laeqNota {
+  margin: var(--spacing-md) 0 0;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* Panel de calibración */
+.calibracionPanel {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+.calibracionIntro,
+.calibracionAviso {
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+.calibracionIntro {
+  margin: 0 0 var(--spacing-lg);
+}
+
+.calibracionAviso {
+  margin: var(--spacing-md) 0 0;
+  padding: var(--spacing-md);
+  background: var(--hover);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--secondary);
+}
+
+.calibracionControles {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.calibracionSlider {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--primary);
+  height: 2rem;
+  cursor: pointer;
+}
+
+.calibracionSlider:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnCalib {
+  flex: 0 0 auto;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--hover);
+  color: var(--text-primary);
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.btnCalib:hover:not(:disabled) {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.btnCalib:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btnCalib:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.calibracionEstado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+}
+
+.calibracionValor {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-family: 'SF Mono', Monaco, monospace;
+}
+
+.btnCalibReset {
+  background: none;
+  border: none;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius);
+  color: var(--primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.btnCalibReset:hover {
+  background: var(--hover);
+}
+
+.btnCalibReset:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 /* Reference Panel */
 .referencePanel {
   background: var(--bg-card);

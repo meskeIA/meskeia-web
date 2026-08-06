@@ -22,12 +22,30 @@ function getNoiseLevel(db: number) {
   return NOISE_LEVELS.find(level => db >= level.min && db < level.max) || NOISE_LEVELS[NOISE_LEVELS.length - 1];
 }
 
+// Calibración: desplazamiento en dB que se suma al nivel medido por el micrófono.
+// 90 es la referencia por defecto (el valor con el que la app nació) y funciona
+// razonablemente en portátiles y móviles de gama media, pero NINGÚN micrófono
+// integrado viene calibrado de fábrica: por eso es ajustable y se recuerda.
+const CALIBRACION_DEFECTO = 90;
+const CALIBRACION_MIN = 60;
+const CALIBRACION_MAX = 120;
+const CLAVE_CALIBRACION = 'sonometro-calibracion';
+
+// Formatea una duración en segundos como "M min S s" (o "S s" si no llega al minuto)
+function formatDuracion(segundos: number): string {
+  const min = Math.floor(segundos / 60);
+  const seg = Math.floor(segundos % 60);
+  return min > 0 ? `${min} min ${seg} s` : `${seg} s`;
+}
+
 export default function SonometroPage() {
   const [isActive, setIsActive] = useState(false);
   const [currentDb, setCurrentDb] = useState(0);
   const [minDb, setMinDb] = useState(Infinity);
   const [maxDb, setMaxDb] = useState(0);
-  const [avgDb, setAvgDb] = useState(0);
+  const [laeq, setLaeq] = useState(0);
+  const [duracion, setDuracion] = useState(0);
+  const [calibracion, setCalibracion] = useState(CALIBRACION_DEFECTO);
   const [error, setError] = useState<string | null>(null);
   const [permissionState, setPermissionState] = useState<'prompt' | 'granted' | 'denied'>('prompt');
 
@@ -35,7 +53,15 @@ export default function SonometroPage() {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const animationRef = useRef<number | null>(null);
-  const readingsRef = useRef<number[]>([]);
+  // Media incremental de la ENERGÍA acústica (no de los dB) y nº de muestras: es lo
+  // que define el LAeq. Van en refs porque el bucle de medición corre a ~60 fps y no
+  // debe provocar re-render por muestra.
+  const energiaMediaRef = useRef(0);
+  const muestrasRef = useRef(0);
+  const inicioRef = useRef(0);
+  // La calibración se lee dentro del bucle sin recrearlo: si viviera en las
+  // dependencias de calculateDb, cada ajuste del slider reiniciaría measureLoop.
+  const calibracionRef = useRef(CALIBRACION_DEFECTO);
 
   // Limpiar recursos al desmontar
   useEffect(() => {
@@ -43,6 +69,21 @@ export default function SonometroPage() {
       stopMeasuring();
     };
   }, []);
+
+  // Recuperar la calibración guardada. Se hace en efecto (no en el estado inicial)
+  // para no romper la hidratación: el servidor no tiene localStorage.
+  useEffect(() => {
+    const guardada = Number(window.localStorage.getItem(CLAVE_CALIBRACION));
+    if (Number.isFinite(guardada) && guardada >= CALIBRACION_MIN && guardada <= CALIBRACION_MAX) {
+      setCalibracion(guardada);
+    }
+  }, []);
+
+  // Espejo de la calibración para el bucle + persistencia
+  useEffect(() => {
+    calibracionRef.current = calibracion;
+    window.localStorage.setItem(CLAVE_CALIBRACION, String(calibracion));
+  }, [calibracion]);
 
   // Calcular dB desde los datos del analizador
   const calculateDb = useCallback((dataArray: Uint8Array): number => {
@@ -53,9 +94,10 @@ export default function SonometroPage() {
     }
     const rms = Math.sqrt(sum / dataArray.length);
 
-    // Convertir RMS a dB (ajustado para micrófonos típicos)
-    // El factor 90 es una aproximación para calibrar con micrófonos de móvil/PC
-    const db = 20 * Math.log10(Math.max(rms, 0.00001)) + 90;
+    // Convertir RMS a dB. El desplazamiento de calibración lo pone el usuario: los
+    // micrófonos integrados no tienen sensibilidad conocida, así que sin un punto de
+    // referencia externo el valor absoluto es una estimación.
+    const db = 20 * Math.log10(Math.max(rms, 0.00001)) + calibracionRef.current;
 
     return Math.max(0, Math.min(130, db));
   }, []);
@@ -73,13 +115,21 @@ export default function SonometroPage() {
     setMinDb(prev => Math.min(prev, db));
     setMaxDb(prev => Math.max(prev, db));
 
-    // Guardar lecturas para promedio (últimos 100 valores)
-    readingsRef.current.push(db);
-    if (readingsRef.current.length > 100) {
-      readingsRef.current.shift();
-    }
-    const avg = readingsRef.current.reduce((a, b) => a + b, 0) / readingsRef.current.length;
-    setAvgDb(avg);
+    // LAeq — nivel continuo equivalente. Es un promedio ENERGÉTICO, no aritmético:
+    // hay que pasar cada lectura a energía (10^(dB/10)), promediar esas energías y
+    // volver a dB. La media aritmética de decibelios subestima la exposición real
+    // porque la escala es logarítmica: 80 dB y 100 dB no son "90 dB de media" sino
+    // 97,03 — el pico domina la energía total, y es justo lo que mide la normativa.
+    // El caso que lo deja claro: 99 muestras de 50 dB con un solo pico de 110 dan
+    // LAeq 90,00 y media aritmética 50,60 — 39 dB de diferencia sobre los mismos
+    // datos. Media incremental para no acumular una suma enorme ni guardar el
+    // histórico completo en memoria; verificado idéntica al cálculo directo y
+    // estable en 216.000 muestras (1 h a 60 fps).
+    const energia = Math.pow(10, db / 10);
+    muestrasRef.current += 1;
+    energiaMediaRef.current += (energia - energiaMediaRef.current) / muestrasRef.current;
+    setLaeq(10 * Math.log10(Math.max(energiaMediaRef.current, 1e-10)));
+    setDuracion((performance.now() - inicioRef.current) / 1000);
 
     animationRef.current = requestAnimationFrame(measureLoop);
   }, [calculateDb]);
@@ -114,8 +164,11 @@ export default function SonometroPage() {
       // Resetear estadísticas
       setMinDb(Infinity);
       setMaxDb(0);
-      setAvgDb(0);
-      readingsRef.current = [];
+      setLaeq(0);
+      setDuracion(0);
+      energiaMediaRef.current = 0;
+      muestrasRef.current = 0;
+      inicioRef.current = performance.now();
 
       setIsActive(true);
       measureLoop();
@@ -156,12 +209,15 @@ export default function SonometroPage() {
     setIsActive(false);
   };
 
-  // Resetear estadísticas
+  // Resetear estadísticas (reinicia también la integración del LAeq)
   const resetStats = () => {
     setMinDb(Infinity);
     setMaxDb(0);
-    setAvgDb(0);
-    readingsRef.current = [];
+    setLaeq(0);
+    setDuracion(0);
+    energiaMediaRef.current = 0;
+    muestrasRef.current = 0;
+    inicioRef.current = performance.now();
   };
 
   const currentLevel = getNoiseLevel(currentDb);
@@ -297,16 +353,89 @@ export default function SonometroPage() {
                   <span className={styles.statLabel}>Máximo (dB)</span>
                 </div>
               </div>
-              <div className={styles.statCard}>
-                <span className={styles.statIcon}>📈</span>
+              <div className={`${styles.statCard} ${styles.statCardLaeq}`}>
+                <span className={styles.statIcon} aria-hidden="true">📈</span>
                 <div className={styles.statInfo}>
-                  <span className={styles.statValue}>{formatNumber(avgDb, 1)}</span>
-                  <span className={styles.statLabel}>Promedio (dB)</span>
+                  <span className={styles.statValue}>{formatNumber(laeq, 1)}</span>
+                  <span className={styles.statLabel}>LAeq (dB)</span>
                 </div>
               </div>
             </div>
+            <p className={styles.laeqNota}>
+              <strong>LAeq</strong> = nivel continuo equivalente de los últimos{' '}
+              <strong>{formatDuracion(duracion)}</strong>. Es el promedio <em>energético</em>,
+              el valor que utilizan las normativas de ruido: pondera los picos como
+              realmente pesan, a diferencia de una media aritmética de decibelios.
+              Para documentar una molestia, mide al menos 5 minutos seguidos.
+            </p>
           </div>
         )}
+
+        {/* Calibración */}
+        <div className={styles.calibracionPanel}>
+          <h2 className={styles.sectionTitle}>
+            <span aria-hidden="true">🎚️</span> Calibración del micrófono
+          </h2>
+          <p className={styles.calibracionIntro}>
+            Los micrófonos de móviles y portátiles no traen una sensibilidad conocida de
+            fábrica, así que el valor absoluto depende de tu equipo. Si tienes una
+            referencia fiable (un sonómetro, otro dispositivo ya calibrado o una fuente
+            de nivel conocido), ajusta aquí el desplazamiento hasta que las lecturas
+            coincidan. Se recuerda en este navegador.
+          </p>
+          <div className={styles.calibracionControles}>
+            <button
+              type="button"
+              className={styles.btnCalib}
+              onClick={() => setCalibracion(v => Math.max(CALIBRACION_MIN, v - 1))}
+              disabled={calibracion <= CALIBRACION_MIN}
+              aria-label="Reducir la calibración un decibelio"
+            >
+              −
+            </button>
+            <input
+              type="range"
+              className={styles.calibracionSlider}
+              min={CALIBRACION_MIN}
+              max={CALIBRACION_MAX}
+              step={1}
+              value={calibracion}
+              onChange={(e) => setCalibracion(Number(e.target.value))}
+              id="calibracion"
+              aria-describedby="calibracion-valor"
+            />
+            <button
+              type="button"
+              className={styles.btnCalib}
+              onClick={() => setCalibracion(v => Math.min(CALIBRACION_MAX, v + 1))}
+              disabled={calibracion >= CALIBRACION_MAX}
+              aria-label="Aumentar la calibración un decibelio"
+            >
+              +
+            </button>
+          </div>
+          <div className={styles.calibracionEstado}>
+            <label htmlFor="calibracion" id="calibracion-valor" className={styles.calibracionValor}>
+              Desplazamiento: <strong>{formatNumber(calibracion, 0)} dB</strong>
+            </label>
+            {calibracion !== CALIBRACION_DEFECTO && (
+              <button
+                type="button"
+                className={styles.btnCalibReset}
+                onClick={() => setCalibracion(CALIBRACION_DEFECTO)}
+              >
+                <span aria-hidden="true">↩️</span> Volver al valor por defecto ({CALIBRACION_DEFECTO} dB)
+              </button>
+            )}
+          </div>
+          <p className={styles.calibracionAviso}>
+            <span aria-hidden="true">💡</span> Truco sin equipo de referencia: una
+            habitación en silencio nocturno suele estar entre 25 y 35 dB, y una
+            conversación normal a un metro, entre 55 y 65 dB. Si tus lecturas se salen
+            mucho de esos rangos, mueve el desplazamiento hasta encajarlas. Sigue siendo
+            una estimación, no una medición certificada.
+          </p>
+        </div>
 
         {/* Tabla de referencia */}
         <div className={styles.referencePanel}>
@@ -756,14 +885,14 @@ export default function SonometroPage() {
               <span className={styles.tipIcon}>📊</span>
               <div>
                 <strong>Usa el LAeq, no el valor pico</strong>
-                <p>El nivel equivalente continuo (LAeq) es el promedio energético de la exposición sonora en el tiempo. Es el valor que utilizan las normativas y el que mejor refleja el impacto real en la salud.</p>
+                <p>El nivel equivalente continuo (LAeq) es el promedio energético de la exposición sonora en el tiempo. Es el valor que utilizan las normativas y el que mejor refleja el impacto real en la salud. El panel de estadísticas de esta página lo calcula así —energéticamente, sobre toda la sesión— y muestra junto a él cuánto tiempo llevas midiendo, porque un LAeq sin su intervalo no significa nada.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>🎙️</span>
               <div>
                 <strong>Calibra o verifica el micrófono del móvil</strong>
-                <p>Los micrófonos de móvil no están calibrados de fábrica para mediciones acústicas. Si necesitas precisión, compara los resultados con una fuente sonora conocida o usa una app con calibración manual.</p>
+                <p>Los micrófonos de móvil no están calibrados de fábrica para mediciones acústicas. Si necesitas precisión, compara los resultados con una fuente sonora conocida y corrige la diferencia en el panel «Calibración del micrófono» de esta misma página: el desplazamiento que ajustes se recuerda en tu navegador para las siguientes mediciones.</p>
               </div>
             </div>
             <div className={styles.tipCard}>

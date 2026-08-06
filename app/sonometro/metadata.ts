@@ -36,7 +36,15 @@ export const jsonLd = generateWebAppSchema({
   description: "Mide el nivel de ruido en decibelios (dB) con tu micrófono. Sonómetro digital gratuito para documentar ruido, medir ambientes de trabajo o verificar niveles sonoros.",
   url: "https://meskeia.com/sonometro/",
   category: 'UtilityApplication',
-  features: [],
+  features: [
+    'Medición del nivel sonoro en tiempo real con el micrófono del dispositivo',
+    'LAeq (nivel continuo equivalente) calculado como promedio energético de la sesión',
+    'Valores mínimo, máximo y duración acumulada de la medición',
+    'Calibración manual ajustable (60-120 dB) que se recuerda en el navegador',
+    'Escala visual con aguja y código de color por franja de ruido',
+    'Tabla de referencia de niveles con ejemplos cotidianos',
+    'Procesamiento local: el audio no se graba ni se envía a ningún servidor',
+  ],
 });
 
 export const faqJsonLd = {
