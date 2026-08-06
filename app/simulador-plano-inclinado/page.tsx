@@ -201,10 +201,13 @@ export default function SimuladorPlanoInclinado() {
       const vNueva = velocidadRef.current + a * dt;
       let seguir = true;
 
-      if (uNueva <= 0) {
+      // Solo se frena en un extremo si el bloque se dirige HACIA él. El bloque parte
+      // justo en un tope (la cima al bajar, la base al subir) y el primer fotograma
+      // tiene dt = 0: comparar sin mirar la velocidad detendría la animación ahí mismo.
+      if (uNueva <= 0 && vNueva < 0) {
         uNueva = 0;
         seguir = false;
-      } else if (uNueva >= longitud) {
+      } else if (uNueva >= longitud && vNueva > 0) {
         uNueva = longitud;
         seguir = false;
       }
