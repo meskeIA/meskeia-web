@@ -1166,10 +1166,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
 
   'visualizador-leyes-newton': [
+    { url: '/simulador-plano-inclinado/', icon: '📐', name: 'Plano Inclinado', description: 'La segunda ley aplicada al problema clásico con rozamiento' },
     { url: '/visualizador-fuerzas-invisibles/', icon: '🌍', name: 'Fuerzas Invisibles', description: 'Física del día a día' },
     { url: '/visualizador-optica/', icon: '💡', name: 'Óptica', description: 'El viaje de la luz' },
     { url: '/visualizador-estados-materia/', icon: '🧊', name: 'Estados de la Materia', description: 'Sólido, líquido, gas, plasma' },
-    { url: '/visualizador-matrices/', icon: '🔢', name: 'Matrices', description: 'Transformaciones 2D' },
   ],
   'visualizador-tabla-periodica-interactiva': [
     { url: '/visualizador-tabla-periodica/', icon: '🧪', name: 'Tabla Periódica Visual', description: 'Elementos interactivos' },
@@ -1663,10 +1663,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-piel/', icon: '🧬', name: 'La Piel', description: 'Otro órgano vital del cuerpo humano' },
   ],
   'visualizador-electromagnetismo': [
+    { url: '/simulador-campo-magnetico/', icon: '🧲', name: 'Campo Magnético', description: 'Calcula Lorentz, el campo de un solenoide y la fem inducida' },
     { url: '/simulador-campo-electrico/', icon: '⚡', name: 'Campo Eléctrico', description: 'Cargas, líneas y equipotenciales' },
     { url: '/visualizador-mecanica-cuantica/', icon: '🔮', name: 'Mecánica Cuántica', description: 'La física que explica las cargas eléctricas' },
     { url: '/visualizador-relatividad-especial/', icon: '🌌', name: 'Relatividad Especial', description: 'Einstein y el electromagnetismo' },
-    { url: '/visualizador-estructura-atomo/', icon: '⚛️', name: 'Estructura del Átomo', description: 'Cargas eléctricas en el átomo' },
   ],
   'visualizador-computacion-cuantica': [
     { url: '/visualizador-mecanica-cuantica/', icon: '🔮', name: 'Mecánica Cuántica', description: 'Los principios físicos detrás de los qubits' },
@@ -3291,10 +3291,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-pendulo/', icon: '⏳', name: 'Péndulo y MAS', description: 'Oscilaciones y energía mecánica' },
   ],
   'simulador-campo-electrico': [
+    { url: '/simulador-campo-magnetico/', icon: '🧲', name: 'Campo Magnético', description: 'El campo hermano: fuerza de Lorentz, solenoides e inducción' },
     { url: '/simulador-circuitos-electricos/', icon: '⚡', name: 'Circuitos Eléctricos', description: 'Serie, paralelo, Ley de Ohm' },
     { url: '/visualizador-electromagnetismo/', icon: '🧲', name: 'Electromagnetismo', description: 'Campos E y B, inducción' },
     { url: '/simulador-ondas-interferencia/', icon: '🌊', name: 'Ondas e Interferencia', description: 'Superposición y estacionarias' },
-    { url: '/calculadora-electricidad/', icon: '🔌', name: 'Calculadora Electricidad', description: 'Ohm, potencia y consumo' },
   ],
   'simulador-ondas-interferencia': [
     { url: '/simulador-pendulo/', icon: '⏳', name: 'Péndulo y MAS', description: 'Oscilaciones y resonancia' },
@@ -6122,7 +6122,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-estadistica/', icon: '📊', name: 'Calculadora Estadística', description: 'Media, varianza, percentiles' },
   ],
   'simulador-conservacion-energia': [
-    { url: '/simulador-lentes-opticas/', icon: '🔍', name: 'Simulador Lentes Ópticas', description: 'Trazado de rayos en lentes' },
+    { url: '/simulador-plano-inclinado/', icon: '📐', name: 'Plano Inclinado', description: 'El rozamiento disipa parte de la energía potencial en la bajada' },
     { url: '/visualizador-termodinamica/', icon: '🌡️', name: 'Termodinámica', description: 'La 1.ª ley generaliza la conservación de energía' },
     { url: '/calculadora-movimiento/', icon: '🚀', name: 'Calculadora de Movimiento', description: 'Cinemática del MRU y MRUA' },
     { url: '/visualizador-fuerzas-invisibles/', icon: '🧲', name: 'Fuerzas Invisibles', description: 'Las fuerzas que actúan sobre los objetos' },
@@ -6192,10 +6192,22 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // SIMULADORES FÍSICA + QUÍMICA — Lista B Sonnet (2026-05-10)
   'simulador-movimiento-circular': [
+    { url: '/simulador-campo-magnetico/', icon: '🧲', name: 'Campo Magnético', description: 'Una carga en un campo describe un MCU: la fuerza magnética hace de centrípeta' },
+    { url: '/simulador-plano-inclinado/', icon: '📐', name: 'Plano Inclinado', description: 'Dinámica con rozamiento: ¿desliza el bloque o no?' },
     { url: '/simulador-pendulo/', icon: '⏳', name: 'Péndulo Simple', description: 'Movimiento periódico, período y oscilaciones' },
     { url: '/simulador-mas-resorte/', icon: '🌀', name: 'Masa-Resorte (MAS)', description: 'Movimiento armónico simple y frecuencia' },
-    { url: '/simulador-conservacion-energia/', icon: '🎢', name: 'Conservación de la Energía', description: 'Energía cinética y potencial en sistemas físicos' },
-    { url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Más simulaciones de física de bachillerato' },
+  ],
+  'simulador-plano-inclinado': [
+    { url: '/visualizador-leyes-newton/', icon: '🍎', name: 'Leyes de Newton', description: 'La teoría detrás de ΣF = m·a que aquí se aplica sobre el eje del plano' },
+    { url: '/simulador-conservacion-energia/', icon: '🎢', name: 'Conservación de la Energía', description: 'Comprueba el balance: m·g·h menos el trabajo del rozamiento' },
+    { url: '/simulador-movimiento-circular/', icon: '🔄', name: 'Movimiento Circular', description: 'Otra dinámica clásica, esta vez con aceleración centrípeta' },
+    { url: '/calculadora-movimiento/', icon: '🚀', name: 'Calculadora de Movimiento', description: 'Cinemática del MRUA para el tiempo y la velocidad de la bajada' },
+  ],
+  'simulador-campo-magnetico': [
+    { url: '/simulador-campo-electrico/', icon: '⚡', name: 'Campo Eléctrico', description: 'El campo hermano: cargas en reposo frente a cargas en movimiento' },
+    { url: '/visualizador-electromagnetismo/', icon: '🧲', name: 'Electromagnetismo', description: 'La panorámica del tema, de la inducción al espectro electromagnético' },
+    { url: '/simulador-circuitos-electricos/', icon: '🔌', name: 'Circuitos Eléctricos', description: 'La corriente que crea el campo, vista desde el circuito' },
+    { url: '/simulador-movimiento-circular/', icon: '🔄', name: 'Movimiento Circular', description: 'La fuerza magnética actúa como centrípeta: el MCU de siempre' },
   ],
   'simulador-mas-resorte': [
     { url: '/simulador-movimiento-circular/', icon: '🔄', name: 'Movimiento Circular', description: 'MCU: otro caso de movimiento periódico con ω constante' },

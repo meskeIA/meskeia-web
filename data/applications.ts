@@ -1417,6 +1417,12 @@ export const applicationsDatabase: Application[] = [
   // Ruido de banda ancha (2026-08)
   // ============================================
   { name: "Generador de Ruido Blanco, Rosa y Marrón", suites: ["tecnicas", "salud"], icon: "🌫️", description: "Sintetiza ruido blanco, rosa, marrón, azul y violeta en el propio navegador, con control de tono, ambientes de lluvia, oleaje y ventilador, y temporizador de apagado con fundido de salida. No descarga ningún archivo de audio: genera y filtra el ruido en tiempo real", url: "/generador-ruido-blanco/", keywords: ["ruido blanco", "ruido rosa", "ruido marron", "ruido browniano", "sonido para dormir", "generador de ruido blanco", "enmascaramiento acustico", "sonido para concentrarse", "ruido para estudiar", "sonido lluvia", "ruido azul", "ruido violeta", "temporizador de apagado"] },
+
+  // ============================================
+  // Dinámica y magnetismo (2026-08)
+  // ============================================
+  { name: "Simulador de Plano Inclinado", suites: ["estudiantes"], icon: "📐", description: "Ajusta masa, ángulo y coeficientes de rozamiento y comprueba si el bloque desliza, con el diagrama de cuerpo libre dibujado, la normal, las componentes del peso, la aceleración, el ángulo crítico y la animación del recorrido", url: "/simulador-plano-inclinado/", keywords: ["plano inclinado", "diagrama de cuerpo libre", "rozamiento", "coeficiente de rozamiento", "angulo critico", "fuerza normal", "leyes de newton", "dinamica", "descomposicion del peso", "aceleracion con rozamiento"] },
+  { name: "Simulador de Campo Magnético", suites: ["estudiantes"], icon: "🧲", description: "Fuerza de Lorentz sobre una carga con su trayectoria circular, campo creado por hilos, espiras y solenoides, fuerza entre conductores e inducción de Faraday-Lenz con la gráfica de flujo y fem de un alternador", url: "/simulador-campo-magnetico/", keywords: ["campo magnetico", "fuerza de lorentz", "ley de faraday", "ley de lenz", "induccion electromagnetica", "solenoide", "radio de ciclotron", "fem inducida", "fuerza entre conductores", "alternador"] },
 ];
 
 // ============================================

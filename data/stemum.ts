@@ -348,6 +348,20 @@ export const STEMUM_APPS: StemumApp[] = [
     disciplina: 'fisica',
   },
   {
+    slug: 'simulador-campo-magnetico',
+    icon: '🧲',
+    titulo: 'Campo magnético',
+    desc: 'Fuerza de Lorentz y trayectoria circular de una carga, campo de hilos, espiras y solenoides, e inducción de Faraday-Lenz.',
+    disciplina: 'fisica',
+  },
+  {
+    slug: 'simulador-plano-inclinado',
+    icon: '📐',
+    titulo: 'Plano inclinado',
+    desc: 'Diagrama de cuerpo libre con rozamiento: decide si el bloque desliza y calcula normal, aceleración y ángulo crítico.',
+    disciplina: 'fisica',
+  },
+  {
     slug: 'simulador-pendulo',
     icon: '🕰️',
     titulo: 'Péndulo y MAS',

@@ -1320,6 +1320,8 @@ export const implementedAppsUrls = [
   "/tabla-areas-volumenes/",           // 48 figuras con diagrama SVG, letras explicadas y ejemplo numérico
   "/tabla-limites-notables/",          // 59 entradas: 7 indeterminaciones, equivalencias infinitesimales, jerarquía de infinitos
   "/tabla-solubilidad/",               // Reglas + 40 iones poliatómicos + Kps + comprobador de precipitación catión×anión
+  "/simulador-plano-inclinado/",       // ¿Desliza? Diagrama de cuerpo libre, rozamiento estático/cinético, ángulo crítico y animación
+  "/simulador-campo-magnetico/",       // Lorentz + trayectoria circular, campo de hilo/espira/solenoide, inducción Faraday-Lenz con gráfica
   "/tabla-grupos-funcionales/",        // 31 grupos con IUPAC, diagrama y orden de prioridad ordenable
   "/tabla-potenciales-redox/",         // 69 semirreacciones E°, serie de actividad y constructor de pilas galvánicas
   "/tabla-ka-kb/",                     // 64 entradas Ka/Kb/pKa/pKb + calculadora de pH y de disolución reguladora

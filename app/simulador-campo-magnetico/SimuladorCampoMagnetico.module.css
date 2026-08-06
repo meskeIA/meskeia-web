@@ -1,0 +1,838 @@
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.hero {
+  background: var(--hero-bg);
+  color: white;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+}
+
+.hero p {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* Pestañas */
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.tab {
+  flex: 1 1 200px;
+  padding: 0.7rem 1rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tab:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.tab:focus-visible,
+.chip:focus-visible,
+.calcBtnGhost:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.tabActiva {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.tabActiva:hover {
+  background: var(--primary);
+  color: white;
+}
+
+/* Panel */
+.panel {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.panelTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+/* Chips de selección */
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.chip {
+  padding: 0.45rem 0.9rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 999px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.chip:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.chipActivo {
+  background: var(--secondary);
+  border-color: var(--secondary);
+  color: white;
+}
+
+.chipActivo:hover {
+  background: var(--secondary);
+  color: white;
+}
+
+.chipSimbolo {
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+/* Inputs */
+.inputGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.1rem;
+}
+
+@media (max-width: 600px) {
+  .inputGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.inputGroup label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.inputGroup input[type='range'] {
+  width: 100%;
+  accent-color: var(--primary);
+}
+
+.inputHint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.valueBadge {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.calcBtnGhost {
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  border: 1.5px solid #d1d5db;
+  padding: 0.55rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.calcBtnGhost:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Lienzo */
+.canvasContainer {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 900px) {
+  .canvasContainer {
+    grid-template-columns: 1fr;
+  }
+}
+
+.canvasSvg {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1.5px solid #e5e7eb;
+}
+
+.canvasHint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0.4rem 0 0;
+  text-align: center;
+}
+
+/* Símbolos del campo uniforme */
+.simboloCampo circle {
+  fill: none;
+  stroke: #94a3b8;
+  stroke-width: 1.2;
+}
+
+.simboloCampo line {
+  stroke: #94a3b8;
+  stroke-width: 1.2;
+}
+
+.puntoCampo {
+  fill: #94a3b8;
+  stroke: none;
+}
+
+.trayectoria {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 2;
+  stroke-dasharray: 7 5;
+  opacity: 0.8;
+}
+
+.particulaPos {
+  fill: #dc2626;
+  stroke: #7f1d1d;
+  stroke-width: 2;
+}
+
+.particulaNeg {
+  fill: #2563eb;
+  stroke: #1e3a8a;
+  stroke-width: 2;
+}
+
+.textoParticula {
+  font-size: 14px;
+  font-weight: 700;
+  fill: white;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
+.vectorLinea {
+  stroke: currentColor;
+  stroke-width: 3;
+}
+
+.vectorPunta {
+  fill: currentColor;
+}
+
+.vectorTexto {
+  font-size: 13px;
+  font-weight: 700;
+  fill: currentColor;
+  text-anchor: middle;
+  dominant-baseline: central;
+  paint-order: stroke;
+  stroke: #f8fafc;
+  stroke-width: 3px;
+}
+
+.vVelocidad {
+  color: #15803d;
+}
+
+.vFuerza {
+  color: #dc2626;
+}
+
+/* Hilo y campo creado */
+.hilo {
+  stroke: #b45309;
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.hiloPunta {
+  fill: #b45309;
+}
+
+.lineaCampo {
+  fill: none;
+  stroke: var(--secondary);
+  stroke-width: 1.6;
+  opacity: 0.75;
+}
+
+.puntoMedida {
+  fill: var(--primary);
+  stroke: white;
+  stroke-width: 1.5;
+}
+
+.etiquetaCampo {
+  font-size: 13px;
+  font-weight: 700;
+  fill: var(--text-primary);
+}
+
+.etiquetaSecundaria {
+  font-size: 11.5px;
+  fill: #64748b;
+}
+
+/* Gráfica de inducción */
+.eje {
+  stroke: #94a3b8;
+  stroke-width: 1.5;
+}
+
+.etiquetaEje {
+  font-size: 11.5px;
+  fill: #64748b;
+}
+
+.curvaFlujo {
+  fill: none;
+  stroke: #2563eb;
+  stroke-width: 2.5;
+}
+
+.curvaFem {
+  fill: none;
+  stroke: #ea580c;
+  stroke-width: 2.5;
+  stroke-dasharray: 6 4;
+}
+
+.marcador {
+  stroke: var(--secondary);
+  stroke-width: 2;
+}
+
+.espira {
+  fill: none;
+  stroke: #b45309;
+  stroke-width: 3;
+}
+
+/* Barra sobre raíles */
+.rail {
+  stroke: #64748b;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.resistor {
+  fill: #fde68a;
+  stroke: #b45309;
+  stroke-width: 2.5;
+}
+
+.barra {
+  stroke: #2e86ab;
+  stroke-width: 7;
+  stroke-linecap: round;
+}
+
+.flechaVelocidad {
+  stroke: #15803d;
+  stroke-width: 3;
+}
+
+.flechaVelocidadPunta {
+  fill: #15803d;
+}
+
+/* Resultados */
+.resultBlock {
+  background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+  border: 1.5px solid #93c5fd;
+  border-radius: 10px;
+  padding: 1.2rem;
+}
+
+.resultTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1d4ed8;
+  margin: 0 0 0.75rem;
+}
+
+.resultRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid #dbeafe;
+  font-size: 0.86rem;
+}
+
+.resultRow:last-child {
+  border-bottom: none;
+}
+
+.resultLabel {
+  color: var(--text-secondary);
+}
+
+.resultValue {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.resultValueAccent {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 0.98rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.resultNota {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0.8rem 0 0;
+  line-height: 1.5;
+}
+
+/* EducationalSection v2.0 */
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: white;
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.comparativaTable td {
+  padding: 0.55rem 0.8rem;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: top;
+}
+
+.comparativaTable tr:nth-child(even) td {
+  background: #f8fafc;
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.escenarioCard h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.escenarioCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+}
+
+.faqItem strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.faqItem p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.faqTip {
+  font-size: 0.8rem;
+  color: var(--primary);
+  margin-top: 0.35rem;
+  font-style: italic;
+}
+
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.step {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  background: var(--primary);
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  padding-top: 0.1rem;
+}
+
+.stepContent strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.stepContent p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0.75rem;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.85rem;
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+}
+
+.tipIcon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.tipCard strong {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.tipCard p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.warningBox {
+  background: #fef3c7;
+  border: 1.5px solid #f59e0b;
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: #92400e;
+  margin-bottom: 0.75rem;
+}
+
+.warningIcon {
+  font-size: 1.1rem;
+}
+
+.warningList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.warningList li {
+  font-size: 0.85rem;
+  color: #78350f;
+  padding-left: 1.2rem;
+  position: relative;
+}
+
+.warningList li::before {
+  content: '✗';
+  position: absolute;
+  left: 0;
+  color: #f59e0b;
+  font-weight: 700;
+}
+
+.eduSubtitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 1.5rem 0 0.75rem;
+}
+
+.eduSubtitle:first-child {
+  margin-top: 0;
+}
+
+/* Dark mode */
+[data-theme='dark'] .panel {
+  border-color: #374151;
+}
+
+[data-theme='dark'] .tab,
+[data-theme='dark'] .chip,
+[data-theme='dark'] .calcBtnGhost {
+  border-color: #4b5563;
+  background: #2a2a2a;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .tabActiva {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+[data-theme='dark'] .chipActivo {
+  background: var(--secondary);
+  border-color: var(--secondary);
+  color: #0f172a;
+}
+
+[data-theme='dark'] .canvasSvg {
+  background: #0f172a;
+  border-color: #374151;
+}
+
+[data-theme='dark'] .simboloCampo circle,
+[data-theme='dark'] .simboloCampo line {
+  stroke: #64748b;
+}
+
+[data-theme='dark'] .puntoCampo {
+  fill: #64748b;
+}
+
+[data-theme='dark'] .trayectoria {
+  stroke: #7fb3d3;
+}
+
+[data-theme='dark'] .vectorTexto {
+  stroke: #0f172a;
+}
+
+[data-theme='dark'] .vVelocidad {
+  color: #4ade80;
+}
+
+[data-theme='dark'] .vFuerza {
+  color: #f87171;
+}
+
+[data-theme='dark'] .hilo,
+[data-theme='dark'] .espira {
+  stroke: #fbbf24;
+}
+
+[data-theme='dark'] .hiloPunta {
+  fill: #fbbf24;
+}
+
+[data-theme='dark'] .etiquetaCampo {
+  fill: #e5e7eb;
+}
+
+[data-theme='dark'] .etiquetaSecundaria,
+[data-theme='dark'] .etiquetaEje {
+  fill: #94a3b8;
+}
+
+[data-theme='dark'] .curvaFlujo {
+  stroke: #60a5fa;
+}
+
+[data-theme='dark'] .curvaFem {
+  stroke: #fb923c;
+}
+
+[data-theme='dark'] .rail {
+  stroke: #94a3b8;
+}
+
+[data-theme='dark'] .resistor {
+  fill: #78350f;
+  stroke: #fbbf24;
+}
+
+[data-theme='dark'] .barra {
+  stroke: #7fb3d3;
+}
+
+[data-theme='dark'] .flechaVelocidad {
+  stroke: #4ade80;
+}
+
+[data-theme='dark'] .flechaVelocidadPunta {
+  fill: #4ade80;
+}
+
+[data-theme='dark'] .resultBlock {
+  background: linear-gradient(135deg, #1e3a5f 0%, #14532d 100%);
+  border-color: #3b82f6;
+}
+
+[data-theme='dark'] .resultTitle {
+  color: #93c5fd;
+}
+
+[data-theme='dark'] .resultRow {
+  border-color: #1e3a5f;
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-color: #374151;
+}
+
+[data-theme='dark'] .comparativaTable tr:nth-child(even) td {
+  background: #1e1e1e;
+}
+
+[data-theme='dark'] .escenarioCard,
+[data-theme='dark'] .faqItem,
+[data-theme='dark'] .tipCard {
+  border-color: #374151;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2d1b00;
+  border-color: #d97706;
+}
+
+[data-theme='dark'] .warningHeader {
+  color: #fcd34d;
+}
+
+[data-theme='dark'] .warningList li {
+  color: #fde68a;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .main {
+    padding: 1.25rem 1rem;
+  }
+
+  .escenariosGrid,
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .resultRow {
+    font-size: 0.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab,
+  .chip,
+  .calcBtnGhost {
+    transition-duration: 0.01ms;
+  }
+}
