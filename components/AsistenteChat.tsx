@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import MiniSearch from 'minisearch';
 import { Application, applicationsDatabase } from '@/data/applications';
 import { implementedAppsUrls } from '@/data/implemented-apps';
+import { withFrom } from '@/lib/trackingFrom';
 import styles from './AsistenteChat.module.css';
 
 type AppDoc = Application & { id: string };
@@ -30,6 +31,17 @@ const indiceAsistente = new MiniSearch<AppDoc>({
 });
 indiceAsistente.addAll(appsImplementadas.map(app => ({ ...app, id: app.url })));
 
+/**
+ * ⚠️ ESTE es el buscador que se ve en la portada: SearchBar delega en él cuando
+ * `large` (SearchBar.tsx). Sus enlaces salían SIN marca de origen, así que sus
+ * clics no se registraban en ninguna parte y `from=search` marcaba 0 en 90 días
+ * — leído como "nadie usa el buscador" cuando en realidad era "nadie lo mide"
+ * (corregido el 07/08/2026 con `from=home-search`).
+ *
+ * El origen se llama `home-search` y no `search` para separarlo del modal Ctrl+K
+ * de SearchBar, que vive en el header de las páginas estáticas y es otra
+ * superficie con otro volumen.
+ */
 export default function AsistenteChat() {
   const [consulta, setConsulta] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -76,7 +88,7 @@ export default function AsistenteChat() {
       {resultados.length > 0 && (
         <div className={styles.appCards}>
           {resultados.map((result) => (
-            <a key={result.url} href={result.url} className={styles.appCard}>
+            <a key={result.url} href={withFrom(result.url, 'home-search')} className={styles.appCard}>
               <span className={styles.appCardIcon}>{result.icon}</span>
               <div className={styles.appCardBody}>
                 <div className={styles.appCardName}>{result.name}</div>

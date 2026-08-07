@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Sidebar, SidebarMobile, DailyApps, MeskeiaLogo } from '@/components';
 import SearchBar from '@/components/SearchBar';
 import HomeFooter from '@/components/home/HomeFooter';
+import AnalyticsTracker from '@/components/AnalyticsTracker';
 import VerticalesPortales from '@/components/home/VerticalesPortales';
 import { TOTAL_IMPLEMENTED_APPS } from '@/data/implemented-apps';
 import styles from './page.module.css';
@@ -91,6 +92,20 @@ export default function Home() {
         </section>
 
         <VerticalesPortales />
+
+        {/*
+          La home era un PUNTO CIEGO de medición: HomeFooter no monta el tracker
+          (a diferencia de Footer, que sí), así que la portada no registraba ni una
+          visita desde diciembre de 2025. Solo se veían sus clics de SALIDA
+          (from=home-daily, sidebar-recent, search), sin denominador con el que
+          calcular ninguna tasa. Detectado el 07/08/2026 al intentar decidir con
+          datos si las "Apps del día" merecían seguir en la portada.
+
+          `home` es el nombre que el dashboard ya esperaba (server/routers/analytics.ts
+          cuenta sesionesConHome con appsUnicas.has('home')): ese contador llevaba
+          desde su origen valiendo cero por falta de emisor, no por falta de visitas.
+        */}
+        <AnalyticsTracker appName="home" />
 
         <HomeFooter />
       </main>

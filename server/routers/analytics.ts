@@ -909,9 +909,14 @@ export const analyticsRouter = router({
       const PORTALES_VERTICALES = ['delegum', 'cronicum', 'stemum', 'coquinum'];
       const categoriaDe = (from: string): string => {
         if (from.startsWith('related-')) return 'related';
-        if (['home-daily', 'sidebar-recent', 'catalog', 'catalog-guides', 'search'].includes(from)) return from;
+        // `home-search` = buscador de la portada (AsistenteChat); `search` = modal
+        // Ctrl+K del header de las páginas estáticas. Son superficies distintas.
+        if (['home-daily', 'sidebar-recent', 'catalog', 'catalog-guides', 'search', 'home-search'].includes(from)) return from;
         // Saltos cross-dominio (antes caían todos en "otro"):
-        if (from === 'meskeia') return 'a-vertical';                        // meskeIA → portal vertical
+        // `meskeia` (cards de portal) y `meskeia-<modulo>` (app del catálogo ya
+        // migrada a un vertical, p.ej. una cronología abierta desde "Apps del día":
+        // ver lib/trackingFrom.ts). Ambos son salidas de meskeIA hacia un portal.
+        if (from === 'meskeia' || from.startsWith('meskeia-')) return 'a-vertical';
         if (PORTALES_VERTICALES.includes(from)) return 'portal-a-meskeia';  // portal vertical → meskeIA
         return 'otro';
       };

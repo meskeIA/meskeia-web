@@ -3,6 +3,7 @@
 import styles from './RelatedApps.module.css';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { withFrom } from '@/lib/trackingFrom';
 
 /**
  * Interfaz para una app relacionada
@@ -78,7 +79,11 @@ export default function RelatedApps({ title = 'Apps relacionadas', apps, icon = 
    */
   const buildHref = (url: string): string => {
     if (url.includes('#')) return url;
-    return `${url}#from=related-${originSlug}`;
+    // Familias migradas a un dominio vertical (cronologías → cronicum.com): se
+    // delega en withFrom, que las resuelve al dominio final con ?from=meskeia-*.
+    // Sin esto, el enlace interno muere en el fetch RSC contra la CSP. Ver
+    // lib/trackingFrom.ts.
+    return withFrom(url, `related-${originSlug}`);
   };
 
   return (

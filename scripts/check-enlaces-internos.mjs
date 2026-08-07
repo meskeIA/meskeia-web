@@ -74,3 +74,54 @@ if (fallos.length) {
 }
 
 console.log('✅ Enlaces internos: ninguno usa ?from= (marca interna en fragmento)');
+
+// ---------------------------------------------------------------------------
+// REGLA 2 — Todo redirect que se lleve apps del catálogo a otro dominio debe
+//           estar declarado en RUTAS_MIGRADAS (lib/trackingFrom.ts)
+//
+// POR QUÉ (2026-08-07): el 22/07 se añadió a next.config.ts un 301 de
+// /visualizador-historia/:path* a cronicum.com, pero las 172 cronologías siguen
+// en el catálogo con su URL interna. Un `next/link` hacia ella pide primero su
+// payload RSC; ese fetch sigue el 308 hasta el dominio vertical y ahí lo corta la
+// CSP de meskeIA, así que Next cae a navegación dura y, como el href lleva
+// `#from=`, el usuario solo cambia de fragmento: se queda donde estaba.
+// SIN ERROR VISIBLE. Estuvo así 16 días y lo delató un usuario, no el build.
+//
+// La invariante que se repite no es "alguien enlazó mal": es "se migró una
+// familia de apps y nadie se lo contó al resolutor". Por eso el candado no mira
+// los href, mira el par redirect ⇄ declaración, que es donde nace el fallo.
+//
+// Casan solo los redirects que de verdad se llevan apps del CATÁLOGO: para
+// /delegum/:path* o /cronicum/:path* ninguna app tiene esa URL (son prefijos de
+// implementación), así que quedan fuera sin necesidad de lista de excepciones.
+// ---------------------------------------------------------------------------
+const configTexto = readFileSync(path.join(RAIZ, 'next.config.ts'), 'utf8');
+const trackingTexto = readFileSync(path.join(RAIZ, 'lib', 'trackingFrom.ts'), 'utf8');
+const appsTexto = readFileSync(path.join(RAIZ, 'data', 'applications.ts'), 'utf8');
+
+// { source: '/<prefijo>/:path*', …, destination: 'https://<otro dominio>/…' }
+const REDIRECT_EXTERNO = /source:\s*'(\/[^']*?)\/:path\*'[^}]*?destination:\s*'(https?:\/\/[^']+)'/g;
+
+const sinDeclarar = [];
+for (const m of configTexto.matchAll(REDIRECT_EXTERNO)) {
+  const prefijo = `${m[1]}/`;
+  // ¿Se lleva alguna app del catálogo? (si no, es un prefijo de implementación)
+  if (!appsTexto.includes(`url: "${prefijo}`)) continue;
+  if (!trackingTexto.includes(`prefijo: '${prefijo}'`)) {
+    sinDeclarar.push(`${prefijo} → ${m[2]}`);
+  }
+}
+
+if (sinDeclarar.length) {
+  console.error('\n❌ Familias de apps migradas a otro dominio SIN declarar en RUTAS_MIGRADAS:\n');
+  sinDeclarar.forEach((f) => console.error('   ' + f));
+  console.error(
+    '\n   Esas apps siguen en el catálogo con su URL interna, así que meskeIA las\n' +
+    '   enlazará con next/link: el fetch RSC seguirá el redirect fuera del dominio,\n' +
+    '   la CSP lo cortará y el clic no navegará A NINGÚN SITIO, sin error visible.\n' +
+    '   Añade el prefijo a RUTAS_MIGRADAS en lib/trackingFrom.ts.\n'
+  );
+  process.exit(1);
+}
+
+console.log('✅ Rutas migradas: toda familia redirigida fuera del dominio está declarada en el resolutor');

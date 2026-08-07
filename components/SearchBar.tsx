@@ -186,7 +186,9 @@ export default function SearchBar({ large = false }: SearchBarProps) {
 
       case 'Enter':
         if (selectedIndex >= 0 && results[selectedIndex]) {
-          window.location.href = results[selectedIndex].url;
+          // Mismo href que el clic con ratón: resuelve familias migradas y marca
+          // el origen, para que la navegación por teclado no quede sin medir.
+          window.location.href = withFrom(results[selectedIndex].url, 'search');
         }
         break;
     }

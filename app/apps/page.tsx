@@ -248,7 +248,15 @@ export default function AppsPage() {
       </main>
 
       <ShareCard appName="meskeIA" />
-      <Footer appName="meskeIA" />
+      {/*
+        Nombre propio en analytics (07/08/2026). Antes el catálogo se registraba
+        como "meskeIA", el mismo cubo que /acerca, /contacto, /privacidad,
+        /terminos y /mcp: sus 407 visitas de 90 días no se podían atribuir a
+        ninguna página concreta. El catálogo es la superficie de descubrimiento
+        con más enlaces del sitio (~1.100), así que necesita su propia serie para
+        poder decidir sobre él. Las páginas legales siguen agregadas en "meskeIA".
+      */}
+      <Footer appName="catalogo-apps" />
     </>
   );
 }
