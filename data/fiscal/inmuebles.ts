@@ -113,18 +113,41 @@ export const TRAMOS_GANANCIAS_PATRIMONIALES_2025: TramoGananciasPatrimoniales[] 
  * para que ambas no puedan divergir. No redondea (cada consumidor decide).
  */
 export function calcularCuotaBaseAhorro(base: number): number {
-  let cuota = 0;
+  return desglosarCuotaBaseAhorro(base).reduce((suma, t) => suma + t.cuota, 0);
+}
+
+export interface TramoDesgloseAhorro {
+  desde: number;
+  hasta: number;
+  tipo: number;
+  base: number;
+  cuota: number;
+}
+
+/**
+ * Mismo cálculo que calcularCuotaBaseAhorro pero devolviendo el reparto por tramos,
+ * para las interfaces que muestran el desglose. La cuota total es la SUMA de este
+ * desglose por construcción: así el detalle mostrado nunca puede contradecir al total.
+ */
+export function desglosarCuotaBaseAhorro(base: number): TramoDesgloseAhorro[] {
+  const desglose: TramoDesgloseAhorro[] = [];
   let restante = Math.max(0, base);
   let limiteAnterior = 0;
   for (const tramo of TRAMOS_GANANCIAS_PATRIMONIALES_2025) {
     const anchura = tramo.hasta - limiteAnterior;
     const enTramo = Math.min(restante, anchura);
     if (enTramo <= 0) break;
-    cuota += enTramo * (tramo.tipo / 100);
+    desglose.push({
+      desde: limiteAnterior,
+      hasta: limiteAnterior + enTramo,
+      tipo: tramo.tipo,
+      base: enTramo,
+      cuota: enTramo * (tramo.tipo / 100),
+    });
     restante -= enTramo;
     limiteAnterior = tramo.hasta;
   }
-  return cuota;
+  return desglose;
 }
 
 // ─── Otros costes de compraventa ─────────────────────────────────────────────

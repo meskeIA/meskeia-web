@@ -860,15 +860,19 @@ function crearServidorDelegum(): McpServer {
       anios_tenencia: z.number().min(0).max(60).describe('Años que se ha tenido el inmueble (para la plusvalía municipal)'),
       gastos_compra_original: z.number().min(0).optional().describe('Gastos pagados al comprar (ITP/IVA + notaría + registro + gestoría), en euros. Reducen la ganancia. Por defecto 0.'),
       valor_catastral_suelo: z.number().min(0).optional().describe('Valor catastral del suelo (aparece en el recibo del IBI). Necesario para calcular la plusvalía municipal; si no se indica, no se calcula.'),
+      valor_catastral_total: z.number().min(0).optional().describe('Valor catastral TOTAL (suelo + construcción), también del recibo del IBI. Sin él NO puede calcularse el método real de la plusvalía y se aplica el objetivo.'),
+      mejoras: z.number().min(0).optional().describe('Inversiones y mejoras con factura (ampliaciones, instalaciones nuevas), en euros. Suman al valor de adquisición y reducen la ganancia. No cuentan reparaciones ni conservación.'),
       tipo_municipal_iivtnu: z.number().min(0).max(30).optional().describe('Tipo de plusvalía municipal que aplica el ayuntamiento en %. Por defecto 25 (orientativo).'),
       comision_inmobiliaria: z.number().min(0).max(10).optional().describe('Comisión de la agencia en %. Por defecto 3.'),
       gastos_gestoria: z.number().min(0).optional().describe('Gestoría, cancelación de hipoteca y otros, en euros. Por defecto 300.'),
       vendedor_mayor_65: z.boolean().optional().describe('¿El vendedor tiene más de 65 años? (exención de IRPF si es vivienda habitual). Por defecto false.'),
       es_vivienda_habitual: z.boolean().optional().describe('¿Es la vivienda habitual del vendedor? Por defecto false.'),
       reinvierte_en_vivienda: z.boolean().optional().describe('¿Va a reinvertir el importe en una nueva vivienda habitual? (exención total/parcial del IRPF, art. 38 LIRPF). Por defecto false.'),
+      importe_reinversion: z.number().min(0).optional().describe('Importe concreto que se reinvierte, en euros. Si se omite y reinvierte_en_vivienda es true, se asume reinversión total. Si es parcial, la exención es proporcional (art. 41 RIRPF).'),
+      hipoteca_pendiente: z.number().min(0).optional().describe('Principal de la hipoteca pendiente de amortizar al vender, en euros. Minora el importe total obtenido a efectos de la reinversión (art. 41.1 RIRPF), así que reinvertir el resto ya basta para la exención total.'),
     },
     { title: 'Consulta de venta de vivienda (IRPF de la ganancia + plusvalía municipal + neto)', readOnlyHint: true },
-    async ({ precio_venta, precio_compra, anios_tenencia, gastos_compra_original, valor_catastral_suelo, tipo_municipal_iivtnu, comision_inmobiliaria, gastos_gestoria, vendedor_mayor_65, es_vivienda_habitual, reinvierte_en_vivienda }, extra) => {
+    async ({ precio_venta, precio_compra, anios_tenencia, gastos_compra_original, valor_catastral_suelo, valor_catastral_total, mejoras, tipo_municipal_iivtnu, comision_inmobiliaria, gastos_gestoria, vendedor_mayor_65, es_vivienda_habitual, reinvierte_en_vivienda, importe_reinversion, hipoteca_pendiente }, extra) => {
       await registrarUsoDelegum('consulta_venta_vivienda', getCaller(extra));
       try {
         const r = calcularVentaInmueble({
@@ -877,12 +881,16 @@ function crearServidorDelegum(): McpServer {
           aniosTenencia: anios_tenencia,
           gastosCompraOriginal: gastos_compra_original,
           valorCatastralSuelo: valor_catastral_suelo,
+          valorCatastralTotal: valor_catastral_total,
+          mejoras,
           tipoMunicipalIIVTNU: tipo_municipal_iivtnu,
           comisionInmobiliaria: comision_inmobiliaria,
           gastosGestoria: gastos_gestoria,
           vendedorMayor65: vendedor_mayor_65,
           esViviendaHabitual: es_vivienda_habitual,
           reinvierteTotalEnVivienda: reinvierte_en_vivienda,
+          importeReinversion: importe_reinversion,
+          hipotecaPendiente: hipoteca_pendiente,
         });
         const gananciaLabel = r.hayGanancia ? '📈 Ganancia patrimonial' : '📉 Pérdida patrimonial';
         const lineas = [
@@ -890,7 +898,7 @@ function crearServidorDelegum(): McpServer {
           '',
           `💶 Precio de venta: **${fmt(r.precioVenta)} €**`,
           `📋 Valor de adquisición (compra + gastos): ${fmt(r.valorAdquisicion)} €`,
-          `📋 Valor de transmisión (venta − comisión − gestoría): ${fmt(r.valorTransmision)} €`,
+          `📋 Valor de transmisión (venta − comisión − gestoría − plusvalía municipal): ${fmt(r.valorTransmision)} €`,
           `${gananciaLabel}: **${fmt(Math.abs(r.gananciaPatrimonial))} €**`,
           '',
           `🧾 **Impuestos y gastos del vendedor**`,

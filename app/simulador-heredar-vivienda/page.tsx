@@ -106,6 +106,7 @@ interface CasoPreconfigurado {
   valorAdquisicion: number;
   valorReferencia: number;
   valorCatastralSuelo: number;
+  valorCatastralTotal: number;
   viviendaHabitual: boolean;
   aniosHastaVenta: number;
   valorVenta: number;
@@ -123,6 +124,7 @@ const CASOS: CasoPreconfigurado[] = [
     valorAdquisicion: 80000,
     valorReferencia: 200000,
     valorCatastralSuelo: 60000,
+    valorCatastralTotal: 120000,
     viviendaHabitual: true,
     aniosHastaVenta: 5,
     valorVenta: 250000,
@@ -138,6 +140,7 @@ const CASOS: CasoPreconfigurado[] = [
     valorAdquisicion: 150000,
     valorReferencia: 350000,
     valorCatastralSuelo: 100000,
+    valorCatastralTotal: 200000,
     viviendaHabitual: true,
     aniosHastaVenta: 3,
     valorVenta: 400000,
@@ -153,6 +156,7 @@ const CASOS: CasoPreconfigurado[] = [
     valorAdquisicion: 50000,
     valorReferencia: 150000,
     valorCatastralSuelo: 45000,
+    valorCatastralTotal: 90000,
     viviendaHabitual: false,
     aniosHastaVenta: 2,
     valorVenta: 180000,
@@ -168,6 +172,7 @@ const CASOS: CasoPreconfigurado[] = [
     valorAdquisicion: 120000,
     valorReferencia: 250000,
     valorCatastralSuelo: 75000,
+    valorCatastralTotal: 150000,
     viviendaHabitual: false,
     aniosHastaVenta: 1,
     valorVenta: 280000,
@@ -299,27 +304,29 @@ function calcularPlusvaliaMunicipal(
   valorCatastralSuelo: number,
   valorAdquisicionOriginal: number,
   valorReferenciaActual: number,
-  aniosTenencia: number
+  aniosTenencia: number,
+  valorCatastralTotal: number
 ): ResultadoPlusvalia {
   // Coeficiente según años (max 20)
   const aniosClamp = Math.min(20, Math.max(0, aniosTenencia));
   const coefRow = COEFICIENTES_IIVTNU_2025.find(c => c.anios === aniosClamp);
   const coeficiente = coefRow?.coeficiente ?? 0.45;
 
-  // Método objetivo: valor catastral del suelo × coef × tipo municipal
+  // Método objetivo: valor catastral del suelo × coef × tipo municipal (art. 107.4 TRLHL)
   const baseObjetiva = valorCatastralSuelo * coeficiente;
   const metodoObjetivo = baseObjetiva * TIPO_MUNICIPAL_PLUSVALIA;
 
-  // Método real: ganancia real prorrateada al suelo
+  // Método real (art. 107.5 TRLHL): el incremento se reparte entre suelo y construcción
+  // en la proporción CATASTRAL, no respecto al valor de mercado. Usar el valor de
+  // referencia como denominador infravaloraba el suelo y con él la cuota.
   const gananciaTotal = valorReferenciaActual - valorAdquisicionOriginal;
-  // Proporción del suelo sobre el total (asumimos suelo / valor referencia)
-  const proporcionSuelo = valorReferenciaActual > 0
-    ? valorCatastralSuelo / valorReferenciaActual
+  const proporcionSuelo = valorCatastralTotal > 0
+    ? Math.min(1, valorCatastralSuelo / valorCatastralTotal)
     : 0;
   const gananciaSuelo = Math.max(0, gananciaTotal * proporcionSuelo);
   const metodoReal = gananciaSuelo * TIPO_MUNICIPAL_PLUSVALIA;
 
-  // Si no hay ganancia real → exento (RDL 26/2021)
+  // Si no hay incremento de valor → no sujeta (RDL 26/2021)
   if (gananciaTotal <= 0) {
     return {
       metodoObjetivo,
@@ -408,6 +415,9 @@ export default function SimuladorHeredarViviendaPage() {
   const [valorAdquisicion, setValorAdquisicion] = useState<number>(80000);
   const [valorReferencia, setValorReferencia] = useState<number>(200000);
   const [valorCatastralSuelo, setValorCatastralSuelo] = useState<number>(60000);
+  // Valor catastral total (suelo + construcción): denominador de la proporción de suelo
+  // que exige el método real del IIVTNU (art. 107.5 TRLHL)
+  const [valorCatastralTotal, setValorCatastralTotal] = useState<number>(120000);
   const [viviendaHabitual, setViviendaHabitual] = useState<boolean>(true);
   const [aniosHastaVenta, setAniosHastaVenta] = useState<number>(5);
   const [valorVenta, setValorVenta] = useState<number>(250000);
@@ -420,6 +430,7 @@ export default function SimuladorHeredarViviendaPage() {
     setValorAdquisicion(caso.valorAdquisicion);
     setValorReferencia(caso.valorReferencia);
     setValorCatastralSuelo(caso.valorCatastralSuelo);
+    setValorCatastralTotal(caso.valorCatastralTotal);
     setViviendaHabitual(caso.viviendaHabitual);
     setAniosHastaVenta(caso.aniosHastaVenta);
     setValorVenta(caso.valorVenta);
@@ -439,9 +450,10 @@ export default function SimuladorHeredarViviendaPage() {
         valorCatastralSuelo,
         valorAdquisicion,
         valorReferencia,
-        aniosTenenciaCausante
+        aniosTenenciaCausante,
+        valorCatastralTotal
       ),
-    [valorCatastralSuelo, valorAdquisicion, valorReferencia, aniosTenenciaCausante]
+    [valorCatastralSuelo, valorAdquisicion, valorReferencia, aniosTenenciaCausante, valorCatastralTotal]
   );
 
   const irpf = useMemo(
@@ -667,6 +679,28 @@ export default function SimuladorHeredarViviendaPage() {
             <div className={styles.sliderRange}>
               <span>5.000 €</span>
               <span>500.000 €</span>
+            </div>
+          </div>
+
+          <div className={styles.sliderGroup}>
+            <label className={styles.sliderLabel} htmlFor="valorCatastralTotal">
+              Valor catastral total:{' '}
+              <span className={styles.sliderValue}>{formatCurrency(valorCatastralTotal)}</span>
+              <span className={styles.muted}> (suelo + construcción, del recibo del IBI)</span>
+            </label>
+            <input
+              id="valorCatastralTotal"
+              type="range"
+              min={10000}
+              max={1000000}
+              step={1000}
+              value={valorCatastralTotal}
+              onChange={e => setValorCatastralTotal(Number(e.target.value))}
+              className={styles.slider}
+            />
+            <div className={styles.sliderRange}>
+              <span>10.000 €</span>
+              <span>1.000.000 €</span>
             </div>
           </div>
 

@@ -832,40 +832,76 @@ export interface DatosPlusvalia {
   aniosPropiedad: number;
   precioCompra: number;
   precioVenta: number;
+  /**
+   * Valor catastral TOTAL del inmueble (suelo + construcción), tal como figura en el
+   * recibo del IBI. Necesario para el método de estimación directa: la ley reparte el
+   * incremento real entre suelo y construcción en la misma proporción que el catastro
+   * (art. 107.5 TRLHL). Sin este dato el método real NO se calcula, en lugar de
+   * calcularse con una proporción inventada.
+   *
+   * Para suelo sin construcción (solar, finca rústica) coincide con el valor del suelo.
+   */
+  valorCatastralTotal?: number;
   tipoMaximo?: number; // Por defecto el tipo orientativo (25%); el máximo legal es 30%
 }
 
+/**
+ * Calcula la plusvalía municipal (IIVTNU) por los dos métodos que permite el RDL 26/2021
+ * y devuelve el más favorable, que es el que el contribuyente puede elegir (art. 107.5 TRLHL).
+ *
+ * - Método objetivo: valor catastral del SUELO × coeficiente según años de tenencia.
+ * - Método real (estimación directa): incremento efectivo (venta − compra) multiplicado por
+ *   la PROPORCIÓN que el suelo representa sobre el valor catastral total. Sin el valor
+ *   catastral total no puede calcularse, y `metodoRealDisponible` lo indica: en ese caso
+ *   `recomendado` se queda en el método objetivo, que es el resultado conservador.
+ */
 export function calcularPlusvaliaMunicipal(datos: DatosPlusvalia): {
   metodoObjetivo: number;
   metodoReal: number;
+  metodoRealDisponible: boolean;
   recomendado: number;
   exento: boolean;
 } {
-  const { valorCatastralSuelo, aniosPropiedad, precioCompra, precioVenta, tipoMaximo = PLUSVALIA_MUNICIPAL_META.tipoOrientativo } = datos;
+  const {
+    valorCatastralSuelo,
+    aniosPropiedad,
+    precioCompra,
+    precioVenta,
+    valorCatastralTotal,
+    tipoMaximo = PLUSVALIA_MUNICIPAL_META.tipoOrientativo,
+  } = datos;
 
   // Coeficientes oficiales (RDL 26/2021 + actualización anual), centralizados en data/fiscal/inmuebles.ts
   const aniosCapped = Math.min(Math.max(aniosPropiedad, 1), 20);
   const coeficiente = COEFICIENTES_IIVTNU_2025.find(c => c.anios === aniosCapped)?.coeficiente ?? 0.45;
 
-  // Método objetivo (tradicional)
+  // Método objetivo (art. 107.4 TRLHL)
   const baseObjetivo = valorCatastralSuelo * coeficiente;
   const metodoObjetivo = baseObjetivo * (tipoMaximo / 100);
 
-  // Método real (plusvalía efectiva)
+  // No sujeción cuando no hay incremento de valor (art. 104.5 TRLHL)
   const incrementoReal = precioVenta - precioCompra;
-  const porcentajeIncremento = incrementoReal / precioCompra;
-  const baseReal = valorCatastralSuelo * porcentajeIncremento;
-  const metodoReal = Math.max(0, baseReal * (tipoMaximo / 100));
-
-  // Exención si no hay ganancia
   const exento = incrementoReal <= 0;
 
+  // Método real (art. 107.5 TRLHL): el incremento se reparte en la proporción catastral
+  // suelo/total. Solo es calculable si conocemos el valor catastral total.
+  const metodoRealDisponible = !!valorCatastralTotal && valorCatastralTotal > 0 && valorCatastralSuelo > 0;
+  const proporcionSuelo = metodoRealDisponible
+    ? Math.min(1, valorCatastralSuelo / (valorCatastralTotal as number))
+    : 0;
+  const metodoReal = metodoRealDisponible ? Math.max(0, incrementoReal * proporcionSuelo * (tipoMaximo / 100)) : 0;
+
   // El contribuyente puede elegir el método más favorable
-  const recomendado = exento ? 0 : Math.min(metodoObjetivo, metodoReal);
+  const recomendado = exento
+    ? 0
+    : metodoRealDisponible
+      ? Math.min(metodoObjetivo, metodoReal)
+      : metodoObjetivo;
 
   return {
     metodoObjetivo,
     metodoReal,
+    metodoRealDisponible,
     recomendado,
     exento,
   };

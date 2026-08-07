@@ -17,6 +17,7 @@ export * from './sociedades';
 export * from './calendario';
 export * from './amortizacion';
 export * from './inmuebles';
+export * from './ganancia-inmueble';
 export * from './sucesiones';
 export * from './donaciones';
 export * from './intereses';

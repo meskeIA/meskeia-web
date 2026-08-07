@@ -5,7 +5,7 @@ import styles from './EstimadorCompraventa.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, NumberInput, ResultCard, LegalNotice, DisclaimerCard, DataReference, ShareCard, RegionBadge } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
-import { TRAMOS_GANANCIAS_PATRIMONIALES_2025, FISCAL_INMUEBLES_META } from '@/data/fiscal';
+import { FISCAL_INMUEBLES_META, calcularGananciaInmueble } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -48,11 +48,17 @@ interface ResultadosVendedor {
   exentoPlusvalia: boolean;
   comisionInmobiliaria: number;
   gastosGestoria: number;
+  otrosGastosVenta: number;
   totalGastos: number;
   netoVendedor: number;
+  valorAdquisicion: number;
+  valorTransmision: number;
   gananciaPatrimonial: number;
+  esPerdida: boolean;
+  baseImponibleIRPF: number;
   irpfGanancia: number;
   exentoIRPF: boolean;
+  motivoExencion: string | null;
 }
 
 // ===== CONSTANTES =====
@@ -157,8 +163,19 @@ export default function SimuladorCompraventaPage() {
   const [precioCompraOriginal, setPrecioCompraOriginal] = useState('');
   const [aniosPropiedad, setAniosPropiedad] = useState('');
   const [valorCatastralSuelo, setValorCatastralSuelo] = useState('');
+  const [valorCatastralTotal, setValorCatastralTotal] = useState('');
   const [vendedorMayor65, setVendedorMayor65] = useState(false);
   const [esViviendaHabitual, setEsViviendaHabitual] = useState(true);
+
+  // Datos del vendedor que corrigen el valor de adquisición (art. 35.1 LIRPF)
+  const [gastosAdquisicion, setGastosAdquisicion] = useState('');
+  const [mejoras, setMejoras] = useState('');
+  const [otrosGastosVenta, setOtrosGastosVenta] = useState('');
+
+  // Exención por reinversión en vivienda habitual (art. 38 LIRPF)
+  const [reinvierte, setReinvierte] = useState(false);
+  const [importeReinversion, setImporteReinversion] = useState('');
+  const [hipotecaPendiente, setHipotecaPendiente] = useState('');
 
   // Pestaña activa
   const [pestanaActiva, setPestanaActiva] = useState<'comprador' | 'vendedor'>('comprador');
@@ -239,11 +256,13 @@ export default function SimuladorCompraventaPage() {
     const precioC = parseSpanishNumber(precioCompraOriginal);
     const anios = parseInt(aniosPropiedad) || 0;
     const valorSuelo = parseSpanishNumber(valorCatastralSuelo);
+    const valorTotal = parseSpanishNumber(valorCatastralTotal);
 
     if (precioV <= 0) return null;
 
     const comisionPct = parseSpanishNumber(comisionInmobiliaria) / 100;
     const gestoria = parseSpanishNumber(gastosGestoria);
+    const otrosVenta = parseSpanishNumber(otrosGastosVenta);
     const comision = precioV * comisionPct;
 
     // Plusvalía municipal
@@ -257,38 +276,47 @@ export default function SimuladorCompraventaPage() {
         aniosPropiedad: anios,
         precioCompra: precioC,
         precioVenta: precioV,
+        valorCatastralTotal: valorTotal > 0 ? valorTotal : undefined,
       });
 
       plusvalia = resultadoPlusvalia.recomendado;
       exentoPlusvalia = resultadoPlusvalia.exento;
       metodoPlusvalia = resultadoPlusvalia.exento
-        ? 'Exento (sin ganancia)'
-        : resultadoPlusvalia.metodoReal < resultadoPlusvalia.metodoObjetivo
-          ? 'Método real (más favorable)'
-          : 'Método objetivo';
+        ? 'No sujeta (sin incremento de valor)'
+        : !resultadoPlusvalia.metodoRealDisponible
+          ? 'Método objetivo (falta el valor catastral total para comparar)'
+          : resultadoPlusvalia.metodoReal < resultadoPlusvalia.metodoObjetivo
+            ? 'Método real (más favorable)'
+            : 'Método objetivo (más favorable)';
     }
 
-    // Ganancia patrimonial para IRPF
-    const ganancia = precioC > 0 ? Math.max(0, precioV - precioC - comision - gestoria) : 0;
-
-    // Exención IRPF para mayores de 65 años con vivienda habitual
+    // Ganancia patrimonial e IRPF: motor único del art. 35 LIRPF. La plusvalía
+    // municipal y los gastos de venta minoran el valor de transmisión; los impuestos
+    // y gastos de la compra en su día lo suman al valor de adquisición.
     const exentoIRPF = vendedorMayor65 && esViviendaHabitual;
+    const puedeReinvertir = esViviendaHabitual && reinvierte && !exentoIRPF;
 
-    // Calcular IRPF sobre ganancia patrimonial
-    let irpf = 0;
-    if (ganancia > 0 && !exentoIRPF) {
-      let gananciaRestante = ganancia;
-      let limiteAnterior = 0;
-      for (const tramo of TRAMOS_GANANCIAS_PATRIMONIALES_2025) {
-        const baseTramo = Math.min(gananciaRestante, tramo.hasta - limiteAnterior);
-        if (baseTramo <= 0) break;
-        irpf += baseTramo * (tramo.tipo / 100);
-        gananciaRestante -= baseTramo;
-        limiteAnterior = tramo.hasta;
-      }
-    }
+    const g = calcularGananciaInmueble({
+      precioVenta: precioV,
+      precioCompra: precioC,
+      gastosAdquisicion: parseSpanishNumber(gastosAdquisicion),
+      mejoras: parseSpanishNumber(mejoras),
+      gastosTransmision: comision + gestoria + otrosVenta,
+      plusvaliaMunicipal: plusvalia,
+      exentoPorEdad: exentoIRPF,
+      reinversion: puedeReinvertir
+        ? {
+            importeReinvertido: parseSpanishNumber(importeReinversion),
+            principalPendiente: parseSpanishNumber(hipotecaPendiente),
+          }
+        : undefined,
+    });
 
-    const totalGastos = plusvalia + comision + gestoria + irpf;
+    // Sin precio de compra no hay ganancia que calcular (el IRPF queda a 0)
+    const hayDatosGanancia = precioC > 0;
+    const irpf = hayDatosGanancia ? g.cuotaIRPF : 0;
+
+    const totalGastos = plusvalia + comision + gestoria + otrosVenta + irpf;
     const neto = precioV - totalGastos;
 
     return {
@@ -298,13 +326,33 @@ export default function SimuladorCompraventaPage() {
       exentoPlusvalia,
       comisionInmobiliaria: comision,
       gastosGestoria: gestoria,
+      otrosGastosVenta: otrosVenta,
       totalGastos,
       netoVendedor: neto,
-      gananciaPatrimonial: ganancia,
+      valorAdquisicion: hayDatosGanancia ? g.valorAdquisicion : 0,
+      valorTransmision: g.valorTransmision,
+      gananciaPatrimonial: hayDatosGanancia ? g.ganancia : 0,
+      esPerdida: hayDatosGanancia && g.esPerdida,
+      baseImponibleIRPF: hayDatosGanancia ? g.baseImponible : 0,
       irpfGanancia: irpf,
       exentoIRPF,
+      motivoExencion: hayDatosGanancia ? g.motivoExencion : null,
     };
-  }, [precioVenta, precioCompraOriginal, aniosPropiedad, valorCatastralSuelo, comisionInmobiliaria, gastosGestoria, vendedorMayor65, esViviendaHabitual]);
+  }, [precioVenta, precioCompraOriginal, aniosPropiedad, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, gastosGestoria, otrosGastosVenta, gastosAdquisicion, mejoras, vendedorMayor65, esViviendaHabitual, reinvierte, importeReinversion, hipotecaPendiente]);
+
+  /**
+   * Estima los impuestos y gastos que el vendedor pagó al comprar el inmueble, para
+   * que no tenga que buscarlos en una escritura de hace años. Usa el mismo motor que
+   * la pestaña Comprador (ITP del tipo general de la CCAA + notaría + registro),
+   * aplicado sobre el precio de compra original.
+   */
+  const estimarGastosAdquisicion = () => {
+    const precioC = parseSpanishNumber(precioCompraOriginal);
+    if (precioC <= 0) return;
+    const itp = calcularITP(precioC, ccaa, ITP_CCAA[ccaa].tipoGeneral);
+    const estimado = itp + calcularNotario(precioC) + calcularRegistro(precioC);
+    setGastosAdquisicion(formatNumber(estimado, 0));
+  };
 
   const datosCcaaActual = ITP_CCAA[ccaa];
   const esInmuebleResidencial = INMUEBLES_RESIDENCIALES.includes(tipoInmueble);
@@ -682,12 +730,49 @@ export default function SimuladorCompraventaPage() {
                   max={50}
                 />
 
+                <div className={styles.campoConAccion}>
+                  <NumberInput
+                    value={gastosAdquisicion}
+                    onChange={setGastosAdquisicion}
+                    label="Impuestos y gastos que pagaste al comprar"
+                    placeholder="20000"
+                    helperText="ITP o IVA, notaría, registro y gestoría de aquella compra. Suman al valor de adquisición y REDUCEN la ganancia (art. 35.1 LIRPF)"
+                    min={0}
+                  />
+                  <button
+                    type="button"
+                    className={styles.btnEstimar}
+                    onClick={estimarGastosAdquisicion}
+                    disabled={parseSpanishNumber(precioCompraOriginal) <= 0}
+                  >
+                    <span aria-hidden="true">✨</span> Estimar por mí
+                  </button>
+                </div>
+
+                <NumberInput
+                  value={mejoras}
+                  onChange={setMejoras}
+                  label="Inversiones y mejoras (opcional)"
+                  placeholder="0"
+                  helperText="Ampliaciones o instalaciones nuevas con factura. No cuentan pintura, sustituciones ni reparaciones de conservación"
+                  min={0}
+                />
+
                 <NumberInput
                   value={valorCatastralSuelo}
                   onChange={setValorCatastralSuelo}
                   label="Valor catastral del suelo"
                   placeholder="50000"
                   helperText="Aparece en el recibo del IBI (solo la parte del suelo)"
+                  min={0}
+                />
+
+                <NumberInput
+                  value={valorCatastralTotal}
+                  onChange={setValorCatastralTotal}
+                  label="Valor catastral total (suelo + construcción)"
+                  placeholder="120000"
+                  helperText="También en el recibo del IBI. Sin este dato no se puede comparar el método real de la plusvalía y se aplica el objetivo"
                   min={0}
                 />
 
@@ -699,6 +784,15 @@ export default function SimuladorCompraventaPage() {
                   helperText="Típico: 3-5%. La paga el vendedor"
                   min={0}
                   max={10}
+                />
+
+                <NumberInput
+                  value={otrosGastosVenta}
+                  onChange={setOtrosGastosVenta}
+                  label="Otros gastos de la venta (opcional)"
+                  placeholder="0"
+                  helperText="Certificado energético, cédula de habitabilidad, cancelación registral de la hipoteca"
+                  min={0}
                 />
 
                 <div className={styles.checkboxGroup}>
@@ -718,7 +812,38 @@ export default function SimuladorCompraventaPage() {
                     />
                     <span>Soy mayor de 65 años</span>
                   </label>
+                  {esViviendaHabitual && !vendedorMayor65 && (
+                    <label className={styles.checkbox}>
+                      <input
+                        type="checkbox"
+                        checked={reinvierte}
+                        onChange={(e) => setReinvierte(e.target.checked)}
+                      />
+                      <span>Voy a reinvertir en otra vivienda habitual</span>
+                    </label>
+                  )}
                 </div>
+
+                {esViviendaHabitual && reinvierte && !vendedorMayor65 && (
+                  <>
+                    <NumberInput
+                      value={importeReinversion}
+                      onChange={setImporteReinversion}
+                      label="Importe que reinviertes en la nueva vivienda"
+                      placeholder="250000"
+                      helperText="Tienes 2 años para hacerlo. Si reinviertes todo lo obtenido, la ganancia queda exenta por completo"
+                      min={0}
+                    />
+                    <NumberInput
+                      value={hipotecaPendiente}
+                      onChange={setHipotecaPendiente}
+                      label="Hipoteca pendiente de la vivienda que vendes"
+                      placeholder="0"
+                      helperText="Se resta del importe obtenido a efectos de la reinversión, así que reinvertir el resto ya basta para la exención total (art. 41 RIRPF)"
+                      min={0}
+                    />
+                  </>
+                )}
               </div>
 
               {resultadosVendedor ? (
@@ -738,22 +863,60 @@ export default function SimuladorCompraventaPage() {
                     description={resultadosVendedor.metodoPlusvalia}
                   />
 
-                  {resultadosVendedor.gananciaPatrimonial > 0 && (
+                  {resultadosVendedor.valorAdquisicion > 0 && (
                     <ResultCard
-                      title="Ganancia patrimonial"
-                      value={formatCurrency(resultadosVendedor.gananciaPatrimonial)}
-                      variant="info"
-                      icon="📈"
-                      description="Base para IRPF"
+                      title="Valor de adquisición"
+                      value={formatCurrency(resultadosVendedor.valorAdquisicion)}
+                      variant="default"
+                      icon="📥"
+                      description="Precio de compra + impuestos y gastos de aquella compra + mejoras"
                     />
+                  )}
+
+                  {resultadosVendedor.valorAdquisicion > 0 && (
+                    <ResultCard
+                      title="Valor de transmisión"
+                      value={formatCurrency(resultadosVendedor.valorTransmision)}
+                      variant="default"
+                      icon="📤"
+                      description="Precio de venta − comisión, gestoría, otros gastos y plusvalía municipal"
+                    />
+                  )}
+
+                  {resultadosVendedor.esPerdida ? (
+                    <ResultCard
+                      title="Pérdida patrimonial"
+                      value={formatCurrency(Math.abs(resultadosVendedor.gananciaPatrimonial))}
+                      variant="success"
+                      icon="📉"
+                      description="Vendes por debajo del valor de adquisición: no hay IRPF que pagar y la pérdida se puede compensar en la declaración"
+                    />
+                  ) : (
+                    resultadosVendedor.gananciaPatrimonial > 0 && (
+                      <ResultCard
+                        title="Ganancia patrimonial"
+                        value={formatCurrency(resultadosVendedor.gananciaPatrimonial)}
+                        variant="info"
+                        icon="📈"
+                        description={
+                          resultadosVendedor.baseImponibleIRPF < resultadosVendedor.gananciaPatrimonial
+                            ? `Tributa ${formatCurrency(resultadosVendedor.baseImponibleIRPF)} tras aplicar la exención`
+                            : 'Base para IRPF'
+                        }
+                      />
+                    )
                   )}
 
                   <ResultCard
                     title="IRPF sobre ganancia"
-                    value={resultadosVendedor.exentoIRPF ? 'EXENTO' : formatCurrency(resultadosVendedor.irpfGanancia)}
-                    variant={resultadosVendedor.exentoIRPF ? 'success' : 'warning'}
+                    value={resultadosVendedor.exentoIRPF || resultadosVendedor.irpfGanancia === 0 ? 'EXENTO' : formatCurrency(resultadosVendedor.irpfGanancia)}
+                    variant={resultadosVendedor.exentoIRPF || resultadosVendedor.irpfGanancia === 0 ? 'success' : 'warning'}
                     icon="💸"
-                    description={resultadosVendedor.exentoIRPF ? 'Mayor de 65 años + vivienda habitual' : 'Tributación en base del ahorro'}
+                    description={
+                      resultadosVendedor.exentoIRPF
+                        ? 'Mayor de 65 años + vivienda habitual'
+                        : resultadosVendedor.motivoExencion ?? 'Tributación en base del ahorro'
+                    }
                   />
 
                   {resultadosVendedor.comisionInmobiliaria > 0 && (
@@ -771,6 +934,15 @@ export default function SimuladorCompraventaPage() {
                       value={formatCurrency(resultadosVendedor.gastosGestoria)}
                       variant="default"
                       icon="📂"
+                    />
+                  )}
+
+                  {resultadosVendedor.otrosGastosVenta > 0 && (
+                    <ResultCard
+                      title="Otros gastos de la venta"
+                      value={formatCurrency(resultadosVendedor.otrosGastosVenta)}
+                      variant="default"
+                      icon="📄"
                     />
                   )}
 
@@ -883,11 +1055,17 @@ export default function SimuladorCompraventaPage() {
                 El vendedor debe pagar el <strong>Impuesto sobre el Incremento del Valor de los Terrenos</strong> (plusvalía municipal).
               </p>
               <p>
-                Desde 2021, puede elegir entre el método <strong>objetivo</strong> (tradicional) o el <strong>real</strong> (plusvalía efectiva),
-                pagando el que resulte más favorable.
+                Desde 2021, puede elegir entre el método <strong>objetivo</strong> (valor catastral del suelo × coeficiente
+                según los años de tenencia) o el <strong>real</strong>, pagando el que resulte más favorable.
               </p>
               <p>
-                <strong>Si no hay ganancia, no se paga</strong> (sentencia del Tribunal Constitucional).
+                En el método real, el incremento de la operación (venta menos compra) <strong>no tributa entero</strong>:
+                solo la parte que corresponde al suelo, en la misma proporción que el suelo representa sobre el valor
+                catastral total. Por eso hacen falta las dos cifras del recibo del IBI, no solo la del suelo.
+              </p>
+              <p>
+                <strong>Si no hay incremento de valor, no se paga</strong> (sentencia del Tribunal Constitucional
+                de 26 de octubre de 2021).
               </p>
               <p>
                 Esta calculadora aplica un <strong>tipo del 25%</strong> como referencia orientativa habitual;
@@ -898,11 +1076,19 @@ export default function SimuladorCompraventaPage() {
             <div className={styles.contentCard}>
               <h4>💰 IRPF del vendedor</h4>
               <p>
-                La ganancia patrimonial (diferencia entre precio de venta y compra) tributa en la <strong>base del ahorro</strong>
-                con tipos del 19% al 28% según el importe.
+                La ganancia patrimonial tributa en la <strong>base del ahorro</strong> con tipos del 19% al 30%
+                según el importe.
               </p>
               <p>
-                <strong>Exención total</strong> para mayores de 65 años que venden su vivienda habitual.
+                No es la simple diferencia entre lo que pagaste y lo que cobras: al precio de compra se le suman
+                los <strong>impuestos y gastos de aquella compra</strong> y las mejoras, y del precio de venta se
+                restan la comisión, la gestoría y la <strong>plusvalía municipal</strong> (art. 35 LIRPF). Declararlos
+                puede rebajar la factura varios miles de euros.
+              </p>
+              <p>
+                <strong>Exención total</strong> para mayores de 65 años que venden su vivienda habitual, y
+                <strong> exención por reinversión</strong> —total o proporcional a lo reinvertido— para quien
+                vende su vivienda habitual y compra otra en los 2 años siguientes.
               </p>
             </div>
           </div>
@@ -976,8 +1162,8 @@ export default function SimuladorCompraventaPage() {
                 </tr>
                 <tr>
                   <td>IRPF ganancia patrimonial</td>
-                  <td>19% – 28%</td>
-                  <td>19% – 28%</td>
+                  <td>19% – 30%</td>
+                  <td>19% – 30%</td>
                   <td>Vendedor</td>
                 </tr>
                 <tr>
@@ -1183,13 +1369,16 @@ export default function SimuladorCompraventaPage() {
               <span className={styles.tipIcon}>📁</span>
               <strong>Guarda todos los justificantes</strong>
               <p>Conserva las facturas de notaría, registro, impuestos y reformas. Cuando vendas en el futuro,
-              estos gastos incrementan el valor de adquisición y reducen la ganancia patrimonial tributable.</p>
+              estos gastos incrementan el valor de adquisición y reducen la ganancia patrimonial tributable:
+              es justo lo que recoge el campo &laquo;impuestos y gastos que pagaste al comprar&raquo; de la
+              pestaña Vendedor.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>👨‍💼</span>
               <strong>Consulta a un asesor fiscal</strong>
-              <p>Para operaciones complejas (herencias, divorcios, no residentes, reinversión en vivienda habitual),
-              un asesor fiscal puede identificar exenciones y deducciones que el simulador no contempla.</p>
+              <p>Este simulador aplica la exención por reinversión en vivienda habitual y la de mayores de 65 años,
+              pero hay situaciones que no cubre: herencias, divorcios, no residentes, varios titulares y los
+              coeficientes de abatimiento de las compras anteriores a 1995. Ahí un asesor fiscal sí marca la diferencia.</p>
             </div>
           </div>
         </section>

@@ -478,6 +478,43 @@
   accent-color: var(--primary);
 }
 
+/* Campo con botón de estimación automática (gastos de la compra original) */
+.campoConAccion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.btnEstimar {
+  align-self: flex-start;
+  background: transparent;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius);
+  color: var(--primary);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btnEstimar:hover:not(:disabled) {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btnEstimar:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnEstimar:disabled {
+  border-color: var(--text-muted);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 /* Disclaimer */
 .disclaimer {
   background: #fff3cd;

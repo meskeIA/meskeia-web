@@ -11,9 +11,10 @@
 
 import {
   COEFICIENTES_IIVTNU_2025,
-  TRAMOS_GANANCIAS_PATRIMONIALES_2025,
   PLUSVALIA_MUNICIPAL_META,
   FISCAL_IRPF_META,
+  calcularGananciaInmueble,
+  desglosarCuotaBaseAhorro,
 } from '@/data/fiscal';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
@@ -29,6 +30,10 @@ export interface ParametrosVentaInmueble {
   aniosTenencia: number;
   /** Valor catastral del suelo (aparece en el recibo del IBI) (€) */
   valorCatastralSuelo?: number;
+  /** Valor catastral TOTAL, suelo + construcción (€). Sin él no se calcula el método real del IIVTNU */
+  valorCatastralTotal?: number;
+  /** Inversiones y mejoras con factura (€) — suman al valor de adquisición */
+  mejoras?: number;
   /** Tipo municipal de plusvalía aplicado por el ayuntamiento (%). Por defecto 25% (orientativo). */
   tipoMunicipalIIVTNU?: number;
   /** Comisión de la agencia inmobiliaria (%). Por defecto 3%. */
@@ -41,6 +46,10 @@ export interface ParametrosVentaInmueble {
   esViviendaHabitual?: boolean;
   /** ¿Reinvierte en vivienda habitual? (exención total o parcial del IRPF) */
   reinvierteTotalEnVivienda?: boolean;
+  /** Importe concreto que se reinvierte (€). Si se omite, se asume reinversión total */
+  importeReinversion?: number;
+  /** Principal de la hipoteca pendiente al transmitir (€) — art. 41.1 RIRPF */
+  hipotecaPendiente?: number;
 }
 
 export interface TramoIRPFVenta {
@@ -108,90 +117,90 @@ export function calcularVentaInmueble(p: ParametrosVentaInmueble): ResultadoVent
   const comisionPct = (p.comisionInmobiliaria ?? 3) / 100;
   const gastoGestoria = p.gastosGestoria ?? 300;
 
-  // Valores de transmisión y adquisición
   const comisionInmobiliaria = r(p.precioVenta * comisionPct);
-  const valorTransmision = r(p.precioVenta - comisionInmobiliaria - gastoGestoria);
-  const valorAdquisicion = r(p.precioCompra + gastosCompraOriginal);
-  const gananciaPatrimonial = r(valorTransmision - valorAdquisicion);
-  const hayGanancia = gananciaPatrimonial > 0;
 
   // ─── Plusvalía municipal (IIVTNU) ─────────────────────────────────────────
+  // Se calcula ANTES que la ganancia: es un tributo inherente a la transmisión
+  // satisfecho por el vendedor y, como tal, minora el valor de transmisión
+  // (art. 35.2 LIRPF). Calcularla después obligaba a dejarla fuera de la ganancia.
 
   let plusvaliaMunicipal = 0;
   let metodoPlusvalia = 'No calculable (falta valor catastral del suelo)';
   let iivtnuCalculable = false;
 
   const valorCatastralSuelo = p.valorCatastralSuelo ?? 0;
+  const valorCatastralTotal = p.valorCatastralTotal ?? 0;
+  const incrementoBruto = p.precioVenta - p.precioCompra;
 
   if (valorCatastralSuelo > 0) {
     iivtnuCalculable = true;
 
-    // Método objetivo: base = valor catastral suelo × coeficiente máximo
+    // Método objetivo (art. 107.4 TRLHL): valor catastral del suelo × coeficiente
     const aniosClamped = Math.min(Math.floor(p.aniosTenencia), 20);
     const coefEntry = COEFICIENTES_IIVTNU_2025.find(c => c.anios === aniosClamped)
       ?? COEFICIENTES_IIVTNU_2025[COEFICIENTES_IIVTNU_2025.length - 1];
     const baseObjetivo = r(valorCatastralSuelo * coefEntry.coeficiente);
     const plusvaliaObjetivo = r(baseObjetivo * (tipoMunicipal / 100));
 
-    // Método real: base = ganancia × (valor catastral suelo / valor catastral total)
-    // Aproximamos: si no tenemos valor catastral total, usamos 60% del catastral suelo
-    let plusvaliaReal = Infinity;
-    if (hayGanancia && valorCatastralSuelo > 0) {
-      const ratioSuelo = 0.6; // Aproximación: suelo ≈ 60% del catastral (orientativo)
-      const baseReal = r(gananciaPatrimonial * ratioSuelo);
-      plusvaliaReal = r(Math.max(0, baseReal) * (tipoMunicipal / 100));
-    }
+    // Método real (art. 107.5 TRLHL): incremento BRUTO de la operación repartido en la
+    // proporción CATASTRAL suelo/total. Sin el valor catastral total no es calculable:
+    // antes se usaba un 60 % fijo inventado, que daba un resultado sin respaldo normativo.
+    const metodoRealDisponible = valorCatastralTotal > 0;
+    const plusvaliaReal = metodoRealDisponible
+      ? r(Math.max(0, incrementoBruto * Math.min(1, valorCatastralSuelo / valorCatastralTotal)) * (tipoMunicipal / 100))
+      : Infinity;
 
-    // Se aplica el método más favorable (menor cuota)
-    if (!hayGanancia) {
-      // Sin ganancia: exento (RDL 26/2021)
+    if (incrementoBruto <= 0) {
+      // Sin incremento de valor: no sujeta (RDL 26/2021)
       plusvaliaMunicipal = 0;
-      metodoPlusvalia = 'Exento (sin incremento de valor)';
+      metodoPlusvalia = 'No sujeta (sin incremento de valor)';
     } else if (plusvaliaReal < plusvaliaObjetivo) {
       plusvaliaMunicipal = plusvaliaReal;
       metodoPlusvalia = `Método real (más favorable): ${r(plusvaliaReal)} €`;
     } else {
       plusvaliaMunicipal = plusvaliaObjetivo;
-      metodoPlusvalia = `Método objetivo: ${r(plusvaliaObjetivo)} €`;
+      metodoPlusvalia = metodoRealDisponible
+        ? `Método objetivo (más favorable): ${r(plusvaliaObjetivo)} €`
+        : `Método objetivo: ${r(plusvaliaObjetivo)} € (sin valor catastral total no puede compararse con el método real)`;
     }
   }
 
-  // ─── IRPF sobre ganancia patrimonial ─────────────────────────────────────
+  // ─── Ganancia patrimonial e IRPF ──────────────────────────────────────────
+  // Motor único compartido con las apps web (data/fiscal/ganancia-inmueble.ts):
+  // así la tool MCP y la web no pueden dar cifras distintas para el mismo caso.
 
-  let exentoIRPF = false;
-  let motivoExencion: string | undefined;
-  let irpfGanancia = 0;
-  let tipoEfectivoIRPF = 0;
-  const desgloseIRPF: TramoIRPFVenta[] = [];
+  const g = calcularGananciaInmueble({
+    precioVenta: p.precioVenta,
+    precioCompra: p.precioCompra,
+    gastosAdquisicion: gastosCompraOriginal,
+    mejoras: p.mejoras,
+    gastosTransmision: comisionInmobiliaria + gastoGestoria,
+    plusvaliaMunicipal,
+    exentoPorEdad: !!(p.vendedorMayor65 && p.esViviendaHabitual),
+    reinversion: p.reinvierteTotalEnVivienda
+      ? {
+          // Si solo se marca la casilla sin importe, se asume reinversión total
+          importeReinvertido: p.importeReinversion ?? Number.MAX_SAFE_INTEGER,
+          principalPendiente: p.hipotecaPendiente,
+        }
+      : undefined,
+  });
 
-  if (p.vendedorMayor65 && p.esViviendaHabitual) {
-    exentoIRPF = true;
-    motivoExencion = 'Exención por transmisión de vivienda habitual por mayor de 65 años (art. 33.4.b LIRPF)';
-  } else if (p.reinvierteTotalEnVivienda) {
-    exentoIRPF = true;
-    motivoExencion = 'Exención por reinversión total en vivienda habitual (art. 38 LIRPF). Se debe reinvertir en los 2 años siguientes.';
-  }
+  const valorTransmision = r(g.valorTransmision);
+  const valorAdquisicion = r(g.valorAdquisicion);
+  const gananciaPatrimonial = r(g.ganancia);
+  const hayGanancia = !g.esPerdida && g.ganancia > 0;
 
-  if (!exentoIRPF && hayGanancia) {
-    let base = gananciaPatrimonial;
-    let baseAnterior = 0;
-    for (const tramo of TRAMOS_GANANCIAS_PATRIMONIALES_2025) {
-      if (base <= baseAnterior) break;
-      const baseEnTramo = Math.min(base, tramo.hasta) - baseAnterior;
-      if (baseEnTramo <= 0) { baseAnterior = tramo.hasta; continue; }
-      const cuotaTramo = r(baseEnTramo * (tramo.tipo / 100));
-      irpfGanancia += cuotaTramo;
-      desgloseIRPF.push({
-        desde: baseAnterior,
-        hasta: Math.min(base, tramo.hasta),
-        tipo: tramo.tipo,
-        cuota: cuotaTramo,
-      });
-      baseAnterior = tramo.hasta;
-    }
-    irpfGanancia = r(irpfGanancia);
-    tipoEfectivoIRPF = r((irpfGanancia / gananciaPatrimonial) * 100);
-  }
+  const exentoIRPF = hayGanancia && g.cuotaIRPF === 0;
+  const motivoExencion = g.motivoExencion ?? undefined;
+  const irpfGanancia = r(g.cuotaIRPF);
+  const tipoEfectivoIRPF = r(g.tipoEfectivo);
+  const desgloseIRPF: TramoIRPFVenta[] = desglosarCuotaBaseAhorro(g.baseImponible).map(t => ({
+    desde: t.desde,
+    hasta: t.hasta,
+    tipo: t.tipo,
+    cuota: r(t.cuota),
+  }));
 
   // ─── Totales ──────────────────────────────────────────────────────────────
 

@@ -94,7 +94,7 @@ const faqData = [
   },
   {
     question: '¿Cuántos impuestos pago por mis inversiones?',
-    answer: 'En España, las plusvalías tributan del 19% al 28% según el importe. Hasta 6.000€: 19%. De 6.000€ a 50.000€: 21%. De 50.000€ a 200.000€: 23%. De 200.000€ a 300.000€: 27%. Más de 300.000€: 28%. Solo pagas cuando vendes con beneficio.',
+    answer: 'En España, las plusvalías tributan del 19% al 30% según el importe. Hasta 6.000€: 19%. De 6.000€ a 50.000€: 21%. De 50.000€ a 200.000€: 23%. De 200.000€ a 300.000€: 27%. Más de 300.000€: 30%. Solo pagas cuando vendes con beneficio.',
   },
 ];
 

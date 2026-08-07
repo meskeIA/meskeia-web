@@ -510,13 +510,13 @@ export default function OptimizadorRentas60() {
             <tr>
               <td>Dividendos / intereses</td>
               <td>Ahorro</td>
-              <td>19%-28%</td>
+              <td>19%-30%</td>
               <td>Tipos más bajos, sin reducción por edad</td>
             </tr>
             <tr>
               <td>Plusvalía fondos/acciones</td>
               <td>Ahorro</td>
-              <td>19%-28%</td>
+              <td>19%-30%</td>
               <td>Solo tributa al vender; traspaso fondos sin tributar</td>
             </tr>
             <tr>

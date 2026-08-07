@@ -17,7 +17,7 @@ import {
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
-import { TRAMOS_GANANCIAS_PATRIMONIALES_2025, IVA_INMUEBLES_2025 } from '@/data/fiscal';
+import { IVA_INMUEBLES_2025, calcularGananciaInmueble } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -56,6 +56,9 @@ interface ResultadosVendedor {
   gastosGestoria: number;
   totalGastos: number;
   netoVendedor: number;
+  valorAdquisicion: number;
+  valorTransmision: number;
+  esPerdida: boolean;
   gananciaPatrimonial: number;
   irpfGanancia: number;
 }
@@ -105,8 +108,10 @@ export default function SimuladorTrasteroCompraventaPage() {
 
   // Datos del vendedor (para plusvalía)
   const [precioCompraOriginal, setPrecioCompraOriginal] = useState('');
+  const [gastosAdquisicion, setGastosAdquisicion] = useState('');
   const [aniosPropiedad, setAniosPropiedad] = useState('');
   const [valorCatastralSuelo, setValorCatastralSuelo] = useState('');
+  const [valorCatastralTotal, setValorCatastralTotal] = useState('');
   const [comisionInmobiliaria, setComisionInmobiliaria] = useState('3');
 
   // Pestaña activa
@@ -183,6 +188,7 @@ export default function SimuladorTrasteroCompraventaPage() {
     const precioC = parseSpanishNumber(precioCompraOriginal);
     const anios = parseInt(aniosPropiedad) || 0;
     const valorSuelo = parseSpanishNumber(valorCatastralSuelo);
+    const valorTotal = parseSpanishNumber(valorCatastralTotal);
 
     if (precioV <= 0) return null;
 
@@ -201,34 +207,33 @@ export default function SimuladorTrasteroCompraventaPage() {
         aniosPropiedad: anios,
         precioCompra: precioC,
         precioVenta: precioV,
+        valorCatastralTotal: valorTotal > 0 ? valorTotal : undefined,
       });
 
       plusvalia = resultadoPlusvalia.recomendado;
       exentoPlusvalia = resultadoPlusvalia.exento;
       metodoPlusvalia = resultadoPlusvalia.exento
-        ? 'Exento (sin ganancia)'
-        : resultadoPlusvalia.metodoReal < resultadoPlusvalia.metodoObjetivo
-          ? 'Método real (más favorable)'
-          : 'Método objetivo';
+        ? 'No sujeta (sin incremento de valor)'
+        : !resultadoPlusvalia.metodoRealDisponible
+          ? 'Método objetivo (falta el valor catastral total para comparar)'
+          : resultadoPlusvalia.metodoReal < resultadoPlusvalia.metodoObjetivo
+            ? 'Método real (más favorable)'
+            : 'Método objetivo (más favorable)';
     }
 
-    // Ganancia patrimonial para IRPF
-    const ganancia = precioC > 0 ? Math.max(0, precioV - precioC - comision - gestoria) : 0;
+    // Ganancia patrimonial e IRPF con el motor único del art. 35 LIRPF: los impuestos
+    // y gastos de la compra suman al valor de adquisición y la plusvalía municipal
+    // resta del valor de transmisión.
+    const g = calcularGananciaInmueble({
+      precioVenta: precioV,
+      precioCompra: precioC,
+      gastosAdquisicion: parseSpanishNumber(gastosAdquisicion),
+      gastosTransmision: comision + gestoria,
+      plusvaliaMunicipal: plusvalia,
+    });
 
-    // Calcular IRPF sobre ganancia patrimonial
-    let irpf = 0;
-    if (ganancia > 0) {
-      let gananciaRestante = ganancia;
-      let limiteAnterior = 0;
-      for (const tramo of TRAMOS_GANANCIAS_PATRIMONIALES_2025) {
-        const baseTramo = Math.min(gananciaRestante, tramo.hasta - limiteAnterior);
-        if (baseTramo <= 0) break;
-        irpf += baseTramo * (tramo.tipo / 100);
-        gananciaRestante -= baseTramo;
-        limiteAnterior = tramo.hasta;
-      }
-    }
-
+    const hayDatosGanancia = precioC > 0;
+    const irpf = hayDatosGanancia ? g.cuotaIRPF : 0;
     const totalGastos = plusvalia + comision + gestoria + irpf;
     const neto = precioV - totalGastos;
 
@@ -241,10 +246,13 @@ export default function SimuladorTrasteroCompraventaPage() {
       gastosGestoria: gestoria,
       totalGastos,
       netoVendedor: neto,
-      gananciaPatrimonial: ganancia,
+      valorAdquisicion: hayDatosGanancia ? g.valorAdquisicion : 0,
+      valorTransmision: g.valorTransmision,
+      gananciaPatrimonial: hayDatosGanancia ? g.ganancia : 0,
+      esPerdida: hayDatosGanancia && g.esPerdida,
       irpfGanancia: irpf,
     };
-  }, [precioVenta, precioCompraOriginal, aniosPropiedad, valorCatastralSuelo, comisionInmobiliaria, gastosGestoria]);
+  }, [precioVenta, precioCompraOriginal, aniosPropiedad, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, gastosGestoria, gastosAdquisicion]);
 
   const datosCcaaActual = ITP_CCAA[ccaa];
 
@@ -563,6 +571,15 @@ export default function SimuladorTrasteroCompraventaPage() {
                 />
 
                 <NumberInput
+                  value={gastosAdquisicion}
+                  onChange={setGastosAdquisicion}
+                  label="Impuestos y gastos que pagaste al comprarlo"
+                  placeholder="1000"
+                  helperText="ITP o IVA, notaría, registro y gestoría de aquella compra: suman al valor de adquisición y REDUCEN la ganancia (art. 35.1 LIRPF)"
+                  min={0}
+                />
+
+                <NumberInput
                   value={aniosPropiedad}
                   onChange={setAniosPropiedad}
                   label="Años de propiedad"
@@ -578,6 +595,15 @@ export default function SimuladorTrasteroCompraventaPage() {
                   label="Valor catastral del suelo"
                   placeholder="4000"
                   helperText="Solo la parte del suelo (en el recibo del IBI o en Catastro)"
+                  min={0}
+                />
+
+                <NumberInput
+                  value={valorCatastralTotal}
+                  onChange={setValorCatastralTotal}
+                  label="Valor catastral total (suelo + construcción)"
+                  placeholder="9000"
+                  helperText="También en el recibo del IBI. Sin este dato no puede compararse el método real de la plusvalía y se aplica el objetivo"
                   min={0}
                 />
 
@@ -609,20 +635,49 @@ export default function SimuladorTrasteroCompraventaPage() {
                     description={resultadosVendedor.metodoPlusvalia}
                   />
 
-                  {resultadosVendedor.gananciaPatrimonial > 0 && (
+                  {resultadosVendedor.valorAdquisicion > 0 && (
+                    <>
+                      <ResultCard
+                        title="Valor de adquisición"
+                        value={formatCurrency(resultadosVendedor.valorAdquisicion)}
+                        variant="default"
+                        icon="📥"
+                        description="Precio de compra + impuestos y gastos de aquella compra"
+                      />
+                      <ResultCard
+                        title="Valor de transmisión"
+                        value={formatCurrency(resultadosVendedor.valorTransmision)}
+                        variant="default"
+                        icon="📤"
+                        description="Precio de venta − comisión, gestoría y plusvalía municipal"
+                      />
+                    </>
+                  )}
+
+                  {resultadosVendedor.esPerdida ? (
                     <ResultCard
-                      title="Ganancia patrimonial"
-                      value={formatCurrency(resultadosVendedor.gananciaPatrimonial)}
-                      variant="info"
-                      icon="📈"
-                      description="Base para IRPF (base del ahorro)"
+                      title="Pérdida patrimonial"
+                      value={formatCurrency(Math.abs(resultadosVendedor.gananciaPatrimonial))}
+                      variant="success"
+                      icon="📉"
+                      description="Vendes por debajo del valor de adquisición: no hay IRPF y la pérdida se puede compensar en la declaración"
                     />
+                  ) : (
+                    resultadosVendedor.gananciaPatrimonial > 0 && (
+                      <ResultCard
+                        title="Ganancia patrimonial"
+                        value={formatCurrency(resultadosVendedor.gananciaPatrimonial)}
+                        variant="info"
+                        icon="📈"
+                        description="Base para IRPF (base del ahorro)"
+                      />
+                    )
                   )}
 
                   <ResultCard
                     title="IRPF sobre ganancia"
-                    value={formatCurrency(resultadosVendedor.irpfGanancia)}
-                    variant="warning"
+                    value={resultadosVendedor.irpfGanancia > 0 ? formatCurrency(resultadosVendedor.irpfGanancia) : 'SIN CUOTA'}
+                    variant={resultadosVendedor.irpfGanancia > 0 ? 'warning' : 'success'}
                     icon="💸"
                     description="Tributación en base del ahorro (19%-30%)"
                   />

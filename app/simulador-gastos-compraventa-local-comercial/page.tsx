@@ -17,7 +17,7 @@ import {
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
-import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
+import { calcularGananciaInmueble } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -55,8 +55,10 @@ interface ResultadosVendedor {
   comisionInmobiliaria: number;
   gastosGestoria: number;
   valorAdquisicionCorregido: number;
+  valorTransmision: number;
   amortizacionesRestadas: number;
   gananciaPatrimonial: number;
+  esPerdida: boolean;
   irpfGanancia: number;
   totalGastos: number;
   netoVendedor: number;
@@ -96,8 +98,10 @@ export default function SimuladorLocalComercialPage() {
 
   // Datos del vendedor
   const [precioCompraOriginal, setPrecioCompraOriginal] = useState('');
+  const [gastosAdquisicion, setGastosAdquisicion] = useState('');
   const [aniosPropiedad, setAniosPropiedad] = useState('');
   const [valorCatastralSuelo, setValorCatastralSuelo] = useState('');
+  const [valorCatastralTotal, setValorCatastralTotal] = useState('');
   const [comisionInmobiliaria, setComisionInmobiliaria] = useState('3');
   const [perfilVendedor, setPerfilVendedor] = useState<PerfilVendedor>('particular');
   const [amortizacionesAcumuladas, setAmortizacionesAcumuladas] = useState('');
@@ -174,6 +178,7 @@ export default function SimuladorLocalComercialPage() {
     const precioC = parseSpanishNumber(precioCompraOriginal);
     const anios = parseInt(aniosPropiedad) || 0;
     const valorSuelo = parseSpanishNumber(valorCatastralSuelo);
+    const valorTotal = parseSpanishNumber(valorCatastralTotal);
 
     if (precioV <= 0) return null;
 
@@ -192,40 +197,37 @@ export default function SimuladorLocalComercialPage() {
         aniosPropiedad: anios,
         precioCompra: precioC,
         precioVenta: precioV,
+        valorCatastralTotal: valorTotal > 0 ? valorTotal : undefined,
       });
       plusvalia = resultadoPlusvalia.recomendado;
       exentoPlusvalia = resultadoPlusvalia.exento;
       metodoPlusvalia = resultadoPlusvalia.exento
-        ? 'Exento (sin ganancia de valor)'
-        : resultadoPlusvalia.metodoReal < resultadoPlusvalia.metodoObjetivo
-          ? 'Método real (más favorable)'
-          : 'Método objetivo';
+        ? 'No sujeta (sin incremento de valor)'
+        : !resultadoPlusvalia.metodoRealDisponible
+          ? 'Método objetivo (falta el valor catastral total para comparar)'
+          : resultadoPlusvalia.metodoReal < resultadoPlusvalia.metodoObjetivo
+            ? 'Método real (más favorable)'
+            : 'Método objetivo (más favorable)';
     }
 
-    // Valor de adquisición corregido: si el local estuvo afecto a actividad, se resta la
-    // amortización deducida (o la mínima), lo que AUMENTA la ganancia patrimonial.
+    // Si el local estuvo afecto a actividad, la amortización deducida MINORA el valor de
+    // adquisición (art. 40 RIRPF) y aumenta la ganancia; los impuestos y gastos de la
+    // compra lo aumentan y la reducen (art. 35.1 LIRPF). Ambos van al motor compartido.
     const amortizaciones = perfilVendedor === 'afecto-actividad'
       ? Math.max(0, parseSpanishNumber(amortizacionesAcumuladas))
       : 0;
-    const valorAdquisicionCorregido = precioC > 0 ? Math.max(0, precioC - amortizaciones) : 0;
 
-    const ganancia = precioC > 0
-      ? Math.max(0, precioV - valorAdquisicionCorregido - comision - gestoria)
-      : 0;
+    const g = calcularGananciaInmueble({
+      precioVenta: precioV,
+      precioCompra: precioC,
+      gastosAdquisicion: parseSpanishNumber(gastosAdquisicion),
+      amortizacionesDeducidas: amortizaciones,
+      gastosTransmision: comision + gestoria,
+      plusvaliaMunicipal: plusvalia,
+    });
 
-    let irpf = 0;
-    if (ganancia > 0) {
-      let gananciaRestante = ganancia;
-      let limiteAnterior = 0;
-      for (const tramo of TRAMOS_GANANCIAS_PATRIMONIALES_2025) {
-        const baseTramo = Math.min(gananciaRestante, tramo.hasta - limiteAnterior);
-        if (baseTramo <= 0) break;
-        irpf += baseTramo * (tramo.tipo / 100);
-        gananciaRestante -= baseTramo;
-        limiteAnterior = tramo.hasta;
-      }
-    }
-
+    const hayDatosGanancia = precioC > 0;
+    const irpf = hayDatosGanancia ? g.cuotaIRPF : 0;
     const totalGastos = plusvalia + comision + gestoria + irpf;
 
     return {
@@ -235,15 +237,18 @@ export default function SimuladorLocalComercialPage() {
       exentoPlusvalia,
       comisionInmobiliaria: comision,
       gastosGestoria: gestoria,
-      valorAdquisicionCorregido,
+      valorAdquisicionCorregido: hayDatosGanancia ? g.valorAdquisicion : 0,
+      valorTransmision: g.valorTransmision,
       amortizacionesRestadas: amortizaciones,
-      gananciaPatrimonial: ganancia,
+      gananciaPatrimonial: hayDatosGanancia ? g.ganancia : 0,
+      esPerdida: hayDatosGanancia && g.esPerdida,
       irpfGanancia: irpf,
       totalGastos,
       netoVendedor: precioV - totalGastos,
     };
   }, [
-    precioVenta, precioCompraOriginal, aniosPropiedad, valorCatastralSuelo,
+    precioVenta, precioCompraOriginal, gastosAdquisicion, aniosPropiedad,
+    valorCatastralSuelo, valorCatastralTotal,
     comisionInmobiliaria, gastosGestoria, perfilVendedor, amortizacionesAcumuladas,
   ]);
 
@@ -559,7 +564,16 @@ export default function SimuladorLocalComercialPage() {
                   onChange={setPrecioCompraOriginal}
                   label="Precio de compra original"
                   placeholder="150000"
-                  helperText="Lo que pagaste al adquirir el local (incluidos gastos e impuestos de aquella compra)"
+                  helperText="Precio escriturado al adquirir el local, sin los gastos (van en el campo siguiente)"
+                  min={0}
+                />
+
+                <NumberInput
+                  value={gastosAdquisicion}
+                  onChange={setGastosAdquisicion}
+                  label="Impuestos y gastos que pagaste al comprarlo (€)"
+                  placeholder="15000"
+                  helperText="ITP o IVA no deducible, notaría, registro y gestoría de aquella compra: suman al valor de adquisición y REDUCEN la ganancia (art. 35.1 LIRPF)"
                   min={0}
                 />
 
@@ -589,6 +603,15 @@ export default function SimuladorLocalComercialPage() {
                   label="Valor catastral del suelo (€)"
                   placeholder="40000"
                   helperText="Solo la parte de suelo, no la construcción. Aparece en el recibo del IBI."
+                  min={0}
+                />
+
+                <NumberInput
+                  value={valorCatastralTotal}
+                  onChange={setValorCatastralTotal}
+                  label="Valor catastral total (suelo + construcción) (€)"
+                  placeholder="100000"
+                  helperText="También en el recibo del IBI. Sin este dato no puede compararse el método real de la plusvalía y se aplica el objetivo"
                   min={0}
                 />
 
@@ -625,28 +648,51 @@ export default function SimuladorLocalComercialPage() {
                     description={resultadosVendedor.metodoPlusvalia}
                   />
 
-                  {resultadosVendedor.amortizacionesRestadas > 0 && (
+                  {resultadosVendedor.valorAdquisicionCorregido > 0 && (
+                    <>
+                      <ResultCard
+                        title="Valor de adquisición"
+                        value={formatCurrency(resultadosVendedor.valorAdquisicionCorregido)}
+                        variant="default"
+                        icon="📥"
+                        description={
+                          resultadosVendedor.amortizacionesRestadas > 0
+                            ? `Compra + impuestos y gastos de aquella compra − ${formatCurrency(resultadosVendedor.amortizacionesRestadas)} de amortizaciones deducidas`
+                            : 'Precio de compra + impuestos y gastos de aquella compra'
+                        }
+                      />
+                      <ResultCard
+                        title="Valor de transmisión"
+                        value={formatCurrency(resultadosVendedor.valorTransmision)}
+                        variant="default"
+                        icon="📤"
+                        description="Precio de venta − comisión, gestoría y plusvalía municipal"
+                      />
+                    </>
+                  )}
+
+                  {resultadosVendedor.esPerdida ? (
                     <ResultCard
-                      title="Valor de adquisición corregido"
-                      value={formatCurrency(resultadosVendedor.valorAdquisicionCorregido)}
-                      variant="default"
+                      title="Pérdida patrimonial"
+                      value={formatCurrency(Math.abs(resultadosVendedor.gananciaPatrimonial))}
+                      variant="success"
                       icon="📉"
-                      description={`Precio de compra menos ${formatCurrency(resultadosVendedor.amortizacionesRestadas)} de amortizaciones deducidas`}
+                      description="Vendes por debajo del valor de adquisición: no hay IRPF y la pérdida se puede compensar en la declaración"
+                    />
+                  ) : (
+                    <ResultCard
+                      title="Ganancia patrimonial"
+                      value={formatCurrency(resultadosVendedor.gananciaPatrimonial)}
+                      variant="default"
+                      icon="📈"
+                      description="Valor de transmisión menos valor de adquisición"
                     />
                   )}
 
                   <ResultCard
-                    title="Ganancia patrimonial"
-                    value={formatCurrency(resultadosVendedor.gananciaPatrimonial)}
-                    variant="default"
-                    icon="📈"
-                    description="Venta menos valor de adquisición corregido y gastos de la transmisión"
-                  />
-
-                  <ResultCard
                     title="IRPF sobre la ganancia"
-                    value={formatCurrency(resultadosVendedor.irpfGanancia)}
-                    variant="warning"
+                    value={resultadosVendedor.irpfGanancia > 0 ? formatCurrency(resultadosVendedor.irpfGanancia) : 'SIN CUOTA'}
+                    variant={resultadosVendedor.irpfGanancia > 0 ? 'warning' : 'success'}
                     icon="🧾"
                     description="Base del ahorro 2025. Un local no tiene exención por reinversión ni por edad."
                   />
