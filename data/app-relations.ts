@@ -1123,10 +1123,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-adn-numeros/', icon: '🧬', name: 'Tu ADN en Números', description: 'Cifras del genoma' },
   ],
   'visualizador-gps': [
+    { url: '/conversor-coordenadas/', icon: '🧭', name: 'Conversor de Coordenadas', description: 'Convierte lo que marca tu GPS a UTM, MGRS o grados minutos segundos' },
+    { url: '/visualizador-cartografia-proyecciones/', icon: '🗺️', name: 'Cartografía y Proyecciones', description: 'Por qué todos los mapas mienten' },
     { url: '/visualizador-anatomia-vuelo/', icon: '✈️', name: 'Anatomía de un Vuelo', description: 'Cómo vuela un avión' },
-    { url: '/visualizador-sistema-solar/', icon: '🪐', name: 'El Sistema Solar', description: '8 planetas en números' },
     { url: '/visualizador-internet-60-segundos/', icon: '🌐', name: 'Internet en 60 Segundos', description: 'El viaje de tus datos' },
-    { url: '/visualizador-pantallas/', icon: '🖥️', name: 'Cómo Funciona una Pantalla', description: 'Píxeles y resoluciones' },
   ],
   'visualizador-como-funciona-wifi': [
     { url: '/visualizador-internet-60-segundos/', icon: '🌐', name: 'Internet en 60 Segundos', description: 'El viaje de tus datos' },
@@ -1442,9 +1442,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-estructuras-cristalinas/', icon: '🔮', name: 'Estructuras Cristalinas', description: 'Cómo se organizan en sólidos' },
   ],
   'visualizador-cartografia-proyecciones': [
+    { url: '/conversor-coordenadas/', icon: '🧭', name: 'Conversor de Coordenadas', description: 'Pasa de UTM a grados minutos segundos y al revés' },
     { url: '/visualizador-estaciones-ano/', icon: '🌍', name: 'Estaciones del Año', description: 'Latitudes e inclinación' },
     { url: '/visualizador-gps/', icon: '📍', name: 'Cómo Funciona el GPS', description: 'Coordenadas en acción' },
-    { url: '/visualizador-mundo-100-personas/', icon: '👥', name: 'El Mundo en 100 Personas', description: 'Geografía humana' },
     { url: '/visualizador-escala-universo/', icon: '🔬', name: 'La Escala del Universo', description: 'Del quark a la galaxia' },
   ],
   'visualizador-enzimas-cuerpo-humano': [
@@ -2932,11 +2932,17 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // CONVERSORES
   'conversor-unidades': conversoresApps.filter(a => a.url !== '/conversor-unidades/'),
+  'conversor-coordenadas': [
+    { url: '/visualizador-cartografia-proyecciones/', icon: '🗺️', name: 'Cartografía y Proyecciones', description: 'Por qué UTM deforma: Mercator, Peters y compañía' },
+    { url: '/visualizador-gps/', icon: '📍', name: 'Cómo Funciona el GPS', description: 'De dónde salen los 3 metros de error de tu posición' },
+    { url: '/conversor-unidades/', icon: '📏', name: 'Conversor de Unidades', description: 'Longitud, superficie, peso y temperatura' },
+    { url: '/calculadora-geometria/', icon: '📐', name: 'Calculadora de Geometría', description: 'Distancias, áreas y ángulos en el plano' },
+  ],
   'conversor-unidades-rf': [
     { url: '/conversor-unidades/', icon: '📏', name: 'Conversor Unidades', description: 'Longitud, peso, temperatura' },
+    { url: '/conversor-coordenadas/', icon: '🧭', name: 'Conversor de Coordenadas', description: 'UTM, MGRS y grados minutos segundos' },
     { url: '/calculadora-electricidad/', icon: '⚡', name: 'Electricidad', description: 'Ley de Ohm, potencia, circuitos' },
     { url: '/analizador-espectro/', icon: '📊', name: 'Analizador Espectro', description: 'FFT y frecuencias de audio' },
-    { url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Ondas y oscilaciones' },
   ],
   'conversor-tallas': conversoresApps.filter(a => a.url !== '/conversor-tallas/'),
   'conversor-numeros-romanos': conversoresApps.filter(a => a.url !== '/conversor-numeros-romanos/'),

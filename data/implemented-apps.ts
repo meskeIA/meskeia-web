@@ -346,6 +346,7 @@ export const implementedAppsUrls = [
 
   // Física y Química (7 implementadas)
   "/conversor-unidades/",
+  "/conversor-coordenadas/",        // UTM, MGRS, grados minutos segundos, distancia y rumbo
   "/conversor-unidades-rf/",        // dBm, Watts, VSWR, longitud de onda
   "/calculadora-movimiento/",
   "/simulador-fisica/",            // Simulador visual: caída libre, péndulo, proyectiles, ondas, resorte
