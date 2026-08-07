@@ -732,6 +732,26 @@ export const analyticsRouter = router({
         ? getClientIPFromRequest(ctx.req)
         : anonymizeIP(input.ip_actual);
 
+      // Marcar retroactivamente los registros históricos de la IP anterior como
+      // es_propio = 1 ANTES de sustituirla. El filtro de tráfico propio compara
+      // `ip_address != ip_excluida`, así que al cambiar de IP dinámica todo el
+      // histórico propio de la IP vieja volvería a contarse como tráfico real.
+      // (Este paso existía en la API route legacy y se perdió al migrar a tRPC.)
+      const ipAnteriorResult = await client.execute({
+        sql: `SELECT valor FROM analytics_config WHERE clave = 'ip_excluida'`,
+        args: [],
+      });
+      if (ipAnteriorResult.rows.length > 0) {
+        const ipAnterior = String(ipAnteriorResult.rows[0].valor);
+        if (ipAnterior && ipAnterior !== ipActual) {
+          await client.execute({
+            sql: `UPDATE uso_aplicaciones SET es_propio = 1
+                  WHERE ip_address = ? AND (es_propio IS NULL OR es_propio = 0)`,
+            args: [ipAnterior],
+          });
+        }
+      }
+
       // Guardar o actualizar IP excluida
       await client.execute({
         sql: `INSERT OR REPLACE INTO analytics_config (clave, valor, actualizado)

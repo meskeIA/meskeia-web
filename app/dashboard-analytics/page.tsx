@@ -320,9 +320,14 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
   // tRPC: Mutation para actualizar IP
   const updateIPMutation = trpc.analytics.updateIPFilter.useMutation({
     onSuccess: (data) => {
-      alert(`✅ IP guardada: ${data.data.ip_excluida}\n\nTus pruebas ya no se registrarán.`);
+      // El refetch de ipConfigQuery NO es opcional: sin él la tarjeta sigue
+      // mostrando la IP vieja y el aviso de desajuste, dando la impresión de
+      // que el guardado no ha funcionado (con staleTime de 10 min y sin
+      // refetchOnWindowFocus, solo se corregía recargando la página).
+      ipConfigQuery.refetch();
       statsQuery.refetch();
       tendencia30Query.refetch();
+      alert(`✅ IP guardada: ${data.data.ip_excluida}\n\nTus pruebas ya no se registrarán.`);
     },
     onError: () => {
       alert('❌ Error al guardar IP');
@@ -599,7 +604,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
         <div className={styles.headerControls}>
           <button
             type="button"
-            onClick={() => { statsQuery.refetch(); resumenQuery.refetch(); }}
+            onClick={() => { statsQuery.refetch(); resumenQuery.refetch(); ipConfigQuery.refetch(); }}
             className={styles.btnRefresh}
             disabled={loading}
           >
