@@ -5,7 +5,7 @@
   "scripts": {
     "predev": "npx kill-port 3050 || exit 0",
     "dev": "next dev -p 3050",
-    "build": "node scripts/check-verticales.mjs && node scripts/check-enlaces-internos.mjs && node scripts/generate-app-dates.mjs && node scripts/generate-llm-index.js && node scripts/generate-delegum-es.mjs && node scripts/build-mcp-ui.mjs && next build --turbopack",
+    "build": "node scripts/check-verticales.mjs && node scripts/check-enlaces-internos.mjs && node scripts/check-fiscal-manifiesto.mjs && node scripts/generate-app-dates.mjs && node scripts/generate-llm-index.js && node scripts/generate-delegum-es.mjs && node scripts/build-mcp-ui.mjs && next build --turbopack",
     "start": "next start -p 3050",
     "lint": "eslint",
     "test": "npx playwright test",
@@ -15,6 +15,7 @@
     "ensayo:restauracion": "node scripts/ensayo-restauracion.mjs",
     "check:verticales": "node scripts/check-verticales.mjs",
     "check:enlaces": "node scripts/check-enlaces-internos.mjs",
+    "check:fiscal": "node scripts/check-fiscal-manifiesto.mjs",
     "check:memoria": "node scripts/check-memoria.mjs",
     "generate:app-dates": "node scripts/generate-app-dates.mjs",
     "check:secrets": "git -c core.quotepath=false diff --cached --unified=0 --no-color --no-renames --diff-filter=ACM | node scripts/check-secrets.mjs",

@@ -1,7 +1,7 @@
 # Manifiesto de Vigilancia Normativa — `data/fiscal/`
 
 > **Propósito**: este documento es el "contrato de vigilancia" del repositorio fiscal de meskeIA/Delegum.
-> Define, para cada uno de los 22 módulos de `data/fiscal/`, qué normativa lo sustenta, qué fuente
+> Define, para cada módulo de `data/fiscal/`, qué normativa lo sustenta, qué fuente
 > oficial hay que vigilar, con qué cadencia cambia y qué señales distinguen un **cambio de datos**
 > (importes, tipos, tramos) de un **cambio de metodología** (nueva fórmula o sistema de cálculo).
 >
@@ -251,6 +251,29 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
   distintas). Cualquier presión para "convertir" entre ambas produce criterio disfrazado de dato;
   `FISCAL_CNAE_IAE_META.sinEquivalenciaOficial` lo deja sellado en el propio módulo.
 - **Verificado**: 2026-07-20.
+
+### 3.7 Módulos EXENTOS de vigilancia normativa
+
+> Un módulo de `data/fiscal/` puede quedar legítimamente fuera de este contrato cuando **no contiene
+> datos con fecha de caducidad**: solo la fórmula o la estructura de cálculo que fija la ley. Un sello
+> `verificado` ahí no significaría nada, porque no hay ninguna cifra que pueda envejecer.
+>
+> **La exención tiene que estar declarada aquí, nunca sobreentendida.** Un módulo sin ficha y sin
+> exención es indistinguible de un olvido, y esa ambigüedad es justo lo que este manifiesto existe
+> para impedir. Lo comprueba `npm run check:fiscal`, que rompe el build si aparece uno.
+>
+> **Criterio para exentar** (los tres, no basta con uno): (1) el módulo no declara importes, tipos,
+> tramos ni plazos; (2) las cifras que use las importa de otro módulo que sí esté vigilado; (3) si la
+> ley cambiara, cambiaría su *código*, no un número — y eso lo caza el chequeo de fórmula de enero,
+> no el barrido mensual.
+
+<!-- EXENTOS:INICIO -->
+
+| Módulo | Por qué queda fuera | Quién lo cubre |
+|---|---|---|
+| `ganancia-inmueble.ts` | Implementa la fórmula del art. 35 LIRPF (valor de adquisición y de transmisión) y las exenciones de los arts. 33.4.b y 38 LIRPF y 41 RIRPF. No declara ni un solo importe: los tramos de la base del ahorro los importa de `inmuebles.ts`, que sí está vigilado. | Chequeo de FÓRMULA de enero (`/revision-fiscal-enero`), no el barrido mensual |
+
+<!-- EXENTOS:FIN -->
 
 ---
 
