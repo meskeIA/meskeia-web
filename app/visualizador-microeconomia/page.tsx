@@ -73,7 +73,7 @@ const CONCEPTOS: Concepto[] = [
       'El precio del alquiler en las grandes ciudades: mucha gente buscando piso (demanda alta) y pocos pisos disponibles (oferta limitada) empuja los precios al alza año tras año.',
     paraLlevar:
       'Ningún precio es «justo» o «injusto» por sí mismo: es el punto donde coinciden lo que unos piden y otros ofrecen.',
-    enlace: { texto: 'Verlo en detalle: Oferta, Demanda y por qué Suben los Precios', url: '/visualizador-oferta-demanda/' },
+    enlace: { texto: 'Simular las curvas: Oferta y Demanda en tiempo real', url: '/simulador-oferta-demanda/' },
   },
   {
     id: 'elasticidad',

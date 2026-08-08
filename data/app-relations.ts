@@ -744,15 +744,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-peso-numeros/', icon: '🔢', name: 'El Peso de los Números', description: 'Escalas numéricas' },
     { url: '/visualizador-escalas-tiempo/', icon: '⏳', name: 'Cuánto Tarda el Mundo', description: 'Escalas temporales' },
   ],
-  'visualizador-oferta-demanda': [
-    { url: '/visualizador-microeconomia/', icon: '⚖️', name: 'Microeconomía Visual', description: '6 conceptos clave de microeconomía' },
-    { url: '/visualizador-como-funciona-banco/', icon: '🏦', name: 'Cómo Funciona un Banco', description: 'Sistema bancario visual' },
-    { url: '/visualizador-viaje-impuestos/', icon: '🏛️', name: 'El Viaje de tus Impuestos', description: 'A dónde va tu dinero' },
-    { url: '/visualizador-precio-real-cosas/', icon: '⏰', name: 'El Precio Real de las Cosas', description: 'Horas de trabajo por compra' },
-  ],
   'visualizador-microeconomia': [
     { url: '/visualizador-macroeconomia/', icon: '📈', name: 'Macroeconomía Visual', description: 'La economía de un país, concepto a concepto' },
-    { url: '/visualizador-oferta-demanda/', icon: '📊', name: 'Oferta y Demanda', description: 'Por qué suben los precios' },
+    { url: '/simulador-oferta-demanda/', icon: '📊', name: 'Simulador de Oferta y Demanda', description: 'Mueve las curvas y mira el nuevo equilibrio' },
     { url: '/visualizador-mercados-financieros/', icon: '📈', name: 'Mercados Financieros', description: 'Cómo funciona la bolsa' },
     { url: '/quiz-conceptos-financieros/', icon: '🧠', name: 'Quiz de Conceptos Financieros', description: 'Pon a prueba lo aprendido' },
   ],
@@ -782,7 +776,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'visualizador-origen-camiseta': [
     { url: '/visualizador-huella-alimentos/', icon: '🌍', name: 'Huella de lo que Comes', description: 'Impacto ambiental' },
-    { url: '/visualizador-oferta-demanda/', icon: '📊', name: 'Oferta y Demanda', description: 'Por qué suben los precios' },
+    { url: '/simulador-oferta-demanda/', icon: '📊', name: 'Simulador de Oferta y Demanda', description: 'Mueve las curvas y mira el nuevo equilibrio' },
     { url: '/visualizador-precio-real-cosas/', icon: '⏰', name: 'El Precio Real de las Cosas', description: 'Horas de trabajo por compra' },
     { url: '/visualizador-mundo-100-personas/', icon: '🌍', name: 'El Mundo en 100 Personas', description: 'Estadísticas globales' },
   ],
@@ -963,7 +957,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'visualizador-historia-dinero': [
     { url: '/visualizador-como-funciona-banco/', icon: '🏦', name: 'Cómo Funciona un Banco', description: 'Sistema bancario visual' },
     { url: '/visualizador-viaje-impuestos/', icon: '🏛️', name: 'El Viaje de tus Impuestos', description: 'A dónde va tu dinero' },
-    { url: '/visualizador-oferta-demanda/', icon: '📊', name: 'Oferta y Demanda', description: 'Por qué suben los precios' },
+    { url: '/simulador-oferta-demanda/', icon: '📊', name: 'Simulador de Oferta y Demanda', description: 'Mueve las curvas y mira el nuevo equilibrio' },
     { url: '/visualizador-escalas-tiempo/', icon: '⏳', name: 'Cuánto Tarda el Mundo', description: 'Escalas temporales' },
   ],
   'visualizador-sistema-electoral': [
@@ -6256,7 +6250,6 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // SIMULADORES ECONOMÍA — Lista B Sonnet (2026-05-10)
   'simulador-oferta-demanda': [
-    { url: '/visualizador-oferta-demanda/', icon: '📊', name: 'Oferta y Demanda (explicador)', description: 'Marco conceptual de las curvas que mueves en este simulador' },
     { url: '/simulador-elasticidad-precio/', icon: '📈', name: 'Elasticidad Precio', description: 'Cuánto responde la cantidad al precio: la pendiente de la curva D' },
     { url: '/visualizador-inflacion/', icon: '💸', name: 'Inflación', description: 'Desequilibrios de demanda generan inflación de demanda' },
     { url: '/visualizador-estructuras-mercado/', icon: '🏭', name: 'Estructuras de Mercado', description: 'Cómo cambia la curva S en monopolio, oligopolio o competencia perfecta' },

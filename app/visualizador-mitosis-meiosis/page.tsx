@@ -468,7 +468,7 @@ export default function VisualizadorMitosisMeiosisPage() {
 
         <header className={styles.hero}>
           <div className={styles.heroIcono} aria-hidden="true">🧬</div>
-          <h1 className={styles.title}>Mitosis y Meiosis</h1>
+          <h1 className={styles.title}>El Ciclo Celular</h1>
           <p className={styles.subtitle}>
             La danza de los cromosomas — división celular paso a paso
           </p>

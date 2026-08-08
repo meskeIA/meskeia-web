@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Mitosis y Meiosis - La Danza de los Cromosomas | meskeIA',
-  description: 'Descubre la mitosis y meiosis paso a paso: fases animadas, crossing-over, comparativa visual y datos fascinantes. Explicador visual interactivo de biología.',
+  title: 'El Ciclo Celular: Interfase, División y Errores en la Mitosis | meskeIA',
+  description: 'El ciclo celular completo, fase a fase: interfase (G1, S, G2), división, cromosomas y ploidía, crossing-over y qué ocurre cuando la división falla (no disyunción). Con las fases de mitosis y meiosis animadas.',
   keywords: 'mitosis, meiosis, división celular, cromosomas, profase, metafase, anafase, telofase, crossing-over, gametos, biología visual',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Mitosis y Meiosis - La Danza de los Cromosomas',
+    title: 'El Ciclo Celular: Interfase, División y Ploidía',
     description: 'División celular explicada visualmente: fases, cromosomas y crossing-over paso a paso.',
     url: 'https://meskeia.com/visualizador-mitosis-meiosis/',
     siteName: 'meskeIA',
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Mitosis y Meiosis - Explicador Visual',
+    title: 'El Ciclo Celular',
     description: '3,8 millones de divisiones por segundo en tu cuerpo. ¿Sabes cómo funcionan?',
     images: ['https://meskeia.com/og-image.png']
   },
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'Mitosis y Meiosis - La Danza de los Cromosomas',
+  name: 'El Ciclo Celular: Interfase, División y Ploidía',
   description: 'Explicador visual interactivo sobre división celular: mitosis (5 fases animadas), meiosis (crossing-over y reducción cromosómica), comparativa y datos fascinantes.',
   url: 'https://meskeia.com/visualizador-mitosis-meiosis/',
   category: 'EducationalApplication',

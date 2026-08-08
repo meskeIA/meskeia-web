@@ -782,6 +782,33 @@ export default function SimuladorOfertaDemandaPage() {
           </p>
         </section>
 
+        {/* MOVIMIENTO VS DESPLAZAMIENTO — migrado de visualizador-oferta-demanda (08/08/2026) */}
+        <section>
+          <h3>Desplazamientos vs. movimientos a lo largo de la curva</h3>
+          <p>
+            Hay que distinguir dos cosas: (1) un <strong>movimiento a lo largo de la curva</strong>,
+            causado por un cambio en el precio del propio bien, y (2) un{' '}
+            <strong>desplazamiento de la curva</strong>, causado por un cambio en cualquier otro factor.
+          </p>
+          <p>
+            Ejemplo: si sube el precio de la gasolina, los consumidores compran menos gasolina
+            (movimiento a lo largo de la curva de demanda). Pero si salen al mercado más coches
+            eléctricos, la demanda de gasolina baja a todos los precios (desplazamiento de la curva).
+          </p>
+        </section>
+
+        {/* ELASTICIDAD — migrado de visualizador-oferta-demanda (08/08/2026) */}
+        <section>
+          <h3>Elasticidad: no todos los mercados reaccionan igual</h3>
+          <p>
+            La elasticidad mide cuánto cambia la cantidad demandada (u ofertada) ante un cambio en
+            el precio. Los bienes de primera necesidad (medicamentos, agua, gasolina) son
+            inelásticos: aunque suba mucho el precio, seguimos comprando casi la misma cantidad.
+            Los bienes de lujo o con muchos sustitutos son elásticos: una pequeña subida de precio
+            hunde la demanda.
+          </p>
+        </section>
+
         {/* TABLA COMPARATIVA */}
         <section>
           <h3>Desplazadores de la demanda — 6 factores clave</h3>

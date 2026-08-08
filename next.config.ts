@@ -181,6 +181,14 @@ const nextConfig: NextConfig = {
       // encuadre en piso compartido dejaba fuera viaje, cena y regalo conjunto, que son la
       // otra mitad de la demanda. 1 uso en 30 días con ocho meses de antigüedad.
       { source: '/calculadora-roommates', has, destination: '/calculadora-gastos-compartidos/', permanent: true },
+
+      // Unificación del par de oferta y demanda (08/08/2026). Las dos apps cubrían la misma
+      // intención de búsqueda y se repartían una demanda ya pequeña (ningún término del tema
+      // pasa de 7 impr/mes en Bing ES). El visualizador acumulaba 27 impresiones y CERO clics
+      // en 16 meses, frente a 87 impresiones y 16 clics del simulador. Antes de retirarlo, el
+      // simulador absorbió lo único que no tenía: la distinción entre movimiento a lo largo de
+      // la curva y desplazamiento de la curva, y la explicación de elasticidad.
+      { source: '/visualizador-oferta-demanda', has, destination: '/simulador-oferta-demanda/', permanent: true },
     ];
   },
 

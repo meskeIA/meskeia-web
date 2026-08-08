@@ -657,8 +657,8 @@ export default function VisualizadorReaccionesQuimicasPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}><span aria-hidden="true">⚗️</span> Reacciones Químicas</h1>
-          <p className={styles.subtitle}>Cuando los átomos cambian de pareja</p>
+          <h1 className={styles.title}><span aria-hidden="true">⚗️</span> Tipos de Reacciones Químicas</h1>
+          <p className={styles.subtitle}>Síntesis, descomposición, desplazamiento y combustión, con ejemplos del día a día</p>
         </header>
 
         <LegalNotice />

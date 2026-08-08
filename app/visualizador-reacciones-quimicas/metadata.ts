@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Reacciones Químicas - Cuando los Átomos Cambian de Pareja | meskeIA',
-  description: 'Descubre los tipos de reacciones químicas, cómo balancear ecuaciones y reacciones del día a día. Explicador visual interactivo con átomos animados.',
+  title: 'Tipos de Reacciones Químicas: Ejemplos con Átomos Animados | meskeIA',
+  description: 'Los tipos de reacciones químicas explicados con átomos animados: síntesis, descomposición, desplazamiento simple y doble, y combustión, con ejemplos reales de la cocina, el motor y las baterías.',
   keywords: 'reacciones químicas, balanceo ecuaciones, tipos reacción, síntesis, combustión, átomos, química visual, conservación masa',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Reacciones Químicas - Cuando los Átomos Cambian de Pareja',
+    title: 'Tipos de Reacciones Químicas con Ejemplos',
     description: 'Tipos de reacciones, balanceo de ecuaciones y química del día a día explicados visualmente.',
     url: 'https://meskeia.com/visualizador-reacciones-quimicas/',
     siteName: 'meskeIA',
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Reacciones Químicas - Explicador Visual',
+    title: 'Tipos de Reacciones Químicas',
     description: 'Los átomos no se crean ni destruyen, solo cambian de pareja. Química visual e interactiva.',
     images: ['https://meskeia.com/og-image.png']
   },
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'Reacciones Químicas - Cuando los Átomos Cambian de Pareja',
+  name: 'Tipos de Reacciones Químicas con Ejemplos',
   description: 'Explicador visual interactivo sobre reacciones químicas: tipos (síntesis, descomposición, combustión), balanceo de ecuaciones con conteo atómico y reacciones cotidianas.',
   url: 'https://meskeia.com/visualizador-reacciones-quimicas/',
   category: 'EducationalApplication',
