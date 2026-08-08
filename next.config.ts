@@ -175,6 +175,12 @@ const nextConfig: NextConfig = {
       // presets y array propio), así que estas dos ya no aportan nada que no esté allí.
       { source: '/simulador-ordenacion', has, destination: '/visualizador-algoritmos/', permanent: true },
       { source: '/visualizador-algoritmos-ordenacion', has, destination: '/visualizador-algoritmos/', permanent: true },
+
+      // Renombrado de «Calculadora Roommates» (08/08/2026). El anglicismo del slug la hacía
+      // invisible —ni siquiera se encontraba buscándola dentro del propio catálogo— y el
+      // encuadre en piso compartido dejaba fuera viaje, cena y regalo conjunto, que son la
+      // otra mitad de la demanda. 1 uso en 30 días con ocho meses de antigüedad.
+      { source: '/calculadora-roommates', has, destination: '/calculadora-gastos-compartidos/', permanent: true },
     ];
   },
 

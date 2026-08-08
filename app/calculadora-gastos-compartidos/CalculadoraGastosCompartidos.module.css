@@ -58,20 +58,20 @@
 }
 
 /* Compañeros Panel */
-.compañerosPanel {
+.personasPanel {
   background: var(--bg-card);
   border-radius: 12px;
   border: 1px solid var(--border);
   padding: 20px;
 }
 
-.compañerosList {
+.personasList {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.compañeroItem {
+.personaItem {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -81,7 +81,7 @@
   border: 1px solid var(--border);
 }
 
-.compañeroAvatar {
+.personaAvatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -93,27 +93,27 @@
   font-size: 1.1rem;
 }
 
-.compañeroInfo {
+.personaInfo {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
-.compañeroNombre {
+.personaNombre {
   font-weight: 600;
   color: var(--text-primary);
 }
 
-.compañeroBalance {
+.personaBalance {
   font-size: 0.9rem;
   font-weight: 500;
 }
 
-.compañeroBalance.positivo {
+.personaBalance.positivo {
   color: #10b981;
 }
 
-.compañeroBalance.negativo {
+.personaBalance.negativo {
   color: #ef4444;
 }
 
@@ -874,4 +874,106 @@
   .tipsGrid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Selector de contexto (piso · viaje · cena · regalo)                 */
+/* ------------------------------------------------------------------ */
+.contextoPanel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.contextoTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.contextoTab {
+  flex: 1 1 160px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.contextoTab:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.contextoTab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.contextoTabActivo {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.12) 0%, rgba(72, 169, 166, 0.12) 100%);
+  color: var(--primary);
+}
+
+/* ------------------------------------------------------------------ */
+/* Liquidación                                                         */
+/* ------------------------------------------------------------------ */
+.liquidacionResumen {
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(72, 169, 166, 0.1);
+  border-left: 3px solid var(--secondary);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.liquidacionResumen strong {
+  color: var(--text-primary);
+}
+
+.btnCopiar {
+  display: block;
+  width: 100%;
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnCopiar:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btnCopiar:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.formLabel {
+  display: block;
+  margin-bottom: var(--spacing-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .liquidacionResumen {
+  background: rgba(72, 169, 166, 0.08);
 }

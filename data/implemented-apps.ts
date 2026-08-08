@@ -122,7 +122,7 @@ export const implementedAppsUrls = [
   "/test-tolerancia-riesgo-detallado/", // Test 20 preguntas en 5 dimensiones: horizonte, capacidad, emoción, experiencia, objetivos
   "/estimador-cartera-inversion/",    // Monte Carlo, Sharpe, volatilidad
   "/calculadora-suscripciones/",      // Control de suscripciones recurrentes
-  "/calculadora-roommates/",          // División gastos piso compartido
+  "/calculadora-gastos-compartidos/", // Reparto de gastos en grupo: viaje, cena, regalo, piso
   "/estimador-fondo-emergencia/",   // Cuánto ahorrar como colchón de seguridad
   "/orientador-regla-50-30-20/",     // Distribución presupuesto 50/30/20
   "/estimador-fire/",               // Independencia financiera, retiro anticipado
