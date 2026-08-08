@@ -1,11 +1,11 @@
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata = {
-  title: 'Visualizador de Estructuras Narrativas — 6 modelos para tu historia | meskeIA',
+  title: 'Estructuras Narrativas: 6 Modelos para Construir tu Historia | meskeIA',
   description: 'Explora 6 estructuras narrativas: Pirámide de Freytag, 3 Actos, Viaje del Héroe, Kishōtenketsu, Save the Cat y 5 Actos. Diagramas de tensión, etapas detalladas y ejemplos literarios.',
   keywords: ['estructura narrativa', 'pirámide de freytag', 'tres actos', 'viaje del héroe', 'kishotenketsu', 'save the cat', 'arco narrativo', 'escritura creativa', 'modelo narrativo', 'monomito campbell'],
   openGraph: {
-    title: 'Visualizador de Estructuras Narrativas | meskeIA',
+    title: 'Estructuras Narrativas: 6 Modelos de Historia',
     description: '6 modelos estructurales con diagramas de tensión y ejemplos: Freytag, 3 Actos, Héroe, Kishōtenketsu, Save the Cat, 5 Actos.',
     url: 'https://meskeia.com/visualizador-estructuras-narrativas/',
     siteName: 'meskeIA',
@@ -15,7 +15,7 @@ export const metadata = {
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'Visualizador de Estructuras Narrativas — 6 modelos para tu historia',
+  name: 'Estructuras Narrativas: 6 Modelos de Historia',
   description: 'Explora y compara 6 modelos de estructura narrativa con diagramas visuales de tensión, etapas detalladas y análisis de obras literarias y cinematográficas.',
   url: 'https://meskeia.com/visualizador-estructuras-narrativas/',
   category: 'EducationalApplication',

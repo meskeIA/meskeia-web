@@ -340,7 +340,7 @@ export default function VisualizadorSistemasOperativos() {
       <header className={styles.hero}>
         <div className={styles.heroContent}>
           <span className={styles.heroBadge}><span aria-hidden="true">🖥️</span> Sistemas Operativos</span>
-          <h1 className={styles.heroTitle}>Visualizador de Sistemas Operativos</h1>
+          <h1 className={styles.heroTitle}>Sistemas Operativos</h1>
           <p className={styles.heroSubtitle}>
             Procesos, planificación de CPU, memoria virtual y sistema de ficheros — todo interactivo
           </p>

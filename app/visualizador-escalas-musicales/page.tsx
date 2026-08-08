@@ -323,7 +323,7 @@ export default function VisualizadorEscalasMusicales() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.heroTitle}>Visualizador de Escalas Musicales</h1>
+        <h1 className={styles.heroTitle}>Escalas Musicales</h1>
         <p className={styles.heroSubtitle}>
           Explora las notas, intervalos y grados de cualquier escala musical.
           Visualiza su posición en el teclado de piano.

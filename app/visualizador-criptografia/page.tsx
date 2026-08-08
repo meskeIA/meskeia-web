@@ -191,7 +191,7 @@ export default function VisualizadorCriptografia() {
 
       <header className={styles.hero}>
         <div className={styles.heroIcon} aria-hidden="true">🔐</div>
-        <h1>Visualizador de Criptografía</h1>
+        <h1>Criptografía</h1>
         <p>Cifrado simétrico, asimétrico, firma digital y cómo funciona HTTPS</p>
       </header>
 

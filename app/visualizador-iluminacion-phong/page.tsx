@@ -239,7 +239,7 @@ export default function VisualizadorIluminacionPhongPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>Visualizador de Iluminación (Modelo de Phong)</h1>
+        <h1 className={styles.title}>Modelo de Phong: Iluminación y Sombreado 3D</h1>
         <p className={styles.subtitle}>
           Sombrea una esfera 3D píxel a píxel: ajusta las componentes ambiente, difusa y especular,
           cambia el brillo y mueve la luz para entender cómo piensan los shaders

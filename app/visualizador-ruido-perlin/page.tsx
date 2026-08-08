@@ -199,7 +199,7 @@ export default function VisualizadorRuidoPerlinPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>Visualizador de Ruido Perlin</h1>
+        <h1 className={styles.title}>Ruido Perlin</h1>
         <p className={styles.subtitle}>
           Genera terreno procedural en tiempo real: ajusta escala, octavas y persistencia, prueba
           semillas y mira cómo nace un mapa de biomas estilo Minecraft

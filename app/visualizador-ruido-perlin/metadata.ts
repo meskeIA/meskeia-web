@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Visualizador de Ruido Perlin - Generación Procedimental de Terreno | meskeIA',
+  title: 'Ruido Perlin: Generación Procedimental de Terreno | meskeIA',
   description:
     'Genera ruido de Perlin 2D en tu navegador y míralo en tiempo real. Ajusta escala, octavas y persistencia para crear terreno procedural estilo Minecraft, nubes o texturas. Cambia entre escala de grises y mapa de biomas (agua, arena, hierba, montaña, nieve) y prueba semillas distintas. Explica el ruido coherente y el fBm para programación de videojuegos.',
   keywords:
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    title: 'Visualizador de Ruido Perlin - Generación Procedimental de Terreno | meskeIA',
+    title: 'Ruido Perlin: Generación Procedimental de Terreno',
     description:
       'Ruido de Perlin 2D en tiempo real: escala, octavas y persistencia para crear terreno procedural, nubes y texturas. Con mapa de biomas estilo Minecraft.',
     url: 'https://meskeia.com/visualizador-ruido-perlin/',
@@ -26,14 +26,14 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Visualizador de Ruido Perlin | meskeIA',
+    title: 'Ruido Perlin',
     description: 'Genera terreno procedural con ruido de Perlin y fBm: octavas, persistencia y mapa de biomas',
     images: ['https://meskeia.com/og-image.png'],
   },
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'Visualizador de Ruido Perlin (Generación Procedimental)',
+  name: 'Ruido Perlin: Generación Procedimental',
   description:
     'Visualizador interactivo de ruido de Perlin 2D que genera terreno procedural en tiempo real sobre un canvas. Ajusta la escala (frecuencia), el número de octavas y la persistencia para construir ruido fractal (fBm), cambia entre escala de grises y un mapa de biomas estilo Minecraft (agua, arena, hierba, montaña, nieve) y prueba semillas distintas. Ideal para entender la generación procedimental en videojuegos.',
   url: 'https://meskeia.com/visualizador-ruido-perlin/',

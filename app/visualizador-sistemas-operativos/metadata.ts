@@ -49,7 +49,7 @@ export const metadata: Metadata = {
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'Visualizador Sistemas Operativos',
+  name: 'Sistemas Operativos: Procesos, Scheduling, Memoria y Ficheros',
   description:
     'Visualizador interactivo de sistemas operativos con diagramas SVG de estados de proceso, planificación de CPU con Gantt animado (FIFO, Round Robin, SJF, Prioridad), simulación de memoria virtual y paginación, y explorador de sistema de ficheros con inodos y journaling.',
   url: 'https://meskeia.com/visualizador-sistemas-operativos/',

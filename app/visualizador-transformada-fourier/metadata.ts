@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Transformada de Fourier: Visualizador Interactivo — meskeIA',
+  title: 'Transformada de Fourier: Señales, Armónicos y Frecuencias | meskeIA',
   description: 'Visualizador interactivo de la Transformada de Fourier. Descompone señales en sumas de senos, muestra espectros de frecuencias, epiciclos animados y aplicaciones reales: MP3, JPEG, ECG, sismología.',
   keywords: [
     'transformada de Fourier visualizador',
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   publisher: 'meskeIA',
   robots: 'index, follow',
   openGraph: {
-    title: 'Transformada de Fourier: Visualizador Interactivo — meskeIA',
+    title: 'Transformada de Fourier: Señales y Armónicos',
     description: 'Cómo cualquier señal se descompone en sumas de senos. Síntesis, espectro, epiciclos y aplicaciones reales explicadas de forma visual.',
     type: 'website',
     url: 'https://meskeia.com/visualizador-transformada-fourier/',
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Transformada de Fourier: Visualizador Interactivo',
+    title: 'Transformada de Fourier',
     description: 'Descompone señales en senos, ve el espectro y los epiciclos animados. MP3, JPEG, ECG explicados con Fourier.',
     images: ['https://meskeia.com/og-image.png']
   },
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'Transformada de Fourier: Visualizador Interactivo',
+  name: 'Transformada de Fourier: Señales y Frecuencias',
   description: 'Visualizador interactivo de la Transformada de Fourier que muestra la síntesis de señales, espectro de frecuencias, epiciclos animados y aplicaciones reales (MP3, JPEG, ECG, sismología). 100% educativo, sin registro.',
   url: 'https://meskeia.com/visualizador-transformada-fourier/',
   category: 'EducationalApplication',

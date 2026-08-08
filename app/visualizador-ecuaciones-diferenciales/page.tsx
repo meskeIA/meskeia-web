@@ -751,7 +751,7 @@ export default function VisualizadorEcuacionesDiferenciales() {
 
       <header className={styles.hero}>
         <div className={styles.heroIcono} aria-hidden="true">📈</div>
-        <h1 className={styles.titulo}>Visualizador de Ecuaciones Diferenciales</h1>
+        <h1 className={styles.titulo}>Ecuaciones Diferenciales</h1>
         <p className={styles.subtitulo}>
           Explora ODEs de forma visual e interactiva: campo de direcciones, sistema predador-presa
           animado y aplicaciones reales en ingeniería, biología y física.

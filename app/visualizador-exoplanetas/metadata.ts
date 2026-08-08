@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Visualizador de Exoplanetas: Detección, Zona Habitable y Diversidad — meskeIA',
+  title: 'Exoplanetas: Detección por Tránsito y Zona Habitable | meskeIA',
   description:
     'Explora cómo detectamos exoplanetas con animaciones del método de tránsito y velocidad radial, la zona habitable de Goldilocks, clasificación de tipos y distribución de los 5.500+ mundos conocidos.',
   keywords: [
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     'tipos de exoplanetas clasificación',
   ],
   openGraph: {
-    title: 'Visualizador de Exoplanetas: Detección, Zona Habitable y Diversidad — meskeIA',
+    title: 'Exoplanetas: Detección por Tránsito y Zona Habitable',
     description:
       'Animaciones interactivas del método de tránsito, velocidad radial, zona habitable y clasificación de los más de 5.500 exoplanetas confirmados.',
     type: 'website',

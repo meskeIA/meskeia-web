@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Visualizador de Iluminación (Modelo de Phong) - Sombreado 3D | meskeIA',
+  title: 'Modelo de Phong: Iluminación y Sombreado 3D | meskeIA',
   description:
     'Visualiza cómo se ilumina una esfera 3D con el modelo de reflexión de Phong, píxel a píxel. Ajusta las componentes ambiente, difusa y especular, el brillo (shininess) y mueve la luz arrastrándola sobre el lienzo. Aprende cómo los shaders de los videojuegos y el render 3D calculan el color de cada punto a partir de las normales y los vectores de luz, vista y reflejo.',
   keywords:
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    title: 'Visualizador de Iluminación (Modelo de Phong) - Sombreado 3D | meskeIA',
+    title: 'Modelo de Phong: Iluminación y Sombreado 3D',
     description:
       'Cómo se ilumina una esfera 3D con el modelo de Phong: ambiente, difuso y especular en tiempo real. Mueve la luz y descubre cómo piensan los shaders.',
     url: 'https://meskeia.com/visualizador-iluminacion-phong/',
@@ -26,14 +26,14 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Visualizador de Iluminación (Modelo de Phong) | meskeIA',
+    title: 'Modelo de Phong',
     description: 'Sombreado 3D en tiempo real: componentes ambiente, difusa y especular sobre una esfera',
     images: ['https://meskeia.com/og-image.png'],
   },
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'Visualizador de Iluminación (Modelo de Phong)',
+  name: 'Modelo de Phong: Iluminación y Sombreado 3D',
   description:
     'Visualizador interactivo del modelo de reflexión de Phong. Renderiza una esfera sombreada píxel a píxel sumando las componentes ambiente, difusa (ley del coseno de Lambert) y especular. Permite ajustar los coeficientes ka, kd y ks, el exponente de brillo (shininess), la intensidad y el color de la luz y del material, mover la fuente de luz arrastrándola sobre el lienzo y aislar cada componente para entender cómo contribuye al resultado final. Ideal para aprender shaders, gráficos por computador y programación de videojuegos.',
   url: 'https://meskeia.com/visualizador-iluminacion-phong/',

@@ -340,7 +340,7 @@ export default function VisualizadorTopologiaPage() {
 
       <header className={styles.hero}>
         <div className={styles.heroIcono} aria-hidden="true">∞</div>
-        <h1 className={styles.titulo}>Visualizador de Topología</h1>
+        <h1 className={styles.titulo}>Topología</h1>
         <p className={styles.subtitulo}>
           La geometría que estudia propiedades invariantes bajo deformación continua.
           Una taza de café y un donut son el mismo objeto topológico.

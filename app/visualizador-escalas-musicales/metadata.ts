@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Visualizador de Escalas Musicales — Notas, Intervalos y Piano | meskeIA',
+  title: 'Escalas Musicales: Notas, Intervalos y Piano Interactivo | meskeIA',
   description: 'Explora las notas de cualquier escala musical: mayor, menor, pentatónica, blues y modos griegos. Visualización en teclado de piano, grados e intervalos.',
   keywords: 'escalas musicales, escala mayor, escala menor, pentatónica, blues, modos griegos, intervalos musicales, teclado piano, teoría musical, solfeo',
   authors: [{ name: 'meskeIA' }],
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Visualizador de Escalas Musicales — meskeIA',
+    title: 'Escalas Musicales: Notas, Intervalos y Piano',
     description: 'Selecciona nota raíz y tipo de escala para ver las notas, grados e intervalos sobre un teclado de piano interactivo.',
     url: 'https://meskeia.com/visualizador-escalas-musicales/',
     siteName: 'meskeIA',
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Visualizador de Escalas Musicales — meskeIA',
+    title: 'Escalas Musicales',
     description: 'Explora escalas mayor, menor, pentatónica, blues y modos griegos con visualización en teclado de piano.',
   },
   other: {
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'Visualizador de Escalas Musicales',
+  name: 'Escalas Musicales: Notas, Intervalos y Piano',
   description: 'Herramienta interactiva para explorar escalas musicales: mayor, menor, pentatónica, blues y todos los modos griegos. Muestra las notas, intervalos, grados y su posición en el teclado de piano.',
   url: 'https://meskeia.com/visualizador-escalas-musicales/',
   category: 'EducationalApplication',

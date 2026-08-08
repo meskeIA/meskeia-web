@@ -347,7 +347,7 @@ export default function VisualizadorEspaciosColorPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>Visualizador de Espacios de Color</h1>
+        <h1 className={styles.title}>Espacios de Color</h1>
         <p className={styles.subtitle}>
           Elige un color y velo a la vez en RGB, HSV, HSL y HEX. Pensado para programación de
           videojuegos, generación de imágenes, CSS y diseño.

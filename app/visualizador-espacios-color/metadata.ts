@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Visualizador de Espacios de Color - RGB, HSV, HSL y HEX | meskeIA',
+  title: 'Espacios de Color: RGB, HSV, HSL y HEX | meskeIA',
   description:
     'Selecciona un color y míralo a la vez en RGB, HSV, HSL y HEX. Picker interactivo con cuadrado de saturación/valor, slider de tono arcoíris y sliders RGB. Pensado para programación de videojuegos, generación de imágenes, CSS y diseño. Copia cada valor con un clic.',
   keywords:
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    title: 'Visualizador de Espacios de Color - RGB, HSV, HSL y HEX | meskeIA',
+    title: 'Espacios de Color: RGB, HSV, HSL y HEX',
     description:
       'Un mismo color en RGB, HSV, HSL y HEX a la vez. Picker con cuadrado saturación/valor y slider de tono, ideal para videojuegos, CSS y diseño.',
     url: 'https://meskeia.com/visualizador-espacios-color/',
@@ -26,14 +26,14 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Visualizador de Espacios de Color | meskeIA',
+    title: 'Espacios de Color',
     description: 'Un mismo color en RGB, HSV, HSL y HEX a la vez, con picker interactivo',
     images: ['https://meskeia.com/og-image.png'],
   },
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'Visualizador de Espacios de Color (RGB, HSV, HSL, HEX)',
+  name: 'Espacios de Color: RGB, HSV, HSL y HEX',
   description:
     'Herramienta interactiva para visualizar un mismo color simultáneamente en los espacios RGB, HSV, HSL y HEX. Incluye un cuadrado de saturación/valor sobre canvas, un slider de tono con gradiente arcoíris y sliders RGB bidireccionales, con copia al portapapeles de cada notación. Útil para programación de videojuegos, generación de imágenes, CSS y diseño gráfico.',
   url: 'https://meskeia.com/visualizador-espacios-color/',

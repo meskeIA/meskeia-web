@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Visualizador de Ecuaciones Diferenciales — Campo de Direcciones, Lotka-Volterra y Aplicaciones | meskeIA',
+  title: 'Ecuaciones Diferenciales: Campo de Direcciones y Lotka-Volterra | meskeIA',
   description: 'Explora ecuaciones diferenciales interactivamente: campo de direcciones con soluciones Euler, sistema predador-presa Lotka-Volterra animado, ley de enfriamiento de Newton y circuitos RC como ODE. Alta demanda en ingeniería y ciencias.',
   keywords: 'ecuaciones diferenciales, campo de direcciones, Lotka-Volterra, predador-presa, método de Euler, Runge-Kutta, enfriamiento Newton, circuito RC, ODE, matemáticas, ingeniería, modelado matemático',
   authors: [{ name: 'meskeIA' }],
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Visualizador de Ecuaciones Diferenciales — ODE Interactivo',
+    title: 'Ecuaciones Diferenciales: Campo de Direcciones',
     description: '¿Cómo predice la ciencia la dinámica de poblaciones, el enfriamiento de un café o la carga de un condensador? Explora ecuaciones diferenciales con visualizaciones interactivas.',
     url: 'https://meskeia.com/visualizador-ecuaciones-diferenciales/',
     siteName: 'meskeIA',
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Visualizador de Ecuaciones Diferenciales',
+    title: 'Ecuaciones Diferenciales',
     description: 'Campo de direcciones, Lotka-Volterra animado y aplicaciones reales: enfriamiento Newton y circuitos RC como ODE.',
     images: ['https://meskeia.com/og-image.png']
   },
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'Visualizador de Ecuaciones Diferenciales',
+  name: 'Ecuaciones Diferenciales: Campo de Direcciones y Lotka-Volterra',
   description: 'Visualizador interactivo de ecuaciones diferenciales ordinarias: campo de direcciones SVG con solución por método de Euler, sistema predador-presa Lotka-Volterra con Runge-Kutta 4 y diagrama de fase, ley de enfriamiento de Newton y circuito RC.',
   url: 'https://meskeia.com/visualizador-ecuaciones-diferenciales/',
   features: [

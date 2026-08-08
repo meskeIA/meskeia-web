@@ -315,7 +315,7 @@ export default function VisualizadorExoplanetas() {
 
       <header className={styles.hero}>
         <span className={styles.heroIcono} aria-hidden="true">🪐</span>
-        <h1>Visualizador de Exoplanetas</h1>
+        <h1>Exoplanetas</h1>
         <p>
           Cómo detectamos mundos lejanos, la zona donde podría existir vida
           y la asombrosa diversidad de los 5.500+ exoplanetas confirmados.

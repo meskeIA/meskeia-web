@@ -291,7 +291,7 @@ export default function VisualizadorMercadosFinancieros() {
 
       <header className={styles.hero}>
         <div className={styles.heroIcon} aria-hidden="true">📈</div>
-        <h1>Visualizador de Mercados Financieros</h1>
+        <h1>Mercados Financieros</h1>
         <p>Cómo funciona la bolsa: libro de órdenes, formación de precios y tipos de activos</p>
       </header>
 

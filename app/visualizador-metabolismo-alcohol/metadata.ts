@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Visualizador del Metabolismo del Alcohol — Acetaldehído y salud | meskeIA',
+  title: 'Metabolismo del Alcohol: Acetaldehído y Efectos en el Cuerpo | meskeIA',
   description: 'Descubre cómo el cuerpo procesa el alcohol: ADH, acetaldehído, ALDH2 y sus efectos en hígado, boca, estómago y cerebro. Información fisiológica educativa.',
   keywords: ['metabolismo alcohol', 'acetaldehído', 'ADH', 'ALDH2', 'hígado', 'cáncer', 'fisiología', 'alcohol deshidrogenasa'],
   openGraph: {
-    title: 'Visualizador del Metabolismo del Alcohol — Acetaldehído',
+    title: 'Metabolismo del Alcohol: Acetaldehído y Salud',
     description: 'Cómo el cuerpo metaboliza el alcohol y por qué el acetaldehído es el protagonista perjudicial: hígado, boca, cerebro y estómago.',
     type: 'website',
     images: [{

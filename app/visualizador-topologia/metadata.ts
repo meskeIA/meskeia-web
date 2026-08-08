@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Visualizador de Topología — Superficies, Nudos y Homeomorfismos | meskeIA',
+  title: 'Topología: Superficies, Nudos y Homeomorfismos | meskeIA',
   description: 'Explora topología interactivamente: superficies (esfera, toro, banda de Möbius, botella de Klein), homeomorfismos, genus, nudos y la característica de Euler. La geometría que estudia propiedades invariantes bajo deformación.',
   keywords: 'topología, superficies topológicas, toro, banda de Möbius, botella de Klein, homeomorfismo, genus, característica de Euler, nudos topológicos, matemáticas, geometría',
   authors: [{ name: 'meskeIA' }],
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Visualizador de Topología — Superficies y Homeomorfismos',
+    title: 'Topología: Superficies y Homeomorfismos',
     description: '¿Por qué una taza de café y un donut son lo mismo para las matemáticas? Explora topología: superficies, genus, nudos y la característica de Euler.',
     url: 'https://meskeia.com/visualizador-topologia/',
     siteName: 'meskeIA',
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Visualizador de Topología',
+    title: 'Topología',
     description: 'La geometría que estudia propiedades invariantes bajo deformación continua. Superficies, nudos y homeomorfismos interactivos.',
     images: ['https://meskeia.com/og-image.png']
   },
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'Visualizador de Topología',
+  name: 'Topología: Superficies, Nudos y Homeomorfismos',
   description: 'Visualizador interactivo de topología: galería de superficies (esfera, toro, doble toro, banda de Möbius, botella de Klein), clasificación por genus, nudos topológicos y tabla de propiedades con la característica de Euler.',
   url: 'https://meskeia.com/visualizador-topologia/',
   features: [
