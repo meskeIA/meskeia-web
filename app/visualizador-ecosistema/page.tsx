@@ -28,9 +28,9 @@ interface SeccionInfo {
 }
 
 const SECCIONES: SeccionInfo[] = [
+  { id: 'ciclos', titulo: 'Ciclos biogeoquímicos', icono: '🔄', subtitulo: 'El carbono y el nitrógeno nunca se destruyen' },
   { id: 'piramide', titulo: 'Pirámide trófica', icono: '🔺', subtitulo: 'Los niveles de la vida: quién come a quién' },
   { id: 'regla10', titulo: 'Regla del 10%', icono: '⚡', subtitulo: 'Por qué se pierde el 90% de la energía' },
-  { id: 'ciclos', titulo: 'Ciclos biogeoquímicos', icono: '🔄', subtitulo: 'El carbono y el nitrógeno nunca se destruyen' },
   { id: 'datos', titulo: 'Datos fascinantes', icono: '🌍', subtitulo: 'Naturaleza en números que sorprenden' },
 ];
 
@@ -651,7 +651,7 @@ function SeccionDatos() {
 // ─────────────────────────────────────────────
 
 export default function VisualizadorEcosistemaPage() {
-  const [seccionActiva, setSeccionActiva] = useState<Seccion>('piramide');
+  const [seccionActiva, setSeccionActiva] = useState<Seccion>('ciclos');
 
   const renderSeccion = () => {
     switch (seccionActiva) {
@@ -667,7 +667,7 @@ export default function VisualizadorEcosistemaPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>Ecosistemas</h1>
+          <h1 className={styles.title}>Ciclos del Carbono y del Nitrógeno</h1>
           <p className={styles.subtitle}>El flujo de energía que sostiene la vida: pirámide trófica, ciclos biogeoquímicos y datos fascinantes</p>
         </header>
 

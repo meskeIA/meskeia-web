@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Óptica - El Viaje de la Luz | meskeIA',
-  description: 'Descubre cómo se comporta la luz: reflexión, refracción, lentes convergentes y divergentes, y descomposición en colores. Explicador visual interactivo.',
+  title: 'Ley de Snell y Refracción de la Luz: Índices y Ángulo Crítico | meskeIA',
+  description: 'La ley de Snell aplicada paso a paso: cambia el ángulo de incidencia y el medio (agua, vidrio, diamante) y observa cómo se desvía la luz, con índices de refracción y ángulo crítico. Incluye reflexión y descomposición en colores.',
   keywords: 'óptica, reflexión, refracción, lentes, prisma, luz, Snell, convergente, divergente, espectro, física visual',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Óptica - El Viaje de la Luz',
+    title: 'Ley de Snell y Refracción de la Luz',
     description: 'Reflexión, refracción, lentes y colores: cómo se comporta la luz explicado visualmente.',
     url: 'https://meskeia.com/visualizador-optica/',
     siteName: 'meskeIA',
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Óptica - Explicador Visual Interactivo',
+    title: 'Ley de Snell y Refracción',
     description: 'Rayos de luz, prismas y lentes: la óptica cobra vida ante tus ojos.',
     images: ['https://meskeia.com/og-image.png']
   },
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'Óptica - El Viaje de la Luz',
+  name: 'Ley de Snell y Refracción de la Luz',
   description: 'Explicador visual interactivo sobre óptica: reflexión con ángulos, refracción (ley de Snell), lentes convergentes y divergentes, y descomposición de la luz en colores.',
   url: 'https://meskeia.com/visualizador-optica/',
   category: 'EducationalApplication',

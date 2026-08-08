@@ -46,8 +46,8 @@ const EJEMPLOS_REFLEXION: EjemploReflexion[] = [
 ];
 
 const SECCIONES: { id: Seccion; icono: string; label: string }[] = [
-  { id: 'reflexion', icono: '🪞', label: 'Reflexión' },
   { id: 'refraccion', icono: '🌊', label: 'Refracción' },
+  { id: 'reflexion', icono: '🪞', label: 'Reflexión' },
   { id: 'lentes', icono: '🔍', label: 'Lentes' },
   { id: 'colores', icono: '🌈', label: 'Colores' },
 ];
@@ -394,7 +394,7 @@ function PrismaSVG() {
 // ─────────────────────────────────────────────
 
 export default function VisualizadorOpticaPage() {
-  const [seccion, setSeccion] = useState<Seccion>('reflexion');
+  const [seccion, setSeccion] = useState<Seccion>('refraccion');
   const [anguloReflexion, setAnguloReflexion] = useState(45);
   const [anguloRefraccion, setAnguloRefraccion] = useState(30);
   const [medioId, setMedioId] = useState('agua');
@@ -410,7 +410,7 @@ export default function VisualizadorOpticaPage() {
 
         <header className={styles.hero}>
           <p className={styles.heroTag} aria-hidden="true">Física visual interactiva</p>
-          <h1 className={styles.title}>Óptica: El Viaje de la Luz</h1>
+          <h1 className={styles.title}>Ley de Snell y Refracción de la Luz</h1>
           <p className={styles.subtitle}>
             Reflexión, refracción, lentes y colores. Descubre cómo se comporta la luz con diagramas SVG interactivos.
           </p>

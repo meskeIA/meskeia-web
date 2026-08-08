@@ -576,7 +576,7 @@ export default function VisualizadorTeoriaGrafosPage() {
 
       <header className={styles.hero}>
         <span className={styles.heroIcon} aria-hidden="true">🔗</span>
-        <h1 className={styles.title}>Visualizador de Teoría de Grafos</h1>
+        <h1 className={styles.title}>Teoría de Grafos</h1>
         <p className={styles.subtitle}>
           Explora grafos famosos, ejecuta el algoritmo de Dijkstra paso a paso y descubre propiedades como caminos de Euler y Hamilton
         </p>

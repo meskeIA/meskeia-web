@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Trigonometría: Círculo Unitario Interactivo — meskeIA',
-  description: 'Explora la trigonometría de forma visual e interactiva: círculo unitario animado, gráficas de seno, coseno y tangente con sliders de amplitud, frecuencia y fase, tabla de valores exactos en ángulos notables e identidades pitagóricas.',
+  title: 'Identidades y Razones Trigonométricas: Tabla de Valores Exactos | meskeIA',
+  description: 'Identidades trigonométricas (pitagórica, ángulo doble, suma y resta) y tabla de razones trigonométricas con los valores exactos de seno, coseno y tangente en los ángulos notables. Incluye gráficas de las funciones y círculo unitario.',
   keywords: 'trigonometría, círculo unitario, seno, coseno, tangente, funciones trigonométricas, identidades pitagóricas, ángulos notables, bachillerato, preparatoria, secundaria, educación media, matemáticas, visualizador interactivo, radianes, grados, ondas, amplitud, frecuencia, fase',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Trigonometría: Círculo Unitario Interactivo — meskeIA',
+    title: 'Identidades y Razones Trigonométricas',
     description: 'Aprende trigonometría con visualizaciones interactivas: círculo unitario, gráficas de sen/cos/tan con sliders y tabla de valores exactos.',
     url: 'https://meskeia.com/visualizador-trigonometria/',
     siteName: 'meskeIA',
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Trigonometría: Círculo Unitario Interactivo — meskeIA',
+    title: 'Identidades Trigonométricas',
     description: 'Círculo unitario animado, gráficas con sliders de amplitud/frecuencia/fase e identidades pitagóricas visualizadas.',
     images: ['https://meskeia.com/og-image.png']
   },
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'Visualizador de Trigonometría — Círculo Unitario Interactivo',
+  name: 'Identidades y Razones Trigonométricas',
   description: 'Herramienta educativa interactiva para explorar trigonometría: círculo unitario animado con proyecciones de seno y coseno, gráficas con sliders de amplitud, frecuencia y fase, tabla de valores exactos en ángulos notables e identidades pitagóricas.',
   url: 'https://meskeia.com/visualizador-trigonometria/',
   category: 'EducationalApplication',

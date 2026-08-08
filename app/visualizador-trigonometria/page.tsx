@@ -433,7 +433,7 @@ function PanelIdentidades({ angulo }: { angulo: number }) {
 
 // ======== PÁGINA PRINCIPAL ========
 export default function VisualizadorTrigonometria() {
-  const [tabActiva, setTabActiva] = useState<TabActiva>('circulo');
+  const [tabActiva, setTabActiva] = useState<TabActiva>('identidades');
   const [estadoCirculo, setEstadoCirculo] = useState<EstadoCirculo>({ angulo: 45 });
   const [estadoGrafica, setEstadoGrafica] = useState<EstadoGrafica>({
     amplitud: 1,
@@ -471,10 +471,10 @@ export default function VisualizadorTrigonometria() {
   const tanActual = Math.tan(rad);
 
   const TABS: { id: TabActiva; label: string }[] = [
-    { id: 'circulo', label: '📐 Círculo Unitario' },
-    { id: 'grafica', label: '📈 Gráficas' },
-    { id: 'tabla', label: '📋 Tabla de Valores' },
     { id: 'identidades', label: '🔗 Identidades' },
+    { id: 'tabla', label: '📋 Tabla de Valores' },
+    { id: 'grafica', label: '📈 Gráficas' },
+    { id: 'circulo', label: '📐 Círculo Unitario' },
   ];
 
   return (
@@ -482,7 +482,7 @@ export default function VisualizadorTrigonometria() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.heroTitle}>Trigonometría Interactiva</h1>
+        <h1 className={styles.heroTitle}>Identidades y Razones Trigonométricas</h1>
         <p className={styles.heroSubtitle}>
           Círculo unitario, gráficas de sen/cos/tan e identidades pitagóricas — visualizadas en tiempo real
         </p>

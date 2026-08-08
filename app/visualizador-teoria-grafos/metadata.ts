@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Visualizador de Teoría de Grafos - Dijkstra, Euler, Hamilton | meskeIA',
-  description: 'Explora la teoría de grafos de forma interactiva: algoritmo de Dijkstra animado, caminos de Euler y Hamilton, detector de propiedades de grafos y grafos famosos como los Puentes de Königsberg.',
+  title: 'Teoría de Grafos: Euler, Hamilton y Puentes de Königsberg | meskeIA',
+  description: 'Teoría de grafos paso a paso: caminos de Euler y ciclos de Hamilton, propiedades de un grafo (grado, conexidad, bipartito), grafos famosos como los Puentes de Königsberg y aplicaciones reales en redes.',
   keywords: 'teoría grafos, algoritmo dijkstra, camino euler, circuito hamilton, puentes königsberg, grafo conexo, árbol, grafo completo k5, visualizador grafos, matemáticas discretas, redes, informática, programación, matemáticas universidad',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Visualizador de Teoría de Grafos - meskeIA',
+    title: 'Teoría de Grafos: Euler, Hamilton y Königsberg',
     description: 'Aprende teoría de grafos con visualizaciones interactivas: Dijkstra animado, Euler, Hamilton y los Puentes de Königsberg.',
     url: 'https://meskeia.com/visualizador-teoria-grafos/',
     siteName: 'meskeIA',
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Visualizador de Teoría de Grafos - meskeIA',
+    title: 'Teoría de Grafos',
     description: 'Explora grafos, algoritmo de Dijkstra y caminos de Euler de forma interactiva.',
     images: ['https://meskeia.com/og-image.png']
   },
@@ -35,8 +35,8 @@ export const metadata: Metadata = {
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: "Teoría de Grafos: Dijkstra, Königsberg y Redes",
-  description: "Explora la teoría de grafos de forma interactiva: algoritmo de Dijkstra animado, caminos de Euler y Hamilton, detector de propiedades de grafos y grafos famosos como los Puentes de Königsberg.",
+  name: "Teoría de Grafos: Euler, Hamilton y Königsberg",
+  description: "Teoría de grafos paso a paso: caminos de Euler y ciclos de Hamilton, propiedades de un grafo (grado, conexidad, bipartito), grafos famosos como los Puentes de Königsberg y aplicaciones reales en redes.",
   url: "https://meskeia.com/visualizador-teoria-grafos/",
   category: 'EducationalApplication',
   features: [],
