@@ -26,11 +26,16 @@ function construir(): string {
 
   l.push('# Coquinum — Cocina y gastronomía con precisión');
   l.push('');
+  // Las secciones se enumeran DESDE el catálogo: escritas a mano se quedaron
+  // nombrando las nueve categorías anteriores a la consolidación del 09/08/2026
+  // mientras la lista de abajo, esa sí derivada, ya solo servía seis.
+  const secciones = Object.values(COQUINUM_CATEGORIAS)
+    .map((c) => c.toLowerCase())
+    .join(', ');
   l.push(
     `> Portal de cocina técnica de meskeIA con ${COQUINUM_TOTAL_APPS} calculadoras y guías en ` +
-      'español sobre panadería y repostería, medidas y conversiones, cocción, conservación, ' +
-      'costes (food cost), ingredientes, bebidas y cultura gastronómica. Gratis, sin registro y ' +
-      'sin publicidad, con cálculo local en el navegador.',
+      `español sobre ${secciones}. Gratis, sin registro y sin publicidad, con cálculo local ` +
+      'en el navegador.',
   );
   l.push('');
   l.push(

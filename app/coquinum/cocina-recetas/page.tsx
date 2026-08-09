@@ -7,9 +7,9 @@ import { appsDeCategoria } from '@/data/coquinum';
 import styles from '../CoquinumHome.module.css';
 
 export const metadata: Metadata = {
-  title: 'Cocina y recetas: conversor, escalado y planificador | Coquinum',
+  title: 'Cocina y recetas: escalado, planificador y escandallo | Coquinum',
   description:
-    'Herramientas de cocina del día a día: conversor de unidades de cocina, escalado de recetas por raciones, planificador de menú semanal y orientador de dieta. En español, sin registro y sin coste.',
+    'Herramientas de cocina del día a día: conversor de unidades, escalado de recetas por raciones, planificador de menú semanal, cantidades para eventos y orientador de dieta, más el escandallo y la merma para poner precio a un plato. En español, sin registro y sin coste.',
   alternates: { canonical: 'https://coquinum.com/cocina-recetas/' },
 };
 
@@ -30,7 +30,9 @@ export default function CoquinumCocinaRecetas() {
           </h1>
           <p className={styles.ejeIntro}>
             Las herramientas de andar por casa: convertir medidas, ajustar raciones y
-            planificar la semana para que cocinar sea más fácil y menos improvisado.
+            planificar la semana para que cocinar sea más fácil y menos improvisado. Y, al
+            final de la sección, poner números a lo cocinado: escandallo, food cost y merma
+            para quien cocina de forma profesional.
           </p>
           <div className={styles.grid}>
             {APPS.map((a) => (

@@ -17,9 +17,11 @@
  * clínica = Salud. Worksheet: _private/GASTRONOMIA.md §10. Revisión periódica.
  */
 export const COQUINUM_ADYACENTES: Record<string, string> = {
+  // Las tres que apuntaban a 'cultura-gastronomica' pasan a 'ingredientes-despensa',
+  // que la absorbió en la consolidación 9 → 6 del 09/08/2026.
   'calculadora-macros': 'cocina-recetas',
-  'curso-nutrisalud': 'cultura-gastronomica',
-  'visualizador-cadena-alimentaria': 'cultura-gastronomica',
-  'visualizador-agua-virtual': 'cultura-gastronomica',
+  'curso-nutrisalud': 'ingredientes-despensa',
+  'visualizador-cadena-alimentaria': 'ingredientes-despensa',
+  'visualizador-agua-virtual': 'ingredientes-despensa',
   'visualizador-indice-glucemico': 'ingredientes-despensa',
 };

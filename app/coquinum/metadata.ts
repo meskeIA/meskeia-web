@@ -5,7 +5,7 @@ const URL_CANONICA = 'https://coquinum.com/';
 export const metadata: Metadata = {
   title: 'Coquinum — Cocina y gastronomía: calculadoras y herramientas | meskeIA',
   description:
-    'Coquinum reúne las herramientas de cocina técnica de meskeIA: calculadoras de panadería y repostería, conversor y escalado de recetas, guías de ingredientes, bebidas y cultura gastronómica. En español, sin registro y sin coste.',
+    'Coquinum reúne las herramientas de cocina técnica de meskeIA: calculadoras de panadería y repostería, conversor y escalado de recetas, guías de ingredientes y bebidas, y herramientas de cocción y conservación. En español, sin registro y sin coste.',
   keywords:
     'coquinum, cocina técnica, calculadora panadería, porcentaje del panadero, hidratación masa, escalador de recetas, conversor de cocina, guía de ingredientes, maridaje, gastronomía en español',
   authors: [{ name: 'meskeIA' }],
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Coquinum — Cocina y gastronomía con precisión',
     description:
-      'Calculadoras y herramientas de cocina técnica: panadería y repostería, recetas y medidas, ingredientes, bebidas y cultura gastronómica. Mide, convierte y cocina con precisión.',
+      'Calculadoras y herramientas de cocina técnica: panadería y repostería, recetas y medidas, cocción y conservación, ingredientes y bebidas. Mide, convierte y cocina con precisión.',
     url: URL_CANONICA,
     siteName: 'Coquinum',
     locale: 'es_ES',
@@ -60,7 +60,7 @@ export const siteJsonLd = {
   name: 'Coquinum',
   url: URL_CANONICA,
   description:
-    'Portal de cocina y gastronomía con herramientas de cocina técnica: panadería y repostería, recetas y medidas, ingredientes, bebidas y cultura gastronómica. Parte de meskeIA.',
+    'Portal de cocina y gastronomía con herramientas de cocina técnica: panadería y repostería, recetas y medidas, cocción y conservación, ingredientes y bebidas. Parte de meskeIA.',
   logo: 'https://coquinum.com/coquinum/app-icon-512.png',
   parentOrganization: {
     '@type': 'Organization',

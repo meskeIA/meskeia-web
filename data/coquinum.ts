@@ -15,8 +15,17 @@
  * `npm run check:verticales` (y el propio build) avisan si algo queda descosido.
  *
  * Curaduría Fase 1 (2026-06-26): 5 categorías pobladas con apps existentes (36).
- * Los bloques roadmap (cocción/temperatura, conservación, food cost) se añadirán
- * cuando existan las apps; ver _private/GASTRONOMIA.md.
+ * Los bloques roadmap (cocción/temperatura, conservación, food cost) se añadieron
+ * después; ver _private/GASTRONOMIA.md.
+ *
+ * CONSOLIDACIÓN 9 → 6 (2026-08-09). El portal había llegado a nueve categorías para
+ * 84 apps —Stemum tiene cinco disciplinas para 136— y tres estaban casi vacías
+ * (costes 2 apps, cultura 4, conservación 6 con la mitad sin uso). Se notaba en el
+ * único sitio donde se puede notar: de cada visita a la home del portal salían 0,45
+ * visitas a una página de sección, contra 1,88 en Stemum. Quien pulsaba una de esas
+ * categorías aterrizaba en una parrilla que no le daba nada y se iba. Las tres se
+ * absorbieron en las categorías con las que ya compartían intención; ninguna app se
+ * retiró y los tres slugs retirados mantienen 301 (ver COQUINUM_CATEGORIAS_RETIRADAS).
  */
 
 // Categorías del portal: slug de ruta → etiqueta visible.
@@ -24,12 +33,68 @@ export const COQUINUM_CATEGORIAS: Record<string, string> = {
   'panaderia-reposteria': 'Panadería y repostería',
   'cocina-recetas': 'Cocina y recetas',
   'medidas-conversiones': 'Medidas y conversiones',
-  'coccion': 'Cocción y temperatura',
-  'conservacion': 'Conservación',
-  'costes-cocina': 'Costes y escandallo',
+  'coccion': 'Cocción y conservación',
   'ingredientes-despensa': 'Ingredientes y despensa',
   'bebidas': 'Bebidas',
-  'cultura-gastronomica': 'Cultura gastronómica',
+};
+
+/**
+ * Icono y descripción con que cada categoría se presenta en la home del portal.
+ *
+ * Vive aquí, y no en `app/coquinum/page.tsx`, porque allí era una lista escrita a
+ * mano: su comentario seguía diciendo «las 5 categorías pobladas» cuando ya había
+ * nueve, y retirar una categoría habría dejado su tarjeta enlazando a un 404 sin que
+ * nada avisara. Es el mismo fallo que en julio de 2026 obligó a derivar las parrillas
+ * del catálogo en Stemum y Coquinum. Al derivarse de aquí, una categoría nueva sin
+ * ficha rompe `npm run check:verticales`, que es cuando conviene enterarse.
+ */
+export interface CoquinumCategoriaInfo {
+  /** Emoji decorativo de la tarjeta (se pinta con aria-hidden). */
+  icon: string;
+  /** Qué reúne la sección, en una frase. */
+  desc: string;
+}
+
+export const COQUINUM_CATEGORIA_INFO: Record<string, CoquinumCategoriaInfo> = {
+  'panaderia-reposteria': {
+    icon: '🍞',
+    desc: 'Porcentaje del panadero, hidratación de masa, masa madre, temperatura de masa, ganache, gelatina y punto de azúcar.',
+  },
+  'cocina-recetas': {
+    icon: '🍽️',
+    desc: 'Escala recetas por raciones, planifica el menú semanal, calcula cantidades para un evento y pon precio a tus platos con escandallo y merma.',
+  },
+  'medidas-conversiones': {
+    icon: '🥄',
+    desc: 'Pasa de tazas y cucharadas a gramos con el peso real de cada ingrediente. Precisión para recetas que vienen en tazas.',
+  },
+  coccion: {
+    icon: '🌡️',
+    desc: 'El punto y la temperatura interna segura, los tiempos de cocción y asado, y el otro lado del termómetro: cuánto dura cada alimento, qué se puede congelar y cómo hacer conservas, encurtidos y fermentados.',
+  },
+  'ingredientes-despensa': {
+    icon: '🥩',
+    desc: 'Guías para elegir y usar aceite, carne, especias, quesos, setas, arroces, pastas y vinagres, y de dónde viene cada alimento: el mapa de las especias, su viaje por el mundo y su huella.',
+  },
+  bebidas: {
+    icon: '🍷',
+    desc: 'Café, té e infusiones, coctelería, cerveza y vino, con selectores para acertar con la copa.',
+  },
+};
+
+/**
+ * Categorías retiradas en la consolidación de 2026-08-09 → categoría que las absorbió.
+ *
+ * Las consume `proxy.ts` para responder 301 bajo coquinum.com. No se borran de aquí
+ * aunque el tráfico sea pequeño: `/coccion/` y `/cultura-gastronomica/` tenían 23 y 18
+ * impresiones en Google en 90 días, y una URL anunciada en el sitemap que pasa a
+ * devolver 404 es exactamente el fallo silencioso que ya nos costó tres 404 internos
+ * en julio de 2026.
+ */
+export const COQUINUM_CATEGORIAS_RETIRADAS: Record<string, string> = {
+  'conservacion': 'coccion',
+  'costes-cocina': 'cocina-recetas',
+  'cultura-gastronomica': 'ingredientes-despensa',
 };
 
 /**
@@ -285,7 +350,7 @@ export const COQUINUM_APPS: CoquinumApp[] = [
     desc: 'De onzas a gramos, mililitros, libras y tazas, separando la onza de peso de la onza líquida, con la diferencia entre EE. UU. y Reino Unido.',
     categoria: 'medidas-conversiones',
   },
-  // Cocción y temperatura (seguridad y punto)
+  // Cocción y conservación · bloque de cocción (seguridad y punto)
   {
     slug: 'temperatura-coccion-carne',
     icon: '🌡️',
@@ -342,63 +407,65 @@ export const COQUINUM_APPS: CoquinumApp[] = [
     desc: 'Con qué aceite freír, saltear o aliñar según su punto de humo, del aliño en crudo a la fritura. Con buscador y filtro por temperatura.',
     categoria: 'coccion',
   },
-  // Conservación (seguridad alimentaria y duración)
+  // Cocción y conservación · tratar el alimento con frío o transformarlo para que dure
+  // (bloque de la antigua categoría 'conservacion', absorbida el 09/08/2026)
   {
     slug: 'calculadora-caducidad',
     icon: '🧊',
     titulo: 'Cuánto dura cada alimento',
     desc: 'Tiempos de conservación en nevera, congelador y despensa para carnes, pescados, lácteos, verduras y sobras, con buscador y filtro.',
-    categoria: 'conservacion',
+    categoria: 'coccion',
   },
   {
     slug: 'calculadora-congelacion',
     icon: '❄️',
     titulo: 'Qué se puede congelar',
     desc: 'Qué alimentos aguantan bien el congelador, cuáles no y cuánto duran, con buscador y filtro por categoría.',
-    categoria: 'conservacion',
+    categoria: 'coccion',
   },
   {
     slug: 'descongelacion-segura',
     icon: '🧊',
     titulo: 'Descongelación segura',
     desc: 'Cuánto tarda en descongelarse un alimento según el peso y el método: nevera, agua fría o microondas. Nunca al ambiente.',
-    categoria: 'conservacion',
+    categoria: 'coccion',
   },
   {
     slug: 'calculadora-mermelada',
     icon: '🍓',
     titulo: 'Mermelada',
     desc: 'Azúcar y limón para tu mermelada según la fruta y el dulzor, con aviso de cuándo necesita pectina.',
-    categoria: 'conservacion',
+    categoria: 'coccion',
   },
   {
     slug: 'calculadora-encurtidos',
     icon: '🥒',
     titulo: 'Encurtidos',
     desc: 'Vinagre, agua, sal y azúcar para tu líquido de encurtido según el estilo y el volumen.',
-    categoria: 'conservacion',
+    categoria: 'coccion',
   },
   {
     slug: 'fermentados-vegetales',
     icon: '🥬',
     titulo: 'Fermentados vegetales',
     desc: 'La sal exacta para fermentar verduras en seco (chucrut, kimchi) o en salmuera, la clave de una fermentación segura.',
-    categoria: 'conservacion',
+    categoria: 'coccion',
   },
-  // Costes y escandallo (ala B2B / hostelería)
+  // Cocina y recetas · poner números a la comida, del ala B2B / hostelería
+  // (bloque de la antigua categoría 'costes-cocina', absorbida el 09/08/2026)
   {
     slug: 'escandallo-food-cost',
     icon: '💼',
     titulo: 'Escandallo y food cost',
     desc: 'Coste de la receta por ingredientes, coste por ración y precio de venta según tu food cost objetivo, con el margen bruto. Para hostelería y catering.',
-    categoria: 'costes-cocina',
+    categoria: 'cocina-recetas',
   },
   {
     slug: 'calculadora-merma',
     icon: '📉',
     titulo: 'Calculadora de merma',
     desc: 'Peso neto, rendimiento, factor de corrección y coste real por kilo útil tras limpiar y cocinar. El coste que el precio de compra no refleja.',
-    categoria: 'costes-cocina',
+    categoria: 'cocina-recetas',
   },
   // Ingredientes y despensa (producto: cómo elegir y usar)
   {
@@ -626,34 +693,35 @@ export const COQUINUM_APPS: CoquinumApp[] = [
     desc: 'Selector que orienta hacia el estilo de cerveza que mejor encaja con lo que vas a comer o el momento.',
     categoria: 'bebidas',
   },
-  // Cultura gastronómica (visualizadores temáticos)
+  // Ingredientes y despensa · de dónde viene y qué le pasa al alimento (visualizadores
+  // temáticos de la antigua categoría 'cultura-gastronomica', absorbida el 09/08/2026)
   {
     slug: 'visualizador-mapa-especias',
     icon: '🗺️',
     titulo: 'Mapa de las especias',
     desc: 'De dónde viene cada especia y cómo las rutas comerciales movieron sabores por todo el planeta.',
-    categoria: 'cultura-gastronomica',
+    categoria: 'ingredientes-despensa',
   },
   {
     slug: 'visualizador-viaje-comida',
     icon: '🌍',
     titulo: 'El viaje de la comida',
     desc: 'Recorrido por el origen y la difusión de alimentos cotidianos: cómo llegaron a tu plato desde el otro lado del mundo.',
-    categoria: 'cultura-gastronomica',
+    categoria: 'ingredientes-despensa',
   },
   {
     slug: 'visualizador-huella-alimentos',
     icon: '🌱',
     titulo: 'Huella de los alimentos',
     desc: 'Compara el impacto ambiental —agua, CO₂, tierra— de lo que comemos para decidir con más información.',
-    categoria: 'cultura-gastronomica',
+    categoria: 'ingredientes-despensa',
   },
   {
     slug: 'visualizador-digestion-nutrientes',
     icon: '🧬',
     titulo: 'Digestión de nutrientes',
     desc: 'Visualiza el camino de hidratos, grasas y proteínas por el aparato digestivo y cómo se aprovechan.',
-    categoria: 'cultura-gastronomica',
+    categoria: 'ingredientes-despensa',
   },
 ];
 

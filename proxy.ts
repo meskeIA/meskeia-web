@@ -1,6 +1,10 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { STEMUM_APP_SLUGS, STEMUM_PORTAL_SLUGS } from './data/stemum';
-import { COQUINUM_APP_SLUGS, COQUINUM_PORTAL_SLUGS } from './data/coquinum';
+import {
+  COQUINUM_APP_SLUGS,
+  COQUINUM_PORTAL_SLUGS,
+  COQUINUM_CATEGORIAS_RETIRADAS,
+} from './data/coquinum';
 
 /**
  * Proxy de enrutado por host para las marcas verticales (antes "middleware",
@@ -74,6 +78,17 @@ function handleCoquinum(req: NextRequest) {
   // cual; MeskeiaLogo detecta el host y muestra la marca Coquinum).
   if (COQUINUM_APP_SLUGS.has(seg)) {
     return NextResponse.next();
+  }
+
+  // Categoría retirada en la consolidación 9 → 6 (09/08/2026) → 301 a la que la
+  // absorbió. Va ANTES del bloque de páginas de portal porque estos slugs ya no
+  // están en COQUINUM_PORTAL_SLUGS y caerían en el 307 genérico a meskeia.com,
+  // que para estas tres URLs sería un destino inexistente.
+  const absorbePor = COQUINUM_CATEGORIAS_RETIRADAS[seg];
+  if (absorbePor) {
+    const url = req.nextUrl.clone();
+    url.pathname = `/${absorbePor}/`;
+    return NextResponse.redirect(url, 301);
   }
 
   // Página del portal (home + categorías) → reescritura interna a /coquinum/*.

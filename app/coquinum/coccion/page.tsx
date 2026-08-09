@@ -7,9 +7,9 @@ import { appsDeCategoria } from '@/data/coquinum';
 import styles from '../CoquinumHome.module.css';
 
 export const metadata: Metadata = {
-  title: 'Cocción y temperatura: punto de la carne y tiempos | Coquinum',
+  title: 'Cocción y conservación: punto de la carne, tiempos y conservas | Coquinum',
   description:
-    'Herramientas de cocción: temperatura interna y punto de la carne y el pescado con el mínimo seguro, y tiempos de cocción en agua de huevos, arroz, legumbres y verduras. En español, sin registro y sin coste.',
+    'Herramientas de cocción y conservación: temperatura interna y punto de la carne y el pescado con el mínimo seguro, tiempos de cocción y asado, cuánto dura cada alimento en nevera y congelador, descongelación segura y elaboración de mermeladas, encurtidos y fermentados. En español, sin registro y sin coste.',
   alternates: { canonical: 'https://coquinum.com/coccion/' },
 };
 
@@ -26,11 +26,13 @@ export default function CoquinumCoccion() {
             <span aria-hidden="true">←</span> Coquinum
           </Link>
           <h1 id="titulo-categoria" className={styles.ejeTitle}>
-            <span aria-hidden="true">🌡️</span> Cocción y temperatura
+            <span aria-hidden="true">🌡️</span> Cocción y conservación
           </h1>
           <p className={styles.ejeIntro}>
-            Acertar el punto y cocinar seguro: la temperatura interna de la carne y el pescado y
-            los tiempos de cocción de los alimentos del día a día.
+            Los dos extremos del termómetro. Acertar el punto y cocinar seguro: la temperatura
+            interna de la carne y el pescado y los tiempos de cocción del día a día. Y que lo
+            cocinado dure: cuánto aguanta cada alimento, qué se puede congelar y cómo hacer
+            conservas, encurtidos y fermentados sin riesgo.
           </p>
           <div className={styles.grid}>
             {APPS.map((a) => (

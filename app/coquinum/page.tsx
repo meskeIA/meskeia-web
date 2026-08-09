@@ -4,67 +4,26 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
-import { COQUINUM_APPS_POR_CATEGORIA, COQUINUM_TOTAL_APPS } from '@/data/coquinum';
+import {
+  COQUINUM_APPS_POR_CATEGORIA,
+  COQUINUM_CATEGORIAS,
+  COQUINUM_CATEGORIA_INFO,
+  COQUINUM_TOTAL_APPS,
+} from '@/data/coquinum';
 import styles from './CoquinumHome.module.css';
 
-// Las 5 categorías pobladas del portal. Cada una enlaza a su página de categoría,
-// que sirve las apps gastro bajo coquinum.com (host-rewrite, lista en proxy.ts).
-const SECCIONES = [
-  {
-    icon: '🍞',
-    titulo: 'Panadería y repostería',
-    desc: 'Porcentaje del panadero, hidratación de masa, masa madre, temperatura de masa, ganache, gelatina y punto de azúcar.',
-    href: '/panaderia-reposteria',
-  },
-  {
-    icon: '🍽️',
-    titulo: 'Cocina y recetas',
-    desc: 'Convierte unidades de cocina, escala recetas por raciones, planifica el menú semanal y orienta tu dieta.',
-    href: '/cocina-recetas',
-  },
-  {
-    icon: '🥄',
-    titulo: 'Medidas y conversiones',
-    desc: 'Pasa de tazas y cucharadas a gramos con el peso real de cada ingrediente. Precisión para recetas que vienen en tazas.',
-    href: '/medidas-conversiones',
-  },
-  {
-    icon: '🌡️',
-    titulo: 'Cocción y temperatura',
-    desc: 'El punto y la temperatura interna segura de la carne y el pescado, y los tiempos de cocción en agua de los alimentos del día a día.',
-    href: '/coccion',
-  },
-  {
-    icon: '🧊',
-    titulo: 'Conservación',
-    desc: 'Cuánto dura cada alimento en la nevera, el congelador y la despensa, y cómo conservar con seguridad.',
-    href: '/conservacion',
-  },
-  {
-    icon: '💼',
-    titulo: 'Costes y escandallo',
-    desc: 'El ala profesional: food cost y precio de venta de tus platos, y cálculo de merma para conocer el coste real de la materia prima.',
-    href: '/costes-cocina',
-  },
-  {
-    icon: '🥩',
-    titulo: 'Ingredientes y despensa',
-    desc: 'Guías para elegir y usar aceite, carne, especias, quesos, setas, arroces, pastas, vinagres y más.',
-    href: '/ingredientes-despensa',
-  },
-  {
-    icon: '🍷',
-    titulo: 'Bebidas',
-    desc: 'Café, té e infusiones, coctelería, cerveza y vino, con selectores para acertar con la copa.',
-    href: '/bebidas',
-  },
-  {
-    icon: '🌍',
-    titulo: 'Cultura gastronómica',
-    desc: 'Mapas de especias, el viaje de la comida por el mundo, la huella ambiental de los alimentos y la digestión.',
-    href: '/cultura-gastronomica',
-  },
-];
+// Las secciones del portal se DERIVAN del catálogo, nunca se escriben a mano: cada
+// una enlaza a su página de categoría, que sirve las apps gastro bajo coquinum.com
+// (host-rewrite, lista en proxy.ts). Mientras fue una lista literal se quedó
+// describiendo «las 5 categorías pobladas» con nueve ya publicadas, y retirar una
+// habría dejado su tarjeta apuntando a un 404 sin que nada avisara.
+const SECCIONES = Object.entries(COQUINUM_CATEGORIAS).map(([slug, titulo]) => ({
+  slug,
+  titulo,
+  icon: COQUINUM_CATEGORIA_INFO[slug].icon,
+  desc: COQUINUM_CATEGORIA_INFO[slug].desc,
+  href: `/${slug}`,
+}));
 
 export default function CoquinumHome() {
   return (
@@ -103,7 +62,7 @@ export default function CoquinumHome() {
             cada receta.
           </p>
           <p className={styles.heroSecciones}>
-            Panadería, recetas, medidas, cocción, conservación, costes, ingredientes, bebidas y cultura gastronómica
+            Panadería, recetas, medidas, cocción y conservación, ingredientes y bebidas
           </p>
           <p className={styles.heroClaim}>
             Mide, convierte y cocina con precisión.
@@ -124,8 +83,7 @@ export default function CoquinumHome() {
           </p>
           <div className={styles.grid}>
             {SECCIONES.map((s) => {
-              const slug = s.href.replace(/\//g, '');
-              const count = COQUINUM_APPS_POR_CATEGORIA[slug] ?? 0;
+              const count = COQUINUM_APPS_POR_CATEGORIA[s.slug] ?? 0;
               const badge = `${count} ${count === 1 ? 'app' : 'apps'}`;
               return (
                 <Link key={s.titulo} href={s.href} className={styles.appCard}>

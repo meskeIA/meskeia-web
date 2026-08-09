@@ -229,17 +229,89 @@ revisarPortalDeParrillas({
 }
 
 // ─── Coquinum ───────────────────────────────────────────────────────────────
+// `finSecciones` corta en la interfaz de la ficha de categoría, NO en `export type
+// CoquinumApp`: entre medias está COQUINUM_CATEGORIAS_RETIRADAS, cuyas entradas
+// ('conservacion': 'coccion') tienen la misma forma que una sección y se colarían
+// en la lista, haciendo que el candado exigiese la carpeta de tres categorías que
+// se acaban de retirar a propósito.
 revisarPortalDeParrillas({
   nombre: 'Coquinum',
   fichero: 'data/coquinum.ts',
   secciones: 'export const COQUINUM_CATEGORIAS',
-  finSecciones: 'export type CoquinumApp',
+  finSecciones: 'export interface CoquinumCategoriaInfo',
   catalogo: 'export const COQUINUM_APPS',
   finCatalogo: 'export function appsDeCategoria',
   campoSeccion: 'categoria',
   rutaSeccion: 'app/coquinum',
   helper: 'appsDeCategoria',
 });
+
+/**
+ * La home del portal DERIVA sus tarjetas de COQUINUM_CATEGORIAS + la ficha de cada
+ * categoría (icono y descripción). Aquí se vigila esa pareja en los dos sentidos, y
+ * que las categorías retiradas queden bien retiradas:
+ *
+ *   - Categoría sin ficha → la home reventaría al leer `.icon` de undefined.
+ *   - Ficha huérfana → texto que ya no pinta nadie, y el próximo que lo lea creerá
+ *     que esa sección sigue viva.
+ *   - Retirada que apunta a una categoría inexistente, o que sigue teniendo carpeta
+ *     → el 301 de proxy.ts llevaría a un 404, o la carpeta ganaría al redirect.
+ *
+ * Sale del mismo sitio que el resto del candado: mientras la home llevó su lista de
+ * secciones a mano, su comentario decía «las 5 categorías pobladas» con nueve ya
+ * publicadas y nada avisaba.
+ */
+{
+  const src = leer('data/coquinum.ts');
+  const clavesDe = (desde, hasta) =>
+    [...trozo(src, desde, hasta, 'data/coquinum.ts').matchAll(/^\s*'?([a-z-]+)'?:/gm)]
+      .map((m) => m[1])
+      .filter((k) => !['icon', 'desc'].includes(k));
+
+  const categorias = clavesDe('export const COQUINUM_CATEGORIAS', 'export interface CoquinumCategoriaInfo');
+  const fichas = clavesDe('export const COQUINUM_CATEGORIA_INFO', 'export const COQUINUM_CATEGORIAS_RETIRADAS');
+  const retiradas = [
+    ...trozo(src, 'export const COQUINUM_CATEGORIAS_RETIRADAS', '\n};', 'data/coquinum.ts')
+      .matchAll(/'([a-z-]+)':\s*'([a-z-]+)'/g),
+  ].map((m) => ({ slug: m[1], absorbe: m[2] }));
+
+  for (const cat of categorias) {
+    if (!fichas.includes(cat)) {
+      errores.push(
+        `[Coquinum] La categoría "${cat}" no tiene ficha en COQUINUM_CATEGORIA_INFO: ` +
+          'su tarjeta de la home saldría sin icono ni descripción.',
+      );
+    }
+  }
+  for (const ficha of fichas) {
+    if (!categorias.includes(ficha)) {
+      errores.push(
+        `[Coquinum] COQUINUM_CATEGORIA_INFO describe "${ficha}", que ya no está en ` +
+          'COQUINUM_CATEGORIAS: ficha huérfana, bórrala.',
+      );
+    }
+  }
+  for (const { slug, absorbe } of retiradas) {
+    if (categorias.includes(slug)) {
+      errores.push(`[Coquinum] "${slug}" está a la vez viva en COQUINUM_CATEGORIAS y en las retiradas.`);
+    }
+    if (!categorias.includes(absorbe)) {
+      errores.push(
+        `[Coquinum] La categoría retirada "${slug}" redirige a "${absorbe}", que no existe: ` +
+          'el 301 de proxy.ts acabaría en un 404.',
+      );
+    }
+    if (existe(`app/coquinum/${slug}/page.tsx`)) {
+      errores.push(
+        `[Coquinum] "${slug}" figura como retirada pero conserva app/coquinum/${slug}/page.tsx: ` +
+          'la página ganaría al 301 y la categoría seguiría viva a medias.',
+      );
+    }
+  }
+  resumen.push(
+    `Coquinum home: ${categorias.length} categorías con ficha · ${retiradas.length} retiradas con 301`,
+  );
+}
 
 // ─── Cronicum ───────────────────────────────────────────────────────────────
 // Arquitectura distinta: las puertas NO duplican el contenido de la cronología
