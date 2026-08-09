@@ -976,12 +976,12 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                       <div key={fila.mes} style={{ marginBottom: '1rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '0.85rem' }}>
                           <span style={{ fontWeight: 600 }}>{fila.mes}</span>
-                          <span style={{ fontWeight: 700, color: fila.pct >= 30 ? '#22c55e' : 'var(--primary)' }}>
+                          <span style={{ fontWeight: 700, color: 'var(--primary)' }}>
                             {fila.pct}% LATAM
                           </span>
                         </div>
                         <div style={{ height: '8px', background: 'var(--bg-primary)', borderRadius: '4px' }}>
-                          <div style={{ width: `${fila.pct}%`, height: '100%', background: fila.pct >= 30 ? '#22c55e' : 'var(--primary)', borderRadius: '4px' }} />
+                          <div style={{ width: `${fila.pct}%`, height: '100%', background: 'var(--primary)', borderRadius: '4px' }} />
                         </div>
                         <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
                           {fila.latam.toLocaleString('es-ES')} de {fila.total.toLocaleString('es-ES')} visitas
@@ -989,9 +989,10 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                       </div>
                     ))
                   )}
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-                    Objetivo reposicionamiento: ≥30% LATAM
-                  </p>
+                  {/* Sin objetivo ni semáforo: el ≥30% se fijó al empezar el seguimiento y
+                      lleva meses batido por más del doble (65% en agosto de 2026), así que
+                      salía conforme siempre y había dejado de informar. La serie mensual se
+                      lee sola; si el reparto vuelve a moverse, se decide entonces. */}
                 </div>
               </div>
             </section>
