@@ -1091,6 +1091,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-escala-universo/', icon: '🔬', name: 'La Escala del Universo', description: 'Del quark a la galaxia' },
     { url: '/visualizador-escalas-tiempo/', icon: '⏳', name: 'Cuánto Tarda el Mundo', description: 'Escalas temporales' },
     { url: '/visualizador-peso-numeros/', icon: '🔢', name: 'El Peso de los Números', description: 'Escalas numéricas' },
+    { url: '/simulador-orbitas-kepler/', icon: '🛰️', name: 'Órbitas y Leyes de Kepler', description: 'Calcula el periodo y las velocidades de la órbita de cualquiera de estos planetas' },
   ],
   'visualizador-cadena-alimentaria': [
     { url: '/visualizador-huella-alimentos/', icon: '🌍', name: 'Huella de lo que Comes', description: 'Impacto ambiental' },
@@ -1164,6 +1165,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-fuerzas-invisibles/', icon: '🌍', name: 'Fuerzas Invisibles', description: 'Física del día a día' },
     { url: '/visualizador-optica/', icon: '💡', name: 'Óptica', description: 'El viaje de la luz' },
     { url: '/visualizador-estados-materia/', icon: '🧊', name: 'Estados de la Materia', description: 'Sólido, líquido, gas, plasma' },
+    { url: '/simulador-orbitas-kepler/', icon: '🛰️', name: 'Órbitas y Leyes de Kepler', description: 'La gravitación universal aplicada: de ΣF = m·a a las tres leyes de Kepler' },
   ],
   'visualizador-tabla-periodica-interactiva': [
     { url: '/visualizador-tabla-periodica/', icon: '🧪', name: 'Tabla Periódica Visual', description: 'Elementos interactivos' },
@@ -1350,6 +1352,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-factura-electrica/', icon: '💡', name: 'Tu Factura Eléctrica', description: 'Cada concepto explicado' },
     { url: '/visualizador-como-funciona-wifi/', icon: '📡', name: 'Cómo Funciona el WiFi', description: 'Ondas y propagación' },
     { url: '/visualizador-maquinas-simples/', icon: '⚙️', name: 'Máquinas Simples', description: 'Palanca, polea y más' },
+    { url: '/calculadora-seccion-cable/', icon: '🔌', name: 'Sección de Cable', description: 'Cuántos mm² necesita cada circuito de la vivienda y qué tensión llega al final' },
   ],
   'visualizador-ph-acidos-bases': [
     { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Tipos y balanceo' },
@@ -3051,17 +3054,20 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-resistencias-led/', icon: '🔴', name: 'Resistencias y LED', description: 'Código de colores y circuito LED' },
     { url: '/simulador-campo-electrico/', icon: '🧲', name: 'Campo Eléctrico', description: 'Cargas, líneas y equipotenciales' },
     { url: '/simulador-puertas-logicas/', icon: '🔌', name: 'Puertas Lógicas', description: 'Circuitos digitales y álgebra booleana' },
+    { url: '/calculadora-seccion-cable/', icon: '🔌', name: 'Sección de Cable', description: 'La resistencia del conductor llevada al dimensionado real de una línea' },
   ],
   'calculadora-electricidad': [
     { url: '/calculadora-resistencias-led/', icon: '🔴', name: 'Resistencias y LED', description: 'Código de colores y circuitos LED' },
     { url: '/simulador-circuitos-electricos/', icon: '🔋', name: 'Circuitos Eléctricos', description: 'Serie, paralelo, hasta 6 resistencias' },
     { url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Simulaciones visuales' },
     { url: '/calculadora-gasto-energetico/', icon: '⚡', name: 'Gasto Energético', description: 'Consumo eléctrico' },
+    { url: '/calculadora-seccion-cable/', icon: '🔌', name: 'Sección de Cable', description: 'Qué sección en mm² necesita la línea y cuánta tensión pierde por el camino' },
   ],
   'calculadora-resistencias-led': [
     { url: '/calculadora-electricidad/', icon: '⚡', name: 'Calculadora Electricidad', description: 'Ley de Ohm, potencia y circuitos' },
     { url: '/simulador-circuitos-electricos/', icon: '🔋', name: 'Circuitos Eléctricos', description: 'Serie, paralelo, hasta 6 resistencias' },
     { url: '/calculadora-sistemas-numericos/', icon: '🔢', name: 'Sistemas Numéricos', description: 'Binario, hex, octal y bit a bit' },
+    { url: '/calculadora-seccion-cable/', icon: '🔌', name: 'Sección de Cable', description: 'El mismo cálculo de caídas de tensión, a escala de instalación eléctrica' },
   ],
   'tabla-periodica': [
     { url: '/quiz-tabla-periodica/', icon: '🧪', name: 'Quiz Tabla Periódica', description: 'Pon a prueba tus conocimientos de química' },
@@ -4587,6 +4593,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-vida-estrella/', icon: '⭐', name: 'Vida de una Estrella', description: 'El tipo estelar determina la zona habitable y la duración de la ventana para que evolucione la vida' },
     { url: '/visualizador-cosmologia/', icon: '🌌', name: 'Cosmología', description: 'Los 100.000 millones de exoplanetas de la Vía Láctea son solo una fracción de los del universo observable' },
     { url: '/visualizador-escala-universo/', icon: '🔭', name: 'Escala del Universo', description: 'Las distancias a los sistemas exoplanetarios ponen en perspectiva la inmensidad del cosmos' },
+    { url: '/simulador-orbitas-kepler/', icon: '🛰️', name: 'Órbitas y Leyes de Kepler', description: 'La tercera ley es lo que convierte un tránsito medido en el semieje de una órbita' },
   ],
 
   // EJE A — Enfermedades de alto impacto (2026-04-25)
@@ -6196,12 +6203,25 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-plano-inclinado/', icon: '📐', name: 'Plano Inclinado', description: 'Dinámica con rozamiento: ¿desliza el bloque o no?' },
     { url: '/simulador-pendulo/', icon: '⏳', name: 'Péndulo Simple', description: 'Movimiento periódico, período y oscilaciones' },
     { url: '/simulador-mas-resorte/', icon: '🌀', name: 'Masa-Resorte (MAS)', description: 'Movimiento armónico simple y frecuencia' },
+    { url: '/simulador-orbitas-kepler/', icon: '🛰️', name: 'Órbitas y Leyes de Kepler', description: 'El MCU que sí existe en la naturaleza: satélites y planetas en órbita' },
   ],
   'simulador-plano-inclinado': [
     { url: '/visualizador-leyes-newton/', icon: '🍎', name: 'Leyes de Newton', description: 'La teoría detrás de ΣF = m·a que aquí se aplica sobre el eje del plano' },
     { url: '/simulador-conservacion-energia/', icon: '🎢', name: 'Conservación de la Energía', description: 'Comprueba el balance: m·g·h menos el trabajo del rozamiento' },
     { url: '/simulador-movimiento-circular/', icon: '🔄', name: 'Movimiento Circular', description: 'Otra dinámica clásica, esta vez con aceleración centrípeta' },
     { url: '/calculadora-movimiento/', icon: '🚀', name: 'Calculadora de Movimiento', description: 'Cinemática del MRUA para el tiempo y la velocidad de la bajada' },
+  ],
+  'simulador-orbitas-kepler': [
+    { url: '/visualizador-sistema-solar/', icon: '🪐', name: 'Sistema Solar', description: 'Los planetas cuyas órbitas describe la tercera ley, vistos a escala' },
+    { url: '/simulador-movimiento-circular/', icon: '🔄', name: 'Movimiento Circular', description: 'El caso particular de excentricidad cero: la órbita perfectamente circular' },
+    { url: '/visualizador-exoplanetas/', icon: '🌌', name: 'Exoplanetas', description: 'Las mismas leyes aplicadas a más de 5.500 mundos de otros sistemas' },
+    { url: '/visualizador-leyes-newton/', icon: '🍎', name: 'Leyes de Newton', description: 'De dónde salen las tres leyes de Kepler: la gravitación universal' },
+  ],
+  'calculadora-seccion-cable': [
+    { url: '/calculadora-electricidad/', icon: '⚡', name: 'Calculadora de Electricidad', description: 'Ley de Ohm, potencia y consumo doméstico para obtener la corriente de partida' },
+    { url: '/simulador-circuitos-electricos/', icon: '🔌', name: 'Circuitos Eléctricos', description: 'La teoría de circuitos detrás de la resistencia del conductor' },
+    { url: '/calculadora-resistencias-led/', icon: '💡', name: 'Resistencias para LED', description: 'El mismo cálculo de caídas, en la escala de la electrónica' },
+    { url: '/visualizador-electricidad-domestica/', icon: '🏠', name: 'Electricidad Doméstica', description: 'Cómo se reparte la instalación de una vivienda por circuitos' },
   ],
   'simulador-campo-magnetico': [
     { url: '/simulador-campo-electrico/', icon: '⚡', name: 'Campo Eléctrico', description: 'El campo hermano: cargas en reposo frente a cargas en movimiento' },

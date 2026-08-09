@@ -961,6 +961,13 @@ export const STEMUM_APPS: StemumApp[] = [
   },
   // Tierra y Espacio
   {
+    slug: 'simulador-orbitas-kepler',
+    icon: '🛰️',
+    titulo: 'Órbitas y leyes de Kepler',
+    desc: 'Periodo, velocidades por vis-viva, escape y energía de una órbita, con la elipse animada barriendo áreas iguales.',
+    disciplina: 'tierra-espacio',
+  },
+  {
     slug: 'visualizador-exoplanetas',
     icon: '🪐',
     titulo: 'Exoplanetas',
