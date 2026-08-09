@@ -10,7 +10,6 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import RegionBadge from '@/components/RegionBadge';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './CalculadoraSeccionCable.module.css';
@@ -202,8 +201,6 @@ export default function CalculadoraSeccionCable() {
         <h1>Calculadora de Sección de Cable y Caída de Tensión</h1>
         <p>Cuántos mm² necesita la línea y cuánta tensión se pierde por el camino</p>
       </header>
-
-      <RegionBadge variant="es-data" />
 
       <LegalNotice />
 

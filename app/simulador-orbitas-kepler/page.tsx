@@ -153,7 +153,24 @@ const SVG_W = 800;
 const SVG_H = 460;
 const CX = 400;
 const CY = 230;
-const A_PX = 300; // semieje mayor de la elipse en píxeles (fijo)
+const A_PX_MAX = 300; // ancho máximo del semieje mayor en píxeles
+const B_PX_MAX = 190; // alto máximo del semieje menor: CY menos el margen de las etiquetas
+
+/**
+ * Escala la elipse para que quepa SIEMPRE en el lienzo.
+ * Una órbita circular (e = 0) tiene el semieje menor igual al mayor, así que
+ * fijar el mayor a 300 px la sacaba por arriba y por abajo: manda la altura.
+ */
+function semiejeEnPixeles(e: number): number {
+  const achatamiento = Math.sqrt(1 - e * e);
+  if (achatamiento <= 0) return A_PX_MAX;
+  return Math.min(A_PX_MAX, B_PX_MAX / achatamiento);
+}
+
+/** Mantiene una etiqueta centrada dentro del lienzo aunque su marca esté en el borde. */
+function etiquetaX(x: number): number {
+  return Math.min(Math.max(x, 80), SVG_W - 80);
+}
 
 // ============================================================
 // Formateadores de magnitudes muy dispares
@@ -341,10 +358,11 @@ export default function SimuladorOrbitasKepler() {
 
   // ── Geometría del dibujo ────────────────────────────────
   const e = Math.min(Math.max(excentricidad, 0), 0.99);
-  const bPx = A_PX * Math.sqrt(1 - e * e);
-  const focoX = CX + A_PX * e; // el cuerpo central ocupa un foco, no el centro
-  const radioCuerpoPx = Math.min(Math.max((A_PX * cuerpo.radio) / orbita.a, 3), 70);
-  const satX = CX + A_PX * posicion.xCentro;
+  const aPx = semiejeEnPixeles(e);
+  const bPx = aPx * Math.sqrt(1 - e * e);
+  const focoX = CX + aPx * e; // el cuerpo central ocupa un foco, no el centro
+  const radioCuerpoPx = Math.min(Math.max((aPx * cuerpo.radio) / orbita.a, 3), 60);
+  const satX = CX + aPx * posicion.xCentro;
   const satY = CY - bPx * posicion.yCentro;
 
   const presets = PRESETS[cuerpoId] ?? [];
@@ -497,10 +515,10 @@ export default function SimuladorOrbitasKepler() {
               aria-label={`Órbita elíptica de excentricidad ${formatNumber(excentricidad, 3)} alrededor de ${cuerpo.nombre}, con el satélite a ${formatDistancia(posicion.radio)} del centro`}
             >
               {/* Elipse de la trayectoria */}
-              <ellipse cx={CX} cy={CY} rx={A_PX} ry={bPx} className={styles.trayectoria} />
+              <ellipse cx={CX} cy={CY} rx={aPx} ry={bPx} className={styles.trayectoria} />
 
               {/* Eje mayor y centro geométrico */}
-              <line x1={CX - A_PX} y1={CY} x2={CX + A_PX} y2={CY} className={styles.ejeMayor} />
+              <line x1={CX - aPx} y1={CY} x2={CX + aPx} y2={CY} className={styles.ejeMayor} />
               <circle cx={CX} cy={CY} r={3} className={styles.centroElipse} />
 
               {/* Radio vector: la línea que barre áreas iguales */}
@@ -510,22 +528,24 @@ export default function SimuladorOrbitasKepler() {
               <circle cx={focoX} cy={CY} r={radioCuerpoPx} className={styles.cuerpoCentral} />
 
               {/* Foco vacío */}
-              <circle cx={CX - A_PX * e} cy={CY} r={3} className={styles.focoVacio} />
+              <circle cx={CX - aPx * e} cy={CY} r={3} className={styles.focoVacio} />
 
-              {/* Periastro y apoastro */}
-              <circle cx={CX + A_PX} cy={CY} r={5} className={styles.marcaPeri} />
-              <text x={CX + A_PX + 10} y={CY - 12} className={styles.etiquetaPeri}>
+              {/* Periastro y apoastro. Las etiquetas van centradas sobre su marca
+                  y sujetas al lienzo: «4.531 millones de km» colgando del extremo
+                  se salía del viewBox en las órbitas más excéntricas. */}
+              <circle cx={CX + aPx} cy={CY} r={5} className={styles.marcaPeri} />
+              <text x={etiquetaX(CX + aPx)} y={CY - 24} className={styles.etiquetaPeri} textAnchor="middle">
                 {cuerpo.peri}
               </text>
-              <text x={CX + A_PX + 10} y={CY + 6} className={styles.etiquetaValor}>
+              <text x={etiquetaX(CX + aPx)} y={CY + 30} className={styles.etiquetaValor} textAnchor="middle">
                 {formatDistancia(orbita.rPeri)}
               </text>
 
-              <circle cx={CX - A_PX} cy={CY} r={5} className={styles.marcaApo} />
-              <text x={CX - A_PX - 10} y={CY - 12} className={styles.etiquetaApo} textAnchor="end">
+              <circle cx={CX - aPx} cy={CY} r={5} className={styles.marcaApo} />
+              <text x={etiquetaX(CX - aPx)} y={CY - 24} className={styles.etiquetaApo} textAnchor="middle">
                 {cuerpo.apo}
               </text>
-              <text x={CX - A_PX - 10} y={CY + 6} className={styles.etiquetaValor} textAnchor="end">
+              <text x={etiquetaX(CX - aPx)} y={CY + 30} className={styles.etiquetaValor} textAnchor="middle">
                 {formatDistancia(orbita.rApo)}
               </text>
 
@@ -632,7 +652,7 @@ export default function SimuladorOrbitasKepler() {
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Específica (por kg)</span>
                 <span className={styles.resultValue}>
-                  {formatNumber(orbita.energiaEspecifica / 1e6, 3)} MJ/kg
+                  −{formatNumber(Math.abs(orbita.energiaEspecifica) / 1e6, 3)} MJ/kg
                 </span>
               </div>
               <div className={styles.resultRow}>
