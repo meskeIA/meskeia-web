@@ -66,15 +66,25 @@ const NO_MCP_ANON =
     .map(c => `COALESCE(json_extract(datos_adicionales,'$.uaCliente'),'') LIKE '${c}%'`)
     .join(' OR ') +
   `))`;
-const whereU1 = (excluir) => `(modo IS NULL OR modo!='bot') AND ${NO_MCP_ANON}${excluir ? ` AND ${noPropio()}` : ''}`;
-const whereU2 = (excluir) => `(modo IS NULL OR modo NOT IN ('bot','mcp'))${excluir ? ` AND ${noPropio()}` : ''}`;
+// IA · lectura = fuera de U1/U2 desde el 10/08/2026. Mismo caso que MCP anónimo: la
+// reclasificación vive en la capa derivada y la columna `modo` cruda sigue diciendo
+// 'web' en los ~295 registros históricos (la ingesta solo marca los nuevos), así que
+// hay que replicar aquí el criterio o la referencia cuenta filas que el rollup ya no.
+const NO_IA_LECTURA = `COALESCE(navegador,'') NOT LIKE '%NotebookLM%'`;
+const whereU1 = (excluir) => `(modo IS NULL OR modo!='bot') AND ${NO_MCP_ANON} AND ${NO_IA_LECTURA}${excluir ? ` AND ${noPropio()}` : ''}`;
+const whereU2 = (excluir) => `(modo IS NULL OR modo NOT IN ('bot','mcp')) AND ${NO_IA_LECTURA}${excluir ? ` AND ${noPropio()}` : ''}`;
 const num = async (sql) => Number((await client.execute(sql)).rows[0].n);
 
 // Réplica EXACTA de lib/analytics-rollup.ts::clasificarOrigenReal. Si divergen, este
 // verificador reporta descuadres que no existen. Al tocar una, tocar la otra.
 const MCP_CLIENTES_IA = /^(Claude-User|openai-mcp|MistralAI-MCPClient)/i;
-function clasificarOrigenReal(modo, datosAd) {
+const AGENTES_IA_LECTURA = /NotebookLM/i;
+const CRAWLERS_UA =
+  /bingbot|Googlebot|Google-InspectionTool|AdsBot-Google|Slurp|DuckDuckBot|Baiduspider|YandexBot|Bytespider|PetalBot|AhrefsBot|SemrushBot|MJ12bot|DotBot|facebookexternalhit|meta-externalagent|Applebot|Amazonbot|GPTBot|OAI-SearchBot|ClaudeBot|anthropic-ai|PerplexityBot|Diffbot|Screaming Frog/i;
+function clasificarOrigenReal(modo, datosAd, navegador = null) {
+  if (navegador && AGENTES_IA_LECTURA.test(navegador)) return 'ia-lectura';
   if (modo === 'bot') return 'bot';
+  if (navegador && CRAWLERS_UA.test(navegador)) return 'bot';
   if (modo === 'mcp') {
     // Lista blanca: MCP anónimo (sondeadores/escáneres) cuenta como bot, no como IA.
     const ua = typeof datosAd?.uaCliente === 'string' ? datosAd.uaCliente : '';
@@ -152,13 +162,15 @@ async function verificarResumen() {
   const h7 = new Date(hoy); h7.setDate(hoy.getDate() - 6); // "7 días" = [hoy-6, hoy]
   const iMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
   const parse = (ts) => { const m = String(ts).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/); return m ? new Date(+m[3], +m[2] - 1, +m[1]) : null; };
-  const rows = (await client.execute(`SELECT timestamp, modo, datos_adicionales, ip_address, es_propio FROM uso_aplicaciones`)).rows;
+  const rows = (await client.execute(`SELECT timestamp, modo, datos_adicionales, ip_address, es_propio, navegador FROM uso_aplicaciones`)).rows;
   const ref = {}; const nf = () => ({ hoy: 0, ayer: 0, semana: 0, mes: 0, total: 0 });
   for (const r of rows) {
     const f = parse(r.timestamp); if (!f) continue;
     let dAd = null; try { if (r.datos_adicionales) dAd = JSON.parse(String(r.datos_adicionales)); } catch {}
     const propio = Number(r.es_propio) === 1 || String(r.ip_address || '') === IPX;
-    const oReal = clasificarOrigenReal(String(r.modo || 'web'), dAd);
+    const oReal = clasificarOrigenReal(
+      String(r.modo || 'web'), dAd, r.navegador == null ? null : String(r.navegador)
+    );
     const o = propio ? 'propio' : oReal;
     if (!ref[o]) ref[o] = nf();
     const c = ref[o];
@@ -166,7 +178,11 @@ async function verificarResumen() {
     if (f >= h7) c.semana++; if (f >= iMes) c.mes++; c.total++;
   }
   const tr = nf();
-  for (const [k, v] of Object.entries(ref)) if (k !== 'bot' && k !== 'propio') for (const p of ['hoy', 'ayer', 'semana', 'mes', 'total']) tr[p] += v[p];
+  // TOTAL REAL excluye bot, propio e ia-lectura (esta última desde el 10/08/2026:
+  // un agente que se lleva el texto no es una visita). Mismo Set que excluirDeTotalReal
+  // en server/routers/analytics.ts.
+  const FUERA_TOTAL_REAL = new Set(['bot', 'propio', 'ia-lectura']);
+  for (const [k, v] of Object.entries(ref)) if (!FUERA_TOTAL_REAL.has(k)) for (const p of ['hoy', 'ayer', 'semana', 'mes', 'total']) tr[p] += v[p];
 
   const got = await trpc('getResumen', {});
   for (const p of ['hoy', 'ayer', 'semana', 'mes', 'total']) cmp(`totalReal.${p}`, tr[p], got.totalReal[p]);

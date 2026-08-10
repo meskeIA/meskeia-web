@@ -85,8 +85,50 @@ export function hoyMadrid(): Date {
 export const CAP_DUR = 1800;
 
 /** Orígenes que cuentan como "visita con página" (universo U2, base de duración).
- *  Excluye mcp (llamada API sin página) y bot/propio. */
+ *  Excluye mcp (llamada API sin página), ia-lectura (agente sin persona) y bot/propio. */
 const U2_SET = new Set(['web', 'chatgpt', 'copilot', 'otras-ia', 'pwa', 'redes']);
+
+/**
+ * Agentes de IA que RENDERIZAN la página (ejecutan JavaScript) y por eso llegan al
+ * tracker, a diferencia de los crawlers que solo hacen fetch del HTML. No son visitas:
+ * no hay nadie mirando. Pero tampoco son bots en el sentido de "ruido a descartar" —
+ * detrás hay una persona que metió la URL en su cuaderno y va a leer el contenido
+ * mediado por la IA. Son la tercera especie del foso, y tienen fila propia.
+ *
+ * Firma medida sobre 295 registros de Google-NotebookLM (24/03→10/08/2026), sin una
+ * sola excepción: 0% con duración registrada, 0% recurrentes, resolución idéntica
+ * (412x732 · Linux armv8l) y 3 IPs de infraestructura de Google. Ninguna señal humana.
+ *
+ * Por qué NO van al foso junto a referral-ia/MCP: esas dos tienen a la persona AL OTRO
+ * LADO —en referral-ia hizo clic, en MCP recibió la respuesta del cálculo—. Aquí la
+ * persona recibe el TEXTO, no la app; en un simulador eso significa que se lleva la
+ * EducationalSection y no puede llevarse el simulador. Sumarlos mediría dos cosas
+ * distintas en la misma columna.
+ *
+ * Se compara contra `navegador` (navigator.userAgent del cliente), NO contra el UA de la
+ * petición HTTP: NotebookLM renderiza con un headless cuyo UA de transporte es el de
+ * Chrome, y por eso esquiva el `botsPattern` del endpoint de ingesta.
+ */
+const AGENTES_IA_LECTURA = /NotebookLM/i;
+
+/**
+ * Crawlers y agentes automatizados que se colaron como modo='web' en el histórico.
+ * Se reclasifican en LECTURA, sin tocar la tabla cruda: el rollup es reconstruible
+ * (?rebuild=1) y el UA original sigue intacto en `navegador` para auditar.
+ *
+ * Caso concreto: 253 registros de bingbot entre 18/12/2025 y 07/03/2026 contados como
+ * tráfico humano en el acumulado del Resumen por Origen. La ingesta ya los ataja desde
+ * entonces (`botsPattern` en track/route.ts caza el UA HTTP), así que esto es
+ * saneamiento del pasado, no una defensa activa — pero la clase queda cerrada por si
+ * otro agente vuelve a presentar un UA de cliente distinto del de transporte.
+ */
+const CRAWLERS_UA =
+  /bingbot|Googlebot|Google-InspectionTool|AdsBot-Google|Slurp|DuckDuckBot|Baiduspider|YandexBot|Bytespider|PetalBot|AhrefsBot|SemrushBot|MJ12bot|DotBot|facebookexternalhit|meta-externalagent|Applebot|Amazonbot|GPTBot|OAI-SearchBot|ClaudeBot|anthropic-ai|PerplexityBot|Diffbot|Screaming Frog/i;
+
+/** true si el UA de cliente es un agente de IA que renderiza para leer el contenido. */
+export function esAgenteIALectura(navegador: string | null): boolean {
+  return !!navegador && AGENTES_IA_LECTURA.test(navegador);
+}
 
 /**
  * Clientes MCP que se identifican con nombre y por tanto cuentan como canal IA real.
@@ -129,11 +171,26 @@ export function mcpEsClienteIdentificado(datosAd: Record<string, unknown> | null
 
 /**
  * Clasifica el origen REAL del registro (sin considerar si es propio).
- * Modelo unificado: web / chatgpt / copilot / otras-ia / mcp / pwa / redes / bot.
+ * Modelo unificado: web / chatgpt / copilot / otras-ia / mcp / pwa / redes / ia-lectura / bot.
  * Limpia el modo espurio 'chatgpt' y agrupa las plataformas IA sin volumen en 'otras-ia'.
+ *
+ * El UA de cliente manda sobre el modo: un agente identificado sale de 'web' (o de 'bot',
+ * donde lo deja la ingesta) hacia su categoría real. Se hace AQUÍ y no en el INSERT por
+ * el mismo motivo que la lista blanca de MCP: esta capa es derivada y reconstruible,
+ * así que un criterio equivocado se corrige con ?rebuild=1 en vez de quedar sellado.
  */
-function clasificarOrigenReal(modo: string, datosAd: Record<string, unknown> | null): string {
+function clasificarOrigenReal(
+  modo: string,
+  datosAd: Record<string, unknown> | null,
+  navegador: string | null = null
+): string {
+  // Agentes de IA que renderizan: categoría propia, ni visita ni bot (ver AGENTES_IA_LECTURA).
+  // Se evalúa ANTES que 'bot' porque la ingesta ya los marca así para que los ~10 filtros
+  // SQL de `modo` los excluyan sin tener que tocarlos uno a uno.
+  if (esAgenteIALectura(navegador)) return 'ia-lectura';
   if (modo === 'bot') return 'bot';
+  // Crawlers que quedaron como 'web' en el histórico (bingbot y compañía).
+  if (navegador && CRAWLERS_UA.test(navegador)) return 'bot';
   // Solo cuenta como canal IA si el cliente dice quién es (ver MCP_CLIENTES_IA).
   if (modo === 'mcp') return mcpEsClienteIdentificado(datosAd) ? 'mcp' : 'bot';
   if (modo === 'chatgpt') return 'chatgpt'; // modo espurio legacy → IA ChatGPT
@@ -182,7 +239,7 @@ export const FECHA_EXPR = `substr(timestamp,7,4)||substr(timestamp,4,2)||substr(
 
 /** Campos crudos mínimos que necesita la agregación. */
 export const CAMPOS_ROLLUP =
-  `timestamp, tipo_dispositivo, es_recurrente, duracion_segundos, ip_address, pais, ciudad, modo, aplicacion, datos_adicionales, es_propio, sesion_id`;
+  `timestamp, tipo_dispositivo, es_recurrente, duracion_segundos, ip_address, pais, ciudad, modo, aplicacion, datos_adicionales, es_propio, sesion_id, navegador`;
 
 /**
  * Agrega un conjunto de registros crudos en los mapas del rollup.
@@ -219,7 +276,8 @@ export function agregarRegistros(
 
     // Criterio unificado de "visita propia": es_propio=1 OR IP del propietario
     const propio = Number(row.es_propio) === 1 || (!!ipExcluida && ip === ipExcluida);
-    const origenReal = clasificarOrigenReal(modo, datosAd);
+    const navegador = row.navegador == null ? null : String(row.navegador);
+    const origenReal = clasificarOrigenReal(modo, datosAd, navegador);
 
     // ── Origen para getResumen: prioridad propio > bot > resto ──
     const origenResumen = propio ? 'propio' : origenReal;
@@ -227,7 +285,13 @@ export function agregarRegistros(
     const ob = origenMap.get(fechaOrd)!;
     ob.set(origenResumen, (ob.get(origenResumen) || 0) + 1);
 
-    // Conteos U1 (tráfico real): excluir SOLO bots no-propios. Dimensión idx = propio.
+    // Conteos U1 (tráfico real): excluir bots no-propios y, siempre, la lectura por
+    // agente de IA. `ia-lectura` sale de TODAS las métricas de visita —usos, ranking de
+    // apps, países, recurrencia, sesiones— porque no hubo nadie en la página; su sitio
+    // es la fila propia del Resumen por Origen, que se llenó unas líneas más arriba.
+    // Sin esta salida, las 183 lecturas/30d de NotebookLM seguirían contando como
+    // visitantes de EEUU con 0% de recurrencia, tirando de esas dos métricas.
+    if (origenReal === 'ia-lectura') continue;
     if (origenReal === 'bot' && !propio) continue;
     const idx: 0 | 1 = propio ? 1 : 0;
     const durCap = dur !== null ? Math.min(dur, CAP_DUR) : null;

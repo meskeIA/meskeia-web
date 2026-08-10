@@ -14,6 +14,7 @@ import {
   ahoraMadrid,
   hoyMadrid,
   mcpEsClienteIdentificado,
+  esAgenteIALectura,
   CAMPOS_ROLLUP,
   FECHA_EXPR,
   type GlobalAcc,
@@ -63,13 +64,31 @@ function mapearRegistro(row: Record<string, unknown>) {
     // Resumen IA decía 3: las 68 eran una ráfaga del sondeador mcp-schema-probe/0.1.
     // La columna se llama «Origen», no «modo»: debe decir de dónde viene de verdad. El
     // dato crudo sigue intacto en Turso y en datos_adicionales.uaCliente, que viaja aquí.
-    modo: modoOrigen(row.modo == null ? 'web' : String(row.modo), datosAd),
+    modo: modoOrigen(
+      row.modo == null ? 'web' : String(row.modo),
+      datosAd,
+      row.navegador == null ? null : String(row.navegador)
+    ),
     datos_adicionales: datosAd,
   };
 }
 
-/** 'mcp' solo si el cliente se identifica; si no, es un agente anónimo → 'bot'. */
-function modoOrigen(modo: string, datosAd: Record<string, unknown> | null): string {
+/**
+ * Origen mostrado en «Últimos Registros». Debe coincidir con clasificarOrigenReal
+ * (lib/analytics-rollup.ts): si divergen, el dashboard cuenta una cosa en el Resumen
+ * por Origen y otra en la tabla de registros — que es exactamente lo que pasó el
+ * 30/07/2026 con las 68 llamadas del sondeador MCP.
+ *
+ * - 'mcp' solo si el cliente se identifica; si no, es un agente anónimo → 'bot'.
+ * - 'ia-lectura' para agentes de IA que renderizan (NotebookLM): la ingesta los deja
+ *   como 'bot', y aquí recuperan su identidad real a partir del UA guardado.
+ */
+function modoOrigen(
+  modo: string,
+  datosAd: Record<string, unknown> | null,
+  navegador: string | null = null
+): string {
+  if (esAgenteIALectura(navegador)) return 'ia-lectura';
   if (modo === 'mcp' && !mcpEsClienteIdentificado(datosAd)) return 'bot';
   return modo;
 }
@@ -524,7 +543,7 @@ export const analyticsRouter = router({
       const nuevaFila = (): Conteo => ({ hoy: 0, ayer: 0, semana: 0, mes: 0, total: 0 });
 
       // Categorías del modelo unificado (claves que produce el rollup)
-      ['web', 'chatgpt', 'copilot', 'otras-ia', 'mcp', 'pwa', 'redes', 'bot', 'propio'].forEach(
+      ['web', 'chatgpt', 'copilot', 'otras-ia', 'mcp', 'ia-lectura', 'pwa', 'redes', 'bot', 'propio'].forEach(
         (k) => { conteos[k] = nuevaFila(); }
       );
 
@@ -576,6 +595,11 @@ export const analyticsRouter = router({
         { key: 'copilot',  label: 'IA · Copilot',        icono: '🤖', grupo: 'ia' },
         { key: 'otras-ia', label: 'IA · Otras',          icono: '🤖', grupo: 'ia' },
         { key: 'mcp',      label: 'IA / MCP',            icono: '🔗', grupo: 'mcp' },
+        // Ni visita ni bot: un agente de IA se llevó el TEXTO de la página para que una
+        // persona lo lea fuera. Fuera de TOTAL REAL porque nadie estuvo aquí, y fuera del
+        // foso (grupo 'ia') porque el foso mide personas que la IA nos manda o preguntas
+        // que nuestro motor responde — esto mide qué parte del catálogo es citable.
+        { key: 'ia-lectura', label: 'IA · lectura (sin visita)', icono: '📖', grupo: 'ialectura' },
         { key: 'pwa',      label: 'App instalada (PWA)', icono: '📱', grupo: 'pwa' },
         { key: 'redes',    label: 'Redes sociales',      icono: '📣', grupo: 'redes' },
         { key: 'bot',      label: 'Bots',                icono: '🕷️', grupo: 'bot' },
@@ -589,8 +613,9 @@ export const analyticsRouter = router({
         ...(conteos[key] || nuevaFila()),
       }));
 
-      // Total Real = todo excepto Bots y Propio (web + IA + MCP + PWA + Redes)
-      const excluirDeTotalReal = new Set(['bot', 'propio']);
+      // Total Real = todo excepto Bots, Propio e IA·lectura (web + IA + MCP + PWA + Redes).
+      // `ia-lectura` queda fuera porque no es una visita: no hubo persona en la página.
+      const excluirDeTotalReal = new Set(['bot', 'propio', 'ia-lectura']);
       const totalReal = nuevaFila();
       for (const [key, vals] of Object.entries(conteos)) {
         if (!excluirDeTotalReal.has(key)) {

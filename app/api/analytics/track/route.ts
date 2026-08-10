@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
 import { getCorsHeaders } from '@/lib/cors';
+import { esAgenteIALectura } from '@/lib/analytics-rollup';
 
 // Configuración para edge runtime (más rápido en Vercel)
 export const runtime = 'edge';
@@ -195,9 +196,24 @@ export async function POST(request: NextRequest) {
     const ipPropia = ip_address ? await getIpPropia(client) : null;
     const es_propio = ipPropia !== null && ip_address === ipPropia ? 1 : 0;
 
+    // Agentes de IA que RENDERIZAN la página. El `botsPattern` de arriba mira el UA de
+    // la petición HTTP, y esta clase lo esquiva: NotebookLM abre la URL con un headless
+    // cuyo UA de transporte es el de Chrome, mientras `navigator.userAgent` —lo que llega
+    // en datos.navegador— dice `Google-NotebookLM`. Por eso 295 registros suyos entraron
+    // como modo='web' desde marzo de 2026 y se contaban como visitas humanas.
+    //
+    // Se marcan 'bot' y NO 'ia-lectura' a propósito: hay ~10 consultas repartidas por el
+    // router y los scripts que filtran `modo NOT IN ('bot','mcp')`, y un valor nuevo se
+    // colaría por todas ellas hasta que alguien se acordara de actualizarlas una a una
+    // —el tipo de fallo silencioso que ya costó 438 layouts—. Su fila propia «IA ·
+    // lectura» se deriva en el rollup a partir de `navegador`, que se guarda intacto
+    // (clasificarOrigenReal en lib/analytics-rollup.ts), así que la distinción no se
+    // pierde y se puede rehacer con ?rebuild=1 si el criterio cambia.
+    const esAgenteIA = esAgenteIALectura(truncar(datos.navegador, 200));
+
     // Detección compuesta de bot: por user agent O por IP de datacenter cloud
     const esBotIP = esIpDatacenter(rawIP);
-    let modo = (esBot || esBotIP || sinIdioma) ? 'bot' : (truncar(datos.modo, 20) || 'web');
+    let modo = (esBot || esBotIP || sinIdioma || esAgenteIA) ? 'bot' : (truncar(datos.modo, 20) || 'web');
 
     // Control de frecuencia anti-granja headless.
     //

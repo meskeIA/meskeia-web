@@ -1587,7 +1587,8 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
           <section className={styles.section}>
             <h2><span aria-hidden="true">📈</span> Resumen por Origen</h2>
             <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-              Desglose completo de visitas por origen y período. Total Real excluye Bots y Mi IP.
+              Desglose completo de visitas por origen y período. Total Real excluye Bots, Mi IP
+              e IA · lectura.
             </p>
 
             {resumenQuery.isLoading && <p>Cargando resumen...</p>}
@@ -1610,7 +1611,11 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                     {resumenQuery.data.filas.map((fila) => {
                       const esCero = fila.total === 0;
                       const esGrupoIA = fila.grupo === 'ia';
-                      const esGris = fila.grupo === 'bot' || fila.grupo === 'miip';
+                      // Gris = fuera del TOTAL REAL. 'ialectura' entra aquí (un agente se
+                      // llevó el texto, no hubo visita), no en el teal del grupo IA, que
+                      // está reservado a los canales que SÍ traen personas.
+                      const esGris =
+                        fila.grupo === 'bot' || fila.grupo === 'miip' || fila.grupo === 'ialectura';
                       return (
                         <tr
                           key={fila.origen}
@@ -1656,6 +1661,15 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
             <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '1rem' }}>
               * Las visitas anteriores al 20/03/2026 no tienen plataforma IA identificada
               (la captura del referrer se activó en esa fecha) y se agrupan en &quot;IA · Otras&quot;.
+            </p>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '0.5rem' }}>
+              ** <strong>IA · lectura</strong> son agentes que abren la página para
+              llevarse su <em>texto</em> a otro sitio donde lo lee una persona (hoy,
+              Google&nbsp;NotebookLM). No son visitas —nadie estuvo aquí: 0&nbsp;% con duración
+              y 0&nbsp;% recurrentes— pero tampoco ruido: miden qué parte del catálogo resulta
+              citable. Van aparte de las filas IA, que cuentan personas que un asistente nos
+              envía. Se reconocen por el <code>user-agent</code> del cliente y quedan fuera
+              del resto de métricas (ranking, países, recurrencia).
             </p>
           </section>
         </div>
