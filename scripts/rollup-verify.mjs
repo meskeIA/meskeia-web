@@ -50,7 +50,9 @@ const ord = (d) => `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0'
 let IPX = '';
 const NORM = { Spain: 'ES', 'United States': 'US', Mexico: 'MX', Argentina: 'AR', Colombia: 'CO', Bolivia: 'BO', Ecuador: 'EC', Chile: 'CL', Peru: 'PE', Venezuela: 'VE', Guatemala: 'GT', 'Costa Rica': 'CR', Honduras: 'HN', 'El Salvador': 'SV', Nicaragua: 'NI', Panama: 'PA', Cuba: 'CU', 'Dominican Republic': 'DO', 'Puerto Rico': 'PR', Uruguay: 'UY', Paraguay: 'PY', Brazil: 'BR', Portugal: 'PT', France: 'FR', Germany: 'DE', 'United Kingdom': 'GB', Italy: 'IT', Netherlands: 'NL', Belgium: 'BE', Switzerland: 'CH', Sweden: 'SE', Norway: 'NO', Denmark: 'DK', Finland: 'FI', Poland: 'PL', Russia: 'RU', Turkey: 'TR', Canada: 'CA', Australia: 'AU', Japan: 'JP', China: 'CN', India: 'IN', 'South Korea': 'KR' };
 
-// Filtros SQL del modelo (bot∩propio=0 verificado → simplificados).
+// Filtros SQL del modelo. NO simplificar por "bot∩propio=0": era cierto cuando se
+// escribió esto y dejó de serlo (ver whereU1). Una simplificación apoyada en los datos
+// de un día caduca en silencio; la condición completa no.
 // "no propio" maneja NULL como el código real: NOT(0 OR NULL)=NULL excluiría mal
 // las filas con ip NULL, por eso se escribe con IS NULL explícito.
 const noPropio = () => `(es_propio IS NULL OR es_propio=0) AND (ip_address IS NULL OR ip_address!='${IPX.replace(/'/g, "''")}')`;
@@ -60,19 +62,51 @@ const noPropio = () => `(es_propio IS NULL OR es_propio=0) AND (ip_address IS NU
 // propósito, para no destruir el dato—, así que hay que replicar aquí la lista blanca o
 // la referencia cuenta filas que el rollup ya no cuenta. Sin esto salían 20 descuadres
 // falsos, todos de esta única causa.
-const NO_MCP_ANON =
-  `NOT (modo='mcp' AND NOT (` +
+const MCP_ANON =
+  `(modo='mcp' AND NOT (` +
   ['Claude-User', 'openai-mcp', 'MistralAI-MCPClient']
     .map(c => `COALESCE(json_extract(datos_adicionales,'$.uaCliente'),'') LIKE '${c}%'`)
     .join(' OR ') +
   `))`;
-// IA · lectura = fuera de U1/U2 desde el 10/08/2026. Mismo caso que MCP anónimo: la
-// reclasificación vive en la capa derivada y la columna `modo` cruda sigue diciendo
-// 'web' en los ~295 registros históricos (la ingesta solo marca los nuevos), así que
-// hay que replicar aquí el criterio o la referencia cuenta filas que el rollup ya no.
-const NO_IA_LECTURA = `COALESCE(navegador,'') NOT LIKE '%NotebookLM%'`;
-const whereU1 = (excluir) => `(modo IS NULL OR modo!='bot') AND ${NO_MCP_ANON} AND ${NO_IA_LECTURA}${excluir ? ` AND ${noPropio()}` : ''}`;
-const whereU2 = (excluir) => `(modo IS NULL OR modo NOT IN ('bot','mcp')) AND ${NO_IA_LECTURA}${excluir ? ` AND ${noPropio()}` : ''}`;
+
+// IA · lectura y crawlers: mismo caso que el MCP anónimo. La reclasificación vive en la
+// capa derivada y la columna `modo` CRUDA sigue diciendo 'web' en los registros
+// históricos (la ingesta solo marca los nuevos), así que hay que replicar aquí el
+// criterio de clasificarOrigenReal o la referencia cuenta filas que el rollup ya no.
+// Medido el 10/08/2026: sin la parte de crawlers salían 579 descuadres falsos en U2
+// (bingbot 253 + Googlebot 189 + Google-InspectionTool 132 + Bytespider/Baiduspider/
+// meta-externalagent 5), todos con modo<>'bot' porque son anteriores al filtro de la
+// ingesta o llegaron con un UA de cliente distinto del de transporte.
+const ES_IA_LECTURA = `COALESCE(navegador,'') LIKE '%NotebookLM%'`;
+const NO_IA_LECTURA = `NOT (${ES_IA_LECTURA})`;
+const ES_CRAWLER = '(' + [
+  'bingbot', 'Googlebot', 'Google-InspectionTool', 'AdsBot-Google', 'Slurp', 'DuckDuckBot',
+  'Baiduspider', 'YandexBot', 'Bytespider', 'PetalBot', 'AhrefsBot', 'SemrushBot', 'MJ12bot',
+  'DotBot', 'facebookexternalhit', 'meta-externalagent', 'Applebot', 'Amazonbot', 'GPTBot',
+  'OAI-SearchBot', 'ClaudeBot', 'anthropic-ai', 'PerplexityBot', 'Diffbot', 'Screaming Frog',
+].map(p => `COALESCE(navegador,'') LIKE '%${p}%'`).join(' OR ') + ')';
+
+// origenReal==='bot', en el MISMO orden de precedencia que clasificarOrigenReal:
+// ia-lectura gana a bot, así que una fila de lectura NUNCA es bot.
+const ES_BOT = `(${NO_IA_LECTURA} AND (modo='bot' OR ${ES_CRAWLER} OR ${MCP_ANON}))`;
+// Negación EXACTA de noPropio() (no basta con es_propio=1: la IP también decide).
+const esPropio = () => `(es_propio=1 OR ip_address='${IPX.replace(/'/g, "''")}')`;
+
+// Universo U1. Ojo con excluir=false: la cabecera de este fichero daba por verificado
+// que bot∩propio=0 y por eso simplificaba a "no es bot". Esa suposición se rompió —hay
+// 3 filas mcp:convertir_unidades lanzadas con curl desde la IP propia—, y como
+// agregarRegistros solo descarta bots NO propios, el rollup las cuenta en el universo
+// sin exclusión y la referencia simplificada no. De ahí 4 descuadres de exactamente 3.
+const whereU1 = (excluir) => excluir
+  ? `NOT ${ES_BOT} AND ${NO_IA_LECTURA} AND ${noPropio()}`
+  : `(NOT ${ES_BOT} OR ${esPropio()}) AND ${NO_IA_LECTURA}`;
+// Universo U2 (visita con página): además fuera mcp, que no tiene página.
+// SIN la excepción de bots propios que sí lleva U1, y no por descuido: los buckets de
+// duración se saltan en agregarRegistros por `U2_SET.has(origenReal)`, no por el
+// `continue` que solo descarta bots no-propios. Un bot propio suma en g.usos pero nunca
+// en b_*, así que aquí la condición es la misma con o sin exclusión.
+const whereU2 = (excluir) =>
+  `NOT ${ES_BOT} AND ${NO_IA_LECTURA} AND (modo IS NULL OR modo!='mcp')${excluir ? ` AND ${noPropio()}` : ''}`;
 const num = async (sql) => Number((await client.execute(sql)).rows[0].n);
 
 // Réplica EXACTA de lib/analytics-rollup.ts::clasificarOrigenReal. Si divergen, este
