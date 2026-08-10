@@ -2,17 +2,17 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Calculadora de Ecuaciones - Resolver Ecuaciones Lineales y Cuadráticas | meskeIA',
-  description: '¿Necesitas resolver ecuaciones algebraicas? Calculadora paso a paso para ecuaciones lineales, cuadráticas y sistemas de ecuaciones 2x2. Visualiza gráficas de parábolas y aprende mientras resuelves.',
-  keywords: 'ecuaciones algebraicas, resolver ecuaciones, ecuaciones cuadráticas, ecuaciones lineales, sistemas de ecuaciones, fórmula cuadrática, factorización, discriminante, calculadora matemática, álgebra online',
+  title: 'Calculadora de Ecuaciones y Regla de Ruffini - Lineales, Cuadráticas y Grado 3+ | meskeIA',
+  description: '¿Necesitas resolver ecuaciones algebraicas? Calculadora paso a paso para ecuaciones lineales, cuadráticas, sistemas 2x2 y polinomios de grado 3, 4 y 5 con la regla de Ruffini: candidatos a raíz racional, tabla de división sintética y factorización completa.',
+  keywords: 'regla de ruffini, ruffini paso a paso, división sintética, factorizar polinomios, división de polinomios, raíces de un polinomio, ecuaciones de tercer grado, ecuaciones algebraicas, resolver ecuaciones, ecuaciones cuadráticas, sistemas de ecuaciones, discriminante, álgebra online',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Calculadora de Ecuaciones Algebraicas - Resolución Paso a Paso',
-    description: 'Resuelve ecuaciones lineales, cuadráticas y sistemas 2x2 con explicaciones paso a paso y visualización gráfica de parábolas',
+    title: 'Calculadora de Ecuaciones y Ruffini - Resolución Paso a Paso',
+    description: 'Resuelve ecuaciones lineales, cuadráticas, sistemas 2x2 y polinomios de grado 3+ con la regla de Ruffini, con la tabla de división sintética completa',
     url: 'https://meskeia.com/algebra-ecuaciones/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Calculadora de Ecuaciones | meskeIA',
-    description: 'Resuelve ecuaciones algebraicas con explicaciones paso a paso y gráficas interactivas',
+    description: 'Resuelve ecuaciones y factoriza polinomios con Ruffini, paso a paso y con gráficas interactivas',
     images: ['https://meskeia.com/og-image.png']
   },
   other: {
@@ -35,11 +35,20 @@ export const metadata: Metadata = {
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: "Calculadora de Ecuaciones",
-  description: "¿Necesitas resolver ecuaciones algebraicas? Calculadora paso a paso para ecuaciones lineales, cuadráticas y sistemas de ecuaciones 2x2. Visualiza gráficas de parábolas y aprende mientras resuelves.",
+  name: "Calculadora de Ecuaciones y Regla de Ruffini",
+  description: "Calculadora paso a paso de ecuaciones lineales, cuadráticas y sistemas 2x2, y factorización de polinomios de grado 3, 4 y 5 con la regla de Ruffini: candidatos a raíz racional, tabla de división sintética y factorización completa.",
   url: "https://meskeia.com/algebra-ecuaciones/",
   category: 'EducationalApplication',
-  features: [],
+  features: [
+    "Ecuaciones lineales de primer grado con los pasos del despeje",
+    "Ecuaciones cuadráticas con discriminante, vértice y gráfica de la parábola",
+    "Sistemas de dos ecuaciones con dos incógnitas por la regla de Cramer",
+    "Polinomios de grado 3, 4 y 5 factorizados con la regla de Ruffini",
+    "Candidatos a raíz racional (±p/q) por el teorema de la raíz racional",
+    "Tabla de división sintética completa en cada paso, con cociente y resto",
+    "Aritmética con fracciones exactas: admite raíces racionales como 1/2 o −1/3",
+    "Multiplicidad agrupada en la factorización final",
+  ],
 });
 
 export const faqJsonLd = {
@@ -51,7 +60,7 @@ export const faqJsonLd = {
       name: '¿Qué tipos de ecuaciones puedo resolver con esta calculadora?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Puedes resolver ecuaciones lineales de primer grado (ax + b = 0), ecuaciones cuadráticas de segundo grado (ax² + bx + c = 0) y sistemas de dos ecuaciones con dos incógnitas (2×2). La calculadora muestra los pasos de resolución y, en el caso de las cuadráticas, calcula el discriminante para determinar el tipo de soluciones.',
+        text: 'Ecuaciones lineales de primer grado (ax + b = 0), ecuaciones cuadráticas de segundo grado (ax² + bx + c = 0), sistemas de dos ecuaciones con dos incógnitas (2×2) y polinomios de grado 3, 4 y 5, que se factorizan con la regla de Ruffini. En todos los casos se muestran los pasos: el despeje, el discriminante, los determinantes de Cramer o la tabla de división sintética según corresponda.',
       },
     },
     {
@@ -80,10 +89,18 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Qué ventaja tiene usar esta herramienta frente a resolver las ecuaciones a mano?',
+      name: '¿Cómo se aplica la regla de Ruffini paso a paso?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Resolver a mano es valioso para aprender, pero esta herramienta permite verificar resultados al instante, detectar errores de cálculo y explorar distintos valores de coeficientes de forma ágil. Al mostrar cada paso intermedio, también sirve como guía didáctica para entender el procedimiento correcto.',
+        text: 'Se escriben los coeficientes del polinomio en orden descendente, poniendo 0 en los grados que falten. Se prueba una raíz candidata: se baja el primer coeficiente, se multiplica por la raíz, se suma al siguiente coeficiente y se repite hasta el final. Si el último número (el resto) es 0, el candidato es raíz y los demás números son los coeficientes del cociente, un polinomio de un grado menos. El proceso se repite sobre ese cociente hasta agotar las raíces racionales.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué valores hay que probar como raíz en Ruffini?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los que da el teorema de la raíz racional: todas las fracciones ±p/q donde p es divisor del término independiente y q divisor del coeficiente principal. Si el coeficiente principal es 1, basta con probar los divisores enteros del término independiente (±1, ±2, ±3…), empezando siempre por los más pequeños. Si ninguno anula el polinomio, este no tiene raíces racionales y Ruffini no sirve, aunque puede tener raíces irracionales como la raíz cúbica de 2.',
       },
     },
   ],

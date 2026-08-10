@@ -309,7 +309,7 @@ const negociosApps: RelatedApp[] = [
 // FAMILIA: MATEMÁTICAS
 // ==========================================
 const matematicasBasicasApps: RelatedApp[] = [
-  { url: '/calculadora-matematica/', icon: '🔢', name: 'Calculadora Matemática', description: 'Operaciones básicas' },
+  { url: '/calculadora-matematica/', icon: '🔢', name: 'Calculadora Matemática', description: 'Matrices, fracciones y logaritmos' },
   { url: '/calculadora-porcentajes/', icon: '📊', name: 'Porcentajes', description: 'Cálculos de %' },
   { url: '/calculadora-regla-de-tres/', icon: '⚖️', name: 'Regla de Tres', description: 'Proporciones' },
   { url: '/calculadora-mcd-mcm/', icon: '🔗', name: 'MCD y MCM', description: 'Divisores y múltiplos' },
@@ -2441,7 +2441,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'tablas-multiplicar': [
     { url: '/calculadora-notas/', icon: '📊', name: 'Calculadora Notas', description: 'Calcula tu nota media' },
     { url: '/juego-puzzle-matematico/', icon: '➕', name: 'Puzzle Matemático', description: 'Retos numéricos' },
-    { url: '/calculadora-matematica/', icon: '🔢', name: 'Calculadora Matemática', description: 'Operaciones básicas' },
+    { url: '/calculadora-matematica/', icon: '🔢', name: 'Calculadora Matemática', description: 'Matrices, fracciones y logaritmos' },
     fichasCalculoApp,
   ],
 

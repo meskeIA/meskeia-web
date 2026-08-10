@@ -10,7 +10,107 @@ import * as Algebrite from 'algebrite';
 Chart.register(...registerables);
 
 // Tipos de ecuaciones
-type EquationType = 'linear' | 'quadratic' | 'system';
+type EquationType = 'linear' | 'quadratic' | 'system' | 'polynomial';
+
+// ---------------------------------------------------------------------------
+// Aritmética racional exacta para la regla de Ruffini
+// Se trabaja con fracciones (no con coma flotante) para que la división
+// sintética dé restos exactamente 0 y no "0,0000000001".
+// ---------------------------------------------------------------------------
+interface Fraccion {
+  n: number; // numerador
+  d: number; // denominador, siempre > 0
+}
+
+const mcdEnteros = (a: number, b: number): number => {
+  let x = Math.abs(a);
+  let y = Math.abs(b);
+  while (y) {
+    const t = y;
+    y = x % y;
+    x = t;
+  }
+  return x;
+};
+
+const frac = (n: number, d: number = 1): Fraccion => {
+  if (d === 0) return { n: 0, d: 1 };
+  let num = n;
+  let den = d;
+  if (den < 0) {
+    num = -num;
+    den = -den;
+  }
+  const g = mcdEnteros(num, den) || 1;
+  return { n: num / g, d: den / g };
+};
+
+const fSuma = (a: Fraccion, b: Fraccion): Fraccion => frac(a.n * b.d + b.n * a.d, a.d * b.d);
+const fProducto = (a: Fraccion, b: Fraccion): Fraccion => frac(a.n * b.n, a.d * b.d);
+const fEsCero = (a: Fraccion): boolean => a.n === 0;
+const fValor = (a: Fraccion): number => a.n / a.d;
+const fTexto = (a: Fraccion): string => (a.d === 1 ? String(a.n) : `${a.n}/${a.d}`);
+
+// Divisores positivos de un entero (para el teorema de la raíz racional)
+const divisores = (num: number): number[] => {
+  const valor = Math.abs(num);
+  const salida: number[] = [];
+  for (let i = 1; i <= valor; i++) {
+    if (valor % i === 0) salida.push(i);
+  }
+  return salida;
+};
+
+// Un paso de división sintética (la tabla clásica de tres filas)
+interface PasoRuffini {
+  raiz: Fraccion;
+  coeficientes: Fraccion[]; // fila superior
+  arrastre: Fraccion[]; // fila central (bajo cada columna salvo la primera)
+  resultado: Fraccion[]; // fila inferior: cociente + resto final
+}
+
+// Divide P(x) entre (x - raiz) por Ruffini y devuelve el paso completo
+const dividirRuffini = (coeficientes: Fraccion[], raiz: Fraccion): PasoRuffini => {
+  const resultado: Fraccion[] = [coeficientes[0]];
+  const arrastre: Fraccion[] = [];
+  for (let i = 1; i < coeficientes.length; i++) {
+    const sube = fProducto(resultado[i - 1], raiz);
+    arrastre.push(sube);
+    resultado.push(fSuma(coeficientes[i], sube));
+  }
+  return { raiz, coeficientes, arrastre, resultado };
+};
+
+// Escribe un polinomio a partir de sus coeficientes (grado descendente)
+const polinomioATexto = (coeficientes: Fraccion[]): string => {
+  const grado = coeficientes.length - 1;
+  const partes: string[] = [];
+  coeficientes.forEach((c, i) => {
+    if (fEsCero(c)) return;
+    const exponente = grado - i;
+    const signo = c.n < 0 ? '−' : partes.length ? '+' : '';
+    const abs = frac(Math.abs(c.n), c.d);
+    const coefTexto = fTexto(abs) === '1' && exponente > 0 ? '' : fTexto(abs);
+    const variable = exponente === 0 ? '' : exponente === 1 ? 'x' : `x${exponente === 2 ? '²' : exponente === 3 ? '³' : exponente === 4 ? '⁴' : '⁵'}`;
+    partes.push(`${signo} ${coefTexto}${variable}`.trim());
+  });
+  return partes.length ? partes.join(' ') : '0';
+};
+
+// Resultado completo del análisis de un polinomio de grado ≥ 3
+interface ResultadoPolinomio {
+  error?: string;
+  polinomio: string;
+  candidatos: string[];
+  descartados: string[];
+  pasos: PasoRuffini[];
+  raicesRacionales: Fraccion[];
+  raicesIrracionales: string[];
+  cocienteFinal: string;
+  cocienteComplejo: boolean; // factor de grado 2 con discriminante negativo
+  cocienteSuperior: boolean; // factor de grado > 2 sin raíces racionales
+  factorizacion: string;
+}
 
 export default function AlgebraEcuacionesPage() {
   // Estado principal
@@ -41,6 +141,12 @@ export default function AlgebraEcuacionesPage() {
   const [sysC2, setSysC2] = useState<string>('1');
   const [systemSolution, setSystemSolution] = useState<{ x: string; y: string }>({ x: '', y: '' });
   const [systemSteps, setSystemSteps] = useState<string[]>([]);
+
+  // Estados para polinomio de grado 3+ (regla de Ruffini)
+  // Por defecto x³ − 6x² + 11x − 6 = (x−1)(x−2)(x−3)
+  const [polyGrado, setPolyGrado] = useState<number>(3);
+  const [polyCoefs, setPolyCoefs] = useState<string[]>(['1', '-6', '11', '-6']);
+  const [polyResultado, setPolyResultado] = useState<ResultadoPolinomio | null>(null);
 
   // Referencia para gráfica
   const chartRef = useRef<HTMLCanvasElement>(null);
@@ -283,6 +389,179 @@ export default function AlgebraEcuacionesPage() {
     setSystemSteps(steps);
   };
 
+  // Cambiar el grado del polinomio manteniendo los coeficientes que ya había
+  const cambiarGrado = (nuevoGrado: number) => {
+    setPolyGrado(nuevoGrado);
+    setPolyCoefs((previos) => {
+      const siguiente = Array.from({ length: nuevoGrado + 1 }, (_, i) => previos[i] ?? '0');
+      return siguiente;
+    });
+  };
+
+  const actualizarCoeficiente = (indice: number, valor: string) => {
+    setPolyCoefs((previos) => previos.map((c, i) => (i === indice ? valor : c)));
+  };
+
+  // Resolver polinomio de grado 3+ por la regla de Ruffini
+  const solvePolynomial = () => {
+    const numeros = polyCoefs.map((c) => Number(c.trim() === '' ? NaN : c));
+
+    if (numeros.some((n) => isNaN(n))) {
+      setPolyResultado({
+        error: 'Introduce todos los coeficientes con valores numéricos.',
+        polinomio: '', candidatos: [], descartados: [], pasos: [], raicesRacionales: [],
+        raicesIrracionales: [], cocienteFinal: '', cocienteComplejo: false, cocienteSuperior: false,
+        factorizacion: '',
+      });
+      return;
+    }
+
+    if (!numeros.every((n) => Number.isInteger(n))) {
+      setPolyResultado({
+        error: 'La regla de Ruffini busca raíces racionales, y para eso los coeficientes deben ser enteros. Si tienes decimales, multiplica toda la ecuación por 10, 100… hasta eliminarlos: las soluciones no cambian.',
+        polinomio: '', candidatos: [], descartados: [], pasos: [], raicesRacionales: [],
+        raicesIrracionales: [], cocienteFinal: '', cocienteComplejo: false, cocienteSuperior: false,
+        factorizacion: '',
+      });
+      return;
+    }
+
+    if (numeros[0] === 0) {
+      setPolyResultado({
+        error: 'El coeficiente principal no puede ser cero: si lo fuera, el polinomio tendría un grado menor al indicado.',
+        polinomio: '', candidatos: [], descartados: [], pasos: [], raicesRacionales: [],
+        raicesIrracionales: [], cocienteFinal: '', cocienteComplejo: false, cocienteSuperior: false,
+        factorizacion: '',
+      });
+      return;
+    }
+
+    let actuales: Fraccion[] = numeros.map((n) => frac(n));
+    const polinomioOriginal = polinomioATexto(actuales);
+    const pasos: PasoRuffini[] = [];
+    const raicesRacionales: Fraccion[] = [];
+
+    // Caso previo: si el término independiente es 0, x = 0 es raíz (se saca factor x).
+    // Hay que agotarlo antes de aplicar el teorema de la raíz racional, que exige
+    // término independiente distinto de cero.
+    while (actuales.length > 1 && fEsCero(actuales[actuales.length - 1])) {
+      const paso = dividirRuffini(actuales, frac(0));
+      pasos.push(paso);
+      raicesRacionales.push(frac(0));
+      actuales = paso.resultado.slice(0, -1);
+    }
+
+    // Candidatos por el teorema de la raíz racional: ±p/q
+    const independiente = actuales[actuales.length - 1];
+    const principal = actuales[0];
+    const candidatosFraccion: Fraccion[] = [];
+    const vistos = new Set<string>();
+
+    if (!fEsCero(independiente)) {
+      for (const p of divisores(independiente.n)) {
+        for (const q of divisores(principal.n)) {
+          for (const signo of [1, -1]) {
+            const candidato = frac(signo * p, q);
+            const clave = fTexto(candidato);
+            if (!vistos.has(clave)) {
+              vistos.add(clave);
+              candidatosFraccion.push(candidato);
+            }
+          }
+        }
+      }
+    }
+    candidatosFraccion.sort((a, b) => Math.abs(fValor(a)) - Math.abs(fValor(b)) || fValor(a) - fValor(b));
+
+    const descartados: string[] = [];
+
+    // Aplicar Ruffini mientras queden raíces racionales, hasta agotar la factorización.
+    // Los candidatos del polinomio original sirven para todos los pasos: toda raíz de
+    // un cociente lo es también del polinomio de partida.
+    let progreso = true;
+    while (actuales.length - 1 >= 1 && progreso) {
+      progreso = false;
+      for (const candidato of candidatosFraccion) {
+        const paso = dividirRuffini(actuales, candidato);
+        const resto = paso.resultado[paso.resultado.length - 1];
+        if (fEsCero(resto)) {
+          pasos.push(paso);
+          raicesRacionales.push(candidato);
+          actuales = paso.resultado.slice(0, -1);
+          progreso = true;
+          break;
+        }
+        const etiqueta = `x = ${fTexto(candidato)} → resto ${fTexto(resto)}`;
+        if (!descartados.includes(etiqueta) && descartados.length < 12) descartados.push(etiqueta);
+      }
+    }
+
+    // Resolver lo que queda
+    const raicesIrracionales: string[] = [];
+    let cocienteComplejo = false;
+    let cocienteSuperior = false;
+    const gradoRestante = actuales.length - 1;
+
+    if (gradoRestante === 2) {
+      const a = fValor(actuales[0]);
+      const b = fValor(actuales[1]);
+      const c = fValor(actuales[2]);
+      const disc = b * b - 4 * a * c;
+      if (disc > 0) {
+        const r1 = (-b + Math.sqrt(disc)) / (2 * a);
+        const r2 = (-b - Math.sqrt(disc)) / (2 * a);
+        raicesIrracionales.push(`x = ${formatNumber(r1)}`, `x = ${formatNumber(r2)}`);
+      } else if (disc === 0) {
+        raicesIrracionales.push(`x = ${formatNumber(-b / (2 * a))} (raíz doble)`);
+      } else {
+        cocienteComplejo = true;
+      }
+    } else if (gradoRestante === 1) {
+      const r = -fValor(actuales[1]) / fValor(actuales[0]);
+      raicesIrracionales.push(`x = ${formatNumber(r)}`);
+    } else if (gradoRestante > 2) {
+      cocienteSuperior = true;
+    }
+
+    // Construir la factorización, agrupando las raíces repetidas como potencias
+    const factores: string[] = [];
+    const conteo = new Map<string, number>();
+    for (const r of raicesRacionales) {
+      const texto = fEsCero(r)
+        ? 'x'
+        : `(x ${r.n < 0 ? '+' : '−'} ${fTexto(frac(Math.abs(r.n), r.d))})`;
+      conteo.set(texto, (conteo.get(texto) ?? 0) + 1);
+    }
+    const exponentes = ['', '', '²', '³', '⁴', '⁵'];
+    for (const [texto, veces] of conteo) {
+      factores.push(veces > 1 ? `${texto}${exponentes[veces] ?? `^${veces}`}` : texto);
+    }
+
+    const restoTexto = polinomioATexto(actuales);
+    const gradoResto = actuales.length - 1;
+    if (gradoResto >= 1) {
+      factores.push(`(${restoTexto})`);
+    } else if (!factores.length) {
+      factores.push(restoTexto);
+    } else if (fTexto(actuales[0]) !== '1') {
+      // Constante sobrante: se antepone como coeficiente
+      factores.unshift(fTexto(actuales[0]));
+    }
+
+    setPolyResultado({
+      polinomio: polinomioOriginal,
+      candidatos: candidatosFraccion.map(fTexto),
+      descartados,
+      pasos,
+      raicesRacionales,
+      raicesIrracionales,
+      cocienteFinal: restoTexto,
+      cocienteComplejo,
+      cocienteSuperior,
+      factorizacion: factores.join(' · ') || polinomioOriginal,
+    });
+  };
+
   // Resolver al cambiar tipo de ecuación
   useEffect(() => {
     if (equationType === 'linear') {
@@ -291,6 +570,8 @@ export default function AlgebraEcuacionesPage() {
       solveQuadratic();
     } else if (equationType === 'system') {
       solveSystem();
+    } else if (equationType === 'polynomial') {
+      solvePolynomial();
     }
   }, [equationType]);
 
@@ -312,7 +593,8 @@ export default function AlgebraEcuacionesPage() {
       <header className={styles.hero}>
         <h1 className={styles.title}>🧮 Calculadora de Ecuaciones Algebraicas</h1>
         <p className={styles.subtitle}>
-          Resuelve ecuaciones lineales, cuadráticas y sistemas 2x2 con explicaciones paso a paso
+          Ecuaciones lineales, cuadráticas, sistemas 2x2 y polinomios de grado 3+ con la regla de
+          Ruffini, paso a paso
         </p>
       </header>
 
@@ -343,6 +625,14 @@ export default function AlgebraEcuacionesPage() {
           aria-pressed={equationType === 'system'}
         >
           <span aria-hidden="true">🔗</span> Sistema 2x2
+        </button>
+        <button
+          type="button"
+          className={`${styles.typeButton} ${equationType === 'polynomial' ? styles.active : ''}`}
+          onClick={() => setEquationType('polynomial')}
+          aria-pressed={equationType === 'polynomial'}
+        >
+          <span aria-hidden="true">🪜</span> Grado 3+ (Ruffini)
         </button>
       </div>
 
@@ -503,6 +793,59 @@ export default function AlgebraEcuacionesPage() {
               </button>
             </div>
           )}
+
+          {/* Polinomio grado 3+ (Ruffini) */}
+          {equationType === 'polynomial' && (
+            <div className={styles.equationCard}>
+              <h2 className={styles.cardTitle}>Polinomio de Grado 3 o Superior</h2>
+              <p className={styles.cardHelp}>
+                Introduce los coeficientes en orden descendente. Los que falten, ponlos a 0.
+              </p>
+
+              <label className={styles.gradoLabel}>
+                Grado del polinomio:
+                <select
+                  value={polyGrado}
+                  onChange={(e) => cambiarGrado(Number(e.target.value))}
+                  className={styles.select}
+                >
+                  <option value={3}>3 (cúbica)</option>
+                  <option value={4}>4 (cuártica)</option>
+                  <option value={5}>5 (quíntica)</option>
+                </select>
+              </label>
+
+              <div className={styles.coefGrid}>
+                {polyCoefs.map((valor, indice) => {
+                  const exponente = polyGrado - indice;
+                  const superindices = ['', 'x', 'x²', 'x³', 'x⁴', 'x⁵'];
+                  return (
+                    <label key={indice} className={styles.coefLabel}>
+                      <span className={styles.coefTermino}>
+                        {exponente === 0 ? 'término indep.' : superindices[exponente]}
+                      </span>
+                      <input
+                        type="number"
+                        value={valor}
+                        onChange={(e) => actualizarCoeficiente(indice, e.target.value)}
+                        step="1"
+                        className={styles.inputSmall}
+                        aria-label={
+                          exponente === 0
+                            ? 'Término independiente'
+                            : `Coeficiente de x elevado a ${exponente}`
+                        }
+                      />
+                    </label>
+                  );
+                })}
+              </div>
+
+              <button type="button" onClick={solvePolynomial} className={styles.btnPrimary}>
+                Factorizar con Ruffini
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Panel derecho: Resultados */}
@@ -591,6 +934,140 @@ export default function AlgebraEcuacionesPage() {
               )}
             </div>
           )}
+
+          {/* Resultados Polinomio grado 3+ */}
+          {equationType === 'polynomial' && polyResultado && (
+            <div className={styles.resultsCard}>
+              <h2 className={styles.cardTitle}>Factorización</h2>
+
+              {polyResultado.error ? (
+                <div className={styles.avisoBox} role="alert">
+                  <p>{polyResultado.error}</p>
+                </div>
+              ) : (
+                <>
+                  <div className={styles.solution}>
+                    <p className={styles.polinomioOriginal}>P(x) = {polyResultado.polinomio}</p>
+                    <p className={styles.solutionValue}>{polyResultado.factorizacion}</p>
+                  </div>
+
+                  {/* Raíces encontradas */}
+                  <div className={styles.extraInfo}>
+                    <p>
+                      <strong>Raíces racionales:</strong>{' '}
+                      {polyResultado.raicesRacionales.length
+                        ? polyResultado.raicesRacionales.map(fTexto).join(', ')
+                        : 'ninguna'}
+                    </p>
+                    {polyResultado.raicesIrracionales.length > 0 && (
+                      <p>
+                        <strong>Raíces del factor restante:</strong>{' '}
+                        {polyResultado.raicesIrracionales.join(' · ')}
+                      </p>
+                    )}
+                    {polyResultado.cocienteComplejo && (
+                      <p>
+                        El factor <strong>{polyResultado.cocienteFinal}</strong> tiene discriminante
+                        negativo: no tiene raíces reales, sus soluciones son números complejos.
+                      </p>
+                    )}
+                    {polyResultado.cocienteSuperior && (
+                      <p>
+                        El factor <strong>{polyResultado.cocienteFinal}</strong> no tiene raíces
+                        racionales, así que Ruffini se detiene aquí. Sí puede tener raíces reales
+                        irracionales (por ejemplo ∛2), que se hallan por métodos numéricos.
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Candidatos del teorema de la raíz racional */}
+                  {polyResultado.candidatos.length > 0 && (
+                    <div className={styles.candidatosBox}>
+                      <h3 className={styles.stepsTitle}>Candidatos a raíz (±p/q)</h3>
+                      <p className={styles.candidatosTexto}>
+                        Divisores del término independiente entre divisores del coeficiente
+                        principal: {polyResultado.candidatos.slice(0, 24).join(', ')}
+                        {polyResultado.candidatos.length > 24
+                          ? ` … (${polyResultado.candidatos.length} en total)`
+                          : ''}
+                      </p>
+                      {polyResultado.descartados.length > 0 && (
+                        <p className={styles.candidatosTexto}>
+                          <strong>Descartados por resto ≠ 0:</strong>{' '}
+                          {polyResultado.descartados.join(' · ')}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Tablas de división sintética */}
+                  {polyResultado.pasos.length > 0 && (
+                    <div className={styles.steps}>
+                      <h3 className={styles.stepsTitle}>División sintética paso a paso:</h3>
+                      {polyResultado.pasos.map((paso, indice) => (
+                        <div key={indice} className={styles.ruffiniWrapper}>
+                          <p className={styles.ruffiniTitulo}>
+                            Paso {indice + 1}: dividir entre (x {paso.raiz.n < 0 ? '+' : '−'}{' '}
+                            {fTexto(frac(Math.abs(paso.raiz.n), paso.raiz.d))})
+                          </p>
+                          <table className={styles.ruffiniTable}>
+                            <caption className={styles.ruffiniCaption}>
+                              Regla de Ruffini para la raíz x = {fTexto(paso.raiz)}
+                            </caption>
+                            <tbody>
+                              <tr>
+                                <th scope="row" className={styles.ruffiniEsquina}>
+                                  <span className={styles.visuallyHidden}>Coeficientes</span>
+                                </th>
+                                {paso.coeficientes.map((c, i) => (
+                                  <td key={i} className={styles.ruffiniCoef}>
+                                    {fTexto(c)}
+                                  </td>
+                                ))}
+                              </tr>
+                              <tr>
+                                <th scope="row" className={styles.ruffiniRaiz}>
+                                  {fTexto(paso.raiz)}
+                                </th>
+                                <td className={styles.ruffiniVacio}></td>
+                                {paso.arrastre.map((a, i) => (
+                                  <td key={i} className={styles.ruffiniArrastre}>
+                                    {fTexto(a)}
+                                  </td>
+                                ))}
+                              </tr>
+                              <tr className={styles.ruffiniFilaResultado}>
+                                <th scope="row" className={styles.ruffiniEsquina}>
+                                  <span className={styles.visuallyHidden}>Resultado</span>
+                                </th>
+                                {paso.resultado.map((r, i) => (
+                                  <td
+                                    key={i}
+                                    className={
+                                      i === paso.resultado.length - 1
+                                        ? styles.ruffiniResto
+                                        : styles.ruffiniCociente
+                                    }
+                                  >
+                                    {fTexto(r)}
+                                  </td>
+                                ))}
+                              </tr>
+                            </tbody>
+                          </table>
+                          <p className={styles.ruffiniPie}>
+                            Cociente: {polinomioATexto(paso.resultado.slice(0, -1))} · Resto:{' '}
+                            {fTexto(paso.resultado[paso.resultado.length - 1])}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -623,7 +1100,7 @@ export default function AlgebraEcuacionesPage() {
             <tbody>
               <tr><td>Lineal (1er grado)</td><td>ax + b = 0</td><td>1 solución real</td><td>Despejar x directamente</td><td>ESO 1º-2º</td></tr>
               <tr><td>Cuadrática (2º grado)</td><td>ax² + bx + c = 0</td><td>0, 1 o 2 soluciones reales</td><td>Fórmula cuadrática / factorización</td><td>ESO 3º-4º</td></tr>
-              <tr><td>Cúbica (3er grado)</td><td>ax³ + bx² + cx + d = 0</td><td>1 o 3 soluciones reales</td><td>Ruffini / fórmula de Cardano</td><td>Bachillerato</td></tr>
+              <tr><td>Cúbica (3er grado)</td><td>ax³ + bx² + cx + d = 0</td><td>1 o 3 soluciones reales</td><td>Ruffini (pestaña «Grado 3+») / Cardano</td><td>Bachillerato</td></tr>
               <tr><td>Racional</td><td>P(x)/Q(x) = 0</td><td>Variable (Q(x) ≠ 0)</td><td>Mínimo común denominador</td><td>ESO 4º / Bach.</td></tr>
               <tr><td>Irracional</td><td>√f(x) = g(x)</td><td>Variable (verificar soluciones)</td><td>Elevar al cuadrado ambos miembros</td><td>Bachillerato</td></tr>
               <tr><td>Sistema 2×2</td><td>ax+by=c, dx+ey=f</td><td>0, 1 o ∞ soluciones</td><td>Sustitución / reducción / Cramer</td><td>ESO 3º-4º</td></tr>
@@ -677,7 +1154,7 @@ export default function AlgebraEcuacionesPage() {
             </div>
             <div className={styles.faqItem}>
               <div className={styles.faqPregunta}>¿Cuándo se usa Ruffini para resolver ecuaciones?</div>
-              <div className={styles.faqRespuesta}>La regla de Ruffini se aplica a polinomios de grado ≥ 2 cuando se conoce (o se puede adivinar) una raíz entera. Se busca entre los divisores del término independiente. Si p(a) = 0, entonces (x - a) es un factor y Ruffini divide el polinomio por ese factor, reduciendo el grado en 1.</div>
+              <div className={styles.faqRespuesta}>La regla de Ruffini se aplica a polinomios de grado ≥ 2 cuando se conoce (o se puede adivinar) una raíz racional. Se busca entre los divisores del término independiente partidos por los del coeficiente principal. Si p(a) = 0, entonces (x − a) es un factor y Ruffini divide el polinomio por ese factor, reduciendo el grado en 1. En la pestaña <strong>«Grado 3+ (Ruffini)»</strong> puedes ejecutarlo: la herramienta prueba los candidatos, muestra la tabla de división sintética de cada paso y devuelve la factorización completa.</div>
             </div>
             <div className={styles.faqItem}>
               <div className={styles.faqPregunta}>¿Por qué hay que verificar las soluciones en ecuaciones irracionales?</div>
