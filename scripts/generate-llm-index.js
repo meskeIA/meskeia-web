@@ -24,12 +24,27 @@ const suitesContent = fs.readFileSync(suitesPath, 'utf-8');
 const extractApplications = () => {
   const applications = [];
 
-  // Regex actualizado para el nuevo formato con suites
-  const appRegex = /\{\s*name:\s*"([^"]+)",\s*suites:\s*\[([^\]]*)\],\s*(?:contexts:\s*\[([^\]]*)\],\s*)?icon:\s*"([^"]+)",\s*description:\s*"([^"]+)",\s*url:\s*"([^"]+)",\s*keywords:\s*\[([^\]]+)\]\s*\}/g;
+  // Literal de cadena TypeScript: admite comillas dobles O simples, y escapes internos
+  // (\" dentro de una cadena entrecomillada). Sin contemplar ambos casos, una entrada con
+  // apóstrofe/comilla simple en el nombre, o con comillas escapadas en la descripción, no
+  // encaja y se pierde EN SILENCIO — así desaparecieron 8 apps del índice hasta 2026-08-10.
+  const CADENA = String.raw`(?:"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')`;
+
+  const appRegex = new RegExp(
+    String.raw`\{\s*name:\s*(${CADENA}),\s*suites:\s*\[([^\]]*)\],\s*(?:contexts:\s*\[([^\]]*)\],\s*)?icon:\s*(${CADENA}),\s*description:\s*(${CADENA}),\s*url:\s*(${CADENA}),\s*keywords:\s*\[([^\]]+)\]\s*\}`,
+    'g'
+  );
+
+  // Quita las comillas envolventes y deshace los escapes (\" → ")
+  const literal = (cadena) => cadena.slice(1, -1).replace(/\\(.)/g, '$1');
 
   let match;
   while ((match = appRegex.exec(applicationsContent)) !== null) {
-    const [, name, suitesStr, contextsStr, icon, description, url, keywordsStr] = match;
+    const [, nameRaw, suitesStr, contextsStr, iconRaw, descriptionRaw, urlRaw, keywordsStr] = match;
+    const name = literal(nameRaw);
+    const icon = literal(iconRaw);
+    const description = literal(descriptionRaw);
+    const url = literal(urlRaw);
 
     // Parsear suites
     const suites = suitesStr
@@ -56,6 +71,29 @@ const extractApplications = () => {
       url,
       keywords,
     });
+  }
+
+  // CANDADO: este parser lee TypeScript con una expresión regular, así que cualquier
+  // entrada con un formato no contemplado deja de encajar y desaparece del índice sin
+  // que nada falle. Ocurrió: 8 apps llevaban meses fuera de ai-index.json (invisibles
+  // para las IAs) por comillas simples en `name` y comillas escapadas en `description`.
+  // Comparar lo capturado con el número real de entradas convierte ese fallo silencioso
+  // en un build roto, que es lo único que se ve.
+  const entradasReales = (applicationsContent.match(/\burl:\s*['"]/g) || []).length;
+  if (applications.length !== entradasReales) {
+    const capturadas = new Set(applications.map((a) => a.url));
+    const perdidas = [...applicationsContent.matchAll(/\burl:\s*['"]([^'"]+)['"]/g)]
+      .map((m) => m[1])
+      .filter((u) => !capturadas.has(u));
+
+    console.error(
+      `\n❌ generate-llm-index: el parser capturó ${applications.length} de ${entradasReales} entradas de data/applications.ts.`
+    );
+    console.error('   Estas NO llegarían a ai-index.json (las IAs no las verían):');
+    perdidas.forEach((u) => console.error(`     · ${u}`));
+    console.error('   Causa habitual: un campo escrito con un formato que el regex no contempla.');
+    console.error('   Corregir el regex de extractApplications(), no los datos.\n');
+    process.exit(1);
   }
 
   return applications;

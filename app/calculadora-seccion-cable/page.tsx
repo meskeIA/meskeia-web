@@ -229,7 +229,7 @@ export default function CalculadoraSeccionCable() {
           </span>
         </section>
 
-        <DisclaimerCard variant="technical" severity="high" collapsible={false}>
+        <DisclaimerCard variant="technical" severity="critical" collapsible={false}>
           <p>
             Esta calculadora resuelve <strong>únicamente el criterio de caída de tensión</strong>. La
             sección definitiva de una instalación es la mayor de tres comprobaciones: caída de
