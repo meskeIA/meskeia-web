@@ -1,14 +1,54 @@
 # CLAUDE.md - Instrucciones específicas del proyecto meskeia-web
 
-> **NOTA**: Este archivo complementa las instrucciones globales en `~/.claude/CLAUDE.md`
-> Las reglas comunes (paleta meskeIA, TypeScript, formato español, etc.) están en el archivo global.
+> Complementa `~/.claude/CLAUDE.md`, que tiene lo **universal** a todos mis proyectos: español,
+> formato español, TypeScript, accesibilidad, dark mode, secretos y disciplina de build.
+> Lo de aquí abajo es lo que solo aplica a meskeIA.
 
 ## Proyecto: meskeia-web
 
-### Ubicación
-- **Repositorio**: `C:\Users\jaceb\meskeia-web`
-- **Hosting**: Vercel (meskeia.com)
-- **Despliegue**: Automático via GitHub push a main
+Repositorio en `C:\Users\jaceb\meskeia-web`, hospedado en Vercel (meskeia.com). Push a `main` despliega solo.
+
+Servidor de desarrollo y producción en el **puerto 3050** (`npm run dev` / `npm run start`). El resto de scripts, en `package.json`.
+
+---
+
+## Identidad visual meskeIA (OBLIGATORIO)
+
+Ya implementada en `app/globals.css` — **no duplicar la definición**, solo usar las variables.
+
+| Variable | Color | Uso |
+|---|---|---|
+| `--primary` | `#2E86AB` | Azul meskeIA, color principal |
+| `--secondary` | `#48A9A6` | Teal meskeIA |
+| `--accent` | `#7FB3D3` | Azul claro |
+| `--hero-bg` | `#1a5278` | Azul marino, **obligatorio en hero sections** |
+
+❌ **Prohibido absoluto**: `#7C3AED` (violeta) y `#2DD4BF` (turquesa). No son la marca.
+
+❌ No preguntar si aplicar la identidad meskeIA: se aplica siempre.
+
+---
+
+## Estructura estándar de una app (OBLIGATORIO)
+
+```
+1. <MeskeiaLogo />
+2. Hero section
+3. <LegalNotice />                       ← RGPD
+4. Herramienta / calculadora
+5. Resultados
+6. <DisclaimerCard /> O `// @disclaimer: exempt` en la línea 2
+7. <EducationalSection>                  ← contenido colapsable
+8. <RelatedApps apps={getRelatedApps('slug')} />
+9. <ShareCard appName="slug" />
+10. <Footer appName="slug" />
+```
+
+**Los cinco obligatorios en TODAS las apps**: `MeskeiaLogo`, `LegalNotice`, `RelatedApps`, `ShareCard`, `Footer`. Se importan de `@/components`; los formateadores, de `@/lib`.
+
+⚠️ **Nunca** ocultar dentro de `<EducationalSection>` un disclaimer legal, una advertencia de responsabilidad ni un aviso sobre datos personales: es responsabilidad jurídica, no maquetación.
+
+**Catálogo de componentes con ejemplos**: `components/README.md` · **plantillas**: `templates/` y `templates/README.md` · **flujo completo de creación**: skill `/nueva-app-meskeia`.
 
 ---
 
