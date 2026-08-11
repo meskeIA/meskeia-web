@@ -119,6 +119,35 @@ for (const f of ficheros) {
   }
 }
 
+// --- 9: scripts que una ficha ofrece ejecutar y ya no existen ---
+//
+// Una ficha que dice `node scripts/loquesea.mjs` cuando ese script se borró no ocupa sitio:
+// MIENTE, y el comando falla en manos de quien la crea. Salió de la auditoría del 11/08/2026:
+// dos scripts anunciados como "reutilizables" llevaban un mes borrados, y un tercero se
+// ofrecía como la herramienta de auditoría de los schemas de ChatGPT.
+//
+// Deliberadamente ACOTADO a la forma ejecutable (`node scripts/…`). La primera versión barría
+// toda ruta citada en prosa y daba 10 avisos sin un solo hallazgo real —globs recortados,
+// placeholders, rutas aún por construir y las propias notas de corrección—: un candado que
+// avisa siempre deja de informar, que es justo lo que dice feedback_semaforo_color_que_informa.
+const DEFUNCION = /\b(borrad|borró|borro|eliminad|eliminó|eliminaron|elimino|ya no (existe|hay|está|vive)|no existe|desaparec|revertid|se retiró|retirad|NO recrear)\b/i;
+const COMANDO = /\bnode\s+(scripts\/[A-Za-z0-9_.\/-]+\.(?:mjs|js))/g;
+const scriptsMuertos = new Map();
+
+for (const f of ficheros) {
+  for (const linea of fs.readFileSync(path.join(DIR, f), 'utf8').split(/\r?\n/)) {
+    if (DEFUNCION.test(linea)) continue;   // la ficha ya dice que no existe: cuenta la verdad
+    for (const m of linea.matchAll(COMANDO)) {
+      if (fs.existsSync(path.join(REPO, m[1]))) continue;
+      if (!scriptsMuertos.has(f)) scriptsMuertos.set(f, new Set());
+      scriptsMuertos.get(f).add(m[1]);
+    }
+  }
+}
+for (const [f, rutas] of scriptsMuertos) {
+  errores.push(`${f} ofrece ejecutar un script que ya no existe: ${[...rutas].join(', ')}`);
+}
+
 // --- 6: punteros externos vivos ---
 const rotosExternos = new Map();
 for (const fuente of FUENTES_EXTERNAS) {
