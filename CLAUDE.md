@@ -20,49 +20,18 @@ meskeIA organiza las apps en 13 Suites Temáticas (clasificación NO excluyente 
 
 ### Suites (13) - "¿Qué problema resuelve?"
 
-| ID | Suite | Icono | Descripción |
-|----|-------|-------|-------------|
-| `accesibilidad` | Accesibilidad e Inclusión | ♿ | Autismo, TDAH, dislexia, discapacidad |
-| `cultura` | Cultura General | 📚 | Conocimiento, referencias, divulgación |
-| `diseno` | Diseño y Contenido | 🎨 | Diseño, desarrollo, SEO, redes sociales (fusión 2026-05-06) |
-| `estudiantes` | Estudiantes | 🧮 | Matemáticas, ciencias, estudio reglado |
-| `finanzas` | Finanzas e Inversión | 📈 | Ahorro, inversión, planificación |
-| `freelance` | Freelance y Autónomo | 💼 | Herramientas para independientes |
-| `tecnicas` | Herramientas Técnicas | 🔧 | Herramientas especializadas |
-| `inmobiliaria` | Inmobiliaria y Hogar | 🏘️ | Hipotecas, alquiler, gestión hogar |
-| `juegos` | Juegos y Ocio | 🎲 | Diversión y entretenimiento |
-| `legal-fiscal` | Legal, Fiscal y Patrimonio | ⚖️ | Impuestos, herencias, jubilación, pensiones (fusión 2026-05-06) |
-| `productividad` | Productividad | ⚡ | Organización personal |
-| `salud` | Salud y Bienestar | 🏥 | Salud, nutrición, mascotas |
-| `viajes` | Viajes y Turismo | ✈️ | Planificación de viajes |
+La lista viva (id, nombre, icono y descripción de cada suite) está en `data/suites.ts`. **NO duplicarla aquí**: una tabla copiada envejece en silencio y acaba contradiciendo al código.
 
 ### Archivos de datos
 
-| Archivo | Descripción |
-|---------|-------------|
-| `data/suites.ts` | Definición de las 13 suites |
-| `data/applications.ts` | Base de datos de apps |
-| `data/implemented-apps.ts` | URLs de apps implementadas |
-| `data/app-relations.ts` | Cross-linking entre apps |
-| `public/ai-index.json` | **Auto-generado en build** desde applications.ts — no editar manualmente |
-| `data/fiscal/` | **Datos normativos centralizados** (ver tabla abajo) |
+`data/suites.ts` · `data/applications.ts` · `data/implemented-apps.ts` · `data/app-relations.ts` — los nombres dicen lo que contienen. Dos que no se deducen leyendo el directorio:
+
+- `public/ai-index.json` — **auto-generado en el build** desde applications.ts. No editar a mano.
+- `data/fiscal/` — datos normativos centralizados, con la regla obligatoria de abajo.
 
 ### Módulos de datos fiscales (`data/fiscal/`)
 
-Repositorio centralizado de datos normativos para la Suite Legal-Fiscal. Cada módulo incluye metadatos de versión, fuente oficial y fecha de verificación.
-
-| Módulo | Contenido |
-|--------|-----------|
-| `data/fiscal/irpf.ts` | Tramos IRPF, mínimos personales y familiares 2025 |
-| `data/fiscal/autonomos.ts` | Tramos RETA, tipo cotización, bonificaciones 2025 |
-| `data/fiscal/inmuebles.ts` | ITP/AJD por CCAA, IVA obra nueva, coeficientes IIVTNU 2025, plusvalías IRPF |
-| `data/fiscal/intereses.ts` | Tipos de demora comercial (Ley 3/2004) por semestre, interés legal, interés tributario |
-| `data/fiscal/sucesiones.ts` | Tarifas ISD por CCAA, grupos, bonificaciones |
-| `data/fiscal/donaciones.ts` | Tarifas impuesto donaciones por CCAA |
-| `data/fiscal/sociedades.ts` | Tipos IS, regímenes especiales |
-| `data/fiscal/pensiones.ts` | Datos SS jubilación: porcentajes por años, pensión máx/mín, coeficientes anticipada 2025 |
-| `data/fiscal/dependencia.ts` | Prestaciones SAAD, copago, cotización SS cuidadores, deducciones IRPF discapacidad, escala Zarit |
-| `data/fiscal/maternidad.ts` | Permiso nacimiento (16 sem), prestación SS, deducción maternidad IRPF, gastos bebé, estilos parentales |
+Repositorio centralizado de datos normativos para la Suite Legal-Fiscal. Cada módulo incluye metadatos de versión, fuente oficial y fecha de verificación. El inventario vivo es `ls data/fiscal/` (25 módulos a 11/08/2026); **no se mantiene aquí una tabla de módulos**, porque la anterior listaba 10 de los 25 y llevaba meses dando una imagen falsa de lo que ya estaba cubierto.
 
 ### ⚠️ Regla obligatoria para apps Legal-Fiscal y Jubilación
 
@@ -82,60 +51,9 @@ Cuando los datos no existan aún, **crear el módulo correspondiente** en `data/
 
 ## Template visualizador-historia/[slug]
 
-Ruta dinámica para cronologías históricas. Cada historia = un archivo `data/historias/[slug].ts` + registro en `data/historias/index.ts`.
+Cronologías históricas: cada historia = `data/historias/[slug].ts` + registro en `data/historias/index.ts`. **Catálogo cerrado desde el 2026-05-09.**
 
-### Slugs activos
-
-Catálogo cerrado (2026-05-09) con ~170 archivos en `data/historias/` — la lista viva está en `data/historias/index.ts`, NO mantener listas de slugs en docs. Las cronologías se sirven también en el vertical CRONICUM (`cronicum.com`, host-rewrite); una cronología nueva requiere además asignar su slug a una puerta en `data/cronicum/puertas.ts` o no aparece en el portal — lo comprueba `npm run check:verticales` desde el 2026-07-28.
-
-### Workflow óptimo: crear múltiples historias en paralelo
-
-**Fase paralela** (N agentes, uno por historia — no tocan archivos compartidos):
-- Cada agente crea SOLO `data/historias/[slug].ts`
-- Verifica con `npx tsc --noEmit` una vez y termina
-- PROHIBIDO en agentes: `npm run build`, modificar index.ts, applications.ts, etc.
-
-**Fase secuencial** (director de proyecto después de que todos los agentes terminan):
-```
-1. data/historias/index.ts  — añadir imports + entradas en registry
-2. data/applications.ts     — añadir entradas con suites
-3. data/implemented-apps.ts — añadir URLs
-4. data/app-relations.ts    — añadir bloques appKey + cross-links mutuos
-5. npm run build            — generateStaticParams() prerenderiza todo automáticamente
-```
-
-### Reglas de UX obligatorias (NO modificar)
-
-Verificadas con el usuario y validadas en producción (2026-05-03):
-
-| Tab | Comportamiento correcto |
-|-----|------------------------|
-| **Tab 1 — Línea del Tiempo** | Clic en período = toggle de panel **inline** debajo del SVG. **Nunca** navegar a otro tab. |
-| **Tab 2 — Período en Detalle** | Botones fecha en flex-wrap + tarjeta grande con header coloreado + botones `← Anterior / Siguiente →` debajo con contador. |
-| **Tab 3 — Comparativa** | **Tabla HTML** con 5 columnas (Período, Rango, Categoría, Obra icónica, Ámbito) + filtros por botones de categoría + buscador arriba. |
-| **Tab 4 — Contexto Histórico** | Eras apiladas en **flex-column** (una sola columna), `border-left: 4px solid` por era, badges de hitos con color de categoría. |
-
-### Estructura de datos (HistoriaData)
-
-- `hitos[]`: **10 períodos** con `id, nombre, anioInicio, anioFin, color, categoria, descripcion, obraIconica, paises[]`
-- `eras[]`: **exactamente 6 eras** con `nombre, desde, hasta, icono, hitosDestacados[], eventos[]`
-- `categorias`: mapa `id → etiqueta` (**6-8 categorías**)
-- `colores`: mapa `id → color hex` — **mismas claves exactas** que `categorias`, ni una más ni una menos
-- `disclaimer: 'exempt'` para historia (educativo puro)
-- `educativo` v2.0 con tamaños fijos: `intro` + `tablaComparativa[6]` + `escenarios[4]` + `faq[5]` + `pasos[5]` + `tips[4]` + `errores[4]`
-
-### Restricciones críticas (errores frecuentes)
-
-1. **`hitosDestacados` en eras**: usar el **`nombre`** exacto del hito, no el `id`. El template busca `data.hitos.find(h => h.nombre === nombre)`.
-2. **Eras continuas**: el rango `desde/hasta` de las 6 eras debe cubrir `anioInicio→anioFin` sin huecos ni solapamientos.
-3. **IDs de hitos**: kebab-case sin acentos ni caracteres especiales (`'reino-antiguo'`, `'conquista-constantinopla'`).
-4. **Años negativos**: `anioInicio: -3100` = 3100 a.C. El template convierte automáticamente para mostrar.
-5. **Suites estándar** para apps de historia: `suites: ["cultura", "estudiantes"]`.
-6. **Archivo de referencia**: `data/historias/roma.ts` — el más completo y correcto para copiar la estructura.
-
-### appKey en app-relations.ts
-
-El appKey sigue el patrón `visualizador-historia-[slug]` (con guión, sin slash).
+El detalle completo (workflow con agentes en paralelo, las 4 reglas de UX que NO se modifican, estructura de `HistoriaData` y las 6 restricciones críticas) vive en **`data/historias/CLAUDE.md`**, que se carga solo al trabajar bajo ese directorio.
 
 ---
 
@@ -407,83 +325,7 @@ Cada agente DEBE incluir estas instrucciones EXACTAS en su prompt:
 
 ## Stack Tecnológico: tRPC + React Query
 
-### Arquitectura Híbrida
-
-| Enfoque | Cuándo usar | Estado |
-|---------|-------------|--------|
-| **tRPC + React Query** | Nuevas apps que necesiten APIs | ✅ Recomendado |
-| **API Routes (legacy)** | Apps existentes (220+) | ✅ Mantenido |
-
-**Principio**: No migrar código legacy que funciona. Usar tRPC solo para nuevas apps.
-
----
-
-### ¿Cuándo usar tRPC?
-
-#### ✅ Usar tRPC cuando:
-- Creas una **nueva app** que necesita consumir datos del servidor
-- La app necesita **múltiples queries** con estado complejo
-- Quieres **type-safety end-to-end** (servidor → cliente)
-- Necesitas **cache automático** y revalidación
-
-#### ❌ NO usar tRPC cuando:
-- La app **NO consume APIs** (solo frontend)
-- Es un **simple POST fire-and-forget** (ej: analytics tracking)
-- Estás **modificando una app existente** con API Routes
-- La app es **crítica** (ej: AnalyticsTracker)
-
----
-
-### Estructura de Archivos tRPC
-
-```
-meskeia-web/
-├── server/
-│   ├── trpc.ts                    # Configuración base
-│   └── routers/
-│       ├── _app.ts                # Router principal
-│       └── analytics.ts           # Ejemplo
-├── lib/
-│   └── trpc.ts                    # Cliente React
-├── app/
-│   ├── providers.tsx              # Wrapper React Query
-│   └── api/trpc/[trpc]/route.ts   # Handler Next.js
-```
-
----
-
-### Template tRPC
-
-**Ver**: `templates/trpc-router.template.ts` para plantilla completa con:
-- Query (GET) con validación Zod
-- Mutation (POST/PUT) con validación
-- Ejemplos de uso en cliente
-- Instrucciones paso a paso
-
-**Uso**:
-```bash
-cp templates/trpc-router.template.ts server/routers/mi-router.ts
-# Editar y registrar en server/routers/_app.ts
-```
-
----
-
-### Ventajas de tRPC
-
-1. **Type-Safety End-to-End**: Tipos inferidos automáticamente
-2. **Menos Boilerplate**: ~40% menos código que API Routes + fetch
-3. **Cache Automático**: React Query gestiona el cache
-4. **Validación**: Zod en cliente + servidor
-5. **Batching**: Múltiples queries en 1 HTTP request
-
----
-
-### Ejemplo Real: dashboard-analytics
-
-**Migrado a tRPC** como prueba de concepto (2026):
-- ✅ Funcionando en producción (protegido con `protectedProcedure` + clave `x-analytics-key`)
-- ✅ Type-safety completo
-- ✅ Reducción código ~40%
+Criterio de uso, ubicación de cada pieza y plantilla de router: skill **`/trpc-meskeia`**. En una frase: tRPC para apps nuevas que consuman datos del servidor; las API Routes existentes (220+) se mantienen y **no se migran**.
 
 ---
 
@@ -528,17 +370,9 @@ la Agenda Operativa del Centro de Mando (`restauracion-turso-semestral`).
 
 ### Cabeceras de Seguridad HTTP
 
-Configuradas en **dos capas** (`next.config.ts` + `vercel.json`):
+Configuradas en **dos capas** (`next.config.ts` + `vercel.json`) — la lista exacta se lee ahí. Lo que no se deduce leyéndolas:
 
-| Cabecera | Protección |
-|----------|------------|
-| `X-Frame-Options: DENY` | Anti-clickjacking |
-| `X-Content-Type-Options: nosniff` | Anti-MIME sniffing |
-| `Referrer-Policy` | Control de referrer |
-| `Permissions-Policy` | Bloquear APIs innecesarias |
-| `Content-Security-Policy` | **CSP ENFORCED** (bloquea; `media-src` incluye `blob:`) |
-
-⚠️ La CSP está en modo enforcement desde 2026 — cualquier recurso externo nuevo debe añadirse a la política o será bloqueado en producción.
+⚠️ La CSP está **en modo enforcement** desde 2026 (bloquea de verdad, y `media-src` incluye `blob:`): cualquier recurso externo nuevo debe añadirse a la política o será bloqueado en producción. Al tocar `Permissions-Policy`, `feature=()` desactiva cámara y micrófono **en silencio**; usar `(self)` y en AMBOS ficheros.
 
 ### CORS en API Routes
 
@@ -669,12 +503,7 @@ fechas falsas para todo el catálogo, así que allí el build solo lee este JSON
 
 ### API Routes (Serverless Functions)
 
-- `/api/analytics/track` - Registrar uso
-- `/api/analytics/stats` - Obtener estadísticas
-- `/api/analytics/duration` - Actualizar duración
-- `/api/analytics/ip-filter` - Gestionar IP excluida
-- `/api/analytics/csp-violations` - Recibir informes CSP
-- `/api/analytics/rollup` - Rollup/agregación Turso
+Las rutas vivas son `ls app/api/analytics/`.
 
 ---
 
@@ -694,19 +523,9 @@ fechas falsas para todo el catálogo, así que allí el build solo lee este JSON
 
 ## Herramientas de Desarrollo
 
-### Plugins de Claude Code
+Los comandos disponibles se ven con `/help`; las revisiones de código van por el `/code-review` integrado. Los plugins `code-review`, `audit`, `analyze-codebase`, `bug-detective`, `debugger` y `accessibility-expert` de `cc-marketplace` **se retiraron el 11/08/2026**: cero usos desde junio, y el primero además duplicaba el comando integrado.
 
-| Plugin | Comando | Uso |
-|--------|---------|-----|
-| `code-review` | `/code-review` | Revisión antes de commits |
-| `audit` | `/audit` | Auditoría de seguridad |
-| `analyze-codebase` | `/analyze-codebase` | Análisis completo |
-| `bug-detective` | `/bug-detective` | Debugging paso a paso |
-
-### Testing de Frontend
-
-- **Playwright MCP**: Tests automatizados (settings.local.json)
-- **Chrome Integration**: Validación visual interactiva
+**Testing de frontend**: Playwright MCP (configurado en `settings.local.json`) y validación visual con Chrome.
 
 ---
 
@@ -745,15 +564,6 @@ Detalle completo y formato de entrada: skill `/agenda`.
 
 ---
 
-## Control de versiones
-
-**Versión actual**: 1.8.0 (2026-08-01) - Candados de juicio (3 reglas derivadas de clasificar las 29 entradas `feedback_*` de memoria: verificación tras cambio a escala, caso de origen de la regla invocada, contador de veredicto repetido)
-
-**Anterior**: 1.7.0 (2026-07-16) - Homogeneización del ecosistema .claude (cifras vivas, timeout único 600000ms, TypeScript real, CSP enforced)
-
-**Historial completo**: `git log` (CHANGELOG histórico archivado en `_private/archivo/`)
-
 ---
 
-**Última actualización**: 2026-08-01
-**Proyecto**: meskeIA Web (https://meskeia.com)
+**Proyecto**: meskeIA Web (https://meskeia.com) · el historial de este fichero es `git log CLAUDE.md`
