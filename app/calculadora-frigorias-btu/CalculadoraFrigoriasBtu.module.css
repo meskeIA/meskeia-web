@@ -1,0 +1,451 @@
+/* Calculadora de Frigorías y BTU — identidad meskeIA */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  padding: 20px;
+}
+
+/* ===== Hero ===== */
+.hero {
+  max-width: 1100px;
+  margin: 0 auto 24px;
+  background: var(--hero-bg);
+  border-radius: 16px;
+  padding: 40px 30px;
+  text-align: center;
+  color: #fff;
+}
+
+.title {
+  font-size: 2.1rem;
+  font-weight: 800;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  opacity: 0.92;
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ===== Estructura ===== */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 25px;
+}
+
+.panelTitle {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+
+.subtitulo {
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  margin: 24px 0 12px;
+}
+
+/* ===== Campos ===== */
+.campo {
+  margin-bottom: 18px;
+}
+
+.filaDoble {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.etiqueta {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.ayuda {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+.input {
+  width: 100%;
+  padding: 11px 12px;
+  font-size: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.inputConUnidad {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.unidad {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ===== Selectores de opción ===== */
+.opcionesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.opcionBtn {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 8px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.opcionBtn:hover {
+  border-color: var(--accent);
+}
+
+.opcionBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.opcionActiva {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.12);
+}
+
+.opcionLabel {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.opcionDetalle {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+.toggle {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.toggle:hover {
+  border-color: var(--accent);
+}
+
+.toggle:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.toggleActivo {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.12);
+}
+
+/* ===== Resultados ===== */
+.destacado {
+  text-align: center;
+  padding: 24px 16px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.12) 0%, rgba(72, 169, 166, 0.12) 100%);
+  margin-bottom: 16px;
+}
+
+.destacadoLabel {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.destacadoValor {
+  display: block;
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--primary);
+}
+
+.destacadoUnidad {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.equivalencias {
+  margin-top: 10px;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+}
+
+.equipo {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  padding: 12px 14px;
+  background: var(--bg-primary);
+  border-radius: 10px;
+  border-left: 4px solid var(--secondary);
+}
+
+.avisoMargen {
+  margin-top: 12px;
+  padding: 12px 14px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  background: rgba(245, 158, 11, 0.12);
+  border-left: 4px solid #f59e0b;
+  border-radius: 10px;
+}
+
+.error {
+  padding: 12px 14px;
+  font-size: 0.92rem;
+  color: #b91c1c;
+  background: rgba(239, 68, 68, 0.12);
+  border-left: 4px solid #ef4444;
+  border-radius: 10px;
+}
+
+.tarjetasGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 12px 10px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  text-align: center;
+}
+
+.tarjetaLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.tarjetaValor {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.tarjetaPie {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ===== Tabla de desglose ===== */
+.tablaWrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.tablaCaption {
+  text-align: left;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  padding-bottom: 8px;
+}
+
+.tabla th,
+.tabla td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  text-align: left;
+}
+
+.tabla thead th {
+  color: var(--text-primary);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tabla tbody th {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tabla td {
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* ===== Bloque de advertencias del contenido educativo ===== */
+.warningBox {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin: 22px 0;
+}
+
+.warningHeader {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.warningList li {
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin-bottom: 10px;
+}
+
+.warningList li:last-child {
+  margin-bottom: 0;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .container {
+    padding: 12px;
+  }
+
+  .hero {
+    padding: 28px 18px;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .panel {
+    padding: 18px;
+  }
+
+  .opcionesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tarjetasGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .destacadoValor {
+    font-size: 2.4rem;
+  }
+}
+
+/* ===== Dark mode ===== */
+[data-theme='dark'] .panel {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .input,
+[data-theme='dark'] .opcionBtn,
+[data-theme='dark'] .toggle,
+[data-theme='dark'] .tarjeta,
+[data-theme='dark'] .equipo {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .opcionActiva,
+[data-theme='dark'] .toggleActivo {
+  background: rgba(46, 134, 171, 0.22);
+}
+
+[data-theme='dark'] .destacado {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.2) 0%, rgba(72, 169, 166, 0.2) 100%);
+}
+
+[data-theme='dark'] .avisoMargen {
+  background: rgba(245, 158, 11, 0.18);
+}
+
+[data-theme='dark'] .error {
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.18);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(245, 158, 11, 0.15);
+}
+
+/* Movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  .opcionBtn,
+  .toggle {
+    transition: none;
+  }
+}

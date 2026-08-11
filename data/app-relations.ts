@@ -2225,7 +2225,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-alimentacion-mascotas': [...mascotasApps.filter(a => a.url !== '/calculadora-alimentacion-mascotas/').slice(0, 3), mascotasExtraApps[0]],
   'calculadora-medicamentos-mascotas': [...mascotasApps.filter(a => a.url !== '/orientador-medicamentos-mascotas/').slice(0, 3), mascotasExtraApps[1]],
   'calculadora-edad-mascotas': [...mascotasApps.filter(a => a.url !== '/calculadora-edad-mascotas/').slice(0, 3), mascotasExtraApps[0]],
-  'calculadora-tamano-adulto-perro': [...mascotasApps.slice(0, 3), { url: '/selector-mascota/', icon: '🐾', name: 'Selector de Mascota', description: '¿Qué animal se adapta a tu vida?' }],
+  // Quien llega aquí YA tiene el cachorro en casa y acaba de introducir su peso: los
+  // ganchos son los que reutilizan ese peso, no los de elegir mascota (2026-08-11).
+  'calculadora-tamano-adulto-perro': [
+    { url: '/calculadora-alimentacion-mascotas/', icon: '🍖', name: 'Alimentación Mascotas', description: 'Cuánta comida al día le toca con el peso que tiene ahora' },
+    { url: '/orientador-medicamentos-mascotas/', icon: '💊', name: 'Medicamentos Mascotas', description: 'Antiparasitarios: la dosis va por kilos y él cambia cada mes' },
+    { url: '/guia-razas-perros/', icon: '🐕', name: 'Guía de Razas de Perros', description: 'Peso adulto y energía de 40 razas: comprueba su categoría' },
+    { url: '/calculadora-edad-mascotas/', icon: '🎂', name: 'Edad Mascotas', description: 'Qué edad humana tiene tu cachorro ahora mismo' },
+  ],
   'guia-cuidado-mascota': [
     { url: '/guia-razas-perros/', icon: '🐕', name: 'Guía de Razas de Perros', description: '40 razas: tamaño, energía, temperamento y compatibilidad' },
     { url: '/guia-razas-gatos/', icon: '🐈', name: 'Guía de Razas de Gatos', description: '35 razas: pelo, energía, temperamento y compatibilidad' },
@@ -6219,9 +6226,15 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'calculadora-seccion-cable': [
     { url: '/calculadora-electricidad/', icon: '⚡', name: 'Calculadora de Electricidad', description: 'Ley de Ohm, potencia y consumo doméstico para obtener la corriente de partida' },
-    { url: '/simulador-circuitos-electricos/', icon: '🔌', name: 'Circuitos Eléctricos', description: 'La teoría de circuitos detrás de la resistencia del conductor' },
+    { url: '/calculadora-frigorias-btu/', icon: '❄️', name: 'Frigorías y BTU', description: 'Qué potencia pide el equipo de climatización antes de tirarle la línea' },
     { url: '/calculadora-resistencias-led/', icon: '💡', name: 'Resistencias para LED', description: 'El mismo cálculo de caídas, en la escala de la electrónica' },
     { url: '/visualizador-electricidad-domestica/', icon: '🏠', name: 'Electricidad Doméstica', description: 'Cómo se reparte la instalación de una vivienda por circuitos' },
+  ],
+  'calculadora-frigorias-btu': [
+    { url: '/selector-calefaccion/', icon: '🏠', name: 'Selector de Calefacción', description: 'Ya sabes cuántos kW: qué sistema conviene para darlos' },
+    { url: '/calculadora-seccion-cable/', icon: '🔌', name: 'Sección de Cable', description: 'Qué sección en mm² necesita la línea que alimentará el equipo' },
+    { url: '/calculadora-electricidad/', icon: '⚡', name: 'Calculadora de Electricidad', description: 'Del consumo en kW a lo que supone en la factura' },
+    { url: '/estimacion-certificacion-energetica/', icon: '📗', name: 'Certificación Energética', description: 'El aislamiento que aquí eliges a ojo, estimado con más detalle' },
   ],
   'simulador-campo-magnetico': [
     { url: '/simulador-campo-electrico/', icon: '⚡', name: 'Campo Eléctrico', description: 'El campo hermano: cargas en reposo frente a cargas en movimiento' },

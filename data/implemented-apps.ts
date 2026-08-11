@@ -1324,6 +1324,7 @@ export const implementedAppsUrls = [
   "/simulador-campo-magnetico/",       // Lorentz + trayectoria circular, campo de hilo/espira/solenoide, inducción Faraday-Lenz con gráfica
   "/simulador-orbitas-kepler/",        // Periodo, velocidades vis-viva, escape y energía; elipse animada por la 2ª ley de Kepler
   "/calculadora-seccion-cable/",       // Sección en mm² y caída de tensión de una línea mono/trifásica, cobre o aluminio
+  "/calculadora-frigorias-btu/",       // Frigorías, BTU y vatios de frío y calor por volumen, aislamiento, sol, cristal y cargas internas
   "/tabla-grupos-funcionales/",        // 31 grupos con IUPAC, diagrama y orden de prioridad ordenable
   "/tabla-potenciales-redox/",         // 69 semirreacciones E°, serie de actividad y constructor de pilas galvánicas
   "/tabla-ka-kb/",                     // 64 entradas Ka/Kb/pKa/pKb + calculadora de pH y de disolución reguladora

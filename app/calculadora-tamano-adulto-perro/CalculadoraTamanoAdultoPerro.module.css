@@ -860,7 +860,188 @@
   }
 }
 
+/* ===== Trayectoria de crecimiento ===== */
+.curvaContainer {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 30px;
+}
+
+.curvaContainer h2 {
+  font-size: 1.4rem;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.curvaIntro {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.graficoWrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.grafico {
+  width: 100%;
+  min-width: 420px;
+  height: auto;
+  display: block;
+}
+
+.gridLine {
+  stroke: var(--border);
+  stroke-width: 1;
+  opacity: 0.55;
+}
+
+.ejeTexto {
+  fill: var(--text-muted);
+  font-size: 11px;
+}
+
+.ejeTitulo {
+  fill: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.banda {
+  fill: var(--primary);
+  opacity: 0.14;
+}
+
+.lineaCurva {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.lineaAdulto {
+  stroke: var(--secondary);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+  opacity: 0.9;
+}
+
+.etiquetaAdulto {
+  fill: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.puntoHito {
+  fill: var(--primary);
+  stroke: var(--bg-card);
+  stroke-width: 2;
+}
+
+.puntoCachorro {
+  fill: var(--hero-bg);
+  stroke: var(--bg-card);
+  stroke-width: 2.5;
+}
+
+.etiquetaCachorro {
+  fill: var(--text-primary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.tablaHitosWrap {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 18px;
+}
+
+.tablaHitos {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.tablaCaption {
+  text-align: left;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  padding-bottom: 8px;
+}
+
+.tablaHitos th,
+.tablaHitos td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.tablaHitos thead th {
+  color: var(--text-primary);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tablaHitos tbody th {
+  color: var(--text-primary);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.filaActual {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.filaActual th,
+.filaActual td {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.coherenciaOk,
+.coherenciaAviso {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.coherenciaOk {
+  background: rgba(72, 169, 166, 0.12);
+  border-left: 4px solid var(--secondary);
+  color: var(--text-secondary);
+}
+
+.coherenciaAviso {
+  background: rgba(245, 158, 11, 0.12);
+  border-left: 4px solid #F59E0B;
+  color: var(--text-secondary);
+}
+
 /* Dark Mode */
+[data-theme='dark'] .curvaContainer {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .filaActual {
+  background: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .coherenciaOk {
+  background: rgba(72, 169, 166, 0.18);
+}
+
+[data-theme='dark'] .coherenciaAviso {
+  background: rgba(245, 158, 11, 0.18);
+}
+
 [data-theme='dark'] .inputPanel,
 [data-theme='dark'] .resultsPanel,
 [data-theme='dark'] .razasContainer {

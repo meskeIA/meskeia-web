@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import styles from './CalculadoraTamanoAdultoPerro.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
@@ -69,6 +69,76 @@ const curvasCrecimiento: Record<TamanoRaza, Record<number, number>> = {
   },
 };
 
+// Peso adulto típico de cada categoría, en kg. Sirve para contrastar la proyección
+// con la categoría elegida: la estimación sale del propio peso del cachorro, así que
+// sin una referencia externa como esta el resultado nunca se puede contradecir.
+const rangosTipicos: Record<TamanoRaza, { min: number; max: number; etiqueta: string }> = {
+  mini: { min: 1, max: 5, etiqueta: 'menos de 5 kg' },
+  pequeno: { min: 5, max: 10, etiqueta: '5-10 kg' },
+  mediano: { min: 10, max: 25, etiqueta: '10-25 kg' },
+  grande: { min: 25, max: 45, etiqueta: '25-45 kg' },
+  gigante: { min: 45, max: 100, etiqueta: 'más de 45 kg' },
+};
+
+// Hitos que se etiquetan en la curva y en la tabla, en meses
+const hitosMeses = [2, 3, 4, 6, 9, 12, 18, 24, 36];
+
+const etiquetasTamano: Record<TamanoRaza, string> = {
+  mini: 'Mini',
+  pequeno: 'Pequeño',
+  mediano: 'Mediano',
+  grande: 'Grande',
+  gigante: 'Gigante',
+};
+
+const obtenerPorcentajeCrecimiento = (edad: number, tamano: TamanoRaza): number => {
+  const curva = curvasCrecimiento[tamano];
+  const edades = Object.keys(curva).map(Number).sort((a, b) => a - b);
+
+  // Si la edad está por debajo del mínimo
+  if (edad <= edades[0]) {
+    return curva[edades[0]];
+  }
+
+  // Si la edad está por encima del máximo
+  if (edad >= edades[edades.length - 1]) {
+    return 1.0;
+  }
+
+  // Interpolación lineal entre los dos puntos más cercanos
+  for (let i = 0; i < edades.length - 1; i++) {
+    if (edad >= edades[i] && edad < edades[i + 1]) {
+      const x0 = edades[i];
+      const x1 = edades[i + 1];
+      const y0 = curva[x0];
+      const y1 = curva[x1];
+      return y0 + (y1 - y0) * ((edad - x0) / (x1 - x0));
+    }
+  }
+
+  return 1.0;
+};
+
+// Semana en la que la curva del tamaño llega al 100 % (fin del crecimiento)
+const semanaMadurez = (tamano: TamanoRaza): number => {
+  const edades = Object.keys(curvasCrecimiento[tamano]).map(Number).sort((a, b) => a - b);
+  return edades[edades.length - 1];
+};
+
+interface PuntoCurva {
+  semanas: number;
+  meses: number;
+  peso: number;
+  porcentaje: number;
+}
+
+// Geometría del gráfico (viewBox fijo: el SVG escala con el ancho disponible)
+const VB_W = 640;
+const VB_H = 260;
+const M = { top: 18, right: 20, bottom: 38, left: 52 };
+const plotW = VB_W - M.left - M.right;
+const plotH = VB_H - M.top - M.bottom;
+
 export default function CalculadoraTamanoAdultoPerroPage() {
   const [pesoActual, setPesoActual] = useState('');
   const [edadSemanas, setEdadSemanas] = useState('');
@@ -81,35 +151,10 @@ export default function CalculadoraTamanoAdultoPerroPage() {
     pesoAdultoEstimado: number;
     porcentajeCrecimiento: number;
     edadMaduracion: string;
+    tamano: TamanoRaza;
+    edad: number;
+    peso: number;
   } | null>(null);
-
-  const obtenerPorcentajeCrecimiento = (edad: number, tamano: TamanoRaza): number => {
-    const curva = curvasCrecimiento[tamano];
-    const edades = Object.keys(curva).map(Number).sort((a, b) => a - b);
-
-    // Si la edad está por debajo del mínimo
-    if (edad <= edades[0]) {
-      return curva[edades[0]];
-    }
-
-    // Si la edad está por encima del máximo
-    if (edad >= edades[edades.length - 1]) {
-      return 1.0;
-    }
-
-    // Interpolación lineal entre los dos puntos más cercanos
-    for (let i = 0; i < edades.length - 1; i++) {
-      if (edad >= edades[i] && edad < edades[i + 1]) {
-        const x0 = edades[i];
-        const x1 = edades[i + 1];
-        const y0 = curva[x0];
-        const y1 = curva[x1];
-        return y0 + (y1 - y0) * ((edad - x0) / (x1 - x0));
-      }
-    }
-
-    return 1.0;
-  };
 
   const calcular = () => {
     const peso = parseFloat(pesoActual.replace(',', '.'));
@@ -151,6 +196,9 @@ export default function CalculadoraTamanoAdultoPerroPage() {
       pesoAdultoEstimado: pesoEstimado,
       porcentajeCrecimiento: porcentaje * 100,
       edadMaduracion: edadesMaduracion[tamanoRaza],
+      tamano: tamanoRaza,
+      edad,
+      peso,
     });
   };
 
@@ -164,6 +212,69 @@ export default function CalculadoraTamanoAdultoPerroPage() {
   const razasFiltradas = filtroRaza === 'todas'
     ? razasReferencia
     : razasReferencia.filter(r => r.tamano === filtroRaza);
+
+  // Trayectoria de crecimiento: la misma curva que ya usa el cálculo, pero recorrida
+  // entera en vez de en un solo punto. Responde "¿cuánto pesará por el camino?" dentro
+  // de la propia consulta, sin pedir al usuario que vuelva a pesar y anotar.
+  const curva = useMemo(() => {
+    if (!resultado) return null;
+
+    const finSemanas = semanaMadurez(resultado.tamano);
+    const puntos: PuntoCurva[] = [];
+    const paso = finSemanas / 60;
+    for (let s = 4; s <= finSemanas + 0.001; s += paso) {
+      const pct = obtenerPorcentajeCrecimiento(s, resultado.tamano);
+      puntos.push({ semanas: s, meses: s / 4.33, peso: resultado.pesoAdultoEstimado * pct, porcentaje: pct });
+    }
+
+    const hitos: PuntoCurva[] = hitosMeses
+      .map((m) => m * 4.33)
+      .filter((s) => s >= 4 && s <= finSemanas)
+      .map((s) => {
+        const pct = obtenerPorcentajeCrecimiento(s, resultado.tamano);
+        return { semanas: s, meses: s / 4.33, peso: resultado.pesoAdultoEstimado * pct, porcentaje: pct };
+      });
+
+    // Contraste con el peso adulto típico de la categoría elegida
+    const rango = rangosTipicos[resultado.tamano];
+    const coherencia: 'dentro' | 'porEncima' | 'porDebajo' =
+      resultado.pesoAdultoEstimado > rango.max ? 'porEncima'
+        : resultado.pesoAdultoEstimado < rango.min ? 'porDebajo'
+          : 'dentro';
+
+    return { puntos, hitos, finSemanas, rango, coherencia };
+  }, [resultado]);
+
+  const grafico = useMemo(() => {
+    if (!resultado || !curva) return null;
+
+    const yMax = resultado.pesoAdultoEstimado * 1.15;
+    const escalaX = (s: number) => M.left + ((s - 4) / (curva.finSemanas - 4)) * plotW;
+    const escalaY = (kg: number) => M.top + plotH - (kg / yMax) * plotH;
+
+    const linea = curva.puntos
+      .map((p, i) => `${i === 0 ? 'M' : 'L'}${escalaX(p.semanas).toFixed(1)},${escalaY(p.peso).toFixed(1)}`)
+      .join(' ');
+
+    // Banda de incertidumbre: el mismo ±15 % que ya declara el rango probable
+    const banda = [
+      ...curva.puntos.map((p, i) => `${i === 0 ? 'M' : 'L'}${escalaX(p.semanas).toFixed(1)},${escalaY(p.peso * 1.15).toFixed(1)}`),
+      ...[...curva.puntos].reverse().map((p) => `L${escalaX(p.semanas).toFixed(1)},${escalaY(p.peso * 0.85).toFixed(1)}`),
+      'Z',
+    ].join(' ');
+
+    const ticksY = [0, 0.25, 0.5, 0.75, 1].map((f) => ({ kg: yMax * f, y: escalaY(yMax * f) }));
+
+    return {
+      linea,
+      banda,
+      ticksY,
+      yAdulto: escalaY(resultado.pesoAdultoEstimado),
+      cachorro: { x: escalaX(Math.min(resultado.edad, curva.finSemanas)), y: escalaY(resultado.peso) },
+      escalaX,
+      escalaY,
+    };
+  }, [resultado, curva]);
 
   return (
     <div className={styles.container}>
@@ -243,17 +354,17 @@ export default function CalculadoraTamanoAdultoPerroPage() {
           </div>
 
           <div className={styles.botones}>
-            <button onClick={calcular} className={styles.btnPrimary}>
+            <button type="button" onClick={calcular} className={styles.btnPrimary}>
               Calcular Peso Adulto
             </button>
-            <button onClick={limpiar} className={styles.btnSecondary}>
+            <button type="button" onClick={limpiar} className={styles.btnSecondary}>
               Limpiar
             </button>
           </div>
 
           {error && (
             <p className={styles.errorMsg} role="alert">
-              ⚠️ {error}
+              <span aria-hidden="true">⚠️</span> {error}
             </p>
           )}
         </div>
@@ -317,6 +428,155 @@ export default function CalculadoraTamanoAdultoPerroPage() {
           )}
         </div>
       </div>
+
+      {/* Trayectoria de crecimiento */}
+      {resultado && curva && grafico && (
+        <section className={styles.curvaContainer} aria-labelledby="tituloCurva">
+          <h2 id="tituloCurva">
+            <span aria-hidden="true">📈</span> Cuánto pesará por el camino
+          </h2>
+          <p className={styles.curvaIntro}>
+            Peso esperado de un perro de tamaño <strong>{etiquetasTamano[resultado.tamano].toLowerCase()}</strong> desde
+            las 4 semanas hasta que deja de crecer, partiendo de los {formatNumber(resultado.pesoAdultoEstimado, 1)} kg
+            adultos estimados. La banda alrededor de la línea es el mismo margen de ±15 % del rango probable.
+          </p>
+
+          <div className={styles.graficoWrap}>
+            <svg
+              viewBox={`0 0 ${VB_W} ${VB_H}`}
+              className={styles.grafico}
+              role="img"
+              aria-label={`Curva de crecimiento: de ${formatNumber(curva.puntos[0].peso, 1)} kg a las 4 semanas hasta ${formatNumber(resultado.pesoAdultoEstimado, 1)} kg a los ${formatNumber(curva.finSemanas / 4.33, 0)} meses. Los valores exactos están en la tabla siguiente.`}
+            >
+              {/* Retícula horizontal, deliberadamente tenue */}
+              {grafico.ticksY.map((t) => (
+                <g key={t.kg}>
+                  <line
+                    x1={M.left}
+                    x2={VB_W - M.right}
+                    y1={t.y}
+                    y2={t.y}
+                    className={styles.gridLine}
+                  />
+                  <text x={M.left - 8} y={t.y + 4} textAnchor="end" className={styles.ejeTexto}>
+                    {formatNumber(t.kg, t.kg < 10 ? 1 : 0)}
+                  </text>
+                </g>
+              ))}
+              <text
+                x={14}
+                y={M.top + plotH / 2}
+                textAnchor="middle"
+                className={styles.ejeTitulo}
+                transform={`rotate(-90 14 ${M.top + plotH / 2})`}
+              >
+                kg
+              </text>
+
+              {/* Banda de incertidumbre ±15 % */}
+              <path d={grafico.banda} className={styles.banda} />
+
+              {/* Peso adulto estimado */}
+              <line
+                x1={M.left}
+                x2={VB_W - M.right}
+                y1={grafico.yAdulto}
+                y2={grafico.yAdulto}
+                className={styles.lineaAdulto}
+              />
+              <text x={VB_W - M.right} y={grafico.yAdulto - 7} textAnchor="end" className={styles.etiquetaAdulto}>
+                adulto ≈ {formatNumber(resultado.pesoAdultoEstimado, 1)} kg
+              </text>
+
+              {/* Curva */}
+              <path d={grafico.linea} className={styles.lineaCurva} />
+
+              {/* Hitos: eje X en meses */}
+              {curva.hitos.map((h) => (
+                <g key={h.semanas}>
+                  <circle
+                    cx={grafico.escalaX(h.semanas)}
+                    cy={grafico.escalaY(h.peso)}
+                    r={4.5}
+                    className={styles.puntoHito}
+                  >
+                    <title>
+                      {formatNumber(h.meses, 0)} meses: {formatNumber(h.peso, 1)} kg (
+                      {formatNumber(h.porcentaje * 100, 0)} % de su peso adulto)
+                    </title>
+                  </circle>
+                  <text
+                    x={grafico.escalaX(h.semanas)}
+                    y={VB_H - M.bottom + 18}
+                    textAnchor="middle"
+                    className={styles.ejeTexto}
+                  >
+                    {formatNumber(h.meses, 0)}
+                  </text>
+                </g>
+              ))}
+              <text x={VB_W - M.right} y={VB_H - 6} textAnchor="end" className={styles.ejeTitulo}>
+                meses
+              </text>
+
+              {/* Tu cachorro, con anillo del color de la superficie para despegarlo de la línea */}
+              <circle cx={grafico.cachorro.x} cy={grafico.cachorro.y} r={7} className={styles.puntoCachorro}>
+                <title>
+                  Tu cachorro: {formatNumber(resultado.peso, 1)} kg a las {formatNumber(resultado.edad, 0)} semanas
+                </title>
+              </circle>
+              <text
+                x={grafico.cachorro.x + (grafico.cachorro.x > VB_W * 0.65 ? -12 : 12)}
+                y={grafico.cachorro.y - 12}
+                textAnchor={grafico.cachorro.x > VB_W * 0.65 ? 'end' : 'start'}
+                className={styles.etiquetaCachorro}
+              >
+                Tu cachorro · {formatNumber(resultado.peso, 1)} kg
+              </text>
+            </svg>
+          </div>
+
+          {/* La misma información en tabla: es la vista accesible del gráfico */}
+          <div className={styles.tablaHitosWrap}>
+            <table className={styles.tablaHitos}>
+              <caption className={styles.tablaCaption}>Peso esperado en cada hito</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Edad</th>
+                  <th scope="col">Peso esperado</th>
+                  <th scope="col">% del adulto</th>
+                </tr>
+              </thead>
+              <tbody>
+                {curva.hitos.map((h) => (
+                  <tr key={h.semanas} className={Math.abs(h.semanas - resultado.edad) < 2.2 ? styles.filaActual : undefined}>
+                    <th scope="row">{formatNumber(h.meses, 0)} meses</th>
+                    <td>{formatNumber(h.peso, 1)} kg</td>
+                    <td>{formatNumber(h.porcentaje * 100, 0)} %</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Contraste con el peso típico de la categoría elegida */}
+          {curva.coherencia === 'dentro' ? (
+            <p className={styles.coherenciaOk}>
+              <span aria-hidden="true">✅</span> La proyección encaja con la categoría{' '}
+              <strong>{etiquetasTamano[resultado.tamano].toLowerCase()}</strong>, cuyo peso adulto habitual es{' '}
+              {curva.rango.etiqueta}.
+            </p>
+          ) : (
+            <p className={styles.coherenciaAviso} role="status">
+              <span aria-hidden="true">⚠️</span> La proyección ({formatNumber(resultado.pesoAdultoEstimado, 1)} kg) queda{' '}
+              {curva.coherencia === 'porEncima' ? 'por encima' : 'por debajo'} del peso adulto habitual de la categoría{' '}
+              <strong>{etiquetasTamano[resultado.tamano].toLowerCase()}</strong> ({curva.rango.etiqueta}). Suele
+              significar que la categoría elegida no es la que corresponde a la raza —prueba con la de al lado—; si estás
+              seguro de ella, coméntalo en la siguiente revisión veterinaria.
+            </p>
+          )}
+        </section>
+      )}
 
       {/* Tabla de razas */}
       <div className={styles.razasContainer}>
