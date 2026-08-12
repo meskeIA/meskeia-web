@@ -316,6 +316,17 @@ es el informe.
 3. Si una fuente no responde o el resultado es ambiguo, se reporta la duda — nunca se rellena con suposición.
 4. El informe termina siempre con: módulos NO revisados en esta pasada (transparencia de cobertura).
 5. Los sellos `verificado` de cada módulo indican la línea base: solo interesa lo publicado DESPUÉS de esa fecha.
+6. **Un N3 sobre un régimen de la lista 5.bis no se escala**: se menciona en una línea y se cierra citando esta sección. Sin esto, un anexo que se actualiza dos veces al año obliga a re-decidir lo mismo cada mes.
+
+### 5.bis Regímenes DESCARTADOS del universo (no volver a proponerlos)
+
+Un N3 propone dar de alta un régimen que hoy no existe en `data/fiscal/`. Cuando la respuesta es que
+**no entra**, se anota aquí con su motivo. La decisión se revisa solo si cambia el motivo, no cada vez
+que la norma se actualiza.
+
+| Régimen | Descartado | Motivo |
+|---|---|---|
+| **Jubilación anticipada por discapacidad ≥45%** (RD 1851/2009, anexo de patologías) | 2026-08-12 | Lo que aportaría es **una lista de patologías**, no un cálculo: la pregunta que resuelve («¿está mi enfermedad en el anexo?») es consulta de tabla, y la respuesta autorizada la da el INSS con dictamen del EVI. El anexo se ha actualizado dos veces en pocos meses (la última, RD 632/2026), así que sería mantenimiento alto con caducidad silenciosa. Y el resultado sería un **veredicto binario sobre la persona** sobre una lista que cambia por RD. Ninguna app del catálogo lo roza hoy: verificado que las 10 apps de jubilación no mencionan discapacidad y las 5 de discapacidad/dependencia no mencionan jubilación, así que no hay deuda que cerrar — solo un borde, resuelto con una advertencia en el bloque educativo de `simulador-jubilacion-publica`. |
 
 ---
 

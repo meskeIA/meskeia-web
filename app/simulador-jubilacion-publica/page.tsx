@@ -880,7 +880,7 @@ export default function SimuladorJubilacionPublicaPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👩‍💼</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👩‍💼</span>
                 <strong>Empleada con carrera completa</strong>
               </div>
               <p className={styles.escenarioExample}>Ana, 62 años, 38 años cotizados, base 2.200 €/mes.</p>
@@ -888,7 +888,7 @@ export default function SimuladorJubilacionPublicaPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👨‍🔧</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👨‍🔧</span>
                 <strong>Autónomo con carrera irregular</strong>
               </div>
               <p className={styles.escenarioExample}>Carlos, 64 años, 28 años cotizados. Bases bajas al principio.</p>
@@ -896,7 +896,7 @@ export default function SimuladorJubilacionPublicaPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👷</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👷</span>
                 <strong>Trabajador que quiere anticipar</strong>
               </div>
               <p className={styles.escenarioExample}>Pedro, 63 años, 36 cotizados. Quiere jubilarse 2 años antes.</p>
@@ -904,7 +904,7 @@ export default function SimuladorJubilacionPublicaPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>⚖️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">⚖️</span>
                 <strong>Persona que prefiere transición gradual</strong>
               </div>
               <p className={styles.escenarioExample}>María, 62 años, 35 cotizados. Quiere reducir jornada al 50%.</p>
@@ -925,7 +925,7 @@ export default function SimuladorJubilacionPublicaPage() {
             </li>
             <li className={styles.faqItem}>
               <strong>¿Puedo jubilarme antes de la edad ordinaria?</strong>
-              <p>Sí: anticipada voluntaria (hasta 2 años antes, 35+ años cotizados) o involuntaria (hasta 4 años, 33+ cotizados). Ambas implican coeficientes reductores permanentes.</p>
+              <p>Sí: anticipada voluntaria (hasta 2 años antes, 35+ años cotizados) o involuntaria (hasta 4 años, 33+ cotizados). Ambas implican coeficientes reductores permanentes. Existe una tercera vía, la jubilación anticipada por discapacidad, con un régimen propio y coeficientes distintos que esta herramienta no cubre: si es tu caso, consúltalo en el INSS.</p>
             </li>
             <li className={styles.faqItem}>
               <strong>¿La reducción por anticipada es permanente?</strong>
@@ -994,32 +994,32 @@ export default function SimuladorJubilacionPublicaPage() {
 
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipCardIcon}>📋</span>
+              <span className={styles.tipCardIcon} aria-hidden="true">📋</span>
               <strong>Revisa la vida laboral cada año</strong>
               <p>Un año no cotizado mal registrado puede costar 1-2% de pensión vitalicia.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipCardIcon}>📅</span>
+              <span className={styles.tipCardIcon} aria-hidden="true">📅</span>
               <strong>Planifica con 10 años</strong>
               <p>A los 55 ya puedes proyectar tu pensión con precisión y ajustar estrategias.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipCardIcon}>💡</span>
+              <span className={styles.tipCardIcon} aria-hidden="true">💡</span>
               <strong>Maximiza bases finales</strong>
               <p>Los últimos 25 años definen tu base reguladora. Prioriza cotizar alto al final.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipCardIcon}>⚖️</span>
+              <span className={styles.tipCardIcon} aria-hidden="true">⚖️</span>
               <strong>Evalúa el break-even</strong>
               <p>Si anticipas 2 años, necesitas ~15-20 años para compensar la reducción.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipCardIcon}>🔍</span>
+              <span className={styles.tipCardIcon} aria-hidden="true">🔍</span>
               <strong>Convenios internacionales</strong>
               <p>Períodos cotizados en países con convenio bilateral pueden sumarse.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipCardIcon}>📊</span>
+              <span className={styles.tipCardIcon} aria-hidden="true">📊</span>
               <strong>Simulador oficial de la SS</strong>
               <p>Ofrece estimaciones personalizadas más precisas con tu historial real.</p>
             </div>
@@ -1027,7 +1027,7 @@ export default function SimuladorJubilacionPublicaPage() {
 
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <strong>Errores frecuentes al planificar la jubilación</strong>
             </div>
             <ul className={styles.warningList}>
