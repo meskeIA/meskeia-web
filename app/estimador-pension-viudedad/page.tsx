@@ -7,7 +7,7 @@ import { MeskeiaLogo, LegalNotice, Footer, NumberInput, EducationalSection, Rela
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { PENSION_VIUDEDAD_2026 } from '@/data/fiscal/pensiones';
+import { PENSION_VIUDEDAD_2026, minimoViudedad2026 } from '@/data/fiscal/pensiones';
 import { FISCAL_PENSIONES_META } from '@/data/fiscal';
 
 // Alias corto para legibilidad interna
@@ -88,17 +88,12 @@ function calcularPension(form: FormData): Resultado | null {
 
   const pensionBruta = (baseReguladora * porcentajeAplicable) / 100;
 
-  // Pensión mínima según edad y cargas
-  let pensionMinima: number;
-  if (edad >= 65) {
-    pensionMinima = PV.minimo65SinDiscap;
-  } else if (edad >= 60) {
-    pensionMinima = PV.minimo60a64;
-  } else if (form.tieneCargas) {
-    pensionMinima = PV.minimoMenor60ConCargas;
-  } else {
-    pensionMinima = PV.minimoMenor60SinCargas;
-  }
+  // Pensión mínima: las cargas familiares mandan sobre el tramo de edad, porque
+  // en el Anexo I del RD 241/2026 «titular con cargas familiares» es una fila
+  // propia y no un subcaso de los menores de 60. Antes se miraba la edad primero,
+  // así que a alguien de 62 años con cargas se le aplicaba el mínimo de su tramo
+  // (875,90 €) en lugar del que le corresponde (1.256,60 €).
+  const pensionMinima = minimoViudedad2026(edad, form.tieneCargas);
 
   const pensionFinal = Math.min(
     Math.max(pensionBruta, pensionMinima),

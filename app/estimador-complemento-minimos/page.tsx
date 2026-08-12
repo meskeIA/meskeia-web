@@ -40,9 +40,11 @@ const SUBTIPOS: Record<TipoPension, { value: string; label: string }[]> = {
     { value: 'total_menos_60', label: 'Total — menos de 60 (enf. común)' },
   ],
   viudedad: [
-    { value: '65_o_mas', label: '65 años o más' },
+    // El orden importa: «con cargas familiares» es fila propia del Anexo I del
+    // RD 241/2026 y prevalece sobre el tramo de edad, sea cual sea esta.
+    { value: 'con_cargas', label: 'Con cargas familiares (cualquier edad)' },
+    { value: '65_o_mas', label: '65 años o más, o discapacidad ≥ 65 %' },
     { value: '60_a_64', label: '60 a 64 años' },
-    { value: 'menos_60_con_cargas', label: 'Menos de 60 — con cargas familiares' },
     { value: 'menos_60_sin_cargas', label: 'Menos de 60 — sin cargas familiares' },
   ],
 };

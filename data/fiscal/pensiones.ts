@@ -14,8 +14,8 @@
 import { SMI_2026 } from './smi';
 
 export const FISCAL_PENSIONES_META = {
-  fuente: 'LGSS (RDL 8/2015) + Ley 21/2021 de Reforma de Pensiones + RDL 16/2025 (prórroga)',
-  verificado: '2026-03-16',
+  fuente: 'LGSS (RDL 8/2015) + Ley 21/2021 de Reforma de Pensiones + RD 241/2026 (revalorización y cuantías mínimas 2026)',
+  verificado: '2026-08-12',
   vigencia: '2026',
   urlOficial: 'https://www.seg-social.es/wps/portal/wss/internet/Pensionistas',
   nota: 'Las cifras son orientativas. La SS calcula la pensión real a partir de tu historial completo de cotización. Consulta tu vida laboral en la Sede Electrónica de la SS.',
@@ -281,10 +281,53 @@ export function edadMinimaJubilacionParcial(anio: number, anosCotizados: number)
   return ordinaria - REQUISITOS_JUBILACION_PARCIAL.anticipacionMaximaAnios;
 }
 
+// ─── Cuantías mínimas de VIUDEDAD 2026 (fuente única) ────────────────────────
+//
+// Anexo I del Real Decreto 241/2026, de 25 de marzo (BOE-A-2026-6977), tomado
+// literalmente en euros/AÑO; el importe mensual sale de dividir entre 14 pagas.
+//
+// ⚠️ 2026-08-12: estas cifras estaban MAL en los dos sitios donde vivían, y con
+//    desviaciones grandes —la de menores de 60 con cargas iba 471,60 €/mes por
+//    debajo del mínimo legal—. Se detectó al contrastar el módulo contra el
+//    texto del Anexo I en la auditoría de arranque. Por eso ahora hay una sola
+//    fuente: los importes vivían duplicados en PENSION_VIUDEDAD_2026 y en
+//    PENSIONES_MINIMAS_2026, y esa duplicación es lo que les permitió divergir.
+//
+// OJO al leer el Anexo: «titular con cargas familiares» es una fila propia que
+// aplica a CUALQUIER edad y prevalece sobre el tramo de edad; y «65 años o
+// discapacidad ≥65 %» comparten una única cuantía, no son dos.
+
+const VIUDEDAD_ANUAL_2026 = {
+  conCargasFamiliares:     17592.40,
+  desde65oDiscapacidad65:  13106.80,
+  entre60y64:              12262.60,
+  menor60:                  9931.60,
+} as const;
+
+const mensual14 = (anual: number): number => Math.round((anual / 14) * 100) / 100;
+
+export const MINIMOS_VIUDEDAD_2026 = {
+  conCargasFamiliares:    mensual14(VIUDEDAD_ANUAL_2026.conCargasFamiliares),    // 1.256,60 €/mes
+  desde65oDiscapacidad65: mensual14(VIUDEDAD_ANUAL_2026.desde65oDiscapacidad65), //   936,20 €/mes
+  entre60y64:             mensual14(VIUDEDAD_ANUAL_2026.entre60y64),             //   875,90 €/mes
+  menor60:                mensual14(VIUDEDAD_ANUAL_2026.menor60),                //   709,40 €/mes
+};
+
+/**
+ * Cuantía mínima de viudedad que corresponde a un caso concreto.
+ * Las cargas familiares mandan sobre la edad (Anexo I del RD 241/2026).
+ */
+export function minimoViudedad2026(edad: number, tieneCargasFamiliares: boolean, discapacidad65 = false): number {
+  if (tieneCargasFamiliares) return MINIMOS_VIUDEDAD_2026.conCargasFamiliares;
+  if (edad >= 65 || discapacidad65) return MINIMOS_VIUDEDAD_2026.desde65oDiscapacidad65;
+  if (edad >= 60) return MINIMOS_VIUDEDAD_2026.entre60y64;
+  return MINIMOS_VIUDEDAD_2026.menor60;
+}
+
 // ─── Pensión de Viudedad: datos normativos 2026 ───────────────────────────────
-// Fuente: LGSS arts. 219-231 (RDL 8/2015) + Resolución INSS pensiones mínimas 2026
-// Revalorización 2026: +2,8% IPC respecto a 2025
-// Verificado: 2026-06-11
+// Fuente: LGSS arts. 219-231 (RDL 8/2015) + RD 241/2026 (cuantías mínimas)
+// Revalorización 2026: +2,7 % (art. 6 del RD 241/2026)
+// Verificado: 2026-08-12
 // SMI 2026: 1.221 €/mes (RD 126/2026) — ver data/fiscal/smi.ts
 
 export const PENSION_VIUDEDAD_2026 = {
@@ -297,13 +340,13 @@ export const PENSION_VIUDEDAD_2026 = {
   smiMensual:            SMI_2026.mensual14, // 1.221 €
   limiteIngresos70:      Math.round(SMI_2026.mensual14 * 0.75), // 916 € = 75% del SMI 2026
 
-  // Pensiones mínimas garantizadas 2026 (brutas/mes, 14 pagas)
-  // Revalorizadas +2,8% IPC respecto a valores 2025
-  minimoMenor60SinCargas:   583,  // 2025: 567 € → +2,8% ≈ 583 €
-  minimoMenor60ConCargas:   785,  // 2025: 763 € → +2,8% ≈ 785 €
-  minimo60a64:              769,  // 2025: 748 € → +2,8% ≈ 769 €
-  minimo65SinDiscap:        853,  // 2025: 830 € → +2,8% ≈ 853 €
-  minimo65ConDiscap65:     1079,  // 2025: 1.050 € → +2,8% ≈ 1.079 €
+  // Mínimos 2026: derivados de MINIMOS_VIUDEDAD_2026, nunca escritos a mano.
+  // «Con cargas» no depende de la edad, pese al nombre heredado del campo.
+  minimoMenor60SinCargas: MINIMOS_VIUDEDAD_2026.menor60,
+  minimoMenor60ConCargas: MINIMOS_VIUDEDAD_2026.conCargasFamiliares,
+  minimo60a64:            MINIMOS_VIUDEDAD_2026.entre60y64,
+  minimo65SinDiscap:      MINIMOS_VIUDEDAD_2026.desde65oDiscapacidad65,
+  minimo65ConDiscap65:    MINIMOS_VIUDEDAD_2026.desde65oDiscapacidad65,
 
   // Pensión máxima SS 2026 (igual que LIMITES_PENSION_2025.maximaMensual)
   pensionMaxima:          3359.60,
@@ -313,10 +356,16 @@ export const PENSION_VIUDEDAD_2026 = {
 };
 
 // ─── Pensiones mínimas completas 2026 (complemento a mínimos) ───────────────
-// Fuente: LPGE 2026 + Resolución INSS pensiones mínimas 2026
-// Revalorización +2,8% IPC respecto a 2025
-// Importes mensuales en €, 14 pagas/año
-// Verificado: 2026-03-16
+// Fuente: Anexo I del Real Decreto 241/2026, de 25 de marzo (BOE-A-2026-6977)
+// Revalorización general 2026: +2,7 % (art. 6 del mismo RD)
+// Importes mensuales en €, 14 pagas/año — el Anexo los da en €/año
+// Verificado: 2026-08-12
+//
+// ⚠️ 2026-08-12: siete de las once filas no coincidían con el Anexo I. El sello
+//    anterior era del 16/03/2026 y el RD se publicó el 25/03/2026, nueve días
+//    después: ninguna pasada del Vigía Normativo podía verlo, porque su
+//    vigilancia del BOE empieza en julio de 2026. Este es exactamente el caso
+//    para el que existe la auditoría de arranque.
 
 export interface PensionMinimaEntry {
   tipo: 'jubilacion' | 'incapacidad' | 'viudedad';
@@ -333,20 +382,23 @@ export interface PensionMinimaEntry {
 export const PENSIONES_MINIMAS_2026: PensionMinimaEntry[] = [
   // ── Jubilación ──
   { tipo: 'jubilacion', subtipo: '65_o_mas',  label: 'Jubilación ≥ 65 años',  conConyuge: 1256.60, sinConyuge: 888.70, unipersonal: 936.20 },
-  { tipo: 'jubilacion', subtipo: 'menos_65',  label: 'Jubilación < 65 años',   conConyuge: 1031.00, sinConyuge: 832.00, unipersonal: 879.00 },
+  { tipo: 'jubilacion', subtipo: 'menos_65',  label: 'Jubilación < 65 años',   conConyuge: 1256.60, sinConyuge: 827.90, unipersonal: 875.90 },
 
   // ── Incapacidad permanente ──
-  { tipo: 'incapacidad', subtipo: 'gran_invalidez',   label: 'Gran Invalidez',                     conConyuge: 1885.00, sinConyuge: 1333.10, unipersonal: 1404.30 },
+  { tipo: 'incapacidad', subtipo: 'gran_invalidez',   label: 'Gran Invalidez',                     conConyuge: 1884.70, sinConyuge: 1333.00, unipersonal: 1404.30 },
   { tipo: 'incapacidad', subtipo: 'absoluta',          label: 'Incapacidad Permanente Absoluta',    conConyuge: 1256.60, sinConyuge: 888.70,  unipersonal: 936.20 },
   { tipo: 'incapacidad', subtipo: 'total_65_o_mas',    label: 'Total ≥ 65 años',                   conConyuge: 1256.60, sinConyuge: 888.70,  unipersonal: 936.20 },
-  { tipo: 'incapacidad', subtipo: 'total_60_64',       label: 'Total 60-64 años',                  conConyuge: 1031.00, sinConyuge: 832.00,  unipersonal: 879.00 },
-  { tipo: 'incapacidad', subtipo: 'total_menos_60',    label: 'Total < 60 años (enf. común)',       conConyuge: 786.00,  sinConyuge: 635.00,  unipersonal: 671.00 },
+  { tipo: 'incapacidad', subtipo: 'total_60_64',       label: 'Total 60-64 años',                  conConyuge: 1256.60, sinConyuge: 827.90,  unipersonal: 875.90 },
+  { tipo: 'incapacidad', subtipo: 'total_menos_60',    label: 'Total < 60 años (enf. común)',       conConyuge: 690.20,  sinConyuge: 684.30,  unipersonal: 690.20 },
 
-  // ── Viudedad (no tiene "con/sin cónyuge" — se usa solo unipersonal) ──
-  { tipo: 'viudedad', subtipo: '65_o_mas',             label: 'Viudedad ≥ 65 años',                conConyuge: 0, sinConyuge: 0, unipersonal: 853.00 },
-  { tipo: 'viudedad', subtipo: '60_a_64',              label: 'Viudedad 60-64 años',               conConyuge: 0, sinConyuge: 0, unipersonal: 769.00 },
-  { tipo: 'viudedad', subtipo: 'menos_60_con_cargas',  label: 'Viudedad < 60 con cargas familiares', conConyuge: 0, sinConyuge: 0, unipersonal: 785.00 },
-  { tipo: 'viudedad', subtipo: 'menos_60_sin_cargas',  label: 'Viudedad < 60 sin cargas familiares', conConyuge: 0, sinConyuge: 0, unipersonal: 583.00 },
+  // ── Viudedad ──
+  // El Anexo I da una sola columna para viudedad: se rellena `unipersonal` y se
+  // derivan de MINIMOS_VIUDEDAD_2026 para que no puedan volver a divergir.
+  // «Con cargas familiares» es fila propia del Anexo y NO depende de la edad.
+  { tipo: 'viudedad', subtipo: '65_o_mas',             label: 'Viudedad ≥ 65 años o discapacidad ≥ 65 %', conConyuge: 0, sinConyuge: 0, unipersonal: MINIMOS_VIUDEDAD_2026.desde65oDiscapacidad65 },
+  { tipo: 'viudedad', subtipo: '60_a_64',              label: 'Viudedad 60-64 años',                      conConyuge: 0, sinConyuge: 0, unipersonal: MINIMOS_VIUDEDAD_2026.entre60y64 },
+  { tipo: 'viudedad', subtipo: 'con_cargas',           label: 'Viudedad con cargas familiares (cualquier edad)', conConyuge: 0, sinConyuge: 0, unipersonal: MINIMOS_VIUDEDAD_2026.conCargasFamiliares },
+  { tipo: 'viudedad', subtipo: 'menos_60_sin_cargas',  label: 'Viudedad < 60 sin cargas familiares',      conConyuge: 0, sinConyuge: 0, unipersonal: MINIMOS_VIUDEDAD_2026.menor60 },
 ];
 
 // ── Límites de ingresos para acceder al complemento a mínimos 2026 ──

@@ -24,7 +24,8 @@
     "generate:llm-index": "node scripts/generate-llm-index.js",
     "generate:delegum-es": "node scripts/generate-delegum-es.mjs",
     "generate:mcp-ui": "node scripts/build-mcp-ui.mjs",
-    "analyze": "set ANALYZE=true && npm run build"
+    "analyze": "set ANALYZE=true && npm run build",
+    "check:vigencia": "node scripts/check-vigencia.mjs"
   },
   "dependencies": {
     "@ffmpeg/ffmpeg": "^0.12.15",

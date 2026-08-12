@@ -24,6 +24,12 @@ export interface Novedad {
 export const NOVEDADES: Novedad[] = [
   {
     fecha: '2026-08-12',
+    fichaSlug: 'pensiones-jubilacion',
+    texto:
+      'Corregidas las cuantías mínimas de pensión de 2026 conforme al Anexo I del Real Decreto 241/2026: viudedad con cargas familiares 1.256,60 €/mes (cualquier edad), viudedad desde 65 años o discapacidad ≥65% 936,20 €/mes, entre 60 y 64 años 875,90 €/mes y por debajo de 60 sin cargas 709,40 €/mes. La revalorización general de 2026 es del 2,7% (Real Decreto 241/2026, de 25 de marzo, BOE-A-2026-6977).',
+  },
+  {
+    fecha: '2026-08-12',
     fichaSlug: 'sucesiones-isd',
     texto:
       'Madrid aprueba una reducción del 99% en la base imponible por transmisión de empresa individual, negocio profesional o participaciones, extendida a los Grupos I, II y III y a colaterales de cuarto grado, con permanencia de 5 años y participación mínima del 5% individual o 20% del grupo familiar. Es una reducción en base, distinta de la bonificación en cuota por parentesco (Ley 3/2026 de la Comunidad de Madrid, BOE-A-2026-16019, en vigor desde el 1 de julio de 2026).',
