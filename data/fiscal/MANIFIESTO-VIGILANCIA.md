@@ -16,6 +16,41 @@
 
 ## 1. Fuentes maestras
 
+### 1.0 Jerarquía de fuentes — qué vale para SELLAR un dato
+
+> **Una cifra solo se sella contra el texto de la norma. Los portales oficiales
+> sirven para encontrarla y para entenderla, nunca para copiarla.**
+
+| Nivel | Fuente | Para qué vale |
+|---|---|---|
+| **1** | Texto publicado en el **BOE** (o boletín autonómico), y el **consolidado** para lo que vive en leyes | **Sellar.** Es la única fuente que fija el dato |
+| **2** | Serie oficial del organismo que la produce, con tabla o API descargable (INE) | **Sellar**, cuando el dato no nace de una norma (índices, estadística) |
+| **3** | Portales divulgativos oficiales: Importass, SEPE, sede AEAT, seg-social.es, IMSERSO | Localizar la norma, entender el concepto, contrastar una duda. **Nunca sellar** |
+| **4** | Notas de prensa, resúmenes, agregadores, prensa especializada | Nada. Ni para orientarse |
+
+**El caso del que sale esta regla (12/08/2026)**: la tabla de tramos de `autonomos.ts`
+se había verificado en junio contra la **guía web de Importass** —fuente oficial de la
+Seguridad Social, pero divulgativa— en lugar de contra la Orden anual de cotización. Al
+contrastarla con el art. 18 de la Orden PJC/297/2026 aparecía una base máxima de 718,95 €
+donde la norma dice 718,94 €. Catorce de las quince filas eran correctas: la única mal era
+la que la fuente primaria contradice.
+
+Lo agrava que **el error de la web ya estaba documentado en el propio módulo**: su nota
+advertía de que Importass mostraba «31,40 %» cuando el desglose daba 31,50 %. Es decir, se
+sabía que esa página arrastraba texto viejo, y aun así se usó para sellar una tabla de
+cifras. Un portal oficial se redacta a mano y se actualiza cuando alguien se acuerda; el BOE
+no.
+
+Mismo día, mismo patrón por otra vía: `COMPLEMENTO_MINIMOS_LIMITES_2026` citaba como fuente
+la «LPGE 2026», **una ley que no existe** —los Presupuestos siguen prorrogados desde los de
+2023—, y sus dos cifras estaban entre 828 y 966 € por debajo de las del RD 241/2026. De ahí
+la regla de trazabilidad que la acompaña:
+
+> **Todo bloque de datos cita su fuente con el identificador que permita abrirla**: `BOE-A-`,
+> número de norma y artículo, o la tabla del organismo. Una fuente que no se puede abrir —un
+> portal genérico, una ley que no existe, «resolución del INSS» sin más— es una señal de que
+> el dato no se comprobó donde debía.
+
 | Fuente | URL | Qué publica | Cadencia |
 |---|---|---|---|
 | BOE — Disposiciones generales (Sección I) | https://www.boe.es/boe/dias/ | Leyes, RD, RDL, Órdenes ministeriales y **leyes autonómicas** (las leyes de medidas fiscales de las CCAA también se publican en el BOE) | Diaria |
