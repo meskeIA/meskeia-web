@@ -5,18 +5,26 @@
  * Datos verificados a la fecha indicada. Pueden haber cambiado.
  * Verifica siempre en la fuente oficial antes de tomar decisiones.
  *
- * Fuente: Real Decreto-ley 13/2022 + tabla 2026 publicada en importass.seg-social.es
- * Verificado: 2026-06-09 (tabla bases 2026 confirmada contra página oficial SS)
- * URL oficial: https://portal.seg-social.gob.es/wps/portal/importass/importass/Colectivos/Trabajo+Autonomo/guia
+ * Fuente: Real Decreto-ley 13/2022 + Orden PJC/297/2026, de 30 de marzo (art. 18)
+ * Verificado: 2026-08-12 (tabla de tramos contrastada contra el texto del BOE)
+ * URL oficial: https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-7296
+ *
+ * ⚠️ 2026-08-12: hasta hoy la tabla se había verificado contra la GUÍA WEB de
+ *    Importass, no contra la norma. Al contrastarla con el art. 18 de la Orden
+ *    apareció una diferencia: la base máxima del tramo 1 de la tabla reducida
+ *    es 718,94 €, no 718,95 € (que es la base MÍNIMA del tramo 2). Un céntimo,
+ *    sin efecto en la cuota redondeada, pero el resto de la tabla —catorce
+ *    filas— coincide exactamente, así que la única cifra que discrepaba era
+ *    precisamente la que no venía de la fuente primaria.
  */
 
 export const FISCAL_AUTONOMOS_META = {
-  fuente: 'Real Decreto-ley 13/2022 + tabla 2026 (importass.seg-social.es)',
+  fuente: 'Real Decreto-ley 13/2022 + Orden PJC/297/2026 (cotización 2026, art. 18)',
   descripcion: 'Sistema de cotización por ingresos reales para autónomos',
-  verificado: '2026-06-09',
+  verificado: '2026-08-12',
   vigencia: '2026',
-  urlOficial: 'https://portal.seg-social.gob.es/wps/portal/importass/importass/Colectivos/Trabajo+Autonomo/guia',
-  nota: 'Tipo 31,50%: CC 28,30% + AT 1,30% + Cese 0,90% + FP 0,10% + MEI 0,90%. La página oficial indica "31,40%" en el encabezado (texto de 2025 no actualizado), pero el desglose de componentes suma 31,50%. Bases mínimas de tramos 3 y 7-15 actualizadas respecto a la tabla 2023.',
+  urlOficial: 'https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-7296',
+  nota: 'Tipo 31,50%: CC 28,30% + AT/EP 1,30% + MEI 0,90% (los tres fijados en el art. 18.2 de la Orden PJC/297/2026) + Cese 0,90% + FP 0,10% (LGSS, no los repite la Orden anual). La guía web de Importass sigue mostrando "31,40%" en su encabezado, texto heredado de 2025: manda la Orden.',
 };
 
 // Tipo de cotización general RETA 2026
@@ -42,7 +50,7 @@ export interface TramoCotizacion {
  */
 export const TRAMOS_RETA_2025: TramoCotizacion[] = [
   // TABLA REDUCIDA (rendimientos < SMI anual)
-  { id: 1,  rendimientoMin: 0,       rendimientoMax: 670,     baseMinima: 653.59,  baseMaxima: 718.95,  cuotaMinima: 205.88, cuotaMaxima: 226.47 },
+  { id: 1,  rendimientoMin: 0,       rendimientoMax: 670,     baseMinima: 653.59,  baseMaxima: 718.94,  cuotaMinima: 205.88, cuotaMaxima: 226.47 },
   { id: 2,  rendimientoMin: 670,     rendimientoMax: 900,     baseMinima: 718.95,  baseMaxima: 900,     cuotaMinima: 226.47, cuotaMaxima: 283.50 },
   { id: 3,  rendimientoMin: 900,     rendimientoMax: 1166.70, baseMinima: 849.67,  baseMaxima: 1166.70, cuotaMinima: 267.65, cuotaMaxima: 367.51 },
   // TABLA GENERAL (rendimientos >= SMI anual)

@@ -403,13 +403,19 @@ export const PENSIONES_MINIMAS_2026: PensionMinimaEntry[] = [
 
 // ── Límites de ingresos para acceder al complemento a mínimos 2026 ──
 // Rentas anuales NO derivadas del trabajo (excluida la propia pensión)
-// Fuente: LPGE 2026
+// Fuente: arts. 9.2 y 10.1.b) del RD 241/2026 (BOE-A-2026-6977)
+//
+// ⚠️ 2026-08-12: estaban en 8.614 € y 10.047 €, entre 828 y 966 € POR DEBAJO de
+//    los límites reales, así que el estimador denegaba el complemento a quien sí
+//    tenía derecho. La cita anterior era «LPGE 2026», una ley que no existe: los
+//    Presupuestos siguen prorrogados desde los de 2023 —por eso el IPREM lleva
+//    congelado desde 2022— y quien fija estos límites es el RD de revalorización.
 
 export const COMPLEMENTO_MINIMOS_LIMITES_2026 = {
-  /** Sin cónyuge a cargo: ingresos anuales máximos */
-  sinConyuge: 8614,
-  /** Con cónyuge a cargo: ingresos anuales máximos (pensionista + cónyuge) */
-  conConyuge: 10047,
+  /** Sin cónyuge a cargo: ingresos anuales máximos (art. 9.2) */
+  sinConyuge: 9442,
+  /** Con cónyuge a cargo: ingresos anuales máximos, pensionista + cónyuge (art. 10.1.b) */
+  conConyuge: 11013,
 };
 
 // ─── Complemento por Brecha de Género 2026 (art. 60 LGSS) ─────────────────────
