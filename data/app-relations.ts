@@ -1342,6 +1342,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-biomoleculas/', icon: '🧪', name: 'Biomoléculas', description: 'Proteínas y anticuerpos' },
   ],
   'visualizador-termodinamica': [
+    { url: '/simulador-calorimetria/', icon: '🌡️', name: 'Calorimetría', description: 'Pon números al calor: Q = m·c·ΔT, calor latente y temperatura de equilibrio' },
     { url: '/visualizador-estados-materia/', icon: '🧊', name: 'Estados de la Materia', description: 'Sólido, líquido, gas, plasma' },
     { url: '/visualizador-clima/', icon: '🌡️', name: 'Cómo Funciona el Clima', description: 'Atmósfera y calentamiento' },
     { url: '/visualizador-produccion-energia/', icon: '⚡', name: 'Producción de Energía', description: 'Fuentes y mix español' },
@@ -3298,6 +3299,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // SIMULADORES BACHILLERATO/UNIVERSIDAD — Tanda 2 (2026-05-07)
   'simulador-gas-ideal': [
+    { url: '/simulador-calorimetria/', icon: '🌡️', name: 'Calorimetría', description: 'Cuánto calor cuesta llegar hasta el gas: fundir, calentar y evaporar' },
     { url: '/simulador-equilibrio-quimico/', icon: '⚖️', name: 'Equilibrio Químico', description: 'Le Chatelier y constante Kc' },
     { url: '/visualizador-termodinamica/', icon: '🔥', name: 'Termodinámica Visual', description: 'Energía, calor y entropía' },
     { url: '/visualizador-estados-materia/', icon: '💧', name: 'Estados de la Materia', description: 'Sólido, líquido y gaseoso' },
@@ -6136,6 +6138,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-estadistica/', icon: '📊', name: 'Calculadora Estadística', description: 'Media, varianza, percentiles' },
   ],
   'simulador-conservacion-energia': [
+    { url: '/simulador-calorimetria/', icon: '🌡️', name: 'Calorimetría', description: 'Dónde acaba la energía disipada: calentando, fundiendo o evaporando' },
     { url: '/simulador-plano-inclinado/', icon: '📐', name: 'Plano Inclinado', description: 'El rozamiento disipa parte de la energía potencial en la bajada' },
     { url: '/visualizador-termodinamica/', icon: '🌡️', name: 'Termodinámica', description: 'La 1.ª ley generaliza la conservación de energía' },
     { url: '/calculadora-movimiento/', icon: '🚀', name: 'Calculadora de Movimiento', description: 'Cinemática del MRU y MRUA' },
@@ -6166,10 +6169,17 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-sesgos-cognitivos/', icon: '🧠', name: 'Sesgos cognitivos', description: 'La falacia bayesiana en la mente humana' },
   ],
   'simulador-termodinamica-carnot': [
+    { url: '/simulador-calorimetria/', icon: '🌡️', name: 'Calorimetría', description: 'El calor que entra en el foco caliente: Q = m·c·ΔT tramo a tramo' },
     { url: '/simulador-conservacion-energia/', icon: '🎢', name: 'Conservación de la Energía', description: '1.ª ley termodinámica (Carnot es 2.ª)' },
     { url: '/visualizador-termodinamica/', icon: '🌡️', name: 'Termodinámica', description: 'Conducción, convección, radiación' },
     { url: '/visualizador-termodinamica-quimica/', icon: '⚗️', name: 'Termodinámica Química', description: 'ΔG, ΔH y equilibrio químico' },
     { url: '/visualizador-maquinas-simples/', icon: '⚙️', name: 'Máquinas simples', description: 'Palancas y poleas: motores no térmicos' },
+  ],
+  'simulador-calorimetria': [
+    { url: '/visualizador-termodinamica/', icon: '🌡️', name: 'Termodinámica', description: 'Por qué calor y temperatura no son lo mismo, y cómo se transmite' },
+    { url: '/simulador-termodinamica-carnot/', icon: '♨️', name: 'Ciclo de Carnot', description: 'Qué parte de ese calor puede convertirse en trabajo' },
+    { url: '/simulador-conservacion-energia/', icon: '🎢', name: 'Conservación de la Energía', description: 'La 1.ª ley: el calor es una forma más de energía en el balance' },
+    { url: '/simulador-gas-ideal/', icon: '💨', name: 'Gas Ideal', description: 'Qué le pasa al vapor una vez la sustancia ha cambiado de estado' },
   ],
   'simulador-potencial-accion': [
     { url: '/visualizador-sistema-nervioso/', icon: '🧠', name: 'Sistema Nervioso', description: 'Anatomía SNC/SNP, neuronas, sinapsis' },

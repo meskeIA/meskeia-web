@@ -1323,6 +1323,7 @@ export const implementedAppsUrls = [
   "/simulador-plano-inclinado/",       // ¿Desliza? Diagrama de cuerpo libre, rozamiento estático/cinético, ángulo crítico y animación
   "/simulador-campo-magnetico/",       // Lorentz + trayectoria circular, campo de hilo/espira/solenoide, inducción Faraday-Lenz con gráfica
   "/simulador-orbitas-kepler/",        // Periodo, velocidades vis-viva, escape y energía; elipse animada por la 2ª ley de Kepler
+  "/simulador-calorimetria/",          // Calor tramo a tramo (m·c·ΔT y m·L), curva de calentamiento y temperatura de equilibrio de una mezcla
   "/calculadora-seccion-cable/",       // Sección en mm² y caída de tensión de una línea mono/trifásica, cobre o aluminio
   "/calculadora-frigorias-btu/",       // Frigorías, BTU y vatios de frío y calor por volumen, aislamiento, sol, cristal y cargas internas
   "/tabla-grupos-funcionales/",        // 31 grupos con IUPAC, diagrama y orden de prioridad ordenable

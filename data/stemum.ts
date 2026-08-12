@@ -355,6 +355,13 @@ export const STEMUM_APPS: StemumApp[] = [
     disciplina: 'fisica',
   },
   {
+    slug: 'simulador-calorimetria',
+    icon: '🌡️',
+    titulo: 'Calorimetría',
+    desc: 'Calor sensible y latente tramo a tramo, curva de calentamiento con sus mesetas y temperatura de equilibrio de una mezcla.',
+    disciplina: 'fisica',
+  },
+  {
     slug: 'simulador-plano-inclinado',
     icon: '📐',
     titulo: 'Plano inclinado',
