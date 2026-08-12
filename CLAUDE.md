@@ -566,8 +566,10 @@ Las rutas vivas son `ls app/api/analytics/`.
 Los comandos disponibles se ven con `/help`; las revisiones de código van por el `/code-review` integrado. Los plugins `code-review`, `audit`, `analyze-codebase`, `bug-detective`, `debugger` y `accessibility-expert` de `cc-marketplace` **se retiraron el 11/08/2026**: cero usos desde junio, y el primero además duplicaba el comando integrado.
 
 **Testing de frontend**: Playwright MCP, registrado en **ámbito de usuario** (`~/.claude.json`, vía
-`claude mcp add`). Comprobar que está vivo con `claude mcp list`; el navegador que usa es el chromium
-que instala Playwright en `%LOCALAPPDATA%\ms-playwright` (en este PC no hay Chrome del sistema).
+`claude mcp add`), con `--browser chromium --headless`. Ese flag no es opcional: por defecto el MCP
+busca el **Chrome del sistema**, que en este PC no existe (el navegador es Vivaldi), y falla al abrir
+la primera página aunque `claude mcp list` diga `✔ Connected`. Con el flag usa el chromium que
+Playwright ya tiene en `%LOCALAPPDATA%\ms-playwright`.
 
 > ⚠️ **Un permiso no arranca un servidor.** Hasta el 12/08/2026 esta línea decía que Playwright estaba
 > «configurado en `settings.local.json`», y era falso: la declaración vivía en `~/.claude/mcp-config.json`,
