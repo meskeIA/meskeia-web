@@ -3,6 +3,12 @@
  * Datos fiscales Impuesto de Sucesiones y Donaciones (ISD) — rama donaciones
  * Tarifa estatal (16 tramos) + tarifa Cataluña (general + reducida) + bonificaciones CCAA
  * Última revisión: 2025-01-01
+ *
+ * ⚠️ 2026-08-12: incorporada la advertencia de la Ley 3/2026 de Madrid (empresa
+ *    familiar). El sello de abajo NO se mueve a propósito: el barrido mensual no
+ *    puede afirmar que las 17 comunidades están verificadas, y eso es lo que
+ *    significa el sello de un módulo cedido. La inmersión por CCAA es de enero
+ *    (skill /revision-fiscal-enero).
  */
 
 // ─── Metadatos ───────────────────────────────────────────────────────────────
@@ -126,7 +132,7 @@ export const BONIFICACIONES_CCAA_ID: Record<string, BonificacionCCAA_ID> = {
       'III':            { porcentaje: 0 },
       'IV':             { porcentaje: 0 },
     },
-    notas: 'Bonificación 99% para Grupos I y II. Sin límite de importe.',
+    notas: 'Bonificación 99% para Grupos I y II. Sin límite de importe. ⚠️ La Ley 3/2026, de 30 de junio, de Apoyo a la Empresa Familiar (BOE-A-2026-16019) añadió una reducción del 99% EN BASE por donación de empresa individual, negocio profesional o participaciones, extendida a los Grupos I, II y III y a colaterales de cuarto grado, con requisitos de permanencia (5 años), participación (5% individual o 20% del grupo familiar) y formalización en escritura. Esta estimación NO la aplica: solo modela la bonificación en cuota por parentesco.',
   },
 
   'andalucia': {

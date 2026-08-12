@@ -31,6 +31,7 @@ import {
   REQUISITOS_ANTICIPADA_VOLUNTARIA,
   REQUISITOS_JUBILACION_PARCIAL,
   JUBILACION_PARCIAL_META,
+  edadMinimaJubilacionParcial,
   getCoeficienteAnticipada,
 } from '@/data/fiscal';
 
@@ -87,6 +88,8 @@ interface ResultadoParcial {
   cumpleCotizacion: boolean;
   cumpleReduccion: boolean;
   motivoImpedimento: string;
+  /** Edad mínima que aplica a este caso (edad ordinaria menos 3 años) */
+  edadMinimaAplicable: number;
   pensionParcialMensual: number;
   salarioParcialMensual: number;
   ingresosTotalesMensual: number;
@@ -267,20 +270,32 @@ function orientarAnticipada(
 // LÓGICA: JUBILACIÓN PARCIAL
 // ──────────────────────────────────────────────────────────────────────────────
 
+/** Pasa una edad en años decimales a texto «63 años y 10 meses» */
+function edadATexto(edadDecimal: number): string {
+  const anios = Math.floor(edadDecimal);
+  const meses = Math.round((edadDecimal - anios) * 12);
+  if (meses === 0) return `${anios} años`;
+  return `${anios} años y ${meses} ${meses === 1 ? 'mes' : 'meses'}`;
+}
+
 function orientarParcial(
   edadActual: number,
   anosCotizados: number,
   reduccionJornada: number,
   salarioBrutoMensual: number,
-  pensionOrdinaria: number
+  pensionOrdinaria: number,
+  anioEvaluacion: number
 ): ResultadoParcial {
   const req = REQUISITOS_JUBILACION_PARCIAL;
-  const cumpleEdad = edadActual >= req.edadMinima;
+  // El art. 215.2.a) LGSS no fija una edad fija: permite anticipar como máximo
+  // 3 años sobre la edad ordinaria, que depende del año y de lo cotizado.
+  const edadMinima = edadMinimaJubilacionParcial(anioEvaluacion, anosCotizados);
+  const cumpleEdad = edadActual >= edadMinima;
   const cumpleCotizacion = anosCotizados >= req.anosCotizadosMinimos;
   const cumpleReduccion = reduccionJornada >= req.reduccionJornadaMin && reduccionJornada <= req.reduccionJornadaMax;
 
   let motivoImpedimento = '';
-  if (!cumpleEdad) motivoImpedimento = `Se necesitan al menos ${req.edadMinima} años. Tienes ${edadActual}.`;
+  if (!cumpleEdad) motivoImpedimento = `Se necesitan al menos ${edadATexto(edadMinima)} en ${anioEvaluacion}: tres años menos que la edad ordinaria que te corresponde. Tienes ${edadActual}.`;
   else if (!cumpleCotizacion) motivoImpedimento = `Se necesitan ${req.anosCotizadosMinimos} años cotizados. Tienes ${anosCotizados}.`;
   else if (!cumpleReduccion) motivoImpedimento = `La reducción debe estar entre ${req.reduccionJornadaMin}% y ${req.reduccionJornadaMax}%.`;
 
@@ -296,6 +311,7 @@ function orientarParcial(
     cumpleCotizacion,
     cumpleReduccion,
     motivoImpedimento,
+    edadMinimaAplicable: edadMinima,
     pensionParcialMensual,
     salarioParcialMensual,
     ingresosTotalesMensual,
@@ -385,13 +401,14 @@ export default function SimuladorJubilacionPublicaPage() {
   function calcularParcial() {
     if (!resultadoPension) return;
     const anio = parseInt(anioNacimiento);
-    const edadActual = new Date().getFullYear() - anio;
+    const anioEvaluacion = new Date().getFullYear();
+    const edadActual = anioEvaluacion - anio;
     const reduccion = parseFloat(reduccionJornada.replace(',', '.'));
     const salario = parseFloat(salarioBruto.replace(',', '.'));
     if (isNaN(reduccion) || isNaN(salario) || salario <= 0) return;
 
     setResultadoParcial(
-      orientarParcial(edadActual, anosCotizadosNum, reduccion, salario, resultadoPension.pensionMensualFinal)
+      orientarParcial(edadActual, anosCotizadosNum, reduccion, salario, resultadoPension.pensionMensualFinal, anioEvaluacion)
     );
   }
 
@@ -766,7 +783,7 @@ export default function SimuladorJubilacionPublicaPage() {
 
                     <div className={styles.requisitosGrid}>
                       <div className={`${styles.requisitoItem} ${resultadoParcial.cumpleEdad ? styles.requisitoOk : styles.requisitoNok}`}>
-                        {resultadoParcial.cumpleEdad ? '✓' : '✗'} Edad (≥ {req.edadMinima} años)
+                        {resultadoParcial.cumpleEdad ? '✓' : '✗'} Edad (≥ {edadATexto(resultadoParcial.edadMinimaAplicable)})
                       </div>
                       <div className={`${styles.requisitoItem} ${resultadoParcial.cumpleCotizacion ? styles.requisitoOk : styles.requisitoNok}`}>
                         {resultadoParcial.cumpleCotizacion ? '✓' : '✗'} Cotización (≥ {req.anosCotizadosMinimos} años)

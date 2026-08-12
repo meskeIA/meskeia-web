@@ -5,16 +5,27 @@
  * Datos verificados a la fecha indicada. Pueden haber cambiado en 2026.
  * Verifica siempre en la fuente oficial antes de tomar decisiones.
  *
- * Fuente: Ley 35/2006 del IRPF + LPGE 2025 + LGSS
- * Verificado: 2025-01-15
+ * Fuente: Ley 35/2006 del IRPF (texto consolidado) + LGSS
+ * Verificado: 2026-08-12
  * URL oficial IRPF: https://sede.agenciatributaria.gob.es
  * URL oficial SS: https://www.seg-social.es
+ *
+ * ⚠️ 2026-08-12: verificados uno a uno contra el texto consolidado del BOE
+ *    (actualizado a 29/04/2026) los artículos que sostienen este módulo. Siguen
+ *    vigentes en 2026 porque ninguno se ha tocado desde entonces:
+ *      · art. 63 (escala general) — última modificación: Ley 11/2020, efectos 1/1/2021
+ *      · art. 57 (mínimo del contribuyente) — Ley 26/2014
+ *      · art. 58 (descendientes) y 59 (ascendientes) — Ley 26/2014
+ *      · art. 60 (discapacidad) — Ley 26/2014
+ *      · art. 66 (base del ahorro, en inmuebles.ts) — Ley 7/2024, efectos 1/1/2025
+ *    Las constantes conservan el sufijo _2025 por compatibilidad con las apps que
+ *    ya las importan; el sufijo es histórico, no una fecha de caducidad.
  */
 
 export const FISCAL_IRPF_META = {
-  fuente: 'Ley 35/2006 del IRPF + Ley de Presupuestos Generales del Estado 2025',
-  verificado: '2025-01-15',
-  vigencia: '2025',
+  fuente: 'Ley 35/2006 del IRPF (texto consolidado, arts. 57 a 66)',
+  verificado: '2026-08-12',
+  vigencia: '2026',
   urlOficial: 'https://sede.agenciatributaria.gob.es/Sede/procedimientoini/GI01.shtml',
   nota: 'Tramos estatales + tipo autonómico medio. Cada CCAA puede tener variaciones. Verificar en la Agencia Tributaria para cálculo exacto.',
 };

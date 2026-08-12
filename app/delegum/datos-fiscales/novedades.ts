@@ -23,6 +23,24 @@ export interface Novedad {
 // Sembrado con los cambios normativos reales recientes. Ampliar al mantener fichas.
 export const NOVEDADES: Novedad[] = [
   {
+    fecha: '2026-08-12',
+    fichaSlug: 'sucesiones-isd',
+    texto:
+      'Madrid aprueba una reducción del 99% en la base imponible por transmisión de empresa individual, negocio profesional o participaciones, extendida a los Grupos I, II y III y a colaterales de cuarto grado, con permanencia de 5 años y participación mínima del 5% individual o 20% del grupo familiar. Es una reducción en base, distinta de la bonificación en cuota por parentesco (Ley 3/2026 de la Comunidad de Madrid, BOE-A-2026-16019, en vigor desde el 1 de julio de 2026).',
+  },
+  {
+    fecha: '2026-08-12',
+    fichaSlug: 'donaciones-isd',
+    texto:
+      'La misma reducción del 99% en base por empresa familiar se aplica a las donaciones en Madrid, con los requisitos de permanencia, participación mínima y formalización en escritura pública (Ley 3/2026 de la Comunidad de Madrid, BOE-A-2026-16019, en vigor desde el 1 de julio de 2026).',
+  },
+  {
+    fecha: '2026-08-12',
+    fichaSlug: 'pensiones-jubilacion',
+    texto:
+      'La jubilación parcial con contrato de relevo ya no exige una edad fija: permite anticipar como máximo tres años sobre la edad ordinaria que corresponda, con 33 años cotizados (25 con discapacidad ≥33%) y 6 de antigüedad en la empresa. La reducción de jornada va del 25% al 75%, y si se anticipa más de dos años, el primer año queda entre el 20% y el 33% (art. 215 LGSS en la redacción del RDL 11/2024, con efectos desde el 1 de abril de 2025).',
+  },
+  {
     fecha: '2026-07-20',
     fichaSlug: 'cnae-iae',
     texto:

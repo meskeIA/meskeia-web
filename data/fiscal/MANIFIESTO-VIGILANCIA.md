@@ -90,7 +90,8 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 - **Vigilar**: RD de revalorización (enero: pensión máx/mín, complemento mínimos, cuantía brecha género); avance anual de la tabla de edad ordinaria y de la ventana del sistema dual (cambia CADA año hasta 2044); sentencias TS/TJUE sobre brecha de género; RDL de medidas de pensiones (frecuentes).
 - **Cadencia**: anual (ene) garantizada + RDL/jurisprudencia puntual.
 - **Alerta metodológica**: el sistema dual está en despliegue — cada ejercicio cambia qué años de cómputo aplican (esto es metodología, no dato). Cambios en coeficientes de anticipada o en el factor de sostenibilidad/MEI = alerta máxima.
-- **Verificado**: 2026-03-16 (principal) · 2026-06-14 (planes) · 2025-01-15 (parcial) · 2026-05-13 (brecha género).
+- **Jubilación parcial — sistema vigente desde 01/04/2025 (RDL 11/2024)**: no hay edad mínima fija. Se puede anticipar **3 años como máximo** sobre la edad ordinaria del art. 205.1.a) (la que corresponda por año y años cotizados), con 33 años cotizados —25 con discapacidad ≥33%— y 6 de antigüedad en la empresa; reducción de jornada del 25% al 75%, y si la anticipación supera los 2 años, el primer año entre el 20% y el 33%. Sin contrato de relevo (art. 215.1, ya cumplida la edad ordinaria) la reducción también llega al 75%.
+- **Verificado**: 2026-03-16 (principal) · 2026-06-14 (planes) · **2026-08-12 (parcial)** · 2026-05-13 (brecha género).
 
 #### `smi.ts` — Salario Mínimo Interprofesional
 - **Contiene**: SMI 2026 (RD 126/2026: 1.221 €/mes × 14) + salarios medios provinciales (AEAT 2023 / INE EAES).
@@ -146,14 +147,16 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 - **Vigilar**: leyes de medidas fiscales autonómicas (bonificaciones y reducciones cambian con los ciclos políticos autonómicos); cualquier reforma de la Ley 29/1987.
 - **Cadencia**: anual por CCAA + reformas a mitad de año.
 - **Alerta metodológica**: (a) armonización estatal del ISD (debate recurrente — eliminaría la ventaja autonómica: alerta máxima, obligaría a rehacer el estimador); (b) una CCAA que pase de "bonificación en cuota" a "reducción en base" o a tarifa propia (cambia el orden de las operaciones, no solo cifras); (c) cambios en los coeficientes multiplicadores.
-- **Verificado**: 2025-01-01 · vigencia 2025. ⚠️ El sello más antiguo del repositorio junto a donaciones.
+- **Alerta (b) MATERIALIZADA — Madrid, 2026-08-12**: la Ley 3/2026, de 30 de junio, de Apoyo a la Empresa Familiar (BOE-A-2026-16019, en vigor desde el 01/07/2026) modifica los arts. 21 y 22 del Decreto Legislativo 1/2010 e introduce una **reducción del 99% EN BASE** por transmisión de empresa individual, negocio profesional o participaciones, extendida a Grupos I, II y III y a colaterales de cuarto grado, con permanencia de 5 años y participación mínima del 5% individual / 20% del grupo familiar. El módulo modela Madrid **solo como bonificación en cuota por parentesco** y no contiene ninguna reducción de empresa familiar (tampoco la estatal del 95% del art. 20.2.c LISD). Aplicado hoy como advertencia en `notas`; **modelarlo exige tocar el código** de `estimador-impuesto-sucesiones` y `simulador-heredar-vivienda`, porque cambia el orden de las operaciones. Planificado en la Agenda Operativa.
+- **Verificado**: 2025-01-01 · vigencia 2025. ⚠️ El sello más antiguo del repositorio junto a donaciones. No se re-selló el 12/08/2026 pese a aplicarse un hallazgo: el sello de un módulo cedido afirma "las 17 comunidades verificadas" y aquí solo se verificó Madrid.
 
 #### `donaciones.ts` — ISD rama donaciones
 - **Contiene**: tarifa estatal (16 tramos — distinta de sucesiones), tarifas Cataluña general y reducida (Grupos I/II + escritura pública), coeficientes multiplicadores, reducciones, bonificaciones 17 CCAA (algunas exigen escritura pública — campo `requiereEscritura`).
 - **Sistema de cálculo vigente**: como sucesiones pero sin ajuar ni reducción de vivienda; la bonificación autonómica frecuentemente condicionada a formalización en escritura pública. Plazo Modelo 651: 1 mes.
 - **Normativa**: Ley 29/1987 + normativas de las 17 CCAA.
 - **Vigilar / Cadencia / Alerta**: idéntico a `sucesiones.ts`. Señal específica: cambios en requisitos formales (escritura, origen de fondos) que condicionan la bonificación — es metodología, no dato.
-- **Verificado**: 2025-01-01 · vigencia 2025. ⚠️ Sello antiguo.
+- **Alerta (b) MATERIALIZADA — Madrid, 2026-08-12**: la misma Ley 3/2026 extiende la reducción del 99% en base a las **donaciones** de empresa familiar, con los requisitos de formalización que ya contempla el campo `requiereEscritura`. Ver la ficha de `sucesiones.ts`. App afectada: `estimador-impuesto-donaciones`.
+- **Verificado**: 2025-01-01 · vigencia 2025. ⚠️ Sello antiguo, por el mismo motivo que `sucesiones.ts`.
 
 #### `patrimonio.ts` — IP e ITSGF (2 bloques con META)
 - **Contiene**: constantes del límite conjunto IRPF-IP (art. 31: tope 60% de bases imponibles, reducción máx. 80% de cuota IP), datos ITSGF (Ley 38/2022, prorrogado), bonificaciones autonómicas, escalas autonómicas detalladas, escala estatal de fallback, lógica de orientación del límite conjunto.

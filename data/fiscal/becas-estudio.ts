@@ -19,15 +19,22 @@
  * Fuente: elaboración propia a partir de organismos oficiales (Ministerio de
  * Educación, Formación Profesional y Deportes; Consejerías de Educación de
  * las Comunidades Autónomas; Servicios Sociales; BDNS)
- * Verificado: 2026-06-11
+ * Verificado: 2026-08-12
  * URL oficial de referencia: https://www.becaseducacion.gob.es
+ *
+ * ⚠️ 2026-08-12: los umbrales de renta y patrimonio y las cuantías del curso
+ *    2026-2027 los fija el Real Decreto 179/2026, de 11 de marzo
+ *    (BOE-A-2026-5713), que además actualizó los umbrales patrimoniales en un
+ *    ~10 % tras quince años sin cambios. Este módulo no recoge esas cifras a
+ *    propósito —describe tipos de beca, no calcula elegibilidad—, así que el RD
+ *    no altera su contenido: solo actualiza el curso al que se refiere.
  */
 
 export const FISCAL_BECAS_ESTUDIO_META = {
   fuente: 'Ministerio de Educación, Formación Profesional y Deportes; Consejerías de Educación de las Comunidades Autónomas; Servicios Sociales; BDNS',
   descripcion: 'Catálogo de tipos de beca y ayuda al estudio (estatal y autonómica) en España',
-  verificado: '2026-06-11',
-  vigencia: '2025-2026',
+  verificado: '2026-08-12',
+  vigencia: '2026-2027',
   urlOficial: 'https://www.becaseducacion.gob.es',
   nota: 'Describe categorías estables de beca y ayuda (marcos normativos generales), no calcula elegibilidad ni cuantías. Los umbrales de renta, patrimonio y los requisitos académicos se publican cada curso: usa siempre el comprobador/simulador oficial del Ministerio de Educación para tu caso concreto.',
 };

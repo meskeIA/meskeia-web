@@ -5,8 +5,8 @@
  * Datos verificados a la fecha indicada. El sistema de pensiones puede
  * cambiar con cada reforma legislativa. Verifica siempre en la SS.
  *
- * Fuente: LGSS (RDL 8/2015) + Ley 21/2021 (reforma pensiones) + LPGE 2025
- * Verificado: 2025-01-15
+ * Fuente: LGSS (RDL 8/2015) + Ley 21/2021 (reforma pensiones) + RDL 16/2025
+ * Verificado: 2026-03-16 (la fecha de cada bloque manda: ver los _META del fichero)
  * URL oficial SS: https://www.seg-social.es/wps/portal/wss/internet/Pensionistas
  * Simulador oficial: https://portal.seg-social.gob.es/wps/portal/importass/importass/Categorias/vidaLaboral-y-pensiones/simuladorPensionJubilacion
  */
@@ -228,23 +228,58 @@ export const LIMITES_PLAN_PENSIONES_2025 = {
   limiteDiscapacidadAnual: 24250,  // Para personas con discapacidad ≥ 33%
 };
 
-// ─── Jubilación Parcial: requisitos 2025 ─────────────────────────────────────
+// ─── Jubilación Parcial: requisitos vigentes (RDL 11/2024) ───────────────────
+//
+// ⚠️ 2026-08-12: el art. 215 LGSS fue reescrito por el RDL 11/2024, de 23 de
+//    diciembre, CON EFECTOS DESDE EL 1 DE ABRIL DE 2025 — dos meses y medio
+//    después del sello anterior de este bloque (2025-01-15), así que sus datos
+//    eran previos a la reforma. Además arrastraba una `edadMinima: 60` que no
+//    procedía ni de la redacción anterior (que exigía 65, o 63 con 36 años y 6
+//    meses cotizados): era un residuo del régimen anterior a 2013.
+//
+//    La ley NO fija una edad mínima absoluta. Exige estar como máximo a TRES
+//    años de la edad ordinaria de jubilación, que depende del año y de los años
+//    cotizados (ver TABLA_EDAD_JUBILACION y edadMinimaJubilacionParcial()).
 
 export const JUBILACION_PARCIAL_META = {
-  fuente: 'LGSS (RDL 8/2015) arts. 215 y 216 + Ley 21/2021',
-  verificado: '2025-01-15',
-  vigencia: '2025',
+  fuente: 'LGSS (RDL 8/2015) arts. 215 y 216, en la redacción dada por el RDL 11/2024 (efectos desde 01/04/2025)',
+  verificado: '2026-08-12',
+  vigencia: '2026',
   urlOficial: 'https://www.seg-social.es/wps/portal/wss/internet/Pensionistas/Jubilacion',
-  nota: 'Requisitos orientativos del régimen general. Existen supuestos especiales por convenio colectivo o sector. Verifica siempre en la SS.',
+  nota: 'Requisitos orientativos del régimen general. Existen supuestos especiales por convenio colectivo o sector (por ejemplo, la industria manufacturera). Verifica siempre en la SS.',
 };
 
 export const REQUISITOS_JUBILACION_PARCIAL = {
-  edadMinima:              60,     // Años cumplidos (régimen general con contrato de relevo)
-  anosCotizadosMinimos:    33,     // Años cotizados mínimos (con contrato de relevo)
-  reduccionJornadaMin:     25,     // % mínimo de reducción de jornada
-  reduccionJornadaMax:     75,     // % máximo de reducción (normal; 85% casos especiales)
-  exigeContratoRelevo:     true,   // El empleador debe contratar un relevista simultáneamente
+  /** Años que como máximo puede anticiparse sobre la edad ordinaria (art. 215.2.a) */
+  anticipacionMaximaAnios:  3,
+  anosCotizadosMinimos:     33,    // Años cotizados mínimos (con contrato de relevo)
+  anosCotizadosDiscapacidad: 25,   // Si discapacidad ≥ 33 % (art. 215.2.a)
+  antiguedadEmpresaAnios:   6,     // Antigüedad en la empresa inmediatamente anterior
+  reduccionJornadaMin:      25,    // % mínimo de reducción de jornada
+  reduccionJornadaMax:      75,    // % máximo de reducción de jornada
+  /** Si se anticipa MÁS de 2 años, el primer año la reducción va entre estos límites */
+  anticipacionQueLimitaPrimerAno: 2,
+  reduccionPrimerAnoMin:    20,
+  reduccionPrimerAnoMax:    33,
+  exigeContratoRelevo:      true,  // El empleador debe contratar un relevista simultáneamente
 };
+
+/**
+ * Edad mínima real de acceso a la jubilación parcial con contrato de relevo,
+ * en años decimales: la edad ordinaria que corresponda menos 3 años.
+ *
+ * La edad ordinaria depende de si se acredita la cotización suficiente del año
+ * (38 años y 3 meses en 2026), de ahí que haga falta pasar los años cotizados.
+ */
+export function edadMinimaJubilacionParcial(anio: number, anosCotizados: number): number {
+  const edades = getEdadJubilacion(anio);
+  const cotizacionSuficiente =
+    anosCotizados >= edades.cotizacionPara65.anios + edades.cotizacionPara65.meses / 12;
+  const ordinaria = cotizacionSuficiente
+    ? 65
+    : edades.edadSinCotizacion.anios + edades.edadSinCotizacion.meses / 12;
+  return ordinaria - REQUISITOS_JUBILACION_PARCIAL.anticipacionMaximaAnios;
+}
 
 // ─── Pensión de Viudedad: datos normativos 2026 ───────────────────────────────
 // Fuente: LGSS arts. 219-231 (RDL 8/2015) + Resolución INSS pensiones mínimas 2026
