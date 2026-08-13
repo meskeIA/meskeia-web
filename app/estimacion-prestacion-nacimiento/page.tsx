@@ -76,18 +76,35 @@ export default function EstimacionPrestacionNacimiento() {
     const esContributiva = baseMensual >= basesReferencia.baseMinimaMensual * 0.5;
 
     if (!esContributiva) {
-      // Prestacion no contributiva
+      // Prestacion no contributiva (art. 182 LGSS). Los 42 dias del descanso
+      // obligatorio se amplian en 14 naturales por monoparentalidad, parto
+      // multiple, familia numerosa o discapacidad >=65%, y el incremento NO se
+      // acumula aunque concurran varios supuestos (art. 182.3 in fine).
+      const supuestosNoContributiva: string[] = [];
+      if (tipoFamilia === 'monoparental') {
+        supuestosNoContributiva.push('monoparentalidad');
+      }
+      if (partoMultiple && numHijos >= 2) {
+        supuestosNoContributiva.push('parto multiple');
+      }
+
+      const diasExtra = supuestosNoContributiva.length > 0 ? noContributiva.incrementoDias : 0;
+      const diasTotal = noContributiva.duracion + diasExtra;
+      const detalle = diasExtra > 0
+        ? [`+${diasExtra} dias naturales por ${supuestosNoContributiva.join(' y ')} (el incremento se aplica una sola vez)`]
+        : [];
+
       return {
         baseReguladoraDiaria: noContributiva.cuantiaDiaria,
         prestacionDiaria: noContributiva.cuantiaDiaria,
         semanasBase: 6,
         semanasExtra: 0,
         semanasTotal: 6,
-        diasTotal: noContributiva.duracion,
-        prestacionTotal: noContributiva.cuantiaDiaria * noContributiva.duracion,
+        diasTotal,
+        prestacionTotal: noContributiva.cuantiaDiaria * diasTotal,
         semanasObligatorias: 6,
         semanasVoluntarias: 0,
-        detalleAmpliaciones: [],
+        detalleAmpliaciones: detalle,
         esContributiva: false,
       };
     }
@@ -483,8 +500,13 @@ export default function EstimacionPrestacionNacimiento() {
               </li>
               {!resultado.esContributiva && (
                 <li>
-                  <strong>Prestacion no contributiva:</strong> al no alcanzar la cotizacion minima,
-                  se cobra el 100% del IPREM durante 42 dias ({formatCurrency(PRESTACION_NACIMIENTO_2025.noContributiva.cuantiaMensual)}/mes).
+                  <strong>Prestacion no contributiva:</strong> al no alcanzar la cotizacion minima, se
+                  cobra el 100% del IPREM ({formatCurrency(PRESTACION_NACIMIENTO_2025.noContributiva.cuantiaMensual)}/mes)
+                  durante {PRESTACION_NACIMIENTO_2025.noContributiva.duracion} dias naturales, salvo que
+                  tu base reguladora sea inferior, en cuyo caso se cobra esta. Se amplia en{' '}
+                  {PRESTACION_NACIMIENTO_2025.noContributiva.incrementoDias} dias por familia numerosa,
+                  monoparentalidad, parto multiple o discapacidad del 65% o mas, una sola vez aunque
+                  coincidan varios supuestos (art. 182 LGSS).
                 </li>
               )}
             </ul>
@@ -535,12 +557,19 @@ export default function EstimacionPrestacionNacimiento() {
                 <tr>
                   <td><strong>Cuantia</strong></td>
                   <td>100% de la base reguladora</td>
-                  <td>100% del IPREM ({formatCurrency(PRESTACION_NACIMIENTO_2025.noContributiva.cuantiaMensual)}/mes)</td>
+                  <td>
+                    100% del IPREM ({formatCurrency(PRESTACION_NACIMIENTO_2025.noContributiva.cuantiaMensual)}/mes),
+                    o la base reguladora si fuese inferior
+                  </td>
                 </tr>
                 <tr>
                   <td><strong>Duracion</strong></td>
                   <td>19 semanas/progenitor (133 dias); 32 semanas (224 dias) si familia monoparental</td>
-                  <td>42 dias (6 semanas)</td>
+                  <td>
+                    {PRESTACION_NACIMIENTO_2025.noContributiva.duracion} dias (6 semanas), +
+                    {PRESTACION_NACIMIENTO_2025.noContributiva.incrementoDias} en familia numerosa,
+                    monoparentalidad, parto multiple o discapacidad &ge; 65%
+                  </td>
                 </tr>
                 <tr>
                   <td><strong>Cotizacion minima &lt; 21 anos</strong></td>

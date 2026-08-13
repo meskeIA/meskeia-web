@@ -7,15 +7,19 @@
  * El IPREM permanece congelado desde 2022 (no se actualiza desde la Ley de
  * Presupuestos 2023, prorrogados). El valor 2026 coincide con el de 2025.
  *
- * Fuente: Ley 31/2022 de PGE 2023 (prorrogados) — IPREM 2026 = IPREM 2025
- * Verificado: 2026-08-12 (las cuatro cifras confirmadas sin cambios)
+ * Fuente: Ley 31/2022 de PGE 2023, disposición adicional 90.ª (prorrogados)
+ * Verificado: 2026-08-13 (las cuatro cifras confirmadas contra el texto de la DA 90.ª)
+ *
+ * ⚠️ Hasta el 13/08/2026 `urlOficial` apuntaba a BOE-A-2022-22685, que es el
+ * RDL 20/2022 —otra norma—, no la Ley 31/2022. Las cifras siempre fueron
+ * correctas; lo que no se podía abrir era la cita.
  */
 
 export const FISCAL_IPREM_META = {
-  fuente: 'Ley 31/2022 de PGE 2023 (prorrogados) — IPREM congelado desde 2022',
-  verificado: '2026-08-12',
+  fuente: 'Ley 31/2022, de 23 de diciembre, de PGE 2023, DA 90.ª (BOE-A-2022-22128) — IPREM congelado desde 2022 por la prórroga presupuestaria',
+  verificado: '2026-08-13',
   vigencia: '2026',
-  urlOficial: 'https://www.boe.es/buscar/doc.php?id=BOE-A-2022-22685',
+  urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2022-22128',
   nota: 'El IPREM 2026 no varía respecto a 2025 al mantenerse la prórroga presupuestaria.',
 };
 

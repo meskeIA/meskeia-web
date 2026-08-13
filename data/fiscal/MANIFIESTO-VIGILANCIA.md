@@ -51,6 +51,27 @@ la regla de trazabilidad que la acompaña:
 > portal genérico, una ley que no existe, «resolución del INSS» sin más— es una señal de que
 > el dato no se comprobó donde debía.
 
+**Ampliación del 13/08/2026 — la cita tiene que abrir lo que dice, y eso se comprueba, no se
+supone.** El barrido de trazabilidad de ese día verificó los 12 identificadores `BOE-A-` citados
+en `data/fiscal/` preguntándole al BOE qué norma es cada uno: 11 abrían exactamente la norma
+citada, y uno no. `iprem.ts` decía «Ley 31/2022 de PGE 2023» con la referencia BOE-A-2022-22685,
+que es el **RDL 20/2022**, una norma distinta. Las cuatro cifras del IPREM eran correctas —están
+en la DA 90.ª de la Ley 31/2022, BOE-A-**2022-22128**—, así que el fallo no se veía por ningún
+lado: el dato era bueno y la fuente parecía formal. Se había sellado el día anterior.
+
+De ahí la regla operativa: **un identificador citado se abre y se lee, aunque el dato que
+acompaña sea correcto y aunque el sello sea reciente**. La comprobación es mecánica y está en
+`npm run audit:fiscal-fuentes`. No se engancha al build a propósito —depende de la red, y un
+candado que falla porque el BOE tarda en responder acaba desactivado—, así que se ejecuta en el
+triaje mensual.
+
+**Fuente genérica sobre un catálogo ≠ fuente genérica sobre cifras.** El mismo barrido marcó
+`ayudas-personas`, `ayudas-publicas` y `jubilacion-tramites` por citar organismos («INSS, SEPE,
+IMSERSO…») en vez de normas. Se comprobó que **ninguno de los tres declara un solo importe**: son
+catálogos de categorías (§3.5), y para eso un directorio de organismos es la fuente correcta. Se
+deja escrito aquí para que la próxima auditoría no vuelva a marcarlos: en un catálogo sin cifras,
+la §1.0 no pide `BOE-A-`; en cuanto uno de ellos declare un importe, sí.
+
 | Fuente | URL | Qué publica | Cadencia |
 |---|---|---|---|
 | BOE — Disposiciones generales (Sección I) | https://www.boe.es/boe/dias/ | Leyes, RD, RDL, Órdenes ministeriales y **leyes autonómicas** (las leyes de medidas fiscales de las CCAA también se publican en el BOE) | Diaria |
@@ -138,11 +159,13 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 
 #### `iprem.ts` — IPREM
 - **Contiene**: `IPREM_2026` (congelado desde 2023 por prórrogas presupuestarias).
-- **Normativa**: LPGE.
+- **Normativa**: Ley 31/2022 de PGE 2023, **DA 90.ª** (BOE-A-2022-22128), prorrogada.
 - **Vigilar**: aprobación de una nueva LPGE → casi con seguridad actualiza el IPREM tras años congelado. Señal de altísima probabilidad si hay presupuestos nuevos.
 - **Cadencia**: anual (si hay LPGE).
 - **Alerta metodológica**: sustitución del IPREM como referencia de ayudas (improbable, impacto enorme — lo usan umbrales de justicia gratuita, bono social, alquiler…).
-- **Verificado**: 2026-06-13 · vigencia 2026.
+- **Consumido por**: `maternidad.ts` importa `IPREM_2026` para la prestación no contributiva por nacimiento. Un cambio aquí se propaga allí sin tocar nada.
+- **Corrección de trazabilidad (13/08/2026)**: la `urlOficial` apuntaba a BOE-A-2022-22685 (**RDL 20/2022**, otra norma) mientras la `fuente` decía «Ley 31/2022». Las cuatro cifras se confirmaron correctas contra el texto de la DA 90.ª. Ver el caso completo en §1.0.
+- **Verificado**: 2026-08-13 · vigencia 2026.
 
 #### `sociedades.ts` — Impuesto sobre Sociedades y SL
 - **Contiene**: tipos IS 2025/2026, **escala progresiva micropymes (DT 44ª LIS, Ley 7/2024) — transitoria, varía cada ejercicio 2025-2027**, retenciones dividendos, cotización autónomo societario, gastos deducibles, obligaciones periódicas SL.
@@ -158,6 +181,7 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 - **Vigilar**: publicación del calendario del contribuyente (AEAT, ~diciembre); cambios de plazo de modelos concretos (p.ej. fechas campaña Renta).
 - **Cadencia**: anual (dic) + ajustes puntuales.
 - **Alerta metodológica**: nuevos modelos obligatorios (precedente: Veri*factu / factura electrónica B2B — en calendario de despliegue, afectará a obligaciones de autónomos y SL).
+- **Sobre su fuente genérica (13/08/2026)**: cita el calendario del contribuyente de la AEAT, que es nivel 3. Se acepta porque **no declara ningún importe**: solo plazos recurrentes en texto, y el propio módulo advierte de que las fechas exactas del ejercicio se confirman en la AEAT. Si algún día incorporase fechas concretas de una campaña, necesitaría la orden que las fija.
 - **Verificado**: 2026-06-20 · vigencia 2026.
 
 #### `dependencia.ts` — SAAD, copago y cuidadores
@@ -221,12 +245,19 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 - **Verificado**: 2026-06-18 · vigencia 2025-2026.
 
 #### `maternidad.ts` — Nacimiento y cuidado del menor
-- **Contiene**: semanas de permiso (RDL 9/2025), ampliaciones, prestación económica (LGSS), deducción por maternidad IRPF (art. 81), gastos estimados primer año, estilos parentales (Baumrind).
-- **Normativa**: RDL 6/2019 + RDL 9/2025 + LGSS + Ley 35/2006.
-- **Vigilar**: nuevos RDL de ampliación de permisos (materia políticamente activa — precedente RDL 9/2025); cambios en la deducción del art. 81 (LPGE).
+- **Contiene**: semanas de permiso (RDL 9/2025), ampliaciones, prestación económica contributiva y no contributiva (LGSS arts. 177-182), deducción por maternidad IRPF (art. 81), gastos estimados primer año, estilos parentales (Baumrind).
+- **Normativa**: RDL 6/2019 + RDL 9/2025 + LGSS + Ley 35/2006 art. 81 (redacción del art. 64 de la Ley 31/2022).
+- **Vigilar**: nuevos RDL de ampliación de permisos (materia políticamente activa — precedente RDL 9/2025); cambios en la deducción del art. 81; revisión del IPREM (la prestación no contributiva es 100% IPREM) y de las bases de cotización de cada enero.
 - **Cadencia**: puntual (RDL) + anual.
 - **Alerta metodológica**: cambio del mecanismo de la prestación (% de base reguladora) o de la deducción (universalización, cuantía por tramos).
-- **Verificado**: 2026-06-11 · vigencia 2025-2026.
+- **Dependencias internas**: importa `IPREM_2026` de `iprem.ts` y `BASES_SS_2026` de `irpf.ts`. Ninguno de los dos datos se copia aquí.
+- **Auditoría a fondo del 13/08/2026** — el bloque de permisos coincidía **literalmente** con el RDL 9/2025 (19/32 semanas, 6 obligatorias, 11/22 flexibles, 2/4 hasta los 8 años). Lo que no coincidía era todo lo demás:
+  - La **deducción por maternidad negaba el derecho a quien lo tiene**. El módulo y la app decían «no aplica a desempleadas que cobran prestación sin cotizar», y el art. 81.1 vigente **desde el 01/01/2023** incluye expresamente a quien percibe prestaciones contributivas o asistenciales de desempleo al nacer el menor, y a quien se da de alta después con 30 días cotizados. La app tenía un `if` que devolvía «no elegible» a esa persona. Mismo patrón que el fallo del complemento a mínimos de 12/08.
+  - Faltaban tres piezas del mismo artículo: el **incremento de 150 €** del mes en que se completan los 30 días cotizados, la **incompatibilidad mes a mes con el complemento de ayuda para la infancia del IMV**, y el segundo tope del incremento por guardería (**gasto efectivo no subvencionado**).
+  - La **prestación no contributiva** ignoraba el **incremento de 14 días naturales** del art. 182.3 (familia numerosa, monoparentalidad, parto múltiple, discapacidad ≥65%) — introducido por el propio RDL 9/2025 que el módulo ya citaba— y presentaba el 100% del IPREM como cuantía fija, cuando el art. 182.2 lo somete a la base reguladora si esta es inferior.
+  - Las **bases de cotización** eran las de 2025 (Orden PJC/178/2025) declarando vigencia «2025-2026», mientras `irpf.ts` ya tenía las de 2026.
+  - La `fuente` citaba **«LPGE 2025»**, ley que no existe (prórroga presupuestaria), y la `urlOficial` era un portal divulgativo de la Seguridad Social. La norma real detrás de la deducción es la Ley 31/2022.
+- **Verificado**: 2026-08-13 · vigencia 2026.
 
 #### `amortizacion.ts` — Tabla de amortización LIS
 - **Contiene**: coeficientes lineales máximos y períodos máximos (art. 12.1.a LIS), multiplicadores de degresiva.
@@ -249,6 +280,12 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 > Estos cuatro módulos describen **categorías** de ayuda/trámite, no importes. Cambian poco, pero
 > cuando cambian es porque nace o muere un marco normativo — que es exactamente lo que hay que contar
 > en Delegum antes que nadie.
+>
+> **No se les aplica la §1.0 igual que a los demás** (verificado el 13/08/2026: ninguno declara un
+> solo importe). Su `fuente` es legítimamente una lista de organismos —INSS, SEPE, IMSERSO, BDNS—,
+> porque lo que catalogan son las prestaciones que esos organismos gestionan, no cifras que una
+> norma fije. En cuanto uno de ellos declare un importe, deja de valer y pasa a necesitar su
+> `BOE-A-`.
 
 #### `ayudas-personas.ts` — Catálogo de ayudas a personas y familias
 - **Vigilar**: creación/supresión de prestaciones estatales (precedente: IMV 2020); reformas de las existentes (SEPE, INSS, IMSERSO). Cadencia: baja. **Verificado**: 2026-06-11.

@@ -3,24 +3,30 @@
  *
  * ⚠️ HERRAMIENTA DE ORIENTACIÓN — No constituye asesoramiento oficial.
  * Datos verificados a la fecha indicada. Las cuantías y condiciones
- * se actualizan anualmente vía LPGE o modificaciones del Estatuto
- * de los Trabajadores / LGSS.
+ * se actualizan vía RDL o modificaciones del Estatuto de los
+ * Trabajadores / LGSS.
  *
  * Fuente: RDL 6/2019 (equiparación permisos 2021) + RDL 9/2025 (ampliación
  *         a 19/32 semanas, en vigor 31-jul-2025, BOE-A-2025-15741) + LGSS
- *         (RDL 8/2015) + Ley 35/2006 IRPF art. 81 (deducción maternidad)
- *         + LPGE 2025 (bases cotización, IPREM)
- * Verificado: 2026-06-11
- * URL oficial SS: https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/PrestacionesPensionesTrabajadores/10938
+ *         (RDL 8/2015) arts. 177-182 + Ley 35/2006 IRPF art. 81, en la
+ *         redacción dada por el art. 64 de la Ley 31/2022 (BOE-A-2022-22128,
+ *         efectos 01-ene-2023)
+ * Verificado: 2026-08-13
+ * URL oficial: https://www.boe.es/buscar/act.php?id=BOE-A-2025-15741
  */
+
+import { IPREM_2026 } from './iprem';
+import { BASES_SS_2026 } from './irpf';
 
 // ─── Metadatos del módulo ────────────────────────────────────────────────────
 
 export const FISCAL_MATERNIDAD_META = {
-  fuente: 'RDL 6/2019 + RDL 9/2025 (BOE-A-2025-15741) + LGSS (RDL 8/2015) + Ley 35/2006 IRPF art. 81 + LPGE 2025',
-  verificado: '2026-06-11',
-  vigencia: '2025-2026',
-  urlOficial: 'https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/PrestacionesPensionesTrabajadores/10938',
+  fuente: 'RDL 9/2025 (BOE-A-2025-15741) + LGSS arts. 177-182 (RDL 8/2015) + Ley 35/2006 IRPF art. 81, redacción del art. 64 de la Ley 31/2022 (BOE-A-2022-22128)',
+  verificado: '2026-08-13',
+  vigencia: '2026',
+  urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2025-15741',
+  /** El art. 81 LIRPF tiene su propio enlace: es la norma que rige la deducción, no el permiso. */
+  urlDeduccionIRPF: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764#a81',
   nota: 'Las cuantías dependen de la base reguladora individual. Los datos son orientativos y reflejan el marco general. Consultar con la Seguridad Social para el cálculo exacto.',
 };
 
@@ -123,17 +129,37 @@ export const PRESTACION_NACIMIENTO_2025 = {
     entre21y25: { meses: 3, nota: '90 días en los últimos 7 años, o 180 en toda la vida laboral' },
     mayores26: { meses: 6, nota: '180 días en los últimos 7 años, o 360 en toda la vida laboral' },
   },
-  /** Prestación no contributiva (sin cotización suficiente) */
+  /**
+   * Prestación no contributiva (art. 182 LGSS, redacción del RDL 9/2025).
+   * El IPREM se importa de `iprem.ts`: es un dato vigilado allí y duplicarlo
+   * aquí lo dejaría envejecer en dos sitios a la vez.
+   */
   noContributiva: {
-    cuantiaDiaria: 20, // IPREM diario aproximado 2025
-    cuantiaMensual: 600, // IPREM mensual 2025
-    duracion: 42, // días naturales (6 semanas)
-    nota: 'Si no se cumple el período mínimo de cotización, se cobra el 100% del IPREM durante 42 días',
+    cuantiaDiaria: IPREM_2026.diario,
+    cuantiaMensual: IPREM_2026.mensual,
+    duracion: 42, // días naturales (6 semanas de descanso obligatorio)
+    /** Art. 182.3 LGSS: la duración se incrementa en 14 días naturales en cuatro supuestos. */
+    incrementoDias: 14,
+    supuestosIncremento: [
+      'Familia numerosa (o que adquiera esa condición con el nacimiento)',
+      'Monoparentalidad por existir un único progenitor',
+      'Parto, adopción, guarda o acogimiento múltiple (dos o más)',
+      'Discapacidad ≥ 65% del progenitor beneficiario o del menor',
+    ],
+    /** El incremento se aplica UNA sola vez aunque concurran dos o más supuestos (art. 182.3 in fine). */
+    incrementoAcumulable: false,
+    /** Art. 182.2: el 100% del IPREM opera como tope, no como cuantía fija. */
+    topeBaseReguladoraInferior: true,
+    nota: 'Sin el período mínimo de cotización se cobra el 100% del IPREM durante 42 días naturales —salvo que la base reguladora sea inferior, en cuyo caso se cobra esta—, ampliables en 14 días por familia numerosa, monoparentalidad, parto múltiple o discapacidad ≥65%. El incremento no se acumula si concurren varios supuestos.',
   },
-  /** Bases de cotización referencia 2025 (Orden PJC/178/2025) */
+  /**
+   * Bases de cotización 2026 (Orden PJC/297/2026), importadas de `irpf.ts`.
+   * Hasta el 13/08/2026 este bloque tenía las de 2025 (Orden PJC/178/2025:
+   * 1.381,20 / 4.909,50) mientras declaraba vigencia 2025-2026.
+   */
   basesReferencia: {
-    baseMinimaMensual: 1381.20,
-    baseMaximaMensual: 4909.50,
+    baseMinimaMensual: BASES_SS_2026.minima,
+    baseMaximaMensual: BASES_SS_2026.maxima,
   },
   /** Exenta de IRPF */
   exentaIRPF: true,
@@ -141,7 +167,11 @@ export const PRESTACION_NACIMIENTO_2025 = {
 };
 
 // ─── Deducción por maternidad IRPF (art. 81 Ley 35/2006) ────────────────────
-// Para madres trabajadoras con hijos menores de 3 años
+// Redacción vigente desde el 01-ene-2023, dada por el art. 64 de la Ley 31/2022
+// (BOE-A-2022-22128). Esa reforma AMPLIÓ el círculo de beneficiarias: hasta 2022
+// se exigía estar de alta y realizar una actividad; desde 2023 basta con percibir
+// prestación o subsidio de desempleo en el momento del nacimiento, o darse de alta
+// en cualquier momento posterior con 30 días cotizados.
 
 export const DEDUCCION_MATERNIDAD_IRPF_2025 = {
   /** Importe anual por hijo menor de 3 años */
@@ -152,15 +182,51 @@ export const DEDUCCION_MATERNIDAD_IRPF_2025 = {
   incrementoGuarderia: {
     importeMaximoAnual: 1000,
     requisito: 'Gastos en guardería o centro de educación infantil autorizado',
+    /** Art. 81.3 in fine: además del tope de 1.000 €, límite del gasto realmente pagado. */
+    limiteGastoEfectivo: 'El importe total del gasto efectivo NO subvencionado satisfecho en el período al centro',
     nota: 'El centro debe comunicar los datos a la AEAT. Aplica hasta el mes anterior al inicio del segundo ciclo de educación infantil (generalmente septiembre del año en que el hijo cumple 3 años).',
+  },
+  /**
+   * Vías de acceso del art. 81.1. Son ALTERNATIVAS: basta cumplir una.
+   * No estar de alta hoy NO excluye por sí solo del derecho.
+   */
+  situacionesConDerecho: [
+    {
+      id: 'alta',
+      titulo: 'De alta en la Seguridad Social o mutualidad',
+      detalle: 'En el momento del nacimiento o en cualquier momento posterior (por cuenta propia o ajena).',
+      requiere30Dias: false,
+    },
+    {
+      id: 'desempleo',
+      titulo: 'Percibiendo prestación o subsidio de desempleo al nacer el menor',
+      detalle: 'Prestaciones contributivas o asistenciales del sistema de protección por desempleo. Da derecho aunque no se esté de alta.',
+      requiere30Dias: false,
+    },
+    {
+      id: 'alta-posterior',
+      titulo: 'Alta posterior al nacimiento con 30 días cotizados',
+      detalle: 'Quien se da de alta después del nacimiento accede a la deducción al alcanzar 30 días cotizados.',
+      requiere30Dias: true,
+    },
+  ],
+  /** Art. 81.3, párrafo 2: pago único adicional el mes en que se completan los 30 días cotizados. */
+  incrementoAltaPosterior: {
+    importe: 150,
+    nota: 'Cuando el derecho nace por alta posterior al nacimiento, la deducción del mes en que se cumplen los 30 días cotizados se incrementa en 150 €.',
+  },
+  /** Art. 81.3: incompatibilidad mes a mes con el complemento de ayuda para la infancia del IMV. */
+  incompatibilidadIMV: {
+    aplica: true,
+    norma: 'Ley 19/2021, de 20 de diciembre (ingreso mínimo vital)',
+    nota: 'No se computan los meses en que cualquiera de los progenitores perciba por ese descendiente el complemento de ayuda para la infancia del IMV.',
   },
   /** Requisitos para aplicar la deducción */
   requisitos: {
-    madresTrabajadoras: true,
-    altaSSoMutualidad: true,
     hijoMenor3: true,
+    minimoPorDescendientes: true,
     padreViudo: true, // También aplica al padre/tutor si la madre fallece
-    nota: 'Solo para madres (o padres viudos/tutores) dadas de alta en la SS o mutualidad. No aplica a desempleadas que cobran prestación sin cotizar.',
+    nota: 'Mujeres con derecho al mínimo por descendientes por un hijo menor de 3 años que estén de alta en la SS o mutualidad, o que percibieran prestación o subsidio de desempleo al nacer el menor. También aplica al padre o tutor en caso de fallecimiento de la madre o guarda y custodia exclusiva.',
   },
   /** Cobro anticipado */
   anticipado: {

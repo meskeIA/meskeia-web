@@ -199,7 +199,11 @@ export default function PermisoPrestacionNacimientoPage() {
             </div>
             <p className={styles.tableFoot}>
               Sin el periodo mínimo de cotización se cobra una prestación no contributiva del 100% del
-              IPREM durante {PRESTACION_NACIMIENTO_2025.noContributiva.duracion} días.
+              IPREM —o la base reguladora, si fuese inferior— durante{' '}
+              {PRESTACION_NACIMIENTO_2025.noContributiva.duracion} días naturales, ampliables en{' '}
+              {PRESTACION_NACIMIENTO_2025.noContributiva.incrementoDias} en caso de familia numerosa,
+              monoparentalidad, parto múltiple o discapacidad igual o superior al 65%. El incremento se
+              aplica una sola vez aunque concurran varios supuestos (art. 182 LGSS).
             </p>
           </section>
 
@@ -207,8 +211,9 @@ export default function PermisoPrestacionNacimientoPage() {
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>Deducción por maternidad en el IRPF</h2>
             <p className={styles.sectionIntro}>
-              Las madres trabajadoras con hijos menores de 3 años pueden aplicar esta deducción en su
-              declaración de la renta (también el padre viudo o tutor):
+              Las mujeres con hijos menores de 3 años con derecho al mínimo por descendientes pueden
+              aplicar esta deducción en su declaración de la renta (también el padre viudo o tutor con
+              guarda y custodia exclusiva):
             </p>
             <div className={styles.tableWrapper}>
               <table className={styles.table}>
@@ -237,8 +242,15 @@ export default function PermisoPrestacionNacimientoPage() {
               </table>
             </div>
             <p className={styles.tableFoot}>
-              La deducción exige estar dada de alta en la Seguridad Social o mutualidad. El incremento
-              por guardería requiere que el centro autorizado comunique los datos a la AEAT.
+              Desde el 1 de enero de 2023 (art. 64 de la Ley 31/2022) basta con estar de alta en la
+              Seguridad Social o mutualidad, <strong>o</strong> percibir prestación o subsidio de
+              desempleo en el momento del nacimiento, <strong>o</strong> darse de alta después con 30
+              días cotizados —en cuyo caso ese mes se suman{' '}
+              {formatCurrency(DEDUCCION_MATERNIDAD_IRPF_2025.incrementoAltaPosterior.importe)}—. No se
+              computan los meses en que se perciba por el mismo hijo/a el complemento de ayuda para la
+              infancia del ingreso mínimo vital. El incremento por guardería requiere que el centro
+              autorizado comunique los datos a la AEAT y no puede superar el gasto efectivo no
+              subvencionado.
             </p>
           </section>
 

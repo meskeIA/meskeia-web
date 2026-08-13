@@ -23,6 +23,18 @@ export interface Novedad {
 // Sembrado con los cambios normativos reales recientes. Ampliar al mantener fichas.
 export const NOVEDADES: Novedad[] = [
   {
+    fecha: '2026-08-13',
+    fichaSlug: 'permiso-prestacion-nacimiento',
+    texto:
+      'La deducción por maternidad del IRPF no exige estar trabajando: desde el 1 de enero de 2023 también da derecho percibir prestación o subsidio de desempleo en el momento del nacimiento, o darse de alta después con 30 días cotizados, en cuyo caso ese mes se suman 150 € adicionales. No se computan los meses en que se perciba por el mismo hijo el complemento de ayuda para la infancia del ingreso mínimo vital (art. 81 de la Ley 35/2006, en la redacción del art. 64 de la Ley 31/2022, BOE-A-2022-22128).',
+  },
+  {
+    fecha: '2026-08-13',
+    fichaSlug: 'permiso-prestacion-nacimiento',
+    texto:
+      'La prestación no contributiva por nacimiento dura 42 días naturales, ampliables en 14 más por familia numerosa, monoparentalidad, parto múltiple o discapacidad igual o superior al 65% —una sola vez aunque concurran varios supuestos—, y su cuantía es el 100% del IPREM salvo que la base reguladora sea inferior (art. 182 de la LGSS, en la redacción del RDL 9/2025, BOE-A-2025-15741).',
+  },
+  {
     fecha: '2026-08-12',
     fichaSlug: 'pensiones-jubilacion',
     texto:

@@ -27,12 +27,21 @@ interface HijoData {
   gastoGuarderia: string;
 }
 
+/**
+ * Situaciones del art. 81.1 LIRPF (redacción del art. 64 de la Ley 31/2022,
+ * con efectos desde el 01-ene-2023). Las tres primeras dan derecho: no estar
+ * de alta HOY no excluye por sí solo, porque la reforma de 2023 incorporó a
+ * las perceptoras de desempleo y al alta posterior con 30 días cotizados.
+ */
+type SituacionLaboral = 'alta' | 'desempleo' | 'alta-posterior' | 'ninguna';
+
 interface Resultado {
   esElegible: boolean;
   motivoNoElegible: string;
   numHijos: number;
   deduccionBase: number;
   incrementoGuarderia: number;
+  incrementoAltaPosterior: number;
   totalAnual: number;
   mensualAnticipado: number;
   detalleHijos: { hijo: number; base: number; guarderia: number }[];
@@ -42,7 +51,7 @@ interface Resultado {
 
 export default function EstimacionDeduccionMaternidadPage() {
   const [numHijos, setNumHijos] = useState(1);
-  const [altaSS, setAltaSS] = useState<'si' | 'no'>('si');
+  const [situacion, setSituacion] = useState<SituacionLaboral>('alta');
   const [hijos, setHijos] = useState<HijoData[]>([
     { tieneGuarderia: false, gastoGuarderia: '' },
   ]);
@@ -75,14 +84,15 @@ export default function EstimacionDeduccionMaternidadPage() {
   }, []);
 
   const calcular = useCallback(() => {
-    // Verificar elegibilidad
-    if (altaSS === 'no') {
+    // Solo queda fuera quien no encaja en ninguna de las tres vías del art. 81.1
+    if (situacion === 'ninguna') {
       setResultado({
         esElegible: false,
-        motivoNoElegible: 'Es necesario estar dada de alta en la Seguridad Social o Mutualidad para aplicar la deduccion por maternidad.',
+        motivoNoElegible: 'Con los datos indicados no se cumple ninguna de las tres vias del articulo 81.1 de la Ley del IRPF: alta en la Seguridad Social o mutualidad, prestacion o subsidio de desempleo al nacer el menor, o alta posterior con 30 dias cotizados. Si tu situacion cambia durante el ano, la deduccion se calcula por los meses en que si se cumple.',
         numHijos,
         deduccionBase: 0,
         incrementoGuarderia: 0,
+        incrementoAltaPosterior: 0,
         totalAnual: 0,
         mensualAnticipado: 0,
         detalleHijos: [],
@@ -113,7 +123,14 @@ export default function EstimacionDeduccionMaternidadPage() {
       detalleHijos.push({ hijo: i + 1, base, guarderia });
     }
 
-    const totalAnual = deduccionBase + incrementoGuarderia;
+    // Art. 81.3, párrafo 2: 150 € adicionales el mes en que se completan los
+    // 30 días cotizados, cuando el derecho nace por un alta posterior al parto.
+    const incrementoAltaPosterior =
+      situacion === 'alta-posterior'
+        ? DEDUCCION_MATERNIDAD_IRPF_2025.incrementoAltaPosterior.importe * numHijos
+        : 0;
+
+    const totalAnual = deduccionBase + incrementoGuarderia + incrementoAltaPosterior;
 
     setResultado({
       esElegible: true,
@@ -121,15 +138,16 @@ export default function EstimacionDeduccionMaternidadPage() {
       numHijos,
       deduccionBase,
       incrementoGuarderia,
+      incrementoAltaPosterior,
       totalAnual,
       mensualAnticipado: totalAnual / 12,
       detalleHijos,
     });
-  }, [numHijos, altaSS, hijos]);
+  }, [numHijos, situacion, hijos]);
 
   const limpiar = useCallback(() => {
     setNumHijos(1);
-    setAltaSS('si');
+    setSituacion('alta');
     setHijos([{ tieneGuarderia: false, gastoGuarderia: '' }]);
     setResultado(null);
   }, []);
@@ -160,10 +178,10 @@ export default function EstimacionDeduccionMaternidadPage() {
       </DisclaimerCard>
 
       <DataReference
-        normativa="Deduccion por maternidad IRPF 2025"
+        normativa="Deduccion por maternidad — art. 81 Ley 35/2006 (IRPF)"
         fuente={FISCAL_MATERNIDAD_META.fuente}
         verificado={FISCAL_MATERNIDAD_META.verificado}
-        urlOficial={FISCAL_MATERNIDAD_META.urlOficial}
+        urlOficial={FISCAL_MATERNIDAD_META.urlDeduccionIRPF}
       />
 
       {/* ── Formulario ───────────────────────────────────────────────────── */}
@@ -198,37 +216,67 @@ export default function EstimacionDeduccionMaternidadPage() {
             </select>
           </div>
 
-          {/* Alta en SS */}
+          {/* Situacion laboral: las tres vias del art. 81.1 LIRPF */}
           <fieldset className={styles.formGroup}>
             <legend className={styles.label}>
-              ¿Estas dada/o de alta en la Seguridad Social o Mutualidad?
+              ¿Cual es tu situacion respecto a la Seguridad Social?
             </legend>
             <div className={styles.radioGroup}>
               <label className={styles.radioLabel}>
                 <input
                   type="radio"
-                  name="altaSS"
-                  value="si"
-                  checked={altaSS === 'si'}
-                  onChange={() => setAltaSS('si')}
+                  name="situacion"
+                  value="alta"
+                  checked={situacion === 'alta'}
+                  onChange={() => setSituacion('alta')}
                   className={styles.radioInput}
                 />
-                <span className={styles.radioText}>Si, estoy de alta</span>
+                <span className={styles.radioText}>
+                  Estoy de alta en la Seguridad Social o mutualidad
+                </span>
               </label>
               <label className={styles.radioLabel}>
                 <input
                   type="radio"
-                  name="altaSS"
-                  value="no"
-                  checked={altaSS === 'no'}
-                  onChange={() => setAltaSS('no')}
+                  name="situacion"
+                  value="desempleo"
+                  checked={situacion === 'desempleo'}
+                  onChange={() => setSituacion('desempleo')}
                   className={styles.radioInput}
                 />
-                <span className={styles.radioText}>No, actualmente no estoy de alta</span>
+                <span className={styles.radioText}>
+                  Cobraba prestacion o subsidio de desempleo cuando nacio el menor
+                </span>
+              </label>
+              <label className={styles.radioLabel}>
+                <input
+                  type="radio"
+                  name="situacion"
+                  value="alta-posterior"
+                  checked={situacion === 'alta-posterior'}
+                  onChange={() => setSituacion('alta-posterior')}
+                  className={styles.radioInput}
+                />
+                <span className={styles.radioText}>
+                  Me di de alta despues del nacimiento y ya tengo 30 dias cotizados
+                </span>
+              </label>
+              <label className={styles.radioLabel}>
+                <input
+                  type="radio"
+                  name="situacion"
+                  value="ninguna"
+                  checked={situacion === 'ninguna'}
+                  onChange={() => setSituacion('ninguna')}
+                  className={styles.radioInput}
+                />
+                <span className={styles.radioText}>Ninguna de las anteriores</span>
               </label>
             </div>
             <p className={styles.helpText}>
-              Es requisito imprescindible estar dada de alta en la SS o Mutualidad al menos 1 dia del mes.
+              Desde el 1 de enero de 2023 no hace falta estar trabajando: el articulo 81.1 de la Ley
+              del IRPF incluye tambien a quien percibia prestacion o subsidio de desempleo al nacer el
+              menor, y a quien se da de alta despues con 30 dias cotizados.
             </p>
           </fieldset>
 
@@ -318,8 +366,10 @@ export default function EstimacionDeduccionMaternidadPage() {
                 <h3>No cumples los requisitos actualmente</h3>
                 <p>{resultado.motivoNoElegible}</p>
                 <p style={{ marginTop: '0.75rem' }}>
-                  <strong>Alternativa:</strong> Si te das de alta en la SS (por cuenta propia o ajena),
-                  podras aplicar la deduccion desde ese mismo mes. Tambien aplica a padres viudos o tutores.
+                  <strong>Alternativa:</strong> si te das de alta en la Seguridad Social (por cuenta
+                  propia o ajena), tendras derecho a la deduccion al alcanzar los 30 dias cotizados, y
+                  ese mes se suman {formatCurrency(DEDUCCION_MATERNIDAD_IRPF_2025.incrementoAltaPosterior.importe)} adicionales.
+                  Tambien aplica a padres viudos o tutores con la guarda y custodia exclusiva.
                 </p>
               </div>
             </>
@@ -329,7 +379,13 @@ export default function EstimacionDeduccionMaternidadPage() {
               <div className={styles.requisitosGrid}>
                 <div className={`${styles.requisitoItem} ${styles.requisitoOk}`}>
                   <span className={styles.requisitoIcon} aria-hidden="true">&#x2705;</span>
-                  <span className={styles.requisitoText}>Alta en Seguridad Social o Mutualidad</span>
+                  <span className={styles.requisitoText}>
+                    {situacion === 'desempleo'
+                      ? 'Prestacion o subsidio de desempleo al nacer el menor'
+                      : situacion === 'alta-posterior'
+                        ? 'Alta posterior al nacimiento con 30 dias cotizados'
+                        : 'Alta en Seguridad Social o Mutualidad'}
+                  </span>
                 </div>
                 <div className={`${styles.requisitoItem} ${styles.requisitoOk}`}>
                   <span className={styles.requisitoIcon} aria-hidden="true">&#x2705;</span>
@@ -358,6 +414,25 @@ export default function EstimacionDeduccionMaternidadPage() {
                     </div>
                   )
                 ))}
+                {resultado.incrementoAltaPosterior > 0 && (
+                  <div className={styles.resultItem}>
+                    <span className={styles.resultLabel}>Incremento por alta posterior</span>
+                    <span className={styles.resultValue}>
+                      {formatCurrency(resultado.incrementoAltaPosterior)} (una vez, art. 81.3)
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className={styles.resultNote} role="note">
+                <span aria-hidden="true">&#x26A0;&#xFE0F;</span>
+                <p>
+                  No se computan los meses en que alguno de los progenitores cobre por ese hijo/a el{' '}
+                  <strong>complemento de ayuda para la infancia</strong> del ingreso minimo vital: la
+                  deduccion y ese complemento son incompatibles mes a mes. El incremento por guarderia
+                  tiene ademas un segundo tope: el gasto efectivo no subvencionado que hayas pagado al
+                  centro.
+                </p>
               </div>
 
               <div className={styles.resultadoFinal}>
@@ -408,24 +483,34 @@ export default function EstimacionDeduccionMaternidadPage() {
         <h3>¿Que es la deduccion por maternidad?</h3>
         <p>
           La deduccion por maternidad es un beneficio fiscal regulado en el articulo 81 de la
-          Ley 35/2006 del IRPF. Permite a las madres trabajadoras (o padres viudos/tutores)
-          deducir {formatCurrency(1200)} anuales de la cuota del IRPF por cada hijo menor
-          de 3 anos. A diferencia de los minimos personales, esta deduccion se aplica directamente
-          sobre la cuota del impuesto, euro por euro.
+          Ley 35/2006 del IRPF. Permite deducir {formatCurrency(1200)} anuales de la cuota del IRPF
+          por cada hijo menor de 3 anos. A diferencia de los minimos personales, esta deduccion se
+          aplica directamente sobre la cuota del impuesto, euro por euro.
         </p>
 
         {/* Requisitos */}
         <h3>Requisitos en detalle</h3>
-        <p>Para poder aplicar la deduccion por maternidad debes cumplir <strong>todos</strong> estos requisitos:</p>
+        <p>
+          Hay que tener derecho al <strong>minimo por descendientes</strong> por un hijo menor de 3
+          anos y encontrarse en <strong>una</strong> de estas tres situaciones (son alternativas, no
+          acumulativas):
+        </p>
         <ul>
-          <li><strong>Ser madre trabajadora</strong> (o padre con guarda y custodia exclusiva, viudo o tutor).</li>
-          <li><strong>Estar dada de alta</strong> en la Seguridad Social o Mutualidad alternativa al menos 1 dia del mes.</li>
-          <li><strong>Tener hijos menores de 3 anos</strong>. La deduccion se aplica desde el mes de nacimiento hasta el mes en que el hijo cumple 3 anos (inclusive).</li>
-          <li><strong>Realizar una actividad por cuenta propia o ajena</strong>. Las desempleadas con prestacion (sin cotizacion) no pueden aplicarla.</li>
+          <li><strong>Estar de alta</strong> en la Seguridad Social o mutualidad alternativa, por cuenta propia o ajena.</li>
+          <li><strong>Percibir prestacion o subsidio de desempleo</strong> en el momento del nacimiento del menor, sean prestaciones contributivas o asistenciales.</li>
+          <li><strong>Darse de alta despues del nacimiento</strong> y alcanzar 30 dias cotizados: la deduccion del mes en que se cumplen se incrementa ademas en {formatCurrency(150)}.</li>
         </ul>
         <p>
-          El padre puede aplicarla en caso de fallecimiento de la madre o si tiene la guarda
-          y custodia exclusiva. Tambien aplica en caso de adopcion o acogimiento.
+          Esta redaccion es la que dio el articulo 64 de la Ley 31/2022, con efectos desde el 1 de
+          enero de 2023. <strong>Antes de esa fecha</strong> la deduccion exigia realizar una actividad
+          por cuenta propia o ajena, de modo que las desempleadas quedaban fuera; muchas guias siguen
+          repitiendo aquel requisito, que ya no esta en vigor.
+        </p>
+        <p>
+          La deduccion se calcula por meses. No cuentan los meses en que alguno de los progenitores
+          perciba por ese descendiente el <strong>complemento de ayuda para la infancia</strong> del
+          ingreso minimo vital (Ley 19/2021). El padre puede aplicarla en caso de fallecimiento de la
+          madre o si tiene la guarda y custodia exclusiva, y tambien vale en adopcion o acogimiento.
         </p>
 
         {/* Cobro anticipado */}
@@ -560,7 +645,17 @@ export default function EstimacionDeduccionMaternidadPage() {
             <h4>¿Puedo cobrar la deduccion si estoy de baja por maternidad?</h4>
             <p>
               Si. Durante la baja por maternidad/paternidad sigues de alta en la SS, por lo que
-              la deduccion se mantiene. Solo se interrumpe si causas baja definitiva.
+              la deduccion se mantiene.
+            </p>
+          </div>
+          <div className={styles.faqItem}>
+            <h4>Estoy en paro cobrando el subsidio, ¿tengo derecho?</h4>
+            <p>
+              Si percibias una prestacion o subsidio de desempleo cuando nacio tu hijo/a,{' '}
+              <strong>si</strong>. Desde el 1 de enero de 2023 el articulo 81.1 de la Ley del IRPF
+              incluye expresamente las prestaciones contributivas y asistenciales del sistema de
+              proteccion por desempleo. Y si te das de alta mas adelante, tienes derecho al llegar a
+              30 dias cotizados, con {formatCurrency(150)} adicionales ese mes.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -651,9 +746,16 @@ export default function EstimacionDeduccionMaternidadPage() {
           </div>
           <ul className={styles.warningList}>
             <li>
-              <strong>No estar de alta en la SS:</strong> es el error mas comun. Si pierdes el alta
-              (excedencia sin reserva, fin de contrato sin prestacion contributiva), pierdes la
-              deduccion desde ese mes.
+              <strong>Darla por perdida al quedarte sin trabajo:</strong> es el error mas comun, y
+              suele venir de guias escritas antes de 2023. Si al nacer el menor percibias prestacion o
+              subsidio de desempleo, la deduccion te corresponde igual. Donde si se interrumpe es en
+              los meses sin alta y sin prestacion (por ejemplo, una excedencia sin reserva o el fin de
+              contrato sin derecho a paro).
+            </li>
+            <li>
+              <strong>Cobrar a la vez el complemento de ayuda para la infancia:</strong> los meses en
+              que se percibe ese complemento del ingreso minimo vital por el mismo hijo/a no se
+              computan en la deduccion.
             </li>
             <li>
               <strong>Guarderia no autorizada:</strong> las ludotecas, cuidadores particulares o
