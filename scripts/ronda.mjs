@@ -93,6 +93,7 @@ const RUIDO = [
   /net::ERR_ABORTED/i,            // consecuencia del bloqueo anterior
   /ERR_INTERNET_DISCONNECTED/i,
   /\/api\/csp-report/i,           // el reporte de CSP falla POR el bloqueo: es efecto, no causa
+  /\[PWA\].*Service Worker/i,     // no se puede registrar porque la ronda lo bloquea a propósito
 ];
 const esRuido = t => RUIDO.some(r => r.test(t));
 
@@ -339,7 +340,16 @@ console.log(`\nRonda de ${urls.length} URLs · ${CONCURRENCIA} en paralelo\n`);
 
 const proc = await asegurarServidor();
 const navegador = await chromium.launch({ headless: true });
-const ctx = await navegador.newContext({ viewport: { width: 1280, height: 900 } });
+/**
+ * `serviceWorkers: 'block'` no es opcional: el 13/08/2026, al verificar el arreglo de
+ * la CSP en producción, el service worker siguió sirviendo de su caché las respuestas
+ * fallidas de ANTES del despliegue, y dos apps ya reparadas seguían apareciendo rotas.
+ * Una ronda que mide la caché del navegador no mide el estado del sitio.
+ */
+const ctx = await navegador.newContext({
+  viewport: { width: 1280, height: 900 },
+  serviceWorkers: 'block',
+});
 
 // El título de la home es la referencia para detectar metadata heredada
 const paginaHome = await ctx.newPage();
