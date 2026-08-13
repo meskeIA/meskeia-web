@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { applicationsDatabase } from '@/data/applications';
+import { guidesJourney } from '@/data/guides-journey';
 import appDates from '@/data/app-dates.json';
 
 // Configuración para static export
@@ -13,11 +14,16 @@ export const dynamic = 'force-static';
  * CADA deploy que el catálogo entero había cambiado. Un lastmod que siempre miente
  * acaba ignorándose, y con él se pierde la única vía de señalar lo que sí cambió.
  * Si una ruta no está en el JSON, se cae a la fecha del build (comportamiento previo).
+ *
+ * Se prueba primero la clave de DOS segmentos (`guia/comprar-casa`) y luego la de
+ * uno (`guia`): las 14 guías-journey viven bajo la misma carpeta de primer nivel, y
+ * con la clave corta las 14 declararían la fecha de la última que se tocase — el
+ * mismo lastmod mentiroso que este mecanismo vino a eliminar.
  */
 const fechas = appDates as Record<string, string>;
 function ultimaModificacion(ruta: string): Date {
-  const slug = ruta.replace(/^\/|\/$/g, '').split('/')[0];
-  const fecha = fechas[slug];
+  const segmentos = ruta.replace(/^\/|\/$/g, '').split('/');
+  const fecha = fechas[segmentos.slice(0, 2).join('/')] ?? fechas[segmentos[0]];
   return fecha ? new Date(`${fecha}T00:00:00Z`) : new Date();
 }
 
@@ -53,7 +59,50 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.5,
     },
+    // Páginas de sitio con contenido propio e `index, follow` que hasta el
+    // 13/08/2026 no se anunciaban en ningún sitio (auditoría del aviso de Bing
+    // "Faltan páginas importantes en los mapas del sitio"). No entran aquí
+    // /contacto/ (noindex) ni /dashboard-analytics/ (panel privado).
+    {
+      url: `${baseUrl}/apps/`,
+      lastModified: ultimaModificacion('apps'),
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/mcp/`,
+      lastModified: ultimaModificacion('mcp'),
+      changeFrequency: 'monthly',
+      priority: 0.5,
+    },
+    {
+      url: `${baseUrl}/developers/terminos/`,
+      lastModified: ultimaModificacion('developers/terminos'),
+      changeFrequency: 'monthly',
+      priority: 0.3,
+    },
+    // Índice de las guías-journey (las guías en sí, más abajo).
+    {
+      url: `${baseUrl}/guia/`,
+      lastModified: ultimaModificacion('guia'),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
   ];
+
+  // Guías-journey (/guia/[id]/): landings que agrupan varias apps alrededor de una
+  // decisión concreta. Viven en data/guides-journey.ts, NO en applicationsDatabase,
+  // así que el sitemap —que se derivaba solo del catálogo de apps— nunca las anunció.
+  // Las 14 responden 200 con `index, follow` y canonical propia: eran 14 landings
+  // publicadas e invisibles para los buscadores (detectado el 13/08/2026).
+  const guidePages: MetadataRoute.Sitemap = guidesJourney
+    .filter((guia) => guia.available)
+    .map((guia) => ({
+      url: `${baseUrl}${guia.url}`,
+      lastModified: ultimaModificacion(guia.url),
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    }));
 
   // Generar entradas para todas las aplicaciones (automático).
   // Excluimos las cronologías del sistema dinámico (/visualizador-historia/[slug]/):
@@ -71,6 +120,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     }));
 
-  // Combinar: páginas principales + aplicaciones
-  return [...mainPages, ...appPages];
+  // Combinar: páginas principales + aplicaciones + guías-journey.
+  // Se deduplica por URL porque /guia/herencias/ figura a la vez en
+  // applicationsDatabase y en guidesJourney; anunciarla dos veces en el mismo
+  // sitemap es un error de formato que Bing y GSC señalan.
+  const porUrl = new Map<string, MetadataRoute.Sitemap[number]>();
+  for (const entrada of [...mainPages, ...appPages, ...guidePages]) {
+    if (!porUrl.has(entrada.url)) porUrl.set(entrada.url, entrada);
+  }
+  return [...porUrl.values()];
 }

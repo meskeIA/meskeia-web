@@ -65,10 +65,19 @@ for (const linea of salidaGit.split('\n')) {
     continue;
   }
   if (!linea.startsWith('app/') || !fechaActual) continue;
-  const slug = linea.split('/')[1];
+  const partes = linea.split('/');
+  const slug = partes[1];
   if (!slug) continue;
   // Solo la primera aparición (= commit más reciente que tocó esa carpeta)
   if (!fechas[slug]) fechas[slug] = fechaActual;
+  // Segundo nivel SOLO para las guías-journey (app/guia/<id>/): las 14 comparten
+  // carpeta de primer nivel, así que con la clave corta las 14 declararían la fecha
+  // de la última que se tocase — el lastmod mentiroso que este script vino a quitar.
+  // No se extiende a los cursos: sus lecciones no se anuncian en el sitemap.
+  if (slug === 'guia' && partes[2]) {
+    const clave = `guia/${partes[2]}`;
+    if (!fechas[clave]) fechas[clave] = fechaActual;
+  }
 }
 
 // Aviso si alguna carpeta de app se queda sin fecha (p.ej. nunca commiteada)

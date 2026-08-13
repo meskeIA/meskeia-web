@@ -129,12 +129,17 @@ const nextConfig: NextConfig = {
   async redirects() {
     const has = [{ type: 'host' as const, value: '(www\\.)?meskeia\\.com' }];
     return [
+      // La BARRA FINAL del destino no es cosmética: los tres dominios usan
+      // `trailingSlash: true`, así que un destino sin barra encadena un SEGUNDO 308
+      // en el dominio de llegada (verificado el 13/08/2026: /delegum/datos-fiscales/iprem/
+      // y /visualizador-historia/roma/ daban 2 saltos). Se usa `:path+` (uno o más
+      // segmentos) para que la raíz no genere `//`; de ella se ocupa la regla previa.
       { source: '/delegum', has, destination: 'https://delegum.com/', permanent: true },
-      { source: '/delegum/:path*', has, destination: 'https://delegum.com/:path*', permanent: true },
+      { source: '/delegum/:path+', has, destination: 'https://delegum.com/:path+/', permanent: true },
       // Consolidación canónica de Cronicum: el prefijo interno /cronicum/* vive en
       // meskeia.com por implementación, pero la URL canónica es cronicum.com/*.
       { source: '/cronicum', has, destination: 'https://cronicum.com/', permanent: true },
-      { source: '/cronicum/:path*', has, destination: 'https://cronicum.com/:path*', permanent: true },
+      { source: '/cronicum/:path+', has, destination: 'https://cronicum.com/:path+/', permanent: true },
 
       // 301 DE MIGRACIÓN de las cronologías (distinto del canónico de arriba): las
       // cronologías del sistema dinámico vivían en meskeia.com/visualizador-historia/[slug]
@@ -147,7 +152,11 @@ const nextConfig: NextConfig = {
       // NO captura las 3 apps custom hifenadas (/visualizador-historia-reloj|dinero|
       // escritura/): son apps propias de meskeIA con formato distinto, no cronologías, y
       // no existen en Cronicum — su path no casa con /visualizador-historia/:path* (barra).
-      { source: '/visualizador-historia/:path*', has, destination: 'https://cronicum.com/:path*', permanent: true },
+      // La raíz va aparte porque `:path+` exige al menos un segmento: sin esta regla,
+      // /visualizador-historia/ (que no tiene page.tsx propio, solo [slug]) pasaría de
+      // redirigir a cronicum.com a devolver un 404.
+      { source: '/visualizador-historia', has, destination: 'https://cronicum.com/', permanent: true },
+      { source: '/visualizador-historia/:path+', has, destination: 'https://cronicum.com/:path+/', permanent: true },
 
       // Recuperación de 404 por apps renombradas (detectado en GSC 2026-07-18).
       // Slugs antiguos (calculadora-*/simulador-*/convertidor-*) que Google aún
