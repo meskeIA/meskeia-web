@@ -13,9 +13,14 @@
  *   cotizaciones en ambos regímenes supera el 53,26% de la base máxima de
  *   cotización del ejercicio multiplicada por 12.
  *
- * Base máxima de cotización 2025: 4.909,50 €/mes (58.914 €/año)
- * Límite total de cotizaciones (53,26% × base máxima anual):
- *   53,26% × 58.914 = 31.380,39 €/año (contingencias comunes)
+ * Base máxima de cotización: la del ejercicio en curso, importada de
+ * `data/fiscal/irpf.ts` (2026: 5.101,20 €/mes = 61.214,40 €/año).
+ * Límite total de cotizaciones = 53,26% × base máxima anual.
+ *
+ * ⚠️ CORREGIDO EL 13/08/2026: el módulo tenía escrita a mano la base máxima de
+ * 2025 (4.909,50 €/mes), de modo que el umbral de devolución salía unos 1.222 €
+ * por debajo del real y podía concluir que NO había derecho a devolución cuando
+ * sí lo había. Ahora se importa del repositorio vigilado y sube solo cada enero.
  *
  * Procedimiento:
  *   1. Solicitar devolución a la TGSS antes del 30 de abril del año siguiente
@@ -29,18 +34,21 @@
  *   - Opción B: aplicar tarifa plana y al terminar, si hay exceso, solicitar devolución
  *   Esta calculadora cubre la devolución del exceso (no la bonificación inicial).
  *
- * Fuente: LGSS art. 313 + DA 3ª Ley 27/2011 — vigente 2025
- * Verificado: 2025-01-15
+ * Fuente: LGSS art. 313 + DA 3ª Ley 27/2011 + Orden PJC/297/2026 (base máxima)
+ * Verificado: 2026-08-13
  *
  * Encadenable con: calcular_cuota_autonomo, calcular_sueldo_neto, calcular_modelo_130
  */
 
-// ─── Constantes 2025 ────────────────────────────────────────────────────────────
+// ─── Constantes ─────────────────────────────────────────────────────────────────
+// La base máxima NO se escribe aquí: es un dato del ejercicio, vigilado en data/fiscal.
 
-const BASE_MAXIMA_MENSUAL_2025 = 4909.50;    // €/mes
-const BASE_MAXIMA_ANUAL_2025 = BASE_MAXIMA_MENSUAL_2025 * 12; // €/año = 58.914 €
+import { BASES_SS_2026 } from '@/data/fiscal';
+
+const BASE_MAXIMA_MENSUAL = BASES_SS_2026.maxima; // €/mes
+const BASE_MAXIMA_ANUAL = BASE_MAXIMA_MENSUAL * 12; // €/año
 const PCT_LIMITE_COTIZACIONES = 53.26;        // % sobre base máxima anual
-const LIMITE_TOTAL_COTIZACIONES_ANUALES = BASE_MAXIMA_ANUAL_2025 * PCT_LIMITE_COTIZACIONES / 100;
+const LIMITE_TOTAL_COTIZACIONES_ANUALES = BASE_MAXIMA_ANUAL * PCT_LIMITE_COTIZACIONES / 100;
 const PCT_DEVOLUCION_EXCESO = 50;            // % del exceso que se devuelve
 
 // Tipos de cotización por contingencias comunes (trabajador)
@@ -75,7 +83,7 @@ export interface ParametrosExcedenteCotizacionSS {
 }
 
 export interface ResultadoExcedenteCotizacionSS {
-  /** Base máxima anual de cotización 2025 (€) */
+  /** Base máxima anual de cotización del ejercicio en curso (€) */
   baseMaximaAnual: number;
   /** Límite de cotizaciones anuales (53,26% × base máxima) (€) */
   limiteAnualCotizaciones: number;
@@ -136,7 +144,7 @@ export function calcularExcedenteCotizacionSS(p: ParametrosExcedenteCotizacionSS
   }
 
   return {
-    baseMaximaAnual: r(BASE_MAXIMA_ANUAL_2025),
+    baseMaximaAnual: r(BASE_MAXIMA_ANUAL),
     limiteAnualCotizaciones: r(LIMITE_TOTAL_COTIZACIONES_ANUALES),
     cuotasCCRGSSAnuales: cuotasCCRGSS,
     cuotasCCRETAAnuales: r(p.cuotasCCAnualesRETA),
@@ -146,6 +154,6 @@ export function calcularExcedenteCotizacionSS(p: ParametrosExcedenteCotizacionSS
     importeADevolver,
     plazoDeSolicitud: 'Antes del 30 de abril del año siguiente al ejercicio (ante la TGSS)',
     advertencias,
-    fuenteDatos: 'LGSS art. 313 + DA 3ª Ley 27/2011 — base máxima 2025: 4.909,50 €/mes',
+    fuenteDatos: `LGSS art. 313 + DA 3ª Ley 27/2011 — base máxima vigente: ${BASE_MAXIMA_MENSUAL.toLocaleString('es-ES')} €/mes`,
   };
 }

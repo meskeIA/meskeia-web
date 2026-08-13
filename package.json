@@ -17,6 +17,7 @@
     "check:enlaces": "node scripts/check-enlaces-internos.mjs",
     "check:fiscal": "node scripts/check-fiscal-manifiesto.mjs",
     "audit:fiscal-fuentes": "node scripts/audit-fiscal-fuentes.mjs",
+    "audit:motores": "node scripts/audit-motores-fiscales.mjs",
     "check:memoria": "node scripts/check-memoria.mjs",
     "generate:app-dates": "node scripts/generate-app-dates.mjs",
     "check:secrets": "git -c core.quotepath=false diff --cached --unified=0 --no-color --no-renames --diff-filter=ACM | node scripts/check-secrets.mjs",
