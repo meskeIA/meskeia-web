@@ -59,7 +59,7 @@
  * Encadenable con: calcular_sueldo_neto, calcular_baja_medica, calcular_complemento_it_empresa
  */
 
-import { PERMISO_NACIMIENTO, AMPLIACIONES_PERMISO, PRESTACION_NACIMIENTO } from '@/data/fiscal';
+import { PERMISO_NACIMIENTO, AMPLIACION_POR_ID, PRESTACION_NACIMIENTO } from '@/data/fiscal';
 
 // ─── Constantes ─────────────────────────────────────────────────────────────
 // Fuente única: data/fiscal/maternidad.ts (RDL 9/2025)
@@ -76,8 +76,8 @@ const SEMANAS_FLEXIBLES_HASTA_12_MESES_BIPARENTAL = PERMISO_BIPARENTAL.semanasFl
 const SEMANAS_FLEXIBLES_HASTA_12_MESES_MONOPARENTAL = PERMISO_MONOPARENTAL.semanasFlexiblesHasta12Meses;
 const SEMANAS_CUIDADO_PROLONGADO_BIPARENTAL = PERMISO_BIPARENTAL.semanasCuidadoProlongadoHasta8Anios; // distribuibles hasta los 8 años
 const SEMANAS_CUIDADO_PROLONGADO_MONOPARENTAL = PERMISO_MONOPARENTAL.semanasCuidadoProlongadoHasta8Anios;
-const SEMANAS_ADICIONAL_MULTIPLE_POR_HIJO = AMPLIACIONES_PERMISO.find((a) => a.motivo === 'Parto múltiple')!.semanasExtra; // por cada hijo a partir del segundo
-const SEMANAS_ADICIONAL_DISCAPACIDAD = AMPLIACIONES_PERMISO.find((a) => a.motivo === 'Discapacidad del hijo/a')!.semanasExtra; // fijo, para cada progenitor
+const SEMANAS_ADICIONAL_MULTIPLE_POR_HIJO = AMPLIACION_POR_ID['parto-multiple'].semanasExtra; // por cada hijo a partir del segundo
+const SEMANAS_ADICIONAL_DISCAPACIDAD = AMPLIACION_POR_ID['discapacidad-menor'].semanasExtra; // fijo, para cada progenitor
 const BASE_MAXIMA_MENSUAL = PRESTACION_NACIMIENTO.basesReferencia.baseMaximaMensual; // €/mes, ejercicio en curso
 const BASE_MAXIMA_DIARIA = BASE_MAXIMA_MENSUAL / 30;
 const NO_CONTRIBUTIVA = PRESTACION_NACIMIENTO.noContributiva;

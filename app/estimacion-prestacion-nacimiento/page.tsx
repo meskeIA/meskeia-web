@@ -19,7 +19,7 @@ import {
   FISCAL_MATERNIDAD_META,
   PRESTACION_NACIMIENTO,
   PERMISO_NACIMIENTO,
-  AMPLIACIONES_PERMISO,
+  AMPLIACION_POR_ID,
 } from '@/data/fiscal';
 
 // ===== TIPOS =====
@@ -150,40 +150,29 @@ export default function EstimacionPrestacionNacimiento() {
       );
     }
 
-    // Ampliaciones
+    // Ampliaciones (por identificador: ni el orden ni la redaccion del motivo
+    // pueden desviar el calculo en silencio)
     if (partoMultiple && numHijos >= 2) {
       const hijosExtra = numHijos - 1;
-      const ampMultiple = AMPLIACIONES_PERMISO.find((a) => a.motivo === 'Parto m\u00FAltiple');
-      if (ampMultiple) {
-        const semanas = ampMultiple.semanasExtra * hijosExtra;
-        semanasExtra += semanas;
-        detalleAmpliaciones.push(
-          `+${semanas} semanas por parto multiple (${hijosExtra} hijo${hijosExtra > 1 ? 's' : ''} adicional${hijosExtra > 1 ? 'es' : ''})`
-        );
-      }
+      const semanas = AMPLIACION_POR_ID['parto-multiple'].semanasExtra * hijosExtra;
+      semanasExtra += semanas;
+      detalleAmpliaciones.push(
+        `+${semanas} semanas por parto multiple (${hijosExtra} hijo${hijosExtra > 1 ? 's' : ''} adicional${hijosExtra > 1 ? 'es' : ''})`
+      );
     }
 
     if (hospitalizacion) {
-      const ampHosp = AMPLIACIONES_PERMISO.find((a) =>
-        a.motivo.includes('hospitalizaci\u00F3n neonatal') || a.motivo.includes('Parto prematuro')
+      const semanasHosp = AMPLIACION_POR_ID['hospitalizacion-neonatal'].semanasExtra;
+      semanasExtra += semanasHosp;
+      detalleAmpliaciones.push(
+        `Hasta +${semanasHosp} semanas por hospitalizacion neonatal (segun dias reales)`
       );
-      if (ampHosp) {
-        semanasExtra += ampHosp.semanasExtra;
-        detalleAmpliaciones.push(
-          `Hasta +${ampHosp.semanasExtra} semanas por hospitalizacion neonatal (segun dias reales)`
-        );
-      }
     }
 
     if (situacion === 'adopcion') {
-      const ampAdopcion = AMPLIACIONES_PERMISO.find((a) =>
-        a.motivo.includes('internacional')
+      detalleAmpliaciones.push(
+        `Posible +${AMPLIACION_POR_ID['adopcion-internacional'].semanasExtra} semanas si adopcion internacional (desplazamiento)`
       );
-      if (ampAdopcion) {
-        detalleAmpliaciones.push(
-          `Posible +${ampAdopcion.semanasExtra} semanas si adopcion internacional (desplazamiento)`
-        );
-      }
     }
 
     const semanasTotal = permiso.semanasTotal + semanasExtra;

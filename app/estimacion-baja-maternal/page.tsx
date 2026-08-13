@@ -16,7 +16,7 @@ import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_MATERNIDAD_META,
   PERMISO_NACIMIENTO,
-  AMPLIACIONES_PERMISO,
+  AMPLIACION_POR_ID,
 } from '@/data/fiscal';
 
 // ── Tipos ────────────────────────────────────────────────────────────────────
@@ -87,29 +87,30 @@ export default function EstimacionBajaMaternalPage() {
     let semanasExtras = 0;
     const detalleExtras: string[] = [];
 
-    // Parto multiple: +2 semanas por cada hijo adicional
+    // Parto multiple: 1 semana por cada hijo adicional a partir del segundo (RDL 9/2025)
     if (partoMultiple && numBebes > 1) {
       const hijosAdicionales = numBebes - 1;
-      const extraMultiple = hijosAdicionales * (AMPLIACIONES_PERMISO[0].semanasExtra);
+      const extraMultiple = hijosAdicionales * AMPLIACION_POR_ID['parto-multiple'].semanasExtra;
       semanasExtras += extraMultiple;
       detalleExtras.push(
         `Parto multiple (${numBebes} bebes): +${extraMultiple} semanas`
       );
     }
 
-    // Discapacidad: +2 semanas
+    // Discapacidad del menor
     if (discapacidad) {
-      semanasExtras += AMPLIACIONES_PERMISO[1].semanasExtra;
+      const extraDiscapacidad = AMPLIACION_POR_ID['discapacidad-menor'].semanasExtra;
+      semanasExtras += extraDiscapacidad;
       detalleExtras.push(
-        `Discapacidad del bebe: +${AMPLIACIONES_PERMISO[1].semanasExtra} semanas`
+        `Discapacidad del bebe: +${extraDiscapacidad} semanas`
       );
     }
 
-    // Hospitalizacion neonatal: hasta 13 semanas (1 semana por cada 7 dias)
+    // Hospitalizacion neonatal: 1 semana por cada 7 dias, con el tope del modulo
     if (hospitalizacion && diasHospitalizacion > 0) {
       const semanasHosp = Math.min(
         Math.ceil(diasHospitalizacion / 7),
-        AMPLIACIONES_PERMISO[2].semanasExtra
+        AMPLIACION_POR_ID['hospitalizacion-neonatal'].semanasExtra
       );
       semanasExtras += semanasHosp;
       detalleExtras.push(
@@ -117,11 +118,12 @@ export default function EstimacionBajaMaternalPage() {
       );
     }
 
-    // Adopcion/acogimiento internacional: +2 semanas (beneficio familiar, RDL 9/2025)
+    // Adopcion/acogimiento internacional: desplazamiento al pais de origen
     if (situacion === 'adopcion' || situacion === 'acogimiento') {
-      semanasExtras += AMPLIACIONES_PERMISO[3].semanasExtra;
+      const extraAdopcion = AMPLIACION_POR_ID['adopcion-internacional'].semanasExtra;
+      semanasExtras += extraAdopcion;
       detalleExtras.push(
-        `${situacion === 'adopcion' ? 'Adopcion' : 'Acogimiento'} (desplazamiento): +${AMPLIACIONES_PERMISO[3].semanasExtra} semanas`
+        `${situacion === 'adopcion' ? 'Adopcion' : 'Acogimiento'} (desplazamiento): +${extraAdopcion} semanas`
       );
     }
 
@@ -197,7 +199,7 @@ export default function EstimacionBajaMaternalPage() {
       </DisclaimerCard>
 
       <DataReference
-        normativa="Permiso por nacimiento y cuidado del menor 2025"
+        normativa={`Permiso por nacimiento y cuidado del menor — ${FISCAL_MATERNIDAD_META.vigencia}`}
         fuente={FISCAL_MATERNIDAD_META.fuente}
         verificado={FISCAL_MATERNIDAD_META.verificado}
         urlOficial={FISCAL_MATERNIDAD_META.urlOficial}

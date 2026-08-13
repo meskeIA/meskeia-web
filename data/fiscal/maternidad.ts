@@ -81,7 +81,20 @@ export const PERMISO_NACIMIENTO: PermisoNacimiento[] = [
 
 // ─── Ampliaciones del permiso ────────────────────────────────────────────────
 
+/**
+ * Identificador estable de cada ampliación. Existe para que los consumidores no
+ * dependan ni del ORDEN del array ni del TEXTO de `motivo`: hasta el 13/08/2026,
+ * `estimacion-baja-maternal` accedía por índice (`AMPLIACIONES_PERMISO[0]`), de
+ * modo que reordenar esta lista habría cambiado sus cálculos sin error visible.
+ */
+export type AmpliacionId =
+  | 'parto-multiple'
+  | 'discapacidad-menor'
+  | 'hospitalizacion-neonatal'
+  | 'adopcion-internacional';
+
 export interface AmpliacionPermiso {
+  id: AmpliacionId;
   motivo: string;
   semanasExtra: number;
   porProgenitor: boolean; // true = cada uno, false = solo uno
@@ -90,30 +103,39 @@ export interface AmpliacionPermiso {
 
 export const AMPLIACIONES_PERMISO: AmpliacionPermiso[] = [
   {
+    id: 'parto-multiple',
     motivo: 'Parto múltiple',
     semanasExtra: 1,
     porProgenitor: true,
     nota: 'Por cada hijo/a adicional a partir del segundo (RDL 9/2025)',
   },
   {
+    id: 'discapacidad-menor',
     motivo: 'Discapacidad del hijo/a',
     semanasExtra: 2,
     porProgenitor: true,
     nota: 'Si el recién nacido tiene discapacidad reconocida',
   },
   {
+    id: 'hospitalizacion-neonatal',
     motivo: 'Parto prematuro (<37 semanas) u hospitalización neonatal',
     semanasExtra: 13,
     porProgenitor: false,
     nota: 'Hasta 13 semanas adicionales (días de hospitalización tras el parto). Solo un progenitor.',
   },
   {
+    id: 'adopcion-internacional',
     motivo: 'Adopción/acogimiento internacional',
     semanasExtra: 2,
     porProgenitor: false,
     nota: 'Hasta 2 semanas adicionales por desplazamiento al país de origen',
   },
 ];
+
+/** Acceso por identificador: ni el orden ni la redacción del motivo pueden romperlo. */
+export const AMPLIACION_POR_ID = Object.fromEntries(
+  AMPLIACIONES_PERMISO.map((a) => [a.id, a]),
+) as Record<AmpliacionId, AmpliacionPermiso>;
 
 // ─── Prestación económica por nacimiento (LGSS) ─────────────────────────────
 // La prestación es el 100% de la base reguladora (BR)
