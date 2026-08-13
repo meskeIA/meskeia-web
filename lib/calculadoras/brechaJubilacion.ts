@@ -4,7 +4,12 @@
  *
  * Calcula cuánto dinero perderás al jubilarte (diferencia sueldo - pensión)
  * y cuánto debes ahorrar mensualmente para cubrirlo.
+ *
+ * Los años de jubilación por defecto salen de `data/fiscal/esperanza-vida`
+ * (INE), que es el supuesto único de longevidad del catálogo.
  */
+
+import { aniosCobroEstimados } from '@/data/fiscal/esperanza-vida';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
@@ -17,7 +22,7 @@ export interface ParametrosBrechaJubilacion {
   edadActual: number;
   /** Edad de jubilación prevista (años, por defecto 67) */
   edadJubilacion?: number;
-  /** Años previstos de jubilación (por defecto 20) */
+  /** Años previstos de jubilación (por defecto, los que restan según la esperanza de vida del INE) */
   anosJubilado?: number;
   /** Rentabilidad anual esperada del ahorro (%, por defecto 4) */
   rentabilidadAnual?: number;
@@ -53,7 +58,7 @@ export function calcularBrechaJubilacion(p: ParametrosBrechaJubilacion): Resulta
 
   const r = (n: number) => Math.round(n * 100) / 100;
   const edadJubilacion = p.edadJubilacion ?? 67;
-  const anosJubilado = p.anosJubilado ?? 20;
+  const anosJubilado = p.anosJubilado ?? aniosCobroEstimados(edadJubilacion);
   const rentabilidad = p.rentabilidadAnual ?? 4;
 
   if (edadJubilacion <= p.edadActual) throw new Error('La edad de jubilación debe ser mayor que la edad actual.');

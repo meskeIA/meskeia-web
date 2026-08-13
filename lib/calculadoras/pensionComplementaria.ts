@@ -11,7 +11,12 @@
  *
  * Encadenable con: calcular_pension_publica, calcular_brecha_jubilacion,
  *                   calcular_interes_compuesto, calcular_fire
+ *
+ * La esperanza de vida por defecto sale de `data/fiscal/esperanza-vida` (INE),
+ * el mismo supuesto que usa `brechaJubilacion`.
  */
+
+import { aniosCobroEstimados } from '@/data/fiscal/esperanza-vida';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
@@ -24,7 +29,7 @@ export interface ParametrosPensionComplementaria {
   edadActual: number;
   /** Edad de jubilación objetivo (años). Por defecto 67 */
   edadJubilacion?: number;
-  /** Esperanza de vida estimada (años). Por defecto 85 */
+  /** Edad final estimada (años). Por defecto, 65 + esperanza de vida a los 65 según el INE */
   esperanzaVida?: number;
   /** Rentabilidad anual esperada del ahorro durante la acumulación (%). Por defecto 5% */
   rentabilidadAcumulacion?: number;
@@ -80,7 +85,6 @@ export function calcularPensionComplementaria(p: ParametrosPensionComplementaria
   const r = (n: number) => Math.round(n * 100) / 100;
 
   const edadJubilacion = p.edadJubilacion ?? 67;
-  const esperanzaVida = p.esperanzaVida ?? 85;
   const rentabilidadAcumulacion = p.rentabilidadAcumulacion ?? 5;
   const rentabilidadRetiro = p.rentabilidadRetiro ?? 3;
   const capitalYaAcumulado = p.capitalYaAcumulado ?? 0;
@@ -91,7 +95,12 @@ export function calcularPensionComplementaria(p: ParametrosPensionComplementaria
   const brechaMensual = Math.max(0, p.rentaDeseadaMensual - p.pensionPublicaEstimada);
   const brechaAnual = r(brechaMensual * 12);
   const anosAhorro = edadJubilacion - p.edadActual;
-  const anosJubilacion = Math.max(1, esperanzaVida - edadJubilacion);
+  // Sin edad final explícita, los años a cubrir salen de la misma función que usa
+  // calcularBrechaJubilacion, para que los dos motores no puedan volver a divergir.
+  const anosJubilacion =
+    p.esperanzaVida != null
+      ? Math.max(1, p.esperanzaVida - edadJubilacion)
+      : aniosCobroEstimados(edadJubilacion);
 
   const pensionSuficiente = brechaMensual <= 0;
 

@@ -116,6 +116,7 @@ que ya rige para las apps en `CLAUDE.md`, que nadie había extendido explícitam
 | **Enero–febrero** | RD del SMI (arrastra: nómada digital, umbral obligación de declarar) | `smi` `nomada-digital` `irpf` |
 | **Abril–junio** | Campaña de Renta (plazos, criterios AEAT) | `calendario` |
 | **Junio–agosto** | RD umbrales de becas del curso siguiente; Resolución Tesoro S2 (~1 jul) | `becas-estudio` `intereses` |
+| **Noviembre** | Indicadores Demográficos Básicos del INE (esperanza de vida del año anterior) | `esperanza-vida` |
 | **Trimestral** | IRAV (INE) — y IPC interanual mensual | `alquiler` |
 | **Todo el año** | RDL tras Consejo de Ministros (impredecible): IVA de productos concretos, permisos familiares, medidas pensiones | `iva` `maternidad` `pensiones` y cualquiera |
 
@@ -376,6 +377,37 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 
 <!-- EXENTOS:FIN -->
 
+### 3.8 Estadística oficial (no normativa)
+
+> Va aparte porque **no la cambia una norma**: la republica un organismo estadístico en su calendario
+> propio. No hay `BOE-A-` que citar ni Consejo de Ministros que vigilar, así que la §1.0 no le aplica
+> igual —su cita legítima es la operación estadística y su nota de prensa—. Y la señal de cambio es de
+> otra naturaleza: no «ha cambiado la ley», sino «hay un año nuevo publicado».
+>
+> (La numeración deja los exentos en 3.7 a propósito: el mensaje de error de `check:fiscal` apunta a
+> esa sección por su número, y renumerarla lo dejaría señalando al sitio equivocado.)
+
+#### `esperanza-vida.ts` — Esperanza de vida a los 65 años
+
+- **Contiene**: la esperanza de vida a los 65 años en España por sexo (2024) y la función que traduce
+  una edad de jubilación en años de pensión a cubrir. **No es una tabla de mortalidad**: solo el dato
+  a los 65, que es el que necesitan las calculadoras de jubilación.
+- **Fuente**: INE — Movimiento Natural de la Población / Indicadores Demográficos Básicos.
+- **Vigilar**: la publicación anual de los Indicadores Demográficos Básicos (**~noviembre**, referida
+  al año anterior). Señal: aparece un año de referencia posterior al sellado en el módulo.
+- **Cadencia**: anual. Los valores se mueven décimas de año salvo choque de mortalidad —el precedente
+  real es 2020, cuando la esperanza de vida cayó de golpe y recuperó después—, así que la expectativa
+  correcta es «cambia poco todos los años, mucho una vez por generación».
+- **Alerta metodológica**: que el INE cambie la base de proyección o la metodología de las tablas de
+  mortalidad; y, del lado de casa, cualquier app que empiece a presentar este dato como pronóstico
+  individual en vez de como media poblacional.
+- **Por qué está aquí y no exento**: declara cifras con fecha de caducidad. Nació el 13/08/2026 al
+  descubrirse que el mismo supuesto de longevidad vivía escrito cuatro veces con cuatro valores
+  distintos y **ninguna fuente** (20 años en `brechaJubilacion`, esperanza de vida 85 en
+  `pensionComplementaria`, «20-25» en el formulario de `planificador-ahorro-jubilacion` y «25-30» en
+  la FAQ de esa misma página). El candado que lo impide reaparecer es el test GOLDEN-BO2.
+- **Verificado**: 2026-08-13.
+
 ---
 
 ## 4. Precedentes de cambio de metodología (la vara de medir)
@@ -446,6 +478,7 @@ informe del vigía enumerar las apps afectadas por cada hallazgo.)*
 | `calendario` | *(solo Delegum/API)* | calendario-fiscal | ✅ |
 | `dependencia` | estimacion-prestaciones-dependencia · estimacion-deduccion-discapacidad · test-zarit-cuidador | prestaciones-dependencia | ✅ |
 | `donaciones` | estimador-impuesto-donaciones | donaciones-isd | ✅ |
+| `esperanza-vida` | planificador-ahorro-jubilacion · *(y los motores `brechaJubilacion` y `pensionComplementaria`, vía MCP Delegum y Actions de ChatGPT)* | — | — |
 | `inmuebles` | comparador-autonomo-vs-sl · estimador-compraventa-inmueble · estimador-plusvalia-municipal · estimador-plusvalias-irpf · optimizador-rentas-60 · orientador-tipos-renta-irpf · simulador-heredar-vivienda · simulador-gastos-compraventa-garaje · simulador-gastos-compraventa-trastero | itp-ccaa · plusvalia-municipal · irpf-tramos-minimos | ✅ |
 | `intereses` | orientador-intereses-demora | interes-legal-demora | ✅ |
 | `iprem` | *(solo Delegum/API)* | iprem | ✅ |

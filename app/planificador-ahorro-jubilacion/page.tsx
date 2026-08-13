@@ -16,6 +16,7 @@ import {
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
+  FISCAL_ESPERANZA_VIDA_META,
   FISCAL_PENSIONES_META,
   FISCAL_PLAN_PENSIONES_META,
   LIMITES_PLAN_PENSIONES_2025,
@@ -243,6 +244,14 @@ export default function PlanificadorAhorroJubilacionPage() {
           nota={FISCAL_PLAN_PENSIONES_META.nota}
         />
 
+        <DataReference
+          normativa={`Esperanza de vida a los 65 años ${FISCAL_ESPERANZA_VIDA_META.vigencia}`}
+          fuente={FISCAL_ESPERANZA_VIDA_META.fuente}
+          verificado={FISCAL_ESPERANZA_VIDA_META.verificado}
+          urlOficial={FISCAL_ESPERANZA_VIDA_META.urlOficial}
+          nota={FISCAL_ESPERANZA_VIDA_META.nota}
+        />
+
         {/* ═══════ FORMULARIO PRINCIPAL ═══════ */}
         <div className={styles.card}>
           <h2 className={styles.cardTitle}>
@@ -292,7 +301,7 @@ export default function PlanificadorAhorroJubilacionPage() {
             onChange={setAnosJubilado}
             label="Años de jubilación previstos"
             placeholder="20"
-            helperText="Esperanza de vida - edad jubilación. Recomendado: 20-25 años."
+            helperText="Esperanza de vida - edad jubilación. Según el INE (2024), a los 65 años quedan 19,9 años de media en hombres y 23,6 en mujeres: jubilándote a los 67, entre 18 y 22 años."
             min={1}
             max={40}
           />
@@ -605,7 +614,7 @@ export default function PlanificadorAhorroJubilacionPage() {
             <li className={styles.faqItem}>
               <strong>¿El interés compuesto importa tanto?</strong>
               <p>Sí. Ahorrar 200 €/mes durante 30 años al 4% genera más capital que 400 €/mes durante 15 años. Cuanto antes empieces, menor el esfuerzo.</p>
-              <p className={styles.faqTip}>💡 Planificar para 25-30 años de jubilación da margen frente a la longevidad.</p>
+              <p className={styles.faqTip}>💡 Jubilarse a los 67 supone financiar unos 20 años de media (18 en hombres, 22 en mujeres, según el INE 2024). Planificar por encima de esa media da margen frente a la longevidad, pero conviene saber sobre qué cifra se está añadiendo el margen.</p>
             </li>
           </ul>
 

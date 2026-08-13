@@ -33,6 +33,7 @@ import { calcularHipoteca } from '../lib/calculadoras/hipoteca';
 import { calcularSucesion } from '../lib/calculadoras/sucesiones';
 import { calcularPensionPublica } from '../lib/calculadoras/pensionPublica';
 import { calcularBrechaJubilacion } from '../lib/calculadoras/brechaJubilacion';
+import { calcularPensionComplementaria } from '../lib/calculadoras/pensionComplementaria';
 import { calcularVentaInmueble } from '../lib/calculadoras/ventaInmueble';
 import { compararDonacionHerencia } from '../lib/calculadoras/comparacionDonacionHerencia';
 import { calcularPensionDesempleo } from '../lib/calculadoras/pensionDesempleo';
@@ -1795,20 +1796,32 @@ test.describe('Golden — calcularPensionPublica (Capa 1 · LGSS / Ley 21/2021)'
 
 test.describe('Golden — calcularBrechaJubilacion (Capa 1 · cálculo financiero propio)', () => {
 
-  test('GOLDEN-BO: sueldo neto 2.400 €, pensión 1.500 €, 47 años → brecha 900 €/mes, capital 216.000 €, ahorro 588,92 €/mes', () => {
-    // Brecha mensual = 2.400 − 1.500 = 900 €. Brecha anual = 10.800 €. Capital = 10.800 × 20 años = 216.000 €.
+  test('GOLDEN-BO: sueldo neto 2.400 €, pensión 1.500 €, 47 años → brecha 900 €/mes, capital 213.840 €, ahorro 583,03 €/mes', () => {
+    // Brecha mensual = 2.400 − 1.500 = 900 €. Brecha anual = 10.800 €.
+    // Años de jubilación por defecto = 65 + 21,76 (esperanza de vida a los 65, INE 2024) − 67 = 19,8.
+    // Capital = 10.800 × 19,8 = 213.840 €.
     // % pensión/sueldo = 1.500/2.400 × 100 = 62,5%. Años hasta jubilación (67−47) = 20 → n = 240 meses, r_mes = 4%/12.
-    // PMT = 216.000 × r_mes / ((1+r_mes)^240 − 1) = 588,92 €/mes.
+    // PMT = 213.840 × r_mes / ((1+r_mes)^240 − 1) = 583,03 €/mes.
     const b = calcularBrechaJubilacion({ sueldoNetoMensual: 2400, pensionEstimadaMensual: 1500, edadActual: 47 });
     expect(b.brechaMensual).toBeCloseTo(900, 2);
     expect(b.brechaAnual).toBeCloseTo(10800, 2);
-    expect(b.capitalNecesario).toBeCloseTo(216000, 2);
+    expect(b.capitalNecesario).toBeCloseTo(213840, 2);
     expect(b.porcentajePensionSobreSueldo).toBeCloseTo(62.5, 2);
     expect(b.anosHastaJubilacion).toBe(20);
-    expect(b.ahorroMensualNecesario).toBeCloseTo(588.92, 2);
+    expect(b.ahorroMensualNecesario).toBeCloseTo(583.03, 2);
     expect(b.tieneBrecha).toBe(true);
     expect(b.edadJubilacion).toBe(67);
-    expect(b.anosJubilado).toBe(20);
+    expect(b.anosJubilado).toBe(19.8);
+  });
+
+  test('GOLDEN-BO2: el supuesto de longevidad es el mismo en brecha y en pensión complementaria', () => {
+    // Candado de la unificación (13/08/2026): hasta esa fecha brechaJubilacion usaba 20 años
+    // y pensionComplementaria una esperanza de vida de 85 (= 18 años), sin fuente ninguna.
+    // Ambos derivan ahora de data/fiscal/esperanza-vida, así que a la misma edad de jubilación
+    // los dos motores tienen que cubrir exactamente los mismos años.
+    const b = calcularBrechaJubilacion({ sueldoNetoMensual: 2400, pensionEstimadaMensual: 1500, edadActual: 47 });
+    const c = calcularPensionComplementaria({ rentaDeseadaMensual: 2400, pensionPublicaEstimada: 1500, edadActual: 47 });
+    expect(b.anosJubilado).toBeCloseTo(c.anosJubilacion, 2);
   });
 
 });

@@ -35,3 +35,4 @@ export * from './becas-estudio';
 export * from './jubilacion-tramites';
 export * from './iprem';
 export * from './cnae-iae';
+export * from './esperanza-vida';
