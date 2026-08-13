@@ -598,7 +598,7 @@ const familiaApps: RelatedApp[] = [
   { url: '/orientador-percentiles/', icon: '📏', name: 'Percentiles Infantiles', description: 'Peso y talla OMS' },
   { url: '/calculadora-fechas/', icon: '📅', name: 'Calculadora Fechas', description: 'Días entre fechas' },
   { url: '/estimacion-prestacion-nacimiento/', icon: '👶', name: 'Prestación Nacimiento', description: 'Cuantía SS por nacimiento/adopción' },
-  { url: '/estimacion-baja-maternal/', icon: '📅', name: 'Baja Maternal/Paternal', description: '16 semanas: distribución y extras' },
+  { url: '/estimacion-baja-maternal/', icon: '📅', name: 'Baja Maternal/Paternal', description: '19 semanas: distribución y extras' },
   { url: '/planificador-gastos-bebe/', icon: '🍼', name: 'Gastos Primer Año Bebé', description: 'Presupuesto categorizado' },
   { url: '/estimacion-deduccion-maternidad/', icon: '👩‍👧', name: 'Deducción Maternidad', description: '1.200 €/año + guardería IRPF' },
   { url: '/test-estilo-parental/', icon: '👨‍👩‍👧‍👦', name: 'Test Estilo Parental', description: 'Autoconocimiento educativo' },

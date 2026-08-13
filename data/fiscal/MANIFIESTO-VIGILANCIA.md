@@ -86,6 +86,27 @@ la §1.0 no pide `BOE-A-`; en cuanto uno de ellos declare un importe, sí.
 | IMSERSO / SAAD | https://imserso.es/el-saad/prestaciones | Cuantías de prestaciones de dependencia | Anual |
 | Consejo de Ministros (referencias) | https://www.lamoncloa.gob.es | Anticipa RDL antes de su publicación en BOE | Semanal (martes) |
 
+### 1.1 Hasta dónde llega este contrato (y dónde deja de llegar)
+
+Este manifiesto cubre `data/fiscal/`. **No cubre `lib/calculadoras/`**, y ahí también vive normativa.
+
+Descubierto el 13/08/2026, probando en navegador: `permisoParental.ts` —motor del MCP— calculaba el
+permiso con **16 semanas**, la duración derogada el 31/07/2025 por el RDL 9/2025; sumaba 2 semanas por
+hijo en parto múltiple donde la norma dice 1; y **descontaba una retención de IRPF de una prestación
+exenta**, anunciando un neto inferior al que se cobra. Llevaba así desde su sello, de enero de 2025.
+
+Lo que importa no es el error, sino **por qué sobrevivió**: el módulo escribía sus semanas a mano en
+vez de importarlas de `maternidad.ts`, que sí está aquí, sí se vigila y sí se actualizó a tiempo. El
+dato correcto y el incorrecto convivieron un año en el mismo repositorio.
+
+De los **210 motores de `lib/calculadoras/`, 172 no importan nada de `data/fiscal/`**. Muchos son de
+cocina y no tienen normativa que envejecer, pero hay decenas fiscales selladas en enero de 2025. La
+auditoría está planificada en la Agenda Operativa (`auditoria-motores-lib-calculadoras`).
+
+**Regla mientras tanto**: un motor de `lib/calculadoras/` **no declara datos normativos propios**. Los
+importa de `data/fiscal/`, y si el dato no existe allí, se crea el módulo primero. Es la misma regla
+que ya rige para las apps en `CLAUDE.md`, que nadie había extendido explícitamente a los motores.
+
 ## 2. Calendario anual de ventanas de cambio
 
 | Ventana | Qué suele cambiar | Módulos afectados |

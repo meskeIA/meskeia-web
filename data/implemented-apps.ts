@@ -294,7 +294,7 @@ export const implementedAppsUrls = [
   "/test-habitos-saludables/",
   "/planificador-embarazo/",         // Planificador embarazo: FPP, checklist, compras, vacunas
   "/estimacion-prestacion-nacimiento/",  // Estimación prestación SS por nacimiento: cuantía, duración, requisitos
-  "/estimacion-baja-maternal/",          // Estimación baja maternal/paternal: 16 semanas, distribución, extras
+  "/estimacion-baja-maternal/",          // Estimación baja maternal/paternal: 19 semanas, distribución, extras
   "/planificador-gastos-bebe/",          // Planificador gastos primer año bebé: 10 categorías, 3 niveles
   "/estimacion-deduccion-maternidad/",   // Estimación deducción maternidad IRPF: 1.200€ + guardería
   "/test-estilo-parental/",              // Test estilo parental: Baumrind, 4 estilos, autoconocimiento

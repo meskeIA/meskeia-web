@@ -978,7 +978,7 @@ export default function CalculadoraFechaPartoPage() {
 
             <details className={styles.faqItem}>
               <summary>¿Qué incluye la baja por maternidad/paternidad en España?</summary>
-              <p>Desde 2021, ambos progenitores tienen derecho a 16 semanas de permiso intransferible.
+              <p>Desde el 31/07/2025 (RDL 9/2025), cada progenitor tiene derecho a 19 semanas de permiso intransferible, y el progenitor único de una familia monoparental a 32.
               Las 6 primeras son obligatorias tras el parto. El resto pueden disfrutarse hasta que el bebé cumpla 12 meses.</p>
             </details>
           </div>
@@ -1069,9 +1069,9 @@ export default function CalculadoraFechaPartoPage() {
               <span className={styles.stepNumber}>5</span>
               <div className={styles.stepContent}>
                 <strong>Gestiona la baja maternal y los trámites antes del parto</strong>
-                <p>Solicita la baja maternal a la Seguridad Social (16 semanas). Informa a tu empresa con
+                <p>Solicita la baja maternal a la Seguridad Social (19 semanas; 32 si eres familia monoparental). Informa a tu empresa con
                 antelación. Solicita el alta en el padrón municipal para el bebé si vivís en otro municipio.
-                Revisa los permisos de paternidad (también 16 semanas desde 2021).</p>
+                Revisa los permisos de paternidad (también 19 semanas desde el RDL 9/2025).</p>
               </div>
             </li>
             <li className={styles.step}>

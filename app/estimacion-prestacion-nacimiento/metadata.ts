@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimacion de Prestacion por Nacimiento - Seguridad Social Espana | meskeIA',
-  description: 'Estima la prestacion por nacimiento de la Seguridad Social en Espana. 100% de la base reguladora, 16 semanas de permiso. Calcula tu prestacion diaria, mensual y total.',
-  keywords: 'prestacion nacimiento, baja maternidad cuanto cobro, prestacion paternidad, seguridad social nacimiento, 16 semanas permiso, permiso nacimiento espana, baja paternidad 2025',
+  description: 'Estima la prestacion por nacimiento de la Seguridad Social en Espana. 100% de la base reguladora, 19 semanas de permiso (32 en familias monoparentales). Calcula tu prestacion diaria, mensual y total.',
+  keywords: 'prestacion nacimiento, baja maternidad cuanto cobro, prestacion paternidad, seguridad social nacimiento, 19 semanas permiso, permiso nacimiento espana, baja paternidad 2025',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Estimacion de Prestacion por Nacimiento | meskeIA',
-    description: 'Calcula cuanto cobraras durante el permiso por nacimiento: 100% de tu base reguladora, 16 semanas. Seguridad Social Espana.',
+    description: 'Calcula cuanto cobraras durante el permiso por nacimiento: 100% de tu base reguladora, 19 semanas. Seguridad Social Espana.',
     url: 'https://meskeia.com/estimacion-prestacion-nacimiento/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -61,7 +61,7 @@ export const faqJsonLd = {
       name: '¿Cuántas semanas dura el permiso por nacimiento en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Ambos progenitores tienen derecho a 16 semanas de permiso por nacimiento en igualdad de condiciones. Las primeras 6 semanas son obligatorias e inmediatamente posteriores al parto. Las 10 semanas restantes pueden distribuirse de forma flexible, incluso a tiempo parcial, durante el primer año del menor.',
+        text: 'Desde el Real Decreto-ley 9/2025, en vigor el 31 de julio de 2025, cada progenitor tiene derecho a 19 semanas en las familias biparentales, y el progenitor unico de una familia monoparental a 32. Las primeras 6 son obligatorias e inmediatamente posteriores al parto; 11 se distribuyen de forma flexible hasta que el menor cumple 12 meses y 2 mas son de cuidado prolongado, repartibles hasta que cumple 8 anos.',
       },
     },
     {

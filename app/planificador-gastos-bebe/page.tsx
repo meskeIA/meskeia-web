@@ -378,7 +378,7 @@ export default function PlanificadorGastosBebePage(): React.JSX.Element {
               <h4>¿Es necesaria la guardería el primer año?</h4>
               <p>
                 No es obligatoria. Depende de la situación laboral y familiar. Opciones
-                alternativas: permisos de paternidad/maternidad (16 semanas cada uno),
+                alternativas: permisos de paternidad/maternidad (19 semanas cada uno),
                 excedencia por cuidado de hijo, abuelos, o combinación de jornada reducida
                 y cuidado compartido.
               </p>

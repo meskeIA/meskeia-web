@@ -93,7 +93,7 @@ export const faqJsonLd = {
       name: '¿Qué ayudas económicas existen en España por tener un bebé?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En España existen varias prestaciones: la baja por nacimiento (16 semanas retribuidas al 100% del salario base para cada progenitor), la deducción por maternidad en el IRPF (1.200 euros anuales por hijo menor de 3 años para madres trabajadoras), el cheque bebé de algunas comunidades autónomas, y ayudas municipales variables. Algunas familias también pueden acceder a la prestación por nacimiento del IMSERSO si cumplen requisitos de renta.',
+        text: 'En España existen varias prestaciones: la baja por nacimiento (19 semanas retribuidas al 100% de la base reguladora para cada progenitor, 32 en familias monoparentales), la deducción por maternidad en el IRPF (1.200 euros anuales por hijo menor de 3 años para madres trabajadoras), el cheque bebé de algunas comunidades autónomas, y ayudas municipales variables. Algunas familias también pueden acceder a la prestación por nacimiento del IMSERSO si cumplen requisitos de renta.',
       },
     },
   ],
