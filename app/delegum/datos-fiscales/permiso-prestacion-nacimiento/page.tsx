@@ -6,10 +6,10 @@ import AnalyticsTracker from '@/components/AnalyticsTracker';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import DataReference from '@/components/DataReference';
 import {
-  PERMISO_NACIMIENTO_2025,
+  PERMISO_NACIMIENTO,
   AMPLIACIONES_PERMISO,
-  PRESTACION_NACIMIENTO_2025,
-  DEDUCCION_MATERNIDAD_IRPF_2025,
+  PRESTACION_NACIMIENTO,
+  DEDUCCION_MATERNIDAD_IRPF,
   FISCAL_MATERNIDAD_META,
 } from '@/data/fiscal';
 import { formatCurrency, formatDate } from '@/lib';
@@ -20,7 +20,7 @@ import styles from '../Ficha.module.css';
 const URL_CANONICA = 'https://delegum.com/datos-fiscales/permiso-prestacion-nacimiento/';
 
 // Requisitos de cotización por edad (desde los datos)
-const COTIZACION = PRESTACION_NACIMIENTO_2025.cotizacionMinima;
+const COTIZACION = PRESTACION_NACIMIENTO.cotizacionMinima;
 const REQUISITOS_COTIZACION = [
   { edad: 'Menores de 21 años', nota: COTIZACION.menores21.nota },
   { edad: 'Entre 21 y 25 años', nota: COTIZACION.entre21y25.nota },
@@ -123,7 +123,7 @@ export default function PermisoPrestacionNacimientoPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {PERMISO_NACIMIENTO_2025.map((p) => (
+                  {PERMISO_NACIMIENTO.map((p) => (
                     <tr key={p.tipoFamilia}>
                       <th scope="row" className={styles.rowHead}>{etiquetaFamilia(p.tipoFamilia)}</th>
                       <td className={styles.numCol}>
@@ -175,7 +175,7 @@ export default function PermisoPrestacionNacimientoPage() {
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>Prestación económica</h2>
             <p className={styles.sectionIntro}>
-              Durante el permiso se cobra el <strong>{PRESTACION_NACIMIENTO_2025.porcentajeBaseReguladora}%
+              Durante el permiso se cobra el <strong>{PRESTACION_NACIMIENTO.porcentajeBaseReguladora}%
               de la base reguladora</strong> (base de cotización del mes anterior ÷ 30), una prestación{' '}
               <strong>exenta de IRPF</strong>. El periodo mínimo de cotización exigido depende de la edad:
             </p>
@@ -200,8 +200,8 @@ export default function PermisoPrestacionNacimientoPage() {
             <p className={styles.tableFoot}>
               Sin el periodo mínimo de cotización se cobra una prestación no contributiva del 100% del
               IPREM —o la base reguladora, si fuese inferior— durante{' '}
-              {PRESTACION_NACIMIENTO_2025.noContributiva.duracion} días naturales, ampliables en{' '}
-              {PRESTACION_NACIMIENTO_2025.noContributiva.incrementoDias} en caso de familia numerosa,
+              {PRESTACION_NACIMIENTO.noContributiva.duracion} días naturales, ampliables en{' '}
+              {PRESTACION_NACIMIENTO.noContributiva.incrementoDias} en caso de familia numerosa,
               monoparentalidad, parto múltiple o discapacidad igual o superior al 65%. El incremento se
               aplica una sola vez aunque concurran varios supuestos (art. 182 LGSS).
             </p>
@@ -227,16 +227,16 @@ export default function PermisoPrestacionNacimientoPage() {
                   <tr>
                     <th scope="row" className={styles.rowHead}>Deducción anual por hijo menor de 3 años</th>
                     <td className={styles.numCol}>
-                      <span className={styles.tipoTag}>{formatCurrency(DEDUCCION_MATERNIDAD_IRPF_2025.importeAnualPorHijo)}</span>
+                      <span className={styles.tipoTag}>{formatCurrency(DEDUCCION_MATERNIDAD_IRPF.importeAnualPorHijo)}</span>
                     </td>
                   </tr>
                   <tr>
                     <th scope="row" className={styles.rowHead}>Equivalente mensual (cobro anticipado, Modelo 140)</th>
-                    <td className={styles.numCol}>{formatCurrency(DEDUCCION_MATERNIDAD_IRPF_2025.importeMensualPorHijo)}</td>
+                    <td className={styles.numCol}>{formatCurrency(DEDUCCION_MATERNIDAD_IRPF.importeMensualPorHijo)}</td>
                   </tr>
                   <tr>
                     <th scope="row" className={styles.rowHead}>Incremento máximo por gastos de guardería</th>
-                    <td className={styles.numCol}>{formatCurrency(DEDUCCION_MATERNIDAD_IRPF_2025.incrementoGuarderia.importeMaximoAnual)}</td>
+                    <td className={styles.numCol}>{formatCurrency(DEDUCCION_MATERNIDAD_IRPF.incrementoGuarderia.importeMaximoAnual)}</td>
                   </tr>
                 </tbody>
               </table>
@@ -246,7 +246,7 @@ export default function PermisoPrestacionNacimientoPage() {
               Seguridad Social o mutualidad, <strong>o</strong> percibir prestación o subsidio de
               desempleo en el momento del nacimiento, <strong>o</strong> darse de alta después con 30
               días cotizados —en cuyo caso ese mes se suman{' '}
-              {formatCurrency(DEDUCCION_MATERNIDAD_IRPF_2025.incrementoAltaPosterior.importe)}—. No se
+              {formatCurrency(DEDUCCION_MATERNIDAD_IRPF.incrementoAltaPosterior.importe)}—. No se
               computan los meses en que se perciba por el mismo hijo/a el complemento de ayuda para la
               infancia del ingreso mínimo vital. El incremento por guardería requiere que el centro
               autorizado comunique los datos a la AEAT y no puede superar el gasto efectivo no

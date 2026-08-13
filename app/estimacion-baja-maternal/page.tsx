@@ -15,7 +15,7 @@ import {
 import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_MATERNIDAD_META,
-  PERMISO_NACIMIENTO_2025,
+  PERMISO_NACIMIENTO,
   AMPLIACIONES_PERMISO,
 } from '@/data/fiscal';
 
@@ -78,9 +78,9 @@ export default function EstimacionBajaMaternalPage() {
 
   const calcular = useCallback(() => {
     // Buscar datos base segun el tipo de familia (RDL 9/2025)
-    const datosBase = PERMISO_NACIMIENTO_2025.find(
+    const datosBase = PERMISO_NACIMIENTO.find(
       (p) => p.tipoFamilia === tipoFamilia
-    ) ?? PERMISO_NACIMIENTO_2025[0];
+    ) ?? PERMISO_NACIMIENTO[0];
 
     const semanasObligatorias = datosBase.semanasObligatorias;
     const semanasVoluntarias = datosBase.semanasVoluntarias;

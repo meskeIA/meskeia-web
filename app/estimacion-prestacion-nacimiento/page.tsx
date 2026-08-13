@@ -17,8 +17,8 @@ import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency } from '@/lib';
 import {
   FISCAL_MATERNIDAD_META,
-  PRESTACION_NACIMIENTO_2025,
-  PERMISO_NACIMIENTO_2025,
+  PRESTACION_NACIMIENTO,
+  PERMISO_NACIMIENTO,
   AMPLIACIONES_PERMISO,
 } from '@/data/fiscal';
 
@@ -44,6 +44,8 @@ interface ResultadoEstimacion {
 // ===== COMPONENTE PRINCIPAL =====
 export default function EstimacionPrestacionNacimiento() {
   const [edad, setEdad] = useState<RangoEdad>('mayor26');
+  const [diasUltimos7Anios, setDiasUltimos7Anios] = useState<string>('');
+  const [diasVidaLaboral, setDiasVidaLaboral] = useState<string>('');
   const [baseCotizacion, setBaseCotizacion] = useState<string>('');
   const [tipoFamilia, setTipoFamilia] = useState<TipoFamilia>('biparental');
   const [situacion, setSituacion] = useState<Situacion>('nacimiento');
@@ -59,21 +61,46 @@ export default function EstimacionPrestacionNacimiento() {
     return isNaN(num) ? 0 : num;
   }, [baseCotizacion]);
 
+  // Dias cotizados declarados (art. 178 LGSS)
+  const dias7Anios = useMemo(() => {
+    const num = parseInt(diasUltimos7Anios.replace(/\./g, ''), 10);
+    return isNaN(num) ? 0 : num;
+  }, [diasUltimos7Anios]);
+
+  const diasTotales = useMemo(() => {
+    const num = parseInt(diasVidaLaboral.replace(/\./g, ''), 10);
+    return isNaN(num) ? 0 : num;
+  }, [diasVidaLaboral]);
+
   // Calcular resultado
   const resultado: ResultadoEstimacion | null = useMemo(() => {
     if (!mostrarResultados || baseMensual <= 0) return null;
 
-    const { basesReferencia, cotizacionMinima, noContributiva } = PRESTACION_NACIMIENTO_2025;
+    const { basesReferencia, cotizacionMinima, noContributiva } = PRESTACION_NACIMIENTO;
 
-    // Verificar si cumple requisitos de cotizacion (simplificado: asumimos que si)
-    // En la realidad, habria que comprobar los dias cotizados
     const baseAplicable = Math.min(
       Math.max(baseMensual, basesReferencia.baseMinimaMensual),
       basesReferencia.baseMaximaMensual
     );
 
-    // Determinar si es contributiva (simplificado: si la base es razonable)
-    const esContributiva = baseMensual >= basesReferencia.baseMinimaMensual * 0.5;
+    // Carencia del art. 178.1 LGSS: la decide la EDAD en la fecha del parto y
+    // los DIAS COTIZADOS, no el importe de la base. Los dos umbrales de cada
+    // tramo son alternativos: basta cumplir uno.
+    const umbral =
+      edad === 'menor21' ? cotizacionMinima.menores21
+      : edad === '21a25' ? cotizacionMinima.entre21y25
+      : cotizacionMinima.mayores26;
+
+    // Si no se han declarado dias, NO se concluye que falte carencia: se asume
+    // cumplida y se advierte. Dar por incumplido lo que el usuario no ha dicho
+    // seria negarle la prestacion por omision.
+    const carenciaDeclarada = diasUltimos7Anios.trim() !== '' || diasVidaLaboral.trim() !== '';
+
+    const esContributiva =
+      umbral.diasUltimos7Anios === 0 ||
+      !carenciaDeclarada ||
+      dias7Anios >= umbral.diasUltimos7Anios ||
+      diasTotales >= umbral.diasVidaLaboral;
 
     if (!esContributiva) {
       // Prestacion no contributiva (art. 182 LGSS). Los 42 dias del descanso
@@ -113,9 +140,15 @@ export default function EstimacionPrestacionNacimiento() {
     const brDiaria = baseAplicable / 30;
     const prestacionDiaria = brDiaria; // 100% de la BR
 
-    const permiso = PERMISO_NACIMIENTO_2025.find((p) => p.tipoFamilia === tipoFamilia) ?? PERMISO_NACIMIENTO_2025[0];
+    const permiso = PERMISO_NACIMIENTO.find((p) => p.tipoFamilia === tipoFamilia) ?? PERMISO_NACIMIENTO[0];
     let semanasExtra = 0;
     const detalleAmpliaciones: string[] = [];
+
+    if (umbral.diasUltimos7Anios > 0 && !carenciaDeclarada) {
+      detalleAmpliaciones.push(
+        `Calculado asumiendo que cumples la carencia (${umbral.nota}). Rellena los dias cotizados para comprobarlo.`
+      );
+    }
 
     // Ampliaciones
     if (partoMultiple && numHijos >= 2) {
@@ -169,11 +202,11 @@ export default function EstimacionPrestacionNacimiento() {
       detalleAmpliaciones,
       esContributiva: true,
     };
-  }, [mostrarResultados, baseMensual, partoMultiple, numHijos, hospitalizacion, situacion, tipoFamilia]);
+  }, [mostrarResultados, baseMensual, partoMultiple, numHijos, hospitalizacion, situacion, tipoFamilia, edad, dias7Anios, diasTotales, diasUltimos7Anios, diasVidaLaboral]);
 
   // Requisitos de cotizacion por edad
   const requisitoEdad = useMemo(() => {
-    const { cotizacionMinima } = PRESTACION_NACIMIENTO_2025;
+    const { cotizacionMinima } = PRESTACION_NACIMIENTO;
     switch (edad) {
       case 'menor21':
         return cotizacionMinima.menores21;
@@ -298,6 +331,41 @@ export default function EstimacionPrestacionNacimiento() {
           </p>
         </div>
 
+        {/* Dias cotizados \u2014 solo si la edad exige carencia (art. 178.1 LGSS) */}
+        {edad !== 'menor21' && (
+          <>
+            <div className={styles.formGroup}>
+              <NumberInput
+                value={diasUltimos7Anios}
+                onChange={(val) => {
+                  setDiasUltimos7Anios(val);
+                  setMostrarResultados(false);
+                }}
+                label="Dias cotizados en los ultimos 7 anos"
+                placeholder="Ej: 365"
+                min={0}
+                max={2555}
+                helperText="Los tienes en el informe de vida laboral de la Seguridad Social."
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <NumberInput
+                value={diasVidaLaboral}
+                onChange={(val) => {
+                  setDiasVidaLaboral(val);
+                  setMostrarResultados(false);
+                }}
+                label="Dias cotizados en toda tu vida laboral"
+                placeholder="Ej: 1.500"
+                min={0}
+                max={20000}
+                helperText={`Vale como alternativa: basta cumplir uno de los dos umbrales. ${requisitoEdad.nota}.`}
+              />
+            </div>
+          </>
+        )}
+
         {/* Base de cotizacion */}
         <div className={styles.formGroup}>
           <NumberInput
@@ -311,7 +379,7 @@ export default function EstimacionPrestacionNacimiento() {
             min={0}
             max={10000}
             suffix="\u20AC"
-            helperText="Aparece en tu nomina o en el informe de vida laboral. En 2025: minima 1.381,20 \u20AC, maxima 4.909,50 \u20AC."
+            helperText={`Aparece en tu nomina o en el informe de vida laboral. En ${FISCAL_MATERNIDAD_META.vigencia}: minima ${formatCurrency(PRESTACION_NACIMIENTO.basesReferencia.baseMinimaMensual)}, maxima ${formatCurrency(PRESTACION_NACIMIENTO.basesReferencia.baseMaximaMensual)}.`}
             required
           />
         </div>
@@ -486,7 +554,7 @@ export default function EstimacionPrestacionNacimiento() {
             <ul style={{ margin: '0.5rem 0 0', paddingLeft: '1.2rem', listStyle: 'disc' }}>
               <li>
                 La prestacion es el <strong>100% de la base reguladora</strong>, sin topes adicionales
-                (el tope es la base maxima de cotizacion: {formatCurrency(PRESTACION_NACIMIENTO_2025.basesReferencia.baseMaximaMensual)}/mes).
+                (el tope es la base maxima de cotizacion: {formatCurrency(PRESTACION_NACIMIENTO.basesReferencia.baseMaximaMensual)}/mes).
               </li>
               <li>
                 {tipoFamilia === 'monoparental' ? (
@@ -501,10 +569,10 @@ export default function EstimacionPrestacionNacimiento() {
               {!resultado.esContributiva && (
                 <li>
                   <strong>Prestacion no contributiva:</strong> al no alcanzar la cotizacion minima, se
-                  cobra el 100% del IPREM ({formatCurrency(PRESTACION_NACIMIENTO_2025.noContributiva.cuantiaMensual)}/mes)
-                  durante {PRESTACION_NACIMIENTO_2025.noContributiva.duracion} dias naturales, salvo que
+                  cobra el 100% del IPREM ({formatCurrency(PRESTACION_NACIMIENTO.noContributiva.cuantiaMensual)}/mes)
+                  durante {PRESTACION_NACIMIENTO.noContributiva.duracion} dias naturales, salvo que
                   tu base reguladora sea inferior, en cuyo caso se cobra esta. Se amplia en{' '}
-                  {PRESTACION_NACIMIENTO_2025.noContributiva.incrementoDias} dias por familia numerosa,
+                  {PRESTACION_NACIMIENTO.noContributiva.incrementoDias} dias por familia numerosa,
                   monoparentalidad, parto multiple o discapacidad del 65% o mas, una sola vez aunque
                   coincidan varios supuestos (art. 182 LGSS).
                 </li>
@@ -558,7 +626,7 @@ export default function EstimacionPrestacionNacimiento() {
                   <td><strong>Cuantia</strong></td>
                   <td>100% de la base reguladora</td>
                   <td>
-                    100% del IPREM ({formatCurrency(PRESTACION_NACIMIENTO_2025.noContributiva.cuantiaMensual)}/mes),
+                    100% del IPREM ({formatCurrency(PRESTACION_NACIMIENTO.noContributiva.cuantiaMensual)}/mes),
                     o la base reguladora si fuese inferior
                   </td>
                 </tr>
@@ -566,24 +634,24 @@ export default function EstimacionPrestacionNacimiento() {
                   <td><strong>Duracion</strong></td>
                   <td>19 semanas/progenitor (133 dias); 32 semanas (224 dias) si familia monoparental</td>
                   <td>
-                    {PRESTACION_NACIMIENTO_2025.noContributiva.duracion} dias (6 semanas), +
-                    {PRESTACION_NACIMIENTO_2025.noContributiva.incrementoDias} en familia numerosa,
+                    {PRESTACION_NACIMIENTO.noContributiva.duracion} dias (6 semanas), +
+                    {PRESTACION_NACIMIENTO.noContributiva.incrementoDias} en familia numerosa,
                     monoparentalidad, parto multiple o discapacidad &ge; 65%
                   </td>
                 </tr>
                 <tr>
                   <td><strong>Cotizacion minima &lt; 21 anos</strong></td>
-                  <td>{PRESTACION_NACIMIENTO_2025.cotizacionMinima.menores21.nota}</td>
+                  <td>{PRESTACION_NACIMIENTO.cotizacionMinima.menores21.nota}</td>
                   <td>No aplica</td>
                 </tr>
                 <tr>
                   <td><strong>Cotizacion minima 21-25 anos</strong></td>
-                  <td>{PRESTACION_NACIMIENTO_2025.cotizacionMinima.entre21y25.nota}</td>
+                  <td>{PRESTACION_NACIMIENTO.cotizacionMinima.entre21y25.nota}</td>
                   <td>No aplica</td>
                 </tr>
                 <tr>
                   <td><strong>Cotizacion minima 26+ anos</strong></td>
-                  <td>{PRESTACION_NACIMIENTO_2025.cotizacionMinima.mayores26.nota}</td>
+                  <td>{PRESTACION_NACIMIENTO.cotizacionMinima.mayores26.nota}</td>
                   <td>No aplica</td>
                 </tr>
                 <tr>

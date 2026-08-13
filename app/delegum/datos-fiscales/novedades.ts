@@ -32,6 +32,12 @@ export const NOVEDADES: Novedad[] = [
     fecha: '2026-08-13',
     fichaSlug: 'permiso-prestacion-nacimiento',
     texto:
+      'La prestación por nacimiento y cuidado de menor está exenta de IRPF: no se declara ni soporta retención (art. 7.h de la Ley 35/2006, en la redacción del RDL 27/2018, con efectos desde 2018 y ejercicios anteriores no prescritos, tras la STS 1462/2018).',
+  },
+  {
+    fecha: '2026-08-13',
+    fichaSlug: 'permiso-prestacion-nacimiento',
+    texto:
       'La prestación no contributiva por nacimiento dura 42 días naturales, ampliables en 14 más por familia numerosa, monoparentalidad, parto múltiple o discapacidad igual o superior al 65% —una sola vez aunque concurran varios supuestos—, y su cuantía es el 100% del IPREM salvo que la base reguladora sea inferior (art. 182 de la LGSS, en la redacción del RDL 9/2025, BOE-A-2025-15741).',
   },
   {

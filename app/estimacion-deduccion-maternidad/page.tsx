@@ -17,7 +17,7 @@ import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_MATERNIDAD_META,
-  DEDUCCION_MATERNIDAD_IRPF_2025,
+  DEDUCCION_MATERNIDAD_IRPF,
 } from '@/data/fiscal';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -100,8 +100,8 @@ export default function EstimacionDeduccionMaternidadPage() {
       return;
     }
 
-    const importeBase = DEDUCCION_MATERNIDAD_IRPF_2025.importeAnualPorHijo;
-    const maxGuarderia = DEDUCCION_MATERNIDAD_IRPF_2025.incrementoGuarderia.importeMaximoAnual;
+    const importeBase = DEDUCCION_MATERNIDAD_IRPF.importeAnualPorHijo;
+    const maxGuarderia = DEDUCCION_MATERNIDAD_IRPF.incrementoGuarderia.importeMaximoAnual;
 
     let deduccionBase = 0;
     let incrementoGuarderia = 0;
@@ -127,7 +127,7 @@ export default function EstimacionDeduccionMaternidadPage() {
     // 30 días cotizados, cuando el derecho nace por un alta posterior al parto.
     const incrementoAltaPosterior =
       situacion === 'alta-posterior'
-        ? DEDUCCION_MATERNIDAD_IRPF_2025.incrementoAltaPosterior.importe * numHijos
+        ? DEDUCCION_MATERNIDAD_IRPF.incrementoAltaPosterior.importe * numHijos
         : 0;
 
     const totalAnual = deduccionBase + incrementoGuarderia + incrementoAltaPosterior;
@@ -309,7 +309,7 @@ export default function EstimacionDeduccionMaternidadPage() {
                     min={0}
                     max={10000}
                     suffix="euro"
-                    helperText={`Maximo deducible: ${formatCurrency(DEDUCCION_MATERNIDAD_IRPF_2025.incrementoGuarderia.importeMaximoAnual)}/ano por hijo`}
+                    helperText={`Maximo deducible: ${formatCurrency(DEDUCCION_MATERNIDAD_IRPF.incrementoGuarderia.importeMaximoAnual)}/ano por hijo`}
                   />
                 </div>
               )}
@@ -368,7 +368,7 @@ export default function EstimacionDeduccionMaternidadPage() {
                 <p style={{ marginTop: '0.75rem' }}>
                   <strong>Alternativa:</strong> si te das de alta en la Seguridad Social (por cuenta
                   propia o ajena), tendras derecho a la deduccion al alcanzar los 30 dias cotizados, y
-                  ese mes se suman {formatCurrency(DEDUCCION_MATERNIDAD_IRPF_2025.incrementoAltaPosterior.importe)} adicionales.
+                  ese mes se suman {formatCurrency(DEDUCCION_MATERNIDAD_IRPF.incrementoAltaPosterior.importe)} adicionales.
                   Tambien aplica a padres viudos o tutores con la guarda y custodia exclusiva.
                 </p>
               </div>
@@ -397,7 +397,7 @@ export default function EstimacionDeduccionMaternidadPage() {
                 <div className={styles.resultItem}>
                   <span className={styles.resultLabel}>Deduccion base</span>
                   <span className={styles.resultValue}>
-                    {resultado.numHijos} x {formatCurrency(DEDUCCION_MATERNIDAD_IRPF_2025.importeAnualPorHijo)} = {formatCurrency(resultado.deduccionBase)}
+                    {resultado.numHijos} x {formatCurrency(DEDUCCION_MATERNIDAD_IRPF.importeAnualPorHijo)} = {formatCurrency(resultado.deduccionBase)}
                   </span>
                 </div>
                 <div className={styles.resultItem}>
@@ -409,7 +409,7 @@ export default function EstimacionDeduccionMaternidadPage() {
                     <div key={d.hijo} className={styles.resultItem}>
                       <span className={styles.resultLabel}>Guarderia hijo/a {d.hijo}</span>
                       <span className={styles.resultValue}>
-                        {formatCurrency(d.guarderia)} (max {formatCurrency(DEDUCCION_MATERNIDAD_IRPF_2025.incrementoGuarderia.importeMaximoAnual)})
+                        {formatCurrency(d.guarderia)} (max {formatCurrency(DEDUCCION_MATERNIDAD_IRPF.incrementoGuarderia.importeMaximoAnual)})
                       </span>
                     </div>
                   )

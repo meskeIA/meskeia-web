@@ -52,7 +52,7 @@ export interface PermisoNacimiento {
   simultaneoObligatorio: number; // semanas que ambos progenitores deben coincidir (0 en monoparental)
 }
 
-export const PERMISO_NACIMIENTO_2025: PermisoNacimiento[] = [
+export const PERMISO_NACIMIENTO: PermisoNacimiento[] = [
   {
     tipoFamilia: 'biparental',
     semanasTotal: 19,
@@ -118,17 +118,38 @@ export const AMPLIACIONES_PERMISO: AmpliacionPermiso[] = [
 // ─── Prestación económica por nacimiento (LGSS) ─────────────────────────────
 // La prestación es el 100% de la base reguladora (BR)
 
-export const PRESTACION_NACIMIENTO_2025 = {
+export const PRESTACION_NACIMIENTO = {
   /** Porcentaje de la base reguladora que se cobra */
   porcentajeBaseReguladora: 100,
   /** Base reguladora = base de cotización del mes anterior / 30 días */
   calculoBaseReguladora: 'Base cotización mes anterior ÷ 30',
-  /** Requisitos de cotización mínima */
+  /**
+   * Período mínimo de cotización del art. 178.1 LGSS. La edad es la que se
+   * tiene **en la fecha del nacimiento** (art. 178.2). Los dos umbrales de cada
+   * tramo son ALTERNATIVOS: basta cumplir uno de los dos.
+   *
+   * El campo `meses` anterior (0/3/6) era una traducción aproximada que la ley
+   * no usa —habla en días— y no permitía comprobar nada.
+   */
   cotizacionMinima: {
-    menores21: { meses: 0, nota: 'Sin período mínimo de cotización' },
-    entre21y25: { meses: 3, nota: '90 días en los últimos 7 años, o 180 en toda la vida laboral' },
-    mayores26: { meses: 6, nota: '180 días en los últimos 7 años, o 360 en toda la vida laboral' },
+    menores21: {
+      diasUltimos7Anios: 0,
+      diasVidaLaboral: 0,
+      nota: 'Sin período mínimo de cotización',
+    },
+    entre21y25: {
+      diasUltimos7Anios: 90,
+      diasVidaLaboral: 180,
+      nota: '90 días en los últimos 7 años, o 180 en toda la vida laboral',
+    },
+    mayores26: {
+      diasUltimos7Anios: 180,
+      diasVidaLaboral: 360,
+      nota: '180 días en los últimos 7 años, o 360 en toda la vida laboral',
+    },
   },
+  /** Art. 178.4 (añadido por el RDL 9/2025): hay que estar en alta o situación asimilada. */
+  exigeAltaOAsimilada: true,
   /**
    * Prestación no contributiva (art. 182 LGSS, redacción del RDL 9/2025).
    * El IPREM se importa de `iprem.ts`: es un dato vigilado allí y duplicarlo
@@ -173,7 +194,7 @@ export const PRESTACION_NACIMIENTO_2025 = {
 // prestación o subsidio de desempleo en el momento del nacimiento, o darse de alta
 // en cualquier momento posterior con 30 días cotizados.
 
-export const DEDUCCION_MATERNIDAD_IRPF_2025 = {
+export const DEDUCCION_MATERNIDAD_IRPF = {
   /** Importe anual por hijo menor de 3 años */
   importeAnualPorHijo: 1200,
   /** Importe mensual (se puede cobrar anticipado) */

@@ -257,6 +257,11 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
   - La **prestación no contributiva** ignoraba el **incremento de 14 días naturales** del art. 182.3 (familia numerosa, monoparentalidad, parto múltiple, discapacidad ≥65%) — introducido por el propio RDL 9/2025 que el módulo ya citaba— y presentaba el 100% del IPREM como cuantía fija, cuando el art. 182.2 lo somete a la base reguladora si esta es inferior.
   - Las **bases de cotización** eran las de 2025 (Orden PJC/178/2025) declarando vigencia «2025-2026», mientras `irpf.ts` ya tenía las de 2026.
   - La `fuente` citaba **«LPGE 2025»**, ley que no existe (prórroga presupuestaria), y la `urlOficial` era un portal divulgativo de la Seguridad Social. La norma real detrás de la deducción es la Ley 31/2022.
+- **Segunda pasada del 13/08/2026 — el motor del MCP** (`lib/calculadoras/prestacionMaternidadPaternidad.ts`, que sirve a ChatGPT y Claude vía `calcular_prestacion_maternidad_paternidad`):
+  - Sin carencia devolvía **0 €**. Quien no acredita el período mínimo no se queda sin nada: pasa al subsidio no contributivo del art. 182. Es el mismo fallo de fondo que el de la deducción —negar un derecho—, aquí servido a las IA.
+  - Advertía de que la prestación **«tributa en IRPF como rendimiento del trabajo y está sujeta a retención»**, cuando el art. 7.h) LIRPF la declara **exenta** (redacción del RDL 27/2018, con efectos desde 2018 y ejercicios no prescritos, tras la STS 1462/2018). El propio `maternidad.ts` ya decía `exentaIRPF: true`: **dos piezas del mismo sistema afirmaban lo contrario**, y la que hablaba con las IA era la equivocada.
+  - La app `estimacion-prestacion-nacimiento` decidía contributiva/no contributiva con `base ≥ mínima × 0,5`, un umbral inventado. El art. 178 lo decide por **edad y días cotizados** (90/180 o 180/360, alternativos), datos que ahora se piden. Con los días sin declarar se asume carencia cumplida y se advierte: dar por incumplido lo que nadie ha dicho sería negar la prestación por omisión.
+  - Motor cubierto con casos a mano (contributiva, sin carencia, monoparental con el +14, base inferior al IPREM y tope de la base máxima).
 - **Verificado**: 2026-08-13 · vigencia 2026.
 
 #### `amortizacion.ts` — Tabla de amortización LIS

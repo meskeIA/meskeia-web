@@ -34,8 +34,7 @@
  * Cuantía:
  *   - 100% de la base reguladora diaria (no hay espera ni reducción)
  *   - Base reguladora diaria = base cotización mes anterior / días del mes
- *   - Máximo: base máxima de cotización 2025 = 4.909,50 €/mes
- *   - No hay mínimo propio (si no se cumple período de carencia, no se genera)
+ *   - Máximo: base máxima de cotización (importada de data/fiscal, ejercicio en curso)
  *
  * Período de carencia (LGSS art. 178):
  *   - < 21 años en la fecha del parto: sin carencia mínima
@@ -43,24 +42,30 @@
  *   - ≥ 26 años: 180 días cotizados en los últimos 7 años, o 360 días totales
  *   - Trabajadores a tiempo parcial: cómputo proporcional
  *
+ * Sin carencia NO se queda a cero: nace el subsidio NO CONTRIBUTIVO del art. 182
+ * LGSS —100% del IPREM, o la base reguladora si fuese inferior, durante 42 días
+ * naturales, ampliables en 14 por familia numerosa, monoparentalidad, parto
+ * múltiple o discapacidad ≥65%—. Hasta el 13/08/2026 esta calculadora devolvía
+ * 0 € en ese caso, negando por el MCP una prestación que la ley reconoce.
+ *
  * Incompatibilidades:
  *   - Compatible con lactancia y reducción de jornada (simultáneamente no)
  *   - Incompatible con IT, desempleo (salvo excepciones) durante el mismo período
  *
  * Fuente: LGSS arts. 177-182 + RDL 6/2019 (equiparación 2021) + RDL 9/2025
  *         (ampliación a 19/32 semanas, en vigor 31-jul-2025) — vigente 2026
- * Verificado: 2026-06-10
+ * Verificado: 2026-08-13
  *
  * Encadenable con: calcular_sueldo_neto, calcular_baja_medica, calcular_complemento_it_empresa
  */
 
-import { PERMISO_NACIMIENTO_2025, AMPLIACIONES_PERMISO, PRESTACION_NACIMIENTO_2025 } from '@/data/fiscal';
+import { PERMISO_NACIMIENTO, AMPLIACIONES_PERMISO, PRESTACION_NACIMIENTO } from '@/data/fiscal';
 
 // ─── Constantes ─────────────────────────────────────────────────────────────
 // Fuente única: data/fiscal/maternidad.ts (RDL 9/2025)
 
-const PERMISO_BIPARENTAL = PERMISO_NACIMIENTO_2025.find((p) => p.tipoFamilia === 'biparental')!;
-const PERMISO_MONOPARENTAL = PERMISO_NACIMIENTO_2025.find((p) => p.tipoFamilia === 'monoparental')!;
+const PERMISO_BIPARENTAL = PERMISO_NACIMIENTO.find((p) => p.tipoFamilia === 'biparental')!;
+const PERMISO_MONOPARENTAL = PERMISO_NACIMIENTO.find((p) => p.tipoFamilia === 'monoparental')!;
 
 const DIAS_SEMANA = 7;
 const SEMANAS_BASE_BIPARENTAL = PERMISO_BIPARENTAL.semanasTotal;
@@ -73,8 +78,9 @@ const SEMANAS_CUIDADO_PROLONGADO_BIPARENTAL = PERMISO_BIPARENTAL.semanasCuidadoP
 const SEMANAS_CUIDADO_PROLONGADO_MONOPARENTAL = PERMISO_MONOPARENTAL.semanasCuidadoProlongadoHasta8Anios;
 const SEMANAS_ADICIONAL_MULTIPLE_POR_HIJO = AMPLIACIONES_PERMISO.find((a) => a.motivo === 'Parto múltiple')!.semanasExtra; // por cada hijo a partir del segundo
 const SEMANAS_ADICIONAL_DISCAPACIDAD = AMPLIACIONES_PERMISO.find((a) => a.motivo === 'Discapacidad del hijo/a')!.semanasExtra; // fijo, para cada progenitor
-const BASE_MAXIMA_MENSUAL_2025 = PRESTACION_NACIMIENTO_2025.basesReferencia.baseMaximaMensual; // €/mes
-const BASE_MAXIMA_DIARIA_2025 = BASE_MAXIMA_MENSUAL_2025 / 30;
+const BASE_MAXIMA_MENSUAL = PRESTACION_NACIMIENTO.basesReferencia.baseMaximaMensual; // €/mes, ejercicio en curso
+const BASE_MAXIMA_DIARIA = BASE_MAXIMA_MENSUAL / 30;
+const NO_CONTRIBUTIVA = PRESTACION_NACIMIENTO.noContributiva;
 
 // ─── Tipos públicos ───────────────────────────────────────────────────────────
 
@@ -122,6 +128,8 @@ export interface ResultadoPrestacionMP {
   diasFlexibles: number;
   /** ¿Cumple el período de carencia? */
   cumpleCarencia: boolean;
+  /** Modalidad resultante: contributiva (art. 177-181) o no contributiva (art. 182 LGSS) */
+  modalidad: 'contributiva' | 'no_contributiva';
   /** Cuantía diaria de la prestación (€) */
   cuantiaDiaria: number;
   /** **Cuantía mensual de la prestación (€)** */
@@ -147,8 +155,8 @@ export function calcularPrestacionMaternidadPaternidad(
   const advertencias: string[] = [];
 
   const diasMes = p.diasMesBaseCotizacion ?? 30;
-  const baseReguladoraDiaria = r(Math.min(p.baseCotizacionMensual / diasMes, BASE_MAXIMA_DIARIA_2025));
-  const limitadaPorBaseMaxima = (p.baseCotizacionMensual / diasMes) > BASE_MAXIMA_DIARIA_2025;
+  const baseReguladoraDiaria = r(Math.min(p.baseCotizacionMensual / diasMes, BASE_MAXIMA_DIARIA));
+  const limitadaPorBaseMaxima = (p.baseCotizacionMensual / diasMes) > BASE_MAXIMA_DIARIA;
   const baseReguladoraMensual = r(baseReguladoraDiaria * 30);
 
   // ── Duración ──────────────────────────────────────────────────────────────
@@ -166,13 +174,23 @@ export function calcularPrestacionMaternidadPaternidad(
   const semanasAdicionalMultiple = hijosAdicionales * SEMANAS_ADICIONAL_MULTIPLE_POR_HIJO;
   const semanasAdicionalDiscapacidad = p.hijoConDiscapacidad ? SEMANAS_ADICIONAL_DISCAPACIDAD : 0;
 
-  const semanasTotal = semanasBase + semanasAdicionalMultiple + semanasAdicionalDiscapacidad;
-  const duracionTotalDias = semanasTotal * DIAS_SEMANA;
-  const diasObligatorios = Math.min(DIAS_OBLIGATORIOS, duracionTotalDias);
-  const diasFlexibles = duracionTotalDias - diasObligatorios;
-
   // ── Carencia ──────────────────────────────────────────────────────────────
   const cumpleCarencia = p.cumpleCarencia ?? true;
+
+  // Sin carencia se cae al subsidio NO CONTRIBUTIVO del art. 182 LGSS: no hay
+  // permiso de 19/32 semanas que cobrar, sino los 42 días del descanso
+  // obligatorio (+14 en los supuestos del art. 182.3).
+  const supuestosIncremento: string[] = [];
+  if (tipoFamilia === 'monoparental') supuestosIncremento.push('monoparentalidad');
+  if (numHijos >= 2) supuestosIncremento.push('parto múltiple');
+
+  const diasNoContributiva =
+    NO_CONTRIBUTIVA.duracion + (supuestosIncremento.length > 0 ? NO_CONTRIBUTIVA.incrementoDias : 0);
+
+  const semanasTotal = semanasBase + semanasAdicionalMultiple + semanasAdicionalDiscapacidad;
+  const duracionTotalDias = cumpleCarencia ? semanasTotal * DIAS_SEMANA : diasNoContributiva;
+  const diasObligatorios = Math.min(DIAS_OBLIGATORIOS, duracionTotalDias);
+  const diasFlexibles = duracionTotalDias - diasObligatorios;
 
   let periodoCarenciaRequerido = '';
   if (p.edadProgenitor === 'menor_21') {
@@ -184,18 +202,34 @@ export function calcularPrestacionMaternidadPaternidad(
   }
 
   // ── Cuantía ───────────────────────────────────────────────────────────────
-  const cuantiaDiaria = cumpleCarencia ? baseReguladoraDiaria : 0;
+  // Contributiva: 100% de la base reguladora. No contributiva: 100% del IPREM,
+  // salvo que la base reguladora sea inferior, en cuyo caso se está a esta
+  // (art. 182.2 LGSS).
+  const cuantiaDiaria = cumpleCarencia
+    ? baseReguladoraDiaria
+    : r(Math.min(NO_CONTRIBUTIVA.cuantiaDiaria, baseReguladoraDiaria));
   const cuantiaMensual = r(cuantiaDiaria * 30);
   const cuotaTotalPrestacion = r(cuantiaDiaria * duracionTotalDias);
 
   // ── Advertencias ──────────────────────────────────────────────────────────
   advertencias.push(`Período de carencia requerido para este progenitor (${p.edadProgenitor === 'menor_21' ? '<21 años' : p.edadProgenitor === 'entre_21_y_26' ? '21-26 años' : '≥26 años'}): ${periodoCarenciaRequerido}.`);
-  advertencias.push(
-    `Las primeras ${SEMANAS_OBLIGATORIAS} semanas (${diasObligatorios} días) son OBLIGATORIAS e ininterrumpidas a jornada completa, inmediatamente después del parto/adopción/acogimiento. ` +
-    `De las ${semanasBase - SEMANAS_OBLIGATORIAS} semanas base restantes (familia ${tipoFamilia}), ${semanasFlexiblesHasta12Meses} se disfrutan de forma flexible hasta que el menor cumpla 12 meses, ` +
-    `y ${semanasCuidadoProlongado} son de cuidado prolongado, distribuibles a tiempo completo o parcial hasta que el menor cumpla 8 años (RDL 9/2025).`
-  );
-  advertencias.push('La prestación tributa en IRPF como rendimiento del trabajo (está sujeta a retención). A diferencia de 2018 (cuando estaba exenta), desde 2019 solo está exenta la prestación de Seguridad Social por maternidad/paternidad reconocida por el TSJUE, que fue incorporada en la Ley de PGE 2018 — la exención aún genera dudas en AEAT para algunos supuestos. Consulte con asesor fiscal.');
+
+  if (cumpleCarencia) {
+    advertencias.push(
+      `Las primeras ${SEMANAS_OBLIGATORIAS} semanas (${diasObligatorios} días) son OBLIGATORIAS e ininterrumpidas a jornada completa, inmediatamente después del parto/adopción/acogimiento. ` +
+      `De las ${semanasBase - SEMANAS_OBLIGATORIAS} semanas base restantes (familia ${tipoFamilia}), ${semanasFlexiblesHasta12Meses} se disfrutan de forma flexible hasta que el menor cumpla 12 meses, ` +
+      `y ${semanasCuidadoProlongado} son de cuidado prolongado, distribuibles a tiempo completo o parcial hasta que el menor cumpla 8 años (RDL 9/2025).`
+    );
+  } else {
+    advertencias.push(
+      `NO se acredita el período de carencia, así que no corresponde la prestación contributiva de ${semanasTotal} semanas, sino el SUBSIDIO NO CONTRIBUTIVO del art. 182 LGSS: ` +
+      `${NO_CONTRIBUTIVA.duracion} días naturales${supuestosIncremento.length > 0 ? ` + ${NO_CONTRIBUTIVA.incrementoDias} por ${supuestosIncremento.join(' y ')} (el incremento se aplica una sola vez aunque concurran varios supuestos)` : ''} ` +
+      `al 100% del IPREM (${NO_CONTRIBUTIVA.cuantiaMensual} €/mes), o la base reguladora si fuese inferior. ` +
+      `También amplían esos 14 días la familia numerosa y la discapacidad ≥65% del progenitor o del menor, que esta calculadora no pregunta.`
+    );
+  }
+
+  advertencias.push('La prestación por nacimiento y cuidado de menor está EXENTA de IRPF: no se declara y no soporta retención (art. 7.h de la Ley 35/2006, en la redacción del RDL 27/2018, con efectos desde 2018 y ejercicios anteriores no prescritos, tras la STS 1462/2018).');
   if (p.situacionLaboral === 'autonomo') {
     advertencias.push('Autónomos: la base reguladora se calcula igual (base cotización mes anterior / días del mes). El RETA cotiza por contingencias comunes, por lo que el autónomo tiene derecho a esta prestación si cumple carencia y está al corriente de pago.');
   }
@@ -206,7 +240,7 @@ export function calcularPrestacionMaternidadPaternidad(
     advertencias.push(`Discapacidad del menor ≥33%: se añaden ${SEMANAS_ADICIONAL_DISCAPACIDAD} semanas adicionales (${SEMANAS_ADICIONAL_DISCAPACIDAD * DIAS_SEMANA} días) para cada progenitor.`);
   }
   if (limitadaPorBaseMaxima) {
-    advertencias.push(`La base de cotización supera la base máxima de 2025 (${BASE_MAXIMA_MENSUAL_2025.toLocaleString('es-ES')} €/mes). La cuantía diaria se limita a ${BASE_MAXIMA_DIARIA_2025.toFixed(2)} €/día.`);
+    advertencias.push(`La base de cotización supera la base máxima del ejercicio (${BASE_MAXIMA_MENSUAL.toLocaleString('es-ES')} €/mes). La cuantía diaria se limita a ${BASE_MAXIMA_DIARIA.toFixed(2)} €/día.`);
   }
   advertencias.push('Si el recién nacido debe permanecer hospitalizado tras el parto, o en caso de parto prematuro, el permiso se amplía un día por cada día de hospitalización, con un máximo de 13 semanas adicionales (RDL 9/2025). Esta calculadora no incluye dicha ampliación; consúltela aparte si aplica.');
 
@@ -221,6 +255,7 @@ export function calcularPrestacionMaternidadPaternidad(
     diasObligatorios,
     diasFlexibles,
     cumpleCarencia,
+    modalidad: cumpleCarencia ? 'contributiva' : 'no_contributiva',
     cuantiaDiaria,
     cuantiaMensual,
     cuotaTotalPrestacion,
