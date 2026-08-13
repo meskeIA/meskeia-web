@@ -61,10 +61,10 @@ export default function CronicumFooter() {
 
         {/* Legal */}
         <nav className={styles.legal} aria-label="Información legal de Cronicum">
-          <a href="https://meskeia.com/aviso-legal" className={styles.legalLink}>
+          <a href="https://meskeia.com/terminos/" className={styles.legalLink}>
             Aviso legal
           </a>
-          <a href="https://meskeia.com/privacidad" className={styles.legalLink}>
+          <a href="https://meskeia.com/privacidad/" className={styles.legalLink}>
             Privacidad
           </a>
           <button type="button" className={styles.shareBtn} onClick={compartir} aria-live="polite">

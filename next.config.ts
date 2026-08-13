@@ -41,16 +41,26 @@ const securityHeaders = [
   // - api.openweathermap.org   → app informacion-tiempo
   // - cdn.jsdelivr.net         → app extractor-audio-video (ffmpeg.wasm scripts)
   // - www.openstreetmap.org    → app editor-exif (iframe mapa)
+  // Añadidos el 13/08/2026, tras la primera Ronda (`npm run ronda`), que encontró
+  // cuatro apps que llevaban rotas desde el propio 23/02 sin que nadie lo supiera:
+  // - fonts.googleapis.com / fonts.gstatic.com → generador-tipografias y adaptador-dislexia
+  //   (la segunda es una ayuda de lectura para dislexia: sin Lexend Deca no hace nada)
+  // - {de1,nl1,at1}.api.radio-browser.info     → radio-meskeia (los 3 mirrors que usa)
+  // - data: en media-src                       → cronometro (aviso sonoro en base64)
+  // - nominatim.openstreetmap.org              → golden-hour (buscador de ciudad). Esta no
+  //   la vio la Ronda, porque solo falla al escribir en el buscador: la encontró el candado.
+  // Cualquier recurso externo nuevo TIENE que pasar por aquí: lo vigila `npm run check:csp`,
+  // enganchado al build precisamente para que esto no vuelva a descubrirse seis meses tarde.
   {
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net",
-      "style-src 'self' 'unsafe-inline'",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "img-src 'self' data: blob:",
-      "font-src 'self'",
-      "connect-src 'self' https://meskeia.com https://ipapi.co https://api64.ipify.org https://api.openweathermap.org",
-      "media-src 'self' blob:",
+      "font-src 'self' https://fonts.gstatic.com",
+      "connect-src 'self' https://meskeia.com https://ipapi.co https://api64.ipify.org https://api.openweathermap.org https://de1.api.radio-browser.info https://nl1.api.radio-browser.info https://at1.api.radio-browser.info https://nominatim.openstreetmap.org",
+      "media-src 'self' blob: data:",
       "worker-src 'self' blob:",
       "frame-src 'self' https://www.openstreetmap.org",
       "frame-ancestors 'none'",
