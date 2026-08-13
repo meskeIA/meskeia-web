@@ -238,6 +238,7 @@ export const implementedAppsUrls = [
   "/comparador-textos/",
   "/conversor-markdown-html/",
   "/conversor-morse/",
+  "/conversor-numeros-letras/",
   "/conversor-numeros-romanos/",
   "/detector-idioma/",
   "/conversor-binario/",

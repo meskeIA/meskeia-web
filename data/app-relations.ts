@@ -2399,11 +2399,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // TEXTO
   'contador-palabras': [...textoApps.filter(a => a.url !== '/contador-palabras/'), textoExtraApps[0]],
-  'conversor-texto': [...textoApps.filter(a => a.url !== '/conversor-texto/'), textoExtraApps[1]],
+  'conversor-texto': [
+    ...textoApps.filter(a => a.url !== '/conversor-texto/'),
+    { url: '/conversor-numeros-letras/', icon: '✍️', name: 'Números a Letras', description: 'Cifras e importes escritos en palabras' },
+    textoExtraApps[1],
+  ],
   'limpiador-texto': [...textoApps.filter(a => a.url !== '/limpiador-texto/'), textoExtraApps[2]],
   'comparador-textos': [...textoApps.filter(a => a.url !== '/comparador-textos/'), textoExtraApps[1]],
   'contador-silabas': [
     { url: '/diccionario-rimas/', icon: '🎵', name: 'Diccionario de Rimas', description: 'Palabras que riman en consonante o asonante' },
+    { url: '/conversor-numeros-letras/', icon: '✍️', name: 'Números a Letras', description: 'Escribe cifras e importes en palabras' },
     scrabbleApp,
     ...textoApps.filter(a => a.url !== '/contador-silabas/'),
     textoExtraApps[1],
@@ -2414,6 +2419,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/generador-anagramas/', icon: '🔤', name: 'Generador Anagramas', description: 'Palabras con letras sueltas' },
     { url: '/generador-poemas/', icon: '✒️', name: 'Generador de Poemas', description: 'Estructuras poéticas para empezar' },
     { url: '/conjugador-verbos/', icon: '🔁', name: 'Conjugador Verbos', description: 'Conjugaciones del español' },
+  ],
+  'conversor-numeros-letras': [
+    { url: '/conversor-numeros-romanos/', icon: '🏛️', name: 'Números Romanos', description: 'La otra forma de escribir una cifra sin dígitos' },
+    { url: '/contador-silabas/', icon: '📐', name: 'Contador Sílabas', description: 'Separa y cuenta sílabas del español' },
+    { url: '/conversor-texto/', icon: '🔄', name: 'Conversor de Texto', description: 'MAYÚSCULAS, minúsculas y otros formatos' },
+    { url: '/estimador-sueldo-neto/', icon: '💶', name: 'Sueldo Neto', description: 'La cifra que después habrá que escribir en letras' },
   ],
   'conversor-markdown-html': [...textoApps.slice(0, 2), ...webDevApps.slice(0, 2)],
   'generador-lorem-ipsum': [...textoApps.filter(a => a.url !== '/generador-lorem-ipsum/')],
@@ -2950,7 +2961,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/analizador-espectro/', icon: '📊', name: 'Analizador Espectro', description: 'FFT y frecuencias de audio' },
   ],
   'conversor-tallas': conversoresApps.filter(a => a.url !== '/conversor-tallas/'),
-  'conversor-numeros-romanos': conversoresApps.filter(a => a.url !== '/conversor-numeros-romanos/'),
+  'conversor-numeros-romanos': [
+    { url: '/conversor-numeros-letras/', icon: '✍️', name: 'Números a Letras', description: 'Escribe la cifra en palabras: cheques, pagarés y contratos' },
+    ...conversoresApps.filter(a => a.url !== '/conversor-numeros-romanos/'),
+  ],
   'conversor-morse': [
     { url: '/conversor-braille/', icon: '⠃', name: 'Traductor de Braille', description: 'Otro sistema por puntos: texto ↔ Braille' },
     { url: '/cifrado-clasico/', icon: '🔐', name: 'Cifrado Clásico', description: 'César, ROT13, Atbash' },

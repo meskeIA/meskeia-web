@@ -13,7 +13,7 @@ import { defineConfig } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './tests',
-  testMatch: /(calculadoras-invariantes|ganancia-inmueble|coordenadas)\.spec\.ts/,
+  testMatch: /(calculadoras-invariantes|ganancia-inmueble|coordenadas|numero-a-letras)\.spec\.ts/,
   fullyParallel: false,
   workers: 1,
   reporter: 'list',
