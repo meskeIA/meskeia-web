@@ -17,6 +17,23 @@
  *
  * Cómo extender: replica los bloques describe() para otros orquestadores
  * (consulta_jubilacion, consulta_herencia, comparar_donacion_vs_herencia, etc.).
+ *
+ * ── Qué significa la marca [SS pendiente verificación] ───────────────────────
+ *
+ * La llevan 28 goldens de prestaciones (incapacidad, viudedad, maternidad,
+ * excedencia, baja médica…) desde 4a04a332, y afirma UNA cosa concreta: que el
+ * valor esperado se dedujo de la lógica de la propia calculadora, SIN contrastar
+ * el caso contra el simulador oficial de la Seguridad Social.
+ *
+ * Es decir, esos goldens son candados de REGRESIÓN, no certificados de acierto:
+ * detectan que un resultado cambie sin querer, pero no garantizan que sea el que
+ * daría el INSS. No confundir con la vigencia de los DATOS: las cifras que
+ * consumen sí están selladas en data/fiscal/ contra su fuente oficial.
+ *
+ * Cómo se levanta la marca en un test: reproducir su caso en el simulador oficial
+ * del INSS, comprobar que coincide y sustituir la coletilla por la referencia
+ * consultada. Actualizar los valores contra data/fiscal/ NO la levanta — eso
+ * corrige los datos, no verifica el cálculo (2026-08-13).
  */
 
 import { test, expect } from '@playwright/test';
