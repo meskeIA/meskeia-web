@@ -2033,7 +2033,7 @@ test.describe('Golden — calcularPensionIncapacidad (Capa 1 · LGSS arts. 194-2
 
   test('GOLDEN-BX: IPT, edad 50 (sin recargo), sin cónyuge → 55% BR = 1.100 €/mes [SS pendiente verificación]', () => {
     // BR = 224.000 / 112 = 2.000 €. IPT al 55% (sin recargo, edad < 55) = 1.100 €/mes.
-    // Mínimo (IPT < 60 años, unipersonal, 2026) = 671 € → no se aplica (1.100 > 671).
+    // Mínimo (IPT < 60 años, unipersonal, 2026) = 690,20 € → no se aplica (1.100 > 690,20).
     // Anual (14 pagas) = 1.100 × 14 = 15.400 €.
     const pi = calcularPensionIncapacidad({
       gradoIncapacidad: 'total',
@@ -2046,7 +2046,7 @@ test.describe('Golden — calcularPensionIncapacidad (Capa 1 · LGSS arts. 194-2
     expect(pi.porcentajeAplicado).toBe(55);
     expect(pi.recargo55Anios).toBe(false);
     expect(pi.cuantiaBrutaMensual).toBeCloseTo(1100.00, 2);
-    expect(pi.pensionMinimaGarantizada).toBeCloseTo(671.00, 2);
+    expect(pi.pensionMinimaGarantizada).toBeCloseTo(690.20, 2);
     expect(pi.cuantiaEfectivaMensual).toBeCloseTo(1100.00, 2);
     expect(pi.cuantiaAnual14Pagas).toBeCloseTo(15400.00, 2);
   });
@@ -2119,7 +2119,7 @@ test.describe('Golden — calcularPensionViudedad (Capa 1 · LGSS arts. 219-231)
 
   test('GOLDEN-CB: causante activo, BC media 2.000 €, 50 años → 52% general = 891,43 €/mes [SS pendiente verificación]', () => {
     // BR = (24 × 2.000) / 28 = 1.714,29 €. Sin cargas ni condiciones especiales → 52% general.
-    // Pensión bruta = 1.714,29 × 52% = 891,43 €. Mínimo (< 60, sin cargas) = 583 € → no se aplica.
+    // Pensión bruta = 1.714,29 × 52% = 891,43 €. Mínimo (< 60, sin cargas, 2026) = 709,40 € → no se aplica.
     // Anual = 891,43 × 14 = 12.480,02 € < 15.000 → sin retención.
     const pv = calcularPensionViudedad({
       situacionCausante: 'activo',
@@ -2131,14 +2131,14 @@ test.describe('Golden — calcularPensionViudedad (Capa 1 · LGSS arts. 219-231)
     expect(pv.baseReguladora).toBeCloseTo(1714.29, 2);
     expect(pv.porcentajeAplicable).toBe(52);
     expect(pv.pensionBruta).toBeCloseTo(891.43, 2);
-    expect(pv.pensionMinima).toBeCloseTo(583.00, 2);
+    expect(pv.pensionMinima).toBeCloseTo(709.40, 2);
     expect(pv.pensionFinal).toBeCloseTo(891.43, 2);
     expect(pv.pensionNetaAprox).toBeCloseTo(891.43, 2);
   });
 
   test('GOLDEN-CC: causante jubilado, pensión 1.800 €, beneficiario 67 años, ingresos < SMI → 60% [SS pendiente verificación]', () => {
     // BR = pensión del causante = 1.800 €. Edad ≥ 65 e ingresos (500) < SMI (1.221) → 60%.
-    // Pensión bruta = 1.800 × 60% = 1.080 €. Mínimo (≥ 65) = 853 € → no se aplica.
+    // Pensión bruta = 1.800 × 60% = 1.080 €. Mínimo (≥ 65, 2026) = 936,20 € → no se aplica.
     // Anual = 1.080 × 14 = 15.120 € → tramo retención 8% (15.000-22.000).
     // Neta = 1.080 × (1 − 0,08) = 993,60 €.
     const pv = calcularPensionViudedad({
@@ -2151,15 +2151,17 @@ test.describe('Golden — calcularPensionViudedad (Capa 1 · LGSS arts. 219-231)
     expect(pv.baseReguladora).toBeCloseTo(1800.00, 2);
     expect(pv.porcentajeAplicable).toBe(60);
     expect(pv.pensionBruta).toBeCloseTo(1080.00, 2);
-    expect(pv.pensionMinima).toBeCloseTo(853.00, 2);
+    expect(pv.pensionMinima).toBeCloseTo(936.20, 2);
     expect(pv.pensionFinal).toBeCloseTo(1080.00, 2);
     expect(pv.pensionNetaAprox).toBeCloseTo(993.60, 2);
   });
 
   test('GOLDEN-CD: causante activo, BC media 1.200 €, 45 años con cargas → 70% pero se aplica el mínimo [SS pendiente verificación]', () => {
     // BR = (24 × 1.200) / 28 = 1.028,57 €. Cargas + ingresos (500) < límite 70% (916) → 70%.
-    // Pensión bruta = 1.028,57 × 70% = 720,00 €. Mínimo (< 60 con cargas) = 785 € → SE APLICA (785 > 720).
-    // Anual = 785 × 14 = 10.990 € < 15.000 → sin retención.
+    // Pensión bruta = 1.028,57 × 70% = 720,00 €. Mínimo (con cargas, 2026) = 1.256,60 € → SE APLICA.
+    // Las cargas familiares mandan sobre la edad (Anexo I del RD 241/2026).
+    // Anual = 1.256,60 × 14 = 17.592,40 € → tramo retención 8% (15.000-22.000).
+    // Neta = 1.256,60 × (1 − 0,08) = 1.156,07 €.
     const pv = calcularPensionViudedad({
       situacionCausante: 'activo',
       baseCotizacionMedia: 1200,
@@ -2170,9 +2172,9 @@ test.describe('Golden — calcularPensionViudedad (Capa 1 · LGSS arts. 219-231)
     expect(pv.baseReguladora).toBeCloseTo(1028.57, 2);
     expect(pv.porcentajeAplicable).toBe(70);
     expect(pv.pensionBruta).toBeCloseTo(720.00, 2);
-    expect(pv.pensionMinima).toBeCloseTo(785.00, 2);
-    expect(pv.pensionFinal).toBeCloseTo(785.00, 2);
-    expect(pv.pensionNetaAprox).toBeCloseTo(785.00, 2);
+    expect(pv.pensionMinima).toBeCloseTo(1256.60, 2);
+    expect(pv.pensionFinal).toBeCloseTo(1256.60, 2);
+    expect(pv.pensionNetaAprox).toBeCloseTo(1156.07, 2);
   });
 
 });
@@ -2230,21 +2232,28 @@ test.describe('Golden — calcularPrestacionMaternidadPaternidad (Capa 1 · LGSS
     expect(mp.cuotaTotalPrestacion).toBeCloseTo(15400.00, 2);
   });
 
-  test('GOLDEN-CG: BC 6.000 €/mes (supera base máxima) sin carencia → cuantía 0 [SS pendiente verificación]', () => {
-    // BR diaria sin tope = 6.000/30 = 200 €, limitada a la base máxima diaria 2025 = 4.909,50/30 = 163,65 €.
-    // Sin carencia → cuantía diaria = 0 → cuantía mensual y total = 0.
+  test('GOLDEN-CG: BC 6.000 €/mes (supera base máxima) sin carencia → subsidio no contributivo de 600 €/mes [SS pendiente verificación]', () => {
+    // BR diaria sin tope = 6.000/30 = 200 €, limitada a la base máxima diaria 2026 = 5.101,20/30 = 170,04 €.
+    // Sin carencia NO se cobra cero: nace el subsidio NO CONTRIBUTIVO del art. 182 LGSS, que son
+    // 42 días naturales (6 semanas de descanso obligatorio) al 100% del IPREM, o la base reguladora
+    // si fuera inferior. IPREM 2026 = 20 €/día → 600 €/mes y 20 × 42 = 840 € en total.
+    //
+    // Este assert es el candado del fix de 2026-08-13 (497842b7): hasta ese día el motor —y con él
+    // el MCP que habla con ChatGPT y Claude— afirmaba que sin carencia no se cobra nada.
     const mp = calcularPrestacionMaternidadPaternidad({
       baseCotizacionMensual: 6000,
       edadProgenitor: 'mayor_26',
       numerosHijos: 1,
       cumpleCarencia: false,
     });
-    expect(mp.baseReguladoraDiaria).toBeCloseTo(163.65, 2);
+    expect(mp.baseReguladoraDiaria).toBeCloseTo(170.04, 2);
     expect(mp.limitadaPorBaseMaxima).toBe(true);
-    expect(mp.baseReguladoraMensual).toBeCloseTo(4909.50, 2);
+    expect(mp.baseReguladoraMensual).toBeCloseTo(5101.20, 2);
     expect(mp.cumpleCarencia).toBe(false);
-    expect(mp.cuantiaMensual).toBe(0);
-    expect(mp.cuotaTotalPrestacion).toBe(0);
+    expect(mp.modalidad).toBe('no_contributiva');
+    expect(mp.duracionTotalDias).toBe(42);
+    expect(mp.cuantiaMensual).toBeCloseTo(600.00, 2);
+    expect(mp.cuotaTotalPrestacion).toBeCloseTo(840.00, 2);
   });
 
   test('GOLDEN-CO: BC 3.000 €/mes, familia monoparental, 1 hijo → 32 semanas (RDL 9/2025) [SS pendiente verificación]', () => {
