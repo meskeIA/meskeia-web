@@ -67,4 +67,26 @@ if (nuevas.length) {
 } else if (comparacion.length) {
   console.log(`\n   Sin novedades. Lo persistente ya se conoce y está en el acta.`);
 }
+
+/**
+ * Contador de veredicto repetido, impreso y no confiado a la memoria de nadie.
+ * "Sin novedades" es la respuesta correcta casi todos los días, y precisamente por eso
+ * deja de informar: a partir de cierto punto es indistinguible de una Ronda que mira mal.
+ * El umbral es alto (15 días) porque aquí lo esperable ES la racha, al revés que en un
+ * semáforo; lo que la rompe es cualquier cambio del catálogo, y se despliega casi a diario.
+ */
+let racha = 0;
+for (let i = actas.length - 1; i >= 0; i--) {
+  const t = fs.readFileSync(path.join(DIR, actas[i]), 'utf8');
+  const m = t.match(/^Frente a la ronda anterior: (\d+) nuevas/m);
+  if (!m) break;              // la primera acta no compara con nada
+  if (m[1] === '0') racha++; else break;
+}
+if (racha >= 15) {
+  console.log(`\n⚠  ${racha} rondas seguidas sin una sola novedad, habiendo desplegado en ese tiempo.`);
+  console.log(`   La lectura por defecto ya no es que el catálogo esté sano, sino que la Ronda`);
+  console.log(`   ha dejado de mirar. Comprobarlo: npm run ronda -- --autocomprobar`);
+} else if (racha > 1) {
+  console.log(`   (${racha} rondas seguidas sin novedades)`);
+}
 console.log('');
