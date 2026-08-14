@@ -32,3 +32,4 @@ export {
 } from './dailyApps';
 
 export { withFrom } from './trackingFrom';
+export { URL_PRIVACIDAD, URL_TERMINOS } from './urls-legales';

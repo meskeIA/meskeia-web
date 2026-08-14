@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, ReactNode } from 'react';
-import Link from 'next/link';
+import { URL_PRIVACIDAD, URL_TERMINOS } from '@/lib/urls-legales';
 import styles from './DisclaimerCard.module.css';
 
 export type DisclaimerVariant = 'financial' | 'general' | 'medical' | 'educational' | 'technical' | 'alcohol';
@@ -132,8 +132,8 @@ export default function DisclaimerCard({
           {showTermsLink && (
             <p className={styles.termsLink}>
               Para más información, consulta nuestros{' '}
-              <Link href="/terminos">Términos de Uso</Link> y{' '}
-              <Link href="/privacidad">Política de Privacidad</Link>.
+              <a href={URL_TERMINOS}>Términos de Uso</a> y{' '}
+              <a href={URL_PRIVACIDAD}>Política de Privacidad</a>.
             </p>
           )}
         </div>

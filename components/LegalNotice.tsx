@@ -9,6 +9,7 @@
 'use client';
 
 import React from 'react';
+import { URL_PRIVACIDAD, URL_TERMINOS } from '@/lib/urls-legales';
 import Link from 'next/link';
 import DescubreVertical from './DescubreVertical';
 import styles from './LegalNotice.module.css';
@@ -44,17 +45,17 @@ export default function LegalNotice({ lastUpdated }: LegalNoticeProps) {
       <span className={styles.icon} aria-hidden="true">ℹ️</span>
 
       <div className={styles.links}>
-        <Link href="/terminos" className={styles.link}>
+        <a href={URL_TERMINOS} className={styles.link}>
           <span className={styles.linkTextFull}>Términos de Uso</span>
           <span className={styles.linkTextShort}>Términos</span>
-        </Link>
+        </a>
 
         <span className={styles.separator}>|</span>
 
-        <Link href="/privacidad" className={styles.link}>
+        <a href={URL_PRIVACIDAD} className={styles.link}>
           <span className={styles.linkTextFull}>Política de Privacidad</span>
           <span className={styles.linkTextShort}>Privacidad</span>
-        </Link>
+        </a>
 
         <span className={styles.separator}>|</span>
 

@@ -26,6 +26,8 @@ import {
   calcularNotario,
   calcularRegistro,
   calcularPlusvaliaMunicipal,
+  elegirTipoITP,
+  TipoElegido,
   ENLACE_CATASTRO,
 } from '@/data/itp-ccaa';
 
@@ -45,6 +47,8 @@ interface ResultadosComprador {
   gastosGestoria: number;
   totalGastos: number;
   totalOperacion: number;
+  /** null en primera mano (allí es IVA, no ITP) */
+  tipoElegido: TipoElegido | null;
 }
 
 interface ResultadosVendedor {
@@ -93,9 +97,6 @@ const PERFILES_COMPRADOR: { value: PerfilComprador; label: string }[] = [
   { value: 'discapacidad', label: 'Persona con discapacidad' },
 ];
 
-// Normaliza tildes para comparar nombres de tipos reducidos (ej: "Jóvenes" → "jovenes")
-const normalizarTexto = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-
 
 export default function SimuladorTrasteroCompraventaPage() {
   // Estado del formulario
@@ -127,6 +128,8 @@ export default function SimuladorTrasteroCompraventaPage() {
     let impuesto = 0;
     let tipoImpuesto = '';
     let porcentaje = 0;
+    /** Qué tipo de ITP se ha aplicado y cuáles NO se han podido comprobar */
+    let elegido: TipoElegido | null = null;
 
     if (tipoTransmision === 'primera-mano') {
       // Trastero nuevo: IVA reducido (10%) solo si se transmite CONJUNTAMENTE con la
@@ -141,24 +144,13 @@ export default function SimuladorTrasteroCompraventaPage() {
       // ITP para segunda mano
       const datosCcaa = ITP_CCAA[ccaa];
 
-      // Buscar tipo reducido si aplica (trastero = inmueble residencial)
-      let tipoAplicable = datosCcaa.tipoGeneral;
-      if (perfilComprador !== 'general' && datosCcaa.tiposReducidos.length > 0) {
-        const reducido = datosCcaa.tiposReducidos.find(r => {
-          const nombre = normalizarTexto(r.nombre);
-          if (perfilComprador === 'joven' && nombre.includes('joven')) return true;
-          if (perfilComprador === 'familia-numerosa' && nombre.includes('familia')) return true;
-          if (perfilComprador === 'discapacidad' && nombre.includes('discapacidad')) return true;
-          return false;
-        });
-        if (reducido && (!reducido.valorMaximo || precio <= reducido.valorMaximo)) {
-          tipoAplicable = reducido.tipo;
-        }
-      }
-
-      impuesto = calcularITP(precio, ccaa, tipoAplicable);
+      // `viviendaHabitual: false`: un trastero suelto no lo es nunca, y esa condición
+      // aparece en 53 de los tipos reducidos. Antes se aplicaba el primer reducido que
+      // casara por nombre sin mirar sus condiciones, y en Madrid eso daba ITP del 0 %.
+      elegido = elegirTipoITP(ccaa, perfilComprador, precio, { viviendaHabitual: false });
+      impuesto = calcularITP(precio, ccaa, elegido.tipo);
       tipoImpuesto = 'ITP';
-      porcentaje = tipoAplicable;
+      porcentaje = elegido.tipo;
     }
 
     // AJD solo aplica en primera mano
@@ -179,6 +171,7 @@ export default function SimuladorTrasteroCompraventaPage() {
       gastosGestoria: gestoria,
       totalGastos,
       totalOperacion: precio + totalGastos,
+      tipoElegido: elegido,
     };
   }, [precioVenta, ccaa, tipoTransmision, perfilComprador, gastosGestoria, modalidadTrastero]);
 
@@ -545,6 +538,30 @@ export default function SimuladorTrasteroCompraventaPage() {
                     icon="💳"
                     description="Precio del trastero + todos los gastos"
                   />
+                  {resultadosComprador.tipoElegido && resultadosComprador.tipoElegido.noComprobables.length > 0 && (
+                    <div className={styles.avisoReducidos} role="note">
+                      <p className={styles.avisoReducidosTitulo}>
+                        <span aria-hidden="true">💡</span> Podrías pagar menos, pero depende de requisitos que no preguntamos
+                      </p>
+                      <p className={styles.avisoReducidosTexto}>
+                        El cálculo usa el tipo general porque no podemos comprobar tu situación.
+                        En {datosCcaaActual.nombre} existe:
+                      </p>
+                      <ul className={styles.avisoReducidosLista}>
+                        {resultadosComprador.tipoElegido.noComprobables.map(r => (
+                          <li key={r.nombre}>
+                            <strong>{formatNumber(r.tipo, 2)}% — {r.nombre}</strong>
+                            <br />
+                            Requisitos: {r.condiciones.join(' · ')}
+                            {r.valorMaximo ? ` · Valor máximo ${formatCurrency(r.valorMaximo)}` : ''}
+                          </li>
+                        ))}
+                      </ul>
+                      <p className={styles.avisoReducidosTexto}>
+                        Un trastero comprado por separado no es vivienda habitual, así que los tipos que exigen esa condición no suelen aplicarse. Confírmalo con la oficina liquidadora de tu comunidad antes de contar con la rebaja.
+                      </p>
+                    </div>
+                  )}
                 </>
               ) : (
                 <div className={styles.placeholder}>

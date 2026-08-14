@@ -658,3 +658,52 @@
     transition: none !important;
   }
 }
+
+/* ===== Aviso de tipos reducidos no comprobables ===== */
+/* Se muestra cuando existe un ITP reducido que encaja con el perfil pero exige
+   requisitos que la herramienta no pregunta (municipio, renta, vivienda habitual).
+   El cálculo usa el tipo general a propósito: presupuestar de menos es el error caro. */
+
+.avisoReducidos {
+  grid-column: 1 / -1;
+  background: rgba(46, 134, 171, 0.06);
+  border: 1px solid rgba(46, 134, 171, 0.3);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+}
+
+[data-theme='dark'] .avisoReducidos {
+  background: rgba(46, 134, 171, 0.1);
+  border-color: rgba(46, 134, 171, 0.35);
+}
+
+.avisoReducidosTitulo {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm);
+  font-size: 0.95rem;
+}
+
+.avisoReducidosTexto {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  margin: 0 0 var(--spacing-sm);
+}
+
+.avisoReducidosLista {
+  margin: 0 0 var(--spacing-sm);
+  padding-left: 1.25rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.avisoReducidosLista li {
+  margin-bottom: var(--spacing-sm);
+}
+
+.avisoReducidosLista strong {
+  color: var(--text-primary);
+}

@@ -712,6 +712,123 @@ export const ARANCELES_REGISTRO: TramoArancel[] = [
 // Límite máximo de arancel por inscripción
 export const REGISTRO_MAXIMO = 2181.67;
 
+// ===== ELECCIÓN DEL TIPO REDUCIDO =====
+
+/** Perfiles por los que preguntan los simuladores de compraventa */
+export type PerfilComprador = 'general' | 'joven' | 'familia-numerosa' | 'discapacidad' | 'vpo';
+
+export interface TipoElegido {
+  /** Porcentaje que hay que aplicar */
+  tipo: number;
+  /** true si es un tipo reducido; false si es el tipo general */
+  esReducido: boolean;
+  nombre?: string;
+  /** Condiciones del tipo aplicado, para mostrarlas junto al resultado */
+  condiciones?: string[];
+  /**
+   * Reducidos que encajaban con el perfil pero exigen algo que la herramienta no
+   * pregunta (municipio, renta, superficie, primera vivienda…). No se aplican, pero
+   * SE AVISA de que existen: el usuario puede cumplirlos y no debe perdérselos.
+   */
+  noComprobables: TipoReducido[];
+}
+
+/**
+ * Condiciones que la herramienta SÍ puede dar por cumplidas a partir del perfil elegido.
+ * Todo lo que no encaje aquí exige un dato que no se pregunta y, por tanto, NO permite
+ * aplicar el tipo reducido automáticamente.
+ */
+const CUBIERTAS_POR_PERFIL: Record<Exclude<PerfilComprador, 'general'>, RegExp> = {
+  joven: /^menor (de|o igual)/i,
+  'familia-numerosa': /^familia numerosa/i,
+  discapacidad: /discapacidad/i,
+  vpo: /vpo|protecci[oó]n oficial/i,
+};
+
+/** Textos del array `condiciones` que no son requisitos del comprador, sino notas. */
+const NO_SON_REQUISITOS = [
+  /^desde \w+\/\d{4}$/i,      // vigencia de la norma, no algo que el comprador cumpla
+  /^sin l[ií]mite/i,          // aclaración, no restricción
+];
+
+/**
+ * Elige el tipo de ITP aplicable — y, sobre todo, el que NO se puede aplicar.
+ *
+ * ── De dónde sale (14/08/2026) ────────────────────────────────────────────────
+ * Las tres apps residenciales del clúster llevaban la misma lógica copiada: buscar el
+ * PRIMER tipo reducido cuyo nombre contuviera «joven», «familia» o «discapacidad» y
+ * aplicarlo comprobando solo su `valorMaximo`, nunca su array `condiciones`.
+ *
+ * En Madrid —la comunidad que viene seleccionada por defecto— el primero que casa con
+ * «joven» es «Jóvenes < 35 años (municipios pequeños)», del 0 %, reservado a municipios
+ * de menos de 2.500 habitantes que ninguna de las apps pregunta. Un joven que comprara
+ * en la capital leía «ITP (0,0%) — 0,00 €». Mismo patrón en Baleares. Lo encontró el
+ * Inspector el 14/08/2026 en dos apps hermanas a la vez.
+ *
+ * ── El criterio ───────────────────────────────────────────────────────────────
+ * En una herramienta fiscal, equivocarse por exceso es recuperable y por defecto no:
+ * quien presupuesta 12.000 € y paga 6.000 se alegra; quien presupuesta 0 y paga 12.000
+ * tiene un problema. Así que un tipo reducido solo se aplica cuando TODAS sus
+ * condiciones están cubiertas por lo que la herramienta pregunta. El resto se devuelve
+ * en `noComprobables` para enseñarlo como oportunidad, nunca como cifra.
+ *
+ * @param viviendaHabitual  Si la operación puede ser vivienda habitual. `true` en la
+ *   compra de vivienda; **`false` en garaje, trastero, local, nave y terreno**, donde
+ *   la condición «Vivienda habitual» —que aparece en 53 de los tipos reducidos— no se
+ *   cumple nunca por definición.
+ */
+export function elegirTipoITP(
+  ccaa: ComunidadAutonoma,
+  perfil: PerfilComprador,
+  precio: number,
+  { viviendaHabitual }: { viviendaHabitual: boolean }
+): TipoElegido {
+  const datos = ITP_CCAA[ccaa];
+  const general: TipoElegido = { tipo: datos.tipoGeneral, esReducido: false, noComprobables: [] };
+  if (perfil === 'general' || !datos.tiposReducidos.length) return general;
+
+  const patronPerfil = CUBIERTAS_POR_PERFIL[perfil];
+  const normaliza = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+  /** ¿Esta condición concreta se puede dar por cumplida sin preguntar nada más? */
+  const cubierta = (c: string): boolean => {
+    if (NO_SON_REQUISITOS.some(r => r.test(c))) return true;
+    if (/^vivienda habitual$|^primera vivienda habitual$/i.test(c)) return viviendaHabitual;
+    if (patronPerfil.test(c)) return true;
+    // Un límite de valor sí es comprobable: se contrasta con el precio introducido
+    const limite = c.match(/[≤<]\s*([\d.]+)\s*€/);
+    if (limite) return precio <= Number(limite[1].replace(/\./g, ''));
+    return false;
+  };
+
+  // Candidatos: los que encajan con el perfil por nombre (mismo criterio de antes)
+  const candidatos = datos.tiposReducidos.filter(r => {
+    const n = normaliza(r.nombre);
+    if (perfil === 'joven') return n.includes('joven');
+    if (perfil === 'familia-numerosa') return n.includes('familia');
+    if (perfil === 'discapacidad') return n.includes('discapacidad');
+    return n.includes('vpo') || n.includes('proteccion oficial');
+  });
+  if (!candidatos.length) return general;
+
+  const aplicables = candidatos.filter(
+    r => (!r.valorMaximo || precio <= r.valorMaximo) && r.condiciones.every(cubierta)
+  );
+  const noComprobables = candidatos.filter(r => !aplicables.includes(r));
+
+  if (!aplicables.length) return { ...general, noComprobables };
+
+  // Entre los que sí se pueden aplicar, el más favorable al comprador
+  const mejor = aplicables.reduce((a, b) => (b.tipo < a.tipo ? b : a));
+  return {
+    tipo: mejor.tipo,
+    esReducido: true,
+    nombre: mejor.nombre,
+    condiciones: mejor.condiciones,
+    noComprobables,
+  };
+}
+
 // ===== FUNCIONES DE CÁLCULO =====
 
 /**

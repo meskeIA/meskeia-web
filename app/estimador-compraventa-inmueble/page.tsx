@@ -14,6 +14,8 @@ import {
   calcularNotario,
   calcularRegistro,
   calcularPlusvaliaMunicipal,
+  elegirTipoITP,
+  TipoElegido,
   ENLACE_CATASTRO,
 } from '@/data/itp-ccaa';
 
@@ -39,6 +41,8 @@ interface ResultadosComprador {
   gastosGestoria: number;
   totalGastos: number;
   totalOperacion: number;
+  /** null en primera mano (allí es IVA, no ITP) */
+  tipoElegido: TipoElegido | null;
 }
 
 interface ResultadosVendedor {
@@ -190,6 +194,8 @@ export default function SimuladorCompraventaPage() {
     let impuesto = 0;
     let tipoImpuesto = '';
     let porcentaje = 0;
+    /** Qué tipo de ITP se ha aplicado y cuáles NO se han podido comprobar */
+    let tipoElegido: TipoElegido | null = null;
 
     // Determinar si es inmueble residencial (para IVA y tipos reducidos)
     const esResidencial = INMUEBLES_RESIDENCIALES.includes(tipoInmueble);
@@ -203,28 +209,18 @@ export default function SimuladorCompraventaPage() {
       // ITP para segunda mano
       const datosCcaa = ITP_CCAA[ccaa];
 
-      // Buscar tipo reducido si aplica (SOLO para inmuebles residenciales)
-      let tipoAplicable = datosCcaa.tipoGeneral;
-      if (esResidencial && perfilComprador !== 'general' && datosCcaa.tiposReducidos.length > 0) {
-        const reducido = datosCcaa.tiposReducidos.find(r => {
-          const nombre = normalizarTexto(r.nombre);
-          if (perfilComprador === 'joven' && nombre.includes('joven')) return true;
-          if (perfilComprador === 'familia-numerosa' && nombre.includes('familia')) return true;
-          if (perfilComprador === 'discapacidad' && nombre.includes('discapacidad')) return true;
-          if (perfilComprador === 'vpo' && nombre.includes('vpo')) return true;
-          return false;
-        });
-        if (reducido) {
-          // Verificar si cumple límite de valor
-          if (!reducido.valorMaximo || precio <= reducido.valorMaximo) {
-            tipoAplicable = reducido.tipo;
-          }
-        }
-      }
-
-      impuesto = calcularITP(precio, ccaa, tipoAplicable);
+      // Los tipos reducidos exigen condiciones que hay que comprobar una a una: antes se
+      // aplicaba el primero que casara por nombre mirando solo su valorMaximo, y en Madrid
+      // eso daba un ITP del 0 % por un tipo reservado a municipios de menos de 2.500
+      // habitantes que la app no pregunta. `viviendaHabitual` solo se da por cierta en
+      // inmuebles residenciales; en local, nave o terreno esa condición no se cumple.
+      const elegido = elegirTipoITP(ccaa, perfilComprador, precio, {
+        viviendaHabitual: esResidencial,
+      });
+      tipoElegido = elegido;
+      impuesto = calcularITP(precio, ccaa, elegido.tipo);
       tipoImpuesto = 'ITP';
-      porcentaje = tipoAplicable;
+      porcentaje = elegido.tipo;
     }
 
     // AJD: Solo aplica en primera mano (junto con IVA). En segunda mano se paga ITP, no AJD
@@ -248,6 +244,7 @@ export default function SimuladorCompraventaPage() {
       gastosGestoria: gestoria,
       totalGastos,
       totalOperacion: precio + totalGastos,
+      tipoElegido,
     };
   }, [precioVenta, ccaa, tipoInmueble, tipoTransmision, perfilComprador, gastosGestoria]);
 
@@ -681,6 +678,30 @@ export default function SimuladorCompraventaPage() {
                     icon="💳"
                     description="Precio + todos los gastos"
                   />
+                  {resultadosComprador.tipoElegido && resultadosComprador.tipoElegido.noComprobables.length > 0 && (
+                    <div className={styles.avisoReducidos} role="note">
+                      <p className={styles.avisoReducidosTitulo}>
+                        <span aria-hidden="true">💡</span> Podrías pagar menos, pero depende de requisitos que no preguntamos
+                      </p>
+                      <p className={styles.avisoReducidosTexto}>
+                        El cálculo usa el tipo general porque no podemos comprobar tu situación.
+                        En {datosCcaaActual.nombre} existe:
+                      </p>
+                      <ul className={styles.avisoReducidosLista}>
+                        {resultadosComprador.tipoElegido.noComprobables.map(r => (
+                          <li key={r.nombre}>
+                            <strong>{formatNumber(r.tipo, 2)}% — {r.nombre}</strong>
+                            <br />
+                            Requisitos: {r.condiciones.join(' · ')}
+                            {r.valorMaximo ? ` · Valor máximo ${formatCurrency(r.valorMaximo)}` : ''}
+                          </li>
+                        ))}
+                      </ul>
+                      <p className={styles.avisoReducidosTexto}>
+                        Comprueba los requisitos con la oficina liquidadora de tu comunidad antes de contar con la rebaja: la mayoría exigen que sea tu vivienda habitual, y algunos añaden límites de renta, superficie o municipio.
+                      </p>
+                    </div>
+                  )}
                 </>
               ) : (
                 <div className={styles.placeholder}>

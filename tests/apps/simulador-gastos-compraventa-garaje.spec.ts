@@ -152,7 +152,7 @@ test.describe('Simulador de gastos de compraventa de garaje', () => {
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('20.153,40 €');
   });
 
-  // ⚠️ HALLAZGO ABIERTO (Inspector, 14/08/2026): al marcar el perfil «Joven (< 35 años)»
+  // ✅ CORREGIDO el 14/08/2026 — al marcar el perfil «Joven (< 35 años)»
   // la app busca el primer tipo reducido cuyo nombre contenga «joven» y lo aplica sin
   // comprobar sus `condiciones`. En Madrid —la CCAA por defecto— ese tipo es
   // «Jóvenes < 35 años (municipios pequeños)», del 0 %, condicionado a un municipio de
@@ -160,9 +160,8 @@ test.describe('Simulador de gastos de compraventa de garaje', () => {
   // en la capital lee «ITP (0,0%) — 0,00 €». Lo anclado para él es el tipo general del
   // 6 % (ITP_CCAA.madrid.tipoGeneral = TIPOS_ITP_CCAA_2025 'Madrid') → 1.500,00 €.
   // Mismo patrón en Baleares con «joven» y con «discapacidad» (tipo 0 %).
-  test('CASO 5 (tipos reducidos) — joven en Madrid: no puede salir 0 € de ITP sin preguntar el municipio', async ({ page }) => {
-    test.fail();
-    await page.goto(RUTA);
+  test('CASO 5 (regresión) — joven en Madrid: no puede salir 0 € de ITP sin preguntar el municipio', async ({ page }) => {
+        await page.goto(RUTA);
     await page.getByRole('button', { name: /Segunda mano/ }).click();
     await page.selectOption('#select-ccaa', 'madrid');
     await rellenar(page, 'Precio del garaje / plaza de parking', '25000');

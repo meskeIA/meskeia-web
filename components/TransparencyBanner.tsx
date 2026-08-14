@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { URL_PRIVACIDAD } from '@/lib/urls-legales';
 import Link from 'next/link';
 import styles from './TransparencyBanner.module.css';
 
@@ -47,9 +48,9 @@ export default function TransparencyBanner() {
             meskeIA guarda tus preferencias y progreso <strong>solo en tu dispositivo</strong> (localStorage).
             No usamos cookies de seguimiento ni enviamos tus datos a terceros.
           </p>
-          <Link href="/privacidad/" className={styles.link}>
+          <a href={URL_PRIVACIDAD} className={styles.link}>
             Más información →
-          </Link>
+          </a>
         </div>
         <button
           onClick={handleDismiss}

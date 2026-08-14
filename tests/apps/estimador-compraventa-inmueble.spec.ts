@@ -199,15 +199,14 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('10.277,10 €');
   });
 
-  // ⚠️ HALLAZGO ABIERTO (Inspector, 14/08/2026): con el perfil «Joven (< 35 años)» la app
+  // ✅ CORREGIDO el 14/08/2026 — con el perfil «Joven (< 35 años)» la app
   // busca el primer tipo reducido cuyo nombre contenga «joven» y lo aplica comprobando solo
   // su `valorMaximo`, nunca sus `condiciones`. En Madrid —la CCAA que viene por defecto— ese
   // tipo es «Jóvenes < 35 años (municipios pequeños)», del 0 %, reservado a municipios de
   // menos de 2.500 habitantes que la app jamás pregunta: quien compre en la capital lee
   // «ITP (0,0%) — 0,00 €». Mismo patrón en Baleares («joven» y «discapacidad», tipo 0 %).
-  test('CASO 5 (hallazgo) — joven en Madrid: no puede salir 0 € de ITP sin preguntar el municipio', async ({ page }) => {
-    test.fail();
-    await page.goto(RUTA);
+  test('CASO 5 (regresión) — joven en Madrid: no puede salir 0 € de ITP sin preguntar el municipio', async ({ page }) => {
+        await page.goto(RUTA);
     await page.getByRole('button', { name: /Segunda mano/ }).click();
     await selectCcaa(page).selectOption('madrid');
     await rellenar(page, 'Precio de la vivienda', '200000');

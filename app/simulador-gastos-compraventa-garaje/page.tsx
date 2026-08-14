@@ -27,6 +27,8 @@ import {
   calcularNotario,
   calcularRegistro,
   calcularPlusvaliaMunicipal,
+  elegirTipoITP,
+  TipoElegido,
   ENLACE_CATASTRO,
 } from '@/data/itp-ccaa';
 
@@ -46,6 +48,8 @@ interface ResultadosComprador {
   gastosGestoria: number;
   totalGastos: number;
   totalOperacion: number;
+  /** null en primera mano (allí es IVA, no ITP) */
+  tipoElegido: TipoElegido | null;
 }
 
 interface ResultadosVendedor {
@@ -94,8 +98,6 @@ const PERFILES_COMPRADOR: { value: PerfilComprador; label: string }[] = [
   { value: 'discapacidad', label: 'Persona con discapacidad' },
 ];
 
-// Normaliza tildes para comparar nombres de tipos reducidos (ej: "Jóvenes" → "jovenes")
-const normalizarTexto = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
 // ===== COMPONENTE PRINCIPAL =====
 export default function SimuladorGarajeCompraventaPage() {
@@ -129,6 +131,8 @@ export default function SimuladorGarajeCompraventaPage() {
     let impuesto = 0;
     let tipoImpuesto = '';
     let porcentaje = 0;
+    /** Qué tipo de ITP se ha aplicado y cuáles NO se han podido comprobar */
+    let elegido: TipoElegido | null = null;
 
     if (tipoTransmision === 'primera-mano') {
       // Garaje nuevo: IVA reducido (10%) si va vinculado a la vivienda (máx. 2 plazas);
@@ -137,24 +141,14 @@ export default function SimuladorGarajeCompraventaPage() {
       porcentaje = tipoGaraje === 'vinculado' ? IVA_INMUEBLES_2025.garageCon : IVA_INMUEBLES_2025.garaje;
       impuesto = precio * (porcentaje / 100);
     } else {
-      // Garaje segunda mano: ITP
-      // El garaje es inmueble residencial → puede optar a tipos reducidos
-      let tipoAplicable = datosCcaa.tipoGeneral;
-      if (perfilComprador !== 'general' && datosCcaa.tiposReducidos.length > 0) {
-        const reducido = datosCcaa.tiposReducidos.find(r => {
-          const nombre = normalizarTexto(r.nombre);
-          if (perfilComprador === 'joven' && nombre.includes('joven')) return true;
-          if (perfilComprador === 'familia-numerosa' && nombre.includes('familia')) return true;
-          if (perfilComprador === 'discapacidad' && nombre.includes('discapacidad')) return true;
-          return false;
-        });
-        if (reducido && (!reducido.valorMaximo || precio <= reducido.valorMaximo)) {
-          tipoAplicable = reducido.tipo;
-        }
-      }
-      impuesto = calcularITP(precio, ccaa, tipoAplicable);
+      // Garaje segunda mano: ITP.
+      // `viviendaHabitual: false` porque un garaje suelto NO lo es nunca, y esa condición
+      // aparece en 53 de los tipos reducidos. Antes se aplicaba el primer reducido que
+      // casara por nombre sin mirar sus condiciones, y en Madrid eso daba ITP del 0 %.
+      elegido = elegirTipoITP(ccaa, perfilComprador, precio, { viviendaHabitual: false });
+      impuesto = calcularITP(precio, ccaa, elegido.tipo);
       tipoImpuesto = 'ITP';
-      porcentaje = tipoAplicable;
+      porcentaje = elegido.tipo;
     }
 
     // AJD solo aplica en primera mano (junto con IVA)
@@ -174,6 +168,7 @@ export default function SimuladorGarajeCompraventaPage() {
       gastosGestoria: gestoria,
       totalGastos,
       totalOperacion: precio + totalGastos,
+      tipoElegido: elegido,
     };
   }, [precioGaraje, ccaa, tipoTransmision, tipoGaraje, perfilComprador, gastosGestoria]);
 
@@ -535,6 +530,38 @@ export default function SimuladorGarajeCompraventaPage() {
                     icon="💳"
                     description="Precio + todos los gastos"
                   />
+                  {/*
+                    Tipos reducidos que encajan con el perfil pero exigen requisitos que
+                    esta herramienta no pregunta. NO se aplican al cálculo —presupuestar
+                    de menos es el error caro— pero se enseñan, porque el comprador puede
+                    cumplirlos y tiene derecho a saber que existen.
+                  */}
+                  {resultadosComprador.tipoElegido && resultadosComprador.tipoElegido.noComprobables.length > 0 && (
+                    <div className={styles.avisoReducidos} role="note">
+                      <p className={styles.avisoReducidosTitulo}>
+                        <span aria-hidden="true">💡</span> Podrías pagar menos, pero depende de requisitos que no preguntamos
+                      </p>
+                      <p className={styles.avisoReducidosTexto}>
+                        El cálculo usa el tipo general ({formatNumber(datosCcaaActual.tipoGeneral, 2)}%) porque no
+                        podemos comprobar tu situación. En {datosCcaaActual.nombre} existe:
+                      </p>
+                      <ul className={styles.avisoReducidosLista}>
+                        {resultadosComprador.tipoElegido.noComprobables.map(r => (
+                          <li key={r.nombre}>
+                            <strong>{formatNumber(r.tipo, 2)}% — {r.nombre}</strong>
+                            <br />
+                            Requisitos: {r.condiciones.join(' · ')}
+                            {r.valorMaximo ? ` · Valor máximo ${formatCurrency(r.valorMaximo)}` : ''}
+                          </li>
+                        ))}
+                      </ul>
+                      <p className={styles.avisoReducidosTexto}>
+                        Un garaje comprado por separado no es vivienda habitual, así que los tipos que
+                        exigen esa condición no suelen aplicarse. Confírmalo con la oficina liquidadora
+                        de tu comunidad antes de contar con la rebaja.
+                      </p>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className={styles.placeholder}>

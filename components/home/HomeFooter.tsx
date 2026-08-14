@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { URL_PRIVACIDAD, URL_TERMINOS } from '@/lib/urls-legales'
 import styles from './HomeFooter.module.css'
 
 export default function HomeFooter() {
@@ -19,13 +20,13 @@ export default function HomeFooter() {
             Acerca de
           </Link>
           <span className={styles.dot}>•</span>
-          <Link href="/privacidad" className={styles.link}>
+          <a href={URL_PRIVACIDAD} className={styles.link}>
             Privacidad
-          </Link>
+          </a>
           <span className={styles.dot}>•</span>
-          <Link href="/terminos" className={styles.link}>
+          <a href={URL_TERMINOS} className={styles.link}>
             Términos
-          </Link>
+          </a>
           <span className={styles.dot}>•</span>
           <Link href="/contacto" className={styles.link}>
             Contacto
