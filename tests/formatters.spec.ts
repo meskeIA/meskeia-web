@@ -114,6 +114,45 @@ test.describe('parseSpanishNumber', () => {
   test('elimina espacios', () => {
     expect(parseSpanishNumber('  1234,56  ')).toBe(1234.56);
   });
+
+  /**
+   * El punto de los millares SIN coma decimal — el caso que faltaba, y que costó caro.
+   *
+   * Hasta el 14/08/2026 estos tests no existían y `parseSpanishNumber` hacía un
+   * `parseFloat` directo en esta rama, así que "200.000" devolvía 200 y "11.440"
+   * devolvía 11,44. El comentario del propio fichero anunciaba una heurística que
+   * nunca se había implementado.
+   *
+   * Lo encontró el Inspector en `estimador-compraventa-inmueble`: su botón «Estimar
+   * por mí» escribía 11.440 en un campo y lo releía como 11,44, de modo que el botón
+   * pensado para REBAJAR la ganancia del vendedor le subía el IRPF 2.618,77 €.
+   * `parseSpanishNumber` lo usan 89 apps, 48 de ellas sobre campos de texto libre.
+   *
+   * Regla: tres dígitos tras el punto = separador de millares (formato español, que
+   * es el obligatorio del proyecto). Cualquier otra cantidad de dígitos = decimal,
+   * para no romper el formato internacional que ya se aceptaba.
+   */
+  test('el punto de millares sin coma decimal se interpreta como millares', () => {
+    expect(parseSpanishNumber('200.000')).toBe(200000);
+    expect(parseSpanishNumber('11.440')).toBe(11440);
+    expect(parseSpanishNumber('1.234.567')).toBe(1234567);
+    // Caso ambiguo, resuelto a favor del español: mil doscientos treinta y cuatro
+    expect(parseSpanishNumber('1.234')).toBe(1234);
+  });
+
+  test('el punto decimal internacional sigue funcionando', () => {
+    expect(parseSpanishNumber('1234.56')).toBe(1234.56);   // 2 dígitos → decimal
+    expect(parseSpanishNumber('1.5')).toBe(1.5);           // 1 dígito  → decimal
+    expect(parseSpanishNumber('0.75')).toBe(0.75);
+    expect(parseSpanishNumber('3.1416')).toBe(3.1416);     // 4 dígitos → decimal
+  });
+
+  test('acepta signo y no rompe con entradas sueltas', () => {
+    expect(parseSpanishNumber('-200.000')).toBe(-200000);
+    expect(parseSpanishNumber('1234')).toBe(1234);
+    expect(parseSpanishNumber('0')).toBe(0);
+    expect(parseSpanishNumber('abc')).toBeNaN();
+  });
 });
 
 test.describe('formatPercentage', () => {

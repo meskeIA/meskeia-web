@@ -64,8 +64,24 @@ export function formatDateTime(date: Date): string {
 
 /**
  * Parsea input de usuario (acepta coma o punto como decimal)
- * @param input - String del input (ej: "1.234,56" o "1234.56")
+ * @param input - String del input (ej: "1.234,56", "200.000" o "1234.56")
  * @returns Número parseado
+ *
+ * ⚠️ Lo usan 89 apps, 48 de ellas sobre campos de texto libre: cualquier cambio aquí
+ * se propaga a todo el catálogo. Ejecutar `npm run test:unit` antes de commitear.
+ *
+ * ── El punto sin coma, y por qué es el caso delicado (corregido el 14/08/2026) ──
+ * Hasta esa fecha esta rama hacía un `parseFloat` directo, así que "200.000" devolvía
+ * 200 y "11.440" devolvía 11,44. El comentario que había aquí anunciaba una heurística
+ * («asumimos decimal si hay menos de 4 dígitos después del punto») que NUNCA se llegó a
+ * implementar, y los tests probaban "1.234,56" y "1234.56" pero jamás el punto de
+ * millares solo, de modo que el único caso roto era justo el que nadie miraba.
+ *
+ * Lo encontró el Inspector en `estimador-compraventa-inmueble`: su botón «Estimar por
+ * mí» escribía 11.440 en un campo y lo releía como 11,44, así que el botón pensado para
+ * rebajar la ganancia del vendedor le subía el IRPF 2.618,77 €. Llevaba oculto porque
+ * `es-ES` no agrupa los millares hasta 5 cifras: por debajo de 10.000 el número se
+ * escribe sin punto y el fallo no se manifiesta.
  */
 export function parseSpanishNumber(input: string): number {
   if (!input || input.trim() === '') return NaN;
@@ -81,8 +97,16 @@ export function parseSpanishNumber(input: string): number {
   else if (cleaned.includes(',')) {
     cleaned = cleaned.replace(',', '.');
   }
-  // Si solo tiene punto, puede ser miles o decimal
-  // Asumimos decimal si hay menos de 4 dígitos después del punto
+  // Si solo tiene puntos, hay que decidir si separan millares o decimales.
+  // Son millares cuando cada punto va seguido de EXACTAMENTE tres dígitos: "200.000",
+  // "1.234.567". Con cualquier otra cantidad de dígitos es un decimal internacional
+  // ("1234.56", "3.1416", "1.5"), que se venía aceptando y se sigue aceptando.
+  // "1.234" es genuinamente ambiguo —mil doscientos treinta y cuatro en español, uno
+  // coma doscientos treinta y cuatro en inglés— y se resuelve a favor del español,
+  // que es el formato obligatorio del proyecto.
+  else if (cleaned.includes('.') && /^-?\d{1,3}(\.\d{3})+$/.test(cleaned)) {
+    cleaned = cleaned.replace(/\./g, '');
+  }
 
   return parseFloat(cleaned);
 }

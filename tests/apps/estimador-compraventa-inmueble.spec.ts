@@ -164,15 +164,18 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('145.200,00 €');
   });
 
-  // ⚠️ HALLAZGO ABIERTO (Inspector, 14/08/2026) — el más grave de esta app.
+  // ✅ CORREGIDO el 14/08/2026 — era el hallazgo más grave de la primera tanda del Inspector.
   // El botón «Estimar por mí» calcula bien (ITP 6 % + notaría + registro sobre el precio de
-  // compra = 11.439,66 €) pero escribe el resultado con `formatNumber(estimado, 0)`, es decir
+  // compra = 11.439,66 €) pero escribía el resultado con `formatNumber(estimado, 0)`, es decir
   // «11.440», con el punto de los millares español. Ese mismo campo se lee luego con
-  // `parseSpanishNumber`, que ante un único punto hace `parseFloat('11.440')` = 11,44.
-  // El botón que existe precisamente para REBAJAR la ganancia acaba sumando 11,44 € en vez
-  // de 11.440 €, y el vendedor lee 2.618,77 € de IRPF de más sin ningún aviso.
-  test('CASO 4 (hallazgo) — «Estimar por mí» pierde los millares y dispara el IRPF', async ({ page }) => {
-    test.fail();
+  // `parseSpanishNumber`, que ante un único punto hacía `parseFloat('11.440')` = 11,44, así que
+  // el botón pensado para REBAJAR la ganancia sumaba 11,44 € en vez de 11.440 € y el vendedor
+  // leía 2.618,77 € de IRPF de más.
+  //
+  // La causa raíz NO estaba en esta app sino en `lib/formatters.ts`, que usan 89 apps: la rama
+  // de "punto sin coma" hacía un parseFloat directo. Corregida allí, este test dejó de necesitar
+  // `test.fail()` y se queda como REGRESIÓN: si alguien vuelve a romper el parser, salta aquí.
+  test('CASO 4 (regresión) — «Estimar por mí» conserva los millares', async ({ page }) => {
     await page.goto(RUTA);
     await selectCcaa(page).selectOption('madrid');
     await rellenar(page, 'Precio de la vivienda', '250000');
@@ -190,7 +193,7 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     //   valor de adquisición = 180.000 + 11.440 = 191.440
     //   valor de transmisión = 250.000 − (7.500 + 300) − 1.250 plusvalía = 240.950
     //   ganancia = 49.510 → IRPF = 6.000×19 % + 43.510×21 % = 1.140 + 9.137,10 = 10.277,10
-    // Obtenido hoy: adquisición 180.011,44 € · ganancia 60.938,56 € · IRPF 12.895,87 €
+    // Antes de la corrección daba: adquisición 180.011,44 € · ganancia 60.938,56 € · IRPF 12.895,87 €
     expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('191.440,00 €');
     expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('49.510,00 €');
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('10.277,10 €');
