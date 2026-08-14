@@ -338,10 +338,10 @@ Cada agente DEBE incluir estas instrucciones EXACTAS en su prompt:
 ```
 ## REGLAS CRÍTICAS PARA ESTE AGENTE
 - ✅ Crea SOLO los 3 archivos de tu app (metadata.ts, page.tsx, .module.css)
-- ✅ Puedes ejecutar `npx tsc --noEmit` UNA SOLA VEZ para verificar
+- ✅ Puedes ejecutar `npm run check:tipos` UNA SOLA VEZ para verificar
 - ❌ PROHIBIDO: ejecutar `npm run build` (conflicto de lock entre agentes)
 - ❌ PROHIBIDO: modificar archivos compartidos (applications.ts, implemented-apps.ts, app-relations.ts)
-- ❌ PROHIBIDO: ejecutar `npx tsc --noEmit` más de una vez
+- ❌ PROHIBIDO: ejecutar `npm run check:tipos` más de una vez
 - ❌ PROHIBIDO: reintentar comandos fallidos en bucle (sleep + retry)
 - ❌ PROHIBIDO: ejecutar comandos en background (run_in_background)
 - ⚠️ TERMINAR INMEDIATAMENTE después de crear los archivos y verificar TS una vez
@@ -403,7 +403,17 @@ la Agenda Operativa del Centro de Mando (`restauracion-turso-semestral`).
 ### TypeScript
 
 - ⚠️ `ignoreBuildErrors: true` en `next.config.ts` — el build de producción NO type-chequea (limitación de RAM en Vercel: el type-check de +1.100 apps agota los 8 GB)
-- Validación de tipos SIEMPRE en local: `npx tsc --noEmit` antes de commitear cambios sustanciales
+- Validación de tipos SIEMPRE en local: **`npm run check:tipos`** antes de commitear cambios sustanciales
+  (lo ejecuta también `npm run build`; en Vercel se salta, para no encarecer cada despliegue)
+
+  ⚠️ **NO usar `npx tsc --noEmit` a secas: puede estar CIEGO y devolver «0 errores» sin haber
+  mirado nada.** Next escribe `.next/dev/types/routes.d.ts` y `validator.ts` sin truncar, así que
+  al acortarse dejan restos de la versión anterior; sus cientos de errores de SINTAXIS abortan el
+  análisis semántico de todo el proyecto. Y no basta con excluirlos del tsconfig, porque
+  `next-env.d.ts` los importa explícitamente. Descubierto el 14/08/2026 inyectando
+  `const x: number = "texto"` en `app/`: tsc devolvía 0 errores. `check:tipos` los retira si están
+  corruptos, revalida, y **falla si no consigue dejar la validación limpia** — un validador que
+  dice «0 errores» tiene que poder distinguir entre «está bien» y «no he mirado».
 - Objetivo: 0 errores TypeScript en todo el proyecto
 - Archivos de tipos custom en `types/`
 - Casts conocidos: Chart.js → `as never`, jStat → `Record`, libs sin tipos → `.d.ts` en `types/`
@@ -439,7 +449,7 @@ npm run build  # timeout: 600000
 ### Reglas estrictas
 
 1. **Timeout de 10 minutos** (600000ms) para `npm run build` — valor canónico en todo el ecosistema (docs, skills, memoria). El proyecto (+1.100 apps) tarda ~1-2 minutos en el PC actual (i7-14700/32GB); el margen extra cubre builds fríos. NO asumir que ha fallado antes de ese tiempo.
-2. **NUNCA lanzar builds en paralelo** — ni siquiera `npx tsc --noEmit` mientras un build está corriendo.
+2. **NUNCA lanzar builds en paralelo** — ni siquiera `npm run check:tipos` mientras un build está corriendo.
 3. **NUNCA reintentar un build sin verificar primero** que el anterior ha terminado (comprobar si `.next/lock` existe).
 4. **Si hay lock stale** (lock existe pero no hay proceso `next build` activo): eliminar con `rm -f .next/lock` y ENTONCES hacer UN solo build.
 5. **No usar `run_in_background`** para builds — ejecutar siempre en foreground con timeout de 600000ms para poder ver el resultado directamente.
