@@ -30,7 +30,11 @@
     "analyze": "set ANALYZE=true && npm run build",
     "check:vigencia": "node scripts/check-vigencia.mjs",
     "check:csp": "node scripts/check-csp.mjs",
-    "ronda": "node scripts/ronda.mjs"
+    "ronda": "node scripts/ronda.mjs",
+    "inspector:sync": "node scripts/inspector/sincronizar.mjs",
+    "inspector:cola": "node scripts/inspector/cola.mjs",
+    "inspector:registrar": "node scripts/inspector/registrar.mjs",
+    "test:apps": "npx playwright test tests/apps"
   },
   "dependencies": {
     "@ffmpeg/ffmpeg": "^0.12.15",
