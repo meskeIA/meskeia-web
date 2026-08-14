@@ -99,15 +99,14 @@ test.describe('Simulador de gastos de compraventa de garaje', () => {
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('37.369,59 €');
   });
 
-  // ⚠️ HALLAZGO ABIERTO (Inspector, 14/08/2026): sin precio introducido, la guarda
+  // ⚠️ CORREGIDO el 14/08/2026 - sin precio introducido, la guarda
   // `if (precio <= 0) return null` no atrapa el NaN que devuelve parseSpanishNumber('')
   // —NaN <= 0 es false—, así que el placeholder nunca se muestra y la app abre con
   // «No definido» en todas las tarjetas, incluida «COSTE TOTAL DE ADQUISICIÓN», y con
   // un «No definido% sobre el precio». `test.fail` marca que hoy falla a propósito:
   // el día que se corrija, este test se pondrá en ROJO y habrá que quitar la marca.
   test('CASO 3 (debe avisar) — sin precio, la app pide el dato en vez de calcular', async ({ page }) => {
-    test.fail();
-    await page.goto(RUTA);
+        await page.goto(RUTA);
 
     await expect(
       page.getByText('Introduce el precio del garaje para ver el desglose de gastos del comprador'),

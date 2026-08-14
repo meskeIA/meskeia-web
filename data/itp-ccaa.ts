@@ -829,6 +829,30 @@ export function elegirTipoITP(
   };
 }
 
+/**
+ * Importe del ITP a partir de un tipo ya elegido con `elegirTipoITP`.
+ *
+ * Es la forma correcta de calcularlo, y existe porque la otra tenía una trampa: las 7 apps
+ * del clúster llamaban a `calcularITP(precio, ccaa, tipoAplicable)` pasando SIEMPRE el
+ * tercer argumento —inicializado al tipo general—, y ese argumento cortocircuita la rama de
+ * `tramosProgresivos`. Resultado: las 7 CCAA con escala progresiva tributaban al tipo plano
+ * del primer tramo mientras la interfaz imprimía, justo encima del resultado, «⚠️ Esta
+ * comunidad aplica escala progresiva (10 % → 11 % → 12 % → 13 %)». Anunciaba la escala y no
+ * la aplicaba. En Cataluña, un millón de euros salía 5.000 € por debajo.
+ *
+ * Aquí la distinción es explícita: un tipo REDUCIDO es siempre plano (así están definidos en
+ * la normativa autonómica), y el tipo GENERAL se somete a la escala cuando la comunidad la
+ * tiene. Al recibir el `TipoElegido` entero, quien llama no puede olvidarse de la diferencia.
+ *
+ * ⚠️ Los tramos salen de `ITP_CCAA` (este fichero), que vive fuera de `data/fiscal/` y
+ * duplica `TIPOS_ITP_CCAA_2025`. Que esos tramos estén al día es trabajo del triaje fiscal
+ * mensual; lo que esta función garantiza es que se apliquen los que se anuncian.
+ */
+export function importeITP(valor: number, ccaa: ComunidadAutonoma, elegido: TipoElegido): number {
+  if (elegido.esReducido) return valor * (elegido.tipo / 100);
+  return calcularITP(valor, ccaa); // sin tercer argumento: usa la escala si existe
+}
+
 // ===== FUNCIONES DE CÁLCULO =====
 
 /**

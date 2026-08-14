@@ -16,7 +16,7 @@ import {
   RegionBadge,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
+import { formatCurrency, formatNumber, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
 import { IVA_INMUEBLES_2025, calcularGananciaInmueble } from '@/data/fiscal';
 import {
   ITP_CCAA,
@@ -27,6 +27,7 @@ import {
   calcularRegistro,
   calcularPlusvaliaMunicipal,
   elegirTipoITP,
+  importeITP,
   TipoElegido,
   ENLACE_CATASTRO,
 } from '@/data/itp-ccaa';
@@ -121,9 +122,9 @@ export default function SimuladorTrasteroCompraventaPage() {
   // ===== CÁLCULOS COMPRADOR =====
   const resultadosComprador = useMemo((): ResultadosComprador | null => {
     const precio = parseSpanishNumber(precioVenta);
-    if (precio <= 0) return null;
+    if (!Number.isFinite(precio) || precio <= 0) return null;
 
-    const gestoria = parseSpanishNumber(gastosGestoria);
+    const gestoria = parseSpanishNumberOr(gastosGestoria);
 
     let impuesto = 0;
     let tipoImpuesto = '';
@@ -148,9 +149,11 @@ export default function SimuladorTrasteroCompraventaPage() {
       // aparece en 53 de los tipos reducidos. Antes se aplicaba el primer reducido que
       // casara por nombre sin mirar sus condiciones, y en Madrid eso daba ITP del 0 %.
       elegido = elegirTipoITP(ccaa, perfilComprador, precio, { viviendaHabitual: false });
-      impuesto = calcularITP(precio, ccaa, elegido.tipo);
+      impuesto = importeITP(precio, ccaa, elegido);
       tipoImpuesto = 'ITP';
-      porcentaje = elegido.tipo;
+      // Tipo EFECTIVO: con escala progresiva el importe no es un porcentaje plano del
+      // precio, asi que mostrar el tipo nominal contradiria a la cifra de al lado.
+      porcentaje = precio > 0 ? (impuesto / precio) * 100 : 0;
     }
 
     // AJD solo aplica en primera mano
@@ -183,10 +186,10 @@ export default function SimuladorTrasteroCompraventaPage() {
     const valorSuelo = parseSpanishNumber(valorCatastralSuelo);
     const valorTotal = parseSpanishNumber(valorCatastralTotal);
 
-    if (precioV <= 0) return null;
+    if (!Number.isFinite(precioV) || precioV <= 0) return null;
 
-    const comisionPct = parseSpanishNumber(comisionInmobiliaria) / 100;
-    const gestoria = parseSpanishNumber(gastosGestoria);
+    const comisionPct = parseSpanishNumberOr(comisionInmobiliaria) / 100;
+    const gestoria = parseSpanishNumberOr(gastosGestoria);
     const comision = precioV * comisionPct;
 
     // Plusvalía municipal
@@ -220,7 +223,7 @@ export default function SimuladorTrasteroCompraventaPage() {
     const g = calcularGananciaInmueble({
       precioVenta: precioV,
       precioCompra: precioC,
-      gastosAdquisicion: parseSpanishNumber(gastosAdquisicion),
+      gastosAdquisicion: parseSpanishNumberOr(gastosAdquisicion),
       gastosTransmision: comision + gestoria,
       plusvaliaMunicipal: plusvalia,
     });

@@ -15,6 +15,7 @@ import {
   formatDate,
   formatDateTime,
   parseSpanishNumber,
+  parseSpanishNumberOr,
   formatPercentage,
   formatCompactNumber,
   isValidNumber,
@@ -152,6 +153,31 @@ test.describe('parseSpanishNumber', () => {
     expect(parseSpanishNumber('1234')).toBe(1234);
     expect(parseSpanishNumber('0')).toBe(0);
     expect(parseSpanishNumber('abc')).toBeNaN();
+  });
+});
+
+/**
+ * El NaN de un campo vacío no lo delata ninguna comparación: `NaN <= 0` es false y
+ * `Math.max(0, NaN)` sigue siendo NaN, así que se propaga en silencio hasta que un bloque
+ * entero de resultados sale «No definido». Para los campos que el formulario anuncia como
+ * opcionales, vacío tiene que valer 0.
+ */
+test.describe('parseSpanishNumberOr', () => {
+  test('un campo vacío vale 0, no NaN', () => {
+    expect(parseSpanishNumberOr('')).toBe(0);
+    expect(parseSpanishNumberOr('   ')).toBe(0);
+    expect(parseSpanishNumberOr('abc')).toBe(0);
+  });
+
+  test('respeta el valor por defecto que se le pase', () => {
+    expect(parseSpanishNumberOr('', 3)).toBe(3);
+    expect(parseSpanishNumberOr('abc', -1)).toBe(-1);
+  });
+
+  test('con un número válido se comporta igual que parseSpanishNumber', () => {
+    expect(parseSpanishNumberOr('1.234,56')).toBe(1234.56);
+    expect(parseSpanishNumberOr('200.000')).toBe(200000);
+    expect(parseSpanishNumberOr('0')).toBe(0);
   });
 });
 

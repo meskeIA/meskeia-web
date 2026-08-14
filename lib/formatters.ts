@@ -83,6 +83,27 @@ export function formatDateTime(date: Date): string {
  * `es-ES` no agrupa los millares hasta 5 cifras: por debajo de 10.000 el número se
  * escribe sin punto y el fallo no se manifiesta.
  */
+/**
+ * Como `parseSpanishNumber`, pero un campo vacío o ilegible vale `porDefecto` (0) en vez
+ * de NaN. Para los campos OPCIONALES de un formulario, que es donde el NaN hace daño.
+ *
+ * ── Por qué hace falta (14/08/2026) ───────────────────────────────────────────
+ * `parseSpanishNumber('')` devuelve NaN, y eso está bien: significa «no hay dato». El
+ * problema es que NaN se propaga en silencio y ninguna comparación lo delata —`NaN <= 0`
+ * es `false`, y `Math.max(0, NaN)` sigue siendo NaN—, así que un solo campo opcional sin
+ * rellenar bastaba para que un bloque entero de resultados saliera «No definido».
+ *
+ * En `estimador-compraventa-inmueble` la pestaña Vendedor no calculaba nada por su ruta
+ * por defecto: dos de sus tres campos se anuncian como «(opcional)» en la propia etiqueta,
+ * y dejarlos vacíos —lo natural— vaciaba el IRPF y el importe neto.
+ *
+ * Regla: si el formulario dice «opcional», el código tiene que tratarlo como opcional.
+ */
+export function parseSpanishNumberOr(input: string, porDefecto = 0): number {
+  const n = parseSpanishNumber(input);
+  return Number.isFinite(n) ? n : porDefecto;
+}
+
 export function parseSpanishNumber(input: string): number {
   if (!input || input.trim() === '') return NaN;
 

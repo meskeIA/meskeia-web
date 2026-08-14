@@ -23,6 +23,12 @@ const valorDe = (n, d) => { const i = args.indexOf(`--${n}`); return i >= 0 && a
 const APP = valorDe('app', '');
 const ARREGLADO = valorDe('arreglado', '');
 const DESCARTADO = valorDe('descartado', '');
+/**
+ * Devuelve un hallazgo a «abierto». Existe porque cerrar el id equivocado es un error
+ * fácil y silencioso —pasó el mismo día que se estrenó esto— y sin vuelta atrás la base
+ * empieza a mentir: dice que algo está arreglado cuando sigue en producción.
+ */
+const REABRIR = valorDe('reabrir', '');
 const MOTIVO = valorDe('motivo', '');
 const TODOS = args.includes('--todos');
 
@@ -58,6 +64,20 @@ function cerrar(ids, estado) {
     console.log(`\nRecuerda: si el hallazgo estaba documentado con test.fail(), ese test se pondrá\nen ROJO al corregirlo. Hay que retirar la marca y dejarlo como test normal.`);
 }
 
+if (REABRIR) {
+  const leer = db.prepare('SELECT id, slug, estado, descripcion FROM hallazgos WHERE id = ?');
+  const upd = db.prepare("UPDATE hallazgos SET estado = 'abierto', descripcion = ? WHERE id = ?");
+  for (const id of REABRIR.split(',').map(s => s.trim()).filter(Boolean)) {
+    const h = leer.get(Number(id));
+    if (!h) { console.error(`  · id ${id}: no existe`); continue; }
+    // Retirar la marca de cierre para que la descripción no contradiga al estado
+    const limpia = h.descripcion.replace(/\s*\[(ARREGLADO|DESCARTADO) \d{4}-\d{2}-\d{2}[^\]]*\]/g, '');
+    upd.run(limpia, h.id);
+    console.log(`  ↩ ${id} · ${h.slug} · vuelve a abierto (estaba "${h.estado}")`);
+  }
+  console.log(`\nabiertos: ${db.prepare("SELECT COUNT(*) n FROM hallazgos WHERE estado='abierto'").get().n}`);
+  process.exit(0);
+}
 if (ARREGLADO) { cerrar(ARREGLADO, 'arreglado'); process.exit(0); }
 if (DESCARTADO) { cerrar(DESCARTADO, 'descartado'); process.exit(0); }
 

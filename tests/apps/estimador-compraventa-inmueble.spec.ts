@@ -90,7 +90,7 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
   });
 
-  // ⚠️ HALLAZGO ABIERTO (Inspector, 14/08/2026): la app SIEMPRE pasa `tipoAplicable` a
+  // ⚠️ CORREGIDO el 14/08/2026 - la app SIEMPRE pasaba `tipoAplicable` a
   // `calcularITP`, así que la rama de `tramosProgresivos` de data/itp-ccaa.ts nunca se
   // ejecuta y toda la operación tributa al tipo del primer tramo. La propia interfaz
   // imprime justo encima «⚠️ Esta comunidad aplica escala progresiva (10% → 11% → 12% → 13%)»,
@@ -99,8 +99,7 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
   // Valencia) y a las hermanas -garaje y -trastero, que hacen la misma llamada.
   // `test.fail` marca que hoy falla a propósito: cuando se corrija se pondrá en ROJO.
   test('CASO 2 (límite: tramo más alto) — Cataluña, segunda mano, 1.000.000 €: escala progresiva de ITP', async ({ page }) => {
-    test.fail();
-    await page.goto(RUTA);
+        await page.goto(RUTA);
     await page.getByRole('button', { name: /Segunda mano/ }).click();
     await selectCcaa(page).selectOption('cataluna');
     await rellenar(page, 'Precio de la vivienda', '1000000');
@@ -224,8 +223,7 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
   // «No definido» y desaparezcan las tarjetas de adquisición, transmisión y ganancia. Es la
   // ruta por defecto de la pestaña Vendedor: dos de los tres campos se anuncian como opcionales.
   test('CASO 6 (hallazgo) — la pestaña Vendedor debe calcular sin rellenar los campos opcionales', async ({ page }) => {
-    test.fail();
-    await page.goto(RUTA);
+        await page.goto(RUTA);
     await rellenar(page, 'Precio de la vivienda', '250000');
     await page.getByRole('button', { name: 'Vendedor' }).click();
     await rellenar(page, 'Precio de compra original', '180000');
@@ -247,13 +245,12 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('228.051,50 €');
   });
 
-  // ⚠️ HALLAZGO ABIERTO (Inspector, 14/08/2026): mismo NaN en la pestaña Comprador. La guarda
+  // ⚠️ CORREGIDO el 14/08/2026 - mismo NaN en la pestaña Comprador. La guarda
   // `if (precio <= 0) return null` no atrapa el NaN de un campo vacío (NaN <= 0 es false), así
   // que el placeholder no llega a mostrarse nunca y la app ABRE con siete «No definido»,
   // incluido «COSTE TOTAL DE ADQUISICIÓN», y un «No definido% sobre el precio».
   test('CASO 7 (hallazgo) — sin precio, la app debe pedir el dato en vez de calcular', async ({ page }) => {
-    test.fail();
-    await page.goto(RUTA);
+        await page.goto(RUTA);
 
     await expect(
       page.getByText('Introduce el precio del inmueble para ver el desglose de gastos del comprador'),

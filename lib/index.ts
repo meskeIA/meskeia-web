@@ -14,6 +14,7 @@ export {
   formatCompactNumber,
   formatDuration,
   parseSpanishNumber,
+  parseSpanishNumberOr,
   isValidNumber,
 } from './formatters';
 

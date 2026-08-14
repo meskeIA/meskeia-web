@@ -16,7 +16,7 @@ import {
   RegionBadge,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
+import { formatCurrency, formatNumber, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -78,9 +78,9 @@ export default function SimuladorNaveIndustrialPage() {
   // ===== CÁLCULOS =====
   const resultadosComprador = useMemo((): ResultadosComprador | null => {
     const precio = parseSpanishNumber(precioVenta);
-    if (precio <= 0) return null;
+    if (!Number.isFinite(precio) || precio <= 0) return null;
 
-    const gestoria = parseSpanishNumber(gastosGestoria);
+    const gestoria = parseSpanishNumberOr(gastosGestoria);
 
     let impuesto = 0;
     let tipoImpuesto = '';
@@ -95,9 +95,13 @@ export default function SimuladorNaveIndustrialPage() {
       // ITP segunda mano — tipo general de la CCAA (sin tipos reducidos: nave industrial es comercial)
       const datosCcaa = ITP_CCAA[ccaa];
       const tipoAplicable = datosCcaa.tipoGeneral;
-      impuesto = calcularITP(precio, ccaa, tipoAplicable);
+      // Sin tercer argumento: así se aplica la escala progresiva de las 7 CCAA
+      // que la tienen, en vez del tipo plano del primer tramo.
+      impuesto = calcularITP(precio, ccaa);
       tipoImpuesto = 'ITP';
-      porcentaje = tipoAplicable;
+      // Tipo EFECTIVO: con escala progresiva el importe no es un porcentaje plano del
+      // precio, asi que mostrar el tipo nominal contradiria a la cifra de al lado.
+      porcentaje = precio > 0 ? (impuesto / precio) * 100 : 0;
     }
 
     // AJD solo aplica en primera mano (IVA + AJD)
