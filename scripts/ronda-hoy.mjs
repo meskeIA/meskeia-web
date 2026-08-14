@@ -1,0 +1,70 @@
+#!/usr/bin/env node
+/**
+ * ronda:hoy — el parte de la Ronda en cinco líneas, sin abrir el acta
+ *
+ * Ejecutar:  npm run ronda:hoy
+ *
+ * La Ronda corre sola cada mañana dentro de la Rutina Matinal y deja un acta de
+ * decenas de páginas. Casi ningún día hay que leerla: lo único accionable es la línea
+ * de NUEVAS. Esto la saca a la superficie para que mirarla cueste tres segundos, que
+ * es la única forma de que se mire de verdad.
+ *
+ * Avisa además si el acta NO es de hoy: eso significa que la Ronda no llegó a correr,
+ * y un vigilante que no corre es indistinguible de un catálogo sano si nadie mira la fecha.
+ */
+
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const DIR = path.join(RAIZ, '_private', 'rondas');
+const hoy = new Date().toISOString().slice(0, 10);
+
+if (!fs.existsSync(DIR)) {
+  console.log('\nLa Ronda no ha dejado ninguna acta todavía.\n');
+  process.exit(0);
+}
+
+const actas = fs.readdirSync(DIR).filter(f => /^ronda-produccion-\d{4}-\d{2}-\d{2}\.md$/.test(f)).sort();
+if (!actas.length) {
+  console.log('\nNo hay ninguna acta de producción. ¿Ha corrido la Ronda alguna vez?\n');
+  process.exit(0);
+}
+
+const ultima = actas[actas.length - 1];
+const fecha = ultima.match(/(\d{4}-\d{2}-\d{2})/)[1];
+const txt = fs.readFileSync(path.join(DIR, ultima), 'utf8');
+
+const cabecera = (txt.match(/^(\d+) URLs revisadas en (\d+) s · \*\*(\d+) con error\*\* · (\d+) con aviso/m) || []).slice(1);
+const comparacion = (txt.match(/^Frente a la ronda anterior: (\d+) nuevas · (\d+) resueltas · (\d+) persistentes/m) || []).slice(1);
+const nuevas = [];
+const bloque = txt.split('**Nuevas desde la última ronda**')[1];
+if (bloque) for (const l of bloque.split('\n')) {
+  if (l.startsWith('- ')) nuevas.push(l.slice(2).trim());
+  else if (l.startsWith('#')) break;
+}
+
+const dias = Math.round((new Date(hoy) - new Date(fecha)) / 86400000);
+console.log(`\nRonda del ${fecha}${dias === 0 ? ' (hoy)' : dias === 1 ? ' (ayer)' : ` — hace ${dias} días`}`);
+
+if (dias >= 1) {
+  console.log(`\n⚠  La Ronda no ha dejado acta de hoy. O no ha corrido, o no llegó a terminar.`);
+  console.log(`   Comprobar con /log, o lanzarla a mano: npm run ronda -- --produccion\n`);
+}
+
+if (cabecera.length) {
+  console.log(`   ${cabecera[0]} URLs · ${cabecera[2]} con error · ${cabecera[3]} con aviso`);
+}
+if (comparacion.length) {
+  console.log(`   ${comparacion[0]} nuevas · ${comparacion[1]} resueltas · ${comparacion[2]} persistentes`);
+}
+
+if (nuevas.length) {
+  console.log(`\n   NUEVAS — es lo único que hay que mirar:`);
+  for (const n of nuevas) console.log(`     · ${n}`);
+  console.log(`\n   Detalle: _private/rondas/${ultima}`);
+} else if (comparacion.length) {
+  console.log(`\n   Sin novedades. Lo persistente ya se conoce y está en el acta.`);
+}
+console.log('');

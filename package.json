@@ -34,7 +34,9 @@
     "inspector:sync": "node scripts/inspector/sincronizar.mjs",
     "inspector:cola": "node scripts/inspector/cola.mjs",
     "inspector:registrar": "node scripts/inspector/registrar.mjs",
-    "test:apps": "npx playwright test tests/apps"
+    "test:apps": "npx playwright test tests/apps",
+    "ronda:hoy": "node scripts/ronda-hoy.mjs",
+    "inspector:hallazgos": "node scripts/inspector/cerrar.mjs"
   },
   "dependencies": {
     "@ffmpeg/ffmpeg": "^0.12.15",
