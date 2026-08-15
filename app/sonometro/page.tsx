@@ -233,7 +233,7 @@ export default function SonometroPage() {
         <span className={styles.heroIcon}>🔊</span>
         <h1 className={styles.title}>Sonómetro</h1>
         <p className={styles.subtitle}>
-          Mide el nivel de ruido en decibelios (dB) con tu micrófono.
+          Sonómetro y decibelímetro online: mide el nivel de ruido en decibelios (dB) con tu micrófono.
           Ideal para documentar ruido, verificar ambientes de trabajo o medir contaminación acústica.
         </p>
       </header>
@@ -485,9 +485,13 @@ export default function SonometroPage() {
         icon="📚"
       >
         <section className={styles.guideSection}>
-          <h2>¿Qué son los decibelios (dB)?</h2>
+          <h2>¿Qué son los decibelios o decibeles (dB)?</h2>
           <p className={styles.introParagraph}>
             El <strong>decibelio (dB)</strong> es la unidad de medida del nivel de presión sonora.
+            En América se usa habitualmente la forma <strong>decibel</strong> (plural{' '}
+            <strong>decibeles</strong>) y al aparato que los mide se le llama{' '}
+            <strong>decibelímetro</strong>, mientras que en España son más frecuentes
+            «decibelio» y «sonómetro»: son las mismas magnitudes y el mismo instrumento.
             Es una escala logarítmica, lo que significa que un aumento de 10 dB representa
             aproximadamente el doble de volumen percibido. Por ejemplo, 70 dB suena el doble
             de fuerte que 60 dB.
@@ -540,6 +544,43 @@ export default function SonometroPage() {
               </ul>
             </div>
           </div>
+        </section>
+
+        <section className={styles.guideSection}>
+          <h2>Referencias internacionales: qué recomienda la OMS</h2>
+          <p className={styles.introParagraph}>
+            Los límites que obligan son siempre los de la normativa de tu país y, en la mayoría
+            de ellos, los de la ordenanza de tu municipio, que es quien regula el ruido de
+            vecindad. Como referencia de salud —no legal— estas son las cifras de la
+            Organización Mundial de la Salud:
+          </p>
+
+          <div className={styles.contentGrid}>
+            <div className={styles.contentCard}>
+              <h4>🌞 Durante el día</h4>
+              <ul>
+                <li>50 dB en exteriores: molestia moderada</li>
+                <li>55 dB en exteriores: molestia seria</li>
+                <li>Fuente: <em>Guidelines for Community Noise</em> (OMS, 1999)</li>
+              </ul>
+            </div>
+            <div className={styles.contentCard}>
+              <h4>🌙 Durante la noche</h4>
+              <ul>
+                <li>40 dB en el exterior de la vivienda: objetivo de salud</li>
+                <li>55 dB: efectos adversos documentados</li>
+                <li>Fuente: <em>Night Noise Guidelines for Europe</em> (OMS, 2009)</li>
+              </ul>
+            </div>
+          </div>
+
+          <p className={styles.introParagraph}>
+            En su revisión de 2018 para la Región Europea, la OMS bajó la recomendación para
+            el ruido de tráfico rodado a 53 dB L<sub>den</sub> en el conjunto del día y 45 dB
+            L<sub>night</sub> por la noche. Son objetivos de salud pública: para saber qué
+            puedes reclamar y ante quién, consulta la ordenanza de tu municipio o el organismo
+            de medio ambiente que corresponda en tu país.
+          </p>
         </section>
 
         <section className={styles.guideSection}>
@@ -634,7 +675,7 @@ export default function SonometroPage() {
 
         {/* SECCIÓN 2: Casos de Uso — 4 perfiles */}
         <section className={styles.guideSection}>
-          <h2>¿Para qué sirve un sonómetro? Casos de uso reales</h2>
+          <h2>¿Para qué sirve un sonómetro o decibelímetro? Casos de uso reales</h2>
           <p className={styles.introParagraph}>
             Medir el ruido no es solo cosa de ingenieros. Cualquier persona puede necesitar documentar
             niveles sonoros para reclamar, proteger su salud o simplemente tomar mejores decisiones.
@@ -699,7 +740,7 @@ export default function SonometroPage() {
           </div>
         </section>
 
-        {/* SECCIÓN 3: FAQ — 8 preguntas */}
+        {/* SECCIÓN 3: FAQ — 9 preguntas */}
         <section className={styles.guideSection}>
           <h2>Preguntas frecuentes sobre ruido y decibelios</h2>
           <ul className={styles.faqList}>
@@ -772,6 +813,16 @@ export default function SonometroPage() {
                 insomnio, hipertensión, mayor riesgo cardiovascular, deterioro cognitivo y pérdida auditiva
                 gradual. La OMS estima que el ruido ambiental es la segunda causa medioambiental de
                 problemas de salud en Europa, después de la contaminación del aire.
+              </p>
+            </li>
+            <li className={styles.faqItem}>
+              <strong>¿Es lo mismo un decibelímetro que un sonómetro?</strong>
+              <p>
+                Sí: es el mismo instrumento con dos nombres. «Decibelímetro» (o medidor de
+                decibeles) es la forma habitual en gran parte de América y «sonómetro» la más
+                extendida en España. Si buscas un equipo profesional lo encontrarás casi siempre
+                como «sonómetro de clase 1» o «clase 2», porque así lo denomina la norma
+                internacional IEC 61672 que fija su precisión.
               </p>
             </li>
           </ul>

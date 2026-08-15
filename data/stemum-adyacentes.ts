@@ -40,6 +40,9 @@ export const STEMUM_ADYACENTES: Record<string, string> = {
   'generador-ondas': 'fisica',
   'generador-tonos': 'fisica',
   'analizador-espectro': 'fisica',
+  // Acústica: mide presión sonora real con el micrófono. No es simulador (no hay
+  // slider→consecuencia), así que va aquí y no en STEMUM_APPS.
+  'sonometro': 'fisica',
   'simulador-fisica': 'fisica',
   // 'visualizador-leyes-newton' promovido a STEMUM_APPS (31/07/2026): tiene la
   // mecánica slider→gráfica que define el catálogo del portal.

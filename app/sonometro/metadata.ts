@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Sonómetro Online - Medidor de Decibelios Gratis | meskeIA',
-  description: 'Mide el nivel de ruido en decibelios (dB) con tu micrófono. Sonómetro digital gratuito para documentar ruido, medir ambientes de trabajo o verificar niveles sonoros.',
-  keywords: 'sonómetro, medidor decibelios, medir ruido, dB, nivel sonoro, contaminación acústica, ruido vecinos, medidor ruido online',
+  description: 'Mide el nivel de ruido en decibelios (dB) con tu micrófono. Sonómetro y decibelímetro online gratuito para documentar ruido, medir ambientes de trabajo o verificar niveles sonoros.',
+  keywords: 'sonómetro, decibelímetro, medidor decibelios, medidor de decibeles, medir decibeles, medir ruido, dB, nivel sonoro, contaminación acústica, ruido vecinos, medidor ruido online',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Sonómetro / Decibelímetro",
-  description: "Mide el nivel de ruido en decibelios (dB) con tu micrófono. Sonómetro digital gratuito para documentar ruido, medir ambientes de trabajo o verificar niveles sonoros.",
+  description: "Mide el nivel de ruido en decibelios (dB) con tu micrófono. Sonómetro y decibelímetro online gratuito para documentar ruido, medir ambientes de trabajo o verificar niveles sonoros.",
   url: "https://meskeia.com/sonometro/",
   category: 'UtilityApplication',
   features: [
@@ -81,6 +81,14 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Puedes tomar capturas o anotaciones de los niveles medidos como referencia personal. Para una reclamación formal ante el ayuntamiento o en un procedimiento judicial generalmente se requiere un informe de un técnico acreditado con un equipo calibrado. Aun así, las mediciones orientativas pueden servir de punto de partida para valorar si el problema justifica una queja formal.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es lo mismo un decibelímetro que un sonómetro?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, es el mismo instrumento con dos nombres. «Decibelímetro» o «medidor de decibeles» es la forma habitual en gran parte de América, y «sonómetro» la más extendida en España. Los equipos profesionales se comercializan casi siempre como sonómetros de clase 1 o clase 2, porque así los denomina la norma internacional IEC 61672, que fija su precisión.',
       },
     },
     {
