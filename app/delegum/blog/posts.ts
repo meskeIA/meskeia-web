@@ -37,6 +37,26 @@ export interface Post {
 
 export const POSTS: Post[] = [
   {
+    slug: 'jubilacion-flexible-real-decreto-416-2026',
+    titulo: 'La jubilación flexible se abre al trabajo por cuenta propia el 28 de agosto',
+    fecha: '2026-08-15',
+    resumen:
+      'El Real Decreto 416/2026 reescribe la jubilación flexible: podrá compatibilizarse con una actividad por cuenta propia, la jornada admitida pasa a estar entre el 33% y el 80%, y quien espere seis meses cobrará un porcentaje adicional. Qué cambia y qué se pierde por el camino.',
+    cuerpo: [
+      'El 28 de agosto de 2026 entra en vigor el Real Decreto 416/2026, de 27 de mayo, que regula de nuevo la jubilación flexible y deroga el Real Decreto 1132/2002 que la venía desarrollando. La jubilación flexible consiste en cobrar la pensión ya reconocida y trabajar a la vez, con la pensión reducida en proporción inversa a la jornada que se realiza (artículo 4.1). No hay que confundirla con la jubilación parcial, que se pide antes de retirarse, ni con la jubilación activa, que tiene sus propias reglas.',
+      'El primer cambio está en la jornada admitida. El artículo 3.1 exige ahora que esté comprendida «entre un 33 y un 80 por ciento» de la de una persona trabajadora a tiempo completo comparable, tomando como referencia el artículo 12.1 del Estatuto de los Trabajadores. La norma anterior no fijaba una horquilla propia: remitía a los límites del artículo 12.6, el de la jubilación parcial. El segundo cambio es que la modalidad deja de ser exclusiva del trabajo por cuenta ajena. El artículo 3.2 permite compatibilizar la pensión con una actividad por cuenta propia, con una condición: que en los tres años inmediatamente anteriores a la fecha del hecho causante de la pensión la persona no hubiera estado de alta como trabajadora por cuenta propia. En ese supuesto la pensión que se percibe es un porcentaje fijo del 25% (artículo 4.3).',
+      'El tercero es un incentivo por esperar. Si la actividad por cuenta ajena a tiempo parcial se inicia por primera vez pasados al menos seis meses desde que se causó la pensión, el importe compatible se incrementa: un 25% adicional cuando la jornada va del 55% al 80%, y un 15% adicional cuando va del 33% a menos del 55% (artículo 4.2). Ese porcentaje se calcula sobre la pensión que se venía percibiendo antes de acceder a la jubilación flexible.',
+      'La letra pequeña conviene leerla antes de decidir. Las cotizaciones que se hagan durante la jubilación flexible no mejoran la pensión reconocida ni incrementan el complemento por demora (artículo 7); la excepción son las jubilaciones anticipadas por causa no imputable al trabajador, donde al cesar en la actividad se vuelve a calcular la base reguladora y se ajusta el porcentaje según el nuevo periodo cotizado. Además, la jubilación flexible es incompatible con el complemento económico del artículo 210.2 de la Ley General de la Seguridad Social: si se optó por cobrarlo como porcentaje adicional, queda suspendido mientras dure la compatibilidad; si se optó por el pago a tanto alzado o por la fórmula mixta, directamente no se puede acceder a la jubilación flexible (artículo 6.2). Durante ese periodo tampoco se tiene derecho a los complementos para pensiones inferiores a la mínima (artículo 6.4), aunque el complemento por maternidad o para la reducción de la brecha de género sí sube y baja en la misma proporción que la pensión (artículo 4.4).',
+      'El real decreto se aplica a todos los regímenes de la Seguridad Social, salvo que el capítulo II queda fuera de los regímenes especiales de los funcionarios civiles del Estado, las Fuerzas Armadas y el personal al servicio de la Administración de Justicia (artículo 2). Quien ya esté en jubilación flexible no se ve afectado: la disposición transitoria única mantiene esas pensiones bajo la normativa anterior. Para quien tenga la decisión por delante, el orientador enlazado abajo recorre los trámites de la jubilación y las calculadoras de cada cuantía.',
+    ],
+    fuente:
+      'BOE — Real Decreto 416/2026, de 27 de mayo (BOE núm. 130, de 28 de mayo de 2026)',
+    fuenteUrl: 'https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-11474',
+    fichaSlug: 'pensiones-jubilacion',
+    visualizadorUrl: 'https://meskeia.com/orientador-tramites-jubilacion/',
+    visualizadorTitulo: 'Orientador de Trámites de Jubilación',
+  },
+  {
     slug: 'medidas-laborales-incendios-forestales-2026',
     titulo: 'Nuevas medidas laborales y de Seguridad Social por los incendios forestales',
     fecha: '2026-08-01',
