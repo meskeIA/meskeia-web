@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './GeneradorSchemaMarkup.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
@@ -19,6 +19,15 @@ interface FAQItem {
 export default function GeneradorSchemaMarkupPage() {
   const [schemaType, setSchemaType] = useState<SchemaType>('article');
   const [copied, setCopied] = useState(false);
+
+  // Fecha por defecto de los campos date* del schema. Se fija al montar y no en el render:
+  // `generateSchema()` se llama dentro del JSX (la vista previa del código), así que con
+  // `new Date()` el HTML estático llevaba la fecha del build y el cliente la del día. No
+  // coincidían y React descartaba el árbol al hidratar (error #418).
+  const [fechaHoy, setFechaHoy] = useState('');
+  useEffect(() => {
+    setFechaHoy(new Date().toISOString().split('T')[0]);
+  }, []);
 
   // Article state
   const [articleData, setArticleData] = useState({
@@ -107,8 +116,8 @@ export default function GeneradorSchemaMarkupPage() {
               "url": articleData.publisherLogo || "https://ejemplo.com/logo.png"
             }
           },
-          "datePublished": articleData.datePublished || new Date().toISOString().split('T')[0],
-          "dateModified": articleData.dateModified || new Date().toISOString().split('T')[0],
+          "datePublished": articleData.datePublished || fechaHoy,
+          "dateModified": articleData.dateModified || fechaHoy,
           "mainEntityOfPage": {
             "@type": "WebPage",
             "@id": articleData.url || "https://ejemplo.com/articulo"

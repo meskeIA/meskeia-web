@@ -54,20 +54,24 @@ function formatFechaLarga(fecha: string): string {
   return `${dias[d.getDay()]} ${d.getDate()} de ${meses[d.getMonth()]}`;
 }
 
-function getUltimos7Dias(): string[] {
+// `base` es la fecha de hoy en formato YYYY-MM-DD, y llega vacía hasta que el componente
+// monta: en el servidor no se puede saber qué día es para quien visita (ver fechaHoy).
+function getUltimos7Dias(base: string): string[] {
+  if (!base) return [];
   const dias: string[] = [];
   for (let i = 6; i >= 0; i--) {
-    const d = new Date();
+    const d = new Date(base + 'T12:00:00');
     d.setDate(d.getDate() - i);
     dias.push(d.toISOString().slice(0, 10));
   }
   return dias;
 }
 
-function getUltimos30Dias(): string[] {
+function getUltimos30Dias(base: string): string[] {
+  if (!base) return [];
   const dias: string[] = [];
   for (let i = 29; i >= 0; i--) {
-    const d = new Date();
+    const d = new Date(base + 'T12:00:00');
     d.setDate(d.getDate() - i);
     dias.push(d.toISOString().slice(0, 10));
   }
@@ -82,8 +86,15 @@ export default function DiarioEmocionalPage() {
   const [nota, setNota] = useState('');
   const [guardado, setGuardado] = useState(false);
 
+  // Qué día es hoy. No puede calcularse durante el render: el HTML estático se genera una vez
+  // en el build y el cliente lo evalúa el día de la visita, así que las fechas no coincidían y
+  // React descartaba el árbol al hidratar (error #418). Se fija al montar, junto al resto del
+  // estado que también vive en el navegador.
+  const [fechaHoy, setFechaHoy] = useState('');
+
   // Cargar del localStorage
   useEffect(() => {
+    setFechaHoy(hoy());
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) setEntradas(JSON.parse(saved));
@@ -106,9 +117,9 @@ export default function DiarioEmocionalPage() {
     setTimeout(() => setGuardado(false), 2000);
   }, [emocionSeleccionada, nota, entradas]);
 
-  const entradaHoy = entradas.find(e => e.fecha === hoy());
-  const ultimos7 = getUltimos7Dias();
-  const ultimos30 = getUltimos30Dias();
+  const entradaHoy = fechaHoy ? entradas.find(e => e.fecha === fechaHoy) : undefined;
+  const ultimos7 = getUltimos7Dias(fechaHoy);
+  const ultimos30 = getUltimos30Dias(fechaHoy);
   const diasRegistrados = entradas.length;
 
   // Estadísticas
@@ -156,7 +167,7 @@ export default function DiarioEmocionalPage() {
         {/* ── Registro de hoy ── */}
         <div className={styles.registroSection}>
           <h2 className={styles.seccionTitulo}>¿Cómo te sientes hoy?</h2>
-          <p className={styles.fechaHoy}>{formatFechaLarga(hoy())}</p>
+          <p className={styles.fechaHoy}>{fechaHoy ? formatFechaLarga(fechaHoy) : ''}</p>
 
           <div className={styles.emocionesGrid}>
             {EMOCIONES.map(emo => (
@@ -208,7 +219,7 @@ export default function DiarioEmocionalPage() {
                 const entrada = entradas.find(e => e.fecha === fecha);
                 const emo = entrada ? EMOCIONES.find(em => em.id === entrada.emocionId) : null;
                 return (
-                  <div key={fecha} className={`${styles.diaCard} ${fecha === hoy() ? styles.diaHoy : ''}`}>
+                  <div key={fecha} className={`${styles.diaCard} ${fecha === fechaHoy ? styles.diaHoy : ''}`}>
                     <span className={styles.diaLabel}>{formatFechaCorta(fecha)}</span>
                     <span className={styles.diaEmoji} aria-hidden="true">{emo ? emo.emoji : '·'}</span>
                     {entrada?.nota && <span className={styles.diaNota} title={entrada.nota}>📝</span>}

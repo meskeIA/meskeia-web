@@ -199,10 +199,16 @@ export default function PruebaCamaraPage() {
     };
   }, []);
 
-  // Verificar soporte
-  const isSupported = typeof navigator !== 'undefined' &&
-    navigator.mediaDevices &&
-    navigator.mediaDevices.getUserMedia;
+  // Verificar soporte. Se arranca en `true` y se corrige al montar, en vez de calcularlo
+  // durante el render: en el servidor no hay `navigator`, así que el HTML estático salía
+  // con el cartel de "Navegador no compatible" —que es lo que Google indexaba de una app
+  // de prueba de cámara— y luego React lo descartaba al hidratar (error #418). Optimista
+  // a propósito: si el navegador de verdad no soporta la cámara, el aviso aparece en
+  // cuanto monta; al revés no había arreglo posible desde el servidor.
+  const [isSupported, setIsSupported] = useState(true);
+  useEffect(() => {
+    setIsSupported(Boolean(navigator.mediaDevices?.getUserMedia));
+  }, []);
 
   return (
     <div className={styles.container}>

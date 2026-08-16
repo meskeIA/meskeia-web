@@ -459,12 +459,14 @@ export default function GeneradorCarruselesPage() {
                 color: plantillaActiva.textoColor,
               }}
             >
+              {/* h2/h3 y no h1/h2: el h1 de la página es su título, y esto es la vista previa
+                  de la diapositiva. Se baja el par entero para conservar su jerarquía relativa. */}
               {slideActual?.titulo && (
-                <h1 className={styles.previewTitulo}>{slideActual.titulo}</h1>
+                <h2 className={styles.previewTitulo}>{slideActual.titulo}</h2>
               )}
 
               {slideActual?.subtitulo && (
-                <h2 className={styles.previewSubtitulo}>{slideActual.subtitulo}</h2>
+                <h3 className={styles.previewSubtitulo}>{slideActual.subtitulo}</h3>
               )}
 
               {slideActual?.texto && (

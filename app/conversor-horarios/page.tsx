@@ -108,7 +108,9 @@ const acronimosReferencia = [
 // ==================== FUNCIONES AUXILIARES ====================
 
 // Obtener el offset UTC de una zona horaria para una fecha específica
-const obtenerOffsetUTC = (zonaIANA: string, fecha: Date): string => {
+// `fecha` admite null: antes de montar no hay hora actual que mostrar (ver horaActual)
+const obtenerOffsetUTC = (zonaIANA: string, fecha: Date | null): string => {
+  if (!fecha) return '';
   try {
     const formatter = new Intl.DateTimeFormat('en-US', {
       timeZone: zonaIANA,
@@ -134,11 +136,16 @@ export default function ConversorHorariosPage() {
   const [horaOrigen, setHoraOrigen] = useState('');
   const [fechaOrigen, setFechaOrigen] = useState('');
   const [zonasSeleccionadas, setZonasSeleccionadas] = useState<string[]>(['nueva_york', 'tokio', 'londres']);
-  const [horaActual, setHoraActual] = useState(new Date());
+  // Arranca en null, no en `new Date()`: el HTML estático se generaba con la hora del build
+  // y el cliente ponía la de la visita, así que no coincidían y React descartaba el árbol al
+  // hidratar (error #418). Hasta que monta se pintan guiones, que es lo honesto: en el HTML
+  // servido no hay ninguna "hora actual" que se pueda saber.
+  const [horaActual, setHoraActual] = useState<Date | null>(null);
   const [mostrarAcronimos, setMostrarAcronimos] = useState(false);
 
-  // Actualizar hora actual cada segundo
+  // Actualizar hora actual cada segundo (la primera, nada más montar)
   useEffect(() => {
+    setHoraActual(new Date());
     const interval = setInterval(() => {
       setHoraActual(new Date());
     }, 1000);
@@ -153,7 +160,8 @@ export default function ConversorHorariosPage() {
   }, []);
 
   // Obtener hora en una zona horaria específica
-  const obtenerHoraEnZona = (zona: string, fecha: Date): string => {
+  const obtenerHoraEnZona = (zona: string, fecha: Date | null): string => {
+    if (!fecha) return '--:--:--';
     try {
       return fecha.toLocaleTimeString('es-ES', {
         timeZone: zona,

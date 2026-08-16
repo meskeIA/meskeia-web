@@ -165,11 +165,25 @@ export default function CursoNutrisaludPage() {
   const completedCount = CHAPTERS.filter((ch) => isChapterCompleted(ch.id)).length;
   const totalDuration = getTotalDuration();
 
-  // Si no ha aceptado el consentimiento, mostrar modal
+  // Si no ha aceptado el consentimiento, mostrar modal. La cabecera va TAMBIÉN en esta rama:
+  // `hasAcceptedConsent` arranca en false, así que esta es la versión que se prerenderiza y la
+  // que indexa Google, y sin ella la página del curso se publicaba sin un solo <h1> y sin nada
+  // que dijese de qué trata (lo cazó la Ronda el 13/08/2026 como "sin <h1>"). El consentimiento
+  // sigue bloqueando el acceso al temario igual que antes: aquí solo se añade el encabezado.
   if (!hasAcceptedConsent) {
     return (
       <div className={styles.container}>
         <MeskeiaLogo />
+
+        <header className={styles.hero}>
+          <span className={styles.heroIcon} aria-hidden="true">🥗</span>
+          <h1 className={styles.title}>Curso de Nutrición</h1>
+          <p className={styles.subtitle}>
+            Conocimiento nutricional avanzado basado en ciencia.
+            Más allá de los consejos básicos que ya conoces.
+          </p>
+        </header>
+
         <ConsentModal />
       </div>
     );
@@ -184,7 +198,7 @@ export default function CursoNutrisaludPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🥗</span>
+        <span className={styles.heroIcon} aria-hidden="true">🥗</span>
         <h1 className={styles.title}>Curso de Nutrición</h1>
         <p className={styles.subtitle}>
           Conocimiento nutricional avanzado basado en ciencia.

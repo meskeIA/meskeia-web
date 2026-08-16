@@ -394,6 +394,15 @@ export default function CalendarioFiscalPage() {
   const [tipoContribuyente, setTipoContribuyente] = useState<TipoContribuyente>('autonomo');
   const [mesActual, setMesActual] = useState(() => new Date().getMonth());
   const [anioActual, setAnioActual] = useState(() => new Date().getFullYear());
+  // El calendario depende del reloj, y el HTML estático se genera una sola vez en el build:
+  // servía el mes del build mientras el cliente pintaba el de la visita, no coincidían y React
+  // descartaba el árbol al hidratar (error #418). La rejilla y el detalle del mes esperan a
+  // montar; el resto de la página (modelos y estimador), que no depende de la fecha, se
+  // prerenderiza igual que antes y es lo que Google indexa de esta app.
+  const [montado, setMontado] = useState(false);
+  useEffect(() => {
+    setMontado(true);
+  }, []);
   const [pestanaActiva, setPestanaActiva] = useState<'calendario' | 'modelos' | 'estimador'>('calendario');
   const [modelosExpandidos, setModelosExpandidos] = useState<string[]>([]);
 
@@ -675,6 +684,7 @@ export default function CalendarioFiscalPage() {
             </div>
 
             {/* Calendario mensual */}
+            {montado && (
             <div className={styles.calendarioMes}>
               <div className={styles.navegacionMes}>
                 <button onClick={mesAnterior} className={styles.btnNav}>◀</button>
@@ -739,9 +749,10 @@ export default function CalendarioFiscalPage() {
                 </div>
               </div>
             </div>
+            )}
 
             {/* Detalle del mes */}
-            {fechasDelMes.length > 0 && (
+            {montado && fechasDelMes.length > 0 && (
               <div className={styles.detalleMes}>
                 <h3 className={styles.seccionTitulo}>
                   📋 Obligaciones de {MESES[mesActual]}

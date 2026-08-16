@@ -92,9 +92,13 @@ export default function CalculadoraPresupuestosPage() {
   ]);
 
   // Configuración
+  // `numero` y `fecha` arrancan vacíos y se rellenan al montar (más abajo). Calculados aquí,
+  // el HTML estático salía con la fecha y el año del build y el cliente ponía los del día: no
+  // coincidían, React descartaba el árbol al hidratar (error #418) y, entre build y visita, el
+  // presupuesto llegaba a anunciar una fecha que no era.
   const [config, setConfig] = useState<ConfigPresupuesto>({
-    numero: `PRES-${new Date().getFullYear()}-001`,
-    fecha: new Date().toISOString().split('T')[0],
+    numero: '',
+    fecha: '',
     validezDias: '30',
     incluirIva: true,
     tipoIva: '21',
@@ -125,6 +129,13 @@ export default function CalculadoraPresupuestosPage() {
         console.error('Error cargando datos:', e);
       }
     }
+    // Número y fecha de hoy, ya en el navegador (ver el estado inicial de config). Solo si
+    // siguen vacíos: lo que venga de localStorage manda, porque es el presupuesto en curso.
+    setConfig(prev => ({
+      ...prev,
+      numero: prev.numero || `PRES-${new Date().getFullYear()}-001`,
+      fecha: prev.fecha || new Date().toISOString().split('T')[0],
+    }));
   }, []);
 
   // Guardar datos
@@ -632,7 +643,9 @@ export default function CalculadoraPresupuestosPage() {
               {/* Cabecera */}
               <div className={styles.docHeader}>
                 <div className={styles.docHeaderLeft}>
-                  <h1 className={styles.docTitulo}>PRESUPUESTO</h1>
+                  {/* h2 y no h1: el h1 de la página es su título, y este es el encabezado
+                      del documento que se previsualiza dentro. El estilo lo da docTitulo. */}
+                  <h2 className={styles.docTitulo}>PRESUPUESTO</h2>
                   <p className={styles.docNumero}>{config.numero}</p>
                 </div>
                 <div className={styles.docHeaderRight}>

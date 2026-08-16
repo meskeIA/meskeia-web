@@ -247,10 +247,14 @@ export default function GeneradorFacturasPage() {
   ]);
 
   // Configuración
+  // `fecha` arranca vacía y se rellena al montar (más abajo). Con `new Date()` aquí, el HTML
+  // estático salía con la fecha del build y el cliente ponía la del día: no coincidían, React
+  // descartaba el árbol al hidratar (error #418) y, entre build y visita, el campo de fecha de
+  // la factura llegaba a anunciar un día que no era.
   const [config, setConfig] = useState<ConfiguracionFactura>({
     serie: 'A',
     numero: 1,
-    fecha: new Date().toISOString().split('T')[0],
+    fecha: '',
     aplicarIrpf: false,
     porcentajeIrpf: 15,
     notas: '',
@@ -378,6 +382,9 @@ export default function GeneradorFacturasPage() {
 
   // Cargar datos guardados
   useEffect(() => {
+    // La fecha de hoy, ya en el navegador (ver el estado inicial de config)
+    setConfig(prev => (prev.fecha ? prev : { ...prev, fecha: new Date().toISOString().split('T')[0] }));
+
     const savedEmisor = localStorage.getItem(STORAGE_KEY_EMISOR);
     if (savedEmisor) {
       try {
