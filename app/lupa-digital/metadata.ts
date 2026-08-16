@@ -40,7 +40,7 @@ export const jsonLd = generateWebAppSchema({
     'Ampliación digital de 1× a 5× con la cámara del móvil o celular',
     'Filtros de accesibilidad: alto contraste, inversión, escala de grises y sepia',
     'Ajuste independiente de brillo y contraste en tiempo real',
-    'Modo congelado para leer sin mantener el pulso',
+    'Restablecer todos los ajustes de un toque',
     'Compatibilidad con cámara frontal y trasera',
     'Activación de linterna integrada en dispositivos compatibles',
     'Procesado 100 % local en el navegador, sin envío de imágenes',
@@ -85,10 +85,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Puedo congelar la imagen para leer con más comodidad?',
+      name: '¿Qué filtro se lee mejor con letra muy pequeña?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí, la herramienta incluye la opción de pausar (congelar) la imagen de la cámara para que puedas leer el texto ampliado sin tener que sostener el dispositivo quieto. Esta función es muy práctica para leer etiquetas de medicamentos, números de serie o instrucciones impresas en letra muy pequeña.',
+        text: 'Depende del papel y de la luz, así que conviene probar los cuatro. El de alto contraste ayuda con impresiones desvaídas, como los prospectos de medicamentos; el invertido (texto claro sobre fondo oscuro) descansa la vista cuando el papel es muy brillante y refleja; la escala de grises quita el color que distrae en etiquetas muy recargadas. Si la imagen se mueve, sube el zoom por pasos y quédate en el menor que te permita leer.',
       },
     },
   ],

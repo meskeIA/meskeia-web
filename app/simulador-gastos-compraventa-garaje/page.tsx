@@ -18,7 +18,7 @@ import {
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
-import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, calcularGananciaInmueble } from '@/data/fiscal';
+import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, calcularGananciaInmueble } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -127,7 +127,6 @@ export default function SimuladorGarajeCompraventaPage() {
     if (!Number.isFinite(precio) || precio <= 0) return null;
 
     const gestoria = parseSpanishNumberOr(gastosGestoria);
-    const datosCcaa = ITP_CCAA[ccaa];
 
     let impuesto = 0;
     let tipoImpuesto = '';
@@ -279,6 +278,16 @@ export default function SimuladorGarajeCompraventaPage() {
         urlOficial={FISCAL_INMUEBLES_META.urlOficialITP}
         nota={FISCAL_INMUEBLES_META.nota}
       />
+      {/* La pestaña Vendedor emite dos cifras normativas más, con vigencia y fecha de
+          verificación propias: presentarlas bajo el sello de ITP/AJD/IVA daba por revisado
+          en 2026 un coeficiente de 2025 que se actualiza cada Ley de Presupuestos. */}
+      <DataReference
+        normativa={`Plusvalía municipal (IIVTNU) ${PLUSVALIA_MUNICIPAL_META.vigencia}`}
+        fuente={PLUSVALIA_MUNICIPAL_META.baseNormativa}
+        verificado={PLUSVALIA_MUNICIPAL_META.verificado}
+        urlOficial={PLUSVALIA_MUNICIPAL_META.urlReferencia}
+        nota={`${PLUSVALIA_MUNICIPAL_META.nota} ${PLUSVALIA_MUNICIPAL_META.aviso} El IRPF de la ganancia usa los tramos del ahorro de 2025 (19 % a 30 %).`}
+      />
 
       {/* Formulario principal */}
       <section className={styles.mainContent}>
@@ -377,11 +386,11 @@ export default function SimuladorGarajeCompraventaPage() {
             <div className={styles.infoCcaaGrid}>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>ITP General</span>
-                <span className={styles.infoCcaaValue}>{datosCcaaActual.tipoGeneral}%</span>
+                <span className={styles.infoCcaaValue}>{formatNumber(datosCcaaActual.tipoGeneral, 2)}%</span>
               </div>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>AJD</span>
-                <span className={styles.infoCcaaValue}>{datosCcaaActual.ajd}%</span>
+                <span className={styles.infoCcaaValue}>{formatNumber(datosCcaaActual.ajd, 2)}%</span>
               </div>
             </div>
             {datosCcaaActual.tramosProgresivos && (
@@ -414,7 +423,7 @@ export default function SimuladorGarajeCompraventaPage() {
                   <ul>
                     {datosCcaaActual.tiposReducidos.map((tr, idx) => (
                       <li key={idx}>
-                        <strong>{tr.tipo}%</strong> — {tr.nombre}
+                        <strong>{formatNumber(tr.tipo, 2)}%</strong> — {tr.nombre}
                         {tr.valorMaximo && (
                           <span className={styles.limite}> (máx. {formatCurrency(tr.valorMaximo)})</span>
                         )}
@@ -757,9 +766,12 @@ export default function SimuladorGarajeCompraventaPage() {
                   <td>Tipo general CCAA (igual)</td>
                   <td>Tipo general CCAA</td>
                 </tr>
+                {/* La celda del garaje distingue los dos tipos porque es lo que aplica el
+                    motor (IVA_INMUEBLES_2025.garaje = 21). Decir «10 %» a secas infravaloraba
+                    en 2.750 € un garaje de 25.000 €, y presupuestar de menos es el error caro. */}
                 <tr>
                   <td>IVA obra nueva</td>
-                  <td>10% (residencial)</td>
+                  <td>10% con la vivienda · 21% independiente</td>
                   <td>10% (residencial)</td>
                 </tr>
                 <tr>
@@ -799,8 +811,14 @@ export default function SimuladorGarajeCompraventaPage() {
                 <span aria-hidden="true" className={styles.casoEmoji}>🚗</span>
                 <span className={styles.casoTag}>Comprar garaje solo (segunda mano)</span>
               </div>
-              <p>Luis compra una plaza de parking en Madrid por 25.000 €. Paga el ITP general de Madrid (6%), más notaría (~400 €), registro (~150 €) y gestoría (300 €). El coste total real asciende a ~27.350 €.</p>
-              <div className={styles.casoResultado}>ITP + gastos = aprox. 10-12% del precio</div>
+              {/* Cifras tomadas del propio simulador con esa misma entrada, no de los mínimos
+                  orientativos de COSTES_COMPRAVENTA_2025: antes anunciaba notaría ~400 €,
+                  registro ~150 €, total ~27.350 € y una banda del 10-12 % que el motor no
+                  produce para Madrid con ninguna cifra (en segunda mano no hay AJD). Un
+                  ejemplo que no cuadra con la calculadora de al lado enseña a desconfiar
+                  del resultado correcto. */}
+              <p>Luis compra una plaza de parking en Madrid por 25.000 €. Paga el ITP general de Madrid (6%) = 1.500 €, más notaría (212,48 €), registro (69,30 €) y gestoría (300 €). El coste total asciende a 27.081,78 €.</p>
+              <div className={styles.casoResultado}>ITP + gastos = 8,33% del precio</div>
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>

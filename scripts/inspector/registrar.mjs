@@ -17,6 +17,9 @@
  *   "modelo": "opus-5",
  *   "segundos": 240,
  *   "veredicto": "ok" | "con_hallazgos" | "no_inspeccionable",
+ *   //  ↑ lo que manda el acta. Lo que se GUARDA se deriva de la severidad máxima:
+ *   //    sin hallazgos → ok · solo medios/bajos → con_hallazgos_menores ·
+ *   //    alguno alto o crítico → con_hallazgos. Ver derivarVeredicto.
  *   "resumen": "qué se ha comprobado y con qué casos",
  *   "test_path": "tests/apps/calculadora-iva.spec.ts",   // opcional pero muy recomendable
  *   "hallazgos": [
@@ -40,9 +43,35 @@
 import fs from 'fs';
 import { abrir } from './db.mjs';
 
-const VEREDICTOS = ['ok', 'con_hallazgos', 'no_inspeccionable'];
+// Lo que puede mandar un acta. El subagente sigue diciendo solo "ok" o "con_hallazgos":
+// no tiene que acertar el matiz, porque el veredicto se DERIVA (ver derivarVeredicto).
+const VEREDICTOS = ['ok', 'con_hallazgos', 'con_hallazgos_menores', 'no_inspeccionable'];
 const TIPOS = ['calculo', 'dato', 'operativa', 'accesibilidad', 'contenido'];
 const SEVERIDADES = ['critico', 'alto', 'medio', 'bajo'];
+
+/**
+ * El veredicto que se GUARDA sale de la severidad máxima encontrada, no de lo que opine
+ * el modelo.
+ *
+ * ── De dónde sale (16/08/2026) ────────────────────────────────────────────────
+ * El contador de veredicto repetido saltó con 8 "con_hallazgos" seguidos. El aviso estaba
+ * bien disparado, pero la causa no era que el Inspector hubiera dejado de mirar —esa misma
+ * tanda encontró 18 hallazgos, varios con su control— sino que el veredicto era BINARIO
+ * mientras los hallazgos tienen severidad: "con_hallazgos" metía en la misma casilla «cobra
+ * el doble de ITP en Ceuta» y «un porcentaje escrito con punto en vez de coma». Con ese
+ * listón ninguna app de un catálogo de 985 iba a salir limpia nunca, así que el veredicto
+ * no informaba aunque el Inspector funcionase perfectamente.
+ *
+ * Nótese la diferencia con el caso que originó el contador (el semáforo del digest, que
+ * marcó ✅ 21 veces mientras la métrica caía): allí el indicador mentía, aquí solo estaba
+ * mal graduado. Por eso la respuesta es calibrar la escala y no desconfiar del detector.
+ */
+function derivarVeredicto(declarado, hallazgos) {
+  if (declarado === 'no_inspeccionable') return 'no_inspeccionable';
+  if (!hallazgos.length) return 'ok';
+  const grave = hallazgos.some(h => h.severidad === 'critico' || h.severidad === 'alto');
+  return grave ? 'con_hallazgos' : 'con_hallazgos_menores';
+}
 
 function leerEntrada() {
   const f = process.argv[2];
@@ -81,11 +110,13 @@ for (const [i, a] of actas.entries()) {
       errores.push(`${d}: falta el caso reproducible (entrada → esperado vs obtenido). Sin él, no es un hallazgo.`);
   }
 
-  // Regla 2: el veredicto tiene que concordar con lo que se ha encontrado
+  // Regla 2: el veredicto tiene que concordar con lo que se ha encontrado. Solo se
+  // comprueba la contradicción de fondo (decir "ok" habiendo encontrado algo, o al revés);
+  // el matiz entre menores y graves lo pone derivarVeredicto, no el modelo.
   if (a.veredicto === 'ok' && hallazgos.length)
     errores.push(`${donde}: veredicto "ok" con ${hallazgos.length} hallazgo(s)`);
-  if (a.veredicto === 'con_hallazgos' && !hallazgos.length)
-    errores.push(`${donde}: veredicto "con_hallazgos" sin ninguno`);
+  if (a.veredicto.startsWith('con_hallazgos') && !hallazgos.length)
+    errores.push(`${donde}: veredicto "${a.veredicto}" sin ninguno`);
   if (a.test_path && !fs.existsSync(a.test_path))
     errores.push(`${donde}: test_path "${a.test_path}" no existe en el disco`);
 }
@@ -107,12 +138,16 @@ const actApp = db.prepare(`UPDATE apps SET ultima_inspeccion = ?, veredicto = ?,
 
 let nH = 0;
 for (const a of actas) {
-  const r = insInsp.run(a.slug, hoy, a.modelo || null, a.veredicto, a.resumen, a.test_path || null, a.segundos || null);
+  const veredicto = derivarVeredicto(a.veredicto, a.hallazgos || []);
+  if (veredicto !== a.veredicto) {
+    console.log(`   ${a.slug}: veredicto "${a.veredicto}" → "${veredicto}" (por la severidad máxima encontrada)`);
+  }
+  const r = insInsp.run(a.slug, hoy, a.modelo || null, veredicto, a.resumen, a.test_path || null, a.segundos || null);
   for (const h of a.hallazgos || []) {
     insHall.run(r.lastInsertRowid, a.slug, h.tipo, h.severidad, h.descripcion, h.caso, hoy);
     nH++;
   }
-  actApp.run(hoy, a.veredicto, a.test_path || null, a.slug);
+  actApp.run(hoy, veredicto, a.test_path || null, a.slug);
 }
 
 console.log(`✓ ${actas.length} acta(s) registrada(s) · ${nH} hallazgo(s)`);

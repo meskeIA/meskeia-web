@@ -752,6 +752,25 @@ const NO_SON_REQUISITOS = [
 ];
 
 /**
+ * Condiciones que se cumplen por el SITIO, no por quien compra: al elegir la comunidad
+ * el usuario ya las ha declarado. Un tipo reducido cuyas condiciones sean todas de esta
+ * clase se aplica solo, sin preguntar el perfil.
+ *
+ * ── De dónde sale (16/08/2026) ────────────────────────────────────────────────
+ * Ceuta y Melilla bonifican el ITP al 50 % por estar el inmueble allí, y eso no lo
+ * captura ningún perfil de comprador. `elegirTipoITP` solo miraba candidatos cuyo NOMBRE
+ * casara con joven/familia/discapacidad/VPO, así que la bonificación no llegaba nunca a
+ * evaluarse: ni se aplicaba ni entraba en `noComprobables`, de modo que tampoco salía el
+ * aviso «Podrías pagar menos». Resultado: se cobraba el 6 % en vez del 3 %, el doble, en
+ * una página que en el mismo recuadro imprimía «Bonificación automática del 50 % para
+ * inmuebles en Ceuta». Lo encontró el Inspector en simulador-gastos-compraventa-garaje.
+ */
+const CONDICIONES_DE_UBICACION = [
+  /^inmueble situado en /i,
+  /^bonificaci[oó]n autom[aá]tica/i,
+];
+
+/**
  * Elige el tipo de ITP aplicable — y, sobre todo, el que NO se puede aplicar.
  *
  * ── De dónde sale (14/08/2026) ────────────────────────────────────────────────
@@ -785,10 +804,35 @@ export function elegirTipoITP(
 ): TipoElegido {
   const datos = ITP_CCAA[ccaa];
   const general: TipoElegido = { tipo: datos.tipoGeneral, esReducido: false, noComprobables: [] };
-  if (perfil === 'general' || !datos.tiposReducidos.length) return general;
+  if (!datos.tiposReducidos.length) return general;
+
+  const normaliza = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+  // Bonificaciones que dependen del SITIO y no del comprador: se aplican con cualquier
+  // perfil, incluido «general», así que se resuelven ANTES de salir por ese atajo.
+  const automaticos = datos.tiposReducidos.filter(
+    r =>
+      (!r.valorMaximo || precio <= r.valorMaximo) &&
+      r.condiciones.length > 0 &&
+      r.condiciones.every(
+        c => CONDICIONES_DE_UBICACION.some(p => p.test(c)) || NO_SON_REQUISITOS.some(p => p.test(c))
+      )
+  );
+  const mejorAutomatico = automaticos.length
+    ? automaticos.reduce((a, b) => (b.tipo < a.tipo ? b : a))
+    : null;
+  const porUbicacion: TipoElegido | null = mejorAutomatico
+    ? {
+        tipo: mejorAutomatico.tipo,
+        esReducido: true,
+        nombre: mejorAutomatico.nombre,
+        noComprobables: [],
+      }
+    : null;
+
+  if (perfil === 'general') return porUbicacion ?? general;
 
   const patronPerfil = CUBIERTAS_POR_PERFIL[perfil];
-  const normaliza = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
   /** ¿Esta condición concreta se puede dar por cumplida sin preguntar nada más? */
   const cubierta = (c: string): boolean => {
@@ -809,17 +853,26 @@ export function elegirTipoITP(
     if (perfil === 'discapacidad') return n.includes('discapacidad');
     return n.includes('vpo') || n.includes('proteccion oficial');
   });
-  if (!candidatos.length) return general;
+  if (!candidatos.length) return porUbicacion ?? general;
 
   const aplicables = candidatos.filter(
     r => (!r.valorMaximo || precio <= r.valorMaximo) && r.condiciones.every(cubierta)
   );
   const noComprobables = candidatos.filter(r => !aplicables.includes(r));
 
-  if (!aplicables.length) return { ...general, noComprobables };
+  if (!aplicables.length) {
+    return porUbicacion ? { ...porUbicacion, noComprobables } : { ...general, noComprobables };
+  }
 
   // Entre los que sí se pueden aplicar, el más favorable al comprador
   const mejor = aplicables.reduce((a, b) => (b.tipo < a.tipo ? b : a));
+
+  // Y si la bonificación por ubicación es aún mejor, manda esa: son acumulables en el
+  // sentido de que el comprador puede acogerse a la que más le convenga, no a las dos.
+  if (porUbicacion && porUbicacion.tipo < mejor.tipo) {
+    return { ...porUbicacion, noComprobables };
+  }
+
   return {
     tipo: mejor.tipo,
     esReducido: true,

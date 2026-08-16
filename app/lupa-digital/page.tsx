@@ -446,8 +446,8 @@ export default function LupaDigitalPage() {
                 examinar el detalle de una pintura sin necesidad de escáner.
               </p>
               <p className={styles.escenarioTip}>
-                Consejo: congela la imagen con el botón de pausa y tómate el tiempo
-                que necesites para leer sin mover el teléfono.
+                Consejo: apoya el teléfono en un soporte o sobre la propia superficie
+                y tómate el tiempo que necesites para leer sin pulso.
               </p>
             </div>
           </div>
@@ -465,7 +465,7 @@ export default function LupaDigitalPage() {
                   degradación. La lupa digital amplía mediante software, por lo que a
                   partir de cierto zoom (normalmente 5x–8x) la imagen puede pixelarse.
                   Para usos cotidianos (leer etiquetas, manuales) la calidad es más que
-                  suficiente y tiene la ventaja de añadir filtros, congelar imagen y
+                  suficiente y tiene la ventaja de añadir filtros de contraste y
                   ajustar el brillo.
                 </p>
                 <p className={styles.faqTip}>
@@ -502,8 +502,8 @@ export default function LupaDigitalPage() {
                   El uso continuado de la cámara consume batería de forma moderada,
                   similar a grabar un vídeo. Para sesiones cortas (leer una etiqueta o
                   un documento) el consumo es mínimo. Si vas a usarla durante varios
-                  minutos seguidos, conecta el cargador o activa el modo congelado, que
-                  detiene la cámara y reduce el consumo.
+                  minutos seguidos, conecta el cargador o pulsa «Detener», que apaga la
+                  cámara y reduce el consumo.
                 </p>
               </details>
             </li>
@@ -539,11 +539,11 @@ export default function LupaDigitalPage() {
             <li className={styles.step}>
               <span className={styles.stepNumber} aria-hidden="true">3</span>
               <div className={styles.stepContent}>
-                <strong>Congelar la imagen si necesitas leer sin mover el teléfono</strong>
+                <strong>Ajustar el contraste si el texto cuesta de leer</strong>
                 <p>
-                  El modo congelado captura el fotograma actual y te permite leer con
-                  calma sin mantener el pulso. Ideal para texto largo o cuando necesitas
-                  comparar varias zonas del documento.
+                  Los filtros de alto contraste, invertido y escala de grises cambian
+                  mucho la legibilidad según el papel y la luz. Prueba «Invertir» con
+                  texto oscuro sobre fondo brillante: suele ser el que más descansa.
                 </p>
               </div>
             </li>
@@ -575,12 +575,12 @@ export default function LupaDigitalPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon} aria-hidden="true">⏸️</span>
-              <h4>Usa el modo congelado para leer sin pulso</h4>
+              <span className={styles.tipIcon} aria-hidden="true">🔎</span>
+              <h4>Sube el zoom por pasos, no de golpe</h4>
               <p>
-                El movimiento involuntario de la mano hace que la imagen se mueva a
-                zoom alto. Congela el fotograma cuando el texto esté bien enfocado y
-                lee sin prisa.
+                El movimiento involuntario de la mano se amplifica con el zoom, así que
+                a 5x cuesta encuadrar. Sube de nivel en nivel y quédate en el menor que
+                te deje leer con comodidad: la imagen se mueve mucho menos.
               </p>
             </div>
             <div className={styles.tipCard}>

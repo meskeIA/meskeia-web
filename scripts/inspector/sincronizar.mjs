@@ -196,9 +196,38 @@ for (const [slug, app] of catalogo) {
   n++;
 }
 
+// ─── Apps que ya no están en el catálogo ──────────────────────────────────────
+// El bucle de arriba solo hace UPSERT, así que una app ELIMINADA se quedaba en la base
+// para siempre: seguía contando en el total, en los usos por segmento y en la cola, y un
+// día habría propuesto inspeccionar una URL que ya devuelve 404. Se vio el 16/08/2026 al
+// retirar radio-meskeia, la primera app que se elimina del catálogo (la cola decía 985
+// apps y este script 984, y esa diferencia de uno era la app fantasma).
+//
+// Solo se retiran las que NUNCA se inspeccionaron. Si una app con histórico desaparece se
+// avisa pero no se toca: sus hallazgos son la memoria de por qué se decidió lo que se
+// decidió, y valen más que la pulcritud del recuento.
+const vivas = new Set(catalogo.keys());
+const huerfanas = db
+  .prepare('SELECT slug, ultima_inspeccion FROM apps')
+  .all()
+  .filter(r => !vivas.has(r.slug));
+const retirables = huerfanas.filter(r => !r.ultima_inspeccion);
+const conHistorico = huerfanas.filter(r => r.ultima_inspeccion);
+
+if (retirables.length) {
+  const borrar = db.prepare('DELETE FROM apps WHERE slug = ?');
+  for (const r of retirables) borrar.run(r.slug);
+}
+
 const cuenta = q => db.prepare(q).get().n;
 console.log(`\nBase del Inspector · _private/inspector/inspector.db`);
 console.log(`  ${n} apps sincronizadas` + (sinCarpeta ? ` · ${sinCarpeta} en el catálogo sin carpeta en app/` : ''));
+if (retirables.length) {
+  console.log(`  🗑️  ${retirables.length} retirada(s) del catálogo, sin inspeccionar: ${retirables.map(r => r.slug).join(', ')}`);
+}
+if (conHistorico.length) {
+  console.log(`  ⚠️  ${conHistorico.length} ya no está(n) en el catálogo pero CONSERVAN inspecciones, así que no se borran: ${conHistorico.map(r => r.slug).join(', ')}`);
+}
 console.log(`  uso cruzado con el dump de ${uso.fecha || 'ninguno'}` + (sinUso ? ` · ${sinUso} sin datos de uso` : ''));
 console.log('\n  por segmento:');
 for (const r of db.prepare('SELECT segmento, COUNT(*) n, SUM(usos) u FROM apps GROUP BY segmento ORDER BY n DESC').all())

@@ -51,6 +51,14 @@ interface ResultadosVendedor {
   plusvaliaMunicipal: number;
   metodoPlusvalia: string;
   exentoPlusvalia: boolean;
+  /**
+   * false cuando faltan datos para calcular la plusvalía municipal (valor catastral del
+   * suelo, años de tenencia o precio de compra). Hay que distinguirlo de una plusvalía de
+   * 0 €: sin este flag la tarjeta pintaba «0,00 €» y ese cero entraba callado en el total
+   * de gastos y en el neto, así que el vendedor leía como cifra final un importe al que le
+   * falta un impuesto que sí va a pagar.
+   */
+  plusvaliaCalculada: boolean;
   comisionInmobiliaria: number;
   gastosGestoria: number;
   otrosGastosVenta: number;
@@ -269,8 +277,9 @@ export default function SimuladorCompraventaPage() {
     let plusvalia = 0;
     let metodoPlusvalia = 'No calculada';
     let exentoPlusvalia = false;
+    const plusvaliaCalculada = valorSuelo > 0 && anios > 0 && precioC > 0;
 
-    if (valorSuelo > 0 && anios > 0 && precioC > 0) {
+    if (plusvaliaCalculada) {
       const resultadoPlusvalia = calcularPlusvaliaMunicipal({
         valorCatastralSuelo: valorSuelo,
         aniosPropiedad: anios,
@@ -304,10 +313,16 @@ export default function SimuladorCompraventaPage() {
       gastosTransmision: comision + gestoria + otrosVenta,
       plusvaliaMunicipal: plusvalia,
       exentoPorEdad: exentoIRPF,
+      // parseSpanishNumberOr y no parseSpanishNumber: los dos campos son OPCIONALES y quien
+      // vende sin hipoteca pendiente deja el segundo vacío, que es lo natural (su placeholder
+      // es «0»). Con parseSpanishNumber eso devolvía NaN, importeTotalObtenido salía NaN, la
+      // guarda `> 0` del motor era false y la exención por reinversión del art. 38 LIRPF NO se
+      // aplicaba: la app cobraba el IRPF entero de una ganancia exenta al 100 %, por la ruta
+      // por defecto y sin avisar. Era el último rincón del NaN que 2067ddbe dio por barrido.
       reinversion: puedeReinvertir
         ? {
-            importeReinvertido: parseSpanishNumber(importeReinversion),
-            principalPendiente: parseSpanishNumber(hipotecaPendiente),
+            importeReinvertido: parseSpanishNumberOr(importeReinversion),
+            principalPendiente: parseSpanishNumberOr(hipotecaPendiente),
           }
         : undefined,
     });
@@ -324,6 +339,7 @@ export default function SimuladorCompraventaPage() {
       plusvaliaMunicipal: plusvalia,
       metodoPlusvalia,
       exentoPlusvalia,
+      plusvaliaCalculada,
       comisionInmobiliaria: comision,
       gastosGestoria: gestoria,
       otrosGastosVenta: otrosVenta,
@@ -349,7 +365,14 @@ export default function SimuladorCompraventaPage() {
   const estimarGastosAdquisicion = () => {
     const precioC = parseSpanishNumber(precioCompraOriginal);
     if (precioC <= 0) return;
-    const itp = calcularITP(precioC, ccaa, ITP_CCAA[ccaa].tipoGeneral);
+    // SIN tercer argumento, que es lo que activa la escala progresiva. Pasando
+    // `tipoGeneral` se cortocircuitaba la rama de tramos y las 7 CCAA con escala
+    // (Aragón, Asturias, Baleares, Castilla y León, Cataluña, Extremadura y Valencia)
+    // estimaban de menos; como esta cifra alimenta el valor de ADQUISICIÓN, quedarse
+    // corto infla la ganancia y el IRPF. La misma página daba dos ITP distintos para
+    // el mismo precio. No se aplican tipos reducidos a propósito: es una estimación de
+    // lo que se pagó hace años, y el perfil del comprador de entonces no se pregunta.
+    const itp = calcularITP(precioC, ccaa);
     const estimado = itp + calcularNotario(precioC) + calcularRegistro(precioC);
     setGastosAdquisicion(formatNumber(estimado, 0));
   };
@@ -506,8 +529,9 @@ export default function SimuladorCompraventaPage() {
 
           {/* Comunidad autónoma */}
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Comunidad Autónoma (ubicación del inmueble)</label>
+            <label className={styles.label} htmlFor="ccaa-inmueble">Comunidad Autónoma (ubicación del inmueble)</label>
             <select
+              id="ccaa-inmueble"
               value={ccaa}
               onChange={(e) => setCcaa(e.target.value as ComunidadAutonoma)}
               className={styles.select}
@@ -545,8 +569,9 @@ export default function SimuladorCompraventaPage() {
           {/* Perfil del comprador (solo para ITP y solo inmuebles residenciales) */}
           {tipoTransmision === 'segunda-mano' && esInmuebleResidencial && (
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Perfil del comprador (para tipos reducidos)</label>
+              <label className={styles.label} htmlFor="perfil-comprador">Perfil del comprador (para tipos reducidos)</label>
               <select
+                id="perfil-comprador"
                 value={perfilComprador}
                 onChange={(e) => setPerfilComprador(e.target.value as PerfilComprador)}
                 className={styles.select}
@@ -879,12 +904,30 @@ export default function SimuladorCompraventaPage() {
                     icon="🏷️"
                   />
 
+                  {/* «Sin calcular» y no «0,00 €»: un cero se lee como «no pagas nada», y aquí
+                      significa «faltan datos». La partida tampoco se suma al total ni al neto. */}
                   <ResultCard
                     title="Plusvalía municipal"
-                    value={resultadosVendedor.exentoPlusvalia ? 'EXENTO' : formatCurrency(resultadosVendedor.plusvaliaMunicipal)}
-                    variant={resultadosVendedor.exentoPlusvalia ? 'success' : 'warning'}
+                    value={
+                      !resultadosVendedor.plusvaliaCalculada
+                        ? 'Sin calcular'
+                        : resultadosVendedor.exentoPlusvalia
+                          ? 'EXENTO'
+                          : formatCurrency(resultadosVendedor.plusvaliaMunicipal)
+                    }
+                    variant={
+                      !resultadosVendedor.plusvaliaCalculada
+                        ? 'default'
+                        : resultadosVendedor.exentoPlusvalia
+                          ? 'success'
+                          : 'warning'
+                    }
                     icon="🏛️"
-                    description={resultadosVendedor.metodoPlusvalia}
+                    description={
+                      resultadosVendedor.plusvaliaCalculada
+                        ? resultadosVendedor.metodoPlusvalia
+                        : 'Falta el valor catastral del suelo, los años de tenencia o el precio de compra. Este impuesto NO está incluido en el neto de abajo.'
+                    }
                   />
 
                   {resultadosVendedor.valorAdquisicion > 0 && (
@@ -977,6 +1020,11 @@ export default function SimuladorCompraventaPage() {
                     value={formatCurrency(resultadosVendedor.totalGastos)}
                     variant="warning"
                     icon="➖"
+                    description={
+                      resultadosVendedor.plusvaliaCalculada
+                        ? undefined
+                        : 'Sin la plusvalía municipal, que no se ha podido calcular'
+                    }
                   />
 
                   <ResultCard
@@ -984,7 +1032,11 @@ export default function SimuladorCompraventaPage() {
                     value={formatCurrency(resultadosVendedor.netoVendedor)}
                     variant="highlight"
                     icon="💰"
-                    description="Lo que realmente recibes"
+                    description={
+                      resultadosVendedor.plusvaliaCalculada
+                        ? 'Lo que realmente recibes'
+                        : 'INCOMPLETO: falta descontar la plusvalía municipal. Rellena el valor catastral del suelo para obtener el neto real.'
+                    }
                   />
                 </>
               ) : (

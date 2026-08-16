@@ -360,9 +360,9 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
   // placeholder es «0»— y entonces `principalPendiente` vale NaN, `importeTotalObtenido` vale
   // NaN, la guarda `importeTotalObtenido > 0` es false y la exención del art. 38 LIRPF NO se
   // aplica: la app cobra el IRPF entero de una ganancia que está exenta al 100 %.
-  // `test.fail` marca que hoy falla a propósito; cuando se corrija, este test se pondrá en rojo.
+  // Arreglados el 16/08/2026: estos tres pasaron de test.fail a verde y se quedan como
+  // REGRESIÓN, que es de lo que se trataba.
   test('CASO 11 (hallazgo) — reinversión total: la exención no puede depender de teclear «0» en la hipoteca', async ({ page }) => {
-    test.fail(); // hallazgo abierto: hoy falla a propósito
     await page.goto(RUTA);
     await rellenar(page, 'Precio de la vivienda', '300000');
     await page.getByRole('button', { name: 'Vendedor' }).click();
@@ -421,7 +421,6 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
   // 100.000 € dentro del botón «Estimar por mí». Como el estimado va al valor de ADQUISICIÓN,
   // quedarse corto infla la ganancia y el IRPF del vendedor.
   test('CASO 12 (hallazgo) — «Estimar por mí» debe usar la misma escala que la pestaña Comprador', async ({ page }) => {
-    test.fail(); // hallazgo abierto: hoy falla a propósito
     await page.goto(RUTA);
     await selectCcaa(page).selectOption('cataluna');
     await rellenar(page, 'Precio de la vivienda', '1200000');
@@ -456,7 +455,6 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
   // labels huérfanos: un lector de pantalla anuncia «cuadro combinado» sin decir de qué.
   // En esta app la CCAA es el dato que más mueve el resultado (del 4 % al 13 % de ITP).
   test('CASO 13 (hallazgo) — los desplegables deben tener nombre accesible', async ({ page }) => {
-    test.fail(); // hallazgo abierto: hoy falla a propósito
     await page.goto(RUTA);
     await expect(selectCcaa(page)).toHaveAccessibleName(/Comunidad Autónoma/);
     await expect(selectPerfil(page)).toHaveAccessibleName(/Perfil del comprador/);

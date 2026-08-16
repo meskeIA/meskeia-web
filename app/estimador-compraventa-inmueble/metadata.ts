@@ -124,7 +124,7 @@ export const faqJsonLd = {
       name: '¿Qué impuestos paga el vendedor al vender un inmueble?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El vendedor debe hacer frente a dos tributos principales: la plusvalía municipal (IIVTNU), que grava el incremento del valor del terreno durante los años de tenencia, y la ganancia patrimonial en el IRPF si el precio de venta supera el precio de adquisición. La ganancia patrimonial tributa entre el 19 % y el 28 % según el importe. Existen exenciones relevantes: reinversión en vivienda habitual, mayores de 65 años, vivienda habitual con hipoteca...',
+        text: 'El vendedor debe hacer frente a dos tributos principales: la plusvalía municipal (IIVTNU), que grava el incremento del valor del terreno durante los años de tenencia, y la ganancia patrimonial en el IRPF si el precio de venta supera el precio de adquisición. La ganancia patrimonial tributa entre el 19 % y el 30 % según el importe. Existen exenciones relevantes: reinversión en vivienda habitual, mayores de 65 años, vivienda habitual con hipoteca...',
       },
     },
     {
