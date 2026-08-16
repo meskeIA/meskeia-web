@@ -519,7 +519,6 @@ const audioApps: RelatedApp[] = [
   // e infra-enlazado (3 entrantes). generador-ondas baja de visibilidad.
   { url: '/generador-tonos/', icon: '🎵', name: 'Generador de Tonos', description: 'Frecuencias y tonos de prueba' },
   { url: '/generador-ondas/', icon: '🌊', name: 'Generador Ondas', description: 'Visualizador audio' },
-  { url: '/radio-meskeia/', icon: '📻', name: 'Radio meskeIA', description: 'Emisoras online' },
 ];
 
 // ==========================================
@@ -2944,7 +2943,6 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'recortador-audio': audioApps.filter(a => a.url !== '/recortador-audio/'),
   'recortador-video': audioApps.filter(a => a.url !== '/recortador-video/'),
   'generador-ondas': audioApps.filter(a => a.url !== '/generador-ondas/'),
-  'radio-meskeia': audioApps.filter(a => a.url !== '/radio-meskeia/'),
 
   // CONVERSORES
   'conversor-unidades': conversoresApps.filter(a => a.url !== '/conversor-unidades/'),
@@ -3238,7 +3236,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/constelaciones-del-cielo/', icon: '🌌', name: 'Constelaciones', description: '32 constelaciones famosas' },
     { url: '/paises-del-mundo/', icon: '🌍', name: 'Países del Mundo', description: 'Geografía mundial' },
     { url: '/minerales-del-mundo/', icon: '💎', name: 'Minerales del Mundo', description: '50 minerales esenciales' },
-    { url: '/radio-meskeia/', icon: '📻', name: 'Radio meskeIA', description: 'Emisoras del mundo' },
+    { url: '/afinador-instrumentos/', icon: '🎸', name: 'Afinador', description: 'Afina tu instrumento con el micrófono' },
   ],
 
   // INFORMÁTICA Y PROGRAMACIÓN

@@ -45,7 +45,8 @@ const securityHeaders = [
   // cuatro apps que llevaban rotas desde el propio 23/02 sin que nadie lo supiera:
   // - fonts.googleapis.com / fonts.gstatic.com → generador-tipografias y adaptador-dislexia
   //   (la segunda es una ayuda de lectura para dislexia: sin Lexend Deca no hace nada)
-  // - {de1,nl1,at1}.api.radio-browser.info     → radio-meskeia (los 3 mirrors que usa)
+  // - (retirado el 16/08/2026) {de1,nl1,at1}.api.radio-browser.info → radio-meskeia, app
+  //   eliminada del catálogo: dos de los tres mirrors del tercero desaparecieron del DNS.
   // - data: en media-src                       → cronometro (aviso sonoro en base64)
   // - nominatim.openstreetmap.org              → golden-hour (buscador de ciudad). Esta no
   //   la vio la Ronda, porque solo falla al escribir en el buscador: la encontró el candado.
@@ -59,7 +60,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "img-src 'self' data: blob:",
       "font-src 'self' https://fonts.gstatic.com",
-      "connect-src 'self' https://meskeia.com https://ipapi.co https://api64.ipify.org https://api.openweathermap.org https://de1.api.radio-browser.info https://nl1.api.radio-browser.info https://at1.api.radio-browser.info https://nominatim.openstreetmap.org",
+      "connect-src 'self' https://meskeia.com https://ipapi.co https://api64.ipify.org https://api.openweathermap.org https://nominatim.openstreetmap.org",
       "media-src 'self' blob: data:",
       "worker-src 'self' blob:",
       "frame-src 'self' https://www.openstreetmap.org",

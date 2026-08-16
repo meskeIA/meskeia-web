@@ -30,6 +30,10 @@
  * sensores (nivel-burbuja, reparada el 25/07) y la cámara (reparada el 21/07), y las dos
  * también se encontraron por casualidad, meses tarde.
  *
+ * (radio-meskeia se eliminó del catálogo el 16/08/2026: no era reparable de forma estable
+ * porque los mirrors del tercero desaparecían del DNS sin aviso. Se cita aquí tal como
+ * estaba en febrero, que es de lo que habla este apartado.)
+ *
  * Tres roturas de la misma causa, descubiertas de una en una. Esto es el candado que
  * convierte esa clase de fallo en un error de build.
  */

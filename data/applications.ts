@@ -321,7 +321,6 @@ export const applicationsDatabase: Application[] = [
   // 8. Juegos y Entretenimiento (13)
   // ============================================
   { name: "Test de Velocidad de Escritura", suites: ["juegos", "productividad"], icon: "⌨️", description: "Mide tu velocidad de escritura en palabras por minuto (PPM) y mejora tu mecanografía con textos en español", url: "/test-velocidad-escritura/", keywords: ["mecanografia", "velocidad", "escritura", "ppm", "palabras por minuto", "typing test", "teclado"] },
-  { name: "Radio meskeIA", suites: ["juegos"], icon: "📻", description: "Escucha miles de emisoras de radio de todo el mundo en vivo", url: "/radio-meskeia/", keywords: ["radio", "musica", "emisoras", "streaming", "noticias", "podcasts", "online"] },
   { name: "Juego Wordle", suites: ["juegos"], icon: "🎮", description: "Adivina la palabra del día en español con 6 intentos", url: "/juego-wordle/", keywords: ["wordle", "palabra", "juego", "adivinar", "español"] },
   { name: "Juego Sudoku", suites: ["juegos"], icon: "🎮", description: "Resuelve puzzles Sudoku con diferentes niveles de dificultad", url: "/juego-sudoku/", keywords: ["sudoku", "puzzle", "numeros", "logica", "juego"] },
   { name: "Juego Tres en Raya", suites: ["juegos"], icon: "🎮", description: "Juega al clásico tres en raya contra la computadora", url: "/juego-tres-en-raya/", keywords: ["tres en raya", "tic tac toe", "juego", "clasico"] },

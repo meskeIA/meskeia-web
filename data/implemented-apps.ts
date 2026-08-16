@@ -273,7 +273,6 @@ export const implementedAppsUrls = [
   "/juego-wordle/",
   "/juego-sudoku/",
   "/juego-puzzle-matematico/",
-  "/radio-meskeia/",
   "/juego-asteroids/",          // Arcade clásico espacial
   "/juego-space-invaders/",     // Arcade clásico de invasores
   "/juego-platform-runner/",    // Juego de plataformas
