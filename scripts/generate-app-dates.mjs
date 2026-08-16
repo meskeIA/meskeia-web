@@ -87,6 +87,28 @@ const carpetas = readdirSync(path.join(RAIZ, 'app'), { withFileTypes: true })
 const sinFecha = carpetas.filter((c) => !fechas[c]);
 
 const anterior = existsSync(SALIDA) ? JSON.parse(readFileSync(SALIDA, 'utf8')) : {};
+
+// No resucitar apps eliminadas. `git log --name-only` lista también los ficheros de un
+// commit que BORRA una carpeta, así que el commit de retirada se leía como "la última vez
+// que se tocó" y le ponía la fecha de ese día: una app eliminada volvía al JSON en cada
+// build, por mucho que se purgase a mano. Se vio el 16/08/2026 al retirar radio-meskeia,
+// la primera app que se elimina del catálogo.
+//
+// El filtro es deliberadamente estrecho: descarta una clave solo si la carpeta no existe
+// Y ADEMÁS no estaba ya en el JSON. Así frena lo que entra nuevo sin tocar el legado —hay
+// ~128 claves antiguas (apps renombradas y ficheros sueltos de app/) que llevan meses aquí
+// sin hacer daño, porque ninguna de esas URLs está en el sitemap. Purgarlas es una limpieza
+// aparte, con su propia comprobación: no se cuela de rondón en el arreglo de otra cosa.
+const vivas = new Set(carpetas);
+const existeEnDisco = (clave) =>
+  clave.startsWith('guia/') ? existsSync(path.join(RAIZ, 'app', clave)) : vivas.has(clave);
+const retiradas = [];
+for (const clave of Object.keys(fechas)) {
+  if (existeEnDisco(clave) || clave in anterior) continue;
+  retiradas.push(clave);
+  delete fechas[clave];
+}
+
 const ordenado = Object.fromEntries(Object.entries(fechas).sort(([a], [b]) => a.localeCompare(b)));
 
 writeFileSync(SALIDA, JSON.stringify(ordenado, null, 0) + '\n', 'utf8');
@@ -95,4 +117,7 @@ const cambiadas = Object.keys(ordenado).filter((k) => anterior[k] !== ordenado[k
 console.log(`✅ data/app-dates.json: ${Object.keys(ordenado).length} carpetas (${cambiadas} con fecha nueva)`);
 if (sinFecha.length) {
   console.log(`   ℹ️  sin fecha en git (usarán la del build): ${sinFecha.slice(0, 5).join(', ')}${sinFecha.length > 5 ? '…' : ''}`);
+}
+if (retiradas.length) {
+  console.log(`   🗑️  descartadas (ya no existen en app/): ${retiradas.join(', ')}`);
 }
