@@ -978,12 +978,12 @@ export default function GeneradorCurriculumPage() {
               <h3>Errores que hacen que descarten tu CV</h3>
             </div>
             <ul className={styles.warningList}>
-              <li><strong>❌ Faltas de ortografía:</strong> transmiten descuido y son de los primeros motivos de descarte. Reléelo o pide a alguien que lo revise.</li>
-              <li><strong>❌ Un CV genérico para todo:</strong> el mismo currículum para 50 ofertas rinde poco. Adáptalo a cada una.</li>
-              <li><strong>❌ Diseños que el ATS no lee:</strong> columnas múltiples, tablas complejas o texto dentro de imágenes pueden hacer que el sistema no te encuentre.</li>
-              <li><strong>❌ Listar tareas en vez de logros:</strong> «responsable de…» aporta poco. Di qué conseguiste y con qué impacto.</li>
-              <li><strong>❌ Datos de contacto erróneos:</strong> un email con errata o un teléfono antiguo tiran por tierra todo lo demás.</li>
-              <li><strong>❌ Información sensible innecesaria:</strong> evita datos que no aportan y pueden generar sesgos (DNI, estado civil, etc.) salvo que la oferta los pida.</li>
+              <li><strong><span aria-hidden="true">❌</span> Faltas de ortografía:</strong> transmiten descuido y son de los primeros motivos de descarte. Reléelo o pide a alguien que lo revise.</li>
+              <li><strong><span aria-hidden="true">❌</span> Un CV genérico para todo:</strong> el mismo currículum para 50 ofertas rinde poco. Adáptalo a cada una.</li>
+              <li><strong><span aria-hidden="true">❌</span> Diseños que el ATS no lee:</strong> columnas múltiples, tablas complejas o texto dentro de imágenes pueden hacer que el sistema no te encuentre.</li>
+              <li><strong><span aria-hidden="true">❌</span> Listar tareas en vez de logros:</strong> «responsable de…» aporta poco. Di qué conseguiste y con qué impacto.</li>
+              <li><strong><span aria-hidden="true">❌</span> Datos de contacto erróneos:</strong> un email con errata o un teléfono antiguo tiran por tierra todo lo demás.</li>
+              <li><strong><span aria-hidden="true">❌</span> Información sensible innecesaria:</strong> evita datos que no aportan y pueden generar sesgos (DNI, estado civil, etc.) salvo que la oferta los pida.</li>
             </ul>
           </div>
         </section>

@@ -637,7 +637,7 @@ export default function VisualizadorConvolucionKernelsPage() {
               Otros &gt; A medida&raquo; de Photoshop es literalmente un editor de kernel como este.
             </p>
             <p className={styles.escenarioTip}>
-              💡 El &laquo;desenfoque gaussiano&raquo; que ves en todas partes es esta operación con un kernel
+              <span aria-hidden="true">💡</span> El &laquo;desenfoque gaussiano&raquo; que ves en todas partes es esta operación con un kernel
               en forma de campana.
             </p>
           </div>
@@ -651,7 +651,7 @@ export default function VisualizadorConvolucionKernelsPage() {
               implementan en shaders aplicando kernels al fotograma renderizado.
             </p>
             <p className={styles.escenarioTip}>
-              💡 En shaders, la convolución se hace muestreando texeles vecinos: la misma ventana 3×3 de
+              <span aria-hidden="true">💡</span> En shaders, la convolución se hace muestreando texeles vecinos: la misma ventana 3×3 de
               aquí, pero en la GPU.
             </p>
           </div>
@@ -665,7 +665,7 @@ export default function VisualizadorConvolucionKernelsPage() {
               preparan la imagen para detectar contornos, líneas o seguir objetos.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Suavizar con un gaussiano antes de buscar bordes reduce el ruido y mejora la detección
+              <span aria-hidden="true">💡</span> Suavizar con un gaussiano antes de buscar bordes reduce el ruido y mejora la detección
               (base del detector de Canny).
             </p>
           </div>
@@ -679,7 +679,7 @@ export default function VisualizadorConvolucionKernelsPage() {
               sus pesos no se escriben a mano: se aprenden durante el entrenamiento.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Las primeras capas de una CNN suelen aprender detectores de bordes muy parecidos a
+              <span aria-hidden="true">💡</span> Las primeras capas de una CNN suelen aprender detectores de bordes muy parecidos a
               Sobel; las profundas reconocen objetos.
             </p>
           </div>
@@ -696,7 +696,7 @@ export default function VisualizadorConvolucionKernelsPage() {
               kernels simétricos, como el desenfoque, el resultado es idéntico.
             </p>
             <p className={styles.faqTip}>
-              💡 Este visualizador usa la correlación cruzada, la convención habitual en visión por
+              <span aria-hidden="true">💡</span> Este visualizador usa la correlación cruzada, la convención habitual en visión por
               computador y aprendizaje profundo.
             </p>
           </div>
@@ -709,7 +709,7 @@ export default function VisualizadorConvolucionKernelsPage() {
               negras y solo brillan los cambios.
             </p>
             <p className={styles.faqTip}>
-              💡 Activa el &laquo;divisor automático&raquo; y compara: sin normalizar, un box blur de pesos 1
+              <span aria-hidden="true">💡</span> Activa el &laquo;divisor automático&raquo; y compara: sin normalizar, un box blur de pesos 1
               dispara el brillo.
             </p>
           </div>
@@ -722,7 +722,7 @@ export default function VisualizadorConvolucionKernelsPage() {
               ambos sentidos.
             </p>
             <p className={styles.faqTip}>
-              💡 Por eso un Sobel con offset se ve gris con bordes claros y oscuros, en lugar de casi todo
+              <span aria-hidden="true">💡</span> Por eso un Sobel con offset se ve gris con bordes claros y oscuros, en lugar de casi todo
               negro.
             </p>
           </div>
@@ -735,7 +735,7 @@ export default function VisualizadorConvolucionKernelsPage() {
               negros artificiales.
             </p>
             <p className={styles.faqTip}>
-              💡 En las CNN, rellenar con ceros (zero padding) es lo más común porque permite controlar el
+              <span aria-hidden="true">💡</span> En las CNN, rellenar con ceros (zero padding) es lo más común porque permite controlar el
               tamaño de salida.
             </p>
           </div>
@@ -748,7 +748,7 @@ export default function VisualizadorConvolucionKernelsPage() {
               computador moderna.
             </p>
             <p className={styles.faqTip}>
-              💡 Entender un kernel 3×3 a mano es entender qué hace cada filtro de una red neuronal por
+              <span aria-hidden="true">💡</span> Entender un kernel 3×3 a mano es entender qué hace cada filtro de una red neuronal por
               dentro.
             </p>
           </div>
@@ -761,7 +761,7 @@ export default function VisualizadorConvolucionKernelsPage() {
               grande.
             </p>
             <p className={styles.faqTip}>
-              💡 Dos desenfoques 3×3 seguidos equivalen aproximadamente a uno 5×5, y son más baratos de
+              <span aria-hidden="true">💡</span> Dos desenfoques 3×3 seguidos equivalen aproximadamente a uno 5×5, y son más baratos de
               calcular.
             </p>
           </div>

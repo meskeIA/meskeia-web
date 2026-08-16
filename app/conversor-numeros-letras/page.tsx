@@ -379,7 +379,7 @@ export default function ConversorNumerosLetrasPage() {
               selector y verás la diferencia sin tocar la cifra.
             </p>
             <p className={styles.faqTip}>
-              💡 «Millón» es masculino siempre: doscientos un millones de libras, no doscientas una.
+              <span aria-hidden="true">💡</span> «Millón» es masculino siempre: doscientos un millones de libras, no doscientas una.
             </p>
           </li>
           <li className={styles.faqItem}>

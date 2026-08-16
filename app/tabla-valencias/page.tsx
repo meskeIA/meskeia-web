@@ -1387,9 +1387,9 @@ export default function TablaValenciasPage() {
                 </tr>
                 <tr>
                   <td><strong>Recomendación IUPAC</strong></td>
-                  <td>✅ Recomendada</td>
-                  <td>✅ Recomendada</td>
-                  <td>⚠️ Desaconsejada, pero tolerada</td>
+                  <td><span aria-hidden="true">✅</span> Recomendada</td>
+                  <td><span aria-hidden="true">✅</span> Recomendada</td>
+                  <td><span aria-hidden="true">⚠️</span> Desaconsejada, pero tolerada</td>
                 </tr>
                 <tr>
                   <td><strong>Ventaja</strong></td>

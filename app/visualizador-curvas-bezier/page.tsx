@@ -526,7 +526,7 @@ export default function VisualizadorCurvasBezierPage() {
               cualquier tamaño sin perder nitidez.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Una «o» o una «s» son varias Béziers encadenadas formando un trazado cerrado.
+              <span aria-hidden="true">💡</span> Una «o» o una «s» son varias Béziers encadenadas formando un trazado cerrado.
             </p>
           </div>
           <div className={styles.escenarioCard}>
@@ -540,7 +540,7 @@ export default function VisualizadorCurvasBezierPage() {
               arranque suave, frenado, rebote, etc.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Aquí los ejes no son x e y del espacio, sino tiempo y progreso de la animación.
+              <span aria-hidden="true">💡</span> Aquí los ejes no son x e y del espacio, sino tiempo y progreso de la animación.
             </p>
           </div>
           <div className={styles.escenarioCard}>
@@ -554,7 +554,7 @@ export default function VisualizadorCurvasBezierPage() {
               con el comando <code>C</code>.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Tirar de un manejador es, literalmente, mover un punto de control como en este
+              <span aria-hidden="true">💡</span> Tirar de un manejador es, literalmente, mover un punto de control como en este
               visualizador.
             </p>
           </div>
@@ -569,7 +569,7 @@ export default function VisualizadorCurvasBezierPage() {
               giros bruscos.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Para recorrer la curva a velocidad constante hace falta reparametrizar por longitud
+              <span aria-hidden="true">💡</span> Para recorrer la curva a velocidad constante hace falta reparametrizar por longitud
               de arco: t no avanza igual de rápido en todos los tramos.
             </p>
           </div>
@@ -586,7 +586,7 @@ export default function VisualizadorCurvasBezierPage() {
               precisamente la propiedad que la hace fácil de controlar.
             </p>
             <p className={styles.faqTip}>
-              💡 Si necesitas que la curva sí pase por unos puntos dados, lo que buscas es una
+              <span aria-hidden="true">💡</span> Si necesitas que la curva sí pase por unos puntos dados, lo que buscas es una
               interpolación tipo spline (por ejemplo Catmull-Rom), no una Bézier directa.
             </p>
           </div>
@@ -599,7 +599,7 @@ export default function VisualizadorCurvasBezierPage() {
               «Animar t» para verlo.
             </p>
             <p className={styles.faqTip}>
-              💡 Por eso, para animar a velocidad constante, hay que corregir t en función de la
+              <span aria-hidden="true">💡</span> Por eso, para animar a velocidad constante, hay que corregir t en función de la
               longitud de arco.
             </p>
           </div>
@@ -612,7 +612,7 @@ export default function VisualizadorCurvasBezierPage() {
               casilla para ver los niveles dibujados con colores distintos.
             </p>
             <p className={styles.faqTip}>
-              💡 Es el mismo resultado que la fórmula con polinomios de Bernstein, pero más estable
+              <span aria-hidden="true">💡</span> Es el mismo resultado que la fórmula con polinomios de Bernstein, pero más estable
               numéricamente y mucho más visual.
             </p>
           </div>
@@ -625,7 +625,7 @@ export default function VisualizadorCurvasBezierPage() {
               del polígono de control.
             </p>
             <p className={styles.faqTip}>
-              💡 Esa fórmula y el algoritmo de De Casteljau dan exactamente el mismo punto.
+              <span aria-hidden="true">💡</span> Esa fórmula y el algoritmo de De Casteljau dan exactamente el mismo punto.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -637,7 +637,7 @@ export default function VisualizadorCurvasBezierPage() {
               formando un spline.
             </p>
             <p className={styles.faqTip}>
-              💡 Para que la unión de dos Béziers sea suave, los manejadores a cada lado del nodo deben
+              <span aria-hidden="true">💡</span> Para que la unión de dos Béziers sea suave, los manejadores a cada lado del nodo deben
               estar alineados (continuidad de la tangente).
             </p>
           </div>
@@ -650,7 +650,7 @@ export default function VisualizadorCurvasBezierPage() {
               nombre y el algoritmo de evaluación, el otro.
             </p>
             <p className={styles.faqTip}>
-              💡 Ambos resolvían el mismo problema industrial: describir formas suaves de forma precisa
+              <span aria-hidden="true">💡</span> Ambos resolvían el mismo problema industrial: describir formas suaves de forma precisa
               y repetible.
             </p>
           </div>

@@ -419,7 +419,7 @@ export default function VisualizadorRuidoPerlinPage() {
               ruido y la dividen en biomas por rangos de altura. Una semilla = un mundo entero.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Cambiar la escala hace los continentes más grandes o más fragmentados.
+              <span aria-hidden="true">💡</span> Cambiar la escala hace los continentes más grandes o más fragmentados.
             </p>
           </div>
           <div className={styles.escenarioCard}>
@@ -432,7 +432,7 @@ export default function VisualizadorRuidoPerlinPage() {
               ruido a un degradado de color en lugar de a una altura.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Animar el ruido en el tiempo (3D, con z = tiempo) da nubes que se mueven.
+              <span aria-hidden="true">💡</span> Animar el ruido en el tiempo (3D, con z = tiempo) da nubes que se mueven.
             </p>
           </div>
           <div className={styles.escenarioCard}>
@@ -445,7 +445,7 @@ export default function VisualizadorRuidoPerlinPage() {
               deciden desiertos, bosques o tundra, no solo por la altura.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Aquí solo usamos la altura; añadir un segundo ruido de humedad es el paso natural.
+              <span aria-hidden="true">💡</span> Aquí solo usamos la altura; añadir un segundo ruido de humedad es el paso natural.
             </p>
           </div>
           <div className={styles.escenarioCard}>
@@ -458,7 +458,7 @@ export default function VisualizadorRuidoPerlinPage() {
               cámara o desplazamiento de partículas sin que parezca aleatorio brusco.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Por su suavidad, el ruido de Perlin es ideal para animar sin saltos bruscos.
+              <span aria-hidden="true">💡</span> Por su suavidad, el ruido de Perlin es ideal para animar sin saltos bruscos.
             </p>
           </div>
         </div>
@@ -474,7 +474,7 @@ export default function VisualizadorRuidoPerlinPage() {
               2001 publicó una versión mejorada, el Simplex noise, más rápida en dimensiones altas.
             </p>
             <p className={styles.faqTip}>
-              💡 El ruido que ves aquí es el Perlin clásico de 1985, el más didáctico para empezar.
+              <span aria-hidden="true">💡</span> El ruido que ves aquí es el Perlin clásico de 1985, el más didáctico para empezar.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -486,7 +486,7 @@ export default function VisualizadorRuidoPerlinPage() {
               parecidos, lo que produce transiciones graduales en lugar de saltos.
             </p>
             <p className={styles.faqTip}>
-              💡 Esa continuidad es la razón por la que sirve para terreno: el mundo real también es
+              <span aria-hidden="true">💡</span> Esa continuidad es la razón por la que sirve para terreno: el mundo real también es
               continuo.
             </p>
           </div>
@@ -499,7 +499,7 @@ export default function VisualizadorRuidoPerlinPage() {
               casi no se aprecia y solo cuesta más cálculo.
             </p>
             <p className={styles.faqTip}>
-              💡 Prueba con 1 octava y sube de una en una para ver cómo aparece el detalle.
+              <span aria-hidden="true">💡</span> Prueba con 1 octava y sube de una en una para ver cómo aparece el detalle.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -511,7 +511,7 @@ export default function VisualizadorRuidoPerlinPage() {
               suave, dominado por las formas grandes.
             </p>
             <p className={styles.faqTip}>
-              💡 0,5 es un valor de partida equilibrado: cada octava pesa la mitad que la anterior.
+              <span aria-hidden="true">💡</span> 0,5 es un valor de partida equilibrado: cada octava pesa la mitad que la anterior.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -523,7 +523,7 @@ export default function VisualizadorRuidoPerlinPage() {
               cada bioma sin tocar el ruido en sí.
             </p>
             <p className={styles.faqTip}>
-              💡 Subir el umbral del agua «inunda» el mapa; bajarlo deja más tierra firme.
+              <span aria-hidden="true">💡</span> Subir el umbral del agua «inunda» el mapa; bajarlo deja más tierra firme.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -535,7 +535,7 @@ export default function VisualizadorRuidoPerlinPage() {
               eso los juegos permiten compartir una semilla para recrear exactamente un mundo.
             </p>
             <p className={styles.faqTip}>
-              💡 Anota una semilla que te guste: podrás reproducir ese mapa cuando quieras.
+              <span aria-hidden="true">💡</span> Anota una semilla que te guste: podrás reproducir ese mapa cuando quieras.
             </p>
           </div>
         </div>

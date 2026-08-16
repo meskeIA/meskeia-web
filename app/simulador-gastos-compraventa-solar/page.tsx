@@ -165,7 +165,7 @@ export default function SimuladorSolarPage() {
 
       {/* Aviso clave: quién vende decide el impuesto */}
       <div className={styles.ivaAviso} role="note">
-        <strong>💡 Clave del solar:</strong> a diferencia del suelo rústico, el terreno edificable <strong>no
+        <strong><span aria-hidden="true">💡</span> Clave del solar:</strong> a diferencia del suelo rústico, el terreno edificable <strong>no
         está exento de IVA</strong>. Si lo vende un <strong>promotor o empresario</strong> pagas IVA 21% + AJD;
         si lo vende un <strong>particular</strong>, pagas ITP. En ambos casos, al ser suelo urbano, el vendedor
         paga <strong>plusvalía municipal</strong>.
@@ -205,7 +205,7 @@ export default function SimuladorSolarPage() {
 
           {esEmpresario && (
             <div className={styles.renunciaAviso} role="note">
-              <strong>⚠️ Compra a promotor o empresa:</strong> el IVA del 21% es <strong>deducible</strong> si
+              <strong><span aria-hidden="true">⚠️</span> Compra a promotor o empresa:</strong> el IVA del 21% es <strong>deducible</strong> si
               eres empresario o autónomo y afectas el solar a una actividad sujeta a IVA (se recupera en el
               modelo 303). Si eres un <strong>particular que autopromueve su vivienda</strong>, el IVA no se
               deduce y es un mayor coste de la parcela.
@@ -261,7 +261,7 @@ export default function SimuladorSolarPage() {
             </div>
             {datosCcaaActual.tramosProgresivos && (
               <p className={styles.infoCcaaNote}>
-                ⚠️ Esta CCAA aplica escala progresiva ({datosCcaaActual.tramosProgresivos.map(t => `${t.tipo}%`).join(' → ')})
+                <span aria-hidden="true">⚠️</span> Esta CCAA aplica escala progresiva ({datosCcaaActual.tramosProgresivos.map(t => `${t.tipo}%`).join(' → ')})
               </p>
             )}
             <p className={styles.infoCcaaNote}>

@@ -401,7 +401,7 @@ export default function IdentificadorColorPage() {
                 El vídeo se procesa <strong>solo en tu dispositivo</strong> y nunca se envía a ningún servidor.
               </p>
               {errorCamara && (
-                <div className={styles.errorVisor} role="alert">⚠️ {errorCamara}</div>
+                <div className={styles.errorVisor} role="alert"><span aria-hidden="true">⚠️</span> {errorCamara}</div>
               )}
               <button type="button" className={styles.btnPrimario} onClick={iniciarCamara} aria-label="Activar cámara">
                 <span aria-hidden="true">📷</span> Activar cámara

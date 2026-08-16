@@ -757,15 +757,15 @@ export default function CalculadoraHorasPage() {
                   <td>
                     <strong>Se puede sumar directamente</strong>
                   </td>
-                  <td>❌ No, hay que llevar el acarreo de sesenta</td>
-                  <td>✅ Sí, se suma como cualquier decimal</td>
+                  <td><span aria-hidden="true">❌</span> No, hay que llevar el acarreo de sesenta</td>
+                  <td><span aria-hidden="true">✅</span> Sí, se suma como cualquier decimal</td>
                 </tr>
                 <tr>
                   <td>
                     <strong>Se puede multiplicar por una tarifa</strong>
                   </td>
-                  <td>❌ No, saldría un importe equivocado</td>
-                  <td>✅ Sí, es su uso principal</td>
+                  <td><span aria-hidden="true">❌</span> No, saldría un importe equivocado</td>
+                  <td><span aria-hidden="true">✅</span> Sí, es su uso principal</td>
                 </tr>
                 <tr>
                   <td>
@@ -1057,33 +1057,33 @@ export default function CalculadoraHorasPage() {
             </div>
             <ul className={styles.warningList}>
               <li>
-                <strong>❌ Sumar 7,45 + 2,30 en la calculadora del móvil:</strong> ese 9,75 no
+                <strong><span aria-hidden="true">❌</span> Sumar 7,45 + 2,30 en la calculadora del móvil:</strong> ese 9,75 no
                 existe. Son 10:15, es decir 10,25 horas decimales. Media hora larga de diferencia en
                 una sola suma.
               </li>
               <li>
-                <strong>❌ Multiplicar la tarifa por el formato sexagesimal:</strong> facturar 7:45 a
+                <strong><span aria-hidden="true">❌</span> Multiplicar la tarifa por el formato sexagesimal:</strong> facturar 7:45 a
                 40 € como si fueran 7,45 horas deja 12 € por el camino cada vez, y pasa desapercibido
                 mes tras mes.
               </li>
               <li>
-                <strong>❌ Restar sin tener en cuenta la medianoche:</strong> de 22:00 a 06:00 no son
+                <strong><span aria-hidden="true">❌</span> Restar sin tener en cuenta la medianoche:</strong> de 22:00 a 06:00 no son
                 menos dieciséis horas; el turno cruza al día siguiente y dura ocho.
               </li>
               <li>
-                <strong>❌ Olvidar la pausa:</strong> confundir horas de presencia con horas
+                <strong><span aria-hidden="true">❌</span> Olvidar la pausa:</strong> confundir horas de presencia con horas
                 efectivas infla el parte y convierte cualquier revisión en una discusión.
               </li>
               <li>
-                <strong>❌ Redondear cada día por separado:</strong> subir cinco días a la media hora
+                <strong><span aria-hidden="true">❌</span> Redondear cada día por separado:</strong> subir cinco días a la media hora
                 más cercana puede añadir más de una hora ficticia a la semana.
               </li>
               <li>
-                <strong>❌ Pasar minutos a decimal dividiendo entre cien:</strong> 20 minutos no son
+                <strong><span aria-hidden="true">❌</span> Pasar minutos a decimal dividiendo entre cien:</strong> 20 minutos no son
                 0,20 horas sino 0,33; el error se multiplica en cuanto hay muchas líneas.
               </li>
               <li>
-                <strong>❌ Fiar el total a la memoria del navegador:</strong> el parte semanal se
+                <strong><span aria-hidden="true">❌</span> Fiar el total a la memoria del navegador:</strong> el parte semanal se
                 guarda solo aquí. Si el dato importa, cópialo a tu hoja o a tu factura.
               </li>
             </ul>

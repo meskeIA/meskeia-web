@@ -389,13 +389,13 @@ export default function GuiaSeguridadInternetPage() {
         <p className={styles.ctaDesc}>Elige el primer paso según lo que más te preocupe ahora:</p>
         <div className={styles.ctaBotones}>
           <Link href="/evaluador-fortaleza-contrasena/" className={styles.ctaBtn}>
-            🔒 Prueba tu contraseña
+            <span aria-hidden="true">🔒</span> Prueba tu contraseña
           </Link>
           <Link href="/test-phishing/" className={styles.ctaBtnSecundario}>
-            🎣 Entrena contra el phishing
+            <span aria-hidden="true">🎣</span> Entrena contra el phishing
           </Link>
           <Link href="/generador-contrasenas/" className={styles.ctaBtnSecundario}>
-            🔑 Crea claves seguras
+            <span aria-hidden="true">🔑</span> Crea claves seguras
           </Link>
         </div>
       </section>

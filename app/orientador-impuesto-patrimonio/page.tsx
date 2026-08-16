@@ -208,7 +208,7 @@ export default function OrientadorImpuestoPatrimonioPage() {
             Mínimo exento aplicable: <strong>{formatCurrency(minimoExento)}</strong>
             {ccaa.foral && (
               <span className={styles.foralAviso}>
-                {' '}⚠️ Régimen foral: esta herramienta usa la normativa estatal. Consulta tu Hacienda foral para el cálculo exacto.
+                {' '}<span aria-hidden="true">⚠️</span> Régimen foral: esta herramienta usa la normativa estatal. Consulta tu Hacienda foral para el cálculo exacto.
               </span>
             )}
           </div>

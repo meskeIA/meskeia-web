@@ -411,7 +411,7 @@ export default function SimuladorModeloOsi() {
         <section className={styles.panel}>
           <div className={styles.controles}>
             <button type="button" className={styles.ctrlBtn} onClick={handleAnterior} disabled={frameIdx === 0}>
-              ◀ Anterior
+              <span aria-hidden="true">◀</span> Anterior
             </button>
             <button
               type="button"
@@ -419,7 +419,7 @@ export default function SimuladorModeloOsi() {
               onClick={handleSiguiente}
               disabled={frameIdx >= totalFrames - 1}
             >
-              Siguiente ▶
+              Siguiente <span aria-hidden="true">▶</span>
             </button>
             <button
               type="button"

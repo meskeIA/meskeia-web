@@ -603,6 +603,7 @@ export default function SimuladorPathfindingPage() {
             <button
               type="button"
               className={`${styles.algoritmoBtn} ${algoritmo === 'astar' ? styles.algoritmoActive : ''}`}
+              aria-pressed={algoritmo === 'astar'}
               onClick={() => {
                 setAlgoritmo('astar');
                 reset();
@@ -614,6 +615,7 @@ export default function SimuladorPathfindingPage() {
             <button
               type="button"
               className={`${styles.algoritmoBtn} ${algoritmo === 'dijkstra' ? styles.algoritmoActive : ''}`}
+              aria-pressed={algoritmo === 'dijkstra'}
               onClick={() => {
                 setAlgoritmo('dijkstra');
                 reset();
@@ -625,6 +627,7 @@ export default function SimuladorPathfindingPage() {
             <button
               type="button"
               className={`${styles.algoritmoBtn} ${algoritmo === 'bfs' ? styles.algoritmoActive : ''}`}
+              aria-pressed={algoritmo === 'bfs'}
               onClick={() => {
                 setAlgoritmo('bfs');
                 reset();
@@ -945,7 +948,7 @@ export default function SimuladorPathfindingPage() {
               muros. Cuando te mueves, recalcula. Es el uso más común del pathfinding.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Recalcular cada frame es caro: muchos juegos lo hacen cada pocos frames o solo si el
+              <span aria-hidden="true">💡</span> Recalcular cada frame es caro: muchos juegos lo hacen cada pocos frames o solo si el
               objetivo se ha movido bastante.
             </p>
           </div>
@@ -959,7 +962,7 @@ export default function SimuladorPathfindingPage() {
               mapa, prefiriendo caminos y evitando bosques o agua (terreno costoso).
             </p>
             <p className={styles.escenarioTip}>
-              💡 Con muchas unidades se combina A* con &laquo;flow fields&raquo; para no calcular una ruta por unidad.
+              <span aria-hidden="true">💡</span> Con muchas unidades se combina A* con &laquo;flow fields&raquo; para no calcular una ruta por unidad.
             </p>
           </div>
           <div className={styles.escenarioCard}>
@@ -972,7 +975,7 @@ export default function SimuladorPathfindingPage() {
               puntos de movimiento, y A* traza la ruta concreta al confirmar el destino.
             </p>
             <p className={styles.escenarioTip}>
-              💡 BFS es ideal aquí porque «N pasos» es exactamente lo que limita el movimiento.
+              <span aria-hidden="true">💡</span> BFS es ideal aquí porque «N pasos» es exactamente lo que limita el movimiento.
             </p>
           </div>
           <div className={styles.escenarioCard}>
@@ -985,7 +988,7 @@ export default function SimuladorPathfindingPage() {
               algoritmo es el mismo A*, pero los nodos son zonas en lugar de casillas.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Unity y Unreal traen sistemas de navmesh + A* listos para usar.
+              <span aria-hidden="true">💡</span> Unity y Unreal traen sistemas de navmesh + A* listos para usar.
             </p>
           </div>
         </div>
@@ -1001,7 +1004,7 @@ export default function SimuladorPathfindingPage() {
               descartando antes las zonas que se alejan del destino.
             </p>
             <p className={styles.faqTip}>
-              💡 Si pones la heurística a cero, A* se convierte exactamente en Dijkstra. Pruébalo
+              <span aria-hidden="true">💡</span> Si pones la heurística a cero, A* se convierte exactamente en Dijkstra. Pruébalo
               mentalmente: sin pista de dónde está la meta, toca explorar a ciegas.
             </p>
           </div>
@@ -1014,7 +1017,7 @@ export default function SimuladorPathfindingPage() {
               compara las rutas.
             </p>
             <p className={styles.faqTip}>
-              💡 En un mapa sin terrenos costosos y sin diagonales, BFS, Dijkstra y A* dan caminos de la
+              <span aria-hidden="true">💡</span> En un mapa sin terrenos costosos y sin diagonales, BFS, Dijkstra y A* dan caminos de la
               misma longitud; solo cambia cuánto exploran.
             </p>
           </div>
@@ -1027,7 +1030,7 @@ export default function SimuladorPathfindingPage() {
               nunca estime de más. Si lo hace, A* garantiza el camino óptimo.
             </p>
             <p className={styles.faqTip}>
-              💡 Si la heurística sobreestima, A* va más rápido pero puede devolver una ruta que no es
+              <span aria-hidden="true">💡</span> Si la heurística sobreestima, A* va más rápido pero puede devolver una ruta que no es
               la más corta. A veces se acepta ese cambio a propósito.
             </p>
           </div>
@@ -1039,7 +1042,7 @@ export default function SimuladorPathfindingPage() {
               Es lo que esperan los jugadores y evita que los enemigos parezcan atravesar paredes.
             </p>
             <p className={styles.faqTip}>
-              💡 Algunos juegos sí permiten cortar esquinas para rutas más fluidas; es una decisión de
+              <span aria-hidden="true">💡</span> Algunos juegos sí permiten cortar esquinas para rutas más fluidas; es una decisión de
               diseño.
             </p>
           </div>
@@ -1052,7 +1055,7 @@ export default function SimuladorPathfindingPage() {
               (una optimización de A* para rejillas uniformes).
             </p>
             <p className={styles.faqTip}>
-              💡 No existe «el mejor algoritmo» absoluto: depende de si hay meta fija, pesos, cuántos
+              <span aria-hidden="true">💡</span> No existe «el mejor algoritmo» absoluto: depende de si hay meta fija, pesos, cuántos
               agentes y cómo es el mapa.
             </p>
           </div>
@@ -1065,7 +1068,7 @@ export default function SimuladorPathfindingPage() {
               el comportamiento no es el esperado.
             </p>
             <p className={styles.faqTip}>
-              💡 Implementar A* a mano una vez es un ejercicio clásico y muy recomendable antes de usar
+              <span aria-hidden="true">💡</span> Implementar A* a mano una vez es un ejercicio clásico y muy recomendable antes de usar
               el del motor.
             </p>
           </div>

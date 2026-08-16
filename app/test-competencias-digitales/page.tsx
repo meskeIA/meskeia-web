@@ -877,23 +877,23 @@ export default function TestCompetenciasDigitalesPage() {
             </div>
             <ul className={styles.warningList}>
               <li>
-                <strong>❌ Tomarlo como una nota o un examen:</strong> es una foto orientativa para
+                <strong><span aria-hidden="true">❌</span> Tomarlo como una nota o un examen:</strong> es una foto orientativa para
                 mejorar, no una calificación ni una credencial.
               </li>
               <li>
-                <strong>❌ Sobreestimarte:</strong> marcar «Avanzado» porque «más o menos me
+                <strong><span aria-hidden="true">❌</span> Sobreestimarte:</strong> marcar «Avanzado» porque «más o menos me
                 defiendo». Si necesitas ayuda para hacerlo, tu tramo es el inferior.
               </li>
               <li>
-                <strong>❌ Querer el máximo en todo:</strong> agota y desmotiva. El objetivo por
+                <strong><span aria-hidden="true">❌</span> Querer el máximo en todo:</strong> agota y desmotiva. El objetivo por
                 contexto existe precisamente para evitarlo.
               </li>
               <li>
-                <strong>❌ Confundir usar mucho con ser competente:</strong> pasar horas en redes no
+                <strong><span aria-hidden="true">❌</span> Confundir usar mucho con ser competente:</strong> pasar horas en redes no
                 implica saber proteger tus datos o evaluar información.
               </li>
               <li>
-                <strong>❌ Hacerlo una vez y olvidarlo:</strong> el valor está en repetir y ver el
+                <strong><span aria-hidden="true">❌</span> Hacerlo una vez y olvidarlo:</strong> el valor está en repetir y ver el
                 progreso, no en la primera foto.
               </li>
             </ul>

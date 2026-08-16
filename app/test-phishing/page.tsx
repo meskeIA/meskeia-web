@@ -332,7 +332,7 @@ export default function TestPhishingPage() {
                   </div>
                 )}
                 <p className={styles.casoBody}>{caso.cuerpo}</p>
-                {caso.url && <div className={styles.casoEnlace}>🔗 {caso.url}</div>}
+                {caso.url && <div className={styles.casoEnlace}><span aria-hidden="true">🔗</span> {caso.url}</div>}
               </div>
             )}
           </div>

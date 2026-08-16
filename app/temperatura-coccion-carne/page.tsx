@@ -91,7 +91,7 @@ export default function TemperaturaCoccionCarnePage() {
                   <tr key={p.nombre} className={!p.seguro ? styles.filaNoSegura : ''}>
                     <td className={styles.celPunto}>
                       {p.nombre}
-                      {!p.seguro && <span className={styles.badgeRiesgo} title="Por debajo del mínimo seguro"> ⚠</span>}
+                      {!p.seguro && <span className={styles.badgeRiesgo} role="img" aria-label="Por debajo del mínimo seguro" title="Por debajo del mínimo seguro"> ⚠</span>}
                     </td>
                     <td className={styles.celTemp}>{p.tempC} °C</td>
                     <td>{p.tempF} °F</td>

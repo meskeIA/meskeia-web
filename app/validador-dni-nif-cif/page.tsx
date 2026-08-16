@@ -1176,35 +1176,35 @@ NIE:      X1234567 → 01234567 % 23 = 19 → "L" → X1234567L`}
           </div>
           <ul className={styles.warningList}>
             <li>
-              <strong>❌ Contar las posiciones empezando en 1:</strong> la cadena
+              <strong><span aria-hidden="true">❌</span> Contar las posiciones empezando en 1:</strong> la cadena
               TRWAGMYFPDXBNJZSQVHLCKE se indexa desde 0. Contar desde 1 desplaza la letra una
               posición y produce un resultado erróneo en todos los casos. Comprueba siempre que el
               resto 0 devuelve la T.
             </li>
             <li>
-              <strong>❌ Olvidar traducir el prefijo del NIE:</strong> aplicar el módulo 23
+              <strong><span aria-hidden="true">❌</span> Olvidar traducir el prefijo del NIE:</strong> aplicar el módulo 23
               directamente a los siete dígitos de un NIE, sin anteponer el 0, 1 o 2 según sea X, Y o
               Z, da una letra distinta a la real. Es el fallo más habitual en implementaciones
               caseras.
             </li>
             <li>
-              <strong>❌ Guardar el documento en un campo numérico:</strong> la base de datos elimina
+              <strong><span aria-hidden="true">❌</span> Guardar el documento en un campo numérico:</strong> la base de datos elimina
               los ceros iniciales y el registro deja de validar. Usa siempre un campo de texto de
               longitud fija y normaliza en la capa de entrada, no en la de almacenamiento.
             </li>
             <li>
-              <strong>❌ Aplicar al CIF el algoritmo del DNI:</strong> son sistemas de control
+              <strong><span aria-hidden="true">❌</span> Aplicar al CIF el algoritmo del DNI:</strong> son sistemas de control
               distintos. El CIF usa una suma ponderada tipo Luhn, no una división modular, y su
               carácter final puede ser letra o número según la naturaleza de la entidad.
             </li>
             <li>
-              <strong>❌ Confundir formato correcto con identidad verificada:</strong> que un
+              <strong><span aria-hidden="true">❌</span> Confundir formato correcto con identidad verificada:</strong> que un
               identificador supere la validación aritmética no acredita que exista ni que pertenezca
               a quien lo aporta. En operaciones con riesgo, exige documento o identificación
               electrónica.
             </li>
             <li>
-              <strong>❌ Usar identificadores ficticios fuera de un entorno de pruebas:</strong>
+              <strong><span aria-hidden="true">❌</span> Usar identificadores ficticios fuera de un entorno de pruebas:</strong>
               &nbsp;introducirlos en un formulario real, en una factura o en cualquier documento
               oficial no es una travesura técnica: es falsear datos ante terceros y puede constituir
               un delito de falsedad documental o de usurpación de identidad.

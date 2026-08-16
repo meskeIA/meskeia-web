@@ -526,7 +526,7 @@ export default function VisualizadorIluminacionPhongPage() {
               escenarios.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Hoy se combina con mapas de normales para fingir detalle sin más geometría.
+              <span aria-hidden="true">💡</span> Hoy se combina con mapas de normales para fingir detalle sin más geometría.
             </p>
           </div>
           <div className={styles.escenarioCard}>
@@ -539,7 +539,7 @@ export default function VisualizadorIluminacionPhongPage() {
               objetos antes de pasar a render fotorrealista. Sigue siendo útil para bocetos rápidos.
             </p>
             <p className={styles.escenarioTip}>
-              💡 El render final suele usar modelos físicos (PBR), pero Phong es perfecto para iterar.
+              <span aria-hidden="true">💡</span> El render final suele usar modelos físicos (PBR), pero Phong es perfecto para iterar.
             </p>
           </div>
           <div className={styles.escenarioCard}>
@@ -552,7 +552,7 @@ export default function VisualizadorIluminacionPhongPage() {
               yeso (sin destello) a una bola de billar o a un metal pulido (destello pequeño e intenso).
             </p>
             <p className={styles.escenarioTip}>
-              💡 Pon ks alto y brillo alto para metal; ks bajo y brillo bajo para superficies mates.
+              <span aria-hidden="true">💡</span> Pon ks alto y brillo alto para metal; ks bajo y brillo bajo para superficies mates.
             </p>
           </div>
           <div className={styles.escenarioCard}>
@@ -565,7 +565,7 @@ export default function VisualizadorIluminacionPhongPage() {
               Unity o Three.js: enseña las normales y los vectores de luz, vista y reflejo.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Entender Phong hace mucho más fácil el salto a modelos físicos como el PBR.
+              <span aria-hidden="true">💡</span> Entender Phong hace mucho más fácil el salto a modelos físicos como el PBR.
             </p>
           </div>
         </div>
@@ -582,7 +582,7 @@ export default function VisualizadorIluminacionPhongPage() {
               los gráficos por computador durante décadas.
             </p>
             <p className={styles.faqTip}>
-              💡 «Modelo de Phong» y «sombreado de Phong» son cosas distintas aunque relacionadas: uno es la
+              <span aria-hidden="true">💡</span> «Modelo de Phong» y «sombreado de Phong» son cosas distintas aunque relacionadas: uno es la
               fórmula de la luz, el otro es cómo se interpolan las normales.
             </p>
           </div>
@@ -596,7 +596,7 @@ export default function VisualizadorIluminacionPhongPage() {
               más brillante y se va oscureciendo hacia los bordes.
             </p>
             <p className={styles.faqTip}>
-              💡 Si N·L sale negativo, la cara está de espaldas a la luz: se recorta a 0 para no «iluminar
+              <span aria-hidden="true">💡</span> Si N·L sale negativo, la cara está de espaldas a la luz: se recorta a 0 para no «iluminar
               en negativo».
             </p>
           </div>
@@ -609,7 +609,7 @@ export default function VisualizadorIluminacionPhongPage() {
               cercano a 1. Ahí ves el destello brillante.
             </p>
             <p className={styles.faqTip}>
-              💡 Como el destello depende de V, se mueve cuando giras la cámara: es la pista de que algo es
+              <span aria-hidden="true">💡</span> Como el destello depende de V, se mueve cuando giras la cámara: es la pista de que algo es
               brillante y no mate.
             </p>
           </div>
@@ -622,7 +622,7 @@ export default function VisualizadorIluminacionPhongPage() {
               punto donde R·V ≈ 1 brilla, dando un destello pequeño e intenso (metal pulido o vidrio).
             </p>
             <p className={styles.faqTip}>
-              💡 El exponente de brillo es el control que más cambia la «sensación de material» en Phong.
+              <span aria-hidden="true">💡</span> El exponente de brillo es el control que más cambia la «sensación de material» en Phong.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -634,7 +634,7 @@ export default function VisualizadorIluminacionPhongPage() {
               realistas en ángulos rasantes. Por eso fue el modelo por defecto del pipeline fijo de OpenGL.
             </p>
             <p className={styles.faqTip}>
-              💡 Este visualizador usa el Phong clásico (R·V) por ser el más directo de explicar.
+              <span aria-hidden="true">💡</span> Este visualizador usa el Phong clásico (R·V) por ser el más directo de explicar.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -646,7 +646,7 @@ export default function VisualizadorIluminacionPhongPage() {
               punto de partida antes de pasar a modelos más avanzados.
             </p>
             <p className={styles.faqTip}>
-              💡 Casi todos los cursos de gráficos empiezan por Phong precisamente por eso.
+              <span aria-hidden="true">💡</span> Casi todos los cursos de gráficos empiezan por Phong precisamente por eso.
             </p>
           </div>
         </div>

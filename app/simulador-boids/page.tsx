@@ -509,7 +509,7 @@ export default function SimuladorBoidsPage() {
               steering behaviors.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Suelen añadirse reglas extra: huir del jugador, evitar obstáculos o buscar comida.
+              <span aria-hidden="true">💡</span> Suelen añadirse reglas extra: huir del jugador, evitar obstáculos o buscar comida.
             </p>
           </div>
           <div className={styles.escenarioCard}>
@@ -523,7 +523,7 @@ export default function SimuladorBoidsPage() {
               animación en variantes del mismo modelo.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Para multitudes humanas se combinan con pathfinding y evitación de colisiones.
+              <span aria-hidden="true">💡</span> Para multitudes humanas se combinan con pathfinding y evitación de colisiones.
             </p>
           </div>
           <div className={styles.escenarioCard}>
@@ -537,7 +537,7 @@ export default function SimuladorBoidsPage() {
               mirando a sus vecinos.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Trabajar con reglas locales hace al enjambre robusto: si falla un agente, el resto sigue.
+              <span aria-hidden="true">💡</span> Trabajar con reglas locales hace al enjambre robusto: si falla un agente, el resto sigue.
             </p>
           </div>
           <div className={styles.escenarioCard}>
@@ -551,7 +551,7 @@ export default function SimuladorBoidsPage() {
               exacto de cada persona.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Aquí las reglas se afinan con datos reales de cómo se mueve la gente.
+              <span aria-hidden="true">💡</span> Aquí las reglas se afinan con datos reales de cómo se mueve la gente.
             </p>
           </div>
         </div>
@@ -566,7 +566,7 @@ export default function SimuladorBoidsPage() {
               comportamiento emergente: surge del conjunto de decisiones locales, no de un plan central.
             </p>
             <p className={styles.faqTip}>
-              💡 Es lo mismo que pasa con los estorninos reales: no siguen a un líder, reaccionan a sus
+              <span aria-hidden="true">💡</span> Es lo mismo que pasa con los estorninos reales: no siguen a un líder, reaccionan a sus
               vecinos próximos.
             </p>
           </div>
@@ -578,7 +578,7 @@ export default function SimuladorBoidsPage() {
               muchos grupitos independientes; con un radio grande tiende a salir una única bandada grande.
             </p>
             <p className={styles.faqTip}>
-              💡 Aumentar el radio también encarece el cálculo: hay más vecinos que considerar.
+              <span aria-hidden="true">💡</span> Aumentar el radio también encarece el cálculo: hay más vecinos que considerar.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -589,7 +589,7 @@ export default function SimuladorBoidsPage() {
               cuadruplica. Por eso una bandada moderada va fluida y una enorme puede ir a tirones.
             </p>
             <p className={styles.faqTip}>
-              💡 Para escalar se divide el espacio en una rejilla (spatial hashing) y solo se miran las
+              <span aria-hidden="true">💡</span> Para escalar se divide el espacio en una rejilla (spatial hashing) y solo se miran las
               celdas cercanas.
             </p>
           </div>
@@ -602,7 +602,7 @@ export default function SimuladorBoidsPage() {
               se queden quietos).
             </p>
             <p className={styles.faqTip}>
-              💡 Es uno de los detalles que más se olvidan al programar boids por primera vez.
+              <span aria-hidden="true">💡</span> Es uno de los detalles que más se olvidan al programar boids por primera vez.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -614,7 +614,7 @@ export default function SimuladorBoidsPage() {
               mejor forma de entenderlo.
             </p>
             <p className={styles.faqTip}>
-              💡 Si todo se apelotona, sube la separación; si se dispersa, sube la cohesión.
+              <span aria-hidden="true">💡</span> Si todo se apelotona, sube la separación; si se dispersa, sube la cohesión.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -625,7 +625,7 @@ export default function SimuladorBoidsPage() {
               fueron el punto de partida de toda una familia de técnicas de comportamiento colectivo.
             </p>
             <p className={styles.faqTip}>
-              💡 Reynolds amplió el modelo con más «steering behaviors»: perseguir, huir, evitar
+              <span aria-hidden="true">💡</span> Reynolds amplió el modelo con más «steering behaviors»: perseguir, huir, evitar
               obstáculos, deambular…
             </p>
           </div>

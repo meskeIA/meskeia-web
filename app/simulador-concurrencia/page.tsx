@@ -535,21 +535,21 @@ export default function SimuladorConcurrencia() {
         {/* Avisos */}
         {sim.deadlock && (
           <div className={`${styles.banner} ${styles.bannerDanger}`} role="alert">
-            <strong>🔒 Interbloqueo (deadlock) detectado.</strong> Todos los hilos vivos están
+            <strong><span aria-hidden="true">🔒</span> Interbloqueo (deadlock) detectado.</strong> Todos los hilos vivos están
             bloqueados esperando un recurso que retiene otro. Nadie puede avanzar: se ha formado una
             espera circular.
           </div>
         )}
         {sim.carrera && (
           <div className={`${styles.banner} ${styles.bannerWarning}`} role="alert">
-            <strong>⚠️ Condición de carrera.</strong> Dos hilos han estado en la sección crítica a la
+            <strong><span aria-hidden="true">⚠️</span> Condición de carrera.</strong> Dos hilos han estado en la sección crítica a la
             vez. Sin exclusión mutua, el resultado depende del orden de ejecución y los datos pueden
             corromperse.
           </div>
         )}
         {todosTerminados && !sim.deadlock && (
           <div className={`${styles.banner} ${styles.bannerOk}`} role="status">
-            <strong>✅ Todos los hilos han terminado</strong> tras {sim.pasos} paso(s) sin
+            <strong><span aria-hidden="true">✅</span> Todos los hilos han terminado</strong> tras {sim.pasos} paso(s) sin
             interbloqueo.
           </div>
         )}
@@ -588,7 +588,7 @@ export default function SimuladorConcurrencia() {
                     onClick={() => handlePasoHilo(h.id)}
                     disabled={h.estado !== 'listo' || sim.deadlock}
                   >
-                    ▶ Ejecutar paso
+                    <span aria-hidden="true">▶</span> Ejecutar paso
                   </button>
                 </div>
               );

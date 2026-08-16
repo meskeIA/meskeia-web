@@ -78,9 +78,9 @@ export default function CalculadoraCaducidadPage() {
               <thead>
                 <tr>
                   <th scope="col">Alimento</th>
-                  <th scope="col">❄️ Nevera</th>
-                  <th scope="col">🧊 Congelador</th>
-                  <th scope="col">🗄️ Despensa</th>
+                  <th scope="col"><span aria-hidden="true">❄️</span> Nevera</th>
+                  <th scope="col"><span aria-hidden="true">🧊</span> Congelador</th>
+                  <th scope="col"><span aria-hidden="true">🗄️</span> Despensa</th>
                 </tr>
               </thead>
               <tbody>

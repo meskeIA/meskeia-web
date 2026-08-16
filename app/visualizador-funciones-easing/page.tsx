@@ -577,7 +577,7 @@ export default function VisualizadorFuncionesEasingPage() {
               <em>easeOut</em> es el más usado porque imita cómo se detiene algo real.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Para microinteracciones de 150–300 ms casi cualquier ease out queda bien; lo importante
+              <span aria-hidden="true">💡</span> Para microinteracciones de 150–300 ms casi cualquier ease out queda bien; lo importante
               es que no sea linear.
             </p>
           </div>
@@ -592,7 +592,7 @@ export default function VisualizadorFuncionesEasingPage() {
               construye en gran parte con easing.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Combinar escala + posición con easings distintas multiplica la sensación de vida.
+              <span aria-hidden="true">💡</span> Combinar escala + posición con easings distintas multiplica la sensación de vida.
             </p>
           </div>
           <div className={styles.escenarioCard}>
@@ -606,7 +606,7 @@ export default function VisualizadorFuncionesEasingPage() {
               corte brusco.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Para recorridos por una trayectoria curva, el easing controla el ritmo y la Bézier, la
+              <span aria-hidden="true">💡</span> Para recorridos por una trayectoria curva, el easing controla el ritmo y la Bézier, la
               forma del camino.
             </p>
           </div>
@@ -621,7 +621,7 @@ export default function VisualizadorFuncionesEasingPage() {
               editor de Bézier cúbica.
             </p>
             <p className={styles.escenarioTip}>
-              💡 La regla «ease todo» de los animadores: casi nada se mueve a velocidad constante en la
+              <span aria-hidden="true">💡</span> La regla «ease todo» de los animadores: casi nada se mueve a velocidad constante en la
               naturaleza.
             </p>
           </div>
@@ -638,7 +638,7 @@ export default function VisualizadorFuncionesEasingPage() {
               a ritmo constante, sigues la curva: arranca o frena según la función elegida.
             </p>
             <p className={styles.faqTip}>
-              💡 La misma fórmula sirve para posición, escala, opacidad o color (interpolando cada canal).
+              <span aria-hidden="true">💡</span> La misma fórmula sirve para posición, escala, opacidad o color (interpolando cada canal).
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -650,7 +650,7 @@ export default function VisualizadorFuncionesEasingPage() {
               rotaciones continuas o cintas.
             </p>
             <p className={styles.faqTip}>
-              💡 Compara en la gráfica cualquier curva con la diagonal: cuanto más se aleja de la recta,
+              <span aria-hidden="true">💡</span> Compara en la gráfica cualquier curva con la diagonal: cuanto más se aleja de la recta,
               más cambia el ritmo.
             </p>
           </div>
@@ -663,7 +663,7 @@ export default function VisualizadorFuncionesEasingPage() {
               <code>ease-in</code> o <code>ease-out</code> de CSS son, por dentro, cubic-bezier concretas.
             </p>
             <p className={styles.faqTip}>
-              💡 back y elastic no se pueden expresar con un solo cubic-bezier porque se salen del rango;
+              <span aria-hidden="true">💡</span> back y elastic no se pueden expresar con un solo cubic-bezier porque se salen del rango;
               en CSS se logran con keyframes o con la nueva función <code>linear()</code>.
             </p>
           </div>
@@ -676,7 +676,7 @@ export default function VisualizadorFuncionesEasingPage() {
               el arranque como el frenado.
             </p>
             <p className={styles.faqTip}>
-              💡 Regla rápida: lo que entra, easeOut; lo que sale, easeIn; lo que va de A a B, easeInOut.
+              <span aria-hidden="true">💡</span> Regla rápida: lo que entra, easeOut; lo que sale, easeIn; lo que va de A a B, easeInOut.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -688,7 +688,7 @@ export default function VisualizadorFuncionesEasingPage() {
               del recorrido.
             </p>
             <p className={styles.faqTip}>
-              💡 No las apliques a propiedades que no admiten salirse de su rango, como una opacidad
+              <span aria-hidden="true">💡</span> No las apliques a propiedades que no admiten salirse de su rango, como una opacidad
               (0–1) o un tamaño que no puede ser negativo.
             </p>
           </div>
@@ -701,7 +701,7 @@ export default function VisualizadorFuncionesEasingPage() {
               permite replicarlas y combinarlas a mano.
             </p>
             <p className={styles.faqTip}>
-              💡 El catálogo «estándar» (easeInQuad, easeOutCubic…) viene de las ecuaciones que popularizó
+              <span aria-hidden="true">💡</span> El catálogo «estándar» (easeInQuad, easeOutCubic…) viene de las ecuaciones que popularizó
               Robert Penner y se reutiliza en casi todas las librerías de animación.
             </p>
           </div>

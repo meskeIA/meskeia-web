@@ -757,7 +757,7 @@ export default function SimuladorAutomatasCelularesPage() {
               un autómata celular. Con pocos parámetros se obtienen mapas distintos cada partida.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Cambia la densidad inicial: por debajo de ~40% salen cavernas amplias; por encima,
+              <span aria-hidden="true">💡</span> Cambia la densidad inicial: por debajo de ~40% salen cavernas amplias; por encima,
               túneles estrechos.
             </p>
           </div>
@@ -774,7 +774,7 @@ export default function SimuladorAutomatasCelularesPage() {
               misma regla local.
             </p>
             <p className={styles.escenarioTip}>
-              💡 El interés es ver cómo el comportamiento global surge sin un &laquo;director&raquo; que lo
+              <span aria-hidden="true">💡</span> El interés es ver cómo el comportamiento global surge sin un &laquo;director&raquo; que lo
               coordine.
             </p>
           </div>
@@ -790,7 +790,7 @@ export default function SimuladorAutomatasCelularesPage() {
               patrones que evolucionan solos, a medio camino entre el azar y la regla.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Pequeños cambios en la regla o el estado inicial producen resultados visuales muy
+              <span aria-hidden="true">💡</span> Pequeños cambios en la regla o el estado inicial producen resultados visuales muy
               distintos.
             </p>
           </div>
@@ -806,7 +806,7 @@ export default function SimuladorAutomatasCelularesPage() {
               estado según sus vecinas: un marco sencillo para entender cómo «contagia» un fenómeno.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Son modelos simplificados: útiles para intuir dinámicas, no para predicciones
+              <span aria-hidden="true">💡</span> Son modelos simplificados: útiles para intuir dinámicas, no para predicciones
               precisas.
             </p>
           </div>
@@ -823,7 +823,7 @@ export default function SimuladorAutomatasCelularesPage() {
               produjeran un comportamiento rico e impredecible.
             </p>
             <p className={styles.faqTip}>
-              💡 No hace falta entender matemáticas avanzadas: las reglas caben en dos frases y aun así
+              <span aria-hidden="true">💡</span> No hace falta entender matemáticas avanzadas: las reglas caben en dos frases y aun así
               generan complejidad infinita.
             </p>
           </div>
@@ -836,7 +836,7 @@ export default function SimuladorAutomatasCelularesPage() {
               otra cantidad de vecinas hace que la célula muera o siga muerta.
             </p>
             <p className={styles.faqTip}>
-              💡 Cambiando esos números se obtienen otros autómatas, como HighLife (B36/S23), que tiene
+              <span aria-hidden="true">💡</span> Cambiando esos números se obtienen otros autómatas, como HighLife (B36/S23), que tiene
               un patrón que se autorreplica.
             </p>
           </div>
@@ -849,7 +849,7 @@ export default function SimuladorAutomatasCelularesPage() {
               ortogonales.
             </p>
             <p className={styles.faqTip}>
-              💡 Con vecindad de Moore, el número máximo de vecinas vivas es 8, lo que define el rango
+              <span aria-hidden="true">💡</span> Con vecindad de Moore, el número máximo de vecinas vivas es 8, lo que define el rango
               de las reglas.
             </p>
           </div>
@@ -862,7 +862,7 @@ export default function SimuladorAutomatasCelularesPage() {
               con el izquierdo y el de arriba con el de abajo, como si la rejilla fuera una rosquilla.
             </p>
             <p className={styles.faqTip}>
-              💡 Para que un planeador no se rompa al llegar al borde, colócalo lejos de los límites o
+              <span aria-hidden="true">💡</span> Para que un planeador no se rompa al llegar al borde, colócalo lejos de los límites o
               usa una rejilla grande.
             </p>
           </div>
@@ -875,7 +875,7 @@ export default function SimuladorAutomatasCelularesPage() {
               vacíen, condensando el ruido aleatorio en cavernas compactas en pocos pasos.
             </p>
             <p className={styles.faqTip}>
-              💡 Es una regla &laquo;de suavizado&raquo;: tras unas pocas iteraciones el resultado se estabiliza
+              <span aria-hidden="true">💡</span> Es una regla &laquo;de suavizado&raquo;: tras unas pocas iteraciones el resultado se estabiliza
               y deja de cambiar.
             </p>
           </div>
@@ -888,7 +888,7 @@ export default function SimuladorAutomatasCelularesPage() {
               algoritmo, aunque hacerlo a mano sería extraordinariamente laborioso.
             </p>
             <p className={styles.faqTip}>
-              💡 La gente ha llegado a construir un &laquo;Juego de la Vida dentro del Juego de la Vida&raquo; y
+              <span aria-hidden="true">💡</span> La gente ha llegado a construir un &laquo;Juego de la Vida dentro del Juego de la Vida&raquo; y
               hasta relojes digitales funcionales.
             </p>
           </div>

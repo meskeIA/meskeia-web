@@ -241,7 +241,7 @@ export default function DafRetroalimentacionPage() {
             </label>
 
             {errorMic && (
-              <div className={styles.errorMic} role="alert">⚠️ {errorMic}</div>
+              <div className={styles.errorMic} role="alert"><span aria-hidden="true">⚠️</span> {errorMic}</div>
             )}
 
             <button

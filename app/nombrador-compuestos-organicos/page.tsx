@@ -1014,6 +1014,7 @@ export default function NombradorCompuestosOrganicosPage() {
                         <button
                           type="button"
                           className={`${styles.carbono} ${esGrupo ? styles.carbonoGrupo : ''}`}
+                          aria-pressed={esGrupo}
                           onClick={() => alternarSustituyente(pos)}
                           aria-label={`Carbono ${pos} del dibujo: añadir o quitar ${sustSeleccionado}`}
                         >

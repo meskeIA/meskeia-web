@@ -819,7 +819,7 @@ export default function CalculadoraGastosCompartidosPage() {
       >
 
         {/* Tabla comparativa métodos */}
-        <h3 className={styles.eduTitle}>⚖️ Métodos para repartir un gasto entre varias personas</h3>
+        <h3 className={styles.eduTitle}><span aria-hidden="true">⚖️</span> Métodos para repartir un gasto entre varias personas</h3>
         <div className={styles.tableWrapper}>
           <table className={styles.comparativaTable}>
             <thead>
@@ -865,7 +865,7 @@ export default function CalculadoraGastosCompartidosPage() {
         </div>
 
         {/* Casos de uso */}
-        <h3 className={styles.eduTitle}>💼 Cuatro situaciones donde las cuentas se enredan</h3>
+        <h3 className={styles.eduTitle}><span aria-hidden="true">💼</span> Cuatro situaciones donde las cuentas se enredan</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
@@ -898,7 +898,7 @@ export default function CalculadoraGastosCompartidosPage() {
         </div>
 
         {/* FAQ */}
-        <h3 className={styles.eduTitle}>❓ Preguntas frecuentes sobre gastos compartidos</h3>
+        <h3 className={styles.eduTitle}><span aria-hidden="true">❓</span> Preguntas frecuentes sobre gastos compartidos</h3>
         <div className={styles.faqList}>
           <div className={styles.faqItem}>
             <h4>¿Por qué importa el número de transferencias?</h4>
@@ -927,7 +927,7 @@ export default function CalculadoraGastosCompartidosPage() {
         </div>
 
         {/* Guía paso a paso */}
-        <h3 className={styles.eduTitle}>📋 Cómo llevar las cuentas de un grupo sin discusiones</h3>
+        <h3 className={styles.eduTitle}><span aria-hidden="true">📋</span> Cómo llevar las cuentas de un grupo sin discusiones</h3>
         <div className={styles.stepGuide}>
           <div className={styles.step}>
             <div className={styles.stepNumber}>1</div>
@@ -967,7 +967,7 @@ export default function CalculadoraGastosCompartidosPage() {
         </div>
 
         {/* Tips */}
-        <h3 className={styles.eduTitle}>✅ Seis costumbres que evitan los conflictos de dinero en grupo</h3>
+        <h3 className={styles.eduTitle}><span aria-hidden="true">✅</span> Seis costumbres que evitan los conflictos de dinero en grupo</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">📲</span>

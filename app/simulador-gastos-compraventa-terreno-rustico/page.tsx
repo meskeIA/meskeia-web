@@ -163,7 +163,7 @@ export default function SimuladorTerrenoRusticoPage() {
 
       {/* Aviso clave: exención de IVA y sin plusvalía */}
       <div className={styles.ivaAviso} role="note">
-        <strong>💡 Clave de la finca rústica:</strong> el terreno rústico no edificable está <strong>exento de
+        <strong><span aria-hidden="true">💡</span> Clave de la finca rústica:</strong> el terreno rústico no edificable está <strong>exento de
         IVA</strong>, así que por norma general se paga <strong>ITP</strong>, no IVA. Y al ser suelo rústico,
         el vendedor <strong>no paga plusvalía municipal</strong> (el IIVTNU solo grava suelo urbano).
       </div>
@@ -202,7 +202,7 @@ export default function SimuladorTerrenoRusticoPage() {
 
           {esRenuncia && (
             <div className={styles.renunciaAviso} role="note">
-              <strong>⚠️ Renuncia a la exención de IVA (Art. 20.Dos LIVA):</strong> solo es posible cuando
+              <strong><span aria-hidden="true">⚠️</span> Renuncia a la exención de IVA (Art. 20.Dos LIVA):</strong> solo es posible cuando
               comprador y vendedor son empresarios o profesionales con derecho a deducción (por ejemplo, un
               agricultor en régimen general que afecta la finca a su explotación). El IVA se autoliquida por
               <strong> inversión del sujeto pasivo</strong> y es deducible si tienes derecho. A cambio, la
@@ -260,7 +260,7 @@ export default function SimuladorTerrenoRusticoPage() {
             </div>
             {datosCcaaActual.tramosProgresivos && (
               <p className={styles.infoCcaaNote}>
-                ⚠️ Esta CCAA aplica escala progresiva ({datosCcaaActual.tramosProgresivos.map(t => `${t.tipo}%`).join(' → ')})
+                <span aria-hidden="true">⚠️</span> Esta CCAA aplica escala progresiva ({datosCcaaActual.tramosProgresivos.map(t => `${t.tipo}%`).join(' → ')})
               </p>
             )}
             <p className={styles.infoCcaaNote}>

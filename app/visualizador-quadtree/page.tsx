@@ -616,7 +616,7 @@ export default function VisualizadorQuadtreePage() {
               es el primer filtro rápido antes de la comprobación precisa.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Si los objetos se mueven cada fotograma, el árbol se reconstruye o se actualiza en
+              <span aria-hidden="true">💡</span> Si los objetos se mueven cada fotograma, el árbol se reconstruye o se actualiza en
               cada frame.
             </p>
           </div>
@@ -631,7 +631,7 @@ export default function VisualizadorQuadtreePage() {
               el área visible.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Es la misma idea que usan los mapas web para mostrar solo los puntos del recuadro
+              <span aria-hidden="true">💡</span> Es la misma idea que usan los mapas web para mostrar solo los puntos del recuadro
               visible.
             </p>
           </div>
@@ -646,7 +646,7 @@ export default function VisualizadorQuadtreePage() {
               bordes, ahorrando datos.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Aquí el criterio para subdividir no es la cantidad de puntos, sino la variación de
+              <span aria-hidden="true">💡</span> Aquí el criterio para subdividir no es la cantidad de puntos, sino la variación de
               color.
             </p>
           </div>
@@ -661,7 +661,7 @@ export default function VisualizadorQuadtreePage() {
               bajando el coste de O(n²) a O(n log n).
             </p>
             <p className={styles.escenarioTip}>
-              💡 Es uno de los usos más elegantes del quadtree fuera de los videojuegos.
+              <span aria-hidden="true">💡</span> Es uno de los usos más elegantes del quadtree fuera de los videojuegos.
             </p>
           </div>
         </div>
@@ -677,7 +677,7 @@ export default function VisualizadorQuadtreePage() {
               lugar de recorrer la lista completa.
             </p>
             <p className={styles.faqTip}>
-              💡 En esta app puedes ver «nodos visitados» frente a «comprobaciones por fuerza bruta»:
+              <span aria-hidden="true">💡</span> En esta app puedes ver «nodos visitados» frente a «comprobaciones por fuerza bruta»:
               cuantos más puntos haya, mayor es la diferencia.
             </p>
           </div>
@@ -689,7 +689,7 @@ export default function VisualizadorQuadtreePage() {
               tres dimensiones es el octree, que divide cada caja en ocho octantes.
             </p>
             <p className={styles.faqTip}>
-              💡 Un quadtree sirve para juegos y mapas 2D; un octree, para mundos y físicas 3D.
+              <span aria-hidden="true">💡</span> Un quadtree sirve para juegos y mapas 2D; un octree, para mundos y físicas 3D.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -701,7 +701,7 @@ export default function VisualizadorQuadtreePage() {
               esta app y observa cómo cambian los nodos y la profundidad.
             </p>
             <p className={styles.faqTip}>
-              💡 No existe un valor universal: ajústalo midiendo el rendimiento con tus propios datos.
+              <span aria-hidden="true">💡</span> No existe un valor universal: ajústalo midiendo el rendimiento con tus propios datos.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -713,7 +713,7 @@ export default function VisualizadorQuadtreePage() {
               diseño más importantes al usar quadtrees en un juego.
             </p>
             <p className={styles.faqTip}>
-              💡 Reconstruir todo cada frame es válido si el número de objetos no es enorme.
+              <span aria-hidden="true">💡</span> Reconstruir todo cada frame es válido si el número de objetos no es enorme.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -725,7 +725,7 @@ export default function VisualizadorQuadtreePage() {
               no contarlo dos veces). Esta app trabaja con puntos para centrarse en la idea base.
             </p>
             <p className={styles.faqTip}>
-              💡 En motores reales se suele usar el rectángulo envolvente del objeto, no un punto.
+              <span aria-hidden="true">💡</span> En motores reales se suele usar el rectángulo envolvente del objeto, no un punto.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -737,7 +737,7 @@ export default function VisualizadorQuadtreePage() {
               pobladas que otras, porque subdivide solo donde hace falta.
             </p>
             <p className={styles.faqTip}>
-              💡 Mide siempre: la estructura «teóricamente mejor» no siempre gana en tu caso concreto.
+              <span aria-hidden="true">💡</span> Mide siempre: la estructura «teóricamente mejor» no siempre gana en tu caso concreto.
             </p>
           </div>
         </div>

@@ -506,7 +506,7 @@ export default function SimuladorProgramacionDinamica() {
           <div className={styles.explicacion} role="status" aria-live="polite">
             {completado ? (
               <span>
-                <strong>✅ Tabla completa.</strong> {tabla.solucionTexto}
+                <strong><span aria-hidden="true">✅</span> Tabla completa.</strong> {tabla.solucionTexto}
               </span>
             ) : pasoSiguiente ? (
               <span>
@@ -533,7 +533,7 @@ export default function SimuladorProgramacionDinamica() {
               }}
               disabled={pasoActual === 0}
             >
-              ◀ Anterior
+              <span aria-hidden="true">◀</span> Anterior
             </button>
             <button
               type="button"
@@ -541,7 +541,7 @@ export default function SimuladorProgramacionDinamica() {
               onClick={() => setPasoActual((p) => Math.min(totalPasos, p + 1))}
               disabled={completado}
             >
-              Siguiente ▶
+              Siguiente <span aria-hidden="true">▶</span>
             </button>
             <button
               type="button"

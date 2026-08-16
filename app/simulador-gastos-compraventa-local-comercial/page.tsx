@@ -286,7 +286,7 @@ export default function SimuladorLocalComercialPage() {
 
       {/* Aviso IVA deducible */}
       <div className={styles.ivaAviso} role="note">
-        <strong>💡 Si eres empresa o autónomo:</strong> el IVA soportado en la compra de un local comercial
+        <strong><span aria-hidden="true">💡</span> Si eres empresa o autónomo:</strong> el IVA soportado en la compra de un local comercial
         puede ser <strong>deducible</strong> si tu actividad está sujeta a IVA. Por eso, en segunda mano entre
         profesionales, muchas veces conviene <strong>renunciar a la exención de IVA</strong> para no pagar un ITP
         que no se recupera. Consulta con tu asesor fiscal antes de decidir.
@@ -336,7 +336,7 @@ export default function SimuladorLocalComercialPage() {
 
           {esRenuncia && (
             <div className={styles.renunciaAviso} role="note">
-              <strong>⚠️ Renuncia a la exención de IVA (Art. 20.Dos LIVA):</strong> solo es posible cuando
+              <strong><span aria-hidden="true">⚠️</span> Renuncia a la exención de IVA (Art. 20.Dos LIVA):</strong> solo es posible cuando
               comprador y vendedor son empresarios o profesionales con derecho a deducción. El IVA se autoliquida
               por <strong>inversión del sujeto pasivo</strong> (no se paga al vendedor) y es deducible si tienes
               derecho. A cambio, la escritura tributa por AJD, que <strong>muchas CCAA aplican a un tipo
@@ -393,7 +393,7 @@ export default function SimuladorLocalComercialPage() {
             </div>
             {datosCcaaActual.tramosProgresivos && (
               <p className={styles.infoCcaaNote}>
-                ⚠️ Esta CCAA aplica escala progresiva ({datosCcaaActual.tramosProgresivos.map(t => `${t.tipo}%`).join(' → ')})
+                <span aria-hidden="true">⚠️</span> Esta CCAA aplica escala progresiva ({datosCcaaActual.tramosProgresivos.map(t => `${t.tipo}%`).join(' → ')})
               </p>
             )}
             <p className={styles.infoCcaaNote}>

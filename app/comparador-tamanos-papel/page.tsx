@@ -1150,10 +1150,10 @@ export default function ComparadorTamanosPapelPage() {
                   </tr>
                   <tr>
                     <th scope="row">¿Se conserva al doblar?</th>
-                    <td>✅ Sí</td>
-                    <td>✅ Sí</td>
-                    <td>✅ Sí</td>
-                    <td>❌ No: medio Carta es 8,5 × 5,5, otra proporción</td>
+                    <td><span aria-hidden="true">✅</span> Sí</td>
+                    <td><span aria-hidden="true">✅</span> Sí</td>
+                    <td><span aria-hidden="true">✅</span> Sí</td>
+                    <td><span aria-hidden="true">❌</span> No: medio Carta es 8,5 × 5,5, otra proporción</td>
                   </tr>
                   <tr>
                     <th scope="row">Formato de referencia</th>
@@ -1424,40 +1424,40 @@ export default function ComparadorTamanosPapelPage() {
               <strong>Errores comunes al trabajar con formatos de papel</strong>
               <ul>
                 <li>
-                  <strong>❌ Dar por hecho que «folio» es un tamaño concreto:</strong> hoy significa
+                  <strong><span aria-hidden="true">❌</span> Dar por hecho que «folio» es un tamaño concreto:</strong> hoy significa
                   A4 en el habla corriente, pero el folio histórico medía 215 × 315 mm. En un pliego
                   de condiciones o un documento antiguo, confirma las medidas antes de maquetar.
                 </li>
                 <li>
-                  <strong>❌ Imprimir un Carta en A4 a «tamaño real»:</strong> se pierden 6 mm del
+                  <strong><span aria-hidden="true">❌</span> Imprimir un Carta en A4 a «tamaño real»:</strong> se pierden 6 mm del
                   borde derecho, justo donde suelen caer los números de las tablas. Reduce al 97,2 %
                   y activa el centrado.
                 </li>
                 <li>
-                  <strong>❌ Confundir «Oficio» con «Legal»:</strong> 216 × 340 mm frente a 216 × 356
+                  <strong><span aria-hidden="true">❌</span> Confundir «Oficio» con «Legal»:</strong> 216 × 340 mm frente a 216 × 356
                   mm. Los 16 mm de diferencia bastan para descolocar un pie de página o cortar la
                   última fila de una tabla.
                 </li>
                 <li>
-                  <strong>❌ Pedir «un A4 en píxeles» sin decir la resolución:</strong> la respuesta
+                  <strong><span aria-hidden="true">❌</span> Pedir «un A4 en píxeles» sin decir la resolución:</strong> la respuesta
                   varía entre 595 y 4.961 px de ancho. Sin DPI, el dato no significa nada.
                 </li>
                 <li>
-                  <strong>❌ Diseñar hasta el borde exacto de la hoja:</strong> la impresora reserva
+                  <strong><span aria-hidden="true">❌</span> Diseñar hasta el borde exacto de la hoja:</strong> la impresora reserva
                   de 3 a 15 mm no imprimibles. Todo lo que quede fuera de esa zona desaparece sin
                   aviso.
                 </li>
                 <li>
-                  <strong>❌ Ampliar una imagen pequeña para llenar un A3:</strong> una foto de 1.200
+                  <strong><span aria-hidden="true">❌</span> Ampliar una imagen pequeña para llenar un A3:</strong> una foto de 1.200
                   px de ancho queda a 103 DPI en A3. Ampliar no crea información: el resultado se ve
                   borroso por mucho que el archivo pese más al reescalarlo.
                 </li>
                 <li>
-                  <strong>❌ Meter un A4 sin doblar en un sobre C5:</strong> el C5 mide 162 × 229 mm
+                  <strong><span aria-hidden="true">❌</span> Meter un A4 sin doblar en un sobre C5:</strong> el C5 mide 162 × 229 mm
                   y está pensado para el A4 ya doblado. Para enviarlo plano hace falta un C4.
                 </li>
                 <li>
-                  <strong>❌ Suponer que media hoja de Carta es «Carta a la mitad» proporcional:</strong>{' '}
+                  <strong><span aria-hidden="true">❌</span> Suponer que media hoja de Carta es «Carta a la mitad» proporcional:</strong>{' '}
                   no lo es. Al partir un Carta cambia la proporción, mientras que en la serie A se
                   mantiene siempre. Es la razón práctica por la que la norma ISO resulta más cómoda
                   para fotocopiar y encuadernar.

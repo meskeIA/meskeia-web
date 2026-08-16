@@ -591,7 +591,7 @@ export default function VisualizadorEspaciosColorPage() {
               para estados hover, bordes o fondos.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Define el color base en HSL y deriva la paleta cambiando solo la L; mantienes la
+              <span aria-hidden="true">💡</span> Define el color base en HSL y deriva la paleta cambiando solo la L; mantienes la
               coherencia del tono.
             </p>
           </div>
@@ -608,7 +608,7 @@ export default function VisualizadorEspaciosColorPage() {
               «cambie» de matiz.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Sombras más saturadas y con tono ligeramente desplazado suelen verse más vivas que
+              <span aria-hidden="true">💡</span> Sombras más saturadas y con tono ligeramente desplazado suelen verse más vivas que
               limitarse a bajar el valor.
             </p>
           </div>
@@ -625,7 +625,7 @@ export default function VisualizadorEspaciosColorPage() {
               se razona en HSV para controlar el resultado.
             </p>
             <p className={styles.escenarioTip}>
-              💡 Subir la saturación uniforme en HSV evita el «lavado» que produce tocar canales RGB
+              <span aria-hidden="true">💡</span> Subir la saturación uniforme en HSV evita el «lavado» que produce tocar canales RGB
               por separado.
             </p>
           </div>
@@ -642,7 +642,7 @@ export default function VisualizadorEspaciosColorPage() {
               sí.
             </p>
             <p className={styles.escenarioTip}>
-              💡 El contraste WCAG se mide entre dos colores con su luminancia relativa; este
+              <span aria-hidden="true">💡</span> El contraste WCAG se mide entre dos colores con su luminancia relativa; este
               visualizador es un punto de partida, no un medidor de conformidad.
             </p>
           </div>
@@ -660,7 +660,7 @@ export default function VisualizadorEspaciosColorPage() {
               diferentes en cada modelo.
             </p>
             <p className={styles.faqTip}>
-              💡 Regla rápida: en HSV el blanco se consigue bajando la saturación; en HSL, subiendo
+              <span aria-hidden="true">💡</span> Regla rápida: en HSV el blanco se consigue bajando la saturación; en HSL, subiendo
               la luminosidad.
             </p>
           </div>
@@ -673,7 +673,7 @@ export default function VisualizadorEspaciosColorPage() {
               gris.
             </p>
             <p className={styles.faqTip}>
-              💡 Es el motivo de que el tono se guarde aparte del RGB en muchos selectores de color.
+              <span aria-hidden="true">💡</span> Es el motivo de que el tono se guarde aparte del RGB en muchos selectores de color.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -685,7 +685,7 @@ export default function VisualizadorEspaciosColorPage() {
               compartirlo.
             </p>
             <p className={styles.faqTip}>
-              💡 2E en hexadecimal es 46 en decimal; 86 es 134; AB es 171.
+              <span aria-hidden="true">💡</span> 2E en hexadecimal es 46 en decimal; 86 es 134; AB es 171.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -697,7 +697,7 @@ export default function VisualizadorEspaciosColorPage() {
               la impresora y del papel, por eso no se incluye aquí.
             </p>
             <p className={styles.faqTip}>
-              💡 Un color RGB muy vivo puede quedar «apagado» al imprimirlo: parte de la gama RGB no
+              <span aria-hidden="true">💡</span> Un color RGB muy vivo puede quedar «apagado» al imprimirlo: parte de la gama RGB no
               es reproducible en CMYK.
             </p>
           </div>
@@ -710,7 +710,7 @@ export default function VisualizadorEspaciosColorPage() {
               al final.
             </p>
             <p className={styles.faqTip}>
-              💡 Implementar las conversiones rgb↔hsv una vez te ahorra depender de librerías en
+              <span aria-hidden="true">💡</span> Implementar las conversiones rgb↔hsv una vez te ahorra depender de librerías en
               proyectos pequeños.
             </p>
           </div>
@@ -722,7 +722,7 @@ export default function VisualizadorEspaciosColorPage() {
               canal en una unidad. Es normal y, a simple vista, imperceptible.
             </p>
             <p className={styles.faqTip}>
-              💡 Si necesitas exactitud bit a bit, guarda y compara siempre en RGB o HEX, no en
+              <span aria-hidden="true">💡</span> Si necesitas exactitud bit a bit, guarda y compara siempre en RGB o HEX, no en
               HSV/HSL.
             </p>
           </div>

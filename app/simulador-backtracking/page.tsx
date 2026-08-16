@@ -270,7 +270,7 @@ export default function SimuladorBacktracking() {
               }}
               disabled={pasoIdx === 0}
             >
-              ◀ Anterior
+              <span aria-hidden="true">◀</span> Anterior
             </button>
             <button
               type="button"
@@ -278,7 +278,7 @@ export default function SimuladorBacktracking() {
               onClick={() => setPasoIdx((i) => Math.min(total - 1, i + 1))}
               disabled={pasoIdx >= total - 1}
             >
-              Siguiente ▶
+              Siguiente <span aria-hidden="true">▶</span>
             </button>
             <button
               type="button"

@@ -346,13 +346,13 @@ export default function GuiaPrimerEmpleoPage() {
         <p className={styles.ctaDesc}>Elige el primer paso según dónde estés ahora mismo:</p>
         <div className={styles.ctaBotones}>
           <Link href="/test-competencias-digitales/" className={styles.ctaBtn}>
-            📊 Mide tus competencias
+            <span aria-hidden="true">📊</span> Mide tus competencias
           </Link>
           <Link href="/generador-curriculum/" className={styles.ctaBtnSecundario}>
-            📄 Crea tu CV
+            <span aria-hidden="true">📄</span> Crea tu CV
           </Link>
           <Link href="/preparar-entrevista-competencias/" className={styles.ctaBtnSecundario}>
-            🌟 Prepara la entrevista
+            <span aria-hidden="true">🌟</span> Prepara la entrevista
           </Link>
         </div>
       </section>

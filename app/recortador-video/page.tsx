@@ -265,7 +265,7 @@ export default function RecortadorVideoPage() {
 
       {!soportado && (
         <div className={styles.warningBox} role="alert">
-          <strong>⚠️ Navegador no compatible.</strong> Este recortador necesita la tecnología WebCodecs, disponible en Chrome y Edge (94+), y en versiones recientes de Safari y Firefox. Actualiza tu navegador o prueba con Chrome/Edge de escritorio.
+          <strong><span aria-hidden="true">⚠️</span> Navegador no compatible.</strong> Este recortador necesita la tecnología WebCodecs, disponible en Chrome y Edge (94+), y en versiones recientes de Safari y Firefox. Actualiza tu navegador o prueba con Chrome/Edge de escritorio.
         </div>
       )}
 
@@ -298,7 +298,7 @@ export default function RecortadorVideoPage() {
         </div>
 
         {avisoTamano && (
-          <p className={styles.notaAviso}>⚠️ El archivo es grande. Al procesarse en memoria, el navegador podría ir lento o quedarse sin memoria. Para clips largos, considera recortar por partes.</p>
+          <p className={styles.notaAviso}><span aria-hidden="true">⚠️</span> El archivo es grande. Al procesarse en memoria, el navegador podría ir lento o quedarse sin memoria. Para clips largos, considera recortar por partes.</p>
         )}
       </section>
 
@@ -419,9 +419,9 @@ export default function RecortadorVideoPage() {
 
             {resultadoUrl && resultadoTamano !== null && (
               <div className={styles.resultado} role="status" aria-live="polite">
-                <p className={styles.resultadoOk}>✅ Recorte listo · {formatTiempo(duracionSeleccion)} · {formatTamano(resultadoTamano)}</p>
+                <p className={styles.resultadoOk}><span aria-hidden="true">✅</span> Recorte listo · {formatTiempo(duracionSeleccion)} · {formatTamano(resultadoTamano)}</p>
                 <video src={resultadoUrl} className={styles.videoResultado} controls playsInline />
-                <a href={resultadoUrl} download={nombreSalida()} className={styles.btnDescargar}>⬇ Descargar {nombreSalida()}</a>
+                <a href={resultadoUrl} download={nombreSalida()} className={styles.btnDescargar}><span aria-hidden="true">⬇</span> Descargar {nombreSalida()}</a>
               </div>
             )}
           </section>

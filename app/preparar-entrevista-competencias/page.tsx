@@ -1023,27 +1023,27 @@ export default function PrepararEntrevistaCompetenciasPage() {
             </div>
             <ul className={styles.warningList}>
               <li>
-                <strong>❌ Responder en abstracto:</strong> decir «soy muy organizado» sin un ejemplo
+                <strong><span aria-hidden="true">❌</span> Responder en abstracto:</strong> decir «soy muy organizado» sin un ejemplo
                 concreto. La entrevista por competencias exige siempre una situación real.
               </li>
               <li>
-                <strong>❌ Diluir tu papel en el «nosotros»:</strong> si todo lo hizo el equipo, el
+                <strong><span aria-hidden="true">❌</span> Diluir tu papel en el «nosotros»:</strong> si todo lo hizo el equipo, el
                 entrevistador no sabe qué aportaste tú. Deja claro tu contribución.
               </li>
               <li>
-                <strong>❌ Olvidar el resultado:</strong> contar la acción y no cerrar. Sin resultado,
+                <strong><span aria-hidden="true">❌</span> Olvidar el resultado:</strong> contar la acción y no cerrar. Sin resultado,
                 la historia queda incompleta y pierde fuerza.
               </li>
               <li>
-                <strong>❌ Elegir un ejemplo demasiado trivial:</strong> un reto sin dificultad no
+                <strong><span aria-hidden="true">❌</span> Elegir un ejemplo demasiado trivial:</strong> un reto sin dificultad no
                 demuestra la competencia. Busca situaciones con verdadero desafío.
               </li>
               <li>
-                <strong>❌ Inventar o exagerar:</strong> un buen entrevistador repregunta. Si la
+                <strong><span aria-hidden="true">❌</span> Inventar o exagerar:</strong> un buen entrevistador repregunta. Si la
                 historia no es real, se derrumba en los detalles.
               </li>
               <li>
-                <strong>❌ Extenderte sin control:</strong> respuestas de cinco minutos agotan al
+                <strong><span aria-hidden="true">❌</span> Extenderte sin control:</strong> respuestas de cinco minutos agotan al
                 entrevistador y diluyen el mensaje. Sé concreto.
               </li>
             </ul>
