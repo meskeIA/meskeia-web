@@ -93,6 +93,10 @@ const NIVEL_MANUAL = {
   // sin ninguna implicación financiera, fiscal ni legal) — revisado 2026-07-27
   'elegir-pintura-paredes':       3,  // qué pintura, imprimación y rodillo usar
   'elegir-barniz-madera':         3,  // qué barniz, lasur, aceite o esmalte usar
+  // Dimensionado técnico de equipos de hogar (revisado 2026-08-17): la suite inmobiliaria la
+  // arrastra a nivel 1 igual que a la pintura, pero aquí no hay fiscalidad, contrato ni asesoría.
+  // Nivel 2 y no 3 porque el resultado orienta la compra de un equipo de varios cientos de euros.
+  'calculadora-frigorias-btu':    2,  // frigorías/BTU: potencia térmica, remite a técnico competente
   // Sobre-protección deliberada del usuario (BACKLOG §4 — no rebajar)
   'recordatorio-medicacion':            1,  // medicación = nivel 1 por decisión explícita
   'simulador-financiacion-empresarial': 1,  // sobre-protección deliberada
