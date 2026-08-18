@@ -17,9 +17,14 @@ export default function LupaDigitalPage() {
   const [linterna, setLinterna] = useState(false);
   const [permisoCamara, setPermisoCamara] = useState<'granted' | 'denied' | 'prompt'>('prompt');
   const [camaraActual, setCamaraActual] = useState<'user' | 'environment'>('environment');
+  const [congelado, setCongelado] = useState(false);
+  const [desplazamiento, setDesplazamiento] = useState({ x: 0, y: 0 });
 
   const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const visorRef = useRef<HTMLDivElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const arrastreRef = useRef<{ x: number; y: number } | null>(null);
 
   const iniciarCamara = async () => {
     try {
@@ -42,6 +47,9 @@ export default function LupaDigitalPage() {
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        // Un pause() previo (al congelar) deja el elemento marcado como pausado y el
+        // atributo autoPlay ya no vuelve a arrancarlo: hay que pedirlo explícitamente.
+        videoRef.current.play().catch(() => { /* sin permiso o pestaña oculta */ });
       }
 
       setActivo(true);
@@ -63,6 +71,8 @@ export default function LupaDigitalPage() {
     }
     setActivo(false);
     setLinterna(false);
+    setCongelado(false);
+    setDesplazamiento({ x: 0, y: 0 });
   };
 
   const toggleLinterna = async (estado: boolean) => {
@@ -108,6 +118,93 @@ export default function LupaDigitalPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [camaraActual]);
 
+  /**
+   * Al ampliar z veces, la imagen sobresale del visor (z - 1) / 2 por cada lado:
+   * ese es el margen que se puede recorrer. Más allá solo habría fondo negro.
+   */
+  const acotarDesplazamiento = (x: number, y: number) => {
+    const visor = visorRef.current;
+    if (!visor) return { x: 0, y: 0 };
+    const maxX = (visor.clientWidth * (zoom - 1)) / 2;
+    const maxY = (visor.clientHeight * (zoom - 1)) / 2;
+    return {
+      x: Math.max(-maxX, Math.min(maxX, x)),
+      y: Math.max(-maxY, Math.min(maxY, y)),
+    };
+  };
+
+  const congelar = () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas || !video.videoWidth) return;
+
+    // Se copia a la resolución nativa del sensor, no a la del visor: así el zoom
+    // sobre la imagen quieta conserva todo el detalle que la cámara llegó a captar.
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // El vídeo se pausa (deja de consumir batería) pero el stream sigue abierto,
+    // de modo que reanudar es inmediato y no vuelve a pedir permiso de cámara.
+    video.pause();
+    setDesplazamiento({ x: 0, y: 0 });
+    setCongelado(true);
+  };
+
+  const descongelar = () => {
+    setCongelado(false);
+    setDesplazamiento({ x: 0, y: 0 });
+    videoRef.current?.play().catch(() => {
+      // Algunos navegadores rechazan play() si la pestaña quedó oculta; al volver
+      // a ella el propio elemento se reanuda por su atributo autoPlay.
+    });
+  };
+
+  const iniciarArrastre = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!congelado) return;
+    arrastreRef.current = { x: e.clientX - desplazamiento.x, y: e.clientY - desplazamiento.y };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+
+  const moverArrastre = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const inicio = arrastreRef.current;
+    if (!inicio) return;
+    setDesplazamiento(acotarDesplazamiento(e.clientX - inicio.x, e.clientY - inicio.y));
+  };
+
+  const terminarArrastre = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    arrastreRef.current = null;
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+  };
+
+  /** El arrastre con el dedo o el ratón no sirve con teclado: mismas flechas, mismo recorrido. */
+  const moverConTeclado = (e: React.KeyboardEvent<HTMLCanvasElement>) => {
+    if (!congelado) return;
+    const paso = e.shiftKey ? 60 : 20;
+    const pasos: Record<string, [number, number]> = {
+      ArrowLeft: [paso, 0],
+      ArrowRight: [-paso, 0],
+      ArrowUp: [0, paso],
+      ArrowDown: [0, -paso],
+    };
+    const delta = pasos[e.key];
+    if (!delta) return;
+    e.preventDefault();
+    setDesplazamiento(acotarDesplazamiento(desplazamiento.x + delta[0], desplazamiento.y + delta[1]));
+  };
+
+  // Al bajar el zoom encoge el margen recorrible: sin reacotar, la imagen quieta
+  // se quedaría descuadrada enseñando fondo negro por un lado.
+  useEffect(() => {
+    if (!congelado) return;
+    setDesplazamiento(d => acotarDesplazamiento(d.x, d.y));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [zoom, congelado]);
+
   const getFiltroStyle = (): string => {
     const filtros: string[] = [];
 
@@ -146,7 +243,7 @@ export default function LupaDigitalPage() {
       <LegalNotice />
 
       {/* Visor de la lupa */}
-      <div className={styles.lupaContainer}>
+      <div className={styles.lupaContainer} ref={visorRef}>
         {!activo ? (
           <div className={styles.lupaPlaceholder} role="status" aria-live="polite">
             {permisoCamara === 'denied' ? (
@@ -173,15 +270,39 @@ export default function LupaDigitalPage() {
           muted
           className={styles.lupaVideo}
           style={{
-            display: activo ? 'block' : 'none',
+            display: activo && !congelado ? 'block' : 'none',
             transform: `scale(${zoom})`,
             filter: getFiltroStyle(),
           }}
         />
 
+        {/* Imagen congelada: se amplía, se filtra y se recorre igual que el vídeo */}
+        <canvas
+          ref={canvasRef}
+          className={`${styles.lupaVideo} ${styles.lupaCanvas}`}
+          role="img"
+          tabIndex={congelado ? 0 : -1}
+          aria-label="Imagen congelada: arrástrala o usa las flechas del teclado para recorrerla"
+          style={{
+            display: congelado ? 'block' : 'none',
+            transform: `translate(${desplazamiento.x}px, ${desplazamiento.y}px) scale(${zoom})`,
+            filter: getFiltroStyle(),
+          }}
+          onPointerDown={iniciarArrastre}
+          onPointerMove={moverArrastre}
+          onPointerUp={terminarArrastre}
+          onPointerCancel={terminarArrastre}
+          onKeyDown={moverConTeclado}
+        />
+
         {/* Controles sobre el video */}
         {activo && (
           <div className={styles.controlesOverlay}>
+            {congelado && (
+              <span className={styles.congeladoIndicador}>
+                <span aria-hidden="true">❄️</span> Congelada
+              </span>
+            )}
             <span className={styles.zoomIndicador}>{zoom}x</span>
           </div>
         )}
@@ -199,11 +320,31 @@ export default function LupaDigitalPage() {
         </button>
 
         {activo && (
+          <button
+            type="button"
+            className={`${styles.btnCongelar} ${congelado ? styles.congelarActivo : ''}`}
+            onClick={congelado ? descongelar : congelar}
+            aria-pressed={congelado}
+          >
+            {congelado
+              ? <><span aria-hidden="true">▶️</span> Reanudar</>
+              : <><span aria-hidden="true">❄️</span> Congelar</>}
+          </button>
+        )}
+
+        {activo && !congelado && (
           <button type="button" className={styles.btnCambiarCamara} onClick={cambiarCamara}>
             <span aria-hidden="true">🔄</span> Cambiar cámara
           </button>
         )}
       </div>
+
+      {congelado && (
+        <p className={styles.congeladoPista} role="status">
+          Imagen fija: ya puedes soltar el móvil. Arrástrala con el dedo —o con las flechas
+          del teclado— para recorrerla, y sigue ajustando el zoom, los filtros y el brillo.
+        </p>
+      )}
 
       {/* Control de zoom */}
       <div className={styles.section}>
@@ -446,8 +587,8 @@ export default function LupaDigitalPage() {
                 examinar el detalle de una pintura sin necesidad de escáner.
               </p>
               <p className={styles.escenarioTip}>
-                Consejo: apoya el teléfono en un soporte o sobre la propia superficie
-                y tómate el tiempo que necesites para leer sin pulso.
+                Consejo: congela la imagen y ya podrás dejar el teléfono en la mesa,
+                arrastrando el detalle que quieras mirar sin tener que sostener nada.
               </p>
             </div>
           </div>
@@ -476,12 +617,17 @@ export default function LupaDigitalPage() {
             </li>
             <li className={styles.faqItem}>
               <details>
-                <summary>¿Puedo tomar fotos con la lupa activa?</summary>
+                <summary>¿Puedo dejar la imagen fija para leerla con calma?</summary>
                 <p>
-                  Sí, aunque esta herramienta está orientada a la visualización en tiempo
-                  real. Para capturar la imagen ampliada puedes hacer una captura de
-                  pantalla del dispositivo mientras la lupa está activa. Así conservas
-                  el nivel de zoom y los filtros aplicados en ese momento.
+                  Sí: el botón «Congelar» detiene la imagen en el fotograma que estés
+                  viendo, y a partir de ahí puedes soltar el teléfono. Sobre la imagen
+                  quieta siguen funcionando el zoom, los filtros y el brillo, y se
+                  recorre arrastrándola con el dedo o con las flechas del teclado.
+                </p>
+                <p className={styles.faqTip}>
+                  Se congela a la resolución de la cámara, no a la de la pantalla: por eso
+                  puedes ampliar después de congelar sin perder el detalle que ya estaba
+                  captado. Si además quieres guardarla, haz una captura de pantalla.
                 </p>
               </details>
             </li>
@@ -512,7 +658,7 @@ export default function LupaDigitalPage() {
 
         {/* ── SECCIÓN 4: Guía Paso a Paso ── */}
         <section>
-          <h2>Cómo usar la lupa digital: 4 pasos</h2>
+          <h2>Cómo usar la lupa digital: 5 pasos</h2>
           <ol className={styles.stepGuide}>
             <li className={styles.step}>
               <span className={styles.stepNumber} aria-hidden="true">1</span>
@@ -539,6 +685,17 @@ export default function LupaDigitalPage() {
             <li className={styles.step}>
               <span className={styles.stepNumber} aria-hidden="true">3</span>
               <div className={styles.stepContent}>
+                <strong>Congelar la imagen para leer sin pulso</strong>
+                <p>
+                  Sostener el móvil quieto a 4x o 5x es lo que más cansa. Pulsa
+                  «Congelar» y la imagen se queda fija: puedes apoyar el brazo, seguir
+                  ampliando y recorrerla arrastrándola. «Reanudar» vuelve al directo.
+                </p>
+              </div>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepNumber} aria-hidden="true">4</span>
+              <div className={styles.stepContent}>
                 <strong>Ajustar el contraste si el texto cuesta de leer</strong>
                 <p>
                   Los filtros de alto contraste, invertido y escala de grises cambian
@@ -548,7 +705,7 @@ export default function LupaDigitalPage() {
               </div>
             </li>
             <li className={styles.step}>
-              <span className={styles.stepNumber} aria-hidden="true">4</span>
+              <span className={styles.stepNumber} aria-hidden="true">5</span>
               <div className={styles.stepContent}>
                 <strong>Aumentar brillo si la iluminación es baja</strong>
                 <p>
@@ -589,7 +746,8 @@ export default function LupaDigitalPage() {
               <p>
                 Apoya el codo en la mesa o coloca el teléfono sobre un libro para
                 mantenerlo firme. A partir de 4x, cualquier movimiento reduce
-                notablemente la nitidez de la imagen.
+                notablemente la nitidez de la imagen. Si aun así te cuesta, congela
+                la imagen: deja de depender del pulso por completo.
               </p>
             </div>
             <div className={styles.tipCard}>

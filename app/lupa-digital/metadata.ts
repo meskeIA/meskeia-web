@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Lupa Digital Online - Amplía con tu Móvil o Celular Gratis | meskeIA',
-  description: 'Lupa digital gratuita que usa la cámara de tu móvil o celular para ampliar texto, objetos pequeños y detalles. Funciona también en ordenador o computadora. Ideal para leer letra pequeña y accesibilidad.',
-  keywords: 'lupa digital, lupa online, lupa celular, lupa móvil, ampliar cámara, lupa gratis, magnificador, zoom cámara, accesibilidad, leer letra pequeña',
+  description: 'Lupa digital gratuita que usa la cámara de tu móvil o celular para ampliar texto, objetos pequeños y detalles. Congela la imagen para leer sin pulso, con filtros de contraste. Ideal para leer letra pequeña y accesibilidad.',
+  keywords: 'lupa digital, lupa online, lupa celular, lupa móvil, ampliar cámara, lupa gratis, magnificador, zoom cámara, congelar imagen, accesibilidad, leer letra pequeña, baja visión',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -38,6 +38,7 @@ export const jsonLd = generateWebAppSchema({
   category: 'UtilityApplication',
   features: [
     'Ampliación digital de 1× a 5× con la cámara del móvil o celular',
+    'Congelar la imagen para leerla sin sostener el teléfono, recorriéndola con el dedo o el teclado',
     'Filtros de accesibilidad: alto contraste, inversión, escala de grises y sepia',
     'Ajuste independiente de brillo y contraste en tiempo real',
     'Restablecer todos los ajustes de un toque',
@@ -81,6 +82,14 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'La lupa del sistema operativo (como la lupa de Windows o la función de accesibilidad de iOS/Android) amplía el contenido de la pantalla, no lo que hay físicamente frente a la cámara. Esta lupa digital amplía el mundo real a través de la cámara, lo que la hace útil para documentos físicos, objetos y entornos, no para contenido digital que ya está en pantalla.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Se puede dejar la imagen fija en vez de sostener el móvil?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. El botón «Congelar» detiene la imagen en el fotograma que estés viendo y a partir de ahí puedes apoyar o soltar el teléfono. Sobre la imagen quieta siguen funcionando el zoom, los filtros de contraste y el brillo, y se recorre arrastrándola con el dedo o con las flechas del teclado. La captura se hace a la resolución de la cámara y no a la de la pantalla, así que ampliar después de congelar conserva el detalle. Es la forma más cómoda de leer un prospecto entero, porque a partir de 4× el temblor de la mano es lo que más dificulta la lectura.',
       },
     },
     {

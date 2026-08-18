@@ -72,10 +72,39 @@
   transition: transform 0.2s ease-out;
 }
 
+/* La transición de .lupaVideo suaviza el zoom, pero al arrastrar la imagen fija
+   la haría ir por detrás del dedo: aquí el movimiento tiene que ser inmediato. */
+.lupaCanvas {
+  transition: none;
+  cursor: grab;
+  touch-action: none;
+}
+
+.lupaCanvas:active {
+  cursor: grabbing;
+}
+
+.lupaCanvas:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: -3px;
+}
+
 .controlesOverlay {
   position: absolute;
   top: 15px;
   right: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.congeladoIndicador {
+  background: rgba(46, 134, 171, 0.85);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
 }
 
 .zoomIndicador {
@@ -132,6 +161,44 @@
 .btnCambiarCamara:hover {
   border-color: #2E86AB;
   color: #2E86AB;
+}
+
+.btnCongelar {
+  padding: 16px 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: 50px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnCongelar:hover {
+  border-color: #2E86AB;
+  color: #2E86AB;
+}
+
+.btnCongelar.congelarActivo {
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  border-color: transparent;
+  color: white;
+}
+
+.congeladoPista {
+  margin: -10px 0 20px;
+  padding: 12px 16px;
+  background: rgba(46, 134, 171, 0.08);
+  border-left: 3px solid var(--primary);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+[data-theme='dark'] .congeladoPista {
+  background: rgba(46, 134, 171, 0.18);
 }
 
 /* Secciones */
