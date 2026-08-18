@@ -838,3 +838,27 @@
     flex-direction: row;
   }
 }
+
+/* Respuesta del botón de linterna cuando la cámara no expone la capacidad torch:
+   sin este aviso el usuario pulsaba y no ocurría nada en pantalla. */
+.avisoLinterna {
+  margin: 10px 0 0;
+  padding: 10px 14px;
+  background: rgba(46, 134, 171, 0.08);
+  border-left: 3px solid var(--primary);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+[data-theme='dark'] .avisoLinterna {
+  background: rgba(46, 134, 171, 0.18);
+}
+
+/* Marca el tope real del control en la tabla de niveles de zoom */
+.notaMaximo {
+  font-size: 0.85em;
+  color: var(--text-secondary);
+  font-weight: 600;
+}

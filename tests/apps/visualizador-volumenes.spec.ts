@@ -146,3 +146,34 @@ test.describe('visualizador-volumenes — volúmenes calculados a mano', () => {
     expect(mostrado).not.toMatch(/No definido|∞|NaN|^-|^0,0+$/);
   });
 });
+
+/**
+ * Reparación del lote mecánico del Inspector (18/08/2026) — hallazgos 1, 2, 5 y 30.
+ */
+test.describe('visualizador-volumenes — lote mecánico 18/08/2026', () => {
+  test('hallazgo 5 — cada slider tiene id y su etiqueta lo apunta con for', async ({ page }) => {
+    await page.goto('/visualizador-volumenes/');
+    await page.getByRole('button', { name: /Cilindro/i }).first().click();
+    await expect(page.locator('label:not([for])')).toHaveCount(0);
+    expect(await page.locator('input[type=range][id]').count()).toBeGreaterThan(0);
+  });
+
+  test('hallazgo 1 — el ejemplo de biología da picolitros, no femtolitros', async ({ page }) => {
+    // r = 0,01 mm → V = (4/3)·π·10⁻⁶ = 4,19×10⁻⁶ mm³. Como 1 mm³ = 10⁻⁶ L, son
+    // 4,19×10⁻¹² L = 4,19 picolitros (= 4.188,8 fL), no 4,19 femtolitros.
+    await page.goto('/visualizador-volumenes/');
+    const cuerpo = page.locator('body');
+    await expect(cuerpo).toContainText('4,19 picolitros');
+    await expect(cuerpo).not.toContainText('4,19 femtolitros');
+  });
+
+  test('hallazgos 2 y 30 — los datos estructurados no prometen ni afirman lo que la app desmiente', async ({ page }) => {
+    await page.goto('/visualizador-volumenes/');
+    const jsonLd = (await page.locator('script[type="application/ld+json"]').allInnerTexts()).join(' ');
+    // La app no tiene selector de unidades: el resultado sale como «unidades³».
+    expect(jsonLd).not.toContain('Resultado en m³ y cm³');
+    // El JSON-LD decía «esfera» donde la FAQ visible de la misma página dice «disco bicóncavo».
+    expect(jsonLd).toContain('disco bicóncavo');
+    expect(jsonLd).not.toMatch(/glóbulos rojos adoptan formas próximas a la esfera/);
+  });
+});

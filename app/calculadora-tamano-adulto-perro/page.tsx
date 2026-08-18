@@ -295,9 +295,10 @@ export default function CalculadoraTamanoAdultoPerroPage() {
 
           {/* Peso actual */}
           <div className={styles.inputGroup}>
-            <label>Peso actual</label>
+            <label htmlFor="peso-actual">Peso actual</label>
             <div className={styles.inputConUnidad}>
               <input
+                id="peso-actual"
                 type="text"
                 inputMode="decimal"
                 value={pesoActual}
@@ -311,9 +312,10 @@ export default function CalculadoraTamanoAdultoPerroPage() {
 
           {/* Edad en semanas */}
           <div className={styles.inputGroup}>
-            <label>Edad del cachorro</label>
+            <label htmlFor="edad-cachorro">Edad del cachorro</label>
             <div className={styles.inputConUnidad}>
               <input
+                id="edad-cachorro"
                 type="text"
                 inputMode="numeric"
                 value={edadSemanas}
@@ -331,8 +333,8 @@ export default function CalculadoraTamanoAdultoPerroPage() {
 
           {/* Tamaño de raza */}
           <div className={styles.inputGroup}>
-            <label>Tamaño esperado de la raza</label>
-            <div className={styles.tamanoGrid}>
+            <span className={styles.grupoLabel} id="etiqueta-tamano-raza">Tamaño esperado de la raza</span>
+            <div className={styles.tamanoGrid} role="group" aria-labelledby="etiqueta-tamano-raza">
               {[
                 { id: 'mini' as TamanoRaza, label: 'Mini', peso: '<5 kg' },
                 { id: 'pequeno' as TamanoRaza, label: 'Pequeño', peso: '5-10 kg' },
@@ -341,6 +343,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
                 { id: 'gigante' as TamanoRaza, label: 'Gigante', peso: '>45 kg' },
               ].map((t) => (
                 <button
+                  type="button"
                   key={t.id}
                   className={`${styles.tamanoBtn} ${tamanoRaza === t.id ? styles.active : ''}`}
                   onClick={() => setTamanoRaza(t.id)}
@@ -584,6 +587,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
 
         <div className={styles.filtrosRaza}>
           <button
+            type="button"
             className={`${styles.filtroBtn} ${filtroRaza === 'todas' ? styles.active : ''}`}
             onClick={() => setFiltroRaza('todas')}
             aria-pressed={filtroRaza === 'todas'}
@@ -591,6 +595,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
             Todas
           </button>
           <button
+            type="button"
             className={`${styles.filtroBtn} ${filtroRaza === 'mini' ? styles.active : ''}`}
             onClick={() => setFiltroRaza('mini')}
             aria-pressed={filtroRaza === 'mini'}
@@ -598,6 +603,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
             Mini
           </button>
           <button
+            type="button"
             className={`${styles.filtroBtn} ${filtroRaza === 'pequeno' ? styles.active : ''}`}
             onClick={() => setFiltroRaza('pequeno')}
             aria-pressed={filtroRaza === 'pequeno'}
@@ -605,6 +611,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
             Pequeño
           </button>
           <button
+            type="button"
             className={`${styles.filtroBtn} ${filtroRaza === 'mediano' ? styles.active : ''}`}
             onClick={() => setFiltroRaza('mediano')}
             aria-pressed={filtroRaza === 'mediano'}
@@ -612,6 +619,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
             Mediano
           </button>
           <button
+            type="button"
             className={`${styles.filtroBtn} ${filtroRaza === 'grande' ? styles.active : ''}`}
             onClick={() => setFiltroRaza('grande')}
             aria-pressed={filtroRaza === 'grande'}
@@ -619,6 +627,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
             Grande
           </button>
           <button
+            type="button"
             className={`${styles.filtroBtn} ${filtroRaza === 'gigante' ? styles.active : ''}`}
             onClick={() => setFiltroRaza('gigante')}
             aria-pressed={filtroRaza === 'gigante'}

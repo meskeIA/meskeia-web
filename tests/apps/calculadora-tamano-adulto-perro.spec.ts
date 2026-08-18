@@ -131,3 +131,43 @@ test.describe('Calculadora de tamaño adulto del perro', () => {
     await expect(page.locator('[class*="resultadoValor"]')).toHaveCount(0);
   });
 });
+
+/**
+ * Reparación del lote mecánico del Inspector (18/08/2026) — hallazgos 47, 48 y 50.
+ */
+test.describe('Calculadora de tamaño adulto del perro — lote mecánico 18/08/2026', () => {
+  test('hallazgo 47 — los dos campos tienen nombre accesible', async ({ page }) => {
+    await page.goto(RUTA);
+    const campos = page.locator('input[type="text"]');
+    await expect(campos.nth(0)).toHaveAccessibleName(/Peso actual/);
+    await expect(campos.nth(1)).toHaveAccessibleName(/Edad del cachorro/);
+  });
+
+  test('hallazgo 50 — ningún botón se queda sin type="button"', async ({ page }) => {
+    await page.goto(RUTA);
+    await expect(page.locator('button:not([type])')).toHaveCount(0);
+  });
+
+  test('hallazgo 48 — la FAQ estructurada no contradice al motor ni a la tabla visible', async ({ page }) => {
+    await page.goto(RUTA);
+    const jsonLd = (await page.locator('script[type="application/ld+json"]').allInnerTexts()).join(' ');
+    // (a) La curva grande a las 14 semanas interpola 0,35 (12→0,30 · 16→0,40), o sea
+    //     ×2,857; la FAQ publicaba la regla «×2,5», que da otra cifra que la app.
+    expect(jsonLd).not.toContain('multiplicado por 2,5');
+    expect(jsonLd).toContain('45,7 kg');
+    // (b) Maduración: la app da 18-24 meses a las grandes y 24-36 a las gigantes.
+    expect(jsonLd).toContain('entre 18 y 24 meses');
+    expect(jsonLd).toContain('24-36 meses');
+    // (c) Beagle y Cocker son medianos en la tabla de razas de la propia app.
+    expect(jsonLd).not.toMatch(/entre 5 y 10 kg \(Beagle/);
+    expect(jsonLd).not.toContain('Labrador juvenil');
+  });
+
+  test('hallazgo 48 — el caso que publica la FAQ da en la app la cifra que la FAQ dice', async ({ page }) => {
+    await page.goto(RUTA);
+    await calcular(page, { peso: '16', edad: '14', tamano: 'Grande 25-45 kg' });
+    // 14 semanas interpola entre 12 (0,30) y 16 (0,40): 0,30 + (2/4)×0,10 = 0,35
+    // 16 / 0,35 = 45,714… → 45,7 kg
+    await expect(valorPrincipal(page)).toHaveText('45,7 kg');
+  });
+});

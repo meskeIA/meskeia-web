@@ -460,3 +460,21 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     await expect(selectPerfil(page)).toHaveAccessibleName(/Perfil del comprador/);
   });
 });
+
+/**
+ * Reparación del lote mecánico del Inspector (18/08/2026) — hallazgo 21.
+ */
+test.describe('Estimador de gastos de compraventa — lote mecánico 18/08/2026', () => {
+  test('hallazgo 21 — el IVA sale de data/fiscal, también en el tramo del 21 %', async ({ page }) => {
+    // IVA_INMUEBLES_2025.local = 21 (data/fiscal/inmuebles.ts, Ley 37/1992).
+    // 200.000 × 21 % = 42.000. Antes el tipo era un literal en page.tsx, así que un
+    // cambio en data/fiscal no llegaba a esta app, que es el hub del clúster.
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Primera mano/ }).click();
+    await page.getByRole('button', { name: /Local comercial/ }).first().click();
+    await rellenar(page, 'Precio del inmueble', '200.000');
+
+    await expect(page.locator('h3', { hasText: /^IVA/ }).first()).toHaveText('IVA (21,0%)');
+    expect(await valorTarjeta(page, /^IVA/)).toBe('42.000,00 €');
+  });
+});

@@ -83,3 +83,52 @@ test('sobre la imagen congelada siguen valiendo el zoom, los filtros y el recorr
   await page.getByRole('button', { name: '1x', exact: true }).click();
   await expect(lienzo).toHaveAttribute('style', /translate\(0px, 0px\)/);
 });
+
+/**
+ * Reparación del lote mecánico del Inspector (18/08/2026) — hallazgos 7, 8, 9 y 32.
+ * Cada test ancla el caso reproducible con el que se levantó el acta.
+ */
+test.describe('lupa-digital — lote mecánico 18/08/2026', () => {
+  test('hallazgo 32 — «Cambiar cámara» pide el facingMode NUEVO ya en la primera pulsación', async ({ page }) => {
+    // iniciarCamara leía camaraActual del closure de la render previa, así que la
+    // segunda llamada a getUserMedia repetía 'environment' y el botón no hacía nada.
+    await page.addInitScript(() => {
+      (window as unknown as { __facings: (string | null)[] }).__facings = [];
+      const orig = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+      navigator.mediaDevices.getUserMedia = (c?: MediaStreamConstraints) => {
+        const video = c?.video as MediaTrackConstraints | undefined;
+        (window as unknown as { __facings: (string | null)[] }).__facings.push(
+          (video?.facingMode as string) ?? null,
+        );
+        return orig(c);
+      };
+    });
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Activar lupa/i }).first().click();
+    await expect(page.getByRole('button', { name: /Cambiar cámara/i }).first()).toBeVisible();
+    await page.getByRole('button', { name: /Cambiar cámara/i }).first().click();
+
+    await expect
+      .poll(async () => page.evaluate(() => (window as unknown as { __facings: (string | null)[] }).__facings))
+      .toEqual(['environment', 'user']);
+  });
+
+  test('hallazgo 9 — la linterna avisa cuando la cámara no expone la capacidad torch', async ({ page }) => {
+    // Antes salía por el if sin tocar el estado: el usuario pulsaba y no ocurría nada.
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Activar lupa/i }).first().click();
+    await page.getByRole('button', { name: /Activar linterna/i }).first().click();
+    await expect(page.getByText(/no tiene linterna/i)).toBeVisible();
+  });
+
+  test('hallazgo 7 — la tabla de niveles solo describe zooms alcanzables (el tope es 5x)', async ({ page }) => {
+    await page.goto(RUTA);
+    const tabla = page.locator('table').first();
+    await expect(tabla).toContainText('4x–5x');
+    await expect(tabla).not.toContainText('8x');
+    await expect(tabla).not.toContainText('16x');
+  });
+});
+// El hallazgo 8 (equipo sin cámara) vive en `lupa-digital-sin-camara.spec.ts`: exige
+// arrancar Chromium sin dispositivo simulado, y `launchOptions` solo admite el nivel
+// superior de un spec.

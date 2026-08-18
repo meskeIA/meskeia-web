@@ -40,7 +40,6 @@ export const jsonLd = generateWebAppSchema({
     'Tabla comparativa de fórmulas de volumen',
     'Guía educativa con casos de uso, FAQ y errores frecuentes',
     'Relación demostrable 1/3 entre el volumen del cono y el cilindro equivalente',
-    'Resultado en m³ y cm³ simultáneamente para cada figura seleccionada',
   ],
 });
 
@@ -85,7 +84,7 @@ export const faqJsonLd = {
       name: '¿Qué figura geométrica tiene el mayor volumen con la menor superficie?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La esfera es la figura que maximiza el volumen para una superficie dada. Este principio se llama isoperimetría esférica y tiene aplicaciones en la naturaleza: las burbujas de jabón y los glóbulos rojos adoptan formas próximas a la esfera precisamente para minimizar la tensión superficial y maximizar el volumen interior.',
+        text: 'La esfera es la figura que maximiza el volumen para una superficie dada. Este principio se llama isoperimetría esférica y tiene aplicaciones en la naturaleza: las burbujas de jabón adoptan forma esférica precisamente porque minimizan la tensión superficial. No todo lo redondo sigue esa regla: los glóbulos rojos tienen forma de disco bicóncavo, optimizada para maximizar el intercambio de oxígeno y no el volumen interior.',
       },
     },
   ],

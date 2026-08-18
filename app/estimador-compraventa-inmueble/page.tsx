@@ -5,7 +5,7 @@ import styles from './EstimadorCompraventa.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, NumberInput, ResultCard, LegalNotice, DisclaimerCard, DataReference, ShareCard, RegionBadge } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
-import { FISCAL_INMUEBLES_META, calcularGananciaInmueble } from '@/data/fiscal';
+import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, calcularGananciaInmueble } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -210,9 +210,9 @@ export default function SimuladorCompraventaPage() {
     const esResidencial = INMUEBLES_RESIDENCIALES.includes(tipoInmueble);
 
     if (tipoTransmision === 'primera-mano') {
-      // IVA: 10% residencial, 21% comercial/industrial/terrenos
+      // IVA desde data/fiscal, no desde un literal: así un cambio de tipo llega aquí
       tipoImpuesto = 'IVA';
-      porcentaje = esResidencial ? 10 : 21;
+      porcentaje = esResidencial ? IVA_INMUEBLES_2025.obraNueva : IVA_INMUEBLES_2025.local;
       impuesto = precio * (porcentaje / 100);
     } else {
       // ITP para segunda mano

@@ -54,7 +54,8 @@
   margin-bottom: 20px;
 }
 
-.inputGroup label {
+.inputGroup label,
+.inputGroup .grupoLabel {
   display: block;
   font-size: 0.9rem;
   font-weight: 500;

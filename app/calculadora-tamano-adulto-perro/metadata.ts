@@ -55,7 +55,7 @@ export const faqJsonLd = {
       name: '¿Cómo puedo saber cuánto pesará mi cachorro de adulto?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La estimación más habitual para razas medianas consiste en tomar el peso a las 16 semanas y multiplicarlo por 2. Para razas grandes, se puede usar el peso a las 14 semanas multiplicado por 2,5. Otra fórmula frecuente es dividir el peso actual (en kg) entre la edad en semanas y multiplicar por la edad aproximada de madurez de la raza. Estas son estimaciones orientativas; la genética individual y la alimentación influyen en el resultado final.',
+        text: 'La calculadora divide el peso actual entre el porcentaje de peso adulto que corresponde a esa edad y a ese tamaño de raza. Una raza grande a las 14 semanas ronda el 35 % de su peso adulto, así que 16 kg a esa edad proyectan unos 45,7 kg. Circulan reglas más rápidas, como multiplicar por 2 el peso de una raza mediana a las 16 semanas, que coincide con la curva en ese punto concreto pero pierde precisión fuera de él. En todos los casos son estimaciones: la genética individual y la alimentación influyen en el resultado final.',
       },
     },
     {
@@ -63,7 +63,7 @@ export const faqJsonLd = {
       name: '¿A qué edad dejan de crecer los perros según su tamaño?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los perros de razas pequeñas (menos de 10 kg) alcanzan su tamaño adulto aproximadamente a los 10-12 meses. Las razas medianas (10-25 kg) maduran entre los 12 y 15 meses. Las razas grandes (25-45 kg) tardan entre 15 y 18 meses, y las razas gigantes (más de 45 kg), como el Dogo Alemán o el San Bernardo, pueden seguir creciendo hasta los 18-24 meses.',
+        text: 'Los perros de razas pequeñas (menos de 10 kg) alcanzan su tamaño adulto aproximadamente a los 10-12 meses. Las razas medianas (10-25 kg) maduran entre los 12 y 15 meses. Las razas grandes (25-45 kg) tardan entre 18 y 24 meses, y las razas gigantes (más de 45 kg), como el Gran Danés o el San Bernardo, pueden seguir creciendo hasta los 24-36 meses.',
       },
     },
     {
@@ -79,7 +79,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre un perro de raza pequeña, mediana y grande?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La clasificación varía según la fuente, pero como referencia general: razas toy o miniatura pesan menos de 5 kg (Chihuahua, Yorkshire); razas pequeñas entre 5 y 10 kg (Beagle, Cocker); razas medianas entre 10 y 25 kg (Labrador juvenil, Springer Spaniel); razas grandes entre 25 y 45 kg (Labrador, Golden Retriever, Husky); y razas gigantes por encima de 45 kg (Mastín, Gran Danés, Terranova).',
+        text: 'La clasificación varía según la fuente, pero como referencia general: razas toy o miniatura pesan menos de 5 kg (Chihuahua, Yorkshire); razas pequeñas entre 5 y 10 kg (Bichón Frisé, Jack Russell); razas medianas entre 10 y 25 kg (Beagle, Cocker Spaniel, Border Collie); razas grandes entre 25 y 45 kg (Labrador Retriever, Golden Retriever, Pastor Alemán); y razas gigantes por encima de 45 kg (Gran Danés, San Bernardo, Terranova).',
       },
     },
     {

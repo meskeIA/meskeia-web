@@ -494,7 +494,7 @@ export default function SimuladorGarajeCompraventaPage() {
                     icon="🚗"
                   />
                   <ResultCard
-                    title={`${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 1)}%)`}
+                    title={`${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 2)}%)`}
                     value={formatCurrency(resultadosComprador.impuestoTransmision)}
                     variant="warning"
                     icon="📋"

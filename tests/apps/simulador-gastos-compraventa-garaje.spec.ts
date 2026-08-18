@@ -54,7 +54,7 @@ test.describe('Simulador de gastos de compraventa de garaje', () => {
     await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
 
     // ITP = 25.000 × 6 % — ITP_CCAA.madrid.tipoGeneral = 6 (= TIPOS_ITP_CCAA_2025 'Madrid')
-    expect(await valorTarjeta(page, 'ITP (6,0%)')).toBe('1500,00 €');
+    expect(await valorTarjeta(page, 'ITP (6,00%)')).toBe('1500,00 €');
 
     // Notaría (ARANCELES_NOTARIO, RD 1426/1989): 90,15 + (25.000 − 6.010,12) × 0,45 %
     //        = 175,60446 ; con el 21 % de IVA → 212,4814
@@ -83,7 +83,7 @@ test.describe('Simulador de gastos de compraventa de garaje', () => {
 
     // IVA = 30.000 × 21 % — IVA_INMUEBLES_2025.garaje = 21 (garaje independiente,
     // el tipo más alto que maneja la app; el vinculado a vivienda sería garageCon = 10)
-    expect(await valorTarjeta(page, 'IVA (21,0%)')).toBe('6300,00 €');
+    expect(await valorTarjeta(page, 'IVA (21,00%)')).toBe('6300,00 €');
 
     // AJD = 30.000 × 1,5 % — ITP_CCAA.cataluna.ajd = 1.5
     expect(await valorTarjeta(page, 'AJD (1,50%)')).toBe('450,00 €');
@@ -156,7 +156,7 @@ test.describe('Simulador de gastos de compraventa de garaje', () => {
   // comprobar sus `condiciones`. En Madrid —la CCAA por defecto— ese tipo es
   // «Jóvenes < 35 años (municipios pequeños)», del 0 %, condicionado a un municipio de
   // menos de 2.500 habitantes que la app nunca pregunta: un joven que compre un garaje
-  // en la capital lee «ITP (0,0%) — 0,00 €». Lo anclado para él es el tipo general del
+  // en la capital lee «ITP (0,00%) — 0,00 €». Lo anclado para él es el tipo general del
   // 6 % (ITP_CCAA.madrid.tipoGeneral = TIPOS_ITP_CCAA_2025 'Madrid') → 1.500,00 €.
   // Mismo patrón en Baleares con «joven» y con «discapacidad» (tipo 0 %).
   test('CASO 5 (regresión) — joven en Madrid: no puede salir 0 € de ITP sin preguntar el municipio', async ({ page }) => {
@@ -166,7 +166,7 @@ test.describe('Simulador de gastos de compraventa de garaje', () => {
     await rellenar(page, 'Precio del garaje / plaza de parking', '25000');
     await page.selectOption('#select-perfil', 'joven');
 
-    // Esperado: «ITP (6,0%)» → 1500,00 € · Obtenido hoy: «ITP (0,0%)» → 0,00 €
+    // Esperado: «ITP (6,00%)» → 1500,00 € · Obtenido hoy: «ITP (0,00%)» → 0,00 €
     const valorITP = page
       .locator('h3', { hasText: /^ITP/ })
       .first()
@@ -242,7 +242,7 @@ test.describe('Simulador de gastos de compraventa de garaje — ronda 16/08/2026
     //   300.000 × 11 % = 33.000
     //   100.000 × 12 % = 12.000  →  105.000, tipo efectivo 10,5 %
     // Aplicar el tipo plano del primer tramo daría 100.000 €: 5.000 € menos de los debidos.
-    expect(await valorTarjeta(page, 'ITP (10,5%)')).toBe('105.000,00 €');
+    expect(await valorTarjeta(page, 'ITP (10,50%)')).toBe('105.000,00 €');
 
     // Notaría (ARANCELES_NOTARIO, RD 1426/1989), recorriendo los seis primeros tramos:
     //   90,15 + 24.040,49×0,45 % + 30.050,60×0,15 % + 90.151,82×0,10 %

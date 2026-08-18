@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useId } from 'react';
 import styles from './VisualizadorVolumenes.module.css';
 import {
   MeskeiaLogo,
@@ -280,13 +280,17 @@ interface SliderProps {
   simbolo?: string;
 }
 function Slider({ label, valor, min, max, onChange, simbolo = '' }: SliderProps) {
+  // Un id propio por slider: sin él la etiqueta queda huérfana y pulsar sobre el
+  // texto no enfoca el control (área de acierto perdida, sensible en móvil).
+  const idSlider = useId();
   return (
     <div className={styles.paramControl}>
       <div className={styles.paramHeader}>
-        <label className={styles.paramLabel}>{label}</label>
+        <label className={styles.paramLabel} htmlFor={idSlider}>{label}</label>
         <span className={styles.paramValor}>{valor}{simbolo}</span>
       </div>
       <input
+        id={idSlider}
         type="range"
         min={min}
         max={max}
@@ -521,7 +525,7 @@ export default function VisualizadorVolumenesPage() {
               </div>
               <div className={styles.escenarioEjemplo}>
                 <p><strong>Ejemplo:</strong></p>
-                <code>Célula esférica: r=0,01mm → V=4,19×10⁻⁶ mm³ → 4,19 femtolitros</code>
+                <code>Célula esférica: r=0,01mm → V=4,19×10⁻⁶ mm³ → 4,19 picolitros (4.188,8 fL)</code>
               </div>
               <p className={styles.escenarioTip}>
                 <strong>Por qué importa:</strong> En biología celular, química y física, conocer el volumen exacto de objetos esféricos (glóbulos, burbujas, nanopartículas) es fundamental para calcular densidades y concentraciones.

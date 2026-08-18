@@ -8,6 +8,31 @@ import { getRelatedApps } from '@/data/app-relations';
 
 type FiltroTipo = 'ninguno' | 'alto-contraste' | 'invertir' | 'escala-grises' | 'sepia';
 
+/**
+ * Por qué no basta con «concedido / denegado»: un equipo sin webcam recibe un
+ * NotFoundError, y contestarle «activa el permiso en el navegador» le manda a un
+ * ajuste que no arregla nada. Cada motivo lleva su consejo.
+ */
+type EstadoCamara = 'prompt' | 'granted' | 'denied' | 'sin-camara' | 'error';
+
+const AVISOS_CAMARA: Record<'denied' | 'sin-camara' | 'error', { icono: string; titulo: string; consejo: string }> = {
+  denied: {
+    icono: '🚫',
+    titulo: 'Permiso de cámara denegado',
+    consejo: 'Activa la cámara en la configuración del navegador',
+  },
+  'sin-camara': {
+    icono: '📷',
+    titulo: 'No se ha encontrado ninguna cámara',
+    consejo: 'Este equipo no tiene cámara disponible. Prueba desde el móvil o conecta una webcam.',
+  },
+  error: {
+    icono: '⚠️',
+    titulo: 'No se ha podido abrir la cámara',
+    consejo: 'Puede que otra aplicación la esté usando. Ciérrala e inténtalo de nuevo.',
+  },
+};
+
 export default function LupaDigitalPage() {
   const [activo, setActivo] = useState(false);
   const [zoom, setZoom] = useState(2);
@@ -15,7 +40,8 @@ export default function LupaDigitalPage() {
   const [brillo, setBrillo] = useState(100);
   const [contraste, setContraste] = useState(100);
   const [linterna, setLinterna] = useState(false);
-  const [permisoCamara, setPermisoCamara] = useState<'granted' | 'denied' | 'prompt'>('prompt');
+  const [permisoCamara, setPermisoCamara] = useState<EstadoCamara>('prompt');
+  const [avisoLinterna, setAvisoLinterna] = useState('');
   const [camaraActual, setCamaraActual] = useState<'user' | 'environment'>('environment');
   const [congelado, setCongelado] = useState(false);
   const [desplazamiento, setDesplazamiento] = useState({ x: 0, y: 0 });
@@ -26,7 +52,12 @@ export default function LupaDigitalPage() {
   const streamRef = useRef<MediaStream | null>(null);
   const arrastreRef = useRef<{ x: number; y: number } | null>(null);
 
-  const iniciarCamara = async () => {
+  /**
+   * El facingMode entra por parámetro (con la cámara actual por defecto) porque
+   * «Cambiar cámara» reinicia justo después de un setState: leerlo del closure
+   * devolvía la cámara ANTERIOR y el primer toque no cambiaba nada.
+   */
+  const iniciarCamara = async (facingMode: 'user' | 'environment' = camaraActual) => {
     try {
       // Detener stream anterior si existe
       if (streamRef.current) {
@@ -35,7 +66,7 @@ export default function LupaDigitalPage() {
 
       const constraints: MediaStreamConstraints = {
         video: {
-          facingMode: camaraActual,
+          facingMode,
           width: { ideal: 1920 },
           height: { ideal: 1080 },
         }
@@ -60,7 +91,14 @@ export default function LupaDigitalPage() {
       }
     } catch (error) {
       console.error('Error al acceder a la cámara:', error);
-      setPermisoCamara('denied');
+      const nombre = error instanceof Error ? error.name : '';
+      if (nombre === 'NotFoundError' || nombre === 'DevicesNotFoundError') {
+        setPermisoCamara('sin-camara');
+      } else if (nombre === 'NotAllowedError' || nombre === 'PermissionDeniedError' || nombre === 'SecurityError') {
+        setPermisoCamara('denied');
+      } else {
+        setPermisoCamara('error');
+      }
     }
   };
 
@@ -71,6 +109,7 @@ export default function LupaDigitalPage() {
     }
     setActivo(false);
     setLinterna(false);
+    setAvisoLinterna('');
     setCongelado(false);
     setDesplazamiento({ x: 0, y: 0 });
   };
@@ -79,18 +118,25 @@ export default function LupaDigitalPage() {
     if (!streamRef.current) return;
 
     const track = streamRef.current.getVideoTracks()[0];
-    if (track && 'getCapabilities' in track) {
-      const capabilities = track.getCapabilities() as MediaTrackCapabilities & { torch?: boolean };
-      if (capabilities.torch) {
-        try {
-          await track.applyConstraints({
-            advanced: [{ torch: estado } as MediaTrackConstraintSet]
-          });
-          setLinterna(estado);
-        } catch {
-          console.log('Linterna no disponible');
-        }
-      }
+    const capabilities = track && 'getCapabilities' in track
+      ? track.getCapabilities() as MediaTrackCapabilities & { torch?: boolean }
+      : undefined;
+
+    // Salir en silencio dejaba al usuario pulsando un botón que no responde: las
+    // webcams y las cámaras frontales casi nunca exponen la capacidad torch.
+    if (!capabilities?.torch) {
+      setAvisoLinterna('Esta cámara no tiene linterna. Suele estar disponible solo en la cámara trasera del móvil.');
+      return;
+    }
+
+    try {
+      await track.applyConstraints({
+        advanced: [{ torch: estado } as MediaTrackConstraintSet]
+      });
+      setLinterna(estado);
+      setAvisoLinterna('');
+    } catch {
+      setAvisoLinterna('No se ha podido encender la linterna en este dispositivo.');
     }
   };
 
@@ -100,7 +146,7 @@ export default function LupaDigitalPage() {
     if (activo) {
       // Reiniciar con nueva cámara
       detenerCamara();
-      setTimeout(() => iniciarCamara(), 100);
+      setTimeout(() => iniciarCamara(nuevaCamara), 100);
     }
   };
 
@@ -246,12 +292,12 @@ export default function LupaDigitalPage() {
       <div className={styles.lupaContainer} ref={visorRef}>
         {!activo ? (
           <div className={styles.lupaPlaceholder} role="status" aria-live="polite">
-            {permisoCamara === 'denied' ? (
+            {permisoCamara !== 'prompt' && permisoCamara !== 'granted' ? (
               <div role="alert">
-                <span aria-hidden="true" className={styles.placeholderIcon}>🚫</span>
-                <p>Permiso de cámara denegado</p>
+                <span aria-hidden="true" className={styles.placeholderIcon}>{AVISOS_CAMARA[permisoCamara].icono}</span>
+                <p>{AVISOS_CAMARA[permisoCamara].titulo}</p>
                 <p className={styles.placeholderSubtexto}>
-                  Activa la cámara en la configuración del navegador
+                  {AVISOS_CAMARA[permisoCamara].consejo}
                 </p>
               </div>
             ) : (
@@ -313,7 +359,7 @@ export default function LupaDigitalPage() {
         <button
           type="button"
           className={`${styles.btnPrincipal} ${activo ? styles.activo : ''}`}
-          onClick={activo ? detenerCamara : iniciarCamara}
+          onClick={activo ? detenerCamara : () => iniciarCamara()}
           aria-pressed={activo}
         >
           {activo ? <><span aria-hidden="true">⏹️</span> Detener</> : <><span aria-hidden="true">🔍</span> Activar lupa</>}
@@ -455,6 +501,12 @@ export default function LupaDigitalPage() {
           </button>
         )}
 
+        {activo && avisoLinterna && (
+          <p className={styles.avisoLinterna} role="status" aria-live="polite">
+            {avisoLinterna}
+          </p>
+        )}
+
         <button
           type="button"
           className={styles.btnReset}
@@ -506,6 +558,13 @@ export default function LupaDigitalPage() {
               </thead>
               <tbody>
                 <tr>
+                  <td>🔍 1,5x</td>
+                  <td>Muy amplio</td>
+                  <td>Ver mejor sin perder de vista el conjunto</td>
+                  <td>Texto de 8–10 pt</td>
+                  <td>Amplía poco: solo ayuda con letra ya casi legible</td>
+                </tr>
+                <tr>
                   <td>🔍 2x</td>
                   <td>Amplio</td>
                   <td>Leer etiquetas y texto normal</td>
@@ -513,25 +572,18 @@ export default function LupaDigitalPage() {
                   <td>Poco útil para detalles muy finos</td>
                 </tr>
                 <tr>
-                  <td>🔍 4x</td>
+                  <td>🔍 3x</td>
                   <td>Medio</td>
                   <td>Manuales, mapas, prospectos</td>
                   <td>Letras de 4–5 pt, líneas finas</td>
-                  <td>Pulso leve causa desenfoque</td>
+                  <td>El pulso leve ya causa desenfoque</td>
                 </tr>
                 <tr>
-                  <td>🔍 8x</td>
+                  <td>🔍 4x–5x <span className={styles.notaMaximo}>(máximo)</span></td>
                   <td>Reducido</td>
-                  <td>Componentes electrónicos, marcas pequeñas</td>
+                  <td>Ingredientes, números de serie, marcas pequeñas</td>
                   <td>Detalles de 1–2 mm</td>
-                  <td>Requiere apoyo del teléfono para estabilidad</td>
-                </tr>
-                <tr>
-                  <td>🔍 16x</td>
-                  <td>Muy reducido</td>
-                  <td>Trabajos de precisión, grabados</td>
-                  <td>Detalles sub-milimétricos</td>
-                  <td>Pixelado notable, solo con buena iluminación</td>
+                  <td>Pixelado del zoom digital: apoya el móvil o congela la imagen</td>
                 </tr>
               </tbody>
             </table>
@@ -604,7 +656,8 @@ export default function LupaDigitalPage() {
                 <p>
                   No exactamente. Una lupa óptica de calidad ofrece imagen nítida sin
                   degradación. La lupa digital amplía mediante software, por lo que a
-                  partir de cierto zoom (normalmente 5x–8x) la imagen puede pixelarse.
+                  partir de cierto zoom la imagen puede pixelarse: en esta lupa se nota
+                  al acercarse a su máximo de 5x.
                   Para usos cotidianos (leer etiquetas, manuales) la calidad es más que
                   suficiente y tiene la ventaja de añadir filtros de contraste y
                   ajustar el brillo.
