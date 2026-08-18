@@ -5,11 +5,12 @@ import { useState, useMemo } from 'react';
 import styles from './SimuladorPuertasLogicas.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { RETOS, corregirIntento, type Correccion } from './motor-retos';
 
 // ============================================
 // TIPOS
 // ============================================
-type SimulatorMode = 'tablas' | 'circuitos' | 'expresiones';
+type SimulatorMode = 'tablas' | 'circuitos' | 'expresiones' | 'retos';
 type GateType = 'AND' | 'OR' | 'NOT' | 'NAND' | 'NOR' | 'XOR' | 'XNOR';
 type CircuitType = 'halfAdder' | 'fullAdder' | 'mux2to1' | 'comparador' | 'decoder2to4';
 
@@ -211,6 +212,15 @@ export default function SimuladorPuertasLogicasPage() {
   const [expression, setExpression] = useState('(A AND B) OR (NOT C)');
   const [expressionError, setExpressionError] = useState('');
 
+  // Modo 4: retos. `intento` es lo que el usuario escribe; `correccion` solo aparece
+  // cuando pulsa Comprobar, para que la tabla no vaya cambiando mientras teclea.
+  const [retoIndice, setRetoIndice] = useState(0);
+  const [intento, setIntento] = useState('');
+  const [correccion, setCorreccion] = useState<Correccion | null>(null);
+  const [pistaVisible, setPistaVisible] = useState(false);
+  const [solucionVisible, setSolucionVisible] = useState(false);
+  const [resueltos, setResueltos] = useState<string[]>([]);
+
   // ============================================
   // MODO 1: TABLAS DE VERDAD
   // ============================================
@@ -284,6 +294,27 @@ export default function SimuladorPuertasLogicasPage() {
   }, [expression, expressionVariables]);
 
   // ============================================
+  // MODO 4: RETOS
+  // ============================================
+  const retoActual = RETOS[retoIndice];
+
+  const comprobarIntento = () => {
+    const resultado = corregirIntento(intento, retoActual);
+    setCorreccion(resultado);
+    if (resultado.resuelto && !resueltos.includes(retoActual.id)) {
+      setResueltos([...resueltos, retoActual.id]);
+    }
+  };
+
+  const irAReto = (indice: number) => {
+    setRetoIndice(indice);
+    setIntento('');
+    setCorreccion(null);
+    setPistaVisible(false);
+    setSolucionVisible(false);
+  };
+
+  // ============================================
   // RENDER
   // ============================================
   return (
@@ -305,28 +336,44 @@ export default function SimuladorPuertasLogicasPage() {
       {/* Mode Selector */}
       <div className={styles.modeSelector}>
         <button
+          type="button"
           className={`${styles.modeBtn} ${mode === 'tablas' ? styles.modeBtnActive : ''}`}
           onClick={() => setMode('tablas')}
+          aria-pressed={mode === 'tablas'}
         >
-          <span className={styles.modeIcon}>📊</span>
+          <span className={styles.modeIcon} aria-hidden="true">📊</span>
           <span className={styles.modeName}>Tablas de Verdad</span>
           <span className={styles.modeDesc}>7 puertas lógicas</span>
         </button>
         <button
+          type="button"
           className={`${styles.modeBtn} ${mode === 'circuitos' ? styles.modeBtnActive : ''}`}
           onClick={() => setMode('circuitos')}
+          aria-pressed={mode === 'circuitos'}
         >
-          <span className={styles.modeIcon}>🔌</span>
+          <span className={styles.modeIcon} aria-hidden="true">🔌</span>
           <span className={styles.modeName}>Circuitos</span>
           <span className={styles.modeDesc}>Simulación interactiva</span>
         </button>
         <button
+          type="button"
           className={`${styles.modeBtn} ${mode === 'expresiones' ? styles.modeBtnActive : ''}`}
           onClick={() => setMode('expresiones')}
+          aria-pressed={mode === 'expresiones'}
         >
-          <span className={styles.modeIcon}>🧮</span>
+          <span className={styles.modeIcon} aria-hidden="true">🧮</span>
           <span className={styles.modeName}>Expresiones</span>
           <span className={styles.modeDesc}>Álgebra booleana</span>
+        </button>
+        <button
+          type="button"
+          className={`${styles.modeBtn} ${mode === 'retos' ? styles.modeBtnActive : ''}`}
+          onClick={() => setMode('retos')}
+          aria-pressed={mode === 'retos'}
+        >
+          <span className={styles.modeIcon} aria-hidden="true">🎯</span>
+          <span className={styles.modeName}>Retos</span>
+          <span className={styles.modeDesc}>{RETOS.length} ejercicios</span>
         </button>
       </div>
 
@@ -340,8 +387,10 @@ export default function SimuladorPuertasLogicasPage() {
             {(Object.keys(GATES) as GateType[]).map((gate) => (
               <button
                 key={gate}
+                type="button"
                 className={`${styles.gateBtn} ${selectedGate === gate ? styles.gateBtnActive : ''}`}
                 onClick={() => setSelectedGate(gate)}
+                aria-pressed={selectedGate === gate}
               >
                 <span className={styles.gateSymbol}>{GATES[gate].symbol}</span>
                 <span className={styles.gateName}>{gate}</span>
@@ -456,6 +505,8 @@ export default function SimuladorPuertasLogicasPage() {
             {(Object.keys(CIRCUITS) as CircuitType[]).map((circuit) => (
               <button
                 key={circuit}
+                type="button"
+                aria-pressed={selectedCircuit === circuit}
                 className={`${styles.circuitBtn} ${selectedCircuit === circuit ? styles.circuitBtnActive : ''}`}
                 onClick={() => {
                   setSelectedCircuit(circuit);
@@ -482,12 +533,14 @@ export default function SimuladorPuertasLogicasPage() {
                 {CIRCUITS[selectedCircuit].inputs.map((input, idx) => (
                   <button
                     key={idx}
+                    type="button"
+                    aria-pressed={circuitInputs[idx]}
                     className={`${styles.ioSwitch} ${circuitInputs[idx] ? styles.ioSwitchOn : ''}`}
                     onClick={() => toggleCircuitInput(idx)}
                   >
                     <span className={styles.ioLabel}>{input}</span>
                     <span className={styles.ioValue}>{circuitInputs[idx] ? '1' : '0'}</span>
-                    <span className={styles.ioIndicator}>{circuitInputs[idx] ? '🟢' : '⚫'}</span>
+                    <span className={styles.ioIndicator} aria-hidden="true">{circuitInputs[idx] ? '🟢' : '⚫'}</span>
                   </button>
                 ))}
               </div>
@@ -608,28 +661,28 @@ export default function SimuladorPuertasLogicasPage() {
           <div className={styles.examplesSection}>
             <h4>Ejemplos</h4>
             <div className={styles.examplesGrid}>
-              <button onClick={() => setExpression('A AND B')} className={styles.exampleBtn}>
+              <button type="button" onClick={() => setExpression('A AND B')} className={styles.exampleBtn}>
                 A AND B
               </button>
-              <button onClick={() => setExpression('A OR B')} className={styles.exampleBtn}>
+              <button type="button" onClick={() => setExpression('A OR B')} className={styles.exampleBtn}>
                 A OR B
               </button>
-              <button onClick={() => setExpression('NOT A')} className={styles.exampleBtn}>
+              <button type="button" onClick={() => setExpression('NOT A')} className={styles.exampleBtn}>
                 NOT A
               </button>
-              <button onClick={() => setExpression('(A AND B) OR C')} className={styles.exampleBtn}>
+              <button type="button" onClick={() => setExpression('(A AND B) OR C')} className={styles.exampleBtn}>
                 (A AND B) OR C
               </button>
-              <button onClick={() => setExpression('A XOR B')} className={styles.exampleBtn}>
+              <button type="button" onClick={() => setExpression('A XOR B')} className={styles.exampleBtn}>
                 A XOR B
               </button>
-              <button onClick={() => setExpression('NOT (A OR B)')} className={styles.exampleBtn}>
+              <button type="button" onClick={() => setExpression('NOT (A OR B)')} className={styles.exampleBtn}>
                 NOT (A OR B)
               </button>
-              <button onClick={() => setExpression('(A AND B) OR (C AND D)')} className={styles.exampleBtn}>
+              <button type="button" onClick={() => setExpression('(A AND B) OR (C AND D)')} className={styles.exampleBtn}>
                 (A·B) + (C·D)
               </button>
-              <button onClick={() => setExpression('(NOT A) AND (NOT B)')} className={styles.exampleBtn}>
+              <button type="button" onClick={() => setExpression('(NOT A) AND (NOT B)')} className={styles.exampleBtn}>
                 Ā · B̄
               </button>
             </div>
@@ -665,6 +718,234 @@ export default function SimuladorPuertasLogicasPage() {
               </table>
             </div>
           )}
+        </div>
+      )}
+
+      {/* ============================================ */}
+      {/* MODO 4: RETOS */}
+      {/* ============================================ */}
+      {mode === 'retos' && (
+        <div className={styles.mainContent}>
+          <div className={styles.retosIntro}>
+            <h2 className={styles.retosTitulo}>Del enunciado al circuito</h2>
+            <p>
+              En los otros modos escribes un circuito y el simulador te dice qué hace.
+              Aquí es al revés: te damos la tabla de verdad que tiene que salir y tú
+              buscas la expresión que la produce, con los menos operadores posibles.
+            </p>
+            <p className={styles.retosProgreso}>
+              Resueltos: <strong>{resueltos.length}</strong> de {RETOS.length}
+            </p>
+          </div>
+
+          {/* Selector de reto */}
+          <div className={styles.retosSelector}>
+            {RETOS.map((reto, indice) => (
+              <button
+                key={reto.id}
+                type="button"
+                aria-pressed={indice === retoIndice}
+                className={`${styles.retoBtn} ${indice === retoIndice ? styles.retoBtnActive : ''} ${resueltos.includes(reto.id) ? styles.retoBtnResuelto : ''}`}
+                onClick={() => irAReto(indice)}
+              >
+                <span className={styles.retoBtnNumero}>{indice + 1}</span>
+                <span className={styles.retoBtnNombre}>{reto.nombre}</span>
+                {resueltos.includes(reto.id) && (
+                  <span className={styles.retoBtnCheck} aria-label="resuelto">✓</span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Enunciado y tabla objetivo */}
+          <div className={styles.retoPanel}>
+            <div className={styles.retoEnunciado}>
+              <h3>{retoActual.nombre}</h3>
+              <p>{retoActual.enunciado}</p>
+              {retoActual.permitidos && (
+                <p className={styles.retoRestriccion}>
+                  <span aria-hidden="true">🔒</span> Solo puedes usar:{' '}
+                  <strong>{retoActual.permitidos.join(', ')}</strong>
+                </p>
+              )}
+            </div>
+
+            <div className={styles.retoTrabajo}>
+            <div className={styles.retoObjetivo}>
+              <h4>Tabla que debes conseguir</h4>
+              <table className={styles.truthTable}>
+                <thead>
+                  <tr>
+                    {retoActual.variables.map((v) => (
+                      <th key={v}>{v}</th>
+                    ))}
+                    <th className={styles.outputHeader}>Y</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {retoActual.salidas.map((esperado, i) => {
+                    const fila = correccion?.filas[i];
+                    return (
+                      <tr key={i} className={fila && !fila.acierta ? styles.filaFallo : ''}>
+                        {retoActual.variables.map((v, j) => {
+                          const bit = Boolean((i >> (retoActual.variables.length - 1 - j)) & 1);
+                          return (
+                            <td key={v} className={bit ? styles.cellOne : styles.cellZero}>
+                              {bit ? '1' : '0'}
+                            </td>
+                          );
+                        })}
+                        <td className={`${styles.outputCell} ${esperado ? styles.cellOne : styles.cellZero}`}>
+                          {esperado ? '1' : '0'}
+                          {fila && !fila.acierta && (
+                            <span className={styles.tuValor}> (tú: {fila.obtenido ? '1' : '0'})</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+          {/* Intento */}
+          <div className={styles.retoRespuesta}>
+          <div className={styles.retoIntento}>
+            <label htmlFor="intento-reto">Tu expresión</label>
+            <div className={styles.retoIntentoFila}>
+              <input
+                id="intento-reto"
+                type="text"
+                value={intento}
+                onChange={(e) => setIntento(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') comprobarIntento();
+                }}
+                placeholder={`Escribe usando ${retoActual.variables.join(', ')}`}
+                className={styles.expressionField}
+                autoComplete="off"
+                spellCheck={false}
+              />
+              <button
+                type="button"
+                className={styles.btnComprobar}
+                onClick={comprobarIntento}
+                disabled={intento.trim().length === 0}
+              >
+                Comprobar
+              </button>
+            </div>
+            <p className={styles.retoAyudaSintaxis}>
+              Admite <code>AND</code>, <code>OR</code>, <code>NOT</code>, <code>XOR</code>,{' '}
+              <code>NAND</code>, <code>NOR</code>, <code>XNOR</code>, los símbolos{' '}
+              <code>·</code> <code>+</code> <code>!</code>, la prima <code>A&apos;</code> y el
+              producto implícito <code>AB</code>.
+            </p>
+          </div>
+
+          {/* Veredicto */}
+          {correccion && (
+            <div
+              className={`${styles.retoVeredicto} ${
+                correccion.resuelto
+                  ? styles.veredictoOk
+                  : correccion.valida
+                    ? styles.veredictoFallo
+                    : styles.veredictoError
+              }`}
+              role="status"
+              aria-live="polite"
+            >
+              {!correccion.valida && (
+                <p>
+                  <strong>No se puede evaluar.</strong> {correccion.error}
+                </p>
+              )}
+
+              {correccion.valida && !correccion.resuelto && (
+                <p>
+                  <strong>
+                    Aciertas {correccion.aciertos} de {correccion.total} filas.
+                  </strong>{' '}
+                  Las que fallan están marcadas en la tabla, con el valor que da tu
+                  expresión al lado del esperado.
+                </p>
+              )}
+
+              {correccion.resuelto && (
+                <>
+                  <p>
+                    <strong>Resuelto.</strong> Tu expresión produce la tabla completa con{' '}
+                    {correccion.operadores}{' '}
+                    {correccion.operadores === 1 ? 'operador' : 'operadores'}.
+                  </p>
+                  <p>
+                    {correccion.operadores < retoActual.operadoresReferencia
+                      ? `Nuestra solución de referencia usa ${retoActual.operadoresReferencia}: la tuya es más corta.`
+                      : correccion.operadores === retoActual.operadoresReferencia
+                        ? 'Es la misma longitud que nuestra solución de referencia.'
+                        : `Nuestra solución de referencia lo consigue con ${retoActual.operadoresReferencia}. Se puede acortar.`}
+                  </p>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Pista y solución */}
+          <div className={styles.retoAyudas}>
+            <button
+              type="button"
+              className={styles.btnAyuda}
+              onClick={() => setPistaVisible(!pistaVisible)}
+              aria-expanded={pistaVisible}
+            >
+              {pistaVisible ? 'Ocultar pista' : 'Ver pista'}
+            </button>
+            <button
+              type="button"
+              className={styles.btnAyuda}
+              onClick={() => setSolucionVisible(!solucionVisible)}
+              aria-expanded={solucionVisible}
+            >
+              {solucionVisible ? 'Ocultar solución' : 'Ver una solución'}
+            </button>
+          </div>
+
+          {pistaVisible && (
+            <div className={styles.retoPista}>
+              <p>{retoActual.pista}</p>
+            </div>
+          )}
+
+          {solucionVisible && (
+            <div className={styles.retoSolucion}>
+              <p>
+                Una solución con {retoActual.operadoresReferencia}{' '}
+                {retoActual.operadoresReferencia === 1 ? 'operador' : 'operadores'}:
+              </p>
+              <code className={styles.retoSolucionCodigo}>{retoActual.referencia}</code>
+              <p className={styles.retoSolucionNota}>
+                No es necesariamente la única ni la más corta posible: es la que usamos como
+                referencia para comparar.
+              </p>
+            </div>
+          )}
+
+          </div>
+            </div>
+          </div>
+
+          {/* Cómo se cuentan los operadores */}
+          <div className={styles.retoNotaConteo}>
+            <h4>Qué cuenta como operador</h4>
+            <p>
+              Cada operador que escribes suma uno, incluidos los <code>NOT</code>. Un circuito
+              real puede necesitar menos puertas que operadores tenga la expresión, porque una
+              señal intermedia se reparte a varias entradas: el XOR con NAND se escribe con
+              cinco operadores y se construye con cuatro puertas, reutilizando{' '}
+              <code>A NAND B</code> en dos sitios.
+            </p>
+          </div>
         </div>
       )}
 
@@ -930,32 +1211,32 @@ export default function SimuladorPuertasLogicasPage() {
           <h3>6 Mejores Prácticas en Lógica Digital</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <strong>Empieza por la tabla de verdad</strong>
               <p>Antes de pensar en puertas, define la tabla. Es el contrato de tu circuito: especifica el comportamiento exacto para cada combinación. Sin tabla, sin diseño correcto.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <strong>Aplica De Morgan para simplificar</strong>
               <p>Cuando veas NOT(AND) o NOT(OR), aplica De Morgan. Reduce el número de puertas y hace las expresiones más manejables. Es la herramienta más poderosa de simplificación.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚡</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚡</span>
               <strong>Usa NAND/NOR en hardware real</strong>
               <p>Son más eficientes en silicio. En FPGAs y ASICs, el compilador las prefiere. Si diseñas hardware, piensa en términos de NAND/NOR desde el principio.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧩</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧩</span>
               <strong>Construye de abajo arriba</strong>
               <p>Domina las 7 puertas básicas, luego semisumadores y comparadores, luego la UAL. Cada nivel de abstracción se construye sobre el anterior.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <strong>Verifica con múltiples métodos</strong>
               <p>Si obtienes una expresión, compruébala construyendo la tabla de verdad y simulándola. Los errores de precedencia son muy comunes. Este simulador facilita la verificación.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📝</span>
+              <span className={styles.tipIcon} aria-hidden="true">📝</span>
               <strong>Documenta las simplificaciones</strong>
               <p>En exámenes y proyectos, muestra cada paso: &quot;A·1 = A&quot; o &quot;A+A&apos; = 1&quot; deben estar justificados. Los profesores valoran el proceso, no solo el resultado.</p>
             </div>

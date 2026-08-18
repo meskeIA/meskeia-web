@@ -34,9 +34,15 @@
 /* Mode Selector */
 .modeSelector {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-xl);
+}
+
+@media (max-width: 1024px) {
+  .modeSelector {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .modeBtn {
@@ -1020,4 +1026,406 @@
   border-left: 3px solid var(--secondary);
   border-radius: 6px;
   font-size: 0.95rem;
+}
+
+/* ============================================
+   MODO 4: RETOS
+   ============================================ */
+
+.retosIntro {
+  padding: var(--spacing-lg);
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-large);
+  margin-bottom: var(--spacing-lg);
+}
+
+.retosTitulo {
+  margin: 0 0 var(--spacing-sm);
+  color: var(--primary);
+  font-size: 1.4rem;
+}
+
+.retosIntro p {
+  margin: 0 0 var(--spacing-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.retosProgreso {
+  margin-bottom: 0 !important;
+  color: var(--text-primary) !important;
+}
+
+/* --- Selector de reto --- */
+.retosSelector {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.retoBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.retoBtn:hover {
+  border-color: var(--primary);
+}
+
+.retoBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.retoBtnActive {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.retoBtnResuelto {
+  border-color: var(--secondary);
+}
+
+.retoBtnNumero {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.retoBtnNombre {
+  flex: 1;
+  line-height: 1.3;
+}
+
+.retoBtnCheck {
+  flex-shrink: 0;
+  color: var(--secondary);
+  font-weight: 700;
+}
+
+/* --- Enunciado y tabla objetivo --- */
+.retoPanel {
+  padding: var(--spacing-lg);
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-large);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* La tabla objetivo y el campo donde se responde, uno al lado del otro: así se
+   comparan sin desplazar la página, que es como se resuelve de verdad. */
+.retoTrabajo {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--spacing-lg);
+  align-items: start;
+  margin-top: var(--spacing-lg);
+}
+
+.retoRespuesta {
+  min-width: 0;
+}
+
+.retoEnunciado h3 {
+  margin: 0 0 var(--spacing-sm);
+  color: var(--primary);
+}
+
+.retoEnunciado p {
+  margin: 0 0 var(--spacing-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.retoRestriccion {
+  padding: var(--spacing-sm);
+  background: var(--bg-primary);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  color: var(--text-primary) !important;
+}
+
+.retoObjetivo h4 {
+  margin: 0 0 var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Se marca la celda de SALIDA, que es la que está mal: teñir también las entradas
+   chocaba con el verde de los unos y dejaba la fila a dos colores. La barra roja de
+   la primera celda señala la fila entera. */
+.filaFallo td:first-child {
+  box-shadow: inset 3px 0 0 #dc2626;
+}
+
+.filaFallo td.outputCell {
+  background: rgba(239, 68, 68, 0.22);
+}
+
+.tuValor {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #b91c1c;
+}
+
+/* --- Campo de intento --- */
+.retoIntento {
+  margin-bottom: var(--spacing-md);
+}
+
+.retoIntento label {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.retoIntentoFila {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: stretch;
+}
+
+.retoIntentoFila .expressionField {
+  flex: 1;
+  min-width: 0;
+}
+
+.btnComprobar {
+  flex-shrink: 0;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--primary);
+  color: #fff;
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnComprobar:hover:not(:disabled) {
+  background: var(--hero-bg);
+  border-color: var(--hero-bg);
+}
+
+.btnComprobar:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnComprobar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.retoAyudaSintaxis {
+  margin: var(--spacing-sm) 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.retoAyudaSintaxis code {
+  padding: 0.1rem 0.35rem;
+  background: var(--bg-primary);
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+/* --- Veredicto --- */
+.retoVeredicto {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius);
+  border-left: 4px solid;
+  margin-bottom: var(--spacing-lg);
+}
+
+.retoVeredicto p {
+  margin: 0 0 var(--spacing-xs);
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.retoVeredicto p:last-child {
+  margin-bottom: 0;
+}
+
+.veredictoOk {
+  background: rgba(16, 185, 129, 0.12);
+  border-left-color: #10b981;
+}
+
+.veredictoFallo {
+  background: rgba(245, 158, 11, 0.12);
+  border-left-color: #f59e0b;
+}
+
+.veredictoError {
+  background: rgba(239, 68, 68, 0.12);
+  border-left-color: #ef4444;
+}
+
+/* --- Pista y solución --- */
+.retoAyudas {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-md);
+}
+
+.btnAyuda {
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btnAyuda:hover {
+  border-color: var(--primary);
+}
+
+.btnAyuda:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.retoPista,
+.retoSolucion {
+  padding: var(--spacing-md);
+  background: var(--bg-primary);
+  border-left: 3px solid var(--secondary);
+  border-radius: 6px;
+  margin-bottom: var(--spacing-md);
+}
+
+.retoPista p,
+.retoSolucion p {
+  margin: 0 0 var(--spacing-xs);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.retoSolucionCodigo {
+  display: block;
+  padding: var(--spacing-sm);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 1rem;
+  color: var(--text-primary);
+  overflow-x: auto;
+  margin-bottom: var(--spacing-xs);
+}
+
+.retoSolucionNota {
+  font-size: 0.85rem;
+  color: var(--text-muted) !important;
+  margin-bottom: 0 !important;
+}
+
+/* --- Nota sobre el conteo --- */
+.retoNotaConteo {
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-large);
+}
+
+.retoNotaConteo h4 {
+  margin: 0 0 var(--spacing-xs);
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.retoNotaConteo p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  font-size: 0.92rem;
+}
+
+.retoNotaConteo code {
+  padding: 0.1rem 0.35rem;
+  background: var(--bg-primary);
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+/* --- Dark mode --- */
+[data-theme='dark'] .retoBtnNumero {
+  color: #fff;
+}
+
+[data-theme='dark'] .filaFallo td.outputCell {
+  background: rgba(239, 68, 68, 0.3);
+}
+
+[data-theme='dark'] .tuValor {
+  color: #fca5a5;
+}
+
+[data-theme='dark'] .veredictoOk {
+  background: rgba(16, 185, 129, 0.18);
+}
+
+[data-theme='dark'] .veredictoFallo {
+  background: rgba(245, 158, 11, 0.18);
+}
+
+[data-theme='dark'] .veredictoError {
+  background: rgba(239, 68, 68, 0.18);
+}
+
+[data-theme='dark'] .btnComprobar {
+  color: #fff;
+}
+
+/* --- Responsive --- */
+@media (max-width: 900px) {
+  .retoTrabajo {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .retoIntentoFila {
+    flex-direction: column;
+  }
+
+  .btnComprobar {
+    width: 100%;
+  }
+
+  .retosSelector {
+    grid-template-columns: 1fr;
+  }
 }
