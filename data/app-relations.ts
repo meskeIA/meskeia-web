@@ -2094,12 +2094,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-zonas-cardiacas': [
     { url: '/calculadora-tiempos-running/', icon: '🏃', name: 'Predictor de Tiempos de Running', description: 'Estima tu tiempo en 5K, 10K y maratón' },
     { url: '/calculadora-pace-running/', icon: '⏱️', name: 'Calculadora de Pace', description: 'Ritmo y splits por kilómetro' },
-    { url: '/calculadora-potencia-ciclismo/', icon: '🚴', name: 'Potencia en Ciclismo', description: 'W/kg, FTP y zonas de entrenamiento' },
+    { url: '/calculadora-potencia-ciclismo/', icon: '🚴', name: 'Vatios en Ciclismo', description: 'Watts, W/kg, FTP y zonas de entrenamiento' },
     { url: '/calculadora-zonas-entrenamiento/', icon: '❤️', name: 'Zonas de Entrenamiento FC', description: 'Otra calculadora de zonas cardíacas' },
   ],
   'calculadora-1rm-gimnasio': [
     { url: '/calculadora-zonas-cardiacas/', icon: '💓', name: 'Zonas Cardíacas (Karvonen)', description: 'Entrena en las zonas adecuadas' },
-    { url: '/calculadora-potencia-ciclismo/', icon: '🚴', name: 'Potencia en Ciclismo', description: 'W/kg y zonas de potencia FTP' },
+    { url: '/calculadora-potencia-ciclismo/', icon: '🚴', name: 'Vatios en Ciclismo', description: 'Watts, W/kg y zonas de potencia FTP' },
     { url: '/selector-tipo-gimnasio/', icon: '🏋️', name: 'Selector de Tipo de Gimnasio', description: '¿Qué tipo de entrenamiento te conviene?' },
     { url: '/selector-ejercicio/', icon: '🏋️', name: 'Selector de Ejercicio', description: '¿Qué actividad física te conviene?' },
   ],

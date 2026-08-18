@@ -2,34 +2,34 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Calculadora de Potencia en Ciclismo — FTP, W/kg y VAM | meskeIA',
-  description: 'Calcula tu ratio W/kg, zonas de entrenamiento por FTP y VAM en subidas cronometradas. Compara tu nivel de ciclismo y obtén recomendaciones de entrenamiento. Gratis.',
-  keywords: 'calculadora potencia ciclismo, FTP vatios, W/kg ciclismo, zonas entrenamiento potencia, VAM ciclismo, nivel ciclista',
+  title: 'Calculadora de Vatios en Ciclismo — Watts, FTP y W/kg | meskeIA',
+  description: 'Calcula tus vatios (watts) en ciclismo: ratio W/kg, zonas de entrenamiento por FTP y VAM en subidas cronometradas. Compara tu nivel y obtén recomendaciones de entrenamiento. Gratis.',
+  keywords: 'calculadora vatios ciclismo, calculadora watts ciclismo, calcular vatios bicicleta, calculadora potencia ciclismo, FTP vatios, W/kg ciclismo, zonas entrenamiento potencia, VAM ciclismo, nivel ciclista',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Calculadora de Potencia en Ciclismo — FTP, W/kg y VAM',
-    description: 'Analiza tu FTP, W/kg y VAM para conocer tu nivel como ciclista. Zonas de entrenamiento por potencia incluidas.',
-    url: 'https://meskeia.com/calculadora-potencia-ciclismo',
+    title: 'Calculadora de Vatios en Ciclismo — Watts, FTP y W/kg',
+    description: 'Calcula tus vatios en ciclismo y analiza tu FTP, W/kg y VAM para conocer tu nivel. Zonas de entrenamiento por potencia incluidas.',
+    url: 'https://meskeia.com/calculadora-potencia-ciclismo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Calculadora de Potencia en Ciclismo | meskeIA',
-    description: 'FTP, W/kg, VAM y zonas de entrenamiento para ciclistas.',
+    title: 'Calculadora de Vatios en Ciclismo | meskeIA',
+    description: 'Vatios, FTP, W/kg, VAM y zonas de entrenamiento para ciclistas.',
   },
   other: {
-    'application-name': 'Calculadora Potencia Ciclismo meskeIA',
+    'application-name': 'Calculadora Vatios Ciclismo meskeIA',
   },
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'Calculadora de Potencia en Ciclismo',
-  description: 'Calculadora de potencia para ciclistas. Calcula tu ratio W/kg, zonas de entrenamiento por potencia (FTP) y VAM para subidas cronometradas. Conoce tu nivel ciclista.',
+  name: 'Calculadora de Vatios en Ciclismo (Watts)',
+  description: 'Calculadora de vatios (watts) para ciclistas. Calcula tu ratio W/kg, zonas de entrenamiento por potencia (FTP) y VAM para subidas cronometradas. Conoce tu nivel ciclista.',
   url: 'https://meskeia.com/calculadora-potencia-ciclismo/',
   category: 'UtilityApplication',
   features: [
@@ -44,6 +44,14 @@ export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Vatios y potencia son lo mismo en ciclismo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí: el vatio (W, o watt en inglés) es la unidad en la que se mide la potencia, de modo que «cuántos vatios muevo» y «cuánta potencia genero» son la misma pregunta. En ciclismo la cifra suelta importa poco sin dos contextos: cuánto tiempo puedes sostenerla —de ahí el FTP, la potencia que aguantas alrededor de una hora— y cuánto pesas, porque en subida lo que manda es la relación vatios por kilo (W/kg). Un ciclista de 60 kg a 240 W sube más rápido que uno de 85 kg a 280 W, pese a mover menos vatios en términos absolutos.',
+      },
+    },
     {
       '@type': 'Question',
       name: '¿Qué es el FTP en ciclismo y cómo se mide?',

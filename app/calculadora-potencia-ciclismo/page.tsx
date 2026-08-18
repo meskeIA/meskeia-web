@@ -66,9 +66,9 @@ export default function CalculadoraPotenciaCiclismoPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}><span aria-hidden="true">🚴</span> Calculadora de Potencia en Ciclismo</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🚴</span> Calculadora de Vatios en Ciclismo</h1>
         <p className={styles.subtitle}>
-          Analiza tu FTP, W/kg y VAM para conocer tu nivel como ciclista
+          Cuántos vatios (watts) mueves y qué significan: FTP, W/kg y VAM para conocer tu nivel como ciclista
         </p>
       </header>
 
