@@ -23,6 +23,24 @@ export interface Novedad {
 // Sembrado con los cambios normativos reales recientes. Ampliar al mantener fichas.
 export const NOVEDADES: Novedad[] = [
   {
+    fecha: '2026-08-19',
+    fichaSlug: 'itp-ccaa',
+    texto:
+      'Murcia: el tipo reducido del 3% para jóvenes se aplica a quienes tengan 40 años o menos —no menos de 35— y NO exige que el inmueble valga como máximo 150.000 €. Los requisitos son que sea vivienda habitual, que la base imponible general menos el mínimo personal y familiar quede por debajo de 40.000 € y que la base del ahorro no supere los 1.800 € (art. 8.6 del texto refundido aprobado por el Decreto Legislativo 1/2010, texto consolidado en BOE-A-2011-10542, última modificación de 24/07/2025).',
+  },
+  {
+    fecha: '2026-08-19',
+    fichaSlug: 'itp-ccaa',
+    texto:
+      'Cataluña: el límite de edad del tipo reducido del 5% para jóvenes subió de 32 a 35 años con efectos del 27 de junio de 2025 —no de 2026—, junto con la escala progresiva del 10/11/12/13% (Decreto-ley 5/2025; tarifas publicadas por la Agencia Tributaria de Cataluña).',
+  },
+  {
+    fecha: '2026-08-19',
+    fichaSlug: 'itp-ccaa',
+    texto:
+      'La Rioja: la primera vivienda habitual de jóvenes menores de 40 años tributa al 4%, y al 3% si el municipio figura en el anexo I de la ley. Antes el beneficio se limitaba a los menores de 36 años (art. 45.3 de la Ley 10/2017, en la redacción de la Ley 1/2025 de medidas urgentes para el acceso a la vivienda, con efectos desde el 03/03/2025; texto consolidado en BOE-A-2017-13750).',
+  },
+  {
     fecha: '2026-08-13',
     fichaSlug: 'permiso-prestacion-nacimiento',
     texto:

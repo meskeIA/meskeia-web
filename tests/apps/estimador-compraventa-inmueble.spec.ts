@@ -478,3 +478,66 @@ test.describe('Estimador de gastos de compraventa — lote mecánico 18/08/2026'
     expect(await valorTarjeta(page, /^IVA/)).toBe('42.000,00 €');
   });
 });
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Lote ITP (19/08/2026) — hallazgo 31 del Inspector
+//
+// El acta decía que `data/itp-ccaa.ts` «duplica TIPOS_ITP_CCAA_2025» y que la app
+// calculaba con la tabla no verificada. Al medirlo, los 17 tipos GENERALES coincidían
+// al 100 %; lo que había divergido eran tres tipos REDUCIDOS, y en direcciones
+// distintas. Cada valor de aquí abajo sale de la fuente oficial consultada ese día,
+// no de ninguna de las dos tablas.
+// ═══════════════════════════════════════════════════════════════════════════
+
+test('ITP La Rioja — el tipo joven es el 4 % para menores de 40, no el 5 % para menores de 36', async ({
+  page,
+}) => {
+  // Art. 45.3 de la Ley 10/2017, en la redacción de la Ley 1/2025 de medidas urgentes
+  // para el acceso a la vivienda (efectos 03/03/2025), texto consolidado BOE-A-2017-13750:
+  // «primera vivienda habitual de jóvenes MENORES DE 40 AÑOS → 4 %», y 3 % si el
+  // municipio figura en el anexo I de la ley (condición que esta app no pregunta, así
+  // que ese 3 % no debe aplicarse solo).
+  //   150.000 × 4 % = 6.000 €   (antes daba 150.000 × 5 % = 7.500 €)
+  await page.goto(RUTA);
+  await page.getByRole('button', { name: /Segunda mano/ }).click();
+  await selectCcaa(page).selectOption('rioja');
+  await rellenar(page, 'Precio de la vivienda', '150.000');
+  await selectPerfil(page).selectOption('joven');
+
+  await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (4,0%)');
+  expect(await valorTarjeta(page, /^ITP/)).toBe('6000,00 €');
+});
+
+test('ITP La Rioja — el perfil general sigue pagando el tipo general del 7 %', async ({ page }) => {
+  // Control del test anterior: el 4 % tiene que venir del perfil, no de haber bajado
+  // el tipo general de la comunidad. 150.000 × 7 % = 10.500 €.
+  await page.goto(RUTA);
+  await page.getByRole('button', { name: /Segunda mano/ }).click();
+  await selectCcaa(page).selectOption('rioja');
+  await rellenar(page, 'Precio de la vivienda', '150.000');
+
+  await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (7,0%)');
+  expect(await valorTarjeta(page, /^ITP/)).toBe('10.500,00 €');
+});
+
+test('ITP Murcia — el joven de hasta 40 años tributa al 3 % sin límite de valor del inmueble', async ({
+  page,
+}) => {
+  // Art. 8.6 del texto refundido aprobado por el Decreto Legislativo 1/2010, texto
+  // consolidado BOE-A-2011-10542 (última modificación 24/07/2025): «sujetos pasivos de
+  // edad INFERIOR O IGUAL A 40 AÑOS», vivienda habitual, base imponible general menos
+  // mínimo personal y familiar < 40.000 € y base del ahorro ≤ 1.800 €. NO hay límite de
+  // valor del inmueble: 200.000 × 3 % = 6.000 €.
+  //
+  // Este es el caso que el hallazgo 31 daba por defectuoso reclamando 15.500 € (7,75 %),
+  // porque partía de la nota de data/fiscal, que decía «<35 y ≤150.000 €». La razón la
+  // tenía la app; lo que estaba mal era la nota, ya corregida.
+  await page.goto(RUTA);
+  await page.getByRole('button', { name: /Segunda mano/ }).click();
+  await selectCcaa(page).selectOption('murcia');
+  await rellenar(page, 'Precio de la vivienda', '200.000');
+  await selectPerfil(page).selectOption('joven');
+
+  await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (3,0%)');
+  expect(await valorTarjeta(page, /^ITP/)).toBe('6000,00 €');
+});

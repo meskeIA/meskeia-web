@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema, generateFAQSchema, combineSchemas } from '@/lib/schema-templates';
+import { RANGO_ITP } from '@/data/itp-ccaa';
 
 export const metadata: Metadata = {
   title: 'Gastos de Compraventa de Vivienda - Calculadora ITP, Notaría y Plusvalía | meskeIA',
@@ -108,7 +109,7 @@ export const faqJsonLd = {
       name: '¿Cuánto se paga de ITP al comprar una vivienda de segunda mano?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El Impuesto de Transmisiones Patrimoniales (ITP) varía entre el 6 % y el 11 % del valor del inmueble según la comunidad autónoma. Cataluña aplica el 10 %, Madrid el 6 %, Andalucía el 7 % y el País Vasco el 4 %. Además, desde 2022 la base imponible es el mayor valor entre el precio escriturado y el valor de referencia catastral, por lo que comprar por debajo del valor de referencia no reduce el impuesto a pagar.',
+        text: `El Impuesto de Transmisiones Patrimoniales (ITP) varía entre el ${RANGO_ITP.min} % y el ${RANGO_ITP.max} % del valor del inmueble según la comunidad autónoma. Cataluña aplica el 10 % de tipo general y escala hasta el 13 % en los inmuebles de más valor, Madrid el 6 %, Andalucía el 7 % y el País Vasco el 4 %. Además, desde 2022 la base imponible es el mayor valor entre el precio escriturado y el valor de referencia catastral, por lo que comprar por debajo del valor de referencia no reduce el impuesto a pagar.`,
       },
     },
     {

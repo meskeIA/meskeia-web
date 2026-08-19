@@ -5,7 +5,7 @@
   "scripts": {
     "predev": "npx kill-port 3050 || exit 0",
     "dev": "next dev -p 3050",
-    "build": "node scripts/check-verticales.mjs && node scripts/check-sitemap.mjs && node scripts/check-enlaces-internos.mjs && node scripts/check-fiscal-manifiesto.mjs && node scripts/check-csp.mjs && node scripts/check-tipos.mjs && node scripts/generate-app-dates.mjs && node scripts/generate-llm-index.js && node scripts/generate-delegum-es.mjs && node scripts/build-mcp-ui.mjs && next build --turbopack",
+    "build": "node scripts/check-verticales.mjs && node scripts/check-sitemap.mjs && node scripts/check-enlaces-internos.mjs && node scripts/check-fiscal-manifiesto.mjs && node scripts/check-itp.mjs && node scripts/check-csp.mjs && node scripts/check-tipos.mjs && node scripts/generate-app-dates.mjs && node scripts/generate-llm-index.js && node scripts/generate-delegum-es.mjs && node scripts/build-mcp-ui.mjs && next build --turbopack",
     "start": "next start -p 3050",
     "lint": "eslint",
     "test": "npx playwright test",
@@ -17,6 +17,7 @@
     "check:sitemap": "node scripts/check-sitemap.mjs",
     "check:enlaces": "node scripts/check-enlaces-internos.mjs",
     "check:fiscal": "node scripts/check-fiscal-manifiesto.mjs",
+    "check:itp": "node scripts/check-itp.mjs",
     "audit:fiscal-fuentes": "node scripts/audit-fiscal-fuentes.mjs",
     "audit:motores": "node scripts/audit-motores-fiscales.mjs",
     "check:memoria": "node scripts/check-memoria.mjs",

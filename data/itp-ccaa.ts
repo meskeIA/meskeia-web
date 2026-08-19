@@ -16,7 +16,38 @@
 
 // ===== TIPOS =====
 
-import { COEFICIENTES_IIVTNU_2025, PLUSVALIA_MUNICIPAL_META } from '@/data/fiscal';
+import { COEFICIENTES_IIVTNU_2025, PLUSVALIA_MUNICIPAL_META, TIPOS_ITP_CCAA_2025 } from '@/data/fiscal';
+
+/**
+ * El tipo general de cada comunidad se LEE de `data/fiscal`; aquí no se escribe.
+ *
+ * ── Por qué (19/08/2026) ──────────────────────────────────────────────────────
+ * El mismo dato vivía en dos sitios: `tipoGeneral` aquí y `TIPOS_ITP_CCAA_2025` en
+ * `data/fiscal/inmuebles.ts`. El inventario del 19/08/2026 comprobó que los 17
+ * coincidían, así que derivarlos no cambió ningún importe — pero nada impedía que
+ * mañana dejaran de coincidir, y esa clase de divergencia no la detecta el build:
+ * los tipos REDUCIDOS, que no se pueden derivar porque aquí son una lista con
+ * condiciones y allí un solo número, ya habían divergido en tres comunidades sin
+ * que nadie lo notara (Murcia, Cataluña y La Rioja).
+ *
+ * El reparto que queda: `data/fiscal` es la autoridad del VALOR del tipo general;
+ * este fichero, la del CÁLCULO — escalas progresivas, tipos reducidos y sus
+ * condiciones, aranceles y plusvalía, que la ficha no modela.
+ *
+ * El `throw` es deliberado: si una comunidad desaparece de la ficha, el módulo no
+ * carga y el build se para. Vale más eso que un `undefined` propagándose a un
+ * cálculo de impuestos. `npm run check:itp` lo dice antes y con mejor mensaje.
+ */
+const tipoGeneralDe = (nombreEnDataFiscal: string): number => {
+  const ficha = TIPOS_ITP_CCAA_2025.find((t) => t.ccaa === nombreEnDataFiscal);
+  if (!ficha) {
+    throw new Error(
+      `ITP: «${nombreEnDataFiscal}» no está en TIPOS_ITP_CCAA_2025 (data/fiscal/inmuebles.ts). ` +
+        'El tipo general se lee de ahí: añádela allí o corrige el nombre.',
+    );
+  }
+  return ficha.tipo;
+};
 
 export type ComunidadAutonoma =
   | 'andalucia'
@@ -66,7 +97,7 @@ export interface DatosCCAA {
 export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
   'andalucia': {
     nombre: 'Andalucía',
-    tipoGeneral: 7,
+    tipoGeneral: tipoGeneralDe('Andalucía'),
     tiposReducidos: [
       {
         nombre: 'Vivienda habitual (valor ≤150.000€)',
@@ -104,7 +135,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
 
   'aragon': {
     nombre: 'Aragón',
-    tipoGeneral: 8,
+    tipoGeneral: tipoGeneralDe('Aragón'),
     tramosProgresivos: [
       { hasta: 400000, tipo: 8 },
       { hasta: Infinity, tipo: 10 },
@@ -134,7 +165,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
 
   'asturias': {
     nombre: 'Asturias',
-    tipoGeneral: 8,
+    tipoGeneral: tipoGeneralDe('Asturias'),
     tramosProgresivos: [
       { hasta: 300000, tipo: 8 },
       { hasta: 500000, tipo: 9 },
@@ -166,7 +197,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
 
   'baleares': {
     nombre: 'Islas Baleares',
-    tipoGeneral: 8,
+    tipoGeneral: tipoGeneralDe('Baleares'),
     tramosProgresivos: [
       { hasta: 400000, tipo: 8 },
       { hasta: 600000, tipo: 9 },
@@ -206,7 +237,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
 
   'canarias': {
     nombre: 'Canarias',
-    tipoGeneral: 6.5,
+    tipoGeneral: tipoGeneralDe('Canarias'),
     tiposReducidos: [
       {
         nombre: 'Vivienda habitual',
@@ -236,7 +267,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
 
   'cantabria': {
     nombre: 'Cantabria',
-    tipoGeneral: 9,
+    tipoGeneral: tipoGeneralDe('Cantabria'),
     tiposReducidos: [
       {
         nombre: 'Vivienda habitual < 200.000€',
@@ -285,7 +316,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
 
   'castilla-leon': {
     nombre: 'Castilla y León',
-    tipoGeneral: 8,
+    tipoGeneral: tipoGeneralDe('Castilla y León'),
     tramosProgresivos: [
       { hasta: 250000, tipo: 8 },
       { hasta: Infinity, tipo: 10 },
@@ -324,7 +355,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
 
   'castilla-mancha': {
     nombre: 'Castilla-La Mancha',
-    tipoGeneral: 9,
+    tipoGeneral: tipoGeneralDe('Castilla-La Mancha'),
     tiposReducidos: [
       {
         nombre: 'Vivienda habitual (primera compra)',
@@ -354,7 +385,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
 
   'cataluna': {
     nombre: 'Cataluña',
-    tipoGeneral: 10,
+    tipoGeneral: tipoGeneralDe('Cataluña'),
     tramosProgresivos: [
       { hasta: 600000, tipo: 10 },
       { hasta: 900000, tipo: 11 },
@@ -363,9 +394,9 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
     ],
     tiposReducidos: [
       {
-        nombre: 'Jóvenes ≤32 años',
+        nombre: 'Jóvenes ≤35 años',
         tipo: 5,
-        condiciones: ['Menor o igual de 32 años', 'Vivienda habitual', 'Renta ≤ 36.000 €'],
+        condiciones: ['Menor o igual de 35 años', 'Vivienda habitual', 'Renta ≤ 36.000 €'],
         rentaMaxima: 36000,
       },
       {
@@ -390,12 +421,12 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 1.5,
-    notas: 'ITP elevado (10-11%). Tipo reducido 5% para colectivos específicos.',
+    notas: 'ITP elevado (10-13% en escala progresiva desde el 27/06/2025, Decreto-ley 5/2025). Tipo reducido 5% para colectivos específicos, con el límite de edad de los jóvenes en 35 años desde esa misma fecha (antes 32). ⚠️ La ATC reconoce además un 5% para víctimas de violencia machista, un 4% en municipios rurales (3% en los de especial atención) y un 20% para grandes tenedores, que esta app no distingue.',
   },
 
   'valencia': {
     nombre: 'Comunidad Valenciana',
-    tipoGeneral: 9,
+    tipoGeneral: tipoGeneralDe('Valencia'),
     tramosProgresivos: [
       { hasta: 1000000, tipo: 9 },
       { hasta: Infinity, tipo: 11 },
@@ -444,7 +475,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
 
   'extremadura': {
     nombre: 'Extremadura',
-    tipoGeneral: 8,
+    tipoGeneral: tipoGeneralDe('Extremadura'),
     tramosProgresivos: [
       { hasta: 360000, tipo: 8 },
       { hasta: 600000, tipo: 10 },
@@ -479,7 +510,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
 
   'galicia': {
     nombre: 'Galicia',
-    tipoGeneral: 8,
+    tipoGeneral: tipoGeneralDe('Galicia'),
     tiposReducidos: [
       {
         nombre: 'Vivienda habitual (patrimonio ≤200.000€)',
@@ -517,7 +548,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
 
   'madrid': {
     nombre: 'Comunidad de Madrid',
-    tipoGeneral: 6,
+    tipoGeneral: tipoGeneralDe('Madrid'),
     tiposReducidos: [
       {
         nombre: 'Familia numerosa',
@@ -543,7 +574,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
 
   'murcia': {
     nombre: 'Región de Murcia',
-    tipoGeneral: 7.75,
+    tipoGeneral: tipoGeneralDe('Murcia'),
     tiposReducidos: [
       {
         nombre: 'VPO régimen especial',
@@ -574,7 +605,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
 
   'navarra': {
     nombre: 'Comunidad Foral de Navarra',
-    tipoGeneral: 6,
+    tipoGeneral: tipoGeneralDe('Navarra'),
     tiposReducidos: [
       {
         nombre: 'Vivienda habitual',
@@ -594,7 +625,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
 
   'pais-vasco': {
     nombre: 'País Vasco',
-    tipoGeneral: 4,
+    tipoGeneral: tipoGeneralDe('País Vasco'),
     tiposReducidos: [
       {
         nombre: 'Vivienda habitual (hasta 120 m²)',
@@ -618,7 +649,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
 
   'rioja': {
     nombre: 'La Rioja',
-    tipoGeneral: 7,
+    tipoGeneral: tipoGeneralDe('La Rioja'),
     tiposReducidos: [
       {
         nombre: 'VPO primera vivienda',
@@ -626,14 +657,14 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
         condiciones: ['VPO', 'Primera vivienda'],
       },
       {
-        nombre: 'Jóvenes < 36 años',
-        tipo: 5,
-        condiciones: ['Menor de 36 años', 'Primera vivienda'],
+        nombre: 'Jóvenes < 40 años',
+        tipo: 4,
+        condiciones: ['Menor de 40 años', 'Primera vivienda habitual'],
       },
       {
-        nombre: 'Jóvenes < 36 años (municipios especiales)',
+        nombre: 'Jóvenes < 40 años (municipios del anexo I)',
         tipo: 3,
-        condiciones: ['Menor de 36 años', 'Municipios determinados'],
+        condiciones: ['Menor de 40 años', 'Primera vivienda habitual', 'Municipio del anexo I de la Ley 10/2017'],
       },
       {
         nombre: 'Familia numerosa',
@@ -647,11 +678,12 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 1,
-    notas: 'ITP moderado (7%). Buenos tipos reducidos para jóvenes y familias. ⚠️ Dato orientativo: existen varios escalones adicionales según colectivo y municipio — verifica la tarifa vigente en larioja.org',
+    notas: 'ITP moderado (7%). Jóvenes menores de 40 años en primera vivienda habitual: 4% (3% en los municipios del anexo I de la Ley 10/2017), por la Ley 1/2025 de medidas urgentes para el acceso a la vivienda, con efectos desde el 03/03/2025. ⚠️ Dato orientativo: la familia numerosa baja del 5% al 3% con requisitos adicionales de renta (≤30.600 €) que esta app no pregunta — verifica la tarifa vigente en larioja.org',
   },
 
   'ceuta': {
     nombre: 'Ciudad Autónoma de Ceuta',
+    // Excepción declarada: Ceuta no es una CCAA y no figura en TIPOS_ITP_CCAA_2025.
     tipoGeneral: 6,
     tiposReducidos: [
       {
@@ -666,6 +698,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
 
   'melilla': {
     nombre: 'Ciudad Autónoma de Melilla',
+    // Excepción declarada: Melilla no es una CCAA y no figura en TIPOS_ITP_CCAA_2025.
     tipoGeneral: 6,
     tiposReducidos: [
       {
@@ -905,6 +938,31 @@ export function importeITP(valor: number, ccaa: ComunidadAutonoma, elegido: Tipo
   if (elegido.esReducido) return valor * (elegido.tipo / 100);
   return calcularITP(valor, ccaa); // sin tercer argumento: usa la escala si existe
 }
+
+/**
+ * Rango real del ITP entre comunidades, CALCULADO de la tabla — nunca escrito a mano.
+ *
+ * ── De dónde sale (19/08/2026) ────────────────────────────────────────────────
+ * La misma página del estimador daba TRES rangos incompatibles, y uno se contradecía
+ * dentro de su propia frase: el JSON-LD decía «entre el 6 % y el 11 %» y acto seguido
+ * citaba «el País Vasco el 4 %»; el bloque educativo, «del 4 % al 11 %»; y la nota de
+ * `data/fiscal`, «6-13 %». Ninguno acertaba. Un rango es un dato DERIVADO de la tabla:
+ * escribirlo a mano garantiza que se quede atrás en cuanto una comunidad se mueva.
+ *
+ * `min` es el tipo general más bajo y `max` el tramo más alto de las escalas
+ * progresivas. Deliberadamente NO entran los tipos reducidos, que bajan mucho más
+ * (Madrid llega a 0 % y Castilla y León a 0,01 %): el rango describe lo que paga quien
+ * no encaja en ningún colectivo, que es la lectura útil de «el ITP va del X al Y».
+ */
+export const RANGO_ITP: { min: number; max: number } = (() => {
+  const comunidades = Object.values(ITP_CCAA);
+  const generales = comunidades.map((c) => c.tipoGeneral);
+  const deEscalas = comunidades.flatMap((c) => (c.tramosProgresivos ?? []).map((t) => t.tipo));
+  return {
+    min: Math.min(...generales),
+    max: Math.max(...generales, ...deEscalas),
+  };
+})();
 
 // ===== FUNCIONES DE CÁLCULO =====
 

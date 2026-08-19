@@ -18,6 +18,7 @@ import {
   importeITP,
   TipoElegido,
   ENLACE_CATASTRO,
+  RANGO_ITP,
 } from '@/data/itp-ccaa';
 
 // ===== TIPOS =====
@@ -1107,7 +1108,7 @@ export default function SimuladorCompraventaPage() {
               <h4>🔄 Segunda mano → ITP</h4>
               <p>
                 El <strong>Impuesto de Transmisiones Patrimoniales</strong> grava las compras de inmuebles de segunda mano.
-                Cada comunidad autónoma fija su propio tipo, que va del 4% (País Vasco) al 11% (Cataluña, Valencia).
+                Cada comunidad autónoma fija su propio tipo, que va del {formatNumber(RANGO_ITP.min, 0)}% (País Vasco) al {formatNumber(RANGO_ITP.max, 0)}% (el tramo más alto de las escalas progresivas de Baleares y Cataluña).
               </p>
               <p>
                 La base imponible es el <strong>mayor valor</strong> entre el precio escriturado y el valor de referencia catastral.
