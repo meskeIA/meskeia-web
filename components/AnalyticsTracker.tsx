@@ -49,7 +49,11 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
       return;
     }
 
-    // URL base para API (relativa, funciona en cualquier dominio)
+    // URL base para API (relativa, funciona en cualquier dominio).
+    // Las llamadas de abajo llevan BARRA FINAL a propósito: con trailingSlash: true
+    // la ruta canónica es /api/analytics/track/ y pedirla sin barra devuelve un 308,
+    // así que el navegador hacía DOS peticiones por cada registro. Vercel las contaba
+    // por separado (19/08/2026: 30K a /duration + 29K a /duration/, 16K + 16K en track).
     const API_BASE = '/api/analytics';
 
     // Obtener o crear sesion_id persistente entre páginas de la misma pestaña.
@@ -169,7 +173,7 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
     // Registrar entrada (nueva API Turso)
     const registerEntry = async () => {
       try {
-        await fetch(`${API_BASE}/track`, {
+        await fetch(`${API_BASE}/track/`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(entryData),
@@ -197,7 +201,7 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
 
         // sendBeacon con text/plain evita preflight en iOS Safari (application/json lo bloquea)
         const beaconFallback = () => {
-          fetch(`${API_BASE}/duration`, {
+          fetch(`${API_BASE}/duration/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: data,
@@ -208,7 +212,7 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
 
         if (navigator.sendBeacon) {
           const blob = new Blob([data], { type: 'text/plain' });
-          const sent = navigator.sendBeacon(`${API_BASE}/duration`, blob);
+          const sent = navigator.sendBeacon(`${API_BASE}/duration/`, blob);
           if (sent) {
             console.log(`✅ Duración registrada (sendBeacon): ${durationSeconds}s`);
           } else {
@@ -242,17 +246,24 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
     // Añadir listener de visibilidad (CRÍTICO para móviles)
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    // Listener de beforeunload (fallback para escritorio)
+    // Listener de beforeunload (fallback para escritorio). La línea «isActive = false»
+    // no es cosmética: al cerrar pestaña en escritorio se disparan beforeunload Y pagehide,
+    // y sin ella la duración se enviaba DOS veces por salida. Medido en Vercel el
+    // 19/08/2026: 30K llamadas a /duration frente a 16K de /track en 30 días.
     window.addEventListener('beforeunload', () => {
       if (isActive) {
         registerDuration();
+        isActive = false;
       }
     });
 
-    // Listener de pagehide (alternativa para iOS)
+    // Listener de pagehide (alternativa para iOS, donde beforeunload no siempre llega).
+    // En escritorio suele dispararse DESPUÉS de beforeunload: el isActive de arriba ya
+    // lo ha apagado, así que aquí no se reenvía.
     window.addEventListener('pagehide', () => {
       if (isActive) {
         registerDuration();
+        isActive = false;
       }
     });
 

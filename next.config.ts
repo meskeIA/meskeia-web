@@ -115,8 +115,13 @@ const nextConfig: NextConfig = {
   //   delegum.com/api/mcp/                        → servidor MCP Delegum (/api/mcp/delegum)
   //   delegum.com/.well-known/mcp/server-card.json → tarjeta de discovery propia de Delegum
   // El enrutado de las PÁGINAS de delegum.com (/, /datos-fiscales, /asistente-ia,
-  // /calculadoras, /aviso-legal → /delegum/*) lo hace middleware.ts, que también
-  // cubre la navegación client-side. Aquí solo queda el endpoint MCP y su server-card.
+  // /calculadoras, /aviso-legal → /delegum/*) NO se hace aquí ni en ningún otro sitio
+  // del repositorio: es un rewrite configurado en el dashboard de Vercel. Verificado el
+  // 19/08/2026 con la cabecera de respuesta X-Matched-Path, que devuelve /delegum/
+  // datos-fiscales al pedir delegum.com/datos-fiscales/. Hasta esa fecha este comentario
+  // decía que lo hacía middleware.ts, y era falso: ese fichero se borró el 26/01/2026 en
+  // 5d7744a3, donde era SOLO el modo mantenimiento, y nadie notó nada porque el rewrite
+  // del dashboard ya sostenía las páginas. Aquí solo queda el endpoint MCP y su server-card.
   // El server-card se sirve por host porque public/.well-known/... es estático (mismo
   // contenido para todos los dominios) y meskeIA ya usa esa ruta estática.
   // ============================================================================
