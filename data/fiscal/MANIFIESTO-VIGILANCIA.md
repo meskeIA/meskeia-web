@@ -248,10 +248,10 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 - **Verificado**: 2025-01-15 · vigencia 2025. ⚠️ Sello antiguo.
 
 #### `inmuebles.ts` — ITP/AJD, IVA obra nueva, plusvalías IRPF, IIVTNU (2 bloques con META)
-- **Contiene**: ITP por CCAA (6-13%), AJD, IVA obra nueva (10%), tramos del ahorro para plusvalías IRPF, otros costes de compraventa, IIVTNU (coeficientes anuales + tipo máximo legal 30%).
+- **Contiene**: ITP por CCAA (del 4% del País Vasco al 13% del tramo alto de las escalas de Baleares y Cataluña), AJD, IVA obra nueva (10%), tramos del ahorro para plusvalías IRPF, otros costes de compraventa, IIVTNU (coeficientes anuales + tipo máximo legal 30%).
 - **Sistema de cálculo IIVTNU vigente**: método dual del RDL 26/2021 — el contribuyente elige entre (a) base objetiva = valor catastral del suelo × coeficiente según años de tenencia (coeficientes actualizados por LPGE) y (b) plusvalía real. Precedente metodológico máximo: STC 182/2021 tumbó el sistema anterior.
 - **Normativa**: Ley 1/1993 ITP-AJD (+ leyes CCAA) + Ley 35/2006 + Ley 37/1992 + RDL 26/2021.
-- **Vigilar**: coeficientes IIVTNU en cada LPGE; tipos ITP/AJD en leyes de medidas CCAA; tramos del ahorro en LPGE (precedente: nuevo tramo 30% > 300.000 € en 2023); nueva jurisprudencia constitucional sobre IIVTNU.
+- **Vigilar**: coeficientes IIVTNU en cada LPGE; tipos ITP/AJD en leyes de medidas CCAA; tramos del ahorro en LPGE (precedente: nuevo tramo 30% > 300.000 € en 2023); nueva jurisprudencia constitucional sobre IIVTNU. **Y la EDAD de los tipos reducidos de jóvenes, que es el punto débil demostrado**: el 19/08/2026 se verificaron tres comunidades en fuente oficial y las tres estaban desactualizadas en algún sitio —Murcia ≤40 (no <35, y sin límite de valor), La Rioja <40 al 4% (no <36 al 5%), Cataluña ≤35 desde el 27/06/2025 (no ≤32)—. Las comunidades cuya ficha sigue diciendo «<36» o «<35» no se han contrastado: es material de la inmersión de enero.
 - **Cadencia**: anual (coeficientes + CCAA) + jurisprudencia puntual.
 - **Alerta metodológica**: cambios sobre el valor de referencia catastral como base imponible (Ley 11/2021 — los ajustes de este mecanismo son metodología); una nueva sentencia sobre IIVTNU.
 - **Verificado**: 2026-06-17 (principal) · 2025-01-15 (IIVTNU). ⚠️ Bloque IIVTNU con sello antiguo: los coeficientes 2026 deben confirmarse.
