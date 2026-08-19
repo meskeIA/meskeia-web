@@ -872,7 +872,17 @@ export function elegirTipoITP(
     if (NO_SON_REQUISITOS.some(r => r.test(c))) return true;
     if (/^vivienda habitual$|^primera vivienda habitual$/i.test(c)) return viviendaHabitual;
     if (patronPerfil.test(c)) return true;
-    // Un límite de valor sí es comprobable: se contrasta con el precio introducido
+    // Un límite de VALOR del inmueble sí es comprobable: se contrasta con el precio
+    // introducido. Un límite de RENTA no —la app no pregunta ingresos— así que queda
+    // fuera de este regex a propósito: si no, «Renta ≤ 36.000 €» se leía como un
+    // límite de precio y comparaba 36.000 contra lo que el usuario tecleaba en
+    // "Precio de la vivienda". Verificado el 19/08/2026: un joven con un inmueble de
+    // 200.000 € en Cataluña perdía el reducido aunque su renta real fuera baja, y uno
+    // con un inmueble de 30.000 € lo obtenía sin que nadie le preguntara la renta.
+    // Con la renta fuera, esa condición no se puede dar por cumplida y el tipo
+    // reducido cae en `noComprobables` —se enseña como oportunidad, nunca como
+    // cifra—, que es el mismo criterio que ya rige el resto de esta función.
+    if (/renta/i.test(c)) return false;
     const limite = c.match(/[≤<]\s*([\d.]+)\s*€/);
     if (limite) return precio <= Number(limite[1].replace(/\./g, ''));
     return false;

@@ -541,3 +541,60 @@ test('ITP Murcia — el joven de hasta 40 años tributa al 3 % sin límite de va
   await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (3,0%)');
   expect(await valorTarjeta(page, /^ITP/)).toBe('6000,00 €');
 });
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Hallazgo nuevo (19/08/2026, encontrado al verificar el lote ITP) — elegirTipoITP
+// confundía condiciones de RENTA con límites de VALOR del inmueble: el regex que
+// detecta «≤ X €» en `cubierta()` no distinguía «Valor ≤ 150.000 €» (comprobable
+// contra el precio) de «Renta ≤ 36.000 €» (un dato que la app nunca pregunta).
+// ═══════════════════════════════════════════════════════════════════════════
+
+test('Cataluña — un inmueble caro ya NO pierde el reducido joven por el precio, sino por no poder verificar la renta', async ({
+  page,
+}) => {
+  // Antes: 200.000 × 10 % (general) — la condición «Renta ≤ 36.000 €» se comparaba
+  // contra el PRECIO (200.000), y como 200.000 > 36.000 el reducido se descartaba.
+  // Casualidad, no criterio: alguien con renta baja e inmueble caro perdía un
+  // beneficio al que sí tenía derecho, sin que la app supiera nada de su renta.
+  // Ahora sigue dando el 10 % general, pero por la razón correcta: la renta no se
+  // puede comprobar, así que el reducido cae en `noComprobables` y se avisa.
+  await page.goto(RUTA);
+  await page.getByRole('button', { name: /Segunda mano/ }).click();
+  await selectCcaa(page).selectOption('cataluna');
+  await rellenar(page, 'Precio de la vivienda', '200.000');
+  await selectPerfil(page).selectOption('joven');
+
+  await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (10,0%)');
+  await expect(page.getByText(/no se ha podido comprobar|podr.as pagar menos/i)).toBeVisible();
+});
+
+test('Cataluña — un inmueble barato ya NO obtiene el reducido joven sin que se pregunte la renta', async ({
+  page,
+}) => {
+  // Antes: 30.000 × 5 % = 1.500 €. La misma condición de renta, con un precio bajo,
+  // pasaba a leerse como «cumplida» — el efecto contrario del caso anterior, y el
+  // peligroso en una herramienta fiscal: enseñar una cifra más baja de la que
+  // correspondería si la renta real superase los 36.000 €.
+  await page.goto(RUTA);
+  await page.getByRole('button', { name: /Segunda mano/ }).click();
+  await selectCcaa(page).selectOption('cataluna');
+  await rellenar(page, 'Precio de la vivienda', '30.000');
+  await selectPerfil(page).selectOption('joven');
+
+  await expect(page.locator('h3', { hasText: /^ITP/ }).first()).not.toHaveText('ITP (5,0%)');
+  await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (10,0%)');
+});
+
+test('Andalucía — control: un reducido con límite de VALOR (no de renta) sigue aplicándose sin cambios', async ({
+  page,
+}) => {
+  // El fix excluye SOLO las condiciones que mencionan «renta»; un límite de precio
+  // real («Valor ≤ 150.000 €») tiene que seguir comparándose contra el precio.
+  await page.goto(RUTA);
+  await page.getByRole('button', { name: /Segunda mano/ }).click();
+  await selectCcaa(page).selectOption('andalucia');
+  await rellenar(page, 'Precio de la vivienda', '100.000');
+  await selectPerfil(page).selectOption('joven');
+
+  await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (3,5%)');
+});
