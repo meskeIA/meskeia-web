@@ -24,10 +24,40 @@ const textToBraille: { [key: string]: string } = {
   // Números (precedidos por indicador numérico ⠼)
   '0': '⠚', '1': '⠁', '2': '⠃', '3': '⠉', '4': '⠙',
   '5': '⠑', '6': '⠋', '7': '⠛', '8': '⠓', '9': '⠊',
-  // Puntuación
-  ' ': '⠀', '.': '⠲', ',': '⠂', ';': '⠆', ':': '⠒',
-  '?': '⠦', '!': '⠖', '"': '⠶', "'": '⠄', '-': '⠤',
-  '(': '⠣', ')': '⠜',
+  // ─── Puntuación ────────────────────────────────────────────────────────────
+  // Fuente: Documento Técnico B 2 de la Comisión Braille Española (ONCE),
+  // «Signografía básica de las lenguas cooficiales españolas», V4 (22/01/2026), § 6.1.
+  //
+  // El braille español NO distingue apertura de cierre: ¿ y ? comparten celda, igual
+  // que ¡ y !, y que las comillas de entrada y de salida. Antes esta tabla traía la
+  // puntuación del braille INGLÉS —punto 2-5-6 e interrogación 2-3-6—, y esos 2-3-6
+  // son en español las comillas, así que el punto y la interrogación de un texto
+  // español real se descodificaban mal.
+  ' ': '⠀',
+  '.': '⠄',                                            // punto ortográfico — punto 3
+  ',': '⠂',                                            // coma — punto 2
+  ';': '⠆',                                            // punto y coma — puntos 2-3
+  ':': '⠒',                                            // dos puntos — puntos 2-5
+  '¿': '⠢', '?': '⠢',                                  // interrogación — puntos 2-6
+  '¡': '⠖', '!': '⠖',                                  // exclamación — puntos 2-3-5
+  '"': '⠦', '«': '⠦', '»': '⠦', '“': '⠦', '”': '⠦',    // comillas — puntos 2-3-6
+  '-': '⠤',                                            // guion — puntos 3-6
+  '(': '⠣', ')': '⠜',                                  // paréntesis — 1-2-6 / 3-4-5
+};
+
+/**
+ * Qué carácter en tinta devuelve una celda que sirve a varios signos.
+ *
+ * Como el braille español abre y cierra con el mismo signo (§ 6.1 del B 2), la vuelta
+ * NO puede recuperar el original: «¿Qué?» vuelve como «?Qué?». Es una propiedad del
+ * sistema, no un defecto de la app, y por eso se advierte en pantalla en vez de
+ * disimularla. Sin esta tabla la preferencia la decidía el orden de inserción del
+ * objeto, que es un detalle de implementación.
+ */
+const PREFERENCIA_INVERSA: { [celda: string]: string } = {
+  '⠢': '?',
+  '⠖': '!',
+  '⠦': '"',
 };
 
 // Invertir para Braille a texto
@@ -41,6 +71,16 @@ Object.entries(textToBraille).forEach(([text, braille]) => {
     brailleToText[braille] = text;
   }
 });
+Object.entries(PREFERENCIA_INVERSA).forEach(([celda, tinta]) => {
+  brailleToText[celda] = tinta;
+});
+
+/**
+ * El apóstrofo NO está en la tabla a propósito. El B 2 lo define como signo compuesto
+ * y la tabla del documento no permite fijarlo con certeza, así que se trata como
+ * carácter sin celda y la app lo dice, en vez de asignarle el punto 3 —que es el punto
+ * ortográfico— como hacía antes.
+ */
 
 // Patrón de puntos para visualización
 const brailleDots: { [key: string]: number[] } = {
@@ -55,10 +95,38 @@ const brailleDots: { [key: string]: number[] } = {
   '⠀': [], '⠲': [2,5,6], '⠂': [2], '⠆': [2,3], '⠒': [2,5],
   '⠦': [2,3,6], '⠖': [2,3,5], '⠶': [2,3,5,6], '⠄': [3], '⠤': [3,6],
   '⠣': [1,2,6], '⠜': [3,4,5], '⠼': [3,4,5,6],
+  '⠢': [2,6],
+  // Los tres indicadores. Faltaban, y brailleDots[c] ?? [] devolvía una celda sin
+  // ningún punto: en la hoja a escala real eso es un espacio, no un indicador.
+  '⠨': [4,6],   // signo de mayúscula (B 2 § 7)
+  '⠐': [5],     // prefijo de latina minúscula (B 2 § 8.2)
 };
 
-const NUMBER_INDICATOR = '⠼';
-const CAPITAL_INDICATOR = '⠨';
+const NUMBER_INDICATOR = '⠼';   // puntos 3-4-5-6 — signo de número (B 2 § 8.1)
+const CAPITAL_INDICATOR = '⠨';  // puntos 4-6 — signo de mayúscula (B 2 § 7)
+/**
+ * Punto 5 — «prefijo de latina minúscula» (B 2 § 8.2).
+ *
+ * Existe exactamente para el caso de «24h»: una minúscula de la primera serie (a-j)
+ * pegada a una cifra se leería como cifra, porque comparten celda. El prefijo la
+ * separa. El documento es explícito en que, si hay varias contiguas, cada una lleva
+ * el suyo: «234ae» → signo de número, b, c, d, prefijo, a, prefijo, e.
+ */
+const LATIN_PREFIX = '⠐';
+
+/** Las diez primeras letras minúsculas, que son las que colisionan con los dígitos. */
+const PRIMERA_SERIE = /^[a-j]$/;
+
+/**
+ * Caracteres del texto que esta app no sabe escribir en braille.
+ *
+ * Antes se colaban dentro de la cadena braille tal cual, y en la hoja imprimible
+ * desaparecían sin avisar, porque el SVG filtra todo lo que no sea U+2800-U+28FF:
+ * el usuario veía una hoja coherente a la que le faltaban caracteres.
+ */
+const caracteresSinCelda = (texto: string): string[] => [
+  ...new Set(Array.from(texto).filter((c) => !textToBraille[c.toLowerCase()])),
+];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Hoja imprimible a escala real
@@ -133,6 +201,21 @@ export default function ConversorBraillePage() {
   const [tituloHoja, setTituloHoja] = useState('');
 
   const norma = NORMAS.find((n) => n.id === normaId) ?? NORMAS[0];
+
+  /**
+   * Lo que la conversión ha dejado fuera. Se calcula sobre el texto de entrada, no
+   * sobre el resultado, porque el resultado ya no contiene rastro de lo omitido.
+   */
+  const sinCelda = useMemo(
+    () => (mode === 'textToBraille' && result ? caracteresSinCelda(input) : []),
+    [mode, result, input],
+  );
+
+  /** ¿Lleva el resultado algún signo que en español abre y cierra igual? */
+  const llevaSignoAmbiguo = useMemo(
+    () => (mode === 'textToBraille' ? /[⠢⠖⠦]/.test(result) : false),
+    [mode, result],
+  );
 
   /**
    * Reparte el Braille en líneas del ancho de la página y calcula la posición en
@@ -226,30 +309,50 @@ export default function ConversorBraillePage() {
 
   const convertTextToBraille = (text: string): string => {
     let result = '';
-    let inNumber = false;
-    const lowerText = text.toLowerCase();
+    /** Dentro de una expresión numérica las letras a-j se leerían como cifras. */
+    let enExpresionNumerica = false;
 
-    for (let i = 0; i < lowerText.length; i++) {
-      const char = lowerText[i];
-      const originalChar = text[i];
+    // Por code points, no por índices UTF-16: un emoji ocupa dos unidades y
+    // recorrerlo a pares partía el carácter en dos mitades sin celda.
+    for (const original of Array.from(text)) {
+      const char = original.toLowerCase();
 
-      // Detectar números
       if (/[0-9]/.test(char)) {
-        if (!inNumber) {
+        if (!enExpresionNumerica) {
           result += NUMBER_INDICATOR;
-          inNumber = true;
+          enExpresionNumerica = true;
         }
-        result += textToBraille[char] || char;
-      } else {
-        inNumber = false;
-
-        // Detectar mayúsculas
-        if (originalChar !== char && /[A-ZÁÉÍÓÚÜÑ]/.test(originalChar)) {
-          result += CAPITAL_INDICATOR;
-        }
-
-        result += textToBraille[char] || char;
+        result += textToBraille[char];
+        continue;
       }
+
+      const celda = textToBraille[char];
+      if (!celda) {
+        // Sin celda no se escribe nada: meter el carácter en tinta dentro de la
+        // cadena braille producía una hoja a la que le faltaban caracteres en
+        // silencio. Los recoge caracteresSinCelda() para avisar en pantalla.
+        enExpresionNumerica = false;
+        continue;
+      }
+
+      const esMayuscula = original !== char && /[A-ZÁÉÍÓÚÜÑ]/.test(original);
+      if (esMayuscula) {
+        // El signo de mayúscula (4-6) no es ninguna cifra, así que desambigua por
+        // sí mismo: es lo que hace el B 2 § 8.5 con los números romanos.
+        result += CAPITAL_INDICATOR + celda;
+        enExpresionNumerica = false;
+        continue;
+      }
+
+      if (enExpresionNumerica && PRIMERA_SERIE.test(char)) {
+        // B 2 § 8.2. Se sigue DENTRO de la expresión numérica a propósito: «234a5»
+        // es legal, y cada minúscula de la primera serie lleva su propio prefijo.
+        result += LATIN_PREFIX + celda;
+        continue;
+      }
+
+      enExpresionNumerica = false;
+      result += celda;
     }
 
     return result;
@@ -258,35 +361,50 @@ export default function ConversorBraillePage() {
   const convertBrailleToText = (braille: string): string => {
     let result = '';
     let nextIsCapital = false;
-    let inNumber = false;
+    /** Puesto por el prefijo de latina: la celda siguiente es letra, no cifra. */
+    let siguienteEsLatina = false;
+    let enExpresionNumerica = false;
 
     for (const char of braille) {
       if (char === CAPITAL_INDICATOR) {
         nextIsCapital = true;
+        // Una mayúscula cierra la expresión numérica: el signo 4-6 no es cifra, y
+        // sin esto «Espana 3D» volvía como «Espana 34».
+        enExpresionNumerica = false;
+        continue;
+      }
+
+      if (char === LATIN_PREFIX) {
+        // El prefijo NO cierra la expresión: solo exime a la celda siguiente.
+        siguienteEsLatina = true;
         continue;
       }
 
       if (char === NUMBER_INDICATOR) {
-        inNumber = true;
+        enExpresionNumerica = true;
         continue;
       }
 
       if (char === '⠀') { // Espacio Braille
-        inNumber = false;
+        enExpresionNumerica = false;
         result += ' ';
         continue;
       }
 
       let converted = brailleToText[char] || char;
 
-      if (inNumber && /[a-j]/.test(converted)) {
-        // Convertir letras a números cuando está activo el indicador
+      if (enExpresionNumerica && !siguienteEsLatina && PRIMERA_SERIE.test(converted)) {
         const numMap: { [key: string]: string } = {
           'a': '1', 'b': '2', 'c': '3', 'd': '4', 'e': '5',
           'f': '6', 'g': '7', 'h': '8', 'i': '9', 'j': '0'
         };
         converted = numMap[converted] || converted;
+      } else if (!PRIMERA_SERIE.test(converted) && converted !== ' ') {
+        // Cualquier otra celda —una letra de la segunda serie, un signo— termina la
+        // expresión numérica, igual que el espacio.
+        enExpresionNumerica = false;
       }
+      siguienteEsLatina = false;
 
       if (nextIsCapital) {
         converted = converted.toUpperCase();
@@ -465,6 +583,26 @@ export default function ConversorBraillePage() {
             <div className={styles.resultBox} role="status" aria-live="polite">
               {result}
             </div>
+
+            {sinCelda.length > 0 && (
+              <p className={styles.avisoConversion} role="alert">
+                <span aria-hidden="true">⚠️</span>{' '}
+                No se ha escrito en braille {sinCelda.length === 1 ? 'este carácter' : 'estos caracteres'},
+                porque el Código Braille Español no le{sinCelda.length === 1 ? '' : 's'} asigna
+                celda en signografía básica:{' '}
+                <strong>{sinCelda.join(' ')}</strong>. El resto del texto sí está completo.
+              </p>
+            )}
+
+            {llevaSignoAmbiguo && (
+              <p className={styles.avisoConversion} role="status">
+                <span aria-hidden="true">ℹ️</span>{' '}
+                En braille español la interrogación, la exclamación y las comillas se
+                abren y se cierran con el <strong>mismo signo</strong>. Al volver a
+                texto, «¿Qué?» sale como «?Qué?»: es así en el sistema, no un fallo de
+                la conversión.
+              </p>
+            )}
 
             {mode === 'textToBraille' && (
               <div className={styles.visualSection}>
@@ -861,7 +999,7 @@ export default function ConversorBraillePage() {
               </div>
               <div className={styles.eduFaqItem}>
                 <h4>¿Es el Braille igual en todos los idiomas?</h4>
-                <p>No exactamente. El sistema de 6 puntos es universal, pero cada idioma adapta los símbolos a sus necesidades. El español tiene símbolos únicos para ñ, á, é, í, ó, ú, ü y ¡¿. El árabe Braille va de derecha a izquierda igual que el árabe impreso. El japonés tiene un Braille basado en silabas (kana) en lugar de letras. El chino Braille tiene variantes por dialectos (mandarín, cantonés). El UEB (Unified English Braille) de 2004 unificó los distintos sistemas del inglés en un estándar global.</p>
+                <p>No exactamente. El sistema de 6 puntos es universal, pero cada idioma adapta los símbolos a sus necesidades. El español tiene celdas propias para ñ, á, é, í, ó, ú y ü. En cambio no tiene signos de apertura: ¿ y ? comparten el mismo signo (puntos 2-6), igual que ¡ y ! (puntos 2-3-5), de modo que la pregunta se marca al principio y al final con la misma celda. El árabe Braille va de derecha a izquierda igual que el árabe impreso. El japonés tiene un Braille basado en silabas (kana) en lugar de letras. El chino Braille tiene variantes por dialectos (mandarín, cantonés). El UEB (Unified English Braille) de 2004 unificó los distintos sistemas del inglés en un estándar global.</p>
               </div>
               <div className={styles.eduFaqItem}>
                 <h4>¿Qué es el Braille Unificado en Español (UEB)?</h4>
@@ -915,7 +1053,7 @@ export default function ConversorBraillePage() {
                 <div className={styles.eduStepNumber}>4</div>
                 <div className={styles.eduStepContent}>
                   <h4>Los indicadores de contexto</h4>
-                  <p>El indicador numérico (⠼, puntos 3-4-5-6) activa el modo número: los siguientes símbolos se leen como dígitos en lugar de letras. El indicador de mayúscula (⠨, punto 6) convierte la siguiente celda en mayúscula. El indicador de cursiva señala texto enfatizado. Estos prefijos permiten que el sistema de 64 símbolos represente letras, números, mayúsculas y formatos tipográficos sin ambigüedad.</p>
+                  <p>El indicador numérico (⠼, puntos 3-4-5-6) activa el modo número: los siguientes símbolos se leen como dígitos en lugar de letras. El indicador de mayúscula (⠨, puntos 4-6) convierte la siguiente celda en mayúscula. Y cuando una letra de la primera década (a-j) va pegada a una cifra, se intercala el prefijo de latina minúscula (⠐, punto 5) para que no se lea como número: por eso «24h» se escribe ⠼⠃⠙⠐⠓ y no ⠼⠃⠙⠓, que se leería «248». Estos prefijos permiten que el sistema de 64 símbolos represente letras, números y mayúsculas sin ambigüedad.</p>
                 </div>
               </div>
               <div className={styles.eduStepItem}>

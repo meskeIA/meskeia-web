@@ -912,3 +912,25 @@
     transition: none;
   }
 }
+/* Avisos de la conversión: lo que no se ha podido escribir en braille y la
+   ambigüedad de los signos que en español abren y cierran igual. Antes ambas
+   cosas ocurrían en silencio. */
+.avisoConversion {
+  margin: 0 0 var(--spacing-md);
+  padding: 12px 16px;
+  background: rgba(46, 134, 171, 0.08);
+  border-left: 3px solid var(--primary);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.avisoConversion strong {
+  color: var(--text-primary);
+  letter-spacing: 1px;
+}
+
+[data-theme='dark'] .container .avisoConversion {
+  background: rgba(46, 134, 171, 0.18);
+}

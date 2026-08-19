@@ -32,7 +32,13 @@ import { test, expect, type Page } from '@playwright/test';
  * seis vocales con diacrítico, los diez dígitos con su indicador ⠼ y el indicador de
  * mayúscula ⠨ coinciden exactamente con el estándar. Eso es lo que fijan los CASOS 1 y 2.
  *
- * Los tests marcados con `test.fail()` son HALLAZGOS ABIERTOS: afirman lo que dice el
+ * REPARADOS el 19/08/2026 (hallazgos 24, 25, 26, 27, 28 y 29 del Inspector) contra el
+ * Documento Técnico B 2 de la Comisión Braille Española, «Signografía básica de las
+ * lenguas cooficiales españolas», V4 (22/01/2026), §§ 6.1, 7, 8.1 y 8.2. Los tests que
+ * llevaban `test.fail()` se quedan como REGRESIÓN: estaban escritos con el valor del
+ * estándar y pasaron a verde sin tocarlos.
+ *
+ * (Histórico) Los tests marcados con `test.fail()` eran HALLAZGOS ABIERTOS: afirman lo que dice el
  * estándar y hoy fallan a propósito. El día que se corrija la app se pondrán en ROJO
  * («expected to fail, but passed») y habrá que quitarles la marca.
  */
@@ -166,15 +172,16 @@ test('CASO 3 (degradar) — sin texto no inventa resultado; con un emoji no debe
     page.getByText('Convierte primero un texto: la hoja se genera con el resultado de arriba.'),
   ).toBeVisible();
 
-  // Un emoji no tiene celda en el braille español (lo dice la propia app en su bloque
-  // «Limitaciones»). Lo que hace hoy es copiarlo literal dentro de la cadena braille:
-  // el resultado deja de ser braille válido y quien lo pegue en una embosadora no
-  // recibirá ningún aviso. Además `result.split('')` parte el par surrogate del emoji,
-  // así que la vista dibuja DOS celdas vacías con medio carácter debajo.
+  // Un emoji no tiene celda en el braille español. Hasta el 19/08/2026 se copiaba
+  // literal dentro de la cadena braille —el resultado dejaba de ser braille válido y
+  // nadie avisaba—, y `result.split('')` partía además su par surrogate, así que la
+  // vista dibujaba DOS celdas vacías con medio carácter debajo. Ahora se omite y se
+  // dice en pantalla, que es la única forma de que el usuario lo sepa.
   await convertir(page, 'sol 🙂');
-  // sol = ⠎(2-3-4) ⠕(1-3-5) ⠇(1-2-3), espacio = ⠀
-  await expect(cajaResultado(page)).toHaveText('⠎⠕⠇⠀🙂');
-  expect(await celdasVisuales(page)).toEqual(['2-3-4', '1-3-5', '1-2-3', 'vacia', 'vacia', 'vacia']);
+  // sol = ⠎(2-3-4) ⠕(1-3-5) ⠇(1-2-3), espacio = ⠀ · el emoji no se escribe
+  await expect(cajaResultado(page)).toHaveText('⠎⠕⠇⠀');
+  expect(await celdasVisuales(page)).toEqual(['2-3-4', '1-3-5', '1-2-3', 'vacia']);
+  await expect(page.getByText(/No se ha escrito en braille/)).toBeVisible();
 
   // Al menos la hoja imprimible sí filtra lo que no es braille (regex U+2800–U+28FF):
   // 3 celdas con puntos y ninguna celda fantasma para el emoji.
@@ -191,10 +198,9 @@ test('CASO 3 (degradar) — sin texto no inventa resultado; con un emoji no debe
 // NINGÚN PUNTO — y una celda sin puntos, en braille, es un ESPACIO. En la vista de
 // celdas es un despiste; en la «hoja imprimible a escala real», que es la que se punza
 // con regleta, "Hola" sale como espacio + h + o + l + a y pierde la mayúscula.
-test('HALLAZGO — la celda del indicador de mayúscula debe dibujar sus puntos 4-6', async ({
+test('REGRESIÓN (hallazgo 24) — la celda del indicador de mayúscula dibuja sus puntos 4-6', async ({
   page,
 }) => {
-  test.fail();
   await page.goto(RUTA);
   await convertir(page, 'Hola');
 
@@ -217,8 +223,7 @@ test('HALLAZGO — la celda del indicador de mayúscula debe dibujar sus puntos 
 // un texto braille español real vuelve mal traducido. Y ni ¿ ni ¡ existen en la tabla,
 // pese a que la FAQ del bloque educativo afirma que «el español tiene símbolos únicos
 // para ñ, á, é, í, ó, ú, ü y ¡¿» (en braille español ¿ y ? comparten signo, igual que ¡ y !).
-test('HALLAZGO — la puntuación debe seguir el Código Braille Español', async ({ page }) => {
-  test.fail();
+test('REGRESIÓN (hallazgos 27 y 28) — la puntuación sigue el Código Braille Español', async ({ page }) => {
   await page.goto(RUTA);
 
   // «Hola.» = ⠨ ⠓ ⠕ ⠇ ⠁ + punto = punto 3 = U+2804 = ⠄
@@ -247,10 +252,9 @@ test('HALLAZGO — la puntuación debe seguir el Código Braille Español', asyn
 // lo demuestra: al darle la vuelta a su propia salida devuelve «248», no «24h».
 // Segundo defecto, en la función inversa: el indicador de mayúscula no cierra el modo
 // número, así que «España 3D» → ⠼⠉⠨⠙ vuelve como «España 34» aunque el ⠨ está ahí.
-test('HALLAZGO — tras un número, una letra no puede seguir leyéndose como cifra', async ({
+test('REGRESIÓN (hallazgos 25 y 26) — tras un número, una letra no se lee como cifra', async ({
   page,
 }) => {
-  test.fail();
   await page.goto(RUTA);
 
   // Ida y vuelta con «24h»: hoy devuelve «248».
@@ -265,4 +269,42 @@ test('HALLAZGO — tras un número, una letra no puede seguir leyéndose como ci
   await page.getByRole('button', { name: 'Intercambiar dirección de conversión' }).click();
   await page.getByRole('button', { name: 'Convertir' }).click();
   await expect(cajaResultado(page)).toHaveText('España 3D');
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Reparación del lote braille (19/08/2026) — hallazgos 28 y 29
+// ═══════════════════════════════════════════════════════════════════════════
+
+test('REGRESIÓN (hallazgo 28) — los signos de apertura usan la misma celda que los de cierre', async ({
+  page,
+}) => {
+  await page.goto(RUTA);
+
+  // B 2 § 6.1: «abrir y cerrar exclamación» son un ÚNICO signo, puntos 2-3-5 = ⠖.
+  // «¡Ya!» = ⠖ + ⠨⠽(Y) + ⠁(a) + ⠖.  Antes el ¡ se colaba como U+00A1 en medio de la
+  // cadena braille y luego desaparecía sin aviso en la hoja imprimible.
+  await convertir(page, '¡Ya!');
+  await expect(cajaResultado(page)).toHaveText('⠖⠨⠽⠁⠖');
+
+  // La cadena entera tiene que estar dentro del bloque Braille Patterns.
+  const salida = await cajaResultado(page).innerText();
+  expect(salida).toMatch(/^[\u2800-\u28FF]+$/);
+
+  // Y la app advierte de que la vuelta no puede recuperar el signo de apertura,
+  // porque el braille español no lo tiene: es del sistema, no de la conversión.
+  await expect(page.getByText(/se abren y se cierran con el/)).toBeVisible();
+});
+
+test('REGRESIÓN (hallazgo 29) — el bloque educativo describe los indicadores que la app usa', async ({
+  page,
+}) => {
+  await page.goto(RUTA);
+  for (const boton of await page.getByRole('button', { name: /Ver Guía|Guía Completa/i }).all()) {
+    await boton.click().catch(() => {});
+  }
+
+  // Decía «punto 6», que es otro signo distinto, mientras la app emitía ⠨ (4-6).
+  await expect(page.getByText(/indicador de mayúscula \(⠨, puntos 4-6\)/)).toBeVisible();
+  // Y ahora explica el prefijo de latina minúscula con el caso que lo motiva.
+  await expect(page.getByText(/«24h» se escribe/)).toBeVisible();
 });
