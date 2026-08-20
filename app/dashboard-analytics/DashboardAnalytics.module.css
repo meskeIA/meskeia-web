@@ -1297,3 +1297,57 @@
 [data-theme='dark'] .rollupWarn {
   color: #fbbf24;
 }
+
+/* ── Ranking Apps: toolbar de filtros y cabeceras ordenables (2026-08-20) ── */
+.rankToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.rankToolbar .filtroModoGroup {
+  flex-wrap: wrap;
+}
+
+.rankMostrar {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.rankSelect {
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.thBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: inherit;
+  color: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.thBtn:hover {
+  color: var(--primary);
+}
+
+.thBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.thBtnActivo {
+  color: var(--primary);
+}

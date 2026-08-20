@@ -190,7 +190,7 @@ async function getStatsPorRollup(
   if (ipExcluida) { regSql += propioSql; regArgs.push(ipExcluida); }
   regSql += ' ORDER BY id DESC LIMIT ?'; regArgs.push(limite);
 
-  const [vivoRes, gcRes, appsAcumRes, muRes, rankRes, rank30Res, ctrlRes, paisRes, ciudadRes, compRes, appsSemCerrRes, appsMesCerrRes, registrosResult] = await Promise.all([
+  const [vivoRes, gcRes, g30Res, appsAcumRes, muRes, rankRes, rank30Res, rank7Res, ctrlRes, paisRes, ciudadRes, compRes, appsSemCerrRes, appsMesCerrRes, registrosResult] = await Promise.all([
     client.execute({ sql: `SELECT ${CAMPOS_ROLLUP} FROM uso_aplicaciones WHERE ${FECHA_EXPR} >= ?`, args: [ayerOrd] }),
     client.execute(
       `SELECT COALESCE(SUM(usos),0) usos, COALESCE(SUM(movil),0) movil, COALESCE(SUM(escritorio),0) escritorio,
@@ -199,6 +199,15 @@ async function getStatsPorRollup(
               COALESCE(SUM(por_compartir),0) por_compartir
        FROM rollup_dia WHERE 1=1${miipWhere}`
     ),
+    // Globales de los últimos 30 días (días cerrados; la ventana viva se suma después).
+    // Alimenta las tarjetas de la pestaña Análisis Técnico, que hasta 2026-08-20 eran
+    // totales históricos: con ~250 días de serie, un acumulado ya no se mueve y no informa.
+    client.execute({
+      sql: `SELECT COALESCE(SUM(usos),0) usos, COALESCE(SUM(movil),0) movil, COALESCE(SUM(escritorio),0) escritorio,
+                   COALESCE(SUM(recurrentes),0) recurrentes, COALESCE(SUM(nuevos),0) nuevos
+            FROM rollup_dia WHERE fecha_ord >= ?${miipWhere}`,
+      args: [hace29Ord],
+    }),
     client.execute(`SELECT aplicacion FROM rollup_app_acum WHERE 1=1${miipWhere} GROUP BY aplicacion`),
     client.execute({ sql: muSql, args: muArgs }),
     client.execute(
@@ -207,6 +216,8 @@ async function getStatsPorRollup(
     ),
     // Usos por app en los últimos 30 días (días cerrados; la ventana viva se suma después)
     client.execute({ sql: `SELECT aplicacion, SUM(usos) usos FROM rollup_dia_app WHERE fecha_ord >= ?${miipWhere} GROUP BY aplicacion`, args: [hace29Ord] }),
+    // Usos por app en los últimos 7 días (días cerrados; la ventana viva se suma después)
+    client.execute({ sql: `SELECT aplicacion, SUM(usos) usos FROM rollup_dia_app WHERE fecha_ord >= ?${miipWhere} GROUP BY aplicacion`, args: [hace6Ord] }),
     // Último día agregado (estado del rollup para la status bar del dashboard)
     client.execute(`SELECT MAX(fecha_ord) m FROM rollup_control`),
     client.execute(`SELECT pais, SUM(usos) usos FROM rollup_pais_acum WHERE 1=1${miipWhere} GROUP BY pais`),
@@ -270,6 +281,15 @@ async function getStatsPorRollup(
   const porcentajeEscritorio = total > 0 ? Math.round((totalEscritorio / total) * 1000) / 10 : 0;
   const porcentajeRecurrentes = total > 0 ? Math.round((totalRecurrentes / total) * 1000) / 10 : 0;
 
+  // ── Ventana 30d (cerrado + vivo): tarjetas de Análisis Técnico ──
+  const g30 = g30Res.rows[0];
+  const usos30 = Number(g30.usos) + gv.usos;
+  const movil30 = Number(g30.movil) + gv.movil;
+  const escritorio30 = Number(g30.escritorio) + gv.escritorio;
+  const recurrentes30 = Number(g30.recurrentes) + gv.recurrentes;
+  const nuevos30 = Number(g30.nuevos) + gv.nuevos;
+  const pct30 = (n: number) => (usos30 > 0 ? Math.round((n / usos30) * 1000) / 10 : 0);
+
   // total_aplicaciones (distinct all-time): apps acumuladas + vivas
   const appsSet = new Set<string>();
   for (const r of appsAcumRes.rows) appsSet.add(String(r.aplicacion));
@@ -298,36 +318,44 @@ async function getStatsPorRollup(
     }
   }
 
-  // Usos por app en los últimos 30 días: cerrado (rank30Res) + ventana viva.
+  // Usos por app en los últimos 30 y 7 días: cerrado (rank30Res/rank7Res) + ventana viva.
   // Base del "estado" del ranking: refleja actividad ACTUAL, no histórica
   // (con all-time, una app muerta con usos antiguos aparecía como Activa).
   const usos30Map = new Map<string, number>();
   for (const r of rank30Res.rows) usos30Map.set(String(r.aplicacion), Number(r.usos));
+  const usos7Map = new Map<string, number>();
+  for (const r of rank7Res.rows) usos7Map.set(String(r.aplicacion), Number(r.usos));
   for (const f of fechasVivas) {
     const pair = vivo.appMap.get(f); if (!pair) continue;
     for (const m of miipList) for (const [app, a] of pair[m]) {
       usos30Map.set(app, (usos30Map.get(app) || 0) + a.usos);
+      usos7Map.set(app, (usos7Map.get(app) || 0) + a.usos);
     }
   }
 
+  // Umbrales del estado = los CANÓNICOS del ecosistema (2026-08-20): "activa" es
+  // ≥5 usos/30d, la misma definición que "apps activas" en la sección 9 del
+  // digest diario y en /cruce-seo. "Sin visitas" y no "sin uso": Analytics solo
+  // sabe que nadie llegó; si hay demanda sin cobertura lo dice GSC, no esto.
   const rankingAplicaciones = [...rankMap.entries()]
     .map(([aplicacion, a]) => {
       const usos = a.usos;
       const usos30 = usos30Map.get(aplicacion) || 0;
-      let estado = '💤 Sin uso 30d';
-      if (usos30 >= 10) estado = '✅ Activa';
+      const usos7 = usos7Map.get(aplicacion) || 0;
+      let estado = '💤 Sin visitas 30d';
+      if (usos30 >= 5) estado = '✅ Activa';
       else if (usos30 >= 1) estado = '⚠️ Bajo uso';
       const raw = a.ult;
       const ultimoUso = raw.length === 8 ? `${raw.slice(6, 8)}/${raw.slice(4, 6)}/${raw.slice(0, 4)}` : raw;
       const durProm = a.cdc > 0 ? a.sdc / a.cdc : 0;
       return {
-        aplicacion, total_usos: usos, usos_30d: usos30, ultimo_uso: ultimoUso,
+        aplicacion, total_usos: usos, usos_30d: usos30, usos_7d: usos7, ultimo_uso: ultimoUso,
         duracion_promedio_segundos: durProm,
         duracion_promedio_formato: formatearDuracion(Math.round(durProm)),
         estado,
       };
     })
-    .sort((x, y) => y.total_usos - x.total_usos);
+    .sort((x, y) => y.usos_30d - x.usos_30d || y.total_usos - x.total_usos);
 
   // ── Geografía: países (top 20) y ciudades (top 10) ──
   const paisAcc = new Map<string, number>();
@@ -398,6 +426,14 @@ async function getStatsPorRollup(
       usuarios: {
         nuevos: { total: totalNuevos, porcentaje: Math.round((100 - porcentajeRecurrentes) * 10) / 10 },
         recurrentes: { total: totalRecurrentes, porcentaje: porcentajeRecurrentes },
+      },
+      // Tarjetas de Análisis Técnico: ventana móvil de 30 días, no histórico
+      ventana30d: {
+        usos: usos30,
+        movil: { total: movil30, porcentaje: pct30(movil30) },
+        escritorio: { total: escritorio30, porcentaje: pct30(escritorio30) },
+        nuevos: { total: nuevos30, porcentaje: pct30(nuevos30) },
+        recurrentes: { total: recurrentes30, porcentaje: pct30(recurrentes30) },
       },
       por_compartir: totalPorCompartir,
       geografia: { paises, ciudades },
@@ -1142,8 +1178,21 @@ export const analyticsRouter = router({
     }),
 
   /**
-   * Distribución de duraciones de visita
+   * Distribución de duraciones de visita — ventana móvil de 30 días.
    * Buckets: sin registro (NULL) / 2-30s / 30s-2min / 2-10min / >10min
+   *
+   * Hasta 2026-08-20 sumaba el histórico completo: con ~250 días de serie la
+   * distribución convergía y ya no se movía (cada día nuevo pesaba <0,5%). La
+   * ventana de 30d la devuelve a la escala en la que puede informar. Devuelve
+   * también `cobertura` (% de visitas CON duración registrada): el bucket "Sin
+   * registro" mezcla salidas <2s con visitas cuyo beacon de salida no llegó,
+   * así que los porcentajes se leen junto a esa cobertura, no como verdad plena
+   * (mismo defecto documentado en el digest el 14/08/2026).
+   *
+   * El antiguo "topPorDuracion" (apps por índice de engagement compuesto) se
+   * retiró aquí mismo: ordenaba por una fórmula que el lector no podía
+   * reconstruir a ojo y sobre el acumulado histórico. La duración media por
+   * app sigue en Ranking Apps y en Por Aplicación.
    */
   getDistribucionDuraciones: protectedProcedure
     .input(z.object({ excluir_mi_ip: z.boolean().default(false) }))
@@ -1160,14 +1209,14 @@ export const analyticsRouter = router({
 
       const hoy = hoyMadrid();
       const ayer = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
+      const hace29 = new Date(hoy); hace29.setDate(hoy.getDate() - 29);
       const ordF = (d: Date) => `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
-      const hoyOrd = ordF(hoy), ayerOrd = ordF(ayer);
+      const hoyOrd = ordF(hoy), ayerOrd = ordF(ayer), hace29Ord = ordF(hace29);
       const fechasVivas = [ayerOrd, hoyOrd];
 
-      // Buckets (rollup_dia, universo U2) + apps (rollup_app_acum) + ventana viva
-      const [bRes, appRes, vivoRes] = await Promise.all([
-        client.execute(`SELECT COALESCE(SUM(b_sinreg),0) sr, COALESCE(SUM(b_rebote),0) rb, COALESCE(SUM(b_corta),0) co, COALESCE(SUM(b_media),0) me, COALESCE(SUM(b_larga),0) la FROM rollup_dia WHERE 1=1${miipWhere}`),
-        client.execute(`SELECT aplicacion, SUM(usos) usos, SUM(suma_dur_cap) sdc, SUM(count_dur_cap) cdc, MAX(max_dur) mx FROM rollup_app_acum WHERE 1=1${miipWhere} GROUP BY aplicacion`),
+      // Buckets (rollup_dia, universo U2, días cerrados de la ventana) + ventana viva
+      const [bRes, vivoRes] = await Promise.all([
+        client.execute({ sql: `SELECT COALESCE(SUM(b_sinreg),0) sr, COALESCE(SUM(b_rebote),0) rb, COALESCE(SUM(b_corta),0) co, COALESCE(SUM(b_media),0) me, COALESCE(SUM(b_larga),0) la FROM rollup_dia WHERE fecha_ord >= ?${miipWhere}`, args: [hace29Ord] }),
         client.execute({ sql: `SELECT ${CAMPOS_ROLLUP} FROM uso_aplicaciones WHERE ${FECHA_EXPR} >= ?`, args: [ayerOrd] }),
       ]);
       const vivo = agregarRegistros(vivoRes.rows, ipConfigurada);
@@ -1181,32 +1230,11 @@ export const analyticsRouter = router({
       const total = sinRegistro + rebote + corta + media + larga;
       const pct = (n: number) => total > 0 ? Math.round(n / total * 1000) / 10 : 0;
 
-      // topPorDuracion: acumulado + vivo. Duración media con cap 1.800 (ya aplicado en el rollup).
-      type DA = { usos: number; sdc: number; cdc: number; mx: number };
-      const appMap = new Map<string, DA>();
-      for (const r of appRes.rows) appMap.set(String(r.aplicacion), { usos: Number(r.usos), sdc: Number(r.sdc), cdc: Number(r.cdc), mx: Number(r.mx) || 0 });
-      for (const f of fechasVivas) {
-        const pair = vivo.appMap.get(f); if (!pair) continue;
-        for (const m of miipList) for (const [app, a] of pair[m]) {
-          let d = appMap.get(app);
-          if (!d) { d = { usos: 0, sdc: 0, cdc: 0, mx: 0 }; appMap.set(app, d); }
-          d.usos += a.usos; d.sdc += a.suma_dur_cap; d.cdc += a.count_dur_cap; if (a.max_dur > d.mx) d.mx = a.max_dur;
-        }
-      }
-
-      const topPorDuracion = [...appMap.entries()]
-        .filter(([, d]) => d.cdc >= 3)
-        .map(([aplicacion, d]) => {
-          const duracionMedia = d.cdc > 0 ? Math.round(d.sdc / d.cdc) : 0;
-          // Índice de engagement: media(cap30min) × cobertura × log10(1+con_duración)
-          const score = Math.min(duracionMedia, 1800) * (d.cdc / d.usos) * Math.log10(1 + d.cdc);
-          return { aplicacion, totalUsos: d.usos, conDuracion: d.cdc, duracionMedia, duracionMax: d.mx, score };
-        })
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 20);
-
       return {
         total,
+        ventanaDias: 30,
+        // % de visitas con duración registrada: el denominador honesto de los buckets
+        cobertura: pct(total - sinRegistro),
         buckets: [
           { label: 'Sin registro', descripcion: 'Visita < 2s o sin evento de salida', valor: sinRegistro, pct: pct(sinRegistro), color: '#9ca3af' },
           { label: '2 – 30s',      descripcion: 'Rebote rápido',                       valor: rebote,      pct: pct(rebote),      color: '#f59e0b' },
@@ -1214,7 +1242,6 @@ export const analyticsRouter = router({
           { label: '2 – 10min',    descripcion: 'Uso real',                             valor: media,       pct: pct(media),       color: '#10b981' },
           { label: '> 10min',      descripcion: 'Uso intensivo',                        valor: larga,       pct: pct(larga),       color: '#8b5cf6' },
         ],
-        topPorDuracion,
       };
     }),
 

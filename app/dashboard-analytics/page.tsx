@@ -61,6 +61,18 @@ const coincideFiltroModo = (r: { modo: string | null }, filtro: FiltroModo): boo
 const formatearOrd = (ord: string): string =>
   ord.length === 8 ? `${ord.slice(6, 8)}/${ord.slice(4, 6)}/${ord.slice(0, 4)}` : ord;
 
+// Ranking Apps: filtro por estado de actividad (los umbrales viven en el servidor
+// y son los canónicos del ecosistema: ✅ ≥5 usos/30d · ⚠️ 1-4 · 💤 0) y columnas
+// por las que se puede reordenar la tabla.
+type FiltroEstadoRank = 'todas' | 'activas' | 'bajo' | 'sin';
+type ColOrdenRank = 'usos_7d' | 'usos_30d' | 'total_usos' | 'ultimo_uso' | 'duracion_promedio_segundos';
+
+// "DD/MM/YYYY[ resto]" → "YYYYMMDD" comparable (para ordenar por último uso)
+const fechaEsAOrd = (f: string | null | undefined): string => {
+  const p = (f || '').split(' ')[0].split('/');
+  return p.length === 3 ? `${p[2]}${p[1]}${p[0]}` : '';
+};
+
 const NOMBRES_PAIS: Record<string, string> = {
   AD: 'Andorra', AE: 'Emiratos Árabes', AF: 'Afganistán', AL: 'Albania',
   AR: 'Argentina', AT: 'Austria', AU: 'Australia', AZ: 'Azerbaiyán',
@@ -188,6 +200,13 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
   const comboboxRef = useRef<HTMLDivElement>(null);
   const [filtroIPActivo, setFiltroIPActivo] = useState(true);
   const [filtroModo, setFiltroModo] = useState<FiltroModo>('todos');
+
+  // Ranking Apps: filtro por estado (umbrales canónicos del digest: activa ≥5
+  // usos/30d), tamaño de página y columna de orden (por defecto usos 30d desc,
+  // que el presente mande sobre el acumulado histórico)
+  const [filtroEstadoRank, setFiltroEstadoRank] = useState<FiltroEstadoRank>('todas');
+  const [numMostrarRank, setNumMostrarRank] = useState<number>(50);
+  const [ordenRank, setOrdenRank] = useState<{ col: ColOrdenRank; desc: boolean }>({ col: 'usos_30d', desc: true });
 
   // Ref para control de inicialización
   const iniciado = useRef(false);
@@ -338,6 +357,40 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
   const datos: StatsData | null = statsQuery.data || null;
   const loading = statsQuery.isLoading || statsQuery.isFetching || tendencia30Query.isFetching;
   const error = statsQuery.error?.message || null;
+
+  // Ranking Apps: conteos por estado (para los chips) y filas visibles
+  // (filtro por estado → orden por columna → recorte de página)
+  const conteosRank = useMemo(() => {
+    const r = datos?.ranking_aplicaciones ?? [];
+    return {
+      todas: r.length,
+      activas: r.filter((a) => a.usos_30d >= 5).length,
+      bajo: r.filter((a) => a.usos_30d >= 1 && a.usos_30d <= 4).length,
+      sin: r.filter((a) => a.usos_30d === 0).length,
+    };
+  }, [datos]);
+
+  const rankingVisible = useMemo(() => {
+    const todas = datos?.ranking_aplicaciones ?? [];
+    const porEstado = todas.filter((a) =>
+      filtroEstadoRank === 'todas' ? true
+      : filtroEstadoRank === 'activas' ? a.usos_30d >= 5
+      : filtroEstadoRank === 'bajo' ? a.usos_30d >= 1 && a.usos_30d <= 4
+      : a.usos_30d === 0
+    );
+    const { col, desc } = ordenRank;
+    const filas = [...porEstado].sort((x, y) => {
+      const cmp = col === 'ultimo_uso'
+        ? fechaEsAOrd(x.ultimo_uso).localeCompare(fechaEsAOrd(y.ultimo_uso))
+        : x[col] - y[col];
+      // Desempate estable: usos 30d y después total histórico
+      return (desc ? -cmp : cmp) || y.usos_30d - x.usos_30d || y.total_usos - x.total_usos;
+    });
+    return {
+      filas: numMostrarRank > 0 ? filas.slice(0, numMostrarRank) : filas,
+      totalFiltradas: porEstado.length,
+    };
+  }, [datos, filtroEstadoRank, ordenRank, numMostrarRank]);
   const ipConfig = ipConfigQuery.data?.data || null;
   const actualizandoIP = updateIPMutation.isPending;
 
@@ -1079,43 +1132,45 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
       {/* Tab: Análisis Técnico */}
       {tabActiva === 'tecnico' && datos && (
         <div className={styles.tabContent}>
-          {/* Stats de dispositivos */}
+          {/* Stats de dispositivos — ventana 30d (un total histórico ya no se mueve y no informa) */}
           <section className={styles.statsGrid}>
             <div className={styles.statCard}>
               <div className={styles.statIcon}>📱</div>
               <div className={styles.statContent}>
-                <h3>{formatearNumero(datos.estadisticas.dispositivos.movil.total)}</h3>
-                <p>Móvil ({datos.estadisticas.dispositivos.movil.porcentaje}%)</p>
+                <h3>{formatearNumero(datos.estadisticas.ventana30d.movil.total)}</h3>
+                <p>Móvil · 30 días ({datos.estadisticas.ventana30d.movil.porcentaje}%)</p>
               </div>
             </div>
             <div className={styles.statCard}>
               <div className={styles.statIcon}>🖥️</div>
               <div className={styles.statContent}>
-                <h3>{formatearNumero(datos.estadisticas.dispositivos.escritorio.total)}</h3>
-                <p>Escritorio ({datos.estadisticas.dispositivos.escritorio.porcentaje}%)</p>
+                <h3>{formatearNumero(datos.estadisticas.ventana30d.escritorio.total)}</h3>
+                <p>Escritorio · 30 días ({datos.estadisticas.ventana30d.escritorio.porcentaje}%)</p>
               </div>
             </div>
             <div className={styles.statCard}>
               <div className={styles.statIcon}>🆕</div>
               <div className={styles.statContent}>
-                <h3>{formatearNumero(datos.estadisticas.usuarios.nuevos.total)}</h3>
-                <p>Nuevos Usuarios</p>
+                <h3>{formatearNumero(datos.estadisticas.ventana30d.nuevos.total)}</h3>
+                <p>Nuevos · 30 días ({datos.estadisticas.ventana30d.nuevos.porcentaje}%)</p>
               </div>
             </div>
             <div className={styles.statCard}>
               <div className={styles.statIcon}>🔁</div>
               <div className={styles.statContent}>
-                <h3>{formatearNumero(datos.estadisticas.usuarios.recurrentes.total)}</h3>
-                <p>Usuarios Recurrentes</p>
+                <h3>{formatearNumero(datos.estadisticas.ventana30d.recurrentes.total)}</h3>
+                <p>Recurrentes · 30 días ({datos.estadisticas.ventana30d.recurrentes.porcentaje}%)</p>
               </div>
             </div>
           </section>
 
           {/* Gráficos técnicos */}
           <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '0 0 1rem' }}>
-            Las tarjetas superiores son totales históricos. Los gráficos siguientes (dispositivo,
-            navegadores, sistemas y resoluciones) se calculan sobre la <strong>muestra de los
-            últimos 500 registros</strong>, no sobre el histórico completo.
+            Las tarjetas superiores corresponden a los <strong>últimos 30 días</strong> (
+            {formatearNumero(datos.estadisticas.ventana30d.usos)} visitas). Los gráficos siguientes
+            (dispositivo, navegadores, sistemas y resoluciones) se calculan sobre la{' '}
+            <strong>muestra de los últimos 500 registros</strong> (~1-2 días de tráfico): su uso es
+            puntual, para reconocer huellas anómalas, no de lectura diaria.
           </p>
           <div className={styles.chartsGrid}>
             {dispositivosData && (
@@ -1184,16 +1239,21 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
             )}
           </div>
 
-          {/* Distribución de duraciones */}
+          {/* Distribución de duraciones — ventana 30d + cobertura del dato */}
           {distribucionQuery.data && (
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}><span aria-hidden="true">⏱️</span> Distribución de Duración de Visitas</h2>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1.25rem' }}>
-                Total: <strong>{formatearNumero(distribucionQuery.data.total)}</strong> visitas —{' '}
+              <h2 className={styles.sectionTitle}><span aria-hidden="true">⏱️</span> Distribución de Duración de Visitas · últimos 30 días</h2>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
+                Total: <strong>{formatearNumero(distribucionQuery.data.total)}</strong> visitas en 30 días —{' '}
                 <strong style={{ color: '#10b981' }}>
-                  {distribucionQuery.data.buckets.slice(2).reduce((s, b) => s + b.pct, 0).toFixed(1)}%
+                  {distribucionQuery.data.buckets.slice(2).reduce((s, b) => s + b.pct, 0).toFixed(1).replace('.', ',')}%
                 </strong>{' '}
                 con duración registrada ≥ 30s
+              </p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
+                Cobertura del dato: <strong>{String(distribucionQuery.data.cobertura).replace('.', ',')}%</strong> de
+                las visitas tiene duración registrada. «Sin registro» mezcla salidas de menos de 2 segundos con
+                visitas cuyo evento de salida no llegó, así que los porcentajes se leen junto a esta cobertura.
               </p>
 
               {/* Barras horizontales por bucket */}
@@ -1219,49 +1279,9 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                 ))}
               </div>
 
-              {/* Top apps por duración media */}
-              {distribucionQuery.data.topPorDuracion.length > 0 && (
-                <>
-                  <h3 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--text-primary)' }}>
-                    🏅 Apps con mayor tiempo medio de uso
-                  </h3>
-                  <div style={{ overflowX: 'auto' }}>
-                    <table className={styles.table}>
-                      <thead>
-                        <tr>
-                          <th>#</th>
-                          <th>Aplicación</th>
-                          <th>Usos totales</th>
-                          <th>Con duración</th>
-                          <th>Tiempo medio</th>
-                          <th>Tiempo máx.</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {distribucionQuery.data.topPorDuracion.map((app, idx) => {
-                          const fmtSeg = (s: number) => {
-                            if (!s) return '-';
-                            if (s < 60) return `${s}s`;
-                            const m = Math.floor(s / 60);
-                            const r = s % 60;
-                            return r > 0 ? `${m}m ${r}s` : `${m}m`;
-                          };
-                          return (
-                            <tr key={app.aplicacion}>
-                              <td>{idx + 1}</td>
-                              <td><strong>{app.aplicacion}</strong></td>
-                              <td>{formatearNumero(app.totalUsos)}</td>
-                              <td>{formatearNumero(app.conDuracion)}</td>
-                              <td style={{ fontWeight: 700, color: '#10b981' }}>{fmtSeg(app.duracionMedia)}</td>
-                              <td style={{ color: 'var(--text-secondary)' }}>{fmtSeg(app.duracionMax)}</td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </>
-              )}
+              {/* El cuadro «Apps con mayor tiempo medio de uso» se retiró el 20/08/2026:
+                  ordenaba por un índice compuesto irreconstruible a ojo y sobre el acumulado
+                  histórico. La duración media por app sigue en Ranking Apps y Por Aplicación. */}
             </section>
           )}
         </div>
@@ -1273,33 +1293,100 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
           <section className={styles.section}>
             <h2><span aria-hidden="true">🏆</span> Ranking de Aplicaciones</h2>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '0 0 1rem' }}>
-              El <strong>Estado</strong> se calcula sobre los usos de los últimos 30 días (✅ ≥ 10 ·
-              ⚠️ 1–9 · 💤 sin uso), no sobre el total histórico: refleja qué apps están vivas ahora.
+              El <strong>Estado</strong> usa los umbrales canónicos del ecosistema sobre los usos de
+              los últimos 30 días (✅ Activa ≥ 5 · ⚠️ Bajo uso 1–4 · 💤 Sin visitas 0 — la misma
+              definición de «apps activas» que el digest diario). «Sin visitas» no es un veredicto:
+              si hay demanda sin cobertura lo dice GSC, no Analytics. Clic en una cabecera para
+              reordenar; por defecto manda <strong>Usos 30d</strong>, el presente antes que el
+              acumulado.
             </p>
+
+            {/* Filtro por estado + tamaño de página */}
+            <div className={styles.rankToolbar}>
+              <div className={styles.filtroModoGroup} role="group" aria-label="Filtrar apps por estado de actividad">
+                {([
+                  { id: 'todas' as const, label: `Todas (${formatearNumero(conteosRank.todas)})` },
+                  { id: 'activas' as const, label: `✅ Activas (${formatearNumero(conteosRank.activas)})` },
+                  { id: 'bajo' as const, label: `⚠️ Bajo uso (${formatearNumero(conteosRank.bajo)})` },
+                  { id: 'sin' as const, label: `💤 Sin visitas (${formatearNumero(conteosRank.sin)})` },
+                ]).map((f) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    aria-pressed={filtroEstadoRank === f.id}
+                    className={`${styles.filtroModoBtn} ${filtroEstadoRank === f.id ? styles.filtroModoActivo : ''}`}
+                    onClick={() => setFiltroEstadoRank(f.id)}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+              <label className={styles.rankMostrar}>
+                Mostrar{' '}
+                <select
+                  value={numMostrarRank}
+                  onChange={(e) => setNumMostrarRank(Number(e.target.value))}
+                  className={styles.rankSelect}
+                >
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                  <option value={0}>Todas</option>
+                </select>
+              </label>
+            </div>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0 0 0.75rem' }}>
+              Mostrando <strong>{formatearNumero(rankingVisible.filas.length)}</strong> de{' '}
+              {formatearNumero(rankingVisible.totalFiltradas)} apps
+              {filtroEstadoRank !== 'todas' ? ' del filtro seleccionado' : ''}.
+            </p>
+
             <div className={styles.tableContainer}>
               <table className={styles.table}>
                 <thead>
                   <tr>
                     <th>#</th>
                     <th>Aplicación</th>
-                    <th>Usos</th>
-                    <th>Usos 30d</th>
-                    <th>Último Uso</th>
-                    <th>Tiempo Promedio</th>
+                    {([
+                      { col: 'usos_7d' as const, label: 'Usos 7d' },
+                      { col: 'usos_30d' as const, label: 'Usos 30d' },
+                      { col: 'total_usos' as const, label: 'Usos totales' },
+                      { col: 'ultimo_uso' as const, label: 'Último uso' },
+                      { col: 'duracion_promedio_segundos' as const, label: 'Tiempo promedio' },
+                    ]).map((c) => (
+                      <th
+                        key={c.col}
+                        aria-sort={ordenRank.col === c.col ? (ordenRank.desc ? 'descending' : 'ascending') : undefined}
+                      >
+                        <button
+                          type="button"
+                          className={`${styles.thBtn} ${ordenRank.col === c.col ? styles.thBtnActivo : ''}`}
+                          onClick={() =>
+                            setOrdenRank((o) => (o.col === c.col ? { col: c.col, desc: !o.desc } : { col: c.col, desc: true }))
+                          }
+                        >
+                          {c.label}
+                          {ordenRank.col === c.col ? (ordenRank.desc ? ' ↓' : ' ↑') : ''}
+                        </button>
+                      </th>
+                    ))}
                     <th>Estado</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {datos.ranking_aplicaciones.map((app, idx) => (
+                  {rankingVisible.filas.map((app, idx) => (
                     <tr key={app.aplicacion}>
                       <td>{idx + 1}</td>
                       <td>
                         <strong>{app.aplicacion}</strong>
                       </td>
-                      <td>{formatearNumero(app.total_usos)}</td>
+                      <td style={{ fontWeight: app.usos_7d > 0 ? 600 : 400 }}>
+                        {app.usos_7d > 0 ? formatearNumero(app.usos_7d) : '–'}
+                      </td>
                       <td style={{ fontWeight: app.usos_30d > 0 ? 600 : 400 }}>
                         {app.usos_30d > 0 ? formatearNumero(app.usos_30d) : '–'}
                       </td>
+                      <td>{formatearNumero(app.total_usos)}</td>
                       <td>{app.ultimo_uso?.split(' ')[0] || '-'}</td>
                       <td>{app.duracion_promedio_formato}</td>
                       <td>

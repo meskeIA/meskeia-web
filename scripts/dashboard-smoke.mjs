@@ -62,11 +62,17 @@ check(c.semana.usos >= c.hoy.usos, `semana (${c.semana.usos}) ≥ hoy (${c.hoy.u
 check(c.mes.usos >= c.hoy.usos, `mes (${c.mes.usos}) ≥ hoy (${c.hoy.usos})`);
 const r0 = d.ranking_aplicaciones[0];
 check(typeof r0.usos_30d === 'number', `ranking[0] usos_30d = ${r0.usos_30d} (${r0.aplicacion})`);
-check(['✅ Activa', '⚠️ Bajo uso', '💤 Sin uso 30d'].includes(r0.estado), `estado 30d = ${r0.estado}`);
-const sinUso = d.ranking_aplicaciones.filter(a => a.estado === '💤 Sin uso 30d').length;
+check(typeof r0.usos_7d === 'number' && r0.usos_7d <= r0.usos_30d, `ranking[0] usos_7d = ${r0.usos_7d} (≤ usos_30d)`);
+// Umbrales canónicos desde 2026-08-20: ✅ ≥5 · ⚠️ 1-4 · 💤 0 (mismos que el digest)
+check(['✅ Activa', '⚠️ Bajo uso', '💤 Sin visitas 30d'].includes(r0.estado), `estado 30d = ${r0.estado}`);
+// El orden por defecto es usos_30d desc (el presente manda sobre el histórico)
+check(d.ranking_aplicaciones.every((a, i, arr) => i === 0 || arr[i - 1].usos_30d >= a.usos_30d), 'ranking ordenado por usos_30d desc');
+const sinUso = d.ranking_aplicaciones.filter(a => a.estado === '💤 Sin visitas 30d').length;
 const activas = d.ranking_aplicaciones.filter(a => a.estado === '✅ Activa').length;
-console.log(`  ℹ️ ranking: ${d.ranking_aplicaciones.length} apps → ${activas} activas, ${sinUso} sin uso 30d`);
+console.log(`  ℹ️ ranking: ${d.ranking_aplicaciones.length} apps → ${activas} activas (≥5/30d), ${sinUso} sin visitas 30d`);
 check(d.filtros.aplicacion === undefined, 'filtros legacy eliminados del shape');
+const v30 = d.estadisticas.ventana30d;
+check(v30 && v30.usos > 0 && v30.movil.total + v30.escritorio.total <= v30.usos, `ventana30d = ${v30?.usos} usos (móvil ${v30?.movil?.total} + escritorio ${v30?.escritorio?.total})`);
 
 // ── 3. getResumen ──
 console.log('\n═══ getResumen ═══');
@@ -109,7 +115,10 @@ console.log('\n═══ getDistribucionDuraciones ═══');
   const { status, body } = await trpc('getDistribucionDuraciones', { excluir_mi_ip: true });
   const rd = body?.result?.data;
   check(status === 200 && rd?.buckets?.length === 5, `HTTP ${status}, ${rd?.buckets?.length} buckets, total=${rd?.total}`);
-  check(rd.topPorDuracion.length > 0, `topPorDuracion = ${rd?.topPorDuracion?.length} apps`);
+  // Ventana 30d + cobertura desde 2026-08-20 (topPorDuracion retirado ese día)
+  check(rd.ventanaDias === 30, `ventanaDias = ${rd?.ventanaDias}`);
+  check(typeof rd.cobertura === 'number' && rd.cobertura > 0 && rd.cobertura <= 100, `cobertura = ${rd?.cobertura}%`);
+  check(rd.topPorDuracion === undefined, 'topPorDuracion retirado del shape');
 }
 
 // ── 7. getNavegacion (con filtro SQL de fecha) ──

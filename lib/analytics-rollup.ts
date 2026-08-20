@@ -322,7 +322,7 @@ export function agregarRegistros(
       else g.b_larga++;
     }
 
-    // ── App (ranking + topPorDuracion; duración con cap 1800, max real) ──
+    // ── App (ranking; duración con cap 1800, max real) ──
     if (!appMap.has(fechaOrd)) appMap.set(fechaOrd, [new Map(), new Map()]);
     const appBucket = appMap.get(fechaOrd)![idx];
     let a = appBucket.get(app);

@@ -239,7 +239,11 @@ async function verificarTendencia(excluir) {
 
 async function verificarDistribucion(excluir) {
   console.log(`\n═══ getDistribucionDuraciones (excluir=${excluir}) ═══`);
-  const w = whereU2(excluir);
+  // Ventana 30d desde 2026-08-20 (antes: histórico completo, que ya no se movía).
+  // topPorDuracion retirado el mismo día (índice compuesto irreconstruible a ojo).
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+  const inicio = new Date(hoy); inicio.setDate(hoy.getDate() - 29);
+  const w = `${whereU2(excluir)} AND ${ordExpr}>='${ord(inicio)}'`;
   const r = (await client.execute(`SELECT
     COUNT(*) total,
     COUNT(CASE WHEN duracion_segundos IS NULL THEN 1 END) sr,
@@ -249,15 +253,15 @@ async function verificarDistribucion(excluir) {
     COUNT(CASE WHEN duracion_segundos>600 THEN 1 END) la
     FROM uso_aplicaciones WHERE ${w}`)).rows[0];
   const got = await trpc('getDistribucionDuraciones', { excluir_mi_ip: excluir });
-  cmp('total U2', r.total, got.total);
+  cmp('total U2 (30d)', r.total, got.total);
   cmp('bucket sin registro', r.sr, got.buckets[0].valor);
   cmp('bucket 2-30s', r.rb, got.buckets[1].valor);
   cmp('bucket 30s-2min', r.co, got.buckets[2].valor);
   cmp('bucket 2-10min', r.me, got.buckets[3].valor);
   cmp('bucket >10min', r.la, got.buckets[4].valor);
-  // nº de apps en el top (con_duracion≥3) — referencia
-  const nApps = await num(`SELECT COUNT(*) n FROM (SELECT aplicacion FROM uso_aplicaciones WHERE ${w} AND duracion_segundos IS NOT NULL GROUP BY aplicacion HAVING COUNT(*)>=3)`);
-  cmp('top apps con_dur≥3 (≥ devueltas)', Math.min(nApps, 20), got.topPorDuracion.length, 0);
+  // cobertura = % con duración registrada (redondeo a 1 decimal, tolerancia 0,1)
+  const cobRef = Number(r.total) > 0 ? Math.round((Number(r.total) - Number(r.sr)) / Number(r.total) * 1000) / 10 : 0;
+  cmp('cobertura del dato', cobRef, got.cobertura, 0.1);
 }
 
 console.log('🔍 Verificación de paridad — modelo unificado\n');
