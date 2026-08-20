@@ -11,7 +11,7 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { formatNumber } from '@/lib';
+import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
 // =========================================================
@@ -40,6 +40,15 @@ type Pt = [number, number];
 const CX = 150;
 const CY = 148;
 
+// Recorrido de los controles de medida. En un solo sitio porque de él depende también la
+// escala del dibujo de la esfera: si cambian aquí, el dibujo sigue respondiendo igual.
+const DIM_MIN = 1;
+const DIM_MAX = 50;
+// Tope del campo escrito. El slider llega a DIM_MAX porque más recorrido lo vuelve
+// impreciso, pero una medida real no tiene por qué caber ahí: un depósito de r=120 era
+// sencillamente inintroducible, en una app que promete calcular volúmenes.
+const DIM_MAX_CAMPO = 100000;
+
 function iso(x: number, y: number, z: number, s: number, ox = CX, oy = CY): Pt {
   return [ox + (x - z) * s * 0.866, oy - y * s + (x + z) * s * 0.5];
 }
@@ -57,7 +66,16 @@ function mid(a: Pt, b: Pt): Pt {
 // =========================================================
 
 function SvgEsfera({ radio }: { radio: number }) {
-  const r = Math.min(radio * 14, 72);
+  // Las otras cuatro figuras se ajustan al lienzo y cambian de PROPORCIÓN al mover sus
+  // sliders; una esfera no tiene proporción que cambiar, así que lo único que puede
+  // responder es su tamaño. Con Math.min(radio * 14, 72) quedaba clavada en 72 px desde
+  // r=6: el 90 % del recorrido del control dibujaba exactamente lo mismo mientras el
+  // volumen se multiplicaba por 578, en una app que promete verlo cambiar en tiempo real.
+  // La raíz comprime el tramo alto sin llegar a saturar, de modo que cada tirón del slider
+  // mueve algo, y se normaliza contra DIM_MAX para que siga valiendo si el rango cambia.
+  const R_PX_MIN = 12;
+  const R_PX_MAX = 72;
+  const r = R_PX_MIN + (R_PX_MAX - R_PX_MIN) * Math.min(1, Math.sqrt(radio / DIM_MAX));
   return (
     <>
       <defs>
@@ -253,12 +271,19 @@ function getFormula(figura: Figura, p: {
   lado: number; alturaPir: number;
 }): string {
   switch (figura) {
-    case 'esfera': return `V = (4/3) × π × r³ = (4/3) × π × ${p.radio}³`;
-    case 'cubo': return `V = a × b × h = ${p.ancho} × ${p.largo} × ${p.alto}`;
-    case 'cilindro': return `V = π × r² × h = π × ${p.radioCil}² × ${p.alturaCil}`;
-    case 'cono': return `V = (1/3) × π × r² × h = (1/3) × π × ${p.radioCon}² × ${p.alturaCon}`;
-    case 'piramide': return `V = (1/3) × l² × h = (1/3) × ${p.lado}² × ${p.alturaPir}`;
+    // Con decimales en juego, interpolar el número tal cual escribiría "12.5" a la
+    // española: la medida se teclea con coma y la fórmula debe devolverla igual.
+    case 'esfera': return `V = (4/3) × π × r³ = (4/3) × π × ${med(p.radio)}³`;
+    case 'cubo': return `V = a × b × h = ${med(p.ancho)} × ${med(p.largo)} × ${med(p.alto)}`;
+    case 'cilindro': return `V = π × r² × h = π × ${med(p.radioCil)}² × ${med(p.alturaCil)}`;
+    case 'cono': return `V = (1/3) × π × r² × h = (1/3) × π × ${med(p.radioCon)}² × ${med(p.alturaCon)}`;
+    case 'piramide': return `V = (1/3) × l² × h = (1/3) × ${med(p.lado)}² × ${med(p.alturaPir)}`;
   }
+}
+
+// Una medida escrita por el usuario: sin decimales si es entera, con los que tenga si no
+function med(v: number): string {
+  return formatNumber(v, Number.isInteger(v) ? 0 : 2);
 }
 
 function formatVolumen(v: number): string {
@@ -280,29 +305,56 @@ interface SliderProps {
   simbolo?: string;
 }
 function Slider({ label, valor, min, max, onChange, simbolo = '' }: SliderProps) {
-  // Un id propio por slider: sin él la etiqueta queda huérfana y pulsar sobre el
-  // texto no enfoca el control (área de acierto perdida, sensible en móvil).
+  // Un id propio por control: sin él la etiqueta queda huérfana y pulsar sobre el
+  // texto no enfoca nada (área de acierto perdida, sensible en móvil).
   const idSlider = useId();
+  const idCampo = useId();
+
+  // El campo guarda su propio texto mientras se escribe. Si reflejara el número del estado,
+  // teclear "12," se normalizaría a "12" en cuanto se pulsa la coma y sería imposible
+  // escribir un decimal: el slider daba saltos de 1 y tampoco pasaba de 50, así que una lata
+  // de r=12,5 había que redondearla a 13 (un 8 % de desviación) y un depósito de r=120 no
+  // tenía manera de entrar. El slider sigue estando para explorar; el campo es para medir.
+  const [texto, setTexto] = useState(() => med(valor));
+
+  const desdeSlider = (v: number) => { setTexto(med(v)); onChange(v); };
+  const desdeCampo = (t: string) => {
+    setTexto(t);
+    const n = parseSpanishNumber(t);
+    if (!isNaN(n) && n > 0 && n <= DIM_MAX_CAMPO) onChange(n);
+  };
+
   return (
     <div className={styles.paramControl}>
       <div className={styles.paramHeader}>
-        <label className={styles.paramLabel} htmlFor={idSlider}>{label}</label>
-        <span className={styles.paramValor}>{valor}{simbolo}</span>
+        <label className={styles.paramLabel} htmlFor={idCampo}>{label}</label>
+        <span className={styles.paramCampoCaja}>
+          <input
+            id={idCampo}
+            type="text"
+            inputMode="decimal"
+            value={texto}
+            onChange={(e) => desdeCampo(e.target.value)}
+            className={styles.paramCampo}
+            aria-label={`${label}, medida exacta`}
+          />
+          {simbolo && <span className={styles.paramSimbolo}>{simbolo}</span>}
+        </span>
       </div>
       <input
         id={idSlider}
         type="range"
         min={min}
         max={max}
-        step={1}
-        value={valor}
-        onChange={(e) => onChange(Number(e.target.value))}
+        step={0.5}
+        value={Math.min(valor, max)}
+        onChange={(e) => desdeSlider(Number(e.target.value))}
         className={styles.sliderRange}
-        aria-label={`${label}: ${valor}${simbolo}`}
+        aria-label={`${label}, control deslizante: ${med(valor)}${simbolo}`}
       />
       <div className={styles.sliderLimits}>
         <span>{min}</span>
-        <span>{max}</span>
+        <span>{valor > max ? `${med(valor)} · fuera del deslizador` : max}</span>
       </div>
     </div>
   );
@@ -382,31 +434,31 @@ export default function VisualizadorVolumenesPage() {
         {/* Panel de controles */}
         <div className={styles.controlPanel}>
           {figura === 'esfera' && (
-            <Slider label="Radio (r)" valor={radio} min={1} max={50} onChange={setRadio} />
+            <Slider label="Radio (r)" valor={radio} min={DIM_MIN} max={DIM_MAX} onChange={setRadio} />
           )}
           {figura === 'cubo' && (
             <>
-              <Slider label="Anchura (a)" valor={ancho} min={1} max={50} onChange={setAncho} />
-              <Slider label="Profundidad (b)" valor={largo} min={1} max={50} onChange={setLargo} />
-              <Slider label="Altura (h)" valor={alto} min={1} max={50} onChange={setAlto} />
+              <Slider label="Anchura (a)" valor={ancho} min={DIM_MIN} max={DIM_MAX} onChange={setAncho} />
+              <Slider label="Profundidad (b)" valor={largo} min={DIM_MIN} max={DIM_MAX} onChange={setLargo} />
+              <Slider label="Altura (h)" valor={alto} min={DIM_MIN} max={DIM_MAX} onChange={setAlto} />
             </>
           )}
           {figura === 'cilindro' && (
             <>
-              <Slider label="Radio (r)" valor={radioCil} min={1} max={50} onChange={setRadioCil} />
-              <Slider label="Altura (h)" valor={alturaCil} min={1} max={50} onChange={setAlturaCil} />
+              <Slider label="Radio (r)" valor={radioCil} min={DIM_MIN} max={DIM_MAX} onChange={setRadioCil} />
+              <Slider label="Altura (h)" valor={alturaCil} min={DIM_MIN} max={DIM_MAX} onChange={setAlturaCil} />
             </>
           )}
           {figura === 'cono' && (
             <>
-              <Slider label="Radio de la base (r)" valor={radioCon} min={1} max={50} onChange={setRadioCon} />
-              <Slider label="Altura (h)" valor={alturaCon} min={1} max={50} onChange={setAlturaCon} />
+              <Slider label="Radio de la base (r)" valor={radioCon} min={DIM_MIN} max={DIM_MAX} onChange={setRadioCon} />
+              <Slider label="Altura (h)" valor={alturaCon} min={DIM_MIN} max={DIM_MAX} onChange={setAlturaCon} />
             </>
           )}
           {figura === 'piramide' && (
             <>
-              <Slider label="Lado de la base (l)" valor={lado} min={1} max={50} onChange={setLado} />
-              <Slider label="Altura (h)" valor={alturaPir} min={1} max={50} onChange={setAlturaPir} />
+              <Slider label="Lado de la base (l)" valor={lado} min={DIM_MIN} max={DIM_MAX} onChange={setLado} />
+              <Slider label="Altura (h)" valor={alturaPir} min={DIM_MIN} max={DIM_MAX} onChange={setAlturaPir} />
             </>
           )}
 

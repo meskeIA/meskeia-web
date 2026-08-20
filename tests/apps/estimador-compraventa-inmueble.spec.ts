@@ -1,3 +1,11 @@
+/**
+ * ⚠️ Cifras revisadas el 20/08/2026, cuando calcularNotario dejó de devolver el arancel puro
+ * para devolver la FACTURA notarial estimada (arancel × 1,75, punto medio de la horquilla
+ * 1,5-2 de FACTURA_NOTARIAL) y calcularRegistro empezó a sumar el asiento de presentación y
+ * la nota simple del RD 1427/1989. Los comentarios que desglosan tramos de arancel siguen
+ * siendo correctos como CÁLCULO DEL COMPONENTE: lo que ya no describen es la cifra final de
+ * la tarjeta, que lleva encima el factor.
+ */
 import { test, expect, Page } from '@playwright/test';
 
 /**
@@ -78,24 +86,30 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     expect(await valorTarjeta(page, /^ITP/)).toBe('12.000,00 €');
     await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (6,0%)');
 
+    // Nota del 20/08/2026: estas tarjetas ya no muestran el arancel puro sino la FACTURA
+    // notarial estimada (el arancel × 1,75, punto medio de la horquilla 1,5-2 documentada en
+    // FACTURA_NOTARIAL). El arancel del RD 1426/1989 cubre la matriz y una copia; copias
+    // adicionales, folios y suplidos van aparte. El registro suma además el asiento de
+    // presentación (6,010121 €) y la nota simple (3,005061 €) del RD 1427/1989.
     // Notaría (ARANCELES_NOTARIO, RD 1426/1989), acumulando tramos hasta 200.000 €:
     //   90,15 + 24.040,49×0,45 % + 30.050,60×0,15 % + 90.151,82×0,10 % + 49.746,97×0,05 %
-    //   = 358,43341 ; con el 21 % de IVA → 433,7044
-    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('433,70 €');
+    //   = 358,43341 ; con el 21 % de IVA → 433,7044 de arancel ; × 1,75 → 758,9827 de factura
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('758,98 €');
 
     // Registro (ARANCELES_REGISTRO, RD 1427/1989):
     //   24,04 + 24.040,49×0,175 % + 30.050,60×0,125 % + 90.151,82×0,075 % + 49.746,97×0,030 %
-    //   = 186,21206 ; con el 21 % de IVA → 225,3166
-    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('225,32 €');
+    //   = 186,21206 ; + 6,010121 (presentación) + 3,005061 (nota simple) = 195,22724
+    //   con el 21 % de IVA → 236,2250
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('236,22 €');
 
     expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
 
-    // Total gastos = 12.000 + 433,7044 + 225,3166 + 300 = 12.959,0210 → 6,48 % del precio
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('12.959,02 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('6,48%');
+    // Total gastos = 12.000 + 758,9827 + 236,2250 + 300 = 13.295,2077 → 6,65 % del precio
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('13.295,21 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('6,65%');
 
-    // Coste total = 200.000 + 12.959,0210. En segunda mano NO hay AJD (TPO y AJD son incompatibles)
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('212.959,02 €');
+    // Coste total = 200.000 + 13.295,2077. En segunda mano NO hay AJD (TPO y AJD son incompatibles)
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('213.295,21 €');
     await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
   });
 
@@ -123,13 +137,13 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     expect(await valorTarjeta(page, /^ITP/)).toBe('105.000,00 €');
 
     // Notaría: 558,93946 + 398.987,90×0,03 % = 678,63583 ; × 1,21 → 821,1494
-    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('821,15 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1437,01 €');
     // Registro: 306,51569 + 398.987,90×0,020 % = 386,31327 (< tope 2.181,67) ; × 1,21 → 467,4391
-    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('467,44 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('478,35 €');
 
     // Total gastos = 105.000 + 821,1494 + 467,4391 + 300 = 106.588,5884
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('106.588,59 €');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('1.106.588,59 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('107.215,36 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('1.107.215,36 €');
   });
 
   test('CASO 3 (debe avisar) — vendedor con pérdida: plusvalía no sujeta y sin IRPF', async ({ page }) => {
@@ -202,9 +216,9 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     //   valor de transmisión = 250.000 − (7.500 + 300) − 1.250 plusvalía = 240.950
     //   ganancia = 49.510 → IRPF = 6.000×19 % + 43.510×21 % = 1.140 + 9.137,10 = 10.277,10
     // Antes de la corrección daba: adquisición 180.011,44 € · ganancia 60.938,56 € · IRPF 12.895,87 €
-    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('191.440,00 €');
-    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('49.510,00 €');
-    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('10.277,10 €');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('191.767,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('49.183,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('10.208,43 €');
   });
 
   // ✅ CORREGIDO el 14/08/2026 — con el perfil «Joven (< 35 años)» la app
@@ -295,16 +309,16 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     // Notaría (ARANCELES_NOTARIO, RD 1426/1989) sobre 180.000 €:
     //   90,15 + 24.040,49×0,45 % + 30.050,60×0,15 % + 90.151,82×0,10 % + 29.746,97×0,05 %
     //   = 348,43341 ; × 1,21 de IVA → 421,6044
-    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('421,60 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('737,81 €');
     // Registro (ARANCELES_REGISTRO, RD 1427/1989):
     //   24,04 + 24.040,49×0,175 % + 30.050,60×0,125 % + 90.151,82×0,075 % + 29.746,97×0,030 %
     //   = 180,21206 ; × 1,21 → 218,0566
-    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('218,06 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('228,96 €');
 
     // Total = 18.000 + 2.700 + 421,6044 + 218,0566 + 300 = 21.639,6610 → 12,02 % del precio
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('21.639,66 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('12,02%');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('201.639,66 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('21.966,77 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('12,20%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('201.966,77 €');
   });
 
   test('CASO 9 (límite: tramo más alto) — Baleares, 2.500.000 €: los cinco tramos de la escala', async ({ page }) => {
@@ -325,15 +339,15 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (11,0%)');
 
     // Notaría: 558,93946 + (2.500.000 − 601.012,10)×0,03 % = 1.128,63583 ; × 1,21 → 1.365,6494
-    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1365,65 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('2389,89 €');
     // Registro: 306,51569 + (2.500.000 − 601.012,10)×0,020 % = 686,31327 (< tope
     // REGISTRO_MAXIMO 2.181,67) ; × 1,21 → 830,4391
-    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('830,44 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('841,35 €');
 
     // Total = 275.000 + 1.365,6494 + 830,4391 + 300 = 277.496,0884 → 11,10 % del precio
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('277.496,09 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('11,10%');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('2.777.496,09 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('278.531,23 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('11,14%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('2.778.531,23 €');
     // En segunda mano no hay AJD: TPO y AJD son incompatibles (art. 31.2 TRLITPAJD)
     await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
   });
@@ -436,7 +450,7 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     // a «106.289». Obtenido hoy: «101.289» (ITP plano del 10 %, 5.000 € menos).
     await expect(
       page.locator('input[aria-label="Impuestos y gastos que pagaste al comprar"]'),
-    ).toHaveValue('106.289');
+    ).toHaveValue('106.915');
 
     // Consecuencia en cadena, con la plusvalía municipal fuera (sin valor catastral no se calcula):
     //   adquisición = 1.000.000 + 106.289 = 1.106.289
@@ -444,9 +458,9 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     //   ganancia    = 57.411 → IRPF = 6.000×19 % + 44.000×21 % + 7.411×23 % = 12.084,53
     // Obtenido hoy: adquisición 1.101.289,00 € · ganancia 62.411,00 € · IRPF 13.234,53 €,
     // es decir 1.150,00 € de IRPF de más.
-    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('1.106.289,00 €');
-    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('57.411,00 €');
-    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('12.084,53 €');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('1.106.915,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('56.785,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('11.940,55 €');
   });
 
   // ⚠️ HALLAZGO ABIERTO (Inspector, 16/08/2026) — accesibilidad.

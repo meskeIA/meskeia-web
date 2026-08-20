@@ -16,6 +16,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { execFileSync } from 'child_process';
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DIR = path.join(RAIZ, '_private', 'rondas');
@@ -65,7 +66,74 @@ if (nuevas.length) {
   for (const n of nuevas) console.log(`     · ${n}`);
   console.log(`\n   Detalle: _private/rondas/${ultima}`);
 } else if (comparacion.length) {
-  console.log(`\n   Sin novedades. Lo persistente ya se conoce y está en el acta.`);
+  console.log(`\n   Sin URLs nuevas rotas desde ayer.`);
+}
+
+/**
+ * Antigüedad de cada hallazgo persistente, y si alguno ha sobrevivido a su reparación.
+ *
+ * El parte decía «N persistentes» y nada más, y esa cifra mezcla dos cosas que no se
+ * parecen: lo que ya se conoce y está en cola, y lo que se dio por arreglado sin estarlo.
+ * Siendo indistinguibles, «persistente» acabó leyéndose como «ruido conocido», y
+ * /calendario-fiscal-emprendedor/ pasó siete rondas señalado (14→20/08/2026) después de que
+ * el fix del 16/08 cerrase a sus otros nueve compañeros de lote y a él no: el gate se montó
+ * a partir de la rejilla y dejó fuera el bloque de vencimientos, que también lee el reloj.
+ * El dato para verlo ya estaba impreso el 17: «10 resueltas · 1 persistentes».
+ *
+ * El discriminador es barato y no depende de que nadie se acuerde: si la app se tocó y las
+ * rondas POSTERIORES al commit siguen avisando, la reparación no cerró. Eso no es un
+ * persistente conocido, es una novedad disfrazada de rutina.
+ */
+function hallazgosDe(texto) {
+  const urls = new Set();
+  for (const l of texto.split('\n')) {
+    const aviso = l.match(/^- \*\*(\/[^*]+)\*\*/);   // sección Avisos
+    if (aviso) { urls.add(aviso[1]); continue; }
+    const error = l.match(/^### (\/\S*)/);           // sección Errores
+    if (error) urls.add(error[1]);
+  }
+  return urls;
+}
+
+const esp = f => f.split('-').reverse().join('/');
+const historico = actas.map(f => ({
+  fecha: f.match(/(\d{4}-\d{2}-\d{2})/)[1],
+  urls: hallazgosDe(fs.readFileSync(path.join(DIR, f), 'utf8')),
+}));
+
+const persistentes = [];
+for (const url of hallazgosDe(txt)) {
+  let rondas = 0, desde = fecha;
+  for (let i = historico.length - 1; i >= 0; i--) {
+    if (!historico[i].urls.has(url)) break;
+    rondas++;
+    desde = historico[i].fecha;
+  }
+  if (rondas < 2) continue;   // lo de un solo día ya sale arriba, como NUEVA
+
+  let tocada = null;
+  const rutaApp = 'app/' + url.replace(/^\/|\/$/g, '');
+  if (url !== '/' && fs.existsSync(path.join(RAIZ, rutaApp))) {
+    try {
+      tocada = execFileSync('git', ['log', '-1', '--format=%ad', '--date=short',
+        '--since', desde, '--', rutaApp], { cwd: RAIZ, encoding: 'utf8' }).trim() || null;
+    } catch { /* sin git no hay cruce, pero el contador de rondas sigue valiendo */ }
+  }
+  const rondasTrasElArreglo = tocada ? historico.filter(a => a.fecha > tocada && a.urls.has(url)).length : 0;
+  persistentes.push({ url, rondas, desde, tocada, rondasTrasElArreglo });
+}
+
+if (persistentes.length) {
+  console.log(`\n   PERSISTENTES — con lo que lleva cada uno:`);
+  for (const p of persistentes.sort((a, b) => b.rondas - a.rondas)) {
+    console.log(`     · ${p.url} — ${p.rondas} rondas seguidas, desde el ${esp(p.desde)}`);
+    if (p.rondasTrasElArreglo > 0) {
+      console.log(`       AVISO: se tocó el ${esp(p.tocada)} y ha seguido avisando ${p.rondasTrasElArreglo} rondas.`);
+      console.log(`       La reparación no cerró. Esto NO es un persistente conocido: mirarlo.`);
+    } else if (p.tocada) {
+      console.log(`       Reparada el ${esp(p.tocada)}; aún sin ronda posterior que lo confirme.`);
+    }
+  }
 }
 
 /**

@@ -12,6 +12,7 @@ import {
   calcularITP,
   calcularAJD,
   calcularNotario,
+  estimarFacturaNotarial,
   calcularRegistro,
   calcularPlusvaliaMunicipal,
   elegirTipoITP,
@@ -39,6 +40,8 @@ interface ResultadosComprador {
   porcentajeImpuesto: number;
   ajd: number;
   gastosNotario: number;
+  gastosNotarioMin: number;
+  gastosNotarioMax: number;
   gastosRegistro: number;
   gastosGestoria: number;
   totalGastos: number;
@@ -239,7 +242,9 @@ export default function SimuladorCompraventaPage() {
     // El AJD en segunda mano solo aplicaría sobre la escritura de hipoteca (no sobre la compraventa)
     const ajd = tipoTransmision === 'primera-mano' ? calcularAJD(precio, ccaa) : 0;
 
-    const notario = calcularNotario(precio);
+    const notaria = estimarFacturaNotarial(precio);
+
+    const notario = notaria.medio;
     const registro = calcularRegistro(precio);
     // Nota: La comisión inmobiliaria la paga el vendedor, no el comprador
 
@@ -252,6 +257,8 @@ export default function SimuladorCompraventaPage() {
       porcentajeImpuesto: porcentaje,
       ajd,
       gastosNotario: notario,
+      gastosNotarioMin: notaria.min,
+      gastosNotarioMax: notaria.max,
       gastosRegistro: registro,
       gastosGestoria: gestoria,
       totalGastos,
@@ -670,6 +677,7 @@ export default function SimuladorCompraventaPage() {
                   <ResultCard
                     title="Gastos de notaría (+ IVA)"
                     value={formatCurrency(resultadosComprador.gastosNotario)}
+                    description={`Factura estimada entre ${formatCurrency(resultadosComprador.gastosNotarioMin)} y ${formatCurrency(resultadosComprador.gastosNotarioMax)}. El arancel cubre la matriz y una copia; las copias adicionales y los folios se facturan aparte y dependen de la extensión de la escritura.`}
                     variant="default"
                     icon="📝"
                   />
@@ -1272,7 +1280,7 @@ export default function SimuladorCompraventaPage() {
               <p>Marta, 29 años, compra su primera vivienda habitual de segunda mano en Andalucía por
               140.000 €. Al ser menor de 35 años y no superar los 150.000 €, se aplica el tipo
               reducido de ITP del 3,5% (4.900 €) en lugar del tipo general del 7%. Además paga
-              unos 790 € en notaría, registro y gestoría.</p>
+              unos 1.193 € en notaría (685 €), registro (209 €) y gestoría (300 €).</p>
               <div className={styles.casoResultado}>Ahorra 4.900 € frente al tipo general del 7%</div>
             </div>
             <div className={styles.casoCard}>

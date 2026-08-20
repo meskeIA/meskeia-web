@@ -24,6 +24,7 @@ import {
   calcularITP,
   calcularAJD,
   calcularNotario,
+  estimarFacturaNotarial,
   calcularRegistro,
   calcularPlusvaliaMunicipal,
   elegirTipoITP,
@@ -44,6 +45,8 @@ interface ResultadosComprador {
   porcentajeImpuesto: number;
   ajd: number;
   gastosNotario: number;
+  gastosNotarioMin: number;
+  gastosNotarioMax: number;
   gastosRegistro: number;
   gastosGestoria: number;
   totalGastos: number;
@@ -159,7 +162,9 @@ export default function SimuladorTrasteroCompraventaPage() {
     // AJD solo aplica en primera mano
     const ajd = tipoTransmision === 'primera-mano' ? calcularAJD(precio, ccaa) : 0;
 
-    const notario = calcularNotario(precio);
+    const notaria = estimarFacturaNotarial(precio);
+
+    const notario = notaria.medio;
     const registro = calcularRegistro(precio);
     const totalGastos = impuesto + ajd + notario + registro + gestoria;
 
@@ -170,6 +175,8 @@ export default function SimuladorTrasteroCompraventaPage() {
       porcentajeImpuesto: porcentaje,
       ajd,
       gastosNotario: notario,
+      gastosNotarioMin: notaria.min,
+      gastosNotarioMax: notaria.max,
       gastosRegistro: registro,
       gastosGestoria: gestoria,
       totalGastos,
@@ -504,6 +511,7 @@ export default function SimuladorTrasteroCompraventaPage() {
                   <ResultCard
                     title="Gastos de notaría (+ IVA)"
                     value={formatCurrency(resultadosComprador.gastosNotario)}
+                    description={`Factura estimada entre ${formatCurrency(resultadosComprador.gastosNotarioMin)} y ${formatCurrency(resultadosComprador.gastosNotarioMax)}. El arancel cubre la matriz y una copia; las copias adicionales y los folios se facturan aparte y dependen de la extensión de la escritura.`}
                     variant="default"
                     icon="📝"
                   />

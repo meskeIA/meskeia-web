@@ -1,3 +1,11 @@
+/**
+ * ⚠️ Cifras revisadas el 20/08/2026, cuando calcularNotario dejó de devolver el arancel puro
+ * para devolver la FACTURA notarial estimada (arancel × 1,75, punto medio de la horquilla
+ * 1,5-2 de FACTURA_NOTARIAL) y calcularRegistro empezó a sumar el asiento de presentación y
+ * la nota simple del RD 1427/1989. Los comentarios que desglosan tramos de arancel siguen
+ * siendo correctos como CÁLCULO DEL COMPONENTE: lo que ya no describen es la cifra final de
+ * la tarjeta, que lleva encima el factor.
+ */
 import { test, expect, Page } from '@playwright/test';
 
 /**
@@ -57,19 +65,25 @@ test.describe('Simulador de gastos de compraventa de garaje', () => {
     expect(await valorTarjeta(page, 'ITP (6,00%)')).toBe('1500,00 €');
 
     // Notaría (ARANCELES_NOTARIO, RD 1426/1989): 90,15 + (25.000 − 6.010,12) × 0,45 %
-    //        = 175,60446 ; con el 21 % de IVA → 212,4814
-    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('212,48 €');
+    // Nota del 20/08/2026: estas tarjetas ya no muestran el arancel puro sino la FACTURA
+    // notarial estimada (el arancel × 1,75, punto medio de la horquilla 1,5-2 documentada en
+    // FACTURA_NOTARIAL). El arancel del RD 1426/1989 cubre la matriz y una copia; copias
+    // adicionales, folios y suplidos van aparte. El registro suma además el asiento de
+    // presentación (6,010121 €) y la nota simple (3,005061 €) del RD 1427/1989.
+    //        = 175,60446 ; con el 21 % de IVA → 212,4814 de arancel ; × 1,75 → 371,8425
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('371,84 €');
 
     // Registro (ARANCELES_REGISTRO, RD 1427/1989): 24,04 + (25.000 − 6.010,12) × 0,175 %
     //          = 57,27229 ; con el 21 % de IVA → 69,2995
-    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('69,30 €');
+    // 57,27234 de arancel + 6,010121 (presentación) + 3,005061 (nota simple) = 66,28752 ; +21 % IVA
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('80,21 €');
 
-    // Total gastos = 1.500 + 212,4814 + 69,2995 + 300 (gestoría) = 2.081,7809
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2081,78 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('8,33%');
+    // Total gastos = 1.500 + 371,8425 + 80,2079 + 300 (gestoría) = 2.252,0504
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2252,05 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('9,01%');
 
     // Coste total = 25.000 + 2.081,7809 (en segunda mano NO hay AJD)
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('27.081,78 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('27.252,05 €');
     await expect(page.locator('h3', { hasText: 'AJD' })).toHaveCount(0);
   });
 
@@ -89,14 +103,14 @@ test.describe('Simulador de gastos de compraventa de garaje', () => {
     expect(await valorTarjeta(page, 'AJD (1,50%)')).toBe('450,00 €');
 
     // Notaría: 90,15 + (30.000 − 6.010,12) × 0,45 % = 198,10446 ; × 1,21 → 239,7064
-    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('239,71 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('419,49 €');
     // Registro: 24,04 + (30.000 − 6.010,12) × 0,175 % = 66,02229 ; × 1,21 → 79,887
-    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('79,89 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('90,80 €');
 
     // Total gastos = 6.300 + 450 + 239,7064 + 79,887 + 300 = 7.369,5934 (24,57 % del precio)
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('7369,59 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('24,57%');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('37.369,59 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('7560,28 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('25,20%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('37.560,28 €');
   });
 
   // ⚠️ CORREGIDO el 14/08/2026 - sin precio introducido, la guarda
@@ -191,8 +205,8 @@ test.describe('Simulador de gastos de compraventa de garaje — ronda 16/08/2026
     await rellenar(page, 'Precio del garaje / plaza de parking', '25000');
     await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
 
-    // Comprador: 1.500 (ITP 6 %) + 212,4814 (notaría) + 69,2995 (registro) + 300 = 2.081,7809
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('27.081,78 €');
+    // Comprador: 1.500 (ITP 6 %) + 371,8425 (notaría) + 80,2079 (registro) + 300 = 2.252,0504
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('27.252,05 €');
 
     await page.getByRole('tab', { name: 'Vendedor' }).click();
     await rellenar(page, 'Precio de compra original del garaje', '18000');
@@ -247,18 +261,18 @@ test.describe('Simulador de gastos de compraventa de garaje — ronda 16/08/2026
     // Notaría (ARANCELES_NOTARIO, RD 1426/1989), recorriendo los seis primeros tramos:
     //   90,15 + 24.040,49×0,45 % + 30.050,60×0,15 % + 90.151,82×0,10 %
     //         + 450.759,07×0,05 % + 398.987,90×0,03 % = 678,63583 ; × 1,21 → 821,1494
-    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('821,15 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1437,01 €');
 
     // Registro (ARANCELES_REGISTRO, RD 1427/1989):
     //   24,04 + 24.040,49×0,175 % + 30.050,60×0,125 % + 90.151,82×0,075 %
     //         + 450.759,07×0,030 % + 398.987,90×0,020 % = 386,31327 ; × 1,21 → 467,4391
     //   (por debajo del tope REGISTRO_MAXIMO = 2.181,67)
-    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('467,44 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('478,35 €');
 
     // Total gastos = 105.000 + 821,1494 + 467,4391 + 300 = 106.588,5884 (10,66 % del precio)
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('106.588,59 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('10,66%');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('1.106.588,59 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('107.215,36 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('10,72%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('1.107.215,36 €');
   });
 
   test('CASO 8 (debe rechazarse) — un precio negativo no puede producir un presupuesto', async ({ page }) => {

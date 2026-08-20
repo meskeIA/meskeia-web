@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import styles from './CalculadoraTamanoAdultoPerro.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, DataReference, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -11,46 +11,76 @@ type TamanoRaza = 'mini' | 'pequeno' | 'mediano' | 'grande' | 'gigante';
 interface RazaReferencia {
   nombre: string;
   tamano: TamanoRaza;
-  pesoAdulto: string;
+  pesoMin: number;   // kg de adulto
+  pesoMax: number;
   maduracion: string;
 }
 
 const razasReferencia: RazaReferencia[] = [
   // Mini
-  { nombre: 'Chihuahua', tamano: 'mini', pesoAdulto: '1,5-3 kg', maduracion: '8-10 meses' },
-  { nombre: 'Yorkshire Terrier', tamano: 'mini', pesoAdulto: '2-3,5 kg', maduracion: '8-10 meses' },
-  { nombre: 'Pomerania', tamano: 'mini', pesoAdulto: '1,5-3 kg', maduracion: '8-10 meses' },
-  { nombre: 'Maltés', tamano: 'mini', pesoAdulto: '3-4 kg', maduracion: '9-12 meses' },
+  { nombre: 'Chihuahua', tamano: 'mini', pesoMin: 1.5, pesoMax: 3, maduracion: '8-10 meses' },
+  { nombre: 'Yorkshire Terrier', tamano: 'mini', pesoMin: 2, pesoMax: 3.5, maduracion: '8-10 meses' },
+  { nombre: 'Pomerania', tamano: 'mini', pesoMin: 1.5, pesoMax: 3, maduracion: '8-10 meses' },
+  { nombre: 'Maltés', tamano: 'mini', pesoMin: 3, pesoMax: 4, maduracion: '9-12 meses' },
   // Pequeño
-  { nombre: 'Bichón Frisé', tamano: 'pequeno', pesoAdulto: '5-10 kg', maduracion: '10-12 meses' },
-  { nombre: 'Cavalier King Charles', tamano: 'pequeno', pesoAdulto: '5,5-8 kg', maduracion: '10-12 meses' },
-  { nombre: 'Jack Russell', tamano: 'pequeno', pesoAdulto: '6-8 kg', maduracion: '10-12 meses' },
-  { nombre: 'Shih Tzu', tamano: 'pequeno', pesoAdulto: '4-7 kg', maduracion: '10-12 meses' },
-  { nombre: 'Teckel', tamano: 'pequeno', pesoAdulto: '7-15 kg', maduracion: '10-12 meses' },
+  { nombre: 'Bichón Frisé', tamano: 'pequeno', pesoMin: 5, pesoMax: 10, maduracion: '10-12 meses' },
+  { nombre: 'Cavalier King Charles', tamano: 'pequeno', pesoMin: 5.5, pesoMax: 8, maduracion: '10-12 meses' },
+  { nombre: 'Jack Russell', tamano: 'pequeno', pesoMin: 6, pesoMax: 8, maduracion: '10-12 meses' },
+  { nombre: 'Shih Tzu', tamano: 'pequeno', pesoMin: 4, pesoMax: 7, maduracion: '10-12 meses' },
+  { nombre: 'Teckel', tamano: 'pequeno', pesoMin: 7, pesoMax: 15, maduracion: '10-12 meses' },
   // Mediano
-  { nombre: 'Beagle', tamano: 'mediano', pesoAdulto: '9-11 kg', maduracion: '12-15 meses' },
-  { nombre: 'Cocker Spaniel', tamano: 'mediano', pesoAdulto: '12-15 kg', maduracion: '12-15 meses' },
-  { nombre: 'Bulldog Francés', tamano: 'mediano', pesoAdulto: '8-14 kg', maduracion: '12-14 meses' },
-  { nombre: 'Border Collie', tamano: 'mediano', pesoAdulto: '14-20 kg', maduracion: '12-15 meses' },
-  { nombre: 'Schnauzer Mediano', tamano: 'mediano', pesoAdulto: '14-20 kg', maduracion: '12-15 meses' },
+  { nombre: 'Beagle', tamano: 'mediano', pesoMin: 9, pesoMax: 11, maduracion: '12-15 meses' },
+  { nombre: 'Cocker Spaniel', tamano: 'mediano', pesoMin: 12, pesoMax: 15, maduracion: '12-15 meses' },
+  { nombre: 'Bulldog Francés', tamano: 'mediano', pesoMin: 8, pesoMax: 14, maduracion: '12-14 meses' },
+  { nombre: 'Border Collie', tamano: 'mediano', pesoMin: 14, pesoMax: 20, maduracion: '12-15 meses' },
+  { nombre: 'Schnauzer Mediano', tamano: 'mediano', pesoMin: 14, pesoMax: 20, maduracion: '12-15 meses' },
   // Grande
-  { nombre: 'Labrador Retriever', tamano: 'grande', pesoAdulto: '25-36 kg', maduracion: '18-24 meses' },
-  { nombre: 'Golden Retriever', tamano: 'grande', pesoAdulto: '25-34 kg', maduracion: '18-24 meses' },
-  { nombre: 'Pastor Alemán', tamano: 'grande', pesoAdulto: '22-40 kg', maduracion: '18-24 meses' },
-  { nombre: 'Boxer', tamano: 'grande', pesoAdulto: '25-32 kg', maduracion: '18-24 meses' },
-  { nombre: 'Husky Siberiano', tamano: 'grande', pesoAdulto: '16-27 kg', maduracion: '15-18 meses' },
+  { nombre: 'Labrador Retriever', tamano: 'grande', pesoMin: 25, pesoMax: 36, maduracion: '18-24 meses' },
+  { nombre: 'Golden Retriever', tamano: 'grande', pesoMin: 25, pesoMax: 34, maduracion: '18-24 meses' },
+  { nombre: 'Pastor Alemán', tamano: 'grande', pesoMin: 22, pesoMax: 40, maduracion: '18-24 meses' },
+  { nombre: 'Boxer', tamano: 'grande', pesoMin: 25, pesoMax: 32, maduracion: '18-24 meses' },
+  { nombre: 'Husky Siberiano', tamano: 'grande', pesoMin: 16, pesoMax: 27, maduracion: '15-18 meses' },
   // Gigante
-  { nombre: 'Pastor Bernés', tamano: 'gigante', pesoAdulto: '35-55 kg', maduracion: '24-36 meses' },
-  { nombre: 'Gran Danés', tamano: 'gigante', pesoAdulto: '45-90 kg', maduracion: '24-36 meses' },
-  { nombre: 'San Bernardo', tamano: 'gigante', pesoAdulto: '50-90 kg', maduracion: '24-36 meses' },
-  { nombre: 'Mastín', tamano: 'gigante', pesoAdulto: '50-70 kg', maduracion: '24-36 meses' },
-  { nombre: 'Terranova', tamano: 'gigante', pesoAdulto: '45-70 kg', maduracion: '24-36 meses' },
-  { nombre: 'Rottweiler', tamano: 'gigante', pesoAdulto: '35-60 kg', maduracion: '18-24 meses' },
-  { nombre: 'Dogo Alemán', tamano: 'gigante', pesoAdulto: '45-90 kg', maduracion: '24-36 meses' },
-  { nombre: 'Leonberger', tamano: 'gigante', pesoAdulto: '45-77 kg', maduracion: '24-36 meses' },
+  { nombre: 'Pastor Bernés', tamano: 'gigante', pesoMin: 35, pesoMax: 55, maduracion: '24-36 meses' },
+  { nombre: 'Gran Danés', tamano: 'gigante', pesoMin: 45, pesoMax: 90, maduracion: '24-36 meses' },
+  { nombre: 'San Bernardo', tamano: 'gigante', pesoMin: 50, pesoMax: 90, maduracion: '24-36 meses' },
+  { nombre: 'Mastín', tamano: 'gigante', pesoMin: 50, pesoMax: 70, maduracion: '24-36 meses' },
+  { nombre: 'Terranova', tamano: 'gigante', pesoMin: 45, pesoMax: 70, maduracion: '24-36 meses' },
+  { nombre: 'Rottweiler', tamano: 'gigante', pesoMin: 35, pesoMax: 60, maduracion: '18-24 meses' },
+  { nombre: 'Dogo Alemán', tamano: 'gigante', pesoMin: 45, pesoMax: 90, maduracion: '24-36 meses' },
+  { nombre: 'Leonberger', tamano: 'gigante', pesoMin: 45, pesoMax: 77, maduracion: '24-36 meses' },
 ];
 
-// Factores de crecimiento por edad (semanas) y tamaño
+/**
+ * Qué son estos números y qué crédito merecen.
+ *
+ * Son una curva ORIENTATIVA propia: el porcentaje del peso adulto que se supone alcanzado a
+ * cada edad. No proceden de ninguna tabla publicada, y conviene decirlo aquí porque la app
+ * las usa como divisor —peso adulto = peso actual / porcentaje—, así que cualquier error
+ * suyo se traslada entero al resultado.
+ *
+ * Contrastadas el 20/08/2026 contra la referencia veterinaria disponible, con este resultado:
+ *
+ *  · Salt et al. (2017), «Growth standard charts for monitoring bodyweight in dogs of
+ *    different sizes», PLoS ONE 12(9):e0182064 — más de 6 millones de perros, y la base de
+ *    las WALTHAM Puppy Growth Charts que se usan en clínica. Sus autores advierten de forma
+ *    explícita que **sus estándares no aplican a perros de más de 40 kg**, que es justo la
+ *    categoría «gigante» de esta app, la que aquí se modela con más detalle (hasta 144
+ *    semanas). Para ese tramo no existe estándar publicado con el que comparar.
+ *  · El estudio publica curvas de percentiles, no una tabla de «% del peso adulto por
+ *    semana», así que no hay de dónde copiar las 51 constantes aunque se quisiera.
+ *  · Los puntos sueltos que sí circulan en la literatura divulgativa NO coinciden con esta
+ *    curva: a las 24 semanas se cita ~80 % para razas toy y ~66 % para grandes, mientras
+ *    aquí figuran 90 % y 55 %. En razas grandes esa diferencia infla la estimación de peso
+ *    adulto alrededor de un 19 %.
+ *
+ * Por eso NO se han sustituido por otras: cambiar un número sin fuente por otro número sin
+ * fuente mejor no arregla nada, solo lo disimula. Lo que sí se ha hecho es retirar de la app
+ * el caso de uso que convertía esta estimación en una decisión clínica (cálculo de dosis) y
+ * decir en pantalla, con <DataReference>, de qué pie cojea el dato.
+ *
+ * Si alguna vez se publican estándares para >40 kg, este es el bloque que hay que rehacer.
+ */
 const curvasCrecimiento: Record<TamanoRaza, Record<number, number>> = {
   mini: {
     8: 0.35, 12: 0.50, 16: 0.65, 20: 0.80, 24: 0.90, 28: 0.95, 32: 0.98, 40: 1.0,
@@ -72,13 +102,34 @@ const curvasCrecimiento: Record<TamanoRaza, Record<number, number>> = {
 // Peso adulto típico de cada categoría, en kg. Sirve para contrastar la proyección
 // con la categoría elegida: la estimación sale del propio peso del cachorro, así que
 // sin una referencia externa como esta el resultado nunca se puede contradecir.
-const rangosTipicos: Record<TamanoRaza, { min: number; max: number; etiqueta: string }> = {
-  mini: { min: 1, max: 5, etiqueta: 'menos de 5 kg' },
-  pequeno: { min: 5, max: 10, etiqueta: '5-10 kg' },
-  mediano: { min: 10, max: 25, etiqueta: '10-25 kg' },
-  grande: { min: 25, max: 45, etiqueta: '25-45 kg' },
-  gigante: { min: 45, max: 100, etiqueta: 'más de 45 kg' },
-};
+// Un peso en kg, con decimal solo si lo tiene: 1,5 kg / 3 kg
+const kg = (n: number): string => formatNumber(n, Number.isInteger(n) ? 0 : 1);
+const rangoKg = (min: number, max: number): string => `${kg(min)}-${kg(max)} kg`;
+
+// Peso adulto típico de cada categoría, DERIVADO de las razas que la propia app clasifica en
+// ella. Antes era una tabla escrita a mano, y divergió de las otras tres que hay en la página:
+// decía que «grande» es 25-45 kg mientras clasificaba al Husky (16-27 kg) como grande, así que
+// el aviso de coherencia corregía a quien había elegido bien —un husky proyectado a 18,2 kg
+// salía «por debajo de lo habitual»—. Derivándolo no pueden volver a contradecirse: si mañana
+// se añade una raza, el rango de su categoría la acoge sola.
+const rangosTipicos: Record<TamanoRaza, { min: number; max: number; etiqueta: string }> =
+  razasReferencia.reduce((acc, raza) => {
+    const actual = acc[raza.tamano];
+    acc[raza.tamano] = actual
+      ? { min: Math.min(actual.min, raza.pesoMin), max: Math.max(actual.max, raza.pesoMax), etiqueta: '' }
+      : { min: raza.pesoMin, max: raza.pesoMax, etiqueta: '' };
+    return acc;
+  }, {} as Record<TamanoRaza, { min: number; max: number; etiqueta: string }>);
+for (const t of Object.keys(rangosTipicos) as TamanoRaza[]) {
+  rangosTipicos[t].etiqueta = rangoKg(rangosTipicos[t].min, rangosTipicos[t].max);
+}
+
+// Límites de entrada. El techo de peso cubre a las razas gigantes de la propia tabla (el Gran
+// Danés y el San Bernardo llegan a 90 kg de adulto) y la edad mínima es la del primer punto de
+// la curva: por debajo no hay dato, y extrapolar sería inventarlo.
+const PESO_MAXIMO = 120;
+const EDAD_MINIMA = 8;
+const EDAD_MAXIMA = 150;
 
 // Hitos que se etiquetan en la curva y en la tabla, en meses
 const hitosMeses = [2, 3, 4, 6, 9, 12, 18, 24, 36];
@@ -160,13 +211,13 @@ export default function CalculadoraTamanoAdultoPerroPage() {
     const peso = parseFloat(pesoActual.replace(',', '.'));
     const edad = parseFloat(edadSemanas);
 
-    if (isNaN(peso) || peso <= 0 || peso > 50) {
-      setError('Introduce un peso actual válido, entre 0 y 50 kg.');
+    if (isNaN(peso) || peso <= 0 || peso > PESO_MAXIMO) {
+      setError(`Introduce un peso actual válido, mayor que 0 y hasta ${PESO_MAXIMO} kg.`);
       setResultado(null);
       return;
     }
-    if (isNaN(edad) || edad < 4 || edad > 150) {
-      setError('Introduce una edad válida, entre 4 y 150 semanas.');
+    if (isNaN(edad) || edad < EDAD_MINIMA || edad > EDAD_MAXIMA) {
+      setError(`Introduce una edad válida, entre ${EDAD_MINIMA} y ${EDAD_MAXIMA} semanas.`);
       setResultado(null);
       return;
     }
@@ -221,15 +272,15 @@ export default function CalculadoraTamanoAdultoPerroPage() {
 
     const finSemanas = semanaMadurez(resultado.tamano);
     const puntos: PuntoCurva[] = [];
-    const paso = finSemanas / 60;
-    for (let s = 4; s <= finSemanas + 0.001; s += paso) {
+    const paso = (finSemanas - EDAD_MINIMA) / 60;
+    for (let s = EDAD_MINIMA; s <= finSemanas + 0.001; s += paso) {
       const pct = obtenerPorcentajeCrecimiento(s, resultado.tamano);
       puntos.push({ semanas: s, meses: s / 4.33, peso: resultado.pesoAdultoEstimado * pct, porcentaje: pct });
     }
 
     const hitos: PuntoCurva[] = hitosMeses
       .map((m) => m * 4.33)
-      .filter((s) => s >= 4 && s <= finSemanas)
+      .filter((s) => s >= EDAD_MINIMA && s <= finSemanas)
       .map((s) => {
         const pct = obtenerPorcentajeCrecimiento(s, resultado.tamano);
         return { semanas: s, meses: s / 4.33, peso: resultado.pesoAdultoEstimado * pct, porcentaje: pct };
@@ -336,11 +387,11 @@ export default function CalculadoraTamanoAdultoPerroPage() {
             <span className={styles.grupoLabel} id="etiqueta-tamano-raza">Tamaño esperado de la raza</span>
             <div className={styles.tamanoGrid} role="group" aria-labelledby="etiqueta-tamano-raza">
               {[
-                { id: 'mini' as TamanoRaza, label: 'Mini', peso: '<5 kg' },
-                { id: 'pequeno' as TamanoRaza, label: 'Pequeño', peso: '5-10 kg' },
-                { id: 'mediano' as TamanoRaza, label: 'Mediano', peso: '10-25 kg' },
-                { id: 'grande' as TamanoRaza, label: 'Grande', peso: '25-45 kg' },
-                { id: 'gigante' as TamanoRaza, label: 'Gigante', peso: '>45 kg' },
+                { id: 'mini' as TamanoRaza, label: 'Mini', peso: rangosTipicos.mini.etiqueta },
+                { id: 'pequeno' as TamanoRaza, label: 'Pequeño', peso: rangosTipicos.pequeno.etiqueta },
+                { id: 'mediano' as TamanoRaza, label: 'Mediano', peso: rangosTipicos.mediano.etiqueta },
+                { id: 'grande' as TamanoRaza, label: 'Grande', peso: rangosTipicos.grande.etiqueta },
+                { id: 'gigante' as TamanoRaza, label: 'Gigante', peso: rangosTipicos.gigante.etiqueta },
               ].map((t) => (
                 <button
                   type="button"
@@ -440,7 +491,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
           </h2>
           <p className={styles.curvaIntro}>
             Peso esperado de un perro de tamaño <strong>{etiquetasTamano[resultado.tamano].toLowerCase()}</strong> desde
-            las 4 semanas hasta que deja de crecer, partiendo de los {formatNumber(resultado.pesoAdultoEstimado, 1)} kg
+            las {EDAD_MINIMA} semanas hasta que deja de crecer, partiendo de los {formatNumber(resultado.pesoAdultoEstimado, 1)} kg
             adultos estimados. La banda alrededor de la línea es el mismo margen de ±15 % del rango probable.
           </p>
 
@@ -449,7 +500,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
               viewBox={`0 0 ${VB_W} ${VB_H}`}
               className={styles.grafico}
               role="img"
-              aria-label={`Curva de crecimiento: de ${formatNumber(curva.puntos[0].peso, 1)} kg a las 4 semanas hasta ${formatNumber(resultado.pesoAdultoEstimado, 1)} kg a los ${formatNumber(curva.finSemanas / 4.33, 0)} meses. Los valores exactos están en la tabla siguiente.`}
+              aria-label={`Curva de crecimiento: de ${formatNumber(curva.puntos[0].peso, 1)} kg a las ${EDAD_MINIMA} semanas hasta ${formatNumber(resultado.pesoAdultoEstimado, 1)} kg a los ${formatNumber(curva.finSemanas / 4.33, 0)} meses. Los valores exactos están en la tabla siguiente.`}
             >
               {/* Retícula horizontal, deliberadamente tenue */}
               {grafico.ticksY.map((t) => (
@@ -641,7 +692,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
             <div key={index} className={`${styles.razaCard} ${styles[raza.tamano]}`}>
               <div className={styles.razaNombre}>{raza.nombre}</div>
               <div className={styles.razaInfo}>
-                <span className={styles.razaPeso}>⚖️ {raza.pesoAdulto}</span>
+                <span className={styles.razaPeso}>⚖️ {rangoKg(raza.pesoMin, raza.pesoMax)}</span>
                 <span className={styles.razaMaduracion}>📅 {raza.maduracion}</span>
               </div>
             </div>
@@ -658,6 +709,14 @@ export default function CalculadoraTamanoAdultoPerroPage() {
         <p className={styles.highlight}><strong>🐾 Solo orientativo. Consulta con tu veterinario sobre el desarrollo y peso ideal de tu cachorro.</strong></p>
       </DisclaimerCard>
 
+      <DataReference
+        normativa="Curva de crecimiento orientativa (no es un estándar veterinario)"
+        fuente="Referencia de contraste: Salt et al. (2017), PLoS ONE 12(9):e0182064 — base de las WALTHAM Puppy Growth Charts"
+        verificado="2026-08-20"
+        urlOficial="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0182064"
+        nota="Los porcentajes que usa esta calculadora son una aproximación propia, no una tabla publicada. El estándar veterinario de referencia no cubre perros de más de 40 kg de adulto, así que en razas gigantes la estimación es especialmente indicativa. Sirve para hacerse una idea del tamaño final, nunca para decidir dosis, dietas ni tratamientos."
+      />
+
       <RelatedApps
         apps={getRelatedApps('calculadora-tamano-adulto-perro')}
         title="Más herramientas para tu mascota"
@@ -669,6 +728,31 @@ export default function CalculadoraTamanoAdultoPerroPage() {
         subtitle="Información sobre las fases de crecimiento y factores que influyen"
       >
         <section className={styles.guideSection}>
+          <h2>🧮 Cómo se calcula esta estimación</h2>
+          <p>
+            La cuenta es una sola división. A cada edad le corresponde un porcentaje del peso que
+            el perro tendrá de adulto —a las {EDAD_MINIMA} semanas, un cachorro mediano ronda el
+            25 %—, así que basta con dividir lo que pesa hoy entre ese porcentaje:
+          </p>
+          <p className={styles.highlight}>
+            <strong>peso adulto estimado = peso actual ÷ porcentaje de crecimiento alcanzado</strong>
+          </p>
+          <p>
+            Un cachorro mediano de 5 kg a las {EDAD_MINIMA} semanas: 5 ÷ 0,25 = <strong>20 kg</strong>.
+            El rango que aparece debajo del resultado es ese número con un margen del 15 % arriba y
+            abajo. La curva no es una línea recta: cuanto mayor es la raza, más tarde llega al 100 %
+            —un gigante no lo alcanza hasta las 144 semanas, casi tres años—, y por eso hay que
+            elegir bien el tamaño de la raza antes de calcular.
+          </p>
+          <p>
+            Dos avisos que salen de la propia fórmula. El primero: como el porcentaje es el divisor,
+            un error pequeño en él se amplifica en el resultado, y más cuanto más joven es el
+            cachorro. El segundo: esos porcentajes son una aproximación orientativa, no una tabla
+            veterinaria publicada, y el estándar clínico de referencia no cubre perros de más de
+            40 kg de adulto. Sirve para hacerse una idea, no para decidir nada que dependa del peso
+            exacto.
+          </p>
+
           <h2>📈 Fases de Crecimiento</h2>
           <div className={styles.fasesGrid}>
             <div className={styles.faseCard}>
@@ -739,7 +823,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
               <tbody>
                 <tr>
                   <td><strong>Toy / Mini</strong></td>
-                  <td>&lt; 4 kg</td>
+                  <td>{rangosTipicos.mini.etiqueta}</td>
                   <td>Chihuahua, Yorkshire, Pomerania</td>
                   <td>14-16 años</td>
                   <td>8-10 meses</td>
@@ -748,7 +832,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
                 </tr>
                 <tr>
                   <td><strong>Pequeño</strong></td>
-                  <td>4-10 kg</td>
+                  <td>{rangosTipicos.pequeno.etiqueta}</td>
                   <td>Jack Russell, Shih Tzu, Bichón</td>
                   <td>12-15 años</td>
                   <td>10-12 meses</td>
@@ -757,7 +841,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
                 </tr>
                 <tr>
                   <td><strong>Mediano</strong></td>
-                  <td>10-25 kg</td>
+                  <td>{rangosTipicos.mediano.etiqueta}</td>
                   <td>Beagle, Border Collie, Cocker</td>
                   <td>10-13 años</td>
                   <td>12-15 meses</td>
@@ -766,7 +850,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
                 </tr>
                 <tr>
                   <td><strong>Grande</strong></td>
-                  <td>25-45 kg</td>
+                  <td>{rangosTipicos.grande.etiqueta}</td>
                   <td>Labrador, Pastor Alemán, Golden</td>
                   <td>9-11 años</td>
                   <td>18-24 meses</td>
@@ -775,7 +859,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
                 </tr>
                 <tr>
                   <td><strong>Gigante</strong></td>
-                  <td>&gt; 45 kg</td>
+                  <td>{rangosTipicos.gigante.etiqueta}</td>
                   <td>Gran Danés, Mastín, San Bernardo</td>
                   <td>7-9 años</td>
                   <td>24-36 meses</td>
@@ -817,15 +901,21 @@ export default function CalculadoraTamanoAdultoPerroPage() {
               </p>
             </div>
             <div className={styles.escenarioCard}>
+              {/* Aquí había un caso de uso de «veterinario que ajusta dosis de antiparasitario
+                  sobre el peso adulto estimado». Se retiró el 20/08/2026: la curva es una
+                  aproximación sin tabla publicada detrás (ver el comentario de curvasCrecimiento),
+                  y en razas gigantes ni siquiera existe estándar con el que contrastarla. Invitar
+                  a dosificar sobre ella es pedirle a la cifra un peso que no puede sostener. El
+                  caso que la sustituye necesita el mismo dato y no decide nada clínico. */}
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon} aria-hidden="true">🩺</span>
-                <strong>Veterinario que ajusta dosis</strong>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎒</span>
+                <strong>Quien prepara la llegada del cachorro</strong>
               </div>
               <p className={styles.escenarioExample}>
-                Necesitas calcular la dosis de un antiparasitario preventivo para un cachorro de 10 semanas en función de su peso adulto estimado.
+                Vas a comprar transportín, arnés y cama para un cachorro de 10 semanas, y todo eso se elige por el tamaño que tendrá de adulto, no por el que tiene ahora.
               </p>
               <p className={styles.escenarioTip}>
-                La calculadora proporciona el rango de peso adulto probable, útil para planificar protocolos de desparasitación y vacunación adaptados al tamaño final.
+                El rango de peso adulto probable evita comprar dos veces: el transportín homologado para viajar y el arnés se escogen por talla final, y el consumo de alimento se estima sobre ese mismo peso.
               </p>
             </div>
             <div className={styles.escenarioCard}>

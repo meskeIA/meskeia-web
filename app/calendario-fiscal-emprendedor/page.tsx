@@ -650,10 +650,19 @@ export default function CalendarioFiscalPage() {
         {/* CALENDARIO */}
         {pestanaActiva === 'calendario' && (
           <div className={styles.calendarioContainer}>
-            {/* Próximas fechas */}
+            {/* Próximas fechas: depende del reloj DOS veces. La ventana de 90 días decide QUÉ
+                vencimientos entran en la lista, y diasHasta() cuántos días faltan para cada uno.
+                Como el HTML estático se genera en el build, servía la cuenta de aquel día —el
+                20/08/2026 anunciaba «62 días» para el 20 de octubre, cuando faltaban 61— y al
+                hidratar no coincidía: es el mismo #418 que se cerró en la rejilla de abajo, con
+                este bloque fuera del gate. El <h2> no depende de la fecha y se prerenderiza; la
+                lista espera a montar. Lo que Google indexa de esta app es la sección educativa,
+                que no toca el reloj. */}
             <div className={styles.proximasFechas}>
               <h2 className={styles.seccionTitulo}>⏰ Próximos vencimientos</h2>
-              {proximasFechas.length === 0 ? (
+              {!montado ? (
+                <p className={styles.cargandoVencimientos}>Calculando los vencimientos pendientes…</p>
+              ) : proximasFechas.length === 0 ? (
                 <p className={styles.sinFechas}>No hay vencimientos próximos</p>
               ) : (
                 <div className={styles.listaProximas}>

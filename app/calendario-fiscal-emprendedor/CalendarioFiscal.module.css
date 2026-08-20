@@ -143,6 +143,16 @@
   font-style: italic;
 }
 
+/* Marcador mientras la lista espera a montar (ver el comentario en page.tsx). Reserva alto
+   para que el bloque no pase de una línea a seis de golpe y arrastre hacia abajo la rejilla. */
+.cargandoVencimientos {
+  color: var(--text-muted);
+  font-style: italic;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+}
+
 .listaProximas {
   display: flex;
   flex-direction: column;

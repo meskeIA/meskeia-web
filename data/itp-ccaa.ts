@@ -1037,9 +1037,10 @@ export function calcularAJD(valor: number, ccaa: ComunidadAutonoma): number {
 }
 
 /**
- * Calcula gastos de notaría
+ * Arancel notarial puro: número 2 del RD 1426/1989 (documentos de cuantía), más IVA.
+ * Es la parte normativa exacta, pero NO es lo que se acaba pagando — ver estimarFacturaNotarial.
  */
-export function calcularNotario(valor: number): number {
+export function calcularArancelNotarial(valor: number): number {
   let total = 0;
   let limiteAnterior = 0;
 
@@ -1058,6 +1059,66 @@ export function calcularNotario(valor: number): number {
   // Añadir IVA (21%) a los honorarios notariales
   return total * 1.21;
 }
+
+/**
+ * Lo que el arancel deja fuera, y por qué la factura nunca coincide con él.
+ *
+ * El número 2 del RD 1426/1989 cubre la matriz y UNA copia autorizada. Se facturan aparte el
+ * número 4 (copias autorizadas, 3,005061 € por folio; simples, 0,601012 €), el número 7 (folios
+ * de matriz desde el quinto, 3,005061 € por cara) y el número 6 (salidas y diligencias). Como
+ * dependen de la extensión de cada escritura, la factura no es un punto sino una horquilla, que
+ * la práctica sitúa entre 1,5 y 2 veces el arancel.
+ *
+ * Corregido el 20/08/2026: hasta entonces las siete apps que llaman aquí mostraban el arancel
+ * puro mientras sus propios textos anunciaban la factura real. Para una vivienda de 200.000 €,
+ * la tarjeta decía 433,70 € y el bloque educativo «700-900 €» dos pantallas más abajo. Se hizo
+ * caso al texto, no al motor: la horquilla reconcilia los tres ejemplos que las apps ya
+ * publicaban (garaje ~400 €, vivienda 700-900 €, 400.000 € → 900-1.200 €).
+ */
+export const FACTURA_NOTARIAL = {
+  factorMin: 1.5,
+  factorMax: 2,
+  baseNormativa: 'RD 1426/1989, Arancel de los Notarios (números 2, 4, 6 y 7)',
+  urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-1989-28111',
+  verificado: '2026-08-20',
+  nota: 'El arancel cubre la matriz y una copia autorizada. Las copias adicionales, los folios y los suplidos se facturan aparte y dependen de la extensión de la escritura.',
+};
+
+/** Horquilla de la factura notarial, y su punto medio para quien necesite una sola cifra. */
+export function estimarFacturaNotarial(valor: number): { min: number; max: number; medio: number } {
+  const arancel = calcularArancelNotarial(valor);
+  const min = arancel * FACTURA_NOTARIAL.factorMin;
+  const max = arancel * FACTURA_NOTARIAL.factorMax;
+  return { min, max, medio: (min + max) / 2 };
+}
+
+/**
+ * Lo que suman las apps en el total de gastos: el punto medio de la horquilla. Conserva el
+ * nombre porque siete apps lo llaman, y porque lo que estaba mal no era la llamada sino que
+ * devolviese el arancel en lugar de la factura.
+ */
+export function calcularNotario(valor: number): number {
+  return estimarFacturaNotarial(valor).medio;
+}
+
+/**
+ * Conceptos del Arancel de los Registradores (RD 1427/1989) que acompañan siempre a una
+ * inscripción de compraventa y que el número 2 no incluye: el asiento de presentación
+ * (número 1) y la nota simple informativa (número 4).
+ *
+ * Aquí NO se aplica la horquilla de la notaría, aunque el defecto pareciera el mismo. El caso
+ * de la notaría son copias y folios que crecen con la extensión de la escritura, y por eso hay
+ * que estimarlos; estos son importes fijos y pequeños, de modo que se suman exactos. Aplicarles
+ * un 1,5-2× por analogía habría inflado el registro sin ningún fundamento: para un garaje de
+ * 25.000 € son unos 9 €, no 70.
+ */
+export const REGISTRO_CONCEPTOS = {
+  presentacion: 6.010121,  // nº 1 — asiento de presentación
+  notaSimple: 3.005061,    // nº 4 — publicidad formal
+  baseNormativa: 'RD 1427/1989, Arancel de los Registradores de la Propiedad (números 1, 2 y 4)',
+  urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-1989-28112',
+  verificado: '2026-08-20',
+};
 
 /**
  * Calcula gastos de registro de la propiedad
@@ -1080,6 +1141,9 @@ export function calcularRegistro(valor: number): number {
 
   // Aplicar límite máximo
   total = Math.min(total, REGISTRO_MAXIMO);
+
+  // El nº 2 cubre la inscripción; presentación y nota simple van aparte y siempre se devengan
+  total += REGISTRO_CONCEPTOS.presentacion + REGISTRO_CONCEPTOS.notaSimple;
 
   // Añadir IVA (21%)
   return total * 1.21;

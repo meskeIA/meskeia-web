@@ -54,7 +54,7 @@ async function calcular(
 test.describe('Calculadora de tamaño adulto del perro', () => {
   test('CASO 1 (normal) — mediano, 5 kg a las 16 semanas', async ({ page }) => {
     await page.goto(RUTA);
-    await calcular(page, { peso: '5', edad: '16', tamano: 'Mediano 10-25 kg' });
+    await calcular(page, { peso: '5', edad: '16', tamano: 'Mediano 8-20 kg' });
 
     // 16 semanas es nodo exacto de la curva mediano → pct = 0,50
     // pesoEstimado = 5 / 0,50 = 10 kg
@@ -75,15 +75,17 @@ test.describe('Calculadora de tamaño adulto del perro', () => {
     //   0,92 + 0,06 × (11,96 / 12) = 0,9798 → 10 × 0,9798 = 9,798 kg
     expect(await filaHito(page, '12 meses')).toEqual(['9,8 kg', '98 %']);
 
-    // rangosTipicos.mediano = 10-25 kg y la proyección son 10 kg exactos → «dentro»
+    // rangosTipicos.mediano ahora se DERIVA de las razas que la app clasifica como medianas
+    // (Bulldog Francés 8 kg – Border Collie/Schnauzer 20 kg), en vez de estar escrito a mano
+    // como 10-25. La proyección son 10 kg exactos → «dentro».
     await expect(
-      page.getByText('La proyección encaja con la categoría mediano, cuyo peso adulto habitual es 10-25 kg.'),
+      page.getByText('La proyección encaja con la categoría mediano, cuyo peso adulto habitual es 8-20 kg.'),
     ).toBeVisible();
   });
 
   test('CASO 2 (límite alto) — gigante, 50 kg (peso máximo admitido) a las 96 semanas', async ({ page }) => {
     await page.goto(RUTA);
-    await calcular(page, { peso: '50', edad: '96', tamano: 'Gigante >45 kg' });
+    await calcular(page, { peso: '50', edad: '96', tamano: 'Gigante 35-90 kg' });
 
     // 96 semanas es nodo exacto de la curva gigante → pct = 0,95
     // pesoEstimado = 50 / 0,95 = 52,63157… kg
@@ -94,29 +96,30 @@ test.describe('Calculadora de tamaño adulto del perro', () => {
     await expect(detalle(page, 0)).toHaveText('95%');
     await expect(detalle(page, 1)).toHaveText('24-36 meses');
 
-    // rangosTipicos.gigante = 45-100 kg → 52,6 kg queda dentro
+    // rangosTipicos.gigante se deriva ahora de las razas gigantes de la tabla (Pastor Bernés
+    // y Rottweiler desde 35 kg, Gran Danés y San Bernardo hasta 90) → 52,6 kg queda dentro
     await expect(page.getByText('La proyección encaja con la categoría gigante')).toBeVisible();
 
-    // ⚠️ HALLAZGO anclado: el techo de peso son 50 kg (`peso > 50` en page.tsx), pero la
-    // app admite edades de hasta 150 semanas y su propia tabla de razas da 45-90 kg de
-    // adulto al Gran Danés y al San Bernardo. Un gigante real de 22 meses pesa más de
-    // 50 kg y la app lo rechaza en vez de estimarlo. Si algún día se sube el techo, este
-    // bloque se pondrá en ROJO: entonces hay que sustituirlo por el valor estimado.
+    // El hallazgo 44 estaba ANCLADO aquí, y este bloque avisaba de que se pondría en rojo el
+    // día que se subiera el techo. Ese día fue el 20/08/2026: el tope pasó de 50 a 120 kg
+    // porque dejaba inservible la categoría gigante entera —la propia tabla de la app da
+    // 45-90 kg de adulto al Gran Danés y al San Bernardo, y un gigante de 22 meses pesa más
+    // de 50—. Ahora 51 kg se estima en vez de rechazarse: 51 / 0,95 = 53,68421…
     await page.locator('input[type="text"]').nth(0).fill('51');
     await page.getByRole('button', { name: 'Calcular Peso Adulto' }).click();
-    await expect(page.locator('p[role="alert"]')).toContainText(
-      'Introduce un peso actual válido, entre 0 y 50 kg.',
-    );
+    await expect(valorPrincipal(page)).toHaveText('53,7 kg');
+    await expect(page.locator('p[role="alert"]')).toHaveCount(0);
   });
 
   test('CASO 3 (debe rechazarse) — peso 0 y peso negativo no se calculan', async ({ page }) => {
     await page.goto(RUTA);
-    await calcular(page, { peso: '0', edad: '16', tamano: 'Mediano 10-25 kg' });
+    await calcular(page, { peso: '0', edad: '16', tamano: 'Mediano 8-20 kg' });
 
     // La guarda `peso <= 0` corta antes de dividir: sin ella, 0 / 0,50 daría «0,0 kg»
-    // como si fuera una predicción válida.
+    // como si fuera una predicción válida. El mensaje decía «entre 0 y 50 kg» cuando el 0
+    // tampoco se aceptaba; desde el 20/08/2026 dice lo que de verdad admite.
     await expect(page.locator('p[role="alert"]')).toContainText(
-      'Introduce un peso actual válido, entre 0 y 50 kg.',
+      'Introduce un peso actual válido, mayor que 0 y hasta 120 kg.',
     );
     await expect(
       page.getByText('Introduce los datos de tu cachorro para predecir su tamaño adulto'),
@@ -124,9 +127,9 @@ test.describe('Calculadora de tamaño adulto del perro', () => {
     await expect(page.locator('[class*="resultadoValor"]')).toHaveCount(0);
 
     // Mismo tratamiento para un peso negativo
-    await calcular(page, { peso: '-5', edad: '16', tamano: 'Mediano 10-25 kg' });
+    await calcular(page, { peso: '-5', edad: '16', tamano: 'Mediano 8-20 kg' });
     await expect(page.locator('p[role="alert"]')).toContainText(
-      'Introduce un peso actual válido, entre 0 y 50 kg.',
+      'Introduce un peso actual válido, mayor que 0 y hasta 120 kg.',
     );
     await expect(page.locator('[class*="resultadoValor"]')).toHaveCount(0);
   });
@@ -145,7 +148,21 @@ test.describe('Calculadora de tamaño adulto del perro — lote mecánico 18/08/
 
   test('hallazgo 50 — ningún botón se queda sin type="button"', async ({ page }) => {
     await page.goto(RUTA);
-    await expect(page.locator('button:not([type])')).toHaveCount(0);
+    // Se cuentan solo los botones DE LA APP. La suite corre contra `next dev` (ver webServer
+    // en playwright.config.ts) y el panel de Dev Tools inyecta su propio botón sin type, que
+    // en producción no existe: contarlo hacía fallar este test sin que nada de la página
+    // estuviera mal. Comprobado el 20/08/2026 sobre el HTML generado por `npm run build`:
+    // 0 botones sin type. Si algún día la suite corriera contra el build, el filtro sobra
+    // pero no estorba.
+    const sinType = await page.locator('button:not([type])').evaluateAll((els) =>
+      els.filter(
+        (e) =>
+          !e.closest('nextjs-portal') &&
+          !e.hasAttribute('data-nextjs-dev-tools-button') &&
+          !e.hasAttribute('data-next-mark'),
+      ).length,
+    );
+    expect(sinType).toBe(0);
   });
 
   test('hallazgo 48 — la FAQ estructurada no contradice al motor ni a la tabla visible', async ({ page }) => {
@@ -165,7 +182,7 @@ test.describe('Calculadora de tamaño adulto del perro — lote mecánico 18/08/
 
   test('hallazgo 48 — el caso que publica la FAQ da en la app la cifra que la FAQ dice', async ({ page }) => {
     await page.goto(RUTA);
-    await calcular(page, { peso: '16', edad: '14', tamano: 'Grande 25-45 kg' });
+    await calcular(page, { peso: '16', edad: '14', tamano: 'Grande 16-40 kg' });
     // 14 semanas interpola entre 12 (0,30) y 16 (0,40): 0,30 + (2/4)×0,10 = 0,35
     // 16 / 0,35 = 45,714… → 45,7 kg
     await expect(valorPrincipal(page)).toHaveText('45,7 kg');

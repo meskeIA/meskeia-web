@@ -25,6 +25,7 @@ import {
   calcularITP,
   calcularAJD,
   calcularNotario,
+  estimarFacturaNotarial,
   calcularRegistro,
   calcularPlusvaliaMunicipal,
   elegirTipoITP,
@@ -45,6 +46,8 @@ interface ResultadosComprador {
   porcentajeImpuesto: number;
   ajd: number;
   gastosNotario: number;
+  gastosNotarioMin: number;
+  gastosNotarioMax: number;
   gastosRegistro: number;
   gastosGestoria: number;
   totalGastos: number;
@@ -155,7 +158,8 @@ export default function SimuladorGarajeCompraventaPage() {
 
     // AJD solo aplica en primera mano (junto con IVA)
     const ajd = tipoTransmision === 'primera-mano' ? calcularAJD(precio, ccaa) : 0;
-    const notario = calcularNotario(precio);
+    const notaria = estimarFacturaNotarial(precio);
+    const notario = notaria.medio;
     const registro = calcularRegistro(precio);
     const totalGastos = impuesto + ajd + notario + registro + gestoria;
 
@@ -166,6 +170,8 @@ export default function SimuladorGarajeCompraventaPage() {
       porcentajeImpuesto: porcentaje,
       ajd,
       gastosNotario: notario,
+      gastosNotarioMin: notaria.min,
+      gastosNotarioMax: notaria.max,
       gastosRegistro: registro,
       gastosGestoria: gestoria,
       totalGastos,
@@ -510,6 +516,7 @@ export default function SimuladorGarajeCompraventaPage() {
                   <ResultCard
                     title="Gastos de notaría (+ IVA)"
                     value={formatCurrency(resultadosComprador.gastosNotario)}
+                    description={`Factura estimada entre ${formatCurrency(resultadosComprador.gastosNotarioMin)} y ${formatCurrency(resultadosComprador.gastosNotarioMax)}. El arancel cubre la matriz y una copia; las copias adicionales y los folios se facturan aparte y dependen de la extensión de la escritura.`}
                     variant="default"
                     icon="📝"
                   />
@@ -811,14 +818,16 @@ export default function SimuladorGarajeCompraventaPage() {
                 <span aria-hidden="true" className={styles.casoEmoji}>🚗</span>
                 <span className={styles.casoTag}>Comprar garaje solo (segunda mano)</span>
               </div>
-              {/* Cifras tomadas del propio simulador con esa misma entrada, no de los mínimos
-                  orientativos de COSTES_COMPRAVENTA_2025: antes anunciaba notaría ~400 €,
-                  registro ~150 €, total ~27.350 € y una banda del 10-12 % que el motor no
-                  produce para Madrid con ninguna cifra (en segunda mano no hay AJD). Un
-                  ejemplo que no cuadra con la calculadora de al lado enseña a desconfiar
-                  del resultado correcto. */}
-              <p>Luis compra una plaza de parking en Madrid por 25.000 €. Paga el ITP general de Madrid (6%) = 1.500 €, más notaría (212,48 €), registro (69,30 €) y gestoría (300 €). El coste total asciende a 27.081,78 €.</p>
-              <div className={styles.casoResultado}>ITP + gastos = 8,33% del precio</div>
+              {/* Cifras tomadas del propio simulador con esa misma entrada. Se han ajustado dos
+                  veces y conviene saber por qué: primero se alineó el texto con el motor, que
+                  daba el arancel puro (212,48 € de notaría); después se corrigió el motor, que
+                  era el que estaba mal —el arancel cubre la matriz y una copia, no la factura—.
+                  Curiosamente, los ~400 € que este ejemplo anunciaba al principio estaban más
+                  cerca de la verdad que el número exacto que los sustituyó. Un ejemplo que no
+                  cuadra con la calculadora de al lado enseña a desconfiar del resultado correcto,
+                  así que si vuelve a cambiar el motor, esta cifra cambia con él. */}
+              <p>Luis compra una plaza de parking en Madrid por 25.000 €. Paga el ITP general de Madrid (6%) = 1.500 €, más notaría (371,84 €, dentro de una horquilla de 318,72 € a 424,96 €), registro (80,21 €) y gestoría (300 €). El coste total asciende a 27.252,05 €.</p>
+              <div className={styles.casoResultado}>ITP + gastos = 9,01% del precio</div>
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
