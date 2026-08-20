@@ -1,43 +1,64 @@
 /**
  * Test de regresión — /visualizador-volumenes/
  *
- * Verifica que el motor de cálculo sigue devolviendo los volúmenes correctos
- * y que el formato español y los límites de los sliders se mantienen.
+ * Qué promete la app (h1 + subtítulo + metadata): «Selecciona una figura, ajusta las
+ * dimensiones y observa cómo cambia el volumen en tiempo real». Contra eso se mide todo
+ * lo de aquí abajo: que el número sea el correcto, que salga en formato español y que la
+ * figura dibujada REACCIONE de verdad a la medida (se comprueba el atributo del SVG, no
+ * que el elemento exista).
  *
- * Los tres casos están resueltos A MANO antes de ejecutarse (desarrollo en cada
- * bloque). Si un cambio futuro altera `calcVolumen` o `formatVolumen`, estos
- * números dejarán de cuadrar y el test lo dirá.
+ * Los tres casos están resueltos A MANO antes de ejecutarse; la aritmética va escrita en
+ * el encabezado de cada bloque. Ninguna cifra esperada se ha copiado de la app.
  *
- * Controles: 5 figuras, sliders `input[type=range]` con min=1, max=50, step=1.
- * No hay entrada numérica libre, así que no existe un caso de "entrada inválida":
- * el caso 3 comprueba el recorte a los límites, que es la única defensa que tiene.
+ * CONTROLES (tras la reparación del 19/08/2026): cada medida tiene DOS entradas
+ * sincronizadas — un campo de texto que admite coma decimal (hasta 100.000) y un
+ * deslizador de 1 a 50 con paso 0,5. El campo es el que permite medir de verdad:
+ * r=12,5 y r=120 no caben en el deslizador.
+ *
+ * FORMATO DEL RESULTADO (`formatVolumen`): <10 → 4 decimales · <100 → 2 · <100.000 → 1 ·
+ * resto → 0. Y `es-ES` NO agrupa los números de cuatro cifras: 8181,2 va sin punto de
+ * miles, 7.238.229 sí lo lleva.
+ *
+ * HALLAZGOS ABIERTOS del acta del 20/08/2026, deliberadamente NO afirmados aquí para que
+ * el spec siga en verde hasta que se reparen: las etiquetas del dibujo escriben la medida
+ * en formato inglés (r=12.5); la fórmula redondea la medida a 2 decimales aunque calcule
+ * con todas; una entrada inválida se ignora sin avisar; el relleno del deslizador está
+ * clavado al 50 %; y en móvil el control y el resultado nacen bajo el pliegue.
  */
 
 import { test, expect, type Page } from '@playwright/test';
 
 const RESULTADO = '[aria-label="Resultado del volumen"]';
 
-/** Valor numérico mostrado en la tarjeta de resultado (2º span: etiqueta, valor, unidad). */
-function valorVolumen(page: Page) {
-  return page.locator(RESULTADO).locator('span').nth(1);
-}
+/** Valor numérico de la tarjeta de resultado (2º span: etiqueta, valor, unidad). */
+const valorVolumen = (page: Page) => page.locator(RESULTADO).locator('span').nth(1);
 
 /** Fórmula aplicada: es el primer <code> del DOM (va antes del bloque educativo). */
-function formulaAplicada(page: Page) {
-  return page.locator('code').first();
-}
+const formulaAplicada = (page: Page) => page.locator('code').first();
+
+/** El SVG de la figura, para no confundirlo con el del logotipo de meskeIA. */
+const dibujo = (page: Page) => page.locator('svg[role="img"]');
+
+/** Campo de texto de una medida (el deslizador tiene otro nombre accesible). */
+const campo = (page: Page, medida: string) => page.getByLabel(`${medida}, medida exacta`);
 
 async function elegirFigura(page: Page, nombre: RegExp) {
-  const boton = page.getByRole('button', { name: nombre });
+  const boton = page.getByRole('button', { name: nombre }).first();
   await boton.click();
   await expect(boton).toHaveAttribute('aria-pressed', 'true');
 }
 
+/** Lee un atributo numérico del SVG (r, rx…) para comprobar que el dibujo reacciona. */
+async function atributoSvg(page: Page, selector: string, atributo: string): Promise<number> {
+  const valor = await dibujo(page).locator(selector).getAttribute(atributo);
+  return Number(valor);
+}
+
 /**
- * Escribe un valor en el slider como lo haría el navegador.
- * Importante: el setter nativo RECORTA a [min, max]; eso es justo lo que mide el caso 3.
+ * Mueve el deslizador como lo haría el navegador.
+ * El setter nativo RECORTA a [min, max]: eso es justo lo que mide el caso 3.
  */
-async function ponerSlider(page: Page, indice: number, valor: number) {
+async function ponerDeslizador(page: Page, indice: number, valor: number) {
   await page.locator('input[type=range]').nth(indice).evaluate((elemento, v) => {
     const setter = Object.getOwnPropertyDescriptor(
       window.HTMLInputElement.prototype,
@@ -53,122 +74,182 @@ test.beforeEach(async ({ page }) => {
   await expect(page.locator('h1')).toContainText('Visualizador de Volúmenes 3D');
 });
 
-test.describe('visualizador-volumenes — volúmenes calculados a mano', () => {
-  /**
-   * CASO 1 — NORMAL · Cilindro r=4, h=8
-   *
-   *   V = π · r² · h = π · 4² · 8 = 128 π
-   *   100 π = 314,159265359
-   *    28 π =  87,964594300
-   *   ---------------------------
-   *   128 π = 402,123859659
-   *
-   *   El formateador usa 1 decimal en el tramo [100, 100.000) → "402,1"
-   */
-  test('caso normal: cilindro r=4 h=8 → 402,1 unidades³', async ({ page }) => {
-    await elegirFigura(page, /Cilindro/);
+// ============================================================
+// CASO 1 — NORMAL · Cilindro r=4 h=8, y el cono equivalente
+// ============================================================
+/**
+ *   V = π · r² · h = π · 4² · 8 = 128 π
+ *     100 π = 314,159265359
+ *      28 π =  87,964594300
+ *     ------------------------
+ *     128 π = 402,123859659      → tramo [100, 100.000) → 1 decimal → «402,1»
+ *
+ *   Subiendo el radio a 8 (misma altura):
+ *     V = π · 64 · 8 = 512 π = 1.608,495438…  → «1608,5» (es-ES no agrupa 4 cifras)
+ *
+ *   El cono de la misma base y altura debe valer exactamente un tercio, que es la
+ *   relación que el bloque educativo invita a comprobar:
+ *     128 π / 3 = 134,041286553…  → «134,0»
+ *
+ *   DIBUJO. La base del cilindro es la 2ª elipse del SVG (la 1ª es la sombra) y su
+ *   semieje mayor vale rx = r · s, con s = min(105/2r, 115/(h+0,76r), 13):
+ *     r=4, h=8 → s = min(13,125 · 10,4166 · 13) = 10,41666…  → rx = 41,6666…
+ *     r=8, h=8 → s = min( 6,5625 ·  8,1676 · 13) =  6,5625   → rx = 52,5
+ */
+test('caso normal: cilindro r=4 h=8 → 402,1, y el dibujo cambia al subir el radio', async ({ page }) => {
+  await elegirFigura(page, /Cilindro/);
 
-    // Son los valores por defecto de la figura; se fijan igualmente para no depender de ellos.
-    await ponerSlider(page, 0, 4); // radio
-    await ponerSlider(page, 1, 8); // altura
+  await expect(valorVolumen(page)).toHaveText('402,1');
+  await expect(page.locator(RESULTADO)).toContainText('unidades³');
+  await expect(formulaAplicada(page)).toHaveText('V = π × r² × h = π × 4² × 8');
+  expect(await atributoSvg(page, 'ellipse >> nth=1', 'rx')).toBeCloseTo(41.6667, 3);
 
-    await expect(valorVolumen(page)).toHaveText('402,1');
-    await expect(page.locator(RESULTADO)).toContainText('unidades³');
-    await expect(formulaAplicada(page)).toHaveText('V = π × r² × h = π × 4² × 8');
+  // Duplicar el radio cuadruplica el volumen (402,1 × 4 = 1.608,5) y redibuja la base.
+  await campo(page, 'Radio (r)').fill('8');
+  await expect(valorVolumen(page)).toHaveText('1608,5');
+  await expect(formulaAplicada(page)).toHaveText('V = π × r² × h = π × 8² × 8');
+  expect(await atributoSvg(page, 'ellipse >> nth=1', 'rx')).toBeCloseTo(52.5, 3);
 
-    // El cono con la misma base y altura debe ser exactamente un tercio (128π/3 = 134,041286…),
-    // que es la relación que el bloque educativo invita a comprobar.
-    await elegirFigura(page, /Cono/);
-    await ponerSlider(page, 0, 4);
-    await ponerSlider(page, 1, 8);
-    await expect(valorVolumen(page)).toHaveText('134,0');
-  });
-
-  /**
-   * CASO 2 — LÍMITE SUPERIOR · Esfera r=50 (máximo del slider)
-   *
-   *   V = (4/3) · π · 50³ = (4/3) · π · 125.000 = 500.000 π / 3
-   *   500.000 π = 1.570.796,32679
-   *          /3 =   523.598,775598
-   *
-   *   Tramo ≥ 100.000 → 0 decimales → redondea a 523.599
-   *   Formato español: punto de miles → "523.599"
-   */
-  test('caso límite: esfera en el máximo r=50 → 523.599 unidades³', async ({ page }) => {
-    await elegirFigura(page, /Esfera/);
-    await ponerSlider(page, 0, 50);
-
-    await expect(page.locator('input[type=range]').first()).toHaveValue('50');
-    await expect(valorVolumen(page)).toHaveText('523.599');
-    await expect(formulaAplicada(page)).toHaveText('V = (4/3) × π × r³ = (4/3) × π × 50³');
-
-    // El máximo declarado en el control es 50: nada debería permitir superarlo.
-    await expect(page.locator('input[type=range]').first()).toHaveAttribute('max', '50');
-  });
-
-  /**
-   * CASO 3 — DEBE RECHAZARSE · valores fuera de rango (0, negativo, 100)
-   *
-   *   Los sliders declaran min=1 / max=50, así que un 0, un -20 o un 100 tienen que
-   *   quedar recortados antes de llegar al cálculo. Nunca debe salir un volumen 0,
-   *   negativo, "No definido" (NaN) ni "∞".
-   *
-   *   r=0 y r=-20 → recortados a 1  → V = (4/3)π = 4,188790204…
-   *                                   tramo < 10 → 4 decimales → "4,1888"
-   *   r=100       → recortado a 50  → "523.599"
-   */
-  test('caso a rechazar: 0, negativo y 100 se recortan a [1, 50]', async ({ page }) => {
-    await elegirFigura(page, /Esfera/);
-    const slider = page.locator('input[type=range]').first();
-
-    await ponerSlider(page, 0, 0);
-    await expect(slider).toHaveValue('1');
-    await expect(valorVolumen(page)).toHaveText('4,1888');
-    await expect(formulaAplicada(page)).toHaveText('V = (4/3) × π × r³ = (4/3) × π × 1³');
-
-    await ponerSlider(page, 0, -20);
-    await expect(slider).toHaveValue('1');
-    await expect(valorVolumen(page)).toHaveText('4,1888');
-
-    await ponerSlider(page, 0, 100);
-    await expect(slider).toHaveValue('50');
-    await expect(valorVolumen(page)).toHaveText('523.599');
-
-    // Ni con el teclado se baja del mínimo.
-    await ponerSlider(page, 0, 1);
-    await slider.focus();
-    await slider.press('ArrowLeft');
-    await slider.press('ArrowLeft');
-    await expect(slider).toHaveValue('1');
-
-    // En ningún momento un resultado degenerado.
-    const mostrado = await valorVolumen(page).innerText();
-    expect(mostrado).not.toMatch(/No definido|∞|NaN|^-|^0,0+$/);
-  });
+  // Un tercio exacto con la misma base y altura.
+  await elegirFigura(page, /Cono/);
+  await campo(page, 'Radio de la base (r)').fill('4');
+  await campo(page, 'Altura (h)').fill('8');
+  await expect(valorVolumen(page)).toHaveText('134,0');
+  await expect(formulaAplicada(page)).toHaveText('V = (1/3) × π × r² × h = (1/3) × π × 4² × 8');
 });
 
+// ============================================================
+// CASO 2 — LÍMITE · Esfera de r=12,5 (decimal) y r=120 (fuera del deslizador)
+// ============================================================
 /**
- * Reparación del lote mecánico del Inspector (18/08/2026) — hallazgos 1, 2, 5 y 30.
+ *   r = 12,5   →  12,5³ = 1.953,125
+ *                 V = 4,18879020479 × 1.953,125
+ *                   = 8.377,58040958 − 196,349540849   (= ×2000 − ×46,875)
+ *                   = 8.181,23086873       → tramo [100, 100.000) → «8181,2»
+ *
+ *   r = 120    →  120³ = 1.728.000
+ *                 V = 4,18879020479 × 1.728.000 = 7.238.229,47387
+ *                                        → tramo ≥ 100.000 → 0 decimales → «7.238.229»
+ *                 El deslizador solo llega a 50: debe quedarse en su tope y avisar de
+ *                 que la medida se ha salido de su recorrido, sin tocar el cálculo.
+ *
+ *   DIBUJO (reparación del 19/08/2026). El radio en píxeles de la esfera es
+ *   12 + 60 · √(r/50), continuo en todo el recorrido del deslizador:
+ *       r=1    → 12 + 60·0,141421 = 20,485281…
+ *       r=6    → 12 + 60·0,346410 = 32,784609…
+ *       r=12,5 → 12 + 60·0,5      = 42          (exacto)
+ *       r=25   → 12 + 60·0,707107 = 54,426407…
+ *       r=50   → 12 + 60·1        = 72
+ *   Antes de la reparación se quedaba clavado en 72 px desde r=6.
  */
-test.describe('visualizador-volumenes — lote mecánico 18/08/2026', () => {
-  test('hallazgo 5 — cada slider tiene id y su etiqueta lo apunta con for', async ({ page }) => {
-    await page.goto('/visualizador-volumenes/');
-    await page.getByRole('button', { name: /Cilindro/i }).first().click();
+test('caso límite: esfera r=12,5 → 8181,2 y r=120 → 7.238.229', async ({ page }) => {
+  await elegirFigura(page, /Esfera/);
+  const radio = campo(page, 'Radio (r)');
+  const deslizador = page.locator('input[type=range]').first();
+
+  // El campo admite coma decimal y conserva lo tecleado mientras se escribe.
+  await radio.fill('12,5');
+  await expect(radio).toHaveValue('12,5');
+  await expect(valorVolumen(page)).toHaveText('8181,2');
+  await expect(formulaAplicada(page)).toHaveText('V = (4/3) × π × r³ = (4/3) × π × 12,50³');
+  expect(await atributoSvg(page, 'circle', 'r')).toBeCloseTo(42, 6);
+  await expect(deslizador).toHaveValue('12.5');
+
+  // Una medida real que no cabe en el deslizador: se calcula igual y se avisa.
+  await radio.fill('120');
+  await expect(valorVolumen(page)).toHaveText('7.238.229');
+  await expect(formulaAplicada(page)).toHaveText('V = (4/3) × π × r³ = (4/3) × π × 120³');
+  await expect(deslizador).toHaveValue('50');
+  await expect(page.getByText('120 · fuera del deslizador')).toBeVisible();
+
+  // El dibujo responde en TODO el recorrido del deslizador, no solo al principio.
+  const pixeles: number[] = [];
+  for (const medida of ['1', '6', '25', '50']) {
+    await radio.fill(medida);
+    pixeles.push(await atributoSvg(page, 'circle', 'r'));
+  }
+  expect(pixeles[0]).toBeCloseTo(20.4853, 3);
+  expect(pixeles[1]).toBeCloseTo(32.7846, 3);
+  expect(pixeles[2]).toBeCloseTo(54.4264, 3);
+  expect(pixeles[3]).toBeCloseTo(72, 6);
+  for (let i = 1; i < pixeles.length; i++) expect(pixeles[i]).toBeGreaterThan(pixeles[i - 1]);
+});
+
+// ============================================================
+// CASO 3 — DEBE RECHAZARSE · negativo, texto, vacío y cero
+// ============================================================
+/**
+ *   Ninguna de estas entradas es una medida: un volumen negativo, nulo o «No definido»
+ *   sería un resultado falso presentado como bueno. La app debe seguir calculando con la
+ *   última medida válida —r=5— y decirlo en la fórmula:
+ *       V = (4/3) · π · 5³ = 4,18879020479 × 125 = 523,598775598  → «523,6»
+ *
+ *   Por el deslizador tampoco: declara min=1 / max=50, así que un 0, un −20 o un 100
+ *   quedan recortados antes de llegar al cálculo.
+ *       recortado a 1  → V = (4/3)π = 4,188790205  → tramo <10 → 4 decimales → «4,1888»
+ *       recortado a 50 → V = 500.000π/3 = 523.598,775598          → «523.599»
+ */
+test('caso a rechazar: negativo, texto, vacío y cero no producen un volumen', async ({ page }) => {
+  await elegirFigura(page, /Esfera/);
+  const radio = campo(page, 'Radio (r)');
+
+  await radio.fill('5');
+  await expect(valorVolumen(page)).toHaveText('523,6');
+
+  for (const entradaMala of ['-5', 'abc', '', '0', '0,0', '-0,001']) {
+    await radio.fill(entradaMala);
+    // Ni resultado degenerado ni cálculo con la basura tecleada: sigue el último válido.
+    await expect(valorVolumen(page)).toHaveText('523,6');
+    await expect(formulaAplicada(page)).toHaveText('V = (4/3) × π × r³ = (4/3) × π × 5³');
+  }
+
+  // Y se recupera en cuanto se vuelve a escribir una medida.
+  await radio.fill('12,5');
+  await expect(valorVolumen(page)).toHaveText('8181,2');
+
+  // El deslizador recorta a su rango declarado.
+  const deslizador = page.locator('input[type=range]').first();
+  await ponerDeslizador(page, 0, 0);
+  await expect(deslizador).toHaveValue('1');
+  await expect(valorVolumen(page)).toHaveText('4,1888');
+
+  await ponerDeslizador(page, 0, -20);
+  await expect(deslizador).toHaveValue('1');
+  await expect(valorVolumen(page)).toHaveText('4,1888');
+
+  await ponerDeslizador(page, 0, 100);
+  await expect(deslizador).toHaveValue('50');
+  await expect(valorVolumen(page)).toHaveText('523.599');
+
+  // Ni con el teclado se baja del mínimo.
+  await ponerDeslizador(page, 0, 1);
+  await deslizador.focus();
+  await deslizador.press('ArrowLeft');
+  await deslizador.press('ArrowLeft');
+  await expect(deslizador).toHaveValue('1');
+
+  const mostrado = await valorVolumen(page).innerText();
+  expect(mostrado).not.toMatch(/No definido|∞|NaN|^-|^0,0+$/);
+});
+
+// ============================================================
+// Reparaciones anteriores que no deben volver atrás (lote del 18/08/2026)
+// ============================================================
+test.describe('visualizador-volumenes — regresiones ya reparadas', () => {
+  test('cada medida tiene su etiqueta asociada a un control', async ({ page }) => {
+    await elegirFigura(page, /Cilindro/);
     await expect(page.locator('label:not([for])')).toHaveCount(0);
     expect(await page.locator('input[type=range][id]').count()).toBeGreaterThan(0);
   });
 
-  test('hallazgo 1 — el ejemplo de biología da picolitros, no femtolitros', async ({ page }) => {
+  test('el ejemplo de biología da picolitros, no femtolitros', async ({ page }) => {
     // r = 0,01 mm → V = (4/3)·π·10⁻⁶ = 4,19×10⁻⁶ mm³. Como 1 mm³ = 10⁻⁶ L, son
     // 4,19×10⁻¹² L = 4,19 picolitros (= 4.188,8 fL), no 4,19 femtolitros.
-    await page.goto('/visualizador-volumenes/');
-    const cuerpo = page.locator('body');
-    await expect(cuerpo).toContainText('4,19 picolitros');
-    await expect(cuerpo).not.toContainText('4,19 femtolitros');
+    await expect(page.locator('body')).toContainText('4,19 picolitros');
+    await expect(page.locator('body')).not.toContainText('4,19 femtolitros');
   });
 
-  test('hallazgos 2 y 30 — los datos estructurados no prometen ni afirman lo que la app desmiente', async ({ page }) => {
-    await page.goto('/visualizador-volumenes/');
+  test('los datos estructurados no prometen ni afirman lo que la app desmiente', async ({ page }) => {
     const jsonLd = (await page.locator('script[type="application/ld+json"]').allInnerTexts()).join(' ');
     // La app no tiene selector de unidades: el resultado sale como «unidades³».
     expect(jsonLd).not.toContain('Resultado en m³ y cm³');

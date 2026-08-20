@@ -1,31 +1,27 @@
 /**
- * ⚠️ Cifras revisadas el 20/08/2026, cuando calcularNotario dejó de devolver el arancel puro
- * para devolver la FACTURA notarial estimada (arancel × 1,75, punto medio de la horquilla
- * 1,5-2 de FACTURA_NOTARIAL) y calcularRegistro empezó a sumar el asiento de presentación y
- * la nota simple del RD 1427/1989. Los comentarios que desglosan tramos de arancel siguen
- * siendo correctos como CÁLCULO DEL COMPONENTE: lo que ya no describen es la cifra final de
- * la tarjeta, que lleva encima el factor.
+ * Inspector — simulador-gastos-compraventa-garaje (segmento FISCAL, riesgo 1 CRÍTICO)
+ * Tanda del 20/08/2026, posterior a la reparación de la factura notarial (commit 44a5dc7d).
+ *
+ * De dónde sale CADA cifra esperada (ninguna de memoria):
+ *  - Tipo general de ITP por CCAA → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
+ *    leído por `tipoGeneralDe()` en `data/itp-ccaa.ts` (Madrid = 6 %).
+ *  - Escala progresiva y AJD por CCAA → `ITP_CCAA` en `data/itp-ccaa.ts`
+ *    (Cataluña: 10/11/12/13 % y `ajd: 1.5`).
+ *  - IVA del garaje de obra nueva → `IVA_INMUEBLES_2025` en `data/fiscal/inmuebles.ts`
+ *    (`garaje: 21` independiente · `garageCon: 10` vinculado a la vivienda).
+ *  - Arancel notarial → `ARANCELES_NOTARIO` (RD 1426/1989, número 2: matriz + una copia),
+ *    y la FACTURA que se muestra → `FACTURA_NOTARIAL` (horquilla ×1,5 a ×2, que cubre los
+ *    números 4, 6 y 7 —copias, folios y suplidos—; la tarjeta enseña el punto medio ×1,75).
+ *  - Arancel registral → `ARANCELES_REGISTRO` (RD 1427/1989, número 2) MÁS los dos importes
+ *    fijos de `REGISTRO_CONCEPTOS`: asiento de presentación 6,010121 € (número 1) y nota
+ *    simple 3,005061 € (número 4). Al registro NO se le aplica la horquilla de la notaría.
+ *  - El 21 % de IVA sobre honorarios notariales y registrales va dentro de
+ *    `calcularArancelNotarial` y `calcularRegistro`.
+ *
+ * Los tres casos están resueltos a mano ANTES de ejecutar la app; el desarrollo va
+ * comentado junto a cada aserción, con los importes sin redondear.
  */
 import { test, expect, Page } from '@playwright/test';
-
-/**
- * Inspector — simulador-gastos-compraventa-garaje (segmento fiscal, riesgo 1 CRÍTICO)
- *
- * De dónde sale cada cifra esperada:
- *  - Tipos de ITP y AJD por CCAA, y aranceles de notaría y registro:
- *    `data/itp-ccaa.ts` (ITP_CCAA, ARANCELES_NOTARIO y ARANCELES_REGISTRO, que citan
- *    los RD 1426/1989 y RD 1427/1989). Los tipos generales coinciden con
- *    TIPOS_ITP_CCAA_2025 de `data/fiscal/inmuebles.ts`.
- *  - Tipos de IVA de garaje: IVA_INMUEBLES_2025 (`data/fiscal/inmuebles.ts`)
- *    → `garaje: 21` (independiente) y `garageCon: 10` (vinculado a vivienda).
- *  - Plusvalía municipal: COEFICIENTES_IIVTNU_2025 y PLUSVALIA_MUNICIPAL_META.tipoOrientativo
- *    (`data/fiscal/inmuebles.ts`, RDL 26/2021).
- *  - IRPF de la ganancia: TRAMOS_GANANCIAS_PATRIMONIALES_2025 (`data/fiscal/inmuebles.ts`)
- *    aplicados por calcularGananciaInmueble (`data/fiscal/ganancia-inmueble.ts`, art. 35 LIRPF).
- *
- * Todos los importes están resueltos a mano ANTES de ejecutar la app; el detalle del
- * cálculo va comentado junto a cada aserción.
- */
 
 const RUTA = '/simulador-gastos-compraventa-garaje/';
 
@@ -35,7 +31,7 @@ async function valorTarjeta(page: Page, titulo: string): Promise<string> {
     .locator('h3', { hasText: titulo })
     .first()
     .locator('xpath=../following-sibling::div[1]/p');
-  return (await valor.innerText()).replace(/\u00A0/g, ' ').trim();
+  return (await valor.innerText()).replace(/\s+/g, ' ').trim();
 }
 
 /** Texto descriptivo bajo el valor de una ResultCard. */
@@ -44,7 +40,7 @@ async function descripcionTarjeta(page: Page, titulo: string): Promise<string> {
     .locator('h3', { hasText: titulo })
     .first()
     .locator('xpath=../following-sibling::p[1]');
-  return (await desc.innerText()).replace(/\u00A0/g, ' ').trim();
+  return (await desc.innerText()).replace(/\s+/g, ' ').trim();
 }
 
 async function rellenar(page: Page, etiqueta: string, valor: string): Promise<void> {
@@ -53,244 +49,147 @@ async function rellenar(page: Page, etiqueta: string, valor: string): Promise<vo
   await campo.blur();
 }
 
-test.describe('Simulador de gastos de compraventa de garaje', () => {
+test.describe('Simulador de gastos de compraventa de garaje — inspección 20/08/2026', () => {
+  /**
+   * CASO 1 (NORMAL) — el que la propia app publica en su bloque educativo:
+   * «Luis compra una plaza de parking en Madrid por 25.000 €». Se comprueba que la
+   * calculadora y esa tarjeta dicen exactamente lo mismo, porque un ejemplo que no
+   * cuadra con el motor enseña a desconfiar del resultado correcto.
+   */
   test('CASO 1 (normal) — Madrid, segunda mano, 25.000 €, comprador general', async ({ page }) => {
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Segunda mano/ }).click();
     await page.selectOption('#select-ccaa', 'madrid');
+    await page.selectOption('#select-perfil', 'general');
     await rellenar(page, 'Precio del garaje / plaza de parking', '25000');
     await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
 
-    // ITP = 25.000 × 6 % — ITP_CCAA.madrid.tipoGeneral = 6 (= TIPOS_ITP_CCAA_2025 'Madrid')
+    // ITP = 25.000 × 6 % = 1.500. El 6 % es TIPOS_ITP_CCAA_2025 → { ccaa: 'Madrid', tipo: 6 }.
+    // Madrid no tiene escala progresiva, así que el tipo efectivo coincide con el nominal.
     expect(await valorTarjeta(page, 'ITP (6,00%)')).toBe('1500,00 €');
 
-    // Notaría (ARANCELES_NOTARIO, RD 1426/1989): 90,15 + (25.000 − 6.010,12) × 0,45 %
-    // Nota del 20/08/2026: estas tarjetas ya no muestran el arancel puro sino la FACTURA
-    // notarial estimada (el arancel × 1,75, punto medio de la horquilla 1,5-2 documentada en
-    // FACTURA_NOTARIAL). El arancel del RD 1426/1989 cubre la matriz y una copia; copias
-    // adicionales, folios y suplidos van aparte. El registro suma además el asiento de
-    // presentación (6,010121 €) y la nota simple (3,005061 €) del RD 1427/1989.
-    //        = 175,60446 ; con el 21 % de IVA → 212,4814 de arancel ; × 1,75 → 371,8425
+    // Notaría — RD 1426/1989, número 2 (ARANCELES_NOTARIO):
+    //   tramo 1 (hasta 6.010,12 €)            →                            90,15
+    //   tramo 2 (6.010,12→30.050,61, 0,45 %)  → 18.989,88 × 0,0045 =       85,45446
+    //   arancel sin IVA                       =                          175,60446
+    //   con el 21 % de IVA                    = 175,60446 × 1,21 =       212,481397
+    // FACTURA_NOTARIAL (números 4, 6 y 7 aparte): ×1,5 = 318,722095 · ×2 = 424,962793
+    //   punto medio, que es lo que suma la app =                         371,842444
     expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('371,84 €');
+    const notaria = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria).toContain('318,72 €');
+    expect(notaria).toContain('424,96 €');
 
-    // Registro (ARANCELES_REGISTRO, RD 1427/1989): 24,04 + (25.000 − 6.010,12) × 0,175 %
-    //          = 57,27229 ; con el 21 % de IVA → 69,2995
-    // 57,27234 de arancel + 6,010121 (presentación) + 3,005061 (nota simple) = 66,28752 ; +21 % IVA
+    // Registro — RD 1427/1989, números 1, 2 y 4 (ARANCELES_REGISTRO + REGISTRO_CONCEPTOS):
+    //   tramo 1 (hasta 6.010,12 €)             →                           24,04
+    //   tramo 2 (6.010,12→30.050,61, 0,175 %)  → 18.989,88 × 0,00175 =     33,23229
+    //   inscripción (número 2)                 =                           57,27229
+    //   + asiento de presentación (número 1)   →                            6,010121
+    //   + nota simple (número 4)               →                            3,005061
+    //                                          =                           66,287472
+    //   con el 21 % de IVA                     = 66,287472 × 1,21 =        80,207841
+    // Al registro NO se le aplica el factor 1,5-2 de la notaría: son importes fijos.
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('80,21 €');
 
-    // Total gastos = 1.500 + 371,8425 + 80,2079 + 300 (gestoría) = 2.252,0504
+    // En segunda mano no hay AJD: la operación tributa por ITP y ambos son incompatibles.
+    await expect(page.locator('h3', { hasText: 'AJD' })).toHaveCount(0);
+
+    // Total gastos = 1.500 + 371,842444 + 80,207841 + 300 = 2.252,050285
+    //   % sobre el precio = 2.252,050285 / 25.000 = 9,008201 %
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2252,05 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('9,01%');
 
-    // Coste total = 25.000 + 2.081,7809 (en segunda mano NO hay AJD)
+    // Coste total = 25.000 + 2.252,050285 = 27.252,050285
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('27.252,05 €');
-    await expect(page.locator('h3', { hasText: 'AJD' })).toHaveCount(0);
+
+    // Contraste con el ejemplo publicado: la tarjeta «Comprar garaje solo (segunda mano)»
+    // del bloque educativo tiene que repetir estas mismas cifras, no unas parecidas.
+    const ejemplo = (
+      await page.getByText(/Luis compra una plaza de parking en Madrid/).innerText()
+    ).replace(/\s+/g, ' ');
+    expect(ejemplo).toContain('1.500 €');
+    expect(ejemplo).toContain('371,84 €');
+    expect(ejemplo).toContain('318,72 € a 424,96 €');
+    expect(ejemplo).toContain('80,21 €');
+    expect(ejemplo).toContain('27.252,05 €');
   });
 
-  test('CASO 2 (límite) — Cataluña, obra nueva, garaje independiente: IVA al 21 % + AJD 1,5 %', async ({ page }) => {
+  /**
+   * CASO 2 (LÍMITE) — dos extremos a la vez: la rama de obra nueva (IVA + AJD, la única
+   * en la que aparece la tarjeta de AJD) con el IVA más alto que maneja la app y el AJD
+   * más alto de la tabla, sobre un precio tan bajo que los importes fijos del arancel
+   * pesan más que el propio impuesto.
+   */
+  test('CASO 2 (límite) — Cataluña, obra nueva independiente, 3.000 €: IVA 21 % + AJD 1,5 % con los fijos dominando', async ({ page }) => {
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Primera mano/ }).click();
     await page.getByRole('button', { name: /Independiente/ }).click();
     await page.selectOption('#select-ccaa', 'cataluna');
-    await rellenar(page, 'Precio del garaje / plaza de parking', '30000');
+    await rellenar(page, 'Precio del garaje / plaza de parking', '3000');
     await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
 
-    // IVA = 30.000 × 21 % — IVA_INMUEBLES_2025.garaje = 21 (garaje independiente,
-    // el tipo más alto que maneja la app; el vinculado a vivienda sería garageCon = 10)
-    expect(await valorTarjeta(page, 'IVA (21,00%)')).toBe('6300,00 €');
+    // IVA = 3.000 × 21 % = 630 — IVA_INMUEBLES_2025.garaje = 21 (garaje independiente;
+    // el vinculado a vivienda sería garageCon = 10 y daría 300 €).
+    expect(await valorTarjeta(page, 'IVA (21,00%)')).toBe('630,00 €');
 
-    // AJD = 30.000 × 1,5 % — ITP_CCAA.cataluna.ajd = 1.5
-    expect(await valorTarjeta(page, 'AJD (1,50%)')).toBe('450,00 €');
+    // AJD = 3.000 × 1,5 % = 45 — ITP_CCAA.cataluna.ajd = 1.5, el tipo más alto de la tabla.
+    expect(await valorTarjeta(page, 'AJD (1,50%)')).toBe('45,00 €');
 
-    // Notaría: 90,15 + (30.000 − 6.010,12) × 0,45 % = 198,10446 ; × 1,21 → 239,7064
-    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('419,49 €');
-    // Registro: 24,04 + (30.000 − 6.010,12) × 0,175 % = 66,02229 ; × 1,21 → 79,887
-    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('90,80 €');
+    // Notaría — por debajo de 6.010,12 € solo se devenga la cuota fija del primer tramo:
+    //   90,15 × 1,21 (IVA) = 109,0815 de arancel
+    //   horquilla FACTURA_NOTARIAL: ×1,5 = 163,62225 · ×2 = 218,163 · medio = 190,892625
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('190,89 €');
+    const notaria = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria).toContain('163,62 €');
+    expect(notaria).toContain('218,16 €');
 
-    // Total gastos = 6.300 + 450 + 239,7064 + 79,887 + 300 = 7.369,5934 (24,57 % del precio)
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('7560,28 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('25,20%');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('37.560,28 €');
-  });
+    // Registro — cuota fija 24,04 + presentación 6,010121 + nota simple 3,005061 = 33,055182
+    //   con el 21 % de IVA = 39,996770
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('40,00 €');
 
-  // ⚠️ CORREGIDO el 14/08/2026 - sin precio introducido, la guarda
-  // `if (precio <= 0) return null` no atrapa el NaN que devuelve parseSpanishNumber('')
-  // —NaN <= 0 es false—, así que el placeholder nunca se muestra y la app abre con
-  // «No definido» en todas las tarjetas, incluida «COSTE TOTAL DE ADQUISICIÓN», y con
-  // un «No definido% sobre el precio». `test.fail` marca que hoy falla a propósito:
-  // el día que se corrija, este test se pondrá en ROJO y habrá que quitar la marca.
-  test('CASO 3 (debe avisar) — sin precio, la app pide el dato en vez de calcular', async ({ page }) => {
-        await page.goto(RUTA);
+    // Total gastos = 630 + 45 + 190,892625 + 39,996770 + 300 = 1.205,889395
+    //   % sobre el precio = 1.205,889395 / 3.000 = 40,196313 % (los fijos pesan más que el IVA)
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1205,89 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('40,20%');
 
-    await expect(
-      page.getByText('Introduce el precio del garaje para ver el desglose de gastos del comprador'),
-    ).toBeVisible();
-    await expect(page.getByText('No definido')).toHaveCount(0);
-  });
+    // Coste total = 3.000 + 1.205,889395 = 4.205,889395
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('4205,89 €');
 
-  test('CASO 4 (vendedor) — plusvalía municipal por el método más favorable e IRPF de la ganancia', async ({ page }) => {
-    await page.goto(RUTA);
-    await page.getByRole('button', { name: /Segunda mano/ }).click();
-    await rellenar(page, 'Precio del garaje / plaza de parking', '22000');
-    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
-    await page.getByRole('tab', { name: 'Vendedor' }).click();
-    await rellenar(page, 'Precio de compra original del garaje', '15000');
-    await rellenar(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '1800');
-    await rellenar(page, 'Años de propiedad', '10');
-    await rellenar(page, 'Valor catastral del suelo (€)', '5000');
-    await rellenar(page, 'Valor catastral total (suelo + construcción) (€)', '12000');
-    await rellenar(page, 'Comisión inmobiliaria del vendedor (%)', '3');
-
-    // Plusvalía municipal (RDL 26/2021):
-    //   objetivo = 5.000 × 0,08 (COEFICIENTES_IIVTNU_2025, 10 años) × 25 %
-    //              (PLUSVALIA_MUNICIPAL_META.tipoOrientativo) = 100
-    //   real     = (22.000 − 15.000) × (5.000 / 12.000) × 25 % = 729,17
-    //   el contribuyente elige el más favorable → 100
-    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('100,00 €');
-    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('Método objetivo');
-
-    // Art. 35 LIRPF (calcularGananciaInmueble):
-    //   valor de adquisición = 15.000 + 1.800 = 16.800
-    //   valor de transmisión = 22.000 − (660 comisión + 300 gestoría) − 100 plusvalía = 20.940
-    //   ganancia = 4.140
-    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('16.800,00 €');
-    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('20.940,00 €');
-    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('4140,00 €');
-
-    // IRPF = 4.140 × 19 % (primer tramo de TRAMOS_GANANCIAS_PATRIMONIALES_2025, hasta 6.000)
-    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('786,60 €');
-
-    // Total gastos vendedor = 100 + 660 + 300 + 786,60 = 1.846,60 → neto 20.153,40
-    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('1846,60 €');
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('20.153,40 €');
-  });
-
-  // ✅ CORREGIDO el 14/08/2026 — al marcar el perfil «Joven (< 35 años)»
-  // la app busca el primer tipo reducido cuyo nombre contenga «joven» y lo aplica sin
-  // comprobar sus `condiciones`. En Madrid —la CCAA por defecto— ese tipo es
-  // «Jóvenes < 35 años (municipios pequeños)», del 0 %, condicionado a un municipio de
-  // menos de 2.500 habitantes que la app nunca pregunta: un joven que compre un garaje
-  // en la capital lee «ITP (0,00%) — 0,00 €». Lo anclado para él es el tipo general del
-  // 6 % (ITP_CCAA.madrid.tipoGeneral = TIPOS_ITP_CCAA_2025 'Madrid') → 1.500,00 €.
-  // Mismo patrón en Baleares con «joven» y con «discapacidad» (tipo 0 %).
-  test('CASO 5 (regresión) — joven en Madrid: no puede salir 0 € de ITP sin preguntar el municipio', async ({ page }) => {
-        await page.goto(RUTA);
-    await page.getByRole('button', { name: /Segunda mano/ }).click();
-    await page.selectOption('#select-ccaa', 'madrid');
-    await rellenar(page, 'Precio del garaje / plaza de parking', '25000');
-    await page.selectOption('#select-perfil', 'joven');
-
-    // Esperado: «ITP (6,00%)» → 1500,00 € · Obtenido hoy: «ITP (0,00%)» → 0,00 €
-    const valorITP = page
-      .locator('h3', { hasText: /^ITP/ })
-      .first()
-      .locator('xpath=../following-sibling::div[1]/p');
-    await expect(valorITP).toHaveText(/^1500,00\s€$/);
-  });
-});
-
-/**
- * Ronda del 16/08/2026 — la app vuelve a la cola porque cambió `data/fiscal`.
- *
- * Los tres casos de esta tanda cubren lo que la tanda anterior no tocaba y lo que el
- * cambio pone en riesgo: la escala progresiva de ITP (que antes se anunciaba y no se
- * aplicaba, y ahora pasa por `importeITP`), el motor de ganancia patrimonial de
- * `data/fiscal/ganancia-inmueble.ts` y el rechazo de una entrada inválida.
- */
-test.describe('Simulador de gastos de compraventa de garaje — ronda 16/08/2026', () => {
-  test('CASO 6 (normal) — Madrid 25.000 €: comprador y vendedor en la misma operación', async ({ page }) => {
-    await page.goto(RUTA);
-    await page.getByRole('button', { name: /Segunda mano/ }).click();
-    await page.selectOption('#select-ccaa', 'madrid');
-    await rellenar(page, 'Precio del garaje / plaza de parking', '25000');
-    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
-
-    // Comprador: 1.500 (ITP 6 %) + 371,8425 (notaría) + 80,2079 (registro) + 300 = 2.252,0504
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('27.252,05 €');
-
-    await page.getByRole('tab', { name: 'Vendedor' }).click();
-    await rellenar(page, 'Precio de compra original del garaje', '18000');
-    await rellenar(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '1800');
-    await rellenar(page, 'Años de propiedad', '8');
-    await rellenar(page, 'Valor catastral del suelo (€)', '5000');
-    await rellenar(page, 'Valor catastral total (suelo + construcción) (€)', '12000');
-    await rellenar(page, 'Comisión inmobiliaria del vendedor (%)', '3');
-
-    // Plusvalía municipal (RDL 26/2021, art. 107.4 y 107.5 TRLHL):
-    //   objetivo = 5.000 × 0,10 (COEFICIENTES_IIVTNU_2025, 8 años) × 25 %
-    //              (PLUSVALIA_MUNICIPAL_META.tipoOrientativo) = 125
-    //   real     = (25.000 − 18.000) × (5.000 / 12.000) × 25 % = 729,1667
-    //   el contribuyente elige el más favorable → 125
-    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('125,00 €');
-    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('Método objetivo');
-
-    // Art. 35 LIRPF (calcularGananciaInmueble, data/fiscal/ganancia-inmueble.ts):
-    //   valor de adquisición = 18.000 + 1.800 = 19.800
-    //   valor de transmisión = 25.000 − (750 comisión + 300 gestoría) − 125 plusvalía = 23.825
-    //   ganancia = 23.825 − 19.800 = 4.025
-    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('19.800,00 €');
-    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('23.825,00 €');
-    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('4025,00 €');
-
-    // IRPF = 4.025 × 19 % (primer tramo de TRAMOS_GANANCIAS_PATRIMONIALES_2025, hasta 6.000) = 764,75
-    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('764,75 €');
-
-    // Total gastos vendedor = 125 + 750 + 300 + 764,75 = 1.939,75 → neto 25.000 − 1.939,75
-    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('1939,75 €');
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('23.060,25 €');
-  });
-
-  test('CASO 7 (límite, tramo más alto) — Cataluña 1.000.000 €: la escala progresiva se aplica de verdad', async ({ page }) => {
-    await page.goto(RUTA);
-    await page.getByRole('button', { name: /Segunda mano/ }).click();
-    await page.selectOption('#select-ccaa', 'cataluna');
-    await rellenar(page, 'Precio del garaje / plaza de parking', '1000000');
-    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
-
-    // La interfaz anuncia la escala: ITP_CCAA.cataluna.tramosProgresivos
+    // La app anuncia la escala progresiva catalana aunque aquí no se aplique (esto es IVA):
+    // ITP_CCAA.cataluna.tramosProgresivos = 10 → 11 → 12 → 13 %.
     await expect(page.getByText('Esta comunidad aplica escala progresiva')).toBeVisible();
-
-    // ITP por tramos (ITP_CCAA.cataluna.tramosProgresivos: 600.000 → 10 %, 900.000 → 11 %,
-    // 1.500.000 → 12 %, resto 13 %):
-    //   600.000 × 10 % = 60.000
-    //   300.000 × 11 % = 33.000
-    //   100.000 × 12 % = 12.000  →  105.000, tipo efectivo 10,5 %
-    // Aplicar el tipo plano del primer tramo daría 100.000 €: 5.000 € menos de los debidos.
-    expect(await valorTarjeta(page, 'ITP (10,50%)')).toBe('105.000,00 €');
-
-    // Notaría (ARANCELES_NOTARIO, RD 1426/1989), recorriendo los seis primeros tramos:
-    //   90,15 + 24.040,49×0,45 % + 30.050,60×0,15 % + 90.151,82×0,10 %
-    //         + 450.759,07×0,05 % + 398.987,90×0,03 % = 678,63583 ; × 1,21 → 821,1494
-    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1437,01 €');
-
-    // Registro (ARANCELES_REGISTRO, RD 1427/1989):
-    //   24,04 + 24.040,49×0,175 % + 30.050,60×0,125 % + 90.151,82×0,075 %
-    //         + 450.759,07×0,030 % + 398.987,90×0,020 % = 386,31327 ; × 1,21 → 467,4391
-    //   (por debajo del tope REGISTRO_MAXIMO = 2.181,67)
-    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('478,35 €');
-
-    // Total gastos = 105.000 + 821,1494 + 467,4391 + 300 = 106.588,5884 (10,66 % del precio)
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('107.215,36 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('10,72%');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('1.107.215,36 €');
   });
 
-  test('CASO 8 (debe rechazarse) — un precio negativo no puede producir un presupuesto', async ({ page }) => {
+  /**
+   * CASO 3 (DEBE RECHAZARSE) — un precio negativo o cero no puede producir presupuesto:
+   * un ITP negativo (−3.000 × 6 % = −180 €) sería un «ahorro» inexistente, y un
+   * «No definido» en la tarjeta de COSTE TOTAL sería peor que no responder.
+   */
+  test('CASO 3 (debe rechazarse) — precio negativo o cero: la app pide el dato en vez de calcular', async ({ page }) => {
     await page.goto(RUTA);
     const precio = page.locator('input[aria-label="Precio del garaje / plaza de parking"]');
-    await precio.fill('-25000');
+    const aviso = page.getByText(
+      'Introduce el precio del garaje para ver el desglose de gastos del comprador',
+    );
 
-    // Sin salir del campo: nada de resultados, y el aviso que pide el dato sigue en pantalla.
-    // Un ITP negativo (−25.000 × 6 % = −1.500 €) sería un presupuesto imposible.
+    // Sin escribir nada: parseSpanishNumber('') devuelve NaN y la guarda lo atrapa
+    // (`!Number.isFinite(precio)`), así que no puede colarse ningún «No definido».
+    await expect(aviso).toBeVisible();
+    await expect(page.getByText('No definido')).toHaveCount(0);
+
+    // Con un negativo y SIN salir del campo: la guarda `precio <= 0` corta el cálculo.
+    await precio.fill('-3000');
     await expect(page.locator('h3', { hasText: 'COSTE TOTAL DE ADQUISICIÓN' })).toHaveCount(0);
-    await expect(
-      page.getByText('Introduce el precio del garaje para ver el desglose de gastos del comprador'),
-    ).toBeVisible();
+    await expect(aviso).toBeVisible();
 
-    // Al perder el foco, NumberInput normaliza al mínimo declarado (min = 0) y sigue sin calcular
+    // Al perder el foco, NumberInput normaliza al mínimo declarado (min = 0)...
     await precio.blur();
     await expect(precio).toHaveValue('0');
+
+    // ...y con 0 tampoco calcula: nada de ITP de 0 €, ni notaría de 190,89 €, ni «0,00 %».
     await expect(page.locator('h3', { hasText: 'COSTE TOTAL DE ADQUISICIÓN' })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: 'Gastos de notaría' })).toHaveCount(0);
+    await expect(aviso).toBeVisible();
     await expect(page.getByText('No definido')).toHaveCount(0);
   });
 });

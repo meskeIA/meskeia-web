@@ -612,3 +612,216 @@ test('Andalucía — control: un reducido con límite de VALOR (no de renta) sig
 
   await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (3,5%)');
 });
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Vuelta del Inspector — 20/08/2026 (verificación de la reparación de notaría
+// y registro, commit 44a5dc7d)
+//
+// Lo que se cambió el día anterior y aquí se comprueba:
+//   · `calcularNotario` devolvía el arancel PURO del número 2 del RD 1426/1989 —que solo
+//     cubre la matriz y una copia— y ahora devuelve el punto medio de una horquilla de
+//     1,5-2× ese arancel (FACTURA_NOTARIAL, `data/itp-ccaa.ts`), porque las copias
+//     adicionales, los folios (nº 4 y 7) y los suplidos (nº 6) se facturan aparte.
+//   · `calcularRegistro` suma ahora dos importes fijos del RD 1427/1989 que el número 2 no
+//     incluye: asiento de presentación 6,010121 € (nº 1) y nota simple 3,005061 € (nº 4).
+//     A propósito NO se le aplica el factor 1,5-2 de la notaría: allí lo que crece con la
+//     escritura son copias y folios, aquí son dos importes fijos y pequeños.
+//
+// Los tres casos de esta vuelta están resueltos a mano ANTES de abrir el navegador, y el
+// CASO B contrasta el motor contra el ejemplo numérico que la propia app publica.
+// ═══════════════════════════════════════════════════════════════════════════
+
+test.describe('Inspector 20/08/2026 — factura notarial y registral', () => {
+  test('CASO A (normal) — Madrid, 200.000 €: la tarjeta de notaría publica la horquilla, no el arancel', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await selectCcaa(page).selectOption('madrid');
+    await rellenar(page, 'Precio de la vivienda', '200000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
+
+    // ITP: ITP_CCAA.madrid.tipoGeneral = 6, que se LEE de TIPOS_ITP_CCAA_2025 'Madrid'
+    // (`data/fiscal/inmuebles.ts`). Madrid no tiene escala progresiva → 200.000 × 6 % = 12.000
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (6,0%)');
+    expect(await valorTarjeta(page, /^ITP/)).toBe('12.000,00 €');
+
+    // Arancel notarial (ARANCELES_NOTARIO, nº 2 del RD 1426/1989), acumulando tramos:
+    //   90,15 + 24.040,49×0,45 % + 30.050,60×0,15 % + 90.151,82×0,10 % + 49.746,97×0,05 %
+    //   = 358,43341 → con el 21 % de IVA = 433,704426
+    // Factura (FACTURA_NOTARIAL, factores 1,5 y 2):
+    //   min 650,556639 · max 867,408852 · medio 758,982746 ← el que suma la app
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('758,98 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain(
+      'Factura estimada entre 650,56 € y 867,41 €',
+    );
+
+    // Registro (ARANCELES_REGISTRO, nº 2 del RD 1427/1989):
+    //   24,04 + 24.040,49×0,175 % + 30.050,60×0,125 % + 90.151,82×0,075 % + 49.746,97×0,030 %
+    //   = 186,212064 (por debajo del tope REGISTRO_MAXIMO de 2.181,67)
+    //   + 6,010121 (nº 1, presentación) + 3,005061 (nº 4, nota simple) = 195,227246
+    //   con el 21 % de IVA = 236,224967
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('236,22 €');
+
+    // Total = 12.000 + 758,982746 + 236,224967 + 300 = 13.295,207713 → 6,6476 % del precio
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('13.295,21 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('6,65%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('213.295,21 €');
+    // Segunda mano: TPO y AJD son incompatibles (art. 31.2 TRLITPAJD)
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+  });
+
+  test('CASO B (límite: tipo reducido por edad) — Andalucía, joven, 140.000 €: el motor tiene que dar el ejemplo que la app publica', async ({
+    page,
+  }) => {
+    // Es el caso «Marta» de la sección «Casos de uso reales» de la propia app, elegido
+    // porque publica las tres cifras que tocó la reparación: ITP 4.900 €, notaría 685 €,
+    // registro 209 € y 1.193 € entre notaría, registro y gestoría.
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await selectCcaa(page).selectOption('andalucia');
+    await rellenar(page, 'Precio de la vivienda', '140000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
+    await selectPerfil(page).selectOption('joven');
+
+    // ITP_CCAA.andalucia, reducido «Jóvenes < 35 años» = 3,5 % con valorMaximo 150.000 € y
+    // condiciones ['Menor de 35 años', 'Vivienda habitual', 'Valor ≤ 150.000 €'], las tres
+    // comprobables con lo que la app pregunta → 140.000 × 3,5 % = 4.900
+    // (el tipo general de Andalucía, 7 %, habría dado 9.800)
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (3,5%)');
+    expect(await valorTarjeta(page, /^ITP/)).toBe('4900,00 €');
+
+    // Arancel notarial sobre 140.000 €:
+    //   90,15 + 24.040,49×0,45 % + 30.050,60×0,15 % + 79.898,79×0,10 % = 323,306895
+    //   con el 21 % de IVA = 391,201343 → min 586,802014 · max 782,402686 · medio 684,602350
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('684,60 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain(
+      'Factura estimada entre 586,80 € y 782,40 €',
+    );
+
+    // Registro sobre 140.000 €:
+    //   24,04 + 24.040,49×0,175 % + 30.050,60×0,125 % + 79.898,79×0,075 % = 163,598200
+    //   + 6,010121 + 3,005061 = 172,613382 → con el 21 % de IVA = 208,862192
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('208,86 €');
+
+    // Total = 4.900 + 684,602350 + 208,862192 + 300 = 6.093,464542 → 4,3525 % del precio.
+    // Ojo al formato: es-ES no agrupa los millares de un número de cuatro cifras.
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('6093,46 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('4,35%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('146.093,46 €');
+
+    // Contraste con el texto publicado: 684,60 → «685 €», 208,86 → «209 €» y
+    // 684,60 + 208,86 + 300 = 1.193,46 → «unos 1.193 €». Si el motor y la tarjeta educativa
+    // vuelven a separarse —que es exactamente lo que se reparó el 20/08— salta aquí.
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const marta = page.getByText(/Marta, 29 años/).first();
+    await expect(marta).toContainText(/3,5%\s*\(4\.900\s*€\)/);
+    await expect(marta).toContainText(/1\.193\s*€ en notaría \(685\s*€\), registro \(209\s*€\)/);
+  });
+
+  test('CASO C (debe rechazarse) — un precio de 0 € no puede producir impuesto ni total', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio de la vivienda', '0');
+
+    // La guarda del useMemo es `!Number.isFinite(precio) || precio <= 0` → null, y el panel
+    // pide el dato. Ni un ITP de 0 €, ni la base mínima de 90,15 € del arancel notarial
+    // —que es lo que saldría de calcular sobre 0—, ni ningún «No definido».
+    await expect(
+      page.getByText('Introduce el precio del inmueble para ver el desglose de gastos del comprador'),
+    ).toBeVisible();
+    await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: 'Gastos de notaría' })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: 'COSTE TOTAL DE ADQUISICIÓN' })).toHaveCount(0);
+    await expect(page.getByText('No definido')).toHaveCount(0);
+  });
+});
+
+// ⚠️ HALLAZGO ABIERTO (Inspector, 20/08/2026) — dato.
+// `RANGO_ITP` (`data/itp-ccaa.ts`) se calcula de la tabla justamente para que nadie escriba
+// el rango a mano, y el bloque educativo lo usa: «va del 4% (País Vasco) al 13%». Dos
+// secciones más abajo, la tabla «Comparativa de impuestos en compraventa» lleva el rango
+// escrito a mano como «4% – 11%», así que la misma página se contradice. El 11 % es el tramo
+// alto de Valencia; los de Baleares y Cataluña llegan al 13 %, que es lo que paga quien
+// compra caro allí. La misma cifra a mano está en el JSON-LD de metadata.ts («ITP entre el
+// 4% y el 11%»), que convive con otro schema donde el rango sí sale de RANGO_ITP.
+// Caso: abrir /estimador-compraventa-inmueble/ y desplegar el bloque educativo → fila ITP de
+//       la tabla comparativa: esperado «4% – 13%» (RANGO_ITP) · obtenido «4% – 11%».
+test('HALLAZGO (dato) — la tabla comparativa debe dar el mismo rango de ITP que RANGO_ITP', async ({
+  page,
+}) => {
+  test.fail(); // hallazgo abierto: hoy falla a propósito
+  await page.goto(RUTA);
+  await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+  await expect(page.locator('tr', { hasText: /^ITP/ }).first()).toContainText('13%');
+});
+
+// ⚠️ HALLAZGO ABIERTO (Inspector, 20/08/2026) — contenido.
+// El aviso «Podrías pagar menos, pero depende de requisitos que no preguntamos» y el panel
+// «Tipos reducidos disponibles en…» solo aparecen cuando el perfil NO es «General»:
+// `elegirTipoITP` sale por `if (perfil === 'general')` antes de rellenar `noComprobables`, y
+// el panel se pinta con `perfilComprador !== 'general'`. Pero hay reducidos que no dependen
+// de ningún colectivo: ITP_CCAA.madrid incluye «Vivienda habitual (bonif. 10%)» al 5,4 %
+// para valor ≤ 250.000 €, y ITP_CCAA.andalucia otro al 6 % para ≤ 150.000 €. Quien compra su
+// vivienda habitual sin pertenecer a ningún colectivo —la ruta por defecto de la app y el
+// caso más común— no ve ni la cifra ni el aviso de que existe.
+// Caso: Madrid · segunda mano · vivienda · 200.000 € · perfil «General (sin bonificaciones)»
+//       → esperado: el aviso citando el 5,4 % de vivienda habitual (10.800 €, 1.200 € menos)
+//       · obtenido: ITP 12.000,00 € (6 %) y ninguna mención a ese tipo en toda la página.
+test('HALLAZGO (contenido) — con perfil General también hay que avisar del reducido de vivienda habitual', async ({
+  page,
+}) => {
+  test.fail(); // hallazgo abierto: hoy falla a propósito
+  await page.goto(RUTA);
+  await page.getByRole('button', { name: /Segunda mano/ }).click();
+  await selectCcaa(page).selectOption('madrid');
+  await rellenar(page, 'Precio de la vivienda', '200000');
+
+  expect(await valorTarjeta(page, /^ITP/)).toBe('12.000,00 €');
+  await expect(page.getByText(/Podrías pagar menos/i)).toBeVisible();
+});
+
+// ⚠️ HALLAZGO ABIERTO (Inspector, 20/08/2026) — contenido.
+// Las tarjetas se titulan «Gastos de notaría (+ IVA)» y «Registro de la Propiedad (+ IVA)»,
+// pero el importe YA lleva el 21 %: `calcularArancelNotarial` y `calcularRegistro` terminan
+// con `total * 1.21`. «+ IVA» significa en castellano «IVA aparte», así que quien presupuesta
+// suma un 21 % que ya está dentro (758,98 € → 918,37 €). El propio recuadro de errores
+// comunes de la app da por hecho lo contrario («los honorarios de notaría y registro llevan
+// IVA al 21 %, que a menudo se olvida»). Vale cualquiera de las dos salidas —rotular «IVA
+// incluido» o publicar la base sin IVA—; lo que no puede quedarse es el «+».
+// Caso: Madrid · 200.000 € → tarjeta «Gastos de notaría (+ IVA)» con valor 758,98 €, que es
+//       358,43 € de arancel × 1,21 de IVA × 1,75 de factura · esperado un rótulo que no
+//       prometa un IVA aparte · obtenido «Gastos de notaría (+ IVA)».
+test('HALLAZGO (contenido) — el rótulo «(+ IVA)» contradice a un importe que ya lleva el 21 %', async ({
+  page,
+}) => {
+  test.fail(); // hallazgo abierto: hoy falla a propósito
+  await page.goto(RUTA);
+  await rellenar(page, 'Precio de la vivienda', '200000');
+
+  expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('758,98 €');
+  const titulo = await page.locator('h3', { hasText: 'Gastos de notaría' }).first().innerText();
+  expect(titulo).not.toMatch(/\+\s*IVA/);
+});
+
+// ⚠️ HALLAZGO ABIERTO (Inspector, 20/08/2026) — dato.
+// El bloque educativo afirma que el AJD «varía entre 0,5% y 1,5% según la comunidad» y la
+// tabla comparativa repite «0,5% – 1,5%», los dos escritos a mano. En la misma página, al
+// elegir País Vasco, el recuadro de la comunidad imprime «AJD 0%» y su nota dice «Sin AJD.
+// Régimen foral propio» (ITP_CCAA['pais-vasco'].ajd = 0). El rango es derivable de la tabla,
+// igual que RANGO_ITP.
+// Caso: elegir «País Vasco» en el selector de comunidad → recuadro de la comunidad: «AJD 0%»
+//       y «Sin AJD» · bloque educativo, en la misma página: «varía entre 0,5% y 1,5%».
+//       Esperado que el rango incluya el 0 % que la propia app calcula.
+test('HALLAZGO (dato) — el rango de AJD del bloque educativo deja fuera el 0 % del País Vasco', async ({
+  page,
+}) => {
+  test.fail(); // hallazgo abierto: hoy falla a propósito
+  await page.goto(RUTA);
+  await selectCcaa(page).selectOption('pais-vasco');
+  await expect(page.locator('[class*="infoCcaa"]').first()).toContainText('Sin AJD');
+
+  await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+  await expect(page.getByText(/Actos Jurídicos Documentados\) que varía/).first()).toContainText('0%');
+});
