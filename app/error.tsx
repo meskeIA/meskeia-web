@@ -138,7 +138,7 @@ export default function GlobalError({
         </p>
       </div>
 
-      <Footer appName="meskeIA" />
+      <Footer appName="pag:error" />
     </>
   );
 }

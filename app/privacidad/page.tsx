@@ -248,8 +248,8 @@ export default function PrivacidadPage() {
         </article>
       </main>
 
-      <ShareCard appName="meskeIA" />
-      <Footer appName="meskeIA" />
+      <ShareCard appName="pag:privacidad" />
+      <Footer appName="pag:privacidad" />
     </>
   );
 }

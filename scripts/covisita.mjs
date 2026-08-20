@@ -29,7 +29,15 @@ const LIFT_FUERTE = 3;      // umbral de afinidad "fuerte" (3x sobre el azar)
 
 // Slugs que son navegación, no una app-herramienta: los excluimos del análisis
 // de AFINIDAD (un hub como la home coincide con todo por construcción).
-const HOME = new Set(['home', '/', 'index', 'meskeia', 'meskeia-home']);
+// ⚠️ 20/08/2026: la entrada era 'meskeia' en minúsculas y el valor real en la tabla
+// es 'meskeIA' — un Set de JS distingue mayúsculas, así que este filtro NUNCA llegó a
+// excluir nada. Y `meskeIA` tampoco era la home: hasta hoy fue el cubo compartido de
+// /acerca/, /contacto/, /mcp/, /privacidad/, /terminos/ y la página de ERROR, que
+// coinciden con todo por construcción igual que un hub. Desde hoy esas páginas emiten
+// `pag:<pagina>`; se filtran por prefijo, y se conserva 'meskeIA' porque el histórico
+// crudo lo mantiene y este script recorre 90 días por defecto.
+const HOME = new Set(['home', '/', 'index', 'meskeia', 'meskeIA', 'meskeia-home']);
+const esNavegacion = (x) => HOME.has(x) || String(x).startsWith('pag:');
 
 const client = createClient({
   url: process.env.TURSO_DATABASE_URL,
@@ -157,7 +165,7 @@ for (const [k, w] of topTrans) console.log(`   ${String(w).padStart(4)} ×  ${k}
 const conLift = [];
 for (const [k, co] of pares) {
   const [a, b] = k.split('|');
-  if (HOME.has(a) || HOME.has(b)) continue;      // afinidad entre herramientas
+  if (esNavegacion(a) || esNavegacion(b)) continue;      // afinidad entre herramientas
   if (co < MIN_SOPORTE) continue;                // soporte mínimo para fiabilidad
   const lift = (co * totalSes) / (appSes.get(a) * appSes.get(b));
   conLift.push({ a, b, co, lift });
@@ -212,7 +220,7 @@ if (OUT) {
   for (const [k, co] of pares) {
     if (co < MIN_ARISTA) continue;
     const [a, b] = k.split('|');
-    if (HOME.has(a) || HOME.has(b)) continue; // afinidad entre herramientas, no navegación
+    if (esNavegacion(a) || esNavegacion(b)) continue; // afinidad entre herramientas, no navegación
     const lift = (co * totalSes) / (appSes.get(a) * appSes.get(b));
     edges.push({ a, b, co, lift: Math.round(lift * 10) / 10 });
     nodeSet.add(a); nodeSet.add(b);

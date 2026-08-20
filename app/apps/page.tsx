@@ -247,7 +247,7 @@ export default function AppsPage() {
         <LegalNotice />
       </main>
 
-      <ShareCard appName="meskeIA" />
+      <ShareCard appName="catalogo-apps" />
       {/*
         Nombre propio en analytics (07/08/2026). Antes el catálogo se registraba
         como "meskeIA", el mismo cubo que /acerca, /contacto, /privacidad,

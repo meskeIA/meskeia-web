@@ -125,8 +125,8 @@ export default function McpPage() {
         </article>
       </main>
 
-      <ShareCard appName="meskeIA" />
-      <Footer appName="meskeIA" />
+      <ShareCard appName="pag:mcp" />
+      <Footer appName="pag:mcp" />
     </>
   );
 }

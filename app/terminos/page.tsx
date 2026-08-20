@@ -262,8 +262,8 @@ export default function TerminosPage() {
         </article>
       </main>
 
-      <ShareCard appName="meskeIA" />
-      <Footer appName="meskeIA" />
+      <ShareCard appName="pag:terminos" />
+      <Footer appName="pag:terminos" />
     </>
   );
 }

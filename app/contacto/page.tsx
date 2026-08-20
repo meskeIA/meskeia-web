@@ -159,8 +159,8 @@ export default function ContactoPage() {
         </div>
       </main>
 
-      <ShareCard appName="meskeIA" />
-      <Footer appName="meskeIA" />
+      <ShareCard appName="pag:contacto" />
+      <Footer appName="pag:contacto" />
     </>
   );
 }

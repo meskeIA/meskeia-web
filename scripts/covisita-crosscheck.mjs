@@ -52,7 +52,13 @@ for (const raw of rel.split('\n')) {
 // ─────────────────────────────────────────────────────────────
 const HUBS = new Set(['stemum', 'coquinum', 'cronicum', 'delegum']);
 const esArtefacto = (p) => /[A-Z ]/.test(p.a) || /[A-Z ]/.test(p.b); // nombre visible, no slug
-const esHome = (p) => ['meskeIA', 'home', '/', 'index'].includes(p.a) || ['meskeIA', 'home', '/', 'index'].includes(p.b);
+// `meskeIA` NO era la home: hasta el 20/08/2026 era el cubo compartido de /acerca/,
+// /contacto/, /mcp/, /privacidad/, /terminos/ y la página de error, así que tratarlo
+// como home descartaba pares de covisita por una razón falsa. Desde esa fecha esas
+// páginas emiten `pag:<pagina>`; se sigue nombrando `meskeIA` porque el histórico
+// crudo lo conserva y este script recorre toda la serie.
+const NO_APP = new Set(['home', '/', 'index', 'meskeIA']);
+const esHome = (p) => NO_APP.has(p.a) || NO_APP.has(p.b) || p.a.startsWith('pag:') || p.b.startsWith('pag:');
 const esPortal = (p) => HUBS.has(p.a) || HUBS.has(p.b);
 
 const tool = [];

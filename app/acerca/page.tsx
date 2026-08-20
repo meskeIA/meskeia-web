@@ -207,8 +207,8 @@ export default function AcercaPage() {
         </div>
       </main>
 
-      <ShareCard appName="meskeIA" />
-      <Footer appName="meskeIA" />
+      <ShareCard appName="pag:acerca" />
+      <Footer appName="pag:acerca" />
     </>
   );
 }
