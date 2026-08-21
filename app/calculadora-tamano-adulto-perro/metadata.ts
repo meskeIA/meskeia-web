@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { rangosTipicos } from './razas';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Peso y Tamaño Adulto del Cachorro por Raza',
@@ -55,7 +56,7 @@ export const faqJsonLd = {
       name: '¿Cómo puedo saber cuánto pesará mi cachorro de adulto?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La calculadora divide el peso actual entre el porcentaje de peso adulto que corresponde a esa edad y a ese tamaño de raza. Una raza grande a las 14 semanas ronda el 35 % de su peso adulto, así que 16 kg a esa edad proyectan unos 45,7 kg. Circulan reglas más rápidas, como multiplicar por 2 el peso de una raza mediana a las 16 semanas, que coincide con la curva en ese punto concreto pero pierde precisión fuera de él. En todos los casos son estimaciones: la genética individual y la alimentación influyen en el resultado final.',
+        text: 'La calculadora divide el peso actual entre el porcentaje de peso adulto que corresponde a esa edad y a ese tamaño de raza. Una raza grande a las 14 semanas ronda el 35 % de su peso adulto, así que 12 kg a esa edad proyectan unos 34,3 kg. Circulan reglas más rápidas, como multiplicar por 2 el peso de una raza mediana a las 16 semanas, que coincide con la curva en ese punto concreto pero pierde precisión fuera de él. En todos los casos son estimaciones: la genética individual y la alimentación influyen en el resultado final.',
       },
     },
     {
@@ -63,7 +64,7 @@ export const faqJsonLd = {
       name: '¿A qué edad dejan de crecer los perros según su tamaño?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los perros de razas pequeñas (menos de 10 kg) alcanzan su tamaño adulto aproximadamente a los 10-12 meses. Las razas medianas (10-25 kg) maduran entre los 12 y 15 meses. Las razas grandes (25-45 kg) tardan entre 18 y 24 meses, y las razas gigantes (más de 45 kg), como el Gran Danés o el San Bernardo, pueden seguir creciendo hasta los 24-36 meses.',
+        text: `Los perros de razas pequeñas (${rangosTipicos.pequeno.etiqueta} de adulto) alcanzan su tamaño adulto aproximadamente a los 10-12 meses. Las razas medianas (${rangosTipicos.mediano.etiqueta}) maduran entre los 12 y 15 meses. Las razas grandes (${rangosTipicos.grande.etiqueta}) tardan entre 18 y 24 meses, y las razas gigantes (${rangosTipicos.gigante.etiqueta}), como el Gran Danés o el San Bernardo, pueden seguir creciendo hasta los 24-36 meses. Los rangos salen de las razas de referencia de la propia calculadora y se solapan en los bordes, porque describen pesos reales de razas, no tramos administrativos.`,
       },
     },
     {

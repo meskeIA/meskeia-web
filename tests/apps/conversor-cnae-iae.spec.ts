@@ -99,16 +99,20 @@ test('CASO 1 (normal) — 673.2 y «peluquería» devuelven el literal, la jerar
   //    «Servicios personales», Grupo 972 «Salones de peluquería e institutos de belleza»,
   //    Epígrafe 972.1 «Servicios de peluquería de señora y caballero».
   await buscarIae(page, 'peluquería');
-  await expect(contador(page)).toHaveText(/^2 resultados/);
+  // Son TRES desde el 21/08/2026: además del epígrafe 972.1 y su grupo 972, sale el
+  // epígrafe hermano 972.2, cuyo título propio («Salones e institutos de belleza…») no
+  // lleva la palabra pero cuelga del grupo «Salones de peluquería e institutos de
+  // belleza». Es justo lo que se reparó: los títulos que dependen del padre.
+  await expect(contador(page)).toHaveText(/^3 resultados/);
   await expect(fichas(page).first()).toContainText('972.1');
   await expect(fichas(page).first()).toContainText('Servicios de peluquería de señora y caballero');
   await expect(fichas(page).first()).toContainText('Agrupación 97: Servicios personales');
-  await expect(fichas(page).nth(1)).toContainText('972');
-  await expect(fichas(page).nth(1)).toContainText('Salones de peluquería e institutos de belleza');
+  await expect(fichas(page).nth(1)).toContainText('972.2');
+  await expect(fichas(page).nth(2)).toContainText('Salones de peluquería e institutos de belleza');
 
   // ── El buscador tolera acentos: «peluqueria» sin tilde da lo mismo.
   await buscarIae(page, 'peluqueria');
-  await expect(contador(page)).toHaveText(/^2 resultados/);
+  await expect(contador(page)).toHaveText(/^3 resultados/);
 
   // ── Y en la CNAE, la búsqueda en lenguaje corriente. El catálogo declara el sinónimo
   //    «hago páginas web» en la clase 62.10 «Actividades de programación informática».
@@ -136,7 +140,7 @@ test('CASO 2 (límite) — 4711 se reparte en DOS clases y el profesional cae en
   //    Las dos tienen que verse: quedarse con una sería elegir por el usuario.
   await buscarCnae(page, '4711');
   await expect(avisoAntiguo(page)).toContainText('4711');
-  await expect(avisoAntiguo(page)).toContainText('es un código de la CNAE-2009');
+  await expect(avisoAntiguo(page)).toContainText('existe en la CNAE-2009');
   await expect(contador(page)).toHaveText(/^2 resultados/);
   await expect(fichas(page)).toHaveCount(2);
   await expect(fichas(page).first()).toContainText('47.11');
@@ -270,13 +274,13 @@ test('REGRESIÓN — la app niega la conversión CNAE→IAE en la página, en el
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS (20/08/2026) — quitar el test.fail() al repararlos
+// REGRESIONES (hallazgos del 20/08/2026, reparados el 21/08/2026)
 // ═══════════════════════════════════════════════════════════════════════════
-test.describe('Buscador CNAE-IAE — hallazgos abiertos', () => {
+// REGRESIONES — los cinco hallazgos del 20/08/2026, reparados el 21/08/2026.
+test.describe('Buscador CNAE-IAE — regresiones de los hallazgos reparados', () => {
   test('un código de 4 dígitos que TAMBIÉN es una clase vigente se lee solo como CNAE-2009', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
     await abrir(page);
 
     // 25.30 es una clase VIGENTE de la CNAE-2025 en el propio catálogo de la app:
@@ -288,13 +292,18 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos', () => {
     // de cuatro dígitos en esta situación (2530, 2540, 3512, 3513, 3514, 1629…).
     await buscarCnae(page, '2530');
     await expect(fichas(page).filter({ hasText: '25.30' })).toHaveCount(1);
-    await expect(page.getByText('Fabricación de armas y municiones')).toBeVisible();
+    await expect(fichas(page).filter({ hasText: 'Fabricación de armas y municiones' })).toHaveCount(
+      1,
+    );
+    // Y la clase de la correspondencia sigue estando: se SUMAN, no se sustituyen.
+    await expect(fichas(page).filter({ hasText: '25.21' })).toHaveCount(1);
+    // El aviso deja de afirmar en seco que el código es de la clasificación anterior.
+    await expect(page.locator('[class*="avisoAntiguo"]')).toContainText('también es una clase');
   });
 
   test('una correspondencia oficial de 32 clases se corta en 10 y pide «afinar» lo que no se puede afinar', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
     await abrir(page);
 
     // 4791 (CNAE-2009, «comercio al por menor por correspondencia o Internet») es el
@@ -306,13 +315,19 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos', () => {
     // 47.92 y 60.39— son inalcanzables. Le pasa igual a 4789 (17), 4799 (30) y 8299 (24).
     await buscarCnae(page, '4791');
     await expect(contador(page)).toContainText('32 resultados');
+    // Ya no se aconseja «afinar» una consulta por código, que no se puede afinar:
+    await expect(contador(page)).not.toContainText('afina la búsqueda');
+    await expect(fichas(page)).toHaveCount(10);
+    await page.getByRole('button', { name: 'Ver los 32' }).click();
     await expect(fichas(page)).toHaveCount(32);
+    // Las que eran inalcanzables, entre ellas 47.92 y 60.39:
+    await expect(fichas(page).filter({ hasText: '47.92' })).toHaveCount(1);
+    await expect(fichas(page).filter({ hasText: '60.39' })).toHaveCount(1);
   });
 
   test('la búsqueda por texto no baja a los epígrafes: «restaurante» no devuelve ninguno', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
     await abrir(page);
 
     // El texto indexado es solo el del propio código, no el de sus padres. Los epígrafes
@@ -322,13 +337,19 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos', () => {
     // 036/037. Solo aparecen tecleando «671», y nada lo indica. Hay 40 epígrafes con
     // título dependiente de su padre en la misma situación.
     await buscarIae(page, 'restaurante');
+    // Los cinco epígrafes del Grupo 671, que son los que se declaran en el 036/037:
+    for (const epigrafe of ['671.1', '671.2', '671.3', '671.4', '671.5']) {
+      await expect(fichas(page).filter({ hasText: epigrafe })).toHaveCount(1);
+    }
     await expect(fichas(page).filter({ hasText: 'De dos tenedores' })).toHaveCount(1);
+    // Y sin arrastrar los 216 epígrafes que cuelgan de la División 6 «COMERCIO,
+    // RESTAURANTES Y HOSPEDAJE»: se hereda el título del GRUPO, no el de la división.
+    await expect(contador(page)).toContainText('15 resultados');
   });
 
   test('la coincidencia por subcadena manda un epígrafe ajeno por delante del correcto', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
     await abrir(page);
 
     // «actores» está contenido en «tr-actores». Como el orden pone primero los epígrafes
@@ -342,7 +363,6 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos', () => {
   });
 
   test('«médico» deja al médico por detrás de siete resultados empresariales', async ({ page }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
     await abrir(page);
 
     // Mismo mecanismo que el anterior. Buscar «médico» devuelve 9 resultados: los siete
@@ -356,7 +376,6 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos', () => {
   test('el <h1> y el <title> llaman «oficial» a la herramienta, no a los catálogos', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
     await abrir(page);
 
     // La app es escrupulosa con lo que importa —niega la conversión CNAE→IAE cuatro

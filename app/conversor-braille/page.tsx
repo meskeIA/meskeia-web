@@ -43,6 +43,21 @@ const textToBraille: { [key: string]: string } = {
   '"': '⠦', '«': '⠦', '»': '⠦', '“': '⠦', '”': '⠦',    // comillas — puntos 2-3-6
   '-': '⠤',                                            // guion — puntos 3-6
   '(': '⠣', ')': '⠜',                                  // paréntesis — 1-2-6 / 3-4-5
+  // ─── Signos auxiliares (B 2 § 6.2) ─────────────────────────────────────────
+  // El apóstrofo comparte celda con el punto ortográfico (punto 3), igual que ¿ y ?
+  // comparten la suya. Antes se trataba como carácter SIN celda y la app afirmaba que
+  // el Código no se la asigna, que es lo contrario de lo que dice la fuente que ella
+  // misma cita. Duele en catalán y valenciano —l'Hospitalet, d'Alacant—, que es justo
+  // el público de un documento sobre lenguas cooficiales (Inspector, 20/08/2026).
+  "'": '⠄',                                            // apóstrofo — punto 3
+};
+
+/**
+ * Signos del B 2 § 6.2 que ocupan DOS celdas. Van aparte de `textToBraille` porque la
+ * vuelta se resuelve mirando dos celdas seguidas, no una.
+ */
+const SIGNOS_COMPUESTOS: { [tinta: string]: string } = {
+  '/': '⠠⠂',                                           // barra inclinada — 6, 2
 };
 
 /**
@@ -58,6 +73,10 @@ const PREFERENCIA_INVERSA: { [celda: string]: string } = {
   '⠢': '?',
   '⠖': '!',
   '⠦': '"',
+  // El punto 3 sirve al punto ortográfico y al apóstrofo (B 2 § 6.1 y § 6.2). Vuelve
+  // como PUNTO, que es incomparablemente más frecuente: al dar de alta el apóstrofo,
+  // la tabla inversa se quedó con él y «hola.» volvía como «hola'».
+  '⠄': '.',
 };
 
 // Invertir para Braille a texto
@@ -75,12 +94,11 @@ Object.entries(PREFERENCIA_INVERSA).forEach(([celda, tinta]) => {
   brailleToText[celda] = tinta;
 });
 
-/**
- * El apóstrofo NO está en la tabla a propósito. El B 2 lo define como signo compuesto
- * y la tabla del documento no permite fijarlo con certeza, así que se trata como
- * carácter sin celda y la app lo dice, en vez de asignarle el punto 3 —que es el punto
- * ortográfico— como hacía antes.
- */
+/** Las dos celdas de un signo compuesto → el carácter en tinta que representan. */
+const COMPUESTOS_INVERSO: { [celdas: string]: string } = Object.fromEntries(
+  Object.entries(SIGNOS_COMPUESTOS).map(([tinta, celdas]) => [celdas, tinta]),
+);
+
 
 // Patrón de puntos para visualización
 const brailleDots: { [key: string]: number[] } = {
@@ -125,8 +143,31 @@ const PRIMERA_SERIE = /^[a-j]$/;
  * el usuario veía una hoja coherente a la que le faltaban caracteres.
  */
 const caracteresSinCelda = (texto: string): string[] => [
-  ...new Set(Array.from(texto).filter((c) => !textToBraille[c.toLowerCase()])),
+  ...new Set(
+    Array.from(texto).filter(
+      (c) =>
+        !textToBraille[c.toLowerCase()] &&
+        !SIGNOS_COMPUESTOS[c] &&
+        // El salto de línea sí se escribe: se convierte en separación de palabra
+        c !== '\n' &&
+        c !== '\r',
+    ),
+  ),
 ];
+
+/**
+ * Cómo nombrar en el aviso un carácter que no se ve.
+ *
+ * El aviso existe para que el usuario sepa QUÉ se ha perdido, y con un carácter de
+ * control dejaba un <strong> vacío y una frase que no decía nada (Inspector, 20/08/2026).
+ */
+const NOMBRE_VISIBLE: { [caracter: string]: string } = {
+  '\t': 'tabulador',
+  '\u00a0': 'espacio duro',
+};
+
+const nombraCaracter = (c: string): string =>
+  NOMBRE_VISIBLE[c] ?? (c.trim() === '' ? 'espacio en blanco' : c);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Hoja imprimible a escala real
@@ -210,6 +251,31 @@ export default function ConversorBraillePage() {
     () => (mode === 'textToBraille' && result ? caracteresSinCelda(input) : []),
     [mode, result, input],
   );
+
+  /**
+   * Celdas braille que esta app no sabe traducir a texto.
+   *
+   * En «Texto → Braille» la app avisaba de lo que no podía escribir, pero en la
+   * dirección contraria una celda desconocida se colaba tal cual en la salida y nadie
+   * lo advertía: el resultado dejaba de ser texto en español en silencio
+   * (Inspector, 20/08/2026).
+   */
+  const celdasSinTexto = useMemo(() => {
+    if (mode !== 'brailleToText' || !result) return [];
+    const conocidas = new Set([CAPITAL_INDICATOR, LATIN_PREFIX, NUMBER_INDICATOR, '⠀']);
+    const compuestas = new Set(Object.values(SIGNOS_COMPUESTOS).flatMap((c) => Array.from(c)));
+    return [
+      ...new Set(
+        Array.from(input).filter(
+          (c) =>
+            /[\u2800-\u28FF]/.test(c) &&
+            !conocidas.has(c) &&
+            !compuestas.has(c) &&
+            !brailleToText[c],
+        ),
+      ),
+    ];
+  }, [mode, result, input]);
 
   /** ¿Lleva el resultado algún signo que en español abre y cierra igual? */
   const llevaSignoAmbiguo = useMemo(
@@ -314,7 +380,10 @@ export default function ConversorBraillePage() {
 
     // Por code points, no por índices UTF-16: un emoji ocupa dos unidades y
     // recorrerlo a pares partía el carácter en dos mitades sin celda.
-    for (const original of Array.from(text)) {
+    const caracteres = Array.from(text);
+
+    for (let i = 0; i < caracteres.length; i++) {
+      const original = caracteres[i];
       const char = original.toLowerCase();
 
       if (/[0-9]/.test(char)) {
@@ -323,6 +392,34 @@ export default function ConversorBraillePage() {
           enExpresionNumerica = true;
         }
         result += textToBraille[char];
+        continue;
+      }
+
+      // B 2 § 8.1: el signo de número cubre el número ENTERO. El punto 2 es el
+      // separador decimal y el punto 3 el de los grupos de tres dígitos, y ninguno
+      // de los dos repite el prefijo. Antes cerraban la expresión, así que «501.439»
+      // salía con un ⠼ de más delante de cada grupo (Inspector, 20/08/2026).
+      if (enExpresionNumerica && (char === ',' || char === '.')) {
+        const siguiente = caracteres[i + 1];
+        if (siguiente && /[0-9]/.test(siguiente)) {
+          result += textToBraille[char];
+          continue;
+        }
+      }
+
+      // Un salto de línea no tiene celda, pero tampoco puede desaparecer: sin
+      // separación, «sal» y «pimienta» en dos líneas salían pegadas y la hoja
+      // imprimible las punzaba como una sola palabra de 11 celdas.
+      if (char === '\n' || char === '\r') {
+        if (!result.endsWith('⠀')) result += '⠀';
+        enExpresionNumerica = false;
+        continue;
+      }
+
+      const compuesto = SIGNOS_COMPUESTOS[original];
+      if (compuesto) {
+        result += compuesto;
+        enExpresionNumerica = false;
         continue;
       }
 
@@ -365,7 +462,21 @@ export default function ConversorBraillePage() {
     let siguienteEsLatina = false;
     let enExpresionNumerica = false;
 
-    for (const char of braille) {
+    const celdas = Array.from(braille);
+
+    for (let i = 0; i < celdas.length; i++) {
+      const char = celdas[i];
+
+      // Signos de dos celdas (B 2 § 6.2): se resuelven antes que la celda suelta,
+      // porque «⠠⠂» es una barra inclinada y no un punto 6 seguido de una coma.
+      const compuesto = COMPUESTOS_INVERSO[char + (celdas[i + 1] ?? '')];
+      if (compuesto) {
+        result += compuesto;
+        enExpresionNumerica = false;
+        i++;
+        continue;
+      }
+
       if (char === CAPITAL_INDICATOR) {
         nextIsCapital = true;
         // Una mayúscula cierra la expresión numérica: el signo 4-6 no es cifra, y
@@ -389,6 +500,18 @@ export default function ConversorBraillePage() {
         enExpresionNumerica = false;
         result += ' ';
         continue;
+      }
+
+      // B 2 § 8.1: dentro de un número, el punto 2 es la coma decimal y el punto 3 el
+      // separador de millares, y NINGUNO cierra la expresión. Antes la cerraban, así
+      // que «73,81» volvía como «73,ha» y «501.439.678» como «501.dci.fgh».
+      if (enExpresionNumerica && (char === '⠂' || char === '⠄')) {
+        const siguiente = celdas[i + 1];
+        if (siguiente && brailleToText[siguiente] && PRIMERA_SERIE.test(brailleToText[siguiente])) {
+          result += char === '⠂' ? ',' : '.';
+          siguienteEsLatina = false;
+          continue;
+        }
       }
 
       let converted = brailleToText[char] || char;
@@ -587,10 +710,21 @@ export default function ConversorBraillePage() {
             {sinCelda.length > 0 && (
               <p className={styles.avisoConversion} role="alert">
                 <span aria-hidden="true">⚠️</span>{' '}
-                No se ha escrito en braille {sinCelda.length === 1 ? 'este carácter' : 'estos caracteres'},
-                porque el Código Braille Español no le{sinCelda.length === 1 ? '' : 's'} asigna
-                celda en signografía básica:{' '}
-                <strong>{sinCelda.join(' ')}</strong>. El resto del texto sí está completo.
+                Esta herramienta no escribe en braille{' '}
+                {sinCelda.length === 1 ? 'este carácter' : 'estos caracteres'}:{' '}
+                <strong>{sinCelda.map(nombraCaracter).join(' · ')}</strong>. El resto del texto
+                sí está completo. Puede que el Código Braille Español sí les asigne celda fuera
+                de la signografía básica que cubre esta app.
+              </p>
+            )}
+
+            {celdasSinTexto.length > 0 && (
+              <p className={styles.avisoConversion} role="alert">
+                <span aria-hidden="true">⚠️</span>{' '}
+                {celdasSinTexto.length === 1 ? 'Esta celda no tiene' : 'Estas celdas no tienen'}{' '}
+                equivalente en la signografía básica que cubre esta app y{' '}
+                {celdasSinTexto.length === 1 ? 'ha pasado' : 'han pasado'} al resultado sin
+                traducir: <strong>{celdasSinTexto.join(' ')}</strong>.
               </p>
             )}
 

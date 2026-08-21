@@ -151,7 +151,10 @@ test('caso límite: esfera r=12,5 → 8181,2 y r=120 → 7.238.229', async ({ pa
   await radio.fill('12,5');
   await expect(radio).toHaveValue('12,5');
   await expect(valorVolumen(page)).toHaveText('8181,2');
-  await expect(formulaAplicada(page)).toHaveText('V = (4/3) × π × r³ = (4/3) × π × 12,50³');
+  // La fórmula muestra la medida TAL COMO entra en el cálculo, sin rellenar ni recortar
+  // decimales: antes usaba dos fijos mientras el volumen se calculaba con el valor
+  // completo, así que rehacer a mano la operación que la app enseña no daba su resultado.
+  await expect(formulaAplicada(page)).toHaveText('V = (4/3) × π × r³ = (4/3) × π × 12,5³');
   expect(await atributoSvg(page, 'circle', 'r')).toBeCloseTo(42, 6);
   await expect(deslizador).toHaveValue('12.5');
 
@@ -256,5 +259,85 @@ test.describe('visualizador-volumenes — regresiones ya reparadas', () => {
     // El JSON-LD decía «esfera» donde la FAQ visible de la misma página dice «disco bicóncavo».
     expect(jsonLd).toContain('disco bicóncavo');
     expect(jsonLd).not.toMatch(/glóbulos rojos adoptan formas próximas a la esfera/);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// REGRESIONES — los seis hallazgos del 20/08/2026, reparados el 21/08/2026
+// ═══════════════════════════════════════════════════════════════════════════
+
+test.describe('visualizador-volumenes — regresiones del 21/08/2026', () => {
+  // Las etiquetas dibujadas sobre la figura interpolaban el number crudo y salían en
+  // formato inglés («r=12.5») en la misma pantalla en la que el campo escribía «12,5».
+  test('las etiquetas del dibujo usan la coma decimal española', async ({ page }) => {
+    await page.locator('input[type=text]').first().fill('12,5');
+    await expect(page.locator('svg text').filter({ hasText: /^r=/ })).toHaveText('r=12,5');
+
+    // Y en las otras figuras, que tienen sus propias etiquetas
+    await page.getByRole('button', { name: /Paralelepípedo|Prisma|Cubo/ }).first().click();
+    await page.locator('input[type=text]').first().fill('2,5');
+    await expect(page.locator('svg text').filter({ hasText: /^a=/ })).toHaveText('a=2,5');
+  });
+
+  // El relleno del deslizador estaba clavado al 50 %: el CSS lo pinta con
+  // var(--slider-pct, 50%) y esa variable no se fijaba nunca en esta página.
+  test('la barra del deslizador se rellena según el valor, no clavada al 50 %', async ({ page }) => {
+    const deslizador = page.locator('input[type=range]').first();
+    const pct = async () =>
+      deslizador.evaluate((el) => el.style.getPropertyValue('--slider-pct'));
+
+    await ponerDeslizador(page, 0, 1); // extremo izquierdo del rango (min = 1)
+    expect(await pct()).toBe('0%');
+
+    await ponerDeslizador(page, 0, 50); // extremo derecho (max = 50)
+    expect(await pct()).toBe('100%');
+  });
+
+  // Una entrada inválida se ignoraba en silencio: el texto malo se quedaba escrito
+  // mientras la app seguía calculando con la última medida válida.
+  test('una medida inválida se avisa en vez de ignorarse', async ({ page }) => {
+    const campo = page.locator('input[type=text]').first();
+    await campo.fill('no es un número');
+    await expect(page.getByRole('alert').filter({ hasText: 'Escribe un número' })).toBeVisible();
+    await expect(campo).toHaveAttribute('aria-invalid', 'true');
+
+    // Y al escribir algo válido, el aviso desaparece
+    await campo.fill('7');
+    await expect(page.getByRole('alert').filter({ hasText: 'Escribe un número' })).toHaveCount(0);
+    await expect(campo).toHaveAttribute('aria-invalid', 'false');
+  });
+
+  // Por arriba sí avisaba («120 · fuera del deslizador») y por abajo no: el deslizador
+  // marcaba el mínimo y el pie seguía anunciando el rango normal.
+  test('por debajo del mínimo se avisa igual que por encima del máximo', async ({ page }) => {
+    const limites = page.locator('[class*=sliderLimits]').first();
+    const campo = page.locator('input[type=text]').first();
+
+    await campo.fill('0,5');
+    await expect(limites).toContainText('fuera del deslizador');
+
+    await campo.fill('120');
+    await expect(limites).toContainText('120 · fuera del deslizador');
+
+    await campo.fill('25');
+    await expect(limites).not.toContainText('fuera del deslizador');
+  });
+});
+
+// En móvil la herramienta entera nacía por debajo del pliegue: la primera pantalla solo
+// mostraba logo, hero, aviso legal, selector de figuras y el borde superior del dibujo,
+// con el primer deslizador a 1.034 px y el resultado a 1.092 px (iPhone 14). Es la
+// explicación medida de los 27,7 s de estancia, y contradice el subtítulo de la app.
+test.describe('en móvil (iPhone 14)', () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test('al menos un control y el resultado entran sin hacer scroll', async ({ page }) => {
+    const alto = 844;
+    const y = async (selector: string) => {
+      const caja = await page.locator(selector).first().boundingBox();
+      return caja ? caja.y : Number.POSITIVE_INFINITY;
+    };
+    expect(await y('input[type=range]')).toBeLessThan(alto);
+    expect(await y('[class*=resultCard]')).toBeLessThan(alto);
   });
 });

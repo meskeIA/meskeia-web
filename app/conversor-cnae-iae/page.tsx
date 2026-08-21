@@ -168,6 +168,15 @@ export default function ConversorCnaeIaePage() {
   const [seccionCnae, setSeccionCnae] = useState<string>('todas');
   const [consultaIae, setConsultaIae] = useState('');
   const [seccionIae, setSeccionIae] = useState<'todas' | SeccionIae>('todas');
+  /**
+   * El tope de 10 resultados venía con el consejo «afina la búsqueda para ver el resto»,
+   * inaplicable a una consulta POR CÓDIGO: cambiar los cuatro dígitos rompe la detección
+   * del código antiguo, y el filtro por sección no baja de 10 cuando 31 de las 32 clases
+   * están en la misma. Con 4791 —comercio electrónico, de los más frecuentes en altas
+   * recientes— 22 de sus 32 clases eran inalcanzables (Inspector, 20/08/2026).
+   */
+  const [verTodosCnae, setVerTodosCnae] = useState(false);
+  const [verTodosIae, setVerTodosIae] = useState(false);
 
   const inputCnaeRef = useRef<HTMLInputElement>(null);
   const inputIaeRef = useRef<HTMLInputElement>(null);
@@ -255,10 +264,38 @@ export default function ConversorCnaeIaePage() {
 
   const iaeIndexado = useMemo<IaeIndexada[]>(() => {
     if (!catalogo) return [];
+
+    // Título de cada entrada por sección+código, para que los hijos hereden el de sus
+    // padres en el índice de búsqueda.
+    const tituloPorCodigo: Record<string, string> = {};
+    for (const entrada of catalogo.iae) {
+      tituloPorCodigo[`${entrada.seccion}|${entrada.codigo}`] = entrada.titulo;
+    }
+
+    /**
+     * 40 epígrafes tienen título DEPENDIENTE del grupo («De cinco tenedores», «De un
+     * tenedor», «De categoría especial»…). Con el índice limitado a su propio título,
+     * buscar la palabra natural de la actividad devolvía el grupo pero jamás el
+     * epígrafe, que es el código que se declara en el modelo 036/037: «restaurante» no
+     * sacaba ni uno de los 671.1 a 671.5 (Inspector, 20/08/2026).
+     */
+    const titulosDeLosPadres = (entrada: (typeof catalogo.iae)[number]): string => {
+      // SOLO el grupo del que cuelga, nunca la agrupación ni la división: heredar la
+      // división entera metía «COMERCIO, RESTAURANTES Y HOSPEDAJE» en los 216 epígrafes
+      // que cuelgan de ella, y «restaurante» pasaba de no encontrar ninguno a devolver
+      // 216 con los correctos fuera de los diez primeros. El grupo es el padre que da
+      // sentido al título dependiente, y basta con él.
+      if (entrada.tipo !== 'epigrafe') return '';
+      const raiz = entrada.codigo.split('.')[0];
+      return tituloPorCodigo[`${entrada.seccion}|${raiz}`] ?? '';
+    };
+
     return catalogo.iae.map((entrada) => ({
       ...entrada,
       codigoDigitos: soloDigitos(entrada.codigo),
-      textoBusqueda: normalizarTexto(`${entrada.codigo} ${entrada.titulo}`),
+      textoBusqueda: normalizarTexto(
+        `${entrada.codigo} ${entrada.titulo} ${titulosDeLosPadres(entrada)}`,
+      ),
     }));
   }, [catalogo]);
 
@@ -274,6 +311,20 @@ export default function ConversorCnaeIaePage() {
 
   const consultaCnaeNormalizada = normalizarTexto(consultaCnae);
   const digitosConsultaCnae = soloDigitos(consultaCnae);
+
+  /**
+   * ¿El código tecleado existe TAMBIÉN como clase vigente? Son 26 códigos que están en
+   * las dos clasificaciones, y decirle a esa gente que su código «es de la anterior»
+   * sin más es exactamente lo contrario de lo que necesita saber.
+   */
+  const vigenteHomonima = useMemo<CnaeIndexada | null>(() => {
+    if (digitosConsultaCnae.length !== 4) return null;
+    return (
+      cnaeIndexado.find(
+        (entrada) => entrada.nivel === 'clase' && entrada.codigoDigitos === digitosConsultaCnae,
+      ) ?? null
+    );
+  }, [cnaeIndexado, digitosConsultaCnae]);
 
   /** Código anterior: 4 dígitos presentes en la tabla oficial CNAE-2009 → CNAE-2025. */
   const equivalenciaAntigua = useMemo<string[] | null>(() => {
@@ -300,9 +351,20 @@ export default function ConversorCnaeIaePage() {
     let base: CnaeIndexada[];
 
     if (equivalenciaAntigua) {
-      // Código antiguo reconocido: mostramos las clases CNAE-2025 equivalentes
+      // Código antiguo reconocido. Las clases equivalentes se SUMAN a la búsqueda
+      // normal, no la sustituyen: 26 códigos de cuatro dígitos existen a la vez en la
+      // CNAE-2009 y en la vigente (2530, 2540, 2561, 3512…), y al sustituirla la app
+      // escondía la clase actual y afirmaba que el código era de la clasificación
+      // anterior. El resultado era la clase de OTRA actividad, servida con un aviso
+      // asertivo y sin ninguna pista (Inspector, 20/08/2026).
       const equivalentes = new Set(equivalenciaAntigua);
-      base = cnaeIndexado.filter((entrada) => equivalentes.has(entrada.codigo));
+      const porCorrespondencia = cnaeIndexado.filter((entrada) => equivalentes.has(entrada.codigo));
+      const porBusquedaNormal = cnaeIndexado.filter(
+        (entrada) =>
+          entrada.codigoDigitos.startsWith(digitosConsultaCnae) ||
+          entrada.textoBusqueda.includes(consultaCnaeNormalizada),
+      );
+      base = [...new Set([...porBusquedaNormal, ...porCorrespondencia])];
     } else if (consultaCnaeNormalizada.length === 0) {
       base = cnaeIndexado;
     } else {
@@ -333,7 +395,9 @@ export default function ConversorCnaeIaePage() {
   // Sin texto ni filtro de sección no hay nada que mostrar: la pantalla inicial son
   // los ejemplos clicables, no un volcado del catálogo.
   const sinCriterioCnae = consultaCnaeNormalizada.length === 0 && seccionCnae === 'todas';
-  const cnaeMostrados = sinCriterioCnae ? [] : resultadosCnae.slice(0, LIMITE_RESULTADOS);
+  const cnaeMostrados = sinCriterioCnae
+    ? []
+    : resultadosCnae.slice(0, verTodosCnae ? undefined : LIMITE_RESULTADOS);
 
   // ─── Búsqueda en las Tarifas del IAE ───────────────────────────────────────
 
@@ -369,17 +433,24 @@ export default function ConversorCnaeIaePage() {
     }
 
     return [...base].sort((a, b) => {
-      const porTipo = PESO_TIPO_IAE[a.tipo] - PESO_TIPO_IAE[b.tipo];
-      if (porTipo !== 0) return porTipo;
+      // La RELEVANCIA manda sobre el tipo de entrada. Al revés —que era como estaba—,
+      // una coincidencia accidental de la Sección 1.ª se colocaba por delante de la
+      // entrada correcta: «actores» devolvía primero «Construcción de tractores
+      // agrícolas» y solo después el 013 «Actores de cine y teatro», y la sección
+      // determina la retención de IRPF en factura (Inspector, 20/08/2026).
       const porRelevancia = relevancia(a) - relevancia(b);
       if (porRelevancia !== 0) return porRelevancia;
+      const porTipo = PESO_TIPO_IAE[a.tipo] - PESO_TIPO_IAE[b.tipo];
+      if (porTipo !== 0) return porTipo;
       if (a.seccion !== b.seccion) return a.seccion.localeCompare(b.seccion, 'es');
       return a.codigo.localeCompare(b.codigo, 'es', { numeric: true });
     });
   }, [iaeIndexado, consultaIae, consultaIaeNormalizada, digitosConsultaIae, seccionIae]);
 
   const sinCriterioIae = consultaIaeNormalizada.length === 0 && seccionIae === 'todas';
-  const iaeMostrados = sinCriterioIae ? [] : resultadosIae.slice(0, LIMITE_RESULTADOS);
+  const iaeMostrados = sinCriterioIae
+    ? []
+    : resultadosIae.slice(0, verTodosIae ? undefined : LIMITE_RESULTADOS);
 
   // ─── Jerarquías ────────────────────────────────────────────────────────────
 
@@ -440,7 +511,7 @@ export default function ConversorCnaeIaePage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>Códigos CNAE-2025 y epígrafes del IAE: buscador oficial</h1>
+        <h1 className={styles.title}>Buscador de códigos CNAE-2025 y epígrafes del IAE</h1>
         <p className={styles.subtitle}>
           Dos catálogos completos y literales para localizar tu actividad: la CNAE-2025 del INE
           (la que sustituyó a la CNAE-2009 en enero de 2026) y las Tarifas del Impuesto sobre
@@ -629,10 +700,17 @@ export default function ConversorCnaeIaePage() {
             {equivalenciaAntigua && (
               <div className={styles.avisoAntiguo} role="note">
                 <p>
-                  <strong>{digitosConsultaCnae}</strong> es un código de la{' '}
-                  <strong>CNAE-2009</strong>, la clasificación anterior. Desde enero de 2026 rige
-                  la CNAE-2025 (RD 10/2025). Estas son las clases actuales que recogen esa
-                  actividad:
+                  <strong>{digitosConsultaCnae}</strong> existe en la <strong>CNAE-2009</strong>,
+                  la clasificación anterior. Desde enero de 2026 rige la CNAE-2025 (RD 10/2025), y
+                  estas son las clases actuales que recogen esa actividad
+                  {vigenteHomonima ? (
+                    <>
+                      . <strong>Ojo</strong>: ese mismo número también es una clase VIGENTE
+                      distinta —{vigenteHomonima.codigo} {vigenteHomonima.titulo}—, que aparece
+                      igualmente en la lista
+                    </>
+                  ) : null}
+                  :
                 </p>
               </div>
             )}
@@ -641,11 +719,17 @@ export default function ConversorCnaeIaePage() {
               <p className={styles.contador} role="status" aria-live="polite">
                 {formatNumber(resultadosCnae.length, 0)}{' '}
                 {resultadosCnae.length === 1 ? 'resultado' : 'resultados'}
-                {resultadosCnae.length > LIMITE_RESULTADOS && (
+                {resultadosCnae.length > LIMITE_RESULTADOS && !verTodosCnae && (
                   <>
                     {' '}
-                    · se muestran los {LIMITE_RESULTADOS} primeros; afina la búsqueda para ver el
-                    resto
+                    · se muestran los {LIMITE_RESULTADOS} primeros{' '}
+                    <button
+                      type="button"
+                      className={styles.verTodos}
+                      onClick={() => setVerTodosCnae(true)}
+                    >
+                      Ver los {resultadosCnae.length}
+                    </button>
                   </>
                 )}
               </p>
@@ -803,11 +887,17 @@ export default function ConversorCnaeIaePage() {
               <p className={styles.contador} role="status" aria-live="polite">
                 {formatNumber(resultadosIae.length, 0)}{' '}
                 {resultadosIae.length === 1 ? 'resultado' : 'resultados'}
-                {resultadosIae.length > LIMITE_RESULTADOS && (
+                {resultadosIae.length > LIMITE_RESULTADOS && !verTodosIae && (
                   <>
                     {' '}
-                    · se muestran los {LIMITE_RESULTADOS} primeros; afina la búsqueda para ver el
-                    resto
+                    · se muestran los {LIMITE_RESULTADOS} primeros{' '}
+                    <button
+                      type="button"
+                      className={styles.verTodos}
+                      onClick={() => setVerTodosIae(true)}
+                    >
+                      Ver los {resultadosIae.length}
+                    </button>
                   </>
                 )}
               </p>

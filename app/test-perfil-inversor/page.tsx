@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import styles from './TestPerfilInversor.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
+import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Definición de preguntas con puntuaciones
@@ -196,10 +197,10 @@ const PROFILES: Record<ProfileType, Profile> = {
     },
     allocation: { rv: 50, rf: 35, liq: 10, alt: 5 },
     recommendations: [
-      'Fondos indexados globales (MSCI World)',
-      'ETFs de acumulación',
-      'Cartera 60/40 clásica',
-      'Aportaciones periódicas (DCA)',
+      'Fondos indexados de renta variable global, ampliamente diversificados',
+      'Vehículos de acumulación, que reinvierten los dividendos',
+      'Reparto equilibrado entre renta variable y renta fija',
+      'Aportaciones periódicas de importe fijo',
     ],
   },
   dinamico: {
@@ -218,7 +219,7 @@ const PROFILES: Record<ProfileType, Profile> = {
       'ETFs de renta variable global',
       'Fondos indexados de mercados desarrollados',
       'Exposición a mercados emergentes',
-      'Small caps para mayor potencial',
+      'Empresas de pequeña capitalización, de mayor recorrido y mayor riesgo',
     ],
   },
   agresivo: {
@@ -236,7 +237,7 @@ const PROFILES: Record<ProfileType, Profile> = {
     recommendations: [
       'ETFs 100% renta variable global',
       'Exposición significativa a mercados emergentes',
-      'Factor investing (small value, momentum)',
+      'Estrategias que sobreponderan algún factor (tamaño, valor, momento)',
       'Mantener disciplina de aportación periódica incluso en mercados volátiles.',
     ],
   },
@@ -251,10 +252,57 @@ function getProfile(score: number): ProfileType {
   return 'agresivo';
 }
 
-// Calcular posición en la barra (0-100%)
+/**
+ * Posición de la flecha en la barra de cinco segmentos (0-100 %).
+ *
+ * El mapeo lineal 10-40 → 0-100 dejaba los topes de tramo (16, 22, 28 y 34) clavados en
+ * 20 %, 40 %, 60 % y 80 %, es decir sobre la línea divisoria con el tramo siguiente:
+ * con `translateX(-50%)` la punta quedaba repartida entre los dos colores mientras el
+ * texto anunciaba el de abajo (Inspector, 20/08/2026). Se separa medio punto de cada
+ * frontera para que la flecha caiga siempre DENTRO del segmento que se ha nombrado.
+ */
 function getBarPosition(score: number): number {
-  // Score va de 10 a 40, mapeamos a 0-100%
-  return Math.min(100, Math.max(0, ((score - 10) / 30) * 100));
+  // El segmento se deriva del PERFIL, no de un mapeo lineal: con 10-40 → 0-100 los topes
+  // de tramo caían clavados en las fronteras (22 → 40 %), y redondearlos hacia dentro con
+  // Math.floor los mandaba al segmento de al lado, que es el error contrario.
+  const orden: ProfileType[] = ['conservador', 'moderado', 'equilibrado', 'dinamico', 'agresivo'];
+  const tipo = getProfile(score);
+  const indice = Math.max(0, orden.indexOf(tipo));
+  const [min, max] = PROFILES[tipo].range;
+  const anchoSegmento = 100 / orden.length;
+  const margen = 2;
+  const proporcion = max > min ? (score - min) / (max - min) : 0.5;
+  return indice * anchoSegmento + margen + proporcion * (anchoSegmento - 2 * margen);
+}
+
+/**
+ * Dónde se guarda el test a medio hacer.
+ *
+ * Vivía solo en `useState`: recargar a mitad del cuestionario borraba las respuestas sin
+ * previo aviso y devolvía a la portada (Inspector, 20/08/2026). Va a `sessionStorage`
+ * —no a `localStorage`— porque es un test de una sentada: sobrevive a un F5 accidental,
+ * y no reaparece semanas después con respuestas que ya no son las de esa persona.
+ */
+const CLAVE_SESION = 'meskeia:test-perfil-inversor:v1';
+
+interface EstadoGuardado {
+  currentQuestion: number;
+  answers: Record<number, number>;
+}
+
+function leerSesion(): EstadoGuardado | null {
+  try {
+    const bruto = sessionStorage.getItem(CLAVE_SESION);
+    if (!bruto) return null;
+    const datos = JSON.parse(bruto) as EstadoGuardado;
+    if (typeof datos?.currentQuestion !== 'number' || typeof datos?.answers !== 'object') {
+      return null;
+    }
+    return datos;
+  } catch {
+    // Ventana privada, almacenamiento bloqueado o JSON corrupto: se empieza de cero.
+    return null;
+  }
 }
 
 export default function TestPerfilInversorPage() {
@@ -262,14 +310,48 @@ export default function TestPerfilInversorPage() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
 
+  /** Recupera el test a medio hacer tras un F5. Solo en el primer render del cliente. */
+  useEffect(() => {
+    const guardado = leerSesion();
+    if (!guardado || Object.keys(guardado.answers).length === 0) return;
+    setAnswers(guardado.answers);
+    setCurrentQuestion(guardado.currentQuestion);
+    setPhase('questions');
+  }, []);
+
+  /** Guarda lo contestado mientras se está respondiendo. */
+  useEffect(() => {
+    if (phase !== 'questions') return;
+    try {
+      sessionStorage.setItem(CLAVE_SESION, JSON.stringify({ currentQuestion, answers }));
+    } catch {
+      // Almacenamiento no disponible: el test sigue funcionando, solo no sobrevive al F5.
+    }
+  }, [phase, currentQuestion, answers]);
+
+  const olvidarSesion = () => {
+    try {
+      sessionStorage.removeItem(CLAVE_SESION);
+    } catch {
+      // Nada que limpiar si no había dónde guardar.
+    }
+  };
+
   const handleStart = () => {
     setPhase('questions');
     setCurrentQuestion(0);
     setAnswers({});
+    olvidarSesion();
   };
 
   const handleAnswer = (questionId: number, points: number) => {
     setAnswers((prev) => ({ ...prev, [questionId]: points }));
+  };
+
+  /** Vuelve a la última pregunta CONSERVANDO lo contestado. */
+  const handleRevisar = () => {
+    setPhase('questions');
+    setCurrentQuestion(QUESTIONS.length - 1);
   };
 
   const handleNext = () => {
@@ -277,6 +359,10 @@ export default function TestPerfilInversorPage() {
       setCurrentQuestion((prev) => prev + 1);
     } else {
       setPhase('result');
+      // El cuestionario ya está terminado: lo que se guardaba era el test A MEDIAS, para
+      // que un F5 no lo borrase. Conservarlo después haría que quien vuelve a entrar
+      // aterrizara en la última pregunta en vez de en la portada.
+      olvidarSesion();
     }
   };
 
@@ -290,6 +376,7 @@ export default function TestPerfilInversorPage() {
     setPhase('start');
     setCurrentQuestion(0);
     setAnswers({});
+    olvidarSesion();
   };
 
   // Calcular puntuación total
@@ -346,7 +433,7 @@ export default function TestPerfilInversorPage() {
             </div>
           </div>
 
-          <button className={styles.startButton} onClick={handleStart}>
+          <button type="button" className={styles.startButton} onClick={handleStart}>
             Comenzar Test →
           </button>
         </div>
@@ -549,8 +636,10 @@ export default function TestPerfilInversorPage() {
                   <code>Pareja de 40 años, 2 hijos. Hipoteca de 1.000€/mes. Quieren complementar la jubilación.</code>
                 </div>
                 <p className={styles.escenarioTip}>
-                  <strong>Perfil recomendado: Moderado o Equilibrado.</strong> Tienen obligaciones financieras fijas.
-                  No pueden permitirse grandes caídas. Horizonte de 20–25 años permite algo de renta variable.
+                  <strong>Perfil recomendado: Equilibrado o Dinámico.</strong> Tienen obligaciones financieras
+                  fijas y no pueden permitirse grandes caídas en el corto plazo, pero el dinero de la jubilación
+                  no se toca en 20–25 años, y ese horizonte es el de los perfiles Equilibrado (5–10 años) y
+                  Dinámico (10–15). Cosa distinta es el colchón de emergencia, que va aparte y en liquidez.
                 </p>
               </div>
 
@@ -564,8 +653,10 @@ export default function TestPerfilInversorPage() {
                   <code>10 años para jubilarse. 100.000€ ahorrados. Necesitará el dinero a partir de los 65.</code>
                 </div>
                 <p className={styles.escenarioTip}>
-                  <strong>Perfil recomendado: Conservador o Moderado.</strong> Un crash del 40% a los 60 años sería devastador.
-                  La preservación de capital es prioritaria. Solo pequeña exposición a renta variable.
+                  <strong>Perfil recomendado: Moderado o Equilibrado.</strong> Un desplome a los 60 años sería
+                  difícil de recuperar y la preservación del capital pesa mucho, pero quedan 10 años hasta el
+                  primer reintegro y el dinero se irá retirando poco a poco después: el horizonte declarado del
+                  Conservador (menos de 3 años) es más corto que el de esta situación.
                 </p>
               </div>
 
@@ -913,6 +1004,10 @@ export default function TestPerfilInversorPage() {
             {question.options.map((option, index) => (
               <button
                 key={index}
+                type="button"
+                // La respuesta elegida solo se comunicaba por la clase CSS «selected», así
+                // que quien no ve la pantalla no podía saber qué tenía marcado.
+                aria-pressed={selectedAnswer === option.points}
                 className={`${styles.optionButton} ${selectedAnswer === option.points ? styles.selected : ''}`}
                 onClick={() => handleAnswer(question.id, option.points)}
               >
@@ -926,6 +1021,7 @@ export default function TestPerfilInversorPage() {
 
           <div className={styles.navigation}>
             <button
+              type="button"
               className={`${styles.navButton} ${styles.prev}`}
               onClick={handlePrev}
               disabled={currentQuestion === 0}
@@ -933,6 +1029,7 @@ export default function TestPerfilInversorPage() {
               ← Anterior
             </button>
             <button
+              type="button"
               className={`${styles.navButton} ${styles.next}`}
               onClick={handleNext}
               disabled={selectedAnswer === undefined}
@@ -962,6 +1059,18 @@ export default function TestPerfilInversorPage() {
           <div className={styles.resultIcon}>{profile.icon}</div>
           <h2 className={styles.resultTitle}>Tu perfil es:</h2>
           <p className={styles.resultProfile}>{profile.name}</p>
+          {/* La app entera se apoya en la puntuación —su propia FAQ pregunta qué pasa si
+              las respuestas quedan en el límite entre dos perfiles— y no la enseñaba
+              nunca: no había forma de saberse en el borde ni de rehacer la cuenta. */}
+          <p className={styles.resultScore}>
+            {formatNumber(totalScore, 0)} puntos · tramo {formatNumber(profile.range[0], 0)}–{formatNumber(profile.range[1], 0)}
+            {totalScore === profile.range[1] || totalScore === profile.range[0] ? (
+              <span className={styles.resultScoreBorde}>
+                {' '}— estás justo en el borde del tramo: con un punto de diferencia el
+                resultado sería el perfil de al lado
+              </span>
+            ) : null}
+          </p>
         </div>
 
         {/* Barra visual de perfil */}
@@ -1020,7 +1129,9 @@ export default function TestPerfilInversorPage() {
 
         {/* Distribución recomendada */}
         <div className={styles.allocationSection}>
-          <h4>📊 Distribución de activos recomendada</h4>
+          <h4>
+            <span aria-hidden="true">📊</span> Distribución de activos de ejemplo para este perfil
+          </h4>
           <div className={styles.allocationBar}>
             {profile.allocation.rv > 0 && (
               <div
@@ -1077,7 +1188,13 @@ export default function TestPerfilInversorPage() {
 
         {/* Recomendaciones */}
         <div className={styles.profileDescription}>
-          <h4>💡 Recomendaciones para tu perfil</h4>
+          <h4><span aria-hidden="true">💡</span> Ideas que suelen asociarse a este perfil</h4>
+          <p className={styles.recomendacionesNota}>
+            Son <strong>ejemplos ilustrativos</strong>, no una recomendación de inversión ni
+            de producto: los nombres concretos que aparecen sirven para reconocer categorías,
+            y proceden en buena parte de la literatura financiera anglosajona, que no siempre
+            encaja con la fiscalidad ni con la oferta de cada país.
+          </p>
           <ul style={{ margin: '0.5rem 0 0 1.2rem', padding: 0 }}>
             {profile.recommendations.map((rec, index) => (
               <li key={index} style={{ marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>
@@ -1098,6 +1215,13 @@ export default function TestPerfilInversorPage() {
           <Link href="/estimador-inversiones/" className={`${styles.actionButton} ${styles.secondary}`}>
             💼 Estimador de Inversiones
           </Link>
+          <button
+            type="button"
+            onClick={handleRevisar}
+            className={`${styles.actionButton} ${styles.secondary}`}
+          >
+            <span aria-hidden="true">✏️</span> Revisar mis respuestas
+          </button>
           <button type="button" onClick={handleRestart} className={`${styles.actionButton} ${styles.secondary}`}>
             🔄 Repetir Test
           </button>

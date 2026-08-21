@@ -90,7 +90,7 @@ async function celdasDeLaHoja(page: Page) {
 async function caracteresDelAviso(page: Page) {
   return page.evaluate(() => {
     const aviso = [...document.querySelectorAll('[class*="avisoConversion"]')].find((p) =>
-      (p.textContent || '').includes('No se ha escrito en braille'),
+      (p.textContent || '').includes('Esta herramienta no escribe en braille'),
     );
     return aviso ? (aviso.querySelector('strong')?.innerHTML ?? null) : null;
   });
@@ -174,7 +174,6 @@ test('CASO 1 (normal) — «¡Sí, señor!» se transcribe signo a signo según 
 test('CASO 2 (límite) — el signo de número ⠼ cubre la coma decimal y el punto de millar', async ({
   page,
 }) => {
-  test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
   await page.goto(RUTA);
 
   // ── Ejemplo literal del B 2 § 8.1: 73,81 → #GC,HA ──────────────────────────
@@ -224,7 +223,6 @@ test('CASO 2 (límite) — el signo de número ⠼ cubre la coma decimal y el pu
 test('CASO 3 (sin representación) — descarta lo que no tiene celda sin perder el resto', async ({
   page,
 }) => {
-  test.fail(); // hallazgo abierto: quitar esta línea el día que se reparen (a) y (b)
   await page.goto(RUTA);
 
   // ── Entrada vacía: no inventa resultado. Esto SÍ degrada con elegancia. ────
@@ -237,7 +235,7 @@ test('CASO 3 (sin representación) — descarta lo que no tiene celda sin perder
   await convertir(page, 'sol 🙂');
   await expect(cajaResultado(page)).toHaveText('⠎⠕⠇⠀');
   expect(await celdasVisuales(page)).toEqual(['2-3-4', '1-3-5', '1-2-3', 'vacia']);
-  await expect(page.getByText(/No se ha escrito en braille/)).toBeVisible();
+  await expect(page.getByText(/Esta herramienta no escribe en braille/)).toBeVisible();
   expect(await caracteresDelAviso(page)).toBe('🙂'); // el aviso nombra algo legible
 
   // ── (a) El apóstrofo, que sí está en el B 2 § 6.2 ─────────────────────────
@@ -247,7 +245,7 @@ test('CASO 3 (sin representación) — descarta lo que no tiene celda sin perder
   await page.goto(RUTA);
   await convertir(page, "d'or");
   await expect.soft(cajaResultado(page)).toHaveText('⠙⠄⠕⠗');
-  await expect.soft(page.getByText(/No se ha escrito en braille/)).toHaveCount(0);
+  await expect.soft(page.getByText(/Esta herramienta no escribe en braille/)).toHaveCount(0);
 
   // ── (b) Dos líneas no pueden acabar siendo una sola palabra ───────────────
   //   sal      = ⠎(2-3-4) ⠁(1) ⠇(1-2-3)
@@ -321,4 +319,33 @@ test('REGRESIÓN — puntuación del § 6.1 y vocales con diacrítico', async ({
   await page.goto(RUTA);
   await convertir(page, '⠓⠕⠇⠁⠄', 'braille');
   await expect(cajaResultado(page)).toHaveText('hola.');
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// REGRESIÓN — los dos sentidos avisan de lo mismo (hallazgo 62, 21/08/2026)
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// En «Texto → Braille» la app avisaba de lo que no podía escribir, pero en la dirección
+// contraria una celda desconocida se colaba tal cual en la salida sin decir nada: el
+// resultado dejaba de ser texto en español y nadie lo advertía.
+test('REGRESIÓN — la barra inclinada del § 6.2 y el aviso de la vuelta', async ({ page }) => {
+  // La barra inclinada es un signo de DOS celdas: punto 6 (⠠) + punto 2 (⠂).
+  await page.goto(RUTA);
+  await convertir(page, '24/08');
+  //   ⠼ signo de número · 2=b=⠃ · 4=d=⠙ · ⠠⠂ barra · ⠼ reabre · 0=j=⠚ · 8=h=⠓
+  await expect(cajaResultado(page)).toHaveText('⠼⠃⠙⠠⠂⠼⠚⠓');
+  await expect(page.getByText(/Esta herramienta no escribe en braille/)).toHaveCount(0);
+
+  // Y vuelve como barra, no como «punto 6 seguido de coma».
+  await page.goto(RUTA);
+  await convertir(page, '⠼⠃⠙⠠⠂⠼⠚⠓', 'braille');
+  await expect(cajaResultado(page)).toHaveText('24/08');
+
+  // Una celda que la app no sabe leer pasa al resultado, pero ahora lo dice.
+  await page.goto(RUTA);
+  await convertir(page, '⠓⠕⠇⠁⠫', 'braille');
+  await expect(cajaResultado(page)).toHaveText('hola⠫');
+  await expect(page.locator('[class*="avisoConversion"]').filter({ hasText: 'sin traducir' })).toContainText(
+    '⠫',
+  );
 });

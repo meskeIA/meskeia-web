@@ -90,7 +90,7 @@ function SvgEsfera({ radio }: { radio: number }) {
       <ellipse cx={CX} cy={CY} rx={r} ry={r * 0.25} fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="1" />
       <ellipse cx={CX} cy={CY} rx={r * 0.25} ry={r} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeDasharray="3,3" />
       <line x1={CX} y1={CY} x2={CX + r} y2={CY} stroke="white" strokeWidth="1.5" strokeDasharray="3,2" opacity="0.85" />
-      <text x={CX + r * 0.5 + 2} y={CY - 8} textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">r={radio}</text>
+      <text x={CX + r * 0.5 + 2} y={CY - 8} textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">r={medExacta(radio)}</text>
     </>
   );
 }
@@ -127,9 +127,9 @@ function SvgCubo({ ancho, largo, alto }: { ancho: number; largo: number; alto: n
       <polygon points={ptsStr([b01, b11, t11, t01])} fill="#48A9A6" fillOpacity="0.72" stroke="#1a5278" strokeWidth="1.5" strokeLinejoin="round" />
       <polygon points={ptsStr([b10, b11, t11, t10])} fill="#2E86AB" fillOpacity="0.72" stroke="#1a5278" strokeWidth="1.5" strokeLinejoin="round" />
       <polygon points={ptsStr([t00, t10, t11, t01])} fill="#7FB3D3" fillOpacity="0.78" stroke="#1a5278" strokeWidth="1.5" strokeLinejoin="round" />
-      <text x={mB01B11[0]} y={mB01B11[1] + 17} textAnchor="middle" fill="var(--text-primary)" fontSize="11" fontWeight="bold">a={ancho}</text>
-      <text x={mB10B11[0]} y={mB10B11[1] + 17} textAnchor="middle" fill="var(--text-primary)" fontSize="11" fontWeight="bold">b={largo}</text>
-      <text x={b10[0] + 9} y={mB10T10[1] + 4} textAnchor="start" fill="var(--text-primary)" fontSize="11" fontWeight="bold">h={alto}</text>
+      <text x={mB01B11[0]} y={mB01B11[1] + 17} textAnchor="middle" fill="var(--text-primary)" fontSize="11" fontWeight="bold">a={medExacta(ancho)}</text>
+      <text x={mB10B11[0]} y={mB10B11[1] + 17} textAnchor="middle" fill="var(--text-primary)" fontSize="11" fontWeight="bold">b={medExacta(largo)}</text>
+      <text x={b10[0] + 9} y={mB10T10[1] + 4} textAnchor="start" fill="var(--text-primary)" fontSize="11" fontWeight="bold">h={medExacta(alto)}</text>
     </>
   );
 }
@@ -164,11 +164,11 @@ function SvgCilindro({ radio, altura }: { radio: number; altura: number }) {
       <ellipse cx={CX} cy={botY} rx={rx} ry={ry} fill="#2E86AB" fillOpacity="0.65" stroke="#1a5278" strokeWidth="1.5" />
       <ellipse cx={CX} cy={topY} rx={rx} ry={ry} fill="url(#gCylTop)" stroke="#1a5278" strokeWidth="1.5" />
       <line x1={CX} y1={topY} x2={CX + rx} y2={topY} stroke="white" strokeWidth="1.5" strokeDasharray="3,2" opacity="0.85" />
-      <text x={CX + rx / 2 + 2} y={topY - 8} textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">r={radio}</text>
+      <text x={CX + rx / 2 + 2} y={topY - 8} textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">r={medExacta(radio)}</text>
       <line x1={CX + rx + 10} y1={topY} x2={CX + rx + 10} y2={botY} stroke="var(--text-secondary)" strokeWidth="1" strokeDasharray="2,2" />
       <line x1={CX + rx + 6} y1={topY} x2={CX + rx + 14} y2={topY} stroke="var(--text-secondary)" strokeWidth="1" />
       <line x1={CX + rx + 6} y1={botY} x2={CX + rx + 14} y2={botY} stroke="var(--text-secondary)" strokeWidth="1" />
-      <text x={CX + rx + 16} y={(topY + botY) / 2 + 4} textAnchor="start" fill="var(--text-primary)" fontSize="11" fontWeight="bold">h={altura}</text>
+      <text x={CX + rx + 16} y={(topY + botY) / 2 + 4} textAnchor="start" fill="var(--text-primary)" fontSize="11" fontWeight="bold">h={medExacta(altura)}</text>
     </>
   );
 }
@@ -205,11 +205,11 @@ function SvgCono({ radio, altura }: { radio: number; altura: number }) {
       <ellipse cx={CX} cy={baseY} rx={rx} ry={ry} fill="#2E86AB" fillOpacity="0.65" stroke="#1a5278" strokeWidth="1.5" />
       <circle cx={CX} cy={apexY} r={3} fill="white" stroke="#1a5278" strokeWidth="1" />
       <line x1={CX} y1={baseY} x2={CX + rx} y2={baseY} stroke="white" strokeWidth="1.5" strokeDasharray="3,2" opacity="0.85" />
-      <text x={CX + rx / 2 + 2} y={baseY + 17} textAnchor="middle" fill="var(--text-primary)" fontSize="11" fontWeight="bold">r={radio}</text>
+      <text x={CX + rx / 2 + 2} y={baseY + 17} textAnchor="middle" fill="var(--text-primary)" fontSize="11" fontWeight="bold">r={medExacta(radio)}</text>
       <line x1={CX + rx + 10} y1={apexY} x2={CX + rx + 10} y2={baseY} stroke="var(--text-secondary)" strokeWidth="1" strokeDasharray="2,2" />
       <line x1={CX + rx + 6} y1={apexY} x2={CX + rx + 14} y2={apexY} stroke="var(--text-secondary)" strokeWidth="1" />
       <line x1={CX + rx + 6} y1={baseY} x2={CX + rx + 14} y2={baseY} stroke="var(--text-secondary)" strokeWidth="1" />
-      <text x={CX + rx + 16} y={(apexY + baseY) / 2 + 4} textAnchor="start" fill="var(--text-primary)" fontSize="11" fontWeight="bold">h={altura}</text>
+      <text x={CX + rx + 16} y={(apexY + baseY) / 2 + 4} textAnchor="start" fill="var(--text-primary)" fontSize="11" fontWeight="bold">h={medExacta(altura)}</text>
     </>
   );
 }
@@ -242,8 +242,8 @@ function SvgPiramide({ lado, altura }: { lado: number; altura: number }) {
       <polygon points={ptsStr([apex, b10, b11])} fill="#2E86AB" fillOpacity="0.72" stroke="#1a5278" strokeWidth="1.5" strokeLinejoin="round" />
       <line x1={apex[0]} y1={apex[1]} x2={center[0]} y2={center[1]} stroke="white" strokeWidth="1" strokeDasharray="2,2" opacity="0.6" />
       <circle cx={apex[0]} cy={apex[1]} r={3} fill="white" stroke="#1a5278" strokeWidth="1" />
-      <text x={apex[0] - 26} y={(apex[1] + center[1]) / 2 + 4} textAnchor="middle" fill="white" fontSize="11" fontWeight="bold">h={altura}</text>
-      <text x={mB10B11[0]} y={mB10B11[1] + 17} textAnchor="middle" fill="var(--text-primary)" fontSize="11" fontWeight="bold">l={lado}</text>
+      <text x={apex[0] - 26} y={(apex[1] + center[1]) / 2 + 4} textAnchor="middle" fill="white" fontSize="11" fontWeight="bold">h={medExacta(altura)}</text>
+      <text x={mB10B11[0]} y={mB10B11[1] + 17} textAnchor="middle" fill="var(--text-primary)" fontSize="11" fontWeight="bold">l={medExacta(lado)}</text>
     </>
   );
 }
@@ -273,17 +273,31 @@ function getFormula(figura: Figura, p: {
   switch (figura) {
     // Con decimales en juego, interpolar el número tal cual escribiría "12.5" a la
     // española: la medida se teclea con coma y la fórmula debe devolverla igual.
-    case 'esfera': return `V = (4/3) × π × r³ = (4/3) × π × ${med(p.radio)}³`;
-    case 'cubo': return `V = a × b × h = ${med(p.ancho)} × ${med(p.largo)} × ${med(p.alto)}`;
-    case 'cilindro': return `V = π × r² × h = π × ${med(p.radioCil)}² × ${med(p.alturaCil)}`;
-    case 'cono': return `V = (1/3) × π × r² × h = (1/3) × π × ${med(p.radioCon)}² × ${med(p.alturaCon)}`;
-    case 'piramide': return `V = (1/3) × l² × h = (1/3) × ${med(p.lado)}² × ${med(p.alturaPir)}`;
+    case 'esfera': return `V = (4/3) × π × r³ = (4/3) × π × ${medExacta(p.radio)}³`;
+    case 'cubo': return `V = a × b × h = ${medExacta(p.ancho)} × ${medExacta(p.largo)} × ${medExacta(p.alto)}`;
+    case 'cilindro': return `V = π × r² × h = π × ${medExacta(p.radioCil)}² × ${medExacta(p.alturaCil)}`;
+    case 'cono': return `V = (1/3) × π × r² × h = (1/3) × π × ${medExacta(p.radioCon)}² × ${medExacta(p.alturaCon)}`;
+    case 'piramide': return `V = (1/3) × l² × h = (1/3) × ${medExacta(p.lado)}² × ${medExacta(p.alturaPir)}`;
   }
 }
 
 // Una medida escrita por el usuario: sin decimales si es entera, con los que tenga si no
 function med(v: number): string {
   return formatNumber(v, Number.isInteger(v) ? 0 : 2);
+}
+
+/**
+ * La medida tal cual entra en el cálculo, sin redondear.
+ *
+ * La caja «Fórmula aplicada» usaba `med()`, de dos decimales, mientras el volumen se
+ * calcula con el valor completo: quien rehacía a mano la operación que la app enseña no
+ * llegaba al número que la app muestra (Inspector, 20/08/2026). Hasta seis decimales,
+ * que es donde el campo deja de admitir más.
+ */
+function medExacta(v: number): string {
+  if (Number.isInteger(v)) return formatNumber(v, 0);
+  const decimales = Math.min(6, (String(v).split('.')[1] ?? '').length);
+  return formatNumber(v, decimales);
 }
 
 function formatVolumen(v: number): string {
@@ -316,12 +330,30 @@ function Slider({ label, valor, min, max, onChange, simbolo = '' }: SliderProps)
   // de r=12,5 había que redondearla a 13 (un 8 % de desviación) y un depósito de r=120 no
   // tenía manera de entrar. El slider sigue estando para explorar; el campo es para medir.
   const [texto, setTexto] = useState(() => med(valor));
+  /**
+   * Una entrada inválida se ignoraba en silencio: el texto malo se quedaba escrito
+   * mientras la app seguía calculando con la última medida válida, así que el número
+   * de la pantalla no correspondía a lo que se leía en el campo (Inspector, 20/08/2026).
+   */
+  const [avisoCampo, setAvisoCampo] = useState('');
 
-  const desdeSlider = (v: number) => { setTexto(med(v)); onChange(v); };
+  const desdeSlider = (v: number) => { setTexto(med(v)); setAvisoCampo(''); onChange(v); };
   const desdeCampo = (t: string) => {
     setTexto(t);
+    if (t.trim() === '') { setAvisoCampo(''); return; }
     const n = parseSpanishNumber(t);
-    if (!isNaN(n) && n > 0 && n <= DIM_MAX_CAMPO) onChange(n);
+    if (isNaN(n)) {
+      setAvisoCampo('Escribe un número: se sigue calculando con la última medida válida.');
+      return;
+    }
+    if (n <= 0 || n > DIM_MAX_CAMPO) {
+      setAvisoCampo(
+        `La medida debe estar entre 0 y ${formatNumber(DIM_MAX_CAMPO, 0)}: se sigue calculando con la última válida.`,
+      );
+      return;
+    }
+    setAvisoCampo('');
+    onChange(n);
   };
 
   return (
@@ -337,6 +369,8 @@ function Slider({ label, valor, min, max, onChange, simbolo = '' }: SliderProps)
             onChange={(e) => desdeCampo(e.target.value)}
             className={styles.paramCampo}
             aria-label={`${label}, medida exacta`}
+            aria-invalid={avisoCampo !== ''}
+            aria-describedby={avisoCampo ? `${idCampo}-aviso` : undefined}
           />
           {simbolo && <span className={styles.paramSimbolo}>{simbolo}</span>}
         </span>
@@ -351,11 +385,24 @@ function Slider({ label, valor, min, max, onChange, simbolo = '' }: SliderProps)
         onChange={(e) => desdeSlider(Number(e.target.value))}
         className={styles.sliderRange}
         aria-label={`${label}, control deslizante: ${med(valor)}${simbolo}`}
+        style={
+          {
+            '--slider-pct': `${((Math.min(Math.max(valor, min), max) - min) / (max - min)) * 100}%`,
+          } as React.CSSProperties
+        }
       />
       <div className={styles.sliderLimits}>
-        <span>{min}</span>
+        {/* Por debajo del mínimo no había aviso, al contrario que por arriba: el
+            deslizador marcaba el mínimo y el pie seguía anunciando el rango normal,
+            así que campo y deslizador decían cosas distintas. */}
+        <span>{valor < min ? `${med(valor)} · fuera del deslizador` : min}</span>
         <span>{valor > max ? `${med(valor)} · fuera del deslizador` : max}</span>
       </div>
+      {avisoCampo && (
+        <p id={`${idCampo}-aviso`} role="alert" className={styles.avisoCampo}>
+          {avisoCampo}
+        </p>
+      )}
     </div>
   );
 }

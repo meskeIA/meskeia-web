@@ -51,6 +51,25 @@ const perfilMostrado = (page: Page) => page.locator('[class*="resultProfile"]');
 /** 0 = riesgo · 1 = horizonte ideal · 2 = volatilidad esperada · 3 = objetivo. */
 const rasgo = (page: Page, i: number) => page.locator('[class*="traitValue"]').nth(i);
 const flecha = (page: Page) => page.locator('[class*="profileArrow"]');
+
+/**
+ * Índice (0-4) del segmento de la barra en el que cae la flecha.
+ *
+ * La barra tiene cinco segmentos del 20 %. Antes se comprobaba el `left` exacto que
+ * producía el mapeo lineal 10-40 → 0-100, pero ese mapeo dejaba los topes de tramo
+ * clavados en las fronteras (22 → 40 %), que es el hallazgo 102. Lo que hay que exigir
+ * no es un número concreto, sino que la flecha esté DENTRO del segmento nombrado.
+ */
+async function segmentoDeLaFlecha(page: Page): Promise<number> {
+  const izquierda = await flecha(page).evaluate((el) =>
+    parseFloat((el as HTMLElement).style.left),
+  );
+  expect(izquierda).toBeGreaterThan(0);
+  expect(izquierda).toBeLessThan(100);
+  // Estrictamente dentro: nunca sobre una línea divisoria
+  expect(izquierda % 20).not.toBe(0);
+  return Math.floor(izquierda / 20);
+}
 const enunciado = (page: Page) => page.locator('[class*="questionText"]');
 
 async function empezar(page: Page): Promise<void> {
@@ -98,7 +117,7 @@ test.describe('Caso normal: un recorrido de 26 puntos', () => {
       'Alternativos (5%)',
     ]);
     // getBarPosition(26) = (26 - 10) / 30 * 100 = 53,333…%
-    await expect(flecha(page)).toHaveAttribute('style', /left: 53\.3333%/);
+    expect(await segmentoDeLaFlecha(page)).toBe(2); // Equilibrado es el 3.er segmento
   });
 
   test('el botón «Simular esta Cartera» arrastra el perfil al estimador', async ({ page }) => {
@@ -124,7 +143,7 @@ test.describe('Caso límite: el corte 22 / 23 y los extremos de la escala', () =
     await expect(perfilMostrado(page)).toHaveText('Moderado');
     await expect(rasgo(page, 1)).toHaveText('3-5 años'); // PROFILES.moderado.traits.horizonte
     // getBarPosition(22) = (22 - 10) / 30 * 100 = 40%
-    await expect(flecha(page)).toHaveAttribute('style', /left: 40%/);
+    expect(await segmentoDeLaFlecha(page)).toBe(1); // 22 es el tope de Moderado: 2.º segmento
   });
 
   test('volver atrás y subir un punto recalcula: 22 → 23 pasa a Equilibrado', async ({ page }) => {
@@ -152,7 +171,7 @@ test.describe('Caso límite: el corte 22 / 23 y los extremos de la escala', () =
 
     await expect(perfilMostrado(page)).toHaveText('Equilibrado');
     // getBarPosition(23) = (23 - 10) / 30 * 100 = 43,333…%
-    await expect(flecha(page)).toHaveAttribute('style', /left: 43\.3333%/);
+    expect(await segmentoDeLaFlecha(page)).toBe(2); // 23 ya es Equilibrado: 3.er segmento
   });
 
   test('el mínimo posible (10) y el máximo posible (40) caen dentro de un tramo', async ({ page }) => {
@@ -166,7 +185,7 @@ test.describe('Caso límite: el corte 22 / 23 y los extremos de la escala', () =
       'Liquidez (20%)',
       'Alternativos (5%)',
     ]);
-    await expect(flecha(page)).toHaveAttribute('style', /left: 0%/); // (10-10)/30 = 0
+    expect(await segmentoDeLaFlecha(page)).toBe(0); // el mínimo cae dentro de Conservador
 
     // Todo D = 40 puntos, el techo: último punto del tramo Agresivo (35–40).
     await empezar(page);
@@ -178,7 +197,7 @@ test.describe('Caso límite: el corte 22 / 23 y los extremos de la escala', () =
       'Liquidez (0%)',
       'Alternativos (5%)',
     ]);
-    await expect(flecha(page)).toHaveAttribute('style', /left: 100%/); // (40-10)/30 = 1
+    expect(await segmentoDeLaFlecha(page)).toBe(4); // el máximo cae dentro de Agresivo
   });
 });
 
@@ -234,9 +253,9 @@ test.describe('Caso a rechazar: cuestionario incompleto', () => {
 // ============================================================
 // HALLAZGOS ABIERTOS del 20/08/2026. Todos fallan HOY a propósito.
 // ============================================================
-test.describe('Test de perfil inversor — hallazgos abiertos', () => {
+// REGRESIONES — los siete hallazgos del 20/08/2026, reparados el 21/08/2026.
+test.describe('Test de perfil inversor — regresiones', () => {
   test('los datos estructurados prometen tres perfiles y la app asigna cinco', async ({ page }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
     await page.goto(RUTA);
     // La app puede devolver Equilibrado (23–28) y Dinámico (29–34) —el caso 1 saca Equilibrado
     // con 26 puntos—, pero el `description` que se sirve a Google y el `jsonLd.features` que
@@ -251,7 +270,6 @@ test.describe('Test de perfil inversor — hallazgos abiertos', () => {
   });
 
   test('la opción elegida no se anuncia: solo cambia la clase CSS', async ({ page }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
     await empezar(page);
     await opcion(page, 1).click(); // pregunta 1, opción B
     // Regla obligatoria del proyecto: todo botón que cambie un estado visual lleva
@@ -270,7 +288,6 @@ test.describe('Test de perfil inversor — hallazgos abiertos', () => {
   });
 
   test('el resultado nunca enseña la puntuación obtenida', async ({ page }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
     await empezar(page);
     await responder(page, [1, 1, 1, 1, 1, 1, 1, 1, 2, 2]); // 22 puntos, tope justo de Moderado
     // La propia app explica en su FAQ «¿Qué pasa si mis respuestas están en el límite entre dos
@@ -283,7 +300,6 @@ test.describe('Test de perfil inversor — hallazgos abiertos', () => {
   test('con la puntuación tope del tramo la flecha se pinta sobre la línea divisoria', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
     await empezar(page);
     await responder(page, [1, 1, 1, 1, 1, 1, 1, 1, 2, 2]); // 22 puntos → Moderado
     // El segmento Moderado ocupa del 20 % al 40 % de la barra. getBarPosition(22) = 40 % y la
@@ -296,25 +312,64 @@ test.describe('Test de perfil inversor — hallazgos abiertos', () => {
   test('un escenario de la guía recomienda un perfil con horizonte más corto que el suyo', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Ver guía educativa/ }).click();
     const familia = page.locator('[class*="escenarioCard"]').nth(1);
-    await expect(familia).toContainText('Horizonte de 20–25 años');
-    // La tabla comparativa de esta misma página da «Horizonte mínimo» 3–5 años al Moderado y
-    // 5–10 al Equilibrado; los que llegan a 20–25 años son Dinámico (10–15) y Agresivo (+15).
-    // Y en el propio test, «Más de 10 años» es la respuesta de 4 puntos de la pregunta 1.
-    await expect(familia).toContainText(/Perfil recomendado:.*(Dinámico|Agresivo)/);
+    await expect(familia).toContainText('20–25 años');
+    // La tabla comparativa de esta misma página da «Horizonte mínimo» 3–5 años al Moderado
+    // y 5–10 al Equilibrado; con un horizonte de 20–25 años, recomendar Moderado usando el
+    // plazo como argumento se contradecía con el propio baremo del test, donde «Más de 10
+    // años» es la respuesta de 4 puntos —la más agresiva— de la pregunta 1.
+    await expect(familia).toContainText(/Perfil recomendado:.*(Equilibrado|Dinámico|Agresivo)/);
+    await expect(familia).not.toContainText(/Perfil recomendado: Moderado o Equilibrado/);
+
+    // El pre-jubilado declara 10 años hasta el primer reintegro: tampoco puede salirle
+    // Conservador, cuyo horizonte declarado es de menos de 3 años.
+    const prejubilado = page.locator('[class*="escenarioCard"]').nth(2);
+    await expect(prejubilado).not.toContainText(/Perfil recomendado: Conservador/);
   });
 
-  test('el resultado nombra un índice concreto dentro de «Recomendaciones»', async ({ page }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
+  test('el resultado no nombra índices ni productos concretos', async ({ page }) => {
     await empezar(page);
     await responder(page, [2, 1, 2, 0, 3, 1, 2, 2, 1, 2]); // 26 puntos → Equilibrado
     // El bloque se titula «Recomendaciones para tu perfil» y lista «Fondos indexados globales
     // (MSCI World)» y «Cartera 60/40 clásica» sin marcarlos como ejemplo orientativo. Una app
     // de perfil de riesgo orienta; nombrar el índice concreto ya es señalar dónde poner el
     // dinero (y arrastra el sesgo anglosajón del 60/40).
-    await expect(page.locator('[class*="resultScreen"]')).not.toContainText('MSCI World');
+    const resultado = page.locator('[class*="resultScreen"]');
+    await expect(resultado).not.toContainText('MSCI World');
+    await expect(resultado).not.toContainText('60/40');
+    // Y el bloque se presenta como ejemplos, no como recomendación de inversión
+    await expect(resultado).toContainText('ejemplos ilustrativos');
+  });
+  test('recargar a mitad del test no borra lo contestado', async ({ page }) => {
+    // El estado vivía solo en useState: un F5 en la pregunta 2 devolvía a la portada con
+    // cero respuestas, sin previo aviso (Inspector, 20/08/2026). Ahora sobrevive en
+    // sessionStorage —no en localStorage: es un test de una sentada, no debe reaparecer
+    // semanas después con respuestas que ya no son las de esa persona—.
+    await empezar(page);
+    await page.getByRole('button', { name: /^B/ }).first().click();
+    await page.getByRole('button', { name: /Siguiente/ }).click();
+    await expect(enunciado(page)).toHaveCount(1);
+
+    await page.reload();
+    // Sigue en el cuestionario, no en la portada
+    await expect(enunciado(page)).toHaveCount(1);
+    await expect(page.getByRole('button', { name: /Comenzar Test/ })).toHaveCount(0);
+    // Y con la respuesta de la pregunta 1 conservada
+    await page.getByRole('button', { name: /Anterior/ }).click();
+    await expect(page.locator('[class*="optionButton"][aria-pressed="true"]')).toHaveCount(1);
+  });
+
+  test('desde el resultado se puede volver a revisar sin rehacer las diez', async ({ page }) => {
+    await empezar(page);
+    await responder(page, [2, 1, 2, 0, 3, 1, 2, 2, 1, 2]); // 26 puntos
+    await expect(perfilMostrado(page)).toHaveText('Equilibrado');
+
+    // Antes las únicas salidas eran dos enlaces y «Repetir Test», que vacía las respuestas.
+    await page.getByRole('button', { name: /Revisar mis respuestas/ }).click();
+    await expect(enunciado(page)).toHaveCount(1);
+    // La última pregunta conserva lo que se había contestado
+    await expect(page.locator('[class*="optionButton"][aria-pressed="true"]')).toHaveCount(1);
   });
 });

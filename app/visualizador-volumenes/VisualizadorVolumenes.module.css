@@ -111,6 +111,19 @@
     grid-template-columns: 1fr;
     padding: 1.25rem 1rem;
   }
+
+  /* Los controles y el resultado van ANTES que el dibujo: en una pantalla estrecha el
+     SVG ocupa toda la altura visible y empujaba la herramienta fuera del pliegue, así
+     que la app se cargaba sin que se viera un solo control ni el número. */
+  .svgPanel {
+    order: 2;
+    min-height: 200px;
+    padding: 1rem;
+  }
+
+  .controlPanel {
+    order: 1;
+  }
 }
 
 /* =========================================================
@@ -254,6 +267,22 @@
 .sliderRange:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
+}
+
+.avisoCampo {
+  margin: 0.35rem 0 0;
+  padding: 0.35rem 0.6rem;
+  border-left: 3px solid #c0392b;
+  border-radius: var(--radius, 6px);
+  background: rgba(192, 57, 43, 0.08);
+  color: #c0392b;
+  font-size: 0.82rem;
+}
+
+[data-theme='dark'] .avisoCampo {
+  background: rgba(192, 57, 43, 0.18);
+  color: #f5b7b1;
+  border-left-color: #f5b7b1;
 }
 
 .sliderLimits {

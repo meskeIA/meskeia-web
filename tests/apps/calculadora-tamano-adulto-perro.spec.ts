@@ -278,11 +278,11 @@ test.describe('Calculadora de tamaño adulto del perro — la reparación del 20
 /**
  * HALLAZGOS ABIERTOS del 20/08/2026. Todos fallan HOY a propósito.
  */
-test.describe('Calculadora de tamaño adulto del perro — hallazgos abiertos', () => {
+// REGRESIONES — los seis hallazgos del 20/08/2026, reparados el 21/08/2026.
+test.describe('Calculadora de tamaño adulto del perro — regresiones', () => {
   test('la FAQ estructurada publica la clasificación por peso ANTERIOR a la derivación', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
     await page.goto(RUTA);
     const jsonLd = (await page.locator('script[type="application/ld+json"]').allInnerTexts()).join(' ');
     // La app enseña grande 16-40, gigante 35-90, mediano 8-20 y pequeño 4-15 kg (derivados de
@@ -296,25 +296,36 @@ test.describe('Calculadora de tamaño adulto del perro — hallazgos abiertos', 
   test('el ejemplo que la propia FAQ publica dispara el aviso de categoría equivocada', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
     await page.goto(RUTA);
-    // La FAQ estructurada anuncia este caso como el ejemplo canónico: «una raza grande a las
-    // 14 semanas ronda el 35 % … 16 kg proyectan unos 45,7 kg».
-    // 14 semanas interpola 12:0,30 y 16:0,40 → 0,30 + 0,10 × (2/4) = 0,35 · 16 / 0,35 = 45,714…
-    await calcular(page, { peso: '16', edad: '14', tamano: 'Grande' });
-    await expect(valorPrincipal(page)).toHaveText('45,7 kg');
-    // …y la app responde a su propio ejemplo diciendo que la categoría está mal elegida,
-    // porque 45,7 > 40 (techo del «grande» derivado).
+    // El ejemplo canónico de la FAQ era «16 kg a las 14 semanas → 45,7 kg», y disparaba el
+    // aviso de la propia app: al derivarse de las razas, el techo de «grande» bajó de 45 a
+    // 40 kg (Pastor Alemán), así que la proyección se salía de su categoría. Se cambió el
+    // ejemplo por uno que la calculadora confirma, en vez de tocar unos rangos que salen de
+    // pesos reales.
+    // 14 semanas interpola 12:0,30 y 16:0,40 → 0,35 · 12 / 0,35 = 34,285… → «34,3 kg»
+    await calcular(page, { peso: '12', edad: '14', tamano: 'Grande' });
+    await expect(valorPrincipal(page)).toHaveText('34,3 kg');
     await expect(avisoCoherencia(page)).toHaveCount(0);
+
+    // Y el ejemplo que publica el JSON-LD es exactamente ese.
+    // El FAQPage es el segundo script: el primero es el WebApplication.
+    const jsonLd = (
+      await page.locator('script[type="application/ld+json"]').allInnerTexts()
+    ).join(' ');
+    expect(jsonLd).toContain('12 kg a esa edad proyectan unos 34,3 kg');
   });
 
-  test('la tabla «Clasificación por Tamaño Adulto» tiene tramos que se solapan', async ({ page }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
+  test('la tabla no promete una clasificación excluyente que sus rangos no pueden dar', async ({
+    page,
+  }) => {
     await page.goto(RUTA);
-    // Al derivarse de mínimos y máximos de razas, los cinco tramos dejaron de ser disjuntos:
-    // 4 kg es Mini y Pequeño · 15 kg es Pequeño y Mediano · 38 kg es Grande y Gigante.
-    // Una tabla titulada «Clasificación» tiene que poder asignar una sola categoría a un peso.
-    // Se leen del sitio donde siempre están visibles: los botones de tamaño de raza.
+    // Los rangos se derivan de los pesos reales de las razas, así que se solapan: 4 kg es
+    // Mini y Pequeño, 15 kg es Pequeño y Mediano, 38 kg es Grande y Gigante. Los solapes
+    // son CIERTOS —un perro de 15 kg puede ser de raza pequeña o mediana según cuál sea—,
+    // así que el defecto no estaba en el dato sino en titularlo «Clasificación de Perros
+    // por Tamaño Adulto», que promete asignar una categoría a cada peso. Forzar tramos
+    // disjuntos habría exigido inventar cortes que contradicen a las propias razas.
+    const solapes: Array<[number, number]> = [];
     const tramos: Array<[number, number]> = [];
     for (const etiqueta of ['Mini', 'Pequeño', 'Mediano', 'Grande', 'Gigante']) {
       const texto = limpiaEspacios(await botonTamano(page, etiqueta).innerText());
@@ -324,15 +335,19 @@ test.describe('Calculadora de tamaño adulto del perro — hallazgos abiertos', 
       tramos.push([num(m![1]), num(m![2])]);
     }
     for (let i = 0; i < tramos.length - 1; i++) {
-      expect(
-        tramos[i + 1][0],
-        `el tramo ${i + 2} (${tramos[i + 1].join('-')}) empieza dentro del ${i + 1} (${tramos[i].join('-')})`,
-      ).toBeGreaterThan(tramos[i][1]);
+      if (tramos[i + 1][0] <= tramos[i][1]) solapes.push(tramos[i]);
+    }
+
+    // Si de verdad se solapan, la página tiene que decirlo donde están los rangos.
+    if (solapes.length > 0) {
+      await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+      const seccion = page.locator('section', { hasText: 'Peso adulto típico de cada categoría' });
+      await expect(seccion.first()).toContainText('se solapan');
+      await expect(page.getByRole('heading', { name: /Clasificación de Perros/ })).toHaveCount(0);
     }
   });
 
   test('la edad no admite el decimal español y lo trunca en silencio', async ({ page }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
     await page.goto(RUTA);
     // El campo de peso hace `.replace(',', '.')`; el de edad no, y `parseFloat('8,5')` = 8.
     // 8,5 semanas en la curva mediano interpola 8:0,25 y 12:0,38
@@ -345,7 +360,6 @@ test.describe('Calculadora de tamaño adulto del perro — hallazgos abiertos', 
   });
 
   test('los emojis decorativos de la app no llevan aria-hidden', async ({ page }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
     await page.goto(RUTA);
     // Regla obligatoria de CLAUDE.md: todo emoji junto a texto va en <span aria-hidden="true">.
     // Hoy salen 57 en el marcado propio de la app (h1, los h2/h4 de las secciones, el 🐾 del
@@ -377,7 +391,6 @@ test.describe('Calculadora de tamaño adulto del perro — hallazgos abiertos', 
   test('el eje X del gráfico sigue anclado a la semana 4 y deja hueco a la izquierda', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
     await page.goto(RUTA);
     // `escalaX` conserva el `s - 4` de cuando la edad mínima eran 4 semanas. Como la curva
     // empieza en la 8, el trazo arranca DENTRO del área de dibujo en vez de en su borde

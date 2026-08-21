@@ -5,124 +5,15 @@ import styles from './CalculadoraTamanoAdultoPerro.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, DataReference, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
-
-type TamanoRaza = 'mini' | 'pequeno' | 'mediano' | 'grande' | 'gigante';
-
-interface RazaReferencia {
-  nombre: string;
-  tamano: TamanoRaza;
-  pesoMin: number;   // kg de adulto
-  pesoMax: number;
-  maduracion: string;
-}
-
-const razasReferencia: RazaReferencia[] = [
-  // Mini
-  { nombre: 'Chihuahua', tamano: 'mini', pesoMin: 1.5, pesoMax: 3, maduracion: '8-10 meses' },
-  { nombre: 'Yorkshire Terrier', tamano: 'mini', pesoMin: 2, pesoMax: 3.5, maduracion: '8-10 meses' },
-  { nombre: 'Pomerania', tamano: 'mini', pesoMin: 1.5, pesoMax: 3, maduracion: '8-10 meses' },
-  { nombre: 'Maltés', tamano: 'mini', pesoMin: 3, pesoMax: 4, maduracion: '9-12 meses' },
-  // Pequeño
-  { nombre: 'Bichón Frisé', tamano: 'pequeno', pesoMin: 5, pesoMax: 10, maduracion: '10-12 meses' },
-  { nombre: 'Cavalier King Charles', tamano: 'pequeno', pesoMin: 5.5, pesoMax: 8, maduracion: '10-12 meses' },
-  { nombre: 'Jack Russell', tamano: 'pequeno', pesoMin: 6, pesoMax: 8, maduracion: '10-12 meses' },
-  { nombre: 'Shih Tzu', tamano: 'pequeno', pesoMin: 4, pesoMax: 7, maduracion: '10-12 meses' },
-  { nombre: 'Teckel', tamano: 'pequeno', pesoMin: 7, pesoMax: 15, maduracion: '10-12 meses' },
-  // Mediano
-  { nombre: 'Beagle', tamano: 'mediano', pesoMin: 9, pesoMax: 11, maduracion: '12-15 meses' },
-  { nombre: 'Cocker Spaniel', tamano: 'mediano', pesoMin: 12, pesoMax: 15, maduracion: '12-15 meses' },
-  { nombre: 'Bulldog Francés', tamano: 'mediano', pesoMin: 8, pesoMax: 14, maduracion: '12-14 meses' },
-  { nombre: 'Border Collie', tamano: 'mediano', pesoMin: 14, pesoMax: 20, maduracion: '12-15 meses' },
-  { nombre: 'Schnauzer Mediano', tamano: 'mediano', pesoMin: 14, pesoMax: 20, maduracion: '12-15 meses' },
-  // Grande
-  { nombre: 'Labrador Retriever', tamano: 'grande', pesoMin: 25, pesoMax: 36, maduracion: '18-24 meses' },
-  { nombre: 'Golden Retriever', tamano: 'grande', pesoMin: 25, pesoMax: 34, maduracion: '18-24 meses' },
-  { nombre: 'Pastor Alemán', tamano: 'grande', pesoMin: 22, pesoMax: 40, maduracion: '18-24 meses' },
-  { nombre: 'Boxer', tamano: 'grande', pesoMin: 25, pesoMax: 32, maduracion: '18-24 meses' },
-  { nombre: 'Husky Siberiano', tamano: 'grande', pesoMin: 16, pesoMax: 27, maduracion: '15-18 meses' },
-  // Gigante
-  { nombre: 'Pastor Bernés', tamano: 'gigante', pesoMin: 35, pesoMax: 55, maduracion: '24-36 meses' },
-  { nombre: 'Gran Danés', tamano: 'gigante', pesoMin: 45, pesoMax: 90, maduracion: '24-36 meses' },
-  { nombre: 'San Bernardo', tamano: 'gigante', pesoMin: 50, pesoMax: 90, maduracion: '24-36 meses' },
-  { nombre: 'Mastín', tamano: 'gigante', pesoMin: 50, pesoMax: 70, maduracion: '24-36 meses' },
-  { nombre: 'Terranova', tamano: 'gigante', pesoMin: 45, pesoMax: 70, maduracion: '24-36 meses' },
-  { nombre: 'Rottweiler', tamano: 'gigante', pesoMin: 35, pesoMax: 60, maduracion: '18-24 meses' },
-  { nombre: 'Dogo Alemán', tamano: 'gigante', pesoMin: 45, pesoMax: 90, maduracion: '24-36 meses' },
-  { nombre: 'Leonberger', tamano: 'gigante', pesoMin: 45, pesoMax: 77, maduracion: '24-36 meses' },
-];
-
-/**
- * Qué son estos números y qué crédito merecen.
- *
- * Son una curva ORIENTATIVA propia: el porcentaje del peso adulto que se supone alcanzado a
- * cada edad. No proceden de ninguna tabla publicada, y conviene decirlo aquí porque la app
- * las usa como divisor —peso adulto = peso actual / porcentaje—, así que cualquier error
- * suyo se traslada entero al resultado.
- *
- * Contrastadas el 20/08/2026 contra la referencia veterinaria disponible, con este resultado:
- *
- *  · Salt et al. (2017), «Growth standard charts for monitoring bodyweight in dogs of
- *    different sizes», PLoS ONE 12(9):e0182064 — más de 6 millones de perros, y la base de
- *    las WALTHAM Puppy Growth Charts que se usan en clínica. Sus autores advierten de forma
- *    explícita que **sus estándares no aplican a perros de más de 40 kg**, que es justo la
- *    categoría «gigante» de esta app, la que aquí se modela con más detalle (hasta 144
- *    semanas). Para ese tramo no existe estándar publicado con el que comparar.
- *  · El estudio publica curvas de percentiles, no una tabla de «% del peso adulto por
- *    semana», así que no hay de dónde copiar las 51 constantes aunque se quisiera.
- *  · Los puntos sueltos que sí circulan en la literatura divulgativa NO coinciden con esta
- *    curva: a las 24 semanas se cita ~80 % para razas toy y ~66 % para grandes, mientras
- *    aquí figuran 90 % y 55 %. En razas grandes esa diferencia infla la estimación de peso
- *    adulto alrededor de un 19 %.
- *
- * Por eso NO se han sustituido por otras: cambiar un número sin fuente por otro número sin
- * fuente mejor no arregla nada, solo lo disimula. Lo que sí se ha hecho es retirar de la app
- * el caso de uso que convertía esta estimación en una decisión clínica (cálculo de dosis) y
- * decir en pantalla, con <DataReference>, de qué pie cojea el dato.
- *
- * Si alguna vez se publican estándares para >40 kg, este es el bloque que hay que rehacer.
- */
-const curvasCrecimiento: Record<TamanoRaza, Record<number, number>> = {
-  mini: {
-    8: 0.35, 12: 0.50, 16: 0.65, 20: 0.80, 24: 0.90, 28: 0.95, 32: 0.98, 40: 1.0,
-  },
-  pequeno: {
-    8: 0.30, 12: 0.45, 16: 0.58, 20: 0.70, 24: 0.80, 28: 0.88, 32: 0.94, 40: 0.98, 48: 1.0,
-  },
-  mediano: {
-    8: 0.25, 12: 0.38, 16: 0.50, 20: 0.60, 24: 0.70, 28: 0.78, 32: 0.85, 40: 0.92, 52: 0.98, 60: 1.0,
-  },
-  grande: {
-    8: 0.20, 12: 0.30, 16: 0.40, 20: 0.48, 24: 0.55, 28: 0.62, 32: 0.68, 40: 0.78, 52: 0.88, 72: 0.96, 96: 1.0,
-  },
-  gigante: {
-    8: 0.15, 12: 0.22, 16: 0.30, 20: 0.37, 24: 0.43, 28: 0.50, 32: 0.55, 40: 0.65, 52: 0.75, 72: 0.85, 96: 0.95, 144: 1.0,
-  },
-};
-
-// Peso adulto típico de cada categoría, en kg. Sirve para contrastar la proyección
-// con la categoría elegida: la estimación sale del propio peso del cachorro, así que
-// sin una referencia externa como esta el resultado nunca se puede contradecir.
-// Un peso en kg, con decimal solo si lo tiene: 1,5 kg / 3 kg
-const kg = (n: number): string => formatNumber(n, Number.isInteger(n) ? 0 : 1);
-const rangoKg = (min: number, max: number): string => `${kg(min)}-${kg(max)} kg`;
-
-// Peso adulto típico de cada categoría, DERIVADO de las razas que la propia app clasifica en
-// ella. Antes era una tabla escrita a mano, y divergió de las otras tres que hay en la página:
-// decía que «grande» es 25-45 kg mientras clasificaba al Husky (16-27 kg) como grande, así que
-// el aviso de coherencia corregía a quien había elegido bien —un husky proyectado a 18,2 kg
-// salía «por debajo de lo habitual»—. Derivándolo no pueden volver a contradecirse: si mañana
-// se añade una raza, el rango de su categoría la acoge sola.
-const rangosTipicos: Record<TamanoRaza, { min: number; max: number; etiqueta: string }> =
-  razasReferencia.reduce((acc, raza) => {
-    const actual = acc[raza.tamano];
-    acc[raza.tamano] = actual
-      ? { min: Math.min(actual.min, raza.pesoMin), max: Math.max(actual.max, raza.pesoMax), etiqueta: '' }
-      : { min: raza.pesoMin, max: raza.pesoMax, etiqueta: '' };
-    return acc;
-  }, {} as Record<TamanoRaza, { min: number; max: number; etiqueta: string }>);
-for (const t of Object.keys(rangosTipicos) as TamanoRaza[]) {
-  rangosTipicos[t].etiqueta = rangoKg(rangosTipicos[t].min, rangosTipicos[t].max);
-}
+import {
+  razasReferencia,
+  rangosTipicos,
+  rangoKg,
+  kg,
+  curvasCrecimiento,
+  type TamanoRaza,
+  type RazaReferencia,
+} from './razas';
 
 // Límites de entrada. El techo de peso cubre a las razas gigantes de la propia tabla (el Gran
 // Danés y el San Bernardo llegan a 90 kg de adulto) y la edad mínima es la del primer punto de
@@ -209,7 +100,10 @@ export default function CalculadoraTamanoAdultoPerroPage() {
 
   const calcular = () => {
     const peso = parseFloat(pesoActual.replace(',', '.'));
-    const edad = parseFloat(edadSemanas);
+    // La coma decimal también aquí: sin esto, parseFloat('8,5') devolvía 8 y la app
+    // daba un peso adulto que no correspondía a la edad tecleada, sin avisar de nada
+    // (Inspector, 20/08/2026).
+    const edad = parseFloat(edadSemanas.replace(',', '.'));
 
     if (isNaN(peso) || peso <= 0 || peso > PESO_MAXIMO) {
       setError(`Introduce un peso actual válido, mayor que 0 y hasta ${PESO_MAXIMO} kg.`);
@@ -300,7 +194,8 @@ export default function CalculadoraTamanoAdultoPerroPage() {
     if (!resultado || !curva) return null;
 
     const yMax = resultado.pesoAdultoEstimado * 1.15;
-    const escalaX = (s: number) => M.left + ((s - 4) / (curva.finSemanas - 4)) * plotW;
+    const escalaX = (s: number) =>
+      M.left + ((s - EDAD_MINIMA) / (curva.finSemanas - EDAD_MINIMA)) * plotW;
     const escalaY = (kg: number) => M.top + plotH - (kg / yMax) * plotH;
 
     const linea = curva.puntos
@@ -332,7 +227,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📏 Predictor de Tamaño Adulto</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📏</span> Predictor de Tamaño Adulto</h1>
         <p className={styles.subtitle}>
           Calcula cuánto pesará tu cachorro cuando sea adulto
         </p>
@@ -377,8 +272,8 @@ export default function CalculadoraTamanoAdultoPerroPage() {
               <span className={styles.unidad}>semanas</span>
             </div>
             <span className={styles.hint}>
-              {edadSemanas && !isNaN(parseFloat(edadSemanas)) ?
-                `≈ ${formatNumber(parseFloat(edadSemanas) / 4.33, 1)} meses` : ''}
+              {edadSemanas && !isNaN(parseFloat(edadSemanas.replace(',', '.'))) ?
+                `≈ ${formatNumber(parseFloat(edadSemanas.replace(',', '.')) / 4.33, 1)} meses` : ''}
             </span>
           </div>
 
@@ -427,7 +322,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
           {resultado ? (
             <>
               <div className={styles.resultadoPrincipal}>
-                <span className={styles.resultadoIcon}>🐕</span>
+                <span className={styles.resultadoIcon} aria-hidden="true">🐕</span>
                 <div className={styles.resultadoValor}>
                   {formatNumber(resultado.pesoAdultoEstimado, 1)} kg
                 </div>
@@ -445,12 +340,12 @@ export default function CalculadoraTamanoAdultoPerroPage() {
 
               <div className={styles.detallesGrid}>
                 <div className={styles.detalleCard}>
-                  <span className={styles.detalleIcon}>📊</span>
+                  <span className={styles.detalleIcon} aria-hidden="true">📊</span>
                   <span className={styles.detalleValor}>{formatNumber(resultado.porcentajeCrecimiento, 0)}%</span>
                   <span className={styles.detalleLabel}>Crecimiento actual</span>
                 </div>
                 <div className={styles.detalleCard}>
-                  <span className={styles.detalleIcon}>🎯</span>
+                  <span className={styles.detalleIcon} aria-hidden="true">🎯</span>
                   <span className={styles.detalleValor}>{resultado.edadMaduracion}</span>
                   <span className={styles.detalleLabel}>Maduración</span>
                 </div>
@@ -470,13 +365,13 @@ export default function CalculadoraTamanoAdultoPerroPage() {
               </div>
 
               <div className={styles.notaInfo}>
-                💡 La precisión es mayor con cachorros de más de 14 semanas.
+                <span aria-hidden="true">💡</span> La precisión es mayor con cachorros de más de 14 semanas.
                 Los mestizos pueden variar más que las razas puras.
               </div>
             </>
           ) : (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>🐾</span>
+              <span className={styles.placeholderIcon} aria-hidden="true">🐾</span>
               <p>Introduce los datos de tu cachorro para predecir su tamaño adulto</p>
             </div>
           )}
@@ -634,7 +529,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
 
       {/* Tabla de razas */}
       <div className={styles.razasContainer}>
-        <h2>📋 Tabla de Razas de Referencia</h2>
+        <h2><span aria-hidden="true">📋</span> Tabla de Razas de Referencia</h2>
 
         <div className={styles.filtrosRaza}>
           <button
@@ -692,8 +587,8 @@ export default function CalculadoraTamanoAdultoPerroPage() {
             <div key={index} className={`${styles.razaCard} ${styles[raza.tamano]}`}>
               <div className={styles.razaNombre}>{raza.nombre}</div>
               <div className={styles.razaInfo}>
-                <span className={styles.razaPeso}>⚖️ {rangoKg(raza.pesoMin, raza.pesoMax)}</span>
-                <span className={styles.razaMaduracion}>📅 {raza.maduracion}</span>
+                <span className={styles.razaPeso}><span aria-hidden="true">⚖️</span> {rangoKg(raza.pesoMin, raza.pesoMax)}</span>
+                <span className={styles.razaMaduracion}><span aria-hidden="true">📅</span> {raza.maduracion}</span>
               </div>
             </div>
           ))}
@@ -706,7 +601,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
           <li><strong>En mestizos la predicción es menos precisa</strong>: Depende de las razas parentales y su proporción genética</li>
           <li><strong>Factores individuales influyen</strong>: Alimentación, esterilización temprana, enfermedades y genética pueden alterar el crecimiento</li>
         </ul>
-        <p className={styles.highlight}><strong>🐾 Solo orientativo. Consulta con tu veterinario sobre el desarrollo y peso ideal de tu cachorro.</strong></p>
+        <p className={styles.highlight}><strong><span aria-hidden="true">🐾</span> Solo orientativo. Consulta con tu veterinario sobre el desarrollo y peso ideal de tu cachorro.</strong></p>
       </DisclaimerCard>
 
       <DataReference
@@ -728,7 +623,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
         subtitle="Información sobre las fases de crecimiento y factores que influyen"
       >
         <section className={styles.guideSection}>
-          <h2>🧮 Cómo se calcula esta estimación</h2>
+          <h2><span aria-hidden="true">🧮</span> Cómo se calcula esta estimación</h2>
           <p>
             La cuenta es una sola división. A cada edad le corresponde un porcentaje del peso que
             el perro tendrá de adulto —a las {EDAD_MINIMA} semanas, un cachorro mediano ronda el
@@ -753,37 +648,37 @@ export default function CalculadoraTamanoAdultoPerroPage() {
             exacto.
           </p>
 
-          <h2>📈 Fases de Crecimiento</h2>
+          <h2><span aria-hidden="true">📈</span> Fases de Crecimiento</h2>
           <div className={styles.fasesGrid}>
             <div className={styles.faseCard}>
-              <h4>🍼 Fase neonatal (0-2 semanas)</h4>
+              <h4><span aria-hidden="true">🍼</span> Fase neonatal (0-2 semanas)</h4>
               <p>Los cachorros nacen ciegos y sordos. Dependen totalmente de la madre. Duplican su peso en la primera semana.</p>
             </div>
             <div className={styles.faseCard}>
-              <h4>👀 Fase de transición (2-4 semanas)</h4>
+              <h4><span aria-hidden="true">👀</span> Fase de transición (2-4 semanas)</h4>
               <p>Abren los ojos y empiezan a oír. Comienzan a dar sus primeros pasos. Empiezan a interactuar con sus hermanos.</p>
             </div>
             <div className={styles.faseCard}>
-              <h4>🐕 Fase de socialización (4-12 semanas)</h4>
+              <h4><span aria-hidden="true">🐕</span> Fase de socialización (4-12 semanas)</h4>
               <p>Período crítico para el desarrollo social. Empiezan a comer alimento sólido. Crecimiento muy rápido.</p>
             </div>
             <div className={styles.faseCard}>
-              <h4>💪 Fase juvenil (3-6 meses)</h4>
+              <h4><span aria-hidden="true">💪</span> Fase juvenil (3-6 meses)</h4>
               <p>El crecimiento continúa fuerte. Cambio de dientes de leche a permanentes. Mucha energía y curiosidad.</p>
             </div>
             <div className={styles.faseCard}>
-              <h4>🎯 Adolescencia (6-18 meses)</h4>
+              <h4><span aria-hidden="true">🎯</span> Adolescencia (6-18 meses)</h4>
               <p>El crecimiento se ralentiza gradualmente. Maduración sexual. Los perros grandes aún siguen creciendo.</p>
             </div>
             <div className={styles.faseCard}>
-              <h4>✨ Madurez (1-3 años)</h4>
+              <h4><span aria-hidden="true">✨</span> Madurez (1-3 años)</h4>
               <p>Alcanzan su tamaño adulto completo. Los gigantes pueden seguir &quot;rellenando&quot; músculo hasta los 3 años.</p>
             </div>
           </div>
         </section>
 
         <section className={styles.guideSection}>
-          <h2>❓ Preguntas Frecuentes</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes</h2>
           <div className={styles.faqGrid}>
             <details className={styles.faqItem}>
               <summary>¿Es cierto que puedo predecir el tamaño por las patas?</summary>
@@ -806,7 +701,13 @@ export default function CalculadoraTamanoAdultoPerroPage() {
 
         {/* SECCIÓN 1 — Tabla Comparativa */}
         <section className={styles.guideSection}>
-          <h2>📊 Clasificación de Perros por Tamaño Adulto</h2>
+          <h2><span aria-hidden="true">📊</span> Peso adulto típico de cada categoría</h2>
+          <p className={styles.introParagraph}>
+            Los rangos se derivan de las razas de referencia de esta misma página, así que
+            <strong> se solapan en los bordes</strong>: un perro de 15 kg puede ser de raza
+            pequeña o mediana según cuál sea. No son tramos excluyentes que asignen una
+            categoría a cada peso, sino el peso adulto habitual de las razas de cada grupo.
+          </p>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
               <thead>
@@ -874,7 +775,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
 
         {/* SECCIÓN 2 — Casos de Uso */}
         <section className={styles.guideSection}>
-          <h2>👤 ¿Para quién es esta calculadora?</h2>
+          <h2><span aria-hidden="true">👤</span> ¿Para quién es esta calculadora?</h2>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -935,7 +836,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
 
         {/* SECCIÓN 3 — FAQ ampliada */}
         <section className={styles.guideSection}>
-          <h2>❓ Preguntas Frecuentes (v2)</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes (v2)</h2>
           <ul className={styles.faqList}>
             <li className={styles.faqItem}>
               <strong>¿A qué edad deja de crecer un perro?</strong>
@@ -982,7 +883,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
 
         {/* SECCIÓN 4 — Guía Paso a Paso */}
         <section className={styles.guideSection}>
-          <h2>🗺️ Cómo estimar el tamaño adulto y adaptar los cuidados</h2>
+          <h2><span aria-hidden="true">🗺️</span> Cómo estimar el tamaño adulto y adaptar los cuidados</h2>
           <ol className={styles.stepGuide}>
             <li className={styles.step}>
               <span className={styles.stepNumber}>1</span>
@@ -1038,7 +939,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
 
         {/* SECCIÓN 5 — Mejores Prácticas */}
         <section className={styles.guideSection}>
-          <h2>✅ Mejores Prácticas en el Seguimiento del Crecimiento</h2>
+          <h2><span aria-hidden="true">✅</span> Mejores Prácticas en el Seguimiento del Crecimiento</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">⚖️</span>

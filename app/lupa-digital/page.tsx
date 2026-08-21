@@ -4,6 +4,7 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './LupaDigital.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
 type FiltroTipo = 'ninguno' | 'alto-contraste' | 'invertir' | 'escala-grises' | 'sepia';
@@ -301,10 +302,17 @@ export default function LupaDigitalPage() {
                 </p>
               </div>
             ) : (
-              <>
+              // Era un <div role="status"> sin onClick, sin botón dentro y con
+              // cursor:auto: ocupaba el ancho entero de la pantalla, invitaba a pulsar
+              // y no pasaba nada (Inspector, 20/08/2026).
+              <button
+                type="button"
+                className={styles.placeholderBoton}
+                onClick={() => iniciarCamara()}
+              >
                 <span aria-hidden="true" className={styles.placeholderIcon}>🔍</span>
-                <p>Pulsa para activar la lupa</p>
-              </>
+                <span>Pulsa para activar la lupa</span>
+              </button>
             )}
           </div>
         ) : null}
@@ -349,7 +357,7 @@ export default function LupaDigitalPage() {
                 <span aria-hidden="true">❄️</span> Congelada
               </span>
             )}
-            <span className={styles.zoomIndicador}>{zoom}x</span>
+            <span className={styles.zoomIndicador}>{formatNumber(zoom, zoom % 1 === 0 ? 0 : 1)}x</span>
           </div>
         )}
       </div>
@@ -394,7 +402,9 @@ export default function LupaDigitalPage() {
 
       {/* Control de zoom */}
       <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>Zoom: {zoom}x</h3>
+        <h3 className={styles.sectionTitle} id="titulo-zoom">
+          Zoom: {formatNumber(zoom, zoom % 1 === 0 ? 0 : 1)}x
+        </h3>
         <div className={styles.zoomControl}>
           <button
             type="button"
@@ -405,6 +415,7 @@ export default function LupaDigitalPage() {
             −
           </button>
           <input
+            id="control-zoom"
             type="range"
             min="1"
             max="5"
@@ -412,6 +423,7 @@ export default function LupaDigitalPage() {
             value={zoom}
             onChange={(e) => setZoom(parseFloat(e.target.value))}
             className={styles.zoomSlider}
+            aria-labelledby="titulo-zoom"
           />
           <button
             type="button"
@@ -431,7 +443,7 @@ export default function LupaDigitalPage() {
               onClick={() => setZoom(z)}
               aria-pressed={zoom === z}
             >
-              {z}x
+              {formatNumber(z, z % 1 === 0 ? 0 : 1)}x
             </button>
           ))}
         </div>
@@ -467,8 +479,11 @@ export default function LupaDigitalPage() {
         <h3 className={styles.sectionTitle}>Ajustes de imagen</h3>
 
         <div className={styles.ajuste}>
-          <label><span aria-hidden="true">☀️</span> Brillo: {brillo}%</label>
+          <label htmlFor="control-brillo">
+            <span aria-hidden="true">☀️</span> Brillo: {formatNumber(brillo, 0)}%
+          </label>
           <input
+            id="control-brillo"
             type="range"
             min="50"
             max="200"
@@ -479,8 +494,11 @@ export default function LupaDigitalPage() {
         </div>
 
         <div className={styles.ajuste}>
-          <label><span aria-hidden="true">◐</span> Contraste: {contraste}%</label>
+          <label htmlFor="control-contraste">
+            <span aria-hidden="true">◐</span> Contraste: {formatNumber(contraste, 0)}%
+          </label>
           <input
+            id="control-contraste"
             type="range"
             min="50"
             max="200"

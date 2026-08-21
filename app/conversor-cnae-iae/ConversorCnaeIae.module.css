@@ -311,6 +311,30 @@
   margin-top: var(--spacing-md);
 }
 
+.verTodos {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--primary);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.verTodos:hover {
+  color: var(--secondary);
+}
+
+.verTodos:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: var(--radius);
+}
+
+[data-theme='dark'] .verTodos {
+  color: var(--accent);
+}
+
 .sinResultados {
   background: var(--bg-soft);
   border-left: 4px solid var(--accent);

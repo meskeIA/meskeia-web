@@ -1187,3 +1187,27 @@
     font-size: 1.25rem;
   }
 }
+
+/* Puntuación y tramo bajo el nombre del perfil (hallazgo 101, 21/08/2026) */
+.resultScore {
+  margin: 0.5rem 0 0;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.resultScoreBorde {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+[data-theme='dark'] .resultScoreBorde {
+  color: var(--accent);
+}
+
+/* Encuadre de las ideas del resultado (hallazgo 104, 21/08/2026) */
+.recomendacionesNota {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}

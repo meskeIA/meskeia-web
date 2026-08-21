@@ -3,7 +3,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Test de Perfil Inversor - Descubre tu Tolerancia al Riesgo | meskeIA',
-  description: 'Test gratuito de perfil de inversor. Responde 10 preguntas y descubre si eres conservador, moderado o agresivo. Recomendaciones personalizadas de inversión.',
+  description: 'Test gratuito de perfil de inversor. Responde 10 preguntas y descubre cuál de los cinco perfiles te corresponde: conservador, moderado, equilibrado, dinámico o agresivo. Recomendaciones personalizadas de inversión.',
   keywords: 'test perfil inversor, tolerancia riesgo, perfil riesgo inversión, test inversión, conservador moderado agresivo, cuestionario inversor',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Test de Perfil Inversor - Descubre tu Tolerancia al Riesgo',
-    description: 'Test gratuito de perfil de inversor. Responde 10 preguntas y descubre si eres conservador, moderado o agresivo.',
+    description: 'Test gratuito de perfil de inversor. Responde 10 preguntas y descubre cuál de los cinco perfiles te corresponde: conservador, moderado, equilibrado, dinámico o agresivo.',
     url: 'https://meskeia.com/test-perfil-inversor/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -83,12 +83,12 @@ export const faqJsonLd = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Test de Perfil Inversor',
-  description: 'Test gratuito que evalúa tu tolerancia al riesgo financiero mediante 10 preguntas. Identifica si tu perfil es conservador, moderado o agresivo y orienta tu estrategia de inversión.',
+  description: 'Test gratuito que evalúa tu tolerancia al riesgo financiero mediante 10 preguntas. Sitúa tu perfil en una escala de cinco tramos —conservador, moderado, equilibrado, dinámico y agresivo— y orienta tu estrategia de inversión.',
   url: 'https://meskeia.com/test-perfil-inversor/',
   category: 'FinanceApplication',
   features: [
     '10 preguntas validadas para evaluar tolerancia al riesgo',
-    'Resultado: perfil conservador, moderado o agresivo',
+    'Resultado: uno de los cinco perfiles (conservador, moderado, equilibrado, dinámico o agresivo)',
     'Recomendaciones orientativas según el perfil obtenido',
     'En español',
   ],

@@ -12,7 +12,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 // coherencia": es captura SEO intencionada, no un descuido.
 
 export const metadata: Metadata = {
-  title: 'Códigos CNAE-2025 y epígrafes del IAE: buscador oficial | meskeIA',
+  title: 'Buscador de códigos CNAE-2025 y epígrafes del IAE | meskeIA',
   description:
     'Busca tu código CNAE-2025 (INE) y tu epígrafe del IAE (Tarifas de la AEAT) en los catálogos oficiales completos. Búsqueda por actividad en lenguaje corriente, por código y por códigos antiguos de la CNAE-2009, con su jerarquía y la sección del IAE.',
   keywords:
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Códigos CNAE-2025 y epígrafes del IAE: buscador oficial',
+    title: 'Buscador de códigos CNAE-2025 y epígrafes del IAE',
     description:
       'Dos catálogos oficiales completos: la CNAE-2025 del INE y las Tarifas del IAE. Busca por actividad, por código o por un código antiguo de la CNAE-2009.',
     url: 'https://meskeia.com/conversor-cnae-iae/',

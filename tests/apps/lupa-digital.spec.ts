@@ -340,8 +340,7 @@ test.describe('lupa-digital — lote mecánico 18/08/2026', () => {
 // visión («Filtros de accesibilidad», keywords «accesibilidad, baja visión»).
 // Caso: cargar /lupa-digital/ y leer el nombre accesible del 2º deslizador
 //       → esperado «Brillo: 100%» · obtenido "" (vacío).
-test('HALLAZGO (accesibilidad) — los tres deslizadores deben tener nombre accesible', async ({ page }) => {
-  test.fail(); // hallazgo abierto: hoy falla a propósito
+test('REGRESIÓN (accesibilidad) — los tres deslizadores deben tener nombre accesible', async ({ page }) => {
   await page.goto(RUTA);
   await expect(page.getByRole('slider').nth(0)).toHaveAccessibleName(/Zoom/i);
   await expect(page.getByRole('slider').nth(1)).toHaveAccessibleName(/Brillo/i);
@@ -354,10 +353,9 @@ test('HALLAZGO (accesibilidad) — los tres deslizadores deben tener nombre acce
 // bloque educativo de la app escribe «1,5x» con coma, así que la app se contradice a sí misma
 // dentro de la misma página, y el formato español es obligatorio en el proyecto.
 // Caso: pulsar el preajuste de 1,5x → esperado «Zoom: 1,5x» · obtenido «Zoom: 1.5x».
-test('HALLAZGO (contenido) — el zoom decimal se escribe con coma, igual que en su tabla educativa', async ({
+test('REGRESIÓN (contenido) — el zoom decimal se escribe con coma, igual que en su tabla educativa', async ({
   page,
 }) => {
-  test.fail(); // hallazgo abierto: hoy falla a propósito
   await page.goto(RUTA);
   // El preajuste se localiza admitiendo las dos grafías, para que el test siga pulsando el
   // botón correcto una vez reparado; lo que se exige es cómo se ESCRIBE el número.
@@ -365,6 +363,10 @@ test('HALLAZGO (contenido) — el zoom decimal se escribe con coma, igual que en
   await preajuste.click();
   await expect(preajuste).toHaveText('1,5x');
   await expect(page.locator('h3', { hasText: /^Zoom/ })).toHaveText('Zoom: 1,5x');
+
+  // El tercer sitio —el indicador flotante sobre el visor— solo existe con la lupa
+  // encendida, así que hay que arrancarla para comprobarlo.
+  await page.getByRole('button', { name: /Activar lupa/ }).click();
   await expect(page.locator('[class*=zoomIndicador]')).toHaveText('1,5x');
 });
 
@@ -377,10 +379,9 @@ test('HALLAZGO (contenido) — el zoom decimal se escribe con coma, igual que en
 // Caso: pulsar sobre el texto «Pulsa para activar la lupa» → esperado que la lupa se active
 //       (o que el visor no invite a pulsarlo) · obtenido: el placeholder sigue ahí y el
 //       <video> sigue con display:none.
-test('HALLAZGO (operativa) — si el visor dice «Pulsa», pulsarlo tiene que activar la lupa', async ({
+test('REGRESIÓN (operativa) — si el visor dice «Pulsa», pulsarlo tiene que activar la lupa', async ({
   page,
 }) => {
-  test.fail(); // hallazgo abierto: hoy falla a propósito
   await page.goto(RUTA);
   const invitacion = page.getByText('Pulsa para activar la lupa');
   if ((await invitacion.count()) === 0) return; // reparado cambiando el texto: nada que exigir
