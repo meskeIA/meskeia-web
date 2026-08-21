@@ -6,6 +6,8 @@
  *            npm run inspector:hallazgos -- --app lupa-digital
  *            npm run inspector:hallazgos -- --arreglado 12,13
  *            npm run inspector:hallazgos -- --descartado 27 --motivo "es correcto: lo confirma la ONCE"
+ *            npm run inspector:hallazgos -- --revalidar lupa-digital,conversor-braille
+ *            npm run inspector:hallazgos -- --revalidar-reparadas
  *
  * El Inspector NO repara: deja los hallazgos abiertos y el usuario decide el lote. Falta
  * entonces la otra mitad del ciclo — cerrarlos cuando se arreglen. Sin esto, la base
@@ -16,7 +18,7 @@
  * es indistinguible de haberlo barrido debajo de la alfombra.
  */
 
-import { abrir } from './db.mjs';
+import { abrir, SQL_INVALIDADA } from './db.mjs';
 
 const args = process.argv.slice(2);
 const valorDe = (n, d) => { const i = args.indexOf(`--${n}`); return i >= 0 && args[i + 1] ? args[i + 1] : d; };
@@ -29,6 +31,20 @@ const DESCARTADO = valorDe('descartado', '');
  * empieza a mentir: dice que algo está arreglado cuando sigue en producción.
  */
 const REABRIR = valorDe('reabrir', '');
+/**
+ * Da por vigente la inspección de una app sobre su código ACTUAL.
+ *
+ * Reparar cambia el código, así que la app vuelve a la cola como INVALIDADA y se coloca
+ * por delante de las que nadie ha mirado nunca: tras la tanda del 21/08/2026, la cola
+ * ofrecía las mismas diez apps que se acababan de arreglar. Pero INVALIDADA está pensada
+ * para cambios que nadie ha verificado, y una reparación sale con sus tests de regresión
+ * —son el producto del Inspector—, así que ahí ya no queda nada que volver a mirar.
+ *
+ * No toca la fecha de la inspección ni su veredicto: solo dice «lo que se verificó es
+ * esto». Si mañana alguien cambia la app por otro motivo, vuelve a invalidarse sola.
+ */
+const REVALIDAR = valorDe('revalidar', '');
+const REVALIDAR_REPARADAS = args.includes('--revalidar-reparadas');
 const MOTIVO = valorDe('motivo', '');
 const TODOS = args.includes('--todos');
 
@@ -78,6 +94,44 @@ if (REABRIR) {
   console.log(`\nabiertos: ${db.prepare("SELECT COUNT(*) n FROM hallazgos WHERE estado='abierto'").get().n}`);
   process.exit(0);
 }
+function revalidar(slugs) {
+  const upd = db.prepare(
+    `UPDATE apps SET hash_inspeccionado = hash_codigo || '|' || COALESCE(hash_deps, '')
+     WHERE slug = ? AND ultima_inspeccion IS NOT NULL`,
+  );
+  const leer = db.prepare('SELECT slug, ultima_inspeccion, veredicto FROM apps WHERE slug = ?');
+  let n = 0;
+  for (const slug of slugs) {
+    const app = leer.get(slug);
+    if (!app) { console.error(`  · ${slug}: no está en el catálogo`); continue; }
+    if (!app.ultima_inspeccion) { console.error(`  · ${slug}: nunca se ha inspeccionado`); continue; }
+    upd.run(slug);
+    console.log(`  ✓ ${slug} · la inspección del ${app.ultima_inspeccion} vale para el código de hoy`);
+    n++;
+  }
+  const inval = db
+    .prepare(`SELECT COUNT(*) n FROM apps WHERE ${SQL_INVALIDADA}`)
+    .get().n;
+  console.log(`\n${n} revalidada(s) · quedan ${inval} invalidadas en la cola`);
+}
+
+if (REVALIDAR || REVALIDAR_REPARADAS) {
+  const slugs = REVALIDAR
+    ? REVALIDAR.split(',').map(s => s.trim()).filter(Boolean)
+    : db
+        .prepare(`SELECT slug FROM apps WHERE ${SQL_INVALIDADA}`)
+        .all()
+        .map(r => r.slug)
+        .filter(slug =>
+          // Solo las que no arrastran hallazgos abiertos: si queda algo por reparar, la
+          // app tiene que seguir en la cola.
+          db.prepare("SELECT COUNT(*) n FROM hallazgos WHERE slug = ? AND estado = 'abierto'").get(slug).n === 0,
+        );
+  if (!slugs.length) { console.log('\nNo hay nada que revalidar.\n'); process.exit(0); }
+  revalidar(slugs);
+  process.exit(0);
+}
+
 if (ARREGLADO) { cerrar(ARREGLADO, 'arreglado'); process.exit(0); }
 if (DESCARTADO) { cerrar(DESCARTADO, 'descartado'); process.exit(0); }
 
@@ -105,4 +159,5 @@ for (const f of filas) {
 const porApp = db.prepare(`SELECT slug, COUNT(*) n FROM hallazgos WHERE estado='abierto' GROUP BY slug ORDER BY n DESC`).all();
 console.log(`\nPor app: ${porApp.map(r => `${r.slug} (${r.n})`).join(' · ')}`);
 console.log(`\nCerrar:  npm run inspector:hallazgos -- --arreglado 1,2,3`);
-console.log(`         npm run inspector:hallazgos -- --descartado 4 --motivo "por qué no era un defecto"\n`);
+console.log(`         npm run inspector:hallazgos -- --descartado 4 --motivo "por qué no era un defecto"`);
+console.log(`Tras reparar: npm run inspector:hallazgos -- --revalidar-reparadas\n`);
