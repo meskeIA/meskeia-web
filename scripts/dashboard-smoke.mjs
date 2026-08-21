@@ -125,11 +125,16 @@ console.log('\n═══ getDistribucionDuraciones ═══');
 console.log('\n═══ getNavegacion ═══');
 {
   const t0 = Date.now();
-  const { status, body } = await trpc('getNavegacion', { dias: 14 });
+  // Ventana 30d desde el 21/08/2026 (= sección 9 del digest, comparables sin conversión)
+  const { status, body } = await trpc('getNavegacion', { dias: 30 });
   const ms = Date.now() - t0;
   const rd = body?.result?.data;
   check(status === 200 && rd?.kpis?.totalSesiones > 0, `HTTP ${status}, ${rd?.kpis?.totalSesiones} sesiones, ${rd?.kpis?.totalVisitas} visitas (${ms} ms)`);
+  check(rd.ventanaDias === 30, `ventanaDias = ${rd?.ventanaDias}`);
   check(typeof rd.descubrimientoInterno?.total === 'number', `descubrimiento interno = ${rd?.descubrimientoInterno?.total} clics`);
+  check(typeof rd.descubrimientoInterno?.ventanas?.ventana?.pct === 'number', `tasa 30d = ${rd?.descubrimientoInterno?.ventanas?.ventana?.pct}%`);
+  // Forense retirado el 21/08/2026 (transiciones dominadas por falsos prev:X→X; puente/puerta con pregunta cerrada)
+  check(rd.topPares === undefined && rd.tablaPuente === undefined, 'topPares/tablaPuente retirados del shape');
 }
 
 // ── 8. getPorDominio ──

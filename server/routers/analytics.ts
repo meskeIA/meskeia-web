@@ -839,21 +839,29 @@ export const analyticsRouter = router({
 
   /**
    * Procedure: getNavegacion
-   * Análisis de patrones de navegación entre apps usando sesion_id.
+   * Desglose EN VIVO del descubrimiento interno (clics ?from= entre apps y
+   * saltos cross-dominio meskeIA ↔ verticales). Es la herramienta de
+   * investigación cuando el digest marca algo raro en un canal; la lectura
+   * diaria protegida (absoluto + Δ7d + racha + avisos de corte) la hace
+   * /digest-diario, no esta vista.
    *
-   * Devuelve:
-   *  - KPIs globales: total sesiones, apps por sesión (medio), %single-app, %multi-app
-   *  - Distribución de longitud de sesión (1, 2, 3, 4-5, 6+ apps)
-   *  - Origen de la primera app de la sesión (home / directo / referencia)
-   *  - Top pares from→to (transiciones internas)
-   *  - Apps "puente" vs "puerta" (continúan vs terminan sesión)
+   * Ventana por defecto: 30 días — la MISMA que la sección 9 del digest, para
+   * que cada cifra se pueda poner al lado de la suya sin conversión (con 14d
+   * los números no cuadraban nunca: ~18-21% vs ~15% para la misma métrica).
+   *
+   * 2026-08-21: retirados del shape topPares, tablaPuente, distribución de
+   * longitud y KPIs de sesión (inertes desde el rediseño del 23/07). Las
+   * transiciones estaban dominadas por falsos `prev:X → X` (recargas: el
+   * fallback prev: no filtraba la misma app), y puente/puerta respondía con
+   * el orden de sesión — que los webviews fragmentan — a una pregunta ya
+   * cerrada (app de un golpe = puerta ES el producto funcionando, 26/07).
    *
    * Excluye bots, mcp y mi-ip por defecto.
    */
   getNavegacion: protectedProcedure
     .input(
       z.object({
-        dias: z.number().int().positive().default(14), // ventana de análisis
+        dias: z.number().int().positive().default(30), // ventana de análisis (= digest)
       })
     )
     .query(async ({ input }) => {
@@ -877,7 +885,7 @@ export const analyticsRouter = router({
       // Sub-ventanas anidadas para el pulso del descubrimiento interno: 24 h y 7 días
       const limite7 = new Date(ahora); limite7.setDate(limite7.getDate() - 7);
       const limite1 = new Date(ahora); limite1.setDate(limite1.getDate() - 1);
-      // Contadores de clics ?from= y visitas por sub-ventana (24 h / 7 d); la quincena reutiliza los KPIs de 14 d
+      // Contadores de clics ?from= y visitas por sub-ventana (24 h / 7 d); la ventana completa reutiliza los totales
       let visitas24h = 0, visitas7d = 0, clics24h = 0, clics7d = 0;
 
       // Cargar visitas relevantes ordenadas por sesión y momento.
@@ -939,26 +947,6 @@ export const analyticsRouter = router({
       // KPIs globales
       const totalSesiones = sesiones.size;
       let totalVisitas = 0;
-      let sesionesConHome = 0;
-      let sesionesSingleApp = 0;
-      let sesionesMultiApp = 0;
-      const distribLongitud: Record<string, number> = { '1': 0, '2': 0, '3': 0, '4-5': 0, '6+': 0 };
-
-      // Origen de primera app por sesión
-      const origenPrimeraApp: Record<string, number> = {
-        'home': 0,
-        'directo-google-ia': 0,
-      };
-
-      // Pares from→to: clave "from|to"
-      const paresFromTo: Map<string, number> = new Map();
-
-      // Para apps puente/puerta:
-      // - apariciones[app] = veces que aparece como visita en una sesión
-      // - continuaciones[app] = veces que después de visitar app hay otra app distinta en la sesión
-      const apariciones: Map<string, number> = new Map();
-      const continuaciones: Map<string, number> = new Map();
-      const incInc = (m: Map<string, number>, k: string) => m.set(k, (m.get(k) || 0) + 1);
 
       // Descubrimiento interno (KPI honesto): cuenta cada clic de navegación entre apps
       // a través del atributo ?from=, INDEPENDIENTEMENTE de si la sesión se fragmenta.
@@ -983,96 +971,23 @@ export const analyticsRouter = router({
       };
 
       for (const [, visitas] of sesiones) {
-        const appsUnicas = new Set(visitas.map(v => v.app));
         totalVisitas += visitas.length;
 
-        // Longitud
-        const n = appsUnicas.size;
-        if (n === 1) { sesionesSingleApp++; distribLongitud['1']++; }
-        else { sesionesMultiApp++; }
-        if (n === 2) distribLongitud['2']++;
-        else if (n === 3) distribLongitud['3']++;
-        else if (n >= 4 && n <= 5) distribLongitud['4-5']++;
-        else if (n >= 6) distribLongitud['6+']++;
-
-        // Pasa por home
-        if (appsUnicas.has('home') || appsUnicas.has('/')) sesionesConHome++;
-
-        // Origen primera app
-        const primera = visitas[0];
-        if (primera.app === 'home' || primera.app === '/') origenPrimeraApp['home']++;
-        else origenPrimeraApp['directo-google-ia']++;
-
-        // Pares from→to (usa from si existe, si no encadena con la app anterior)
-        for (let i = 0; i < visitas.length; i++) {
-          const v = visitas[i];
-          // Apariciones contables: cada visita única en la sesión
-          incInc(apariciones, v.app);
-
-          // Continuación: si hay siguiente visita y es app distinta, esta es app puente
-          const tieneSiguiente = visitas.slice(i + 1).some(s => s.app !== v.app);
-          if (tieneSiguiente) incInc(continuaciones, v.app);
-
-          // Clic de descubrimiento interno: cualquier visita con ?from= explícito
+        // Clic de descubrimiento interno: cualquier visita con ?from= explícito
+        for (const v of visitas) {
           if (v.from) {
             clicsInternos++;
             const cat = categoriaDe(v.from);
             clicsPorCategoria[cat] = (clicsPorCategoria[cat] || 0) + 1;
           }
-
-          // Par from→to: priorizar el `from` explícito (RelatedApps, home-daily, search...)
-          let origen: string | null = null;
-          if (v.from) {
-            origen = v.from;
-          } else if (i > 0) {
-            origen = `prev:${visitas[i - 1].app}`;
-          }
-          if (origen) {
-            const key = `${origen}|${v.app}`;
-            paresFromTo.set(key, (paresFromTo.get(key) || 0) + 1);
-          }
         }
       }
-
-      // Top pares from→to (top 30)
-      const topPares = Array.from(paresFromTo.entries())
-        .map(([k, count]) => {
-          const [origen, destino] = k.split('|');
-          return { origen, destino, count };
-        })
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 30);
-
-      // Apps puente/puerta (top 20 por apariciones, mostrando ratio de continuación)
-      const tablaPuente = Array.from(apariciones.entries())
-        .map(([app, apar]) => ({
-          app,
-          apariciones: apar,
-          continuaciones: continuaciones.get(app) || 0,
-          ratio: apar > 0 ? (continuaciones.get(app) || 0) / apar : 0,
-        }))
-        .filter(r => r.apariciones >= 3) // mínimo 3 apariciones para ser estadísticamente útil
-        .sort((a, b) => b.apariciones - a.apariciones)
-        .slice(0, 20);
-
-      const appsPorSesionMedio = totalSesiones > 0 ? totalVisitas / totalSesiones : 0;
-      const pctSingleApp = totalSesiones > 0 ? (sesionesSingleApp / totalSesiones) * 100 : 0;
-      const pctMultiApp = totalSesiones > 0 ? (sesionesMultiApp / totalSesiones) * 100 : 0;
-      const pctConHome = totalSesiones > 0 ? (sesionesConHome / totalSesiones) * 100 : 0;
-      const pctOrigenHome = totalSesiones > 0 ? (origenPrimeraApp['home'] / totalSesiones) * 100 : 0;
-      const pctOrigenDirecto = totalSesiones > 0 ? (origenPrimeraApp['directo-google-ia'] / totalSesiones) * 100 : 0;
 
       return {
         ventanaDias: input.dias,
         kpis: {
           totalSesiones,
           totalVisitas,
-          appsPorSesionMedio: Math.round(appsPorSesionMedio * 100) / 100,
-          pctSingleApp: Math.round(pctSingleApp * 10) / 10,
-          pctMultiApp: Math.round(pctMultiApp * 10) / 10,
-          pctConHome: Math.round(pctConHome * 10) / 10,
-          pctOrigenHome: Math.round(pctOrigenHome * 10) / 10,
-          pctOrigenDirecto: Math.round(pctOrigenDirecto * 10) / 10,
         },
         descubrimientoInterno: {
           total: clicsInternos,
@@ -1082,12 +997,9 @@ export const analyticsRouter = router({
           ventanas: {
             hoy: { clics: clics24h, visitas: visitas24h, pct: visitas24h > 0 ? Math.round((clics24h / visitas24h) * 1000) / 10 : 0 },
             semana: { clics: clics7d, visitas: visitas7d, pct: visitas7d > 0 ? Math.round((clics7d / visitas7d) * 1000) / 10 : 0 },
-            quincena: { clics: clicsInternos, visitas: totalVisitas, pct: totalVisitas > 0 ? Math.round((clicsInternos / totalVisitas) * 1000) / 10 : 0 },
+            ventana: { clics: clicsInternos, visitas: totalVisitas, pct: totalVisitas > 0 ? Math.round((clicsInternos / totalVisitas) * 1000) / 10 : 0 },
           },
         },
-        distribucionLongitud: distribLongitud,
-        topPares,
-        tablaPuente,
       };
     }),
 

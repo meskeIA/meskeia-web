@@ -235,9 +235,10 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
     { enabled: tabActiva === 'resumen' }
   );
 
-  // tRPC: Navegación — lazy: solo carga cuando el tab está activo
+  // tRPC: Navegación — lazy: solo carga cuando el tab está activo.
+  // Ventana 30d = la misma que la sección 9 del digest, para poder comparar sin conversión.
   const navegacionQuery = trpc.analytics.getNavegacion.useQuery(
-    { dias: 14 },
+    { dias: 30 },
     { enabled: tabActiva === 'navegacion' }
   );
 
@@ -1776,6 +1777,13 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
               encima, dos líneas reparten el tráfico de portales según entre por meskeia.com o ya por su
               dominio propio. Excluye bots y tu propia IP.
             </p>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
+              ⚠️ La cifra de dominio propio <strong>no es comparable entre verticales</strong>: solo Cronicum
+              migró sus apps a su dominio; las de los otros tres viven en meskeia.com <strong>por diseño</strong>,
+              así que su número de portal solo mide sus páginas propias y está estructuralmente acotado. Un
+              portal pequeño aquí no es síntoma de nada — compara cada tema consigo mismo en el tiempo, no
+              un vertical contra otro.
+            </p>
 
             {dominiosQuery.isLoading && <p>Cargando tráfico por dominio...</p>}
             {dominiosQuery.error && <p style={{ color: 'red' }}>Error al cargar el desglose por dominio</p>}
@@ -1947,7 +1955,13 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
               Lo que esta página mide y ninguna otra: los clics <code>?from=</code> de navegación entre apps
               (descubrimiento interno) y los saltos cross-dominio meskeIA ↔ verticales. Es la <strong>única palanca de
               crecimiento endógena</strong> — la que sí controlas, frente a Google/Bing/IA que son exógenos.
-              Ventana: últimos {navegacionQuery.data?.ventanaDias ?? 14} días. Excluye bots, MCP y Mi IP.
+              Ventana: últimos {navegacionQuery.data?.ventanaDias ?? 30} días — <strong>la misma que el digest</strong>,
+              para comparar sin conversión. Excluye bots, MCP y Mi IP.
+            </p>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1rem' }}>
+              La <strong>lectura diaria</strong> de estas métricas (absoluto + tendencia + avisos de corte de
+              instrumentación) la hace <code>/digest-diario</code>; esta pestaña es el <strong>desglose por canal</strong>{' '}
+              para investigar cuando el digest marca algo.
             </p>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '1.5rem', background: 'var(--bg-primary)', borderLeft: '3px solid var(--primary)', padding: '0.75rem 1rem', borderRadius: '0 6px 6px 0' }}>
               <strong>Por qué el clic <code>?from=</code> y no «apps por sesión».</strong> El <code>sesion_id</code> no
@@ -1971,7 +1985,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                         {([
                           { label: 'Hoy (24 h)', w: navegacionQuery.data.descubrimientoInterno.ventanas.hoy },
                           { label: '7 días', w: navegacionQuery.data.descubrimientoInterno.ventanas.semana },
-                          { label: '14 días', w: navegacionQuery.data.descubrimientoInterno.ventanas.quincena, ref: true },
+                          { label: '30 días', w: navegacionQuery.data.descubrimientoInterno.ventanas.ventana, ref: true },
                         ]).map((v) => (
                           <div key={v.label} style={{
                             flex: 1, textAlign: 'center', padding: '10px 4px', borderRadius: '10px',
@@ -1984,7 +1998,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                         ))}
                       </div>
                       <small style={{ opacity: 0.9 }}>
-                        Tasa = clics de descubrimiento ÷ visitas de la ventana. Se lee la <strong>dirección</strong> (14 días = referencia), sin suelos ni alarmas.
+                        Tasa = clics de descubrimiento ÷ visitas de la ventana. Se lee la <strong>dirección</strong> (30 días = referencia, la ventana del digest), sin suelos ni alarmas.
                       </small>
                     </div>
                   </div>
@@ -1993,7 +2007,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                   <div className={styles.statCard}>
                     <div style={{ width: '100%' }}>
                       <div style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em', color: 'var(--text-muted)', marginBottom: '10px' }}>
-                        Composición del descubrimiento (14 días)
+                        Composición del descubrimiento (30 días)
                       </div>
                       {[
                         { label: 'Visitas de la ventana', value: navegacionQuery.data.kpis.totalVisitas.toLocaleString('es-ES'), sub: 'denominador' },
@@ -2057,81 +2071,12 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                   </table>
                 </div>
 
-                {/* Detalle forense (plegado): material de contraste con GSC/BWT, no señal de vistazo diario.
-                    Se apoya en el orden dentro de la sesión, que los webviews fragmentan → tomar con pinzas. */}
-                <details style={{ marginTop: '2rem' }}>
-                  <summary style={{ cursor: 'pointer', fontSize: '1.05rem', fontWeight: 700 }}>
-                    Detalle forense: transiciones y apps puente (top 10)
-                  </summary>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', margin: '0.75rem 0 1.25rem' }}>
-                    Plegado a propósito: es material de contraste (cruce con GSC/BWT), no señal de vistazo diario. Las
-                    transiciones y el ratio puente/puerta se apoyan en el orden dentro de la sesión, que los webviews fragmentan.
-                  </p>
-
-                  <h3 style={{ fontSize: '1rem' }}>Top 10 transiciones (origen → destino)</h3>
-                  {navegacionQuery.data.topPares.length === 0 ? (
-                    <p style={{ color: 'var(--text-muted)' }}>Aún no hay transiciones registradas en esta ventana.</p>
-                  ) : (
-                    <div className={styles.tableContainer}>
-                      <table className={styles.table}>
-                        <thead>
-                          <tr>
-                            <th>Origen</th>
-                            <th>Destino</th>
-                            <th style={{ textAlign: 'right' }}>Veces</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {navegacionQuery.data.topPares.slice(0, 10).map((par, i) => (
-                            <tr key={`${par.origen}-${par.destino}-${i}`}>
-                              <td><code>{par.origen}</code></td>
-                              <td><code>{par.destino}</code></td>
-                              <td style={{ textAlign: 'right' }}><strong>{par.count}</strong></td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-
-                  <h3 style={{ fontSize: '1rem', marginTop: '1.5rem' }}>Top 10 apps puente vs puerta</h3>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '0.75rem' }}>
-                    <strong>Ratio de continuación</strong> = % de visitas a esa app que siguen a otra app en la misma sesión.
-                    Alto = «puente» (conduce a explorar); bajo = «puerta» (entran y salen). Mínimo 3 apariciones.
-                  </p>
-                  {navegacionQuery.data.tablaPuente.length === 0 ? (
-                    <p style={{ color: 'var(--text-muted)' }}>Sin datos suficientes en la ventana.</p>
-                  ) : (
-                    <div className={styles.tableContainer}>
-                      <table className={styles.table}>
-                        <thead>
-                          <tr>
-                            <th>App</th>
-                            <th style={{ textAlign: 'right' }}>Apariciones</th>
-                            <th style={{ textAlign: 'right' }}>Continuaciones</th>
-                            <th style={{ textAlign: 'right' }}>Ratio</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {navegacionQuery.data.tablaPuente.slice(0, 10).map((row) => (
-                            <tr key={row.app}>
-                              <td><code>{row.app}</code></td>
-                              <td style={{ textAlign: 'right' }}>{row.apariciones}</td>
-                              <td style={{ textAlign: 'right' }}>{row.continuaciones}</td>
-                              <td style={{
-                                textAlign: 'right',
-                                color: row.ratio >= 0.5 ? '#16a34a' : row.ratio >= 0.25 ? '#f59e0b' : '#dc2626',
-                                fontWeight: 700,
-                              }}>
-                                {(row.ratio * 100).toFixed(1)}%
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </details>
+                {/* El «detalle forense» (transiciones + puente/puerta) se retiró el 21/08/2026:
+                    las transiciones estaban dominadas por falsos `prev:X → X` (recargas — el
+                    fallback prev: no filtraba la misma app) y puente/puerta respondía, con el
+                    orden de sesión que los webviews fragmentan, a una pregunta ya cerrada
+                    (app de un golpe = puerta ES el producto funcionando). Una transición
+                    concreta se consulta en el dump. */}
               </>
             )}
           </section>
