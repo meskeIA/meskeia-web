@@ -58,10 +58,23 @@ export default function SimuladorGeneticaPage() {
     organisms,
   } = useGeneticSimulation();
 
-  // Realizar cruce automáticamente cuando cambian los genotipos
+  // Recalcular el cruce cuando cambia CUALQUIERA de sus entradas. Antes solo escuchaba a
+  // los genotipos del rasgo 1: pulsar «Dihíbrido» o cambiar el segundo rasgo dejaba en
+  // pantalla el cruce anterior, sin marca de estar viejo (Inspector, 20/08/2026).
   useEffect(() => {
     performCrossing();
-  }, [parent1Genotype, parent2Genotype, selectedTrait1, performCrossing]);
+  }, [
+    parent1Genotype,
+    parent2Genotype,
+    parent1Genotype2,
+    parent2Genotype2,
+    selectedTrait1,
+    selectedTrait2,
+    crossType,
+    parent1Sex,
+    parent2Sex,
+    performCrossing,
+  ]);
 
   // Obtener fenotipos para preview
   const getPhentypeForGenotype = (genotype: string, sex: 'male' | 'female') => {
@@ -160,12 +173,14 @@ export default function SimuladorGeneticaPage() {
         {organisms.map((organism) => (
           <button
             key={organism.id}
+            type="button"
+            aria-pressed={selectedOrganism.id === organism.id}
             className={`${styles.organismButton} ${
               selectedOrganism.id === organism.id ? styles.active : ''
             }`}
             onClick={() => setSelectedOrganism(organism.id)}
           >
-            <span className={styles.organismIcon}>{organism.icon}</span>
+            <span aria-hidden="true" className={styles.organismIcon}>{organism.icon}</span>
             <span className={styles.organismName}>{organism.name}</span>
           </button>
         ))}
@@ -187,6 +202,8 @@ export default function SimuladorGeneticaPage() {
             {canDoDihybrid && (
               <div className={styles.crossTypeToggle}>
                 <button
+                  type="button"
+                  aria-pressed={crossType === 'monohybrid'}
                   className={`${styles.crossTypeBtn} ${
                     crossType === 'monohybrid' ? styles.active : ''
                   }`}
@@ -195,6 +212,8 @@ export default function SimuladorGeneticaPage() {
                   Monohíbrido
                 </button>
                 <button
+                  type="button"
+                  aria-pressed={crossType === 'dihybrid'}
                   className={`${styles.crossTypeBtn} ${
                     crossType === 'dihybrid' ? styles.active : ''
                   }`}
@@ -339,8 +358,8 @@ export default function SimuladorGeneticaPage() {
               </div>
             )}
 
-            <button className={styles.crossButton} onClick={performCrossing}>
-              🧬 Realizar Cruce
+            <button type="button" className={styles.crossButton} onClick={performCrossing}>
+              <span aria-hidden="true">🧬</span> Realizar Cruce
             </button>
           </div>
         </div>
@@ -355,26 +374,38 @@ export default function SimuladorGeneticaPage() {
           </div>
 
           {/* Tabs */}
-          <div className={styles.tabs}>
+          <div className={styles.tabs} role="tablist" aria-label="Resultados del cruce">
             <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'punnett'}
               className={`${styles.tab} ${activeTab === 'punnett' ? styles.active : ''}`}
               onClick={() => setActiveTab('punnett')}
             >
               Punnett
             </button>
             <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'stats'}
               className={`${styles.tab} ${activeTab === 'stats' ? styles.active : ''}`}
               onClick={() => setActiveTab('stats')}
             >
               Estadísticas
             </button>
             <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'population'}
               className={`${styles.tab} ${activeTab === 'population' ? styles.active : ''}`}
               onClick={() => setActiveTab('population')}
             >
               Población
             </button>
             <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'pedigree'}
               className={`${styles.tab} ${activeTab === 'pedigree' ? styles.active : ''}`}
               onClick={() => {
                 setActiveTab('pedigree');
@@ -661,8 +692,9 @@ export default function SimuladorGeneticaPage() {
                 </code>
               </div>
               <p className={styles.escenarioTip}>
-                <strong>Por qué funciona:</strong> Selecciona &quot;Herencia ligada al sexo&quot;,
-                elige los genotipos y el cuadro de Punnett se construye automáticamente.
+                <strong>Por qué funciona:</strong> elige el organismo <strong>Humanos</strong> y,
+                dentro, el rasgo <strong>Daltonismo</strong> —de herencia ligada al sexo—; fija los
+                genotipos y el cuadro de Punnett se construye automáticamente.
                 La pestaña Estadísticas muestra los porcentajes exactos que pide el examen.
               </p>
             </div>
@@ -677,7 +709,7 @@ export default function SimuladorGeneticaPage() {
                 <code>
                   {`Padres portadores de fibrosis quística (Aa × Aa)
 → 25% afectados, 50% portadores, 25% libres
-→ Árbol genealógico con 3 generaciones`}
+→ Árbol genealógico de padres e hijos`}
                 </code>
               </div>
               <p className={styles.escenarioTip}>
@@ -703,7 +735,7 @@ Cruce Aa × Aa → 75% liso, 25% rizado
               </div>
               <p className={styles.escenarioTip}>
                 <strong>Por qué funciona:</strong> La pestaña Población simula hasta
-                1.000 individuos y muestra la distribución real frente a la teórica.
+                500 individuos y muestra la distribución real frente a la teórica.
                 El test chi-cuadrado verifica si los resultados son estadísticamente esperables.
               </p>
             </div>

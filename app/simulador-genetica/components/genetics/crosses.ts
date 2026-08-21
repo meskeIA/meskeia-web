@@ -375,8 +375,15 @@ export function generateSexLinkedPunnett(
         genotype = `${femaleGamete} Y`;
         offspringSex = 'male';
       } else {
-        // Hija hembra
-        genotype = `${femaleGamete} ${maleGamete}`;
+        // Hija hembra. El orden NO es el de los progenitores: rige el convenio universal
+        // que la propia guia de la app enseña —el alelo dominante va primero (XD Xd, no
+        // Xd XD)—. Con el gameto materno delante salían cadenas que no existen en la tabla
+        // de fenotipos de organisms.ts (Inspector, 20/08/2026).
+        const dominanteX = `X${trait.alleles.dominant.symbol}`;
+        genotype =
+          maleGamete === dominanteX && femaleGamete !== dominanteX
+            ? `${maleGamete} ${femaleGamete}`
+            : `${femaleGamete} ${maleGamete}`;
         offspringSex = 'female';
       }
 

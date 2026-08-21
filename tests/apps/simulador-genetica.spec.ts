@@ -65,8 +65,9 @@ const probabilidadesDeCelda = (page: Page) => page.locator('[class*="cellProbabi
 /** 0 y 1 = rasgo 1 (padre, madre); 2 y 3 = rasgo 2 en el cruce dihíbrido. */
 const selectorGenotipo = (page: Page, i: number) => page.locator('[class*="genotypeSelect"]').nth(i);
 const selectorRasgo = (page: Page, i: number) => page.locator('select[class*="select"]').nth(i);
+/** Las cuatro pestañas de resultados son `role="tab"` desde la reparación del 21/08/2026. */
 const pestana = (page: Page, nombre: string) =>
-  page.getByRole('button', { name: nombre, exact: true });
+  page.getByRole('tab', { name: nombre, exact: true });
 const campoPoblacion = (page: Page) => page.locator('input[type="number"]');
 
 /** Cabeceras del cuadro: [gametos en columnas, gametos en filas]. */
@@ -164,7 +165,8 @@ test.describe('Caso 2 — límites', () => {
     await selectorGenotipo(page, 1).selectOption('aa');
 
     // Un padre que solo da A y una madre que solo da a: no hay más resultado posible que Aa.
-    await expect(genotiposDeCelda(page)).toHaveText(['Aa']);
+    // El cuadro se dibuja 2×2 (cabeceras A|A y a|a), así que las cuatro celdas son Aa.
+    await expect(genotiposDeCelda(page)).toHaveText(['Aa', 'Aa', 'Aa', 'Aa']);
     const { genotipos, fenotipos } = await estadisticas(page);
     expect(genotipos.filas).toEqual(['Aa 100%']);
     expect(fenotipos.filas).toEqual(['🟡 Amarillo 100%']);
@@ -285,44 +287,62 @@ test.describe('Caso 3 — rechazos', () => {
 /**
  * HALLAZGOS ABIERTOS del 20/08/2026. Todos fallan HOY a propósito.
  */
-test.describe('Simulador de genética — hallazgos abiertos', () => {
+// REGRESIONES — los diez hallazgos del 20/08/2026, reparados el 21/08/2026. Afirman lo que
+// debe pasar y hoy PASAN: si alguien reintroduce el defecto, saltan aquí.
+test.describe('Simulador de genética — regresiones de los hallazgos reparados', () => {
   test('el dihíbrido con un progenitor homocigoto coloca mal TODAS las celdas', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
     await page.goto(RUTA);
     await page.getByRole('button', { name: 'Dihíbrido', exact: true }).click();
     await selectorGenotipo(page, 0).selectOption('AA'); // padre AA RR: un solo gameto, AR
     await selectorGenotipo(page, 2).selectOption('RR');
     await page.getByRole('button', { name: /Realizar Cruce/ }).click();
 
-    // AA RR × Aa Rr: el padre solo aporta AR; la madre AR, Ar, aR, ar (25 % cada uno).
-    // Descendencia calculada a mano → AA RR, AA Rr, Aa RR, Aa Rr, una por fila.
-    // El panel Estadísticas lo dice bien (1:1:1:1), pero el CUADRO repite «AA RR» cuatro veces:
-    // PunnettSquare indexa las celdas con el nº de gametos ÚNICOS y lee las 4 primeras de las 16.
-    await expect(genotiposDeCelda(page)).toHaveText(['AA RR', 'AA Rr', 'Aa RR', 'Aa Rr']);
+    // AA RR × Aa Rr: el padre solo aporta AR (sus 4 columnas son iguales); la madre aporta
+    // AR, Ar, aR, ar, una por fila. Resuelto a mano, cada fila da el mismo genotipo en sus
+    // cuatro columnas: fila AR → AA RR · fila Ar → AA Rr · fila aR → Aa RR · fila ar → Aa Rr.
+    // Antes se indexaban las celdas con el nº de gametos ÚNICOS mientras se generaban sobre la
+    // rejilla entera, así que se leían las 4 primeras de las 16 y «AA RR» salía repetido en
+    // todo el cuadro, contradiciendo al panel Estadísticas (que sí decía 1:1:1:1).
+    await expect(genotiposDeCelda(page)).toHaveText([
+      'AA RR', 'AA RR', 'AA RR', 'AA RR',
+      'AA Rr', 'AA Rr', 'AA Rr', 'AA Rr',
+      'Aa RR', 'Aa RR', 'Aa RR', 'Aa RR',
+      'Aa Rr', 'Aa Rr', 'Aa Rr', 'Aa Rr',
+    ]);
+
+    // Y las 16 celdas suman 100 %: 4/16 de cada genotipo, que es el 1:1:1:1 de Estadísticas.
+    expect((await estadisticas(page)).genotipos.ratio).toBe('Ratio: 1:1:1:1');
   });
 
-  test('la probabilidad de cada celda sigue siendo 25 % aunque el cuadro se colapse', async ({
+  test('el cuadro de un homocigoto se dibuja completo y sus celdas suman 100 %', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
     await page.goto(RUTA);
     await selectorGenotipo(page, 0).selectOption('AA');
     await selectorGenotipo(page, 1).selectOption('aa');
 
-    // AA × aa deja una sola combinación posible: su probabilidad es 4/4 = 100 %, y así lo dice
-    // la pestaña Estadísticas («Aa 100%»). El cuadro de Punnett — que es lo que se enseña y se
-    // copia al cuaderno — etiqueta esa única celda con «25.0%», contradiciendo al otro panel.
+    // AA × aa se dibuja 2×2 con las cabeceras A|A y a|a: es el cuadro de Punnett canónico y
+    // la 1.ª ley de Mendel que la propia app enseña («todos Aa»). Las cuatro celdas son Aa al
+    // 25 % y suman el 100 % que anuncia Estadísticas. Lo que estaba roto no era el número de
+    // celdas, sino que las cabeceras se colapsaban mientras las celdas no, dejando cada una
+    // bajo una fila y una columna que no le correspondían.
+    const [columnas, filas] = await cabeceras(page);
+    expect(columnas).toHaveLength(2);
+    expect(filas).toHaveLength(2);
+
     const probabilidades = await probabilidadesDeCelda(page).allInnerTexts();
-    expect(probabilidades).toHaveLength(1);
-    expect(probabilidades[0]).toMatch(/^100/);
+    expect(probabilidades).toEqual(['25,0%', '25,0%', '25,0%', '25,0%']);
+    await expect(genotiposDeCelda(page)).toHaveText(['Aa', 'Aa', 'Aa', 'Aa']);
+
+    // Las cuatro celdas son el mismo genotipo: Estadísticas dice «Aa 100%», sin contradicción.
+    expect((await estadisticas(page)).genotipos.filas).toEqual(['Aa 100%']);
   });
 
   test('el cuadro no se rehace al pasar a dihíbrido ni al cambiar el segundo rasgo', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
     await page.goto(RUTA);
     await page.getByRole('button', { name: 'Dihíbrido', exact: true }).click();
     // El useEffect que recruza solo mira parent1Genotype, parent2Genotype y selectedTrait1:
@@ -340,7 +360,6 @@ test.describe('Simulador de genética — hallazgos abiertos', () => {
   test('en herencia ligada al sexo las estadísticas enseñan dos filas idénticas', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
     await page.goto(RUTA);
     await abreDaltonismo(page);
 
@@ -355,16 +374,14 @@ test.describe('Simulador de genética — hallazgos abiertos', () => {
   });
 
   test('los porcentajes se imprimen con punto decimal en vez de coma', async ({ page }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
     await page.goto(RUTA);
-    // Formato español obligatorio (formatPercentage de lib/formatters da «25,00%»);
-    // aquí se usa toFixed(1) directamente y sale «25.0%».
+    // Formato español obligatorio: antes se usaba toFixed(1) directamente y salía «25.0%».
+    await expect(probabilidadesDeCelda(page)).toHaveCount(4);
     const probabilidades = await probabilidadesDeCelda(page).allInnerTexts();
     expect(probabilidades).toEqual(['25,0%', '25,0%', '25,0%', '25,0%']);
   });
 
   test('los botones de selección no llevan type ni anuncian qué está activo', async ({ page }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
     await page.goto(RUTA);
     const organismos = page.locator('[class*="organismButton"]');
     await expect(organismos).toHaveCount(4);
@@ -378,28 +395,30 @@ test.describe('Simulador de genética — hallazgos abiertos', () => {
     }
   });
 
-  test('la guía promete 1.000 individuos y tres generaciones que la herramienta no da', async ({
-    page,
-  }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
+  test('la guía no promete nada que la herramienta no haga', async ({ page }) => {
     await page.goto(RUTA);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const guia = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
-    expect(guia).toContain('hasta 1.000 individuos'); // lo que promete el bloque educativo
-    expect(guia).toContain('3 generaciones');
 
-    // Pero el campo de población tope en 500…
+    // Prometía 1.000 individuos, tres generaciones de pedigree y una opción «Herencia ligada
+    // al sexo» inexistente. Se alinea el texto con la herramienta, no al revés: el pedigree de
+    // tres generaciones existe (`generatePedigree`) pero exige los cuatro genotipos de los
+    // abuelos, que la app no pregunta, así que conectarlo sería interfaz nueva.
+    expect(guia).not.toContain('1.000 individuos');
+    expect(guia).not.toContain('3 generaciones');
+    expect(guia).toContain('hasta');
+    expect(guia).toContain('500 individuos');
+
+    // Y el tope que anuncia es el que declara el campo…
     await pestana(page, 'Población').click();
-    expect(Number(await campoPoblacion(page).getAttribute('max'))).toBeGreaterThanOrEqual(1000);
+    expect(Number(await campoPoblacion(page).getAttribute('max'))).toBe(500);
 
-    // …y el árbol genealógico solo pinta dos generaciones (Padres e Hijos): la función de tres
-    // generaciones existe en pedigree.ts pero no está conectada a la pestaña.
+    // …y el árbol genealógico sigue siendo de padres e hijos, como ahora dice el texto.
     await pestana(page, 'Pedigree').click();
-    await expect(page.locator('[class*="pedigreeGenerationLabel"]')).toHaveCount(3);
+    await expect(page.locator('[class*="pedigreeGenerationLabel"]')).toHaveCount(2);
   });
 
   test('el bloque chi-cuadrado desaparece justo cuando el ajuste es perfecto', async ({ page }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
     await page.goto(RUTA);
     // AA × aa da un solo fenotipo: lo observado SIEMPRE coincide con lo esperado y χ² = 0.
     await selectorGenotipo(page, 0).selectOption('AA');
@@ -414,20 +433,28 @@ test.describe('Simulador de genética — hallazgos abiertos', () => {
   });
 
   test('el tamaño de población acepta 7 aunque el campo declare min=10', async ({ page }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
     await page.goto(RUTA);
     await pestana(page, 'Población').click();
     const campo = campoPoblacion(page);
     await campo.fill('7');
-    // El validador de JavaScript solo comprueba > 0 y <= 500, así que 7 entra y simula 7
-    // individuos pese al min=10 del propio campo (checkValidity() da false y nadie lo mira).
+    // El validador comprobaba > 0 y <= 500 mientras el campo declara min=10: el 7 entraba y
+    // se simulaban 7 individuos. Ahora se rechaza, y además se dice por qué en vez de
+    // revertir en silencio.
     await expect(campo).toHaveValue('100');
+    await expect(page.locator('#aviso-tamano-poblacion')).toContainText('entre 10 y 500');
+
+    // El límite superior se rechaza igual…
+    await campo.fill('1000');
+    await expect(page.locator('#aviso-tamano-poblacion')).toBeVisible();
+    // …y un valor válido no deja aviso ninguno.
+    await campo.fill('50');
+    await expect(page.locator('#aviso-tamano-poblacion')).toHaveCount(0);
+    await expect(campo).toHaveValue('50');
   });
 
   test('en ligada al sexo el genotipo se escribe con el alelo recesivo delante', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
     await page.goto(RUTA);
     await abreDaltonismo(page);
     // La hija portadora sale como «Xd XD» porque el gameto materno se escribe primero. La guía

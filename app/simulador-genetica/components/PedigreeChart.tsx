@@ -1,5 +1,6 @@
 'use client';
 
+import { Fragment } from 'react';
 import styles from '../SimuladorGenetica.module.css';
 import { PedigreeChart as PedigreeChartType, PedigreeIndividual } from './types';
 
@@ -37,13 +38,15 @@ export default function PedigreeChart({ pedigree }: PedigreeChartProps) {
           {genIndex === 0 ? (
             // Padres: mostrar como pareja
             <div className={styles.pedigreeCouple}>
+              {/* La key va en el elemento RAÍZ que devuelve el map, es decir en el
+                  fragmento, no en el hijo: React avisaba de «unique key prop» en consola. */}
               {individuals.map((ind, idx) => (
-                <>
-                  <PedigreeIndividualComponent key={ind.id} individual={ind} />
+                <Fragment key={ind.id}>
+                  <PedigreeIndividualComponent individual={ind} />
                   {idx === 0 && individuals.length > 1 && (
                     <div className={styles.pedigreeConnection} />
                   )}
-                </>
+                </Fragment>
               ))}
             </div>
           ) : (

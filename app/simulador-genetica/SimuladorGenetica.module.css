@@ -480,6 +480,22 @@
   text-align: center;
 }
 
+.avisoTamano {
+  margin: calc(-1 * var(--spacing-md)) 0 var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-left: 3px solid #c0392b;
+  border-radius: var(--radius);
+  background: rgba(192, 57, 43, 0.08);
+  color: #c0392b;
+  font-size: 0.9rem;
+}
+
+[data-theme='dark'] .avisoTamano {
+  background: rgba(192, 57, 43, 0.18);
+  color: #f5b7b1;
+  border-left-color: #f5b7b1;
+}
+
 .simulateBtn {
   padding: var(--spacing-sm) var(--spacing-lg);
   background: var(--secondary);

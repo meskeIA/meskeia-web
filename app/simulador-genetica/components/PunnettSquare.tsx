@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import styles from '../SimuladorGenetica.module.css';
+import { formatNumber } from '@/lib';
 import { PunnettResult, PunnettAnimationState } from './types';
 
 interface PunnettSquareProps {
@@ -58,26 +59,33 @@ export default function PunnettSquare({
 
   const isDihybrid = punnett.size === 4;
 
-  // Obtener gametos únicos para cabeceras
-  const uniqueGametes1 = [...new Set(punnett.gametes1)];
-  const uniqueGametes2 = [...new Set(punnett.gametes2)];
+  /**
+   * La rejilla se pinta COMPLETA, con los gametos tal como los devuelve el motor y sus
+   * repeticiones incluidas. Antes se colapsaban con `new Set(...)` para las cabeceras
+   * mientras las celdas seguían generándose sobre la rejilla entera: con un progenitor
+   * homocigoto, cada celda quedaba bajo una fila y una columna que no eran las suyas
+   * (Inspector, 20/08/2026). Un cuadro de Punnett de AA × aa se dibuja 2×2 con las
+   * cabeceras A|A y a|a, no 1×1: las cuatro celdas Aa al 25 % son la 1.ª ley de Mendel.
+   */
+  const gametesFila = punnett.gametes2;
+  const gametesColumna = punnett.gametes1;
 
   return (
     <div className={styles.punnettContainer}>
       <div className={styles.animationControls}>
         {animationState === 'idle' && (
-          <button className={styles.animBtn} onClick={onStartAnimation}>
-            ▶️ Animar
+          <button type="button" className={styles.animBtn} onClick={onStartAnimation}>
+            <span aria-hidden="true">▶️</span> Animar
           </button>
         )}
         {(animationState === 'showing-gametes' || animationState === 'filling-cells') && (
-          <button className={styles.animBtn} disabled>
+          <button type="button" className={styles.animBtn} disabled>
             Animando...
           </button>
         )}
         {animationState === 'complete' && (
-          <button className={styles.animBtn} onClick={onResetAnimation}>
-            🔄 Reiniciar
+          <button type="button" className={styles.animBtn} onClick={onResetAnimation}>
+            <span aria-hidden="true">🔄</span> Reiniciar
           </button>
         )}
       </div>
@@ -86,7 +94,7 @@ export default function PunnettSquare({
         <thead>
           <tr>
             <th className={styles.corner}></th>
-            {uniqueGametes1.map((gamete, i) => (
+            {gametesColumna.map((gamete, i) => (
               <th
                 key={i}
                 colSpan={isDihybrid ? 1 : 1}
@@ -97,13 +105,13 @@ export default function PunnettSquare({
               >
                 {gamete}
                 <br />
-                <small>({((1 / uniqueGametes1.length) * 100).toFixed(0)}%)</small>
+                <small>({formatNumber((1 / gametesColumna.length) * 100, 0)}%)</small>
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {uniqueGametes2.map((gamete2, rowIndex) => (
+          {gametesFila.map((gamete2, rowIndex) => (
             <tr key={rowIndex}>
               <th
                 style={{
@@ -113,10 +121,11 @@ export default function PunnettSquare({
               >
                 {gamete2}
                 <br />
-                <small>({((1 / uniqueGametes2.length) * 100).toFixed(0)}%)</small>
+                <small>({formatNumber((1 / gametesFila.length) * 100, 0)}%)</small>
               </th>
-              {uniqueGametes1.map((_, colIndex) => {
-                const cellIndex = rowIndex * uniqueGametes1.length + colIndex;
+              {gametesColumna.map((_, colIndex) => {
+                // Mismo orden en el que el motor rellena `cells`: for (row) { for (col) }
+                const cellIndex = rowIndex * gametesColumna.length + colIndex;
                 const cell = punnett.cells[cellIndex];
                 const isVisible = visibleCells.has(cellIndex);
                 const isAnimating = animationState === 'filling-cells' && animationStep === cellIndex;
@@ -137,7 +146,7 @@ export default function PunnettSquare({
                     <div className={styles.cellIcon}>{cell.phenotypeIcon}</div>
                     <div className={styles.cellPhenotype}>{cell.phenotype}</div>
                     <div className={styles.cellProbability}>
-                      {(cell.probability * 100).toFixed(1)}%
+                      {formatNumber(cell.probability * 100, 1)}%
                     </div>
                   </td>
                 );

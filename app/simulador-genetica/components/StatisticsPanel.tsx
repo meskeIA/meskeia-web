@@ -1,6 +1,7 @@
 'use client';
 
 import styles from '../SimuladorGenetica.module.css';
+import { formatNumber } from '@/lib';
 import { PunnettResult } from './types';
 
 interface StatisticsPanelProps {
@@ -48,7 +49,7 @@ export default function StatisticsPanel({ punnett }: StatisticsPanelProps) {
                   }}
                 />
               </div>
-              <span className={styles.ratioValue}>{(ratio * 100).toFixed(0)}%</span>
+              <span className={styles.ratioValue}>{formatNumber(ratio * 100, 0)}%</span>
             </div>
           ))}
         {genotypeRatioStr && (
@@ -64,7 +65,10 @@ export default function StatisticsPanel({ punnett }: StatisticsPanelProps) {
           .map(([phenotype, data]) => (
             <div key={phenotype} className={styles.ratioBar}>
               <span className={styles.ratioLabel}>
-                {data.icon} {phenotype.split(' (')[0]}
+                {/* El « (♀)» / « (♂)» NO se recorta: en herencia ligada al sexo el recuento
+                    separa por sexo, así que sin él quedaban dos filas de texto idéntico con
+                    porcentajes distintos (Inspector, 20/08/2026). */}
+                <span aria-hidden="true">{data.icon}</span> {phenotype}
               </span>
               <div className={styles.ratioBarContainer}>
                 <div
@@ -75,7 +79,7 @@ export default function StatisticsPanel({ punnett }: StatisticsPanelProps) {
                   }}
                 />
               </div>
-              <span className={styles.ratioValue}>{(data.count * 100).toFixed(0)}%</span>
+              <span className={styles.ratioValue}>{formatNumber(data.count * 100, 0)}%</span>
             </div>
           ))}
         {phenotypeRatioStr && (
