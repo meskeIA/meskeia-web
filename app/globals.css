@@ -13,9 +13,24 @@
   --accent: #7FB3D3; /* Acento meskeIA (antes solo definido localmente en algunas apps) */
   --hero-bg: #1a5278;
 
+  /* ── Variantes ACCESIBLES de la marca (21/08/2026) ──────────────────────
+     Los colores de arriba son la identidad y no se tocan: rigen fondos, bordes,
+     iconos y degradados. Pero como TEXTO sobre fondo claro no llegan al 4,5:1 que
+     exige WCAG 2.1 AA —el azul da 4,11 y el teal con texto blanco, 2,80—, y eso
+     salía en el logo, el aviso legal, el pie y las tarjetas de todas las apps.
+     Estas variantes son el MISMO tono, un punto más oscuro, y se usan solo donde
+     el color hace de texto o de fondo de un texto blanco.                      */
+  --primary-texto: #26718F;      /* 5,47:1 sobre blanco · 5,24 sobre la tarjeta */
+  --secondary-texto: #327874;    /* 5,15:1 · 4,94 */
+  --primary-boton: #26718F;      /* texto blanco encima: 5,47:1 */
+  --secondary-boton: #327874;    /* texto blanco encima: 5,15:1 */
+
   --text-primary: #1A1A1A;
   --text-secondary: #666666;
-  --text-muted: #757575; /* Cambiado de #999999 para cumplir WCAG AA (4.5:1) */
+  --text-muted: #6E6E6E; /* 5,10:1 sobre blanco y 4,89 sobre la tarjeta #FAFAFA.
+                            Era #757575, elegido midiendo contra blanco puro (4,60),
+                            pero sobre el fondo de tarjeta se quedaba en 4,41 y axe lo
+                            marcaba en las descripciones de RelatedApps y en el pie. */
 
   --border: #E5E5E5;
   --hover: #F5F5F5;
@@ -78,6 +93,14 @@
   --primary-hover: #5CB8DC;
   --secondary: #5ABDB9;
 
+  /* En oscuro el color va sobre fondo #1A1A1A/#2D2D2D y estos tonos claros ya
+     superan el 4,5:1, así que las variantes de texto son los mismos colores. El
+     botón, en cambio, lleva texto blanco: ahí manda el tono oscuro del modo claro. */
+  --primary-texto: #3FA5D1;
+  --secondary-texto: #5ABDB9;
+  --primary-boton: #26718F;
+  --secondary-boton: #327874;
+
   /* Textos invertidos */
   --text-primary: #E8E8E8;
   --text-secondary: #B0B0B0;
@@ -115,6 +138,11 @@
   --accent: #C99BF5;
   --hero-bg: #2A1547;
   --focus: rgba(107, 33, 168, 0.15);
+  /* El violeta primario ya da 8,72:1; el secundario se queda en 3,96 y se oscurece */
+  --primary-texto: #6B21A8;
+  --secondary-texto: #8B3BD1;   /* 5,76:1 */
+  --primary-boton: #6B21A8;
+  --secondary-boton: #8B3BD1;
 }
 
 /* En modo oscuro, violetas más claros para contraste sobre fondo oscuro */
@@ -141,6 +169,11 @@
   --accent: #E8A33D;
   --hero-bg: #2C4327;
   --focus: rgba(79, 122, 58, 0.15);
+  /* El verde primario ya da 5,03:1; el secundario se queda en 2,38 y se oscurece */
+  --primary-texto: #4F7A3A;
+  --secondary-texto: #5E7547;   /* 5,11:1 */
+  --primary-boton: #4F7A3A;
+  --secondary-boton: #5E7547;
 }
 
 /* En modo oscuro, verdes más claros para contraste sobre fondo oscuro */
@@ -169,6 +202,11 @@
   --accent: #F6C27A;
   --hero-bg: #241C18;
   --focus: rgba(162, 75, 42, 0.15);
+  /* El terracota primario ya da 5,87:1; el secundario se oscurece a 5,33 */
+  --primary-texto: #A24B2A;
+  --secondary-texto: #9E5A22;   /* 5,33:1 */
+  --primary-boton: #A24B2A;
+  --secondary-boton: #9E5A22;
 }
 
 /* En modo oscuro, terracota/ámbar más claros para contraste */

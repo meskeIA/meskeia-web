@@ -27,13 +27,14 @@
 }
 
 .shareText {
-  color: var(--primary);
+  /* Variante accesible: como texto sobre blanco el azul de marca da 4,11:1 y AA exige 4,5 */
+  color: var(--primary-texto, #26718F);
 }
 
 .shareButton {
   background: none;
   border: none;
-  color: var(--primary);
+  color: var(--primary-texto, #26718F);
   cursor: pointer;
   font-size: 0.9rem;
   padding: 0;
@@ -84,11 +85,11 @@
 .invitacionPortales {
   margin: 0.2rem 0 0;
   font-size: 0.82rem;
-  color: var(--text-muted, #999);
+  color: var(--text-muted, #6E6E6E);
 }
 
 .marcaMadre {
-  color: var(--primary);
+  color: var(--primary-texto, #26718F);
   font-weight: 700;
   text-decoration: none;
 }

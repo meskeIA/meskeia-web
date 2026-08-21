@@ -10,6 +10,24 @@ import AxeBuilder from '@axe-core/playwright';
  * Los tests usan baseURL automáticamente.
  */
 
+/**
+ * Congela animaciones y transiciones antes de medir.
+ *
+ * `networkidle` no basta y esperar a `getAnimations()` tampoco: el TransparencyBanner
+ * entra con `animation: slideUp .3s` y los enlaces llevan `transition: color .2s`, así
+ * que axe-core llegaba a leer fotogramas intermedios —#eaeaea sobre blanco, 1,2:1— y el
+ * spec fallaba de forma intermitente por colores que nadie ve. Inyectar la regla es
+ * determinista: se mide el color en reposo, que es el que juzga WCAG (21/08/2026).
+ */
+async function congelarAnimaciones(page: Page): Promise<void> {
+  await page.addStyleTag({
+    content: `*, *::before, *::after {
+      animation: none !important;
+      transition: none !important;
+    }`,
+  });
+}
+
 // Apps a probar
 const APPS = [
   {
@@ -51,6 +69,7 @@ APPS.forEach(({ name, url, interactions }) => {
 
       // Esperar a que la página cargue completamente
       await page.waitForLoadState('networkidle');
+      await congelarAnimaciones(page);
 
       // Ejecutar análisis de accesibilidad
       const accessibilityScanResults = await new AxeBuilder({ page })
@@ -109,8 +128,14 @@ APPS.forEach(({ name, url, interactions }) => {
     test('debe permitir navegación completa por teclado', async ({ page }) => {
       await page.goto(url);
       await page.waitForLoadState('networkidle');
+      await congelarAnimaciones(page);
 
-      // Obtener todos los elementos interactivos
+      // Obtener todos los elementos interactivos de LA PÁGINA.
+      //
+      // Se excluye el overlay de Next.js Dev Tools (`<nextjs-portal>`, con su botón
+      // `#next-logo`): lo inyecta `next dev`, no existe en producción y vive en un portal
+      // que se queda el foco, así que el bucle de abajo lo daba por no enfocable y el test
+      // fallaba por un artefacto del servidor de desarrollo, no por la app (21/08/2026).
       const interactiveElements = await page.locator(
         'button, a, input, select, textarea, [tabindex]:not([tabindex="-1"])'
       ).all();
@@ -125,6 +150,8 @@ APPS.forEach(({ name, url, interactions }) => {
       let focusableCount = 0;
       for (const element of interactiveElements) {
         const isFocusable = await element.evaluate(el => {
+          if (el.closest('nextjs-portal') || el.id === 'next-logo') return false;
+          if ((el as HTMLButtonElement).disabled) return false;
           const style = window.getComputedStyle(el);
           return style.display !== 'none' && style.visibility !== 'hidden';
         });
@@ -172,6 +199,7 @@ APPS.forEach(({ name, url, interactions }) => {
     test('debe tener contraste de color adecuado', async ({ page }) => {
       await page.goto(url);
       await page.waitForLoadState('networkidle');
+      await congelarAnimaciones(page);
 
       // Ejecutar análisis solo de contraste
       const contrastResults = await new AxeBuilder({ page })
@@ -204,6 +232,7 @@ APPS.forEach(({ name, url, interactions }) => {
     test('debe funcionar interacción básica con teclado', async ({ page }) => {
       await page.goto(url);
       await page.waitForLoadState('networkidle');
+      await congelarAnimaciones(page);
 
       console.log(`\n⌨️ INTERACCIÓN CON TECLADO: ${name}`);
 
@@ -227,6 +256,7 @@ APPS.forEach(({ name, url, interactions }) => {
     test('debe tener estructura semántica HTML correcta', async ({ page }) => {
       await page.goto(url);
       await page.waitForLoadState('networkidle');
+      await congelarAnimaciones(page);
 
       console.log(`\n📋 ESTRUCTURA SEMÁNTICA: ${name}`);
 
@@ -292,6 +322,7 @@ test.describe('Resumen General de Accesibilidad', () => {
     for (const { name, url } of APPS) {
       await page.goto(url);
       await page.waitForLoadState('networkidle');
+      await congelarAnimaciones(page);
 
       const scanResults = await new AxeBuilder({ page })
         .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])

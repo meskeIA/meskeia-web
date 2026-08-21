@@ -48,7 +48,7 @@
   font-weight: 600;
   border: none;
   border-radius: var(--radius, 12px);
-  background: var(--secondary);
+  background: var(--secondary-boton, #327874);
   color: white;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -57,7 +57,7 @@
 }
 
 .toggleButton:hover {
-  background: #3a8784;
+  background: var(--secondary-texto, #2F726F);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.1));
 }
@@ -105,11 +105,11 @@
 }
 
 [data-theme='dark'] .toggleButton {
-  background: var(--secondary);
+  background: var(--secondary-boton, #327874);
 }
 
 [data-theme='dark'] .toggleButton:hover {
-  background: #3a8784;
+  background: var(--secondary-texto, #2F726F);
 }
 
 /* Responsive */

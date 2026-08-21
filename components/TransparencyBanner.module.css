@@ -80,13 +80,13 @@
   display: inline-block;
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--primary);
+  color: var(--primary-texto, #26718F);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .link:hover {
-  color: var(--secondary);
+  color: var(--secondary-texto, #327874);
   text-decoration: underline;
 }
 

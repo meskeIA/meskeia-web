@@ -115,9 +115,9 @@
 }
 
 .btnPorcentaje.activo {
-  background: var(--secondary);
+  background: var(--secondary-boton, #327874);
   color: white;
-  border-color: var(--secondary);
+  border-color: var(--secondary-boton, #327874);
 }
 
 /* Botón Reset */

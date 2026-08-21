@@ -54,12 +54,12 @@
 }
 
 .btnCopy {
-  background: var(--secondary);
+  background: var(--secondary-boton, #327874);
   color: white;
 }
 
 .btnCopy:hover:not(:disabled) {
-  background: #3a8c89;
+  background: var(--secondary-texto, #2F726F);
   transform: translateY(-2px);
   box-shadow: var(--shadow-medium);
 }
@@ -71,12 +71,12 @@
 }
 
 .btnGenerate {
-  background: var(--primary);
+  background: var(--primary-boton, #26718F);
   color: white;
 }
 
 .btnGenerate:hover {
-  background: #256d92;
+  background: #1f6786;
   transform: translateY(-2px);
   box-shadow: var(--shadow-medium);
 }
@@ -400,7 +400,7 @@
 
 .historyStrength4 {
   background: #e0f2f7;
-  color: #16a085;
+  color: #0f6a59;
 }
 
 .historyStrength5 {
@@ -445,7 +445,7 @@
 
 .btnSecondary {
   padding: 12px 24px;
-  background: var(--primary);
+  background: var(--primary-boton, #26718F);
   color: white;
   border: none;
   border-radius: var(--radius);

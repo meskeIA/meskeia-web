@@ -136,14 +136,14 @@
   font-weight: 600;
   border: none;
   border-radius: var(--radius);
-  background: var(--primary);
+  background: var(--primary-boton, #26718F);
   color: white;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .btnPrimary:hover {
-  background: #256a8a;
+  background: #1f6786;
   transform: translateY(-2px);
 }
 

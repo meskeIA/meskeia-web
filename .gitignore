@@ -49,6 +49,11 @@ yarn-error.log*
 next-env.d.ts
 
 # playwright
+# Capturas de inspeccion visual que generan dark-mode-check, dark-mode-toggle-click y
+# logo-mobile-debug: se reescriben en cada ejecucion y no son baselines de comparacion,
+# asi que ensuciaban el control de codigo fuente despues de cada suite (21/08/2026).
+/tests/screenshots/
+/tests/screenshots-darkmode/
 /test-results/
 /playwright-report/
 /playwright/.cache/

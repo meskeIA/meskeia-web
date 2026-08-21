@@ -86,7 +86,9 @@
 
 .ia {
   font-weight: 600;
-  color: #2E86AB;
+  /* Variante accesible del azul de marca: como texto sobre blanco, #2E86AB da 4,11:1
+     y WCAG AA exige 4,5 (axe-core, 21/08/2026). El logotipo lo lleva en TODAS las apps. */
+  color: var(--primary-texto, #26718F);
 }
 
 /* Variante de marca Stemum (servida bajo stemum.com) */
