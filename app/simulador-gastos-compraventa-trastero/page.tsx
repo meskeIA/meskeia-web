@@ -31,6 +31,7 @@ import {
   importeITP,
   TipoElegido,
   ENLACE_CATASTRO,
+  RANGO_AJD,
 } from '@/data/itp-ccaa';
 
 // ===== TIPOS =====
@@ -60,6 +61,9 @@ interface ResultadosVendedor {
   plusvaliaMunicipal: number;
   metodoPlusvalia: string;
   exentoPlusvalia: boolean;
+  /** Falso cuando faltan años de propiedad o valor catastral del suelo: entonces la
+   *  plusvalía no es 0 €, es desconocida, y el neto que se muestra es un techo. */
+  plusvaliaCalculada: boolean;
   comisionInmobiliaria: number;
   gastosGestoria: number;
   totalGastos: number;
@@ -70,6 +74,67 @@ interface ResultadosVendedor {
   gananciaPatrimonial: number;
   irpfGanancia: number;
 }
+
+/**
+ * Cifras de los ejemplos del bloque educativo, DERIVADAS del mismo motor que usa la
+ * calculadora. Estaban escritas a mano y habian divergido: la tarjeta de segunda mano
+ * seguia anunciando ~160 EUR de notaria cuando la app ya calculaba 305,14 EUR, y la de
+ * la venta prometia 1.330 EUR de IRPF donde el motor da 1.255,50 EUR (Inspector,
+ * 20/08/2026). Derivarlas es lo unico que impide que la reparacion de hoy vuelva a
+ * envejecer sola: en cuanto cambie un arancel o el ITP de una comunidad, el ejemplo
+ * cambia con el.
+ */
+const EJEMPLOS = (() => {
+  // 1 - Obra nueva en Madrid: trastero de 12.000 EUR transmitido junto a la vivienda
+  const nuevoPrecio = 12000;
+  const nuevoIva = nuevoPrecio * (IVA_INMUEBLES_2025.garageCon / 100);
+  const nuevoAjd = calcularAJD(nuevoPrecio, 'madrid');
+
+  // 2 - Segunda mano en Cataluna: trastero independiente de 18.000 EUR
+  const usadoPrecio = 18000;
+  const usadoItp = importeITP(
+    usadoPrecio,
+    'cataluna',
+    elegirTipoITP('cataluna', 'general', usadoPrecio, { viviendaHabitual: false }),
+  );
+  const usadoNotaria = estimarFacturaNotarial(usadoPrecio).medio;
+  const usadoRegistro = calcularRegistro(usadoPrecio);
+
+  // 3 - Venta por 15.000 EUR de lo comprado por 8.000 EUR, con la comision del 3 % que
+  //     trae el simulador por defecto y sin gastos propios de gestoria del vendedor
+  const ventaComision = 15000 * 0.03;
+  const venta = calcularGananciaInmueble({
+    precioVenta: 15000,
+    precioCompra: 8000,
+    gastosTransmision: ventaComision,
+  });
+
+  // 4 - Galicia, comprador joven: el reducido del 3 % exige vivienda habitual y un
+  //     trastero suelto nunca lo es, asi que la app aplica el tipo general
+  const galiciaPrecio = 12000;
+  const galiciaElegido = elegirTipoITP('galicia', 'joven', galiciaPrecio, { viviendaHabitual: false });
+  const galiciaItp = importeITP(galiciaPrecio, 'galicia', galiciaElegido);
+  const galiciaReducido = ITP_CCAA['galicia'].tiposReducidos.find(r => r.nombre.toLowerCase().includes('joven'));
+
+  return {
+    nuevoPrecio,
+    nuevoIva,
+    nuevoAjd,
+    nuevoTotal: nuevoIva + nuevoAjd,
+    usadoPrecio,
+    usadoItp,
+    usadoNotaria,
+    usadoRegistro,
+    usadoTotal: usadoItp + usadoNotaria + usadoRegistro,
+    ventaComision,
+    ventaGanancia: venta.ganancia,
+    ventaIrpf: venta.cuotaIRPF,
+    galiciaPrecio,
+    galiciaItp,
+    galiciaTipoGeneral: ITP_CCAA['galicia'].tipoGeneral,
+    galiciaTipoReducido: galiciaReducido?.tipo ?? 0,
+  };
+})();
 
 // ===== CONSTANTES =====
 const COMUNIDADES: { value: ComunidadAutonoma; label: string }[] = [
@@ -118,6 +183,10 @@ export default function SimuladorTrasteroCompraventaPage() {
   const [valorCatastralSuelo, setValorCatastralSuelo] = useState('');
   const [valorCatastralTotal, setValorCatastralTotal] = useState('');
   const [comisionInmobiliaria, setComisionInmobiliaria] = useState('3');
+  // Gestoría del VENDEDOR, separada de la del comprador: el art. 35.1 LIRPF solo admite
+  // los gastos «satisfechos por el transmitente», y un único campo compartido hacía que
+  // los 300 € del comprador rebajaran el IRPF de la otra parte (Inspector 20/08/2026).
+  const [gastosGestoriaVenta, setGastosGestoriaVenta] = useState('');
 
   // Pestaña activa
   const [pestanaActiva, setPestanaActiva] = useState<'comprador' | 'vendedor'>('comprador');
@@ -196,15 +265,17 @@ export default function SimuladorTrasteroCompraventaPage() {
     if (!Number.isFinite(precioV) || precioV <= 0) return null;
 
     const comisionPct = parseSpanishNumberOr(comisionInmobiliaria) / 100;
-    const gestoria = parseSpanishNumberOr(gastosGestoria);
+    const gestoria = parseSpanishNumberOr(gastosGestoriaVenta);
     const comision = precioV * comisionPct;
 
     // Plusvalía municipal
     let plusvalia = 0;
     let metodoPlusvalia = 'No calculada (faltan datos)';
     let exentoPlusvalia = false;
+    let plusvaliaCalculada = false;
 
     if (valorSuelo > 0 && anios > 0 && precioC > 0) {
+      plusvaliaCalculada = true;
       const resultadoPlusvalia = calcularPlusvaliaMunicipal({
         valorCatastralSuelo: valorSuelo,
         aniosPropiedad: anios,
@@ -245,6 +316,7 @@ export default function SimuladorTrasteroCompraventaPage() {
       plusvaliaMunicipal: plusvalia,
       metodoPlusvalia,
       exentoPlusvalia,
+      plusvaliaCalculada,
       comisionInmobiliaria: comision,
       gastosGestoria: gestoria,
       totalGastos,
@@ -255,7 +327,7 @@ export default function SimuladorTrasteroCompraventaPage() {
       esPerdida: hayDatosGanancia && g.esPerdida,
       irpfGanancia: irpf,
     };
-  }, [precioVenta, precioCompraOriginal, aniosPropiedad, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, gastosGestoria, gastosAdquisicion]);
+  }, [precioVenta, precioCompraOriginal, aniosPropiedad, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, gastosGestoriaVenta, gastosAdquisicion]);
 
   const datosCcaaActual = ITP_CCAA[ccaa];
 
@@ -289,8 +361,9 @@ export default function SimuladorTrasteroCompraventaPage() {
         <span className={styles.trasteroNoteIcon}>ℹ️</span>
         <p>
           <strong>Trastero vinculado a vivienda:</strong> tributa como anejo residencial (IVA 10% en obra nueva,
-          ITP residencial en segunda mano). <strong>Trastero vendido de forma independiente:</strong> puede
-          tributar diferente según la comunidad autónoma — consulta con un asesor fiscal.
+          ITP residencial en segunda mano). <strong>Trastero vendido de forma independiente:</strong> en obra nueva
+          pierde el tipo reducido y paga el IVA general del 21%, una diferencia estatal (art. 91.Uno.1.7º LIVA)
+          que no depende de la comunidad autónoma. En segunda mano paga el mismo ITP que el vinculado.
         </p>
       </div>
 
@@ -376,8 +449,9 @@ export default function SimuladorTrasteroCompraventaPage() {
 
           {/* Comunidad autónoma */}
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Comunidad Autónoma (ubicación del trastero)</label>
+            <label className={styles.label} htmlFor="select-ccaa">Comunidad Autónoma (ubicación del trastero)</label>
             <select
+              id="select-ccaa"
               value={ccaa}
               onChange={(e) => setCcaa(e.target.value as ComunidadAutonoma)}
               className={styles.select}
@@ -415,8 +489,9 @@ export default function SimuladorTrasteroCompraventaPage() {
           {/* Perfil del comprador (solo para ITP) */}
           {tipoTransmision === 'segunda-mano' && (
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Perfil del comprador (para tipos reducidos)</label>
+              <label className={styles.label} htmlFor="select-perfil">Perfil del comprador (para tipos reducidos)</label>
               <select
+                id="select-perfil"
                 value={perfilComprador}
                 onChange={(e) => setPerfilComprador(e.target.value as PerfilComprador)}
                 className={styles.select}
@@ -436,9 +511,9 @@ export default function SimuladorTrasteroCompraventaPage() {
             <NumberInput
               value={gastosGestoria}
               onChange={setGastosGestoria}
-              label="Gastos de gestoría (€)"
+              label="Gastos de gestoría del comprador (€)"
               placeholder="300"
-              helperText="Típico: 200-400 € (tramitación de escrituras)"
+              helperText="Típico: 200-400 € (tramitación de escrituras). Solo afecta al presupuesto del comprador"
               min={0}
             />
           </div>
@@ -509,7 +584,7 @@ export default function SimuladorTrasteroCompraventaPage() {
                   )}
 
                   <ResultCard
-                    title="Gastos de notaría (+ IVA)"
+                    title="Gastos de notaría (IVA incluido)"
                     value={formatCurrency(resultadosComprador.gastosNotario)}
                     description={`Factura estimada entre ${formatCurrency(resultadosComprador.gastosNotarioMin)} y ${formatCurrency(resultadosComprador.gastosNotarioMax)}. El arancel cubre la matriz y una copia; las copias adicionales y los folios se facturan aparte y dependen de la extensión de la escritura.`}
                     variant="default"
@@ -517,7 +592,7 @@ export default function SimuladorTrasteroCompraventaPage() {
                   />
 
                   <ResultCard
-                    title="Registro de la Propiedad (+ IVA)"
+                    title="Registro de la Propiedad (IVA incluido)"
                     value={formatCurrency(resultadosComprador.gastosRegistro)}
                     variant="default"
                     icon="🏛️"
@@ -644,6 +719,15 @@ export default function SimuladorTrasteroCompraventaPage() {
                   min={0}
                   max={10}
                 />
+
+                <NumberInput
+                  value={gastosGestoriaVenta}
+                  onChange={setGastosGestoriaVenta}
+                  label="Gestoría y certificados del vendedor (€)"
+                  placeholder="0"
+                  helperText="Solo lo que pagas TÚ al vender (certificado energético, cédula, gestoría propia). La gestoría del comprador no reduce tu ganancia: art. 35.1 LIRPF"
+                  min={0}
+                />
               </div>
 
               {resultadosVendedor ? (
@@ -657,7 +741,13 @@ export default function SimuladorTrasteroCompraventaPage() {
 
                   <ResultCard
                     title="Plusvalía municipal"
-                    value={resultadosVendedor.exentoPlusvalia ? 'EXENTO' : formatCurrency(resultadosVendedor.plusvaliaMunicipal)}
+                    value={
+                      resultadosVendedor.exentoPlusvalia
+                        ? 'EXENTO'
+                        : resultadosVendedor.plusvaliaCalculada
+                          ? formatCurrency(resultadosVendedor.plusvaliaMunicipal)
+                          : 'SIN CALCULAR'
+                    }
                     variant={resultadosVendedor.exentoPlusvalia ? 'success' : 'warning'}
                     icon="🏛️"
                     description={resultadosVendedor.metodoPlusvalia}
@@ -742,7 +832,11 @@ export default function SimuladorTrasteroCompraventaPage() {
                     value={formatCurrency(resultadosVendedor.netoVendedor)}
                     variant="highlight"
                     icon="💰"
-                    description="Lo que realmente recibes tras los gastos"
+                    description={
+                      resultadosVendedor.plusvaliaCalculada || resultadosVendedor.exentoPlusvalia
+                        ? 'Lo que realmente recibes tras los gastos'
+                        : 'Techo: aún NO incluye la plusvalía municipal. Añade los años de propiedad y el valor catastral del suelo para calcularla'
+                    }
                   />
                 </>
               ) : (
@@ -796,9 +890,9 @@ export default function SimuladorTrasteroCompraventaPage() {
                 </tr>
                 <tr>
                   <td>AJD en primera mano</td>
-                  <td>0,5% – 1,5% según CCAA</td>
-                  <td>0,5% – 1,5% según CCAA</td>
-                  <td>0,5% – 1,5% según CCAA</td>
+                  <td>{formatNumber(RANGO_AJD.min, 0)}% – {formatNumber(RANGO_AJD.max, 1)}% según CCAA</td>
+                  <td>{formatNumber(RANGO_AJD.min, 0)}% – {formatNumber(RANGO_AJD.max, 1)}% según CCAA</td>
+                  <td>{formatNumber(RANGO_AJD.min, 0)}% – {formatNumber(RANGO_AJD.max, 1)}% según CCAA</td>
                 </tr>
                 <tr>
                   <td>Plusvalía municipal</td>
@@ -826,20 +920,21 @@ export default function SimuladorTrasteroCompraventaPage() {
                 <span className={styles.casoEmoji}>🏗️</span>
                 <span className={styles.casoTag}>Trastero con vivienda nueva</span>
               </div>
-              <p>Al comprar un piso de obra nueva en Madrid por 280.000 € con trastero incluido por 12.000 €,
-              el trastero tributa al 10% de IVA (1.200 €) más AJD al 0,75% (90 €). El promotor lo vende
+              <p>Al comprar un piso de obra nueva en Madrid por 280.000 € con trastero incluido por {formatCurrency(EJEMPLOS.nuevoPrecio)},
+              el trastero tributa al {formatNumber(IVA_INMUEBLES_2025.garageCon, 0)}% de IVA ({formatCurrency(EJEMPLOS.nuevoIva)}) más AJD
+              al {formatNumber(ITP_CCAA['madrid'].ajd, 2)}% ({formatCurrency(EJEMPLOS.nuevoAjd)}). El promotor lo vende
               como anejo de la vivienda, por lo que se aplica el mismo tipo reducido.</p>
-              <div className={styles.casoResultado}>IVA 10% + AJD: ~1.290 € de gastos fiscales</div>
+              <div className={styles.casoResultado}>IVA + AJD: {formatCurrency(EJEMPLOS.nuevoTotal)} de gastos fiscales</div>
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
                 <span className={styles.casoEmoji}>🔄</span>
                 <span className={styles.casoTag}>Trastero de segunda mano</span>
               </div>
-              <p>Una persona compra un trastero independiente en Cataluña por 18.000 €. Al ser segunda mano,
-              paga ITP al tipo general del 10% (1.800 €), más notaría (~160 €) y registro (~90 €).
-              La operación tiene un coste adicional de ~2.350 €.</p>
-              <div className={styles.casoResultado}>ITP + notaría + registro: ~2.350 € en gastos</div>
+              <p>Una persona compra un trastero independiente en Cataluña por {formatCurrency(EJEMPLOS.usadoPrecio)}. Al ser segunda mano,
+              paga ITP por {formatCurrency(EJEMPLOS.usadoItp)} (primer tramo de la escala progresiva catalana),
+              más notaría ({formatCurrency(EJEMPLOS.usadoNotaria)}) y registro ({formatCurrency(EJEMPLOS.usadoRegistro)}), ambos con el IVA ya incluido.</p>
+              <div className={styles.casoResultado}>ITP + notaría + registro: {formatCurrency(EJEMPLOS.usadoTotal)} en gastos</div>
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
@@ -847,19 +942,23 @@ export default function SimuladorTrasteroCompraventaPage() {
                 <span className={styles.casoTag}>Vender un trastero</span>
               </div>
               <p>El vendedor debe calcular la plusvalía municipal (si la hay) y la posible ganancia patrimonial
-              en IRPF. Si compró el trastero por 8.000 € y lo vende por 15.000 €, la ganancia de 7.000 €
-              tributará al 19% en la base del ahorro (1.330 €).</p>
-              <div className={styles.casoResultado}>Ganancia de 7.000 € → ~1.330 € de IRPF</div>
+              en IRPF. Si compró el trastero por 8.000 € y lo vende por 15.000 €, la diferencia bruta son 7.000 €,
+              pero el art. 35 LIRPF descuenta antes los gastos de la venta: con la comisión del 3% que trae el
+              simulador ({formatCurrency(EJEMPLOS.ventaComision)}) la ganancia queda en {formatCurrency(EJEMPLOS.ventaGanancia)} y
+              el IRPF en {formatCurrency(EJEMPLOS.ventaIrpf)}, porque la base del ahorro no es plana: 19% hasta 6.000 € y 21% sobre el resto.</p>
+              <div className={styles.casoResultado}>Ganancia de {formatCurrency(EJEMPLOS.ventaGanancia)} → {formatCurrency(EJEMPLOS.ventaIrpf)} de IRPF</div>
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
                 <span className={styles.casoEmoji}>🎯</span>
                 <span className={styles.casoTag}>Tipos reducidos de ITP</span>
               </div>
-              <p>Un joven de 30 años que compra un trastero en Galicia por 12.000 € podría acceder al ITP
-              reducido del 3% (360 €) en lugar del tipo general del 8% (960 €), si se cumplen los
-              requisitos de la Xunta para jóvenes compradores.</p>
-              <div className={styles.casoResultado}>Ahorro de 600 € con el tipo reducido del 3%</div>
+              <p>Un joven de 30 años que compra un trastero en Galicia por {formatCurrency(EJEMPLOS.galiciaPrecio)} paga
+              el tipo general del {formatNumber(EJEMPLOS.galiciaTipoGeneral, 0)}% ({formatCurrency(EJEMPLOS.galiciaItp)}), y no
+              el reducido del {formatNumber(EJEMPLOS.galiciaTipoReducido, 0)}% para jóvenes: la Xunta lo condiciona a que el inmueble sea
+              <strong> vivienda habitual</strong>, y un trastero comprado por separado nunca lo es. El reducido sí entra si el
+              trastero se adquiere como anejo de la vivienda en la misma escritura.</p>
+              <div className={styles.casoResultado}>Trastero independiente: tipo general del {formatNumber(EJEMPLOS.galiciaTipoGeneral, 0)}%, sin reducción por edad</div>
             </div>
           </div>
         </section>

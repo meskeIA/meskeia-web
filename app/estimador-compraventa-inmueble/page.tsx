@@ -20,6 +20,7 @@ import {
   TipoElegido,
   ENLACE_CATASTRO,
   RANGO_ITP,
+  RANGO_AJD,
 } from '@/data/itp-ccaa';
 
 // ===== TIPOS =====
@@ -64,7 +65,6 @@ interface ResultadosVendedor {
    */
   plusvaliaCalculada: boolean;
   comisionInmobiliaria: number;
-  gastosGestoria: number;
   otrosGastosVenta: number;
   totalGastos: number;
   netoVendedor: number;
@@ -318,7 +318,10 @@ export default function SimuladorCompraventaPage() {
       precioCompra: precioC,
       gastosAdquisicion: parseSpanishNumberOr(gastosAdquisicion),
       mejoras: parseSpanishNumberOr(mejoras),
-      gastosTransmision: comision + gestoria + otrosVenta,
+      // Sin la gestoria: la del campo de arriba la paga el COMPRADOR y el art. 35.1 LIRPF
+      // solo descuenta los gastos «satisfechos por el transmitente». Lo que paga el
+      // vendedor va en «Otros gastos de la venta» (Inspector, 20/08/2026).
+      gastosTransmision: comision + otrosVenta,
       plusvaliaMunicipal: plusvalia,
       exentoPorEdad: exentoIRPF,
       // parseSpanishNumberOr y no parseSpanishNumber: los dos campos son OPCIONALES y quien
@@ -339,7 +342,7 @@ export default function SimuladorCompraventaPage() {
     const hayDatosGanancia = precioC > 0;
     const irpf = hayDatosGanancia ? g.cuotaIRPF : 0;
 
-    const totalGastos = plusvalia + comision + gestoria + otrosVenta + irpf;
+    const totalGastos = plusvalia + comision + otrosVenta + irpf;
     const neto = precioV - totalGastos;
 
     return {
@@ -349,7 +352,6 @@ export default function SimuladorCompraventaPage() {
       exentoPlusvalia,
       plusvaliaCalculada,
       comisionInmobiliaria: comision,
-      gastosGestoria: gestoria,
       otrosGastosVenta: otrosVenta,
       totalGastos,
       netoVendedor: neto,
@@ -675,7 +677,7 @@ export default function SimuladorCompraventaPage() {
                   )}
 
                   <ResultCard
-                    title="Gastos de notaría (+ IVA)"
+                    title="Gastos de notaría (IVA incluido)"
                     value={formatCurrency(resultadosComprador.gastosNotario)}
                     description={`Factura estimada entre ${formatCurrency(resultadosComprador.gastosNotarioMin)} y ${formatCurrency(resultadosComprador.gastosNotarioMax)}. El arancel cubre la matriz y una copia; las copias adicionales y los folios se facturan aparte y dependen de la extensión de la escritura.`}
                     variant="default"
@@ -683,7 +685,7 @@ export default function SimuladorCompraventaPage() {
                   />
 
                   <ResultCard
-                    title="Registro de la Propiedad (+ IVA)"
+                    title="Registro de la Propiedad (IVA incluido)"
                     value={formatCurrency(resultadosComprador.gastosRegistro)}
                     variant="default"
                     icon="🏛️"
@@ -849,7 +851,7 @@ export default function SimuladorCompraventaPage() {
                   onChange={setOtrosGastosVenta}
                   label="Otros gastos de la venta (opcional)"
                   placeholder="0"
-                  helperText="Certificado energético, cédula de habitabilidad, cancelación registral de la hipoteca"
+                  helperText="Lo que pagas TÚ al vender: certificado energético, cédula de habitabilidad, tu propia gestoría, cancelación registral de la hipoteca. La gestoría del comprador no cuenta (art. 35.1 LIRPF)"
                   min={0}
                 />
 
@@ -955,7 +957,7 @@ export default function SimuladorCompraventaPage() {
                       value={formatCurrency(resultadosVendedor.valorTransmision)}
                       variant="default"
                       icon="📤"
-                      description="Precio de venta − comisión, gestoría, otros gastos y plusvalía municipal"
+                      description="Precio de venta − comisión, otros gastos de la venta y plusvalía municipal"
                     />
                   )}
 
@@ -1004,14 +1006,6 @@ export default function SimuladorCompraventaPage() {
                     />
                   )}
 
-                  {resultadosVendedor.gastosGestoria > 0 && (
-                    <ResultCard
-                      title="Gastos de gestoría"
-                      value={formatCurrency(resultadosVendedor.gastosGestoria)}
-                      variant="default"
-                      icon="📂"
-                    />
-                  )}
 
                   {resultadosVendedor.otrosGastosVenta > 0 && (
                     <ResultCard
@@ -1130,7 +1124,7 @@ export default function SimuladorCompraventaPage() {
                 Los locales comerciales, naves industriales y terrenos pagan <strong>IVA al 21%</strong>.
               </p>
               <p>
-                Además, se paga <strong>AJD</strong> (Actos Jurídicos Documentados) que varía entre 0,5% y 1,5% según la comunidad.
+                Además, se paga <strong>AJD</strong> (Actos Jurídicos Documentados), que va del {formatNumber(RANGO_AJD.min, 0)}% al {formatNumber(RANGO_AJD.max, 1)}% según la comunidad: el País Vasco no lo cobra, por su régimen foral.
               </p>
             </div>
 
@@ -1201,8 +1195,8 @@ export default function SimuladorCompraventaPage() {
             según el valor del inmueble con una escala progresiva.
           </p>
           <ul>
-            <li><strong>Notaría:</strong> Entre 600€ y 1.500€ para inmuebles típicos (+ 21% IVA)</li>
-            <li><strong>Registro:</strong> Entre 200€ y 600€ (+ 21% IVA)</li>
+            <li><strong>Notaría:</strong> Entre 600€ y 1.500€ para inmuebles típicos, IVA del 21% incluido</li>
+            <li><strong>Registro:</strong> Entre 200€ y 600€, IVA del 21% incluido</li>
             <li><strong>Gestoría:</strong> Opcional, entre 200€ y 400€ (tramitación de documentos)</li>
           </ul>
         </section>
@@ -1230,13 +1224,13 @@ export default function SimuladorCompraventaPage() {
                 <tr>
                   <td>ITP</td>
                   <td>No aplica</td>
-                  <td>4% – 11% (según CC.AA.)</td>
+                  <td>{formatNumber(RANGO_ITP.min, 0)}% – {formatNumber(RANGO_ITP.max, 0)}% (según CC.AA.)</td>
                   <td>Comprador</td>
                 </tr>
                 <tr>
                   <td>AJD</td>
-                  <td>0,5% – 1,5%</td>
-                  <td>0,5% – 1,5% (con hipoteca)</td>
+                  <td>{formatNumber(RANGO_AJD.min, 0)}% – {formatNumber(RANGO_AJD.max, 1)}%</td>
+                  <td>{formatNumber(RANGO_AJD.min, 0)}% – {formatNumber(RANGO_AJD.max, 1)}% (con hipoteca)</td>
                   <td>Comprador</td>
                 </tr>
                 <tr>

@@ -52,6 +52,11 @@ async function valorTarjeta(page: Page, titulo: string | RegExp): Promise<string
   return (await valor.innerText()).replace(ESPACIO_DURO, ' ').trim();
 }
 
+/** Texto de un elemento, con el espacio duro del formato español normalizado. */
+async function texto(locator: ReturnType<Page['getByText']>): Promise<string> {
+  return (await locator.innerText()).replace(ESPACIO_DURO, ' ').replace(/\s+/g, ' ').trim();
+}
+
 /** Texto descriptivo bajo el valor de una ResultCard. */
 async function descripcionTarjeta(page: Page, titulo: string | RegExp): Promise<string> {
   const desc = page
@@ -86,7 +91,7 @@ test.describe('Simulador de gastos de compraventa de trastero — inspección 20
     await selectCcaa(page).selectOption('madrid');
     await selectPerfil(page).selectOption('general');
     await rellenar(page, 'Precio del trastero', '15000');
-    await rellenar(page, 'Gastos de gestoría (€)', '300');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
 
     // ITP = 15.000 × 6 % = 900. El 6 % es TIPOS_ITP_CCAA_2025 → { ccaa: 'Madrid', tipo: 6 }.
     // Madrid no tiene escala progresiva, así que el tipo efectivo coincide con el nominal.
@@ -145,7 +150,7 @@ test.describe('Simulador de gastos de compraventa de trastero — inspección 20
     await page.getByRole('button', { name: /Primera mano/ }).click();
     await selectCcaa(page).selectOption('madrid');
     await rellenar(page, 'Precio del trastero', '3000');
-    await rellenar(page, 'Gastos de gestoría (€)', '300');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
 
     // --- Trastero VINCULADO (es la modalidad por defecto) ---
     // IVA = 3.000 × 10 % = 300 — IVA_INMUEBLES_2025.garageCon = 10 (anejo con la vivienda).
@@ -257,10 +262,11 @@ test.describe('Simulador de gastos de compraventa de trastero — inspección 20
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// HALLAZGOS ABIERTOS del 20/08/2026. Todos fallan HOY a propósito.
+// REGRESIONES — hallazgos del 20/08/2026, reparados el 21/08/2026. Afirman lo que debe
+// pasar y hoy PASAN: si alguien reintroduce el defecto, saltan aquí.
 // ─────────────────────────────────────────────────────────────────────────────
 
-// ⚠️ HALLAZGO ABIERTO — cálculo.
+// ✅ REPARADO 21/08/2026 — cálculo.
 // Hay UN solo campo de gestoría, en el panel «Datos de la operación» junto al precio y la
 // CCAA, y su importe se cobra al COMPRADOR (tarjeta «Gastos de gestoría» dentro del COSTE
 // TOTAL DE ADQUISICIÓN) y ADEMÁS se pasa como `gastosTransmision` del vendedor, donde resta
@@ -272,13 +278,12 @@ test.describe('Simulador de gastos de compraventa de trastero — inspección 20
 //       la paga el vendedor) · obtenido 6.250,00 € y 1.192,50 €, 63,00 € menos de IRPF.
 //       Poniendo la gestoría a 0 la app da exactamente los valores esperados, lo que
 //       confirma que el desvío viene de ese campo.
-test('HALLAZGO (cálculo) — la gestoría del comprador no puede reducir la ganancia del vendedor', async ({
+test('REGRESIÓN (cálculo) — la gestoría del comprador no puede reducir la ganancia del vendedor', async ({
   page,
 }) => {
-  test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
   await page.goto(RUTA);
   await rellenar(page, 'Precio del trastero', '15000');
-  await rellenar(page, 'Gastos de gestoría (€)', '300');
+  await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
   await page.getByRole('button', { name: /Vendedor/ }).click();
   await rellenar(page, 'Precio de compra original', '8000');
 
@@ -289,7 +294,7 @@ test('HALLAZGO (cálculo) — la gestoría del comprador no puede reducir la gan
   expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1255,50 €');
 });
 
-// ⚠️ HALLAZGO ABIERTO — contenido.
+// ✅ REPARADO 21/08/2026 — contenido.
 // Las tarjetas se titulan «Gastos de notaría (+ IVA)» y «Registro de la Propiedad (+ IVA)»,
 // pero el importe YA lleva el 21 %: `calcularArancelNotarial` y `calcularRegistro` terminan
 // en `total * 1.21`. «+ IVA» significa en castellano «IVA aparte», así que quien presupuesta
@@ -299,10 +304,9 @@ test('HALLAZGO (cálculo) — la gestoría del comprador no puede reducir la gan
 //       (130,60446 de arancel × 1,21 de IVA × 1,75 de factura) y «Registro de la Propiedad
 //       (+ IVA)» = 59,03 € (48,787472 × 1,21). Esperado un rótulo que no prometa un IVA
 //       aparte · obtenido el «(+ IVA)», que lleva a presupuestar 334,63 € y 71,43 €.
-test('HALLAZGO (contenido) — el rótulo «(+ IVA)» contradice a unos importes que ya llevan el 21 %', async ({
+test('REGRESIÓN (contenido) — el rótulo «(+ IVA)» contradice a unos importes que ya llevan el 21 %', async ({
   page,
 }) => {
-  test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
   await page.goto(RUTA);
   await rellenar(page, 'Precio del trastero', '15000');
 
@@ -317,7 +321,7 @@ test('HALLAZGO (contenido) — el rótulo «(+ IVA)» contradice a unos importes
   expect(tituloRegistro).not.toMatch(/\+\s*IVA/);
 });
 
-// ⚠️ HALLAZGO ABIERTO — dato.
+// ✅ REPARADO 21/08/2026 — dato.
 // La fila «AJD en primera mano» de la tabla comparativa dice «0,5% – 1,5% según CCAA» en sus
 // tres columnas, escrito a mano. En la misma página, ITP_CCAA['pais-vasco'].ajd = 0: al
 // elegir País Vasco el recuadro imprime «AJD 0%» y la tarjeta de AJD desaparece. El 1,5 %
@@ -325,10 +329,9 @@ test('HALLAZGO (contenido) — el rótulo «(+ IVA)» contradice a unos importes
 // Caso: primera mano · independiente · País Vasco · 3.000 € → esperado que la fila de AJD
 //       incluya el 0 % que la propia app aplica · obtenido «0,5% – 1,5% según CCAA» y
 //       cero tarjetas de AJD en el resultado.
-test('HALLAZGO (dato) — el rango de AJD de la tabla deja fuera el 0 % del País Vasco', async ({
+test('REGRESIÓN (dato) — el rango de AJD de la tabla deja fuera el 0 % del País Vasco', async ({
   page,
 }) => {
-  test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
   await page.goto(RUTA);
   await page.getByRole('button', { name: /Primera mano/ }).click();
   await selectCcaa(page).selectOption('pais-vasco');
@@ -339,7 +342,7 @@ test('HALLAZGO (dato) — el rango de AJD de la tabla deja fuera el 0 % del Paí
   await expect(page.locator('tr', { hasText: 'AJD en primera mano' })).toContainText('0%');
 });
 
-// ⚠️ HALLAZGO ABIERTO — contenido.
+// ✅ REPARADO 21/08/2026 — contenido.
 // La tarjeta «Trastero de segunda mano» del bloque educativo se quedó con las cifras de
 // notaría y registro de antes de la reparación del 20/08/2026: dice «notaría (~160 €) y
 // registro (~90 €)» y «un coste adicional de ~2.350 €». El ITP sí cuadra (10 % del primer
@@ -348,10 +351,9 @@ test('HALLAZGO (dato) — el rango de AJD de la tabla deja fuera el 0 % del Paí
 //       1,21 × 1,75) y registro 65,39 € (54,037472 × 1,21); ITP + notaría + registro =
 //       2.170,53 €. Esperado que el ejemplo repita esas cifras · obtenido ~160 €, ~90 € y
 //       ~2.350 €, con la notaría casi al doble.
-test('HALLAZGO (contenido) — el ejemplo de Cataluña publica una notaría que el motor ya no da', async ({
+test('REGRESIÓN (contenido) — el ejemplo de Cataluña publica una notaría que el motor ya no da', async ({
   page,
 }) => {
-  test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
   await page.goto(RUTA);
   await selectCcaa(page).selectOption('cataluna');
   await rellenar(page, 'Precio del trastero', '18000');
@@ -360,14 +362,14 @@ test('HALLAZGO (contenido) — el ejemplo de Cataluña publica una notaría que 
   expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('65,39 €');
 
   await page.getByRole('button', { name: /Ver guía educativa/i }).click();
-  const ejemplo = await page
-    .getByText(/Una persona compra un trastero independiente en Cataluña/)
-    .innerText();
+  const ejemplo = await texto(
+    page.getByText(/Una persona compra un trastero independiente en Cataluña/),
+  );
   expect(ejemplo).toContain('305,14 €');
   expect(ejemplo).toContain('65,39 €');
 });
 
-// ⚠️ HALLAZGO ABIERTO — contenido.
+// ✅ REPARADO 21/08/2026 — contenido.
 // La tarjeta «Vender un trastero» anuncia una ganancia que el motor no produce: dice que
 // comprado por 8.000 € y vendido por 15.000 € «la ganancia de 7.000 € tributará al 19 % en
 // la base del ahorro (1.330 €)». El motor del art. 35 LIRPF descuenta del valor de
@@ -377,25 +379,23 @@ test('HALLAZGO (contenido) — el ejemplo de Cataluña publica una notaría que 
 // Caso: precio de venta 15.000 € · compra 8.000 € · comisión 3 % · gestoría 300 € (todo por
 //       defecto) → esperado que el ejemplo diga lo mismo que la calculadora, 6.250,00 € de
 //       ganancia y 1.192,50 € de IRPF · obtenido «7.000 €» y «1.330 €», 137,50 € de más.
-test('HALLAZGO (contenido) — la tarjeta de venta anuncia una ganancia que el motor no produce', async ({
+test('REGRESIÓN (contenido) — la tarjeta de venta anuncia una ganancia que el motor no produce', async ({
   page,
 }) => {
-  test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
   await page.goto(RUTA);
   await rellenar(page, 'Precio del trastero', '15000');
   await page.getByRole('button', { name: /Vendedor/ }).click();
   await rellenar(page, 'Precio de compra original', '8000');
-  expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('6250,00 €');
-  expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1192,50 €');
+  expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('6550,00 €');
+  expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1255,50 €');
 
   await page.getByRole('button', { name: /Ver guía educativa/i }).click();
-  const ejemplo = await page
-    .getByText(/El vendedor debe calcular la plusvalía municipal/)
-    .innerText();
-  expect(ejemplo).toContain('1.192,50 €');
+  const ejemplo = await texto(page.getByText(/El vendedor debe calcular la plusvalía municipal/));
+  // es-ES no agrupa los millares en cifras de cuatro dígitos: «1255,50 €», no «1.255,50 €»
+  expect(ejemplo).toContain('1255,50 €');
 });
 
-// ⚠️ HALLAZGO ABIERTO — contenido.
+// ✅ REPARADO 21/08/2026 — contenido.
 // La tarjeta «Tipos reducidos de ITP» promete un «Ahorro de 600 € con el tipo reducido del
 // 3%» para un joven que compra un trastero en Galicia por 12.000 €, y remite solo a «los
 // requisitos de la Xunta para jóvenes compradores». El reducido gallego del 3 % exige
@@ -406,10 +406,9 @@ test('HALLAZGO (contenido) — la tarjeta de venta anuncia una ganancia que el m
 // Caso: Galicia · segunda mano · joven · 12.000 € → esperado que el ejemplo nombre la
 //       condición de vivienda habitual · obtenido una promesa de 360 € de ITP mientras la
 //       calculadora cobra 960,00 € (8 %) y saca el aviso «Podrías pagar menos».
-test('HALLAZGO (contenido) — el ejemplo del reducido gallego omite la condición que lo bloquea', async ({
+test('REGRESIÓN (contenido) — el ejemplo del reducido gallego omite la condición que lo bloquea', async ({
   page,
 }) => {
-  test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
   await page.goto(RUTA);
   await selectCcaa(page).selectOption('galicia');
   await rellenar(page, 'Precio del trastero', '12000');
@@ -418,13 +417,11 @@ test('HALLAZGO (contenido) — el ejemplo del reducido gallego omite la condici�
   await expect(page.getByText(/Podrías pagar menos/)).toBeVisible();
 
   await page.getByRole('button', { name: /Ver guía educativa/i }).click();
-  const ejemplo = await page
-    .getByText(/Un joven de 30 años que compra un trastero en Galicia/)
-    .innerText();
+  const ejemplo = await texto(page.getByText(/Un joven de 30 años que compra un trastero en Galicia/));
   expect(ejemplo).toMatch(/vivienda habitual/i);
 });
 
-// ⚠️ HALLAZGO ABIERTO — contenido.
+// ✅ REPARADO 21/08/2026 — contenido.
 // La nota que encabeza la app dice del trastero independiente que «puede tributar diferente
 // según la comunidad autónoma». La diferencia que la app aplica —y la única que hay— es
 // ESTATAL: el 10 % del anejo transmitido con la vivienda frente al 21 % general del
@@ -434,10 +431,9 @@ test('HALLAZGO (contenido) — el ejemplo del reducido gallego omite la condici�
 //       y en País Vasco; y en segunda mano · Madrid · 15.000 €, alternar vinculado ↔
 //       independiente deja el ITP en 900,00 € y el coste total en 16.535,59 €. Esperado que
 //       la nota nombre el 21 % estatal · obtenido la remisión a la comunidad autónoma.
-test('HALLAZGO (contenido) — la nota atribuye a la CCAA una diferencia que es estatal', async ({
+test('REGRESIÓN (contenido) — la nota atribuye a la CCAA una diferencia que es estatal', async ({
   page,
 }) => {
-  test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
   await page.goto(RUTA);
   await page.getByRole('button', { name: /Primera mano/ }).click();
   await page.getByRole('button', { name: /Independiente/ }).click();
@@ -451,7 +447,7 @@ test('HALLAZGO (contenido) — la nota atribuye a la CCAA una diferencia que es 
   expect(nota).toContain('21%');
 });
 
-// ⚠️ HALLAZGO ABIERTO — operativa.
+// ✅ REPARADO 21/08/2026 — operativa.
 // Cuando faltan los datos de la plusvalía municipal (años de propiedad y valor catastral del
 // suelo), la app imprime «0,00 €» en la tarjeta y suma ese 0 al total de gastos y al neto del
 // vendedor, aunque su propia descripción diga «No calculada (faltan datos)». Un importe de
@@ -460,10 +456,9 @@ test('HALLAZGO (contenido) — la nota atribuye a la CCAA una diferencia que es 
 //       la tarjeta no dé una cifra (o que el neto avise de que le falta la plusvalía) ·
 //       obtenido «Plusvalía municipal 0,00 €» y un «IMPORTE NETO VENDEDOR 13.057,50 €»
 //       presentado como «Lo que realmente recibes tras los gastos».
-test('HALLAZGO (operativa) — una plusvalía no calculada no puede presentarse como 0,00 €', async ({
+test('REGRESIÓN (operativa) — una plusvalía no calculada no puede presentarse como 0,00 €', async ({
   page,
 }) => {
-  test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
   await page.goto(RUTA);
   await rellenar(page, 'Precio del trastero', '15000');
   await page.getByRole('button', { name: /Vendedor/ }).click();
@@ -472,7 +467,7 @@ test('HALLAZGO (operativa) — una plusvalía no calculada no puede presentarse 
   expect(await valorTarjeta(page, 'Plusvalía municipal')).not.toBe('0,00 €');
 });
 
-// ⚠️ HALLAZGO ABIERTO — accesibilidad.
+// ✅ REPARADO 21/08/2026 — accesibilidad.
 // Los dos <select> de la app («Comunidad Autónoma» y «Perfil del comprador») no tienen id,
 // ni aria-label, ni aria-labelledby, y el <label> que los precede no lleva htmlFor ni los
 // envuelve: son labels huérfanos. Un lector de pantalla anuncia «cuadro combinado» sin decir
@@ -482,10 +477,9 @@ test('HALLAZGO (operativa) — una plusvalía no calculada no puede presentarse 
 // Caso: abrir la app → los dos selects devuelven nombre accesible vacío (id null, aria-label
 //       null, aria-labelledby null, ningún label[for]) · esperado «Comunidad Autónoma
 //       (ubicación del trastero)» y «Perfil del comprador (para tipos reducidos)».
-test('HALLAZGO (accesibilidad) — los desplegables deben tener nombre accesible', async ({
+test('REGRESIÓN (accesibilidad) — los desplegables deben tener nombre accesible', async ({
   page,
 }) => {
-  test.fail(); // hallazgo abierto: quitar esta línea el día que se repare
   await page.goto(RUTA);
   await page.getByRole('button', { name: /Segunda mano/ }).click();
   await expect(selectCcaa(page)).toHaveAccessibleName(/Comunidad Autónoma/);

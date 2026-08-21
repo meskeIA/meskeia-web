@@ -65,7 +65,7 @@ const faqSchema = generateFAQSchema({
     },
     {
       question: '¿Cuánto hay que sumar al precio de una vivienda por gastos e impuestos?',
-      answer: 'La horquilla habitual en España es del 10% al 14% del precio para una vivienda de segunda mano y del 12% al 15% en obra nueva. El grueso es el impuesto: ITP entre el 4% y el 11% según la comunidad autónoma en segunda mano, o IVA al 10% más AJD en obra nueva. A eso se suman notaría, registro de la propiedad y gestoría, que en conjunto rondan el 1%-2%. Conviene tener ese dinero ahorrado aparte, porque no se financia con la hipoteca.',
+      answer: `La horquilla habitual en España es del 10% al 14% del precio para una vivienda de segunda mano y del 12% al 15% en obra nueva. El grueso es el impuesto: ITP entre el ${RANGO_ITP.min} % y el ${RANGO_ITP.max} % según la comunidad autónoma en segunda mano, o IVA al 10% más AJD en obra nueva. A eso se suman notaría, registro de la propiedad y gestoría, que en conjunto rondan el 1%-2%. Conviene tener ese dinero ahorrado aparte, porque no se financia con la hipoteca.`,
     },
     {
       question: '¿Qué paga el vendedor de una vivienda?',

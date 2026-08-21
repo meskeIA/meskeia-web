@@ -863,7 +863,36 @@ export function elegirTipoITP(
       }
     : null;
 
-  if (perfil === 'general') return porUbicacion ?? general;
+  /**
+   * Reducidos que NO dependen de pertenecer a un colectivo (joven, familia numerosa,
+   * discapacidad, VPO). Antes, con perfil «general» esta funcion salia por el atajo de
+   * abajo devolviendo `noComprobables` vacio, asi que quien compra su vivienda habitual
+   * sin encajar en ningun colectivo —el camino por defecto de las apps y el caso mas
+   * comun— no veia nunca que existiera un tipo mas bajo: en Madrid, el 5,4 % de vivienda
+   * habitual hasta 250.000 EUR (Inspector, 20/08/2026).
+   *
+   * No se APLICAN sin comprobar sus condiciones: el importe sigue siendo el conservador.
+   * Se devuelven como oportunidad, que es el mismo criterio que ya rige el resto de la
+   * funcion — «se ensena como oportunidad, nunca como cifra».
+   */
+  const DE_COLECTIVO = /joven|familia|discapacidad|vpo|proteccion oficial/i;
+  const alAlcanceDeCualquiera = datos.tiposReducidos.filter(
+    r =>
+      r !== mejorAutomatico &&
+      !DE_COLECTIVO.test(normaliza(r.nombre)) &&
+      (!r.valorMaximo || precio <= r.valorMaximo) &&
+      r.tipo < (porUbicacion?.tipo ?? datos.tipoGeneral) &&
+      // Un reducido que exige vivienda habitual esta DESCARTADO, no «sin comprobar»,
+      // cuando la app ya sabe que no lo es (un garaje o un trastero sueltos nunca lo son).
+      !(!viviendaHabitual && r.condiciones.some(c => /vivienda habitual/i.test(c)))
+  );
+
+  if (perfil === 'general') {
+    const base = porUbicacion ?? general;
+    return alAlcanceDeCualquiera.length
+      ? { ...base, noComprobables: alAlcanceDeCualquiera }
+      : base;
+  }
 
   const patronPerfil = CUBIERTAS_POR_PERFIL[perfil];
 
@@ -896,12 +925,20 @@ export function elegirTipoITP(
     if (perfil === 'discapacidad') return n.includes('discapacidad');
     return n.includes('vpo') || n.includes('proteccion oficial');
   });
-  if (!candidatos.length) return porUbicacion ?? general;
+  if (!candidatos.length) {
+    const base = porUbicacion ?? general;
+    return alAlcanceDeCualquiera.length
+      ? { ...base, noComprobables: alAlcanceDeCualquiera }
+      : base;
+  }
 
   const aplicables = candidatos.filter(
     r => (!r.valorMaximo || precio <= r.valorMaximo) && r.condiciones.every(cubierta)
   );
-  const noComprobables = candidatos.filter(r => !aplicables.includes(r));
+  const noComprobables = [
+    ...candidatos.filter(r => !aplicables.includes(r)),
+    ...alAlcanceDeCualquiera.filter(r => !candidatos.includes(r)),
+  ];
 
   if (!aplicables.length) {
     return porUbicacion ? { ...porUbicacion, noComprobables } : { ...general, noComprobables };
@@ -972,6 +1009,22 @@ export const RANGO_ITP: { min: number; max: number } = (() => {
     min: Math.min(...generales),
     max: Math.max(...generales, ...deEscalas),
   };
+})();
+
+/**
+ * Rango de AJD (Actos Jurídicos Documentados) en primera transmisión, DERIVADO de la tabla.
+ *
+ * ── De dónde sale (21/08/2026) ────────────────────────────────────────────────
+ * El Inspector encontró el mismo defecto en cuatro apps del clúster de compraventa: la
+ * FAQ y las tablas comparativas anunciaban «entre el 0,5 % y el 1,5 % según la comunidad»
+ * mientras la propia app cobraba 0 € de AJD en el País Vasco (`ajd: 0`, régimen foral) y
+ * su recuadro de comunidad lo decía en la misma pantalla. El extremo alto sí acertaba; el
+ * bajo no. Es el caso de RANGO_ITP repetido: un rango es un dato derivado de la tabla, y
+ * escribirlo a mano garantiza que se quede atrás en cuanto una comunidad se mueva.
+ */
+export const RANGO_AJD: { min: number; max: number } = (() => {
+  const tipos = Object.values(ITP_CCAA).map((c) => c.ajd);
+  return { min: Math.min(...tipos), max: Math.max(...tipos) };
 })();
 
 // ===== FUNCIONES DE CÁLCULO =====

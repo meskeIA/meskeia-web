@@ -7,6 +7,8 @@ import FixedHeader from '@/components/FixedHeader';
 import Footer from '@/components/Footer';
 import InfoBox from '@/components/legal/InfoBox';
 import styles from '../privacidad/page.module.css'; // Reutilizamos los estilos
+import { RANGO_ITP } from '@/data/itp-ccaa';
+import { formatNumber } from '@/lib';
 
 export default function TerminosPage() {
   return (
@@ -73,7 +75,7 @@ export default function TerminosPage() {
               <li><strong>Variabilidad de condiciones:</strong> Los tipos de interés, comisiones bancarias, gastos notariales y requisitos legales varían significativamente según:
                 <ul>
                   <li>La entidad financiera específica</li>
-                  <li>La comunidad autónoma (impuestos como ITP varían del 4% al 11%)</li>
+                  <li>La comunidad autónoma (impuestos como el ITP varían del {formatNumber(RANGO_ITP.min, 0)}% al {formatNumber(RANGO_ITP.max, 0)}%)</li>
                   <li>Tu situación crediticia, laboral y financiera personal</li>
                   <li>El momento en que realices la operación (tipos de interés cambiantes)</li>
                   <li>Las características específicas de la vivienda o inversión</li>

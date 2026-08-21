@@ -193,3 +193,124 @@ test.describe('Simulador de gastos de compraventa de garaje — inspección 20/0
     await expect(page.getByText('No definido')).toHaveCount(0);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// REGRESIONES — los cinco hallazgos del 20/08/2026, reparados el 21/08/2026.
+// Afirman lo que debe pasar y hoy PASAN: si alguien reintroduce el defecto, saltan aquí.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Texto de un elemento con los espacios (duros incluidos) normalizados. */
+async function texto(page: Page, patron: RegExp): Promise<string> {
+  return (await page.getByText(patron).first().innerText()).replace(/\s+/g, ' ').trim();
+}
+
+// ✅ REPARADO 21/08/2026 — cálculo (era el defecto 1, y el mismo del trastero).
+// El único campo de gestoría se rotulaba «Gastos de gestoría del comprador (€)» y valía
+// 300 € por defecto, pero la pestaña Vendedor lo pasaba a `gastosTransmision` de
+// `calcularGananciaInmueble`: los mismos 300 € eran a la vez coste del comprador y gasto
+// deducible del vendedor. El art. 35.1 LIRPF solo admite los gastos «satisfechos por el
+// transmitente». Ahora el vendedor tiene su propio campo, con 0 € por defecto.
+// Caso: venta 22.000 € · compra 15.000 € · comisión 0 % · gestoría del comprador 300 € →
+//       transmisión 22.000, ganancia 7.000 e IRPF 1.350,00 € (6.000×19 % + 1.000×21 %).
+//       Antes daba 21.700, 6.700 y 1.287,00 €, es decir 63,00 € menos de IRPF.
+test('REGRESIÓN (cálculo) — la gestoría del comprador no reduce la ganancia del vendedor', async ({
+  page,
+}) => {
+  await page.goto(RUTA);
+  await rellenar(page, 'Precio del garaje / plaza de parking', '22000');
+  await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
+  await page.getByRole('tab', { name: /Vendedor/ }).click();
+  await rellenar(page, 'Precio de compra original del garaje', '15000');
+  await rellenar(page, 'Comisión inmobiliaria del vendedor (%)', '0');
+  await rellenar(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '0');
+
+  expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('22.000,00 €');
+  expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('7000,00 €');
+  expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1350,00 €');
+  expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('20.650,00 €');
+
+  // Y el vendedor puede fijar la SUYA sin tocar el presupuesto del comprador
+  await rellenar(page, 'Gestoría y certificados del vendedor (€)', '150');
+  expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('21.850,00 €');
+});
+
+// ✅ REPARADO 21/08/2026 — contenido (defecto 3).
+// Las tarjetas se titulaban «Gastos de notaría (+ IVA)» y «Registro de la Propiedad
+// (+ IVA)», pero el importe ya lleva el 21 % dentro (`calcularArancelNotarial` y
+// `calcularRegistro` terminan en `total * 1.21`). «+ IVA» se lee como «IVA aparte».
+test('REGRESIÓN (contenido) — ningún rótulo promete un IVA que ya está dentro', async ({ page }) => {
+  await page.goto(RUTA);
+  await rellenar(page, 'Precio del garaje / plaza de parking', '25000');
+
+  // 175,60446 de arancel × 1,21 de IVA × 1,75 de factura = 371,84 €
+  expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('371,84 €');
+  // 66,287472 × 1,21 = 80,21 €
+  expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('80,21 €');
+
+  const tituloNotaria = await page.locator('h3', { hasText: 'Gastos de notaría' }).first().innerText();
+  const tituloRegistro = await page
+    .locator('h3', { hasText: 'Registro de la Propiedad' })
+    .first()
+    .innerText();
+  expect(tituloNotaria).not.toMatch(/\+\s*IVA/);
+  expect(tituloRegistro).not.toMatch(/\+\s*IVA/);
+});
+
+// ✅ REPARADO 21/08/2026 — contenido (defecto 2).
+// La FAQ escribía el rango de ITP a mano —«entre el 4% (País Vasco) y el 11% (Cataluña,
+// Comunidad Valenciana)»— y se quedaba dos puntos por debajo de la propia tabla de la app,
+// que en el tramo alto de Baleares y Cataluña llega al 13 %. `RANGO_ITP` existe justo para
+// que nadie lo escriba a mano, y la misma pantalla se contradecía al elegir Cataluña.
+test('REGRESIÓN (contenido) — la FAQ da el mismo rango de ITP que RANGO_ITP', async ({ page }) => {
+  await page.goto(RUTA);
+  await page.getByRole('button', { name: /Ver guía educativa|Todo lo que necesitas saber/i }).click();
+  const faq = await texto(page, /tributa por el Impuesto de Transmisiones Patrimoniales/);
+  expect(faq).toContain('4%');
+  expect(faq).toContain('13%');
+  expect(faq).not.toContain('11%');
+});
+
+// ✅ REPARADO 21/08/2026 — contenido (defecto 5).
+// La FAQ prometía «AJD (entre 0,5% y 1,5% según la comunidad)», pero
+// ITP_CCAA['pais-vasco'].ajd = 0 y la app no cobra AJD allí: el simulador y su propia FAQ
+// decían cosas distintas para la misma comunidad.
+test('REGRESIÓN (contenido) — el rango de AJD de la FAQ incluye el 0 % del País Vasco', async ({
+  page,
+}) => {
+  await page.goto(RUTA);
+  await page.getByRole('button', { name: /Primera mano/ }).click();
+  await page.locator('#select-ccaa').selectOption('pais-vasco');
+  await rellenar(page, 'Precio del garaje / plaza de parking', '25000');
+  // El País Vasco no cobra AJD: la tarjeta no se pinta
+  await expect(page.locator('h3', { hasText: 'AJD' })).toHaveCount(0);
+
+  await page.getByRole('button', { name: /Ver guía educativa|Todo lo que necesitas saber/i }).click();
+  const faq = await texto(page, /paga IVA más AJD/);
+  expect(faq).toContain('0%');
+});
+
+// ✅ REPARADO 21/08/2026 — contenido (defecto 4).
+// La tarjeta «Vender garaje con ganancia» anunciaba que Ana tributa «por la ganancia de
+// 7.000 €» aunque paga comisión, cuando el art. 35 LIRPF descuenta esos gastos del valor
+// de transmisión: con la comisión del 3 % que trae el simulador, la ganancia es 6.340 € y
+// el IRPF 1.211,40 €, no los 1.330 € que salían de aplicar un 19 % plano a 7.000 €.
+test('REGRESIÓN (contenido) — el ejemplo de venta cuadra con lo que calcula el motor', async ({
+  page,
+}) => {
+  await page.goto(RUTA);
+  await rellenar(page, 'Precio del garaje / plaza de parking', '22000');
+  await page.getByRole('tab', { name: /Vendedor/ }).click();
+  await rellenar(page, 'Precio de compra original del garaje', '15000');
+  await rellenar(page, 'Comisión inmobiliaria del vendedor (%)', '3');
+  await rellenar(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '0');
+
+  // transmisión = 22.000 − 660 de comisión = 21.340 ; ganancia = 6.340
+  // IRPF = 6.000×19 % + 340×21 % = 1.140 + 71,40 = 1.211,40
+  expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('6340,00 €');
+  expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1211,40 €');
+
+  await page.getByRole('button', { name: /Ver guía educativa|Todo lo que necesitas saber/i }).click();
+  const ejemplo = await texto(page, /Ana compró un garaje por 15.000/);
+  expect(ejemplo).toContain('6.340 €');
+  expect(ejemplo).toContain('1.211,40 €');
+});

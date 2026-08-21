@@ -32,6 +32,8 @@ import {
   importeITP,
   TipoElegido,
   ENLACE_CATASTRO,
+  RANGO_ITP,
+  RANGO_AJD,
 } from '@/data/itp-ccaa';
 
 // ===== TIPOS =====
@@ -120,6 +122,10 @@ export default function SimuladorGarajeCompraventaPage() {
   const [valorCatastralSuelo, setValorCatastralSuelo] = useState('');
   const [valorCatastralTotal, setValorCatastralTotal] = useState('');
   const [comisionInmobiliaria, setComisionInmobiliaria] = useState('3');
+  // Gestoría del VENDEDOR, separada de la del comprador: el art. 35.1 LIRPF solo admite
+  // los gastos «satisfechos por el transmitente», y un único campo compartido hacía que
+  // los 300 € del comprador rebajaran el IRPF de la otra parte (Inspector 20/08/2026).
+  const [gastosGestoriaVenta, setGastosGestoriaVenta] = useState('');
 
   // Pestaña activa
   const [pestanaActiva, setPestanaActiva] = useState<'comprador' | 'vendedor'>('comprador');
@@ -191,7 +197,7 @@ export default function SimuladorGarajeCompraventaPage() {
     if (!Number.isFinite(precioV) || precioV <= 0) return null;
 
     const comisionPct = parseSpanishNumberOr(comisionInmobiliaria) / 100;
-    const gestoria = parseSpanishNumberOr(gastosGestoria);
+    const gestoria = parseSpanishNumberOr(gastosGestoriaVenta);
     const comision = precioV * comisionPct;
 
     // Plusvalía municipal
@@ -249,7 +255,7 @@ export default function SimuladorGarajeCompraventaPage() {
       esPerdida: hayDatosGanancia && g.esPerdida,
       irpfGanancia: irpf,
     };
-  }, [precioGaraje, precioCompraOriginal, aniosPropiedad, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, gastosGestoria, gastosAdquisicion]);
+  }, [precioGaraje, precioCompraOriginal, aniosPropiedad, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, gastosGestoriaVenta, gastosAdquisicion]);
 
   const datosCcaaActual = ITP_CCAA[ccaa];
 
@@ -514,14 +520,14 @@ export default function SimuladorGarajeCompraventaPage() {
                     />
                   )}
                   <ResultCard
-                    title="Gastos de notaría (+ IVA)"
+                    title="Gastos de notaría (IVA incluido)"
                     value={formatCurrency(resultadosComprador.gastosNotario)}
                     description={`Factura estimada entre ${formatCurrency(resultadosComprador.gastosNotarioMin)} y ${formatCurrency(resultadosComprador.gastosNotarioMax)}. El arancel cubre la matriz y una copia; las copias adicionales y los folios se facturan aparte y dependen de la extensión de la escritura.`}
                     variant="default"
                     icon="📝"
                   />
                   <ResultCard
-                    title="Registro de la Propiedad (+ IVA)"
+                    title="Registro de la Propiedad (IVA incluido)"
                     value={formatCurrency(resultadosComprador.gastosRegistro)}
                     variant="default"
                     icon="🏛️"
@@ -646,6 +652,14 @@ export default function SimuladorGarajeCompraventaPage() {
                   min={0}
                   max={10}
                 />
+                <NumberInput
+                  value={gastosGestoriaVenta}
+                  onChange={setGastosGestoriaVenta}
+                  label="Gestoría y certificados del vendedor (€)"
+                  placeholder="0"
+                  helperText="Solo lo que pagas TÚ al vender (certificado energético, cédula, gestoría propia). La gestoría del comprador no reduce tu ganancia: art. 35.1 LIRPF"
+                  min={0}
+                />
               </div>
 
               {resultadosVendedor ? (
@@ -717,7 +731,7 @@ export default function SimuladorGarajeCompraventaPage() {
                   )}
                   {resultadosVendedor.gastosGestoria > 0 && (
                     <ResultCard
-                      title="Gastos de gestoría"
+                      title="Gestoría y certificados del vendedor"
                       value={formatCurrency(resultadosVendedor.gastosGestoria)}
                       variant="default"
                       icon="📂"
@@ -842,7 +856,7 @@ export default function SimuladorGarajeCompraventaPage() {
                 <span aria-hidden="true" className={styles.casoEmoji}>💸</span>
                 <span className={styles.casoTag}>Vender garaje con ganancia</span>
               </div>
-              <p>Ana compró un garaje por 15.000 € hace 10 años y lo vende por 22.000 €. Debe pagar plusvalía municipal al ayuntamiento y tributar por la ganancia de 7.000 € en IRPF (base del ahorro: 19% los primeros 6.000 €, 21% el resto). Además abona la comisión si usa inmobiliaria.</p>
+              <p>Ana compró un garaje por 15.000 € hace 10 años y lo vende por 22.000 €. La diferencia bruta son 7.000 €, pero no es la base que tributa: el art. 35 LIRPF resta del valor de transmisión los gastos que paga el vendedor. Con la comisión del 3% que trae el simulador (660 €), sin plusvalía municipal y sin declarar los gastos de aquella compra, la ganancia queda en 6.340 € y el IRPF en 1.211,40 € (19% hasta 6.000 € y 21% sobre el resto), no los 1.330 € que saldrían de los 7.000 € brutos. Si además hay plusvalía municipal, o Ana declara los impuestos y gastos que pagó al comprarlo, la ganancia baja todavía más.</p>
               <div className={styles.casoResultado}>Ganancia tributa: IRPF ahorro + plusvalía municipal</div>
             </div>
             <div className={styles.casoCard}>
@@ -866,11 +880,11 @@ export default function SimuladorGarajeCompraventaPage() {
             </div>
             <div className={styles.faqItem}>
               <h4>¿Qué ITP paga un garaje de segunda mano?</h4>
-              <p>El garaje tributa por el Impuesto de Transmisiones Patrimoniales (ITP) al mismo tipo que los inmuebles residenciales de su comunidad autónoma, que oscila entre el 4% (País Vasco) y el 11% (Cataluña, Comunidad Valenciana). El garaje se considera inmueble residencial y puede beneficiarse de tipos reducidos para jóvenes, familias numerosas o personas con discapacidad si los cumple.</p>
+              <p>El garaje tributa por el Impuesto de Transmisiones Patrimoniales (ITP) al mismo tipo que los inmuebles residenciales de su comunidad autónoma, que va del {formatNumber(RANGO_ITP.min, 0)}% (País Vasco) al {formatNumber(RANGO_ITP.max, 0)}% (tramo más alto de las escalas progresivas de Baleares y Cataluña). El garaje se considera inmueble residencial y puede beneficiarse de tipos reducidos para jóvenes, familias numerosas o personas con discapacidad si los cumple.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Garaje nuevo o de segunda mano: qué impuesto se paga?</h4>
-              <p>Un garaje de primera transmisión (nuevo, del promotor) paga IVA más AJD (entre 0,5% y 1,5% según la comunidad). El IVA es del 10% si el garaje va vinculado a la vivienda (máximo 2 plazas, mismo edificio y promotor) y del 21% si se adquiere de forma independiente o en un edificio de uso no residencial. Un garaje de segunda mano paga ITP al tipo general de la comunidad autónoma. No pueden coexistir ITP e IVA en la misma operación.</p>
+              <p>Un garaje de primera transmisión (nuevo, del promotor) paga IVA más AJD (del {formatNumber(RANGO_AJD.min, 0)}% al {formatNumber(RANGO_AJD.max, 1)}% según la comunidad: el País Vasco no lo cobra, por su régimen foral). El IVA es del 10% si el garaje va vinculado a la vivienda (máximo 2 plazas, mismo edificio y promotor) y del 21% si se adquiere de forma independiente o en un edificio de uso no residencial. Un garaje de segunda mano paga ITP al tipo general de la comunidad autónoma. No pueden coexistir ITP e IVA en la misma operación.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿El vendedor de un garaje paga plusvalía municipal?</h4>

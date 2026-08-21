@@ -335,7 +335,7 @@ export default function SimuladorTerrenoRusticoPage() {
               )}
 
               <ResultCard
-                title="Gastos de notaría (+ IVA)"
+                title="Gastos de notaría (IVA incluido)"
                 value={formatCurrency(resultadosComprador.gastosNotario)}
                 description={`Factura estimada entre ${formatCurrency(resultadosComprador.gastosNotarioMin)} y ${formatCurrency(resultadosComprador.gastosNotarioMax)}. El arancel cubre la matriz y una copia; las copias adicionales y los folios se facturan aparte y dependen de la extensión de la escritura.`}
                 variant="default"
@@ -343,7 +343,7 @@ export default function SimuladorTerrenoRusticoPage() {
               />
 
               <ResultCard
-                title="Registro de la Propiedad (+ IVA)"
+                title="Registro de la Propiedad (IVA incluido)"
                 value={formatCurrency(resultadosComprador.gastosRegistro)}
                 variant="default"
                 icon="🏛️"

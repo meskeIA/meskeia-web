@@ -26,6 +26,7 @@ import {
   estimarFacturaNotarial,
   calcularRegistro,
   ENLACE_CATASTRO,
+  RANGO_AJD,
 } from '@/data/itp-ccaa';
 
 // ===== TIPOS =====
@@ -315,7 +316,7 @@ export default function SimuladorNaveIndustrialPage() {
               )}
 
               <ResultCard
-                title="Gastos de notaría (+ IVA)"
+                title="Gastos de notaría (IVA incluido)"
                 value={formatCurrency(resultadosComprador.gastosNotario)}
                 description={`Factura estimada entre ${formatCurrency(resultadosComprador.gastosNotarioMin)} y ${formatCurrency(resultadosComprador.gastosNotarioMax)}. El arancel cubre la matriz y una copia; las copias adicionales y los folios se facturan aparte y dependen de la extensión de la escritura.`}
                 variant="default"
@@ -323,7 +324,7 @@ export default function SimuladorNaveIndustrialPage() {
               />
 
               <ResultCard
-                title="Registro de la Propiedad (+ IVA)"
+                title="Registro de la Propiedad (IVA incluido)"
                 value={formatCurrency(resultadosComprador.gastosRegistro)}
                 variant="default"
                 icon="🏛️"
@@ -406,8 +407,8 @@ export default function SimuladorNaveIndustrialPage() {
                 </tr>
                 <tr>
                   <td style={{ padding: '8px 10px' }}>AJD obra nueva</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center' }}>Sí (0,5% – 1,5%)</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center' }}>Sí (0,5% – 1,5%)</td>
+                  <td style={{ padding: '8px 10px', textAlign: 'center' }}>Sí ({formatNumber(RANGO_AJD.min, 0)}% – {formatNumber(RANGO_AJD.max, 1)}%)</td>
+                  <td style={{ padding: '8px 10px', textAlign: 'center' }}>Sí ({formatNumber(RANGO_AJD.min, 0)}% – {formatNumber(RANGO_AJD.max, 1)}%)</td>
                 </tr>
               </tbody>
             </table>

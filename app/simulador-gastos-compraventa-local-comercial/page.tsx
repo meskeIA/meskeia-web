@@ -106,6 +106,10 @@ export default function SimuladorLocalComercialPage() {
   const [valorCatastralSuelo, setValorCatastralSuelo] = useState('');
   const [valorCatastralTotal, setValorCatastralTotal] = useState('');
   const [comisionInmobiliaria, setComisionInmobiliaria] = useState('3');
+  // Gestoria del VENDEDOR, separada de la del comprador: el art. 35.1 LIRPF solo admite
+  // los gastos «satisfechos por el transmitente», y un unico campo compartido hacia que
+  // la gestoria del comprador rebajara el IRPF de la otra parte (Inspector, 20/08/2026).
+  const [gastosGestoriaVenta, setGastosGestoriaVenta] = useState('');
   const [perfilVendedor, setPerfilVendedor] = useState<PerfilVendedor>('particular');
   const [amortizacionesAcumuladas, setAmortizacionesAcumuladas] = useState('');
 
@@ -194,7 +198,7 @@ export default function SimuladorLocalComercialPage() {
     if (!Number.isFinite(precioV) || precioV <= 0) return null;
 
     const comisionPct = parseSpanishNumberOr(comisionInmobiliaria) / 100;
-    const gestoria = parseSpanishNumberOr(gastosGestoria);
+    const gestoria = parseSpanishNumberOr(gastosGestoriaVenta);
     const comision = precioV * comisionPct;
 
     // Plusvalía municipal (IIVTNU): el local está en suelo urbano, sí tributa
@@ -414,9 +418,9 @@ export default function SimuladorLocalComercialPage() {
             <NumberInput
               value={gastosGestoria}
               onChange={setGastosGestoria}
-              label="Gastos de gestoría (€)"
+              label="Gastos de gestoría del comprador (€)"
               placeholder="500"
-              helperText="Típico en operaciones comerciales: 400-800 €"
+              helperText="Típico en operaciones comerciales: 400-800 €. Solo afecta al presupuesto del comprador"
               min={0}
             />
           </div>
@@ -490,7 +494,7 @@ export default function SimuladorLocalComercialPage() {
               )}
 
               <ResultCard
-                title="Gastos de notaría (+ IVA)"
+                title="Gastos de notaría (IVA incluido)"
                 value={formatCurrency(resultadosComprador.gastosNotario)}
                 description={`Factura estimada entre ${formatCurrency(resultadosComprador.gastosNotarioMin)} y ${formatCurrency(resultadosComprador.gastosNotarioMax)}. El arancel cubre la matriz y una copia; las copias adicionales y los folios se facturan aparte y dependen de la extensión de la escritura.`}
                 variant="default"
@@ -498,7 +502,7 @@ export default function SimuladorLocalComercialPage() {
               />
 
               <ResultCard
-                title="Registro de la Propiedad (+ IVA)"
+                title="Registro de la Propiedad (IVA incluido)"
                 value={formatCurrency(resultadosComprador.gastosRegistro)}
                 variant="default"
                 icon="🏛️"
@@ -633,6 +637,15 @@ export default function SimuladorLocalComercialPage() {
                   label="Comisión de la inmobiliaria (%)"
                   placeholder="3"
                   helperText="Habitual en locales: 3-5% del precio de venta"
+                  min={0}
+                />
+
+                <NumberInput
+                  value={gastosGestoriaVenta}
+                  onChange={setGastosGestoriaVenta}
+                  label="Gestoría y certificados del vendedor (€)"
+                  placeholder="0"
+                  helperText="Solo lo que pagas TÚ al vender (certificado energético, gestoría propia). La gestoría del comprador no reduce tu ganancia: art. 35.1 LIRPF"
                   min={0}
                 />
 
