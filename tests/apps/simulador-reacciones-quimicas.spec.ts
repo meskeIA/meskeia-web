@@ -110,6 +110,9 @@ test('la app promete lo que este fichero verifica', async ({ page }) => {
   // La promesa del subtítulo: estequiometría + reactivo limitante sobre 20 reacciones.
   await expect(page.getByText(/Estequiometría y reactivo limitante — 20 reacciones reales/)).toBeVisible();
   // Y el catálogo tiene efectivamente las 20 tarjetas que anuncia el filtro «Todas».
+  // Desde el 23/08/2026 la app se abre en la CALCULADORA, que es lo que promete su title
+  // (hallazgo 114), así que hay que ir al catálogo para verlo.
+  await abrirPestana(page, /Catálogo/);
   await expect(page.getByRole('button', { name: /^Todas \(20\)$/ })).toBeVisible();
   await expect(page.locator('[role="button"][aria-expanded]')).toHaveCount(20);
 });
@@ -175,12 +178,12 @@ test('CASO 2 (límite) — estequiometría 1:1 exacta: 2 mol de HCl con 2 mol de
   // Lo importante del caso frontera: al ser exacto NO sobra nada de ningún reactivo.
   await expect(resultado(page)).not.toContainText('sobrante');
 
-  // HALLAZGO documentado: aun sin sobrante, la app rotula como limitante al primero de la
-  // lista por desempate de Math.min/indexOf. A mano, en 1:1 exacto no limita ninguno.
-  // Si algún día se corrige el desempate, es este expect.soft el que avisa.
-  await expect
-    .soft(resultado(page), 'empate 1:1: la app rotula HCl como limitante aunque a mano no limita ninguno')
-    .toContainText('Reactivo limitante: HCl');
+  // REPARADO el 23/08/2026 (hallazgo 118). Con los cocientes empatados no limita ninguno:
+  // ambos reactivos se consumen íntegros y no sobra nada — que es justo lo que la propia app
+  // confirmaba al no mostrar fila de sobrante. Antes rotulaba al primero de la lista, por el
+  // desempate implícito de Math.min + indexOf. Es el caso frontera que más se pregunta.
+  await expect(resultado(page)).toContainText('ninguno limita');
+  await expect(resultado(page)).not.toContainText('Reactivo limitante:');
 });
 
 test('CASO 3 (rechazo) — cantidades negativas, cero o vacías no producen tabla', async ({ page }) => {

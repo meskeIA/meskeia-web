@@ -6,6 +6,7 @@ import styles from './CalculadoraAspectos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface AspectPreset {
@@ -23,7 +24,7 @@ const PRESETS: AspectPreset[] = [
   { name: 'Instagram Story', ratio: '9:16', width: 1080, height: 1920, icon: '📱', category: 'Redes Sociales' },
   { name: 'Instagram Landscape', ratio: '1.91:1', width: 1080, height: 566, icon: '🌅', category: 'Redes Sociales' },
   { name: 'Facebook Post', ratio: '1.91:1', width: 1200, height: 630, icon: '👍', category: 'Redes Sociales' },
-  { name: 'Facebook Cover', ratio: '2.7:1', width: 820, height: 312, icon: '🖼️', category: 'Redes Sociales' },
+  { name: 'Facebook Cover', ratio: '2,63:1', width: 820, height: 312, icon: '🖼️', category: 'Redes Sociales' },
   { name: 'Twitter Post', ratio: '16:9', width: 1200, height: 675, icon: '🐦', category: 'Redes Sociales' },
   { name: 'LinkedIn Post', ratio: '1.91:1', width: 1200, height: 627, icon: '💼', category: 'Redes Sociales' },
   { name: 'Pinterest Pin', ratio: '2:3', width: 1000, height: 1500, icon: '📌', category: 'Redes Sociales' },
@@ -51,7 +52,7 @@ function simplifyRatio(width: number, height: number): string {
 
   if (w > 100 || h > 100) {
     const ratio = width / height;
-    return `${ratio.toFixed(2)}:1`;
+    return `${formatNumber(ratio, 2)}:1`;
   }
 
   return `${w}:${h}`;
@@ -137,7 +138,7 @@ export default function CalculadoraAspectosPage() {
     const h = parseFloat(newHeight) || 0;
     const pixels = w * h;
     if (pixels >= 1000000) {
-      return `${(pixels / 1000000).toFixed(2)} MP`;
+      return `${formatNumber(pixels / 1000000, 2)} MP`;
     }
     return `${pixels.toLocaleString('es-ES')} px`;
   }, [newWidth, newHeight]);
@@ -177,7 +178,7 @@ export default function CalculadoraAspectosPage() {
                 placeholder="1920"
               />
             </div>
-            <button onClick={swapDimensions} className={styles.swapBtn} title="Intercambiar" aria-label="Intercambiar ancho y alto">
+            <button type="button" onClick={swapDimensions} className={styles.swapBtn} title="Intercambiar" aria-label="Intercambiar ancho y alto">
               ⇄
             </button>
             <div className={styles.inputGroup}>
@@ -201,7 +202,7 @@ export default function CalculadoraAspectosPage() {
           <div className={styles.ratioDisplay} role="status" aria-live="polite">
             <span className={styles.ratioLabel}>Ratio actual:</span>
             <span className={styles.ratioValue}>{currentRatio.ratio}</span>
-            <span className={styles.ratioDecimal}>({currentRatio.decimal.toFixed(3)})</span>
+            <span className={styles.ratioDecimal}>({formatNumber(currentRatio.decimal, 3)})</span>
           </div>
 
           <div className={styles.section}>
@@ -213,7 +214,7 @@ export default function CalculadoraAspectosPage() {
                 checked={lockRatio}
                 onChange={(e) => setLockRatio(e.target.checked)}
               />
-              🔒 Mantener proporción
+              <span aria-hidden="true">🔒</span> Mantener proporción
             </label>
 
             <div className={styles.dimensionInputs}>
@@ -276,6 +277,7 @@ export default function CalculadoraAspectosPage() {
           <div className={styles.categoryTabs}>
             {categories.map(cat => (
               <button
+                type="button"
                 key={cat}
                 className={`${styles.categoryBtn} ${selectedCategory === cat ? styles.categoryActive : ''}`}
                 onClick={() => setSelectedCategory(cat)}
@@ -289,6 +291,7 @@ export default function CalculadoraAspectosPage() {
           <div className={styles.presetGrid}>
             {filteredPresets.map((preset) => (
               <button
+                type="button"
                 key={preset.name}
                 className={styles.presetBtn}
                 onClick={() => applyPreset(preset)}
@@ -410,7 +413,7 @@ export default function CalculadoraAspectosPage() {
               </div>
               <p>Adapta imágenes para diferentes breakpoints sin que se vean distorsionadas en móvil, tablet y escritorio.</p>
               <div className={styles.escenarioExample}>
-                <strong>Ejemplo:</strong> Hero image 1920×600 (16:2,7) → recortar a 768×480 (16:10) para tablet manteniendo el punto focal.
+                <strong>Ejemplo:</strong> Hero image 1920×600 (16:5) → recortar a 768×480 (16:10) para tablet manteniendo el punto focal.
               </div>
               <div className={styles.escenarioTip}>
                 Usa <code>object-fit: cover</code> y <code>object-position</code> en CSS para controlar el recorte automático.

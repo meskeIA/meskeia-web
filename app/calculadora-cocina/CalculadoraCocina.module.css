@@ -892,3 +892,11 @@
     padding: 16px 18px;
   }
 }
+
+/* Valor exacto junto a la equivalencia convencional de mando de horno.
+   Las marcas de los mandos van redondeadas (180 °C ≈ 350 °F) y no coinciden con la fórmula
+   que la propia tarjeta imprime, que da 356 (hallazgo 146 del Inspector). */
+.exacto {
+  font-size: 0.85em;
+  color: var(--text-secondary);
+}

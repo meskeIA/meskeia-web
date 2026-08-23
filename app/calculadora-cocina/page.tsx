@@ -32,7 +32,18 @@ const unidadesCocina: Record<string, ConversionUnidad> = {
   'onzas-liquidas': { nombre: 'Onzas líquidas (fl oz)', aGramos: 29.5735, categoria: 'volumen' },
 };
 
-// Densidades aproximadas para conversión peso↔volumen
+/**
+ * Densidades aproximadas para conversión peso↔volumen, en g/ml.
+ *
+ * Se contrastan con la tabla de pesos de King Arthur Baking, que es la referencia habitual
+ * en repostería y mide «spooned & levelled» (cucharear y enrasar), no compactando.
+ * Verificado: 2026-08-23.
+ *
+ * ⚠️ El cacao estaba en 0,52 g/ml, que da 124,80 g por taza de 240 ml: es el valor de cacao
+ * COMPACTADO. King Arthur da 1/2 taza = 42 g, es decir 84 g por taza, y las demás tablas lo
+ * sitúan en torno a 85 g. Se pasaba entre un 25 % y un 47 %, y era la única de las doce que
+ * no cuadraba (hallazgo 144 del Inspector, 21/08/2026).
+ */
 const densidadesIngredientes: Record<string, number> = {
   'agua': 1,
   'leche': 1.03,
@@ -44,7 +55,7 @@ const densidadesIngredientes: Record<string, number> = {
   'arroz': 0.75,
   'miel': 1.42,
   'mantequilla': 0.946,
-  'cacao': 0.52,
+  'cacao': 0.35,   // 84 g por taza de 240 ml (King Arthur: 1/2 taza = 42 g)
   'avena': 0.4,
 };
 
@@ -215,6 +226,28 @@ const sustitutosIngredientes: Sustituto[] = [
 
 // ==================== COMPONENTE PRINCIPAL ====================
 
+/**
+ * Cantidad escalada, escrita como se escriben las recetas: entero si sale exacto, fracción
+ * de cocina si encaja (1/4, 1/3, 1/2, 2/3, 3/4) y, si no, un decimal. Devolver «0,5 taza»
+ * donde la receta decía «1/2 taza» es correcto pero no es lo que nadie escribe.
+ */
+/** Por encima de esto ya no se cuenta en fracciones sino en gramos o mililitros: «187 1/2 ml»
+ *  no lo escribe nadie, pero «2 1/2 huevos» o «1 1/2 taza» sí. */
+const TOPE_FRACCIONES = 20;
+
+const formatearCantidad = (n: number): string => {
+  if (Math.abs(n % 1) < 1e-9) return formatNumber(Math.round(n), 0);
+  if (n >= TOPE_FRACCIONES) return formatNumber(n, 1);
+  const entera = Math.floor(n);
+  const resto = n - entera;
+  const fracciones: [number, string][] = [
+    [1 / 4, '1/4'], [1 / 3, '1/3'], [1 / 2, '1/2'], [2 / 3, '2/3'], [3 / 4, '3/4'],
+  ];
+  const encaje = fracciones.find(([v]) => Math.abs(resto - v) < 0.02);
+  if (encaje) return entera > 0 ? `${formatNumber(entera, 0)} ${encaje[1]}` : encaje[1];
+  return formatNumber(n, 1);
+};
+
 export default function CalculadoraCocinaPage() {
   const [tabActiva, setTabActiva] = useState<TabActiva>('conversor');
 
@@ -294,18 +327,32 @@ export default function CalculadoraCocinaPage() {
     const lineas = ingredientesReceta.split('\n').filter(l => l.trim());
 
     const resultado = lineas.map(linea => {
+      /**
+       * Se reconocen también las FRACCIONES y los mixtos («1/2 cebolla», «1 1/2 taza»).
+       *
+       * La expresión anterior solo capturaba el numerador y arrastraba el «/2» al resto de
+       * la línea: «1/2 cebolla» escalado ×2 daba «2 /2 cebolla». Y las fracciones son
+       * justamente las de las recetas anglosajonas que esta app dice adaptar — su propia
+       * tabla de sustitutos usa «1/2 plátano» y «1/2 cdta» (hallazgo 143 del Inspector).
+       */
+      const conFraccion =
+        linea.match(/^(\d+)\s+(\d+)\/(\d+)\s*(.+)$/) ??   // «1 1/2 taza»
+        linea.match(/^()(\d+)\/(\d+)\s*(.+)$/);           // «1/2 cebolla»
+      if (conFraccion) {
+        const entera = conFraccion[1] ? parseInt(conFraccion[1], 10) : 0;
+        const num = parseInt(conFraccion[2], 10);
+        const den = parseInt(conFraccion[3], 10);
+        const resto = conFraccion[4];
+        if (den > 0) return `${formatearCantidad((entera + num / den) * factor)} ${resto}`;
+      }
+
       // Buscar números en la línea (incluyendo decimales con coma o punto)
       const match = linea.match(/^([\d.,]+)\s*(.+)$/);
       if (match) {
         const cantidadOriginal = parseSpanishNumber(match[1]);
         const resto = match[2];
         if (!isNaN(cantidadOriginal)) {
-          const nuevaCantidad = cantidadOriginal * factor;
-          // Formatear según si es entero o decimal
-          const cantidadFormateada = nuevaCantidad % 1 === 0
-            ? formatNumber(nuevaCantidad, 0)
-            : formatNumber(nuevaCantidad, 1);
-          return `${cantidadFormateada} ${resto}`;
+          return `${formatearCantidad(cantidadOriginal * factor)} ${resto}`;
         }
       }
       return linea; // Si no encuentra número, devolver línea original
@@ -347,26 +394,34 @@ export default function CalculadoraCocinaPage() {
       {/* Tabs de navegación */}
       <nav className={styles.tabs}>
         <button
+          type="button"
           className={`${styles.tab} ${tabActiva === 'conversor' ? styles.tabActiva : ''}`}
           onClick={() => setTabActiva('conversor')}
+          aria-pressed={tabActiva === 'conversor'}
         >
           Conversor
         </button>
         <button
+          type="button"
           className={`${styles.tab} ${tabActiva === 'escalador' ? styles.tabActiva : ''}`}
           onClick={() => setTabActiva('escalador')}
+          aria-pressed={tabActiva === 'escalador'}
         >
           Escalador
         </button>
         <button
+          type="button"
           className={`${styles.tab} ${tabActiva === 'tiempos' ? styles.tabActiva : ''}`}
           onClick={() => setTabActiva('tiempos')}
+          aria-pressed={tabActiva === 'tiempos'}
         >
           Tiempos
         </button>
         <button
+          type="button"
           className={`${styles.tab} ${tabActiva === 'sustitutos' ? styles.tabActiva : ''}`}
           onClick={() => setTabActiva('sustitutos')}
+          aria-pressed={tabActiva === 'sustitutos'}
         >
           Sustitutos
         </button>
@@ -469,7 +524,7 @@ export default function CalculadoraCocinaPage() {
               </div>
             </div>
 
-            <button onClick={convertirUnidades} className={styles.btnPrimary}>
+            <button type="button" onClick={convertirUnidades} className={styles.btnPrimary}>
               Convertir
             </button>
 
@@ -573,7 +628,7 @@ export default function CalculadoraCocinaPage() {
               />
             </div>
 
-            <button onClick={escalarReceta} className={styles.btnPrimary}>
+            <button type="button" onClick={escalarReceta} className={styles.btnPrimary}>
               Escalar Receta
             </button>
 
@@ -731,13 +786,17 @@ export default function CalculadoraCocinaPage() {
                 </ul>
               </div>
               <div className={styles.tipCard}>
-                <h4>Conversión °C a °F</h4>
+                <h4>Mandos de horno °C ↔ °F</h4>
                 <ul>
-                  <li>150°C = 300°F</li>
-                  <li>180°C = 350°F</li>
-                  <li>200°C = 400°F</li>
-                  <li>220°C = 425°F</li>
+                  <li>150 °C ≈ 300 °F <span className={styles.exacto}>(exacto: 302)</span></li>
+                  <li>180 °C ≈ 350 °F <span className={styles.exacto}>(exacto: 356)</span></li>
+                  <li>200 °C ≈ 400 °F <span className={styles.exacto}>(exacto: 392)</span></li>
+                  <li>220 °C ≈ 425 °F <span className={styles.exacto}>(exacto: 428)</span></li>
                 </ul>
+                <p>
+                  Son las marcas <strong>convencionales</strong> de los mandos, redondeadas: no
+                  coinciden con la conversión exacta, y por eso van con ≈. Para calcularla:
+                </p>
                 <p className={styles.formula}>°F = (°C × 9/5) + 32</p>
               </div>
             </div>

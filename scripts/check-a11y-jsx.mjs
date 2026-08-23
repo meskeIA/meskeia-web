@@ -85,9 +85,18 @@ if (process.env.VERCEL) {
   process.exit(0);
 }
 
-/** Un emoji de verdad. Extended_Pictographic incluye © ® ™, que no son decoración. */
+/**
+ * Un emoji de verdad.
+ *
+ * `Extended_Pictographic` es más ancho de lo que parece: incluye © ® ™ y **el bloque entero
+ * de flechas** (U+2190–U+21FF). Una flecha así no es decoración: en «peso↔volumen» o
+ * «°C ↔ °F» es contenido, y envolverla en un `<span aria-hidden>` la borraría para quien usa
+ * lector de pantalla. Se descuentan antes de decidir. Los emojis de flecha que SÍ son
+ * decorativos —⬆️ ⬇️ ➡️— viven fuera de ese bloque y siguen detectándose.
+ * (Falso positivo encontrado el 23/08/2026 en `calculadora-cocina`.)
+ */
 const PICTOGRAFICO = /\p{Extended_Pictographic}/u;
-const NO_SON_EMOJI = /[©®™]/g;
+const NO_SON_EMOJI = /[©®™←-⇿]/g;
 const esEmoji = (t) => PICTOGRAFICO.test(t.replace(NO_SON_EMOJI, ''));
 /**
  * Si al quitar todo esto no queda nada, el nodo es SOLO emoji (y entonces es un aviso, no

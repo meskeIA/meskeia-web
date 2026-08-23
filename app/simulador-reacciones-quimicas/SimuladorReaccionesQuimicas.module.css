@@ -574,3 +574,10 @@
   .tipsGrid { grid-template-columns: 1fr; }
   .ecuacion { font-size: 0.82rem; }
 }
+
+/* Aclaración del caso en que los cocientes empatan y no hay reactivo limitante. */
+.resumenNota {
+  font-weight: 400;
+  font-size: 0.9em;
+  color: var(--text-secondary);
+}

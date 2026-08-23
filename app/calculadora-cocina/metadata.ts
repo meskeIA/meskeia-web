@@ -4,7 +4,7 @@ import { generateWebAppSchema, generateFAQSchema, combineSchemas } from '@/lib/s
 export const metadata: Metadata = {
   title: 'Calculadora de Cocina Online - Convertir Tazas a Gramos, Escalar Recetas',
   description: 'Convierte unidades de cocina (tazas, gramos, ml, onzas), escala recetas según comensales, consulta tiempos de cocción y encuentra sustitutos de ingredientes. Gratis.',
-  keywords: 'calculadora cocina, conversor unidades cocina, tazas a gramos, escalador recetas, tiempos coccion, sustitutos ingredientes, medidas cocina, recetas, conversion, temperatura horno',
+  keywords: 'calculadora cocina, conversor unidades cocina, tazas a gramos, escalador recetas, tiempos coccion, sustitutos ingredientes, medidas cocina, recetas, conversion, tiempos de horno',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -43,11 +43,10 @@ const webAppSchema = generateWebAppSchema({
   url: 'https://meskeia.com/calculadora-cocina/',
   category: 'UtilityApplication',
   features: [
-    'Conversor de unidades de cocina (volumen, peso, temperatura)',
+    'Conversor de unidades de cocina (volumen y peso, con densidad por ingrediente)',
     'Escalador de recetas según número de comensales',
     'Tabla de tiempos de cocción por alimento y método',
     'Buscador de sustitutos de ingredientes',
-    'Conversor de temperaturas de horno (°C, °F, gas)',
     'En español',
   ],
   keywords: ['calculadora cocina', 'conversor unidades', 'escalador recetas', 'tiempos cocción', 'sustitutos ingredientes'],

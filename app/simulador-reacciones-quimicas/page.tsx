@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   MeskeiaLogo,
   Footer,
@@ -74,7 +74,7 @@ const REACCIONES: Reaccion[] = [
     ],
   },
   {
-    id: 'combustion-carbono', nombre: 'Combustión del carbono', tipo: 'síntesis', energia: 'exotérmica',
+    id: 'combustion-carbono', nombre: 'Combustión del carbono', tipo: 'combustión', energia: 'exotérmica',
     ecuacion: 'C + O₂ → CO₂',
     descripcion: 'El carbono reacciona con el oxígeno para producir dióxido de carbono. Reacción base de toda combustión de carbono elemental.',
     aplicaciones: 'Industria siderúrgica (alto horno), pilas de combustible de carbono.',
@@ -206,7 +206,7 @@ const REACCIONES: Reaccion[] = [
     ],
   },
   {
-    id: 'propano', nombre: 'Combustión del propano (gas butano/propano)', tipo: 'combustión', energia: 'exotérmica',
+    id: 'propano', nombre: 'Combustión del propano (C₃H₈)', tipo: 'combustión', energia: 'exotérmica',
     ecuacion: 'C₃H₈ + 5O₂ → 3CO₂ + 4H₂O',
     descripcion: 'El propano se usa en bombonas de gas. Su combustión completa libera más energía por mol que el metano.',
     aplicaciones: 'Bombonas de gas doméstico, camping, estufas industriales, automoción (GLP).',
@@ -318,7 +318,31 @@ interface FilaResultado {
 }
 
 export default function SimuladorReaccionesQuimicas() {
-  const [tab, setTab] = useState<Tab>('catalogo');
+  // Se abre en la CALCULADORA, no en el catálogo: el <h1>, el title y la metadata prometen
+  // «Calculadora de estequiometría y reactivo limitante», y se aterrizaba en una lista de 20
+  // tarjetas — la primera cifra estaba a cinco interacciones y a ~600 px de scroll en móvil
+  // (hallazgo 114 del Inspector).
+  /**
+   * Referencias a los dos bloques de resultado, para llevar la vista hasta ellos.
+   *
+   * La tabla se inserta DEBAJO del botón Calcular, que es el último elemento del panel. En
+   * móvil —donde además el teclado virtual acaba de ocupar media pantalla— el resultado
+   * nacía fuera de vista: pulsar parecía no hacer nada. Medido por el Inspector: de 246 px
+   * de tabla quedaban visibles 6,9. Es el candidato directo a la estancia media de 21,8 s
+   * de esta app (hallazgo 113).
+   */
+  const stoicResultadoRef = useRef<HTMLDivElement>(null);
+  const limResultadoRef = useRef<HTMLDivElement>(null);
+
+  /** Lleva la vista al resultado recién calculado, respetando a quien prefiere no animar. */
+  const irAlResultado = (ref: React.RefObject<HTMLDivElement | null>) => {
+    requestAnimationFrame(() => {
+      const suave = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      ref.current?.scrollIntoView({ behavior: suave ? 'smooth' : 'auto', block: 'nearest' });
+    });
+  };
+
+  const [tab, setTab] = useState<Tab>('estequiometria');
 
   // Catálogo
   const [filtro, setFiltro] = useState<TipoReaccion | 'todas'>('todas');
@@ -356,6 +380,7 @@ export default function SimuladorReaccionesQuimicas() {
       return { formula: s.formula, nombre: s.nombre, coef: s.coef, moles, gramos, esReactivo: s.esReactivo, esBase: i === stoicSustIdx, esLimite: false };
     });
     setStoicResultado(filas);
+    irAlResultado(stoicResultadoRef);
   }
 
   function calcLimite() {
@@ -370,16 +395,24 @@ export default function SimuladorReaccionesQuimicas() {
     const molesReact = reactivos.map((s, i) => limUnidad === 'gramos' ? cants[i] / s.masa : cants[i]);
     const coefUnits = reactivos.map((s, i) => molesReact[i] / s.coef);
     const limiteCoefUnit = Math.min(...coefUnits);
-    const limiteIdx = coefUnits.indexOf(limiteCoefUnit);
-    const excesos = coefUnits.map((cu, i) => i === limiteIdx ? 0 : (cu - limiteCoefUnit));
+    // Empate: si todos los cocientes coinciden, no hay reactivo limitante — se consumen
+    // íntegros y no sobra ninguno. El desempate de indexOf señalaba al primero de la lista
+    // (hallazgo 118). Se compara con tolerancia porque los cocientes vienen de dividir.
+    const hayEmpate = coefUnits.every(cu => Math.abs(cu - limiteCoefUnit) < 1e-9);
+    const limiteIdx = hayEmpate ? -1 : coefUnits.indexOf(limiteCoefUnit);
+    const excesos = coefUnits.map(cu => cu - limiteCoefUnit);
     const filas: FilaResultado[] = limReaccion.sustancias.map((s, si) => {
       const moles = limiteCoefUnit * s.coef;
       const gramos = moles * s.masa;
       const reactIdx = reactivos.findIndex(r => r.formula === s.formula);
-      const esLimite = reactIdx === limiteIdx;
+      // Ojo al doble −1: `findIndex` devuelve −1 para los PRODUCTOS, y `limiteIdx` vale −1
+      // cuando no hay limitante (empate). Sin el guard, los productos salían marcados
+      // «⚠️ LÍMITE» justo en el caso que se acababa de reparar.
+      const esLimite = limiteIdx >= 0 && reactIdx === limiteIdx;
       return { formula: s.formula, nombre: s.nombre, coef: s.coef, moles, gramos, esReactivo: s.esReactivo, esBase: false, esLimite };
     });
     setLimResultado({ filas, limiteIdx, excesos });
+    irAlResultado(limResultadoRef);
   }
 
   const reaccionesFiltradas = filtro === 'todas' ? REACCIONES : REACCIONES.filter(r => r.tipo === filtro);
@@ -400,9 +433,25 @@ export default function SimuladorReaccionesQuimicas() {
         <nav className={styles.tabBar} aria-label="Secciones del simulador" role="tablist">
           {(['catalogo', 'estequiometria', 'limitante'] as Tab[]).map(t => (
             <button
+              type="button"
               key={t}
               role="tab"
+              id={`tab-${t}`}
               aria-selected={tab === t}
+              // Solo la activa: los paneles se montan bajo demanda, así que apuntar a los
+              // otros dos dejaría un aria-controls colgando de un id que no existe.
+              aria-controls={tab === t ? `panel-${t}` : undefined}
+              // Solo la pestaña activa entra en el orden de tabulación: dentro de un tablist
+              // se navega con las flechas, no con Tab (patrón ARIA de pestañas).
+              tabIndex={tab === t ? 0 : -1}
+              onKeyDown={e => {
+                const orden: Tab[] = ['catalogo', 'estequiometria', 'limitante'];
+                const i = orden.indexOf(t);
+                if (e.key === 'ArrowRight') setTab(orden[(i + 1) % orden.length]);
+                if (e.key === 'ArrowLeft') setTab(orden[(i - 1 + orden.length) % orden.length]);
+                if (e.key === 'Home') setTab(orden[0]);
+                if (e.key === 'End') setTab(orden[orden.length - 1]);
+              }}
               className={`${styles.tabBtn} ${tab === t ? styles.tabActive : ''}`}
               onClick={() => setTab(t)}
             >
@@ -414,13 +463,14 @@ export default function SimuladorReaccionesQuimicas() {
 
         {/* TAB 1 — CATÁLOGO */}
         {tab === 'catalogo' && (
-          <div>
+          <div role="tabpanel" id="panel-catalogo" aria-labelledby="tab-catalogo">
             <div className={styles.filtros}>
-              <button className={`${styles.filtroBtn} ${filtro === 'todas' ? styles.filtroActivo : ''}`} onClick={() => setFiltro('todas')} aria-pressed={filtro === 'todas'}>
+              <button type="button" className={`${styles.filtroBtn} ${filtro === 'todas' ? styles.filtroActivo : ''}`} onClick={() => setFiltro('todas')} aria-pressed={filtro === 'todas'}>
                 Todas ({REACCIONES.length})
               </button>
               {TODOS_TIPOS.map(t => (
                 <button
+                  type="button"
                   key={t}
                   className={`${styles.filtroBtn} ${filtro === t ? styles.filtroActivo : ''}`}
                   onClick={() => setFiltro(t)}
@@ -440,7 +490,12 @@ export default function SimuladorReaccionesQuimicas() {
                     role="button"
                     tabIndex={0}
                     aria-expanded={expandida === r.id}
-                    onKeyDown={e => e.key === 'Enter' && setExpandida(expandida === r.id ? null : r.id)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();   // el espacio, si no, hace scroll de página
+                        setExpandida(expandida === r.id ? null : r.id);
+                      }
+                    }}
                   >
                     <div className={styles.reaccionHeaderLeft}>
                       <p className={styles.reaccionNombre}>
@@ -457,7 +512,7 @@ export default function SimuladorReaccionesQuimicas() {
                   {expandida === r.id && (
                     <div className={styles.reaccionDetalle}>
                       <p>{r.descripcion}</p>
-                      <p className={styles.aplicaciones}>💡 Aplicaciones: {r.aplicaciones}</p>
+                      <p className={styles.aplicaciones}><span aria-hidden="true">💡</span> Aplicaciones: {r.aplicaciones}</p>
                       <table className={styles.resultTable} style={{ marginTop: '0.75rem' }}>
                         <thead>
                           <tr>
@@ -488,7 +543,7 @@ export default function SimuladorReaccionesQuimicas() {
 
         {/* TAB 2 — ESTEQUIOMETRÍA */}
         {tab === 'estequiometria' && (
-          <div>
+          <div role="tabpanel" id="panel-estequiometria" aria-labelledby="tab-estequiometria">
             <div className={styles.panel}>
               <h2 className={styles.panelTitle}>Calculadora Estequiométrica</h2>
               <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
@@ -514,8 +569,8 @@ export default function SimuladorReaccionesQuimicas() {
               </div>
 
               <div className={styles.unidadToggle}>
-                <button className={`${styles.unidadBtn} ${stoicUnidad === 'gramos' ? styles.unidadBtnActivo : ''}`} onClick={() => setStoicUnidad('gramos')} aria-pressed={stoicUnidad === 'gramos'}>Gramos</button>
-                <button className={`${styles.unidadBtn} ${stoicUnidad === 'moles' ? styles.unidadBtnActivo : ''}`} onClick={() => setStoicUnidad('moles')} aria-pressed={stoicUnidad === 'moles'}>Moles</button>
+                <button type="button" className={`${styles.unidadBtn} ${stoicUnidad === 'gramos' ? styles.unidadBtnActivo : ''}`} onClick={() => { setStoicUnidad('gramos'); setStoicResultado(null); }} aria-pressed={stoicUnidad === 'gramos'}>Gramos</button>
+                <button type="button" className={`${styles.unidadBtn} ${stoicUnidad === 'moles' ? styles.unidadBtnActivo : ''}`} onClick={() => { setStoicUnidad('moles'); setStoicResultado(null); }} aria-pressed={stoicUnidad === 'moles'}>Moles</button>
               </div>
 
               <div className={styles.selectGroup} style={{ maxWidth: '240px' }}>
@@ -531,10 +586,10 @@ export default function SimuladorReaccionesQuimicas() {
               </div>
 
               {stoicError && <p role="alert" className={styles.errorMsg}>{stoicError}</p>}
-              <button className={styles.calcBtn} onClick={calcStoic}>Calcular</button>
+              <button type="button" className={styles.calcBtn} onClick={calcStoic}>Calcular</button>
 
               {stoicResultado && (
-                <div role="status" aria-live="polite">
+                <div role="status" aria-live="polite" ref={stoicResultadoRef}>
                 <table className={styles.resultTable}>
                   <thead>
                     <tr>
@@ -566,7 +621,7 @@ export default function SimuladorReaccionesQuimicas() {
 
         {/* TAB 3 — REACTIVO LIMITANTE */}
         {tab === 'limitante' && (
-          <div>
+          <div role="tabpanel" id="panel-limitante" aria-labelledby="tab-limitante">
             <div className={styles.panel}>
               <h2 className={styles.panelTitle}>Reactivo Limitante</h2>
               <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
@@ -583,8 +638,8 @@ export default function SimuladorReaccionesQuimicas() {
               <div className={styles.ecuacionDisplay}>{limReaccion.ecuacion}</div>
 
               <div className={styles.unidadToggle}>
-                <button className={`${styles.unidadBtn} ${limUnidad === 'gramos' ? styles.unidadBtnActivo : ''}`} onClick={() => setLimUnidad('gramos')} aria-pressed={limUnidad === 'gramos'}>Gramos</button>
-                <button className={`${styles.unidadBtn} ${limUnidad === 'moles' ? styles.unidadBtnActivo : ''}`} onClick={() => setLimUnidad('moles')} aria-pressed={limUnidad === 'moles'}>Moles</button>
+                <button type="button" className={`${styles.unidadBtn} ${limUnidad === 'gramos' ? styles.unidadBtnActivo : ''}`} onClick={() => { setLimUnidad('gramos'); setLimResultado(null); }} aria-pressed={limUnidad === 'gramos'}>Gramos</button>
+                <button type="button" className={`${styles.unidadBtn} ${limUnidad === 'moles' ? styles.unidadBtnActivo : ''}`} onClick={() => { setLimUnidad('moles'); setLimResultado(null); }} aria-pressed={limUnidad === 'moles'}>Moles</button>
               </div>
 
               <div className={styles.reactivosGrid}>
@@ -606,10 +661,10 @@ export default function SimuladorReaccionesQuimicas() {
               </div>
 
               {limError && <p role="alert" className={styles.errorMsg}>{limError}</p>}
-              <button className={styles.calcBtn} onClick={calcLimite}>Calcular reactivo limitante</button>
+              <button type="button" className={styles.calcBtn} onClick={calcLimite}>Calcular reactivo limitante</button>
 
               {limResultado && (
-                <div role="status" aria-live="polite">
+                <div role="status" aria-live="polite" ref={limResultadoRef}>
                 <table className={styles.resultTable}>
                     <thead>
                       <tr>
@@ -625,7 +680,7 @@ export default function SimuladorReaccionesQuimicas() {
                           <td>
                             {f.formula} — {f.nombre}{' '}
                             <span className={f.esReactivo ? styles.tagR : styles.tagP}>{f.esReactivo ? 'R' : 'P'}</span>
-                            {f.esLimite && <span className={styles.tagLimite}> ⚠️ LÍMITE</span>}
+                            {f.esLimite && <span className={styles.tagLimite}> <span aria-hidden="true">⚠️</span> LÍMITE</span>}
                           </td>
                           <td>{f.coef}</td>
                           <td>{formatNumber(f.moles, 4)} mol</td>
@@ -636,9 +691,22 @@ export default function SimuladorReaccionesQuimicas() {
                   </table>
 
                   <div className={styles.resumenLimite}>
-                    <h4>⚠️ Reactivo limitante: {limReaccion.sustancias.filter(s => s.esReactivo)[limResultado.limiteIdx].formula}</h4>
+                    {limResultado.limiteIdx >= 0 ? (
+                      <h4>
+                        <span aria-hidden="true">⚠️</span> Reactivo limitante:{' '}
+                        {limReaccion.sustancias.filter(s => s.esReactivo)[limResultado.limiteIdx].formula}
+                      </h4>
+                    ) : (
+                      <h4>
+                        <span aria-hidden="true">⚖️</span> Proporción exacta: ninguno limita
+                        <span className={styles.resumenNota}>
+                          {' '}— los cocientes coinciden, así que todos los reactivos se consumen
+                          íntegros y no sobra ninguno.
+                        </span>
+                      </h4>
+                    )}
                     {limResultado.excesos.map((ex, i) => {
-                      if (ex === 0) return null;
+                      if (Math.abs(ex) < 1e-9) return null;
                       const s = limReaccion.sustancias.filter(r => r.esReactivo)[i];
                       const excGramos = ex * s.coef * s.masa;
                       return (

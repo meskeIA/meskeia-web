@@ -188,7 +188,8 @@ test.describe('Escalador de recetas', () => {
     const texto = await escalar(page, '4', '5');
     expect(texto).toContain('250 g harina');
     expect(texto).toContain('125 g azúcar');
-    expect(texto).toContain('2,5 huevos');
+    // Desde el 23/08/2026 las cantidades se escriben como en una receta: «2 1/2», no «2,5»
+    expect(texto).toContain('2 1/2 huevos');
     expect(texto).toContain('187,5 ml leche');
     expect(texto).not.toContain('2.5 huevos'); // punto decimal = formato US, prohibido
   });
@@ -217,7 +218,9 @@ test.describe('Escalador de recetas', () => {
     expect(texto).toContain('3 tazas harina'); // 1,5 × 2 = 3
     // HALLAZGO ABIERTO: lo esperado sería «1 cebolla» (media cebolla × 2). La regex captura solo
     // el «1» y arrastra el «/2» al resto de la línea. Si se arregla, este expect fallará.
-    expect(texto).toContain('2 /2 cebolla');
+    // REPARADO (hallazgo 143): la fracción se escala entera. «1/2» ×2 = «1», no «2 /2».
+    expect(texto).toContain('1 cebolla');
+    expect(texto).not.toContain('2 /2');
   });
 });
 
@@ -250,7 +253,7 @@ test.describe('Estructura y accesibilidad', () => {
     await expect(page.locator('footer').first()).toBeVisible(); // Footer
   });
 
-  test('TESTIGO · las pestañas no anuncian a un lector de pantalla cuál está activa', async ({
+  test('HALLAZGO 141+142 (reparado) — las pestañas anuncian cuál está activa y llevan type', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -258,8 +261,8 @@ test.describe('Estructura y accesibilidad', () => {
       const boton = page.getByRole('button', { name: nombre, exact: true });
       // HALLAZGO ABIERTO: sin aria-pressed ni role="tab"+aria-selected, y sin type="button"
       // (regla obligatoria del proyecto). Cuando se corrija, hay que invertir estos dos expect.
-      expect(await boton.getAttribute('aria-pressed')).toBeNull();
-      expect(await boton.getAttribute('type')).toBeNull();
+      expect(await boton.getAttribute('aria-pressed')).not.toBeNull();
+      expect(await boton.getAttribute('type')).toBe('button');
     }
   });
 });

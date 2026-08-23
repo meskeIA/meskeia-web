@@ -47,16 +47,16 @@ import { test, expect, Page } from '@playwright/test';
  *       en «Nuevo Ancho» no puede producir NINGÚN alto. Lo que no debe salir nunca:
  *       «NaN», «Infinity», «-1920:1080» ni una división por cero disfrazada.
  *
- * HALLAZGOS CONOCIDOS (se documentan aquí como TESTIGO, NO se corrigen desde el test):
- *   1. FORMATO ESPAÑOL: las tres cifras decimales de la pantalla salen de un `toFixed()` crudo,
- *      con PUNTO decimal: «(1.778)», «1.78:1» y «1.44 MP». Y conviven con el separador de millar
- *      correcto («360.000 px», vía toLocaleString('es-ES')) en el MISMO hueco de pantalla, así que
- *      el punto significa dos cosas distintas a un segundo de diferencia.
- *   2. El preset «Facebook Cover» se anuncia como 2.7:1, pero 820/312 = 2,628 → la propia app
- *      muestra 2.63:1 al pulsarlo. La etiqueta se contradice con el resultado.
- *   3. Accesibilidad: tres <button> sin type="button" (intercambio, categorías, presets) y el
- *      emoji 🔒 junto a «Mantener proporción» sin <span aria-hidden="true">.
- *   Si algún día se arreglan, los bloques marcados TESTIGO fallarán y habrá que invertirlos.
+ * HALLAZGOS de la prueba de especificidad (23/08/2026), REPARADOS ese mismo día (tanda 5):
+ *   1. FORMATO ESPAÑOL: las cifras decimales salían de un `toFixed()` crudo, con PUNTO decimal
+ *      —«(1.778)», «1.78:1», «1.44 MP»— conviviendo con el separador de millar correcto
+ *      («360.000 px») en el MISMO hueco, así que el punto significaba dos cosas distintas a un
+ *      segundo de diferencia. Ahora todo pasa por formatNumber.
+ *   2. El preset «Facebook Cover» se anunciaba como 2.7:1 cuando 820/312 = 2,628: la etiqueta
+ *      contradecía al resultado que la propia app mostraba al pulsarlo. Corregida a 2,63:1.
+ *   3. Accesibilidad: tres <button> sin type="button" y el emoji 🔒 sin aria-hidden.
+ *   Los bloques que estaban marcados TESTIGO quedan invertidos, que es lo que aquel
+ *   encabezado anticipaba.
  */
 
 const RUTA = '/calculadora-aspectos/';
@@ -94,14 +94,15 @@ test('CASO 1 (normal): 1920×1080 da 16:9 y 1600 de ancho da 900 de alto', async
   // mcd(1920,1080) = 120 → 16:9 (calculado a mano en la cabecera). 1920/1080 = 1,777… → 1,778.
   expect(await leeRatio(page)).toContain('16:9');
   // TESTIGO del hallazgo 1: debería ser «1,778» con coma decimal.
-  expect(await leeRatio(page)).toContain('1.778');
+  // Formato español desde el 23/08/2026 (hallazgo 183): la coma es el separador decimal
+  expect(await leeRatio(page)).toContain('1,778');
 
   // 1600 × 1080/1920 = 900 exacto.
   await page.fill('#newWidth', '1600');
   await expect(page.locator('#newHeight')).toHaveValue('900');
   // 1600 × 900 = 1.440.000 px → 1,44 MP.
   // TESTIGO del hallazgo 1: debería ser «1,44 MP».
-  expect(await leeResolucion(page)).toContain('1.44 MP');
+  expect(await leeResolucion(page)).toContain('1,44 MP');
 
   // 800 × 1080/1920 = 450 ; 800 × 450 = 360.000 px (por debajo del megapíxel, rama toLocaleString).
   await page.fill('#newWidth', '800');
@@ -120,8 +121,8 @@ test('CASO 2 (límite): 1920×1081 no simplifica y 500 de alto da 888 de ancho',
   // mcd(1920,1081) = 1 (1081 = 23×47, primo con 2^7×3×5), así que 1920 > 100 y cae a la rama
   // decimal: 1920/1081 = 1,77613… → «1.78:1», y el decimal a 3 cifras → «1.776».
   // TESTIGO del hallazgo 1: deberían ser «1,78:1» y «1,776» con coma decimal.
-  expect(ratio).toContain('1.78:1');
-  expect(ratio).toContain('1.776');
+  expect(ratio).toContain('1,78:1');
+  expect(ratio).toContain('1,776');
   // Lo que NO puede pasar: que se cuele la fracción sin simplificar.
   expect(ratio).not.toContain('1920:1081');
 
@@ -170,7 +171,7 @@ test('los presets cargan las dimensiones que anuncian y el ratio se recalcula', 
   await page.getByRole('button', { name: /Facebook Cover/ }).click();
   await expect(page.locator('#originalWidth')).toHaveValue('820');
   await expect(page.locator('#originalHeight')).toHaveValue('312');
-  expect(await leeRatio(page)).toContain('2.63:1');
+  expect(await leeRatio(page)).toContain('2,63:1');
 });
 
 test('el botón de intercambio invierte el ratio (16:9 → 9:16)', async ({ page }) => {
