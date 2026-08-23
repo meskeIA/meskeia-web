@@ -400,6 +400,28 @@ la Agenda Operativa del Centro de Mando (`restauracion-turso-semestral`).
 > Gotcha de datos: `uso_aplicaciones.timestamp` es TEXT en formato español (`31/05/2026, 23:34:51`);
 > `MIN`/`MAX` lo ordenan alfabéticamente y devuelven un rango falso. Usar `created_at` (ISO).
 
+### Candado de accesibilidad JSX
+
+`npm run check:a11y-jsx` — lo ejecuta también `npm run build`, y **rompe el build** si el
+commit escribe un `<button>` sin `type=` o un emoji junto a texto sin `aria-hidden` (las dos
+reglas del CLAUDE.md global §5 cuya corrección es unívoca). Las otras dos situaciones
+—`aria-pressed` en un toggle, emoji en nodo propio— exigen criterio y **solo avisan**: un
+`aria-pressed` en un botón de acción es una regresión, no una mejora.
+
+⚠️ Juzga **las líneas que el commit añade**, no el fichero entero, igual que `check:secrets`.
+El catálogo arrastra ~5.000 incumplimientos en 731 ficheros (medido el 23/08/2026 con
+`--todo`), así que un candado por fichero rompería el build al tocar cualquier app antigua y
+acabaría desactivado. Lo que el fichero ya arrastraba se cuenta y se nombra, pero no detiene
+nada. Falso positivo: `a11y-ok: <razón>` en esa línea o en la anterior.
+
+`npm run check:a11y-jsx -- --todo` mide el pasivo entero (2,5 s, no rompe nada) y
+`node scripts/check-a11y-jsx.mjs <fichero>` audita uno concreto.
+
+> Sale de la tanda del Inspector del 21/08/2026: 15 hallazgos de accesibilidad en **10 de 10**
+> apps, siempre las mismas tres reglas. No es que el candado fallara — no había candado. La
+> skill `/audit-accesibilidad-jsx` solo mira las apps de los últimos 60 días, y aquellas eran
+> de febrero-mayo. El pasivo sigue siendo suyo; lo nuevo ya es de este candado.
+
 ### TypeScript
 
 - ⚠️ `ignoreBuildErrors: true` en `next.config.ts` — el build de producción NO type-chequea (limitación de RAM en Vercel: el type-check de +1.100 apps agota los 8 GB)

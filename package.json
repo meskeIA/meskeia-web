@@ -5,7 +5,7 @@
   "scripts": {
     "predev": "npx kill-port 3050 || exit 0",
     "dev": "next dev -p 3050",
-    "build": "node scripts/check-verticales.mjs && node scripts/check-sitemap.mjs && node scripts/check-enlaces-internos.mjs && node scripts/check-fiscal-manifiesto.mjs && node scripts/check-itp.mjs && node scripts/check-csp.mjs && node scripts/check-tipos.mjs && node scripts/generate-app-dates.mjs && node scripts/generate-llm-index.js && node scripts/generate-delegum-es.mjs && node scripts/build-mcp-ui.mjs && next build --turbopack",
+    "build": "node scripts/check-verticales.mjs && node scripts/check-sitemap.mjs && node scripts/check-enlaces-internos.mjs && node scripts/check-fiscal-manifiesto.mjs && node scripts/check-itp.mjs && node scripts/check-csp.mjs && node scripts/check-a11y-jsx.mjs && node scripts/check-tipos.mjs && node scripts/generate-app-dates.mjs && node scripts/generate-llm-index.js && node scripts/generate-delegum-es.mjs && node scripts/build-mcp-ui.mjs && next build --turbopack",
     "start": "next start -p 3050",
     "lint": "eslint",
     "test": "npx playwright test",
@@ -31,6 +31,7 @@
     "analyze": "set ANALYZE=true && npm run build",
     "check:vigencia": "node scripts/check-vigencia.mjs",
     "check:csp": "node scripts/check-csp.mjs",
+    "check:a11y-jsx": "node scripts/check-a11y-jsx.mjs",
     "ronda": "node scripts/ronda.mjs",
     "inspector:sync": "node scripts/inspector/sincronizar.mjs",
     "inspector:cola": "node scripts/inspector/cola.mjs",
