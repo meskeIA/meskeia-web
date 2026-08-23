@@ -398,6 +398,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Es puramente decorativa: no debe capturar un toque NUNCA. En móvil llegó a robárselos
+     al último conmutador de cada circuito (hallazgo 138). */
+  pointer-events: none;
 }
 
 .arrow {
@@ -636,7 +639,18 @@
     gap: var(--spacing-md);
   }
 
+  /* Se gira el GLIFO, no el contenedor.
+     `transform` gira lo que se ve pero no cambia la caja que el elemento ocupa en el
+     layout: al rotar el contenedor de 252×51, su rectángulo pasaba a medir 51×252 y se
+     montaba encima del conmutador anterior, de modo que el centro del último interruptor
+     —justo donde se pinta su 0/1— pertenecía a la flecha y tocar ahí no hacía nada.
+     Afectaba a Cin en el Full Adder, S en el Multiplexor y B en el Half Adder. */
   .arrowContainer {
+    min-height: 2.5rem;
+  }
+
+  .arrow {
+    display: inline-block;
     transform: rotate(90deg);
   }
 

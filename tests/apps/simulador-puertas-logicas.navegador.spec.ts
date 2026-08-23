@@ -32,8 +32,8 @@ import { test, expect, devices, type Locator, type Page } from '@playwright/test
  *   dedo: sin desbordamiento horizontal de la página, conmutadores por encima de los 44 px
  *   de WCAG 2.5.5, y las tablas legibles dentro de los 412 px sin encoger la letra.
  *
- * HALLAZGOS ABIERTOS: al final, marcados con `test.fail()` — afirman lo que debería pasar y
- * hoy fallan a propósito. El día que se reparen, quitar la línea `test.fail()` y quedan como
+ * HALLAZGOS del 21/08, reparados el 23/08/2026 (tanda 3). Se escribieron con `test.fail()`
+ * afirmando lo que debería pasar; se les retiró la marca y hoy quedan como
  * regresión.
  */
 
@@ -194,7 +194,11 @@ test.describe('CASO 2 · circuitos de varias puertas', () => {
     await page.getByRole('button', { name: 'Full Adder (Sumador Completo)' }).click();
 
     const tabla = page.locator(TABLA).first();
-    expect(await tabla.locator('thead th').allInnerTexts()).toEqual(['A', 'B', 'Cin', 'S', 'Cout']);
+    // Desde el 23/08/2026 la cabecera NO se recorta por el primer espacio: hacerlo convertía
+    // «A > B», «A = B» y «A < B» del comparador en tres columnas llamadas «A» (hallazgo 137).
+    expect(await tabla.locator('thead th').allInnerTexts()).toEqual([
+      'A', 'B', 'Cin', 'S (Suma)', 'Cout (Acarreo)',
+    ]);
     expect(await filasDe(tabla)).toEqual(FULL_ADDER);
   });
 
@@ -252,7 +256,9 @@ test.describe('CASO 2 · circuitos de varias puertas', () => {
 
     // Half Adder: S = A⊕B, C = A·B.  00→00 · 01→10 · 10→10 · 11→01
     await page.getByRole('button', { name: 'Half Adder (Semisumador)' }).click();
-    expect(await tabla.locator('thead th').allInnerTexts()).toEqual(['A', 'B', 'S', 'C']);
+    expect(await tabla.locator('thead th').allInnerTexts()).toEqual([
+      'A', 'B', 'S (Suma)', 'C (Acarreo)',
+    ]);
     expect(await filasDe(tabla)).toEqual([
       ['0', '0', '0', '0'],
       ['0', '1', '1', '0'],
@@ -263,7 +269,7 @@ test.describe('CASO 2 · circuitos de varias puertas', () => {
     // Multiplexor 2:1 — Y copia D0 mientras S=0 y D1 cuando S=1.
     // Filas (D0,D1,S): 000→0 · 001→0 · 010→0 · 011→1 · 100→1 · 101→0 · 110→1 · 111→1
     await page.getByRole('button', { name: 'Multiplexor 2:1' }).click();
-    expect(await tabla.locator('thead th').allInnerTexts()).toEqual(['D0', 'D1', 'S', 'Y']);
+    expect(await tabla.locator('thead th').allInnerTexts()).toEqual(['D0', 'D1', 'S (Select)', 'Y']);
     expect(await salidasDe(tabla)).toEqual([0, 0, 0, 1, 1, 0, 1, 1]);
 
     // Comparador de 1 bit — las tres salidas son A>B, A=B, A<B.
@@ -277,17 +283,17 @@ test.describe('CASO 2 · circuitos de varias puertas', () => {
     ]);
 
     // Decodificador 2:4 — se activa la salida cuyo número es 2·A1 + A0.
-    // OJO al orden de las filas: la columna de la izquierda es A0, que aquí es el bit MENOS
-    // significativo del número decodificado, así que la diagonal sale Y0, Y2, Y1, Y3.
-    //   A0=0 A1=0 → 0 → Y0   |   A0=0 A1=1 → 2 → Y2
-    //   A0=1 A1=0 → 1 → Y1   |   A0=1 A1=1 → 3 → Y3
+    // Desde el 23/08/2026 la columna de la izquierda es A1, el bit MÁS significativo, que es
+    // como se enumera en cualquier libro. Antes iba A0 delante y la diagonal salía
+    // Y0·Y2·Y1·Y3, con pinta de estar rota aunque los valores fueran correctos (hallazgo 140).
     await page.getByRole('button', { name: 'Decodificador 2:4' }).click();
-    expect(await tabla.locator('thead th').allInnerTexts()).toEqual(['A0', 'A1', 'Y0', 'Y1', 'Y2', 'Y3']);
+    expect(await tabla.locator('thead th').allInnerTexts()).toEqual(['A1', 'A0', 'Y0', 'Y1', 'Y2', 'Y3']);
+    // Con A1 delante, la diagonal se lee Y0·Y1·Y2·Y3, que es como aparece en cualquier libro
     expect(await filasDe(tabla)).toEqual([
-      ['0', '0', '1', '0', '0', '0'],
-      ['0', '1', '0', '0', '1', '0'],
-      ['1', '0', '0', '1', '0', '0'],
-      ['1', '1', '0', '0', '0', '1'],
+      ['0', '0', '1', '0', '0', '0'],   // A1=0 A0=0 → 0 → Y0
+      ['0', '1', '0', '1', '0', '0'],   // A1=0 A0=1 → 1 → Y1
+      ['1', '0', '0', '0', '1', '0'],   // A1=1 A0=0 → 2 → Y2
+      ['1', '1', '0', '0', '0', '1'],   // A1=1 A0=1 → 3 → Y3
     ]);
     // Exactamente una salida activa en cada fila: eso es un decodificador.
     for (const fila of await filasDe(tabla)) {
@@ -334,7 +340,10 @@ test.describe('CASO 2.bis · evaluador de expresiones', () => {
   test('avisa cuando se pasa de cuatro variables', async ({ page }) => {
     await abrir(page, 'Expresiones');
     await page.getByLabel('Expresión Booleana').fill('(A AND B) OR (C AND D) OR E');
-    await expect(page.locator(ERROR_EXPRESION)).toHaveText('Máximo 4 variables (A-D)');
+    // El mensaje dice AHORA cuál es el carácter que sobra. El anterior —«Máximo 4 variables
+    // (A-D)»— era justo lo que el hallazgo 136 criticaba: salía también con expresiones de
+    // dos variables (NOR), así que no describía el problema real.
+    await expect(page.locator(ERROR_EXPRESION)).toHaveText('«E» no es una variable válida. Usa A, B, C o D.');
     await expect(page.locator(TABLA)).toHaveCount(0);
   });
 });
@@ -445,7 +454,6 @@ test.describe('CASO 3 · en móvil (Pixel 7)', () => {
 // ═══════════════════════════════════════════════════════════════════════════
 test.describe('hallazgos abiertos', () => {
   test('HALLAZGO 1 · la palabra XOR devuelve una columna de ceros en modo Expresiones', async ({ page }) => {
-    test.fail(); // Reparado el día que esto pase en verde.
     await abrir(page, 'Expresiones');
     const campo = page.getByLabel('Expresión Booleana');
     const tabla = page.locator(TABLA).first();
@@ -472,7 +480,6 @@ test.describe('hallazgos abiertos', () => {
   });
 
   test('HALLAZGO 2 · «A NAND B» se inventa variables en vez de avisar', async ({ page }) => {
-    test.fail(); // Reparado el día que esto pase en verde.
     await abrir(page, 'Expresiones');
     const campo = page.getByLabel('Expresión Booleana');
     const tabla = page.locator(TABLA).first();
@@ -492,7 +499,6 @@ test.describe('hallazgos abiertos', () => {
   });
 
   test('HALLAZGO 3 · el comparador rotula sus tres salidas con la misma letra', async ({ page }) => {
-    test.fail(); // Reparado el día que esto pase en verde.
     await abrir(page, 'Circuitos');
     await page.getByRole('button', { name: 'Comparador 1-bit' }).click();
 
@@ -505,7 +511,6 @@ test.describe('hallazgos abiertos', () => {
   });
 
   test('HALLAZGO 5 · el LED de salida no está preparado para un lector de pantalla', async ({ page }) => {
-    test.fail(); // Reparado el día que esto pase en verde.
     await abrir(page, 'Circuitos');
     await page.getByRole('button', { name: 'Full Adder (Sumador Completo)' }).click();
 
@@ -524,7 +529,6 @@ test.describe('hallazgos abiertos · móvil', () => {
   test.use(COMO_MOVIL);
 
   test('HALLAZGO 4 · la flecha tapa el centro del último conmutador', async ({ page }) => {
-    test.fail(); // Reparado el día que esto pase en verde.
     await abrir(page, 'Circuitos');
     await page.getByRole('button', { name: 'Full Adder (Sumador Completo)' }).click();
     await page.locator('[class*="__circuitPanel"]').scrollIntoViewIfNeeded();

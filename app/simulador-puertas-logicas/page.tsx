@@ -5,6 +5,7 @@ import { useState, useMemo } from 'react';
 import styles from './SimuladorPuertasLogicas.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { evaluarExpresion, extraerVariables, MAX_VARIABLES } from './motor';
 import { RETOS, corregirIntento, type Correccion } from './motor-retos';
 
 // ============================================
@@ -140,65 +141,16 @@ const CIRCUITS: Record<CircuitType, CircuitInfo> = {
   decoder2to4: {
     name: 'Decodificador 2:4',
     description: 'Activa una de 4 salidas según entrada binaria',
-    inputs: ['A0', 'A1'],
+    // A1 va PRIMERO: es el bit más significativo del número decodificado (índice = 2·A1 + A0),
+    // y la tabla se enumera de izquierda a derecha empezando por el MSB. Con A0 delante, la
+    // diagonal salía Y0·Y2·Y1·Y3 y parecía rota (hallazgo 140).
+    inputs: ['A1', 'A0'],
     outputs: ['Y0', 'Y1', 'Y2', 'Y3'],
-    compute: ([a0, a1]) => {
+    compute: ([a1, a0]) => {
       const index = (a1 ? 2 : 0) + (a0 ? 1 : 0);
       return [index === 0, index === 1, index === 2, index === 3];
     }
   }
-};
-
-// ============================================
-// PARSER DE EXPRESIONES BOOLEANAS
-// ============================================
-const parseExpression = (expr: string, variables: Record<string, boolean>): boolean => {
-  // Normalizar expresión
-  let normalized = expr.toUpperCase()
-    .replace(/\s+/g, '')
-    .replace(/NOT\s*/gi, '!')
-    .replace(/AND/gi, '&')
-    .replace(/OR/gi, '|')
-    .replace(/XOR/gi, '^')
-    .replace(/·/g, '&')
-    .replace(/\+/g, '|')
-    .replace(/⊕/g, '^')
-    .replace(/∧/g, '&')
-    .replace(/∨/g, '|')
-    .replace(/¬/g, '!');
-
-  // Reemplazar variables por valores
-  Object.entries(variables).forEach(([name, value]) => {
-    const regex = new RegExp(name, 'gi');
-    normalized = normalized.replace(regex, value ? '1' : '0');
-  });
-
-  // Evaluar expresión
-  try {
-    // Convertir a expresión JavaScript evaluable
-    const jsExpr = normalized
-      .replace(/!/g, '!')
-      .replace(/&/g, '&&')
-      .replace(/\|/g, '||')
-      .replace(/\^/g, '!==')
-      .replace(/1/g, 'true')
-      .replace(/0/g, 'false');
-
-    // Evaluar de forma segura
-    // eslint-disable-next-line no-new-func
-    return new Function(`return ${jsExpr}`)();
-  } catch {
-    return false;
-  }
-};
-
-const extractVariables = (expr: string): string[] => {
-  // Eliminar los operadores en palabra (AND/OR/NOT/XOR) antes de extraer
-  // letras sueltas, para no confundir sus letras con variables (A-D).
-  const sinOperadores = expr.toUpperCase().replace(/\b(AND|OR|NOT|XOR)\b/g, '');
-  const matches = sinOperadores.match(/[A-Z]/g);
-  if (!matches) return [];
-  return [...new Set(matches)].sort();
 };
 
 // ============================================
@@ -210,7 +162,6 @@ export default function SimuladorPuertasLogicasPage() {
   const [selectedCircuit, setSelectedCircuit] = useState<CircuitType>('halfAdder');
   const [circuitInputs, setCircuitInputs] = useState<boolean[]>([false, false, false, false]);
   const [expression, setExpression] = useState('(A AND B) OR (NOT C)');
-  const [expressionError, setExpressionError] = useState('');
 
   // Modo 4: retos. `intento` es lo que el usuario escribe; `correccion` solo aparece
   // cuando pulsa Comprobar, para que la tabla no vaya cambiando mientras teclea.
@@ -259,39 +210,41 @@ export default function SimuladorPuertasLogicasPage() {
   // ============================================
   // MODO 3: EXPRESIONES
   // ============================================
-  const expressionVariables = useMemo(() => extractVariables(expression), [expression]);
+  const analisisExpresion = useMemo(() => extraerVariables(expression), [expression]);
+  const expressionVariables = analisisExpresion.ok ? analisisExpresion.variables : [];
 
-  const expressionTruthTable = useMemo(() => {
-    if (expressionVariables.length === 0 || expressionVariables.length > 4) {
-      setExpressionError(expressionVariables.length > 4 ? 'Máximo 4 variables (A-D)' : '');
-      return [];
-    }
+  /**
+   * La tabla y el error se calculan JUNTOS y sin efectos secundarios.
+   *
+   * Antes el error se escribía con setExpressionError DENTRO del useMemo —un efecto durante
+   * el render— y el fallo real se perdía en un `catch` que devolvía una columna de ceros.
+   * Ahora, si la expresión no se entiende, lo que sale es el motivo.
+   */
+  const resultadoExpresion = useMemo((): { filas: { inputs: boolean[]; output: boolean }[]; error: string } => {
+    if (!expression.trim()) return { filas: [], error: '' };
+    if (!analisisExpresion.ok) return { filas: [], error: analisisExpresion.error };
+    if (analisisExpresion.variables.length === 0) return { filas: [], error: '' };
 
-    setExpressionError('');
-    const rows: { inputs: boolean[]; output: boolean }[] = [];
-    const numRows = Math.pow(2, expressionVariables.length);
+    const vars = analisisExpresion.variables;
+    const filas: { inputs: boolean[]; output: boolean }[] = [];
 
-    for (let i = 0; i < numRows; i++) {
+    for (let i = 0; i < Math.pow(2, vars.length); i++) {
       const inputs: boolean[] = [];
       const variables: Record<string, boolean> = {};
-
-      for (let j = 0; j < expressionVariables.length; j++) {
-        const value = Boolean((i >> (expressionVariables.length - 1 - j)) & 1);
+      for (let j = 0; j < vars.length; j++) {
+        const value = Boolean((i >> (vars.length - 1 - j)) & 1);
         inputs.push(value);
-        variables[expressionVariables[j]] = value;
+        variables[vars[j]] = value;
       }
-
-      try {
-        const output = parseExpression(expression, variables);
-        rows.push({ inputs, output });
-      } catch {
-        setExpressionError('Expresión inválida');
-        return [];
-      }
+      const r = evaluarExpresion(expression, variables);
+      if (!r.ok) return { filas: [], error: r.error };
+      filas.push({ inputs, output: r.valor });
     }
 
-    return rows;
-  }, [expression, expressionVariables]);
+    return { filas, error: '' };
+  }, [expression, analisisExpresion]);
+
+  const expressionTruthTable = resultadoExpresion.filas;
 
   // ============================================
   // MODO 4: RETOS
@@ -546,8 +499,9 @@ export default function SimuladorPuertasLogicasPage() {
               </div>
             </div>
 
-            {/* Flecha */}
-            <div className={styles.arrowContainer}>
+            {/* Flecha — decorativa: separa entradas de salidas y no aporta información
+                que no esté ya en los rótulos, así que se oculta a la ayuda técnica */}
+            <div className={styles.arrowContainer} aria-hidden="true">
               <span className={styles.arrow}>→</span>
             </div>
 
@@ -556,13 +510,18 @@ export default function SimuladorPuertasLogicasPage() {
               <h4>Salidas</h4>
               <div className={styles.ioGrid}>
                 {CIRCUITS[selectedCircuit].outputs.map((output, idx) => (
+                  // role="status" + aria-live: al conmutar una entrada, la salida CAMBIA, y
+                  // eso es justo lo que enseña este modo. Sin anunciarlo, quien no ve la
+                  // pantalla no se entera de lo único que ocurre (hallazgo 139).
                   <div
                     key={idx}
                     className={`${styles.ioLed} ${circuitOutputs[idx] ? styles.ioLedOn : ''}`}
+                    role="status"
+                    aria-live="polite"
                   >
                     <span className={styles.ioLabel}>{output}</span>
                     <span className={styles.ioValue}>{circuitOutputs[idx] ? '1' : '0'}</span>
-                    <span className={styles.ioIndicator}>{circuitOutputs[idx] ? '🔴' : '⚫'}</span>
+                    <span className={styles.ioIndicator} aria-hidden="true">{circuitOutputs[idx] ? '🔴' : '⚫'}</span>
                   </div>
                 ))}
               </div>
@@ -575,11 +534,13 @@ export default function SimuladorPuertasLogicasPage() {
             <table className={styles.truthTable}>
               <thead>
                 <tr>
+                  {/* Sin recortar por el primer espacio: en el comparador 1-bit eso convertía
+                      «A > B», «A = B» y «A < B» en tres columnas llamadas «A» (hallazgo 137). */}
                   {CIRCUITS[selectedCircuit].inputs.map((input, idx) => (
-                    <th key={idx}>{input.split(' ')[0]}</th>
+                    <th key={idx}>{input}</th>
                   ))}
                   {CIRCUITS[selectedCircuit].outputs.map((output, idx) => (
-                    <th key={idx} className={styles.outputHeader}>{output.split(' ')[0]}</th>
+                    <th key={idx} className={styles.outputHeader}>{output}</th>
                   ))}
                 </tr>
               </thead>
@@ -629,7 +590,9 @@ export default function SimuladorPuertasLogicasPage() {
               placeholder="Ej: (A AND B) OR (NOT C)"
               className={styles.expressionField}
             />
-            {expressionError && <p className={styles.expressionError}>{expressionError}</p>}
+            {resultadoExpresion.error && (
+              <p className={styles.expressionError} role="alert">{resultadoExpresion.error}</p>
+            )}
           </div>
 
           {/* Ayuda de sintaxis */}
@@ -1045,7 +1008,7 @@ export default function SimuladorPuertasLogicasPage() {
                 Examen tipo: &quot;Simplifica A·(A+B)&quot;. Usando el teorema de absorción: A·(A+B) = A·A + A·B = A + A·B = <strong>A</strong>. Resultado: una conexión directa sin puertas.
               </p>
               <p className={styles.escenarioTip}>
-                💡 Memoriza las leyes De Morgan: NOT(A·B) = NOT(A)+NOT(B). Son las más preguntadas en exámenes preuniversitarios.
+                <span aria-hidden="true">💡</span> Memoriza las leyes De Morgan: NOT(A·B) = NOT(A)+NOT(B). Son las más preguntadas en exámenes preuniversitarios.
               </p>
             </div>
 
@@ -1058,7 +1021,7 @@ export default function SimuladorPuertasLogicasPage() {
                 Diseñar un semisumador de 1 bit: puerta XOR para la suma (S = A⊕B) + puerta AND para el acarreo (C = A·B). <strong>Solo 2 puertas para sumar bits binarios.</strong>
               </p>
               <p className={styles.escenarioTip}>
-                💡 Practica implementando cualquier función con solo puertas NAND. Es ejercicio estándar en arquitectura de computadores.
+                <span aria-hidden="true">💡</span> Practica implementando cualquier función con solo puertas NAND. Es ejercicio estándar en arquitectura de computadores.
               </p>
             </div>
 
@@ -1071,7 +1034,7 @@ export default function SimuladorPuertasLogicasPage() {
                 Detector de paridad para comunicaciones serie: <strong>3 puertas XOR en cascada</strong> detectan si el número de unos en 4 bits es par o impar. Usado en UART para verificar integridad de datos.
               </p>
               <p className={styles.escenarioTip}>
-                💡 En diseño real, NAND y NOR son más eficientes en silicio. Los fabricantes de chips los usan como bloques constructivos básicos.
+                <span aria-hidden="true">💡</span> En diseño real, NAND y NOR son más eficientes en silicio. Los fabricantes de chips los usan como bloques constructivos básicos.
               </p>
             </div>
 
@@ -1084,7 +1047,7 @@ export default function SimuladorPuertasLogicasPage() {
                 Multiplexor 4:1 para seleccionar entre 4 fuentes de datos: 3 puertas AND (con señales de selección) + 1 puerta OR. <strong>Base de los buses de datos en microprocesadores.</strong>
               </p>
               <p className={styles.escenarioTip}>
-                💡 Entender la lógica subyacente permite optimizar el uso de LUTs en FPGAs y celdas estándar en ASICs.
+                <span aria-hidden="true">💡</span> Entender la lógica subyacente permite optimizar el uso de LUTs en FPGAs y celdas estándar en ASICs.
               </p>
             </div>
           </div>
@@ -1097,55 +1060,55 @@ export default function SimuladorPuertasLogicasPage() {
             <div className={styles.faqItem}>
               <h4>¿Es lo mismo una puerta lógica que una compuerta lógica?</h4>
               <p>Sí, son <strong>el mismo componente</strong>: un circuito que recibe entradas binarias (0 y 1) y devuelve una salida según una operación lógica. La única diferencia es el término regional: en España se dice <strong>puerta lógica</strong> y en buena parte de Hispanoamérica (México, Colombia, Argentina...) se dice <strong>compuerta lógica</strong>. Ambas traducen el inglés <em>logic gate</em>.</p>
-              <p className={styles.faqTip}>💡 Este simulador funciona igual con cualquiera de los dos nombres: las 7 puertas (o compuertas) AND, OR, NOT, NAND, NOR, XOR y XNOR son universales.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Este simulador funciona igual con cualquiera de los dos nombres: las 7 puertas (o compuertas) AND, OR, NOT, NAND, NOR, XOR y XNOR son universales.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Qué es el Álgebra de Boole y para qué sirve?</h4>
               <p>El Álgebra de Boole (1854) es el sistema matemático que describe los circuitos digitales. Trabaja con solo dos valores (0 y 1) y tres operaciones básicas (AND, OR, NOT). Permite simplificar expresiones lógicas para reducir el número de puertas y ahorrar coste, energía y espacio en silicio.</p>
-              <p className={styles.faqTip}>💡 Las leyes fundamentales son conmutativa (A·B = B·A), asociativa y distributiva (A·(B+C) = A·B + A·C).</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Las leyes fundamentales son conmutativa (A·B = B·A), asociativa y distributiva (A·(B+C) = A·B + A·C).</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Por qué NAND y NOR se llaman puertas universales?</h4>
               <p>Porque cualquier función lógica puede implementarse usando <strong>únicamente puertas NAND</strong> (o únicamente NOR). NOT(A) = A NAND A; AND(A,B) = NOT(A NAND B); OR(A,B) = (NOT A) NAND (NOT B). Los fabricantes de chips simplifican la producción usando una sola celda estándar.</p>
-              <p className={styles.faqTip}>💡 En FPGAs modernas, los &quot;Look-Up Tables&quot; (LUT) son la generalización de este concepto: una tabla de memoria que implementa cualquier función booleana.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> En FPGAs modernas, los &quot;Look-Up Tables&quot; (LUT) son la generalización de este concepto: una tabla de memoria que implementa cualquier función booleana.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Qué es una tabla de verdad y cómo se construye?</h4>
               <p>Una tabla de verdad lista todas las combinaciones posibles de entradas (2<sup>n</sup> filas para n entradas) y la salida correspondiente. Para 2 entradas: 4 filas (00, 01, 10, 11). Para 3 entradas: 8 filas. Para 10 entradas: 1.024 filas.</p>
-              <p className={styles.faqTip}>💡 Construye siempre las entradas en orden binario natural (de 0 a 2^n-1) para no omitir ninguna combinación.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Construye siempre las entradas en orden binario natural (de 0 a 2^n-1) para no omitir ninguna combinación.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Qué diferencia hay entre XOR y XNOR?</h4>
               <p>XOR da salida 1 cuando las entradas son <strong>DIFERENTES</strong>. XNOR da 1 cuando son <strong>IGUALES</strong>. Son complementarias: si A XOR B = Y, entonces A XNOR B = NOT(Y). XOR se usa en sumadores y detectores de paridad; XNOR en comparadores de igualdad.</p>
-              <p className={styles.faqTip}>💡 XOR detecta si el número de unos en la entrada es impar. Concatenando XORs se construyen generadores/verificadores de paridad.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> XOR detecta si el número de unos en la entrada es impar. Concatenando XORs se construyen generadores/verificadores de paridad.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Cómo se aplican las Leyes de De Morgan?</h4>
               <p>Primera ley: <strong>NOT(A AND B) = NOT(A) OR NOT(B)</strong>. Segunda ley: <strong>NOT(A OR B) = NOT(A) AND NOT(B)</strong>. Permiten convertir NAND en OR con entradas negadas y NOR en AND con entradas negadas. Son esenciales para simplificar circuitos.</p>
-              <p className={styles.faqTip}>💡 Para aplicar De Morgan: 1) Niega toda la expresión, 2) Cambia AND por OR (o viceversa), 3) Niega cada variable individual.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Para aplicar De Morgan: 1) Niega toda la expresión, 2) Cambia AND por OR (o viceversa), 3) Niega cada variable individual.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Qué es una expresión en Forma Normal Canónica?</h4>
               <p>Existen dos formas: <strong>Suma de Minterms (SOP)</strong> y Producto de Maxterms (POS). SOP: para cada fila con salida 1, escribe el AND de variables y únelos con OR. Cualquier tabla de verdad puede expresarse en forma canónica.</p>
-              <p className={styles.faqTip}>💡 SOP es más intuitiva: lee las filas con salida 1, escribe el mintérmino para cada una y únelos con OR.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> SOP es más intuitiva: lee las filas con salida 1, escribe el mintérmino para cada una y únelos con OR.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Para qué sirven los Mapas de Karnaugh?</h4>
               <p>Los K-Maps son un método <strong>gráfico</strong> para simplificar expresiones booleanas. Organizan la tabla de verdad en cuadrícula donde celdas adyacentes difieren en una variable (código Gray). Agrupando celdas con valor 1 en potencias de 2, se obtiene la expresión mínima.</p>
-              <p className={styles.faqTip}>💡 Son muy eficientes para hasta 4-5 variables. Para más, se usan algoritmos como Quine-McCluskey o herramientas EDA.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Son muy eficientes para hasta 4-5 variables. Para más, se usan algoritmos como Quine-McCluskey o herramientas EDA.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Cómo se implementan las puertas en hardware real?</h4>
               <p>Las puertas lógicas se implementan con <strong>transistores CMOS</strong>. Una puerta NAND básica usa 4 transistores (2 NMOS en serie + 2 PMOS en paralelo). Los microprocesadores modernos tienen miles de millones de transistores operando a frecuencias de GHz.</p>
-              <p className={styles.faqTip}>💡 La tecnología CMOS domina porque solo consume energía durante las transiciones. Una puerta CMOS en reposo consume esencialmente cero potencia.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> La tecnología CMOS domina porque solo consume energía durante las transiciones. Una puerta CMOS en reposo consume esencialmente cero potencia.</p>
             </div>
           </div>
         </section>
@@ -1292,7 +1255,7 @@ export default function SimuladorPuertasLogicasPage() {
           </li>
         </ul>
         <p className={styles.relatedConceptsTip}>
-          💡 ¿Buscabas una <strong>calculadora de compuertas lógicas</strong> o un{' '}
+          <span aria-hidden="true">💡</span> ¿Buscabas una <strong>calculadora de compuertas lógicas</strong> o un{' '}
           <strong>sumador binario</strong>? Es esta misma herramienta: usa el modo «Expresiones»
           para evaluar cualquier fórmula booleana, y el modo «Circuitos» para los sumadores
           (half adder y full adder).

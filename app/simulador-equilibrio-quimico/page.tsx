@@ -34,7 +34,13 @@ interface Reaccion {
   reactivos: Especie[];
   productos: Especie[];
   Kc: number;
-  exotermica: boolean;
+  /**
+   * ΔH de reacción en kJ/mol. El SIGNO ya dice si es exotérmica (ΔH<0) o endotérmica
+   * (ΔH>0), así que no hay un campo `exotermica` aparte: tenerlo permitía que se
+   * contradijeran, y eso es lo que pasó — la esterificación llevaba `exotermica: false`
+   * con `deltaH: -3` y la tarjeta se rotulaba «endotérmica · ΔH = -3 kJ/mol», que es
+   * imposible (hallazgo 172).
+   */
   deltaH: number; // kJ/mol
   contexto: string;
   // Concentraciones iniciales sugeridas (orden = reactivos + productos)
@@ -74,7 +80,6 @@ const REACCIONES: Reaccion[] = [
     ],
     productos: [{ simbolo: 'NH₃', coef: 2, estado: 'g' }],
     Kc: 0.5,
-    exotermica: true,
     deltaH: -92,
     contexto: 'Producción industrial de fertilizantes. Δn = 2 − 4 = −2 (mol gas).',
     inicialesSugeridas: { 'N₂': 1.0, 'H₂': 3.0, 'NH₃': 0.5 },
@@ -92,7 +97,6 @@ const REACCIONES: Reaccion[] = [
       { simbolo: 'H₂O', coef: 1, estado: 'l' },
     ],
     Kc: 4.0,
-    exotermica: false,
     deltaH: -3,
     contexto: 'Equilibrio en disolución líquida. Δn = 0, la presión no afecta.',
     inicialesSugeridas: { 'CH₃COOH': 1.0, 'C₂H₅OH': 1.0, 'CH₃COOC₂H₅': 0.2, 'H₂O': 0.2 },
@@ -107,7 +111,6 @@ const REACCIONES: Reaccion[] = [
       { simbolo: 'Cl₂', coef: 1, estado: 'g' },
     ],
     Kc: 0.04,
-    exotermica: false,
     deltaH: 88,
     contexto: 'Reacción endotérmica. Δn = +1: la presión sí afecta.',
     inicialesSugeridas: { 'PCl₅': 1.0, 'PCl₃': 0.1, 'Cl₂': 0.1 },
@@ -122,7 +125,6 @@ const REACCIONES: Reaccion[] = [
     ],
     productos: [{ simbolo: 'SO₃', coef: 2, estado: 'g' }],
     Kc: 4.32,
-    exotermica: true,
     deltaH: -198,
     contexto: 'Producción de ácido sulfúrico. Δn = −1: comprimir favorece productos.',
     inicialesSugeridas: { 'SO₂': 1.0, 'O₂': 0.5, 'SO₃': 0.5 },
@@ -134,7 +136,6 @@ const REACCIONES: Reaccion[] = [
     reactivos: [{ simbolo: 'NO₂', coef: 2, estado: 'g' }],
     productos: [{ simbolo: 'N₂O₄', coef: 1, estado: 'g' }],
     Kc: 170,
-    exotermica: true,
     deltaH: -57,
     contexto: 'Equilibrio rojizo/incoloro clásico. Δn = −1.',
     inicialesSugeridas: { 'NO₂': 0.2, 'N₂O₄': 1.0 },
@@ -152,7 +153,6 @@ const REACCIONES: Reaccion[] = [
       { simbolo: 'H₂', coef: 1, estado: 'g' },
     ],
     Kc: 5.0,
-    exotermica: true,
     deltaH: -41,
     contexto: 'Producción de hidrógeno industrial. Δn = 0, P no afecta.',
     inicialesSugeridas: { 'CO': 1.0, 'H₂O': 1.0, 'CO₂': 0.5, 'H₂': 0.5 },
@@ -190,7 +190,12 @@ function calcularQ(reaccion: Reaccion, concentraciones: Record<string, number>):
   }
   for (const r of reaccion.reactivos) {
     if (especieParticipaEnK(r.estado, todaEnLiquido)) {
-      const c = Math.max(concentraciones[r.simbolo] ?? 0, 1e-12);
+      const c = concentraciones[r.simbolo] ?? 0;
+      // Con un reactivo agotado el cociente DIVERGE. Antes se sustituía por un suelo de
+      // 1e-12 y el resultado —«9.259.259.259,2593»— se presentaba como una cifra exacta a
+      // cuatro decimales: el epsilon interno asomando en pantalla (hallazgo 175). Se
+      // devuelve Infinity y la interfaz lo rotula como lo que es.
+      if (c === 0) return Infinity;
       denominador *= Math.pow(c, r.coef);
       hayDenominador = true;
     }
@@ -295,6 +300,43 @@ function nuevoEquilibrio(
  * Ecuación de van't Hoff simplificada: ln(K2/K1) = -ΔH/R · (1/T2 − 1/T1)
  * R = 8.314 J/(mol·K), ΔH en J/mol
  */
+/**
+ * Temperatura de referencia del simulador, en kelvin, y ancla de van 't Hoff.
+ *
+ * ⚠️ Las Kc de este simulador son DIDÁCTICAS: valores elegidos para que la simulación sea
+ * legible, no constantes tabuladas. Hasta el 23/08/2026 la interfaz las rotulaba «Kc (a
+ * 298 K, referencia)», y eso era falso para cuatro de las seis reacciones: la Kc real a
+ * 298 K del proceso Haber-Bosch es del orden de 10⁸, y la del proceso de contacto, de 10²⁶
+ * (hallazgo 173). Con esos números la simulación no se puede ver, así que se usan valores
+ * de aula — pero no se presentan como lo que no son.
+ *
+ * Lo que SÍ es real y es lo que la app enseña: los ΔH de cada reacción, el signo del
+ * desplazamiento y cómo cambia Kc con la temperatura según van 't Hoff. Esa física es
+ * correcta sea cual sea el valor de partida.
+ */
+export const T_REFERENCIA_K = 298;
+
+/** Rango de temperatura que admite el simulador, en kelvin (no hay temperaturas absolutas negativas) */
+export const T_MIN_K = 100;
+export const T_MAX_K = 2000;
+
+/**
+ * Equilibrio de partida, redondeado a cuatro decimales.
+ *
+ * `nuevoEquilibrio` resuelve numéricamente y devuelve valores como 0,5964470977695575, que
+ * es exacto pero ilegible en un campo de concentración. Cuatro decimales bastan de sobra:
+ * la tolerancia con la que la app decide «⇌ Equilibrio» es del 2 %.
+ */
+function equilibrioDePartida(reaccion: Reaccion): Record<string, number> {
+  const eq = nuevoEquilibrio(reaccion, reaccion.inicialesSugeridas, reaccion.Kc);
+  return Object.fromEntries(Object.entries(eq).map(([k, v]) => [k, Math.round(v * 10000) / 10000]));
+}
+
+/** Exotérmica ⟺ ΔH < 0. Es la ÚNICA definición que usa la app, para que no pueda divergir. */
+function esExotermicaDe(deltaH: number): boolean {
+  return deltaH < 0;
+}
+
 function nuevoKcConTemperatura(
   KcInicial: number,
   deltaH_kJmol: number,
@@ -319,8 +361,19 @@ export default function SimuladorEquilibrioQuimicoPage() {
     [reaccionId],
   );
 
+  /**
+   * Se parte del EQUILIBRIO, no de las concentraciones sugeridas en crudo.
+   *
+   * Le Chatelier solo habla de sistemas EN equilibrio, y los seis estados de partida
+   * estaban lejos de él (Q ≪ Kc en los seis). Por eso el mensaje —que enuncia lo que
+   * predice el principio— contradecía a la flecha, que muestra hacia dónde va el sistema
+   * de verdad: en Haber-Bosch, «hacia los reactivos (←)» junto a «Q < Kc → productos →».
+   * No estaba mal ninguno de los dos: el sistema no estaba en equilibrio y la premisa del
+   * principio no se cumplía (hallazgo 171). Se resuelve con la misma función que usa el
+   * botón «Aplicar nuevo equilibrio», así que la primera pantalla ya es un equilibrio.
+   */
   const [concentraciones, setConcentraciones] = useState<Record<string, number>>(
-    () => ({ ...REACCIONES[0].inicialesSugeridas }),
+    () => equilibrioDePartida(REACCIONES[0]),
   );
   const [temperaturaK, setTemperaturaK] = useState<number>(298);
   const [historialPerturbaciones, setHistorialPerturbaciones] = useState<Perturbacion[]>([]);
@@ -331,14 +384,16 @@ export default function SimuladorEquilibrioQuimicoPage() {
     const nueva = REACCIONES.find((r) => r.id === id);
     if (!nueva) return;
     setReaccionId(id);
-    setConcentraciones({ ...nueva.inicialesSugeridas });
+    setConcentraciones(equilibrioDePartida(nueva));
     setTemperaturaK(298);
     setHistorialPerturbaciones([]);
     setMensaje(`Reacción cargada: ${nueva.nombre}. Pulsa una perturbación para experimentar.`);
   }, []);
 
+  const esExotermica = esExotermicaDe(reaccion.deltaH);
+
   const KcEfectiva = useMemo(
-    () => nuevoKcConTemperatura(reaccion.Kc, reaccion.deltaH, 298, temperaturaK),
+    () => nuevoKcConTemperatura(reaccion.Kc, reaccion.deltaH, T_REFERENCIA_K, temperaturaK),
     [reaccion, temperaturaK],
   );
 
@@ -429,7 +484,7 @@ export default function SimuladorEquilibrioQuimicoPage() {
         ...h,
         { tipo, descripcion: `Temperatura subida +${dT} K (ahora ${Tnueva} K)` },
       ]);
-      if (reaccion.exotermica) {
+      if (esExotermica) {
         setMensaje(
           `Subiste T en una reacción exotérmica (ΔH<0): el sistema absorbe el calor extra desplazándose hacia los reactivos (←). Kc disminuye.`,
         );
@@ -447,7 +502,7 @@ export default function SimuladorEquilibrioQuimicoPage() {
         ...h,
         { tipo, descripcion: `Temperatura bajada −${dT} K (ahora ${Tnueva} K)` },
       ]);
-      if (reaccion.exotermica) {
+      if (esExotermica) {
         setMensaje(
           `Bajaste T en una reacción exotérmica (ΔH<0): el sistema libera menos calor y se desplaza hacia los productos (→). Kc aumenta.`,
         );
@@ -543,7 +598,7 @@ export default function SimuladorEquilibrioQuimicoPage() {
   };
 
   const reiniciar = () => {
-    setConcentraciones({ ...reaccion.inicialesSugeridas });
+    setConcentraciones(equilibrioDePartida(reaccion));
     setTemperaturaK(298);
     setHistorialPerturbaciones([]);
     setMensaje('Estado inicial restaurado.');
@@ -589,7 +644,7 @@ export default function SimuladorEquilibrioQuimicoPage() {
                 <strong>{r.nombre}</strong>
                 <span className={styles.ecuacion}>{r.ecuacion}</span>
                 <span className={styles.reaccionMeta}>
-                  Kc ≈ {formatNumber(r.Kc, 2)} · {r.exotermica ? 'exotérmica' : 'endotérmica'} · ΔH = {formatNumber(r.deltaH, 0)} kJ/mol
+                  Kc ≈ {formatNumber(r.Kc, 2)} · {esExotermicaDe(r.deltaH) ? 'exotérmica' : 'endotérmica'} · ΔH = {formatNumber(r.deltaH, 0)} kJ/mol
                 </span>
               </button>
             ))}
@@ -633,7 +688,13 @@ export default function SimuladorEquilibrioQuimicoPage() {
                 max={2000}
                 step={10}
                 value={temperaturaK}
-                onChange={(ev) => setTemperaturaK(parseFloat(ev.target.value) || 298)}
+                onChange={(ev) => {
+                  // `parseFloat(v) || 298` hacía decorativos el min y el max, y además
+                  // convertía el 0 en 298 en silencio, porque 0 es falsy (hallazgo 174).
+                  const n = parseFloat(ev.target.value);
+                  if (!Number.isFinite(n)) return;
+                  setTemperaturaK(Math.min(Math.max(n, T_MIN_K), T_MAX_K));
+                }}
                 inputMode="decimal"
               />
             </div>
@@ -789,14 +850,16 @@ export default function SimuladorEquilibrioQuimicoPage() {
             <h3 className={styles.resultTitle}>Cociente Q vs constante Kc</h3>
             <div className={styles.resultRow}>
               <span className={styles.resultLabel}>Q (cociente actual)</span>
-              <span className={styles.resultValueAccent}>{formatNumber(Q, 4)}</span>
+              <span className={styles.resultValueAccent}>
+                {Number.isFinite(Q) ? formatNumber(Q, 4) : '∞ (un reactivo se ha agotado)'}
+              </span>
             </div>
             <div className={styles.resultRow}>
               <span className={styles.resultLabel}>Kc (a {temperaturaK} K)</span>
               <span className={styles.resultValueAccent}>{formatNumber(KcEfectiva, 4)}</span>
             </div>
             <div className={styles.resultRow}>
-              <span className={styles.resultLabel}>Kc (a 298 K, referencia)</span>
+              <span className={styles.resultLabel}>Kc de referencia (didáctica, a {T_REFERENCIA_K} K)</span>
               <span className={styles.resultValue}>{formatNumber(reaccion.Kc, 4)}</span>
             </div>
             <div className={styles.resultRow}>
@@ -1060,42 +1123,42 @@ export default function SimuladorEquilibrioQuimicoPage() {
           <h3>Mejores Prácticas</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧪</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧪</span>
               <div>
                 <strong>Equilibra primero</strong>
                 <p>Sin coeficientes correctos, los exponentes en Kc estarán mal y todo el cálculo será incorrecto.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📐</span>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
               <div>
                 <strong>Coeficientes = exponentes</strong>
                 <p>El coeficiente estequiométrico de cada especie es su exponente en la expresión de Kc.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🌡️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🌡️</span>
               <div>
                 <strong>Solo T cambia Kc</strong>
                 <p>Memoriza esto: concentración, presión y catalizador NO modifican Kc. Solo la temperatura.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔢</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔢</span>
               <div>
                 <strong>Calcula Δn antes de presión</strong>
                 <p>Δn = mol gases productos − mol gases reactivos. Si Δn=0, la presión no afecta.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚖️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
               <div>
                 <strong>Usa el calor como reactivo o producto</strong>
                 <p>En exotérmicas, trata el calor como producto. Subir T = añadir producto = retroceso.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔍</span>
               <div>
                 <strong>Verifica con Q vs Kc</strong>
                 <p>Después de cada perturbación, comprueba que el sentido de desplazamiento corresponde a la comparación Q–Kc.</p>
@@ -1105,7 +1168,7 @@ export default function SimuladorEquilibrioQuimicoPage() {
 
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <span>Errores Frecuentes</span>
             </div>
             <ul className={styles.warningList}>

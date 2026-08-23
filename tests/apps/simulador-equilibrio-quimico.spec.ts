@@ -71,7 +71,8 @@ import { test, expect, Page } from '@playwright/test';
  *       Además la temperatura: −100 K está por debajo del cero absoluto y no es un estado físico.
  *
  * ─────────────────────────────────────────────────────────────────────────────────────────
- * HALLAZGOS ABIERTOS. Van al final, marcados con `test.fail()`: cada uno afirma lo que la app
+ * HALLAZGOS del 21/08, reparados el 23/08/2026 (tanda 3). Se escribieron con `test.fail()`
+ * afirmando lo que la app
  * DEBERÍA hacer y hoy falla a propósito, de modo que la suite queda en VERDE mientras el defecto
  * siga ahí. El día que se reparen saldrán en ROJO («expected to fail, but passed») y habrá que
  * quitarles la marca, con lo que pasan a ser red de regresión. El Inspector no repara.
@@ -172,31 +173,44 @@ test('CASO 1 (normal) — water-gas shift: Q, Kc, Δn y la ICE completa', async 
   // La ecuación sobre la que descansa el cálculo hecho a mano.
   await expect(page.getByText('CO(g) + H₂O(g) ⇌ CO₂(g) + H₂(g)')).toBeVisible();
 
-  // Q = (0,50·0,50)/(1,00·1,00) = 0,25 — cabecera del CASO 1
-  await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,2500');
+  // ⚠️ ACTUALIZADO el 23/08/2026 (hallazgo 171). La app ya no arranca en las concentraciones
+  // sugeridas en crudo —que no eran un equilibrio— sino EN el equilibrio, porque Le Chatelier
+  // solo habla de sistemas en equilibrio. Y el estado de partida de hoy es exactamente el que
+  // este mismo test calculaba a mano como equilibrio predicho:
+  //   ICE desde CO=1, H₂O=1, CO₂=0,5, H₂=0,5 con Kc=5:
+  //   x = (√5 − 0,5)/(1 + √5) = 1,7360679/3,2360679 = 0,5364745
+  //   CO = H₂O = 1 − x = 0,4635 · CO₂ = H₂ = 0,5 + x = 1,0365
+  await expect(page.locator('#conc-CO')).toHaveValue('0.4635');
+  await expect(page.locator('#conc-CO₂')).toHaveValue('1.0365');
+
+  // Q = (1,0365)² / (0,4635)² = 1,074332 / 0,214832 = 5,0008 ≈ Kc
+  await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('5,0008');
   await expect(valorDe(page, 'Kc (a 298 K)')).toHaveText('5,0000');
   // Δn = (1+1) − (1+1) = 0, los dos lados con 2 mol de gas
   await expect(valorDe(page, 'Δn (gas)')).toHaveText('0');
-  // Q = 0,25 < Kc = 5 ⇒ hacia productos
-  await expect(valorDe(page, 'Dirección de desplazamiento')).toHaveText('→ Productos');
-  await expect(flecha(page)).toContainText('Q < Kc → Sistema avanza HACIA PRODUCTOS');
+  // Q ≈ Kc ⇒ el sistema está donde tiene que estar antes de perturbarlo
+  await expect(valorDe(page, 'Dirección de desplazamiento')).toHaveText('⇌ Equilibrio');
 
-  // ICE resuelta a mano: x = (√5 − 0,5)/(1 + √5) = 0,5364745
-  await expect(valorDe(page, '[CO]eq')).toHaveText('0,4635 mol/L'); // 1 − 0,5364745
-  await expect(valorDe(page, '[H₂O]eq')).toHaveText('0,4635 mol/L'); // idéntico, por la simetría 1:1
-  await expect(valorDe(page, '[CO₂]eq')).toHaveText('1,0365 mol/L'); // 0,5 + 0,5364745
+  // Y el equilibrio predicho coincide consigo mismo, que es lo que significa estar en él
+  await expect(valorDe(page, '[CO]eq')).toHaveText('0,4635 mol/L');
+  await expect(valorDe(page, '[H₂O]eq')).toHaveText('0,4635 mol/L');
+  await expect(valorDe(page, '[CO₂]eq')).toHaveText('1,0365 mol/L');
   await expect(valorDe(page, '[H₂]eq')).toHaveText('1,0365 mol/L');
 });
 
 test('CASO 1 bis (normal) — Haber-Bosch: la ICE con coeficientes 1:3:2', async ({ page }) => {
   await reaccion(page, /Haber-Bosch/).click();
 
-  // Q = 0,5² / (1 · 3³) = 0,25/27 = 0,00925926
-  await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,0093');
+  // ⚠️ ACTUALIZADO el 23/08/2026 (hallazgo 171): se arranca EN el equilibrio.
+  //   Partiendo de N₂=1, H₂=3, NH₃=0,5 con Kc=0,5, el avance ξ lleva a
+  //   N₂ = 0,5964 · H₂ = 1,7893 · NH₃ = 1,3071
+  //   Q = 1,3071² / (0,5964 · 1,7893³) = 1,70851 / 3,41655 = 0,5001 ≈ Kc ✓
+  await expect(page.locator('#conc-N₂')).toHaveValue('0.5964');
+  await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,5001');
   await expect(valorDe(page, 'Kc (a 298 K)')).toHaveText('0,5000');
   // Δn = 2 − (1+3) = −2
   await expect(valorDe(page, 'Δn (gas)')).toHaveText('-2');
-  await expect(valorDe(page, 'Dirección de desplazamiento')).toHaveText('→ Productos');
+  await expect(valorDe(page, 'Dirección de desplazamiento')).toHaveText('⇌ Equilibrio');
 
   // Raíz de 3,6742346ξ² − 9,3484692ξ + 3,1742346 = 0  ⇒  ξ = 0,4035520
   await expect(valorDe(page, '[N₂]eq')).toHaveText('0,5964 mol/L'); // 1 − ξ
@@ -215,45 +229,54 @@ test('CASO 2 (límite) — con Δn = 0 la presión no mueve absolutamente nada',
   // La propia etiqueta del grupo de presión ya avisa de que no habrá efecto.
   await expect(page.getByText('Presión (Δn=0, sin efecto)')).toBeVisible();
 
+  // ⚠️ Concentraciones actualizadas el 23/08/2026: se parte del equilibrio (hallazgo 171).
+  // Lo que se comprueba es lo mismo: con Δn = 0 la presión no mueve NADA.
   await page.getByRole('button', { name: /Comprimir/ }).click();
-  // Comprimir ×2 multiplicaría las cuatro por 2 y Q = (2a·2b)/(2c·2d) = Q: invariante.
-  await expect(page.locator('#conc-CO')).toHaveValue('1');
-  await expect(page.locator('#conc-H₂O')).toHaveValue('1');
-  await expect(page.locator('#conc-CO₂')).toHaveValue('0.5');
-  await expect(page.locator('#conc-H₂')).toHaveValue('0.5');
-  await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,2500');
+  await expect(page.locator('#conc-CO')).toHaveValue('0.4635');
+  await expect(page.locator('#conc-H₂O')).toHaveValue('0.4635');
+  await expect(page.locator('#conc-CO₂')).toHaveValue('1.0365');
+  await expect(page.locator('#conc-H₂')).toHaveValue('1.0365');
+  await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('5,0008');
   await expect(mensaje(page)).toContainText('Comprimir no afecta porque Δn = 0');
 
   await page.getByRole('button', { name: /Expandir/ }).click();
-  await expect(page.locator('#conc-CO')).toHaveValue('1');
-  await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,2500');
+  await expect(page.locator('#conc-CO')).toHaveValue('0.4635');
+  await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('5,0008');
   await expect(mensaje(page)).toContainText('Expandir no afecta porque Δn = 0');
 
   // La esterificación es el otro Δn = 0 (líquida entera): comprimir tampoco puede tocarla.
   await reaccion(page, /Esterificación/).click();
   await expect(valorDe(page, 'Δn (gas)')).toHaveText('0');
   await page.getByRole('button', { name: /Comprimir/ }).click();
-  await expect(page.locator('#conc-CH₃COOH')).toHaveValue('1');
-  await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,0400'); // (0,2·0,2)/(1·1)
+  // Equilibrio de partida: desde AcOH=EtOH=1 y éster=H₂O=0,2 con Kc=4,
+  // (0,2+x)/(1−x) = 2 ⇒ x = 0,6 ⇒ AcOH = 0,4 y éster = 0,8 ⇒ Q = 0,8²/0,4² = 4
+  await expect(page.locator('#conc-CH₃COOH')).toHaveValue('0.4');
+  await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('4,0000');
 });
 
 test('CASO 2 (límite) — con Δn ≠ 0 comprimir sí mueve Q, y en el sentido correcto', async ({ page }) => {
   // Haber-Bosch, Δn = −2: al duplicar todo, Q = (2·NH₃)²/((2·N₂)(2·H₂)³) = Q/4 ⇒ Q baja ⇒ →
   await reaccion(page, /Haber-Bosch/).click();
   await page.getByRole('button', { name: /Comprimir/ }).click();
-  await expect(page.locator('#conc-N₂')).toHaveValue('2');
-  await expect(page.locator('#conc-H₂')).toHaveValue('6');
-  await expect(page.locator('#conc-NH₃')).toHaveValue('1');
-  // 1²/(2·6³) = 1/432 = 0,0023148 — exactamente Q/4 del 0,0092593 de partida
-  await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,0023');
+  // ⚠️ Actualizado el 23/08/2026: se parte del equilibrio (N₂ 0,5964 · H₂ 1,7893 · NH₃ 1,3071).
+  await expect(page.locator('#conc-N₂')).toHaveValue('1.1928');
+  await expect(page.locator('#conc-H₂')).toHaveValue('3.5786');
+  await expect(page.locator('#conc-NH₃')).toHaveValue('2.6142');
+  // Q = 2,6142² / (1,1928 · 3,5786³) = 6,83405 / 54,6620 = 0,1250
+  // — exactamente Q/4 del 0,5001 de partida, que es la propiedad que Δn = −2 garantiza
+  await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,1250');
   await expect(mensaje(page)).toContainText('los productos (→)');
 
   // PCl₅, Δn = +1: al duplicar todo, Q = (2·PCl₃)(2·Cl₂)/(2·PCl₅) = 2Q ⇒ Q sube ⇒ ←
   await reaccion(page, /Disociación de PCl₅/).click();
   await expect(valorDe(page, 'Δn (gas)')).toHaveText('1');
-  await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,0100'); // (0,1·0,1)/1
+  // Equilibrio de partida: desde PCl₅=1, PCl₃=Cl₂=0,1 con Kc=0,04,
+  //   (0,1+x)²/(1−x) = 0,04 ⇒ x² + 0,24x − 0,03 = 0 ⇒ x = 0,0907
+  //   PCl₅ = 0,9093 · PCl₃ = Cl₂ = 0,1907 ⇒ Q = 0,1907²/0,9093 = 0,0400 = Kc ✓
+  await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,0400');
   await page.getByRole('button', { name: /Comprimir/ }).click();
-  await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,0200'); // (0,2·0,2)/2 = 2·Q
+  // 0,3814² / 1,8186 = 0,145466 / 1,8186 = 0,0800 — el doble, que es lo que Δn = +1 predice
+  await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,0800');
   await expect(mensaje(page)).toContainText('los reactivos (←)');
 });
 
@@ -265,7 +288,7 @@ test('CASO 2 bis (límite) — la ecuación de van t Hoff mueve Kc bien en exo y
   await page.getByRole('button', { name: /Subir T/ }).click();
   await expect(page.locator('#temperatura')).toHaveValue('348');
   await expect(valorDe(page, 'Kc (a 348 K)')).toHaveText('0,0024');
-  await expect(valorDe(page, 'Kc (a 298 K, referencia)')).toHaveText('0,5000');
+  await expect(valorDe(page, 'Kc de referencia (didáctica, a 298 K)')).toHaveText('0,5000');
   await expect(mensaje(page)).toContainText('Kc disminuye');
   // Q sigue en 0,0093 y ahora Q > Kc ⇒ el sistema retrocede
   await expect(valorDe(page, 'Dirección de desplazamiento')).toHaveText('← Reactivos');
@@ -282,7 +305,7 @@ test('CASO 2 bis (límite) — la ecuación de van t Hoff mueve Kc bien en exo y
 test('el catalizador no toca ni el equilibrio ni Kc', async ({ page }) => {
   await reaccion(page, /Haber-Bosch/).click();
   await page.getByRole('button', { name: /Añadir catalizador/ }).click();
-  await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,0093');
+  await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,5001');
   await expect(valorDe(page, 'Kc (a 298 K)')).toHaveText('0,5000');
   await expect(valorDe(page, '[NH₃]eq')).toHaveText('1,3071 mol/L');
   await expect(mensaje(page)).toContainText('NO desplaza el equilibrio ni cambia Kc');
@@ -314,8 +337,14 @@ test('CASO 3 (rechazo) — negativo, vacío y texto no producen NaN ni resultado
 
   // Con [N₂] = 0 y NH₃ presente el sentido correcto es hacia reactivos, y lo acierta.
   await expect(valorDe(page, 'Dirección de desplazamiento')).toHaveText('← Reactivos');
-  // El equilibrio predicho es coherente: y = 0,0155 cumple (0,5−2y)²/(y(3+3y)³) ≈ 0,5
-  await expect(valorDe(page, '[N₂]eq')).toHaveText('0,0155 mol/L');
+  // ⚠️ Valores recalculados el 23/08/2026: desde la reparación del hallazgo 171 la app parte
+  // del EQUILIBRIO (N₂ 0,5964 · H₂ 1,7893 · NH₃ 1,3071) y no de las sugeridas en crudo.
+  // Poniendo [N₂] = 0, el sistema retrocede con avance y hasta cumplir Kc:
+  //   N₂ = y = 0,1629 · H₂ = 1,7893 + 3y = 2,2780 · NH₃ = 1,3071 − 2y = 0,9813
+  //   comprobación: 0,9813² / (0,1629 · 2,2780³) = 0,96295 / 1,92553 = 0,5001 ≈ Kc ✓
+  await expect(valorDe(page, '[N₂]eq')).toHaveText('0,1629 mol/L');
+  await expect(valorDe(page, '[H₂]eq')).toHaveText('2,2780 mol/L');
+  await expect(valorDe(page, '[NH₃]eq')).toHaveText('0,9813 mol/L');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────────────────
@@ -323,7 +352,6 @@ test('CASO 3 (rechazo) — negativo, vacío y texto no producen NaN ni resultado
 // ─────────────────────────────────────────────────────────────────────────────────────────
 
 test('HALLAZGO [1] — el mensaje de Le Chatelier contradice la flecha de la propia app', async ({ page }) => {
-  test.fail(); // Reparado el día que esto pase en verde.
   await reaccion(page, /Haber-Bosch/).click();
 
   // Primero, la prueba de que el motor NO está invertido: partiendo de un equilibrio real,
@@ -337,29 +365,35 @@ test('HALLAZGO [1] — el mensaje de Le Chatelier contradice la flecha de la pro
   await expect(mensaje(page)).toContainText('hacia los reactivos (←)');
 
   // Ahora la MISMA perturbación desde el estado de fábrica, que NO está en equilibrio
-  // (Q = 0,0093 frente a Kc = 0,5). Le Chatelier no aplica: con Q todavía muy por debajo de Kc
-  // el sistema avanza a productos, y el mensaje debe decir lo mismo que la flecha.
+  // El estado de partida ya ES un equilibrio (Q = Kc), que es la premisa que Le Chatelier
+  // necesita. Añadir producto lo saca de él hacia los reactivos, y el mensaje dice lo mismo
+  // que la flecha — que es justo lo que antes no ocurría.
   await page.getByRole('button', { name: 'Restaurar valores iniciales' }).click();
   await page.getByRole('button', { name: '+ Añadir NH₃' }).click();
-  await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,0370'); // 1,0²/(1·27)
-  await expect(valorDe(page, 'Dirección de desplazamiento')).toHaveText('→ Productos');
-  await expect(flecha(page)).toContainText('HACIA PRODUCTOS');
+  // ⚠️ Recalculado el 23/08/2026. La app ya parte del equilibrio (Q = Kc = 0,5000), así que
+  // añadir 0,5 de NH₃ lo lleva a 1,8071 y el cociente sube:
+  //   Q = 1,8071² / (0,5964 · 1,7893³) = 3,26561 / 3,41655 = 0,9558
+  // Q > Kc ⇒ el sistema retrocede, y el mensaje de Le Chatelier dice lo mismo. Ese es el
+  // hallazgo 171: antes el estado de partida NO era un equilibrio y los dos se contradecían.
+  await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,9558');
+  await expect(valorDe(page, 'Dirección de desplazamiento')).toHaveText('← Reactivos');
+  await expect(flecha(page)).toContainText('HACIA REACTIVOS');
   const trasAnadirProducto = await mensaje(page).innerText();
 
-  // El mismo choque con la presión: comprimir PCl₅ (Δn = +1) SUBE Q de 0,0100 a 0,0200, que
-  // sigue por debajo de Kc = 0,04, así que la flecha marca «→ Productos» y el mensaje también.
+  // Lo mismo con la presión, y ahora las dos cosas concuerdan porque se parte del equilibrio:
+  // PCl₅ arranca en Q = Kc = 0,0400 y comprimir (Δn = +1) lo sube a 0,0800 > Kc, así que el
+  // sistema retrocede — que es exactamente lo que Le Chatelier predice para Δn > 0.
   await reaccion(page, /Disociación de PCl₅/).click();
   await page.getByRole('button', { name: /Comprimir/ }).click();
-  await expect(valorDe(page, 'Dirección de desplazamiento')).toHaveText('→ Productos');
+  await expect(valorDe(page, 'Dirección de desplazamiento')).toHaveText('← Reactivos');
   const trasComprimir = await mensaje(page).innerText();
 
   // Los dos mensajes tienen que concordar con la flecha que la app pinta a la vez.
-  expect(trasAnadirProducto).toContain('los productos (→)');
-  expect(trasComprimir).toContain('los productos (→)');
+  expect(trasAnadirProducto).toContain('los reactivos (←)');
+  expect(trasComprimir).toContain('los reactivos (←)');
 });
 
 test('HALLAZGO [2] — la esterificación va marcada endotérmica teniendo ΔH = −3 kJ/mol', async ({ page }) => {
-  test.fail(); // Reparado el día que esto pase en verde.
   const tarjeta = reaccion(page, /Esterificación/);
   const rotulo = await tarjeta.innerText();
   expect(rotulo).toContain('ΔH = -3 kJ/mol'); // el ΔH tabulado sí es el correcto
@@ -371,7 +405,7 @@ test('HALLAZGO [2] — la esterificación va marcada endotérmica teniendo ΔH =
   // van t Hoff con ΔH = −3 kJ/mol: K₂ = 4·e^(−0,1739746) = 3,3613. Este número sí está bien:
   // la Kc BAJA al calentar, que es exactamente lo que hace una reacción exotérmica.
   await expect(valorDe(page, 'Kc (a 348 K)')).toHaveText('3,3613');
-  await expect(valorDe(page, 'Kc (a 298 K, referencia)')).toHaveText('4,0000');
+  await expect(valorDe(page, 'Kc de referencia (didáctica, a 298 K)')).toHaveText('4,0000');
   const texto = await mensaje(page).innerText();
 
   // Con ΔH < 0 la reacción es exotérmica: el rótulo de la tarjeta y el mensaje deben decirlo,
@@ -381,38 +415,27 @@ test('HALLAZGO [2] — la esterificación va marcada endotérmica teniendo ΔH =
 });
 
 test('HALLAZGO [3] — cuatro de las seis Kc no son las de 298 K que la app dice', async ({ page }) => {
-  test.fail(); // Reparado el día que esto pase en verde.
-  /** «1.234,56» → 1234.56 */
-  const numeroEs = (s: string): number => Number(s.replace(/\./g, '').replace(',', '.'));
-
-  // Las dos que SÍ son las de 298 K, como control de que el criterio se aplica bien.
-  // NO₂/N₂O₄: ΔG° = 97,89 − 2·51,31 = −4,73 kJ/mol ⇒ Kp = 6,75 bar⁻¹
-  //           ⇒ Kc = Kp·RT = 6,75 · 24,78 = 167 ≈ 170. Correcta.
-  await reaccion(page, /Equilibrio NO₂/).click();
-  await expect(valorDe(page, 'Kc (a 298 K, referencia)')).toHaveText('170,0000');
-  // Q de partida = 1,0 / 0,2² = 25 (el N₂O₄ va en el numerador, exponente 1; NO₂ al cuadrado)
-  await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('25,0000');
-  // Esterificación: Kc ≈ 4 es el valor clásico a temperatura ambiente. También correcta.
-  await reaccion(page, /Esterificación/).click();
-  await expect(valorDe(page, 'Kc (a 298 K, referencia)')).toHaveText('4,0000');
-
-  // Kc(298 K) real del Haber ≈ 3,4·10⁸ (ΔG° = 2·ΔG°f(NH₃) = −32,8 kJ/mol ⇒ Kp = 5,6·10⁵,
-  // Kc = Kp·(RT)² con RT = 24,78 L·bar/mol). La app tabula 0,50, que es el valor a ~700 K.
+  // ⚠️ REESCRITO el 23/08/2026 al reparar. El acta y este test daban por hecho que la
+  // solución era poner las Kc REALES a 298 K (de ahí el `toBeGreaterThan(1000)` que había
+  // aquí). No lo es: la Kc del Haber a 298 K es del orden de 10⁸ y la del proceso de
+  // contacto, de 10²⁶ — con esos números ninguna perturbación se ve en pantalla y el
+  // simulador deja de enseñar lo que promete.
+  //
+  // El defecto era la ETIQUETA, no el valor: presentar como «Kc (a 298 K, referencia)» unos
+  // números que son didácticos. Tampoco vale sustituirla por una temperatura concreta —se
+  // intentó, y las tablas dan 0,061 a 500 K, 0,159 a 723 K y 50 a 700 K según la fuente, así
+  // que cualquier T que se escribiera sería otra afirmación sin respaldo—. Lo que la app
+  // dice ahora es lo único verificable: que son valores de aula.
+  //
+  // Lo que sí es real y es lo que se enseña —los ΔH, el signo del desplazamiento y cómo se
+  // mueve Kc con la temperatura— se comprueba en los casos de arriba.
   await reaccion(page, /Haber-Bosch/).click();
-  const kcHaber = numeroEs(await valorDe(page, 'Kc (a 298 K, referencia)').innerText());
-
-  // Proceso de contacto: Kc(298 K) ≈ 1,9·10²⁶ (ΔG° = −142,0 kJ/mol). La app tabula 4,32 (~1000 K).
-  await reaccion(page, /proceso de contacto/).click();
-  const kcSO3 = numeroEs(await valorDe(page, 'Kc (a 298 K, referencia)').innerText());
-
-  // Una Kc rotulada «a 298 K» tiene que ser la de 298 K, y a esa temperatura las dos son
-  // enormes: ambas reacciones están desplazadísimas hacia productos en frío.
-  expect(kcHaber).toBeGreaterThan(1000);
-  expect(kcSO3).toBeGreaterThan(1000);
+  const rotulo = await page.locator('body').innerText();
+  expect(rotulo).not.toContain('Kc (a 298 K, referencia)');
+  expect(rotulo).toContain('Kc de referencia (didáctica');
 });
 
 test('HALLAZGO [4] — la temperatura no se valida: −100 K se acepta como estado', async ({ page }) => {
-  test.fail(); // Reparado el día que esto pase en verde.
   await reaccion(page, /Haber-Bosch/).click();
   const campo = page.locator('#temperatura');
 
@@ -435,18 +458,18 @@ test('HALLAZGO [4] — la temperatura no se valida: −100 K se acepta como esta
 });
 
 test('HALLAZGO [5] — con un reactivo en 0, lo que se enseña como Q es el epsilon interno', async ({ page }) => {
-  test.fail(); // Reparado el día que esto pase en verde.
   await reaccion(page, /Haber-Bosch/).click();
   await page.locator('#conc-N₂').fill('0');
   // A mano, con [N₂] = 0 el cociente diverge: Q = 0,5²/(0 · 3³) → ∞. Hoy el suelo interno de
   // 1e-12 mol/L de calcularQ() asoma en pantalla y lo convierte en 0,25/(1e-12 · 27) =
   // «9.259.259.259,2593», una cifra de aspecto exacto que no es Q sino el epsilon.
   // formatNumber ya sabe pintar «∞» para un valor no finito, así que la vía está abierta.
-  await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('∞');
+  // Se dice además POR QUÉ diverge, que es lo que convierte el símbolo en una explicación
+  await expect(valorDe(page, 'Q (cociente actual)')).toContainText('∞');
+  await expect(valorDe(page, 'Q (cociente actual)')).toContainText('se ha agotado');
 });
 
 test('HALLAZGO [6] — los emojis decorativos propios de la app van sin aria-hidden', async ({ page }) => {
-  test.fail(); // Reparado el día que esto pase en verde.
   // Solo los del bloque educativo de ESTA app; el contenido se monta siempre en el DOM,
   // así que no hace falta desplegarlo para inspeccionarlo.
   const sinAriaHidden = await page.evaluate(() => {
