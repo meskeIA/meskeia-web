@@ -111,7 +111,8 @@ export default function SidebarMobile() {
         {/* Header */}
         <div className={styles.sidebarHeader}>
           <Link href="/" className={styles.logoWrapper} onClick={() => setIsOpen(false)}>
-            <MeskeiaLogo inline showThemeToggle={false} />
+            {/* `disableLink`: el <Link> de fuera ya lleva a la portada */}
+            <MeskeiaLogo inline showThemeToggle={false} disableLink />
           </Link>
           <button
             className={styles.closeButton}

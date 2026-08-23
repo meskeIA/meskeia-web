@@ -92,7 +92,10 @@ export default function Sidebar() {
               </div>
             </div>
           ) : (
-            <MeskeiaLogo inline showThemeToggle={false} />
+            // `disableLink` porque este logo ya va dentro del <Link> de arriba: un <a>
+            // dentro de otro <a> es HTML inválido, el navegador reescribe el árbol y de
+            // ahí salía el aviso de hidratación en cada carga (21/08/2026).
+            <MeskeiaLogo inline showThemeToggle={false} disableLink />
           )}
         </Link>
       </div>
