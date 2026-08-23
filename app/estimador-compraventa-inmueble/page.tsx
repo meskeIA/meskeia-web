@@ -2,7 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import styles from './EstimadorCompraventa.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, NumberInput, ResultCard, LegalNotice, DisclaimerCard, DataReference, ShareCard, RegionBadge } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, NumberInput, ResultCard, LegalNotice, DisclaimerCard, DataReference, ShareCard, RegionBadge,
+  AvisoTerritorioSinIva,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
 import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, calcularGananciaInmueble } from '@/data/fiscal';
@@ -551,6 +553,8 @@ export default function SimuladorCompraventaPage() {
               ))}
             </select>
           </div>
+
+          <AvisoTerritorioSinIva ccaa={ccaa} aplica={tipoTransmision === 'primera-mano'} />
 
           {/* Info CCAA */}
           <div className={styles.infoCcaa}>

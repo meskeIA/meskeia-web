@@ -9,10 +9,12 @@ import {
   RelatedApps,
   EducationalSection,
   DisclaimerCard,
+  DataReference,
   ShareCard, RegionBadge
 } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
+import { BONO_ALQUILER_JOVEN_2026, FISCAL_VIVIENDA_JOVEN_META } from '@/data/fiscal';
 
 interface Requisito {
   id: string;
@@ -30,8 +32,8 @@ const REQUISITOS: Requisito[] = [
   },
   {
     id: 'ingresos',
-    pregunta: 'Tus ingresos están dentro del límite establecido por tu Comunidad Autónoma',
-    explicacion: 'El Plan Estatal 2026-2030 establece un límite de ingresos máximos, pero cada Comunidad Autónoma puede concretar o ajustar ese umbral en su convocatoria. Consulta la convocatoria de tu CA para conocer el límite exacto aplicable.',
+    pregunta: 'Tus rentas anuales no superan 5 veces el IPREM',
+    explicacion: 'El RD 326/2026 fija el umbral en 5 veces el IPREM, que sube a 5,5 con una discapacidad reconocida del 33 % o más (y si eres hijo o hija de víctima de violencia de género) y a 6 con una discapacidad del 65 % o más. Cada Comunidad Autónoma concreta el cómputo en su convocatoria.',
     bloqueante: true,
   },
   {
@@ -52,12 +54,9 @@ const REQUISITOS: Requisito[] = [
     explicacion: 'El contrato debe estar formalizado por escrito y depositada la fianza. Las CA pueden pedir su depósito oficial.',
     bloqueante: false,
   },
-  {
-    id: 'renta',
-    pregunta: 'La renta mensual no supera 600 € (o 900 € en zonas tensionadas)',
-    explicacion: 'El límite general es 600 €/mes. En zonas de mercado residencial tensionado la CA puede ampliar hasta 900 €/mes.',
-    bloqueante: false,
-  },
+  // El requisito de renta NO se pregunta: la app tiene el importe tecleado y el límite del
+  // RD, así que lo comprueba ella (art. 133.1.e). Preguntarlo era pedirle al usuario que
+  // respondiera algo que el simulador sabe, y además con los topes del plan anterior.
   {
     id: 'comunidad',
     pregunta: 'Tu Comunidad Autónoma tiene el Bono Joven activo',
@@ -69,12 +68,16 @@ const REQUISITOS: Requisito[] = [
 type EstadoRequisito = 'si' | 'no' | 'pendiente';
 type TipoVivienda = 'vivienda' | 'habitacion';
 
-const BONO: Record<TipoVivienda, number> = { vivienda: 300, habitacion: 200 };
-const DURACION_MAX_MESES = 48; // hasta 4 años (2 + renovación 2)
+// Todo lo normativo sale de data/fiscal/vivienda-joven.ts, sellado contra el BOE.
+const BONO: Record<TipoVivienda, number> = BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual;
+const DURACION_MAX_MESES = BONO_ALQUILER_JOVEN_2026.plazo.totalMaximoMeses; // 2 + prórroga de 2
+const LIMITE_SOBRE_RENTA = BONO_ALQUILER_JOVEN_2026.limiteSobreRenta;
+const RENTA_MAX = BONO_ALQUILER_JOVEN_2026.rentaMaximaMensual;
 
 export default function SimuladorBonoJovenAlquilerPage() {
   const [alquilMensual, setAlquilMensual] = useState('');
   const [tipoVivienda, setTipoVivienda] = useState<TipoVivienda>('vivienda');
+  const [municipioPequeno, setMunicipioPequeno] = useState(false);
   const [estados, setEstados] = useState<Record<string, EstadoRequisito>>(
     Object.fromEntries(REQUISITOS.map(r => [r.id, 'pendiente']))
   );
@@ -83,6 +86,24 @@ export default function SimuladorBonoJovenAlquilerPage() {
     setEstados(prev => ({ ...prev, [id]: prev[id] === valor ? 'pendiente' : valor }));
   };
 
+  const alquilerNum = parseFloat(alquilMensual.replace(',', '.')) || 0;
+  const bonificacionMaxima = BONO[tipoVivienda];
+  // El bono no puede superar el 60% de la renta mensual (RD 326/2026, art. 137)
+  const bonificacionEfectiva = alquilerNum > 0
+    ? Math.min(bonificacionMaxima, alquilerNum * LIMITE_SOBRE_RENTA)
+    : bonificacionMaxima;
+  // El acumulado se calcula sobre la ayuda EFECTIVA: con el tope del 60% mordiendo, el
+  // total del programa es un número que este caso concreto no puede llegar a cobrar.
+  const totalAyudaMax = bonificacionEfectiva * DURACION_MAX_MESES;
+  const alquilerConBono = Math.max(0, alquilerNum - bonificacionEfectiva);
+
+  /** Renta máxima del contrato para poder acceder a la ayuda (art. 133.1.e) */
+  const rentaMaxima = municipioPequeno
+    ? RENTA_MAX.municipioPequeno[tipoVivienda]
+    : RENTA_MAX[tipoVivienda];
+  /** `null` mientras no haya renta tecleada: no se puede juzgar lo que no se sabe */
+  const rentaDentroDelLimite = alquilerNum > 0 ? alquilerNum <= rentaMaxima : null;
+
   const resultado = useMemo(() => {
     const bloqueantes = REQUISITOS.filter(r => r.bloqueante);
     const algunBloqueanteFalla = bloqueantes.some(r => estados[r.id] === 'no');
@@ -90,18 +111,14 @@ export default function SimuladorBonoJovenAlquilerPage() {
     const todosConfirmados = REQUISITOS.every(r => estados[r.id] === 'si');
     const algunNoRecomendado = REQUISITOS.filter(r => !r.bloqueante).some(r => estados[r.id] === 'no');
 
+    // La renta por encima del tope excluye igual que cualquier requisito imprescindible:
+    // es una condición del propio RD, no un aspecto que la CA pueda matizar.
+    if (rentaDentroDelLimite === false) return 'no-apto';
     if (algunBloqueanteFalla) return 'no-apto';
-    if (todosConfirmados && !algunNoRecomendado) return 'apto';
+    if (todosConfirmados && !algunNoRecomendado && rentaDentroDelLimite === true) return 'apto';
     if (!algunBloqueantePendiente && !algunBloqueanteFalla) return 'casi';
     return 'pendiente';
-  }, [estados]);
-
-  const alquilerNum = parseFloat(alquilMensual.replace(',', '.')) || 0;
-  const bonificacionMaxima = BONO[tipoVivienda];
-  // El bono no puede superar el 60% de la renta mensual (RD 326/2026)
-  const bonificacionEfectiva = alquilerNum > 0 ? Math.min(bonificacionMaxima, alquilerNum * 0.6) : bonificacionMaxima;
-  const totalAyudaMax = bonificacionMaxima * DURACION_MAX_MESES;
-  const alquilerConBono = Math.max(0, alquilerNum - bonificacionEfectiva);
+  }, [estados, rentaDentroDelLimite]);
 
   const iconoEstado = (estado: EstadoRequisito) => {
     if (estado === 'si') return '✅';
@@ -130,6 +147,13 @@ export default function SimuladorBonoJovenAlquilerPage() {
         severity="critical"
         collapsible={false}
         context="Bono Joven al Alquiler 2026-2030 (RD 326/2026): las cuantías son orientativas. Los requisitos concretos, límite de ingresos y condiciones específicas los fija cada Comunidad Autónoma en su convocatoria. Consulta siempre con tu CA antes de tomar decisiones económicas."
+      />
+
+      <DataReference
+        normativa="Plan Estatal de Vivienda 2026-2030 · ayuda al alquiler joven"
+        fuente={FISCAL_VIVIENDA_JOVEN_META.fuente}
+        verificado={FISCAL_VIVIENDA_JOVEN_META.verificado}
+        urlOficial={FISCAL_VIVIENDA_JOVEN_META.urlOficial}
       />
 
       {/* Sección de tu alquiler */}
@@ -178,7 +202,34 @@ export default function SimuladorBonoJovenAlquilerPage() {
           <span className={styles.helperText}>Introduce lo que pagas actualmente o lo que pagarás</span>
         </div>
 
-        {alquilerNum > 0 && (
+        <div className={styles.field}>
+          <button
+            type="button"
+            className={`${styles.tipoBtn} ${municipioPequeno ? styles.tipoBtnActivo : ''}`}
+            onClick={() => setMunicipioPequeno(v => !v)}
+            aria-pressed={municipioPequeno}
+          >
+            <span aria-hidden="true">🏘️</span> El municipio tiene 10.000 habitantes o menos
+            <span className={styles.tipoBono}>renta máxima {formatCurrency(RENTA_MAX.municipioPequeno[tipoVivienda])}/mes</span>
+          </button>
+          <span className={styles.helperText}>
+            En municipios y núcleos pequeños el Real Decreto rebaja la renta máxima que da derecho a la ayuda.
+          </span>
+        </div>
+
+        {rentaDentroDelLimite === false && (
+          <div className={styles.avisoRenta} role="alert">
+            <span aria-hidden="true">⚠️</span>{' '}
+            <strong>La renta supera el máximo que da derecho a la ayuda.</strong> Para{' '}
+            {tipoVivienda === 'vivienda' ? 'una vivienda completa' : 'una habitación'}
+            {municipioPequeno ? ' en un municipio de 10.000 habitantes o menos' : ''} el tope es{' '}
+            {formatCurrency(rentaMaxima)}/mes (RD 326/2026, art. 133.1.e) y has introducido{' '}
+            {formatCurrency(alquilerNum)}/mes. Tu comunidad autónoma puede elevar ese máximo, pero
+            solo con acuerdo previo del Ministerio: compruébalo en su convocatoria.
+          </div>
+        )}
+
+        {alquilerNum > 0 && resultado !== 'no-apto' && (
           <div className={styles.ahorroPanel}>
             <div className={styles.ahorroCard}>
               <span className={styles.ahorroValor}>{formatCurrency(bonificacionEfectiva)}</span>
@@ -222,6 +273,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
                 )}
                 <div className={styles.radioGroup} role="group" aria-label={`Respuesta para: ${req.pregunta}`}>
                   <button
+                    type="button"
                     className={`${styles.radioBtn} ${estado === 'si' ? styles.radioBtnActive : ''}`}
                     onClick={() => toggleEstado(req.id, 'si')}
                     aria-pressed={estado === 'si'}
@@ -229,6 +281,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
                     Sí
                   </button>
                   <button
+                    type="button"
                     className={`${styles.radioBtn} ${estado === 'no' ? styles.radioBtnActive : ''}`}
                     onClick={() => toggleEstado(req.id, 'no')}
                     aria-pressed={estado === 'no'}
@@ -251,7 +304,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
               <div className={styles.resultadoIcon} aria-hidden="true">🎉</div>
               <h3 className={styles.resultadoTitulo}>¡Cumples todos los requisitos!</h3>
               <p className={styles.resultadoTexto}>
-                En principio puedes solicitar el Bono Joven al Alquiler y recibir hasta <strong>{formatCurrency(bonificacionMaxima)}/mes durante hasta 4 años</strong> (2 años renovables).
+                En principio puedes solicitar el Bono Joven al Alquiler y recibir hasta <strong>{formatCurrency(bonificacionEfectiva)}/mes durante hasta 4 años</strong> (2 años renovables).
                 El siguiente paso es contactar con la oficina de vivienda de tu Comunidad Autónoma para tramitar la solicitud.
               </p>
             </div>
@@ -271,7 +324,15 @@ export default function SimuladorBonoJovenAlquilerPage() {
               <div className={styles.resultadoIcon} aria-hidden="true">❌</div>
               <h3 className={styles.resultadoTitulo}>No cumples los requisitos obligatorios</h3>
               <p className={styles.resultadoTexto}>
-                Existe al menos un requisito imprescindible que no cumples. El Bono Joven al Alquiler no estaría disponible para tu situación actual.
+                {rentaDentroDelLimite === false ? (
+                  <>
+                    La renta que has introducido ({formatCurrency(alquilerNum)}/mes) supera el máximo
+                    de {formatCurrency(rentaMaxima)}/mes que da derecho a esta ayuda.
+                  </>
+                ) : (
+                  <>Existe al menos un requisito imprescindible que no cumples.</>
+                )}{' '}
+                El Bono Joven al Alquiler no estaría disponible para tu situación actual.
                 Consulta otras ayudas al alquiler disponibles en tu Comunidad Autónoma.
               </p>
             </div>
@@ -441,7 +502,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
             {[
               { icon: '⚡', titulo: 'Solicita cuanto antes', desc: 'Muchas CCAA agotan los fondos. No esperes: solicita el bono en cuanto tengas el contrato firmado.' },
               { icon: '📋', titulo: 'Prepara la documentación completa', desc: 'Una solicitud incompleta genera retrasos. Revisa la lista de documentos de tu CA antes de presentar.' },
-              { icon: '🔍', titulo: 'Consulta el límite de renta de tu CA', desc: 'El límite general es 600 €/mes, pero tu CA puede ampliarlo hasta 900 € en zonas tensionadas. Infórmate.' },
+              { icon: '🔍', titulo: 'Consulta el límite de renta de tu CA', desc: 'El Real Decreto fija 1.000 €/mes para vivienda completa y 600 €/mes para habitación (500 y 250 € en municipios de 10.000 habitantes o menos). Tu CA puede elevarlo, pero solo con acuerdo previo del Ministerio.' },
               { icon: '💡', titulo: 'Comprueba la deducción autonómica IRPF', desc: 'Aparte del bono, muchas CCAA tienen deducción en el IRPF por alquiler de vivienda habitual. Puedes acumular ambas.' },
               { icon: '📱', titulo: 'Activa notificaciones en la sede electrónica', desc: 'La CA puede pedir documentación adicional. Deja activadas las notificaciones para no perder plazos de respuesta.' },
               { icon: '🤝', titulo: 'Involucra al propietario', desc: 'El propietario puede necesitar aportar documentación (datos catastrales, etc.). Informa al arrendador con antelación.' },

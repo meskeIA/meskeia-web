@@ -27,8 +27,8 @@
  * Los tres casos están resueltos a mano ANTES de ejecutar la app; el desarrollo va comentado
  * junto a cada aserción, con los importes sin redondear.
  *
- * HALLAZGOS ABIERTOS: al final, marcados con `test.fail()`. Afirman lo que DEBERÍA pasar y hoy
- * fallan a propósito; cuando se reparen, se quita el `test.fail()` y quedan como regresión.
+ * HALLAZGOS ABIERTOS: al final, marcados con `test()`. Afirman lo que DEBERÍA pasar y hoy
+ * fallan a propósito; cuando se reparen, se quita el `test()` y quedan como regresión.
  */
 import { test, expect, Page } from '@playwright/test';
 
@@ -226,7 +226,7 @@ test.describe('Hallazgos abiertos — 21/08/2026', () => {
    * `<LegalNotice>` lleva la fecha escrita a mano «2024-12-20», año y medio anterior a los
    * datos que el motor está usando (FISCAL_INMUEBLES_META.verificado = 2026-06-17).
    */
-  test.fail('HALLAZGO 1 — DataReference con fuente y fecha, y LegalNotice sellado con data/fiscal', async ({ page }) => {
+  test('HALLAZGO 1 — DataReference con fuente y fecha, y LegalNotice sellado con data/fiscal', async ({ page }) => {
     await page.goto(RUTA);
     // La hermana `simulador-gastos-compraventa-garaje` lo hace así:
     //   <LegalNotice lastUpdated={FISCAL_INMUEBLES_META.verificado} />
@@ -244,13 +244,19 @@ test.describe('Hallazgos abiertos — 21/08/2026', () => {
    * nueva de 500.000 € en Canarias soporta ~35.000 €, no 105.000 €: un factor de tres en
    * una app de riesgo 1.
    */
-  test.fail('HALLAZGO 2 — Canarias en obra nueva no debe liquidarse como IVA 21 %', async ({ page }) => {
+  test('HALLAZGO 2 — Canarias en obra nueva no debe liquidarse como IVA 21 %', async ({ page }) => {
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Obra nueva/ }).click();
     await page.selectOption('#select-ccaa', 'canarias');
     await rellenar(page, PRECIO, '500000');
-    // Lo mínimo aceptable: que no se presente como IVA español del 21 % sin decir nada.
-    expect(await valorTarjeta(page, 'IVA (')).not.toBe('105.000,00 €');
+    // Reparado el 23/08/2026. El acta pedía «que no se presente como IVA del 21 %»; la
+    // corrección va más allá y no inventa ninguna cifra, porque calcular el IGIC exigiría
+    // sellar sus tipos con su propia fuente y hoy no están en data/fiscal. Así que la app
+    // nombra el impuesto que sí corresponde, no liquida nada y marca el total como parcial.
+    await expect(page.getByText('105.000,00 €')).toHaveCount(0);
+    await expect(page.locator('body')).toContainText('IGIC');
+    await expect(page.locator('body')).toContainText('No calculado');
+    await expect(page.locator('body')).toContainText('COSTE TOTAL (PARCIAL)');
   });
 
   /**
@@ -262,7 +268,7 @@ test.describe('Hallazgos abiertos — 21/08/2026', () => {
    * `simulador-gastos-compraventa-garaje` y que motivó las condiciones «que se cumplen por
    * el SITIO» de `data/itp-ccaa.ts`; aquí, además, ni se aplica ni se avisa de que existe.
    */
-  test.fail('HALLAZGO 3 — Ceuta: la bonificación del 50 % declarada en ITP_CCAA no se aplica ni se anuncia', async ({ page }) => {
+  test('HALLAZGO 3 — Ceuta: la bonificación del 50 % declarada en ITP_CCAA no se aplica ni se anuncia', async ({ page }) => {
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Segunda mano/ }).click();
     await page.selectOption('#select-ccaa', 'ceuta');
@@ -279,7 +285,7 @@ test.describe('Hallazgos abiertos — 21/08/2026', () => {
    * obtiene 35.000 €, no los 32.500 € que la tarjeta enseña al lado. La app hermana del garaje
    * ya rotula con dos decimales («ITP (6,00%)»).
    */
-  test.fail('HALLAZGO 4 — el rótulo del tipo redondea a entero y contradice al importe', async ({ page }) => {
+  test('HALLAZGO 4 — el rótulo del tipo redondea a entero y contradice al importe', async ({ page }) => {
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Segunda mano/ }).click();
     await page.selectOption('#select-ccaa', 'canarias');
@@ -299,7 +305,7 @@ test.describe('Hallazgos abiertos — 21/08/2026', () => {
    * veces en la misma página con dos formatos distintos: «AJD 0.75%» arriba y «AJD (0,75%)»
    * en la tarjeta. El formato español es obligatorio (regla 2 del CLAUDE.md global).
    */
-  test.fail('HALLAZGO 5 — el recuadro de la comunidad usa punto decimal en vez de coma', async ({ page }) => {
+  test('HALLAZGO 5 — el recuadro de la comunidad usa punto decimal en vez de coma', async ({ page }) => {
     await page.goto(RUTA);
     await page.selectOption('#select-ccaa', 'canarias');
     const recuadro = page.locator('[class*="infoCcaa"]').first();
@@ -320,7 +326,7 @@ test.describe('Hallazgos abiertos — 21/08/2026', () => {
    *   · «el Registro de la Propiedad entre 400 € y 800 €» para una nave de 200.000 € — el
    *     propio motor da 236,22 € (arancel 186,2121 + 9,015182 fijos, × 1,21).
    */
-  test.fail('HALLAZGO 6 — el FAQPage JSON-LD contradice al motor en AJD, ITP y registro', async ({ page }) => {
+  test('HALLAZGO 6 — el FAQPage JSON-LD contradice al motor en AJD, ITP y registro', async ({ page }) => {
     await page.goto(RUTA);
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const faq = bloques.find((b) => b.includes('FAQPage')) ?? '';
@@ -336,7 +342,7 @@ test.describe('Hallazgos abiertos — 21/08/2026', () => {
    * con un tramo marginal del 13 % (`ITP_CCAA['baleares'].tramosProgresivos`), y Cataluña llega
    * también al 13 %. `RANGO_ITP` existe en `data/itp-ccaa.ts` precisamente para derivarlo.
    */
-  test.fail('HALLAZGO 7 — el rango de ITP del bloque educativo se queda corto frente al propio motor', async ({ page }) => {
+  test('HALLAZGO 7 — el rango de ITP del bloque educativo se queda corto frente al propio motor', async ({ page }) => {
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Segunda mano/ }).click();
     await page.selectOption('#select-ccaa', 'baleares');
@@ -356,7 +362,7 @@ test.describe('Hallazgos abiertos — 21/08/2026', () => {
    * El `min={0}` de NumberInput solo actúa en el blur, así que la cifra en pantalla es
    * momentáneamente incoherente con su propio desglose.
    */
-  test.fail('HALLAZGO 8 — una gestoría negativa sin blur descuadra el total frente a sus líneas', async ({ page }) => {
+  test('HALLAZGO 8 — una gestoría negativa sin blur descuadra el total frente a sus líneas', async ({ page }) => {
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Segunda mano/ }).click();
     await page.selectOption('#select-ccaa', 'madrid');
@@ -376,7 +382,7 @@ test.describe('Hallazgos abiertos — 21/08/2026', () => {
    * `aria-labelledby`), así que un lector de pantalla los anuncia sin decir de qué elección
    * forman parte.
    */
-  test.fail('HALLAZGO 9 — el par de botones de transmisión no forma un grupo accesible', async ({ page }) => {
+  test('HALLAZGO 9 — el par de botones de transmisión no forma un grupo accesible', async ({ page }) => {
     await page.goto(RUTA);
     await expect(page.getByRole('group', { name: /Tipo de transmisión/ })).toBeVisible();
   });

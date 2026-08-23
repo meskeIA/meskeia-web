@@ -1,5 +1,23 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { RANGO_AJD, RANGO_ITP, calcularRegistro, estimarFacturaNotarial } from '@/data/itp-ccaa';
+import { IVA_INMUEBLES_2025 } from '@/data/fiscal';
+
+/**
+ * Las cifras del FAQPage se DERIVAN del mismo motor que hace los cálculos.
+ *
+ * Escritas a mano se quedaron atrás cuando la página visible sí se corrigió, y el bloque que
+ * consumen Bing Copilot, ChatGPT y Perplexity contradecía al simulador en tres números a la
+ * vez: decía que el AJD va «entre el 0,5% y el 1,5%» cuando la app cobra 0 € en el País Vasco,
+ * que el ITP está «habitualmente entre el 6% y el 10%» cuando cobra del 4% al 13%, y que el
+ * Registro de una nave de 200.000 € cuesta «entre 400 € y 800 €» cuando su propio arancel da
+ * 236,22 €. Derivándolas, esa divergencia deja de ser posible.
+ */
+const PRECIO_EJEMPLO = 200000;
+const NOTARIA_EJEMPLO = estimarFacturaNotarial(PRECIO_EJEMPLO);
+const REGISTRO_EJEMPLO = calcularRegistro(PRECIO_EJEMPLO);
+const euros = (n: number) => `${Math.round(n)} €`;
+const pct = (n: number) => `${String(n).replace('.', ',')}%`;
 
 export const metadata: Metadata = {
   title: 'Simulador Gastos Compra Nave Industrial - IVA, ITP y Costes | meskeIA',
@@ -55,7 +73,7 @@ export const faqJsonLd = {
       name: '¿Qué impuesto paga la compra de una nave industrial?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Si la nave es de nueva construcción y la vende el promotor, se paga IVA al 21% más AJD (Actos Jurídicos Documentados), que varía entre el 0,5% y el 1,5% según la comunidad autónoma. Si es una segunda transmisión (segunda mano), se paga ITP (Impuesto de Transmisiones Patrimoniales) al tipo general de la comunidad, habitualmente entre el 6% y el 10%. No pueden coexistir IVA e ITP en la misma operación.',
+        text: `Si la nave es de nueva construcción y la vende el promotor, se paga IVA al ${pct(IVA_INMUEBLES_2025.local)} más AJD (Actos Jurídicos Documentados), que va del ${pct(RANGO_AJD.min)} al ${pct(RANGO_AJD.max)} según la comunidad autónoma. Si es una segunda transmisión (segunda mano), se paga ITP (Impuesto de Transmisiones Patrimoniales) al tipo general de la comunidad, que va del ${pct(RANGO_ITP.min)} al ${pct(RANGO_ITP.max)} contando el tramo más alto de las comunidades con escala progresiva. No pueden coexistir IVA e ITP en la misma operación, salvo que se renuncie a la exención de IVA en la segunda transmisión entre empresarios: entonces vuelve a haber IVA con inversión del sujeto pasivo y no se paga ITP. En Ceuta y Melilla la cuota se bonifica al 50% (art. 57 bis del TRLITPAJD), sea cual sea el uso del inmueble.`,
       },
     },
     {
@@ -71,7 +89,7 @@ export const faqJsonLd = {
       name: '¿Cuánto cuesta la notaría y el registro en la compra de una nave industrial?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los honorarios notariales y registrales se calculan sobre el valor escriturado según aranceles oficiales. Para una nave de 200.000 €, la notaría suele costar entre 700 € y 1.200 €, y el Registro de la Propiedad entre 400 € y 800 €. Los aranceles son decrecientes: el porcentaje baja a medida que sube el precio de la operación.',
+        text: `Los honorarios notariales y registrales se calculan sobre el valor escriturado según aranceles oficiales. Para una nave de 200.000 €, la notaría sale por unos ${euros(NOTARIA_EJEMPLO.min)} a ${euros(NOTARIA_EJEMPLO.max)} y el Registro de la Propiedad por unos ${euros(REGISTRO_EJEMPLO)}. Los aranceles son decrecientes: el porcentaje baja a medida que sube el precio de la operación.`,
       },
     },
     {

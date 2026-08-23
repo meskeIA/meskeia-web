@@ -22,6 +22,7 @@ export type { DisclaimerVariant, DisclaimerSeverity } from './DisclaimerCard';
 
 // Referencia de datos normativos (complementa DisclaimerCard)
 export { default as DataReference } from './DataReference';
+export { default as AvisoTerritorioSinIva } from './AvisoTerritorioSinIva';
 
 // Componente de última actualización
 export { default as LastUpdated } from './LastUpdated';

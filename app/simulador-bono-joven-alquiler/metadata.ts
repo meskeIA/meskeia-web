@@ -92,7 +92,7 @@ export const faqJsonLd = {
       name: '¿El Bono Joven Alquiler tributa en el IRPF?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí, el Bono Joven Alquiler está sujeto al IRPF como ganancia patrimonial no derivada de la transmisión de elementos patrimoniales. Debe declararse en la renta del ejercicio en que se cobra. No obstante, al integrarse en la base general del impuesto y dada su cuantía (máximo 3.000 € anuales), el impacto fiscal suele ser moderado. Es recomendable verificar la tributación exacta con un asesor fiscal según el perfil concreto.',
+        text: 'Sí, el Bono Joven Alquiler está sujeto al IRPF como ganancia patrimonial no derivada de la transmisión de elementos patrimoniales. Debe declararse en la renta del ejercicio en que se cobra. No obstante, al integrarse en la base general del impuesto y dada su cuantía (máximo 3.600 € anuales con los 300 €/mes de vivienda completa, o 2.400 € con los 200 €/mes de habitación), el impacto fiscal suele ser moderado. Es recomendable verificar la tributación exacta con un asesor fiscal según el perfil concreto.',
       },
     },
   ],

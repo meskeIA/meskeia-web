@@ -12,6 +12,7 @@ import {
   ResultCard,
   LegalNotice,
   DisclaimerCard,
+  DataReference,
   ShareCard,
   RegionBadge,
 } from '@/components';
@@ -27,7 +28,11 @@ import {
   calcularRegistro,
   ENLACE_CATASTRO,
   RANGO_AJD,
+  RANGO_ITP,
+  TERRITORIOS_SIN_IVA,
+  CIUDADES_CON_BONIFICACION,
 } from '@/data/itp-ccaa';
+import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META } from '@/data/fiscal';
 
 // ===== TIPOS =====
 type TipoTransmision = 'segunda-mano' | 'primera-mano';
@@ -37,6 +42,10 @@ interface ResultadosComprador {
   impuestoTransmision: number;
   tipoImpuesto: string;
   porcentajeImpuesto: number;
+  /** Cierto cuando el impuesto indirecto no se ha podido calcular (IGIC / IPSI) */
+  impuestoNoCalculado: boolean;
+  /** Cierto cuando se ha aplicado la bonificación del 50 % de Ceuta y Melilla */
+  bonificado: boolean;
   ajd: number;
   gastosNotario: number;
   gastosNotarioMin: number;
@@ -70,8 +79,26 @@ const COMUNIDADES: { value: ComunidadAutonoma; label: string }[] = [
   { value: 'melilla', label: 'Melilla' },
 ];
 
-// IVA nave industrial: 21% (inmueble comercial/industrial, no residencial)
-const IVA_NAVE_INDUSTRIAL = 21;
+// IVA nave industrial: el de local comercial/industrial, no el de vivienda. Sale de
+// data/fiscal para que no divergir en silencio cuando allí cambie (hallazgo 163).
+const IVA_NAVE_INDUSTRIAL = IVA_INMUEBLES_2025.local;
+
+// La bonificación del 50 % de Ceuta y Melilla (art. 57 bis TRLITPAJD) y la lista de
+// territorios sin IVA viven en el motor: se cumplen por el SITIO del inmueble, así que las
+// aplica calcularITP/calcularAJD y ninguna app tiene que acordarse de ellas.
+
+/**
+ * Tipo de la tabla, en formato español y con los decimales que de verdad tiene.
+ *
+ * Estos son tipos NOMINALES declarados (6 %, 6,5 %, 7,75 %), no resultados de un cálculo:
+ * forzarles dos decimales convertiría «escala progresiva (9% → 11%)» en «(9,00% → 11,00%)»,
+ * que es ruido. El tipo EFECTIVO de la tarjeta de resultados sí va con dos fijos, porque ahí
+ * el importe puede no ser un porcentaje redondo del precio. Lo que había antes era peor que
+ * cualquiera de las dos: `{datosCcaaActual.tipoGeneral}%` imprimía el número crudo, con punto
+ * decimal anglosajón, junto a una tarjeta que usaba coma.
+ */
+const tipoNominal = (n: number) =>
+  formatNumber(n, Number.isInteger(n) ? 0 : Number.isInteger(n * 10) ? 1 : 2);
 
 export default function SimuladorNaveIndustrialPage() {
   const [precioVenta, setPrecioVenta] = useState('');
@@ -84,31 +111,43 @@ export default function SimuladorNaveIndustrialPage() {
     const precio = parseSpanishNumber(precioVenta);
     if (!Number.isFinite(precio) || precio <= 0) return null;
 
-    const gestoria = parseSpanishNumberOr(gastosGestoria);
+    // Se acota aquí y no solo en el blur del NumberInput: mientras el campo tiene el foco,
+    // un importe negativo se sumaba al total y su tarjeta ni se pintaba (guard > 0), así que
+    // el total en pantalla no cuadraba con las líneas visibles.
+    const gestoria = Math.max(0, parseSpanishNumberOr(gastosGestoria));
 
     let impuesto = 0;
     let tipoImpuesto = '';
     let porcentaje = 0;
+    let impuestoNoCalculado = false;
+    const bonificado = CIUDADES_CON_BONIFICACION.includes(ccaa);
+
+    const territorioSinIva = TERRITORIOS_SIN_IVA[ccaa];
 
     if (tipoTransmision === 'primera-mano') {
-      // Nave industrial: IVA 21% (inmueble comercial)
-      tipoImpuesto = 'IVA';
-      porcentaje = IVA_NAVE_INDUSTRIAL;
-      impuesto = precio * (porcentaje / 100);
+      if (territorioSinIva) {
+        // Allí no se devenga IVA: se nombra el impuesto que corresponde y no se inventa cifra
+        tipoImpuesto = territorioSinIva.impuesto;
+        impuestoNoCalculado = true;
+      } else {
+        // Nave industrial: IVA de local comercial (inmueble no residencial)
+        tipoImpuesto = 'IVA';
+        porcentaje = IVA_NAVE_INDUSTRIAL;
+        impuesto = precio * (porcentaje / 100);
+      }
     } else {
       // ITP segunda mano — tipo general de la CCAA (sin tipos reducidos: nave industrial es comercial)
-      const datosCcaa = ITP_CCAA[ccaa];
-      const tipoAplicable = datosCcaa.tipoGeneral;
       // Sin tercer argumento: así se aplica la escala progresiva de las 7 CCAA
       // que la tienen, en vez del tipo plano del primer tramo.
       impuesto = calcularITP(precio, ccaa);
       tipoImpuesto = 'ITP';
-      // Tipo EFECTIVO: con escala progresiva el importe no es un porcentaje plano del
-      // precio, asi que mostrar el tipo nominal contradiria a la cifra de al lado.
+      // Tipo EFECTIVO: con escala progresiva —o con la bonificación aplicada— el importe no
+      // es un porcentaje plano del precio, así que el tipo nominal contradiría a la cifra.
       porcentaje = precio > 0 ? (impuesto / precio) * 100 : 0;
     }
 
-    // AJD solo aplica en primera mano (IVA + AJD)
+    // AJD solo aplica en primera mano (IVA + AJD). En Ceuta y Melilla la cuota gradual de
+    // documentos notariales también se bonifica al 50 % (art. 57 bis.1 TRLITPAJD).
     const ajd = tipoTransmision === 'primera-mano' ? calcularAJD(precio, ccaa) : 0;
 
     const notaria = estimarFacturaNotarial(precio);
@@ -123,6 +162,8 @@ export default function SimuladorNaveIndustrialPage() {
       impuestoTransmision: impuesto,
       tipoImpuesto,
       porcentajeImpuesto: porcentaje,
+      impuestoNoCalculado,
+      bonificado,
       ajd,
       gastosNotario: notario,
       gastosNotarioMin: notaria.min,
@@ -135,6 +176,8 @@ export default function SimuladorNaveIndustrialPage() {
   }, [precioVenta, ccaa, tipoTransmision, gastosGestoria]);
 
   const datosCcaaActual = ITP_CCAA[ccaa];
+  const territorioActualSinIva = TERRITORIOS_SIN_IVA[ccaa];
+  const esCiudadBonificada = CIUDADES_CON_BONIFICACION.includes(ccaa);
 
   return (
     <div className={styles.container}>
@@ -151,7 +194,7 @@ export default function SimuladorNaveIndustrialPage() {
 
       <RegionBadge variant="es-only" />
 
-      <LegalNotice lastUpdated="2024-12-20" />
+      <LegalNotice lastUpdated={FISCAL_INMUEBLES_META.verificado} />
 
       {/* Disclaimer Legal — CRÍTICO (fiscal España estructural) */}
       <DisclaimerCard
@@ -159,6 +202,14 @@ export default function SimuladorNaveIndustrialPage() {
         severity="critical"
         context="simulador-gastos-compraventa-nave-industrial"
         collapsible={false}
+      />
+
+      <DataReference
+        normativa={`ITP/AJD/IVA ${FISCAL_INMUEBLES_META.vigencia}`}
+        fuente={FISCAL_INMUEBLES_META.fuente}
+        verificado={FISCAL_INMUEBLES_META.verificado}
+        urlOficial={FISCAL_INMUEBLES_META.urlOficialITP}
+        nota={FISCAL_INMUEBLES_META.nota}
       />
 
       {/* Aviso IVA deducible */}
@@ -175,8 +226,11 @@ export default function SimuladorNaveIndustrialPage() {
 
           {/* Tipo de transmisión */}
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Tipo de transmisión</label>
-            <div className={styles.transmisionGrid}>
+            {/* No es un <label>: no gobierna un control, sino un grupo de dos botones. Con
+                role="group" + aria-labelledby el lector de pantalla dice de qué elección
+                forman parte, que es lo que un <label> suelto no llegaba a decir. */}
+            <span className={styles.label} id="etiqueta-transmision">Tipo de transmisión</span>
+            <div className={styles.transmisionGrid} role="group" aria-labelledby="etiqueta-transmision">
               <button
                 type="button"
                 className={`${styles.transmisionBtn} ${tipoTransmision === 'segunda-mano' ? styles.active : ''}`}
@@ -187,6 +241,9 @@ export default function SimuladorNaveIndustrialPage() {
                 <span>Segunda mano</span>
                 <span className={styles.transmisionSub}>Paga ITP (tipo general)</span>
               </button>
+              {/* El aviso va aquí, en la herramienta, y no solo en el recuadro de limitaciones
+                  del final: para el público que la app declara —empresas y autónomos— la renuncia
+                  a la exención es el caso frecuente, no el raro. */}
               <button
                 type="button"
                 className={`${styles.transmisionBtn} ${tipoTransmision === 'primera-mano' ? styles.active : ''}`}
@@ -195,9 +252,17 @@ export default function SimuladorNaveIndustrialPage() {
               >
                 <span className={styles.transmisionIcon} aria-hidden="true">🆕</span>
                 <span>Obra nueva / Promotor</span>
-                <span className={styles.transmisionSub}>Paga IVA 21% + AJD</span>
+                <span className={styles.transmisionSub}>Paga IVA {formatNumber(IVA_NAVE_INDUSTRIAL, 0)}% + AJD</span>
               </button>
             </div>
+            {tipoTransmision === 'segunda-mano' && (
+              <p className={styles.avisoRenuncia} role="note">
+                <span aria-hidden="true">ℹ️</span> Entre empresarios con derecho a deducción es habitual{' '}
+                <strong>renunciar a la exención de IVA</strong>: la operación pasa a IVA con inversión del
+                sujeto pasivo, no se paga ITP y el AJD suele ir a un tipo incrementado. El simulador calcula
+                siempre ITP, así que en ese supuesto la cifra no es la tuya.
+              </p>
+            )}
           </div>
 
           {/* Precio */}
@@ -236,26 +301,47 @@ export default function SimuladorNaveIndustrialPage() {
             <div className={styles.infoCcaaGrid}>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>ITP General</span>
-                <span className={styles.infoCcaaValue}>{datosCcaaActual.tipoGeneral}%</span>
+                <span className={styles.infoCcaaValue}>{tipoNominal(datosCcaaActual.tipoGeneral)}%</span>
               </div>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>AJD</span>
-                <span className={styles.infoCcaaValue}>{datosCcaaActual.ajd}%</span>
+                <span className={styles.infoCcaaValue}>{formatNumber(datosCcaaActual.ajd, 2)}%</span>
               </div>
               <div className={styles.infoCcaaItem}>
-                <span className={styles.infoCcaaLabel}>IVA (obra nueva)</span>
-                <span className={styles.infoCcaaValue}>{IVA_NAVE_INDUSTRIAL}%</span>
+                <span className={styles.infoCcaaLabel}>
+                  {territorioActualSinIva ? `${territorioActualSinIva.impuesto} (obra nueva)` : 'IVA (obra nueva)'}
+                </span>
+                <span className={styles.infoCcaaValue}>
+                  {territorioActualSinIva ? 'No calculado' : `${tipoNominal(IVA_NAVE_INDUSTRIAL)}%`}
+                </span>
               </div>
             </div>
             {datosCcaaActual.tramosProgresivos && (
               <p className={styles.infoCcaaNote}>
-                ⚠️ Esta CCAA aplica escala progresiva ({datosCcaaActual.tramosProgresivos.map(t => `${t.tipo}%`).join(' → ')})
+                <span aria-hidden="true">⚠️</span> Esta CCAA aplica escala progresiva ({datosCcaaActual.tramosProgresivos.map(t => `${tipoNominal(t.tipo)}%`).join(' → ')})
               </p>
             )}
-            <p className={styles.infoCcaaNote}>
-              Las naves industriales tributan por el <strong>tipo general</strong> de ITP, sin tipos reducidos
-              (los tipos reducidos solo aplican a inmuebles residenciales).
-            </p>
+            {esCiudadBonificada ? (
+              <p className={styles.infoCcaaNote}>
+                Las naves industriales tributan por el <strong>tipo general</strong> de ITP, pero en{' '}
+                {datosCcaaActual.nombre} se aplica además la <strong>bonificación del 50 % de la cuota</strong>{' '}
+                del artículo 57 bis del TRLITPAJD, que corresponde a los inmuebles situados en la ciudad
+                sea cual sea su uso. El simulador ya la descuenta.
+              </p>
+            ) : (
+              <p className={styles.infoCcaaNote}>
+                Las naves industriales tributan por el <strong>tipo general</strong> de ITP, sin tipos reducidos
+                (los tipos reducidos solo aplican a inmuebles residenciales).
+              </p>
+            )}
+            {territorioActualSinIva && (
+              <p className={styles.infoCcaaNote}>
+                <span aria-hidden="true">⚠️</span> En {datosCcaaActual.nombre} <strong>no se aplica el IVA</strong>:
+                la obra nueva tributa por el {territorioActualSinIva.impuesto} ({territorioActualSinIva.nombre}),
+                con sus propios tipos. Este simulador no lo calcula — consúltalo en la administración tributaria
+                de {datosCcaaActual.nombre}.
+              </p>
+            )}
           </div>
 
           {/* Gestoría */}
@@ -295,14 +381,28 @@ export default function SimuladorNaveIndustrialPage() {
               />
 
               <ResultCard
-                title={`${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 0)}%)`}
-                value={formatCurrency(resultadosComprador.impuestoTransmision)}
+                title={
+                  resultadosComprador.impuestoNoCalculado
+                    ? resultadosComprador.tipoImpuesto
+                    // Dos decimales: a cero, un 6,50 % se rotulaba «7%» junto a un importe
+                    // que es el 6,5 % del precio, y las dos cifras se desmentían en pantalla.
+                    : `${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 2)}%)`
+                }
+                value={
+                  resultadosComprador.impuestoNoCalculado
+                    ? 'No calculado'
+                    : formatCurrency(resultadosComprador.impuestoTransmision)
+                }
                 variant="warning"
                 icon="📋"
                 description={
-                  resultadosComprador.tipoImpuesto === 'IVA'
-                    ? 'Potencialmente deducible si eres empresa/autónomo sujeto a IVA'
-                    : 'Tipo general — naves industriales no tienen tipos reducidos'
+                  resultadosComprador.impuestoNoCalculado
+                    ? `En ${datosCcaaActual.nombre} no rige el IVA: la obra nueva tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
+                    : resultadosComprador.tipoImpuesto === 'IVA'
+                      ? 'Potencialmente deducible si eres empresa/autónomo sujeto a IVA'
+                      : resultadosComprador.bonificado
+                        ? 'Tipo general con la bonificación del 50 % de la cuota ya aplicada (art. 57 bis TRLITPAJD)'
+                        : 'Tipo general — naves industriales no tienen tipos reducidos'
                 }
               />
 
@@ -312,6 +412,7 @@ export default function SimuladorNaveIndustrialPage() {
                   value={formatCurrency(resultadosComprador.ajd)}
                   variant="warning"
                   icon="📄"
+                  description={resultadosComprador.bonificado ? 'Con la bonificación del 50 % de Ceuta y Melilla aplicada' : undefined}
                 />
               )}
 
@@ -342,19 +443,27 @@ export default function SimuladorNaveIndustrialPage() {
               <div className={styles.separador} />
 
               <ResultCard
-                title="Total gastos adicionales"
+                title={resultadosComprador.impuestoNoCalculado ? 'Total gastos adicionales (parcial)' : 'Total gastos adicionales'}
                 value={formatCurrency(resultadosComprador.totalGastos)}
                 variant="info"
                 icon="➕"
-                description={`${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio de compra`}
+                description={
+                  resultadosComprador.impuestoNoCalculado
+                    ? `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio — SIN el ${resultadosComprador.tipoImpuesto}, que no está incluido`
+                    : `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio de compra`
+                }
               />
 
               <ResultCard
-                title="COSTE TOTAL DE ADQUISICIÓN"
+                title={resultadosComprador.impuestoNoCalculado ? 'COSTE TOTAL (PARCIAL)' : 'COSTE TOTAL DE ADQUISICIÓN'}
                 value={formatCurrency(resultadosComprador.totalOperacion)}
                 variant="highlight"
                 icon="💳"
-                description="Precio + todos los gastos (antes de deducir IVA si aplica)"
+                description={
+                  resultadosComprador.impuestoNoCalculado
+                    ? `No incluye el ${resultadosComprador.tipoImpuesto}: el coste real será mayor`
+                    : 'Precio + todos los gastos (antes de deducir IVA si aplica)'
+                }
               />
             </>
           ) : (
@@ -458,8 +567,17 @@ export default function SimuladorNaveIndustrialPage() {
               <strong>¿Se paga IVA o ITP al comprar una nave industrial?</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
                 Depende del tipo de transmisión. Si es la primera entrega del promotor (obra nueva),
-                se paga IVA al 21%. Si es de segunda mano (entre particulares o empresas ya usadas),
-                se paga ITP al tipo general de la comunidad autónoma. Nunca se pagan los dos a la vez.
+                se paga IVA al {formatNumber(IVA_NAVE_INDUSTRIAL, 0)}%. Si es de segunda mano, se paga ITP
+                al tipo general de la comunidad autónoma. Nunca se pagan los dos a la vez.
+              </p>
+              <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
+                <strong>Con una salvedad que en naves industriales es frecuente:</strong> la segunda
+                transmisión está exenta de IVA, pero cuando comprador y vendedor son empresarios con derecho
+                a deducción es habitual <strong>renunciar a esa exención</strong>. Entonces la operación vuelve
+                al IVA (con inversión del sujeto pasivo: lo declara el comprador) y no se paga ITP, aunque el
+                AJD suele ir a un tipo incrementado en muchas comunidades. Este simulador
+                <strong> no modela la renuncia</strong>: calcula siempre ITP en segunda mano. Si tu operación
+                es entre empresas, consúltalo con tu asesor antes de dar la cifra por buena.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
@@ -474,8 +592,12 @@ export default function SimuladorNaveIndustrialPage() {
               <strong>¿Qué tipos de ITP aplican a una nave industrial?</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
                 Los tipos reducidos de ITP (jóvenes, familias numerosas, discapacidad) son exclusivos de
-                inmuebles residenciales. Para naves industriales y locales comerciales, siempre aplica el
-                tipo general de la CCAA, que oscila entre el 4% (País Vasco) y el 10-11% (Cataluña, Valencia).
+                inmuebles residenciales. Para naves industriales y locales comerciales aplica el tipo general
+                de la comunidad, que hoy va del {formatNumber(RANGO_ITP.min, 2)}% al {formatNumber(RANGO_ITP.max, 2)}%
+                — el techo corresponde al tramo más alto de las comunidades con escala progresiva, así que una
+                nave cara puede pagar un tipo efectivo superior al nominal de su comunidad. La excepción no es
+                un tipo reducido sino una bonificación de cuota: en Ceuta y Melilla se descuenta el 50 %
+                (art. 57 bis del TRLITPAJD), y ahí sí entra cualquier inmueble, también una nave.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>

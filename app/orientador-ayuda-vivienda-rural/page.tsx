@@ -14,13 +14,15 @@ import {
 } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
+import { AYUDA_COMPRA_JOVEN_RURAL_2026 } from '@/data/fiscal';
 
 type SiNo = 'si' | 'no' | 'pendiente';
 type TipoMunicipio = 'pequeno' | 'despoblacion' | 'grande' | 'pendiente';
 
-const AYUDA_MAX = 15000;
-const PORCENTAJE = 0.20;
-const PRECIO_TOPE = AYUDA_MAX / PORCENTAJE; // 75.000€
+// RD 326/2026, art. 143 — sellado en data/fiscal/vivienda-joven.ts
+const AYUDA_MAX = AYUDA_COMPRA_JOVEN_RURAL_2026.ayudaMaxima;
+const PORCENTAJE = AYUDA_COMPRA_JOVEN_RURAL_2026.limiteSobreCoste;
+const PRECIO_TOPE = AYUDA_MAX / PORCENTAJE; // 75.000€, el precio a partir del cual manda el tope
 
 export default function OrientadorAyudaViviendaRural() {
   const [edad, setEdad] = useState<SiNo>('pendiente');

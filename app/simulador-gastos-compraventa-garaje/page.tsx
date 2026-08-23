@@ -15,6 +15,7 @@ import {
   DataReference,
   ShareCard,
   RegionBadge,
+  AvisoTerritorioSinIva,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
@@ -388,6 +389,8 @@ export default function SimuladorGarajeCompraventaPage() {
               ))}
             </select>
           </div>
+
+          <AvisoTerritorioSinIva ccaa={ccaa} aplica={tipoTransmision === 'primera-mano'} />
 
           {/* Info CCAA */}
           <div className={styles.infoCcaa}>

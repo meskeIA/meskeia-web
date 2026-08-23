@@ -246,6 +246,26 @@
   .tipoSelector { grid-template-columns: 1fr; }
 }
 
+/* Aviso de renta por encima del tope del RD: sustituye al panel de ahorro, así que
+   tiene que leerse como un corte y no como una nota al pie. */
+.avisoRenta {
+  border: 2px solid #d97706;
+  border-left-width: 6px;
+  background: #fffbeb;
+  color: #7c2d12;
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+[data-theme='dark'] .avisoRenta {
+  background: rgba(217, 119, 6, 0.12);
+  color: #fcd9b6;
+  border-color: #b45309;
+}
+
 /* Próximos pasos */
 .pasosGrid { display: flex; flex-direction: column; gap: 0.75rem; }
 

@@ -12,12 +12,14 @@ import {
   ResultCard,
   LegalNotice,
   DisclaimerCard,
+  DataReference,
   ShareCard,
   RegionBadge,
+  AvisoTerritorioSinIva,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
-import { calcularGananciaInmueble } from '@/data/fiscal';
+import { calcularGananciaInmueble, IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -91,7 +93,9 @@ const COMUNIDADES: { value: ComunidadAutonoma; label: string }[] = [
 ];
 
 // IVA local comercial: 21% (inmueble comercial, no residencial)
-const IVA_LOCAL_COMERCIAL = 21;
+// Tipo de IVA de inmueble no residencial. Sale de data/fiscal para no divergir en
+// silencio cuando cambie allí (hallazgo 163 del Inspector, del clúster entero).
+const IVA_LOCAL_COMERCIAL = IVA_INMUEBLES_2025.local;
 
 export default function SimuladorLocalComercialPage() {
   const [precioVenta, setPrecioVenta] = useState('');
@@ -285,7 +289,7 @@ export default function SimuladorLocalComercialPage() {
 
       <RegionBadge variant="es-only" />
 
-      <LegalNotice lastUpdated="2025-01-15" />
+      <LegalNotice lastUpdated={FISCAL_INMUEBLES_META.verificado} />
 
       {/* Disclaimer Legal — CRÍTICO (fiscal España estructural) */}
       <DisclaimerCard
@@ -293,6 +297,14 @@ export default function SimuladorLocalComercialPage() {
         severity="critical"
         context="simulador-gastos-compraventa-local-comercial"
         collapsible={false}
+      />
+
+      <DataReference
+        normativa={`ITP/AJD/IVA ${FISCAL_INMUEBLES_META.vigencia}`}
+        fuente={FISCAL_INMUEBLES_META.fuente}
+        verificado={FISCAL_INMUEBLES_META.verificado}
+        urlOficial={FISCAL_INMUEBLES_META.urlOficialITP}
+        nota={FISCAL_INMUEBLES_META.nota}
       />
 
       {/* Aviso IVA deducible */}
@@ -381,6 +393,8 @@ export default function SimuladorLocalComercialPage() {
               ))}
             </select>
           </div>
+
+          <AvisoTerritorioSinIva ccaa={ccaa} aplica={tipoTransmision === 'primera-mano' || esRenuncia} />
 
           {/* Info CCAA */}
           <div className={styles.infoCcaa}>

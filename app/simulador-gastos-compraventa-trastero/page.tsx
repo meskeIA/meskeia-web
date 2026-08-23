@@ -12,12 +12,14 @@ import {
   ResultCard,
   LegalNotice,
   DisclaimerCard,
+  DataReference,
   ShareCard,
   RegionBadge,
+  AvisoTerritorioSinIva,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
-import { IVA_INMUEBLES_2025, calcularGananciaInmueble } from '@/data/fiscal';
+import { IVA_INMUEBLES_2025, calcularGananciaInmueble, FISCAL_INMUEBLES_META } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -346,7 +348,7 @@ export default function SimuladorTrasteroCompraventaPage() {
 
       <RegionBadge variant="es-only" />
 
-      <LegalNotice lastUpdated="2024-12-20" />
+      <LegalNotice lastUpdated={FISCAL_INMUEBLES_META.verificado} />
 
       {/* Disclaimer Legal - CRÍTICO */}
       <DisclaimerCard
@@ -354,6 +356,14 @@ export default function SimuladorTrasteroCompraventaPage() {
         severity="critical"
         context="simulador-gastos-compraventa-trastero"
         collapsible={false}
+      />
+
+      <DataReference
+        normativa={`ITP/AJD/IVA ${FISCAL_INMUEBLES_META.vigencia}`}
+        fuente={FISCAL_INMUEBLES_META.fuente}
+        verificado={FISCAL_INMUEBLES_META.verificado}
+        urlOficial={FISCAL_INMUEBLES_META.urlOficialITP}
+        nota={FISCAL_INMUEBLES_META.nota}
       />
 
       {/* Nota informativa sobre trastero */}
@@ -461,6 +471,8 @@ export default function SimuladorTrasteroCompraventaPage() {
               ))}
             </select>
           </div>
+
+          <AvisoTerritorioSinIva ccaa={ccaa} aplica={tipoTransmision === 'primera-mano'} />
 
           {/* Info CCAA */}
           <div className={styles.infoCcaa}>

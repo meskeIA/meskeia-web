@@ -12,8 +12,10 @@ import {
   ResultCard,
   LegalNotice,
   DisclaimerCard,
+  DataReference,
   ShareCard,
   RegionBadge,
+  AvisoTerritorioSinIva,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
@@ -27,6 +29,7 @@ import {
   calcularRegistro,
   ENLACE_CATASTRO,
 } from '@/data/itp-ccaa';
+import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META } from '@/data/fiscal';
 
 // ===== TIPOS =====
 // Solar / terreno edificable (suelo urbano):
@@ -74,7 +77,9 @@ const COMUNIDADES: { value: ComunidadAutonoma; label: string }[] = [
 ];
 
 // IVA solar / terreno edificable: 21%
-const IVA_SOLAR = 21;
+// Tipo de IVA de inmueble no residencial. Sale de data/fiscal para no divergir en
+// silencio cuando cambie allí (hallazgo 163 del Inspector, del clúster entero).
+const IVA_SOLAR = IVA_INMUEBLES_2025.local;
 
 export default function SimuladorSolarPage() {
   const [precioVenta, setPrecioVenta] = useState('');
@@ -160,7 +165,7 @@ export default function SimuladorSolarPage() {
 
       <RegionBadge variant="es-only" />
 
-      <LegalNotice lastUpdated="2025-01-15" />
+      <LegalNotice lastUpdated={FISCAL_INMUEBLES_META.verificado} />
 
       {/* Disclaimer Legal — CRÍTICO (fiscal España estructural) */}
       <DisclaimerCard
@@ -168,6 +173,14 @@ export default function SimuladorSolarPage() {
         severity="critical"
         context="simulador-gastos-compraventa-solar"
         collapsible={false}
+      />
+
+      <DataReference
+        normativa={`ITP/AJD/IVA ${FISCAL_INMUEBLES_META.vigencia}`}
+        fuente={FISCAL_INMUEBLES_META.fuente}
+        verificado={FISCAL_INMUEBLES_META.verificado}
+        urlOficial={FISCAL_INMUEBLES_META.urlOficialITP}
+        nota={FISCAL_INMUEBLES_META.nota}
       />
 
       {/* Aviso clave: quién vende decide el impuesto */}
@@ -245,6 +258,8 @@ export default function SimuladorSolarPage() {
               ))}
             </select>
           </div>
+
+          <AvisoTerritorioSinIva ccaa={ccaa} aplica={tipoVendedor === 'empresario'} />
 
           {/* Info CCAA */}
           <div className={styles.infoCcaa}>

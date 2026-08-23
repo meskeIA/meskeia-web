@@ -118,6 +118,7 @@ que ya rige para las apps en `CLAUDE.md`, que nadie había extendido explícitam
 | **Junio–agosto** | RD umbrales de becas del curso siguiente; Resolución Tesoro S2 (~1 jul) | `becas-estudio` `intereses` |
 | **Noviembre** | Indicadores Demográficos Básicos del INE (esperanza de vida del año anterior) | `esperanza-vida` |
 | **Trimestral** | IRAV (INE) — y IPC interanual mensual | `alquiler` |
+| **2.º semestre 2026** | Convocatorias autonómicas del Plan Estatal de Vivienda 2026-2030 (concretan el marco del RD 326/2026 y pueden elevar la renta máxima) | `vivienda-joven` |
 | **Todo el año** | RDL tras Consejo de Ministros (impredecible): IVA de productos concretos, permisos familiares, medidas pensiones | `iva` `maternidad` `pensiones` y cualquiera |
 
 ## 3. Fichas de vigilancia por módulo
@@ -408,6 +409,31 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
   la FAQ de esa misma página). El candado que lo impide reaparecer es el test GOLDEN-BO2.
 - **Verificado**: 2026-08-13.
 
+#### `vivienda-joven.ts` — Ayudas jóvenes del Plan Estatal de Vivienda 2026-2030
+
+- **Contiene**: `BONO_ALQUILER_JOVEN_2026` (cuantías 300/200 €/mes, límite del 60 % de la renta,
+  rentas máximas 1.000/600 y 500/250 en municipios pequeños, edad 18-35 inclusive, plazo 2+2 años) y
+  `AYUDA_COMPRA_JOVEN_RURAL_2026` (15.000 € o el 20 % del coste, municipios ≤10.000 hab), más el
+  umbral de ingresos en veces el IPREM (5 · 5,5 · 6).
+- **Normativa**: **RD 326/2026, de 22 de abril** (BOE-A-2026-8872), Capítulo IV, secciones 3.ª
+  (arts. 132-139, alquiler) y 4.ª (arts. 140-145, compra rural). Cada constante cita su artículo.
+- **Vigilar**: las convocatorias autonómicas —que es donde se concreta y donde puede subir la renta
+  máxima (art. 135, con acuerdo previo del Ministerio)— y cualquier modificación del RD. El anexo IV
+  (precio máximo de vivienda por CA para la ayuda de compra) **no está volcado aquí**: si alguna app
+  llega a necesitarlo, se trae con su propia verificación.
+- **Cadencia**: al abrir convocatorias las CCAA (previstas para el 2.º semestre de 2026) y ante
+  cualquier reforma del Plan. El Plan cubre 2026-2030, así que fuera de eso el dato es estable.
+- **Alerta metodológica**: **confundirlo con el RD 42/2022**. No es una actualización de cifras: el
+  plan anterior fijaba 600 €/mes de renta máxima ampliables a 900 € en zona tensionada, y el vigente
+  fija 1.000 € (vivienda) / 600 € (habitación), sin esa figura. Un texto que hable de «900 € en zona
+  tensionada» está citando la convocatoria muerta.
+- **Por qué está aquí y no exento**: son cuantías y umbrales con fecha de caducidad, en apps de
+  riesgo 1. Nació el 23/08/2026 al reparar el hallazgo 154 del Inspector: los valores vivían inline
+  en `simulador-bono-joven-alquiler`, y al verificarlos contra el BOE resultó que **los límites de
+  renta en producción eran los del RD 42/2022**, derogado. Sin punto único, el Vigía Normativo no
+  tenía nada que vigilar.
+- **Verificado**: 2026-08-23 · artículo por artículo contra el texto del BOE.
+
 ---
 
 ## 4. Precedentes de cambio de metodología (la vara de medir)
@@ -492,6 +518,7 @@ informe del vigía enumerar las apps afectadas por cada hallazgo.)*
 | `smi` | calculadora-propinas · estimador-smi | smi-salario-minimo | ✅ |
 | `sociedades` | comparador-autonomo-vs-sl · simulador-financiacion-empresarial | impuesto-sociedades | ✅ |
 | `sucesiones` | estimador-impuesto-sucesiones · simulador-heredar-vivienda | sucesiones-isd | ✅ |
+| `vivienda-joven` | simulador-bono-joven-alquiler · orientador-ayuda-vivienda-rural | — | — |
 
 **Observaciones del mapa** (relevantes para priorizar alertas):
 - **`irpf.ts` es el módulo de mayor radio de impacto**: 18 apps + ficha Delegum + API. Un cambio N2 en IRPF es el escenario de máxima urgencia.

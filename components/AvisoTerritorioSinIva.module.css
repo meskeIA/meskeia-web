@@ -1,0 +1,20 @@
+/* Aviso de territorio fuera del IVA (IGIC / IPSI).
+   Va pegado al resultado que corrige, no al pie de la página: quien lo necesita está
+   mirando una cifra que no le corresponde. */
+.aviso {
+  margin: 0.75rem 0;
+  padding: 0.8rem 1rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  border: 2px solid #d97706;
+  border-left-width: 6px;
+  border-radius: 0 8px 8px 0;
+  background: #fffbeb;
+  color: #7c2d12;
+}
+
+[data-theme='dark'] .aviso {
+  background: rgba(217, 119, 6, 0.12);
+  color: #fcd9b6;
+  border-color: #b45309;
+}

@@ -268,6 +268,23 @@
   line-height: 1.4;
 }
 
+/* Aviso de la renuncia a la exención de IVA: va pegado al selector de transmisión
+   porque afecta a lo que el usuario acaba de elegir, no al pie de la página. */
+.avisoRenuncia {
+  margin: 0.6rem 0 0;
+  padding: 0.7rem 0.85rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  border-left: 4px solid var(--primary);
+  border-radius: 0 8px 8px 0;
+  background: rgba(46, 134, 171, 0.08);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .avisoRenuncia {
+  background: rgba(46, 134, 171, 0.16);
+}
+
 /* ===== ENLACE CATASTRO ===== */
 .enlaceCatastro {
   padding-top: 0.25rem;

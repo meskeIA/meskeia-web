@@ -12,8 +12,10 @@ import {
   ResultCard,
   LegalNotice,
   DisclaimerCard,
+  DataReference,
   ShareCard,
   RegionBadge,
+  AvisoTerritorioSinIva,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
@@ -27,6 +29,7 @@ import {
   calcularRegistro,
   ENLACE_CATASTRO,
 } from '@/data/itp-ccaa';
+import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META } from '@/data/fiscal';
 
 // ===== TIPOS =====
 // Terreno rústico no edificable: exento de IVA → ITP (regla general).
@@ -72,7 +75,9 @@ const COMUNIDADES: { value: ComunidadAutonoma; label: string }[] = [
   { value: 'melilla', label: 'Melilla' },
 ];
 
-const IVA_RENUNCIA = 21;
+// Tipo de IVA de inmueble no residencial. Sale de data/fiscal para no divergir en
+// silencio cuando cambie allí (hallazgo 163 del Inspector, del clúster entero).
+const IVA_RENUNCIA = IVA_INMUEBLES_2025.local;
 
 export default function SimuladorTerrenoRusticoPage() {
   const [precioVenta, setPrecioVenta] = useState('');
@@ -158,7 +163,7 @@ export default function SimuladorTerrenoRusticoPage() {
 
       <RegionBadge variant="es-only" />
 
-      <LegalNotice lastUpdated="2025-01-15" />
+      <LegalNotice lastUpdated={FISCAL_INMUEBLES_META.verificado} />
 
       {/* Disclaimer Legal — CRÍTICO (fiscal España estructural) */}
       <DisclaimerCard
@@ -166,6 +171,14 @@ export default function SimuladorTerrenoRusticoPage() {
         severity="critical"
         context="simulador-gastos-compraventa-terreno-rustico"
         collapsible={false}
+      />
+
+      <DataReference
+        normativa={`ITP/AJD/IVA ${FISCAL_INMUEBLES_META.vigencia}`}
+        fuente={FISCAL_INMUEBLES_META.fuente}
+        verificado={FISCAL_INMUEBLES_META.verificado}
+        urlOficial={FISCAL_INMUEBLES_META.urlOficialITP}
+        nota={FISCAL_INMUEBLES_META.nota}
       />
 
       {/* Aviso clave: exención de IVA y sin plusvalía */}
@@ -244,6 +257,8 @@ export default function SimuladorTerrenoRusticoPage() {
               ))}
             </select>
           </div>
+
+          <AvisoTerritorioSinIva ccaa={ccaa} aplica={esRenuncia} />
 
           {/* Info CCAA */}
           <div className={styles.infoCcaa}>

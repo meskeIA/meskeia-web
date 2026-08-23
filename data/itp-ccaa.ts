@@ -1040,17 +1040,56 @@ export function calcularITP(
   const datos = ITP_CCAA[ccaa];
 
   if (tipoAplicable !== undefined) {
+    // Con tipo forzado NO se bonifica: los tipos reducidos declarados para Ceuta y Melilla
+    // ya vienen con el 50 % descontado (su `tipo: 3` es el 6 % general bonificado), así que
+    // volver a aplicarlo aquí dejaría la cuota en la cuarta parte.
     return valor * (tipoAplicable / 100);
   }
 
-  // Si hay tramos progresivos, calcular por tramos
-  if (datos.tramosProgresivos && datos.tramosProgresivos.length > 0) {
-    return calcularITPProgresivo(valor, datos.tramosProgresivos);
-  }
+  const cuota = datos.tramosProgresivos && datos.tramosProgresivos.length > 0
+    ? calcularITPProgresivo(valor, datos.tramosProgresivos)
+    : valor * (datos.tipoGeneral / 100);
 
-  // Tipo fijo
-  return valor * (datos.tipoGeneral / 100);
+  return aplicarBonificacionCiudad(cuota, ccaa);
 }
+
+/**
+ * Bonificación del 50 % de la cuota en Ceuta y Melilla — art. 57 bis del TRLITPAJD
+ * (RDL 1/1993, añadido por la Ley 53/2002). Verificado contra el BOE el 23/08/2026.
+ *
+ * Se aplica en el MOTOR y no en cada app a propósito. El apartado 3.a) la reconoce a las
+ * «transmisiones y arrendamiento de inmuebles situados en Ceuta o Melilla» **sin distinguir
+ * el uso**, y el apartado 1 hace lo mismo con la cuota gradual de AJD cuando el Registro
+ * radica allí: es decir, se cumple por el SITIO del inmueble y no depende de nada que haya
+ * que preguntarle al comprador. Por eso ninguna app tiene que acordarse de ella.
+ *
+ * Hasta el 23/08/2026 no la aplicaba ninguna de las 7 del clúster de compraventa: una nave
+ * de 500.000 € en Ceuta liquidaba 30.000 € cuando le correspondían 15.000 €, el doble. Lo
+ * encontró el Inspector en `nave-industrial` (hallazgo 157) y estaba en las siete.
+ */
+export const BONIFICACION_CUOTA_CEUTA_MELILLA = 0.5;
+export const CIUDADES_CON_BONIFICACION: ComunidadAutonoma[] = ['ceuta', 'melilla'];
+
+export function aplicarBonificacionCiudad(cuota: number, ccaa: ComunidadAutonoma): number {
+  return CIUDADES_CON_BONIFICACION.includes(ccaa)
+    ? cuota * (1 - BONIFICACION_CUOTA_CEUTA_MELILLA)
+    : cuota;
+}
+
+/**
+ * Territorios donde NO rige el IVA español.
+ *
+ * Canarias tributa por IGIC y Ceuta y Melilla por IPSI, con sus propios tipos y ordenanzas.
+ * El catálogo NO los calcula —traerlos exigiría sellar esos tipos con su propia fuente—,
+ * pero una app que ofrezca esos territorios en su desplegable tampoco puede cobrarles un
+ * 21 % que allí no existe: hasta el 23/08/2026, una nave de 500.000 € en Canarias liquidaba
+ * 105.000 € de IVA inventados (hallazgo 156, presente en las 7 apps del clúster).
+ */
+export const TERRITORIOS_SIN_IVA: Partial<Record<ComunidadAutonoma, { impuesto: string; nombre: string }>> = {
+  canarias: { impuesto: 'IGIC', nombre: 'Impuesto General Indirecto Canario' },
+  ceuta: { impuesto: 'IPSI', nombre: 'Impuesto sobre la Producción, los Servicios y la Importación' },
+  melilla: { impuesto: 'IPSI', nombre: 'Impuesto sobre la Producción, los Servicios y la Importación' },
+};
 
 /**
  * Calcula ITP con escala progresiva
@@ -1086,7 +1125,9 @@ export function calcularIVA(valor: number, tipoInmueble: 'vivienda' | 'garaje' |
  */
 export function calcularAJD(valor: number, ccaa: ComunidadAutonoma): number {
   const datos = ITP_CCAA[ccaa];
-  return valor * (datos.ajd / 100);
+  // El art. 57 bis.1 del TRLITPAJD bonifica al 50 % la cuota gradual de documentos
+  // notariales cuando el Registro radica en Ceuta o Melilla — mismo criterio de sitio.
+  return aplicarBonificacionCiudad(valor * (datos.ajd / 100), ccaa);
 }
 
 /**
