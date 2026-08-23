@@ -520,7 +520,11 @@ Cada regla se escribió para su caso; el parecido superficial con el caso siguie
 
 **Qué hacer**: el veredicto sale **acompañado del número de lecturas consecutivas que lleva diciendo lo mismo**. A partir de **5 iguales seguidas**, la lectura por defecto es *"el indicador está roto"*, no *"todo sigue bien"*, y se dice así en vez de repetirlo una vez más. El contador va **impreso en la salida**, no confiado a la memoria de nadie.
 
+⚠️ **El contador va sobre el eje que discrimina, y la ausencia de un valor NO es una racha.** Antes de contar, mira qué valores llegan a salir de verdad: si uno de ellos exige condiciones que casi nada cumple, que lleve N lecturas sin aparecer no dice nada del indicador — sale de donde tiene que salir, que es de que ese valor es inalcanzable. Contar sobre él da la alarma equivocada, y encima suena a diligencia.
+
 **De dónde sale**: el semáforo de la sección 9 del digest marcó ✅ durante **21 lecturas seguidas** mientras la métrica caía, y *Apps activas* llevaba 30 lecturas subiendo sin que su suelo llegara a hablar nunca. El principio ya estaba escrito ("un color que sale siempre deja de informar"); lo que faltaba era volverlo **mecánico**, porque un principio depende de que alguien lo recuerde y un contador no.
+
+**El aviso salió del caso simétrico** (23/08/2026): el Inspector llevaba **32 inspecciones sin un solo veredicto `ok`** y eso disparó la sospecha de detector roto. Se hizo la prueba —criterio escrito antes de ejecutarla, en `_private/inspector/PRUEBA-ESPECIFICIDAD.md`— y el detector estaba sano: los hallazgos verificados a mano eran reales. `ok` exigía que una app de 620-946 líneas no tuviera **ni un detalle**, algo que en este catálogo no ocurre (0/32); el eje informativo era la pareja `con_hallazgos` / `con_hallazgos_menores`, donde la racha máxima histórica era **4**, por debajo del umbral. Allí un color salía siempre y dejó de informar; aquí un valor no salía nunca y tampoco informaba. **Un indicador puede mentir por los dos extremos, y el contador no distingue solo: hay que decirle qué contar.**
 
 ---
 
