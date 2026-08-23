@@ -35,7 +35,7 @@ import {
 import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META } from '@/data/fiscal';
 
 // ===== TIPOS =====
-type TipoTransmision = 'segunda-mano' | 'primera-mano';
+type TipoTransmision = 'segunda-mano' | 'primera-mano' | 'segunda-mano-renuncia';
 
 interface ResultadosComprador {
   precioInmueble: number;
@@ -124,14 +124,22 @@ export default function SimuladorNaveIndustrialPage() {
 
     const territorioSinIva = TERRITORIOS_SIN_IVA[ccaa];
 
-    if (tipoTransmision === 'primera-mano') {
+    // La segunda transmisión de una nave está EXENTA de IVA, pero entre empresarios con
+    // derecho a deducción es habitual renunciar a la exención (art. 20.Dos LIVA): entonces
+    // vuelve a haber IVA —lo autoliquida el comprador, inversión del sujeto pasivo— y no se
+    // paga ITP. Para el público que declara la app (empresas y autónomos) es el caso
+    // frecuente, no el raro, y hasta el 23/08/2026 no se podía ni elegir. La hermana del
+    // local comercial ya lo modelaba así.
+    const conIva = tipoTransmision === 'primera-mano' || tipoTransmision === 'segunda-mano-renuncia';
+
+    if (conIva) {
       if (territorioSinIva) {
         // Allí no se devenga IVA: se nombra el impuesto que corresponde y no se inventa cifra
         tipoImpuesto = territorioSinIva.impuesto;
         impuestoNoCalculado = true;
       } else {
         // Nave industrial: IVA de local comercial (inmueble no residencial)
-        tipoImpuesto = 'IVA';
+        tipoImpuesto = tipoTransmision === 'segunda-mano-renuncia' ? 'IVA (renuncia · ISP)' : 'IVA';
         porcentaje = IVA_NAVE_INDUSTRIAL;
         impuesto = precio * (porcentaje / 100);
       }
@@ -148,7 +156,7 @@ export default function SimuladorNaveIndustrialPage() {
 
     // AJD solo aplica en primera mano (IVA + AJD). En Ceuta y Melilla la cuota gradual de
     // documentos notariales también se bonifica al 50 % (art. 57 bis.1 TRLITPAJD).
-    const ajd = tipoTransmision === 'primera-mano' ? calcularAJD(precio, ccaa) : 0;
+    const ajd = conIva ? calcularAJD(precio, ccaa) : 0;
 
     const notaria = estimarFacturaNotarial(precio);
 
@@ -254,13 +262,32 @@ export default function SimuladorNaveIndustrialPage() {
                 <span>Obra nueva / Promotor</span>
                 <span className={styles.transmisionSub}>Paga IVA {formatNumber(IVA_NAVE_INDUSTRIAL, 0)}% + AJD</span>
               </button>
+              <button
+                type="button"
+                className={`${styles.transmisionBtn} ${tipoTransmision === 'segunda-mano-renuncia' ? styles.active : ''}`}
+                onClick={() => setTipoTransmision('segunda-mano-renuncia')}
+                aria-pressed={tipoTransmision === 'segunda-mano-renuncia'}
+              >
+                <span className={styles.transmisionIcon} aria-hidden="true">🤝</span>
+                <span>2ª mano con renuncia al IVA</span>
+                <span className={styles.transmisionSub}>IVA {formatNumber(IVA_NAVE_INDUSTRIAL, 0)}% (ISP) + AJD</span>
+              </button>
             </div>
             {tipoTransmision === 'segunda-mano' && (
               <p className={styles.avisoRenuncia} role="note">
                 <span aria-hidden="true">ℹ️</span> Entre empresarios con derecho a deducción es habitual{' '}
-                <strong>renunciar a la exención de IVA</strong>: la operación pasa a IVA con inversión del
-                sujeto pasivo, no se paga ITP y el AJD suele ir a un tipo incrementado. El simulador calcula
-                siempre ITP, así que en ese supuesto la cifra no es la tuya.
+                <strong>renunciar a la exención de IVA</strong> en la segunda transmisión: la operación
+                vuelve al IVA, lo autoliquida el comprador (inversión del sujeto pasivo) y no se paga ITP.
+                Si es tu caso, usa la tercera opción.
+              </p>
+            )}
+            {tipoTransmision === 'segunda-mano-renuncia' && (
+              <p className={styles.avisoRenuncia} role="note">
+                <span aria-hidden="true">ℹ️</span> Con renuncia a la exención el IVA no se paga al vendedor:
+                lo <strong>autoliquida el comprador</strong> (inversión del sujeto pasivo), y suele ser
+                deducible si tu actividad está sujeta a IVA. Ojo al AJD: varias comunidades le aplican un{' '}
+                <strong>tipo incrementado</strong> cuando hay renuncia, y aquí se calcula con el tipo
+                general de la tabla — consúltalo en tu comunidad.
               </p>
             )}
           </div>
@@ -575,9 +602,10 @@ export default function SimuladorNaveIndustrialPage() {
                 transmisión está exenta de IVA, pero cuando comprador y vendedor son empresarios con derecho
                 a deducción es habitual <strong>renunciar a esa exención</strong>. Entonces la operación vuelve
                 al IVA (con inversión del sujeto pasivo: lo declara el comprador) y no se paga ITP, aunque el
-                AJD suele ir a un tipo incrementado en muchas comunidades. Este simulador
-                <strong> no modela la renuncia</strong>: calcula siempre ITP en segunda mano. Si tu operación
-                es entre empresas, consúltalo con tu asesor antes de dar la cifra por buena.
+                AJD suele ir a un tipo incrementado en muchas comunidades. El simulador lo
+                contempla en su tercera opción, «2ª mano con renuncia al IVA»; lo que no ajusta es el tipo
+                incrementado de AJD que varias comunidades aplican en ese supuesto, así que conviene
+                contrastarlo con tu asesor.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>

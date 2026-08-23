@@ -191,6 +191,37 @@ test.describe('Simulador de gastos de compra de nave industrial — inspección 
    * Riesgo 1: el disclaimer crítico tiene que estar y NO puede ser colapsable
    * (_private/DISCLAIMER-POLICY.md, nivel 1 CRÍTICO).
    */
+  /**
+   * HALLAZGO 10 (contenido, medio) — reparado el 23/08/2026.
+   *
+   * La segunda transmisión de una nave está exenta de IVA, pero entre empresarios con derecho
+   * a deducción lo habitual es renunciar a la exención (art. 20.Dos LIVA): vuelve a haber IVA
+   * —autoliquidado por el comprador, inversión del sujeto pasivo— y NO se paga ITP. Para el
+   * público que la app declara (empresas y autónomos) ese es el caso frecuente, y la app lo
+   * negaba: forzaba ITP en toda segunda mano y su FAQ lo afirmaba sin matiz.
+   *
+   * Madrid, 500.000 €, con renuncia:
+   *   IVA 21 % = 105.000 · AJD 0,75 % = 3.750 · ITP = 0
+   *   notaría (medio) 1.076,61 · registro 345,12 · gestoría 500
+   *   → total gastos = 110.671,73 · coste total = 610.671,73
+   */
+  test('HALLAZGO 10 — la renuncia a la exención de IVA se puede elegir y liquida IVA + AJD, no ITP', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /renuncia al IVA/ }).click();
+    await page.selectOption('#select-ccaa', 'madrid');
+    await rellenar(page, PRECIO, '500000');
+
+    expect(await valorTarjeta(page, 'IVA (renuncia')).toBe('105.000,00 €');
+    // «3750,00 €» sin punto: es-ES no agrupa los millares de un número de cuatro cifras
+    expect(await valorTarjeta(page, 'AJD (')).toBe('3750,00 €');
+    // Ninguna TARJETA de resultado liquida ITP (el texto «ITP» sí sale en el recuadro de la
+    // comunidad y en el bloque educativo, que hablan del impuesto, no de esta operación)
+    await expect(page.locator('h3', { hasText: 'ITP (' })).toHaveCount(0);
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('610.671,73 €');
+    // Y se dice quién autoliquida ese IVA, que es lo que cambia respecto de la obra nueva
+    await expect(page.locator('body')).toContainText('inversión del sujeto pasivo');
+  });
+
   test('Disclaimer crítico presente y no colapsable', async ({ page }) => {
     await page.goto(RUTA);
     const disclaimer = page.locator('[class*="disclaimer" i]').first();
