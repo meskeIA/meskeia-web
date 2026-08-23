@@ -3,6 +3,20 @@
  * Actualizado: Junio 2026 (reconciliación 6 CCAA: Andalucía, Baleares, Castilla y León,
  * Extremadura, Murcia, Valencia)
  *
+ * ⚠️ ANTES DE UNIFICAR ESTE FICHERO CON `data/fiscal` (pendiente del 13/09/2026, hallazgo 31
+ * del Inspector): esto ya NO es solo una tabla de tipos. Desde el 23/08/2026 lleva LÓGICA
+ * propia, y moverla es parte del trabajo:
+ *
+ *   · la bonificación del 50 % de la cuota en Ceuta y Melilla (art. 57 bis TRLITPAJD), que
+ *     `calcularITP` y `calcularAJD` aplican solas porque se cumple por el SITIO del inmueble
+ *     y no por el comprador ni por el uso;
+ *   · `TERRITORIOS_SIN_IVA`, los tres donde no se liquida IVA sino IGIC o IPSI.
+ *
+ * Sustituir la constante y quedarse tan ancho deja a las 7 apps del clúster cobrando el
+ * doble en Ceuta otra vez, y liquidando un IVA que allí no existe. El candado que lo avisa
+ * es `tests/itp-bonificacion-ceuta-melilla.spec.ts`: si la unificación lo pone en rojo, es
+ * que se ha quedado algo por el camino.
+ *
  * Cambios verificados jun-2026:
  * - Murcia: tipo general 8% → 7,75% (Ley 3/2025, efectos 25/07/2025) — ATRM oficial
  * - Valencia: tipo general 10% → 9% (≤1M €; 11% por encima) desde 01/06/2026
