@@ -144,6 +144,18 @@
   border: 1px solid rgba(0, 0, 0, 0.1);
   position: relative;
   overflow: hidden;
+  /* Las celdas pasaron de <div> a <button> el 23/08/2026 para poder abrirse con el teclado.
+     Un botón no hereda la tipografía ni el color del texto, así que hay que devolvérselos
+     o las 118 celdas cambian de aspecto. */
+  font-family: inherit;
+  color: inherit;
+  text-align: center;
+}
+
+.elemento:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+  z-index: 11;
 }
 
 .elemento:hover {

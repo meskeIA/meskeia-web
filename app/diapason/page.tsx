@@ -23,6 +23,26 @@ const FRECUENCIAS_PRESET: FrecuenciaPreset[] = [
 
 export default function DiapasonPage() {
   const [frecuencia, setFrecuencia] = useState(440);
+  /**
+   * Lo escrito en el campo, aparte del número que suena.
+   *
+   * El input estaba controlado por `frecuencia` y su onChange acotaba en CADA pulsación:
+   * al teclear «440», el primer «4» caía bajo el mínimo de 20 y se convertía en 20, con los
+   * dígitos siguientes pegándose detrás. Escribir la frecuencia era imposible. Es el mismo
+   * defecto que el Inspector encontró en `generador-tonos` (hallazgo 127, 21/08/2026); aquí
+   * no lo había inspeccionado nadie, apareció al grepear el patrón por el catálogo.
+   */
+  const [frecuenciaTexto, setFrecuenciaTexto] = useState('440');
+
+  const DIAPASON_MIN = 20;
+  const DIAPASON_MAX = 2000;
+
+  /** Única puerta para cambiar la frecuencia desde fuera del campo (slider y presets) */
+  const aplicarFrecuencia = (n: number) => {
+    const v = Math.max(DIAPASON_MIN, Math.min(DIAPASON_MAX, Math.round(n)));
+    setFrecuencia(v);
+    setFrecuenciaTexto(String(v));
+  };
   const [reproduciendo, setReproduciendo] = useState(false);
   const [volumen, setVolumen] = useState(0.5);
   const [tipoOnda, setTipoOnda] = useState<OscillatorType>('sine');
@@ -116,7 +136,7 @@ export default function DiapasonPage() {
   }, [tipoOnda]);
 
   const seleccionarPreset = (preset: FrecuenciaPreset) => {
-    setFrecuencia(preset.frecuencia);
+    aplicarFrecuencia(preset.frecuencia);
   };
 
   return (
@@ -214,15 +234,21 @@ export default function DiapasonPage() {
             max="480"
             step="1"
             value={frecuencia}
-            onChange={(e) => setFrecuencia(parseInt(e.target.value))}
+            onChange={(e) => aplicarFrecuencia(parseInt(e.target.value, 10))}
             className={styles.customSlider}
           />
           <input
             type="number"
             min="20"
             max="2000"
-            value={frecuencia}
-            onChange={(e) => setFrecuencia(Math.max(20, Math.min(2000, parseInt(e.target.value) || 440)))}
+            value={frecuenciaTexto}
+            onChange={(e) => {
+              setFrecuenciaTexto(e.target.value);
+              const n = parseInt(e.target.value, 10);
+              if (Number.isFinite(n) && n >= DIAPASON_MIN && n <= DIAPASON_MAX) setFrecuencia(n);
+            }}
+            onBlur={() => aplicarFrecuencia(parseInt(frecuenciaTexto, 10) || 440)}
+            aria-label="Frecuencia personalizada en Hz"
             className={styles.customInput}
           />
         </div>

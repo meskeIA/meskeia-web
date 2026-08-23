@@ -7,6 +7,8 @@
 // TIPOS
 // ═══════════════════════════════════════════════════════════════════════
 
+import { parsearFormulaQuimica } from '@/lib/formula-quimica';
+
 export type TipoElemento = 'metal' | 'nometal' | 'hidrogeno';
 
 export interface Elemento {
@@ -291,97 +293,19 @@ export function conIndice(simbolo: string, n: number): string {
 // ═══════════════════════════════════════════════════════════════════════
 
 export function parsearFormula(entrada: string): { ok: true; parseo: Parseo } | { ok: false; fallo: ErrorAnalisis } {
-  const f = entrada
-    .replace(/\s+/g, '')
-    .replace(/[₀-₉]/g, (d) => String(SUBINDICES.indexOf(d)))
-    .replace(/[[{]/g, '(')
-    .replace(/[\]}]/g, ')');
-
-  if (!f) return { ok: false, fallo: { error: 'Escribe una fórmula para analizarla.', pista: null } };
-  if (!/^[A-Za-z0-9()]+$/.test(f)) {
-    return { ok: false, fallo: { error: 'La fórmula solo admite letras, números y paréntesis.', pista: 'Ejemplos válidos: Fe2O3, Ca(OH)2, Al2(SO4)3.' } };
-  }
-
-  const pilaComp: Record<string, number>[] = [{}];
-  const pilaOrden: string[][] = [[]];
-  const grupos: { formula: string; n: number }[] = [];
-  let i = 0;
-
-  while (i < f.length) {
-    const c = f[i];
-
-    if (c === '(') {
-      pilaComp.push({});
-      pilaOrden.push([]);
-      i++;
-      continue;
-    }
-
-    if (c === ')') {
-      if (pilaComp.length === 1) {
-        return { ok: false, fallo: { error: 'Hay un paréntesis que se cierra sin haberse abierto.', pista: null } };
-      }
-      i++;
-      let num = '';
-      while (i < f.length && /\d/.test(f[i])) {
-        num += f[i];
-        i++;
-      }
-      const mult = num ? parseInt(num, 10) : 1;
-      if (mult === 0) return { ok: false, fallo: { error: 'Un subíndice no puede valer 0.', pista: null } };
-
-      const comp = pilaComp.pop() as Record<string, number>;
-      const orden = pilaOrden.pop() as string[];
-      grupos.push({ formula: orden.map((s) => conIndice(s, comp[s])).join(''), n: mult });
-
-      const destino = pilaComp[pilaComp.length - 1];
-      const ordenDestino = pilaOrden[pilaOrden.length - 1];
-      for (const s of orden) {
-        if (!(s in destino)) ordenDestino.push(s);
-        destino[s] = (destino[s] ?? 0) + comp[s] * mult;
-      }
-      continue;
-    }
-
-    const m = f.slice(i).match(/^([A-Z][a-z]?)(\d*)/);
-    if (!m) {
-      return {
-        ok: false,
-        fallo: {
-          error: `No entiendo «${f.slice(i, i + 3)}».`,
-          pista: 'Los símbolos llevan la primera letra en mayúscula y la segunda en minúscula: Fe, Na, Cl, Ca.',
-        },
-      };
-    }
-    const simbolo = m[1];
-    const digitos = m[2];
-    if (!MAPA_ELEMENTOS[simbolo]) {
-      return {
-        ok: false,
-        fallo: {
-          error: `El elemento «${simbolo}» no está en la tabla de esta herramienta.`,
-          pista: `Se cubren ${ELEMENTOS.length} elementos: los habituales en formulación de secundaria. Revisa también las mayúsculas: «CO» es carbono con oxígeno y «Co» es cobalto.`,
-        },
-      };
-    }
-    const n = digitos ? parseInt(digitos, 10) : 1;
-    if (n === 0) return { ok: false, fallo: { error: 'Un subíndice no puede valer 0.', pista: null } };
-
-    const destino = pilaComp[pilaComp.length - 1];
-    const ordenDestino = pilaOrden[pilaOrden.length - 1];
-    if (!(simbolo in destino)) ordenDestino.push(simbolo);
-    destino[simbolo] = (destino[simbolo] ?? 0) + n;
-    i += m[0].length;
-  }
-
-  if (pilaComp.length > 1) {
-    return { ok: false, fallo: { error: 'Falta cerrar un paréntesis.', pista: null } };
-  }
-
-  return {
-    ok: true,
-    parseo: { comp: pilaComp[0], orden: pilaOrden[0], grupos, normalizada: f },
-  };
+  // El algoritmo vive en lib/formula-quimica.ts desde el 23/08/2026. Estaba aquí, y era el
+  // único correcto del catálogo: `tabla-periodica` tenía el suyo propio con una expresión
+  // regular que se saltaba los paréntesis y devolvía masas falsas sin avisar (hallazgo 121
+  // del Inspector). Compartirlo es lo que impide que vuelvan a divergir; lo que NO se puede
+  // compartir es la tabla de elementos, porque aquí son los 42 de formulación de secundaria
+  // y allí los 118 — por eso el validador entra por parámetro.
+  return parsearFormulaQuimica(entrada, {
+    simboloValido: (s) => Boolean(MAPA_ELEMENTOS[s]),
+    errorSimbolo: (s) => ({
+      error: `El elemento «${s}» no está en la tabla de esta herramienta.`,
+      pista: `Se cubren ${ELEMENTOS.length} elementos: los habituales en formulación de secundaria. Revisa también las mayúsculas: «CO» es carbono con oxígeno y «Co» es cobalto.`,
+    }),
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════════════

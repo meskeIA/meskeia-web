@@ -1,6 +1,21 @@
 /**
  * Base de datos de 118 elementos químicos
  * Tabla Periódica Interactiva - meskeIA
+ *
+ * MASAS ATÓMICAS
+ * ──────────────
+ * Pesos atómicos estándar de la IUPAC / CIAAW, tabla 2021 (sin cambios en la revisión de
+ * 2023 para estos elementos). Fuente: https://iupac.qmul.ac.uk/AtWt/
+ * Verificado: 2026-08-23.
+ *
+ * ⚠️ Los pesos atómicos SE REVISAN: la IUPAC publica actualizaciones cada pocos años y
+ * algunos elementos cambian de cifra. Hasta el 23/08/2026 el módulo no declaraba fuente ni
+ * fecha, y arrastraba dos rezagados que nadie podía fechar — el selenio con 78,960 (valor
+ * anterior a la revisión de 2013; el vigente es 78,971) y el litio con 6,941 (anterior a
+ * 2009; hoy 6,94). Los encontró el Inspector el 21/08/2026 (hallazgo 125).
+ *
+ * Al actualizar masas, comprobar también los tests de tests/formula-quimica.spec.ts y los
+ * casos de masa molar de tests/apps/tabla-periodica.spec.ts, que llevan totales escritos.
  */
 
 export interface Elemento {
@@ -57,7 +72,7 @@ export const elementos: Elemento[] = [
   { numero: 2, simbolo: "He", nombre: "Helio", masa: 4.003, grupo: 18, periodo: 1, familia: "gases-nobles", estado: "gas", electronegatividad: null, radioAtomico: 31, configuracionElectronica: "1s²", usos: ["Globos", "Criogenia", "Respiración profunda"], datoCurioso: "Es el segundo elemento más abundante del universo, pero raro en la Tierra." },
 
   // Período 2
-  { numero: 3, simbolo: "Li", nombre: "Litio", masa: 6.941, grupo: 1, periodo: 2, familia: "metales-alcalinos", estado: "solido", electronegatividad: 0.98, radioAtomico: 167, configuracionElectronica: "[He] 2s¹", usos: ["Baterías", "Medicamentos", "Aleaciones"], datoCurioso: "Es el metal más ligero y puede flotar en el agua." },
+  { numero: 3, simbolo: "Li", nombre: "Litio", masa: 6.94, grupo: 1, periodo: 2, familia: "metales-alcalinos", estado: "solido", electronegatividad: 0.98, radioAtomico: 167, configuracionElectronica: "[He] 2s¹", usos: ["Baterías", "Medicamentos", "Aleaciones"], datoCurioso: "Es el metal más ligero y puede flotar en el agua." },
   { numero: 4, simbolo: "Be", nombre: "Berilio", masa: 9.012, grupo: 2, periodo: 2, familia: "metales-alcalinoterreos", estado: "solido", electronegatividad: 1.57, radioAtomico: 112, configuracionElectronica: "[He] 2s²", usos: ["Aleaciones aeroespaciales", "Rayos X", "Reactores nucleares"], datoCurioso: "Es extremadamente tóxico pero indispensable en aeronáutica." },
   { numero: 5, simbolo: "B", nombre: "Boro", masa: 10.811, grupo: 13, periodo: 2, familia: "metaloides", estado: "solido", electronegatividad: 2.04, radioAtomico: 87, configuracionElectronica: "[He] 2s² 2p¹", usos: ["Vidrio borosilicato", "Detergentes", "Semiconductores"], datoCurioso: "Forma enlaces químicos únicos que desafían las reglas tradicionales." },
   { numero: 6, simbolo: "C", nombre: "Carbono", masa: 12.011, grupo: 14, periodo: 2, familia: "no-metales", estado: "solido", electronegatividad: 2.55, radioAtomico: 67, configuracionElectronica: "[He] 2s² 2p²", usos: ["Base de vida orgánica", "Acero", "Diamantes", "Grafito"], datoCurioso: "Puede formar más compuestos que cualquier otro elemento." },
@@ -92,7 +107,7 @@ export const elementos: Elemento[] = [
   { numero: 31, simbolo: "Ga", nombre: "Galio", masa: 69.723, grupo: 13, periodo: 4, familia: "otros-metales", estado: "solido", electronegatividad: 1.81, radioAtomico: 136, configuracionElectronica: "[Ar] 3d¹⁰ 4s² 4p¹", usos: ["Semiconductores", "LEDs", "Termómetros"], datoCurioso: "Se derrite en la mano (punto fusión 29.76°C)." },
   { numero: 32, simbolo: "Ge", nombre: "Germanio", masa: 72.63, grupo: 14, periodo: 4, familia: "metaloides", estado: "solido", electronegatividad: 2.01, radioAtomico: 125, configuracionElectronica: "[Ar] 3d¹⁰ 4s² 4p²", usos: ["Semiconductores", "Fibra óptica", "Detectores"], datoCurioso: "Predicho por Mendeleev como 'eka-silicio'." },
   { numero: 33, simbolo: "As", nombre: "Arsénico", masa: 74.922, grupo: 15, periodo: 4, familia: "metaloides", estado: "solido", electronegatividad: 2.18, radioAtomico: 114, configuracionElectronica: "[Ar] 3d¹⁰ 4s² 4p³", usos: ["Semiconductores", "Pesticidas", "Medicina"], datoCurioso: "Históricamente usado como veneno por su difícil detección." },
-  { numero: 34, simbolo: "Se", nombre: "Selenio", masa: 78.96, grupo: 16, periodo: 4, familia: "no-metales", estado: "solido", electronegatividad: 2.55, radioAtomico: 103, configuracionElectronica: "[Ar] 3d¹⁰ 4s² 4p⁴", usos: ["Electrónica", "Vidrio", "Suplementos"], datoCurioso: "Esencial en pequeñas cantidades, tóxico en grandes." },
+  { numero: 34, simbolo: "Se", nombre: "Selenio", masa: 78.971, grupo: 16, periodo: 4, familia: "no-metales", estado: "solido", electronegatividad: 2.55, radioAtomico: 103, configuracionElectronica: "[Ar] 3d¹⁰ 4s² 4p⁴", usos: ["Electrónica", "Vidrio", "Suplementos"], datoCurioso: "Esencial en pequeñas cantidades, tóxico en grandes." },
   { numero: 35, simbolo: "Br", nombre: "Bromo", masa: 79.904, grupo: 17, periodo: 4, familia: "halogenos", estado: "liquido", electronegatividad: 2.96, radioAtomico: 94, configuracionElectronica: "[Ar] 3d¹⁰ 4s² 4p⁵", usos: ["Retardantes de fuego", "Fotografía", "Medicina"], datoCurioso: "Único no metal líquido a temperatura ambiente." },
   { numero: 36, simbolo: "Kr", nombre: "Kriptón", masa: 83.798, grupo: 18, periodo: 4, familia: "gases-nobles", estado: "gas", electronegatividad: 3.00, radioAtomico: 88, configuracionElectronica: "[Ar] 3d¹⁰ 4s² 4p⁶", usos: ["Iluminación", "Láseres", "Fotografía"], datoCurioso: "Usado para definir el metro hasta 1983." },
 

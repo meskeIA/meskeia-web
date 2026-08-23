@@ -34,7 +34,7 @@ import { test, expect, devices, type Page } from '@playwright/test';
  * Chromium arranca con `--autoplay-policy=no-user-gesture-required` para que el
  * AudioContext no se quede suspendido en un navegador sin usuario delante.
  *
- * Los HALLAZGOS ABIERTOS van al final, marcados con `test.fail()`: afirman lo que la app
+ * Los HALLAZGOS ABIERTOS van al final, marcados con `test()`: afirman lo que la app
  * debería hacer y hoy fallan a propósito. El día que se reparen saldrán en ROJO
  * («expected to fail, but passed») y habrá que quitarles la marca, quedando como regresión.
  */
@@ -250,7 +250,9 @@ test('CASO 1 — 440 Hz senoidal crea un oscilador real a 440 Hz, y los cambios 
   ];
   for (const [nota, semitonos] of semitonosDesdeLa4) {
     const texto = await page.getByRole('button', { name: nota, exact: false }).first().innerText();
-    const anunciada = Number(/([\d.]+)\s*Hz/.exec(texto)?.[1]);
+    // Desde el 23/08/2026 los presets se imprimen en formato español («261,63 Hz»), que es
+    // obligatorio: la coma es el separador DECIMAL, no de millares. Leerlo con punto daba 63.
+    const anunciada = Number((/([\d.,]+)\s*Hz/.exec(texto)?.[1] ?? '').replace(/\./g, '').replace(',', '.'));
     expect(anunciada, `${nota} anunciada por la app`).toBeCloseTo(
       440 * Math.pow(2, semitonos / 12),
       1,
@@ -331,30 +333,39 @@ test('CASO 3 — un valor fuera de rango se satura en el borde y nunca genera Na
   await botonReproducir(page).click();
   await expect.poll(async () => (await registros(page)).length, { timeout: 5000 }).toBe(1);
 
+  // ⚠️ Reescrito el 23/08/2026 al reparar el hallazgo 127. Este caso afirmaba que el valor
+  // se satura NADA MÁS escribirlo, y esa era justamente la causa del defecto: acotar en cada
+  // pulsación hacía imposible teclear («1000» acababa en 20.000 Hz). Ahora se acota al SALIR
+  // del campo, así que la comprobación es la misma con un blur() de por medio — el borde
+  // sigue siendo el borde, y sigue sin haber NaN.
+  const saturaA = async (escrito: string, esperado: string) => {
+    await campoFrecuencia(page).fill(escrito);
+    await campoFrecuencia(page).blur();
+    await expect(campoFrecuencia(page)).toHaveValue(esperado);
+  };
+
   // 99.999 Hz → techo prometido, 20.000 Hz (no 99.999, ni Nyquist, ni NaN).
-  await campoFrecuencia(page).fill('99999');
-  await expect(campoFrecuencia(page)).toHaveValue('20000');
+  await saturaA('99999', '20000');
   await esperarFrecuencia(page, 20000, 0);
 
   // 20.001 Hz, un hercio por encima del techo → 20.000 Hz.
-  await campoFrecuencia(page).fill('20001');
-  await expect(campoFrecuencia(page)).toHaveValue('20000');
+  await saturaA('20001', '20000');
 
   // Negativo → suelo prometido, 20 Hz (una frecuencia negativa es audio inválido).
-  await campoFrecuencia(page).fill('-50');
-  await expect(campoFrecuencia(page)).toHaveValue('20');
+  await saturaA('-50', '20');
   await esperarFrecuencia(page, 20, 0);
 
   // Cero y 19 Hz, justo por debajo del suelo → 20 Hz.
-  await campoFrecuencia(page).fill('0');
-  await expect(campoFrecuencia(page)).toHaveValue('20');
-  await campoFrecuencia(page).fill('19');
-  await expect(campoFrecuencia(page)).toHaveValue('20');
+  await saturaA('0', '20');
+  await saturaA('19', '20');
 
-  // Texto: el campo numérico lo ignora y el estado sigue siendo un número válido.
+  // Texto: el campo numérico lo ignora, y al salir vuelve a haber un número válido.
+  // (Mientras se escribe el campo puede quedar vacío: eso es lo que permite teclear una
+  // frecuencia entera sin que el primer dígito se sature. Ver hallazgo 127.)
   await campoFrecuencia(page).click();
   await campoFrecuencia(page).press('Control+a');
   await campoFrecuencia(page).pressSequentially('abc', { delay: 30 });
+  await campoFrecuencia(page).blur();
   await expect(campoFrecuencia(page)).toHaveValue(/^\d+(\.\d+)?$/);
 
   // Ninguna de las frecuencias que la app ha llegado a aplicar es NaN ni absurda.
@@ -378,7 +389,7 @@ test('CASO 3 — un valor fuera de rango se satura en el borde y nunca genera Na
  * los dígitos siguientes se añaden detrás de ese 20. Resultado medido: «1000» → 20000,
  * «440» → 2040, «50» → 200, «15000» → 20000. Idéntico en escritorio y en móvil.
  */
-test.fail('HALLAZGO — teclear una frecuencia a mano debe dar esa frecuencia', async ({ page }) => {
+test('HALLAZGO — teclear una frecuencia a mano debe dar esa frecuencia', async ({ page }) => {
   await abrir(page);
   await campoFrecuencia(page).click();
   await campoFrecuencia(page).press('Control+a');
@@ -392,7 +403,7 @@ test.fail('HALLAZGO — teclear una frecuencia a mano debe dar esa frecuencia', 
  * muestra frecuencias de hasta 99.999 Hz mientras el oscilador satura en Nyquist
  * (24.000 Hz con sampleRate 48.000): la app enseña una frecuencia que NO está emitiendo.
  */
-test.fail(
+test(
   'HALLAZGO — el barrido debe respetar el rango 20–20.000 Hz que promete la app',
   async ({ page }) => {
     await abrir(page);
@@ -426,7 +437,7 @@ test.fail(
  * hay forma de saber qué onda está seleccionada. Mismo caso en los presets `.presetActivo`.
  * Regla del proyecto: «todo botón que cambie un filtro o un estado visual lleva aria-pressed».
  */
-test.fail('HALLAZGO — el selector de onda debe exponer cuál está activa', async ({ page }) => {
+test('HALLAZGO — el selector de onda debe exponer cuál está activa', async ({ page }) => {
   await abrir(page);
   await page.getByRole('button', { name: /Cuadrada/ }).click();
   await expect(page.getByRole('button', { name: /Cuadrada/ })).toHaveAttribute(
@@ -440,7 +451,7 @@ test.fail('HALLAZGO — el selector de onda debe exponer cuál está activa', as
  * onda y 🔉 🔊 en el control de volumen (medidos: 28 emojis expuestos frente a 4 ocultos).
  * Un lector de pantalla los anuncia («onda ondulada Senoidal»).
  */
-test.fail(
+test(
   'HALLAZGO — los iconos decorativos del selector de onda deben ir ocultos a la ayuda técnica',
   async ({ page }) => {
     await abrir(page);
@@ -454,7 +465,7 @@ test.fail(
  * en crudo, con punto decimal («261.63 Hz»), mientras el bloque educativo de la misma
  * página escribe correctamente «261,63 Hz». La app se contradice a sí misma.
  */
-test.fail('HALLAZGO — los presets de notas deben usar coma decimal', async ({ page }) => {
+test('HALLAZGO — los presets de notas deben usar coma decimal', async ({ page }) => {
   await abrir(page);
   await expect(page.getByRole('button', { name: /Do \(C4\)/ })).toContainText('261,63 Hz');
 });

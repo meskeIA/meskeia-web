@@ -53,6 +53,7 @@ export default function TransparencyBanner() {
           </a>
         </div>
         <button
+          type="button"
           onClick={handleDismiss}
           className={styles.closeButton}
           aria-label="Cerrar aviso de transparencia"

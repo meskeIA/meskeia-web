@@ -1,11 +1,12 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import styles from './TablaPeriodica.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { elementos, elementosPorSimbolo, FAMILIAS, ESTADOS, Elemento } from './elementos-data';
+import { parsearFormulaQuimica } from '@/lib/formula-quimica';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Posiciones especiales en el grid de la tabla periódica
@@ -61,43 +62,32 @@ export default function TablaPerodicaPage() {
     }
 
     try {
-      // Parsear fórmula química: H2O, NaCl, C6H12O6, Ca(OH)2, etc.
-      const formula = formulaMolar.trim();
-      const elementosEncontrados: { simbolo: string; cantidad: number }[] = [];
+      // El parser vive en lib/formula-quimica.ts y usa una PILA, no una expresión regular:
+      // los paréntesis anidan y una regex no puede contarlos. El anterior era
+      // /([A-Z][a-z]?)(\d*)/g, que se saltaba «(» y «)» y perdía el subíndice del grupo
+      // entero — Ca(OH)2 daba 57,0850 g/mol en vez de 74,0920, sin avisar de nada.
+      const resultado = parsearFormulaQuimica(formulaMolar, {
+        simboloValido: (s) => Boolean(elementosPorSimbolo[s]),
+        errorSimbolo: (s) => ({ error: `Elemento "${s}" no reconocido`, pista: null }),
+        errorVacia: () => ({ error: 'Ingresa una fórmula química', pista: null }),
+      });
 
-      // Regex para capturar elementos y sus cantidades
-      // Soporta: H, He, H2, Ca, Ca2, etc.
-      const regex = /([A-Z][a-z]?)(\d*)/g;
-      let match;
-
-      while ((match = regex.exec(formula)) !== null) {
-        const simbolo = match[1];
-        const cantidad = match[2] ? parseInt(match[2]) : 1;
-
-        if (!elementosPorSimbolo[simbolo]) {
-          setErrorMasa(`Elemento "${simbolo}" no reconocido`);
-          return;
-        }
-
-        // Buscar si ya existe el elemento
-        const existente = elementosEncontrados.find(e => e.simbolo === simbolo);
-        if (existente) {
-          existente.cantidad += cantidad;
-        } else {
-          elementosEncontrados.push({ simbolo, cantidad });
-        }
+      if (!resultado.ok) {
+        setErrorMasa(resultado.fallo.error);
+        return;
       }
 
-      if (elementosEncontrados.length === 0) {
+      const { comp, orden } = resultado.parseo;
+      if (orden.length === 0) {
         setErrorMasa('No se encontraron elementos válidos');
         return;
       }
 
       // Calcular masa total
       let masaTotal = 0;
-      const desglose = elementosEncontrados.map(({ simbolo, cantidad }) => {
-        const elemento = elementosPorSimbolo[simbolo];
-        const masa = elemento.masa * cantidad;
+      const desglose = orden.map((simbolo) => {
+        const cantidad = comp[simbolo];
+        const masa = elementosPorSimbolo[simbolo].masa * cantidad;
         masaTotal += masa;
         return { simbolo, cantidad, masa };
       });
@@ -120,12 +110,36 @@ export default function TablaPerodicaPage() {
     setElementoSeleccionado(null);
   };
 
+  /**
+   * La ficha se comporta como un diálogo de verdad: al abrirse el foco entra en ella
+   * —antes se quedaba en BODY, así que con teclado no había forma de llegar a su contenido—,
+   * Escape la cierra, y al cerrarse el foco vuelve a la celda desde la que se abrió, que es
+   * lo que evita tener que retabular las 118 casillas.
+   */
+  const cerrarModalRef = useRef<HTMLButtonElement>(null);
+  const origenFocoRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!elementoSeleccionado) return;
+    origenFocoRef.current = document.activeElement as HTMLElement | null;
+    cerrarModalRef.current?.focus();
+
+    const alPulsar = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') cerrarModal();
+    };
+    document.addEventListener('keydown', alPulsar);
+    return () => {
+      document.removeEventListener('keydown', alPulsar);
+      origenFocoRef.current?.focus();
+    };
+  }, [elementoSeleccionado]);
+
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>⚛️ Tabla Periódica Interactiva</h1>
+        <h1 className={styles.title}><span aria-hidden="true">⚛️</span> Tabla Periódica Interactiva</h1>
         <p className={styles.subtitle}>
           Explora los 118 elementos químicos con información detallada y calculadora de masa molar
         </p>
@@ -178,8 +192,8 @@ export default function TablaPerodicaPage() {
             />
           </div>
 
-          <button onClick={limpiarFiltros} className={styles.btnOutline}>
-            🗑️ Limpiar
+          <button type="button" onClick={limpiarFiltros} className={styles.btnOutline}>
+            <span aria-hidden="true">🗑️</span> Limpiar
           </button>
         </div>
 
@@ -196,7 +210,12 @@ export default function TablaPerodicaPage() {
             const estaFiltrado = !elementosFiltrados.includes(elemento);
 
             return (
-              <div
+              // Es un <button> y no un <div onClick>: la ficha es donde vive todo el detalle
+              // que la app promete, y con divs no se llegaba a NINGUNA de las 118 con el
+              // teclado (WCAG 2.1.1, nivel A). Un botón nativo trae foco, Enter y Espacio
+              // sin escribir un solo manejador.
+              <button
+                type="button"
                 key={elemento.numero}
                 className={`${styles.elemento} ${styles[elemento.familia]} ${estaFiltrado ? styles.filtrado : ''}`}
                 style={{
@@ -204,13 +223,17 @@ export default function TablaPerodicaPage() {
                   gridRow: pos.fila,
                 }}
                 onClick={() => !estaFiltrado && setElementoSeleccionado(elemento)}
+                // Los filtrados salen del orden de tabulación en vez de quedar como trampas
+                // silenciosas: siguen visibles, atenuados, pero no reciben foco.
+                disabled={estaFiltrado}
+                aria-label={`${elemento.nombre} (${elemento.simbolo}), número atómico ${elemento.numero}`}
                 title={`${elemento.nombre} (${elemento.simbolo})`}
               >
                 <span className={styles.numeroAtomico}>{elemento.numero}</span>
                 <span className={styles.simbolo}>{elemento.simbolo}</span>
                 <span className={styles.nombre}>{elemento.nombre}</span>
                 <span className={styles.masa}>{formatNumber(elemento.masa, elemento.masa % 1 === 0 ? 0 : 2)}</span>
-              </div>
+              </button>
             );
           })}
 
@@ -239,7 +262,7 @@ export default function TablaPerodicaPage() {
 
       {/* Calculadora de Masa Molar */}
       <div className={styles.calculadoraPanel}>
-        <h2>🧮 Calculadora de Masa Molar</h2>
+        <h2><span aria-hidden="true">🧮</span> Calculadora de Masa Molar</h2>
         <p className={styles.calculadoraDesc}>
           Ingresa una fórmula química para calcular su masa molar (ej: H2O, NaCl, C6H12O6)
         </p>
@@ -253,7 +276,7 @@ export default function TablaPerodicaPage() {
             className={styles.inputFormula}
             onKeyDown={(e) => e.key === 'Enter' && calcularMasaMolar()}
           />
-          <button onClick={calcularMasaMolar} className={styles.btnPrimary}>
+          <button type="button" onClick={calcularMasaMolar} className={styles.btnPrimary}>
             Calcular
           </button>
         </div>
@@ -294,26 +317,44 @@ export default function TablaPerodicaPage() {
 
         <div className={styles.ejemplosFormula}>
           <span>Ejemplos:</span>
-          <button onClick={() => { setFormulaMolar('H2O'); setResultadoMasa(null); }}>H₂O</button>
-          <button onClick={() => { setFormulaMolar('NaCl'); setResultadoMasa(null); }}>NaCl</button>
-          <button onClick={() => { setFormulaMolar('C6H12O6'); setResultadoMasa(null); }}>C₆H₁₂O₆</button>
-          <button onClick={() => { setFormulaMolar('H2SO4'); setResultadoMasa(null); }}>H₂SO₄</button>
-          <button onClick={() => { setFormulaMolar('CaCO3'); setResultadoMasa(null); }}>CaCO₃</button>
+          <button type="button" onClick={() => { setFormulaMolar('H2O'); setResultadoMasa(null); }}>H₂O</button>
+          <button type="button" onClick={() => { setFormulaMolar('NaCl'); setResultadoMasa(null); }}>NaCl</button>
+          <button type="button" onClick={() => { setFormulaMolar('C6H12O6'); setResultadoMasa(null); }}>C₆H₁₂O₆</button>
+          <button type="button" onClick={() => { setFormulaMolar('H2SO4'); setResultadoMasa(null); }}>H₂SO₄</button>
+          <button type="button" onClick={() => { setFormulaMolar('CaCO3'); setResultadoMasa(null); }}>CaCO₃</button>
+          {/* Con paréntesis: es la mitad de las fórmulas de secundaria (hidróxidos, nitratos,
+              sulfatos, fosfatos) y hasta el 23/08/2026 la calculadora las daba mal en silencio */}
+          <button type="button" onClick={() => { setFormulaMolar('Ca(OH)2'); setResultadoMasa(null); }}>Ca(OH)₂</button>
+          <button type="button" onClick={() => { setFormulaMolar('Al2(SO4)3'); setResultadoMasa(null); }}>Al₂(SO₄)₃</button>
         </div>
       </div>
 
       {/* Modal de Elemento */}
       {elementoSeleccionado && (
         <div className={styles.modalOverlay} onClick={cerrarModal}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <button className={styles.cerrarModal} onClick={cerrarModal}>✕</button>
+          <div
+            className={styles.modal}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="titulo-ficha-elemento"
+          >
+            <button
+              type="button"
+              ref={cerrarModalRef}
+              className={styles.cerrarModal}
+              onClick={cerrarModal}
+              aria-label={`Cerrar la ficha de ${elementoSeleccionado.nombre}`}
+            >
+              <span aria-hidden="true">✕</span>
+            </button>
 
             <div className={styles.modalHeader}>
               <div className={`${styles.modalSimbolo} ${styles[elementoSeleccionado.familia]}`}>
                 {elementoSeleccionado.simbolo}
               </div>
               <div className={styles.modalInfo}>
-                <h2>{elementoSeleccionado.nombre}</h2>
+                <h2 id="titulo-ficha-elemento">{elementoSeleccionado.nombre}</h2>
                 <p>Número atómico: {elementoSeleccionado.numero}</p>
                 <p>Masa atómica: {formatNumber(elementoSeleccionado.masa, 3)} u</p>
               </div>
@@ -362,7 +403,7 @@ export default function TablaPerodicaPage() {
               </div>
 
               <div className={styles.datoCurioso}>
-                <h3>💡 Dato curioso</h3>
+                <h3><span aria-hidden="true">💡</span> Dato curioso</h3>
                 <p>{elementoSeleccionado.datoCurioso}</p>
               </div>
             </div>
@@ -377,7 +418,7 @@ export default function TablaPerodicaPage() {
       >
         {/* ========== SECCIÓN 1: TABLA COMPARATIVA ========== */}
         <section className={styles.comparativaSection}>
-          <h2>📊 Grupos principales de la tabla periódica</h2>
+          <h2><span aria-hidden="true">📊</span> Grupos principales de la tabla periódica</h2>
           <p className={styles.comparativaSubtitle}>
             Comparativa de los siete grupos y categorías más importantes: propiedades, electronegatividad, estado, reactividad, usos y elemento representativo
           </p>
@@ -466,7 +507,7 @@ export default function TablaPerodicaPage() {
 
         {/* ========== SECCIÓN 2: ESCENARIOS ========== */}
         <section className={styles.escenariosSection}>
-          <h2>🎭 Escenarios: La tabla periódica en contextos profesionales</h2>
+          <h2><span aria-hidden="true">🎭</span> Escenarios: La tabla periódica en contextos profesionales</h2>
           <p className={styles.escenariosSubtitle}>
             Casos reales de cómo diferentes profesionales aplican el conocimiento de la tabla periódica
           </p>
@@ -528,7 +569,7 @@ export default function TablaPerodicaPage() {
 
         {/* ========== SECCIÓN 3: FAQ ========== */}
         <section className={styles.faqSection}>
-          <h2>❓ Preguntas frecuentes sobre la tabla periódica</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas frecuentes sobre la tabla periódica</h2>
 
           <div className={styles.faqGrid}>
             <div className={styles.faqItem}>
@@ -541,7 +582,7 @@ export default function TablaPerodicaPage() {
             <div className={styles.faqItem}>
               <h3 className={styles.faqQuestion}>¿Qué son los elementos del bloque f (lantánidos y actínidos)?</h3>
               <p className={styles.faqAnswer}>
-                Los 14 lantánidos (Z=57-71) tienen configuración [Xe]4f<sup>n</sup>. Muy similares entre sí (misma configuración exterior 5d¹6s²), difíciles de separar. Usados en imanes de neodimio, LEDs, catalizadores. Los actínidos (Z=89-103) incluyen uranio y plutonio, casi todos radiactivos.
+                Los 15 lantánidos (Z=57-71) tienen configuración [Xe]4f<sup>n</sup> 6s². Muy similares entre sí —la capa que se llena es interna, así que apenas cambia el comportamiento químico—, difíciles de separar. Solo La, Ce, Gd y Lu llevan además un electrón 5d¹. Usados en imanes de neodimio, LEDs, catalizadores. Los actínidos (Z=89-103) incluyen uranio y plutonio, casi todos radiactivos.
               </p>
             </div>
 
@@ -591,7 +632,7 @@ export default function TablaPerodicaPage() {
 
         {/* ========== SECCIÓN 4: GUÍA PASO A PASO ========== */}
         <section className={styles.guiaSection}>
-          <h2>📋 Guía paso a paso: determinar propiedades de un elemento por su posición</h2>
+          <h2><span aria-hidden="true">📋</span> Guía paso a paso: determinar propiedades de un elemento por su posición</h2>
           <p className={styles.guiaSubtitle}>
             7 pasos para deducir electronegatividad, radio atómico, reactividad y configuración electrónica
           </p>
@@ -642,7 +683,7 @@ export default function TablaPerodicaPage() {
               <div className={styles.stepContent}>
                 <h3>Predecir el radio atómico</h3>
                 <p>
-                  Disminuye → (más protones sin más capas). Aumenta ↓ (más capas electrónicas). El mayor radio es Cs (262 pm), el menor el He (31 pm).
+                  Disminuye → (más protones sin más capas). Aumenta ↓ (más capas electrónicas). El mayor radio de esta tabla es el Fr (348 pm), seguido del Cs (298 pm); el menor, el He (31 pm). Ojo: hay varias escalas de radio atómico y sus cifras no coinciden, así que compara siempre dentro de la misma.
                 </p>
               </div>
             </div>
@@ -671,7 +712,7 @@ export default function TablaPerodicaPage() {
 
         {/* ========== SECCIÓN 5: MEJORES PRÁCTICAS ========== */}
         <section className={styles.tipsSection}>
-          <h2>💡 Mejores prácticas para dominar la tabla periódica</h2>
+          <h2><span aria-hidden="true">💡</span> Mejores prácticas para dominar la tabla periódica</h2>
 
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
@@ -726,13 +767,13 @@ export default function TablaPerodicaPage() {
 
         {/* ========== SECCIÓN 6: WARNING BOX ========== */}
         <div className={styles.warningBox}>
-          <h2>⚠️ Confusiones frecuentes en la tabla periódica</h2>
+          <h2><span aria-hidden="true">⚠️</span> Confusiones frecuentes en la tabla periódica</h2>
           <ul className={styles.warningList}>
             <li>
               <strong>Masa atómica ≠ número atómico</strong>: Z=número de protones (define el elemento). A=protones+neutrones (varía en isótopos). La masa atómica de la tabla es el promedio de isótopos naturales.
             </li>
             <li>
-              <strong>Grupos 1-18 vs sistema A/B antiguo</strong>: El Grupo 8 IUPAC incluye Fe, Co, Ni. El Grupo VIII antiguo incluía también los 9 metales de transición. Verifica siempre qué sistema usa tu tabla.
+              <strong>Grupos 1-18 vs sistema A/B antiguo</strong>: El Grupo 8 IUPAC incluye Fe, Co, Ni. El Grupo VIII antiguo agrupaba nueve elementos en una sola columna: Fe-Co-Ni, Ru-Rh-Pd y Os-Ir-Pt. Verifica siempre qué sistema usa tu tabla.
             </li>
             <li>
               <strong>Electrones de valencia en bloque d</strong>: Los metales de transición tienen 1-2 electrones en 4s pero también usan los 3d. Fe puede ser Fe²⁺ (pierde 4s²) o Fe³⁺ (pierde 4s² + 1 de 3d).
@@ -741,7 +782,7 @@ export default function TablaPerodicaPage() {
               <strong>Hidrógeno no es un metal alcalino</strong>: A pesar de estar en Grupo 1, H es un no metal gaseoso. En metales alcalinos, el tamaño y la energía de ionización bajan con Z; en H son atípicos.
             </li>
             <li>
-              <strong>Lantánidos y actínidos NO son &apos;aparte&apos;</strong>: Pertenecen a los períodos 6 y 7 respectivamente. Se sacan fuera por conveniencia de espacio, pero el cerio (Ce) sigue al bario (Ba) en el período 6.
+              <strong>Lantánidos y actínidos NO son &apos;aparte&apos;</strong>: Pertenecen a los períodos 6 y 7 respectivamente. Se sacan fuera por conveniencia de espacio, pero el lantano (La, 57) sigue al bario (Ba, 56) en el período 6.
             </li>
             <li>
               <strong>Confundir isótopos con iones</strong>: Isótopos: mismo Z, distinto N → mismas propiedades químicas. Iones: mismo Z, distinto número de electrones → distintas propiedades y carga eléctrica.

@@ -5,12 +5,18 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './GeneradorTonos.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { formatNumber } from '@/lib';
 
 interface FrecuenciaPreset {
   nombre: string;
   frecuencia: number;
   categoria: string;
 }
+
+/** Rango audible que la app promete en su <h1>, su title y jsonLd.features */
+const FREC_MIN = 20;
+const FREC_MAX = 20000;
+const acotarFrecuencia = (n: number) => Math.max(FREC_MIN, Math.min(FREC_MAX, n));
 
 const PRESETS: FrecuenciaPreset[] = [
   // Notas musicales
@@ -34,12 +40,39 @@ const PRESETS: FrecuenciaPreset[] = [
 
 export default function GeneradorTonosPage() {
   const [frecuencia, setFrecuencia] = useState(440);
+  /**
+   * Lo que se ve escrito en el campo, separado del número que se emite.
+   *
+   * El input estaba controlado directamente por `frecuencia` y su onChange saturaba el
+   * valor en CADA pulsación: al teclear «1000», el primer «1» caía bajo el mínimo, se
+   * convertía en 20, y los dígitos siguientes se pegaban detrás hasta acabar en 20.000 Hz
+   * —justo la frecuencia que la propia app pide evitar a volumen alto—. Escribir era
+   * imposible y no había ningún aviso. Ahora el texto se acota al salir del campo, no
+   * mientras se escribe.
+   */
+  const [frecuenciaTexto, setFrecuenciaTexto] = useState('440');
   const [reproduciendo, setReproduciendo] = useState(false);
   const [volumen, setVolumen] = useState(0.3);
   const [tipoOnda, setTipoOnda] = useState<OscillatorType>('sine');
   const [sweep, setSweep] = useState(false);
   const [sweepMin, setSweepMin] = useState(20);
   const [sweepMax, setSweepMax] = useState(2000);
+  const [sweepMinTexto, setSweepMinTexto] = useState('20');
+
+  /**
+   * Cambiar la frecuencia desde fuera del campo (slider, atajos, presets, barrido) pasa
+   * SIEMPRE por aquí, para que el número y lo escrito no se separen. Antes cada sitio
+   * llamaba a setFrecuencia por su cuenta y el campo mostraba lo que le tocara.
+   */
+  const aplicarFrecuencia = useCallback((n: number) => {
+    // NO se redondea: los presets musicales son fracciones (Do = 261,63 Hz) y redondear
+    // aquí las destruía —lo cazó el CASO 1 del propio spec al reparar el hallazgo 127—.
+    // Quien necesite un entero, como el barrido, lo redondea antes de llamar.
+    const v = acotarFrecuencia(n);
+    setFrecuencia(v);
+    setFrecuenciaTexto(String(v));
+  }, []);
+  const [sweepMaxTexto, setSweepMaxTexto] = useState('2000');
   const [sweepDuracion, setSweepDuracion] = useState(5);
 
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -165,16 +198,21 @@ export default function GeneradorTonosPage() {
       iniciarAudio();
     }
 
+    // Los límites se ordenan aquí: con «Desde» mayor que «Hasta» el incremento salía
+    // negativo y el barrido se quedaba clavado en el mínimo sin avisar de nada.
+    const desde = acotarFrecuencia(Math.min(sweepMin, sweepMax));
+    const hasta = acotarFrecuencia(Math.max(sweepMin, sweepMax));
+
     setSweep(true);
-    let frecActual = sweepMin;
-    const incremento = (sweepMax - sweepMin) / (sweepDuracion * 20);
+    let frecActual = desde;
+    const incremento = (hasta - desde) / (sweepDuracion * 20);
 
     sweepIntervalRef.current = setInterval(() => {
       frecActual += incremento;
-      if (frecActual >= sweepMax) {
-        frecActual = sweepMin;
+      if (frecActual >= hasta) {
+        frecActual = desde;
       }
-      setFrecuencia(Math.round(frecActual));
+      aplicarFrecuencia(Math.round(frecActual));
     }, 50);
   };
 
@@ -219,8 +257,19 @@ export default function GeneradorTonosPage() {
             type="number"
             min="20"
             max="20000"
-            value={frecuencia}
-            onChange={(e) => setFrecuencia(Math.max(20, Math.min(20000, parseInt(e.target.value) || 20)))}
+            value={frecuenciaTexto}
+            onChange={(e) => {
+              setFrecuenciaTexto(e.target.value);
+              // Solo se emite cuando lo escrito ya es una frecuencia válida; mientras tanto
+              // el oscilador se queda en la última buena y el usuario termina de teclear.
+              const n = parseInt(e.target.value, 10);
+              if (Number.isFinite(n) && n >= FREC_MIN && n <= FREC_MAX) setFrecuencia(n);
+            }}
+            onBlur={() => {
+              const n = acotarFrecuencia(parseInt(frecuenciaTexto, 10) || FREC_MIN);
+              setFrecuencia(n);
+              setFrecuenciaTexto(String(n));
+            }}
             className={styles.frecuenciaInput}
             aria-label="Frecuencia en Hz"
           />
@@ -239,7 +288,7 @@ export default function GeneradorTonosPage() {
             min="20"
             max="20000"
             value={frecuencia}
-            onChange={(e) => setFrecuencia(parseInt(e.target.value))}
+            onChange={(e) => aplicarFrecuencia(parseInt(e.target.value, 10))}
             className={styles.frecuenciaSlider}
             aria-label="Seleccionar frecuencia"
           />
@@ -248,13 +297,13 @@ export default function GeneradorTonosPage() {
 
         {/* Slider logarítmico visual */}
         <div className={styles.escalaVisual}>
-          <button type="button" onClick={() => setFrecuencia(20)} aria-label="Ir a 20 Hz">20</button>
-          <button type="button" onClick={() => setFrecuencia(100)} aria-label="Ir a 100 Hz">100</button>
-          <button type="button" onClick={() => setFrecuencia(500)} aria-label="Ir a 500 Hz">500</button>
-          <button type="button" onClick={() => setFrecuencia(1000)} aria-label="Ir a 1.000 Hz">1k</button>
-          <button type="button" onClick={() => setFrecuencia(5000)} aria-label="Ir a 5.000 Hz">5k</button>
-          <button type="button" onClick={() => setFrecuencia(10000)} aria-label="Ir a 10.000 Hz">10k</button>
-          <button type="button" onClick={() => setFrecuencia(20000)} aria-label="Ir a 20.000 Hz">20k</button>
+          <button type="button" onClick={() => aplicarFrecuencia(20)} aria-label="Ir a 20 Hz">20</button>
+          <button type="button" onClick={() => aplicarFrecuencia(100)} aria-label="Ir a 100 Hz">100</button>
+          <button type="button" onClick={() => aplicarFrecuencia(500)} aria-label="Ir a 500 Hz">500</button>
+          <button type="button" onClick={() => aplicarFrecuencia(1000)} aria-label="Ir a 1.000 Hz">1k</button>
+          <button type="button" onClick={() => aplicarFrecuencia(5000)} aria-label="Ir a 5.000 Hz">5k</button>
+          <button type="button" onClick={() => aplicarFrecuencia(10000)} aria-label="Ir a 10.000 Hz">10k</button>
+          <button type="button" onClick={() => aplicarFrecuencia(20000)} aria-label="Ir a 20.000 Hz">20k</button>
         </div>
 
         {/* Botones de control */}
@@ -297,8 +346,9 @@ export default function GeneradorTonosPage() {
               type="button"
               className={`${styles.ondaBtn} ${tipoOnda === tipo ? styles.ondaActiva : ''}`}
               onClick={() => setTipoOnda(tipo)}
+              aria-pressed={tipoOnda === tipo}
             >
-              <span className={styles.ondaIcono}>
+              <span className={styles.ondaIcono} aria-hidden="true">
                 {tipo === 'sine' && '〰️'}
                 {tipo === 'triangle' && '📐'}
                 {tipo === 'square' && '⬜'}
@@ -325,10 +375,19 @@ export default function GeneradorTonosPage() {
               <input
                 id="sweep-min"
                 type="number"
-                value={sweepMin}
-                onChange={(e) => setSweepMin(parseInt(e.target.value) || 20)}
-                min="20"
-                max="20000"
+                value={sweepMinTexto}
+                onChange={(e) => {
+                  setSweepMinTexto(e.target.value);
+                  const n = parseInt(e.target.value, 10);
+                  if (Number.isFinite(n) && n >= FREC_MIN && n <= FREC_MAX) setSweepMin(n);
+                }}
+                onBlur={() => {
+                  const n = acotarFrecuencia(parseInt(sweepMinTexto, 10) || FREC_MIN);
+                  setSweepMin(n);
+                  setSweepMinTexto(String(n));
+                }}
+                min={FREC_MIN}
+                max={FREC_MAX}
               />
               <span>Hz</span>
             </div>
@@ -337,10 +396,19 @@ export default function GeneradorTonosPage() {
               <input
                 id="sweep-max"
                 type="number"
-                value={sweepMax}
-                onChange={(e) => setSweepMax(parseInt(e.target.value) || 20000)}
-                min="20"
-                max="20000"
+                value={sweepMaxTexto}
+                onChange={(e) => {
+                  setSweepMaxTexto(e.target.value);
+                  const n = parseInt(e.target.value, 10);
+                  if (Number.isFinite(n) && n >= FREC_MIN && n <= FREC_MAX) setSweepMax(n);
+                }}
+                onBlur={() => {
+                  const n = acotarFrecuencia(parseInt(sweepMaxTexto, 10) || FREC_MAX);
+                  setSweepMax(n);
+                  setSweepMaxTexto(String(n));
+                }}
+                min={FREC_MIN}
+                max={FREC_MAX}
               />
               <span>Hz</span>
             </div>
@@ -380,10 +448,13 @@ export default function GeneradorTonosPage() {
                   key={preset.nombre}
                   type="button"
                   className={`${styles.presetBtn} ${Math.round(frecuencia) === Math.round(preset.frecuencia) ? styles.presetActivo : ''}`}
-                  onClick={() => setFrecuencia(preset.frecuencia)}
+                  onClick={() => aplicarFrecuencia(preset.frecuencia)}
+                  aria-pressed={Math.round(frecuencia) === Math.round(preset.frecuencia)}
                 >
                   <span className={styles.presetNombre}>{preset.nombre}</span>
-                  <span className={styles.presetFrec}>{preset.frecuencia} Hz</span>
+                  {/* [131] formato español: se imprimía el número crudo, con punto decimal,
+                      mientras el bloque educativo de la misma página escribe «261,63 Hz» */}
+                  <span className={styles.presetFrec}>{formatNumber(preset.frecuencia, preset.frecuencia % 1 === 0 ? 0 : 2)} Hz</span>
                 </button>
               ))}
             </div>
@@ -419,7 +490,7 @@ export default function GeneradorTonosPage() {
         icon="🔊"
       >
         <section>
-          <h3>📊 Rangos de Frecuencia: De los Subgraves al Ultrasonido</h3>
+          <h3><span aria-hidden="true">📊</span> Rangos de Frecuencia: De los Subgraves al Ultrasonido</h3>
           <div className={styles.eduTablaWrapper}>
             <table className={styles.eduTabla}>
               <thead>
@@ -494,7 +565,7 @@ export default function GeneradorTonosPage() {
         </section>
 
         <section>
-          <h3>🎯 Casos de Uso: Para Qué Sirve un Generador de Tonos</h3>
+          <h3><span aria-hidden="true">🎯</span> Casos de Uso: Para Qué Sirve un Generador de Tonos</h3>
           <div className={styles.eduEscenariosGrid}>
             <div className={styles.eduEscenarioCard}>
               <span className={styles.eduEscenarioIcon}>👂</span>
@@ -504,7 +575,7 @@ export default function GeneradorTonosPage() {
             <div className={styles.eduEscenarioCard}>
               <span className={styles.eduEscenarioIcon}>🎵</span>
               <h4>Afinación de Instrumentos</h4>
-              <p>La nota La4 estándar es 440 Hz (ISO 16:1975). Algunos géneros y épocas históricas usan 432 Hz (barroco) o 443 Hz (orquestas modernas europeas). Reproduce el tono y afina tu instrumento por referencia auditiva. Para instrumentos de cuerda: Do (261,63 Hz), Re (293,66 Hz), Mi (329,63 Hz), Fa (349,23 Hz), Sol (392 Hz), La (440 Hz), Si (493,88 Hz).</p>
+              <p>La nota La4 estándar es 440 Hz (ISO 16:1975). La interpretación históricamente informada del barroco suele afinar en 415 Hz, un semitono por debajo, y las orquestas europeas modernas tiran de 442-443 Hz. En el barroco no había un estándar único: los órganos del norte de Alemania llegaban a 466 Hz y los instrumentos franceses bajaban hasta 392 Hz. Reproduce el tono y afina tu instrumento por referencia auditiva. Para instrumentos de cuerda: Do (261,63 Hz), Re (293,66 Hz), Mi (329,63 Hz), Fa (349,23 Hz), Sol (392 Hz), La (440 Hz), Si (493,88 Hz).</p>
             </div>
             <div className={styles.eduEscenarioCard}>
               <span className={styles.eduEscenarioIcon}>🔊</span>
@@ -520,7 +591,7 @@ export default function GeneradorTonosPage() {
         </section>
 
         <section>
-          <h3>❓ Preguntas Frecuentes sobre Frecuencias y Sonido</h3>
+          <h3><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Frecuencias y Sonido</h3>
           <div className={styles.eduFaqList}>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqPregunta}>¿Qué es la frecuencia y por qué se mide en Hz?</summary>
@@ -528,7 +599,7 @@ export default function GeneradorTonosPage() {
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqPregunta}>¿Por qué el oído humano oye exactamente de 20 Hz a 20 kHz?</summary>
-              <p className={styles.eduFaqRespuesta}>El rango audible humano está determinado por la anatomía del oído interno. La cóclea contiene ~16.000 células ciliares dispuestas como un piano: las de la base detectan agudos y las del ápice detectan graves. Las frecuencias muy bajas (&lt;20 Hz) no son suficientemente energéticas para mover los cilios con eficacia; las muy altas (&gt;20 kHz) tienen longitudes de onda menores que las estructuras ciliares. Con la edad, las células de los agudos mueren primero por ser las más expuestas, lo que explica la presbiacusia (pérdida auditiva de agudos por envejecimiento).</p>
+              <p className={styles.eduFaqRespuesta}>El rango audible humano está determinado por la anatomía del oído interno. La cóclea contiene ~16.000 células ciliares dispuestas como un piano: las de la base detectan agudos y las del ápice detectan graves. Las frecuencias muy bajas (&lt;20 Hz) no son suficientemente energéticas para mover los cilios con eficacia; y las muy altas (&gt;20 kHz) dejan de mover la membrana basilar de forma eficaz — el límite lo pone la mecánica de la onda viajera en la cóclea, no el tamaño de los cilios: a 20 kHz la longitud de onda en aire es de 1,7 cm, unas diez mil veces mayor que un estereocilio. Con la edad, las células de los agudos mueren primero por ser las más expuestas, lo que explica la presbiacusia (pérdida auditiva de agudos por envejecimiento).</p>
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqPregunta}>¿Qué diferencia hay entre onda senoidal, cuadrada, triangular y sierra?</summary>
@@ -552,13 +623,13 @@ export default function GeneradorTonosPage() {
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqPregunta}>¿Por qué la nota La estándar es 440 Hz y no otra frecuencia?</summary>
-              <p className={styles.eduFaqRespuesta}>Durante siglos no existía un estándar: Mozart componía con La ~421 Hz, Händel usó 423 Hz, y en el siglo XIX las orquestas llegaron a usar 452 Hz para sonar "más brillantes". La ISO estandarizó 440 Hz en 1939 (revisado en 1975) por ser un compromiso entre las prácticas europeas de la época. Sin embargo, muchas orquestas modernas tocan a 441-443 Hz por sonar "más brillantes". La polémica de los 432 Hz como "frecuencia natural" carece de base científica sólida, pero continúa siendo popular en círculos de bienestar.</p>
+              <p className={styles.eduFaqRespuesta}>Durante siglos no existía un estándar: Mozart componía con La ~421 Hz, Händel usó 423 Hz, y en el siglo XIX las orquestas llegaron a usar 452 Hz para sonar "más brillantes". El acuerdo llegó en la conferencia internacional de Londres de 1939, por ser un compromiso entre las prácticas europeas de la época; la ISO —fundada en 1947— lo recogió en la norma ISO 16 en 1955 y la revisó en 1975. Sin embargo, muchas orquestas modernas tocan a 441-443 Hz por sonar "más brillantes". La polémica de los 432 Hz como "frecuencia natural" carece de base científica sólida, pero continúa siendo popular en círculos de bienestar.</p>
             </details>
           </div>
         </section>
 
         <section>
-          <h3>📋 Guía: Cómo Hacer un Test de Audición Casero</h3>
+          <h3><span aria-hidden="true">📋</span> Guía: Cómo Hacer un Test de Audición Casero</h3>
           <ol className={styles.eduPasosList}>
             <li className={styles.eduPaso}>
               <span className={styles.eduPasoNum}>1</span>
@@ -606,7 +677,7 @@ export default function GeneradorTonosPage() {
         </section>
 
         <section>
-          <h3>💡 Consejos para Sacar el Máximo al Generador de Tonos</h3>
+          <h3><span aria-hidden="true">💡</span> Consejos para Sacar el Máximo al Generador de Tonos</h3>
           <div className={styles.eduTipsGrid}>
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcono}>🎧</span>

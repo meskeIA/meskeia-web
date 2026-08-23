@@ -56,8 +56,8 @@ import { test, expect, devices, Page } from '@playwright/test';
  *     sino si el desbordamiento se queda DENTRO de .tablaContainer (overflow-x: auto) en
  *     lugar de empujar la página entera. Y si, tocando una celda, la ficha se abre y se lee.
  *
- * HALLAZGOS ABIERTOS: al final, marcados con `test.fail()` — afirman lo que debería pasar y
- * hoy fallan a propósito. El día que se reparen, quitar la línea `test.fail()` y quedan como
+ * HALLAZGOS del 21/08: al final. Se escribieron con `test.fail()` afirmando lo que debería
+ * pasar; se repararon el 23/08/2026 (tanda 2), se les retiró la marca y hoy quedan como
  * regresión.
  */
 
@@ -331,11 +331,10 @@ test.describe('CASO 3 · en móvil (Pixel 7)', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS — afirman lo correcto y hoy fallan a propósito (test.fail)
+// HALLAZGOS del 21/08, reparados el 23/08/2026 (tanda 2) — hoy son la regresión
 // ═══════════════════════════════════════════════════════════════════════════
 test.describe('hallazgos abiertos', () => {
   test('HALLAZGO 1 · la calculadora ignora los paréntesis y devuelve un número falso', async ({ page }) => {
-    test.fail(); // Reparado el día que esto pase en verde.
     await page.goto(RUTA);
 
     // Ca(OH)2, hidróxido de calcio — de las fórmulas más frecuentes en secundaria.
@@ -353,7 +352,6 @@ test.describe('hallazgos abiertos', () => {
   });
 
   test('HALLAZGO 2 · ninguna de las 118 celdas se puede abrir con el teclado', async ({ page }) => {
-    test.fail(); // Reparado el día que esto pase en verde.
     await page.goto(RUTA);
 
     // Las celdas son <div onClick> sin role, sin tabIndex y sin onKeyDown: quien no usa
@@ -373,7 +371,6 @@ test.describe('hallazgos abiertos', () => {
   });
 
   test('HALLAZGO 3 · el bloque educativo se contradice con los datos de la propia app', async ({ page }) => {
-    test.fail(); // Reparado el día que esto pase en verde.
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Ver guía educativa/i }).click();
     const cuerpo = page.locator('body');
