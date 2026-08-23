@@ -17,6 +17,8 @@ import styles from './SimuladorMovimientoCircular.module.css';
 type Modo = 'mcu' | 'mcnu';
 
 const ALPHA_MCNU = 0.5; // rad/s² constante en modo MCNU
+/** Techo de ω en MCNU: al alcanzarlo el simulador vuelve a empezar, y lo dice en pantalla */
+const OMEGA_MAX_MCNU = 20;
 
 function drawArrow(
   ctx: CanvasRenderingContext2D,
@@ -64,6 +66,23 @@ export default function SimuladorMovimientoCircularPage() {
   const rafRef = useRef<number | null>(null);
   const thetaRef = useRef<number>(0);
   const omegaRef = useRef<number>(omega);
+
+  /**
+   * ω que se ENSEÑA en el panel.
+   *
+   * En MCU es la del slider; en MCNU la que de verdad gira, que vive en `omegaRef` y el
+   * bucle de animación va acelerando. Las seis tarjetas (ω, v, a_c, F_c, T, f) se derivaban
+   * de `omega` a secas, así que en MCNU salían congeladas en ω₀ mientras la bola aceleraba
+   * en pantalla: la app se contradecía a sí misma —su propia tabla dice «la aceleración
+   * centrípeta varía porque ω varía»— y quien leía las cifras se llevaba números que no
+   * correspondían a lo que estaba viendo (hallazgo 167 del Inspector).
+   *
+   * Se refresca a ~10 Hz y no en cada fotograma: a 60 fps un re-render por cuadro no aporta
+   * nada legible y sí bastante trabajo.
+   */
+  const [omegaAnimada, setOmegaAnimada] = useState(omega);
+  const ultimoRefrescoRef = useRef<number>(0);
+
   const prevTimestampRef = useRef<number | null>(null);
 
   // Sincronizar omegaRef con el estado cuando cambia
@@ -71,10 +90,11 @@ export default function SimuladorMovimientoCircularPage() {
     omegaRef.current = omega;
     thetaRef.current = 0;
     prevTimestampRef.current = null;
+    setOmegaAnimada(omega);
   }, [omega, radio, modo]);
 
   // Magnitudes derivadas (mostradas en panel)
-  const omegaVal = omega;
+  const omegaVal = modo === 'mcnu' ? omegaAnimada : omega;
   const v = omegaVal * radio;
   const ac = omegaVal * omegaVal * radio;
   const fc = masa * ac;
@@ -206,7 +226,7 @@ export default function SimuladorMovimientoCircularPage() {
         ctx.fillStyle = acColor;
         ctx.font = `bold ${Math.round(w * 0.028)}px system-ui`;
         ctx.textAlign = 'center';
-        ctx.fillText('aₒ', acx2, acy2 - 8);
+        ctx.fillText('a_c', acx2, acy2 - 8);
       }
 
       // Punto/partícula
@@ -239,7 +259,13 @@ export default function SimuladorMovimientoCircularPage() {
 
       if (modo === 'mcnu') {
         omegaRef.current = Math.max(0, omegaRef.current + ALPHA_MCNU * dt);
-        if (omegaRef.current > 20) omegaRef.current = 0; // reset para visualización cíclica
+        // Al llegar al techo del simulador se vuelve a empezar. El ciclo se anuncia en
+        // pantalla: antes la bola se paraba de golpe sin que nada lo explicara.
+        if (omegaRef.current > OMEGA_MAX_MCNU) omegaRef.current = 0;
+        if (timestamp - ultimoRefrescoRef.current > 100) {
+          ultimoRefrescoRef.current = timestamp;
+          setOmegaAnimada(omegaRef.current);
+        }
       } else {
         omegaRef.current = omega;
       }
@@ -296,6 +322,7 @@ export default function SimuladorMovimientoCircularPage() {
       {/* SELECTOR MCU / MCNU */}
       <div className={styles.modeSelector}>
         <button
+          type="button"
           className={`${styles.modeBtn} ${modo === 'mcu' ? styles.modeBtnActive : ''}`}
           onClick={() => setModo('mcu')}
           aria-pressed={modo === 'mcu'}
@@ -303,6 +330,7 @@ export default function SimuladorMovimientoCircularPage() {
           MCU — Movimiento Circular Uniforme
         </button>
         <button
+          type="button"
           className={`${styles.modeBtn} ${modo === 'mcnu' ? styles.modeBtnActive : ''}`}
           onClick={() => setModo('mcnu')}
           aria-pressed={modo === 'mcnu'}
@@ -377,6 +405,15 @@ export default function SimuladorMovimientoCircularPage() {
         />
       </div>
 
+      {modo === 'mcnu' && (
+        <p className={styles.avisoCiclo} role="note">
+          <span aria-hidden="true">🔁</span> En MCNU las cifras del panel siguen a la animación:
+          ω crece a {formatNumber(ALPHA_MCNU, 1)} rad/s² y, al llegar a{' '}
+          {formatNumber(OMEGA_MAX_MCNU, 0)} rad/s, el simulador vuelve a empezar para que el
+          ciclo pueda verse entero.
+        </p>
+      )}
+
       {/* PANEL DE VALORES */}
       <div className={styles.valuesPanel}>
         <div className={styles.valueCard}>
@@ -419,7 +456,7 @@ export default function SimuladorMovimientoCircularPage() {
         </span>
         <span className={styles.legendItem}>
           <span className={styles.legendDot} style={{ background: '#E07A1F' }} aria-hidden="true" />
-          Vector aceleración centrípeta (aₒ)
+          Vector aceleración centrípeta (a_c)
         </span>
         <span className={styles.legendItem}>
           <span className={styles.legendDot} style={{ background: '#2E86AB' }} aria-hidden="true" />
@@ -452,13 +489,13 @@ export default function SimuladorMovimientoCircularPage() {
             la rapidez (no hace trabajo), solo cambia la dirección del movimiento.
           </p>
           <div className={styles.formulaBox}>
-            <strong>MCU:</strong> v = ω · r &nbsp;|&nbsp; aₒ = ω² · r = v²/r &nbsp;|&nbsp; T = 2π/ω
+            <strong>MCU:</strong> v = ω · r &nbsp;|&nbsp; a_c = ω² · r = v²/r &nbsp;|&nbsp; T = 2π/ω
           </div>
           <ul className={styles.bulletList}>
             <li>La velocidad tangencial v siempre es perpendicular al radio.</li>
-            <li>La aceleración centrípeta aₒ nunca modifica la rapidez, solo la dirección.</li>
-            <li>Aumentar el radio a igual ω aumenta tanto v como aₒ.</li>
-            <li>En el MCNU, ω varía: hay además aceleración tangencial αt = α · r.</li>
+            <li>La aceleración centrípeta a_c nunca modifica la rapidez, solo la dirección.</li>
+            <li>Aumentar el radio a igual ω aumenta tanto v como a_c.</li>
+            <li>En el MCNU, ω varía: hay además aceleración tangencial a_t = α · r.</li>
           </ul>
         </section>
 
@@ -486,7 +523,7 @@ export default function SimuladorMovimientoCircularPage() {
                   <td>Varía (ω = ω₀ + α·t)</td>
                 </tr>
                 <tr>
-                  <td>Aceleración centrípeta (aₒ)</td>
+                  <td>Aceleración centrípeta (a_c)</td>
                   <td>Constante (ω y r fijos)</td>
                   <td>Varía porque ω varía</td>
                 </tr>
@@ -559,9 +596,9 @@ export default function SimuladorMovimientoCircularPage() {
             <div className={styles.faqItem}>
               <dt>¿Por qué la aceleración centrípeta no cambia la rapidez?</dt>
               <dd>
-                Porque aₒ siempre es <em>perpendicular</em> a v. La aceleración solo modifica la
-                rapidez cuando tiene componente en la dirección del movimiento. Como aₒ apunta al
-                centro y v es tangente al círculo, son perpendiculares: el trabajo de aₒ es nulo.
+                Porque a_c siempre es <em>perpendicular</em> a v. La aceleración solo modifica la
+                rapidez cuando tiene componente en la dirección del movimiento. Como a_c apunta al
+                centro y v es tangente al círculo, son perpendiculares: el trabajo de a_c es nulo.
               </dd>
             </div>
             <div className={styles.faqItem}>
@@ -623,7 +660,7 @@ export default function SimuladorMovimientoCircularPage() {
             <li className={styles.step}>
               <span className={styles.stepNumber}>3</span>
               <div className={styles.stepContent}>
-                <strong>Calcula la aceleración centrípeta:</strong> aₒ = ω² · r o aₒ = v²/r.
+                <strong>Calcula la aceleración centrípeta:</strong> a_c = ω² · r o a_c = v²/r.
                 Expresar en m/s².
               </div>
             </li>
@@ -631,7 +668,7 @@ export default function SimuladorMovimientoCircularPage() {
               <span className={styles.stepNumber}>4</span>
               <div className={styles.stepContent}>
                 <strong>Aplica la 2.ª ley de Newton:</strong> la suma de fuerzas hacia el centro
-                debe ser igual a m · aₒ. Identifica qué fuerza física actúa como centrípeta.
+                debe ser igual a m · a_c. Identifica qué fuerza física actúa como centrípeta.
               </div>
             </li>
             <li className={styles.step}>
@@ -666,7 +703,7 @@ export default function SimuladorMovimientoCircularPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">📐</span>
               <p>
-                <strong>aₒ crece con ω²:</strong> si duplicas ω, la aceleración centrípeta se
+                <strong>a_c crece con ω²:</strong> si duplicas ω, la aceleración centrípeta se
                 cuadruplica. Por eso los motores rápidos necesitan piezas mucho más robustas.
               </p>
             </div>
@@ -697,7 +734,7 @@ export default function SimuladorMovimientoCircularPage() {
                 existe. Solo aparece como fuerza ficticia en sistemas giratorios no inerciales.
               </li>
               <li>
-                <strong>Olvidar convertir rpm a rad/s:</strong> la fórmula aₒ = ω² · r requiere ω en
+                <strong>Olvidar convertir rpm a rad/s:</strong> la fórmula a_c = ω² · r requiere ω en
                 rad/s. Si introduces rpm directamente el resultado es incorrecto.
               </li>
               <li>

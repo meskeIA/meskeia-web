@@ -253,7 +253,7 @@ test('la app promete lo que este fichero verifica', async ({ page }) => {
   // Se acota al recuadro entero porque «v = ω · r» reaparece suelto en un truco posterior.
   await page.getByRole('button', { name: 'Ver guía educativa' }).click();
   await expect(
-    page.getByText(/^MCU:\s*v = ω · r\s*\|\s*aₒ = ω² · r = v²\/r\s*\|\s*T = 2π\/ω$/),
+    page.getByText(/^MCU:\s*v = ω · r\s*\|\s*a_c = ω² · r = v²\/r\s*\|\s*T = 2π\/ω$/),
   ).toBeVisible();
 });
 
@@ -425,7 +425,7 @@ test('CASO 4 (animación) — la partícula gira a la ω del panel y los vectore
   expect(r4 / r2, 'doblar el radio físico debe doblar el radio dibujado').toBeLessThan(2.1);
 });
 
-test('CASO 5 (MCNU) — la animación acelera con α = 0,5 rad/s², pero el panel se queda quieto', async ({
+test('CASO 5 (MCNU) — la animación acelera con α = 0,5 rad/s² y el panel la sigue', async ({
   page,
 }) => {
   await page.addScriptTag({ content: SONDA_CANVAS });
@@ -462,26 +462,35 @@ test('CASO 5 (MCNU) — la animación acelera con α = 0,5 rad/s², pero el pane
   expect(alfa, 'α declarada en el propio botón: 0,5 rad/s²').toBeGreaterThan(0.38);
   expect(alfa, 'α declarada en el propio botón: 0,5 rad/s²').toBeLessThan(0.62);
 
-  // HALLAZGO documentado: tras ~3,5 s girando en MCNU la ω real ronda ya ω₀ + α·t = 1 + 0,5·3,5
-  // = 2,75 rad/s (a_c ≈ 2,75² · 2 = 15,1 m/s²), pero el panel sigue clavado en la ω del slider.
-  // La tabla de la propia app dice «Aceleración centrípeta: varía porque ω varía».
-  // Si algún día el panel se engancha a omegaRef, son estos expect.soft los que avisan.
-  await expect
-    .soft(magnitud(page, 'ω'), 'MCNU: el panel congela ω en el valor del slider mientras la partícula acelera')
-    .toHaveText('1,00');
-  await expect
-    .soft(
-      magnitud(page, 'Aceleración centrípeta'),
-      'MCNU: a_c congelada en ω₀²·r = 1 · 2 = 2 m/s² pese a que ω ya no vale 1 rad/s',
-    )
-    .toHaveText('2,00');
-  await expect
-    .soft(
-      magnitud(page, 'Período \\(T\\)'),
-      'MCNU: T congelado en 2π/ω₀ = 6,28 s aunque cada vuelta dura ya bastante menos',
-    )
-    .toHaveText('6,28');
+  // REPARADO el 23/08/2026 (hallazgo 167). El panel se derivaba de `omega` —el estado del
+  // slider— y no de `omegaRef`, que es lo que de verdad gira, así que en MCNU las seis
+  // tarjetas salían congeladas en ω₀ mientras la bola aceleraba en pantalla. Es justo lo que
+  // este bloque anticipaba: «si algún día el panel se engancha a omegaRef, son estos expect
+  // los que avisan».
+  //
+  // No se fijan cifras exactas porque dependen del instante de lectura. Lo que se comprueba
+  // es más fuerte: que ω ha CRECIDO desde el 1,00 del slider, y que las demás magnitudes
+  // siguen siendo coherentes con la ω que el propio panel enseña.
+  // Se toma UNA foto del panel entero: en MCNU se re-renderiza cada ~100 ms y leer tarjeta a
+  // tarjeta deja los locators despegados a mitad de camino.
+  const foto = await page.locator('[class*="valuesPanel"]').innerText();
+  const leerDeFoto = (rotulo: string): number => {
+    const linea = foto.split('\n').map((l) => l.trim());
+    const i = linea.findIndex((l) => l.toUpperCase() === rotulo.toUpperCase());
+    return Number((linea[i + 1] ?? '').replace(/\./g, '').replace(',', '.'));
+  };
 
+  const omegaPanel = leerDeFoto('ω');
+  expect(omegaPanel, 'MCNU: el panel sigue a la animación, no al slider').toBeGreaterThan(1.5);
+
+  const acPanel = leerDeFoto('Aceleración centrípeta');
+  const vPanel = leerDeFoto('v tangencial');
+  const tPanel = leerDeFoto('Período (T)');
+
+  // Con r = 2 m:  a_c = ω²·r  ·  v = ω·r  ·  T = 2π/ω
+  expect(acPanel, 'a_c = ω²·r con la ω que enseña el propio panel').toBeCloseTo(omegaPanel ** 2 * 2, 1);
+  expect(vPanel, 'v = ω·r con la ω que enseña el propio panel').toBeCloseTo(omegaPanel * 2, 1);
+  expect(tPanel, 'T = 2π/ω con la ω que enseña el propio panel').toBeCloseTo((2 * Math.PI) / omegaPanel, 1);
   // Volver a MCU debe dejar panel y animación otra vez de acuerdo.
   await page.getByRole('button', { name: /^MCU/ }).click();
   await expect(page.getByRole('button', { name: /^MCU/ })).toHaveAttribute('aria-pressed', 'true');
@@ -502,12 +511,7 @@ test('accesibilidad — etiquetas de los controles y estado de los botones de mo
   await expect(page.getByRole('button', { name: /^MCU/ })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('button', { name: /^MCNU/ })).toHaveAttribute('aria-pressed', 'false');
 
-  // HALLAZGO documentado: a los dos les falta type="button" (regla de oro del CLAUDE.md).
-  // Cuando se añada, estos expect.soft avisarán de que el hallazgo está cerrado.
-  await expect
-    .soft(page.getByRole('button', { name: /^MCU/ }), 'todo <button> lleva type="button"')
-    .not.toHaveAttribute('type', 'button');
-  await expect
-    .soft(page.getByRole('button', { name: /^MCNU/ }), 'todo <button> lleva type="button"')
-    .not.toHaveAttribute('type', 'button');
+  // Regla de oro del CLAUDE.md: todo <button> lleva type="button". Reparado el 23/08/2026.
+  await expect(page.getByRole('button', { name: /^MCU/ })).toHaveAttribute('type', 'button');
+  await expect(page.getByRole('button', { name: /^MCNU/ })).toHaveAttribute('type', 'button');
 });

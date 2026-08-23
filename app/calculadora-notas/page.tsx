@@ -24,6 +24,31 @@ interface AsignaturaEvau {
   tipo: TipoMateria;
 }
 
+/**
+ * Rango válido de cada escala. Sin esto, el conversor recortaba en silencio: quien tecleaba
+ * un 15 en la escala española veía «10,00» con pinta de resultado legítimo, y en la media
+ * ponderada una nota imposible entraba tal cual y sacaba las equivalencias de su propia
+ * escala —un 11 daba «GPA 4,40», cuando el GPA acaba en 4,0— (hallazgo 178).
+ */
+export const RANGOS_ESCALA: Record<string, { min: number; max: number; nombre: string }> = {
+  espana: { min: 0, max: 10, nombre: 'España (0-10)' },
+  mexico: { min: 0, max: 10, nombre: 'México (0-10)' },
+  argentina: { min: 0, max: 10, nombre: 'Argentina (0-10)' },
+  gpa: { min: 0, max: 4, nombre: 'GPA (0-4)' },
+  porcentaje: { min: 0, max: 100, nombre: 'Porcentaje (0-100)' },
+  chile: { min: 1, max: 7, nombre: 'Chile (1-7)' },
+  colombia: { min: 0, max: 5, nombre: 'Colombia (0-5)' },
+  peru: { min: 0, max: 20, nombre: 'Perú (0-20)' },
+  venezuela: { min: 0, max: 20, nombre: 'Venezuela (0-20)' },
+};
+
+/** ¿Está la nota dentro del rango de su escala? */
+export const notaEnRango = (nota: number, escala: string): boolean => {
+  const r = RANGOS_ESCALA[escala];
+  if (!r) return true;
+  return nota >= r.min && nota <= r.max;
+};
+
 // Funciones de conversión multi-país (España + Latam + USA)
 const convertirNota = (nota: number, desde: string) => {
   // Normalizar a escala 0-10 (referencia común)
@@ -60,6 +85,12 @@ const convertirNota = (nota: number, desde: string) => {
 
   // Limitar entre 0 y 10
   nota10 = Math.max(0, Math.min(10, nota10));
+
+  // Se redondea antes de clasificar: (5,8−1)/6·10 da 7,999999999999999 en coma flotante, y
+  // como las letras se deciden con umbrales ≥8, la cifra impresa («8,00») contradecía a su
+  // propia etiqueta —salía «B» y «C (Bien)» en vez de «B+» y «B (Muy Bien)»—. Y el 5,8 no es
+  // rebuscado: es el ejemplo que sugiere el placeholder de Chile (hallazgo 180).
+  nota10 = Math.round(nota10 * 1e6) / 1e6;
 
   // Convertir a todas las escalas numéricas
   const gpa = (nota10 / 10) * 4;
@@ -210,7 +241,9 @@ export default function CalculadoraNotasPage() {
     const asignaturasValidas = asignaturas.filter(a => {
       const nota = parseFloat(a.nota.replace(',', '.'));
       const creditos = parseFloat(a.creditos.replace(',', '.'));
-      return !isNaN(nota) && !isNaN(creditos) && creditos > 0;
+      // Una nota fuera de 0-10 no es una nota: entraba en la media y sacaba las
+      // equivalencias de su escala (un 11 daba «GPA 4,40», y el GPA acaba en 4,0).
+      return !isNaN(nota) && nota >= 0 && nota <= 10 && !isNaN(creditos) && creditos > 0;
     });
 
     if (asignaturasValidas.length === 0) {
@@ -265,13 +298,27 @@ export default function CalculadoraNotasPage() {
     // Nota de acceso = 60% Bachillerato + 40% Fase General
     const notaAcceso = bachiller * 0.6 + mediaFaseGeneral * 0.4;
 
-    // Fase específica: mejores 2 notas × 0.1 o 0.2 (simplificamos con 0.2)
+    /**
+     * Fase específica: las DOS mejores materias superadas, ponderadas sobre su nota entera.
+     *
+     * La fórmula oficial es  admisión = 0,6·NMB + 0,4·CFG + a·M1 + b·M2,  con a y b entre
+     * 0,1 y 0,2 aplicados sobre la calificación de la materia (M), no sobre el exceso
+     * respecto al aprobado. Aquí estaba escrito `(M − 5) × 0,2`, que dejaba el techo en 12
+     * en vez de en 14 —los 14 que la propia app rotula como «Máximo posible»— y hacía que
+     * una materia aprobada con un 5 justo aportase 0,00 en lugar de 1,00. Infravaloraba la
+     * nota de admisión hasta en 2 puntos, que es justo la cifra que se compara con la nota
+     * de corte (hallazgo 177 del Inspector, 21/08/2026).
+     *
+     * Se usa 0,2 porque es el máximo y es lo que la pestaña anuncia; el ponderador real lo
+     * fija cada universidad para cada materia y titulación, y puede ser 0,1.
+     */
+    const PONDERADOR_MAXIMO = 0.2;
     let bonificacionEspecifica = 0;
     if (notasEspecificas.length >= 1 && notasEspecificas[0] >= 5) {
-      bonificacionEspecifica += (notasEspecificas[0] - 5) * 0.2;
+      bonificacionEspecifica += notasEspecificas[0] * PONDERADOR_MAXIMO;
     }
     if (notasEspecificas.length >= 2 && notasEspecificas[1] >= 5) {
-      bonificacionEspecifica += (notasEspecificas[1] - 5) * 0.2;
+      bonificacionEspecifica += notasEspecificas[1] * PONDERADOR_MAXIMO;
     }
 
     // Nota de admisión = Nota acceso + bonificación (máx 14)
@@ -290,8 +337,26 @@ export default function CalculadoraNotasPage() {
   const resultadoConversor = useMemo(() => {
     const nota = parseFloat(notaConversor.replace(',', '.'));
     if (isNaN(nota)) return null;
+    if (!notaEnRango(nota, escalaOrigen)) return null;
     return convertirNota(nota, escalaOrigen);
   }, [notaConversor, escalaOrigen]);
+
+  /** Aviso cuando la nota tecleada se sale de la escala elegida */
+  const avisoConversor = useMemo(() => {
+    const nota = parseFloat(notaConversor.replace(',', '.'));
+    if (isNaN(nota) || notaEnRango(nota, escalaOrigen)) return '';
+    const r = RANGOS_ESCALA[escalaOrigen];
+    return `En la escala de ${r.nombre} la nota va de ${formatNumber(r.min, 0)} a ${formatNumber(r.max, 0)}. Revisa el valor: antes se recortaba en silencio y el resultado parecía correcto.`;
+  }, [notaConversor, escalaOrigen]);
+
+  /** Notas de la media ponderada que se salen de 0-10 */
+  const notasFueraDeRango = useMemo(
+    () => asignaturas.filter((a) => {
+      const n = parseFloat(a.nota.replace(',', '.'));
+      return !isNaN(n) && (n < 0 || n > 10);
+    }).length,
+    [asignaturas],
+  );
 
   // Calcular "qué nota necesito"
   const resultadoSimulador = useMemo(() => {
@@ -399,22 +464,28 @@ export default function CalculadoraNotasPage() {
       {/* Tabs */}
       <div className={styles.tabsContainer}>
         <button
+          type="button"
           className={`${styles.tab} ${tabActivo === 'media' ? styles.activo : ''}`}
           onClick={() => setTabActivo('media')}
+          aria-pressed={tabActivo === 'media'}
         >
-          <span>📊</span> Media Ponderada
+          <span aria-hidden="true">📊</span> Media Ponderada
         </button>
         <button
+          type="button"
           className={`${styles.tab} ${tabActivo === 'evau' ? styles.activo : ''}`}
           onClick={() => setTabActivo('evau')}
+          aria-pressed={tabActivo === 'evau'}
         >
-          <span>🎓</span> Simulador EvAU 🇪🇸
+          <span aria-hidden="true">🎓</span> Simulador EvAU 🇪🇸
         </button>
         <button
+          type="button"
           className={`${styles.tab} ${tabActivo === 'conversor' ? styles.activo : ''}`}
           onClick={() => setTabActivo('conversor')}
+          aria-pressed={tabActivo === 'conversor'}
         >
-          <span>🔄</span> Conversor Escalas
+          <span aria-hidden="true">🔄</span> Conversor Escalas
         </button>
       </div>
 
@@ -423,7 +494,7 @@ export default function CalculadoraNotasPage() {
         <div className={styles.mainContent}>
           <div className={styles.panel}>
             <h2 className={styles.sectionTitle}>
-              <span>📝</span> Tus Asignaturas
+              <span aria-hidden="true">📝</span> Tus Asignaturas
             </h2>
 
             <div className={styles.asignaturaLabels}>
@@ -460,6 +531,7 @@ export default function CalculadoraNotasPage() {
                     placeholder="ECTS"
                   />
                   <button
+                    type="button"
                     className={styles.btnEliminar}
                     onClick={() => eliminarAsignatura(asig.id)}
                     disabled={asignaturas.length <= 1}
@@ -472,14 +544,14 @@ export default function CalculadoraNotasPage() {
               ))}
             </div>
 
-            <button className={styles.btnAnadir} onClick={agregarAsignatura}>
-              <span>+</span> Añadir asignatura
+            <button type="button" className={styles.btnAnadir} onClick={agregarAsignatura}>
+              <span aria-hidden="true">+</span> Añadir asignatura
             </button>
 
             {/* Simulador qué nota necesito */}
             <div className={styles.simuladorSection}>
               <h3 className={styles.sectionTitle}>
-                <span>🎯</span> ¿Qué nota necesito?
+                <span aria-hidden="true">🎯</span> ¿Qué nota necesito?
               </h3>
 
               <div className={styles.simuladorGrid}>
@@ -571,14 +643,23 @@ export default function CalculadoraNotasPage() {
               )}
             </div>
 
+            {notasFueraDeRango > 0 && (
+              <p className={styles.avisoRango} role="alert">
+                <span aria-hidden="true">⚠️</span>{' '}
+                {notasFueraDeRango === 1
+                  ? 'Hay una nota fuera del rango 0-10 y no se ha contado en la media.'
+                  : `Hay ${formatNumber(notasFueraDeRango, 0)} notas fuera del rango 0-10 y no se han contado en la media.`}
+              </p>
+            )}
+
             <div className={styles.statsGrid}>
               <div className={styles.statCard}>
                 <span className={styles.statLabel}>Asignaturas</span>
                 <span className={styles.statValue}>{resultadoMedia.asignaturasContadas}</span>
               </div>
               <div className={styles.statCard}>
-                <span className={styles.statLabel}>Créditos ECTS</span>
-                <span className={styles.statValue}>{formatNumber(resultadoMedia.totalCreditos, 0)}</span>
+                <span className={styles.statLabel}>Peso total (créditos, horas…)</span>
+                <span className={styles.statValue}>{formatNumber(resultadoMedia.totalCreditos, Number.isInteger(resultadoMedia.totalCreditos) ? 0 : 2)}</span>
               </div>
               <div className={`${styles.statCard} ${styles.success}`}>
                 <span className={styles.statLabel}>Aprobadas</span>
@@ -593,7 +674,7 @@ export default function CalculadoraNotasPage() {
             {resultadoMedia.asignaturasContadas > 0 && resultadoMedia.media > 0 && (
               <>
                 <h3 className={styles.sectionTitle}>
-                  <span>🔄</span> Equivalencias
+                  <span aria-hidden="true">🔄</span> Equivalencias
                 </h3>
                 <div className={styles.statsGrid}>
                   <div className={styles.statCard}>
@@ -622,7 +703,7 @@ export default function CalculadoraNotasPage() {
             {/* Nota Bachillerato */}
             <div className={styles.evauSection}>
               <h3 className={styles.evauSectionTitle}>
-                <span>📚</span> Nota Media de Bachillerato
+                <span aria-hidden="true">📚</span> Nota Media de Bachillerato
               </h3>
               <input
                 type="text"
@@ -641,7 +722,7 @@ export default function CalculadoraNotasPage() {
             {/* Fase General */}
             <div className={styles.evauSection}>
               <h3 className={styles.evauSectionTitle}>
-                <span>📝</span> Fase General (Obligatoria)
+                <span aria-hidden="true">📝</span> Fase General (Obligatoria)
               </h3>
               <p className={styles.evauInfo}>
                 4 exámenes obligatorios que suponen el 40% de la nota de acceso
@@ -782,13 +863,13 @@ export default function CalculadoraNotasPage() {
         <div className={styles.mainContent}>
           <div className={styles.panel}>
             <h2 className={styles.sectionTitle}>
-              <span>🔄</span> Conversor de Escalas
+              <span aria-hidden="true">🔄</span> Conversor de Escalas
             </h2>
 
             <div className={styles.conversorGrid}>
               <div className={styles.conversorCard}>
                 <label className={styles.conversorTitle}>
-                  <span>📥</span> Escala de origen
+                  <span aria-hidden="true">📥</span> Escala de origen
                 </label>
                 <select
                   className={styles.select}
@@ -815,7 +896,7 @@ export default function CalculadoraNotasPage() {
 
               <div className={styles.conversorCard}>
                 <label className={styles.conversorTitle}>
-                  <span>🔢</span> Introduce tu nota
+                  <span aria-hidden="true">🔢</span> Introduce tu nota
                 </label>
                 <input
                   type="text"
@@ -835,66 +916,72 @@ export default function CalculadoraNotasPage() {
               </div>
             </div>
 
+            {avisoConversor && (
+              <p className={styles.avisoRango} role="alert">
+                <span aria-hidden="true">⚠️</span> {avisoConversor}
+              </p>
+            )}
+
             {resultadoConversor && (
               <div className={styles.conversorResultados} role="status" aria-live="polite">
                 <div className={styles.conversorResultado}>
-                  <span className={styles.conversorEscala}>🇪🇸 España (0-10)</span>
+                  <span className={styles.conversorEscala}><span aria-hidden="true">🇪🇸</span> España (0-10)</span>
                   <span className={styles.conversorValor}>{formatNumber(resultadoConversor.espana, 2)}</span>
                 </div>
                 <div className={styles.conversorResultado}>
-                  <span className={styles.conversorEscala}>🇲🇽 México (0-10)</span>
+                  <span className={styles.conversorEscala}><span aria-hidden="true">🇲🇽</span> México (0-10)</span>
                   <span className={styles.conversorValor}>{formatNumber(resultadoConversor.mexico, 2)}</span>
                 </div>
                 <div className={styles.conversorResultado}>
-                  <span className={styles.conversorEscala}>🇦🇷 Argentina (0-10)</span>
+                  <span className={styles.conversorEscala}><span aria-hidden="true">🇦🇷</span> Argentina (0-10)</span>
                   <span className={styles.conversorValor}>{formatNumber(resultadoConversor.argentina, 2)}</span>
                 </div>
                 <div className={styles.conversorResultado}>
-                  <span className={styles.conversorEscala}>🇨🇱 Chile (1-7)</span>
+                  <span className={styles.conversorEscala}><span aria-hidden="true">🇨🇱</span> Chile (1-7)</span>
                   <span className={styles.conversorValor}>{formatNumber(resultadoConversor.chile, 2)}</span>
                 </div>
                 <div className={styles.conversorResultado}>
-                  <span className={styles.conversorEscala}>🇨🇴 Colombia (0-5)</span>
+                  <span className={styles.conversorEscala}><span aria-hidden="true">🇨🇴</span> Colombia (0-5)</span>
                   <span className={styles.conversorValor}>{formatNumber(resultadoConversor.colombia, 2)}</span>
                 </div>
                 <div className={styles.conversorResultado}>
-                  <span className={styles.conversorEscala}>🇵🇪 Perú / 🇻🇪 Venezuela (0-20)</span>
+                  <span className={styles.conversorEscala}><span aria-hidden="true">🇵🇪</span> Perú / 🇻🇪 Venezuela (0-20)</span>
                   <span className={styles.conversorValor}>{formatNumber(resultadoConversor.peru, 2)}</span>
                 </div>
                 <div className={styles.conversorResultado}>
-                  <span className={styles.conversorEscala}>🇺🇸 GPA USA (0-4)</span>
+                  <span className={styles.conversorEscala}><span aria-hidden="true">🇺🇸</span> GPA USA (0-4)</span>
                   <span className={styles.conversorValor}>{formatNumber(resultadoConversor.gpa, 2)}</span>
                 </div>
                 <div className={styles.conversorResultado}>
-                  <span className={styles.conversorEscala}>📊 Porcentaje</span>
+                  <span className={styles.conversorEscala}><span aria-hidden="true">📊</span> Porcentaje</span>
                   <span className={styles.conversorValor}>{formatNumber(resultadoConversor.porcentaje, 0)}%</span>
                 </div>
                 <div className={styles.conversorResultado}>
-                  <span className={styles.conversorEscala}>🇺🇸 Letra (USA)</span>
+                  <span className={styles.conversorEscala}><span aria-hidden="true">🇺🇸</span> Letra (USA)</span>
                   <span className={styles.conversorValor}>{resultadoConversor.letra}</span>
                 </div>
                 <div className={styles.conversorResultado}>
-                  <span className={styles.conversorEscala}>🇪🇺 ECTS (Europa)</span>
+                  <span className={styles.conversorEscala}><span aria-hidden="true">🇪🇺</span> ECTS (Europa)</span>
                   <span className={styles.conversorValor}>{resultadoConversor.ects}</span>
                 </div>
                 <div className={styles.conversorResultado}>
-                  <span className={styles.conversorEscala}>🇪🇸 Calificación España</span>
+                  <span className={styles.conversorEscala}><span aria-hidden="true">🇪🇸</span> Calificación España</span>
                   <span className={styles.conversorValor}>{resultadoConversor.calificacionEs}</span>
                 </div>
                 <div className={styles.conversorResultado}>
-                  <span className={styles.conversorEscala}>🇲🇽 Calificación México</span>
+                  <span className={styles.conversorEscala}><span aria-hidden="true">🇲🇽</span> Calificación México</span>
                   <span className={styles.conversorValor}>{resultadoConversor.calificacionMx}</span>
                 </div>
                 <div className={styles.conversorResultado}>
-                  <span className={styles.conversorEscala}>🇨🇱 Calificación Chile</span>
+                  <span className={styles.conversorEscala}><span aria-hidden="true">🇨🇱</span> Calificación Chile</span>
                   <span className={styles.conversorValor}>{resultadoConversor.calificacionCl}</span>
                 </div>
                 <div className={styles.conversorResultado}>
-                  <span className={styles.conversorEscala}>🇨🇴 Calificación Colombia</span>
+                  <span className={styles.conversorEscala}><span aria-hidden="true">🇨🇴</span> Calificación Colombia</span>
                   <span className={styles.conversorValor}>{resultadoConversor.calificacionCo}</span>
                 </div>
                 <div className={styles.conversorResultado}>
-                  <span className={styles.conversorEscala}>🇵🇪 Calificación Perú/Venezuela</span>
+                  <span className={styles.conversorEscala}><span aria-hidden="true">🇵🇪</span> Calificación Perú/Venezuela</span>
                   <span className={styles.conversorValor}>{resultadoConversor.calificacionPe}</span>
                 </div>
               </div>
@@ -902,7 +989,7 @@ export default function CalculadoraNotasPage() {
 
             {/* Tabla de referencia */}
             <h3 className={styles.sectionTitle} style={{ marginTop: 'var(--spacing-xl)' }}>
-              <span>📋</span> Tabla de Equivalencias
+              <span aria-hidden="true">📋</span> Tabla de Equivalencias
             </h3>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: 'var(--spacing-md)' }}>
               Equivalencias aproximadas entre escalas de calificación de los principales países hispanohablantes.

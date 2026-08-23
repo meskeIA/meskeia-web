@@ -904,3 +904,24 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Aviso de nota fuera del rango de su escala.
+   Antes se recortaba en silencio —un 15 en escala española salía como «10,00»— y el
+   resultado tenía pinta de correcto (hallazgo 178 del Inspector). */
+.avisoRango {
+  margin: 0 0 1rem;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  border: 2px solid #d97706;
+  border-left-width: 6px;
+  border-radius: 0 8px 8px 0;
+  background: #fffbeb;
+  color: #7c2d12;
+}
+
+[data-theme='dark'] .avisoRango {
+  background: rgba(217, 119, 6, 0.12);
+  color: #fcd9b6;
+  border-color: #b45309;
+}

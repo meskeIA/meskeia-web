@@ -45,8 +45,9 @@ import { test, expect, Page } from '@playwright/test';
  *       «abc» y vacío → la fila se descarta y el panel muestra «—». Correcto, sin NaN.
  *       11 y −3 → la escala que declara el propio campo es «0-10»: deberían rechazarse.
  *
- * HALLAZGOS ABIERTOS (se documentan aquí como TESTIGO, NO se corrigen desde el test).
- * Si algún día se arreglan, los bloques marcados TESTIGO fallarán y habrá que invertirlos.
+ * HALLAZGOS del 21/08, reparados el 23/08/2026 (tanda 4). Se documentaron aquí como TESTIGO
+ * —afirmando el comportamiento defectuoso— y al corregirse se invirtieron, que es lo que
+ * aquel encabezado anticipaba. Hoy son la regresión que impide que vuelvan.
  *   1. EvAU · la bonificación de la fase específica usa (M − 5) × 0,2 en lugar de M × ponderador.
  *      La fórmula oficial es admisión = 0,6·NMB + 0,4·CFG + a·M1 + b·M2 con a,b ∈ {0,1; 0,2}
  *      sobre la nota entera de la materia superada (≥5). La propia app se contradice: el panel
@@ -123,7 +124,7 @@ test.describe('Media ponderada — lo que promete el <h1>', () => {
     const texto = await panel(page);
     expect(texto).toContain('Notable'); // 7,67 está entre 7 y 9
     expect(texto).toContain('Asignaturas 3');
-    expect(texto).toContain('Créditos ECTS 18'); // 6 + 3 + 9
+    expect(texto).toContain('Peso total (créditos, horas…) 18'); // 6 + 3 + 9
     expect(texto).toContain('Aprobadas 3');
     expect(texto).toContain('Suspensas 0');
     expect(texto).toContain('GPA (USA) 3,07'); // 7,6667 / 10 × 4 = 3,0667
@@ -139,7 +140,7 @@ test.describe('Media ponderada — lo que promete el <h1>', () => {
     await creditos(page, 1).fill('30');
 
     expect(await valorPrincipal(page)).toBe('7,25');
-    expect(await panel(page)).toContain('Créditos ECTS 80');
+    expect(await panel(page)).toContain('Peso total (créditos, horas…) 80');
   });
 
   test('CASO 2 (límite) · una sola asignatura con un 10', async ({ page }) => {
@@ -151,7 +152,7 @@ test.describe('Media ponderada — lo que promete el <h1>', () => {
     const texto = await panel(page);
     expect(texto).toContain('Sobresaliente');
     expect(texto).toContain('Asignaturas 1');
-    expect(texto).toContain('Créditos ECTS 6');
+    expect(texto).toContain('Peso total (créditos, horas…) 6');
     expect(texto).toContain('GPA (USA) 4,00'); // 10 / 10 × 4
     expect(texto).toContain('Porcentaje 100%');
   });
@@ -200,43 +201,37 @@ test.describe('Media ponderada — lo que promete el <h1>', () => {
     expect(await panel(page)).toContain('Asignaturas 1');
   });
 
-  test('TESTIGO · HALLAZGO 2: una nota de 11 se acepta y contamina las equivalencias', async ({
-    page,
-  }) => {
-    // El campo declara la escala «0-10» en su placeholder, pero no valida nada:
-    // 11×6 / 6 = 11,00 → «Sobresaliente», GPA 11/10×4 = 4,40 (la escala GPA acaba en 4,0) y 110%.
-    // Lo correcto sería rechazar la fila o avisar. Cuando se corrija, invertir estos expect.
+  test('HALLAZGO 2 (reparado) — una nota de 11 se descarta y se avisa', async ({ page }) => {
+    // El campo declara la escala «0-10» en su placeholder y ahora la respeta. Antes, 11×6/6
+    // daba 11,00 «Sobresaliente» con GPA 4,40 —y la escala GPA acaba en 4,0— y 110 %.
     await nota(page, 0).fill('11');
     await creditos(page, 0).fill('6');
 
-    expect(await valorPrincipal(page)).toBe('11,00');
     const texto = await panel(page);
-    expect(texto).toContain('Sobresaliente');
-    expect(texto).toContain('GPA (USA) 4,40');
-    expect(texto).toContain('Porcentaje 110%');
+    expect(texto).toContain('fuera del rango 0-10');
+    expect(texto).not.toContain('GPA (USA) 4,40');
+    expect(texto).not.toContain('Porcentaje 110%');
   });
 
-  test('TESTIGO · HALLAZGO 2: una nota de −3 también se acepta', async ({ page }) => {
-    // −3×6 / 6 = −3,00. Cuando se corrija, invertir este expect.
+  test('HALLAZGO 2 (reparado) — una nota de −3 tampoco entra en la media', async ({ page }) => {
     await nota(page, 0).fill('-3');
     await creditos(page, 0).fill('6');
 
-    expect(await valorPrincipal(page)).toBe('-3,00');
-    expect(await panel(page)).toContain('Suspenso');
+    expect(await panel(page)).toContain('fuera del rango 0-10');
   });
 
-  test('TESTIGO · HALLAZGO 4: 4,5 + 3 créditos se imprimen como «8» aunque la media divide entre 7,5', async ({
+  test('HALLAZGO 4 (reparado) — el peso total que se enseña es el que se ha usado', async ({
     page,
   }) => {
-    // (8×4,5 + 6×3) / 7,5 = (36 + 18) / 7,5 = 54 / 7,5 = 7,20 ← la media es correcta,
-    // pero el total de créditos sale con 0 decimales y 7,5 se redondea a 8.
+    // (8×4,5 + 6×3) / 7,5 = (36 + 18) / 7,5 = 54 / 7,5 = 7,20. La media siempre fue correcta;
+    // lo que no cuadraba era el denominador que se enseñaba al lado, impreso sin decimales.
     await nota(page, 0).fill('8');
     await creditos(page, 0).fill('4,5');
     await nota(page, 1).fill('6');
     await creditos(page, 1).fill('3');
 
     expect(await valorPrincipal(page)).toBe('7,20');
-    expect(await panel(page)).toContain('Créditos ECTS 8'); // debería decir 7,5
+    expect(await panel(page)).toContain('Peso total (créditos, horas…) 7,50');
   });
 });
 
@@ -305,46 +300,47 @@ test.describe('Simulador EvAU', () => {
     expect(texto).toContain('60% Bachillerato 4,80');
   });
 
-  test('TESTIGO · HALLAZGO 1: la fase específica resta 5 antes de ponderar (8,600 en vez de 10,600)', async ({
+  test('HALLAZGO 1 (reparado) — la fase específica pondera sobre la nota entera: 10,600', async ({
     page,
   }) => {
     // Acceso 7,600 (caso anterior) más dos específicas de 9 y 6:
-    //   Oficial : 7,60 + 9 × 0,2 + 6 × 0,2 = 7,60 + 1,80 + 1,20 = 10,600
-    //   La app  : 7,60 + (9−5) × 0,2 + (6−5) × 0,2 = 7,60 + 0,80 + 0,20 = 8,600
-    // Cuando se corrija, invertir estos expect.
+    //   0,6·8 + 0,4·7 = 4,80 + 2,80 = 7,60 de acceso
+    //   + 9 × 0,2 + 6 × 0,2 = 1,80 + 1,20 = 3,00 de fase específica  →  10,600
+    // Reparado el 23/08/2026: antes se restaba 5 antes de ponderar y salía 8,600.
     await page.locator('input[placeholder="Ej: 7,5"]').fill('8');
     const notas = ['7', '6', '8', '7', '9', '6'];
     for (let i = 0; i < notas.length; i++) await nota(page, i).fill(notas[i]);
 
-    expect(await valorPrincipal(page)).toBe('8,600');
-    expect(await panel(page)).toContain('Bonificación Específica +1,00'); // oficial: +3,00
+    expect(await valorPrincipal(page)).toBe('10,600');
+    expect(await panel(page)).toContain('Bonificación Específica +3,00');
   });
 
-  test('TESTIGO · HALLAZGO 1: el expediente perfecto se queda en 12,000 y el panel anuncia 14', async ({
+  test('HALLAZGO 1 (reparado) — el expediente perfecto llega a los 14 que la app anuncia', async ({
     page,
   }) => {
     // Bachillerato 10, las 4 troncales a 10 y las 2 específicas a 10:
-    //   Oficial : 10 + 2 + 2 = 14,000 ← es el techo que anuncia la propia app
-    //   La app  : 10 + (10−5)×0,2 + (10−5)×0,2 = 10 + 1 + 1 = 12,000
+    //   0,6·10 + 0,4·10 = 10 de acceso · + 10×0,2 + 10×0,2 = 2 + 2  →  14,000
+    // Es exactamente el techo que la propia app anuncia. Antes se quedaba en 12,000.
     await page.locator('input[placeholder="Ej: 7,5"]').fill('10');
     for (let i = 0; i < 6; i++) await nota(page, i).fill('10');
 
-    expect(await valorPrincipal(page)).toBe('12,000');
+    expect(await valorPrincipal(page)).toBe('14,000');
     const texto = await panel(page);
-    expect(texto).toContain('Máximo posible: 14 puntos'); // ...que su propia fórmula no alcanza
+    expect(texto).toContain('Máximo posible: 14 puntos'); // ...y ahora su fórmula sí lo alcanza
     expect(texto).toContain('Nota de Acceso 10,000');
   });
 
-  test('TESTIGO · HALLAZGO 1: una específica aprobada con un 5 justo suma 0,00 (debería sumar 1,00)', async ({
+  test('HALLAZGO 1 (reparado) — una específica aprobada con un 5 justo suma 1,00', async ({
     page,
   }) => {
-    // (5 − 5) × 0,2 = 0. Con la fórmula oficial, 5 × 0,2 = 1,00 punto.
+    // Una materia superada con un 5 justo pondera 5 × 0,2 = 1,00 punto. Antes, al restar 5
+    // antes de ponderar, aportaba 0,00: aprobarla no servía de nada.
     await page.locator('input[placeholder="Ej: 7,5"]').fill('8');
     const notas = ['7', '6', '8', '7', '5'];
     for (let i = 0; i < notas.length; i++) await nota(page, i).fill(notas[i]);
 
-    expect(await valorPrincipal(page)).toBe('7,600'); // oficial: 8,600
-    expect(await panel(page)).toContain('Bonificación Específica +0,00');
+    expect(await valorPrincipal(page)).toBe('8,600');
+    expect(await panel(page)).toContain('Bonificación Específica +1,00');
   });
 
   test('CASO 3 (rechazo) · sin nota de bachillerato no se calcula nada', async ({ page }) => {
@@ -396,32 +392,34 @@ test.describe('Conversor de escalas', () => {
     expect(texto).toContain('Letra (USA) A');
   });
 
-  test('TESTIGO · HALLAZGO 3: Chile 5,8 muestra 8,00 pero lo clasifica como si fuera 7,99', async ({
+  test('HALLAZGO 3 (reparado) — Chile 5,8 da 8,00 y se clasifica como 8,00', async ({
     page,
   }) => {
-    // (5,8 − 1) / 6 × 10 = 7,999999999999999 en coma flotante. El número se imprime redondeado
-    // a «8,00», pero los umbrales (≥ 8) se evalúan sobre el valor crudo, así que la letra cae a
-    // «B» y el ECTS a «C (Bien)» — cuando la tabla de la propia app dice 8,0-8,9 → B+.
-    // 5,8 es además el ejemplo que sugiere el placeholder de Chile. Al corregirse, invertir.
+    // (5,8 − 1) / 6 × 10 = 7,999999999999999 en coma flotante. Antes el número se imprimía
+    // redondeado a «8,00» pero los umbrales (≥ 8) se evaluaban sobre el valor crudo, así que
+    // la cifra contradecía a su propia etiqueta: «B» y «C (Bien)» cuando la tabla de la misma
+    // app dice 8,0-8,9 → B+. Reparado redondeando antes de clasificar. Y 5,8 no es rebuscado:
+    // es el ejemplo que sugiere el placeholder de Chile.
     await escala(page).selectOption('chile');
     await page.locator('input[placeholder="5,8"]').fill('5,8');
 
     const texto = (await resultados(page).innerText()).replace(/\s+/g, ' ');
     expect(texto).toContain('España (0-10) 8,00');
-    expect(texto).toContain('Letra (USA) B'); // debería ser B+
-    expect(texto).toContain('ECTS (Europa) C (Bien)'); // debería ser B (Muy Bien)
-    expect(texto).toContain('Calificación México Bien'); // debería ser «Muy bien»
+    expect(texto).toContain('Letra (USA) B+');
+    expect(texto).toContain('ECTS (Europa) B (Muy Bien)');
+    expect(texto).toContain('Calificación México Muy bien');
   });
 
-  test('TESTIGO · HALLAZGO 2: un 15 en la escala 0-10 se recorta a 10,00 en silencio', async ({
+  test('HALLAZGO 2 (reparado) — un 15 en la escala 0-10 se avisa en vez de recortarse', async ({
     page,
   }) => {
-    // convertirNota recorta a [0, 10] sin avisar: quien teclea 15 por error ve un 10 legítimo.
+    // Antes se recortaba a [0, 10] sin avisar: quien tecleaba 15 por error veía un 10 con
+    // pinta de resultado legítimo. Ahora se dice cuál es el rango de la escala elegida.
     await page.locator('input[placeholder="7,5"]').fill('15');
 
-    const texto = (await resultados(page).innerText()).replace(/\s+/g, ' ');
-    expect(texto).toContain('España (0-10) 10,00');
-    expect(texto).not.toContain('Revisa'); // no aparece ningún aviso de rango
+    await expect(resultados(page)).toHaveCount(0);
+    const cuerpo = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
+    expect(cuerpo).toContain('Revisa el valor');
   });
 
   test('CASO 3 (rechazo) · texto sin números no pinta ninguna tabla de conversión', async ({
@@ -446,16 +444,16 @@ test.describe('Formato español y accesibilidad', () => {
     expect(texto).not.toMatch(/\d+\.\d{2}/); // ningún punto decimal a la inglesa
   });
 
-  test('TESTIGO · HALLAZGO 5: las 3 pestañas no exponen su estado y ningún botón lleva type', async ({
+  test('HALLAZGO 5 (reparado) — las 3 pestañas exponen su estado y llevan type', async ({
     page,
   }) => {
     for (const nombre of [/Media Ponderada/, /Simulador EvAU/, /Conversor Escalas/]) {
       const boton = page.getByRole('button', { name: nombre });
       // Regla obligatoria del proyecto (CLAUDE.md §5): type="button" siempre, y aria-pressed
-      // en todo botón que cambie un estado visual. Al corregirse, invertir estos expect.
-      expect(await boton.getAttribute('type')).toBeNull();
-      expect(await boton.getAttribute('aria-pressed')).toBeNull();
-      expect(await boton.getAttribute('aria-selected')).toBeNull();
+      // en todo botón que cambie un estado visual. Antes el estado activo viajaba solo por la
+      // clase CSS, así que con lector de pantalla las tres pestañas sonaban idénticas.
+      expect(await boton.getAttribute('type')).toBe('button');
+      expect(await boton.getAttribute('aria-pressed')).not.toBeNull();
     }
   });
 });
