@@ -235,6 +235,16 @@ export default function GeneradorAnagramasPage() {
   const [maxLength, setMaxLength] = useState(10);
   const [mustContain, setMustContain] = useState('');
   const [results, setResults] = useState<string[]>([]);
+  /**
+   * ¿Se ha pulsado «Buscar palabras» con las letras que hay ahora en el campo?
+   *
+   * El veredicto «No se encontraron palabras» se pintaba con results.length === 0 y dos
+   * letras en el campo, así que aparecía ANTES de buscar: bastaba teclear «amor» para que la
+   * app afirmara que no hay ninguna palabra, cuando al pulsar salen 16. Y al revés: tras una
+   * búsqueda, editar las letras dejaba en pantalla los resultados viejos presentados como si
+   * fueran los de las letras nuevas (hallazgos 194 y 195).
+   */
+  const [buscado, setBuscado] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [dictionary, setDictionary] = useState<string[]>([]);
   const [dictStatus, setDictStatus] = useState<DictStatus>('loading');
@@ -281,12 +291,27 @@ export default function GeneradorAnagramasPage() {
   }, []);
 
   // Indexar diccionario por longitud para búsquedas más rápidas
+  /** Las letras que de verdad quedan tras descartar cifras, signos y espacios. */
+  const letrasUtiles = useMemo(() => normalizarTexto(letters), [letters]);
+
+  /**
+   * Diccionario indexado por longitud, con la forma NORMALIZADA al lado de la original.
+   *
+   * El modo de letras comparaba contra el texto crudo del lema mientras los modos de frase y
+   * de verificación normalizaban: «á» y «a» eran letras distintas solo aquí. Medido sobre el
+   * diccionario, 18.230 de los 86.973 lemas (el 21 %) resultaban inalcanzables si se tecleaba
+   * sin tildes —«corazon» no encontraba «corazón»— y al teclear con tilde se perdía todo lo
+   * demás. Afectaba de lleno al uso que la app promociona: un atril de Scrabble o de Wordle,
+   * donde nadie teclea tildes (hallazgo 197).
+   */
   const wordsByLength = useMemo(() => {
-    const index: { [key: number]: string[] } = {};
+    const index: { [key: number]: { original: string; normalizada: string }[] } = {};
     for (const word of dictionary) {
-      const len = word.length;
+      const normalizada = normalizarTexto(word);
+      if (!normalizada) continue;
+      const len = normalizada.length;
       if (!index[len]) index[len] = [];
-      index[len].push(word);
+      index[len].push({ original: word, normalizada });
     }
     return index;
   }, [dictionary]);
@@ -312,26 +337,28 @@ export default function GeneradorAnagramasPage() {
     setIsSearching(true);
 
     setTimeout(() => {
-      const normalizedLetters = letters.toLowerCase().replace(/[^a-záéíóúüñ]/g, '');
+      // Sin tildes, igual que los otros dos modos de la app
+      const normalizedLetters = normalizarTexto(letters);
 
       if (normalizedLetters.length < 2) {
         setResults([]);
+        setBuscado(true);
         setIsSearching(false);
         return;
       }
 
       const found: string[] = [];
-      const mustContainLower = mustContain.toLowerCase();
+      const mustContainNorm = normalizarTexto(mustContain);
 
       // Iterar solo sobre las longitudes válidas para acelerar
       for (let len = minLength; len <= maxLength; len++) {
         const bucket = wordsByLength[len];
         if (!bucket) continue;
 
-        for (const word of bucket) {
-          if (mustContainLower && !word.includes(mustContainLower)) continue;
-          if (canFormWord(word, normalizedLetters)) {
-            found.push(word);
+        for (const { original, normalizada } of bucket) {
+          if (mustContainNorm && !normalizada.includes(mustContainNorm)) continue;
+          if (canFormWord(normalizada, normalizedLetters)) {
+            found.push(original);
           }
         }
       }
@@ -342,6 +369,7 @@ export default function GeneradorAnagramasPage() {
       });
 
       setResults(found);
+      setBuscado(true);
       setIsSearching(false);
     }, 50);
   };
@@ -350,6 +378,7 @@ export default function GeneradorAnagramasPage() {
     setLetters('');
     setMustContain('');
     setResults([]);
+    setBuscado(false);
   };
 
   const groupedResults = useMemo(() => {
@@ -493,7 +522,7 @@ export default function GeneradorAnagramasPage() {
             type="text"
             className={styles.input}
             value={letters}
-            onChange={(e) => setLetters(e.target.value)}
+            onChange={(e) => { setLetters(e.target.value); setResults([]); setBuscado(false); }}
             placeholder="Ej: amorpls"
             maxLength={15}
             autoComplete="off"
@@ -505,7 +534,7 @@ export default function GeneradorAnagramasPage() {
               <button
                 key={ex.letters}
                 className={styles.exampleBtn}
-                onClick={() => setLetters(ex.letters)}
+                onClick={() => { setLetters(ex.letters); setResults([]); setBuscado(false); }}
                 type="button"
               >
                 {ex.label}
@@ -550,7 +579,7 @@ export default function GeneradorAnagramasPage() {
               type="text"
               className={styles.filterInput}
               value={mustContain}
-              onChange={(e) => setMustContain(e.target.value)}
+              onChange={(e) => { setMustContain(e.target.value); setResults([]); setBuscado(false); }}
               placeholder="Opcional"
               maxLength={3}
               autoComplete="off"
@@ -562,7 +591,7 @@ export default function GeneradorAnagramasPage() {
           <button
             onClick={findAnagrams}
             className={styles.btnPrimary}
-            disabled={letters.length < 2 || isSearching || dictStatus !== 'ready'}
+            disabled={letrasUtiles.length < 2 || isSearching || dictStatus !== 'ready'}
             type="button"
           >
             {isSearching ? 'Buscando...' : 'Buscar palabras'}
@@ -597,7 +626,7 @@ export default function GeneradorAnagramasPage() {
           </div>
         )}
 
-        {results.length === 0 && letters.length >= 2 && !isSearching && dictStatus === 'ready' && (
+        {buscado && results.length === 0 && !isSearching && dictStatus === 'ready' && (
           <div className={styles.noResults}>
             <p>No se encontraron palabras con esas letras.</p>
             <p className={styles.hint}>Prueba añadiendo más letras o reduciendo los filtros.</p>
@@ -823,7 +852,7 @@ export default function GeneradorAnagramasPage() {
         icon="🔤"
       >
         <section>
-          <h3>🏛️ Historia y Tipos de Reorganización de Letras</h3>
+          <h3><span aria-hidden="true">🏛️</span> Historia y Tipos de Reorganización de Letras</h3>
           <p>Los anagramas forman parte de una familia más amplia de transformaciones lingüísticas con historia milenaria:</p>
           <div className={styles.eduTableWrapper}>
             <table className={styles.eduTable}>
@@ -872,7 +901,7 @@ export default function GeneradorAnagramasPage() {
         </section>
 
         <section>
-          <h3>🎯 Casos de Uso y Aplicaciones</h3>
+          <h3><span aria-hidden="true">🎯</span> Casos de Uso y Aplicaciones</h3>
           <div className={styles.eduEscenariosGrid}>
             <div className={styles.eduEscenarioCard}>
               <span className={styles.eduEscenarioIcon}>🎮</span>
@@ -898,7 +927,7 @@ export default function GeneradorAnagramasPage() {
         </section>
 
         <section>
-          <h3>❓ Preguntas Frecuentes sobre Anagramas</h3>
+          <h3><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Anagramas</h3>
           <div className={styles.eduFaqList}>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqQuestion}>¿Cuántas palabras se pueden formar con N letras?</summary>
@@ -936,7 +965,7 @@ export default function GeneradorAnagramasPage() {
         </section>
 
         <section>
-          <h3>📋 Cómo Sacar el Máximo Partido al Generador</h3>
+          <h3><span aria-hidden="true">📋</span> Cómo Sacar el Máximo Partido al Generador</h3>
           <ol className={styles.eduStepsList}>
             <li className={styles.eduStep}>
               <span className={styles.eduStepNum}>1</span>
@@ -984,7 +1013,7 @@ export default function GeneradorAnagramasPage() {
         </section>
 
         <section>
-          <h3>💡 Consejos de Estrategia para Juegos de Palabras</h3>
+          <h3><span aria-hidden="true">💡</span> Consejos de Estrategia para Juegos de Palabras</h3>
           <div className={styles.eduTipsGrid}>
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcon}>📊</span>
@@ -1028,7 +1057,7 @@ export default function GeneradorAnagramasPage() {
                 <li><strong>Fuente</strong>: Lemario General del Español de Ismael Olea (<a href="https://github.com/olea/lemarios" target="_blank" rel="noopener noreferrer">github.com/olea/lemarios</a>), distribuido en dominio público. Aproximadamente 87.000 lemas del español estándar.</li>
                 <li><strong>Lemas, no flexiones completas</strong>: El diccionario contiene formas base y flexiones frecuentes, pero puede no incluir todas las conjugaciones verbales raras o regionalismos muy específicos.</li>
                 <li><strong>No es árbitro oficial</strong>: Para partidas competitivas de Scrabble, usa siempre el diccionario oficial de la FISE. Este generador es una herramienta de práctica y aprendizaje.</li>
-                <li><strong>Sensibilidad a tildes</strong>: El sistema distingue entre letras con y sin tilde. Si no encuentras una palabra, prueba con y sin acentos en las vocales.</li>
+                <li><strong>Tildes</strong>: da igual escribirlas o no. Las letras se comparan sin acentos en los tres modos, así que «corazon» encuentra «corazón» y al revés.</li>
               </ul>
             </div>
           </div>

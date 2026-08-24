@@ -83,44 +83,30 @@ import { test, expect, Page } from '@playwright/test';
  *       Este fichero deja el hallazgo por escrito como testigo: el Inspector no repara.
  *
  * ─────────────────────────────────────────────────────────────────────────────────────────
- * HALLAZGOS ABIERTOS (el Inspector no repara). Los tests de abajo fijan el comportamiento
- * ACTUAL como TESTIGO: al reparar cualquiera de ellos el test se pondrá en rojo y habrá que
- * invertir la aserción marcada «TESTIGO DEL HALLAZGO».
- *   · Sin validación de entradas: peso 0 → «∞ W/kg» + «Profesional / Élite»; peso −70 →
- *     «-4,00 W/kg» + «Principiante». Los `min`/`max` del input son sugerencias del
- *     navegador, no hay guarda en calcularPotenciaCiclismo(). Ver CASO 3.
- *   · La escala de VAM del bloque educativo va DESFASADA UN ESCALÓN respecto al clasificador:
- *     el texto dice «Amateurs fuertes: 1.000–1.200 m/h. Semi-profesionales: 1.200–1.400 m/h»
- *     y el motor rotula 1000–1200 como «Amateur» y 1200–1400 como «Amateur fuerte»
- *     (reserva «Semi-profesional» para 1400–1600). Un VAM de 1200 recibe dos veredictos
- *     distintos en la misma página. Ver el testigo del CASO 1.
- *   · Dato físico del bloque educativo: «A 8% de pendiente: W/kg ≈ VAM / 255». Resuelto a
- *     mano con el modelo de fuerzas para 78 kg totales, Crr 0,005, CdA 0,32 m², ρ 1,2 kg/m³:
+ * HALLAZGOS DEL INSPECTOR (24/08/2026) — REPARADOS el 24/08/2026, y estos tests los blindan.
+ *   · 237 · Sin validación de entradas: peso 0 → «∞ W/kg» con el veredicto MÁS favorable de
+ *     su escala («Profesional / Élite»); peso −70 → «-4,00 W/kg» con el más desfavorable. Los
+ *     min/max del input son sugerencias del navegador, no una guarda. Ver CASO 3.
+ *   · 238 · «A 8% de pendiente: W/kg ≈ VAM / 255». Resuelto a mano con el modelo de fuerzas
+ *     para 78 kg totales, Crr 0,005, CdA 0,32 m²:
  *         θ = arctan(0,08) = 4,5739° → sen θ = 0,079746 · cos θ = 0,996815
  *         F_grav = 78·9,81·0,079746 = 61,02 N · F_rod = 0,005·78·9,81·0,996815 = 3,81 N
- *         para W/kg = 4,0 (280 W al pedal, 273,0 W a la rueda):
- *             273,0 = (61,02 + 3,81)·v + ½·1,2·0,32·v³  →  v = 4,0186 m/s
- *         VAM = v · sen θ · 3600 = 4,0186 · 0,079746 · 3600 = 1153,7 m/h
- *         ratio VAM/(W/kg) = 1153,7 / 4,0 = 288  (la regla clásica de Ferrari,
- *         VAM = W/kg·(2 + %/10)·100, da 280 a esa pendiente: coinciden dentro del 3 %)
- *     El 255 del texto corresponde a una pendiente del 5,5 %, no del 8 %. Aplicado a 8 %
- *     sobreestima el W/kg un 13 % (1153,7/255 = 4,52 en lugar de 4,00).
- *   · Los dos <input type="range"> llevan aria-hidden="true" pero conservan tabIndex 0: son
- *     alcanzables con el tabulador y mudos para el lector de pantalla (patrón
- *     aria-hidden-focus). Les falta tabIndex={-1}. Ver el test de accesibilidad.
- *   · La tabla de zonas deja huecos: con FTP 280 W, Z1 acaba en 154 W y Z2 empieza en 157 W,
- *     así que 155 y 156 W no pertenecen a ninguna zona (igual entre Z2 y Z3, y así todas).
- *     Sale de expresar los cortes Coggan como 55/56, 75/76… en vez de contiguos.
- *   · Promesa: el <h1>, la metadata y las keywords («calcular vatios bicicleta») ofrecen
- *     calcular vatios, pero el FTP en vatios es una ENTRADA obligatoria. La app divide
- *     vatios ya conocidos entre kilos; no estima potencia a partir de nada.
- *   · El page.tsx se declara `// @disclaimer: exempt` aunque la app está en la suite `salud`
- *     y pauta entrenamiento personalizado por zonas (Z4 de 10–20 min, Z5–Z6). La política
- *     sitúa «orientación de hábitos de salud o ejercicio» en Nivel 2 ALTO.
- *   · El FTP del encabezado de la tabla y los vatios de cada zona se interpolan crudos, sin
- *     formatNumber(). Dentro del rango declarado (≤ 600 W) coincide con lo que daría es-ES,
- *     así que hoy no se ve; pero el input acepta valores mayores sin protesta (FTP 1000 W
- *     se calcula y publica Z6 «1210 – 1500 W»).
+ *         280 W al pedal (273,0 a la rueda) → v = 4,0186 m/s → VAM = 1153,7 m/h
+ *         ratio VAM/(W/kg) = 1153,7/4,0 = 288 para un ciclista de 70 kg con bici de 8;
+ *         la regla de Ferrari, VAM = W/kg·(2+%/10)·100, da 280 a esa pendiente.
+ *     El 255 corresponde al 5,5 %, y aplicado al 8 % sobreestimaba el rendimiento un 13 %.
+ *   · 239 · La escala de VAM del bloque educativo iba DESFASADA UN ESCALÓN respecto al
+ *     clasificador, de modo que la misma pantalla daba dos veredictos para 1200 m/h.
+ *   · 240 · El h1 y las keywords ofrecían «calcular vatios» y el FTP en vatios era una
+ *     ENTRADA obligatoria: la app dividía vatios ya conocidos entre kilos. Ahora hay un
+ *     estimador por el modelo de fuerzas para quien no tiene potenciómetro.
+ *   · 241 · Los dos <input type=range> llevaban aria-hidden pero conservaban tabIndex 0.
+ *   · 242 · La app se declaraba exenta de disclaimer estando en la suite salud y pautando
+ *     entrenamiento por zonas (Z4 de 10-20 min, Z5-Z6): Nivel 2 ALTO.
+ *   · 243 · Cuando la VAM no se podía calcular, la tarjeta desaparecía sin decir por qué.
+ *   · 244 · La tabla de zonas dejaba huecos: con FTP 280 W, 155 y 156 W no caían en ninguna.
+ *   · 245 · El FTP del encabezado y los vatios de cada zona se interpolaban crudos, sin
+ *     formatNumber().
  * ─────────────────────────────────────────────────────────────────────────────────────────
  */
 
@@ -183,16 +169,15 @@ test.describe('CASO 1 (normal) — 70 kg, FTP 280 W, 1000 m en 50 min', () => {
     await expect(resultados(page)).toContainText('1200');
     await expect(resultados(page)).toContainText('m/h');
 
-    // HALLAZGO ABIERTO: el motor clasifica 1200 m/h como «Amateur fuerte» (1200 no es < 1200,
-    // así que cae en el tramo < 1400), mientras el bloque educativo de esta misma página
-    // dice «Semi-profesionales: 1.200–1.400 m/h». Desfase de un escalón entre texto y motor.
+    // HALLAZGO 239, reparado el 24/08/2026: el motor clasifica 1200 m/h como «Amateur fuerte»
+    // (1200 no es < 1200, así que cae en el tramo < 1400) y el bloque educativo decía
+    // «Semi-profesionales: 1.200–1.400 m/h». La misma pantalla emitía dos veredictos para el
+    // mismo número; ahora la guía enuncia la escala del clasificador.
     await expect(resultados(page)).toContainText('Amateur fuerte');
     await page.locator('button:has-text("Ver Guía")').first().click();
     const textoGuia = await page.locator('body').innerText();
-    // TESTIGO DEL HALLAZGO: la guía sitúa 1.200–1.400 m/h en «Semi-profesionales» y el badge
-    // de la misma pantalla acaba de decir «Amateur fuerte» para 1200. Cuando se armonicen las
-    // dos escalas, esta aserción se pondrá en rojo: entonces hay que invertirla.
-    expect(textoGuia).toContain('Semi-profesionales: 1.200–1.400 m/h');
+    expect(textoGuia).toContain('1.200–1.400, amateur fuerte');
+    expect(textoGuia).not.toContain('Semi-profesionales: 1.200–1.400 m/h');
   });
 
   test('las 6 zonas salen de FTP · % / 100 redondeado al entero', async ({ page }) => {
@@ -200,18 +185,24 @@ test.describe('CASO 1 (normal) — 70 kg, FTP 280 W, 1000 m en 50 min', () => {
     const tabla = resultados(page);
 
     await expect(tabla).toContainText('basadas en tu FTP: 280 W');
-    // Z1  0–55 %  → 0 – round(280·0,55 = 154)
-    await expect(tabla).toContainText('0 – 154 W');
-    // Z2 56–75 %  → round(280·0,56 = 156,8) = 157 – round(280·0,75 = 210)
-    await expect(tabla).toContainText('157 – 210 W');
-    // Z3 76–90 %  → round(212,8) = 213 – round(252) = 252
-    await expect(tabla).toContainText('213 – 252 W');
-    // Z4 91–105 % → round(254,8) = 255 – round(294) = 294
-    await expect(tabla).toContainText('255 – 294 W');
-    // Z5 106–120 %→ round(296,8) = 297 – round(336) = 336
-    await expect(tabla).toContainText('297 – 336 W');
-    // Z6 121–150 %→ round(338,8) = 339 – round(420) = 420
-    await expect(tabla).toContainText('339 – 420 W');
+    // HALLAZGO 244, reparado el 24/08/2026: los cortes de Coggan son CONTIGUOS (menos de 55 %,
+    // 55-75 %, 75-90 %…), y escribirlos como 0-55 / 56-75 / 76-90 dejaba vatios sin zona: con
+    // FTP 280, ni 155 ni 156 W caían en ninguna. Ahora cada zona empieza donde acaba la anterior.
+    await expect(tabla).toContainText('0 – 154 W');   // Z1: hasta round(280·0,55) = 154
+    await expect(tabla).toContainText('155 – 210 W'); // Z2: hasta round(280·0,75) = 210
+    await expect(tabla).toContainText('211 – 252 W'); // Z3: hasta round(280·0,90) = 252
+    await expect(tabla).toContainText('253 – 294 W'); // Z4: hasta round(280·1,05) = 294
+    await expect(tabla).toContainText('295 – 336 W'); // Z5: hasta round(280·1,20) = 336
+    await expect(tabla).toContainText('337 – 420 W'); // Z6: hasta round(280·1,50) = 420
+
+    // Y no queda ni un vatio huérfano entre dos zonas
+    const rangos = await tabla.locator('td').filter({ hasText: /^d+ – d+ W$/ }).allTextContents();
+    const limites = rangos.map((t) => t.match(/(d+) – (d+)/)!.slice(1, 3).map(Number));
+    for (let i = 1; i < limites.length; i++) {
+      expect(limites[i][0], `la zona ${i + 1} debe empezar donde acaba la anterior`).toBe(
+        limites[i - 1][1] + 1,
+      );
+    }
 
     // Los nombres Coggan de cada zona, para que un renombrado no pase inadvertido.
     await expect(tabla).toContainText('Recuperación activa');
@@ -271,37 +262,39 @@ test.describe('CASO 2 (límite) — división por cero en la VAM y bordes de cla
     await calcular(page, { peso: '70', ftp: '560' });
     await expect(resultados(page)).toContainText('8,00');
     await expect(resultados(page)).toContainText('Profesional / Élite');
-    // Z6 con 280 W era 339 – 420 W; con 560 W debe ser 678 – 840 W (round(560·1,21) = 678).
-    await expect(resultados(page)).toContainText('678 – 840 W');
+    // Z6 con 280 W era 337 – 420 W; con 560 W debe ser 673 – 840 W: empieza justo donde acaba
+    // Z5, round(560·1,20) = 672, y llega a round(560·1,50) = 840.
+    await expect(resultados(page)).toContainText('673 – 840 W');
   });
 });
 
 test.describe('CASO 3 (rechazo) — entradas que no describen a ningún ciclista', () => {
-  test('HALLAZGO — peso 0 kg no se rechaza: publica «∞ W/kg» y «Profesional / Élite»', async ({
+  test('peso 0 kg: se rechaza con un aviso, sin publicar ningún veredicto', async ({
     page,
   }) => {
     // 280 W / 0 kg es una división por cero. Lo esperable es un aviso y ningún veredicto.
     await calcular(page, { peso: '', ftp: '280' });
-    const texto = await resultados(page).innerText();
+    const texto = await page.locator('p[role="alert"]').innerText();
+    await expect(page.locator('[role="region"][aria-label="Resultados de potencia"]')).toHaveCount(0);
 
-    // TESTIGO DEL HALLAZGO — lo que la app hace HOY. Lo correcto sería no calcular y avisar
-    // («el peso debe ser mayor que 0»). Cuando se añada la validación, estas dos aserciones se
-    // pondrán en rojo: entonces hay que sustituirlas por la comprobación del aviso.
-    expect(texto).toContain('∞');
-    expect(texto).toContain('Profesional / Élite');
+    // HALLAZGO 237, reparado el 24/08/2026: publicaba «∞ W/kg» con el veredicto MÁS favorable
+    // de su escala. Ahora el motor rechaza la entrada y la app lo dice.
+    expect(texto).not.toContain('∞');
+    expect(texto).not.toContain('Profesional / Élite');
+    expect(texto).toContain('El peso debe ser un número mayor que 0 kg.');
   });
 
-  test('HALLAZGO — peso negativo tampoco se rechaza: «-4,00 W/kg» y «Principiante»', async ({
+  test('peso negativo: mismo rechazo, sin «-4,00 W/kg» ni «Principiante»', async ({
     page,
   }) => {
     // 280 W / −70 kg = −4,00 W/kg: una potencia por kilo negativa no significa nada.
     await calcular(page, { peso: '-70', ftp: '280' });
-    const texto = await resultados(page).innerText();
+    const texto = await page.locator('p[role="alert"]').innerText();
+    await expect(page.locator('[role="region"][aria-label="Resultados de potencia"]')).toHaveCount(0);
 
-    // TESTIGO DEL HALLAZGO — mismo caso que el anterior: hoy se publica el veredicto en vez
-    // de rechazar la entrada. Invertir estas aserciones cuando se valide el peso.
-    expect(texto).toContain('-4,00');
-    expect(texto).toContain('Principiante');
+    // Mismo hallazgo 237: un peso negativo daba «-4,00 W/kg» y el veredicto MÁS desfavorable.
+    expect(texto).not.toContain('-4,00');
+    expect(texto).toContain('El peso debe ser un número mayor que 0 kg.');
   });
 });
 
@@ -320,9 +313,9 @@ test('accesibilidad — los sliders están ocultos al lector de pantalla pero se
   expect(sliders.length).toBe(2);
   for (const s of sliders) {
     expect(s.ariaHidden).toBe('true');
-    // TESTIGO DEL HALLAZGO: un control aria-hidden debe llevar además tabIndex={-1} para no
-    // quedar en el recorrido del tabulador. Al añadirlo, este 0 pasará a −1 y el test avisará.
-    expect(s.tabIndex).toBe(0);
+    // HALLAZGO 241, reparado el 24/08/2026: un control aria-hidden tiene que llevar además
+    // tabIndex={-1} para salir del recorrido del tabulador (patrón axe «aria-hidden-focus»).
+    expect(s.tabIndex).toBe(-1);
   }
 
   // Todos los botones con type explícito (regla de oro del CLAUDE.md) y el plegable de la
@@ -335,4 +328,88 @@ test('accesibilidad — los sliders están ocultos al lector de pantalla pero se
     'aria-expanded',
     'false',
   );
+});
+
+/**
+ * HALLAZGO 240 — la promesa incumplida, reparada el 24/08/2026.
+ *
+ * El h1 («Calculadora de Vatios en Ciclismo») y las keywords («calcular vatios bicicleta»)
+ * ofrecían obtener vatios, y el FTP en vatios era una ENTRADA obligatoria: quien buscaba
+ * «cuántos vatios muevo» se encontraba un formulario que le exigía justo el dato que venía a
+ * buscar. Ahora se estiman con el modelo de fuerzas.
+ *
+ * CASO RESUELTO A MANO — 78 kg totales a 14,467 km/h (4,0186 m/s) por una rampa del 8 %:
+ *   θ = arctan(0,08) = 0,0798299 rad → sen θ = 0,0797469 · cos θ = 0,9968147
+ *   F_grav = 78 · 9,80665 · 0,0797469 = 60,9975 N
+ *   F_rod  = 0,005 · 78 · 9,80665 · 0,9968147 = 3,8126 N
+ *   F_aero = ½ · 1,225 · 0,32 · 4,0186² = 3,1648 N
+ *   P = (60,9975 + 3,8126 + 3,1648) · 4,0186 / 0,975 = 280 W
+ *   VAM = 4,0186 · 0,0797469 · 3600 = 1153,6 m/h
+ * El reparto es el que enseña la física de la escalada: casi todo contra la gravedad.
+ */
+test('el estimador da los vatios de quien no tiene potenciómetro', async ({ page }) => {
+  await page.goto(RUTA);
+  await page.getByRole('button', { name: /Estima tus vatios/i }).click();
+
+  await page.fill('#masaTotal', '');
+  await page.fill('#masaTotal', '78');
+  await page.fill('#velocidad', '');
+  await page.fill('#velocidad', '14.467');
+  await page.fill('#pendiente', '');
+  await page.fill('#pendiente', '8');
+  await page.getByRole('button', { name: /Estimar vatios/i }).click();
+
+  const tarjeta = page.locator('[role="status"]').filter({ hasText: 'Potencia estimada' });
+  await expect(tarjeta).toContainText('280');
+  await expect(tarjeta).toContainText('W');
+  // El desglose: 251 W contra la gravedad, 16 de rodadura y 13 contra el aire
+  await expect(tarjeta).toContainText('251 W contra la gravedad');
+  await expect(tarjeta).toContainText('16 W de rodadura');
+  await expect(tarjeta).toContainText('13 W contra el aire');
+  // Y la VAM que corresponde a esa subida
+  await expect(tarjeta).toContainText('1154 m/h');
+  // Se dice que es una estimación y con qué supuestos
+  await expect(tarjeta).toContainText('no sustituye a un potenciómetro');
+
+  // En llano no hay VAM que dar, y el reparto se invierte: manda el aire
+  await page.fill('#pendiente', '');
+  await page.fill('#pendiente', '0');
+  await page.fill('#velocidad', '');
+  await page.fill('#velocidad', '30');
+  await page.getByRole('button', { name: /Estimar vatios/i }).click();
+  await expect(tarjeta).not.toContainText('de VAM');
+  const desglose = await tarjeta.innerText();
+  const [, gravedad] = desglose.match(/(\d+) W contra la gravedad/)!;
+  const [, aire] = desglose.match(/(\d+) W contra el aire/)!;
+  expect(Number(gravedad)).toBe(0);
+  expect(Number(aire)).toBeGreaterThan(100); // a 30 km/h el aire ya es el grueso del esfuerzo
+});
+
+/**
+ * HALLAZGO 243 — cuando la VAM no se puede calcular, se dice por qué. Antes la tarjeta
+ * simplemente no aparecía: el usuario abría el plegable, rellenaba un campo, pulsaba
+ * Calcular y no obtenía ni VAM ni explicación.
+ */
+test('si falta el tiempo o el desnivel, la VAM se explica en vez de desaparecer', async ({
+  page,
+}) => {
+  await page.goto(RUTA);
+  await page.getByRole('button', { name: /Calcular VAM/i }).click();
+
+  // Desnivel sin tiempo
+  await page.fill('#desnivel', '1500');
+  await page.getByRole('button', { name: /Calcular potencia/i }).click();
+  await expect(resultados(page)).toContainText('hacen falta los dos datos');
+
+  // Con tiempo 0
+  await page.fill('#tiempoMin', '0');
+  await page.getByRole('button', { name: /Calcular potencia/i }).click();
+  await expect(resultados(page)).toContainText('Indica un tiempo mayor que 0 minutos');
+
+  // Y con los dos datos, la VAM aparece y el aviso se va
+  await page.fill('#tiempoMin', '');
+  await page.fill('#tiempoMin', '50');
+  await page.getByRole('button', { name: /Calcular potencia/i }).click();
+  await expect(resultados(page)).toContainText('1800'); // 1500 · 60 / 50
+  await expect(resultados(page)).not.toContainText('hacen falta los dos datos');
 });

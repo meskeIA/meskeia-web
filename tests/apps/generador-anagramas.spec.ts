@@ -49,11 +49,11 @@ import { test, expect, Page } from '@playwright/test';
  *   CASO 3 (rechazo) — entradas que no son letras
  *       «12345» y «@@@» no aportan NINGUNA letra. En modo frase el contador dice «0 letras a
  *       repartir» y el botón queda deshabilitado: correcto. En modo letras el botón sigue
- *       habilitado (mide letters.length, no las letras reales) — hallazgo abierto al final.
+ *       habilitado (medía letters.length, no las letras reales) — reparado el 24/08/2026.
  *
- * HALLAZGOS ABIERTOS: al final, marcados con `test.fail()` — afirman lo que DEBERÍA pasar y
- * hoy fallan a propósito. El día que se reparen, quitar la línea `test.fail()` y quedan como
- * regresión.
+ * HALLAZGOS DEL INSPECTOR: al final. Se escribieron con test.fail() afirmando lo que
+ * DEBERÍA pasar, y el 24/08/2026 se repararon los cinco: hoy son tests de regresión
+ * normales.
  */
 
 const RUTA = '/generador-anagramas/';
@@ -184,11 +184,10 @@ test.describe('generador-anagramas', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // HALLAZGOS ABIERTOS — hoy fallan a propósito
+  // HALLAZGOS DEL INSPECTOR — reparados el 24/08/2026, ya son regresión
   // ---------------------------------------------------------------------------------------
 
-  test.describe('hallazgos abiertos', () => {
-    test.fail();
+  test.describe('hallazgos del Inspector', () => {
 
     test('el modo letras no debería dar veredicto antes de buscar', async ({ page }) => {
       await abrirConDiccionario(page);
@@ -236,4 +235,43 @@ test.describe('generador-anagramas', () => {
       await expect(titulo.locator('[aria-hidden="true"]')).toHaveCount(1);
     });
   });
+    /**
+     * HALLAZGO 197 — la asimetría de tildes entre los tres modos de la misma app.
+     *
+     * `normalizarTexto()` iguala á = a en los modos «frase» y «verificar», pero el modo de
+     * letras comparaba contra el texto crudo del lema: ahí «á» y «a» eran letras distintas.
+     * Medido sobre el diccionario, 18.230 de los 86.973 lemas (el 21 %) quedaban inalcanzables
+     * si se tecleaba sin tildes, y al teclear con tilde se perdía todo lo demás. Afectaba de
+     * lleno al uso que la propia app promociona —un atril de Scrabble o de Wordle—, donde nadie
+     * teclea tildes, y se alcanzaba pulsando su propio botón de ejemplo «corazon».
+     */
+    test('el modo letras ignora las tildes, como los otros dos modos', async ({ page }) => {
+      await abrirConDiccionario(page);
+
+      // El ejemplo que ofrece la propia app: sin tilde tiene que encontrar la palabra con tilde
+      await page.fill('#anagram-letters', 'corazon');
+      await page.selectOption('#anagram-min', '7');
+      await page.selectOption('#anagram-max', '7');
+      await page.getByRole('button', { name: 'Buscar palabras' }).click();
+      const chips = page.locator('[class*="wordChip"]');
+      await expect(chips).toContainText(['corazón']);
+
+      // Y al revés: escribiéndolo con tilde salen las mismas palabras que sin ella
+      await page.fill('#anagram-letters', 'corazón');
+      await page.getByRole('button', { name: 'Buscar palabras' }).click();
+      await expect(chips).toContainText(['corazón']);
+
+      // «arbol» encuentra «árbol», que antes solo aparecía tecleando la tilde
+      await page.fill('#anagram-letters', 'arbol');
+      await page.selectOption('#anagram-min', '5');
+      await page.selectOption('#anagram-max', '5');
+      await page.getByRole('button', { name: 'Buscar palabras' }).click();
+      // La búsqueda va en un setTimeout: hay que esperar a que aparezcan los resultados
+      await expect(chips.first()).toBeVisible();
+      const cinco = await chips.allInnerTexts();
+      expect(cinco).toContain('árbol');
+      expect(cinco).toContain('labor'); // y no se pierde ninguna de las que ya salían
+      expect(cinco).toContain('borla');
+    });
+
 });

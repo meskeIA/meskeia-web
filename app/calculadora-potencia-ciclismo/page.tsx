@@ -1,5 +1,4 @@
 'use client';
-// @disclaimer: exempt
 
 import { useState } from 'react';
 import styles from './CalculadoraPotenciaCiclismo.module.css';
@@ -10,10 +9,16 @@ import {
   RelatedApps,
   ShareCard,
   EducationalSection,
+  DisclaimerCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { calcularPotenciaCiclismo, ResultadoPotenciaCiclismo } from '@/lib/calculadoras/deporte';
+import {
+  calcularPotenciaCiclismo,
+  calcularVatiosPorFuerzas,
+  type ResultadoPotenciaCiclismo,
+  type ResultadoVatios,
+} from '@/lib/calculadoras/deporte';
 
 // ── Mapa de colores por nivel ─────────────────────────────────────────────────
 
@@ -53,12 +58,42 @@ export default function CalculadoraPotenciaCiclismoPage() {
   const [tiempoMin, setTiempoMin] = useState<string>('');
   const [resultado, setResultado] = useState<ResultadoPotenciaCiclismo | null>(null);
   const [mostrarVam, setMostrarVam] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Estimador de vatios sin potenciómetro (modelo de fuerzas)
+  const [mostrarEstimador, setMostrarEstimador] = useState<boolean>(false);
+  const [masaTotal, setMasaTotal] = useState<number>(78);
+  const [velocidad, setVelocidad] = useState<number>(20);
+  const [pendiente, setPendiente] = useState<number>(0);
+  const [vatios, setVatios] = useState<ResultadoVatios | null>(null);
 
   const calcular = () => {
     const des = desnivel !== '' ? Number(desnivel) : undefined;
     const tMin = tiempoMin !== '' ? Number(tiempoMin) : undefined;
-    const res = calcularPotenciaCiclismo(peso, ftp, des, tMin);
-    setResultado(res);
+    try {
+      // El motor valida: un peso de 0 kg daba Infinity, que la app rotulaba «∞ W/kg» con el
+      // veredicto MÁS favorable de su escala, y uno negativo, con el más desfavorable.
+      setResultado(calcularPotenciaCiclismo(peso, ftp, des, tMin));
+      setError(null);
+    } catch (e) {
+      setResultado(null);
+      setError(e instanceof Error ? e.message : 'No se ha podido calcular.');
+    }
+  };
+
+  const estimarVatios = () => {
+    try {
+      const r = calcularVatiosPorFuerzas({
+        masaTotal_kg: masaTotal,
+        velocidad_kmh: velocidad,
+        pendiente_pct: pendiente,
+      });
+      setVatios(r);
+      setError(null);
+    } catch (e) {
+      setVatios(null);
+      setError(e instanceof Error ? e.message : 'No se ha podido estimar.');
+    }
   };
 
   return (
@@ -71,6 +106,11 @@ export default function CalculadoraPotenciaCiclismoPage() {
           Cuántos vatios (watts) mueves y qué significan: FTP, W/kg y VAM para conocer tu nivel como ciclista
         </p>
       </header>
+
+      {/* La app está en la suite salud y pauta entrenamiento personalizado a partir del FTP
+          (intervalos en Z4, trabajo en Z5-Z6), que la política sitúa en Nivel 2 ALTO. Estaba
+          declarada como exenta de disclaimer, que se reserva a lo educativo puro. */}
+      <DisclaimerCard variant="medical" severity="high" collapsible={false} />
 
       <LegalNotice />
 
@@ -101,6 +141,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
                 onChange={e => { setPeso(Number(e.target.value)); setResultado(null); }}
                 className={styles.slider}
                 aria-hidden="true"
+                tabIndex={-1}
               />
             </div>
 
@@ -125,6 +166,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
                 onChange={e => { setFtp(Number(e.target.value)); setResultado(null); }}
                 className={styles.slider}
                 aria-hidden="true"
+                tabIndex={-1}
               />
             </div>
           </div>
@@ -189,6 +231,125 @@ export default function CalculadoraPotenciaCiclismoPage() {
           </div>
         </div>
 
+        {/* ── Sección 1.bis: estimar los vatios sin potenciómetro ──
+            El h1 promete «calcular tus vatios» y el resto de la app pide el FTP en vatios como
+            ENTRADA: quien buscaba «cuántos vatios muevo» se encontraba un formulario que le
+            exigía justo el dato que venía a buscar. Aquí se estiman con el modelo de fuerzas a
+            partir de lo que sí tiene sin potenciómetro (hallazgo 240 del Inspector). */}
+        <div className={styles.panel}>
+          <div className={styles.vamToggle}>
+            <button
+              type="button"
+              className={styles.vamToggleBtn}
+              onClick={() => setMostrarEstimador(v => !v)}
+              aria-expanded={mostrarEstimador}
+            >
+              <span aria-hidden="true">{mostrarEstimador ? '▲' : '▼'}</span> ¿No tienes
+              potenciómetro? Estima tus vatios a partir de la velocidad
+            </button>
+          </div>
+
+          {mostrarEstimador && (
+            <>
+              <div className={styles.vamGrid}>
+                <div className={styles.inputGroup}>
+                  <label className={styles.inputLabel} htmlFor="masaTotal">
+                    Peso total en movimiento
+                    <span className={styles.inputHint}>Tú + la bici + lo que lleves</span>
+                  </label>
+                  <div className={styles.inputRow}>
+                    <input
+                      id="masaTotal"
+                      type="number"
+                      min={30}
+                      max={200}
+                      value={masaTotal}
+                      onChange={e => { setMasaTotal(Number(e.target.value)); setVatios(null); }}
+                      className={styles.inputNumber}
+                      aria-label="Peso total en kilogramos"
+                    />
+                    <span className={styles.inputUnidad}>kg</span>
+                  </div>
+                </div>
+
+                <div className={styles.inputGroup}>
+                  <label className={styles.inputLabel} htmlFor="velocidad">
+                    Velocidad media sostenida
+                  </label>
+                  <div className={styles.inputRow}>
+                    <input
+                      id="velocidad"
+                      type="number"
+                      min={1}
+                      max={80}
+                      value={velocidad}
+                      onChange={e => { setVelocidad(Number(e.target.value)); setVatios(null); }}
+                      className={styles.inputNumber}
+                      aria-label="Velocidad en kilómetros por hora"
+                    />
+                    <span className={styles.inputUnidad}>km/h</span>
+                  </div>
+                </div>
+
+                <div className={styles.inputGroup}>
+                  <label className={styles.inputLabel} htmlFor="pendiente">
+                    Pendiente media
+                    <span className={styles.inputHint}>0 en llano; negativa en bajada</span>
+                  </label>
+                  <div className={styles.inputRow}>
+                    <input
+                      id="pendiente"
+                      type="number"
+                      min={-15}
+                      max={25}
+                      step={0.5}
+                      value={pendiente}
+                      onChange={e => { setPendiente(Number(e.target.value)); setVatios(null); }}
+                      className={styles.inputNumber}
+                      aria-label="Pendiente en porcentaje"
+                    />
+                    <span className={styles.inputUnidad}>%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.btnWrapper}>
+                <button type="button" onClick={estimarVatios} className={styles.btnCalcular}>
+                  Estimar vatios →
+                </button>
+              </div>
+
+              {vatios && (
+                <div className={styles.resultCard} role="status">
+                  <div className={styles.resultHeader}>
+                    <span className={styles.resultLabel}>Potencia estimada</span>
+                  </div>
+                  <div className={styles.resultValor}>
+                    {formatNumber(vatios.vatios, 0)} <span className={styles.resultUnidad}>W</span>
+                  </div>
+                  <p className={styles.resultDesc}>
+                    Reparto del esfuerzo: {formatNumber(vatios.desglose.gravedad, 0)} W contra la
+                    gravedad · {formatNumber(vatios.desglose.rodadura, 0)} W de rodadura ·{' '}
+                    {formatNumber(vatios.desglose.aerodinamica, 0)} W contra el aire.
+                    {vatios.vam !== null && (
+                      <> Esa subida son {formatNumber(vatios.vam, 0)} m/h de VAM.</>
+                    )}
+                  </p>
+                  <p className={styles.resultDesc}>
+                    Es una <strong>estimación</strong>: supone asfalto en buen estado (Crr 0,005),
+                    posición sobre las manetas (CdA 0,32 m²) y aire a nivel del mar. Con viento,
+                    otra postura o ruedas distintas cambia, y no sustituye a un potenciómetro.
+                  </p>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        {error && (
+          <p className={styles.avisoError} role="alert">{error}</p>
+        )}
+
         {/* ── Resultados ── */}
         {resultado && (
           <div className={styles.resultados} role="region" aria-label="Resultados de potencia">
@@ -225,9 +386,15 @@ export default function CalculadoraPotenciaCiclismoPage() {
               </div>
             )}
 
+            {resultado.avisoVam && (
+              <p className={styles.avisoVam}>{resultado.avisoVam}</p>
+            )}
+
             {/* Tabla de zonas */}
             <div className={styles.zonasCard}>
-              <h3 className={styles.zonasTitle}>Zonas de Potencia (basadas en tu FTP: {ftp} W)</h3>
+              <h3 className={styles.zonasTitle}>
+                Zonas de Potencia (basadas en tu FTP: {formatNumber(ftp, 0)} W)
+              </h3>
               <div className={styles.tableWrapper}>
                 <table className={styles.zonasTable}>
                   <thead>
@@ -252,7 +419,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
                         <td className={styles.zonaNombre}>{z.nombre}</td>
                         <td className={styles.zonaPorc}>{z.porcentajeFTP}</td>
                         <td className={styles.zonaRango}>
-                          {z.wattsMin} – {z.wattsMax} W
+                          {formatNumber(z.wattsMin, 0)} – {formatNumber(z.wattsMax, 0)} W
                         </td>
                       </tr>
                     ))}
@@ -373,7 +540,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
               <div className={styles.faqItem}>
                 <h4><span aria-hidden="true">📊</span> Valores de referencia en subida</h4>
                 <p>
-                  Ciclistas de nivel medio: 800–1.000 m/h. Amateurs fuertes: 1.000–1.200 m/h. Semi-profesionales: 1.200–1.400 m/h. Profesionales del World Tour: 1.600–1.800 m/h en grandes ascensiones. En el Tour de Francia, los mejores escaladores han superado 1.800 m/h.
+                  Es la misma escala con la que esta calculadora te clasifica: por debajo de 800 m/h, principiante; 800–1.000, cicloturista; 1.000–1.200, amateur; 1.200–1.400, amateur fuerte; 1.400–1.600, semi-profesional; y por encima de 1.600 m/h, élite. Los profesionales del World Tour se mueven en 1.600–1.800 m/h en grandes ascensiones, y en el Tour de Francia los mejores escaladores han superado los 1.800 m/h.
                 </p>
                 <p className={styles.faqTip}>
                   El VAM varía según la pendiente: a mayor pendiente, mayor VAM para el mismo W/kg. Comparar VAMs de subidas con pendientes muy distintas puede inducir a error.
@@ -382,7 +549,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
               <div className={styles.faqItem}>
                 <h4><span aria-hidden="true">🔗</span> Relación VAM y W/kg</h4>
                 <p>
-                  Existe una relación aproximada entre VAM y W/kg según la pendiente media de la subida. A 8% de pendiente: W/kg ≈ VAM / 255. Esta relación varía con la resistencia aerodinámica, el peso de la bici, la temperatura y la altura (altitud). Úsala como estimación orientativa, no como fórmula exacta.
+                  Existe una relación aproximada entre VAM y W/kg que depende de la pendiente media. La regla que popularizó el propio Ferrari es <strong>VAM ≈ W/kg × (2 + %pendiente/10) × 100</strong>: al 8 % sale el factor 280, no 255 —ese corresponde a una pendiente del 5,5 %—, y resolver la subida con el modelo de fuerzas da 288 para un ciclista de 70 kg con una bici de 8. Es decir, al 8 % de pendiente, <strong>W/kg ≈ VAM / 280</strong>. La relación varía con la resistencia aerodinámica, el peso de la bici, la temperatura y la altitud: úsala como estimación orientativa, no como fórmula exacta.
                 </p>
               </div>
             </div>

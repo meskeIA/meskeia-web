@@ -488,9 +488,25 @@ test('CASO 5 (MCNU) — la animación acelera con α = 0,5 rad/s² y el panel la
   const tPanel = leerDeFoto('Período (T)');
 
   // Con r = 2 m:  a_c = ω²·r  ·  v = ω·r  ·  T = 2π/ω
-  expect(acPanel, 'a_c = ω²·r con la ω que enseña el propio panel').toBeCloseTo(omegaPanel ** 2 * 2, 1);
-  expect(vPanel, 'v = ω·r con la ω que enseña el propio panel').toBeCloseTo(omegaPanel * 2, 1);
-  expect(tPanel, 'T = 2π/ω con la ω que enseña el propio panel').toBeCloseTo((2 * Math.PI) / omegaPanel, 1);
+  //
+  // La tolerancia sale de PROPAGAR el redondeo, no de un número fijo. El panel publica ω con
+  // dos decimales, así que arrastra hasta ±0,005 rad/s; en a_c = ω²·r ese error se amplifica
+  // por 2·ω·r, que con ω ≈ 3 rad/s ya vale 0,06 — por encima del ±0,05 de `toBeCloseTo(…, 1)`.
+  // Con la tolerancia fija, el test fallaba o no según el instante en que se tomase la foto.
+  const dOmega = 0.005;
+  const r = 2;
+  expect(
+    Math.abs(acPanel - omegaPanel ** 2 * r),
+    'a_c = ω²·r con la ω que enseña el propio panel',
+  ).toBeLessThanOrEqual(2 * omegaPanel * r * dOmega + 0.01);
+  expect(
+    Math.abs(vPanel - omegaPanel * r),
+    'v = ω·r con la ω que enseña el propio panel',
+  ).toBeLessThanOrEqual(r * dOmega + 0.01);
+  expect(
+    Math.abs(tPanel - (2 * Math.PI) / omegaPanel),
+    'T = 2π/ω con la ω que enseña el propio panel',
+  ).toBeLessThanOrEqual(((2 * Math.PI) / omegaPanel ** 2) * dOmega + 0.01);
   // Volver a MCU debe dejar panel y animación otra vez de acuerdo.
   await page.getByRole('button', { name: /^MCU/ }).click();
   await expect(page.getByRole('button', { name: /^MCU/ })).toHaveAttribute('aria-pressed', 'true');

@@ -483,3 +483,28 @@
   .btnCalcular,
   .vamToggleBtn { transition: none; }
 }
+
+/* Aviso de entrada inválida (peso o FTP fuera de lo posible) */
+.avisoError {
+  margin: 1rem 0 0;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid #dc2626;
+  border-radius: 6px;
+  background: rgba(220, 38, 38, 0.1);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+/* La VAM se pidió pero faltaban datos: antes la tarjeta desaparecía sin decir por qué */
+.avisoVam {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid #eab308;
+  border-radius: 6px;
+  background: rgba(234, 179, 8, 0.12);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+[data-theme='dark'] .avisoError { background: rgba(220, 38, 38, 0.16); }
+[data-theme='dark'] .avisoVam { background: rgba(234, 179, 8, 0.16); }
