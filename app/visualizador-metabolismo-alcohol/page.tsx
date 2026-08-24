@@ -496,9 +496,25 @@ export default function MetabolismoAlcoholPage() {
         <h3>El acetaldehído en bebidas fermentadas</h3>
         <p>
           Las bebidas fermentadas (vino, cerveza, sidra) contienen acetaldehído preformado como subproducto
-          de la fermentación. El vino puede contener 10-300 mg/L de acetaldehído; la cerveza, menos.
-          Los vinos más oxidados (jerez, cava) tienden a tener más. Este acetaldehído adicional se absorbe
-          directamente, sin pasar por la vía ADH.
+          de la fermentación. En vino se describen concentraciones del orden de 10-200 mg/L y en cerveza
+          bastante menores, con frecuencia entre 1 y 20 mg/L. Los rangos son amplios y no permiten predecir
+          el contenido de una botella concreta: algunos estudios sitúan las medias en torno a 9 mg/L en
+          cerveza, 34 mg/L en vino y 118 mg/L en vinos fortificados. Donde sí cabe esperar niveles altos es
+          en los vinos deliberadamente oxidativos, como determinados estilos de jerez; que un vino sea
+          espumoso no basta para suponer que tenga más.
+        </p>
+        <p>
+          Este acetaldehído no necesita que la ADH lo fabrique, porque <em>ya es</em> acetaldehído: entra en
+          contacto de forma inmediata con la mucosa de la boca, la faringe y el esófago. Eso no significa
+          que llegue intacto a la sangre o al hígado, porque se metaboliza localmente y durante el primer
+          paso gastrointestinal y hepático.
+        </p>
+        <p>
+          Conviene además ponerlo a escala. Una copa de 150 ml de un vino con 50 mg/L aporta unos 7,5 mg de
+          acetaldehído preformado, mientras que los aproximadamente 14 g de etanol de esa misma copa
+          generarán, al metabolizarse, del orden de varios miles de miligramos. El preformado importa por
+          <strong> dónde</strong> actúa —la exposición local de las mucosas, con picos breves en la saliva—
+          y no por su cantidad: la exposición dominante procede del etanol.
         </p>
       </EducationalSection>
 
