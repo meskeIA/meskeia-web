@@ -199,13 +199,20 @@ export interface CantidadEnLetras {
  * El redondeo es a dos decimales: 3,456 € se escribe como 3,46 €, igual que
  * haría cualquier factura.
  */
+/** ¿El numeral termina en «millón» o «millones», y por tanto pide «de» ante el sustantivo? */
+function cuantificaConDe(numeral: string): boolean {
+  return /mill(ón|ones)$/.test(numeral);
+}
+
 export function cantidadALetras(valor: number, opciones: OpcionesCantidad): CantidadEnLetras {
   const { moneda, estiloFraccion = 'letras', mayusculas = false } = opciones;
 
   if (!Number.isFinite(valor)) {
     throw new Error('Introduce una cantidad válida.');
   }
-  if (Math.abs(valor) > LIMITE_NUMERO_A_LETRAS) {
+  // El tope se compara contra la parte ENTERA: la ayuda anuncia «hasta 999.999.999.999 y dos
+  // decimales», y comparando el valor con céntimos el propio máximo declarado se rechazaba.
+  if (Math.floor(Math.abs(valor)) > LIMITE_NUMERO_A_LETRAS) {
     throw new Error(`La cantidad supera el límite admitido (${LIMITE_NUMERO_A_LETRAS}).`);
   }
 
@@ -219,7 +226,14 @@ export function cantidadALetras(valor: number, opciones: OpcionesCantidad): Cant
   const enteroTexto = enteroALetras(entero, { genero: moneda.genero, apocope: true });
   const unidad = entero === 1 ? moneda.singular : moneda.plural;
 
-  const partes = [enteroTexto, unidad];
+  /**
+   * DPD, s. v. «millón»: cuando millón/millones NO va seguido de otro numeral, el sustantivo
+   * cuantificado se introduce con DE. «Un millón DE euros», pero «un millón doscientos mil
+   * euros» (correcto sin «de»). Faltaba, y se alcanzaba pulsando el ejemplo 1.000.000 que la
+   * propia app ofrece: la línea que invita a copiar en un pagaré decía «la cantidad de un
+   * millón euros». Afecta igual a las monedas femeninas: «un millón DE libras».
+   */
+  const partes = [enteroTexto, cuantificaConDe(enteroTexto) ? `de ${unidad}` : unidad];
 
   if (estiloFraccion === 'fraccion') {
     partes.push(`con ${String(fraccion).padStart(2, '0')}/100`);
@@ -240,11 +254,15 @@ export function cantidadALetras(valor: number, opciones: OpcionesCantidad): Cant
  * cifra tras la palabra «coma», que es como se leen en español: 3,45 es «tres
  * coma cuatro cinco», no «tres coma cuarenta y cinco».
  */
-export function numeroALetras(valor: number, genero: GeneroNumeral = 'masculino'): string {
+export function numeroALetras(
+  valor: number,
+  genero: GeneroNumeral = 'masculino',
+  decimalesTecleados?: string,
+): string {
   if (!Number.isFinite(valor)) {
     throw new Error('Introduce un número válido.');
   }
-  if (Math.abs(valor) > LIMITE_NUMERO_A_LETRAS) {
+  if (Math.floor(Math.abs(valor)) > LIMITE_NUMERO_A_LETRAS) {
     throw new Error(`El número supera el límite admitido (${LIMITE_NUMERO_A_LETRAS}).`);
   }
 
@@ -254,7 +272,13 @@ export function numeroALetras(valor: number, genero: GeneroNumeral = 'masculino'
 
   let texto = enteroALetras(entero, { genero });
 
-  const decimalesTexto = String(absoluto).split('.')[1];
+  // El número ya no recuerda el cero final que el usuario escribió: 0,50 vale 0,5. Y la app
+  // promete leer «las cifras tras la coma una a una», de modo que 0,50 es «cero coma cinco
+  // cero». Por eso quien llama puede pasar las cifras tal como se teclearon.
+  const decimalesTexto =
+    decimalesTecleados && /^\d+$/.test(decimalesTecleados)
+      ? decimalesTecleados
+      : String(absoluto).split('.')[1];
   if (decimalesTexto) {
     const cifras = decimalesTexto
       .split('')

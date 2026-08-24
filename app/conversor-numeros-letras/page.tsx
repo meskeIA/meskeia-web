@@ -11,7 +11,7 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { formatNumber, parseSpanishNumber } from '@/lib';
+import { formatNumber, parseSpanishNumber, partesNumericas } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   MONEDAS,
@@ -51,11 +51,16 @@ export default function ConversorNumerosLetrasPage() {
     const limpio = entrada.trim();
     if (limpio === '') return { texto: '', error: '' };
 
+    // `partesNumericas` da además las cifras decimales TAL COMO SE TECLEARON: el número ya no
+    // recuerda el cero final de 0,50 y esta app promete leerlas «una a una».
+    const partes = partesNumericas(limpio);
     const valor = parseSpanishNumber(limpio);
-    if (!Number.isFinite(valor)) {
+    if (!partes || !Number.isFinite(valor)) {
       return { texto: '', error: 'No se reconoce esa cantidad. Escribe solo cifras, con coma o punto decimal.' };
     }
-    if (Math.abs(valor) > LIMITE_NUMERO_A_LETRAS) {
+    // El tope se compara contra la parte ENTERA: la ayuda anuncia «hasta 999.999.999.999 y dos
+    // decimales», y comparando el valor completo el propio máximo declarado se rechazaba.
+    if (Math.floor(Math.abs(valor)) > LIMITE_NUMERO_A_LETRAS) {
       return {
         texto: '',
         error: `La cantidad máxima admitida es ${formatNumber(LIMITE_NUMERO_A_LETRAS, 0)}.`,
@@ -67,8 +72,8 @@ export default function ConversorNumerosLetrasPage() {
         modo === 'importe'
           ? cantidadALetras(valor, { moneda, estiloFraccion, mayusculas }).texto
           : mayusculas
-            ? numeroALetras(valor).toUpperCase()
-            : numeroALetras(valor);
+            ? numeroALetras(valor, 'masculino', partes.decimales).toUpperCase()
+            : numeroALetras(valor, 'masculino', partes.decimales);
       return { texto, error: '', valor };
     } catch (e) {
       return { texto: '', error: e instanceof Error ? e.message : 'No se ha podido convertir la cantidad.' };

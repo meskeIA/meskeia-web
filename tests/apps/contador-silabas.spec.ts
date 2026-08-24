@@ -40,9 +40,9 @@ import { test, expect, Page } from '@playwright/test';
  *       Con el campo vacío o solo con espacios, `analizar()` sale por `if (!texto.trim())`
  *       y la app se queda en el marcador de posición, sin inventarse un resultado.
  *
- * HALLAZGOS ABIERTOS: al final, marcados con `test.fail()` — afirman lo que DEBERÍA pasar y
- * hoy fallan a propósito. El día que se reparen, quitar la línea `test.fail()` y quedan como
- * regresión.
+ * HALLAZGOS DEL INSPECTOR: al final. Se escribieron con `test.fail()` afirmando lo que
+ * DEBERÍA pasar, y el 24/08/2026 se repararon los ocho: hoy son tests de regresión
+ * normales.
  */
 
 const RUTA = '/contador-silabas/';
@@ -116,10 +116,11 @@ test.describe('contador-silabas', () => {
   }) => {
     await analizar(page, '12345 €€€ --- 3,14');
 
-    // /[a-záéíóúüñ]+/gi no encuentra ninguna palabra: cero en todo y ni una tarjeta.
-    await expect(page.locator('[class*="resumenValor"]').nth(0)).toHaveText('0');
-    await expect(page.locator('[class*="resumenValor"]').nth(1)).toHaveText('0');
-    await expect(page.locator('[class*="resumenValor"]').nth(2)).toHaveText('0'); // no NaN
+    // /[a-záéíóúüñ]+/gi no encuentra ninguna palabra. HALLAZGO 214, reparado el 24/08/2026:
+    // antes se pintaba el panel con ceros y un «Análisis detallado» vacío, indistinguible de
+    // un análisis real; ahora se dice que no había nada que analizar.
+    await expect(page.getByText('No hay ninguna palabra que analizar')).toBeVisible();
+    await expect(page.locator('[class*="resumenValor"]')).toHaveCount(0);
     await expect(page.locator('[class*="palabraCard"]')).toHaveCount(0);
 
     // Con el campo solo con espacios no llega a haber resultado: sigue el marcador inicial.
@@ -188,11 +189,14 @@ test.describe('contador-silabas', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // HALLAZGOS ABIERTOS — hoy fallan a propósito
+  // HALLAZGOS DEL INSPECTOR — reparados el 24/08/2026, ya son regresión
+  //
+  // El silabeador se reescribió entero y salió del componente: vive en
+  // `app/contador-silabas/silabeo.ts` con 24 tests unitarios que resuelven cada regla a mano
+  // (`tests/silabeo.spec.ts`). Lo que sigue comprueba que esas reglas llegan a la pantalla.
   // ---------------------------------------------------------------------------------------
 
-  test.describe('hallazgos abiertos', () => {
-    test.fail();
+  test.describe('hallazgos del Inspector', () => {
 
     test('los grupos de 3+ consonantes deberían dejar entero el grupo inseparable', async ({
       page,
@@ -258,5 +262,22 @@ test.describe('contador-silabas', () => {
       const titulo = page.locator('h3', { hasText: 'Reglas de División Silábica' });
       await expect(titulo.locator('[aria-hidden="true"]')).toHaveCount(1);
     });
+    test('las tarjetas nombran los diptongos, triptongos e hiatos que prometía el JSON-LD', async ({
+      page,
+    }) => {
+      // HALLAZGO 212: el JSON-LD anunciaba «Identificación de diptongos, hiatos y triptongos»
+      // y la tarjeta de Twitter prometía «diptongos e hiatos», pero la interfaz no marcaba
+      // ninguno: solo se explicaban en el texto educativo, que es lo que da cualquier apunte.
+      await analizar(page, 'cielo país buey aquí');
+
+      const tarjeta = (i: number) => page.locator('[class*="palabraCard"]').nth(i);
+      await expect(tarjeta(0)).toContainText('Diptongo: ie');
+      await expect(tarjeta(1)).toContainText('Hiato: a-í');
+      await expect(tarjeta(2)).toContainText('Triptongo: uey');
+      // En «aquí» la u de «qu» no suena: no hay ningún encuentro vocálico que marcar
+      await expect(tarjeta(3)).not.toContainText('Diptongo');
+      await expect(tarjeta(3)).not.toContainText('Hiato');
+    });
+
   });
 });

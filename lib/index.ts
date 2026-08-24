@@ -15,6 +15,8 @@ export {
   formatDuration,
   parseSpanishNumber,
   parseSpanishNumberOr,
+  partesNumericas,
+  type PartesNumericas,
   isValidNumber,
 } from './formatters';
 

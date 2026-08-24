@@ -135,8 +135,25 @@ export function parseSpanishNumberOr(input: string, porDefecto = 0): number {
 const AGRUPA_CON_PUNTO = /^\d{1,3}(\.\d{3})+$/;
 const AGRUPA_CON_COMA = /^\d{1,3}(,\d{3})+$/;
 
-export function parseSpanishNumber(input: string): number {
-  if (!input || input.trim() === '') return NaN;
+/**
+ * Las tres piezas de lo que el usuario tecleó, o `null` si no es un número.
+ *
+ * Se separa de `parseSpanishNumber` porque hay una que el número ya no recuerda: las cifras
+ * decimales TAL COMO SE ESCRIBIERON. `0,50` vale 0,5 y ahí el cero final se perdió para
+ * siempre; `conversor-numeros-letras`, que promete leer las cifras tras la coma «una a una»,
+ * necesita ese cero para decir «cero coma cinco cero».
+ */
+export interface PartesNumericas {
+  /** -1 o 1 */
+  signo: number;
+  /** Parte entera, ya sin separadores de millar */
+  entera: string;
+  /** Cifras tras el separador decimal, tal cual se teclearon ('' si no hay) */
+  decimales: string;
+}
+
+export function partesNumericas(input: string): PartesNumericas | null {
+  if (!input || input.trim() === '') return null;
 
   // Fuera lo que no aporta cifra: espacios (normal, NBSP y fino) y el símbolo pegado
   const limpio = input
@@ -144,7 +161,7 @@ export function parseSpanishNumber(input: string): number {
     .replace(/^[€$£%]+|[€$£%]+$/g, '');
 
   // A partir de aquí solo cifras, signo y separadores. Nada de letras ni exponentes.
-  if (!/^[+-]?[\d.,]+$/.test(limpio) || !/\d/.test(limpio)) return NaN;
+  if (!/^[+-]?[\d.,]+$/.test(limpio) || !/\d/.test(limpio)) return null;
 
   const signo = limpio.startsWith('-') ? -1 : 1;
   const cuerpo = limpio.replace(/^[+-]/, '');
@@ -152,33 +169,50 @@ export function parseSpanishNumber(input: string): number {
   const comas = (cuerpo.match(/,/g) || []).length;
   const puntos = (cuerpo.match(/\./g) || []).length;
 
-  let normalizado: string;
-
   if (comas > 0 && puntos > 0) {
     // Los dos separadores presentes: el ÚLTIMO es el decimal, el otro agrupa millares
     const decimalEsComa = cuerpo.lastIndexOf(',') > cuerpo.lastIndexOf('.');
-    if ((decimalEsComa ? comas : puntos) !== 1) return NaN;  // dos decimales no es un número
+    if ((decimalEsComa ? comas : puntos) !== 1) return null;   // dos decimales no es un número
     const corte = cuerpo.lastIndexOf(decimalEsComa ? ',' : '.');
     const entera = cuerpo.slice(0, corte);
     const decimales = cuerpo.slice(corte + 1);
     const agrupa = decimalEsComa ? AGRUPA_CON_PUNTO : AGRUPA_CON_COMA;
-    if (!agrupa.test(entera)) return NaN;
-    normalizado = entera.replace(/[.,]/g, '') + '.' + decimales;
-  } else if (comas > 0) {
-    // Una coma sola es SIEMPRE decimal español, aunque pudiera leerse como millar inglés
-    if (comas === 1) normalizado = cuerpo.replace(',', '.');
-    else if (AGRUPA_CON_COMA.test(cuerpo)) normalizado = cuerpo.replace(/,/g, '');
-    else return NaN;                                          // "2,5,3" no es un número
-  } else if (puntos > 0) {
-    if (AGRUPA_CON_PUNTO.test(cuerpo)) normalizado = cuerpo.replace(/\./g, '');
-    else if (puntos === 1) normalizado = cuerpo;              // decimal internacional
-    else return NaN;                                          // "1.2.3" no es un número
-  } else {
-    normalizado = cuerpo;
+    if (!agrupa.test(entera)) return null;
+    return { signo, entera: entera.replace(/[.,]/g, ''), decimales };
   }
 
-  const n = parseFloat(normalizado);
-  return Number.isFinite(n) ? signo * n : NaN;
+  if (comas > 0) {
+    // Una coma sola es SIEMPRE decimal español, aunque pudiera leerse como millar inglés
+    if (comas === 1) {
+      const [entera, decimales] = cuerpo.split(',');
+      return { signo, entera, decimales };
+    }
+    if (AGRUPA_CON_COMA.test(cuerpo)) {
+      return { signo, entera: cuerpo.replace(/,/g, ''), decimales: '' };
+    }
+    return null;                                               // "2,5,3" no es un número
+  }
+
+  if (puntos > 0) {
+    if (AGRUPA_CON_PUNTO.test(cuerpo)) {
+      return { signo, entera: cuerpo.replace(/\./g, ''), decimales: '' };
+    }
+    if (puntos === 1) {
+      const [entera, decimales] = cuerpo.split('.');
+      return { signo, entera, decimales };
+    }
+    return null;                                               // "1.2.3" no es un número
+  }
+
+  return { signo, entera: cuerpo, decimales: '' };
+}
+
+export function parseSpanishNumber(input: string): number {
+  const partes = partesNumericas(input);
+  if (!partes) return NaN;
+
+  const n = parseFloat(`${partes.entera || '0'}.${partes.decimales || '0'}`);
+  return Number.isFinite(n) ? partes.signo * n : NaN;
 }
 
 /**

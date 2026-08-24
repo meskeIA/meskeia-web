@@ -16,6 +16,7 @@ import {
   type AnalisisVerso,
   analizarPoema,
   contarSilabasTexto,
+  encuentrosVocalicos,
   nombreDelVerso,
 } from './metrica';
 import {
@@ -278,10 +279,10 @@ sabañón garrafal, morado y frito.`,
           </div>
 
           <div className={styles.botones}>
-            <button onClick={analizar} className={styles.btnPrimary}>
+            <button type="button" onClick={analizar} className={styles.btnPrimary}>
               Analizar Sílabas
             </button>
-            <button onClick={limpiar} className={styles.btnSecondary}>
+            <button type="button" onClick={limpiar} className={styles.btnSecondary}>
               Limpiar
             </button>
           </div>
@@ -289,7 +290,17 @@ sabañón garrafal, morado y frito.`,
 
         {/* Panel de resultados */}
         <div className={styles.resultsPanel} role="status" aria-live="polite">
-          {resultado ? (
+          {/* Una entrada sin ninguna letra («12345 €€€ --- 3,14») pintaba el panel con ceros y
+              un «Análisis detallado» vacío, indistinguible de un análisis real. */}
+          {resultado && resultado.totalPalabras === 0 ? (
+            <div className={styles.placeholder}>
+              <span className={styles.placeholderIcon} aria-hidden="true">🔤</span>
+              <p>
+                No hay ninguna palabra que analizar: lo que has escrito son solo cifras o
+                signos. Escribe al menos una palabra.
+              </p>
+            </div>
+          ) : resultado ? (
             <>
               {/* Resumen */}
               <div className={styles.resumen}>
@@ -496,6 +507,27 @@ sabañón garrafal, morado y frito.`,
                       <div className={styles.palabraTotal}>
                         {p.total} {p.total === 1 ? 'sílaba' : 'sílabas'}
                       </div>
+                      {/* El JSON-LD y la tarjeta de Twitter prometían «identificación de
+                          diptongos, hiatos y triptongos» y no se marcaba ninguno: solo se
+                          explicaban en el texto educativo, que es lo que da cualquier apunte. */}
+                      {(() => {
+                        const enc = encuentrosVocalicos(p.palabra);
+                        const etiquetas = [
+                          ...enc.triptongos.map((v) => ({ tipo: 'Triptongo', valor: v })),
+                          ...enc.diptongos.map((v) => ({ tipo: 'Diptongo', valor: v })),
+                          ...enc.hiatos.map((v) => ({ tipo: 'Hiato', valor: v })),
+                        ];
+                        if (etiquetas.length === 0) return null;
+                        return (
+                          <div className={styles.palabraEncuentros}>
+                            {etiquetas.map((e, i) => (
+                              <span key={i} className={styles.encuentro}>
+                                {e.tipo}: <strong>{e.valor}</strong>
+                              </span>
+                            ))}
+                          </div>
+                        );
+                      })()}
                     </div>
                   ))}
                 </div>
@@ -512,7 +544,7 @@ sabañón garrafal, morado y frito.`,
 
       {/* Información sobre reglas */}
       <div className={styles.reglas}>
-        <h3>📚 Reglas de División Silábica en Español</h3>
+        <h3><span aria-hidden="true">📚</span> Reglas de División Silábica en Español</h3>
         <div className={styles.reglasGrid}>
           <div className={styles.reglaCard}>
             <h4>Diptongos</h4>
@@ -555,7 +587,7 @@ sabañón garrafal, morado y frito.`,
         icon="📝"
       >
         <section>
-          <h3>📊 Fenómenos Fonéticos: Diptongos, Hiatos y Sinalefa</h3>
+          <h3><span aria-hidden="true">📊</span> Fenómenos Fonéticos: Diptongos, Hiatos y Sinalefa</h3>
           <div className={styles.eduTablaWrapper}>
             <table className={styles.eduTabla}>
               <thead>
@@ -616,7 +648,7 @@ sabañón garrafal, morado y frito.`,
         </section>
 
         <section>
-          <h3>🎯 Usos del Contador de Sílabas</h3>
+          <h3><span aria-hidden="true">🎯</span> Usos del Contador de Sílabas</h3>
           <div className={styles.eduEscenariosGrid}>
             <div className={styles.eduEscenarioCard}>
               <span className={styles.eduEscenarioIcon}>🎭</span>
@@ -642,7 +674,7 @@ sabañón garrafal, morado y frito.`,
         </section>
 
         <section>
-          <h3>❓ Preguntas Frecuentes sobre Sílabas y Métrica</h3>
+          <h3><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Sílabas y Métrica</h3>
           <div className={styles.eduFaqList}>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqPregunta}>¿Cómo se cuenta una sílaba tónica para la métrica?</summary>
@@ -680,7 +712,7 @@ sabañón garrafal, morado y frito.`,
         </section>
 
         <section>
-          <h3>📋 Cómo Analizar Métricamente un Poema: Guía Paso a Paso</h3>
+          <h3><span aria-hidden="true">📋</span> Cómo Analizar Métricamente un Poema: Guía Paso a Paso</h3>
           <ol className={styles.eduPasosList}>
             <li className={styles.eduPaso}>
               <span className={styles.eduPasoNum}>1</span>
@@ -728,7 +760,7 @@ sabañón garrafal, morado y frito.`,
         </section>
 
         <section>
-          <h3>💡 Consejos para Dominar el Silabeo Español</h3>
+          <h3><span aria-hidden="true">💡</span> Consejos para Dominar el Silabeo Español</h3>
           <div className={styles.eduTipsGrid}>
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcono}>🗣️</span>
@@ -753,7 +785,7 @@ sabañón garrafal, morado y frito.`,
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcono}>🎯</span>
               <h4>Los grupos bl, br, cl, cr, dr, fl, fr... van juntos</h4>
-              <p>Estos grupos consonánticos (oclusiva + líquida) nunca se separan en el silabeo: a-brir, o-tros, a-gra-dar, a-fli-gir. En cambio, los grupos ns, bs, nst, etc. sí se separan: cons-tar → con-tar histórico. La regla es: si el grupo puede iniciar una sílaba en español, no se divide.</p>
+              <p>Estos grupos consonánticos (oclusiva + líquida) nunca se separan en el silabeo: a-brir, o-tros, a-gra-dar, a-fli-gir. En cambio, los que no pueden abrir sílaba se reparten entre las dos: cons-tar, ins-ti-tu-to, obs-tá-cu-lo, pers-pec-ti-va. La regla es esa: si el grupo puede iniciar una sílaba en español, viaja entero a la siguiente; si no, se parte.</p>
             </div>
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcono}>📖</span>

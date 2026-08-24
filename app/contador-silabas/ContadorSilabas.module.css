@@ -992,3 +992,30 @@
   background: #2E86AB;
   color: #fff;
 }
+
+/* Encuentros vocálicos de cada palabra (diptongo · triptongo · hiato) */
+.palabraEncuentros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.35rem;
+}
+
+.encuentro {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+  white-space: nowrap;
+}
+
+.encuentro strong {
+  color: var(--primary-texto);
+}
+
+[data-theme='dark'] .encuentro {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.14);
+}

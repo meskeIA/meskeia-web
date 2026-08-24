@@ -233,16 +233,25 @@ test('CASO 3 · vacío, texto y fuera de rango se rechazan sin inventar cifras',
 
 // ─── TESTIGOS DE LOS HALLAZGOS (afirman el fallo tal y como está hoy) ─────────
 
-test('HALLAZGO 1 · los millones redondos salen sin la preposición «de»', async ({ page }) => {
-  // DPD, s. v. «millón»: «un millón DE euros» cuando no sigue otro numeral. Al repararse,
-  // estas líneas deben pasar a 'un millón de euros', 'dos millones de euros', 'mil millones
-  // de euros' y 'un millón de libras'.
-  expect(await enLetras(page, '1.000.000')).toBe('un millón euros');
-  expect(await enLetras(page, '2.000.000')).toBe('dos millones euros');
-  expect(await enLetras(page, '1.000.000.000')).toBe('mil millones euros');
+/**
+ * HALLAZGO 1 · REPARADO el 24/08/2026. El DPD (s. v. «millón») es explícito: si millón(es) no
+ * va seguido de otro numeral, el sustantivo cuantificado se introduce con «de». Faltaba, y se
+ * alcanzaba pulsando el ejemplo 1.000.000 que la propia app ofrece en «Prueba con:», de modo
+ * que la línea preparada para copiar decía «Págese por este pagaré la cantidad de un millón
+ * euros». El caso contrario ya estaba bien y tiene que seguir estándolo: cuando detrás del
+ * millón viene otro numeral, NO lleva «de».
+ */
+test('HALLAZGO 1 · los millones redondos llevan la preposición «de»', async ({ page }) => {
+  expect(await enLetras(page, '1.000.000')).toBe('un millón de euros');
+  expect(await enLetras(page, '2.000.000')).toBe('dos millones de euros');
+  expect(await enLetras(page, '1.000.000.000')).toBe('mil millones de euros');
+  // Con otro numeral detrás, sin «de»
+  expect(await enLetras(page, '1.234.567')).toBe(
+    'un millón doscientos treinta y cuatro mil quinientos sesenta y siete euros',
+  );
 
   await page.locator('#moneda').selectOption('GBP');
-  expect(await enLetras(page, '1.000.000')).toBe('un millón libras');
+  expect(await enLetras(page, '1.000.000')).toBe('un millón de libras');
 });
 
 /**
@@ -286,17 +295,34 @@ test('HALLAZGO 3 · la basura se rechaza con el aviso que la app ya anunciaba', 
   }
 });
 
-test('HALLAZGO 4 · el tope con dos decimales se rechaza pese a anunciarse', async ({ page }) => {
-  // La ayuda dice «Hasta 999.999.999.999 y dos decimales»; el céntimo lo tira fuera.
-  await page.locator('#cantidad').fill('999.999.999.999,99');
+/**
+ * HALLAZGO 4 · REPARADO el 24/08/2026. La ayuda anuncia «Hasta 999.999.999.999 y dos
+ * decimales», pero el tope se comparaba contra el valor CON decimales, así que el propio
+ * máximo declarado se rechazaba. Ahora se compara la parte entera.
+ */
+test('HALLAZGO 4 · el tope admitido incluye sus dos decimales', async ({ page }) => {
+  expect(await enLetras(page, '999.999.999.999,99')).toContain('novecientos noventa y nueve');
+  expect(await enLetras(page, '999.999.999.999,99')).toContain('con noventa y nueve céntimos');
+  // Un euro más allá del tope sí se rechaza
+  await page.locator('#cantidad').fill('1.000.000.000.000');
   await expect(
     page.locator('[role="region"][aria-label="Resultado"] [role="alert"]'),
   ).toHaveText('La cantidad máxima admitida es 999.999.999.999.');
 });
 
-test('HALLAZGO 5 · el número suelto pierde el cero final de los decimales', async ({ page }) => {
+/**
+ * HALLAZGO 5 · REPARADO el 24/08/2026. En modo «número suelto» los decimales se leen cifra a
+ * cifra, y salían del número ya convertido: el cero final que el usuario escribió no estaba
+ * en el número. Ahora la app pasa al motor las cifras TAL COMO SE TECLEARON
+ * (), que es lo único que las recuerda.
+ */
+test('HALLAZGO 5 · el número suelto conserva el cero final de los decimales', async ({ page }) => {
   await page.getByRole('button', { name: /Número suelto/ }).click();
-  // Anunciado: las cifras tras la coma se leen una a una → 'cero coma cinco cero'.
-  expect(await enLetras(page, '0,50')).toBe('cero coma cinco');
-  expect(await enLetras(page, '1,20')).toBe('uno coma dos');
+  expect(await enLetras(page, '0,50')).toBe('cero coma cinco cero');
+  expect(await enLetras(page, '1,20')).toBe('uno coma dos cero');
+  expect(await enLetras(page, '3.847,50')).toBe(
+    'tres mil ochocientos cuarenta y siete coma cinco cero',
+  );
+  // Y sigue leyendo cifra a cifra lo que no lleva cero final
+  expect(await enLetras(page, '3,45')).toBe('tres coma cuatro cinco');
 });

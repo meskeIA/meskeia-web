@@ -167,3 +167,77 @@ test.describe('Límites', () => {
     );
   });
 });
+
+/**
+ * La preposición «de» tras millón/millones — hallazgo 232 del Inspector (24/08/2026).
+ *
+ * DPD, s. v. «millón»: si millón(es) no va seguido de otro numeral, el sustantivo cuantificado
+ * se introduce con «de». Faltaba, y se alcanzaba pulsando el ejemplo «1.000.000» que la propia
+ * app ofrece: la línea preparada para copiar decía «Págese por este pagaré la cantidad de un
+ * millón euros».
+ */
+test.describe('cantidadALetras — la preposición «de» tras millones', () => {
+  test('los múltiplos exactos de millón la llevan', () => {
+    expect(cantidadALetras(1_000_000, { moneda: EUR }).texto).toBe('un millón de euros');
+    expect(cantidadALetras(2_000_000, { moneda: EUR }).texto).toBe('dos millones de euros');
+    expect(cantidadALetras(1_000_000_000, { moneda: EUR }).texto).toBe('mil millones de euros');
+    expect(cantidadALetras(25_000_000, { moneda: EUR }).texto).toBe(
+      'veinticinco millones de euros',
+    );
+  });
+
+  test('con otro numeral detrás, NO la lleva', () => {
+    expect(cantidadALetras(1_234_567, { moneda: EUR }).texto).toBe(
+      'un millón doscientos treinta y cuatro mil quinientos sesenta y siete euros',
+    );
+    expect(cantidadALetras(2_000_500, { moneda: EUR }).texto).toBe(
+      'dos millones quinientos euros',
+    );
+    // «mil millones quinientos mil» termina en «mil», no en «millones»
+    expect(cantidadALetras(1_000_500_000, { moneda: EUR }).texto).toBe(
+      'mil millones quinientos mil euros',
+    );
+  });
+
+  test('vale igual para las monedas femeninas y con céntimos detrás', () => {
+    expect(cantidadALetras(1_000_000, { moneda: GBP }).texto).toBe('un millón de libras');
+    expect(cantidadALetras(1_000_000.5, { moneda: EUR }).texto).toBe(
+      'un millón de euros con cincuenta céntimos',
+    );
+  });
+
+  test('un número suelto no cuantifica nada, así que no lleva «de»', () => {
+    expect(numeroALetras(1_000_000)).toBe('un millón');
+  });
+});
+
+/**
+ * El tope y el cero final — hallazgos 235 y 236.
+ *
+ * El tope se comparaba contra el valor CON decimales, así que el máximo que la propia ayuda
+ * anuncia se rechazaba. Y los decimales del número suelto salían de `String(valor)`, donde el
+ * cero final que el usuario escribió ya no existe.
+ */
+test.describe('límites con decimales y cifras tal como se teclearon', () => {
+  test('el tope admitido incluye sus dos decimales', () => {
+    expect(() => cantidadALetras(LIMITE_NUMERO_A_LETRAS + 0.99, { moneda: EUR })).not.toThrow();
+    expect(cantidadALetras(LIMITE_NUMERO_A_LETRAS + 0.99, { moneda: EUR }).fraccion).toBe(99);
+    // Un euro por encima sí se rechaza
+    expect(() => cantidadALetras(LIMITE_NUMERO_A_LETRAS + 1, { moneda: EUR })).toThrow();
+  });
+
+  test('los decimales tecleados conservan el cero final', () => {
+    expect(numeroALetras(0.5, 'masculino', '50')).toBe('cero coma cinco cero');
+    expect(numeroALetras(1.2, 'masculino', '20')).toBe('uno coma dos cero');
+    expect(numeroALetras(3847.5, 'masculino', '50')).toBe(
+      'tres mil ochocientos cuarenta y siete coma cinco cero',
+    );
+  });
+
+  test('sin cifras tecleadas se comporta como antes', () => {
+    expect(numeroALetras(3.45)).toBe('tres coma cuatro cinco');
+    expect(numeroALetras(0.5)).toBe('cero coma cinco');
+    // Y lo que no son cifras se ignora, no se cuela en la lectura
+    expect(numeroALetras(0.5, 'masculino', 'abc')).toBe('cero coma cinco');
+  });
+});

@@ -30,88 +30,12 @@ export interface AnalisisVerso {
 
 // ─── Silabeo ─────────────────────────────────────────────────────────────────
 
-export const separarSilabas = (palabra: string): string[] => {
-  const vocales = 'aeiouáéíóúü';
-  const vocalesFuertes = 'aeoáéó';
-  const vocalesDebiles = 'iuíúü';
-  const consonantes = 'bcdfghjklmnñpqrstvwxyz';
-
-  palabra = palabra.toLowerCase().trim();
-  if (!palabra) return [];
-
-  const silabas: string[] = [];
-  let silabaActual = '';
-
-  const esVocal = (c: string) => vocales.includes(c);
-  const esConsonante = (c: string) => consonantes.includes(c);
-  const esVocalFuerte = (c: string) => vocalesFuertes.includes(c);
-  const esVocalDebil = (c: string) => vocalesDebiles.includes(c);
-
-  // Grupos consonánticos inseparables
-  const gruposInseparables = ['bl', 'br', 'cl', 'cr', 'dr', 'fl', 'fr', 'gl', 'gr', 'pl', 'pr', 'tr', 'ch', 'll', 'rr'];
-
-  for (let i = 0; i < palabra.length; i++) {
-    const char = palabra[i];
-    const siguiente = palabra[i + 1] || '';
-    const siguiente2 = palabra[i + 2] || '';
-
-    silabaActual += char;
-
-    // Si es vocal, verificamos si debemos cortar
-    if (esVocal(char)) {
-      // Si la siguiente es consonante
-      if (esConsonante(siguiente)) {
-        // Ver si hay grupo consonántico
-        const grupo = siguiente + siguiente2;
-        const esGrupoInseparable = gruposInseparables.includes(grupo.toLowerCase());
-
-        // Si hay dos consonantes seguidas
-        if (esConsonante(siguiente2)) {
-          if (esGrupoInseparable) {
-            // El grupo va con la siguiente sílaba
-            silabas.push(silabaActual);
-            silabaActual = '';
-          } else {
-            // Primera consonante va con esta sílaba, segunda con la siguiente
-            silabaActual += siguiente;
-            silabas.push(silabaActual);
-            silabaActual = '';
-            i++; // Saltamos la consonante que ya añadimos
-          }
-        } else if (esVocal(siguiente2) || !siguiente2) {
-          // Consonante simple entre vocales: va con la siguiente
-          silabas.push(silabaActual);
-          silabaActual = '';
-        }
-      }
-      // Si la siguiente es vocal
-      else if (esVocal(siguiente)) {
-        // Verificar diptongos e hiatos
-        const esDiptongo =
-          (esVocalDebil(char) && esVocalFuerte(siguiente)) ||
-          (esVocalFuerte(char) && esVocalDebil(siguiente)) ||
-          (esVocalDebil(char) && esVocalDebil(siguiente));
-
-        // Las vocales acentuadas en débiles rompen el diptongo (hiato)
-        const tieneAcentoDebil = 'íú'.includes(char) || 'íú'.includes(siguiente);
-
-        if (!esDiptongo || tieneAcentoDebil) {
-          // Hiato: cortar aquí
-          silabas.push(silabaActual);
-          silabaActual = '';
-        }
-        // Si es diptongo, continúan juntas
-      }
-    }
-  }
-
-  // Añadir última sílaba si queda algo
-  if (silabaActual) {
-    silabas.push(silabaActual);
-  }
-
-  return silabas;
-};
+// El silabeador vive en su propio módulo, con tests unitarios que resuelven a mano cada regla
+// (tests/silabeo.spec.ts). Se sacó de aquí el 24/08/2026 al reescribirlo: cuatro de los ocho
+// hallazgos del Inspector eran suyos, y el build no puede ver una regla ortográfica mal.
+import { separarSilabas, encuentrosVocalicos } from './silabeo';
+export { separarSilabas, encuentrosVocalicos };
+export type { EncuentrosVocalicos } from './silabeo';
 
 export const contarSilabasTexto = (
   texto: string
