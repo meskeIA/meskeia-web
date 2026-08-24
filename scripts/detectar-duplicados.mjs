@@ -9,12 +9,20 @@
 //   node scripts/detectar-duplicados.mjs "idea o descripcion libre"   # consulta (preventivo)
 //   node scripts/detectar-duplicados.mjs --slug conversor-braille     # vecinos de una app existente
 //   node scripts/detectar-duplicados.mjs --pares                      # barrido del catalogo
+//   node scripts/detectar-duplicados.mjs --clusters                   # clusteres tematicos + uso 30d
 //
 // Opciones:
-//   --top N          nº de resultados (consulta: 8 · pares: 40)
-//   --umbral X       similitud mínima 0..1 (consulta: 0.10 · pares: 0.32)
+//   --top N          nº de resultados (consulta: 8 · pares: 40 · clusters: 20)
+//   --umbral X       similitud mínima 0..1 (consulta: 0.10 · pares y clusters: 0.32)
 //   --mismo-modo     (solo --pares) solo pares con el mismo modo (riesgo real de duplicado)
 //   --con-familias   (solo --pares) NO ocultar las familias intencionadas (historia, compraventa…)
+//   --min-usos N     (solo --clusters) uso mínimo del clúster para emitir veredicto (50)
+//
+// MODO --clusters (2026-08-24): responde a «¿potenciar o ampliar?», que es una decisión de CLÚSTER
+// TEMÁTICO y no de suite. El briefing de /semilla-diaria mide la concentración por suite (top2%),
+// pero el patrón «una estrella arrastra y sus hermanas están muertas» vive un nivel más abajo:
+// mascotas era 441 usos en calculadora-tamano-adulto-perro frente a 27 repartidos en 7 apps, y para
+// verlo había que grepear a mano. Aquí sale solo, cruzando la similitud léxica con el uso real.
 //
 // LÍMITE HONESTO: la similitud es LÉXICA (TF-IDF + coseno sobre nombre+keywords+slug+descripción),
 // no semántica. No capta sinónimos puros ("ración de pienso" ≈ "cantidad de comida para tu perro"
@@ -27,13 +35,15 @@
 // DISTINTAS (falso positivo). El script lo marca con «≠modo» para que el juicio lo hagas tú.
 // -------------------------------------------------------------------------------------------------
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { DatabaseSync } from 'node:sqlite';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const RAIZ = path.resolve(__dirname, '..');
 const APPS_TS = path.join(RAIZ, 'data', 'applications.ts');
+const TURSO_DIR = path.join(RAIZ, '_backups', 'turso');
 
 // -------------------------------------------------------------------------------------------------
 // 1. Parseo de data/applications.ts (mismo regex robusto que semilla-diaria.mjs: objetos planos)
@@ -192,6 +202,8 @@ function parseArgs() {
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--pares') flags.pares = true;
+    else if (a === '--clusters') flags.clusters = true;
+    else if (a === '--min-usos') flags.minUsos = parseInt(argv[++i], 10);
     else if (a === '--mismo-modo') flags.mismoModo = true;
     else if (a === '--con-familias') flags.conFamilias = true;
     else if (a === '--slug') flags.slug = argv[++i];
@@ -210,8 +222,9 @@ detectar-duplicados.mjs — filtro de casi-duplicados del catálogo meskeIA
   node scripts/detectar-duplicados.mjs "idea libre"        consulta preventiva (top vecinos)
   node scripts/detectar-duplicados.mjs --slug <slug>       vecinos de una app existente
   node scripts/detectar-duplicados.mjs --pares             barrido del catálogo
+  node scripts/detectar-duplicados.mjs --clusters          clústeres temáticos + uso 30 d
 
-  --top N   --umbral X (0..1)   --mismo-modo   --con-familias
+  --top N   --umbral X (0..1)   --mismo-modo   --con-familias   --min-usos N
 
 Similitud LÉXICA (no semántica). «≠modo» marca solapes entre una app que HACE y otra que EXPLICA:
 casi siempre funciones distintas, no un duplicado real.
@@ -321,9 +334,160 @@ function mostrarPares() {
   }
 }
 
+// --- 7b bis. Clústeres temáticos cruzados con el uso real ----------------------------------------
+
+// Uso 30 d por app desde el dump congelado de Turso: misma fuente y mismos filtros que /digest-diario
+// y /semilla-diaria (humanos, sin bots, sin la IP propia, sin páginas institucionales), para que las
+// cifras de aquí sean comparables con las de allí y no aparezca una tercera contabilidad.
+function usos30dPorApp() {
+  if (!existsSync(TURSO_DIR)) return null;
+  const files = readdirSync(TURSO_DIR).filter((f) => /^turso-dump-\d{4}-\d{2}-\d{2}\.sql$/.test(f)).sort();
+  if (!files.length) return null;
+  const dumpPath = path.join(TURSO_DIR, files[files.length - 1]);
+  const db = new DatabaseSync(':memory:');
+  const cargarDump = db.exec.bind(db); // node:sqlite carga el dump SQL (NO es child_process)
+  cargarDump(readFileSync(dumpPath, 'utf8'));
+  const one = (s) => db.prepare(s).get();
+  const all = (s) => db.prepare(s).all();
+
+  const tieneConfig = one(`SELECT name FROM sqlite_master WHERE type='table' AND name='analytics_config'`);
+  const ipExcluida = tieneConfig ? (one(`SELECT valor v FROM analytics_config WHERE clave='ip_excluida'`)?.v ?? null) : null;
+  const FILTRO_IP = ipExcluida
+    ? ` AND (ip_address IS NULL OR ip_address <> '${String(ipExcluida).replace(/'/g, "''")}')`
+    : '';
+  const anchor = one(`SELECT MAX(created_at) m FROM uso_aplicaciones`).m;
+  const filas = all(`
+    SELECT aplicacion app, COUNT(*) usos FROM uso_aplicaciones
+    WHERE created_at > datetime('${anchor}','-30 days') AND created_at <= '${anchor}'
+      AND modo<>'bot' AND es_propio=0${FILTRO_IP}
+      AND aplicacion NOT LIKE 'mcp:%' AND aplicacion NOT LIKE 'pag:%' AND aplicacion <> 'meskeIA'
+    GROUP BY aplicacion`);
+  return { mapa: new Map(filas.map((r) => [r.app, r.usos])), dump: path.basename(dumpPath), anchor };
+}
+
+// Lista de vecinos por app (mismo índice invertido que --pares; el coseno se recalcula EXACTO).
+function adyacencia(umbral) {
+  const DF_CUT = Math.max(40, Math.floor(N * 0.12));
+  const postings = new Map();
+  vecs.forEach((v, i) => {
+    for (const [t, w] of v) {
+      if ((df.get(t) || 0) > DF_CUT) continue;
+      let arr = postings.get(t);
+      if (!arr) { arr = []; postings.set(t, arr); }
+      arr.push([i, w]);
+    }
+  });
+
+  const calculados = new Set();
+  const ady = new Map();
+  const enlaza = (a, b, sim) => {
+    let arr = ady.get(a);
+    if (!arr) { arr = []; ady.set(a, arr); }
+    arr.push([b, sim]);
+  };
+  for (const arr of postings.values()) {
+    for (let x = 0; x < arr.length; x++) {
+      for (let y = x + 1; y < arr.length; y++) {
+        const a = Math.min(arr[x][0], arr[y][0]);
+        const b = Math.max(arr[x][0], arr[y][0]);
+        const key = a * N + b;
+        if (calculados.has(key)) continue;
+        calculados.add(key);
+        const sim = coseno(vecs[a], vecs[b]);
+        if (sim < umbral) continue;
+        enlaza(a, b, sim);
+        enlaza(b, a, sim);
+      }
+    }
+  }
+  return ady;
+}
+
+function mediana(nums) {
+  if (!nums.length) return 0;
+  const s = [...nums].sort((a, b) => a - b);
+  const m = Math.floor(s.length / 2);
+  return s.length % 2 ? s[m] : Math.round((s[m - 1] + s[m]) / 2);
+}
+
+const MAX_MIEMBROS = 15;
+
+function mostrarClusters() {
+  const top = flags.top || 20;
+  const umbral = flags.umbral ?? 0.32;
+  const minUsos = Number.isFinite(flags.minUsos) ? flags.minUsos : 50;
+
+  const trafico = usos30dPorApp();
+  const uso = (i) => (trafico ? trafico.mapa.get(apps[i].slug) || 0 : 0);
+  const ady = adyacencia(umbral);
+
+  // Clustering «por líder»: el núcleo de cada grupo es la app MÁS USADA que aún no pertenece a
+  // ninguno, y se le adjuntan sus vecinos léxicos libres. Anclar en el uso —en vez de tomar
+  // componentes conexas— evita el encadenamiento transitivo A~B~C, que fundiría familias enteras
+  // en un solo grupo inútil, y deja la estrella en el centro por construcción, que es lo que se
+  // quiere leer. Contrapartida honesta: la asignación depende del orden, así que una app puede
+  // caer en el grupo del líder más fuerte y no en el que más se le parece.
+  const orden = apps.map((_, i) => i).sort((a, b) => uso(b) - uso(a) || a - b);
+  const asignado = new Set();
+  const grupos = [];
+  for (const nucleo of orden) {
+    if (asignado.has(nucleo)) continue;
+    asignado.add(nucleo);
+    const vecinos = (ady.get(nucleo) || [])
+      .filter(([j]) => !asignado.has(j))
+      .sort((x, y) => y[1] - x[1]);
+    if (!vecinos.length) continue;
+    const miembros = [nucleo];
+    for (const [j] of vecinos) { asignado.add(j); miembros.push(j); }
+    grupos.push(miembros);
+  }
+
+  const filas = grupos.map((m) => {
+    const ms = [...m].sort((a, b) => uso(b) - uso(a));
+    const usos = ms.map(uso);
+    const total = usos.reduce((a, b) => a + b, 0);
+    const pctEstrella = total ? usos[0] / total : 0;
+    let veredicto;
+    if (!trafico) veredicto = '· sin dump';
+    else if (ms.length > MAX_MIEMBROS) veredicto = '· familia grande';
+    else if (total < minUsos) veredicto = '· frío';
+    else if (ms.length >= 3 && pctEstrella >= 0.6 && mediana(usos.slice(1)) <= 10) veredicto = '⚠ POTENCIAR';
+    else veredicto = '≈ repartido';
+    return { ms, usos, total, pctEstrella, veredicto };
+  });
+  filas.sort((a, b) => b.total - a.total || b.ms.length - a.ms.length);
+
+  console.log(`\nClústeres temáticos ≥ ${pct(umbral)}` +
+    (trafico ? ` · uso 30 d de ${trafico.dump}` : ' · SIN DUMP: agrupa, pero no juzga'));
+  if (!filas.length) { console.log('  · ninguna app tiene vecinos por encima del umbral.'); return; }
+  console.log(`  ${filas.length} grupo(s) de 2+ apps · mostrando top ${Math.min(top, filas.length)} por uso total\n`);
+
+  for (const f of filas.slice(0, top)) {
+    console.log(`  ${f.veredicto.padEnd(16)} ${String(f.total).padStart(5)} usos30d · ${String(f.ms.length).padStart(2)} apps · ${pct(f.pctEstrella).padStart(4)} en la estrella`);
+    // Junto a cada hermana, lo que la ata a la estrella: es lo que permite descartar de un vistazo
+    // los falsos positivos del léxico (movimiento CIRCULAR ⇄ economía CIRCULAR no son un clúster).
+    const estrella = f.ms[0];
+    f.ms.slice(0, MAX_MIEMBROS).forEach((i, k) => {
+      const une = k === 0 ? '' : `  · une: ${terminosComunes(tfs[estrella], tfs[i], idf, 3).join(', ') || '—'}`;
+      console.log(`      ${String(f.usos[k]).padStart(5)}  /${apps[i].slug}/${une}`);
+    });
+    if (f.ms.length > MAX_MIEMBROS) console.log(`      … y ${f.ms.length - MAX_MIEMBROS} apps más`);
+    console.log('');
+  }
+
+  const aPotenciar = filas.filter((f) => f.veredicto === '⚠ POTENCIAR').length;
+  console.log(`  ⚠ POTENCIAR = 3+ apps · ${minUsos}+ usos en el grupo · 60%+ del uso en una sola · mediana del resto ≤ 10.`);
+  console.log(`    ${aPotenciar} grupo(s) lo cumplen: ahí una app nueva nacería al lado de hermanas que ya nadie abre.`);
+  console.log('  · frío = el grupo no llega al uso mínimo. No dice «amplía»: dice que no hay señal para decidir.');
+  console.log('  OJO: una app publicada hace pocas semanas aparece en la cola sin serlo. Comprueba su antigüedad');
+  console.log('       antes de contarla como muerta (feedback_no_medir_antes_de_madurar).');
+}
+
 // --- 7c. Enrutado --------------------------------------------------------------------------------
 if (flags.pares) {
   mostrarPares();
+} else if (flags.clusters) {
+  mostrarClusters();
 } else if (flags.slug) {
   const s = flags.slug.replace(/^\/|\/$/g, '');
   const idx = apps.findIndex((a) => a.slug === s);

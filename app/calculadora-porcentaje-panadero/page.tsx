@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import styles from './CalculadoraPorcentajePanadero.module.css';
 import {
   MeskeiaLogo,
@@ -15,8 +15,14 @@ import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   calcularBakersPercentage,
+  calcularDDT,
   type ResultadoBakersPercentage,
+  type TipoAmasadora,
 } from '@/lib/calculadoras/cocina';
+import {
+  ajustarFermentacion,
+  formatearTiempo,
+} from '@/lib/calculadoras/fermentacionTemperatura';
 
 interface OtroIngrediente {
   id: number;
@@ -30,6 +36,24 @@ const ingredientesIniciales: OtroIngrediente[] = [
   { id: 3, nombre: 'Levadura', gramos: '3' },
 ];
 
+// Los dos pasos que vienen justo después de tener la fórmula: a qué temperatura poner el agua
+// y cuánto va a tardar en fermentar hoy. El cálculo NO se reimplementa aquí: son los mismos
+// motores que usan /calculadora-temperatura-masa/ y /fermentacion-temperatura/, que siguen
+// siendo la página de quien busca esas dos cosas por su nombre.
+const AMASADOS: { id: TipoAmasadora; label: string }[] = [
+  { id: 'manual', label: 'A mano (sin fricción)' },
+  { id: 'amasadora_espiral', label: 'Amasadora espiral (+5 °C)' },
+  { id: 'kitchen_aid', label: 'Amasadora de pie / KitchenAid (+8 °C)' },
+  { id: 'thermomix', label: 'Thermomix o robot de cocción (+12 °C)' },
+];
+
+// Campo vacío o no numérico → null, para distinguirlo de un 0 legítimo (0 °C es una temperatura).
+function leerNumero(valor: string): number | null {
+  if (!valor.trim()) return null;
+  const n = parseSpanishNumber(valor);
+  return Number.isFinite(n) ? n : null;
+}
+
 export default function CalculadoraPorcentajePanaderoPage() {
   const [harinaStr, setHarinaStr] = useState('1000');
   const [otros, setOtros] = useState<OtroIngrediente[]>(ingredientesIniciales);
@@ -37,6 +61,37 @@ export default function CalculadoraPorcentajePanaderoPage() {
   const [resultado, setResultado] = useState<ResultadoBakersPercentage | null>(null);
   const [error, setError] = useState('');
   const [nextId, setNextId] = useState(10);
+
+  // ── Paso 2: temperatura del agua de amasado (DDT) ──
+  const [ddtAbierto, setDdtAbierto] = useState(false);
+  const [ddtObjetivo, setDdtObjetivo] = useState('24');
+  const [tAmbiente, setTAmbiente] = useState('22');
+  const [tHarina, setTHarina] = useState('');
+  const [harinaComoAmbiente, setHarinaComoAmbiente] = useState(true);
+  const [amasado, setAmasado] = useState<TipoAmasadora>('manual');
+
+  // ── Paso 3: cuánto tarda en fermentar a la temperatura real ──
+  const [fermAbierto, setFermAbierto] = useState(false);
+  const [fermHoras, setFermHoras] = useState('2');
+  const [fermTempReceta, setFermTempReceta] = useState('24');
+  const [fermTempReal, setFermTempReal] = useState('22');
+
+  const resultadoDDT = useMemo(() => {
+    const ddt = leerNumero(ddtObjetivo);
+    const ambiente = leerNumero(tAmbiente);
+    if (ddt === null || ambiente === null) return null;
+    const harina = harinaComoAmbiente ? ambiente : leerNumero(tHarina);
+    if (harina === null) return null;
+    return calcularDDT(ddt, ambiente, harina, amasado);
+  }, [ddtObjetivo, tAmbiente, tHarina, harinaComoAmbiente, amasado]);
+
+  const resultadoFermentacion = useMemo(() => {
+    const horas = leerNumero(fermHoras);
+    const tempReceta = leerNumero(fermTempReceta);
+    const tempReal = leerNumero(fermTempReal);
+    if (horas === null || horas <= 0 || tempReceta === null || tempReal === null) return null;
+    return ajustarFermentacion(horas, tempReceta, tempReal);
+  }, [fermHoras, fermTempReceta, fermTempReal]);
 
   const agregarIngrediente = useCallback(() => {
     setOtros(prev => [...prev, { id: nextId, nombre: '', gramos: '' }]);
@@ -275,6 +330,255 @@ export default function CalculadoraPorcentajePanaderoPage() {
           )}
         </div>
       </div>
+
+      {/* Los dos pasos siguientes de la misma sesión de amasado */}
+      <section className={styles.pasosSection} aria-labelledby="pasos-titulo">
+        <h2 id="pasos-titulo" className={styles.pasosTitulo}>
+          Ya tienes la fórmula. Ahora, el amasado
+        </h2>
+        <p className={styles.pasosIntro}>
+          Con los porcentajes cerrados quedan dos preguntas que deciden el pan tanto como la receta:
+          a qué temperatura echar el agua y cuánto va a tardar en levar hoy, en tu cocina.
+        </p>
+
+        <div className={styles.pasosGrid}>
+          {/* Paso 2 — temperatura del agua (DDT) */}
+          <div className={styles.pasoCard}>
+            <button
+              type="button"
+              className={styles.pasoToggle}
+              aria-expanded={ddtAbierto}
+              aria-controls="paso-ddt"
+              onClick={() => setDdtAbierto(v => !v)}
+            >
+              <span>
+                <span aria-hidden="true">🌡️</span> ¿A qué temperatura pongo el agua?
+              </span>
+              <span className={styles.pasoChevron} aria-hidden="true">{ddtAbierto ? '−' : '+'}</span>
+            </button>
+
+            <div id="paso-ddt" className={styles.pasoBody} hidden={!ddtAbierto}>
+              <p className={styles.pasoAyuda}>
+                El agua es lo único que puedes ajustar a voluntad para que la masa salga del amasado
+                a la temperatura que quieres. Es la fórmula DDT (<em>desired dough temperature</em>).
+              </p>
+
+              <div className={styles.pasoCampo}>
+                <label htmlFor="ddt-objetivo" className={styles.fieldLabel}>
+                  Temperatura que quieres en la masa
+                </label>
+                <div className={styles.inputGroup}>
+                  <input
+                    id="ddt-objetivo"
+                    type="text"
+                    inputMode="decimal"
+                    className={styles.inputField}
+                    value={ddtObjetivo}
+                    onChange={e => setDdtObjetivo(e.target.value)}
+                    placeholder="24"
+                  />
+                  <span className={styles.unidad}>°C</span>
+                </div>
+              </div>
+
+              <div className={styles.pasoCampo}>
+                <label htmlFor="ddt-ambiente" className={styles.fieldLabel}>
+                  Temperatura de tu cocina
+                </label>
+                <div className={styles.inputGroup}>
+                  <input
+                    id="ddt-ambiente"
+                    type="text"
+                    inputMode="decimal"
+                    className={styles.inputField}
+                    value={tAmbiente}
+                    onChange={e => setTAmbiente(e.target.value)}
+                    placeholder="22"
+                  />
+                  <span className={styles.unidad}>°C</span>
+                </div>
+              </div>
+
+              <div className={styles.pasoCheck}>
+                <input
+                  id="ddt-harina-igual"
+                  type="checkbox"
+                  checked={harinaComoAmbiente}
+                  onChange={e => setHarinaComoAmbiente(e.target.checked)}
+                />
+                <label htmlFor="ddt-harina-igual">La harina está a la temperatura de la cocina</label>
+              </div>
+
+              {!harinaComoAmbiente && (
+                <div className={styles.pasoCampo}>
+                  <label htmlFor="ddt-harina" className={styles.fieldLabel}>
+                    Temperatura de la harina
+                  </label>
+                  <div className={styles.inputGroup}>
+                    <input
+                      id="ddt-harina"
+                      type="text"
+                      inputMode="decimal"
+                      className={styles.inputField}
+                      value={tHarina}
+                      onChange={e => setTHarina(e.target.value)}
+                      placeholder="18"
+                    />
+                    <span className={styles.unidad}>°C</span>
+                  </div>
+                </div>
+              )}
+
+              <div className={styles.pasoCampo}>
+                <label htmlFor="ddt-amasado" className={styles.fieldLabel}>
+                  Cómo amasas
+                </label>
+                <select
+                  id="ddt-amasado"
+                  className={styles.selectField}
+                  value={amasado}
+                  onChange={e => setAmasado(e.target.value as TipoAmasadora)}
+                >
+                  {AMASADOS.map(a => (
+                    <option key={a.id} value={a.id}>{a.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              {resultadoDDT ? (
+                <div className={styles.pasoResultado}>
+                  <span className={styles.pasoResultadoLabel}>Pon el agua a</span>
+                  <span className={styles.pasoResultadoValor}>
+                    {formatNumber(resultadoDDT.temperatura_agua_c, 1)} °C
+                  </span>
+                  <p className={styles.pasoResultadoNota}>{resultadoDDT.interpretacion}</p>
+                  {resultadoDDT.advertencia && (
+                    <p className={styles.warningBox} role="alert">
+                      <span aria-hidden="true">⚠️</span> {resultadoDDT.advertencia}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p className={styles.emptyState}>
+                  Completa las temperaturas para ver el agua que necesitas.
+                </p>
+              )}
+
+              <p className={styles.pasoEnlace}>
+                ¿Usas prefermento (poolish, biga, masa madre madura)? Entonces la fórmula es de cuatro
+                factores:{' '}
+                <a href="/calculadora-temperatura-masa/">calculadora DDT completa</a>.
+              </p>
+            </div>
+          </div>
+
+          {/* Paso 3 — tiempo de fermentación a temperatura real */}
+          <div className={styles.pasoCard}>
+            <button
+              type="button"
+              className={styles.pasoToggle}
+              aria-expanded={fermAbierto}
+              aria-controls="paso-fermentacion"
+              onClick={() => setFermAbierto(v => !v)}
+            >
+              <span>
+                <span aria-hidden="true">⏳</span> ¿Cuánto va a tardar en fermentar?
+              </span>
+              <span className={styles.pasoChevron} aria-hidden="true">{fermAbierto ? '−' : '+'}</span>
+            </button>
+
+            <div id="paso-fermentacion" className={styles.pasoBody} hidden={!fermAbierto}>
+              <p className={styles.pasoAyuda}>
+                Los tiempos de una receta valen para la temperatura a la que se escribió. La actividad
+                de la levadura se duplica aproximadamente cada 10 °C, así que en verano el mismo pan
+                leva en la mitad de tiempo.
+              </p>
+
+              <div className={styles.pasoCampo}>
+                <label htmlFor="ferm-horas" className={styles.fieldLabel}>
+                  Tiempo que indica la receta
+                </label>
+                <div className={styles.inputGroup}>
+                  <input
+                    id="ferm-horas"
+                    type="text"
+                    inputMode="decimal"
+                    className={styles.inputField}
+                    value={fermHoras}
+                    onChange={e => setFermHoras(e.target.value)}
+                    placeholder="2"
+                  />
+                  <span className={styles.unidad}>h</span>
+                </div>
+              </div>
+
+              <div className={styles.pasoCampo}>
+                <label htmlFor="ferm-temp-receta" className={styles.fieldLabel}>
+                  Temperatura para la que está pensada
+                </label>
+                <div className={styles.inputGroup}>
+                  <input
+                    id="ferm-temp-receta"
+                    type="text"
+                    inputMode="decimal"
+                    className={styles.inputField}
+                    value={fermTempReceta}
+                    onChange={e => setFermTempReceta(e.target.value)}
+                    placeholder="24"
+                  />
+                  <span className={styles.unidad}>°C</span>
+                </div>
+              </div>
+
+              <div className={styles.pasoCampo}>
+                <label htmlFor="ferm-temp-real" className={styles.fieldLabel}>
+                  Temperatura real donde va a levar
+                </label>
+                <div className={styles.inputGroup}>
+                  <input
+                    id="ferm-temp-real"
+                    type="text"
+                    inputMode="decimal"
+                    className={styles.inputField}
+                    value={fermTempReal}
+                    onChange={e => setFermTempReal(e.target.value)}
+                    placeholder="22"
+                  />
+                  <span className={styles.unidad}>°C</span>
+                </div>
+              </div>
+
+              {resultadoFermentacion ? (
+                <div className={styles.pasoResultado}>
+                  <span className={styles.pasoResultadoLabel}>Tiempo estimado</span>
+                  <span className={styles.pasoResultadoValor}>
+                    {formatearTiempo(resultadoFermentacion.tiempoHoras)}
+                  </span>
+                  <p className={styles.pasoResultadoNota}>
+                    A esa temperatura la masa fermenta{' '}
+                    <strong>{resultadoFermentacion.masRapido ? 'más rápido' : 'más lento'}</strong>: el
+                    tiempo de la receta se multiplica por{' '}
+                    {formatNumber(resultadoFermentacion.factor, 2)}.
+                  </p>
+                  <p className={styles.warningBox}>
+                    <span aria-hidden="true">⚠️</span> Es una estimación: el punto de la masa lo marca
+                    su volumen y su tacto, no el reloj. Úsala para saber cuándo empezar a mirarla.
+                  </p>
+                </div>
+              ) : (
+                <p className={styles.emptyState}>
+                  Completa el tiempo y las dos temperaturas para ver la estimación.
+                </p>
+              )}
+
+              <p className={styles.pasoEnlace}>
+                Con la tabla de referencia de cada temperatura (nevera, ambiente fresco, 24 °C…):{' '}
+                <a href="/fermentacion-temperatura/">tiempo de fermentación por temperatura</a>.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Sección educativa */}
       <EducationalSection

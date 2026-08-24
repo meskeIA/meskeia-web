@@ -459,9 +459,174 @@
   color: #fcd34d;
 }
 
+/* Pasos siguientes del amasado (DDT + fermentación) */
+.pasosSection {
+  margin-top: var(--spacing-xl);
+  padding: var(--spacing-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+}
+
+.pasosTitulo {
+  margin: 0 0 var(--spacing-sm);
+  font-size: 1.25rem;
+  color: var(--text-primary);
+}
+
+.pasosIntro {
+  margin: 0 0 var(--spacing-lg);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.pasosGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+}
+
+.pasoCard {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  overflow: hidden;
+}
+
+.pasoToggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  padding: 0.85rem var(--spacing-md);
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pasoToggle:hover {
+  background: var(--hover);
+}
+
+.pasoToggle:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+.pasoChevron {
+  font-size: 1.3rem;
+  line-height: 1;
+  color: var(--primary);
+}
+
+.pasoBody {
+  padding: 0 var(--spacing-md) var(--spacing-md);
+  border-top: 1px solid var(--border);
+}
+
+/* `hidden` debe ganar al display de la clase */
+.pasoBody[hidden] {
+  display: none;
+}
+
+.pasoAyuda {
+  margin: var(--spacing-md) 0;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.pasoCampo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  margin-bottom: 0.6rem;
+}
+
+.pasoCheck {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.2rem 0 0.7rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.selectField {
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  max-width: 62%;
+}
+
+.selectField:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.pasoResultado {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.pasoResultadoLabel {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.pasoResultadoValor {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--primary-texto, var(--primary));
+}
+
+.pasoResultadoNota {
+  margin: var(--spacing-sm) 0 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--text-primary);
+}
+
+.pasoResultado .warningBox {
+  margin-top: var(--spacing-sm);
+  padding: 0.6rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+.pasoEnlace {
+  margin: var(--spacing-md) 0 0;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.pasoEnlace a {
+  color: var(--primary-texto, var(--primary));
+  font-weight: 600;
+}
+
 /* Responsive */
 @media (max-width: 900px) {
   .mainContent {
+    grid-template-columns: 1fr;
+  }
+
+  .pasosGrid {
     grid-template-columns: 1fr;
   }
 }

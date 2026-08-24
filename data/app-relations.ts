@@ -6426,11 +6426,15 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
 
   // ── Cocina Técnica (Tanda 3 MCP — 2026-05-20) ──────────────────────────────
+  // La app resuelve ya la hidratación, la temperatura del agua (DDT) y el tiempo de fermentación
+  // dentro de su propia página, así que enlazar aquí a esas tres sería mandar al lector a repetir
+  // lo que acaba de hacer. Las versiones completas siguen enlazadas EN CONTEXTO, dentro de cada
+  // bloque, para el caso avanzado (prefermento, tabla de temperaturas de referencia).
   'calculadora-porcentaje-panadero': [
-    { url: '/calculadora-hidratacion-pan/', icon: '💧', name: 'Hidratación del Pan', description: 'Calcula o convierte el porcentaje de agua de tu masa' },
     { url: '/calculadora-masa-madre/', icon: '🦠', name: 'Sustitución Masa Madre', description: 'Convierte levadura comercial a masa madre con ajuste de receta' },
-    { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta tu fórmula de pan a más o menos piezas' },
-    { url: '/calculadora-temperatura-masa/', icon: '🌡️', name: 'Temperatura de la Masa (DDT)', description: 'Temperatura del agua para controlar la fermentación' },
+    { url: '/calculadora-masa-pizza/', icon: '🍕', name: 'Masa de Pizza', description: 'El mismo sistema aplicado a bolas: napolitana, romana o focaccia' },
+    { url: '/conversor-tazas-gramos/', icon: '🥄', name: 'Tazas a Gramos', description: 'Pasa una receta en tazas al peso que exige el porcentaje del panadero' },
+    { url: '/ajuste-recetas-altitud/', icon: '⛰️', name: 'Recetas por Altitud', description: 'Corrige levadura, líquido y horno cuando cocinas en altura' },
   ],
   'calculadora-hidratacion-pan': [
     { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Porcentaje del Panadero', description: 'Expresa cada ingrediente como % del peso de harina' },
