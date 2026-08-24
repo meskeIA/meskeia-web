@@ -585,7 +585,7 @@ export const implementedAppsUrls = [
   "/orientador-alquiler-habitaciones/",   // Orientador alquiler por habitaciones zona tensionada: techo renta, SERPAVI, municipios
   "/estimador-actualizacion-alquiler/",   // Calculadora IRAV/IPC para actualización de renta de alquiler según Ley de Vivienda 2023
   "/requisitos-nomada-digital/",            // Orientador elegibilidad Visa Nómada Digital (Ley 28/2022 de Startups)
-  "/quiz-simbolos-quimicos/",               // Quiz símbolos químicos — 85 elementos, 3 dificultades, 2 modos
+  "/quiz-simbolos-quimicos/",               // Quiz símbolos químicos — 3 dificultades, 2 modos (el total sale de ELEMENTOS.length)
   "/quiz-tabla-periodica/",                 // Quiz Tabla Periódica — 40+ preguntas sobre grupos, períodos, propiedades y curiosidades
   "/test-burnout-laboral/",                 // Test orientativo burnout laboral — 15 preguntas, 3 dimensiones
   "/orientador-discapacidad/",              // Orientador grado discapacidad — test funcional RD 888/2022

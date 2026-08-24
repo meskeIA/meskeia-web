@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { ELEMENTOS, TOTAL_ELEMENTOS } from '../../data/elementos-quimicos';
 
 /**
  * Quiz Símbolos Químicos — test de regresión del Inspector (24/08/2026)
@@ -189,5 +190,64 @@ test.describe('Quiz Símbolos Químicos', () => {
     // Símbolo del helio = He (IUPAC): mayúscula inicial y segunda letra minúscula.
     await expect(feedback(page)).toContainText('✅ ¡Correcto!');
     await expect(feedback(page)).toContainText('símbolo He');
+  });
+
+  /**
+   * HALLAZGOS 246-251 del Inspector, reparados el 24/08/2026. Son de datos y de contenido: el
+   * flujo del quiz estaba sano, pero enseñaba mal justo en la caja que enseña a no equivocarse.
+   */
+  test('lo que la app afirma de química es cierto y sus cifras salen del fichero de datos', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+
+    // 247 · La cifra del hero sale de ELEMENTOS.length, no tecleada. El fichero traía 88
+    // elementos y la app prometía 85 en siete sitios, JSON-LD incluido.
+    await expect(page.locator('header')).toContainText(`${TOTAL_ELEMENTOS} elementos`);
+    expect(TOTAL_ELEMENTOS).toBe(ELEMENTOS.length);
+    await expect(page.locator('header')).not.toContainText('85 elementos');
+
+    // Y la cifra que leen Google y los motores de IA, también
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const todo = bloques.join(' ');
+    expect(todo).toContain(`${TOTAL_ELEMENTOS} elementos`);
+    expect(todo).not.toContain('85 elementos');
+    // 251 · la interrogación abría con el signo equivocado, y eso se publica en el snippet
+    expect(todo).toContain('¿Cuántos conoces?');
+    expect(todo).not.toContain('¡Cuántos conoces?');
+
+    // El bloque educativo vive dentro de EducationalSection, que arranca colapsada
+    const abrir = page.getByRole('button', { name: /guía educativa/i });
+    if (await abrir.isVisible()) await abrir.click();
+    const texto = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
+
+    // 246 · El bromo NO es un gas a temperatura ambiente: funde a −7,2 °C y hierve a 58,8 °C
+    expect(texto).toContain('el bromo (Br) ni siquiera es un gas');
+    expect(texto).not.toContain('H, N, O, F, Cl y Br también son gases');
+
+    // 248 · El uranio no da nombre a ninguna escala geológica, y «hidrárgiro» estaba mal escrito
+    expect(texto).not.toContain('da nombre a la escala geológica');
+    expect(texto).not.toContain('hidrárgiro');
+    expect(texto).toContain('hydrargyrum');
+
+    // 251 · anglicismo
+    expect(texto).toContain('electrodos de soldadura');
+    expect(texto).not.toContain('electrodes');
+  });
+
+  /**
+   * 250 · El nombre ES la respuesta que el quiz enseña y corrige, así que va la forma
+   * normalizada en español: el DLE recoge «tantalio» para el elemento; «Tántalo» es el
+   * personaje mitológico del que deriva el nombre.
+   */
+  test('el elemento 73 se llama Tantalio, la forma que recoge el DLE', () => {
+    const ta = ELEMENTOS.find((e) => e.z === 73)!;
+    expect(ta.simbolo).toBe('Ta');
+    expect(ta.nombre).toBe('Tantalio');
+    // Y ningún nombre del fichero se queda sin símbolo ni sin número atómico
+    for (const e of ELEMENTOS) {
+      expect(e.simbolo, `${e.nombre} sin símbolo`).toMatch(/^[A-Z][a-z]?$/);
+      expect(e.z, `${e.nombre} sin Z válido`).toBeGreaterThan(0);
+    }
   });
 });

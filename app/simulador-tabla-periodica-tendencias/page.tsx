@@ -120,7 +120,7 @@ const ELEMENTOS: Elemento[] = [
   { Z:71, simbolo:'Lu', nombre:'Lutecio', grupo:null, periodo:6, radioAtomico:217, electronegatividad:1.27, energiaIonizacion:524, afinidadElectronica:-50, puntoFusion:1663, categoria:'lantanido' },
   // Transición período 6
   { Z:72, simbolo:'Hf', nombre:'Hafnio', grupo:4, periodo:6, radioAtomico:208, electronegatividad:1.3, energiaIonizacion:658, afinidadElectronica:0, puntoFusion:2233, categoria:'metal-transicion' },
-  { Z:73, simbolo:'Ta', nombre:'Tántalo', grupo:5, periodo:6, radioAtomico:200, electronegatividad:1.5, energiaIonizacion:761, afinidadElectronica:-31, puntoFusion:3017, categoria:'metal-transicion' },
+  { Z:73, simbolo:'Ta', nombre:'Tantalio', grupo:5, periodo:6, radioAtomico:200, electronegatividad:1.5, energiaIonizacion:761, afinidadElectronica:-31, puntoFusion:3017, categoria:'metal-transicion' },
   { Z:74, simbolo:'W', nombre:'Wolframio', grupo:6, periodo:6, radioAtomico:193, electronegatividad:2.36, energiaIonizacion:770, afinidadElectronica:-78.6, puntoFusion:3422, categoria:'metal-transicion' },
   { Z:75, simbolo:'Re', nombre:'Renio', grupo:7, periodo:6, radioAtomico:188, electronegatividad:1.9, energiaIonizacion:760, afinidadElectronica:-14.5, puntoFusion:3186, categoria:'metal-transicion' },
   { Z:76, simbolo:'Os', nombre:'Osmio', grupo:8, periodo:6, radioAtomico:185, electronegatividad:2.2, energiaIonizacion:840, afinidadElectronica:-106.1, puntoFusion:3033, categoria:'metal-transicion' },

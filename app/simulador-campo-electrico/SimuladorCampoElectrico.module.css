@@ -736,3 +736,28 @@
     font-size: 0.82rem;
   }
 }
+
+/* Aviso de que la sonda está sobre una carga: ahí E y V divergen */
+.avisoSingularidad {
+  margin: 0 0 0.75rem;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text-primary);
+  background: rgba(234, 179, 8, 0.12);
+  border-left: 3px solid #eab308;
+  border-radius: 6px;
+}
+
+[data-theme='dark'] .avisoSingularidad {
+  background: rgba(234, 179, 8, 0.16);
+  color: var(--text-primary);
+}
+
+/* Párrafo suelto dentro de la guía educativa */
+.eduParrafo {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}

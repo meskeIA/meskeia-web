@@ -46,6 +46,11 @@ const ORIGIN_Y = SVG_HEIGHT / 2;
 const SCALE = 100; // 1 metro = 100 px
 
 // Conversores mundo <-> SVG
+/** Mitad del lienzo en metros: 800 px / 2 / 100 px·m⁻¹ = 4,00 m · 500 / 2 / 100 = 2,50 m */
+const LIMITE_X = SVG_WIDTH / 2 / SCALE;
+const LIMITE_Y = SVG_HEIGHT / 2 / SCALE;
+const acotarAlLienzo = (v: number, limite: number) => Math.max(-limite, Math.min(limite, v));
+
 const worldToSvg = (x: number, y: number): Punto => ({
   x: ORIGIN_X + x * SCALE,
   y: ORIGIN_Y - y * SCALE,
@@ -58,31 +63,53 @@ const svgToWorld = (sx: number, sy: number): Punto => ({
 // ============================================================
 // Cálculos del campo
 // ============================================================
+/**
+ * Radio alrededor de cada carga donde E y V divergen y no hay cifra que dar.
+ *
+ * La guardia estaba —hay que saltarse el término, o sale Infinity— pero no se decía: se
+ * presentaba el campo de LAS DEMÁS cargas como si fuese el del punto, con el mismo formato y
+ * sin ningún aviso. Sobre una carga de +5 nC de un dipolo, el panel daba «44,95 N/C» y un
+ * potencial NEGATIVO, que son los de la otra carga. Y soltar la sonda encima es un gesto
+ * natural: mide 10 px de radio y la carga 17.
+ */
+const RADIO_SINGULARIDAD = 0.05; // m
+
 function calcularCampoEnPunto(
   x: number,
   y: number,
   cargas: Carga[]
-): { Ex: number; Ey: number; V: number } {
+): { Ex: number; Ey: number; V: number; singular: boolean } {
   let Ex = 0;
   let Ey = 0;
   let V = 0;
+  let singular = false;
   for (const c of cargas) {
     const dx = x - c.x;
     const dy = y - c.y;
     const r2 = dx * dx + dy * dy;
     const r = Math.sqrt(r2);
-    if (r < 0.05) continue; // singularidad: ignorar puntos muy cercanos a la carga
+    if (r < RADIO_SINGULARIDAD) {
+      singular = true;
+      continue;
+    }
     const qC = c.q * NC_TO_C;
     const factor = (K_COULOMB * qC) / (r2 * r); // E = kq/r² · r̂
     Ex += factor * dx;
     Ey += factor * dy;
     V += (K_COULOMB * qC) / r;
   }
-  return { Ex, Ey, V };
+  return { Ex, Ey, V, singular };
 }
 
 function generarId(): string {
   return Math.random().toString(36).substring(2, 9);
+}
+
+/** Exponente en superíndices Unicode: -8 → ⁻⁸ */
+const SUPERINDICES = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'];
+function aSuperindice(exp: number): string {
+  const signo = exp < 0 ? '⁻' : '';
+  return signo + String(Math.abs(exp)).split('').map((d) => SUPERINDICES[Number(d)]).join('');
 }
 
 // ============================================================
@@ -380,7 +407,10 @@ export default function SimuladorCampoElectrico() {
     if (arrastrandoId) {
       setCargas((prev) => prev.map((c) => (c.id === arrastrandoId ? { ...c, x, y } : c)));
     } else if (arrastrandoPrueba) {
-      setPruebaPos({ x, y });
+      // Acotada al área visible: setPointerCapture mantiene el arrastre más allá del borde del
+      // SVG, y sin esto la sonda se perdía fuera del viewBox mientras el panel seguía dando
+      // cifras de un punto invisible. No había forma de recuperarla salvo recargar la página.
+      setPruebaPos({ x: acotarAlLienzo(x, LIMITE_X), y: acotarAlLienzo(y, LIMITE_Y) });
     }
   };
 
@@ -483,13 +513,13 @@ export default function SimuladorCampoElectrico() {
   // Cálculos sobre la carga de prueba (q0 = +1 nC)
   const datosPrueba = useMemo(() => {
     const q0 = 1 * NC_TO_C;
-    const { Ex, Ey, V } = calcularCampoEnPunto(pruebaPos.x, pruebaPos.y, cargas);
+    const { Ex, Ey, V, singular } = calcularCampoEnPunto(pruebaPos.x, pruebaPos.y, cargas);
     const E = Math.sqrt(Ex * Ex + Ey * Ey);
     const Fx = q0 * Ex;
     const Fy = q0 * Ey;
     const F = Math.sqrt(Fx * Fx + Fy * Fy);
     const U = q0 * V;
-    return { Ex, Ey, E, V, Fx, Fy, F, U };
+    return { Ex, Ey, E, V, Fx, Fy, F, U, singular };
   }, [cargas, pruebaPos]);
 
   const sufijoNotacion = (n: number, decimales: number = 2): string => {
@@ -504,7 +534,9 @@ export default function SimuladorCampoElectrico() {
         mant /= 10;
         exp += 1;
       }
-      return `${formatNumber(mant, decimales)} × 10^${exp}`;
+      // Superíndices reales, como los escribe el bloque educativo de la misma página (10⁻⁹,
+      // r², C·m). Con el circunflejo ASCII, «1,64 × 10^-8» se lee como texto sin formatear.
+      return `${formatNumber(mant, decimales)} × 10${aSuperindice(exp)}`;
     }
     return formatNumber(n, decimales);
   };
@@ -544,6 +576,7 @@ export default function SimuladorCampoElectrico() {
               className={`${styles.toolBtn} ${modo === 'add-pos' ? styles.toolActive : ''}`}
               onClick={() => setModo('add-pos')}
               type="button"
+              aria-pressed={modo === 'add-pos'}
             >
               ＋ Añadir +
             </button>
@@ -551,6 +584,7 @@ export default function SimuladorCampoElectrico() {
               className={`${styles.toolBtn} ${modo === 'add-neg' ? styles.toolActive : ''}`}
               onClick={() => setModo('add-neg')}
               type="button"
+              aria-pressed={modo === 'add-neg'}
             >
               − Añadir −
             </button>
@@ -558,6 +592,7 @@ export default function SimuladorCampoElectrico() {
               className={`${styles.toolBtn} ${modo === 'move' ? styles.toolActive : ''}`}
               onClick={() => setModo('move')}
               type="button"
+              aria-pressed={modo === 'move'}
             >
               ✥ Mover
             </button>
@@ -565,6 +600,7 @@ export default function SimuladorCampoElectrico() {
               className={`${styles.toolBtn} ${modo === 'delete' ? styles.toolActive : ''}`}
               onClick={() => setModo('delete')}
               type="button"
+              aria-pressed={modo === 'delete'}
             >
               ✕ Eliminar
             </button>
@@ -874,29 +910,40 @@ export default function SimuladorCampoElectrico() {
                 <span className={styles.resultLabel}>Posición y</span>
                 <span className={styles.resultValue}>{formatNumber(pruebaPos.y, 2)} m</span>
               </div>
+              {/* Sin role propio: el panel entero ya es una región viva (role="status" con
+                  aria-live), y anidar otra dentro duplicaría el anuncio. */}
+              {datosPrueba.singular && (
+                <p className={styles.avisoSingularidad}>
+                  La sonda está <strong>sobre una carga</strong>: ahí el campo y el potencial
+                  divergen (r → 0) y no hay ninguna cifra que dar. Lo que se lee abajo es lo que
+                  aportan las demás cargas. Sepárala unos centímetros para volver a medir.
+                </p>
+              )}
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>|E| (campo)</span>
-                <span className={styles.resultValueAccent}>{sufijoNotacion(datosPrueba.E)} N/C</span>
+                <span className={styles.resultValueAccent}>
+                  {datosPrueba.singular ? '—' : `${sufijoNotacion(datosPrueba.E)} N/C`}
+                </span>
               </div>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Eₓ</span>
-                <span className={styles.resultValue}>{sufijoNotacion(datosPrueba.Ex)} N/C</span>
+                <span className={styles.resultValue}>{datosPrueba.singular ? '—' : `${sufijoNotacion(datosPrueba.Ex)} N/C`}</span>
               </div>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Eᵧ</span>
-                <span className={styles.resultValue}>{sufijoNotacion(datosPrueba.Ey)} N/C</span>
+                <span className={styles.resultValue}>{datosPrueba.singular ? '—' : `${sufijoNotacion(datosPrueba.Ey)} N/C`}</span>
               </div>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>V (potencial)</span>
-                <span className={styles.resultValueAccent}>{sufijoNotacion(datosPrueba.V)} V</span>
+                <span className={styles.resultValueAccent}>{datosPrueba.singular ? '—' : `${sufijoNotacion(datosPrueba.V)} V`}</span>
               </div>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>|F| sobre q₀</span>
-                <span className={styles.resultValueAccent}>{sufijoNotacion(datosPrueba.F)} N</span>
+                <span className={styles.resultValueAccent}>{datosPrueba.singular ? '—' : `${sufijoNotacion(datosPrueba.F)} N`}</span>
               </div>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>U (energía)</span>
-                <span className={styles.resultValue}>{sufijoNotacion(datosPrueba.U)} J</span>
+                <span className={styles.resultValue}>{datosPrueba.singular ? '—' : `${sufijoNotacion(datosPrueba.U)} J`}</span>
               </div>
 
               <div className={styles.legendRow}>
@@ -921,6 +968,13 @@ export default function SimuladorCampoElectrico() {
           subtitle="Ley de Coulomb, líneas de campo y equipotenciales"
         >
           <h3 className={styles.eduSubtitle}>Fórmulas clave</h3>
+          {/* El valor de k solo vivía en el FAQPage del JSON-LD, que el usuario no lee, mientras
+              la guía de la propia app le manda «aplicar E = kq/r²» y comparar su resultado con
+              el panel. Sin la constante a la vista, esa comprobación es imposible. */}
+          <p className={styles.eduParrafo}>
+            En todas ellas <strong>k</strong> es la constante de Coulomb:{' '}
+            <strong>k = 8,99 × 10⁹ N·m²/C²</strong>, que es el valor que aplica este simulador.
+          </p>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
               <thead>
@@ -978,8 +1032,11 @@ export default function SimuladorCampoElectrico() {
             <div className={styles.escenarioCard}>
               <h4>Universitario de ingeniería</h4>
               <p>
-                Explora cómo se distribuye el campo en un cuadrupolo o entre placas (3 cargas en
-                línea aproximan un condensador). Prepárate para electromagnetismo I.
+                Explora cómo se distribuye el campo en un cuadrupolo o en un hilo cargado: eso es
+                lo que aproximan tres cargas del MISMO signo en línea. Un condensador es otra cosa
+                —exige dos placas de signo opuesto y da un campo uniforme entre ellas—, y la propia
+                app lo desmiente: en el centro del preset «+++» el campo es 0 pero el potencial no.
+                Prepárate para electromagnetismo I.
               </p>
             </div>
             <div className={styles.escenarioCard}>

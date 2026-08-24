@@ -2900,7 +2900,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/quiz-simbolos-quimicos/', icon: '⚗️', name: 'Quiz Símbolos Químicos', description: 'Aprende la tabla periódica' },
   ],
   'quiz-tabla-periodica': [
-    { url: '/quiz-simbolos-quimicos/', icon: '⚗️', name: 'Quiz Símbolos Químicos', description: 'Símbolo ↔ nombre de 85 elementos' },
+    { url: '/quiz-simbolos-quimicos/', icon: '⚗️', name: 'Quiz Símbolos Químicos', description: 'Símbolo ↔ nombre de los elementos' },
     { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica', description: 'Consulta los 118 elementos' },
     { url: '/visualizador-tabla-periodica-interactiva/', icon: '🔬', name: 'Tendencias Periódicas', description: 'Mapas de calor y propiedades' },
   ],

@@ -5,7 +5,7 @@ import { useState, useMemo, useCallback } from 'react';
 import styles from './QuizSimbolosQuimicos.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, ShareCard, LegalNotice, RelatedApps } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { ELEMENTOS, type Elemento } from '@/data/elementos-quimicos';
+import { ELEMENTOS, TOTAL_ELEMENTOS, type Elemento } from '@/data/elementos-quimicos';
 
 type Modo = 'simbolo-nombre' | 'nombre-simbolo';
 type Dificultad = 'facil' | 'medio' | 'dificil';
@@ -165,7 +165,7 @@ export default function QuizSimbolosQuimicosPage() {
         <h1 className={styles.title}>Quiz Símbolos Químicos</h1>
         <p className={styles.subtitle}>Pon a prueba tus conocimientos de la tabla periódica</p>
         <div className={styles.heroBadges}>
-          <span>85 elementos</span>
+          <span>{TOTAL_ELEMENTOS} elementos</span>
           <span>3 dificultades</span>
           <span>2 modos de juego</span>
         </div>
@@ -180,10 +180,11 @@ export default function QuizSimbolosQuimicosPage() {
             <h2 className={styles.configTitulo}>Elige el modo de juego</h2>
             <div className={styles.modoGrid}>
               {(Object.entries(MODO_CONFIG) as [Modo, typeof MODO_CONFIG[Modo]][]).map(([key, cfg]) => (
-                <button
+                <button type="button"
                   key={key}
                   className={`${styles.modoCard} ${modo === key ? styles.modoActivo : ''}`}
                   onClick={() => setModo(key)}
+                  aria-pressed={modo === key}
                 >
                   <span className={styles.modoIcono} aria-hidden="true">{cfg.icon}</span>
                   <strong>{cfg.label}</strong>
@@ -197,10 +198,11 @@ export default function QuizSimbolosQuimicosPage() {
             <h2 className={styles.configTitulo}>Elige la dificultad</h2>
             <div className={styles.difGrid}>
               {(Object.entries(DIFICULTAD_CONFIG) as [Dificultad, typeof DIFICULTAD_CONFIG[Dificultad]][]).map(([key, cfg]) => (
-                <button
+                <button type="button"
                   key={key}
                   className={`${styles.difCard} ${dificultad === key ? styles.difActivo : ''}`}
                   onClick={() => setDificultad(key)}
+                  aria-pressed={dificultad === key}
                 >
                   <span className={styles.difEmoji} aria-hidden="true">{cfg.emoji}</span>
                   <strong>{cfg.label}</strong>
@@ -210,7 +212,7 @@ export default function QuizSimbolosQuimicosPage() {
             </div>
           </section>
 
-          <button className={styles.btnIniciar} onClick={iniciarQuiz}>
+          <button type="button" className={styles.btnIniciar} onClick={iniciarQuiz}>
             ¡Empezar quiz!
           </button>
         </div>
@@ -223,7 +225,10 @@ export default function QuizSimbolosQuimicosPage() {
           <div className={styles.progresoBarra}>
             <div className={styles.progresoInfo}>
               <span>Pregunta {indice + 1} / {preguntas.length}</span>
-              <span role="status" aria-live="polite">✅ {aciertos} · 🔥 Racha: {rachaActual}</span>
+              <span role="status" aria-live="polite">
+                <span aria-hidden="true">✅</span> {aciertos} · <span aria-hidden="true">🔥</span> Racha:{' '}
+                {rachaActual}
+              </span>
             </div>
             <div className={styles.progresoTrack}>
               <div
@@ -253,7 +258,7 @@ export default function QuizSimbolosQuimicosPage() {
             {preguntaActual.opciones.map((opcion, i) => {
               const estado = estadoOpcion(opcion);
               return (
-                <button
+                <button type="button"
                   key={opcion}
                   className={`${styles.opcionBtn} ${styles[`opcion-${estado}`]}`}
                   onClick={() => responder(opcion)}
@@ -274,12 +279,12 @@ export default function QuizSimbolosQuimicosPage() {
             <div className={styles.feedbackPanel}>
               <div role="alert" className={`${styles.feedbackMensaje} ${seleccionada === preguntaActual.correcta ? styles.feedbackOk : styles.feedbackFail}`}>
                 {seleccionada === preguntaActual.correcta ? (
-                  <>✅ ¡Correcto! <strong>{preguntaActual.elemento.nombre}</strong> · símbolo <strong>{preguntaActual.elemento.simbolo}</strong> · Z={preguntaActual.elemento.z}</>
+                  <><span aria-hidden="true">✅</span> ¡Correcto! <strong>{preguntaActual.elemento.nombre}</strong> · símbolo <strong>{preguntaActual.elemento.simbolo}</strong> · Z={preguntaActual.elemento.z}</>
                 ) : (
-                  <>❌ La respuesta correcta era: <strong>{preguntaActual.correcta}</strong> ({modo === 'simbolo-nombre' ? `símbolo ${preguntaActual.elemento.simbolo}` : `nombre: ${preguntaActual.elemento.nombre}`})</>
+                  <><span aria-hidden="true">❌</span> La respuesta correcta era: <strong>{preguntaActual.correcta}</strong> ({modo === 'simbolo-nombre' ? `símbolo ${preguntaActual.elemento.simbolo}` : `nombre: ${preguntaActual.elemento.nombre}`})</>
                 )}
               </div>
-              <button className={styles.btnSiguiente} onClick={siguiente}>
+              <button type="button" className={styles.btnSiguiente} onClick={siguiente}>
                 {indice + 1 < preguntas.length ? 'Siguiente pregunta →' : 'Ver resultados'}
               </button>
             </div>
@@ -330,14 +335,14 @@ export default function QuizSimbolosQuimicosPage() {
           )}
 
           <div className={styles.finBotones}>
-            <button className={styles.btnIniciar} onClick={iniciarQuiz}>
-              🔄 Repetir quiz
+            <button type="button" className={styles.btnIniciar} onClick={iniciarQuiz}>
+              <span aria-hidden="true">🔄</span> Repetir quiz
             </button>
-            <button
+            <button type="button"
               className={styles.btnSecundario}
               onClick={() => setFase('inicio')}
             >
-              ⚙️ Cambiar configuración
+              <span aria-hidden="true">⚙️</span> Cambiar configuración
             </button>
           </div>
         </div>
@@ -521,12 +526,12 @@ export default function QuizSimbolosQuimicosPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">💡</span>
               <h3>El wolframio aguanta el calor</h3>
-              <p>El wolframio (W) tiene el punto de fusión más alto de todos los metales: 3.422 °C. Por eso se usa en filamentos de bombillas y electrodes de soldadura.</p>
+              <p>El wolframio (W) tiene el punto de fusión más alto de todos los metales: 3.422 °C. Por eso se usa en filamentos de bombillas y electrodos de soldadura.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">☢️</span>
-              <h3>El uranio no fue el primero</h3>
-              <p>Aunque el uranio (U) da nombre a la escala geológica, fue el hidrárgiro (Hg, mercurio) el primer elemento en usarse con fines médicos, hace más de 2.000 años en China.</p>
+              <h3>El mercurio, con nombre de dios y de planeta</h3>
+              <p>Su símbolo (Hg) no viene de «mercurio» sino de <em>hydrargyrum</em>, «plata líquida» en latín, del griego <em>hydrárgyros</em>. Es uno de los dos únicos elementos líquidos a temperatura ambiente, junto con el bromo.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🌡️</span>
@@ -543,7 +548,7 @@ export default function QuizSimbolosQuimicosPage() {
 
         {/* Warning box — errores comunes */}
         <section className={styles.warningBox}>
-          <h2>⚠️ 6 errores típicos al estudiar la tabla periódica</h2>
+          <h2><span aria-hidden="true">⚠️</span> 6 errores típicos al estudiar la tabla periódica</h2>
           <div className={styles.warningGrid}>
             <div className={styles.warningItem}>
               <strong>1. Confundir Na con N</strong>
@@ -563,7 +568,7 @@ export default function QuizSimbolosQuimicosPage() {
             </div>
             <div className={styles.warningItem}>
               <strong>5. Creer que todos los gases son nobles</strong>
-              <p>H, N, O, F, Cl y Br también son gases a temperatura ambiente, pero no son gases nobles. Los gases nobles (He, Ne, Ar, Kr, Xe, Rn) son un grupo concreto del grupo 18.</p>
+              <p>H, N, O, F y Cl son gases a temperatura ambiente sin ser gases nobles; el bromo (Br) ni siquiera es un gas: funde a −7,2 °C y hierve a 58,8 °C, así que a 25 °C es LÍQUIDO, uno de los dos únicos que lo son junto con el mercurio. Los gases nobles (He, Ne, Ar, Kr, Xe, Rn) son el grupo 18.</p>
             </div>
             <div className={styles.warningItem}>
               <strong>6. Estudiar sin contexto</strong>

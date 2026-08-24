@@ -1,10 +1,11 @@
 import { Metadata } from 'next';
+import { TOTAL_ELEMENTOS } from '@/data/elementos-quimicos';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Quiz Símbolos Químicos — Aprende la Tabla Periódica | meskeIA',
   description:
-    'Pon a prueba tus conocimientos de química: adivina el nombre del elemento por su símbolo o viceversa. 3 dificultades, 2 modos, 85 elementos. ¡Cuántos conoces?',
+    `Pon a prueba tus conocimientos de química: adivina el nombre del elemento por su símbolo o viceversa. 3 dificultades, 2 modos, ${TOTAL_ELEMENTOS} elementos. ¿Cuántos conoces?`,
   keywords:
     'quiz símbolos químicos, tabla periódica juego, aprender química, símbolos elementos, quiz quimica, juego tabla periódica, aprender elementos quimicos, Fe Au Ag Hg',
   authors: [{ name: 'meskeIA' }],
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Quiz Símbolos Químicos — Aprende la Tabla Periódica',
     description:
-      'Adivina el nombre del elemento por su símbolo o el símbolo por el nombre. 3 dificultades, 2 modos, 85 elementos.',
+      `Adivina el nombre del elemento por su símbolo o el símbolo por el nombre. 3 dificultades, 2 modos, ${TOTAL_ELEMENTOS} elementos.`,
     url: 'https://meskeia.com/quiz-simbolos-quimicos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -37,11 +38,11 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Quiz Símbolos Químicos",
-  description: "Pon a prueba tus conocimientos de química: adivina el nombre del elemento por su símbolo o viceversa. 3 dificultades, 2 modos, 85 elementos. ¡Cuántos conoces?",
+  description: `Pon a prueba tus conocimientos de química: adivina el nombre del elemento por su símbolo o viceversa. 3 dificultades, 2 modos, ${TOTAL_ELEMENTOS} elementos. ¿Cuántos conoces?`,
   url: "https://meskeia.com/quiz-simbolos-quimicos/",
   category: 'EducationalApplication',
   features: [
-    '85 elementos de la tabla periódica',
+    `${TOTAL_ELEMENTOS} elementos de la tabla periódica`,
     '2 modos: símbolo → nombre y nombre → símbolo',
     '3 niveles de dificultad: fácil (10 preguntas), medio (15) y difícil (20)',
     'Feedback inmediato con nombre, símbolo y número atómico',

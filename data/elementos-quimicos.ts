@@ -1,6 +1,8 @@
 /**
  * Tabla periódica — datos para quiz de símbolos químicos
- * 85 elementos con nombre en español, símbolo y número atómico.
+ * Los elementos con nombre en español, símbolo y número atómico. El total NO se escribe aquí:
+ * la app lo deriva de ELEMENTOS.length. Esta cabecera decía «85» y el fichero tenía 88, cifra
+ * que la app repetía en siete sitios, JSON-LD incluido (hallazgo 247 del Inspector).
  * Categoría: 'comun' | 'conocido' | 'avanzado'
  */
 
@@ -96,7 +98,7 @@ export const ELEMENTOS: Elemento[] = [
   { simbolo: 'Yb', nombre: 'Iterbio',    z: 70,  categoria: 'avanzado', grupo: 'Lantánido' },
   { simbolo: 'Lu', nombre: 'Lutecio',    z: 71,  categoria: 'avanzado', grupo: 'Lantánido' },
   { simbolo: 'Hf', nombre: 'Hafnio',     z: 72,  categoria: 'avanzado', grupo: 'Metal de transición' },
-  { simbolo: 'Ta', nombre: 'Tántalo',    z: 73,  categoria: 'avanzado', grupo: 'Metal de transición' },
+  { simbolo: 'Ta', nombre: 'Tantalio',   z: 73,  categoria: 'avanzado', grupo: 'Metal de transición' },
   { simbolo: 'Re', nombre: 'Renio',      z: 75,  categoria: 'avanzado', grupo: 'Metal de transición' },
   { simbolo: 'Os', nombre: 'Osmio',      z: 76,  categoria: 'avanzado', grupo: 'Metal de transición' },
   { simbolo: 'Ir', nombre: 'Iridio',     z: 77,  categoria: 'avanzado', grupo: 'Metal de transición' },
@@ -107,3 +109,10 @@ export const ELEMENTOS: Elemento[] = [
   { simbolo: 'Th', nombre: 'Torio',      z: 90,  categoria: 'avanzado', grupo: 'Actínido' },
   { simbolo: 'Pu', nombre: 'Plutonio',   z: 94,  categoria: 'avanzado', grupo: 'Actínido' },
 ];
+
+/**
+ * Cuántos elementos hay de verdad. La app prometía «85» en el hero, la metadata, el JSON-LD
+ * y la ficha del catálogo mientras el fichero traía 88, y esa cifra viaja a Google y a los
+ * motores de IA. Se deriva, no se teclea.
+ */
+export const TOTAL_ELEMENTOS = ELEMENTOS.length;

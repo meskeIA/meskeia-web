@@ -51,8 +51,8 @@ import { test, expect, Page } from '@playwright/test';
  *         aleja de ella y las DOS componentes salen positivas. Un signo invertido aquí sería
  *         un fallo de física aunque el módulo cuadrase.
  *       V   = k·q/r       = 44,95 / 1,6552946   = 27,155288 V      → «27,16 V»
- *       F   = q₀·|E|      = 1×10⁻⁹ · 16,405109  = 1,6405109×10⁻⁸ N → «1,64 × 10^-8 N»
- *       U   = q₀·V        = 1×10⁻⁹ · 27,155288  = 2,7155288×10⁻⁸ J → «2,72 × 10^-8 J»
+ *       F   = q₀·|E|      = 1×10⁻⁹ · 16,405109  = 1,6405109×10⁻⁸ N → «1,64 × 10⁻⁸ N»
+ *       U   = q₀·V        = 1×10⁻⁹ · 27,155288  = 2,7155288×10⁻⁸ J → «2,72 × 10⁻⁸ J»
  *
  *   CASO 1.bis (el espejo, que es lo que caza un signo invertido) — la MISMA carga con signo
  *   −5 nC en (0, 0) y la sonda en el mismo sitio: los módulos no cambian (|E| = 16,41 N/C,
@@ -81,7 +81,7 @@ import { test, expect, Page } from '@playwright/test';
  *                                         (se dirige HACIA la carga negativa)
  *       Los dos apuntan al MISMO lado (de + hacia −), así que se suman:
  *       Ex = 179,8 + 179,8 = 359,6 N/C → «359,60 N/C»   ·   Ey = 0 → «0 N/C»
- *       |E| = 359,60 N/C   ·   F = 1×10⁻⁹ · 359,6 = 3,596×10⁻⁷ N → «3,60 × 10^-7 N»
+ *       |E| = 359,60 N/C   ·   F = 1×10⁻⁹ · 359,6 = 3,596×10⁻⁷ N → «3,60 × 10⁻⁷ N»
  *       V   = +44,95/0,5 − 44,95/0,5 = +89,9 − 89,9 = 0 V exactos → «0 V» (y U = «0 J»)
  *       Si el panel diese |E| = 0 aquí, estaría anulando vectores que se suman: fallo grave.
  *
@@ -111,32 +111,25 @@ import { test, expect, Page } from '@playwright/test';
  *         aviso: es el HALLAZGO ABIERTO de más abajo. El CASO 3 fotografía lo que hace hoy.
  *
  * ─────────────────────────────────────────────────────────────────────────────────────────
- * HALLAZGOS ABIERTOS QUE ESTE FICHERO **NO** BLOQUEA (el Inspector no repara)
- *   · Singularidad silenciosa. Dentro de 5 cm de una carga, calcularCampoEnPunto la descarta
- *     y devuelve el campo de LAS DEMÁS como si aquélla no existiera, con el mismo formato y
- *     sin marca alguna. Encima de la carga +5 nC del dipolo el panel rotula |E| = 44,95 N/C
- *     y V = −44,95 V: potencial NEGATIVO en el punto donde está la carga POSITIVA. La sonda
- *     mide 10 px de radio y la carga 17 px (≈ 0,17 m de mundo), así que soltar la sonda
- *     «dentro» de una carga es un gesto natural, no rebuscado. Ver CASO 3c.
- *   · La sonda se puede perder fuera del lienzo. setPointerCapture mantiene el arrastre más
- *     allá del borde y setPruebaPos no acota nada, de modo que q₀ acaba p. ej. en x = 5,60 m
- *     (el viewBox llega a 4,00 m): el círculo deja de dibujarse, el panel sigue dando cifras
- *     de un punto invisible y, como no hay ningún botón que recoloque la sonda —setPruebaPos
- *     solo se llama desde el arrastre—, la única salida es recargar la página.
- *   · Notación científica en ASCII: el panel escribe «1,64 × 10^-8 N», con acento circunflejo,
- *     mientras el bloque educativo de la misma página usa superíndices reales (10⁻⁹, 10⁹).
- *   · Los cuatro botones de «Modo de edición» llevan type="button" pero NO aria-pressed,
- *     aunque tienen estado visual activo (clase toolActive) y el modo decide qué hace un clic
- *     en el lienzo (añadir + / añadir − / mover / ELIMINAR). Regla 2 del CLAUDE.md §5.
- *     El test de accesibilidad no lo bloquea: solo exige coherencia si algún día se declara.
- *   · Contenido: la tarjeta «Universitario de ingeniería» afirma que «3 cargas en línea
- *     aproximan un condensador». El preset son tres cargas POSITIVAS de +4 nC: eso aproxima
- *     un hilo cargado, no un condensador, que exige dos placas de signo OPUESTO. Se comprueba
- *     de paso que en el centro de ese preset V = 71,92 V distinto de 0, incompatible con el
- *     plano medio de un condensador.
- *   · Contenido: el bloque educativo visible nunca dice cuánto vale k, pese a que el paso 3
- *     de su guía manda «aplica E = kq/r²» y el paso 5 «compara el módulo de E y V con tu
- *     resultado». El valor solo está en el FAQPage del JSON-LD, que el usuario no lee.
+ * HALLAZGOS DEL INSPECTOR (24/08/2026) — REPARADOS el 24/08/2026, y este fichero los blinda
+ *   · 215 · Singularidad silenciosa. Dentro de 5 cm de una carga, calcularCampoEnPunto la
+ *     descartaba y devolvía el campo de LAS DEMÁS como si aquélla no existiera, con el mismo
+ *     formato y sin marca alguna: encima de la carga +5 nC del dipolo el panel rotulaba
+ *     |E| = 44,95 N/C y V = −44,95 V, potencial NEGATIVO donde está la carga POSITIVA. Ahora
+ *     se dice que ahí el campo diverge y las magnitudes salen con un guion. Ver CASO 3c.
+ *   · 216 · La sonda se perdía fuera del lienzo (setPointerCapture mantiene el arrastre más
+ *     allá del borde y setPruebaPos no acotaba nada): el círculo dejaba de dibujarse y el
+ *     panel seguía dando cifras de un punto invisible, sin más salida que recargar. Acotada.
+ *   · 217 · La tarjeta «Universitario de ingeniería» afirmaba que «3 cargas en línea aproximan
+ *     un condensador». El preset son tres cargas POSITIVAS: eso aproxima un hilo cargado, y la
+ *     propia app lo desmentía (en el centro E = 0 pero V = 71,92 V).
+ *   · 218 · Los cuatro botones de «Modo de edición» no declaraban aria-pressed pese a tener
+ *     estado visual activo y decidir qué hace un clic en el lienzo (añadir + / añadir − /
+ *     mover / ELIMINAR). Regla 2 del CLAUDE.md §5.
+ *   · 219 · El bloque educativo visible nunca decía cuánto vale k, pese a que su guía manda
+ *     «aplica E = kq/r²» y comparar el resultado con el panel. Estaba solo en el JSON-LD.
+ *   · 220 · El panel escribía la potencia de diez con circunflejo ASCII (10^-8) mientras el
+ *     bloque educativo de la misma página usa superíndices reales (10⁻⁹, r², C·m).
  * ─────────────────────────────────────────────────────────────────────────────────────────
  */
 
@@ -243,9 +236,9 @@ test('CASO 1 · carga puntual +5 nC en (0,0) y sonda en (1,50; 0,70): E = k|q|/r
   // V = k·q/r = 44,95 / 1,6552946 = 27,155288 V (positivo: carga positiva)
   await expect(valor(page, 'V (potencial)')).toHaveText('27,16 V');
   // F = q₀·|E| = 1e-9 · 16,405109 = 1,6405109e-8 N
-  await expect(valor(page, '|F| sobre q₀')).toHaveText('1,64 × 10^-8 N');
+  await expect(valor(page, '|F| sobre q₀')).toHaveText('1,64 × 10⁻⁸ N');
   // U = q₀·V = 1e-9 · 27,155288 = 2,7155288e-8 J
-  await expect(valor(page, 'U (energía)')).toHaveText('2,72 × 10^-8 J');
+  await expect(valor(page, 'U (energía)')).toHaveText('2,72 × 10⁻⁸ J');
 });
 
 test('CASO 1.bis · la misma carga en −5 nC: mismo módulo, campo HACIA la carga y V negativo', async ({
@@ -263,9 +256,9 @@ test('CASO 1.bis · la misma carga en −5 nC: mismo módulo, campo HACIA la car
   await expect(valor(page, 'Eᵧ')).toHaveText('-6,94 N/C');
   // V = −44,95/1,6552946 = −27,155288 V · U = q₀·V = −2,7155288e-8 J
   await expect(valor(page, 'V (potencial)')).toHaveText('-27,16 V');
-  await expect(valor(page, 'U (energía)')).toHaveText('-2,72 × 10^-8 J');
+  await expect(valor(page, 'U (energía)')).toHaveText('-2,72 × 10⁻⁸ J');
   // El módulo de la fuerza tampoco cambia
-  await expect(valor(page, '|F| sobre q₀')).toHaveText('1,64 × 10^-8 N');
+  await expect(valor(page, '|F| sobre q₀')).toHaveText('1,64 × 10⁻⁸ N');
 });
 
 test('CASO 1.ter · superposición: el dipolo de arranque medido en (1,50; 0,70)', async ({ page }) => {
@@ -300,7 +293,7 @@ test('CASO 2 · punto medio del dipolo: E se DUPLICA (359,60 N/C) mientras V se 
   await expect(valor(page, 'V (potencial)')).toHaveText('0 V');
   await expect(valor(page, 'U (energía)')).toHaveText('0 J');
   // F = q₀·E = 1e-9 · 359,6 = 3,596e-7 N
-  await expect(valor(page, '|F| sobre q₀')).toHaveText('3,60 × 10^-7 N');
+  await expect(valor(page, '|F| sobre q₀')).toHaveText('3,60 × 10⁻⁷ N');
 });
 
 test('CASO 2.bis · centro del cuadrupolo: ahí SÍ se anula todo (E = 0 y V = 0)', async ({ page }) => {
@@ -316,11 +309,22 @@ test('CASO 2.bis · centro del cuadrupolo: ahí SÍ se anula todo (E = 0 y V = 0
   // Suma de cargas = +5 +5 −5 −5 = 0 a la misma distancia, luego V = 0. Es lo que dice su FAQ.
   await expect(valor(page, 'V (potencial)')).toHaveText('0 V');
 
-  // Contraprueba de que ese cero significa algo: en el preset «3 cargas en línea» (+4 nC ×3)
-  // el mismo punto da E = 0 por simetría pero V = 2 · 8,99e9·4e-9/1 = 71,92 V, distinto de 0.
+  // Contraprueba de que ese cero significa algo (y hallazgo 217: tres cargas del mismo signo
+  // en línea NO son un condensador). En el preset «3 cargas en línea» (+4 nC ×3) el centro es
+  // una de las cargas, así que la app avisa de la singularidad; medido 30 cm por encima:
+  //   carga (0,0):   r = 0,30 → Ey = 35,96/0,09 = 399,556 ·  V = 35,96/0,30 = 119,867
+  //   cargas (∓1,0): r² = 1,09 · r = 1,0440307 · r³ = 1,1379422 → factor = 31,600
+  //                  Ex se cancela entre las dos · Ey = 2 · 31,600·0,3 = 18,960
+  //                  V = 2 · 35,96/1,0440307 = 68,887
+  //   Ey = 399,556 + 18,960 = 418,52 N/C  ·  V = 119,867 + 68,887 = 188,75 V
+  // En el plano medio de un condensador V valdría 0 y el campo sería uniforme: ni una cosa
+  // ni la otra.
   await page.getByRole('button', { name: '3 cargas en línea' }).click();
-  await expect(valor(page, '|E| (campo)')).toHaveText('0 N/C');
-  await expect(valor(page, 'V (potencial)')).toHaveText('71,92 V');
+  await expect(valor(page, '|E| (campo)')).toHaveText('—'); // la sonda está sobre la carga central
+  await arrastrarSonda(page, 400, 220); // (0,00; 0,30)
+  await expect(valor(page, 'Posición y')).toHaveText('0,30 m');
+  await expect(valor(page, 'Eₓ')).toHaveText('0 N/C');
+  await expect(valor(page, 'V (potencial)')).toHaveText('188,75 V');
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════════════
@@ -358,19 +362,21 @@ test('CASO 3 · sin cargas, magnitud fuera de rango y sonda sobre la carga (r �
   await expect(valor(page, '|E| (campo)')).toHaveText('12.536,98 N/C');
   await expect(valor(page, 'Eₓ')).toHaveText('12.536,98 N/C');
 
-  //     Y ahora ENCIMA de la carga. No sale ni infinito ni NaN —eso está bien—, pero la
-  //     guardia `if (r < 0,05) continue` no marca nada: descarta la carga y presenta el campo
-  //     de la OTRA como si fuese el del punto. Queda |E| = 44,95/1² = 44,95 N/C y V = −44,95 V,
-  //     o sea potencial NEGATIVO justo donde está la carga POSITIVA. Es un HALLAZGO ABIERTO
-  //     (acta 24/08/2026) y lo que va debajo es una foto de lo que hace HOY: si algún día el
-  //     simulador marca la singularidad en vez de disimularla, estas dos líneas se pondrán en
-  //     rojo, y eso es exactamente lo que se quiere que ocurra.
+  //     Y ahora ENCIMA de la carga. HALLAZGO 215, reparado el 24/08/2026: antes la guardia
+  //     `if (r < 0,05) continue` descartaba la carga en silencio y presentaba el campo de la
+  //     OTRA como si fuese el del punto —|E| = 44,95 N/C y V = −44,95 V, o sea un potencial
+  //     NEGATIVO justo donde está la carga POSITIVA—. Ahora se dice que ahí no hay cifra.
   await arrastrarSonda(page, 350, 250);
   await expect(valor(page, 'Posición x')).toHaveText('-0,50 m');
   const panelEncima = (await page.locator('[role="status"]').textContent()) ?? '';
   expect(panelEncima).not.toMatch(/NaN|Infinity|undefined/);
-  await expect(valor(page, '|E| (campo)')).toHaveText('44,95 N/C');
-  await expect(valor(page, 'V (potencial)')).toHaveText('-44,95 V');
+  expect(panelEncima).toContain('sobre una carga');
+  await expect(valor(page, '|E| (campo)')).toHaveText('—');
+  await expect(valor(page, 'V (potencial)')).toHaveText('—');
+
+  //     Y al salir de la singularidad vuelven las cifras de siempre
+  await arrastrarSonda(page, 356, 250);
+  await expect(valor(page, '|E| (campo)')).toHaveText('12.536,98 N/C');
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════════════
@@ -439,14 +445,12 @@ test('accesibilidad y formato: type="button", aria-pressed y coma decimal', asyn
   expect(modos.filter((m) => m.activo)).toHaveLength(1); // siempre hay un modo activo
   for (const m of modos) {
     expect(m.tipo, `«${m.texto}» debe llevar type="button"`).toBe('button');
-    // HALLAZGO ABIERTO (acta 24/08/2026): los cuatro devuelven aria-pressed = null pese a
-    // tener estado visual activo. No se bloquea aquí, pero sí se blinda que, el día que se
-    // declare, sea coherente con la clase toolActive y no un aria-pressed puesto al tuntún.
-    if (m.pressed !== null) {
-      expect(m.pressed, `«${m.texto}»: aria-pressed debe seguir al estado visual`).toBe(
-        String(m.activo),
-      );
-    }
+    // HALLAZGO 218, reparado el 24/08/2026: los cuatro devolvían aria-pressed = null pese a
+    // tener estado visual activo, y el modo decide qué hace un clic en el lienzo (añadir +,
+    // añadir −, mover o ELIMINAR). Tiene que seguir al estado visual, no ir al tuntún.
+    expect(m.pressed, `«${m.texto}»: aria-pressed debe seguir al estado visual`).toBe(
+      String(m.activo),
+    );
   }
 
   // Formato español en todo el panel: coma decimal y punto de millar (12.536,98).
@@ -456,10 +460,11 @@ test('accesibilidad y formato: type="button", aria-pressed y coma decimal', asyn
   const panel = (await page.locator('[role="status"]').textContent()) ?? '';
   expect(panel).not.toMatch(/\d\.\d{2} [NVJ]/); // ni un punto decimal a la anglosajona
 
-  // La potencia de diez tiene que ser legible en una de las dos formas admisibles: superíndice
-  // real (10⁻⁸) o marca ASCII (10^-8). HALLAZGO ABIERTO (acta 24/08/2026): hoy es la segunda,
-  // mientras el bloque educativo de la MISMA página escribe 10⁻⁹ con superíndice.
+  // HALLAZGO 220, reparado el 24/08/2026: la potencia de diez se escribía con circunflejo
+  // ASCII (10^-8) mientras el bloque educativo de la MISMA página usa superíndices reales
+  // (10⁻⁹, r², C·m). Ahora el panel también.
   await page.getByRole('button', { name: 'Dipolo' }).click();
   const conPotencia = (await page.locator('[role="status"]').textContent()) ?? '';
-  expect(conPotencia).toMatch(/× 10(\^-?\d+|⁻?[⁰¹²³⁴⁵⁶⁷⁸⁹]+)/);
+  expect(conPotencia).toMatch(/× 10⁻?[⁰¹²³⁴⁵⁶⁷⁸⁹]+/);
+  expect(conPotencia).not.toContain('10^');
 });

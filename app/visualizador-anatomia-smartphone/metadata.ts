@@ -56,7 +56,7 @@ export const faqJsonLd = {
       name: '¿Qué minerales contiene un smartphone y de dónde vienen?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un smartphone contiene más de 30 minerales extraídos en unos 15 países. El litio para la batería proviene principalmente de Chile y Argentina, el cobalto del Congo, el tántalo de África Central y las tierras raras (neodimio, disprosio) casi en exclusiva de China. La cadena de suministro abarca extractores, refinadores y fabricantes de componentes en distintos continentes antes de que el dispositivo llegue a la tienda.',
+        text: 'Un smartphone contiene más de 30 minerales extraídos en unos 15 países. El litio para la batería proviene principalmente de Chile y Argentina, el cobalto del Congo, el tantalio de África Central y las tierras raras (neodimio, disprosio) casi en exclusiva de China. La cadena de suministro abarca extractores, refinadores y fabricantes de componentes en distintos continentes antes de que el dispositivo llegue a la tienda.',
       },
     },
     {
