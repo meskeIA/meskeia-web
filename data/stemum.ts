@@ -770,6 +770,13 @@ export const STEMUM_APPS: StemumApp[] = [
   },
   // Química
   {
+    slug: 'calculadora-configuracion-electronica',
+    icon: '⚛️',
+    titulo: 'Configuración electrónica',
+    desc: 'Llenado de orbitales de cualquier elemento o ion: diagrama de Möller, cajas con la regla de Hund, números cuánticos y las 20 excepciones reales.',
+    disciplina: 'quimica',
+  },
+  {
     slug: 'simulador-equilibrio-quimico',
     icon: '⚗️',
     titulo: 'Equilibrio químico',

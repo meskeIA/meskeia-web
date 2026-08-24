@@ -1436,7 +1436,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-tabla-periodica-interactiva/', icon: '🔬', name: 'Tabla Periódica', description: 'Tendencias y propiedades' },
     { url: '/visualizador-enlaces-quimicos/', icon: '⚛️', name: 'Enlaces Químicos', description: 'Cómo se unen los átomos' },
     { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Tipos y balanceo' },
-    { url: '/visualizador-estructuras-cristalinas/', icon: '🔮', name: 'Estructuras Cristalinas', description: 'Cómo se organizan en sólidos' },
+    { url: '/calculadora-configuracion-electronica/', icon: '⚛️', name: 'Configuración Electrónica', description: 'En qué orbital entra cada electrón, con las reglas de Aufbau, Hund y Pauli' },
   ],
   'visualizador-cartografia-proyecciones': [
     { url: '/conversor-coordenadas/', icon: '🧭', name: 'Conversor de Coordenadas', description: 'Pasa de UTM a grados minutos segundos y al revés' },
@@ -3089,9 +3089,15 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-sistemas-numericos/', icon: '🔢', name: 'Sistemas Numéricos', description: 'Binario, hex, octal y bit a bit' },
     { url: '/calculadora-seccion-cable/', icon: '🔌', name: 'Sección de Cable', description: 'El mismo cálculo de caídas de tensión, a escala de instalación eléctrica' },
   ],
+  'calculadora-configuracion-electronica': [
+    { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica Interactiva', description: 'Los 118 elementos con sus propiedades, uno a uno' },
+    { url: '/simulador-tabla-periodica-tendencias/', icon: '⚗️', name: 'Tendencias Periódicas', description: 'Por qué el radio y la electronegatividad se repiten: es esta configuración' },
+    { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'Los electrones de valencia que acabas de contar, aplicados a la formulación' },
+    { url: '/visualizador-estructura-atomo/', icon: '⚛️', name: 'Estructura del Átomo', description: 'Dónde están esos orbitales y qué forma tienen' },
+  ],
   'tabla-periodica': [
     { url: '/quiz-tabla-periodica/', icon: '🧪', name: 'Quiz Tabla Periódica', description: 'Pon a prueba tus conocimientos de química' },
-    { url: '/quiz-simbolos-quimicos/', icon: '⚗️', name: 'Quiz Símbolos Químicos', description: 'Símbolo ↔ nombre de 85 elementos' },
+    { url: '/calculadora-configuracion-electronica/', icon: '⚛️', name: 'Configuración Electrónica', description: 'El llenado de orbitales de cualquier elemento o ion, paso a paso' },
     { url: '/simulador-estequiometria/', icon: '⚗️', name: 'Estequiometría', description: 'Reacciones, masas molares y reactivo limitante' },
     { url: '/simulador-equilibrio-quimico/', icon: '⚖️', name: 'Equilibrio Químico', description: 'Le Chatelier y constante Kc' },
   ],
@@ -6272,7 +6278,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'simulador-tabla-periodica-tendencias': [
     { url: '/simulador-estequiometria/', icon: '🧪', name: 'Estequiometría', description: 'Las masas molares que usas en estequiometría vienen de la tabla' },
-    { url: '/simulador-cinetica-arrhenius/', icon: '⚗️', name: 'Cinética Arrhenius', description: 'La reactividad química depende de las tendencias periódicas' },
+    { url: '/calculadora-configuracion-electronica/', icon: '⚛️', name: 'Configuración Electrónica', description: 'La causa de las tendencias: cómo se llenan los orbitales de cada elemento' },
     { url: '/visualizador-tabla-periodica/', icon: '🔬', name: 'Tabla Periódica', description: 'Visualizador de la tabla periódica con información de cada elemento' },
     { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'Números de oxidación y nomenclatura IUPAC' },
   ],
