@@ -125,3 +125,143 @@ if (sinDeclarar.length) {
 }
 
 console.log('✅ Rutas migradas: toda familia redirigida fuera del dominio está declarada en el resolutor');
+
+// ---------------------------------------------------------------------------
+// REGLA 3 — Ningún enlace interno literal puede apuntar a una ruta que no existe
+//
+// POR QUÉ (2026-08-24): el 16/03 el commit 035a31a0 renombró 29 apps
+// (calculadora/simulador → estimador/orientador). Cinco meses después, 21 de las
+// 29 URLs viejas seguían devolviendo 404 sin redirect —correcto, porque ya no
+// tenían tráfico que preservar (1 de 21 con impresiones en GSC, y 2)—, pero
+// app/curso-decisiones-inversion/CourseContext.tsx seguía enlazando a DOS de
+// ellas con `available: true`. Googlebot sigue los enlaces internos aunque la
+// URL vieja ya no reciba impresiones: de ahí el aviso «No se ha encontrado
+// (404)» que Search Console mandó ese día. Lo delató el correo de Google, no el
+// build, cinco meses tarde.
+//
+// Es la TERCERA vez que se repite la misma forma: renombrar a escala y dejar
+// enlaces internos colgando (18/07/2026, tres 404 internos tras otros
+// renombrados). La regla 1 de CLAUDE.md pide convertir en candado la invariante
+// que se repite, y ésta es "todo href literal resuelve a una página real".
+//
+// LÍMITES DELIBERADOS, para que el candado no mienta sobre su alcance:
+//   · Solo hrefs LITERALES. Los construidos (`href={`/${slug}/`}`) no se miran:
+//     su destino no existe hasta ejecutar.
+//   · Los hrefs con extensión (.pdf, .png…) apuntan a public/, no a páginas: fuera.
+//   · Un href raíz-relativo escrito DENTRO de un vertical (app/cronicum/page.tsx
+//     enlaza a /europa/) es correcto en su dominio, donde la raíz es el vertical.
+//     Se resuelve contra el prefijo DE ESE fichero, y solo ahí se admiten rutas
+//     dinámicas. Un componente compartido (components/DelegumHeader.tsx) puede
+//     probar todos los prefijos, pero únicamente contra rutas ESTÁTICAS.
+//
+// La primera versión de este candado admitía cualquier prefijo con dinámicas, y
+// eso lo dejaba inerte: /cronicum/[slug]/ casaba con cualquier ruta de un solo
+// segmento, que es la forma de casi toda app del catálogo. Daba verde al propio
+// fallo que venía a cazar. Lo delató la prueba de especificidad —reinyectar el
+// caso de origen y exigir que falle— antes de llegar a producción.
+// Escape puntual: `enlace-ok: <razón>` en la línea o en la anterior.
+// ---------------------------------------------------------------------------
+const PREFIJOS_VERTICAL = ['/delegum', '/cronicum', '/stemum', '/coquinum'];
+
+/** Rutas con página real bajo app/, con los grupos (x) plegados. */
+function rutasDeApp(dir, prefijo, acc) {
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    if (!e.isDirectory() || e.name === 'api' || e.name.startsWith('_')) continue;
+    const hijo = path.join(dir, e.name);
+    // Los grupos de rutas —(marketing)— no aportan segmento a la URL.
+    const ruta = e.name.startsWith('(') ? prefijo : `${prefijo}/${e.name}`;
+    try {
+      statSync(path.join(hijo, 'page.tsx'));
+      acc.add(`${ruta}/`);
+    } catch { /* carpeta sin página propia: solo contenedor */ }
+    rutasDeApp(hijo, ruta, acc);
+  }
+  return acc;
+}
+
+const RUTAS = rutasDeApp(path.join(RAIZ, 'app'), '', new Set(['/']));
+const DINAMICAS = [...RUTAS].filter((r) => r.includes('['));
+
+/** Redirects declarados en next.config.ts (estáticos y de familia con :path*). */
+const REDIRECTS = new Set();
+const PREFIJOS_REDIRIGIDOS = [];
+for (const m of configTexto.matchAll(/source:\s*'(\/[^']+)'/g)) {
+  const s = m[1];
+  if (s.includes('(')) continue; // patrón de headers(), no una ruta
+  const familia = s.match(/^(.*)\/:path[*+]$/);
+  if (familia) PREFIJOS_REDIRIGIDOS.push(`${familia[1]}/`);
+  else REDIRECTS.add(s.endsWith('/') ? s : `${s}/`);
+}
+
+/** ¿Casa la ruta con alguna dinámica? /curso-x/leccion/3/ ⇄ /curso-x/leccion/[id]/ */
+function casaDinamica(ruta) {
+  const segs = ruta.split('/').filter(Boolean);
+  return DINAMICAS.some((d) => {
+    const ds = d.split('/').filter(Boolean);
+    const catchAll = ds.some((s) => s.startsWith('[...'));
+    if (!catchAll && ds.length !== segs.length) return false;
+    return ds.every((s, i) => {
+      if (s.startsWith('[...')) return true; // absorbe el resto
+      return s.startsWith('[') || s === segs[i];
+    });
+  });
+}
+
+function resuelve(ruta, rel) {
+  if (RUTAS.has(ruta) || REDIRECTS.has(ruta)) return true;
+  if (PREFIJOS_REDIRIGIDOS.some((p) => ruta.startsWith(p))) return true;
+  if (casaDinamica(ruta)) return true;
+  // Escrito dentro de un vertical: allí la raíz del dominio es el prefijo, y la
+  // ruta puede ser dinámica (las puertas de Cronicum son /cronicum/[slug]/).
+  const propio = PREFIJOS_VERTICAL.find((p) =>
+    rel.startsWith(path.join('app', p.slice(1)) + path.sep)
+  );
+  if (propio) return RUTAS.has(`${propio}${ruta}`) || casaDinamica(`${propio}${ruta}`);
+  // Componente compartido: puede servirse bajo cualquier vertical, pero solo se
+  // acepta contra una ruta ESTÁTICA — una dinámica de un segmento casaría con todo.
+  return PREFIJOS_VERTICAL.some((p) => RUTAS.has(`${p}${ruta}`));
+}
+
+// href="/x" · href='/x' · href={'/x'} · href={`/x`} · href: '/x'
+const PATRON_HREF = /href\s*[=:]\s*\{?\s*["'`](\/[^"'`{}\s]*)["'`]/g;
+const CON_EXTENSION = /\.[a-z0-9]{2,4}$/i;
+
+const rotos = new Map();
+let comprobados = 0;
+for (const carpeta of CARPETAS) {
+  for (const f of ficheros(path.join(RAIZ, carpeta))) {
+    const rel = path.relative(RAIZ, f);
+    const lineas = readFileSync(f, 'utf8').split('\n');
+    lineas.forEach((linea, i) => {
+      const previa = i > 0 ? lineas[i - 1] : '';
+      if (/enlace-ok:/.test(linea) || /enlace-ok:/.test(previa)) return;
+      // Ejemplo de marcado dentro de una cadena (glosarios de programación).
+      if (/<\s*(Link|a)\b/.test(linea) && /["'`]\s*<\s*(Link|a)\b/.test(linea)) return;
+      PATRON_HREF.lastIndex = 0;
+      for (const m of linea.matchAll(PATRON_HREF)) {
+        let ruta = m[1].split('#')[0].split('?')[0];
+        if (!ruta || ruta.startsWith('/api/') || CON_EXTENSION.test(ruta)) continue;
+        if (!ruta.endsWith('/')) ruta += '/';
+        comprobados++;
+        if (resuelve(ruta, rel)) continue;
+        if (!rotos.has(ruta)) rotos.set(ruta, []);
+        rotos.get(ruta).push(`${rel}:${i + 1}`);
+      }
+    });
+  }
+}
+
+if (rotos.size) {
+  console.error('\n❌ Enlaces internos hacia rutas que NO existen (404 para el usuario y para Googlebot):\n');
+  for (const [ruta, sitios] of [...rotos].sort()) {
+    console.error(`   ${ruta.padEnd(46)} ← ${sitios.slice(0, 4).join(', ')}${sitios.length > 4 ? ` (+${sitios.length - 4})` : ''}`);
+  }
+  console.error(
+    `\n   ${rotos.size} ruta(s) sin página detrás. Apunta el enlace a la ruta viva, o\n` +
+    '   añade el 301 a next.config.ts si la URL vieja aún conserva impresiones.\n' +
+    '   Falso positivo: comentario `enlace-ok: <razón>` en la línea o en la anterior.\n'
+  );
+  process.exit(1);
+}
+
+console.log(`✅ Enlaces internos: ${comprobados} enlaces literales revisados, todos con página real detrás`);

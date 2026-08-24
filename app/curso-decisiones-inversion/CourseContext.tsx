@@ -110,10 +110,10 @@ export const CHAPTERS = [
 export const TOOLS = [
   {
     id: 'interes-compuesto',
-    name: 'Calculadora Interés Compuesto',
+    name: 'Estimador de Interés Compuesto',
     description: 'Calcula el crecimiento de tus inversiones con el poder del interés compuesto',
     icon: '📈',
-    href: '/interes-compuesto/',
+    href: '/estimador-interes-compuesto/',
     available: true,
   },
   {
@@ -126,10 +126,10 @@ export const TOOLS = [
   },
   {
     id: 'calculadora-inversiones',
-    name: 'Calculadora de Inversiones',
+    name: 'Estimador de Inversiones',
     description: 'Diseña tu cartera según tu perfil de riesgo y visualiza la distribución de activos',
     icon: '💼',
-    href: '/calculadora-inversiones/',
+    href: '/estimador-inversiones/',
     available: true,
   },
 ];
