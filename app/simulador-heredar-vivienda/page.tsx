@@ -29,6 +29,7 @@ import {
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
   PLUSVALIA_MUNICIPAL_META,
 } from '@/data/fiscal';
+import { calcularCuotaIntegraIS } from '@/lib/calculadoras/sucesiones';
 import styles from './SimuladorHeredarVivienda.module.css';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -215,26 +216,18 @@ const TIPO_MUNICIPAL_PLUSVALIA = PLUSVALIA_MUNICIPAL_META.tipoOrientativo / 100;
  */
 const ANIO_REFERENCIA = 2026;
 
-function aplicarTarifa(
-  base: number,
-  tarifa: typeof TARIFA_ESTATAL_IS
-): number {
-  let cuota = 0;
-  let restante = base;
-  let limiteAnterior = 0;
-
-  for (const tramo of tarifa) {
-    if (restante <= 0) break;
-    const limite = tramo.hasta === Infinity ? base + 1 : tramo.hasta;
-    const ancho = limite - limiteAnterior;
-    const aplicado = Math.min(restante, ancho);
-    cuota += aplicado * (tramo.tipo / 100);
-    restante -= aplicado;
-    limiteAnterior = limite;
-  }
-
-  return cuota;
-}
+/**
+ * La cuota íntegra la calcula `calcularCuotaIntegraIS`, el mismo helper que usan
+ * `lib/calculadoras/sucesiones.ts` (MCP Delegum y GPT), `estimador-impuesto-sucesiones` y
+ * `estimador-impuesto-donaciones`.
+ *
+ * Hasta el 24/08/2026 esta app tenía aquí su propia versión, que acumulaba los tramos
+ * marginales e ignoraba la columna `cuota` que declara cada fila de `TARIFA_ESTATAL_IS`.
+ * Como esa columna no es exactamente la acumulación de sus propios tipos —arrastra los
+ * redondeos de la tabla oficial condensada—, las dos lecturas divergían por encima de
+ * 31.956,87 € de base liquidable y dos apps fiscales de meskeIA daban cuotas distintas
+ * para la misma herencia (hallazgo 277 del Inspector). Manda la tabla publicada.
+ */
 
 /** Edad mínima del colateral (Grupo III) para la reducción de vivienda habitual, art. 20.2.c LISD */
 const EDAD_MIN_COLATERAL_VIVIENDA = 65;
@@ -305,7 +298,7 @@ function calcularISD(
 
   // Aplicar tarifa
   const tarifa = esCataluna ? TARIFA_CATALUNA_IS : TARIFA_ESTATAL_IS;
-  const cuotaIntegra = aplicarTarifa(baseLiquidable, tarifa);
+  const cuotaIntegra = calcularCuotaIntegraIS(baseLiquidable, tarifa);
 
   // Coeficiente por patrimonio preexistente, desde data/fiscal. Índice 0 = primer tramo
   // (patrimonio del heredero < 402.678,11 €), que es el supuesto que simula esta app.
@@ -367,6 +360,17 @@ function calcularISD(
     bonificacionPorc,
   };
 }
+
+/**
+ * Lo que ESTA MISMA página liquida para el ejemplo que cita el bloque educativo: Grupo IV,
+ * 200.000 €, sin vivienda habitual, régimen común (Madrid, que no bonifica al Grupo IV).
+ *
+ * Sale del motor y no de un número escrito a mano porque el texto decía «80-100.000 € de
+ * ISD», más del DOBLE de lo que devuelve el motor y una cifra inalcanzable en la app: ni
+ * la CCAA más cara ni el coeficiente más alto del Grupo IV llegan ahí. Y era el texto que
+ * aconseja «valorar si compensa renunciar a la herencia» (hallazgo 275 del Inspector).
+ */
+const EJEMPLO_GRUPO_IV = calcularISD(200000, 'sin_parentesco', 'madrid', false, 50, false);
 
 function calcularPlusvaliaMunicipal(
   valorCatastralSuelo: number,
@@ -1138,8 +1142,10 @@ export default function SimuladorHeredarViviendaPage() {
             <h4>Heredero del Grupo IV (sin parentesco)</h4>
             <p>
               Coeficiente multiplicador 2,0 y sin reducciones. Casi ninguna CCAA bonifica.
-              Heredar 200.000 € puede suponer 80-100.000 € de ISD. Conviene valorar si compensa
-              renunciar a la herencia (la herencia es siempre voluntaria).
+              Heredar 200.000 € supone {formatCurrency(EJEMPLO_GRUPO_IV.cuotaFinal)} de ISD en
+              régimen común, y más con un patrimonio previo alto (el coeficiente llega a 2,4).
+              Conviene valorar si compensa renunciar a la herencia (la herencia es siempre
+              voluntaria). Simula tu caso arriba: cada CCAA cambia el resultado.
             </p>
           </div>
         </div>

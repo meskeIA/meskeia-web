@@ -8,6 +8,7 @@ import { RelatedApps, LegalNotice, ShareCard, EducationalSection,
   DisclaimerCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { formatDate } from '@/lib';
 
 interface UTMParams {
   url: string;
@@ -146,7 +147,7 @@ export default function GeneradorUTMPage() {
       url: params.url,
       fullUrl: generatedUrl,
       campaign: params.campaign,
-      date: new Date().toLocaleDateString('es-ES'),
+      date: formatDate(new Date()),
     };
 
     const updated = [newLink, ...savedLinks].slice(0, 20); // Máximo 20 enlaces

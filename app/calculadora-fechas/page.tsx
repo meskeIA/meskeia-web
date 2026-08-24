@@ -5,6 +5,7 @@ import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, Legal
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import styles from './CalculadoraFechas.module.css';
 import { getRelatedApps } from '@/data/app-relations';
+import { formatDate } from '@/lib';
 
 type TimeUnit = 'days' | 'weeks' | 'months' | 'years';
 type Operation = 'add' | 'subtract';
@@ -198,7 +199,7 @@ export default function CalculadoraFechas() {
    * Formatea fecha a formato corto español
    */
   const formatDateShort = (date: Date): string => {
-    return date.toLocaleDateString('es-ES');
+    return formatDate(date);
   };
 
   /**

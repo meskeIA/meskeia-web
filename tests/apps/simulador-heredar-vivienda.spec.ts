@@ -41,8 +41,13 @@
  *  27 % hasta 300.000 · 30 % en adelante.
  *
  * Formato: `formatCurrency` usa es-ES con agrupación «min2», así que los importes de
- * cuatro dígitos enteros van SIN punto de millares (5404,75 €) y los de cinco o más, con
- * él (509.404,75 €). Las cifras esperadas se escriben literales, tal cual las pinta la app.
+ * cuatro dígitos enteros van SIN punto de millares (5405,24 €) y los de cinco o más, con
+ * él (509.405,24 €). Las cifras esperadas se escriben literales, tal cual las pinta la app.
+ *
+ * ⚠️ 24/08/2026 — las cuotas íntegras de TODOS los casos cambiaron al cerrar el hallazgo
+ * 277: la app aplica ya la COLUMNA `cuota` de la tabla oficial (`calcularCuotaIntegraIS`,
+ * compartido con el MCP y los dos estimadores) en vez de acumular los tramos marginales,
+ * que era su lectura propia y la única del repositorio que hacía eso.
  */
 import { test, expect, Page } from '@playwright/test';
 
@@ -114,14 +119,11 @@ test.describe('Simulador de heredar vivienda — re-inspección 24/08/2026', () 
    *   − Reducción vivienda    mín(500.000 × 0,95; 122.606,47) −122.606,47
    *   − Reducción autonómica  asturias…['II'].reduccionBase   −300.000,00
    *   = Base liquidable                                        61.436,66
-   *   Cuota íntegra por tramos marginales de TARIFA_ESTATAL_IS:
-   *        7.993,46 × 7,65 % =   611,49969
-   *       23.963,41 × 8,50 % = 2.036,88985   (31.956,87 − 7.993,46)
-   *       29.479,79 × 9,35 % = 2.756,360365  (61.436,66 − 31.956,87)
-   *                            ────────────
-   *                             5.404,749905 → «5404,75 €»
-   *   × COEFICIENTES_IS['II'][0] = 1,0000  → cuota tributaria 5.404,749905
-   *   Asturias NO bonifica en cuota (porcentaje 0) → Cuota ISD final = 5.404,749905
+   *   Cuota íntegra por la COLUMNA `cuota` de TARIFA_ESTATAL_IS (hallazgo 277):
+   *        2.648,88 + (61.436,66 − 31.956,87) × 9,35 %
+   *      = 2.648,88 + 2.756,360365 = 5.405,240365 → «5405,24 €»
+   *   × COEFICIENTES_IS['II'][0] = 1,0000  → cuota tributaria 5.405,240365
+   *   Asturias NO bonifica en cuota (porcentaje 0) → Cuota ISD final = 5.405,240365
    *
    * Plusvalía municipal (IIVTNU), tipo ORIENTATIVO del módulo (25 %):
    *   16 años de tenencia → COEFICIENTES_IIVTNU_2025[16] = 0,16
@@ -131,15 +133,15 @@ test.describe('Simulador de heredar vivienda — re-inspección 24/08/2026', () 
    *   (con el 30 % hardcodeado del hallazgo 199 saldrían 4.800,00 €)
    *
    * IRPF al vender a los 3 años por 600.000 €:
-   *   Valor de adquisición fiscal = 500.000 + 5.404,749905 + 4.000 = 509.404,749905
-   *   Ganancia = 600.000 − 509.404,749905 = 90.595,250095
+   *   Valor de adquisición fiscal = 500.000 + 5.405,240365 + 4.000 = 509.405,240365
+   *   Ganancia = 600.000 − 509.405,240365 = 90.594,759635
    *        6.000,000000 × 19 % =  1.140,00
    *       44.000,000000 × 21 % =  9.240,00
-   *       40.595,250095 × 23 % =  9.336,90752185
+   *       40.594,759635 × 23 % =  9.336,79471605
    *                               ─────────────
-   *                                19.716,90752185 → «19.716,91 €»
+   *                                19.716,79471605 → «19.716,79 €»
    *
-   * TOTAL = 5.404,749905 + 4.000 + 19.716,90752185 = 29.121,65742685 → «29.121,66 €»
+   * TOTAL = 5.405,240365 + 4.000 + 19.716,79471605 = 29.122,03508105 → «29.122,04 €»
    * Porcentaje sobre la venta = 29.121,657.../600.000 × 100 = 4,8536 → «4,85 %»
    */
   test('CASO 1 (normal) — hijo hereda 500.000 € en Asturias y vende a los 3 años: ISD + IIVTNU + IRPF', async ({
@@ -170,12 +172,16 @@ test.describe('Simulador de heredar vivienda — re-inspección 24/08/2026', () 
       '−300.000,00 €'
     );
     expect(await linea(page, ISD, '= Base liquidable')).toBe('61.436,66 €');
-    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('5404,75 €');
+    // Hallazgo 277: la cuota íntegra se lee de la COLUMNA `cuota` de TARIFA_ESTATAL_IS,
+    // como hacen `lib/calculadoras/sucesiones.ts` y los dos estimadores, y no acumulando
+    // los tramos marginales. 2.648,88 + (61.436,66 − 31.956,87) × 9,35 % = 5.405,2404
+    // (acumulando marginales salían 5.404,75, y era esta app la única que lo hacía).
+    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('5405,24 €');
     // Hallazgo 205: el coeficiente sale de COEFICIENTES_IS, no de una tabla inline
     expect(await linea(page, ISD, '× Coef. patrimonio (Grupo II)')).toBe('×1,0000');
-    expect(await linea(page, ISD, '= Cuota tributaria')).toBe('5404,75 €');
+    expect(await linea(page, ISD, '= Cuota tributaria')).toBe('5405,24 €');
     expect(await panel(page, ISD)).toContain('Bonificación CCAA (0,0%)');
-    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('5404,75 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('5405,24 €');
 
     // ── Plusvalía municipal ──────────────────────────────────────────────────
     expect(await panel(page, IIVTNU)).toContain('16 años de tenencia');
@@ -188,15 +194,16 @@ test.describe('Simulador de heredar vivienda — re-inspección 24/08/2026', () 
     expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('4000,00 €');
 
     // ── IRPF ─────────────────────────────────────────────────────────────────
-    expect(await linea(page, IRPF, 'Valor adquisición fiscal*')).toBe('509.404,75 €');
-    expect(await linea(page, IRPF, 'Ganancia patrimonial')).toBe('90.595,25 €');
-    expect(await linea(page, IRPF, 'Cuota IRPF venta')).toBe('19.716,91 €');
+    expect(await linea(page, IRPF, 'Valor adquisición fiscal*')).toBe('509.405,24 €');
+    expect(await linea(page, IRPF, 'Ganancia patrimonial')).toBe('90.594,76 €');
+    // 6.000 × 19 % + 44.000 × 21 % + 40.594,76 × 23 % = 19.716,79 €
+    expect(await linea(page, IRPF, 'Cuota IRPF venta')).toBe('19.716,79 €');
 
     // ── Total y formato español ──────────────────────────────────────────────
     const total = await bloqueTotal(page);
-    expect(total).toContain('29.121,66'); // 5.404,75 + 4.000,00 + 19.716,91
+    expect(total).toContain('29.122,04'); // 5.405,24 + 4.000,00 + 19.716,79
     expect(total).toContain('4,85%');
-    expect(total).not.toMatch(/29,121\.66/); // nunca formato US
+    expect(total).not.toMatch(/29,122\.04/); // nunca formato US
 
     // Hallazgo 202: el año ya no está congelado en el código, sale del reloj
     expect(await page.locator('#anioAdq').getAttribute('max')).toBe(String(ANIO));
@@ -215,32 +222,24 @@ test.describe('Simulador de heredar vivienda — re-inspección 24/08/2026', () 
    * dejan la base liquidable a un lado y a otro del tope de 500.000 €:
    *
    *  (a) 515.000 − 15.956,87 = 499.043,13  ≤ 500.000 → 99 %
-   *      Cuota íntegra:
-   *          7.993,46 × 7,65 %  =    611,49969
-   *         23.963,41 × 8,50 %  =  2.036,88985
-   *         47.924,31 × 9,35 %  =  4.480,922985
-   *        159.507,95 × 10,20 % = 16.269,81090
-   *        159.388,41 × 15,30 % = 24.386,42673
-   *        100.265,59 × 21,25 % = 21.306,437875  (499.043,13 − 398.777,54)
-   *                               ─────────────
-   *                                69.091,98803  → «69.091,99 €»
-   *      Cuota final = 69.091,98803 × 0,01 = 690,9198803 → «690,92 €»
+   *      Cuota íntegra = 47.798,51 + (499.043,13 − 398.777,54) × 21,25 %
+   *                    = 47.798,51 + 21.306,437875 = 69.104,947875 → «69.104,95 €»
+   *      Cuota final = 69.104,947875 × 0,01 = 691,04947875 → «691,05 €»
    *
    *  (b) 520.000 − 15.956,87 = 504.043,13  > 500.000 → 98 %
-   *      Último tramo: 105.265,59 × 21,25 % = 22.368,937875 → cuota íntegra 70.154,48803
-   *      Cuota final = 70.154,48803 × 0,02 = 1.403,0897606 → «1403,09 €»
-   *      (con el 99 % que aplicaba la versión rota saldrían 701,54 €, la mitad)
+   *      Cuota íntegra = 47.798,51 + 105.265,59 × 21,25 % = 70.167,447875
+   *      Cuota final = 70.167,447875 × 0,02 = 1.403,3489575 → «1403,35 €»
+   *      (con el 99 % que aplicaba la versión rota saldrían 701,67 €, la mitad)
    *
    * Plusvalía en ambos: 1995 → tenencia topada en 20 años → coeficiente 0,45 →
    * objetivo 100.000 × 0,45 × 0,25 = 11.250,00, menor que el real → cuota 11.250,00.
    *
-   * ⚠️ Nota para quien repare el hallazgo abierto de la columna `cuota`: la app calcula la
-   * cuota íntegra acumulando tramos marginales e IGNORA el campo `cuota` que declara cada
-   * fila de `TARIFA_ESTATAL_IS`, que es lo que sí usan `lib/calculadoras/sucesiones.ts`,
-   * `estimador-impuesto-sucesiones` y `estimador-impuesto-donaciones`
-   * (`tramo.cuota + (base − prevHasta) × tipo`). Con la columna declarada, (a) daría
-   * 47.798,51 + 100.265,59 × 21,25 % = 69.104,95 € de cuota íntegra (12,96 € más). Si se
-   * unifica el criterio, hay que actualizar estas cifras.
+   * ⚠️ Las cuotas íntegras de este caso cambiaron el 24/08/2026 al cerrar el hallazgo 277:
+   * la app acumulaba los tramos marginales e ignoraba la columna `cuota` de la tabla
+   * oficial, que es la que aplican `lib/calculadoras/sucesiones.ts` y los dos estimadores.
+   * (a) daba 69.091,99 € y ahora da 69.104,95 €, los 12,96 € que el acta anticipaba. La
+   * diferencia no es aritmética sino de fuente: la columna publicada arrastra los redondeos
+   * de la tabla condensada de la ley, y manda la tabla.
    */
   test('CASO 2 (límite) — La Rioja: 99 % justo por debajo del tope de 500.000 € y 98 % justo por encima', async ({
     page,
@@ -261,19 +260,19 @@ test.describe('Simulador de heredar vivienda — re-inspección 24/08/2026', () 
     await mover(page, 'valorRef', 515000);
     expect(await panel(page, ISD)).toContain('La Rioja — Grupo II');
     expect(await linea(page, ISD, '= Base liquidable')).toBe('499.043,13 €');
-    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('69.091,99 €');
+    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('69.104,95 €');
     expect(await panel(page, ISD)).toContain('Bonificación CCAA (99,0%)');
-    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('690,92 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('691,05 €');
     expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('11.250,00 €');
-    expect(await bloqueTotal(page)).toContain('11.940,92'); // 690,92 + 11.250,00
+    expect(await bloqueTotal(page)).toContain('11.941,05'); // 691,05 + 11.250,00
 
     // (b) Base liquidable 504.043,13 € → justo por ENCIMA del tope
     await mover(page, 'valorRef', 520000);
     expect(await linea(page, ISD, '= Base liquidable')).toBe('504.043,13 €');
-    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('70.154,49 €');
+    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('70.167,45 €');
     expect(await panel(page, ISD)).toContain('Bonificación CCAA (98,0%)');
-    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('1403,09 €');
-    expect(await bloqueTotal(page)).toContain('12.653,09'); // 1.403,09 + 11.250,00
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('1403,35 €');
+    expect(await bloqueTotal(page)).toContain('12.653,35'); // 1.403,35 + 11.250,00
 
     // Sin venta no hay IRPF que declarar
     expect(await panel(page, IRPF)).toContain('Sin venta simulada');
@@ -341,11 +340,12 @@ test.describe('Simulador de heredar vivienda — re-inspección 24/08/2026', () 
     );
     expect(await linea(page, ISD, '− Reducción parentesco')).toBe('−7993,46 €');
     expect(await linea(page, ISD, '= Base liquidable')).toBe('292.006,54 €');
-    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('31.449,59 €');
+    // 23.409,28 + (292.006,54 − 239.389,13) × 15,30 % = 31.459,7437 (columna `cuota`)
+    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('31.459,74 €');
     expect(await linea(page, ISD, '× Coef. patrimonio (Grupo III)')).toBe('×1,5882');
-    expect(await linea(page, ISD, '= Cuota tributaria')).toBe('49.948,23 €');
+    expect(await linea(page, ISD, '= Cuota tributaria')).toBe('49.964,36 €');
     expect(await panel(page, ISD)).toContain('Bonificación CCAA (99,9%)');
-    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('49,95 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('49,96 €');
 
     // b) Sin incremento de valor del terreno no se devenga el IIVTNU (RDL 26/2021)
     expect(await linea(page, IIVTNU, 'Método objetivo')).toBe('1600,00 €');
@@ -354,11 +354,11 @@ test.describe('Simulador de heredar vivienda — re-inspección 24/08/2026', () 
     expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('0,00 €');
 
     // c) Una pérdida patrimonial no genera cuota de IRPF
-    expect(await linea(page, IRPF, 'Valor adquisición fiscal*')).toBe('300.049,95 €');
-    expect(await linea(page, IRPF, 'Pérdida patrimonial')).toBe('−50.049,95 €');
+    expect(await linea(page, IRPF, 'Valor adquisición fiscal*')).toBe('300.049,96 €');
+    expect(await linea(page, IRPF, 'Pérdida patrimonial')).toBe('−50.049,96 €');
     expect(await linea(page, IRPF, 'Cuota IRPF venta')).toBe('0,00 €');
 
-    expect(await bloqueTotal(page)).toContain('49,95 €');
+    expect(await bloqueTotal(page)).toContain('49,96 €');
 
     // Con 65 años cumplidos pero sin convivencia, sigue sin proceder
     await mover(page, 'edadHer', 66);
@@ -370,8 +370,9 @@ test.describe('Simulador de heredar vivienda — re-inspección 24/08/2026', () 
     await page.locator('#convivencia').check();
     expect(await linea(page, ISD, '− Reducción vivienda habitual (95%)')).toBe('−122.606,47 €');
     expect(await linea(page, ISD, '= Base liquidable')).toBe('169.400,07 €');
-    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('16.260,24 €');
-    expect(await linea(page, ISD, '= Cuota tributaria')).toBe('25.824,51 €');
+    // 7.127,47 + (169.400,07 − 79.881,18) × 10,20 % = 16.258,39678 (columna `cuota`)
+    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('16.258,40 €');
+    expect(await linea(page, ISD, '= Cuota tributaria')).toBe('25.821,59 €');
     expect(await linea(page, ISD, 'Cuota ISD final')).toBe('25,82 €');
   });
 
@@ -382,23 +383,18 @@ test.describe('Simulador de heredar vivienda — re-inspección 24/08/2026', () 
    * `reduccionBase: 0`, así que aquí no alivia nada) y 0 años de tenencia.
    *
    *   Base imponible = base liquidable = 2.000.000,00 (ninguna reducción)
-   *   Cuota íntegra por tramos marginales:
-   *          7.993,46 × 7,65 %  =        611,49969
-   *         23.963,41 × 8,50 %  =      2.036,88985
-   *         47.924,31 × 9,35 %  =      4.480,922985
-   *        159.507,95 × 10,20 % =     16.269,81090
-   *        159.388,41 × 15,30 % =     24.386,42673
-   *        398.777,54 × 21,25 % =     84.740,22725
-   *      1.202.444,92 × 25,50 % =    306.623,45460   (2.000.000 − 797.555,08)
-   *                                 ──────────────
-   *                                  439.149,232005 → «439.149,23 €»
-   *   × COEFICIENTES_IS['IV'][0] = 2,0000 = 878.298,46401 → «878.298,46 €»
-   *   Asturias no bonifica → Cuota ISD final = 878.298,46 €
+   *   Cuota íntegra por la COLUMNA `cuota` del último tramo de TARIFA_ESTATAL_IS:
+   *        132.549,07 + (2.000.000 − 797.555,08) × 25,50 %
+   *      = 132.549,07 + 306.623,4546 = 439.172,5246 → «439.172,52 €»
+   *   × COEFICIENTES_IS['IV'][0] = 2,0000 = 878.345,0492 → «878.345,05 €»
+   *   Asturias no bonifica → Cuota ISD final = 878.345,05 €
+   *   (acumulando los tramos marginales, como hacía la app hasta el hallazgo 277, salían
+   *    439.149,23 y 878.298,46: 46,59 € menos de cuota tributaria)
    *
    *   Plusvalía: 0 años → COEFICIENTES_IIVTNU_2025[0] = 0,14
    *     objetivo = 500.000 × 0,14 × 0,25 = 17.500,00
    *     real     = (2.000.000 − 30.000) × (500.000 / 1.000.000) × 0,25 = 246.250,00
-   *   TOTAL (sin venta) = 878.298,46401 + 17.500 = 895.798,46401 → «895.798,46 €»
+   *   TOTAL (sin venta) = 878.345,0492 + 17.500 = 895.845,0492 → «895.845,05 €»
    */
   test('GUARDA — tramo del 25,50 %, coeficiente 2,0000 y 0 años de tenencia (Grupo IV, 2.000.000 € en Asturias)', async ({
     page,
@@ -418,10 +414,11 @@ test.describe('Simulador de heredar vivienda — re-inspección 24/08/2026', () 
 
     expect(await panel(page, ISD)).toContain('Principado de Asturias — Grupo IV');
     expect(await linea(page, ISD, '− Reducción parentesco')).toBe('−0,00 €');
-    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('439.149,23 €');
+    // 132.549,07 + (2.000.000 − 797.555,08) × 25,50 % = 439.172,5246 (columna `cuota`)
+    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('439.172,52 €');
     expect(await linea(page, ISD, '× Coef. patrimonio (Grupo IV)')).toBe('×2,0000');
-    expect(await linea(page, ISD, '= Cuota tributaria')).toBe('878.298,46 €');
-    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('878.298,46 €');
+    expect(await linea(page, ISD, '= Cuota tributaria')).toBe('878.345,05 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('878.345,05 €');
     // El Grupo IV de Asturias declara reduccionBase 0: no debe aparecer la línea autonómica
     expect(await panel(page, ISD)).not.toContain('Reducción autonómica');
 
@@ -431,7 +428,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 24/08/2026', () 
     expect(await linea(page, IIVTNU, 'Método real (suelo)')).toBe('246.250,00 €');
     expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('17.500,00 €');
 
-    expect(await bloqueTotal(page)).toContain('895.798,46');
+    expect(await bloqueTotal(page)).toContain('895.845,05');
     expect(await page.locator('label[for="anioAdq"]').innerText()).toContain('(0 años hasta hoy)');
   });
 
@@ -483,24 +480,21 @@ test.describe('Simulador de heredar vivienda — re-inspección 24/08/2026', () 
   /**
    * GUARDA — Grupo IV con 200.000 €, el ejemplo que el bloque educativo comenta.
    *
-   * Base liquidable = 200.000 (sin reducciones):
-   *      7.993,46 × 7,65 %  =    611,49969
-   *     23.963,41 × 8,50 %  =  2.036,88985
-   *     47.924,31 × 9,35 %  =  4.480,922985
-   *    120.118,82 × 10,20 % = 12.252,11964   (200.000 − 79.881,18)
-   *                           ────────────
-   *                            19.381,432165 → «19.381,43 €»
-   *   × COEFICIENTES_IS['IV'][0] = 2,0000 → 38.762,86433 → «38.762,86 €»
-   *   Madrid no bonifica al Grupo IV (porcentaje 0) → Cuota ISD final = 38.762,86 €
+   * Base liquidable = 200.000 (sin reducciones). Por la COLUMNA `cuota` del tramo del
+   * 10,20 % (hallazgo 277; antes se acumulaban los marginales y salía 19.381,43):
+   *      7.127,47 + (200.000 − 79.881,18) × 10,20 % = 7.127,47 + 12.252,11964
+   *                                                 = 19.379,58964 → «19.379,59 €»
+   *   × COEFICIENTES_IS['IV'][0] = 2,0000 → 38.759,17928 → «38.759,18 €»
+   *   Madrid no bonifica al Grupo IV (porcentaje 0) → Cuota ISD final = 38.759,18 €
    *
-   * ⚠️ HALLAZGO ABIERTO (24/08/2026): la tarjeta «Heredero del Grupo IV (sin parentesco)»
-   * del bloque educativo afirma que «Heredar 200.000 € puede suponer 80-100.000 € de ISD»,
-   * más del DOBLE de lo que devuelve el propio motor de la página — y de lo que sale con
-   * cualquier CCAA del desplegable (46.000,00 € en Cataluña, la más cara). La cifra del
-   * motor es la correcta según `data/fiscal`; lo que hay que corregir es el texto. Esta
-   * guarda fija la cifra del motor para que la corrección del texto no arrastre al cálculo.
+   * Esta guarda fija la cifra del motor porque el bloque educativo la CITA: la tarjeta
+   * «Heredero del Grupo IV (sin parentesco)» decía «80-100.000 € de ISD», más del doble de
+   * lo que liquida la propia página e inalcanzable con cualquier CCAA del desplegable
+   * (46.000,00 € en Cataluña, la más cara). Al cerrar el hallazgo 275 el texto dejó de
+   * llevar una cifra escrita a mano: ahora la deriva del motor con estos mismos parámetros
+   * (`EJEMPLO_GRUPO_IV` en page.tsx), así que si el cálculo cambia, el texto cambia con él.
    */
-  test('GUARDA — Grupo IV sin reducciones: 200.000 € tributan 38.762,86 € de ISD en régimen común', async ({
+  test('GUARDA — Grupo IV sin reducciones: 200.000 € tributan 38.759,18 € de ISD en régimen común', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -513,9 +507,17 @@ test.describe('Simulador de heredar vivienda — re-inspección 24/08/2026', () 
     if (await habitual.isChecked()) await habitual.uncheck();
 
     expect(await linea(page, ISD, '= Base liquidable')).toBe('200.000,00 €');
-    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('19.381,43 €');
-    expect(await linea(page, ISD, '= Cuota tributaria')).toBe('38.762,86 €');
-    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('38.762,86 €');
+    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('19.379,59 €');
+    expect(await linea(page, ISD, '= Cuota tributaria')).toBe('38.759,18 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('38.759,18 €');
+
+    // Y el bloque educativo tiene que decir ESA cifra, no una escrita a mano (hallazgo 275).
+    // `textContent` y no `innerText` porque <EducationalSection> oculta su contenido por CSS
+    // sin desmontarlo: el texto está en el DOM aunque la guía esté plegada.
+    // (el espacio antes del € que pinta `formatCurrency` es U+00A0, así que se normaliza)
+    const educativo = ((await page.locator('body').textContent()) ?? '').replace(/\s+/g, ' ');
+    expect(educativo).toContain('38.759,18 €');
+    expect(educativo).not.toContain('80-100.000');
 
     // Cataluña, con su tarifa propia, es la más cara del desplegable para este supuesto:
     // 50.000 × 7 % + 100.000 × 11 % + 50.000 × 17 % = 23.000,00 → × 2,0000 = 46.000,00 €

@@ -28,9 +28,14 @@ const MAX_HIJOS = COMPLEMENTO_BRECHA_GENERO_2026.maxHijos;
 const MAX_MES = formatCurrency(COMPLEMENTO_BRECHA_GENERO_2026.maxMensual);
 const PENSION_MAXIMA_MES = formatCurrency(LIMITES_PENSION_2025.maximaMensual);
 
+/** La exclusión del art. 60.4 LGSS, leída del módulo fiscal y no tecleada aquí. */
+const EXCLUSION_PARCIAL = COMPLEMENTO_BRECHA_GENERO_2026.exclusiones.find(
+  e => e.supuesto === 'jubilacion_parcial',
+)!;
+
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
-type TipoPension = 'jubilacion' | 'incapacidad' | 'viudedad' | 'no_contributiva' | 'ninguna';
+type TipoPension = 'jubilacion' | 'jubilacion_parcial' | 'incapacidad' | 'viudedad' | 'no_contributiva' | 'ninguna';
 type Genero = 'mujer' | 'hombre';
 type EstadoOtroProgenitor = 'no_aplica' | 'no_percibe' | 'percibe' | 'denegado';
 type FechaCausante = 'antes_2021' | 'desde_2021' | 'sin_iniciar';
@@ -85,6 +90,23 @@ function evaluar(
       esReclamacion: false,
       pasoSiguiente:
         'Cuando solicites jubilación, IP o quedes como viudo/a, recuerda revisar este derecho.',
+    };
+  }
+  // Caso 1.bis: jubilación parcial. Es contributiva y es jubilación, así que hasta el
+  // 24/08/2026 el cuestionario ni la distinguía ni la excluía: quien la percibía recibía
+  // un «cumples los requisitos» y un importe, mientras el FAQPage de esta misma página
+  // declaraba lo contrario a los buscadores (hallazgo 280 del Inspector).
+  if (tipo === 'jubilacion_parcial') {
+    return {
+      procede: false,
+      hijosComputables: 0,
+      importeMensual: 0,
+      importeAnual: 0,
+      motivo: `${EXCLUSION_PARCIAL.norma} excluye expresamente el complemento en la jubilación parcial. ${EXCLUSION_PARCIAL.detalle}`,
+      esReclamacion: false,
+      pasoSiguiente:
+        'Cuando pases de la jubilación parcial a la jubilación plena, solicita entonces el ' +
+        'complemento ante el INSS citando el art. 60 LGSS.',
     };
   }
 
@@ -270,7 +292,8 @@ export default function VerificadorComplementoBrechaGeneroPage() {
             </p>
             <div className={styles.optionGrid}>
               {([
-                { id: 'jubilacion' as const, icon: '🌅', label: 'Jubilación' },
+                { id: 'jubilacion' as const, icon: '🌅', label: 'Jubilación (ordinaria o anticipada)' },
+                { id: 'jubilacion_parcial' as const, icon: '🕐', label: 'Jubilación parcial' },
                 { id: 'incapacidad' as const, icon: '♿', label: 'Incapacidad permanente' },
                 { id: 'viudedad' as const, icon: '💍', label: 'Viudedad' },
                 { id: 'no_contributiva' as const, icon: '🚫', label: 'No contributiva' },

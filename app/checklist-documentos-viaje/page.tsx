@@ -8,6 +8,7 @@ import { RelatedApps, LegalNotice, ShareCard, EducationalSection,
   DisclaimerCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { formatDate } from '@/lib';
 
 type TipoViaje = 'espana' | 'europa' | 'internacional';
 
@@ -169,7 +170,7 @@ export default function ChecklistDocumentosViajePage() {
       `CHECKLIST DE DOCUMENTOS DE VIAJE`,
       `Tipo: ${TIPO_CONFIG[tipoViaje].label} — ${TIPO_CONFIG[tipoViaje].desc}`,
       `Progreso: ${itemsCompletados}/${totalItems} (${porcentaje}%)`,
-      `Generado el: ${new Date().toLocaleDateString('es-ES')}`,
+      `Generado el: ${formatDate(new Date())}`,
       '',
     ];
 

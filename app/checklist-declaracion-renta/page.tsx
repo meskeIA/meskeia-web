@@ -6,6 +6,7 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { formatDate } from '@/lib';
 
 // ──────────────────────────────────────────
 // TIPOS
@@ -207,7 +208,7 @@ export default function ChecklistDeclaracionRentaPage() {
       'CHECKLIST DECLARACIÓN DE LA RENTA 2026 (ejercicio 2025)',
       `Perfil: ${perfilesTxt}`,
       `Progreso: ${itemsCompletados}/${totalItems} (${porcentaje}%)`,
-      `Generado el: ${new Date().toLocaleDateString('es-ES')}`,
+      `Generado el: ${formatDate(new Date())}`,
       '',
       'FECHAS CLAVE:',
       '  8 de abril    → Apertura presentación online (Renta Web)',

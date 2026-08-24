@@ -5,7 +5,7 @@ import styles from './CalculadoraPresupuestos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, EducationalSection, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
-import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
+import { formatCurrency, formatNumber, parseSpanishNumber, formatDate } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -187,7 +187,7 @@ export default function CalculadoraPresupuestosPage() {
   const fechaValidez = () => {
     const fecha = new Date(config.fecha);
     fecha.setDate(fecha.getDate() + parseInt(config.validezDias));
-    return fecha.toLocaleDateString('es-ES');
+    return formatDate(fecha);
   };
 
   // Exportar a PDF
@@ -649,7 +649,7 @@ export default function CalculadoraPresupuestosPage() {
                   <p className={styles.docNumero}>{config.numero}</p>
                 </div>
                 <div className={styles.docHeaderRight}>
-                  <p><strong>Fecha:</strong> {new Date(config.fecha).toLocaleDateString('es-ES')}</p>
+                  <p><strong>Fecha:</strong> {formatDate(new Date(config.fecha))}</p>
                   <p><strong>Válido hasta:</strong> {fechaValidez()}</p>
                 </div>
               </div>

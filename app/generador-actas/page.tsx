@@ -6,6 +6,7 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, Shar
   DisclaimerCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { formatDate as formatDateCorto } from '@/lib';
 
 // Tipos
 interface Asistente {
@@ -1025,7 +1026,7 @@ export default function GeneradorActasPage() {
                   )}
                 </div>
                 <p className={styles.actaGeneratedBy}>
-                  Acta generada con meskeIA - {new Date().toLocaleDateString('es-ES')}
+                  Acta generada con meskeIA - {formatDateCorto(new Date())}
                 </p>
               </footer>
             </div>

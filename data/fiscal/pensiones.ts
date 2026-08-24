@@ -452,4 +452,19 @@ export const COMPLEMENTO_BRECHA_GENERO_2026 = {
   pagasAnuales: 14,
   /** Pensiones contributivas a las que se puede añadir el complemento */
   pensionesElegibles: ['jubilacion', 'incapacidad_permanente', 'viudedad'] as const,
+  /**
+   * Modalidades EXCLUIDAS expresamente por la ley, aunque la pensión sea contributiva y
+   * de una de las clases elegibles. Hasta el 24/08/2026 este dato no estaba en ningún
+   * módulo fiscal —solo en el FAQPage de una app—, así que el ciclo /triaje-fiscal no
+   * podía revisarlo y la herramienta no lo aplicaba (hallazgo 280 del Inspector).
+   */
+  exclusiones: [
+    {
+      supuesto: 'jubilacion_parcial',
+      norma: 'Art. 60.4 LGSS',
+      detalle:
+        'El complemento no se reconoce en la jubilación parcial del art. 215 LGSS. Sí se reconoce ' +
+        'cuando desde ella se accede a la jubilación plena, una vez cumplida la edad que corresponda.',
+    },
+  ] as const,
 };

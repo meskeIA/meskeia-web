@@ -41,10 +41,21 @@ export function formatCurrency(num: number): string {
 /**
  * Formatea fecha a formato español (DD/MM/YYYY)
  * @param date - Fecha a formatear
- * @returns String formateado (ej: "25/11/2025")
+ * @returns String formateado (ej: "25/11/2025", "13/05/2026")
+ *
+ * ── Por qué no basta `toLocaleDateString('es-ES')` (24/08/2026) ───────────────
+ * A secas suprime los ceros a la izquierda: el 13 de mayo salía «13/5/2026», que no es
+ * el DD/MM/YYYY que el CLAUDE.md global §2 declara obligatorio ni el que promete el
+ * ejemplo de aquí arriba. Se veía en el sello «Última verificación» de todo
+ * `<DataReference>` y en las 25 fichas de Delegum. `formatDateTime`, justo debajo, ya
+ * pedía '2-digit' desde el principio: eran dos formatos de fecha en el mismo fichero.
  */
 export function formatDate(date: Date): string {
-  return date.toLocaleDateString('es-ES');
+  return date.toLocaleDateString('es-ES', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
 }
 
 /**

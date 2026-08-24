@@ -56,7 +56,7 @@ export const jsonLd = {
   author: { '@type': 'Organization', name: 'meskeIA', url: 'https://meskeia.com' },
   inLanguage: 'es',
   featureList: [
-    'Checklist de 5 preguntas alineadas con el art. 60 LGSS',
+    'Checklist de 6 preguntas alineadas con el art. 60 LGSS',
     `Cálculo del importe mensual y anual (${CUANTIA}/hijo, máx. ${MAX_HIJOS})`,
     'Considera la doctrina TJUE 2025 e igualdad de trato H/M',
     'Detecta casos de reclamación retroactiva (denegaciones previas)',

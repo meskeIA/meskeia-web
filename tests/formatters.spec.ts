@@ -81,6 +81,18 @@ test.describe('formatDate', () => {
     const date = new Date(2025, 10, 25); // Mes es 0-indexed
     expect(formatDate(date)).toBe('25/11/2025');
   });
+
+  // El caso de arriba tiene día y mes de dos cifras, así que pasaba igual con la versión
+  // que suprimía los ceros a la izquierda. Estos son los que la distinguen: la fecha de
+  // verificación del complemento por brecha de género salía «13/5/2026» en el sello de
+  // <DataReference> de una app de riesgo 1 (hallazgo 282 del Inspector).
+  test('rellena con cero el mes de una cifra', () => {
+    expect(formatDate(new Date(2026, 4, 13))).toBe('13/05/2026');
+  });
+
+  test('rellena con cero el día de una cifra', () => {
+    expect(formatDate(new Date(2026, 0, 1))).toBe('01/01/2026');
+  });
 });
 
 test.describe('formatDateTime', () => {

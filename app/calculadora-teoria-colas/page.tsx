@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './TeoriaColas.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { formatNumber } from '@/lib';
+import { formatNumber, formatDate } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface Metricas {
@@ -289,7 +289,7 @@ export default function CalculadoraTeoriaColasPage() {
 
     let reporte = `═══════════════════════════════════════════════════════════
         REPORTE DE ANÁLISIS - SISTEMA DE COLAS M/M/1
-              Generado por meskeIA - ${new Date().toLocaleDateString('es-ES')}
+              Generado por meskeIA - ${formatDate(new Date())}
 ═══════════════════════════════════════════════════════════
 
 PARÁMETROS DE ENTRADA

@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import { RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
 import { getRelatedApps } from '@/data/app-relations';
+import { formatDate } from '@/lib';
 
 // Tipos
 type TabType = 'calculadora' | 'checklist' | 'compras' | 'vacunas';
@@ -518,7 +519,7 @@ export default function CalculadoraFechaPartoPage() {
                   <div className={styles.detalleItem}>
                     <span className={styles.detalleLabel}>Fecha estimada de concepción</span>
                     <span className={styles.detalleValor}>
-                      {resultado.fechaConcepcion.toLocaleDateString('es-ES')}
+                      {formatDate(resultado.fechaConcepcion)}
                     </span>
                   </div>
                 </div>

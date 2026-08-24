@@ -80,6 +80,8 @@ export interface ResultadoSucesiones {
   reduccionDiscapacidad: number;
   reduccionVivienda: number;
   reduccionSeguroVida: number;
+  /** Reducción autonómica aplicada sobre la BASE, antes de la tarifa (Asturias) */
+  reduccionAutonomicaBase: number;
   totalReducciones: number;
   baseLiquidable: number;
   cuotaIntegra: number;
@@ -97,9 +99,22 @@ export interface ResultadoSucesiones {
   fuenteDatos: string;
 }
 
-// ─── Helpers privados ──────────────────────────────────────────────────────────
+// ─── Helpers ───────────────────────────────────────────────────────────────────
 
-function calcularTarifa(base: number, tarifa: TramoTarifaIS[]): number {
+/**
+ * Cuota íntegra de una base liquidable según una tarifa del ISD.
+ *
+ * Aplica la tabla tal como la publica la ley: la CUOTA ÍNTEGRA declarada para el tramo
+ * anterior, más el tipo marginal sobre el resto. No es lo mismo que acumular los tramos a
+ * mano, porque la columna `cuota` de la tabla oficial arrastra sus propios redondeos: a
+ * partir de 31.956,87 € de base las dos lecturas divergen (+0,49 € en el tramo del 9,35 %,
+ * −1,84 € en el del 10,20 %, +12,96 € en el del 21,25 %…). Manda la tabla, que es la ley.
+ *
+ * Es público desde el 24/08/2026 porque `simulador-heredar-vivienda` tenía su propia
+ * versión acumulando marginales, y dos apps fiscales de meskeIA daban cuotas íntegras
+ * distintas para la misma base liquidable (hallazgo 277 del Inspector).
+ */
+export function calcularCuotaIntegraIS(base: number, tarifa: TramoTarifaIS[]): number {
   if (base <= 0) return 0;
   let prevHasta = 0;
   for (const tramo of tarifa) {
@@ -130,9 +145,18 @@ function aplicarBonificacionIS(
   const bGrupo: BonificacionGrupoIS | undefined = config.bonificaciones[grupo];
   if (!bGrupo) return { bonificacion: 0, porcentaje: 0, detalle: 'Sin bonificación para este grupo' };
 
-  // Reducción adicional en base (Asturias)
+  /**
+   * Reducción adicional en BASE (Asturias). Aquí solo se rotula: restarla es cosa del paso 6.bis
+   * de `calcularSucesion`, porque una reducción en base entra antes de la tarifa.
+   *
+   * Hasta el 24/08/2026 esta rama era el ÚNICO sitio donde `reduccionBase` se leía en todo el
+   * calculador, así que la respuesta imprimía «Reducción adicional en base: 300.000 €» y acto
+   * seguido liquidaba sobre una base en la que esos 300.000 € seguían dentro: se contradecía a
+   * sí misma. La app web sí la aplicaba desde el hallazgo 200, de modo que la misma herencia
+   * daba 0,00 € en meskeia.com y 10.346,13 € por MCP (hallazgo 276 del Inspector).
+   */
   if (bGrupo.reduccionBase !== undefined && bGrupo.reduccionBase > 0) {
-    return { bonificacion: 0, porcentaje: 0, detalle: `Reducción adicional en base: ${bGrupo.reduccionBase.toLocaleString('es-ES')} € (${config.nombre})` };
+    return { bonificacion: 0, porcentaje: 0, detalle: `Reducción adicional de ${bGrupo.reduccionBase.toLocaleString('es-ES')} € en la base (${config.nombre}), ya aplicada antes de la tarifa. Sin bonificación en cuota.` };
   }
 
   // Bonificación escalonada (Castilla-La Mancha, Cantabria)
@@ -231,7 +255,12 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
     reduccionSeguroVida = r(Math.min(p.seguroVida, REDUCCION_SEGURO_VIDA_MAX_IS));
   }
 
-  const totalReducciones = r(reduccionParentesco + reduccionEdadMenor21 + reduccionDiscapacidad + reduccionVivienda + reduccionSeguroVida);
+  // 6.bis Reducción autonómica sobre la BASE (hoy solo Asturias: 300.000 € para los Grupos I
+  // y II, 50.000 € para el III). Es el único beneficio del catálogo modelado como reducción
+  // en base en vez de como bonificación en cuota, y entra aquí porque va antes de la tarifa.
+  const reduccionAutonomicaBase = ccaaInfo.bonificaciones[p.grupo]?.reduccionBase ?? 0;
+
+  const totalReducciones = r(reduccionParentesco + reduccionEdadMenor21 + reduccionDiscapacidad + reduccionVivienda + reduccionSeguroVida + reduccionAutonomicaBase);
   const baseLiquidable = r(Math.max(0, baseConAjuar - totalReducciones));
 
   // 7. Tarifa
@@ -245,7 +274,7 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
     tarifaAplicada = 'Tarifa estatal régimen común (7,65%–25,5%)';
   }
 
-  const cuotaIntegra = r(calcularTarifa(baseLiquidable, tarifa));
+  const cuotaIntegra = r(calcularCuotaIntegraIS(baseLiquidable, tarifa));
 
   // 8. Coeficiente multiplicador
   const coefs = esCataluna ? COEFICIENTES_CATALUNA_IS : COEFICIENTES_IS;
@@ -266,6 +295,7 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
     reduccionDiscapacidad:    r(reduccionDiscapacidad),
     reduccionVivienda,
     reduccionSeguroVida,
+    reduccionAutonomicaBase: r(reduccionAutonomicaBase),
     totalReducciones,
     baseLiquidable,
     cuotaIntegra,

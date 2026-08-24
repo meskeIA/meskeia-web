@@ -6,7 +6,7 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
-import { formatNumber, formatCurrency } from '@/lib';
+import { formatNumber, formatCurrency, formatDate } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
 interface TimeEntry {
@@ -230,7 +230,7 @@ export default function TimeTrackerPage() {
   const exportarCSV = () => {
     const headers = ['Fecha', 'Proyecto', 'Cliente', 'Descripción', 'Duración (h)', 'Tarifa (€/h)', 'Total (€)'];
     const rows = entriesFiltradas.map(e => [
-      new Date(e.inicio).toLocaleDateString('es-ES'),
+      formatDate(new Date(e.inicio)),
       e.proyecto,
       e.cliente,
       e.descripcion,

@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import styles from './ListaCompras.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { formatDate } from '@/lib';
 
 // ==================== TIPOS ====================
 
@@ -180,7 +181,7 @@ export default function ListaComprasPage() {
     const nuevaLista: ListaGuardada = {
       id: Date.now().toString(),
       nombre: nombreLista,
-      fecha: new Date().toLocaleDateString('es-ES'),
+      fecha: formatDate(new Date()),
       items: items,
     };
 

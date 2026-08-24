@@ -1021,6 +1021,50 @@ test.describe('Golden — calcularSucesion (Capa 1 · tarifa ISD estatal + auton
     expect(res.tipoEfectivo).toBeCloseTo(17.34, 2);
   });
 
+  /**
+   * El caso del hallazgo 276 del Inspector: hasta el 24/08/2026 `reduccionBase` solo se leía
+   * para ROTULARLA («Reducción adicional en base: 300.000 €») y nunca se restaba, así que el
+   * MCP de Delegum y el GPT liquidaban 10.346,13 € sobre una herencia que la web —que sí la
+   * aplicaba desde el hallazgo 200— resolvía en 0,00 €. La respuesta se contradecía a sí misma.
+   *
+   * Hijo, Asturias, 250.000 € que son íntegramente vivienda habitual:
+   *   reducción parentesco     15.956,87
+   *   reducción vivienda       122.606,47  (250.000 × 95 % = 237.500 → tope 122.606,47)
+   *   reducción autonómica     300.000,00  (BONIFICACIONES_CCAA_IS.asturias…['II'].reduccionBase)
+   *                            ──────────
+   *                            438.563,34 > 250.000 → base liquidable 0 → cuota 0,00 €
+   */
+  test('GOLDEN-AD2: Asturias aplica su reducción en BASE, no solo la rotula (hallazgo 276)', () => {
+    const res = calcularSucesion({
+      baseImponible: 250000, ccaa: 'asturias', grupo: 'II', viviendaHabitual: 250000,
+    });
+    expect(res.reduccionAutonomicaBase).toBe(300000);
+    expect(res.totalReducciones).toBeCloseTo(438563.34, 2);
+    expect(res.baseLiquidable).toBe(0);
+    expect(res.cuotaIntegra).toBe(0);
+    expect(res.cuotaFinal).toBe(0);
+    // Lo que la respuesta dice y lo que liquida tienen que ser lo mismo
+    expect(res.detalleBonificacion).toContain('ya aplicada antes de la tarifa');
+  });
+
+  /**
+   * Y el mismo beneficio cuando NO absorbe la base entera, para que el test anterior no pase
+   * por un cero que también daría una reducción desbocada. Hijo, Asturias, 500.000 € sin
+   * vivienda habitual:
+   *   base liquidable = 500.000 − 15.956,87 − 300.000 = 184.043,13
+   *   cuota íntegra   = 7.127,47 + (184.043,13 − 79.881,18) × 10,20 % = 17.751,99
+   *   coeficiente 1,0 y Asturias no bonifica en cuota → cuota final 17.751,99 €
+   */
+  test('GOLDEN-AD3: Asturias, Grupo II, 500.000 € → base 184.043,13 → cuotaFinal 17.751,99 €', () => {
+    const res = calcularSucesion({ baseImponible: 500000, ccaa: 'asturias', grupo: 'II' });
+    expect(res.reduccionAutonomicaBase).toBe(300000);
+    expect(res.baseLiquidable).toBeCloseTo(184043.13, 2);
+    expect(res.cuotaIntegra).toBeCloseTo(17751.99, 2);
+    expect(res.coeficienteMultiplicador).toBe(1.0);
+    expect(res.bonificacionCcaa).toBe(0);
+    expect(res.cuotaFinal).toBeCloseTo(17751.99, 2);
+  });
+
   test('GOLDEN-AE: Cataluña, Grupo II, 300.000 € → tarifa propia → cuotaFinal 31.500 €', () => {
     // Cataluña usa tarifa propia (7%–32%) y reducción parentesco propia (50.000 €).
     // baseLiquidable = 300.000 − 50.000 = 250.000; tramo 17% → cuotaIntegra = 31.500 €
@@ -2418,6 +2462,26 @@ test.describe('Golden — calcularComplementoBrechaGenero (Capa 1 · art. 60 LGS
     expect(cb.hijosComputables).toBe(4);
     expect(cb.complementoMensual).toBeCloseTo(147.60, 2);
     expect(cb.complementoAnual).toBeCloseTo(2066.40, 2);
+  });
+
+  /**
+   * Art. 60.4 LGSS: la jubilación parcial queda excluida expresamente, aunque sea
+   * contributiva y sea jubilación. Hasta el 24/08/2026 el motor no contemplaba el caso y
+   * devolvía «cumples los requisitos» con importe, mientras el FAQPage de la app declaraba
+   * a los buscadores justo lo contrario (hallazgo 280 del Inspector).
+   */
+  test('GOLDEN-CN2: jubilación parcial → no procede, art. 60.4 LGSS [sin contraste oficial]', () => {
+    const cb = calcularComplementoBrechaGenero({
+      sexo: 'mujer',
+      numHijos: 2,
+      tipoPension: 'jubilacion_parcial',
+    });
+    expect(cb.tieneDerechoComplemento).toBe(false);
+    expect(cb.complementoMensual).toBe(0);
+    expect(cb.complementoAnual).toBe(0);
+    expect(cb.motivo).toContain('60.4');
+    // Y el paso siguiente tiene que decir lo que la ley sí permite
+    expect(cb.pasoSiguiente).toContain('jubilación plena');
   });
 
   test('GOLDEN-CN: hecho causante anterior a 2021 → no procede el complemento [sin contraste oficial]', () => {

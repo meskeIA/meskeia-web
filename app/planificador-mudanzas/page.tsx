@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import styles from './PlanificadorMudanzas.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatCurrency, formatNumber } from '@/lib';
+import { formatCurrency, formatNumber, formatDate } from '@/lib';
 
 // ==================== TIPOS ====================
 
@@ -327,7 +327,7 @@ export default function PlanificadorMudanzasPage() {
     const nuevaMudanza = {
       ...datos,
       id: Date.now().toString(),
-      fechaGuardado: new Date().toLocaleDateString('es-ES'),
+      fechaGuardado: formatDate(new Date()),
     };
     const nuevas = [...mudanzasGuardadas, nuevaMudanza];
     setMudanzasGuardadas(nuevas);

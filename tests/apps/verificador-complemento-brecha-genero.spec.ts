@@ -179,7 +179,7 @@ test.describe('Verificador del complemento por brecha de género', () => {
   test('caso 2 (límite): el corte del 4-feb-2021 decide, y solo él', async ({ page }) => {
     // 2a — hecho causante ANTERIOR al corte
     await responderYVerificar(page, {
-      pension: 'Jubilación',
+      pension: 'Jubilación (ordinaria o anticipada)',
       fecha: 'Antes del 4-feb-2021',
       hijos: 3,
       sexo: 'Mujer',
@@ -194,7 +194,7 @@ test.describe('Verificador del complemento por brecha de género', () => {
 
     // 2b — el MISMO perfil, un día al otro lado del corte
     await responderYVerificar(page, {
-      pension: 'Jubilación',
+      pension: 'Jubilación (ordinaria o anticipada)',
       fecha: 'El 4-feb-2021 o después',
       hijos: 3,
       sexo: 'Mujer',
@@ -209,7 +209,7 @@ test.describe('Verificador del complemento por brecha de género', () => {
 
     // 2c — pensión aún sin causar: tampoco procede todavía
     await responderYVerificar(page, {
-      pension: 'Jubilación',
+      pension: 'Jubilación (ordinaria o anticipada)',
       fecha: 'Aún sin solicitar',
       hijos: 3,
       sexo: 'Mujer',
@@ -234,7 +234,7 @@ test.describe('Verificador del complemento por brecha de género', () => {
     page,
   }) => {
     await responderYVerificar(page, {
-      pension: 'Jubilación',
+      pension: 'Jubilación (ordinaria o anticipada)',
       fecha: 'El 4-feb-2021 o después',
       hijos: 1,
       sexo: 'Mujer',
@@ -259,7 +259,7 @@ test.describe('Verificador del complemento por brecha de género', () => {
     expect(resultado).toContain('Anual (14 pagas) 2066,40 €/año'); // maxAnual
 
     await responderYVerificar(page, {
-      pension: 'Jubilación',
+      pension: 'Jubilación (ordinaria o anticipada)',
       fecha: 'El 4-feb-2021 o después',
       hijos: 0,
       sexo: 'Mujer',
@@ -290,7 +290,7 @@ test.describe('Verificador del complemento por brecha de género', () => {
   }) => {
     // 3a — el otro progenitor ya lo percibe
     await responderYVerificar(page, {
-      pension: 'Jubilación',
+      pension: 'Jubilación (ordinaria o anticipada)',
       fecha: 'El 4-feb-2021 o después',
       hijos: 2,
       sexo: 'Mujer',
@@ -341,7 +341,7 @@ test.describe('Verificador del complemento por brecha de género', () => {
   }) => {
     // 225a — al otro progenitor se lo denegaron: eso no me da a mí nada que reclamar
     await responderYVerificar(page, {
-      pension: 'Jubilación',
+      pension: 'Jubilación (ordinaria o anticipada)',
       fecha: 'El 4-feb-2021 o después',
       hijos: 2,
       sexo: 'Hombre',
@@ -355,7 +355,7 @@ test.describe('Verificador del complemento por brecha de género', () => {
 
     // 225b — la denegación es MÍA (P6): ahí sí procede valorar reclamación
     await responderYVerificar(page, {
-      pension: 'Jubilación',
+      pension: 'Jubilación (ordinaria o anticipada)',
       fecha: 'El 4-feb-2021 o después',
       hijos: 2,
       sexo: 'Hombre',
@@ -370,7 +370,7 @@ test.describe('Verificador del complemento por brecha de género', () => {
     // 225c — la asimetría anterior también desaparece: una mujer con denegación propia
     // recibe orientación sobre su resolución, no el silencio del caso general.
     await responderYVerificar(page, {
-      pension: 'Jubilación',
+      pension: 'Jubilación (ordinaria o anticipada)',
       fecha: 'El 4-feb-2021 o después',
       hijos: 2,
       sexo: 'Mujer',
@@ -384,7 +384,7 @@ test.describe('Verificador del complemento por brecha de género', () => {
     // 225d — precedencia: si el otro progenitor YA lo percibe, la denegación propia fue
     // conforme a derecho. La app no puede mandar a reclamar sobre una denegación válida.
     await responderYVerificar(page, {
-      pension: 'Jubilación',
+      pension: 'Jubilación (ordinaria o anticipada)',
       fecha: 'El 4-feb-2021 o después',
       hijos: 2,
       sexo: 'Hombre',
@@ -477,6 +477,76 @@ test.describe('Verificador del complemento por brecha de género', () => {
   });
 
   /**
+   * CASO 280 — LA JUBILACIÓN PARCIAL, QUE EL FAQPage EXCLUÍA Y LA HERRAMIENTA NO.
+   *
+   * El art. 60.4 LGSS excluye expresamente el complemento en la jubilación parcial del
+   * art. 215 LGSS, y solo lo reconoce cuando desde ella se accede a la jubilación plena.
+   * Eso lo decía el faqJsonLd desde la reparación del hallazgo 6 —o sea, lo leían Bing
+   * Copilot, ChatGPT y Perplexity—, pero el cuestionario ofrecía un único botón
+   * «Jubilación» sin distinguir, el motor no contemplaba el caso y la palabra «parcial»
+   * no aparecía en toda la página: un jubilado parcial con 2 hijos recibía «+73,80 €/mes ·
+   * Cumples los requisitos básicos».
+   *
+   * Ahora la exclusión vive en `data/fiscal` (COMPLEMENTO_BRECHA_GENERO_2026.exclusiones),
+   * la aplican tanto la app como `lib/calculadoras/complementoBrechaGenero.ts` —que alimenta
+   * el MCP de Delegum— y la P1 la pregunta.
+   */
+  test('caso 280: la jubilación parcial se pregunta y se deniega por el art. 60.4 LGSS', async ({
+    page,
+  }) => {
+    // El mismo supuesto que en jubilación plena SÍ da derecho: la única variable es la P1
+    await responderYVerificar(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 2,
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    expect(await textoResultado(page)).toContain('73,80 €');
+
+    await page.reload();
+    await responderYVerificar(page, {
+      pension: 'Jubilación parcial',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 2,
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    const resultado = await textoResultado(page);
+    expect(resultado).toContain('60.4');
+    expect(resultado).toContain('jubilación parcial');
+    expect(resultado).not.toContain('73,80 €');
+    // Y lo que la ley sí permite tiene que decirse, o el veredicto engaña por el otro lado
+    expect(resultado).toContain('jubilación plena');
+  });
+
+  /**
+   * CASO 281/282 — LO QUE LEEN LOS BUSCADORES Y EL SELLO DE LA FECHA.
+   *
+   * El `featureList` del WebApplication seguía anunciando «5 preguntas» cuando el
+   * cuestionario tiene 6 desde la reparación del hallazgo 1: todo lo demás se había
+   * actualizado y el único sitio que discrepaba era justo el que consumen buscadores y LLM.
+   *
+   * Y el sello de <DataReference> imprimía «13/5/2026», sin ceros a la izquierda, contra el
+   * DD/MM/YYYY que el CLAUDE.md global §2 declara obligatorio. El origen estaba en
+   * `formatDate` (lib/formatters.ts), así que la corrección alcanza a toda app con
+   * <DataReference> y a las 25 fichas de datos fiscales de Delegum.
+   */
+  test('casos 281 y 282: el JSON-LD cuenta 6 preguntas y la fecha lleva sus ceros', async ({
+    page,
+  }) => {
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const app = bloques.map(b => JSON.parse(b)).find(j => j['@type'] === 'WebApplication');
+    expect(app).toBeTruthy();
+    expect(app.featureList[0]).toContain('6 preguntas');
+    expect(app.featureList.join(' ')).not.toContain('5 preguntas');
+
+    const visible = normalizar(await page.locator('body').innerText());
+    expect(visible).toContain('13/05/2026');
+    expect(visible).not.toContain('13/5/2026');
+  });
+
+  /**
    * CASO 229/230 — ACCESIBILIDAD DEL CUESTIONARIO Y DEL VEREDICTO (dos hallazgos bajos,
    * reparados).
    *
@@ -517,8 +587,13 @@ test.describe('Verificador del complemento por brecha de género', () => {
     await expect(panel).toHaveAttribute('aria-live', 'polite');
     await expect(panel).toHaveAttribute('role', 'status');
 
-    // Ningún <button> sin type= (candado npm run check:a11y-jsx, CLAUDE.md §5)
-    expect(await page.locator('button:not([type])').count()).toBe(0);
+    // Ningún <button> sin type= (candado npm run check:a11y-jsx, CLAUDE.md §5).
+    // Se excluye el overlay de `next dev`, cuyo botón «Open Next.js Dev Tools» no lleva
+    // type y no es de la app: contra el servidor de desarrollo daba un rojo que en
+    // producción no existe, y un test que solo pasa en un entorno no informa de nada.
+    expect(
+      await page.locator('button:not([type]):not([data-nextjs-dev-tools-button])').count(),
+    ).toBe(0);
   });
 
   /**
@@ -530,7 +605,7 @@ test.describe('Verificador del complemento por brecha de género', () => {
    */
   test('caso 231: cambiar una respuesta invalida el veredicto anterior', async ({ page }) => {
     await responderYVerificar(page, {
-      pension: 'Jubilación',
+      pension: 'Jubilación (ordinaria o anticipada)',
       fecha: 'El 4-feb-2021 o después',
       hijos: 2,
       sexo: 'Mujer',

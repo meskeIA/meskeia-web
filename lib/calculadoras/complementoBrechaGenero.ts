@@ -27,6 +27,10 @@
  *      (incompatibilidad: solo uno de los dos). En caso de concurrencia, la SS lo
  *      reconoce al progenitor con pensión pública de menor cuantía.
  *
+ * ── Exclusión expresa (art. 60.4 LGSS) ───────────────────────────────────────────
+ *   La JUBILACIÓN PARCIAL del art. 215 LGSS no da derecho al complemento, aunque sea
+ *   contributiva y sea jubilación. Sí lo da el acceso posterior a la jubilación plena.
+ *
  * ── Cuantía y cómputo ────────────────────────────────────────────────────────────
  *   - Importe FIJO por hijo/a (no porcentaje), con un máximo de 4 hijos computables.
  *   - Se abona en 14 pagas.
@@ -47,10 +51,18 @@ import {
   COMPLEMENTO_BRECHA_GENERO_META,
 } from '@/data/fiscal';
 
+/**
+ * La exclusión del art. 60.4 LGSS, leída del módulo fiscal y no tecleada aquí: es un dato
+ * normativo, y como tal tiene que pasar por el ciclo /triaje-fiscal como los demás.
+ */
+const EXCLUSION_JUBILACION_PARCIAL = COMPLEMENTO_BRECHA_GENERO_2026.exclusiones.find(
+  e => e.supuesto === 'jubilacion_parcial',
+)!;
+
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
 export type SexoBeneficiario = 'mujer' | 'hombre';
-export type TipoPensionBG = 'jubilacion' | 'incapacidad_permanente' | 'viudedad' | 'no_contributiva' | 'ninguna';
+export type TipoPensionBG = 'jubilacion' | 'jubilacion_parcial' | 'incapacidad_permanente' | 'viudedad' | 'no_contributiva' | 'ninguna';
 export type FechaHechoCausante = 'antes_2021' | 'desde_2021' | 'sin_iniciar';
 export type EstadoOtroProgenitor = 'no_percibe' | 'percibe' | 'denegado' | 'no_aplica';
 
@@ -163,6 +175,15 @@ export function calcularComplementoBrechaGenero(
     return noProcede(
       'El complemento se reconoce únicamente sobre una pensión ya causada.',
       'Cuando solicites jubilación, incapacidad permanente o viudedad, recuerda revisar este derecho.',
+    );
+  }
+  // Caso 1.bis: jubilación parcial. Es contributiva y es jubilación, así que sin esta
+  // comprobación caía en «procede» y devolvía un importe.
+  if (p.tipoPension === 'jubilacion_parcial') {
+    return noProcede(
+      `${EXCLUSION_JUBILACION_PARCIAL.norma} excluye expresamente el complemento en la jubilación parcial. ${EXCLUSION_JUBILACION_PARCIAL.detalle}`,
+      'Cuando accedas desde la jubilación parcial a la jubilación plena, solicita entonces el complemento ante el INSS citando el art. 60 LGSS.',
+      [COMPLEMENTO_BRECHA_GENERO_META.nota],
     );
   }
 

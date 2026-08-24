@@ -642,7 +642,7 @@ function crearServidorDelegum(): McpServer {
           `⚖️ **Delegum — Impuesto de Sucesiones en ${r.ccaaNombre}**`,
           '',
           `💶 Herencia recibida: **${fmt(r.baseImponible)} €**`,
-          r.totalReducciones > 0 ? `➖ Reducciones aplicadas: ${fmt(r.totalReducciones)} €` : '',
+          r.totalReducciones > 0 ? `➖ Reducciones aplicadas: ${fmt(r.totalReducciones)} €${r.reduccionAutonomicaBase > 0 ? ` (incluidos ${fmt(r.reduccionAutonomicaBase)} € de reducción autonómica en base)` : ''}` : '',
           `📦 Base liquidable: ${fmt(r.baseLiquidable)} €`,
           `🔢 Cuota íntegra: ${fmt(r.cuotaIntegra)} €`,
           r.coeficienteMultiplicador !== 1 ? `✖️ Coeficiente patrimonio: ×${r.coeficienteMultiplicador}` : '',
@@ -1422,7 +1422,7 @@ function crearServidorDelegum(): McpServer {
     {
       sexo: z.enum(['mujer', 'hombre']).describe('Sexo del beneficiario (informativo: desde la doctrina 2025 no afecta al derecho)'),
       num_hijos: z.number().int().min(0).describe('Número de hijos/as nacidos con vida o adoptados antes del hecho causante'),
-      tipo_pension: z.enum(['jubilacion', 'incapacidad_permanente', 'viudedad', 'no_contributiva', 'ninguna']).describe('Tipo de pensión. Solo las contributivas dan acceso.'),
+      tipo_pension: z.enum(['jubilacion', 'jubilacion_parcial', 'incapacidad_permanente', 'viudedad', 'no_contributiva', 'ninguna']).describe('Tipo de pensión. Solo las contributivas dan acceso, y la jubilación parcial queda excluida por el art. 60.4 LGSS.'),
       fecha_hecho_causante: z.enum(['antes_2021', 'desde_2021', 'sin_iniciar']).optional().describe('Momento del hecho causante. El complemento exige hecho causante desde el 04/02/2021. Por defecto desde_2021.'),
       otro_progenitor: z.enum(['no_percibe', 'percibe', 'denegado', 'no_aplica']).optional().describe('Situación del OTRO progenitor (no del solicitante): no_percibe, percibe (incompatible, el complemento ya se reconoció por esos hijos), denegado, no_aplica. Que se lo denegaran a ÉL no da derecho a reclamar: para eso está denegacion_propia. Por defecto no_percibe.'),
       denegacion_propia: z.boolean().optional().describe('¿Al SOLICITANTE le denegaron el complemento en su día y tiene una resolución denegatoria? Es lo que decide si procede reclamar (STJUE C-623/23 para denegaciones a hombres anteriores a 2025). Por defecto false.'),
