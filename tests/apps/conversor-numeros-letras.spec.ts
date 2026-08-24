@@ -52,11 +52,12 @@ import { test, expect, Page } from '@playwright/test';
  * REPARADOS en el navegador; sus tests dejan de ser testigos y pasan a ser candados de
  * regresión, con la norma que los justifica escrita encima de cada uno.
  *
- * HALLAZGO NUEVO de esta segunda pasada, y es hijo de la reparación del tope (nº 4): en la
- * franja [999.999.999.999,995 , 1.000.000.000.000) la comprobación de la página usa
- * Math.floor(|v|) y deja pasar el valor, pero cantidadALetras() redondea los céntimos por
- * encima del tope y lanza SU mensaje interno, que llega crudo a la interfaz con el número sin
- * formato español. Va marcado TESTIGO más abajo.
+ * HALLAZGO 263 de la segunda pasada —hijo de la reparación del tope (nº 4)— REPARADO el
+ * 24/08/2026: en la franja [999.999.999.999,995 , 1.000.000.000.000) la comprobación de la
+ * página usaba Math.floor(|v|) y dejaba pasar el valor, pero cantidadALetras() redondea los
+ * céntimos por encima del tope y lanzaba SU mensaje interno, que llegaba crudo a la interfaz
+ * con el número sin formato español. Ahora las dos comprobaciones miran la parte entera ya
+ * redondeada. Su testigo es la REGRESIÓN 6, al final.
  */
 
 const RUTA = '/conversor-numeros-letras/';
@@ -368,11 +369,27 @@ test('REGRESIÓN 5 · el número suelto conserva el cero final de los decimales'
  * LO CORRECTO cuando se repare, y hay que invertir este test: el mismo aviso que la app da un
  * céntimo más allá, «La cantidad máxima admitida es 999.999.999.999.».
  */
-test('TESTIGO · el mensaje del motor se filtra a la interfaz justo bajo el tope', async ({ page }) => {
+/**
+ * REGRESIÓN 6 (hallazgo 263) — la franja de medio céntimo bajo el tope.
+ *
+ * En modo importe la cantidad se redondea a céntimos ANTES de leerse, así que el tope hay
+ * que comprobarlo sobre la parte entera ya redondeada. Comprobándolo antes, la franja
+ * [999.999.999.999,995 , 1.000.000.000.000) pasaba el filtro de la página y reventaba dentro
+ * del motor, que soltaba su mensaje interno con el número sin formato español —justo lo que
+ * el CLAUDE.md prohíbe en cualquier cifra de interfaz— en una app que se usa para rellenar
+ * pagarés. La frontera real está en el medio céntimo, y a cada lado responde quien debe.
+ */
+test('REGRESIÓN 6 · la franja de medio céntimo bajo el tope la rechaza la app, no el motor', async ({ page }) => {
   // 999.999.999.999,994 redondea a ,99 y se acepta: la frontera está en el medio céntimo.
   expect(await enLetras(page, '999.999.999.999,994')).toContain('con noventa y nueve céntimos');
 
+  // Y medio céntimo más arriba redondea a un billón, que no cabe: contesta la app, con su
+  // mensaje y su número en formato español
   expect(await avisoDe(page, '999.999.999.999,995')).toBe(
-    'El número supera el límite admitido (999999999999).', // debería ser el aviso de la app
+    'La cantidad máxima admitida es 999.999.999.999.',
+  );
+  // El mismo aviso que un billón redondo, que nunca estuvo en duda
+  expect(await avisoDe(page, '1.000.000.000.000')).toBe(
+    'La cantidad máxima admitida es 999.999.999.999.',
   );
 });

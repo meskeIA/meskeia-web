@@ -256,9 +256,12 @@ test('REGRESIÓN — la app niega la conversión CNAE→IAE en la página, en el
   ).toBeVisible();
 
   // DataReference con las dos fuentes normativas y su fecha de verificación (20/07/2026).
+  // El día 24/08/2026 esta línea esperaba «20/7/2026», sin el cero: era el formato que daba
+  // `formatDate` con `toLocaleDateString('es-ES')` a secas, y el test lo fijaba como contrato
+  // pese a incumplir el DD/MM/YYYY obligatorio del CLAUDE.md §2 (hallazgo 282 del Inspector).
   await expect(page.getByText('RD 10/2025', { exact: false }).first()).toBeVisible();
   await expect(page.getByText('RD Legislativo 1175/1990', { exact: false }).first()).toBeVisible();
-  await expect(page.getByText('20/7/2026', { exact: false }).first()).toBeVisible();
+  await expect(page.getByText('20/07/2026', { exact: false }).first()).toBeVisible();
 
   // El FAQPage del JSON-LD dice lo mismo que la página: sin él, las IAs citarían la
   // app como si fuese un conversor.

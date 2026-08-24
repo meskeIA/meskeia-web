@@ -60,7 +60,15 @@ export default function ConversorNumerosLetrasPage() {
     }
     // El tope se compara contra la parte ENTERA: la ayuda anuncia «hasta 999.999.999.999 y dos
     // decimales», y comparando el valor completo el propio máximo declarado se rechazaba.
-    if (Math.floor(Math.abs(valor)) > LIMITE_NUMERO_A_LETRAS) {
+    //
+    // En modo IMPORTE, además, sobre la parte entera ya redondeada a céntimos, que es la que
+    // se va a leer: 999.999.999.999,995 se redondea a un billón y no cabe. Sin esto, esa
+    // franja de un céntimo se colaba y salía el mensaje interno del motor —con el número sin
+    // formato español— en lugar del aviso que la propia app promete (hallazgo 263).
+    const enteroQueSeLee = modo === 'importe'
+      ? Math.floor(Math.round(Math.abs(valor) * 100) / 100)
+      : Math.floor(Math.abs(valor));
+    if (enteroQueSeLee > LIMITE_NUMERO_A_LETRAS) {
       return {
         texto: '',
         error: `La cantidad máxima admitida es ${formatNumber(LIMITE_NUMERO_A_LETRAS, 0)}.`,

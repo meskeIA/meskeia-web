@@ -210,16 +210,26 @@ export function cantidadALetras(valor: number, opciones: OpcionesCantidad): Cant
   if (!Number.isFinite(valor)) {
     throw new Error('Introduce una cantidad válida.');
   }
-  // El tope se compara contra la parte ENTERA: la ayuda anuncia «hasta 999.999.999.999 y dos
-  // decimales», y comparando el valor con céntimos el propio máximo declarado se rechazaba.
-  if (Math.floor(Math.abs(valor)) > LIMITE_NUMERO_A_LETRAS) {
-    throw new Error(`La cantidad supera el límite admitido (${LIMITE_NUMERO_A_LETRAS}).`);
-  }
-
   const negativo = valor < 0;
   const totalCentimos = Math.round(Math.abs(valor) * 100);
   const entero = Math.floor(totalCentimos / 100);
   const fraccion = totalCentimos % 100;
+
+  /**
+   * El tope se compara contra la parte ENTERA —la ayuda anuncia «hasta 999.999.999.999 y dos
+   * decimales», y comparando el valor con céntimos el propio máximo declarado se rechazaba—,
+   * pero contra la parte entera YA REDONDEADA a céntimos, que es la que se va a leer.
+   *
+   * Comprobándolo antes del redondeo quedaba una franja de un céntimo,
+   * [999.999.999.999,995 , 1.000.000.000.000), que pasaba el filtro y reventaba aquí dentro
+   * (hallazgo 263 del Inspector). El importe se formatea en español también en el error:
+   * es una cifra que puede acabar en pantalla.
+   */
+  if (entero > LIMITE_NUMERO_A_LETRAS) {
+    throw new Error(
+      `La cantidad supera el límite admitido (${LIMITE_NUMERO_A_LETRAS.toLocaleString('es-ES')}).`,
+    );
+  }
 
   // El numeral concuerda con la moneda y va apocopado por precederla:
   // «veintiún euros», «veintiuna libras».

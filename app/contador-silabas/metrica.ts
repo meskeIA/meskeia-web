@@ -68,21 +68,49 @@ const terminaEnVocal = (palabra: string): boolean => {
 /**
  * ¿La palabra empieza por sonido vocálico?
  * La «h» es muda («la hoja» → sinalefa), salvo cuando encabeza los diptongos
- * «hue-», «hui-», «hie-», que se pronuncian con sonido consonántico (/gwe/, /ye/)
- * y bloquean la fusión: «la huella» NO hace sinalefa.
+ * «hue-», «hui-», «hie-», «huy-», que se pronuncian con sonido consonántico
+ * ([w], [j]) y bloquean la fusión: «la huella» NO hace sinalefa.
+ *
+ * «huy-» se añadió el 24/08/2026 (hallazgo 258): es el mismo sonido de «hui-» y faltaba,
+ * así que «huye», «huyó», «huyen», «huyeron» y «huyendo» fusionaban lo que no se fusiona.
+ * Se veía en el segundo verso de la Lira que la propia app trae como ejemplo, «la del que
+ * huye del mundanal ruido», que salía decasílabo dentro de una estrofa que exige 11B.
  */
+const INICIOS_H_CONSONANTICA = ['hue', 'hui', 'hie', 'huy'];
+
 const empiezaPorVocal = (palabra: string): boolean => {
   const p = palabra.toLowerCase();
   if (!p) return false;
   if (esVocalMetrica(p[0])) return true;
-  // «y» conjunción: funciona como vocal
+  // «y» conjunción: funciona como vocal («rosa y» sí funde)
   if (p === 'y') return true;
   if (p[0] === 'h') {
-    if (p.startsWith('hue') || p.startsWith('hui') || p.startsWith('hie')) return false;
+    if (INICIOS_H_CONSONANTICA.some((ini) => p.startsWith(ini))) return false;
     return p.length > 1 && esVocalMetrica(p[1]);
   }
   return false;
 };
+
+/**
+ * La conjunción «y» funde por UN lado, nunca por los dos.
+ *
+ * Es una semivocal [i̯]: puede cerrar diptongo con la vocal anterior («rosa y» → [saj]) o
+ * abrirlo como semiconsonante [j] ante la siguiente («y escriba» → [jes-kri-ba]), pero no
+ * ambas cosas a la vez. Entre dos vocales, a-i-a no da una sílaba sino dos: «de rosa y
+ * azucena» se lee [de-ro-sa-ja-θu-θe-na] y ahorra UNA sílaba, no dos — por eso el soneto
+ * XXIII de Garcilaso, que la propia app propone como banco de pruebas, es endecasílabo.
+ *
+ * Los dos versos de Quevedo y del romance que lo fijan, con la cuenta hecha a mano:
+ *   «érase una nariz sayón y escriba» → 13 fonéticas, funde se_u y y_e (la «y» no tiene
+ *      vocal a la izquierda, «sayón» acaba en n) = 11 · endecasílabo
+ *   «y están los campos en flor»      → 8 fonéticas, funde y_e (la «y» abre el verso) y la
+ *      aguda suma 1 = 8 · octosílabo
+ * Frente a «En tanto que de rosa y azucena» → 12 fonéticas, funde sa_y y AHÍ SE PARA = 11.
+ *
+ * No afecta a la «y» final de «hoy», «rey» o «muy», que es semivocal plena y funde como
+ * cualquier vocal («hoy es lunes»).
+ */
+const esConjuncionY = (palabra: string): boolean => palabra.toLowerCase() === 'y';
 
 /**
  * Clasifica la acentuación de la última palabra del verso, que determina
@@ -148,24 +176,47 @@ export const analizarVerso = (linea: string): AnalisisVerso | null => {
   const palabras = encontradas.map((e) => ({ palabra: e.palabra, silabas: separarSilabas(e.palabra) }));
   const silabasFoneticas = palabras.reduce((acc, p) => acc + p.silabas.length, 0);
 
-  // Sinalefas: vocal final de una palabra + vocal inicial de la siguiente.
-  // No se encadenan: si una palabra ya se ha fundido con la anterior, no vuelve a
-  // fundirse con la siguiente. La sinalefa triple existe pero es excepcional, y la
-  // escansión tradicional no la aplica — «de rosa y azucena» es endecasílabo (una
-  // sola fusión), no decasílabo (dos).
+  /**
+   * Sinalefas: vocal final de una palabra + vocal inicial de la siguiente.
+   *
+   * Cada contacto entre vocales de palabras contiguas ahorra UNA sílaba, y se cuentan
+   * todos. Un grupo de N vocales en contacto tiene N−1 contactos y se pronuncia en una
+   * sola sílaba, o sea que ahorra N−1: la cuenta sale sola sin tratar aparte la sinalefa
+   * triple.
+   *
+   * ── Por qué se cuentan todos (24/08/2026, hallazgos 257 y 260) ──────────────────
+   * Antes había un `i++` que saltaba la palabra siguiente ENTERA para no encadenar, y eso
+   * perdía dos cosas distintas:
+   *   · la sinalefa triple, que sí existe (Quilis, Métrica española): «Érase un hombre a
+   *     una nariz pegado» tiene tres contactos (se_un, bre_a, a_u) y es endecasílabo;
+   *     con el salto salían 12 y la app rotulaba dodecasílabo el primer verso del soneto
+   *     que ella misma ofrece como ejemplo, dentro de una ficha que dice «catorce
+   *     endecasílabos».
+   *   · dos sinalefas INDEPENDIENTES separadas por una palabra bisílaba, donde las vocales
+   *     ni siquiera son la misma: «érase una alquitara» funde se_u por un lado y na_al por
+   *     otro, y la segunda se perdía.
+   * Lo que sostenía el «de rosa y azucena» del comentario anterior no era el salto general,
+   * sino que la conjunción «y» no funde dos veces (ver `esConjuncionY`): esa es la única
+   * palabra que sigue sin encadenar, y por una razón fonética, no por regla de conteo.
+   */
   const sinalefas: Sinalefa[] = [];
+  let veniaFundida: boolean = false; // ¿la palabra i se fundió ya con la i−1?
   for (let i = 0; i < encontradas.length - 1; i++) {
     const actual = encontradas[i];
     const siguiente = encontradas[i + 1];
-    if (terminaEnVocal(actual.palabra) && empiezaPorVocal(siguiente.palabra)) {
+    const funde: boolean =
+      !(esConjuncionY(actual.palabra) && veniaFundida) &&
+      terminaEnVocal(actual.palabra) &&
+      empiezaPorVocal(siguiente.palabra);
+    if (funde) {
       const entreMedias = linea.slice(actual.fin, siguiente.inicio);
       sinalefas.push({
         indice: i,
         texto: `${actual.palabra.slice(-1)}_${siguiente.palabra[0]}`,
         conPausa: /[,;:.…!?—)]/.test(entreMedias),
       });
-      i++; // la palabra fundida no encadena con la siguiente
     }
+    veniaFundida = funde;
   }
 
   const ultima = palabras[palabras.length - 1];

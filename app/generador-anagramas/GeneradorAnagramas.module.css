@@ -876,6 +876,12 @@
   border-left: 4px solid #d32f2f;
 }
 
+/* Ni acierto ni error: no hay letras que comparar, así que el aviso es neutro */
+.veredictoAviso {
+  background: rgba(46, 134, 171, 0.08);
+  border-left: 4px solid var(--primary);
+}
+
 .sobranList {
   margin: var(--spacing-sm) 0 0;
   padding-left: 1.1rem;
@@ -893,6 +899,10 @@
 
 [data-theme='dark'] .veredictoKo {
   background: rgba(211, 47, 47, 0.15);
+}
+
+[data-theme='dark'] .veredictoAviso {
+  background: rgba(46, 134, 171, 0.16);
 }
 
 @media (max-width: 768px) {

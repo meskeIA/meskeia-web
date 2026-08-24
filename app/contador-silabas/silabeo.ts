@@ -199,7 +199,12 @@ export function separarSilabas(palabra: string): string[] {
     else if (k === 1) alaDerecha = 1;                              // V-CV: ca-sa, a-quí
     else if (k === 2) alaDerecha = esAtaqueDoble(bloque[0], bloque[1]) ? 2 : 1;
     else if (k === 3) alaDerecha = esAtaqueDoble(bloque[1], bloque[2]) ? 2 : 1;
-    else alaDerecha = 2;                                           // abs-trac-to, cons-truir
+    // Con cuatro o más consonantes seguidas, la pregunta es la misma que con tres: si las
+    // dos últimas pueden abrir sílaba, viajan juntas (angs-trom); si no, solo va una
+    // (tungs-te-no, porque «st» no abre sílaba en español). Hasta el 24/08/2026 aquí se
+    // mandaban dos SIN mirar cuáles, que es justo lo contrario de lo que enseña la propia
+    // app en su bloque educativo, y «tungsteno» salía «tung-ste-no» (hallazgo 259).
+    else alaDerecha = esAtaqueDoble(bloque[k - 2], bloque[k - 1]) ? 2 : 1;
 
     cortes.push(finBloque - alaDerecha);
   }

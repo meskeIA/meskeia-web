@@ -47,10 +47,14 @@ import { test, expect, Page } from '@playwright/test';
  *       Con el campo vacío o solo con espacios, analizar() sale por `if (!texto.trim())` y
  *       la app se queda en el marcador de posición, sin inventarse un resultado.
  *
- * HALLAZGOS: al final del fichero. Los ocho de la primera inspección están REPARADOS y se
- * quedan como regresión; los abiertos de esta segunda tanda van con test.fail(), afirmando
- * lo que DEBERÍA pasar, así que el día que se reparen empezarán a pasar y habrá que
- * quitarles el .fail().
+ * HALLAZGOS: al final del fichero, los de las dos inspecciones, todos REPARADOS y como
+ * regresión. Los seis de la segunda tanda (257-262) se cerraron el 24/08/2026 quitándoles
+ * el test.fail() con el que se documentaron, tras comprobar uno a uno que lo que afirmaban
+ * seguía siendo correcto — que es la regla que dejó la ronda 1: un test.fail() que pasa a
+ * verde no prueba nada hasta verificar su contenido.
+ *
+ * Cuatro de ellos son del motor de escansión, que además tiene sus propios tests unitarios
+ * sobre poemas enteros de métrica conocida en `tests/metrica-verso.spec.ts`.
  */
 
 const RUTA = '/contador-silabas/';
@@ -376,13 +380,13 @@ test.describe('contador-silabas', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // HALLAZGOS ABIERTOS — segunda inspección, 24/08/2026
-  // Escritos con test.fail(): afirman lo que DEBERÍA ocurrir. Cuando se reparen empezarán a
-  // pasar y habrá que quitarles el .fail().
+  // HALLAZGOS 257-262 — segunda inspección, 24/08/2026 · REPARADOS el 24/08/2026
+  // Estaban escritos con test.fail(), afirmando lo que DEBERÍA ocurrir. Se les ha quitado la
+  // marca al repararlos, comprobando antes que lo que afirmaban sigue siendo lo correcto.
   // ---------------------------------------------------------------------------------------
 
-  test.describe('hallazgos abiertos', () => {
-    test.fail('«tungsteno» debería separarse tungs-te-no', async ({ page }) => {
+  test.describe('hallazgos 257-262, ya reparados', () => {
+    test('«tungsteno» se separa tungs-te-no', async ({ page }) => {
       // Residuo de la reparación del hallazgo 210. Cuando entre dos vocales hay CUATRO o más
       // consonantes, separarSilabas() manda dos a la derecha sin mirar cuáles: vale para
       // abs-trac-to, cons-truir o subs-tra-er, donde las dos últimas SÍ forman grupo
@@ -394,7 +398,7 @@ test.describe('contador-silabas', () => {
       await expect(silabasDe(page)).toHaveText(['tungs', 'te', 'no']); // obtenido: tung-ste-no
     });
 
-    test.fail('«la del que huye del mundanal ruido» es un endecasílabo', async ({ page }) => {
+    test('«la del que huye del mundanal ruido» es un endecasílabo', async ({ page }) => {
       // empiezaPorVocal() bloquea la sinalefa ante «hue-», «hui-» y «hie-» porque esa h + u/i
       // suena consonántica ([w], [j]) — y hace bien: «la del que hierve…» da 11. Pero deja
       // fuera «huy-», que es el mismo sonido: «huye», «huyó», «huyeron», «huyendo».
@@ -405,7 +409,7 @@ test.describe('contador-silabas', () => {
       await expect(metricasDe(page)).toHaveText('11'); // obtenido: 10, decasílabo
     });
 
-    test.fail('dos sinalefas seguidas e independientes cuentan las dos', async ({ page }) => {
+    test('dos sinalefas seguidas e independientes cuentan las dos', async ({ page }) => {
       // Para no encadenar sinalefas, analizarVerso() salta la palabra siguiente entera
       // (`i++`). Eso es correcto cuando la vocal es la MISMA («hombre a una»: la única vocal
       // de «a» ya se fundió), pero no cuando la palabra de en medio tiene más de una sílaba:
@@ -417,7 +421,7 @@ test.describe('contador-silabas', () => {
       await expect(metricasDe(page)).toHaveText('11'); // obtenido: 12, dodecasílabo
     });
 
-    test.fail('el primer verso del soneto de Quevedo es un endecasílabo', async ({ page }) => {
+    test('el primer verso del soneto de Quevedo es un endecasílabo', async ({ page }) => {
       // Aquí sí hay tres vocales en contacto («hom-bre a u-na»): la escansión clásica las
       // funde en UNA sola sílaba métrica, que es lo que hace de este verso un endecasílabo
       // de manual. El bloque educativo declara que no encadenar «es el criterio de la
@@ -428,7 +432,7 @@ test.describe('contador-silabas', () => {
       await expect(metricasDe(page)).toHaveText('11'); // obtenido: 12, dodecasílabo
     });
 
-    test.fail('el icono del marcador de posición debería llevar aria-hidden', async ({ page }) => {
+    test('el icono del marcador de posición lleva aria-hidden', async ({ page }) => {
       // La reparación del hallazgo 214 añadió `aria-hidden` al icono del aviso nuevo (🔤) y
       // dejó sin él al gemelo de al lado (📝, page.tsx L538), que es además el que ve TODO
       // el mundo al entrar: un lector de pantalla lee «memo Introduce un texto para analizar
@@ -438,7 +442,7 @@ test.describe('contador-silabas', () => {
       await expect(icono).toHaveAttribute('aria-hidden', 'true'); // obtenido: sin atributo
     });
 
-    test.fail('el «Romance viejo» de ejemplo debería medir ocho en todos sus versos', async ({
+    test('el «Romance viejo» de ejemplo mide ocho en todos sus versos', async ({
       page,
     }) => {
       // El motor acierta: «cuando hace la calor» son cuan-do(2) ha-ce(2) la(1) ca-lor(2) = 7
@@ -447,7 +451,7 @@ test.describe('contador-silabas', () => {
       // antigua la que evita la sinalefa y sostiene el octosílabo. Con la forma modernizada,
       // la app enseña un heptasílabo dentro de un bloque cuya ficha dice «serie indefinida
       // de OCTOSÍLABOS con rima asonante en los pares».
-      await page.getByRole('button', { name: 'Cargar estrofa de ejemplo: Romance viejo' }).click();
+      await page.getByRole('button', { name: 'Cargar estrofa de ejemplo: Romance viejo (grafía antigua)' }).click();
       await page.getByRole('button', { name: 'Analizar Sílabas' }).click();
       await expect(metricasDe(page, 1)).toHaveText('8'); // obtenido: 7, heptasílabo
     });

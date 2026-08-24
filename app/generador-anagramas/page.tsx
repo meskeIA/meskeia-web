@@ -203,6 +203,13 @@ interface Comparacion {
   sobranEnB: DiferenciaLetras[];
   totalA: number;
   totalB: number;
+  /**
+   * Ninguno de los dos textos contiene una sola letra («123» frente a «456»). No hay nada
+   * que juzgar, y sin esto salía el ❌ con una explicación que no explicaba nada: «El
+   * original tiene 0 letras y la propuesta 0», sin ninguna letra en las listas de sobrantes
+   * (hallazgo 265 del Inspector).
+   */
+  sinLetras: boolean;
 }
 
 /** Comprueba si dos textos son anagramas exactos y, si no, qué letras sobran en cada lado. */
@@ -226,6 +233,7 @@ function compararTextos(textoA: string, textoB: string): Comparacion {
     sobranEnB,
     totalA: normA.length,
     totalB: normB.length,
+    sinLetras: normA.length === 0 && normB.length === 0,
   };
 }
 
@@ -372,6 +380,31 @@ export default function GeneradorAnagramasPage() {
       setBuscado(true);
       setIsSearching(false);
     }, 50);
+  };
+
+  /**
+   * Los dos selectores de longitud se arrastran el uno al otro para que el rango nunca sea
+   * imposible. Con mínimo 7 y máximo 5, el bucle `for (len = minLength; len <= maxLength)`
+   * no itera ni una vez y la app presentaba el vacío como si el problema fueran las letras
+   * del usuario, empujando además en la dirección contraria («prueba añadiendo más
+   * letras») — hallazgo 266 del Inspector. Se ajusta el otro extremo en vez de avisar:
+   * el usuario ha dicho lo que quiere, y no hay ninguna lectura útil de un rango vacío.
+   */
+  const OPCIONES_MIN = [2, 3, 4, 5, 6, 7];
+  const OPCIONES_MAX = [4, 5, 6, 7, 8, 9, 10, 12, 15];
+
+  const cambiarMinimo = (valor: number) => {
+    setMinLength(valor);
+    if (valor > maxLength) {
+      setMaxLength(OPCIONES_MAX.find((n) => n >= valor) ?? OPCIONES_MAX[OPCIONES_MAX.length - 1]);
+    }
+  };
+
+  const cambiarMaximo = (valor: number) => {
+    setMaxLength(valor);
+    if (valor < minLength) {
+      setMinLength([...OPCIONES_MIN].reverse().find((n) => n <= valor) ?? OPCIONES_MIN[0]);
+    }
   };
 
   const handleClear = () => {
@@ -550,9 +583,9 @@ export default function GeneradorAnagramasPage() {
               id="anagram-min"
               className={styles.select}
               value={minLength}
-              onChange={(e) => setMinLength(Number(e.target.value))}
+              onChange={(e) => cambiarMinimo(Number(e.target.value))}
             >
-              {[2, 3, 4, 5, 6, 7].map(n => (
+              {OPCIONES_MIN.map(n => (
                 <option key={n} value={n}>{n} letras</option>
               ))}
             </select>
@@ -564,9 +597,9 @@ export default function GeneradorAnagramasPage() {
               id="anagram-max"
               className={styles.select}
               value={maxLength}
-              onChange={(e) => setMaxLength(Number(e.target.value))}
+              onChange={(e) => cambiarMaximo(Number(e.target.value))}
             >
-              {[4, 5, 6, 7, 8, 9, 10, 12, 15].map(n => (
+              {OPCIONES_MAX.map(n => (
                 <option key={n} value={n}>{n} letras</option>
               ))}
             </select>
@@ -801,15 +834,30 @@ export default function GeneradorAnagramasPage() {
 
         {comparacion && (
           <div
-            className={`${styles.veredicto} ${comparacion.iguales ? styles.veredictoOk : styles.veredictoKo}`}
+            className={`${styles.veredicto} ${
+              comparacion.sinLetras
+                ? styles.veredictoAviso
+                : comparacion.iguales
+                  ? styles.veredictoOk
+                  : styles.veredictoKo
+            }`}
             role="status"
             aria-live="polite"
           >
             <span className={styles.veredictoIcono} aria-hidden="true">
-              {comparacion.iguales ? '✅' : '❌'}
+              {comparacion.sinLetras ? '💬' : comparacion.iguales ? '✅' : '❌'}
             </span>
             <div>
-              {comparacion.iguales ? (
+              {comparacion.sinLetras ? (
+                <>
+                  <strong>Todavía no hay nada que comparar.</strong>
+                  <p>
+                    Ninguno de los dos textos contiene letras: los anagramas se hacen con letras,
+                    así que las cifras y los signos no cuentan. Escribe una palabra o una frase en
+                    cada campo.
+                  </p>
+                </>
+              ) : comparacion.iguales ? (
                 <>
                   <strong>Son anagramas exactos.</strong>
                   <p>
@@ -892,7 +940,7 @@ export default function GeneradorAnagramasPage() {
                 <tr>
                   <td><strong>Heterograma</strong></td>
                   <td>Palabra sin letras repetidas</td>
-                  <td>MURCIÉLAGO (12 letras únicas)</td>
+                  <td>MURCIÉLAGO (10 letras únicas)</td>
                   <td>Tipografía, diseño de teclados</td>
                 </tr>
               </tbody>
@@ -939,7 +987,7 @@ export default function GeneradorAnagramasPage() {
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqQuestion}>¿Qué letras son más valiosas en Scrabble español?</summary>
-              <p className={styles.eduFaqAnswer}>En la edición clásica de Scrabble en español, las letras de mayor valor son: <strong>CH (5 pts), LL (8 pts), RR (8 pts), Ñ (8 pts)</strong> como fichas especiales, y entre las individuales: <strong>Q (8), X (8), Y (4), Z (10), J (8), K (8)</strong>. Las vocales solo valen 1 punto. Otras variantes (como Apalabrados) pueden usar puntuaciones distintas. La estrategia consiste en usar letras de alto valor en casillas premium (doble/triple letra o palabra).</p>
+              <p className={styles.eduFaqAnswer}>En la edición clásica de Scrabble en español, las letras de mayor valor son: <strong>CH (5 pts), LL (8 pts), RR (8 pts), Ñ (8 pts)</strong> como fichas especiales, y entre las individuales: <strong>Z (10), J (8), X (8), Q (5), Y (4)</strong>. Ojo: la edición española <strong>no tiene fichas K ni W</strong>, así que ninguna palabra que las lleve es jugable. Las vocales solo valen 1 punto. Otras variantes (como Apalabrados) pueden usar puntuaciones distintas. La estrategia consiste en usar letras de alto valor en casillas premium (doble/triple letra o palabra).</p>
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqQuestion}>¿Cómo funciona el algoritmo de búsqueda de anagramas?</summary>
@@ -951,7 +999,7 @@ export default function GeneradorAnagramasPage() {
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqQuestion}>¿Las tildes cuentan como letras diferentes?</summary>
-              <p className={styles.eduFaqAnswer}>En español, las letras acentuadas (á, é, í, ó, ú, ü) son variantes ortográficas de las vocales base. En Scrabble oficial, <strong>sí cuentan como fichas distintas</strong>. En esta herramienta, el diccionario conserva las tildes originales, así que si una palabra lleva acento (por ejemplo &quot;árbol&quot;) deberás introducir las letras con tilde para que aparezca. La Ñ es una letra completamente independiente del abecedario español con su propia ficha en Scrabble.</p>
+              <p className={styles.eduFaqAnswer}>En español, las letras acentuadas (á, é, í, ó, ú, ü) son variantes ortográficas de las vocales base, y <strong>esta herramienta las trata como tales</strong>: da igual escribir las tildes o no, porque las letras se comparan sin ellas. Tecleando <strong>arbol</strong> aparece <strong>árbol</strong>, y al revés. En Scrabble tampoco existen fichas acentuadas: las vocales del juego van sin tilde. La Ñ sí es una letra independiente del abecedario español, con su propia ficha, y aquí también se cuenta aparte de la N.</p>
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqQuestion}>¿Qué es el &quot;bingo&quot; en Scrabble?</summary>

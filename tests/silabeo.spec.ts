@@ -129,8 +129,16 @@ test.describe('separarSilabas — tres o más consonantes seguidas (hallazgo 210
     expect(sil('inglés')).toBe('in-glés');   // «gl» sí es ataque
   });
 
-  test('cuatro consonantes se reparten dos y dos', () => {
-    expect(sil('substraer')).toBe('subs-tra-er');
+  /**
+   * Con cuatro o más consonantes la pregunta es la misma que con tres: si las DOS ÚLTIMAS
+   * pueden abrir sílaba, viajan juntas; si no, solo pasa una. No es «dos y dos» siempre.
+   * «st» no puede abrir sílaba en español, así que «tungsteno» es tungs-te-no y no
+   * tung-ste-no, que es lo que salía hasta el 24/08/2026 (hallazgo 259 del Inspector).
+   */
+  test('con cuatro consonantes decide si las dos últimas pueden abrir sílaba', () => {
+    expect(sil('substraer')).toBe('subs-tra-er');   // «tr» sí abre → viajan dos
+    expect(sil('tungsteno')).toBe('tungs-te-no');   // «st» no abre → viaja una
+    expect(sil('angstrom')).toBe('angs-trom');      // «tr» sí abre
   });
 });
 

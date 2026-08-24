@@ -94,9 +94,13 @@ sin ver que sois la ocasión
 de lo mismo que culpáis`,
     },
     {
-      etiqueta: 'Romance viejo',
+      etiqueta: 'Romance viejo (grafía antigua)',
+      // «faze» y no «hace»: es la grafía del romance del prisionero, y es ella la que evita
+      // la sinalefa y sostiene el octosílabo. Con la forma modernizada, el segundo verso
+      // salía heptasílabo dentro de un ejemplo rotulado «serie indefinida de octosílabos»
+      // (hallazgo 262 del Inspector).
       texto: `Que por mayo era por mayo
-cuando hace la calor
+cuando faze la calor
 cuando los trigos encañan
 y están los campos en flor
 cuando canta la calandria
@@ -535,7 +539,7 @@ sabañón garrafal, morado y frito.`,
             </>
           ) : (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>📝</span>
+              <span className={styles.placeholderIcon} aria-hidden="true">📝</span>
               <p>Introduce un texto para analizar sus sílabas</p>
             </div>
           )}
@@ -803,7 +807,7 @@ sabañón garrafal, morado y frito.`,
               <ul>
                 <li><strong>Las sinalefas se detectan, pero la última palabra la tienes tú:</strong> el cómputo métrico aplica la norma general (toda sinalefa posible se realiza). El poeta puede romperla (dialefa) o unir un hiato (sinéresis) por motivos de ritmo; esas licencias no son predecibles por algoritmo. Las fusiones señaladas <em>con pausa</em> son las primeras candidatas a revisar si el verso no cuadra.</li>
                 <li><strong>Sinéresis y diéresis no se aplican solas:</strong> el análisis parte del silabeo estándar de cada palabra. Si el poeta trató &quot;poeta&quot; como bisílabo (sinéresis) o &quot;suave&quot; como trisílabo (diéresis), el resultado diferirá en una sílaba.</li>
-                <li><strong>Las sinalefas no se encadenan:</strong> cuando tres vocales entran en contacto («de ro-sa y a-zu-ce-na»), el cómputo aplica una sola fusión, que es el criterio de la escansión tradicional. La sinalefa triple existe en español, pero es excepcional; si estás analizando un verso donde el poeta sí la usa, réstale una sílaba más.</li>
+                <li><strong>Las sinalefas sí se encadenan:</strong> cuando tres o más vocales entran en contacto, se funden todas en una sílaba. «Érase un hombre a una nariz pegado» tiene 14 sílabas fonéticas y tres contactos vocálicos (se_un, bre_a, a_u): 14 − 3 = 11, el endecasílabo que Quevedo escribió. La excepción es la conjunción <em>y</em>, que funde por un solo lado —«de rosa y azucena» ahorra una sílaba, no dos—, porque entre vocales se lee [ro-sa-<em>ja</em>-zu-ce-na].</li>
                 <li><strong>Palabras compuestas y prefijadas:</strong> En palabras como &quot;subrayar&quot;, &quot;deshacer&quot; o &quot;transatlántico&quot;, el silabeo puede variar según se considere la morfología o solo la fonética. La RAE y las distintas tradiciones gramaticales no siempre coinciden.</li>
                 <li><strong>Nombres propios y extranjerismos:</strong> El algoritmo puede fallar con nombres como &quot;Shakespeare&quot;, &quot;Nietzsche&quot; o topónimos poco frecuentes cuya pronunciación en español no sigue las reglas estándar.</li>
                 <li><strong>Secuencias &quot;ui&quot;/&quot;iu&quot; en verbos como &quot;construir&quot;:</strong> la RAE admite tanto el diptongo (cons-truir, 2 sílabas) como el hiato (cons-tru-ir, 3 sílabas) según la pronunciación. El algoritmo aplica siempre el criterio de diptongo.</li>

@@ -57,10 +57,11 @@ import { test, expect, Page } from '@playwright/test';
  *       queda deshabilitado. «zzzz» sí son letras, se busca y no hay ninguna palabra: ahí el
  *       mensaje «No se encontraron palabras» es correcto porque se ha buscado de verdad.
  *
- * ESTADO DE LOS 5 HALLAZGOS DE LA PRIMERA PASADA: los cinco verificados como reparados; sus
- * tests están abajo como regresión. Lo que la segunda pasada sí encuentra está en el bloque
- * final, escrito con test.fail(): afirma lo que DEBERÍA ocurrir, así que el día que se repare
- * el test empezará a pasar y habrá que quitarle el .fail().
+ * ESTADO DE LOS HALLAZGOS: los 5 de la primera pasada y los 5 de la segunda (264-268) están
+ * reparados, y sus tests quedan abajo como regresión. Los de la segunda se cerraron el
+ * 24/08/2026 retirando el test.fail() con el que se documentaron y añadiendo la afirmación
+ * en positivo: que la app ya no diga lo que decía es media prueba, la otra media es que diga
+ * lo correcto.
  */
 
 const RUTA = '/generador-anagramas/';
@@ -408,13 +409,14 @@ test.describe('generador-anagramas', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // HALLAZGOS ABIERTOS — segunda pasada del Inspector, 24/08/2026
-  // Escritos con test.fail(): afirman lo que DEBERÍA ocurrir. Cuando se reparen empezarán a
-  // pasar y habrá que quitarles el .fail().
+  // HALLAZGOS 264-268 — segunda pasada del Inspector, 24/08/2026 · REPARADOS el 24/08/2026
+  // Estaban escritos con test.fail(). Al repararlos se les ha quitado la marca y se ha
+  // añadido la afirmación en POSITIVO: que la app ya no diga lo que decía es la mitad de la
+  // prueba; la otra mitad es que diga lo correcto.
   // ---------------------------------------------------------------------------------------
-  test.describe('hallazgos abiertos', () => {
-    test.fail(
-      'la FAQ de tildes debería contar el comportamiento nuevo, no el de antes de la reparación',
+  test.describe('hallazgos 264-268, ya reparados', () => {
+    test(
+      'la FAQ de tildes cuenta el comportamiento del motor, no el de antes de la reparación',
       async ({ page }) => {
         await abrirConDiccionario(page);
         await page.getByRole('button', { name: 'Ver guía educativa' }).click();
@@ -428,10 +430,11 @@ test.describe('generador-anagramas', () => {
         await expect(faq).not.toContainText(
           'deberás introducir las letras con tilde para que aparezca'
         );
+        await expect(faq).toContainText('da igual escribir las tildes o no');
       }
     );
 
-    test.fail('el verificador no debería juzgar dos textos sin ninguna letra', async ({ page }) => {
+    test('el verificador no juzga dos textos sin ninguna letra', async ({ page }) => {
       await abrirConDiccionario(page);
       await pestana(page, /Verificar dos textos/).click();
       await page.fill('#anagram-texto-a', '123');
@@ -440,28 +443,38 @@ test.describe('generador-anagramas', () => {
       // emite un ❌ «No son anagramas exactos. El original tiene 0 letras y la propuesta 0»,
       // sin listar ni una letra sobrante. Es el mismo patrón del H4 reparado —veredicto donde
       // no hay nada que juzgar— en el modo que la reparación no tocó.
-      await expect(page.locator('[class*="veredicto"]').first()).not.toContainText(
-        'No son anagramas exactos'
-      );
+      const veredicto = page.locator('[class*="veredicto"]').first();
+      await expect(veredicto).not.toContainText('No son anagramas exactos');
+      await expect(veredicto).toContainText('Todavía no hay nada que comparar');
+      // Y en cuanto uno de los dos tiene letras, vuelve a haber veredicto
+      await page.fill('#anagram-texto-a', 'roma');
+      await page.fill('#anagram-texto-b', 'amor');
+      await expect(veredicto).toContainText('Son anagramas exactos');
     });
 
-    test.fail('un rango de longitudes imposible no debería culpar a las letras', async ({
+    test('un rango de longitudes imposible ya no se puede pedir', async ({
       page,
     }) => {
       await abrirConDiccionario(page);
       await page.fill('#anagram-letters', 'corazon');
       await page.selectOption('#anagram-min', '7');
-      await page.selectOption('#anagram-max', '5'); // mínimo > máximo: el bucle no itera nunca
+      await page.selectOption('#anagram-max', '5'); // antes: mínimo > máximo, bucle que no itera
+      // Los dos selectores se arrastran: al bajar el máximo por debajo del mínimo, el mínimo
+      // baja con él. Nunca se llega a un rango vacío que luego se explique culpando a las
+      // letras del usuario («prueba añadiendo más letras», que empuja al revés).
+      await expect(page.locator('#anagram-min')).toHaveValue('5');
+      await expect(page.locator('#anagram-max')).toHaveValue('5');
+      // Y al revés: subir el mínimo por encima del máximo arrastra al máximo
+      await page.selectOption('#anagram-min', '7');
+      await expect(page.locator('#anagram-max')).toHaveValue('7');
+      // Con el rango ya coherente (7..7) la búsqueda devuelve lo que tiene que devolver, en
+      // vez del vacío que antes se explicaba culpando a las letras
       await page.getByRole('button', { name: 'Buscar palabras' }).click();
-      // Con 5..10 esas mismas letras dan 32 palabras (CASO 2a). Aquí no sale ninguna, pero el
-      // motivo no son las letras: es que se pide un mínimo mayor que el máximo. El mensaje
-      // «Prueba añadiendo más letras» empuja justo en la dirección contraria.
-      await expect(page.locator('[class*="noResults"]')).not.toContainText(
-        'No se encontraron palabras con esas letras'
-      );
+      await expect(page.locator('[class*="noResults"]')).toHaveCount(0);
+      await expect(page.locator('[class*="wordCard"], [class*="word"]').first()).toBeVisible();
     });
 
-    test.fail('los datos del bloque educativo deberían ser correctos', async ({ page }) => {
+    test('los datos del bloque educativo son correctos', async ({ page }) => {
       await abrirConDiccionario(page);
       await page.getByRole('button', { name: 'Ver guía educativa' }).click();
       // MURCIÉLAGO tiene 10 letras (m-u-r-c-i-é-l-a-g-o), no 12. Es el heterograma que la
@@ -471,9 +484,12 @@ test.describe('generador-anagramas', () => {
       );
       // Y en el Scrabble español la Q vale 5 puntos (no 8) y no existe ficha K: el juego en
       // español no lleva K ni W. Los demás valores de esa lista sí son correctos.
-      await expect(
-        page.locator('details', { hasText: '¿Qué letras son más valiosas en Scrabble español?' })
-      ).not.toContainText('K (8)');
+      const scrabble = page.locator('details', {
+        hasText: '¿Qué letras son más valiosas en Scrabble español?',
+      });
+      await expect(scrabble).not.toContainText('K (8)');
+      await expect(scrabble).toContainText('Q (5)');
+      await expect(scrabble).toContainText('no tiene fichas K ni W');
     });
   });
 });
