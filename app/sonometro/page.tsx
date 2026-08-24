@@ -17,6 +17,54 @@ const NOISE_LEVELS = [
   { min: 100, max: 130, label: 'Peligroso', color: '#dc2626', icon: '🔴', examples: 'Sirena, taladro, avión' },
 ];
 
+/** Fondo de escala del medidor: 0-130 dB(A) repartidos en el semicírculo. */
+const DB_MAXIMO_ESCALA = 130;
+
+/** Ángulo de la aguja para un nivel, en grados: −90° (0 dB) a +90° (130 dB). */
+const anguloDe = (db: number): number => (db / DB_MAXIMO_ESCALA) * 180 - 90;
+
+/**
+ * Las bandas de color, como SECTORES del semicírculo y no como columnas verticales.
+ *
+ * La aguja gira linealmente en dB, así que la posición horizontal de su punta va con el
+ * SENO del ángulo; las bandas se repartían con anchuras lineales en dB, de modo que las dos
+ * escalas solo coincidían en el centro. En los extremos la aguja señalaba una banda distinta
+ * de la que la propia app declaraba: con 3,0 dB(A) («Muy silencioso 0-30») la punta caía
+ * sobre el verde de «Silencioso 30-50», y con 111,0 dB(A) («Peligroso»), sobre «Muy
+ * ruidoso». Era el hallazgo 279 del Inspector, que la reparación del suelo de 8 bits destapó
+ * al permitir por fin lecturas por debajo de 44,9 dB.
+ *
+ * Con un `conic-gradient` centrado en el pivote de la aguja, banda y aguja comparten escala
+ * por construcción: el ángulo del sector ES el ángulo de la aguja.
+ */
+const FONDO_ESCALA = `conic-gradient(from 270deg at 50% 100%, ${NOISE_LEVELS.map(
+  (level) =>
+    `${level.color} ${(level.min / DB_MAXIMO_ESCALA) * 180}deg ${(level.max / DB_MAXIMO_ESCALA) * 180}deg`,
+).join(', ')})`;
+
+/** Los valores rotulados en el arco: los bordes de las siete bandas. */
+const MARCAS_ESCALA = [0, 30, 50, 70, 85, 100, 130];
+
+/**
+ * Coloca cada rótulo en SU ángulo, no a distancias iguales. Con `justify-content:
+ * space-between` los siete números se repartían por igual aunque sus valores no lo estén
+ * (de 70 a 85 hay 15 dB y de 100 a 130, treinta), y se desalineaban de los bordes de color
+ * hasta 25 px.
+ *
+ * El contenedor tiene proporción 2:1, así que su alto es el radio del arco: un mismo factor
+ * vale como porcentaje de medio ancho y como porcentaje del alto, y el resultado es
+ * circular sin necesidad de píxeles.
+ */
+const RADIO_MARCAS = 0.72; // fracción del radio del arco
+
+const posicionDeMarca = (db: number): { left: string; bottom: string } => {
+  const radianes = (anguloDe(db) * Math.PI) / 180;
+  return {
+    left: `${50 + RADIO_MARCAS * 50 * Math.sin(radianes)}%`,
+    bottom: `${RADIO_MARCAS * 100 * Math.cos(radianes)}%`,
+  };
+};
+
 // Obtener nivel actual
 function getNoiseLevel(db: number) {
   return NOISE_LEVELS.find(level => db >= level.min && db < level.max) || NOISE_LEVELS[NOISE_LEVELS.length - 1];
@@ -30,6 +78,19 @@ const CALIBRACION_DEFECTO = 90;
 const CALIBRACION_MIN = 60;
 const CALIBRACION_MAX = 120;
 const CLAVE_CALIBRACION = 'sonometro-calibracion';
+
+/**
+ * Fotogramas que el instrumento se da para estabilizarse antes de empezar a acumular
+ * estadísticas de sesión.
+ *
+ * Se cuenta en FOTOGRAMAS y no en milisegundos porque lo que tiene que asentarse depende de
+ * cuántas veces se ha leído el analizador, no del reloj: la ventana temporal son 2048
+ * muestras (~46 ms, tres fotogramas a 60 fps) y el `smoothingTimeConstant` de 0,3 promedia
+ * lecturas consecutivas, así que su error decae 0,3^n por LECTURA. Con diez, es de 6·10⁻⁶.
+ * Una guarda por tiempo funcionaba con el equipo desahogado y fallaba con él cargado, que es
+ * justo cuando llegan menos fotogramas por segundo.
+ */
+const FOTOGRAMAS_ESTABILIZACION = 10;
 
 /**
  * Ganancia de la ponderación A a una frecuencia, en dB (IEC 61672-1).
@@ -84,6 +145,8 @@ export default function SonometroPage() {
   const energiaMediaRef = useRef(0);
   const muestrasRef = useRef(0);
   const inicioRef = useRef(0);
+  // Fotogramas CON AUDIO ya leídos: los primeros no cuentan para las estadísticas
+  const fotogramasRef = useRef(0);
   // La calibración se lee dentro del bucle sin recrearlo: si viviera en las
   // dependencias de calculateDb, cada ajuste del slider reiniciaría measureLoop.
   const calibracionRef = useRef(CALIBRACION_DEFECTO);
@@ -108,11 +171,30 @@ export default function SonometroPage() {
     }
   }, []);
 
-  // Espejo de la calibración para el bucle + persistencia
+  // Espejo de la calibración para el bucle de medición, que la lee por ref
   useEffect(() => {
     calibracionRef.current = calibracion;
-    window.localStorage.setItem(CLAVE_CALIBRACION, String(calibracion));
   }, [calibracion]);
+
+  /**
+   * Único punto por el que se cambia la calibración, y el único que la persiste.
+   *
+   * Persistirla en un efecto sobre `[calibracion]` creaba una carrera con el efecto que la
+   * RECUPERA: en el primer commit se ejecutaban los dos, y el segundo escribía el valor por
+   * defecto (90) sobre el que el primero acababa de leer. Con StrictMode —o sea, en todo el
+   * desarrollo— la segunda pasada de efectos releía ese 90 y la calibración del usuario se
+   * perdía en cada carga. Encontrado el 24/08/2026 al escribir el test de regresión del
+   * hallazgo 279, que necesitaba arrancar con una calibración guardada de 60 dB.
+   *
+   * Guardar solo cuando alguien la cambia elimina la carrera: no hay ningún camino por el
+   * que el valor por defecto llegue a escribirse encima del guardado.
+   */
+  const cambiarCalibracion = useCallback((valor: number) => {
+    const acotada = Math.min(CALIBRACION_MAX, Math.max(CALIBRACION_MIN, valor));
+    setCalibracion(acotada);
+    calibracionRef.current = acotada;
+    window.localStorage.setItem(CLAVE_CALIBRACION, String(acotada));
+  }, []);
 
   /**
    * Calcular dB desde la onda del analizador.
@@ -172,11 +254,52 @@ export default function SonometroPage() {
     const dataArray = new Float32Array(analyserRef.current.fftSize);
     analyserRef.current.getFloatTimeDomainData(dataArray);
 
+    /**
+     * Los primeros fotogramas no son una medición: son el búfer del analizador antes de que
+     * llegue el audio, con TODAS las muestras exactamente a cero. `startMeasuring` llama a
+     * este bucle de forma síncrona nada más conectar el analizador, así que las tres o
+     * cuatro primeras vueltas leían −140 dB (el suelo de `Math.max(rms, 1e-7)`), que el
+     * recorte dejaba en 0, y `setMinDb(prev => Math.min(prev, 0))` clavaba el mínimo de la
+     * sesión en 0,0 dB(A) para siempre — en cualquier medición y en cualquier dispositivo.
+     * Contaminaba además el LAeq (60,9 en vez de 61,0 con señal constante). Era el hallazgo
+     * 278 del Inspector, y también la causa de que su propio spec fallara de forma
+     * intermitente según qué fotograma pillase.
+     *
+     * Un micrófono real nunca devuelve 2048 ceros exactos: siempre hay ruido de fondo,
+     * aunque sea de un LSB. Un cero exacto significa «todavía no hay señal» (o el micrófono
+     * está silenciado), y de eso no se sigue ningún nivel sonoro: se salta el fotograma sin
+     * tocar ninguna estadística.
+     */
+    if (dataArray.every((muestra) => muestra === 0)) {
+      animationRef.current = requestAnimationFrame(measureLoop);
+      return;
+    }
+
     // El instrumento entero trabaja en dB(A): es la magnitud que rotula («LAeq») y la que
     // usan los límites que su propio bloque educativo manda comparar.
     const db = Math.max(0, Math.min(130, calculateDb(dataArray) + correccionPonderacionA()));
 
     setCurrentDb(db);
+
+    /**
+     * Y todavía hay unos fotogramas más en los que la ventana de análisis está a MEDIO
+     * llenar: el búfer trae ya audio al final y ceros de relleno al principio, así que su
+     * RMS es menor que el de la señal. Con un tono constante de 61,0 dB(A) el mínimo salía
+     * 39,5 solo por esas primeras ventanas.
+     *
+     * El reloj de la sesión arranca en el primer fotograma CON audio, y las estadísticas
+     * —mínimo, máximo y LAeq— empiezan a acumular cuando la ventana ya está llena. La
+     * lectura instantánea sí se muestra desde el principio: lo que no se hace es dejar que
+     * un artefacto del arranque se quede grabado en el resumen de la sesión.
+     */
+    const ahora = performance.now();
+    if (inicioRef.current === 0) inicioRef.current = ahora;
+    if (fotogramasRef.current < FOTOGRAMAS_ESTABILIZACION) {
+      fotogramasRef.current += 1;
+      animationRef.current = requestAnimationFrame(measureLoop);
+      return;
+    }
+
     setMinDb(prev => Math.min(prev, db));
     setMaxDb(prev => Math.max(prev, db));
 
@@ -240,7 +363,10 @@ export default function SonometroPage() {
       setDuracion(0);
       energiaMediaRef.current = 0;
       muestrasRef.current = 0;
-      inicioRef.current = performance.now();
+      // 0 = «aún no ha llegado audio». Lo pone el bucle en su primer fotograma con señal,
+      // para que la duración de la sesión no incluya la espera del micrófono.
+      inicioRef.current = 0;
+      fotogramasRef.current = 0;
 
       setIsActive(true);
       setHayMedicion(true);
@@ -300,12 +426,14 @@ export default function SonometroPage() {
     energiaMediaRef.current = 0;
     muestrasRef.current = 0;
     inicioRef.current = performance.now();
+    fotogramasRef.current = 0;
   };
 
   const currentLevel = getNoiseLevel(currentDb);
 
-  // Calcular rotación de la aguja (de -90° a 90° para 0-130 dB)
-  const needleRotation = (currentDb / 130) * 180 - 90;
+  // Rotación de la aguja: la MISMA función que reparte los sectores de color y coloca los
+  // rótulos, para que las tres cosas no puedan volver a decir niveles distintos.
+  const needleRotation = anguloDe(currentDb);
 
   return (
     <div className={styles.container}>
@@ -329,24 +457,15 @@ export default function SonometroPage() {
           {/* Medidor visual */}
           <div className={styles.meterContainer}>
             <div className={styles.meterBackground}>
-              {/* Escala de colores */}
-              <div className={styles.meterScale}>
-                {NOISE_LEVELS.map((level, index) => (
-                  <div
-                    key={index}
-                    className={styles.scaleSegment}
-                    style={{
-                      background: level.color,
-                      width: `${((level.max - level.min) / 130) * 100}%`
-                    }}
-                  />
-                ))}
-              </div>
+              {/* Escala de colores — sectores ANGULARES, la misma escala que gira la aguja */}
+              <div className={styles.meterScale} style={{ background: FONDO_ESCALA }} />
 
-              {/* Marcas de escala */}
+              {/* Marcas de escala, cada una en el ángulo que le corresponde */}
               <div className={styles.scaleMarks}>
-                {[0, 30, 50, 70, 85, 100, 130].map(mark => (
-                  <span key={mark} className={styles.scaleMark}>{mark}</span>
+                {MARCAS_ESCALA.map(mark => (
+                  <span key={mark} className={styles.scaleMark} style={posicionDeMarca(mark)}>
+                    {mark}
+                  </span>
                 ))}
               </div>
 
@@ -478,7 +597,7 @@ export default function SonometroPage() {
             <button
               type="button"
               className={styles.btnCalib}
-              onClick={() => setCalibracion(v => Math.max(CALIBRACION_MIN, v - 1))}
+              onClick={() => cambiarCalibracion(calibracion - 1)}
               disabled={calibracion <= CALIBRACION_MIN}
               aria-label="Reducir la calibración un decibelio"
             >
@@ -491,14 +610,14 @@ export default function SonometroPage() {
               max={CALIBRACION_MAX}
               step={1}
               value={calibracion}
-              onChange={(e) => setCalibracion(Number(e.target.value))}
+              onChange={(e) => cambiarCalibracion(Number(e.target.value))}
               id="calibracion"
               aria-describedby="calibracion-valor"
             />
             <button
               type="button"
               className={styles.btnCalib}
-              onClick={() => setCalibracion(v => Math.min(CALIBRACION_MAX, v + 1))}
+              onClick={() => cambiarCalibracion(calibracion + 1)}
               disabled={calibracion >= CALIBRACION_MAX}
               aria-label="Aumentar la calibración un decibelio"
             >
@@ -513,7 +632,7 @@ export default function SonometroPage() {
               <button
                 type="button"
                 className={styles.btnCalibReset}
-                onClick={() => setCalibracion(CALIBRACION_DEFECTO)}
+                onClick={() => cambiarCalibracion(CALIBRACION_DEFECTO)}
               >
                 <span aria-hidden="true">↩️</span> Volver al valor por defecto ({CALIBRACION_DEFECTO} dB)
               </button>

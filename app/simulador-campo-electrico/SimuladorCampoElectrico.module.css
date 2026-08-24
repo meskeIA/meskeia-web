@@ -761,3 +761,50 @@
   line-height: 1.6;
   color: var(--text-secondary);
 }
+
+/* Posición exacta de la sonda — la vía sin ratón (hallazgo 270) */
+.sondaExacta {
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border);
+}
+
+.sondaExactaTitulo {
+  margin: 0 0 var(--spacing-xs);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.sondaExactaCampos {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.sondaExactaCampo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.sondaExactaCampo input {
+  width: 5.5rem;
+  padding: 4px 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--background);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.sondaExactaCampo input:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.canvasSvg:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}

@@ -162,6 +162,19 @@ function estadoDelMedio(page: Page) {
 /** Lectura digital grande, tal cual se ve (formato español: coma decimal). */
 const lecturaTexto = (page: Page) => page.locator('[class*="dbValue"]');
 
+/**
+ * Espera a que la app esté midiendo de verdad.
+ *
+ * Con el timeout de 5 s de `expect` esta espera fallaba de vez en cuando y en un caso
+ * distinto cada vez: lo que tarda no es la app sino el micrófono SINTÉTICO —crear el
+ * AudioContext y reanudarlo—, y en una máquina cargada se va por encima de cinco segundos.
+ * Un test que solo pasa si el equipo va desahogado no informa de nada, así que la espera se
+ * declara con el mismo margen que `esperarMedicionEnMarcha`.
+ */
+async function esperarLectura(page: Page): Promise<void> {
+  await expect(lecturaTexto(page)).not.toHaveText('--', { timeout: 15000 });
+}
+
 /** La misma lectura como número, para poder compararla con un valor calculado. */
 async function lecturaNumero(page: Page): Promise<number> {
   const texto = (await lecturaTexto(page).innerText()).trim();
@@ -204,7 +217,7 @@ async function medirTono(
   await micrófonoSintético(pagina, frecuencia, amplitud);
   await pagina.goto(RUTA);
   await pagina.getByRole('button', { name: /Iniciar medición/i }).click();
-  await expect(lecturaTexto(pagina)).not.toHaveText('--');
+  await esperarLectura(pagina);
   await pagina.waitForTimeout(1500); // que se asiente: el nivel es constante, no hace falta más
   const db = await lecturaNumero(pagina);
   const etiqueta = (await pagina.locator('[class*="levelLabel"]').textContent())?.trim() ?? '';
@@ -538,81 +551,158 @@ test('REGRESIÓN C — el permiso denegado se anuncia a la ayuda técnica y no r
   expect(erroresDeJs, 'una excepción sin capturar dejaría la app muerta').toEqual([]);
 });
 
+
 // ===========================================================================
-// HALLAZGOS ABIERTOS — 2.ª pasada del Inspector, 24/08/2026
+// HALLAZGOS 278 y 279 — 2.ª pasada del Inspector, 24/08/2026 · REPARADOS el 24/08/2026
 // ===========================================================================
 
-// ⚠️ HALLAZGO 8 — cálculo. El «Mínimo» de la sesión marca 0,0 dB(A) SIEMPRE, en toda medición
-// y en cualquier dispositivo. `startMeasuring` llama a `measureLoop()` de forma síncrona justo
-// después de conectar el analizador, cuando su búfer todavía está a cero: las tres primeras
-// vueltas del bucle leen −50 dB (el suelo de `Math.max(rms, 1e-7)`), que el recorte
-// `Math.max(0, …)` deja en 0, y `setMinDb(prev => Math.min(prev, 0))` clava el mínimo en 0
-// para el resto de la sesión. Es una de las tres estadísticas que la app enseña y una de las
-// prestaciones que anuncia su metadata («Valores mínimo, máximo y duración acumulada»); con un
-// tono perfectamente constante debería coincidir con el máximo. La prueba de que el culpable
-// son los primeros fotogramas y no la señal: pulsando «Resetear» un segundo después —misma
-// app, misma señal, mismo micrófono— el mínimo pasa a 61,0.
-// Caso: tono constante de 1 kHz y amplitud 0,05 (61,0 dB(A) estables durante 12 s) →
-//       esperado mínimo ≈ 61,0 · obtenido 0,0 (máximo 61,0; tras «Resetear», 61,0).
-test.fail('HALLAZGO 8 — con una señal constante el mínimo de sesión debe valer lo que la señal', async ({
+/**
+ * HALLAZGO 278 — el «Mínimo» de la sesión marcaba 0,0 dB(A) SIEMPRE, en toda medición y en
+ * cualquier dispositivo. `startMeasuring` llama a `measureLoop()` de forma síncrona justo
+ * después de conectar el analizador, cuando su búfer todavía está a cero: las primeras
+ * vueltas leían −140 dB (el suelo de `Math.max(rms, 1e-7)`), que el recorte `Math.max(0, …)`
+ * dejaba en 0, y `setMinDb(prev => Math.min(prev, 0))` clavaba el mínimo el resto de la
+ * sesión. Es una de las tres estadísticas que la app enseña, una de las prestaciones que
+ * anuncia su metadata, y la que usaría un vecino para documentar el suelo de ruido nocturno.
+ *
+ * Ahora los fotogramas cuyo búfer es todo ceros exactos se saltan sin tocar estadísticas: un
+ * micrófono real nunca devuelve 2048 ceros seguidos. Era además la causa de que este mismo
+ * spec fallara de forma intermitente, en un caso distinto según qué fotograma pillara.
+ */
+test('HALLAZGO 278 — con una señal constante el mínimo de sesión vale lo que la señal', async ({
   page,
 }) => {
   await micrófonoSintético(page, 1000, 0.05);
   await page.goto(RUTA);
   await page.getByRole('button', { name: /Iniciar medición/i }).click();
-  await expect(lecturaTexto(page)).not.toHaveText('--');
+  await esperarLectura(page);
   await page.waitForTimeout(2500);
 
-  const { min, max } = await estadisticas(page);
-  expect(max).toBe('61,0'); // control: el máximo sí sale bien (20·log₁₀(0,05/√2)+90 = 60,97)
-  expect(min, 'el mínimo se queda clavado en 0,0 por los fotogramas previos al audio').toBe('61,0');
+  // 20·log₁₀(0,05/√2) + 90 = 60,97 → «61,0» con un decimal, y la ponderación A a 1 kHz es 0
+  const { min, max, laeq } = await estadisticas(page);
+  expect(max).toBe('61,0');
+
+  /**
+   * El mínimo se comprueba contra el MÁXIMO y no contra un literal. Lo que el hallazgo dice
+   * es que el mínimo tiene que reflejar la señal, y eso es lo que se mide aquí: antes salía
+   * 0,0 (los fotogramas previos al audio) y, quitados esos, 39,5 (la ventana a medio llenar).
+   * Un literal exacto obligaría además a que el audio simulado no tuviera ni un microcorte,
+   * y con el equipo cargado los tiene: entonces 59,9 es la lectura CORRECTA de una señal que
+   * de verdad bajó, y un sonómetro que la escondiera estaría mintiendo.
+   */
+  const aNumero = (t: string) => Number(t.replace(',', '.'));
+  expect(
+    aNumero(min),
+    `el mínimo (${min}) debería ir con la señal (máximo ${max}), no con el arranque`,
+  ).toBeGreaterThan(aNumero(max) - 2);
+  // Y el LAeq deja de estar contaminado por esos ceros iniciales (daba 60,9 con 61,0 de señal)
+  expect(aNumero(laeq)).toBeGreaterThan(aNumero(max) - 1);
 });
 
-// ⚠️ HALLAZGO 9 — operativa. La aguja y la barra de colores del medidor usan dos escalas
-// DISTINTAS y solo coinciden en el centro. La aguja gira linealmente en dB
-// (`(currentDb / 130) * 180 - 90`, page.tsx), así que la posición horizontal de su punta va
-// con el SENO del ángulo; las bandas de color, en cambio, se reparten con anchuras lineales en
-// dB (`width: ((max - min) / 130) * 100%`). Resultado: en los extremos la aguja señala una
-// banda que no es la que la propia app declara. Las marcas numéricas 0/30/50/70/85/100/130
-// añaden una tercera escala, repartida a distancias IGUALES (`justify-content: space-between`),
-// desalineada con los bordes de color hasta 25 px. No es una regresión de la reparación, pero
-// la reparación es la que lo hace visible: hasta el 24/08 la lectura nunca bajaba de 44,9 dB y
-// la aguja no llegaba a la zona donde más se desvía.
-// Caso: calibración 60 y senoide de 1 kHz amplitud 0,002 → lectura 3,0 dB(A), etiqueta «Muy
-//       silencioso» y fila «0-30 dB» resaltada en la tabla · esperado que la punta de la aguja
-//       caiga sobre la banda 0-30 (x ∈ [464, 545] px) · obtenida en x = 552 px, sobre la banda
-//       verde «Silencioso 30-50». En el otro extremo, 111,0 dB(A) («Peligroso 100-130») pone
-//       la punta en x = 723, dentro de «Muy ruidoso 85-100».
-test.fail('HALLAZGO 9 — la aguja debe apuntar a la banda de color que la app declara', async ({
+/**
+ * HALLAZGO 279 — la aguja y la barra de colores usaban dos escalas DISTINTAS y solo
+ * coincidían en el centro. La aguja gira linealmente en dB, así que la posición horizontal
+ * de su punta va con el SENO del ángulo; las bandas se repartían con anchuras lineales en dB.
+ * En los extremos la aguja señalaba una banda que no era la que la propia app declara: con
+ * 3,0 dB(A) («Muy silencioso 0-30») caía sobre el verde de «Silencioso 30-50», y con 111,0
+ * dB(A) («Peligroso»), sobre «Muy ruidoso». Las marcas numéricas añadían una tercera escala,
+ * repartida a distancias iguales y desalineada hasta 25 px.
+ *
+ * Ahora las bandas son sectores angulares de un `conic-gradient` centrado en el pivote de la
+ * aguja, y los rótulos van cada uno en su ángulo. Este test no compara la aguja con la
+ * fórmula —sería tautológico, es la misma función— sino con lo que el navegador PINTA: qué
+ * color hay bajo la punta de la aguja, y si es el de la banda que la app rotula.
+ */
+async function colorBajoLaAguja(page: Page): Promise<{ pintado: string; declarado: string }> {
+  return page.evaluate(() => {
+    const aguja = document.querySelector('[class*="needle"]') as HTMLElement;
+    const matriz = new DOMMatrix(getComputedStyle(aguja).transform);
+    // Ángulo de la aguja respecto a la vertical, en grados y en sentido horario
+    const anguloAguja = (Math.atan2(matriz.b, matriz.a) * 180) / Math.PI;
+    // El conic-gradient arranca en 270deg (las 9 en punto), así que el ángulo de cono de la
+    // aguja es el suyo más 90.
+    const anguloCono = anguloAguja + 90;
+
+    const escala = document.querySelector('[class*="meterScale"]') as HTMLElement;
+    const fondo = getComputedStyle(escala).backgroundImage;
+    // El navegador normaliza el gradiente a paradas sueltas («rgb(16, 185, 129) 0deg,
+    // rgb(16, 185, 129) 41.5385deg, …»), así que se leen las paradas y el tramo es el hueco
+    // entre dos consecutivas.
+    const paradas = [...fondo.matchAll(/(rgba?\([^)]+\))\s+([\d.]+)deg/g)].map((m) => ({
+      color: m[1],
+      grados: parseFloat(m[2]),
+    }));
+    const i = paradas.findIndex(
+      (p, k) => k < paradas.length - 1 && anguloCono >= p.grados && anguloCono <= paradas[k + 1].grados,
+    );
+    const sector = i >= 0 ? paradas[i] : undefined;
+
+    const indicador = document.querySelector('[class*="levelIndicator"]') as HTMLElement;
+    return {
+      pintado: sector?.color ?? `sin sector para ${anguloCono.toFixed(1)}deg entre ${paradas.length} paradas`,
+      declarado: getComputedStyle(indicador).backgroundColor,
+    };
+  });
+}
+
+test('HALLAZGO 279 — la aguja apunta al color de la banda que la app declara, también en los extremos', async ({
   page,
+  browser,
 }) => {
-  // Calibración 60 (mínimo del deslizador) guardada como si el usuario ya la hubiera ajustado.
+  // (a) Extremo bajo. Calibración 60 (mínimo del deslizador), 1 kHz y amplitud 0,002:
+  //     20·log₁₀(0,002/√2) + 60 = 3,01 dB(A) → primera franja de la tabla de la app.
   await page.addInitScript(() => window.localStorage.setItem('sonometro-calibracion', '60'));
   await micrófonoSintético(page, 1000, 0.002);
   await page.goto(RUTA);
   await page.getByRole('button', { name: /Iniciar medición/i }).click();
-  await expect(lecturaTexto(page)).not.toHaveText('--');
+  await esperarLectura(page);
   await page.waitForTimeout(1500);
 
-  // 20·log₁₀(0,002/√2) + 60 = 3,01 dB(A) → primera franja de la tabla de la app.
   expect(await lecturaNumero(page)).toBeCloseTo(3.01, 0);
   await expect(page.locator('[class*="levelLabel"]')).toHaveText('Muy silencioso');
+  const bajo = await colorBajoLaAguja(page);
+  expect(bajo.pintado, 'la punta de la aguja cae fuera de la banda 0-30 dB').toBe(bajo.declarado);
 
-  const geometria = await page.evaluate(() => {
-    const aguja = document.querySelector('[class*="needle"]') as HTMLElement;
-    const matriz = new DOMMatrix(getComputedStyle(aguja).transform);
-    const angulo = Math.atan2(matriz.b, matriz.a); // radianes
-    const padre = (aguja.offsetParent as HTMLElement).getBoundingClientRect();
-    // transform-origin: bottom center (Sonometro.module.css)
-    const pivoteX = padre.left + aguja.offsetLeft + aguja.offsetWidth / 2;
-    const puntaX = pivoteX + aguja.offsetHeight * Math.sin(angulo);
-    const primeraBanda = document.querySelector('[class*="scaleSegment"]')!.getBoundingClientRect();
-    return { puntaX, izq: primeraBanda.left, der: primeraBanda.right };
-  });
+  // (b) Extremo alto, en una pestaña propia: calibración 120 y amplitud 0,5 →
+  //     20·log₁₀(0,5/√2) + 120 = 111,0 dB(A) → «Peligroso 100-130».
+  const contexto = await browser.newContext({ permissions: ['microphone'] });
+  const alta = await contexto.newPage();
+  await alta.addInitScript(() => window.localStorage.setItem('sonometro-calibracion', '120'));
+  await micrófonoSintético(alta, 1000, 0.5);
+  await alta.goto(RUTA);
+  await alta.getByRole('button', { name: /Iniciar medición/i }).click();
+  await esperarLectura(alta);
+  await alta.waitForTimeout(1500);
 
-  expect(
-    geometria.puntaX,
-    `la punta cae en x=${geometria.puntaX.toFixed(1)}, fuera de la banda 0-30 dB ` +
-      `[${geometria.izq.toFixed(1)}, ${geometria.der.toFixed(1)}]`,
-  ).toBeLessThanOrEqual(geometria.der);
+  expect(await lecturaNumero(alta)).toBeCloseTo(111.0, 0);
+  await expect(alta.locator('[class*="levelLabel"]')).toHaveText('Peligroso');
+  const altoColor = await colorBajoLaAguja(alta);
+  expect(altoColor.pintado, 'la punta de la aguja cae fuera de la banda 100-130 dB').toBe(
+    altoColor.declarado,
+  );
+  await contexto.close();
+});
+
+test('HALLAZGO 279 — los rótulos de la escala van cada uno en su ángulo, no a distancias iguales', async ({
+  page,
+}) => {
+  await page.goto(RUTA);
+  const centros = await page.evaluate(() =>
+    [...document.querySelectorAll('[class*="scaleMarks"] > span')].map((el) => {
+      const r = el.getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2, texto: el.textContent };
+    }),
+  );
+  expect(centros.map((c) => c.texto)).toEqual(['0', '30', '50', '70', '85', '100', '130']);
+
+  // Distancia horizontal entre rótulos consecutivos. Con `space-between` eran todas iguales;
+  // repartidos por ángulo, los de los extremos se comprimen por el coseno.
+  const separaciones = centros.slice(1).map((c, i) => c.x - centros[i].x);
+  expect(Math.min(...separaciones), 'algún rótulo se ha quedado a la izquierda del anterior').toBeGreaterThan(0);
+  // 0→30 dB y 50→70 dB: el primero cae en el extremo del arco y el segundo en el centro, así
+  // que el primero tiene que separar MENOS aunque abarque más decibelios.
+  expect(separaciones[0]).toBeLessThan(separaciones[2]);
+  // Y los rótulos no están todos a la misma altura: siguen el arco
+  const alturas = centros.map((c) => c.y);
+  expect(Math.max(...alturas) - Math.min(...alturas)).toBeGreaterThan(20);
 });

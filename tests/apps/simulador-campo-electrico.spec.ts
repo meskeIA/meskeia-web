@@ -568,7 +568,7 @@ test('HALLAZGO 220 y formato español · superíndices reales y coma decimal en 
 // Estos cuatro tests FALLAN hoy a propósito: describen lo que debería ocurrir.
 // ═══════════════════════════════════════════════════════════════════════════════════════
 
-// ⚠️ HALLAZGO ABIERTO — contenido. El aviso de singularidad termina diciendo «Lo que se lee
+// HALLAZGO 271 (contenido) · REPARADO el 24/08/2026. El aviso de singularidad terminaba diciendo «Lo que se lee
 // abajo es lo que aportan las demás cargas», que es la frase de cuando el panel SÍ enseñaba
 // esas cifras. La reparación las sustituyó por «—» en las seis filas, así que el aviso
 // promete una lectura que ya no existe y se contradice con lo que hay debajo, en la misma
@@ -576,33 +576,39 @@ test('HALLAZGO 220 y formato español · superíndices reales y coma decimal en 
 // Caso: preset «Dipolo», sonda arrastrada a (−0,50; 0,00) → esperado un aviso coherente con
 //       el panel · obtenido «Lo que se lee abajo es lo que aportan las demás cargas» encima
 //       de seis filas que ponen «—».
-test.fail('REGRESIÓN (contenido) — el aviso de singularidad no debe prometer cifras que el panel no da', async ({
+test('REGRESIÓN 271 (contenido) — el aviso de singularidad no promete cifras que el panel no da', async ({
   page,
 }) => {
   await page.getByRole('button', { name: 'Dipolo' }).click();
   await arrastrarSonda(page, 350, 250);
   await expect(valor(page, '|E| (campo)')).toHaveText('—');
   await expect(page.locator('[role="status"] p')).not.toContainText('Lo que se lee abajo');
+  // Y dice lo que de verdad pasa: que ni el panel ni el lienzo dan nada ahí
+  await expect(page.locator('[role="status"] p')).toContainText('no dibuja la flecha de fuerza');
 });
 
-// ⚠️ HALLAZGO ABIERTO — operativa. Sobre el punto singular el panel dice «—», pero el lienzo
-// SIGUE dibujando la flecha verde de fuerza sobre q₀, calculada con las cargas que quedan.
+// HALLAZGO 272 (operativa) · REPARADO el 24/08/2026. Sobre el punto singular el panel decía «—»
+// pero el lienzo SEGUÍA dibujando la flecha verde de fuerza sobre q₀, calculada con las cargas que quedan.
 // El vector no es decorativo: su longitud codifica el módulo (lenF = 14 + 30·log10(1+F·1e8)),
 // de modo que los 36,20 px medidos son exactamente |F| = 4,50 × 10⁻⁸ N, o sea los 44,95 N/C
 // de la otra carga — la misma cifra que la reparación retiró del panel por engañosa.
 // Caso: preset «Dipolo», sonda en (−0,50; 0,00) sobre la carga +5 nC → esperado ninguna
 //       flecha de fuerza (o marcada como no válida) · obtenido <line stroke="#16a34a"> de
 //       (350; 250) a (386,20; 250).
-test.fail('REGRESIÓN (operativa) — sobre la singularidad tampoco debe dibujarse el vector fuerza', async ({
+test('REGRESIÓN 272 (operativa) — sobre la singularidad tampoco se dibuja el vector fuerza', async ({
   page,
 }) => {
   await page.getByRole('button', { name: 'Dipolo' }).click();
   await arrastrarSonda(page, 350, 250);
   await expect(valor(page, '|F| sobre q₀')).toHaveText('—');
   await expect(lienzo(page).locator('line[stroke="#16a34a"]')).toHaveCount(0);
+  // Control: apartada de la carga, la flecha vuelve — no se ha eliminado, se ha condicionado
+  await arrastrarSonda(page, 500, 250);
+  await expect(valor(page, '|F| sobre q₀')).not.toHaveText('—');
+  await expect(lienzo(page).locator('line[stroke="#16a34a"]')).toHaveCount(1);
 });
 
-// ⚠️ HALLAZGO ABIERTO — operativa. La reparación acotó la SONDA al lienzo, pero no las
+// HALLAZGO 269 (operativa) · REPARADO el 24/08/2026. La reparación del 216 acotó la SONDA pero no las
 // CARGAS, que se arrastran con el mismo mecanismo (setPointerCapture + setCargas sin acotar).
 // Una carga arrastrada fuera del viewBox queda recortada por el SVG: invisible, pero sigue
 // contada en «Cargas en el sistema» y sigue alterando el campo. No hay ningún control para
@@ -612,7 +618,7 @@ test.fail('REGRESIÓN (operativa) — sobre la singularidad tampoco debe dibujar
 //       esperado que quede acotada al área visible (|x| ≤ 4,00 m) · obtenido x = 10,49 m,
 //       cx = 1448,69 en un viewBox que acaba en 800, círculo no visible, contador «2» y el
 //       potencial en (0,00; 1,00) pasando de 0 V a −36,50 V.
-test.fail('REGRESIÓN (operativa) — las cargas tampoco deben poder perderse fuera del lienzo', async ({
+test('REGRESIÓN 269 (operativa) — las cargas tampoco pueden perderse fuera del lienzo', async ({
   page,
 }) => {
   await page.getByRole('button', { name: 'Dipolo' }).click();
@@ -638,7 +644,7 @@ test.fail('REGRESIÓN (operativa) — las cargas tampoco deben poder perderse fu
   }
 });
 
-// ⚠️ HALLAZGO ABIERTO — accesibilidad. El lienzo no es operable con el teclado: dentro del
+// HALLAZGO 270 (accesibilidad) · REPARADO el 24/08/2026. El lienzo no era operable con el teclado: dentro del
 // <svg> no hay ni un elemento focalizable, el propio <svg> no tiene tabindex ni role, y no
 // existe ninguna entrada numérica alternativa para la posición de la sonda ni para colocar
 // cargas. Sin ratón, la configuración se queda en los cuatro presets y la sonda, clavada en
@@ -649,10 +655,35 @@ test.fail('REGRESIÓN (operativa) — las cargas tampoco deben poder perderse fu
 // Caso: cargar la app y contar elementos focalizables dentro del lienzo → esperado al menos
 //       uno (o controles numéricos equivalentes) · obtenido 0, con tabindex = null y
 //       role = null en el <svg>.
-test.fail('REGRESIÓN (accesibilidad) — el lienzo debe ofrecer alguna vía de teclado', async ({ page }) => {
+test('REGRESIÓN 270 (accesibilidad) — el lienzo se maneja con el teclado', async ({ page }) => {
   const focalizables = await lienzo(page).evaluate((svg: SVGSVGElement) => {
     const dentro = svg.querySelectorAll('[tabindex], button, a[href], input, [contenteditable]');
     return dentro.length + (svg.hasAttribute('tabindex') ? 1 : 0);
   });
   expect(focalizables, 'ni un elemento focalizable dentro del lienzo').toBeGreaterThan(0);
+
+  // Y la vía existe de verdad: las flechas mueven la sonda, con paso fino con Mayús
+  await page.getByRole('button', { name: 'Dipolo' }).click();
+  const leerX = async () => (await valor(page, 'Posición x').innerText()).trim();
+  await lienzo(page).focus();
+  const partida = await leerX();
+  await page.keyboard.press('ArrowRight');
+  const trasFlecha = await leerX();
+  expect(trasFlecha, 'la flecha derecha no movió la sonda').not.toBe(partida);
+  await page.keyboard.press('Shift+ArrowLeft');
+  expect(await leerX(), 'Mayús debe dar un paso más corto').not.toBe(partida);
+
+  // «+» coloca una carga donde está la sonda, «Supr» retira la más cercana
+  const cuantasCargas = () => lienzo(page).locator('circle[data-tipo="carga"]').count();
+  const antes = await cuantasCargas();
+  await page.keyboard.press('+');
+  expect(await cuantasCargas()).toBe(antes + 1);
+  await page.keyboard.press('Delete');
+  expect(await cuantasCargas()).toBe(antes);
+
+  // Y la posición exacta se puede escribir, que es lo que arrastrando no se puede
+  await page.locator('#sonda-x').fill('2');
+  await page.locator('#sonda-y').fill('-1');
+  await expect(valor(page, 'Posición x')).toHaveText('2,00 m');
+  await expect(valor(page, 'Posición y')).toHaveText('-1,00 m');
 });

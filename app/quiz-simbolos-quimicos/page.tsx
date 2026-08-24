@@ -225,7 +225,15 @@ export default function QuizSimbolosQuimicosPage() {
           <div className={styles.progresoBarra}>
             <div className={styles.progresoInfo}>
               <span>Pregunta {indice + 1} / {preguntas.length}</span>
-              <span role="status" aria-live="polite">
+              {/* Al envolver los emojis en aria-hidden (hallazgo 249) el número de aciertos se
+                  quedó sin rótulo: el emoji era su única etiqueta, y un lector de pantalla
+                  oía «10 · Racha: 10» después de cada respuesta. El aria-label da la frase
+                  completa sin cambiar lo que se ve (hallazgo 284). */}
+              <span
+                role="status"
+                aria-live="polite"
+                aria-label={`Aciertos: ${aciertos}. Racha: ${rachaActual}.`}
+              >
                 <span aria-hidden="true">✅</span> {aciertos} · <span aria-hidden="true">🔥</span> Racha:{' '}
                 {rachaActual}
               </span>
@@ -235,9 +243,11 @@ export default function QuizSimbolosQuimicosPage() {
                 className={styles.progresoFill}
                 style={{ width: `${((indice) / preguntas.length) * 100}%` }}
                 role="progressbar"
+                aria-label="Preguntas respondidas"
                 aria-valuemin={0}
                 aria-valuenow={indice}
                 aria-valuemax={preguntas.length}
+                aria-valuetext={`${indice} de ${preguntas.length} preguntas respondidas`}
               />
             </div>
           </div>
@@ -253,8 +263,15 @@ export default function QuizSimbolosQuimicosPage() {
             </div>
           </div>
 
-          {/* Opciones */}
-          <div className={styles.opcionesGrid}>
+          {/* Opciones.
+              SIN aria-pressed: es el atributo de un botón conmutador, y esto es elegir entre
+              alternativas. Un lector de pantalla anunciaba las cuatro como «botón de
+              alternar, no pulsado» antes de contestar, y una vez elegida una ya no se podía
+              «despulsar» porque las cuatro quedan disabled. El CLAUDE.md §5 exime justamente
+              a este patrón, y avisa de que un aria-pressed en un botón de acción es una
+              regresión y no una mejora (hallazgo 285). Tampoco se usa role="radio": estos
+              botones no preseleccionan nada, ejecutan la respuesta al pulsarlos. */}
+          <div className={styles.opcionesGrid} role="group" aria-label="Opciones de respuesta">
             {preguntaActual.opciones.map((opcion, i) => {
               const estado = estadoOpcion(opcion);
               return (
@@ -263,7 +280,6 @@ export default function QuizSimbolosQuimicosPage() {
                   className={`${styles.opcionBtn} ${styles[`opcion-${estado}`]}`}
                   onClick={() => responder(opcion)}
                   disabled={seleccionada !== null}
-                  aria-pressed={seleccionada === opcion}
                 >
                   <span className={styles.opcionLetra} aria-hidden="true">{LETRAS[i]}</span>
                   <span className={styles.opcionTexto}>{opcion}</span>
@@ -528,14 +544,19 @@ export default function QuizSimbolosQuimicosPage() {
               <h3>El wolframio aguanta el calor</h3>
               <p>El wolframio (W) tiene el punto de fusión más alto de todos los metales: 3.422 °C. Por eso se usa en filamentos de bombillas y electrodos de soldadura.</p>
             </div>
+            {/* Esta tarjeta hablaba OTRA VEZ del mercurio —misma etimología y misma liquidez
+                que la primera— bajo un icono de radiactividad, que el mercurio no es, y con
+                un titular sobre el dios y el planeta que su cuerpo no mencionaba. Se sustituye
+                por lo que el quiz pregunta de verdad: los símbolos que no se parecen a su
+                nombre en español (hallazgo 287 del Inspector). */}
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon} aria-hidden="true">☢️</span>
-              <h3>El mercurio, con nombre de dios y de planeta</h3>
-              <p>Su símbolo (Hg) no viene de «mercurio» sino de <em>hydrargyrum</em>, «plata líquida» en latín, del griego <em>hydrárgyros</em>. Es uno de los dos únicos elementos líquidos a temperatura ambiente, junto con el bromo.</p>
+              <span className={styles.tipIcon} aria-hidden="true">📜</span>
+              <h3>Los símbolos que no se parecen al nombre</h3>
+              <p>Diez elementos llevan la inicial de su nombre en latín, no en español: sodio es Na (<em>natrium</em>), potasio K (<em>kalium</em>), hierro Fe (<em>ferrum</em>), cobre Cu (<em>cuprum</em>), plata Ag (<em>argentum</em>), oro Au (<em>aurum</em>) y plomo Pb (<em>plumbum</em>). Son los que más se fallan en este quiz.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🌡️</span>
-              <h3>El helio y los globos</h3>
+              <h3>El helio se descubrió en el Sol</h3>
               <p>El helio (He) se descubrió primero en el Sol que en la Tierra: su nombre viene de <em>Helios</em> (dios griego del Sol). Es el segundo elemento más abundante del universo.</p>
             </div>
             <div className={styles.tipCard}>

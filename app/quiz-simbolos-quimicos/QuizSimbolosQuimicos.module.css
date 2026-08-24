@@ -196,6 +196,11 @@
   color: var(--text-secondary);
 }
 
+/*
+ * Mismo caso que .btnSiguiente, y peor: axe no evalúa gradientes y lo dejaba pasar en
+ * silencio, pero blanco sobre el teal de marca (#48A9A6) da 2,80:1. El gradiente se mantiene
+ * —es la identidad de la app— con los dos tonos accesibles de los tokens.
+ */
 .btnIniciar {
   width: 100%;
   padding: 1rem;
@@ -203,7 +208,7 @@
   font-weight: 700;
   border: none;
   border-radius: var(--radius);
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   cursor: pointer;
   transition: all 0.25s;
@@ -378,13 +383,21 @@
   color: var(--text-primary);
 }
 
+/*
+ * El botón que más se pulsa de la app (10 o 20 veces por partida). Con `--primary` (#2E86AB)
+ * y texto blanco de 16 px en negrita daba 4,11:1, por debajo del 4,5:1 que exige WCAG AA —16
+ * px bold no llega al umbral de texto grande, que empieza en 18,66 px bold—, y era idéntico
+ * en claro y en oscuro porque este módulo redefine `--primary` en `.container` y su bloque
+ * [data-theme='dark'] no lo toca. El proyecto ya tiene el token hecho: `--primary-boton`
+ * (#26718F) da 5,47:1 sobre blanco. Hallazgo 283 del Inspector.
+ */
 .btnSiguiente {
   padding: 0.85rem var(--spacing-xl);
   font-size: 1rem;
   font-weight: 700;
   border: none;
   border-radius: var(--radius);
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   cursor: pointer;
   transition: all 0.2s;
@@ -392,7 +405,7 @@
 }
 
 .btnSiguiente:hover {
-  background: #256a8a;
+  background: #1d5872;
   transform: translateY(-1px);
 }
 

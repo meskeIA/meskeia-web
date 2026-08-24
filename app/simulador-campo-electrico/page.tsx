@@ -11,7 +11,7 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatNumber } from '@/lib';
+import { formatNumber, parseSpanishNumberOr } from '@/lib';
 import styles from './SimuladorCampoElectrico.module.css';
 
 // ============================================================
@@ -404,19 +404,95 @@ export default function SimuladorCampoElectrico() {
     const svgPt = pointerASvg(e.clientX, e.clientY);
     if (!svgPt) return;
     const { x, y } = svgToWorld(svgPt.x, svgPt.y);
+    // Acotado al área visible: `setPointerCapture` mantiene el arrastre más allá del borde
+    // del SVG, así que sin esto lo arrastrado se pierde fuera del viewBox. La sonda se acotó
+    // al reparar el hallazgo 216, pero las CARGAS se arrastran con el mismo mecanismo y se
+    // quedaron fuera: una carga arrastrada al vacío quedaba invisible, seguía contada en
+    // «Cargas en el sistema» y seguía alterando el campo que el panel presenta como bueno,
+    // sin más salida que «Limpiar todo», que destruye la configuración entera. Es el
+    // hallazgo 269 del Inspector: la misma trampa del 216, movida de la sonda a las cargas.
+    const xAcotada = acotarAlLienzo(x, LIMITE_X);
+    const yAcotada = acotarAlLienzo(y, LIMITE_Y);
     if (arrastrandoId) {
-      setCargas((prev) => prev.map((c) => (c.id === arrastrandoId ? { ...c, x, y } : c)));
+      setCargas((prev) =>
+        prev.map((c) => (c.id === arrastrandoId ? { ...c, x: xAcotada, y: yAcotada } : c)),
+      );
     } else if (arrastrandoPrueba) {
-      // Acotada al área visible: setPointerCapture mantiene el arrastre más allá del borde del
-      // SVG, y sin esto la sonda se perdía fuera del viewBox mientras el panel seguía dando
-      // cifras de un punto invisible. No había forma de recuperarla salvo recargar la página.
-      setPruebaPos({ x: acotarAlLienzo(x, LIMITE_X), y: acotarAlLienzo(y, LIMITE_Y) });
+      setPruebaPos({ x: xAcotada, y: yAcotada });
     }
   };
 
   const handlePointerUp = () => {
     setArrastrandoId(null);
     setArrastrandoPrueba(false);
+  };
+
+  /**
+   * El lienzo, manejado con el teclado (hallazgo 270 del Inspector).
+   *
+   * No había dentro del SVG ni un elemento focalizable, ni tabindex, ni role, ni entrada
+   * numérica alternativa: sin ratón, la configuración se limitaba a los cuatro presets y la
+   * sonda se quedaba clavada en (1,50; 0,70), de modo que la promesa del subtítulo —«mide la
+   * fuerza sobre una carga de prueba»— era inalcanzable para quien navega con teclado o con
+   * lector de pantalla, que además solo oía «Lienzo del campo eléctrico» por muchas cargas
+   * que hubiera.
+   *
+   * Las flechas mueven la sonda, `+`/`−` colocan una carga donde está y `Supr` retira la más
+   * cercana. El paso es de 10 cm, y de 1 cm con Mayús, para poder acercarse a una carga sin
+   * caer en su singularidad (radio 5 cm). Debajo del panel hay además dos campos numéricos
+   * con la posición exacta, que sirven igual con ratón.
+   */
+  const handleCanvasKeyDown = (e: React.KeyboardEvent<SVGSVGElement>) => {
+    const paso = e.shiftKey ? 0.01 : 0.1;
+    const mover = (dx: number, dy: number) => {
+      e.preventDefault();
+      setPruebaPos((p) => ({
+        x: acotarAlLienzo(p.x + dx, LIMITE_X),
+        y: acotarAlLienzo(p.y + dy, LIMITE_Y),
+      }));
+    };
+
+    switch (e.key) {
+      case 'ArrowLeft':  return mover(-paso, 0);
+      case 'ArrowRight': return mover(paso, 0);
+      case 'ArrowUp':    return mover(0, paso);
+      case 'ArrowDown':  return mover(0, -paso);
+      case '+':
+      case 'Add':
+        e.preventDefault();
+        setCargas((prev) => [
+          ...prev,
+          { id: generarId(), x: pruebaPos.x, y: pruebaPos.y, q: magnitudNueva },
+        ]);
+        return;
+      case '-':
+      case '−':
+      case 'Subtract':
+        e.preventDefault();
+        setCargas((prev) => [
+          ...prev,
+          { id: generarId(), x: pruebaPos.x, y: pruebaPos.y, q: -magnitudNueva },
+        ]);
+        return;
+      case 'Delete':
+      case 'Backspace': {
+        e.preventDefault();
+        setCargas((prev) => {
+          if (prev.length === 0) return prev;
+          let masCercana = prev[0];
+          let menorDistancia = Infinity;
+          for (const c of prev) {
+            const d = Math.hypot(c.x - pruebaPos.x, c.y - pruebaPos.y);
+            if (d < menorDistancia) {
+              menorDistancia = d;
+              masCercana = c;
+            }
+          }
+          return prev.filter((c) => c.id !== masCercana.id);
+        });
+        return;
+      }
+    }
   };
 
   const handleEliminar = (e: React.MouseEvent<SVGGElement>, id: string) => {
@@ -706,7 +782,11 @@ export default function SimuladorCampoElectrico() {
                 onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp}
                 onPointerLeave={handlePointerUp}
+                onKeyDown={handleCanvasKeyDown}
+                tabIndex={0}
+                role="application"
                 aria-label="Lienzo del campo eléctrico"
+                aria-describedby="lienzo-teclado"
               >
                 {/* Mapa de color (debajo de todo) */}
                 {mapaColor.map((m, i) => (
@@ -862,8 +942,14 @@ export default function SimuladorCampoElectrico() {
                   >
                     q₀
                   </text>
-                  {/* Vector fuerza sobre la prueba */}
-                  {datosPrueba.F > 0 && (() => {
+                  {/* Vector fuerza sobre la prueba.
+                      Sobre una carga la fuerza no está definida, y el panel lo dice con «—»:
+                      la flecha tampoco se dibuja. Su longitud CODIFICA el módulo
+                      (lenF = 14 + 30·log₁₀(1 + F·10⁸)), así que seguir pintándola era seguir
+                      publicando la misma cifra que la reparación del hallazgo 216 había
+                      retirado del panel por engañosa — solo que en píxeles en vez de en
+                      números (hallazgo 272 del Inspector). */}
+                  {!datosPrueba.singular && datosPrueba.F > 0 && (() => {
                     const fmag = Math.sqrt(datosPrueba.Fx * datosPrueba.Fx + datosPrueba.Fy * datosPrueba.Fy);
                     const lenF = Math.min(50, 14 + 30 * Math.log10(1 + fmag * 1e8));
                     const ang = Math.atan2(-datosPrueba.Fy, datosPrueba.Fx);
@@ -897,6 +983,16 @@ export default function SimuladorCampoElectrico() {
                 Haz clic en el lienzo para añadir carga · Arrastra cargas y la bola gris (q₀) ·
                 Eje X y eje Y en metros
               </p>
+              {/* El nombre del lienzo se deja FIJO y el estado se cuenta aquí: un aria-label
+                  que cambiara con cada tecla haría que el lector de pantalla renombrase el
+                  elemento enfocado en cada pulsación. Las cifras nuevas ya las anuncia el
+                  panel de resultados, que es una región viva. */}
+              <p className={styles.canvasHint} id="lienzo-teclado">
+                <span aria-hidden="true">⌨️</span> Con el lienzo enfocado: las <strong>flechas</strong>{' '}
+                mueven la sonda (10 cm, o 1 cm con <kbd>Mayús</kbd>), <kbd>+</kbd> y <kbd>−</kbd>{' '}
+                colocan una carga donde está, y <kbd>Supr</kbd> retira la más cercana. También
+                puedes escribir su posición exacta bajo el panel de resultados.
+              </p>
             </div>
 
             {/* Panel de resultados */}
@@ -915,8 +1011,9 @@ export default function SimuladorCampoElectrico() {
               {datosPrueba.singular && (
                 <p className={styles.avisoSingularidad}>
                   La sonda está <strong>sobre una carga</strong>: ahí el campo y el potencial
-                  divergen (r → 0) y no hay ninguna cifra que dar. Lo que se lee abajo es lo que
-                  aportan las demás cargas. Sepárala unos centímetros para volver a medir.
+                  divergen (r → 0) y no hay ninguna cifra que dar, así que el panel las deja en
+                  «—» y el lienzo no dibuja la flecha de fuerza. Sepárala unos centímetros para
+                  volver a medir.
                 </p>
               )}
               <div className={styles.resultRow}>
@@ -959,6 +1056,54 @@ export default function SimuladorCampoElectrico() {
                 Carga de prueba q₀ (arrastrable)
               </div>
             </div>
+
+              {/* Posición exacta de la sonda, escribible.
+                  Es la vía sin ratón que faltaba (hallazgo 270) y de paso permite colocar q₀
+                  en un punto concreto, que arrastrando no se puede. Va FUERA de la región
+                  role="status" del panel: un campo de formulario dentro de una zona viva se
+                  reanuncia entero con cada tecla. */}
+              <div className={styles.sondaExacta}>
+                <p className={styles.sondaExactaTitulo} id="sonda-exacta-titulo">
+                  Posición exacta de la sonda
+                </p>
+                <div className={styles.sondaExactaCampos} role="group" aria-labelledby="sonda-exacta-titulo">
+                  <label className={styles.sondaExactaCampo} htmlFor="sonda-x">
+                    <span>x (m)</span>
+                    <input
+                      id="sonda-x"
+                      type="number"
+                      step={0.1}
+                      min={-LIMITE_X}
+                      max={LIMITE_X}
+                      value={pruebaPos.x}
+                      onChange={(e) =>
+                        setPruebaPos((p) => ({
+                          ...p,
+                          x: acotarAlLienzo(parseSpanishNumberOr(e.target.value), LIMITE_X),
+                        }))
+                      }
+                    />
+                  </label>
+                  <label className={styles.sondaExactaCampo} htmlFor="sonda-y">
+                    <span>y (m)</span>
+                    <input
+                      id="sonda-y"
+                      type="number"
+                      step={0.1}
+                      min={-LIMITE_Y}
+                      max={LIMITE_Y}
+                      value={pruebaPos.y}
+                      onChange={(e) =>
+                        setPruebaPos((p) => ({
+                          ...p,
+                          y: acotarAlLienzo(parseSpanishNumberOr(e.target.value), LIMITE_Y),
+                        }))
+                      }
+                    />
+                  </label>
+                </div>
+              </div>
+
           </div>
         </section>
 

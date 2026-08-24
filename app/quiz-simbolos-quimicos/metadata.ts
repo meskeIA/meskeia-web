@@ -83,7 +83,7 @@ export const faqJsonLd = {
       name: '¿Para qué nivel educativo está pensado este quiz?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El quiz es adecuado desde el primer contacto con la química en educación secundaria hasta bachillerato o primer año universitario. El modo fácil (elementos del primer y segundo período) es ideal para estudiantes de 12-14 años; el modo difícil, con elementos de tierras raras y metales de transición, supone un reto incluso para estudiantes universitarios.',
+        text: 'El quiz es adecuado desde el primer contacto con la química en educación secundaria hasta la universidad. El modo fácil sortea entre los 26 elementos más corrientes —del hidrógeno al plomo, pasando por el hierro, el cobre, la plata o el oro—, los que aparecen en clase y en la vida diaria, y es adecuado a partir de los 12 años; el modo difícil, con tierras raras y metales de transición poco frecuentes, supone un reto incluso para estudiantes universitarios.',
       },
     },
     {

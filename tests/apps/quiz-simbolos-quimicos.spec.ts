@@ -342,3 +342,155 @@ test.describe('Quiz Símbolos Químicos', () => {
     expect(texto).not.toContain('electrodes');
   });
 });
+
+// ===========================================================================
+// HALLAZGOS 283-287 — 2.ª pasada del Inspector, 24/08/2026 · REPARADOS el 24/08/2026
+// ===========================================================================
+
+test.describe('hallazgos 283-287, ya reparados', () => {
+  /**
+   * 283 — el botón «Siguiente pregunta», el que más se pulsa (10 o 20 veces por partida),
+   * pintaba blanco de 16 px en negrita sobre `--primary` (#2E86AB): 4,11:1, por debajo del
+   * 4,5:1 de WCAG AA, e idéntico en claro y en oscuro porque el módulo redefine `--primary`
+   * en `.container` y su bloque [data-theme='dark'] no lo toca. Los botones de gradiente eran
+   * peores en su mitad teal (2,80:1) y axe no los evalúa.
+   *
+   * El contraste se calcula aquí a mano, con la fórmula de WCAG sobre los colores computados:
+   * así el test cubre también el gradiente, que es donde axe no llega.
+   */
+  const luminancia = (rgb: string): number => {
+    const [r, g, b] = rgb.match(/\d+/g)!.slice(0, 3).map(Number).map((c) => {
+      const s = c / 255;
+      return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const contraste = (a: string, b: string): number => {
+    const [la, lb] = [luminancia(a), luminancia(b)];
+    return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+  };
+
+  test('283 · el botón de siguiente y el de empezar cumplen el 4,5:1 de WCAG AA', async ({ page }) => {
+    await page.goto(RUTA);
+
+    // (a) El botón de empezar: gradiente de los dos tonos de marca, ambos accesibles
+    const iniciar = await page.locator('button', { hasText: '¡Empezar quiz!' }).first().evaluate((el) => {
+      const cs = getComputedStyle(el);
+      return { color: cs.color, fondo: cs.backgroundImage };
+    });
+    const tonos = iniciar.fondo.match(/rgba?\([^)]+\)/g) ?? [];
+    expect(tonos.length, 'el botón debería seguir siendo un gradiente de dos tonos').toBeGreaterThanOrEqual(2);
+    for (const tono of tonos) {
+      expect(
+        contraste(iniciar.color, tono),
+        `texto ${iniciar.color} sobre ${tono} no llega a 4,5:1`,
+      ).toBeGreaterThanOrEqual(4.5);
+    }
+
+    // (b) El botón de siguiente, que solo existe tras responder
+    await page.locator('button', { hasText: '¡Empezar quiz!' }).first().click();
+    await page.locator('[class*="opcionBtn"]').first().click();
+    const siguiente = await page.locator('[class*="btnSiguiente"]').evaluate((el) => {
+      const cs = getComputedStyle(el);
+      return { color: cs.color, fondo: cs.backgroundColor };
+    });
+    expect(
+      contraste(siguiente.color, siguiente.fondo),
+      `texto ${siguiente.color} sobre ${siguiente.fondo} no llega a 4,5:1`,
+    ).toBeGreaterThanOrEqual(4.5);
+  });
+
+  /**
+   * 284 — la zona de progreso no decía QUÉ mide a quien no ve la pantalla. El div con
+   * role="progressbar" no tenía nombre accesible (axe: aria-progressbar-name, serious), y el
+   * marcador vivo anunciaba «10 · Racha: 10»: al envolver los emojis en aria-hidden —que es
+   * la corrección correcta del hallazgo 249— el número de aciertos se quedó sin etiqueta,
+   * porque el emoji era su único rótulo.
+   */
+  test('284 · la barra de progreso y el marcador dicen qué miden', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.locator('button', { hasText: '¡Empezar quiz!' }).first().click();
+
+    const barra = page.locator('[role="progressbar"]');
+    await expect(barra).toHaveAttribute('aria-label', /pregunta/i);
+    await expect(barra).toHaveAttribute('aria-valuetext', /de 10 preguntas/);
+
+    const marcador = page.locator('[role="status"]').first();
+    await expect(marcador).toHaveAttribute('aria-label', /Aciertos: \d+\. Racha: \d+\./);
+    // Lo que se VE no cambia: los emojis siguen ahí y siguen ocultos al lector
+    await expect(marcador.locator('[aria-hidden="true"]')).toHaveCount(2);
+  });
+
+  /**
+   * 285 — las cuatro opciones llevaban aria-pressed, que es el atributo de un conmutador:
+   * antes de contestar, un lector de pantalla anunciaba las cuatro como «botón de alternar,
+   * no pulsado», y una vez elegida una ya no se podía despulsar porque las cuatro quedan
+   * disabled. El CLAUDE.md §5 exime justamente a este patrón. El candado check:a11y-jsx no lo
+   * veía porque su regla 3 solo salta cuando el botón no tiene NINGÚN aria-*.
+   */
+  test('285 · las opciones de respuesta no se anuncian como conmutadores', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.locator('button', { hasText: '¡Empezar quiz!' }).first().click();
+
+    const opciones = page.locator('[class*="opcionBtn"]');
+    await expect(opciones).toHaveCount(4);
+    expect(await page.locator('[class*="opcionBtn"][aria-pressed]').count()).toBe(0);
+    // El grupo sí tiene nombre, que es lo que faltaba de verdad
+    await expect(page.locator('[class*="opcionesGrid"]')).toHaveAttribute('role', 'group');
+
+    // Y tras responder tampoco aparece: siguen siendo botones de acción, ya deshabilitados
+    await opciones.first().click();
+    expect(await page.locator('[class*="opcionBtn"][aria-pressed]').count()).toBe(0);
+    await expect(opciones.first()).toBeDisabled();
+  });
+
+  /**
+   * 286 — el FAQPage del JSON-LD describía mal el propio nivel Fácil: «elementos del primer y
+   * segundo período». El nivel Fácil sortea sobre los 26 elementos de categoría 'comun', y
+   * solo 7 son de los períodos 1 y 2 (H, He, C, N, O, F, Ne); los otros 19 llegan hasta el
+   * plomo (Z=82), el mercurio (80) y el oro (79). Es la misma familia que el hallazgo 247:
+   * una afirmación falsa sobre el contenido propio, publicada en datos estructurados, que es
+   * lo que ChatGPT, Copilot y Perplexity usan para fundamentar respuestas.
+   */
+  test('286 · el FAQPage no promete un nivel Fácil que la app no tiene', async ({ page }) => {
+    await page.goto(RUTA);
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = bloques.map((b) => JSON.parse(b)).find((j) => j['@type'] === 'FAQPage');
+    const textos: string[] = faq.mainEntity.map(
+      (q: { acceptedAnswer: { text: string } }) => q.acceptedAnswer.text,
+    );
+    const nivel = textos.find((t) => t.includes('modo fácil'))!;
+    expect(nivel).not.toContain('primer y segundo período');
+    expect(nivel).toContain('26 elementos');
+  });
+
+  /**
+   * 287 — la reparación del hallazgo 248 cambió el titular y el cuerpo de la cuarta
+   * curiosidad (de uranio a mercurio) y dejó el icono de radiactividad encima de un texto
+   * sobre el mercurio, que es tóxico pero no radiactivo. Además dejaba 2 de 6 tarjetas
+   * dedicadas al mercurio, repitiendo las dos la misma etimología y la misma liquidez, y el
+   * titular nuevo hablaba de un dios y un planeta que su cuerpo no mencionaba.
+   */
+  test('287 · las seis curiosidades no se repiten y cada titular lo sostiene su cuerpo', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    const tarjetas = page.locator('[class*="tipCard"]');
+    await expect(tarjetas).toHaveCount(6);
+
+    const textos = await tarjetas.allTextContents();
+    // Ni el icono de radiactividad ni dos tarjetas sobre el mismo elemento
+    expect(textos.join(' ')).not.toContain('☢️');
+    expect(textos.filter((t) => t.includes('mercurio')).length).toBe(1);
+    expect(textos.filter((t) => t.includes('hydrargyrum')).length).toBe(1);
+
+    // Y los dos titulares que no sostenía su cuerpo, corregidos
+    const titulares = await tarjetas.locator('h3').allTextContents();
+    expect(titulares).not.toContain('El helio y los globos');
+    expect(titulares).not.toContain('El mercurio, con nombre de dios y de planeta');
+    // La tarjeta nueva habla de lo que el quiz pregunta: símbolos que no siguen al nombre
+    const simbolos = textos.find((t) => t.includes('natrium'))!;
+    expect(simbolos).toContain('kalium');
+    expect(simbolos).toContain('plumbum');
+  });
+});
