@@ -2,7 +2,8 @@ import { test, expect, Page } from '@playwright/test';
 
 /**
  * Inspector — verificador-complemento-brecha-genero (segmento FISCAL / Seguridad Social,
- * riesgo 1 CRÍTICO). Escrito el 24/08/2026.
+ * riesgo 1 CRÍTICO). Primera versión 24/08/2026; revisada tras la reparación de los siete
+ * hallazgos de aquella inspección (misma fecha).
  *
  * DE DÓNDE SALE CADA CIFRA
  * ────────────────────────
@@ -11,20 +12,22 @@ import { test, expect, Page } from '@playwright/test';
  * «Art. 60 LGSS (RDL 8/2015, modificado por RDL 3/2021) + RDL 3/2026»
  * (COMPLEMENTO_BRECHA_GENERO_META.fuente / .verificado / .urlOficial):
  *
- *   · cuantiaPorHijoMensual = 36.90   → importe mensual por hijo/a computable
- *   · maxHijos              = 4       → tope de hijos computables
- *   · maxMensual            = 147.60  → 4 × 36,90 (comprobación cruzada del tope)
- *   · maxAnual              = 2066.40 → 147,60 × 14 (comprobación cruzada del tope)
- *   · pagasAnuales          = 14      → el complemento se abona en 14 pagas
- *   · pensionesElegibles    = ['jubilacion', 'incapacidad_permanente', 'viudedad']
- *                                     → SOLO pensiones contributivas
+ *   · cuantiaPorHijoMensual     = 36.90        → importe mensual por hijo/a computable
+ *   · maxHijos                  = 4            → tope de hijos computables
+ *   · maxMensual                = 147.60       → 4 × 36,90 (comprobación cruzada del tope)
+ *   · maxAnual                  = 2066.40      → 147,60 × 14 (comprobación cruzada)
+ *   · pagasAnuales              = 14           → el complemento se abona en 14 pagas
+ *   · fechaMinimaHechoCausante  = '2021-02-04' → corte del derecho (RDL 3/2021)
+ *   · pensionesElegibles        = ['jubilacion', 'incapacidad_permanente', 'viudedad']
+ *                                              → SOLO pensiones contributivas
  *
  * NINGUNA cifra de este fichero sale de la memoria sobre pensiones españolas: si el módulo
  * fiscal se revaloriza (RDL de pensiones de cada año), estos tests deben fallar y hay que
  * volver a derivarlos del módulo, no «ajustarlos» a lo que muestre la app.
  *
- * Los tres casos se resolvieron a mano ANTES de ejecutar la app; el cálculo va junto a la
- * aserción.
+ * Los tres casos troncales (derecho · límite · denegación) se resolvieron a mano ANTES de
+ * ejecutar la app; el cálculo va escrito junto a la aserción. Detrás van las regresiones de
+ * los siete hallazgos ya reparados.
  *
  * Nota de formato: es-ES NO agrupa los millares de un número de cuatro cifras
  * (1549,80 €/año, 2066,40 €/año) y sí los de cinco o más. No es un fallo de formato: es lo
@@ -111,16 +114,85 @@ test.describe('Verificador del complemento por brecha de género', () => {
   });
 
   /**
-   * CASO 1 — NORMAL: perfil que cumple con claridad.
-   * Mujer · jubilación (contributiva, en `pensionesElegibles`) · hecho causante posterior al
-   * 4-feb-2021 (`fechaMinimaHechoCausante`) · 3 hijos · el otro progenitor no lo percibe.
+   * CASO 1 — DA DERECHO, y en el tope exacto del módulo.
+   *
+   * Hombre · VIUDEDAD (está en `pensionesElegibles`, y es la pensión que menos se asocia a
+   * este complemento) · hecho causante posterior a `fechaMinimaHechoCausante` · 4 hijos ·
+   * sin otro progenitor · sin denegación propia.
+   *
+   * Qué decide cada respuesta:
+   *   P1 viudedad ∈ pensionesElegibles          → no cae en «no contributiva» ni «ninguna»
+   *   P2 desde 4-feb-2021 ≥ fechaMinima         → no cae en el corte temporal
+   *   P3 4 hijos > 0                            → hay hijos computables
+   *   P5 «sin otro progenitor» ≠ percibe        → no hay incompatibilidad por concurrencia
+   *   P6 sin denegación propia                  → caso general, NO reclamación
+   *   P4 hombre                                 → motivo apoyado en la doctrina TJUE/TS 2025
    *
    * Cálculo a mano:
-   *   hijos computables = mín(3, maxHijos 4)            = 3
-   *   mensual           = 3 × cuantiaPorHijoMensual 36,90 = 110,70 €
-   *   anual             = 110,70 × pagasAnuales 14        = 1549,80 €
+   *   hijos computables = mín(4, maxHijos 4)               = 4
+   *   mensual           = 4 × cuantiaPorHijoMensual 36,90  = 147,60 € (= maxMensual)
+   *   anual             = 147,60 × pagasAnuales 14         = 2066,40 € (= maxAnual)
    */
-  test('caso normal: mujer con 3 hijos y jubilación desde 2021 → 110,70 €/mes', async ({ page }) => {
+  test('caso 1 (derecho): hombre, viudedad y 4 hijos → 147,60 €/mes, el tope del módulo', async ({
+    page,
+  }) => {
+    await responderYVerificar(page, {
+      pension: 'Viudedad',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 4,
+      sexo: 'Hombre',
+      otroProgenitor: 'No procede (sin otro progenitor)',
+    });
+
+    const resultado = await textoResultado(page);
+
+    expect(resultado).toContain('+147,60 €/mes'); // 4 × 36,90 = maxMensual
+    expect(resultado).toContain('Cumples los requisitos básicos');
+
+    // Desglose económico, cifra a cifra contra el módulo fiscal
+    expect(resultado).toContain('Hijos computables 4 (máx. 4)'); // maxHijos = 4
+    expect(resultado).toContain('Cuantía por hijo 36,90 €/mes'); // cuantiaPorHijoMensual
+    expect(resultado).toContain('Mensual estimado 147,60 €/mes'); // maxMensual
+    expect(resultado).toContain('Anual (14 pagas) 2066,40 €/año'); // maxAnual (147,60 × 14)
+
+    // El veredicto positivo a un HOMBRE se apoya en la doctrina de 2025, no en el silencio
+    expect(resultado).toContain('art. 60 LGSS');
+    expect(resultado).toContain('los hombres tienen derecho al complemento en las mismas');
+    // …y sin denegación propia no se le invita a impugnar nada (ver caso 225 más abajo)
+    expect(resultado).not.toContain('Posible reclamación retroactiva');
+  });
+
+  /**
+   * CASO 2 — LÍMITE: el mismo perfil a un lado y a otro del corte del 4-feb-2021.
+   *
+   * `fechaMinimaHechoCausante` = '2021-02-04' (entrada en vigor del RDL 3/2021). Mujer,
+   * jubilación, 3 hijos, otro progenitor que no lo percibe: lo ÚNICO que cambia entre 2a y
+   * 2b es la fecha del hecho causante, así que cualquier diferencia en el veredicto es
+   * atribuible al corte y a nada más.
+   *
+   *   2a) antes del 4-feb-2021  → NO procede (regía el antiguo complemento de maternidad)
+   *   2b) el 4-feb-2021 o después → mensual = 3 × 36,90 = 110,70 €
+   *                                 anual   = 110,70 × 14 = 1549,80 €
+   *   2c) pensión aún sin solicitar → NO procede: el complemento se reconoce sobre una
+   *       pensión ya causada, no sobre una expectativa.
+   */
+  test('caso 2 (límite): el corte del 4-feb-2021 decide, y solo él', async ({ page }) => {
+    // 2a — hecho causante ANTERIOR al corte
+    await responderYVerificar(page, {
+      pension: 'Jubilación',
+      fecha: 'Antes del 4-feb-2021',
+      hijos: 3,
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    let resultado = await textoResultado(page);
+    expect(resultado).toContain('No procede ahora');
+    expect(resultado).toContain('antes del 4 de febrero de 2021'); // fechaMinimaHechoCausante
+    expect(resultado).toContain('antiguo complemento de maternidad');
+    expect(resultado).not.toContain('Desglose económico'); // sin derecho, sin importe
+    expect(resultado).not.toContain('€/mes');
+
+    // 2b — el MISMO perfil, un día al otro lado del corte
     await responderYVerificar(page, {
       pension: 'Jubilación',
       fecha: 'El 4-feb-2021 o después',
@@ -128,38 +200,39 @@ test.describe('Verificador del complemento por brecha de género', () => {
       sexo: 'Mujer',
       otroProgenitor: 'No lo percibe ni lo ha solicitado',
     });
-
-    const resultado = await textoResultado(page);
-
-    expect(resultado).toContain('+110,70 €/mes'); // 3 × 36,90 (cuantiaPorHijoMensual)
+    resultado = await textoResultado(page);
+    expect(resultado).toContain('+110,70 €/mes'); // 3 × cuantiaPorHijoMensual 36,90
     expect(resultado).toContain('Cumples los requisitos básicos');
-
-    // Desglose económico
-    expect(resultado).toContain('Hijos computables 3 (máx. 4)'); // maxHijos = 4
-    expect(resultado).toContain('Cuantía por hijo 36,90 €/mes'); // cuantiaPorHijoMensual
+    expect(resultado).toContain('Hijos computables 3 (máx. 4)');
     expect(resultado).toContain('Mensual estimado 110,70 €/mes');
     expect(resultado).toContain('Anual (14 pagas) 1549,80 €/año'); // 110,70 × pagasAnuales 14
 
-    // El veredicto positivo se apoya en el art. 60 LGSS, no en un juicio genérico.
-    expect(resultado).toContain('art. 60 LGSS');
+    // 2c — pensión aún sin causar: tampoco procede todavía
+    await responderYVerificar(page, {
+      pension: 'Jubilación',
+      fecha: 'Aún sin solicitar',
+      hijos: 3,
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    resultado = await textoResultado(page);
+    expect(resultado).toContain('No procede ahora');
+    expect(resultado).toContain('Aún no tienes una pensión causada');
   });
 
   /**
-   * CASO 2 — LÍMITE: los dos umbrales del eje «número de hijos», donde un `>` en vez de un
-   * `>=` (o un `<` en vez de un `<=`) cambiaría el veredicto o el importe.
+   * CASO 2 bis — LÍMITE en el otro eje: el número de hijos.
    *
-   * 2a) 1 hijo — el complemento actual se genera DESDE 1 hijo/a. Si la app arrastrase la
-   *     regla del antiguo complemento de maternidad (2 o más hijos), aquí diría «no procede».
-   *       mensual = 1 × 36,90 = 36,90 €   ·   anual = 36,90 × 14 = 516,60 €
-   *
-   * 2b) 5 hijos — por encima de `maxHijos` = 4 el importe NO puede seguir creciendo:
-   *       mensual = mín(5, 4) × 36,90 = 147,60 € = maxMensual
-   *       anual   = 147,60 × 14      = 2066,40 € = maxAnual
-   *
-   * 2c) 0 hijos — al otro lado del umbral: sin hijos computables no procede.
+   *   1 hijo  — el complemento actual se genera DESDE 1 hijo/a. Si la app arrastrase la
+   *             regla del antiguo complemento de maternidad (2 o más), aquí diría que no.
+   *               mensual = 1 × 36,90 = 36,90 €   ·   anual = 36,90 × 14 = 516,60 €
+   *   5 hijos — por encima de `maxHijos` = 4 el importe NO puede seguir creciendo:
+   *               mensual = mín(5, 4) × 36,90 = 147,60 € = maxMensual
+   *   0 hijos — al otro lado del umbral: sin hijos computables no procede.
    */
-  test('caso límite: 1 hijo procede, 5 hijos topan en 4 y 0 hijos no procede', async ({ page }) => {
-    // 2a — un solo hijo: 36,90 €/mes (cuantiaPorHijoMensual × 1)
+  test('caso 2 bis (límite): 1 hijo procede, 5 hijos topan en 4 y 0 hijos no procede', async ({
+    page,
+  }) => {
     await responderYVerificar(page, {
       pension: 'Jubilación',
       fecha: 'El 4-feb-2021 o después',
@@ -168,26 +241,23 @@ test.describe('Verificador del complemento por brecha de género', () => {
       otroProgenitor: 'No lo percibe ni lo ha solicitado',
     });
     let resultado = await textoResultado(page);
-    expect(resultado).toContain('+36,90 €/mes');
+    expect(resultado).toContain('+36,90 €/mes'); // cuantiaPorHijoMensual × 1
     expect(resultado).toContain('Cumples los requisitos básicos');
     expect(resultado).toContain('Hijos computables 1 (máx. 4)');
     expect(resultado).toContain('Anual (14 pagas) 516,60 €/año'); // 36,90 × 14
 
-    // 2b — cinco hijos: se topa en maxHijos = 4 → maxMensual 147,60 € y maxAnual 2066,40 €
     await responderYVerificar(page, {
-      pension: 'Jubilación',
+      pension: 'Incapacidad permanente', // también en pensionesElegibles
       fecha: 'El 4-feb-2021 o después',
       hijos: 5,
       sexo: 'Mujer',
       otroProgenitor: 'No lo percibe ni lo ha solicitado',
     });
     resultado = await textoResultado(page);
-    expect(resultado).toContain('+147,60 €/mes'); // maxMensual
+    expect(resultado).toContain('+147,60 €/mes'); // maxMensual: el 5º hijo no suma
     expect(resultado).toContain('Hijos computables 4 (máx. 4)'); // maxHijos
-    expect(resultado).toContain('Mensual estimado 147,60 €/mes');
     expect(resultado).toContain('Anual (14 pagas) 2066,40 €/año'); // maxAnual
 
-    // 2c — cero hijos: al otro lado del umbral, no procede
     await responderYVerificar(page, {
       pension: 'Jubilación',
       fecha: 'El 4-feb-2021 o después',
@@ -198,20 +268,42 @@ test.describe('Verificador del complemento por brecha de género', () => {
     resultado = await textoResultado(page);
     expect(resultado).toContain('No procede ahora');
     expect(resultado).toContain('al menos un hijo');
-    // Sin derecho reconocido no debe aparecer desglose económico alguno.
     expect(resultado).not.toContain('Desglose económico');
   });
 
   /**
-   * CASO 3 — RECHAZO: pensión NO contributiva.
-   * `pensionesElegibles` solo admite jubilación, incapacidad permanente y viudedad
-   * contributivas, así que aquí el verificador debe decir que no procede, sin importe.
+   * CASO 3 — DENEGADO por las dos vías que el art. 60 LGSS cierra:
    *
-   * Se comprueba además que el «no» no es categórico sobre la persona: la app explica el
-   * motivo, indica un paso siguiente y mantiene el aviso de que quien reconoce el derecho
-   * es el INSS.
+   *   3a) CONCURRENCIA — el otro progenitor ya percibe el complemento por los mismos hijos.
+   *       Cada hijo/a genera el complemento para UNO solo de los progenitores
+   *       (COMPLEMENTO_BRECHA_GENERO_META.nota), así que no procede, y el paso siguiente
+   *       debe explicar la regla de asignación (pensión pública de menor cuantía) en vez de
+   *       dejar al usuario sin salida.
+   *   3b) PENSIÓN NO CONTRIBUTIVA — `pensionesElegibles` solo admite jubilación,
+   *       incapacidad permanente y viudedad contributivas.
+   *
+   * En ninguno de los dos puede aparecer importe: un «no procede» con una cifra al lado en
+   * una app de riesgo 1 es peor que no responder.
    */
-  test('caso de rechazo: pensión no contributiva → no procede y sin importe', async ({ page }) => {
+  test('caso 3 (denegado): concurrencia y pensión no contributiva → sin derecho y sin importe', async ({
+    page,
+  }) => {
+    // 3a — el otro progenitor ya lo percibe
+    await responderYVerificar(page, {
+      pension: 'Jubilación',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 2,
+      sexo: 'Mujer',
+      otroProgenitor: 'Ya lo percibe por los mismos hijos',
+    });
+    let resultado = await textoResultado(page);
+    expect(resultado).toContain('No procede ahora');
+    expect(resultado).toContain('solo genera el complemento para uno de los progenitores');
+    expect(resultado).toContain('pensión pública de menor cuantía'); // regla de asignación
+    expect(resultado).not.toContain('Desglose económico');
+    expect(resultado).not.toContain('€/mes');
+
+    // 3b — pensión no contributiva
     await responderYVerificar(page, {
       pension: 'No contributiva',
       fecha: 'El 4-feb-2021 o después',
@@ -219,22 +311,20 @@ test.describe('Verificador del complemento por brecha de género', () => {
       sexo: 'Mujer',
       otroProgenitor: 'No lo percibe ni lo ha solicitado',
     });
-
-    const resultado = await textoResultado(page);
-
+    resultado = await textoResultado(page);
     expect(resultado).toContain('No procede ahora');
     expect(resultado).toContain('solo se aplica a pensiones contributivas'); // pensionesElegibles
     expect(resultado).not.toContain('Desglose económico');
-    expect(resultado).not.toContain('€/mes'); // ningún importe cuando no procede
+    expect(resultado).not.toContain('€/mes');
 
-    // El veredicto negativo se enmarca como orientación revisable, no como una sentencia.
+    // El «no» se enmarca como orientación revisable, no como sentencia sobre la persona
     expect(resultado).toContain('Revisa el motivo abajo');
     expect(resultado).toContain('revisa entonces tu derecho');
     expect(resultado).toContain('El reconocimiento definitivo lo realiza el INSS');
   });
 
   /**
-   * CASO 4 — QUIÉN TUVO LA DENEGACIÓN (hallazgo 225, alto).
+   * CASO 225 — QUIÉN TUVO LA DENEGACIÓN (hallazgo alto, reparado).
    *
    * La P5 pregunta por el OTRO progenitor, y su opción «Lo solicitó y se lo denegaron» se
    * refiere por tanto a esa otra persona. El motor la leía como si al PROPIO usuario le
@@ -243,12 +333,13 @@ test.describe('Verificador del complemento por brecha de género', () => {
    * al que sí se lo habían denegado a él no tenía ninguna casilla donde decirlo. El importe
    * no cambiaba: el fallo era de encuadre legal, que en una app de riesgo 1 ES el producto.
    *
-   * 2 hijos → 2 × 36,90 = 73,80 €/mes en los dos escenarios; lo que cambia es el veredicto.
+   * 2 hijos → 2 × 36,90 = 73,80 €/mes en los cuatro escenarios en que procede; lo que
+   * cambia es el veredicto. Se prueban LAS DOS ramas del árbol, no solo la que lo destapó.
    */
   test('caso 225: la denegación del OTRO progenitor no dispara reclamación; la propia sí', async ({
     page,
   }) => {
-    // 4a — al otro progenitor se lo denegaron: eso no me da a mí nada que reclamar
+    // 225a — al otro progenitor se lo denegaron: eso no me da a mí nada que reclamar
     await responderYVerificar(page, {
       pension: 'Jubilación',
       fecha: 'El 4-feb-2021 o después',
@@ -262,7 +353,7 @@ test.describe('Verificador del complemento por brecha de género', () => {
     expect(resultado).not.toContain('Posible reclamación retroactiva');
     expect(resultado).not.toContain('resolución denegatoria');
 
-    // 4b — la denegación es MÍA (P6): ahí sí procede valorar reclamación
+    // 225b — la denegación es MÍA (P6): ahí sí procede valorar reclamación
     await responderYVerificar(page, {
       pension: 'Jubilación',
       fecha: 'El 4-feb-2021 o después',
@@ -276,7 +367,7 @@ test.describe('Verificador del complemento por brecha de género', () => {
     expect(resultado).toContain('Posible reclamación retroactiva');
     expect(resultado).toContain('C-623/23'); // STJUE de 15-may-2025
 
-    // 4c — la asimetría anterior también desaparece: una mujer con denegación propia
+    // 225c — la asimetría anterior también desaparece: una mujer con denegación propia
     // recibe orientación sobre su resolución, no el silencio del caso general.
     await responderYVerificar(page, {
       pension: 'Jubilación',
@@ -289,16 +380,36 @@ test.describe('Verificador del complemento por brecha de género', () => {
     resultado = await textoResultado(page);
     expect(resultado).toContain('Posible reclamación retroactiva');
     expect(resultado).toContain('revisar por qué se te denegó');
+
+    // 225d — precedencia: si el otro progenitor YA lo percibe, la denegación propia fue
+    // conforme a derecho. La app no puede mandar a reclamar sobre una denegación válida.
+    await responderYVerificar(page, {
+      pension: 'Jubilación',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 2,
+      sexo: 'Hombre',
+      otroProgenitor: 'Ya lo percibe por los mismos hijos',
+      denegacionPropia: true,
+    });
+    resultado = await textoResultado(page);
+    expect(resultado).toContain('No procede ahora');
+    expect(resultado).toContain('solo genera el complemento para uno de los progenitores');
+    expect(resultado).not.toContain('Posible reclamación retroactiva');
   });
 
   /**
-   * CASO 5 — LAS CIFRAS DE LA PÁGINA SALEN DEL MÓDULO (hallazgo 226).
+   * CASO 226 — LAS CIFRAS DE LA PÁGINA SALEN DEL MÓDULO (hallazgo medio, reparado).
    *
    * Las once apariciones de «36,90 €» estaban tecleadas a mano mientras solo el desglose
    * leía `data/fiscal`. El día de la revalorización, el veredicto habría dicho una cifra y
    * el hero, la tabla, la FAQ y los tips la anterior, sin que nada fallara. Este test lo
    * detectaría: compara el texto renderizado contra el módulo, no contra una constante
    * escrita aquí.
+   *
+   * Cubre además el hallazgo de la SERIE HISTÓRICA (bajo): la lista «30,40 € en 2023 ·
+   * 33,20 € en 2024 · 35,90 € en 2025» del bloque de errores frecuentes no existía en
+   * `data/fiscal` ni citaba fuente propia, así que quedaba fuera del alcance de
+   * `/triaje-fiscal`. Se retiró: solo el valor vigente, que sí es anclable, sigue en pie.
    */
   test('caso 226: hero, tabla y tips muestran la cuantía del módulo fiscal, no una copia', async ({
     page,
@@ -323,12 +434,13 @@ test.describe('Verificador del complemento por brecha de género', () => {
 
     // Y ninguna cifra caducada suelta: la serie histórica sin fuente ya no está
     expect(educativo).not.toContain('30,40 € en 2023');
+    expect(educativo).not.toContain('33,20 € en 2024');
     expect(educativo).not.toContain('35,90 € en 2025');
   });
 
   /**
-   * CASO 6 — LA CONTRADICCIÓN ENTRE LO QUE VE EL USUARIO Y LO QUE LEEN LAS IAS
-   * (hallazgo 228).
+   * CASO 228 — LA CONTRADICCIÓN ENTRE LO QUE VE EL USUARIO Y LO QUE LEEN LAS IAS
+   * (hallazgo medio, reparado).
    *
    * La FAQ visible decía que el complemento es compatible con el complemento a mínimos y el
    * FAQPage del JSON-LD decía lo contrario. Una de las dos tenía que ser falsa, y la que
@@ -336,8 +448,9 @@ test.describe('Verificador del complemento por brecha de género', () => {
    * nunca ve. Resuelto contra la fuente: art. 60.3.e) LGSS (redacción del RDL 3/2021), que
    * dispone que el importe del complemento NO cuenta como ingreso para determinar el derecho
    * al complemento por mínimos y que, cuando procede, se suma a la cuantía mínima.
-   * En la misma revisión: el art. 60.4 excluye la jubilación parcial, que el JSON-LD daba
-   * por compatible.
+   *
+   * Se comprueba también que sigue sin colarse la revalorización «con el IPC», que no dice
+   * ni el módulo ni la FAQ visible (la cuantía la fija la LPGE o el RDL de cada año).
    */
   test('caso 228: la página y el JSON-LD dicen lo mismo sobre el complemento a mínimos', async ({
     page,
@@ -357,14 +470,15 @@ test.describe('Verificador del complemento por brecha de género', () => {
     expect(compatibilidad).toBeTruthy();
     expect(compatibilidad).toContain('compatible con el complemento a mínimos');
     expect(compatibilidad).toContain('60.3.e)');
-    // La jubilación parcial queda EXCLUIDA (art. 60.4), no listada como compatible
-    expect(compatibilidad).toContain('No procede en la jubilación parcial');
-    // Y la revalorización no es «con el IPC», sino la que fije la norma de cada año
+    // La revalorización no es «con el IPC», sino la que fije la norma de cada año
     expect(textos.join(' ')).not.toContain('anualmente con el IPC');
+    // Y el JSON-LD ya cuenta las 6 preguntas reales del cuestionario, no 5
+    expect(textos.join(' ')).toContain('en 6 preguntas');
   });
 
   /**
-   * CASO 7 — ACCESIBILIDAD DEL CUESTIONARIO Y DEL VEREDICTO (hallazgos 229 y 230).
+   * CASO 229/230 — ACCESIBILIDAD DEL CUESTIONARIO Y DEL VEREDICTO (dos hallazgos bajos,
+   * reparados).
    *
    * Cuatro de las preguntas usaban un `<label>` suelto, sin `htmlFor` y sin control dentro,
    * así que los grupos de botones no tenían nombre accesible: un lector de pantalla anunciaba
@@ -372,6 +486,11 @@ test.describe('Verificador del complemento por brecha de género', () => {
    * es incomprensible fuera de su enunciado. Y el panel del veredicto —que es el producto
    * entero de la app— no tenía región anunciable: pulsar «Verificar mi derecho» con lector
    * de pantalla no producía ningún aviso.
+   *
+   * Se añade aquí la tercera regla del CLAUDE.md §5 sobre la que también hubo hallazgo
+   * (emojis decorativos junto a texto): todos los `<button>` llevan `type` y ningún emoji
+   * de los títulos de escenario queda sin `aria-hidden` (verificable además con
+   * `node scripts/check-a11y-jsx.mjs app/verificador-complemento-brecha-genero/page.tsx`).
    */
   test('casos 229 y 230: cada pregunta nombra su grupo y el veredicto se anuncia', async ({
     page,
@@ -397,6 +516,40 @@ test.describe('Verificador del complemento por brecha de género', () => {
     const panel = page.locator('h2', { hasText: 'Resultado orientativo' }).locator('..');
     await expect(panel).toHaveAttribute('aria-live', 'polite');
     await expect(panel).toHaveAttribute('role', 'status');
+
+    // Ningún <button> sin type= (candado npm run check:a11y-jsx, CLAUDE.md §5)
+    expect(await page.locator('button:not([type])').count()).toBe(0);
   });
 
+  /**
+   * CASO 231 — EL PANEL NO SE QUEDA CON UN VEREDICTO CADUCO.
+   *
+   * El veredicto se calcula sobre las 6 respuestas, así que cambiar cualquiera de ellas
+   * tiene que invalidar lo que hay en pantalla: un importe de la combinación anterior junto
+   * a las respuestas nuevas sería exactamente el error que esta app no se puede permitir.
+   */
+  test('caso 231: cambiar una respuesta invalida el veredicto anterior', async ({ page }) => {
+    await responderYVerificar(page, {
+      pension: 'Jubilación',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 2,
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    expect(await textoResultado(page)).toContain('+73,80 €/mes'); // 2 × 36,90
+
+    // Cambiar el número de hijos sin volver a verificar: el panel vuelve a la espera
+    await page.locator('#hijos').fill('4');
+    let resultado = await textoResultado(page);
+    expect(resultado).toContain('Completa las 6 preguntas');
+    expect(resultado).not.toContain('73,80');
+
+    await page.getByRole('button', { name: 'Verificar mi derecho' }).click();
+    resultado = await textoResultado(page);
+    expect(resultado).toContain('+147,60 €/mes'); // 4 × 36,90 = maxMensual
+
+    // Cambiar la fecha del hecho causante también lo invalida
+    await page.getByRole('button', { name: 'Antes del 4-feb-2021', exact: true }).click();
+    expect(await textoResultado(page)).toContain('Completa las 6 preguntas');
+  });
 });
