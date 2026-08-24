@@ -89,7 +89,7 @@ export const faqJsonLd = {
       name: '¿Necesito un potenciómetro para usar estas métricas de potencia?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Para medir el FTP y las zonas de potencia con precisión durante los entrenamientos reales sí se necesita un potenciómetro (medidor de potencia integrado en el pedal, biela o buje). Sin embargo, la calculadora permite estimar y planificar tus zonas de entrenamiento si ya conoces tu FTP por haber realizado un test o una prueba anterior. La VAM, en cambio, solo requiere conocer el desnivel y el tiempo invertido, datos fácilmente obtenibles sin potenciómetro.',
+        text: 'Para medir el FTP con precisión durante los entrenamientos reales sí se necesita un potenciómetro (medidor de potencia integrado en el pedal, biela o buje), pero la calculadora no lo exige: estima los vatios a partir del peso, la velocidad sostenida y la pendiente, aplicando el modelo de fuerzas (gravedad, rodadura y resistencia del aire). Con esa estimación —o con un FTP ya conocido— calcula el ratio W/kg y las seis zonas de entrenamiento. La VAM, por su parte, solo requiere el desnivel y el tiempo invertido.',
       },
     },
   ],

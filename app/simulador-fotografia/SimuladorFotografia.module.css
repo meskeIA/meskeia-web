@@ -749,3 +749,16 @@
     font-size: 0.8rem;
   }
 }
+
+/* El modo compensado ha topado con los extremos de las escalas (hallazgo 273) */
+.avisoCompensacion {
+  margin: var(--spacing-sm) 0 0;
+  padding: 8px 10px;
+  border-left: 3px solid var(--color-warn, #f59e0b);
+  background: rgba(245, 158, 11, 0.1);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  text-align: left;
+}

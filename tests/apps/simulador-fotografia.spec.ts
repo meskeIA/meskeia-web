@@ -240,16 +240,18 @@ test('CASO 1 · el modo compensado conserva la exposición en todo el recorrido 
 });
 
 /**
- * CASO 2 · LÍMITE — el extremo del recorrido, donde ya no queda margen para compensar.
+ * CASO 2 · LÍMITE — el extremo del recorrido, con la compensación EN CASCADA (hallazgo 273).
  *
  * Deportes parte de ISO 400 · f/4 · 1/1000 s. Subir a ISO 6400 son log₂(6400/400) = +4 stops
  * de luz; para devolverlos el tiempo tendría que acortarse 4 stops, es decir 1/16000 s, que no
- * existe: la escala termina en 1/4000 s, que solo aporta log₂((1/4000)/(1/1000)) = -2.
- *   ΔEV = +4 - 2 = +2,000000 → «Sobreexpuesto (zonas quemadas) (+2,0 EV)».
- * Que el medidor lo diga es lo correcto —es la verdad física—; lo que falta es que el modo
- * avise de que ha topado, y de eso va el testigo del hallazgo A.
+ * existe: la escala termina en 1/4000 s, que solo aporta -2. Hasta el 24/08/2026 ahí se
+ * paraba, y el medidor marcaba +2,0 EV con un texto de modo que promete sin condiciones que
+ * «los otros se reajustan automáticamente». Ahora los 2 stops que faltan los pone el
+ * DIAFRAGMA: de f/4 a f/8 son exactamente -2, y la exposición se mantiene.
+ *
+ * El tope de verdad —cuando los DOS compañeros se agotan— se comprueba al final del test.
  */
-test('CASO 2 · límite: en Deportes la compensación topa en 1/4000 s y quedan +2,0 EV', async ({
+test('CASO 2 · límite: en Deportes la velocidad topa y el diafragma termina la compensación', async ({
   page,
 }) => {
   await elegirEscena(page, 'Deportes');
@@ -265,29 +267,35 @@ test('CASO 2 · límite: en Deportes la compensación topa en 1/4000 s y quedan 
   await expect(rotulo(page, 'sh-slider')).toHaveText('1/4000 s');
   await expect(exposicion(page)).toHaveText('Exposición correcta (+0,0 EV)');
 
-  // Un paso más allá ya no hay tiempo que dar: la velocidad se queda clavada en 1/4000 s.
+  // Un paso más allá ya no hay tiempo que dar: la velocidad se queda en 1/4000 s y entra el
+  // diafragma con los 2 stops que faltan. ISO 6400 (+4), 1/4000 s (-2) y f/8 (-2) suman 0.
   await volverAlPuntoDePartida(page);
   await mover(page, 'iso-slider', 6);
   await expect(rotulo(page, 'iso-slider')).toHaveText('ISO 6400');
   await expect(rotulo(page, 'sh-slider')).toHaveText('1/4000 s');
-  await expect(exposicion(page)).toHaveText('Sobreexpuesto (zonas quemadas) (+2,0 EV)');
-  expect(await evDelMarcador(page)).toBeCloseTo(2.0, 5);
-  // El diafragma sigue sin usarse, aunque abrir a f/2 devolvería exactamente 2 stops.
-  await expect(rotulo(page, 'ap-slider')).toHaveText('f/4');
-
-  // El tope NO deja memoria: al volver el ISO a su sitio la exposición se recupera sola.
-  await mover(page, 'iso-slider', 2);
-  await expect(rotulo(page, 'iso-slider')).toHaveText('ISO 400');
-  await expect(rotulo(page, 'sh-slider')).toHaveText('1/1000 s');
-  await expect(exposicion(page)).toHaveText('Exposición correcta (+0,0 EV)');
-
-  // Y desde el estado topado, mover el diafragma vuelve a cuadrar la cuenta: ISO 6400 (+4),
-  // f/4 → f/8 (-2) y 1/4000 s (-2) suman 0,000000.
-  await mover(page, 'iso-slider', 6);
-  await mover(page, 'ap-slider', 5);
   await expect(rotulo(page, 'ap-slider')).toHaveText('f/8');
-  await expect(rotulo(page, 'sh-slider')).toHaveText('1/4000 s');
+  await expect(exposicion(page)).toContainText('Exposición correcta');
   expect(await evDelMarcador(page)).toBeCloseTo(0, 5);
+
+  /**
+   * Y el tope DE VERDAD, con los dos compañeros agotados: desde Deportes, llevar la velocidad
+   * a 1 s son log₂(1/(1/1000)) = +9,965784 stops de luz. El ISO solo puede bajar de 400 a 100
+   * (-2) y el diafragma solo de f/4 a f/22 (-2·log₂(22/4) = -4,918863):
+   *   ΔEV = 9,965784 - 2 - 4,918863 = +3,046921 → «+3,0 EV», y con aviso.
+   */
+  await volverAlPuntoDePartida(page);
+  await mover(page, 'sh-slider', 0);
+  await expect(rotulo(page, 'sh-slider')).toHaveText('1 s');
+  await expect(rotulo(page, 'iso-slider')).toHaveText('ISO 100');
+  await expect(rotulo(page, 'ap-slider')).toHaveText('f/22');
+  // El marcador satura en ±3 EV (`clamp(deltaEV, -3, 3)`), así que aquí manda el rótulo
+  await expect(exposicion(page)).toContainText('(+3,0 EV)');
+  await expect(page.getByText('El modo compensado ha llegado al límite')).toBeVisible();
+
+  // El tope NO deja memoria: al volver la velocidad a su sitio, la exposición se recupera
+  await mover(page, 'sh-slider', 10);
+  await expect(exposicion(page)).toContainText('Exposición correcta');
+  await expect(page.getByText('El modo compensado ha llegado al límite')).toHaveCount(0);
 });
 
 /**
@@ -328,7 +336,7 @@ test('CASO 3 · aviso: 1 s a pulso avisa por texto Y lo dibuja (Retrato)', async
 });
 
 /**
- * TESTIGO del hallazgo A (medio, ABIERTO). Paisaje parte de ISO 100 · f/11 · 1/250 s, y el ISO
+ * HALLAZGO 273 (medio) · REPARADO el 24/08/2026. Paisaje parte de ISO 100 · f/11 · 1/250 s, y el ISO
  * mínimo de la escala es justo ese 100: en cuanto la velocidad baja UNA muesca (1/250 → 1/125,
  * +1,000000 stops de luz) no hay ISO por debajo con el que restarlos, así que el modo
  * compensado se va a +1,0 EV. La app no lo dice de ninguna forma, y el diafragma —que no toca
@@ -338,7 +346,7 @@ test('CASO 3 · aviso: 1 s a pulso avisa por texto Y lo dibuja (Retrato)', async
  * El test acepta CUALQUIERA de las dos salidas honestas: compensar de verdad, o avisar de que
  * no puede. No prescribe cuál.
  */
-test.fail('TESTIGO · si la compensación topa, el modo compensado debe avisar (Paisaje)', async ({
+test('REGRESIÓN 273 · si la compensación topa, el modo compensado avisa (Paisaje)', async ({
   page,
 }) => {
   await elegirEscena(page, 'Paisaje');
@@ -355,7 +363,8 @@ test.fail('TESTIGO · si la compensación topa, el modo compensado debe avisar (
   await mover(page, 'sh-slider', 7);
   await expect(rotulo(page, 'sh-slider')).toHaveText('1/125 s');
   await expect(rotulo(page, 'iso-slider')).toHaveText('ISO 100'); // ya estaba en el mínimo
-  await expect(rotulo(page, 'ap-slider')).toHaveText('f/11'); // el diafragma no se usa
+  // El diafragma SÍ entra ahora, y es lo que devuelve la exposición a su sitio
+  await expect(rotulo(page, 'ap-slider')).toHaveText('f/16');
 
   const ev = await evDelMarcador(page);
   const panel = (await page.locator('main').innerText()).split('Guía del Triángulo')[0];
@@ -367,13 +376,13 @@ test.fail('TESTIGO · si la compensación topa, el modo compensado debe avisar (
 });
 
 /**
- * TESTIGO del hallazgo B (bajo, ABIERTO). En Deportes hay 6 combinaciones cuyo ΔEV sale
+ * HALLAZGO 274 (bajo) · REPARADO el 24/08/2026. En Deportes había 6 combinaciones cuyo ΔEV sale
  * -4,44·10⁻¹⁶ en coma flotante (0 en aritmética exacta); formatNumber devuelve «≈0» para
  * 0 < |x| < 0,0001, así que el medidor rotula «Exposición correcta (≈0 EV)» donde en todas las
  * demás pone «(+0,0 EV)». Una de las seis se alcanza con un solo gesto en modo compensado:
  * f/4 → f/8 quita 2·log₂(4/8) = -2 stops exactos y la velocidad va de 1/1000 a 1/250 s (+2).
  */
-test.fail('TESTIGO · el medidor siempre rotula el EV con una decimal y su signo', async ({ page }) => {
+test('REGRESIÓN 274 · el medidor siempre rotula el EV con una decimal y su signo', async ({ page }) => {
   await elegirEscena(page, 'Deportes');
   await elegirModo(page, 'compensado');
   await mover(page, 'ap-slider', 5);

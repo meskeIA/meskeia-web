@@ -322,19 +322,35 @@ export default function CalculadoraPotenciaCiclismoPage() {
               {vatios && (
                 <div className={styles.resultCard} role="status">
                   <div className={styles.resultHeader}>
-                    <span className={styles.resultLabel}>Potencia estimada</span>
+                    <span className={styles.resultLabel}>
+                      {vatios.sinPedalear ? 'No hace falta pedalear' : 'Potencia estimada'}
+                    </span>
                   </div>
                   <div className={styles.resultValor}>
                     {formatNumber(vatios.vatios, 0)} <span className={styles.resultUnidad}>W</span>
                   </div>
-                  <p className={styles.resultDesc}>
-                    Reparto del esfuerzo: {formatNumber(vatios.desglose.gravedad, 0)} W contra la
-                    gravedad · {formatNumber(vatios.desglose.rodadura, 0)} W de rodadura ·{' '}
-                    {formatNumber(vatios.desglose.aerodinamica, 0)} W contra el aire.
-                    {vatios.vam !== null && (
-                      <> Esa subida son {formatNumber(vatios.vam, 0)} m/h de VAM.</>
-                    )}
-                  </p>
+                  {/* En bajada el balance de fuerzas puede dar un número negativo. Es correcto
+                      como balance, pero no es la potencia del ciclista: a esa velocidad no
+                      pedalea, frena. Se dice, en vez de publicar «−178 W» como si fuera su
+                      esfuerzo (hallazgo 252). */}
+                  {vatios.sinPedalear ? (
+                    <p className={styles.resultDesc}>
+                      Con esa pendiente, la gravedad sostiene esa velocidad de sobra: el ciclista
+                      no aporta potencia, y aún le sobran{' '}
+                      <strong>{formatNumber(vatios.potenciaSobrante, 0)} W</strong> que tiene que
+                      disipar frenando o dejando subir la velocidad. Para estimar tus vatios en
+                      bajada haría falta saber cuánto frenas, que no es un dato que se tenga.
+                    </p>
+                  ) : (
+                    <p className={styles.resultDesc}>
+                      Reparto del esfuerzo: {formatNumber(vatios.desglose.gravedad, 0)} W contra la
+                      gravedad · {formatNumber(vatios.desglose.rodadura, 0)} W de rodadura ·{' '}
+                      {formatNumber(vatios.desglose.aerodinamica, 0)} W contra el aire.
+                      {vatios.vam !== null && (
+                        <> Esa subida son {formatNumber(vatios.vam, 0)} m/h de VAM.</>
+                      )}
+                    </p>
+                  )}
                   <p className={styles.resultDesc}>
                     Es una <strong>estimación</strong>: supone asfalto en buen estado (Crr 0,005),
                     posición sobre las manetas (CdA 0,32 m²) y aire a nivel del mar. Con viento,
@@ -472,7 +488,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
                   <h3>Sin potenciómetro</h3>
                 </div>
                 <p className={styles.escenarioTip}>
-                  Si no dispones de potenciómetro, algunas aplicaciones de entrenamiento (Zwift, TrainerRoad, Garmin Connect) estiman el FTP mediante frecuencia cardíaca y velocidad en rodillos calibrados. Los valores estimados son orientativos; un potenciómetro físico ofrece la medición más precisa.
+                  Esta misma página lo estima: en «Estimar mis vatios», arriba, con tu peso, la velocidad que sostuviste y la pendiente. Sale del modelo de fuerzas (gravedad, rodadura y aire), así que es orientativo y supone coeficientes típicos de carretera. También hay aplicaciones de entrenamiento (Zwift, TrainerRoad, Garmin Connect) que estiman el FTP con la frecuencia cardíaca y la velocidad en rodillos calibrados. Un potenciómetro físico sigue siendo la medición más precisa.
                 </p>
               </div>
             </div>

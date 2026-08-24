@@ -137,7 +137,10 @@ async function abrirVam(page: Page): Promise<void> {
 async function abrirEstimador(page: Page) {
   await page.getByRole('button', { name: /Estima tus vatios/i }).click();
   await expect(page.locator('#masaTotal')).toBeVisible();
-  return page.locator('[role="status"]').filter({ hasText: 'Potencia estimada' });
+  // El rótulo de la tarjeta cambia según el caso: «Potencia estimada» en llano y en subida,
+  // «No hace falta pedalear» cuando la gravedad sostiene la marcha (hallazgo 252). El locator
+  // no puede depender de lo que precisamente se está comprobando.
+  return page.locator('[role="status"]').filter({ hasText: /Potencia estimada|No hace falta pedalear/ });
 }
 
 /** Rellena el estimador y pulsa «Estimar vatios». */
@@ -346,8 +349,11 @@ test.describe('CASO 2 (límite) — el corte 1200 m/h de la escala de VAM, por l
     // El W/kg, que no depende del tiempo, se sigue publicando: 280 / 70 = 4,00.
     expect(texto).toContain('4,00');
 
+    // Cada caso con SU aviso (hallazgo 255): antes todo lo que no fuera «tiempo ≤ 0» caía en
+    // un genérico «hacen falta los dos datos» que la propia pantalla desmentía cuando los dos
+    // campos estaban rellenos.
     await calcular(page, { desnivel: '1500', tiempo: '' });
-    await expect(resultados(page)).toContainText('hacen falta los dos datos');
+    await expect(resultados(page)).toContainText('Falta el tiempo empleado');
     texto = await resultados(page).innerText();
     expect(texto).not.toContain('m/h');
 
@@ -452,12 +458,13 @@ test('accesibilidad — los sliders quedan fuera del tabulador y los botones lle
 });
 
 /* ═══════════════════════════════════════════════════════════════════════════════════════
- * HALLAZGOS ABIERTOS de la segunda inspección (24/08/2026).
- * Escritos con `test.fail()`: afirman lo que DEBERÍA ocurrir, así que hoy fallan a propósito.
+ * HALLAZGOS 252-256 de la segunda inspección (24/08/2026) · REPARADOS el 24/08/2026.
+ * Estaban escritos con `test.fail()`, afirmando lo que DEBERÍA ocurrir; se les ha quitado la
+ * marca al repararlos, tras comprobar que lo que afirmaban seguía siendo correcto.
  * ═══════════════════════════════════════════════════════════════════════════════════════ */
 
-test.describe('Hallazgos abiertos', () => {
-  test.fail('en bajada no debería publicarse una potencia negativa como «tu potencia»', async ({
+test.describe('Hallazgos 252-256, ya reparados', () => {
+  test('252 · en bajada no se publica una potencia negativa como «tu potencia»', async ({
     page,
   }) => {
     // El estimador invita expresamente a la bajada («0 en llano; negativa en bajada», min −15).
@@ -469,9 +476,18 @@ test.describe('Hallazgos abiertos', () => {
     await estimar(page, { masa: '78', velocidad: '25', pendiente: '-5' });
     const texto = await tarjeta.innerText();
     expect(texto).not.toMatch(/-\d+ W/);
+    // Y lo que sí dice: que ahí no se pedalea, con los vatios que sobran
+    expect(texto).toContain('No hace falta pedalear');
+    expect(texto).toMatch(/sobran \d+ W/);
+
+    // Control: en subida sigue estimando como siempre
+    await estimar(page, { masa: '78', velocidad: '15', pendiente: '6' });
+    const subida = await tarjeta.innerText();
+    expect(subida).toContain('Potencia estimada');
+    expect(subida).toContain('contra la gravedad');
   });
 
-  test.fail('un FTP fuera del rango declarado (50–600 W) no debería recibir veredicto', async ({
+  test('253 · un FTP fuera del rango declarado (50-600 W) no recibe veredicto', async ({
     page,
   }) => {
     // Mitad no reparada del hallazgo 245: los vatios ya pasan por formatNumber(), pero el
@@ -482,22 +498,38 @@ test.describe('Hallazgos abiertos', () => {
     // casi el triple del récord humano.)
     await calcular(page, { peso: '70', ftp: '1000' });
     await expect(page.locator('p[role="alert"]')).toBeVisible();
+    await expect(page.locator('p[role="alert"]')).toContainText('entre 50 y 600 W');
+    // Y por abajo, el peso: 10 kg daba «20,00 W/kg · Nivel profesional internacional»
+    await calcular(page, { peso: '10', ftp: '200' });
+    await expect(page.locator('p[role="alert"]')).toContainText('entre 30 y 150 kg');
+    // Control: dentro del rango se calcula sin avisos
+    await calcular(page, { peso: '70', ftp: '280' });
+    await expect(page.locator('p[role="alert"]')).toHaveCount(0);
   });
 
-  test.fail('ninguna fila de zonas debería salir con el mínimo por encima del máximo', async ({
+  test('254 · ninguna fila de zonas sale con el mínimo por encima del máximo', async ({
     page,
   }) => {
     // Regresión introducida al reparar el hallazgo 244: `wattsMin = límite anterior + 1` se
     // vuelve del revés cuando dos límites consecutivos redondean al mismo entero, algo que
     // ocurre por debajo de ~7 W de FTP (el 15–20 % de separación entre límites no llega a 1 W).
     // ENTRADA 70 kg · FTP 3 W → ESPERADO rangos crecientes · OBTENIDO Z2 «3 – 2 W» y Z4 «4 – 3 W».
+    // Con el rango ya validado (253), un FTP de 3 W ni siquiera llega a calcularse: la fila
+    // invertida era alcanzable solo porque el rango declarado no se hacía cumplir.
     await calcular(page, { peso: '70', ftp: '3' });
-    for (const [min, max] of await rangosDeZona(page)) {
+    await expect(page.locator('p[role="alert"]')).toBeVisible();
+    expect(await rangosDeZona(page)).toHaveLength(0);
+
+    // Y en el FTP más bajo que la herramienta SÍ admite, las seis filas son crecientes
+    await calcular(page, { peso: '70', ftp: '50' });
+    const filas = await rangosDeZona(page);
+    expect(filas).toHaveLength(6);
+    for (const [min, max] of filas) {
       expect(min).toBeLessThanOrEqual(max);
     }
   });
 
-  test.fail('con el desnivel a 0 el aviso no debería decir que faltan datos', async ({ page }) => {
+  test('255 · con el desnivel a 0 el aviso no dice que faltan datos', async ({ page }) => {
     // El aviso del hallazgo 243 solo distingue el caso «tiempo ≤ 0»; con el desnivel a 0 cae en
     // la rama genérica y afirma algo que la pantalla desmiente.
     // ENTRADA desnivel 0 m · tiempo 30 min (los dos rellenos) → ESPERADO un aviso sobre el
@@ -506,9 +538,10 @@ test.describe('Hallazgos abiertos', () => {
     await abrirVam(page);
     await calcular(page, { peso: '70', ftp: '280', desnivel: '0', tiempo: '30' });
     await expect(resultados(page)).not.toContainText('hacen falta los dos datos');
+    await expect(resultados(page)).toContainText('desnivel mayor que 0');
   });
 
-  test.fail('la guía y el FAQ deberían enviar al estimador propio, no solo a apps de terceros', async ({
+  test('256 · la guía y el FAQ envían al estimador propio, no solo a apps de terceros', async ({
     page,
   }) => {
     // El hallazgo 240 se reparó en el formulario, pero los dos sitios que responden justo a esa
@@ -520,6 +553,16 @@ test.describe('Hallazgos abiertos', () => {
     await page.getByRole('button', { name: /Ver guía educativa/i }).click();
     const guia = await page.locator('main').innerText();
     const tarjeta = guia.slice(guia.indexOf('Sin potenciómetro'), guia.indexOf('Sin potenciómetro') + 420);
-    expect(tarjeta).toMatch(/estimador|esta misma página|más arriba/i);
+    expect(tarjeta).toMatch(/Estimar mis vatios|esta misma página/i);
+
+    // Y el FAQPage, que es lo que leen Bing Copilot, ChatGPT o Perplexity
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = bloques.map((b) => JSON.parse(b)).find((j) => j['@type'] === 'FAQPage');
+    const textos: string[] = faq.mainEntity.map(
+      (q: { acceptedAnswer: { text: string } }) => q.acceptedAnswer.text,
+    );
+    const sinPotenciometro = textos.find((t) => t.includes('potenciómetro'))!;
+    expect(sinPotenciometro).not.toContain('si ya conoces tu FTP por haber realizado un test');
+    expect(sinPotenciometro).toContain('modelo de fuerzas');
   });
 });

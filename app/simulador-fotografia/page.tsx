@@ -102,6 +102,33 @@ function clamp(n: number, min: number, max: number) {
  * es exactamente logarítmica (de 1/8 a 1/15 hay 0,91 stops, no 1), de modo que contar
  * índices tampoco daría el valor correcto aunque el signo fuese el bueno.
  */
+/**
+ * Desviación por debajo de la cual la exposición se considera correcta.
+ *
+ * La escala de velocidades no es exactamente logarítmica, así que la compensación deja
+ * restos de centésimas de stop, y la aritmética binaria añade los suyos: en seis
+ * combinaciones de la escena Deportes el resultado exacto 0 salía −4,44·10⁻¹⁶, y
+ * `formatNumber` rotula «~0» todo lo que cae entre 0 y 0,0001 — de modo que en la misma
+ * pantalla convivían «Exposición correcta (~0 EV)» y «(+0,0 EV)» (hallazgo 274). Medio
+ * décimo de stop no lo distingue ningún ojo ni ningún fotómetro.
+ */
+const TOLERANCIA_EV = 0.05;
+
+/**
+ * Lleva un parámetro a aportar `stopsDe(actual) + pendiente` stops, y devuelve lo que NO ha
+ * podido absorber por haber topado con el extremo de su escala.
+ */
+function absorber(
+  pendiente: number,
+  actual: number,
+  stopsDe: (i: number) => number,
+  longitud: number,
+) {
+  const objetivo = stopsDe(actual) + pendiente;
+  const indice = indiceParaStops(objetivo, stopsDe, longitud);
+  return { indice, restante: objetivo - stopsDe(indice) };
+}
+
 function indiceParaStops(objetivo: number, stopsDe: (i: number) => number, longitud: number) {
   let mejor = 0;
   for (let i = 1; i < longitud; i++) {
@@ -147,6 +174,18 @@ export default function SimuladorFotografiaPage() {
    * se expresa en STOPS y luego se traduce a índice con `indiceParaStops`: el objetivo es
    * que `calcDeltaEV` vuelva a 0, no que el deslizador se mueva N muescas.
    */
+  /**
+   * La compensación va en CASCADA: si el primer compañero topa con el extremo de su escala,
+   * lo que falta lo pone el segundo. Antes solo se movía uno —velocidad si tocabas ISO o
+   * diafragma, ISO si tocabas velocidad—, así que en Paisaje bastaba UNA muesca del
+   * deslizador de velocidad para romper la exposición, porque el ISO ya parte de su mínimo
+   * (100). El diafragma no entraba nunca, aunque le quedaran pasos y aunque el propio
+   * FAQPage de la app anuncie esa vía («cómo debe bajar el número f o subir el ISO para
+   * compensar la luz perdida»). Alcance medido antes de reparar: 6 de los 13 puestos del
+   * deslizador de velocidad en Retrato y 8 de 13 en Paisaje y Deportes (hallazgo 273).
+   *
+   * Cuando ni con los dos se llega, el medidor lo dice: ver `compensacionTopada`.
+   */
   const setIso = (newIdx: number) => {
     setIsoIdxRaw(newIdx);
     if (modo === 'compensado') {
@@ -155,8 +194,14 @@ export default function SimuladorFotografiaPage() {
         (isoStops(newIdx) - isoStops(escena.isoIdx)) +
         (apertureStops(apIdx) - apertureStops(escena.apIdx));
       // La velocidad tiene que aportar justo ese exceso con el signo contrario
-      const objetivo = shutterStops(escena.shIdx) - exceso;
-      setShIdxRaw(indiceParaStops(objetivo, shutterStops, SHUTTER_VALUES.length));
+      const vel = absorber(
+        shutterStops(escena.shIdx) - exceso - shutterStops(shIdx),
+        shIdx, shutterStops, SHUTTER_VALUES.length,
+      );
+      setShIdxRaw(vel.indice);
+      if (Math.abs(vel.restante) > TOLERANCIA_EV) {
+        setApIdxRaw(absorber(vel.restante, apIdx, apertureStops, APERTURE_VALUES.length).indice);
+      }
     }
   };
 
@@ -166,8 +211,14 @@ export default function SimuladorFotografiaPage() {
       const exceso =
         (isoStops(isoIdx) - isoStops(escena.isoIdx)) +
         (apertureStops(newIdx) - apertureStops(escena.apIdx));
-      const objetivo = shutterStops(escena.shIdx) - exceso;
-      setShIdxRaw(indiceParaStops(objetivo, shutterStops, SHUTTER_VALUES.length));
+      const vel = absorber(
+        shutterStops(escena.shIdx) - exceso - shutterStops(shIdx),
+        shIdx, shutterStops, SHUTTER_VALUES.length,
+      );
+      setShIdxRaw(vel.indice);
+      if (Math.abs(vel.restante) > TOLERANCIA_EV) {
+        setIsoIdxRaw(absorber(vel.restante, isoIdx, isoStops, ISO_VALUES.length).indice);
+      }
     }
   };
 
@@ -177,15 +228,45 @@ export default function SimuladorFotografiaPage() {
       const exceso =
         (apertureStops(apIdx) - apertureStops(escena.apIdx)) +
         (shutterStops(newIdx) - shutterStops(escena.shIdx));
-      const objetivo = isoStops(escena.isoIdx) - exceso;
-      setIsoIdxRaw(indiceParaStops(objetivo, isoStops, ISO_VALUES.length));
+      const iso = absorber(
+        isoStops(escena.isoIdx) - exceso - isoStops(isoIdx),
+        isoIdx, isoStops, ISO_VALUES.length,
+      );
+      setIsoIdxRaw(iso.indice);
+      // El ISO ha topado (en Paisaje parte de 100, su mínimo): sigue el diafragma
+      if (Math.abs(iso.restante) > TOLERANCIA_EV) {
+        setApIdxRaw(absorber(iso.restante, apIdx, apertureStops, APERTURE_VALUES.length).indice);
+      }
     }
   };
 
-  const deltaEV = useMemo(
+  const deltaEVCrudo = useMemo(
     () => calcDeltaEV(isoIdx, apIdx, shIdx, escena),
     [isoIdx, apIdx, shIdx, escena],
   );
+
+  /**
+   * El valor con el que se calcula todo —marcador, velos de sobre y subexposición, veredicto—
+   * es el crudo: cambiarlo movería la aguja de casos que están bien medidos.
+   */
+  const deltaEV = deltaEVCrudo;
+
+  /**
+   * Lo que se ROTULA se redondea antes al decimal que se va a enseñar. En seis combinaciones
+   * de la escena Deportes el resultado exacto 0 salía −4,44·10⁻¹⁶ por aritmética binaria, y
+   * `formatNumber` rotula «~0» todo lo que cae entre 0 y 0,0001: en la misma pantalla
+   * convivían «Exposición correcta (~0 EV)» y «(+0,0 EV)», perdiendo además el signo y la
+   * decimal (hallazgo 274). El `+ 0` normaliza el −0 que deja `Math.round`.
+   */
+  const deltaEVRotulado = Math.round(deltaEVCrudo * 10) / 10 + 0;
+
+  /**
+   * En modo compensado, la exposición debería mantenerse siempre… salvo cuando los DOS
+   * compañeros han topado con el extremo de su escala. Entonces el simulador lo dice, en vez
+   * de dejar al usuario con un «Ligeramente sobreexpuesto» y un texto de modo que promete sin
+   * condiciones que «los otros se reajustan automáticamente» (hallazgo 273).
+   */
+  const compensacionTopada = modo === 'compensado' && Math.abs(deltaEVCrudo) > TOLERANCIA_EV;
 
   // Efectos visuales derivados de los parámetros
   const bokehBlur = useMemo(
@@ -401,9 +482,18 @@ export default function SimuladorFotografiaPage() {
               </div>
               <div role="status" aria-live="polite">
                 <p className={`${styles.exposureLabel} ${exposureClass}`}>
-                  {exposureLabel} ({deltaEV >= 0 ? '+' : ''}
-                  {formatNumber(deltaEV, 1)} EV)
+                  {exposureLabel} ({deltaEVRotulado >= 0 ? '+' : ''}
+                  {formatNumber(deltaEVRotulado, 1)} EV)
                 </p>
+                {compensacionTopada && (
+                  <p className={styles.avisoCompensacion}>
+                    <span aria-hidden="true">⚠️</span> El modo compensado ha llegado al límite:
+                    con esta escena, ni el ISO ni el diafragma tienen ya recorrido para devolver
+                    la exposición a su sitio. Es lo que pasa en una cámara real cuando se agota
+                    el margen — hay que aceptar la desviación, cambiar de escena o volver al modo
+                    libre.
+                  </p>
+                )}
               </div>
             </div>
 

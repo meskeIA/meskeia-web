@@ -218,6 +218,15 @@ export interface ResultadoPotenciaCiclismo {
  * vatios sin zona: con un FTP de 280 W, 155 y 156 W no caían en ninguna, y así en los cinco
  * cortes. Ahora cada zona empieza donde acaba la anterior.
  */
+/**
+ * Rangos admitidos, los mismos que los controles de la app declaran en sus `min`/`max`.
+ * Viven aquí para que el motor pueda hacerlos cumplir: son parte del contrato, no adorno.
+ */
+export const PESO_MIN_KG = 30;
+export const PESO_MAX_KG = 150;
+export const FTP_MIN_W = 50;
+export const FTP_MAX_W = 600;
+
 const ZONAS_COGGAN: { zona: string; nombre: string; limite: number }[] = [
   { zona: 'Z1', nombre: 'Recuperación activa', limite: 55 },
   { zona: 'Z2', nombre: 'Resistencia', limite: 75 },
@@ -242,6 +251,24 @@ export function calcularPotenciaCiclismo(
   }
   if (!Number.isFinite(ftp_w) || ftp_w <= 0) {
     throw new Error('El FTP debe ser un número mayor que 0 W.');
+  }
+  /**
+   * Los rangos que la app DECLARA en sus controles se comprueban aquí, porque los `min` y
+   * `max` de un input son una sugerencia del navegador y se saltan escribiendo el número a
+   * mano: con 70 kg y 1.000 W de FTP salía «14,29 W/kg» y el veredicto más favorable de la
+   * escala, y con 10 kg y 200 W, «20,00 W/kg» — casi el triple del récord humano— sin una
+   * palabra (hallazgo 253 del Inspector). Reparar solo el formato de la cifra, como se hizo
+   * al cerrar el 245, dejaba en pie el veredicto sobre datos imposibles.
+   *
+   * Y de paso desaparece el caso que producía filas de zonas invertidas (254): con FTP por
+   * debajo de ~7 W, dos límites consecutivos de Coggan redondean al mismo entero y
+   * `wattsMin = anterior + 1` quedaba por encima del máximo de su propia fila.
+   */
+  if (peso_kg < PESO_MIN_KG || peso_kg > PESO_MAX_KG) {
+    throw new Error(`El peso debe estar entre ${PESO_MIN_KG} y ${PESO_MAX_KG} kg, que es el rango que admite la herramienta.`);
+  }
+  if (ftp_w < FTP_MIN_W || ftp_w > FTP_MAX_W) {
+    throw new Error(`El FTP debe estar entre ${FTP_MIN_W} y ${FTP_MAX_W} W, que es el rango que admite la herramienta.`);
   }
 
   const wattsKg = Math.round((ftp_w / peso_kg) * 100) / 100;
@@ -270,10 +297,18 @@ export function calcularPotenciaCiclismo(
   } else if (pidioVam) {
     // Antes la tarjeta desaparecía sin decir nada: el usuario abría el plegable, rellenaba un
     // campo, pulsaba Calcular y no obtenía ni VAM ni explicación.
-    avisoVam =
-      tiempo_min !== undefined && tiempo_min <= 0
-        ? 'Indica un tiempo mayor que 0 minutos para calcular la VAM.'
-        : 'Para la VAM hacen falta los dos datos: el desnivel subido y el tiempo empleado.';
+    // Cada caso con su aviso. Antes solo se distinguía «tiempo <= 0» y todo lo demás caía en
+    // el mensaje genérico: con desnivel 0 y tiempo 30 min —los dos campos RELLENOS— la app
+    // decía «hacen falta los dos datos», que la propia pantalla desmiente (hallazgo 255).
+    if (tiempo_min !== undefined && tiempo_min <= 0) {
+      avisoVam = 'Indica un tiempo mayor que 0 minutos para calcular la VAM.';
+    } else if (desnivel_m !== undefined && desnivel_m <= 0 && tiempo_min !== undefined) {
+      avisoVam = 'Indica un desnivel mayor que 0 metros: la VAM mide lo que se sube, así que en llano no hay ninguna que calcular.';
+    } else if (desnivel_m === undefined) {
+      avisoVam = 'Falta el desnivel subido: la VAM necesita los metros y el tiempo.';
+    } else {
+      avisoVam = 'Falta el tiempo empleado: la VAM necesita los metros y el tiempo.';
+    }
   }
 
   let anterior = 0;
@@ -305,12 +340,20 @@ export interface ParametrosVatios {
 }
 
 export interface ResultadoVatios {
-  /** Potencia total en el pedal (W) */
+  /** Potencia total en el pedal (W). Nunca negativa: ver `sinPedalear`. */
   vatios: number;
-  /** Reparto del esfuerzo, en vatios */
+  /** Reparto del esfuerzo, en vatios. La gravedad sale NEGATIVA en bajada: empuja. */
   desglose: { gravedad: number; rodadura: number; aerodinamica: number };
   /** Velocidad ascensional media que corresponde a esa subida (m/h), null en llano o bajada */
   vam: number | null;
+  /**
+   * A esa velocidad y esa pendiente no hace falta pedalear: la gravedad sostiene la marcha
+   * de sobra. El balance de fuerzas da entonces un número negativo, que es correcto como
+   * balance pero NO es la potencia del ciclista — a esa velocidad no pedalea, frena.
+   */
+  sinPedalear: boolean;
+  /** Potencia que sobra en el balance (W, positiva), solo cuando `sinPedalear` */
+  potenciaSobrante: number;
 }
 
 /** Aceleración de la gravedad (m/s²) */
@@ -358,8 +401,19 @@ export function calcularVatiosPorFuerzas(p: ParametrosVatios): ResultadoVatios {
 
   const potencia = ((fGravedad + fRodadura + fAero) * v) / RENDIMIENTO_TRANSMISION;
 
+  /**
+   * Fuera de dominio: en bajada el balance puede dar un número negativo, y la app invita
+   * expresamente a esa entrada («0 en llano; negativa en bajada», mínimo −15 %). Publicarlo
+   * como «Potencia estimada −178 W» era rotular como potencia del ciclista la solución de
+   * una ecuación que ahí no describe su esfuerzo: a esa velocidad no pedalea, frena
+   * (hallazgo 252 del Inspector). La potencia en el pedal es 0 y el sobrante se dice aparte.
+   */
+  const sinPedalear = potencia < 0;
+
   return {
-    vatios: Math.round(potencia),
+    vatios: Math.max(0, Math.round(potencia)),
+    sinPedalear,
+    potenciaSobrante: sinPedalear ? Math.round(-potencia) : 0,
     desglose: {
       gravedad: Math.round((fGravedad * v) / RENDIMIENTO_TRANSMISION),
       rodadura: Math.round((fRodadura * v) / RENDIMIENTO_TRANSMISION),
