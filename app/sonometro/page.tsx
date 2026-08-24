@@ -31,6 +31,29 @@ const CALIBRACION_MIN = 60;
 const CALIBRACION_MAX = 120;
 const CLAVE_CALIBRACION = 'sonometro-calibracion';
 
+/**
+ * Ganancia de la ponderación A a una frecuencia, en dB (IEC 61672-1).
+ *
+ * La app rotula su estadística principal «LAeq» y todo su bloque educativo remite a límites
+ * en dB(A) —85 dB(A) laborales, 45 dB(A) nocturnos—, pero el motor era un RMS de banda
+ * ancha sin ponderar: cometía exactamente el error del que ella misma avisa en su caja de
+ * errores frecuentes. Dos senoides de la misma amplitud a 1 kHz y a 100 Hz salían iguales
+ * (61,1 y 61,0 dB) cuando deben separarse 19,1 dB.
+ *
+ *   A(f) = 20·log₁₀( 12194²·f⁴ / [ (f²+20,6²)·√((f²+107,7²)(f²+737,9²))·(f²+12194²) ] ) + 2,00
+ *
+ * Por definición vale 0 dB a 1 kHz, que es lo que ancla la calibración del usuario.
+ */
+function ponderacionA(f: number): number {
+  const f2 = f * f;
+  const numerador = 12194 ** 2 * f2 * f2;
+  const denominador =
+    (f2 + 20.6 ** 2) *
+    Math.sqrt((f2 + 107.7 ** 2) * (f2 + 737.9 ** 2)) *
+    (f2 + 12194 ** 2);
+  return 20 * Math.log10(numerador / denominador) + 2.0;
+}
+
 // Formatea una duración en segundos como "M min S s" (o "S s" si no llega al minuto)
 function formatDuracion(segundos: number): string {
   const min = Math.floor(segundos / 60);
@@ -48,6 +71,8 @@ export default function SonometroPage() {
   const [calibracion, setCalibracion] = useState(CALIBRACION_DEFECTO);
   const [error, setError] = useState<string | null>(null);
   const [permissionState, setPermissionState] = useState<'prompt' | 'granted' | 'denied'>('prompt');
+  // Ha habido al menos una sesión de medición: mantiene el resumen en pantalla tras detener
+  const [hayMedicion, setHayMedicion] = useState(false);
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -62,6 +87,10 @@ export default function SonometroPage() {
   // La calibración se lee dentro del bucle sin recrearlo: si viviera en las
   // dependencias de calculateDb, cada ajuste del slider reiniciaría measureLoop.
   const calibracionRef = useRef(CALIBRACION_DEFECTO);
+  // Ganancia lineal de la ponderación A por bin del analizador. Depende solo de la
+  // frecuencia de muestreo y del fftSize, así que se tabula una vez al arrancar en vez de
+  // evaluar el logaritmo 1.024 veces en cada fotograma.
+  const gananciaARef = useRef<Float64Array | null>(null);
 
   // Limpiar recursos al desmontar
   useEffect(() => {
@@ -85,31 +114,67 @@ export default function SonometroPage() {
     window.localStorage.setItem(CLAVE_CALIBRACION, String(calibracion));
   }, [calibracion]);
 
-  // Calcular dB desde los datos del analizador
-  const calculateDb = useCallback((dataArray: Uint8Array): number => {
+  /**
+   * Calcular dB desde la onda del analizador.
+   *
+   * Se lee en coma flotante, no con `getByteTimeDomainData`. Con 8 bits la señal se
+   * cuantiza en 256 escalones y por debajo de ~50 dB la lectura dejaba de seguirla: se
+   * plantaba en un suelo de 44,9 dB, de modo que las dos franjas bajas de la tabla de la
+   * propia app —«Muy silencioso 0-30» y «Silencioso 30-50»— eran inalcanzables, y son justo
+   * las que su bloque educativo manda comparar con el límite nocturno y con los «menos de
+   * 30 dB» de la OMS para el cuarto de un bebé. Leyendo la MISMA señal del MISMO analizador
+   * en float salen los valores exactos, así que el suelo era de la resolución elegida.
+   */
+  const calculateDb = useCallback((dataArray: Float32Array): number => {
     let sum = 0;
     for (let i = 0; i < dataArray.length; i++) {
-      const normalized = (dataArray[i] - 128) / 128;
-      sum += normalized * normalized;
+      sum += dataArray[i] * dataArray[i];
     }
     const rms = Math.sqrt(sum / dataArray.length);
 
     // Convertir RMS a dB. El desplazamiento de calibración lo pone el usuario: los
     // micrófonos integrados no tienen sensibilidad conocida, así que sin un punto de
     // referencia externo el valor absoluto es una estimación.
-    const db = 20 * Math.log10(Math.max(rms, 0.00001)) + calibracionRef.current;
+    return 20 * Math.log10(Math.max(rms, 1e-7)) + calibracionRef.current;
+  }, []);
 
-    return Math.max(0, Math.min(130, db));
+  /**
+   * Corrección de ponderación A del espectro actual, en dB.
+   *
+   * Es la diferencia entre el nivel ponderado A y el nivel sin ponderar para el contenido
+   * espectral de este instante: 10·log₁₀(Σ pₖ·10^(A(fₖ)/10) / Σ pₖ). Al ser un cociente de
+   * energías no depende de cómo esté normalizada la FFT, así que se puede sumar al RMS
+   * temporal sin tocar la calibración que el usuario ya tenía guardada. Con un tono puro de
+   * 1 kHz vale 0 dB; con uno de 100 Hz, −19,1 dB.
+   */
+  const correccionPonderacionA = useCallback((): number => {
+    const analyser = analyserRef.current;
+    const ganancias = gananciaARef.current;
+    if (!analyser || !ganancias) return 0;
+
+    const espectro = new Float32Array(analyser.frequencyBinCount);
+    analyser.getFloatFrequencyData(espectro);
+
+    let energia = 0;
+    let energiaA = 0;
+    for (let k = 1; k < espectro.length; k++) {
+      const p = Math.pow(10, espectro[k] / 10);   // −Infinity dB ⇒ 0, sin caso especial
+      energia += p;
+      energiaA += p * ganancias[k];
+    }
+    return energia > 0 ? 10 * Math.log10(energiaA / energia) : 0;
   }, []);
 
   // Bucle de medición
   const measureLoop = useCallback(() => {
     if (!analyserRef.current) return;
 
-    const dataArray = new Uint8Array(analyserRef.current.fftSize);
-    analyserRef.current.getByteTimeDomainData(dataArray);
+    const dataArray = new Float32Array(analyserRef.current.fftSize);
+    analyserRef.current.getFloatTimeDomainData(dataArray);
 
-    const db = calculateDb(dataArray);
+    // El instrumento entero trabaja en dB(A): es la magnitud que rotula («LAeq») y la que
+    // usan los límites que su propio bloque educativo manda comparar.
+    const db = Math.max(0, Math.min(130, calculateDb(dataArray) + correccionPonderacionA()));
 
     setCurrentDb(db);
     setMinDb(prev => Math.min(prev, db));
@@ -132,7 +197,7 @@ export default function SonometroPage() {
     setDuracion((performance.now() - inicioRef.current) / 1000);
 
     animationRef.current = requestAnimationFrame(measureLoop);
-  }, [calculateDb]);
+  }, [calculateDb, correccionPonderacionA]);
 
   // Iniciar medición
   const startMeasuring = async () => {
@@ -161,6 +226,13 @@ export default function SonometroPage() {
       source.connect(analyser);
       analyserRef.current = analyser;
 
+      const hzPorBin = audioContext.sampleRate / analyser.fftSize;
+      const ganancias = new Float64Array(analyser.frequencyBinCount);
+      for (let k = 0; k < ganancias.length; k++) {
+        ganancias[k] = Math.pow(10, ponderacionA(k * hzPorBin) / 10);
+      }
+      gananciaARef.current = ganancias;
+
       // Resetear estadísticas
       setMinDb(Infinity);
       setMaxDb(0);
@@ -171,19 +243,29 @@ export default function SonometroPage() {
       inicioRef.current = performance.now();
 
       setIsActive(true);
+      setHayMedicion(true);
       measureLoop();
 
     } catch (err) {
       console.error('Error al acceder al micrófono:', err);
+      // Si el fallo llega DESPUÉS de conceder el permiso —un navegador sin AudioContext sin
+      // prefijo, por ejemplo—, el stream se quedaba abierto: la app decía que no estaba
+      // midiendo mientras el indicador de grabación del sistema seguía encendido, y su
+      // argumento de venta es que el audio no se graba ni sale del dispositivo.
+      stopMeasuring();
       setPermissionState('denied');
-      if (err instanceof Error) {
-        if (err.name === 'NotAllowedError') {
-          setError('Permiso de micrófono denegado. Permite el acceso en la configuración del navegador.');
-        } else if (err.name === 'NotFoundError') {
-          setError('No se encontró ningún micrófono. Conecta uno e intenta de nuevo.');
-        } else {
-          setError(`Error: ${err.message}`);
-        }
+      if (err instanceof Error && err.name === 'NotAllowedError') {
+        setError('Permiso de micrófono denegado. Permite el acceso en la configuración del navegador.');
+      } else if (err instanceof Error && err.name === 'NotFoundError') {
+        setError('No se encontró ningún micrófono. Conecta uno e intenta de nuevo.');
+      } else {
+        // Tercer fallo previsible y el único que salía en crudo: sin `navigator.mediaDevices`
+        // (HTTP sin cifrar, WebView antiguo) al usuario le llegaba el TypeError del motor de
+        // JavaScript. Ahora se le habla de su navegador, como en los otros dos casos.
+        setError(
+          'Este navegador no permite acceder al micrófono desde la página. ' +
+          'Comprueba que la dirección empieza por https:// y usa un navegador actualizado.'
+        );
       }
     }
   };
@@ -233,7 +315,8 @@ export default function SonometroPage() {
         <span className={styles.heroIcon}>🔊</span>
         <h1 className={styles.title}>Sonómetro</h1>
         <p className={styles.subtitle}>
-          Sonómetro y decibelímetro online: mide el nivel de ruido en decibelios (dB) con tu micrófono.
+          Sonómetro y decibelímetro online: mide el nivel de ruido en decibelios ponderados A —dB(A),
+          los de la normativa— con tu micrófono.
           Ideal para documentar ruido, verificar ambientes de trabajo o medir contaminación acústica.
         </p>
       </header>
@@ -283,7 +366,7 @@ export default function SonometroPage() {
             <span className={styles.dbValue} style={{ color: currentLevel.color }}>
               {isActive ? formatNumber(currentDb, 1) : '--'}
             </span>
-            <span className={styles.dbUnit}>dB</span>
+            <span className={styles.dbUnit}>dB(A)</span>
           </div>
 
           {/* Nivel actual */}
@@ -316,22 +399,28 @@ export default function SonometroPage() {
           </div>
 
           {/* Error */}
+          {/* Es la ÚNICA señal de que no se está midiendo: el botón no cambia, el foco no se
+              mueve y la lectura sigue en «--». Sin role="alert" un lector de pantalla no
+              anunciaba nada al denegarse el micrófono. */}
           {error && (
-            <div className={styles.errorMessage}>
-              ⚠️ {error}
+            <div className={styles.errorMessage} role="alert">
+              <span aria-hidden="true">⚠️</span> {error}
             </div>
           )}
 
           {/* Mensaje de permiso */}
           {permissionState === 'prompt' && !isActive && !error && (
             <div className={styles.infoMessage}>
-              💡 Se solicitará permiso para acceder al micrófono
+              <span aria-hidden="true">💡</span> Se solicitará permiso para acceder al micrófono
             </div>
           )}
         </div>
 
-        {/* Estadísticas */}
-        {isActive && (
+        {/* Estadísticas — visibles también DESPUÉS de detener: la app pide medir «al menos
+            5 minutos seguidos» y compararlos con la ordenanza, y pulsar Detener borraba de
+            la pantalla el mínimo, el máximo, el LAeq y la duración justo al terminar la
+            sesión. La guía sorteaba el problema pidiendo la captura «mientras está midiendo». */}
+        {(isActive || hayMedicion) && (
           <div className={styles.statsPanel}>
             <h2 className={styles.sectionTitle}>
               <span aria-hidden="true">📊</span> Estadísticas de sesión
@@ -343,29 +432,31 @@ export default function SonometroPage() {
                   <span className={styles.statValue}>
                     {minDb === Infinity ? '--' : formatNumber(minDb, 1)}
                   </span>
-                  <span className={styles.statLabel}>Mínimo (dB)</span>
+                  <span className={styles.statLabel}>Mínimo (dB(A))</span>
                 </div>
               </div>
               <div className={styles.statCard}>
                 <span className={styles.statIcon}>⬆️</span>
                 <div className={styles.statInfo}>
                   <span className={styles.statValue}>{formatNumber(maxDb, 1)}</span>
-                  <span className={styles.statLabel}>Máximo (dB)</span>
+                  <span className={styles.statLabel}>Máximo (dB(A))</span>
                 </div>
               </div>
               <div className={`${styles.statCard} ${styles.statCardLaeq}`}>
                 <span className={styles.statIcon} aria-hidden="true">📈</span>
                 <div className={styles.statInfo}>
                   <span className={styles.statValue}>{formatNumber(laeq, 1)}</span>
-                  <span className={styles.statLabel}>LAeq (dB)</span>
+                  <span className={styles.statLabel}>LAeq (dB(A))</span>
                 </div>
               </div>
             </div>
             <p className={styles.laeqNota}>
-              <strong>LAeq</strong> = nivel continuo equivalente de los últimos{' '}
+              <strong>LAeq</strong> = nivel continuo equivalente, en dB(A), de los últimos{' '}
               <strong>{formatDuracion(duracion)}</strong>. Es el promedio <em>energético</em>,
               el valor que utilizan las normativas de ruido: pondera los picos como
-              realmente pesan, a diferencia de una media aritmética de decibelios.
+              realmente pesan, a diferencia de una media aritmética de decibelios. La «A» es la
+              ponderación en frecuencia de la IEC 61672, la que exige la normativa: rebaja los
+              graves igual que los rebaja el oído (−19,1 dB a 100 Hz) y deja el 1 kHz intacto.
               Para documentar una molestia, mide al menos 5 minutos seguidos.
             </p>
           </div>
@@ -499,7 +590,7 @@ export default function SonometroPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🔢 Escala logarítmica</h4>
+              <h4><span aria-hidden="true">🔢</span> Escala logarítmica</h4>
               <ul>
                 <li>0 dB: Umbral de audición</li>
                 <li>+10 dB: 10x más intensidad</li>
@@ -508,7 +599,7 @@ export default function SonometroPage() {
               </ul>
             </div>
             <div className={styles.contentCard}>
-              <h4>👂 Salud auditiva</h4>
+              <h4><span aria-hidden="true">👂</span> Salud auditiva</h4>
               <ul>
                 <li>&lt;70 dB: Seguro indefinidamente</li>
                 <li>85 dB: Máx. 8 horas/día</li>
@@ -528,7 +619,7 @@ export default function SonometroPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🏠 Viviendas (interior)</h4>
+              <h4><span aria-hidden="true">🏠</span> Viviendas (interior)</h4>
               <ul>
                 <li>Día (8:00-22:00): 35-40 dB</li>
                 <li>Noche (22:00-8:00): 30-35 dB</li>
@@ -536,7 +627,7 @@ export default function SonometroPage() {
               </ul>
             </div>
             <div className={styles.contentCard}>
-              <h4>🏢 Ambientes laborales</h4>
+              <h4><span aria-hidden="true">🏢</span> Ambientes laborales</h4>
               <ul>
                 <li>Oficinas: 50-55 dB</li>
                 <li>Industria: máx. 85 dB (con protección)</li>
@@ -557,7 +648,7 @@ export default function SonometroPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🌞 Durante el día</h4>
+              <h4><span aria-hidden="true">🌞</span> Durante el día</h4>
               <ul>
                 <li>50 dB en exteriores: molestia moderada</li>
                 <li>55 dB en exteriores: molestia seria</li>
@@ -565,7 +656,7 @@ export default function SonometroPage() {
               </ul>
             </div>
             <div className={styles.contentCard}>
-              <h4>🌙 Durante la noche</h4>
+              <h4><span aria-hidden="true">🌙</span> Durante la noche</h4>
               <ul>
                 <li>40 dB en el exterior de la vivienda: objetivo de salud</li>
                 <li>55 dB: efectos adversos documentados</li>
@@ -587,7 +678,7 @@ export default function SonometroPage() {
           <h2>Consejos para medir correctamente</h2>
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>✅ Buenas prácticas</h4>
+              <h4><span aria-hidden="true">✅</span> Buenas prácticas</h4>
               <ul>
                 <li>Mantén el móvil a 1-1,5 m de la fuente</li>
                 <li>Evita cubrir el micrófono</li>
@@ -596,7 +687,7 @@ export default function SonometroPage() {
               </ul>
             </div>
             <div className={styles.contentCard}>
-              <h4>❌ Evitar</h4>
+              <h4><span aria-hidden="true">❌</span> Evitar</h4>
               <ul>
                 <li>Viento directo sobre el micrófono</li>
                 <li>Tocar el móvil durante la medición</li>

@@ -89,6 +89,27 @@ function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
 
+/**
+ * Índice de la escala cuyo valor en stops queda más cerca del objetivo.
+ *
+ * El modo compensado sumaba el número de stops directamente AL ÍNDICE del deslizador. Para
+ * el ISO cuela, porque `isoStops(i)` vale exactamente `i` (100, 200, 400… son potencias de
+ * dos), pero para la velocidad no: `shutterStops` DECRECE al avanzar el índice (idx 0 = 1 s,
+ * idx 12 = 1/4000 s), así que para aportar +n stops de luz el índice tiene que BAJAR n. Al
+ * sumarlos, la corrección no cancelaba el error sino que lo DUPLICABA, y el simulador
+ * enseñaba justo lo contrario de la regla que dice enseñar: de f/2,8 a f/8 en modo
+ * compensado marcaba −6,0 EV donde debía marcar +0,0. Además la escala de velocidades no
+ * es exactamente logarítmica (de 1/8 a 1/15 hay 0,91 stops, no 1), de modo que contar
+ * índices tampoco daría el valor correcto aunque el signo fuese el bueno.
+ */
+function indiceParaStops(objetivo: number, stopsDe: (i: number) => number, longitud: number) {
+  let mejor = 0;
+  for (let i = 1; i < longitud; i++) {
+    if (Math.abs(stopsDe(i) - objetivo) < Math.abs(stopsDe(mejor) - objetivo)) mejor = i;
+  }
+  return mejor;
+}
+
 function formatShutter(idx: number) {
   const s = SHUTTER_VALUES[idx];
   if (s >= 1) return `${s} s`;
@@ -118,41 +139,46 @@ export default function SimuladorFotografiaPage() {
     setShIdxRaw(esc.shIdx);
   };
 
-  // Setters con compensación automática en modo compensado.
-  // Estrategia: mover ISO o apertura → compensa con velocidad. Mover velocidad → compensa con ISO.
+  /**
+   * Setters con compensación automática en modo compensado.
+   *
+   * Estrategia: mover ISO o apertura → compensa con velocidad. Mover velocidad → compensa
+   * con ISO. La compensación busca el valor que deja la exposición donde estaba, y por eso
+   * se expresa en STOPS y luego se traduce a índice con `indiceParaStops`: el objetivo es
+   * que `calcDeltaEV` vuelva a 0, no que el deslizador se mueva N muescas.
+   */
   const setIso = (newIdx: number) => {
     setIsoIdxRaw(newIdx);
     if (modo === 'compensado') {
-      const objStops = -(
+      // Luz de más (o de menos) que aportan ISO y diafragma respecto a la escena de partida
+      const exceso =
         (isoStops(newIdx) - isoStops(escena.isoIdx)) +
-        (apertureStops(apIdx) - apertureStops(escena.apIdx))
-      );
-      const newShIdx = clamp(Math.round(escena.shIdx + objStops), 0, SHUTTER_VALUES.length - 1);
-      setShIdxRaw(newShIdx);
+        (apertureStops(apIdx) - apertureStops(escena.apIdx));
+      // La velocidad tiene que aportar justo ese exceso con el signo contrario
+      const objetivo = shutterStops(escena.shIdx) - exceso;
+      setShIdxRaw(indiceParaStops(objetivo, shutterStops, SHUTTER_VALUES.length));
     }
   };
 
   const setAp = (newIdx: number) => {
     setApIdxRaw(newIdx);
     if (modo === 'compensado') {
-      const objStops = -(
+      const exceso =
         (isoStops(isoIdx) - isoStops(escena.isoIdx)) +
-        (apertureStops(newIdx) - apertureStops(escena.apIdx))
-      );
-      const newShIdx = clamp(Math.round(escena.shIdx + objStops), 0, SHUTTER_VALUES.length - 1);
-      setShIdxRaw(newShIdx);
+        (apertureStops(newIdx) - apertureStops(escena.apIdx));
+      const objetivo = shutterStops(escena.shIdx) - exceso;
+      setShIdxRaw(indiceParaStops(objetivo, shutterStops, SHUTTER_VALUES.length));
     }
   };
 
   const setSh = (newIdx: number) => {
     setShIdxRaw(newIdx);
     if (modo === 'compensado') {
-      const objStops = -(
+      const exceso =
         (apertureStops(apIdx) - apertureStops(escena.apIdx)) +
-        (shutterStops(newIdx) - shutterStops(escena.shIdx))
-      );
-      const newIsoIdx = clamp(Math.round(escena.isoIdx + objStops), 0, ISO_VALUES.length - 1);
-      setIsoIdxRaw(newIsoIdx);
+        (shutterStops(newIdx) - shutterStops(escena.shIdx));
+      const objetivo = isoStops(escena.isoIdx) - exceso;
+      setIsoIdxRaw(indiceParaStops(objetivo, isoStops, ISO_VALUES.length));
     }
   };
 
@@ -169,9 +195,19 @@ export default function SimuladorFotografiaPage() {
 
   const noiseOpacity = useMemo(() => (isoIdx / (ISO_VALUES.length - 1)) * 0.45, [isoIdx]);
 
+  /**
+   * Desenfoque por movimiento. El panel avisa de «Trepidación posible» y «Motion blur
+   * fuerte» en CUALQUIER escena —y el hero, la metadata y el JSON-LD lo prometen sin
+   * condición—, pero solo se dibujaba en Deportes: en Retrato con 1 s la app decía a la vez
+   * «Motion blur fuerte» y «Trípode: Imprescindible» sobre una foto perfectamente nítida.
+   *
+   * La referencia es distinta según lo que se mueva: en Deportes, el sujeto corre y se
+   * arrastra por debajo de 1/1000; en las demás, lo que tiembla es la cámara a pulso, y el
+   * umbral clásico está en 1/125 (el mismo shIdx 7 con el que el panel cambia de veredicto).
+   */
   const motionBlur = useMemo(() => {
-    if (escena.id !== 'deporte') return 0;
-    const stopsLento = shutterStops(shIdx) - shutterStops(10); // positivo cuando más lento que 1/1000
+    const referencia = escena.id === 'deporte' ? 10 : 7;
+    const stopsLento = shutterStops(shIdx) - shutterStops(referencia);
     if (stopsLento <= 0) return 0;
     return Math.min(stopsLento * 4, 30);
   }, [shIdx, escena.id]);
@@ -204,7 +240,7 @@ export default function SimuladorFotografiaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1>📷 Simulador de Fotografía</h1>
+        <h1><span aria-hidden="true">📷</span> Simulador de Fotografía</h1>
         <p>
           Aprende el triángulo de exposición moviendo ISO, apertura y velocidad. Ve el resultado en
           tiempo real con bokeh, ruido y motion blur.
@@ -218,6 +254,7 @@ export default function SimuladorFotografiaPage() {
           {ESCENAS.map((esc) => (
             <button
               key={esc.id}
+              type="button"
               role="tab"
               aria-selected={escenaId === esc.id}
               className={`${styles.tabBtn} ${escenaId === esc.id ? styles.tabActive : ''}`}
@@ -230,6 +267,7 @@ export default function SimuladorFotografiaPage() {
 
         <div className={styles.modoToggle} role="group" aria-label="Modo de simulación">
           <button
+            type="button"
             className={`${styles.modoBtn} ${modo === 'libre' ? styles.modoActive : ''}`}
             onClick={() => setModo('libre')}
             aria-pressed={modo === 'libre'}
@@ -237,6 +275,7 @@ export default function SimuladorFotografiaPage() {
             Modo libre
           </button>
           <button
+            type="button"
             className={`${styles.modoBtn} ${modo === 'compensado' ? styles.modoActive : ''}`}
             onClick={() => setModo('compensado')}
             aria-pressed={modo === 'compensado'}
@@ -322,8 +361,12 @@ export default function SimuladorFotografiaPage() {
               </span>
             </div>
 
-            <button className={styles.calcBtnGhost} onClick={() => cambiarEscena(escena.id)}>
-              ↺ Volver a la combinación correcta
+            <button
+              type="button"
+              className={styles.calcBtnGhost}
+              onClick={() => cambiarEscena(escena.id)}
+            >
+              <span aria-hidden="true">↺</span> Volver a la combinación correcta
             </button>
           </div>
 
@@ -417,9 +460,16 @@ export default function SimuladorFotografiaPage() {
             </div>
 
             <div className={styles.formulaBox}>
-              <p className={styles.formulaTex}>EV = log₂(N² / t) + log₂(ISO / 100)</p>
+              <p className={styles.formulaTex}>
+                ΔEV = log₂(ISO / ISO₀) + 2·log₂(N₀ / N) + log₂(t / t₀)
+              </p>
               <p className={styles.formulaCaption}>
-                Cada paso (stop) duplica o divide a la mitad la luz que llega al sensor
+                Cada paso (stop) duplica o divide a la mitad la luz que llega al sensor. El
+                indicador mide la <strong>desviación</strong> respecto a la combinación correcta de
+                la escena (subíndice 0), con el convenio del fotómetro: <strong>positivo = más
+                luz = sobreexpuesto</strong>. Ojo al signo si vienes de la definición clásica
+                EV = log₂(N²/t), que crece cuando la escena es más luminosa y por tanto se mueve
+                al revés que este indicador.
               </p>
             </div>
           </div>
@@ -520,7 +570,7 @@ export default function SimuladorFotografiaPage() {
                 aperturas grandes (más luz).
               </p>
               <p className={styles.faqTip}>
-                💡 Cada paso de apertura es un factor √2 (≈ 1,41) en el f-number, porque la luz
+                <span aria-hidden="true">💡</span> Cada paso de apertura es un factor √2 (≈ 1,41) en el f-number, porque la luz
                 depende del área (diámetro al cuadrado).
               </p>
             </div>
@@ -540,7 +590,7 @@ export default function SimuladorFotografiaPage() {
                 modernos permiten 2-3 stops más lento (con un 50 mm, hasta 1/15s o 1/8s).
               </p>
               <p className={styles.faqTip}>
-                💡 Esta regla aplica a fotografía estática, no a sujetos en movimiento.
+                <span aria-hidden="true">💡</span> Esta regla aplica a fotografía estática, no a sujetos en movimiento.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -776,9 +826,13 @@ function EscenaSVG({
         </linearGradient>
       </defs>
 
-      {escena === 'retrato' && <EscenaRetrato W={W} H={H} />}
-      {escena === 'paisaje' && <EscenaPaisaje W={W} H={H} />}
-      {escena === 'deporte' && <EscenaDeporte W={W} H={H} />}
+      {/* En Deportes el arrastre es del sujeto y va dentro de la escena; en las otras dos
+          lo que tiembla es la cámara, así que el desenfoque afecta a toda la imagen. */}
+      <g filter={escena === 'deporte' ? undefined : 'url(#motion-blur)'}>
+        {escena === 'retrato' && <EscenaRetrato W={W} H={H} />}
+        {escena === 'paisaje' && <EscenaPaisaje W={W} H={H} />}
+        {escena === 'deporte' && <EscenaDeporte W={W} H={H} />}
+      </g>
 
       {/* Overlay de exposición: oscuro o claro */}
       {overlayDark > 0 && (

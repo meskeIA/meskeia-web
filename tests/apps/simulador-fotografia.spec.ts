@@ -102,7 +102,9 @@ import { test, expect, Page } from '@playwright/test';
  *         «Sobreexpuesto (zonas quemadas) (+6,1 EV)».
  *     El tercer deslizador, setSh(), SÍ es correcto, y por el mismo motivo: compensa con el
  *     ISO, cuyo isoStops CRECE con el índice, de modo que ahí el «+» es el signo que toca.
- *     Ver los dos testigos del modo compensado (diafragma e ISO), marcados con test.fail().
+ *     REPARADO el 24/08/2026: la compensación se calcula en STOPS y luego se busca el índice
+ *     más cercano a ese valor, así que ni el signo ni la escala irregular de velocidades
+ *     (de 1/8 a 1/15 hay 0,91 stops, no 1) pueden volver a estropearla.
  *
  *   · La caja de fórmula rotula «EV = log₂(N² / t) + log₂(ISO / 100)» justo debajo de un
  *     medidor cuyo signo es el contrario para dos de las tres variables: con esa fórmula,
@@ -289,29 +291,35 @@ test('CASO 2 · límites de los deslizadores y profundidad de campo (Paisaje)', 
     expect(desenfoques[i]).toBeLessThan(desenfoques[i - 1]);
   }
 
-  // HALLAZGO ABIERTO: la fórmula impresa lleva el signo contrario al medidor que hay encima.
-  // Se vuelve antes al punto de partida de la escena porque el marcador satura en ±3 EV, y
-  // dos lecturas saturadas serían iguales aunque el ΔEV real no lo fuese.
+  // La fórmula impresa describe AHORA la magnitud que el medidor muestra (ΔEV respecto a la
+  // combinación correcta de la escena). Se vuelve antes al punto de partida porque el marcador
+  // satura en ±3 EV, y dos lecturas saturadas serían iguales aunque el ΔEV real no lo fuese.
   await volverAlPuntoDePartida(page);
   const evAntes = await evDelMarcador(page); // ISO 100 · f/11 · 1/250 s → 0,0 EV
   await mover(page, 'ap-slider', 8);
   const evDespues = await evDelMarcador(page); // f/22 → -2,0 EV
-  await expect(page.locator('[class*="formulaTex"]')).toHaveText('EV = log₂(N² / t) + log₂(ISO / 100)');
-  // El medidor sigue el convenio de fotómetro (cerrar el diafragma resta luz, luego BAJA) y es
-  // el correcto para lo que muestra: eso va como comprobación firme.
+  await expect(page.locator('[class*="formulaTex"]')).toHaveText(
+    'ΔEV = log₂(ISO / ISO₀) + 2·log₂(N₀ / N) + log₂(t / t₀)',
+  );
+  // El medidor sigue el convenio de fotómetro: cerrar el diafragma resta luz, luego BAJA.
   expect(evDespues).toBeLessThan(evAntes);
   expect(evDespues - evAntes).toBeCloseTo(-2.0, 2);
-  // Lo que sobra es la fórmula, y su comprobación vive en el testigo de aquí abajo.
 });
 
-// Testigo de la fórmula impresa con N². Cuando se repare, este test pasará y Playwright avisará.
-test('Testigo · la fórmula impresa lleva el signo contrario al medidor', async ({ page }) => {
-  test.fail();
-  // EV = log₂(N²/t) es el EV ABSOLUTO, con el que cerrar el diafragma SUBIRÍA el EV en 2, y el
-  // medidor que tiene justo encima lo BAJA. La comprobación cae sobre el texto impreso, no sobre
-  // el medidor: el convenio de fotómetro del medidor es el correcto para lo que muestra.
+/**
+ * REPARADO 24/08/2026 (hallazgo 222). La caja imprimía EV = log₂(N²/t) + log₂(ISO/100), el EV
+ * ABSOLUTO, con el que cerrar el diafragma SUBE el valor — justo al revés que el medidor que
+ * tiene encima. El medidor no estaba mal: sigue el convenio de fotómetro (+ = sobreexpuesto),
+ * que es el correcto para lo que muestra. Lo que no encajaba era la fórmula, que ahora describe
+ * la desviación respecto a la combinación de partida y avisa del signo del EV clásico.
+ */
+test('la fórmula impresa describe la magnitud que el medidor muestra', async ({ page }) => {
   const formula = (await page.locator('[class*="formulaTex"]').textContent()) ?? '';
-  expect(formula, 'la fórmula impresa lleva el signo contrario al medidor que hay encima').not.toContain('N²');
+  expect(formula, 'la fórmula impresa no puede llevar el signo contrario al medidor').not.toContain('N²');
+  expect(formula).toContain('ΔEV');
+  expect(formula).toContain('2·log₂(N₀ / N)'); // cerrar el diafragma RESTA, como en el medidor
+  const pie = (await page.locator('[class*="formulaCaption"]').textContent()) ?? '';
+  expect(pie).toContain('positivo = más luz = sobreexpuesto');
 });
 
 test('CASO 3 · coherencia interna: el modo compensado debe conservar la exposición', async ({ page }) => {
@@ -328,64 +336,66 @@ test('CASO 3 · coherencia interna: el modo compensado debe conservar la exposic
 
   // (a) Diafragma → velocidad. f/2,8 → f/8 son -3,029146 stops; el tiempo debe alargarse
   //     hasta 1/15 s (+3,058893) para devolverlos. ΔEV = +0,029747 → «Exposición correcta».
-  //     HALLAZGO ABIERTO: la app pone 1/1000 s y se va a -6,0 EV (signo invertido en setAp).
-  //     Los asertos de ese desvío viven en el testigo de aquí abajo; aquí solo queda lo que hoy
-  //     sí cumple, que es mover el diafragma al valor pedido.
+  //     REPARADO (hallazgo 221): la compensación se calcula en stops y se traduce a índice,
+  //     en vez de sumar los stops al índice del deslizador con el signo cambiado.
   await volverAlPuntoDePartida(page);
   await mover(page, 'ap-slider', 5);
   await expect(rotulo(page, 'ap-slider')).toHaveText('f/8');
+  await expect(rotulo(page, 'sh-slider')).toHaveText('1/15 s');
+  await expect(exposicion(page)).toHaveText('Exposición correcta (+0,0 EV)');
+  expect(Math.abs(await evDelMarcador(page))).toBeLessThan(0.3);
 
   // (b) ISO → velocidad. ISO 800 → 6400 son +3 stops; el tiempo debe acortarse 3 stops
   //     (1/125 → 1/1000 s) para quitarlos. ΔEV = 0,000000.
-  //     HALLAZGO ABIERTO: la app pone 1/15 s y se va a +6,1 EV (signo invertido en setIso).
-  //     Mismo reparto que en (a): el desvío se comprueba en su testigo.
   await volverAlPuntoDePartida(page);
   await mover(page, 'iso-slider', 6);
   await expect(rotulo(page, 'iso-slider')).toHaveText('ISO 6400');
+  await expect(rotulo(page, 'sh-slider')).toHaveText('1/1000 s');
+  await expect(exposicion(page)).toHaveText('Exposición correcta (+0,0 EV)');
+  expect(await evDelMarcador(page)).toBeCloseTo(0, 5);
 });
 
-// Testigo del signo invertido en setAp. Cuando se repare, este test pasará y Playwright avisará.
-test('Testigo · en modo compensado, mover el diafragma no conserva la exposición', async ({ page }) => {
-  test.fail();
+/**
+ * REPARADO 24/08/2026 (hallazgo 221, alto). El modo compensado —la promesa central de la app—
+ * sumaba los stops al ÍNDICE del deslizador de velocidad, cuyo eje va al revés: la corrección
+ * DUPLICABA el error en vez de cancelarlo y el simulador enseñaba lo contrario de lo que dice
+ * enseñar. Con el ISO colaba porque su índice sí coincide con sus stops.
+ */
+test('en modo compensado, mover el diafragma conserva la exposición', async ({ page }) => {
   // f/2,8 → f/8 son -3,029146 stops; el tiempo debe alargarse hasta 1/15 s (+3,058893) para
-  // devolverlos. La app suma objStops al índice de velocidad en vez de restarlo y pone 1/1000 s.
+  // devolverlos. Antes la app ponía 1/1000 s y se iba a -6,0 EV.
   await page.getByRole('button', { name: 'Modo compensado' }).click();
   await mover(page, 'ap-slider', 5);
   await expect(rotulo(page, 'ap-slider')).toHaveText('f/8');
-  expect
-    .soft(await rotulo(page, 'sh-slider').textContent(), 'compensar f/2,8→f/8 pide 1/15 s')
-    .toBe('1/15 s');
-  expect
-    .soft(await exposicion(page).textContent(), 'el modo compensado promete mantener la exposición')
-    .toBe('Exposición correcta (+0,0 EV)');
-  expect
-    .soft(
-      Math.abs(await evDelMarcador(page)),
-      'el ΔEV tras compensar debe caber en ±0,3 EV (el marcador satura en 3: el desvío real es mayor)',
-    )
-    .toBeLessThan(0.3);
+  expect(await rotulo(page, 'sh-slider').textContent(), 'compensar f/2,8→f/8 pide 1/15 s').toBe(
+    '1/15 s',
+  );
+  expect(
+    await exposicion(page).textContent(),
+    'el modo compensado promete mantener la exposición',
+  ).toBe('Exposición correcta (+0,0 EV)');
+  expect(Math.abs(await evDelMarcador(page)), 'el ΔEV tras compensar cabe en ±0,3 EV').toBeLessThan(
+    0.3,
+  );
 });
 
-// Testigo del signo invertido en setIso. Cuando se repare, este test pasará y Playwright avisará.
-test('Testigo · en modo compensado, mover el ISO no conserva la exposición', async ({ page }) => {
-  test.fail();
+test('en modo compensado, mover el ISO conserva la exposición', async ({ page }) => {
   // ISO 800 → 6400 son +3 stops de luz de más; el tiempo debe acortarse 3 stops (1/125 → 1/1000 s)
-  // para quitarlos. Con el signo cambiado la app pone 1/15 s y duplica el error.
+  // para quitarlos. Con el signo cambiado la app ponía 1/15 s y duplicaba el error.
   await page.getByRole('button', { name: 'Modo compensado' }).click();
   await mover(page, 'iso-slider', 6);
   await expect(rotulo(page, 'iso-slider')).toHaveText('ISO 6400');
-  expect
-    .soft(await rotulo(page, 'sh-slider').textContent(), 'compensar ISO 800→6400 pide 1/1000 s')
-    .toBe('1/1000 s');
-  expect
-    .soft(await exposicion(page).textContent(), 'el modo compensado promete mantener la exposición')
-    .toBe('Exposición correcta (+0,0 EV)');
-  expect
-    .soft(
-      Math.abs(await evDelMarcador(page)),
-      'el ΔEV tras compensar debe caber en ±0,3 EV (el marcador satura en 3: el desvío real es mayor)',
-    )
-    .toBeLessThan(0.3);
+  expect(
+    await rotulo(page, 'sh-slider').textContent(),
+    'compensar ISO 800→6400 pide 1/1000 s',
+  ).toBe('1/1000 s');
+  expect(
+    await exposicion(page).textContent(),
+    'el modo compensado promete mantener la exposición',
+  ).toBe('Exposición correcta (+0,0 EV)');
+  expect(Math.abs(await evDelMarcador(page)), 'el ΔEV tras compensar cabe en ±0,3 EV').toBeLessThan(
+    0.3,
+  );
 });
 
 test('Sonda · motion blur y formato español', async ({ page }) => {
@@ -407,13 +417,14 @@ test('Sonda · motion blur y formato español', async ({ page }) => {
   expect(await desenfoqueMovimiento(page)).toBe(0);
   await expect(efecto(page, 'Movimiento')).toHaveText('Congelado por completo');
 
-  // HALLAZGO ABIERTO: fuera de Deportes el barrido no se dibuja nunca, aunque el panel siga
-  // rotulando movimiento y el hero prometa motion blur sin condición.
+  // REPARADO (hallazgo 223): fuera de Deportes también se dibuja, porque lo que tiembla es la
+  // cámara. La referencia allí es 1/125 s (shIdx 7), el umbral con el que el propio panel pasa
+  // a avisar de trepidación: 1 s está 6,965784 stops por debajo → min(4·6,965784; 30) = 27,863137.
   await page.getByRole('tab', { name: /Retrato/ }).click();
   await mover(page, 'sh-slider', 0);
   await expect(rotulo(page, 'sh-slider')).toHaveText('1 s');
   await expect(efecto(page, 'Movimiento')).toHaveText('Motion blur fuerte');
-  // El aserto de que ese barrido llegue a dibujarse vive en el testigo del final del fichero.
+  expect(await desenfoqueMovimiento(page)).toBeCloseTo(27.863137, 4);
 
   // Formato español (CLAUDE.md global §2): coma decimal en diafragmas y en el EV.
   await volverAlPuntoDePartida(page);
@@ -437,14 +448,17 @@ test('Sonda · accesibilidad de los controles', async ({ page }) => {
   await expect(page.getByRole('tab', { name: /Retrato/ })).toHaveAttribute('aria-selected', 'true');
   await expect(page.getByRole('button', { name: 'Modo libre' })).toHaveAttribute('aria-pressed', 'true');
 
-  // El recuento de botones sin type="button" vive en el testigo de aquí abajo.
+  // El recuento de botones sin type="button" vive en el test del final del fichero.
 });
 
-// Testigo del motion blur limitado a Deportes. Cuando se repare, este test pasará y Playwright avisará.
-test('Testigo · fuera de Deportes el barrido no se dibuja aunque el panel lo anuncie', async ({ page }) => {
-  test.fail();
-  // Escena Retrato (la de partida) a 1 s: el panel rotula «Motion blur fuerte», pero
-  // escena.id !== 'deporte' deja el filtro a 0 y la imagen no cambia.
+/**
+ * REPARADO 24/08/2026 (hallazgo 223). El barrido solo se dibujaba en Deportes, así que en
+ * Retrato con 1 s la app decía a la vez «Motion blur fuerte» y «Trípode: Imprescindible» sobre
+ * una foto perfectamente nítida, mientras el hero y el JSON-LD lo prometían sin condición.
+ */
+test('fuera de Deportes el barrido se dibuja cuando el panel lo anuncia', async ({ page }) => {
+  // Escena Retrato (la de partida) a 1 s: el panel rotula «Motion blur fuerte» y ahora la
+  // imagen lo enseña.
   await mover(page, 'sh-slider', 0);
   await expect(rotulo(page, 'sh-slider')).toHaveText('1 s');
   await expect(efecto(page, 'Movimiento')).toHaveText('Motion blur fuerte');
@@ -454,11 +468,12 @@ test('Testigo · fuera de Deportes el barrido no se dibuja aunque el panel lo an
   ).toBeGreaterThan(0);
 });
 
-// Testigo de los botones sin type="button". Cuando se repare, este test pasará y Playwright avisará.
-test('Testigo · ningún botón de la app lleva type="button"', async ({ page }) => {
-  test.fail();
-  // Los 6 botones (3 pestañas de escena, 2 de modo y «↺ Volver a la combinación correcta»)
-  // salen sin atributo type. Regla de oro del CLAUDE.md global §5.
+/**
+ * REPARADO 24/08/2026 (hallazgo 224). Los 6 botones (3 pestañas de escena, 2 de modo y
+ * «↺ Volver a la combinación correcta») salían sin atributo type. Regla de oro del CLAUDE.md
+ * global §5, y una de las dos que el candado check:a11y-jsx rompe el build por incumplir.
+ */
+test('todos los botones de la app llevan type="button"', async ({ page }) => {
   const sinTipo = await page.evaluate(
     () => [...document.querySelectorAll('main button')].filter((b) => !b.getAttribute('type')).length,
   );

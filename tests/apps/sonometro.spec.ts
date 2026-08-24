@@ -35,10 +35,9 @@ import { test, expect, devices, type Page } from '@playwright/test';
  * (page.tsx, calculateDb): 20·log10(rms) + calibración, con rms = A/√2 y calibración 90 por
  * defecto. Método validado con el control de 61,0 dB del primer hallazgo.
  *
- * Los HALLAZGOS ABIERTOS van al final, marcados con `test.fail()`: afirman lo que la app
- * debería hacer y hoy fallan a propósito, así que Playwright los cuenta como «esperado que
- * falle» y la suite queda verde. El día que se reparen saldrán como «expected to fail but
- * passed» — ese es el aviso de que toca quitarles el `test.fail()` y dejarlos de regresión.
+ * Los seis hallazgos del Inspector van al final. Se escribieron con `test.fail()` afirmando lo
+ * que la app debería hacer, y el 24/08/2026 se repararon todos: ya son tests de regresión
+ * normales, y el día que alguno de los defectos vuelva se pondrán en rojo.
  */
 
 test.use({
@@ -182,12 +181,12 @@ test('CASO 1 (normal) — el medidor arranca de verdad, mide y suelta el micróf
   await page.getByRole('button', { name: /Iniciar medición/i }).click();
   await esperarMedicionEnMarcha(page);
 
-  // El panel de estadísticas solo se pinta con isActive: sus tres rótulos son los de page.tsx.
+  // Los tres rótulos son los de page.tsx, y llevan la (A) porque el motor pondera
   const estadisticas = page.locator('[class*="statsPanel"]');
   await expect(estadisticas).toBeVisible();
-  await expect(estadisticas).toContainText('Mínimo (dB)');
-  await expect(estadisticas).toContainText('Máximo (dB)');
-  await expect(estadisticas).toContainText('LAeq (dB)');
+  await expect(estadisticas).toContainText('Mínimo (dB(A))');
+  await expect(estadisticas).toContainText('Máximo (dB(A))');
+  await expect(estadisticas).toContainText('LAeq (dB(A))');
 
   // La lectura ha dejado de ser '--' y va en formato español (coma decimal, un decimal:
   // formatNumber(currentDb, 1)).
@@ -301,7 +300,7 @@ test.describe('CASO 3 (móvil)', () => {
 });
 
 // ===========================================================================
-// HALLAZGOS ABIERTOS (Inspector 24/08/2026) — fallan a propósito
+// HALLAZGOS DEL INSPECTOR (24/08/2026) — REPARADOS el 24/08/2026, ya son regresión
 // ===========================================================================
 
 // ⚠️ HALLAZGO 1 — cálculo. La app lee el audio con `getByteTimeDomainData`, que devuelve
@@ -320,8 +319,6 @@ test.describe('CASO 3 (móvil)', () => {
 test('HALLAZGO 1 — por debajo de 50 dB la lectura debe seguir a la señal, no plantarse en 44,9', async ({
   page,
 }) => {
-  // Testigo del suelo de ~44,9 dB. Cuando se repare, este test pasará y Playwright avisará.
-  test.fail();
   const AMPLITUD = 0.002;
   await micrófonoSintético(page, 1000, AMPLITUD);
   await page.goto(RUTA);
@@ -347,8 +344,6 @@ test('HALLAZGO 1 — por debajo de 50 dB la lectura debe seguir a la señal, no 
 test('HALLAZGO 2 — si la app dice LAeq, 100 Hz tiene que pesar ~19 dB menos que 1 kHz', async ({
   browser,
 }) => {
-  // Testigo de la falta de ponderación A. Cuando se repare, este test pasará y Playwright avisará.
-  test.fail();
   const AMPLITUD = 0.05;
   const mide = async (frecuencia: number): Promise<number> => {
     const contexto = await browser.newContext({ permissions: ['microphone'] });
@@ -384,8 +379,6 @@ test('HALLAZGO 2 — si la app dice LAeq, 100 Hz tiene que pesar ~19 dB menos qu
 test('HALLAZGO 3 — si falla tras conceder el permiso, el micrófono tiene que quedar cerrado', async ({
   page,
 }) => {
-  // Testigo del micrófono que queda abierto tras el error. Cuando se repare, este test pasará y Playwright avisará.
-  test.fail();
   await instrumentar(page);
   await page.addInitScript(() => {
     window.AudioContext = function () {
@@ -414,8 +407,6 @@ test('HALLAZGO 3 — si falla tras conceder el permiso, el micrófono tiene que 
 test('HALLAZGO 4 — sin soporte del navegador el aviso debe ser legible, no un TypeError', async ({
   page,
 }) => {
-  // Testigo del TypeError crudo que se le enseña al usuario. Cuando se repare, este test pasará y Playwright avisará.
-  test.fail();
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'mediaDevices', { value: undefined, configurable: true });
   });
@@ -438,8 +429,6 @@ test('HALLAZGO 4 — sin soporte del navegador el aviso debe ser legible, no un 
 // Caso: permiso denegado → esperado el aviso anunciado (role="alert" o aria-live) ·
 //       obtenido un <div> mudo.
 test('HALLAZGO 5 — el aviso de error tiene que anunciarse a la ayuda técnica', async ({ page }) => {
-  // Testigo del aviso sin role="alert" ni aria-live. Cuando se repare, este test pasará y Playwright avisará.
-  test.fail();
   await page.addInitScript(() => {
     navigator.mediaDevices.getUserMedia = () =>
       Promise.reject(new DOMException('Permission denied', 'NotAllowedError'));
@@ -464,14 +453,12 @@ test('HALLAZGO 5 — el aviso de error tiene que anunciarse a la ayuda técnica'
 // Caso: medir y pulsar Detener → esperado que siga leyéndose el LAeq de la sesión ·
 //       obtenido: el panel entero desaparece.
 test('HALLAZGO 6 — al detener, el resumen de la sesión debe seguir a la vista', async ({ page }) => {
-  // Testigo del resumen que desaparece al detener. Cuando se repare, este test pasará y Playwright avisará.
-  test.fail();
   await instrumentar(page);
   await page.goto(RUTA);
   await page.getByRole('button', { name: /Iniciar medición/i }).click();
   await esperarMedicionEnMarcha(page);
-  await expect(page.locator('[class*="statsPanel"]')).toContainText('LAeq (dB)');
+  await expect(page.locator('[class*="statsPanel"]')).toContainText('LAeq (dB(A))');
 
   await page.getByRole('button', { name: /Detener/i }).click();
-  await expect(page.locator('[class*="statsPanel"]')).toContainText('LAeq (dB)');
+  await expect(page.locator('[class*="statsPanel"]')).toContainText('LAeq (dB(A))');
 });
