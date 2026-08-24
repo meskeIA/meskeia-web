@@ -48,7 +48,7 @@ const jubilacionApps: RelatedApp[] = [
   { url: '/estimador-pension-viudedad/', icon: '💍', name: 'Pensión de Viudedad', description: 'Cuantía y requisitos 2026' },
   { url: '/planificador-ahorro-jubilacion/', icon: '💹', name: 'Planificador de Ahorro', description: 'Brecha, ahorro y plan de pensiones' },
   { url: '/estimador-irpf-pensionista/', icon: '📊', name: 'IRPF Pensionista', description: 'Cuánto pagas de renta al jubilarte' },
-  { url: '/verificador-complemento-brecha-genero/', icon: '⚖️', name: 'Complemento Brecha de Género', description: '36,90 €/mes por hijo en tu pensión' },
+  { url: '/verificador-complemento-brecha-genero/', icon: '⚖️', name: 'Complemento Brecha de Género', description: 'Complemento por hijo en tu pensión' },
 ];
 
 // ==========================================
@@ -4008,7 +4008,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     ...jubilacionApps.filter(a => a.url !== '/estimador-pension-viudedad/').slice(0, 4),
   ],
   'estimador-complemento-minimos': [
-    { url: '/verificador-complemento-brecha-genero/', icon: '⚖️', name: 'Complemento Brecha de Género', description: '36,90 €/mes por hijo en tu pensión' },
+    { url: '/verificador-complemento-brecha-genero/', icon: '⚖️', name: 'Complemento Brecha de Género', description: 'Complemento por hijo en tu pensión' },
     ...jubilacionApps.filter(a => a.url !== '/estimador-complemento-minimos/').slice(0, 3),
     { url: '/estimacion-prestaciones-dependencia/', icon: '💶', name: 'Prestaciones Dependencia', description: 'Cuantías SAAD según grado' },
   ],

@@ -63,8 +63,16 @@ export interface ParametrosComplementoBrechaGenero {
   tipoPension: TipoPensionBG;
   /** Momento del hecho causante de la pensión. Por defecto 'desde_2021'. */
   fechaHechoCausante?: FechaHechoCausante;
-  /** Situación del otro progenitor respecto al complemento. Por defecto 'no_percibe'. */
+  /** Situación del OTRO progenitor respecto al complemento. Por defecto 'no_percibe'. */
   otroProgenitor?: EstadoOtroProgenitor;
+  /**
+   * ¿Al PROPIO beneficiario le denegaron el complemento en su día? Es lo que decide si
+   * procede reclamar. Antes se deducía de `otroProgenitor === 'denegado'`, que es una
+   * respuesta sobre OTRA persona: quien la marcaba recibía la instrucción de impugnar una
+   * resolución denegatoria que no tenía, y a quien sí se la habían denegado a él no había
+   * forma de decirlo. Sale del hallazgo 225 del Inspector (tanda 6).
+   */
+  denegacionPropia?: boolean;
   /** Cuantía mensual de la pensión base del beneficiario (€/mes). Opcional: para mostrar la pensión total con complemento. */
   cuantiaPensionBeneficiario?: number;
 }
@@ -189,22 +197,26 @@ export function calcularComplementoBrechaGenero(
     );
   }
 
-  // Caso 5: denegación previa a un hombre antes de la doctrina 2025 → posible reclamación
-  // (la denegación por requisitos adicionales solo se aplicaba históricamente a hombres)
-  const esReclamacion = otroProgenitor === 'denegado' && p.sexo === 'hombre';
+  // Caso 5: al PROPIO beneficiario le denegaron el complemento → procede valorar reclamación.
+  // Que se lo denegaran al otro progenitor no da derecho a reclamar nada.
+  const esReclamacion = p.denegacionPropia === true;
 
   const pensionTotalMensual = p.cuantiaPensionBeneficiario !== undefined
     ? r2(p.cuantiaPensionBeneficiario + complementoMensual)
     : undefined;
 
   const motivo = esReclamacion
-    ? 'Tras la STJUE C-623/23 (15-may-2025) y la doctrina del Tribunal Supremo (09-jul-2025), las denegaciones previas a hombres por no cumplir requisitos adicionales son revisables. El complemento debe reconocerse en las mismas condiciones que a las mujeres.'
+    ? (p.sexo === 'hombre'
+        ? 'Tras la STJUE C-623/23 (15-may-2025) y la doctrina del Tribunal Supremo (09-jul-2025), las denegaciones previas a hombres por no cumplir requisitos adicionales son revisables. El complemento debe reconocerse en las mismas condiciones que a las mujeres.'
+        : 'Se cumplen los requisitos básicos del art. 60 LGSS, así que conviene revisar el motivo de la resolución denegatoria: de él depende si cabe reclamar o si hay algo que subsanar.')
     : (p.sexo === 'hombre'
         ? 'Tras la doctrina TJUE/TS 2025, los hombres tienen derecho al complemento en las mismas condiciones que las mujeres. Se cumplen los requisitos básicos del art. 60 LGSS.'
         : 'Se cumplen los requisitos básicos del art. 60 LGSS para el reconocimiento del complemento.');
 
   const pasoSiguiente = esReclamacion
-    ? 'Procede valorar reclamación: nueva solicitud o reclamación previa contra la resolución denegatoria, citando la STJUE C-623/23 y la doctrina del TS. Recomendable acudir a un abogado laboralista o al sindicato.'
+    ? (p.sexo === 'hombre'
+        ? 'Procede valorar reclamación: nueva solicitud o reclamación previa contra la resolución denegatoria, citando la STJUE C-623/23 y la doctrina del TS. Recomendable acudir a un abogado laboralista o al sindicato.'
+        : 'Recupera la resolución denegatoria y revisa su motivo con un abogado laboralista o con tu sindicato antes de volver a solicitarlo.')
     : 'Si ya cobras la pensión y el complemento no aparece en tu nómina, presenta una solicitud expresa ante el INSS (Sede Electrónica de la SS) citando el art. 60 LGSS.';
 
   const advertencias = [...advertenciasBase];

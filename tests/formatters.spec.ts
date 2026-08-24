@@ -154,6 +154,63 @@ test.describe('parseSpanishNumber', () => {
     expect(parseSpanishNumber('0')).toBe(0);
     expect(parseSpanishNumber('abc')).toBeNaN();
   });
+
+  /**
+   * El formato internacional — la promesa que la documentación hacía y el código no.
+   *
+   * El CLAUDE.md decía, en su regla Latam-friendly, que esta función «ya admite 1,234.56
+   * y 1.234,56». No era cierto: con punto Y coma resolvía siempre a favor del español, de
+   * modo que 1,234.56 salía 1,23456. Lo encontró el Inspector en `conversor-numeros-letras`
+   * (tanda 6, 21/08/2026), cuya ayuda repetía la misma promesa sobre un campo que rellena
+   * cheques y pagarés: 3,847.50 € se escribía en letras como «tres euros con ochenta y
+   * cinco céntimos». Con LATAM en el 59,6 % de las impresiones, y México y Perú separando
+   * el millar con coma, el defecto no era de una app sino del catálogo.
+   *
+   * Regla: cuando aparecen LOS DOS separadores, el último es el decimal. Es cierto en los
+   * dos convenios y no toca nada de lo que ya funcionaba en español.
+   */
+  test('con los dos separadores, el ÚLTIMO es el decimal', () => {
+    // Formato internacional (millar con coma) — lo que se reparó
+    expect(parseSpanishNumber('1,234.56')).toBe(1234.56);
+    expect(parseSpanishNumber('3,847.50')).toBe(3847.5);
+    expect(parseSpanishNumber('1,234,567.89')).toBe(1234567.89);
+    // Formato español — sigue exactamente igual
+    expect(parseSpanishNumber('1.234,56')).toBe(1234.56);
+    expect(parseSpanishNumber('1.234.567,89')).toBe(1234567.89);
+  });
+
+  test('la coma sola sigue siendo decimal español, aunque agrupe de tres en tres', () => {
+    // Ambigüedad irreducible con un solo separador: gana el español, que es el formato
+    // obligatorio del proyecto. Es la misma regla que ya se aplicaba al punto ("1.234").
+    expect(parseSpanishNumber('1,234')).toBe(1.234);
+    // Con DOS comas ya no hay ambigüedad: solo puede ser el millar internacional
+    expect(parseSpanishNumber('1,234,567')).toBe(1234567);
+  });
+
+  /**
+   * `parseFloat` acepta prefijos numéricos y notación científica, así que «12abc» valía 12,
+   * «1e3» valía 1000 y «1.2.3» valía 1,2: importes plausibles pero equivocados, sin nada
+   * que los delatara. NaN es lo que las apps ya saben tratar («No definido»), y
+   * `parseSpanishNumberOr` sigue devolviendo su valor por defecto.
+   */
+  test('rechaza lo que no es un número en vez de inventarse uno', () => {
+    expect(parseSpanishNumber('12abc')).toBeNaN();
+    expect(parseSpanishNumber('1e3')).toBeNaN();
+    expect(parseSpanishNumber('Infinity')).toBeNaN();
+    expect(parseSpanishNumber('1.2.3')).toBeNaN();      // los puntos no agrupan millares
+    expect(parseSpanishNumber('2,5,3')).toBeNaN();      // las comas tampoco
+    expect(parseSpanishNumber('12.34,5')).toBeNaN();    // la parte entera no agrupa de tres
+    expect(parseSpanishNumber('1.234,56,7')).toBeNaN(); // dos decimales no es un número
+  });
+
+  test('tolera lo que `Intl` y los usuarios pegan alrededor de la cifra', () => {
+    // Releer lo que escribió formatCurrency (el símbolo va tras un NBSP)
+    expect(parseSpanishNumber(formatCurrency(1234.56))).toBe(1234.56);
+    expect(parseSpanishNumber('1.234,56 €')).toBe(1234.56);
+    expect(parseSpanishNumber('1 234,56')).toBe(1234.56);   // millar con espacio (SI)
+    expect(parseSpanishNumber('50%')).toBe(50);
+    expect(parseSpanishNumber('+1.234,56')).toBe(1234.56);
+  });
 });
 
 /**
@@ -238,8 +295,10 @@ test.describe('isValidNumber', () => {
   test('rechaza strings inválidos', () => {
     expect(isValidNumber('')).toBe(false);
     expect(isValidNumber('abc')).toBe(false);
-    // Nota: parseFloat('12abc') retorna 12 en JS, comportamiento estándar
-    // isValidNumber usa parseSpanishNumber que se basa en parseFloat
+    // Desde el 24/08/2026 parseSpanishNumber ya no acepta prefijos numéricos ni
+    // notación científica, así que isValidNumber tampoco los da por buenos
+    expect(isValidNumber('12abc')).toBe(false);
+    expect(isValidNumber('1e3')).toBe(false);
   });
 });
 

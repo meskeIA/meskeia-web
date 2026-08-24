@@ -48,16 +48,32 @@ interface Situacion {
   hijos: number;
   sexo: string;
   otroProgenitor: string;
+  /** P6 — denegación PROPIA del solicitante. Por defecto, no la hay. */
+  denegacionPropia?: boolean;
 }
 
-/** Responde las 5 preguntas y pulsa «Verificar mi derecho». */
+/** Responde las 6 preguntas y pulsa «Verificar mi derecho». */
 async function responderYVerificar(page: Page, s: Situacion): Promise<void> {
   await page.getByRole('button', { name: s.pension, exact: true }).click();
   await page.getByRole('button', { name: s.fecha, exact: true }).click();
   await page.locator('#hijos').fill(String(s.hijos));
   await page.getByRole('button', { name: s.sexo, exact: true }).click();
   await page.getByRole('button', { name: s.otroProgenitor, exact: true }).click();
+  await page
+    .getByRole('button', {
+      name: s.denegacionPropia ? 'Sí, tengo una resolución denegatoria' : 'No',
+      exact: true,
+    })
+    .click();
   await page.getByRole('button', { name: 'Verificar mi derecho' }).click();
+}
+
+/** Despliega la EducationalSection, que arranca colapsada y guarda dentro la guía. */
+async function abrirGuia(page: Page): Promise<void> {
+  // El nombre accesible del botón es su aria-label ('Ver guía educativa'), no su texto
+  const boton = page.getByRole('button', { name: 'Ver guía educativa' });
+  if (await boton.isVisible()) await boton.click();
+  await expect(page.getByText('Comparativa: antiguo complemento')).toBeVisible();
 }
 
 /** Texto completo del panel «Resultado orientativo», ya normalizado. */
@@ -216,4 +232,171 @@ test.describe('Verificador del complemento por brecha de género', () => {
     expect(resultado).toContain('revisa entonces tu derecho');
     expect(resultado).toContain('El reconocimiento definitivo lo realiza el INSS');
   });
+
+  /**
+   * CASO 4 — QUIÉN TUVO LA DENEGACIÓN (hallazgo 225, alto).
+   *
+   * La P5 pregunta por el OTRO progenitor, y su opción «Lo solicitó y se lo denegaron» se
+   * refiere por tanto a esa otra persona. El motor la leía como si al PROPIO usuario le
+   * hubieran denegado el complemento y le devolvía «Posible reclamación retroactiva» con la
+   * instrucción de impugnar una resolución denegatoria que él no tenía; mientras, el hombre
+   * al que sí se lo habían denegado a él no tenía ninguna casilla donde decirlo. El importe
+   * no cambiaba: el fallo era de encuadre legal, que en una app de riesgo 1 ES el producto.
+   *
+   * 2 hijos → 2 × 36,90 = 73,80 €/mes en los dos escenarios; lo que cambia es el veredicto.
+   */
+  test('caso 225: la denegación del OTRO progenitor no dispara reclamación; la propia sí', async ({
+    page,
+  }) => {
+    // 4a — al otro progenitor se lo denegaron: eso no me da a mí nada que reclamar
+    await responderYVerificar(page, {
+      pension: 'Jubilación',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 2,
+      sexo: 'Hombre',
+      otroProgenitor: 'Lo solicitó y se lo denegaron',
+    });
+    let resultado = await textoResultado(page);
+    expect(resultado).toContain('+73,80 €/mes'); // 2 × cuantiaPorHijoMensual
+    expect(resultado).toContain('Cumples los requisitos básicos');
+    expect(resultado).not.toContain('Posible reclamación retroactiva');
+    expect(resultado).not.toContain('resolución denegatoria');
+
+    // 4b — la denegación es MÍA (P6): ahí sí procede valorar reclamación
+    await responderYVerificar(page, {
+      pension: 'Jubilación',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 2,
+      sexo: 'Hombre',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+      denegacionPropia: true,
+    });
+    resultado = await textoResultado(page);
+    expect(resultado).toContain('+73,80 €/mes'); // el importe es el mismo
+    expect(resultado).toContain('Posible reclamación retroactiva');
+    expect(resultado).toContain('C-623/23'); // STJUE de 15-may-2025
+
+    // 4c — la asimetría anterior también desaparece: una mujer con denegación propia
+    // recibe orientación sobre su resolución, no el silencio del caso general.
+    await responderYVerificar(page, {
+      pension: 'Jubilación',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 2,
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+      denegacionPropia: true,
+    });
+    resultado = await textoResultado(page);
+    expect(resultado).toContain('Posible reclamación retroactiva');
+    expect(resultado).toContain('revisar por qué se te denegó');
+  });
+
+  /**
+   * CASO 5 — LAS CIFRAS DE LA PÁGINA SALEN DEL MÓDULO (hallazgo 226).
+   *
+   * Las once apariciones de «36,90 €» estaban tecleadas a mano mientras solo el desglose
+   * leía `data/fiscal`. El día de la revalorización, el veredicto habría dicho una cifra y
+   * el hero, la tabla, la FAQ y los tips la anterior, sin que nada fallara. Este test lo
+   * detectaría: compara el texto renderizado contra el módulo, no contra una constante
+   * escrita aquí.
+   */
+  test('caso 226: hero, tabla y tips muestran la cuantía del módulo fiscal, no una copia', async ({
+    page,
+  }) => {
+    const cuantia = normalizar(
+      new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(36.9),
+    );
+    const maximo = normalizar(
+      new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(147.6),
+    );
+
+    // El subtítulo del hero
+    const hero = normalizar(await page.locator('header').innerText());
+    expect(hero).toContain(`${cuantia}/mes por hijo`);
+    expect(hero).toContain('6 preguntas');
+
+    // La tabla comparativa vive dentro de EducationalSection, que arranca colapsada
+    await abrirGuia(page);
+    const educativo = normalizar(await page.locator('body').innerText());
+    expect(educativo).toContain(`Importe fijo por hijo/a (${cuantia}/mes)`);
+    expect(educativo).toContain(`4 hijos × ${cuantia} = ${maximo}/mes`);
+
+    // Y ninguna cifra caducada suelta: la serie histórica sin fuente ya no está
+    expect(educativo).not.toContain('30,40 € en 2023');
+    expect(educativo).not.toContain('35,90 € en 2025');
+  });
+
+  /**
+   * CASO 6 — LA CONTRADICCIÓN ENTRE LO QUE VE EL USUARIO Y LO QUE LEEN LAS IAS
+   * (hallazgo 228).
+   *
+   * La FAQ visible decía que el complemento es compatible con el complemento a mínimos y el
+   * FAQPage del JSON-LD decía lo contrario. Una de las dos tenía que ser falsa, y la que
+   * citan Bing Copilot, ChatGPT o Perplexity para hacer grounding es justo la que el usuario
+   * nunca ve. Resuelto contra la fuente: art. 60.3.e) LGSS (redacción del RDL 3/2021), que
+   * dispone que el importe del complemento NO cuenta como ingreso para determinar el derecho
+   * al complemento por mínimos y que, cuando procede, se suma a la cuantía mínima.
+   * En la misma revisión: el art. 60.4 excluye la jubilación parcial, que el JSON-LD daba
+   * por compatible.
+   */
+  test('caso 228: la página y el JSON-LD dicen lo mismo sobre el complemento a mínimos', async ({
+    page,
+  }) => {
+    await abrirGuia(page);
+    const visible = normalizar(await page.locator('body').innerText());
+    expect(visible).toContain('no cuenta como ingreso');
+    expect(visible).toContain('art. 60.3.e) LGSS');
+
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = bloques.map(b => JSON.parse(b)).find(j => j['@type'] === 'FAQPage');
+    expect(faq).toBeTruthy();
+    const textos: string[] = faq.mainEntity.map(
+      (q: { acceptedAnswer: { text: string } }) => q.acceptedAnswer.text,
+    );
+    const compatibilidad = textos.find(t => t.includes('complemento a mínimos'));
+    expect(compatibilidad).toBeTruthy();
+    expect(compatibilidad).toContain('compatible con el complemento a mínimos');
+    expect(compatibilidad).toContain('60.3.e)');
+    // La jubilación parcial queda EXCLUIDA (art. 60.4), no listada como compatible
+    expect(compatibilidad).toContain('No procede en la jubilación parcial');
+    // Y la revalorización no es «con el IPC», sino la que fije la norma de cada año
+    expect(textos.join(' ')).not.toContain('anualmente con el IPC');
+  });
+
+  /**
+   * CASO 7 — ACCESIBILIDAD DEL CUESTIONARIO Y DEL VEREDICTO (hallazgos 229 y 230).
+   *
+   * Cuatro de las preguntas usaban un `<label>` suelto, sin `htmlFor` y sin control dentro,
+   * así que los grupos de botones no tenían nombre accesible: un lector de pantalla anunciaba
+   * «Mujer, botón» sin decir a qué pregunta respondía, y «No lo percibe ni lo ha solicitado»
+   * es incomprensible fuera de su enunciado. Y el panel del veredicto —que es el producto
+   * entero de la app— no tenía región anunciable: pulsar «Verificar mi derecho» con lector
+   * de pantalla no producía ningún aviso.
+   */
+  test('casos 229 y 230: cada pregunta nombra su grupo y el veredicto se anuncia', async ({
+    page,
+  }) => {
+    const grupos = page.locator('[role="group"]');
+    await expect(grupos).toHaveCount(5); // P1, P2, P4, P5 y P6 (P3 es un input con label)
+
+    for (const nombre of [
+      '1. ¿Qué pensión percibes (o vas a percibir)?',
+      '2. ¿Cuándo se causó (o se causará) tu pensión?',
+      '4. Sexo administrativo del solicitante',
+      '5. Estado del otro progenitor respecto al complemento',
+      '6. ¿Solicitaste tú el complemento y te lo denegaron?',
+    ]) {
+      await expect(page.getByRole('group', { name: nombre })).toBeVisible();
+    }
+
+    // El único label con control asociado sigue siendo el de la P3
+    const asociados = await page.locator('label[for]').count();
+    expect(asociados).toBe(1);
+
+    // El panel del resultado es una región anunciable, y lo es ANTES de pulsar
+    const panel = page.locator('h2', { hasText: 'Resultado orientativo' }).locator('..');
+    await expect(panel).toHaveAttribute('aria-live', 'polite');
+    await expect(panel).toHaveAttribute('role', 'status');
+  });
+
 });

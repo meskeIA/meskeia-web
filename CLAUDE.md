@@ -228,7 +228,13 @@ meskeIA sirve a todo el público hispanohablante (España + Latam = ~50% del tr�
 **Apps con datos de referencia España pero metodología universal** (intereses, finanzas genéricas con ejemplos en €): usar `<RegionBadge variant="es-data" />`.
 
 **Reglas técnicas adicionales**:
-- Parser numérico: usar `parseSpanishNumber` que ya admite `1,234.56` y `1.234,56`
+- Parser numérico: usar `parseSpanishNumber`, que admite `1,234.56` y `1.234,56` — cuando
+  aparecen los dos separadores, **el último es el decimal**. Con uno solo la ambigüedad es
+  irreducible (`1.234`) y gana el español. Rechaza con `NaN` lo que no es un número
+  (`12abc`, `1e3`, `1.2.3`), así que no hace falta validar antes de llamarlo.
+  > Hasta el 24/08/2026 esta línea prometía los dos formatos y **el código no los admitía**:
+  > `1,234.56` salía 1,23456. Lo destapó el Inspector en `conversor-numeros-letras`, que
+  > repetía la promesa sobre el campo con el que se rellenan pagarés.
 - Moneda: si no es contable-España, considerar dejar el símbolo configurable o usar genérico
 - En bloques educativos, citar normativa España solo cuando sea relevante; preferir ejemplos universales
 

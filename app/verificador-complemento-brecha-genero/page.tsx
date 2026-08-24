@@ -11,7 +11,22 @@ import { getRelatedApps } from '@/data/app-relations';
 import {
   COMPLEMENTO_BRECHA_GENERO_2026,
   COMPLEMENTO_BRECHA_GENERO_META,
+  LIMITES_PENSION_2025,
 } from '@/data/fiscal';
+
+/**
+ * Las cifras del complemento se escriben UNA vez, aquí, y se interpolan en toda la página.
+ *
+ * Antes estaban tecleadas a mano en once sitios (hero, hint, tabla comparativa, casos
+ * típicos, FAQ, tips, metadata y la ficha de `data/applications.ts`) mientras el desglose
+ * del resultado sí leía `data/fiscal`. Hoy coinciden todas, así que no había error visible:
+ * el problema es la próxima revalorización, en la que el veredicto diría una cifra y el
+ * resto de la página la anterior, sin que nada fallara.
+ */
+const CUANTIA_MES = formatCurrency(COMPLEMENTO_BRECHA_GENERO_2026.cuantiaPorHijoMensual);
+const MAX_HIJOS = COMPLEMENTO_BRECHA_GENERO_2026.maxHijos;
+const MAX_MES = formatCurrency(COMPLEMENTO_BRECHA_GENERO_2026.maxMensual);
+const PENSION_MAXIMA_MES = formatCurrency(LIMITES_PENSION_2025.maximaMensual);
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -38,6 +53,7 @@ function evaluar(
   numHijos: number,
   genero: Genero,
   otroProgenitor: EstadoOtroProgenitor,
+  denegacionPropia: boolean,
 ): Resultado {
   const { cuantiaPorHijoMensual, maxHijos, pagasAnuales } = COMPLEMENTO_BRECHA_GENERO_2026;
   const hijosComputables = Math.min(numHijos, maxHijos);
@@ -134,22 +150,37 @@ function evaluar(
     };
   }
 
-  // Caso 5: hombre con denegación previa antes de la doctrina TJUE/TS 2025
-  if (genero === 'hombre' && otroProgenitor === 'denegado') {
+  /**
+   * Caso 5: al SOLICITANTE le denegaron el complemento en su día.
+   *
+   * Esta rama miraba antes `otroProgenitor === 'denegado'`, que es una respuesta sobre la
+   * OTRA persona: al hombre al que le habían denegado a él no había forma de decirlo, y el
+   * que llegaba aquí lo hacía contestando por su ex pareja. El importe no cambiaba, pero el
+   * encuadre sí —y en una app de riesgo crítico el encuadre es el producto: mandaba a un
+   * abogado a impugnar una resolución denegatoria que el usuario no tenía—. Ahora lo
+   * pregunta la P6, y la respuesta de la P5 sobre el otro progenitor no dispara nada.
+   */
+  if (denegacionPropia) {
     return {
       procede: true,
       hijosComputables,
       importeMensual,
       importeAnual,
       motivo:
-        'Tras la STJUE 15-may-2025 y la doctrina del Tribunal Supremo (9-jul-2025), las denegaciones ' +
-        'previas a hombres por no cumplir requisitos adicionales son revisables. El complemento debe ' +
-        'reconocerse en las mismas condiciones que a las mujeres.',
+        genero === 'hombre'
+          ? 'Tras la STJUE de 15-may-2025 (C-623/23) y la doctrina del Tribunal Supremo (9-jul-2025), ' +
+            'las denegaciones previas a hombres por no cumplir requisitos adicionales son revisables. ' +
+            'El complemento debe reconocerse en las mismas condiciones que a las mujeres.'
+          : 'Cumples los requisitos básicos del art. 60 LGSS, así que conviene revisar por qué se te ' +
+            'denegó: el motivo de la resolución decide si cabe reclamar o si hay que subsanar algo.',
       esReclamacion: true,
       pasoSiguiente:
-        'Procede valorar reclamación: nueva solicitud o reclamación previa contra la resolución ' +
-        'denegatoria, citando la STJUE C-623/23 y la doctrina TS. Recomendable acudir a un abogado ' +
-        'laboralista o al sindicato.',
+        genero === 'hombre'
+          ? 'Procede valorar reclamación: nueva solicitud o reclamación previa contra la resolución ' +
+            'denegatoria, citando la STJUE C-623/23 y la doctrina TS. Recomendable acudir a un abogado ' +
+            'laboralista o al sindicato.'
+          : 'Recupera la resolución denegatoria y revisa su motivo con un abogado laboralista o con tu ' +
+            'sindicato antes de volver a solicitarlo.',
     };
   }
 
@@ -180,11 +211,12 @@ export default function VerificadorComplementoBrechaGeneroPage() {
   const [hijos, setHijos] = useState<number>(2);
   const [genero, setGenero] = useState<Genero>('mujer');
   const [otroProgenitor, setOtroProgenitor] = useState<EstadoOtroProgenitor>('no_percibe');
+  const [denegacionPropia, setDenegacionPropia] = useState<boolean>(false);
   const [evaluado, setEvaluado] = useState(false);
 
   const resultado = useMemo(
-    () => evaluar(tipo, fecha, hijos, genero, otroProgenitor),
-    [tipo, fecha, hijos, genero, otroProgenitor],
+    () => evaluar(tipo, fecha, hijos, genero, otroProgenitor, denegacionPropia),
+    [tipo, fecha, hijos, genero, otroProgenitor, denegacionPropia],
   );
 
   const reset = () => {
@@ -201,8 +233,8 @@ export default function VerificadorComplementoBrechaGeneroPage() {
         <span className={styles.heroIcon} aria-hidden="true">⚖️</span>
         <h1 className={styles.title}>Verificador del Complemento por Brecha de Género</h1>
         <p className={styles.subtitle}>
-          5 preguntas para saber si te corresponde el complemento de 36,90 €/mes por hijo en
-          tu pensión pública (2026)
+          6 preguntas para saber si te corresponde el complemento de {CUANTIA_MES}/mes por hijo
+          en tu pensión pública
         </p>
       </header>
 
@@ -229,10 +261,13 @@ export default function VerificadorComplementoBrechaGeneroPage() {
           <h2 className={styles.cardTitle}>Tu situación</h2>
 
           {/* P1: tipo de pensión */}
-          <div className={styles.formGroup}>
-            <label className={styles.label}>
+          {/* Los grupos de botones no son un control con label: sin role="group" +
+              aria-labelledby, un lector de pantalla anuncia «Jubilación, botón» sin decir a
+              qué pregunta responde. El único <label> con control asociado es el de P3. */}
+          <div className={styles.formGroup} role="group" aria-labelledby="p1-titulo">
+            <p className={styles.label} id="p1-titulo">
               1. ¿Qué pensión percibes (o vas a percibir)?
-            </label>
+            </p>
             <div className={styles.optionGrid}>
               {([
                 { id: 'jubilacion' as const, icon: '🌅', label: 'Jubilación' },
@@ -255,10 +290,10 @@ export default function VerificadorComplementoBrechaGeneroPage() {
           </div>
 
           {/* P2: fecha del hecho causante */}
-          <div className={styles.formGroup}>
-            <label className={styles.label}>
+          <div className={styles.formGroup} role="group" aria-labelledby="p2-titulo">
+            <p className={styles.label} id="p2-titulo">
               2. ¿Cuándo se causó (o se causará) tu pensión?
-            </label>
+            </p>
             <div className={styles.optionGrid}>
               {([
                 { id: 'antes_2021' as const, label: 'Antes del 4-feb-2021' },
@@ -297,13 +332,13 @@ export default function VerificadorComplementoBrechaGeneroPage() {
             />
             <p className={styles.hint}>
               Cuentan hijos/as nacidos con vida o adoptados antes del hecho causante de la pensión.
-              El complemento se calcula como máximo sobre 4 hijos.
+              El complemento se calcula como máximo sobre {MAX_HIJOS} hijos.
             </p>
           </div>
 
           {/* P4: género */}
-          <div className={styles.formGroup}>
-            <label className={styles.label}>4. Sexo administrativo del solicitante</label>
+          <div className={styles.formGroup} role="group" aria-labelledby="p4-titulo">
+            <p className={styles.label} id="p4-titulo">4. Sexo administrativo del solicitante</p>
             <div className={styles.optionGrid}>
               {([
                 { id: 'mujer' as const, label: 'Mujer' },
@@ -327,10 +362,10 @@ export default function VerificadorComplementoBrechaGeneroPage() {
           </div>
 
           {/* P5: estado del otro progenitor */}
-          <div className={styles.formGroup}>
-            <label className={styles.label}>
+          <div className={styles.formGroup} role="group" aria-labelledby="p5-titulo">
+            <p className={styles.label} id="p5-titulo">
               5. Estado del otro progenitor respecto al complemento
-            </label>
+            </p>
             <div className={styles.optionGridStack}>
               {([
                 { id: 'no_percibe' as const, label: 'No lo percibe ni lo ha solicitado' },
@@ -355,6 +390,34 @@ export default function VerificadorComplementoBrechaGeneroPage() {
             </p>
           </div>
 
+          {/* P6: denegación PROPIA — la que decide si procede reclamar. La P5 pregunta por la
+              otra persona, así que no puede usarse para esto (ver `evaluar`, caso 5). */}
+          <div className={styles.formGroup} role="group" aria-labelledby="p6-titulo">
+            <p className={styles.label} id="p6-titulo">
+              6. ¿Solicitaste tú el complemento y te lo denegaron?
+            </p>
+            <div className={styles.optionGrid}>
+              {([
+                { id: false, label: 'No' },
+                { id: true, label: 'Sí, tengo una resolución denegatoria' },
+              ] as const).map(opt => (
+                <button
+                  key={String(opt.id)}
+                  type="button"
+                  className={`${styles.optionBtn} ${denegacionPropia === opt.id ? styles.optionActivo : ''}`}
+                  onClick={() => { setDenegacionPropia(opt.id); reset(); }}
+                  aria-pressed={denegacionPropia === opt.id}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+            <p className={styles.hint}>
+              Se refiere a una denegación a TI, no al otro progenitor. Las denegaciones a hombres
+              anteriores a 2025 por «requisitos adicionales» son revisables tras la STJUE C-623/23.
+            </p>
+          </div>
+
           <button
             type="button"
             className={styles.btn}
@@ -365,12 +428,14 @@ export default function VerificadorComplementoBrechaGeneroPage() {
         </div>
 
         {/* ─── Panel derecho: resultado ─── */}
-        <div className={styles.card}>
+        {/* El veredicto es el producto entero de la app: sin región anunciable, pulsar
+            «Verificar mi derecho» con lector de pantalla no decía absolutamente nada. */}
+        <div className={styles.card} role="status" aria-live="polite">
           <h2 className={styles.cardTitle}>Resultado orientativo</h2>
 
           {!evaluado ? (
             <p className={styles.placeholder}>
-              Completa las 5 preguntas y pulsa &laquo;Verificar mi derecho&raquo; para revisar
+              Completa las 6 preguntas y pulsa &laquo;Verificar mi derecho&raquo; para revisar
               tu situación.
             </p>
           ) : (
@@ -455,7 +520,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
           <p>
             Su naturaleza es la de pensión pública contributiva: se abona junto con la pensión en 14
             pagas y <strong>no computa</strong> a efectos del límite máximo de pensiones públicas
-            (3.359,60 €/mes en 2026).
+            ({PENSION_MAXIMA_MES}/mes), por el art. 60.3.d) LGSS.
           </p>
 
           {/* ─── 1. Tabla comparativa ─── */}
@@ -473,7 +538,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
                 <tr>
                   <td>Naturaleza del cálculo</td>
                   <td>% sobre la pensión (5%, 10% o 15% según nº hijos)</td>
-                  <td>Importe fijo por hijo/a (36,90 €/mes en 2026)</td>
+                  <td>Importe fijo por hijo/a ({CUANTIA_MES}/mes)</td>
                 </tr>
                 <tr>
                   <td>Nº de hijos exigido</td>
@@ -483,7 +548,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
                 <tr>
                   <td>Máximo</td>
                   <td>15% (4 o más hijos)</td>
-                  <td>4 hijos × 36,90 € = 147,60 €/mes</td>
+                  <td>{MAX_HIJOS} hijos × {CUANTIA_MES} = {MAX_MES}/mes</td>
                 </tr>
                 <tr>
                   <td>Acceso de hombres</td>
@@ -508,16 +573,18 @@ export default function VerificadorComplementoBrechaGeneroPage() {
           <h2>Casos típicos</h2>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <h3>👩 Mujer con 3 hijos, jubilación 2024</h3>
+              <h3><span aria-hidden="true">👩</span> Mujer con 3 hijos, jubilación 2024</h3>
               <p>
                 <strong>Situación:</strong> hecho causante posterior al 4-feb-2021, sin que el padre
-                lo perciba. <strong>Resultado:</strong> 3 × 36,90 € = <strong>110,70 €/mes</strong>
-                (1.549,80 €/año en 14 pagas). El INSS suele reconocerlo de oficio o con solicitud
-                expresa.
+                lo perciba. <strong>Resultado:</strong> 3 × {CUANTIA_MES} ={' '}
+                <strong>{formatCurrency(3 * COMPLEMENTO_BRECHA_GENERO_2026.cuantiaPorHijoMensual)}/mes</strong>{' '}
+                ({formatCurrency(3 * COMPLEMENTO_BRECHA_GENERO_2026.cuantiaPorHijoMensual * COMPLEMENTO_BRECHA_GENERO_2026.pagasAnuales)}/año
+                en {COMPLEMENTO_BRECHA_GENERO_2026.pagasAnuales} pagas). El INSS suele reconocerlo de oficio o con
+                solicitud expresa.
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h3>👨 Hombre con denegación previa</h3>
+              <h3><span aria-hidden="true">👨</span> Hombre con denegación previa</h3>
               <p>
                 <strong>Situación:</strong> solicitó el complemento en 2022 y se lo denegaron por no
                 acreditar &laquo;requisitos adicionales&raquo;. <strong>Resultado:</strong> la doctrina
@@ -526,7 +593,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h3>👫 Concurrencia entre progenitores</h3>
+              <h3><span aria-hidden="true">👫</span> Concurrencia entre progenitores</h3>
               <p>
                 <strong>Situación:</strong> ambos progenitores cobran pensión contributiva y ambos
                 tienen 2 hijos comunes. <strong>Resultado:</strong> solo uno puede percibir el
@@ -535,7 +602,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h3>🧓 Pensión anterior a feb-2021</h3>
+              <h3><span aria-hidden="true">🧓</span> Pensión anterior a feb-2021</h3>
               <p>
                 <strong>Situación:</strong> jubilación causada en 2019. <strong>Resultado:</strong>
                 no aplica el complemento actual. Si entonces percibía o se le denegó el antiguo
@@ -597,18 +664,22 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               <h3>¿Cómo se actualiza la cuantía cada año?</h3>
               <p>
                 La cuantía se revaloriza según la Ley de Presupuestos y los Reales Decretos-Ley de
-                pensiones de cada año. Para 2026, el RDL 3/2026 fijó 36,90 €/mes por hijo.
+                pensiones de cada año. La cuantía vigente que aplica esta herramienta es de{' '}
+                {CUANTIA_MES}/mes por hijo.
               </p>
               <p className={styles.faqTip}>
-                💡 Si llevas tiempo cobrando el complemento, comprueba que tu nómina refleja la
+                <span aria-hidden="true">💡</span> Si llevas tiempo cobrando el complemento, comprueba que tu nómina refleja la
                 actualización anual.
               </p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Es compatible con el complemento a mínimos?</h3>
               <p>
-                Sí. Son complementos distintos con requisitos independientes. Puedes percibir ambos
-                simultáneamente si cumples las condiciones de cada uno.
+                Sí, y el art. 60.3.e) LGSS lo dice expresamente: el importe de este complemento{' '}
+                <strong>no cuenta como ingreso</strong> para decidir si tienes derecho al complemento
+                por mínimos del art. 59. Cuando procede, se reconoce primero la cuantía mínima que
+                fije la Ley de Presupuestos y a ese importe <strong>se le suma</strong> el
+                complemento por brecha de género.
               </p>
             </div>
           </div>
@@ -697,7 +768,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               <h3>Vigila la revalorización anual</h3>
               <p>
                 La cuantía cambia cada año por LPGE o RDL. Comprueba en enero que tu nómina refleja
-                la nueva cifra (en 2026, 36,90 €/mes por hijo).
+                la nueva cifra (hoy, {CUANTIA_MES}/mes por hijo).
               </p>
             </div>
             <div className={styles.tipCard}>
@@ -763,9 +834,12 @@ export default function VerificadorComplementoBrechaGeneroPage() {
                 <strong>Reclamar fuera de plazo.</strong> La reclamación previa tiene 30 días desde
                 la notificación. Pasado ese plazo, hay que recurrir a vías más complejas.
               </li>
+              {/* La serie 30,40 / 33,20 / 35,90 que había aquí no estaba en data/fiscal ni
+                  citaba fuente: solo el valor vigente es verificable, y es el que se usa. */}
               <li>
-                <strong>No actualizar el cálculo cada año.</strong> El importe se revaloriza: 30,40
-                € en 2023, 33,20 € en 2024, 35,90 € en 2025, 36,90 € en 2026.
+                <strong>No actualizar el cálculo cada año.</strong> El importe se revaloriza en cada
+                ejercicio, así que una estimación hecha con la cuantía de hace dos años se queda
+                corta. La vigente hoy es {CUANTIA_MES}/mes por hijo.
               </li>
             </ul>
           </div>

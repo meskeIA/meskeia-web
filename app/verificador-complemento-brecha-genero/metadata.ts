@@ -1,12 +1,20 @@
 import { Metadata } from 'next';
+import { COMPLEMENTO_BRECHA_GENERO_2026 } from '@/data/fiscal';
+import { formatCurrency } from '@/lib/formatters';
+
+// Las cifras salen del módulo fiscal, nunca tecleadas: en la próxima revalorización el
+// snippet de buscadores y el JSON-LD envejecían en silencio mientras la app decía otra cosa.
+const CUANTIA = formatCurrency(COMPLEMENTO_BRECHA_GENERO_2026.cuantiaPorHijoMensual);
+const MAX_HIJOS = COMPLEMENTO_BRECHA_GENERO_2026.maxHijos;
+const MAX_MES = formatCurrency(COMPLEMENTO_BRECHA_GENERO_2026.maxMensual);
 
 const title = 'Verificador del Complemento por Brecha de Género 2026 — ¿Te corresponde? | meskeIA';
-const description = 'Comprueba si tienes derecho al complemento por brecha de género en tu pensión. 36,90 €/mes por hijo en 2026 (máximo 4). Incluye los cambios tras la sentencia TJUE 2025 que iguala el trato a hombres y mujeres.';
+const description = `Comprueba si tienes derecho al complemento por brecha de género en tu pensión: ${CUANTIA}/mes por hijo (máximo ${MAX_HIJOS}). Incluye los cambios tras la sentencia TJUE 2025 que iguala el trato a hombres y mujeres.`;
 
 export const metadata: Metadata = {
   title,
   description,
-  keywords: 'complemento brecha género 2026, complemento maternidad pensión, art 60 LGSS, sentencia TJUE complemento, reclamación complemento hombres, pensión jubilación viudedad complemento, 36.90 euros hijo pensión',
+  keywords: 'complemento brecha género 2026, complemento maternidad pensión, art 60 LGSS, sentencia TJUE complemento, reclamación complemento hombres, pensión jubilación viudedad complemento',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -28,7 +36,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Verificador del Complemento por Brecha de Género 2026 | meskeIA',
-    description: '5 preguntas para saber si te corresponde el complemento de 36,90 €/mes por hijo en tu pensión.',
+    description: `6 preguntas para saber si te corresponde el complemento de ${CUANTIA}/mes por hijo en tu pensión.`,
     images: ['https://meskeia.com/og-image.png'],
   },
   other: {
@@ -49,7 +57,7 @@ export const jsonLd = {
   inLanguage: 'es',
   featureList: [
     'Checklist de 5 preguntas alineadas con el art. 60 LGSS',
-    'Cálculo del importe mensual y anual (36,90 €/hijo, máx. 4)',
+    `Cálculo del importe mensual y anual (${CUANTIA}/hijo, máx. ${MAX_HIJOS})`,
     'Considera la doctrina TJUE 2025 e igualdad de trato H/M',
     'Detecta casos de reclamación retroactiva (denegaciones previas)',
     'Datos normativos 2026 verificados con fuente oficial',
@@ -66,7 +74,7 @@ export const faqJsonLd = {
       name: '¿Qué es el complemento por brecha de género en la pensión y a cuánto asciende en 2026?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El complemento por brecha de género es un incremento en la pensión de jubilación, viudedad o incapacidad permanente reconocido por el artículo 60 de la Ley General de la Seguridad Social. En 2026 su importe es de 36,90 euros al mes por cada hijo o hija, con un máximo de 4 hijos (147,60 €/mes). Se actualiza anualmente con el IPC y tributa como rendimiento del trabajo en el IRPF.',
+        text: `El complemento por brecha de género es un incremento en la pensión de jubilación, viudedad o incapacidad permanente reconocido por el artículo 60 de la Ley General de la Seguridad Social. Su importe vigente es de ${CUANTIA} al mes por cada hijo o hija, con un máximo de ${MAX_HIJOS} hijos (${MAX_MES}/mes). La cuantía se fija cada año en la Ley de Presupuestos o en el Real Decreto-ley de revalorización de pensiones, y tributa como rendimiento del trabajo en el IRPF.`,
       },
     },
     {
@@ -82,7 +90,7 @@ export const faqJsonLd = {
       name: '¿Cómo saber si tengo derecho al complemento por brecha de género?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los requisitos son: ser titular de una pensión contributiva de jubilación, viudedad o incapacidad permanente con hecho causante desde el 4 de febrero de 2021; tener al menos un hijo o hija biológico o adoptado; y que el otro progenitor no perciba ya el complemento por los mismos hijos. No es necesario acreditar una interrupción concreta de la carrera laboral: el complemento se reconoce automáticamente si se cumplen estas condiciones. El verificador comprueba estas condiciones en 5 preguntas y calcula el importe estimado según el número de hijos.',
+        text: 'Los requisitos son: ser titular de una pensión contributiva de jubilación, viudedad o incapacidad permanente con hecho causante desde el 4 de febrero de 2021; tener al menos un hijo o hija biológico o adoptado; y que el otro progenitor no perciba ya el complemento por los mismos hijos. No es necesario acreditar una interrupción concreta de la carrera laboral: el complemento se reconoce automáticamente si se cumplen estas condiciones. El verificador comprueba estas condiciones en 6 preguntas y calcula el importe estimado según el número de hijos.',
       },
     },
     {
@@ -98,7 +106,7 @@ export const faqJsonLd = {
       name: '¿El complemento por brecha de género es compatible con cualquier tipo de pensión?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El complemento es compatible con la pensión de jubilación ordinaria, la jubilación anticipada, la jubilación parcial, la incapacidad permanente total, absoluta o gran invalidez, y la pensión de viudedad. No se aplica a las pensiones no contributivas ni al complemento a mínimos. En caso de recibir más de una pensión, el complemento puede percibirse una sola vez en la pensión principal.',
+        text: 'El complemento se reconoce sobre las pensiones contributivas de jubilación —ordinaria o anticipada—, incapacidad permanente (total, absoluta o gran invalidez) y viudedad. No procede en la jubilación parcial: el artículo 60.4 LGSS lo excluye expresamente, y solo se reconoce cuando desde ella se accede a la jubilación plena. Tampoco alcanza a las pensiones no contributivas. Sí es compatible con el complemento a mínimos: el artículo 60.3.e) LGSS dispone que su importe no cuenta como ingreso para determinar el derecho a ese complemento y que, cuando procede, se suma a la cuantía mínima reconocida.',
       },
     },
   ],

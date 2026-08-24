@@ -87,6 +87,15 @@ async function enLetras(pagina: Page, entrada: string): Promise<string> {
   return (await resultado.innerText()).trim();
 }
 
+/** Escribe la cantidad y devuelve el aviso de rechazo que muestra el panel. */
+async function avisoDe(pagina: Page, entrada: string): Promise<string> {
+  await pagina.locator('#cantidad').fill('');
+  await pagina.locator('#cantidad').fill(entrada);
+  const aviso = pagina.locator('[role="region"][aria-label="Resultado"] [role="alert"]');
+  await expect(aviso).toBeVisible();
+  return (await aviso.innerText()).trim();
+}
+
 test.beforeEach(async ({ page }) => {
   await page.goto(RUTA);
   // La app es un client component: sin hidratar no hay resultado que comprobar.
@@ -236,20 +245,45 @@ test('HALLAZGO 1 · los millones redondos salen sin la preposición «de»', asy
   expect(await enLetras(page, '1.000.000')).toBe('un millón libras');
 });
 
-test('HALLAZGO 2 · el formato US que promete la ayuda da una cantidad mil veces menor', async ({ page }) => {
+/**
+ * HALLAZGO 2 · REPARADO el 24/08/2026 en `lib/formatters.ts`.
+ *
+ * La ayuda del campo prometía los dos formatos y `parseSpanishNumber` resolvía siempre a
+ * favor del español, así que 3,847.50 € se escribía en el pagaré como «tres euros con
+ * ochenta y cinco céntimos». La regla que lo arregla: con los DOS separadores presentes, el
+ * último es el decimal. Con uno solo la ambigüedad es irreducible y gana el español, que es
+ * lo que este test fija en su última línea.
+ */
+test('HALLAZGO 2 · el formato internacional que promete la ayuda se lee bien', async ({ page }) => {
   await expect(page.locator('#cantidad ~ p').first()).toContainText('3.847,50 y 3,847.50');
-  // Lo prometido: 'tres mil ochocientos cuarenta y siete euros con cincuenta céntimos'.
-  expect(await enLetras(page, '3,847.50')).toBe('tres euros con ochenta y cinco céntimos');
-  // Lo prometido: 'un millón doscientos treinta y cuatro mil quinientos sesenta y siete
-  // euros con ochenta y nueve céntimos'.
-  expect(await enLetras(page, '1,234,567.89')).toBe('un euro con veintitrés céntimos');
+  expect(await enLetras(page, '3,847.50')).toBe(
+    'tres mil ochocientos cuarenta y siete euros con cincuenta céntimos',
+  );
+  expect(await enLetras(page, '1,234,567.89')).toBe(
+    'un millón doscientos treinta y cuatro mil quinientos sesenta y siete euros con ochenta y nueve céntimos',
+  );
+  // El formato español sigue leyéndose exactamente igual que antes
+  expect(await enLetras(page, '3.847,50')).toBe(
+    'tres mil ochocientos cuarenta y siete euros con cincuenta céntimos',
+  );
+  // Con un solo separador gana el español: 1.234 son mil doscientos treinta y cuatro
+  expect(await enLetras(page, '1.234')).toBe('mil doscientos treinta y cuatro euros');
 });
 
-test('HALLAZGO 3 · entra basura por el prefijo numérico de parseFloat', async ({ page }) => {
-  // El mensaje de error dice «Escribe solo cifras», pero estas tres pasan sin aviso.
-  expect(await enLetras(page, '12abc')).toBe('doce euros');
-  expect(await enLetras(page, '1.2.3')).toBe('un euro con veinte céntimos');
-  expect(await enLetras(page, '1e3')).toBe('mil euros');
+/**
+ * HALLAZGO 3 · REPARADO el 24/08/2026 en `lib/formatters.ts`.
+ *
+ * `parseFloat` aceptaba prefijos numéricos y notación científica, así que «12abc» valía 12 y
+ * «1e3» valía 1000: importes plausibles pero equivocados en la línea que se copia a un
+ * pagaré, y encima contradiciendo el propio mensaje de error de la app. Ahora el parser
+ * devuelve NaN y la app dice lo que ya decía que diría.
+ */
+test('HALLAZGO 3 · la basura se rechaza con el aviso que la app ya anunciaba', async ({ page }) => {
+  for (const basura of ['12abc', '1.2.3', '1e3', '2,5,3']) {
+    expect(await avisoDe(page, basura)).toBe(
+      'No se reconoce esa cantidad. Escribe solo cifras, con coma o punto decimal.',
+    );
+  }
 });
 
 test('HALLAZGO 4 · el tope con dos decimales se rechaza pese a anunciarse', async ({ page }) => {

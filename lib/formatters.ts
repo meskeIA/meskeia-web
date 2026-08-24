@@ -63,27 +63,6 @@ export function formatDateTime(date: Date): string {
 }
 
 /**
- * Parsea input de usuario (acepta coma o punto como decimal)
- * @param input - String del input (ej: "1.234,56", "200.000" o "1234.56")
- * @returns Número parseado
- *
- * ⚠️ Lo usan 89 apps, 48 de ellas sobre campos de texto libre: cualquier cambio aquí
- * se propaga a todo el catálogo. Ejecutar `npm run test:unit` antes de commitear.
- *
- * ── El punto sin coma, y por qué es el caso delicado (corregido el 14/08/2026) ──
- * Hasta esa fecha esta rama hacía un `parseFloat` directo, así que "200.000" devolvía
- * 200 y "11.440" devolvía 11,44. El comentario que había aquí anunciaba una heurística
- * («asumimos decimal si hay menos de 4 dígitos después del punto») que NUNCA se llegó a
- * implementar, y los tests probaban "1.234,56" y "1234.56" pero jamás el punto de
- * millares solo, de modo que el único caso roto era justo el que nadie miraba.
- *
- * Lo encontró el Inspector en `estimador-compraventa-inmueble`: su botón «Estimar por
- * mí» escribía 11.440 en un campo y lo releía como 11,44, así que el botón pensado para
- * rebajar la ganancia del vendedor le subía el IRPF 2.618,77 €. Llevaba oculto porque
- * `es-ES` no agrupa los millares hasta 5 cifras: por debajo de 10.000 el número se
- * escribe sin punto y el fallo no se manifiesta.
- */
-/**
  * Como `parseSpanishNumber`, pero un campo vacío o ilegible vale `porDefecto` (0) en vez
  * de NaN. Para los campos OPCIONALES de un formulario, que es donde el NaN hace daño.
  *
@@ -104,32 +83,102 @@ export function parseSpanishNumberOr(input: string, porDefecto = 0): number {
   return Number.isFinite(n) ? n : porDefecto;
 }
 
+/**
+ * Parsea input de usuario (acepta coma o punto como decimal)
+ * @param input - String del input (ej: "1.234,56", "1,234.56", "200.000" o "1234.56")
+ * @returns Número parseado, o NaN si lo tecleado no es un número
+ *
+ * ⚠️ Lo usan 93 ficheros, casi la mitad sobre campos de texto libre: cualquier cambio aquí
+ * se propaga a todo el catálogo. Ejecutar `npm run test:unit` antes de commitear.
+ *
+ * ── El punto sin coma, y por qué es el caso delicado (corregido el 14/08/2026) ──
+ * Hasta esa fecha esta rama hacía un `parseFloat` directo, así que "200.000" devolvía
+ * 200 y "11.440" devolvía 11,44. El comentario que había aquí anunciaba una heurística
+ * («asumimos decimal si hay menos de 4 dígitos después del punto») que NUNCA se llegó a
+ * implementar, y los tests probaban "1.234,56" y "1234.56" pero jamás el punto de
+ * millares solo, de modo que el único caso roto era justo el que nadie miraba.
+ *
+ * Lo encontró el Inspector en `estimador-compraventa-inmueble`: su botón «Estimar por
+ * mí» escribía 11.440 en un campo y lo releía como 11,44, así que el botón pensado para
+ * rebajar la ganancia del vendedor le subía el IRPF 2.618,77 €. Llevaba oculto porque
+ * `es-ES` no agrupa los millares hasta 5 cifras: por debajo de 10.000 el número se
+ * escribe sin punto y el fallo no se manifiesta.
+ *
+ * ── El formato internacional, y la basura que colaba (corregido el 24/08/2026) ──
+ * El CLAUDE.md prometía, en su regla Latam-friendly, que esta función «ya admite 1,234.56
+ * y 1.234,56», y era falso: con punto Y coma resolvía siempre a favor del español, así que
+ * "1,234.56" salía 1,23456 —tres órdenes de magnitud menos— sin ningún aviso. Con LATAM en
+ * el 59,6 % de las impresiones y México o Perú escribiendo el millar con coma, la promesa
+ * tenía que cumplirla el código, no la documentación.
+ *
+ * La regla que lo resuelve sin ambigüedad: **cuando aparecen los dos separadores, el
+ * ÚLTIMO es el decimal**. Vale en los dos convenios y no cambia nada de lo que ya
+ * funcionaba en español, donde la coma va siempre detrás del punto.
+ *
+ * Con UN SOLO separador la ambigüedad es irreducible ("1.234" y "1,234" significan cosas
+ * distintas en cada convenio) y se resuelve a favor del español, que es el formato
+ * obligatorio del proyecto: la coma sola es decimal, y el punto solo agrupa millares
+ * cuando parte el número en grupos de exactamente tres cifras.
+ *
+ * Y se dejó de admitir lo que no es un número. `parseFloat` acepta prefijos numéricos y
+ * notación científica, de modo que "12abc" valía 12, "1e3" valía 1000 y "1.2.3" valía 1,2:
+ * importes plausibles pero equivocados, sin nada que los delatase. En
+ * `conversor-numeros-letras` eso se escribe en un pagaré. Ahora devuelven NaN, que es lo
+ * que las apps ya saben tratar («No definido»), y `parseSpanishNumberOr` sigue dando su
+ * valor por defecto.
+ *
+ * Lo que SÍ se sigue tolerando: espacios de cualquier clase —incluido el NBSP con que
+ * `Intl` separa el símbolo de moneda— y un símbolo de moneda o porcentaje pegado al
+ * número, para que releer lo que escribió `formatCurrency` siga funcionando.
+ */
+// Un separador agrupa millares si parte el número en grupos de exactamente tres cifras
+const AGRUPA_CON_PUNTO = /^\d{1,3}(\.\d{3})+$/;
+const AGRUPA_CON_COMA = /^\d{1,3}(,\d{3})+$/;
+
 export function parseSpanishNumber(input: string): number {
   if (!input || input.trim() === '') return NaN;
 
-  // Eliminar espacios
-  let cleaned = input.trim();
+  // Fuera lo que no aporta cifra: espacios (normal, NBSP y fino) y el símbolo pegado
+  const limpio = input
+    .replace(/[\s\u00A0\u202F]/g, '')
+    .replace(/^[€$£%]+|[€$£%]+$/g, '');
 
-  // Si tiene punto Y coma, asumimos formato español (1.234,56)
-  if (cleaned.includes('.') && cleaned.includes(',')) {
-    cleaned = cleaned.replace(/\./g, '').replace(',', '.');
-  }
-  // Si solo tiene coma, es decimal español
-  else if (cleaned.includes(',')) {
-    cleaned = cleaned.replace(',', '.');
-  }
-  // Si solo tiene puntos, hay que decidir si separan millares o decimales.
-  // Son millares cuando cada punto va seguido de EXACTAMENTE tres dígitos: "200.000",
-  // "1.234.567". Con cualquier otra cantidad de dígitos es un decimal internacional
-  // ("1234.56", "3.1416", "1.5"), que se venía aceptando y se sigue aceptando.
-  // "1.234" es genuinamente ambiguo —mil doscientos treinta y cuatro en español, uno
-  // coma doscientos treinta y cuatro en inglés— y se resuelve a favor del español,
-  // que es el formato obligatorio del proyecto.
-  else if (cleaned.includes('.') && /^-?\d{1,3}(\.\d{3})+$/.test(cleaned)) {
-    cleaned = cleaned.replace(/\./g, '');
+  // A partir de aquí solo cifras, signo y separadores. Nada de letras ni exponentes.
+  if (!/^[+-]?[\d.,]+$/.test(limpio) || !/\d/.test(limpio)) return NaN;
+
+  const signo = limpio.startsWith('-') ? -1 : 1;
+  const cuerpo = limpio.replace(/^[+-]/, '');
+
+  const comas = (cuerpo.match(/,/g) || []).length;
+  const puntos = (cuerpo.match(/\./g) || []).length;
+
+  let normalizado: string;
+
+  if (comas > 0 && puntos > 0) {
+    // Los dos separadores presentes: el ÚLTIMO es el decimal, el otro agrupa millares
+    const decimalEsComa = cuerpo.lastIndexOf(',') > cuerpo.lastIndexOf('.');
+    if ((decimalEsComa ? comas : puntos) !== 1) return NaN;  // dos decimales no es un número
+    const corte = cuerpo.lastIndexOf(decimalEsComa ? ',' : '.');
+    const entera = cuerpo.slice(0, corte);
+    const decimales = cuerpo.slice(corte + 1);
+    const agrupa = decimalEsComa ? AGRUPA_CON_PUNTO : AGRUPA_CON_COMA;
+    if (!agrupa.test(entera)) return NaN;
+    normalizado = entera.replace(/[.,]/g, '') + '.' + decimales;
+  } else if (comas > 0) {
+    // Una coma sola es SIEMPRE decimal español, aunque pudiera leerse como millar inglés
+    if (comas === 1) normalizado = cuerpo.replace(',', '.');
+    else if (AGRUPA_CON_COMA.test(cuerpo)) normalizado = cuerpo.replace(/,/g, '');
+    else return NaN;                                          // "2,5,3" no es un número
+  } else if (puntos > 0) {
+    if (AGRUPA_CON_PUNTO.test(cuerpo)) normalizado = cuerpo.replace(/\./g, '');
+    else if (puntos === 1) normalizado = cuerpo;              // decimal internacional
+    else return NaN;                                          // "1.2.3" no es un número
+  } else {
+    normalizado = cuerpo;
   }
 
-  return parseFloat(cleaned);
+  const n = parseFloat(normalizado);
+  return Number.isFinite(n) ? signo * n : NaN;
 }
 
 /**

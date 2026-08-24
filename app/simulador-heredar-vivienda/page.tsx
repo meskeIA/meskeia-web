@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   MeskeiaLogo,
   Footer,
@@ -23,6 +23,8 @@ import {
   REDUCCION_VIVIENDA_PORC_IS,
   REDUCCION_VIVIENDA_MAX_IS,
   BONIFICACIONES_CCAA_IS,
+  COEFICIENTES_IS,
+  COEFICIENTES_CATALUNA_IS,
   COEFICIENTES_IIVTNU_2025,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
   PLUSVALIA_MUNICIPAL_META,
@@ -31,12 +33,16 @@ import styles from './SimuladorHeredarVivienda.module.css';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
-type Parentesco = 'conyuge_hijo' | 'padre' | 'hermano' | 'sobrino' | 'sin_parentesco';
+type Parentesco = 'conyuge' | 'hijo' | 'padre' | 'hermano' | 'sin_parentesco';
 
 interface ResultadoISD {
   baseImponible: number;
   reduccionParentesco: number;
   reduccionVivienda: number;
+  /** Reducción propia de la CCAA sobre la BASE (hoy solo Asturias: 300.000 € Grupos I-II) */
+  reduccionAutonomica: number;
+  /** Por qué NO se ha aplicado la reducción de vivienda habitual, si el usuario la marcó */
+  viviendaNoAplicada: string | null;
   baseLiquidable: number;
   cuotaIntegra: number;
   coeficiente: number;
@@ -67,12 +73,23 @@ interface ResultadoIRPF {
 
 // ─── Datos auxiliares ─────────────────────────────────────────────────────────
 
+/**
+ * Cada opción tiene que significar algo DISTINTO, y su `reducKey` es la fila que se lee
+ * en `data/fiscal/sucesiones.ts` — no el número del grupo.
+ *
+ * Antes había dos opciones («Hermano / Tío / Sobrino» y «Pariente lejano (Grupo III)») que
+ * compartían grupo y clave, así que devolvían exactamente el mismo resultado, y el sobrino
+ * aparecía nombrado en las dos. Y «Cónyuge / Hijo / Descendiente ≥21» iba rotulada Grupo II
+ * leyendo la fila `I-conyuge`: en régimen común da igual (las cuatro filas valen 15.956,87 €)
+ * pero en Cataluña NO, porque allí el cónyuge reduce 100.000 € y el hijo ≥21, 50.000 €.
+ * Separar cónyuge de hijo arregla las dos cosas a la vez.
+ */
 const PARENTESCOS: Array<{ id: Parentesco; label: string; grupo: string; reducKey: string }> = [
-  { id: 'conyuge_hijo', label: 'Cónyuge / Hijo / Descendiente ≥21', grupo: 'II', reducKey: 'I-conyuge' },
-  { id: 'padre', label: 'Padre / Ascendiente', grupo: 'II', reducKey: 'II-ascendiente' },
-  { id: 'hermano', label: 'Hermano / Tío / Sobrino', grupo: 'III', reducKey: 'III' },
-  { id: 'sobrino', label: 'Pariente lejano (Grupo III)', grupo: 'III', reducKey: 'III' },
-  { id: 'sin_parentesco', label: 'Sin parentesco (Grupo IV)', grupo: 'IV', reducKey: 'IV' },
+  { id: 'conyuge', label: 'Cónyuge o pareja estable (Grupo II)', grupo: 'II', reducKey: 'I-conyuge' },
+  { id: 'hijo', label: 'Hijo o descendiente ≥21 años (Grupo II)', grupo: 'II', reducKey: 'II' },
+  { id: 'padre', label: 'Padre / Ascendiente (Grupo II)', grupo: 'II', reducKey: 'II-ascendiente' },
+  { id: 'hermano', label: 'Hermano / Tío / Sobrino (Grupo III)', grupo: 'III', reducKey: 'III' },
+  { id: 'sin_parentesco', label: 'Primo, pariente lejano o sin parentesco (Grupo IV)', grupo: 'IV', reducKey: 'IV' },
 ];
 
 const CCAA_LIST: Array<{ id: string; label: string }> = [
@@ -117,7 +134,7 @@ const CASOS: CasoPreconfigurado[] = [
     id: 'madrid-hijo',
     nombre: 'Hijo hereda piso 200k en Madrid',
     descripcion: 'Vivienda habitual del padre, Madrid bonifica 99%',
-    parentesco: 'conyuge_hijo',
+    parentesco: 'hijo',
     edad: 45,
     ccaa: 'madrid',
     anioAdquisicion: 1995,
@@ -133,7 +150,7 @@ const CASOS: CasoPreconfigurado[] = [
     id: 'cataluna-conyuge',
     nombre: 'Cónyuge hereda piso 350k en Cataluña',
     descripcion: 'Tarifa propia Cataluña, reducción cónyuge 100k',
-    parentesco: 'conyuge_hijo',
+    parentesco: 'conyuge',
     edad: 60,
     ccaa: 'cataluna',
     anioAdquisicion: 2000,
@@ -165,7 +182,7 @@ const CASOS: CasoPreconfigurado[] = [
     id: 'andalucia-sobrino',
     nombre: 'Sobrino hereda piso 250k en Andalucía',
     descripcion: 'Grupo III sin bonificación autonómica',
-    parentesco: 'sobrino',
+    parentesco: 'hermano',
     edad: 40,
     ccaa: 'andalucia',
     anioAdquisicion: 2005,
@@ -181,8 +198,22 @@ const CASOS: CasoPreconfigurado[] = [
 
 // ─── Lógica de cálculo ────────────────────────────────────────────────────────
 
-const TIPO_MUNICIPAL_PLUSVALIA = 0.30; // tipo medio orientativo (30%)
-const ANIO_ACTUAL = 2025;
+/**
+ * El tipo lo fija cada Ayuntamiento. `PLUSVALIA_MUNICIPAL_META` declara DOS valores y aquí
+ * hay que usar el orientativo (25 %), no el máximo legal (30 %): la interfaz rotula
+ * «Tipo municipal (orientativo)», así que tomar el techo sobreestimaba la plusvalía un 20 %
+ * en todos los casos, y de rebote el IRPF (la cuota pagada engorda el valor de adquisición
+ * fiscal) y el total. Hardcodeado además, contra la regla de CLAUDE.md.
+ */
+const TIPO_MUNICIPAL_PLUSVALIA = PLUSVALIA_MUNICIPAL_META.tipoOrientativo / 100;
+
+/**
+ * Año de partida del primer render, el mismo en servidor y en cliente para que la
+ * hidratación no discrepe. El año REAL lo pone `useEffect` nada más montar: antes esto era
+ * una constante `2025` y con ella se congelaban la tenencia del causante (que decide el
+ * coeficiente del IIVTNU) y el tope del deslizador de año de adquisición.
+ */
+const ANIO_REFERENCIA = 2026;
 
 function aplicarTarifa(
   base: number,
@@ -205,11 +236,16 @@ function aplicarTarifa(
   return cuota;
 }
 
+/** Edad mínima del colateral (Grupo III) para la reducción de vivienda habitual, art. 20.2.c LISD */
+const EDAD_MIN_COLATERAL_VIVIENDA = 65;
+
 function calcularISD(
   valorReferencia: number,
   parentesco: Parentesco,
   ccaa: string,
-  viviendaHabitual: boolean
+  viviendaHabitual: boolean,
+  edad: number,
+  convivioDosAnios: boolean
 ): ResultadoISD {
   const parentescoData = PARENTESCOS.find(p => p.id === parentesco) ?? PARENTESCOS[0];
   const grupo = parentescoData.grupo;
@@ -218,6 +254,7 @@ function calcularISD(
   const ccaaInfo = BONIFICACIONES_CCAA_IS[ccaa];
   const ccaaNombre = ccaaInfo?.nombre ?? 'Régimen común';
   const esCataluna = ccaa === 'cataluna';
+  const bonifGrupo = ccaaInfo?.bonificaciones[reducKey];
 
   const baseImponible = valorReferencia;
 
@@ -225,59 +262,88 @@ function calcularISD(
   const reducciones = esCataluna ? REDUCCIONES_PARENTESCO_CATALUNA_IS : REDUCCIONES_PARENTESCO_IS;
   const reduccionParentesco = reducciones[reducKey] ?? 0;
 
-  // Reducción vivienda habitual (95% hasta 122.606,47€) — solo Grupos I, II y III conviviente
+  /**
+   * Reducción por vivienda habitual (95 % hasta 122.606,47 €).
+   *
+   * El art. 20.2.c LISD la reserva al cónyuge, ascendientes y descendientes, y al pariente
+   * COLATERAL mayor de 65 años que hubiera convivido con el causante los dos años anteriores.
+   * Antes bastaba `grupo !== 'IV'`, así que un hermano de 40 años que no convivía se llevaba
+   * hasta 122.606,47 € de reducción — justo lo contrario de lo que dice la FAQ de esta misma
+   * página. En una app de nivel crítico el motor y su texto legal no pueden discrepar.
+   */
   let reduccionVivienda = 0;
-  if (viviendaHabitual && grupo !== 'IV') {
-    reduccionVivienda = Math.min(
-      valorReferencia * REDUCCION_VIVIENDA_PORC_IS,
-      REDUCCION_VIVIENDA_MAX_IS
-    );
+  let viviendaNoAplicada: string | null = null;
+  if (viviendaHabitual) {
+    const esColateral = grupo === 'III';
+    if (grupo === 'IV') {
+      viviendaNoAplicada = 'sin parentesco: el art. 20.2.c LISD no la contempla';
+    } else if (esColateral && edad < EDAD_MIN_COLATERAL_VIVIENDA) {
+      viviendaNoAplicada = `pariente colateral menor de ${EDAD_MIN_COLATERAL_VIVIENDA} años`;
+    } else if (esColateral && !convivioDosAnios) {
+      viviendaNoAplicada = 'pariente colateral que no convivió los 2 años anteriores';
+    } else {
+      reduccionVivienda = Math.min(
+        valorReferencia * REDUCCION_VIVIENDA_PORC_IS,
+        REDUCCION_VIVIENDA_MAX_IS
+      );
+    }
   }
 
-  const baseLiquidable = Math.max(0, baseImponible - reduccionParentesco - reduccionVivienda);
+  /**
+   * Reducción autonómica sobre la BASE. Asturias es la única CCAA del catálogo cuyo
+   * beneficio está modelado así (300.000 € para Grupos I y II, 50.000 € para el III) en vez
+   * de como bonificación en cuota, y era justo la que el motor no sabía leer: presentaba
+   * Asturias como la comunidad más cara mientras `data/fiscal` decía que un hijo que hereda
+   * 250.000 € de vivienda habitual no paga nada.
+   */
+  const reduccionAutonomica = bonifGrupo?.reduccionBase ?? 0;
+
+  const baseLiquidable = Math.max(
+    0,
+    baseImponible - reduccionParentesco - reduccionVivienda - reduccionAutonomica
+  );
 
   // Aplicar tarifa
   const tarifa = esCataluna ? TARIFA_CATALUNA_IS : TARIFA_ESTATAL_IS;
   const cuotaIntegra = aplicarTarifa(baseLiquidable, tarifa);
 
-  // Coeficiente patrimonio preexistente (asumimos primer tramo: patrimonio < 402.678€)
-  const coeficientesGrupo: Record<string, number> = {
-    'I': 1.0,
-    'II': 1.0,
-    'III': 1.5882,
-    'IV': 2.0,
-  };
-  const coeficiente = coeficientesGrupo[grupo] ?? 1.0;
+  // Coeficiente por patrimonio preexistente, desde data/fiscal. Índice 0 = primer tramo
+  // (patrimonio del heredero < 402.678,11 €), que es el supuesto que simula esta app.
+  const tablaCoeficientes = esCataluna ? COEFICIENTES_CATALUNA_IS : COEFICIENTES_IS;
+  const coeficiente = tablaCoeficientes[grupo]?.[0] ?? 1.0;
   const cuotaTributaria = cuotaIntegra * coeficiente;
 
   // Bonificación CCAA
   let bonificacionPorc = 0;
-  if (ccaaInfo) {
-    const bonifGrupo = ccaaInfo.bonificaciones[reducKey];
-    if (bonifGrupo) {
-      if (typeof bonifGrupo.porcentaje === 'number') {
-        bonificacionPorc = bonifGrupo.porcentaje;
-      }
-      if (bonifGrupo.escalonado && bonifGrupo.escalonado.length > 0) {
-        // Tomar el primer tramo aplicable según base liquidable
-        for (const t of bonifGrupo.escalonado) {
-          if (t.hasta && baseLiquidable <= t.hasta) {
-            bonificacionPorc = t.porcentaje;
-            break;
-          }
-          if (t.desde && baseLiquidable > t.desde) {
-            bonificacionPorc = t.porcentaje;
-          }
+  if (bonifGrupo) {
+    if (typeof bonifGrupo.porcentaje === 'number') {
+      bonificacionPorc = bonifGrupo.porcentaje;
+    }
+    if (bonifGrupo.escalonado && bonifGrupo.escalonado.length > 0) {
+      // Tomar el primer tramo aplicable según base liquidable
+      for (const t of bonifGrupo.escalonado) {
+        if (t.hasta && baseLiquidable <= t.hasta) {
+          bonificacionPorc = t.porcentaje;
+          break;
+        }
+        if (t.desde && baseLiquidable > t.desde) {
+          bonificacionPorc = t.porcentaje;
         }
       }
-      // Aragón: limite — si supera el limite no aplica
-      if (bonifGrupo.limite && baseLiquidable > bonifGrupo.limite) {
-        bonificacionPorc = 0;
-      }
-      // Andalucia/Galicia/Cantabria: exencion total bajo umbral
-      if (bonifGrupo.exencion && baseLiquidable < bonifGrupo.exencion) {
-        bonificacionPorc = 1.0;
-      }
+    }
+    // La Rioja: 99 % hasta 500.000 € de base y 98 % por encima. Sin leer el escalón, la app
+    // cobraba la MITAD de lo debido en las herencias grandes: como la bonificación va sobre
+    // cuota y lo que se paga es el complemento, pasar del 98 % al 99 % duplica el error.
+    if (bonifGrupo.tope && typeof bonifGrupo.porcentajeMayor === 'number' && baseLiquidable > bonifGrupo.tope) {
+      bonificacionPorc = bonifGrupo.porcentajeMayor;
+    }
+    // Aragón: limite — si supera el limite no aplica
+    if (bonifGrupo.limite && baseLiquidable > bonifGrupo.limite) {
+      bonificacionPorc = 0;
+    }
+    // Andalucia/Galicia: exencion total bajo umbral
+    if (bonifGrupo.exencion && baseLiquidable < bonifGrupo.exencion) {
+      bonificacionPorc = 1.0;
     }
   }
 
@@ -288,6 +354,8 @@ function calcularISD(
     baseImponible,
     reduccionParentesco,
     reduccionVivienda,
+    reduccionAutonomica,
+    viviendaNoAplicada,
     baseLiquidable,
     cuotaIntegra,
     coeficiente,
@@ -408,7 +476,7 @@ function calcularIRPFGanancia(
 // ─── Componente ───────────────────────────────────────────────────────────────
 
 export default function SimuladorHeredarViviendaPage() {
-  const [parentesco, setParentesco] = useState<Parentesco>('conyuge_hijo');
+  const [parentesco, setParentesco] = useState<Parentesco>('hijo');
   const [edad, setEdad] = useState<number>(45);
   const [ccaa, setCcaa] = useState<string>('madrid');
   const [anioAdquisicion, setAnioAdquisicion] = useState<number>(1995);
@@ -419,8 +487,17 @@ export default function SimuladorHeredarViviendaPage() {
   // que exige el método real del IIVTNU (art. 107.5 TRLHL)
   const [valorCatastralTotal, setValorCatastralTotal] = useState<number>(120000);
   const [viviendaHabitual, setViviendaHabitual] = useState<boolean>(true);
+  // Solo interviene si el heredero es colateral (Grupo III): art. 20.2.c LISD
+  const [convivioDosAnios, setConvivioDosAnios] = useState<boolean>(false);
   const [aniosHastaVenta, setAniosHastaVenta] = useState<number>(5);
   const [valorVenta, setValorVenta] = useState<number>(250000);
+
+  // El año real solo se conoce en el navegador: en el primer render (y en el HTML que se
+  // sirve) vale ANIO_REFERENCIA, para que servidor y cliente pinten lo mismo
+  const [anioActual, setAnioActual] = useState<number>(ANIO_REFERENCIA);
+  useEffect(() => {
+    setAnioActual(new Date().getFullYear());
+  }, []);
 
   const aplicarCaso = useCallback((caso: CasoPreconfigurado) => {
     setParentesco(caso.parentesco);
@@ -432,16 +509,17 @@ export default function SimuladorHeredarViviendaPage() {
     setValorCatastralSuelo(caso.valorCatastralSuelo);
     setValorCatastralTotal(caso.valorCatastralTotal);
     setViviendaHabitual(caso.viviendaHabitual);
+    setConvivioDosAnios(false);
     setAniosHastaVenta(caso.aniosHastaVenta);
     setValorVenta(caso.valorVenta);
   }, []);
 
   // Cálculos
-  const aniosTenenciaCausante = ANIO_ACTUAL - anioAdquisicion;
+  const aniosTenenciaCausante = anioActual - anioAdquisicion;
 
   const isd = useMemo(
-    () => calcularISD(valorReferencia, parentesco, ccaa, viviendaHabitual),
-    [valorReferencia, parentesco, ccaa, viviendaHabitual]
+    () => calcularISD(valorReferencia, parentesco, ccaa, viviendaHabitual, edad, convivioDosAnios),
+    [valorReferencia, parentesco, ccaa, viviendaHabitual, edad, convivioDosAnios]
   );
 
   const plusvalia = useMemo(
@@ -468,7 +546,10 @@ export default function SimuladorHeredarViviendaPage() {
   const porcSobreVenta = valorVenta > 0 ? (totalImpuestos / valorVenta) * 100 : 0;
 
   // Aviso edad menor de 21 (informativo)
-  const avisoEdad = edad < 21 && parentesco === 'conyuge_hijo';
+  const avisoEdad = edad < 21 && parentesco === 'hijo';
+
+  // Grupo del parentesco elegido, para decidir qué campos tienen sentido en el formulario
+  const grupoParentesco = PARENTESCOS.find(p => p.id === parentesco)?.grupo ?? 'II';
 
   return (
     <div className={styles.container}>
@@ -506,6 +587,7 @@ export default function SimuladorHeredarViviendaPage() {
             {CASOS.map(caso => (
               <button
                 key={caso.id}
+                type="button"
                 className={styles.casoBtn}
                 onClick={() => aplicarCaso(caso)}
                 aria-label={`Cargar caso: ${caso.nombre}`}
@@ -533,15 +615,15 @@ export default function SimuladorHeredarViviendaPage() {
               id="anioAdq"
               type="range"
               min={1985}
-              max={2025}
+              max={anioActual}
               step={1}
-              value={anioAdquisicion}
+              value={Math.min(anioAdquisicion, anioActual)}
               onChange={e => setAnioAdquisicion(Number(e.target.value))}
               className={styles.slider}
             />
             <div className={styles.sliderRange}>
               <span>1985</span>
-              <span>2025</span>
+              <span>{anioActual}</span>
             </div>
           </div>
 
@@ -609,8 +691,8 @@ export default function SimuladorHeredarViviendaPage() {
             </div>
             {avisoEdad && (
               <p className={styles.sliderHint} role="status" aria-live="polite">
-                ⚠️ Heredero menor de 21 años: existen reducciones adicionales no incluidas
-                aquí. Consulta con un asesor.
+                <span aria-hidden="true">⚠️</span> Heredero menor de 21 años: existen
+                reducciones adicionales no incluidas aquí. Consulta con un asesor.
               </p>
             )}
           </div>
@@ -640,7 +722,7 @@ export default function SimuladorHeredarViviendaPage() {
 
           <div className={styles.sliderGroup}>
             <label className={styles.sliderLabel} htmlFor="valorRef">
-              Valor de referencia catastral 2025:{' '}
+              Valor de referencia catastral:{' '}
               <span className={styles.sliderValue}>{formatCurrency(valorReferencia)}</span>
               <span className={styles.muted}> (base ISD)</span>
             </label>
@@ -707,6 +789,7 @@ export default function SimuladorHeredarViviendaPage() {
           <div className={styles.toggleGroup}>
             <label className={styles.toggleLabel}>
               <input
+                id="viviendaHabitual"
                 type="checkbox"
                 checked={viviendaHabitual}
                 onChange={e => setViviendaHabitual(e.target.checked)}
@@ -718,6 +801,28 @@ export default function SimuladorHeredarViviendaPage() {
               </span>
             </label>
           </div>
+
+          {/* El colateral (Grupo III) solo tiene derecho a la reducción si además es mayor
+              de 65 años y convivió con el causante los dos años anteriores (art. 20.2.c LISD) */}
+          {viviendaHabitual && grupoParentesco === 'III' && (
+            <div className={styles.toggleGroup}>
+              <label className={styles.toggleLabel}>
+                <input
+                  id="convivencia"
+                  type="checkbox"
+                  checked={convivioDosAnios}
+                  onChange={e => setConvivioDosAnios(e.target.checked)}
+                  className={styles.toggleInput}
+                />
+                <span>
+                  Convivió con el fallecido los 2 años anteriores{' '}
+                  <span className={styles.muted}>
+                    (requisito del colateral, junto con tener 65 años o más)
+                  </span>
+                </span>
+              </label>
+            </div>
+          )}
         </div>
 
         {/* Datos venta */}
@@ -793,6 +898,18 @@ export default function SimuladorHeredarViviendaPage() {
               <div className={styles.panelLine}>
                 <span>− Reducción vivienda habitual (95%)</span>
                 <strong>−{formatCurrency(isd.reduccionVivienda)}</strong>
+              </div>
+            )}
+            {isd.viviendaNoAplicada && (
+              <div className={styles.panelLine}>
+                <span>Reducción vivienda habitual</span>
+                <strong>No aplicable: {isd.viviendaNoAplicada}</strong>
+              </div>
+            )}
+            {isd.reduccionAutonomica > 0 && (
+              <div className={styles.panelLine}>
+                <span>− Reducción autonómica ({isd.ccaaNombre})</span>
+                <strong>−{formatCurrency(isd.reduccionAutonomica)}</strong>
               </div>
             )}
             <div className={styles.panelLine}>
