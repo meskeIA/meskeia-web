@@ -13,8 +13,8 @@ import { getTursoClient, initializeDatabase } from '@/lib/turso';
 import { getCorsHeaders } from '@/lib/cors';
 import { esAgenteIALectura } from '@/lib/analytics-rollup';
 
-// Configuración para edge runtime (más rápido en Vercel)
-export const runtime = 'edge';
+// Runtime nodejs: el Edge Runtime está deprecado desde Next 16.3.0 (detectado 2026-08-10)
+export const runtime = 'nodejs';
 
 /**
  * Anonimiza una dirección IP truncando el último octeto (IPv4)

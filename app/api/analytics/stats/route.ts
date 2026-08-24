@@ -15,8 +15,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getTursoClient, initializeDatabase, formatearDuracion } from '@/lib/turso';
 import { getCorsHeaders } from '@/lib/cors';
 
-// Configuración para edge runtime
-export const runtime = 'edge';
+// Runtime nodejs: el Edge Runtime está deprecado desde Next 16.3.0 (detectado 2026-08-10)
+export const runtime = 'nodejs';
 
 /**
  * Verifica que la petición incluye la API key correcta.

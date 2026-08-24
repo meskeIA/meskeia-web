@@ -9,8 +9,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getTursoClient } from '@/lib/turso';
 import { getCorsHeaders } from '@/lib/cors';
 
-// Configuración para edge runtime
-export const runtime = 'edge';
+// Runtime nodejs: el Edge Runtime está deprecado desde Next 16.3.0 (detectado 2026-08-10)
+export const runtime = 'nodejs';
 
 export async function OPTIONS() {
   return NextResponse.json({}, { headers: getCorsHeaders('POST, OPTIONS') });
