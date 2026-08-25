@@ -94,21 +94,23 @@ export default function Footer({ appName }: FooterProps) {
 
       <footer className={styles.footer}>
         <div className={styles.shareSection}>
-          <span className={styles.shareText}>💡 ¿Te resultó útil?</span>
+          <span className={styles.shareText}><span aria-hidden="true">💡</span> ¿Te resultó útil?</span>
           <button
             type="button"
             onClick={compartirApp}
             className={styles.shareButton}
             title="Compartir esta App"
           >
-            🔗 Compártela
+            <span aria-hidden="true">🔗</span> Compártela
           </button>
         </div>
       </footer>
 
       {showMessage && (
-        <div className={styles.toast}>
-          ✅ Enlace copiado al portapapeles
+        // role="status": el aviso aparece SIN que el foco se mueva, así que sin región live
+        // quien no lo ve no se entera de que el enlace se ha copiado.
+        <div className={styles.toast} role="status" aria-live="polite">
+          <span aria-hidden="true">✅</span> Enlace copiado al portapapeles
         </div>
       )}
     </>

@@ -94,7 +94,8 @@ export default function RelatedApps({ title = 'Apps relacionadas', apps, icon = 
     // categoría/disciplina. En meskeia.com se muestra con normalidad.
     <section className={styles.relatedApps} aria-label="Aplicaciones relacionadas" data-hide-in-vertical="">
       <h3 className={styles.title}>
-        <span className={styles.titleIcon}>{icon}</span>
+        {/* Decorativo: el título va justo al lado y dice lo mismo. */}
+        <span className={styles.titleIcon} aria-hidden="true">{icon}</span>
         {title}
       </h3>
       <div className={styles.grid}>
@@ -105,7 +106,10 @@ export default function RelatedApps({ title = 'Apps relacionadas', apps, icon = 
             className={styles.card}
             aria-label={`Ir a ${app.name}`}
           >
-            <span className={styles.cardIcon}>{app.icon}</span>
+            {/* El enlace ya se nombra con `aria-label={`Ir a ${app.name}`}`, así que el icono
+                de la app es decoración. Con cuatro tarjetas por app y 1.152 apps, es el emoji
+                suelto que más veces se leía en todo el catálogo. */}
+            <span className={styles.cardIcon} aria-hidden="true">{app.icon}</span>
             <span className={styles.cardName}>{app.name}</span>
             <span className={styles.cardDesc}>{app.description}</span>
           </Link>

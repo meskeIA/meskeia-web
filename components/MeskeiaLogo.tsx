@@ -142,7 +142,12 @@ export default function MeskeiaLogo({ disableLink = false, inline = false, showT
       aria-label={mounted && theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
       title={mounted && theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
     >
-      <span className={styles.themeIcon}>
+      {/* El botón ya se nombra por su aria-label («Cambiar a modo oscuro»), así que el emoji
+          es decoración: sin aria-hidden, un lector de pantalla lo verbaliza además del
+          nombre. Y como este componente lo monta el catálogo entero, se oía en las 1.152
+          apps. El candado check:a11y-jsx no puede verlo porque el emoji sale de una
+          expresión, no de texto JSX. */}
+      <span className={styles.themeIcon} aria-hidden="true">
         {mounted ? (theme === 'dark' ? '☀️' : '🌙') : '🌙'}
       </span>
     </button>
