@@ -17,7 +17,7 @@ import {
   RegionBadge,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatCurrency, formatNumber, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
+import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -87,18 +87,9 @@ const IVA_NAVE_INDUSTRIAL = IVA_INMUEBLES_2025.local;
 // territorios sin IVA viven en el motor: se cumplen por el SITIO del inmueble, así que las
 // aplica calcularITP/calcularAJD y ninguna app tiene que acordarse de ellas.
 
-/**
- * Tipo de la tabla, en formato español y con los decimales que de verdad tiene.
- *
- * Estos son tipos NOMINALES declarados (6 %, 6,5 %, 7,75 %), no resultados de un cálculo:
- * forzarles dos decimales convertiría «escala progresiva (9% → 11%)» en «(9,00% → 11,00%)»,
- * que es ruido. El tipo EFECTIVO de la tarjeta de resultados sí va con dos fijos, porque ahí
- * el importe puede no ser un porcentaje redondo del precio. Lo que había antes era peor que
- * cualquiera de las dos: `{datosCcaaActual.tipoGeneral}%` imprimía el número crudo, con punto
- * decimal anglosajón, junto a una tarjeta que usaba coma.
- */
-const tipoNominal = (n: number) =>
-  formatNumber(n, Number.isInteger(n) ? 0 : Number.isInteger(n * 10) ? 1 : 2);
+// El helper `tipoNominal` que vivía aquí subió a `lib/formatters.ts` como
+// `formatTipoNominal` el 25/08/2026: el mismo defecto estaba en las otras seis apps del
+// clúster, cada una con un número de decimales distinto (hallazgos 331 y 333).
 
 export default function SimuladorNaveIndustrialPage() {
   const [precioVenta, setPrecioVenta] = useState('');
@@ -328,7 +319,7 @@ export default function SimuladorNaveIndustrialPage() {
             <div className={styles.infoCcaaGrid}>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>ITP General</span>
-                <span className={styles.infoCcaaValue}>{tipoNominal(datosCcaaActual.tipoGeneral)}%</span>
+                <span className={styles.infoCcaaValue}>{formatTipoNominal(datosCcaaActual.tipoGeneral)}%</span>
               </div>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>AJD</span>
@@ -339,13 +330,13 @@ export default function SimuladorNaveIndustrialPage() {
                   {territorioActualSinIva ? `${territorioActualSinIva.impuesto} (obra nueva)` : 'IVA (obra nueva)'}
                 </span>
                 <span className={styles.infoCcaaValue}>
-                  {territorioActualSinIva ? 'No calculado' : `${tipoNominal(IVA_NAVE_INDUSTRIAL)}%`}
+                  {territorioActualSinIva ? 'No calculado' : `${formatTipoNominal(IVA_NAVE_INDUSTRIAL)}%`}
                 </span>
               </div>
             </div>
             {datosCcaaActual.tramosProgresivos && (
               <p className={styles.infoCcaaNote}>
-                <span aria-hidden="true">⚠️</span> Esta CCAA aplica escala progresiva ({datosCcaaActual.tramosProgresivos.map(t => `${tipoNominal(t.tipo)}%`).join(' → ')})
+                <span aria-hidden="true">⚠️</span> Esta CCAA aplica escala progresiva ({datosCcaaActual.tramosProgresivos.map(t => `${formatTipoNominal(t.tipo)}%`).join(' → ')})
               </p>
             )}
             {esCiudadBonificada ? (

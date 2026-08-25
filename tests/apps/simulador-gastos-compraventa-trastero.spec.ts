@@ -98,8 +98,8 @@ test.describe('Simulador de gastos de compraventa de trastero — inspección 20
     // `elegirTipoITP` recibe `viviendaHabitual: false` (un trastero suelto nunca lo es), y
     // los tres reducidos de Madrid exigen vivienda habitual o municipio pequeño, así que
     // ninguno se aplica: el general es lo correcto.
-    expect(await valorTarjeta(page, 'ITP (6,0%)')).toBe('900,00 €');
-    expect(await descripcionTarjeta(page, 'ITP (6,0%)')).toContain('Comunidad de Madrid');
+    expect(await valorTarjeta(page, 'ITP (6,00%)')).toBe('900,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (6,00%)')).toContain('Comunidad de Madrid');
 
     // Notaría — RD 1426/1989, número 2 (ARANCELES_NOTARIO):
     //   tramo 1 (hasta 6.010,12 €)            →                             90,15
@@ -158,8 +158,8 @@ test.describe('Simulador de gastos de compraventa de trastero — inspección 20
       'aria-pressed',
       'true',
     );
-    expect(await valorTarjeta(page, 'IVA (10,0%)')).toBe('300,00 €');
-    expect(await descripcionTarjeta(page, 'IVA (10,0%)')).toContain('anejo transmitido con la vivienda');
+    expect(await valorTarjeta(page, 'IVA (10,00%)')).toBe('300,00 €');
+    expect(await descripcionTarjeta(page, 'IVA (10,00%)')).toContain('anejo transmitido con la vivienda');
 
     // AJD = 3.000 × 0,75 % = 22,50 — ITP_CCAA.madrid.ajd = 0.75. Solo hay AJD en obra nueva.
     expect(await valorTarjeta(page, 'AJD (0,75%)')).toBe('22,50 €');
@@ -187,8 +187,8 @@ test.describe('Simulador de gastos de compraventa de trastero — inspección 20
 
     // IVA = 3.000 × 21 % = 630 — IVA_INMUEBLES_2025.garaje = 21 (tipo general).
     // El salto respecto al vinculado es de 330 €, el 11 % del precio del trastero.
-    expect(await valorTarjeta(page, 'IVA (21,0%)')).toBe('630,00 €');
-    expect(await descripcionTarjeta(page, 'IVA (21,0%)')).toContain('trastero independiente');
+    expect(await valorTarjeta(page, 'IVA (21,00%)')).toBe('630,00 €');
+    expect(await descripcionTarjeta(page, 'IVA (21,00%)')).toContain('trastero independiente');
 
     // El aviso tiene que explicar la CONDICIÓN, no solo el tipo: el 10 % es para los anejos
     // transmitidos junto con la vivienda.
@@ -208,12 +208,12 @@ test.describe('Simulador de gastos de compraventa de trastero — inspección 20
     // El 10 %/21 % es estatal (Ley 37/1992), no autonómico: cambiar de comunidad mueve el
     // AJD (Cataluña 1,5 % → 45 €) pero NO el IVA.
     await selectCcaa(page).selectOption('cataluna');
-    expect(await valorTarjeta(page, 'IVA (21,0%)')).toBe('630,00 €');
+    expect(await valorTarjeta(page, 'IVA (21,00%)')).toBe('630,00 €');
     expect(await valorTarjeta(page, 'AJD (1,50%)')).toBe('45,00 €');
 
     // País Vasco tiene ITP_CCAA['pais-vasco'].ajd = 0, y entonces la tarjeta desaparece.
     await selectCcaa(page).selectOption('pais-vasco');
-    expect(await valorTarjeta(page, 'IVA (21,0%)')).toBe('630,00 €');
+    expect(await valorTarjeta(page, 'IVA (21,00%)')).toBe('630,00 €');
     await expect(page.locator('h3', { hasText: 'AJD' })).toHaveCount(0);
   });
 
@@ -357,7 +357,7 @@ test('REGRESIÓN (contenido) — el ejemplo de Cataluña publica una notaría qu
   await page.goto(RUTA);
   await selectCcaa(page).selectOption('cataluna');
   await rellenar(page, 'Precio del trastero', '18000');
-  expect(await valorTarjeta(page, 'ITP (10,0%)')).toBe('1800,00 €');
+  expect(await valorTarjeta(page, 'ITP (10,00%)')).toBe('1800,00 €');
   expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('305,14 €');
   expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('65,39 €');
 
@@ -413,7 +413,7 @@ test('REGRESIÓN (contenido) — el ejemplo del reducido gallego omite la condic
   await selectCcaa(page).selectOption('galicia');
   await rellenar(page, 'Precio del trastero', '12000');
   await selectPerfil(page).selectOption('joven');
-  expect(await valorTarjeta(page, 'ITP (8,0%)')).toBe('960,00 €');
+  expect(await valorTarjeta(page, 'ITP (8,00%)')).toBe('960,00 €');
   await expect(page.getByText(/Podrías pagar menos/)).toBeVisible();
 
   await page.getByRole('button', { name: /Ver guía educativa/i }).click();
@@ -440,7 +440,7 @@ test('REGRESIÓN (contenido) — la nota atribuye a la CCAA una diferencia que e
   await rellenar(page, 'Precio del trastero', '3000');
   for (const comunidad of ['madrid', 'cataluna', 'pais-vasco']) {
     await selectCcaa(page).selectOption(comunidad);
-    expect(await valorTarjeta(page, 'IVA (21,0%)')).toBe('630,00 €');
+    expect(await valorTarjeta(page, 'IVA (21,00%)')).toBe('630,00 €');
   }
 
   const nota = await page.locator('[class*="trasteroNote"]').first().innerText();

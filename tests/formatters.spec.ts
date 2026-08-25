@@ -11,6 +11,7 @@ import { test, expect } from '@playwright/test';
 // Nota: Estos tests se ejecutan en Node, no en browser
 import {
   formatNumber,
+  formatTipoNominal,
   formatCurrency,
   formatDate,
   formatDateTime,
@@ -247,6 +248,36 @@ test.describe('parseSpanishNumberOr', () => {
     expect(parseSpanishNumberOr('1.234,56')).toBe(1234.56);
     expect(parseSpanishNumberOr('200.000')).toBe(200000);
     expect(parseSpanishNumberOr('0')).toBe(0);
+  });
+});
+
+test.describe('formatTipoNominal', () => {
+  // De dónde sale: hallazgos 331 y 333 del Inspector (25/08/2026). Las siete apps del
+  // clúster de compraventa formateaban los tipos impositivos cada una a su manera —cero,
+  // uno o dos decimales, y el panel de CCAA con el número crudo de JavaScript—, así que el
+  // 7,75 % de Murcia (Ley 3/2025) se anunciaba como «ITP (8%)» al lado de un importe que
+  // era el 7,75 %, y como «7.75%» tres centímetros más allá.
+
+  test('un tipo entero va sin decimales', () => {
+    expect(formatTipoNominal(6)).toBe('6');
+    expect(formatTipoNominal(10)).toBe('10');
+    expect(formatTipoNominal(21)).toBe('21');
+  });
+
+  test('un tipo con un decimal conserva ese decimal, y con coma', () => {
+    expect(formatTipoNominal(6.5)).toBe('6,5');
+    expect(formatTipoNominal(1.5)).toBe('1,5');
+  });
+
+  test('un tipo con dos decimales los conserva los dos', () => {
+    expect(formatTipoNominal(7.75)).toBe('7,75');
+    expect(formatTipoNominal(0.75)).toBe('0,75');
+  });
+
+  test('nunca imprime el punto decimal anglosajón', () => {
+    for (const tipo of [4, 6.5, 7.75, 10, 11.125, 13]) {
+      expect(formatTipoNominal(tipo)).not.toContain('.');
+    }
   });
 });
 

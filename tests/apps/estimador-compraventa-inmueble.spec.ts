@@ -84,7 +84,7 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     // ITP = 200.000 × 6 % — ITP_CCAA.madrid.tipoGeneral = 6
     // (coincide con TIPOS_ITP_CCAA_2025 'Madrid' de data/fiscal/inmuebles.ts)
     expect(await valorTarjeta(page, /^ITP/)).toBe('12.000,00 €');
-    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (6,0%)');
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (6,00%)');
 
     // Nota del 20/08/2026: estas tarjetas ya no muestran el arancel puro sino la FACTURA
     // notarial estimada (el arancel × 1,75, punto medio de la horquilla 1,5-2 documentada en
@@ -133,7 +133,7 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     // ITP_CCAA.cataluna.tramosProgresivos = 10 % hasta 600.000 · 11 % hasta 900.000 ·
     // 12 % hasta 1.500.000 · 13 % el resto →
     //   600.000×10 % + 300.000×11 % + 100.000×12 % = 60.000 + 33.000 + 12.000 = 105.000
-    // Obtenido hoy: «ITP (10,0%)» → 100.000,00 € (5.000 € menos de impuesto)
+    // Obtenido hoy: «ITP (10,00%)» → 100.000,00 € (5.000 € menos de impuesto)
     expect(await valorTarjeta(page, /^ITP/)).toBe('105.000,00 €');
 
     // Notaría: 558,93946 + 398.987,90×0,03 % = 678,63583 ; × 1,21 → 821,1494
@@ -230,7 +230,7 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
   // su `valorMaximo`, nunca sus `condiciones`. En Madrid —la CCAA que viene por defecto— ese
   // tipo es «Jóvenes < 35 años (municipios pequeños)», del 0 %, reservado a municipios de
   // menos de 2.500 habitantes que la app jamás pregunta: quien compre en la capital lee
-  // «ITP (0,0%) — 0,00 €». Mismo patrón en Baleares («joven» y «discapacidad», tipo 0 %).
+  // «ITP (0,00%) — 0,00 €». Mismo patrón en Baleares («joven» y «discapacidad», tipo 0 %).
   test('CASO 5 (regresión) — joven en Madrid: no puede salir 0 € de ITP sin preguntar el municipio', async ({ page }) => {
         await page.goto(RUTA);
     await page.getByRole('button', { name: /Segunda mano/ }).click();
@@ -239,7 +239,7 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     await selectPerfil(page).selectOption('joven');
 
     // Lo anclado para él es el tipo general: ITP_CCAA.madrid.tipoGeneral = 6 → 12.000,00 €
-    // Obtenido hoy: «ITP (0,0%)» → 0,00 €
+    // Obtenido hoy: «ITP (0,00%)» → 0,00 €
     expect(await valorTarjeta(page, /^ITP/)).toBe('12.000,00 €');
   });
 
@@ -303,7 +303,7 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     // La primera entrega del promotor tributa por IVA, no por ITP (art. 20.Uno.22º LIVA).
     // IVA_INMUEBLES_2025.obraNueva = 10 (`data/fiscal/inmuebles.ts`, Ley 37/1992):
     //   180.000 × 10 % = 18.000
-    await expect(page.locator('h3', { hasText: /^IVA/ }).first()).toHaveText('IVA (10,0%)');
+    await expect(page.locator('h3', { hasText: /^IVA/ }).first()).toHaveText('IVA (10,00%)');
     expect(await valorTarjeta(page, /^IVA/)).toBe('18.000,00 €');
     await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
 
@@ -342,7 +342,7 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     // Tipo efectivo mostrado = 275.000 / 2.500.000 = 11,0 %
     await expect(page.getByText('Esta comunidad aplica escala progresiva')).toBeVisible();
     expect(await valorTarjeta(page, /^ITP/)).toBe('275.000,00 €');
-    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (11,0%)');
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (11,00%)');
 
     // Notaría: 558,93946 + (2.500.000 − 601.012,10)×0,03 % = 1.128,63583 ; × 1,21 → 1.365,6494
     expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('2389,89 €');
@@ -497,7 +497,7 @@ test.describe('Estimador de gastos de compraventa — lote mecánico 18/08/2026'
     await page.getByRole('button', { name: /Local comercial/ }).first().click();
     await rellenar(page, 'Precio del inmueble', '200.000');
 
-    await expect(page.locator('h3', { hasText: /^IVA/ }).first()).toHaveText('IVA (21,0%)');
+    await expect(page.locator('h3', { hasText: /^IVA/ }).first()).toHaveText('IVA (21,00%)');
     expect(await valorTarjeta(page, /^IVA/)).toBe('42.000,00 €');
   });
 });
@@ -527,7 +527,7 @@ test('ITP La Rioja — el tipo joven es el 4 % para menores de 40, no el 5 % par
   await rellenar(page, 'Precio de la vivienda', '150.000');
   await selectPerfil(page).selectOption('joven');
 
-  await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (4,0%)');
+  await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (4,00%)');
   expect(await valorTarjeta(page, /^ITP/)).toBe('6000,00 €');
 });
 
@@ -539,7 +539,7 @@ test('ITP La Rioja — el perfil general sigue pagando el tipo general del 7 %',
   await selectCcaa(page).selectOption('rioja');
   await rellenar(page, 'Precio de la vivienda', '150.000');
 
-  await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (7,0%)');
+  await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (7,00%)');
   expect(await valorTarjeta(page, /^ITP/)).toBe('10.500,00 €');
 });
 
@@ -561,7 +561,7 @@ test('ITP Murcia — el joven de hasta 40 años tributa al 3 % sin límite de va
   await rellenar(page, 'Precio de la vivienda', '200.000');
   await selectPerfil(page).selectOption('joven');
 
-  await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (3,0%)');
+  await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (3,00%)');
   expect(await valorTarjeta(page, /^ITP/)).toBe('6000,00 €');
 });
 
@@ -587,7 +587,7 @@ test('Cataluña — un inmueble caro ya NO pierde el reducido joven por el preci
   await rellenar(page, 'Precio de la vivienda', '200.000');
   await selectPerfil(page).selectOption('joven');
 
-  await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (10,0%)');
+  await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (10,00%)');
   await expect(page.getByText(/no se ha podido comprobar|podr.as pagar menos/i)).toBeVisible();
 });
 
@@ -604,8 +604,8 @@ test('Cataluña — un inmueble barato ya NO obtiene el reducido joven sin que s
   await rellenar(page, 'Precio de la vivienda', '30.000');
   await selectPerfil(page).selectOption('joven');
 
-  await expect(page.locator('h3', { hasText: /^ITP/ }).first()).not.toHaveText('ITP (5,0%)');
-  await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (10,0%)');
+  await expect(page.locator('h3', { hasText: /^ITP/ }).first()).not.toHaveText('ITP (5,00%)');
+  await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (10,00%)');
 });
 
 test('Andalucía — control: un reducido con límite de VALOR (no de renta) sigue aplicándose sin cambios', async ({
@@ -619,7 +619,7 @@ test('Andalucía — control: un reducido con límite de VALOR (no de renta) sig
   await rellenar(page, 'Precio de la vivienda', '100.000');
   await selectPerfil(page).selectOption('joven');
 
-  await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (3,5%)');
+  await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (3,50%)');
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -652,7 +652,7 @@ test.describe('Inspector 20/08/2026 — factura notarial y registral', () => {
 
     // ITP: ITP_CCAA.madrid.tipoGeneral = 6, que se LEE de TIPOS_ITP_CCAA_2025 'Madrid'
     // (`data/fiscal/inmuebles.ts`). Madrid no tiene escala progresiva → 200.000 × 6 % = 12.000
-    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (6,0%)');
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (6,00%)');
     expect(await valorTarjeta(page, /^ITP/)).toBe('12.000,00 €');
 
     // Arancel notarial (ARANCELES_NOTARIO, nº 2 del RD 1426/1989), acumulando tramos:
@@ -697,7 +697,7 @@ test.describe('Inspector 20/08/2026 — factura notarial y registral', () => {
     // condiciones ['Menor de 35 años', 'Vivienda habitual', 'Valor ≤ 150.000 €'], las tres
     // comprobables con lo que la app pregunta → 140.000 × 3,5 % = 4.900
     // (el tipo general de Andalucía, 7 %, habría dado 9.800)
-    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (3,5%)');
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (3,50%)');
     expect(await valorTarjeta(page, /^ITP/)).toBe('4900,00 €');
 
     // Arancel notarial sobre 140.000 €:

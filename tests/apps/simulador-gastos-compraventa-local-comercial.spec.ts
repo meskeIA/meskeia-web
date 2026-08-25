@@ -75,7 +75,7 @@ test.describe('Simulador de gastos de compraventa de local comercial', () => {
     // ITP_CCAA.madrid.tipoGeneral = 6 (TIPOS_ITP_CCAA_2025 'Madrid', data/fiscal/inmuebles.ts),
     // sin escala progresiva: 200.000 × 6 % = 12.000. Un local NO tiene tipos reducidos.
     await page.getByRole('button', { name: /Segunda mano/ }).first().click();
-    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (6%)');
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (6,00%)');
     expect(await valorTarjeta(page, /^ITP/)).toBe('12.000,00 €');
     // Sin renuncia no hay cuota gradual de AJD: la tarjeta no debe existir.
     await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
@@ -101,7 +101,7 @@ test.describe('Simulador de gastos de compraventa de local comercial', () => {
     // IVA_INMUEBLES_2025.local = 21 → 200.000 × 21 % = 42.000
     // ITP_CCAA.madrid.ajd = 0,75 → 200.000 × 0,75 % = 1.500
     await page.getByRole('button', { name: /Obra nueva/ }).click();
-    await expect(page.locator('h3', { hasText: /^IVA/ }).first()).toHaveText('IVA (21%)');
+    await expect(page.locator('h3', { hasText: /^IVA/ }).first()).toHaveText('IVA (21,00%)');
     expect(await valorTarjeta(page, /^IVA/)).toBe('42.000,00 €');
     await expect(page.locator('h3', { hasText: /^AJD/ }).first()).toHaveText('AJD (0,75%)');
     expect(await valorTarjeta(page, /^AJD/)).toBe('1500,00 €');
@@ -115,7 +115,7 @@ test.describe('Simulador de gastos de compraventa de local comercial', () => {
     // inversión del sujeto pasivo + AJD. Mismo importe que la obra nueva, distinto título
     // y aviso propio, porque el comprador lo autoliquida en vez de pagarlo al vendedor.
     await page.getByRole('button', { name: /renuncia IVA/ }).click();
-    await expect(page.locator('h3', { hasText: /^IVA/ }).first()).toHaveText('IVA (renuncia · ISP) (21%)');
+    await expect(page.locator('h3', { hasText: /^IVA/ }).first()).toHaveText('IVA (renuncia · ISP) (21,00%)');
     expect(await valorTarjeta(page, /^IVA/)).toBe('42.000,00 €');
     expect(await descripcionTarjeta(page, /^IVA/)).toContain('inversión del sujeto pasivo');
     expect(await valorTarjeta(page, /^AJD/)).toBe('1500,00 €');
@@ -125,7 +125,7 @@ test.describe('Simulador de gastos de compraventa de local comercial', () => {
     // El disclaimer de nivel 1 CRÍTICO no puede colapsarse y el sello de datos normativos
     // debe estar a la vista (política de disclaimers, apps fiscales).
     await expect(page.getByText('Información Importante sobre Herramientas Financieras')).toBeVisible();
-    await expect(page.locator('[aria-label="Datos de referencia normativos"]')).toContainText('17/06/2026');
+    await expect(page.locator('[aria-label="Datos de referencia normativos"]').first()).toContainText('17/06/2026');
   });
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -144,9 +144,11 @@ test.describe('Simulador de gastos de compraventa de local comercial', () => {
     // recorren los cuatro, incluido el último:
     //   600.000×10 % + 300.000×11 % + 600.000×12 % + 100.000×13 %
     //   = 60.000 + 33.000 + 72.000 + 13.000 = 178.000
-    // Tipo EFECTIVO = 178.000 / 1.600.000 = 11,125 % (la app lo redondea a 0 decimales).
+    // Tipo EFECTIVO = 178.000 / 1.600.000 = 11,125 % → 11,13 % con dos decimales. Hasta el
+    // 25/08/2026 la app lo redondeaba a 0 y rotulaba «ITP (11%)», que sobre ese precio son
+    // 176.000 € y no 178.000 €.
     expect(await valorTarjeta(page, /^ITP/)).toBe('178.000,00 €');
-    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (11%)');
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (11,13%)');
 
     // Notaría sobre 1.600.000 €: 90,15 + 24.040,49×0,45 % + 30.050,60×0,15 % +
     //   90.151,82×0,10 % + 450.759,07×0,05 % + 998.987,90×0,03 % = 858,63583 ;
@@ -167,7 +169,7 @@ test.describe('Simulador de gastos de compraventa de local comercial', () => {
     await page.locator('#select-ccaa').selectOption('ceuta');
     await rellenar(page, 'Precio del local comercial', '200000');
     expect(await valorTarjeta(page, /^ITP/)).toBe('6000,00 €');
-    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (3%)');
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (3,00%)');
     // Total = 6.000 + 758,9827 + 236,2250 + 500 = 7.495,2077 → 3,7476 %
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('7495,21 €');
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('207.495,21 €');
@@ -211,20 +213,19 @@ test.describe('Simulador de gastos de compraventa de local comercial', () => {
   });
 
   // ══════════════════════════════════════════════════════════════════════════
-  // HALLAZGOS del Inspector — 25/08/2026
+  // HALLAZGOS del Inspector — 25/08/2026, los tres REPARADOS el mismo día
   // ══════════════════════════════════════════════════════════════════════════
 
   /**
-   * ⚠️ HALLAZGO (alto) — la gestoría del VENDEDOR no entra en el cálculo hasta que se toca
-   * otro campo. El `useMemo` de resultadosVendedor usa `gastosGestoriaVenta` pero declara
-   * `gastosGestoria` (la del COMPRADOR) en su array de dependencias: el campo separado el
-   * 20/08/2026 por el art. 35.1 LIRPF se separó en el valor, no en las dependencias.
-   * Consecuencia medida: al escribir 2.000 € de gestoría del vendedor, el neto sigue
-   * diciendo 187.398,00 € en vez de 185.818,00 € — 1.580,00 € de más—, y solo se corrige
-   * al editar la gestoría del comprador, que no tiene nada que ver.
+   * ✅ HALLAZGO 330 (alto), reparado — la gestoría del VENDEDOR no entraba en el cálculo
+   * hasta que se tocaba otro campo. El `useMemo` de resultadosVendedor usaba
+   * `gastosGestoriaVenta` pero declaraba `gastosGestoria` (la del COMPRADOR) en su array de
+   * dependencias: el campo separado el 20/08/2026 por el art. 35.1 LIRPF se separó en el
+   * valor, no en las dependencias. Consecuencia medida: al escribir 2.000 € de gestoría del
+   * vendedor, el neto seguía diciendo 187.398,00 € en vez de 185.818,00 € —1.580,00 € de
+   * más—, y solo se corregía al editar la gestoría del comprador, que no pinta nada ahí.
    */
-  test('CASO 4 (hallazgo) — la gestoría del vendedor debe reducir la ganancia en cuanto se escribe', async ({ page }) => {
-    test.fail(); // hoy el useMemo depende de la gestoría del COMPRADOR
+  test('CASO 4 (regresión 330) — la gestoría del vendedor reduce la ganancia en cuanto se escribe', async ({ page }) => {
     await page.goto(RUTA);
     await rellenar(page, 'Precio del local comercial', '200000');
     await page.getByRole('button', { name: /Vendedor/ }).click();
@@ -265,38 +266,58 @@ test.describe('Simulador de gastos de compraventa de local comercial', () => {
   });
 
   /**
-   * ⚠️ HALLAZGO (medio) — la etiqueta del ITP se redondea a 0 decimales y contradice al
-   * importe que tiene al lado, que es justo lo que el comentario del código dice evitar al
-   * mostrar el tipo EFECTIVO. Murcia tiene el 7,75 % desde el 25/07/2025 (Ley 3/2025,
-   * TIPOS_ITP_CCAA_2025): 200.000 × 7,75 % = 15.500 €, pero el título dice «ITP (8%)», que
-   * sobre ese precio serían 16.000 €. Pasa igual en Canarias (6,5 % → «ITP (7%)»).
-   * El resto del clúster muestra un decimal («ITP (6,0%)»).
+   * ✅ HALLAZGO 331 (medio), reparado — la etiqueta del ITP se redondeaba a 0 decimales y
+   * contradecía al importe que tiene al lado, que es justo lo que el comentario del código
+   * dice evitar al mostrar el tipo EFECTIVO. Murcia tiene el 7,75 % desde el 25/07/2025
+   * (Ley 3/2025, TIPOS_ITP_CCAA_2025): 200.000 × 7,75 % = 15.500 €, pero el título decía
+   * «ITP (8%)», que sobre ese precio serían 16.000 €. Igual en Canarias (6,5 % → «ITP (7%)»).
+   *
+   * El tipo EFECTIVO va con dos decimales fijos en todo el clúster: con escala progresiva
+   * el importe no es un porcentaje plano del precio, así que el decimal es información.
    */
-  test('CASO 5 (hallazgo) — el tipo de la etiqueta debe ser el que se ha aplicado (Murcia, 7,75 %)', async ({ page }) => {
-    test.fail(); // hoy rotula «ITP (8%)» junto al importe del 7,75 %
+  test('CASO 5 (regresión 331) — el tipo de la etiqueta es el que se ha aplicado (Murcia, 7,75 %)', async ({ page }) => {
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Segunda mano/ }).first().click();
     await page.locator('#select-ccaa').selectOption('murcia');
     await rellenar(page, 'Precio del local comercial', '200000');
 
     expect(await valorTarjeta(page, /^ITP/)).toBe('15.500,00 €');
-    // Obtenido hoy: «ITP (8%)».
-    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText(/ITP \(7,75?%\)|ITP \(7,8%\)/);
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (7,75%)');
   });
 
   /**
-   * ⚠️ HALLAZGO (bajo) — el panel «info CCAA» imprime los tipos con el número crudo de
-   * JavaScript: «7.75%» y «1.5%», con punto decimal. El CLAUDE.md global §2 obliga a coma
-   * decimal, y las ResultCard de dos centímetros más allá sí la usan («AJD (0,75%)»), así
-   * que la misma pantalla muestra el mismo dato en dos formatos.
+   * ✅ HALLAZGO 333 (bajo), reparado — el panel «info CCAA» imprimía los tipos con el número
+   * crudo de JavaScript: «7.75%» y «1.5%», con punto decimal. El CLAUDE.md global §2 obliga
+   * a coma decimal, y las ResultCard de dos centímetros más allá sí la usaban («AJD (0,75%)»),
+   * así que la misma pantalla mostraba el mismo dato en dos formatos.
+   *
+   * Ahí el tipo es NOMINAL (lo declara la norma), así que lleva los decimales que tenga y
+   * no dos fijos: `formatTipoNominal` de `lib/formatters.ts`, que el 25/08/2026 subió al
+   * motor desde `nave-industrial` porque el defecto estaba en las siete apps del clúster.
    */
-  test('CASO 6 (hallazgo) — los tipos del panel de la CCAA deben ir en formato español', async ({ page }) => {
-    test.fail(); // hoy interpola el número crudo: «7.75%»
+  test('CASO 6 (regresión 333) — los tipos del panel de la CCAA van en formato español', async ({ page }) => {
     await page.goto(RUTA);
     await page.locator('#select-ccaa').selectOption('murcia');
 
     const panel = page.locator('text=ITP General').locator('xpath=ancestor::div[1]/ancestor::div[1]');
-    await expect(panel).toContainText('7,75%');   // obtenido hoy: «7.75%»
-    await expect(panel).toContainText('1,5%');    // obtenido hoy: «1.5%»
+    await expect(panel).toContainText('7,75%');
+    await expect(panel).toContainText('1,5%');
+  });
+
+  /**
+   * ✅ HALLAZGO 332 (medio), reparado — el único sello de datos era el de la compra
+   * («ITP/AJD/IVA 2026», verificado el 17/06/2026), mientras la mitad vendedora calcula con
+   * COEFICIENTES_IIVTNU_2025 (verificados el 15/01/2025, y que se actualizan cada año por
+   * Ley de Presupuestos). Un sello de 2026 cubriendo datos de 2025 es peor que no tenerlo.
+   */
+  test('CASO 7 (regresión 332) — cada mitad lleva su propio sello de datos normativos', async ({ page }) => {
+    await page.goto(RUTA);
+
+    const sellos = page.locator('[class*="dataReference"]');
+    await expect(sellos).toHaveCount(2);
+    await expect(sellos.nth(0)).toContainText('quien compra');
+    await expect(sellos.nth(1)).toContainText('quien vende');
+    // El de la venta tiene que declarar SU fecha, no la de la compra.
+    await expect(sellos.nth(1)).toContainText('15/01/2025');
   });
 });

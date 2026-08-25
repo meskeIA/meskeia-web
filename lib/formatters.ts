@@ -24,6 +24,25 @@ export function formatNumber(num: number, decimals: number = 2): string {
 }
 
 /**
+ * Formatea un tipo impositivo NOMINAL con los decimales que de verdad tiene.
+ *
+ * Un tipo nominal es el que declara una norma (6 %, 6,5 %, 7,75 %), no el resultado de un
+ * cálculo. Forzarle dos decimales convierte «escala progresiva (9 % → 11 %)» en
+ * «(9,00 % → 11,00 %)», que es ruido; forzarle cero convierte el 7,75 % de Murcia en un
+ * «8 %» que no cuadra con el importe de al lado (hallazgo 331 del Inspector).
+ *
+ * El tipo EFECTIVO —cuota entre base— sí va con dos decimales fijos: ahí el importe puede
+ * no ser un porcentaje redondo del precio y el decimal es información, no adorno.
+ *
+ * @param num - Tipo en tanto por ciento (7.75, no 0.0775)
+ * @returns String formateado sin el símbolo (ej: "7,75", "6,5", "6")
+ */
+export function formatTipoNominal(num: number): string {
+  const decimales = Number.isInteger(num) ? 0 : Number.isInteger(num * 10) ? 1 : 2;
+  return formatNumber(num, decimales);
+}
+
+/**
  * Formatea moneda a formato español (EUR)
  * @param num - Cantidad a formatear
  * @returns String formateado (ej: "1.234,56 €")

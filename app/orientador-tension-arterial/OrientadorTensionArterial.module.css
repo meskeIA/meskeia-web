@@ -420,6 +420,19 @@
   flex-shrink: 0;
 }
 
+.tablaNotas {
+  margin: 0;
+  padding: 0.75rem 1rem 0.75rem 2rem;
+  border-top: 1px solid var(--border, #e5e5e5);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-secondary, #555);
+}
+
+.tablaNotas li + li {
+  margin-top: 0.4rem;
+}
+
 .tablaFuente {
   text-align: right;
   font-size: 0.75rem;
@@ -427,6 +440,11 @@
   padding: 0.5rem 1rem;
   margin: 0;
   border-top: 1px solid var(--border, #e5e5e5);
+}
+
+[data-theme='dark'] .tablaNotas {
+  color: var(--text-secondary, #cbd5e1);
+  border-top-color: var(--border, #334155);
 }
 
 /* ─── Historial ────────────────────────────────────────────────────────────── */

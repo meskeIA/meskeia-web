@@ -18,8 +18,8 @@ import {
   AvisoTerritorioSinIva,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatCurrency, formatNumber, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
-import { calcularGananciaInmueble, IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META } from '@/data/fiscal';
+import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
+import { calcularGananciaInmueble, IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -268,7 +268,11 @@ export default function SimuladorLocalComercialPage() {
   }, [
     precioVenta, precioCompraOriginal, gastosAdquisicion, aniosPropiedad,
     valorCatastralSuelo, valorCatastralTotal,
-    comisionInmobiliaria, gastosGestoria, perfilVendedor, amortizacionesAcumuladas,
+    // gastosGestoriaVenta, NO gastosGestoria: la del comprador no entra en el IRPF del
+    // vendedor (art. 35.1 LIRPF). El campo se separó el 20/08/2026 pero solo en el valor,
+    // así que lo que el vendedor escribía no se recalculaba hasta tocar otro campo, y el
+    // que lo despertaba era justo la gestoría del comprador (hallazgo 330, ALTO).
+    comisionInmobiliaria, gastosGestoriaVenta, perfilVendedor, amortizacionesAcumuladas,
   ]);
 
   const datosCcaaActual = ITP_CCAA[ccaa];
@@ -299,12 +303,23 @@ export default function SimuladorLocalComercialPage() {
         collapsible={false}
       />
 
+      {/* DOS sellos, uno por mitad. Con uno solo, el «verificado 2026-06-17» de la compra
+          cubría también los coeficientes de plusvalía, que están sellados en 2025 y se
+          actualizan cada año por Ley de Presupuestos (hallazgo 332). */}
       <DataReference
-        normativa={`ITP/AJD/IVA ${FISCAL_INMUEBLES_META.vigencia}`}
+        normativa={`ITP/AJD/IVA ${FISCAL_INMUEBLES_META.vigencia} · lo que paga quien compra`}
         fuente={FISCAL_INMUEBLES_META.fuente}
         verificado={FISCAL_INMUEBLES_META.verificado}
         urlOficial={FISCAL_INMUEBLES_META.urlOficialITP}
         nota={FISCAL_INMUEBLES_META.nota}
+      />
+
+      <DataReference
+        normativa={`Plusvalía municipal (IIVTNU) e IRPF de la ganancia ${PLUSVALIA_MUNICIPAL_META.vigencia} · lo que paga quien vende`}
+        fuente={PLUSVALIA_MUNICIPAL_META.baseNormativa}
+        verificado={PLUSVALIA_MUNICIPAL_META.verificado}
+        urlOficial={PLUSVALIA_MUNICIPAL_META.urlReferencia}
+        nota={`${PLUSVALIA_MUNICIPAL_META.aviso} ${PLUSVALIA_MUNICIPAL_META.nota}`}
       />
 
       {/* Aviso IVA deducible */}
@@ -405,11 +420,11 @@ export default function SimuladorLocalComercialPage() {
             <div className={styles.infoCcaaGrid}>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>ITP General</span>
-                <span className={styles.infoCcaaValue}>{datosCcaaActual.tipoGeneral}%</span>
+                <span className={styles.infoCcaaValue}>{formatTipoNominal(datosCcaaActual.tipoGeneral)}%</span>
               </div>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>AJD</span>
-                <span className={styles.infoCcaaValue}>{datosCcaaActual.ajd}%</span>
+                <span className={styles.infoCcaaValue}>{formatTipoNominal(datosCcaaActual.ajd)}%</span>
               </div>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>IVA (comercial)</span>
@@ -484,7 +499,7 @@ export default function SimuladorLocalComercialPage() {
               />
 
               <ResultCard
-                title={`${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 0)}%)`}
+                title={`${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 2)}%)`}
                 value={formatCurrency(resultadosComprador.impuestoTransmision)}
                 variant="warning"
                 icon="📋"
@@ -733,7 +748,7 @@ export default function SimuladorLocalComercialPage() {
                     value={resultadosVendedor.irpfGanancia > 0 ? formatCurrency(resultadosVendedor.irpfGanancia) : 'SIN CUOTA'}
                     variant={resultadosVendedor.irpfGanancia > 0 ? 'warning' : 'success'}
                     icon="🧾"
-                    description="Base del ahorro 2025. Un local no tiene exención por reinversión ni por edad."
+                    description="Base del ahorro (19–30 %). Un local no tiene exención por reinversión ni por edad."
                   />
 
                   <ResultCard

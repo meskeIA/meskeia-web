@@ -39,7 +39,7 @@ interface Medicion {
   clasificacionId: ClasificacionId;
 }
 
-// ─── Clasificaciones ESH/ESC 2023 ────────────────────────────────────────────
+// ─── Clasificaciones ESH 2023 ────────────────────────────────────────────
 
 const CLASIFICACIONES: Record<ClasificacionId, Clasificacion> = {
   hipotension: {
@@ -102,7 +102,9 @@ const CLASIFICACIONES: Record<ClasificacionId, Clasificacion> = {
     id: 'crisis-hipertensiva',
     nombre: 'Crisis Hipertensiva',
     descripcion: 'Tensión sistólica ≥ 180 mmHg y/o diastólica ≥ 120 mmHg',
-    recomendacion: '⚠️ Acude a urgencias inmediatamente o llama al 112.',
+    // Sin emoji: la cadena se lee en voz alta y un lector de pantalla antepondría
+    // «señal de advertencia» a la única instrucción urgente de la app (hallazgo 297).
+    recomendacion: 'Acude a urgencias inmediatamente o llama al 112.',
     color: 'var(--cl-crisis)',
     urgencia: 'emergencia',
   },
@@ -124,14 +126,26 @@ const URGENCIA_ETIQUETAS: Record<Clasificacion['urgencia'], { emoji: string; tex
   emergencia: { emoji: '🚨', texto: 'Emergencia' },
 };
 
-// ─── Lógica de clasificación ESH/ESC 2023 ────────────────────────────────────
+// ─── Lógica de clasificación ESH 2023 ────────────────────────────────────
 
+/**
+ * Clasifica una lectura según la tabla de la ESH 2023.
+ *
+ * La regla que gobierna toda la tabla es que **manda la categoría más alta de las dos**:
+ * si la sistólica cae en grado 2 y la diastólica es normal, la lectura es de grado 2. De
+ * ahí que las ramas vayan de mayor a menor gravedad y que la hipotensión se evalúe la
+ * ÚLTIMA: hasta el 25/08/2026 iba la segunda y con OR, así que toda lectura con
+ * diastólica < 60 se resolvía como «Hipotensión» sin llegar a mirar la sistólica —
+ * 175/55 salía rotulada como tensión baja (hallazgo 294 del Inspector).
+ *
+ * La HTA sistólica aislada NO es una rama de esta función: la guía la gradúa por el valor
+ * de la sistólica, así que es un matiz sobre el grado (ver `esSistolicaAislada`), no una
+ * categoría que lo sustituya. Rotular 175/55 como «sistólica aislada» a secas rebajaba su
+ * urgencia de «urgente» (grado 2) a «alerta».
+ */
 function clasificarTension(sis: number, dia: number): ClasificacionId {
-  // Crisis hipertensiva (prioridad máxima) — umbral ≥ según guías ESH/ESC 2023
+  // Crisis hipertensiva (prioridad máxima) — PAS ≥ 180 y/o PAD ≥ 120
   if (sis >= 180 || dia >= 120) return 'crisis-hipertensiva';
-
-  // Hipotensión
-  if (sis < 90 || dia < 60) return 'hipotension';
 
   // HTA Grado 3
   if (sis >= 180 || dia >= 110) return 'hta-grado-3';
@@ -139,20 +153,40 @@ function clasificarTension(sis: number, dia: number): ClasificacionId {
   // HTA Grado 2
   if (sis >= 160 || dia >= 100) return 'hta-grado-2';
 
-  // HTA Sistólica aislada: sistólica >= 140 pero diastólica < 90
-  if (sis >= 140 && dia < 90) return 'sistolica-aislada';
-
   // HTA Grado 1
   if (sis >= 140 || dia >= 90) return 'hta-grado-1';
 
   // Normal-alta
   if (sis >= 130 || dia >= 85) return 'normal-alta';
 
+  // Hipotensión — solo cuando NADA está elevado, para que nunca eclipse a una HTA. Va aquí
+  // y no al final para no perder los casos de diastólica baja con sistólica de 120-129
+  // (125/58), que la versión anterior sí avisaba.
+  if (sis < 90 || dia < 60) return 'hipotension';
+
   // Normal
   if (sis >= 120 || dia >= 80) return 'normal';
 
   // Óptima
   return 'optima';
+}
+
+/**
+ * Patrón de HTA sistólica aislada: sistólica alta con diastólica normal, típico de la
+ * rigidez arterial del mayor. Se superpone al grado, que lo fija la sistólica.
+ */
+function esSistolicaAislada(sis: number, dia: number): boolean {
+  return sis >= 140 && dia < 90;
+}
+
+/** Nombre que se muestra: el del grado, con el matiz del patrón cuando lo hay. */
+function nombreClasificacion(clId: ClasificacionId, sis: number, dia: number): string {
+  const base = CLASIFICACIONES[clId].nombre;
+  if (!esSistolicaAislada(sis, dia)) return base;
+  if (clId === 'hta-grado-1') return 'HTA Sistólica Aislada (Grado 1)';
+  if (clId === 'hta-grado-2') return 'HTA Sistólica Aislada (Grado 2)';
+  if (clId === 'hta-grado-3') return 'HTA Sistólica Aislada (Grado 3)';
+  return base;
 }
 
 function calcularTAM(sis: number, dia: number): number {
@@ -205,6 +239,13 @@ interface ResultadoProps {
 function Resultado({ sistolica, diastolica, pulso }: ResultadoProps) {
   const clId = clasificarTension(sistolica, diastolica);
   const cl = CLASIFICACIONES[clId];
+  const aislada = esSistolicaAislada(sistolica, diastolica);
+  const nombre = nombreClasificacion(clId, sistolica, diastolica);
+  // Con el patrón aislado la descripción del grado no encaja: sus rangos de diastólica
+  // presuponen que también está elevada, y aquí precisamente no lo está.
+  const descripcion = aislada && nombre !== cl.nombre
+    ? `Sistólica elevada (${sistolica} mmHg) con diastólica normal (< 90 mmHg). El grado lo fija la sistólica.`
+    : cl.descripcion;
   const tam = calcularTAM(sistolica, diastolica);
   const pp = calcularPresionPulso(sistolica, diastolica);
   const ppLabel = valorarPresionPulso(pp);
@@ -216,8 +257,8 @@ function Resultado({ sistolica, diastolica, pulso }: ResultadoProps) {
           <span aria-hidden="true">{URGENCIA_ETIQUETAS[cl.urgencia].emoji}</span>
           {' '}{URGENCIA_ETIQUETAS[cl.urgencia].texto}
         </span>
-        <h2 className={styles.resultadoNombre}>{cl.nombre}</h2>
-        <p className={styles.resultadoDescripcion}>{cl.descripcion}</p>
+        <h2 className={styles.resultadoNombre}>{nombre}</h2>
+        <p className={styles.resultadoDescripcion}>{descripcion}</p>
       </div>
 
       <div className={styles.resultadoMetricas}>
@@ -263,7 +304,10 @@ function Resultado({ sistolica, diastolica, pulso }: ResultadoProps) {
         </div>
       </div>
 
-      <div className={styles.resultadoRecomendacion} role="alert" aria-live="polite">
+      {/* Sin role/aria-live propios: el contenedor del resultado ya es role="status"
+          aria-live="polite", y anidar aquí un role="alert" (que implica assertive)
+          hacía que la recomendación se anunciase dos veces (hallazgo 297). */}
+      <div className={styles.resultadoRecomendacion}>
         <strong>Recomendación:</strong> {cl.recomendacion}
       </div>
     </div>
@@ -281,13 +325,13 @@ function TablaClasificaciones() {
     { rango: 'HTA Grado 1',          sis: '140–159',   dia: '90–99',     id: 'hta-grado-1'        },
     { rango: 'HTA Grado 2',          sis: '160–179',   dia: '100–109',   id: 'hta-grado-2'        },
     { rango: 'HTA Grado 3',          sis: '≥ 180',     dia: '≥ 110',     id: 'hta-grado-3'        },
-    { rango: 'Crisis Hipertensiva',  sis: '> 180',     dia: '> 120',     id: 'crisis-hipertensiva' },
+    { rango: 'Crisis Hipertensiva',  sis: '≥ 180',     dia: '≥ 120',     id: 'crisis-hipertensiva' },
     { rango: 'HTA Sistólica Aislada',sis: '≥ 140',     dia: '< 90',      id: 'sistolica-aislada'  },
   ];
 
   return (
     <div className={styles.tablaWrapper}>
-      <table className={styles.tabla} aria-label="Clasificación de tensión arterial ESH/ESC 2023">
+      <table className={styles.tabla} aria-label="Clasificación de tensión arterial ESH 2023">
         <thead>
           <tr>
             <th>Categoría</th>
@@ -311,7 +355,19 @@ function TablaClasificaciones() {
           })}
         </tbody>
       </table>
-      <p className={styles.tablaFuente}>Fuente: Guías ESH/ESC 2023 para el manejo de la hipertensión arterial</p>
+      <ul className={styles.tablaNotas}>
+        <li>
+          Cuando la sistólica y la diastólica caen en categorías distintas, <strong>manda la más alta
+          de las dos</strong>: 175/55 es hipertensión de grado 2, no tensión baja.
+        </li>
+        <li>
+          Las dos últimas filas se <strong>superponen</strong> a los grados en lugar de sustituirlos.
+          La <em>HTA sistólica aislada</em> se gradúa por la sistólica (140–159 → grado 1, 160–179 →
+          grado 2). Una lectura de ≥ 180 y/o ≥ 120 se rotula <em>crisis hipertensiva</em>, que es la
+          categoría que esta herramienta muestra por delante de grado 3.
+        </li>
+      </ul>
+      <p className={styles.tablaFuente}>Fuente: Guías ESH 2023 para el manejo de la hipertensión arterial</p>
     </div>
   );
 }
@@ -417,7 +473,7 @@ export default function CalculadoraTensionArterial() {
 
       <header className={styles.hero}>
         <h1 className={styles.heroTitulo}>Orientador Tensión Arterial</h1>
-        <p className={styles.heroSubtitulo}>Clasifica tu presión según las guías ESH/ESC 2023 · Calcula TAM y presión de pulso</p>
+        <p className={styles.heroSubtitulo}>Clasifica tu presión según las guías ESH 2023 · Calcula TAM y presión de pulso</p>
       </header>
 
       <LegalNotice />
@@ -433,7 +489,7 @@ export default function CalculadoraTensionArterial() {
         >
           <p>
             Esta herramienta es <strong>exclusivamente orientativa y educativa</strong>. Los resultados que ofrece
-            se basan en las guías ESH/ESC 2023 y <strong>no constituyen ni sustituyen un diagnóstico médico</strong>,
+            se basan en las guías ESH 2023 y <strong>no constituyen ni sustituyen un diagnóstico médico</strong>,
             una consulta profesional ni ningún tipo de prescripción o consejo clínico.
           </p>
           <p>
@@ -543,7 +599,7 @@ export default function CalculadoraTensionArterial() {
           type="button"
           aria-expanded={mostrarTabla}
         >
-          {mostrarTabla ? '▲ Ocultar' : '▼ Ver'} tabla de clasificación ESH/ESC 2023
+          {mostrarTabla ? '▲ Ocultar' : '▼ Ver'} tabla de clasificación ESH 2023
         </button>
         {mostrarTabla && <TablaClasificaciones />}
       </div>
@@ -586,7 +642,7 @@ export default function CalculadoraTensionArterial() {
                           className={styles.historialBadge}
                           style={{ background: cl.color }}
                         >
-                          {cl.nombre}
+                          {nombreClasificacion(m.clasificacionId, m.sistolica, m.diastolica)}
                         </span>
                       </td>
                       <td>
@@ -615,7 +671,7 @@ export default function CalculadoraTensionArterial() {
         subtitle="Guía educativa sobre presión arterial, medición correcta y factores de riesgo"
         icon="🩺"
       >
-        {/* Tabla comparativa - Clasificación ESH/ESC 2023 */}
+        {/* Tabla comparativa - Clasificación ESH 2023 */}
         <div className={styles.tableWrapper}>
           <table className={styles.comparativaTable}>
             <thead>
@@ -682,36 +738,43 @@ export default function CalculadoraTensionArterial() {
                 <td>≥ 180</td>
                 <td>≥ 120</td>
                 <td>≥ 140 mmHg</td>
-                <td>🚨 Urgencias / llamar al 112</td>
+                <td><span aria-hidden="true">🚨</span> Urgencias / llamar al 112</td>
               </tr>
             </tbody>
           </table>
         </div>
+        <p>
+          <strong>Cómo se lee esta tabla:</strong> cuando la sistólica y la diastólica caen en
+          categorías distintas, manda la más alta de las dos. Las dos últimas filas se superponen
+          a los grados en vez de sustituirlos: la HTA sistólica aislada se gradúa por la sistólica
+          (140–159 → grado 1; 160–179 → grado 2), y una lectura de ≥ 180 y/o ≥ 120 se rotula como
+          crisis hipertensiva.
+        </p>
 
         {/* Escenarios de uso */}
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <h3>🩺 Hipertenso en tratamiento</h3>
-            <p>Si tomas antihipertensivos, monitoriza si tus valores están en el rango objetivo (&lt;130/80 mmHg según las guías ESH/ESC 2023 para pacientes en tratamiento). Lleva un registro para tu médico.</p>
+            <h3><span aria-hidden="true">🩺</span> Hipertenso en tratamiento</h3>
+            <p>Si tomas antihipertensivos, monitoriza si tus valores están en el rango objetivo (&lt;130/80 mmHg según las guías ESH 2023 para pacientes en tratamiento). Lleva un registro para tu médico.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🏠 Medición domiciliaria</h3>
+            <h3><span aria-hidden="true">🏠</span> Medición domiciliaria</h3>
             <p>La medición en casa evita el efecto de &quot;bata blanca&quot; (tensión alta solo en la consulta). Toma mediciones a las mismas horas durante 7 días y calcula la media para un resultado más fiable.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🏃 Deportista</h3>
+            <h3><span aria-hidden="true">🏃</span> Deportista</h3>
             <p>Los deportistas de resistencia suelen tener tensión sistólica ligeramente más alta en reposo pero excelente respuesta al ejercicio. La presión de pulso amplia puede ser normal en atletas con buena forma cardíaca.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>👴 Persona mayor</h3>
+            <h3><span aria-hidden="true">👴</span> Persona mayor</h3>
             <p>En mayores de 65 años es frecuente la hipertensión sistólica aislada (sistólica ≥140 con diastólica normal). Los objetivos de tratamiento pueden ser menos estrictos para evitar hipotensión ortostática.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🤰 Embarazada</h3>
+            <h3><span aria-hidden="true">🤰</span> Embarazada</h3>
             <p>La tensión arterial se controla estrechamente durante el embarazo. La preeclampsia (sistólica ≥140 o diastólica ≥90 después de la semana 20) es una emergencia obstétrica que requiere atención inmediata.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>📱 Primera medición</h3>
+            <h3><span aria-hidden="true">📱</span> Primera medición</h3>
             <p>Si es tu primera vez midiendo la tensión y obtienes un valor elevado, no te alarmes: el estrés de la situación puede subir temporalmente la tensión (&quot;hipertensión de bata blanca&quot;). Repite la medición varios días en reposo.</p>
           </div>
         </div>
@@ -724,7 +787,7 @@ export default function CalculadoraTensionArterial() {
           </li>
           <li className={styles.faqItem}>
             <h3>¿Es mejor medir la tensión por la mañana o por la noche?</h3>
-            <p>Las guías recomiendan medir por la mañana (antes de tomar medicación, antes de desayunar) y por la noche (antes de dormir). La tensión tiene un ritmo circadiano: sube al levantarse, alcanza su pico a media mañana, y baja por la noche. Las guías ESH/ESC recomiendan la media de ambas sesiones durante 7 días.</p>
+            <p>Las guías recomiendan medir por la mañana (antes de tomar medicación, antes de desayunar) y por la noche (antes de dormir). La tensión tiene un ritmo circadiano: sube al levantarse, alcanza su pico a media mañana, y baja por la noche. Las guías ESH recomiendan la media de ambas sesiones durante 7 días.</p>
           </li>
           <li className={styles.faqItem}>
             <h3>¿Qué es la &quot;hipertensión de bata blanca&quot;?</h3>
@@ -786,14 +849,14 @@ export default function CalculadoraTensionArterial() {
             <div className={styles.stepNumber}>5</div>
             <div className={styles.stepContent}>
               <h3>Introduce los valores en la calculadora</h3>
-              <p>Usa la media de tus mediciones. Introduce sistólica, diastólica y opcionalmente el pulso. La app calculará la clasificación ESH/ESC 2023, la TAM y la presión de pulso.</p>
+              <p>Usa la media de tus mediciones. Introduce sistólica, diastólica y opcionalmente el pulso. La app calculará la clasificación ESH 2023, la TAM y la presión de pulso.</p>
             </div>
           </div>
           <div className={styles.step}>
             <div className={styles.stepNumber}>6</div>
             <div className={styles.stepContent}>
               <h3>Interpreta la clasificación</h3>
-              <p>Consulta la tabla de clasificación ESH/ESC 2023 para entender en qué categoría estás. Recuerda que un valor aislado no es diagnóstico — se necesitan mediciones repetidas.</p>
+              <p>Consulta la tabla de clasificación ESH 2023 para entender en qué categoría estás. Recuerda que un valor aislado no es diagnóstico — se necesitan mediciones repetidas.</p>
             </div>
           </div>
           <div className={styles.step}>
@@ -808,36 +871,36 @@ export default function CalculadoraTensionArterial() {
         {/* Mejores prácticas */}
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <h3>🕐 Mide a la misma hora</h3>
+            <h3><span aria-hidden="true">🕐</span> Mide a la misma hora</h3>
             <p>La tensión varía a lo largo del día. Para comparar valores, mide siempre a las mismas horas: típicamente por la mañana (antes del desayuno) y por la noche (antes de dormir).</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>💪 Siempre el mismo brazo</h3>
+            <h3><span aria-hidden="true">💪</span> Siempre el mismo brazo</h3>
             <p>Puede haber diferencias de 5-10 mmHg entre brazos. Mide ambos en la primera ocasión y usa siempre el que dé valores más altos para el seguimiento.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🧂 Reduce el sodio</h3>
+            <h3><span aria-hidden="true">🧂</span> Reduce el sodio</h3>
             <p>Reducir el sodio de 3,5 g/día a 2 g/día puede bajar la sistólica entre 5-8 mmHg. El impacto es mayor en personas &quot;sal-sensibles&quot;, especialmente mayores y personas con diabetes.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🏃 Ejercicio aeróbico regular</h3>
+            <h3><span aria-hidden="true">🏃</span> Ejercicio aeróbico regular</h3>
             <p>150 minutos/semana de actividad moderada reduce la sistólica entre 5-8 mmHg en hipertensos. Caminar a paso rápido, nadar o montar en bici son opciones excelentes y seguras.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🍷 Limita el alcohol</h3>
+            <h3><span aria-hidden="true">🍷</span> Limita el alcohol</h3>
             <p>El consumo de más de 2 unidades de alcohol al día (hombres) o 1 unidad (mujeres) eleva la tensión arterial de forma consistente. La reducción tiene efecto en 2-4 semanas.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>😴 Duerme bien</h3>
+            <h3><span aria-hidden="true">😴</span> Duerme bien</h3>
             <p>Dormir menos de 6 horas aumenta el riesgo de hipertensión. La apnea del sueño no tratada es una causa frecuente de hipertensión resistente al tratamiento.</p>
           </div>
         </div>
 
         {/* Aviso médico importante */}
         <div className={styles.warningBox}>
-          <h3>⚠️ Esta herramienta no reemplaza la atención médica</h3>
+          <h3><span aria-hidden="true">⚠️</span> Esta herramienta no reemplaza la atención médica</h3>
           <ul className={styles.warningList}>
-            <li>Los resultados son orientativos basados en guías ESH/ESC 2023. No constituyen diagnóstico ni prescripción médica.</li>
+            <li>Los resultados son orientativos basados en guías ESH 2023. No constituyen diagnóstico ni prescripción médica.</li>
             <li>Ante lecturas repetidamente elevadas (HTA Grado 1 o superior), consulta a tu médico. No modifiques ni suspendas medicación antihipertensiva por tu cuenta.</li>
             <li>En crisis hipertensiva (sistólica ≥180 o diastólica ≥120), especialmente con síntomas (dolor de cabeza intenso, visión borrosa, dolor en el pecho), llama al 112 o acude a urgencias inmediatamente.</li>
             <li>Una sola medición elevada no es diagnóstico de hipertensión. Se requieren mediciones repetidas en condiciones correctas a lo largo de varios días.</li>
@@ -887,7 +950,7 @@ export default function CalculadoraTensionArterial() {
           Ante cualquier lectura en rango HTA Grado 1 o superior de forma repetida,
           o si presentas síntomas como dolor de cabeza intenso, visión borrosa, mareos,
           dolor en el pecho o dificultad para respirar.
-          En caso de crisis hipertensiva ({'>'}180/120), acude a urgencias o llama al 112.
+          En caso de crisis hipertensiva (≥ 180 y/o ≥ 120), acude a urgencias o llama al 112.
         </p>
       </EducationalSection>
 

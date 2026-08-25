@@ -57,19 +57,20 @@ import { test, expect, type Page } from '@playwright/test';
  *          119/79 → «Tensión Óptima» · 120/80 → «Tensión Normal» (mismo criterio, borde
  *            inferior inclusivo).
  *          179/119 → «HTA Grado 3» · 180/120 → «Crisis Hipertensiva» (la app declara el corte
- *            de crisis con ≥, y así lo aplica; su tabla de referencia dice otra cosa →
- *            hallazgo abierto 2).
+ *            de crisis con ≥, y así lo aplica; su tabla de referencia decía otra cosa →
+ *            hallazgo 295, reparado el 25/08/2026).
  *
  *   CASO 3 (discordante) — EL QUE DE VERDAD IMPORTA
  *          135/95 → sistólica normal-alta, diastólica grado 1. Manda la más alta →
  *            «HTA Grado 1». Si la app se quedara con la sistólica diría «Normal-Alta» y si
  *            promediara (115) diría «Tensión Óptima»: las dos respuestas son peligrosas.
  *          150/85 → sistólica grado 1, diastólica normal-alta → hipertensión, y como la
- *            diastólica es < 90 la etiqueta correcta es «HTA Sistólica Aislada».
+ *            diastólica es < 90 la etiqueta correcta es «HTA Sistólica Aislada (Grado 1)».
  *          175/55 → sistólica de grado 2 con diastólica baja. Es el perfil clásico de la
  *            persona mayor con rigidez arterial, el que la propia app describe en su tarjeta
  *            «👴 Persona mayor» y en su fila «HTA Sistólica Aislada ≥ 140 / < 90». Debe salir
- *            «HTA Sistólica Aislada». HOY SALE «Hipotensión» → hallazgo abierto 1, CRÍTICO.
+ *            «HTA Sistólica Aislada (Grado 2)» — el patrón lleva el GRADO de su sistólica,
+ *            que es lo que fija la urgencia. HASTA EL 25/08/2026 SALÍA «Hipotensión».
  *
  *   CASO 4 (crisis) — 185/125 → «Crisis Hipertensiva», rótulo de urgencia «Emergencia» y una
  *          recomendación que manda a urgencias / al 112, NO un consejo de estilo de vida.
@@ -84,7 +85,15 @@ import { test, expect, type Page } from '@playwright/test';
  *          niveles 1 y 2.
  *
  * ─────────────────────────────────────────────────────────────────────────────────────────
- * HALLAZGOS DE LA 1.ª PASADA (25/08/2026)
+ * HALLAZGOS DE LA 1.ª PASADA (25/08/2026) — LOS CUATRO REPARADOS EL MISMO DÍA
+ *
+ * Lo que la reparación decidió y no estaba en el acta: la HTA sistólica aislada dejó de ser
+ * una rama de `clasificarTension()` y pasó a ser un MATIZ sobre el grado. El acta pedía que
+ * 175/55 saliera «HTA Sistólica Aislada», pero esa categoría tenía urgencia «Alerta»
+ * cableada, así que rotularla a secas habría rebajado un grado 2 —urgencia «Urgente»— a
+ * alerta: se arreglaba el nombre y se estropeaba la conducta. La guía ESH gradúa el patrón
+ * por la sistólica, y eso es lo que hace ahora la app.
+ *
  *   1 CRÍTICO — `clasificarTension()` evalúa la hipotensión ANTES que la hipertensión y con
  *     OR: `if (sis < 90 || dia < 60) return 'hipotension'`. Cualquier lectura con diastólica
  *     < 60 y sistólica < 180 sale como «Hipotensión», incluidas 145/58, 160/55 y 179/59.
@@ -101,9 +110,9 @@ import { test, expect, type Page } from '@playwright/test';
  *   4 BAJO — 14 emojis junto a texto sin `aria-hidden` (`node scripts/check-a11y-jsx.mjs
  *     app/orientador-tension-arterial/page.tsx`); no se duplican aquí.
  *
- * HALLAZGOS ABIERTOS: al final, marcados con `test.fail()`. Afirman lo que DEBERÍA pasar, así
- * que hoy fallan a propósito; cuando se reparen, se les quita el `test.fail()` y quedan como
- * regresión.
+ * Los cuatro quedan al final como tests de REGRESIÓN (ya sin `test.fail()`), más uno que la
+ * reparación exigió y el acta no tenía: 294d comprueba que mover la rama de hipotensión no
+ * la dejó inalcanzable, que es el hueco que ese arreglo podía abrir en silencio.
  * ─────────────────────────────────────────────────────────────────────────────────────────
  */
 
@@ -214,7 +223,8 @@ test('CASO 3 · 135/95 manda la diastólica: es HTA Grado 1, no Normal-Alta ni u
 test('CASO 3b · 150/85 es hipertensión sistólica aislada (≥ 140 con diastólica < 90)', async ({ page }) => {
   await medir(page, '150', '85');
 
-  await expect(categoria(page)).toHaveText('HTA Sistólica Aislada');
+  // El patrón se rotula con su grado, que la guía ESH fija por la SISTÓLICA: 150 → grado 1.
+  await expect(categoria(page)).toHaveText('HTA Sistólica Aislada (Grado 1)');
   await expect(urgencia(page)).toContainText('Alerta');
   await expect(recomendacion(page)).toContainText('Consulta a tu médico');
 
@@ -226,7 +236,9 @@ test('CASO 3b · 150/85 es hipertensión sistólica aislada (≥ 140 con diastó
 
 test('CASO 3c · 165/85: la sistólica de grado 2 manda sobre una diastólica normal-alta', async ({ page }) => {
   await medir(page, '165', '85');
-  await expect(categoria(page)).toHaveText('HTA Grado 2');
+  // Con diastólica < 90 el patrón es sistólico aislado, pero el GRADO —y con él la
+  // urgencia— sale de la sistólica: 165 está en 160-179, o sea grado 2.
+  await expect(categoria(page)).toHaveText('HTA Sistólica Aislada (Grado 2)');
   await expect(urgencia(page)).toContainText('Urgente');
 });
 
@@ -286,11 +298,11 @@ test('MARCO LEGAL · el aviso médico es crítico, no colapsable y niega el diag
 
 test('MARCO LEGAL · el subtítulo y la fuente de la tabla nombran la guía que la app aplica', async ({ page }) => {
   await expect(page.locator('h1')).toHaveText('Orientador Tensión Arterial');
-  await expect(page.locator('h1 + p')).toContainText('ESH/ESC 2023');
+  await expect(page.locator('h1 + p')).toContainText('ESH 2023');
 
   await page.getByRole('button', { name: /tabla de clasificación/i }).click();
   await expect(page.locator('[class*="tablaFuente"]')).toContainText(
-    'Guías ESH/ESC 2023 para el manejo de la hipertensión arterial',
+    'Guías ESH 2023 para el manejo de la hipertensión arterial',
   );
 });
 
@@ -302,53 +314,78 @@ test('MARCO LEGAL · aplica los cortes europeos (≥ 140/90), no los de la AHA (
   await expect(categoria(page)).not.toHaveText(/HTA Grado/);
 });
 
-// ─── HALLAZGOS ABIERTOS ─────────────────────────────────────────────────────────────────
+// ─── REGRESIÓN · los hallazgos de la 1.ª pasada, reparados el 25/08/2026 ────────────────
 
-test('ABIERTO 1 (CRÍTICO) · 175/55 es hipertensión sistólica aislada, no hipotensión', async ({ page }) => {
-  test.fail(); // hoy devuelve «Hipotensión»
-
+test('REGRESIÓN 294 (CRÍTICO) · 175/55 es hipertensión sistólica aislada, no hipotensión', async ({ page }) => {
   await medir(page, '175', '55');
 
   // La propia app declara la fila «HTA Sistólica Aislada ≥ 140 / < 90» y describe este perfil
-  // en su tarjeta «Persona mayor». 175 es sistólica de grado 2 (160-179).
-  await expect(categoria(page)).toHaveText('HTA Sistólica Aislada');
-  await expect(categoria(page)).not.toHaveText('Hipotensión');
+  // en su tarjeta «Persona mayor». 175 es sistólica de grado 2 (160-179), y el grado del
+  // patrón aislado lo fija la sistólica, así que la urgencia tiene que ser la del grado 2.
+  await expect(categoria(page)).toHaveText('HTA Sistólica Aislada (Grado 2)');
+  await expect(categoria(page)).not.toContainText('Hipotensión');
+  await expect(urgencia(page)).toContainText('Urgente');
 });
 
-test('ABIERTO 1b (CRÍTICO) · con diastólica < 60, la sistólica alta sigue mandando', async ({ page }) => {
-  test.fail(); // hoy las tres devuelven «Hipotensión»
-
-  for (const [sis, dia] of [['145', '58'], ['160', '55'], ['179', '59']]) {
+test('REGRESIÓN 294b (CRÍTICO) · con diastólica < 60, la sistólica alta sigue mandando', async ({ page }) => {
+  // Cada uno con el grado que le da su sistólica: 145 → grado 1; 160 y 179 → grado 2.
+  const casos: Array<[string, string, string]> = [
+    ['145', '58', 'HTA Sistólica Aislada (Grado 1)'],
+    ['160', '55', 'HTA Sistólica Aislada (Grado 2)'],
+    ['179', '59', 'HTA Sistólica Aislada (Grado 2)'],
+  ];
+  for (const [sis, dia, esperado] of casos) {
     await medir(page, sis, dia);
-    await expect(categoria(page)).toHaveText('HTA Sistólica Aislada');
+    await expect(categoria(page)).toHaveText(esperado);
   }
 });
 
-test('ABIERTO 1c (CRÍTICO) · una presión de pulso «Muy elevada» no puede rotularse hipotensión', async ({ page }) => {
-  test.fail(); // hoy convive «Hipotensión» con una presión de pulso de 120 mmHg
-
+test('REGRESIÓN 294c (CRÍTICO) · una presión de pulso «Muy elevada» no puede rotularse hipotensión', async ({ page }) => {
   await medir(page, '175', '55');
   // La app calcula 175 − 55 = 120 mmHg y lo llama «Muy elevada (> 80 mmHg)» — signo de
-  // rigidez arterial — mientras la cabecera dice «por debajo de los valores normales».
+  // rigidez arterial — mientras la cabecera decía «por debajo de los valores normales».
   await expect(derivadoNota(page, 1)).toHaveText('Muy elevada (> 80 mmHg)');
   await expect(recomendacion(page)).not.toContainText('mareos, cansancio o desmayos');
 });
 
-test('ABIERTO 2 (MEDIO) · la tabla visible debe usar el mismo corte de crisis que el código', async ({ page }) => {
-  test.fail(); // la tabla dice «> 180 / > 120»; el código y la tabla educativa usan ≥
+test('REGRESIÓN 294d · la hipotensión se sigue emitiendo cuando NADA está elevado', async ({ page }) => {
+  // Mover la rama al final no puede haberla dejado inalcanzable: es el riesgo de la
+  // reparación, y sin este caso el arreglo del crítico crearía un hueco silencioso.
+  await medir(page, '85', '55');
+  await expect(categoria(page)).toHaveText('Hipotensión');
 
+  // Hipotensión diastólica aislada, con la sistólica todavía por debajo de lo normal.
+  await medir(page, '110', '55');
+  await expect(categoria(page)).toHaveText('Hipotensión');
+
+  // Y con la sistólica ya en rango «normal»: la diastólica baja sigue avisando, porque
+  // ahí no hay ninguna categoría hipertensiva a la que la hipotensión pueda eclipsar.
+  await medir(page, '125', '58');
+  await expect(categoria(page)).toHaveText('Hipotensión');
+
+  // El límite: a partir de normal-alta ya manda lo elevado, no la diastólica baja.
+  await medir(page, '135', '58');
+  await expect(categoria(page)).toHaveText('Normal-Alta');
+});
+
+test('REGRESIÓN 295 (MEDIO) · la tabla visible usa el mismo corte de crisis que el código', async ({ page }) => {
   await page.getByRole('button', { name: /tabla de clasificación/i }).click();
   const filaCrisis = page.locator('table[aria-label*="Clasificación"] tbody tr', {
     hasText: 'Crisis Hipertensiva',
   });
   await expect(filaCrisis.locator('td').nth(1)).toHaveText('≥ 180');
   await expect(filaCrisis.locator('td').nth(2)).toHaveText('≥ 120');
+
+  // Y la tabla explica la superposición que hacía «HTA Grado 3 ≥ 180» inalcanzable por
+  // vía sistólica: sin esa nota, quien lea la tabla deduce grado 3 donde la app dice crisis.
+  await expect(page.locator('[class*="tablaNotas"]')).toContainText('se superponen');
+  await expect(page.locator('[class*="tablaNotas"]')).toContainText('manda la más alta');
 });
 
-test('ABIERTO 3 (MEDIO) · la app debe citar UNA sola versión de la guía en toda la página', async ({ page }) => {
-  test.fail(); // la meta description y el FAQPage JSON-LD siguen diciendo «ESH/ESC 2018»
-
+test('REGRESIÓN 296 (MEDIO) · la app cita UNA sola versión de la guía en toda la página', async ({ page }) => {
   const html = await page.content();
-  expect(html).toContain('ESH/ESC 2023');
+  // La ESH 2023 es un documento real; «ESH/ESC 2023» no lo es (la conjunta fue la de 2018).
+  expect(html).toContain('ESH 2023');
   expect(html).not.toContain('ESH/ESC 2018');
+  expect(html).not.toContain('ESH/ESC 2023');
 });

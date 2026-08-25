@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Orientador Tensión Arterial - Clasifica tu Presión según ESH/ESC | meskeIA',
-  description: 'Introduce tu tensión arterial sistólica y diastólica y obtén tu clasificación según las guías europeas ESH/ESC 2018. Calcula TAM, presión de pulso y guarda tu historial.',
+  title: 'Orientador Tensión Arterial - Clasifica tu Presión según la guía ESH 2023 | meskeIA',
+  description: 'Introduce tu tensión arterial sistólica y diastólica y obtén tu clasificación según las guías europeas ESH 2023. Calcula TAM, presión de pulso y guarda tu historial.',
   keywords: 'calculadora tension arterial, presion arterial, hipertension, clasificacion tension, sistolica, diastolica, TAM, ESH, ESC, hipertension grado 1, hipotension, tension alta',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Orientador Tensión Arterial | meskeIA',
-    description: 'Clasifica tu presión arterial según las guías ESH/ESC 2018 y guarda tu historial de mediciones.',
+    description: 'Clasifica tu presión arterial según las guías ESH 2023 y guarda tu historial de mediciones.',
     url: 'https://meskeia.com/orientador-tension-arterial/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Orientador Tensión Arterial | meskeIA',
-    description: 'Clasifica tu presión arterial según guías europeas ESH/ESC. Historial de mediciones incluido.',
+    description: 'Clasifica tu presión arterial según guías europeas ESH 2023. Historial de mediciones incluido.',
     images: ['https://meskeia.com/og-image.png']
   },
   other: {
@@ -36,11 +36,11 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Orientador Tensión Arterial",
-  description: "Introduce tu tensión arterial sistólica y diastólica y obtén tu clasificación según las guías europeas ESH/ESC 2023. Calcula TAM, presión de pulso y guarda tu historial.",
+  description: "Introduce tu tensión arterial sistólica y diastólica y obtén tu clasificación según las guías europeas ESH 2023. Calcula TAM, presión de pulso y guarda tu historial.",
   url: "https://meskeia.com/orientador-tension-arterial/",
   category: 'UtilityApplication',
   features: [
-    'Clasificación de tensión arterial según guías ESH/ESC 2023 (hipotensión, óptima, normal, normal-alta, HTA grados 1-3, crisis)',
+    'Clasificación de tensión arterial según guías ESH 2023 (hipotensión, óptima, normal, normal-alta, HTA grados 1-3, crisis)',
     'Cálculo de TAM (Tensión Arterial Media) con fórmula diastólica + (sistólica − diastólica) / 3',
     'Cálculo e interpretación de la presión de pulso (normal 40-60 mmHg)',
     'Historial de mediciones con almacenamiento local (hasta 20 entradas)',
@@ -59,7 +59,7 @@ export const faqJsonLd = {
       name: '¿Cuáles son los valores normales de tensión arterial?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Según las guías europeas ESH/ESC 2018, la tensión arterial óptima es inferior a 120/80 mmHg. Se considera normal entre 120-129/80-84 mmHg, y normal-alta entre 130-139/85-89 mmHg. A partir de 140/90 mmHg se clasifica como hipertensión grado 1.',
+        text: 'Según las guías europeas ESH 2023, la tensión arterial óptima es inferior a 120/80 mmHg. Se considera normal entre 120-129/80-84 mmHg, y normal-alta entre 130-139/85-89 mmHg. A partir de 140/90 mmHg se clasifica como hipertensión grado 1.',
       },
     },
     {

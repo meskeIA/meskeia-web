@@ -7,6 +7,7 @@
 
 export {
   formatNumber,
+  formatTipoNominal,
   formatCurrency,
   formatDate,
   formatDateTime,

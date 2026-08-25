@@ -542,7 +542,7 @@ export const implementedAppsUrls = [
   "/quiz-reinos-naturaleza/",            // Quiz Reinos de la Naturaleza: 43 organismos sorprendentes, clasificación por grupos
   "/guia-seguro-viaje/",                 // Coberturas recomendadas por destino/tipo de viaje + checklist 12 puntos
   "/planificador-itinerario/",           // Organiza días y actividades de viaje con horarios y notas
-  "/orientador-tension-arterial/",      // Clasificación ESH/ESC 2018: TAM, presión de pulso e historial local
+  "/orientador-tension-arterial/",      // Clasificación ESH 2023: TAM, presión de pulso e historial local
   "/planificador-chequeos-medicos/",     // Chequeos preventivos por edad/sexo: referencia Ministerio Sanidad y SEMFyC
 
   // Apps de Accesibilidad (2026-03-13)
