@@ -23,12 +23,19 @@
  *   ROMPE   2. emoji JUNTO A TEXTO sin aria-hidden
  *   AVISA   3. botón con onClick + className condicional y sin ningún aria-* ni role
  *   AVISA   4. emoji en nodo propio, sin aria-hidden y sin aria-label
+ *   AVISA   5. aria-pressed en un botón que al pulsarlo se deshabilita (no se despulsa)
  *
- * Las dos últimas exigen criterio y no se pueden resolver a ciegas: un `aria-pressed` en un
+ * Las tres últimas exigen criterio y no se pueden resolver a ciegas: un `aria-pressed` en un
  * botón de ACCIÓN es una regresión, no una mejora (el teclado de calculadora-jugada-scrabble
  * es el caso que lo demostró), y un emoji solo puede ser decorativo o portar información,
  * que se arreglan al revés. Un candado que grita por lo que no sabe resolver acaba
- * desactivado, así que esas dos se cuentan y se listan, pero dejan pasar el build.
+ * desactivado, así que esas tres se cuentan y se listan, pero dejan pasar el build.
+ *
+ * La 5 se añadió el 24/08/2026 por el hallazgo 285 del Inspector: las cuatro opciones de
+ * `quiz-simbolos-quimicos` llevaban `aria-pressed` siendo botones de acción, y la regla 3 no
+ * podía verlo porque solo salta cuando el botón no tiene NINGÚN `aria-*` — allí había uno,
+ * del tipo equivocado. Su criterio está en `seDeshabilitaAlPulsarse`, y su caso de prueba en
+ * `scripts/pruebas/a11y-regla5.tsx`: dos botones que debe cazar y dos que debe dejar pasar.
  *
  * Escape para el falso positivo: «a11y-ok: <razón>» en la línea o en la anterior.
  *
@@ -107,6 +114,68 @@ const esEmoji = (t) => PICTOGRAFICO.test(t.replace(NO_SON_EMOJI, ''));
  */
 const SOLO_EMOJI = /[\p{Extended_Pictographic}\p{Emoji_Modifier}️‍⃣\s]/gu;
 const ARIA_ESTADO = ['aria-pressed', 'aria-selected', 'aria-checked', 'aria-expanded'];
+
+/**
+ * ¿La expresión de un atributo JSX, ya sin las llaves? `null` si el atributo no la tiene.
+ */
+function expresionDe(atributo) {
+  const ini = atributo && atributo.initializer;
+  return ini && ts.isJsxExpression(ini) && ini.expression ? ini.expression : null;
+}
+
+const textoPlano = (nodo) => (nodo ? nodo.getText().replace(/\s+/g, ' ').trim() : '');
+const esNulo = (nodo) =>
+  nodo && (nodo.kind === ts.SyntaxKind.NullKeyword || textoPlano(nodo) === 'undefined');
+
+/** Operandos de una cadena de `||`, aplanada. */
+function operandosOr(nodo) {
+  if (nodo && ts.isBinaryExpression(nodo) && nodo.operatorToken.kind === ts.SyntaxKind.BarBarToken)
+    return [...operandosOr(nodo.left), ...operandosOr(nodo.right)];
+  if (nodo && ts.isParenthesizedExpression(nodo)) return operandosOr(nodo.expression);
+  return [nodo];
+}
+
+/**
+ * ¿`disabled` es NECESARIAMENTE verdadero cuando `aria-pressed` lo es? Es decir: pulsar el
+ * botón lo deshabilita, así que no hay forma de despulsarlo — y entonces no es un conmutador
+ * por mucho que lleve el atributo de uno.
+ *
+ * Solo devuelve `true` cuando puede DEMOSTRARLO por la forma de las dos expresiones. Ante la
+ * duda calla, porque un aviso que acierta una de cada cuatro veces acaba desactivando el
+ * candado entero. Las tres formas que sí se pueden afirmar:
+ *
+ *   1. Son la misma expresión:  aria-pressed={activo}    disabled={activo}
+ *   2. `disabled` la contiene como operando de un `||` de primer nivel:
+ *      aria-pressed={reproduciendo}   disabled={reproduciendo || sinVidas}
+ *   3. `aria-pressed` compara algo con un valor y `disabled` dice que ese algo no es nulo:
+ *      aria-pressed={seleccionada === opcion}   disabled={seleccionada !== null}
+ *
+ * Lo que deja pasar a propósito, porque ahí el botón SÍ se puede despulsar: que el estado
+ * aparezca negado (`disabled={animando && !autoplay}`) o dentro de un `&&` que lo excluya
+ * (`disabled={!seleccionados.includes(f.id) && tope}`).
+ */
+function seDeshabilitaAlPulsarse(pressed, disabled) {
+  if (!pressed || !disabled) return false;
+  const p = textoPlano(pressed);
+
+  // 1 y 2 — la misma expresión, sola o como rama de un ||
+  if (operandosOr(disabled).some(o => textoPlano(o) === p)) return true;
+
+  // 3 — «X === algo» pulsado y «X !== null» deshabilitado
+  if (
+    ts.isBinaryExpression(pressed) &&
+    pressed.operatorToken.kind === ts.SyntaxKind.EqualsEqualsEqualsToken &&
+    !esNulo(pressed.right) &&
+    ts.isBinaryExpression(disabled) &&
+    disabled.operatorToken.kind === ts.SyntaxKind.ExclamationEqualsEqualsToken &&
+    esNulo(disabled.right) &&
+    textoPlano(disabled.left) === textoPlano(pressed.left)
+  ) {
+    return true;
+  }
+
+  return false;
+}
 
 // ─── Qué ficheros mirar ───────────────────────────────────────────────────────
 
@@ -219,6 +288,29 @@ for (const rel of objetivos()) {
         const cls = at.get('className') ? at.get('className').getText() : '';
         if (/\?|&&/.test(cls))
           apuntar(avisos, n, 'toggle sin aria-pressed', 'className=' + cls.slice(0, 60));
+      }
+      /**
+       * Regla 5 — `aria-pressed` que SOBRA. Un conmutador que queda deshabilitado en cuanto
+       * lo pulsas no es un conmutador: no hay forma de despulsarlo. Es un botón de acción
+       * con el atributo de otro patrón, y el CLAUDE.md §5 avisa de que eso es una regresión
+       * y no una mejora.
+       *
+       * Sale del hallazgo 285 (24/08/2026): las cuatro opciones de `quiz-simbolos-quimicos`
+       * llevaban `aria-pressed={seleccionada === opcion}` y `disabled={seleccionada !== null}`,
+       * así que un lector de pantalla anunciaba las cuatro como «botón de alternar, no
+       * pulsado» antes de contestar. La regla 3 no podía verlo: solo salta cuando el botón no
+       * tiene NINGÚN aria-*, y aquí tenía uno, del tipo equivocado.
+       *
+       * Avisa y no rompe, como las otras de criterio: `disabled` también se usa para «aún no
+       * se puede», y ahí un aria-pressed puede ser correcto.
+       */
+      if (at.has('aria-pressed') && at.has('disabled')) {
+        const pressed = expresionDe(at.get('aria-pressed'));
+        const disabled = expresionDe(at.get('disabled'));
+        if (seDeshabilitaAlPulsarse(pressed, disabled)) {
+          apuntar(avisos, n, 'aria-pressed en un botón que no se puede despulsar',
+                  `disabled={${textoPlano(disabled).slice(0, 50)}} lo deja fijo al pulsarlo`);
+        }
       }
     }
 

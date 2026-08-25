@@ -410,9 +410,18 @@ la Agenda Operativa del Centro de Mando (`restauracion-turso-semestral`).
 
 `npm run check:a11y-jsx` — lo ejecuta también `npm run build`, y **rompe el build** si el
 commit escribe un `<button>` sin `type=` o un emoji junto a texto sin `aria-hidden` (las dos
-reglas del CLAUDE.md global §5 cuya corrección es unívoca). Las otras dos situaciones
-—`aria-pressed` en un toggle, emoji en nodo propio— exigen criterio y **solo avisan**: un
-`aria-pressed` en un botón de acción es una regresión, no una mejora.
+reglas del CLAUDE.md global §5 cuya corrección es unívoca). Las otras **tres** situaciones
+—`aria-pressed` que falta en un toggle, `aria-pressed` que SOBRA, y emoji en nodo propio—
+exigen criterio y **solo avisan**: un `aria-pressed` en un botón de acción es una regresión,
+no una mejora.
+
+> La regla del `aria-pressed` que sobra es de 24/08/2026 y sale del hallazgo 285: las cuatro
+> opciones de `quiz-simbolos-quimicos` lo llevaban siendo botones de acción, y la regla que
+> vigila el caso contrario no podía verlo porque solo salta cuando el botón no tiene **ningún**
+> `aria-*` — allí había uno, del tipo equivocado. Señala solo lo que puede DEMOSTRAR por la
+> forma del código: que `disabled` sea verdadero siempre que `aria-pressed` lo sea, o sea que
+> pulsarlo lo deje fijo. Su caso de prueba —dos botones que debe cazar y dos conmutadores
+> legítimos que debe dejar pasar— está en `scripts/pruebas/a11y-regla5.tsx`.
 
 ⚠️ Juzga **las líneas que el commit añade**, no el fichero entero, igual que `check:secrets`.
 El catálogo arrastra ~5.000 incumplimientos en 731 ficheros (medido el 23/08/2026 con
@@ -529,6 +538,8 @@ Cada regla se escribió para su caso; el parecido superficial con el caso siguie
 ⚠️ **El contador va sobre el eje que discrimina, y la ausencia de un valor NO es una racha.** Antes de contar, mira qué valores llegan a salir de verdad: si uno de ellos exige condiciones que casi nada cumple, que lleve N lecturas sin aparecer no dice nada del indicador — sale de donde tiene que salir, que es de que ese valor es inalcanzable. Contar sobre él da la alarma equivocada, y encima suena a diligencia.
 
 **De dónde sale**: el semáforo de la sección 9 del digest marcó ✅ durante **21 lecturas seguidas** mientras la métrica caía, y *Apps activas* llevaba 30 lecturas subiendo sin que su suelo llegara a hablar nunca. El principio ya estaba escrito ("un color que sale siempre deja de informar"); lo que faltaba era volverlo **mecánico**, porque un principio depende de que alguien lo recuerde y un contador no.
+
+⚠️ **Y va sobre UNA sola población.** Si la serie mezcla dos cosas que se comportan distinto, la racha mide la mezcla y no el indicador. El caso: el contador del Inspector saltó con **8 `con_hallazgos_menores` seguidos**, pero aquellas ocho eran RE-inspecciones de apps recién reparadas —sus altos y críticos se habían arreglado días antes, así que solo podían quedar detalles—, mientras la serie de primeras inspecciones llevaba una racha de 2. Desde el 24/08/2026 `registrar.mjs` cuenta las dos por separado y cada una avisa de una cosa distinta: en primeras inspecciones, que el detector puede haber dejado de mirar; en re-inspecciones con hallazgos graves, que lo que no cierra es la reparación; con hallazgos menores, nada, porque es el resultado esperado. Que dispara donde debe y calla donde debe se comprueba con **`npm run inspector:probar-contador`**, que le reinyecta los cuatro casos sobre bases desechables.
 
 **El aviso salió del caso simétrico** (23/08/2026): el Inspector llevaba **32 inspecciones sin un solo veredicto `ok`** y eso disparó la sospecha de detector roto. Se hizo la prueba —criterio escrito antes de ejecutarla, en `_private/inspector/PRUEBA-ESPECIFICIDAD.md`— y el detector estaba sano: los hallazgos verificados a mano eran reales. `ok` exigía que una app de 620-946 líneas no tuviera **ni un detalle**, algo que en este catálogo no ocurre (0/32); el eje informativo era la pareja `con_hallazgos` / `con_hallazgos_menores`, donde la racha máxima histórica era **4**, por debajo del umbral. Allí un color salía siempre y dejó de informar; aquí un valor no salía nunca y tampoco informaba. **Un indicador puede mentir por los dos extremos, y el contador no distingue solo: hay que decirle qué contar.**
 

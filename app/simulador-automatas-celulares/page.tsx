@@ -404,7 +404,6 @@ export default function SimuladorAutomatasCelularesPage() {
   // Lista de índices para renderizar (estable: 0..TOTAL-1)
   const indices = useRef<number[]>(Array.from({ length: TOTAL }, (_, i) => i));
 
-  const reproduccionPausada = !reproduciendo;
 
   return (
     <div className={styles.container}>
@@ -613,12 +612,17 @@ export default function SimuladorAutomatasCelularesPage() {
               />
               <span className={styles.velocidadValue}>{velocidad} ms</span>
             </div>
+            {/* «Reproducir» y «Pausar» son botones de ACCIÓN, no conmutadores: cada uno
+                pone el estado en un valor y se deshabilita cuando ya está ahí, así que no hay
+                forma de despulsarlos. Con `aria-pressed` un lector de pantalla los anunciaba
+                como «botón de alternar», y el CLAUDE.md §5 avisa de que eso es una regresión
+                y no una mejora. Lo encontró la regla 5 de `check:a11y-jsx` al estrenarse
+                (24/08/2026), que nació del hallazgo 285 del Inspector. */}
             <button
               type="button"
               className={styles.controlBtn}
               onClick={() => setReproduciendo(true)}
               disabled={reproduciendo || (modo === 'vida' && vivas === 0)}
-              aria-pressed={reproduciendo}
             >
               <span aria-hidden="true">▶</span> Reproducir
             </button>
@@ -627,7 +631,6 @@ export default function SimuladorAutomatasCelularesPage() {
               className={`${styles.controlBtn} ${styles.secondaryBtn}`}
               onClick={() => setReproduciendo(false)}
               disabled={!reproduciendo}
-              aria-pressed={reproduccionPausada}
             >
               <span aria-hidden="true">⏸</span> Pausar
             </button>

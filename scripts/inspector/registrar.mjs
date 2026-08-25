@@ -152,13 +152,72 @@ for (const a of actas) {
 
 console.log(`✓ ${actas.length} acta(s) registrada(s) · ${nH} hallazgo(s)`);
 
-// Contador de veredicto repetido: un indicador que sale siempre igual deja de informar.
-const ultimos = db.prepare(`SELECT veredicto FROM inspecciones ORDER BY id DESC LIMIT 8`).all().map(r => r.veredicto);
-let racha = 0;
-for (const v of ultimos) { if (v === ultimos[0]) racha++; else break; }
-if (racha >= 5)
-  console.log(`\n⚠  ${racha} veredictos "${ultimos[0]}" seguidos. La lectura por defecto ya NO es que el catálogo\n` +
-              `   esté bien, sino que el Inspector ha dejado de mirar. Antes de seguir, comprobar que\n` +
-              `   encuentra un fallo conocido (meter uno a propósito en una app y ver si lo caza).`);
-else if (racha > 1)
-  console.log(`   (${racha} veredictos "${ultimos[0]}" seguidos)`);
+/**
+ * Contador de veredicto repetido: un indicador que sale siempre igual deja de informar.
+ *
+ * ── Por qué va SEPARADO por población (24/08/2026) ────────────────────────────
+ * Saltó con 8 "con_hallazgos_menores" seguidos, y el aviso estaba mal dirigido: la muestra
+ * de aquel día eran diez RE-INSPECCIONES de apps recién reparadas, cuyos altos y críticos se
+ * habían corregido días antes, así que solo podían quedar detalles. En la serie de PRIMERAS
+ * inspecciones, esas mismas horas, la racha era de 2.
+ *
+ * Es la misma forma de fallo del 23/08 que el CLAUDE.md dejó escrita en el candado 3: contar
+ * un valor cuya frecuencia depende de otra variable. Aquí la variable es si la app se mira
+ * por primera vez o después de repararla, y mezclarlas convertía en alarma lo que era el
+ * resultado normal de una ronda de reparación que funcionó.
+ *
+ * Y por eso cada población avisa de una cosa distinta:
+ *   · Primera inspección, cualquier veredicto repetido → el detector puede haber dejado de
+ *     mirar (el aviso original, que sigue valiendo).
+ *   · Re-inspección con hallazgos GRAVES repetidos → lo que no está cerrando es la
+ *     reparación, no el detector.
+ *   · Re-inspección "ok" repetido → sospechoso al revés: puede estar dando por buena la
+ *     reparación sin comprobarla.
+ *   · Re-inspección con hallazgos MENORES repetidos → es lo esperado tras reparar. Se cuenta
+ *     y se dice, pero NO se da la alarma: sería la alarma equivocada.
+ */
+const UMBRAL_RACHA = 5;
+
+const historia = db.prepare(`
+  SELECT i.veredicto AS veredicto,
+         (SELECT COUNT(*) FROM inspecciones p WHERE p.slug = i.slug AND p.id < i.id) AS previas
+  FROM inspecciones i
+  ORDER BY i.id DESC
+  LIMIT 200
+`).all();
+
+/** Veredictos consecutivos iguales al más reciente de esa serie. */
+function rachaDe(serie) {
+  if (!serie.length) return { veredicto: null, racha: 0 };
+  let racha = 0;
+  for (const v of serie) { if (v === serie[0]) racha++; else break; }
+  return { veredicto: serie[0], racha };
+}
+
+const primeras = rachaDe(historia.filter(f => f.previas === 0).map(f => f.veredicto));
+const reinspecciones = rachaDe(historia.filter(f => f.previas > 0).map(f => f.veredicto));
+
+if (primeras.racha > 1)
+  console.log(`   (primeras inspecciones: ${primeras.racha} veredictos "${primeras.veredicto}" seguidos)`);
+if (reinspecciones.racha > 1)
+  console.log(`   (re-inspecciones: ${reinspecciones.racha} veredictos "${reinspecciones.veredicto}" seguidos)`);
+
+if (primeras.racha >= UMBRAL_RACHA)
+  console.log(`\n⚠  ${primeras.racha} veredictos "${primeras.veredicto}" seguidos en apps que se miran por PRIMERA vez.\n` +
+              `   La lectura por defecto ya NO es que el catálogo esté bien, sino que el Inspector ha\n` +
+              `   dejado de mirar. Antes de seguir, comprobar que encuentra un fallo conocido (meter uno\n` +
+              `   a propósito en una app y ver si lo caza). El procedimiento y el criterio, escritos ANTES\n` +
+              `   de ejecutar la prueba, están en _private/inspector/PRUEBA-ESPECIFICIDAD.md.`);
+
+if (reinspecciones.racha >= UMBRAL_RACHA) {
+  if (reinspecciones.veredicto === 'con_hallazgos')
+    console.log(`\n⚠  ${reinspecciones.racha} RE-inspecciones seguidas vuelven a encontrar hallazgos graves.\n` +
+                `   Lo que no cierra es la REPARACIÓN, no el detector: revisar si las rondas se están\n` +
+                `   dando por buenas sin verificar el caso reproducible de cada ficha.`);
+  else if (reinspecciones.veredicto === 'ok')
+    console.log(`\n⚠  ${reinspecciones.racha} RE-inspecciones seguidas sin un solo hallazgo. En un catálogo donde ninguna\n` +
+                `   primera inspección sale limpia, que la segunda pasada no encuentre nada es sospechoso:\n` +
+                `   comprobar que la re-inspección mira de verdad y no da por buena la reparación.`);
+  // con_hallazgos_menores repetido en re-inspecciones es el resultado ESPERADO de una ronda
+  // que funcionó: los altos ya se arreglaron y solo quedan detalles. No se alarma.
+}

@@ -76,9 +76,17 @@ const TABLAS = [
   `CREATE INDEX IF NOT EXISTS idx_hall_slug ON hallazgos(slug, estado)`,
 ];
 
+/**
+ * `INSPECTOR_DB` apunta a otra base. Existe para poder PROBAR los candados del Inspector
+ * —el contador de veredicto repetido, sin ir más lejos— sin manipular el histórico real,
+ * que es lo único de esta base que no se reconstruye con `inspector:sync` y por tanto lo
+ * único irrecuperable. Sin esta vía, comprobar que una alarma dispara exigía inyectar
+ * inspecciones falsas en el histórico de verdad y acordarse de borrarlas.
+ */
 export function abrir() {
-  fs.mkdirSync(DIR_BASE, { recursive: true });
-  const db = new DatabaseSync(RUTA_BASE);
+  const ruta = process.env.INSPECTOR_DB || RUTA_BASE;
+  fs.mkdirSync(path.dirname(ruta), { recursive: true });
+  const db = new DatabaseSync(ruta);
   for (const t of TABLAS) db.prepare(t).run();
   return db;
 }

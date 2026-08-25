@@ -39,6 +39,7 @@
     "test:apps": "npx playwright test tests/apps",
     "ronda:hoy": "node scripts/ronda-hoy.mjs",
     "inspector:hallazgos": "node scripts/inspector/cerrar.mjs",
+    "inspector:probar-contador": "node scripts/inspector/probar-contador.mjs",
     "check:tipos": "node scripts/check-tipos.mjs"
   },
   "dependencies": {
