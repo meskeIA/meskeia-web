@@ -5,6 +5,7 @@ import { useState, useMemo } from 'react';
 import styles from './SimuladorEcosistemaTrofico.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { formatNumber } from '@/lib';
 
 // ============================================
 // TIPOS
@@ -116,21 +117,26 @@ function aplicarEvento(
     poblacion: Math.max(5, Math.min(100, niveles[idx].poblacion * (1 + cambio))),
   };
 
-  // Efecto en cascada hacia arriba (depredadores)
+  // Efecto en cascada hacia arriba (depredadores): quedarse sin presa arrastra al depredador
   for (let i = idx + 1; i < result.length; i++) {
     const factorPresa = result[i - 1].poblacion / niveles[i - 1].poblacion;
     result[i] = {
       ...result[i],
-      poblacion: Math.max(2, Math.min(100, niveles[i].poblacion * (0.3 + 0.7 * factorPresa))),
+      poblacion: Math.max(2, Math.min(100, niveles[i].poblacion * (1 - ATENUACION + ATENUACION * factorPresa))),
     };
   }
 
-  // Efecto en cascada hacia abajo (presas)
+  // Efecto en cascada hacia abajo (presas): perder depredador libera a la presa
   for (let i = idx - 1; i >= 0; i--) {
     const factorDepred = result[i + 1].poblacion / niveles[i + 1].poblacion;
+    // Con la MISMA atenuación que hacia arriba. Antes era `2 − factorDepred`, que traslada el
+    // cambio con magnitud idéntica: un −50 % en el depredador daba un +50 % en la presa,
+    // mientras el paso 3 del bloque educativo prometía «un cambio menor, del orden del
+    // 20-30 %, en los niveles adyacentes» (hallazgo 324). La asimetría no tenía ninguna
+    // justificación biológica: era la de arriba la que atenuaba y la de abajo la que no.
     result[i] = {
       ...result[i],
-      poblacion: Math.max(5, Math.min(100, niveles[i].poblacion * (2 - factorDepred))),
+      poblacion: Math.max(5, Math.min(100, niveles[i].poblacion * (1 + ATENUACION * (1 - factorDepred)))),
     };
   }
 
@@ -183,6 +189,15 @@ function generarExplicacion(
 // COLORES POR NIVEL
 // ============================================
 const COLORES_NIVEL = ['#3a7d44', '#d4a017', '#d4621c', '#c0392b'];
+
+/**
+ * Cuánto del cambio de un nivel llega al de al lado.
+ *
+ * Es lo que hace que una cascada trófica se vaya apagando en vez de propagarse intacta, y va
+ * en LOS DOS SENTIDOS: hasta el 25/08/2026 la cascada hacia arriba atenuaba con este mismo
+ * 0,7 y la de abajo no atenuaba nada, sin ninguna razón biológica detrás.
+ */
+const ATENUACION = 0.7;
 const NOMBRES_CLASE_NIVEL = [
   styles.nivelProductor,
   styles.nivelHerbivoro,
@@ -231,7 +246,7 @@ export default function SimuladorEcosistemaTroficoPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🌍 Simulador de Ecosistema: Cadena Trófica</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🌍</span> Simulador de Ecosistema: Cadena Trófica</h1>
           <p className={styles.subtitle}>
             Selecciona un ecosistema, aplica una perturbación y observa cómo la cascada trófica
             transforma cada nivel. Aprende la regla del 10% de la energía en acción.
@@ -244,6 +259,7 @@ export default function SimuladorEcosistemaTroficoPage() {
         <div className={styles.ecosistemaSelector} role="group" aria-label="Seleccionar ecosistema">
           {ECOSISTEMAS.map(eco => (
             <button
+              type="button"
               key={eco.id}
               className={`${styles.ecosistemaBtn} ${ecosistemaId === eco.id ? styles.ecosistemaBtnActivo : ''}`}
               onClick={() => { setEcosistemaId(eco.id); setEventoId('ninguno'); }}
@@ -259,6 +275,7 @@ export default function SimuladorEcosistemaTroficoPage() {
         <div className={styles.eventoSelector} role="group" aria-label="Seleccionar perturbación">
           {EVENTOS.map(ev => (
             <button
+              type="button"
               key={ev.id}
               className={`${styles.eventoBtn} ${eventoId === ev.id ? styles.eventoBtnActivo : ''}`}
               onClick={() => setEventoId(ev.id)}
@@ -293,16 +310,27 @@ export default function SimuladorEcosistemaTroficoPage() {
         {/* VISUALIZACIÓN PRINCIPAL */}
         <div className={styles.simLayout}>
           {/* PIRÁMIDE TRÓFICA */}
-          <div className={styles.piramide} aria-label="Pirámide trófica">
+          {/* `role="list"`: los cuatro escalones llevan role="listitem", y un listitem sin
+              lista padre es inválido — los lectores de pantalla no anunciaban ni la lista ni
+              la posición de cada nivel, que es justo la información que ordena una pirámide
+              trófica (hallazgo 327). */}
+          <div className={styles.piramide} role="list" aria-label="Pirámide trófica">
             <p className={styles.piramideTitulo}>Pirámide trófica</p>
             {nivelesInvertidos.map((nivel, idx) => {
               const idxOriginal = 3 - idx;
               return (
                 <div key={nivel.nombre} className={styles.nivelWrapper}>
                   {/* Flecha de energía entre niveles (no en el último = base) */}
+                  {/* La flecha apunta hacia ARRIBA, que es donde va la energía. Decía
+                      «↓ 10% energía» sobre una pirámide con los productores en la base, así
+                      que leída literalmente enseñaba que el 10% pasa de los superdepredadores
+                      a los carnívoros y de estos a los herbívoros: justo lo contrario de la
+                      regla de Lindeman que el subtítulo de la app promete enseñar
+                      (hallazgo 325). Va aria-hidden, así que el error solo lo veía quien mira
+                      — es decir, el público de secundaria al que apunta la metadata. */}
                   {idx > 0 && (
                     <div className={styles.flechaEnergia} aria-hidden="true">
-                      <span>↓ 10% energía</span>
+                      <span>↑ solo el 10% de la energía sube a este nivel</span>
                     </div>
                   )}
                   <div
@@ -340,7 +368,11 @@ export default function SimuladorEcosistemaTroficoPage() {
                     </span>
                     <span className={styles.barraValor} style={{ color }}>
                       {Math.round(porcActual)}
-                      {porcActual !== porcOriginal && (
+                      {/* El delta se decide sobre el valor REDONDEADO, que es el que se
+                          imprime. Comparando los valores sin redondear, una sequía al 1 %
+                          pintaba «40 (0)» —un cambio de cero anunciado como si fuera un
+                          cambio— porque la diferencia real era 0,168 (hallazgo 328). */}
+                      {Math.round(porcActual - porcOriginal) !== 0 && (
                         <span className={styles.barraDelta}>
                           {' '}({porcActual > porcOriginal ? '+' : ''}{Math.round(porcActual - porcOriginal)})
                         </span>
@@ -374,23 +406,22 @@ export default function SimuladorEcosistemaTroficoPage() {
                 un concepto distinto de la <strong>población relativa</strong> mostrada en las barras de arriba:
                 un nivel puede tener pocos individuos pero canalizar mucha energía, o al contrario.
               </p>
+              {/* Las cifras se LEEN del dato (`energiaPorcentaje`), no se escriben a mano.
+                  Estaban rellenas en los 16 niveles de los cuatro ecosistemas y no se leían
+                  en ninguna parte del render: eran dos fuentes para el mismo número, y nada
+                  habría detectado que una cambiara sin la otra (hallazgo 329). Y como cada
+                  ecosistema tiene sus propios nombres de nivel, la leyenda ahora los sigue en
+                  vez de dar por hecho los de la pradera. */}
               <div className={styles.leyendaFila}>
-                <div className={styles.leyendaLinea}>
-                  <div className={styles.leyendaProduces} style={{ background: COLORES_NIVEL[0] }} />
-                  <span>Productores: 100% energía solar</span>
-                </div>
-                <div className={styles.leyendaLinea}>
-                  <div className={styles.leyendaProduces} style={{ background: COLORES_NIVEL[1] }} />
-                  <span>Herbívoros: 10%</span>
-                </div>
-                <div className={styles.leyendaLinea}>
-                  <div className={styles.leyendaProduces} style={{ background: COLORES_NIVEL[2] }} />
-                  <span>Carnívoros: 1%</span>
-                </div>
-                <div className={styles.leyendaLinea}>
-                  <div className={styles.leyendaProduces} style={{ background: COLORES_NIVEL[3] }} />
-                  <span>Superdepredadores: 0,1%</span>
-                </div>
+                {ecosistema.niveles.map((nivel, idx) => (
+                  <div className={styles.leyendaLinea} key={nivel.nombre}>
+                    <div className={styles.leyendaProduces} style={{ background: COLORES_NIVEL[idx] }} />
+                    <span>
+                      {nivel.nombre}: {formatNumber(nivel.energiaPorcentaje, nivel.energiaPorcentaje < 1 ? 1 : 0)}%
+                      {idx === 0 ? ' energía solar' : ''}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -404,8 +435,8 @@ export default function SimuladorEcosistemaTroficoPage() {
 
         {/* BOTÓN RESTABLECER */}
         <div className={styles.resetRow}>
-          <button onClick={handleReset} className={styles.btnReset}>
-            🔄 Restablecer equilibrio
+          <button type="button" onClick={handleReset} className={styles.btnReset}>
+            <span aria-hidden="true">🔄</span> Restablecer equilibrio
           </button>
         </div>
 
@@ -449,42 +480,42 @@ export default function SimuladorEcosistemaTroficoPage() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td>🌾 Pradera</td>
+                    <td><span aria-hidden="true">🌾</span> Pradera</td>
                     <td>Gramíneas (Poaceae)</td>
                     <td>Conejos, topillos</td>
                     <td>Águila real</td>
                     <td>Desertificación</td>
                   </tr>
                   <tr>
-                    <td>🌲 Bosque Templado</td>
+                    <td><span aria-hidden="true">🌲</span> Bosque Templado</td>
                     <td>Robles y hayas</td>
                     <td>Ciervos (Cervus elaphus)</td>
                     <td>Lobo gris</td>
                     <td>Deforestación</td>
                   </tr>
                   <tr>
-                    <td>🌊 Océano</td>
+                    <td><span aria-hidden="true">🌊</span> Océano</td>
                     <td>Fitoplancton</td>
                     <td>Zooplancton / krill</td>
                     <td>Gran tiburón blanco</td>
                     <td>Acidificación + sobrepesca</td>
                   </tr>
                   <tr>
-                    <td>🌅 Sabana</td>
+                    <td><span aria-hidden="true">🌅</span> Sabana</td>
                     <td>Gramíneas tropicales</td>
                     <td>Cebras y ñus</td>
                     <td>León africano</td>
                     <td>Sequía + fragmentación</td>
                   </tr>
                   <tr>
-                    <td>🏔️ Tundra Ártica</td>
+                    <td><span aria-hidden="true">🏔️</span> Tundra Ártica</td>
                     <td>Líquenes y musgos</td>
                     <td>Caribús, lemmings</td>
                     <td>Oso polar</td>
                     <td>Deshielo ártico (cambio climático)</td>
                   </tr>
                   <tr>
-                    <td>🌿 Manglar</td>
+                    <td><span aria-hidden="true">🌿</span> Manglar</td>
                     <td>Mangle (Rhizophora spp.)</td>
                     <td>Cangrejos fangosos</td>
                     <td>Cocodrilo marino</td>
@@ -499,7 +530,7 @@ export default function SimuladorEcosistemaTroficoPage() {
             <h3>4 escenarios reales de cascadas tróficas</h3>
             <div className={styles.scenariosGrid}>
               <div className={styles.scenarioCard}>
-                <span className={styles.scenarioIcon}>🐺</span>
+                <span className={styles.scenarioIcon} aria-hidden="true">🐺</span>
                 <strong>Reintroducción del lobo en Yellowstone (EE. UU., 1995)</strong>
                 <p>
                   La vuelta de los lobos redujo a los ciervos y cambió su comportamiento (dejaron
@@ -509,7 +540,7 @@ export default function SimuladorEcosistemaTroficoPage() {
                 </p>
               </div>
               <div className={styles.scenarioCard}>
-                <span className={styles.scenarioIcon}>🦈</span>
+                <span className={styles.scenarioIcon} aria-hidden="true">🦈</span>
                 <strong>Sobrepesca de tiburones en el Atlántico noroeste</strong>
                 <p>
                   Según Myers et al. (2007, <em>Science</em>), el desplome de los grandes tiburones
@@ -519,7 +550,7 @@ export default function SimuladorEcosistemaTroficoPage() {
                 </p>
               </div>
               <div className={styles.scenarioCard}>
-                <span className={styles.scenarioIcon}>🌳</span>
+                <span className={styles.scenarioIcon} aria-hidden="true">🌳</span>
                 <strong>Deforestación amazónica y ciclos del agua</strong>
                 <p>
                   Los árboles amazónicos generan los «ríos voladores» que alimentan las lluvias
@@ -529,7 +560,7 @@ export default function SimuladorEcosistemaTroficoPage() {
                 </p>
               </div>
               <div className={styles.scenarioCard}>
-                <span className={styles.scenarioIcon}>💧</span>
+                <span className={styles.scenarioIcon} aria-hidden="true">💧</span>
                 <strong>Eutrofización de lagos y proliferación de algas</strong>
                 <p>
                   El exceso de nutrientes (nitratos, fosfatos) dispara la producción de algas
@@ -554,9 +585,19 @@ export default function SimuladorEcosistemaTroficoPage() {
                   los elefantes en la sabana africana y las estrellas de mar Pisaster en la costa
                   noroeste de EE. UU. (el caso original descrito por Paine, 1969).
                 </p>
+                {/* Prometía «la eliminación de un nivel», y el suelo del modelo la hace
+                    imposible en cualquier ecosistema y a cualquier intensidad: el peor
+                    impacto es −0,7 y la menor población de carnívoros es 12, así que nunca se
+                    baja de 5 (hallazgo 323). Se describe lo que el simulador SÍ enseña, y se
+                    dice por qué no llega a cero: es un modelo simplificado con suelo, no una
+                    afirmación de que un nivel no pueda extinguirse. */}
                 <p className={styles.faqTip}>
-                  💡 En el simulador, prueba &quot;caza excesiva del depredador&quot; al 100%: verás que la
-                  eliminación de un nivel provoca una cascada en cascada en todos los demás.
+                  <span aria-hidden="true">💡</span> En el simulador, prueba &quot;caza excesiva del
+                  depredador&quot; al 100% en la pradera: los carnívoros caen a un tercio y el efecto
+                  recorre toda la pirámide, apagándose a cada nivel. El modelo tiene un suelo de
+                  población y no llega a cero —es una simplificación, no una afirmación de que un
+                  nivel no pueda extinguirse—, pero la forma de la cascada es la misma que
+                  describen los casos reales de arriba.
                 </p>
               </div>
 
@@ -570,7 +611,7 @@ export default function SimuladorEcosistemaTroficoPage() {
                   de productor. Esto limita físicamente la longitud de las cadenas tróficas.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 La segunda ley de la termodinámica es la raíz de este principio: en toda
+                  <span aria-hidden="true">💡</span> La segunda ley de la termodinámica es la raíz de este principio: en toda
                   transferencia de energía siempre hay pérdidas irrecuperables (entropía).
                 </p>
               </div>
@@ -586,7 +627,7 @@ export default function SimuladorEcosistemaTroficoPage() {
                   los niveles superiores.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 La mayoría de ecosistemas funcionan con ambas direcciones al mismo tiempo,
+                  <span aria-hidden="true">💡</span> La mayoría de ecosistemas funcionan con ambas direcciones al mismo tiempo,
                   aunque generalmente domina una según el contexto.
                 </p>
               </div>
@@ -601,7 +642,7 @@ export default function SimuladorEcosistemaTroficoPage() {
                   pueden existir cadenas algo más largas.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 Los ecosistemas tropicales húmedos tienen cadenas más largas porque la
+                  <span aria-hidden="true">💡</span> Los ecosistemas tropicales húmedos tienen cadenas más largas porque la
                   alta productividad primaria permite sustentar más niveles.
                 </p>
               </div>
@@ -616,7 +657,7 @@ export default function SimuladorEcosistemaTroficoPage() {
                   sistema más resiliente: si desaparece una especie, hay alternativas.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 Este simulador usa cadenas simplificadas (4 niveles). Los ecosistemas reales
+                  <span aria-hidden="true">💡</span> Este simulador usa cadenas simplificadas (4 niveles). Los ecosistemas reales
                   tienen redes con decenas o cientos de especies interconectadas.
                 </p>
               </div>
@@ -644,7 +685,7 @@ export default function SimuladorEcosistemaTroficoPage() {
                 <div className={styles.stepNumber}>3</div>
                 <div className={styles.stepContent}>
                   <strong>Evalúa la magnitud del impacto con el modelo simplificado</strong>
-                  <p>Como aproximación orientativa (no una ley empírica), cada nivel trófico tiende a atenuar el impacto: un cambio del 50% en un nivel suele traducirse en un cambio menor —del orden del 20-30%— en los niveles adyacentes, ya que los ecosistemas tienen cierta inercia y capacidad de amortiguación. La magnitud real varía mucho según el ecosistema y las especies implicadas.</p>
+                  <p>Como aproximación orientativa (no una ley empírica), cada nivel trófico tiende a atenuar el impacto: en este simulador un cambio del 50% en un nivel se traduce en algo más de un 35% en el nivel de al lado, y en torno a un 25% en el siguiente, porque los ecosistemas tienen cierta inercia y capacidad de amortiguación. Puedes seguirlo tú: prueba «caza excesiva del depredador» al 71% en la pradera y verás −50% en carnívoros, +35% en herbívoros y −24% en productores. La magnitud real varía mucho según el ecosistema y las especies implicadas.</p>
                 </div>
               </div>
               <div className={styles.step}>
@@ -668,22 +709,22 @@ export default function SimuladorEcosistemaTroficoPage() {
             <h3>4 claves para interpretar las cadenas tróficas</h3>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🔑</span>
+                <span className={styles.tipIcon} aria-hidden="true">🔑</span>
                 <strong>Busca la especie clave</strong>
                 <p>Pregúntate: ¿qué especie, si desapareciese, cambiaría radicalmente este ecosistema? Suele ser un depredador ápice o un ingeniero del ecosistema (castores, elefantes). No siempre es el más abundante.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>⚡</span>
+                <span className={styles.tipIcon} aria-hidden="true">⚡</span>
                 <strong>Calcula la energía disponible en cada nivel</strong>
                 <p>Multiplica la producción primaria (kJ/m²/año) por 0,10 en cada paso. Si la pradera produce 10.000 kJ/m²/año, los herbívoros tendrán ~1.000, los carnívoros ~100 y los superdepredadores ~10 kJ/m²/año.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🔄</span>
+                <span className={styles.tipIcon} aria-hidden="true">🔄</span>
                 <strong>No olvides los descomponedores</strong>
                 <p>Bacterias y hongos descomponen la materia orgánica de todos los niveles y devuelven nutrientes al suelo o al agua. Sin ellos, los ciclos biogeoquímicos se romperían y los productores quedarían sin nutrientes.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📊</span>
+                <span className={styles.tipIcon} aria-hidden="true">📊</span>
                 <strong>Distingue biomasa, número e individuos y energía</strong>
                 <p>La pirámide de energía siempre es cónica (base ancha). La de biomasa casi siempre también. Pero la de número de individuos puede invertirse: un árbol (un individuo, mucha biomasa) puede albergar miles de insectos herbívoros.</p>
               </div>

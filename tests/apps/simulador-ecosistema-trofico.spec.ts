@@ -130,10 +130,16 @@ test.describe('simulador-ecosistema-trofico', () => {
     await seleccionar(page, 'Caza excesiva del depredador', '1');
     const barras = await leerBarras(page);
 
-    // Valores del encabezado, CASO 2: 15×0,30=4,5 recortado a 5 por max(5, …);
-    // hacia arriba 5×0,53333=2,6667; hacia abajo 40×1,66667=66,6667 y 100×0,33333=33,3333.
-    expect(barras.map((b) => b.valor)).toEqual([33, 67, 5, 3]);
-    expect(barras.map((b) => b.texto)).toEqual(['33 (-67)', '67 (+27)', '5 (-10)', '3 (-2)']);
+    // 15 × 0,30 = 4,5 recortado a 5 por max(5, …). Desde el 25/08/2026 la cascada atenúa en
+    // los DOS sentidos con el mismo factor 0,7 (hallazgo 324): antes la de arriba atenuaba y
+    // la de abajo trasladaba el cambio intacto, sin ninguna razón biológica detrás.
+    //   hacia arriba  · superdepredadores: 5 × (0,3 + 0,7 × 5/15)      = 2,667 → 3
+    //   hacia abajo   · herbívoros:       40 × (1 + 0,7 × (1 − 5/15))  = 58,67 → 59
+    //                 · productores:     100 × (1 + 0,7 × (1 − 58,67/40)) = 67,33 → 67
+    // La cascada se APAGA a cada nivel: −67 % en carnívoros, +47 % en herbívoros, −33 % en
+    // productores. Antes daba −67 %, +67 %, −67 %: se propagaba intacta.
+    expect(barras.map((b) => b.valor)).toEqual([67, 59, 5, 3]);
+    expect(barras.map((b) => b.texto)).toEqual(['67 (-33)', '59 (+19)', '5 (-10)', '3 (-2)']);
 
     // El nivel cazado NO se extingue: el suelo lo deja en 5 = 33 % de los 15 originales
     expect(barras[2].valor).toBe(5);
@@ -151,10 +157,13 @@ test.describe('simulador-ecosistema-trofico', () => {
     expect(barras[1].valor).toBeGreaterThan(40); // herbívoros suben desde 40
     expect(barras[0].valor).toBeLessThan(100); // productores bajan desde 100
 
+    // La cascada se APAGA nivel a nivel, que es lo que el bloque educativo promete: el −67 %
+    // de los carnívoros llega como +47 % a los herbívoros y como −33 % a los productores.
+    // Antes se propagaba intacta —67 % en los tres— y el texto del paso 3 mentía.
     const explicacion = page.locator('[role="status"]');
-    await expect(explicacion).toContainText('productores han reducido un 67%');
-    await expect(explicacion).toContainText('herbívoros han aumentado un 67%');
     await expect(explicacion).toContainText('carnívoros han reducido un 67%');
+    await expect(explicacion).toContainText('herbívoros han aumentado un 47%');
+    await expect(explicacion).toContainText('productores han reducido un 33%');
     await expect(explicacion).toContainText('superdepredadores han reducido un 47%');
   });
 

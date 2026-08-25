@@ -1,5 +1,7 @@
 // Calculadoras de Cocina Técnica — lógica pura
 
+import { formatNumber } from '@/lib/formatters';
+
 // ─── 1. Baker's Percentage (porcentaje del panadero) ─────────────────────────
 
 export interface IngredienteBaker {
@@ -136,12 +138,28 @@ export function calcularSustitucionMasaMadre(
     case 'seca':         levadura_seca_equivalente_g = levadura_g; break;
   }
 
-  // 20g masa madre (100%) por 1g levadura seca
-  const factor_mm = 20;
-  const masa_madre_g = Math.round(levadura_seca_equivalente_g * factor_mm);
+  // 20 g de masa madre AL 100 % por cada gramo de levadura seca. De esos 20 g, la mitad es
+  // harina: la hidratación del panadero es agua/harina, así que al 100 % hay tanta agua como
+  // harina. Esos 10 g son la HARINA PREFERMENTADA, que es lo que de verdad gobierna la
+  // fermentación — la levadura y las bacterias viven en ella, no en el agua.
+  const factor_mm_al_100 = 20;
+  const harina_prefermentada_g = levadura_seca_equivalente_g * factor_mm_al_100 / 2;
 
-  // La masa madre aporta harina y agua según su hidratación
-  // hidratacion_mm_pct = agua/(agua+harina)*100 → agua = hid/(100+hid)*masa_madre
+  // Y de ahí sale cuánta masa madre hace falta A LA HIDRATACIÓN QUE TENGA la del panadero.
+  //
+  // Hasta el 25/08/2026 la dosis era `levadura × 20` fija, y el deslizador de hidratación solo
+  // cambiaba el reparto harina/agua a restar de la receta. Consecuencia: la harina
+  // prefermentada que de verdad entraba en la masa se desviaba del ancla que la propia app
+  // declara — 40 g al 50 % (+33 %) y 24 g al 150 % (−20 %) frente a los 30 g del 100 %—, así
+  // que dos panaderos con la misma receta y fermentos de distinta hidratación obtenían
+  // fermentaciones distintas creyendo hacer lo mismo (hallazgo 288).
+  const masa_madre_g = Math.round(harina_prefermentada_g * (100 + hidratacion_mm_pct) / 100);
+
+  // Lo que la masa madre aporta a la receta, para restarlo de la harina y el agua originales.
+  // hidratacion_mm_pct = agua/harina × 100  →  harina = masa_madre × 100/(100 + hid)
+  // (el comentario que había aquí decía «agua/(agua+harina)», que es la definición de otra
+  // cosa y NO la que implementa esta línea: una trampa para quien viniera a «corregirlo»
+  // hacia el comentario y rompiera de golpe la app, la Action de ChatGPT y la tool del MCP.)
   const harina_en_mm_g = Math.round(masa_madre_g * 100 / (100 + hidratacion_mm_pct));
   const agua_en_mm_g   = masa_madre_g - harina_en_mm_g;
 
@@ -155,7 +173,9 @@ export function calcularSustitucionMasaMadre(
     // Para informar al usuario cuánto aporta la MM en términos de receta ajustada
     harina_adicional_g: 0,
     agua_adicional_g: 0,
-    nota: `Resta ${harina_en_mm_g}g de harina y ${agua_en_mm_g}g de agua de tu receta original para compensar lo que aporta la masa madre.`,
+    // Formato español: separador de millar y ESPACIO antes de la unidad. Escribía «50g»
+    // pegado mientras las dos fichas visibles de la app sí ponen «- 50 g» (hallazgo 289).
+    nota: `Resta ${formatNumber(harina_en_mm_g, 0)} g de harina y ${formatNumber(agua_en_mm_g, 0)} g de agua de tu receta original para compensar lo que aporta la masa madre.`,
     tiempo_fermentacion: 'Con masa madre activa: 4–6h en bloque a temperatura ambiente + 1–2h en frío. Ajusta según la actividad de tu fermento.',
   };
 }

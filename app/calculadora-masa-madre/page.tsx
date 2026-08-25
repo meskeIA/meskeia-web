@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { formatNumber, parseSpanishNumber } from '@/lib';
 import {
   calcularSustitucionMasaMadre,
   type TipoLevaduraOrigen,
@@ -29,12 +30,23 @@ export default function CalculadoraMasaMadrePage() {
   const [hidratacion, setHidratacion] = useState<number>(100);
 
   const resultado = useCallback(() => {
-    const g = parseFloat(levaduraG.replace(',', '.'));
-    if (!g || g <= 0) return null;
+    // `parseSpanishNumber`, el parser canónico del proyecto, no `parseFloat`: aquel colaba
+    // entradas que no son números —«12abc» daba 240 g y «1e3» daba 20.000 g— y leía el millar
+    // español mil veces más pequeño, así que «1.500» (mil quinientos) se convertía en 1,5 g
+    // (hallazgo 290).
+    const g = parseSpanishNumber(levaduraG);
+    if (!Number.isFinite(g) || g <= 0) return null;
     return calcularSustitucionMasaMadre(tipoLevadura, g, hidratacion);
   }, [tipoLevadura, levaduraG, hidratacion]);
 
   const res = resultado();
+
+  /**
+   * Cierto cuando la cantidad es positiva pero tan pequeña que la conversión se redondea a
+   * cero. Presentar «Masa madre a añadir: 0 g» con sus restas de 0 g es dar por buena una
+   * respuesta que no lo es (hallazgo 291).
+   */
+  const cantidadNoConvertible = res !== null && res.masa_madre_g <= 0;
 
   function handleLevaduraChange(e: React.ChangeEvent<HTMLInputElement>) {
     setLevaduraG(e.target.value);
@@ -58,6 +70,7 @@ export default function CalculadoraMasaMadrePage() {
         <div className={styles.tipoGroup}>
           {TIPOS.map(t => (
             <button
+              type="button"
               key={t.id}
               className={`${styles.tipoBtn} ${tipoLevadura === t.id ? styles.tipoBtnActivo : ''}`}
               onClick={() => setTipoLevadura(t.id)}
@@ -70,6 +83,9 @@ export default function CalculadoraMasaMadrePage() {
 
         <div className={styles.equivalenciasBox}>
           <strong>Equivalencias orientativas:</strong> 1 g levadura seca ≈ 1 g levadura instantánea ≈ 3 g levadura fresca ≈ 20 g de masa madre activa al 100% de hidratación.
+          Si tu masa madre está a otra hidratación, la cantidad cambia para que la <strong>harina
+          prefermentada</strong> sea la misma —es donde vive el fermento—: al 50% hacen falta 15 g
+          por cada 1 g de levadura seca, y al 150%, 25 g.
           Estas equivalencias pueden variar según la fuerza del fermento y la temperatura.
         </div>
 
@@ -124,36 +140,46 @@ export default function CalculadoraMasaMadrePage() {
           </div>
         </div>
 
-        {res && (
+        {cantidadNoConvertible && (
+          <div role="alert" className={styles.equivalenciasBox}>
+            Esa cantidad es demasiado pequeña para convertirla: la masa madre equivalente no
+            llega ni a un gramo. Prueba con la cantidad total de la receta.
+          </div>
+        )}
+
+        {res && !cantidadNoConvertible && (
           <div className={styles.resultadoBox} role="status" aria-live="polite">
             <div className={styles.resultadoGrid}>
               <div className={styles.resultItem}>
                 <div className={styles.resultLabel}>Masa madre a añadir</div>
-                <div className={styles.resultValorGrande}>{res.masa_madre_g} <span className={styles.resultUnidad}>g</span></div>
+                {/* Por `formatNumber`, no crudo: a partir de cuatro cifras faltaba el
+                    separador de millar y salía «10000 g» donde toca «10.000 g»
+                    (hallazgo 289, formato español obligatorio del CLAUDE.md §2). */}
+                <div className={styles.resultValorGrande}>{formatNumber(res.masa_madre_g, 0)} <span className={styles.resultUnidad}>g</span></div>
               </div>
               <div className={styles.resultItem}>
                 <div className={styles.resultLabel}>Hidratación aplicada</div>
-                <div className={styles.resultValorGrande}>{res.hidratacion_mm_pct} <span className={styles.resultUnidad}>%</span></div>
+                <div className={styles.resultValorGrande}>{formatNumber(res.hidratacion_mm_pct, 0)} <span className={styles.resultUnidad}>%</span></div>
               </div>
             </div>
 
             <div className={styles.resultadoAjustes}>
               <div className={styles.ajusteItem}>
                 <span className={styles.ajusteLabel}>Harina a restar</span>
-                <span className={styles.ajusteValor}>− {res.harina_restar_g} g</span>
+                <span className={styles.ajusteValor}>− {formatNumber(res.harina_restar_g, 0)} g</span>
               </div>
               <div className={styles.ajusteItem}>
                 <span className={styles.ajusteLabel}>Agua a restar</span>
-                <span className={styles.ajusteValor}>− {res.agua_restar_g} g</span>
+                <span className={styles.ajusteValor}>− {formatNumber(res.agua_restar_g, 0)} g</span>
               </div>
             </div>
 
             <div className={styles.notaBox}>
-              💡 {res.nota}
+              <span aria-hidden="true">💡</span> {res.nota}
             </div>
 
             <div className={styles.tiempoBox}>
-              <span className={styles.tiempoIcon}>⏱️</span>
+              <span className={styles.tiempoIcon} aria-hidden="true">⏱️</span>
               <strong>Fermentación:</strong> {res.tiempo_fermentacion}
             </div>
           </div>
@@ -202,22 +228,22 @@ export default function CalculadoraMasaMadrePage() {
 
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <div className={styles.escenarioIcon}>🥖</div>
+            <div className={styles.escenarioIcon} aria-hidden="true">🥖</div>
             <h3>Baguette con 2 g levadura seca</h3>
             <p>Con MM al 100%: añadir 40 g de masa madre, restar 20 g harina y 20 g agua. Fermentación lenta en nevera 12–16h.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <div className={styles.escenarioIcon}>🍕</div>
+            <div className={styles.escenarioIcon} aria-hidden="true">🍕</div>
             <h3>Pizza con 5 g levadura fresca</h3>
             <p>Con MM al 100%: añadir 33 g de masa madre, restar 17 g harina y 16 g agua. Retardo en nevera 24–48h para más sabor.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <div className={styles.escenarioIcon}>🫓</div>
+            <div className={styles.escenarioIcon} aria-hidden="true">🫓</div>
             <h3>Pan de molde con 7 g levadura seca</h3>
             <p>Con MM al 100%: añadir 140 g masa madre, restar 70 g harina y 70 g agua. Fermentación a temperatura ambiente: 4–6h.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <div className={styles.escenarioIcon}>🥐</div>
+            <div className={styles.escenarioIcon} aria-hidden="true">🥐</div>
             <h3>Brioche con 10 g levadura fresca</h3>
             <p>Con MM al 100%: añadir 67 g masa madre. Considera que la grasa y el azúcar ralentizan la fermentación: puede necesitar más tiempo.</p>
           </div>
@@ -258,22 +284,22 @@ export default function CalculadoraMasaMadrePage() {
 
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>🌡️</div>
+            <div className={styles.tipIcon} aria-hidden="true">🌡️</div>
             <h4>Controla la temperatura</h4>
             <p>A 24–26°C la fermentación va bien. Por encima de 30°C se acelera mucho y puede volverse demasiado ácida.</p>
           </div>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>⏰</div>
+            <div className={styles.tipIcon} aria-hidden="true">⏰</div>
             <h4>Paciencia con los tiempos</h4>
             <p>El rango 4–8h de fermentación en bloque puede variar. Observa el volumen y la textura, no el reloj.</p>
           </div>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>🍞</div>
+            <div className={styles.tipIcon} aria-hidden="true">🍞</div>
             <h4>Refresca antes de usar</h4>
             <p>Alimenta tu masa madre 4–12h antes de usarla para que esté en su máximo de actividad.</p>
           </div>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>🧪</div>
+            <div className={styles.tipIcon} aria-hidden="true">🧪</div>
             <h4>Anota tus resultados</h4>
             <p>Cada masa madre es única. Lleva un registro de tiempos y temperaturas para ajustar en futuras panificaciones.</p>
           </div>
