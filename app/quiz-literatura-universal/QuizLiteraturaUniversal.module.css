@@ -87,8 +87,22 @@
 .explicacionMal { background: rgba(231,76,60,0.06); border-color: #E74C3C; }
 .explicacionTexto { font-size: 0.88rem; color: var(--text-primary); line-height: 1.6; margin: 0; }
 
+/* El veredicto en TEXTO: acertar o fallar no puede transmitirse solo con el color y unas
+   marcas aria-hidden (WCAG 1.4.1). */
+.explicacionVeredicto { font-size: 0.95rem; font-weight: 700; margin: 0 0 0.4rem; color: var(--text-primary); }
+.explicacionBien .explicacionVeredicto { color: #1E8449; }
+.explicacionMal .explicacionVeredicto { color: #C0392B; }
+
 .btnSiguiente { display: block; width: 100%; padding: 0.9rem; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: opacity 0.15s ease; }
 .btnSiguiente:hover { opacity: 0.9; }
+
+/* Salida de la partida: discreta, para no competir con «Siguiente», pero siempre presente. */
+.btnAbandonar { display: block; margin: 0.75rem auto 0; padding: 0.5rem 1rem; background: none; color: var(--text-secondary); border: none; font-size: 0.85rem; cursor: pointer; text-decoration: underline; }
+.btnAbandonar:hover { color: var(--text-primary); }
+.btnAbandonar:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 6px; }
+
+[data-theme='dark'] .explicacionBien .explicacionVeredicto { color: #58D68D; }
+[data-theme='dark'] .explicacionMal .explicacionVeredicto { color: #EC7063; }
 
 /* ── Resultado ── */
 .resultadoBox { margin-bottom: 2rem; }

@@ -41,27 +41,50 @@ import { verbosIrregulares } from '../../data/verbos-irregulares';
  * CUALQUIER tanda: 4 opciones distintas, la correcta entre ellas, ningún verbo repetido, la
  * conjugación del banner cuadrando con el canon y el marcador cuadrando pregunta a pregunta.
  *
- * HALLAZGOS ABIERTOS: al final, marcados con `test.fail()`. Afirman lo que DEBERÍA pasar,
- * así que hoy fallan a propósito; cuando se reparen, se les quita el `test.fail()` y quedan
- * como regresión.
+ * HALLAZGOS: los siete de esta pasada se repararon el 25/08/2026 y quedan al final como
+ * REGRESIÓN, ya sin `test.fail()`. Dos decisiones de esa reparación cambian lo que estos
+ * tests pueden dar por supuesto, y por eso se nombran aquí:
+ *   · «show» sale del sorteo de preguntas —su past simple es regular y era el único en -ed
+ *     de los 75— pero sigue en las tablas del bloque educativo.
+ *   · de «be» se pregunta «was», no «was / were», y el enunciado lo dice; la conjugación del
+ *     banner sí sigue enseñando las dos formas. De ahí `respuestaQueSePregunta()`.
  */
 
 const RUTA = '/quiz-verbos-irregulares/';
 
 /**
- * Conjugación canónica de los 75 verbos del banco: infinitivo → past simple → past participle.
- * Escrita a mano desde las tablas de verbos irregulares de Oxford/Cambridge. `variantes` lista
- * las OTRAS formas igualmente correctas que la app no ofrece (no son errores del banco, pero
- * sí lo que un alumno puede haber aprendido y aquí se rechazaría).
+ * La forma que el quiz PREGUNTA, que no siempre es el past simple entero del canon.
+ *
+ * Para «be» el past simple es «was / were», pero desde el 25/08/2026 el quiz pregunta la
+ * forma de singular y lo dice en el enunciado: «was / were» era la única respuesta con barra
+ * de los 75, así que se acertaba —y se descartaba de distractor— por la forma de la cadena,
+ * sin saber nada del verbo (hallazgo 316). El banner de feedback sigue enseñando la
+ * conjugación completa, «was / were» incluido.
  */
-const CANON: Record<string, { ps: string; pp: string; es: string; nivel: string; variantes?: string }> = {
+function respuestaQueSePregunta(infinitivo: string): string {
+  return infinitivo === 'be' ? 'was' : CANON[infinitivo].ps;
+}
+
+/**
+ * Conjugación canónica de los 75 verbos del banco: infinitivo → past simple → past participle.
+ * Escrita a mano desde las tablas de verbos irregulares de Oxford/Cambridge.
+ *
+ * `variantes` lista las OTRAS formas igualmente correctas que la app no ofrece (no son
+ * errores del banco, pero sí lo que un alumno puede haber aprendido y aquí se rechazaría).
+ *
+ * `ppAlt` es la variante de participio que el banner DEBE mostrar, con su etiqueta de
+ * variedad. Existe desde el 25/08/2026: la app enseñaba «get → got → got» mientras su propia
+ * caja de avisos decía que get admite got/gotten, y un test de aquí fijaba ese
+ * «get→got→got» como contrato — o sea, consagraba justo el defecto (hallazgo 315).
+ */
+const CANON: Record<string, { ps: string; pp: string; es: string; nivel: string; variantes?: string; ppAlt?: string }> = {
   // ── A1 (15) ──
   be:     { ps: 'was / were', pp: 'been',    es: 'ser / estar',         nivel: 'A1' },
   have:   { ps: 'had',        pp: 'had',     es: 'tener',               nivel: 'A1' },
   do:     { ps: 'did',        pp: 'done',    es: 'hacer',               nivel: 'A1' },
   go:     { ps: 'went',       pp: 'gone',    es: 'ir',                  nivel: 'A1' },
   come:   { ps: 'came',       pp: 'come',    es: 'venir',               nivel: 'A1' },
-  get:    { ps: 'got',        pp: 'got',     es: 'obtener / conseguir', nivel: 'A1', variantes: 'participio «gotten» en inglés americano' },
+  get:    { ps: 'got',        pp: 'got',     es: 'obtener / conseguir', nivel: 'A1', variantes: 'participio «gotten» en inglés americano', ppAlt: 'gotten (AmE)' },
   make:   { ps: 'made',       pp: 'made',    es: 'hacer / fabricar',    nivel: 'A1' },
   know:   { ps: 'knew',       pp: 'known',   es: 'saber / conocer',     nivel: 'A1' },
   think:  { ps: 'thought',    pp: 'thought', es: 'pensar',              nivel: 'A1' },
@@ -106,7 +129,7 @@ const CANON: Record<string, { ps: string; pp: string; es: string; nivel: string;
   pay:    { ps: 'paid',   pp: 'paid',      es: 'pagar',                     nivel: 'B1' },
   sell:   { ps: 'sold',   pp: 'sold',      es: 'vender',                    nivel: 'B1' },
   send:   { ps: 'sent',   pp: 'sent',      es: 'enviar',                    nivel: 'B1' },
-  show:   { ps: 'showed', pp: 'shown',     es: 'mostrar',                   nivel: 'B1', variantes: 'participio «showed» también admitido' },
+  show:   { ps: 'showed', pp: 'shown',     es: 'mostrar',                   nivel: 'B1', variantes: 'participio «showed» también admitido', ppAlt: 'showed (menos frecuente)' },
   sing:   { ps: 'sang',   pp: 'sung',      es: 'cantar',                    nivel: 'B1' },
   spend:  { ps: 'spent',  pp: 'spent',     es: 'gastar / pasar tiempo',     nivel: 'B1' },
   swim:   { ps: 'swam',   pp: 'swum',      es: 'nadar',                     nivel: 'B1' },
@@ -131,38 +154,73 @@ const CANON: Record<string, { ps: string; pp: string; es: string; nivel: string;
   shoot:  { ps: 'shot',    pp: 'shot',      es: 'disparar',           nivel: 'B2' },
   steal:  { ps: 'stole',   pp: 'stolen',    es: 'robar',              nivel: 'B2' },
   throw:  { ps: 'threw',   pp: 'thrown',    es: 'lanzar / tirar',     nivel: 'B2' },
-  wake:   { ps: 'woke',    pp: 'woken',     es: 'despertar',          nivel: 'B2', variantes: '«waked» en inglés americano' },
+  wake:   { ps: 'woke',    pp: 'woken',     es: 'despertar',          nivel: 'B2', variantes: '«waked» en inglés americano', ppAlt: 'waked (AmE)' },
   forbid: { ps: 'forbade', pp: 'forbidden', es: 'prohibir',           nivel: 'B2', variantes: '«forbad», hoy en desuso' },
   shine:  { ps: 'shone',   pp: 'shone',     es: 'brillar',            nivel: 'B2', variantes: '«shined» solo con el sentido transitivo de sacar brillo' },
 };
 
 /**
  * Verbos que el bloque educativo manda practicar EN UN NIVEL CONCRETO del quiz.
- * Salen de las semanas 1, 2 y 3 del «Plan de 30 días» y del consejo de la FAQ
- * «practica estos pares en el nivel B2 del quiz».
+ * Salen de las semanas 1 a 4 del «Plan de 30 días» y del consejo de la FAQ sobre los pares
+ * confundidos.
+ *
+ * Hasta el 25/08/2026 esta tabla listaba 21 verbos, de los que **10 no existían en el banco**
+ * (hit, let, set, shut, burst, cost, become, overcome, lie, raise) y 6 estaban en otro nivel:
+ * quien seguía el plan al pie de la letra practicaba donde esos verbos no salen nunca
+ * (hallazgo 314). El plan se reescribió contra el banco real y esta tabla lo refleja.
  */
 const VERBOS_QUE_EL_PLAN_MANDA_PRACTICAR: { verbo: string; nivelQuePideElPlan: string; donde: string }[] = [
-  { verbo: 'put',   nivelQuePideElPlan: 'A1', donde: 'Semana 1 (A-A-A), «practica 10 preguntas del nivel A1»' },
-  { verbo: 'cut',   nivelQuePideElPlan: 'A1', donde: 'Semana 1 (A-A-A), «practica 10 preguntas del nivel A1»' },
-  { verbo: 'hit',   nivelQuePideElPlan: 'A1', donde: 'Semana 1 (A-A-A), «practica 10 preguntas del nivel A1»' },
-  { verbo: 'let',   nivelQuePideElPlan: 'A1', donde: 'Semana 1 (A-A-A), «practica 10 preguntas del nivel A1»' },
-  { verbo: 'set',   nivelQuePideElPlan: 'A1', donde: 'Semana 1 (A-A-A), «practica 10 preguntas del nivel A1»' },
-  { verbo: 'shut',  nivelQuePideElPlan: 'A1', donde: 'Semana 1 (A-A-A), «practica 10 preguntas del nivel A1»' },
-  { verbo: 'burst', nivelQuePideElPlan: 'A1', donde: 'Semana 1 (A-A-A), «practica 10 preguntas del nivel A1»' },
-  { verbo: 'cost',  nivelQuePideElPlan: 'A1', donde: 'Semana 1 (A-A-A), «practica 10 preguntas del nivel A1»' },
-  { verbo: 'buy',   nivelQuePideElPlan: 'A2', donde: 'Semana 2, «empieza con los A2 … practica en el nivel A2»' },
-  { verbo: 'bring', nivelQuePideElPlan: 'A2', donde: 'Semana 2, «empieza con los A2 … practica en el nivel A2»' },
-  { verbo: 'think', nivelQuePideElPlan: 'A2', donde: 'Semana 2, «empieza con los A2 … practica en el nivel A2»' },
-  { verbo: 'teach', nivelQuePideElPlan: 'A2', donde: 'Semana 2, «empieza con los A2 … practica en el nivel A2»' },
-  { verbo: 'sell',  nivelQuePideElPlan: 'A2', donde: 'Semana 2, «empieza con los A2 … practica en el nivel A2»' },
-  { verbo: 'lay',   nivelQuePideElPlan: 'B2', donde: 'FAQ, «practica estos pares en el nivel B2 del quiz»' },
-  { verbo: 'lie',   nivelQuePideElPlan: 'B2', donde: 'FAQ, «practica estos pares en el nivel B2 del quiz»' },
-  { verbo: 'rise',  nivelQuePideElPlan: 'B2', donde: 'FAQ, «practica estos pares en el nivel B2 del quiz»' },
-  { verbo: 'raise', nivelQuePideElPlan: 'B2', donde: 'FAQ, «practica estos pares en el nivel B2 del quiz»' },
-  { verbo: 'fall',  nivelQuePideElPlan: 'B2', donde: 'FAQ, «practica estos pares en el nivel B2 del quiz»' },
-  { verbo: 'feel',  nivelQuePideElPlan: 'B2', donde: 'FAQ, «practica estos pares en el nivel B2 del quiz»' },
-  { verbo: 'find',  nivelQuePideElPlan: 'B2', donde: 'FAQ, «practica estos pares en el nivel B2 del quiz»' },
+  // Semana 1 — A-A-A. El plan ya no manda un nivel concreto para estos, porque están
+  // repartidos: dice «practica en el nivel Completo». Lo que sí afirma es dónde está cada uno.
+  { verbo: 'put',   nivelQuePideElPlan: 'A2', donde: 'Semana 1 (A-A-A), «put (A2)»' },
+  { verbo: 'cut',   nivelQuePideElPlan: 'B1', donde: 'Semana 1 (A-A-A), «cut y hurt (B1)»' },
+  { verbo: 'hurt',  nivelQuePideElPlan: 'B1', donde: 'Semana 1 (A-A-A), «cut y hurt (B1)»' },
+  { verbo: 'read',  nivelQuePideElPlan: 'A2', donde: 'Semana 1 (A-A-A), «read (A2)»' },
+  // Semana 2 — A-B-B, «los de A1 y A2 … practica en A2»
+  { verbo: 'think', nivelQuePideElPlan: 'A1', donde: 'Semana 2 (A-B-B), grupo de A1 y A2' },
+  { verbo: 'buy',   nivelQuePideElPlan: 'A2', donde: 'Semana 2 (A-B-B), grupo de A1 y A2' },
+  { verbo: 'bring', nivelQuePideElPlan: 'A2', donde: 'Semana 2 (A-B-B), grupo de A1 y A2' },
+  { verbo: 'keep',  nivelQuePideElPlan: 'A2', donde: 'Semana 2 (A-B-B), grupo de A1 y A2' },
+  { verbo: 'feel',  nivelQuePideElPlan: 'A2', donde: 'Semana 2 (A-B-B), grupo de A1 y A2' },
+  { verbo: 'leave', nivelQuePideElPlan: 'A2', donde: 'Semana 2 (A-B-B), grupo de A1 y A2' },
+  { verbo: 'meet',  nivelQuePideElPlan: 'A2', donde: 'Semana 2 (A-B-B), grupo de A1 y A2' },
+  { verbo: 'sleep', nivelQuePideElPlan: 'A2', donde: 'Semana 2 (A-B-B), grupo de A1 y A2' },
+  { verbo: 'sell',  nivelQuePideElPlan: 'B1', donde: 'Semana 2 (A-B-B), «pasa a B1 para…»' },
+  { verbo: 'teach', nivelQuePideElPlan: 'B1', donde: 'Semana 2 (A-B-B), «pasa a B1 para…»' },
+  { verbo: 'send',  nivelQuePideElPlan: 'B1', donde: 'Semana 2 (A-B-B), «pasa a B1 para…»' },
+  { verbo: 'pay',   nivelQuePideElPlan: 'B1', donde: 'Semana 2 (A-B-B), «pasa a B1 para…»' },
+  { verbo: 'build', nivelQuePideElPlan: 'B1', donde: 'Semana 2 (A-B-B), «pasa a B1 para…»' },
+  // Días 15-17 — A-B-A
+  { verbo: 'come',  nivelQuePideElPlan: 'A1', donde: 'Días 15-17 (A-B-A), «come/came/come (A1)»' },
+  { verbo: 'run',   nivelQuePideElPlan: 'A2', donde: 'Días 15-17 (A-B-A), «run/ran/run (A2)»' },
+  // Días 18-24 — A-B-C, «empieza por los de A1 … luego el A2»
+  { verbo: 'be',    nivelQuePideElPlan: 'A1', donde: 'Días 18-24 (A-B-C), grupo de A1' },
+  { verbo: 'go',    nivelQuePideElPlan: 'A1', donde: 'Días 18-24 (A-B-C), grupo de A1' },
+  { verbo: 'do',    nivelQuePideElPlan: 'A1', donde: 'Días 18-24 (A-B-C), grupo de A1' },
+  { verbo: 'see',   nivelQuePideElPlan: 'A1', donde: 'Días 18-24 (A-B-C), grupo de A1' },
+  { verbo: 'take',  nivelQuePideElPlan: 'A1', donde: 'Días 18-24 (A-B-C), grupo de A1' },
+  { verbo: 'give',  nivelQuePideElPlan: 'A1', donde: 'Días 18-24 (A-B-C), grupo de A1' },
+  { verbo: 'know',  nivelQuePideElPlan: 'A1', donde: 'Días 18-24 (A-B-C), grupo de A1' },
+  { verbo: 'write', nivelQuePideElPlan: 'A2', donde: 'Días 18-24 (A-B-C), grupo de A2' },
+  { verbo: 'eat',   nivelQuePideElPlan: 'A2', donde: 'Días 18-24 (A-B-C), grupo de A2' },
+  { verbo: 'drink', nivelQuePideElPlan: 'A2', donde: 'Días 18-24 (A-B-C), grupo de A2' },
+  { verbo: 'speak', nivelQuePideElPlan: 'A2', donde: 'Días 18-24 (A-B-C), grupo de A2' },
+  { verbo: 'drive', nivelQuePideElPlan: 'A2', donde: 'Días 18-24 (A-B-C), grupo de A2' },
+  // FAQ y escenario de examen oficial — los pares confundidos que SÍ están
+  { verbo: 'lay',   nivelQuePideElPlan: 'B2', donde: 'FAQ y escenario de examen, pares confundidos' },
+  { verbo: 'rise',  nivelQuePideElPlan: 'B2', donde: 'FAQ y escenario de examen, pares confundidos' },
+  { verbo: 'lead',  nivelQuePideElPlan: 'B2', donde: 'FAQ y escenario de examen, pares confundidos' },
+  { verbo: 'feed',  nivelQuePideElPlan: 'B2', donde: 'FAQ y escenario de examen, pares confundidos' },
+  { verbo: 'fall',  nivelQuePideElPlan: 'B1', donde: 'FAQ, «fall en B1»' },
+  { verbo: 'find',  nivelQuePideElPlan: 'A1', donde: 'FAQ, «find en A1»' },
 ];
+
+/**
+ * Parejas regulares que la FAQ nombra para contrastar y que NO están en el banco, porque no
+ * son verbos irregulares. La FAQ tiene que decirlo, o vuelve el hallazgo 314 por la puerta
+ * de atrás: mandar practicar en el quiz algo que el quiz no tiene.
+ */
+const PAREJAS_REGULARES_QUE_LA_FAQ_NOMBRA = ['lie', 'raise', 'found'];
 
 // ─── Utilidades de lectura de la pantalla ────────────────────────────────────
 
@@ -208,7 +266,9 @@ function feedback(page: Page) {
 
 async function arrancarPartida(page: Page, nivel: string, numPreguntas: 10 | 15 | 20) {
   await page.locator('[class*="nivelBtn"]').filter({ hasText: nivel }).click();
-  await page.getByRole('button', { name: `${numPreguntas} preguntas` }).click();
+  // `exact`: desde el 25/08/2026 el botón de empezar también dice «— 15 preguntas», porque
+  // ahora anuncia el tamaño REAL de la partida y no el pedido (hallazgo 312).
+  await page.getByRole('button', { name: `${numPreguntas} preguntas`, exact: true }).click();
   await page.getByRole('button', { name: /^Empezar Quiz/ }).click();
 }
 
@@ -283,24 +343,30 @@ test.describe('Quiz Verbos Irregulares', () => {
       expect(canon, `A1 preguntó «${infinitivo}», que no está en la tabla canónica`).toBeTruthy();
       expect(canon.nivel, `«${infinitivo}» no es de A1 y ha salido en una partida de A1`).toBe('A1');
 
-      // Lo que se pregunta es SIEMPRE el past simple; el participio nunca se pregunta.
-      await expect(page.getByText('¿Cuál es el Past Simple de...?')).toBeVisible();
+      // Lo que se pregunta es SIEMPRE el past simple; el participio nunca se pregunta. En
+      // «be» el enunciado añade además la persona, porque ahí la forma depende de ella.
+      await expect(page.locator('[class*="preguntaEtiqueta"]')).toHaveText(
+        infinitivo === 'be' ? '¿Cuál es el Past Simple (con I, he, she, it) de...?' : '¿Cuál es el Past Simple de...?',
+      );
       await expect(page.getByText(`Pregunta ${i} de 10`)).toBeVisible();
       expect((await hud(page)).progreso).toBe(`${i}/10`);
 
       const opciones = await opcionesVisibles(page);
       expect(opciones, `Q${i} (${infinitivo}) debe ofrecer 4 opciones`).toHaveLength(4);
       expect(new Set(opciones).size, `Q${i} repite alguna opción: ${opciones.join(', ')}`).toBe(4);
-      expect(opciones, `Q${i}: «${canon.ps}» no está entre las ofrecidas`).toContain(canon.ps);
+      const buena = respuestaQueSePregunta(infinitivo);
+      expect(opciones, `Q${i}: «${buena}» no está entre las ofrecidas`).toContain(buena);
 
       const acierta = i <= 7;
-      const elegida = acierta ? canon.ps : opciones.find((o) => o !== canon.ps)!;
+      const elegida = acierta ? buena : opciones.find((o) => o !== buena)!;
       await pulsarOpcion(page, elegida);
 
       await expect(feedback(page)).toContainText(acierta ? '¡Correcto!' : 'Incorrecto');
-      // La conjugación completa que enseña el banner es la del canon, acierte o falle
+      // La conjugación completa que enseña el banner es la del canon, acierte o falle — y
+      // «completa» incluye el segundo participio donde el inglés admite dos (hallazgo 315).
       const conjugacion = (await page.locator('[class*="conjugacion"]').textContent())!.replace(/\s+/g, ' ').trim();
-      expect(conjugacion).toBe(`${infinitivo}→${canon.ps}→${canon.pp}`);
+      const ppEsperado = canon.ppAlt ? `${canon.pp} / ${canon.ppAlt}` : canon.pp;
+      expect(conjugacion).toBe(`${infinitivo}→${canon.ps}→${ppEsperado}`);
       // El marcador solo sube con los aciertos
       expect((await hud(page)).correctas, `tras Q${i} debe haber ${acierta ? i : 7} aciertos`).toBe(String(acierta ? i : 7));
 
@@ -348,7 +414,7 @@ test.describe('Quiz Verbos Irregulares', () => {
       const canon = CANON[infinitivo];
 
       const opciones = await opcionesVisibles(page);
-      await pulsarOpcion(page, opciones.find((o) => o !== canon.ps)!);
+      await pulsarOpcion(page, opciones.find((o) => o !== respuestaQueSePregunta(infinitivo))!);
 
       await expect(feedback(page)).toContainText('Incorrecto');
       expect((await hud(page)).correctas, `tras fallar Q${i} el marcador debe seguir en 0`).toBe('0');
@@ -384,7 +450,7 @@ test.describe('Quiz Verbos Irregulares', () => {
 
     // ── Q1: se contesta bien y se insiste ──
     const infinitivo = (await verboEnPantalla(page).textContent())!.trim();
-    const correcta = CANON[infinitivo].ps;
+    const correcta = respuestaQueSePregunta(infinitivo);
     await pulsarOpcion(page, correcta);
     expect((await hud(page)).correctas).toBe('1');
 
@@ -404,7 +470,7 @@ test.describe('Quiz Verbos Irregulares', () => {
     // ── Resto de la partida, todo correcto → 10/10 ──
     for (let i = 2; i <= 10; i++) {
       const inf = (await verboEnPantalla(page).textContent())!.trim();
-      await pulsarOpcion(page, CANON[inf].ps);
+      await pulsarOpcion(page, respuestaQueSePregunta(inf));
       expect((await hud(page)).correctas).toBe(String(i));
       await botonSiguiente(page).click();
     }
@@ -422,26 +488,48 @@ test.describe('Quiz Verbos Irregulares', () => {
     await expect(page.locator('[role="progressbar"]')).toHaveAttribute('aria-valuenow', '0');
   });
 
-  // ══════════════════════ HALLAZGOS ABIERTOS (test.fail) ══════════════════════
+  // ═══════════ REGRESIÓN de los hallazgos del 25/08/2026, reparados ese día ═══════════
 
   /**
-   * HALLAZGO 1 (cálculo) — la «Precisión» del HUD pasa del 100 % mientras se lee el feedback.
-   * Es `correctas / preguntaActual`: al contestar la pregunta i (índice i−1) el numerador ya
-   * incluye esa respuesta y el denominador todavía no. Acertando las dos primeras se ve 200 %.
+   * 311 (cálculo) — la «Precisión» del HUD pasaba del 100 % mientras se lee el feedback,
+   * que es justo cuando se mira la pantalla. Era `correctas / preguntaActual`: al contestar
+   * la pregunta i el numerador ya incluía esa respuesta y el denominador todavía no.
+   * Acertando las dos primeras se veía 200 %; y con la primera fallada y la segunda
+   * acertada, 100 % cuando la precisión real era 50 %.
    */
-  test('la precisión del HUD nunca debería pasar del 100 %', async ({ page }) => {
-    test.fail(); // hoy muestra 200 % tras acertar la segunda pregunta (y 150 %, 133 %, 125 %…)
+  test('311 · la precisión del HUD nunca pasa del 100 %', async ({ page }) => {
     await page.goto(RUTA);
     await arrancarPartida(page, 'A1 Básico', 10);
 
     for (let i = 1; i <= 3; i++) {
       const inf = (await verboEnPantalla(page).textContent())!.trim();
-      await pulsarOpcion(page, CANON[inf].ps);
+      await pulsarOpcion(page, respuestaQueSePregunta(inf));
       const { precision } = await hud(page);
-      const valor = Number(precision.replace('%', ''));
-      expect(valor, `tras acertar ${i} de ${i} la precisión no puede ser ${precision}`).toBeLessThanOrEqual(100);
+      expect(precision, `tras acertar ${i} de ${i} la precisión tiene que ser 100 %`).toBe('100%');
       await botonSiguiente(page).click();
     }
+  });
+
+  /**
+   * 311b — el otro lado del mismo defecto, que el acta describe y el test de arriba no puede
+   * ver: fallando la primera y acertando la segunda mostraba 100 %, no 50 %.
+   */
+  test('311b · con una fallada y una acertada la precisión es del 50 %, no del 100 %', async ({ page }) => {
+    await page.goto(RUTA);
+    await arrancarPartida(page, 'A1 Básico', 10);
+
+    // Primera: se falla a propósito eligiendo una opción que no es la buena.
+    const primero = (await verboEnPantalla(page).textContent())!.trim();
+    const ops = await opcionesVisibles(page);
+    const incorrecta = ops.find((o) => o !== respuestaQueSePregunta(primero))!;
+    await pulsarOpcion(page, incorrecta);
+    expect((await hud(page)).precision, 'tras fallar la primera').toBe('0%');
+    await botonSiguiente(page).click();
+
+    // Segunda: se acierta.
+    const segundo = (await verboEnPantalla(page).textContent())!.trim();
+    await pulsarOpcion(page, respuestaQueSePregunta(segundo));
+    expect((await hud(page)).precision, '1 de 2 es el 50 %').toBe('50%');
   });
 
   /**
@@ -449,18 +537,21 @@ test.describe('Quiz Verbos Irregulares', () => {
    * El truncado (Math.min en generarPreguntas) es correcto; lo que falla es que el botón
    * sigue prometiendo «20 preguntas» y en ningún sitio se avisa de que el nivel no da para tanto.
    */
-  test('pedir más preguntas que verbos tiene el nivel debería avisar antes de empezar', async ({ page }) => {
-    test.fail(); // hoy el botón promete 20 preguntas y la partida arranca en «1/15» sin decir nada
+  test('312 · pedir más preguntas que verbos tiene el nivel avisa antes de empezar', async ({ page }) => {
     await page.goto(RUTA);
     await page.locator('[class*="nivelBtn"]').filter({ hasText: 'A1 Básico' }).click();
     await page.getByRole('button', { name: '20 preguntas' }).click();
 
+    // El rótulo dice la verdad: A1 tiene 15 verbos, así que la partida es de 15.
     const rotulo = (await page.getByRole('button', { name: /^Empezar Quiz/ }).textContent())!;
-    // O el rótulo dice la verdad (15), o hay un aviso visible de que A1 no llega a 20
-    const avisa =
-      /15 preguntas/.test(rotulo) ||
-      (await page.getByText(/solo (tiene|hay) 15|se jugará con 15|máximo 15/i).count()) > 0;
-    expect(avisa, `el botón promete «${rotulo.trim()}» y la partida servirá 15 preguntas`).toBe(true);
+    expect(rotulo, `el botón sigue prometiendo de más: «${rotulo.trim()}»`).toMatch(/15 preguntas/);
+
+    // Y además hay un aviso visible que explica por qué.
+    await expect(page.locator('[class*="avisoNivel"]')).toContainText('15 verbos');
+
+    // Y lo que se sirve es lo que se anuncia.
+    await page.getByRole('button', { name: /^Empezar Quiz/ }).click();
+    expect((await hud(page)).progreso).toBe('1/15');
   });
 
   /**
@@ -470,13 +561,12 @@ test.describe('Quiz Verbos Irregulares', () => {
    * `verbo.pastSimple` como respuesta y como pool de distractores, y el rótulo de la
    * pregunta es fijo.
    */
-  test('el JSON-LD no debería prometer preguntas de Past Participle', async ({ page }) => {
-    test.fail(); // hoy el FAQPage dice «Past Simple o Past Participle» y el quiz solo pregunta Past Simple
+  test('313 · el JSON-LD no promete preguntas de Past Participle', async ({ page }) => {
     await page.goto(RUTA);
 
     // El rótulo de la pregunta es fijo: nunca se pide el participio
     await arrancarPartida(page, 'A1 Básico', 10);
-    await expect(page.getByText('¿Cuál es el Past Simple de...?')).toBeVisible();
+    await expect(page.getByText(/¿Cuál es el Past Simple.*de\.\.\.\?/)).toBeVisible();
     await expect(page.getByText(/¿Cuál es el Past Participle/)).toHaveCount(0);
 
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
@@ -495,8 +585,7 @@ test.describe('Quiz Verbos Irregulares', () => {
    * B1 y no A2; fall es B1, feel A2 y find A1, no B2). El alumno que siga el plan al pie de
    * la letra practica en niveles donde esos verbos no salen nunca.
    */
-  test('los verbos que el plan educativo manda practicar deberían estar en el nivel que dice', async () => {
-    test.fail(); // hoy 10 no están en el banco y 6 están en otro nivel
+  test('314 · los verbos que el plan educativo manda practicar están en el nivel que dice', async () => {
     const enBanco = new Map(verbosIrregulares.map((v) => [v.infinitive, v.level]));
     const fallos: string[] = [];
 
@@ -510,17 +599,100 @@ test.describe('Quiz Verbos Irregulares', () => {
   });
 
   /**
+   * 314b — el contrapunto: las parejas regulares que la FAQ nombra para contrastar (lie,
+   * raise, found) NO están en el banco porque no son irregulares, y la FAQ tiene que decirlo
+   * en vez de mandar practicarlas aquí.
+   */
+  test('314b · la FAQ avisa de que las parejas regulares no entran en el quiz', async ({ page }) => {
+    const enBanco = new Set(verbosIrregulares.map((v) => v.infinitive));
+    for (const verbo of PAREJAS_REGULARES_QUE_LA_FAQ_NOMBRA) {
+      expect(enBanco.has(verbo), `«${verbo}» es regular y no debería estar en el banco`).toBe(false);
+    }
+
+    await page.goto(RUTA);
+    const educativo = page.locator('[class*="faqItem"]').filter({ hasText: /más confundidos en el B2/ });
+    await expect(educativo).toContainText('no entran');
+    await expect(educativo).toContainText('no son irregulares');
+  });
+
+  /**
    * HALLAZGO 5 (accesibilidad) — `npm run check:a11y-jsx` señala 10 incumplimientos en
    * page.tsx: los 6 <button> de la app sin `type="button"` y 3 emojis pegados al texto sin
    * `aria-hidden` (el 📝 del H1 y los rótulos «🔄 Jugar de nuevo» y «⚙️ Cambiar nivel»).
    * Es pasivo anterior al candado, que solo juzga las líneas que un commit añade.
    */
-  test('todos los botones deberían llevar type="button"', async ({ page }) => {
-    test.fail(); // hoy ninguno de los botones propios de la app lo lleva
+  test('317 · todos los botones llevan type="button"', async ({ page }) => {
     await page.goto(RUTA);
     const sinType = await page
       .locator('[class*="configPanel"] button, [class*="opcionesGrid"] button, [class*="botonesResultado"] button')
       .evaluateAll((bs) => bs.filter((b) => !b.getAttribute('type')).map((b) => (b.textContent ?? '').trim().slice(0, 40)));
     expect(sinType, `botones sin type="button": ${sinType.join(' · ')}`).toEqual([]);
+  });
+
+  /**
+   * 315 (contenido) — el banner de feedback enseña «la conjugación completa» y en los verbos
+   * que admiten dos participios enseñaba uno solo: «get → got → got», contradiciendo a la
+   * propia caja de avisos de la app («algunos verbos admiten dos participios correctos:
+   * got/gotten…») y a su tabla de patrones, que escribe «get/got/got(ten)».
+   */
+  test('315 · la conjugación del banner incluye el segundo participio donde lo hay', async ({ page }) => {
+    await page.goto(RUTA);
+    // «get» es A1, así que una partida de A1 con las 15 preguntas lo recorre seguro.
+    await arrancarPartida(page, 'A1 Básico', 15);
+
+    let vistoGet = false;
+    for (let i = 0; i < 15; i++) {
+      const inf = (await verboEnPantalla(page).textContent())!.trim();
+      await pulsarOpcion(page, respuestaQueSePregunta(inf));
+      if (inf === 'get') {
+        vistoGet = true;
+        const conjugacion = (await page.locator('[class*="conjugacion"]').innerText()).replace(/\s+/g, ' ');
+        expect(conjugacion, 'la conjugación de «get» omite el participio americano').toContain('gotten');
+        expect(conjugacion).toContain('AmE');
+      }
+      const boton = botonSiguiente(page);
+      if (/Ver resultados/.test((await boton.textContent()) ?? '')) { await boton.click(); break; }
+      await boton.click();
+    }
+    expect(vistoGet, 'la partida de A1 con 15 preguntas debería recorrer los 15 verbos, «get» incluido').toBe(true);
+  });
+
+  /**
+   * 316 (contenido) — dos de las 75 respuestas se identificaban por su FORMA, sin saber el
+   * verbo: «showed» era el único past simple acabado en -ed de todo el banco (show es
+   * irregular solo en el participio) y «was / were» el único con barra. Cuando cualquiera de
+   * los dos era la respuesta, se acertaba gratis; cuando salía de distractor, se descartaba
+   * igual de gratis — y «was / were» salió de distractor en 5 de 10 preguntas de la partida
+   * de prueba del Inspector.
+   */
+  test('316 · ninguna respuesta se reconoce por su forma sin saber el verbo', async ({ page }) => {
+    // «show» queda fuera del sorteo: su past simple es regular y no enseña nada aquí.
+    const preguntables = verbosIrregulares.filter((v) => !v.pastSimpleRegular);
+    expect(preguntables.map((v) => v.infinitive)).not.toContain('show');
+    // Regular = infinitivo + -ed. No vale «acaba en ed» a secas: «fed» y «led» acaban así y
+    // son irregulares de manual, y «heard» es infinitivo+d pero cambia la pronunciación.
+    // El único de los 75 que forma su pasado con la regla es «show».
+    const regulares = preguntables.filter((v) => v.pastSimple === `${v.infinitive}ed`);
+    expect(regulares.map((v) => v.infinitive), 'sigue habiendo un past simple regular').toEqual([]);
+    expect(preguntables.map((v) => v.pastSimple), 'showed sigue pudiendo salir de distractor').not.toContain('showed');
+
+    // Y de «be» se pregunta la forma de singular, no «was / were».
+    await page.goto(RUTA);
+    await arrancarPartida(page, 'A1 Básico', 15);
+    for (let i = 0; i < 15; i++) {
+      const inf = (await verboEnPantalla(page).textContent())!.trim();
+      const ops = await opcionesVisibles(page);
+      expect(ops.filter((o) => o.includes('/')), `«${inf}»: una opción con barra delata la respuesta`).toEqual([]);
+      if (inf === 'be') {
+        await expect(page.locator('[class*="preguntaEtiqueta"]')).toContainText('con I, he, she, it');
+        await pulsarOpcion(page, 'was');
+        expect((await hud(page)).correctas, '«was» tiene que contar como acierto en «be»').not.toBe('0');
+      } else {
+        await pulsarOpcion(page, respuestaQueSePregunta(inf));
+      }
+      const boton = botonSiguiente(page);
+      if (/Ver resultados/.test((await boton.textContent()) ?? '')) { await boton.click(); break; }
+      await boton.click();
+    }
   });
 });

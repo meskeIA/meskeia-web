@@ -19,12 +19,15 @@ interface PreguntaQuiz {
   respuestaCorrecta: string;
 }
 
-const NIVEL_CONFIG: Record<Nivel, { label: string; desc: string }> = {
-  A1:    { label: '🟢 A1 Básico',       desc: '15 verbos esenciales' },
-  A2:    { label: '🟡 A2 Elemental',    desc: '20 verbos frecuentes' },
-  B1:    { label: '🟠 B1 Intermedio',   desc: '20 verbos habituales' },
-  B2:    { label: '🔴 B2 Avanzado',     desc: '20 verbos complejos'  },
-  todos: { label: '⭐ Todos los niveles', desc: '75 verbos completos'  },
+// Emoji y rótulo separados: dentro de la misma cadena el lector de pantalla lee «círculo
+// verde A1 Básico» y el candado check:a11y-jsx no puede verlo, porque viene de una constante
+// y no de texto JSX (hallazgo 317).
+const NIVEL_CONFIG: Record<Nivel, { emoji: string; label: string; desc: string }> = {
+  A1:    { emoji: '🟢', label: 'A1 Básico',          desc: '15 verbos esenciales' },
+  A2:    { emoji: '🟡', label: 'A2 Elemental',       desc: '20 verbos frecuentes' },
+  B1:    { emoji: '🟠', label: 'B1 Intermedio',      desc: '20 verbos habituales' },
+  B2:    { emoji: '🔴', label: 'B2 Avanzado',        desc: '20 verbos complejos'  },
+  todos: { emoji: '⭐', label: 'Todos los niveles',  desc: '75 verbos completos'  },
 };
 
 const OPCIONES_PREGUNTAS = [10, 15, 20];
@@ -44,17 +47,42 @@ function generarOpciones(correcto: string, pool: string[]): string[] {
   return mezclar([correcto, ...incorrectos]);
 }
 
+/**
+ * Past simple que se PREGUNTA de un verbo.
+ *
+ * Para `be` no es «was / were»: esa era la única respuesta con barra de los 75, así que se
+ * acertaba —y se descartaba como distractor— sin saber nada del verbo, solo por la forma de
+ * la cadena (hallazgo 316). Se pregunta la forma de singular, que además es unívoca, y el
+ * enunciado lo dice.
+ */
+function respuestaDe(verbo: VerboIrregular): string {
+  return verbo.infinitive === 'be' ? 'was' : verbo.pastSimple;
+}
+
+/** Matiz que el enunciado añade cuando el past simple depende de la persona. */
+function matizDelEnunciado(verbo: VerboIrregular): string {
+  return verbo.infinitive === 'be' ? ' (con I, he, she, it)' : '';
+}
+
 function generarPreguntas(nivel: Nivel, numPreguntas: number): PreguntaQuiz[] {
   const pool = nivel === 'todos'
     ? verbosIrregulares
     : verbosIrregulares.filter(v => v.level === nivel);
 
-  const seleccionados = mezclar(pool).slice(0, Math.min(numPreguntas, pool.length));
-  const poolRespuestas = pool.map(v => v.pastSimple);
+  // `show` sale del sorteo: su past simple «showed» es regular, es el único en -ed de los 75
+  // y se reconocía sin saber el verbo. Sigue en las tablas del bloque educativo, que es
+  // donde de verdad enseña algo (es irregular en el participio: shown).
+  const preguntables = pool.filter(v => !v.pastSimpleRegular);
+
+  const seleccionados = mezclar(preguntables).slice(0, Math.min(numPreguntas, preguntables.length));
+  // Los distractores salen del MISMO conjunto: si «showed» apareciera de distractor, se
+  // descartaría igual de gratis que cuando era la respuesta.
+  const poolRespuestas = preguntables.map(respuestaDe);
 
   return seleccionados.map(verbo => {
-    const opciones = generarOpciones(verbo.pastSimple, poolRespuestas);
-    return { verbo, opciones, respuestaCorrecta: verbo.pastSimple };
+    const correcta = respuestaDe(verbo);
+    const opciones = generarOpciones(correcta, poolRespuestas);
+    return { verbo, opciones, respuestaCorrecta: correcta };
   });
 }
 
@@ -87,6 +115,14 @@ export default function QuizVerbosIrregularesPage() {
   const pregunta = preguntas[preguntaActual];
   const totalPreguntas = preguntas.length;
   const esUltima = preguntaActual === totalPreguntas - 1;
+  /** Preguntas ya contestadas, contando la actual en cuanto se responde. */
+  const respondidas = preguntaActual + (seleccionada !== null ? 1 : 0);
+  /** Verbos PREGUNTABLES del nivel elegido: el techo real de la partida. */
+  const verbosDelNivel = useMemo(
+    () => (nivel === 'todos' ? verbosIrregulares : verbosIrregulares.filter(v => v.level === nivel))
+      .filter(v => !v.pastSimpleRegular).length,
+    [nivel]
+  );
 
   const iniciarQuiz = useCallback(() => {
     const nuevasPreguntas = generarPreguntas(nivel, numPreguntas);
@@ -140,7 +176,7 @@ export default function QuizVerbosIrregularesPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>Quiz Verbos Irregulares 📝</h1>
+        <h1 className={styles.title}>Quiz Verbos Irregulares <span aria-hidden="true">📝</span></h1>
         <p className={styles.subtitle}>
           Aprende el Past Simple en inglés de forma interactiva · Niveles A1 a B2
         </p>
@@ -156,12 +192,15 @@ export default function QuizVerbosIrregularesPage() {
           <div className={styles.nivelGrid}>
             {(Object.entries(NIVEL_CONFIG) as [Nivel, typeof NIVEL_CONFIG[Nivel]][]).map(([key, cfg]) => (
               <button
+                type="button"
                 key={key}
                 className={`${styles.nivelBtn} ${nivel === key ? styles.active : ''}`}
                 onClick={() => setNivel(key)}
                 aria-pressed={nivel === key}
               >
-                <span className={styles.nivelLabel}>{cfg.label}</span>
+                <span className={styles.nivelLabel}>
+                  <span aria-hidden="true">{cfg.emoji}</span> {cfg.label}
+                </span>
                 <span className={styles.nivelDesc}>{cfg.desc}</span>
               </button>
             ))}
@@ -172,6 +211,7 @@ export default function QuizVerbosIrregularesPage() {
             {OPCIONES_PREGUNTAS.map(n => (
               <button
                 key={n}
+                type="button"
                 className={`${styles.pregBtn} ${numPreguntas === n ? styles.active : ''}`}
                 onClick={() => setNumPreguntas(n)}
                 aria-pressed={numPreguntas === n}
@@ -181,8 +221,18 @@ export default function QuizVerbosIrregularesPage() {
             ))}
           </div>
 
-          <button className={styles.btnIniciar} onClick={iniciarQuiz}>
-            Empezar Quiz — {numPreguntas} preguntas · Nivel {nivel === 'todos' ? 'Completo' : nivel}
+          {/* El nivel A1 solo tiene 15 verbos, así que pedir 20 servía 15 en silencio: el
+              truncado era correcto, pero el botón seguía prometiendo 20 (hallazgo 312). */}
+          {verbosDelNivel < numPreguntas && (
+            <p className={styles.avisoNivel} role="status">
+              El nivel {nivel === 'todos' ? 'Completo' : nivel} tiene {verbosDelNivel} verbos, así que
+              la partida será de {verbosDelNivel} preguntas. Para jugar {numPreguntas}, elige un nivel
+              con más verbos o el nivel Completo.
+            </p>
+          )}
+
+          <button type="button" className={styles.btnIniciar} onClick={iniciarQuiz}>
+            Empezar Quiz — {Math.min(numPreguntas, verbosDelNivel)} preguntas · Nivel {nivel === 'todos' ? 'Completo' : nivel}
           </button>
         </div>
       )}
@@ -202,7 +252,12 @@ export default function QuizVerbosIrregularesPage() {
             </div>
             <div className={styles.hudItem}>
               <span className={styles.hudValor}>
-                {preguntaActual > 0 ? Math.round((correctas / preguntaActual) * 100) : 0}%
+                {/* El denominador son las RESPONDIDAS, no el índice de la pregunta: al
+                    contestar, `correctas` ya incluye esta respuesta y `preguntaActual`
+                    todavía no, así que durante toda la fase de feedback —que es justo cuando
+                    se mira la pantalla— la precisión salía al 200 % con 2/2, 150 % con 3/3 y
+                    100 % con la primera fallada y la segunda acertada (hallazgo 311). */}
+                {respondidas > 0 ? Math.round((correctas / respondidas) * 100) : 0}%
               </span>
               <span className={styles.hudLabel}>Precisión</span>
             </div>
@@ -222,7 +277,9 @@ export default function QuizVerbosIrregularesPage() {
           {/* Tarjeta de pregunta */}
           <div className={styles.preguntaCard}>
             <p className={styles.preguntaNumero}>Pregunta {preguntaActual + 1} de {totalPreguntas}</p>
-            <p className={styles.preguntaEtiqueta}>¿Cuál es el Past Simple de...?</p>
+            <p className={styles.preguntaEtiqueta}>
+              ¿Cuál es el Past Simple{matizDelEnunciado(pregunta.verbo)} de...?
+            </p>
             <p className={styles.verboPrincipal}>{pregunta.verbo.infinitive}</p>
             <p className={styles.verboSignificado}>"{pregunta.verbo.spanish}"</p>
           </div>
@@ -238,6 +295,7 @@ export default function QuizVerbosIrregularesPage() {
               }
               return (
                 <button
+                  type="button"
                   key={opcion}
                   className={`${styles.opcion} ${claseExtra}`}
                   onClick={() => responder(opcion)}
@@ -264,14 +322,25 @@ export default function QuizVerbosIrregularesPage() {
                 </p>
                 <div className={styles.conjugacion}>
                   <span className={styles.conjForma}>{pregunta.verbo.infinitive}</span>
-                  <span className={styles.conjFlecha}>→</span>
+                  <span className={styles.conjFlecha} aria-hidden="true">→</span>
                   <span className={styles.conjForma}>{pregunta.verbo.pastSimple}</span>
-                  <span className={styles.conjFlecha}>→</span>
-                  <span className={styles.conjForma}>{pregunta.verbo.pastParticiple}</span>
+                  <span className={styles.conjFlecha} aria-hidden="true">→</span>
+                  {/* La «conjugación completa» tiene que incluir el segundo participio donde
+                      lo hay: enseñar «get → got → got» contradecía a la propia caja de avisos
+                      de la app y a su tabla, que escribe «get/got/got(ten)» (hallazgo 315). */}
+                  <span className={styles.conjForma}>
+                    {pregunta.verbo.pastParticiple}
+                    {pregunta.verbo.varianteParticipio && (
+                      <span className={styles.conjVariante}>
+                        {' / '}{pregunta.verbo.varianteParticipio.forma}
+                        <small> ({pregunta.verbo.varianteParticipio.variedad})</small>
+                      </span>
+                    )}
+                  </span>
                 </div>
                 <p className={styles.conjSignificado}>"{pregunta.verbo.spanish}"</p>
               </div>
-              <button className={styles.btnSiguiente} onClick={siguiente}>
+              <button type="button" className={styles.btnSiguiente} onClick={siguiente}>
                 {esUltima ? 'Ver resultados' : 'Siguiente pregunta →'}
               </button>
             </>
@@ -307,11 +376,11 @@ export default function QuizVerbosIrregularesPage() {
           </div>
 
           <div className={styles.botonesResultado}>
-            <button className={styles.btnRejugar} onClick={reiniciar}>
-              🔄 Jugar de nuevo
+            <button type="button" className={styles.btnRejugar} onClick={reiniciar}>
+              <span aria-hidden="true">🔄</span> Jugar de nuevo
             </button>
-            <button className={styles.btnConfig} onClick={volverConfig}>
-              ⚙️ Cambiar nivel
+            <button type="button" className={styles.btnConfig} onClick={volverConfig}>
+              <span aria-hidden="true">⚙️</span> Cambiar nivel
             </button>
           </div>
         </div>
@@ -393,7 +462,9 @@ export default function QuizVerbosIrregularesPage() {
                 Preparas el examen de inglés del trimestre y el profesor va a poner Past Simple y Past Participle.
               </p>
               <p className={styles.escenarioTip}>
-                Empieza por el nivel A1–A2 y pasa al B1 cuando encadenes 10 correctas seguidas.
+                Empieza por el nivel A1–A2 y pasa al B1 cuando encadenes 10 correctas seguidas. El quiz
+                pregunta el <strong>Past Simple</strong>; el participio lo repasas en la conjugación
+                completa que sale al responder y en la tabla de patrones de más abajo.
               </p>
             </div>
 
@@ -406,7 +477,9 @@ export default function QuizVerbosIrregularesPage() {
                 Necesitas dominar los verbos irregulares para el examen oficial: Cambridge, EOI o APTIS.
               </p>
               <p className={styles.escenarioTip}>
-                Practica el nivel B2 diariamente. Pon especial atención a los pares confundidos (lay/lie, rise/raise).
+                Practica el nivel B2 diariamente, donde están <em>lay</em>, <em>rise</em>, <em>lead</em> y
+                <em> feed</em>: sus parejas regulares (<em>lie</em>, <em>raise</em>) no entran en el quiz,
+                pero son justo las que hay que tener presentes al responder.
               </p>
             </div>
 
@@ -433,6 +506,8 @@ export default function QuizVerbosIrregularesPage() {
               </p>
               <p className={styles.escenarioTip}>
                 Practica los grupos A-B-B y A-B-C, son los que más aparecen en textos profesionales formales.
+                Ojo: aquí se pregunta el Past Simple, así que para el participio conviene fijarse en la
+                tercera columna de la conjugación que aparece tras cada respuesta.
               </p>
             </div>
 
@@ -516,7 +591,10 @@ export default function QuizVerbosIrregularesPage() {
                 <em>feel/felt/felt</em>, y <em>find/found/found</em> vs. <em>found/founded/founded</em>.
               </p>
               <p className={styles.faqTip}>
-                Consejo: practica estos pares en el nivel B2 del quiz hasta conseguir 0 errores consecutivos.
+                Consejo: de esos pares, el quiz tiene <em>lay</em>, <em>rise</em>, <em>lead</em> y
+                <em> feed</em> en el nivel B2, <em>fall</em> en B1, <em>feel</em> en A2 y <em>find</em> en
+                A1 — sus parejas regulares (<em>lie</em>, <em>raise</em>, <em>found</em>) no entran, porque
+                no son irregulares. Para practicarlos juntos, juega en el nivel <strong>Completo</strong>.
               </p>
             </li>
 
@@ -531,12 +609,18 @@ export default function QuizVerbosIrregularesPage() {
           </p>
           <ol className={styles.stepGuide}>
 
+            {/* Cada semana nombra verbos que ESTÁN en el banco y el nivel donde de verdad
+                están. Hasta el 25/08/2026, de los 21 verbos que el plan mandaba practicar,
+                10 no existían aquí y 6 estaban en otro nivel: quien seguía el plan al pie de
+                la letra practicaba donde esos verbos no salen nunca (hallazgo 314). */}
             <li className={styles.step}>
               <span className={styles.stepNumber}>1</span>
               <div className={styles.stepContent}>
                 <strong>Semana 1 — Patrón A-A-A (días 1–7)</strong>
-                <p>Aprende los 8 verbos sin cambio: <em>put, cut, hit, let, set, shut, burst, cost</em>.
-                Practica 10 preguntas del nivel A1 cada día. Objetivo: 0 errores al final de la semana.</p>
+                <p>Los verbos que no cambian son los que menos cuesta fijar. En este quiz están
+                <em> put</em> (A2), <em>cut</em> y <em>hurt</em> (B1), y <em>read</em> (A2), que cambia
+                la pronunciación pero no la grafía. Como están repartidos, practica en el nivel
+                <strong> Completo</strong> con 10 preguntas diarias.</p>
               </div>
             </li>
 
@@ -544,9 +628,10 @@ export default function QuizVerbosIrregularesPage() {
               <span className={styles.stepNumber}>2</span>
               <div className={styles.stepContent}>
                 <strong>Semana 2 — Patrón A-B-B (días 8–14)</strong>
-                <p>Este grupo es el más numeroso (~40 verbos). Empieza con los A2:
-                <em>buy/bought, bring/brought, think/thought, teach/taught, sell/sold</em>.
-                Practica en el nivel A2 con 15 preguntas diarias.</p>
+                <p>Es el grupo más numeroso. Empieza por los de A1 y A2, que es donde el quiz los tiene:
+                <em> think/thought, buy/bought, bring/brought, keep/kept, feel/felt, leave/left,
+                meet/met, sleep/slept</em>. Practica en <strong>A2</strong> con 15 preguntas diarias, y
+                pasa a B1 para <em>sell/sold, teach/taught, send/sent, pay/paid, build/built</em>.</p>
               </div>
             </li>
 
@@ -554,8 +639,9 @@ export default function QuizVerbosIrregularesPage() {
               <span className={styles.stepNumber}>3</span>
               <div className={styles.stepContent}>
                 <strong>Días 15–17 — Patrón A-B-A</strong>
-                <p>Solo 4 verbos comunes: <em>come/came/come, run/ran/run, become/became/become,
-                overcome/overcame/overcome</em>. Practícalos hasta no confundirlos con el grupo A-B-C.</p>
+                <p>Aquí hay dos: <em>come/came/come</em> (A1) y <em>run/ran/run</em> (A2). Son pocos, pero
+                se confunden con el grupo A-B-C precisamente porque el participio vuelve al infinitivo:
+                practícalos hasta no dudar.</p>
               </div>
             </li>
 
@@ -563,8 +649,11 @@ export default function QuizVerbosIrregularesPage() {
               <span className={styles.stepNumber}>4</span>
               <div className={styles.stepContent}>
                 <strong>Días 18–24 — Patrón A-B-C</strong>
-                <p>El grupo más exigente: tres formas completamente distintas. Empieza por los 10 más usados
-                (<em>go/went/gone, be/was-were/been, write/wrote/written</em>). Luego pasa al nivel B1–B2.</p>
+                <p>El grupo más exigente: tres formas distintas. Empieza por los de A1, que son los más
+                usados (<em>be/was-were/been, go/went/gone, do/did/done, see/saw/seen, take/took/taken,
+                give/gave/given, know/knew/known</em>). Luego el A2 (<em>write/wrote/written,
+                eat/ate/eaten, drink/drank/drunk, speak/spoke/spoken, drive/drove/driven</em>) y de ahí
+                al B1–B2.</p>
               </div>
             </li>
 

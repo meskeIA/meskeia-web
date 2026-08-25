@@ -4,6 +4,25 @@ export interface VerboIrregular {
   pastParticiple: string;
   spanish: string;
   level: 'A1' | 'A2' | 'B1' | 'B2';
+  /**
+   * Segunda forma de participio admitida, con la variedad que la usa.
+   *
+   * El banner de feedback del quiz enseña «la conjugación completa», y en los verbos que
+   * admiten dos participios enseñaba solo uno: «get → got → got», contradiciendo a la propia
+   * caja de avisos de la app («algunos verbos admiten dos participios correctos:
+   * got/gotten…») y a su tabla de patrones, que escribe «get/got/got(ten)» (hallazgo 315).
+   * Con la mitad del público en Latinoamérica, el americano «gotten» no es marginal.
+   */
+  varianteParticipio?: { forma: string; variedad: string };
+  /**
+   * Cierto cuando el past simple de este verbo NO es irregular.
+   *
+   * Solo `show`: es irregular únicamente en el participio («shown»), y su past simple
+   * «showed» era el ÚNICO acabado en -ed de los 75, así que se acertaba —o se descartaba—
+   * sin saber el verbo, solo por la forma de la palabra (hallazgo 316). Se queda en las
+   * tablas, que es donde enseña algo, y sale del sorteo de preguntas.
+   */
+  pastSimpleRegular?: boolean;
 }
 
 export const verbosIrregulares: VerboIrregular[] = [
@@ -13,7 +32,7 @@ export const verbosIrregulares: VerboIrregular[] = [
   { infinitive: 'do',    pastSimple: 'did',        pastParticiple: 'done',    spanish: 'hacer',               level: 'A1' },
   { infinitive: 'go',    pastSimple: 'went',       pastParticiple: 'gone',    spanish: 'ir',                  level: 'A1' },
   { infinitive: 'come',  pastSimple: 'came',       pastParticiple: 'come',    spanish: 'venir',               level: 'A1' },
-  { infinitive: 'get',   pastSimple: 'got',        pastParticiple: 'got',     spanish: 'obtener / conseguir', level: 'A1' },
+  { infinitive: 'get',   pastSimple: 'got',        pastParticiple: 'got',     spanish: 'obtener / conseguir', level: 'A1', varianteParticipio: { forma: 'gotten', variedad: 'AmE' } },
   { infinitive: 'make',  pastSimple: 'made',       pastParticiple: 'made',    spanish: 'hacer / fabricar',    level: 'A1' },
   { infinitive: 'know',  pastSimple: 'knew',       pastParticiple: 'known',   spanish: 'saber / conocer',     level: 'A1' },
   { infinitive: 'think', pastSimple: 'thought',    pastParticiple: 'thought', spanish: 'pensar',              level: 'A1' },
@@ -60,7 +79,7 @@ export const verbosIrregulares: VerboIrregular[] = [
   { infinitive: 'pay',    pastSimple: 'paid',    pastParticiple: 'paid',      spanish: 'pagar',               level: 'B1' },
   { infinitive: 'sell',   pastSimple: 'sold',    pastParticiple: 'sold',      spanish: 'vender',              level: 'B1' },
   { infinitive: 'send',   pastSimple: 'sent',    pastParticiple: 'sent',      spanish: 'enviar',              level: 'B1' },
-  { infinitive: 'show',   pastSimple: 'showed',  pastParticiple: 'shown',     spanish: 'mostrar',             level: 'B1' },
+  { infinitive: 'show',   pastSimple: 'showed',  pastParticiple: 'shown',     spanish: 'mostrar',             level: 'B1', pastSimpleRegular: true, varianteParticipio: { forma: 'showed', variedad: 'menos frecuente' } },
   { infinitive: 'sing',   pastSimple: 'sang',    pastParticiple: 'sung',      spanish: 'cantar',              level: 'B1' },
   { infinitive: 'spend',  pastSimple: 'spent',   pastParticiple: 'spent',     spanish: 'gastar / pasar tiempo', level: 'B1' },
   { infinitive: 'swim',   pastSimple: 'swam',    pastParticiple: 'swum',      spanish: 'nadar',               level: 'B1' },
@@ -86,7 +105,7 @@ export const verbosIrregulares: VerboIrregular[] = [
   { infinitive: 'shoot',  pastSimple: 'shot',    pastParticiple: 'shot',      spanish: 'disparar',            level: 'B2' },
   { infinitive: 'steal',  pastSimple: 'stole',   pastParticiple: 'stolen',    spanish: 'robar',               level: 'B2' },
   { infinitive: 'throw',  pastSimple: 'threw',   pastParticiple: 'thrown',    spanish: 'lanzar / tirar',      level: 'B2' },
-  { infinitive: 'wake',   pastSimple: 'woke',    pastParticiple: 'woken',     spanish: 'despertar',           level: 'B2' },
+  { infinitive: 'wake',   pastSimple: 'woke',    pastParticiple: 'woken',     spanish: 'despertar',           level: 'B2', varianteParticipio: { forma: 'waked', variedad: 'AmE' } },
   { infinitive: 'forbid', pastSimple: 'forbade', pastParticiple: 'forbidden', spanish: 'prohibir',            level: 'B2' },
   { infinitive: 'shine',  pastSimple: 'shone',   pastParticiple: 'shone',     spanish: 'brillar',             level: 'B2' },
 ];

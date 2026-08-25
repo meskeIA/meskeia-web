@@ -40,21 +40,28 @@ import { test, expect, type Page } from '@playwright/test';
  * se lee el enunciado que sale y se pulsa la opción que la historia de la literatura dice
  * que es la buena. Lo que se comprueba son invariantes que valen en CUALQUIER tanda.
  *
- * HALLAZGOS ABIERTOS de esta pasada: al final, con `test.fail()`. Afirman lo que DEBERÍA
- * pasar y hoy fallan a propósito; el día que se reparen se les quita el `test.fail()` y se
- * quedan como regresión. Dos hallazgos más no caben en un test determinista y viven solo
- * en el acta: la explicación de b05 («Sherlock Holmes fue el primer detective moderno de
- * la ficción», falso — Dupin es de 1841, y Poe está entre los distractores de esa misma
- * pregunta) y tres categorías mal puestas (b08 y b10 preguntan «¿Quién escribió…?» y se
- * rotulan 📖 Obras; m15 pregunta por el narrador de Gatsby y se rotula ✒️ Autores).
+ * HALLAZGOS de esta pasada: los diez se repararon el 25/08/2026 y los que se pueden
+ * comprobar aquí quedan al final como regresión, ya sin `test.fail()`.
+ *
+ * Lo que NO vive en este fichero, y por qué: desde el 25/08/2026 el banco está en
+ * `app/quiz-literatura-universal/preguntas.ts`, y sus invariantes —reparto de la correcta
+ * entre las cuatro posiciones, tamaño de cada nivel, cobertura geográfica y las
+ * explicaciones de b05, m11, a01 y a09— se comprueban contando sobre el banco entero en
+ * `tests/quiz-literatura-banco.spec.ts`, sin abrir el navegador. Aquí solo queda lo que
+ * exige una partida de verdad.
  */
 
 const RUTA = '/quiz-literatura-universal/';
 
-/** Preguntas por nivel en POOL (contadas en page.tsx el 25/08/2026). */
-const POR_NIVEL = { basico: 17, medio: 16, avanzado: 13 } as const;
-/** Total del banco. La metadata anuncia 50; en page.tsx hay 46. */
-const TOTAL_BANCO = 46;
+/**
+ * Preguntas por nivel en POOL, contadas en `app/quiz-literatura-universal/preguntas.ts`.
+ * El 25/08/2026 eran 17/16/13 y pasaron a 19/19/18: diez preguntas nuevas para que ningún
+ * nivel quedara por debajo del tamaño de partida (hallazgo 298) y para que un quiz de
+ * literatura «universal» tuviera alguna pregunta de Asia, Oriente Medio o India (309).
+ */
+const POR_NIVEL = { basico: 19, medio: 19, avanzado: 18 } as const;
+/** Total del banco. La metadata lo deriva de ahí desde el 25/08/2026; antes decía «50». */
+const TOTAL_BANCO = 56;
 /** `PREGUNTAS_POR_PARTIDA` de page.tsx. */
 const POR_PARTIDA = 15;
 
@@ -154,14 +161,38 @@ const BANCO: Record<string, { id: string; nivel: Nivel; correcta: string }> = {
     { id: "a08", nivel: "avanzado", correcta: "Chinua Achebe" },
   "¿Qué novela de Roberto Bolaño sigue a jóvenes poetas que buscan a la escritora Cesárea Tinajero?":
     { id: "a09", nivel: "avanzado", correcta: "Los detectives salvajes" },
-  "¿Qué narradora propuso Genette como categoría para describir quién ve/percibe la historia?":
+  "¿Qué categoría propuso Genette para describir quién ve o percibe la historia, frente a quién la cuenta?":
     { id: "a10", nivel: "avanzado", correcta: "Focalización" },
   "¿Qué escritora austríaca ganó el Nobel de Literatura en 2004?":
     { id: "a11", nivel: "avanzado", correcta: "Elfriede Jelinek" },
   "¿En qué año publicó Cervantes la segunda parte del Quijote?":
     { id: "a12", nivel: "avanzado", correcta: "1615" },
-  "¿Qué escritores conforman el llamado \"trío del realismo mágico\" más citado por la crítica?":
-    { id: "a13", nivel: "avanzado", correcta: "García Márquez, Rulfo y Carpentier" },
+  "¿Quién acuñó el término «realismo mágico» en 1925, y a propósito de qué arte?":
+    { id: "a13", nivel: "avanzado", correcta: "Franz Roh, a propósito de la pintura" },
+
+  // ── AÑADIDAS EL 25/08/2026 (hallazgos 298 y 309) ──
+  // Diez preguntas nuevas: el banco no tenía NINGUNA de Asia, Oriente Medio ni India, y el
+  // nivel Avanzado se quedaba en 13, por debajo del tamaño de partida que la app anuncia.
+  "¿Qué obra japonesa del siglo XI, escrita por Murasaki Shikibu, se cita a menudo como una de las primeras novelas de la literatura universal?":
+    { id: "b18", nivel: "basico", correcta: "La historia de Genji" },
+  "¿De qué colección proceden los relatos de Simbad, Aladino y Alí Babá?":
+    { id: "b19", nivel: "basico", correcta: "Las mil y una noches" },
+  "¿Qué poeta indio, autor de \"Gitanjali\", fue el primer no europeo en recibir el Nobel de Literatura?":
+    { id: "m17", nivel: "medio", correcta: "Rabindranath Tagore" },
+  "¿Qué escritor egipcio, autor de la \"Trilogía de El Cairo\", ganó el Nobel de Literatura en 1988?":
+    { id: "m18", nivel: "medio", correcta: "Naguib Mahfuz" },
+  "¿Qué forma poética japonesa de tres versos y 17 moras llevó a su cumbre Matsuo Bashō en el siglo XVII?":
+    { id: "m19", nivel: "medio", correcta: "El haiku" },
+  "¿Qué novela china del siglo XVIII, atribuida a Cao Xueqin, retrata la decadencia de una familia aristocrática?":
+    { id: "a14", nivel: "avanzado", correcta: "Sueño en el pabellón rojo" },
+  "¿Qué escritor recibió el Nobel de Literatura en 2012 por una obra que «funde cuentos populares, historia y contemporaneidad»?":
+    { id: "a15", nivel: "avanzado", correcta: "Mo Yan" },
+  "¿Qué poeta persa del siglo XIII es autor del \"Masnavi\", una de las obras centrales del sufismo?":
+    { id: "a16", nivel: "avanzado", correcta: "Yalal ad-Din Rumi" },
+  "¿Qué autora surcoreana ganó el Premio Booker Internacional en 2016 por \"La vegetariana\"?":
+    { id: "a17", nivel: "avanzado", correcta: "Han Kang" },
+  "¿Qué novela empieza con «Todas las familias felices se parecen; cada familia infeliz lo es a su manera»?":
+    { id: "a18", nivel: "avanzado", correcta: "Ana Karenina" },
 };
 
 // ─── Utilidades de lectura de la pantalla ────────────────────────────────────
@@ -321,28 +352,28 @@ test.describe('Quiz de Literatura Universal', () => {
    * CASO LÍMITE — Avanzado con TODAS las respuestas correctas.
    *
    * Esperado (calculado a mano ANTES de ejecutar la app):
-   *   · El banco avanzado tiene 13 preguntas y `slice(0, 15)` no puede dar más:
-   *     la partida es de 13, no de las 15 que anuncia la pantalla anterior
-   *     (eso es el hallazgo H1, aquí solo se fija el comportamiento real).
-   *   · marcador final «13 / 13 correctas»
-   *   · 13/13 = 1,0 ≥ 0,9 → «¡Excelente! Dominas la literatura.» 🏆 · barra 100%
+   *   · Desde el 25/08/2026 el banco avanzado tiene 18 preguntas, así que la partida es de
+   *     las 15 que la pantalla anterior anuncia. Antes eran 13 de 13 y el rótulo mentía
+   *     (hallazgo 298).
+   *   · marcador final «15 / 15 correctas»
+   *   · 15/15 = 1,0 ≥ 0,9 → «¡Excelente! Dominas la literatura.» 🏆 · barra 100%
    */
   test('caso límite: todas correctas en Avanzado dan pleno y «¡Excelente! Dominas la literatura.»', async ({
     page,
   }) => {
     test.setTimeout(120_000);
-    const esperadas = Math.min(POR_PARTIDA, POR_NIVEL.avanzado); // = 13
+    const esperadas = Math.min(POR_PARTIDA, POR_NIVEL.avanzado); // = 15
     await arrancar(page, /^Avanzado/);
 
     expect(await contador(page)).toBe(`1/${esperadas}`);
 
     const { ids, total } = await jugarPartida(page, Number.MAX_SAFE_INTEGER);
-    expect(total, 'la partida de Avanzado se queda en lo que da el banco').toBe(esperadas);
+    expect(total, 'la partida de Avanzado no da las preguntas que anuncia').toBe(esperadas);
     expect(new Set(ids).size).toBe(esperadas);
     expect(ids.every((id) => id.startsWith('a')), `«Avanzado» ha colado otro nivel: ${ids.join(',')}`).toBe(true);
 
     expect(await resultado(page)).toEqual({
-      puntuacion: '13 / 13 correctas', // 13 = tamaño del banco avanzado en page.tsx
+      puntuacion: `${esperadas} / ${esperadas} correctas`,
       etiqueta: '¡Excelente! Dominas la literatura.', // pct = 1,0 ≥ 0,9
       emoji: '🏆',
       barra: '100%',
@@ -431,59 +462,72 @@ test.describe('Quiz de Literatura Universal', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * HALLAZGOS ABIERTOS de la 1.ª pasada (25/08/2026). Cada uno afirma lo que DEBERÍA pasar
- * y hoy falla: `test.fail()` hace que el fichero esté verde mientras el hallazgo siga ahí,
- * y que grite el día que se repare para quitarle el marcador.
+ * HALLAZGOS de la 1.ª pasada (25/08/2026), REPARADOS el mismo día. Ya sin `test.fail()`:
+ * quedan como regresión.
  */
-test.describe('Hallazgos abiertos del Inspector', () => {
+test.describe('Regresión de los hallazgos del Inspector', () => {
   /**
-   * H1 · La pantalla de selección promete «15 preguntas aleatorias» en los cuatro modos,
-   * pero el banco avanzado solo tiene 13 y `slice(0, 15)` las entrega todas: la partida es
-   * de 13 y, además, SIEMPRE es el mismo conjunto de preguntas, solo reordenado — con lo
+   * 298 · La pantalla de selección prometía «15 preguntas aleatorias» en los cuatro modos,
+   * pero el banco avanzado solo tenía 13 y `slice(0, 15)` las entregaba todas: la partida
+   * era de 13 y, además, SIEMPRE el mismo conjunto de preguntas, solo reordenado — con lo
    * que la FAQ de la propia app («Con varios intentos verás preguntas diferentes») tampoco
-   * se cumple en Avanzado.
+   * podía cumplirse en Avanzado.
+   *
+   * Reparado por los dos lados: el rótulo se calcula del banco y ya no puede prometer de
+   * más, y el nivel Avanzado pasó de 13 a 18 preguntas para que la promesa sea alcanzable.
    */
-  test('H1 · Avanzado debe entregar las 15 preguntas que anuncia la pantalla de selección', async ({ page }) => {
-    test.fail();
+  test('298 · Avanzado entrega las 15 preguntas que anuncia la pantalla de selección', async ({ page }) => {
     test.setTimeout(120_000);
     await page.goto(RUTA);
-    await expect(page.locator('[class*="seleccionInfo"]')).toContainText('15 preguntas aleatorias');
     await page.getByRole('button', { name: /^Avanzado/ }).click();
+    await expect(page.locator('[class*="seleccionInfo"]')).toContainText(`${POR_PARTIDA} preguntas aleatorias`);
     await page.getByRole('button', { name: /Empezar el quiz/ }).click();
-    expect(await contador(page), 'el nivel Avanzado sirve 13 preguntas y anuncia 15').toBe('1/15');
+    expect(await contador(page)).toBe(`1/${POR_PARTIDA}`);
   });
 
   /**
-   * H2 · Tras responder, si la respuesta fue correcta o no se transmite ÚNICAMENTE por
+   * 303 · Tras responder, si la respuesta fue correcta o no se transmitía ÚNICAMENTE por
    * color (borde/fondo verde o rojo) y por dos marcas ✓/✗ que llevan aria-hidden="true".
-   * El nombre accesible de los botones no cambia, la explicación no es región live y no
-   * dice «correcto» ni «incorrecto»: quien no ve el color no se entera de si ha acertado
-   * hasta el marcador final. WCAG 1.4.1 (uso del color).
+   * El nombre accesible de los botones no cambiaba, la explicación no era región live y no
+   * decía «correcto» ni «incorrecto»: quien no ve el color no se enteraba de si había
+   * acertado hasta el marcador final. WCAG 1.4.1 (uso del color).
+   *
+   * Reparado por los dos caminos, y aquí se exigen los dos: el nombre accesible del botón
+   * lleva el veredicto, y la explicación va dentro de una región live que además empieza
+   * diciendo en texto si se acertó y cuál era la respuesta buena.
    */
-  test('H2 · el acierto o el fallo deben llegar también en texto, no solo por color', async ({ page }) => {
-    test.fail();
+  test('303 · el acierto o el fallo llegan también en texto, no solo por color', async ({ page }) => {
     await arrancar(page, /^Básico/);
 
     const ficha = BANCO[await enunciado(page)];
     const ops = await textosOpcion(page);
     const iCorrecta = ops.indexOf(ficha.correcta);
-    await opciones(page).nth(iCorrecta === 0 ? 1 : 0).click(); // se falla a propósito
+    const iFallada = iCorrecta === 0 ? 1 : 0;
+    await opciones(page).nth(iFallada).click(); // se falla a propósito
 
-    // Nombre accesible = texto sin los subárboles aria-hidden (así lo lee un lector)
+    // El nombre accesible de un botón con aria-label ES el aria-label: eso es lo que lee un
+    // lector de pantalla, no el texto visible.
     const nombres = await page.evaluate(() =>
       [...document.querySelectorAll('button')]
         .filter((b) => b.querySelector('[class*="opcionLetra"]'))
         .map((b) => {
+          const etiqueta = b.getAttribute('aria-label');
+          if (etiqueta) return etiqueta.replace(/\s+/g, ' ').trim();
           const clon = b.cloneNode(true) as HTMLElement;
           clon.querySelectorAll('[aria-hidden="true"]').forEach((n) => n.remove());
           return clon.textContent!.replace(/\s+/g, ' ').trim();
         })
     );
-    const anunciaCorreccion =
-      nombres.some((n) => /correct|incorrect|✓|✗/i.test(n)) ||
-      (await page.locator('[class*="explicacion"][role="status"], [class*="explicacion"][aria-live]').count()) > 0;
+    expect(nombres[iCorrecta], 'la opción buena no se anuncia como correcta').toMatch(/respuesta correcta/i);
+    expect(nombres[iFallada], 'la opción fallada no se anuncia como incorrecta').toMatch(/incorrecta/i);
 
-    expect(anunciaCorreccion, 'la corrección solo se ve por color: ✓ y ✗ llevan aria-hidden').toBe(true);
+    // Y la explicación, dentro de una región live que dice el veredicto antes de explicar.
+    const region = page.locator('[role="status"]').filter({ has: page.locator('[class*="explicacion"]') });
+    await expect(region).toHaveCount(1);
+    await expect(region).toHaveAttribute('aria-live', 'polite');
+    await expect(page.locator('[class*="explicacionVeredicto"]')).toContainText(
+      `Incorrecto. La respuesta era: ${ficha.correcta}`,
+    );
   });
 
   /**
@@ -491,8 +535,7 @@ test.describe('Hallazgos abiertos del Inspector', () => {
    * jsonLd.description y jsonLd.features) y en el faqJsonLd, que es el que las IAs usan
    * para grounding. En POOL hay 46.
    */
-  test('H3 · el JSON-LD servido no debe anunciar más preguntas de las que tiene el banco', async ({ page }) => {
-    test.fail();
+  test('299 · el JSON-LD servido no anuncia más preguntas de las que tiene el banco', async ({ page }) => {
     await page.goto(RUTA);
     const bloques = await page.evaluate(() =>
       [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => s.textContent ?? '')
@@ -503,20 +546,52 @@ test.describe('Hallazgos abiertos del Inspector', () => {
   });
 
   /**
-   * H4 · Sesgo de posición: en las 46 preguntas del banco la correcta está 0 veces en A,
-   * 3 en B, 19 en C y 24 en D. Las opciones no se barajan al pintarlas, así que el sesgo
-   * es estable: responder siempre «D» saca 24/46 (52%) sin saber nada, y responder siempre
-   * «A» saca 0. Una partida de Avanzado recorre las 13 preguntas del nivel entero, de modo
-   * que este recuento es determinista, no un muestreo.
+   * 300 · Sesgo de posición: en las 46 preguntas del banco la correcta estaba 0 veces en A,
+   * 3 en B, 19 en C y 24 en D, y las opciones no se barajaban al pintarlas, así que el sesgo
+   * era estable y explotable: responder siempre «D» sacaba 24/46 (52 %) sin saber nada de
+   * literatura, y responder siempre «A» sacaba cero garantizado.
+   *
+   * La reparación es el barajado en la partida, y eso es lo que se comprueba aquí: que a lo
+   * largo de una partida la correcta NO cae siempre en la misma letra. El reparto del banco
+   * en sí lo vigila `tests/quiz-literatura-banco.spec.ts`, que puede contarlo entero sin
+   * abrir el navegador.
+   *
+   * Se juegan varias partidas seguidas porque una sola podría dar un reparto degenerado por
+   * puro azar: con 15 preguntas y 4 letras, que todas cayeran en una misma letra tiene
+   * probabilidad 4·(1/4)^15, o sea ninguna, pero acumular partidas lo hace además estable.
    */
-  test('H4 · la opción A debe ser la correcta alguna vez a lo largo del nivel Avanzado', async ({ page }) => {
-    test.fail();
-    test.setTimeout(120_000);
-    await arrancar(page, /^Avanzado/);
-    const { letras, total } = await jugarPartida(page, Number.MAX_SAFE_INTEGER);
-    expect(total).toBe(POR_NIVEL.avanzado); // la partida es el nivel entero
-    const cuenta = Object.fromEntries(['A', 'B', 'C', 'D'].map((l) => [l, letras.filter((x) => x === l).length]));
-    expect(cuenta.A, `reparto de la correcta en Avanzado: ${JSON.stringify(cuenta)}`).toBeGreaterThan(0);
+  test('300 · la correcta no cae siempre en la misma letra: las opciones se barajan', async ({ page }) => {
+    test.setTimeout(180_000);
+    const cuenta: Record<string, number> = { A: 0, B: 0, C: 0, D: 0 };
+
+    for (let partida = 0; partida < 3; partida++) {
+      await arrancar(page, /^Avanzado/);
+      const { letras, total } = await jugarPartida(page, Number.MAX_SAFE_INTEGER);
+      expect(total).toBe(POR_PARTIDA);
+      for (const l of letras) cuenta[l]++;
+    }
+
+    const detalle = JSON.stringify(cuenta);
+    // Ninguna letra puede quedarse a cero ni acaparar: con 45 respuestas repartidas al azar
+    // entre 4 posiciones, lo esperable son ~11 en cada una.
+    for (const letra of ['A', 'B', 'C', 'D']) {
+      expect(cuenta[letra], `la letra ${letra} nunca es la correcta · reparto ${detalle}`).toBeGreaterThan(0);
+      expect(cuenta[letra], `la letra ${letra} acapara las correctas · reparto ${detalle}`).toBeLessThan(POR_PARTIDA * 3 * 0.6);
+    }
+  });
+
+  /**
+   * 310 · Empezada una partida no había forma de abandonarla ni de volver a la pantalla de
+   * selección: cambiar de nivel a mitad, o rendirse, obligaba a recargar la página.
+   */
+  test('310 · se puede salir de una partida sin recargar la página', async ({ page }) => {
+    await arrancar(page, /^Básico/);
+    await expect(page.locator('h2[class*="pregunta"]')).toBeVisible();
+
+    await page.getByRole('button', { name: /Cambiar de nivel/ }).click();
+
+    await expect(page.getByRole('heading', { name: 'Elige el nivel de dificultad' })).toBeVisible();
+    await expect(page.locator('h2[class*="pregunta"]')).toHaveCount(0);
   });
 
   /**
@@ -531,18 +606,22 @@ test.describe('Hallazgos abiertos del Inspector', () => {
    * Una partida de Avanzado siempre recorre las 13 preguntas del nivel, así que las dos
    * aparecen sí o sí.
    */
-  test('H5 · ningún enunciado de Avanzado debe estar mal redactado ni presuponer un consenso inexistente', async ({
+  test('302 y 307 · ningún enunciado de Avanzado está mal redactado ni presupone un consenso inexistente', async ({
     page,
   }) => {
-    test.fail();
-    test.setTimeout(120_000);
-    await arrancar(page, /^Avanzado/);
-    const enunciados: string[] = [];
-    for (;;) {
-      enunciados.push(await enunciado(page));
-      await opciones(page).nth(0).click();
-      if (/Ver resultado/.test(await avanzar(page))) break;
+    test.setTimeout(180_000);
+    // Ya no basta con una partida: el nivel tiene 18 preguntas y la partida sirve 15, así
+    // que se juegan varias para recorrerlo. Es el precio de haber ampliado el banco.
+    const vistos = new Set<string>();
+    for (let partida = 0; partida < 4; partida++) {
+      await arrancar(page, /^Avanzado/);
+      for (;;) {
+        vistos.add(await enunciado(page));
+        await opciones(page).nth(0).click();
+        if (/Ver resultado/.test(await avanzar(page))) break;
+      }
     }
+    const enunciados = [...vistos];
     expect(enunciados.filter((e) => /narradora propuso Genette/i.test(e)), 'a10: «narradora» por «categoría»').toEqual([]);
     expect(enunciados.filter((e) => /trío del realismo mágico/i.test(e)), 'a13: consenso crítico inexistente').toEqual([]);
   });

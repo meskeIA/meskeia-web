@@ -1,9 +1,19 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { TOTAL_PREGUNTAS, preguntasDeNivel } from './preguntas';
+
+// La cifra del banco NUNCA se escribe a mano: hasta el 25/08/2026 la metadata prometía 50
+// preguntas y en el banco había 46, en cinco sitios distintos incluido el faqJsonLd, que es
+// lo que leen Bing Copilot y ChatGPT (hallazgo 299). Es además la regla 1.quater del
+// CLAUDE.md: las cifras del catálogo solo aparecen vía variable.
+//
+// Se toma el nivel más corto porque es el que fija la promesa que la app puede cumplir en
+// todos los casos: Avanzado tenía 13 preguntas y la partida anunciaba 15 (hallazgo 298).
+const POR_PARTIDA = Math.min(15, preguntasDeNivel('avanzado').length);
 
 export const metadata: Metadata = {
   title: 'Quiz de Literatura Universal — Pon a prueba tus conocimientos | meskeIA',
-  description: 'Quiz de literatura con 50 preguntas en 3 niveles (básico, medio, avanzado): autores, obras, movimientos literarios y citas célebres. Con explicación tras cada respuesta.',
+  description: `Quiz de literatura con ${TOTAL_PREGUNTAS} preguntas en 3 niveles (básico, medio, avanzado): autores, obras, movimientos literarios y citas célebres. Con explicación tras cada respuesta.`,
   keywords: 'quiz literatura, test literatura, preguntas literatura, autores literarios, obras literarias, movimientos literarios, trivia literatura, cultura general, bachillerato literatura',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -20,7 +30,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Quiz de Literatura Universal | meskeIA',
-    description: '50 preguntas de literatura universal en 3 niveles con explicaciones y puntuación.',
+    description: `${TOTAL_PREGUNTAS} preguntas de literatura universal en 3 niveles con explicaciones y puntuación.`,
   },
   other: {
     'application-name': 'Quiz Literatura Universal meskeIA',
@@ -29,15 +39,15 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Quiz de Literatura Universal',
-  description: 'Quiz de literatura universal con 50 preguntas distribuidas en 3 niveles de dificultad. Categorías: autores, obras, movimientos literarios y citas célebres. Explicación educativa tras cada respuesta.',
+  description: `Quiz de literatura universal con ${TOTAL_PREGUNTAS} preguntas distribuidas en 3 niveles de dificultad. Categorías: autores, obras, movimientos literarios y citas célebres. Explicación educativa tras cada respuesta.`,
   url: 'https://meskeia.com/quiz-literatura-universal/',
   category: 'EducationalApplication',
   features: [
-    '50 preguntas de literatura universal curadas editorialmente',
+    `${TOTAL_PREGUNTAS} preguntas de literatura universal curadas editorialmente`,
     '3 niveles de dificultad: básico, medio y avanzado',
     '4 categorías: autores, obras, movimientos y citas',
     'Explicación educativa tras cada respuesta',
-    'Selección aleatoria de 15 preguntas por partida',
+    `Selección aleatoria de hasta ${POR_PARTIDA} preguntas por partida`,
     'Puntuación y evaluación final con feedback',
   ],
 });
@@ -59,7 +69,7 @@ export const faqJsonLd = {
       name: '¿Cuántas preguntas tiene el quiz y cuánto tiempo lleva completarlo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El banco de preguntas cuenta con 50 preguntas en total, pero cada partida selecciona aleatoriamente 15 de ellas. El quiz se puede completar en unos 10-15 minutos. Al finalizar recibes tu puntuación y una evaluación cualitativa de tu nivel.',
+        text: `El banco cuenta con ${TOTAL_PREGUNTAS} preguntas en total, y cada partida selecciona hasta ${POR_PARTIDA} al azar: las del nivel que elijas, o de los tres si juegas en modo Mezcla. Se completa en unos 10-15 minutos. Al finalizar recibes tu puntuación y una evaluación cualitativa de tu nivel.`,
       },
     },
     {

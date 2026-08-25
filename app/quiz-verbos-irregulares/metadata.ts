@@ -75,7 +75,10 @@ export const faqJsonLd = {
       name: '¿Cómo funciona el quiz de verbos irregulares?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El quiz muestra el verbo en infinitivo y pide seleccionar la forma correcta de Past Simple o Past Participle entre cuatro opciones. Al responder, se muestra si la respuesta es correcta y la conjugación completa del verbo. Puedes filtrar por nivel MCER (A1, A2, B1, B2) para adaptar la dificultad a tu nivel actual.',
+        // Hallazgo 313: esta respuesta prometía que el quiz pregunta «Past Simple o Past
+        // Participle», y solo pregunta el pasado simple. Es la señal estructurada que leen
+        // Bing Copilot, ChatGPT y Perplexity, así que la promesa falsa viajaba lejos.
+        text: 'El quiz muestra el verbo en infinitivo y pide seleccionar su Past Simple entre cuatro opciones. Al responder se indica si es correcta y se muestra la conjugación completa del verbo —infinitivo, pasado y participio—, de modo que el participio se estudia en el repaso aunque no sea lo que se pregunta. Puedes filtrar por nivel MCER (A1, A2, B1, B2) para adaptar la dificultad a tu nivel actual.',
       },
     },
     {
