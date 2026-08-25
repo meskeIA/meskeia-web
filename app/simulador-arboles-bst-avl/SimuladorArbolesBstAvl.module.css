@@ -321,10 +321,18 @@
   text-align: center;
 }
 
+/**
+ * El SVG se DESPLAZA, no se encoge.
+ *
+ * `max-width: 100%` anulaba el `overflow-x: auto` del contenedor: el scroll no llegaba a
+ * activarse nunca y un árbol de 45 nodos —2.310 px de viewBox— se pintaba a 992 px, con la
+ * etiqueta de cada nodo bajando de 14 a 8 px, y a unos 2 px en un móvil de 375 (hallazgo 320).
+ * Un árbol ilegible no enseña nada; uno que hay que recorrer, sí.
+ */
 .arbolSvg {
   display: block;
-  max-width: 100%;
-  height: auto;
+  max-width: none;
+  flex-shrink: 0;
   font-family: 'SF Mono', Monaco, monospace;
 }
 

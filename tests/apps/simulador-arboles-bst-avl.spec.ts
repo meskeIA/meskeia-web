@@ -489,11 +489,11 @@ test('la búsqueda cuenta bien las comparaciones y la profundidad', async ({ pag
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// HALLAZGOS — marcados test.fail() mientras el defecto siga en pie
+// HALLAZGOS del 25/08/2026 — REPARADOS ese mismo dia. Tests de regresion.
 // ─────────────────────────────────────────────────────────────────────────────
 
-test.fail(
-  '[1] operativa/medio — «Insertar» con el campo vacío no debería crear el nodo 0',
+test(
+  '[1] REGRESIÓN 318 — «Insertar» con el campo vacío no crea el nodo 0',
   async ({ page }) => {
     await page.locator('#ins-input').fill('');
     await botonExacto(page, 'Insertar').click();
@@ -505,8 +505,8 @@ test.fail(
   },
 );
 
-test.fail(
-  '[1 bis] operativa/medio — «Eliminar» con el campo vacío no debería borrar el nodo 0',
+test(
+  '[1 bis] REGRESIÓN 318 — «Eliminar» con el campo vacío no borra el nodo 0',
   async ({ page }) => {
     await cargarSecuencia(page, '0, 5, 10');
     await expect(recorrido(page, 'INORDEN (LNR)')).toHaveText('0, 5, 10');
@@ -521,8 +521,8 @@ test.fail(
   },
 );
 
-test.fail(
-  '[2] operativa/bajo — «Insertar varios» debería aplicar el mismo rango que «Insertar»',
+test(
+  '[2] REGRESIÓN 319 — «Insertar varios» aplica el mismo rango que «Insertar»',
   async ({ page }) => {
     // El botón «Insertar» rechaza 12345 por rango…
     await page.locator('#ins-input').fill('12345');
@@ -537,8 +537,8 @@ test.fail(
   },
 );
 
-test.fail(
-  '[3] operativa/bajo — con muchos nodos el SVG debería desplazarse, no encogerse',
+test(
+  '[3] REGRESIÓN 320 — con muchos nodos el SVG se desplaza, no se encoge',
   async ({ page }) => {
     const valores = Array.from({ length: 45 }, (_, i) => (i + 1) * 7);
     await cargarSecuencia(page, valores.join(', '));
@@ -563,8 +563,8 @@ test.fail(
   },
 );
 
-test.fail(
-  '[4] contenido/bajo — el B-tree no deriva del AVL',
+test(
+  '[4] REGRESIÓN 321 — el B-tree no se presenta como derivado del AVL',
   async ({ page }) => {
     // Bayer y McCreight (1972) publicaron el B-tree como estructura multivía para bloques de
     // disco; no es un descendiente del AVL de Adelson-Velsky y Landis (1962).

@@ -43,6 +43,8 @@ interface ProgramaPredefinido {
 
 const SIMBOLO_BLANCO = '_';
 const LIMITE_PASOS = 5000;
+/** Pausa mínima entre pasos. A 10 ms el tope de 5.000 pasos se alcanza en menos de un minuto. */
+const VELOCIDAD_MIN = 10;
 const CELDAS_VISIBLES = 21; // celdas mostradas en el SVG (cabezal centrado)
 
 // ============================================================
@@ -75,7 +77,11 @@ const PROGRAMAS: ProgramaPredefinido[] = [
   {
     id: 'anbn',
     titulo: 'Reconocer aⁿbⁿ',
-    descripcion: 'Acepta cadenas con n veces "a" seguidas de n veces "b"',
+    // «n ≥ 1» explícito: con el convenio habitual n ≥ 0 la cadena vacía pertenece al
+    // lenguaje, y este programa la RECHAZA por falta de regla para (q0, blanco). La guía de
+    // la propia app manda probar los casos límite —«cadena vacía» entre ellos—, así que el
+    // alumno que la seguía obtenía un rechazo que la descripción no explicaba (hallazgo 339).
+    descripcion: 'Acepta cadenas con n veces "a" seguidas de n veces "b" (n ≥ 1)',
     cintaInicial: 'aaabbb',
     estadoInicial: 'q0',
     estadosFinales: ['qf'],
@@ -173,6 +179,8 @@ interface ResultadoPaso {
   simboloLeido: string;
   simboloEscrito: string;
   movimiento: Movimiento;
+  /** 1 si el paso ha insertado una celda por el extremo izquierdo, desplazando los indices. */
+  insertadaIzquierda: number;
 }
 
 function ejecutarPaso(
@@ -190,11 +198,18 @@ function ejecutarPaso(
   const nuevaCinta = [...cinta];
   nuevaCinta[cabezal] = regla.escribe;
   let nuevoCabezal = cabezal;
+  // Cuando el cabezal sale por el extremo izquierdo se inserta una celda —correcto, la cinta
+  // es infinita en los dos sentidos— pero eso desplaza TODOS los índices del array. Se cuenta
+  // para poder restarlo al pintar: si no, los «índices reales» que la app dibuja bajo cada
+  // celda saltan +1 para todo lo ya escrito y el cabezal nunca llega a mostrar un índice
+  // negativo, aunque el mismo SVG sí pinte negativos a la izquierda (hallazgo 341).
+  let insertadaIzquierda = 0;
   if (regla.mueve === 'L') {
     nuevoCabezal -= 1;
     if (nuevoCabezal < 0) {
       nuevaCinta.unshift(SIMBOLO_BLANCO);
       nuevoCabezal = 0;
+      insertadaIzquierda = 1;
     }
   } else if (regla.mueve === 'R') {
     nuevoCabezal += 1;
@@ -210,6 +225,7 @@ function ejecutarPaso(
     simboloLeido: simbolo,
     simboloEscrito: regla.escribe,
     movimiento: regla.mueve,
+    insertadaIzquierda,
   };
 }
 
@@ -250,6 +266,14 @@ export default function SimuladorMaquinaTuring() {
   );
   const [pasos, setPasos] = useState<number>(0);
   const [simbolosEscritos, setSimbolosEscritos] = useState<number>(0);
+  /**
+   * Cuántas celdas se han insertado por el extremo IZQUIERDO desde el arranque.
+   *
+   * Es lo que hay que restar al índice del array para obtener el índice real de la cinta.
+   * Sin esto, salir por la izquierda renumeraba todo lo ya escrito y el cabezal volvía a 0
+   * en vez de pasar a −1, aunque el mismo SVG sí pintaba índices negativos a su izquierda.
+   */
+  const [origenCinta, setOrigenCinta] = useState<number>(0);
   const [movimientosCabezal, setMovimientosCabezal] = useState<number>(0);
   const [reglaActiva, setReglaActiva] = useState<number | null>(null);
   const [celdaEscrita, setCeldaEscrita] = useState<number | null>(null);
@@ -276,6 +300,7 @@ export default function SimuladorMaquinaTuring() {
     setEstadoActual(prog.estadoInicial);
     setPasos(0);
     setSimbolosEscritos(0);
+    setOrigenCinta(0);
     setMovimientosCabezal(0);
     setReglaActiva(null);
     setCeldaEscrita(null);
@@ -299,6 +324,7 @@ export default function SimuladorMaquinaTuring() {
     setEstadoActual(estadoInicial);
     setPasos(0);
     setSimbolosEscritos(0);
+    setOrigenCinta(0);
     setMovimientosCabezal(0);
     setReglaActiva(null);
     setCeldaEscrita(null);
@@ -329,8 +355,13 @@ export default function SimuladorMaquinaTuring() {
     setCabezal(resultado.nuevoCabezal);
     setEstadoActual(resultado.nuevoEstado);
     setReglaActiva(resultado.reglaUsada);
-    setCeldaEscrita(cabezal);
+    // En índice REAL, porque es lo que compara el render. Con el índice del array, el
+    // destello señalaría otra celda en cuanto la cinta creciera por la izquierda.
+    setCeldaEscrita(cabezal - origenCinta);
     setPasos((p) => p + 1);
+    // Si el paso ha insertado celda por la izquierda, el origen se corre para que el índice
+    // que se dibuja bajo cada celda siga siendo el mismo de antes (y el cabezal pase a −1).
+    if (resultado.insertadaIzquierda) setOrigenCinta((o) => o + resultado.insertadaIzquierda);
     if (resultado.simboloEscrito !== resultado.simboloLeido) {
       setSimbolosEscritos((s) => s + 1);
     }
@@ -342,7 +373,7 @@ export default function SimuladorMaquinaTuring() {
       return false;
     }
     return true;
-  }, [cabezal, cinta, estadoActual, estadosFinales, pasos, reglas]);
+  }, [cabezal, cinta, estadoActual, estadosFinales, pasos, reglas, origenCinta]);
 
   // Iniciar / pausar
   const toggleEjecucion = useCallback(() => {
@@ -400,14 +431,34 @@ export default function SimuladorMaquinaTuring() {
     };
   }, []);
 
-  // Recargar cinta cuando cambia el input (solo si está detenida y no ejecutándose)
+  /**
+   * Recargar la cinta cuando cambia el input.
+   *
+   * Los CONTADORES se reinician con ella. Hasta el 25/08/2026 no lo hacían, así que editar la
+   * cinta a mitad de una ejecución paso a paso devolvía cabezal y estado al principio pero
+   * dejaba «Pasos ejecutados 5» de la ejecución anterior: la app informaba de un número de
+   * pasos que no correspondía a nada de lo que había en pantalla, y el clic siguiente marcaba
+   * 6 habiéndose ejecutado 1 (hallazgo 334).
+   *
+   * Y se aplica SIEMPRE, no solo con `estadoEjecucion === 'detenida'`: el modo paso a paso
+   * nunca sale de ese valor, así que la guarda no protegía del caso que decía proteger, y en
+   * cambio sí impedía el simétrico — con la máquina ya en «aceptada», teclear una cinta nueva
+   * no cambiaba nada en pantalla hasta pulsar Reiniciar. Lo que hay que respetar es la
+   * ejecución CONTINUA, que sí tiene su propio estado.
+   */
   useEffect(() => {
-    if (estadoEjecucion === 'detenida') {
-      const cintaArr = cintaInicialInput.split('').filter((c) => c !== ' ');
-      setCinta(cintaArr.length > 0 ? cintaArr : [SIMBOLO_BLANCO]);
-      setCabezal(0);
-      setEstadoActual(estadoInicial);
-    }
+    if (estadoEjecucion === 'ejecutando') return;
+    const cintaArr = cintaInicialInput.split('').filter((c) => c !== ' ');
+    setCinta(cintaArr.length > 0 ? cintaArr : [SIMBOLO_BLANCO]);
+    setCabezal(0);
+    setEstadoActual(estadoInicial);
+    setEstadoEjecucion('detenida');
+    setPasos(0);
+    setMovimientosCabezal(0);
+    setSimbolosEscritos(0);
+    setOrigenCinta(0);
+    setReglaActiva(null);
+    setCeldaEscrita(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cintaInicialInput, estadoInicial]);
 
@@ -467,10 +518,11 @@ export default function SimuladorMaquinaTuring() {
     for (let i = 0; i < CELDAS_VISIBLES; i++) {
       const idx = inicio + i;
       const sim = idx >= 0 && idx < cinta.length ? cinta[idx] : SIMBOLO_BLANCO;
-      celdas.push({ simbolo: sim, indiceReal: idx });
+      // El índice REAL de la cinta, no el del array: se resta lo insertado por la izquierda.
+      celdas.push({ simbolo: sim, indiceReal: idx - origenCinta });
     }
     return celdas;
-  }, [cinta, cabezal]);
+  }, [cinta, cabezal, origenCinta]);
 
   const cintaFinalLimpia = useMemo(() => cintaToString(cinta), [cinta]);
 
@@ -544,6 +596,9 @@ export default function SimuladorMaquinaTuring() {
                   programaActivo === p.id ? styles.programaBtnActive : ''
                 }`}
                 onClick={() => cargarPrograma(p.id)}
+                // Marcaban la selección solo con la clase CSS: un lector de pantalla no podía
+                // saber qué programa estaba cargado (hallazgo 336).
+                aria-pressed={programaActivo === p.id}
               >
                 <span className={styles.programaTitle}>{p.titulo}</span>
                 <span className={styles.programaDesc}>{p.descripcion}</span>
@@ -578,7 +633,9 @@ export default function SimuladorMaquinaTuring() {
               />
             </div>
             <div className={styles.inputGroup}>
-              <label>Estados finales</label>
+              {/* La etiqueta no tenía `htmlFor` y el campo de abajo solo se apoyaba en su
+                  placeholder, que desaparece al escribir y no es un nombre accesible. */}
+              <label htmlFor="estado-final-nuevo">Estados finales</label>
               <div className={styles.chipsRow}>
                 {estadosFinales.map((ef) => (
                   <span key={ef} className={styles.chip}>
@@ -594,6 +651,7 @@ export default function SimuladorMaquinaTuring() {
                   </span>
                 ))}
                 <input
+                  id="estado-final-nuevo"
                   className={styles.chipAddInput}
                   value={estadoFinalInputDraft}
                   onChange={(e) => setEstadoFinalInputDraft(e.target.value)}
@@ -642,6 +700,7 @@ export default function SimuladorMaquinaTuring() {
                           actualizarRegla(idx, 'estado', e.target.value.trim())
                         }
                         spellCheck={false}
+                        aria-label={`Regla ${idx + 1}: estado actual`}
                       />
                     </td>
                     <td>
@@ -656,6 +715,7 @@ export default function SimuladorMaquinaTuring() {
                           )
                         }
                         spellCheck={false}
+                        aria-label={`Regla ${idx + 1}: símbolo que lee`}
                       />
                     </td>
                     <td>
@@ -670,6 +730,7 @@ export default function SimuladorMaquinaTuring() {
                           )
                         }
                         spellCheck={false}
+                        aria-label={`Regla ${idx + 1}: símbolo que escribe`}
                       />
                     </td>
                     <td>
@@ -679,6 +740,7 @@ export default function SimuladorMaquinaTuring() {
                         onChange={(e) =>
                           actualizarRegla(idx, 'mueve', e.target.value)
                         }
+                        aria-label={`Regla ${idx + 1}: hacia dónde mueve el cabezal`}
                       >
                         <option value="L">L (izquierda)</option>
                         <option value="R">R (derecha)</option>
@@ -697,6 +759,7 @@ export default function SimuladorMaquinaTuring() {
                           )
                         }
                         spellCheck={false}
+                        aria-label={`Regla ${idx + 1}: estado al que pasa`}
                       />
                     </td>
                     <td>
@@ -731,16 +794,28 @@ export default function SimuladorMaquinaTuring() {
           <input
             id="velocidad-slider"
             type="range"
-            min={100}
+            min={VELOCIDAD_MIN}
             max={2000}
-            step={50}
+            step={10}
             value={velocidad}
             onChange={(e) => setVelocidad(Number(e.target.value))}
           />
           <span className={styles.velocidadValue}>
-            {formatNumber(velocidad, 0)} ms
+            {velocidad <= VELOCIDAD_MIN ? 'Sin pausa' : `${formatNumber(velocidad, 0)} ms`}
           </span>
         </div>
+        {/* El tope de velocidad era 100 ms/paso, o sea unos 9 pasos por segundo reales: llegar
+            a los 5.000 pasos que el bloque educativo invita a usar como señal de bucle
+            infinito tardaba unos NUEVE MINUTOS, y cualquier máquina de unos cientos de pasos
+            obligaba a esperar (hallazgo 342). El cortafuegos ya existía y la ejecución es
+            asíncrona, así que no cuelga el navegador; lo que faltaba era poder llegar hasta
+            él. Con 10 ms el aviso aparece en menos de un minuto. */}
+        {velocidad <= VELOCIDAD_MIN && (
+          <p className={styles.velocidadNota}>
+            A esta velocidad la cinta va demasiado rápido para seguirla con la vista: sirve para
+            llegar al final —o al aviso de los {formatNumber(LIMITE_PASOS, 0)} pasos— sin esperar.
+          </p>
+        )}
 
         {/* Controles */}
         <div className={styles.controlBar}>
@@ -871,7 +946,12 @@ export default function SimuladorMaquinaTuring() {
             <span className={styles.metricValue}>{formatNumber(pasos, 0)}</span>
           </div>
           <div className={styles.metricCard}>
-            <span className={styles.metricLabel}>Símbolos escritos</span>
+            {/* El contador solo sube cuando la escritura CAMBIA la celda, y en el formalismo
+                toda transición escribe un símbolo aunque sea el mismo: con el bucle
+                q0 1→1,S,q0 la app marcaba «Símbolos escritos 0» tras 36 transiciones. Se
+                renombra la etiqueta a lo que de verdad mide, que además es lo interesante de
+                ver en una app didáctica (hallazgo 340). */}
+            <span className={styles.metricLabel}>Celdas modificadas</span>
             <span className={styles.metricValue}>
               {formatNumber(simbolosEscritos, 0)}
             </span>
@@ -981,7 +1061,7 @@ export default function SimuladorMaquinaTuring() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🎓</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
               <strong>Estudiante de Teoría de la Computación</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -996,7 +1076,7 @@ export default function SimuladorMaquinaTuring() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>📘</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">📘</span>
               <strong>Opositor TIC</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -1011,7 +1091,7 @@ export default function SimuladorMaquinaTuring() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🎙️</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🎙️</span>
               <strong>Divulgador o curioso</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -1026,7 +1106,7 @@ export default function SimuladorMaquinaTuring() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>👨‍🏫</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">👨‍🏫</span>
               <strong>Profesor de Informática</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -1034,10 +1114,15 @@ export default function SimuladorMaquinaTuring() {
               alumnado entienda transiciones, estados y la diferencia entre
               aceptar y rechazar una entrada.
             </p>
+            {/* Decía «el aprendizaje activo cuadruplica la retención»: un multiplicador
+                redondo, sin fuente ni año, del mismo género que la «pirámide del aprendizaje»
+                o el cono de Dale, cuyos porcentajes de retención están desacreditados y nunca
+                tuvieron base experimental. Antipatrón editorial nº 1 del CLAUDE.md, y
+                hallazgo 337 del Inspector. La recomendación se sostiene sola sin la cifra. */}
             <div className={styles.escenarioTip}>
               Proyecta el simulador en el aula y deja que la clase modifique
-              reglas en directo: el aprendizaje activo cuadruplica la
-              retención.
+              reglas en directo: ver cómo una regla mal puesta cuelga la máquina
+              enseña más que leer la definición.
             </div>
           </div>
         </div>
@@ -1101,12 +1186,18 @@ export default function SimuladorMaquinaTuring() {
           </div>
           <div className={styles.faqItem}>
             <h4>¿Una computadora real es Turing-completa?</h4>
+            {/* Decía que «un PC es un autómata linealmente acotado». Un LBA usa una cinta
+                acotada por una función lineal DE LA ENTRADA, así que crece con ella; un
+                ordenador real tiene memoria fija, que no crece con nada. El modelo formal
+                estricto es un autómata finito — enorme, pero finito (hallazgo 338). El resto
+                de la respuesta ya era correcto. */}
             <p>
               En la práctica, sí. En sentido estricto, no: las máquinas reales
               tienen memoria finita, mientras que la máquina de Turing tiene
-              cinta infinita. Por eso se dice que un PC es un autómata
-              linealmente acotado, pero a efectos prácticos lo tratamos como
-              Turing-completo porque la memoria es muy grande.
+              cinta infinita. Con memoria fija, el modelo formal que le
+              corresponde a un ordenador es un autómata finito —enorme, pero
+              finito—, y a efectos prácticos lo tratamos como Turing-completo
+              porque esa memoria es tan grande que el límite no se nota.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -1183,7 +1274,7 @@ export default function SimuladorMaquinaTuring() {
         <h3>Mejores Prácticas</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📐</span>
+            <span className={styles.tipIcon} aria-hidden="true">📐</span>
             <strong>Diseña primero en papel</strong>
             <p>
               Dibuja el diagrama de estados antes de teclear reglas. Te
@@ -1191,7 +1282,7 @@ export default function SimuladorMaquinaTuring() {
             </p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🏷️</span>
+            <span className={styles.tipIcon} aria-hidden="true">🏷️</span>
             <strong>Usa marcadores auxiliares</strong>
             <p>
               Reescribir &quot;a&quot; como &quot;X&quot; al consumirla evita
@@ -1199,7 +1290,7 @@ export default function SimuladorMaquinaTuring() {
             </p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🐢</span>
+            <span className={styles.tipIcon} aria-hidden="true">🐢</span>
             <strong>Empieza con velocidad lenta</strong>
             <p>
               A 1500-2000 ms verás cada transición claramente. Acelera solo
@@ -1207,7 +1298,7 @@ export default function SimuladorMaquinaTuring() {
             </p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔍</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔍</span>
             <strong>Modo paso a paso para depurar</strong>
             <p>
               Cuando el resultado no es el esperado, avanza con &quot;Paso
@@ -1215,7 +1306,7 @@ export default function SimuladorMaquinaTuring() {
             </p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🎯</span>
+            <span className={styles.tipIcon} aria-hidden="true">🎯</span>
             <strong>Una fase, un estado</strong>
             <p>
               Si un estado intenta hacer dos cosas a la vez, divídelo en dos.
@@ -1223,7 +1314,7 @@ export default function SimuladorMaquinaTuring() {
             </p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🧪</span>
+            <span className={styles.tipIcon} aria-hidden="true">🧪</span>
             <strong>Verifica con casos extremos</strong>
             <p>
               Cadena vacía, un solo carácter, casos que deben rechazarse:
@@ -1234,7 +1325,7 @@ export default function SimuladorMaquinaTuring() {
 
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores frecuentes al diseñar máquinas</strong>
           </div>
           <ul className={styles.warningList}>

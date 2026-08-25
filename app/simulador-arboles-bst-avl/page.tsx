@@ -43,6 +43,31 @@ interface PresetArbol {
   valores: number[];
 }
 
+/**
+ * Rango admitido para un nodo.
+ *
+ * Vive aquí, y no dentro de `handleInsertar`, porque hasta el 25/08/2026 solo lo aplicaba el
+ * botón «Insertar»: el textarea «Insertar varios» no pasaba por esa validación, así que el
+ * mismo 12345 era rechazado por un control y aceptado por el otro en la misma pantalla
+ * (hallazgo 319).
+ */
+const VALOR_MIN = -999;
+const VALOR_MAX = 9999;
+
+/**
+ * Lee lo que hay escrito en un campo de valor.
+ *
+ * Devuelve `null` cuando no hay un número, incluido el campo VACÍO: `Number('')` es 0, no
+ * NaN, así que el guardián `if (!Number.isNaN(Number(valor)))` dejaba pasar el vacío y la app
+ * insertaba —o BORRABA— el nodo 0 sin que nadie lo pidiera. Y como un `input[type=number]`
+ * deja el value en '' con cualquier texto, bastaba teclear mal para provocarlo (hallazgo 318).
+ */
+function leerValor(texto: string): number | null {
+  if (texto.trim() === '') return null;
+  const v = Number(texto);
+  return Number.isFinite(v) ? v : null;
+}
+
 const PRESETS: PresetArbol[] = [
   {
     id: 'ordenado',
@@ -413,8 +438,8 @@ export default function SimuladorArbolesBstAvl() {
 
   const handleInsertar = useCallback(
     (valor: number) => {
-      if (!Number.isFinite(valor) || valor < -999 || valor > 9999) {
-        setMensaje('Valor fuera de rango. Introduce un número entero válido.');
+      if (!Number.isFinite(valor) || valor < VALOR_MIN || valor > VALOR_MAX) {
+        setMensaje(`Valor fuera de rango. Introduce un número entero entre ${VALOR_MIN} y ${VALOR_MAX}.`);
         return;
       }
       const valorEntero = Math.trunc(valor);
@@ -524,14 +549,22 @@ export default function SimuladorArbolesBstAvl() {
   );
 
   const handleInsertarVarios = useCallback(() => {
-    const numeros = valoresMultiples
+    const leidos = valoresMultiples
       .split(/[,;\s]+/)
       .map((s) => s.trim())
       .filter((s) => s.length > 0)
       .map((s) => Number(s))
       .filter((n) => Number.isFinite(n));
-    if (numeros.length === 0) {
+    if (leidos.length === 0) {
       setMensaje('No se encontraron números válidos en el texto.');
+      return;
+    }
+    // El MISMO rango que el botón «Insertar». Hasta el 25/08/2026 esta vía no lo aplicaba, así
+    // que 12345 se rechazaba por un control y entraba por el otro en la misma pantalla.
+    const numeros = leidos.filter((n) => n >= VALOR_MIN && n <= VALOR_MAX);
+    const fueraDeRango = leidos.length - numeros.length;
+    if (numeros.length === 0) {
+      setMensaje(`Todos los valores quedan fuera del rango ${VALOR_MIN} a ${VALOR_MAX}.`);
       return;
     }
     let arbol = clonar(raiz);
@@ -550,7 +583,8 @@ export default function SimuladorArbolesBstAvl() {
     setRaiz(arbol);
     setRotaciones((prev) => [...prev, ...logTotal]);
     setMensaje(
-      `Insertados ${insertados} de ${numeros.length} valores. Rotaciones aplicadas: ${logTotal.length}.`
+      `Insertados ${insertados} de ${leidos.length} valores. Rotaciones aplicadas: ${logTotal.length}.` +
+        (fueraDeRango > 0 ? ` ${fueraDeRango} quedaron fuera del rango ${VALOR_MIN} a ${VALOR_MAX}.` : '')
     );
     setValoresMultiples('');
   }, [valoresMultiples, raiz, tipo]);
@@ -718,11 +752,13 @@ export default function SimuladorArbolesBstAvl() {
                   type="button"
                   className={styles.opBtn}
                   onClick={() => {
-                    const v = Number(valorInsertar);
-                    if (!Number.isNaN(v)) {
-                      handleInsertar(v);
-                      setValorInsertar('');
+                    const v = leerValor(valorInsertar);
+                    if (v === null) {
+                      setMensaje('Escribe un número antes de insertar.');
+                      return;
                     }
+                    handleInsertar(v);
+                    setValorInsertar('');
                   }}
                 >
                   Insertar
@@ -746,11 +782,13 @@ export default function SimuladorArbolesBstAvl() {
                   type="button"
                   className={`${styles.opBtn} ${styles.opBtnDanger}`}
                   onClick={() => {
-                    const v = Number(valorEliminar);
-                    if (!Number.isNaN(v)) {
-                      handleEliminar(v);
-                      setValorEliminar('');
+                    const v = leerValor(valorEliminar);
+                    if (v === null) {
+                      setMensaje('Escribe el valor del nodo que quieres eliminar.');
+                      return;
                     }
+                    handleEliminar(v);
+                    setValorEliminar('');
                   }}
                 >
                   Eliminar
@@ -1059,8 +1097,13 @@ export default function SimuladorArbolesBstAvl() {
               <strong>Índices de bases de datos</strong>
             </div>
             <div className={styles.escenarioExample}>
+              {/* Decía «B-Tree, derivado de AVL», y no lo es: el B-tree (Bayer y McCreight,
+                  1972) es una generalización multivía pensada para bloques de disco, no una
+                  derivación del AVL (Adelson-Velsky y Landis, 1962). Son dos respuestas
+                  independientes al mismo problema (hallazgo 321). */}
               Las bases de datos relacionales (PostgreSQL, MySQL, SQLite) usan árboles equilibrados
-              (B-Tree, derivado de AVL) para indexar columnas y mantener búsquedas en O(log n) sobre
+              —B-Tree y B+Tree, que no derivan del AVL sino que resuelven el mismo problema para
+              bloques de disco— para indexar columnas y mantener búsquedas en O(log n) sobre
               millones de filas.
             </div>
             <div className={styles.escenarioTip}>

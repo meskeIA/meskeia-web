@@ -334,6 +334,14 @@
   text-align: right;
 }
 
+/* Nota del modo sin pausa: explica para qué sirve, para que no parezca un fallo de dibujo. */
+.velocidadNota {
+  margin: 0.5rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
 /* Control bar */
 .controlBar {
   display: flex;

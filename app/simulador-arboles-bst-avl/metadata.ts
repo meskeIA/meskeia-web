@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Simulador de Árboles BST y AVL | meskeIA',
-    description: 'Inserciones, borrados y rotaciones AVL animadas paso a paso',
+    description: 'Inserciones, borrados y rotaciones AVL, con búsqueda animada e historial de rotaciones paso a paso',
     url: 'https://meskeia.com/simulador-arboles-bst-avl/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -32,13 +32,17 @@ export const metadata: Metadata = {
 export const jsonLd = generateWebAppSchema({
   name: 'Simulador de Árboles BST y AVL',
   description:
-    'Simulador interactivo de árboles binarios de búsqueda (BST) y AVL auto-balanceados. Inserta, elimina y busca nodos, observa las rotaciones LL/RR/LR/RL animadas y los 4 recorridos clásicos.',
+    // La animación es la de la BÚSQUEDA, que sí recorre el camino paso a paso, y la del
+    // destello del nodo nuevo. La inserción y el borrado se aplican de golpe, y la rotación se
+    // sigue en el historial numerado, no viéndola desplegarse: prometer «rotaciones animadas»
+    // hacía esperar algo que la app no hace (hallazgo 322).
+    'Simulador interactivo de árboles binarios de búsqueda (BST) y AVL auto-balanceados. Inserta, elimina y busca nodos con la búsqueda animada nodo a nodo, y sigue las rotaciones LL/RR/LR/RL en un historial numerado, junto con los 4 recorridos clásicos.',
   url: 'https://meskeia.com/simulador-arboles-bst-avl/',
   category: 'EducationalApplication',
   features: [
     'Modos BST simple y AVL auto-balanceado',
-    'Inserción, borrado y búsqueda animadas',
-    'Rotaciones LL, RR, LR, RL paso a paso',
+    'Búsqueda animada nodo a nodo, con velocidad regulable',
+    'Rotaciones LL, RR, LR, RL en un historial numerado',
     'Factor de balance visible en cada nodo (AVL)',
     '4 recorridos: inorden, preorden, postorden, niveles',
     '4 ejemplos clásicos (inserción ordenada, rotación simple/doble, balanceado)',
