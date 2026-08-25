@@ -437,6 +437,36 @@ nada. Falso positivo: `a11y-ok: <razón>` en esa línea o en la anterior.
 > skill `/audit-accesibilidad-jsx` solo mira las apps de los últimos 60 días, y aquellas eran
 > de febrero-mayo. El pasivo sigue siendo suyo; lo nuevo ya es de este candado.
 
+### Candado del parser numérico
+
+`npm run check:parser` — lo ejecuta también `npm run build`, y **rompe el build** si el commit
+escribe `parseFloat(x.replace(',', '.'))` o cualquier variante del parseo casero. El parser
+canónico es **`parseSpanishNumber`** de `@/lib`.
+
+`parseFloat` se queda con el prefijo numérico y descarta el resto sin avisar (`'12abc'` → 12,
+`'1e3'` → 1000, `'10.5.3'` → 10,5), y el `.replace(',', '.')` de delante lee el millar español
+mil veces más pequeño: «1.500» se convierte en 1,5.
+
+⚠️ Igual que `check:a11y-jsx`, juzga **las líneas que el commit añade**, no el fichero entero, y
+por una razón medida: el catálogo arrastra **191 usos en 87 ficheros** (25/08/2026), y de una
+muestra de 60 **35 no validan el resultado del parseo**. Sustituirlos en bloque haría aparecer
+«NaN» en pantalla en más de la mitad, porque `parseSpanishNumber` devuelve NaN donde `parseFloat`
+devolvía un número: sería cambiar un defecto silencioso por uno visible en 87 apps a la vez. El
+pasivo lo drena el Inspector app por app, que es donde se puede comprobar en navegador si esa app
+maneja el NaN o si hay que añadirle la guarda. Falso positivo: `parser-ok: <razón>` en esa línea
+o en la anterior — los hay de verdad, como parsear un `dataset` que escribe la propia app.
+
+`npm run check:parser -- --todo` mide el pasivo entero y `node scripts/check-parser-numerico.mjs
+<fichero>` audita uno concreto. Su caso de prueba —cuatro formas que debe cazar y cuatro que debe
+dejar pasar— está en `scripts/pruebas/parser-numerico.tsx`.
+
+> Sale de dos hallazgos del Inspector con el mismo defecto: `conversor-numeros-letras`
+> (24/08/2026), que es con lo que se rellenan pagarés, y `calculadora-masa-madre` (hallazgo 290).
+> Y su primera versión **era ciega a la forma más habitual del catálogo** —dos `replace`
+> encadenados, `x.replace(/\./g, '').replace(',', '.')`, donde el paréntesis del primero rompía
+> el patrón—: veía 153 de 188 usos reales. Se descubrió comparándolo con un `grep` independiente,
+> no ejecutándolo.
+
 ### TypeScript
 
 - ⚠️ `ignoreBuildErrors: true` en `next.config.ts` — el build de producción NO type-chequea (limitación de RAM en Vercel: el type-check de +1.100 apps agota los 8 GB)
