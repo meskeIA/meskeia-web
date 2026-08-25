@@ -37,6 +37,26 @@ export interface Post {
 
 export const POSTS: Post[] = [
   {
+    slug: 'becas-colaboracion-departamentos-universitarios-2026-2027',
+    titulo:
+      'Las becas de colaboración en departamentos universitarios cierran el 22 de septiembre',
+    fecha: '2026-09-01',
+    resumen:
+      'El Real Decreto 179/2026 dio rango reglamentario propio a las becas de colaboración, y la primera convocatoria bajo ese régimen sigue abierta: 2.111 plazas de 2.000 euros para estudiantes de último curso de grado o primero de máster. Qué exige, qué se cobra y qué dedicación pide a cambio.',
+    cuerpo: [
+      'El Real Decreto 179/2026, de 11 de marzo (BOE núm. 63, de 12 de marzo de 2026), es la norma que cada curso fija los umbrales de renta y patrimonio familiar y las cuantías de las becas al estudio: la convocatoria general que de él dependía cerró su plazo el 19 de mayo. Pero ese real decreto hizo además algo que no es anual. Añadió un capítulo VI completo, artículos 43 a 51, al Real Decreto 1721/2007, que es el reglamento donde vive el régimen de las becas y ayudas al estudio, para regular en él las becas de colaboración de estudiantes en departamentos universitarios. El artículo 43 fija su objeto: iniciar en tareas de investigación al alumnado que termina el grado o cursa el primer año de un máster oficial, y orientarlo profesionalmente mediante una asignación económica.',
+      'La convocatoria de este curso se publicó el 17 de julio y sigue abierta. Pueden pedirla quienes en 2026-2027 estén matriculados en el último curso de grado o en el primero de un máster universitario oficial y alcancen una nota media en los estudios previos de «7,25 puntos para la rama de Ingeniería y Arquitectura o Enseñanzas Técnicas; 7,70 puntos para las ramas de Ciencias o Ciencias Experimentales y para Ciencias Sociales y Jurídicas; 7,80 puntos para la rama de Ciencias de la Salud y 8,00 puntos para la rama de Artes y Humanidades». El artículo 47 exige además, en el caso del grado, haber superado al menos el 75 % de la carga lectiva del título, y presentar un proyecto de colaboración avalado por el consejo del departamento. No hay umbral de renta ni de patrimonio: a diferencia de la beca general, esta se concede por mérito académico en régimen de concurrencia competitiva.',
+      'La cuantía individual es de 2.000 euros y no exime del pago de los precios públicos por servicios académicos. A cambio, el artículo 48 pide colaborar de forma presencial en el departamento a razón de al menos tres horas diarias durante siete meses y medio desde la incorporación. Conviene leer esas dos cifras juntas antes de solicitarla, porque la norma declara una finalidad formativa —la iniciación en la investigación— y no retributiva, y la dedicación que exige es la de una jornada parcial sostenida durante casi todo el curso.',
+      'El plazo de solicitud va del 21 de julio de 2026 a las 8:00 al 22 de septiembre de 2026 a las 15:00, hora peninsular, por formulario telemático en la sede electrónica del Ministerio de Educación, Formación Profesional y Deportes. Se convocan 2.111 becas y las bases reguladoras están depositadas en la Base de Datos Nacional de Subvenciones con el identificador 919565. Hay un detalle que no está en la convocatoria y que conviene comprobar cuanto antes: el aval del departamento no se resuelve dentro del formulario, y cada universidad organiza por su cuenta la recogida y evaluación de los proyectos, con calendarios internos propios que pueden vencer antes del 22 de septiembre. Ese plazo se consulta en la universidad de matrícula, no en la convocatoria.',
+      'No hay que confundir esta beca con la general del mismo real decreto, que sí depende de la renta y el patrimonio familiar y cuyo plazo terminó el 19 de mayo de 2026: son convocatorias distintas, con requisitos, calendarios y criterios de concesión propios. Para situar cuál corresponde a cada nivel educativo y a cada situación familiar, el orientador enlazado abajo recorre las becas y ayudas al estudio disponibles y los organismos ante los que se piden.',
+    ],
+    fuente:
+      'BOE — Extracto de la Resolución de 15 de julio de 2026, de la Secretaría de Estado de Educación (BOE núm. 173, de 17 de julio de 2026)',
+    fuenteUrl: 'https://www.boe.es/diario_boe/txt.php?id=BOE-B-2026-24454',
+    visualizadorUrl: 'https://meskeia.com/orientador-becas-ayudas-estudio/',
+    visualizadorTitulo: 'Orientador de Becas y Ayudas al Estudio',
+  },
+  {
     slug: 'jubilacion-flexible-real-decreto-416-2026',
     titulo: 'La jubilación flexible se abre al trabajo por cuenta propia el 28 de agosto',
     fecha: '2026-08-15',
