@@ -3,6 +3,18 @@
   background: var(--bg-primary);
   color: var(--text-primary);
   font-family: system-ui, -apple-system, sans-serif;
+
+  /* Colores del SVG de la curva. Iban cableados en el marcado, sin variante para modo
+     oscuro: las etiquetas de los ejes (#64748b, de 9-10 px) quedaban en 3,07:1 sobre el
+     fondo oscuro del contenedor, por debajo del 4,5:1 de AA, y el rótulo «Viraje» (#92400e)
+     sobre su banda amarilla en 2,13:1 (hallazgo 349). En tema claro sí cumplían. */
+  --svg-eje: #475569;
+  --svg-viraje: #78350f;
+}
+
+[data-theme='dark'] .container {
+  --svg-eje: #cbd5e1;
+  --svg-viraje: #451a03;
 }
 
 .hero {
@@ -179,6 +191,37 @@
 .indicatorActive {
   border-color: var(--primary);
   background: #eff6ff;
+}
+
+/* Marca de «este sí sirve aquí»: va en TEXTO, no solo en color, porque es información y no
+   decoración (el criterio es el rango de viraje frente al pH de equivalencia). */
+.indicatorApto {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #15803d;
+}
+
+.indicatorAviso {
+  margin: 0.9rem 0 0;
+  padding: 0.8rem 1rem;
+  background: rgba(202, 138, 4, 0.1);
+  border-left: 3px solid #CA8A04;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .indicatorActive {
+  background: rgba(46, 134, 171, 0.18);
+}
+
+[data-theme='dark'] .indicatorApto {
+  color: #4ADE80;
+}
+
+[data-theme='dark'] .indicatorAviso {
+  background: rgba(202, 138, 4, 0.2);
 }
 
 /* Layout simulación: bureta + curva */

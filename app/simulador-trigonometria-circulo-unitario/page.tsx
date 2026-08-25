@@ -17,12 +17,62 @@ const BOTONES_NOTABLES = [0, 30, 45, 60, 90, 180, 270, 360];
 // UTILIDADES
 // ============================================
 
+/** Una vuelta completa en radianes. */
+const TAU = 2 * Math.PI;
+
+/**
+ * Rango del simulador: una vuelta hacia atrás y dos hacia delante.
+ *
+ * Era [0, 360], y el bloque educativo enseñaba lo que ahí no se puede comprobar: «si el
+ * ángulo es negativo, gira en sentido horario», «si supera 360, da vueltas completas y
+ * continúa», y un error frecuente cuyo ejemplo es sen(390°) = sen(30°). Las tres lecciones
+ * eran inverificables en la propia herramienta que las da (hallazgo 353).
+ */
+const ANGULO_MIN = -360;
+const ANGULO_MAX = 720;
+
 function gradosARadianes(grados: number): number {
   return (grados * Math.PI) / 180;
 }
 
+function radianesAGrados(radianes: number): number {
+  // Sin redondear: 1 rad son 57,2958°, y quedarse en 57° cambia el seno de 0,8415 a 0,8387.
+  // El ángulo interno de la app está en grados, así que este es el único punto donde la
+  // conversión puede perder precisión.
+  return (radianes * 180) / Math.PI;
+}
+
+/**
+ * Redondea a la precisión que la app muestra y mata el residuo de coma flotante.
+ *
+ * `Math.cos(270°)` no da 0 sino −1,84·10⁻¹⁶, y `Math.sin(360°)` da −2,45·10⁻¹⁶. Esos
+ * residuos son CERO a cuatro decimales, pero conservan el signo: el panel escribía
+ * «−0,0000» donde la tabla del propio bloque educativo dice «270 · cos 0» (hallazgo 350), y
+ * el panel de signos los calificaba de negativos (hallazgo 351). Sumar 0 normaliza el −0 de
+ * JavaScript, que es lo único que distingue «−0,0000» de «0,0000».
+ */
+function redondear(n: number, decimales = 4): number {
+  const factor = Math.pow(10, decimales);
+  return Math.round(n * factor) / factor + 0;
+}
+
 function formatearNumero(n: number, decimales = 4): string {
-  return n.toFixed(decimales).replace('.', ',');
+  return redondear(n, decimales).toFixed(decimales).replace('.', ',');
+}
+
+/**
+ * Signo de una razón trigonométrica A LA PRECISIÓN QUE SE MUESTRA.
+ *
+ * Cero no es positivo ni negativo, y hay cinco ángulos notables donde una de las razones
+ * vale cero exacto. Decidirlo con `valor >= 0` sobre el residuo de coma flotante daba tres
+ * respuestas distintas para el mismo 0: «−» en cos 270 y en sen 360, «+» en 0, 90 y 180
+ * (hallazgo 351). La app ya sabe que esos ángulos son especiales — su indicador de Cuadrante
+ * los rotula «—» — así que aquí se dice lo mismo: cero, sin signo.
+ */
+function signoDe(valor: number): { texto: string; clase: 'pos' | 'neg' | 'cero' } {
+  const v = redondear(valor);
+  if (v === 0) return { texto: '0 · sin signo', clase: 'cero' };
+  return v > 0 ? { texto: '+ (positivo)', clase: 'pos' } : { texto: '− (negativo)', clase: 'neg' };
 }
 
 function obtenerCuadrante(angulo: number): string {
@@ -51,6 +101,55 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
   const [unidad, setUnidad] = useState<'grados' | 'radianes'>('grados');
   const [animando, setAnimando] = useState(false);
   const [velocidad, setVelocidad] = useState(1);
+  /**
+   * Lo que hay ESCRITO en el campo, que no siempre es un ángulo válido todavía.
+   *
+   * Sin un estado propio para el texto no se puede teclear un número de tres cifras: con el
+   * campo atado directamente al ángulo, escribir «450» pasaba por «45» —válido— y luego por
+   * «450» —rechazado—, así que se quedaba en 45 sin decir nada (hallazgo 352).
+   */
+  const [anguloTexto, setAnguloTexto] = useState('45');
+  const [avisoAngulo, setAvisoAngulo] = useState('');
+
+  const enRadianes = unidad === 'radianes';
+
+  /**
+   * Escribe en el campo y, si lo escrito es un ángulo del rango, lo aplica.
+   *
+   * Lo que queda fuera se dice en voz alta en vez de descartarse: es la diferencia entre una
+   * herramienta que enseña y una que corrige a escondidas.
+   */
+  const escribirAngulo = useCallback(
+    (texto: string) => {
+      setAnguloTexto(texto);
+      if (texto.trim() === '') { setAvisoAngulo(''); return; }
+
+      const v = Number(texto);
+      if (Number.isNaN(v)) { setAvisoAngulo('Eso no es un número.'); return; }
+
+      const grados = enRadianes ? radianesAGrados(v) : v;
+      if (grados < ANGULO_MIN || grados > ANGULO_MAX) {
+        const equivalente = ((grados % 360) + 360) % 360;
+        setAvisoAngulo(
+          `Fuera del rango del simulador (${ANGULO_MIN}° a ${ANGULO_MAX}°). ` +
+            `Ese ángulo equivale a ${formatearNumero(equivalente, 0)}°, que sí puedes introducir: ` +
+            'las razones trigonométricas se repiten cada vuelta completa.',
+        );
+        return;
+      }
+      setAvisoAngulo('');
+      setAngulo(grados);
+    },
+    [enRadianes],
+  );
+
+  // El campo sigue al ángulo cuando este cambia por otra vía (slider, notables, animación).
+  // Se recorta a 4 decimales: al venir de radianes el ángulo puede ser 57,29577951308232 y
+  // el campo no tiene por qué enseñar dieciséis cifras.
+  useEffect(() => {
+    const n = enRadianes ? gradosARadianes(angulo) : angulo;
+    setAnguloTexto(Number.isInteger(n) ? String(n) : n.toFixed(4));
+  }, [angulo, enRadianes]);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number | null>(null);
@@ -359,6 +458,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
         {/* Toggle de unidad */}
         <div className={styles.unitToggle}>
           <button
+            type="button"
             className={`${styles.unitBtn} ${unidad === 'grados' ? styles.unitBtnActive : ''}`}
             onClick={() => setUnidad('grados')}
             aria-pressed={unidad === 'grados'}
@@ -366,6 +466,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
             Grados (°)
           </button>
           <button
+            type="button"
             className={`${styles.unitBtn} ${unidad === 'radianes' ? styles.unitBtnActive : ''}`}
             onClick={() => setUnidad('radianes')}
             aria-pressed={unidad === 'radianes'}
@@ -384,31 +485,41 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
             <input
               id="slider-angulo"
               type="range"
-              min={0}
-              max={360}
-              step={1}
-              value={angulo}
-              onChange={e => setAngulo(Number(e.target.value))}
+              min={enRadianes ? -TAU : ANGULO_MIN}
+              max={enRadianes ? 2 * TAU : ANGULO_MAX}
+              step={enRadianes ? 0.01 : 1}
+              value={enRadianes ? gradosARadianes(angulo) : angulo}
+              onChange={e => {
+                const v = Number(e.target.value);
+                setAngulo(enRadianes ? radianesAGrados(v) : v);
+              }}
               className={styles.slider}
-              aria-label="Ángulo θ en grados"
+              aria-label={`Ángulo θ en ${enRadianes ? 'radianes' : 'grados'}`}
               disabled={animando}
             />
             <input
               type="number"
-              min={0}
-              max={360}
-              step={1}
-              value={angulo}
-              onChange={e => {
-                const v = Number(e.target.value);
-                if (!isNaN(v) && v >= 0 && v <= 360) setAngulo(v);
-              }}
+              min={enRadianes ? -TAU : ANGULO_MIN}
+              max={enRadianes ? 2 * TAU : ANGULO_MAX}
+              step={enRadianes ? 0.01 : 1}
+              value={anguloTexto}
+              onChange={e => escribirAngulo(e.target.value)}
               className={styles.angleInput}
-              aria-label="Ángulo θ numérico"
+              aria-label={`Ángulo θ numérico en ${enRadianes ? 'radianes' : 'grados'}`}
               disabled={animando}
+              aria-describedby={avisoAngulo ? 'aviso-angulo' : undefined}
             />
-            <span className={styles.angleUnit}>°</span>
+            <span className={styles.angleUnit}>{enRadianes ? 'rad' : '°'}</span>
           </div>
+          {/* Lo que quedaba fuera de rango se descartaba SIN DEJAR RASTRO: teclear 450 dejaba
+              45 porque el tercer dígito se caía, y −30 dejaba 30, que no es el equivalente de
+              −30 (sería 330, con el seno cambiado de signo). No había ni un role="alert" en
+              toda la página (hallazgo 352). */}
+          {avisoAngulo && (
+            <p className={styles.avisoAngulo} id="aviso-angulo" role="alert">
+              {avisoAngulo}
+            </p>
+          )}
         </div>
 
         {/* Ángulos notables */}
@@ -417,10 +528,14 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
           <div className={styles.notableButtons}>
             {BOTONES_NOTABLES.map(ang => (
               <button
+                type="button"
                 key={ang}
                 className={`${styles.notableBtn} ${angulo === ang ? styles.notableBtnActive : ''}`}
                 onClick={() => { setAnimando(false); setAngulo(ang); }}
                 aria-label={`Ir a ${ang}°`}
+                // Pintaban el estado activo solo con la clase CSS: un lector de pantalla no
+                // podía saber cuál estaba seleccionado (hallazgo 356).
+                aria-pressed={angulo === ang}
               >
                 {ang}°
               </button>
@@ -472,9 +587,17 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
 
           <div className={styles.valueDivider} />
 
+          {/* Se CALCULA. Hasta el 25/08/2026 esta fila era la cadena literal «1,0000 ✓»
+              escrita a mano, así que daba el visto bueno pasara lo que pasara: si el seno o
+              el coseno se estropearan, seguiría diciendo ✓. Y el paso 5 del bloque educativo
+              enseña justo lo contrario («si tu resultado no satisface esta identidad, hay un
+              error»). Un verificador que no puede fallar no verifica nada (hallazgo 355). */}
           <div className={styles.valueRow}>
             <span className={styles.valueName}>sin²+cos²</span>
-            <span className={`${styles.valueNum} ${styles.valueIdentidad}`}>1,0000 ✓</span>
+            <span className={`${styles.valueNum} ${styles.valueIdentidad}`}>
+              {formatearNumero(sinVal * sinVal + cosVal * cosVal)}
+              {redondear(sinVal * sinVal + cosVal * cosVal) === 1 ? ' ✓' : ' ✗'}
+            </span>
           </div>
 
           <div className={styles.valueDivider} />
@@ -486,18 +609,16 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
 
           {/* Signos en cuadrante */}
           <div className={styles.signosGrid}>
-            <div className={styles.signoItem}>
-              <span className={styles.signoNombre}>sin</span>
-              <span className={sinVal >= 0 ? styles.signoPos : styles.signoNeg}>
-                {sinVal >= 0 ? '+ (positivo)' : '− (negativo)'}
-              </span>
-            </div>
-            <div className={styles.signoItem}>
-              <span className={styles.signoNombre}>cos</span>
-              <span className={cosVal >= 0 ? styles.signoPos : styles.signoNeg}>
-                {cosVal >= 0 ? '+ (positivo)' : '− (negativo)'}
-              </span>
-            </div>
+            {([['sin', sinVal], ['cos', cosVal]] as const).map(([nombre, valor]) => {
+              const signo = signoDe(valor);
+              const clase = signo.clase === 'pos' ? styles.signoPos : signo.clase === 'neg' ? styles.signoNeg : styles.signoCero;
+              return (
+                <div className={styles.signoItem} key={nombre}>
+                  <span className={styles.signoNombre}>{nombre}</span>
+                  <span className={clase}>{signo.texto}</span>
+                </div>
+              );
+            })}
           </div>
         </aside>
       </div>
@@ -520,6 +641,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
           <div className={styles.velocidadRow}>
             <span className={styles.velocidadLabel}>Velocidad:</span>
             <button
+              type="button"
               className={`${styles.velBtn} ${velocidad === 1 ? styles.velBtnActive : ''}`}
               onClick={() => setVelocidad(1)}
               aria-pressed={velocidad === 1}
@@ -527,6 +649,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
               Lenta
             </button>
             <button
+              type="button"
               className={`${styles.velBtn} ${velocidad === 2 ? styles.velBtnActive : ''}`}
               onClick={() => setVelocidad(2)}
               aria-pressed={velocidad === 2}
@@ -534,6 +657,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
               Media
             </button>
             <button
+              type="button"
               className={`${styles.velBtn} ${velocidad === 3 ? styles.velBtnActive : ''}`}
               onClick={() => setVelocidad(3)}
               aria-pressed={velocidad === 3}
@@ -608,22 +732,22 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
           <h3>4 aplicaciones reales de la trigonometría</h3>
           <div className={styles.scenariosGrid}>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🌊</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🌊</span>
               <strong>Ondas y oscilaciones en física</strong>
               <p>El movimiento armónico simple (péndulo, resorte) se describe con seno y coseno: <code>x(t) = A·cos(ωt + φ)</code>. La posición del péndulo en cada instante es exactamente el coseno del ángulo en el círculo unitario.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>⚡</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">⚡</span>
               <strong>Corriente alterna en ingeniería eléctrica</strong>
               <p>La tensión doméstica es una función sinusoidal: <code>V(t) = 230·sin(2πft)</code> donde f = 50 Hz. Las rotaciones del alternador generan exactamente las coordenadas del círculo unitario a lo largo del tiempo.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🎮</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🎮</span>
               <strong>Rotaciones en videojuegos y gráficos 3D</strong>
               <p>Rotar un punto (x, y) un ángulo θ en un videojuego o simulación 3D usa la fórmula: <code>x&apos; = x·cos θ − y·sin θ</code>, <code>y&apos; = x·sin θ + y·cos θ</code>. Millones de estas operaciones ocurren por segundo en cualquier motor gráfico.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🛰️</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🛰️</span>
               <strong>GPS y posicionamiento por satélite</strong>
               <p>Los satélites orbitan en trayectorias circulares o elípticas. Para calcular su posición desde la Tierra se usan ángulos en el círculo trigonométrico. Sin trigonometría no habría GPS, navegación aérea ni telefonía móvil.</p>
             </div>
@@ -643,7 +767,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
                 <code>sin θ = y/r</code> y <code>cos θ = x/r</code>. Con r = 1, la división desaparece:
                 <code>sin θ = y</code> y <code>cos θ = x</code>.
               </p>
-              <p className={styles.faqTip}>💡 Esta misma idea se usa en todas las matemáticas: normalizar para que las fórmulas sean más limpias.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Esta misma idea se usa en todas las matemáticas: normalizar para que las fórmulas sean más limpias.</p>
             </div>
 
             <div className={styles.faqItem}>
@@ -654,7 +778,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
                 del punto sobre la circunferencia y se lee su coordenada Y (sin θ) y su coordenada X (cos θ).
                 Los signos cambian según el cuadrante: en el II cuadrante, sin &gt; 0 pero cos &lt; 0.
               </p>
-              <p className={styles.faqTip}>💡 Prueba en el simulador: ve a 150°. Sin(150°) = 0,5 = sin(30°), pero cos(150°) = −cos(30°). ¡El triángulo rectángulo ya no es suficiente!</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Prueba en el simulador: ve a 150°. Sin(150°) = 0,5 = sin(30°), pero cos(150°) = −cos(30°). ¡El triángulo rectángulo ya no es suficiente!</p>
             </div>
 
             <div className={styles.faqItem}>
@@ -665,7 +789,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
                 La circunferencia completa (longitud = 2π·r = 2π) corresponde a 2π rad = 360°. Por eso
                 <strong> π rad = 180°</strong>.
               </p>
-              <p className={styles.faqTip}>💡 Los radianes son la unidad &quot;natural&quot; de los ángulos en matemáticas: simplifican derivadas (d/dθ sin θ = cos θ) y series de Taylor sin factores de conversión.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Los radianes son la unidad &quot;natural&quot; de los ángulos en matemáticas: simplifican derivadas (d/dθ sin θ = cos θ) y series de Taylor sin factores de conversión.</p>
             </div>
 
             <div className={styles.faqItem}>
@@ -676,7 +800,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
                 que la recta tangente al círculo en ese punto es vertical y nunca corta al eje X:
                 &quot;se va al infinito&quot;. Lo mismo ocurre en 270°.
               </p>
-              <p className={styles.faqTip}>💡 En la calculadora, si escribes tan(90°) verás &quot;Error&quot; o un número enorme (por error de redondeo). En este simulador mostramos ∞.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> En la calculadora, si escribes tan(90°) verás &quot;Error&quot; o un número enorme (por error de redondeo). En este simulador mostramos ∞.</p>
             </div>
 
             <div className={styles.faqItem}>
@@ -687,7 +811,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
                 unitarios posibles. Esta representación es fundamental en física (dirección de fuerzas), programación
                 gráfica (normales de superficies) y probabilidad (distribución circular).
               </p>
-              <p className={styles.faqTip}>💡 El producto escalar de dos vectores unitarios es exactamente cos θ, donde θ es el ángulo entre ellos. ¡El círculo unitario une trigonometría y álgebra vectorial!</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> El producto escalar de dos vectores unitarios es exactamente cos θ, donde θ es el ángulo entre ellos. ¡El círculo unitario une trigonometría y álgebra vectorial!</p>
             </div>
           </div>
         </section>
@@ -739,22 +863,22 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
           <h3>4 trucos para memorizar los ángulos notables</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🖐️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🖐️</span>
               <strong>El truco del dedo</strong>
               <p>Para sin: extiende la mano izquierda. El pulgar = 0°, índice = 30°, medio = 45°, anular = 60°, meñique = 90°. Dobla el dedo del ángulo; el número de dedos a la izquierda da el numerador de <code>√n/2</code> (n = 0,1,2,3,4). Para cos, inviértelo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📐</span>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
               <strong>El triángulo 30-60-90</strong>
               <p>Un triángulo equilátero de lado 2 dividido por la altura da lados 1, √3, 2. Los ángulos 30° y 60° tienen sin/cos de 1/2 y √3/2 respectivamente. Dibújalo en el examen si tienes dudas.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔲</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔲</span>
               <strong>El triángulo 45-45-90</strong>
               <p>Un cuadrado de lado 1 tiene diagonal √2. Dividiendo entre √2, el triángulo isósceles rectángulo tiene catetos 1 y √2 de hipotenusa, dando sin(45°) = cos(45°) = √2/2 ≈ 0,707. Es el único ángulo con sin = cos.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <strong>Las simetrías de cuadrante</strong>
               <p>Si sabes los valores del primer cuadrante (0°, 30°, 45°, 60°, 90°), los demás cuadrantes son copias con signos cambiados. Ejemplo: sin(150°) = sin(30°) = 1/2, pero cos(150°) = −cos(30°) = −√3/2. El simulador te muestra estos signos en tiempo real.</p>
             </div>

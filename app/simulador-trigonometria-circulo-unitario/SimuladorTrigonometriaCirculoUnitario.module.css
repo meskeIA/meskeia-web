@@ -384,6 +384,34 @@
   font-weight: 600;
 }
 
+/* Cero: ni positivo ni negativo. Existe desde el 25/08/2026, cuando el panel dejó de dar
+   tres respuestas distintas para el mismo 0 según el residuo de coma flotante. */
+.signoCero {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #64748b);
+  font-weight: 600;
+}
+
+/* Aviso del campo de ángulo: lo que queda fuera de rango se dice, no se descarta. */
+.avisoAngulo {
+  margin: 0.6rem 0 0;
+  padding: 0.6rem 0.85rem;
+  background: rgba(202, 138, 4, 0.1);
+  border-left: 3px solid #CA8A04;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .signoCero {
+  color: var(--text-secondary, #94a3b8);
+}
+
+[data-theme='dark'] .avisoAngulo {
+  background: rgba(202, 138, 4, 0.2);
+}
+
 /* ============================================
    CONTROLES DE ANIMACIÓN
 ============================================ */

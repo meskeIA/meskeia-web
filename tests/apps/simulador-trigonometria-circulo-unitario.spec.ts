@@ -370,12 +370,15 @@ test.describe('Caso 2 · los cinco ángulos de los ejes', () => {
 // ═════════════════════════════════════════════════════════════════════════════════════════
 
 test.describe('Caso 3 · entradas inválidas', () => {
-  test('el campo es numérico acotado a [0, 360] y el navegador filtra las letras', async ({ page }) => {
+  test('el campo es numérico acotado a [−360, 720] y el navegador filtra las letras', async ({ page }) => {
     await page.goto(RUTA);
     const campo = campoAngulo(page);
     await expect(campo).toHaveAttribute('type', 'number');
-    await expect(campo).toHaveAttribute('min', '0');
-    await expect(campo).toHaveAttribute('max', '360');
+    // El rango era [0, 360] y se amplió el 25/08/2026 a una vuelta hacia atrás y dos hacia
+    // delante: el bloque educativo enseña ángulos negativos y mayores de 360°, y con el
+    // control acotado a la vuelta esas lecciones no se podían comprobar (hallazgo 353).
+    await expect(campo).toHaveAttribute('min', '-360');
+    await expect(campo).toHaveAttribute('max', '720');
     // Un <input type="number"> no admite texto: lo que se teclee queda descartado por el
     // propio navegador antes de llegar al cálculo.
     await campo.fill('');
@@ -392,32 +395,39 @@ test.describe('Caso 3 · entradas inválidas', () => {
       await page.waitForTimeout(80);
       const panel = await page.locator('[role="status"]').innerText();
       expect(panel, `panel tras teclear ${JSON.stringify(basura)}`).not.toMatch(/NaN|Infinity|undefined/);
-      // Y el ángulo resultante sigue dentro de la vuelta:
-      const grados = Number((await valor(page, 'θ (grados)').innerText()).replace('°', ''));
-      expect(grados, `θ tras teclear ${JSON.stringify(basura)}`).toBeGreaterThanOrEqual(0);
-      expect(grados).toBeLessThanOrEqual(360);
+      // Y el ángulo resultante sigue dentro del rango del simulador. −30 y 450 ya NO son
+      // basura: son ángulos legítimos desde que el rango se amplió, y el simulador tiene que
+      // aceptarlos porque su propio bloque educativo los pone de ejemplo.
+      const grados = Number((await valor(page, 'θ (grados)').innerText()).replace('°', '').replace(',', '.'));
+      expect(grados, `θ tras teclear ${JSON.stringify(basura)}`).toBeGreaterThanOrEqual(-360);
+      expect(grados).toBeLessThanOrEqual(720);
     }
   });
 
-  test('el slider no deja salirse de la vuelta completa', async ({ page }) => {
+  test('el slider no deja salirse del rango del simulador', async ({ page }) => {
     await page.goto(RUTA);
     const slider = page.locator('#slider-angulo');
-    await expect(slider).toHaveAttribute('min', '0');
-    await expect(slider).toHaveAttribute('max', '360');
-    await slider.fill('360');
-    await expect(valor(page, 'θ (grados)')).toHaveText('360°');
-    await slider.fill('0');
-    await expect(valor(page, 'θ (grados)')).toHaveText('0°');
+    await expect(slider).toHaveAttribute('min', '-360');
+    await expect(slider).toHaveAttribute('max', '720');
+    // Con TECLADO, que es como lo movería una persona: `Home` y `End` llevan un
+    // `input[type=range]` a sus extremos con eventos nativos que React procesa siempre.
+    // `locator.fill` no vale aquí — dentro de la suite el evento se perdía y el deslizador se
+    // quedaba en 45° por más que se reintentara, mientras en solitario funcionaba: un test
+    // que solo pasa cuando corre solo no informa de nada.
+    await slider.focus();
+    await page.keyboard.press('End');
+    await expect(valor(page, 'θ (grados)')).toHaveText('720°');
+    await page.keyboard.press('Home');
+    await expect(valor(page, 'θ (grados)')).toHaveText('-360°');
   });
 });
 
 // ═════════════════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS — estos tests FALLAN a propósito hasta que se reparen
+// HALLAZGOS del 25/08/2026 — REPARADOS ese mismo día. Tests de regresión.
 // ═════════════════════════════════════════════════════════════════════════════════════════
 
-test.describe('Hallazgos abiertos (25/08/2026)', () => {
-  test('H1 · el cero de los ejes no lleva signo menos', async ({ page }) => {
-    test.fail(); // hoy escribe «-0,0000» donde el valor es cero exacto
+test.describe('Regresión de los hallazgos (25/08/2026)', () => {
+  test('350 · el cero de los ejes no lleva signo menos', async ({ page }) => {
     await page.goto(RUTA);
     // tan 180° = sen 180°/cos 180° = 0/(−1) = 0. La tabla del propio bloque educativo de la
     // app dice «180° · tan 0». El panel escribe «-0,0000» porque Math.tan(π) vale
@@ -435,20 +445,30 @@ test.describe('Hallazgos abiertos (25/08/2026)', () => {
     expect(await valor(page, 'tan(θ)').innerText(), 'tan 360°').toBe('0,0000');
   });
 
-  test('H2 · el panel de signos no llama positivo ni negativo a un cero', async ({ page }) => {
-    test.fail(); // hoy rotula «− (negativo)» un coseno que vale 0
+  test('351 · el panel de signos no llama positivo ni negativo a un cero', async ({ page }) => {
     await page.goto(RUTA);
-    // En 270° el coseno vale CERO, y cero no es negativo. La app lo rotula «− (negativo)».
+    // En 270° el coseno vale CERO, y cero no es negativo. La app lo rotulaba «− (negativo)».
     await ponerAngulo(page, 270);
-    expect(await valor(page, 'cos').innerText(), 'signo de cos 270°').not.toContain('negativo');
-    // En 360° el seno vale CERO, y la app lo rotula «− (negativo)» mientras 0° y 180°, con el
-    // mismo seno nulo, lo rotulan «+ (positivo)»: tres respuestas distintas para el mismo 0.
+    expect(await valor(page, 'cos').innerText(), 'signo de cos 270°').toBe('0 · sin signo');
+    // En 360° el seno vale CERO, y la app lo rotulaba «− (negativo)» mientras 0° y 180°, con
+    // el mismo seno nulo, lo rotulaban «+ (positivo)»: tres respuestas para el mismo 0.
     await ponerAngulo(page, 360);
-    expect(await valor(page, 'sin').innerText(), 'signo de sen 360°').not.toContain('negativo');
+    expect(await valor(page, 'sin').innerText(), 'signo de sen 360°').toBe('0 · sin signo');
+
+    // Y los dos casos que ANTES decían «+ (positivo)» sobre un cero: mismo rasero.
+    await ponerAngulo(page, 0);
+    expect(await valor(page, 'sin').innerText(), 'signo de sen 0°').toBe('0 · sin signo');
+    await ponerAngulo(page, 90);
+    expect(await valor(page, 'cos').innerText(), 'signo de cos 90°').toBe('0 · sin signo');
+
+    // Control: donde el valor NO es cero, el signo se sigue diciendo.
+    await ponerAngulo(page, 30);
+    expect(await valor(page, 'sin').innerText(), 'signo de sen 30°').toContain('positivo');
+    await ponerAngulo(page, 210);
+    expect(await valor(page, 'cos').innerText(), 'signo de cos 210°').toContain('negativo');
   });
 
-  test('H3 · una entrada fuera de rango se avisa, no se convierte en otro ángulo', async ({ page }) => {
-    test.fail(); // hoy 450 deja 45° y −30 deja 30°, en silencio
+  test('352 · una entrada fuera de rango se avisa, no se convierte en otro ángulo', async ({ page }) => {
     await page.goto(RUTA);
     const campo = campoAngulo(page);
 
@@ -473,8 +493,7 @@ test.describe('Hallazgos abiertos (25/08/2026)', () => {
     expect(await valor(page, 'θ (grados)').innerText(), 'campo vaciado').not.toBe('0°');
   });
 
-  test('H4 · el rango que promete el bloque educativo se puede probar en el simulador', async ({ page }) => {
-    test.fail(); // hoy el control está acotado a [0, 360]
+  test('353 · el rango que promete el bloque educativo se puede probar en el simulador', async ({ page }) => {
     await page.goto(RUTA);
     // El bloque educativo pone de ejemplo «sen 390° = sen 30°» y explica que un ángulo mayor
     // de 360° da vueltas completas. El control no admite 390, así que la lección no se puede
@@ -489,8 +508,7 @@ test.describe('Hallazgos abiertos (25/08/2026)', () => {
     await expect(page.getByText('sin(390°) = sin(30°)')).toBeVisible();
   });
 
-  test('H5 · el conmutador de radianes cambia la unidad de entrada, no solo la etiqueta', async ({ page }) => {
-    test.fail(); // hoy solo reescribe la etiqueta «θ =»
+  test('354 · el conmutador de radianes cambia la unidad de entrada, no solo la etiqueta', async ({ page }) => {
     await page.goto(RUTA);
     await page.getByRole('button', { name: 'Radianes (rad)' }).click();
     await expect(page.getByRole('button', { name: 'Radianes (rad)' })).toHaveAttribute('aria-pressed', 'true');
@@ -501,8 +519,33 @@ test.describe('Hallazgos abiertos (25/08/2026)', () => {
     expect(await valor(page, 'sin(θ)').innerText(), 'sen(1 rad)').toBe('0,8415');
   });
 
-  test('H7 · todos los botones llevan type="button"', async ({ page }) => {
-    test.fail(); // hoy 10 botones van sin type
+  test('355 · la identidad pitagórica se CALCULA, no es una cadena fija', async ({ page }) => {
+    await page.goto(RUTA);
+    // La fila «sin²+cos²» era la cadena literal «1,0000 ✓» escrita a mano en el JSX: daba el
+    // visto bueno pasara lo que pasara, y el paso 5 del propio bloque educativo enseña lo
+    // contrario («si tu resultado no satisface esta identidad, hay un error»).
+    //
+    // Que ahora salga «1,0000 ✓» no demuestra por sí solo que se calcule — es el mismo texto
+    // de antes. Lo que lo demuestra es que el número siga al seno y al coseno: se comprueba
+    // que la fila coincide con sen² + cos² leídos del propio panel, en ángulos de los cuatro
+    // cuadrantes y en los ejes.
+    for (const ang of [0, 30, 45, 90, 150, 180, 233, 270, 315, 360]) {
+      await ponerAngulo(page, ang);
+      const sen = Number((await valor(page, 'sin(θ)').innerText()).replace(',', '.'));
+      const cos = Number((await valor(page, 'cos(θ)').innerText()).replace(',', '.'));
+      const fila = await valor(page, 'sin²+cos²').innerText();
+
+      // Con tolerancia, porque el panel muestra el seno y el coseno ya redondeados a cuatro
+      // decimales y sus cuadrados no suman 1 exacto: en 233° dan 0,9999. La app calcula con
+      // los valores completos, así que da 1,0000 — y eso es lo correcto.
+      const mostrado = Number(fila.replace('✓', '').replace('✗', '').trim().replace(',', '.'));
+      expect(mostrado, `identidad en ${ang}°`).toBeCloseTo(sen * sen + cos * cos, 3);
+      expect(mostrado, `la identidad vale 1 en ${ang}°`).toBeCloseTo(1, 4);
+      expect(fila, `visto bueno en ${ang}°`).toContain('✓');
+    }
+  });
+
+  test('356 · todos los botones llevan type="button"', async ({ page }) => {
     await page.goto(RUTA);
     const sinTipo = await page.evaluate(() =>
       [...document.querySelectorAll('button')]

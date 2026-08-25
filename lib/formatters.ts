@@ -17,7 +17,12 @@ export function formatNumber(num: number, decimals: number = 2): string {
   // Verificar si el número es muy pequeño (científico)
   if (Math.abs(num) < 0.0001 && num !== 0) return '≈0';
 
-  return num.toLocaleString('es-ES', {
+  // El cero negativo se imprime CON signo: `(-0).toLocaleString('es-ES')` da «-0,00», y la
+  // guarda de arriba no lo atrapa porque `-0 !== 0` es false. En JavaScript el -0 aparece
+  // solo con hacer `-Math.log10(1)`, que es justo el pH de un HCl 1 M: el simulador de
+  // titulación mostraba «pH -0,00» (hallazgo 346). `num + 0` lo normaliza a 0 sin tocar
+  // ningún otro valor.
+  return (num + 0).toLocaleString('es-ES', {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   });

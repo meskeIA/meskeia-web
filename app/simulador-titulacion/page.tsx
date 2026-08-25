@@ -90,6 +90,41 @@ const TIPOS_TITULACION: Record<TipoTitulacion, { titulo: string; ecuacion: strin
 };
 
 /**
+ * pH de una mezcla ácido débil / base conjugada, resolviendo el balance de cargas.
+ *
+ * Con [HA] = C_HA − x y [A⁻] = C_A + x, la constante de acidez da una cuadrática:
+ *
+ *     x² + (Ka + C_A)·x − Ka·C_HA = 0
+ *
+ * y de sus dos raíces solo la positiva tiene sentido físico. Es la fórmula que Henderson y
+ * Hasselbalch simplifican SUPONIENDO que x es despreciable frente a C_HA y a C_A; esa
+ * suposición se cae justo al principio de la valoración, cuando C_A es minúsculo, y ahí H-H
+ * da un pH MENOR que el del ácido puro. De ahí el valle del hallazgo 343.
+ *
+ * Casos resueltos a mano con acético 0,1 M · 25 mL (pKa 4,76), antes de escribir esto:
+ *   V = 0,00 mL → 2,8829 (idéntico a la aproximación ½(pKa − log C) que había: 2,88)
+ *   V = 0,10 mL → 2,9502 → 2,95, y SUBE, que es lo que tiene que hacer al echar base
+ *   V = 12,50 mL (semiequivalencia) → 4,7605, contra el 4,7600 de H-H: ahí sí valía
+ *
+ * `techo` acota el resultado: la cuadrática ignora la autoionización del agua, así que con
+ * el HA casi agotado el pH se dispararía por encima del de la propia equivalencia (10,16 a
+ * dos microlitros de ella). El pH antes de la equivalencia nunca puede superar el de la
+ * equivalencia, y ese tope solo llega a morder a partir de V = 24,998 mL de 25.
+ */
+function phZonaTampon(C_HA: number, C_A: number, pKa: number, techo: number): number {
+  const Ka = Math.pow(10, -pKa);
+  const b = Ka + C_A;
+  const x = (-b + Math.sqrt(b * b + 4 * Ka * C_HA)) / 2;
+  return Math.min(-Math.log10(Math.max(x, 1e-14)), techo);
+}
+
+/** pH en la equivalencia de ácido débil + base fuerte: hidrólisis de la sal. */
+function phEnEquivalenciaAdBf(moles_analito: number, V_total_L: number, pKa: number): number {
+  const C_sal = moles_analito / V_total_L;
+  return 7 + 0.5 * (pKa + Math.log10(Math.max(C_sal, 1e-14)));
+}
+
+/**
  * Calcula pH a un volumen V (mL) de titulante añadido para un escenario dado.
  */
 function calcularPH(
@@ -127,21 +162,22 @@ function calcularPH(
   }
 
   if (tipo === 'ad-bf') {
-    if (V_titulante <= 0) {
-      // pH inicial de ácido débil: pH = 0.5*(pKa - log C)
-      return 0.5 * (pKa - Math.log10(C_analito));
-    }
     if (V_titulante < V_eq) {
-      // Zona tampón: Henderson-Hasselbalch
+      // Una sola fórmula para V = 0 y para toda la zona tampón, y por eso no hay salto:
+      // hasta el 25/08/2026 V = 0 usaba ½(pKa − log C) y V > 0 saltaba a
+      // Henderson-Hasselbalch puro, así que la PRIMERA GOTA de NaOH bajaba el pH de 2,88 a
+      // 2,36 — añadir base acidificaba (hallazgo 343). H-H no vale cuando n(A⁻) es mucho
+      // menor que n(HA): ahí el H⁺ que aporta el propio ácido no es despreciable frente al
+      // A⁻ que hay, y hay que resolver el balance de cargas.
       const moles_HA = moles_analito - moles_titulante;
       const moles_A = moles_titulante;
       if (moles_HA <= 0) return 7;
-      return pKa + Math.log10(moles_A / moles_HA);
+      // El techo es el pH de la equivalencia, calculado con el volumen que HABRÁ allí.
+      const techo = phEnEquivalenciaAdBf(moles_analito, (V_analito + V_eq) / 1000, pKa);
+      return phZonaTampon(moles_HA / V_total_L, moles_A / V_total_L, pKa, techo);
     } else if (Math.abs(V_titulante - V_eq) < 0.001) {
       // Punto de equivalencia: hidrólisis de la sal
-      const C_sal = moles_analito / V_total_L;
-      // pH = 7 + 0.5*(pKa + log C_sal)
-      return 7 + 0.5 * (pKa + Math.log10(Math.max(C_sal, 1e-14)));
+      return phEnEquivalenciaAdBf(moles_analito, V_total_L, pKa);
     } else {
       // Exceso de base fuerte
       const moles_OH = moles_titulante - moles_analito;
@@ -179,14 +215,14 @@ function calcularPH(
   }
 
   // ad-bd: aproximación
-  if (V_titulante <= 0) {
-    return 0.5 * (pKa - Math.log10(C_analito));
-  }
   if (V_titulante < V_eq) {
+    // Misma zona tampón que en ad-bf y, hasta el 25/08/2026, el mismo valle en la primera
+    // gota: el acta solo lo describe en ad-bf, pero el código era idéntico. Aquí el techo es
+    // el pH de la equivalencia de ácido débil + base débil, ½(pKa + 14 − pKb).
     const moles_HA = moles_analito - moles_titulante;
     const moles_A = moles_titulante;
     if (moles_HA <= 0) return 7;
-    return pKa + Math.log10(moles_A / moles_HA);
+    return phZonaTampon(moles_HA / V_total_L, moles_A / V_total_L, pKa, 0.5 * (pKa + 14 - pKb));
   } else if (Math.abs(V_titulante - V_eq) < 0.001) {
     // pH ≈ 0.5*(pKa + 14 - pKb)
     return 0.5 * (pKa + 14 - pKb);
@@ -233,12 +269,24 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } {
   };
 }
 
+/**
+ * Rótulo de la fase de la valoración.
+ *
+ * El punto de equivalencia es UNO y es V = V_eq. Hasta el 25/08/2026 esta función rotulaba
+ * «Salto de equivalencia» justo en V_eq y llamaba «Punto de equivalencia» a todo lo que
+ * quedara por debajo del 110 % —o sea, a 27,00 mL de una equivalencia de 25,00, que son
+ * 2 mL PASADOS— mientras la app dedica una FAQ entera a distinguir el punto de equivalencia
+ * del punto final (hallazgo 345). El salto es el tramo estrecho que lo rodea; la
+ * equivalencia, el punto exacto.
+ */
 function getFase(V: number, V_eq: number): string {
   if (V <= 0) return 'Solución inicial del analito';
+  // Tolerancia de la propia app para «estar en» la equivalencia (la misma de calcularPH)
+  if (Math.abs(V - V_eq) < 0.001) return 'Punto de equivalencia';
   if (V < V_eq * 0.1) return 'Inicio de la titulación';
   if (V < V_eq * 0.9) return 'Zona tampón / Pre-equivalencia';
-  if (Math.abs(V - V_eq) < V_eq * 0.05) return 'Salto de equivalencia';
-  if (V < V_eq * 1.1) return 'Punto de equivalencia';
+  if (V < V_eq) return 'Salto de equivalencia (antes del punto)';
+  if (V < V_eq * 1.1) return 'Salto de equivalencia (pasado el punto)';
   return 'Exceso de titulante';
 }
 
@@ -272,6 +320,32 @@ export default function SimuladorTitulacion() {
     return puntos;
   }, [tipo, V_eq, V_analito, C_analito, C_titulante, pKa, pKb]);
 
+  /**
+   * pH en el punto de equivalencia, que es lo que decide si un indicador sirve o no.
+   */
+  const pHEquivalencia = useMemo(
+    () => calcularPH(tipo, V_eq, V_analito, C_analito, C_titulante, pKa, pKb),
+    [tipo, V_eq, V_analito, C_analito, C_titulante, pKa, pKb]
+  );
+
+  /**
+   * Si el indicador elegido sirve para ESTA valoración.
+   *
+   * La app tenía la teoría escrita en tres sitios —la tabla del bloque educativo, la FAQ
+   * «¿cómo elijo el indicador correcto?» y hasta la metadata, que avisa de que el naranja de
+   * metilo «daría un error importante» en ácido débil + base fuerte— y NADA de eso estaba
+   * conectado con el selector: se elegía sin que la herramienta dijera una palabra, y con el
+   * indicador inadecuado el propio simulador induce el error, porque el matraz declara
+   * «amarillo» —color básico, punto final alcanzado— con la valoración al 32 % (hallazgo 344).
+   *
+   * El criterio es el que la propia app enseña: el rango de viraje tiene que contener el pH
+   * de equivalencia, o al menos quedar dentro del salto vertical de la curva.
+   */
+  const indicadorAdecuado = useMemo(() => {
+    const [min, max] = INDICADORES[indicador].rango;
+    return pHEquivalencia >= min && pHEquivalencia <= max;
+  }, [indicador, pHEquivalencia]);
+
   // Curva visible (solo hasta V_titulante actual)
   const curvaVisible = useMemo(
     () => curva.filter((p) => p.v <= V_titulante + 0.001),
@@ -280,7 +354,10 @@ export default function SimuladorTitulacion() {
 
   const colorMatraz = getColorMatraz(pHActual, indicador);
   const fase = getFase(V_titulante, V_eq);
-  const porcentaje = V_eq > 0 ? Math.min(100, (V_titulante / V_eq) * 100) : 0;
+  // Sin tope: con Math.min(100, …) marcaba «100,0 %» igual en la equivalencia que a 108 % o
+  // a 200 % del volumen equivalente, y es la ÚNICA cifra del panel que dice a qué altura del
+  // ensayo se está una vez pasada la equivalencia (hallazgo 347).
+  const porcentaje = V_eq > 0 ? (V_titulante / V_eq) * 100 : 0;
   const muestraPKa = tipo === 'ad-bf' || tipo === 'ad-bd';
   const muestraPKb = tipo === 'af-bd' || tipo === 'ad-bd';
   const V_max = V_eq * 2;
@@ -350,6 +427,7 @@ export default function SimuladorTitulacion() {
           <div className={styles.tabBar} role="group" aria-label="Tipo de titulación">
             {(Object.keys(TIPOS_TITULACION) as TipoTitulacion[]).map((t) => (
               <button
+                type="button"
                 key={t}
                 aria-pressed={tipo === t}
                 className={`${styles.tabBtn} ${tipo === t ? styles.tabActive : ''}`}
@@ -472,14 +550,17 @@ export default function SimuladorTitulacion() {
           <div className={styles.indicatorSelector}>
             {(Object.keys(INDICADORES) as Indicador[]).map((ind) => {
               const info = INDICADORES[ind];
+              const sirve = pHEquivalencia >= info.rango[0] && pHEquivalencia <= info.rango[1];
               return (
                 <button
                   key={ind}
+                  type="button"
                   aria-pressed={indicador === ind}
                   className={`${styles.indicatorBtn} ${indicador === ind ? styles.indicatorActive : ''}`}
                   onClick={() => setIndicador(ind)}
                 >
                   {info.nombre}
+                  {sirve && <span className={styles.indicatorApto}> · apto aquí</span>}
                   <small>
                     Vira pH {formatNumber(info.rango[0], 1)}–{formatNumber(info.rango[1], 1)} ({info.descripcionAcido} → {info.descripcionBase})
                   </small>
@@ -487,6 +568,19 @@ export default function SimuladorTitulacion() {
               );
             })}
           </div>
+
+          {/* El aviso que faltaba: la app tenía la teoría escrita en tres sitios y ninguno
+              estaba conectado con este selector (hallazgo 344). */}
+          {!indicadorAdecuado && (
+            <p className={styles.indicatorAviso} role="status">
+              <strong>Este indicador no sirve para esta valoración.</strong> El punto de equivalencia
+              está en pH {formatNumber(pHEquivalencia, 2)} y {INDICADORES[indicador].nombre} vira entre{' '}
+              {formatNumber(INDICADORES[indicador].rango[0], 1)} y {formatNumber(INDICADORES[indicador].rango[1], 1)}:
+              el color cambiaría {pHEquivalencia > INDICADORES[indicador].rango[1] ? 'antes' : 'después'} de
+              llegar a la equivalencia, así que el punto final leído sería erróneo. Es exactamente el
+              error que la tabla de más abajo explica.
+            </p>
+          )}
         </section>
 
         {/* Simulación */}
@@ -512,7 +606,7 @@ export default function SimuladorTitulacion() {
                 {[0, 25, 50, 75, 100].map((p) => {
                   const y = 12 + (216 * p) / 100;
                   return (
-                    <line key={p} x1="60" y1={y} x2="65" y2={y} stroke="#64748b" strokeWidth="1" />
+                    <line key={p} x1="60" y1={y} x2="65" y2={y} stroke="var(--svg-eje)" strokeWidth="1" />
                   );
                 })}
                 {/* Llave */}
@@ -552,7 +646,7 @@ export default function SimuladorTitulacion() {
                   return (
                     <g key={ph}>
                       <line x1="30" y1={y} x2="490" y2={y} stroke="#e5e7eb" strokeWidth="0.5" />
-                      <text x="22" y={y + 4} fontSize="10" fill="#64748b" textAnchor="end">
+                      <text x="22" y={y + 4} fontSize="10" fill="var(--svg-eje)" textAnchor="end">
                         {ph}
                       </text>
                     </g>
@@ -565,8 +659,8 @@ export default function SimuladorTitulacion() {
                   const x = (v / V_max) * 460 + 30;
                   return (
                     <g key={frac}>
-                      <line x1={x} y1={320} x2={x} y2={325} stroke="#64748b" strokeWidth="0.8" />
-                      <text x={x} y={340} fontSize="9" fill="#64748b" textAnchor="middle">
+                      <line x1={x} y1={320} x2={x} y2={325} stroke="var(--svg-eje)" strokeWidth="0.8" />
+                      <text x={x} y={340} fontSize="9" fill="var(--svg-eje)" textAnchor="middle">
                         {formatNumber(v, 1)}
                       </text>
                     </g>
@@ -582,7 +676,7 @@ export default function SimuladorTitulacion() {
                   fill="#fef3c7"
                   opacity="0.5"
                 />
-                <text x="486" y={yIndMax + (yIndMin - yIndMax) / 2 + 3} fontSize="9" fill="#92400e" textAnchor="end">
+                <text x="486" y={yIndMax + (yIndMin - yIndMax) / 2 + 3} fontSize="9" fill="var(--svg-viraje)" textAnchor="end">
                   Viraje
                 </text>
 
@@ -657,16 +751,16 @@ export default function SimuladorTitulacion() {
 
           {/* Botones de control */}
           <div className={styles.controlBar}>
-            <button className={styles.gotaBtn} onClick={addGota} disabled={V_titulante >= V_max}>
+            <button type="button" className={styles.gotaBtn} onClick={addGota} disabled={V_titulante >= V_max}>
               + Gota (0,1 mL)
             </button>
-            <button className={styles.calcBtn} onClick={addMl} disabled={V_titulante >= V_max}>
+            <button type="button" className={styles.calcBtn} onClick={addMl} disabled={V_titulante >= V_max}>
               + 1 mL
             </button>
-            <button className={styles.calcBtn} onClick={irAEquivalencia}>
+            <button type="button" className={styles.calcBtn} onClick={irAEquivalencia}>
               Ir a equivalencia
             </button>
-            <button className={styles.resetBtn} onClick={reset}>
+            <button type="button" className={styles.resetBtn} onClick={reset}>
               ↺ Reiniciar
             </button>
           </div>
@@ -875,42 +969,42 @@ export default function SimuladorTitulacion() {
           <h3>Mejores Prácticas</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <div>
                 <strong>Pesa el indicador</strong>
                 <p>Usa exactamente 2-3 gotas: demasiado indicador puede consumir titulante y falsear el resultado.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💧</span>
+              <span className={styles.tipIcon} aria-hidden="true">💧</span>
               <div>
                 <strong>Goteo controlado</strong>
                 <p>Cerca del punto de equivalencia, añade media gota o lava la pared del matraz con agua destilada.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📏</span>
+              <span className={styles.tipIcon} aria-hidden="true">📏</span>
               <div>
                 <strong>Lee la bureta a la altura del menisco</strong>
                 <p>El nivel correcto es el inferior del menisco, leído al ojo para evitar paralaje.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔁</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔁</span>
               <div>
                 <strong>Repite tres veces</strong>
                 <p>Calcula la media solo con los volúmenes que difieran en menos de 0,1 mL entre sí.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <div>
                 <strong>Usa pH-metro si puedes</strong>
                 <p>Para titulaciones débil + débil, un pH-metro es más fiable que el indicador de color.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧪</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧪</span>
               <div>
                 <strong>Estandariza el titulante</strong>
                 <p>Las disoluciones de NaOH absorben CO₂; estandarízalas con un patrón primario (KHFt) antes de usar.</p>
@@ -920,7 +1014,7 @@ export default function SimuladorTitulacion() {
 
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               Errores Frecuentes
             </div>
             <ul className={styles.warningList}>

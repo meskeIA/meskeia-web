@@ -251,6 +251,29 @@ test.describe('parseSpanishNumberOr', () => {
   });
 });
 
+test.describe('formatNumber · el cero negativo', () => {
+  // De dónde sale: hallazgo 346 del Inspector (25/08/2026). `-Math.log10(1)` es −0 en
+  // JavaScript, y `toLocaleString('es-ES')` conserva ese signo, así que el simulador de
+  // titulación mostraba «pH -0,00» para un HCl 1 M. La guarda de números diminutos no lo
+  // atrapaba porque `-0 !== 0` es false: en JavaScript el −0 y el 0 son iguales para `!==`
+  // y distintos para el formateador.
+
+  test('el cero negativo se imprime sin signo', () => {
+    expect(formatNumber(-0, 2)).toBe('0,00');
+    expect(formatNumber(-Math.log10(1), 2)).toBe('0,00');
+  });
+
+  test('un residuo de coma flotante negativo tampoco arrastra el signo', () => {
+    // Math.cos(3π/2) da −1,84·10⁻¹⁶, que es cero a cualquier precisión que se muestre.
+    expect(formatNumber(Math.cos((3 * Math.PI) / 2), 4)).not.toContain('-');
+  });
+
+  test('y los negativos de verdad siguen llevando su signo', () => {
+    expect(formatNumber(-1.5, 2)).toBe('-1,50');
+    expect(formatNumber(-0.01, 2)).toBe('-0,01');
+  });
+});
+
 test.describe('formatTipoNominal', () => {
   // De dónde sale: hallazgos 331 y 333 del Inspector (25/08/2026). Las siete apps del
   // clúster de compraventa formateaban los tipos impositivos cada una a su manera —cero,

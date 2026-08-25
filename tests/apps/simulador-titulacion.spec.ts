@@ -81,10 +81,16 @@ import { test, expect, Page } from '@playwright/test';
  * En particular NO comete el error clásico: la equivalencia del ácido débil sale 8,73, no 7,00.
  * Los hallazgos están en los bordes de ese motor y en el acompañamiento.
  *
- * HALLAZGOS del 25/08/2026. Los que se pueden afirmar como aserción van con `test.fail()`,
- * escritos diciendo lo que la app DEBERÍA hacer y hoy no hace, de modo que la suite queda en
- * VERDE mientras el defecto siga ahí. El día que se reparen saldrán en ROJO («expected to
- * fail, but passed») y habrá que quitarles la marca. El Inspector no repara.
+ * HALLAZGOS del 25/08/2026, REPARADOS el mismo día. Al final, ya sin `test.fail()`: son
+ * tests de regresión normales.
+ *
+ * Lo que la reparación descubrió y no estaba en ningún acta: el helper que movía los
+ * deslizadores usaba el truco del setter nativo + `dispatchEvent`, que escribe el DOM pero
+ * NO llega a React. El CASO 3 creía valorar a 1 M mientras la app seguía a 0,1 M, así que la
+ * bureta se agotaba a las 5 pulsaciones de las 50 que daba — un rojo permanente que no tenía
+ * nada que ver con lo que el test dice comprobar. Y el hallazgo [4] fallaba por ese mismo
+ * motivo, no por el cero negativo que documenta. Ahora se usa `locator.fill` (ver `deslizar`).
+ * Un test que no llega a la app no verifica la app, aunque su color parezca informar.
  *
  *   [1] calculo/medio — En ácido débil + base fuerte, la PRIMERA GOTA BAJA EL pH. A V = 0 la
  *       app usa ½(pKa − log C) y da 2,88; a V = 0,10 mL salta a Henderson-Hasselbalch puro y
@@ -153,6 +159,44 @@ const reiniciar = (page: Page) => page.getByRole('button', { name: /Reiniciar/ }
 
 async function pulsar(boton: ReturnType<typeof gota>, veces: number) {
   for (let i = 0; i < veces; i++) await boton.click();
+}
+
+/**
+ * Mueve un deslizador de la app hasta un valor y ESPERA a que el estado lo refleje.
+ *
+ * Dos cosas, las dos aprendidas el 25/08/2026 depurando un rojo permanente:
+ *
+ * 1. Con `locator.fill`, NO con el truco del setter nativo + `dispatchEvent`. Ese truco
+ *    escribe el DOM pero **no llega a React**: tras usarlo el input decía «1» y el rótulo de
+ *    al lado —que pinta el ESTADO, `formatNumber(C_analito, 2)`— seguía diciendo «0,10 M».
+ *
+ * 2. Y hay que esperar al rótulo antes de tocar el deslizador siguiente. Dos `fill`
+ *    encadenados sin esperar dejan el segundo actuando sobre un DOM que React todavía no ha
+ *    reconciliado, y al re-renderizar pisa el primero: `cAnalito` volvía a 0,10 M después de
+ *    haberlo puesto a 1. Con la espera de por medio, los dos se aplican.
+ *
+ * Lo que costaba: el CASO 3 creía valorar a 1 M mientras la app seguía a 0,1 M, así que V_eq
+ * era 2,5 mL en vez de 25 y la bureta se agotaba a las 5 pulsaciones de las 50 que el test
+ * daba. Y el hallazgo [4] fallaba por ese mismo motivo, no por el cero negativo que
+ * documenta. Un test que no llega a la app no verifica la app, aunque su color parezca decir
+ * algo.
+ */
+async function deslizar(page: Page, id: string, valor: string, rotuloEsperado: string) {
+  const rotulo = page.locator(`#${id} ~ [class*="sliderValue"]`).first();
+  // Con TECLADO, que es como lo movería una persona: `focus` + `End` lleva un `input[range]`
+  // a su máximo con eventos nativos que React procesa siempre. `locator.fill` no vale aquí —
+  // escribe el valor y dispara el evento, pero si llega antes de que React haya hidratado el
+  // input, el evento se pierde en silencio y el deslizador se queda donde estaba, sin que
+  // nada falle: es lo que dejaba el CASO 3 valorando a 0,1 M mientras creía estar a 1 M.
+  // El reintento se DECLARA y se comprueba contra el rótulo, que pinta el ESTADO de React.
+  await expect(async () => {
+    const input = page.locator(`#${id}`);
+    await input.focus();
+    if (valor === (await input.getAttribute('max'))) await page.keyboard.press('End');
+    else if (valor === (await input.getAttribute('min'))) await page.keyboard.press('Home');
+    else await input.fill(valor);
+    await expect(rotulo).toHaveText(rotuloEsperado, { timeout: 1_000 });
+  }).toPass({ timeout: 15_000 });
 }
 
 /** Lleva la bureta a un volumen exacto desde 0: enteros con «+1 mL» y décimas con «+ Gota». */
@@ -340,20 +384,8 @@ test('CASO 3 · el exceso de titulante converge al pH de la base pura y nunca sa
   page,
 }) => {
   // El peor caso posible: analito y titulante a 1 M, el par que maximiza el pH final.
-  await page.evaluate(() => {
-    const poner = (id: string, v: string) => {
-      const el = document.getElementById(id) as HTMLInputElement;
-      const setter = Object.getOwnPropertyDescriptor(
-        window.HTMLInputElement.prototype,
-        'value',
-      )!.set!;
-      setter.call(el, v);
-      el.dispatchEvent(new Event('input', { bubbles: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true }));
-    };
-    poner('cAnalito', '1');
-    poner('cTitulante', '1');
-  });
+  await deslizar(page, 'cAnalito', '1', '1,00 M');
+  await deslizar(page, 'cTitulante', '1', '1,00 M');
 
   // Tope de la bureta: V_max = 2·V_eq = 50 mL. Sobran 25 mmol de OH⁻ en 75 mL ⇒ [OH⁻] = 0,3333 M
   // ⇒ pOH = 0,4771 ⇒ pH = 13,52, ya casi el 14,00 del NaOH 1 M. No se dispara.
@@ -372,9 +404,9 @@ test('CASO 3 · el exceso de titulante converge al pH de la base pura y nunca sa
   expect(panel).not.toMatch(/NaN|Infinity|∞|No definido/);
 });
 
-// ───────────────────────── HALLAZGOS · marcados test.fail() ─────────────────────────────────
+// ────────── HALLAZGOS del 25/08/2026 · REPARADOS ese mismo día (regresión) ──────────
 
-test.fail(
+test(
   '[1] calculo/medio — la primera gota de NaOH no puede BAJAR el pH de un ácido débil',
   async ({ page }) => {
     await page.getByRole('button', { name: /Ácido débil \+ Base fuerte/ }).click();
@@ -390,7 +422,7 @@ test.fail(
   },
 );
 
-test.fail(
+test(
   '[1 bis] calculo/medio — la curva de AD+BF no puede tener un valle al principio',
   async ({ page }) => {
     await page.getByRole('button', { name: /Ácido débil \+ Base fuerte/ }).click();
@@ -402,8 +434,8 @@ test.fail(
   },
 );
 
-test.fail(
-  '[2] contenido/medio — con AD+BF el naranja de metilo da el punto final al 32 % y nadie avisa',
+test(
+  '[2] REGRESIÓN 344 — con AD+BF el naranja de metilo da el punto final al 32 %, y la app avisa',
   async ({ page }) => {
     await page.getByRole('button', { name: /Ácido débil \+ Base fuerte/ }).click();
     await page.getByRole('button', { name: /Naranja de metilo/ }).click();
@@ -411,28 +443,41 @@ test.fail(
     // A V = 8,00 mL (32 % de la valoración) el pH es 4,43, ya por encima del viraje 3,1–4,4:
     // el simulador declara el matraz «amarillo», o sea punto final alcanzado, con la
     // equivalencia real todavía a 25,00 mL. Quien pare ahí subestima la concentración un 68 %.
+    //
+    // La reparación NO falsea el matraz —el naranja de metilo vira ahí de verdad, y ocultarlo
+    // sería enseñar química falsa—: lo que hace es DECIR que ese indicador no sirve para esta
+    // valoración, que es lo que un profesor diría al verte elegirlo. El acta admitía
+    // cualquiera de las dos vías; esta conserva el fenómeno y añade la advertencia.
     await verter(page, 8);
     await expect(valorDe(page, 'pH actual')).toHaveText('4,43');
-    await expect(colorMatraz(page)).not.toHaveText('amarillo');
+    await expect(colorMatraz(page)).toHaveText('amarillo');
+    await expect(page.locator('[class*="indicatorAviso"]')).toBeVisible();
   },
 );
 
-test.fail(
-  '[2 bis] contenido/medio — elegir un indicador inadecuado no produce ninguna advertencia',
+test(
+  '[2 bis] REGRESIÓN 344 — elegir un indicador inadecuado produce una advertencia',
   async ({ page }) => {
     await page.getByRole('button', { name: /Ácido débil \+ Base fuerte/ }).click();
     await page.getByRole('button', { name: /Naranja de metilo/ }).click();
-    await irAEquivalencia(page).click();
 
-    // La herramienta debería decir que ese indicador no sirve para esta titulación: su tabla
-    // educativa y la FAQ de la metadata ya lo saben, pero el selector no lo conecta.
-    await expect(page.locator('div[role="status"]')).toContainText(
-      /no recomendad|inadecuad|fuera del salto|usa fenolftale/i,
-    );
+    // La herramienta tiene que decir que ese indicador no sirve para esta valoración: su
+    // tabla educativa y la FAQ de la metadata ya lo sabían, pero el selector no lo conectaba.
+    const aviso = page.locator('[class*="indicatorAviso"]');
+    await expect(aviso).toContainText('no sirve para esta valoración');
+    // Y tiene que razonarlo con los dos números que lo deciden.
+    await expect(aviso).toContainText('8,73');      // pH de la equivalencia
+    await expect(aviso).toContainText('3,1');       // inicio del viraje del naranja de metilo
+
+    // Con la fenolftaleína (vira 8,2–10,0, y la equivalencia está en 8,73) el aviso desaparece
+    // y el indicador se marca como apto: el criterio discrimina, no avisa siempre.
+    await page.getByRole('button', { name: /Fenolftaleína/ }).click();
+    await expect(aviso).toHaveCount(0);
+    await expect(page.locator('[class*="indicatorApto"]')).toHaveCount(1);
   },
 );
 
-test.fail(
+test(
   '[3] contenido/medio — el punto de equivalencia es V_eq, no 2 mL más allá',
   async ({ page }) => {
     // En V = V_eq exacto la fase debería llamarse «Punto de equivalencia»; la app dice «Salto».
@@ -442,7 +487,7 @@ test.fail(
   },
 );
 
-test.fail(
+test(
   '[3 bis] contenido/medio — a 27,00 mL (108 % de V_eq) ya no se está en el punto de equivalencia',
   async ({ page }) => {
     await verter(page, 27);
@@ -450,48 +495,60 @@ test.fail(
   },
 );
 
-test.fail('[4] calculo/bajo — el pH de un HCl 1 M es 0,00, no «-0,00»', async ({ page }) => {
-  await page.evaluate(() => {
-    const el = document.getElementById('cAnalito') as HTMLInputElement;
-    const setter = Object.getOwnPropertyDescriptor(
-      window.HTMLInputElement.prototype,
-      'value',
-    )!.set!;
-    setter.call(el, '1');
-    el.dispatchEvent(new Event('input', { bubbles: true }));
-  });
-  // −Math.log10(1) es −0 en JavaScript y toLocaleString('es-ES') conserva el signo.
+test('[4] REGRESIÓN 346 — el pH de un HCl 1 M es 0,00, no «-0,00»', async ({ page }) => {
+  await deslizar(page, 'cAnalito', '1', '1,00 M');
+  // −Math.log10(1) es −0 en JavaScript y toLocaleString('es-ES') conservaba el signo. Se
+  // normaliza en `formatNumber` (lib/formatters.ts), que es de donde venía: no era de la app.
   await expect(valorDe(page, 'pH actual')).toHaveText('0,00');
 });
 
-test.fail('[5] operativa/bajo — «% completado» se queda clavado en 100 %', async ({ page }) => {
+test('[5] REGRESIÓN 347 — «% completado» no se queda clavado en 100 %', async ({ page }) => {
   // A 50,00 mL con V_eq = 25,00 mL se ha vertido el 200 % del titulante, no el 100 %.
   await pulsar(mililitro(page), 50);
   await expect(valorDe(page, 'Volumen añadido')).toHaveText('50,00 mL');
   await expect(valorDe(page, '% completado')).toHaveText('200,0 %');
 });
 
-test.fail(
-  '[6] accesibilidad/bajo — los 12 botones propios de la app van sin type="button"',
+test(
+  '[6] REGRESIÓN 348 — los 12 botones propios de la app llevan type="button"',
   async ({ page }) => {
-    // Los botones de MeskeiaLogo, EducationalSection y ShareCard sí lo llevan; los de la app no.
+    // Los botones de MeskeiaLogo, EducationalSection y ShareCard sí lo llevaban; los de la app no.
+    //
+    // Se excluye el overlay de `next dev` (`nextjs-portal`), que monta botones sin `type` y no
+    // es de la app: aparece de forma intermitente según lo que el servidor esté compilando, y
+    // por eso este test pasaba en solitario y fallaba dentro de la suite. Es el mismo falso
+    // rojo que el proyecto ya se encontró en el sonómetro.
+    // `getRootNode() !== document` es lo que de verdad descarta el overlay: vive en un shadow
+    // DOM, y `closest('nextjs-portal')` no cruza esa frontera —lo intenté y seguía colándose—.
+    // Playwright sí atraviesa el shadow root al buscar, así que el filtro tiene que ser este.
     const sinType = await page.locator('button').evaluateAll((bs) =>
-      bs.filter((b) => !b.getAttribute('type')).map((b) => b.textContent!.trim().slice(0, 30)),
+      bs
+        .filter((b) => b.getRootNode() === document && !b.getAttribute('type'))
+        .map((b) => b.textContent!.trim().slice(0, 30)),
     );
     expect(sinType).toEqual([]);
   },
 );
 
-test.fail(
-  '[6 bis] accesibilidad/bajo — los 7 emojis decorativos junto a texto van sin aria-hidden',
+test(
+  '[6 bis] REGRESIÓN 348 — los 7 emojis decorativos junto a texto llevan aria-hidden',
   async ({ page }) => {
     // 🎯 💧 📏 🔁 📊 🧪 de «Mejores Prácticas» y ⚠️ de «Errores Frecuentes».
     // EducationalSection monta su contenido siempre en el DOM, así que no hace falta abrirlo.
+    //
+    // Se miran SOLO los spans de esta app, por su CSS Module. Los de MeskeiaLogo, RelatedApps
+    // y Footer también arrastran emojis sin aria-hidden (🌙, 🔗, los iconos de tarjeta y el 💡
+    // del pie), pero eso NO es de esta app: es de tres componentes que monta el catálogo
+    // entero, así que se repara ahí y con su propio alcance, no dentro de una tanda.
     const sueltos = await page.locator('span').evaluateAll((spans) => {
       const emoji = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/u;
+      // Solo los de ESTA app: se reconocen por su CSS Module. Los de MeskeiaLogo, RelatedApps
+      // y Footer se descartan aquí y se anotan aparte, con su propio alcance.
+      const esDeLaApp = (s: Element) => /SimuladorTitulacion-module/.test(s.className || '');
       return spans
         .filter(
           (s) =>
+            esDeLaApp(s) &&
             emoji.test(s.textContent || '') &&
             s.children.length === 0 &&
             s.getAttribute('aria-hidden') !== 'true' &&
@@ -503,42 +560,46 @@ test.fail(
   },
 );
 
-test.fail(
-  '[7] accesibilidad/bajo — las etiquetas de la curva no cumplen AA en modo oscuro',
+test(
+  '[7] REGRESIÓN 349 — las etiquetas de la curva cumplen AA en modo oscuro',
   async ({ page }) => {
-    await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
-    // Hay que esperar a que el tema oscuro llegue de verdad al contenedor: si se mide antes,
-    // se mide el fondo claro y el resultado sale al revés.
+    // El atributo se REAPLICA en cada intento: ponerlo una vez no basta porque el script de
+    // tema de la app lo reescribe al hidratar leyendo la preferencia guardada, y entonces se
+    // mediría el fondo claro y el resultado saldría al revés — o el poll agotaría el tiempo,
+    // que es lo que pasaba de forma intermitente dentro de la suite.
     await expect
       .poll(async () =>
-        page.evaluate(
-          () =>
-            getComputedStyle(
-              document.querySelector('svg[aria-label="Curva de titulación"]')!.parentElement!,
-            ).backgroundColor,
-        ),
+        page.evaluate(() => {
+          document.documentElement.setAttribute('data-theme', 'dark');
+          return getComputedStyle(
+            document.querySelector('svg[aria-label="Curva de titulación"]')!.parentElement!,
+          ).backgroundColor;
+        }),
       )
       .toBe('rgb(31, 41, 55)');
 
     const contraste = await page.evaluate(() => {
-      const luminancia = (hex: string) => {
-        const canales = [1, 3, 5].map((i) => {
-          const v = parseInt(hex.substr(i, 2), 16) / 255;
-          return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
-        });
+      // Del color COMPUTADO, no del atributo `fill`: desde el 25/08/2026 el JSX escribe
+      // `var(--svg-eje)`, que es justo lo que permite tener un valor distinto en cada tema
+      // (hallazgo 349). Leer el atributo devolvía la cadena «var(--svg-eje)» y el cálculo
+      // salía NaN — un test que no mide nada, pero que sin este comentario parecería medir.
+      const luminancia = (color: string) => {
+        const canales = color
+          .match(/[\d.]+/g)!
+          .slice(0, 3)
+          .map((n) => {
+            const v = Number(n) / 255;
+            return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+          });
         return 0.2126 * canales[0] + 0.7152 * canales[1] + 0.0722 * canales[2];
       };
       const svg = document.querySelector('svg[aria-label="Curva de titulación"]')!;
-      const texto = svg.querySelector('text')!.getAttribute('fill')!; // #64748b, cableado en el JSX
-      const rgb = getComputedStyle(svg.parentElement!)
-        .backgroundColor.match(/\d+/g)!
-        .map(Number);
-      const fondo =
-        '#' + rgb.slice(0, 3).map((n) => n.toString(16).padStart(2, '0')).join('');
+      const texto = getComputedStyle(svg.querySelector('text')!).fill;
+      const fondo = getComputedStyle(svg.parentElement!).backgroundColor;
       const [claro, oscuro] = [luminancia(texto), luminancia(fondo)].sort((x, y) => y - x);
       return (claro + 0.05) / (oscuro + 0.05);
     });
-    // Hoy sale 3,07:1 sobre el rgb(31,41,55) del contenedor en oscuro.
+    // Antes del 25/08/2026 salía 3,07:1 sobre el rgb(31,41,55) del contenedor en oscuro.
     expect(contraste).toBeGreaterThanOrEqual(4.5);
   },
 );
