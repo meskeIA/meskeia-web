@@ -1,5 +1,10 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { RANGO_AJD } from '@/data/itp-ccaa';
+import { IVA_INMUEBLES_2025 } from '@/data/fiscal';
+
+/** Un rango es un dato DERIVADO de la tabla de CCAA: escrito a mano envejece en silencio. */
+const pct = (n: number) => `${String(n).replace('.', ',')}%`;
 
 export const metadata: Metadata = {
   title: 'Simulador Gastos Compra Solar / Terreno Edificable - IVA o ITP | meskeIA',
@@ -54,7 +59,7 @@ export const faqJsonLd = {
       name: '¿Se paga IVA o ITP al comprar un solar?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Depende de quién venda. Si el vendedor es un promotor o empresario que actúa en su actividad, la entrega del solar está sujeta a IVA al 21% más AJD (entre el 0,5% y el 1,5% según la comunidad autónoma). Si el vendedor es un particular, la compra tributa por ITP al tipo general de la comunidad. No coinciden IVA e ITP en la misma operación.',
+        text: `Depende de quién venda. Si el vendedor es un promotor o empresario que actúa en su actividad, la entrega del solar está sujeta a IVA al ${pct(IVA_INMUEBLES_2025.local)} más AJD, que va del ${pct(RANGO_AJD.min)} al ${pct(RANGO_AJD.max)} según la comunidad autónoma — el extremo bajo es el 0% del Régimen foral del País Vasco. Si el vendedor es un particular, la compra tributa por ITP al tipo general de la comunidad. No coinciden IVA e ITP en la misma operación. En Canarias, Ceuta y Melilla no rige el IVA: la operación tributa por IGIC o IPSI, con sus propios tipos.`,
       },
     },
     {

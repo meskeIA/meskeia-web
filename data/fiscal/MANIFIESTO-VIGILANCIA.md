@@ -295,6 +295,20 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 - **Alerta metodológica**: reforma de la tabla del art. 12.1.a (no ocurre desde 2015 — sería alerta).
 - **Verificado**: 2026-06-18 · vigencia 2026.
 
+#### `costas-judiciales.ts` — Arancel de la Procura, tasas judiciales y umbrales de la LEC
+- **Contiene**: escala del arancel de los profesionales de la Procura (art. 2 RD 434/2024, 34 peldaños), suplemento por exceso de 600.000 €, cuantía indeterminada, tope global por asunto, recargo del juicio ordinario y concepto propio del monitorio; cuotas fijas vigentes de la tasa judicial (art. 7.1 Ley 10/2012) y sus dos exenciones; umbrales procesales de la LEC (cuantía del verbal, mínimo sin abogado ni procurador, límite del tercio del art. 394.3 y valoración de la pretensión inestimable).
+- **Normativa**: RD 434/2024 + Ley 10/2012 con la nulidad parcial de la STC 140/2016 + LEC en la redacción de la LO 1/2025.
+- **Vigilar**: nuevo real decreto de arancel de la Procura (el vigente sustituyó al RD 1373/2003 tras anular el Tribunal Supremo el RD 307/2022, así que la materia lleva tres normas en tres años); cualquier reforma de la Ley 10/2012 —las tasas llevan congeladas desde 2015 pero su reinstauración es materia políticamente activa—; y las reformas procesales de la LEC, que son las que mueven los umbrales.
+- **Cadencia**: baja, por real decreto o ley procesal. Sin ventana fija.
+- **Alerta metodológica**: que el arancel de la Procura vuelva a ser de mínimos (sería contrario al procedimiento de infracción de la Comisión Europea que originó el de máximos), o que se restablezca alguna cuota **variable** de tasa judicial: la anterior fue declarada inconstitucional en su totalidad, así que su vuelta exigiría una construcción distinta.
+- **Dependencias internas**: la app `estimador-costas-judiciales` importa de aquí y toma el tipo de IVA de `iva.ts`. Ningún dato se duplica.
+- **Auditoría de origen (26/08/2026)** — el módulo nace de la reparación de los hallazgos 414-421 del Inspector, y al contrastar contra el BOE aparecieron **tres defectos que el acta no recogía y que pesaban más que varios de los que sí**:
+  - La app atribuía los aranceles del procurador al **RD 1373/2003, derogado el 02/05/2024**, y sus cifras **superaban el máximo legal vigente** a partir de 60.000 € de cuantía (1.100 € frente a los 1.026,36 € del arancel) y hasta un 44 % en 600.000 €.
+  - Sumaba a la tasa judicial una **cuota variable del «0,10 % con tope 10.000 €»**. El art. 7.2 de la Ley 10/2012 fue declarado inconstitucional y **nulo en su totalidad** por la STC 140/2016, con efectos del 15/08/2016: la app cobraba un tributo inexistente, y con un tipo que ni siquiera era el que la ley anulada preveía (0,5 %).
+  - Usaba **6.000 €** como frontera entre juicio verbal y ordinario. Desde el **03/04/2025** son **15.000 €** (art. 250.2 LEC, reformado por la LO 1/2025). El acta lo marcó como «el candidato más probable a estar caducado» sin poder afirmarlo; queda confirmado.
+  - También faltaba la exención **objetiva** del art. 4.1.c (monitorio y verbal de cantidad hasta 2.000 €), que alcanza igualmente a las personas jurídicas, y el IVA del 21 % sobre unos servicios profesionales que la app presentaba sin él.
+- **Verificado**: 2026-08-26 · vigencia 2025-2026.
+
 #### `nomada-digital.ts` — Visa nómada digital
 - **Contiene**: mínimos de ingresos (**múltiplos del SMI** — se actualiza en cascada con `smi.ts`), duraciones de visado/autorización/renovación, requisitos.
 - **Normativa**: Ley 28/2022 de Startups + RD 1008/2023.

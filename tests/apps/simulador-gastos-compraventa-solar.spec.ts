@@ -343,10 +343,12 @@ test.describe('Simulador de gastos de compra de solar — inspección 26/08/2026
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS del 26/08/2026. Todos fallan HOY a propósito.
+// REGRESIÓN de los hallazgos del 26/08/2026, REPARADOS ese mismo día.
+// Estos tests se escribieron afirmando lo que DEBERÍA pasar, así que la reparación los
+// puso en verde sin reescribirlos: son ya el contrato de que el defecto no vuelve.
 // ═══════════════════════════════════════════════════════════════════════════════
 
-test.describe('Hallazgos abiertos — 26/08/2026', () => {
+test.describe('Regresión — hallazgos reparados el 26/08/2026', () => {
   /**
    * HALLAZGO 1 (cálculo, alto) — en Canarias, Ceuta y Melilla la opción «Promotor / Empresa»
    * liquida un IVA del 21 % que allí NO existe, y lo suma al «COSTE TOTAL DE ADQUISICIÓN»

@@ -1,5 +1,9 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { RANGO_ITP } from '@/data/itp-ccaa';
+
+/** Un rango es un dato DERIVADO de la tabla de CCAA: escrito a mano envejece en silencio. */
+const pct = (n: number) => `${String(n).replace('.', ',')}%`;
 
 export const metadata: Metadata = {
   title: 'Simulador Gastos Compra Finca Rústica - ITP, Notaría y Registro | meskeIA',
@@ -54,7 +58,7 @@ export const faqJsonLd = {
       name: '¿Qué impuesto se paga al comprar una finca rústica?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La transmisión de un terreno rústico no edificable está exenta de IVA (Art. 20.Uno.20º de la Ley del IVA), incluso cuando el vendedor es empresario. Por eso, por regla general se paga ITP (Impuesto de Transmisiones Patrimoniales) al tipo general de la comunidad autónoma, habitualmente entre el 6% y el 10%. Entre particulares siempre se paga ITP.',
+        text: `La transmisión de un terreno rústico no edificable está exenta de IVA (Art. 20.Uno.20º de la Ley del IVA), incluso cuando el vendedor es empresario. Por eso, por regla general se paga ITP (Impuesto de Transmisiones Patrimoniales) al tipo general de la comunidad autónoma, que va del ${pct(RANGO_ITP.min)} al ${pct(RANGO_ITP.max)} contando el tramo más alto de las comunidades con escala progresiva. En Ceuta y Melilla la cuota se bonifica al 50% (art. 57 bis del TRLITPAJD), lo que deja el tipo efectivo por debajo de ese mínimo. Entre particulares siempre se paga ITP.`,
       },
     },
     {

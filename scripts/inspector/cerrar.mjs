@@ -4,6 +4,7 @@
  *
  * Ejecutar:  npm run inspector:hallazgos                 (los abiertos, por severidad)
  *            npm run inspector:hallazgos -- --app lupa-digital
+ *            npm run inspector:hallazgos -- --app lupa-digital --detalle   (ficha entera + caso)
  *            npm run inspector:hallazgos -- --arreglado 12,13
  *            npm run inspector:hallazgos -- --descartado 27 --motivo "es correcto: lo confirma la ONCE"
  *            npm run inspector:hallazgos -- --revalidar lupa-digital,conversor-braille
@@ -47,6 +48,13 @@ const REVALIDAR = valorDe('revalidar', '');
 const REVALIDAR_REPARADAS = args.includes('--revalidar-reparadas');
 const MOTIVO = valorDe('motivo', '');
 const TODOS = args.includes('--todos');
+/**
+ * Imprime la ficha ENTERA —descripción y caso reproducible— en vez del resumen de 150
+ * caracteres. Quien va a reparar necesita el caso: el resumen dice QUÉ falla y el caso dice
+ * cómo reproducirlo y qué se esperaba, que es lo único con lo que se puede verificar la
+ * reparación. Sin esto había que leer la base a mano, y eso invita a reparar de oído.
+ */
+const DETALLE = args.includes('--detalle');
 
 const db = abrir();
 const hoy = new Date().toISOString().slice(0, 10);
@@ -153,7 +161,12 @@ for (const f of filas) {
   if (f.severidad !== sevActual) { sevActual = f.severidad; console.log(`── ${sevActual.toUpperCase()} ──`); }
   const marca = f.estado === 'abierto' ? ' ' : f.estado === 'arreglado' ? '✓' : '×';
   console.log(`${marca} [${String(f.id).padStart(3)}] ${f.slug} · ${f.tipo}`);
-  console.log(`      ${f.descripcion.slice(0, 150).replace(/\s+/g, ' ')}…`);
+  if (DETALLE) {
+    console.log(`\n${f.descripcion.trim()}\n`);
+    if (f.caso) console.log(`      CASO: ${f.caso.trim()}\n`);
+  } else {
+    console.log(`      ${f.descripcion.slice(0, 150).replace(/\s+/g, ' ')}…`);
+  }
 }
 
 const porApp = db.prepare(`SELECT slug, COUNT(*) n FROM hallazgos WHERE estado='abierto' GROUP BY slug ORDER BY n DESC`).all();

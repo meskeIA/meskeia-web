@@ -24,12 +24,16 @@ import {
   ComunidadAutonoma,
   calcularITP,
   calcularAJD,
-  calcularNotario,
   estimarFacturaNotarial,
   calcularRegistro,
   ENLACE_CATASTRO,
+  TERRITORIOS_SIN_IVA,
 } from '@/data/itp-ccaa';
-import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META } from '@/data/fiscal';
+import {
+  IVA_INMUEBLES_2025,
+  FISCAL_INMUEBLES_META,
+  TRAMOS_GANANCIAS_PATRIMONIALES_2025,
+} from '@/data/fiscal';
 
 // ===== TIPOS =====
 // Terreno rústico no edificable: exento de IVA → ITP (regla general).
@@ -41,6 +45,8 @@ interface ResultadosComprador {
   impuestoTransmision: number;
   tipoImpuesto: string;
   porcentajeImpuesto: number;
+  /** En Canarias, Ceuta y Melilla no rige el IVA: no se inventa cifra. */
+  impuestoNoCalculado: boolean;
   ajd: number;
   gastosNotario: number;
   gastosNotarioMin: number;
@@ -79,6 +85,11 @@ const COMUNIDADES: { value: ComunidadAutonoma; label: string }[] = [
 // silencio cuando cambie allí (hallazgo 163 del Inspector, del clúster entero).
 const IVA_RENUNCIA = IVA_INMUEBLES_2025.local;
 
+// Extremos de la base del ahorro del IRPF. Derivados de data/fiscal para que el bloque
+// educativo no pueda contradecir a la escala el día que ésta se mueva (hallazgo 371).
+const TIPO_AHORRO_MIN = TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo;
+const TIPO_AHORRO_MAX = TRAMOS_GANANCIAS_PATRIMONIALES_2025[TRAMOS_GANANCIAS_PATRIMONIALES_2025.length - 1].tipo;
+
 export default function SimuladorTerrenoRusticoPage() {
   const [precioVenta, setPrecioVenta] = useState('');
   const [ccaa, setCcaa] = useState<ComunidadAutonoma>('madrid');
@@ -92,25 +103,36 @@ export default function SimuladorTerrenoRusticoPage() {
     const precio = parseSpanishNumber(precioVenta);
     if (!Number.isFinite(precio) || precio <= 0) return null;
 
-    const gestoria = parseSpanishNumberOr(gastosGestoria);
+    // Un gasto no puede ser negativo: el min={0} de NumberInput solo corrige al salir del
+    // campo, y hasta entonces la cifra entraba en el total contradiciendo a su desglose.
+    const gestoria = Math.max(0, parseSpanishNumberOr(gastosGestoria));
 
     let impuesto = 0;
     let tipoImpuesto = '';
     let porcentaje = 0;
     let ivaRecuperable = false;
     let ajd = 0;
+    let impuestoNoCalculado = false;
+
+    const territorioSinIva = TERRITORIOS_SIN_IVA[ccaa];
 
     if (tipoOperacion === 'renuncia') {
-      // Renuncia a la exención de IVA (Art. 20.Dos LIVA) → IVA 21% con inversión del sujeto pasivo + AJD
-      tipoImpuesto = 'IVA (renuncia · ISP)';
-      porcentaje = IVA_RENUNCIA;
-      impuesto = precio * (porcentaje / 100);
+      if (territorioSinIva) {
+        // Canarias (IGIC), Ceuta y Melilla (IPSI): allí el IVA no existe, así que no se
+        // liquida un 21 % inventado ni se cierra el total como si estuviera completo.
+        // El AJD sí se devenga y por eso se sigue calculando.
+        tipoImpuesto = territorioSinIva.impuesto;
+        impuestoNoCalculado = true;
+      } else {
+        // Renuncia a la exención de IVA (Art. 20.Dos LIVA) → IVA 21% con inversión del sujeto pasivo + AJD
+        tipoImpuesto = 'IVA (renuncia · ISP)';
+        porcentaje = IVA_RENUNCIA;
+        impuesto = precio * (porcentaje / 100);
+        ivaRecuperable = true;
+      }
       ajd = calcularAJD(precio, ccaa);
-      ivaRecuperable = true;
     } else {
-      // Regla general: terreno rústico exento de IVA → ITP tipo general de la CCAA
-      const datosCcaa = ITP_CCAA[ccaa];
-      const tipoAplicable = datosCcaa.tipoGeneral;
+      // Regla general: terreno rústico exento de IVA → ITP tipo general de la CCAA.
       // Sin tercer argumento: así se aplica la escala progresiva de las 7 CCAA
       // que la tienen, en vez del tipo plano del primer tramo.
       impuesto = calcularITP(precio, ccaa);
@@ -133,6 +155,7 @@ export default function SimuladorTerrenoRusticoPage() {
       impuestoTransmision: impuesto,
       tipoImpuesto,
       porcentajeImpuesto: porcentaje,
+      impuestoNoCalculado,
       ajd,
       gastosNotario: notario,
       gastosNotarioMin: notaria.min,
@@ -195,8 +218,11 @@ export default function SimuladorTerrenoRusticoPage() {
 
           {/* Tipo de operación */}
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Tipo de operación</label>
-            <div className={styles.transmisionGrid}>
+            {/* Sin htmlFor no hay control al que apuntar: son dos botones. Con
+                role="group" + aria-labelledby el lector de pantalla dice de qué elección
+                forman parte, que aquí es nada menos que el régimen fiscal. */}
+            <span className={styles.label} id="etiqueta-operacion">Tipo de operación</span>
+            <div className={styles.transmisionGrid} role="group" aria-labelledby="etiqueta-operacion">
               <button
                 type="button"
                 className={`${styles.transmisionBtn} ${tipoOperacion === 'itp' ? styles.active : ''}`}
@@ -328,14 +354,24 @@ export default function SimuladorTerrenoRusticoPage() {
               />
 
               <ResultCard
-                title={`${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 2)}%)`}
-                value={formatCurrency(resultadosComprador.impuestoTransmision)}
+                title={
+                  resultadosComprador.impuestoNoCalculado
+                    ? resultadosComprador.tipoImpuesto
+                    : `${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 2)}%)`
+                }
+                value={
+                  resultadosComprador.impuestoNoCalculado
+                    ? 'No calculado'
+                    : formatCurrency(resultadosComprador.impuestoTransmision)
+                }
                 variant="warning"
                 icon="📋"
                 description={
-                  esRenuncia
-                    ? 'Autorrepercutido por inversión del sujeto pasivo — deducible si eres sujeto pasivo de IVA'
-                    : 'Tipo general de la CCAA (posibles reducciones agrarias no incluidas)'
+                  resultadosComprador.impuestoNoCalculado
+                    ? `En ${datosCcaaActual.nombre} no rige el IVA: la operación tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
+                    : esRenuncia
+                      ? 'Autorrepercutido por inversión del sujeto pasivo — deducible si eres sujeto pasivo de IVA'
+                      : 'Tipo general de la CCAA (posibles reducciones agrarias no incluidas)'
                 }
               />
 
@@ -380,18 +416,24 @@ export default function SimuladorTerrenoRusticoPage() {
                 value={formatCurrency(resultadosComprador.totalGastos)}
                 variant="info"
                 icon="➕"
-                description={`${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio de compra`}
+                description={
+                  resultadosComprador.impuestoNoCalculado
+                    ? `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio — SIN el ${resultadosComprador.tipoImpuesto}, que no está incluido`
+                    : `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio de compra`
+                }
               />
 
               <ResultCard
-                title="COSTE TOTAL DE ADQUISICIÓN"
+                title={resultadosComprador.impuestoNoCalculado ? 'COSTE TOTAL (PARCIAL)' : 'COSTE TOTAL DE ADQUISICIÓN'}
                 value={formatCurrency(resultadosComprador.totalOperacion)}
                 variant="highlight"
                 icon="💳"
                 description={
-                  resultadosComprador.ivaRecuperable
-                    ? 'Precio + todos los gastos (antes de deducir el IVA si tienes derecho)'
-                    : 'Precio + todos los gastos de la operación'
+                  resultadosComprador.impuestoNoCalculado
+                    ? `No incluye el ${resultadosComprador.tipoImpuesto}: el coste real será mayor`
+                    : resultadosComprador.ivaRecuperable
+                      ? 'Precio + todos los gastos (antes de deducir el IVA si tienes derecho)'
+                      : 'Precio + todos los gastos de la operación'
                 }
               />
             </>
@@ -477,7 +519,8 @@ export default function SimuladorTerrenoRusticoPage() {
               <strong><span aria-hidden="true">📈</span> Vender la finca con ganancia</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
                 No hay plusvalía municipal, pero la ganancia patrimonial tributa en el IRPF del vendedor (base
-                del ahorro, 19%-30%) o en el Impuesto de Sociedades si vende una empresa.
+                del ahorro, {formatNumber(TIPO_AHORRO_MIN, 0)}%-{formatNumber(TIPO_AHORRO_MAX, 0)}%) o en el
+                Impuesto de Sociedades si vende una empresa.
               </p>
             </div>
           </div>

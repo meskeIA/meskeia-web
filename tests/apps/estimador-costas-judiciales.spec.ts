@@ -2,131 +2,65 @@ import { test, expect, Page } from '@playwright/test';
 
 /**
  * Inspector — estimador-costas-judiciales (segmento cálculo, RIESGO 1 CRÍTICO)
- * Inspeccionada el 26/08/2026.
+ * Inspeccionada el 26/08/2026 · REPARADA el 26/08/2026 (hallazgos 414-421).
  *
  * Qué promete la app
  * ──────────────────
  *   <h1>  «Estimador de Costas Judiciales»
  *   sub.  «Cuánto puede costar un procedimiento judicial en España: abogado, procurador,
- *          tasas y peritos»
- *   <title> y JSON-LD la fechan en «2026».
- *   Bloque educativo: honorarios de abogado (libres, «criterios orientadores» de los
- *   Colegios), aranceles de procurador «regulados por RD 1373/2003», tasas judiciales
- *   («desde 2015 las personas físicas están exentas») y peritos. Cita el art. 394 LEC
- *   como fundamento del principio de vencimiento.
+ *          tasas, peritos e IVA»
  *
  * De dónde sale cada cifra esperada
  * ─────────────────────────────────
- *   TODAS las escalas viven escritas a mano en `app/estimador-costas-judiciales/page.tsx`
- *   (`estimarHonorariosAbogado`, `estimarArancelesProcurador`, `estimarTasas` y el bloque
- *   de perito dentro de `calcular`). NO hay módulo en `data/fiscal/` para costas, aranceles
- *   de procurador ni tasas judiciales — ver HALLAZGO 4. Por eso los valores esperados de
- *   los tres casos se resuelven a mano contra esas escalas, que son la única fuente que la
- *   app declara, y NO contra ningún arancel oficial: el propio comentario del código admite
- *   que las cifras de procurador son «orientativos, tarifas reducidas habituales».
+ *   Ya NO de la propia app. El cálculo vive en `app/estimador-costas-judiciales/motor.ts`
+ *   y los datos normativos en `data/fiscal/costas-judiciales.ts`, contrastados contra el
+ *   texto consolidado del BOE el 26/08/2026:
+ *     · RD 434/2024 (arancel de la Procura) arts. 1.4, 2, 3, 18.d y 24.1
+ *     · Ley 10/2012 (tasas) arts. 4 y 7, con la nulidad de la STC 140/2016
+ *     · LEC arts. 23.2.1.º, 31.2.1.º, 250.2 y 394.3, tras la LO 1/2025
+ *     · Ley 37/1992 (IVA), tipo general del 21 % sobre servicios profesionales
  *
- *   El único dato con anclaje normativo real usado aquí es el 21 % de IVA:
- *   `data/fiscal/iva.ts` → PORCENTAJES_IVA.general = 21, con «Servicios profesionales»
- *   entre los ejemplos del tipo general (Ley 37/1992 del IVA). Se usa en el HALLAZGO 1.
+ *   La aritmética la cubre `tests/costas-judiciales-motor.spec.ts`, que corre sin navegador.
+ *   Este fichero comprueba que lo que la app PINTA es lo que el motor calcula, y las cuatro
+ *   cosas que solo se ven en la página: el desglose, el aviso del tercio, el rechazo audible
+ *   y los grupos de botones con nombre accesible.
+ *
+ * Lo que la reparación descubrió y el acta NO recogía
+ * ───────────────────────────────────────────────────
+ *   Tres defectos normativos más graves que varios de los ocho hallazgos:
+ *     · La app citaba el RD 1373/2003 como arancel del procurador. Está DEROGADO desde el
+ *       02/05/2024 por el RD 434/2024, y sus cifras superaban el máximo legal vigente a
+ *       partir de 60.000 € de cuantía (1.100 € frente a los 1.026,36 € del arancel).
+ *     · Sumaba una cuota variable de tasa judicial del «0,10 % con tope 10.000 €». El
+ *       art. 7.2 de la Ley 10/2012 fue declarado inconstitucional y NULO EN SU TOTALIDAD
+ *       por la STC 140/2016, con efectos del 15/08/2016. Cobraba un tributo inexistente.
+ *     · El umbral verbal/ordinario era 6.000 €. Desde el 03/04/2025 es 15.000 € (art. 250.2
+ *       LEC, reformado por la LO 1/2025). El acta lo marcó como sospechoso; queda confirmado.
  *
  * Nota de formato: `formatCurrency` usa es-ES, que NO agrupa los millares de un número de
- * cuatro cifras (2.200 → «2200,00 €») y sí los de cinco o más (23.000 → «23.000,00 €»),
- * y separa la cifra del € con un espacio duro (U+00A0), que aquí se normaliza.
+ * cuatro cifras (2.200 → «2200,00 €») y sí los de cinco o más (23.000 → «23.000,00 €»), y
+ * separa la cifra del € con un espacio duro (U+00A0), que aquí se normaliza.
  *
  * CASOS (resueltos a mano ANTES de ejecutar la app)
  * ────────────────────────────────────────────────
- *   CASO 1 (normal) — ordinario · persona física · 30.000 € · sin perito y con perito
- *       abogado    30000 ≤ 30000 → 1.500 – 4.500
- *       procurador 30000 ≤ 30000 → 700   (ordinario: requiereProcurador = true)
+ *   CASO 1 (normal) — ordinario · persona física · 30.000 €
+ *       abogado    ancla exacta de la tabla de mercado → 1.500 – 4.500
+ *       procurador escalón «hasta 36.000» = 714,00 · art. 18.d ×1,10 → 785,40
  *       tasas      persona física → 0 → «Exento»
- *       total      1500+700 = 2.200  ·  4500+700 = 5.200
- *       con perito 30000 ≤ 60000 → 1.200 → 3.400 – 6.400
+ *       IVA 21 %   sobre 2.285,40 y 5.285,40 → 479,93 – 1109,93
+ *       total      2.765,33 – 6.395,33
+ *       con perito 800,00 (interpolado entre 600 a 15.000 € y 1.200 a 60.000 €)
  *
- *   CASO 2 (límite) — los bordes exactos de las escalas
- *       2.000 € verbal: tramo `cuantia <= 2000` → 400 – 900; y `cuantia > 2000` es FALSO
- *                       en 2.000 clavados, así que procurador = «No requerido».
- *       2.001 € verbal: salta los dos umbrales a la vez → 600 – 1.500 + procurador 250.
- *       600.000 € ordinario (tope del penúltimo tramo) → 6.000+3.000 = 9.000 – 23.000
- *       600.001 € ordinario (tramo más alto de la escala) → 10.000+4.500 = 14.500 – 39.500
- *       El límite del tercio del art. 394.3 LEC se comprueba aquí: ver HALLAZGO 2.
+ *   CASO 2 (límite) — verbal · 2.000 € clavados
+ *       abogado NO preceptivo (arts. 23.2.1.º y 31.2.1.º LEC) → mínimo 0, máximo 900
+ *       tercio del art. 394.3 = 666,67 €, POR DEBAJO del máximo del abogado: muerde
+ *       2.001 € cruza el umbral: abogado 400,05 – 900,15 y procurador 120,49
  *
- *   CASO 3 (rechazo) — «0», «-5000», «15000abc» y «10,500.00» no deben producir estimación
- *       (los dos primeros por no ser cuantías; los dos últimos por no ser números que la
- *       app pueda leer con seguridad). Ver HALLAZGO 3.
+ *   CASO 3 (continuidad) — 600.000 € frente a 600.001 €
+ *       antes daba un salto del 61 % en el mínimo; ahora la diferencia es de céntimos
  *
- * HALLAZGOS del 26/08/2026 — documentados como TESTIGO: los bloques marcados así afirman
- * el comportamiento DEFECTUOSO, de modo que repararlo pone el test en rojo y obliga a
- * volver aquí. NO se reparó nada en esta inspección.
- *
- *   1. (cálculo, alto) EL IVA NO EXISTE EN NINGUNA PARTE DE LA APP. Ni se suma, ni se
- *      menciona, ni se advierte de que el total va sin él: la cadena «IVA» no aparece en
- *      todo el HTML renderizado. Honorarios de abogado y aranceles de procurador son
- *      servicios profesionales al tipo general del 21 % (`data/fiscal/iva.ts`), y para una
- *      persona física —el valor por defecto del formulario— el IVA es coste real y no
- *      recuperable. En el CASO 1 el «Coste total estimado» de 2.200 – 5.200 € debería ser
- *      2.662 – 6.292 € (2200 × 1,21 y 5200 × 1,21): entre 462 y 1.092 € menos de lo que el
- *      usuario va a pagar. Las tasas judiciales NO llevan IVA, así que la corrección no es
- *      multiplicar el total: es el 21 % sobre abogado + procurador + perito.
- *
- *   2. (contenido, alto) NO APARECE EL LÍMITE DEL TERCIO DEL ART. 394.3 LEC. La app cita
- *      el art. 394 LEC y avisa dos veces de que quien pierde puede pagar las costas de la
- *      contraria (tarjeta de resultados y FAQ «¿Qué pasa si pierdo el juicio?»), pero
- *      nunca dice que ese mismo artículo, en su apartado 3, limita lo que la parte
- *      condenada abona por abogado y demás profesionales no sujetos a arancel a un tercio
- *      de la cuantía del proceso. Ni las cadenas «tercio» ni «394.3» están en la página.
- *      En el CASO 2 se ve por qué importa: en un verbal de 2.000 € el tercio son 666,67 €,
- *      por debajo de los 900 € que la propia app estima como máximo del abogado. La app
- *      exagera la exposición del perdedor justo en los pleitos pequeños, que son los de
- *      sus tramos bajos. Tampoco ofrece «cuantía indeterminada», que es el supuesto que
- *      ese mismo apartado resuelve expresamente.
- *
- *   3. (cálculo, alto) EL PARSEO ES CASERO Y NO `parseSpanishNumber`. La línea 164 hace
- *      `parseFloat(cuantia.replace(/\./g, '').replace(',', '.')) || 0`, que es justo el
- *      patrón que `npm run check:parser` señala en este fichero. Dos consecuencias medidas:
- *        · «15000abc» cuela como 15.000 € y devuelve 1.450 – 3.450 € en vez de rechazarse.
- *        · «10,500.00» (diez mil quinientos: con los dos separadores el último es el
- *          decimal, CLAUDE.md §1.bis, en vigor desde el 24/08/2026) se lee 10,5 y devuelve
- *          550 – 1.050 € en vez de los 1.450 – 3.450 € que da al teclear «10500». Un
- *          factor 2,6 de diferencia, sin ningún aviso.
- *
- *   4. (dato, alto) DATOS NORMATIVOS ESCRITOS A MANO, SIN MÓDULO EN `data/fiscal/` Y SIN
- *      `<DataReference>`. La app fija las cuotas fijas de tasas judiciales (150/300/100/
- *      150/200 €), el tipo variable (0,10 % con tope 10.000 €), los ocho escalones de
- *      procurador que atribuye al RD 1373/2003, y los umbrales procesales de 6.000 €
- *      (verbal/ordinario) y 2.000 € (abogado y procurador). Ninguno está en `data/fiscal/`
- *      —25 módulos, ninguno de costas— ni lleva fecha de verificación en pantalla, pese a
- *      que el <title>, el OpenGraph y el JSON-LD se anuncian como «2026». El único dato
- *      que SÍ existe en `data/fiscal` (el 21 % de IVA) es precisamente el que falta.
- *      A verificar en la reparación: el umbral de 6.000 € entre verbal y ordinario es el
- *      candidato más probable a estar caducado; no se puede afirmar aquí porque la app no
- *      cita ninguna fuente, que es exactamente el hallazgo.
- *
- *   5. (cálculo, medio) `requiereAbogado` SE DECLARA Y NUNCA SE LEE. Está en la interfaz
- *      `ProcedimientoInfo` y relleno en los seis procedimientos, pero `calcular()` solo
- *      consulta `requiereProcurador`: los honorarios de abogado se suman SIEMPRE. Así, un
- *      monitorio de 1.500 € sale por «200,00 € – 500,00 €» con su fila de abogado, mientras
- *      el FAQ de esa misma página dice que en monitorios y verbales de hasta 2.000 € el
- *      abogado no es obligatorio. El mínimo de la horquilla no puede ser el coste de quien
- *      va sin abogado, que es 0 €.
- *
- *   6. (cálculo, bajo) SALTO DE TRAMO. Las escalas son escalones planos, no una escala
- *      progresiva, así que el error clásico —aplicar el tipo del tramo alto a toda la
- *      base— no puede darse aquí. Lo que sí se da es la discontinuidad: 600.000 € da
- *      9.000 – 23.000 € y 600.001 € da 14.500 – 39.500 €. Un euro más de cuantía sube el
- *      mínimo un 61 % y el máximo un 72 %.
- *
- *   7. (operativa, medio) EL RECHAZO ES MUDO. `if (val <= 0) return;` no avisa de nada:
- *      con «0» o «-5000» la tarjeta de resultados sigue diciendo «Completa los datos y
- *      pulsa Estimar costas», indistinguible de no haber pulsado. No se añade ningún
- *      `role="alert"` nuevo ni región `aria-live` con el motivo.
- *
- *   8. (accesibilidad, bajo) TRES GRUPOS DE BOTONES SIN NOMBRE ACCESIBLE. «Tipo de
- *      procedimiento», «¿Quién eres?» y «¿Necesitarás perito?» son `<label>` sin `for` y
- *      sin control dentro, y no hay ni un `<fieldset><legend>` ni un `role="group"` con
- *      `aria-labelledby` en toda la página. Quien navega con lector de pantalla oye
- *      «Persona física, botón, no pulsado» sin saber de qué pregunta es respuesta.
- *      Lo correcto según las reglas —`type="button"` y `aria-pressed` en los quince
- *      botones, `aria-hidden` en los emojis— sí está, y se comprueba en el CASO 1.
+ *   CASO 4 (rechazo) — «0», «-5000», «15000abc» y «10,500.00»
+ *       los tres primeros se rechazan CON MENSAJE; el cuarto se lee como 10.500 €
  */
 
 const RUTA = '/estimador-costas-judiciales/';
@@ -134,6 +68,12 @@ const RUTA = '/estimador-costas-judiciales/';
 /** El formato de moneda es-ES separa la cifra del € con un espacio duro (U+00A0). */
 const ESPACIO_DURO = new RegExp(String.fromCharCode(160), 'g');
 const limpiar = (s: string) => s.replace(ESPACIO_DURO, ' ').replace(/\s+/g, ' ').trim();
+
+/** «1.234,56 €» → 1234.56, para comparar importes sin depender del formato. */
+function aNumero(importe: string): number {
+  const limpio = limpiar(importe).replace(/[€\s]/g, '').replace(/\./g, '').replace(',', '.');
+  return Number(limpio);
+}
 
 async function elegirProcedimiento(page: Page, etiqueta: RegExp): Promise<void> {
   await page.getByRole('button', { name: etiqueta }).first().click();
@@ -144,23 +84,26 @@ async function elegirPersona(page: Page, etiqueta: string): Promise<void> {
 }
 
 async function elegirPerito(page: Page, necesita: boolean): Promise<void> {
-  const grupo = page.locator('div').filter({ hasText: /^¿Necesitarás perito\?/ }).last();
+  const grupo = page.getByRole('group', { name: '¿Necesitarás perito?' });
   await grupo.getByRole('button', { name: necesita ? 'Sí' : 'No', exact: true }).click();
 }
 
 async function estimar(page: Page, cuantia: string): Promise<void> {
-  await page.locator('#cuantia').fill(cuantia);
+  const campo = page.locator('#cuantia');
+  await campo.fill(cuantia);
+  // El `fill` puede perderse si React aún no ha hidratado: se declara y se reintenta.
+  await expect(campo).toHaveValue(cuantia);
   await page.getByRole('button', { name: 'Estimar costas' }).click();
 }
 
 /** «Coste total estimado» — la horquilla que preside la tarjeta de resultados. */
 async function totalEstimado(page: Page): Promise<string> {
-  const total = page.locator('xpath=//*[text()="Coste total estimado"]/following-sibling::div[1]');
+  const total = page.locator('xpath=//*[starts-with(text(),"Coste total estimado")]/following-sibling::div[1]');
   await expect(total).toBeVisible();
   return limpiar(await total.innerText());
 }
 
-/** Importe de una fila del desglose («Abogado», «Procurador», «Tasas judiciales», «Perito»). */
+/** Importe de una fila del desglose («Abogado», «Procurador», «Tasas judiciales», «IVA»). */
 async function partida(page: Page, nombre: string): Promise<string> {
   const fila = page
     .locator('h3', { hasText: 'Desglose' })
@@ -182,136 +125,184 @@ async function hayEstimacion(page: Page): Promise<boolean> {
   return (await page.locator('h3', { hasText: 'Desglose' }).count()) > 0;
 }
 
+/** Las dos partes de la horquilla «X – Y» del total. */
+async function horquilla(page: Page): Promise<[number, number]> {
+  const [min, max] = (await totalEstimado(page)).split('–');
+  return [aNumero(min), aNumero(max)];
+}
+
 test.beforeEach(async ({ page }) => {
   await page.goto(RUTA);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Estimador de Costas Judiciales');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-test('CASO 1 (normal) · ordinario, persona física, 30.000 €: el desglose suma el total', async ({ page }) => {
+test('CASO 1 (normal) · ordinario, persona física, 30.000 €: el desglose suma el total CON IVA', async ({ page }) => {
   // Riesgo 1: el disclaimer crítico va SIEMPRE desplegado y con role="alert".
   const disclaimer = page.locator('[role="alert"]').first();
   await expect(disclaimer).toContainText('carácter exclusivamente orientativo');
   await expect(disclaimer).toContainText('no constituye asesoramiento financiero, fiscal ni jurídico');
   expect(await disclaimer.locator('button').count()).toBe(0); // no colapsable
 
-  // El titular es una estimación, no una cifra vinculante.
-  await expect(page.locator('header p').first()).toContainText('Cuánto puede costar');
+  // HALLAZGO 417 — la app declara de dónde salen sus cifras y cuándo se verificaron.
+  await expect(page.locator('body')).toContainText('RD 434/2024');
+  await expect(page.locator('body')).toContainText('26/08/2026');
 
   await elegirProcedimiento(page, /Juicio ordinario/);
   await elegirPersona(page, 'Persona física');
   await estimar(page, '30000');
 
-  // abogado 30000 ≤ 30000 → 1.500 – 4.500 · procurador 30000 ≤ 30000 → 700 · tasas 0
+  // abogado 1.500 – 4.500 · procurador 714,00 × 1,10 (art. 18.d) · tasas 0
   expect(await partida(page, 'Abogado')).toBe('1500,00 € – 4500,00 €');
-  expect(await partida(page, 'Procurador')).toBe('700,00 €');
+  expect(await partida(page, 'Procurador')).toBe('785,40 €');
   expect(await partida(page, 'Tasas judiciales')).toBe('Exento');
-  // 1500 + 700 = 2.200 · 4500 + 700 = 5.200 → las partidas suman el total mostrado
-  expect(await totalEstimado(page)).toBe('2200,00 € – 5200,00 €');
-  expect(await notas(page)).toContain('ℹ️ Las personas físicas están exentas de tasas judiciales desde 2015');
 
-  // Con perito: 30000 ≤ 60000 → 1.200 · total 1500+700+1200 = 3.400 · 4500+700+1200 = 6.400
+  // HALLAZGO 414 — el IVA existe, se desglosa y entra en el total.
+  expect(await partida(page, 'IVA')).toBe('479,93 € – 1109,93 €');
+  expect(await totalEstimado(page)).toBe('2765,33 € – 6395,33 €');
+  expect(await notas(page)).toContain('ℹ️ Las personas físicas están exentas de tasas judiciales desde 2015 (art. 4.2 Ley 10/2012)');
+
+  // Con perito: interpolado a 800,00 € para 30.000 € de cuantía.
   await elegirPerito(page, true);
   expect(await hayEstimacion(page)).toBe(false); // cambiar un dato limpia el resultado anterior
   await estimar(page, '30000');
-  expect(await partida(page, 'Perito')).toBe('1200,00 €');
-  expect(await totalEstimado(page)).toBe('3400,00 € – 6400,00 €');
+  expect(await partida(page, 'Perito')).toBe('800,00 €');
+  // base 3.085,40 – 6.085,40 · IVA 647,93 – 1277,93 · total 3.733,33 – 7.363,33
+  expect(await partida(page, 'IVA')).toBe('647,93 € – 1277,93 €');
+  expect(await totalEstimado(page)).toBe('3733,33 € – 7363,33 €');
 
-  // HALLAZGO 1 (TESTIGO) — el IVA no aparece por ninguna parte. Con el 21 % del tipo
-  // general de `data/fiscal/iva.ts` sobre abogado + procurador + perito, el total del
-  // primer supuesto (2.200 – 5.200) debería ser 2.662 – 6.292 €.
-  await expect(page.locator('body')).not.toContainText('IVA');
+  // HALLAZGO 421 — los tres grupos de botones tienen nombre accesible.
+  await expect(page.getByRole('group', { name: 'Tipo de procedimiento' })).toBeVisible();
+  await expect(page.getByRole('group', { name: '¿Quién eres?' })).toBeVisible();
+  await expect(page.getByRole('group', { name: '¿Necesitarás perito?' })).toBeVisible();
 
-  // HALLAZGO 8 (parcial) — lo que las reglas SÍ exigen y la app cumple:
-  const botones = page.locator('button');
-  for (let i = 0; i < (await botones.count()); i++) {
-    expect(await botones.nth(i).getAttribute('type')).toBe('button');
-  }
-  // ...pero ningún grupo de botones tiene nombre accesible (TESTIGO).
-  expect(await page.locator('[role="group"],[role="radiogroup"],fieldset').count()).toBe(0);
+  // Lo que las reglas obligatorias exigen y ya se cumplía. Se recorre el DOM de la página
+  // con `evaluate` y no con `page.locator('button')`: el localizador atraviesa el shadow
+  // DOM y allí vive el overlay de `next dev`, cuyos botones no llevan `type` y no son de
+  // la app. `getRootNode() !== document` es lo que los distingue.
+  const sinType = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('button'))
+      .filter(b => b.getRootNode() === document && !b.getAttribute('type'))
+      .map(b => (b.textContent || '').slice(0, 40)),
+  );
+  expect(sinType).toEqual([]);
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-test('CASO 2 (límite) · bordes de la escala y el tercio del art. 394.3 LEC', async ({ page }) => {
-  // ── 2.000 € clavados en juicio verbal ──────────────────────────────────────
-  // abogado: tramo `cuantia <= 2000` → 400 – 900
-  // procurador: `tipo === 'verbal' && cuantia > 2000` es FALSO en 2.000 → «No requerido»
+test('CASO 2 (límite) · 2.000 € en verbal: abogado no preceptivo y el tercio del art. 394.3 LEC', async ({ page }) => {
   await elegirProcedimiento(page, /Juicio verbal/);
   await elegirPersona(page, 'Persona física');
   await estimar(page, '2000');
-  expect(await partida(page, 'Abogado')).toBe('400,00 € – 900,00 €');
+
+  // HALLAZGO 418 — hasta 2.000 € el abogado no es preceptivo: el mínimo es 0 €, no 400 €.
+  expect(await partida(page, 'Abogado')).toBe('0,00 € – 900,00 €');
+  await expect(page.locator('h3', { hasText: 'Desglose' }).locator('xpath=..')).toContainText('no preceptivo');
   expect(await partida(page, 'Procurador')).toBe('No requerido');
-  expect(await totalEstimado(page)).toBe('400,00 € – 900,00 €');
-  expect(await notas(page)).toContain('ℹ️ Abogado y procurador obligatorios si la cuantía supera 2.000 €');
+  // IVA sobre 0 – 900 → 0 – 189 · total 0 – 1.089
+  expect(await partida(page, 'IVA')).toBe('0,00 € – 189,00 €');
+  expect(await totalEstimado(page)).toBe('0,00 € – 1089,00 €');
 
-  // HALLAZGO 2 (TESTIGO) — con 2.000 € de cuantía, el art. 394.3 LEC limitaría a
-  // 2000/3 = 666,67 € lo que el condenado en costas paga por el abogado del contrario,
-  // por debajo de los 900 € que la app da como máximo. La página avisa del riesgo de
-  // pagar las costas de la contraria y no menciona nunca ese tope.
-  await expect(page.locator('body')).toContainText('podrías ser condenado a pagar también las costas de la parte contraria');
-  await expect(page.locator('body')).not.toContainText('tercio');
-  await expect(page.locator('body')).not.toContainText('394.3');
-  // Tampoco existe la opción de cuantía indeterminada, que es la que ese apartado resuelve.
-  await expect(page.locator('body')).not.toContainText('indeterminada');
+  // HALLAZGO 415 — el tope del art. 394.3 LEC se calcula, se nombra y se dice si muerde.
+  await expect(page.locator('body')).toContainText('art. 394.3 LEC');
+  await expect(page.locator('body')).toContainText('tercio de la cuantía del proceso');
+  await expect(page.locator('body')).toContainText('666,67');
+  await expect(page.locator('body')).toContainText('aquí sí muerde');
+  // Y los dos matices que la mera cita del tope se dejaría fuera:
+  await expect(page.locator('body')).toContainText('temeridad');
 
-  // ── 2.001 €: un euro más cruza los dos umbrales a la vez ───────────────────
-  // abogado 2001 ≤ 6000 → 600 – 1.500 · procurador 2001 ≤ 6000 → 250 · total 850 – 1.750
+  // ── 2.001 €: un euro cruza el umbral de los arts. 23.2 y 31.2 LEC ──
   await estimar(page, '2001');
-  expect(await partida(page, 'Abogado')).toBe('600,00 € – 1500,00 €');
-  expect(await partida(page, 'Procurador')).toBe('250,00 €');
-  expect(await totalEstimado(page)).toBe('850,00 € – 1750,00 €');
-  expect(await notas(page)).toContain('ℹ️ Cuantía > 2.000 €: procurador obligatorio en juicio verbal');
+  expect(await partida(page, 'Abogado')).toBe('400,05 € – 900,15 €');
+  expect(await partida(page, 'Procurador')).toBe('120,49 €'); // escalón «hasta 2.400»
+  expect(await notas(page)).toContain('ℹ️ Cuantía superior a 2000,00 €: procurador obligatorio en juicio verbal (art. 23.2 LEC)');
 
-  // ── Tope del penúltimo tramo y tramo más alto de la escala ─────────────────
-  await elegirProcedimiento(page, /Juicio ordinario/);
-  // 600.000 → abogado 6.000 – 20.000 · procurador 3.000 · total 9.000 – 23.000
-  await estimar(page, '600000');
-  expect(await partida(page, 'Abogado')).toBe('6000,00 € – 20.000,00 €');
-  expect(await partida(page, 'Procurador')).toBe('3000,00 €');
-  expect(await totalEstimado(page)).toBe('9000,00 € – 23.000,00 €');
-
-  // 600.001 → tramo más alto: abogado 10.000 – 35.000 · procurador 4.500 → 14.500 – 39.500
-  // HALLAZGO 6 (TESTIGO): un euro de cuantía sube el mínimo un 61 % y el máximo un 72 %.
-  await estimar(page, '600001');
-  expect(await partida(page, 'Abogado')).toBe('10.000,00 € – 35.000,00 €');
-  expect(await partida(page, 'Procurador')).toBe('4500,00 €');
-  expect(await totalEstimado(page)).toBe('14.500,00 € – 39.500,00 €');
+  // El umbral del verbal es 15.000 €, no 6.000: por encima, la app lo advierte.
+  await estimar(page, '15001');
+  expect((await notas(page)).some(n => n.includes('sería un juicio ordinario'))).toBe(true);
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-test('CASO 3 (rechazo) · lo que no es una cuantía no debe producir estimación', async ({ page }) => {
+test('CASO 3 (continuidad) · un euro de cuantía ya no dispara la estimación un 61 %', async ({ page }) => {
   await elegirProcedimiento(page, /Juicio ordinario/);
   await elegirPersona(page, 'Persona física');
 
-  // ── Cero y negativo: la app NO estima (correcto) pero tampoco explica por qué ──
-  // HALLAZGO 7 (TESTIGO): el rechazo es mudo; la tarjeta sigue en su texto de reposo.
+  await estimar(page, '600000');
+  const [minA, maxA] = await horquilla(page);
+  expect(await partida(page, 'Abogado')).toBe('6000,00 € – 20.000,00 €');
+  expect(await partida(page, 'Procurador')).toBe('2287,48 €'); // 2.079,53 × 1,10
+
+  await estimar(page, '600001');
+  const [minB, maxB] = await horquilla(page);
+
+  // Antes: 9.000 – 23.000 € pasaba a 14.500 – 39.500 €. Ahora el único salto es el del
+  // arancel del procurador, que es escalonado POR LEY (art. 2.2: 15,17 € por fracción).
+  expect(minB - minA).toBeLessThan(25);
+  expect(maxB - maxA).toBeLessThan(25);
+  expect(minB).toBeGreaterThanOrEqual(minA);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+test('CASO 4 (rechazo) · lo que no es una cuantía se rechaza EN VOZ ALTA', async ({ page }) => {
+  await elegirProcedimiento(page, /Juicio ordinario/);
+  await elegirPersona(page, 'Persona física');
+
+  // HALLAZGO 419 — el rechazo dice por qué, y lo dice en un role="alert" propio.
+  // NO se cuentan los `[role="alert"]` de la página: el `__next-route-announcer__` de Next
+  // también lo es y va vacío, así que `.last()` lo devolvería a él en vez del aviso de la
+  // app. Se apunta por la clase del módulo CSS, que es lo único que identifica al mensaje.
+  const aviso = page.locator('p[class*="errorMsg"][role="alert"]');
+  await expect(aviso).toHaveCount(0);
+
   for (const invalida of ['0', '-5000']) {
     await estimar(page, invalida);
     expect(await hayEstimacion(page)).toBe(false);
-    await expect(page.getByText('Completa los datos y pulsa')).toBeVisible();
-    // Los dos role="alert" de la página son el disclaimer y el aviso legal: no hay uno nuevo.
-    expect(await page.locator('[role="alert"]').count()).toBe(2);
-    expect(await page.locator('[aria-live]').count()).toBe(2);
+    await expect(aviso).toHaveCount(1);
+    await expect(aviso).toContainText('mayor que 0');
+    await expect(page.locator('#cuantia')).toHaveAttribute('aria-invalid', 'true');
   }
 
-  // ── Basura con prefijo numérico: DEBERÍA rechazarse y no se rechaza ──────────
-  // HALLAZGO 3 (TESTIGO): parseFloat('15000abc') = 15000, así que la app estima como si
-  // fueran 15.000 € (abogado 1.000 – 3.000 · procurador 450). `parseSpanishNumber`
-  // devolvería NaN y el rechazo sería el correcto.
+  // HALLAZGO 416 — «15000abc» ya no cuela como 15.000 €: parseSpanishNumber da NaN.
   await estimar(page, '15000abc');
-  expect(await hayEstimacion(page)).toBe(true);
-  expect(await totalEstimado(page)).toBe('1450,00 € – 3450,00 €');
+  expect(await hayEstimacion(page)).toBe(false);
+  await expect(aviso).toContainText('como un número');
 
-  // ── Número con los dos separadores: se lee 2,6 veces más pequeño ────────────
-  // HALLAZGO 3 (TESTIGO): «10,500.00» son diez mil quinientos (con ambos separadores el
-  // último es el decimal — CLAUDE.md §1.bis, `parseSpanishNumber` desde el 24/08/2026).
-  // La app hace replace(/\./g,'').replace(',','.') → «10.50000» → 10,5 y cae al tramo de
-  // 2.000 €. Tecleado como «10500» la misma app devuelve 1.450,00 € – 3.450,00 €.
+  // HALLAZGO 416 — con los dos separadores el último es el decimal: «10,500.00» = 10.500 €.
   await estimar(page, '10,500.00');
-  expect(await partida(page, 'Abogado')).toBe('400,00 € – 900,00 €');
-  expect(await partida(page, 'Procurador')).toBe('150,00 €');
-  expect(await totalEstimado(page)).toBe('550,00 € – 1050,00 €');
-
+  const conSeparadores = await totalEstimado(page);
   await estimar(page, '10500');
-  expect(await totalEstimado(page)).toBe('1450,00 € – 3450,00 €');
+  expect(await totalEstimado(page)).toBe(conSeparadores);
+  await estimar(page, '10.500');
+  expect(await totalEstimado(page)).toBe(conSeparadores);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+test('CASO 5 (cuantía indeterminada) · el supuesto que el art. 394.3 LEC resuelve', async ({ page }) => {
+  // HALLAZGO 415, segunda mitad: la app no ofrecía este supuesto y ahora sí.
+  await elegirProcedimiento(page, /Juicio ordinario/);
+  await elegirPersona(page, 'Persona física');
+  await page.getByRole('button', { name: 'Cuantía indeterminada' }).click();
+  await expect(page.locator('#cuantia')).toBeDisabled();
+  await page.getByRole('button', { name: 'Estimar costas' }).click();
+
+  // Art. 3 RD 434/2024: 351,00 € · art. 18.d: ×1,10 en ordinario → 386,10 €
+  expect(await partida(page, 'Procurador')).toBe('386,10 €');
+  // Art. 394.3 LEC: la pretensión inestimable se valora en 24.000 € → tercio 8.000 €
+  await expect(page.locator('body')).toContainText('8000,00');
+  expect((await notas(page)).some(n => n.includes('Cuantía indeterminada'))).toBe(true);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+test('CASO 6 (tasas) · la persona jurídica paga la cuota fija, y solo la cuota fija', async ({ page }) => {
+  await elegirProcedimiento(page, /Juicio ordinario/);
+  await elegirPersona(page, 'Empresa / persona jurídica');
+
+  // La cuota variable del art. 7.2 Ley 10/2012 es NULA desde la STC 140/2016: la tasa
+  // no puede crecer con la cuantía. Antes, 1.000.000 € sumaban 1.000 € de variable.
+  await estimar(page, '30000');
+  expect(await partida(page, 'Tasas judiciales')).toBe('300,00 €');
+  await estimar(page, '1000000');
+  expect(await partida(page, 'Tasas judiciales')).toBe('300,00 €');
+
+  // Y el IVA soportado por una empresa deducible se advierte, porque cambia su coste real.
+  expect((await notas(page)).some(n => n.includes('deducirse el IVA'))).toBe(true);
 });

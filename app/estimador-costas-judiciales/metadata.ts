@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 const title = 'Estimador de Costas Judiciales 2026 — Cuánto cuesta un juicio en España | meskeIA';
-const description = 'Estima el coste orientativo de un procedimiento judicial en España: honorarios de abogado, aranceles de procurador, tasas judiciales y peritos. Por tipo de procedimiento y cuantía.';
+const description = 'Estima el coste orientativo de un procedimiento judicial en España: honorarios de abogado, aranceles de procurador, tasas judiciales, peritos e IVA. Con el límite del tercio del art. 394.3 LEC y el arancel vigente de la Procura.';
 
 export const metadata: Metadata = {
   title,
@@ -55,15 +55,15 @@ export const faqJsonLd = {
       name: '¿Cuánto cuesta un juicio en España en 2026?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El coste total de un juicio en España varía enormemente según el tipo de procedimiento y la cuantía reclamada. Un juicio verbal sencillo puede rondar los 600-1.500 €, mientras que un juicio ordinario complejo puede superar los 5.000-10.000 €. Los principales conceptos son los honorarios del abogado, los aranceles del procurador (obligatorio en muchos procedimientos), las tasas judiciales y, en su caso, los honorarios de peritos.',
+        text: 'Varía según el tipo de procedimiento y la cuantía reclamada. Un juicio verbal sencillo puede rondar los 600-1.500 € de abogado, más el arancel del procurador y el 21 % de IVA sobre ambos; un juicio ordinario complejo supera con facilidad los 5.000-10.000 €. Los conceptos son cuatro: honorarios de abogado (libres), aranceles de procurador (arancel de máximos del RD 434/2024), tasas judiciales (solo personas jurídicas) y, en su caso, el informe pericial. El IVA no es opcional: grava los tres primeros servicios profesionales al tipo general.',
       },
     },
     {
       '@type': 'Question',
-      name: '¿Qué son las costas judiciales y quién las paga?',
+      name: '¿Hasta cuánto puedo tener que pagar si me condenan en costas?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las costas judiciales son los gastos generados por el proceso judicial: honorarios de abogado, aranceles de procurador, tasas, peritos y otros desembolsos. En España, el principio general es que el juez condena en costas a la parte que pierde el juicio (art. 394 LEC). Sin embargo, si el tribunal aprecia dudas de hecho o de derecho, puede no imponer costas a ninguna de las partes.',
+        text: 'El artículo 394.3 de la Ley de Enjuiciamiento Civil limita lo que el condenado en costas paga de la parte contraria, en concepto de abogado y demás profesionales no sujetos a arancel, a un tercio de la cuantía del proceso por cada litigante que haya obtenido esa condena. En un pleito de 2.000 € el tope son 666,67 €. El límite decae si el tribunal declara la temeridad del condenado, y los aranceles del procurador quedan fuera de él por estar sujetos a arancel. Si la pretensión es inestimable, a estos solos efectos se valora en 24.000 €.',
       },
     },
     {
@@ -71,23 +71,23 @@ export const faqJsonLd = {
       name: '¿Cuándo es obligatorio el procurador en un juicio?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En España, el procurador es obligatorio en la mayoría de los procedimientos ante los juzgados de primera instancia, audiencias provinciales y tribunales superiores. No es necesario en juicios verbales con cuantía inferior a 2.000 € ni en determinados procedimientos administrativos y laborales. Sus aranceles están regulados por el Real Decreto 1373/2003 y se calculan en función de la cuantía del asunto.',
+        text: 'El procurador es preceptivo en la mayoría de procedimientos civiles. No lo es en los juicios verbales determinados por razón de la cuantía cuando ésta no supere los 2.000 €, ni en la petición inicial del monitorio (art. 23.2 LEC), ni en el orden social. Sus derechos se rigen por el arancel del Real Decreto 434/2024, en vigor desde el 2 de mayo de 2024, que derogó el antiguo RD 1373/2003: es un arancel de máximos, con un tope global de 75.000 € por profesional y asunto, y en juicio ordinario se incrementa un 10 %.',
       },
     },
     {
       '@type': 'Question',
-      name: '¿Existe alguna manera de reducir el coste de un juicio?',
+      name: '¿El juicio verbal sigue siendo hasta 6.000 euros?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. Si no superas el umbral de ingresos establecido (vinculado al IPREM), puedes solicitar el beneficio de justicia gratuita, que cubre abogado y procurador de oficio sin coste. Además, muchos conflictos pueden resolverse mediante mediación o arbitraje, que suelen ser más económicos y rápidos que la vía judicial. En reclamaciones de cantidad inferiores a 6.000 € tampoco hay tasas judiciales para personas físicas.',
+        text: 'No. Desde el 3 de abril de 2025 el juicio verbal cubre las demandas cuya cuantía no exceda de 15.000 €, no de 6.000 €: lo elevó la Ley Orgánica 1/2025 al reformar el artículo 250.2 LEC. Por encima de esa cifra el procedimiento es el juicio ordinario, con un arancel de procurador más alto y tasa judicial de 300 € para las personas jurídicas frente a los 150 € del verbal. Muchos estimadores en línea siguen aplicando el umbral antiguo.',
       },
     },
     {
       '@type': 'Question',
-      name: '¿Las tasas judiciales afectan a las personas físicas en España?',
+      name: '¿Cuánto se paga de tasa judicial?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'No. Desde la reforma de 2015, las personas físicas están exentas del pago de tasas judiciales en todos los órdenes jurisdiccionales. Las tasas judiciales solo las pagan las personas jurídicas (empresas, asociaciones, etc.) en determinados procedimientos civiles y contencioso-administrativos, con cuotas que oscilan entre 150 € y varios miles según el tipo de recurso y la cuantía.',
+        text: 'Las personas físicas están exentas en todos los órdenes desde marzo de 2015, con independencia de la cuantía. Las personas jurídicas pagan una cuota fija según el procedimiento: 150 € en verbal y cambiario, 300 € en ordinario, 100 € en monitorio y 350 € en el contencioso ordinario. La cuota proporcional a la cuantía del artículo 7.2 de la Ley 10/2012 fue declarada inconstitucional y nula por la sentencia 140/2016 del Tribunal Constitucional, así que ya no se devenga. El monitorio y el verbal de reclamación de cantidad hasta 2.000 € están además exentos por su objeto.',
       },
     },
   ],

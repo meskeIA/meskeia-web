@@ -4,166 +4,50 @@ import { useState } from 'react';
 import styles from './EstimadorCostasJudiciales.module.css';
 import {
   MeskeiaLogo, Footer, LegalNotice, EducationalSection, RelatedApps,
-  ShareCard, DisclaimerCard,
+  ShareCard, DisclaimerCard, DataReference,
 } from '@/components';
-import { formatCurrency } from '@/lib';
+import { formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-
-// ─── Tipos ────────────────────────────────────────────────────────────────────
-
-type TipoProcedimiento = 'ordinario' | 'verbal' | 'monitorio' | 'cambiario' | 'laboral' | 'contencioso';
-type TipoPersona = 'fisica' | 'juridica';
-
-interface ProcedimientoInfo {
-  label: string;
-  descripcion: string;
-  requiereProcurador: boolean;
-  requiereAbogado: boolean;
-  nota?: string;
-}
-
-const PROCEDIMIENTOS: Record<TipoProcedimiento, ProcedimientoInfo> = {
-  ordinario: { label: 'Juicio ordinario (> 6.000 €)', descripcion: 'Reclamaciones civiles superiores a 6.000 €', requiereProcurador: true, requiereAbogado: true },
-  verbal: { label: 'Juicio verbal (≤ 6.000 €)', descripcion: 'Reclamaciones civiles hasta 6.000 €', requiereProcurador: false, requiereAbogado: false, nota: 'Abogado y procurador obligatorios si la cuantía supera 2.000 €' },
-  monitorio: { label: 'Proceso monitorio', descripcion: 'Reclamación de deudas dinerarias documentadas', requiereProcurador: false, requiereAbogado: false, nota: 'Si el deudor se opone y la cuantía supera 2.000 €, se transforma en verbal/ordinario' },
-  cambiario: { label: 'Juicio cambiario', descripcion: 'Reclamación de cheques, letras o pagarés', requiereProcurador: true, requiereAbogado: true },
-  laboral: { label: 'Procedimiento laboral', descripcion: 'Despidos, reclamación de cantidades, conflictos laborales', requiereProcurador: false, requiereAbogado: false, nota: 'No hay tasas. Abogado recomendable pero no obligatorio. Sin procurador.' },
-  contencioso: { label: 'Contencioso-administrativo', descripcion: 'Recursos contra la Administración', requiereProcurador: true, requiereAbogado: true },
-};
-
-interface Resultado {
-  abogado: { min: number; max: number };
-  procurador: number;
-  tasas: number;
-  perito: number;
-  total: { min: number; max: number };
-  notas: string[];
-}
-
-// ─── Estimación de honorarios ─────────────────────────────────────────────────
-
-function estimarHonorariosAbogado(cuantia: number, tipo: TipoProcedimiento): { min: number; max: number } {
-  // Honorarios orientativos basados en criterios orientadores de colegios de abogados
-  // Los abogados fijan libremente sus honorarios; estas cifras son medias de mercado
-
-  if (tipo === 'laboral') {
-    // Laboral: suelen cobrar por resultado o tramo fijo
-    if (cuantia <= 6000) return { min: 600, max: 1500 };
-    if (cuantia <= 30000) return { min: 1200, max: 3000 };
-    return { min: 2000, max: 5000 };
-  }
-
-  if (tipo === 'monitorio') {
-    if (cuantia <= 2000) return { min: 200, max: 500 };
-    if (cuantia <= 6000) return { min: 400, max: 1000 };
-    return { min: 800, max: 2000 };
-  }
-
-  // Civil y contencioso: porcentaje decreciente sobre cuantía
-  if (cuantia <= 2000) return { min: 400, max: 900 };
-  if (cuantia <= 6000) return { min: 600, max: 1500 };
-  if (cuantia <= 15000) return { min: 1000, max: 3000 };
-  if (cuantia <= 30000) return { min: 1500, max: 4500 };
-  if (cuantia <= 60000) return { min: 2500, max: 7000 };
-  if (cuantia <= 150000) return { min: 4000, max: 12000 };
-  if (cuantia <= 600000) return { min: 6000, max: 20000 };
-  return { min: 10000, max: 35000 };
-}
-
-function estimarArancelesProcurador(cuantia: number): number {
-  // Aranceles regulados por RD 1373/2003 (orientativos, tarifas reducidas habituales)
-  if (cuantia <= 2000) return 150;
-  if (cuantia <= 6000) return 250;
-  if (cuantia <= 15000) return 450;
-  if (cuantia <= 30000) return 700;
-  if (cuantia <= 60000) return 1100;
-  if (cuantia <= 150000) return 1800;
-  if (cuantia <= 600000) return 3000;
-  return 4500;
-}
-
-function estimarTasas(cuantia: number, tipo: TipoProcedimiento, persona: TipoPersona): number {
-  // Desde 2015, las personas físicas están exentas de tasas judiciales
-  // Solo pagan personas jurídicas (empresas, asociaciones)
-  if (persona === 'fisica') return 0;
-  if (tipo === 'laboral') return 0;
-
-  // Personas jurídicas: cuota fija + variable
-  let fija = 0;
-  if (tipo === 'verbal') fija = 150;
-  else if (tipo === 'ordinario') fija = 300;
-  else if (tipo === 'monitorio') fija = 100;
-  else if (tipo === 'cambiario') fija = 150;
-  else if (tipo === 'contencioso') fija = 200;
-
-  // Variable: 0,10% sobre la cuantía (máximo 10.000 €)
-  const variable = Math.min(cuantia * 0.001, 10000);
-
-  return Math.round(fija + variable);
-}
-
-function calcular(
-  cuantia: number,
-  tipo: TipoProcedimiento,
-  persona: TipoPersona,
-  incluirPerito: boolean,
-): Resultado {
-  const info = PROCEDIMIENTOS[tipo];
-  const abogado = estimarHonorariosAbogado(cuantia, tipo);
-  const notas: string[] = [];
-
-  // Procurador
-  let procurador = 0;
-  if (info.requiereProcurador) {
-    procurador = estimarArancelesProcurador(cuantia);
-  } else if (tipo === 'verbal' && cuantia > 2000) {
-    procurador = estimarArancelesProcurador(cuantia);
-    notas.push('Cuantía > 2.000 €: procurador obligatorio en juicio verbal');
-  }
-
-  // Tasas
-  const tasas = estimarTasas(cuantia, tipo, persona);
-  if (persona === 'fisica' && tipo !== 'laboral') {
-    notas.push('Las personas físicas están exentas de tasas judiciales desde 2015');
-  }
-
-  // Perito
-  let perito = 0;
-  if (incluirPerito) {
-    if (cuantia <= 15000) perito = 600;
-    else if (cuantia <= 60000) perito = 1200;
-    else if (cuantia <= 150000) perito = 2500;
-    else perito = 4000;
-  }
-
-  if (info.nota) notas.push(info.nota);
-
-  return {
-    abogado,
-    procurador,
-    tasas,
-    perito,
-    total: {
-      min: abogado.min + procurador + tasas + perito,
-      max: abogado.max + procurador + tasas + perito,
-    },
-    notas,
-  };
-}
-
-// ─── Componente ───────────────────────────────────────────────────────────────
+import {
+  ARANCEL_PROCURA, COSTAS_JUDICIALES_META, PORCENTAJES_IVA, UMBRALES_LEC,
+} from '@/data/fiscal';
+import {
+  calcular, PROCEDIMIENTOS,
+  type ProcedimientoInfo, type Resultado, type TipoPersona, type TipoProcedimiento,
+} from './motor';
 
 export default function EstimadorCostasJudicialesPage() {
   const [tipo, setTipo] = useState<TipoProcedimiento>('ordinario');
   const [persona, setPersona] = useState<TipoPersona>('fisica');
   const [cuantia, setCuantia] = useState('');
+  const [indeterminada, setIndeterminada] = useState(false);
   const [incluirPerito, setIncluirPerito] = useState(false);
   const [resultado, setResultado] = useState<Resultado | null>(null);
+  const [error, setError] = useState('');
+
+  const reiniciar = () => { setResultado(null); setError(''); };
 
   const handleEstimar = () => {
-    const val = parseFloat(cuantia.replace(/\./g, '').replace(',', '.')) || 0;
-    if (val <= 0) return;
-    setResultado(calcular(val, tipo, persona, incluirPerito));
+    if (indeterminada) {
+      setError('');
+      setResultado(calcular({ cuantia: null, tipo, persona, incluirPerito }));
+      return;
+    }
+
+    const val = parseSpanishNumber(cuantia);
+    if (isNaN(val)) {
+      setResultado(null);
+      setError('Escribe la cuantía como un número: 15.000 o 15000. Si no la conoces, marca «Cuantía indeterminada».');
+      return;
+    }
+    if (val <= 0) {
+      setResultado(null);
+      setError('La cuantía del pleito tiene que ser mayor que 0 €. Si no se puede determinar, marca «Cuantía indeterminada».');
+      return;
+    }
+
+    setError('');
+    setResultado(calcular({ cuantia: val, tipo, persona, incluirPerito }));
   };
 
   return (
@@ -174,27 +58,34 @@ export default function EstimadorCostasJudicialesPage() {
           <span className={styles.heroIcon} aria-hidden="true">⚖️</span>
           <h1 className={styles.title}>Estimador de Costas Judiciales</h1>
           <p className={styles.subtitle}>
-            Cuánto puede costar un procedimiento judicial en España: abogado, procurador, tasas y peritos
+            Cuánto puede costar un procedimiento judicial en España: abogado, procurador, tasas, peritos e IVA
           </p>
         </header>
 
         <LegalNotice />
         <DisclaimerCard variant="financial" severity="critical" context="estimador-costas-judiciales" />
+        <DataReference
+          normativa="Costas judiciales 2025-2026"
+          fuente={COSTAS_JUDICIALES_META.fuente}
+          verificado={COSTAS_JUDICIALES_META.verificado}
+          urlOficial={COSTAS_JUDICIALES_META.urlOficial}
+          nota={COSTAS_JUDICIALES_META.nota}
+        />
 
         <div className={styles.mainContent}>
           {/* ── Formulario ── */}
           <div className={styles.card}>
             <h2 className={styles.cardTitle}>Datos del procedimiento</h2>
 
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Tipo de procedimiento</label>
+            <div className={styles.formGroup} role="group" aria-labelledby="lbl-procedimiento">
+              <span className={styles.label} id="lbl-procedimiento">Tipo de procedimiento</span>
               <div className={styles.optionGrid}>
                 {(Object.entries(PROCEDIMIENTOS) as [TipoProcedimiento, ProcedimientoInfo][]).map(([id, info]) => (
                   <button
                     key={id}
                     type="button"
                     className={`${styles.optionBtn} ${tipo === id ? styles.optionActivo : ''}`}
-                    onClick={() => { setTipo(id); setResultado(null); }}
+                    onClick={() => { setTipo(id); reiniciar(); }}
                     aria-pressed={tipo === id}
                   >
                     <strong>{info.label}</strong>
@@ -204,13 +95,13 @@ export default function EstimadorCostasJudicialesPage() {
               </div>
             </div>
 
-            <div className={styles.formGroup}>
-              <label className={styles.label}>¿Quién eres?</label>
+            <div className={styles.formGroup} role="group" aria-labelledby="lbl-persona">
+              <span className={styles.label} id="lbl-persona">¿Quién eres?</span>
               <div className={styles.switchRow}>
-                <button type="button" className={`${styles.switchBtn} ${persona === 'fisica' ? styles.switchActivo : ''}`} onClick={() => { setPersona('fisica'); setResultado(null); }} aria-pressed={persona === 'fisica'}>
+                <button type="button" className={`${styles.switchBtn} ${persona === 'fisica' ? styles.switchActivo : ''}`} onClick={() => { setPersona('fisica'); reiniciar(); }} aria-pressed={persona === 'fisica'}>
                   Persona física
                 </button>
-                <button type="button" className={`${styles.switchBtn} ${persona === 'juridica' ? styles.switchActivo : ''}`} onClick={() => { setPersona('juridica'); setResultado(null); }} aria-pressed={persona === 'juridica'}>
+                <button type="button" className={`${styles.switchBtn} ${persona === 'juridica' ? styles.switchActivo : ''}`} onClick={() => { setPersona('juridica'); reiniciar(); }} aria-pressed={persona === 'juridica'}>
                   Empresa / persona jurídica
                 </button>
               </div>
@@ -225,18 +116,36 @@ export default function EstimadorCostasJudicialesPage() {
                 className={styles.input}
                 placeholder="Ej: 15000"
                 value={cuantia}
-                onChange={e => { setCuantia(e.target.value); setResultado(null); }}
+                disabled={indeterminada}
+                aria-describedby="hint-cuantia"
+                aria-invalid={error !== ''}
+                onChange={e => { setCuantia(e.target.value); reiniciar(); }}
               />
-              <p className={styles.hint}>Importe que se reclama o valor económico del litigio</p>
+              <p className={styles.hint} id="hint-cuantia">Importe que se reclama o valor económico del litigio</p>
+              <div className={styles.switchRow}>
+                <button
+                  type="button"
+                  className={`${styles.switchBtn} ${indeterminada ? styles.switchActivo : ''}`}
+                  onClick={() => { setIndeterminada(!indeterminada); reiniciar(); }}
+                  aria-pressed={indeterminada}
+                >
+                  Cuantía indeterminada
+                </button>
+              </div>
+              {error && (
+                <p className={styles.errorMsg} role="alert">
+                  <span aria-hidden="true">⚠️</span> {error}
+                </p>
+              )}
             </div>
 
-            <div className={styles.formGroup}>
-              <label className={styles.label}>¿Necesitarás perito?</label>
+            <div className={styles.formGroup} role="group" aria-labelledby="lbl-perito">
+              <span className={styles.label} id="lbl-perito">¿Necesitarás perito?</span>
               <div className={styles.switchRow}>
-                <button type="button" className={`${styles.switchBtn} ${!incluirPerito ? styles.switchActivo : ''}`} onClick={() => { setIncluirPerito(false); setResultado(null); }} aria-pressed={!incluirPerito}>
+                <button type="button" className={`${styles.switchBtn} ${!incluirPerito ? styles.switchActivo : ''}`} onClick={() => { setIncluirPerito(false); reiniciar(); }} aria-pressed={!incluirPerito}>
                   No
                 </button>
-                <button type="button" className={`${styles.switchBtn} ${incluirPerito ? styles.switchActivo : ''}`} onClick={() => { setIncluirPerito(true); setResultado(null); }} aria-pressed={incluirPerito}>
+                <button type="button" className={`${styles.switchBtn} ${incluirPerito ? styles.switchActivo : ''}`} onClick={() => { setIncluirPerito(true); reiniciar(); }} aria-pressed={incluirPerito}>
                   Sí
                 </button>
               </div>
@@ -256,7 +165,7 @@ export default function EstimadorCostasJudicialesPage() {
             ) : (
               <div className={styles.resultados}>
                 <div className={styles.totalHero}>
-                  <div className={styles.totalLabel}>Coste total estimado</div>
+                  <div className={styles.totalLabel}>Coste total estimado (IVA incluido)</div>
                   <div className={styles.totalImporte}>
                     {formatCurrency(resultado.total.min)} – {formatCurrency(resultado.total.max)}
                   </div>
@@ -266,7 +175,10 @@ export default function EstimadorCostasJudicialesPage() {
                   <h3 className={styles.desgloseTitle}>Desglose</h3>
 
                   <div className={styles.desgloseItem}>
-                    <span><span aria-hidden="true">👨‍⚖️</span> Abogado</span>
+                    <span>
+                      <span aria-hidden="true">👨‍⚖️</span> Abogado
+                      {resultado.abogadoOpcional && <span className={styles.optionDesc}> (no preceptivo)</span>}
+                    </span>
                     <strong>{formatCurrency(resultado.abogado.min)} – {formatCurrency(resultado.abogado.max)}</strong>
                   </div>
                   <div className={styles.desgloseItem}>
@@ -283,6 +195,28 @@ export default function EstimadorCostasJudicialesPage() {
                       <strong>{formatCurrency(resultado.perito)}</strong>
                     </div>
                   )}
+                  <div className={styles.desgloseItem}>
+                    <span><span aria-hidden="true">🧾</span> IVA ({PORCENTAJES_IVA.general} %)</span>
+                    <strong>{formatCurrency(resultado.iva.min)} – {formatCurrency(resultado.iva.max)}</strong>
+                  </div>
+                </div>
+
+                <div className={styles.notasCard}>
+                  <h3 className={styles.desgloseTitle}>Si te condenan en costas</h3>
+                  <p className={styles.nota}>
+                    <span aria-hidden="true">⚖️</span> El art. 394.3 LEC limita lo que pagarías de la
+                    parte contraria por abogado y demás profesionales no sujetos a arancel a un{' '}
+                    <strong>tercio de la cuantía del proceso</strong>: en tu caso,{' '}
+                    <strong>{formatCurrency(resultado.limiteCostas)}</strong>
+                    {resultado.cuantiaIndeterminada && ` (la pretensión inestimable se valora en ${formatCurrency(UMBRALES_LEC.valorPretensionInestimable)})`}.
+                    {resultado.limiteCostasMuerde
+                      ? ' Ese tope está por debajo del máximo estimado del abogado, así que aquí sí muerde.'
+                      : ' Con esta cuantía el tope queda por encima del máximo estimado, así que no llega a aplicarse.'}
+                  </p>
+                  <p className={styles.nota}>
+                    <span aria-hidden="true">ℹ️</span> El tope no rige si el tribunal declara la temeridad
+                    del condenado, y los aranceles del procurador quedan fuera de él por estar sujetos a arancel.
+                  </p>
                 </div>
 
                 {resultado.notas.length > 0 && (
@@ -299,8 +233,9 @@ export default function EstimadorCostasJudicialesPage() {
                 <div className={styles.infoCard}>
                   <span aria-hidden="true">💡</span>
                   <p>
-                    Si pierdes el juicio, podrías ser condenado a pagar también las costas de la parte contraria
-                    (abogado y procurador del ganador), salvo excepciones.
+                    El arancel del procurador es de <strong>máximos</strong> (RD 434/2024): puede cobrar
+                    menos, nunca más. Los honorarios de abogado son libres y la horquilla es una estimación
+                    de mercado, no una tarifa.
                   </p>
                 </div>
               </div>
@@ -316,26 +251,26 @@ export default function EstimadorCostasJudicialesPage() {
             <h2>¿Qué son las costas procesales?</h2>
             <p>
               Son los gastos derivados de un procedimiento judicial. Incluyen los honorarios de abogado,
-              aranceles de procurador, tasas judiciales (si aplican) y gastos periciales. En España,
-              el juez puede condenar a la parte perdedora a pagar las costas de la parte ganadora
-              (<strong>principio de vencimiento</strong>, art. 394 LEC).
+              aranceles de procurador, tasas judiciales (si aplican), gastos periciales y el IVA que
+              gravan esos servicios profesionales. En España, el juez puede condenar a la parte perdedora
+              a pagar las costas de la parte ganadora (<strong>principio de vencimiento</strong>, art. 394 LEC).
             </p>
 
             <div className={styles.conceptosGrid}>
               <div className={styles.conceptoCard}>
                 <span className={styles.conceptoIcono} aria-hidden="true">👨‍⚖️</span>
                 <strong>Abogado</strong>
-                <p>Honorarios libres. Los Colegios de Abogados publican criterios orientadores, pero cada profesional fija sus tarifas.</p>
+                <p>Honorarios libres desde la Ley 25/2009: ningún baremo los fija. Las cifras de esta app son estimaciones de mercado y cada profesional pone su precio.</p>
               </div>
               <div className={styles.conceptoCard}>
                 <span className={styles.conceptoIcono} aria-hidden="true">📋</span>
                 <strong>Procurador</strong>
-                <p>Aranceles regulados por RD 1373/2003. Representa al litigante ante el juzgado. Obligatorio en la mayoría de procedimientos.</p>
+                <p>Arancel de máximos del RD 434/2024, en vigor desde mayo de 2024, que derogó el antiguo RD 1373/2003. Tope de {formatCurrency(ARANCEL_PROCURA.topeGlobalPorAsunto)} por profesional y asunto.</p>
               </div>
               <div className={styles.conceptoCard}>
                 <span className={styles.conceptoIcono} aria-hidden="true">🏛️</span>
                 <strong>Tasas judiciales</strong>
-                <p>Desde 2015, las personas físicas están exentas. Solo pagan empresas y personas jurídicas.</p>
+                <p>Solo las paga la persona jurídica: la física está exenta desde 2015. Son cuotas fijas; la parte proporcional a la cuantía se anuló en 2016.</p>
               </div>
               <div className={styles.conceptoCard}>
                 <span className={styles.conceptoIcono} aria-hidden="true">🔍</span>
@@ -344,14 +279,45 @@ export default function EstimadorCostasJudicialesPage() {
               </div>
             </div>
 
+            <h2>El límite del tercio (art. 394.3 LEC)</h2>
+            <p>
+              Perder el pleito no significa pagar sin techo lo que la contraria haya gastado en abogado.
+              El art. 394.3 LEC limita esa parte —abogado y demás profesionales <em>no sujetos a tarifa o
+              arancel</em>— a <strong>un tercio de la cuantía del proceso</strong> por cada litigante que
+              haya obtenido la condena en costas. En un verbal de 2.000 € el tope son 666,67 €, por debajo
+              de lo que costaría el abogado del contrario. Dos matices que suelen omitirse:
+            </p>
+            <ul className={styles.warningList}>
+              <li>El tope <strong>no se aplica</strong> si el tribunal declara la temeridad del condenado en costas.</li>
+              <li>Los aranceles del procurador <strong>quedan fuera</strong> del tope, precisamente por estar sujetos a arancel.</li>
+              <li>Si la pretensión es inestimable, a estos solos efectos se valora en {formatCurrency(UMBRALES_LEC.valorPretensionInestimable)}, salvo que el tribunal disponga otra cosa por la complejidad del asunto.</li>
+            </ul>
+
+            <h2>El IVA no es opcional</h2>
+            <p>
+              Los honorarios de abogado, los aranceles de procurador y el informe pericial son servicios
+              profesionales sujetos al tipo general del <strong>{PORCENTAJES_IVA.general} %</strong> (Ley 37/1992).
+              Para una persona física es coste real y no recuperable; una empresa que pueda deducirse el IVA
+              soportado debe mirar la base, no el total. Las tasas judiciales son un tributo y no llevan IVA:
+              por eso el {PORCENTAJES_IVA.general} % se aplica sobre abogado + procurador + perito, y no sobre el total.
+            </p>
+
             <div className={styles.faqList}>
               <details className={styles.faqItem}>
                 <summary>¿Puedo reclamar sin abogado?</summary>
-                <p>En juicios verbales de hasta 2.000 € y en procesos monitorios, no es obligatorio. Sin embargo, es muy recomendable para proteger tus derechos. En el resto de procedimientos civiles es obligatorio.</p>
+                <p>En juicios verbales determinados por razón de la cuantía cuando ésta no supere los {formatCurrency(UMBRALES_LEC.sinAbogadoNiProcuradorHasta)} y en la petición inicial del monitorio, no es obligatorio (arts. 23.2.1.º y 31.2.1.º LEC). En el orden social puedes comparecer por ti mismo (art. 18 LRJS). Sigue siendo muy recomendable contar con abogado; en el resto de procedimientos civiles es obligatorio.</p>
+              </details>
+              <details className={styles.faqItem}>
+                <summary>¿Verbal u ordinario? El umbral cambió en 2025</summary>
+                <p>Desde el 3 de abril de 2025, el juicio verbal cubre las demandas cuya cuantía no exceda de {formatCurrency(UMBRALES_LEC.juicioVerbalHasta)}, no de 6.000 € como antes: lo elevó la Ley Orgánica 1/2025 al reformar el art. 250.2 LEC. Muchos estimadores que circulan por internet siguen con el umbral viejo.</p>
               </details>
               <details className={styles.faqItem}>
                 <summary>¿Qué pasa si pierdo el juicio?</summary>
-                <p>El juez puede condenarte en costas: tendrías que pagar tus propios gastos más los de la parte contraria (abogado y procurador del ganador). No es automático en todos los casos, pero es lo habitual.</p>
+                <p>El juez puede condenarte en costas: pagarías tus propios gastos más los de la parte contraria. No es automático —cabe que el tribunal aprecie serias dudas de hecho o de derecho— y, cuando ocurre, la parte de abogado está limitada al tercio de la cuantía del proceso (art. 394.3 LEC). Desde la LO 1/2025, además, rehusar sin justa causa un medio adecuado de solución de controversias al que se te haya convocado puede costarte las costas aunque ganes.</p>
+              </details>
+              <details className={styles.faqItem}>
+                <summary>¿Cuánto se paga de tasa judicial?</summary>
+                <p>Las personas físicas no pagan nada desde marzo de 2015. Las personas jurídicas pagan una cuota fija según el procedimiento: 150 € en verbal y cambiario, 300 € en ordinario, 100 € en monitorio y 350 € en el contencioso ordinario. La cuota proporcional a la cuantía que preveía el art. 7.2 de la Ley 10/2012 fue declarada inconstitucional y nula por la STC 140/2016: ya no existe. El monitorio y el verbal de cantidad hasta {formatCurrency(2000)} están además exentos por el objeto (art. 4.1.c).</p>
               </details>
               <details className={styles.faqItem}>
                 <summary>¿Puedo pedir justicia gratuita?</summary>
@@ -366,8 +332,9 @@ export default function EstimadorCostasJudicialesPage() {
               </div>
               <ul className={styles.warningList}>
                 <li>Los honorarios de abogado son orientativos: cada profesional fija sus propios precios</li>
-                <li>Los aranceles de procurador están regulados pero tienen márgenes de aplicación</li>
+                <li>El arancel del procurador marca un máximo, no un precio: se puede pactar por debajo</li>
                 <li>Esta estimación NO incluye gastos de ejecución si la sentencia no se cumple voluntariamente</li>
+                <li>Desde el 3 de abril de 2025 muchos asuntos civiles exigen intentar un medio adecuado de solución de controversias antes de demandar (LO 1/2025): ese intento también tiene coste</li>
                 <li>Consulta siempre con un abogado antes de iniciar cualquier procedimiento</li>
               </ul>
             </div>

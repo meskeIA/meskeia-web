@@ -24,10 +24,11 @@ import {
   ComunidadAutonoma,
   calcularITP,
   calcularAJD,
-  calcularNotario,
   estimarFacturaNotarial,
   calcularRegistro,
   ENLACE_CATASTRO,
+  RANGO_AJD,
+  TERRITORIOS_SIN_IVA,
 } from '@/data/itp-ccaa';
 import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META } from '@/data/fiscal';
 
@@ -42,6 +43,8 @@ interface ResultadosComprador {
   impuestoTransmision: number;
   tipoImpuesto: string;
   porcentajeImpuesto: number;
+  /** En Canarias, Ceuta y Melilla no rige el IVA: no se inventa cifra. */
+  impuestoNoCalculado: boolean;
   ajd: number;
   gastosNotario: number;
   gastosNotarioMin: number;
@@ -94,25 +97,36 @@ export default function SimuladorSolarPage() {
     const precio = parseSpanishNumber(precioVenta);
     if (!Number.isFinite(precio) || precio <= 0) return null;
 
-    const gestoria = parseSpanishNumberOr(gastosGestoria);
+    // Un gasto no puede ser negativo: el min={0} de NumberInput solo corrige al salir del
+    // campo, y hasta entonces la cifra entraba en el total contradiciendo a su desglose.
+    const gestoria = Math.max(0, parseSpanishNumberOr(gastosGestoria));
 
     let impuesto = 0;
     let tipoImpuesto = '';
     let porcentaje = 0;
     let ivaRecuperable = false;
     let ajd = 0;
+    let impuestoNoCalculado = false;
+
+    const territorioSinIva = TERRITORIOS_SIN_IVA[ccaa];
 
     if (tipoVendedor === 'empresario') {
-      // Vendedor promotor/empresario: solar sujeto a IVA 21% + AJD
-      tipoImpuesto = 'IVA';
-      porcentaje = IVA_SOLAR;
-      impuesto = precio * (porcentaje / 100);
+      if (territorioSinIva) {
+        // Canarias (IGIC), Ceuta y Melilla (IPSI): allí el IVA no existe, así que no se
+        // liquida un 21 % inventado ni se cierra un total como si fuera completo. El AJD
+        // sí se devenga, y por eso se sigue calculando.
+        tipoImpuesto = territorioSinIva.impuesto;
+        impuestoNoCalculado = true;
+      } else {
+        // Vendedor promotor/empresario: solar sujeto a IVA 21% + AJD
+        tipoImpuesto = 'IVA';
+        porcentaje = IVA_SOLAR;
+        impuesto = precio * (porcentaje / 100);
+        ivaRecuperable = true;
+      }
       ajd = calcularAJD(precio, ccaa);
-      ivaRecuperable = true;
     } else {
-      // Vendedor particular: ITP tipo general de la CCAA
-      const datosCcaa = ITP_CCAA[ccaa];
-      const tipoAplicable = datosCcaa.tipoGeneral;
+      // Vendedor particular: ITP tipo general de la CCAA.
       // Sin tercer argumento: así se aplica la escala progresiva de las 7 CCAA
       // que la tienen, en vez del tipo plano del primer tramo.
       impuesto = calcularITP(precio, ccaa);
@@ -135,6 +149,7 @@ export default function SimuladorSolarPage() {
       impuestoTransmision: impuesto,
       tipoImpuesto,
       porcentajeImpuesto: porcentaje,
+      impuestoNoCalculado,
       ajd,
       gastosNotario: notario,
       gastosNotarioMin: notaria.min,
@@ -198,8 +213,11 @@ export default function SimuladorSolarPage() {
 
           {/* Tipo de vendedor */}
           <div className={styles.inputGroup}>
-            <label className={styles.label}>¿Quién vende el solar?</label>
-            <div className={styles.transmisionGrid}>
+            {/* Sin htmlFor no hay control al que apuntar: son dos botones. Con
+                role="group" + aria-labelledby el lector de pantalla dice de qué elección
+                forman parte, que aquí es nada menos que el régimen fiscal. */}
+            <span className={styles.label} id="etiqueta-vendedor">¿Quién vende el solar?</span>
+            <div className={styles.transmisionGrid} role="group" aria-labelledby="etiqueta-vendedor">
               <button
                 type="button"
                 className={`${styles.transmisionBtn} ${tipoVendedor === 'particular' ? styles.active : ''}`}
@@ -329,14 +347,24 @@ export default function SimuladorSolarPage() {
               />
 
               <ResultCard
-                title={`${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 2)}%)`}
-                value={formatCurrency(resultadosComprador.impuestoTransmision)}
+                title={
+                  resultadosComprador.impuestoNoCalculado
+                    ? resultadosComprador.tipoImpuesto
+                    : `${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 2)}%)`
+                }
+                value={
+                  resultadosComprador.impuestoNoCalculado
+                    ? 'No calculado'
+                    : formatCurrency(resultadosComprador.impuestoTransmision)
+                }
                 variant="warning"
                 icon="📋"
                 description={
-                  esEmpresario
-                    ? 'Deducible si eres empresa/autónomo sujeto a IVA; no deducible si autopromueves tu vivienda'
-                    : 'Tipo general — los solares no tienen tipos reducidos de ITP'
+                  resultadosComprador.impuestoNoCalculado
+                    ? `En ${datosCcaaActual.nombre} no rige el IVA: la compra al promotor tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
+                    : esEmpresario
+                      ? 'Deducible si eres empresa/autónomo sujeto a IVA; no deducible si autopromueves tu vivienda'
+                      : 'Tipo general — los solares no tienen tipos reducidos de ITP'
                 }
               />
 
@@ -380,18 +408,24 @@ export default function SimuladorSolarPage() {
                 value={formatCurrency(resultadosComprador.totalGastos)}
                 variant="info"
                 icon="➕"
-                description={`${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio de compra`}
+                description={
+                  resultadosComprador.impuestoNoCalculado
+                    ? `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio — SIN el ${resultadosComprador.tipoImpuesto}, que no está incluido`
+                    : `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio de compra`
+                }
               />
 
               <ResultCard
-                title="COSTE TOTAL DE ADQUISICIÓN"
+                title={resultadosComprador.impuestoNoCalculado ? 'COSTE TOTAL (PARCIAL)' : 'COSTE TOTAL DE ADQUISICIÓN'}
                 value={formatCurrency(resultadosComprador.totalOperacion)}
                 variant="highlight"
                 icon="💳"
                 description={
-                  resultadosComprador.ivaRecuperable
-                    ? 'Precio + todos los gastos (antes de deducir el IVA si tienes derecho)'
-                    : 'Precio + todos los gastos de la operación'
+                  resultadosComprador.impuestoNoCalculado
+                    ? `No incluye el ${resultadosComprador.tipoImpuesto}: el coste real será mayor`
+                    : resultadosComprador.ivaRecuperable
+                      ? 'Precio + todos los gastos (antes de deducir el IVA si tienes derecho)'
+                      : 'Precio + todos los gastos de la operación'
                 }
               />
 
@@ -436,7 +470,7 @@ export default function SimuladorSolarPage() {
                 </tr>
                 <tr style={{ background: 'var(--bg-primary)' }}>
                   <td style={{ padding: '8px 10px', borderBottom: '1px solid #e0e0e0' }}>AJD</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid #e0e0e0' }}>Sí (0,5%–1,5%)</td>
+                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid #e0e0e0' }}>Sí ({formatNumber(RANGO_AJD.min, 0)}%–{formatNumber(RANGO_AJD.max, 1)}%)</td>
                   <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid #e0e0e0' }}>No</td>
                 </tr>
                 <tr>
