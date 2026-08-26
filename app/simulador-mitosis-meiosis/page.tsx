@@ -11,204 +11,19 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import {
+  cromosomasPorPolo,
+  FASES_MEIOSIS,
+  FASES_MITOSIS,
+  parDelCromosoma,
+  type FaseConfig,
+} from './motor';
 import styles from './SimuladorMitosisMeiosis.module.css';
 
 // ============================================================
 // Tipos
 // ============================================================
 type TipoDivision = 'mitosis' | 'meiosis';
-type Membrana = 'completa' | 'disolviendose' | 'ausente' | 'formandose';
-
-interface FaseConfig {
-  id: string;
-  nombre: string;
-  descripcion: string;
-  celulas: number;
-  nucleos: number;
-  membrana: Membrana;
-  husillo: boolean;
-  crossingOver: boolean;
-  // Posición relativa de los cromosomas (0=interfase difuso, 1=condensado, 2=alineado placa, 3=separando, 4=polos)
-  estadoCromosomasId: number;
-}
-
-// ============================================================
-// Datos de fases
-// ============================================================
-const FASES_MITOSIS: FaseConfig[] = [
-  {
-    id: 'interfase',
-    nombre: 'Interfase',
-    descripcion:
-      'El ADN se duplica en el núcleo. Los cromosomas no son visibles como estructuras individuales: aparecen como cromatina difusa. La membrana nuclear está intacta. La célula crece y se prepara para dividirse.',
-    celulas: 1,
-    nucleos: 1,
-    membrana: 'completa',
-    husillo: false,
-    crossingOver: false,
-    estadoCromosomasId: 0,
-  },
-  {
-    id: 'profase',
-    nombre: 'Profase',
-    descripcion:
-      'Los cromosomas se condensan y se hacen visibles al microscopio. La membrana nuclear comienza a desintegrarse. El huso acromático empieza a formarse desde los centrosomas en los polos opuestos.',
-    celulas: 1,
-    nucleos: 1,
-    membrana: 'disolviendose',
-    husillo: true,
-    crossingOver: false,
-    estadoCromosomasId: 1,
-  },
-  {
-    id: 'metafase',
-    nombre: 'Metafase',
-    descripcion:
-      'Los cromosomas alcanzan su máxima condensación y se alinean en la placa ecuatorial (plano central de la célula). El huso acromático está completamente formado y los cinetocoros de cada cromátida están unidos a fibras del huso.',
-    celulas: 1,
-    nucleos: 0,
-    membrana: 'ausente',
-    husillo: true,
-    crossingOver: false,
-    estadoCromosomasId: 2,
-  },
-  {
-    id: 'anafase',
-    nombre: 'Anafase',
-    descripcion:
-      'Las cromátidas hermanas se separan: las fibras del huso tiran de cada cromátida hacia un polo opuesto de la célula. Cada polo recibe un conjunto completo de cromosomas (2n).',
-    celulas: 1,
-    nucleos: 0,
-    membrana: 'ausente',
-    husillo: true,
-    crossingOver: false,
-    estadoCromosomasId: 3,
-  },
-  {
-    id: 'telofase',
-    nombre: 'Telofase',
-    descripcion:
-      'Los cromosomas llegan a los polos y comienzan a descondensar. Se forman dos nuevas membranas nucleares alrededor de cada conjunto de cromosomas. El huso acromático desaparece.',
-    celulas: 1,
-    nucleos: 2,
-    membrana: 'formandose',
-    husillo: false,
-    crossingOver: false,
-    estadoCromosomasId: 4,
-  },
-  {
-    id: 'citocinesis',
-    nombre: 'Citocinesis',
-    descripcion:
-      'El citoplasma se divide y da lugar a dos células hijas idénticas a la célula madre. Cada célula hija tiene 2n cromosomas (diploide). En la mitosis se produce siempre este resultado: 2 células 2n.',
-    celulas: 2,
-    nucleos: 1,
-    membrana: 'completa',
-    husillo: false,
-    crossingOver: false,
-    estadoCromosomasId: 0,
-  },
-];
-
-const FASES_MEIOSIS: FaseConfig[] = [
-  {
-    id: 'interfase',
-    nombre: 'Interfase',
-    descripcion:
-      'La célula duplica su ADN antes de iniciar la meiosis. Los cromosomas no son visibles aún. La célula es diploide (2n=4 en nuestro modelo con 2 pares de homólogos).',
-    celulas: 1,
-    nucleos: 1,
-    membrana: 'completa',
-    husillo: false,
-    crossingOver: false,
-    estadoCromosomasId: 0,
-  },
-  {
-    id: 'profase-i',
-    nombre: 'Profase I',
-    descripcion:
-      'Los cromosomas homólogos se aparean formando bivalentes (tétradas). Ocurre el crossing-over: intercambio de segmentos entre cromátidas no hermanas de los homólogos. Este proceso genera variabilidad genética. La membrana nuclear se disuelve.',
-    celulas: 1,
-    nucleos: 1,
-    membrana: 'disolviendose',
-    husillo: true,
-    crossingOver: true,
-    estadoCromosomasId: 1,
-  },
-  {
-    id: 'metafase-i',
-    nombre: 'Metafase I',
-    descripcion:
-      'Los bivalentes (pares de homólogos unidos) se alinean en la placa ecuatorial. Cada bivalente es orientado por el huso de modo que los homólogos quedan en lados opuestos.',
-    celulas: 1,
-    nucleos: 0,
-    membrana: 'ausente',
-    husillo: true,
-    crossingOver: false,
-    estadoCromosomasId: 2,
-  },
-  {
-    id: 'anafase-i',
-    nombre: 'Anafase I',
-    descripcion:
-      'Los cromosomas homólogos se separan y migran a polos opuestos. IMPORTANTE: las cromátidas hermanas permanecen unidas. Solo se separan los homólogos. El número de cromosomas en cada polo queda en n (haploide, pero cada cromosoma tiene dos cromátidas).',
-    celulas: 1,
-    nucleos: 0,
-    membrana: 'ausente',
-    husillo: true,
-    crossingOver: false,
-    estadoCromosomasId: 3,
-  },
-  {
-    id: 'telofase-i',
-    nombre: 'Telofase I / Citocinesis I',
-    descripcion:
-      'Se forman dos células haploides (n=2). Cada célula tiene la mitad de cromosomas de la original, pero cada cromosoma aún consta de dos cromátidas unidas. Las células resultantes son genéticamente distintas entre sí.',
-    celulas: 2,
-    nucleos: 1,
-    membrana: 'completa',
-    husillo: false,
-    crossingOver: false,
-    estadoCromosomasId: 4,
-  },
-  {
-    id: 'metafase-ii',
-    nombre: 'Metafase II',
-    descripcion:
-      'En cada una de las dos células haploides, los cromosomas se alinean en la placa ecuatorial. No hay apareamiento de homólogos porque ya se separaron en la meiosis I. El huso se forma de nuevo.',
-    celulas: 2,
-    nucleos: 0,
-    membrana: 'ausente',
-    husillo: true,
-    crossingOver: false,
-    estadoCromosomasId: 2,
-  },
-  {
-    id: 'anafase-ii',
-    nombre: 'Anafase II',
-    descripcion:
-      'Las cromátidas hermanas se separan y migran a polos opuestos dentro de cada célula. Este paso es equivalente a la anafase de la mitosis, pero en células ya haploides.',
-    celulas: 2,
-    nucleos: 0,
-    membrana: 'ausente',
-    husillo: true,
-    crossingOver: false,
-    estadoCromosomasId: 3,
-  },
-  {
-    id: 'telofase-ii',
-    nombre: 'Telofase II / Citocinesis II',
-    descripcion:
-      'Se forman cuatro células haploides (n=2) genéticamente distintas. Estas son las células que pueden convertirse en gametos (óvulos o espermatozoides) en organismos de reproducción sexual.',
-    celulas: 4,
-    nucleos: 1,
-    membrana: 'completa',
-    husillo: false,
-    crossingOver: false,
-    estadoCromosomasId: 0,
-  },
-];
-
 // ============================================================
 // Funciones de dibujo
 // ============================================================
@@ -219,6 +34,12 @@ const COLOR_MEMBRANA = '#2E86AB';
 const COLOR_NUCLEO_FILL = 'rgba(46,134,171,0.15)';
 const COLOR_HUSILLO = '#94a3b8';
 const COLOR_CROSSING = '#D63384';
+
+/**
+ * Radios de la cromatina difusa. Fijos y no `Math.random()`: con azar, dos capturas de la
+ * MISMA fase salían distintas y el dibujo temblaba en cada fotograma sin que nada cambiara.
+ */
+const PSEUDO_ALEATORIO = [0.82, 0.31, 0.64, 0.19, 0.95, 0.47, 0.73, 0.08];
 
 interface PuntoCanvas {
   x: number;
@@ -384,23 +205,21 @@ function dibujarCelula(
     dibujarCrossingOver(ctx, cx, cy, radioCell);
   }
 
-  // Cromosomas según el estado
-  const estado = fase.estadoCromosomasId;
+  // ── Cromosomas ──
+  // Todo lo que sigue sale de los DATOS de la fase (`motor.ts`), no de un identificador de
+  // estado compartido por las tres divisiones. Ese identificador es el que hacía que la
+  // mitosis se dibujara como reduccional: repartía siempre la mitad de los cromosomas de la
+  // placa entre los dos polos, y eso solo es correcto cuando lo que se separa son homólogos.
+  const n = fase.cromosomasPorCelula;
+  const colorDe = (i: number) => COLORES_CROMOSOMAS[parDelCromosoma(i, n)];
 
-  // estadoCromosomasId:
-  // 0 = difuso (interfase / citocinesis)
-  // 1 = condensado visible
-  // 2 = alineado en placa ecuatorial
-  // 3 = separando hacia polos
-  // 4 = en polos (telofase)
-
-  if (estado === 0) {
+  if (fase.disposicion === 'difuso') {
     // Cromatina difusa
     ctx.save();
     ctx.globalAlpha = 0.3;
     for (let p = 0; p < 8; p++) {
       const ang = (p / 8) * Math.PI * 2;
-      const r = radioCell * 0.3 * Math.random() + radioCell * 0.05;
+      const r = radioCell * 0.3 * PSEUDO_ALEATORIO[p] + radioCell * 0.05;
       const px = cx + Math.cos(ang) * r;
       const py = cy + Math.sin(ang) * r;
       ctx.beginPath();
@@ -413,133 +232,147 @@ function dibujarCelula(
     return;
   }
 
-  // Cromosomas condensados
-  // En meiosis la célula tiene 2 pares de homólogos = 4 cromosomas visibles
-  // En mitosis también 2n=4 = 4 cromosomas
-  const numPares = isMeiosis && fase.id.includes('ii') ? 1 : 2; // meiosis II: 1 par en n=2
-
-  if (estado === 1) {
-    // Condensados distribuidos por el núcleo
+  if (fase.disposicion === 'condensado') {
+    // Repartidos por el núcleo. Con bivalentes, los HOMÓLOGOS —los del mismo color— van
+    // uno encima de otro, que es lo que significa aparearse; antes las líneas del bivalente
+    // unían cromosomas de pares distintos, o sea de colores distintos.
     const radioNucleo = radioCell * 0.42;
     const posiciones: PuntoCanvas[] = [];
-    if (numPares === 2) {
+    if (n >= 4) {
+      // Columna izquierda: par 0 (arriba y abajo). Columna derecha: par 1.
       posiciones.push(
         { x: cx - radioNucleo * 0.5, y: cy - radioNucleo * 0.3 },
-        { x: cx + radioNucleo * 0.5, y: cy - radioNucleo * 0.3 },
         { x: cx - radioNucleo * 0.5, y: cy + radioNucleo * 0.3 },
-        { x: cx + radioNucleo * 0.5, y: cy + radioNucleo * 0.3 }
+        { x: cx + radioNucleo * 0.5, y: cy - radioNucleo * 0.3 },
+        { x: cx + radioNucleo * 0.5, y: cy + radioNucleo * 0.3 },
       );
     } else {
       posiciones.push(
         { x: cx - radioNucleo * 0.4, y: cy },
-        { x: cx + radioNucleo * 0.4, y: cy }
+        { x: cx + radioNucleo * 0.4, y: cy },
       );
     }
     posiciones.forEach((pos, i) => {
-      const color = COLORES_CROMOSOMAS[Math.floor(i / 2) % 2];
-      dibujarCromosoma(ctx, pos.x, pos.y, radioCell * 0.18, color, i % 2 === 0 ? 0.3 : -0.3, false);
+      dibujarCromosoma(ctx, pos.x, pos.y, radioCell * 0.18, colorDe(i), i % 2 === 0 ? 0.3 : -0.3, false);
     });
-    // En meiosis Profase I: dibujar bivalentes (pares apareados)
-    if (isMeiosis && fase.crossingOver) {
+
+    if (fase.bivalentes && posiciones.length >= 4) {
       ctx.save();
       ctx.strokeStyle = COLOR_CROSSING;
       ctx.lineWidth = 1.5;
       ctx.globalAlpha = 0.6;
-      // Línea que une los pares
-      if (posiciones.length >= 4) {
+      // Cada línea une los DOS HOMÓLOGOS de un par: (0,1) y (2,3), que comparten color.
+      for (const [a, b] of [[0, 1], [2, 3]]) {
         ctx.beginPath();
-        ctx.moveTo(posiciones[0].x, posiciones[0].y);
-        ctx.lineTo(posiciones[2].x, posiciones[2].y);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(posiciones[1].x, posiciones[1].y);
-        ctx.lineTo(posiciones[3].x, posiciones[3].y);
+        ctx.moveTo(posiciones[a].x, posiciones[a].y);
+        ctx.lineTo(posiciones[b].x, posiciones[b].y);
         ctx.stroke();
       }
       ctx.globalAlpha = 1;
       ctx.restore();
     }
-  } else if (estado === 2) {
-    // Alineados en la placa ecuatorial
-    const espaciado = radioCell * 0.32;
-    const nCrom = numPares === 2 ? 4 : 2;
-    const totalAncho = (nCrom - 1) * espaciado;
-    for (let i = 0; i < nCrom; i++) {
-      const px = cx - totalAncho / 2 + i * espaciado;
-      const color = COLORES_CROMOSOMAS[Math.floor(i / 2) % 2];
-      dibujarCromosoma(ctx, px, cy, radioCell * 0.18, color, 0, false);
-    }
-    // Línea ecuatorial
-    ctx.save();
-    ctx.strokeStyle = isDark ? 'rgba(200,200,220,0.25)' : 'rgba(80,80,100,0.2)';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([4, 3]);
-    ctx.beginPath();
-    ctx.moveTo(cx - radioCell * 0.9, cy);
-    ctx.lineTo(cx + radioCell * 0.9, cy);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.restore();
-  } else if (estado === 3) {
-    // Separando hacia los polos
-    const nCrom = numPares === 2 ? 4 : 2;
-    const poloDist = radioCell * 0.48;
-    const espaciado = radioCell * 0.28;
-    const totalAncho = ((nCrom / 2) - 1) * espaciado;
-    for (let i = 0; i < nCrom / 2; i++) {
-      const px = cx - totalAncho / 2 + i * espaciado;
-      const color = COLORES_CROMOSOMAS[i % 2];
-      // Polo superior
-      dibujarCromosoma(ctx, px, cy - poloDist, radioCell * 0.14, color, 0, true);
-      // Polo inferior
-      dibujarCromosoma(ctx, px, cy + poloDist, radioCell * 0.14, color, Math.PI, true);
-    }
-    // Fibras del huso tirando
-    ctx.save();
-    ctx.strokeStyle = COLOR_HUSILLO;
-    ctx.lineWidth = 1;
-    ctx.globalAlpha = 0.4;
-    for (let i = 0; i < nCrom / 2; i++) {
-      const px = cx - totalAncho / 2 + i * espaciado;
-      ctx.beginPath();
-      ctx.moveTo(px, cy - poloDist);
-      ctx.lineTo(cx, cy - radioCell * 0.85);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(px, cy + poloDist);
-      ctx.lineTo(cx, cy + radioCell * 0.85);
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-    ctx.restore();
-  } else if (estado === 4) {
-    // En polos (telofase)
-    const nCrom = numPares === 2 ? 2 : 1;
-    const poloDist = radioCell * 0.45;
-    const espaciado = radioCell * 0.28;
-    const totalAncho = (nCrom - 1) * espaciado;
-    for (let i = 0; i < nCrom; i++) {
-      const px = cx - totalAncho / 2 + i * espaciado;
-      const color = COLORES_CROMOSOMAS[i % 2];
-      dibujarCromosoma(ctx, px, cy - poloDist, radioCell * 0.14, color, 0, false);
-      dibujarCromosoma(ctx, px, cy + poloDist, radioCell * 0.14, color, 0, false);
-    }
-    // Membranas nucleares formándose
-    ctx.save();
-    ctx.setLineDash([5, 4]);
-    ctx.strokeStyle = COLOR_MEMBRANA;
-    ctx.lineWidth = 1.5;
-    ctx.globalAlpha = 0.7;
-    ctx.beginPath();
-    ctx.arc(cx, cy - poloDist, radioCell * 0.3, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(cx, cy + poloDist, radioCell * 0.3, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.globalAlpha = 1;
-    ctx.restore();
+    return;
   }
+
+  if (fase.disposicion === 'placa') {
+    // Alineados en la placa ecuatorial. Con bivalentes se dibujan DOS grupos de dos
+    // homólogos enfrentados por el ecuador, no cuatro cromosomas sueltos: es la diferencia
+    // visible entre la metafase I y la metafase mitótica que la app promete enseñar.
+    const espaciado = radioCell * 0.32;
+    if (fase.bivalentes) {
+      const nBivalentes = n / 2;
+      const totalAncho = (nBivalentes - 1) * espaciado * 1.6;
+      const separacionHomologos = radioCell * 0.16;
+      for (let b = 0; b < nBivalentes; b++) {
+        const px = cx - totalAncho / 2 + b * espaciado * 1.6;
+        const color = COLORES_CROMOSOMAS[b % 2];
+        dibujarCromosoma(ctx, px, cy - separacionHomologos, radioCell * 0.16, color, 0, false);
+        dibujarCromosoma(ctx, px, cy + separacionHomologos, radioCell * 0.16, color, 0, false);
+      }
+    } else {
+      const totalAncho = (n - 1) * espaciado;
+      for (let i = 0; i < n; i++) {
+        const px = cx - totalAncho / 2 + i * espaciado;
+        dibujarCromosoma(ctx, px, cy, radioCell * 0.18, colorDe(i), 0, false);
+      }
+    }
+    dibujarEcuador(ctx, cx, cy, radioCell, isDark);
+    return;
+  }
+
+  if (fase.disposicion === 'separando' || fase.disposicion === 'polos') {
+    const porPolo = cromosomasPorPolo(fase);
+    const separando = fase.disposicion === 'separando';
+    const poloDist = radioCell * (separando ? 0.48 : 0.45);
+    const espaciado = radioCell * 0.26;
+    const totalAncho = (porPolo - 1) * espaciado;
+    const radio = radioCell * 0.13;
+
+    for (let i = 0; i < porPolo; i++) {
+      const px = cx - totalAncho / 2 + i * espaciado;
+      // El par se deriva de cuántos cromosomas hay EN EL POLO, no de cuántos tenía la
+      // célula: al separarse homólogos cada polo recibe uno de cada par (naranja + teal),
+      // y al separarse hermanas recibe el juego completo (naranja, naranja, teal, teal).
+      const color = COLORES_CROMOSOMAS[parDelCromosoma(i, porPolo)];
+      dibujarCromosoma(ctx, px, cy - poloDist, radio, color, 0, separando);
+      dibujarCromosoma(ctx, px, cy + poloDist, radio, color, separando ? Math.PI : 0, separando);
+    }
+
+    if (separando) {
+      ctx.save();
+      ctx.strokeStyle = COLOR_HUSILLO;
+      ctx.lineWidth = 1;
+      ctx.globalAlpha = 0.4;
+      for (let i = 0; i < porPolo; i++) {
+        const px = cx - totalAncho / 2 + i * espaciado;
+        ctx.beginPath();
+        ctx.moveTo(px, cy - poloDist);
+        ctx.lineTo(cx, cy - radioCell * 0.85);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(px, cy + poloDist);
+        ctx.lineTo(cx, cy + radioCell * 0.85);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+      ctx.restore();
+    } else {
+      // Envolturas nucleares formándose alrededor de cada juego.
+      ctx.save();
+      ctx.setLineDash([5, 4]);
+      ctx.strokeStyle = COLOR_MEMBRANA;
+      ctx.lineWidth = 1.5;
+      ctx.globalAlpha = 0.7;
+      for (const dy of [-poloDist, poloDist]) {
+        ctx.beginPath();
+        ctx.arc(cx, cy + dy, radioCell * 0.3, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
+      ctx.restore();
+    }
+  }
+}
+
+/** Línea discontinua del ecuador, donde se alinean los cromosomas en la metafase. */
+function dibujarEcuador(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  radioCell: number,
+  isDark: boolean,
+): void {
+  ctx.save();
+  ctx.strokeStyle = isDark ? 'rgba(200,200,220,0.25)' : 'rgba(80,80,100,0.2)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 3]);
+  ctx.beginPath();
+  ctx.moveTo(cx - radioCell * 0.9, cy);
+  ctx.lineTo(cx + radioCell * 0.9, cy);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
 }
 
 // ============================================================
@@ -794,6 +627,7 @@ export default function SimuladorMitosisMeiosis() {
                 className={`${styles.velocidadBtn} ${velocidad === v.ms ? styles.velocidadBtnActiva : ''}`}
                 onClick={() => setVelocidad(v.ms)}
                 type="button"
+                aria-pressed={velocidad === v.ms}
               >
                 {v.label}
               </button>
@@ -924,7 +758,8 @@ export default function SimuladorMitosisMeiosis() {
             <strong>¿Por qué la meiosis produce 4 células y no 2?</strong>
             <p>
               Porque ocurren dos divisiones consecutivas. En la meiosis I se separan los
-              cromosomas homólogos (n pares de hermanas), dando 2 células haploides. En la meiosis
+              cromosomas homólogos —uno de cada par a cada célula—, dando 2 células haploides cuyos
+              cromosomas conservan sus dos cromátidas hermanas unidas. En la meiosis
               II cada una de esas células divide sus cromátidas, resultando 4 células haploides.
             </p>
             <p className={styles.faqTip}>

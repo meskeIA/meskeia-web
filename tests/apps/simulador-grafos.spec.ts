@@ -285,7 +285,7 @@ test.describe('Simulador de Grafos', () => {
    * baje de 33 a 13 y A* pase a devolver 10 y el camino bueno. La misma pregunta sobre
    * el mismo grafo da dos respuestas distintas según dónde esté dibujado un nodo.
    */
-  test('HALLAZGO 1 — A* devuelve un camino peor que Dijkstra en el preset de la propia app', async ({ page }) => {
+  test('REGRESIÓN 384 — A* devuelve el mismo camino óptimo que Dijkstra en el preset de la app', async ({ page }) => {
     await abrir(page);
     await page.getByRole('button', { name: 'Grafo denso' }).click();
 
@@ -308,7 +308,7 @@ test.describe('Simulador de Grafos', () => {
    * Las hermanas `.nodoLabel` y `.aristaPeso` sí llevan `pointer-events: none` en el CSS
    * Module; a este rótulo se le olvidó.
    */
-  test('HALLAZGO 2 — el rótulo «Lienzo vacío» se come el clic en el centro del lienzo', async ({ page }) => {
+  test('REGRESIÓN 386 — el rótulo «Lienzo vacío» ya no se come el clic en el centro del lienzo', async ({ page }) => {
     await abrir(page);
     await page.getByRole('button', { name: 'Limpiar grafo' }).click();
     await page.getByRole('button', { name: 'Añadir nodo' }).click();
@@ -333,7 +333,7 @@ test.describe('Simulador de Grafos', () => {
    * ▶ Iniciar, ⏸ Pausar, ⏭ Paso y diez 💡 del bloque educativo). El fichero es de junio de
    * 2026, anterior al candado, así que es pasivo: no rompe el build.
    */
-  test('HALLAZGO 3 — los botones de algoritmo no exponen aria-pressed', async ({ page }) => {
+  test('REGRESIÓN 385 — los botones de algoritmo exponen aria-pressed', async ({ page }) => {
     await abrir(page);
     await page.getByRole('button', { name: ALGORITMO.dijkstra }).click();
 

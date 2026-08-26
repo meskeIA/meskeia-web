@@ -52,8 +52,19 @@ export default function CalculadoraAlgebraBooleanaPage() {
 
   // Cambiar número de variables
   const handleNumVariablesChange = useCallback((newNum: NumVariables) => {
-    setNumVariables(newNum);
-    setTruthTable(Array(Math.pow(2, newNum)).fill(0) as (0 | 1 | 'X')[]);
+    // Pulsar el número que YA está activo no borra nada. El botón se anuncia como pulsado
+    // (aria-pressed="true") y se pinta como activo, así que nada avisaba de que fuera a
+    // reiniciar: con 4 variables se perdían las 16 celdas puestas a mano, sin deshacer.
+    setNumVariables(prev => {
+      if (prev !== newNum) setTruthTable(Array(Math.pow(2, newNum)).fill(0) as (0 | 1 | 'X')[]);
+      return newNum;
+    });
+  }, []);
+
+  /** Carga un ejemplo: cambia el número de variables Y su tabla, en el mismo paso. */
+  const cargarTabla = useCallback((num: NumVariables, tabla: (0 | 1 | 'X')[]) => {
+    setNumVariables(num);
+    setTruthTable(tabla);
   }, []);
 
   // Toggle valor en la tabla de verdad (0 -> 1 -> X -> 0)
@@ -265,20 +276,17 @@ export default function CalculadoraAlgebraBooleanaPage() {
                         value === 'X' ? styles.cellX : styles.cellZero
                       }`}
                       style={{ backgroundColor: background }}
-                      onClick={() => toggleTruthValue(cellIndex)}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          toggleTruthValue(cellIndex);
-                        }
-                      }}
-                      role="button"
-                      tabIndex={0}
-                      aria-label={`Celda ${cellIndex}: vale ${value}${groups.length > 0 ? `, en el grupo ${groups.map(g => g.term).join(' y ')}` : ''}. Pulsa para cambiar`}
                       title={groups.length > 0 ? `Grupos: ${groups.map(g => g.term).join(', ')}` : ''}
                     >
-                      <span className={styles.cellValue}>{value}</span>
-                      <span className={styles.cellIndex}>{cellIndex}</span>
+                      <button
+                        type="button"
+                        className={styles.karnaughBoton}
+                        onClick={() => toggleTruthValue(cellIndex)}
+                        aria-label={`Celda ${cellIndex}: vale ${value}${groups.length > 0 ? `, en el grupo ${groups.map(g => g.term).join(' y ')}` : ''}. Pulsa para cambiar`}
+                      >
+                        <span className={styles.cellValue}>{value}</span>
+                        <span className={styles.cellIndex}>{cellIndex}</span>
+                      </button>
                     </td>
                   );
                 })}
@@ -295,23 +303,19 @@ export default function CalculadoraAlgebraBooleanaPage() {
     switch (example) {
       case 'xor':
         // XOR de 2 variables
-        handleNumVariablesChange(2);
-        setTimeout(() => setTruthTable([0, 1, 1, 0]), 0);
+        cargarTabla(2, [0, 1, 1, 0]);
         break;
       case 'majority':
         // Votación mayoría de 3 variables
-        handleNumVariablesChange(3);
-        setTimeout(() => setTruthTable([0, 0, 0, 1, 0, 1, 1, 1]), 0);
+        cargarTabla(3, [0, 0, 0, 1, 0, 1, 1, 1]);
         break;
       case 'bcd':
         // BCD inválido (>9)
-        handleNumVariablesChange(4);
-        setTimeout(() => setTruthTable([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1]), 0);
+        cargarTabla(4, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1]);
         break;
       case 'parity':
         // Paridad impar de 4 bits
-        handleNumVariablesChange(4);
-        setTimeout(() => setTruthTable([0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0]), 0);
+        cargarTabla(4, [0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0]);
         break;
     }
   };
@@ -574,7 +578,7 @@ export default function CalculadoraAlgebraBooleanaPage() {
 
         <div className={styles.referenceGrid}>
           <div className={styles.referenceCard}>
-            <h4>📐 Reglas de Agrupación</h4>
+            <h3><span aria-hidden="true">📐</span> Reglas de Agrupación</h3>
             <ul>
               <li>Solo agrupar 1, 2, 4, 8, 16... (potencias de 2)</li>
               <li>Los grupos deben ser rectangulares</li>
@@ -585,7 +589,7 @@ export default function CalculadoraAlgebraBooleanaPage() {
           </div>
 
           <div className={styles.referenceCard}>
-            <h4>🔤 Operadores Booleanos</h4>
+            <h3><span aria-hidden="true">🔤</span> Operadores Booleanos</h3>
             <ul>
               <li><code>A&apos;</code> = NOT A (complemento)</li>
               <li><code>AB</code> = A AND B (producto)</li>
@@ -596,7 +600,7 @@ export default function CalculadoraAlgebraBooleanaPage() {
           </div>
 
           <div className={styles.referenceCard}>
-            <h4>❓ Don&apos;t Care (X)</h4>
+            <h3><span aria-hidden="true">❓</span> Don&apos;t Care (X)</h3>
             <ul>
               <li>Condiciones que nunca ocurren</li>
               <li>Pueden ser 0 o 1 según convenga</li>
@@ -697,10 +701,10 @@ export default function CalculadoraAlgebraBooleanaPage() {
               <div className={styles.scenarioIcon}>💻</div>
               <h4 className={styles.scenarioTitle}>Diseñador de circuitos digitales</h4>
               <p className={styles.scenarioDesc}>
-                Minimizar un circuito de 6 variables con Mapa de Karnaugh: de 12 compuertas AND/OR a 4 compuertas NAND. Ahorro del 67% en área de silicio y consumo.
+                Minimizar un circuito de 4 variables con Mapa de Karnaugh: de 12 compuertas AND/OR a 4 compuertas NAND, un 67% menos de <em>compuertas</em>. El ahorro en área y consumo va en la misma dirección, pero no es esa cifra: una NAND CMOS lleva menos transistores que una AND, y el consumo dinámico depende sobre todo de cuánto conmute cada nodo.
               </p>
               <div className={styles.scenarioTip}>
-                <strong>Tip:</strong> Mapas de Karnaugh para n≤6 variables; para n&gt;6 usa algoritmo Quine-McCluskey o Espresso.
+                <strong>Tip:</strong> esta calculadora resuelve 2, 3 y 4 variables, que es donde el mapa de Karnaugh sigue siendo legible a ojo. A partir de 5 el método gráfico se complica y a partir de 7 deja de ser practicable: ahí se usa Quine-McCluskey o Espresso.
               </div>
             </div>
 
@@ -708,7 +712,7 @@ export default function CalculadoraAlgebraBooleanaPage() {
               <div className={styles.scenarioIcon}>🔒</div>
               <h4 className={styles.scenarioTitle}>Sistemas de acceso</h4>
               <p className={styles.scenarioDesc}>
-                Control de acceso: ENTRAR = (TarjetaVálida AND HorarioLaboral) OR (TarjetaAdmin AND NOT Bloqueado). Implementado con 3 compuertas NAND universales.
+                Control de acceso: ENTRAR = (TarjetaVálida AND HorarioLaboral) OR (TarjetaAdmin AND NOT Bloqueado). Implementado con 4 compuertas NAND: dos para los productos, una para unirlos y una cuarta —NAND(Bloqueado, Bloqueado)— que produce el NOT. Serían 3 solo si la señal complementada llegara ya invertida desde el sensor.
               </p>
               <div className={styles.scenarioTip}>
                 <strong>Tip:</strong> NAND y NOR son puertas universales: cualquier función booleana se implementa solo con ellas.
@@ -907,12 +911,12 @@ export default function CalculadoraAlgebraBooleanaPage() {
 
         {/* Sección 6: Warning Box */}
         <div className={styles.warningBox}>
-          <h4 className={styles.warningTitle}>⚠️ Errores que invalidan el diseño booleano</h4>
+          <h3 className={styles.warningTitle}><span aria-hidden="true">⚠️</span> Errores que invalidan el diseño booleano</h3>
           <ul className={styles.warningList}>
             <li><strong>Orden incorrecto en el mapa de Karnaugh</strong>: Las columnas deben ir en código Gray (00,01,11,10), NO en orden binario (00,01,10,11). Con orden incorrecto, los grupos adyacentes son incorrectos.</li>
             <li><strong>Grupos que no son potencias de 2</strong>: Solo son válidos grupos de 1, 2, 4, 8, 16 celdas. Un grupo de 3 o 5 celdas es incorrecto.</li>
             <li><strong>Olvidar la toroidalidad del mapa</strong>: Las esquinas y bordes son adyacentes. La columna izquierda es adyacente a la derecha, la fila superior a la inferior.</li>
-            <li><strong>Confundir NAND y NOR universales</strong>: Ambas son universales pero las conversiones son distintas. NOT(A) = NAND(A,A) pero NOT(A) = NOR(A,A).</li>
+            <li><strong>Confundir NAND y NOR universales</strong>: las dos bastan por sí solas para construir cualquier función, y en el NOT coinciden —NOT(A) = NAND(A,A) = NOR(A,A)—, pero divergen en el AND y el OR: AND(A,B) = NAND(NAND(A,B), NAND(A,B)) mientras que con NOR es AND(A,B) = NOR(NOR(A,A), NOR(B,B)). Copiar el esquema de una a la otra da la función complementaria.</li>
             <li><strong>Ignorar los hazards</strong>: Un diseño minimizado puede tener glitches. Añade términos de consenso para eliminarlos en circuitos síncronos sensibles.</li>
             <li><strong>Don&apos;t care en entradas posibles</strong>: Marcar como X una combinación que puede ocurrir → comportamiento impredecible. Solo usa X en combinaciones garantizadas como imposibles.</li>
           </ul>

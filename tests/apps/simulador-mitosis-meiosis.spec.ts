@@ -56,9 +56,10 @@ import { test, expect, Page } from '@playwright/test';
  *   de la membrana (#2E86AB) exige mirar g-b: el teal lo tiene entre -3 y +3 sea cual sea su
  *   alfa, y el azul siempre <= -3-34·alfa. Con |g-b| <= 8 la membrana punteada no cuela.
  *
- * HALLAZGOS ABIERTOS: al final, marcados con `test.fail()` — afirman lo que debería pasar y
+ * HALLAZGOS del 26/08/2026, REPARADOS ese mismo día: al final. Afirmaban lo que debía pasar y
  * hoy fallan a propósito. El día que se reparen se ponen en verde: quitar entonces la línea
- * `test.fail()` y quedan como regresión.
+ * la reparación los puso en verde, así que se les retiró el `test.fail()` y quedan como
+ * regresión: son el contrato de que ninguno de los siete vuelve.
  */
 
 const RUTA = '/simulador-mitosis-meiosis/';
@@ -195,13 +196,16 @@ test('CASO 2 · meiosis: crossing-over solo en Profase I, 2 cromosomas por polo 
 }) => {
   await elegirModo(page, 'Meiosis');
 
-  // Las 8 fases que la metadata promete («meiosis (8 fases)»)
+  // Nueve fases desde la reparación del hallazgo 4: faltaba la Profase II, y sin ella la
+  // envoltura nuclear que la telofase I acaba de formar desaparecía sin etapa que lo
+  // explicara y el huso se rehacía sin fase propia.
   await expect(page.getByRole('tab')).toHaveText([
     'Interfase',
     'Profase I',
     'Metafase I',
     'Anafase I',
     'Telofase I / Citocinesis I',
+    'Profase II',
     'Metafase II',
     'Anafase II',
     'Telofase II / Citocinesis II',
@@ -289,11 +293,10 @@ test('CASO 3 · operativa: extremos deshabilitados, secuencia sin saltos, cambio
 // HALLAZGOS ABIERTOS (26/08/2026) — afirman la biología correcta y hoy fallan
 // ============================================================================
 
-test.describe('hallazgos abiertos', () => {
+test.describe('regresión — hallazgos reparados el 26/08/2026', () => {
   test('HALLAZGO 1 · mitosis, Anafase: cada polo debe recibir 4 cromosomas, no 2', async ({
     page,
   }) => {
-    test.fail();
     // En la anafase mitótica se separan las CROMÁTIDAS HERMANAS: los 4 cromosomas replicados
     // dan 8 cromosomas, 4 por polo (2 naranjas + 2 teal). La propia descripción de la fase lo
     // dice: «Cada polo recibe un conjunto completo de cromosomas (2n)».
@@ -306,7 +309,6 @@ test.describe('hallazgos abiertos', () => {
   test('HALLAZGO 1b · mitosis, Telofase: cada núcleo hijo debe tener 4 cromosomas (2n=4)', async ({
     page,
   }) => {
-    test.fail();
     // Las células hijas de una mitosis son 2n=4, como confirma el propio rótulo final
     // «Resultado: 2 células (2n=4)». Hoy cada polo muestra 2 cromosomas, o sea n=2: la app
     // pinta la mitosis como si redujera la ploidía.
@@ -318,7 +320,6 @@ test.describe('hallazgos abiertos', () => {
   test('HALLAZGO 2 · Anafase de mitosis y Anafase I de meiosis no pueden ser la misma imagen', async ({
     page,
   }) => {
-    test.fail();
     // Es la diferencia que la propia app declara clave en «Errores frecuentes en exámenes»:
     // «anafase de mitosis = cromátidas hermanas; anafase I = cromosomas homólogos completos».
     // Hoy los dos canvas son idénticos byte a byte.
@@ -337,7 +338,6 @@ test.describe('hallazgos abiertos', () => {
   test('HALLAZGO 2b · Metafase I debe mostrar bivalentes, no la misma placa que la mitosis', async ({
     page,
   }) => {
-    test.fail();
     // La guía «Cómo identificar una fase en el microscopio» de la propia app dice: «En metafase I
     // de meiosis ves bivalentes (pares de cromosomas homólogos), mientras que en metafase de
     // mitosis cada cromosoma está aislado en la placa». Hoy las dos imágenes son idénticas.
@@ -356,23 +356,28 @@ test.describe('hallazgos abiertos', () => {
   test('HALLAZGO 3 · Telofase I: cada célula hija debe tener n=2 cromosomas en un solo núcleo', async ({
     page,
   }) => {
-    test.fail();
     // Tras la citocinesis I hay 2 células haploides con n=2 cada una: 2 cromosomas por célula,
     // agrupados en UN núcleo. Lo dice la descripción de la fase («Se forman dos células
     // haploides (n=2)») y el rótulo «Intermedio: 2 células (n=2)».
-    // Hoy cada célula muestra 2 cromosomas en el polo superior y otros 2 en el inferior (4 en
-    // total, con dos envolturas nucleares punteadas): el doble de material genético.
+    // Antes cada célula mostraba 2 cromosomas en el polo superior y otros 2 en el inferior
+    // (4 en total, con dos envolturas nucleares punteadas): el doble de material genético,
+    // justo en la fase que explica la reducción.
+    //
+    // La región se mide sobre la célula ENTERA, no sumando su mitad de arriba y su mitad de
+    // abajo: ahora los cromosomas están agrupados en UN núcleo centrado, así que cruzan la
+    // línea media y sumar los dos cuadrantes los contaría dos veces. Ese reparto en dos
+    // grupos polares era precisamente el defecto.
     await elegirModo(page, 'Meiosis');
     await irAFase(page, 'Telofase I / Citocinesis I');
-    const celulaIzquierdaArriba = await contarCromosomas(page, { x0: 0, x1: 0.5, y0: 0, y1: 0.5 });
-    const celulaIzquierdaAbajo = await contarCromosomas(page, { x0: 0, x1: 0.5, y0: 0.5, y1: 1 });
-    expect(celulaIzquierdaArriba.n + celulaIzquierdaAbajo.n).toBe(2);
+    const celulaIzquierda = await contarCromosomas(page, { x0: 0, x1: 0.5, y0: 0, y1: 1 });
+    expect(celulaIzquierda.n).toBe(2);
+    // Y son uno de cada par, no dos copias del mismo: eso es ser haploide.
+    expect(new Set(celulaIzquierda.colores).size).toBe(2);
   });
 
   test('HALLAZGO 4 · la meiosis debe incluir la Profase II entre la Telofase I y la Metafase II', async ({
     page,
   }) => {
-    test.fail();
     // La secuencia canónica de la meiosis II es Profase II → Metafase II → Anafase II →
     // Telofase II. La app salta de «Telofase I / Citocinesis I» a «Metafase II»: la envoltura
     // nuclear que acaba de formarse desaparece sin fase que lo explique. La palabra «Profase II»
@@ -384,7 +389,6 @@ test.describe('hallazgos abiertos', () => {
   test('HALLAZGO 5 · Metafase II: los 2 cromosomas de cada célula deben ser uno de cada par', async ({
     page,
   }) => {
-    test.fail();
     // Una célula haploide de este modelo (n=2) lleva UN cromosoma de cada par de homólogos:
     // 1 naranja (par 1) + 1 teal (par 2). Que los dos sean del mismo par sería una no
     // disyunción. Hoy la app pinta los dos naranjas y el par teal desaparece de la meiosis II.
@@ -396,7 +400,6 @@ test.describe('hallazgos abiertos', () => {
   });
 
   test('HALLAZGO 6 · Anafase II: cada polo debe recibir 2 cromosomas, no 1', async ({ page }) => {
-    test.fail();
     // Cada célula llega a la meiosis II con n=2 cromosomas de 2 cromátidas. Al separarse las
     // cromátidas hermanas, cada polo recibe 2 cromosomas, y así las 4 células finales son n=2
     // como anuncia el rótulo «Resultado: 4 células (n=2)». Hoy dibuja 1 por polo, o sea n=1.
@@ -407,7 +410,6 @@ test.describe('hallazgos abiertos', () => {
   });
 
   test('HALLAZGO 7 · los botones de velocidad deben llevar aria-pressed', async ({ page }) => {
-    test.fail();
     // Regla 2 del CLAUDE.md global §5: todo botón que cambie un estado visual lleva
     // aria-pressed. Los tres botones de velocidad marcan el activo solo por clase CSS
     // (velocidadBtnActiva), así que un lector de pantalla no sabe cuál está seleccionado.

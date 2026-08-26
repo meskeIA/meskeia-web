@@ -96,7 +96,7 @@ test.describe('Calculadora de Álgebra Booleana', () => {
     // El mapa de 4 variables debe estar en código Gray: la fila AB=11 va ANTES que AB=10,
     // y las columnas son 00,01,11,10. Si el orden fuera binario, las adyacencias mentirían.
     const filaAB11 = seccionMapa(page).locator('tbody tr').nth(2);
-    const indices = await filaAB11.locator('td').evaluateAll(celdas =>
+    const indices = await filaAB11.locator('td button').evaluateAll(celdas =>
       celdas.map(c => (c.getAttribute('aria-label') || '').replace(/^Celda (\d+).*$/, '$1'))
     );
     expect(indices).toEqual(['12', '13', '15', '14']);
@@ -132,16 +132,21 @@ test.describe('Calculadora de Álgebra Booleana', () => {
     await expect(resultado(page)).toContainText("F = (A + B)(A' + B')");
   });
 
-  test('hallazgo abierto: pulsar el botón de variables ya activo borra la tabla', async ({ page }) => {
-    // Inspector 26/08/2026 — `handleNumVariablesChange` no comprueba si el número pedido
-    // es el que ya está puesto, así que reinicia la tabla de verdad aunque no cambie nada.
-    // Con 4 variables se pierden 16 celdas puestas a mano, sin aviso ni deshacer.
-    // Cuando se corrija, este test debe pasar a esperar que la tabla NO cambie.
+  test('regresión: pulsar el botón de variables ya activo NO borra la tabla', async ({ page }) => {
+    // Hallazgo 387 del Inspector (26/08/2026), reparado ese mismo día:
+    // `handleNumVariablesChange` no comprobaba si el número pedido era el que ya estaba
+    // puesto, así que reiniciaba la tabla de verdad aunque no cambiara nada. Con 4 variables
+    // se perdían las 16 celdas puestas a mano, sin aviso ni deshacer — y el botón se anuncia
+    // como pulsado (aria-pressed="true") y se pinta activo, así que nada avisaba.
     await ponerVariables(page, 2);
     for (const fila of [1, 2]) await fijarFila(page, fila, 1);
     await expect(resultado(page)).toContainText("F = A'B + AB'");
 
-    await ponerVariables(page, 2); // mismo número: no debería tocar nada
-    await expect(resultado(page)).toContainText('F = 0'); // …pero hoy borra la tabla entera
+    await ponerVariables(page, 2); // mismo número: no toca nada
+    await expect(resultado(page)).toContainText("F = A'B + AB'");
+
+    // Y cambiar de verdad el número sí reinicia, que es lo que debe hacer.
+    await ponerVariables(page, 3);
+    await expect(resultado(page)).toContainText('F = 0');
   });
 });

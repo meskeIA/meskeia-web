@@ -542,7 +542,42 @@ function ejecutarDijkstra(
 function distanciaEuclidea(a: Nodo, b: Nodo): number {
   const dx = a.x - b.x;
   const dy = a.y - b.y;
-  return Math.round(Math.sqrt(dx * dx + dy * dy) / 10);
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+/**
+ * Coste mínimo por píxel del grafo: el menor cociente peso/longitud de sus aristas.
+ *
+ * A* solo garantiza el camino óptimo si su heurística es ADMISIBLE, es decir, si nunca
+ * sobreestima lo que falta. Hasta el 26/08/2026 esta app usaba h(n) = distancia en píxeles
+ * dividida entre diez, y los pesos los pone el usuario con un deslizador de 1 a 99 sin
+ * ninguna relación con la geometría del dibujo: en el preset «Grafo denso», los 8 nodos
+ * caben en un círculo de 180 px, así que h valía entre 14 y 36 cuando el camino óptimo
+ * COMPLETO costaba 10. La heurística sobreestimaba por un factor de tres y A* degeneraba en
+ * búsqueda voraz, devolviendo coste 11 donde su propio Dijkstra —en la misma pantalla—
+ * devolvía 10. Que la culpa era de la heurística y no del grafo se demostraba arrastrando un
+ * nodo sin tocar un solo peso: A* cambiaba de respuesta.
+ *
+ * Calibrar con `k` lo arregla sin renunciar a informar la búsqueda: si ninguna arista cuesta
+ * menos de k por píxel, entonces ningún camino de n al destino puede costar menos de k veces
+ * la distancia en línea recta, que es la definición de heurística admisible.
+ */
+function costeMinimoPorPixel(nodos: Nodo[], aristas: Arista[]): number {
+  const nodoMap: Record<string, Nodo> = {};
+  for (const n of nodos) nodoMap[n.id] = n;
+
+  let k = Infinity;
+  for (const a of aristas) {
+    const desde = nodoMap[a.from];
+    const hasta = nodoMap[a.to];
+    if (!desde || !hasta) continue;
+    const longitud = distanciaEuclidea(desde, hasta);
+    // Dos nodos superpuestos darían k = 0: la heurística se vuelve trivial pero sigue
+    // siendo admisible, que es lo único que se le exige.
+    if (longitud <= 0) return 0;
+    k = Math.min(k, a.peso / longitud);
+  }
+  return Number.isFinite(k) ? k : 0;
 }
 
 function ejecutarAStar(
@@ -561,9 +596,14 @@ function ejecutarAStar(
   const h: Record<string, number> = {};
   const f: Record<string, number> = {};
   const pred: Record<string, string | null> = {};
+
+  // Heurística calibrada con el propio grafo, para que sea ADMISIBLE y A* devuelva el
+  // camino óptimo. Se redondea hacia abajo a dos decimales: redondear al alza podría
+  // hacerla sobreestimar por unas centésimas y romper justo la propiedad que se busca.
+  const k = costeMinimoPorPixel(nodos, aristas);
   for (const n of nodos) {
     g[n.id] = n.id === origen ? 0 : Infinity;
-    h[n.id] = distanciaEuclidea(n, dest);
+    h[n.id] = Math.floor(k * distanciaEuclidea(n, dest) * 100) / 100;
     f[n.id] = n.id === origen ? h[n.id] : Infinity;
     pred[n.id] = null;
   }
@@ -1330,6 +1370,7 @@ export default function SimuladorGrafosPage() {
             <button
               type="button"
               className={`${styles.algoritmoBtn} ${algoritmo === 'bfs' ? styles.algoritmoActive : ''}`}
+              aria-pressed={algoritmo === 'bfs'}
               onClick={() => {
                 setAlgoritmo('bfs');
                 setResultado(null);
@@ -1341,6 +1382,7 @@ export default function SimuladorGrafosPage() {
             <button
               type="button"
               className={`${styles.algoritmoBtn} ${algoritmo === 'dfs' ? styles.algoritmoActive : ''}`}
+              aria-pressed={algoritmo === 'dfs'}
               onClick={() => {
                 setAlgoritmo('dfs');
                 setResultado(null);
@@ -1352,6 +1394,7 @@ export default function SimuladorGrafosPage() {
             <button
               type="button"
               className={`${styles.algoritmoBtn} ${algoritmo === 'dijkstra' ? styles.algoritmoActive : ''}`}
+              aria-pressed={algoritmo === 'dijkstra'}
               onClick={() => {
                 setAlgoritmo('dijkstra');
                 setResultado(null);
@@ -1363,6 +1406,7 @@ export default function SimuladorGrafosPage() {
             <button
               type="button"
               className={`${styles.algoritmoBtn} ${algoritmo === 'astar' ? styles.algoritmoActive : ''}`}
+              aria-pressed={algoritmo === 'astar'}
               onClick={() => {
                 setAlgoritmo('astar');
                 setResultado(null);
@@ -1405,6 +1449,7 @@ export default function SimuladorGrafosPage() {
             <button
               type="button"
               className={`${styles.toolBtn} ${modo === 'add-node' ? styles.toolActive : ''}`}
+              aria-pressed={modo === 'add-node'}
               onClick={() => {
                 setModo('add-node');
                 setSeleccionAristaFrom(null);
@@ -1415,6 +1460,7 @@ export default function SimuladorGrafosPage() {
             <button
               type="button"
               className={`${styles.toolBtn} ${modo === 'add-edge' ? styles.toolActive : ''}`}
+              aria-pressed={modo === 'add-edge'}
               onClick={() => {
                 setModo('add-edge');
                 setSeleccionAristaFrom(null);
@@ -1425,6 +1471,7 @@ export default function SimuladorGrafosPage() {
             <button
               type="button"
               className={`${styles.toolBtn} ${modo === 'move' ? styles.toolActive : ''}`}
+              aria-pressed={modo === 'move'}
               onClick={() => {
                 setModo('move');
                 setSeleccionAristaFrom(null);
@@ -1435,12 +1482,13 @@ export default function SimuladorGrafosPage() {
             <button
               type="button"
               className={`${styles.toolBtn} ${modo === 'delete' ? styles.toolActive : ''}`}
+              aria-pressed={modo === 'delete'}
               onClick={() => {
                 setModo('delete');
                 setSeleccionAristaFrom(null);
               }}
             >
-              🗑 Eliminar
+              <span aria-hidden="true">🗑</span> Eliminar
             </button>
 
             <label className={styles.toggleControl}>
@@ -1486,16 +1534,18 @@ export default function SimuladorGrafosPage() {
             <button
               type="button"
               className={`${styles.actionBtn} ${seleccionMarcado === 'origen' ? styles.toolActive : ''}`}
+              aria-pressed={seleccionMarcado === 'origen'}
               onClick={() => setSeleccionMarcado(seleccionMarcado === 'origen' ? null : 'origen')}
             >
-              📍 Marcar origen {origen && <>({origen})</>}
+              <span aria-hidden="true">📍</span> Marcar origen {origen && <>({origen})</>}
             </button>
             <button
               type="button"
               className={`${styles.actionBtn} ${seleccionMarcado === 'destino' ? styles.toolActive : ''}`}
+              aria-pressed={seleccionMarcado === 'destino'}
               onClick={() => setSeleccionMarcado(seleccionMarcado === 'destino' ? null : 'destino')}
             >
-              🎯 Marcar destino {destino && <>({destino})</>}
+              <span aria-hidden="true">🎯</span> Marcar destino {destino && <>({destino})</>}
             </button>
             <button type="button" className={`${styles.actionBtn} ${styles.dangerBtn}`} onClick={limpiarGrafo}>
               Limpiar grafo
@@ -1625,6 +1675,7 @@ export default function SimuladorGrafosPage() {
                     textAnchor="middle"
                     fill={COLOR_NO_VISITADO}
                     fontSize="16"
+                    style={{ pointerEvents: 'none' }}
                   >
                     Lienzo vacío. Carga un preset o añade nodos.
                   </text>
@@ -1680,7 +1731,7 @@ export default function SimuladorGrafosPage() {
                   onClick={() => setAnimando(true)}
                   disabled={animando || pasoActual >= resultado.pasos.length - 1}
                 >
-                  ▶ Iniciar
+                  <span aria-hidden="true">▶</span> Iniciar
                 </button>
                 <button
                   type="button"
@@ -1688,7 +1739,7 @@ export default function SimuladorGrafosPage() {
                   onClick={() => setAnimando(false)}
                   disabled={!animando}
                 >
-                  ⏸ Pausar
+                  <span aria-hidden="true">⏸</span> Pausar
                 </button>
                 <button
                   type="button"
@@ -1699,7 +1750,7 @@ export default function SimuladorGrafosPage() {
                   }}
                   disabled={pasoActual >= resultado.pasos.length - 1}
                 >
-                  ⏭ Paso
+                  <span aria-hidden="true">⏭</span> Paso
                 </button>
                 <button
                   type="button"
@@ -1830,7 +1881,7 @@ export default function SimuladorGrafosPage() {
               Google Maps, Waze y aplicaciones similares usan variantes de Dijkstra y A* sobre grafos donde nodos son intersecciones y aristas son tramos de carretera con peso = tiempo o distancia.
             </p>
             <p className={styles.escenarioTip}>
-              💡 A* gana a Dijkstra cuando se conoce el destino, gracias a la heurística geográfica.
+              <span aria-hidden="true">💡</span> A* gana a Dijkstra cuando se conoce el destino, gracias a la heurística geográfica.
             </p>
           </div>
           <div className={styles.escenarioCard}>
@@ -1842,7 +1893,7 @@ export default function SimuladorGrafosPage() {
               El pathfinding de personajes no jugables (NPCs) en juegos de estrategia, RPG o shooters se resuelve con A* sobre grids o navmesh, con heurística manhattan o euclídea.
             </p>
             <p className={styles.escenarioTip}>
-              💡 BFS también se usa en juegos por turnos para casillas alcanzables en N pasos.
+              <span aria-hidden="true">💡</span> BFS también se usa en juegos por turnos para casillas alcanzables en N pasos.
             </p>
           </div>
           <div className={styles.escenarioCard}>
@@ -1854,7 +1905,7 @@ export default function SimuladorGrafosPage() {
               Protocolos como OSPF (Open Shortest Path First) usan Dijkstra para construir tablas de enrutamiento. Los routers calculan el mejor camino al destino en tiempo real.
             </p>
             <p className={styles.escenarioTip}>
-              💡 BGP es un caso especial: usa políticas, no solo coste mínimo.
+              <span aria-hidden="true">💡</span> BGP es un caso especial: usa políticas, no solo coste mínimo.
             </p>
           </div>
           <div className={styles.escenarioCard}>
@@ -1866,7 +1917,7 @@ export default function SimuladorGrafosPage() {
               &laquo;Personas que quizás conozcas&raquo; en LinkedIn o Facebook se calcula con BFS limitado a 2-3 niveles de profundidad sobre el grafo de amistad.
             </p>
             <p className={styles.escenarioTip}>
-              💡 BFS mantiene el orden por distancia social: primero amigos, luego amigos-de-amigos.
+              <span aria-hidden="true">💡</span> BFS mantiene el orden por distancia social: primero amigos, luego amigos-de-amigos.
             </p>
           </div>
         </div>
@@ -1879,7 +1930,7 @@ export default function SimuladorGrafosPage() {
               BFS explora &laquo;por niveles&raquo;: visita primero todos los vecinos directos, luego los vecinos de los vecinos, y así sucesivamente. Usa una cola FIFO. DFS explora &laquo;a fondo&raquo;: sigue un camino hasta agotarlo y vuelve hacia atrás (backtracking) cuando no puede avanzar. Usa una pila LIFO (o recursión).
             </p>
             <p className={styles.faqTip}>
-              💡 BFS encuentra el camino más corto en número de aristas. DFS no garantiza camino óptimo, pero usa menos memoria en grafos profundos.
+              <span aria-hidden="true">💡</span> BFS encuentra el camino más corto en número de aristas. DFS no garantiza camino óptimo, pero usa menos memoria en grafos profundos.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -1888,7 +1939,7 @@ export default function SimuladorGrafosPage() {
               Dijkstra asume que una vez que extraes un nodo del heap (con la menor distancia), esa distancia es definitiva: no puede mejorar. Con pesos negativos, una arista posterior podría reducir la distancia, invalidando esa decisión.
             </p>
             <p className={styles.faqTip}>
-              💡 Si tu grafo tiene aristas con peso negativo, usa Bellman-Ford (O(V·E)) o Floyd-Warshall (todos los pares).
+              <span aria-hidden="true">💡</span> Si tu grafo tiene aristas con peso negativo, usa Bellman-Ford (O(V·E)) o Floyd-Warshall (todos los pares).
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -1896,8 +1947,18 @@ export default function SimuladorGrafosPage() {
             <p>
               Una heurística h(n) estima el coste desde n hasta el destino. Debe ser <strong>admisible</strong> (nunca sobreestimar el coste real) para garantizar la optimalidad. Heurísticas comunes: distancia euclídea (rejillas con movimiento libre), distancia Manhattan (rejillas 4-direcciones), distancia Chebyshev (rejillas 8-direcciones).
             </p>
+            <p>
+              <strong>Cómo la calcula este simulador.</strong> Aquí los pesos los pones tú con un
+              deslizador y no tienen ninguna relación con las distancias del dibujo, así que la
+              distancia en píxeles a secas NO sería admisible: podría estimar 30 donde el camino
+              entero cuesta 10, y entonces A* dejaría de garantizar el óptimo. Por eso h se calibra
+              con el propio grafo — h(n) = k · distancia(n, destino), donde k es el menor cociente
+              peso/longitud de todas sus aristas. Si ninguna arista cuesta menos de k por píxel,
+              ningún camino puede costar menos de k veces la línea recta, y la heurística queda
+              garantizada por debajo del coste real.
+            </p>
             <p className={styles.faqTip}>
-              💡 Si h = 0, A* degenera a Dijkstra. Si h sobreestima, encuentra camino rápido pero no óptimo.
+              <span aria-hidden="true">💡</span> Si h = 0, A* degenera a Dijkstra. Si h sobreestima, encuentra camino rápido pero no óptimo.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -1906,7 +1967,7 @@ export default function SimuladorGrafosPage() {
               Cuando hay un destino concreto y se puede calcular una buena heurística. A* dirige la búsqueda hacia el destino, evitando explorar zonas alejadas. En grafos sin geometría (sin coordenadas), no hay heurística natural y Dijkstra suele ser más sencillo.
             </p>
             <p className={styles.faqTip}>
-              💡 Si necesitas el camino más corto desde un origen a <em>todos</em> los nodos, usa Dijkstra (no A*).
+              <span aria-hidden="true">💡</span> Si necesitas el camino más corto desde un origen a <em>todos</em> los nodos, usa Dijkstra (no A*).
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -1915,7 +1976,7 @@ export default function SimuladorGrafosPage() {
               En un grafo <strong>dirigido</strong>, cada arista tiene sentido: A→B no implica B→A. Se usa para modelar relaciones asimétricas: calles de una sola dirección, dependencias, &laquo;sigue a&raquo; en redes sociales. En un grafo <strong>no dirigido</strong>, las aristas son simétricas: A↔B significa que se puede ir en ambos sentidos.
             </p>
             <p className={styles.faqTip}>
-              💡 Internamente, un grafo no dirigido se puede ver como dirigido con dos aristas opuestas por cada conexión.
+              <span aria-hidden="true">💡</span> Internamente, un grafo no dirigido se puede ver como dirigido con dos aristas opuestas por cada conexión.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -1924,7 +1985,7 @@ export default function SimuladorGrafosPage() {
               Un heap binario es un árbol donde cada padre es menor (min-heap) o mayor (max-heap) que sus hijos. Insertar y extraer-mínimo son O(log n). En la mayoría de lenguajes hay implementaciones nativas: <code>heapq</code> en Python, <code>PriorityQueue</code> en Java, o librerías en JavaScript.
             </p>
             <p className={styles.faqTip}>
-              💡 Para grafos pequeños, una lista ordenada (O(n) por extracción) basta. Para grafos grandes, el heap marca diferencia.
+              <span aria-hidden="true">💡</span> Para grafos pequeños, una lista ordenada (O(n) por extracción) basta. Para grafos grandes, el heap marca diferencia.
             </p>
           </div>
         </div>
