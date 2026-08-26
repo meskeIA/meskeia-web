@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './Sonometro.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatNumber } from '@/lib';
+import { formatNumber, formatDate } from '@/lib';
 
 // Niveles de referencia en dB
 const NOISE_LEVELS = [
@@ -80,6 +80,61 @@ const CALIBRACION_MAX = 120;
 const CLAVE_CALIBRACION = 'sonometro-calibracion';
 
 /**
+ * Registro de mediciones — el diario de sesiones que la propia app pedía llevar.
+ *
+ * Su bloque educativo instruye a «registrar el nivel durante varias sesiones en distintos
+ * días y horarios» para documentar una molestia, pero hasta ahora lo único que sobrevivía a
+ * cerrar la pestaña era la calibración: el LAeq de la sesión, que es el dato que piden las
+ * ordenanzas, se perdía en cuanto se soltaba la pantalla. La guía sorteaba el problema
+ * mandando hacer capturas de pantalla.
+ *
+ * Todo queda en ESTE navegador: no hay servidor, ni cuenta, ni sincronización. Es la misma
+ * promesa que hace el resto de la app con el audio, y por eso el registro se guarda en
+ * localStorage y no en ningún otro sitio.
+ */
+const CLAVE_SESIONES = 'sonometro-sesiones';
+
+/** Tope del registro: las más antiguas se descartan al superarlo. */
+const MAX_SESIONES = 60;
+
+/**
+ * Duración mínima para que una medición entre en el registro.
+ *
+ * Sin este suelo, cada pulsación accidental de «Iniciar / Detener» dejaría una fila, y un
+ * parte lleno de sesiones de dos segundos no documenta nada. Tres segundos es además el
+ * mínimo por debajo del cual el LAeq todavía arrastra el arranque del micrófono.
+ */
+const SEGUNDOS_MINIMOS_REGISTRO = 3;
+
+interface SesionRegistrada {
+  /** Momento de FIN de la medición, en ISO. La fecha y la hora se derivan de aquí. */
+  id: string;
+  duracionSegundos: number;
+  laeq: number;
+  minDb: number;
+  maxDb: number;
+  /** El desplazamiento con el que se midió: sin él, dos filas de días distintos no son comparables. */
+  calibracion: number;
+  /** Anotación del usuario: dónde y en qué condiciones se midió. */
+  nota: string;
+}
+
+/** ¿Es una sesión guardada y no cualquier cosa que haya en localStorage? */
+function esSesionValida(valor: unknown): valor is SesionRegistrada {
+  if (typeof valor !== 'object' || valor === null) return false;
+  const s = valor as Record<string, unknown>;
+  return (
+    typeof s.id === 'string' &&
+    Number.isFinite(s.duracionSegundos) &&
+    Number.isFinite(s.laeq) &&
+    Number.isFinite(s.minDb) &&
+    Number.isFinite(s.maxDb) &&
+    Number.isFinite(s.calibracion) &&
+    typeof s.nota === 'string'
+  );
+}
+
+/**
  * Fotogramas que el instrumento se da para estabilizarse antes de empezar a acumular
  * estadísticas de sesión.
  *
@@ -134,6 +189,10 @@ export default function SonometroPage() {
   const [permissionState, setPermissionState] = useState<'prompt' | 'granted' | 'denied'>('prompt');
   // Ha habido al menos una sesión de medición: mantiene el resumen en pantalla tras detener
   const [hayMedicion, setHayMedicion] = useState(false);
+  // Registro de mediciones anteriores, recuperado de este navegador
+  const [sesiones, setSesiones] = useState<SesionRegistrada[]>([]);
+  // Qué ocurrió con la última medición al detenerla (se guardó o era demasiado corta)
+  const [avisoRegistro, setAvisoRegistro] = useState<string | null>(null);
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -175,6 +234,36 @@ export default function SonometroPage() {
   useEffect(() => {
     calibracionRef.current = calibracion;
   }, [calibracion]);
+
+  // Recuperar el registro de mediciones. En efecto, por lo mismo que la calibración: el
+  // servidor no tiene localStorage y el HTML servido debe coincidir con el primer render.
+  useEffect(() => {
+    try {
+      const crudo = window.localStorage.getItem(CLAVE_SESIONES);
+      if (!crudo) return;
+      const leidas: unknown = JSON.parse(crudo);
+      if (Array.isArray(leidas)) setSesiones(leidas.filter(esSesionValida));
+    } catch {
+      // JSON corrupto o localStorage bloqueado: se arranca con el registro vacío en vez de
+      // reventar la página entera, que es lo único que el usuario no puede arreglar.
+    }
+  }, []);
+
+  /**
+   * Único punto por el que se escribe el registro, igual que `cambiarCalibracion` es el
+   * único que escribe la calibración — y por la misma razón: persistir en un efecto sobre
+   * `[sesiones]` crearía una carrera con el efecto que las RECUPERA, y en el primer commit
+   * el array vacío inicial se escribiría encima de lo guardado.
+   */
+  const guardarSesiones = useCallback((nuevas: SesionRegistrada[]) => {
+    setSesiones(nuevas);
+    try {
+      window.localStorage.setItem(CLAVE_SESIONES, JSON.stringify(nuevas));
+    } catch {
+      // Cuota agotada o almacenamiento denegado: el registro sigue en pantalla durante esta
+      // visita, simplemente no sobrevivirá a cerrarla.
+    }
+  }, []);
 
   /**
    * Único punto por el que se cambia la calibración, y el único que la persiste.
@@ -326,6 +415,7 @@ export default function SonometroPage() {
   const startMeasuring = async () => {
     try {
       setError(null);
+      setAvisoRegistro(null);
 
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -415,6 +505,90 @@ export default function SonometroPage() {
 
     analyserRef.current = null;
     setIsActive(false);
+  };
+
+  /**
+   * Detener la medición y dejarla anotada en el registro.
+   *
+   * Es lo que hace el botón «Detener»; `stopMeasuring` a secas se reserva para los caminos
+   * en los que no hay nada que anotar (el desmontaje del componente y el fallo al abrir el
+   * micrófono). La duración se toma del reloj de alta resolución y no del estado, que se
+   * refresca por fotograma y podría ir uno por detrás en el momento del clic.
+   */
+  const detenerYRegistrar = () => {
+    const segundos = inicioRef.current === 0 ? 0 : (performance.now() - inicioRef.current) / 1000;
+    stopMeasuring();
+
+    if (muestrasRef.current === 0 || segundos < SEGUNDOS_MINIMOS_REGISTRO) {
+      setAvisoRegistro(
+        `Medición demasiado corta para registrarla: hacen falta al menos ${SEGUNDOS_MINIMOS_REGISTRO} segundos.`,
+      );
+      return;
+    }
+
+    const sesion: SesionRegistrada = {
+      id: new Date().toISOString(),
+      duracionSegundos: segundos,
+      laeq,
+      minDb: minDb === Infinity ? 0 : minDb,
+      maxDb,
+      calibracion,
+      nota: '',
+    };
+    // Las más recientes arriba; el tope descarta por la cola, que es la parte vieja
+    guardarSesiones([sesion, ...sesiones].slice(0, MAX_SESIONES));
+    setAvisoRegistro('Medición guardada en el registro de este navegador.');
+  };
+
+  /** Anotación de una fila: dónde se midió, con qué ventanas, qué se oía. */
+  const cambiarNota = (id: string, nota: string) => {
+    guardarSesiones(sesiones.map((s) => (s.id === id ? { ...s, nota } : s)));
+  };
+
+  const borrarSesion = (id: string) => {
+    guardarSesiones(sesiones.filter((s) => s.id !== id));
+  };
+
+  const borrarTodo = () => {
+    if (!window.confirm('¿Borrar todas las mediciones registradas? No se pueden recuperar.')) return;
+    guardarSesiones([]);
+  };
+
+  /**
+   * Descarga del registro como CSV para Excel o LibreOffice en español: separador de punto y
+   * coma (con la coma decimal, el separador de campo NO puede ser la coma) y BOM al frente,
+   * sin el cual Excel abre el fichero en su página de códigos local y destroza las tildes.
+   */
+  const descargarCsv = () => {
+    const cabecera = ['Fecha', 'Hora', 'Duración (s)', 'LAeq dB(A)', 'Mínimo dB(A)', 'Máximo dB(A)', 'Calibración (dB)', 'Nota'];
+    const filas = sesiones.map((s) => {
+      const fecha = new Date(s.id);
+      return [
+        formatDate(fecha),
+        fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        formatNumber(s.duracionSegundos, 0),
+        formatNumber(s.laeq, 1),
+        formatNumber(s.minDb, 1),
+        formatNumber(s.maxDb, 1),
+        formatNumber(s.calibracion, 0),
+        // Punto y coma y salto de línea dentro de una nota romperían la rejilla del CSV. Al
+        // sustituirlos por un espacio se colapsan los blancos: «salón; con la tele» debe salir
+        // con un espacio, no con dos.
+        s.nota.replace(/[;\r\n]+/g, ' ').replace(/\s+/g, ' ').trim(),
+      ];
+    });
+    const csv = '﻿' + [cabecera, ...filas].map((f) => f.join(';')).join('\r\n');
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+    const enlace = document.createElement('a');
+    enlace.href = url;
+    enlace.download = `sonometro-registro-${new Date().toISOString().slice(0, 10)}.csv`;
+    // Un enlace fuera del documento no dispara la descarga en todos los navegadores, y
+    // revocar la URL en el mismo tick del clic corre una carrera con la lectura del blob:
+    // se añade, se pulsa, se retira, y la revocación espera al siguiente ciclo del bucle.
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
+    setTimeout(() => URL.revokeObjectURL(url), 0);
   };
 
   // Resetear estadísticas (reinicia también la integración del LAeq)
@@ -507,8 +681,8 @@ export default function SonometroPage() {
               </button>
             ) : (
               <>
-                <button type="button" onClick={stopMeasuring} className={styles.btnStop}>
-                  <span aria-hidden="true">⏹️</span> Detener
+                <button type="button" onClick={detenerYRegistrar} className={styles.btnStop}>
+                  <span aria-hidden="true">⏹️</span> Detener y guardar
                 </button>
                 <button type="button" onClick={resetStats} className={styles.btnReset}>
                   <span aria-hidden="true">🔄</span> Resetear
@@ -578,6 +752,135 @@ export default function SonometroPage() {
               graves igual que los rebaja el oído (−19,1 dB a 100 Hz) y deja el 1 kHz intacto.
               Para documentar una molestia, mide al menos 5 minutos seguidos.
             </p>
+          </div>
+        )}
+
+        {/* Registro de mediciones — lo que convierte una lectura instantánea en un diario.
+            Es también lo ÚNICO que se imprime: el @media print del módulo esconde todo lo
+            demás para que del papel salga un parte y no una página web. */}
+        {(sesiones.length > 0 || avisoRegistro) && (
+          <div className={styles.registroPanel}>
+            {/* Solo en papel: quien lea la hoja no tiene delante ni el título ni la web */}
+            <div className={styles.parteCabecera}>
+              <h2 className={styles.parteTitulo}>Parte de mediciones de ruido</h2>
+              <p className={styles.parteSubtitulo}>
+                Emitido el {formatDate(new Date())} · {sesiones.length}{' '}
+                {sesiones.length === 1 ? 'medición registrada' : 'mediciones registradas'} ·
+                Sonómetro de meskeia.com
+              </p>
+            </div>
+
+            <h2 className={`${styles.sectionTitle} ${styles.noImprimir}`}>
+              <span aria-hidden="true">📒</span> Registro de mediciones
+            </h2>
+
+            {avisoRegistro && (
+              <p className={`${styles.avisoRegistro} ${styles.noImprimir}`} role="status">
+                {avisoRegistro}
+              </p>
+            )}
+
+            {sesiones.length > 0 && (
+              <>
+                <p className={`${styles.registroIntro} ${styles.noImprimir}`}>
+                  Cada vez que pulsas <strong>Detener y guardar</strong> queda aquí una fila.
+                  Anota junto a ella dónde mediste y en qué condiciones: una molestia se
+                  documenta con varias sesiones en días y horarios distintos, no con una sola
+                  lectura. El registro vive en este navegador y no se envía a ningún sitio.
+                </p>
+
+                <div className={styles.tablaScroll}>
+                  <table className={styles.tablaRegistro}>
+                    <caption className={styles.tablaCaption}>
+                      Mediciones guardadas, de la más reciente a la más antigua
+                    </caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Hora</th>
+                        <th scope="col">Duración</th>
+                        <th scope="col">LAeq dB(A)</th>
+                        <th scope="col">Mín.</th>
+                        <th scope="col">Máx.</th>
+                        <th scope="col">Calib.</th>
+                        <th scope="col">Dónde y en qué condiciones</th>
+                        <th scope="col" className={styles.noImprimir}>
+                          <span className={styles.svo}>Acciones</span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {sesiones.map((s) => {
+                        const momento = new Date(s.id);
+                        return (
+                          <tr key={s.id}>
+                            <td>{formatDate(momento)}</td>
+                            <td>
+                              {momento.toLocaleTimeString('es-ES', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </td>
+                            <td>{formatDuracion(s.duracionSegundos)}</td>
+                            <td className={styles.celdaLaeq}>{formatNumber(s.laeq, 1)}</td>
+                            <td>{formatNumber(s.minDb, 1)}</td>
+                            <td>{formatNumber(s.maxDb, 1)}</td>
+                            <td>{formatNumber(s.calibracion, 0)} dB</td>
+                            <td>
+                              <input
+                                type="text"
+                                className={styles.notaInput}
+                                value={s.nota}
+                                onChange={(e) => cambiarNota(s.id, e.target.value)}
+                                placeholder="Ej: dormitorio, ventana cerrada"
+                                maxLength={80}
+                                autoComplete="off"
+                                aria-label={`Anotación de la medición del ${formatDate(momento)}`}
+                              />
+                            </td>
+                            <td className={styles.noImprimir}>
+                              <button
+                                type="button"
+                                className={styles.btnBorrarFila}
+                                onClick={() => borrarSesion(s.id)}
+                                aria-label={`Borrar la medición del ${formatDate(momento)}`}
+                              >
+                                ✕
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                <p className={styles.parteAviso}>
+                  <span aria-hidden="true">⚠️</span> Mediciones orientativas tomadas con el
+                  micrófono de un dispositivo de consumo, sin homologar y calibrado a ojo por
+                  el propio usuario: el margen frente a un sonómetro de clase 1 o 2 es de ±3 a
+                  ±6 dB. <strong>No tienen validez legal ni metrológica</strong> y no sustituyen
+                  al informe de un técnico acreditado. Sirven para documentar la persistencia y
+                  el horario de una molestia, y para pedir una inspección oficial.
+                </p>
+
+                <div className={`${styles.registroAcciones} ${styles.noImprimir}`}>
+                  <button
+                    type="button"
+                    className={styles.btnImprimir}
+                    onClick={() => window.print()}
+                  >
+                    <span aria-hidden="true">🖨️</span> Imprimir el parte
+                  </button>
+                  <button type="button" className={styles.btnCsv} onClick={descargarCsv}>
+                    <span aria-hidden="true">⬇️</span> Descargar CSV
+                  </button>
+                  <button type="button" className={styles.btnBorrarTodo} onClick={borrarTodo}>
+                    <span aria-hidden="true">🗑️</span> Borrar el registro
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         )}
 
@@ -973,10 +1276,14 @@ export default function SonometroPage() {
             <li className={styles.faqItem}>
               <strong>¿Cómo medir el ruido de un vecino para reclamar?</strong>
               <p>
-                Mide desde el interior de tu vivienda con puertas y ventanas cerradas.
-                Registra el nivel durante varias sesiones en distintos días y horarios.
-                Documenta con capturas de pantalla con fecha y hora. Para una reclamación formal
-                ante el ayuntamiento se recomienda un informe pericial de un técnico acreditado.
+                Mide desde el interior de tu vivienda con puertas y ventanas cerradas, en
+                sesiones de al menos cinco minutos. Repítelo en <strong>distintos días y
+                horarios</strong>: lo que sostiene una reclamación no es un pico aislado sino
+                un patrón que se repite. Cada vez que pulses «Detener y guardar», la medición
+                queda con su fecha, su hora y su LAeq en el registro de esta página, donde
+                puedes anotar dónde mediste y descargarlo o imprimirlo como parte. Para una
+                reclamación formal ante el ayuntamiento se recomienda además un informe
+                pericial de un técnico acreditado.
               </p>
               <p className={styles.faqTip}>
                 Importante: las mediciones de un sonómetro de móvil no tienen validez legal por sí solas,

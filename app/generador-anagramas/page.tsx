@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useRef, Fragment } from 'react';
 import styles from './GeneradorAnagramas.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
@@ -54,6 +54,132 @@ function contarLetras(normalizado: string): Uint8Array {
   const cuenta = new Uint8Array(27);
   for (const caracter of normalizado) cuenta[IDX_LETRA[caracter]]++;
   return cuenta;
+}
+
+// -------------------------------------------------------------------------------------------------
+// FICHAS BLANCAS (comodines) del atril
+//
+// El modo de letras se presenta como el atril de un juego de palabras —habla de bingo, de las
+// 7 fichas y de jugadas de alto valor—, pero un atril de Scrabble en español trae DOS fichas
+// blancas, y hasta ahora `normalizarTexto` las tiraba junto a las cifras y los signos: quien
+// tenía una blanca, que es justo cuando más falta hace la ayuda, no podía representarla.
+// -------------------------------------------------------------------------------------------------
+
+/** Lo que la gente teclea para decir «ficha blanca». El interrogante es el habitual. */
+const COMODINES_ACEPTADOS = '?*_';
+
+/**
+ * Tope de fichas blancas: las dos que trae un atril de Scrabble en español, y también las de
+ * Apalabrados. No es solo fidelidad al reglamento, es una guarda con una cifra detrás.
+ *
+ * Cada blanca multiplica las palabras que encajan, y el crecimiento es brutal. Medido sobre
+ * el lemario real con el atril «casa» y longitudes 2 a 10:
+ *
+ *     0 blancas →     9 palabras
+ *     1 blanca  →   176
+ *     2 blancas →  1.244
+ *     3 blancas →  4.976        ← cinco mil chips en una rejilla: ni se pinta ni se lee
+ *     4 blancas → 13.265
+ *
+ * Un tercer comodín «de margen» no le sirve a ningún jugador y sí cuadruplica la lista.
+ */
+const MAX_COMODINES = 2;
+
+interface Atril {
+  /** Letras concretas, ya normalizadas */
+  letras: string;
+  /** Fichas blancas que se van a usar */
+  comodines: number;
+  /** Las que se han tecleado por encima del tope y no se usan */
+  comodinesIgnorados: number;
+}
+
+/** Separa un atril tecleado en letras concretas y fichas blancas. */
+function analizarAtril(texto: string): Atril {
+  let letras = '';
+  let pedidos = 0;
+  for (const caracter of texto.toLowerCase()) {
+    if (COMODINES_ACEPTADOS.includes(caracter)) {
+      pedidos++;
+      continue;
+    }
+    const base = SIN_TILDE[caracter] ?? caracter;
+    if (IDX_LETRA[base] !== undefined) letras += base;
+  }
+  const comodines = Math.min(pedidos, MAX_COMODINES);
+  return { letras, comodines, comodinesIgnorados: pedidos - comodines };
+}
+
+/**
+ * ¿Cabe esta palabra en el atril, poniendo fichas blancas donde falte letra?
+ *
+ * Devuelve las POSICIONES de la palabra que cubre una blanca (array vacío si no hace falta
+ * ninguna), o `null` si ni con todas alcanza. Las posiciones se refieren a la forma
+ * normalizada, que es sobre la que se ha hecho la cuenta.
+ *
+ * El reparto es voraz y eso basta: cuántas letras faltan no depende del orden en que se
+ * consuman —cada una sale del mismo montón—, así que la primera aparición de una letra
+ * repetida se lleva la ficha real y la última, la blanca.
+ */
+function posicionesDeComodin(
+  palabra: string,
+  disponibles: Uint8Array,
+  comodines: number,
+): number[] | null {
+  const restante = Uint8Array.from(disponibles);
+  const cubiertas: number[] = [];
+  for (let i = 0; i < palabra.length; i++) {
+    const letra = IDX_LETRA[palabra[i]];
+    if (restante[letra] > 0) {
+      restante[letra]--;
+      continue;
+    }
+    cubiertas.push(i);
+    if (cubiertas.length > comodines) return null;
+  }
+  return cubiertas;
+}
+
+interface ResultadoPalabra {
+  /** Forma del diccionario, con sus tildes */
+  palabra: string;
+  /** Forma normalizada: es a la que se refieren las posiciones de `comodines` */
+  normalizada: string;
+  comodines: number[];
+}
+
+/**
+ * La palabra, con las letras que pone una ficha blanca resaltadas.
+ *
+ * Las posiciones vienen referidas a la forma NORMALIZADA, y usarlas directamente como índice
+ * de la original solo funciona mientras las dos tengan la misma longitud — cierto con este
+ * lemario, que es solo letras, y falso en cuanto entre un lema con guion o apóstrofo. Se
+ * recorre la original llevando aparte el contador de la normalizada, que avanza únicamente en
+ * los caracteres que la normalización conserva, y así el resaltado no depende de esa suerte.
+ */
+function PalabraConComodines({ resultado }: { resultado: ResultadoPalabra }) {
+  if (resultado.comodines.length === 0) return <>{resultado.palabra}</>;
+
+  const marcadas = new Set(resultado.comodines);
+  let indiceNormalizado = -1;
+
+  return (
+    <>
+      {Array.from(resultado.palabra).map((caracter, posicion) => {
+        const minuscula = caracter.toLowerCase();
+        const base = SIN_TILDE[minuscula] ?? minuscula;
+        const cuenta = IDX_LETRA[base] !== undefined;
+        if (cuenta) indiceNormalizado++;
+        return cuenta && marcadas.has(indiceNormalizado) ? (
+          <span key={posicion} className={styles.letraComodin}>
+            {caracter}
+          </span>
+        ) : (
+          <Fragment key={posicion}>{caracter}</Fragment>
+        );
+      })}
+    </>
+  );
 }
 
 interface IndiceVocabulario {
@@ -242,7 +368,7 @@ export default function GeneradorAnagramasPage() {
   const [minLength, setMinLength] = useState(2);
   const [maxLength, setMaxLength] = useState(10);
   const [mustContain, setMustContain] = useState('');
-  const [results, setResults] = useState<string[]>([]);
+  const [results, setResults] = useState<ResultadoPalabra[]>([]);
   /**
    * ¿Se ha pulsado «Buscar palabras» con las letras que hay ahora en el campo?
    *
@@ -299,8 +425,8 @@ export default function GeneradorAnagramasPage() {
   }, []);
 
   // Indexar diccionario por longitud para búsquedas más rápidas
-  /** Las letras que de verdad quedan tras descartar cifras, signos y espacios. */
-  const letrasUtiles = useMemo(() => normalizarTexto(letters), [letters]);
+  /** El atril: letras que de verdad quedan tras descartar cifras y signos, y fichas blancas. */
+  const atril = useMemo(() => analizarAtril(letters), [letters]);
 
   /**
    * Diccionario indexado por longitud, con la forma NORMALIZADA al lado de la original.
@@ -324,39 +450,23 @@ export default function GeneradorAnagramasPage() {
     return index;
   }, [dictionary]);
 
-  const canFormWord = (word: string, availableLetters: string): boolean => {
-    const letterCount: { [key: string]: number } = {};
-
-    for (const letter of availableLetters.toLowerCase()) {
-      letterCount[letter] = (letterCount[letter] || 0) + 1;
-    }
-
-    for (const letter of word.toLowerCase()) {
-      if (!letterCount[letter] || letterCount[letter] === 0) {
-        return false;
-      }
-      letterCount[letter]--;
-    }
-
-    return true;
-  };
-
   const findAnagrams = () => {
     setIsSearching(true);
 
     setTimeout(() => {
-      // Sin tildes, igual que los otros dos modos de la app
-      const normalizedLetters = normalizarTexto(letters);
+      // Sin tildes, igual que los otros dos modos de la app; las fichas blancas van aparte
+      const { letras, comodines } = analizarAtril(letters);
 
-      if (normalizedLetters.length < 2) {
+      if (letras.length + comodines < 2 || letras.length === 0) {
         setResults([]);
         setBuscado(true);
         setIsSearching(false);
         return;
       }
 
-      const found: string[] = [];
+      const found: ResultadoPalabra[] = [];
       const mustContainNorm = normalizarTexto(mustContain);
+      const disponibles = contarLetras(letras);
 
       // Iterar solo sobre las longitudes válidas para acelerar
       for (let len = minLength; len <= maxLength; len++) {
@@ -365,15 +475,21 @@ export default function GeneradorAnagramasPage() {
 
         for (const { original, normalizada } of bucket) {
           if (mustContainNorm && !normalizada.includes(mustContainNorm)) continue;
-          if (canFormWord(normalizada, normalizedLetters)) {
-            found.push(original);
-          }
+          const posiciones = posicionesDeComodin(normalizada, disponibles, comodines);
+          if (posiciones) found.push({ palabra: original, normalizada, comodines: posiciones });
         }
       }
 
+      // Primero las largas; a igual longitud, las que NO gastan blanca, porque guardarla
+      // para la jugada siguiente vale más que cualquier desempate alfabético.
       found.sort((a, b) => {
-        if (b.length !== a.length) return b.length - a.length;
-        return a.localeCompare(b);
+        if (b.normalizada.length !== a.normalizada.length) {
+          return b.normalizada.length - a.normalizada.length;
+        }
+        if (a.comodines.length !== b.comodines.length) {
+          return a.comodines.length - b.comodines.length;
+        }
+        return a.palabra.localeCompare(b.palabra, 'es');
       });
 
       setResults(found);
@@ -414,21 +530,32 @@ export default function GeneradorAnagramasPage() {
     setBuscado(false);
   };
 
+  // Se agrupa por la longitud de la forma NORMALIZADA, que es la que filtran los selectores de
+  // longitud mínima y máxima. Hoy da igual —el lemario es solo letras del alfabeto español, así
+  // que ambas longitudes coinciden—, pero agrupar por la que filtra evita que un lema con guion
+  // o apóstrofo, si algún día entrara, cayera en un grupo distinto del que lo dejó pasar.
   const groupedResults = useMemo(() => {
-    const groups: { [key: number]: string[] } = {};
-    for (const word of results) {
-      const len = word.length;
+    const groups: { [key: number]: ResultadoPalabra[] } = {};
+    for (const resultado of results) {
+      const len = resultado.normalizada.length;
       if (!groups[len]) groups[len] = [];
-      groups[len].push(word);
+      groups[len].push(resultado);
     }
     return groups;
   }, [results]);
+
+  /** Cuántas de las encontradas necesitan gastar una ficha blanca. */
+  const conComodin = useMemo(
+    () => results.filter((r) => r.comodines.length > 0).length,
+    [results],
+  );
 
   const examples = [
     { letters: 'amor', label: 'amor' },
     { letters: 'mesa', label: 'mesa' },
     { letters: 'palabra', label: 'palabra' },
     { letters: 'corazon', label: 'corazon' },
+    { letters: 'casa?', label: 'casa? (con blanca)' },
   ];
 
   // --- Modo frase: anagramas perfectos --------------------------------------------------------
@@ -550,17 +677,40 @@ export default function GeneradorAnagramasPage() {
         <>
         <div className={styles.inputSection}>
           <label className={styles.label} htmlFor="anagram-letters">Introduce tus letras:</label>
+          <p className={styles.modeHint}>
+            Las de tu atril, seguidas y sin espacios. Para una <strong>ficha blanca</strong>{' '}
+            (comodín) escribe <strong>?</strong> —también valen <strong>*</strong> y{' '}
+            <strong>_</strong>—: vale por cualquier letra, y en los resultados se ve cuál
+            está poniendo. Se admiten hasta {MAX_COMODINES}, y las tildes se ignoran.
+          </p>
           <input
             id="anagram-letters"
             type="text"
             className={styles.input}
             value={letters}
             onChange={(e) => { setLetters(e.target.value); setResults([]); setBuscado(false); }}
-            placeholder="Ej: amorpls"
+            placeholder="Ej: amorpls o casa?"
             maxLength={15}
             autoComplete="off"
             inputMode="text"
+            aria-describedby="anagram-atril"
           />
+          <div className={styles.contadorLetras} id="anagram-atril" aria-live="polite">
+            {atril.letras.length}{' '}
+            {atril.letras.length === 1 ? 'letra' : 'letras'}
+            {atril.comodines > 0 && (
+              <>
+                {' + '}
+                <strong>
+                  {atril.comodines} {atril.comodines === 1 ? 'ficha blanca' : 'fichas blancas'}
+                </strong>
+              </>
+            )}
+            {atril.comodinesIgnorados > 0 &&
+              ` — se ignoran ${atril.comodinesIgnorados} comodín(es) por encima del máximo de ${MAX_COMODINES}`}
+            {atril.letras.length === 0 && atril.comodines > 0 &&
+              ' — hace falta al menos una letra concreta: solo con comodines saldría medio diccionario'}
+          </div>
           <div className={styles.examples}>
             <span className={styles.exampleLabel}>Probar:</span>
             {examples.map((ex) => (
@@ -624,7 +774,12 @@ export default function GeneradorAnagramasPage() {
           <button
             onClick={findAnagrams}
             className={styles.btnPrimary}
-            disabled={letrasUtiles.length < 2 || isSearching || dictStatus !== 'ready'}
+            disabled={
+              atril.letras.length === 0 ||
+              atril.letras.length + atril.comodines < 2 ||
+              isSearching ||
+              dictStatus !== 'ready'
+            }
             type="button"
           >
             {isSearching ? 'Buscando...' : 'Buscar palabras'}
@@ -640,6 +795,15 @@ export default function GeneradorAnagramasPage() {
               <h3>Palabras encontradas: {results.length}</h3>
             </div>
 
+            {conComodin > 0 && (
+              <p className={styles.leyendaComodin}>
+                <span className={styles.letraComodin}>A</span> = letra que pone una ficha
+                blanca. {conComodin} de las {results.length} necesitan gastarla; las que no,
+                salen primero dentro de cada longitud, porque conservar la blanca vale más
+                que una jugada corta.
+              </p>
+            )}
+
             {Object.keys(groupedResults)
               .sort((a, b) => Number(b) - Number(a))
               .map(len => (
@@ -648,9 +812,12 @@ export default function GeneradorAnagramasPage() {
                     {len} letras ({groupedResults[Number(len)].length})
                   </h4>
                   <div className={styles.wordsGrid}>
-                    {groupedResults[Number(len)].map(word => (
-                      <span key={word} className={styles.wordChip}>
-                        {word}
+                    {groupedResults[Number(len)].map(resultado => (
+                      <span
+                        key={resultado.palabra}
+                        className={`${styles.wordChip} ${resultado.comodines.length > 0 ? styles.wordChipComodin : ''}`}
+                      >
+                        <PalabraConComodines resultado={resultado} />
                       </span>
                     ))}
                   </div>
@@ -662,7 +829,11 @@ export default function GeneradorAnagramasPage() {
         {buscado && results.length === 0 && !isSearching && dictStatus === 'ready' && (
           <div className={styles.noResults}>
             <p>No se encontraron palabras con esas letras.</p>
-            <p className={styles.hint}>Prueba añadiendo más letras o reduciendo los filtros.</p>
+            <p className={styles.hint}>
+              Prueba añadiendo más letras, reduciendo los filtros o, si tienes una ficha
+              blanca en el atril, escribiendo <strong>?</strong> para que valga por cualquier
+              letra.
+            </p>
           </div>
         )}
         </>
@@ -959,7 +1130,7 @@ export default function GeneradorAnagramasPage() {
             <div className={styles.eduEscenarioCard}>
               <span className={styles.eduEscenarioIcon}>🃏</span>
               <h4>Scrabble y Palabras Cruzadas</h4>
-              <p>Busca las palabras más largas posibles con las letras de tu atril. Las palabras de 7+ letras dan bingo (+50 puntos). Filtra por longitud mínima para encontrar jugadas de alto valor.</p>
+              <p>Busca las palabras más largas posibles con las letras de tu atril; si tienes una ficha blanca, escríbela como <strong>?</strong> y verás resaltada la letra que pone. Las palabras de 7+ letras dan bingo (+50 puntos). Filtra por longitud mínima para encontrar jugadas de alto valor.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
               <span className={styles.eduEscenarioIcon}>📚</span>
@@ -1004,6 +1175,14 @@ export default function GeneradorAnagramasPage() {
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqQuestion}>¿Qué es el &quot;bingo&quot; en Scrabble?</summary>
               <p className={styles.eduFaqAnswer}>El <strong>bingo</strong> (o &quot;scrabble&quot; en versión americana) consiste en usar las 7 fichas del atril en una sola jugada. Se obtiene un bonus de <strong>+50 puntos</strong> además del valor de la palabra. Los jugadores competitivos memorizan palabras de 7 letras que contienen letras frecuentes (S, R, N, T, A, E, I) para maximizar las posibilidades de bingo.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>Tengo una ficha blanca en el atril, ¿cómo la escribo?</summary>
+              <p className={styles.eduFaqAnswer}>Con un <strong>interrogante</strong>: escribe <strong>casa?</strong> y la herramienta busca palabras usando esas cuatro letras más una cualquiera. También se admiten el asterisco (<strong>*</strong>) y el guion bajo (<strong>_</strong>), y hasta tres comodines a la vez. En los resultados, la letra que pone la blanca aparece <strong>resaltada</strong>, así que se ve de un vistazo dónde hay que colocarla en el tablero. Un atril de Scrabble en español trae dos blancas entre sus 100 fichas; en Apalabrados y en juegos parecidos, también dos.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqQuestion}>¿Conviene gastar la ficha blanca en cuanto se puede?</summary>
+              <p className={styles.eduFaqAnswer}>Depende de lo que ganes con ella. La blanca vale <strong>cero puntos</strong> por sí misma, así que su valor está en lo que desbloquea: completar una palabra de siete fichas para llevarse el bingo (+50) o alcanzar una casilla de triple palabra puede compensar de sobra; usarla para una jugada de ocho o diez puntos, casi nunca. Por eso, dentro de cada longitud, esta herramienta muestra <strong>primero las palabras que no la necesitan</strong>: si hay una jugada equivalente sin gastar la blanca, es la que conviene mirar antes.</p>
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqQuestion}>¿Cuál es la mejor estrategia inicial en Wordle?</summary>

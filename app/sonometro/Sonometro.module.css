@@ -1067,3 +1067,378 @@
     justify-content: center;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   REGISTRO DE MEDICIONES  ·  y el parte que sale de él por impresora
+   ═══════════════════════════════════════════════════════════════════ */
+
+.registroPanel {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+.registroIntro {
+  margin: 0 0 var(--spacing-lg) 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.avisoRegistro {
+  margin: 0 0 var(--spacing-lg) 0;
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  background: rgba(46, 134, 171, 0.1);
+  border-left: 4px solid var(--primary);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+/* Texto solo para lectores de pantalla: la columna de acciones necesita un
+   encabezado aunque en pantalla no deba ocupar sitio. */
+.svo {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Nueve columnas no caben en un móvil: la tabla se desplaza dentro de su caja
+   y nunca empuja el ancho de la página. */
+.tablaScroll {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.tablaRegistro {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 760px;
+}
+
+.tablaCaption {
+  text-align: left;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  background: var(--hover);
+}
+
+.tablaRegistro th {
+  background: var(--primary);
+  color: white;
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tablaRegistro td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-top: 1px solid var(--border);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.tablaRegistro tbody tr:nth-child(even) {
+  background: var(--hover);
+}
+
+.celdaLaeq {
+  font-weight: 700;
+  color: var(--primary-texto);
+}
+
+.notaInput {
+  width: 100%;
+  min-width: 200px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.notaInput:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.btnBorrarFila {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnBorrarFila:hover {
+  background: #ef4444;
+  color: white;
+}
+
+.btnBorrarFila:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.parteAviso {
+  margin: var(--spacing-lg) 0 0 0;
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  background: rgba(239, 68, 68, 0.08);
+  border-left: 4px solid #ef4444;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .parteAviso {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+[data-theme='dark'] .avisoRegistro {
+  background: rgba(46, 134, 171, 0.2);
+}
+
+.registroAcciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.btnImprimir,
+.btnCsv,
+.btnBorrarTodo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btnImprimir {
+  border: none;
+  background: var(--primary);
+  color: white;
+}
+
+.btnImprimir:hover {
+  background: #256a8a;
+}
+
+.btnCsv {
+  border: 1px solid var(--primary);
+  background: transparent;
+  color: var(--primary-texto);
+}
+
+.btnCsv:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.btnBorrarTodo {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  margin-left: auto;
+}
+
+.btnBorrarTodo:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.btnImprimir:focus-visible,
+.btnCsv:focus-visible,
+.btnBorrarTodo:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* La cabecera del parte solo existe en el papel: en pantalla el usuario ya
+   sabe dónde está, pero una hoja suelta sin título ni fecha no documenta nada. */
+.parteCabecera {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .registroAcciones {
+    flex-direction: column;
+  }
+
+  .btnImprimir,
+  .btnCsv,
+  .btnBorrarTodo {
+    width: 100%;
+    justify-content: center;
+    margin-left: 0;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   IMPRESIÓN — sale un parte, no una página web.
+
+   No se usa styles/impresion.module.css a propósito: esa base es para
+   material que se rellena a mano (fichas, sopas de letras, bingos) y su
+   propia cabecera avisa de que NO se aplique a informes tabulares, donde
+   interesa lo contrario, apretar filas para que quepan.
+
+   El recorte se hace por hijos directos, así ningún componente compartido
+   (logo, aviso legal, disclaimer, apps relacionadas, pie) necesita saber
+   que existe una vista de impresión.
+   ───────────────────────────────────────────────────────────── */
+@media print {
+  .container > *:not(.mainContent) {
+    display: none !important;
+  }
+
+  .mainContent > *:not(.registroPanel) {
+    display: none !important;
+  }
+
+  .noImprimir {
+    display: none !important;
+  }
+
+  .container {
+    max-width: none;
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+    background: white;
+  }
+
+  .mainContent {
+    gap: 0;
+    margin: 0;
+  }
+
+  .registroPanel {
+    background: white;
+    color: black;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+  }
+
+  .parteCabecera {
+    display: block;
+    margin-bottom: 8mm;
+    padding-bottom: 4mm;
+    border-bottom: 2pt solid #2e86ab;
+  }
+
+  .parteTitulo {
+    margin: 0 0 2mm 0;
+    font-size: 16pt;
+    color: #2e86ab;
+  }
+
+  .parteSubtitulo {
+    margin: 0;
+    font-size: 10pt;
+    color: #333333;
+  }
+
+  /* Al imprimir, las media queries miden el ancho del PAPEL (~718 px en A4 con
+     márgenes), por debajo del corte de móvil: sin esto la tabla conservaría su
+     min-width y su scroll, y se cortaría por la derecha. */
+  .tablaScroll {
+    overflow: visible;
+    border: none;
+    border-radius: 0;
+  }
+
+  .tablaRegistro {
+    min-width: 0;
+    width: 100%;
+    font-size: 9pt;
+    color: black;
+  }
+
+  .tablaCaption {
+    background: none;
+    color: #333333;
+    padding: 0 0 2mm 0;
+    font-size: 9pt;
+  }
+
+  .tablaRegistro th {
+    background: #e8eef2 !important;
+    color: black !important;
+    border-bottom: 1pt solid #2e86ab;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .tablaRegistro td {
+    border-top: 0.5pt solid #cccccc;
+    color: black;
+    /* En papel la nota puede ocupar dos líneas: es preferible a truncarla */
+    white-space: normal;
+  }
+
+  .tablaRegistro tbody tr:nth-child(even) {
+    background: none;
+  }
+
+  /* Una fila partida entre dos páginas hace ilegible el parte */
+  .tablaRegistro tr {
+    break-inside: avoid;
+  }
+
+  .celdaLaeq {
+    color: black;
+    font-weight: 700;
+  }
+
+  /* El campo de la nota deja de parecer un formulario y pasa a ser texto */
+  .notaInput {
+    border: none;
+    background: none;
+    color: black;
+    padding: 0;
+    min-width: 0;
+    font-size: 9pt;
+  }
+
+  /* Una fila sin anotar debe salir en blanco, no con el «Ej: dormitorio, ventana
+     cerrada» del placeholder impreso como si fuera lo que midió el usuario. */
+  .notaInput::placeholder {
+    color: transparent;
+  }
+
+  .parteAviso {
+    background: none;
+    border-left: 3pt solid #666666;
+    color: black;
+    font-size: 8.5pt;
+    margin-top: 6mm;
+    break-inside: avoid;
+  }
+}

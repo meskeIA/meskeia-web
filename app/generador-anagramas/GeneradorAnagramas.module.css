@@ -918,3 +918,33 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Fichas blancas (comodines) del atril                                */
+/* ------------------------------------------------------------------ */
+
+/* La letra que pone una blanca. Se distingue por COLOR, GROSOR y un
+   subrayado punteado a la vez: el color solo no serviría para quien no
+   lo percibe, y estos chips no admiten más espacio que el de la letra. */
+.letraComodin {
+  color: var(--secondary-texto);
+  font-weight: 800;
+  border-bottom: 2px dotted currentColor;
+}
+
+/* El chip entero se marca también en el borde: dentro de una rejilla de
+   cien palabras, una letra resaltada pasa desapercibida. */
+.wordChipComodin {
+  border-style: dashed;
+  border-color: var(--secondary);
+}
+
+.leyendaComodin {
+  margin: 0 0 var(--spacing-lg) 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--hover);
+  border-radius: var(--radius);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
