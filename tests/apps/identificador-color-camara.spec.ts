@@ -165,10 +165,15 @@ const NOMBRE_COLOR = (page: Page) =>
 //                   · redmean: «Gris» #808080 d=0 (coincidencia exacta)
 //  RGB(46,134,171)  → #2E86AB · h=(4+(rn-gn)/d)/6=0,549333 → 197,76° → round 198
 //                   · s=0,490196/0,850980=0,576 → 58 · l=42,549 → 43 → 198°,58%,43%
-//                   · redmean: «Verde azulado» #008080 d=9.939,8 gana a «Gris» d=20.788,2
+//                   · redmean: «Azul petróleo» #2E86AB d=0 (coincidencia exacta desde que la
+//                     paleta tiene azules medios — hallazgo 393). Antes ganaba «Verde
+//                     azulado» #008080 con d=9.939,8, y el azul de marca de meskeIA se
+//                     llamaba verde.
 //  RGB(70,130,180)  → #4682B4 · h=(4-0,545455)/6=0,575758 → 207,27° → 207
 //                   · s=0,431373/0,980392=0,44 → 44 · l=49,0196 → 49 → 207°,44%,49%
-//                   · redmean: «Gris» d=15.100,6 gana a «Verde azulado» d=18.217,8
+//                   · redmean: «Azul acero» #4682B4 d=0 (coincidencia exacta). Antes ganaba
+//                     «Gris» con d=15.100,6: un azul con 44 % de saturación se llamaba gris,
+//                     y esta app existe para poner NOMBRE al color a quien no lo distingue.
 //  RGB(0,128,0)     → #008000 · l=0,250980 → 25 · s=d/(max+min)=1 → 100 · h=120°
 //                   · redmean: «Verde» #008000 d=0 (coincidencia exacta)
 // ═══════════════════════════════════════════════════════════════════════════
@@ -176,9 +181,8 @@ const NOMBRE_COLOR = (page: Page) =>
 const CASOS_COLOR = [
   { rgb: [255, 0, 0], hex: '#FF0000', rgbTexto: '255, 0, 0', hsl: '0°, 100%, 50%', nombre: 'Rojo' },
   { rgb: [128, 128, 128], hex: '#808080', rgbTexto: '128, 128, 128', hsl: '0°, 0%, 50%', nombre: 'Gris' },
-  { rgb: [46, 134, 171], hex: '#2E86AB', rgbTexto: '46, 134, 171', hsl: '198°, 58%, 43%', nombre: 'Verde azulado' },
-  // El nombre de este NO se afirma aquí: es un hallazgo abierto (ver al final del fichero).
-  { rgb: [70, 130, 180], hex: '#4682B4', rgbTexto: '70, 130, 180', hsl: '207°, 44%, 49%', nombre: null },
+  { rgb: [46, 134, 171], hex: '#2E86AB', rgbTexto: '46, 134, 171', hsl: '198°, 58%, 43%', nombre: 'Azul petróleo' },
+  { rgb: [70, 130, 180], hex: '#4682B4', rgbTexto: '70, 130, 180', hsl: '207°, 44%, 49%', nombre: 'Azul acero' },
   { rgb: [0, 128, 0], hex: '#008000', rgbTexto: '0, 128, 0', hsl: '120°, 100%, 25%', nombre: 'Verde' },
 ] as const;
 
@@ -380,8 +384,7 @@ test('caso 3 · con el permiso denegado avisa de forma accesible y no se rompe',
 // HALLAZGOS ABIERTOS — hoy fallan a propósito (test.fail).
 // ═══════════════════════════════════════════════════════════════════════════
 
-test('HALLAZGO · volver al modo foto tras usar la cámara deja un lienzo fantasma que responde «Negro»', async ({ page }) => {
-  test.fail();
+test('REGRESIÓN 392 · volver al modo foto tras usar la cámara no deja lienzo fantasma', async ({ page }) => {
   // `cambiarModo` reinicia color, calibración y aviso, pero NO `hayImagen`. Al desmontarse
   // la sección del modo imagen se pierde el lienzo dibujado; al volver, el <canvas> es nuevo
   // (300 × 150 por defecto, transparente) pero se muestra igual y el texto sigue diciendo
@@ -396,15 +399,21 @@ test('HALLAZGO · volver al modo foto tras usar la cámara deja un lienzo fantas
 
   await page.getByRole('tab', { name: 'Cámara en vivo' }).click();
   await page.getByRole('tab', { name: 'Desde una foto' }).click();
-  await page.locator('canvas[role=button]').click({ position: { x: 20, y: 20 } });
 
-  // Esperado: sin foto cargada no debe haber lectura ninguna (o debe seguir la foto anterior).
-  // Obtenido hoy: «#000000 / Negro», inventado a partir de un lienzo vacío.
+  // El lienzo vuelve a estar oculto y fuera del tabulador: no hay dónde pulsar, que es la
+  // reparación. Antes se mostraba —vacío y transparente— y respondía «Negro #000000».
+  const lienzo = page.locator('canvas[role=button]');
+  await expect(lienzo).not.toBeVisible();
+  await expect(lienzo).toHaveAttribute('tabindex', '-1');
+
+  // Y la ayuda vuelve a pedir una foto en vez de invitar a tocar una que ya no está.
+  await expect(page.getByText('Sube una foto o una captura de pantalla')).toBeVisible();
+
+  // Sin foto no hay lectura ninguna.
   await expect(page.locator('section[aria-label="Color identificado"]')).toHaveCount(0);
 });
 
-test('HALLAZGO · el fallo de cámara se clasifica por el TEXTO inglés del error, no por su nombre', async ({ page }) => {
-  test.fail();
+test('REGRESIÓN 394 · el fallo de cámara se clasifica por el nombre estándar del error', async ({ page }) => {
   // page.tsx mira `err.message` en vez de `err.name`. Consecuencias medidas el 26/08/2026:
   //   · NotFoundError → el mensaje real de Chrome es «Requested device not found», que NO
   //     contiene «NotFound»: la rama «No se encontró ninguna cámara» es CÓDIGO MUERTO.
@@ -424,8 +433,7 @@ test('HALLAZGO · el fallo de cámara se clasifica por el TEXTO inglés del erro
   await expect(alerta, 'no debe filtrarse texto en inglés a una interfaz en español').not.toContainText(/[Rr]equested device/);
 });
 
-test('HALLAZGO · el cuentagotas es un role="button" enfocable que el teclado no puede activar', async ({ page }) => {
-  test.fail();
+test('REGRESIÓN 395 · el cuentagotas responde a Enter y Espacio, no solo al clic', async ({ page }) => {
   // El <canvas> del modo imagen declara role="button" y tabIndex={0}, así que entra en el
   // recorrido del tabulador, pero solo tiene onClick: sin onKeyDown, Enter y Espacio no
   // hacen nada. Es una parada de tabulador muerta (WCAG 2.1.1) en una app cuyo público
@@ -443,23 +451,41 @@ test('HALLAZGO · el cuentagotas es un role="button" enfocable que el teclado no
   await expect(page.locator('section[aria-label="Color identificado"]')).toBeVisible({ timeout: 2000 });
 });
 
-test('HALLAZGO · la región aria-live se reescribe ~9 veces por segundo con la cámara en marcha', async ({ page }) => {
-  test.fail();
-  // <section aria-live="polite"> envuelve nombre, HEX, RGB, HSL, calibración y botones, y la
-  // lectura se refresca ~8 veces por segundo. Medido el 26/08/2026: 26 cambios en 3 s. Un
-  // lector de pantalla encola cada uno y nunca vacía la cola, así que el usuario no llega a
-  // oír ni la etiqueta del botón «Congelar lectura», que es justo la salida del bucle.
+test('REGRESIÓN 396 · lo que se refresca 9 veces por segundo NO es una región viva', async ({ page }) => {
+  // El bloque de resultado era un <section aria-live="polite"> que envolvía nombre, HEX,
+  // RGB, HSL, calibración y los tres botones de copiar, y su contenido se refresca unas 8
+  // veces por segundo con la cámara en marcha (medido el 26/08/2026: 26 cambios en 3 s). Un
+  // lector de pantalla encolaba cada uno y nunca vaciaba la cola, así que no llegaba a oírse
+  // ni la etiqueta de «Congelar lectura», que es justamente la salida del bucle.
+  //
+  // La reparación NO es refrescar menos —enseñar el color en directo es la función de la
+  // app— sino dejar de ANUNCIAR cada refresco. Por eso lo que se comprueba es que la
+  // sección ya no es región viva, y que el contenido sigue actualizándose.
   await page.goto(RUTA);
   await page.getByRole('button', { name: 'Activar cámara' }).click();
   await esperarCamaraEnMarcha(page);
-  await expect(page.locator('section[aria-label="Color identificado"]')).toBeVisible();
+  const seccion = page.locator('section[aria-label="Color identificado"]');
+  await expect(seccion).toBeVisible();
 
+  expect(await seccion.getAttribute('aria-live'), 'aria-live del bloque de resultado').toBeNull();
+  expect(await seccion.getAttribute('role'), 'role del bloque de resultado').toBeNull();
+
+  // Y ninguna región viva de la página envuelve un botón: releerlos enteros en cada
+  // actualización es lo que hacía inaudible la salida del bucle.
+  const vivasConBotones = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('[aria-live]'))
+      .filter((el) => el.querySelector('button'))
+      .map((el) => el.getAttribute('aria-label') || el.className),
+  );
+  expect(vivasConBotones, 'regiones vivas que envuelven botones').toEqual([]);
+
+  // La lectura SÍ sigue viva en pantalla: la app no ha dejado de hacer su trabajo.
   const cambios = await page.evaluate(async () => {
     const sec = document.querySelector('section[aria-label="Color identificado"]')!;
     let prev = sec.textContent;
     let n = 0;
     const t0 = Date.now();
-    while (Date.now() - t0 < 3000) {
+    while (Date.now() - t0 < 2000) {
       await new Promise((r) => setTimeout(r, 60));
       if (sec.textContent !== prev) {
         n++;
@@ -468,13 +494,10 @@ test('HALLAZGO · la región aria-live se reescribe ~9 veces por segundo con la 
     }
     return n;
   });
-
-  // Esperado: como mucho unas pocas locuciones en 3 s. Obtenido: 26.
-  expect(cambios, `la región viva cambió ${cambios} veces en 3 s`).toBeLessThanOrEqual(5);
+  expect(cambios, 'la lectura debe seguir refrescándose en pantalla').toBeGreaterThan(0);
 });
 
-test('HALLAZGO · la paleta no tiene ningún azul medio, así que el azul acero se llama «Gris»', async ({ page }) => {
-  test.fail();
+test('REGRESIÓN 393 · la paleta tiene azules medios y el azul acero se llama azul', async ({ page }) => {
   // La PALETA de page.tsx salta de «Azul» #0057E7 (un azul vivo y muy saturado) a «Celeste»
   // #87CEEB y «Verde azulado» #008080: no hay ningún azul medio ni apagado. Con la distancia
   // redmean, #4682B4 (azul acero, HSL 207°, 44 % de SATURACIÓN — cualquier cosa menos gris)

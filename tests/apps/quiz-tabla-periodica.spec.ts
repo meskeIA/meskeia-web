@@ -84,7 +84,11 @@ const CLAVE_IUPAC: Record<string, string> = {
   // Renio 5.596 °C por encima de Wolframio 5.555 °C, y la propia explicación de la app cita
   // los 5.555 °C. Aquí se escribe lo que la app afirma HOY para que el test no dé un falso
   // rojo; si alguien lo corrige a «Renio», hay que corregir también esta línea.
-  '¿Cuál es el elemento con mayor punto de ebullición?': 'Wolframio (Tungsteno)',
+  // CRC Handbook: renio 5.596 °C > wolframio 5.555 °C. Era el hallazgo 363: la app marcaba
+  // el Wolframio y trataba «Renio» como fallo, citando en su explicación el 5.555 °C que esa
+  // misma fuente le da al W. El enunciado nombra ahora la fuente, porque las tablas no
+  // coinciden en el wolframio (5.555 frente a 5.930 °C).
+  'Según el CRC Handbook, ¿cuál es el elemento con mayor punto de ebullición?': 'Renio',
   '¿Qué elemento tiene mayor densidad de todos los sólidos?': 'Osmio', // Os = 22,59 g/cm³ (Ir 22,56)
   // ── Familias ──
   '¿Cuál de los siguientes NO es un Gas Noble?': 'Cloro (Cl)', // Cl es halógeno, grupo 17
@@ -236,7 +240,12 @@ test.describe('Quiz Tabla Periódica', () => {
         page.locator(debeAcertar ? '[class*="feedbackCorrecto"]' : '[class*="feedbackIncorrecto"]'),
         `«${pregunta}» respondida ${debeAcertar ? 'bien' : 'mal'} a propósito`,
       ).toBeVisible();
-      await expect(contadorAciertos(page)).toContainText(`${CONTADOR_ESPERADO[n - 1]} aciertos`);
+      // Singular con 1: era el hallazgo 366 («1 aciertos»), y lo veía todo el que acertara
+      // la primera pregunta.
+      const acumulados = CONTADOR_ESPERADO[n - 1];
+      await expect(contadorAciertos(page)).toContainText(
+        `${acumulados} ${acumulados === 1 ? 'acierto' : 'aciertos'}`,
+      );
 
       if (n < TOTAL_PREGUNTAS) await botonAvanzar(page).click();
     }

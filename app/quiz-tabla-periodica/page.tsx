@@ -1,7 +1,8 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { BANCO_PREGUNTAS, TOTAL_BANCO, type Categoria, type Fase, type Pregunta } from './preguntas';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import LegalNotice from '@/components/LegalNotice';
@@ -11,353 +12,23 @@ import EducationalSection from '@/components/EducationalSection';
 import { getRelatedApps } from '@/data/app-relations';
 import styles from './QuizTablaPeriodica.module.css';
 
-type Categoria = 'numero-atomico' | 'grupo-periodo' | 'propiedades' | 'familia' | 'curiosidad';
-type Fase = 'inicio' | 'jugando' | 'resultado';
 
-interface Pregunta {
-  id: number;
-  pregunta: string;
-  opciones: string[];
-  correcta: number;
-  explicacion: string;
-  categoria: Categoria;
-}
-
-const ETIQUETAS_CATEGORIA: Record<Categoria, string> = {
-  'numero-atomico': '⚛️ Número atómico',
-  'grupo-periodo': '📊 Grupo y período',
-  'propiedades': '🔬 Propiedades',
-  'familia': '🧩 Familias',
-  'curiosidad': '💡 Curiosidades',
+/**
+ * Etiqueta de cada categoría, con el emoji SEPARADO del texto.
+ *
+ * Iban juntos en la misma cadena, así que el emoji viajaba dentro del rótulo y un lector de
+ * pantalla lo leía en voz alta en cada una de las diez preguntas. El candado
+ * `check:a11y-jsx` no podía verlo: solo sabe leer emojis literales en el JSX, y estos
+ * llegaban por variable. Separarlos en el dato es lo que permite ocultarlos al pintarlos.
+ */
+const ETIQUETAS_CATEGORIA: Record<Categoria, { emoji: string; texto: string }> = {
+  'numero-atomico': { emoji: '⚛️', texto: 'Número atómico' },
+  'grupo-periodo': { emoji: '📊', texto: 'Grupo y período' },
+  'propiedades': { emoji: '🔬', texto: 'Propiedades' },
+  'familia': { emoji: '🧩', texto: 'Familias' },
+  'curiosidad': { emoji: '💡', texto: 'Curiosidades' },
 };
 
-const BANCO_PREGUNTAS: Pregunta[] = [
-  {
-    id: 1,
-    pregunta: '¿Cuál es el número atómico del Oro (Au)?',
-    opciones: ['47', '79', '82', '29'],
-    correcta: 1,
-    explicacion: 'El Oro (Au) tiene número atómico 79. El 47 es la Plata (Ag), el 82 es el Plomo (Pb) y el 29 es el Cobre (Cu).',
-    categoria: 'numero-atomico',
-  },
-  {
-    id: 2,
-    pregunta: '¿Qué elemento tiene número atómico 1?',
-    opciones: ['Helio', 'Litio', 'Hidrógeno', 'Berilio'],
-    correcta: 2,
-    explicacion: 'El Hidrógeno (H) es el primer elemento de la tabla periódica. Es el más ligero y el más abundante del universo.',
-    categoria: 'numero-atomico',
-  },
-  {
-    id: 3,
-    pregunta: '¿Cuál es el número atómico del Hierro (Fe)?',
-    opciones: ['24', '26', '28', '30'],
-    correcta: 1,
-    explicacion: 'El Hierro (Fe, del latín "ferrum") tiene número atómico 26. Es el elemento más abundante en la Tierra por masa total.',
-    categoria: 'numero-atomico',
-  },
-  {
-    id: 4,
-    pregunta: '¿Qué elemento tiene número atómico 6?',
-    opciones: ['Nitrógeno', 'Oxígeno', 'Carbono', 'Boro'],
-    correcta: 2,
-    explicacion: 'El Carbono (C) tiene número atómico 6. Es la base de toda la química orgánica y puede formar millones de compuestos distintos.',
-    categoria: 'numero-atomico',
-  },
-  {
-    id: 5,
-    pregunta: '¿Cuál es el número atómico del Uranio (U)?',
-    opciones: ['88', '90', '92', '94'],
-    correcta: 2,
-    explicacion: 'El Uranio (U) tiene número atómico 92. Es el elemento natural más pesado en cantidades significativas en la Tierra.',
-    categoria: 'numero-atomico',
-  },
-  {
-    id: 6,
-    pregunta: '¿Qué elemento tiene número atómico 8?',
-    opciones: ['Flúor', 'Nitrógeno', 'Oxígeno', 'Azufre'],
-    correcta: 2,
-    explicacion: 'El Oxígeno (O) tiene número atómico 8. Constituye el 21% de la atmósfera terrestre y es esencial para la respiración.',
-    categoria: 'numero-atomico',
-  },
-  {
-    id: 7,
-    pregunta: '¿Cuál es el número atómico del Sodio (Na)?',
-    opciones: ['9', '11', '13', '15'],
-    correcta: 1,
-    explicacion: 'El Sodio (Na, del latín "Natrium") tiene número atómico 11. Es un metal alcalino muy reactivo que reacciona con el agua.',
-    categoria: 'numero-atomico',
-  },
-  {
-    id: 8,
-    pregunta: '¿Qué elemento tiene número atómico 2?',
-    opciones: ['Litio', 'Berilio', 'Hidrógeno', 'Helio'],
-    correcta: 3,
-    explicacion: 'El Helio (He) tiene número atómico 2. Es el segundo elemento más abundante del universo y el gas noble más ligero.',
-    categoria: 'numero-atomico',
-  },
-  {
-    id: 9,
-    pregunta: '¿A qué grupo pertenece el Carbono (C)?',
-    opciones: ['Grupo 12', 'Grupo 14', 'Grupo 16', 'Grupo 18'],
-    correcta: 1,
-    explicacion: 'El Carbono pertenece al Grupo 14. Comparte grupo con el Silicio (Si), Germanio (Ge), Estaño (Sn) y Plomo (Pb).',
-    categoria: 'grupo-periodo',
-  },
-  {
-    id: 10,
-    pregunta: '¿En qué período se encuentra el Sodio (Na)?',
-    opciones: ['Período 1', 'Período 2', 'Período 3', 'Período 4'],
-    correcta: 2,
-    explicacion: 'El Sodio está en el Período 3, junto al Magnesio, Aluminio, Silicio, Fósforo, Azufre, Cloro y Argón.',
-    categoria: 'grupo-periodo',
-  },
-  {
-    id: 11,
-    pregunta: '¿A qué grupo pertenecen los Gases Nobles?',
-    opciones: ['Grupo 1', 'Grupo 7', 'Grupo 17', 'Grupo 18'],
-    correcta: 3,
-    explicacion: 'Los Gases Nobles (He, Ne, Ar, Kr, Xe, Rn) pertenecen al Grupo 18. Tienen la capa de valencia completa, lo que los hace extremadamente poco reactivos.',
-    categoria: 'grupo-periodo',
-  },
-  {
-    id: 12,
-    pregunta: '¿A qué grupo pertenecen los Halógenos?',
-    opciones: ['Grupo 1', 'Grupo 7', 'Grupo 17', 'Grupo 18'],
-    correcta: 2,
-    explicacion: 'Los Halógenos (F, Cl, Br, I, At) pertenecen al Grupo 17. Son los no metales más reactivos y tienden a ganar un electrón.',
-    categoria: 'grupo-periodo',
-  },
-  {
-    id: 13,
-    pregunta: '¿En qué período se encuentran los Lantánidos?',
-    opciones: ['Período 4', 'Período 5', 'Período 6', 'Período 7'],
-    correcta: 2,
-    explicacion: 'Los Lantánidos (La al Lu, números atómicos 57-71) corresponden al Período 6, aunque se muestran separados al pie de la tabla por cuestiones de espacio.',
-    categoria: 'grupo-periodo',
-  },
-  {
-    id: 14,
-    pregunta: '¿A qué grupo pertenecen los Metales Alcalinos?',
-    opciones: ['Grupo 1', 'Grupo 2', 'Grupo 11', 'Grupo 17'],
-    correcta: 0,
-    explicacion: 'Los Metales Alcalinos (Li, Na, K, Rb, Cs, Fr) pertenecen al Grupo 1. Son los metales más reactivos y reaccionan violentamente con el agua.',
-    categoria: 'grupo-periodo',
-  },
-  {
-    id: 15,
-    pregunta: '¿En qué período se encuentra el Hierro (Fe)?',
-    opciones: ['Período 3', 'Período 4', 'Período 5', 'Período 6'],
-    correcta: 1,
-    explicacion: 'El Hierro está en el Período 4, junto a otros metales de transición importantes como el Cromo, Manganeso, Cobalto, Níquel y Cobre.',
-    categoria: 'grupo-periodo',
-  },
-  {
-    id: 16,
-    pregunta: '¿Cuál es el metal más abundante en la corteza terrestre?',
-    opciones: ['Hierro', 'Calcio', 'Aluminio', 'Sodio'],
-    correcta: 2,
-    explicacion: 'El Aluminio es el metal más abundante en la corteza terrestre (~8% en masa). El Oxígeno y Silicio son más abundantes pero no son metales.',
-    categoria: 'propiedades',
-  },
-  {
-    id: 17,
-    pregunta: '¿Cuál es el elemento más electronegativo de la tabla periódica?',
-    opciones: ['Oxígeno', 'Cloro', 'Nitrógeno', 'Flúor'],
-    correcta: 3,
-    explicacion: 'El Flúor (F) es el elemento más electronegativo (3,98 en la escala de Pauling). Esto lo hace extremadamente reactivo y oxidante.',
-    categoria: 'propiedades',
-  },
-  {
-    id: 18,
-    pregunta: '¿Qué dos elementos son líquidos a temperatura ambiente (25°C)?',
-    opciones: ['Mercurio y Galio', 'Mercurio y Bromo', 'Bromo y Cesio', 'Mercurio y Cesio'],
-    correcta: 1,
-    explicacion: 'Solo el Mercurio (metal) y el Bromo (no metal) son líquidos a 25°C. El Galio funde a 29,8°C y el Cesio a 28,5°C, muy cerca pero son sólidos.',
-    categoria: 'propiedades',
-  },
-  {
-    id: 19,
-    pregunta: '¿Qué metal tiene el punto de fusión más alto de todos?',
-    opciones: ['Platino', 'Osmio', 'Wolframio (Tungsteno)', 'Renio'],
-    correcta: 2,
-    explicacion: 'El Wolframio (W) tiene el punto de fusión más alto: 3.422°C. Por eso se usa en filamentos de bombillas incandescentes.',
-    categoria: 'propiedades',
-  },
-  {
-    id: 20,
-    pregunta: '¿Cuál es el elemento más abundante en el universo?',
-    opciones: ['Helio', 'Oxígeno', 'Hidrógeno', 'Carbono'],
-    correcta: 2,
-    explicacion: 'El Hidrógeno constituye aproximadamente el 75% de la masa del universo. Las estrellas como el Sol son principalmente Hidrógeno.',
-    categoria: 'propiedades',
-  },
-  {
-    id: 21,
-    pregunta: '¿Cuál es el metal más ligero (menor densidad)?',
-    opciones: ['Sodio', 'Potasio', 'Litio', 'Berilio'],
-    correcta: 2,
-    explicacion: 'El Litio (Li) es el metal más ligero con densidad 0,534 g/cm³, menor que la del agua. Puede flotar en agua y en aceite.',
-    categoria: 'propiedades',
-  },
-  {
-    id: 22,
-    pregunta: '¿Cuál es el gas noble más abundante en la atmósfera terrestre?',
-    opciones: ['Helio', 'Neón', 'Argón', 'Kriptón'],
-    correcta: 2,
-    explicacion: 'El Argón (Ar) constituye el 0,93% de la atmósfera. El Helio es muy escaso porque es tan ligero que acaba escapando al espacio.',
-    categoria: 'propiedades',
-  },
-  {
-    id: 23,
-    pregunta: '¿Cuál de los siguientes NO es un Gas Noble?',
-    opciones: ['Argón (Ar)', 'Kriptón (Kr)', 'Xenón (Xe)', 'Cloro (Cl)'],
-    correcta: 3,
-    explicacion: 'El Cloro (Cl) es un halógeno (Grupo 17), no un gas noble. Los gases nobles son He, Ne, Ar, Kr, Xe y Rn, todos en el Grupo 18.',
-    categoria: 'familia',
-  },
-  {
-    id: 24,
-    pregunta: '¿Cuál de los siguientes es un Metaloide?',
-    opciones: ['Sodio (Na)', 'Aluminio (Al)', 'Silicio (Si)', 'Cloro (Cl)'],
-    correcta: 2,
-    explicacion: 'El Silicio (Si) es un metaloide: propiedades intermedias entre metales y no metales. Es el fundamento de los semiconductores modernos.',
-    categoria: 'familia',
-  },
-  {
-    id: 25,
-    pregunta: '¿Qué familia incluye al Flúor, Cloro, Bromo y Yodo?',
-    opciones: ['Metales alcalinos', 'Gases nobles', 'Halógenos', 'Metales de transición'],
-    correcta: 2,
-    explicacion: 'Los Halógenos (Grupo 17) incluyen F, Cl, Br, I y At. "Halógeno" significa "productor de sal" porque reaccionan con metales para formarlas.',
-    categoria: 'familia',
-  },
-  {
-    id: 26,
-    pregunta: '¿A qué familia pertenece el Hierro (Fe)?',
-    opciones: ['Metales alcalinos', 'Metales alcalinotérreos', 'Metales de transición', 'Lantánidos'],
-    correcta: 2,
-    explicacion: 'El Hierro pertenece a los Metales de Transición (Grupos 3-12), junto al Cobre, Zinc, Plata, Oro y Platino, entre otros.',
-    categoria: 'familia',
-  },
-  {
-    id: 27,
-    pregunta: '¿Cuál de estos elementos es un metal alcalinotérreo?',
-    opciones: ['Potasio (K)', 'Calcio (Ca)', 'Aluminio (Al)', 'Manganeso (Mn)'],
-    correcta: 1,
-    explicacion: 'El Calcio (Ca) es un metal alcalinotérreo (Grupo 2). Los alcalinotérreos son Be, Mg, Ca, Sr, Ba y Ra.',
-    categoria: 'familia',
-  },
-  {
-    id: 28,
-    pregunta: '¿Cuántos elementos forman el grupo de los Gases Nobles?',
-    opciones: ['5', '6', '7', '8'],
-    correcta: 1,
-    explicacion: 'Los Gases Nobles son 6: Helio (He), Neón (Ne), Argón (Ar), Kriptón (Kr), Xenón (Xe) y Radón (Rn). El Oganesón (Og) es artificial.',
-    categoria: 'familia',
-  },
-  {
-    id: 29,
-    pregunta: '¿Qué elemento da el color rojo a los fuegos artificiales?',
-    opciones: ['Potasio', 'Estroncio', 'Bario', 'Cobre'],
-    correcta: 1,
-    explicacion: 'El Estroncio (Sr) produce llamas rojo brillante. El Bario produce verde, el Cobre azul-verde y el Potasio violeta.',
-    categoria: 'curiosidad',
-  },
-  {
-    id: 30,
-    pregunta: '¿Cuál es el único metal líquido a temperatura ambiente estándar?',
-    opciones: ['Galio', 'Cesio', 'Mercurio', 'Plomo'],
-    correcta: 2,
-    explicacion: 'El Mercurio (Hg) es el único metal líquido a 25°C. El Galio funde a 29,8°C y el Cesio a 28,5°C, muy cerca pero siguen siendo sólidos.',
-    categoria: 'curiosidad',
-  },
-  {
-    id: 31,
-    pregunta: '¿Qué elemento es el principal componente de los chips modernos?',
-    opciones: ['Germanio', 'Carbono', 'Silicio', 'Galio'],
-    correcta: 2,
-    explicacion: 'El Silicio (Si) es la base de la industria semiconductora. Los chips de ordenadores y teléfonos están fabricados con Silicio ultrapuro.',
-    categoria: 'curiosidad',
-  },
-  {
-    id: 32,
-    pregunta: '¿Cuál fue el primer elemento sintético creado por el ser humano?',
-    opciones: ['Plutonio', 'Tecnecio', 'Americio', 'Curio'],
-    correcta: 1,
-    explicacion: 'El Tecnecio (Tc, número atómico 43) fue el primer elemento creado artificialmente, en 1937. Su nombre viene del griego "technetos" (artificial).',
-    categoria: 'curiosidad',
-  },
-  {
-    id: 33,
-    pregunta: '¿Qué elemento es esencial para la fotosíntesis y tiene símbolo Mg?',
-    opciones: ['Manganeso', 'Molibdeno', 'Mercurio', 'Magnesio'],
-    correcta: 3,
-    explicacion: 'El Magnesio (Mg) es el átomo central de la molécula de clorofila. Sin él, las plantas no pueden captar energía solar para la fotosíntesis.',
-    categoria: 'curiosidad',
-  },
-  {
-    id: 34,
-    pregunta: '¿Por qué el Wolframio tiene símbolo W?',
-    opciones: [
-      'Su nombre alemán es "Wolfram"',
-      'Error histórico del IUPAC',
-      'Abreviatura de "Wolfganium"',
-      'Lo nombró el físico Wolfgang Pauli',
-    ],
-    correcta: 0,
-    explicacion: 'El símbolo W viene del alemán "Wolfram", nombre con el que se conoce este elemento en Alemania y otros países. En inglés se llama Tungsten.',
-    categoria: 'curiosidad',
-  },
-  {
-    id: 35,
-    pregunta: '¿Qué elemento da el color amarillo brillante a las llamas?',
-    opciones: ['Potasio', 'Sodio', 'Litio', 'Calcio'],
-    correcta: 1,
-    explicacion: 'El Sodio (Na) produce llamas de color amarillo brillante e inconfundible. Esta es la base de las lámparas de vapor de sodio usadas en el alumbrado público.',
-    categoria: 'curiosidad',
-  },
-  {
-    id: 36,
-    pregunta: '¿Qué gas se usa en los globos de helio de las fiestas?',
-    opciones: ['Hidrógeno', 'Neón', 'Helio', 'Nitrógeno'],
-    correcta: 2,
-    explicacion: 'El Helio se usa en globos porque es más ligero que el aire y no inflamable. El Hidrógeno también elevaría los globos, pero es explosivo (desastre del Hindenburg, 1937).',
-    categoria: 'curiosidad',
-  },
-  {
-    id: 37,
-    pregunta: '¿Cuál es el elemento más reactivo de todos?',
-    opciones: ['Sodio', 'Potasio', 'Cesio', 'Flúor'],
-    correcta: 3,
-    explicacion: 'El Flúor (F) es el elemento más reactivo. Reacciona con casi cualquier sustancia, incluso con algunos gases nobles. Entre los metales, el Cesio y el Francio son los más reactivos.',
-    categoria: 'curiosidad',
-  },
-  {
-    id: 38,
-    pregunta: '¿Qué elemento tiene el mayor número de isótopos estables?',
-    opciones: ['Plomo', 'Estaño', 'Teluro', 'Xenón'],
-    correcta: 1,
-    explicacion: 'El Estaño (Sn) tiene 10 isótopos estables, más que cualquier otro elemento. Le sigue el Xenón con 9 isótopos estables.',
-    categoria: 'curiosidad',
-  },
-  {
-    id: 39,
-    pregunta: '¿Cuál es el elemento con mayor punto de ebullición?',
-    opciones: ['Platino', 'Renio', 'Wolframio (Tungsteno)', 'Osmio'],
-    correcta: 2,
-    explicacion: 'El Wolframio (W) tiene tanto el punto de fusión (3.422°C) como el de ebullición (5.555°C) más altos de todos los metales.',
-    categoria: 'propiedades',
-  },
-  {
-    id: 40,
-    pregunta: '¿Qué elemento tiene mayor densidad de todos los sólidos?',
-    opciones: ['Platino', 'Iridio', 'Osmio', 'Wolframio'],
-    correcta: 2,
-    explicacion: 'El Osmio (Os) tiene la mayor densidad de todos los elementos sólidos: 22,59 g/cm³. El Iridio es muy similar (22,56 g/cm³), ambos superan ampliamente al Plomo (11,3 g/cm³).',
-    categoria: 'propiedades',
-  },
-];
 
 const TOTAL_PREGUNTAS = 10;
 
@@ -380,6 +51,17 @@ export default function QuizTablaPeriodicaPage() {
   const pregunta = preguntas[indice];
   const haRespondido = seleccionada !== null;
   const totalAciertos = aciertos.filter(Boolean).length;
+
+  /**
+   * Al responder, el botón pulsado queda `disabled` y el navegador suelta el foco al
+   * <body>: quien juega con teclado tenía que tabular el documento entero para llegar a
+   * «Siguiente pregunta», diez veces por partida. Aquí el foco se lleva a ese botón, que es
+   * la única acción que queda por hacer.
+   */
+  const botonSiguienteRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (haRespondido) botonSiguienteRef.current?.focus();
+  }, [haRespondido, indice]);
 
   function iniciarQuiz() {
     setPreguntas(mezclarArray(BANCO_PREGUNTAS).slice(0, TOTAL_PREGUNTAS));
@@ -457,7 +139,7 @@ export default function QuizTablaPeriodicaPage() {
       <header className={styles.hero}>
         <h1 className={styles.heroTitle}><span aria-hidden="true">⚗️</span> Quiz Tabla Periódica</h1>
         <p className={styles.heroSubtitle}>
-          40+ preguntas sobre elementos, grupos, propiedades y curiosidades
+          {TOTAL_BANCO} preguntas sobre elementos, grupos, propiedades y curiosidades
         </p>
       </header>
 
@@ -467,15 +149,17 @@ export default function QuizTablaPeriodicaPage() {
         {fase === 'inicio' && (
           <div className={styles.inicio}>
             <div className={styles.inicioCard}>
-              <div className={styles.inicioEmoji}>🧪</div>
+              <div className={styles.inicioEmoji} aria-hidden="true">🧪</div>
               <h2 className={styles.inicioTitulo}>¿Cuánto sabes de química?</h2>
               <p className={styles.inicioDesc}>
                 {TOTAL_PREGUNTAS} preguntas aleatorias de un banco de {BANCO_PREGUNTAS.length}.
                 Categorías: números atómicos, grupos, períodos, familias y curiosidades.
               </p>
               <div className={styles.categoriasBadges}>
-                {(Object.entries(ETIQUETAS_CATEGORIA) as [Categoria, string][]).map(([cat, etiqueta]) => (
-                  <span key={cat} className={styles.badge}>{etiqueta}</span>
+                {(Object.entries(ETIQUETAS_CATEGORIA) as [Categoria, { emoji: string; texto: string }][]).map(([cat, etiqueta]) => (
+                  <span key={cat} className={styles.badge}>
+                    <span aria-hidden="true">{etiqueta.emoji}</span> {etiqueta.texto}
+                  </span>
                 ))}
               </div>
               <button type="button" className={styles.btnPrimario} onClick={iniciarQuiz}>
@@ -490,7 +174,7 @@ export default function QuizTablaPeriodicaPage() {
             <div className={styles.progreso}>
               <div className={styles.progresoInfo}>
                 <span>Pregunta {indice + 1} de {TOTAL_PREGUNTAS}</span>
-                <span className={styles.aciertosProgreso}><span aria-hidden="true">✓</span> {totalAciertos} aciertos</span>
+                <span className={styles.aciertosProgreso}><span aria-hidden="true">✓</span> {totalAciertos} {totalAciertos === 1 ? 'acierto' : 'aciertos'}</span>
               </div>
               <div className={styles.barraProgreso}>
                 <div
@@ -502,7 +186,8 @@ export default function QuizTablaPeriodicaPage() {
 
             <div className={styles.preguntaCard}>
               <span className={styles.categoriaBadge}>
-                {ETIQUETAS_CATEGORIA[pregunta.categoria]}
+                <span aria-hidden="true">{ETIQUETAS_CATEGORIA[pregunta.categoria].emoji}</span>{' '}
+                {ETIQUETAS_CATEGORIA[pregunta.categoria].texto}
               </span>
               <p className={styles.preguntaTexto}>{pregunta.pregunta}</p>
 
@@ -531,17 +216,30 @@ export default function QuizTablaPeriodicaPage() {
                 })}
               </div>
 
-              {haRespondido && (
-                <div className={`${styles.feedback} ${seleccionada === pregunta.correcta ? styles.feedbackCorrecto : styles.feedbackIncorrecto}`}>
-                  <p className={styles.feedbackResultado}>
-                    {seleccionada === pregunta.correcta ? <><span aria-hidden="true">✓</span> ¡Correcto!</> : <><span aria-hidden="true">✗</span> Incorrecto</>}
-                  </p>
-                  <p className={styles.explicacion}>{pregunta.explicacion}</p>
-                  <button type="button" className={styles.btnSiguiente} onClick={siguiente}>
-                    {indice + 1 >= TOTAL_PREGUNTAS ? 'Ver resultados →' : 'Siguiente pregunta →'}
-                  </button>
-                </div>
-              )}
+              {/* role="status" para que el veredicto y la explicación se anuncien solos: es
+                  el momento en que la app enseña algo, y sin región viva no llegaba. Solo se
+                  actualiza al responder, no en bucle, así que no atropella al lector. */}
+              <div role="status" aria-live="polite">
+                {haRespondido && (
+                  <div className={`${styles.feedback} ${seleccionada === pregunta.correcta ? styles.feedbackCorrecto : styles.feedbackIncorrecto}`}>
+                    <p className={styles.feedbackResultado}>
+                      {seleccionada === pregunta.correcta ? <><span aria-hidden="true">✓</span> ¡Correcto!</> : <><span aria-hidden="true">✗</span> Incorrecto</>}
+                    </p>
+                    <p className={styles.explicacion}>{pregunta.explicacion}</p>
+                    {/* El foco salta aquí al responder: el botón que se acaba de pulsar queda
+                        `disabled` y el navegador lo suelta al <body>, así que sin esto había
+                        que tabular el documento entero para llegar a la pregunta siguiente. */}
+                    <button
+                      type="button"
+                      className={styles.btnSiguiente}
+                      onClick={siguiente}
+                      ref={botonSiguienteRef}
+                    >
+                      {indice + 1 >= TOTAL_PREGUNTAS ? 'Ver resultados →' : 'Siguiente pregunta →'}
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -554,7 +252,7 @@ export default function QuizTablaPeriodicaPage() {
                 <span className={styles.puntuacionTotal}>/{TOTAL_PREGUNTAS}</span>
               </div>
               <div className={styles.mensajeFinal}>
-                <span className={styles.mensajeEmoji}>{getMensaje().emoji}</span>
+                <span className={styles.mensajeEmoji} aria-hidden="true">{getMensaje().emoji}</span>
                 <p className={styles.mensajeTexto}>{getMensaje().texto}</p>
               </div>
               <div className={styles.statsGrid}>

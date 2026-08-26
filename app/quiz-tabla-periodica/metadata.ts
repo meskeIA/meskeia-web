@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
+import { TOTAL_BANCO } from './preguntas';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Quiz Tabla Periódica — Pon a prueba tu química | meskeIA',
   description:
-    'Quiz interactivo sobre la tabla periódica: números atómicos, grupos, períodos, familias de elementos y propiedades. 40+ preguntas de química. ¿Cuánto sabes de los elementos?',
+    `Quiz interactivo sobre la tabla periódica: números atómicos, grupos, períodos, familias de elementos y propiedades. ${TOTAL_BANCO} preguntas de química. ¿Cuánto sabes de los elementos?`,
   keywords: [
     'quiz tabla periódica',
     'test química',
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Quiz Tabla Periódica | meskeIA',
     description:
-      '40+ preguntas sobre elementos, grupos, propiedades y curiosidades de la tabla periódica. ¿Eres un experto en química?',
+      `${TOTAL_BANCO} preguntas sobre elementos, grupos, propiedades y curiosidades de la tabla periódica. ¿Eres un experto en química?`,
     url: 'https://meskeia.com/quiz-tabla-periodica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -39,7 +40,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Quiz Tabla Periódica",
-  description: "Quiz interactivo sobre la tabla periódica: números atómicos, grupos, períodos, familias de elementos y propiedades. 40+ preguntas de química. ¿Cuánto sabes de los elementos?",
+  description: `Quiz interactivo sobre la tabla periódica: números atómicos, grupos, períodos, familias de elementos y propiedades. ${TOTAL_BANCO} preguntas de química. ¿Cuánto sabes de los elementos?`,
   url: "https://meskeia.com/quiz-tabla-periodica/",
   category: 'EducationalApplication',
   features: [],
@@ -78,7 +79,7 @@ export const faqJsonLd = {
       name: '¿Para qué sirve estudiar la tabla periódica?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Conocer la tabla periódica permite predecir el comportamiento químico de los elementos, entender cómo se forman los compuestos y enlazar la química con la física cuántica. Es la base de la química, la farmacología, la materiales y la ingeniería. En el ámbito educativo es contenido obligatorio en la ESO, el bachillerato científico y los primeros cursos universitarios de ciencias.',
+        text: 'Conocer la tabla periódica permite predecir el comportamiento químico de los elementos, entender cómo se forman los compuestos y enlazar la química con la física cuántica. Es la base de la química, la farmacología, la ciencia de materiales y la ingeniería. En el ámbito educativo es contenido obligatorio en la ESO, el bachillerato científico y los primeros cursos universitarios de ciencias.',
       },
     },
     {

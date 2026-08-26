@@ -56,6 +56,15 @@ const PALETA: ColorNombrado[] = [
   { nombre: 'Cian', hex: '#00FFFF' },
   { nombre: 'Celeste', hex: '#87CEEB' },
   { nombre: 'Azul claro', hex: '#ADD8E6' },
+  // Tres azules MEDIOS. Sin ellos la paleta saltaba del «Azul» muy saturado (#0057E7) al
+  // «Celeste» pastel, y con la distancia redmean —que está bien implementada— toda la franja
+  // de azules cotidianos caía fuera de la familia: los vaqueros, la loza, la señalética y el
+  // propio azul de marca de meskeIA salían «Gris» o «Verde azulado». El código HEX era
+  // siempre exacto, pero la promesa de esta app a una persona con daltonismo es poner NOMBRE
+  // al color, y «Gris» para un azul no es un nombre aproximado: es un nombre equivocado.
+  { nombre: 'Azul acero', hex: '#4682B4' },
+  { nombre: 'Azul grisáceo', hex: '#6A8CAF' },
+  { nombre: 'Azul petróleo', hex: '#2E86AB' },
   { nombre: 'Azul', hex: '#0057E7' },
   { nombre: 'Azul marino', hex: '#000080' },
   { nombre: 'Azul oscuro', hex: '#00008B' },
@@ -218,13 +227,24 @@ export default function IdentificadorColorPage() {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = requestAnimationFrame(muestrearCentro);
     } catch (err) {
+      // Se clasifica por `name`, que es el valor ESTANDARIZADO de DOMException, y no por
+      // `message`, que es texto en inglés que fija cada navegador. Con el mensaje:
+      //   · la rama de «NotFound» era código muerto, porque Chrome dice «Requested device
+      //     not found», que no contiene esa cadena;
+      //   · Firefox y Safari deniegan el permiso con «The request is not allowed by the
+      //     user agent…», que no contiene ni «Permission» ni «NotAllowed», así que en un
+      //     iPhone —el escenario principal de una app de cámara— salía esa frase en inglés
+      //     en vez de cómo reactivar el permiso.
+      const nombre = err instanceof DOMException ? err.name : '';
       const msg = err instanceof Error ? err.message : 'Error desconocido';
-      if (msg.includes('Permission') || msg.includes('NotAllowed')) {
+      if (nombre === 'NotAllowedError' || nombre === 'SecurityError') {
         setErrorCamara('Permiso de cámara denegado. Actívalo en la configuración del navegador, o usa el modo imagen para analizar una foto.');
-      } else if (msg.includes('NotFound')) {
+      } else if (nombre === 'NotFoundError' || nombre === 'OverconstrainedError') {
         setErrorCamara('No se encontró ninguna cámara. Puedes usar el modo imagen para analizar una foto.');
+      } else if (nombre === 'NotReadableError') {
+        setErrorCamara('La cámara está ocupada por otra aplicación. Ciérrala e inténtalo de nuevo, o usa el modo imagen.');
       } else {
-        setErrorCamara(`No se pudo acceder a la cámara: ${msg}. Prueba con el modo imagen.`);
+        setErrorCamara(`No se pudo acceder a la cámara (${nombre || msg}). Prueba con el modo imagen.`);
       }
     }
   }, [muestrearCentro]);
@@ -272,6 +292,10 @@ export default function IdentificadorColorPage() {
     setColor(null);
     setCalibracion(null);
     setAvisoCalib(null);
+    // La sección del modo imagen se desmonta al cambiar de pestaña, así que su canvas se
+    // pierde: al volver se monta uno nuevo, vacío y transparente. Sin reiniciar esto, el
+    // lienzo seguía visible y clicable, y leía [0,0,0,0] como si fuera negro de verdad.
+    setHayImagen(false);
   }, [modo, detenerCamara]);
 
   // Modo imagen: cargar archivo
@@ -294,6 +318,25 @@ export default function IdentificadorColorPage() {
     img.src = URL.createObjectURL(file);
   }, []);
 
+  /**
+   * Lee el píxel de unas coordenadas del lienzo. Antes vivía dentro del manejador del clic,
+   * así que la lectura por teclado no podía reutilizarla.
+   */
+  const leerPixel = useCallback((x: number, y: number) => {
+    const canvas = imagenCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    if (!ctx) return;
+    const d = ctx.getImageData(x, y, 1, 1).data;
+    // Un píxel totalmente transparente no es un color: es que no hay imagen ahí. Devolverlo
+    // como negro es lo que producía el «Negro» del lienzo fantasma (hallazgo 392).
+    if (d[3] === 0) return;
+    const nuevo = { r: d[0], g: d[1], b: d[2] };
+    setColor(nuevo);
+    const c = calibracion ? aplicarGanancia(nuevo, calibracion) : nuevo;
+    anadirHistorial(rgbAHex(c.r, c.g, c.b));
+  }, [anadirHistorial, calibracion]);
+
   // Modo imagen: leer píxel al tocar/clicar
   const onSeleccionImagen = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = imagenCanvasRef.current;
@@ -301,14 +344,17 @@ export default function IdentificadorColorPage() {
     const rect = canvas.getBoundingClientRect();
     const x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
     const y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height));
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    if (!ctx) return;
-    const d = ctx.getImageData(x, y, 1, 1).data;
-    const nuevo = { r: d[0], g: d[1], b: d[2] };
-    setColor(nuevo);
-    const c = calibracion ? aplicarGanancia(nuevo, calibracion) : nuevo;
-    anadirHistorial(rgbAHex(c.r, c.g, c.b));
-  }, [anadirHistorial, calibracion]);
+    leerPixel(x, y);
+  }, [leerPixel]);
+
+  /** Enter y Espacio leen el centro de la imagen: el canvas ya se anunciaba como botón. */
+  const onTeclaImagen = useCallback((e: React.KeyboardEvent<HTMLCanvasElement>) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    const canvas = imagenCanvasRef.current;
+    if (!canvas) return;
+    leerPixel(Math.floor(canvas.width / 2), Math.floor(canvas.height / 2));
+  }, [leerPixel]);
 
   const copiar = useCallback((texto: string) => {
     navigator.clipboard?.writeText(texto).then(() => {
@@ -449,20 +495,31 @@ export default function IdentificadorColorPage() {
                 : 'Sube una foto o una captura de pantalla. Se analiza en tu dispositivo, no se sube a ningún servidor.'}
             </p>
           </div>
+          {/* El canvas era una parada de tabulador MUERTA: declaraba role="button" y
+              tabIndex 0, recibía el foco y hasta tenía su :focus-visible, pero solo llevaba
+              onClick — Enter y Espacio no hacían nada (WCAG 2.1.1). Y el público declarado
+              de esta app incluye baja visión, que es quien más navega con teclado. Ahora
+              responde a las dos teclas leyendo el centro de la imagen, y lo dice. */}
           <canvas
             ref={imagenCanvasRef}
             className={`${styles.imagenCanvas} ${hayImagen ? '' : styles.oculto}`}
             onClick={onSeleccionImagen}
+            onKeyDown={onTeclaImagen}
             role="button"
             tabIndex={hayImagen ? 0 : -1}
-            aria-label="Imagen cargada. Toca un punto para leer su color."
+            aria-label="Imagen cargada. Toca un punto para leer su color, o pulsa Enter para leer el del centro."
           />
         </section>
       )}
 
-      {/* RESULTADO */}
+      {/* RESULTADO — sin aria-live sobre el bloque entero: con la cámara en marcha su
+          contenido se reescribe unas 8 veces por segundo, el lector encola cada cambio y
+          nunca vacía la cola, de modo que no llegaba a oírse ni la etiqueta de «Congelar
+          lectura», que es justamente la salida del bucle. Y envolver contenido INTERACTIVO
+          en una región viva agrava el efecto: los tres botones de copiar se releían enteros
+          cada vez. El nombre del color se anuncia al detener la lectura, no en bucle. */}
       {colorMostrado && hex && hsl && nombre && (
-        <section className={styles.resultado} aria-live="polite" aria-label="Color identificado">
+        <section className={styles.resultado} aria-label="Color identificado">
           <div className={styles.muestraGrande} style={{ backgroundColor: hex, color: textoContraste }}>
             <span className={styles.muestraNombre}>{nombre}</span>
             <span className={styles.muestraHex}>{hex}</span>
