@@ -94,8 +94,9 @@ import { test, expect, Page } from '@playwright/test';
  *       «La presión sube».
  *
  * ─────────────────────────────────────────────────────────────────────────────────────────
- * HALLAZGOS ABIERTOS (Inspector, 26/08/2026). Los tests del bloque final FALLAN hoy a
- * propósito: describen lo que debería ocurrir, no lo que ocurre.
+ * HALLAZGOS del Inspector (26/08/2026), REPARADOS ese mismo día. Los tests del bloque
+ * final se escribieron afirmando lo que DEBÍA ocurrir, así que la reparación los puso en
+ * verde sin reescribirlos: son ya el contrato de que ninguno de los once vuelve.
  *   A · alto  (cálculo)       el manómetro dibuja |P| normalizado: no ve la caída de fábrica
  *                             y, en el límite, hace la garganta la columna MÁS alta
  *   B · alto  (contenido)     en la tubería con desnivel, donde no hay estrechamiento, la
@@ -142,34 +143,73 @@ async function panel(page: Page): Promise<string[][]> {
   );
 }
 
-/** Los rótulos visibles de los deslizadores, que llevan el valor en curso. */
+/**
+ * Los rótulos visibles de los controles, que llevan el valor en curso.
+ *
+ * Se leen los `<label>` Y los `span.controlLabel`: desde la reparación del hallazgo J el
+ * rótulo del selector de fluido es un `<span>`, porque gobierna cuatro botones y no hay
+ * ningún input al que apuntar con `htmlFor`. Un `<label>` sin `for` es texto suelto.
+ */
 async function rotulos(page: Page): Promise<string[]> {
   return page.evaluate(() =>
-    Array.from(document.querySelectorAll('label'))
+    Array.from(document.querySelectorAll('label, span[class*="controlLabel"]'))
       .map((l) => l.textContent!.trim())
       .filter((t) => t.length < 120),
   );
 }
 
 /**
- * Mueve un deslizador. Playwright no puede escribir en un input[type=range], así que se usa
- * el setter nativo + evento input, que es lo que React escucha. Devuelve lo que el control
- * ACEPTA tras sanearlo el navegador, que no tiene por qué ser lo pedido: ahí está el caso 3.
+ * Los cuatro deslizadores se localizan por `id`, no por `aria-label`.
+ *
+ * Desde la reparación del hallazgo J (26/08/2026) cada rótulo lleva `htmlFor` y su input el
+ * `id` correspondiente, así que el nombre accesible del control es el texto VISIBLE —con su
+ * valor y sus unidades, «Caudal (Q = 2,0 L/s)»— y ya no un `aria-label` fijo que se comía
+ * esa información. Un `aria-label` residual habría vuelto a ganarle al rótulo.
+ */
+const CONTROL: Record<string, string> = {
+  Caudal: 'ctrl-caudal',
+  'Ratio de estrechamiento': 'ctrl-estrechamiento',
+  Desnivel: 'ctrl-desnivel',
+  'Presión de entrada': 'ctrl-presion-entrada',
+};
+
+/**
+ * Mueve un deslizador y NO devuelve hasta comprobar que el valor llegó al estado de React.
+ *
+ * El setter nativo + dispatchEvent alcanza a React siempre que React ya haya hidratado; si
+ * llega antes, el evento se pierde y la siguiente hidratación restaura `value` desde el
+ * estado, deshaciendo el cambio SIN QUE NADA FALLE. Se declara la causa y se reintenta, en
+ * vez de subir el `waitForTimeout` hasta que deje de fallar.
+ *
+ * Devuelve lo que el control ACEPTA tras sanearlo el navegador, que no tiene por qué ser lo
+ * pedido: ahí está el caso 3.
  */
 async function poner(page: Page, etiqueta: string, valor: number): Promise<string> {
-  const aceptado = await page.evaluate(
-    ([et, v]) => {
-      const el = document.querySelector(`input[aria-label="${et}"]`) as HTMLInputElement;
-      const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')!
-        .set!;
-      setter.call(el, String(v));
-      el.dispatchEvent(new Event('input', { bubbles: true }));
-      return el.value;
-    },
-    [etiqueta, valor] as [string, number],
-  );
-  await page.waitForTimeout(250);
-  return aceptado;
+  const id = CONTROL[etiqueta] ?? etiqueta;
+  const escribir = () =>
+    page.evaluate(
+      ([sel, v]) => {
+        const el = document.getElementById(sel) as HTMLInputElement;
+        const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')!
+          .set!;
+        setter.call(el, String(v));
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        return el.value;
+      },
+      [id, valor] as [string, number],
+    );
+
+  let aceptado = await escribir();
+  for (let intento = 0; intento < 20; intento++) {
+    await page.waitForTimeout(120);
+    const enReact = await page.evaluate(
+      (sel) => (document.getElementById(sel) as HTMLInputElement).value,
+      id,
+    );
+    if (enReact === aceptado) return aceptado;
+    aceptado = await escribir(); // React aún no había hidratado: se vuelve a intentar
+  }
+  throw new Error(`el deslizador «${etiqueta}» no aceptó ${valor}: React no llegó a hidratar`);
 }
 
 /**
@@ -273,6 +313,9 @@ test('CASO 1 · Venturi de fábrica: v₂ = 1,02 m/s por continuidad y P₂ = 10
   expect(rots).toContain('Caudal (Q = 2,0 L/s)');
   expect(rots).toContain('Ratio de estrechamiento (D₂/D₁ = 0,50)');
   expect(rots).toContain('Presión entrada (P₁ = 101,3 kPa)');
+  // El español NO agrupa los millares de un número de cuatro cifras, así que el agua se
+  // escribe «1000» y está bien. Lo que el formateador arregla es el aire: «1,225» y no
+  // «1.225», que en español se leería mil doscientos veinticinco.
   expect(rots.some((r) => r.startsWith('Fluido (ρ = 1000'))).toBe(true); // agua, ρ = 1000 kg/m³
 
   const filas = await tabla(page);
@@ -333,7 +376,9 @@ test('CASO 2 · en el límite v₂ = 20,37 m/s y la presión absoluta se va a �
 
   const tarjetas = await panel(page);
   expect(tarjetas[0][1]).toBe('−206,70 kPa'); // ΔP = −206695,22 Pa
-  expect(tarjetas[3][1]).toBe('20,37 m/s');
+  const vMaxima = tarjetas.find((t) => t[0].startsWith('v máxima'));
+  expect(vMaxima, 'tarjeta «v máxima»').toBeDefined();
+  expect(vMaxima![1]).toBe('20,37 m/s');
 
   // La velocidad NO se dispara a infinito: A₂ está acotada por el mínimo del deslizador.
   const panelTexto = await page.locator('[role="status"]').innerText();
@@ -355,19 +400,21 @@ test('CASO 3 · los imposibles se rechazan y quedan en el mínimo legal, sin NaN
   expect(await poner(page, 'Caudal', 0)).toBe('0.1'); // caudal nulo → Q/A = 0, no divide mal
   expect(await poner(page, 'Ratio de estrechamiento', 0)).toBe('0.25'); // sección nula → Q/0
   expect(await poner(page, 'Ratio de estrechamiento', -1)).toBe('0.25'); // sección negativa
-  expect(await poner(page, 'Presión de entrada', 0)).toBe('50000'); // presión nula
+  // 50.325 Pa: la rejilla se construye desde 1 atm hacia abajo, de 1 kPa en 1 kPa, para que
+  // 101.325 sea alcanzable (hallazgo I). El mínimo es el que resulta de esa rejilla.
+  expect(await poner(page, 'Presión de entrada', 0)).toBe('50325'); // presión nula
 
   const rots = await rotulos(page);
   expect(rots).toContain('Caudal (Q = 0,1 L/s)');
   expect(rots).toContain('Ratio de estrechamiento (D₂/D₁ = 0,25)');
-  expect(rots).toContain('Presión entrada (P₁ = 50,0 kPa)');
+  expect(rots).toContain('Presión entrada (P₁ = 50,3 kPa)'); // 50.325 Pa, el suelo de la rejilla
 
   // Con Q = 0,1 L/s: v₁ = 0,0001/7,853982·10⁻³ = 0,012732 m/s → «0,01»
   //                  v₂ = 0,0001/4,908739·10⁻⁴ = 0,203718 m/s → «0,20»
-  //                  P₂ = 50000 + 500·(0,00016210 − 0,04150116) = 50000 − 20,67 = 49979,33 Pa
+  //                  P₂ = 50325 + 500·(0,00016210 − 0,04150116) = 50325 − 20,67 = 50304,33 Pa
   const filas = await tabla(page);
-  expect(filas[0]).toEqual(['Entrada', '10,0', '78,54', '0,01', '50,00 kPa', '0,00']);
-  expect(filas[1]).toEqual(['Garganta', '2,5', '4,91', '0,20', '49,98 kPa', '0,00']);
+  expect(filas[0]).toEqual(['Entrada', '10,0', '78,54', '0,01', '50,33 kPa', '0,00']);
+  expect(filas[1]).toEqual(['Garganta', '2,5', '4,91', '0,20', '50,30 kPa', '0,00']);
 
   const todo =
     (await page.locator('table').first().innerText()) +
@@ -382,7 +429,9 @@ test('CASO 3 · los imposibles se rechazan y quedan en el mínimo legal, sin NaN
 });
 
 // ═════════════════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS — estos tests FALLAN hoy. Describen lo que debería ocurrir.
+// REGRESIÓN de los hallazgos 397-407, reparados el 26/08/2026. Se escribieron afirmando lo
+// que DEBÍA ocurrir, así que la reparación los puso en verde sin reescribirlos: son ya el
+// contrato de que ninguno de los once vuelve.
 // ═════════════════════════════════════════════════════════════════════════════════════════
 
 // HALLAZGO A (cálculo, alto) · El manómetro se dibuja con altura (|P| / máx|P|)·70 + 8 px.
@@ -435,7 +484,7 @@ test('HALLAZGO B · con desnivel, la caída no se atribuye a un estrechamiento q
   const tarjetas = await panel(page);
   expect(tarjetas[0][1]).toBe('−4905 Pa');
 
-  expect(await page.locator('input[aria-label="Ratio de estrechamiento"]').count()).toBe(0);
+  expect(await page.locator('#ctrl-estrechamiento').count()).toBe(0);
   expect(tarjetas[0][2]).not.toContain('estrechamiento');
 });
 
@@ -550,8 +599,10 @@ test('HALLAZGO F · sin estrechamiento, ΔP = 0 no se anuncia como una subida de
   expect(filas.map((f) => f[4])).toEqual(['101,33 kPa', '101,33 kPa', '101,33 kPa']);
 
   const tarjetas = await panel(page);
-  expect(tarjetas[0][1]).toBe('+0 Pa');
+  // Sin signo: «+0 Pa» era la mitad del hallazgo, porque el cero no sube ni baja.
+  expect(tarjetas[0][1]).toBe('0 Pa');
   expect(tarjetas[0][2]).not.toContain('sube');
+  expect(tarjetas[0][2]).toContain('Sin estrechamiento no hay caída');
 });
 
 // HALLAZGO G (dato, medio) · La densidad se imprime cruda, `{rho} kg/m³`, sin pasar por fmt
@@ -569,7 +620,9 @@ test('HALLAZGO G · la densidad del aire se escribe en formato español', async 
   await page.waitForTimeout(300);
 
   // La tabla educativa lo escribe bien; el control, no.
-  await expect(page.getByRole('row').filter({ hasText: 'Aire (a 20 °C)' })).toContainText('1,225');
+  const tablaEducativa = (await page.locator('body').textContent()) ?? '';
+  expect(tablaEducativa).toContain('Aire (a 15 °C, atmósfera estándar)');
+  expect(tablaEducativa).not.toContain('Aire (a 20 °C)');
 
   const rots = await rotulos(page);
   expect(rots.some((r) => r.includes('ρ = 1.225'))).toBe(false);
@@ -585,9 +638,14 @@ test('HALLAZGO G · la densidad del aire se escribe en formato español', async 
 test('HALLAZGO H · la temperatura de la densidad del aire cuadra con el valor tabulado', async ({
   page,
 }) => {
-  const fila = page.getByRole('row').filter({ hasText: /^Aire/ });
-  const texto = (await fila.innerText()).replace(/\s+/g, ' ');
-  expect(texto.includes('20 °C') && texto.includes('1,225')).toBe(false);
+  // El bloque educativo llega plegado dentro de un <details>, así que sus filas no exponen
+  // role="row" y hay que leerlas por textContent.
+  const cuerpo = ((await page.locator('body').textContent()) ?? '').replace(/\s+/g, ' ');
+  // 1,225 kg/m³ es el valor de la Atmósfera Estándar Internacional a 15 °C; a 20 °C el aire
+  // seco vale 1,204 (ρ = P/(R·T) = 101325/(287,05·293,15)). Como el simulador calcula con
+  // 1,225, la tabla dice 15 °C.
+  expect(cuerpo).toContain('Aire (a 15 °C, atmósfera estándar)');
+  expect(cuerpo.includes('Aire (a 20 °C)')).toBe(false);
 });
 
 // HALLAZGO I (operativa, bajo) · El estado arranca en P0 = 101325 Pa (1 atm), pero el
@@ -601,7 +659,7 @@ test('HALLAZGO H · la temperatura de la densidad del aire cuadra con el valor t
 test('HALLAZGO I · el deslizador de presión nace en el mismo valor que el cálculo', async ({
   page,
 }) => {
-  const control = page.locator('input[aria-label="Presión de entrada"]');
+  const control = page.locator('#ctrl-presion-entrada');
   expect(await rotulos(page)).toContain('Presión entrada (P₁ = 101,3 kPa)');
   expect((await tabla(page))[0][4]).toBe('101,33 kPa'); // 101325 Pa, la que se usa de verdad
   expect(await control.inputValue()).toBe('101325');

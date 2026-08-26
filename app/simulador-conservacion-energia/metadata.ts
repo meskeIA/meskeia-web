@@ -46,7 +46,7 @@ export const jsonLd = generateWebAppSchema({
     'Controles de masa, altura inicial, gravedad y fricción',
     'Visualización de v, h, E_c, E_p y E_total en cualquier instante',
     'Comparación con la energía total inicial (línea de referencia)',
-    'Botones de play/pausa/reset y velocidad de simulación',
+    'Botones de iniciar, pausar y reiniciar la simulación',
   ],
   keywords: ['conservación de la energía', 'energía mecánica', 'cinética', 'potencial', 'fricción', 'EBAU', 'Bachillerato', 'preparatoria', 'secundaria', 'física'],
 });

@@ -38,6 +38,39 @@ interface SeccionData {
 // ============================================
 const G = 9.81;
 
+/** Presión atmosférica normal (Pa). Es el valor de referencia que cita el bloque educativo. */
+const P_ATMOSFERICA = 101325;
+
+/**
+ * Paso del deslizador de presión (Pa). La rejilla se construye DESDE la presión
+ * atmosférica —min = P_atm − 51 pasos— para que 101.325 Pa caiga exactamente en ella. Con
+ * min = 50.000 y step = 1.000 no caía: el navegador saneaba el pulgar a 101.000 mientras el
+ * rótulo y todo el cálculo seguían en 101.325, y en cuanto se tocaba el control 1 atm dejaba
+ * de ser alcanzable.
+ */
+const PASO_PRESION = 1000;
+
+/**
+ * Velocidad de referencia de la animación (m/s). Fija a propósito: si se derivase del propio
+ * caudal, éste se cancelaría y las partículas irían igual de rápido con 0,1 L/s que con 10.
+ */
+const V_REFERENCIA_ANIMACION = 0.5;
+
+/**
+ * Presión de vapor del agua a 20 °C (Pa). Por debajo de ella el líquido hierve a temperatura
+ * ambiente: es donde empieza la cavitación, el fenómeno que un Venturi extremo provoca de
+ * verdad y que la app no mencionaba ni al dar presiones absolutas NEGATIVAS.
+ */
+const P_VAPOR_AGUA_20C = 2339;
+
+/** Recorrido máximo del deslizador de desnivel (m). El dibujo se escala a él, no al valor. */
+const DESNIVEL_MAX = 10;
+
+/** Densidad en formato español: «1,225» para el aire y «1.000» para el agua. */
+function fmtDensidad(rho: number): string {
+  return rho.toLocaleString('es-ES', { maximumFractionDigits: 3 });
+}
+
 function fmt(n: number, decimales = 2): string {
   if (!isFinite(n)) return '∞';
   return n.toFixed(decimales).replace('.', ',');
@@ -185,6 +218,9 @@ export default function SimuladorFluidosBernoulliPage() {
   // Caudal másico
   const caudalMasico = useMemo(() => Q_m3s * rho, [Q_m3s, rho]);
 
+  /** La presión más baja de las tres secciones: la que decide si el modelo sigue siendo válido. */
+  const presionMinima = useMemo(() => Math.min(...datos.map(d => d.P)), [datos]);
+
   // ============================================
   // ANIMACIÓN PARTÍCULAS
   // ============================================
@@ -201,17 +237,19 @@ export default function SimuladorFluidosBernoulliPage() {
   }, []);
 
   const updateParticulas = useCallback((dt: number) => {
-    // Velocidad relativa: depende de v en cada x (más velocidad en zona estrecha)
-    const A0 = Math.PI * (0.10 / 2) * (0.10 / 2);
-    const v_ref = Q_m3s / A0; // velocidad de referencia
 
     for (const p of particulasRef.current) {
       const ancho = anchoEnX(p.x, geom, ratioEstrechamiento);
       const A_local = Math.PI * (ancho / 2) * (ancho / 2);
       const v_local = Q_m3s / A_local;
 
-      // Velocidad normalizada (0..1 representa la fracción de pantalla por segundo)
-      const vNorm = (v_local / v_ref) * 0.15;
+      // Velocidad normalizada (fracción de pantalla por segundo). Antes era
+      // (v_local/v_ref)·0,15, donde v_ref = Q/A0: Q se cancelaba y la animación solo
+      // dependía de la geometría, así que mover el caudal en TODO su recorrido —cien veces
+      // más— no cambiaba un píxel por segundo, mientras la metadata prometía «partículas
+      // fluyendo a velocidad real». Ahora la referencia es una velocidad FIJA, así que el
+      // caudal sí se ve. Se acota para que a 10 L/s el patrón siga siendo legible.
+      const vNorm = Math.min(v_local / V_REFERENCIA_ANIMACION, 6) * 0.15;
       p.x += vNorm * dt;
       if (p.x > 1) {
         p.x -= 1;
@@ -259,7 +297,11 @@ export default function SimuladorFluidosBernoulliPage() {
     const hMaxFis = geom === 'desnivel' ? alturaDesnivel : 0;
     // Para que el centro del tubo quede aproximadamente a media altura del canvas
     // y la subida llene plotH * 0.4, mapeamos altura física → desplazamiento vertical
-    const escalaY = (plotH * 0.5) / Math.max(1, hMaxFis);
+    // Escala FIJA sobre el recorrido completo del deslizador (0-10 m). Con la anterior
+    // —(plotH·0,5)/max(1, dh)— la subida ocupaba siempre la misma mitad del canvas para
+    // cualquier dh ≥ 1 m: el tubo salía idéntico píxel a píxel con 1 m y con 10, mientras la
+    // tabla sí cambiaba. Ahora arrastrar el control mueve el dibujo.
+    const escalaY = (plotH * 0.6) / DESNIVEL_MAX;
     const yCentral = (xn: number) => {
       const h = alturaEnX(xn, geom, alturaDesnivel);
       // Para desnivel: alto h → arriba (menor py)
@@ -336,10 +378,20 @@ export default function SimuladorFluidosBernoulliPage() {
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Manómetro: una "columna" arriba del tubo cuya altura es proporcional a la presión
-      // Normalizar presión: la columna más alta tiene unos 80 px
-      const Pmax = Math.max(...datos.map(dd => Math.abs(dd.P)), 100);
-      const colHeight = (Math.abs(d.P) / Pmax) * 70 + 8;
+      // Manómetro DIFERENCIAL: la columna mide la presión relativa dentro del rango de las
+      // tres secciones, no su valor absoluto. Con |P|/max|P| las tres salían de la misma
+      // altura —las presiones absolutas se diferencian un 0,5 %— y, en cuanto P₂ se volvía
+      // negativa, su módulo superaba al de la entrada y la garganta se dibujaba como la
+      // columna MÁS ALTA: el canvas afirmaba que donde menos presión hay es donde más marca
+      // el manómetro, lo contrario de lo que enseña la propia app.
+      const presiones = datos.map(dd => dd.P);
+      const pMin = Math.min(...presiones);
+      const pMax = Math.max(...presiones);
+      const rango = pMax - pMin;
+      // Sin diferencia de presión (tubo recto, dh = 0) las tres columnas son iguales, que es
+      // exactamente lo que hay que enseñar: no hay caída ninguna.
+      const fraccion = rango > 1e-9 ? (d.P - pMin) / rango : 0.5;
+      const colHeight = fraccion * 62 + 16;
       const manTop = pad.top - 4;
       const manBottom = manTop + colHeight;
 
@@ -492,7 +544,7 @@ export default function SimuladorFluidosBernoulliPage() {
         <div className={styles.controls}>
           <div className={styles.controlsGrid}>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
+              <label className={styles.controlLabel} htmlFor="ctrl-caudal">
                 Caudal (Q = <strong>{fmt(Q, 1)} L/s</strong>)
               </label>
               <input
@@ -503,14 +555,17 @@ export default function SimuladorFluidosBernoulliPage() {
                 value={Q}
                 onChange={e => setQ(parseFloat(e.target.value))}
                 className={styles.slider}
-                aria-label="Caudal"
+                id="ctrl-caudal"
               />
             </div>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
-                Fluido (ρ = <strong>{rho} kg/m³</strong>)
-              </label>
-              <div className={styles.fluidSelector} role="group" aria-label="Tipo de fluido">
+              {/* Sin htmlFor no hay control al que apuntar: son cuatro botones. El grupo
+                  se nombra con este rótulo —que lleva la densidad— en vez de con un
+                  aria-label fijo, para que el lector anuncie también el valor vigente. */}
+              <span className={styles.controlLabel} id="rotulo-fluido">
+                Fluido (ρ = <strong>{fmtDensidad(rho)} kg/m³</strong>)
+              </span>
+              <div className={styles.fluidSelector} role="group" aria-labelledby="rotulo-fluido">
                 {FLUIDOS.map(f => (
                   <button
                     type="button"
@@ -529,7 +584,7 @@ export default function SimuladorFluidosBernoulliPage() {
           <div className={styles.controlsGrid}>
             {geom !== 'desnivel' && (
               <div className={styles.controlGroup}>
-                <label className={styles.controlLabel}>
+                <label className={styles.controlLabel} htmlFor="ctrl-estrechamiento">
                   Ratio de estrechamiento (D₂/D₁ = <strong>{fmt(ratioEstrechamiento, 2)}</strong>)
                 </label>
                 <input
@@ -540,13 +595,13 @@ export default function SimuladorFluidosBernoulliPage() {
                   value={ratioEstrechamiento}
                   onChange={e => setRatio(parseFloat(e.target.value))}
                   className={styles.slider}
-                  aria-label="Ratio de estrechamiento"
+                  id="ctrl-estrechamiento"
                 />
               </div>
             )}
             {geom === 'desnivel' && (
               <div className={styles.controlGroup}>
-                <label className={styles.controlLabel}>
+                <label className={styles.controlLabel} htmlFor="ctrl-desnivel">
                   Desnivel (Δh = <strong>{fmt(alturaDesnivel, 1)} m</strong>)
                 </label>
                 <input
@@ -557,24 +612,36 @@ export default function SimuladorFluidosBernoulliPage() {
                   value={alturaDesnivel}
                   onChange={e => setAlturaDesnivel(parseFloat(e.target.value))}
                   className={styles.slider}
-                  aria-label="Desnivel"
+                  id="ctrl-desnivel"
                 />
               </div>
             )}
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
+              <label className={styles.controlLabel} htmlFor="ctrl-presion-entrada">
                 Presión entrada (P₁ = <strong>{fmt(P0 / 1000, 1)} kPa</strong>)
               </label>
+              {/* La rejilla arranca en 1 atm y avanza de 1 kPa, así que el valor inicial
+                  (101.325 Pa) es alcanzable y el pulgar no nace desplazado. Antes, con
+                  min = 50.000 y step = 1.000, el navegador saneaba a 101.000 mientras el
+                  rótulo y todo el cálculo seguían en 101.325. */}
               <input
                 type="range"
-                min={50000}
-                max={300000}
-                step={1000}
+                min={P_ATMOSFERICA - 51 * PASO_PRESION}
+                max={P_ATMOSFERICA + 198 * PASO_PRESION}
+                step={PASO_PRESION}
                 value={P0}
                 onChange={e => setP0(parseFloat(e.target.value))}
                 className={styles.slider}
-                aria-label="Presión de entrada"
+                id="ctrl-presion-entrada"
               />
+              <button
+                type="button"
+                className={styles.resetPresionBtn}
+                onClick={() => setP0(P_ATMOSFERICA)}
+                disabled={P0 === P_ATMOSFERICA}
+              >
+                Volver a 1 atm ({fmt(P_ATMOSFERICA / 1000, 3)} kPa)
+              </button>
             </div>
           </div>
 
@@ -637,15 +704,51 @@ export default function SimuladorFluidosBernoulliPage() {
         <div className={styles.resultsPanel} role="status" aria-live="polite" aria-atomic="true">
           <div className={styles.resultCardOk}>
             <span className={styles.resultLabel}>Diferencia de presión P₂ − P₁ {datos.length > 1 && `(de ${datos[0].nombre} a ${datos[1].nombre})`}</span>
-            <span className={styles.resultValueLarge} style={{ color: dP < 0 ? '#A82E68' : '#48A9A6' }}>
-              {dP < 0 ? '−' : '+'}{fmtPresion(Math.abs(dP))}
+            <span
+              className={styles.resultValueLarge}
+              style={{ color: dP < 0 ? '#A82E68' : dP > 0 ? '#48A9A6' : 'var(--text-primary)' }}
+            >
+              {dP < 0 ? '−' : dP > 0 ? '+' : ''}{fmtPresion(Math.abs(dP))}
             </span>
+            {/* Tres ramas, no dos. dP = 0 exacto no es rebuscado: es el extremo alto del
+                deslizador de estrechamiento (D₂/D₁ = 1, tubo recto) y el bajo del de desnivel
+                (dh = 0), los dos alcanzables de un tirón. Y con desnivel el diámetro es
+                CONSTANTE: atribuir la caída a un estrechamiento que no existe explicaba el
+                número por el mecanismo equivocado, contradiciendo a la tarjeta de la propia
+                geometría cuatro bloques más arriba. */}
             <span className={styles.resultRange}>
-              {dP < 0
-                ? '⚠️ La presión CAE en el estrechamiento (paradoja Bernoulli)'
-                : 'La presión sube'}
+              {dP === 0
+                ? geom === 'desnivel'
+                  ? 'Sin desnivel no hay caída: el tubo es horizontal y de sección constante'
+                  : 'Sin estrechamiento no hay caída: la sección es constante'
+                : dP < 0
+                  ? geom === 'desnivel'
+                    ? <><span aria-hidden="true">⚠️</span> Subir cuesta presión: se convierte en energía potencial (ρ·g·Δh)</>
+                    : <><span aria-hidden="true">⚠️</span> La presión CAE en el estrechamiento (paradoja Bernoulli)</>
+                  : 'La presión sube'}
             </span>
           </div>
+
+          {presionMinima < P_VAPOR_AGUA_20C && (
+            <div className={styles.avisoCavitacion} role="note">
+              <span aria-hidden="true">🫧</span>{' '}
+              {presionMinima < 0 ? (
+                <>
+                  <strong>Cavitación segura: presión absoluta negativa</strong> ({fmtPresion(presionMinima)}).
+                  El modelo ideal ha salido de su dominio — un líquido no puede tener presión absoluta
+                  negativa.
+                </>
+              ) : (
+                <>
+                  <strong>Zona de cavitación</strong> ({fmtPresion(presionMinima)}).
+                </>
+              )}{' '}
+              Por debajo de la presión de vapor —unos {fmt(P_VAPOR_AGUA_20C / 1000, 1)} kPa para el agua a
+              20 °C— el líquido hierve a temperatura ambiente y se forman burbujas que al colapsar erosionan
+              la tubería. Bernoulli ideal no lo contempla: sigue calculando como si el fluido aguantara
+              cualquier presión.
+            </div>
+          )}
 
           <div className={styles.resultCard}>
             <span className={styles.resultLabel}>Caudal másico</span>
@@ -664,7 +767,7 @@ export default function SimuladorFluidosBernoulliPage() {
           </div>
           <div className={styles.resultCard}>
             <span className={styles.resultLabel}>Densidad del fluido</span>
-            <span className={styles.resultValue}>{rho} kg/m³</span>
+            <span className={styles.resultValue}>{fmtDensidad(rho)} kg/m³</span>
             <span className={styles.resultRange}>{fluido.nombre}</span>
           </div>
         </div>
@@ -720,7 +823,7 @@ export default function SimuladorFluidosBernoulliPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>Aire (a 20 °C)</td>
+                  <td>Aire (a 15 °C, atmósfera estándar)</td>
                   <td>1,225</td>
                   <td>Casi 1000 veces menos denso que el agua</td>
                 </tr>
@@ -766,6 +869,13 @@ export default function SimuladorFluidosBernoulliPage() {
               <span className={styles.scenarioIcon} aria-hidden="true">🩺</span>
               <strong>Circulación sanguínea y estenosis</strong>
               <p>Una arteria parcialmente bloqueada (estenosis) acelera la sangre en la zona estrecha. La presión local cae, lo que el ecocardiograma Doppler detecta y cuantifica. Diferencias de presión &gt; 50 mmHg indican estenosis severa.</p>
+              <p className={styles.avisoEscala}>
+                <span aria-hidden="true">⚠️</span> <strong>La escala de esta geometría no es fisiológica.</strong>{' '}
+                El simulador usa el diámetro nominal de la tubería industrial (10 cm, unas cuatro veces
+                una aorta) y su caudal por defecto de 2 L/s equivale a 120 L/min, más de veinte veces el
+                gasto cardíaco completo. Sirve para ver el mecanismo —al estrechar, la velocidad sube y la
+                presión cae—, no para leer cifras de un vaso real ni para interpretar un Doppler.
+              </p>
             </div>
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">📏</span>
@@ -786,31 +896,31 @@ export default function SimuladorFluidosBernoulliPage() {
             <div className={styles.faqItem}>
               <h4>¿Por qué la presión CAE cuando el fluido se acelera?</h4>
               <p>Por <strong>conservación de la energía</strong>. La presión es energía potencial almacenada en el fluido; la velocidad es energía cinética. Si el fluido acelera, parte de la presión se ha &quot;convertido&quot; en velocidad. La suma P + ½ρv² + ρgh permanece constante a lo largo de la corriente.</p>
-              <p className={styles.faqTip}>💡 No es magia: es la misma idea que una pelota cayendo intercambia energía potencial por cinética. Aquí, presión por velocidad.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> No es magia: es la misma idea que una pelota cayendo intercambia energía potencial por cinética. Aquí, presión por velocidad.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Cuándo NO se cumple Bernoulli?</h4>
               <p>La ecuación clásica asume <strong>fluido ideal</strong> (sin viscosidad, incompresible) en régimen estacionario y a lo largo de una <em>línea de corriente</em>. NO se aplica directamente a: fluidos viscosos (miel, aceite muy frío), turbulencia, tubos con codos bruscos, gases a velocidades supersónicas, fluidos que se calientan o enfrían.</p>
-              <p className={styles.faqTip}>💡 En la práctica industrial se añaden términos de pérdidas por fricción (ecuación de Bernoulli generalizada o ecuación de energía).</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> En la práctica industrial se añaden términos de pérdidas por fricción (ecuación de Bernoulli generalizada o ecuación de energía).</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿De verdad los aviones vuelan por Bernoulli?</h4>
               <p>Es una <strong>parte</strong> de la explicación, pero no toda. La sustentación se debe sobre todo a la <em>desviación del aire hacia abajo</em> (3.ª ley de Newton: el ala empuja el aire abajo, el aire empuja al ala arriba). Bernoulli explica por qué la presión arriba del ala es menor, lo que contribuye a la fuerza neta. Ambos enfoques son correctos y complementarios.</p>
-              <p className={styles.faqTip}>💡 Una explicación &quot;sólo Bernoulli&quot; tiene problemas: no explica por qué un avión puede volar invertido. La realidad combina forma, ángulo de ataque y dinámica del aire.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Una explicación &quot;sólo Bernoulli&quot; tiene problemas: no explica por qué un avión puede volar invertido. La realidad combina forma, ángulo de ataque y dinámica del aire.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Cómo afecta la viscosidad?</h4>
               <p>La viscosidad <strong>disipa energía</strong>. En tuberías largas o con fluidos viscosos, parte de P + ½ρv² + ρgh se transforma en calor por fricción interna. La presión cae a lo largo del flujo aunque no haya estrechamiento. Eso lleva a las ecuaciones de Hagen-Poiseuille (régimen laminar) o Darcy-Weisbach (turbulento).</p>
-              <p className={styles.faqTip}>💡 Por eso el grifo de tu casa tiene menos presión que el de la red municipal: parte se ha disipado en las tuberías.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Por eso el grifo de tu casa tiene menos presión que el de la red municipal: parte se ha disipado en las tuberías.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Qué es el número de Reynolds y por qué importa?</h4>
               <p>Re = ρvL/μ, donde L es una longitud característica y μ la viscosidad. Mide la importancia relativa de fuerzas inerciales frente a viscosas. Re &lt; 2300 → flujo laminar (suave, Bernoulli funciona razonablemente). Re &gt; 4000 → flujo turbulento (caótico, hay que añadir correcciones empíricas). Entre medias: transición.</p>
-              <p className={styles.faqTip}>💡 Un grifo abierto un poco da chorro laminar; abierto del todo, turbulento. Tú mismo cambias Re con la mano.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Un grifo abierto un poco da chorro laminar; abierto del todo, turbulento. Tú mismo cambias Re con la mano.</p>
             </div>
           </div>
         </section>

@@ -41,7 +41,7 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [
     'Tubería interactiva con 3 geometrías predefinidas',
-    'Animación de partículas fluyendo a velocidad real',
+    'Animación de partículas cuya velocidad sigue al caudal y a la sección del tubo',
     'Manómetros mostrando presión local en cada sección',
     'Aplicación automática de continuidad (A·v = cte) y Bernoulli',
     'Sliders para caudal, densidad, ratio de estrechamiento y altura',

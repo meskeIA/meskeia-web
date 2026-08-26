@@ -143,19 +143,41 @@ async function leer(page: Page): Promise<Record<string, string>> {
  * cambia el estado, pero la pelota la recoloca un useEffect que escribe en un ref y fuerza un
  * segundo render. Leer entre los dos renders devuelve el rótulo nuevo con la altura vieja.
  */
+/**
+ * Mueve un deslizador y NO devuelve hasta comprobar que el valor llegó al estado de React.
+ *
+ * El truco del setter nativo + dispatchEvent escribe el DOM y sí alcanza a React… siempre
+ * que React ya haya hidratado. Si llega antes, el evento se pierde y en la siguiente
+ * hidratación React restaura `value` desde su estado, deshaciendo el cambio SIN QUE NADA
+ * FALLE: el test sigue adelante creyendo que movió el control. Es la forma que el plan de
+ * reparación del Inspector documenta como «test que no llega a la app», y aquí se resuelve
+ * declarando la causa —se espera a que el rótulo, que lo pinta React, refleje el valor— en
+ * vez de subir un `waitForTimeout` hasta que deje de fallar.
+ */
 async function poner(page: Page, etiqueta: string, valor: number): Promise<string> {
-  const aceptado = await page.evaluate(
-    ([et, v]) => {
-      const el = document.querySelector(`input[aria-label="${et}"]`) as HTMLInputElement;
-      const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')!.set!;
-      setter.call(el, String(v));
-      el.dispatchEvent(new Event('input', { bubbles: true }));
-      return el.value;
-    },
-    [etiqueta, valor] as [string, number],
-  );
-  await page.waitForTimeout(200);
-  return aceptado;
+  const escribir = () =>
+    page.evaluate(
+      ([et, v]) => {
+        const el = document.querySelector(`input[aria-label="${et}"]`) as HTMLInputElement;
+        const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')!.set!;
+        setter.call(el, String(v));
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        return el.value;
+      },
+      [etiqueta, valor] as [string, number],
+    );
+
+  let aceptado = await escribir();
+  for (let intento = 0; intento < 20; intento++) {
+    await page.waitForTimeout(100);
+    const enReact = await page.evaluate(
+      (et) => (document.querySelector(`input[aria-label="${et}"]`) as HTMLInputElement).value,
+      etiqueta,
+    );
+    if (enReact === aceptado) return aceptado;
+    aceptado = await escribir(); // React aún no había hidratado: se vuelve a intentar
+  }
+  throw new Error(`el deslizador «${etiqueta}» no aceptó ${valor}: React no llegó a hidratar`);
 }
 
 /** «98,24 J» → 98.24 */
@@ -339,8 +361,26 @@ test('CASO 3 · los cuatro imposibles se rechazan y quedan en el mínimo legal',
 });
 
 // ═════════════════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS (Inspector, 26/08/2026)
-// Estos seis tests FALLAN hoy a propósito: describen lo que debería ocurrir.
+// REGRESIÓN de los hallazgos 357-362, REPARADOS el 26/08/2026.
+//
+// La física se fue a `app/simulador-conservacion-energia/motor.ts` y sus invariantes se
+// comprueban sin navegador en `tests/conservacion-energia-motor.spec.ts` (18 casos). Lo que
+// queda aquí es lo que solo se ve en la página: que el rótulo del deslizador no mienta sobre
+// la pelota, que las cifras del panel conserven, y que ni el JSON-LD ni el bloque educativo
+// afirmen cosas que la app no hace.
+//
+// Dos de los seis se reescriben porque el «esperado» del acta no se sostenía:
+//
+//   · A — el acta esperaba que la pelota llegase al final de la pista y se quedara allí con
+//     sus 98 J. Parar la simulación a los 2,8 s mata la demostración que la app existe para
+//     dar. Los extremos son ahora TOPES ELÁSTICOS: la pelota rebota sin perder energía, así
+//     que lo que se comprueba es que la energía se conserva DURANTE TODO el recorrido, que
+//     es más fuerte que comprobarla en un instante.
+//
+//   · B — el acta esperaba que en montaña rusa h₀ = 1 m colocara la pelota a 1,00 m. Esa
+//     pista NO TIENE ningún punto a 1 m: su mínimo real es 2,46 m. El defecto no era dónde
+//     caía la pelota, era que el deslizador ofrecía alturas inexistentes; así que lo que se
+//     comprueba es que sus dos extremos son alturas que la pista alcanza de verdad.
 // ═════════════════════════════════════════════════════════════════════════════════════════
 
 // HALLAZGO A (cálculo, alto) · La pista es finita y `step()` topa x en xMax anulando la
@@ -357,41 +397,49 @@ test('HALLAZGO A · el tope de la pista no puede disipar 98 J «sin fricción»'
   await poner(page, 'Altura inicial', 10);
   expect((await leer(page))['Energía inicial']).toBe('98,00 J');
 
-  // Correr hasta que la pelota alcance el final de la pista (x = xMax = 20 m).
-  const historia = await correr(page, 60, 100, (l) => aNumero(l['Posición x']) >= 20);
-  const final = historia[historia.length - 1];
-  expect(final['Posición x']).toBe('20,00 m');
+  // Diez segundos de simulación: de sobra para que la pelota baje los 10 m de rampa, cruce
+  // los 10 m de suelo llano y llegue al tope de x = 20, donde antes se paraba en seco.
+  const historia = await correr(page, 60, 100);
 
-  // Sin fricción, esos 98 J tienen que seguir ahí en alguna forma.
-  expect(final['Energía disipada']).toBe('0,00 J');
-  expect(final.Emec).toBe('98,00 J');
+  // Sin fricción no hay NADA que pueda disipar energía, ni el tope de la pista.
+  expect(historia.every((l) => l['Energía disipada'] === '0,00 J')).toBe(true);
+
+  // Y las tres barras no caen a cero a la vez en ningún instante: la energía sigue ahí,
+  // repartida entre cinética y potencial. Antes, en x = 20, las tres marcaban 0,00 J.
+  expect(Math.min(...historia.map((l) => aNumero(l.Emec)))).toBeGreaterThan(97.9);
+
+  // La pelota llegó al final del recorrido: el tope existe y se ha usado.
+  expect(Math.max(...historia.map((l) => aNumero(l['Posición x'])))).toBeGreaterThan(19);
 });
 
-// HALLAZGO B (operativa, alto) · El deslizador de altura ofrece 1–12 m en las cuatro pistas
-// (1–10 en la doble joroba), pero ninguna pista cubre esa banda. En rampa y valle la altura
-// máxima es 10 m y reset() topa el x calculado en xMin, así que 11 y 12 m dan los mismos
-// 10 m. En las dos pistas procedurales el barrido busca en x ∈ [xMin, xMin+6], cuyo mínimo
-// de y(x) es 6,64 m (montaña rusa) y 7,13 m (doble joroba): la mitad baja del deslizador es
-// inerte. En los tres casos el rótulo sigue afirmando la altura pedida, y la tarjeta rotulada
-// «m·g·h₀» muestra una energía que no es m·g·h₀ — hasta 6,6 veces mayor.
-// Caso: Montaña rusa · h₀ = 1,0 m · m = 1 kg · g = 9,8 → esperado altura 1,00 m y 9,80 J ·
-//       obtenido altura 6,64 m y 65,03 J (y 1, 2, 4 y 6 m dan los cuatro exactamente lo mismo).
-test('HALLAZGO B · la altura que promete el deslizador es la altura de la que parte la pelota', async ({
-  page,
-}) => {
-  await page.getByRole('button', { name: /Montaña rusa/ }).click();
-  await poner(page, 'Altura inicial', 1);
-  const bajo = await leer(page);
-  expect(bajo.rotuloAltura).toBe('Altura inicial (h₀ = 1,0 m)');
-  expect(bajo['Altura h']).toBe('1,00 m'); // hoy: 6,64 m
-  expect(bajo['Energía inicial']).toBe('9,80 J'); // hoy: 65,03 J
+// HALLAZGO B (operativa, alto) · El deslizador de altura ofrecía 1-12 m en las cuatro pistas
+// (1-10 en la doble joroba) mientras ninguna cubría esa banda: en montaña rusa y doble joroba
+// la mitad baja del recorrido era inerte —1, 2, 4 y 6 m daban los cuatro la misma altura— y
+// en rampa y valle lo era la parte alta, porque su tope real es 10 m. El rótulo seguía
+// afirmando la altura pedida mientras la tarjeta «m·g·h₀» mostraba una energía hasta 6,6
+// veces mayor. Ahora el rango se deriva del perfil de cada pista.
+// Caso: para cada pista, los dos extremos de su deslizador deben ser alturas que la pelota
+//       ocupa de verdad, y la energía inicial ha de ser m·g·(altura mostrada) exacta.
+test('HALLAZGO B · el deslizador solo ofrece alturas que su pista alcanza', async ({ page }) => {
+  for (const pista of ['Rampa', 'Valle parabólico', 'Montaña rusa', 'Doble joroba']) {
+    await page.getByRole('button', { name: new RegExp(pista) }).click();
+    await page.waitForTimeout(150);
 
-  // Y el tramo alto en el valle: 12 m debe dar 1 · 9,8 · 12 = 117,60 J, o no ofrecerse.
-  await page.getByRole('button', { name: /Valle parabólico/ }).click();
-  await poner(page, 'Altura inicial', 12);
-  const alto = await leer(page);
-  expect(alto['Altura h']).toBe('12,00 m'); // hoy: 10,00 m
-  expect(alto['Energía inicial']).toBe('117,60 J'); // hoy: 98,00 J
+    const rango = await page.evaluate(() => {
+      const el = document.querySelector('input[aria-label="Altura inicial"]') as HTMLInputElement;
+      return { min: Number(el.min), max: Number(el.max) };
+    });
+    expect(rango.max, pista).toBeGreaterThan(rango.min);
+
+    for (const altura of [rango.min, rango.max]) {
+      await poner(page, 'Altura inicial', altura);
+      const l = await leer(page);
+      // La pelota está EXACTAMENTE donde el rótulo dice que está.
+      expect(aNumero(l['Altura h']), `${pista} a ${altura} m`).toBeCloseTo(altura, 1);
+      // Y la energía inicial es m·g·h de esa misma altura (m = 1 kg, g = 9,8 m/s²).
+      expect(aNumero(l['Energía inicial']), `${pista} a ${altura} m`).toBeCloseTo(9.8 * altura, 1);
+    }
+  }
 });
 
 // HALLAZGO C (cálculo, bajo) · Con μ = 0 la tarjeta «Energía disipada» —cuya propia nota dice
@@ -462,6 +510,12 @@ test('HALLAZGO F · ni se anuncia un control inexistente ni 159 km/h es la veloc
   expect(schema).toContain('WebApplication');
   expect(schema).not.toContain('velocidad de simulación');
 
-  const fila = page.getByRole('row').filter({ hasText: '44,3 m/s' });
-  await expect(fila).not.toContainText('Velocidad terminal');
+  // El bloque educativo llega plegado dentro de un <details>: su tabla está en el DOM pero
+  // sus filas no exponen role="row", así que se lee por textContent.
+  const cuerpo = (await page.locator('body').textContent()) ?? '';
+  expect(cuerpo).toContain('44,3 m/s');
+  expect(cuerpo).not.toContain('Velocidad terminal sin paracaídas');
+  // Y la tarjeta de más abajo ya no contradice a la tabla: dice que los 200 km/h son la
+  // velocidad terminal REAL, que ninguna fórmula de la página calcula.
+  expect(cuerpo).toContain('que ninguna fórmula de esta página calcula');
 });

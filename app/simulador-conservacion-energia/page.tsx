@@ -5,104 +5,24 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorConservacionEnergia.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import {
+  TRACKS,
+  TRACK_IDS,
+  crearEstado,
+  leer as leerEstado,
+  paso as pasoFisico,
+  rangoAlturas,
+  type EstadoFisico,
+  type TrackId,
+} from './motor';
 
 // ============================================
-// TIPOS
+// FÍSICA
 // ============================================
-type TrackId = 'rampa' | 'valle' | 'montana_rusa' | 'looping_suave';
-
-interface TrackDef {
-  id: TrackId;
-  nombre: string;
-  icono: string;
-  // Pista parametrizada por x: y(x)
-  y: (x: number) => number;
-  yPrime: (x: number) => number;
-  xMin: number;
-  xMax: number;
-  xInicial: number;
-  altInicialDefault: number; // referencia para slider
-}
-
-// ============================================
-// CATÁLOGO DE PISTAS (perfiles y(x))
-// Coordenadas en metros aproximados
-// ============================================
-const TRACKS: Record<TrackId, TrackDef> = {
-  rampa: {
-    id: 'rampa',
-    nombre: 'Rampa',
-    icono: '⛷️',
-    y: (x) => {
-      // Rampa lineal en [0, 10], luego suelo plano [10, 20]
-      if (x < 10) return 10 - x;
-      return 0;
-    },
-    yPrime: (x) => {
-      if (x < 10) return -1;
-      return 0;
-    },
-    xMin: 0,
-    xMax: 20,
-    xInicial: 0,
-    altInicialDefault: 10,
-  },
-  valle: {
-    id: 'valle',
-    nombre: 'Valle parabólico',
-    icono: '🥣',
-    y: (x) => 0.1 * (x - 10) * (x - 10),
-    yPrime: (x) => 0.2 * (x - 10),
-    xMin: 0,
-    xMax: 20,
-    xInicial: 0,
-    altInicialDefault: 10,
-  },
-  montana_rusa: {
-    id: 'montana_rusa',
-    nombre: 'Montaña rusa',
-    icono: '🎢',
-    // Suma de cosenos: una pendiente decreciente con jorobas
-    y: (x) => {
-      // Empieza a 10 m, baja oscilando hasta ~0
-      const decay = Math.max(0, 10 - x * 0.3);
-      const oscil = 2.5 * Math.cos(x * 0.7) * Math.exp(-0.05 * x);
-      return decay + oscil;
-    },
-    yPrime: (x) => {
-      // Derivada
-      const decayPrime = -0.3;
-      // d/dx [cos(0.7x) * e^(-0.05x)] = -0.7 sin(0.7x) e^(-0.05x) - 0.05 cos(0.7x) e^(-0.05x)
-      const oscilPrime = 2.5 * (-0.7 * Math.sin(x * 0.7) * Math.exp(-0.05 * x) - 0.05 * Math.cos(x * 0.7) * Math.exp(-0.05 * x));
-      return decayPrime + oscilPrime;
-    },
-    xMin: 0,
-    xMax: 24,
-    xInicial: 0,
-    altInicialDefault: 12.5,
-  },
-  looping_suave: {
-    id: 'looping_suave',
-    nombre: 'Doble joroba',
-    icono: '🌊',
-    // Dos jorobas y un valle
-    y: (x) => {
-      const y0 = 8;
-      return y0 - x * 0.2 + 3 * Math.sin(x * 0.5) * Math.exp(-0.04 * x);
-    },
-    yPrime: (x) => {
-      const decayPrime = -0.2;
-      const oscilPrime = 3 * (0.5 * Math.cos(x * 0.5) * Math.exp(-0.04 * x) - 0.04 * Math.sin(x * 0.5) * Math.exp(-0.04 * x));
-      return decayPrime + oscilPrime;
-    },
-    xMin: 0,
-    xMax: 24,
-    xInicial: 0,
-    altInicialDefault: 8,
-  },
-};
-
-const TRACK_IDS: TrackId[] = ['rampa', 'valle', 'montana_rusa', 'looping_suave'];
+// El perfil de las pistas, el rango de alturas que cada una puede dar de verdad y el paso de
+// integración viven en `motor.ts`, probado sin navegador en
+// `tests/conservacion-energia-motor.spec.ts`. Un canvas que dibuja algo plausible pasa
+// cualquier build: la física no la puede sujetar la vista.
 
 // ============================================
 // UTILIDADES
@@ -123,32 +43,40 @@ export default function SimuladorConservacionEnergiaPage() {
   const [altInicial, setAltInicial] = useState(10);
   const [running, setRunning] = useState(false);
 
+  // Colocación de partida, resuelta en el PRIMER render y no en un efecto. Con los refs a
+  // cero, el HTML servido enseñaba «Altura h 0,00 m» y «Energía inicial 0,00 J» hasta que
+  // React hidrataba: la pelota estaba ya dibujada en el canvas y el panel decía otra cosa.
+  const partida = useMemo(() => {
+    const parametros = { masa: 1, g: 9.8, mu: 0 };
+    const estado = crearEstado(TRACKS.valle, 10, parametros);
+    return { estado, lectura: { ...leerEstado(estado, TRACKS.valle, parametros), tiempo: 0 } };
+  // El estado inicial es fijo por definición: no depende de nada que pueda cambiar después.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Estado físico (no en React state para evitar re-renders 60 fps)
-  const stateRef = useRef({
-    x: 0, // posición en x (metros)
-    v: 0, // velocidad a lo largo de la curva (m/s, con signo)
-    energiaInicial: 0,
-  });
+  const stateRef = useRef<EstadoFisico>(partida.estado);
 
   // Datos para mostrar (se actualizan a 30 fps con setForceRender)
   const [, setTick] = useState(0);
-  const dataRef = useRef({
-    x: 0,
-    y: 0,
-    v: 0,
-    eC: 0,
-    eP: 0,
-    eTotal: 0,
-    eInicial: 0,
-    tiempo: 0,
-    eDisipada: 0,
-  });
+  const dataRef = useRef(partida.lectura);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animFrameRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number>(0);
 
   const track = TRACKS[trackId];
+
+  // Alturas que ESTA pista puede dar de verdad. El deslizador ofrecía 1-12 m en las cuatro
+  // mientras ninguna cubría esa banda: la mitad baja era inerte en las dos procedurales y la
+  // alta en rampa y valle, con el rótulo afirmando una altura que la pelota no tenía.
+  const alturas = useMemo(() => rangoAlturas(track), [track]);
+
+  // Al cambiar de pista, la altura pedida se recoloca dentro del nuevo rango en vez de
+  // quedarse fuera del perfil.
+  useEffect(() => {
+    setAltInicial(a => Math.min(alturas.max, Math.max(alturas.min, a)));
+  }, [alturas]);
 
   // ============================================
   // INICIALIZAR / RESET
@@ -160,55 +88,15 @@ export default function SimuladorConservacionEnergiaPage() {
     }
     setRunning(false);
 
-    // Buscar x tal que y(x) = altInicial (cerca del inicio)
-    // Para simplificar: para 'rampa' y 'valle' se puede invertir; para los demás buscar numéricamente
-    let xInit = track.xInicial;
+    const estado = crearEstado(track, altInicial, { masa, g, mu: 0 });
+    stateRef.current = estado;
 
-    if (trackId === 'rampa') {
-      // y = 10 - x para x < 10
-      xInit = 10 - altInicial;
-      if (xInit < 0) xInit = 0;
-      if (xInit > 10) xInit = 10;
-    } else if (trackId === 'valle') {
-      // y = 0.1*(x-10)^2 → x = 10 - sqrt(y/0.1)
-      xInit = 10 - Math.sqrt(altInicial / 0.1);
-      if (xInit < track.xMin) xInit = track.xMin;
-    } else {
-      // Buscar por barrido el primer x donde y(x) ≈ altInicial
-      let mejorDif = Infinity;
-      for (let x = track.xMin; x <= track.xMin + 6; x += 0.05) {
-        const dif = Math.abs(track.y(x) - altInicial);
-        if (dif < mejorDif) {
-          mejorDif = dif;
-          xInit = x;
-        }
-      }
-    }
-
-    const yInit = track.y(xInit);
-    const eP = masa * g * yInit;
-    const eC = 0;
-    const eTotal = eP + eC;
-
-    stateRef.current = {
-      x: xInit,
-      v: 0,
-      energiaInicial: eTotal,
-    };
-    dataRef.current = {
-      x: xInit,
-      y: yInit,
-      v: 0,
-      eC,
-      eP,
-      eTotal,
-      eInicial: eTotal,
-      tiempo: 0,
-      eDisipada: 0,
-    };
+    const l = leerEstado(estado, track, { masa, g, mu: 0 });
+    dataRef.current = { ...l, tiempo: 0 };
     lastTimeRef.current = 0;
     setTick(t => t + 1);
-  }, [trackId, masa, g, altInicial, track]);
+  }, [masa, g, altInicial, track]);
+
 
   // Reset al cambiar parámetros (no al cambiar mu en mitad de simulación)
   useEffect(() => {
@@ -220,56 +108,12 @@ export default function SimuladorConservacionEnergiaPage() {
   // STEP DE INTEGRACIÓN (Euler semi-implícito)
   // ============================================
   const step = useCallback((dt: number) => {
-    const s = stateRef.current;
-    const yp = track.yPrime(s.x);
-    const sec = Math.sqrt(1 + yp * yp); // sec(theta) = ds/dx
-
-    // Aceleración a lo largo de la curva (positiva si v crece)
-    // Componente gravedad a lo largo de la curva: -g * sin(theta) = -g * yp / sec
-    const aGrav = -g * yp / sec;
-
-    // Aceleración por fricción: -mu * g * cos(theta) * sign(v) = -mu * g / sec * sign(v)
-    let aFric = 0;
-    if (mu > 0 && Math.abs(s.v) > 1e-4) {
-      aFric = -mu * g / sec * Math.sign(s.v);
-    }
-
-    const a = aGrav + aFric;
-    s.v += a * dt;
-
-    // Si fricción muy fuerte y v bajo, parar (evita oscilación numérica)
-    if (mu > 0 && Math.abs(s.v) < 1e-3 && Math.abs(yp) < 1e-3) {
-      s.v = 0;
-    }
-
-    // Avanzar x: dx/dt = v_x = v / sec
-    s.x += (s.v / sec) * dt;
-
-    // Limitar a la pista
-    if (s.x < track.xMin) {
-      s.x = track.xMin;
-      if (s.v < 0) s.v = 0;
-    }
-    if (s.x > track.xMax) {
-      s.x = track.xMax;
-      if (s.v > 0) s.v = 0;
-    }
-
-    // Datos para mostrar
-    const yNow = track.y(s.x);
-    const eP = masa * g * yNow;
-    const eC = 0.5 * masa * s.v * s.v;
-    const eMec = eP + eC;
-    dataRef.current.x = s.x;
-    dataRef.current.y = yNow;
-    dataRef.current.v = s.v;
-    dataRef.current.eC = eC;
-    dataRef.current.eP = eP;
-    dataRef.current.eTotal = eMec;
-    dataRef.current.eInicial = s.energiaInicial;
-    dataRef.current.tiempo += dt;
-    dataRef.current.eDisipada = Math.max(0, s.energiaInicial - eMec);
+    const parametros = { masa, g, mu };
+    pasoFisico(stateRef.current, track, parametros, dt);
+    const l = leerEstado(stateRef.current, track, parametros);
+    dataRef.current = { ...l, tiempo: dataRef.current.tiempo + dt };
   }, [track, g, masa, mu]);
+
 
   // ============================================
   // ANIMACIÓN
@@ -502,7 +346,7 @@ export default function SimuladorConservacionEnergiaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🎢 Simulador de Conservación de la Energía</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🎢</span> Simulador de Conservación de la Energía</h1>
         <p className={styles.subtitle}>
           Suelta una pelota por una pista y observa cómo la <strong>energía cinética y potencial se
           intercambian</strong> en tiempo real. Activa la fricción y mira la energía mecánica disiparse.
@@ -516,11 +360,12 @@ export default function SimuladorConservacionEnergiaPage() {
         {TRACK_IDS.map(id => (
           <button
             key={id}
+            type="button"
             className={`${styles.trackBtn} ${trackId === id ? styles.trackBtnActive : ''}`}
             onClick={() => setTrackId(id)}
             aria-pressed={trackId === id}
           >
-            <span className={styles.trackIcon}>{TRACKS[id].icono}</span>
+            <span className={styles.trackIcon} aria-hidden="true">{TRACKS[id].icono}</span>
             <span className={styles.trackName}>{TRACKS[id].nombre}</span>
           </button>
         ))}
@@ -543,14 +388,17 @@ export default function SimuladorConservacionEnergiaPage() {
               </label>
               <input
                 type="range"
-                min={1}
-                max={trackId === 'looping_suave' ? 10 : 12}
+                min={alturas.min}
+                max={alturas.max}
                 step={0.5}
                 value={altInicial}
                 onChange={e => setAltInicial(parseFloat(e.target.value))}
                 className={styles.slider}
                 aria-label="Altura inicial"
               />
+              <span className={styles.controlHint}>
+                {TRACKS[trackId].nombre} va de {fmt(alturas.min, 1)} a {fmt(alturas.max, 1)} m
+              </span>
             </div>
             <div className={styles.controlGroup}>
               <label className={styles.controlLabel}>
@@ -604,6 +452,7 @@ export default function SimuladorConservacionEnergiaPage() {
 
           <div className={styles.actions}>
             <button
+              type="button"
               className={styles.actionBtn}
               onClick={running ? pause : play}
               aria-pressed={running}
@@ -612,10 +461,11 @@ export default function SimuladorConservacionEnergiaPage() {
               <span aria-hidden="true">{running ? '⏸' : '▶'}</span> {running ? 'Pausa' : 'Iniciar'}
             </button>
             <button
+              type="button"
               className={`${styles.actionBtn} ${styles.actionBtnSecondary}`}
               onClick={reset}
             >
-              🔄 Reiniciar
+              <span aria-hidden="true">🔄</span> Reiniciar
             </button>
           </div>
         </div>
@@ -626,10 +476,13 @@ export default function SimuladorConservacionEnergiaPage() {
         </div>
 
         {/* BARRAS DE ENERGÍA */}
-        <div className={styles.energyBarsWrapper} role="status" aria-live="polite" aria-atomic="false" aria-label="Barras de energía cinética, potencial y mecánica total">
+        {/* Sin aria-live: estas tres cifras se reescriben en cada fotograma, y una región
+            viva sirve para avisar de un cambio, no para narrar una animación a 60 anuncios
+            por segundo. El resumen hablado va debajo y solo se emite al pausar. */}
+        <div className={styles.energyBarsWrapper} aria-label="Barras de energía cinética, potencial y mecánica total">
           <div className={styles.energyBar}>
             <div className={styles.energyBarLabel}>
-              <span>⚡ Cinética (E_c)</span>
+              <span><span aria-hidden="true">⚡</span> Cinética (E_c)</span>
               <span className={styles.energyBarValue} style={{ color: '#2E86AB' }}>{fmt(data.eC, 2)} J</span>
             </div>
             <div className={styles.energyBarTrack}>
@@ -641,7 +494,7 @@ export default function SimuladorConservacionEnergiaPage() {
           </div>
           <div className={styles.energyBar}>
             <div className={styles.energyBarLabel}>
-              <span>🪜 Potencial (E_p)</span>
+              <span><span aria-hidden="true">🪜</span> Potencial (E_p)</span>
               <span className={styles.energyBarValue} style={{ color: '#48A9A6' }}>{fmt(data.eP, 2)} J</span>
             </div>
             <div className={styles.energyBarTrack}>
@@ -780,7 +633,7 @@ export default function SimuladorConservacionEnergiaPage() {
                   <td>100 m</td>
                   <td>44,3 m/s ≈ 159 km/h</td>
                   <td>4,52 s</td>
-                  <td>Velocidad terminal sin paracaídas (limitada por aire)</td>
+                  <td>Caída desde un rascacielos de 30 plantas — sin aire</td>
                 </tr>
               </tbody>
             </table>
@@ -792,22 +645,22 @@ export default function SimuladorConservacionEnergiaPage() {
           <h3>4 escenarios donde la conservación de la energía manda</h3>
           <div className={styles.scenariosGrid}>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🎢</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🎢</span>
               <strong>Montañas rusas</strong>
               <p>Las jorobas posteriores siempre son más bajas que la primera: la fricción en raíles y aire impide alcanzar la misma altura. Por eso necesitan motor o cadena para subir la primera cuesta.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>⚡</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">⚡</span>
               <strong>Centrales hidroeléctricas</strong>
               <p>El agua almacenada en una presa tiene E_p = m·g·h. Al bajar por las turbinas, esa E_p se convierte en E_c y luego en energía eléctrica. Eficiencia ~90 %.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🪂</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🪂</span>
               <strong>Caída libre y paracaídas</strong>
-              <p>Sin aire, un cuerpo cayendo desde 100 m alcanza 44 m/s. Con aire, la fricción frena hasta una velocidad terminal. Un paracaídas la reduce de 200 km/h a 20 km/h disipando energía.</p>
+              <p>Sin aire, un cuerpo cayendo desde 100 m alcanza 44 m/s (159 km/h), que es lo que calcula la tabla de arriba. Con aire, la resistencia crece con la velocidad hasta igualar al peso: a partir de ahí se cae a velocidad constante — la <strong>velocidad terminal</strong>, unos 200 km/h para una persona boca abajo, que ninguna fórmula de esta página calcula. Un paracaídas la baja a unos 20 km/h disipando energía.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🎯</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🎯</span>
               <strong>Péndulos</strong>
               <p>Un péndulo ideal alterna E_c (en el punto bajo) con E_p (en los extremos) infinitamente. En la práctica, la fricción del aire y el pivote lo paran. La amplitud decae exponencialmente.</p>
             </div>
@@ -821,31 +674,31 @@ export default function SimuladorConservacionEnergiaPage() {
             <div className={styles.faqItem}>
               <h4>¿La masa influye en la velocidad final al caer?</h4>
               <p><strong>Sin fricción no.</strong> v = √(2gh) no depende de m. Galileo lo demostró dejando caer dos pesos distintos desde la torre de Pisa: tocan el suelo a la vez. Con resistencia del aire, sí: una pluma cae más despacio que una bala.</p>
-              <p className={styles.faqTip}>💡 En el simulador, sin fricción, cambia m y verás que la velocidad en cada punto es la misma. Solo cambia la energía total (escala con m).</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> En el simulador, sin fricción, cambia m y verás que la velocidad en cada punto es la misma. Solo cambia la energía total (escala con m).</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿La energía se &quot;pierde&quot; cuando hay fricción?</h4>
               <p><strong>No, se transforma.</strong> La energía mecánica disminuye, pero esa diferencia aparece como <em>calor</em> en la pista, en el aire y en el cuerpo deslizante. La energía total del universo se conserva siempre. La 1ª ley de la termodinámica.</p>
-              <p className={styles.faqTip}>💡 Si pudieras medir la temperatura de la pelota tras pararse por fricción, estaría algunas milésimas de grado más caliente. Esa es la energía mecánica convertida.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Si pudieras medir la temperatura de la pelota tras pararse por fricción, estaría algunas milésimas de grado más caliente. Esa es la energía mecánica convertida.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Puede la pelota llegar más alto que el punto inicial?</h4>
               <p><strong>NUNCA</strong> sin un aporte externo de energía. Por eso una montaña rusa nunca tiene una joroba más alta que la primera (a menos que un motor empuje). Aplicar &quot;movimiento perpetuo&quot; viola este principio: por eso ninguna patente de máquina perpetua ha funcionado nunca.</p>
-              <p className={styles.faqTip}>💡 Si en el simulador toqueteas para que h_max sea mayor que la altura inicial, hay un error en la integración numérica (errores acumulados). El principio físico real lo prohíbe estrictamente.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Si en el simulador toqueteas para que h_max sea mayor que la altura inicial, hay un error en la integración numérica (errores acumulados). El principio físico real lo prohíbe estrictamente.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Por qué se elige h = 0 como referencia?</h4>
               <p>Es <em>arbitrario</em>: solo importan las <strong>diferencias</strong> de E_p. Puedes elegir como cero el suelo, la mesa o el techo. El movimiento de la pelota es el mismo. La conservación es relativa a la elección, pero todas las elecciones dan el mismo resultado físico.</p>
-              <p className={styles.faqTip}>💡 En el simulador tomamos como cero el suelo. Si lo eligieras como el punto más alto, las E_p serían negativas, pero el principio sigue funcionando.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> En el simulador tomamos como cero el suelo. Si lo eligieras como el punto más alto, las E_p serían negativas, pero el principio sigue funcionando.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿La conservación se cumple también para la energía interna y química?</h4>
               <p>Sí. La <strong>1.ª ley de la termodinámica</strong> generaliza el principio: ΔU = Q − W. La energía interna de un sistema cambia por calor recibido o trabajo realizado, pero la energía total del universo es constante. Aplica a reacciones químicas, nucleares, biológicas, todo.</p>
-              <p className={styles.faqTip}>💡 Solo Einstein extendió la idea con E = mc²: masa y energía son intercambiables, pero su suma sigue siendo constante.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Solo Einstein extendió la idea con E = mc²: masa y energía son intercambiables, pero su suma sigue siendo constante.</p>
             </div>
           </div>
         </section>
@@ -897,22 +750,22 @@ export default function SimuladorConservacionEnergiaPage() {
           <h3>4 buenas prácticas con problemas de energía</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚡</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚡</span>
               <strong>Usa energía en vez de cinemática siempre que puedas</strong>
               <p>Para problemas con curvas o trayectorias complicadas, conservación de energía es MUCHO más simple que las ecuaciones de movimiento. Ahorra páginas de cálculo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <strong>Identifica las fuerzas conservativas y no conservativas</strong>
               <p>Conservativas: gravedad, elástica, electrostática (energía potencial bien definida). No conservativas: fricción, fuerzas de arrastre, normales (no almacenables como E_p).</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🪜</span>
+              <span className={styles.tipIcon} aria-hidden="true">🪜</span>
               <strong>Trabaja en E_c y E_p, no en velocidades y posiciones</strong>
               <p>Pasa los datos a julios desde el principio. Comparas dos números (energías inicial y final) y todo es más limpio. Las cuentas con v² son más propensas a errores de signo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <strong>Verifica con un caso extremo</strong>
               <p>Si tu fórmula final da algo absurdo cuando h = 0 o v = 0, está mal. Probar casos límite es la forma más rápida de pillar errores algebraicos.</p>
             </div>
@@ -922,7 +775,7 @@ export default function SimuladorConservacionEnergiaPage() {
         {/* WARNING BOX */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>5 errores frecuentes con conservación de la energía</strong>
           </div>
           <ul className={styles.warningList}>
