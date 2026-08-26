@@ -21,6 +21,7 @@ import {
   formatCompactNumber,
   isValidNumber,
   formatDuration,
+  lecturaAmbiguaAlternativa,
 } from '../lib/formatters';
 
 test.describe('formatNumber', () => {
@@ -389,5 +390,51 @@ test.describe('formatDuration', () => {
   test('formatea horas y minutos', () => {
     expect(formatDuration(5400)).toBe('1h 30min');
     expect(formatDuration(9000)).toBe('2h 30min');
+  });
+});
+
+test.describe('lecturaAmbiguaAlternativa', () => {
+  test('ofrece el millar americano cuando la coma podria agrupar', () => {
+    // Lo que el parser devuelve es 830,4; la otra lectura plausible es 830.400
+    expect(parseSpanishNumber('830,400')).toBe(830.4);
+    expect(lecturaAmbiguaAlternativa('830,400')?.valor).toBe(830400);
+    expect(lecturaAmbiguaAlternativa('1,234')?.valor).toBe(1234);
+    expect(lecturaAmbiguaAlternativa('17,149')?.valor).toBe(17149);
+    expect(lecturaAmbiguaAlternativa('2,500')?.valor).toBe(2500);
+  });
+
+  test('devuelve el numero alternativo ya escrito en formato espanol', () => {
+    expect(lecturaAmbiguaAlternativa('830,400')?.texto).toBe('830.400');
+    // Sin punto por debajo de 10.000: `es-ES` no agrupa los millares de cuatro cifras, y la
+    // RAE tampoco. Da igual para lo que importa — que el texto vuelva a entrar por el campo
+    // sin ambiguedad ninguna—, pero conviene no confundirlo con un fallo de formato.
+    expect(lecturaAmbiguaAlternativa('2,500')?.texto).toBe('2500');
+    expect(parseSpanishNumber('2500')).toBe(2500);
+  });
+
+  test('respeta el signo', () => {
+    expect(lecturaAmbiguaAlternativa('-2,500')?.valor).toBe(-2500);
+  });
+
+  test('tolera el simbolo de moneda y los espacios, como el parser', () => {
+    expect(lecturaAmbiguaAlternativa('$2,500')?.valor).toBe(2500);
+    expect(lecturaAmbiguaAlternativa(' 2,500 ')?.valor).toBe(2500);
+  });
+
+  test('calla cuando NO hay ambiguedad', () => {
+    expect(lecturaAmbiguaAlternativa('830,40')).toBeNull();     // dos decimales: no es millar
+    expect(lecturaAmbiguaAlternativa('830,4')).toBeNull();      // un decimal: tampoco
+    expect(lecturaAmbiguaAlternativa('85,911,818')).toBeNull(); // dos comas: el millar ya se delata
+    expect(lecturaAmbiguaAlternativa('1234,567')).toBeNull();   // cuatro cifras delante: no agrupa
+    expect(lecturaAmbiguaAlternativa('830,400.00')).toBeNull(); // los dos separadores: sin duda
+    expect(lecturaAmbiguaAlternativa('1000')).toBeNull();
+    expect(lecturaAmbiguaAlternativa('')).toBeNull();
+    expect(lecturaAmbiguaAlternativa('12abc')).toBeNull();
+  });
+
+  test('calla ante el millar espanol bien escrito, aunque sea el caso simetrico', () => {
+    // Avisar aqui saltaria ante cualquier importe redondo y dejaria de informar
+    expect(lecturaAmbiguaAlternativa('1.500')).toBeNull();
+    expect(lecturaAmbiguaAlternativa('20.000')).toBeNull();
   });
 });

@@ -242,6 +242,50 @@ export function partesNumericas(input: string): PartesNumericas | null {
   return { signo, entera: cuerpo, decimales: '' };
 }
 
+/**
+ * La lectura que `parseSpanishNumber` NO ha elegido, cuando la entrada es genuinamente
+ * ambigua. Devuelve `null` cuando no hay nada que desambiguar, que es lo normal.
+ *
+ * Esto NO cambia lo que devuelve el parser: sirve para que una app pueda decir en voz alta
+ * «lo he leído así, ¿querías esto otro?» en vez de adivinar en silencio.
+ *
+ * ── El caso, y por qué solo este (26/08/2026) ─────────────────────────────────
+ * Con un solo separador la ambigüedad es irreducible y el parser resuelve a favor del
+ * español. Para «830,400» eso da 830,4 — y un mexicano, un peruano o un hondureño que
+ * escribe un importe redondo quería 830.400. **Mil veces más, y sin ningún aviso.**
+ *
+ * No es un caso de laboratorio: de las visitas de `conversor-numeros-letras` entre el 17 y
+ * el 21 de agosto, el 62 % venía de países que agrupan los millares con coma (MX 111,
+ * PE 29, HN 20, DO 15 de 282), y sus consultas en Bing traían el número tal cual —«como se
+ * escribe 830,400.00 en letras», «como se escribe $17,149.16 pesos en letra»—. Es la app
+ * con la que se rellenan pagarés: ahí un cero de más no es una errata.
+ *
+ * ── Por qué NO se avisa del caso simétrico ────────────────────────────────────
+ * «830.400» también podría leerse a la americana como 830,4, pero avisarlo saltaría ante
+ * CUALQUIER millar redondo bien escrito en español —«1.500», «20.000»— para preguntar si
+ * el usuario quería tres decimales, que en un importe no se escriben nunca. Un aviso que
+ * sale siempre deja de informar, así que se calla donde la otra lectura no es plausible.
+ */
+export function lecturaAmbiguaAlternativa(
+  input: string
+): { valor: number; texto: string } | null {
+  if (!input) return null;
+  const limpio = input
+    .replace(/[\s  ]/g, '')
+    .replace(/^[€$£%]+|[€$£%]+$/g, '');
+  const signo = limpio.startsWith('-') ? -1 : 1;
+  const cuerpo = limpio.replace(/^[+-]/, '');
+
+  // Una sola coma, tres cifras detrás y de una a tres delante: tanto puede ser el decimal
+  // español como el millar americano. Con dos comas («85,911,818») el millar ya se delata
+  // solo, y con otro número de decimales («830,40», «830,4») no hay millar posible.
+  if (!/^\d{1,3},\d{3}$/.test(cuerpo)) return null;
+
+  const valor = signo * Number(cuerpo.replace(',', ''));
+  if (!Number.isFinite(valor)) return null;
+  return { valor, texto: formatNumber(valor, 0) };
+}
+
 export function parseSpanishNumber(input: string): number {
   const partes = partesNumericas(input);
   if (!partes) return NaN;

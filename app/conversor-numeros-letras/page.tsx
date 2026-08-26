@@ -11,7 +11,12 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { formatNumber, parseSpanishNumber, partesNumericas } from '@/lib';
+import {
+  formatNumber,
+  parseSpanishNumber,
+  partesNumericas,
+  lecturaAmbiguaAlternativa,
+} from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   MONEDAS,
@@ -100,6 +105,15 @@ export default function ConversorNumerosLetrasPage() {
   };
 
   const valorNumerico = typeof resultado.valor === 'number' ? resultado.valor : null;
+
+  // «830,400» tanto puede ser ochocientos treinta con cuarenta como ochocientos treinta mil
+  // cuatrocientos, y ninguna regla lo resuelve: depende del país de quien escribe. La app lo
+  // dice en voz alta y ofrece la otra lectura en vez de adivinar en silencio, porque de aquí
+  // sale la cantidad de un pagaré y equivocarse cuesta un factor mil.
+  const alternativa = useMemo(
+    () => (resultado.error ? null : lecturaAmbiguaAlternativa(entrada)),
+    [entrada, resultado.error]
+  );
 
   return (
     <div className={styles.container}>
@@ -259,6 +273,24 @@ export default function ConversorNumerosLetrasPage() {
             <p className={styles.resultadoTexto} aria-live="polite">
               {resultado.texto}
             </p>
+
+            {alternativa && (
+              <div className={styles.desambiguacion} role="status">
+                <p className={styles.desambiguacionTexto}>
+                  <span aria-hidden="true">🔎</span> La coma de{' '}
+                  <strong>{entrada.trim()}</strong> se ha leído como decimal. Si separa los
+                  millares —como se escribe en México, Perú o Centroamérica—, la cantidad es{' '}
+                  <strong>{alternativa.texto}</strong>.
+                </p>
+                <button
+                  type="button"
+                  className={styles.desambiguacionBtn}
+                  onClick={() => setEntrada(alternativa.texto)}
+                >
+                  Leer {alternativa.texto}
+                </button>
+              </div>
+            )}
             {modo === 'importe' && (
               <p className={styles.resultadoDocumento}>
                 <span aria-hidden="true">📄</span> En un documento:{' '}

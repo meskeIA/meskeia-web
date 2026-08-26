@@ -289,6 +289,51 @@
   word-break: break-word;
 }
 
+/* Aviso de coma ambigua: decimal español o millar americano. Ámbar, como el resto de avisos
+   de la app, y no rojo: no es un error, es una lectura que puede no ser la que se quería. */
+.desambiguacion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem 0 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid #f59e0b;
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.desambiguacionTexto {
+  flex: 1 1 16rem;
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #92400e;
+}
+
+.desambiguacionBtn {
+  flex: 0 0 auto;
+  padding: 0.55rem 1rem;
+  border: 1px solid #b45309;
+  border-radius: 8px;
+  background: #fff;
+  color: #92400e;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.desambiguacionBtn:hover {
+  background: #b45309;
+  color: #fff;
+}
+
+.desambiguacionBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 .resultadoDocumento {
   margin: 1rem 0 0;
   padding-top: 0.9rem;
@@ -551,6 +596,26 @@
 [data-theme='dark'] .helper,
 [data-theme='dark'] .ejemplosLabel,
 [data-theme='dark'] .toggleAyuda,
+[data-theme='dark'] .desambiguacion {
+  border-color: #b45309;
+  background: rgba(245, 158, 11, 0.14);
+}
+
+[data-theme='dark'] .desambiguacionTexto {
+  color: #fcd34d;
+}
+
+[data-theme='dark'] .desambiguacionBtn {
+  background: transparent;
+  border-color: #fcd34d;
+  color: #fcd34d;
+}
+
+[data-theme='dark'] .desambiguacionBtn:hover {
+  background: #fcd34d;
+  color: #422006;
+}
+
 [data-theme='dark'] .resultadoEtiqueta,
 [data-theme='dark'] .resultadoDocumento,
 [data-theme='dark'] .stepContent p,

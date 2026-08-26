@@ -17,6 +17,7 @@ export {
   parseSpanishNumber,
   parseSpanishNumberOr,
   partesNumericas,
+  lecturaAmbiguaAlternativa,
   type PartesNumericas,
   isValidNumber,
 } from './formatters';

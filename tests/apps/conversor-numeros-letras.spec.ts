@@ -393,3 +393,68 @@ test('REGRESIÓN 6 · la franja de medio céntimo bajo el tope la rechaza la app
     'La cantidad máxima admitida es 999.999.999.999.',
   );
 });
+
+/**
+ * ── MEJORA · 26/08/2026 · la coma que puede ser millar ────────────────────────────────────
+ *
+ * «830,400» no tiene una lectura correcta: en España son ochocientos treinta con cuarenta y
+ * en México, Perú u Honduras son ochocientos treinta mil cuatrocientos. `parseSpanishNumber`
+ * resuelve a favor del español —es el formato obligatorio del proyecto y la ambigüedad es
+ * irreducible sin saber quién escribe—, así que hasta ahora la app leía el importe MIL VECES
+ * más pequeño sin decir nada.
+ *
+ * De dónde sale: entre el 17 y el 21 de agosto esta app hizo 282 visitas, el 62 % desde
+ * países que agrupan los millares con coma (MX 111, PE 29, HN 20, DO 15), y sus consultas en
+ * Bing llegaban con el número dentro — «como se escribe 830,400.00 en letras», «como se
+ * escribe $17,149.16 pesos en letra».
+ *
+ * La app no adivina: dice cómo lo ha leído y ofrece la otra lectura a un clic. Al pulsarlo
+ * reescribe el campo con la forma inequívoca, de modo que lo que se copia al pagaré es
+ * siempre lo que se ve escrito.
+ */
+test('MEJORA · la coma ambigua se avisa y la otra lectura está a un clic', async ({ page }) => {
+  const aviso = page.locator('[role="region"][aria-label="Resultado"] [role="status"]');
+
+  // Lectura por defecto, la española: 830,400 → 830,40 € redondeado a céntimos.
+  expect(await enLetras(page, '830,400')).toBe('ochocientos treinta euros con cuarenta céntimos');
+
+  // Y la app lo dice, con las dos cantidades a la vista.
+  await expect(aviso).toBeVisible();
+  await expect(aviso).toContainText('830,400');
+  await expect(aviso).toContainText('830.400');
+
+  // Un clic y pasa a la lectura americana. 830.400 = ochocientos treinta mil cuatrocientos:
+  // «mil» invariable, sin «y» entre centena y decena (OLE 2010, § 10.4).
+  await page.getByRole('button', { name: 'Leer 830.400' }).click();
+  await expect(page.locator('#cantidad')).toHaveValue('830.400');
+  await expect(page.locator('p[aria-live="polite"]')).toHaveText(
+    'ochocientos treinta mil cuatrocientos euros',
+  );
+
+  // Resuelta la duda, el aviso se retira: «830.400» ya no admite dos lecturas.
+  await expect(aviso).toHaveCount(0);
+});
+
+test('MEJORA · el aviso calla donde no hay duda, para no dejar de informar', async ({ page }) => {
+  const aviso = page.locator('[role="region"][aria-label="Resultado"] [role="status"]');
+
+  // Millar español bien escrito: aquí avisar saltaría ante cualquier importe redondo.
+  expect(await enLetras(page, '1.500')).toBe('mil quinientos euros');
+  await expect(aviso).toHaveCount(0);
+
+  // Dos decimales tras la coma: no hay millar posible.
+  expect(await enLetras(page, '830,40')).toBe('ochocientos treinta euros con cuarenta céntimos');
+  await expect(aviso).toHaveCount(0);
+
+  // Dos comas: el millar ya se delata solo y el parser lo lee bien sin ayuda.
+  expect(await enLetras(page, '85,911,818')).toBe(
+    'ochenta y cinco millones novecientos once mil ochocientos dieciocho euros',
+  );
+  await expect(aviso).toHaveCount(0);
+
+  // Los dos separadores juntos: el último es el decimal, sin duda que resolver.
+  expect(await enLetras(page, '830,400.00')).toBe(
+    'ochocientos treinta mil cuatrocientos euros',
+  );
+  await expect(aviso).toHaveCount(0);
+});
