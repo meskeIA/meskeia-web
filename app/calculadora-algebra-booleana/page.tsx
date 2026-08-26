@@ -698,7 +698,7 @@ export default function CalculadoraAlgebraBooleanaPage() {
           <h3 className={styles.eduBlockTitle}>Casos de Uso Reales</h3>
           <div className={styles.scenariosGrid}>
             <div className={styles.scenarioCard}>
-              <div className={styles.scenarioIcon}>💻</div>
+              <div className={styles.scenarioIcon} aria-hidden="true">💻</div>
               <h4 className={styles.scenarioTitle}>Diseñador de circuitos digitales</h4>
               <p className={styles.scenarioDesc}>
                 Minimizar un circuito de 4 variables con Mapa de Karnaugh: de 12 compuertas AND/OR a 4 compuertas NAND, un 67% menos de <em>compuertas</em>. El ahorro en área y consumo va en la misma dirección, pero no es esa cifra: una NAND CMOS lleva menos transistores que una AND, y el consumo dinámico depende sobre todo de cuánto conmute cada nodo.
@@ -709,7 +709,7 @@ export default function CalculadoraAlgebraBooleanaPage() {
             </div>
 
             <div className={styles.scenarioCard}>
-              <div className={styles.scenarioIcon}>🔒</div>
+              <div className={styles.scenarioIcon} aria-hidden="true">🔒</div>
               <h4 className={styles.scenarioTitle}>Sistemas de acceso</h4>
               <p className={styles.scenarioDesc}>
                 Control de acceso: ENTRAR = (TarjetaVálida AND HorarioLaboral) OR (TarjetaAdmin AND NOT Bloqueado). Implementado con 4 compuertas NAND: dos para los productos, una para unirlos y una cuarta —NAND(Bloqueado, Bloqueado)— que produce el NOT. Serían 3 solo si la señal complementada llegara ya invertida desde el sensor.
@@ -720,7 +720,7 @@ export default function CalculadoraAlgebraBooleanaPage() {
             </div>
 
             <div className={styles.scenarioCard}>
-              <div className={styles.scenarioIcon}>🖥️</div>
+              <div className={styles.scenarioIcon} aria-hidden="true">🖥️</div>
               <h4 className={styles.scenarioTitle}>Arquitectura de CPU</h4>
               <p className={styles.scenarioDesc}>
                 La ALU de un procesador ARM Cortex-M0 usa álgebra booleana para operaciones bit a bit: AND, OR, XOR entre registros. XOR para detectar cambios de bit (flip-flops, paridad).
@@ -731,7 +731,7 @@ export default function CalculadoraAlgebraBooleanaPage() {
             </div>
 
             <div className={styles.scenarioCard}>
-              <div className={styles.scenarioIcon}>🔍</div>
+              <div className={styles.scenarioIcon} aria-hidden="true">🔍</div>
               <h4 className={styles.scenarioTitle}>Motor de búsqueda</h4>
               <p className={styles.scenarioDesc}>
                 Google usa álgebra booleana en búsquedas: &apos;python AND (tutorial OR curso) NOT básico&apos;. El índice invertido evalúa esta expresión booleana sobre millones de documentos.
@@ -872,37 +872,37 @@ export default function CalculadoraAlgebraBooleanaPage() {
           <h3 className={styles.eduBlockTitle}>Mejores Prácticas de Diseño Booleano</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <div className={styles.tipIcon}>🗺️</div>
+              <div className={styles.tipIcon} aria-hidden="true">🗺️</div>
               <h4 className={styles.tipTitle}>Grupos máximos, pero sin redundancia</h4>
               <p className={styles.tipDesc}>Agranda cada grupo todo lo posible (menos literales = circuito más simple), pero descarta el grupo cuyas celdas ya cubren otros: un término redundante añade puertas sin cambiar la función.</p>
             </div>
 
             <div className={styles.tipCard}>
-              <div className={styles.tipIcon}>🔄</div>
+              <div className={styles.tipIcon} aria-hidden="true">🔄</div>
               <h4 className={styles.tipTitle}>Usa NOR/NAND universales</h4>
               <p className={styles.tipDesc}>En FPGA y ASIC, implementa con NAND para minimizar celdas lógicas. NAND-NAND = SOP en 2 niveles.</p>
             </div>
 
             <div className={styles.tipCard}>
-              <div className={styles.tipIcon}>✅</div>
+              <div className={styles.tipIcon} aria-hidden="true">✅</div>
               <h4 className={styles.tipTitle}>Verifica con tabla de verdad</h4>
               <p className={styles.tipDesc}>Siempre comprueba la expresión minimizada evaluando todos los casos. Un error en el mapa invalida el circuito.</p>
             </div>
 
             <div className={styles.tipCard}>
-              <div className={styles.tipIcon}>🔢</div>
+              <div className={styles.tipIcon} aria-hidden="true">🔢</div>
               <h4 className={styles.tipTitle}>Don&apos;t cares bien definidos</h4>
               <p className={styles.tipDesc}>Solo usa don&apos;t care cuando la combinación es físicamente imposible o no importa. Un don&apos;t care mal colocado puede causar comportamiento erróneo en entradas no previstas.</p>
             </div>
 
             <div className={styles.tipCard}>
-              <div className={styles.tipIcon}>📐</div>
+              <div className={styles.tipIcon} aria-hidden="true">📐</div>
               <h4 className={styles.tipTitle}>POS cuando hay más 0s que 1s</h4>
               <p className={styles.tipDesc}>Si hay pocos 0s en la tabla, minimiza en POS (Product of Sums) agrupando los 0s. Más eficiente cuando f=0 es el caso común.</p>
             </div>
 
             <div className={styles.tipCard}>
-              <div className={styles.tipIcon}>🏭</div>
+              <div className={styles.tipIcon} aria-hidden="true">🏭</div>
               <h4 className={styles.tipTitle}>Herramientas EDA para diseño real</h4>
               <p className={styles.tipDesc}>Para circuitos con &gt;6 variables, usa Vivado (Xilinx), Quartus (Intel/Altera) o Yosys. Implementan Espresso y síntesis lógica automática.</p>
             </div>

@@ -1874,7 +1874,7 @@ export default function SimuladorGrafosPage() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🗺</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🗺</span>
               <strong>Mapas y navegación</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -1886,7 +1886,7 @@ export default function SimuladorGrafosPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🎮</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🎮</span>
               <strong>Videojuegos y NPCs</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -1898,7 +1898,7 @@ export default function SimuladorGrafosPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🌐</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🌐</span>
               <strong>Redes y enrutamiento</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -1910,7 +1910,7 @@ export default function SimuladorGrafosPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>👥</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">👥</span>
               <strong>Redes sociales y recomendaciones</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -2042,42 +2042,42 @@ export default function SimuladorGrafosPage() {
         <h3>Mejores prácticas</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>✅</span>
+            <span className={styles.tipIcon} aria-hidden="true">✅</span>
             <strong>Elige la representación correcta</strong>
             <p>
               Lista de adyacencia para grafos dispersos (la mayoría). Matriz de adyacencia solo si V es pequeño y necesitas consultas O(1) por par (i,j).
             </p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>✅</span>
+            <span className={styles.tipIcon} aria-hidden="true">✅</span>
             <strong>Usa estructuras adecuadas</strong>
             <p>
               Cola FIFO para BFS, pila o recursión para DFS, heap binario para Dijkstra/A*. Una mala elección multiplica la complejidad.
             </p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>✅</span>
+            <span className={styles.tipIcon} aria-hidden="true">✅</span>
             <strong>Marca visitados al extraer, no al insertar</strong>
             <p>
               En Dijkstra, un nodo puede entrar al heap varias veces con diferentes distancias. Solo se considera definitivo al extraerse.
             </p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>✅</span>
+            <span className={styles.tipIcon} aria-hidden="true">✅</span>
             <strong>Heurística admisible en A*</strong>
             <p>
               h(n) nunca debe sobreestimar el coste real. Distancia euclídea es admisible si los pesos son distancias geométricas; Manhattan lo es en grids 4-direcciones.
             </p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>✅</span>
+            <span className={styles.tipIcon} aria-hidden="true">✅</span>
             <strong>Detecta caminos imposibles</strong>
             <p>
               Si la estructura auxiliar queda vacía sin haber alcanzado el destino, no existe camino. Devuelve un valor especial (null, -1, ∞).
             </p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>✅</span>
+            <span className={styles.tipIcon} aria-hidden="true">✅</span>
             <strong>Reconstruye el camino con predecesores</strong>
             <p>
               No guardes caminos completos en cada nodo (gasto de memoria). Guarda solo &laquo;de quién vine&raquo; y reconstruye al final siguiendo la cadena hacia atrás.
@@ -2087,7 +2087,7 @@ export default function SimuladorGrafosPage() {
 
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠</span>
             <strong>Errores frecuentes al implementar grafos</strong>
           </div>
           <ul className={styles.warningList}>
