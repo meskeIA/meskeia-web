@@ -662,13 +662,12 @@ test.describe('generador-anagramas', () => {
     });
 
     // -------------------------------------------------------------------------------------
-    // HALLAZGOS ABIERTOS de esta pasada
+    // REGRESIÓN — los tres hallazgos de esta pasada, reparados el 27/08/2026
     // -------------------------------------------------------------------------------------
 
     test(
-      'HALLAZGO · la FAQ de la ficha blanca promete tres comodines y el tope son dos',
+      'REGRESIÓN · la FAQ de la ficha blanca dice los dos comodines que admite el motor',
       async ({ page }) => {
-        test.fail();
         await abrirConDiccionario(page);
         await page.getByRole('button', { name: 'Ver guía educativa' }).click();
         const faq = page.locator('details', {
@@ -685,9 +684,8 @@ test.describe('generador-anagramas', () => {
     );
 
     test(
-      'HALLAZGO · el JSON-LD sigue describiendo la app anterior a las fichas blancas',
+      'REGRESIÓN · el JSON-LD describe las fichas blancas que la app tiene',
       async ({ page }) => {
-        test.fail();
         await page.goto(RUTA);
         const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
         const faqPage = bloques.find((b) => b.includes('FAQPage')) ?? '';
@@ -702,9 +700,8 @@ test.describe('generador-anagramas', () => {
     );
 
     test(
-      'HALLAZGO · el rechazo del atril de solo comodines se justifica con una cifra falsa',
+      'REGRESIÓN · el rechazo del atril de solo comodines se explica con una cifra cierta',
       async ({ page }) => {
-        test.fail();
         await abrirConDiccionario(page);
         await page.fill('#anagram-letters', '??');
         // «solo con comodines saldría medio diccionario» — con el tope de 2 blancas y ninguna

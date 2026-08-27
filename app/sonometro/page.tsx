@@ -148,6 +148,17 @@ function esSesionValida(valor: unknown): valor is SesionRegistrada {
 const FOTOGRAMAS_ESTABILIZACION = 10;
 
 /**
+ * Fotogramas seguidos con la ventana ENTERA a cero antes de avisar de que no entra audio.
+ *
+ * Los primeros ceros son normales —el búfer del analizador antes de que llegue la señal, ver
+ * `measureLoop`— y por eso hay margen: a ~60 fps son unos dos segundos, tiempo de sobra para
+ * cualquier arranque y muy por debajo de los 3 segundos que la app exige para registrar una
+ * medición. Un micrófono real nunca devuelve 2048 ceros exactos ni un instante: siempre hay
+ * ruido de fondo, aunque sea de un LSB.
+ */
+const FOTOGRAMAS_SIN_SENAL_AVISO = 120;
+
+/**
  * Ganancia de la ponderación A a una frecuencia, en dB (IEC 61672-1).
  *
  * La app rotula su estadística principal «LAeq» y todo su bloque educativo remite a límites
@@ -193,6 +204,8 @@ export default function SonometroPage() {
   const [sesiones, setSesiones] = useState<SesionRegistrada[]>([]);
   // Qué ocurrió con la última medición al detenerla (se guardó o era demasiado corta)
   const [avisoRegistro, setAvisoRegistro] = useState<string | null>(null);
+  /** «No entra audio»: distinto de `error`, que es no haber podido abrir el micrófono */
+  const [avisoSinSenal, setAvisoSinSenal] = useState<string | null>(null);
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -203,6 +216,8 @@ export default function SonometroPage() {
   // debe provocar re-render por muestra.
   const energiaMediaRef = useRef(0);
   const muestrasRef = useRef(0);
+  /** Fotogramas seguidos con la ventana entera a cero — ver `measureLoop` (hallazgo 469) */
+  const fotogramasSinSenalRef = useRef(0);
   const inicioRef = useRef(0);
   // Fotogramas CON AUDIO ya leídos: los primeros no cuentan para las estadísticas
   const fotogramasRef = useRef(0);
@@ -360,8 +375,30 @@ export default function SonometroPage() {
      * tocar ninguna estadística.
      */
     if (dataArray.every((muestra) => muestra === 0)) {
+      /*
+       * Saltar el fotograma es correcto AL ARRANCAR, pero no puede serlo para siempre: un
+       * micrófono silenciado por el sistema, por el interruptor del portátil o retenido por
+       * otra aplicación entrega ceros indefinidamente, y la app enseñaba «0,0 dB(A) — Muy
+       * silencioso» sin decir en ningún momento que no estaba entrando audio. La lectura es
+       * verosímil para quien mide una habitación de noche, que es justo el caso de uso, y
+       * al detener se le culpaba a la duración. Pasado el umbral, se avisa (hallazgo 469).
+       */
+      fotogramasSinSenalRef.current += 1;
+      if (fotogramasSinSenalRef.current === FOTOGRAMAS_SIN_SENAL_AVISO) {
+        const pista = streamRef.current?.getAudioTracks()[0];
+        setAvisoSinSenal(
+          pista && (pista.muted || !pista.enabled)
+            ? 'El micrófono está silenciado: el sistema no entrega audio, así que estos 0,0 dB(A) no son una medición. Actívalo y vuelve a empezar.'
+            : 'No está entrando audio del micrófono (silencio digital exacto). Puede estar silenciado, tapado o en uso por otra aplicación: estos 0,0 dB(A) no son una medición.',
+        );
+      }
       animationRef.current = requestAnimationFrame(measureLoop);
       return;
+    }
+    // Hay señal: se limpia el aviso y el contador vuelve a cero
+    if (fotogramasSinSenalRef.current > 0) {
+      fotogramasSinSenalRef.current = 0;
+      setAvisoSinSenal(null);
     }
 
     // El instrumento entero trabaja en dB(A): es la magnitud que rotula («LAeq») y la que
@@ -426,6 +463,8 @@ export default function SonometroPage() {
       });
 
       streamRef.current = stream;
+      fotogramasSinSenalRef.current = 0;
+      setAvisoSinSenal(null);
       setPermissionState('granted');
 
       const audioContext = new AudioContext();
@@ -520,8 +559,13 @@ export default function SonometroPage() {
     stopMeasuring();
 
     if (muestrasRef.current === 0 || segundos < SEGUNDOS_MINIMOS_REGISTRO) {
+      // Sin una sola muestra válida, la culpa no es de la duración: es que no entró audio.
+      // Acusar de brevedad a una sesión que el usuario ha tenido ocho segundos en marcha
+      // manda a buscar el problema donde no está (hallazgo 469).
       setAvisoRegistro(
-        `Medición demasiado corta para registrarla: hacen falta al menos ${SEGUNDOS_MINIMOS_REGISTRO} segundos.`,
+        muestrasRef.current === 0
+          ? 'No se ha registrado: durante toda la medición no entró audio del micrófono. Comprueba que no esté silenciado ni en uso por otra aplicación.'
+          : `Medición demasiado corta para registrarla: hacen falta al menos ${SEGUNDOS_MINIMOS_REGISTRO} segundos.`,
       );
       return;
     }
@@ -536,8 +580,22 @@ export default function SonometroPage() {
       nota: '',
     };
     // Las más recientes arriba; el tope descarta por la cola, que es la parte vieja
-    guardarSesiones([sesion, ...sesiones].slice(0, MAX_SESIONES));
-    setAvisoRegistro('Medición guardada en el registro de este navegador.');
+    const conLaNueva = [sesion, ...sesiones];
+    const descartadas = Math.max(0, conLaNueva.length - MAX_SESIONES);
+    guardarSesiones(conLaNueva.slice(0, MAX_SESIONES));
+    /*
+     * El descarte se DICE. La app está construida sobre la idea contraria —su FAQ explica
+     * que lo que sostiene una reclamación «no es un pico aislado sino un patrón que se
+     * repite» y manda repetir la medición en distintos días—, así que perder por la cola es
+     * perder justo el extremo que documenta la persistencia. Con una medición diaria el tope
+     * se alcanza en dos meses, y el usuario tiene salida (el CSV) pero no sabía que la
+     * necesitaba (hallazgo 467).
+     */
+    setAvisoRegistro(
+      descartadas > 0
+        ? `Medición guardada. El registro está lleno (${MAX_SESIONES} mediciones), así que se ha borrado la más antigua: descarga el CSV antes de seguir si quieres conservar el histórico completo.`
+        : 'Medición guardada en el registro de este navegador.',
+    );
   };
 
   /** Anotación de una fila: dónde se midió, con qué ventanas, qué se oía. */
@@ -573,11 +631,21 @@ export default function SonometroPage() {
         formatNumber(s.calibracion, 0),
         // Punto y coma y salto de línea dentro de una nota romperían la rejilla del CSV. Al
         // sustituirlos por un espacio se colapsan los blancos: «salón; con la tele» debe salir
-        // con un espacio, no con dos.
+        // con un espacio, no con dos. La comilla doble la resuelve `campoCsv`, más abajo.
         s.nota.replace(/[;\r\n]+/g, ' ').replace(/\s+/g, ' ').trim(),
       ];
     });
-    const csv = '﻿' + [cabecera, ...filas].map((f) => f.join(';')).join('\r\n');
+    /*
+     * La comilla doble es el TERCER carácter con significado en un CSV, y era el que faltaba.
+     * En RFC 4180 un campo que empieza por comilla es un campo entrecomillado, y el lector
+     * sigue leyendo —saltos de línea incluidos— hasta la comilla de cierre: una nota como
+     * «"karaoke" a las 3» se tragaba la fila siguiente entera dentro de su propia celda, y
+     * la exportación perdía mediciones sin avisar. Se entrecomilla el campo y se duplican
+     * sus comillas, que es lo que manda la norma (hallazgo 468).
+     */
+    const campoCsv = (valor: string) =>
+      valor.includes('"') ? `"${valor.replace(/"/g, '""')}"` : valor;
+    const csv = '﻿' + [cabecera, ...filas].map((f) => f.map(campoCsv).join(';')).join('\r\n');
     const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
     const enlace = document.createElement('a');
     enlace.href = url;
@@ -701,6 +769,14 @@ export default function SonometroPage() {
             </div>
           )}
 
+          {/* El micrófono se abrió, pero no entrega señal. No es un error de permisos: es una
+              lectura que parece buena («0,0 dB(A) — Muy silencioso») y no lo es. */}
+          {avisoSinSenal && (
+            <div className={styles.errorMessage} role="alert">
+              <span aria-hidden="true">🔇</span> {avisoSinSenal}
+            </div>
+          )}
+
           {/* Mensaje de permiso */}
           {permissionState === 'prompt' && !isActive && !error && (
             <div className={styles.infoMessage}>
@@ -786,7 +862,11 @@ export default function SonometroPage() {
                   Cada vez que pulsas <strong>Detener y guardar</strong> queda aquí una fila.
                   Anota junto a ella dónde mediste y en qué condiciones: una molestia se
                   documenta con varias sesiones en días y horarios distintos, no con una sola
-                  lectura. El registro vive en este navegador y no se envía a ningún sitio.
+                  lectura. El registro vive en este navegador y no se envía a ningún sitio,
+                  y guarda las {MAX_SESIONES} mediciones más recientes: al llegar a ese tope,
+                  cada nueva medición desplaza a la más antigua ({sesiones.length} de {MAX_SESIONES}
+                  ahora mismo). Descarga el CSV de vez en cuando si quieres conservar el
+                  histórico entero, que es justo lo que documenta que la molestia se repite.
                 </p>
 
                 <div className={styles.tablaScroll}>

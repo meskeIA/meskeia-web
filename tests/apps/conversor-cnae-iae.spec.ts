@@ -39,7 +39,7 @@ import { SECCIONES_IAE } from '../../data/fiscal/cnae-iae';
  *   consecuencia sobre la retención de IRPF, la detección de códigos de la CNAE-2009 y el
  *   rechazo limpio de lo que no existe.
  *
- * HALLAZGOS ABIERTOS: al final, marcados con `test.fail()`. Afirman lo que DEBERÍA pasar y
+ * REGRESIÓN de la re-inspección: al final. Estaban con `test.fail()` y hoy están reparados;
  * hoy fallan a propósito. El día que se reparen pasarán a ROJO («expected to fail, but
  * passed»): entonces se les quita la marca y se quedan como regresión. No se reescribe el
  * valor esperado.
@@ -455,11 +455,10 @@ test.describe('Buscador CNAE-IAE — regresiones de los hallazgos reparados', ()
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS — re-inspección del 27/08/2026
+// REGRESIÓN — los hallazgos de la re-inspección del 27/08/2026, REPARADOS ese mismo día.
+// Estaban marcados con `test.fail()`; ahora sujetan la reparación.
 // ═══════════════════════════════════════════════════════════════════════════
-test.describe('Buscador CNAE-IAE — hallazgos abiertos (27/08/2026)', () => {
-  test.fail();
-
+test.describe('Buscador CNAE-IAE — hallazgos del 27/08/2026, reparados', () => {
   test('el aviso llama «clase VIGENTE distinta» a la clase que ES la equivalencia del código antiguo', async ({
     page,
   }) => {
@@ -500,7 +499,10 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos (27/08/2026)', () => {
     // el aviso tendría que reconocerlo en vez de mandarlo a la clasificación derogada.
     await buscarCnae(page, '47.11');
     await expect(fichas(page).first()).toContainText('47.11');
-    await expect(avisoAntiguo(page)).not.toContainText('la clasificación anterior');
+    // `toHaveCount(0)` y no `not.toContainText`: reparado, el aviso NO SE PINTA, y una
+    // aserción de texto sobre un elemento que no existe falla igual que si existiera con
+    // el texto malo. El localizador dejó de encontrar nada porque eso era el defecto.
+    await expect(avisoAntiguo(page)).toHaveCount(0);
   });
 
   test('«fotógrafo» devuelve artes gráficas y esconde la clase 74.20 «Actividades de fotografía»', async ({
@@ -543,6 +545,113 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos (27/08/2026)', () => {
 // ═══════════════════════════════════════════════════════════════════════════
 // CANDADO DE DATO — los porcentajes de retención de la página salen de data/fiscal
 // ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * CANDADO del hallazgo 423 — el reparto de los sinónimos dentro de la correspondencia.
+ *
+ * El defecto no era «un sinónimo mal puesto»: era el MECANISMO. Los términos coloquiales se
+ * asignaron al PRIMER destino de la tabla CNAE-2009 → CNAE-2025, sin mirar cuál de los
+ * destinos describe la actividad, y `correspondencia['8299']` reparte en 24 clases mientras
+ * `correspondencia['8690']` reparte en 7. Así, los diez términos sanitarios cayeron en el
+ * laboratorio de análisis y los cinco administrativos en una clase de construcción.
+ *
+ * Este test reejecuta el oráculo que encontró el defecto: para cada término, si alguna clase
+ * HERMANA de su propia correspondencia lo lleva ENTERO en su título oficial, el término está
+ * en la clase equivocada. Se compara por raíces de seis caracteres (para que «fotógrafo» case
+ * con «fotografía») y descartando las palabras genéricas de los títulos de la CNAE, sin las
+ * cuales casaría cualquier cosa con cualquier cosa («comercio», «actividades», «servicios»).
+ *
+ * No hace falta navegador: es un contrato sobre el dato.
+ */
+test('CANDADO — ningún sinónimo está en una clase que un hermano de su correspondencia nombra mejor', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  const catalogo = JSON.parse(
+    readFileSync(join(process.cwd(), 'public', 'datos', 'cnae-iae-catalogo.json'), 'utf8'),
+  ) as {
+    cnae: { codigo: string; titulo: string; nivel: string }[];
+    correspondencia: Record<string, string[]>;
+    sinonimos: Record<string, string[]>;
+  };
+
+  const GENERICAS = new Set([
+    'comercio', 'menor', 'mayor', 'actividades', 'actividad', 'servicios', 'servicio',
+    'otros', 'otras', 'otro', 'productos', 'articulos', 'fabricacion', 'venta',
+    'especializado', 'especializada', 'similares', 'general', 'generales', 'demas',
+    'establecimientos', 'diversos', 'tipos', 'clase', 'para', 'con', 'sin', 'los', 'las',
+    'del', 'una', 'uno', 'por', 'cuenta', 'propia', 'ajena', 'auxiliares', 'apoyo',
+    'relacionados', 'relacionadas', 'siguientes', 'principalmente', 'excepto', 'incluidas',
+  ]);
+  const raices = (texto: string): Set<string> => {
+    const limpio = texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const fuera = new Set<string>();
+    for (const w of limpio.match(/[a-z0-9]{3,}/g) ?? []) {
+      if (!GENERICAS.has(w)) fuera.add(w.slice(0, 6));
+    }
+    return fuera;
+  };
+
+  const clases = new Map(
+    catalogo.cnae.filter((e) => e.nivel === 'clase').map((e) => [e.codigo, e.titulo]),
+  );
+
+  /*
+   * Excepciones declaradas, con su motivo — el mismo patrón que los `parser-ok:` del
+   * proyecto. Un término de UNA sola palabra casa con cualquier hermano que la lleve junto a
+   * un calificativo, aunque el hermano sea MÁS específico y por tanto peor destino.
+   */
+  const ADMITIDOS = new Set([
+    // «ropa» a secas pertenece a la confección general (14.10), no a «Confección de ropa
+    // INTERIOR» (14.22), que es un subconjunto: mover el término allí sería empeorarlo.
+    '«ropa» está en 14.10 y 14.22 lo nombra: Confección de ropa interior',
+  ]);
+
+  const malAsignados: string[] = [];
+  for (const [codigo, terminos] of Object.entries(catalogo.sinonimos)) {
+    const hermanos = new Set<string>();
+    for (const destinos of Object.values(catalogo.correspondencia)) {
+      if (destinos.length > 1 && destinos.includes(codigo)) {
+        destinos.filter((d) => d !== codigo).forEach((d) => hermanos.add(d));
+      }
+    }
+    if (hermanos.size === 0) continue;
+
+    const propias = raices(clases.get(codigo) ?? '');
+    for (const termino of terminos) {
+      const rt = raices(termino);
+      if (rt.size === 0 || [...rt].some((r) => propias.has(r))) continue;
+      for (const hermano of hermanos) {
+        const suyas = raices(clases.get(hermano) ?? '');
+        if ([...rt].every((r) => suyas.has(r))) {
+          const linea = `«${termino}» está en ${codigo} y ${hermano} lo nombra: ${clases.get(hermano)}`;
+          if (!ADMITIDOS.has(linea)) malAsignados.push(linea);
+          break;
+        }
+      }
+    }
+  }
+
+  expect(malAsignados, malAsignados.join('\n')).toEqual([]);
+});
+
+/**
+ * CANDADO del hallazgo 426 — la ruta del catálogo se importa del módulo de datos.
+ *
+ * `data/fiscal/cnae-iae.ts` la exporta con ese fin explícito y la app la redeclaraba: si el
+ * generador la cambiase y se actualizase el módulo, esta app seguiría pidiendo la antigua y
+ * caería en «No se han podido cargar los catálogos» sin que nada avisara.
+ */
+test('CANDADO — la app pide el catálogo por CNAE_IAE_RUTA_CATALOGO, no por una ruta suya', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  const fuente = readFileSync(
+    join(process.cwd(), 'app', 'conversor-cnae-iae', 'page.tsx'),
+    'utf8',
+  );
+  expect(fuente).toContain('CNAE_IAE_RUTA_CATALOGO');
+  expect(fuente).not.toMatch(/RUTA_CATALOGO = '\/datos\//);
+});
+
 test('CANDADO — los porcentajes de retención de la FAQ siguen a SECCIONES_IAE', async ({
   page,
 }) => {

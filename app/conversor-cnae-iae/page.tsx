@@ -13,9 +13,14 @@ import {
   ShareCard,
   Footer,
 } from '@/components';
-import { formatNumber } from '@/lib';
+import { formatDate, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { SECCIONES_IAE, IAE_EXENCION } from '@/data/fiscal';
+import {
+  SECCIONES_IAE,
+  IAE_EXENCION,
+  CNAE_VIGENCIA,
+  CNAE_IAE_RUTA_CATALOGO,
+} from '@/data/fiscal';
 
 // ─── Tipos del catálogo oficial (public/datos/cnae-iae-catalogo.json) ────────
 
@@ -84,7 +89,22 @@ type Pestana = 'cnae' | 'iae';
 // solo alarga el scroll. Y SIN criterio no se lista nada: el catálogo entero por
 // orden alfabético empieza en "Cultivo de cereales", que no le sirve a nadie.
 const LIMITE_RESULTADOS = 10;
-const RUTA_CATALOGO = '/datos/cnae-iae-catalogo.json';
+/*
+ * La ruta la exporta el módulo de datos con ese fin explícito («Las apps hacen
+ * fetch(CNAE_IAE_RUTA_CATALOGO)»), y hasta hoy no la usaba nadie: estaba redeclarada aquí.
+ * Si el generador cambiara la ruta y se actualizara el módulo, esta app seguiría pidiendo
+ * la antigua y caería en «No se han podido cargar los catálogos» sin que ningún candado lo
+ * viera (hallazgo 426).
+ */
+const RUTA_CATALOGO = CNAE_IAE_RUTA_CATALOGO;
+
+/**
+ * La Sección 2ª del IAE, leída del módulo. Los porcentajes de retención son dato normativo
+ * y el comentario de `data/fiscal/cnae-iae.ts` lo dice sin rodeos: «Fuente única de estos
+ * textos: las apps NO deben redactar los suyos, porque el dato que contienen (los
+ * porcentajes de retención) es normativo y divergiría» (hallazgo 425).
+ */
+const SECCION_PROFESIONAL = SECCIONES_IAE.find((s) => s.seccion === '2ª')!;
 
 const EJEMPLOS_CNAE: string[] = [
   'hago páginas web',
@@ -326,12 +346,39 @@ export default function ConversorCnaeIaePage() {
     );
   }, [cnaeIndexado, digitosConsultaCnae]);
 
+  /**
+   * ¿La consulta viene escrita con el formato de la CNAE-2025 (dos dígitos, punto, dos
+   * dígitos)? Entonces no es un código de la clasificación anterior, aunque sus cuatro
+   * dígitos también existan allí: quien tiene hoy la clase 47.11 y la escribe como figura
+   * en su alta recibía «4711 existe en la CNAE-2009, la clasificación anterior» sobre un
+   * código que está VIGENTE en el catálogo que la app acaba de servir (hallazgo 424).
+   */
+  const consultaConFormatoVigente = /^\s*\d{2}\.\d{2}\s*$/.test(consultaCnae);
+
   /** Código anterior: 4 dígitos presentes en la tabla oficial CNAE-2009 → CNAE-2025. */
   const equivalenciaAntigua = useMemo<string[] | null>(() => {
     if (!catalogo) return null;
     if (digitosConsultaCnae.length !== 4) return null;
+    if (consultaConFormatoVigente) return null;
     return catalogo.correspondencia[digitosConsultaCnae] ?? null;
-  }, [catalogo, digitosConsultaCnae]);
+  }, [catalogo, digitosConsultaCnae, consultaConFormatoVigente]);
+
+  /**
+   * ¿La clase vigente con ese mismo número es DISTINTA de la actividad que se buscaba?
+   *
+   * ── Por qué esto no es «hay homónima» a secas (hallazgo 422) ─────────────────
+   * El refuerzo «Ojo: ese mismo número también es una clase VIGENTE distinta» se añadió al
+   * reparar el hallazgo 63 y era cierto en los 26 códigos de aquel caso, donde la homónima
+   * NO figuraba en su propia correspondencia. Pero se emitía SIEMPRE que existiera homónima,
+   * y de los 512 códigos de la CNAE-2009 con clase homónima en la CNAE-2025 hay 486 en los
+   * que la homónima SÍ es una de sus equivalencias: para el 95 % de los casos la frase era
+   * falsa, y encima enfática. Quien llegaba con «4711» leía que 47.11 era «distinta» y
+   * descartaba precisamente la clase que le corresponde.
+   */
+  const homonimaEsOtraActividad =
+    vigenteHomonima !== null &&
+    equivalenciaAntigua !== null &&
+    !equivalenciaAntigua.includes(vigenteHomonima.codigo);
 
   const resultadosCnae = useMemo<CnaeIndexada[]>(() => {
     if (cnaeIndexado.length === 0) return [];
@@ -700,14 +747,21 @@ export default function ConversorCnaeIaePage() {
             {equivalenciaAntigua && (
               <div className={styles.avisoAntiguo} role="note">
                 <p>
-                  <strong>{digitosConsultaCnae}</strong> existe en la <strong>CNAE-2009</strong>,
-                  la clasificación anterior. Desde enero de 2026 rige la CNAE-2025 (RD 10/2025), y
+                  <strong>{digitosConsultaCnae}</strong> existe en la <strong>{CNAE_VIGENCIA.anterior}</strong>,
+                  la clasificación anterior. Desde el {formatDate(new Date(CNAE_VIGENCIA.desde))} rige la{' '}
+                  {CNAE_VIGENCIA.vigente} ({CNAE_VIGENCIA.normaVigente}), y
                   estas son las clases actuales que recogen esa actividad
-                  {vigenteHomonima ? (
+                  {homonimaEsOtraActividad && vigenteHomonima ? (
                     <>
                       . <strong>Ojo</strong>: ese mismo número también es una clase VIGENTE
-                      distinta —{vigenteHomonima.codigo} {vigenteHomonima.titulo}—, que aparece
-                      igualmente en la lista
+                      distinta —{vigenteHomonima.codigo} {vigenteHomonima.titulo}—, que{' '}
+                      <strong>no</strong> recoge la actividad que buscas y aparece igualmente
+                      en la lista
+                    </>
+                  ) : vigenteHomonima ? (
+                    <>
+                      , entre ellas <strong>{vigenteHomonima.codigo} {vigenteHomonima.titulo}</strong>,
+                      que conserva el mismo número en la clasificación nueva
                     </>
                   ) : null}
                   :
@@ -998,8 +1052,9 @@ export default function ConversorCnaeIaePage() {
             su finalidad es censal y tributaria: identifica qué actividad has declarado ejercer.
           </p>
           <p className={styles.introText}>
-            La CNAE vigente es la <strong>CNAE-2025</strong>, aprobada por el RD 10/2025, que
-            sustituye a la CNAE-2009 desde enero de 2026. Muchos formularios, escrituras y
+            La CNAE vigente es la <strong>{CNAE_VIGENCIA.vigente}</strong>, aprobada por el{' '}
+            {CNAE_VIGENCIA.normaVigente}, que sustituye a la {CNAE_VIGENCIA.anterior} desde{' '}
+            {formatDate(new Date(CNAE_VIGENCIA.desde))}. Muchos formularios, escrituras y
             contratos anteriores siguen citando códigos de la CNAE-2009: por eso este buscador los
             reconoce y muestra a qué clase equivalen hoy. Las Tarifas del IAE, en cambio, siguen
             siendo las de 1990 con sus modificaciones posteriores, y su lenguaje refleja esa fecha.
@@ -1166,8 +1221,9 @@ export default function ConversorCnaeIaePage() {
                 La Sección 1ª recoge las actividades empresariales y la 2ª el ejercicio individual
                 de una profesión. La diferencia práctica está en la factura: un profesional de la
                 Sección 2ª aplica retención de IRPF en sus facturas a empresas y a otros
-                profesionales (15 % con carácter general y 7 % el año de inicio de la actividad y
-                los dos siguientes), mientras que una actividad empresarial de la Sección 1ª, con
+                profesionales ({formatNumber(SECCION_PROFESIONAL.tipoRetencion ?? 0, 0)} % con carácter
+                general y {formatNumber(SECCION_PROFESIONAL.tipoRetencionInicio ?? 0, 0)} % el año de
+                inicio de la actividad y los dos siguientes), mientras que una actividad empresarial de la Sección 1ª, con
                 carácter general, no la aplica. La Sección 3ª, artística, tiene tratamiento
                 análogo al profesional.
               </p>

@@ -708,8 +708,18 @@ export default function GeneradorAnagramasPage() {
             )}
             {atril.comodinesIgnorados > 0 &&
               ` — se ignoran ${atril.comodinesIgnorados} comodín(es) por encima del máximo de ${MAX_COMODINES}`}
-            {atril.letras.length === 0 && atril.comodines > 0 &&
-              ' — hace falta al menos una letra concreta: solo con comodines saldría medio diccionario'}
+            {atril.letras.length === 0 && atril.comodines > 0 && (
+              /*
+               * La cifra se CUENTA del lemario cargado, no se estima. Antes decía «medio
+               * diccionario» y son 95 palabras sobre 86.973 —el 0,1 %—: con dos blancas y
+               * ninguna letra solo caben los lemas de dos letras, porque uno de tres no
+               * entra en dos fichas. La regla es correcta; lo que era falso era el número
+               * con el que se explicaba (hallazgo 460).
+               */
+              ` — hace falta al menos una letra concreta: solo con ${MAX_COMODINES} blancas saldrían ` +
+              `las ${dictionary.filter((w) => w.length <= atril.comodines).length} palabras de ` +
+              `${atril.comodines} ${atril.comodines === 1 ? 'letra' : 'letras o menos'} del diccionario, y poco más`
+            )}
           </div>
           <div className={styles.examples}>
             <span className={styles.exampleLabel}>Probar:</span>
@@ -1178,7 +1188,7 @@ export default function GeneradorAnagramasPage() {
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqQuestion}>Tengo una ficha blanca en el atril, ¿cómo la escribo?</summary>
-              <p className={styles.eduFaqAnswer}>Con un <strong>interrogante</strong>: escribe <strong>casa?</strong> y la herramienta busca palabras usando esas cuatro letras más una cualquiera. También se admiten el asterisco (<strong>*</strong>) y el guion bajo (<strong>_</strong>), y hasta tres comodines a la vez. En los resultados, la letra que pone la blanca aparece <strong>resaltada</strong>, así que se ve de un vistazo dónde hay que colocarla en el tablero. Un atril de Scrabble en español trae dos blancas entre sus 100 fichas; en Apalabrados y en juegos parecidos, también dos.</p>
+              <p className={styles.eduFaqAnswer}>Con un <strong>interrogante</strong>: escribe <strong>casa?</strong> y la herramienta busca palabras usando esas cuatro letras más una cualquiera. También se admiten el asterisco (<strong>*</strong>) y el guion bajo (<strong>_</strong>), y hasta {MAX_COMODINES} comodines a la vez, que son las blancas que trae el juego real. En los resultados, la letra que pone la blanca aparece <strong>resaltada</strong>, así que se ve de un vistazo dónde hay que colocarla en el tablero. Un atril de Scrabble en español trae dos blancas entre sus 100 fichas; en Apalabrados y en juegos parecidos, también dos.</p>
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqQuestion}>¿Conviene gastar la ficha blanca en cuanto se puede?</summary>

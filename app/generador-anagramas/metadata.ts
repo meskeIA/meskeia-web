@@ -47,6 +47,8 @@ export const jsonLd = generateWebAppSchema({
     'Diccionario español integrado de 87.000 lemas',
     'Filtros por longitud de palabra y por número de palabras',
     'Ignora tildes, espacios y puntuación al repartir letras',
+    'Fichas blancas: escribe ? * o _ por cada comodín del atril, hasta dos a la vez',
+    'Resalta en cada resultado la letra que pone la ficha blanca',
     'Útil para juegos de palabras (Wordle, Scrabble, Apalabrados)',
   ],
   keywords: ['anagramas', 'anagrama de frase', 'anagrama de nombre', 'palabras', 'Wordle', 'Scrabble', 'crucigramas', 'juegos palabras'],
@@ -85,7 +87,15 @@ export const faqJsonLd = {
       name: '¿Cómo usar el generador de anagramas para Scrabble o Apalabrados?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Introduce en el generador las letras que tienes en tu atril (entre 2 y 10 letras). El generador busca todas las palabras válidas que puedes formar con esas letras, ordenadas por longitud de mayor a menor. Para Scrabble o Apalabrados, las palabras más largas suelen dar más puntos. También puedes introducir las letras del tablero junto con las tuyas para encontrar combinaciones que aprovechen letras ya colocadas.',
+        text: 'Introduce en el generador las letras que tienes en tu atril, hasta quince caracteres. El generador busca todas las palabras válidas que puedes formar con esas letras, ordenadas por longitud de mayor a menor. Para Scrabble o Apalabrados, las palabras más largas suelen dar más puntos. También puedes introducir las letras del tablero junto con las tuyas para encontrar combinaciones que aprovechen letras ya colocadas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se escribe una ficha blanca o comodín en el generador de anagramas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Con un interrogante, un asterisco o un guion bajo por cada ficha blanca: escribe «casa?» y el generador busca las palabras que se forman con esas cuatro letras más una cualquiera. Se admiten hasta dos comodines a la vez, que son las blancas que trae un juego de Scrabble en español entre sus 100 fichas (y también Apalabrados). En cada resultado aparece resaltada la letra que pone la blanca, así que se ve de un vistazo dónde hay que colocarla en el tablero. Hace falta al menos una letra concreta: un atril de solo comodines no acota nada.',
       },
     },
     {
