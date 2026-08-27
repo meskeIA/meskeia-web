@@ -1,5 +1,24 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
+
+/**
+ * La escala de la base del ahorro que sirve el FAQPage se DERIVA de `data/fiscal`.
+ *
+ * ── Por qué (27/08/2026, hallazgo 463) ────────────────────────────────────────
+ * Escrita a mano se había quedado en CUATRO tramos con el último abierto («27% por
+ * encima»), cuando `TRAMOS_GANANCIAS_PATRIMONIALES_2025` tiene CINCO (27 % hasta 300.000 €
+ * y 30 % en adelante) y tanto el bloque educativo como el panel de resultados de esta misma
+ * página los enumeran bien. En una ganancia de 1.793.195,95 € la diferencia entre lo que
+ * promete el texto y lo que cobra la app son 44.795,88 €. Y este bloque es el que leen Bing
+ * Copilot, ChatGPT, Perplexity y Gemini, donde ya no va acompañado del disclaimer.
+ */
+const euros = (n: number) => `${n.toLocaleString('es-ES')} €`;
+const ESCALA_AHORRO = TRAMOS_GANANCIAS_PATRIMONIALES_2025.map((t, i, todos) => {
+  const desde = i === 0 ? 0 : todos[i - 1].hasta;
+  if (t.hasta === Infinity) return `${t.tipo}% a partir de ${euros(desde)}`;
+  return i === 0 ? `${t.tipo}% hasta ${euros(t.hasta)}` : `${t.tipo}% de ${euros(desde)} a ${euros(t.hasta)}`;
+}).join(', ');
 
 export const metadata: Metadata = {
   title: 'Simulador Heredar Vivienda - ISD + Plusvalía + IRPF | meskeIA',
@@ -83,7 +102,7 @@ export const faqJsonLd = {
       name: '¿Cuánto IRPF se paga al vender una vivienda heredada?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La ganancia patrimonial se calcula como la diferencia entre el precio de venta y el valor declarado en la herencia (que actúa como precio de adquisición). Ese beneficio tributa en la base del ahorro del IRPF: 19% hasta 6.000 €, 21% de 6.000 a 50.000 €, 23% de 50.000 a 200.000 € y 27% por encima. Si la vivienda era habitual del fallecido y el heredero es mayor de 65 años o la reinvierte en su propia vivienda habitual, puede quedar exenta.',
+        text: `La ganancia patrimonial se calcula como la diferencia entre el precio de venta y el valor declarado en la herencia (que actúa como precio de adquisición). Ese beneficio tributa en la base del ahorro del IRPF: ${ESCALA_AHORRO}. Las exenciones del IRPF miran la vivienda habitual DEL QUE VENDE, no la del fallecido: el mayor de 65 años que transmite SU vivienda habitual (art. 33.4.b LIRPF) y la reinversión en la propia vivienda habitual (art. 38 LIRPF). Que la casa fuera la habitual del fallecido es el requisito de la reducción del Impuesto de Sucesiones (art. 20.2.c LISD), que es otro impuesto: para el heredero que vende una casa que no habita, la ganancia tributa entera.`,
       },
     },
     {

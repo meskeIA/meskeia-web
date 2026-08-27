@@ -230,15 +230,46 @@ function evaluar(
 export default function VerificadorComplementoBrechaGeneroPage() {
   const [tipo, setTipo] = useState<TipoPension>('jubilacion');
   const [fecha, setFecha] = useState<FechaCausante>('desde_2021');
-  const [hijos, setHijos] = useState<number>(2);
+  /**
+   * El número de hijos se guarda como TEXTO y el número se deriva.
+   *
+   * ── Por qué (27/08/2026, hallazgo 470) ──────────────────────────────────────
+   * Antes el estado era `number` y el `onChange` hacía `Math.max(0, parseInt(e.target.value) || 0)`
+   * sobre un `<input type="number">`. Mientras el contenido no es un número válido el navegador
+   * devuelve cadena vacía en `.value`, así que el 0 volvía al campo y el dígito ya escrito
+   * desaparecía: tecleando «2.5» la traza era 2 → 0 → 05, y una entrada de dos hijos se
+   * convertía en una de cinco. Como el módulo topa en 4, el importe se DUPLICABA —de 73,80 a
+   * 147,60 €/mes— y el panel lo presentaba con «Cumples los requisitos básicos». Guardando el
+   * texto, lo tecleado se queda donde el usuario lo puso y lo que no es un número se RECHAZA
+   * en vez de convertirse en otro.
+   */
+  const [hijosTexto, setHijosTexto] = useState<string>('2');
+  const hijosEsValido = /^\d+$/.test(hijosTexto.trim()) && Number(hijosTexto) <= 20;
+  const hijos = hijosEsValido ? Number(hijosTexto) : 0;
   const [genero, setGenero] = useState<Genero>('mujer');
   const [otroProgenitor, setOtroProgenitor] = useState<EstadoOtroProgenitor>('no_percibe');
   const [denegacionPropia, setDenegacionPropia] = useState<boolean>(false);
   const [evaluado, setEvaluado] = useState(false);
 
   const resultado = useMemo(
-    () => evaluar(tipo, fecha, hijos, genero, otroProgenitor, denegacionPropia),
-    [tipo, fecha, hijos, genero, otroProgenitor, denegacionPropia],
+    (): Resultado => {
+      // Con el campo de hijos sin un número válido, el veredicto NO puede ser el de fondo:
+      // «no tienes hijos computables» y «lo que has escrito no es un número» son cosas
+      // distintas, y confundirlas es la misma clase de error que el 0 silencioso de antes.
+      if (!hijosEsValido) {
+        return {
+          procede: false,
+          hijosComputables: 0,
+          importeMensual: 0,
+          importeAnual: 0,
+          motivo: `«${hijosTexto}» no es un número entero de hijos, así que no hay nada que calcular todavía.`,
+          esReclamacion: false,
+          pasoSiguiente: 'Escribe en la pregunta 3 un número entero de 0 a 20 y vuelve a verificar.',
+        };
+      }
+      return evaluar(tipo, fecha, hijos, genero, otroProgenitor, denegacionPropia);
+    },
+    [tipo, fecha, hijos, hijosEsValido, hijosTexto, genero, otroProgenitor, denegacionPropia],
   );
 
   const reset = () => {
@@ -350,10 +381,18 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               min={0}
               max={20}
               className={styles.input}
-              value={hijos}
-              onChange={e => { setHijos(Math.max(0, parseInt(e.target.value) || 0)); reset(); }}
+              value={hijosTexto}
+              onChange={e => { setHijosTexto(e.target.value); reset(); }}
+              aria-invalid={!hijosEsValido}
+              aria-describedby="hijos-ayuda"
             />
-            <p className={styles.hint}>
+            {!hijosEsValido && (
+              <p className={styles.hint} role="alert">
+                <span aria-hidden="true">⚠️</span> Escribe un número entero de hijos, de 0 a 20. Mientras
+                esto no sea un número, el cálculo no se hace: «{hijosTexto}» no se interpreta.
+              </p>
+            )}
+            <p className={styles.hint} id="hijos-ayuda">
               Cuentan hijos/as nacidos con vida o adoptados antes del hecho causante de la pensión.
               El complemento se calcula como máximo sobre {MAX_HIJOS} hijos.
             </p>
@@ -543,7 +582,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
           <p>
             Su naturaleza es la de pensión pública contributiva: se abona junto con la pensión en 14
             pagas y <strong>no computa</strong> a efectos del límite máximo de pensiones públicas
-            ({PENSION_MAXIMA_MES}/mes), por el art. 60.3.d) LGSS.
+            ({PENSION_MAXIMA_MES}/mes), por el {COMPLEMENTO_BRECHA_GENERO_2026.concurrencia.noComputaAlLimiteMaximo.norma}.
           </p>
 
           {/* ─── 1. Tabla comparativa ─── */}
@@ -586,7 +625,11 @@ export default function VerificadorComplementoBrechaGeneroPage() {
                 <tr>
                   <td>Pensiones cubiertas</td>
                   <td>Jubilación, IP, viudedad</td>
-                  <td>Jubilación, IP, viudedad (contributivas)</td>
+                  <td>
+                    Jubilación, IP, viudedad (contributivas), salvo la{' '}
+                    <strong>jubilación parcial</strong>, excluida por el{' '}
+                    {EXCLUSION_PARCIAL.norma}
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -651,7 +694,9 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               <p>
                 No. El complemento exige que la pensión sea <strong>contributiva</strong> (jubilación,
                 incapacidad permanente o viudedad). Pensiones no contributivas, PNC, IMV o PCI quedan
-                fuera.
+                fuera. Y hay una modalidad contributiva que también queda fuera: la{' '}
+                <strong>jubilación parcial</strong>. {EXCLUSION_PARCIAL.detalle}{' '}
+                ({EXCLUSION_PARCIAL.norma}).
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -698,7 +743,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
             <div className={styles.faqItem}>
               <h3>¿Es compatible con el complemento a mínimos?</h3>
               <p>
-                Sí, y el art. 60.3.e) LGSS lo dice expresamente: el importe de este complemento{' '}
+                Sí, y el {COMPLEMENTO_BRECHA_GENERO_2026.concurrencia.compatibleConComplementoAMinimos.norma} lo dice expresamente: el importe de este complemento{' '}
                 <strong>no cuenta como ingreso</strong> para decidir si tienes derecho al complemento
                 por mínimos del art. 59. Cuando procede, se reconoce primero la cuantía mínima que
                 fije la Ley de Presupuestos y a ese importe <strong>se le suma</strong> el
@@ -754,11 +799,13 @@ export default function VerificadorComplementoBrechaGeneroPage() {
             <li className={styles.step}>
               <span className={styles.stepNumber}>5</span>
               <div className={styles.stepContent}>
-                <h3>Espera la resolución (≈ 90 días)</h3>
+                <h3>Espera la resolución (≈ {COMPLEMENTO_BRECHA_GENERO_2026.plazos.resolucionInssDiasOrientativo} días)</h3>
                 <p>
                   Si la respuesta es favorable, el complemento se abona con efectos desde la fecha
-                  que reconozca la SS. Si es desfavorable, se puede plantear reclamación previa en
-                  30 días.
+                  que reconozca la SS. Si es desfavorable, se puede plantear reclamación previa en{' '}
+                  {COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaDias} días{' '}
+                  {COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaTipoDias}{' '}
+                  ({COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaNorma}).
                 </p>
               </div>
             </li>
@@ -814,8 +861,10 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               <span className={styles.tipIcon} aria-hidden="true">⏱️</span>
               <h3>Respeta los plazos</h3>
               <p>
-                30 días naturales para reclamación previa tras una denegación. Pasado ese plazo, la
-                resolución gana firmeza y la reclamación se complica.
+                {COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaDias} días{' '}
+                {COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaTipoDias} para reclamación previa
+                tras una denegación ({COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaNorma}).
+                Pasado ese plazo, la resolución gana firmeza y la reclamación se complica.
               </p>
             </div>
             <div className={styles.tipCard}>
@@ -854,8 +903,10 @@ export default function VerificadorComplementoBrechaGeneroPage() {
                 doctrina TJUE/TS.
               </li>
               <li>
-                <strong>Reclamar fuera de plazo.</strong> La reclamación previa tiene 30 días desde
-                la notificación. Pasado ese plazo, hay que recurrir a vías más complejas.
+                <strong>Reclamar fuera de plazo.</strong> La reclamación previa tiene{' '}
+                {COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaDias} días{' '}
+                {COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaTipoDias} desde la notificación.
+                Pasado ese plazo, hay que recurrir a vías más complejas.
               </li>
               {/* La serie 30,40 / 33,20 / 35,90 que había aquí no estaba en data/fiscal ni
                   citaba fuente: solo el valor vigente es verificable, y es el que se usa. */}

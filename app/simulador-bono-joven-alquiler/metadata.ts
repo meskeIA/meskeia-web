@@ -84,7 +84,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre el Bono Joven Alquiler y otras ayudas al alquiler autonómicas?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El Bono Joven Alquiler es una ayuda estatal cofinanciada por las comunidades autónomas, con requisitos de edad e ingresos homogéneos en toda España. Muchas comunidades tienen además sus propias ayudas complementarias al alquiler, con requisitos diferentes (límites de renta distintos, tramos de edad más amplios, cuantías adicionales). Ambas ayudas pueden ser compatibles si se cumplen los requisitos de cada programa de forma independiente.',
+        text: 'El Bono Joven Alquiler es una ayuda estatal cofinanciada por las comunidades autónomas, con requisitos de edad e ingresos homogéneos en toda España. Muchas comunidades tienen además sus propias ayudas complementarias al alquiler, con requisitos diferentes (límites de renta distintos, tramos de edad más amplios, cuantías adicionales). No se pueden cobrar las dos a la vez: el art. 136 del Real Decreto 326/2026 declara esta ayuda incompatible con cualquier otra destinada al pago del alquiler o de la cesión de uso de la misma vivienda o habitación. Hay que elegir la que más convenga. Distinto es la deducción autonómica del IRPF por alquiler de vivienda habitual, que no es una ayuda al pago sino un beneficio fiscal y se rige por la normativa de cada región.',
       },
     },
     {

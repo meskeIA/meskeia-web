@@ -14,9 +14,9 @@ import { test, expect, Page } from '@playwright/test';
  *     `calcular_complemento_brecha_genero`. Son DOS implementaciones distintas de la misma
  *     norma, así que una reparación puede aterrizar en una y no en la otra. Se comprueban
  *     los mismos supuestos por las dos vías (test «paridad»).
- *   · Tres hallazgos abiertos, marcados con `test.fail()` según la convención de estos
- *     ficheros: se convierten en verdes el día que se reparen, y hasta entonces documentan
- *     el defecto con su caso exacto.
+ *   · Tres hallazgos de la re-inspección del 27/08, REPARADOS ese mismo día. Estaban
+ *     escritos con `test.fail()` afirmando lo que debería pasar; al repararlos se les
+ *     quitó la marca y ahora sujetan la reparación.
  *
  * DE DÓNDE SALE CADA CIFRA
  * ────────────────────────
@@ -778,8 +778,8 @@ test.describe('Verificador del complemento por brecha de género', () => {
    * por ningún lado. El defecto no es el parser casero sino el campo controlado que
    * sobrescribe con «0» cada pulsación intermedia inválida.
    */
-  test.fail(
-    'ABIERTO: teclear «2.5» en el campo de hijos duplica el importe (147,60 € en vez de 73,80 €)',
+  test(
+    'REGRESIÓN: teclear «2.5» en el campo de hijos ya no duplica el importe',
     async ({ page }) => {
       const campo = page.locator('#hijos');
       await campo.click();
@@ -792,10 +792,37 @@ test.describe('Verificador del complemento por brecha de género', () => {
       await page.getByRole('button', { name: 'Verificar mi derecho' }).click();
       const resultado = await textoResultado(page);
 
-      // 2) Y el veredicto tiene que ser el de DOS hijos: 2 × cuantiaPorHijoMensual 36,90
-      expect(resultado).toContain('Hijos computables 2 (máx. 4)');
-      expect(resultado).toContain('+73,80 €/mes');
-      expect(resultado).not.toContain('+147,60 €/mes'); // maxMensual: no es lo que se pidió
+      // 2) ⚠️ El acta admitía dos desenlaces —«2 hijos computables» o «un rechazo explícito
+      //    de la entrada»— y la reparación elige el SEGUNDO. Adivinar que «2.5» significa 2
+      //    es exactamente la clase de suposición que produjo el defecto: por el mismo camino,
+      //    «2.5» podría ser un 25 mal tecleado. En una app de riesgo 1 sobre pensiones, lo
+      //    que no es un número se dice, no se interpreta.
+      expect(resultado).not.toContain('+147,60 €/mes'); // maxMensual: el defecto original
+      expect(resultado).not.toContain('+73,80 €/mes');  // tampoco se adivina la intención
+      expect(resultado).toContain('no es un número entero de hijos');
+      // Y el motivo nombra el CAMPO, no el fondo: «no tienes hijos» sería otra cosa
+      expect(resultado).not.toContain('exige al menos un hijo');
+
+      // 3) Corregido el campo, el veredicto sale: 2 × cuantiaPorHijoMensual 36,90 = 73,80
+      await campo.click();
+      await page.keyboard.press('Control+a');
+      await page.keyboard.type('2');
+      await page.getByRole('button', { name: 'Verificar mi derecho' }).click();
+      const corregido = await textoResultado(page);
+      expect(corregido).toContain('Hijos computables 2 (máx. 4)');
+      expect(corregido).toContain('+73,80 €/mes');
+
+      // 4) Las otras dos entradas del acta, por el mismo mecanismo: «1.500» acababa en
+      //    «0500» (→ tope, 147,60 €/mes) y «-3» en «03» (→ 3 hijos).
+      for (const basura of ['1.500', '-3']) {
+        await campo.click();
+        await page.keyboard.press('Control+a');
+        await page.keyboard.type(basura);
+        await page.getByRole('button', { name: 'Verificar mi derecho' }).click();
+        const veredicto = await textoResultado(page);
+        expect(veredicto).not.toContain('+147,60 €/mes');
+        expect(veredicto).not.toContain('+110,70 €/mes'); // 3 hijos, que es en lo que caía «-3»
+      }
     },
   );
 
@@ -815,8 +842,8 @@ test.describe('Verificador del complemento por brecha de género', () => {
    * por el cuestionario— concluye que su jubilación parcial está cubierta, mientras la
    * herramienta, el MCP y los datos estructurados dicen lo contrario.
    */
-  test.fail(
-    'ABIERTO: la guía educativa no menciona la exclusión de la jubilación parcial (art. 60.4)',
+  test(
+    'REGRESIÓN: la guía educativa menciona la exclusión de la jubilación parcial (art. 60.4)',
     async ({ page }) => {
       await abrirGuia(page);
       const guia = normalizar(
@@ -853,7 +880,7 @@ test.describe('Verificador del complemento por brecha de género', () => {
    * fuera del alcance de cualquier revisión de vigencia. Hoy no hay error numérico; el
    * riesgo es el de siempre, envejecer sin que nada falle.
    */
-  test.fail('ABIERTO: los plazos legales están tecleados en page.tsx, no en data/fiscal', async () => {
+  test('REGRESIÓN: los plazos legales viven en data/fiscal, no tecleados en page.tsx', async () => {
     const { readFileSync } = await import('node:fs');
     const { join } = await import('node:path');
 

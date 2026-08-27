@@ -65,6 +65,16 @@ export interface ParametrosSucesiones {
   patrimonioIdx?: IndicePatrimonioIS;
   /** Valor de la vivienda habitual incluida en la herencia (para reducción 95%) */
   viviendaHabitual?: number;
+  /**
+   * ¿El heredero convivió con el causante los dos años anteriores al fallecimiento?
+   *
+   * Solo importa para el pariente COLATERAL (Grupo III), a quien el art. 20.2.c LISD le
+   * exige además tener 65 años o más. Hasta el 27/08/2026 este motor concedía la reducción
+   * a todo el Grupo III sin condición, mientras `simulador-heredar-vivienda` sí la
+   * comprobaba desde la reparación del hallazgo 204: la misma herencia de un hermano de 40
+   * años valía 14.741,88 € en la web y 4.883,57 € por MCP (hallazgo 462).
+   */
+  convivenciaDosAnios?: boolean;
   /** Importe del seguro de vida recibido (reducción hasta 9.195,49 €) */
   seguroVida?: number;
   /** Si se incluye el ajuar doméstico en la base (3% masa hereditaria) */
@@ -79,6 +89,13 @@ export interface ResultadoSucesiones {
   reduccionEdadMenor21: number;
   reduccionDiscapacidad: number;
   reduccionVivienda: number;
+  /**
+   * Por qué NO se ha aplicado la reducción por vivienda habitual, cuando se declaró una y
+   * el resultado es cero. `null` si se aplicó o si no había vivienda que reducir. Quien
+   * presenta el resultado —la web o el MCP— tiene que poder decirlo: un cero sin motivo se
+   * lee como «no te corresponde» cuando muchas veces significa «falta un requisito».
+   */
+  reduccionViviendaNoAplicada: string | null;
   reduccionSeguroVida: number;
   /** Reducción autonómica aplicada sobre la BASE, antes de la tarifa (Asturias) */
   reduccionAutonomicaBase: number;
@@ -199,6 +216,72 @@ function aplicarBonificacionIS(
   return { bonificacion: 0, porcentaje: 0, detalle: 'Sin bonificación autonómica para este grupo' };
 }
 
+/** Edad mínima del colateral (Grupo III) para la reducción por vivienda, art. 20.2.c LISD */
+export const EDAD_MIN_COLATERAL_VIVIENDA_IS = 65;
+
+/**
+ * Reducción del art. 20.2.c LISD por vivienda habitual del causante — FUENTE ÚNICA.
+ *
+ * ── Por qué es pública (27/08/2026, hallazgos 461 y 462) ──────────────────────
+ * La misma regla vivía escrita dos veces: aquí y en `simulador-heredar-vivienda`. Cada
+ * copia envejeció por su lado y las dos daban resultados distintos para la MISMA herencia,
+ * según se preguntara por la web o por la tool `calcular_sucesiones` del MCP Delegum:
+ *
+ *   · hermano de 40 años, Madrid, 200.000 € de vivienda habitual → 14.741,88 € en la web
+ *     (que sí comprueba el art. 20.2.c) y 4.883,57 € por MCP (que se la concedía a todo el
+ *     Grupo III sin mirar edad ni convivencia). Aquí acertaba la web.
+ *   · cónyuge, Cataluña, 350.000 € → 12.013,29 € en la web (aplicaba la reducción ESTATAL)
+ *     y 31.500,00 € por MCP (no aplicaba ninguna). Aquí no acertaba ninguno de los dos.
+ *
+ * ⚠️ Cataluña: tiene régimen PROPIO de reducción por vivienda habitual (Ley 19/2010), con
+ * topes distintos del estatal y requisito de mantenimiento. Este catálogo NO lo modela, y
+ * aplicarle el tope estatal de 122.606,47 € es inventarse una cifra que no es la suya. Se
+ * resuelve como el IGIC en el clúster de compraventa: no se calcula, y se DICE. Por eso el
+ * motivo viaja en `noAplicada` en vez de dejar un cero mudo. Modelar el régimen catalán
+ * exige fuente oficial y queda fuera de una ronda de reparación.
+ */
+export function evaluarReduccionVivienda(p: {
+  valorVivienda?: number;
+  grupo: GrupoParentescoIS;
+  ccaa: string;
+  edadHeredero?: number;
+  convivenciaDosAnios?: boolean;
+}): { reduccion: number; noAplicada: string | null } {
+  if (!p.valorVivienda || p.valorVivienda <= 0) return { reduccion: 0, noAplicada: null };
+
+  if (p.ccaa === 'cataluna') {
+    return {
+      reduccion: 0,
+      noAplicada:
+        'Cataluña tiene su propia reducción por vivienda habitual (Ley 19/2010), con topes distintos ' +
+        'de los estatales: esta herramienta no la calcula, así que la cuota que sale es la de arriba',
+    };
+  }
+
+  if (p.grupo === 'IV') {
+    return { reduccion: 0, noAplicada: 'sin parentesco: el art. 20.2.c LISD no la contempla' };
+  }
+
+  if (p.grupo === 'III') {
+    // El colateral solo tiene derecho si además es mayor de 65 años y convivió con el
+    // causante los dos años anteriores al fallecimiento (art. 20.2.c LISD).
+    if (p.edadHeredero === undefined || p.edadHeredero < EDAD_MIN_COLATERAL_VIVIENDA_IS) {
+      return {
+        reduccion: 0,
+        noAplicada: `pariente colateral menor de ${EDAD_MIN_COLATERAL_VIVIENDA_IS} años`,
+      };
+    }
+    if (!p.convivenciaDosAnios) {
+      return { reduccion: 0, noAplicada: 'pariente colateral que no convivió los 2 años anteriores' };
+    }
+  }
+
+  return {
+    reduccion: Math.min(p.valorVivienda * REDUCCION_VIVIENDA_PORC_IS, REDUCCION_VIVIENDA_MAX_IS),
+    noAplicada: null,
+  };
+}
+
 // ─── Función principal ─────────────────────────────────────────────────────────
 
 export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
@@ -241,13 +324,16 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
   if (discapacidad === '33') reduccionDiscapacidad = REDUCCION_DISCAPACIDAD_33_IS;
   else if (discapacidad === '65') reduccionDiscapacidad = REDUCCION_DISCAPACIDAD_65_IS;
 
-  // 5. Reducción vivienda habitual (95%, máx 122.606,47 € por heredero)
-  // Art. 20.2.c LISD: cónyuge, descendientes/adoptados, ascendientes/adoptantes y colaterales
-  // (Grupo III simplificado). No aplica al Grupo IV ni en Cataluña (régimen propio no modelado).
-  const gruposConReduccionVivienda: GrupoParentescoIS[] = ['I-conyuge', 'I-descendiente', 'II', 'II-ascendiente', 'III'];
-  const reduccionVivienda = (p.viviendaHabitual && !esCataluna && gruposConReduccionVivienda.includes(p.grupo))
-    ? r(Math.min(p.viviendaHabitual * REDUCCION_VIVIENDA_PORC_IS, REDUCCION_VIVIENDA_MAX_IS))
-    : 0;
+  // 5. Reducción vivienda habitual — ver `evaluarReduccionVivienda`, que es la fuente única
+  // de esta regla desde el 27/08/2026 y la comparten este motor y la app.
+  const vivienda = evaluarReduccionVivienda({
+    valorVivienda: p.viviendaHabitual,
+    grupo: p.grupo,
+    ccaa: p.ccaa,
+    edadHeredero: edad,
+    convivenciaDosAnios: p.convivenciaDosAnios,
+  });
+  const reduccionVivienda = r(vivienda.reduccion);
 
   // 6. Reducción seguro de vida (100% cónyuge/descendientes/ascendientes, tope 9.195,49 €)
   let reduccionSeguroVida = 0;
@@ -294,6 +380,7 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
     reduccionEdadMenor21:     r(reduccionEdadMenor21),
     reduccionDiscapacidad:    r(reduccionDiscapacidad),
     reduccionVivienda,
+    reduccionViviendaNoAplicada: vivienda.noAplicada,
     reduccionSeguroVida,
     reduccionAutonomicaBase: r(reduccionAutonomicaBase),
     totalReducciones,

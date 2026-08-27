@@ -12,9 +12,21 @@ import {
   DataReference,
   ShareCard, RegionBadge
 } from '@/components';
-import { formatCurrency } from '@/lib';
+import { formatCurrency, formatNumber, parseSpanishNumberOr } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { BONO_ALQUILER_JOVEN_2026, FISCAL_VIVIENDA_JOVEN_META } from '@/data/fiscal';
+import {
+  BONO_ALQUILER_JOVEN_2026,
+  UMBRAL_IPREM_VIVIENDA_JOVEN,
+  FISCAL_VIVIENDA_JOVEN_META,
+} from '@/data/fiscal';
+
+/**
+ * Las cuantías del Real Decreto son importes redondos y en la prosa se leen como tales:
+ * «300 €/mes», no «300,00 €/mes». Lo que se CALCULA —la ayuda efectiva, el pago real, el
+ * acumulado— sigue con `formatCurrency`, que es lo que pide la regla de formato. Aquí lo
+ * que importa es que la cifra salga del módulo en vez de estar tecleada (hallazgo 444).
+ */
+const eur = (n: number) => `${formatNumber(n, 0)} €`;
 
 interface Requisito {
   id: string;
@@ -26,14 +38,14 @@ interface Requisito {
 const REQUISITOS: Requisito[] = [
   {
     id: 'edad',
-    pregunta: 'Tienes entre 18 y 35 años (inclusive)',
+    pregunta: `Tienes entre ${BONO_ALQUILER_JOVEN_2026.edad.minima} y ${BONO_ALQUILER_JOVEN_2026.edad.maxima} años (inclusive)`,
     explicacion: 'El Bono Joven está destinado exclusivamente a personas de hasta 35 años.',
     bloqueante: true,
   },
   {
     id: 'ingresos',
-    pregunta: 'Tus rentas anuales no superan 5 veces el IPREM',
-    explicacion: 'El RD 326/2026 fija el umbral en 5 veces el IPREM, que sube a 5,5 con una discapacidad reconocida del 33 % o más (y si eres hijo o hija de víctima de violencia de género) y a 6 con una discapacidad del 65 % o más. Cada Comunidad Autónoma concreta el cómputo en su convocatoria.',
+    pregunta: `Tus rentas anuales no superan ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.general, 0)} veces el IPREM`,
+    explicacion: `El RD 326/2026 fija el umbral en ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.general, 0)} veces el IPREM, que sube a ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad33, 1)} con una discapacidad reconocida del 33 % o más (y si eres hijo o hija de víctima de violencia de género) y a ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad65, 0)} con una discapacidad del 65 % o más. Cada Comunidad Autónoma concreta el cómputo en su convocatoria.`,
     bloqueante: true,
   },
   {
@@ -86,7 +98,14 @@ export default function SimuladorBonoJovenAlquilerPage() {
     setEstados(prev => ({ ...prev, [id]: prev[id] === valor ? 'pendiente' : valor }));
   };
 
-  const alquilerNum = parseFloat(alquilMensual.replace(',', '.')) || 0;
+  // `parseSpanishNumberOr` y no el parseo casero de antes, que convertía la coma en punto y
+  // se lo daba a parseFloat: así «1.500» se leía 1,5 —el punto del millar español pasaba a
+  // decimal— y con ello la app CONCEDÍA la ayuda a quien cobra por encima del tope del
+  // art. 133.1.e sin ningún aviso, porque 1,50 € queda muy por debajo de los 1.000 €. El
+  // navegador además normaliza la coma del teclado español al punto, así que tecleando
+  // «1,500» ocurría lo mismo. Es justo el patrón que persigue `npm run check:parser`
+  // (hallazgo 440).
+  const alquilerNum = Math.max(0, parseSpanishNumberOr(alquilMensual));
   const bonificacionMaxima = BONO[tipoVivienda];
   // El bono no puede superar el 60% de la renta mensual (RD 326/2026, art. 137)
   const bonificacionEfectiva = alquilerNum > 0
@@ -133,7 +152,11 @@ export default function SimuladorBonoJovenAlquilerPage() {
       <header className={styles.hero}>
         <div className={styles.heroIcon} aria-hidden="true">🏠</div>
         <h1 className={styles.title}>Simulador Bono Joven Alquiler</h1>
-        <p className={styles.subtitle}>Comprueba si puedes recibir hasta 300 €/mes (vivienda) o 200 €/mes (habitación) durante hasta 4 años</p>
+        <p className={styles.subtitle}>
+          Comprueba si puedes recibir hasta {eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.vivienda)}/mes
+          (vivienda) o {eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.habitacion)}/mes (habitación) durante
+          hasta {BONO_ALQUILER_JOVEN_2026.plazo.totalMaximoMeses / 12} años
+        </p>
         <p className={styles.heroLaw}>Real Decreto 326/2026, de 22 de abril · Plan Estatal de Vivienda 2026-2030</p>
       </header>
 
@@ -169,7 +192,8 @@ export default function SimuladorBonoJovenAlquilerPage() {
               onClick={() => setTipoVivienda('vivienda')}
               aria-pressed={tipoVivienda === 'vivienda'}
             >
-              🏠 Vivienda completa <span className={styles.tipoBono}>hasta 300 €/mes</span>
+              <span aria-hidden="true">🏠</span> Vivienda completa{' '}
+              <span className={styles.tipoBono}>hasta {eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.vivienda)}/mes</span>
             </button>
             <button
               className={`${styles.tipoBtn} ${tipoVivienda === 'habitacion' ? styles.tipoBtnActivo : ''}`}
@@ -177,7 +201,8 @@ export default function SimuladorBonoJovenAlquilerPage() {
               onClick={() => setTipoVivienda('habitacion')}
               aria-pressed={tipoVivienda === 'habitacion'}
             >
-              🛏️ Habitación (piso compartido) <span className={styles.tipoBono}>hasta 200 €/mes</span>
+              <span aria-hidden="true">🛏️</span> Habitación (piso compartido){' '}
+              <span className={styles.tipoBono}>hasta {eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.habitacion)}/mes</span>
             </button>
           </div>
         </div>
@@ -314,8 +339,9 @@ export default function SimuladorBonoJovenAlquilerPage() {
               <div className={styles.resultadoIcon} aria-hidden="true">⚠️</div>
               <h3 className={styles.resultadoTitulo}>Cumples los requisitos básicos</h3>
               <p className={styles.resultadoTexto}>
-                Cumples los requisitos obligatorios, aunque algunos aspectos adicionales (renta, contrato registrado, disponibilidad en tu CA)
-                pueden condicionar la aprobación final. Consulta con tu Comunidad Autónoma.
+                Cumples los requisitos obligatorios, aunque algunos aspectos adicionales (contrato registrado,
+                documentación completa, disponibilidad de fondos en tu CA) pueden condicionar la aprobación final.
+                La renta ya está comprobada aquí arriba contra el tope del art. 133.1.e. Consulta con tu Comunidad Autónoma.
               </p>
             </div>
           )}
@@ -381,9 +407,9 @@ export default function SimuladorBonoJovenAlquilerPage() {
               <tbody>
                 <tr>
                   <td>Bono Joven al Alquiler 2026-2030 (estatal)</td>
-                  <td>Hasta 300 €/mes (vivienda) · 200 €/mes (habitación)</td>
-                  <td>Hasta 4 años (2+2)</td>
-                  <td>≤35 años</td>
+                  <td>Hasta {eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.vivienda)}/mes (vivienda) · {eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.habitacion)}/mes (habitación)</td>
+                  <td>Hasta {BONO_ALQUILER_JOVEN_2026.plazo.totalMaximoMeses / 12} años ({BONO_ALQUILER_JOVEN_2026.plazo.inicialMeses / 12}+{BONO_ALQUILER_JOVEN_2026.plazo.prorrogaMaximaMeses / 12})</td>
+                  <td>≤{BONO_ALQUILER_JOVEN_2026.edad.maxima} años</td>
                 </tr>
                 <tr>
                   <td>Ayudas al alquiler de la CA</td>
@@ -430,7 +456,13 @@ export default function SimuladorBonoJovenAlquilerPage() {
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">🏙️</span>
               <h3>Habitación en piso compartido</h3>
-              <p>El Plan 2026-2030 incluye expresamente la modalidad de habitación: hasta 200 €/mes. Alquiler de 350 €/mes por habitación → bono de 200 €/mes (57%, dentro del límite del 60%).</p>
+              <p>
+                El Plan 2026-2030 incluye expresamente la modalidad de habitación: hasta{' '}
+                {eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.habitacion)}/mes. Alquiler de 350 €/mes por
+                habitación → bono de {eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.habitacion)}/mes
+                ({formatNumber((BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.habitacion / 350) * 100, 0)}%, dentro del
+                límite del {formatNumber(BONO_ALQUILER_JOVEN_2026.limiteSobreRenta * 100, 0)}%).
+              </p>
             </div>
           </div>
         </section>
@@ -449,7 +481,13 @@ export default function SimuladorBonoJovenAlquilerPage() {
             </div>
             <div className={styles.faqItem}>
               <h3>¿Es compatible el bono con otras ayudas?</h3>
-              <p>Depende de cada CA. Algunas permiten compatibilidad con ayudas autonómicas al alquiler, otras no. La deducción en el IRPF autonómica por alquiler también puede ser compatible según la normativa de cada región.</p>
+              <p>
+                Con otras ayudas al pago del alquiler, <strong>no</strong>: el art. 136 del RD 326/2026 declara esta
+                ayuda incompatible con cualquier otra destinada al pago del alquiler o de la cesión de uso de la misma
+                vivienda o habitación, venga de donde venga. No es algo que decida cada comunidad. Lo que sí es otra
+                cosa es la deducción autonómica del IRPF por alquiler de vivienda habitual, que no es una ayuda al
+                pago sino un beneficio fiscal, y se rige por la normativa de cada región.
+              </p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Qué ocurre si cambio de piso durante el periodo de cobro?</h3>
@@ -465,7 +503,14 @@ export default function SimuladorBonoJovenAlquilerPage() {
             </div>
             <div className={styles.faqItem}>
               <h3>¿Se puede pedir si tengo contrato de habitación?</h3>
-              <p>Depende de la CA. Algunas aceptan contratos de habitación en pisos compartidos; otras solo pisos completos. Consulta la normativa específica de tu Comunidad Autónoma.</p>
+              <p>
+                Sí. El Plan 2026-2030 la incluye expresamente: el art. 137 asigna a la habitación hasta{' '}
+                {eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.habitacion)}/mes y el art. 133.1.e le pone
+                su propio tope de renta, {eur(BONO_ALQUILER_JOVEN_2026.rentaMaximaMensual.habitacion)}/mes
+                ({eur(BONO_ALQUILER_JOVEN_2026.rentaMaximaMensual.municipioPequeno.habitacion)} en municipios
+                de 10.000 habitantes o menos). Con el Plan anterior sí quedaba a criterio de cada convocatoria
+                autonómica; con este ya no. El selector de arriba lo calcula.
+              </p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Qué pasa si mis ingresos suben durante el cobro?</h3>
@@ -502,8 +547,8 @@ export default function SimuladorBonoJovenAlquilerPage() {
             {[
               { icon: '⚡', titulo: 'Solicita cuanto antes', desc: 'Muchas CCAA agotan los fondos. No esperes: solicita el bono en cuanto tengas el contrato firmado.' },
               { icon: '📋', titulo: 'Prepara la documentación completa', desc: 'Una solicitud incompleta genera retrasos. Revisa la lista de documentos de tu CA antes de presentar.' },
-              { icon: '🔍', titulo: 'Consulta el límite de renta de tu CA', desc: 'El Real Decreto fija 1.000 €/mes para vivienda completa y 600 €/mes para habitación (500 y 250 € en municipios de 10.000 habitantes o menos). Tu CA puede elevarlo, pero solo con acuerdo previo del Ministerio.' },
-              { icon: '💡', titulo: 'Comprueba la deducción autonómica IRPF', desc: 'Aparte del bono, muchas CCAA tienen deducción en el IRPF por alquiler de vivienda habitual. Puedes acumular ambas.' },
+              { icon: '🔍', titulo: 'Consulta el límite de renta de tu CA', desc: `El Real Decreto fija ${eur(BONO_ALQUILER_JOVEN_2026.rentaMaximaMensual.vivienda)}/mes para vivienda completa y ${eur(BONO_ALQUILER_JOVEN_2026.rentaMaximaMensual.habitacion)}/mes para habitación (${eur(BONO_ALQUILER_JOVEN_2026.rentaMaximaMensual.municipioPequeno.vivienda)} y ${eur(BONO_ALQUILER_JOVEN_2026.rentaMaximaMensual.municipioPequeno.habitacion)} en municipios de 10.000 habitantes o menos). Tu CA puede elevarlo, pero solo con acuerdo previo del Ministerio.` },
+              { icon: '💡', titulo: 'Comprueba la deducción autonómica IRPF', desc: 'Aparte del bono, muchas CCAA tienen deducción en el IRPF por alquiler de vivienda habitual. Esa sí es compatible, porque es un beneficio fiscal y no una ayuda al pago del alquiler, que el art. 136 declara incompatible.' },
               { icon: '📱', titulo: 'Activa notificaciones en la sede electrónica', desc: 'La CA puede pedir documentación adicional. Deja activadas las notificaciones para no perder plazos de respuesta.' },
               { icon: '🤝', titulo: 'Involucra al propietario', desc: 'El propietario puede necesitar aportar documentación (datos catastrales, etc.). Informa al arrendador con antelación.' },
             ].map(t => (
@@ -518,7 +563,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
 
         {/* Warning */}
         <section className={styles.warningBox}>
-          <h2>⚠️ Advertencias importantes</h2>
+          <h2><span aria-hidden="true">⚠️</span> Advertencias importantes</h2>
           <div className={styles.warningGrid}>
             {[
               { titulo: 'Los fondos son limitados y se agotan', desc: 'El Estado transfiere fondos a las CCAA, pero estos son finitos. Cada año puede haber convocatorias distintas o sin fondos disponibles.' },

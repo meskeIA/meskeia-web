@@ -467,4 +467,30 @@ export const COMPLEMENTO_BRECHA_GENERO_2026 = {
         'cuando desde ella se accede a la jubilación plena, una vez cumplida la edad que corresponda.',
     },
   ] as const,
+  /**
+   * Reglas de concurrencia del art. 60.3 LGSS, con su subapartado. Estaban citadas en el JSX
+   * de `verificador-complemento-brecha-genero` y en su FAQPage —o sea, en lo que leen Bing
+   * Copilot y ChatGPT— pero fuera del alcance de cualquier revisión de vigencia, que es
+   * justo lo que el CLAUDE.md prohíbe (hallazgo 472).
+   */
+  concurrencia: {
+    /** No computa para el límite máximo de pensiones (art. 60.3.d LGSS) */
+    // En minúscula: las dos van SIEMPRE a mitad de frase en la página.
+    noComputaAlLimiteMaximo: { norma: 'art. 60.3.d) LGSS' },
+    /** Compatible con el complemento a mínimos (art. 60.3.e LGSS) */
+    compatibleConComplementoAMinimos: { norma: 'art. 60.3.e) LGSS' },
+  },
+  /**
+   * Plazos del procedimiento. El de la reclamación previa aparecía TRES veces en el JSX y
+   * solo una lo calificaba de «naturales», así que la página no decía lo mismo tres veces
+   * sobre un plazo de caducidad.
+   */
+  plazos: {
+    /** Reclamación previa ante el INSS tras una denegación (art. 71 LRJS) */
+    reclamacionPreviaDias: 30,
+    reclamacionPreviaTipoDias: 'naturales' as const,
+    reclamacionPreviaNorma: 'Art. 71.2 LRJS',
+    /** Orientativo: lo que suele tardar el INSS en resolver. NO es un plazo legal. */
+    resolucionInssDiasOrientativo: 90,
+  },
 };

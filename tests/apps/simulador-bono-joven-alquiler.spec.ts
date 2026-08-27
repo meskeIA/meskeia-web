@@ -38,7 +38,7 @@ import { BONO_ALQUILER_JOVEN_2026, UMBRAL_IPREM_VIVIENDA_JOVEN } from '../../dat
  * primer test comprueba que el módulo sigue diciendo exactamente eso: si el RD cambia, este
  * fichero avisa en vez de seguir pasando contra unas cifras que ya no son.
  *
- * HALLAZGOS ABIERTOS: al final, marcados con `test.fail()` — afirman lo que DEBERÍA pasar y
+ * REGRESIÓN de la re-inspección: al final. Estaban con `test.fail()` y hoy están reparados;
  * hoy fallan a propósito. El día que se reparen se les quita la línea `test.fail()` y quedan
  * como regresión.
  *
@@ -109,13 +109,20 @@ async function teclearRenta(page: Page, valor: string): Promise<void> {
   await page.waitForTimeout(150);
 }
 
-/** Despliega el `<EducationalSection>`, que llega plegado. */
+/**
+ * Despliega el `<EducationalSection>`, que llega plegado.
+ *
+ * ⚠️ La primera versión recorría `nth(i)` sobre `button[aria-expanded="false"]`, que es un
+ * locator VIVO: al pulsar el primero deja de casar y la lista encoge, así que `nth(1)` se
+ * quedaba esperando a un elemento que ya no existe hasta agotar el timeout. Se resuelve
+ * pulsando siempre el PRIMERO que quede, con un tope por si alguno no llega a abrirse.
+ */
 async function abrirGuia(page: Page): Promise<void> {
-  const abridores = page.locator('button[aria-expanded="false"]');
-  const total = await abridores.count();
-  for (let i = 0; i < total; i++) {
-    const boton = abridores.nth(i);
-    if ((await boton.getAttribute('aria-expanded')) === 'false') await boton.click();
+  const plegados = page.locator('button[aria-expanded="false"]');
+  for (let i = 0; i < 20; i++) {
+    if ((await plegados.count()) === 0) break;
+    await plegados.first().click();
+    await page.waitForTimeout(80);
   }
   await page.waitForTimeout(400);
 }
@@ -210,9 +217,14 @@ test.describe('Simulador Bono Joven Alquiler — promesa y encuadre legal', () =
     const cuerpo = await textoVisible(page);
     expect(cuerpo).toContain('300 €/mes');            // art. 137 · vivienda
     expect(cuerpo).toContain('200 €/mes');            // art. 137 · habitación
-    expect(cuerpo).toContain('1.000 €/mes');          // art. 133.1.e · tope vivienda
+    // «1000» y no «1.000»: la cifra ya no está tecleada, sale de
+    // BONO_ALQUILER_JOVEN_2026.rentaMaximaMensual por toLocaleString('es-ES'), y el español
+    // NO agrupa los millares de un número de cuatro cifras. El punto era anglosajón.
+    expect(cuerpo).toContain('1000 €/mes');           // art. 133.1.e · tope vivienda
     expect(cuerpo).toContain('600 €/mes');            // art. 133.1.e · tope habitación
-    expect(cuerpo).toContain('500 y 250 €');          // art. 133.1.e · municipio pequeño
+    // «500 € y 250 €»: los dos importes salen de rentaMaximaMensual.municipioPequeno y cada
+    // uno lleva su unidad, en vez del «500 y 250 €» que estaba escrito a mano.
+    expect(cuerpo).toContain('500 € y 250 €');        // art. 133.1.e · municipio pequeño
     expect(cuerpo).toContain('entre 18 y 35 años');   // art. 133.1.b
     expect(cuerpo).toContain('5 veces el IPREM');     // art. 133.1.d
     expect(cuerpo).toContain('hasta 4 años');         // art. 134 · 24 + 24 meses
@@ -469,13 +481,14 @@ test.describe('Simulador Bono Joven Alquiler — casos resueltos a mano', () => 
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════════════
- * HALLAZGOS ABIERTOS — re-inspección del 27/08/2026. Todos fallan HOY a propósito.
- * Afirman lo que DEBERÍA ocurrir; cuando se reparen, se quita la línea `test.fail()`.
+ * REGRESIÓN — los siete hallazgos de la re-inspección del 27/08/2026, REPARADOS ese mismo
+ * día. Estaban escritos con `test.fail()` afirmando lo que debería ocurrir; al repararlos se
+ * les quitó la marca y ahora sujetan la reparación.
  * ═══════════════════════════════════════════════════════════════════════════════════════
  */
-test.describe('Simulador Bono Joven Alquiler — hallazgos abiertos (27/08/2026)', () => {
+test.describe('Simulador Bono Joven Alquiler — hallazgos del 27/08/2026, reparados', () => {
   /**
-   * ABIERTO 1 (calculo, alto) — la renta escrita a la española se lee mil veces más pequeña.
+   * REPARADO 1 (calculo, alto) — la renta escrita a la española se lee mil veces más pequeña.
    *
    * `page.tsx:89` hace `parseFloat(alquilMensual.replace(',', '.'))`, que es exactamente el
    * patrón que persigue `npm run check:parser`: «1.500» → 1,5. Y el navegador normaliza la
@@ -484,8 +497,7 @@ test.describe('Simulador Bono Joven Alquiler — hallazgos abiertos (27/08/2026)
    * Esperado (art. 133.1.e): 1.500 € > 1.000 € → «No cumples los requisitos obligatorios».
    * El parser canónico del proyecto es `parseSpanishNumber` de `@/lib`.
    */
-  test('ABIERTO 1 — «1.500» debe leerse como mil quinientos y denegar, no como 1,50 €', async ({ page }) => {
-    test.fail();
+  test('REGRESIÓN 1 — «1.500» debe leerse como mil quinientos y denegar, no como 1,50 €', async ({ page }) => {
     await page.goto(RUTA);
     await responderTodoSi(page);
     await ponerRenta(page, '1.500');
@@ -493,7 +505,7 @@ test.describe('Simulador Bono Joven Alquiler — hallazgos abiertos (27/08/2026)
   });
 
   /**
-   * ABIERTO 2 (contenido, alto) — la FAQ del bloque educativo contradice el art. 136.
+   * REPARADO 2 (contenido, alto) — la FAQ del bloque educativo contradice el art. 136.
    *
    * El módulo sella `compatibleConOtrasAyudasAlquiler: false`: la ayuda es INCOMPATIBLE con
    * cualquier otra ayuda al pago del alquiler o la cesión. La FAQ dice que «depende de cada
@@ -501,8 +513,7 @@ test.describe('Simulador Bono Joven Alquiler — hallazgos abiertos (27/08/2026)
    * En una app cuyo propio bloque de advertencias avisa de que el fraude conlleva devolución
    * más sanción, decirle a alguien que puede acumular ayudas que el RD prohíbe no es menor.
    */
-  test('ABIERTO 2 — la FAQ debe decir que es incompatible con otras ayudas al alquiler (art. 136)', async ({ page }) => {
-    test.fail();
+  test('REGRESIÓN 2 — la FAQ debe decir que es incompatible con otras ayudas al alquiler (art. 136)', async ({ page }) => {
     await page.goto(RUTA);
     await abrirGuia(page);
     const cuerpo = await textoVisible(page);
@@ -514,14 +525,13 @@ test.describe('Simulador Bono Joven Alquiler — hallazgos abiertos (27/08/2026)
   });
 
   /**
-   * ABIERTO 3 (dato, medio) — el mismo error del art. 136, pero en el FAQPage JSON-LD.
+   * REPARADO 3 (dato, medio) — el mismo error del art. 136, pero en el FAQPage JSON-LD.
    *
    * Es el mecanismo del hallazgo 153: el bloque estructurado se sirve a Bing Copilot, ChatGPT,
    * Perplexity y Gemini, así que la afirmación equivocada viaja fuera del sitio y ya no la
    * corrige el disclaimer de la página.
    */
-  test('ABIERTO 3 — el FAQPage JSON-LD no puede afirmar compatibilidad contra el art. 136', async ({ page }) => {
-    test.fail();
+  test('REGRESIÓN 3 — el FAQPage JSON-LD no puede afirmar compatibilidad contra el art. 136', async ({ page }) => {
     await page.goto(RUTA);
     const bloques = await page.locator('script[type="application/ld+json"]').allInnerTexts();
     const faq = bloques.map(b => JSON.parse(b)).find(b => b['@type'] === 'FAQPage');
@@ -532,7 +542,7 @@ test.describe('Simulador Bono Joven Alquiler — hallazgos abiertos (27/08/2026)
   });
 
   /**
-   * ABIERTO 4 (contenido, medio) — la FAQ deja la habitación «a criterio de la CA» mientras la
+   * REPARADO 4 (contenido, medio) — la FAQ deja la habitación «a criterio de la CA» mientras la
    * app la calcula.
    *
    * El RD 326/2026 incluye expresamente la modalidad de habitación (art. 137: 200 €/mes, y art.
@@ -540,8 +550,7 @@ test.describe('Simulador Bono Joven Alquiler — hallazgos abiertos (27/08/2026)
    * como botón. La FAQ, tres pantallas más abajo, sigue con el texto del RD 42/2022, donde la
    * habitación sí quedaba a discreción de cada convocatoria autonómica.
    */
-  test('ABIERTO 4 — la FAQ de la habitación debe ser coherente con el art. 137', async ({ page }) => {
-    test.fail();
+  test('REGRESIÓN 4 — la FAQ de la habitación debe ser coherente con el art. 137', async ({ page }) => {
     await page.goto(RUTA);
     await abrirGuia(page);
     const cuerpo = await textoVisible(page);
@@ -552,15 +561,14 @@ test.describe('Simulador Bono Joven Alquiler — hallazgos abiertos (27/08/2026)
   });
 
   /**
-   * ABIERTO 5 (contenido, bajo) — el veredicto intermedio sigue listando la renta entre los
+   * REPARADO 5 (contenido, bajo) — el veredicto intermedio sigue listando la renta entre los
    * «aspectos adicionales» que pueden condicionar la aprobación.
    *
    * Es texto de antes de reparar el hallazgo 150: hoy la renta ya no es un aspecto que matice
    * nada, es una exclusión dura que la app calcula ella con el tope del art. 133.1.e, y si
    * fallara el usuario no vería este veredicto sino la denegación.
    */
-  test('ABIERTO 5 — el veredicto «casi» ya no debe citar la renta como aspecto pendiente', async ({ page }) => {
-    test.fail();
+  test('REGRESIÓN 5 — el veredicto «casi» ya no debe citar la renta como aspecto pendiente', async ({ page }) => {
     await page.goto(RUTA);
     await ponerRenta(page, '600');   // 600 ≤ 1.000: la app YA la ha validado
     for (const req of [REQUISITOS.edad, REQUISITOS.ingresos, REQUISITOS.propietario, REQUISITOS.habitual]) {
@@ -572,7 +580,7 @@ test.describe('Simulador Bono Joven Alquiler — hallazgos abiertos (27/08/2026)
   });
 
   /**
-   * ABIERTO 6 (accesibilidad, bajo) — emojis decorativos sin `aria-hidden` en el control que
+   * REPARADO 6 (accesibilidad, bajo) — emojis decorativos sin `aria-hidden` en el control que
    * decide la cuantía.
    *
    * `node scripts/check-a11y-jsx.mjs app/simulador-bono-joven-alquiler/page.tsx` señala tres:
@@ -581,15 +589,14 @@ test.describe('Simulador Bono Joven Alquiler — hallazgos abiertos (27/08/2026)
    * dos primeras son los botones que eligen entre 300 y 200 €/mes, y el lector de pantalla los
    * anuncia empezando por el emoji.
    */
-  test('ABIERTO 6 — el nombre accesible de los botones de modalidad no debe empezar por el emoji', async ({ page }) => {
-    test.fail();
+  test('REGRESIÓN 6 — el nombre accesible de los botones de modalidad no debe empezar por el emoji', async ({ page }) => {
     await page.goto(RUTA);
     await expect(page.getByRole('button', { name: /Vivienda completa/ })).toHaveAccessibleName(/^Vivienda completa/);
     await expect(page.getByRole('button', { name: /Habitación/ })).toHaveAccessibleName(/^Habitación/);
   });
 
   /**
-   * ABIERTO 7 (dato, medio) — el motor lee del módulo sellado, pero los textos no.
+   * REPARADO 7 (dato, medio) — el motor lee del módulo sellado, pero los textos no.
    *
    * `page.tsx` importa `BONO_ALQUILER_JOVEN_2026` para calcular y deja tecleadas a mano las
    * mismas cifras en la prosa: la franja «entre 18 y 35 años» (existe
@@ -602,8 +609,7 @@ test.describe('Simulador Bono Joven Alquiler — hallazgos abiertos (27/08/2026)
    * motor y deja la prosa hablando de la convocatoria anterior. El módulo se creó para que la
    * cifra viva en un solo sitio; mientras haya dos, el candado no sirve de nada.
    */
-  test('ABIERTO 7 — la edad y el umbral de IPREM deben salir del módulo, no estar tecleados', async () => {
-    test.fail();
+  test('REGRESIÓN 7 — la edad y el umbral de IPREM deben salir del módulo, no estar tecleados', async () => {
     const { readFileSync } = await import('node:fs');
     const { join } = await import('node:path');
     const fuente = readFileSync(

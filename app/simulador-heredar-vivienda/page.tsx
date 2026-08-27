@@ -20,16 +20,20 @@ import {
   TARIFA_CATALUNA_IS,
   REDUCCIONES_PARENTESCO_IS,
   REDUCCIONES_PARENTESCO_CATALUNA_IS,
-  REDUCCION_VIVIENDA_PORC_IS,
-  REDUCCION_VIVIENDA_MAX_IS,
   BONIFICACIONES_CCAA_IS,
   COEFICIENTES_IS,
   COEFICIENTES_CATALUNA_IS,
   COEFICIENTES_IIVTNU_2025,
-  TRAMOS_GANANCIAS_PATRIMONIALES_2025,
+  REDUCCION_VIVIENDA_MAX_IS,
+  desglosarCuotaBaseAhorro,
   PLUSVALIA_MUNICIPAL_META,
 } from '@/data/fiscal';
-import { calcularCuotaIntegraIS } from '@/lib/calculadoras/sucesiones';
+import {
+  calcularCuotaIntegraIS,
+  evaluarReduccionVivienda,
+  EDAD_MIN_COLATERAL_VIVIENDA_IS,
+  type GrupoParentescoIS,
+} from '@/lib/calculadoras/sucesiones';
 import styles from './SimuladorHeredarVivienda.module.css';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -85,7 +89,20 @@ interface ResultadoIRPF {
  * pero en Cataluña NO, porque allí el cónyuge reduce 100.000 € y el hijo ≥21, 50.000 €.
  * Separar cónyuge de hijo arregla las dos cosas a la vez.
  */
-const PARENTESCOS: Array<{ id: Parentesco; label: string; grupo: string; reducKey: string }> = [
+/**
+  * Las comunidades cuya bonificación al Grupo II es un porcentaje FIJO de al menos el 99 %,
+  * leídas de `BONIFICACIONES_CCAA_IS`. La tarjeta educativa las listaba a mano y contaba una
+  * versión que el motor de la misma página no calcula (hallazgo 465): metía a Castilla-La
+  * Mancha, que no tiene porcentaje fijo sino un escalonado que cae al 80 % por encima de
+  * 300.000 € de base —ahí la cuota no es «casi cero», son 8.416,51 €—, ponía a Cantabria y
+  * Aragón como «99 %» cuando lo suyo es una exención por tramos, y dejaba fuera a Canarias,
+  * que es la más generosa del régimen común. Derivada, la lista no puede volver a mentir.
+  */
+const CCAA_BONIFICACION_CASI_TOTAL = Object.values(BONIFICACIONES_CCAA_IS)
+  .filter((c) => typeof c.bonificaciones['II']?.porcentaje === 'number' && (c.bonificaciones['II'].porcentaje as number) >= 0.99)
+  .map((c) => c.nombre);
+
+const PARENTESCOS: Array<{ id: Parentesco; label: string; grupo: string; reducKey: GrupoParentescoIS }> = [
   { id: 'conyuge', label: 'Cónyuge o pareja estable (Grupo II)', grupo: 'II', reducKey: 'I-conyuge' },
   { id: 'hijo', label: 'Hijo o descendiente ≥21 años (Grupo II)', grupo: 'II', reducKey: 'II' },
   { id: 'padre', label: 'Padre / Ascendiente (Grupo II)', grupo: 'II', reducKey: 'II-ascendiente' },
@@ -230,7 +247,7 @@ const ANIO_REFERENCIA = 2026;
  */
 
 /** Edad mínima del colateral (Grupo III) para la reducción de vivienda habitual, art. 20.2.c LISD */
-const EDAD_MIN_COLATERAL_VIVIENDA = 65;
+const EDAD_MIN_COLATERAL_VIVIENDA = EDAD_MIN_COLATERAL_VIVIENDA_IS;
 
 function calcularISD(
   valorReferencia: number,
@@ -256,31 +273,24 @@ function calcularISD(
   const reduccionParentesco = reducciones[reducKey] ?? 0;
 
   /**
-   * Reducción por vivienda habitual (95 % hasta 122.606,47 €).
+   * Reducción por vivienda habitual (art. 20.2.c LISD, 95 % hasta 122.606,47 €).
    *
-   * El art. 20.2.c LISD la reserva al cónyuge, ascendientes y descendientes, y al pariente
-   * COLATERAL mayor de 65 años que hubiera convivido con el causante los dos años anteriores.
-   * Antes bastaba `grupo !== 'IV'`, así que un hermano de 40 años que no convivía se llevaba
-   * hasta 122.606,47 € de reducción — justo lo contrario de lo que dice la FAQ de esta misma
-   * página. En una app de nivel crítico el motor y su texto legal no pueden discrepar.
+   * La regla ya NO se escribe aquí: la sirve `evaluarReduccionVivienda` del motor de
+   * sucesiones, el mismo que ejecutan las tools `calcular_sucesiones` y `consulta_herencia`
+   * del MCP Delegum. Estaba escrita dos veces y las dos copias divergieron: por MCP un
+   * hermano de 40 años se llevaba la reducción entera (hallazgo 462) y en Cataluña la web
+   * aplicaba un tope estatal que allí no rige (hallazgo 461). La misma herencia valía
+   * 12.013,29 € en la web y 31.500,00 € por MCP.
    */
-  let reduccionVivienda = 0;
-  let viviendaNoAplicada: string | null = null;
-  if (viviendaHabitual) {
-    const esColateral = grupo === 'III';
-    if (grupo === 'IV') {
-      viviendaNoAplicada = 'sin parentesco: el art. 20.2.c LISD no la contempla';
-    } else if (esColateral && edad < EDAD_MIN_COLATERAL_VIVIENDA) {
-      viviendaNoAplicada = `pariente colateral menor de ${EDAD_MIN_COLATERAL_VIVIENDA} años`;
-    } else if (esColateral && !convivioDosAnios) {
-      viviendaNoAplicada = 'pariente colateral que no convivió los 2 años anteriores';
-    } else {
-      reduccionVivienda = Math.min(
-        valorReferencia * REDUCCION_VIVIENDA_PORC_IS,
-        REDUCCION_VIVIENDA_MAX_IS
-      );
-    }
-  }
+  const vivienda = evaluarReduccionVivienda({
+    valorVivienda: viviendaHabitual ? valorReferencia : undefined,
+    grupo: reducKey,
+    ccaa,
+    edadHeredero: edad,
+    convivenciaDosAnios: convivioDosAnios,
+  });
+  const reduccionVivienda = vivienda.reduccion;
+  const viviendaNoAplicada = vivienda.noAplicada;
 
   /**
    * Reducción autonómica sobre la BASE. Asturias es la única CCAA del catálogo cuyo
@@ -444,29 +454,19 @@ function calcularIRPFGanancia(
     };
   }
 
-  // Aplicar tramos ganancias patrimoniales
-  let cuota = 0;
-  let restante = ganancia;
-  let limiteAnterior = 0;
-  const desglose: ResultadoIRPF['desglose'] = [];
-
-  for (const tramo of TRAMOS_GANANCIAS_PATRIMONIALES_2025) {
-    if (restante <= 0) break;
-    const limite = tramo.hasta === Infinity ? ganancia + 1 : tramo.hasta;
-    const ancho = limite - limiteAnterior;
-    const aplicado = Math.min(restante, ancho);
-    const cuotaTramo = aplicado * (tramo.tipo / 100);
-    cuota += cuotaTramo;
-    desglose.push({
-      desde: limiteAnterior,
-      hasta: limite,
-      tipo: tramo.tipo,
-      aplicado,
-      cuota: cuotaTramo,
-    });
-    restante -= aplicado;
-    limiteAnterior = limite;
-  }
+  // Los tramos de la base del ahorro los desglosa `data/fiscal/inmuebles.ts`, que se declara
+  // «fuente única del cálculo» y es lo que usan `estimador-plusvalias-irpf` y la tool del MCP.
+  // Este bucle estaba reimplementado a mano: hoy daba la misma cifra, pero es la mitad del
+  // hallazgo 276 que no llegó a repararse, y una corrección en data/fiscal no llegaría aquí.
+  const tramos = desglosarCuotaBaseAhorro(ganancia);
+  const cuota = tramos.reduce((acc, t) => acc + t.cuota, 0);
+  const desglose: ResultadoIRPF['desglose'] = tramos.map((t) => ({
+    desde: t.desde,
+    hasta: t.hasta,
+    tipo: t.tipo,
+    aplicado: t.base,
+    cuota: t.cuota,
+  }));
 
   return {
     valorAdquisicionFiscal,
@@ -1115,11 +1115,14 @@ export default function SimuladorHeredarViviendaPage() {
           <div className={styles.escenarioCard}>
             <h4>Hijo hereda piso vivienda habitual del padre</h4>
             <p>
-              Reducción de parentesco (15.957 €) + reducción vivienda habitual 95% (hasta
-              122.606 €). En CCAA con bonificación 99% (Madrid, Andalucía, Galicia, Murcia,
-              Valencia, Extremadura, Castilla y León, Castilla-La Mancha, Cantabria, Aragón…)
-              el ISD se reduce a casi cero. Solo queda la plusvalía municipal y, si vende,
-              el IRPF.
+              Reducción de parentesco ({formatCurrency(REDUCCIONES_PARENTESCO_IS['II'] ?? 0)}) + reducción
+              vivienda habitual del 95% (hasta {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)}). En las
+              comunidades que bonifican la cuota al 99% o más ({CCAA_BONIFICACION_CASI_TOTAL.join(', ')})
+              el ISD se queda en casi nada. Ojo con las que bonifican <strong>por tramos</strong>:
+              Castilla-La Mancha empieza en el 100% pero baja al 80% por encima de 300.000 € de base
+              liquidable, y Cantabria y Aragón funcionan con una exención hasta cierto importe, no con
+              un porcentaje plano. Cambia la comunidad en el selector de arriba y el cálculo lo dice.
+              En cualquier caso quedan la plusvalía municipal y, si vende, el IRPF.
             </p>
           </div>
           <div className={styles.escenarioCard}>

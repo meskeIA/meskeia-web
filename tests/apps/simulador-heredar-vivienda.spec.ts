@@ -81,6 +81,7 @@
  */
 import { test, expect, Page } from '@playwright/test';
 import { calcularSucesion } from '../../lib/calculadoras/sucesiones';
+import { BONIFICACIONES_CCAA_IS } from '../../data/fiscal';
 
 const RUTA = '/simulador-heredar-vivienda/';
 
@@ -742,38 +743,37 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
   });
 
   /**
-   * WEB ↔ MCP (2/3) — ABIERTO. La reducción por vivienda habitual en CATALUÑA.
+   * WEB ↔ MCP (2/3) — REPARADO el 27/08/2026. La reducción por vivienda habitual en CATALUÑA.
    *
    * Es el caso preconfigurado nº 2 de la propia app («Cónyuge hereda piso 350k en
    * Cataluña»), así que basta con pulsar su botón para reproducirlo.
    *
-   * `calcularISD` en page.tsx concede la reducción estatal del art. 20.2.c (122.606,47 €)
-   * también en Cataluña; `lib/calculadoras/sucesiones.ts` la excluye allí a propósito
-   * («No aplica al Grupo IV ni en Cataluña (régimen propio no modelado)»). Ninguna de las
-   * dos fuentes del repositorio puede arbitrar cuál es la correcta —`data/fiscal` modela
-   * de Cataluña la tarifa y las reducciones por parentesco, no la de vivienda—, y esa
-   * indefinición es justo el hallazgo: la misma herencia tiene hoy dos respuestas.
+   * Hasta el 27/08/2026 la web aplicaba aquí la reducción ESTATAL del art. 20.2.c
+   * (122.606,47 €) y el motor compartido no aplicaba ninguna: la misma herencia valía
+   * 12.013,29 € por la web y 31.500,00 € por MCP, 19.486,71 € de diferencia.
    *
-   *   WEB:  350.000 − 100.000 (CATALUNA['I-conyuge']) − 122.606,47 = 127.393,53
-   *         3.500 + (127.393,53 − 50.000) × 11 % = 12.013,2883 → «12.013,29 €»
-   *   MCP:  350.000 − 100.000 = 250.000 de base liquidable
-   *         14.500 + (250.000 − 150.000) × 17 % = 31.500,00 → «Cuota a pagar: 31.500,00 €»
-   *         (comprobado con POST al endpoint vivo el 27/08/2026)
-   *   Diferencia: 19.486,71 € sobre la misma entrada.
+   * ⚠️ Y no acertaba ninguno de los dos. Cataluña tiene régimen PROPIO de reducción por
+   * vivienda habitual (Ley 19/2010), con topes distintos del estatal: aplicarle los
+   * 122.606,47 € es inventarse una cifra que no es la suya. La reparación unifica los dos
+   * caminos en `evaluarReduccionVivienda` y resuelve Cataluña como el clúster de
+   * compraventa resuelve el IGIC: no se calcula lo que no está modelado, y se DICE. Modelar
+   * el régimen catalán exige fuente oficial y no cabe en una ronda de reparación.
+   *
+   *   350.000 − 100.000 (CATALUNA['I-conyuge']) = 250.000 de base liquidable
+   *   14.500 + (250.000 − 150.000) × 17 % = 31.500,00 €, por los dos caminos.
    */
-  test('WEB ↔ MCP (2/3) — Cataluña, cónyuge, 350.000 € de vivienda habitual: 12.013,29 € en la web y 31.500,00 € por MCP', async ({
+  test('WEB ↔ MCP (2/3) — Cataluña, cónyuge, 350.000 €: la web y el MCP dicen los mismos 31.500,00 €', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto de la re-inspección del 27/08/2026
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Cónyuge hereda piso 350k en Cataluña/ }).click();
     await mover(page, 'aniosVenta', 0);
 
-    // Lo que hoy pinta la web (guarda literal: si cambia, hay que rehacer el caso)
     expect(await linea(page, ISD, '− Reducción parentesco')).toBe('−100.000,00 €');
-    expect(await linea(page, ISD, '− Reducción vivienda habitual (95%)')).toBe('−122.606,47 €');
-    expect(await linea(page, ISD, '= Base liquidable')).toBe('127.393,53 €');
-    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('12.013,29 €');
+    // No se aplica ninguna reducción de vivienda, y la app dice por qué en vez de callarlo
+    expect(await linea(page, ISD, 'Reducción vivienda habitual')).toContain('Cataluña tiene su propia reducción');
+    expect(await linea(page, ISD, '= Base liquidable')).toBe('250.000,00 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('31.500,00 €');
 
     const mcp = calcularSucesion({
       baseImponible: 350000,
@@ -781,22 +781,24 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
       grupo: 'I-conyuge',
       viviendaHabitual: 350000,
     });
-    // Lo que hoy devuelve el motor compartido, comprobado también contra el endpoint vivo
-    expect(mcp.reduccionVivienda).toBe(0); // no aplica la reducción de vivienda en Cataluña
+    expect(mcp.reduccionVivienda).toBe(0);
+    expect(mcp.reduccionViviendaNoAplicada).toContain('Ley 19/2010');
     expect(mcp.baseLiquidable).toBe(250000);
     expect(mcp.cuotaFinal).toBe(31500);
+    // Y la paridad, que es lo que este test existe para sujetar
     expect(mcp.cuotaFinal).toBe(importe(await linea(page, ISD, 'Cuota ISD final')));
   });
 
   /**
-   * WEB ↔ MCP (3/3) — ABIERTO. Los requisitos del COLATERAL (Grupo III).
+   * WEB ↔ MCP (3/3) — REPARADO el 27/08/2026. Los requisitos del COLATERAL (Grupo III).
    *
    * La reparación del hallazgo 204 —el art. 20.2.c LISD reserva la reducción del 95 % al
-   * colateral mayor de 65 años que convivió con el causante los 2 años anteriores— aterrizó
-   * SOLO en `page.tsx`. `lib/calculadoras/sucesiones.ts` sigue concediéndola a todo el
-   * Grupo III sin condición, y su tool `calcular_sucesiones` ni siquiera acepta la edad del
-   * heredero, así que por MCP el requisito no es que se incumpla: es que no se puede
-   * expresar. Es el mismo defecto del 276 con los papeles cambiados.
+   * colateral mayor de 65 años que convivió con el causante los 2 años anteriores— había
+   * aterrizado SOLO en `page.tsx`: el motor compartido se la concedía a todo el Grupo III
+   * sin condición y la tool `calcular_sucesiones` ni siquiera aceptaba la edad, así que por
+   * MCP el requisito no es que se incumpliera, es que no se podía expresar. Aquí la que
+   * acertaba era la web; ahora la regla vive UNA sola vez, en `evaluarReduccionVivienda`,
+   * y la tool expone `edad_heredero` y `convivio_dos_anios`.
    *
    *   Hermano de 40 años, Madrid, 200.000 € que eran la vivienda habitual del fallecido:
    *   WEB:  no reduce (no cumple los requisitos) → base liquidable 192.006,54
@@ -807,10 +809,9 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
    *         × 1,5882 = 9.767,14 → − 50 % = 4.883,57 €
    *   Diferencia: 9.858,31 €, tres veces la cuota que anuncia el MCP.
    */
-  test('WEB ↔ MCP (3/3) — colateral de 40 años que no convivió: 14.741,88 € en la web y 4.883,57 € por MCP', async ({
+  test('WEB ↔ MCP (3/3) — colateral de 40 años que no convivió: la web y el MCP dicen los mismos 14.741,88 €', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto de la re-inspección del 27/08/2026
     await page.goto(RUTA);
 
     await page.selectOption('#parentescoSel', 'hermano');
@@ -831,14 +832,28 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
       baseImponible: 200000,
       ccaa: 'madrid',
       grupo: 'III',
-      edadHeredero: 40, // `calcular_sucesiones` ni siquiera expone este parámetro
+      edadHeredero: 40,
       viviendaHabitual: 200000,
     });
-    // Lo que hoy devuelve el motor compartido: concede la reducción sin mirar requisitos
-    expect(mcp.reduccionVivienda).toBe(122606.47);
-    expect(mcp.baseLiquidable).toBe(69400.07);
-    expect(mcp.cuotaFinal).toBe(4883.57);
+    // El motor compartido comprueba ya los dos requisitos del art. 20.2.c
+    expect(mcp.reduccionVivienda).toBe(0);
+    expect(mcp.reduccionViviendaNoAplicada).toBe('pariente colateral menor de 65 años');
+    expect(mcp.baseLiquidable).toBe(192006.54);
     expect(mcp.cuotaFinal).toBe(importe(await linea(page, ISD, 'Cuota ISD final')));
+
+    // Y con los dos requisitos cumplidos SÍ reduce: 65 años y convivencia acreditada
+    const conDerecho = calcularSucesion({
+      baseImponible: 200000,
+      ccaa: 'madrid',
+      grupo: 'III',
+      edadHeredero: 70,
+      convivenciaDosAnios: true,
+      viviendaHabitual: 200000,
+    });
+    expect(conDerecho.reduccionVivienda).toBe(122606.47);
+    expect(conDerecho.reduccionViviendaNoAplicada).toBeNull();
+    expect(conDerecho.baseLiquidable).toBe(69400.07);
+    expect(conDerecho.cuotaFinal).toBe(4883.57);
   });
 
   /**
@@ -881,7 +896,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
   });
 
   /**
-   * ABIERTO — el `faqJsonLd` de metadata.ts se quedó contando una escala del ahorro que la
+   * REPARADO 27/08/2026 — el `faqJsonLd` de metadata.ts se había quedado contando una escala del ahorro que la
    * app no aplica: «19% hasta 6.000 €, 21% de 6.000 a 50.000 €, 23% de 50.000 a 200.000 € y
    * 27% por encima». `TRAMOS_GANANCIAS_PATRIMONIALES_2025` tiene CINCO tramos (27 % hasta
    * 300.000 y 30 % en adelante) y el propio bloque educativo de la página los enumera bien.
@@ -891,10 +906,9 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
    * CRÍTICO. Sobre la ganancia de 1.793.195,95 € de la guarda anterior, la regla del
    * `faqJsonLd` daría 475.042,91 € y el motor liquida 519.838,78 €.
    */
-  test('ABIERTO — el faqJsonLd describe la base del ahorro sin los tramos del 27 % y del 30 %', async ({
+  test('REGRESIÓN — el faqJsonLd sirve los cinco tramos de la base del ahorro', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto de la re-inspección del 27/08/2026
     await page.goto(RUTA);
 
     const faq = await faqServida(page);
@@ -903,14 +917,15 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
     expect(irpf).toBeDefined();
     const respuesta = irpf!.acceptedAnswer.text;
 
-    // La escala completa de TRAMOS_GANANCIAS_PATRIMONIALES_2025
-    expect(respuesta).toContain('27% de 200.000 a 300.000');
-    expect(respuesta).toMatch(/30\s*%/);
+    // La escala ya no se escribe: se DERIVA de TRAMOS_GANANCIAS_PATRIMONIALES_2025, así que
+    // el día que data/fiscal cambie, el texto servido a las IAs cambia con él.
+    expect(respuesta).toContain('27% de 200.000 € a 300.000 €');
+    expect(respuesta).toContain('30% a partir de 300.000 €');
     expect(respuesta).not.toContain('27% por encima');
   });
 
   /**
-   * ABIERTO — el mismo `faqJsonLd` anuncia una exención de IRPF que ni la app aplica ni
+   * REPARADO 27/08/2026 — el mismo `faqJsonLd` anunciaba una exención de IRPF que ni la app aplica ni
    * `data/fiscal` reconoce en esos términos: «Si la vivienda era habitual del fallecido y el
    * heredero es mayor de 65 años o la reinvierte en su propia vivienda habitual, puede
    * quedar exenta».
@@ -922,10 +937,9 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
    * LISD), no el del IRPF: el texto mezcla los dos impuestos. Y la app, coherente con
    * `data/fiscal`, cobra el IRPF íntegro a un heredero de 90 años (guarda anterior).
    */
-  test('ABIERTO — el faqJsonLd atribuye la exención de IRPF a la vivienda habitual del FALLECIDO', async ({
+  test('REGRESIÓN — el faqJsonLd no atribuye la exención de IRPF a la vivienda habitual del FALLECIDO', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto de la re-inspección del 27/08/2026
     await page.goto(RUTA);
 
     const faq = await faqServida(page);
@@ -933,6 +947,9 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
     const respuesta = irpf!.acceptedAnswer.text;
 
     expect(respuesta).not.toContain('la vivienda era habitual del fallecido y el heredero es mayor de 65');
+    // Y dice de quién se mira la vivienda habitual en cada impuesto, que es lo que se cruzaba
+    expect(respuesta).toContain('DEL QUE VENDE');
+    expect(respuesta).toContain('art. 20.2.c LISD');
   });
 
   /**
@@ -970,7 +987,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
   });
 
   /**
-   * ABIERTO — la tarjeta educativa «Hijo hereda piso vivienda habitual del padre» lista
+   * REPARADO 27/08/2026 — la tarjeta educativa «Hijo hereda piso vivienda habitual del padre» listaba
    * Castilla-La Mancha entre las «CCAA con bonificación 99%» donde «el ISD se reduce a casi
    * cero». `data/fiscal` dice otra cosa: la de Castilla-La Mancha es ESCALONADA y baja al
    * 80 % por encima de 300.000 € de base liquidable, así que el motor de la misma página
@@ -982,10 +999,14 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
    * queda corto a favor del contribuyente; Canarias, que es la más generosa del régimen
    * común con su 99,9 % para los Grupos I, II y III, no aparece.)
    */
-  test('ABIERTO — el bloque educativo lista Castilla-La Mancha entre las CCAA que bonifican el 99 %', async ({
+  // ⚠️ Este test se REESCRIBIÓ al reparar. Su «esperado» era que la tarjeta no nombrase a
+  // Castilla-La Mancha, pero la reparación correcta no es borrarla: es dejar de meterla en
+  // la lista de las que bonifican casi al 100 % y decir que la suya baja por tramos. Así que
+  // lo que se comprueba es lo que de verdad protege: que la lista de comunidades coincida
+  // con las que `BONIFICACIONES_CCAA_IS` bonifica al 99 % o más con porcentaje FIJO.
+  test('REGRESIÓN — la lista de CCAA que bonifican casi al 100 % sale de los datos, no de la memoria', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto de la re-inspección del 27/08/2026
     await page.goto(RUTA);
 
     const tarjeta = await page.evaluate(() => {
@@ -995,7 +1016,17 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
       return (h4?.parentElement?.textContent ?? '').replace(/\s+/g, ' ').trim();
     });
 
-    expect(tarjeta).toContain('bonificación 99%');
-    expect(tarjeta).not.toContain('Castilla-La Mancha');
+    const casiTotal = Object.values(BONIFICACIONES_CCAA_IS)
+      .filter(c => typeof c.bonificaciones['II']?.porcentaje === 'number' && (c.bonificaciones['II'].porcentaje as number) >= 0.99)
+      .map(c => c.nombre);
+
+    // Canarias (99,9 %) es la más generosa del régimen común y antes no aparecía
+    expect(casiTotal).toContain('Canarias');
+    for (const nombre of casiTotal) expect(tarjeta).toContain(nombre);
+
+    // Castilla-La Mancha NO bonifica un porcentaje fijo: baja al 80 % por encima de 300.000 €
+    expect(casiTotal).not.toContain('Castilla-La Mancha');
+    expect(tarjeta).toContain('por tramos');
+    expect(tarjeta).toContain('80%');
   });
 });

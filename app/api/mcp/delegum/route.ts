@@ -620,13 +620,15 @@ function crearServidorDelegum(): McpServer {
         .describe('Edad del heredero (reducción adicional si <21 y grupo I/II)'),
       vivienda_habitual: z.number().nonnegative().optional()
         .describe('Valor de la vivienda habitual del fallecido incluida en la herencia (reducción 95%, tope 122.606,47 €)'),
+      convivio_dos_anios: z.boolean().optional()
+        .describe('Si el heredero convivió con el fallecido los dos años anteriores. Solo se le exige al Grupo III (colateral) para la reducción por vivienda habitual (art. 20.2.c LISD).'),
       seguro_vida: z.number().nonnegative().optional()
         .describe('Importe de seguro de vida recibido (reducción hasta 9.195,49 € para parientes directos)'),
       discapacidad: z.enum(['0', '33', '65']).optional()
         .describe('Grado de discapacidad del heredero. Por defecto "0".'),
     },
     { title: 'Consulta de herencia: Impuesto de Sucesiones por CCAA', readOnlyHint: true },
-    async ({ valor_herencia, ccaa, grupo_parentesco, edad_heredero, vivienda_habitual, seguro_vida, discapacidad }, extra) => {
+    async ({ valor_herencia, ccaa, grupo_parentesco, edad_heredero, vivienda_habitual, convivio_dos_anios, seguro_vida, discapacidad }, extra) => {
       await registrarUsoDelegum('consulta_herencia', getCaller(extra));
       try {
         const r = calcularSucesion({
@@ -636,6 +638,7 @@ function crearServidorDelegum(): McpServer {
           edadHeredero: edad_heredero,
           discapacidad: discapacidad as NivelDiscapacidadIS | undefined,
           viviendaHabitual: vivienda_habitual,
+          convivenciaDosAnios: convivio_dos_anios,
           seguroVida: seguro_vida,
         });
         const lineas = [
@@ -643,6 +646,7 @@ function crearServidorDelegum(): McpServer {
           '',
           `💶 Herencia recibida: **${fmt(r.baseImponible)} €**`,
           r.totalReducciones > 0 ? `➖ Reducciones aplicadas: ${fmt(r.totalReducciones)} €${r.reduccionAutonomicaBase > 0 ? ` (incluidos ${fmt(r.reduccionAutonomicaBase)} € de reducción autonómica en base)` : ''}` : '',
+          r.reduccionViviendaNoAplicada ? `⚠️ Sin reducción por vivienda habitual: ${r.reduccionViviendaNoAplicada}` : '',
           `📦 Base liquidable: ${fmt(r.baseLiquidable)} €`,
           `🔢 Cuota íntegra: ${fmt(r.cuotaIntegra)} €`,
           r.coeficienteMultiplicador !== 1 ? `✖️ Coeficiente patrimonio: ×${r.coeficienteMultiplicador}` : '',
@@ -1303,9 +1307,19 @@ function crearServidorDelegum(): McpServer {
       vivienda_habitual: z.number().nonnegative().optional().describe('Valor de la vivienda habitual heredada (reducción 95%)'),
       seguro_vida: z.number().nonnegative().optional().describe('Importe de seguro de vida recibido'),
       discapacidad: z.enum(['0', '33', '65']).optional().describe('Grado de discapacidad. Por defecto "0".'),
+      // Los dos requisitos que el art. 20.2.c LISD le exige al pariente COLATERAL (Grupo III)
+      // para la reducción por vivienda habitual. Antes no se podían ni expresar, así que la
+      // tool se la concedía siempre y contradecía a la web (hallazgo 462).
+      edad_heredero: z.number().int().nonnegative().optional().describe(
+        'Edad del heredero. Necesaria si es del Grupo III (colateral: hermanos, sobrinos, tíos) y hay ' +
+        'vivienda habitual: el art. 20.2.c LISD le exige 65 años o más. También activa la reducción ' +
+        'adicional del menor de 21 años en descendientes.'),
+      convivio_dos_anios: z.boolean().optional().describe(
+        'Si el heredero convivió con el fallecido los dos años anteriores. Solo se le exige al Grupo III ' +
+        '(colateral) para la reducción por vivienda habitual (art. 20.2.c LISD).'),
     },
     { title: 'Calcula el Impuesto de Sucesiones por comunidad autónoma', readOnlyHint: true },
-    async ({ valor_herencia, ccaa, grupo_parentesco, vivienda_habitual, seguro_vida, discapacidad }, extra) => {
+    async ({ valor_herencia, ccaa, grupo_parentesco, vivienda_habitual, seguro_vida, discapacidad, edad_heredero, convivio_dos_anios }, extra) => {
       await registrarUsoDelegum('calcular_sucesiones', getCaller(extra));
       try {
         const r = calcularSucesion({
@@ -1315,15 +1329,22 @@ function crearServidorDelegum(): McpServer {
           discapacidad: discapacidad as NivelDiscapacidadIS | undefined,
           viviendaHabitual: vivienda_habitual,
           seguroVida: seguro_vida,
+          edadHeredero: edad_heredero,
+          convivenciaDosAnios: convivio_dos_anios,
         });
         const texto = [
           `⚖️ **Impuesto de Sucesiones — ${r.ccaaNombre}**`,
           `💶 Herencia: ${fmt(r.baseImponible)} € · Reducciones: ${fmt(r.totalReducciones)} €`,
           `📦 Base liquidable: ${fmt(r.baseLiquidable)} €`,
+          // Un cero sin motivo se lee como «no te corresponde»: si se declaró vivienda
+          // habitual y no se ha reducido nada, se dice por qué.
+          r.reduccionViviendaNoAplicada
+            ? `⚠️ Sin reducción por vivienda habitual: ${r.reduccionViviendaNoAplicada}`
+            : null,
           r.bonificacionCcaa > 0 ? `➖ ${r.detalleBonificacion}: −${fmt(r.bonificacionCcaa)} €` : `ℹ️ ${r.detalleBonificacion}`,
           `💰 **Cuota a pagar: ${fmt(r.cuotaFinal)} €** (tipo efectivo ${pct(r.tipoEfectivo)}%)`,
           `📚 ${r.fuenteDatos}`,
-        ].join('\n');
+        ].filter(Boolean).join('\n');
         return conAviso(texto, AVISO_FISCAL);
       } catch (err) {
         return errorMcp(err);
