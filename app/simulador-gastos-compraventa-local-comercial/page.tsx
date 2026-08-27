@@ -30,6 +30,7 @@ import {
   calcularRegistro,
   calcularPlusvaliaMunicipal,
   ENLACE_CATASTRO,
+  TERRITORIOS_SIN_IVA,
 } from '@/data/itp-ccaa';
 
 // ===== TIPOS =====
@@ -41,6 +42,8 @@ interface ResultadosComprador {
   impuestoTransmision: number;
   tipoImpuesto: string;
   porcentajeImpuesto: number;
+  /** En Canarias, Ceuta y Melilla no rige el IVA: se nombra el impuesto y no se inventa cifra */
+  impuestoNoCalculado: boolean;
   ajd: number;
   gastosNotario: number;
   gastosNotarioMin: number;
@@ -126,15 +129,31 @@ export default function SimuladorLocalComercialPage() {
     const precio = parseSpanishNumber(precioVenta);
     if (!Number.isFinite(precio) || precio <= 0) return null;
 
-    const gestoria = parseSpanishNumberOr(gastosGestoria);
+    // Se acota aquí y no solo en el blur del NumberInput: mientras el campo tiene el foco,
+    // un importe negativo se sumaba al total y su tarjeta ni se pintaba (guard > 0), así que
+    // el total en pantalla no cuadraba con las líneas visibles.
+    const gestoria = Math.max(0, parseSpanishNumberOr(gastosGestoria));
 
     let impuesto = 0;
     let tipoImpuesto = '';
     let porcentaje = 0;
     let ivaRecuperable = false;
+    let impuestoNoCalculado = false;
     let ajd = 0;
 
-    if (tipoTransmision === 'primera-mano') {
+    const territorioSinIva = TERRITORIOS_SIN_IVA[ccaa];
+    const conIva = tipoTransmision === 'primera-mano' || tipoTransmision === 'segunda-mano-renuncia';
+
+    if (conIva && territorioSinIva) {
+      // Allí no se devenga IVA sino IGIC o IPSI: se nombra el impuesto que corresponde y no
+      // se inventa cifra, como ya hacen nave-industrial, solar y terreno-rústico. La cuota
+      // gradual de AJD sí se devenga, porque la operación va sujeta al impuesto indirecto
+      // canario o ceutí y no exenta.
+      tipoImpuesto = territorioSinIva.impuesto;
+      impuestoNoCalculado = true;
+      ajd = calcularAJD(precio, ccaa);
+      ivaRecuperable = true;
+    } else if (tipoTransmision === 'primera-mano') {
       // Obra nueva del promotor: IVA 21% + AJD
       tipoImpuesto = 'IVA';
       porcentaje = IVA_LOCAL_COMERCIAL;
@@ -175,6 +194,7 @@ export default function SimuladorLocalComercialPage() {
       impuestoTransmision: impuesto,
       tipoImpuesto,
       porcentajeImpuesto: porcentaje,
+      impuestoNoCalculado,
       ajd,
       gastosNotario: notario,
       gastosNotarioMin: notaria.min,
@@ -499,16 +519,28 @@ export default function SimuladorLocalComercialPage() {
               />
 
               <ResultCard
-                title={`${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 2)}%)`}
-                value={formatCurrency(resultadosComprador.impuestoTransmision)}
+                title={
+                  resultadosComprador.impuestoNoCalculado
+                    ? resultadosComprador.tipoImpuesto
+                    : `${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 2)}%)`
+                }
+                value={
+                  resultadosComprador.impuestoNoCalculado
+                    ? 'No calculado'
+                    : formatCurrency(resultadosComprador.impuestoTransmision)
+                }
                 variant="warning"
                 icon="📋"
                 description={
-                  esRenuncia
-                    ? 'Autorrepercutido por inversión del sujeto pasivo — deducible si eres sujeto pasivo de IVA'
-                    : resultadosComprador.ivaRecuperable
-                      ? 'Potencialmente deducible si eres empresa/autónomo sujeto a IVA'
-                      : 'Tipo general — los locales comerciales no tienen tipos reducidos'
+                  resultadosComprador.impuestoNoCalculado
+                    // El texto nombra la operación ELEGIDA, no siempre la obra nueva: es el
+                    // hallazgo 451 de la app hermana de la nave industrial.
+                    ? `En ${datosCcaaActual.nombre} no rige el IVA: ${esRenuncia ? 'la renuncia a la exención' : 'la compra de obra nueva'} tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
+                    : esRenuncia
+                      ? 'Autorrepercutido por inversión del sujeto pasivo — deducible si eres sujeto pasivo de IVA'
+                      : resultadosComprador.ivaRecuperable
+                        ? 'Potencialmente deducible si eres empresa/autónomo sujeto a IVA'
+                        : 'Tipo general — los locales comerciales no tienen tipos reducidos'
                 }
               />
 
@@ -549,22 +581,28 @@ export default function SimuladorLocalComercialPage() {
               <div className={styles.separador} />
 
               <ResultCard
-                title="Total gastos adicionales"
+                title={resultadosComprador.impuestoNoCalculado ? 'Total gastos adicionales (parcial)' : 'Total gastos adicionales'}
                 value={formatCurrency(resultadosComprador.totalGastos)}
                 variant="info"
                 icon="➕"
-                description={`${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio de compra`}
+                description={
+                  resultadosComprador.impuestoNoCalculado
+                    ? `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio — SIN el ${resultadosComprador.tipoImpuesto}, que no está incluido`
+                    : `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio de compra`
+                }
               />
 
               <ResultCard
-                title="COSTE TOTAL DE ADQUISICIÓN"
+                title={resultadosComprador.impuestoNoCalculado ? 'COSTE TOTAL (PARCIAL)' : 'COSTE TOTAL DE ADQUISICIÓN'}
                 value={formatCurrency(resultadosComprador.totalOperacion)}
                 variant="highlight"
                 icon="💳"
                 description={
-                  resultadosComprador.ivaRecuperable
-                    ? 'Precio + todos los gastos (antes de deducir el IVA si tienes derecho)'
-                    : 'Precio + todos los gastos de la operación'
+                  resultadosComprador.impuestoNoCalculado
+                    ? `No incluye el ${resultadosComprador.tipoImpuesto}: el coste real será mayor`
+                    : resultadosComprador.ivaRecuperable
+                      ? 'Precio + todos los gastos (antes de deducir el IVA si tienes derecho)'
+                      : 'Precio + todos los gastos de la operación'
                 }
               />
             </div>

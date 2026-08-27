@@ -46,6 +46,9 @@
  */
 
 import { calcularCuotaBaseAhorro } from './inmuebles';
+// El motivo de la exención se PRESENTA al usuario, así que su porcentaje lleva coma decimal:
+// toFixed() escribía «51.8 %» en una app en español (CLAUDE.md global §2, hallazgo 433).
+import { formatNumber } from '@/lib/formatters';
 
 export interface EntradaGananciaInmueble {
   /** Precio de venta escriturado (€) */
@@ -169,7 +172,7 @@ export function calcularGananciaInmueble(e: EntradaGananciaInmueble): ResultadoG
   const motivoExencion = proporcionReinvertida >= 1
     ? 'Reinversión total del importe obtenido en una nueva vivienda habitual (art. 38 LIRPF)'
     : proporcionReinvertida > 0
-      ? `Reinversión parcial: exento el ${(proporcionReinvertida * 100).toFixed(1)} % de la ganancia (art. 41 RIRPF)`
+      ? `Reinversión parcial: exento el ${formatNumber(proporcionReinvertida * 100, 1)} % de la ganancia (art. 41 RIRPF)`
       : null;
 
   return {

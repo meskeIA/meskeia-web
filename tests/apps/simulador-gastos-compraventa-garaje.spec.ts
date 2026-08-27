@@ -13,9 +13,9 @@
  *   4. MITAD B (27/08) — casos nuevos, en zonas que ninguna inspección anterior tocó:
  *      la plusvalía municipal del vendedor con sus dos métodos, la escala progresiva en un
  *      tramo alto de verdad, la venta con pérdida y el rechazo de texto que no es un número.
- *   5. HALLAZGOS ABIERTOS 27/08 — marcados con `test.fail()`: afirman lo que DEBERÍA pasar,
- *      así que hoy fallan a propósito. Al repararlos se les quita la marca y quedan como
- *      regresión.
+ *   5. REGRESIÓN 27/08 — los cinco hallazgos de la re-inspección del 27/08/2026, reparados
+ *      ese mismo día. Estaban escritos con `test.fail()` afirmando lo que DEBERÍA pasar; al
+ *      repararlos se les quitó la marca y quedan como regresión.
  *
  * De dónde sale CADA cifra esperada (ninguna de memoria):
  *  - Tipo general de ITP por CCAA → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
@@ -654,15 +654,13 @@ test.describe('MITAD B — casos nuevos de la re-inspección (27/08/2026)', () =
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS — re-inspección del 27/08/2026.
-// Marcados con `test.fail()`: afirman lo que DEBERÍA pasar, así que hoy fallan a propósito.
-// Cuando se reparen, se les quita la marca y quedan como regresión.
+// REGRESIÓN — los cinco hallazgos de la re-inspección del 27/08/2026, REPARADOS ese mismo
+// día. Estaban marcados con `test.fail()` afirmando lo que debería pasar; al repararlos se
+// les quitó la marca y ahora sujetan la reparación.
 // ═════════════════════════════════════════════════════════════════════════════
 
-test.describe('HALLAZGOS ABIERTOS — re-inspección del 27/08/2026', () => {
-  test.fail();
-
-  // ⚠️ ABIERTO (alto) — cálculo.
+test.describe('REGRESIÓN — hallazgos del 27/08/2026, reparados', () => {
+  // ✅ REPARADO 27/08 (alto) — cálculo.
   // En Canarias, Ceuta y Melilla no rige el IVA español: `TERRITORIOS_SIN_IVA` (data/itp-ccaa.ts)
   // los declara como IGIC e IPSI, y la app IMPRIME ese aviso —«Esta herramienta no lo calcula,
   // así que el importe del impuesto indirecto no es el tuyo»— mientras la tarjeta de al lado
@@ -673,7 +671,7 @@ test.describe('HALLAZGOS ABIERTOS — re-inspección del 27/08/2026', () => {
   // Caso: Canarias · primera mano · Independiente · 25.000 € · gestoría 300 € → esperado
   //       ninguna cifra de IVA y un total marcado como parcial · obtenido «IVA (21,00%)
   //       5.250,00 €» y «COSTE TOTAL DE ADQUISICIÓN 31.189,55 € — Precio + todos los gastos».
-  test('ABIERTO (cálculo) — en Canarias no se liquida un IVA que allí no existe', async ({
+  test('REGRESIÓN (cálculo) — en Canarias no se liquida un IVA que allí no existe', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -690,7 +688,7 @@ test.describe('HALLAZGOS ABIERTOS — re-inspección del 27/08/2026', () => {
     await expect(page.locator('h3', { hasText: 'COSTE TOTAL' })).toContainText('PARCIAL');
   });
 
-  // ⚠️ ABIERTO (medio) — dato.
+  // ✅ REPARADO 27/08 (medio) — dato.
   // El consejo «Liquida el ITP en el plazo legal» lleva escrita a mano una escala de recargos
   // —«del 5% al 20%»— que contradice a la calculadora canónica del propio catálogo:
   // `lib/calculadoras/recargoPresentacionTardia.ts` (LGT art. 27.2 en la redacción de la
@@ -700,7 +698,7 @@ test.describe('HALLAZGOS ABIERTOS — re-inspección del 27/08/2026', () => {
   // Caso: bloque educativo → obtenido «recargos del 5% al 20% más intereses de demora» ·
   //       esperado la escala del 1 %/15 %. Sobre el ITP de 1.500 € del caso de Madrid, un mes
   //       de retraso son 15,00 € y no los 75,00 € que anuncia el 5 %.
-  test('ABIERTO (dato) — el recargo por liquidar tarde es el del art. 27.2 LGT vigente', async ({
+  test('REGRESIÓN (dato) — el recargo por liquidar tarde es el del art. 27.2 LGT vigente', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -710,7 +708,7 @@ test.describe('HALLAZGOS ABIERTOS — re-inspección del 27/08/2026', () => {
     await expect(consejo).toContainText('1%');
   });
 
-  // ⚠️ ABIERTO (bajo) — operativa.
+  // ✅ REPARADO 27/08 (bajo) — operativa.
   // Cuando falta el precio de compra, la plusvalía no se calcula y la tarjeta culpa a un campo
   // que el usuario SÍ ha rellenado: el mensaje por defecto es «No calculada (falta valor
   // catastral del suelo)» y solo se sustituye dentro del `if (valorSuelo > 0 && anios > 0 &&
@@ -719,7 +717,7 @@ test.describe('HALLAZGOS ABIERTOS — re-inspección del 27/08/2026', () => {
   // Caso: pestaña Vendedor · venta 30.000 € · años 8 · suelo catastral 5.000 € · SIN precio de
   //       compra → esperado un mensaje que nombre el precio de compra · obtenido «Plusvalía
   //       municipal 0,00 € — No calculada (falta valor catastral del suelo)», con el suelo puesto.
-  test('ABIERTO (operativa) — el aviso de la plusvalía nombra el dato que de verdad falta', async ({
+  test('REGRESIÓN (operativa) — el aviso de la plusvalía nombra el dato que de verdad falta', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -733,7 +731,7 @@ test.describe('HALLAZGOS ABIERTOS — re-inspección del 27/08/2026', () => {
     );
   });
 
-  // ⚠️ ABIERTO (bajo) — contenido.
+  // ✅ REPARADO 27/08 (bajo) — contenido.
   // El título de la tarjeta de comisión interpola el TEXTO CRUDO del input
   // (`Comisión inmobiliaria (${comisionInmobiliaria}%)`) en vez de pasarlo por `formatNumber`.
   // Es el último resto del hallazgo 36, que corrigió las otras tres interpolaciones crudas de
@@ -741,7 +739,7 @@ test.describe('HALLAZGOS ABIERTOS — re-inspección del 27/08/2026', () => {
   // rótulo, en una app cuya regla de formato español es obligatoria.
   // Caso: pestaña Vendedor · venta 30.000 € · comisión «3.5» → esperado «Comisión inmobiliaria
   //       (3,5%)» · obtenido «Comisión inmobiliaria (3.5%)» con el importe correcto 1.050,00 €.
-  test('ABIERTO (contenido) — el porcentaje de comisión se rotula en formato español', async ({
+  test('REGRESIÓN (contenido) — el porcentaje de comisión se rotula en formato español', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -756,7 +754,7 @@ test.describe('HALLAZGOS ABIERTOS — re-inspección del 27/08/2026', () => {
     expect(titulo).toContain('3,5%');
   });
 
-  // ⚠️ ABIERTO (bajo) — accesibilidad.
+  // ✅ REPARADO 27/08 (bajo) — accesibilidad.
   // Los dos grupos de botones-conmutador («Tipo de transmisión» y, en obra nueva, «Tipo de
   // garaje») se rotulan con un <label> que no tiene `for` ni envuelve ningún control, y el par
   // de botones no va dentro de ningún `role="group"` ni `fieldset`: quien navega por voz oye
@@ -767,7 +765,7 @@ test.describe('HALLAZGOS ABIERTOS — re-inspección del 27/08/2026', () => {
   // Caso: abrir la app → `document.querySelectorAll('[role="group"],fieldset').length` = 0 y el
   //       <label> «Tipo de transmisión» sin `for` ni control dentro · esperado que el par de
   //       botones se anuncie bajo su rótulo.
-  test('ABIERTO (accesibilidad) — los grupos de botones tienen nombre accesible', async ({
+  test('REGRESIÓN (accesibilidad) — los grupos de botones tienen nombre accesible', async ({
     page,
   }) => {
     await page.goto(RUTA);

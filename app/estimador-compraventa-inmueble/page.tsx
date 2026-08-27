@@ -23,6 +23,7 @@ import {
   ENLACE_CATASTRO,
   RANGO_ITP,
   RANGO_AJD,
+  TERRITORIOS_SIN_IVA,
 } from '@/data/itp-ccaa';
 
 // ===== TIPOS =====
@@ -41,6 +42,8 @@ interface ResultadosComprador {
   impuestoTransmision: number;
   tipoImpuesto: string;
   porcentajeImpuesto: number;
+  /** En Canarias, Ceuta y Melilla no rige el IVA: se nombra el impuesto y no se inventa cifra */
+  impuestoNoCalculado: boolean;
   ajd: number;
   gastosNotario: number;
   gastosNotarioMin: number;
@@ -76,6 +79,8 @@ interface ResultadosVendedor {
   esPerdida: boolean;
   baseImponibleIRPF: number;
   irpfGanancia: number;
+  /** false mientras falte el precio de compra: entonces el 0 no es una exención */
+  irpfCalculado: boolean;
   exentoIRPF: boolean;
   motivoExencion: string | null;
 }
@@ -204,22 +209,35 @@ export default function SimuladorCompraventaPage() {
     const precio = parseSpanishNumber(precioVenta);
     if (!Number.isFinite(precio) || precio <= 0) return null;
 
-    const gestoria = parseSpanishNumberOr(gastosGestoria);
+    // Se acota aquí y no solo en el blur del NumberInput: mientras el campo tiene el foco,
+    // un importe negativo se sumaba al total y su tarjeta ni se pintaba (guard > 0).
+    const gestoria = Math.max(0, parseSpanishNumberOr(gastosGestoria));
 
     let impuesto = 0;
     let tipoImpuesto = '';
     let porcentaje = 0;
+    let impuestoNoCalculado = false;
     /** Qué tipo de ITP se ha aplicado y cuáles NO se han podido comprobar */
     let tipoElegido: TipoElegido | null = null;
 
     // Determinar si es inmueble residencial (para IVA y tipos reducidos)
     const esResidencial = INMUEBLES_RESIDENCIALES.includes(tipoInmueble);
 
+    const territorioSinIva = TERRITORIOS_SIN_IVA[ccaa];
+
     if (tipoTransmision === 'primera-mano') {
-      // IVA desde data/fiscal, no desde un literal: así un cambio de tipo llega aquí
-      tipoImpuesto = 'IVA';
-      porcentaje = esResidencial ? IVA_INMUEBLES_2025.obraNueva : IVA_INMUEBLES_2025.local;
-      impuesto = precio * (porcentaje / 100);
+      if (territorioSinIva) {
+        // Allí no se devenga IVA sino IGIC o IPSI: se nombra el impuesto que corresponde y
+        // no se inventa cifra. El aviso ya estaba en pantalla desde c47189ca; lo que faltaba
+        // era que el cálculo se enterase, y el total se sumaba el IVA que el aviso negaba.
+        tipoImpuesto = territorioSinIva.impuesto;
+        impuestoNoCalculado = true;
+      } else {
+        // IVA desde data/fiscal, no desde un literal: así un cambio de tipo llega aquí
+        tipoImpuesto = 'IVA';
+        porcentaje = esResidencial ? IVA_INMUEBLES_2025.obraNueva : IVA_INMUEBLES_2025.local;
+        impuesto = precio * (porcentaje / 100);
+      }
     } else {
       // ITP para segunda mano
       const datosCcaa = ITP_CCAA[ccaa];
@@ -257,6 +275,7 @@ export default function SimuladorCompraventaPage() {
       impuestoTransmision: impuesto,
       tipoImpuesto,
       porcentajeImpuesto: porcentaje,
+      impuestoNoCalculado,
       ajd,
       gastosNotario: notario,
       gastosNotarioMin: notaria.min,
@@ -340,7 +359,10 @@ export default function SimuladorCompraventaPage() {
         : undefined,
     });
 
-    // Sin precio de compra no hay ganancia que calcular (el IRPF queda a 0)
+    // Sin precio de compra no hay ganancia que calcular. El IRPF queda a 0, pero ese 0
+    // NO es una exención: es un dato que falta, y presentarlo como «EXENTO» en verde
+    // afirmaba algo que nadie había comprobado (hallazgo 428, el mismo defecto que el 43
+    // cerró en la tarjeta de la plusvalía).
     const hayDatosGanancia = precioC > 0;
     const irpf = hayDatosGanancia ? g.cuotaIRPF : 0;
 
@@ -363,6 +385,7 @@ export default function SimuladorCompraventaPage() {
       esPerdida: hayDatosGanancia && g.esPerdida,
       baseImponibleIRPF: hayDatosGanancia ? g.baseImponible : 0,
       irpfGanancia: irpf,
+      irpfCalculado: hayDatosGanancia,
       exentoIRPF,
       motivoExencion: hayDatosGanancia ? g.motivoExencion : null,
     };
@@ -391,6 +414,18 @@ export default function SimuladorCompraventaPage() {
 
   const datosCcaaActual = ITP_CCAA[ccaa];
   const esInmuebleResidencial = INMUEBLES_RESIDENCIALES.includes(tipoInmueble);
+
+  /**
+   * Las partidas que el neto del vendedor NO está descontando porque faltan datos.
+   * Se nombran las dos: el aviso solo hablaba de la plusvalía, así que con el precio de
+   * compra en blanco el IRPF quedaba fuera del neto sin que nada lo dijera (hallazgo 428).
+   */
+  const faltanEnElNeto = resultadosVendedor
+    ? [
+        resultadosVendedor.plusvaliaCalculada ? null : 'la plusvalía municipal',
+        resultadosVendedor.irpfCalculado ? null : 'el IRPF de la ganancia',
+      ].filter((x): x is string => x !== null)
+    : [];
 
   return (
     <div className={styles.container}>
@@ -665,15 +700,31 @@ export default function SimuladorCompraventaPage() {
                   />
 
                   <ResultCard
-                    title={`${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 2)}%)`}
-                    value={formatCurrency(resultadosComprador.impuestoTransmision)}
+                    title={
+                      resultadosComprador.impuestoNoCalculado
+                        ? resultadosComprador.tipoImpuesto
+                        : `${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 2)}%)`
+                    }
+                    value={
+                      resultadosComprador.impuestoNoCalculado
+                        ? 'No calculado'
+                        : formatCurrency(resultadosComprador.impuestoTransmision)
+                    }
                     variant="warning"
                     icon="📋"
+                    description={
+                      resultadosComprador.impuestoNoCalculado
+                        ? `En ${datosCcaaActual.nombre} no rige el IVA: la compra de obra nueva tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
+                        : undefined
+                    }
                   />
 
                   {resultadosComprador.ajd > 0 && (
                     <ResultCard
-                      title={`AJD (${formatNumber(datosCcaaActual.ajd, 2)}%)`}
+                      // Tipo EFECTIVO, igual que el del ITP: en Ceuta y Melilla la cuota gradual
+                      // se bonifica al 50 % (art. 57 bis TRLITPAJD) y el nominal de la tabla se
+                      // desmentía con el importe de al lado (hallazgo 431).
+                      title={`AJD (${formatNumber((resultadosComprador.ajd / resultadosComprador.precioInmueble) * 100, 2)}%)`}
                       value={formatCurrency(resultadosComprador.ajd)}
                       variant="warning"
                       icon="📄"
@@ -707,20 +758,53 @@ export default function SimuladorCompraventaPage() {
                   <div className={styles.separador} />
 
                   <ResultCard
-                    title="Total gastos adicionales"
+                    title={resultadosComprador.impuestoNoCalculado ? 'Total gastos adicionales (parcial)' : 'Total gastos adicionales'}
                     value={formatCurrency(resultadosComprador.totalGastos)}
                     variant="info"
                     icon="➕"
-                    description={`${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio`}
+                    description={
+                      resultadosComprador.impuestoNoCalculado
+                        ? `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio — SIN el ${resultadosComprador.tipoImpuesto}, que no está incluido`
+                        : `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio`
+                    }
                   />
 
                   <ResultCard
-                    title="COSTE TOTAL DE ADQUISICIÓN"
+                    title={resultadosComprador.impuestoNoCalculado ? 'COSTE TOTAL (PARCIAL)' : 'COSTE TOTAL DE ADQUISICIÓN'}
                     value={formatCurrency(resultadosComprador.totalOperacion)}
                     variant="highlight"
                     icon="💳"
-                    description="Precio + todos los gastos"
+                    description={
+                      resultadosComprador.impuestoNoCalculado
+                        ? `No incluye el ${resultadosComprador.tipoImpuesto}: el coste real será mayor`
+                        : 'Precio + todos los gastos'
+                    }
                   />
+                  {/*
+                    En primera mano el selector de perfil no se pinta —el IVA no tiene tipos por
+                    perfil del comprador— y con él desaparecía el ÚNICO mecanismo que la app tiene
+                    para decir «podrías pagar menos». El IVA superreducido del 4 % de la VPO de
+                    régimen especial o promoción pública existe (art. 91.Dos.1.6º LIVA) y la app no
+                    lo aplica a propósito, porque exige una calificación que aquí no se pregunta:
+                    lo que no puede hacer es callárselo (hallazgo 430).
+                  */}
+                  {tipoTransmision === 'primera-mano' && esInmuebleResidencial && !resultadosComprador.impuestoNoCalculado && (
+                    <div className={styles.avisoReducidos} role="note">
+                      <p className={styles.avisoReducidosTitulo}>
+                        <span aria-hidden="true">💡</span> Podrías pagar menos, pero depende de requisitos que no preguntamos
+                      </p>
+                      <p className={styles.avisoReducidosTexto}>
+                        El cálculo usa el IVA del {formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}%. Si la
+                        vivienda está acogida a un régimen de <strong>protección oficial de régimen especial
+                        o de promoción pública</strong>, el IVA baja al {formatNumber(IVA_INMUEBLES_2025.viviendaProtegida, 0)}%
+                        (art. 91.Dos.1.6º LIVA): serían{' '}
+                        {formatCurrency(resultadosComprador.precioInmueble * (IVA_INMUEBLES_2025.viviendaProtegida / 100))}{' '}
+                        en vez de {formatCurrency(resultadosComprador.impuestoTransmision)}. No lo aplicamos
+                        porque la calificación concreta de la vivienda no se puede deducir del precio:
+                        compruébala en la escritura o con la promotora.
+                      </p>
+                    </div>
+                  )}
                   {resultadosComprador.tipoElegido && resultadosComprador.tipoElegido.noComprobables.length > 0 && (
                     <div className={styles.avisoReducidos} role="note">
                       <p className={styles.avisoReducidosTitulo}>
@@ -991,13 +1075,27 @@ export default function SimuladorCompraventaPage() {
 
                   <ResultCard
                     title="IRPF sobre ganancia"
-                    value={resultadosVendedor.exentoIRPF || resultadosVendedor.irpfGanancia === 0 ? 'EXENTO' : formatCurrency(resultadosVendedor.irpfGanancia)}
-                    variant={resultadosVendedor.exentoIRPF || resultadosVendedor.irpfGanancia === 0 ? 'success' : 'warning'}
+                    value={
+                      !resultadosVendedor.irpfCalculado
+                        ? 'Sin calcular'
+                        : resultadosVendedor.exentoIRPF || resultadosVendedor.irpfGanancia === 0
+                          ? 'EXENTO'
+                          : formatCurrency(resultadosVendedor.irpfGanancia)
+                    }
+                    variant={
+                      !resultadosVendedor.irpfCalculado
+                        ? 'default'
+                        : resultadosVendedor.exentoIRPF || resultadosVendedor.irpfGanancia === 0
+                          ? 'success'
+                          : 'warning'
+                    }
                     icon="💸"
                     description={
-                      resultadosVendedor.exentoIRPF
-                        ? 'Mayor de 65 años + vivienda habitual'
-                        : resultadosVendedor.motivoExencion ?? 'Tributación en base del ahorro'
+                      !resultadosVendedor.irpfCalculado
+                        ? 'Falta el precio de compra original. Este impuesto NO está incluido en el neto de abajo.'
+                        : resultadosVendedor.exentoIRPF
+                          ? 'Mayor de 65 años + vivienda habitual'
+                          : resultadosVendedor.motivoExencion ?? 'Tributación en base del ahorro'
                     }
                   />
 
@@ -1022,16 +1120,15 @@ export default function SimuladorCompraventaPage() {
 
                   <div className={styles.separador} />
 
+                  {/* El aviso nombra TODAS las partidas que faltan, no solo la plusvalía: con el
+                      precio de compra en blanco, el IRPF tampoco entra en el neto y el único
+                      aviso que había daba a entender que el resto estaba completo. */}
                   <ResultCard
                     title="Total gastos vendedor"
                     value={formatCurrency(resultadosVendedor.totalGastos)}
                     variant="warning"
                     icon="➖"
-                    description={
-                      resultadosVendedor.plusvaliaCalculada
-                        ? undefined
-                        : 'Sin la plusvalía municipal, que no se ha podido calcular'
-                    }
+                    description={faltanEnElNeto.length > 0 ? `Sin ${faltanEnElNeto.join(' ni ')}` : undefined}
                   />
 
                   <ResultCard
@@ -1040,9 +1137,9 @@ export default function SimuladorCompraventaPage() {
                     variant="highlight"
                     icon="💰"
                     description={
-                      resultadosVendedor.plusvaliaCalculada
+                      faltanEnElNeto.length === 0
                         ? 'Lo que realmente recibes'
-                        : 'INCOMPLETO: falta descontar la plusvalía municipal. Rellena el valor catastral del suelo para obtener el neto real.'
+                        : `INCOMPLETO: falta descontar ${faltanEnElNeto.join(' y ')}. Rellena ${resultadosVendedor.plusvaliaCalculada ? 'el precio de compra original' : resultadosVendedor.irpfCalculado ? 'el valor catastral del suelo' : 'el precio de compra original y el valor catastral del suelo'} para obtener el neto real.`
                     }
                   />
                 </>
@@ -1181,7 +1278,7 @@ export default function SimuladorCompraventaPage() {
             Muchas comunidades ofrecen tipos reducidos para determinados colectivos:
           </p>
           <ul className={styles.listaReducidos}>
-            <li><strong>Jóvenes</strong> (generalmente menores de 35-36 años)</li>
+            <li><strong>Jóvenes</strong> (cada comunidad fija su propia edad tope, y no coinciden: el panel «Tipos reducidos disponibles» de arriba muestra la de la comunidad elegida)</li>
             <li><strong>Familias numerosas</strong></li>
             <li><strong>Personas con discapacidad</strong> (≥33% o ≥65%)</li>
             <li><strong>VPO</strong> (Vivienda de Protección Oficial)</li>
@@ -1297,9 +1394,11 @@ export default function SimuladorCompraventaPage() {
                 <span className={styles.casoTag}>Vendedor con ganancia</span>
               </div>
               <p>Ana vende su piso por 250.000 €. Lo compró hace 8 años por 180.000 €. Tras restar
-              la comisión inmobiliaria (3%) y la gestoría, su ganancia patrimonial es de 62.200 €,
+              la comisión inmobiliaria (3%), que paga ella, su ganancia patrimonial es de 62.500 €,
               que tributa al 19% los primeros 6.000 €, al 21% hasta 50.000 € y al 23% el resto.
-              Además paga la plusvalía municipal por el método más favorable.</p>
+              La gestoría del comprador NO se resta: el art. 35.1 LIRPF solo admite los gastos
+              satisfechos por quien transmite. Además paga la plusvalía municipal por el método
+              más favorable, que también minora el valor de transmisión.</p>
               <div className={styles.casoResultado}>Ganancia patrimonial sujeta a IRPF del ahorro</div>
             </div>
             <div className={styles.casoCard}>
@@ -1351,9 +1450,11 @@ export default function SimuladorCompraventaPage() {
             </div>
             <div className={styles.faqItem}>
               <h4>¿Qué son los tipos reducidos de ITP y cómo acceder a ellos?</h4>
-              <p>Muchas comunidades aplican tipos reducidos para jóvenes (menores de 35-36 años), familias numerosas,
+              <p>Muchas comunidades aplican tipos reducidos para jóvenes, familias numerosas,
               personas con discapacidad (≥33%), VPO o municipios en riesgo de despoblación. Los requisitos
-              (edad, ingresos, valor máximo del inmueble) varían por comunidad. Consulta la normativa de tu CC.AA.</p>
+              (edad, ingresos, valor máximo del inmueble) varían por comunidad: la edad tope del tipo joven
+              va de los 32 a los 40 años según dónde compres, y el panel «Tipos reducidos disponibles» de la
+              calculadora muestra la que aplica en cada caso. Consulta la normativa de tu CC.AA.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿La gestoría es obligatoria en la compraventa?</h4>

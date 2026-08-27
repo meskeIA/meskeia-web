@@ -32,7 +32,7 @@ import {
   TERRITORIOS_SIN_IVA,
   CIUDADES_CON_BONIFICACION,
 } from '@/data/itp-ccaa';
-import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META } from '@/data/fiscal';
+import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
 
 // ===== TIPOS =====
 type TipoTransmision = 'segunda-mano' | 'primera-mano' | 'segunda-mano-renuncia';
@@ -415,7 +415,7 @@ export default function SimuladorNaveIndustrialPage() {
                 icon="📋"
                 description={
                   resultadosComprador.impuestoNoCalculado
-                    ? `En ${datosCcaaActual.nombre} no rige el IVA: la obra nueva tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
+                    ? `En ${datosCcaaActual.nombre} no rige el IVA: ${tipoTransmision === 'segunda-mano-renuncia' ? 'la renuncia a la exención' : 'la obra nueva'} tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
                     : resultadosComprador.tipoImpuesto === 'IVA'
                       ? 'Potencialmente deducible si eres empresa/autónomo sujeto a IVA'
                       : resultadosComprador.bonificado
@@ -426,7 +426,10 @@ export default function SimuladorNaveIndustrialPage() {
 
               {resultadosComprador.ajd > 0 && (
                 <ResultCard
-                  title={`AJD (${formatNumber(datosCcaaActual.ajd, 2)}%)`}
+                  // Tipo EFECTIVO, igual que el del ITP: en Ceuta y Melilla la cuota gradual
+                  // se bonifica al 50 % (art. 57 bis.1 TRLITPAJD) y el nominal de la tabla se
+                  // desmentía con el importe de al lado (hallazgo 447).
+                  title={`AJD (${formatNumber((resultadosComprador.ajd / resultadosComprador.precioInmueble) * 100, 2)}%)`}
                   value={formatCurrency(resultadosComprador.ajd)}
                   variant="warning"
                   icon="📄"
@@ -514,8 +517,8 @@ export default function SimuladorNaveIndustrialPage() {
               <tbody>
                 <tr>
                   <td style={{ padding: '8px 10px', borderBottom: '1px solid var(--bg-primary)' }}>IVA obra nueva</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', fontWeight: 700, color: 'var(--primary)' }}>21%</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>10%</td>
+                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', fontWeight: 700, color: 'var(--primary)' }}>{formatNumber(IVA_INMUEBLES_2025.local, 0)}%</td>
+                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>{formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}%</td>
                 </tr>
                 <tr style={{ background: 'var(--bg-primary)' }}>
                   <td style={{ padding: '8px 10px', borderBottom: '1px solid #e0e0e0' }}>ITP segunda mano</td>
@@ -571,7 +574,7 @@ export default function SimuladorNaveIndustrialPage() {
               <strong><span aria-hidden="true">📈</span> Vender nave con ganancia patrimonial</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
                 Si vendes la nave como persona física, la ganancia tributa en el IRPF base del ahorro
-                (19-30%). Si vendes como empresa (IS), tributa en el Impuesto de Sociedades.
+                ({formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo, 0)}-{formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[TRAMOS_GANANCIAS_PATRIMONIALES_2025.length - 1].tipo, 0)}%). Si vendes como empresa (IS), tributa en el Impuesto de Sociedades.
               </p>
             </div>
           </div>
@@ -689,7 +692,7 @@ export default function SimuladorNaveIndustrialPage() {
             <li>El IVA del 21% solo es deducible si el comprador es sujeto pasivo de IVA con actividad sujeta y no exenta.</li>
             <li>Los tipos de ITP y AJD pueden variar; verifica la normativa vigente de tu comunidad autónoma.</li>
             <li>El valor de referencia catastral puede ser la base imponible real del ITP si supera el precio escriturado.</li>
-            <li>Esta calculadora no contempla situaciones especiales (renuncia a la exención de IVA en segunda mano, operaciones vinculadas, etc.).</li>
+            <li>La renuncia a la exención de IVA en segunda mano SÍ se calcula, en la tercera opción de «Tipo de transmisión». Lo que esta calculadora no contempla son otras situaciones especiales: operaciones vinculadas, permutas, aportaciones no dinerarias a sociedades o transmisiones de unidad económica autónoma.</li>
             <li>Consulta siempre con tu asesor fiscal antes de cerrar la operación.</li>
           </ul>
         </div>

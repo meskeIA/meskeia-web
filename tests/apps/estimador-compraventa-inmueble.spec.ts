@@ -7,6 +7,7 @@
  * la tarjeta, que lleva encima el factor.
  */
 import { test, expect, Page } from '@playwright/test';
+import { ITP_CCAA } from '../../data/itp-ccaa';
 
 /**
  * Inspector — estimador-compraventa-inmueble (segmento fiscal, riesgo 1 CRÍTICO)
@@ -946,12 +947,12 @@ test.describe('Inspector 27/08/2026 — caminos nuevos', () => {
 });
 
 // ══════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS — Inspector 27/08/2026. Afirman lo que DEBERÍA pasar, así que hoy
-// fallan a propósito (`test.fail()`). Cuando se reparen, se les quita la marca y quedan
-// como regresión.
+// REGRESIÓN — los ocho hallazgos del Inspector del 27/08/2026, REPARADOS ese mismo día.
+// Estaban escritos con `test.fail()` afirmando lo que debería pasar; al repararlos se les
+// quitó la marca y ahora sujetan la reparación.
 // ══════════════════════════════════════════════════════════════════════════════
 
-// ⚠️ HALLAZGO ABIERTO — cálculo (ALTO).
+// ✅ REPARADO 27/08/2026 — cálculo (ALTO).
 // En Canarias, Ceuta y Melilla no rige el IVA español (TERRITORIOS_SIN_IVA: allí se liquida
 // IGIC o IPSI). El commit c47189ca dice que «ya no se inventa cifra: se nombra el impuesto
 // que toca y el total se marca como parcial», y así lo hacen las hermanas nave-industrial,
@@ -964,8 +965,7 @@ test.describe('Inspector 27/08/2026 — caminos nuevos', () => {
 //       tarjeta de IVA y el total marcado como parcial · obtenido «IVA (10,00%) 20.000,00 €»,
 //       «Total gastos adicionales 22.795,21 € — 11,40% sobre el precio» y «COSTE TOTAL DE
 //       ADQUISICIÓN 222.795,21 €».
-test('HALLAZGO — en Canarias no se puede liquidar un IVA que allí no existe', async ({ page }) => {
-  test.fail();
+test('REGRESIÓN — en Canarias no se puede liquidar un IVA que allí no existe', async ({ page }) => {
   await page.goto(RUTA);
   await page.getByRole('button', { name: /Primera mano/ }).click();
   await page.locator('#ccaa-inmueble').selectOption('canarias');
@@ -975,7 +975,7 @@ test('HALLAZGO — en Canarias no se puede liquidar un IVA que allí no existe',
   await expect(page.locator('h3', { hasText: /^IVA/ })).toHaveCount(0);
 });
 
-// ⚠️ HALLAZGO ABIERTO — contenido (ALTO).
+// ✅ REPARADO 27/08/2026 — contenido (ALTO).
 // Sin precio de compra no hay ganancia que calcular, y el motor deja el IRPF en 0. La
 // tarjeta traduce ese 0 a «EXENTO» en verde, con la descripción «Tributación en base del
 // ahorro»: afirma una exención que nadie ha comprobado. Es el mismo defecto que el hallazgo
@@ -986,10 +986,9 @@ test('HALLAZGO — en Canarias no se puede liquidar un IVA que allí no existe',
 //       → esperado «Sin calcular», como en la plusvalía · obtenido «EXENTO» y un neto de
 //       242.500,00 €. Control: con compra 180.000 € y 8 años, esa misma venta paga
 //       13.255,00 € de IRPF.
-test('HALLAZGO — sin precio de compra el IRPF no está «EXENTO», está sin calcular', async ({
+test('REGRESIÓN — sin precio de compra el IRPF no está «EXENTO», está sin calcular', async ({
   page,
 }) => {
-  test.fail();
   await page.goto(RUTA);
   await rellenar(page, 'Precio de la vivienda', '250000');
   await page.getByRole('button', { name: 'Vendedor' }).click();
@@ -998,7 +997,7 @@ test('HALLAZGO — sin precio de compra el IRPF no está «EXENTO», está sin c
   expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('Sin calcular');
 });
 
-// ⚠️ HALLAZGO ABIERTO — contenido (MEDIO).
+// ✅ REPARADO 27/08/2026 — contenido (MEDIO).
 // El caso de uso «Ana» del bloque educativo sigue enseñando la regla que la reparación del
 // 21/08 retiró del motor: dice que a la ganancia se le resta «la comisión inmobiliaria (3%)
 // y la gestoría», y por eso publica 62.200 € en vez de 62.500 €. La gestoría del formulario
@@ -1007,8 +1006,7 @@ test('HALLAZGO — sin precio de compra el IRPF no está «EXENTO», está sin c
 // Caso: venta 250.000 € · compra 180.000 € · 8 años · comisión 3 % · gestoría 300 € y sin
 //       valores catastrales → la app da «Ganancia patrimonial 62.500,00 €» mientras su
 //       propio bloque educativo publica 62.200 € · esperado 62.500 € y sin citar la gestoría.
-test('HALLAZGO — el caso «Ana» del bloque educativo contradice al motor', async ({ page }) => {
-  test.fail();
+test('REGRESIÓN — el caso «Ana» del bloque educativo contradice al motor', async ({ page }) => {
   await page.goto(RUTA);
   await rellenar(page, 'Precio de la vivienda', '250000');
   await page.getByRole('button', { name: 'Vendedor' }).click();
@@ -1021,7 +1019,7 @@ test('HALLAZGO — el caso «Ana» del bloque educativo contradice al motor', as
   await expect(page.getByText(/Ana vende su piso/)).toContainText('62.500');
 });
 
-// ⚠️ HALLAZGO ABIERTO — operativa (MEDIO). Mitad no reparada del hallazgo 21.
+// ✅ REPARADO 27/08/2026 — operativa (MEDIO). Era la mitad no reparada del hallazgo 21.
 // El perfil «Vivienda de Protección Oficial» se honra en segunda mano (Murcia: ITP al 4 %),
 // pero al pasar a primera mano el selector DESAPARECE, el perfil declarado se descarta sin
 // decirlo y se cobra el 10 % de IVA. IVA_INMUEBLES_2025.viviendaProtegida = 4 vive en
@@ -1031,8 +1029,7 @@ test('HALLAZGO — el caso «Ana» del bloque educativo contradice al motor', as
 //       mano da «ITP (4,00%) 8.000,00 €»; al pulsar «Primera mano» da «IVA (10,00%)
 //       20.000,00 €» sin selector de perfil y sin una sola mención al 4 % de VPO
 //       (8.000 €) · esperado al menos el aviso de que ese tipo existe.
-test('HALLAZGO — en primera mano el perfil VPO se descarta sin avisar', async ({ page }) => {
-  test.fail();
+test('REGRESIÓN — en primera mano el perfil VPO se descarta sin avisar', async ({ page }) => {
   await page.goto(RUTA);
   await page.locator('#ccaa-inmueble').selectOption('murcia');
   await rellenar(page, 'Precio de la vivienda', '200000');
@@ -1045,7 +1042,7 @@ test('HALLAZGO — en primera mano el perfil VPO se descarta sin avisar', async 
   ).toBeVisible();
 });
 
-// ⚠️ HALLAZGO ABIERTO — contenido (BAJO).
+// ✅ REPARADO 27/08/2026 — contenido (BAJO).
 // La tarjeta del AJD rotula el tipo NOMINAL de la tabla mientras el importe ya lleva la
 // bonificación del 50 % del art. 57 bis TRLITPAJD que `calcularAJD` aplica en Ceuta y
 // Melilla. La tarjeta del ITP, en la misma pantalla, resuelve esto mostrando el tipo
@@ -1053,8 +1050,7 @@ test('HALLAZGO — en primera mano el perfil VPO se descarta sin avisar', async 
 // Caso: Melilla · primera mano · vivienda · 200.000 € → tarjeta «AJD (0,50%)» con
 //       500,00 €, que es el 0,25 % · esperado «AJD (0,25%)» (o 1.000,00 € si el rótulo
 //       fuera el bueno, que no lo es: la bonificación es correcta).
-test('HALLAZGO — el rótulo del AJD en Melilla no coincide con su importe', async ({ page }) => {
-  test.fail();
+test('REGRESIÓN — el rótulo del AJD en Melilla no coincide con su importe', async ({ page }) => {
   await page.goto(RUTA);
   await page.getByRole('button', { name: /Primera mano/ }).click();
   await page.locator('#ccaa-inmueble').selectOption('melilla');
@@ -1064,7 +1060,7 @@ test('HALLAZGO — el rótulo del AJD en Melilla no coincide con su importe', as
   await expect(page.locator('h3', { hasText: /^AJD/ }).first()).toHaveText('AJD (0,25%)');
 });
 
-// ⚠️ HALLAZGO ABIERTO — contenido (BAJO).
+// ✅ REPARADO 27/08/2026 — contenido (BAJO).
 // El bloque educativo y la FAQ (que va también al JSON-LD que consumen los buscadores y las
 // IAs) fijan la edad del tipo joven en «menores de 35-36 años», escrita a mano. La propia
 // tabla de la app la desmiente en dos comunidades desde el commit 23b2844f, que subió esas
@@ -1074,10 +1070,9 @@ test('HALLAZGO — el rótulo del AJD en Melilla no coincide con su importe', as
 //       reducidos disponibles» lista «3% - Jóvenes ≤40 años» y la app cobra 4.500,00 €,
 //       mientras el bloque educativo dice «Jóvenes (generalmente menores de 35-36 años)» y
 //       la FAQ «tipos reducidos para jóvenes (menores de 35-36 años)».
-test('HALLAZGO — la edad del tipo joven del bloque educativo contradice a la tabla', async ({
+test('REGRESIÓN — la edad del tipo joven del bloque educativo contradice a la tabla', async ({
   page,
 }) => {
-  test.fail();
   await page.goto(RUTA);
   await page.locator('#ccaa-inmueble').selectOption('murcia');
   await rellenar(page, 'Precio de la vivienda', '150000');
@@ -1089,7 +1084,7 @@ test('HALLAZGO — la edad del tipo joven del bloque educativo contradice a la t
   await expect(page.getByText(/menores de 35-36 años/)).toHaveCount(0);
 });
 
-// ⚠️ HALLAZGO ABIERTO — contenido (BAJO).
+// ✅ REPARADO 27/08/2026 — contenido (BAJO).
 // El motivo de la exención parcial por reinversión se compone con
 // `(proporcionReinvertida * 100).toFixed(1)` en `data/fiscal/ganancia-inmueble.ts`, así que
 // el porcentaje sale con punto decimal inglés en una app en español (CLAUDE.md §2: nunca
@@ -1097,8 +1092,7 @@ test('HALLAZGO — la edad del tipo joven del bloque educativo contradice a la t
 // Caso: el CASO 15 (venta 300.000 €, compra 200.000 €, reinversión de 150.000 €) → la
 //       descripción de la tarjeta de IRPF dice «exento el 51.8 % de la ganancia»
 //       · esperado «51,8 %».
-test('HALLAZGO — el porcentaje de reinversión sale con punto decimal inglés', async ({ page }) => {
-  test.fail();
+test('REGRESIÓN — el porcentaje de reinversión sale con punto decimal inglés', async ({ page }) => {
   await page.goto(RUTA);
   await rellenar(page, 'Precio de la vivienda', '300000');
   await page.getByRole('button', { name: 'Vendedor' }).click();
@@ -1113,19 +1107,33 @@ test('HALLAZGO — el porcentaje de reinversión sale con punto decimal inglés'
   expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toContain('51,8 %');
 });
 
-// ⚠️ HALLAZGO ABIERTO — dato (BAJO).
+// ✅ REPARADO 27/08/2026 — dato (BAJO).
 // El JSON-LD de `metadata.ts` escribe a mano cuatro tipos generales de ITP («Cataluña
 // aplica el 10 % … Madrid el 6 %, Andalucía el 7 % y el País Vasco el 4 %») en el mismo
 // fichero donde los extremos del rango SÍ se derivan de RANGO_ITP. Hoy los cuatro coinciden
 // con TIPOS_ITP_CCAA_2025, pero salen de un literal: el candado `npm run check:itp` vigila
 // `data/itp-ccaa.ts`, no los ficheros de las apps, así que un cambio en data/fiscal —como
 // el de Murcia (8 → 7,75 %) o el de Valencia (10 → 9 %) de junio— no llegaría hasta aquí.
-// Caso: leer el <script type="application/ld+json"> de la página y comparar cada tipo
-//       citado con ITP_CCAA → esperado que ninguno esté escrito a mano · obtenido cuatro,
-//       correctos hoy y sin nada que avise el día que dejen de serlo.
-test('HALLAZGO — el JSON-LD escribe a mano cuatro tipos generales de ITP', async ({ page }) => {
-  test.fail();
+// ⚠️ Este test se REESCRIBIÓ al reparar, porque su «esperado» no se sostenía: derivar el
+// tipo de la tabla produce EXACTAMENTE el mismo texto que el literal —«Madrid el 6 %» sale
+// igual de las dos maneras—, así que desde el navegador es imposible distinguir un literal
+// de un derivado, y `not.toMatch(/Madrid el 6 %/)` habría obligado a EMPEORAR la frase para
+// ponerse verde. Lo que sí protege es comprobar que lo publicado COINCIDE con ITP_CCAA: el
+// día que la tabla se mueva y el JSON-LD se quede atrás, salta aquí.
+test('REGRESIÓN — los tipos de ITP del JSON-LD coinciden con la tabla', async ({ page }) => {
   await page.goto(RUTA);
   const schemas = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
-  expect(schemas).not.toMatch(/Madrid el 6 %/);
+  const pct = (n: number) => String(n).replace('.', ',');
+
+  expect(schemas).toContain(`Madrid el ${pct(ITP_CCAA['madrid'].tipoGeneral)} %`);
+  expect(schemas).toContain(`Andalucía el ${pct(ITP_CCAA['andalucia'].tipoGeneral)} %`);
+  expect(schemas).toContain(`País Vasco el ${pct(ITP_CCAA['pais-vasco'].tipoGeneral)} %`);
+  expect(schemas).toContain(`Cataluña aplica el ${pct(ITP_CCAA['cataluna'].tipoGeneral)} %`);
+
+  // El techo de la escala catalana es el otro número citado en esa misma frase.
+  const techoCataluna = Math.max(
+    ITP_CCAA['cataluna'].tipoGeneral,
+    ...(ITP_CCAA['cataluna'].tramosProgresivos ?? []).map((t) => t.tipo),
+  );
+  expect(schemas).toContain(`escala hasta el ${pct(techoCataluna)} %`);
 });

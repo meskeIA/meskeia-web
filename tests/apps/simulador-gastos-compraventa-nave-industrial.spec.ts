@@ -668,10 +668,11 @@ test.describe('Casos nuevos — re-inspección 27/08/2026', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS de la re-inspección del 27/08/2026. Todos fallan HOY a propósito.
+// REGRESIÓN — los cinco hallazgos de la re-inspección del 27/08/2026, reparados ese mismo
+// día. Estaban escritos con `test.fail()`; ahora sujetan la reparación.
 // ═══════════════════════════════════════════════════════════════════════════════
 
-test.describe('Hallazgos abiertos — 27/08/2026', () => {
+test.describe('Regresión — hallazgos del 27/08/2026, reparados', () => {
   /**
    * HALLAZGO A (contenido, medio) — reparación ASIMÉTRICA de la bonificación de Ceuta y Melilla.
    *
@@ -682,8 +683,7 @@ test.describe('Hallazgos abiertos — 27/08/2026', () => {
    * 1.250,00 €», donde 0,50 % de 500.000 € son 2.500 €, el doble de lo que la propia tarjeta
    * enseña. Es el defecto que el Inspector ya vio en `simulador-gastos-compraventa-garaje`.
    */
-  test('HALLAZGO A — el rótulo del AJD en Ceuta muestra el tipo nominal con el importe bonificado', async ({ page }) => {
-    test.fail();
+  test('REPARADO A — el rótulo del AJD en Ceuta muestra el tipo nominal con el importe bonificado', async ({ page }) => {
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Obra nueva/ }).click();
     await page.selectOption('#select-ccaa', 'ceuta');
@@ -706,8 +706,7 @@ test.describe('Hallazgos abiertos — 27/08/2026', () => {
    * calcula — y su propia FAQ, dos bloques más arriba, dice lo contrario: «El simulador lo
    * contempla en su tercera opción». Dos afirmaciones opuestas en la misma página.
    */
-  test('HALLAZGO B — el recuadro de limitaciones niega la renuncia que la app sí calcula', async ({ page }) => {
-    test.fail();
+  test('REPARADO B — el recuadro de limitaciones niega la renuncia que la app sí calcula', async ({ page }) => {
     await page.goto(RUTA);
 
     // La app SÍ la calcula: Madrid, 500.000 € con renuncia → IVA 105.000 + AJD 3.750
@@ -732,8 +731,7 @@ test.describe('Hallazgos abiertos — 27/08/2026', () => {
    * Es el bloque que consumen Bing Copilot, ChatGPT y Perplexity: la cifra que se les sirve
    * no es la que la app calcula.
    */
-  test('HALLAZGO C — la quinta pregunta del FAQPage sigue escrita a mano y contradice al motor', async ({ page }) => {
-    test.fail();
+  test('REPARADO C — la quinta pregunta del FAQPage sigue escrita a mano y contradice al motor', async ({ page }) => {
     await page.goto(RUTA);
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const faq = bloques.find((b) => b.includes('FAQPage')) ?? '';
@@ -754,8 +752,7 @@ test.describe('Hallazgos abiertos — 27/08/2026', () => {
    *   · la tarjeta «Vender nave con ganancia patrimonial» dice «(19-30%)» cuando esos dos
    *     extremos son el primer y el último tramo de `TRAMOS_GANANCIAS_PATRIMONIALES_2025`.
    */
-  test('HALLAZGO D — la tabla comparativa y el IRPF del ahorro llevan los tipos escritos a mano', async () => {
-    test.fail();
+  test('REPARADO D — la tabla comparativa y el IRPF del ahorro llevan los tipos escritos a mano', async () => {
     const fuente = await leerFuente();
     // Los valores de data/fiscal que hoy coinciden con los literales (por eso no hay error de
     // importe: hay riesgo de divergencia el día que cambien).
@@ -775,8 +772,7 @@ test.describe('Hallazgos abiertos — 27/08/2026', () => {
    * El texto es fijo (`impuestoNoCalculado`) y no mira qué transmisión se ha seleccionado, así
    * que describe una operación distinta de la que el usuario está simulando.
    */
-  test('HALLAZGO E — en Canarias, la tarjeta habla de «obra nueva» aunque se elija la renuncia', async ({ page }) => {
-    test.fail();
+  test('REPARADO E — en Canarias, la tarjeta habla de «obra nueva» aunque se elija la renuncia', async ({ page }) => {
     await page.goto(RUTA);
     await page.getByRole('button', { name: /renuncia al IVA/ }).click();
     await page.selectOption('#select-ccaa', 'canarias');

@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { RANGO_AJD, RANGO_ITP, calcularRegistro, estimarFacturaNotarial } from '@/data/itp-ccaa';
+import { ITP_CCAA, RANGO_AJD, RANGO_ITP, calcularRegistro, estimarFacturaNotarial } from '@/data/itp-ccaa';
 import { IVA_INMUEBLES_2025 } from '@/data/fiscal';
 
 /**
@@ -18,6 +18,23 @@ const NOTARIA_EJEMPLO = estimarFacturaNotarial(PRECIO_EJEMPLO);
 const REGISTRO_EJEMPLO = calcularRegistro(PRECIO_EJEMPLO);
 const euros = (n: number) => `${Math.round(n)} €`;
 const pct = (n: number) => `${String(n).replace('.', ',')}%`;
+
+/**
+ * El extremo alto de cada comunidad: su tipo general, o el último tramo si tiene escala.
+ * Sin esto la quinta pregunta hablaba de «10%-11%» mientras la app cobraba el 11,50 %
+ * efectivo en Cataluña y el 11,00 % en Baleares (hallazgo 449).
+ */
+const techoDe = (c: (typeof ITP_CCAA)[keyof typeof ITP_CCAA]) =>
+  Math.max(c.tipoGeneral, ...(c.tramosProgresivos ?? []).map((t) => t.tipo));
+
+const ordenadas = Object.values(ITP_CCAA).slice().sort((a, b) => a.tipoGeneral - b.tipoGeneral);
+const masBaratas = ordenadas.slice(0, 3).map((c) => `${c.nombre} (${pct(c.tipoGeneral)})`).join(', ');
+const masCaras = ordenadas
+  .slice()
+  .sort((a, b) => techoDe(b) - techoDe(a))
+  .slice(0, 3)
+  .map((c) => `${c.nombre} (hasta el ${pct(techoDe(c))})`)
+  .join(', ');
 
 export const metadata: Metadata = {
   title: 'Simulador Gastos Compra Nave Industrial - IVA, ITP y Costes | meskeIA',
@@ -105,7 +122,7 @@ export const faqJsonLd = {
       name: '¿Qué comunidad autónoma tiene el ITP más bajo para la compra de una nave?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El País Vasco aplica uno de los tipos más bajos (en torno al 4%-6% según territorio histórico). Madrid aplica el 6%, y otras comunidades como Castilla y León o Aragón tienen tipos en el rango del 7%-8%. Cataluña y Comunidad Valenciana se encuentran entre las que aplican tipos más altos, llegando al 10%-11%. Estos tipos pueden variar y se recomienda consultar la normativa vigente de cada comunidad.',
+        text: `Los tipos generales de ITP van del ${pct(RANGO_ITP.min)} al ${pct(RANGO_ITP.max)} contando el tramo más alto de las comunidades con escala progresiva. Los más bajos hoy son ${masBaratas}. Los más altos, ${masCaras}. Una nave no tiene tipos reducidos por perfil del comprador —esos van ligados a la vivienda habitual—, así que se aplica el tipo general del sitio donde esté el inmueble. En Ceuta y Melilla la cuota se bonifica al 50% (art. 57 bis del TRLITPAJD). Estos tipos los fija cada comunidad y cambian: conviene comprobar la normativa vigente antes de firmar.`,
       },
     },
   ],

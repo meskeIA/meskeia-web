@@ -18,7 +18,7 @@ import {
   AvisoTerritorioSinIva,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatCurrency, formatNumber, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
+import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
 import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, calcularGananciaInmueble } from '@/data/fiscal';
 import {
   ITP_CCAA,
@@ -35,7 +35,9 @@ import {
   ENLACE_CATASTRO,
   RANGO_ITP,
   RANGO_AJD,
+  TERRITORIOS_SIN_IVA,
 } from '@/data/itp-ccaa';
+import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 
 // ===== TIPOS =====
 type TipoTransmision = 'segunda-mano' | 'primera-mano';
@@ -47,6 +49,8 @@ interface ResultadosComprador {
   impuestoTransmision: number;
   tipoImpuesto: string;
   porcentajeImpuesto: number;
+  /** En Canarias, Ceuta y Melilla no rige el IVA: se nombra el impuesto y no se inventa cifra */
+  impuestoNoCalculado: boolean;
   ajd: number;
   gastosNotario: number;
   gastosNotarioMin: number;
@@ -136,20 +140,33 @@ export default function SimuladorGarajeCompraventaPage() {
     const precio = parseSpanishNumber(precioGaraje);
     if (!Number.isFinite(precio) || precio <= 0) return null;
 
-    const gestoria = parseSpanishNumberOr(gastosGestoria);
+    // Se acota aquí y no solo en el blur del NumberInput: mientras el campo tiene el foco,
+    // un importe negativo se sumaba al total y su tarjeta ni se pintaba (guard > 0), así que
+    // el total en pantalla no cuadraba con las líneas visibles.
+    const gestoria = Math.max(0, parseSpanishNumberOr(gastosGestoria));
 
     let impuesto = 0;
     let tipoImpuesto = '';
     let porcentaje = 0;
+    let impuestoNoCalculado = false;
     /** Qué tipo de ITP se ha aplicado y cuáles NO se han podido comprobar */
     let elegido: TipoElegido | null = null;
 
+    const territorioSinIva = TERRITORIOS_SIN_IVA[ccaa];
+
     if (tipoTransmision === 'primera-mano') {
-      // Garaje nuevo: IVA reducido (10%) si va vinculado a la vivienda (máx. 2 plazas);
-      // IVA general (21%) si es independiente o está en un edificio no residencial
-      tipoImpuesto = 'IVA';
-      porcentaje = tipoGaraje === 'vinculado' ? IVA_INMUEBLES_2025.garageCon : IVA_INMUEBLES_2025.garaje;
-      impuesto = precio * (porcentaje / 100);
+      if (territorioSinIva) {
+        // Allí no se devenga IVA sino IGIC o IPSI: se nombra el impuesto que corresponde
+        // y no se inventa cifra, como ya hacen nave-industrial, solar y terreno-rústico.
+        tipoImpuesto = territorioSinIva.impuesto;
+        impuestoNoCalculado = true;
+      } else {
+        // Garaje nuevo: IVA reducido (10%) si va vinculado a la vivienda (máx. 2 plazas);
+        // IVA general (21%) si es independiente o está en un edificio no residencial
+        tipoImpuesto = 'IVA';
+        porcentaje = tipoGaraje === 'vinculado' ? IVA_INMUEBLES_2025.garageCon : IVA_INMUEBLES_2025.garaje;
+        impuesto = precio * (porcentaje / 100);
+      }
     } else {
       // Garaje segunda mano: ITP.
       // `viviendaHabitual: false` porque un garaje suelto NO lo es nunca, y esa condición
@@ -175,6 +192,7 @@ export default function SimuladorGarajeCompraventaPage() {
       impuestoTransmision: impuesto,
       tipoImpuesto,
       porcentajeImpuesto: porcentaje,
+      impuestoNoCalculado,
       ajd,
       gastosNotario: notario,
       gastosNotarioMin: notaria.min,
@@ -203,10 +221,18 @@ export default function SimuladorGarajeCompraventaPage() {
 
     // Plusvalía municipal
     let plusvalia = 0;
-    let metodoPlusvalia = 'No calculada (falta valor catastral del suelo)';
+    // El aviso nombra lo que de verdad falta. Antes decía siempre «falta valor catastral
+    // del suelo», así que quien no había puesto el precio de compra o los años releía un
+    // campo que ya tenía relleno (Inspector, hallazgo 437).
+    const faltan = [
+      valorSuelo > 0 ? null : 'el valor catastral del suelo',
+      anios > 0 ? null : 'los años de propiedad',
+      precioC > 0 ? null : 'el precio de compra original',
+    ].filter((x): x is string => x !== null);
+    let metodoPlusvalia = `No calculada (falta ${faltan.join(', ')})`;
     let exentoPlusvalia = false;
 
-    if (valorSuelo > 0 && anios > 0 && precioC > 0) {
+    if (faltan.length === 0) {
       const resultadoPlusvalia = calcularPlusvaliaMunicipal({
         valorCatastralSuelo: valorSuelo,
         aniosPropiedad: anios,
@@ -310,8 +336,8 @@ export default function SimuladorGarajeCompraventaPage() {
 
           {/* Tipo de transmisión */}
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Tipo de transmisión</label>
-            <div className={styles.transmisionGrid}>
+            <span className={styles.label} id="rotulo-transmision">Tipo de transmisión</span>
+            <div className={styles.transmisionGrid} role="group" aria-labelledby="rotulo-transmision">
               <button
                 type="button"                className={`${styles.transmisionBtn} ${tipoTransmision === 'segunda-mano' ? styles.active : ''}`}
                 onClick={() => setTipoTransmision('segunda-mano')}
@@ -336,8 +362,8 @@ export default function SimuladorGarajeCompraventaPage() {
           {/* Tipo de garaje (solo primera mano: determina el tipo de IVA) */}
           {tipoTransmision === 'primera-mano' && (
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Tipo de garaje</label>
-              <div className={styles.transmisionGrid}>
+              <span className={styles.label} id="rotulo-tipo-garaje">Tipo de garaje</span>
+              <div className={styles.transmisionGrid} role="group" aria-labelledby="rotulo-tipo-garaje">
                 <button
                   type="button"                  className={`${styles.transmisionBtn} ${tipoGaraje === 'vinculado' ? styles.active : ''}`}
                   onClick={() => setTipoGaraje('vinculado')}
@@ -509,10 +535,23 @@ export default function SimuladorGarajeCompraventaPage() {
                     icon="🚗"
                   />
                   <ResultCard
-                    title={`${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 2)}%)`}
-                    value={formatCurrency(resultadosComprador.impuestoTransmision)}
+                    title={
+                      resultadosComprador.impuestoNoCalculado
+                        ? resultadosComprador.tipoImpuesto
+                        : `${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 2)}%)`
+                    }
+                    value={
+                      resultadosComprador.impuestoNoCalculado
+                        ? 'No calculado'
+                        : formatCurrency(resultadosComprador.impuestoTransmision)
+                    }
                     variant="warning"
                     icon="📋"
+                    description={
+                      resultadosComprador.impuestoNoCalculado
+                        ? `En ${datosCcaaActual.nombre} no rige el IVA: la compra de obra nueva tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
+                        : undefined
+                    }
                   />
                   {resultadosComprador.ajd > 0 && (
                     <ResultCard
@@ -545,18 +584,26 @@ export default function SimuladorGarajeCompraventaPage() {
                   )}
                   <div className={styles.separador} />
                   <ResultCard
-                    title="Total gastos adicionales"
+                    title={resultadosComprador.impuestoNoCalculado ? 'Total gastos adicionales (parcial)' : 'Total gastos adicionales'}
                     value={formatCurrency(resultadosComprador.totalGastos)}
                     variant="info"
                     icon="➕"
-                    description={`${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioGaraje) * 100, 2)}% sobre el precio`}
+                    description={
+                      resultadosComprador.impuestoNoCalculado
+                        ? `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioGaraje) * 100, 2)}% sobre el precio — SIN el ${resultadosComprador.tipoImpuesto}, que no está incluido`
+                        : `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioGaraje) * 100, 2)}% sobre el precio`
+                    }
                   />
                   <ResultCard
-                    title="COSTE TOTAL DE ADQUISICIÓN"
+                    title={resultadosComprador.impuestoNoCalculado ? 'COSTE TOTAL (PARCIAL)' : 'COSTE TOTAL DE ADQUISICIÓN'}
                     value={formatCurrency(resultadosComprador.totalOperacion)}
                     variant="highlight"
                     icon="💳"
-                    description="Precio + todos los gastos"
+                    description={
+                      resultadosComprador.impuestoNoCalculado
+                        ? `No incluye el ${resultadosComprador.tipoImpuesto}: el coste real será mayor`
+                        : 'Precio + todos los gastos'
+                    }
                   />
                   {/*
                     Tipos reducidos que encajan con el perfil pero exigen requisitos que
@@ -726,7 +773,7 @@ export default function SimuladorGarajeCompraventaPage() {
                   />
                   {resultadosVendedor.comisionInmobiliaria > 0 && (
                     <ResultCard
-                      title={`Comisión inmobiliaria (${comisionInmobiliaria}%)`}
+                      title={`Comisión inmobiliaria (${formatTipoNominal(parseSpanishNumberOr(comisionInmobiliaria))}%)`}
                       value={formatCurrency(resultadosVendedor.comisionInmobiliaria)}
                       variant="default"
                       icon="🏪"
@@ -917,7 +964,16 @@ export default function SimuladorGarajeCompraventaPage() {
             <div className={styles.tipCard}>
               <span aria-hidden="true" className={styles.tipIcon}>📅</span>
               <strong>Liquida el ITP en el plazo legal</strong>
-              <p>El ITP debe liquidarse en 30 días hábiles desde la firma de la escritura. El retraso genera recargos del 5% al 20% más intereses de demora. Planifica la liquidación desde el día de la firma.</p>
+              <p>
+                El ITP debe liquidarse en 30 días hábiles desde la firma de la escritura. Presentarlo
+                tarde por iniciativa propia, sin requerimiento de la Administración, genera recargos:
+                el {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}% por cada mes completo de retraso
+                hasta los {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses, y el{' '}
+                {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}% más intereses de demora a partir
+                de ahí ({ESCALA_RECARGO_EXTEMPORANEO.baseNormativa}). Si el recargo se paga en período
+                voluntario se reduce un {ESCALA_RECARGO_EXTEMPORANEO.reduccionProntoPago}%. Planifica
+                la liquidación desde el día de la firma.
+              </p>
             </div>
             <div className={styles.tipCard}>
               <span aria-hidden="true" className={styles.tipIcon}>👨‍💼</span>

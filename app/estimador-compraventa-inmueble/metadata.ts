@@ -1,6 +1,23 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema, generateFAQSchema, combineSchemas } from '@/lib/schema-templates';
-import { RANGO_ITP } from '@/data/itp-ccaa';
+import { ITP_CCAA, RANGO_ITP } from '@/data/itp-ccaa';
+import { IVA_INMUEBLES_2025 } from '@/data/fiscal';
+
+/**
+ * Los tipos que cita el JSON-LD se LEEN de la tabla, no se escriben.
+ *
+ * ── Por qué (27/08/2026, hallazgo 434) ────────────────────────────────────────
+ * Los extremos del rango ya se derivaban de RANGO_ITP, pero cuatro comunidades iban
+ * nombradas con su tipo a mano en la misma frase. Hoy los cuatro coinciden con la
+ * tabla, así que no había ninguna cifra mal — pero `npm run check:itp` vigila
+ * `data/itp-ccaa.ts`, no los ficheros de las apps: un movimiento como el de Murcia
+ * (8 → 7,75 %) o el de Valencia (10 → 9 %) no llegaría hasta aquí, y la señal
+ * estructurada que leen Bing Copilot, ChatGPT y Perplexity envejecería sin aviso.
+ */
+const pct = (n: number) => `${String(n).replace('.', ',')} %`;
+const tipoDe = (id: keyof typeof ITP_CCAA) => pct(ITP_CCAA[id].tipoGeneral);
+const techoDe = (id: keyof typeof ITP_CCAA) =>
+  pct(Math.max(ITP_CCAA[id].tipoGeneral, ...(ITP_CCAA[id].tramosProgresivos ?? []).map((t) => t.tipo)));
 
 export const metadata: Metadata = {
   title: 'Gastos de Compraventa de Vivienda - Calculadora ITP, Notaría y Plusvalía | meskeIA',
@@ -65,7 +82,7 @@ const faqSchema = generateFAQSchema({
     },
     {
       question: '¿Cuánto hay que sumar al precio de una vivienda por gastos e impuestos?',
-      answer: `La horquilla habitual en España es del 10% al 14% del precio para una vivienda de segunda mano y del 12% al 15% en obra nueva. El grueso es el impuesto: ITP entre el ${RANGO_ITP.min} % y el ${RANGO_ITP.max} % según la comunidad autónoma en segunda mano, o IVA al 10% más AJD en obra nueva. A eso se suman notaría, registro de la propiedad y gestoría, que en conjunto rondan el 1%-2%. Conviene tener ese dinero ahorrado aparte, porque no se financia con la hipoteca.`,
+      answer: `La horquilla habitual en España es del 10% al 14% del precio para una vivienda de segunda mano y del 12% al 15% en obra nueva. El grueso es el impuesto: ITP entre el ${RANGO_ITP.min} % y el ${RANGO_ITP.max} % según la comunidad autónoma en segunda mano, o IVA al ${IVA_INMUEBLES_2025.obraNueva}% más AJD en obra nueva. A eso se suman notaría, registro de la propiedad y gestoría, que en conjunto rondan el 1%-2%. Conviene tener ese dinero ahorrado aparte, porque no se financia con la hipoteca.`,
     },
     {
       question: '¿Qué paga el vendedor de una vivienda?',
@@ -109,7 +126,7 @@ export const faqJsonLd = {
       name: '¿Cuánto se paga de ITP al comprar una vivienda de segunda mano?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `El Impuesto de Transmisiones Patrimoniales (ITP) varía entre el ${RANGO_ITP.min} % y el ${RANGO_ITP.max} % del valor del inmueble según la comunidad autónoma. Cataluña aplica el 10 % de tipo general y escala hasta el 13 % en los inmuebles de más valor, Madrid el 6 %, Andalucía el 7 % y el País Vasco el 4 %. Además, desde 2022 la base imponible es el mayor valor entre el precio escriturado y el valor de referencia catastral, por lo que comprar por debajo del valor de referencia no reduce el impuesto a pagar.`,
+        text: `El Impuesto de Transmisiones Patrimoniales (ITP) varía entre el ${RANGO_ITP.min} % y el ${RANGO_ITP.max} % del valor del inmueble según la comunidad autónoma. Cataluña aplica el ${tipoDe('cataluna')} de tipo general y escala hasta el ${techoDe('cataluna')} en los inmuebles de más valor, Madrid el ${tipoDe('madrid')}, Andalucía el ${tipoDe('andalucia')} y el País Vasco el ${tipoDe('pais-vasco')}. Además, desde 2022 la base imponible es el mayor valor entre el precio escriturado y el valor de referencia catastral, por lo que comprar por debajo del valor de referencia no reduce el impuesto a pagar.`,
       },
     },
     {

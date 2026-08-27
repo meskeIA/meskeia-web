@@ -14,9 +14,9 @@
  *      municipal del vendedor con sus dos métodos, la venta con pérdida y no sujeción, la
  *      bonificación de Ceuta y la escala progresiva catalana en un tramo alto de verdad, y
  *      el rechazo de una cifra malformada.
- *   4. HALLAZGOS ABIERTOS 27/08 — marcados con `test.fail()`: afirman lo que DEBERÍA pasar,
- *      así que hoy fallan a propósito. Al repararlos se les quita la marca y quedan como
- *      regresión.
+ *   4. REGRESIÓN 27/08 — los seis hallazgos de la re-inspección, reparados ese mismo día.
+ *      Estaban escritos con `test.fail()` afirmando lo que DEBERÍA pasar; al repararlos se
+ *      les quitó la marca y ahora sujetan la reparación.
  *
  * De dónde sale CADA cifra esperada (ninguna de memoria):
  *  - Tipo general de ITP por CCAA → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
@@ -55,9 +55,8 @@
  * Nota de formato: `formatCurrency` usa es-ES, que NO agrupa los millares de un número de
  * cuatro cifras («1535,59 €») y sí los de cinco o más («16.535,59 €»).
  *
- * HALLAZGOS ABIERTOS: al final, marcados con `test.fail()`. Afirman lo que DEBERÍA pasar y
- * hoy fallan a propósito; el día que se reparen, se les quita el `test.fail()` y quedan
- * como regresión.
+ * Los hallazgos de la re-inspección van al final. Estaban marcados con `test.fail()` y hoy
+ * están REPARADOS, así que la marca se retiró y las aserciones sujetan la reparación.
  */
 import { test, expect, Page } from '@playwright/test';
 
@@ -676,10 +675,8 @@ test.describe('MITAD B — zonas no cubiertas por la inspección del 20/08/2026'
 // Cuando se reparen, se les quita la marca y quedan como regresión.
 // ═════════════════════════════════════════════════════════════════════════════
 
-test.describe('HALLAZGOS ABIERTOS — re-inspección del 27/08/2026', () => {
-  test.fail();
-
-  // ⚠️ ABIERTO (alto) — cálculo. REPARACIÓN A MEDIAS del commit c47189ca.
+test.describe('REGRESIÓN — hallazgos del 27/08/2026, reparados', () => {
+  // ✅ REPARADO 27/08 (alto) — cálculo. REPARACIÓN A MEDIAS del commit c47189ca.
   // En Canarias, Ceuta y Melilla no rige el IVA español: `TERRITORIOS_SIN_IVA`
   // (data/itp-ccaa.ts) los declara como IGIC e IPSI. La app RENDERIZA el componente
   // `AvisoTerritorioSinIva`, que dice literalmente «Esta herramienta no lo calcula, así que
@@ -694,7 +691,7 @@ test.describe('HALLAZGOS ABIERTOS — re-inspección del 27/08/2026', () => {
   //       «IVA (10,00%) 1500,00 €», «Total gastos adicionales 2248,09 € — 14,99% sobre el
   //       precio» y «COSTE TOTAL DE ADQUISICIÓN 17.248,09 € — Precio del trastero + todos los
   //       gastos». En Ceuta con trastero independiente: «IVA (21,00%) 3150,00 €» y 18.823,09 €.
-  test('ABIERTO (cálculo) — en Canarias, Ceuta y Melilla no puede liquidarse IVA', async ({
+  test('REGRESIÓN (cálculo) — en Canarias, Ceuta y Melilla no puede liquidarse IVA', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -713,7 +710,7 @@ test.describe('HALLAZGOS ABIERTOS — re-inspección del 27/08/2026', () => {
     expect(total).toMatch(/PARCIAL/i);
   });
 
-  // ⚠️ ABIERTO (medio) — dato.
+  // ✅ REPARADO 27/08 (medio) — dato.
   // El único `<DataReference>` de la página declara «ITP/AJD/IVA 2026» con
   // FISCAL_INMUEBLES_META (verificado 17/06/2026), pero la pestaña Vendedor emite dos cifras
   // normativas más con vigencia y verificación PROPIAS y sin ninguna referencia: la plusvalía
@@ -728,7 +725,7 @@ test.describe('HALLAZGOS ABIERTOS — re-inspección del 27/08/2026', () => {
   //       bloque de referencia que nombre la plusvalía municipal · obtenido un solo bloque
   //       «DATOS DE REFERENCIA — Normativa aplicada: ITP/AJD/IVA 2026 · última verificación
   //       17/06/2026», que no cubre ninguna de las dos.
-  test('ABIERTO (dato) — la plusvalía municipal y el IRPF se publican sin su propia referencia', async ({
+  test('REGRESIÓN (dato) — la plusvalía municipal y el IRPF se publican sin su propia referencia', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -738,14 +735,28 @@ test.describe('HALLAZGOS ABIERTOS — re-inspección del 27/08/2026', () => {
     await rellenar(page, 'Años de propiedad', '5');
     await rellenar(page, 'Valor catastral del suelo', '4000');
     await rellenar(page, 'Valor catastral total (suelo + construcción)', '9000');
+    // Plusvalía, método objetivo: 4.000 × 0,17 (coeficiente de 5 años, COEFICIENTES_IIVTNU_2025)
+    //   = 680 de base × 25 % (PLUSVALIA_MUNICIPAL_META.tipoOrientativo) = 170,00 €.
     expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('170,00 €');
-    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1022,20 €');
+
+    // ⚠️ El acta anotaba aquí 1022,20 €, y esa cifra NO sale de ningún camino: estaba dentro
+    // de un `test.fail()`, donde basta con que el test falle en ALGÚN punto, así que la
+    // aserción nunca llegó a comprobarse. Resuelto a mano con el art. 35 LIRPF:
+    //   comisión (3 % por defecto)  = 15.000 × 0,03            =    450,00
+    //   valor de transmisión        = 15.000 − 450 − 170       = 14.380,00
+    //   valor de adquisición        = 8.000 (sin gastos declarados)
+    //   ganancia                    = 14.380 − 8.000           =  6.380,00
+    //   IRPF (TRAMOS_GANANCIAS_PATRIMONIALES_2025)
+    //        6.000 × 19 %           =                             1.140,00
+    //          380 × 21 %           =                                79,80
+    //                               =                             1.219,80
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1219,80 €');
 
     // Debe existir una referencia que cubra el IIVTNU, además de la de ITP/AJD/IVA.
     await expect(page.getByText(/Normativa aplicada:.*(IIVTNU|[Pp]lusval)/)).toBeVisible();
   });
 
-  // ⚠️ ABIERTO (medio) — dato.
+  // ✅ REPARADO 27/08 (medio) — dato.
   // El consejo «Liquida los impuestos a tiempo» del bloque educativo lleva escrita a mano una
   // escala de recargos por presentación extemporánea que contradice a la calculadora canónica
   // del propio catálogo: `lib/calculadoras/recargoPresentacionTardia.ts` aplica el art. 27.2
@@ -757,7 +768,7 @@ test.describe('HALLAZGOS ABIERTOS — re-inspección del 27/08/2026', () => {
   //       «El incumplimiento genera recargos automáticos del 5% al 20%» · esperado la escala
   //       vigente. Sobre el ITP de 900,00 € del caso de Madrid que la propia página publica,
   //       un mes de retraso son 9,00 € y la app hace temer entre 45,00 € y 180,00 €.
-  test('ABIERTO (dato) — la escala de recargos del bloque educativo es la anterior a la Ley 11/2021', async ({
+  test('REGRESIÓN (dato) — la escala de recargos del bloque educativo es la anterior a la Ley 11/2021', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -767,7 +778,7 @@ test.describe('HALLAZGOS ABIERTOS — re-inspección del 27/08/2026', () => {
     expect(consejo).toMatch(/1\s*%.*mes|15\s*%/);
   });
 
-  // ⚠️ ABIERTO (medio) — accesibilidad. REPARACIÓN A MEDIAS del hallazgo 85 (21/08/2026).
+  // ✅ REPARADO 27/08 (medio) — accesibilidad. REPARACIÓN A MEDIAS del hallazgo 85 (21/08/2026).
   // Aquel hallazgo nombraba dos cosas: los `<select>` sin nombre accesible —reparados, ver la
   // regresión de más arriba— y que «los labels de "Modalidad del trastero" y "Tipo de
   // transmisión" están igualmente sueltos sobre sus grupos de botones». Esa segunda mitad
@@ -781,7 +792,7 @@ test.describe('HALLAZGOS ABIERTOS — re-inspección del 27/08/2026', () => {
   //       esperado ≥ 2 · obtenido 0; y los labels sin destino son
   //       ["Modalidad del trastero", "Tipo de transmisión"] (los otros dos labels huérfanos
   //       son de NumberInput, cuyo input sí lleva aria-label).
-  test('ABIERTO (accesibilidad) — los dos grupos de botones deben tener nombre accesible', async ({
+  test('REGRESIÓN (accesibilidad) — los dos grupos de botones deben tener nombre accesible', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -789,7 +800,7 @@ test.describe('HALLAZGOS ABIERTOS — re-inspección del 27/08/2026', () => {
     expect(grupos).toBeGreaterThanOrEqual(2);
   });
 
-  // ⚠️ ABIERTO (bajo) — contenido.
+  // ✅ REPARADO 27/08 (bajo) — contenido.
   // El título de la tarjeta de comisión del vendedor interpola el TEXTO CRUDO del input
   // —`Comisión inmobiliaria (${comisionInmobiliaria}%)`— en vez de pasarlo por `formatNumber`,
   // así que un porcentaje tecleado con punto decimal se publica en formato estadounidense,
@@ -799,7 +810,7 @@ test.describe('HALLAZGOS ABIERTOS — re-inspección del 27/08/2026', () => {
   //       inmobiliaria (%)» = 3.5 → esperado el título «Comisión inmobiliaria (3,5%)» ·
   //       obtenido «Comisión inmobiliaria (3.5%)», con el importe 525,00 €, que sí es
   //       correcto (15.000 × 3,5 %).
-  test('ABIERTO (contenido) — el porcentaje de comisión se publica en formato estadounidense', async ({
+  test('REGRESIÓN (contenido) — el porcentaje de comisión se publica en formato estadounidense', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -813,7 +824,7 @@ test.describe('HALLAZGOS ABIERTOS — re-inspección del 27/08/2026', () => {
     expect(titulo).not.toContain('3.5%');
   });
 
-  // ⚠️ ABIERTO (bajo) — operativa.
+  // ✅ REPARADO 27/08 (bajo) — operativa.
   // Mientras el campo de gestoría tiene el foco, un importe negativo se suma tal cual al total
   // y su tarjeta ni se pinta (la guarda es `gastosGestoria > 0`), así que el total en pantalla
   // no cuadra con las líneas visibles. El `min={0}` de NumberInput solo actúa en el blur. La
@@ -824,7 +835,7 @@ test.describe('HALLAZGOS ABIERTOS — re-inspección del 27/08/2026', () => {
   //       lo que se ve, 1235,59 € (900 de ITP + 276,55 de notaría + 59,03 de registro) ·
   //       obtenido «Total gastos adicionales 735,59 € — 4,90% sobre el precio» y «COSTE TOTAL
   //       DE ADQUISICIÓN 15.735,59 €», 500 € por debajo de sus propias líneas.
-  test('ABIERTO (operativa) — una gestoría negativa con el foco puesto descuadra el total', async ({
+  test('REGRESIÓN (operativa) — una gestoría negativa con el foco puesto descuadra el total', async ({
     page,
   }) => {
     await page.goto(RUTA);

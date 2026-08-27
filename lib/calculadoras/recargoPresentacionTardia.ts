@@ -36,6 +36,30 @@ const PCT_RECARGO_MAS_12_MESES = 15;     // % fijo si pasa de 12 meses
 const TIPO_INTERES_DEMORA_ANUAL = 4.0625; // % (2025)
 const PCT_REDUCCION_PRONTO_PAGO = 25;    // % de reducción si paga en voluntario
 
+/**
+ * La escala, expuesta para que ninguna app la vuelva a escribir a mano.
+ *
+ * ── Por qué (27/08/2026) ──────────────────────────────────────────────────────
+ * Los hallazgos 436 y 454 del Inspector encontraron «recargos del 5% al 20%» en el
+ * bloque educativo de dos apps del clúster de compraventa: la escala ANTERIOR a la
+ * Ley 11/2021, que sobre un ITP de 1.500 € hace temer 75 € donde el art. 27.2 LGT
+ * cobra 15 €. Aquel número no salía de ningún módulo, así que nada podía avisar de
+ * que había envejecido. Quien necesite el TEXTO de la escala lo compone desde aquí.
+ */
+export const ESCALA_RECARGO_EXTEMPORANEO = {
+  /** % por cada mes completo de retraso, hasta 12 meses (art. 27.2 LGT) */
+  porcentajePorMes: PCT_RECARGO_POR_MES,
+  /** Último mes de la escala proporcional */
+  mesesEscalaProporcional: 12,
+  /** % fijo a partir del mes 13, más intereses de demora */
+  porcentajeMas12Meses: PCT_RECARGO_MAS_12_MESES,
+  /** % de reducción si el recargo se paga en período voluntario (art. 27.5 LGT) */
+  reduccionProntoPago: PCT_REDUCCION_PRONTO_PAGO,
+  /** Interés de demora tributario anual (%) */
+  interesDemoraAnual: TIPO_INTERES_DEMORA_ANUAL,
+  baseNormativa: 'Art. 27.2 LGT (Ley 58/2003), redacción de la Ley 11/2021',
+} as const;
+
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
 export interface ParametrosRecargoPresentacionTardia {

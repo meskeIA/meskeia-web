@@ -19,7 +19,7 @@ import {
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
-import { IVA_INMUEBLES_2025, calcularGananciaInmueble, FISCAL_INMUEBLES_META } from '@/data/fiscal';
+import { IVA_INMUEBLES_2025, calcularGananciaInmueble, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -34,7 +34,9 @@ import {
   TipoElegido,
   ENLACE_CATASTRO,
   RANGO_AJD,
+  TERRITORIOS_SIN_IVA,
 } from '@/data/itp-ccaa';
+import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 
 // ===== TIPOS =====
 type TipoTransmision = 'segunda-mano' | 'primera-mano';
@@ -46,6 +48,8 @@ interface ResultadosComprador {
   impuestoTransmision: number;
   tipoImpuesto: string;
   porcentajeImpuesto: number;
+  /** En Canarias, Ceuta y Melilla no rige el IVA: se nombra el impuesto y no se inventa cifra */
+  impuestoNoCalculado: boolean;
   ajd: number;
   gastosNotario: number;
   gastosNotarioMin: number;
@@ -198,23 +202,37 @@ export default function SimuladorTrasteroCompraventaPage() {
     const precio = parseSpanishNumber(precioVenta);
     if (!Number.isFinite(precio) || precio <= 0) return null;
 
-    const gestoria = parseSpanishNumberOr(gastosGestoria);
+    // Se acota aquí y no solo en el blur del NumberInput: mientras el campo tiene el foco,
+    // un importe negativo se sumaba al total y su tarjeta ni se pintaba (guard > 0), así que
+    // el total en pantalla no cuadraba con las líneas visibles (hallazgo 457, la misma
+    // reparación que el 165 de nave-industrial).
+    const gestoria = Math.max(0, parseSpanishNumberOr(gastosGestoria));
 
     let impuesto = 0;
     let tipoImpuesto = '';
     let porcentaje = 0;
+    let impuestoNoCalculado = false;
     /** Qué tipo de ITP se ha aplicado y cuáles NO se han podido comprobar */
     let elegido: TipoElegido | null = null;
 
+    const territorioSinIva = TERRITORIOS_SIN_IVA[ccaa];
+
     if (tipoTransmision === 'primera-mano') {
-      // Trastero nuevo: IVA reducido (10%) solo si se transmite CONJUNTAMENTE con la
-      // vivienda como anejo (art. 91.Uno.1.7º LIVA). El trastero independiente —finca
-      // registral propia, comprado por separado— tributa al tipo general del 21%.
-      tipoImpuesto = 'IVA';
-      porcentaje = modalidadTrastero === 'vinculado'
-        ? IVA_INMUEBLES_2025.garageCon
-        : IVA_INMUEBLES_2025.garaje;
-      impuesto = precio * (porcentaje / 100);
+      if (territorioSinIva) {
+        // Allí no se devenga IVA sino IGIC o IPSI: se nombra el impuesto que corresponde
+        // y no se inventa cifra, como ya hacen nave-industrial, solar y terreno-rústico.
+        tipoImpuesto = territorioSinIva.impuesto;
+        impuestoNoCalculado = true;
+      } else {
+        // Trastero nuevo: IVA reducido (10%) solo si se transmite CONJUNTAMENTE con la
+        // vivienda como anejo (art. 91.Uno.1.7º LIVA). El trastero independiente —finca
+        // registral propia, comprado por separado— tributa al tipo general del 21%.
+        tipoImpuesto = 'IVA';
+        porcentaje = modalidadTrastero === 'vinculado'
+          ? IVA_INMUEBLES_2025.garageCon
+          : IVA_INMUEBLES_2025.garaje;
+        impuesto = precio * (porcentaje / 100);
+      }
     } else {
       // ITP para segunda mano
       const datosCcaa = ITP_CCAA[ccaa];
@@ -244,6 +262,7 @@ export default function SimuladorTrasteroCompraventaPage() {
       impuestoTransmision: impuesto,
       tipoImpuesto,
       porcentajeImpuesto: porcentaje,
+      impuestoNoCalculado,
       ajd,
       gastosNotario: notario,
       gastosNotarioMin: notaria.min,
@@ -365,6 +384,17 @@ export default function SimuladorTrasteroCompraventaPage() {
         urlOficial={FISCAL_INMUEBLES_META.urlOficialITP}
         nota={FISCAL_INMUEBLES_META.nota}
       />
+      {/* La pestaña Vendedor emite dos cifras normativas más, con vigencia y fecha de
+          verificación propias: presentarlas bajo el sello de ITP/AJD/IVA daba por revisado
+          en 2026 un coeficiente de 2025 que se actualiza cada Ley de Presupuestos. Es lo
+          que la app hermana del garaje cerró con el hallazgo 35 y aquí faltaba. */}
+      <DataReference
+        normativa={`Plusvalía municipal (IIVTNU) ${PLUSVALIA_MUNICIPAL_META.vigencia}`}
+        fuente={PLUSVALIA_MUNICIPAL_META.baseNormativa}
+        verificado={PLUSVALIA_MUNICIPAL_META.verificado}
+        urlOficial={PLUSVALIA_MUNICIPAL_META.urlReferencia}
+        nota={`${PLUSVALIA_MUNICIPAL_META.nota} ${PLUSVALIA_MUNICIPAL_META.aviso} El IRPF de la ganancia usa los tramos del ahorro de 2025 (19 % a 30 %).`}
+      />
 
       {/* Nota informativa sobre trastero */}
       <div className={styles.trasteroNote}>
@@ -384,15 +414,15 @@ export default function SimuladorTrasteroCompraventaPage() {
 
           {/* Modalidad de trastero */}
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Modalidad del trastero</label>
-            <div className={styles.transmisionGrid}>
+            <span className={styles.label} id="rotulo-modalidad">Modalidad del trastero</span>
+            <div className={styles.transmisionGrid} role="group" aria-labelledby="rotulo-modalidad">
               <button
                 type="button"
                 aria-pressed={modalidadTrastero === 'vinculado'}
                 className={`${styles.transmisionBtn} ${modalidadTrastero === 'vinculado' ? styles.active : ''}`}
                 onClick={() => setModalidadTrastero('vinculado')}
               >
-                <span className={styles.transmisionIcon}>🏠</span>
+                <span aria-hidden="true" className={styles.transmisionIcon}>🏠</span>
                 <span>Vinculado a vivienda</span>
                 <span className={styles.transmisionSub}>Anejo residencial</span>
               </button>
@@ -402,7 +432,7 @@ export default function SimuladorTrasteroCompraventaPage() {
                 className={`${styles.transmisionBtn} ${modalidadTrastero === 'independiente' ? styles.active : ''}`}
                 onClick={() => setModalidadTrastero('independiente')}
               >
-                <span className={styles.transmisionIcon}>📦</span>
+                <span aria-hidden="true" className={styles.transmisionIcon}>📦</span>
                 <span>Independiente</span>
                 <span className={styles.transmisionSub}>Finca registral propia</span>
               </button>
@@ -420,15 +450,15 @@ export default function SimuladorTrasteroCompraventaPage() {
 
           {/* Tipo de transmisión */}
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Tipo de transmisión</label>
-            <div className={styles.transmisionGrid}>
+            <span className={styles.label} id="rotulo-transmision">Tipo de transmisión</span>
+            <div className={styles.transmisionGrid} role="group" aria-labelledby="rotulo-transmision">
               <button
                 type="button"
                 aria-pressed={tipoTransmision === 'segunda-mano'}
                 className={`${styles.transmisionBtn} ${tipoTransmision === 'segunda-mano' ? styles.active : ''}`}
                 onClick={() => setTipoTransmision('segunda-mano')}
               >
-                <span className={styles.transmisionIcon}>🔄</span>
+                <span aria-hidden="true" className={styles.transmisionIcon}>🔄</span>
                 <span>Segunda mano</span>
                 <span className={styles.transmisionSub}>Paga ITP</span>
               </button>
@@ -438,7 +468,7 @@ export default function SimuladorTrasteroCompraventaPage() {
                 className={`${styles.transmisionBtn} ${tipoTransmision === 'primera-mano' ? styles.active : ''}`}
                 onClick={() => setTipoTransmision('primera-mano')}
               >
-                <span className={styles.transmisionIcon}>🆕</span>
+                <span aria-hidden="true" className={styles.transmisionIcon}>🆕</span>
                 <span>Primera mano</span>
                 <span className={styles.transmisionSub}>
                   Paga IVA {modalidadTrastero === 'vinculado' ? '10%' : '21%'}
@@ -573,16 +603,26 @@ export default function SimuladorTrasteroCompraventaPage() {
                   />
 
                   <ResultCard
-                    title={`${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 2)}%)`}
-                    value={formatCurrency(resultadosComprador.impuestoTransmision)}
+                    title={
+                      resultadosComprador.impuestoNoCalculado
+                        ? resultadosComprador.tipoImpuesto
+                        : `${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 2)}%)`
+                    }
+                    value={
+                      resultadosComprador.impuestoNoCalculado
+                        ? 'No calculado'
+                        : formatCurrency(resultadosComprador.impuestoTransmision)
+                    }
                     variant="warning"
                     icon="📋"
                     description={
-                      tipoTransmision === 'primera-mano'
-                        ? (modalidadTrastero === 'vinculado'
-                            ? 'IVA 10% — anejo transmitido con la vivienda (obra nueva)'
-                            : 'IVA 21% — trastero independiente (obra nueva)')
-                        : `ITP ${datosCcaaActual.nombre}`
+                      resultadosComprador.impuestoNoCalculado
+                        ? `En ${datosCcaaActual.nombre} no rige el IVA: la obra nueva tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
+                        : tipoTransmision === 'primera-mano'
+                          ? (modalidadTrastero === 'vinculado'
+                              ? `IVA ${formatNumber(IVA_INMUEBLES_2025.garageCon, 0)}% — anejo transmitido con la vivienda (obra nueva)`
+                              : `IVA ${formatNumber(IVA_INMUEBLES_2025.garaje, 0)}% — trastero independiente (obra nueva)`)
+                          : `ITP ${datosCcaaActual.nombre}`
                     }
                   />
 
@@ -622,19 +662,27 @@ export default function SimuladorTrasteroCompraventaPage() {
                   <div className={styles.separador} />
 
                   <ResultCard
-                    title="Total gastos adicionales"
+                    title={resultadosComprador.impuestoNoCalculado ? 'Total gastos adicionales (parcial)' : 'Total gastos adicionales'}
                     value={formatCurrency(resultadosComprador.totalGastos)}
                     variant="info"
                     icon="➕"
-                    description={`${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio`}
+                    description={
+                      resultadosComprador.impuestoNoCalculado
+                        ? `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio — SIN el ${resultadosComprador.tipoImpuesto}, que no está incluido`
+                        : `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio`
+                    }
                   />
 
                   <ResultCard
-                    title="COSTE TOTAL DE ADQUISICIÓN"
+                    title={resultadosComprador.impuestoNoCalculado ? 'COSTE TOTAL (PARCIAL)' : 'COSTE TOTAL DE ADQUISICIÓN'}
                     value={formatCurrency(resultadosComprador.totalOperacion)}
                     variant="highlight"
                     icon="💳"
-                    description="Precio del trastero + todos los gastos"
+                    description={
+                      resultadosComprador.impuestoNoCalculado
+                        ? `No incluye el ${resultadosComprador.tipoImpuesto}: el coste real será mayor`
+                        : 'Precio del trastero + todos los gastos'
+                    }
                   />
                   {resultadosComprador.tipoElegido && resultadosComprador.tipoElegido.noComprobables.length > 0 && (
                     <div className={styles.avisoReducidos} role="note">
@@ -814,7 +862,7 @@ export default function SimuladorTrasteroCompraventaPage() {
 
                   {resultadosVendedor.comisionInmobiliaria > 0 && (
                     <ResultCard
-                      title={`Comisión inmobiliaria (${comisionInmobiliaria}%)`}
+                      title={`Comisión inmobiliaria (${formatTipoNominal(parseSpanishNumberOr(comisionInmobiliaria))}%)`}
                       value={formatCurrency(resultadosVendedor.comisionInmobiliaria)}
                       variant="default"
                       icon="🏪"
@@ -1042,8 +1090,15 @@ export default function SimuladorTrasteroCompraventaPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>📅</span>
               <strong>Liquida los impuestos a tiempo</strong>
-              <p>El ITP o el IVA+AJD debe liquidarse en 30 días hábiles desde la firma de la escritura.
-              El incumplimiento genera recargos automáticos del 5% al 20%.</p>
+              <p>
+                El ITP o el IVA+AJD debe liquidarse en 30 días hábiles desde la firma de la escritura.
+                Presentarlo tarde por iniciativa propia, sin requerimiento de la Administración, genera
+                recargos: el {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}% por cada mes completo de
+                retraso hasta los {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses, y el{' '}
+                {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}% más intereses de demora a partir de
+                ahí ({ESCALA_RECARGO_EXTEMPORANEO.baseNormativa}); se reduce un{' '}
+                {ESCALA_RECARGO_EXTEMPORANEO.reduccionProntoPago}% si el recargo se paga en período voluntario.
+              </p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>📁</span>
