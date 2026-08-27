@@ -67,7 +67,11 @@ async function rellenar(page: Page, etiqueta: string, valor: string): Promise<vo
   await campo.blur();
 }
 
-/** Los dos <select> de la app no tienen id: se localizan por una opción propia de cada uno. */
+/**
+ * Desde el 16/08/2026 los dos <select> SÍ tienen id (#ccaa-inmueble y #perfil-comprador) y su
+ * <label> lleva htmlFor: era el hallazgo 42. Estos dos helpers se conservan porque los usan los
+ * casos escritos antes; los nuevos van directos al id.
+ */
 const selectCcaa = (page: Page) =>
   page.locator('select').filter({ has: page.locator('option[value="madrid"]') });
 const selectPerfil = (page: Page) =>
@@ -211,9 +215,11 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     await rellenar(page, 'Otros gastos de la venta (opcional)', '0');
     await page.getByRole('button', { name: /Estimar por mí/ }).click();
 
-    // Estimación = 180.000×6 % (ITP_CCAA.madrid.tipoGeneral) + notaría 421,60 + registro 218,06
-    //            = 11.439,66 → redondeado a 11.440
-    //   valor de adquisición = 180.000 + 11.440 = 191.440
+    // Estimación = 180.000×6 % (ITP_CCAA.madrid.tipoGeneral) + notaría 737,81 + registro 228,96
+    //            = 11.766,77 → redondeado a 11.767 (el campo muestra «11.767»)
+    //   Cifras revisadas el 27/08/2026: desde el 20/08 calcularNotario devuelve la FACTURA
+    //   (arancel 421,6044 × 1,75) y calcularRegistro suma presentación y nota simple.
+    //   valor de adquisición = 180.000 + 11.767 = 191.767
     //   valor de transmisión = 250.000 − 7.500 de comisión − 1.250 de plusvalía = 241.250
     //   (la gestoría de 300 € la paga el COMPRADOR y ya no resta aquí: art. 35.1 LIRPF,
     //    reparado el 21/08/2026)
@@ -829,4 +835,297 @@ test('REGRESIÓN (dato) — el rango de AJD del bloque educativo deja fuera el 0
 
   await page.getByRole('button', { name: 'Ver guía educativa' }).click();
   await expect(page.getByText(/Actos Jurídicos Documentados\)/).first()).toContainText('0%');
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Tercera vuelta del Inspector — 27/08/2026 (RE-INSPECCIÓN)
+//
+// La app volvió a la cola porque `data/fiscal` cambió otra vez: el commit 23b2844f llevó el
+// tipo general de las 17 comunidades a `tipoGeneralDe('X')`, que lo LEE de
+// TIPOS_ITP_CCAA_2025 (`data/fiscal/inmuebles.ts`), y dejó el candado `npm run check:itp`
+// enganchado al build para que no vuelva a tener dos dueños. Comprobado en esta vuelta: los
+// 28 casos anteriores siguen en verde y ninguna reparación se ha deshecho.
+//
+// Lo que sigue son: (a) casos NUEVOS por caminos que las dos vueltas anteriores no pisaron
+// —escala de tres tramos, reinversión PARCIAL, bonificación de Ceuta y entrada basura— y
+// (b) los hallazgos abiertos de esta vuelta, al final, con `test.fail()`.
+// ══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Inspector 27/08/2026 — caminos nuevos', () => {
+  // Tercera escala progresiva del catálogo, con tres tramos y cortes distintos a los de
+  // Cataluña y Baleares (que ya tenían caso): ITP_CCAA.extremadura.tramosProgresivos =
+  // 8 % hasta 360.000 · 10 % hasta 600.000 · 11 % el resto.
+  test('CASO 14 (límite: escala de tres tramos) — Extremadura, 700.000 €', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.locator('#ccaa-inmueble').selectOption('extremadura');
+    await rellenar(page, 'Precio de la vivienda', '700000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
+
+    await expect(page.getByText('Esta comunidad aplica escala progresiva')).toBeVisible();
+
+    // ITP = 360.000×8 % + 240.000×10 % + 100.000×11 % = 28.800 + 24.000 + 11.000 = 63.800
+    // Tipo EFECTIVO = 63.800 / 700.000 = 9,1142… → la tarjeta rotula 9,11 %
+    expect(await valorTarjeta(page, /^ITP/)).toBe('63.800,00 €');
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (9,11%)');
+
+    // Notaría (ARANCELES_NOTARIO): 90,15 + 24.040,49×0,45 % + 30.050,60×0,15 %
+    //   + 90.151,82×0,10 % + 450.759,07×0,05 % + 98.987,90×0,03 % = 588,63583 de arancel
+    //   × 1,21 de IVA = 712,2494 ; × 1,75 (punto medio de FACTURA_NOTARIAL) = 1.246,4362
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1246,44 €');
+    // Registro (ARANCELES_REGISTRO): 24,04 + 24.040,49×0,175 % + 30.050,60×0,125 %
+    //   + 90.151,82×0,075 % + 450.759,07×0,030 % + 98.987,90×0,020 % = 326,31327
+    //   + 6,010121 + 3,005061 = 335,32846 ; × 1,21 = 405,7474
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('405,75 €');
+
+    // Total = 63.800 + 1.246,4362 + 405,7474 + 300 = 65.752,1836
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('65.752,18 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('765.752,18 €');
+  });
+
+  // La exención por reinversión del art. 38 LIRPF es PROPORCIONAL cuando no se reinvierte
+  // todo: hasta ahora solo estaba anclado el caso de reinversión TOTAL (CASO 11).
+  test('CASO 15 (normal) — reinversión PARCIAL: la exención es proporcional a lo reinvertido', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio de la vivienda', '300000');
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await rellenar(page, 'Precio de compra original', '200000');
+    await rellenar(page, 'Años de propiedad', '10');
+    await rellenar(page, 'Valor catastral del suelo', '60000');
+    await rellenar(page, 'Valor catastral total (suelo + construcción)', '150000');
+    await rellenar(page, 'Comisión inmobiliaria (%)', '3');
+    await page.getByText('Voy a reinvertir en otra vivienda habitual').click();
+    await rellenar(page, 'Importe que reinviertes en la nueva vivienda', '150000');
+
+    // Plusvalía municipal: objetivo = 60.000 × 0,08 (COEFICIENTES_IIVTNU_2025, 10 años)
+    //   × 25 % (PLUSVALIA_MUNICIPAL_META.tipoOrientativo) = 1.200
+    //   real = 100.000 × (60.000/150.000) × 25 % = 10.000 → gana el objetivo
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1200,00 €');
+    // Valor de transmisión = 300.000 − 9.000 de comisión − 1.200 de plusvalía = 289.800
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('289.800,00 €');
+    // Ganancia = 289.800 − 200.000 = 89.800
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('89.800,00 €');
+    // Importe total obtenido (art. 41 RIRPF) = 289.800 − 0 de hipoteca pendiente
+    //   proporción reinvertida = 150.000 / 289.800 = 0,5175983…
+    //   exenta = 89.800 × 0,5175983 = 46.480,3313 → base = 89.800 − 46.480,3313 = 43.319,6687
+    //   IRPF = 6.000×19 % + 37.319,6687×21 % = 1.140 + 7.837,1304 = 8.977,1304
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('8977,13 €');
+    // Neto = 300.000 − (1.200 + 9.000 + 8.977,1304) = 280.822,8696
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('280.822,87 €');
+  });
+
+  // Art. 57 bis TRLITPAJD: la cuota se bonifica al 50 % por estar el inmueble en Ceuta o
+  // Melilla. En la tabla ese tipo ya viene con el 50 % descontado (`tipo: 3` sobre el 6 %
+  // general), y `elegirTipoITP` lo aplica por UBICACIÓN, sin preguntar el perfil.
+  test('CASO 16 (límite: régimen especial) — Ceuta, segunda mano, 200.000 €', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.locator('#ccaa-inmueble').selectOption('ceuta');
+    await rellenar(page, 'Precio de la vivienda', '200000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
+
+    // 200.000 × 3 % = 6.000 (el 6 % general bonificado al 50 %), NO 12.000
+    expect(await valorTarjeta(page, /^ITP/)).toBe('6000,00 €');
+    // Total = 6.000 + 758,9827 + 236,2250 + 300 = 7.295,2077
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('7295,21 €');
+  });
+
+  // Caso que DEBE rechazarse: texto que no es un número. `parseSpanishNumber` devuelve NaN
+  // (no un prefijo numérico, como haría parseFloat) y la app tiene que pedir el dato en vez
+  // de pintar cifras. Complementa al CASO 7 (campo vacío) y al CASO 10 (precio negativo).
+  test('CASO 17 (debe rechazarse) — «doscientos mil» no es un precio', async ({ page }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio de la vivienda', 'doscientos mil');
+
+    await expect(
+      page.getByText('Introduce el precio del inmueble para ver el desglose de gastos del comprador'),
+    ).toBeVisible();
+    await expect(page.getByText('No definido')).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS — Inspector 27/08/2026. Afirman lo que DEBERÍA pasar, así que hoy
+// fallan a propósito (`test.fail()`). Cuando se reparen, se les quita la marca y quedan
+// como regresión.
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ⚠️ HALLAZGO ABIERTO — cálculo (ALTO).
+// En Canarias, Ceuta y Melilla no rige el IVA español (TERRITORIOS_SIN_IVA: allí se liquida
+// IGIC o IPSI). El commit c47189ca dice que «ya no se inventa cifra: se nombra el impuesto
+// que toca y el total se marca como parcial», y así lo hacen las hermanas nave-industrial,
+// solar y terreno-rústico con su bandera `impuestoNoCalculado`. A esta app —el hub del
+// clúster— solo llegó el AVISO: sigue calculando un IVA del 10 % (o del 21 %) y metiéndolo
+// en «Total gastos adicionales» y en «COSTE TOTAL DE ADQUISICIÓN», que se presenta como
+// «Precio + todos los gastos» mientras el aviso de tres líneas más arriba dice que ese
+// importe «no es el tuyo».
+// Caso: Canarias · primera mano · vivienda · 200.000 € · gestoría 300 € → esperado ninguna
+//       tarjeta de IVA y el total marcado como parcial · obtenido «IVA (10,00%) 20.000,00 €»,
+//       «Total gastos adicionales 22.795,21 € — 11,40% sobre el precio» y «COSTE TOTAL DE
+//       ADQUISICIÓN 222.795,21 €».
+test('HALLAZGO — en Canarias no se puede liquidar un IVA que allí no existe', async ({ page }) => {
+  test.fail();
+  await page.goto(RUTA);
+  await page.getByRole('button', { name: /Primera mano/ }).click();
+  await page.locator('#ccaa-inmueble').selectOption('canarias');
+  await rellenar(page, 'Precio de la vivienda', '200000');
+
+  await expect(page.getByText(/no se aplica el IVA/)).toBeVisible();
+  await expect(page.locator('h3', { hasText: /^IVA/ })).toHaveCount(0);
+});
+
+// ⚠️ HALLAZGO ABIERTO — contenido (ALTO).
+// Sin precio de compra no hay ganancia que calcular, y el motor deja el IRPF en 0. La
+// tarjeta traduce ese 0 a «EXENTO» en verde, con la descripción «Tributación en base del
+// ahorro»: afirma una exención que nadie ha comprobado. Es el mismo defecto que el hallazgo
+// 43 (la plusvalía pintada como «0,00 €» cuando faltaban datos), reparado el 16/08 en la
+// tarjeta de al lado —que hoy dice «Sin calcular»— y no en esta. Además el 0 entra callado
+// en «Total gastos vendedor» y en el neto, cuyo único aviso es sobre la plusvalía.
+// Caso: Vendedor · precio de venta 250.000 € · sin tocar «Precio de compra original»
+//       → esperado «Sin calcular», como en la plusvalía · obtenido «EXENTO» y un neto de
+//       242.500,00 €. Control: con compra 180.000 € y 8 años, esa misma venta paga
+//       13.255,00 € de IRPF.
+test('HALLAZGO — sin precio de compra el IRPF no está «EXENTO», está sin calcular', async ({
+  page,
+}) => {
+  test.fail();
+  await page.goto(RUTA);
+  await rellenar(page, 'Precio de la vivienda', '250000');
+  await page.getByRole('button', { name: 'Vendedor' }).click();
+
+  expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
+  expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('Sin calcular');
+});
+
+// ⚠️ HALLAZGO ABIERTO — contenido (MEDIO).
+// El caso de uso «Ana» del bloque educativo sigue enseñando la regla que la reparación del
+// 21/08 retiró del motor: dice que a la ganancia se le resta «la comisión inmobiliaria (3%)
+// y la gestoría», y por eso publica 62.200 € en vez de 62.500 €. La gestoría del formulario
+// la paga el COMPRADOR y el art. 35.1 LIRPF solo descuenta los gastos satisfechos por el
+// transmitente — que es exactamente el motivo por el que se corrigió el cálculo.
+// Caso: venta 250.000 € · compra 180.000 € · 8 años · comisión 3 % · gestoría 300 € y sin
+//       valores catastrales → la app da «Ganancia patrimonial 62.500,00 €» mientras su
+//       propio bloque educativo publica 62.200 € · esperado 62.500 € y sin citar la gestoría.
+test('HALLAZGO — el caso «Ana» del bloque educativo contradice al motor', async ({ page }) => {
+  test.fail();
+  await page.goto(RUTA);
+  await rellenar(page, 'Precio de la vivienda', '250000');
+  await page.getByRole('button', { name: 'Vendedor' }).click();
+  await rellenar(page, 'Precio de compra original', '180000');
+  await rellenar(page, 'Años de propiedad', '8');
+  await rellenar(page, 'Comisión inmobiliaria (%)', '3');
+  expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('62.500,00 €');
+
+  await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+  await expect(page.getByText(/Ana vende su piso/)).toContainText('62.500');
+});
+
+// ⚠️ HALLAZGO ABIERTO — operativa (MEDIO). Mitad no reparada del hallazgo 21.
+// El perfil «Vivienda de Protección Oficial» se honra en segunda mano (Murcia: ITP al 4 %),
+// pero al pasar a primera mano el selector DESAPARECE, el perfil declarado se descarta sin
+// decirlo y se cobra el 10 % de IVA. IVA_INMUEBLES_2025.viviendaProtegida = 4 vive en
+// `data/fiscal/inmuebles.ts` y no hay ningún camino en la app que llegue a él: ni se aplica
+// ni se menciona, aunque la app tiene justo para esto el aviso «Podrías pagar menos».
+// Caso: Murcia · vivienda · 200.000 € · perfil «Vivienda de Protección Oficial» → segunda
+//       mano da «ITP (4,00%) 8.000,00 €»; al pulsar «Primera mano» da «IVA (10,00%)
+//       20.000,00 €» sin selector de perfil y sin una sola mención al 4 % de VPO
+//       (8.000 €) · esperado al menos el aviso de que ese tipo existe.
+test('HALLAZGO — en primera mano el perfil VPO se descarta sin avisar', async ({ page }) => {
+  test.fail();
+  await page.goto(RUTA);
+  await page.locator('#ccaa-inmueble').selectOption('murcia');
+  await rellenar(page, 'Precio de la vivienda', '200000');
+  await page.locator('#perfil-comprador').selectOption('vpo');
+  expect(await valorTarjeta(page, /^ITP/)).toBe('8000,00 €');
+
+  await page.getByRole('button', { name: /Primera mano/ }).click();
+  await expect(
+    page.locator('section[class*="mainContent"]').getByText(/protección oficial|VPO/i).first(),
+  ).toBeVisible();
+});
+
+// ⚠️ HALLAZGO ABIERTO — contenido (BAJO).
+// La tarjeta del AJD rotula el tipo NOMINAL de la tabla mientras el importe ya lleva la
+// bonificación del 50 % del art. 57 bis TRLITPAJD que `calcularAJD` aplica en Ceuta y
+// Melilla. La tarjeta del ITP, en la misma pantalla, resuelve esto mostrando el tipo
+// EFECTIVO precisamente para no contradecir a la cifra de al lado.
+// Caso: Melilla · primera mano · vivienda · 200.000 € → tarjeta «AJD (0,50%)» con
+//       500,00 €, que es el 0,25 % · esperado «AJD (0,25%)» (o 1.000,00 € si el rótulo
+//       fuera el bueno, que no lo es: la bonificación es correcta).
+test('HALLAZGO — el rótulo del AJD en Melilla no coincide con su importe', async ({ page }) => {
+  test.fail();
+  await page.goto(RUTA);
+  await page.getByRole('button', { name: /Primera mano/ }).click();
+  await page.locator('#ccaa-inmueble').selectOption('melilla');
+  await rellenar(page, 'Precio de la vivienda', '200000');
+
+  expect(await valorTarjeta(page, /^AJD/)).toBe('500,00 €');
+  await expect(page.locator('h3', { hasText: /^AJD/ }).first()).toHaveText('AJD (0,25%)');
+});
+
+// ⚠️ HALLAZGO ABIERTO — contenido (BAJO).
+// El bloque educativo y la FAQ (que va también al JSON-LD que consumen los buscadores y las
+// IAs) fijan la edad del tipo joven en «menores de 35-36 años», escrita a mano. La propia
+// tabla de la app la desmiente en dos comunidades desde el commit 23b2844f, que subió esas
+// edades con su norma: Murcia ≤40 (art. 8.6 del Decreto Legislativo 1/2010) y La Rioja <40
+// (art. 45.3 de la Ley 10/2017 según la Ley 1/2025). Quien tenga 38 años lee que no le toca.
+// Caso: Murcia · perfil «Joven (< 35 años)» · vivienda · 150.000 € → el panel «Tipos
+//       reducidos disponibles» lista «3% - Jóvenes ≤40 años» y la app cobra 4.500,00 €,
+//       mientras el bloque educativo dice «Jóvenes (generalmente menores de 35-36 años)» y
+//       la FAQ «tipos reducidos para jóvenes (menores de 35-36 años)».
+test('HALLAZGO — la edad del tipo joven del bloque educativo contradice a la tabla', async ({
+  page,
+}) => {
+  test.fail();
+  await page.goto(RUTA);
+  await page.locator('#ccaa-inmueble').selectOption('murcia');
+  await rellenar(page, 'Precio de la vivienda', '150000');
+  await page.locator('#perfil-comprador').selectOption('joven');
+  expect(await valorTarjeta(page, /^ITP/)).toBe('4500,00 €');
+  await expect(page.getByText('3% - Jóvenes ≤40 años')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+  await expect(page.getByText(/menores de 35-36 años/)).toHaveCount(0);
+});
+
+// ⚠️ HALLAZGO ABIERTO — contenido (BAJO).
+// El motivo de la exención parcial por reinversión se compone con
+// `(proporcionReinvertida * 100).toFixed(1)` en `data/fiscal/ganancia-inmueble.ts`, así que
+// el porcentaje sale con punto decimal inglés en una app en español (CLAUDE.md §2: nunca
+// `toFixed()` para presentar cifras). Lo ve todo el que reinvierte en parte.
+// Caso: el CASO 15 (venta 300.000 €, compra 200.000 €, reinversión de 150.000 €) → la
+//       descripción de la tarjeta de IRPF dice «exento el 51.8 % de la ganancia»
+//       · esperado «51,8 %».
+test('HALLAZGO — el porcentaje de reinversión sale con punto decimal inglés', async ({ page }) => {
+  test.fail();
+  await page.goto(RUTA);
+  await rellenar(page, 'Precio de la vivienda', '300000');
+  await page.getByRole('button', { name: 'Vendedor' }).click();
+  await rellenar(page, 'Precio de compra original', '200000');
+  await rellenar(page, 'Años de propiedad', '10');
+  await rellenar(page, 'Valor catastral del suelo', '60000');
+  await rellenar(page, 'Valor catastral total (suelo + construcción)', '150000');
+  await rellenar(page, 'Comisión inmobiliaria (%)', '3');
+  await page.getByText('Voy a reinvertir en otra vivienda habitual').click();
+  await rellenar(page, 'Importe que reinviertes en la nueva vivienda', '150000');
+
+  expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toContain('51,8 %');
+});
+
+// ⚠️ HALLAZGO ABIERTO — dato (BAJO).
+// El JSON-LD de `metadata.ts` escribe a mano cuatro tipos generales de ITP («Cataluña
+// aplica el 10 % … Madrid el 6 %, Andalucía el 7 % y el País Vasco el 4 %») en el mismo
+// fichero donde los extremos del rango SÍ se derivan de RANGO_ITP. Hoy los cuatro coinciden
+// con TIPOS_ITP_CCAA_2025, pero salen de un literal: el candado `npm run check:itp` vigila
+// `data/itp-ccaa.ts`, no los ficheros de las apps, así que un cambio en data/fiscal —como
+// el de Murcia (8 → 7,75 %) o el de Valencia (10 → 9 %) de junio— no llegaría hasta aquí.
+// Caso: leer el <script type="application/ld+json"> de la página y comparar cada tipo
+//       citado con ITP_CCAA → esperado que ninguno esté escrito a mano · obtenido cuatro,
+//       correctos hoy y sin nada que avise el día que dejen de serlo.
+test('HALLAZGO — el JSON-LD escribe a mano cuatro tipos generales de ITP', async ({ page }) => {
+  test.fail();
+  await page.goto(RUTA);
+  const schemas = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+  expect(schemas).not.toMatch(/Madrid el 6 %/);
 });

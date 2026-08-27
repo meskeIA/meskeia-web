@@ -1,8 +1,22 @@
 /**
  * Inspector — simulador-gastos-compraventa-trastero (segmento FISCAL, riesgo 1 CRÍTICO)
+ *
  * Primera inspección: 20/08/2026, posterior a la reparación de la factura notarial y del
  * arancel registral (commit 44a5dc7d). App hermana de simulador-gastos-compraventa-garaje:
  * comparten los motores de notaría y registro, y se han vuelto a verificar aquí desde cero.
+ *
+ * RE-INSPECCIÓN 27/08/2026 (la cola la reabrió porque `data/fiscal` cambió después de la
+ * reparación del 21/08). El fichero tiene cuatro partes:
+ *   1. CASOS 1-3 — los de la primera inspección, intactos y en verde.
+ *   2. REGRESIONES — los 9 hallazgos del 20/08, reparados el 21/08 y hoy reproducidos uno a
+ *      uno: los 9 siguen cerrados en lo que estas aserciones afirman.
+ *   3. CASOS 4-7 (MITAD B, 27/08) — zonas que ninguna inspección anterior tocó: la plusvalía
+ *      municipal del vendedor con sus dos métodos, la venta con pérdida y no sujeción, la
+ *      bonificación de Ceuta y la escala progresiva catalana en un tramo alto de verdad, y
+ *      el rechazo de una cifra malformada.
+ *   4. HALLAZGOS ABIERTOS 27/08 — marcados con `test.fail()`: afirman lo que DEBERÍA pasar,
+ *      así que hoy fallan a propósito. Al repararlos se les quita la marca y quedan como
+ *      regresión.
  *
  * De dónde sale CADA cifra esperada (ninguna de memoria):
  *  - Tipo general de ITP por CCAA → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
@@ -25,8 +39,17 @@
  *  - Ganancia patrimonial e IRPF → `calcularGananciaInmueble` (`data/fiscal/ganancia-inmueble.ts`,
  *    arts. 34-36 LIRPF) sobre `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (19 % hasta 6.000 ·
  *    21 % hasta 50.000 · 23 % hasta 200.000 · 27 % hasta 300.000 · 30 % resto).
+ *  - Plusvalía municipal → `calcularPlusvaliaMunicipal` (`data/itp-ccaa.ts`) sobre
+ *    `COEFICIENTES_IIVTNU_2025` y `PLUSVALIA_MUNICIPAL_META.tipoOrientativo` = 25 %
+ *    (`data/fiscal/inmuebles.ts`, RDL 26/2021 y arts. 104.5 y 107.4-5 TRLHL).
+ *  - Bonificación del 50 % de la cuota en Ceuta y Melilla → `ITP_CCAA.ceuta` /
+ *    `aplicarBonificacionCiudad` (art. 57 bis TRLITPAJD).
+ *  - Territorios donde NO rige el IVA español → `TERRITORIOS_SIN_IVA` (`data/itp-ccaa.ts`):
+ *    Canarias (IGIC) y Ceuta y Melilla (IPSI).
+ *  - Escala de recargos por presentación extemporánea → `lib/calculadoras/recargoPresentacionTardia.ts`
+ *    (LGT art. 27.2 en la redacción de la Ley 11/2021).
  *
- * Los tres casos están resueltos a mano ANTES de ejecutar la app; el desarrollo va comentado
+ * Todos los casos están resueltos a mano ANTES de ejecutar la app; el desarrollo va comentado
  * junto a cada aserción, con los importes sin redondear.
  *
  * Nota de formato: `formatCurrency` usa es-ES, que NO agrupa los millares de un número de
@@ -73,9 +96,10 @@ async function rellenar(page: Page, etiqueta: string, valor: string): Promise<vo
 }
 
 /**
- * Los dos desplegables no tienen id ni nombre accesible (ver el hallazgo de accesibilidad
- * del final), así que hay que localizarlos por posición: el de comunidad autónoma siempre
- * existe; el de perfil solo se pinta en la rama de segunda mano.
+ * Los dos desplegables ya tienen id desde la reparación del 21/08/2026 (#select-ccaa y
+ * #select-perfil), pero se siguen localizando por posición para que el test no dependa de
+ * un identificador: el de comunidad autónoma siempre existe; el de perfil solo se pinta en
+ * la rama de segunda mano.
  */
 const selectCcaa = (page: Page) => page.locator('select').nth(0);
 const selectPerfil = (page: Page) => page.locator('select').nth(1);
@@ -484,4 +508,331 @@ test('REGRESIÓN (accesibilidad) — los desplegables deben tener nombre accesib
   await page.getByRole('button', { name: /Segunda mano/ }).click();
   await expect(selectCcaa(page)).toHaveAccessibleName(/Comunidad Autónoma/);
   await expect(selectPerfil(page)).toHaveAccessibleName(/Perfil del comprador/);
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// MITAD B — casos nuevos de la re-inspección del 27/08/2026, en zonas que ninguna
+// inspección anterior tocó: la plusvalía municipal por sus dos métodos, la venta con
+// pérdida, la bonificación de Ceuta, la escala progresiva catalana y el rechazo de una
+// cifra malformada. Resueltos a mano ANTES de abrir el navegador.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('MITAD B — zonas no cubiertas por la inspección del 20/08/2026', () => {
+  /**
+   * CASO 4 (NORMAL, pestaña Vendedor) — la plusvalía municipal con TODOS sus datos, que es
+   * la parte del vendedor que la inspección anterior solo tocó por su ausencia (hallazgo 88).
+   * Se elige a propósito un caso donde el método objetivo gana al real, para comprobar que
+   * la app aplica el mínimo del art. 107.5 TRLHL y lo dice.
+   */
+  test('CASO 4 (normal) — vendedor con plusvalía calculada: 15.000/8.000, 5 años, suelo 4.000 de 9.000', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio del trastero', '15000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await rellenar(page, 'Precio de compra original', '8000');
+    await rellenar(page, 'Impuestos y gastos que pagaste al comprarlo', '1000');
+    await rellenar(page, 'Años de propiedad', '5');
+    await rellenar(page, 'Valor catastral del suelo', '4000');
+    await rellenar(page, 'Valor catastral total (suelo + construcción)', '9000');
+
+    // Plusvalía municipal — calcularPlusvaliaMunicipal (data/itp-ccaa.ts):
+    //   método OBJETIVO (art. 107.4 TRLHL): COEFICIENTES_IIVTNU_2025 da 0,17 a los 5 años
+    //     base = 4.000 × 0,17 = 680 · cuota = 680 × 25 % = 170,00
+    //     (el 25 % es PLUSVALIA_MUNICIPAL_META.tipoOrientativo, no el 30 % máximo legal)
+    //   método REAL (art. 107.5 TRLHL): el incremento se reparte en la proporción catastral
+    //     (15.000 − 8.000) × (4.000 / 9.000) × 25 % = 7.000 × 0,4444… × 0,25 = 777,777…
+    //   el contribuyente elige el más favorable → 170,00 €, y el método se nombra.
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('170,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('Método objetivo');
+
+    // Valor de adquisición (art. 35.1 LIRPF) = 8.000 + 1.000 de impuestos y gastos = 9.000
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('9000,00 €');
+
+    // Valor de transmisión (art. 35.2 LIRPF) = 15.000 − 450 de comisión (3 % por defecto)
+    //   − 0 de gestoría del vendedor − 170 de plusvalía municipal = 14.380
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('14.380,00 €');
+    expect(await valorTarjeta(page, 'Comisión inmobiliaria (3%)')).toBe('450,00 €');
+
+    // Ganancia = 14.380 − 9.000 = 5.380 → cabe entera en el primer tramo del ahorro
+    //   (TRAMOS_GANANCIAS_PATRIMONIALES_2025: 19 % hasta 6.000) → 5.380 × 19 % = 1.022,20
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('5380,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1022,20 €');
+
+    // Total gastos vendedor = 170 + 450 + 0 de gestoría + 1.022,20 = 1.642,20
+    // Neto = 15.000 − 1.642,20 = 13.357,80
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('1642,20 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('13.357,80 €');
+    // Con la plusvalía ya calculada, el neto deja de ser un techo (reparación del hallazgo 88)
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('realmente recibes');
+  });
+
+  /**
+   * CASO 5 (LÍMITE) — vender por DEBAJO de lo que se pagó. Toca a la vez las dos ramas que
+   * se salen del camino normal: la no sujeción del art. 104.5 TRLHL (sin incremento de valor
+   * no hay plusvalía municipal) y la pérdida patrimonial del art. 33 LIRPF (sin cuota).
+   * Es el caso en el que un cero mal puesto se convierte en un impuesto inexistente.
+   */
+  test('CASO 5 (límite) — venta con pérdida: plusvalía no sujeta y cero IRPF', async ({ page }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio del trastero', '8000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await rellenar(page, 'Precio de compra original', '12000');
+    await rellenar(page, 'Años de propiedad', '10');
+    await rellenar(page, 'Valor catastral del suelo', '5000');
+    await rellenar(page, 'Valor catastral total (suelo + construcción)', '10000');
+
+    // incremento real = 8.000 − 12.000 = −4.000 ≤ 0 → `exento` en calcularPlusvaliaMunicipal.
+    // No puede salir la cuota objetiva (5.000 × 0,08 × 25 % = 100,00 €): sin incremento de
+    // valor el impuesto no se devenga, y el rótulo tiene que decirlo con palabras.
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('EXENTO');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('No sujeta');
+
+    // valor de transmisión = 8.000 − 240 (comisión 3 %) = 7.760 · valor de adquisición = 12.000
+    // ganancia = 7.760 − 12.000 = −4.240 → pérdida patrimonial, sin cuota
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('12.000,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('7760,00 €');
+    expect(await valorTarjeta(page, 'Pérdida patrimonial')).toBe('4240,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('SIN CUOTA');
+    await expect(page.locator('h3', { hasText: 'Ganancia patrimonial' })).toHaveCount(0);
+
+    // Total gastos = 0 de plusvalía + 240 de comisión + 0 de gestoría + 0 de IRPF = 240
+    // Neto = 8.000 − 240 = 7.760
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('240,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('7760,00 €');
+  });
+
+  /**
+   * CASO 6 (LÍMITE) — las dos comunidades cuyo ITP NO es un porcentaje plano del precio:
+   * Ceuta, donde el art. 57 bis TRLITPAJD bonifica la cuota al 50 % por el SITIO del
+   * inmueble (y por tanto se aplica también a un trastero, que nunca es vivienda habitual),
+   * y Cataluña, cuya escala progresiva solo se separa del tipo plano por encima de 600.000 €.
+   */
+  test('CASO 6 (límite) — Ceuta bonificada al 50 % y la escala progresiva catalana por encima de 600.000 €', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await selectCcaa(page).selectOption('ceuta');
+    await rellenar(page, 'Precio del trastero', '20000');
+
+    // ITP_CCAA.ceuta: tipoGeneral 6 y un reducido «Bonificación general 50%» del 3 % cuyas
+    // condiciones son ['Inmueble situado en Ceuta', 'Bonificación automática 50%'] — las dos
+    // de UBICACIÓN, así que `elegirTipoITP` las da por cumplidas con el perfil general.
+    //   20.000 × 3 % = 600,00 (la mitad de los 1.200 del tipo general)
+    expect(await valorTarjeta(page, 'ITP (3,00%)')).toBe('600,00 €');
+
+    // Cataluña, 700.000 € — tramosProgresivos 10/11/12/13 %:
+    //   600.000 × 10 % = 60.000 · (700.000 − 600.000) × 11 % = 11.000 → 71.000,00
+    //   tipo EFECTIVO = 71.000 / 700.000 = 10,142857 % (NO el 10 % nominal del primer tramo:
+    //   el tipo plano daría 70.000 €, mil euros menos)
+    await selectCcaa(page).selectOption('cataluna');
+    await rellenar(page, 'Precio del trastero', '700000');
+    expect(await valorTarjeta(page, 'ITP (10,14%)')).toBe('71.000,00 €');
+    await expect(page.getByText(/aplica escala progresiva/)).toBeVisible();
+
+    // Notaría a ese precio — ARANCELES_NOTARIO acumulado hasta 700.000 = 588,63583 sin IVA;
+    //   × 1,21 = 712,2493543 de arancel · factura media × 1,75 = 1.246,43637
+    // Registro — ARANCELES_REGISTRO acumulado 326,3132735 (por debajo del tope de 2.181,67)
+    //   + 6,010121 de presentación + 3,005061 de nota simple = 335,3284555 · × 1,21 = 405,747…
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1246,44 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('405,75 €');
+  });
+
+  /**
+   * CASO 7 (DEBE RECHAZARSE) — una cifra malformada. `NumberInput` filtra las letras con su
+   * regex `/^-?[\d.,]*$/`, así que lo que de verdad puede llegar al motor es un número con
+   * dos separadores mal puestos. `parseSpanishNumber` devuelve NaN para «1.2.3» (está en su
+   * propia documentación), y la app tiene que pedir el dato en vez de calcular sobre NaN.
+   */
+  test('CASO 7 (debe rechazarse) — «1.2.3» no es un precio: ni cálculo ni «No definido»', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio del trastero', '1.2.3');
+
+    await expect(
+      page.getByText('Introduce el precio del trastero para ver el desglose de gastos del comprador'),
+    ).toBeVisible();
+    await expect(page.locator('h3', { hasText: 'COSTE TOTAL DE ADQUISICIÓN' })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: 'Gastos de notaría' })).toHaveCount(0);
+    await expect(page.getByText('No definido')).toHaveCount(0);
+    // Sobre el texto completo y con mayúsculas: `getByText('NaN')` es una búsqueda de
+    // subcadena SIN distinguir mayúsculas y casaría con «ganancia», que lleva «nan» dentro.
+    expect(await page.locator('body').innerText()).not.toContain('NaN');
+
+    // Lo mismo en el campo de gestoría: `parseSpanishNumberOr` devuelve su valor por defecto
+    // (0) en vez de contaminar el total. Con un precio válido, el total no puede llevar NaN.
+    await rellenar(page, 'Precio del trastero', '15000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '1.2.3');
+    // 900 de ITP + 276,55494405 de notaría + 59,03284112 de registro + 0 de gestoría
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1235,59 €');
+    await expect(page.locator('h3', { hasText: 'Gastos de gestoría' })).toHaveCount(0);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS — re-inspección del 27/08/2026.
+// Marcados con `test.fail()`: afirman lo que DEBERÍA pasar, así que hoy fallan a propósito.
+// Cuando se reparen, se les quita la marca y quedan como regresión.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('HALLAZGOS ABIERTOS — re-inspección del 27/08/2026', () => {
+  test.fail();
+
+  // ⚠️ ABIERTO (alto) — cálculo. REPARACIÓN A MEDIAS del commit c47189ca.
+  // En Canarias, Ceuta y Melilla no rige el IVA español: `TERRITORIOS_SIN_IVA`
+  // (data/itp-ccaa.ts) los declara como IGIC e IPSI. La app RENDERIZA el componente
+  // `AvisoTerritorioSinIva`, que dice literalmente «Esta herramienta no lo calcula, así que
+  // el importe del impuesto indirecto no es el tuyo»… y la tarjeta de al lado liquida un IVA
+  // que allí no existe y lo suma a un total rotulado «Precio del trastero + todos los gastos».
+  // A esta app llegó el aviso pero NO el cálculo: `page.tsx` ni siquiera importa
+  // `TERRITORIOS_SIN_IVA`. Las tres hermanas del clúster (nave-industrial, solar y
+  // terreno-rústico) lo resolvieron con una bandera `impuestoNoCalculado` que deja el
+  // impuesto sin cifra y rotula «COSTE TOTAL (PARCIAL)».
+  // Caso: Canarias · primera mano · vinculado · 15.000 € · gestoría 300 € → esperado ninguna
+  //       cifra de impuesto indirecto y el total marcado como parcial · obtenido
+  //       «IVA (10,00%) 1500,00 €», «Total gastos adicionales 2248,09 € — 14,99% sobre el
+  //       precio» y «COSTE TOTAL DE ADQUISICIÓN 17.248,09 € — Precio del trastero + todos los
+  //       gastos». En Ceuta con trastero independiente: «IVA (21,00%) 3150,00 €» y 18.823,09 €.
+  test('ABIERTO (cálculo) — en Canarias, Ceuta y Melilla no puede liquidarse IVA', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Primera mano/ }).click();
+    await selectCcaa(page).selectOption('canarias');
+    await rellenar(page, 'Precio del trastero', '15000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
+
+    // El aviso SÍ está: es el cálculo el que no se enteró.
+    await expect(page.getByText(/no se aplica el IVA/)).toBeVisible();
+
+    // Ninguna tarjeta puede titularse «IVA» ni poner cifra a ese impuesto…
+    await expect(page.locator('h3', { hasText: /^IVA/ })).toHaveCount(0);
+    // …y el total no puede presentarse como completo mientras falte el impuesto indirecto.
+    const total = await page.locator('h3', { hasText: /COSTE TOTAL/ }).first().innerText();
+    expect(total).toMatch(/PARCIAL/i);
+  });
+
+  // ⚠️ ABIERTO (medio) — dato.
+  // El único `<DataReference>` de la página declara «ITP/AJD/IVA 2026» con
+  // FISCAL_INMUEBLES_META (verificado 17/06/2026), pero la pestaña Vendedor emite dos cifras
+  // normativas más con vigencia y verificación PROPIAS y sin ninguna referencia: la plusvalía
+  // municipal, calculada con COEFICIENTES_IIVTNU_2025 y PLUSVALIA_MUNICIPAL_META
+  // (RDL 26/2021; ese módulo declara `verificado: '2025-01-15'` y `vigencia: '2025'`, y avisa
+  // de que los coeficientes se actualizan cada Ley de Presupuestos), y el IRPF de la ganancia
+  // con TRAMOS_GANANCIAS_PATRIMONIALES_2025. La página presenta datos de 2025 bajo un sello
+  // de 2026. La app hermana del garaje cerró exactamente esto (hallazgo 35) añadiendo un
+  // segundo DataReference con PLUSVALIA_MUNICIPAL_META; aquí no llegó.
+  // Caso: pestaña Vendedor · 15.000/8.000 · 5 años · suelo 4.000 · total 9.000 → plusvalía
+  //       170,00 € (coeficiente 0,17 de 2025) e IRPF 1022,20 € (tramos de 2025) · esperado un
+  //       bloque de referencia que nombre la plusvalía municipal · obtenido un solo bloque
+  //       «DATOS DE REFERENCIA — Normativa aplicada: ITP/AJD/IVA 2026 · última verificación
+  //       17/06/2026», que no cubre ninguna de las dos.
+  test('ABIERTO (dato) — la plusvalía municipal y el IRPF se publican sin su propia referencia', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio del trastero', '15000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await rellenar(page, 'Precio de compra original', '8000');
+    await rellenar(page, 'Años de propiedad', '5');
+    await rellenar(page, 'Valor catastral del suelo', '4000');
+    await rellenar(page, 'Valor catastral total (suelo + construcción)', '9000');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('170,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1022,20 €');
+
+    // Debe existir una referencia que cubra el IIVTNU, además de la de ITP/AJD/IVA.
+    await expect(page.getByText(/Normativa aplicada:.*(IIVTNU|[Pp]lusval)/)).toBeVisible();
+  });
+
+  // ⚠️ ABIERTO (medio) — dato.
+  // El consejo «Liquida los impuestos a tiempo» del bloque educativo lleva escrita a mano una
+  // escala de recargos por presentación extemporánea que contradice a la calculadora canónica
+  // del propio catálogo: `lib/calculadoras/recargoPresentacionTardia.ts` aplica el art. 27.2
+  // LGT en la redacción de la Ley 11/2021 —1 % por cada mes completo hasta 12 meses, y 15 %
+  // más intereses de demora desde el mes 13— mientras esta app anuncia «recargos automáticos
+  // del 5% al 20%», que es la escala ANTERIOR a esa reforma. No hay módulo en data/fiscal con
+  // este dato, así que el número vive inline pudiendo derivarse de la lógica ya existente.
+  // Caso: desplegar la guía educativa → consejo «Liquida los impuestos a tiempo»: obtenido
+  //       «El incumplimiento genera recargos automáticos del 5% al 20%» · esperado la escala
+  //       vigente. Sobre el ITP de 900,00 € del caso de Madrid que la propia página publica,
+  //       un mes de retraso son 9,00 € y la app hace temer entre 45,00 € y 180,00 €.
+  test('ABIERTO (dato) — la escala de recargos del bloque educativo es la anterior a la Ley 11/2021', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+    const consejo = await texto(page.getByText(/recargos/i).first());
+    expect(consejo).not.toMatch(/5\s*%?\s*al\s*20\s*%/);
+    expect(consejo).toMatch(/1\s*%.*mes|15\s*%/);
+  });
+
+  // ⚠️ ABIERTO (medio) — accesibilidad. REPARACIÓN A MEDIAS del hallazgo 85 (21/08/2026).
+  // Aquel hallazgo nombraba dos cosas: los `<select>` sin nombre accesible —reparados, ver la
+  // regresión de más arriba— y que «los labels de "Modalidad del trastero" y "Tipo de
+  // transmisión" están igualmente sueltos sobre sus grupos de botones». Esa segunda mitad
+  // sigue igual: los dos `<label>` no tienen `for` ni envuelven ningún control, y el par de
+  // botones no va dentro de ningún `role="group"` ni `<fieldset>`, así que quien navega por
+  // voz oye «Vinculado a vivienda» y «Segunda mano» sin saber de qué pregunta son opciones.
+  // No lo cubre `npm run check:a11y-jsx`, que vigila type=, aria-hidden y aria-pressed: los
+  // tres están correctos en esta página.
+  // Caso: abrir la app y evaluar en el DOM →
+  //       document.querySelectorAll('[role="group"],[role="radiogroup"],fieldset').length
+  //       esperado ≥ 2 · obtenido 0; y los labels sin destino son
+  //       ["Modalidad del trastero", "Tipo de transmisión"] (los otros dos labels huérfanos
+  //       son de NumberInput, cuyo input sí lleva aria-label).
+  test('ABIERTO (accesibilidad) — los dos grupos de botones deben tener nombre accesible', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    const grupos = await page.locator('[role="group"], [role="radiogroup"], fieldset').count();
+    expect(grupos).toBeGreaterThanOrEqual(2);
+  });
+
+  // ⚠️ ABIERTO (bajo) — contenido.
+  // El título de la tarjeta de comisión del vendedor interpola el TEXTO CRUDO del input
+  // —`Comisión inmobiliaria (${comisionInmobiliaria}%)`— en vez de pasarlo por `formatNumber`,
+  // así que un porcentaje tecleado con punto decimal se publica en formato estadounidense,
+  // contra la regla de formato español obligatoria. El importe sí es correcto. Es el mismo
+  // resto que el garaje tiene abierto (hallazgo 438).
+  // Caso: pestaña Vendedor · precio de venta 15.000 € · compra 8.000 € · «Comisión
+  //       inmobiliaria (%)» = 3.5 → esperado el título «Comisión inmobiliaria (3,5%)» ·
+  //       obtenido «Comisión inmobiliaria (3.5%)», con el importe 525,00 €, que sí es
+  //       correcto (15.000 × 3,5 %).
+  test('ABIERTO (contenido) — el porcentaje de comisión se publica en formato estadounidense', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio del trastero', '15000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await rellenar(page, 'Precio de compra original', '8000');
+    await rellenar(page, 'Comisión inmobiliaria (%)', '3.5');
+
+    const titulo = await page.locator('h3', { hasText: 'Comisión inmobiliaria' }).first().innerText();
+    expect(titulo).toContain('3,5%');
+    expect(titulo).not.toContain('3.5%');
+  });
+
+  // ⚠️ ABIERTO (bajo) — operativa.
+  // Mientras el campo de gestoría tiene el foco, un importe negativo se suma tal cual al total
+  // y su tarjeta ni se pinta (la guarda es `gastosGestoria > 0`), así que el total en pantalla
+  // no cuadra con las líneas visibles. El `min={0}` de NumberInput solo actúa en el blur. La
+  // hermana `nave-industrial` cerró esto el 23/08/2026 acotando con `Math.max(0, …)` dentro
+  // del useMemo, y el comentario de su código explica por qué no basta con el blur.
+  // Caso: Madrid · segunda mano · 15.000 € · escribir «-500» en «Gastos de gestoría del
+  //       comprador (€)» SIN salir del campo → esperado que el total siga siendo la suma de
+  //       lo que se ve, 1235,59 € (900 de ITP + 276,55 de notaría + 59,03 de registro) ·
+  //       obtenido «Total gastos adicionales 735,59 € — 4,90% sobre el precio» y «COSTE TOTAL
+  //       DE ADQUISICIÓN 15.735,59 €», 500 € por debajo de sus propias líneas.
+  test('ABIERTO (operativa) — una gestoría negativa con el foco puesto descuadra el total', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio del trastero', '15000');
+    const gestoria = page.locator('input[aria-label="Gastos de gestoría del comprador (€)"]');
+    await gestoria.fill('-500'); // sin blur: el min={0} de NumberInput aún no ha actuado
+
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1235,59 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('16.235,59 €');
+  });
 });

@@ -1,7 +1,13 @@
 import { test, expect, devices, type Browser, type Page } from '@playwright/test';
+import { readFile } from 'node:fs/promises';
+// El CSV que descarga la app se lee con el MISMO parser que usaría una hoja de cálculo
+// (papaparse, RFC 4180, ya dependencia del proyecto) y no con un split casero: la diferencia
+// entre los dos es justo uno de los hallazgos de la 3.ª pasada.
+import { parse as parsearCsv } from 'papaparse';
 
 /**
- * Sonómetro — test de regresión (Inspector; 1.ª pasada 24/08/2026, 2.ª pasada 24/08/2026)
+ * Sonómetro — test de regresión (Inspector; 1.ª pasada 24/08/2026, 2.ª pasada 24/08/2026,
+ * 3.ª pasada 27/08/2026)
  *
  * Segmento «interactiva sin número»: es un SENSOR de micrófono, así que no hay una casilla
  * donde teclear un dato y comprobar el resultado a mano. Se audita la OPERATIVA —que el
@@ -51,6 +57,11 @@ import { test, expect, devices, type Browser, type Page } from '@playwright/test
  * HALLAZGOS ABIERTOS de la 2.ª pasada: al final, marcados con `test.fail()`. Afirman lo que
  * DEBERÍA pasar y hoy fallan a propósito; el día que se reparen se les quita el `test.fail()`
  * y se quedan como regresión.
+ *
+ * 3.ª PASADA (27/08/2026) — la cola se reabrió por CÓDIGO NUEVO, no por reparación: el commit
+ * fc27e76b estrenó el registro de mediciones (fila persistente, CSV, parte impreso, suelo de
+ * 3 s y tope de 60). Los siete hallazgos anteriores siguen cerrados. Lo nuevo se prueba en los
+ * CASOS 4 a 6 y en los tres `test.fail()` del final de este fichero.
  */
 
 test.use({
@@ -717,4 +728,425 @@ test('HALLAZGO 279 — los rótulos de la escala van cada uno en su ángulo, no 
   // Y los rótulos no están todos a la misma altura: siguen el arco
   const alturas = centros.map((c) => c.y);
   expect(Math.max(...alturas) - Math.min(...alturas)).toBeGreaterThan(20);
+});
+
+// ===========================================================================
+// 3.ª PASADA DEL INSPECTOR · 27/08/2026 — el REGISTRO DE MEDICIONES estrenado
+// el 26/08 en el commit fc27e76b: fila persistente en localStorage, CSV en
+// formato español, parte por impresora, suelo de 3 s y tope de 60 mediciones.
+// Lo que sigue ataca sus BORDES, que es lo que ese commit no dice haber probado.
+//
+// Lo que ya cubre `tests/apps/sonometro-registro.spec.ts` —que la fila sobrevive
+// a recargar, que una de 0,3 s se descarta, que la nota persiste, que el CSV
+// lleva BOM y punto y coma, que el parte imprime su aviso legal— no se repite.
+// ===========================================================================
+
+const CLAVE_SESIONES = 'sonometro-sesiones';
+
+interface SesionSembrada {
+  id: string;
+  duracionSegundos: number;
+  laeq: number;
+  minDb: number;
+  maxDb: number;
+  calibracion: number;
+  nota: string;
+}
+
+/** Escribe un registro en localStorage ANTES de que cargue la app. */
+async function sembrarRegistro(page: Page, sesiones: SesionSembrada[]): Promise<void> {
+  await page.addInitScript(
+    ([clave, datos]) => window.localStorage.setItem(clave, datos),
+    [CLAVE_SESIONES, JSON.stringify(sesiones)] as [string, string],
+  );
+}
+
+/** Una medición de 5 minutos fechada el día `dia` de junio de 2026, a las 22:15. */
+const sesionDeJunio = (dia: number): SesionSembrada => ({
+  id: new Date(Date.UTC(2026, 5, dia, 20, 15, 0)).toISOString(),
+  duracionSegundos: 300,
+  laeq: 50 + (dia % 10),
+  minDb: 40,
+  maxDb: 70,
+  calibracion: 90,
+  nota: `noche ${dia}`,
+});
+
+const filasRegistro = (page: Page) => page.locator('[class*="tablaRegistro"] tbody tr');
+const avisoRegistro = (page: Page) => page.locator('[class*="avisoRegistro"]');
+
+/** Mide `segundos` con el micrófono ya inyectado y pulsa «Detener y guardar». */
+async function medirYGuardar(page: Page, segundos: number): Promise<void> {
+  await page.getByRole('button', { name: /Iniciar medición/i }).click();
+  await esperarLectura(page);
+  await page.waitForTimeout(segundos * 1000);
+  await page.getByRole('button', { name: /Detener y guardar/i }).click();
+  await page.waitForTimeout(300);
+}
+
+// ---------------------------------------------------------------------------
+// CASO 4 (límite) — el suelo de 3 segundos, por sus dos lados
+// ---------------------------------------------------------------------------
+// El registro rechaza lo que dure menos de SEGUNDOS_MINIMOS_REGISTRO = 3 (page.tsx), con la
+// comparación `segundos < 3` sobre un tiempo medido desde el PRIMER FOTOGRAMA CON AUDIO y no
+// desde el clic. `sonometro-registro.spec.ts` prueba 0,3 s (fuera) y 3,5 s (dentro); aquí se
+// aprieta el borde —2,9 s fuera, 3,3 s dentro— y se comprueba además que la duración anotada
+// es la que se midió y no un número inventado.
+test('CASO 4 (límite) — 2,9 s no entra en el registro y 3,3 s sí, con la duración que se midió', async ({
+  browser,
+}) => {
+  for (const [segundos, debeGuardarse] of [
+    [2.9, false],
+    [3.3, true],
+  ] as [number, boolean][]) {
+    const contexto = await browser.newContext({ permissions: ['microphone'] });
+    const pagina = await contexto.newPage();
+    await micrófonoSintético(pagina, 1000, 0.05);
+    await pagina.goto(RUTA);
+
+    const inicioReloj = Date.now();
+    await pagina.getByRole('button', { name: /Iniciar medición/i }).click();
+    await esperarLectura(pagina);
+    await pagina.waitForTimeout(segundos * 1000);
+    await pagina.getByRole('button', { name: /Detener y guardar/i }).click();
+    const pulsacionReal = (Date.now() - inicioReloj) / 1000;
+    await pagina.waitForTimeout(300);
+
+    const guardadas: SesionSembrada[] = JSON.parse(
+      (await pagina.evaluate((k) => window.localStorage.getItem(k), CLAVE_SESIONES)) ?? '[]',
+    );
+
+    if (debeGuardarse) {
+      expect(guardadas, `${segundos} s deberían registrarse`).toHaveLength(1);
+      await expect(avisoRegistro(pagina)).toHaveText(
+        'Medición guardada en el registro de este navegador.',
+      );
+      // La duración anotada es la del AUDIO, no la del botón: el reloj de la sesión arranca en
+      // el primer fotograma con señal. Medido el 27/08/2026, el desfase es de ~0,19 s
+      // (4,002 s de pulsación → 3,807 s anotados); medio segundo cubre el arranque.
+      expect(guardadas[0].duracionSegundos).toBeLessThanOrEqual(pulsacionReal);
+      expect(guardadas[0].duracionSegundos).toBeGreaterThan(pulsacionReal - 0.5);
+    } else {
+      expect(guardadas, `${segundos} s NO deberían registrarse`).toHaveLength(0);
+      await expect(avisoRegistro(pagina)).toHaveText(
+        'Medición demasiado corta para registrarla: hacen falta al menos 3 segundos.',
+      );
+    }
+    await contexto.close();
+  }
+});
+
+// ---------------------------------------------------------------------------
+// CASO 5 (operativa) — un registro corrupto no puede dejar la página en blanco
+// ---------------------------------------------------------------------------
+// El registro vive entero en localStorage, que es del navegador y no de la app: una extensión,
+// una versión anterior o una escritura a medias pueden dejar ahí cualquier cosa. Si la app se
+// cae al leerlo, el usuario se queda con una pantalla rota y sin ninguna salida.
+test('CASO 5 (operativa) — basura en localStorage deja el registro vacío, no la página rota', async ({
+  browser,
+}) => {
+  const casos: [string, string, number][] = [
+    ['basura que no es JSON', 'no soy json {{{', 0],
+    ['JSON válido que no es un array', '{"a":1}', 0],
+    // Fila de una hipotética versión anterior, sin el campo `nota`: se descarta entera en vez
+    // de pintar `undefined` en la celda.
+    [
+      'fila sin el campo `nota`',
+      JSON.stringify([
+        {
+          id: '2026-08-01T20:00:00.000Z',
+          duracionSegundos: 300,
+          laeq: 55.2,
+          minDb: 40,
+          maxDb: 70,
+          calibracion: 90,
+        },
+      ]),
+      0,
+    ],
+    // Mezcla: la buena se conserva y la rota (`laeq: null`) se cae. Perder una fila ilegible es
+    // preferible a no poder abrir la página; perderlas TODAS no lo sería.
+    [
+      'una válida y una rota',
+      JSON.stringify([
+        {
+          id: '2026-08-25T20:00:00.000Z',
+          duracionSegundos: 300,
+          laeq: 55.2,
+          minDb: 40,
+          maxDb: 70,
+          calibracion: 90,
+          nota: 'buena',
+        },
+        {
+          id: '2026-08-24T20:00:00.000Z',
+          duracionSegundos: 'trescientos',
+          laeq: null,
+          minDb: 40,
+          maxDb: 70,
+          calibracion: 90,
+          nota: 'rota',
+        },
+      ]),
+      1,
+    ],
+  ];
+
+  for (const [nombre, valor, filasEsperadas] of casos) {
+    const contexto = await browser.newContext();
+    const pagina = await contexto.newPage();
+    const erroresDePagina: string[] = [];
+    pagina.on('pageerror', (e) => erroresDePagina.push(String(e)));
+    await pagina.addInitScript(
+      ([k, v]) => window.localStorage.setItem(k, v),
+      [CLAVE_SESIONES, valor] as [string, string],
+    );
+    await pagina.goto(RUTA);
+
+    await expect(pagina.getByRole('heading', { level: 1, name: 'Sonómetro' }), nombre).toBeVisible();
+    await expect(filasRegistro(pagina), nombre).toHaveCount(filasEsperadas);
+    expect(erroresDePagina, `${nombre}: la página lanzó una excepción`).toEqual([]);
+
+    // Y no se ha reescrito lo que había: mientras el usuario no guarde nada nuevo, su dato
+    // crudo sigue en el almacenamiento y se puede rescatar a mano.
+    expect(
+      await pagina.evaluate((k) => window.localStorage.getItem(k), CLAVE_SESIONES),
+      nombre,
+    ).toBe(valor);
+    await contexto.close();
+  }
+});
+
+// ---------------------------------------------------------------------------
+// CASO 6 (móvil) — Pixel 7: medir, guardar e imprimir el parte desde el teléfono
+// ---------------------------------------------------------------------------
+// Un sonómetro se usa con el móvil en la mano, y el parte tiene NUEVE columnas en una pantalla
+// de 412 px. Se comprueba que el micrófono arranca DE VERDAD —pista en `live` y el AnalyserNode
+// entregando muestras distintas de cero, no que exista el botón— y que la tabla se desplaza
+// dentro de su caja sin empujar la página a lo ancho.
+test.describe('CASO 6 (móvil)', () => {
+  // PIXEL_7, definido más arriba: solo las propiedades del dispositivo. `devices['Pixel 7']`
+  // entero trae `defaultBrowserType` y Playwright no lo admite dentro de un describe.
+  test.use({ ...PIXEL_7, permissions: ['microphone'] });
+
+  test('en un Pixel 7 se mide, se guarda y el parte sale con su aviso legal', async ({ page }) => {
+    // Una medición de verdad no cabe en los 30 s por defecto: hay que esperar al micrófono,
+    // muestrear dos segundos de audio y superar el suelo de 3 s del registro.
+    test.setTimeout(60000);
+
+    // Aquí NO se inyecta oscilador: el micrófono es el dispositivo falso de Chromium, una
+    // pista de verdad sobre la que se puede exigir readyState === 'live'.
+    await page.addInitScript(() => {
+      const gUM = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+      navigator.mediaDevices.getUserMedia = async (c?: MediaStreamConstraints) => {
+        const s = await gUM(c);
+        (window as unknown as { __pista?: MediaStreamTrack }).__pista = s.getAudioTracks()[0];
+        return s;
+      };
+      const crearAnalizador = AudioContext.prototype.createAnalyser;
+      AudioContext.prototype.createAnalyser = function (this: AudioContext) {
+        const analizador = crearAnalizador.call(this);
+        (window as unknown as { __analizador?: AnalyserNode }).__analizador = analizador;
+        return analizador;
+      };
+    });
+    await page.goto(RUTA);
+
+    await page.getByRole('button', { name: /Iniciar medición/i }).tap();
+    await esperarLectura(page);
+    await page.waitForTimeout(1200);
+
+    // El medio, no el DOM: pista viva y ventana de análisis con señal real.
+    // ⚠️ El dispositivo falso de Chromium NO entrega un tono continuo sino pulsos: una sola
+    // captura del analizador cae con frecuencia entre dos y sale toda a cero (medido el
+    // 27/08/2026: 0 de 2048 muestras en tres intentos seguidos, y 55 de 2048 en otro). Se
+    // acumula sobre dos segundos de fotogramas, que es lo que prueba que ENTRA audio.
+    const medio = await page.evaluate(async () => {
+      const w = window as unknown as { __pista: MediaStreamTrack; __analizador: AnalyserNode };
+      const buf = new Float32Array(w.__analizador.fftSize);
+      let noCeros = 0;
+      let pico = 0;
+      const hasta = performance.now() + 2000;
+      while (performance.now() < hasta) {
+        await new Promise((r) => requestAnimationFrame(r));
+        w.__analizador.getFloatTimeDomainData(buf);
+        for (const v of buf) {
+          if (v !== 0) noCeros += 1;
+          pico = Math.max(pico, Math.abs(v));
+        }
+      }
+      return { estadoPista: w.__pista.readyState, silenciada: w.__pista.muted, noCeros, pico };
+    });
+    expect(medio.estadoPista).toBe('live');
+    expect(medio.silenciada).toBe(false);
+    expect(medio.noCeros, 'el analizador no está recibiendo audio').toBeGreaterThan(0);
+    expect(medio.pico, 'el audio que entra es silencio digital').toBeGreaterThan(0);
+
+    await page.waitForTimeout(3000);
+    await page.getByRole('button', { name: /Detener y guardar/i }).tap();
+    await expect(filasRegistro(page)).toHaveCount(1);
+    // Al detener, el micrófono queda cerrado también en móvil
+    expect(
+      await page.evaluate(
+        () => (window as unknown as { __pista: MediaStreamTrack }).__pista.readyState,
+      ),
+    ).toBe('ended');
+
+    // Las nueve columnas se desplazan DENTRO de su caja y la página no desborda a lo ancho.
+    // ⚠️ `documentElement.scrollWidth` NO sirve de medida aquí: en emulación móvil devuelve 866
+    // con un viewport de 412 aunque nada desborde. La que informa es la del BODY contra el
+    // ancho de layout (`documentElement.clientWidth`), medidos ambos el 27/08/2026 en 412.
+    const anchos = await page.evaluate(() => {
+      const caja = document.querySelector('[class*="tablaScroll"]') as HTMLElement;
+      return {
+        cajaScroll: caja.scrollWidth,
+        cajaVisible: caja.clientWidth,
+        bodyScroll: document.body.scrollWidth,
+        layout: document.documentElement.clientWidth,
+      };
+    });
+    expect(anchos.cajaScroll, 'la tabla debería necesitar scroll horizontal').toBeGreaterThan(
+      anchos.cajaVisible,
+    );
+    expect(anchos.bodyScroll, 'la página desborda a lo ancho en móvil').toBeLessThanOrEqual(
+      anchos.layout,
+    );
+
+    // Y el parte impreso sigue llevando el aviso de que esto no sirve como prueba
+    await page.emulateMedia({ media: 'print' });
+    await expect(page.getByRole('heading', { name: 'Parte de mediciones de ruido' })).toBeVisible();
+    await expect(page.getByText(/No tienen validez legal ni metrológica/)).toBeVisible();
+    await expect(page.locator('[class*="meterPanel"]')).toBeHidden();
+    await page.emulateMedia({ media: 'screen' });
+  });
+});
+
+// ===========================================================================
+// HALLAZGOS ABIERTOS de la 3.ª pasada (27/08/2026)
+// Afirman lo que DEBERÍA ocurrir y hoy fallan a propósito: `test.fail()` los da por
+// esperados. El día que se reparen, se les quita el `test.fail()` y quedan de regresión.
+// ===========================================================================
+
+// ---------------------------------------------------------------------------
+// HALLAZGO — la medición 61 borra la más antigua sin decir nada
+// ---------------------------------------------------------------------------
+// `guardarSesiones([sesion, ...sesiones].slice(0, MAX_SESIONES))` con MAX_SESIONES = 60
+// descarta por la COLA, que es la parte vieja, y el aviso que se pinta es el de guardado
+// normal. Ni el aviso, ni la introducción del registro, ni el bloque educativo mencionan que
+// exista un tope: en `app/sonometro/page.tsx` el 60 solo aparece en el código.
+// Y la app está construida sobre lo contrario: su FAQ dice que lo que sostiene una reclamación
+// «no es un pico aislado sino un patrón que se repite», manda repetir la medición «en distintos
+// días y horarios», y la introducción del registro promete que «cada vez que pulsas Detener y
+// guardar queda aquí una fila». A partir de la 61 eso deja de ser cierto sin avisar, y lo que
+// se pierde es justo el extremo antiguo del diario, que es el que documenta la persistencia.
+test('HALLAZGO 3.ª pasada — al llegar a 60, la app debería avisar de que descarta la más antigua', async ({
+  page,
+}) => {
+  test.fail();
+
+  // 60 noches consecutivas ya registradas: dos meses de diario de ruido
+  await sembrarRegistro(
+    page,
+    Array.from({ length: 60 }, (_, i) => sesionDeJunio(60 - i)),
+  );
+  await micrófonoSintético(page, 1000, 0.05);
+  await page.goto(RUTA);
+  await expect(filasRegistro(page)).toHaveCount(60);
+
+  const laMasAntigua = sesionDeJunio(1); // «noche 1», la primera del diario
+  await expect(filasRegistro(page).last().locator('input[type="text"]')).toHaveValue(
+    laMasAntigua.nota,
+  );
+
+  await medirYGuardar(page, 4);
+
+  // Sigue habiendo 60 filas: la nueva ha entrado y otra ha salido
+  await expect(filasRegistro(page)).toHaveCount(60);
+  const idsGuardados: string[] = (
+    JSON.parse(
+      (await page.evaluate((k) => window.localStorage.getItem(k), CLAVE_SESIONES)) ?? '[]',
+    ) as SesionSembrada[]
+  ).map((s) => s.id);
+  expect(idsGuardados, 'la más antigua ha desaparecido del almacenamiento').not.toContain(
+    laMasAntigua.id,
+  );
+
+  // ESTO es lo que falla: el usuario acaba de perder la primera noche de su diario y lo único
+  // que se le dice es «Medición guardada en el registro de este navegador.».
+  await expect(
+    avisoRegistro(page),
+    'el aviso no menciona que se haya descartado la medición más antigua',
+  ).toHaveText(/m[áa]s antigua|se ha descartado|registro (está )?lleno|l[íi]mite/i);
+});
+
+// ---------------------------------------------------------------------------
+// HALLAZGO — una nota entrecomillada se traga las filas siguientes del CSV
+// ---------------------------------------------------------------------------
+// `descargarCsv` limpia de la nota el punto y coma y los saltos de línea, que son lo que parte
+// la rejilla, pero NO la comilla doble, que es el tercer carácter con significado en un CSV: en
+// RFC 4180 un campo que EMPIEZA por comilla es un campo entrecomillado, y el lector sigue
+// leyendo —saltos de línea incluidos— hasta encontrar la comilla de cierre.
+// Verificado el 27/08/2026 con papaparse, el parser que ya usa el proyecto: exportando cuatro
+// mediciones donde una está anotada «"karaoke" a las 3», la hoja recibe TRES, y la cuarta
+// aparece pegada entera dentro de la celda de nota de la tercera, con dos errores del parser
+// (InvalidQuotes y MissingQuotes). La nota se teclea en el campo de la app, sin pegar nada:
+// `maxLength=80` y ninguna restricción de caracteres.
+test('HALLAZGO 3.ª pasada — una nota que empieza por comilla no debería perder filas del CSV', async ({
+  page,
+}) => {
+  test.fail();
+
+  await sembrarRegistro(page, [sesionDeJunio(12), sesionDeJunio(11)]);
+  await page.goto(RUTA);
+  await expect(filasRegistro(page)).toHaveCount(2);
+
+  // El usuario anota la más reciente citando lo que se oía
+  await filasRegistro(page).first().locator('input[type="text"]').fill('"karaoke" a las 3');
+
+  const [descarga] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByRole('button', { name: /Descargar CSV/i }).click(),
+  ]);
+  const contenido = (await readFile((await descarga.path()) as string, 'utf8')).replace(/^﻿/, '');
+
+  // En bruto el fichero parece correcto: tres líneas físicas, cabecera y dos mediciones
+  expect(contenido.split('\r\n')).toHaveLength(3);
+
+  // Pero esto es lo que recibe la hoja de cálculo
+  const leido = parsearCsv<string[]>(contenido, { delimiter: ';' });
+  expect(leido.errors, `el CSV no es válido: ${JSON.stringify(leido.errors)}`).toEqual([]);
+  expect(leido.data, 'la hoja debería recibir la cabecera y las DOS mediciones').toHaveLength(3);
+  expect(leido.data[1][7]).toBe('"karaoke" a las 3');
+  expect(leido.data[2][7]).toBe(sesionDeJunio(11).nota); // la segunda medición sigue existiendo
+});
+
+// ---------------------------------------------------------------------------
+// HALLAZGO — con el micrófono silenciado, la app marca «0,0 dB(A) · Muy silencioso»
+// ---------------------------------------------------------------------------
+// El bucle salta los fotogramas cuya ventana está TODA a cero —es la reparación del hallazgo
+// 278 y para el arranque es correcta—, pero nunca deja de saltarlos: un micrófono silenciado
+// por el sistema, por el interruptor físico del portátil o retenido en exclusiva por otra
+// aplicación entrega ceros indefinidamente. La app no distingue «todavía no hay audio» de «no
+// va a haberlo»: muestra 0,0 dB(A) con la etiqueta «Muy silencioso», que es una lectura
+// perfectamente verosímil para quien mide una habitación de noche, y al detener culpa a la
+// duración («hacen falta al menos 3 segundos») de una sesión de ocho.
+test('HALLAZGO 3.ª pasada — un micrófono mudo debería decirse, no leerse como 0,0 dB(A)', async ({
+  page,
+}) => {
+  test.fail();
+
+  await micrófonoSintético(page, 1000, 0); // ganancia 0: silencio digital exacto
+  await page.goto(RUTA);
+  await page.getByRole('button', { name: /Iniciar medición/i }).click();
+  await page.waitForTimeout(8000);
+
+  // Lo que se ve hoy tras ocho segundos: una lectura de aspecto normal
+  await expect(lecturaTexto(page)).toHaveText('0,0');
+  await expect(page.locator('[class*="levelLabel"]')).toHaveText('Muy silencioso');
+
+  // ESTO es lo que falla: nada en el panel del medidor dice que no está entrando audio
+  await expect(
+    page.locator('[class*="meterPanel"]'),
+    'ningún aviso advierte de que el micrófono no entrega señal',
+  ).toContainText(/micr[óo]fono|sin se[ñn]al|no llega audio|silenciad/i);
 });

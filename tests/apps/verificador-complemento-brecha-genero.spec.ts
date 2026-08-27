@@ -5,6 +5,19 @@ import { test, expect, Page } from '@playwright/test';
  * riesgo 1 CRÍTICO). Primera versión 24/08/2026; revisada tras la reparación de los siete
  * hallazgos de aquella inspección (misma fecha).
  *
+ * RE-INSPECCIÓN 27/08/2026 — los diez hallazgos anteriores (225, 226, 227, 228, 229, 230,
+ * 231, 280, 281, 282) se reprodujeron uno a uno en el navegador y CIERRAN todos. Lo que se
+ * añade aquí abajo es lo nuevo de esta vuelta:
+ *
+ *   · PARIDAD web ↔ MCP Delegum — la app tiene un gemelo en
+ *     `lib/calculadoras/complementoBrechaGenero.ts`, que alimenta la tool
+ *     `calcular_complemento_brecha_genero`. Son DOS implementaciones distintas de la misma
+ *     norma, así que una reparación puede aterrizar en una y no en la otra. Se comprueban
+ *     los mismos supuestos por las dos vías (test «paridad»).
+ *   · Tres hallazgos abiertos, marcados con `test.fail()` según la convención de estos
+ *     ficheros: se convierten en verdes el día que se reparen, y hasta entonces documentan
+ *     el defecto con su caso exacto.
+ *
  * DE DÓNDE SALE CADA CIFRA
  * ────────────────────────
  * Toda cifra esperada viene de `COMPLEMENTO_BRECHA_GENERO_2026` en
@@ -626,5 +639,237 @@ test.describe('Verificador del complemento por brecha de género', () => {
     // Cambiar la fecha del hecho causante también lo invalida
     await page.getByRole('button', { name: 'Antes del 4-feb-2021', exact: true }).click();
     expect(await textoResultado(page)).toContain('Completa las 6 preguntas');
+  });
+
+  /**
+   * PARIDAD — la web y el MCP de Delegum tienen que dar el MISMO número (27/08/2026).
+   *
+   * `evaluar()` de page.tsx y `calcularComplementoBrechaGenero()` de
+   * lib/calculadoras/complementoBrechaGenero.ts son DOS implementaciones separadas de la
+   * misma norma: la app no importa la calculadora. Comparten `data/fiscal`, pero no el
+   * árbol de decisión, así que una reparación puede aterrizar en una y dejar la otra atrás
+   * —es lo que se encontró en `simulador-heredar-vivienda`, donde web y MCP divergían en
+   * 19.486,71 € sobre el caso preconfigurado de la propia app—.
+   *
+   * Se pregunta al MCP por HTTP (la tool real, no la función suelta) y se compara contra
+   * lo que muestra el panel de la web para el mismo supuesto. La barra final de la ruta NO
+   * es opcional: sin ella Next responde con una redirección y el cuerpo no es JSON-RPC.
+   */
+  test('paridad: la web y la tool del MCP Delegum dan el mismo importe', async ({
+    page,
+    request,
+  }) => {
+    /** Llama a `calcular_complemento_brecha_genero` y devuelve el texto de la respuesta. */
+    async function porMcp(argumentos: Record<string, unknown>): Promise<string> {
+      const respuesta = await request.post('/api/mcp/delegum/', {
+        headers: { Accept: 'application/json, text/event-stream' },
+        data: {
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'tools/call',
+          params: { name: 'calcular_complemento_brecha_genero', arguments: argumentos },
+        },
+      });
+      expect(respuesta.ok()).toBeTruthy();
+      const cuerpo = await respuesta.json();
+      return normalizar(cuerpo.result.content[0].text);
+    }
+
+    // a) 3 hijos, jubilación, mujer → 3 × 36,90 = 110,70 €/mes · × 14 = 1549,80 €/año
+    await responderYVerificar(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 3,
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    let web = await textoResultado(page);
+    let mcp = await porMcp({
+      sexo: 'mujer',
+      num_hijos: 3,
+      tipo_pension: 'jubilacion',
+      fecha_hecho_causante: 'desde_2021',
+      otro_progenitor: 'no_percibe',
+      denegacion_propia: false,
+    });
+    expect(web).toContain('+110,70 €/mes');
+    expect(mcp).toContain('110,70 €/mes');
+    expect(web).toContain('Anual (14 pagas) 1549,80 €/año');
+    expect(mcp).toContain('1549,80 €/año');
+
+    // b) el tope: 7 hijos topan en maxHijos = 4 → 147,60 €/mes (maxMensual) por las dos vías
+    await page.reload();
+    await responderYVerificar(page, {
+      pension: 'Incapacidad permanente',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 7,
+      sexo: 'Hombre',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    web = await textoResultado(page);
+    mcp = await porMcp({
+      sexo: 'hombre',
+      num_hijos: 7,
+      tipo_pension: 'incapacidad_permanente',
+      fecha_hecho_causante: 'desde_2021',
+    });
+    expect(web).toContain('+147,60 €/mes');
+    expect(web).toContain('Hijos computables 4 (máx. 4)');
+    expect(mcp).toContain('147,60 €/mes');
+    expect(mcp).toContain('Hijos computables: 4');
+    expect(mcp).toContain('2066,40 €/año'); // maxAnual
+
+    // c) la exclusión del art. 60.4 tiene que denegar por las dos vías, no solo en la web
+    await page.reload();
+    await responderYVerificar(page, {
+      pension: 'Jubilación parcial',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 2,
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    web = await textoResultado(page);
+    mcp = await porMcp({
+      sexo: 'mujer',
+      num_hijos: 2,
+      tipo_pension: 'jubilacion_parcial',
+      fecha_hecho_causante: 'desde_2021',
+    });
+    expect(web).toContain('60.4');
+    expect(mcp).toContain('60.4');
+    expect(web).not.toContain('73,80 €');
+    expect(mcp).not.toContain('73,80 €');
+
+    // d) la denegación del OTRO progenitor tampoco dispara reclamación por el MCP
+    mcp = await porMcp({
+      sexo: 'hombre',
+      num_hijos: 2,
+      tipo_pension: 'jubilacion',
+      fecha_hecho_causante: 'desde_2021',
+      otro_progenitor: 'denegado',
+      denegacion_propia: false,
+    });
+    expect(mcp).toContain('73,80 €/mes'); // 2 × 36,90, igual que la web
+    expect(mcp).not.toContain('Posible reclamación retroactiva');
+  });
+
+  /**
+   * HALLAZGO ABIERTO (27/08/2026) — el campo «hijos» se traga lo tecleado antes de un
+   * carácter que el navegador rechaza, y los dígitos siguientes forman OTRO número.
+   *
+   * `onChange` hace `Math.max(0, parseInt(e.target.value) || 0)`. En un `<input
+   * type="number">`, mientras el contenido no es un número válido el navegador devuelve
+   * cadena vacía en `.value`: al teclear el punto de «2.5», `parseInt('') || 0` da 0, React
+   * reescribe el campo a «0» y se pierde el 2 que el usuario ya había escrito. El «5» que
+   * viene después aterriza detrás de ese cero y el campo queda en «05».
+   *
+   * Traza tecla a tecla, medida en el navegador:
+   *     «2» → [2]    «.» → [0]    «5» → [05]
+   *
+   * Consecuencia: quien teclea «2.5» recibe el veredicto de CUATRO hijos —el tope del
+   * módulo— en vez del de dos. 4 × 36,90 = 147,60 €/mes frente a 2 × 36,90 = 73,80 €/mes:
+   * el importe se DUPLICA, y el panel lo presenta con un «Cumples los requisitos básicos»
+   * sin ninguna señal de que la entrada se haya reinterpretado.
+   *
+   * El mismo mecanismo con «1.500» deja el campo en «0500» (→ tope, 147,60 €/mes) y con
+   * «-3» en «03» (→ 3 hijos): un número imposible se convierte en uno posible en silencio.
+   *
+   * No lo ve `npm run check:parser`, y con razón: no hay `parseFloat(x.replace(',','.'))`
+   * por ningún lado. El defecto no es el parser casero sino el campo controlado que
+   * sobrescribe con «0» cada pulsación intermedia inválida.
+   */
+  test.fail(
+    'ABIERTO: teclear «2.5» en el campo de hijos duplica el importe (147,60 € en vez de 73,80 €)',
+    async ({ page }) => {
+      const campo = page.locator('#hijos');
+      await campo.click();
+      await page.keyboard.press('Control+a');
+      await page.keyboard.type('2.5');
+
+      // 1) El campo no puede quedarse en «05» habiendo tecleado «2.5»
+      expect(await campo.inputValue()).not.toBe('05');
+
+      await page.getByRole('button', { name: 'Verificar mi derecho' }).click();
+      const resultado = await textoResultado(page);
+
+      // 2) Y el veredicto tiene que ser el de DOS hijos: 2 × cuantiaPorHijoMensual 36,90
+      expect(resultado).toContain('Hijos computables 2 (máx. 4)');
+      expect(resultado).toContain('+73,80 €/mes');
+      expect(resultado).not.toContain('+147,60 €/mes'); // maxMensual: no es lo que se pidió
+    },
+  );
+
+  /**
+   * HALLAZGO ABIERTO (27/08/2026) — la guía educativa no se enteró de la exclusión del
+   * art. 60.4 LGSS.
+   *
+   * La reparación del hallazgo 280 llevó la exclusión de la jubilación parcial a
+   * `data/fiscal` (COMPLEMENTO_BRECHA_GENERO_2026.exclusiones), al motor de la app, a la
+   * calculadora del MCP y al `faqJsonLd` de metadata.ts. Todo menos el bloque educativo:
+   * ahí «parcial» y «60.4» no aparecen ni una vez, la fila «Pensiones cubiertas» de la
+   * tabla comparativa sigue diciendo «Jubilación, IP, viudedad (contributivas)» y la FAQ
+   * «¿Sirve para pensiones no contributivas o PCI?» enumera las mismas tres sin matiz.
+   *
+   * Es el patrón del hallazgo 280 con el signo cambiado: entonces la IA leía la exclusión
+   * y el usuario no la recibía; ahora el usuario que se limita a LEER la guía —sin pasar
+   * por el cuestionario— concluye que su jubilación parcial está cubierta, mientras la
+   * herramienta, el MCP y los datos estructurados dicen lo contrario.
+   */
+  test.fail(
+    'ABIERTO: la guía educativa no menciona la exclusión de la jubilación parcial (art. 60.4)',
+    async ({ page }) => {
+      await abrirGuia(page);
+      const guia = normalizar(
+        await page
+          .locator('section')
+          .filter({ hasText: 'Comparativa: antiguo complemento' })
+          .first()
+          .innerText(),
+      );
+
+      // La exclusión que el motor SÍ aplica tiene que estar también en lo que se lee
+      expect(guia.toLowerCase()).toContain('parcial');
+      expect(guia).toContain('60.4');
+    },
+  );
+
+  /**
+   * HALLAZGO ABIERTO (27/08/2026) — plazos y subapartados normativos tecleados en el JSX.
+   *
+   * CLAUDE.md prohíbe hardcodear datos normativos —incluidos los PLAZOS LEGALES— pudiendo
+   * vivir en `data/fiscal`, y el precedente es de esta misma app: al reparar el hallazgo
+   * 280 la exclusión del art. 60.4 se movió al módulo fiscal precisamente para que el ciclo
+   * `/triaje-fiscal` pudiera revisarla. Con estos otros datos no se hizo:
+   *
+   *   · el plazo de 30 días de la reclamación previa, tres veces en page.tsx, y calificado
+   *     de «naturales» en solo una de las tres (las otras dos lo dejan sin adjetivo, así
+   *     que la propia página no dice lo mismo tres veces);
+   *   · el «≈ 90 días» de resolución del INSS;
+   *   · los subapartados art. 60.3.d) —no computa al límite máximo de pensiones— y
+   *     art. 60.3.e) —compatibilidad con el complemento a mínimos—, este último también en
+   *     el `faqJsonLd`, que es lo que citan Bing Copilot, ChatGPT y Perplexity.
+   *
+   * Ninguno está en `COMPLEMENTO_BRECHA_GENERO_2026` ni en su `_META`, de modo que quedan
+   * fuera del alcance de cualquier revisión de vigencia. Hoy no hay error numérico; el
+   * riesgo es el de siempre, envejecer sin que nada falle.
+   */
+  test.fail('ABIERTO: los plazos legales están tecleados en page.tsx, no en data/fiscal', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
+
+    const pagina = readFileSync(
+      join(process.cwd(), 'app', 'verificador-complemento-brecha-genero', 'page.tsx'),
+      'utf8',
+    );
+    const fiscal = readFileSync(join(process.cwd(), 'data', 'fiscal', 'pensiones.ts'), 'utf8');
+
+    // El plazo de la reclamación previa no puede estar escrito en el componente…
+    expect(pagina).not.toMatch(/30 días/);
+    // …ni el de resolución del INSS…
+    expect(pagina).not.toMatch(/90 días/);
+    // …y los subapartados del art. 60 que la página cita tienen que existir en el módulo
+    // fiscal, como ya existe la exclusión del 60.4 (`exclusiones`).
+    expect(fiscal).toContain('60.3.d');
+    expect(fiscal).toContain('60.3.e');
   });
 });

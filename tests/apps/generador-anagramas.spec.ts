@@ -492,4 +492,230 @@ test.describe('generador-anagramas', () => {
       await expect(scrabble).toContainText('no tiene fichas K ni W');
     });
   });
+  // ---------------------------------------------------------------------------------------
+  // TERCERA PASADA — 27/08/2026 · las FICHAS BLANCAS estrenadas en el commit fc27e76b
+  //
+  // No es una re-inspección de hallazgos: la cola se reabrió porque la app tiene código nuevo
+  // sin estrenar. Se comprueba lo que el commit NO dice haber probado, y todo se resolvió
+  // ANTES de abrir el navegador con un ORÁCULO PROPIO en Node —implementación independiente
+  // de «normalizar (NFD, conservando la Ñ) + repartir multiconjunto con N comodines», escrita
+  // contra public/data/diccionario-es.txt (86.973 lemas) sin importar nada de la app—.
+  //
+  // CIFRA DE CONTROL DEL COMMIT, REVERIFICADA POR ESE ORÁCULO (atril «casa», 2..10):
+  //     0 blancas → 9 · 1 → 176 · 2 → 1.244 · 3 → 4.976 · 4 → 13.265   ✔ coinciden
+  //
+  // DIFERENCIAL COMPLETO app ↔ oráculo (12 atriles, no solo el total: la LISTA entera y la
+  // POSICIÓN de cada resaltado): mesa 11 · palabra 37 · ñoquis 15 · sartén? 760 · bici?? 440 ·
+  // ll? 10 · chal? (4..4) 37 · ax? (2..4) 27 · zzz? 1 · qu?? (2..5) 186 · aeiou? (5..5) 6 ·
+  // perro?? (6..6) 259. Cero divergencias: ni una palabra de más, ni una de menos, ni un
+  // resaltado corrido.
+  //
+  // CASOS LÍMITE DEL ORÁCULO USADOS ABAJO
+  //   «a?»            → 23 palabras, todas de 2 letras y todas gastando la blanca
+  //   «??»            → el motor daría 95 (todos los lemas de 2 letras); la app lo rechaza
+  //   «?»             → daría 0 (un tile no llena una palabra de 2); la app lo rechaza
+  //   «casa??»        → 1.244 = 74+343+489+243+95 por longitud; 9 sin gastar blanca
+  //   «corazn?» (7..7)→ 8, y «corazón» sale con la blanca puesta EN LA Ó (posición 5)
+  //   «casa?» + «ta»  → 10 palabras
+  //   «abcdefghijklm??» (13 letras + 2 blancas, el máximo que admite el campo) → 8.847
+  // ---------------------------------------------------------------------------------------
+  test.describe('fichas blancas · tercera pasada 27/08/2026', () => {
+    /** Cada chip con la letra que pone la blanca entre corchetes, EN SU POSICIÓN. */
+    const chipsMarcados = (page: Page) =>
+      page.locator('[class*="wordChip"]').evaluateAll((nodos) =>
+        nodos.map((n) =>
+          Array.from(n.childNodes)
+            .map((h) => (h.nodeType === 1 ? `[${h.textContent}]` : h.textContent))
+            .join('')
+        )
+      );
+
+    const buscarAtril = async (page: Page, atril: string) => {
+      await page.fill('#anagram-letters', atril);
+      await page.getByRole('button', { name: 'Buscar palabras' }).click();
+      await expect(page.getByRole('button', { name: 'Buscar palabras' })).toBeEnabled();
+    };
+
+    test('LÍMITE · «a?» (una sola letra y una blanca) da las 23 de dos letras', async ({
+      page,
+    }) => {
+      await abrirConDiccionario(page);
+      await buscarAtril(page, 'a?');
+      await expect(page.getByRole('heading', { name: /Palabras encontradas/ })).toHaveText(
+        'Palabras encontradas: 23'
+      );
+      // Oráculo, en este orden exacto: ninguna puede evitar la blanca, así que dentro de la
+      // única longitud manda el alfabético español (ál después de al, ña entre na y oa).
+      expect(await chipsMarcados(page)).toEqual([
+        'a[d]', 'a[h]', 'a[j]', 'a[l]', 'á[l]', 'a[m]', 'a[r]', 'a[s]', 'a[x]', 'a[y]',
+        '[c]a', '[e]a', '[f]a', '[h]a', '[j]a', '[k]a', '[l]a', '[n]a', '[ñ]a', '[o]a',
+        '[t]a', '[y]a', '[z]a',
+      ]);
+      // Y el único grupo es el de 2 letras: con 1+1 fichas no cabe nada más largo
+      await expect(page.locator('[class*="groupTitle"]')).toHaveText(['2 letras (23)']);
+    });
+
+    test('LÍMITE · una sola blanca sin ninguna letra tampoco se busca', async ({ page }) => {
+      await abrirConDiccionario(page);
+      // El spec de comodines cubre «??»; «?» es el otro extremo y tiene otra cuenta detrás:
+      // con una blanca y cero letras el oráculo da 0 palabras (la longitud mínima es 2), no 95.
+      await page.fill('#anagram-letters', '?');
+      await expect(page.locator('#anagram-atril')).toHaveText(/0 letras \+ 1 ficha blanca/);
+      await expect(page.getByRole('button', { name: 'Buscar palabras' })).toBeDisabled();
+    });
+
+    test('LÍMITE · «casa??» reparte 1.244 por longitudes y marca las DOS blancas', async ({
+      page,
+    }) => {
+      await abrirConDiccionario(page);
+      await buscarAtril(page, 'casa??');
+      await expect(page.getByRole('heading', { name: /Palabras encontradas/ })).toHaveText(
+        'Palabras encontradas: 1244'
+      );
+      // Reparto por longitud del oráculo. Que cuadre grupo a grupo prueba que el filtro de
+      // longitud sigue trabajando sobre la forma normalizada también con dos blancas.
+      await expect(page.locator('[class*="groupTitle"]')).toHaveText([
+        '6 letras (74)', '5 letras (343)', '4 letras (489)', '3 letras (243)', '2 letras (95)',
+      ]);
+      // 1.244 − 9 = 1.235: las 9 que no gastan blanca son exactamente las de «casa» a secas
+      await expect(page.locator('[class*="leyendaComodin"]')).toContainText(
+        '1235 de las 1244 necesitan gastarla'
+      );
+      // Las dos blancas se resaltan por separado y en su sitio (oráculo: t@3 y e@4 en «acates»)
+      const chips = await chipsMarcados(page);
+      expect(chips.slice(0, 3)).toEqual(['aca[t][e]s', 'ac[o]sa[r]', 'ac[u]sa[r]']);
+    });
+
+    test('la blanca puede poner una Ñ y puede caer sobre una vocal con tilde', async ({
+      page,
+    }) => {
+      await abrirConDiccionario(page);
+      await buscarAtril(page, 'casa?');
+      const chips = await chipsMarcados(page);
+      // La Ñ es letra propia del alfabeto (y ficha propia del juego): la blanca puede ponerla.
+      expect(chips).toContain('ca[ñ]a');
+      expect(chips).toContain('sa[ñ]a');
+      // Y el resaltado cae sobre el carácter ORIGINAL, con su tilde, no sobre el normalizado
+      expect(chips).toContain('as[í]');
+      // Contraprueba de que no se ha corrido ningún índice: «casca» tiene dos C y el atril
+      // solo trae una, así que la blanca va en la SEGUNDA (posición 3), no en la primera.
+      expect(chips).toContain('cas[c]a');
+    });
+
+    test('el resaltado sobre un lema acentuado apunta a la letra correcta', async ({ page }) => {
+      await abrirConDiccionario(page);
+      await page.selectOption('#anagram-min', '7');
+      await page.selectOption('#anagram-max', '7');
+      await buscarAtril(page, 'corazn?');
+      // Oráculo: 8 palabras de 7 letras, y en «corazón» la blanca pone la Ó (posición 5 de la
+      // forma normalizada «corazon»). Es el caso que ejercita el mapeo normalizada → original.
+      await expect(page.getByRole('heading', { name: /Palabras encontradas/ })).toHaveText(
+        'Palabras encontradas: 8'
+      );
+      expect(await chipsMarcados(page)).toEqual([
+        'arc[a]zón', 'az[a]rcón', 'coraz[ó]n', 'cr[i]azón', 'r[e]cazón', 'z[i]rcona',
+        'zonc[e]ar', 'zonc[e]ra',
+      ]);
+    });
+
+    test('el filtro «debe contener» sigue mandando cuando hay blanca', async ({ page }) => {
+      await abrirConDiccionario(page);
+      await page.fill('#anagram-contain', 'ta');
+      await buscarAtril(page, 'casa?');
+      // Oráculo: 10 palabras con «ta» dentro; en todas la T la pone la blanca, porque el
+      // atril «casa» no tiene ninguna T.
+      await expect(page.getByRole('heading', { name: /Palabras encontradas/ })).toHaveText(
+        'Palabras encontradas: 10'
+      );
+      expect(await chipsMarcados(page)).toEqual([
+        'cas[t]a', '[t]asca', 'ac[t]a', 'as[t]a', 'ca[t]a', '[t]aca', '[t]asa',
+        '[t]ac', '[t]as', '[t]a',
+      ]);
+    });
+
+    test('el atril más grande que admite el campo se pinta entero', async ({ page }) => {
+      await abrirConDiccionario(page);
+      // maxLength del campo = 15 caracteres. 13 letras + las 2 blancas del tope es el atril
+      // máximo posible, y el oráculo da 8.847 palabras: casi el doble de las 4.976 que el
+      // commit consideró impintables al fijar el tope en 2 comodines. Se pintan igualmente.
+      await buscarAtril(page, 'abcdefghijklm??');
+      await expect(page.getByRole('heading', { name: /Palabras encontradas/ })).toHaveText(
+        'Palabras encontradas: 8847'
+      );
+      await expect(page.locator('[class*="wordChip"]')).toHaveCount(8847);
+    });
+
+    test('el comodín es del modo letras: el modo frase no lo usa ni lo cuenta', async ({
+      page,
+    }) => {
+      await abrirConDiccionario(page);
+      await pestana(page, /Anagrama perfecto/).click();
+      await page.fill('#anagram-frase', 'roma?');
+      // El «?» no es una letra a repartir y el contador no lo suma: un anagrama PERFECTO
+      // consume todas las letras, y una blanca no tiene letra que consumir.
+      await expect(page.locator('[class*="contadorLetras"]').first()).toHaveText(
+        /^4 letras a repartir/
+      );
+      await page.getByRole('button', { name: 'Buscar anagramas perfectos' }).click();
+      // Los mismos 4 repartos que «roma» a secas (CASO 2e del bloque de arriba)
+      await expect(page.getByText(/Anagramas perfectos encontrados: 4/)).toBeVisible();
+    });
+
+    // -------------------------------------------------------------------------------------
+    // HALLAZGOS ABIERTOS de esta pasada
+    // -------------------------------------------------------------------------------------
+
+    test(
+      'HALLAZGO · la FAQ de la ficha blanca promete tres comodines y el tope son dos',
+      async ({ page }) => {
+        test.fail();
+        await abrirConDiccionario(page);
+        await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+        const faq = page.locator('details', {
+          hasText: 'Tengo una ficha blanca en el atril, ¿cómo la escribo?',
+        });
+        // Dice «y hasta tres comodines a la vez», mientras el propio campo dice «Se admiten
+        // hasta 2» y el motor tiene MAX_COMODINES = 2. Con «casa???» la app ignora la tercera
+        // y devuelve 1.244, no las 4.976 que darían tres blancas (oráculo). Dos afirmaciones
+        // opuestas en la misma página, y la falsa es la que responde a la pregunta: el mismo
+        // patrón del hallazgo 264, ya reparado, en la FAQ que estrena el commit.
+        await expect(faq).not.toContainText('hasta tres comodines');
+        await expect(faq).toContainText(/hasta dos comodines|dos a la vez|hasta 2/);
+      }
+    );
+
+    test(
+      'HALLAZGO · el JSON-LD sigue describiendo la app anterior a las fichas blancas',
+      async ({ page }) => {
+        test.fail();
+        await page.goto(RUTA);
+        const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+        const faqPage = bloques.find((b) => b.includes('FAQPage')) ?? '';
+        expect(faqPage).not.toBe('');
+        // Ni los 8 `features` del WebApplication ni las 7 preguntas del FAQPage nombran la
+        // ficha blanca; la pregunta de Scrabble sigue diciendo «Introduce las letras que
+        // tienes en tu atril (entre 2 y 10 letras)», que además ya no es el límite (el campo
+        // admite 15 caracteres). Es la señal estructurada que usan Bing Copilot, ChatGPT,
+        // Perplexity y Gemini para responder: la app tiene comodines y su ficha no lo sabe.
+        expect(bloques.join(' ')).toMatch(/ficha blanca|comod/i);
+      }
+    );
+
+    test(
+      'HALLAZGO · el rechazo del atril de solo comodines se justifica con una cifra falsa',
+      async ({ page }) => {
+        test.fail();
+        await abrirConDiccionario(page);
+        await page.fill('#anagram-letters', '??');
+        // «solo con comodines saldría medio diccionario» — con el tope de 2 blancas y ninguna
+        // letra saldrían 95 palabras: TODOS los lemas de dos letras y nada más, porque tres
+        // fichas no caben en dos blancas. 95 de 86.973 es el 0,1 %, no la mitad. La regla es
+        // correcta; el número con el que se explica, no.
+        await expect(page.locator('#anagram-atril')).toContainText(
+          'hace falta al menos una letra concreta'
+        );
+        await expect(page.locator('#anagram-atril')).not.toContainText('medio diccionario');
+      }
+    );
+  });
 });
