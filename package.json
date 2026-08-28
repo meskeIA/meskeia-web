@@ -21,6 +21,7 @@
     "audit:fiscal-fuentes": "node scripts/audit-fiscal-fuentes.mjs",
     "audit:motores": "node scripts/audit-motores-fiscales.mjs",
     "check:memoria": "node scripts/check-memoria.mjs",
+    "memoria:probar-ritmo": "node scripts/pruebas/memoria-ritmo.mjs",
     "generate:app-dates": "node scripts/generate-app-dates.mjs",
     "check:secrets": "git -c core.quotepath=false diff --cached --unified=0 --no-color --no-renames --diff-filter=ACM | node scripts/check-secrets.mjs",
     "audit:secrets": "git -c core.quotepath=false diff --unified=0 --no-color --no-renames 4b825dc642cb6eb9a060e54bf8d69288fbee4904 | node scripts/check-secrets.mjs",

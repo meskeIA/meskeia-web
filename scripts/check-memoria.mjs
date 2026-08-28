@@ -46,7 +46,10 @@ const UMBRAL_CRITICO = Math.round(UMBRAL_ERROR * 0.94);   // 22.936 B — ya cas
 // fichas nuevas sino entradas viejas engordando al editarlas. Un salto grande en una sesión
 // es accionable; un número alto y quieto no.
 const SALTO_ACCIONABLE = 600;                             // B desde la lectura anterior
-const SERIE = path.join(REPO, '_private', 'serie-indice-memoria.json');
+// SERIE_MEMORIA permite apuntar a una serie desechable: es lo que hace posible
+// `npm run memoria:probar-ritmo`, que reinyecta series sintéticas y exige que el pronóstico
+// dispare donde debe y calle donde debe, sin tocar la serie real.
+const SERIE = process.env.SERIE_MEMORIA || path.join(REPO, '_private', 'serie-indice-memoria.json');
 const MAX_SERIE = 30;
 
 // Tokens con forma de memoria que NO lo son (nombres de campo, variables…)
@@ -220,10 +223,52 @@ if (previa) {
   }
 }
 
+// --- 10: pronóstico de RITMO ---
+//
+// El nivel del índice no informa: es constante durante semanas y depende de cuándo se podó
+// por última vez. Lo que decide si esto vuelve a romperse es el RITMO al que entran fichas,
+// porque el índice tiene que enumerarlas todas. Medido el 28/08/2026: 1,55 fichas/día a 94 B
+// cada una son 145 B/día, y desde 16.001 B eso agota el margen en 33 días. Por eso el
+// pronóstico se IMPRIME siempre, en días: un número que cambia con el comportamiento informa,
+// y un porcentaje quieto no (feedback_semaforo_color_que_informa).
+//
+// Se calcula sobre FICHAS, no sobre bytes: una poda hunde los bytes y falsearía la
+// pendiente —la del 28/08 fueron −5.188 B en un día—, mientras que el recuento de fichas
+// sube de forma monótona y sobrevive a las podas.
+//
+// El aviso NO dice "poda": dice dónde va lo que entra. Podar es tratar el stock; el flujo se
+// trata en el origen, con la regla de destino de la cabecera de MEMORY.md. Fundir fichas se
+// midió y compra poco: al 50 % pasaba de 33 a 72 días, menos que bajar el flujo un 60 %.
+const DIAS_MARGEN_MINIMO = 45;    // por debajo, el aviso todavía da tiempo a reaccionar
+const MIN_LECTURAS = 4;           // con menos, la pendiente es ruido
+
+let ritmoTexto = '';
+if (serie.length >= MIN_LECTURAS) {
+  const prim = serie[0];
+  const ult = serie[serie.length - 1];
+  const dias = (new Date(ult.fecha) - new Date(prim.fecha)) / 86400000;
+  const nuevasFichas = ult.fichas - prim.fichas;
+  if (dias >= 7 && nuevasFichas > 0) {
+    const fichasDia = nuevasFichas / dias;
+    const costeFicha = bytesIndice / Math.max(ficheros.length, 1);
+    const bytesDia = fichasDia * costeFicha;
+    const diasAviso = Math.round((UMBRAL_AVISO - bytesIndice) / bytesDia);
+    ritmoTexto = `\n   Ritmo: ${fichasDia.toFixed(2)} fichas/día · ${Math.round(bytesDia)} B/día · ` +
+      (diasAviso > 0 ? `~${diasAviso} días hasta el aviso` : 'el aviso YA está superado');
+    if (diasAviso > 0 && diasAviso < DIAS_MARGEN_MINIMO) {
+      avisos.push(
+        `A este ritmo (${fichasDia.toFixed(2)} fichas/día) el índice llega al umbral de aviso en ~${diasAviso} días. ` +
+        `Antes de crear ficha, mirar la regla de destino de la cabecera de MEMORY.md: un candado, ` +
+        `el CLAUDE.md del directorio o la skill no cuestan un solo byte de índice.`
+      );
+    }
+  }
+}
+
 // --- Informe ---
 const pct = ((bytesIndice / UMBRAL_ERROR) * 100).toFixed(0);
 console.log(`\n🧾 Memoria del proyecto — ${path.relative(os.homedir(), DIR)}`);
-console.log(`   ${ficheros.length} fichas · MEMORY.md ${(bytesIndice / 1024).toFixed(1)} KB (${pct}% del límite de lectura) · ${enlazados.size} enlaces${deltaTexto}`);
+console.log(`   ${ficheros.length} fichas · MEMORY.md ${(bytesIndice / 1024).toFixed(1)} KB (${pct}% del límite de lectura) · ${enlazados.size} enlaces${deltaTexto}${ritmoTexto}`);
 
 if (VERBOSE) {
   const porTipo = {};
