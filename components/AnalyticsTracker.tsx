@@ -5,6 +5,17 @@ import { useEffect } from 'react';
 interface AnalyticsTrackerProps {
   applicationName?: string;
   appName?: string;
+  /**
+   * Pares clave/valor que se añaden a `datos_adicionales`, junto a los que el propio
+   * tracker ya deduce (`ref`, `from`, `referrer_ia`, `ref_dominio`). Aditivo y opcional:
+   * quien no lo pasa —o sea, las 1.161 apps del catálogo— no cambia de comportamiento.
+   *
+   * Nació el 28/08/2026 para `app/error.tsx`: la pantalla de error registraba la caída
+   * pero NO qué excepción la causó, así que 47 caídas en 8 días eran indiagnosticables.
+   * Los valores se recortan a 200 caracteres porque aquí llegan mensajes de error, que
+   * no tienen longitud acotada.
+   */
+  extra?: Record<string, string | undefined>;
 }
 
 /**
@@ -15,8 +26,11 @@ interface AnalyticsTrackerProps {
  *
  * Ahora usa API Routes de Next.js + Turso (SQLite en la nube)
  */
-export default function AnalyticsTracker({ applicationName, appName }: AnalyticsTrackerProps) {
+export default function AnalyticsTracker({ applicationName, appName, extra }: AnalyticsTrackerProps) {
   const finalAppName = applicationName || appName || 'unknown';
+  // Serializado para la lista de dependencias del efecto: `extra` es un objeto literal y
+  // cambiaría de identidad en cada render, reenviando la visita en bucle.
+  const extraSerializado = extra ? JSON.stringify(extra) : '';
   useEffect(() => {
     // NO ejecutar analytics en subdominios de desarrollo (next.meskeia.com,
     // previews de Vercel, localhost). Sí registramos los tres dominios de
@@ -161,12 +175,19 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
       es_recurrente: isRecurrent,
       sesion_id: sessionId,
       datos_adicionales: (() => {
-        const extra: Record<string, string> = {};
-        if (refParam) extra.ref = refParam;
-        if (referrerHostname) extra.referrer_ia = referrerHostname;
-        if (refDominio) extra.ref_dominio = refDominio;
-        if (fromParam) extra.from = fromParam.slice(0, 80);
-        return Object.keys(extra).length > 0 ? extra : undefined;
+        const extras: Record<string, string> = {};
+        if (refParam) extras.ref = refParam;
+        if (referrerHostname) extras.referrer_ia = referrerHostname;
+        if (refDominio) extras.ref_dominio = refDominio;
+        if (fromParam) extras.from = fromParam.slice(0, 80);
+        // Los que aporta quien monta el componente (hoy solo app/error.tsx). Van los
+        // últimos a propósito: no deben poder pisar la atribución que el tracker deduce.
+        if (extraSerializado) {
+          for (const [k, v] of Object.entries(JSON.parse(extraSerializado) as Record<string, string | undefined>)) {
+            if (v && !(k in extras)) extras[k] = String(v).slice(0, 200);
+          }
+        }
+        return Object.keys(extras).length > 0 ? extras : undefined;
       })(),
     };
 
@@ -272,7 +293,7 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       // No es necesario remover beforeunload/pagehide ya que el componente se desmonta al salir
     };
-  }, [finalAppName]);
+  }, [finalAppName, extraSerializado]);
 
   return null; // No renderiza nada
 }

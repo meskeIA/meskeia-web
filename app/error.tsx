@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { Button } from '@/components/ui';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
+import AnalyticsTracker from '@/components/AnalyticsTracker';
 
 export default function GlobalError({
   error,
@@ -138,7 +139,27 @@ export default function GlobalError({
         </p>
       </div>
 
-      <Footer appName="pag:error" />
+      {/*
+        El registro de la caída lo hace este tracker, NO el Footer (que se monta sin
+        `appName` justo debajo, así que no registra nada): sólo montándolo aquí se le
+        pueden pasar los datos del error. Hasta el 28/08/2026 registraba el Footer y la
+        fila quedaba con `datos_adicionales` vacío — sabíamos que 47 personas habían visto
+        esta pantalla en 8 días y no de qué murió ninguna, ni siquiera en qué página.
+      */}
+      <AnalyticsTracker
+        appName="pag:error"
+        extra={{
+          ruta: typeof window !== 'undefined' ? window.location.pathname : undefined,
+          nombre: error.name,
+          // En errores de SERVIDOR Next sanea el mensaje en producción a propósito y aquí
+          // llega uno genérico; para esos el que sirve es `digest`, que Next imprime
+          // también en los logs de Vercel y permite cruzarlos. En los de CLIENTE —los que
+          // saltan al interactuar con un simulador— este mensaje ES la causa.
+          msg: error.message,
+          digest: error.digest,
+        }}
+      />
+      <Footer />
     </>
   );
 }
