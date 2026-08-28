@@ -14,6 +14,14 @@
  * Los originales NO se modifican. El destino se regenera limpio cada vez.
  * Destino: C:\Users\jaceb\Documents\meskeIA_Critico\  (Proton lo sincroniza)
  *
+ * ⚠️ El destino TIENE que estar dentro de `Documents`. El cliente de Proton
+ * Drive en Windows NO sincroniza la carpeta `C:\Users\jaceb\Proton Drive`
+ * —esa no sube nada—: funciona en modo "carpetas sincronizadas de este
+ * dispositivo", y solo están Documents y Archivo Histórico. Mover el destino
+ * a un sitio de nombre más lógico deja este script corriendo bien cada día y
+ * sin copia off-site, sin dar ningún error. Lo mismo vale para los otros dos
+ * backups del mismo patrón, en `Mis Desarrollos\Backups\`.
+ *
  * Uso:   node scripts/backup-critico.mjs
  * ------------------------------------------------------------------
  */

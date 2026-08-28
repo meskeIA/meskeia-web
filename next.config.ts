@@ -31,6 +31,16 @@ const securityHeaders = [
   // Restringir APIs del navegador innecesarias
   {
     key: 'Permissions-Policy',
+    // ⚠️ Un allowlist VACÍO —`feature=()`— deshabilita la capacidad INCLUSO PARA EL PROPIO
+    // SITIO, no solo para iframes de terceros, y lo hace EN SILENCIO: `getUserMedia` falla
+    // con NotAllowedError sin mostrar diálogo. Desde el commit ae0bb268 (06/02/2026) esta
+    // línea se ha desmontado TRES veces, siempre a posteriori y tras descubrir apps rotas:
+    // geolocation (informacion-tiempo), camera+microphone (4 apps ~5 meses: lupa-digital,
+    // prueba-camara, espejo, luxometro) y los sensores de movimiento. Cualquier `feature=()`
+    // que quede aquí es una bomba de relojería para la próxima app que la necesite: si una
+    // app va a usar la capacidad, `(self)`, no `()`.
+    // ⚠️ Y hay que cambiarlo en LOS DOS ficheros: esta cabecera vive por duplicado aquí y en
+    // `vercel.json` (doble capa). Tocar solo uno deja la política vieja sirviéndose.
     // magnetometer/gyroscope/accelerometer en (self): los necesita nivel-burbuja
     // (evento deviceorientation). Con =() Chrome los bloqueaba en silencio.
     value: 'camera=(self), microphone=(self), geolocation=(self), payment=(), usb=(), magnetometer=(self), gyroscope=(self), accelerometer=(self)',
