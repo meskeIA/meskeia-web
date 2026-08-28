@@ -41,12 +41,26 @@ Umbral canónico, alineado con el digest: **app activa = ≥5 usos/30d** (⚠️
   cuadre». → `project_ia_lectura_notebooklm`
 - **Referrer sin `from`**: inatribuible **por decisión RGPD**, no por un fallo. Una sesión sin
   origen NO se investiga. → `reference_analytics_referrer_no_capturado`
+- **`pag:error`**: sí hay una persona, pero es alguien que **se quedó sin la herramienta**, no
+  alguien que la usó. Fuera del pulso, como el resto de `pag:`. Su lectura no es el total del día
+  —el ruido de fondo son 2-3 caídas, ~7,6 por cada 1.000 visitas— sino la **concentración** en una
+  misma ruta o un mismo mensaje, que es lo que distingue un bug de la red del visitante. Lo vigila
+  la sección `E` del digest diario; `ChunkLoadError` no es bug propio.
 
 ## Cortes de instrumentación conocidos (un escalón en la serie que NO es el producto)
 
 - **`pag:` — 20/08/2026** (commit `3d5226ed`): siete páginas emitían el mismo `appName`, `meskeIA`,
   incluida `app/error.tsx`. Cada página de error se contaba como visita. Si *Apps activas* da un
   escalón o `meskeIA` desaparece del top, **es esto**. → `project_corte_identificador_pag_analytics`
+- **`pag:error` — el identificador NACIÓ ese mismo día.** ⚠️ Cualquier cero anterior al 20/08/2026
+  es **ceguera del instrumento, no ausencia de errores**: antes las caídas se contabilizaban como
+  visitas normales. El 28/08 se investigó un supuesto brote «desde el 21/08» que no existía como
+  tal — sencillamente era el primer día en que se veían. Antes de leer una serie de `pag:error`,
+  comprobar que empieza después de esa fecha.
+- **`datos_adicionales` de `pag:error` — 28/08/2026** (commit `77ee868e`): desde entonces lleva
+  `ruta`, `nombre`, `msg` y `digest`. Las filas anteriores lo tienen a `null` y **no son
+  diagnosticables a posteriori**: no se sabe ni qué página cayó. El digest diario las cuenta aparte
+  y lo dice.
 - **`home-search` — 07/08/2026** (commit `ebeb3aa1`): la home no se medía. Afecta al share de
   RelatedApps, no al absoluto.
 
