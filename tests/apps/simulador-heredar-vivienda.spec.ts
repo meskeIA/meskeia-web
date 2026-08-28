@@ -1029,4 +1029,311 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
     expect(tarjeta).toContain('por tramos');
     expect(tarjeta).toContain('80%');
   });
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // RE-INSPECCIÓN DE CIERRE 28/08/2026 — casos nuevos sobre la parte que tocó
+  // el commit `e1a42c65`, resueltos a mano antes de abrir el navegador
+  // ══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * CASO 6 (LÍMITE) — el borde EXACTO de los 65 años del colateral, por los dos lados.
+   *
+   * La reparación del 27/08 movió la regla del art. 20.2.c a `evaluarReduccionVivienda`, y
+   * el test «WEB ↔ MCP (3/3)» comprueba la rama que DENIEGA en el navegador y la que
+   * CONCEDE solo contra el motor en Node. O sea: que la web conceda de verdad la reducción
+   * a un colateral con derecho no lo había mirado nadie en pantalla, y es la mitad del
+   * cambio que decide el importe. Aquí se prueban las dos ramas con un año de diferencia.
+   *
+   * Hermano de 65 años que convivió los 2 años anteriores, Madrid, 135.000 € de vivienda
+   * habitual (`EDAD_MIN_COLATERAL_VIVIENDA_IS` = 65, así que 65 es el primer año CON
+   * derecho). El importe está elegido para que la base liquidable caiga en el PRIMER tramo
+   * de `TARIFA_ESTATAL_IS`, el del 7,65 % con cuota acumulada 0, que ningún otro caso de
+   * este fichero visita:
+   *
+   *   − Reducción parentesco  REDUCCIONES_PARENTESCO_IS['III']    −7.993,46
+   *   − Reducción vivienda    mín(135.000 × 0,95; 122.606,47)   −122.606,47  ← manda el TOPE
+   *   = Base liquidable                                            4.400,07
+   *   Cuota íntegra = 0 + 4.400,07 × 7,65 % = 336,605355         → «336,61 €»
+   *   × COEFICIENTES_IS['III'][0] = 1,5882 → 534,596624          → «534,60 €»
+   *   − 50 % (madrid…['III'].porcentaje) → 267,298312            → «267,30 €»
+   *
+   * Y con 64 años, un solo año por debajo del umbral, la reducción desaparece entera:
+   *   = Base liquidable 135.000 − 7.993,46 = 127.006,54
+   *   Cuota íntegra = 7.127,47 + (127.006,54 − 79.881,18) × 10,20 % = 11.934,25672
+   *   × 1,5882 = 18.953,986522 → − 50 % = 9.476,993261            → «9476,99 €»
+   *
+   * 9.209,69 € de diferencia por un año de edad: por eso el umbral se prueba en su borde y
+   * no «alrededor».
+   */
+  test('CASO 6 (límite) — el colateral en el borde de los 65 años: 267,30 € con derecho y 9476,99 € sin él', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+
+    await page.selectOption('#parentescoSel', 'hermano');
+    await page.selectOption('#ccaaSel', 'madrid');
+    await mover(page, 'edadHer', 65);
+    await mover(page, 'valorRef', 135000);
+    await casilla(page, 'viviendaHabitual', true);
+    await casilla(page, 'convivencia', true);
+    await mover(page, 'aniosVenta', 0);
+
+    // Con derecho: el tope de 122.606,47 € manda sobre el 95 % de 135.000 €
+    expect(await linea(page, ISD, '− Reducción vivienda habitual (95%)')).toBe('−122.606,47 €');
+    expect(await linea(page, ISD, '= Base liquidable')).toBe('4400,07 €');
+    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('336,61 €');
+    expect(await linea(page, ISD, '= Cuota tributaria')).toBe('534,60 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('267,30 €');
+
+    // Un año por debajo del umbral y no queda nada de la reducción
+    await mover(page, 'edadHer', 64);
+    expect(await linea(page, ISD, 'Reducción vivienda habitual')).toBe(
+      'No aplicable: pariente colateral menor de 65 años'
+    );
+    expect(await linea(page, ISD, '= Base liquidable')).toBe('127.006,54 €');
+    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('11.934,26 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('9476,99 €');
+
+    // La misma entrada por el motor compartido, que es lo que responde el MCP Delegum
+    const motor = calcularSucesion({
+      baseImponible: 135000,
+      ccaa: 'madrid',
+      grupo: 'III',
+      edadHeredero: 65,
+      convivenciaDosAnios: true,
+      viviendaHabitual: 135000,
+    });
+    expect(motor.reduccionVivienda).toBe(122606.47);
+    expect(motor.baseLiquidable).toBe(4400.07);
+    expect(motor.cuotaFinal).toBe(267.3);
+  });
+
+  /**
+   * CASO 7 (NORMAL) — la plusvalía por el método REAL, que hasta ahora nunca ganaba.
+   *
+   * Los cinco casos de la ronda anterior eligen siempre el método OBJETIVO (o la no
+   * sujeción), así que la rama del art. 107.5 TRLHL —la que reparte la ganancia entre
+   * suelo y construcción en proporción CATASTRAL— no la ejercitaba ningún test pese a ser
+   * la mitad del cálculo. Se fuerza comprando barato el mismo año de la referencia:
+   * la ganancia real es pequeña y el método real baja del objetivo.
+   *
+   * Y de paso, Baleares, la única CCAA del catálogo que bonifica al Grupo II un 95 % (no un
+   * 99 %): el 5 % que queda hace visible la cuota íntegra, que con el 99 % se queda en
+   * calderilla y esconde cualquier error de tarifa.
+   *
+   * Hijo de 45 años, Baleares, vivienda habitual comprada hace 20 años por 195.000 €, valor
+   * de referencia 200.000 €, suelo catastral 60.000 € sobre 120.000 € de catastral total,
+   * venta a los 2 años por 210.000 €.
+   *
+   * ISD:
+   *   200.000 − 15.956,87 − mín(190.000; 122.606,47) = 61.436,66 de base liquidable
+   *   Cuota íntegra = 2.648,88 + (61.436,66 − 31.956,87) × 9,35 % = 5.405,240365 → «5405,24 €»
+   *   × 1,0000 → − 95 % (baleares…['II'].porcentaje) = 270,262018 → «270,26 €»
+   *
+   * Plusvalía municipal, 20 años → COEFICIENTES_IIVTNU_2025 = 0,45:
+   *   objetivo = 60.000 × 0,45 × 0,25 =                                 6.750,00
+   *   real     = (200.000 − 195.000) × (60.000 / 120.000) × 0,25 =         625,00  ← el MENOR
+   *
+   * IRPF a los 2 años:
+   *   Valor de adquisición fiscal = 200.000 + 270,262018 + 625 = 200.895,262018
+   *   Ganancia = 210.000 − 200.895,262018 = 9.104,737982
+   *        6.000,000000 × 19 % = 1.140,00
+   *        3.104,737982 × 21 % =   651,994776
+   *                               ──────────
+   *                                1.791,994776 → «1791,99 €»
+   *
+   * TOTAL = 270,262018 + 625 + 1.791,994776 = 2.687,256794 → «2687,26 €» = 1,28 % de 210.000
+   */
+  test('CASO 7 (normal) — Baleares al 95 % y la plusvalía por el método REAL: 270,26 € + 625,00 € + 1791,99 €', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+
+    await page.selectOption('#parentescoSel', 'hijo');
+    await page.selectOption('#ccaaSel', 'baleares');
+    await mover(page, 'edadHer', 45);
+    await mover(page, 'anioAdq', ANIO - 20);
+    await mover(page, 'valorAdq', 195000);
+    await mover(page, 'valorRef', 200000);
+    await mover(page, 'valorSuelo', 60000);
+    await mover(page, 'valorCatastralTotal', 120000);
+    await casilla(page, 'viviendaHabitual', true);
+    await mover(page, 'aniosVenta', 2);
+    await mover(page, 'valorVta', 210000);
+
+    expect(await linea(page, ISD, '= Base liquidable')).toBe('61.436,66 €');
+    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('5405,24 €');
+    expect(await panel(page, ISD)).toContain('Bonificación CCAA (95,0%)');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('270,26 €');
+
+    expect(await panel(page, IIVTNU)).toContain('20 años de tenencia');
+    expect(await linea(page, IIVTNU, 'Coeficiente 20 años')).toBe('0,45');
+    expect(await linea(page, IIVTNU, 'Método objetivo')).toBe('6750,00 €');
+    expect(await linea(page, IIVTNU, 'Método real (suelo)')).toBe('625,00 €');
+    expect(await linea(page, IIVTNU, 'Método elegido')).toBe('Real (menor)');
+    expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('625,00 €');
+
+    expect(await linea(page, IRPF, 'Valor adquisición fiscal*')).toBe('200.895,26 €');
+    expect(await linea(page, IRPF, 'Ganancia patrimonial')).toBe('9104,74 €');
+    expect(await linea(page, IRPF, 'Cuota IRPF venta')).toBe('1791,99 €');
+
+    const total = await bloqueTotal(page);
+    expect(total).toContain('2687,26 €');
+    expect(total).toContain('1,28%');
+  });
+
+  /**
+   * CASO 8 (RECHAZO) — Grupo IV marcando la casilla de vivienda habitual.
+   *
+   * La guarda del Grupo IV que ya existía DESMARCA la casilla, así que la rama que deniega
+   * la reducción a quien no tiene parentesco —una de las tres que `evaluarReduccionVivienda`
+   * decide— no se probaba en el navegador. Y es la que más se pulsa por error: la casilla
+   * viene marcada de serie, y quien hereda de un extraño la deja como está.
+   *
+   * Sin parentesco (Grupo IV), Madrid, 200.000 € que SÍ eran la vivienda habitual del
+   * fallecido. El art. 20.2.c LISD no contempla al Grupo IV, así que marcarla no cambia nada:
+   *   Base liquidable = 200.000 (REDUCCIONES_PARENTESCO_IS['IV'] = 0 y ninguna más)
+   *   Cuota íntegra = 7.127,47 + (200.000 − 79.881,18) × 10,20 % = 19.379,58964
+   *   × COEFICIENTES_IS['IV'][0] = 2,0000 = 38.759,17928 → «38.759,18 €», sin bonificación
+   *
+   * Que es exactamente la cifra que el bloque educativo deriva del motor (`EJEMPLO_GRUPO_IV`,
+   * calculado con la casilla en falso): la prueba de que la casilla es inocua aquí.
+   */
+  test('CASO 8 (rechazo) — Grupo IV con la vivienda habitual marcada: se deniega, se dice, y la cuota no se mueve', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+
+    await page.selectOption('#parentescoSel', 'sin_parentesco');
+    await page.selectOption('#ccaaSel', 'madrid');
+    await mover(page, 'edadHer', 50);
+    await mover(page, 'valorRef', 200000);
+    await casilla(page, 'viviendaHabitual', true);
+    await mover(page, 'aniosVenta', 0);
+
+    expect(await linea(page, ISD, 'Reducción vivienda habitual')).toBe(
+      'No aplicable: sin parentesco: el art. 20.2.c LISD no la contempla'
+    );
+    expect(await linea(page, ISD, '= Base liquidable')).toBe('200.000,00 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('38.759,18 €');
+
+    // La casilla del colateral NO se ofrece fuera del Grupo III: no tendría efecto y sugeriría
+    // que el requisito del art. 20.2.c se puede cumplir sin parentesco.
+    expect(await page.locator('#convivencia').count()).toBe(0);
+  });
+
+  /**
+   * ⚠️ HALLAZGO ABIERTO (28/08/2026) — la tarjeta educativa se contradice a sí misma en dos
+   * frases seguidas, y el test de regresión que la vigila no puede verlo.
+   *
+   * `CCAA_BONIFICACION_CASI_TOTAL` filtra `bonificaciones['II'].porcentaje >= 0.99`. Aragón
+   * lo declara como `{ porcentaje: 1.00, limite: 3000000 }`, así que ENTRA en la lista de
+   * «las comunidades que bonifican la cuota al 99% o más», y la frase siguiente de la misma
+   * tarjeta dice que «Cantabria y Aragón funcionan con una exención hasta cierto importe, no
+   * con un porcentaje plano». El comentario que justifica la derivación en `page.tsx` dice
+   * que ese era justo el caso a excluir.
+   *
+   * El test «REGRESIÓN — la lista de CCAA…» no lo caza porque re-deriva EL MISMO filtro y
+   * comprueba que la tarjeta lo refleja: valida el mecanismo contra sí mismo. Lo que hay que
+   * comprobar es la tarjeta contra su propia prosa, que es lo que lee el usuario.
+   *
+   * Ninguna cifra está mal —dentro del deslizador (2.000.000 € de tope) Aragón bonifica el
+   * 100 % de verdad— pero es una página de riesgo 1 afirmando dos cosas incompatibles sobre
+   * la misma comunidad en el mismo párrafo.
+   */
+  test.fail('HALLAZGO — la tarjeta educativa mete a Aragón en la lista del «porcentaje plano» y en la de las que no lo son', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+
+    const tarjeta = await page.evaluate(() => {
+      const h4 = [...document.querySelectorAll('h4')].find(h =>
+        (h.textContent ?? '').includes('Hijo hereda piso')
+      );
+      return (h4?.parentElement?.textContent ?? '').replace(/\s+/g, ' ').trim();
+    });
+
+    // La frase «Cantabria y Aragón funcionan con una exención… no con un porcentaje plano»
+    // está en la tarjeta; Aragón no puede estar además en la enumeración de las que sí.
+    const enumeracion = tarjeta.slice(0, tarjeta.indexOf('el ISD se queda en casi nada'));
+    expect(enumeracion).not.toContain('Aragón');
+  });
+
+  /**
+   * ⚠️ HALLAZGO ABIERTO (28/08/2026) — la deduplicación dejó viva una TERCERA copia.
+   *
+   * El commit `e1a42c65` unificó la regla del art. 20.2.c entre `page.tsx` y el motor
+   * compartido. Pero la misma regla está escrita una tercera vez en
+   * `app/estimador-impuesto-sucesiones/page.tsx` (su paso «4. Reducción vivienda habitual»),
+   * que NO importa `evaluarReduccionVivienda` y concede el 95 % a todo el Grupo III sin
+   * mirar edad ni convivencia — el defecto exacto del hallazgo 462, intacto.
+   *
+   * Es la misma herencia del hallazgo 462 en la app hermana: Madrid, Grupo III, 200.000 € de
+   * vivienda habitual. Aquella app añade siempre el 3 % de ajuar (base 206.000 €):
+   *
+   *   con la regla única  → sin reducción de vivienda: base liquidable 198.006,54
+   *                         7.127,47 + 118.125,36 × 10,20 % = 19.176,25672
+   *                         × 1,5882 = 30.455,730922 → − 50 % = 15.227,87 €
+   *   lo que sirve hoy    → reduce 122.606,47: base liquidable 75.400,07
+   *                         2.648,88 + 43.443,20 × 9,35 % = 6.710,8192
+   *                         × 1,5882 = 10.658,123053 → − 50 % = 5329,06 €
+   *
+   * 9.898,81 € de menos, y el formulario de esa app ni siquiera ofrece la edad del heredero
+   * fuera del Grupo I: el requisito no es que se incumpla, es que no se puede expresar — la
+   * misma frase que el commit escribió sobre el MCP antes de arreglarlo allí.
+   */
+  test.fail('HALLAZGO — estimador-impuesto-sucesiones conserva su propia copia de la regla del art. 20.2.c', async ({
+    page,
+  }) => {
+    await page.goto('/estimador-impuesto-sucesiones/');
+
+    const selects = page.locator('select');
+    await selects.nth(0).selectOption('madrid');
+    await selects.nth(1).selectOption('III');
+    await page
+      .locator('xpath=//label[contains(., "Vivienda habitual")]/following::input[1]')
+      .fill('200000');
+
+    const cuota = page.locator('xpath=//*[contains(@class,"resultsPanel")]');
+    await expect(cuota).toContainText('CUOTA A INGRESAR');
+
+    // La ÚNICA aserción de fondo: el colateral de esta herencia no cumple el art. 20.2.c,
+    // así que la cuota tiene que ser la misma que dan la web y el MCP para el mismo caso.
+    expect((await cuota.innerText()).replace(/\s+/g, ' ')).toContain('15.227,87 €');
+  });
+
+  /**
+   * ⚠️ HALLAZGO ABIERTO (28/08/2026) — el otro consumidor del motor se quedó sin el
+   * parámetro nuevo.
+   *
+   * `evaluarReduccionVivienda` pasó a exigir `convivenciaDosAnios` para el Grupo III. Las dos
+   * tools del MCP Delegum lo exponen (`convivio_dos_anios`), pero
+   * `app/api/chatgpt/sucesiones/route.ts` —la Action del GPT, que llama al MISMO
+   * `calcularSucesion`— no lo copia del body, así que el parámetro se pierde por el camino.
+   *
+   * Efecto: por esa ruta el colateral con derecho no puede acreditarlo NUNCA, y la respuesta
+   * afirma un hecho falso sobre quien pregunta («pariente colateral que no convivió los 2
+   * años anteriores») cuando el body decía lo contrario. Antes del commit esa misma llamada
+   * devolvía 4.883,57 € concediendo la reducción sin comprobar nada; ahora devuelve
+   * 14.741,88 € negándola sin poder comprobarla. La respuesta correcta para el body que se
+   * envía —edad 70 y convivencia acreditada— es 4.883,57 €, que es lo que da el MCP.
+   */
+  test.fail('HALLAZGO — /api/chatgpt/sucesiones ignora convivenciaDosAnios y niega la reducción al colateral con derecho', async ({
+    request,
+  }) => {
+    const respuesta = await request.post('/api/chatgpt/sucesiones/', {
+      data: {
+        baseImponible: 200000,
+        ccaa: 'madrid',
+        grupo: 'III',
+        edadHeredero: 70,
+        convivenciaDosAnios: true,
+        viviendaHabitual: 200000,
+      },
+    });
+    const json = await respuesta.json();
+
+    // El MCP, con el mismo supuesto, da 4.883,57 €: es la cifra que fija la paridad
+    expect(json.cuotaFinal).toBe(4883.57);
+  });
 });

@@ -899,4 +899,263 @@ test.describe('Verificador del complemento por brecha de género', () => {
     expect(fiscal).toContain('60.3.d');
     expect(fiscal).toContain('60.3.e');
   });
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // RE-INSPECCIÓN DE CIERRE — 28/08/2026
+  //
+  // Mitad A (cierre de la reparación e1a42c65): la deduplicación de los plazos, los
+  // subapartados del art. 60.3 y la exclusión del art. 60.4 CIERRA en `page.tsx` y en la
+  // guía visible —lo comprueban los tests de arriba y se reprodujo en navegador—, pero
+  // quedan copias supervivientes FUERA de `page.tsx`, que es donde mira el candado que
+  // dejó aquella reparación. Van marcadas con `test.fail()` abajo.
+  //
+  // Mitad B: tres casos nuevos resueltos a mano contra `COMPLEMENTO_BRECHA_GENERO_2026`
+  // ANTES de abrir el navegador.
+  // ──────────────────────────────────────────────────────────────────────────
+
+  /**
+   * CASO 4 (LÍMITE) — el tope del módulo DENTRO de la rama que manda a un abogado.
+   *
+   * Resuelto a mano con `COMPLEMENTO_BRECHA_GENERO_2026` antes de ejecutar la app:
+   *
+   *   P1 incapacidad permanente ∈ pensionesElegibles → no cae en «no contributiva»
+   *   P2 desde el 4-feb-2021 ≥ fechaMinimaHechoCausante → no cae en el corte temporal
+   *   P3 4 hijos = maxHijos → hijosComputables = mín(4, 4) = 4
+   *   P5 «lo solicitó y se lo denegaron» es una respuesta sobre el OTRO progenitor, así
+   *      que no dispara nada (es lo que fijó el hallazgo 225)
+   *   P6 denegación PROPIA = sí → esReclamacion = true
+   *
+   *   mensual = 4 × cuantiaPorHijoMensual 36,90 = 147,60 € (= maxMensual)
+   *   anual   = 147,60 × pagasAnuales 14        = 2066,40 € (= maxAnual)
+   *
+   * Y el BORDE exacto: con 5 hijos y todo lo demás igual el importe NO cambia, porque el
+   * quinto cae fuera de maxHijos. Ningún caso anterior cruzaba estas dos cosas: el tope se
+   * probaba en la rama «cumples los requisitos» y la reclamación, con 2 hijos.
+   */
+  test('caso 4 (límite): 4 hijos y denegación propia → 147,60 €/mes con reclamación, y el 5.º no suma', async ({
+    page,
+  }) => {
+    await responderYVerificar(page, {
+      pension: 'Incapacidad permanente',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 4,
+      sexo: 'Hombre',
+      otroProgenitor: 'Lo solicitó y se lo denegaron',
+      denegacionPropia: true,
+    });
+    const resultado = await textoResultado(page);
+    expect(resultado).toContain('+147,60 €/mes'); // 4 × 36,90 = maxMensual
+    expect(resultado).toContain('Hijos computables 4 (máx. 4)');
+    expect(resultado).toContain('Anual (14 pagas) 2066,40 €/año'); // maxAnual
+    expect(resultado).toContain('Posible reclamación retroactiva'); // P6, no P5
+    expect(resultado).toContain('C-623/23');
+
+    // El borde: el quinto hijo no existe para el módulo
+    await page.locator('#hijos').fill('5');
+    await page.getByRole('button', { name: 'Verificar mi derecho' }).click();
+    const conCinco = await textoResultado(page);
+    expect(conCinco).toContain('+147,60 €/mes'); // idéntico: maxHijos = 4
+    expect(conCinco).toContain('Hijos computables 4 (máx. 4)');
+  });
+
+  /**
+   * CASO 5 (RECHAZO) — la exclusión del art. 60.4 manda sobre la doctrina TJUE.
+   *
+   * Hombre con jubilación PARCIAL, 3 hijos y una resolución denegatoria propia. Las dos
+   * ramas se pisan: la del art. 60.4 (no hay derecho) y la de la reclamación retroactiva
+   * (denegación propia + hombre). Resuelto a mano: si la ley excluye la modalidad, no hay
+   * derecho que reclamar, luego la exclusión es previa y el veredicto tiene que ser un
+   * rechazo limpio, sin el 3 × 36,90 = 110,70 €/mes y sin mandar a nadie a impugnar una
+   * denegación que fue correcta.
+   *
+   * Es el orden de evaluación lo que se prueba, no el importe: invertirlo produciría el
+   * peor desenlace posible en una app de riesgo 1 —«posible reclamación retroactiva» a
+   * quien no tiene nada que reclamar—.
+   */
+  test('caso 5 (rechazo): jubilación parcial con denegación propia → art. 60.4, y NADA de reclamación', async ({
+    page,
+  }) => {
+    await responderYVerificar(page, {
+      pension: 'Jubilación parcial',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 3,
+      sexo: 'Hombre',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+      denegacionPropia: true,
+    });
+    const resultado = await textoResultado(page);
+    expect(resultado).toContain('No procede ahora');
+    expect(resultado).toContain('60.4'); // exclusiones[0].norma
+    expect(resultado).not.toContain('Posible reclamación retroactiva');
+    expect(resultado).not.toContain('110,70 €'); // 3 × 36,90: no debe aparecer
+    expect(resultado).not.toContain('C-623/23');
+  });
+
+  /**
+   * HALLAZGO ABIERTO (28/08/2026) — LA COPIA SUPERVIVIENTE ESTÁ EN `metadata.ts`.
+   *
+   * El comentario que la reparación e1a42c65 dejó en `data/fiscal/pensiones.ts` dice por
+   * qué subieron allí los subapartados del art. 60.3: «Estaban citadas en el JSX de
+   * verificador-complemento-brecha-genero Y EN SU FAQPage —o sea, en lo que leen Bing
+   * Copilot y ChatGPT— pero fuera del alcance de cualquier revisión de vigencia».
+   *
+   * El JSX se arregló. El FAQPage no: `metadata.ts` importa del módulo la cuantía, el
+   * máximo de hijos y el importe máximo, pero sigue teniendo TECLEADOS a mano «el artículo
+   * 60.4 LGSS lo excluye expresamente» y «el artículo 60.3.e) LGSS dispone que» (línea
+   * 109), más «4 de febrero de 2021» en otras dos respuestas.
+   *
+   * Hoy los literales COINCIDEN con el módulo, así que no hay error visible: el riesgo es
+   * exactamente el que la reparación quiso cerrar, que una corrección futura en
+   * `data/fiscal` cambie la página y deje al FAQPage —lo que citan las IAs— diciendo la
+   * versión anterior. El candado que dejó aquella ronda («los plazos legales viven en
+   * data/fiscal») solo lee `page.tsx`, así que no puede verlo.
+   */
+  test.fail(
+    'HALLAZGO: el faqJsonLd de metadata.ts sigue con el art. 60.3/60.4 tecleado a mano',
+    async () => {
+      const { readFileSync } = await import('node:fs');
+      const { join } = await import('node:path');
+      const meta = readFileSync(
+        join(process.cwd(), 'app', 'verificador-complemento-brecha-genero', 'metadata.ts'),
+        'utf8',
+      );
+      // Igual que ya deriva CUANTIA / MAX_HIJOS / MAX_MES, el FAQPage tiene que derivar los
+      // subapartados normativos del módulo en vez de repetirlos.
+      expect(meta).toMatch(/COMPLEMENTO_BRECHA_GENERO_2026\.(exclusiones|concurrencia)/);
+    },
+  );
+
+  /**
+   * HALLAZGO ABIERTO (28/08/2026) — LA FECHA DEL CORTE ESTÁ EN `data/fiscal` Y NO LA LEE
+   * NADIE.
+   *
+   * `COMPLEMENTO_BRECHA_GENERO_2026.fechaMinimaHechoCausante = '2021-02-04'` es la fecha
+   * que decide TODO el derecho, y no tiene un solo consumidor en producción: el
+   * `grep` solo la encuentra en su propia declaración y en los comentarios de este
+   * fichero. Mientras tanto, la misma fecha va escrita a mano seis veces en `page.tsx`
+   * (etiquetas de la P2, hint, motivo del rechazo, casos típicos, guía paso a paso y
+   * errores frecuentes), dos en `metadata.ts`, cuatro en
+   * `lib/calculadoras/complementoBrechaGenero.ts` y dos en el MCP de Delegum.
+   *
+   * `pensionesElegibles` está en la misma situación: declarada y sin consumidor, mientras
+   * la lista de pensiones que dan acceso vive duplicada como unión de TypeScript en la app
+   * y en el motor. Un campo del módulo fiscal que nadie lee no es una fuente única: es un
+   * comentario con tipo.
+   */
+  test.fail(
+    'HALLAZGO: fechaMinimaHechoCausante no la consume nadie; la fecha va tecleada en la app',
+    async () => {
+      const { readFileSync } = await import('node:fs');
+      const { join } = await import('node:path');
+      const consumidores = [
+        join('app', 'verificador-complemento-brecha-genero', 'page.tsx'),
+        join('app', 'verificador-complemento-brecha-genero', 'metadata.ts'),
+        join('lib', 'calculadoras', 'complementoBrechaGenero.ts'),
+      ]
+        .map(rel => readFileSync(join(process.cwd(), rel), 'utf8'))
+        .join('\n');
+      expect(consumidores).toContain('fechaMinimaHechoCausante');
+    },
+  );
+
+  /**
+   * HALLAZGO ABIERTO (28/08/2026) — EL RECHAZO DE «21» DA UN MOTIVO FALSO.
+   *
+   * El campo declara un rango de 0 a 20 (`max={20}` y el texto de ayuda), y la validación
+   * lo aplica: `hijosEsValido = /^\d+$/.test(...) && Number(...) <= 20`. Pero el motivo del
+   * veredicto es el mismo para las dos causas de rechazo, así que quien escribe 21 lee
+   * «"21" no es un número entero de hijos», que es FALSO: 21 sí es un entero, lo que pasa
+   * es que excede el tope del campo. El paso siguiente sí nombra el rango, pero el bloque
+   * «¿Por qué?» —que es el que explica el veredicto— afirma algo que no es cierto.
+   *
+   * Es el reverso del hallazgo 470, que se reparó precisamente para que el motivo nombrara
+   * el CAMPO en vez del fondo: aquí lo nombra, pero se equivoca de defecto.
+   *
+   * Nota de paridad: la tool del MCP no tiene ese tope y con `num_hijos: 21` devuelve
+   * 147,60 €/mes (el tope de maxHijos). No es un error del MCP —21 hijos se computan como
+   * 4—, pero confirma que el 20 es un límite de la interfaz, no de la norma.
+   */
+  test.fail(
+    'HALLAZGO: con 21 hijos el motivo dice «no es un número entero», y 21 lo es',
+    async ({ page }) => {
+      const campo = page.locator('#hijos');
+      await campo.click();
+      await page.keyboard.press('Control+a');
+      await page.keyboard.type('21');
+      await page.getByRole('button', { name: 'Verificar mi derecho' }).click();
+      expect(await textoResultado(page)).not.toContain('«21» no es un número entero de hijos');
+    },
+  );
+
+  /**
+   * HALLAZGO ABIERTO (28/08/2026) — UNA REGLA DE CÓMPUTO DE HIJOS SIN FUENTE.
+   *
+   * La FAQ «¿Y los hijos fallecidos antes de los 16 años?» responde «La doctrina
+   * administrativa también los computa si nacieron con vida». Es una regla sobre HIJOS
+   * COMPUTABLES, o sea sobre el factor que multiplica el importe, y no cita norma ni
+   * criterio concreto, ni existe en `data/fiscal` (`grep -rn fallecid data/fiscal/` no
+   * devuelve nada del complemento), de modo que queda fuera del alcance de
+   * `/triaje-fiscal`.
+   *
+   * Es el mismo motivo por el que la ronda anterior RETIRÓ de esta misma app la serie
+   * histórica «30,40 € en 2023 · 33,20 € en 2024 · 35,90 € en 2025» —«no estaba en
+   * data/fiscal ni citaba fuente: solo el valor vigente es verificable»—. Aquella se fue y
+   * esta se quedó, y esta decide el número de hijos, no un dato de contexto.
+   */
+  test.fail(
+    'HALLAZGO: la FAQ de los hijos fallecidos no cita norma ni criterio',
+    async ({ page }) => {
+      await abrirGuia(page);
+      const respuesta = normalizar(
+        await page
+          .locator('h3', { hasText: '¿Y los hijos fallecidos antes de los 16 años?' })
+          .locator('..')
+          .innerText(),
+      );
+      expect(respuesta).toMatch(/art\.|LGSS|RDL|Criterio de Gestión|Resolución/);
+    },
+  );
+
+  /**
+   * HALLAZGO ABIERTO (28/08/2026) — «ACORDADLO PREVIAMENTE» CONTRADICE LA REGLA DE
+   * CONCURRENCIA QUE LA PROPIA PÁGINA ENUNCIA DOS VECES.
+   *
+   * El hint de la P5 dice «si hay concurrencia, la SS lo asigna al de pensión pública
+   * menor», y la tarjeta «Documenta la concurrencia familiar» lo repite. Pero el bloque de
+   * errores frecuentes cierra con «Si ambos lo solicitan por los mismos hijos, solo lo
+   * cobrará uno. Acordadlo previamente», que presenta como acordable entre los progenitores
+   * algo que decide la ley por la cuantía de las pensiones. En una app de riesgo 1, invitar
+   * a pactar la asignación de una prestación cuya atribución es reglada es una instrucción
+   * que el INSS no va a respetar.
+   */
+  test.fail(
+    'HALLAZGO: «Acordadlo previamente» presenta como pactable una atribución reglada',
+    async ({ page }) => {
+      await abrirGuia(page);
+      const guia = normalizar(await page.locator('body').innerText());
+      expect(guia).not.toContain('Acordadlo previamente');
+    },
+  );
+
+  /**
+   * HALLAZGO ABIERTO (28/08/2026) — «GRATIS» SIN LA CONDICIÓN QUE LO HACE GRATIS.
+   *
+   * La tarjeta «Consulta antes de actuar» dice que «un sindicato o abogado laboralista
+   * puede orientarte gratis (turno de oficio, asesoría sindical)». Los dos canales que
+   * nombra son condicionados: el turno de oficio exige el reconocimiento del derecho a
+   * asistencia jurídica gratuita (Ley 1/1996, con umbrales de renta) y la asesoría
+   * sindical, estar afiliado. Enunciado sin la condición, el consejo promete a un
+   * pensionista una puerta que puede encontrarse cerrada justo cuando le corren los días
+   * del plazo de reclamación previa.
+   */
+  test.fail(
+    'HALLAZGO: el turno de oficio se ofrece «gratis» sin nombrar su requisito',
+    async ({ page }) => {
+      await abrirGuia(page);
+      const tarjeta = normalizar(
+        await page.locator('h3', { hasText: 'Consulta antes de actuar' }).locator('..').innerText(),
+      );
+      expect(tarjeta).toMatch(/asistencia jurídica gratuita|afiliad|umbral|requisitos de renta/i);
+    },
+  );
 });

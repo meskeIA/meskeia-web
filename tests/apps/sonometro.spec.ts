@@ -1151,3 +1151,363 @@ test('REGRESIÓN 3.ª pasada — un micrófono mudo se dice, no se lee como 0,0 
     'ningún aviso advierte de que el micrófono no entrega señal',
   ).toContainText(/micr[óo]fono|sin se[ñn]al|no llega audio|silenciad/i);
 });
+
+// ===========================================================================
+// 4.ª PASADA DEL INSPECTOR · 28/08/2026 — RE-INSPECCIÓN DE CIERRE
+//
+// Se reabrió por REPARACIÓN: el commit 0b1630d9 cerró los tres hallazgos de la 3.ª pasada
+// (CSV que perdía filas por la comilla doble, micrófono mudo leído como 0,0 dB(A) y tope de
+// 60 mediciones que descartaba en silencio) y fc27e76b había estrenado el registro. Sus tres
+// `test.fail()` ya están arriba convertidos en REGRESIÓN.
+//
+// Lo que sigue son: el CIERRE comprobado contando filas de verdad (CASO 7) y tres casos
+// nuevos de operativa —un límite, un rechazo y uno en móvil— más los hallazgos que abren.
+//
+// VALORES RESUELTOS A MANO ANTES DE EJECUTAR (de page.tsx):
+//   nivel = clamp(0, 130, 20·log10(RMS) + calibración + A(f)) · RMS de una senoide = a/√2
+//   a=0,05 · cal 90 · 1 kHz → 60,97 → «61,0»      a=1,0 · cal 120 → 116,99 → «117,0»
+//   a=8    · cal 120        → 135,05 teóricos → el techo lo deja en «130,0»
+//   aguja  = (dB/130)·180 − 90 → 117,0 ⇒ 71,99° · 130,0 ⇒ 90°
+// ===========================================================================
+
+declare global {
+  interface Window {
+    /** Ganancia del oscilador de prueba, para cambiar el nivel EN CALIENTE. */
+    __ganancia?: GainNode;
+    __ctxTono?: AudioContext;
+  }
+}
+
+/**
+ * Como `micrófonoSintético`, pero deja a mano la ganancia para poder MOVER el nivel durante
+ * la medición: es lo que hace falta para llevar la app hasta el techo de su escala sin
+ * detenerla, y para que el máximo de la sesión sea distinto del mínimo.
+ *
+ * Devuelve un stream NUEVO en cada llamada, como un micrófono de verdad: cachearlo rompe la
+ * segunda medición porque la app detiene las pistas al terminar la primera.
+ */
+async function micrófonoRegulable(page: Page, frecuencia: number, amplitud: number): Promise<void> {
+  await page.addInitScript(
+    ([hz, amp]) => {
+      const OriginalAudioContext = window.AudioContext;
+      let ctx: AudioContext | null = null;
+      navigator.mediaDevices.getUserMedia = async () => {
+        if (!ctx) ctx = new OriginalAudioContext();
+        await ctx.resume();
+        const oscilador = ctx.createOscillator();
+        oscilador.type = 'sine';
+        oscilador.frequency.value = hz;
+        const ganancia = ctx.createGain();
+        ganancia.gain.value = amp;
+        const destino = ctx.createMediaStreamDestination();
+        oscilador.connect(ganancia).connect(destino);
+        oscilador.start();
+        window.__ganancia = ganancia;
+        window.__ctxTono = ctx;
+        return destino.stream;
+      };
+    },
+    [frecuencia, amplitud] as [number, number],
+  );
+}
+
+/** Lleva el oscilador a otra amplitud con una RAMPA de 500 ms (un escalón mete un clic). */
+async function rampaDeNivel(page: Page, amplitud: number): Promise<void> {
+  await page.evaluate((destino) => {
+    const g = window.__ganancia;
+    const t = window.__ctxTono?.currentTime ?? 0;
+    if (!g) return;
+    g.gain.setValueAtTime(g.gain.value, t);
+    g.gain.linearRampToValueAtTime(destino, t + 0.5);
+  }, amplitud);
+}
+
+/** Ángulo de la aguja tal como lo escribe el estilo en línea. */
+async function ánguloAguja(page: Page): Promise<number> {
+  const estilo = (await page.locator('[class*="needle"]').getAttribute('style')) ?? '';
+  return Number(estilo.match(/rotate\((-?[\d.]+)deg\)/)?.[1]);
+}
+
+/** La fecha de hoy como la escribe `formatDate` (es-ES). */
+const hoyEsES = (): string =>
+  new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+// ---------------------------------------------------------------------------
+// CASO 7 (cierre) — el CSV lleva TODAS las filas de la pantalla, la última incluida
+// ---------------------------------------------------------------------------
+// Cierra el hallazgo 468 contando las filas de verdad, y con la nota más hostil que cabe en
+// el campo: comilla doble AL PRINCIPIO (que en RFC 4180 abre un campo entrecomillado y se
+// tragaba la fila siguiente) Y punto y coma (el separador). Además comprueba lo que la 3.ª
+// pasada no llegó a mirar: que lo que se guarda es lo que el panel enseñaba al detener —el
+// resumen se congela ahí— y que la medición recién hecha es la PRIMERA fila del fichero.
+test('CASO 7 (cierre) — el CSV lleva las cuatro filas de la pantalla, incluida la recién medida', async ({
+  page,
+}) => {
+  test.setTimeout(60000);
+  await sembrarRegistro(page, [sesionDeJunio(12), sesionDeJunio(11), sesionDeJunio(10)]);
+  await micrófonoSintético(page, 1000, 0.05);
+  await page.goto(RUTA);
+  await expect(filasRegistro(page)).toHaveCount(3);
+
+  await medirYGuardar(page, 4);
+  await expect(filasRegistro(page)).toHaveCount(4);
+
+  // El registro NO olvida lo que midió: la fila dice lo mismo que el panel congelado
+  const panel = (await page.locator('[class*="statValue"]').allInnerTexts()).map((t) => t.trim());
+  const celdas = (await filasRegistro(page).first().locator('td').allInnerTexts()).map((t) =>
+    t.trim(),
+  );
+  expect(
+    [celdas[4], celdas[5], celdas[3]],
+    'la fila guardada tiene que decir lo mismo que el resumen que queda en pantalla',
+  ).toEqual(panel);
+
+  // La nota se teclea en el campo de la app: sin pegar nada y dentro de sus 80 caracteres
+  await filasRegistro(page).nth(1).locator('input[type="text"]').fill('"karaoke"; a las 3');
+
+  const [descarga] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByRole('button', { name: /Descargar CSV/i }).click(),
+  ]);
+  const contenido = (await readFile((await descarga.path()) as string, 'utf8')).replace(/^﻿/, '');
+
+  const leido = parsearCsv<string[]>(contenido, { delimiter: ';' });
+  expect(leido.errors, `el CSV no es válido: ${JSON.stringify(leido.errors)}`).toEqual([]);
+  expect(leido.data, 'cabecera + las CUATRO mediciones que hay en pantalla').toHaveLength(5);
+  expect(
+    leido.data.map((f) => f.length),
+    'ocho columnas en cada registro',
+  ).toEqual([8, 8, 8, 8, 8]);
+  // La última medición es la primera fila del fichero, con la fecha de hoy
+  expect(leido.data[1][0]).toBe(hoyEsES());
+  expect(leido.data[1][3]).toBe(celdas[3]); // y su LAeq es el de la tabla
+  // El punto y coma se sustituye por un espacio; la comilla se entrecomilla y se duplica
+  expect(leido.data[2][7]).toBe('"karaoke" a las 3');
+  // Y la más antigua sigue estando: no se ha tragado ninguna fila
+  expect(leido.data[4][7]).toBe(sesionDeJunio(10).nota);
+});
+
+// ---------------------------------------------------------------------------
+// CASO 8 (límite) — la calibración en su tope y el techo de la escala
+// ---------------------------------------------------------------------------
+// Dos límites en una sola sesión. `cambiarCalibracion` acota a [60,120] y persiste, y la
+// columna «Calib.» del registro existe justamente para que dos filas de días distintos sean
+// comparables: si no guarda el desplazamiento con el que se midió, no lo son.
+// El techo importa porque el nivel es `Math.min(130, …)`: una señal de 135 dB(A) teóricos
+// tiene que quedarse en 130,0 y no salirse de la escala que la propia app dibuja.
+test('CASO 8 (límite) — con la calibración en su tope: 117,0 dB(A) y un techo que no se pasa', async ({
+  page,
+}) => {
+  test.setTimeout(60000);
+  await page.addInitScript(() => window.localStorage.setItem('sonometro-calibracion', '118'));
+  await micrófonoRegulable(page, 1000, 1.0);
+  await page.goto(RUTA);
+
+  const mas = page.getByRole('button', { name: /Aumentar la calibración/i });
+  await mas.click();
+  await mas.click();
+  await expect(page.locator('[class*="calibracionValor"]')).toContainText('120 dB');
+  await expect(mas, 'en el tope no se puede seguir subiendo').toBeDisabled();
+  await expect(
+    page.getByRole('button', { name: /Reducir la calibración/i }),
+    'pero sí bajar',
+  ).toBeEnabled();
+
+  await page.getByRole('button', { name: /Iniciar medición/i }).click();
+  await esperarLectura(page);
+  await page.waitForTimeout(2000); // el nivel es constante: en dos segundos está asentado
+
+  // 20·log10(1/√2) + 120 + A(1 kHz)=0 → 116,99
+  expect(await lecturaNumero(page)).toBeCloseTo(116.99, 0);
+  await expect(page.locator('[class*="levelLabel"]')).toHaveText(/^peligroso$/i);
+  expect(await ánguloAguja(page)).toBeCloseTo(71.99, 0);
+
+  // Y ahora ocho veces esa amplitud: 135,05 dB(A) teóricos
+  await rampaDeNivel(page, 8);
+  await page.waitForTimeout(2500);
+  expect(await lecturaNumero(page), 'el techo de la escala es 130 dB(A)').toBe(130);
+  expect(await ánguloAguja(page), 'la aguja se queda a fondo de escala').toBeCloseTo(90, 1);
+
+  await page.getByRole('button', { name: /Detener y guardar/i }).click();
+  await expect(filasRegistro(page)).toHaveCount(1);
+  const celdas = (await filasRegistro(page).first().locator('td').allInnerTexts()).map((t) =>
+    t.trim(),
+  );
+  expect(celdas[6], 'la fila guarda la calibración con la que se midió').toBe('120 dB');
+  expect(Number(celdas[5].replace(',', '.')), 'el máximo guardado tampoco pasa del techo').toBe(130);
+});
+
+// ---------------------------------------------------------------------------
+// CASO 9 (rechazo) — el permiso denegado con un registro ya en pantalla
+// ---------------------------------------------------------------------------
+// REGRESIÓN C ya cubre que el aviso se anuncia y que no se abre ningún medio. Lo que aquí se
+// mira es lo que aparece cuando la app ya tiene un diario detrás: que un permiso denegado no
+// deja ningún número en la lectura, no toca las mediciones guardadas y —sobre todo— no dice
+// «Medición guardada», que es el aviso que el usuario lee para saber si tiene la prueba.
+test('CASO 9 (rechazo) — permiso denegado: ni número falso, ni fila nueva, ni falso «guardada»', async ({
+  page,
+}) => {
+  await sembrarRegistro(page, [sesionDeJunio(12), sesionDeJunio(11)]);
+  await instrumentar(page);
+  await page.addInitScript(() => {
+    navigator.mediaDevices.getUserMedia = () =>
+      Promise.reject(new DOMException('Permission denied', 'NotAllowedError'));
+  });
+  await page.goto(RUTA);
+  await expect(filasRegistro(page)).toHaveCount(2);
+
+  await page.getByRole('button', { name: /Iniciar medición/i }).click();
+  await expect(page.locator('[class*="errorMessage"][role="alert"]')).toContainText(
+    'Permiso de micrófono denegado',
+  );
+  await expect(lecturaTexto(page), 'sin micrófono no puede haber un número').toHaveText('--');
+  await expect(page.locator('[class*="levelLabel"]')).toHaveText(/^esperando\.\.\.$/i);
+  await expect(page.locator('[class*="avisoRegistro"]'), 'no se ha guardado nada').toHaveCount(0);
+  await expect(filasRegistro(page), 'el diario anterior sigue intacto').toHaveCount(2);
+
+  // No se cuelga: se puede volver a pedir el permiso y vuelve a decir lo mismo
+  await page.getByRole('button', { name: /Iniciar medición/i }).click();
+  await expect(page.locator('[class*="errorMessage"][role="alert"]')).toContainText(
+    'Permiso de micrófono denegado',
+  );
+  expect(await estadoDelMedio(page)).toEqual({ contextos: [], pistas: [] });
+});
+
+// ---------------------------------------------------------------------------
+// CASO 10 (móvil) — Pixel 7: el teléfono mide, guarda y la tabla cabe en su caja
+// ---------------------------------------------------------------------------
+// Con una senoide de amplitud conocida el teléfono tiene que dar el MISMO número que el
+// escritorio: 61,0 dB(A). Y la tabla de nueve columnas (min-width 760 px) tiene que
+// desplazarse DENTRO de `.tablaScroll` en una pantalla de 412 px.
+test.describe('CASO 10 (móvil)', () => {
+  test.use({ ...PIXEL_7, permissions: ['microphone'] });
+
+  test('en un Pixel 7 se mide 61,0 dB(A), queda registrado y la tabla se desplaza en su caja', async ({
+    page,
+  }) => {
+    test.setTimeout(60000);
+    await micrófonoSintético(page, 1000, 0.05);
+    await page.goto(RUTA);
+
+    await medirYGuardar(page, 4);
+    await expect(filasRegistro(page)).toHaveCount(1);
+
+    const celdas = (await filasRegistro(page).first().locator('td').allInnerTexts()).map((t) =>
+      t.trim(),
+    );
+    // 20·log10(0,05/√2) + 90 = 60,97 → «61,0» también en el teléfono
+    expect(Number(celdas[3].replace(',', '.'))).toBeCloseTo(60.97, 0);
+    expect(celdas[6]).toBe('90 dB');
+
+    const caja = await page
+      .locator('[class*="tablaScroll"]')
+      .evaluate((e) => ({ sw: e.scrollWidth, cw: e.clientWidth }));
+    expect(caja.sw, 'la tabla es más ancha que su caja').toBeGreaterThan(caja.cw);
+    expect(caja.cw, 'y su caja cabe en la pantalla del teléfono').toBeLessThanOrEqual(412);
+  });
+});
+
+// ===========================================================================
+// HALLAZGOS ABIERTOS de la 4.ª pasada (28/08/2026)
+// Afirman lo que DEBERÍA ocurrir y hoy fallan a propósito: `test.fail()` los da por
+// esperados. Cada uno lleva UNA sola aserción de fondo, para que no pueda pasar por
+// «esperado» fallando por otro sitio. El día que se reparen, se les quita la marca.
+// ===========================================================================
+
+// ---------------------------------------------------------------------------
+// HALLAZGO — en el móvil, guardar una medición deja el botón de modo oscuro fuera de la pantalla
+// ---------------------------------------------------------------------------
+// La tabla del registro mide 854 px de ancho intrínseco (nueve columnas con `white-space:
+// nowrap`, `min-width: 760px` y un campo de nota de 200 px mínimo). En un móvil eso estira el
+// VIEWPORT DE MAQUETACIÓN: con el registro vacío `window.innerWidth` vale 412 —lo mismo que
+// `documentElement.clientWidth`—, y en cuanto hay una fila pasa a 859 mientras la pantalla
+// sigue siendo de 412. La cabecera de `MeskeiaLogo` es `position: fixed; left: 0; right: 0`,
+// así que se maqueta contra ese viewport y se estira hasta 859: su botón de modo oscuro
+// —`justify-content: space-between`— se va a x = 806-844, fuera de la pantalla, y no hay forma
+// de llegar hasta él porque html y body llevan `overflow-x: hidden` (tras `scrollTo(9999, 0)`
+// el desplazamiento sigue siendo 0).
+// Medido el 28/08/2026 en Pixel 7 (412 px) y en iPhone 13 (390 px); en un escritorio estrecho
+// de 412 px SIN `isMobile` no ocurre (innerWidth = clientWidth = 412 y el botón queda en 397).
+// Que la causa es esta tabla se comprueba de dos maneras: ocultándola, `innerWidth` vuelve a
+// 412 en el acto; y borrando el registro y recargando, el botón vuelve a la pantalla.
+// El hit-test del navegador sí devuelve los botones de la app en su sitio, así que lo que se
+// pierde es la cabecera fija, no la herramienta.
+test.describe('HALLAZGO 4.ª pasada (móvil)', () => {
+  test.use(PIXEL_7);
+
+  test('con una medición guardada, el botón de modo oscuro debería seguir en la pantalla', async ({
+    page,
+  }) => {
+    test.fail();
+
+    await sembrarRegistro(page, [sesionDeJunio(12)]);
+    await page.goto(RUTA);
+    await page.waitForSelector('[class*="tablaRegistro"] tbody tr');
+
+    const medida = await page.evaluate(() => {
+      const t = document.querySelector('[class*="themeToggle"]')!.getBoundingClientRect();
+      return {
+        derecha: Math.round(t.right),
+        pantalla: document.documentElement.clientWidth,
+        maquetación: window.innerWidth,
+      };
+    });
+
+    expect(
+      medida.derecha,
+      `el viewport de maquetación se ha estirado a ${medida.maquetación} px sobre una pantalla de ${medida.pantalla} px`,
+    ).toBeLessThanOrEqual(medida.pantalla);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// HALLAZGO — la misma medición dura un segundo distinto en el parte y en el CSV
+// ---------------------------------------------------------------------------
+// La tabla (y con ella el parte impreso) usa `formatDuracion`, que TRUNCA: `Math.floor`. El
+// CSV usa `formatNumber(s.duracionSegundos, 0)`, que REDONDEA. Con 5,6 s el parte dice «5 s»
+// y el CSV «6». Son los dos documentos que la app ofrece como prueba de la misma medición, y
+// no dicen lo mismo: quien adjunte los dos a una reclamación tendrá que explicar por qué.
+// Visto también con una medición real (sonda del 28/08/2026: tabla «5 s», CSV «6»).
+test('la duración de una medición debería ser la misma en la tabla que en el CSV', async ({
+  page,
+}) => {
+  test.fail();
+
+  await sembrarRegistro(page, [{ ...sesionDeJunio(12), duracionSegundos: 5.6 }]);
+  await page.goto(RUTA);
+  await page.waitForSelector('[class*="tablaRegistro"] tbody tr');
+  const enLaTabla = (await filasRegistro(page).first().locator('td').nth(2).innerText()).trim();
+
+  const [descarga] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByRole('button', { name: /Descargar CSV/i }).click(),
+  ]);
+  const contenido = (await readFile((await descarga.path()) as string, 'utf8')).replace(/^﻿/, '');
+  const enElCsv = parsearCsv<string[]>(contenido, { delimiter: ';' }).data[1][2];
+
+  expect(enElCsv, `la tabla y el parte impreso dicen «${enLaTabla}»`).toBe('5');
+});
+
+// ---------------------------------------------------------------------------
+// HALLAZGO — dos de las tres tarjetas de estadísticas leen su emoji decorativo en voz alta
+// ---------------------------------------------------------------------------
+// En el mismo grupo de tres tarjetas, la del LAeq marca su icono con `aria-hidden="true"`
+// (page.tsx, línea 815) y las de mínimo y máximo no (líneas 799 y 808). Un lector de pantalla
+// anuncia entonces «flecha hacia abajo 41,0 Mínimo (dB(A))» en dos de ellas y «61,0 LAeq
+// (dB(A))» en la tercera. Los tres iconos son decorativos: el dato ya lo dice la etiqueta.
+test('el icono decorativo de la tarjeta «Mínimo» debería estar oculto al lector, como el del LAeq', async ({
+  page,
+}) => {
+  test.fail();
+  test.setTimeout(60000);
+
+  await micrófonoSintético(page, 1000, 0.05);
+  await page.goto(RUTA);
+  await page.getByRole('button', { name: /Iniciar medición/i }).click();
+  await page.waitForSelector('[class*="statCard"]');
+
+  await expect(
+    page.locator('[class*="statCard"]').first().locator('[class*="statIcon"]'),
+    'la tarjeta del LAeq sí lo oculta; estas dos, no',
+  ).toHaveAttribute('aria-hidden', 'true');
+});

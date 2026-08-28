@@ -1137,3 +1137,286 @@ test('REGRESIÓN — los tipos de ITP del JSON-LD coinciden con la tabla', async
   );
   expect(schemas).toContain(`escala hasta el ${pct(techoCataluna)} %`);
 });
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Inspector 28/08/2026 — RE-INSPECCIÓN DE CIERRE del commit d787b81b
+// ("el IVA que no existe en Canarias deja de sumarse al total en las cuatro apps
+// que faltaban"). Mitad A: que la reparación es correcta de verdad y no ha roto
+// el camino peninsular. Mitad B: tres caminos que no tenían caso.
+// ══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Inspector 28/08/2026 — cierre del IVA en territorios sin IVA', () => {
+  // ── MITAD A · el caso literal del commit ────────────────────────────────────
+  // La REGRESIÓN de arriba comprueba que ya no hay tarjeta de IVA, pero no llega a
+  // las cifras, que es donde vivía el daño: el IVA inventado se colaba en el total
+  // rotulado «Precio + todos los gastos». Aquí se anclan los importes exactos.
+  //
+  // Canarias · primera mano · vivienda · 200.000 € · gestoría 300 €:
+  //   Impuesto ..... TERRITORIOS_SIN_IVA.canarias → IGIC, sin cifra (allí no rige el IVA)
+  //   AJD .......... 200.000 × 0,75 % = 1.500 (ITP_CCAA.canarias.ajd = 0,75; Canarias NO
+  //                  está en CIUDADES_CON_BONIFICACION, así que el efectivo es el nominal)
+  //   Notaría ...... arancel RD 1426/1989 = 90,15 + 24.040,49×0,45 % + 30.050,60×0,15 %
+  //                  + 90.151,82×0,10 % + 49.746,97×0,05 % = 358,43341 ; ×1,21 de IVA
+  //                  = 433,70443 ; ×1,75 (punto medio de FACTURA_NOTARIAL) = 758,98275
+  //   Registro ..... arancel RD 1427/1989 = 24,04 + 24.040,49×0,175 % + 30.050,60×0,125 %
+  //                  + 90.151,82×0,075 % + 49.746,97×0,030 % = 186,21206 ; + 6,010121 de
+  //                  presentación + 3,005061 de nota simple = 195,22725 ; ×1,21 = 236,22497
+  //   Total gastos . 0 + 1.500 + 758,98275 + 236,22497 + 300 = 2.795,20771 → 1,40 % del precio
+  //   Coste total .. 200.000 + 2.795,20771 = 202.795,20771
+  // Antes de d787b81b ese total era 222.795,21 € (20.000 € de IVA inexistente dentro).
+  test('CIERRE A — Canarias, primera mano: el total ya NO lleva el IVA inventado', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Primera mano/ }).click();
+    await page.locator('#ccaa-inmueble').selectOption('canarias');
+    await rellenar(page, 'Precio de la vivienda', '200000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
+
+    await expect(page.locator('h3', { hasText: /^IVA/ })).toHaveCount(0);
+    expect(await valorTarjeta(page, /^IGIC/)).toBe('No calculado');
+    expect(await valorTarjeta(page, /^AJD/)).toBe('1500,00 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('758,98 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('236,22 €');
+
+    await expect(page.locator('h3', { hasText: /Total gastos adicionales/ }).first()).toHaveText('Total gastos adicionales (parcial)');
+    expect(await valorTarjeta(page, /Total gastos adicionales/)).toBe('2795,21 €');
+    expect(await descripcionTarjeta(page, /Total gastos adicionales/)).toContain(
+      'SIN el IGIC, que no está incluido',
+    );
+    await expect(page.locator('h3', { hasText: /COSTE TOTAL/ }).first()).toHaveText('COSTE TOTAL (PARCIAL)');
+    expect(await valorTarjeta(page, /COSTE TOTAL/)).toBe('202.795,21 €');
+
+    // El aviso del IVA del 4 % de VPO no puede salir donde no hay IVA que rebajar
+    await expect(page.getByText(/protección oficial de régimen especial/)).toHaveCount(0);
+  });
+
+  // ── MITAD A · control de NO regresión ───────────────────────────────────────
+  // La misma operación en la península tiene que seguir dando exactamente lo de antes:
+  //   IVA .......... 200.000 × 10 % (IVA_INMUEBLES_2025.obraNueva) = 20.000
+  //   AJD .......... 200.000 × 0,75 % (ITP_CCAA.madrid.ajd) = 1.500
+  //   Total gastos . 20.000 + 1.500 + 758,98275 + 236,22497 + 300 = 22.795,20771 → 11,40 %
+  //   Coste total .. 222.795,20771
+  //   Aviso VPO .... 200.000 × 4 % (IVA_INMUEBLES_2025.viviendaProtegida) = 8.000
+  test('CIERRE A (control) — Madrid, primera mano: el camino peninsular no se ha tocado', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Primera mano/ }).click();
+    await page.locator('#ccaa-inmueble').selectOption('madrid');
+    await rellenar(page, 'Precio de la vivienda', '200000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
+
+    await expect(page.locator('h3', { hasText: /^IVA/ }).first()).toHaveText('IVA (10,00%)');
+    expect(await valorTarjeta(page, /^IVA/)).toBe('20.000,00 €');
+    expect(await valorTarjeta(page, /^AJD/)).toBe('1500,00 €');
+    await expect(page.locator('h3', { hasText: /Total gastos adicionales/ }).first()).toHaveText('Total gastos adicionales');
+    expect(await valorTarjeta(page, /Total gastos adicionales/)).toBe('22.795,21 €');
+    await expect(page.locator('h3', { hasText: /COSTE TOTAL/ }).first()).toHaveText('COSTE TOTAL DE ADQUISICIÓN');
+    expect(await valorTarjeta(page, /COSTE TOTAL/)).toBe('222.795,21 €');
+    await expect(page.getByText(/protección oficial de régimen especial/).first()).toBeVisible();
+    await expect(page.getByText(/serían.*8000,00/).first()).toBeVisible();
+  });
+
+  // ── MITAD B · CASO 18 ───────────────────────────────────────────────────────
+  // El cierre solo se probó con vivienda en Canarias. Aquí se cruza el territorio sin
+  // IVA con las DOS ramas que el arreglo atraviesa y que no tenían caso: un inmueble NO
+  // residencial (el que iba al 21 %, no al 10 %) y la ciudad donde además se bonifica el
+  // AJD al 50 % (art. 57 bis TRLITPAJD, aplicado por `aplicarBonificacionCiudad`).
+  //
+  // Ceuta · primera mano · local comercial · 400.000 € · gestoría 300 €:
+  //   Impuesto ..... TERRITORIOS_SIN_IVA.ceuta → IPSI, sin cifra (antes: 21 % = 84.000 €)
+  //   AJD .......... 400.000 × 0,5 % = 2.000 ; × (1 − 0,5) de bonificación = 1.000
+  //                  → tipo EFECTIVO 1.000 / 400.000 = 0,25 %
+  //   Notaría ...... arancel = 90,15 + 108,182205 + 45,0759 + 90,15182 + 249.746,97×0,05 %
+  //                  (=124,873485) = 458,43341 ; ×1,21 = 554,70443 ; ×1,75 = 970,73275
+  //   Registro ..... 24,04 + 42,0708575 + 37,56325 + 67,613865 + 249.746,97×0,030 %
+  //                  (=74,924091) = 246,21206 ; + 9,015182 = 255,22725 ; ×1,21 = 308,82497
+  //   Total gastos . 0 + 1.000 + 970,73275 + 308,82497 + 300 = 2.579,55771 → 0,64 % del precio
+  //   Coste total .. 402.579,55771
+  test('CASO 18 (límite: territorio sin IVA + inmueble no residencial) — Ceuta, primera mano, local de 400.000 €', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Local comercial/ }).click();
+    await page.getByRole('button', { name: /Primera mano/ }).click();
+    await page.locator('#ccaa-inmueble').selectOption('ceuta');
+    await rellenar(page, 'Precio del inmueble', '400000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
+
+    await expect(page.locator('h3', { hasText: /^IVA/ })).toHaveCount(0);
+    expect(await valorTarjeta(page, /^IPSI/)).toBe('No calculado');
+    await expect(page.locator('h3', { hasText: /^AJD/ }).first()).toHaveText('AJD (0,25%)');
+    expect(await valorTarjeta(page, /^AJD/)).toBe('1000,00 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('970,73 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('308,82 €');
+    expect(await valorTarjeta(page, /Total gastos adicionales/)).toBe('2579,56 €');
+    expect(await descripcionTarjeta(page, /Total gastos adicionales/)).toContain(
+      'SIN el IPSI, que no está incluido',
+    );
+    expect(await valorTarjeta(page, /COSTE TOTAL/)).toBe('402.579,56 €');
+    // Un local no es vivienda: el aviso del IVA del 4 % de VPO no le corresponde
+    await expect(page.getByText(/protección oficial de régimen especial/)).toHaveCount(0);
+  });
+
+  // ── MITAD B · CASO 19 ───────────────────────────────────────────────────────
+  // Dos caminos de `calcularPlusvaliaMunicipal` que ningún caso anterior recorría: que
+  // gane el MÉTODO REAL (en el CASO 15 y en el 3 siempre ganaba el objetivo o había
+  // exención) y el TOPE de 20 años de `aniosCapped` (COEFICIENTES_IIVTNU_2025 se acaba
+  // en «20 o más años», coeficiente 0,45).
+  //
+  // Venta 260.000 · compra 250.000 · 25 años · suelo 80.000 · total 200.000 · comisión 3 %:
+  //   objetivo ..... 80.000 × 0,45 (coef. de 20 años, por el tope) × 25 %
+  //                  (PLUSVALIA_MUNICIPAL_META.tipoOrientativo) = 9.000
+  //   real ......... (260.000 − 250.000) × (80.000/200.000 = 0,4) × 25 % = 1.000
+  //   recomendado .. min(9.000, 1.000) = 1.000 → «Método real (más favorable)»
+  //   comisión ..... 260.000 × 3 % = 7.800
+  //   v. transmis. . 260.000 − 7.800 − 1.000 = 251.200 (art. 35.1 LIRPF)
+  //   v. adquisic. . 250.000 (sin gastos de compra ni mejoras declarados)
+  //   ganancia ..... 1.200 → primer tramo del ahorro
+  //   IRPF ......... 1.200 × 19 % = 228
+  //   total gastos . 1.000 + 7.800 + 0 + 228 = 9.028
+  //   neto ......... 260.000 − 9.028 = 250.972
+  test('CASO 19 (límite: tope de 20 años) — la plusvalía sale por el método real y el coeficiente se topa', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio de la vivienda', '260000');
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await rellenar(page, 'Precio de compra original', '250000');
+    await rellenar(page, 'Años de propiedad', '25');
+    await rellenar(page, 'Valor catastral del suelo', '80000');
+    await rellenar(page, 'Valor catastral total (suelo + construcción)', '200000');
+    await rellenar(page, 'Comisión inmobiliaria (%)', '3');
+
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1000,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe('Método real (más favorable)');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('250.000,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('251.200,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('1200,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('228,00 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('9028,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('250.972,00 €');
+  });
+
+  // ── MITAD B · CASO 20 (control) ─────────────────────────────────────────────
+  // La misma pantalla con los dos campos del vendedor en su valor legítimo. Sujeta el
+  // montaje de los dos test.fail() de abajo: si esto se pone rojo, lo que falla es el
+  // caso, no el hallazgo.
+  //   plusvalía .... objetivo 50.000 × 0,10 (8 años) × 25 % = 1.250 ; real
+  //                  70.000 × (50.000/120.000) × 25 % = 7.291,67 → gana el objetivo
+  //   comisión ..... 250.000 × 3 % = 7.500
+  //   v. transmis. . 250.000 − 7.500 − 1.250 = 241.250
+  //   ganancia ..... 241.250 − 180.000 = 61.250
+  //   IRPF ......... 6.000×19 % + 44.000×21 % + 11.250×23 % = 1.140 + 9.240 + 2.587,50
+  //                  = 12.967,50
+  //   total gastos . 1.250 + 7.500 + 0 + 12.967,50 = 21.717,50
+  //   neto ......... 250.000 − 21.717,50 = 228.282,50
+  test('CASO 20 (control) — vendedor con comisión del 3 % y sin otros gastos', async ({ page }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio de la vivienda', '250000');
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await rellenar(page, 'Precio de compra original', '180000');
+    await rellenar(page, 'Años de propiedad', '8');
+    await rellenar(page, 'Valor catastral del suelo', '50000');
+    await rellenar(page, 'Valor catastral total (suelo + construcción)', '120000');
+    await rellenar(page, 'Comisión inmobiliaria (%)', '3');
+
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1250,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('241.250,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('61.250,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('12.967,50 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('21.717,50 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('228.282,50 €');
+  });
+});
+
+// ❌ ABIERTO 28/08/2026 — cálculo (MEDIO). Inspector, re-inspección de cierre.
+// El commit d787b81b acotó con `Math.max(0, …)` DENTRO del useMemo la gestoría del
+// comprador, con esta razón escrita al lado: «se acota aquí y no solo en el blur del
+// NumberInput: mientras el campo tiene el foco, un importe negativo se sumaba al total y
+// su tarjeta ni se pintaba (guard > 0)». Las dos partidas gemelas de la pestaña Vendedor
+// —«Otros gastos de la venta» y «Comisión inmobiliaria (%)»— siguen entrando por
+// `parseSpanishNumberOr` sin acotar, y reproducen el defecto entero: mientras el campo
+// tiene el foco (que es cuando se teclea) el importe negativo NO pinta tarjeta —los dos
+// render llevan el mismo guard `> 0`— y en cambio SÍ entra en `totalGastos`, restando en
+// vez de sumar, de modo que el «IMPORTE NETO VENDEDOR» sube. Es reparar donde se encontró
+// el fallo y no donde vive, que es justo lo que el acta de ese commit denunciaba.
+// Caso (sobre el montaje del CASO 20, cuyo neto correcto es 228.282,50 €):
+//   «Otros gastos de la venta» = −2.000, campo aún enfocado
+//   → esperado, acotado a 0: valor de transmisión 241.250,00 €, ganancia 61.250,00 €,
+//     IRPF 12.967,50 €, total gastos 21.717,50 € y neto 228.282,50 €
+//   → obtenido: valor de transmisión 243.250,00 €, ganancia 63.250,00 €, IRPF 13.427,50 €,
+//     total gastos 20.177,50 € y neto 229.822,50 € — 1.540 € de más, y ninguna tarjeta que
+//     explique de dónde salen. Al salir del campo el NumberInput lo devuelve a «0» y el
+//     neto vuelve a 228.282,50 €, así que el importe erróneo solo se ve mientras se teclea.
+test.fail(
+  'ABIERTO — un importe negativo en «Otros gastos de la venta» no puede subir el neto',
+  async ({ page }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio de la vivienda', '250000');
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await rellenar(page, 'Precio de compra original', '180000');
+    await rellenar(page, 'Años de propiedad', '8');
+    await rellenar(page, 'Valor catastral del suelo', '50000');
+    await rellenar(page, 'Valor catastral total (suelo + construcción)', '120000');
+    await rellenar(page, 'Comisión inmobiliaria (%)', '3');
+    // SIN blur: así es como está el campo mientras el usuario teclea
+    await page.locator('input[aria-label="Otros gastos de la venta (opcional)"]').fill('-2000');
+
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('228.282,50 €');
+  },
+);
+
+// ❌ ABIERTO 28/08/2026 — cálculo (MEDIO). La misma falta de acotación, en el otro campo.
+// Caso (mismo montaje del CASO 20, con la comisión a −3 % y el campo aún enfocado):
+//   → esperado, acotado a 0 %: comisión 0 €, valor de transmisión 248.750,00 €, ganancia
+//     68.750,00 €, IRPF 14.692,50 €, total gastos 15.942,50 € y neto 234.057,50 €
+//   → obtenido: sin tarjeta de comisión, valor de transmisión 248.750,00 € (el motor sí
+//     acota con `positivo()`), ganancia 68.750,00 € e IRPF 14.692,50 € correctos, pero
+//     total gastos 8.442,50 € y neto 241.557,50 € — 7.500 € de más, porque el −7.500 €
+//     de comisión se resta del total de gastos del vendedor.
+test.fail(
+  'ABIERTO — una comisión negativa no puede restar del total de gastos del vendedor',
+  async ({ page }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio de la vivienda', '250000');
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await rellenar(page, 'Precio de compra original', '180000');
+    await rellenar(page, 'Años de propiedad', '8');
+    await rellenar(page, 'Valor catastral del suelo', '50000');
+    await rellenar(page, 'Valor catastral total (suelo + construcción)', '120000');
+    // SIN blur, igual que arriba
+    await page.locator('input[aria-label="Comisión inmobiliaria (%)"]').fill('-3');
+
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('234.057,50 €');
+  },
+);
+
+// ❌ ABIERTO 28/08/2026 — dato (MEDIO). Inspector, re-inspección de cierre.
+// El propio commit d787b81b creó `ESCALA_RECARGO_EXTEMPORANEO` en
+// `lib/calculadoras/recargoPresentacionTardia.ts` con esta razón escrita al lado: «los
+// hallazgos 436 y 454 encontraron "recargos del 5% al 20%" en el bloque educativo de dos
+// apps del clúster: la escala ANTERIOR a la Ley 11/2021». La constante se aplicó en garaje
+// y en trastero, y esta app —el hub del clúster, reparada en ese mismo commit— sigue
+// publicando la escala vieja en DOS sitios de su bloque educativo (paso 5 de la guía y
+// último punto del recuadro de errores comunes). Es otra vez «se repara donde se encontró
+// el fallo, no donde vive».
+// La escala vigente del art. 27.2 LGT (redacción de la Ley 11/2021) es el 1 % por cada mes
+// completo de retraso hasta los 12 meses y el 15 % más intereses de demora a partir de ahí,
+// con reducción del 25 % si el recargo se paga en voluntario (art. 27.5 LGT).
+// Caso: abrir «Ver guía educativa» → el paso 5 dice «recargos del 5% al 20% e intereses de
+//       demora» y el recuadro de errores comunes «recargos automáticos del 5% al 20%»
+//       · esperado 0 apariciones de esa escala y, en su lugar, la que ya componen garaje y
+//       trastero desde ESCALA_RECARGO_EXTEMPORANEO · obtenido 2 apariciones. Sobre un ITP
+//       de 1.500 € liquidado con un mes de retraso, el texto hace temer 75 € donde el art.
+//       27.2 LGT cobra 15 €.
+test.fail(
+  'ABIERTO — el bloque educativo publica la escala de recargos anterior a la Ley 11/2021',
+  async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+
+    await expect(page.getByText(/5% al 20%/)).toHaveCount(0);
+  },
+);

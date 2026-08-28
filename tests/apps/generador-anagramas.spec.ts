@@ -715,4 +715,329 @@ test.describe('generador-anagramas', () => {
       }
     );
   });
+
+  // ---------------------------------------------------------------------------------------
+  // CUARTA PASADA — 28/08/2026 · RE-INSPECCIÓN DE CIERRE
+  //
+  // Cierra las fichas blancas estrenadas en fc27e76b y los tres hallazgos reparados en
+  // 0b1630d9 (sus regresiones son los tres tests «REGRESIÓN ·» de la tercera pasada, que se
+  // re-ejecutaron en verde), y abre casos nuevos. TODO se resolvió ANTES de abrir el
+  // navegador con un oráculo propio en Node —normalización por NFD protegiendo la Ñ y reparto
+  // de multiconjuntos— escrito contra public/data/diccionario-es.txt sin importar nada de la
+  // app:
+  //
+  //   modo letras   casa 9 · casa? 176 · casa?? 1.244 · casa??? 1.244 (la 3ª blanca se ignora)
+  //                 aaaa 0 · ñ? 3 (ña, ño, ñu, con la blanca en la 2ª letra) · jot (3..3) 0
+  //   modo frase    «el niño» (3 pal., mín. 2) → 10 repartos · «el nino» → 20, y son OTROS
+  //                 «señor» (3 pal., mín. 3) → 0 con 11 candidatas · (2 pal., mín. 2) → 3
+  //                 «la cañita» (3 pal., mín. 3) → 19 · «roma amor» (3 pal., mín. 3) → 36
+  //   verificador   pingüino = pinguino · cañón ≠ canon (Ñ vs N) · «la niñera» = «reñían la»
+  //
+  // Cero divergencias con la app en los 1.244 + 176 + 9 + 36 + 19 + 10 resultados comparados,
+  // lista completa y posición de cada resaltado incluidas.
+  // ---------------------------------------------------------------------------------------
+  test.describe('cierre de fichas blancas y casos nuevos · 28/08/2026', () => {
+    /** Como `firma`, pero SIN ordenar: la forma normalizada de la palabra. */
+    const sinTildes = (texto: string): string =>
+      texto
+        .toLowerCase()
+        .replace(/[áàâä]/g, 'a').replace(/[éèêë]/g, 'e').replace(/[íìîï]/g, 'i')
+        .replace(/[óòôö]/g, 'o').replace(/[úùûü]/g, 'u')
+        .replace(/[^a-zñ]/g, '');
+
+    /** Cada reparto del modo frase como «palabra palabra», en el orden en que se pinta. */
+    const repartos = (page: Page) =>
+      page.locator('[class*="solucionCard"]').evaluateAll((nodos) =>
+        nodos.map((n) => Array.from(n.querySelectorAll('span')).map((s) => s.textContent).join(' '))
+      );
+
+    /** Cada chip con la letra que pone la blanca entre corchetes, EN SU POSICIÓN. */
+    const chipsMarcados = (page: Page) =>
+      page.locator('[class*="wordChip"]').evaluateAll((nodos) =>
+        nodos.map((n) =>
+          Array.from(n.childNodes)
+            .map((h) => (h.nodeType === 1 ? `[${h.textContent}]` : h.textContent))
+            .join('')
+        )
+      );
+
+    const buscarFrase = async (page: Page) => {
+      await page.getByRole('button', { name: /Buscar anagramas perfectos/ }).click();
+      await page.waitForFunction(() => {
+        const boton = [...document.querySelectorAll('button')].find((b) =>
+          /anagramas perfectos/i.test(b.textContent ?? '')
+        );
+        return !!boton && !/Repartiendo/.test(boton.textContent ?? '');
+      });
+    };
+
+    // -------------------------------------------------------------------------------------
+    // CIERRE · las fichas blancas, comprobadas RESULTADO A RESULTADO
+    //
+    // El spec de comodines y la tercera pasada comprueban los TOTALES (176, 1.244) y unas
+    // cuantas palabras sueltas. Lo que faltaba era la comprobación exhaustiva: que ninguna de
+    // las 1.244 esté inventada, que todas quepan en «casa» más dos blancas y que el resaltado
+    // caiga en la letra que de verdad pone la blanca. Se rehace contra el fichero real, sin
+    // listas escritas a mano que puedan envejecer.
+    // -------------------------------------------------------------------------------------
+    test('CIERRE · las 1.244 de «casa??» son del lemario, caben en el atril y marcan bien la blanca', async ({
+      page,
+    }) => {
+      const { readFileSync, existsSync } = await import('node:fs');
+      const RUTA_LEMARIO = 'public/data/diccionario-es.txt';
+      expect(existsSync(RUTA_LEMARIO), `no se encuentra ${RUTA_LEMARIO} desde ${process.cwd()}`)
+        .toBe(true);
+      const lemario = new Set(
+        readFileSync(RUTA_LEMARIO, 'utf8').split('\n').filter(Boolean).map(sinTildes)
+      );
+      // Si el fichero se leyera a medias, todo lo de abajo pasaría en falso.
+      expect(lemario.size).toBeGreaterThan(80000);
+
+      await abrirConDiccionario(page);
+      await page.fill('#anagram-letters', 'casa??');
+      await page.getByRole('button', { name: 'Buscar palabras' }).click();
+      await expect(page.locator('[class*="resultsHeader"] h3')).toHaveText(
+        'Palabras encontradas: 1244'
+      );
+
+      const planas = await page.locator('[class*="wordChip"]').allTextContents();
+      const marcados = await chipsMarcados(page);
+      expect(planas).toHaveLength(1244);
+
+      /** Reparto voraz independiente: qué posiciones tendría que cubrir la blanca, o null. */
+      const posicionesEsperadas = (palabra: string, atril: string): number[] | null => {
+        const quedan: Record<string, number> = {};
+        for (const letra of sinTildes(atril)) quedan[letra] = (quedan[letra] ?? 0) + 1;
+        const normalizada = sinTildes(palabra);
+        const posiciones: number[] = [];
+        for (let i = 0; i < normalizada.length; i++) {
+          if (quedan[normalizada[i]]) { quedan[normalizada[i]]--; continue; }
+          posiciones.push(i);
+          if (posiciones.length > 2) return null; // ni con las dos blancas
+        }
+        return posiciones;
+      };
+
+      const inventadas: string[] = [];
+      const noCaben: string[] = [];
+      const malMarcadas: string[] = [];
+      planas.forEach((palabra, i) => {
+        if (!lemario.has(sinTildes(palabra))) inventadas.push(palabra);
+        const posiciones = posicionesEsperadas(palabra, 'casa');
+        if (posiciones === null) { noCaben.push(palabra); return; }
+        // Se rehace el chip esperado: la letra de la blanca entre corchetes, en su sitio
+        const marcadas = new Set(posiciones);
+        let indice = -1;
+        let esperado = '';
+        for (const caracter of palabra) {
+          const cuenta = sinTildes(caracter).length === 1;
+          if (cuenta) indice++;
+          esperado += cuenta && marcadas.has(indice) ? `[${caracter}]` : caracter;
+        }
+        if (marcados[i] !== esperado) malMarcadas.push(`${marcados[i]} ≠ ${esperado}`);
+      });
+
+      expect(inventadas, 'palabras que no están en el lemario').toEqual([]);
+      expect(noCaben, 'palabras que no caben en «casa» ni con las dos blancas').toEqual([]);
+      expect(malMarcadas, 'resaltados que no apuntan a la letra que pone la blanca').toEqual([]);
+    });
+
+    // -------------------------------------------------------------------------------------
+    // CASO NUEVO 1 · LA Ñ EN EL REPARTO DE UNA FRASE
+    // El reparto de multiconjuntos es donde una Ñ mal tratada pasaría desapercibida: si se
+    // plegara a la N, «el niño» daría los repartos de «el nino», que son OTROS y son 20.
+    // Oráculo (máximo 3 palabras, mínimo 2 letras): 10 repartos, en este orden.
+    // -------------------------------------------------------------------------------------
+    test('NUEVO · «el niño» da los 10 repartos exactos y la Ñ no se confunde con la N', async ({
+      page,
+    }) => {
+      await abrirConDiccionario(page);
+      await pestana(page, /Anagrama perfecto/).click();
+      await page.selectOption('#anagram-max-palabras', '3');
+      await page.selectOption('#anagram-min-longitud', '2');
+      await page.fill('#anagram-frase', 'el niño');
+      await expect(page.locator('[class*="contadorLetras"]').first()).toHaveText(
+        /^6 letras a repartir/
+      );
+      await buscarFrase(page);
+
+      await expect(page.getByRole('heading', { name: /Anagramas perfectos/ })).toHaveText(
+        'Anagramas perfectos encontrados: 10'
+      );
+      const conEnne = await repartos(page);
+      expect(conEnne).toEqual([
+        'en liño', 'in leño', 'le niño', 'leño ni', 'liño ne', 'niel ño',
+        'el in ño', 'el ni ño', 'in le ño', 'le ni ño',
+      ]);
+      // La verdad comprobable del modo: cada reparto conserva el multiconjunto ENTERO, ñ incluida
+      for (const reparto of conEnne) {
+        expect(firma(reparto), `«${reparto}» no usa las mismas letras`).toBe(firma('el niño'));
+      }
+      // Y el texto de partida no se devuelve como anagrama de sí mismo
+      expect(conEnne).not.toContain('el niño');
+
+      // Contraprueba: sin la virgulilla el reparto es otro, y son 20
+      await page.fill('#anagram-frase', 'el nino');
+      await buscarFrase(page);
+      await expect(page.getByRole('heading', { name: /Anagramas perfectos/ })).toHaveText(
+        'Anagramas perfectos encontrados: 20'
+      );
+      expect(await repartos(page)).not.toContain('le niño');
+    });
+
+    // -------------------------------------------------------------------------------------
+    // CASO NUEVO 2 · LÍMITE: una entrada SIN ningún reparto posible
+    // «señor» con las condiciones por defecto (3 palabras, mínimo 3 letras) no admite
+    // ninguno. El oráculo cuenta 11 palabras del lemario que caben en {s,e,ñ,o,r} con tres
+    // letras o más, y ninguna combinación de ellas consume las cinco: la cifra que la app
+    // pone en el aviso es comprobable, no un adorno.
+    // -------------------------------------------------------------------------------------
+    test('NUEVO · LÍMITE · «señor» no admite reparto con 3 letras mínimas, y el aviso cuenta bien', async ({
+      page,
+    }) => {
+      await abrirConDiccionario(page);
+      await pestana(page, /Anagrama perfecto/).click();
+      await expect(page.locator('#anagram-max-palabras')).toHaveValue('3');
+      await expect(page.locator('#anagram-min-longitud')).toHaveValue('3');
+      await page.fill('#anagram-frase', 'señor');
+      await buscarFrase(page);
+
+      await expect(page.locator('[class*="solucionCard"]')).toHaveCount(0);
+      await expect(page.locator('[class*="noResults"]')).toContainText(
+        'Había 11 palabras que caben en tus letras'
+      );
+      // Y el consejo que da el aviso —bajar la longitud mínima— funciona: con palabras de dos
+      // letras aparecen los tres repartos del oráculo, los tres apoyados en la Ñ.
+      await page.selectOption('#anagram-min-longitud', '2');
+      await page.selectOption('#anagram-max-palabras', '2');
+      await buscarFrase(page);
+      expect(await repartos(page)).toEqual(['res ño', 'se ñor', 'ser ño']);
+    });
+
+    // -------------------------------------------------------------------------------------
+    // CASO NUEVO 3 · UN REPARTO PUEDE REPETIR PALABRA
+    // «roma amor» son ocho letras y da 36 repartos, cinco de ellos con la MISMA palabra dos
+    // veces («amor amor», «maro maro», «mora mora», «ramo ramo», «roma roma»). Es el caso que
+    // rompería una tarjeta que deduplicara por palabra: media tarjeta sería un anagrama de
+    // cuatro letras presentado como de ocho.
+    // -------------------------------------------------------------------------------------
+    test('NUEVO · «roma amor» da 36 repartos y los que repiten palabra se pintan enteros', async ({
+      page,
+    }) => {
+      await abrirConDiccionario(page);
+      await pestana(page, /Anagrama perfecto/).click();
+      await page.selectOption('#anagram-max-palabras', '3');
+      await page.selectOption('#anagram-min-longitud', '3');
+      await page.fill('#anagram-frase', 'roma amor');
+      await buscarFrase(page);
+
+      await expect(page.getByRole('heading', { name: /Anagramas perfectos/ })).toHaveText(
+        'Anagramas perfectos encontrados: 36'
+      );
+      const lista = await repartos(page);
+      expect(lista).toHaveLength(36);
+      // Los cinco que repiten palabra, tal y como los da el oráculo
+      expect(lista.filter((r) => new Set(r.split(' ')).size !== r.split(' ').length)).toEqual([
+        'amor amor', 'maro maro', 'mora mora', 'ramo ramo', 'roma roma',
+      ]);
+      // La tarjeta pinta DOS palabras, no una: las ocho letras de la entrada
+      await expect(
+        page.locator('[class*="solucionCard"]').filter({ hasText: /^amor\s*amor$/i }).locator('span')
+      ).toHaveCount(2);
+      // Y los 36 conservan el multiconjunto completo
+      for (const reparto of lista) {
+        expect(firma(reparto), `«${reparto}» no usa las mismas letras`).toBe(firma('roma amor'));
+      }
+      // El propio texto de partida, que también es reparto suyo, no se devuelve
+      expect(lista).not.toContain('amor roma');
+    });
+
+    // -------------------------------------------------------------------------------------
+    // CASO NUEVO 4 · LÍMITES DEL ATRIL Y ENTRADA QUE HAY QUE RECHAZAR
+    //   «aaaa»  todas las letras iguales → el lemario no tiene ninguna palabra de solo aes
+    //   «ñ?»    una sola letra propia del español más una blanca → ña, ño, ñu y nada más
+    //   «12345» ni una letra: no hay nada que buscar y el botón no debe dejar intentarlo
+    // -------------------------------------------------------------------------------------
+    test('NUEVO · LÍMITE · «aaaa», «ñ?» y un atril sin ninguna letra', async ({ page }) => {
+      await abrirConDiccionario(page);
+
+      await page.fill('#anagram-letters', 'aaaa');
+      await page.getByRole('button', { name: 'Buscar palabras' }).click();
+      await expect(page.locator('[class*="noResults"]')).toContainText(
+        'No se encontraron palabras con esas letras'
+      );
+      await expect(page.locator('[class*="wordChip"]')).toHaveCount(0);
+
+      // La blanca puede poner cualquier letra, pero la Ñ del atril sigue siendo una Ñ: las
+      // únicas palabras de dos letras que empiezan por ñ en el lemario son ña, ño y ñu.
+      await page.fill('#anagram-letters', 'ñ?');
+      await page.getByRole('button', { name: 'Buscar palabras' }).click();
+      await expect(page.locator('[class*="groupTitle"]')).toHaveText(['2 letras (3)']);
+      expect(await chipsMarcados(page)).toEqual(['ñ[a]', 'ñ[o]', 'ñ[u]']);
+
+      // Cifras y signos no son letras: el contador lo dice y el botón queda inerte
+      await page.fill('#anagram-letters', '12345');
+      await expect(page.locator('#anagram-atril')).toHaveText('0 letras');
+      await expect(page.getByRole('button', { name: 'Buscar palabras' })).toBeDisabled();
+    });
+
+    // -------------------------------------------------------------------------------------
+    // HALLAZGOS ABIERTOS DE ESTA PASADA — cada uno con UNA sola aserción de fondo
+    // -------------------------------------------------------------------------------------
+
+    test.fail(
+      'HALLAZGO · modo frase: editar la frase deja en pantalla los repartos de la anterior',
+      async ({ page }) => {
+        await abrirConDiccionario(page);
+        await pestana(page, /Anagrama perfecto/).click();
+        await page.fill('#anagram-frase', 'roma');
+        await page.getByRole('button', { name: /Buscar anagramas perfectos/ }).click();
+        await page.getByRole('heading', { name: 'Anagramas perfectos encontrados: 4' }).waitFor();
+
+        // Se cambia la frase por otra que no comparte NINGUNA letra con la anterior.
+        await page.fill('#anagram-frase', 'casa');
+
+        // El modo letras invalida sus resultados al editar el campo desde la reparación de los
+        // hallazgos 194 y 195; el modo frase no lo hace, y aquí es peor: en pantalla quedan
+        // «amor, maro, mora, ramo» bajo el título «Anagramas perfectos encontrados: 4», que
+        // ahora afirma que son los anagramas perfectos de «casa». Ninguno lo es.
+        await expect(page.locator('[class*="solucionCard"]')).toHaveCount(0);
+      }
+    );
+
+    test.fail(
+      'HALLAZGO · modo letras: cambiar la longitud mínima no invalida los resultados pintados',
+      async ({ page }) => {
+        await abrirConDiccionario(page);
+        await page.fill('#anagram-letters', 'amor');
+        await page.getByRole('button', { name: 'Buscar palabras' }).click();
+        await page.getByRole('heading', { name: 'Palabras encontradas: 16' }).waitFor();
+
+        await page.selectOption('#anagram-min', '4');
+
+        // El campo «Debe contener», que está en la misma fila de filtros, SÍ borra los
+        // resultados al tocarlo; los dos selectores de longitud no. Con «Longitud mínima: 4»
+        // en pantalla siguen los grupos «3 letras (7)» y «2 letras (4)».
+        await expect(page.locator('[class*="groupTitle"]', { hasText: '2 letras' })).toHaveCount(0);
+      }
+    );
+
+    test.fail(
+      'HALLAZGO · la tarjeta de consejos da por válidas palabras que su propio lemario no tiene',
+      async ({ page }) => {
+        await page.goto(RUTA);
+        await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+        const tarjeta = page.locator('[class*="eduTipCard"]', {
+          hasText: 'Amplía tu vocabulario pasivo',
+        });
+
+        // «Lista de palabras raras válidas: OHM, JOT, ZAG, QAT». De las cuatro, el lemario que
+        // la propia app declara como su diccionario solo tiene OHM: con el atril «jot» y
+        // longitud 3..3 la app responde «No se encontraron palabras con esas letras». JOT, ZAG
+        // y QAT son entradas del léxico Collins de Scrabble en INGLÉS, no del español.
+        await expect(tarjeta).not.toContainText(/JOT|ZAG|QAT/);
+      }
+    );
+  });
+
 });

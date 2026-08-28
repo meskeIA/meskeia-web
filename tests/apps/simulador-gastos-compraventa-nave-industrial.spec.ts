@@ -784,3 +784,330 @@ test.describe('Regresión — hallazgos del 27/08/2026, reparados', () => {
     expect(await descripcionTarjeta(page, 'IGIC')).not.toContain('la obra nueva');
   });
 });
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN DE CIERRE — 28/08/2026
+//
+// MITAD A (cierre): se reproduce con su caso literal la reparación del commit d787b81b
+//   —el IVA que no existe en Canarias y el rótulo EFECTIVO del AJD, que es la reparación
+//   de referencia de la que carecían sus hermanas— y, sobre todo, se comprueba que NO se
+//   pasó de largo: en SEGUNDA mano el ITP se sigue cobrando en Canarias.
+// MITAD B (casos nuevos): tres casos frescos, resueltos a mano ANTES de ejecutar la app,
+//   con el desarrollo entero junto a cada aserción. Ninguna cifra sale de memoria: los
+//   tipos vienen de `TIPOS_ITP_CCAA_2025`/`ITP_CCAA` y los aranceles de `ARANCELES_NOTARIO`
+//   y `ARANCELES_REGISTRO` (RD 1426/1989 y RD 1427/1989).
+// ═══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Cierre y casos nuevos — 28/08/2026', () => {
+  /**
+   * MITAD A — la reparación del IVA de Canarias no se llevó por delante el ITP.
+   *
+   * Lo que se apagó en `c47189ca`/`d787b81b` es el IVA de una PRIMERA entrega en un
+   * territorio donde ese impuesto no existe. El ITP no tiene nada que ver: es un tributo
+   * cedido que Canarias sí exige, con su tipo general del 6,5 % (`TIPOS_ITP_CCAA_2025`),
+   * así que una nave usada en Las Palmas tiene que seguir liquidándolo.
+   *
+   * Canarias · segunda mano · 500.000 € · gestoría 500 € (a mano):
+   *   ITP  = 500.000 × 6,5 %                                    = 32.500,00
+   *   AJD  = 0 (no hay cuota gradual en la compraventa sin IVA)
+   *   Notaría: arancel = 90,15 + 108,182205 + 45,0759 + 90,15182
+   *            + (500.000 − 150.253,03) × 0,0005 = 174,873485    = 508,43341
+   *            × 1,21 = 615,2044261 · × 1,75 (punto medio)       =  1.076,6077
+   *   Registro: 24,04 + 42,0708575 + 37,56325 + 67,613865
+   *            + (500.000 − 150.253,03) × 0,0003 = 104,924091    = 276,2120635
+   *            + 6,010121 + 3,005061 = 285,2272455 · × 1,21      =    345,1250
+   *   Total gastos = 32.500 + 1.076,6077 + 345,1250 + 500        = 34.421,7327
+   *   Total operación                                            = 534.421,7327
+   * Y ni el total ni su rótulo pueden marcarse como PARCIAL: aquí no falta ningún impuesto.
+   */
+  test('A (cierre) — Canarias en SEGUNDA mano sigue cobrando ITP: la reparación del IVA no se pasó de largo', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.selectOption('#select-ccaa', 'canarias');
+    await rellenar(page, PRECIO, '500000');
+    await rellenar(page, GESTORIA, '500');
+
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (6,50%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('32.500,00 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1076,61 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('345,12 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('34.421,73 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('534.421,73 €');
+    // Nada de «parcial»: el IGIC solo entra en juego cuando hay IVA que sustituir.
+    await expect(page.locator('body')).not.toContainText('COSTE TOTAL (PARCIAL)');
+    // Ninguna tarjeta del desglose se queda «No calculado» (el recuadro de la comunidad sí
+    // rotula «IGIC (obra nueva) · No calculado», y eso es correcto: describe la obra nueva).
+    await expect(page.locator('[class*="resultados"]').getByText('No calculado')).toHaveCount(0);
+    // El tipo del recuadro de la comunidad sale de la tabla, con su decimal y coma española.
+    expect(ITP_CCAA['canarias'].tipoGeneral).toBe(6.5);
+  });
+
+  /**
+   * MITAD A — el rótulo EFECTIVO del AJD, ahora en Melilla y con otro importe.
+   *
+   * `REPARADO A` lo fija en Ceuta con 500.000 €; esto comprueba que la reparación es de la
+   * fórmula y no del caso: el art. 57 bis.1 del TRLITPAJD bonifica al 50 % la cuota gradual
+   * cuando el Registro radica en Melilla igual que en Ceuta.
+   *
+   * Melilla · obra nueva · 800.000 € · gestoría 500 € (a mano):
+   *   IPSI: no se calcula (TERRITORIOS_SIN_IVA) → total marcado PARCIAL
+   *   AJD  = 800.000 × 0,5 % = 4.000 · bonificado al 50 %        =  2.000,00
+   *          tipo efectivo = 2.000 / 800.000                     =      0,25 %
+   *   Notaría: arancel = 558,93946 (hasta 601.012,10)
+   *            + (800.000 − 601.012,10) × 0,0003 = 59,69637      = 618,63583
+   *            × 1,21 = 748,5493543 · × 1,75                     =  1.309,9614
+   *   Registro: 306,5156935 (hasta 601.012,10)
+   *            + (800.000 − 601.012,10) × 0,0002 = 39,79758      = 346,3132735
+   *            + 9,015182 = 355,3284555 · × 1,21                 =    429,9474
+   *   Total parcial = 2.000 + 1.309,9614 + 429,9474 + 500        =  4.239,9088
+   *   Total operación                                            = 804.239,9088
+   */
+  test('A (cierre) — Melilla, obra nueva 800.000 €: el AJD se rotula con su tipo efectivo (0,25%)', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Obra nueva/ }).click();
+    await page.selectOption('#select-ccaa', 'melilla');
+    await rellenar(page, PRECIO, '800000');
+    await rellenar(page, GESTORIA, '500');
+
+    expect(await valorTarjeta(page, 'IPSI')).toBe('No calculado');
+    expect(await rotuloTarjeta(page, /^AJD \(/)).toBe('AJD (0,25%)');
+    expect(await valorTarjeta(page, 'AJD (')).toBe('2000,00 €');
+    expect(await descripcionTarjeta(page, 'AJD (')).toContain('bonificación del 50 %');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('4239,91 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('804.239,91 €');
+    // El 21 % que allí no existe no aparece por ninguna parte del desglose.
+    await expect(page.getByText('168.000,00 €')).toHaveCount(0);
+  });
+
+  /**
+   * MITAD B · CASO NUEVO 1 (normal) — Baleares, segunda mano, 700.000 €.
+   *
+   * Una nave usada en el tramo medio de la escala balear: es donde el tipo NOMINAL de la
+   * tabla (8 %) y el que de verdad se paga dejan de coincidir, que es justo lo que el
+   * rótulo del tipo efectivo tiene que enseñar. `ITP_CCAA['baleares'].tramosProgresivos`
+   * = 8 % hasta 400.000, 9 % hasta 600.000, 10 % hasta 1.000.000, 12 % hasta 2.000.000, 13 %.
+   *
+   * A mano (gestoría 500 €):
+   *   ITP = 400.000 × 8 % + 200.000 × 9 % + 100.000 × 10 %
+   *       = 32.000 + 18.000 + 10.000                              = 60.000,00
+   *   tipo efectivo = 60.000 / 700.000                            =      8,5714 % → «8,57%»
+   *   AJD = 0 (segunda mano sin renuncia: no hay cuota gradual)
+   *   Notaría: arancel = 558,93946 + (700.000 − 601.012,10) × 0,0003 = 29,69637
+   *          = 588,63583 · × 1,21 = 712,2493543 · × 1,75           =  1.246,4364
+   *   Registro: 306,5156935 + (700.000 − 601.012,10) × 0,0002 = 19,79758
+   *          = 326,3132735 + 9,015182 = 335,3284555 · × 1,21       =    405,7474
+   *   Total gastos = 60.000 + 1.246,4364 + 405,7474 + 500          = 62.152,1838
+   *   % sobre el precio = 62.152,1838 / 700.000                    =      8,8789 % → «8,88%»
+   *   Total operación                                              = 762.152,1838
+   */
+  test('B1 (normal) — Baleares, segunda mano, 700.000 €: la escala 8/9/10 da un efectivo del 8,57%', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.selectOption('#select-ccaa', 'baleares');
+    await rellenar(page, PRECIO, '700000');
+    await rellenar(page, GESTORIA, '500');
+
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (8,57%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('60.000,00 €');
+    // El nominal de la tabla, 8 %, habría dado 56.000 €: el tramo importa.
+    await expect(page.getByText('56.000,00 €')).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1246,44 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('405,75 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('62.152,18 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('8,88%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('762.152,18 €');
+  });
+
+  /**
+   * MITAD B · CASO NUEVO 2 (el supuesto propio de una nave) — Cataluña, 2ª mano con
+   * renuncia a la exención, 800.000 €.
+   *
+   * Es el caso que separa una nave de una vivienda: entre empresarios con derecho a
+   * deducción la segunda transmisión vuelve al IVA (art. 20.Dos LIVA), con inversión del
+   * sujeto pasivo, y entonces NO se paga ITP pero SÍ la cuota gradual de AJD. La app tiene
+   * que sustituir un impuesto por el otro, no sumarlos.
+   *
+   * A mano (gestoría 500 €):
+   *   IVA = 800.000 × 21 % (IVA_INMUEBLES_2025.local)             = 168.000,00
+   *   AJD = 800.000 × 1,5 % (ITP_CCAA['cataluna'].ajd)            =  12.000,00
+   *   ITP = 0 — y el 10 % del primer tramo catalán (80.000 €) no puede aparecer
+   *   Notaría 1.309,9614 · Registro 429,9474 (mismo desarrollo que el caso de Melilla)
+   *   Total gastos = 168.000 + 12.000 + 1.309,9614 + 429,9474 + 500 = 182.239,9088
+   *   Total operación                                               = 982.239,9088
+   */
+  test('B2 (renuncia) — Cataluña, 2ª mano con renuncia, 800.000 €: IVA 21% + AJD y ningún ITP', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /renuncia al IVA/ }).click();
+    await page.selectOption('#select-ccaa', 'cataluna');
+    await rellenar(page, PRECIO, '800000');
+    await rellenar(page, GESTORIA, '500');
+
+    expect(await rotuloTarjeta(page, /^IVA \(renuncia/)).toBe('IVA (renuncia · ISP) (21,00%)');
+    expect(await valorTarjeta(page, 'IVA (renuncia')).toBe('168.000,00 €');
+    expect(await rotuloTarjeta(page, /^AJD \(/)).toBe('AJD (1,50%)');
+    expect(await valorTarjeta(page, 'AJD (')).toBe('12.000,00 €');
+    // No coexisten: ni tarjeta de ITP ni el 10 % del primer tramo catalán.
+    await expect(page.locator('h3', { hasText: /^ITP \(/ })).toHaveCount(0);
+    await expect(page.getByText('80.000,00 €')).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('182.239,91 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('982.239,91 €');
+  });
+
+  /**
+   * MITAD B · CASO NUEVO 3 (LÍMITE) — Madrid, segunda mano, 6.010,12 €.
+   *
+   * El primer tramo del arancel notarial (RD 1426/1989) y del registral (RD 1427/1989) es
+   * una cuota FIJA hasta 6.010,12 € exactos. Ese es el punto en el que el bucle de
+   * `calcularArancelNotarial` tiene que cortar sin entrar en el tramo del exceso: un `<=`
+   * mal puesto ahí cobraría un exceso de cero euros o duplicaría la base. Además el precio
+   * se teclea en formato español CON los dos separadores («6.010,12»), donde el último
+   * manda como decimal.
+   *
+   * A mano (gestoría 500 €):
+   *   ITP = 6.010,12 × 6 % (Madrid, TIPOS_ITP_CCAA_2025)          =    360,6072
+   *   Notaría: arancel = 90,15 exacto (cuota fija del primer tramo)
+   *            × 1,21 = 109,0815 · × 1,5 = 163,62225 (min)
+   *                              × 2   = 218,163   (max)
+   *                              × 1,75                            =    190,8926
+   *   Registro: 24,04 + 6,010121 + 3,005061 = 33,055182 · × 1,21    =     39,9968
+   *   Total gastos = 360,6072 + 190,8926 + 39,9968 + 500            =  1.091,4966
+   *   % sobre el precio = 1.091,4966 / 6.010,12                     =     18,1610 % → «18,16%»
+   *   Total operación = 6.010,12 + 1.091,4966                       =  7.101,6166
+   */
+  test('B3 (límite) — Madrid, 6.010,12 €: la frontera exacta del primer tramo del arancel', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.selectOption('#select-ccaa', 'madrid');
+    await rellenar(page, PRECIO, '6.010,12');
+    await rellenar(page, GESTORIA, '500');
+
+    expect(await valorTarjeta(page, 'Precio de la nave industrial')).toBe('6010,12 €');
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (6,00%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('360,61 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('190,89 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('entre 163,62 € y 218,16 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('40,00 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1091,50 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('7101,62 €');
+  });
+
+  /**
+   * MITAD B · CASO NUEVO 4 (RECHAZO) — la gestoría que no es un número.
+   *
+   * `CASO 3` cubre el rechazo del PRECIO y `HALLAZGO 165` el de una gestoría negativa. Falta
+   * la tercera puerta: una gestoría que pasa el filtro del input (solo dígitos y separadores)
+   * pero que `parseSpanishNumber` rechaza con NaN — «1.2.3», donde `parseFloat` habría
+   * devuelto 10,5 y colado un importe inventado. `parseSpanishNumberOr` la resuelve a 0.
+   *
+   * Madrid · segunda mano · 500.000 € · gestoría «1.2.3» (a mano):
+   *   ITP 30.000 + notaría 1.076,6077 + registro 345,1250 + gestoría 0 = 31.421,7327
+   *   Total operación                                                  = 531.421,7327
+   * y sin tarjeta de gestoría, porque el render la esconde cuando vale 0.
+   */
+  test('B4 (rechazo) — una gestoría no numérica vale 0, no descuadra el total ni pinta NaN', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.selectOption('#select-ccaa', 'madrid');
+    await rellenar(page, PRECIO, '500000');
+    await rellenar(page, GESTORIA, '1.2.3');
+
+    await expect(page.locator('h3', { hasText: 'Gastos de gestoría' })).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('31.421,73 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('531.421,73 €');
+    const cuerpo = await page.locator('body').innerText();
+    expect(cuerpo).not.toContain('NaN');
+    expect(cuerpo).not.toContain('No definido');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS — re-inspección del 28/08/2026.
+// Afirman lo que DEBERÍA pasar y hoy fallan a propósito. UNA sola aserción de fondo cada
+// uno: con `test.fail()` basta con fallar en algún punto, y varias aserciones taparían que
+// la que documenta el hallazgo ni llega a evaluarse.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Hallazgos abiertos — 28/08/2026', () => {
+  /**
+   * HALLAZGO F (contenido, medio) — el formulario ofrece dos controles rotulados con un IVA
+   * del 21 % en los tres territorios donde ese impuesto no existe.
+   *
+   * La reparación del `d787b81b` llegó al RESULTADO (tarjeta «IGIC · No calculado», total
+   * marcado parcial) y al recuadro de la comunidad, que ya rotula «IGIC (obra nueva) · No
+   * calculado». No llegó a los BOTONES, que es donde el usuario elige: con Canarias
+   * seleccionada siguen diciendo «Paga IVA 21% + AJD» e «IVA 21% (ISP) + AJD» tres
+   * centímetros por encima del aviso «En Canarias no se aplica el IVA». El usuario elige el
+   * supuesto leyendo una promesa que la misma pantalla desmiente. Igual en Ceuta y Melilla.
+   */
+  test.fail('HALLAZGO F — en Canarias los botones siguen ofreciendo «IVA 21%»', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.selectOption('#select-ccaa', 'canarias');
+    const grupo = page.getByRole('group', { name: /Tipo de transmisión/ });
+    const rotulos = (await grupo.innerText()).replace(/\s+/g, ' ');
+    // Hoy: «🔄 Segunda mano Paga ITP (tipo general) || 🆕 Obra nueva / Promotor Paga IVA 21% +
+    // AJD || 🤝 2ª mano con renuncia al IVA IVA 21% (ISP) + AJD».
+    expect(rotulos).not.toMatch(/IVA\s*21\s*%/);
+  });
+
+  /**
+   * HALLAZGO G (contenido, medio) — la FAQ del bloque educativo niega el AJD que la app
+   * cobra en su tercera opción.
+   *
+   * «¿Hay AJD en la compra de una nave industrial?» responde: «En segunda mano, el AJD solo
+   * se pagaría sobre la escritura de hipoteca, no sobre la compraventa en sí». Pero con
+   * Cataluña · 2ª mano con renuncia · 800.000 € la app liquida 12.000 € de AJD sobre esa
+   * misma compraventa de segunda mano (lo comprueba el caso B2 de arriba), y su propio aviso
+   * bajo los botones advierte de que varias comunidades le aplican ahí un tipo incrementado.
+   * Es la misma reparación de `REPARADO B` —el recuadro de limitaciones, corregido el
+   * 27/08/2026— que no se propagó al párrafo de al lado.
+   */
+  test.fail('HALLAZGO G — la FAQ dice que en segunda mano no hay AJD sobre la compraventa', async ({ page }) => {
+    await page.goto(RUTA);
+    const bloque = (
+      await page
+        .locator('strong', { hasText: '¿Hay AJD en la compra de una nave industrial?' })
+        .first()
+        .locator('xpath=..')
+        .innerText()
+    ).replace(/\s+/g, ' ');
+    expect(bloque).not.toMatch(/En segunda mano, el AJD solo se pagaría sobre la escritura de hipoteca/);
+  });
+
+  /**
+   * HALLAZGO H (contenido, bajo) — «no hay bonificaciones para naves industriales» es falso
+   * en Ceuta y Melilla, y lo desmiente la propia app.
+   *
+   * La tarjeta «Autónomo compra nave de segunda mano» afirma que se paga «ITP al tipo general
+   * de su CCAA (no hay bonificaciones para naves industriales)». Tres bloques más abajo, su
+   * propia FAQ dice lo contrario: «en Ceuta y Melilla se descuenta el 50 % (art. 57 bis del
+   * TRLITPAJD), y ahí sí entra cualquier inmueble, también una nave». Y el motor la aplica:
+   * Ceuta · segunda mano · 500.000 € liquida 15.000 €, no 30.000 € (test HALLAZGO 157).
+   */
+  test.fail('HALLAZGO H — el caso de uso del autónomo niega la bonificación de Ceuta y Melilla', async ({ page }) => {
+    await page.goto(RUTA);
+    const tarjeta = (
+      await page
+        .locator('strong', { hasText: 'Autónomo compra nave de segunda mano' })
+        .first()
+        .locator('xpath=..')
+        .innerText()
+    ).replace(/\s+/g, ' ');
+    expect(tarjeta).not.toContain('no hay bonificaciones para naves industriales');
+  });
+
+  /**
+   * HALLAZGO I (dato, bajo) — el 21 % sigue escrito a mano en tres sitios del bloque
+   * educativo, con `IVA_INMUEBLES_2025.local` ya importado en el fichero.
+   *
+   * `REPARADO D` corrigió la tabla comparativa el 27/08/2026, pero dejó atrás los otros tres
+   * literales: «Paga IVA 21% + AJD» (caso de uso de la empresa), «comprar en primera mano
+   * (IVA 21%)» (consejo del régimen de IVA) y «El IVA del 21% solo es deducible…»
+   * (limitaciones). Es exactamente la divergencia-en-silencio del hallazgo 163: hoy coinciden,
+   * y el día que `IVA_INMUEBLES_2025.local` cambie, la app cobrará una cifra y contará otra.
+   */
+  test.fail('HALLAZGO I — quedan tres «21%» escritos a mano en el bloque educativo', async () => {
+    const fuente = await leerFuente();
+    // El valor existe en data/fiscal y ya está importado aquí (lo fija `REPARADO D`).
+    expect(fuente.match(/\b21%/g) ?? []).toHaveLength(0);
+  });
+});

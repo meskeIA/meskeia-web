@@ -8,6 +8,9 @@ import { BONO_ALQUILER_JOVEN_2026, UMBRAL_IPREM_VIVIENDA_JOVEN } from '../../dat
  * AMPLIADO el 27/08/2026 en la re-inspección: los once casos anteriores siguen en verde
  * (la reparación cerró de verdad) y se añaden los casos que aquella no miró, más siete
  * hallazgos nuevos marcados con `test.fail()`.
+ * AMPLIADO de nuevo el 28/08/2026 en la re-inspección de cierre del commit e1a42c65: los 24
+ * casos anteriores siguen en verde —incluidos los siete que aquel commit reparó— y al final
+ * hay tres casos nuevos y tres hallazgos abiertos, otra vez con `test.fail()`.
  *
  * POR QUÉ SE REESCRIBIÓ ENTERO EN SU DÍA Y NO SE LE QUITARON LAS MARCAS
  * ────────────────────────────────────────────────────────────────────
@@ -618,5 +621,201 @@ test.describe('Simulador Bono Joven Alquiler — hallazgos del 27/08/2026, repar
     );
     expect(fuente).toContain('UMBRAL_IPREM_VIVIENDA_JOVEN');
     expect(fuente).not.toContain('Tienes entre 18 y 35 años (inclusive)');
+  });
+});
+
+/**
+ * ═══════════════════════════════════════════════════════════════════════════════════════
+ * RE-INSPECCIÓN DE CIERRE del 28/08/2026 — casos nuevos.
+ *
+ * Los 24 casos de arriba pasan: la reparación del commit e1a42c65 cerró de verdad los siete
+ * hallazgos del 27/08 (440-446) y no ha movido ninguno de los once del 23/08. Lo que se añade
+ * aquí es lo que aquella tanda no miró, sobre la parte del motor que el commit tocó.
+ * ═══════════════════════════════════════════════════════════════════════════════════════
+ */
+test.describe('Simulador Bono Joven Alquiler — casos nuevos del 28/08/2026', () => {
+  /**
+   * CASO NUEVO 1 (LÍMITE) — el punto exacto donde se cruzan los DOS topes del art. 137.
+   *
+   * El art. 137 pone dos techos a la vez: 300 €/mes de ayuda máxima en vivienda y el 60 % de
+   * la renta. Se cruzan en una renta de 500 €/mes (500 × 0,6 = 300), que es el borde donde la
+   * app cambia de un techo al otro. Los tests anteriores probaban los dos lados lejos del
+   * cruce (300 € y 600 €), nunca el euro de antes y el de después.
+   *
+   * Resuelto a mano antes de ejecutar:
+   *   · 499 € → 499 × 0,6 = 299,40 € < 300 → manda el 60 %: ayuda 299,40 € · pago 199,60 € ·
+   *     acumulado 299,40 × 48 = 14.371,20 € · Y la nota «Límite: 60% de la renta» SÍ sale.
+   *   · 500 € → 500 × 0,6 = 300,00 € = el máximo del art. 137: ayuda 300,00 € · pago 200,00 € ·
+   *     acumulado 14.400,00 € · la nota NO sale (no hay recorte que anunciar).
+   *   · 501 € → 501 × 0,6 = 300,60 € > 300 → manda el máximo: ayuda 300,00 € · pago 201,00 € ·
+   *     acumulado 14.400,00 €.
+   *
+   * Las tres rentas están por debajo del tope del art. 133.1.e (1.000 €), así que las tres
+   * conceden. Lo que se fija es que la ayuda sea continua en el borde y que el acumulado la
+   * siga (es donde vivía el hallazgo 147).
+   */
+  test('CRUCE DE LOS DOS TOPES — 499 € recorta al 60 %, 500 € es el punto exacto y 501 € ya no', async ({ page }) => {
+    await page.goto(RUTA);
+    await responderTodoSi(page);
+    const nota = page.locator('[class*="ahorroNota"]');
+
+    await ponerRenta(page, '499');
+    expect(await valorPanel(page, 'Ayuda mensual')).toBe('299,40 €');
+    expect(await valorPanel(page, 'Tu pago real')).toBe('199,60 €');
+    expect(await valorPanel(page, 'Máximo en 4 años')).toBe('14.371,20 €');
+    await expect(nota).toHaveCount(1);   // el 60 % está mordiendo y se dice
+
+    await ponerRenta(page, '500');
+    expect(await valorPanel(page, 'Ayuda mensual')).toBe('300,00 €');
+    expect(await valorPanel(page, 'Tu pago real')).toBe('200,00 €');
+    expect(await valorPanel(page, 'Máximo en 4 años')).toBe('14.400,00 €');
+    await expect(nota).toHaveCount(0);   // los dos topes coinciden: no hay recorte que anunciar
+
+    await ponerRenta(page, '501');
+    expect(await valorPanel(page, 'Ayuda mensual')).toBe('300,00 €');
+    expect(await valorPanel(page, 'Tu pago real')).toBe('201,00 €');
+    expect(await valorPanel(page, 'Máximo en 4 años')).toBe('14.400,00 €');
+    await expect(nota).toHaveCount(0);
+  });
+
+  /**
+   * CASO NUEVO 2 (RECHAZO) — la renta excluye ella sola, sin checklist.
+   *
+   * El art. 133.1.e es una condición del propio Real Decreto, no un aspecto que la comunidad
+   * autónoma matice: una renta por encima del tope deniega aunque el usuario no haya
+   * contestado todavía a ningún requisito. Todos los rechazos anteriores contestaban los seis
+   * primero, así que la precedencia de la renta sobre «pendiente» no estaba fijada por nadie.
+   *
+   * Resuelto a mano: vivienda completa, 1.200 €/mes, checklist intacta (los seis en ⬜) →
+   * 1.200 > 1.000 → «No cumples los requisitos obligatorios», el aviso cita el tope 1000,00 €
+   * y lo introducido 1200,00 €, y el panel de cifras no llega a aparecer.
+   */
+  test('RECHAZO SIN CHECKLIST — 1.200 €/mes deniega antes de responder a ningún requisito', async ({ page }) => {
+    await page.goto(RUTA);
+    await ponerRenta(page, '1200');
+
+    const veredicto = await textoResultado(page);
+    expect(veredicto).toContain('No cumples los requisitos obligatorios');
+    expect(veredicto).toContain('1000,00 €');
+    expect(veredicto).toContain('1200,00 €');
+    await expect(page.locator('[class*="ahorroPanel"]')).toHaveCount(0);
+
+    // Y ningún requisito se ha respondido: el rechazo no viene de la checklist
+    await expect(page.locator('button[class*="radioBtnActive"]')).toHaveCount(0);
+  });
+
+  /**
+   * CASO NUEVO 3 (PARSER, el que tocó el commit) — la renta tecleada como la teclea un usuario.
+   *
+   * El hallazgo 440 decía «campo de renta = "1.500" … idéntico tecleando "1,500"», y la
+   * REGRESIÓN 1 de arriba solo prueba la primera forma, y con `fill()`, que escribe en el DOM
+   * sin pasar por el teclado. Aquí se teclea carácter a carácter y en un navegador con locale
+   * español, que es donde el `input[type=number]` decide qué hace con el separador.
+   *
+   * Resuelto a mano: las tres formas son la misma cantidad, mil quinientos euros, y las tres
+   * superan el tope del art. 133.1.e (1.000 €) → las tres deben denegar.
+   */
+  test.describe('con el navegador en español', () => {
+    test.use({ locale: 'es-ES' });
+
+    test('PARSER TECLEADO — «1500», «1.500» y «1,500» son la misma renta y las tres deniegan', async ({ page }) => {
+      await page.goto(RUTA);
+      await responderTodoSi(page);
+
+      for (const tecleado of ['1500', '1.500', '1,500']) {
+        await teclearRenta(page, tecleado);
+        const veredicto = await textoResultado(page);
+        expect(veredicto, `tecleando «${tecleado}»`).toContain('No cumples los requisitos obligatorios');
+        expect(veredicto, `tecleando «${tecleado}»`).toContain('1500,00 €');
+      }
+    });
+  });
+});
+
+/**
+ * ═══════════════════════════════════════════════════════════════════════════════════════
+ * HALLAZGOS ABIERTOS de la re-inspección del 28/08/2026.
+ *
+ * Cada uno con UNA sola aserción de fondo: con `test.fail()` basta con fallar en algún punto,
+ * así que dos aserciones pueden tapar que la que documenta el hallazgo ni se evalúa.
+ * ═══════════════════════════════════════════════════════════════════════════════════════
+ */
+test.describe('Simulador Bono Joven Alquiler — hallazgos abiertos (28/08/2026)', () => {
+  /**
+   * HALLAZGO A (contenido, medio) — el veredicto afirma haber comprobado una renta que no existe.
+   *
+   * Lo escribió el propio commit e1a42c65 al reparar el hallazgo 445: donde antes la nota
+   * listaba la renta entre los aspectos pendientes, ahora afirma «La renta ya está comprobada
+   * aquí arriba contra el tope del art. 133.1.e». Es cierto cuando hay una renta tecleada y
+   * FALSO cuando no la hay, que es justo el caso en que este veredicto aparece con los seis
+   * requisitos contestados: sin renta, `rentaDentroDelLimite` es `null` y la app no ha
+   * comprobado nada.
+   *
+   * Con el campo vacío y los seis «Sí»: esperado que el veredicto no dé por hecha una
+   * comprobación que no ha ocurrido. La misma frase sale con «-500» tecleado —el campo se ve
+   * lleno y `Math.max(0, …)` lo convierte en 0 sin decirlo—, que es la versión silenciosa.
+   */
+  test('HALLAZGO A — sin renta tecleada, el veredicto no puede decir que la renta ya está comprobada', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await responderTodoSi(page);
+    expect(await textoResultado(page)).not.toContain('La renta ya está comprobada');
+  });
+
+  /**
+   * HALLAZGO B (dato, medio) — el FAQPage y la página contestan distinto a quién fija el
+   * umbral de ingresos.
+   *
+   * La reparación derivó el requisito visible de `UMBRAL_IPREM_VIVIENDA_JOVEN` y hoy la
+   * checklist dice «El RD 326/2026 fija el umbral en 5 veces el IPREM … Cada Comunidad
+   * Autónoma concreta el CÓMPUTO en su convocatoria». El FAQPage JSON-LD, que no se tocó,
+   * sigue contestando a la pregunta «¿Cuáles son los requisitos de ingresos…?» con «cada
+   * Comunidad Autónoma concreta ese UMBRAL en su propia convocatoria», sin la cifra del art.
+   * 133.1.d que el módulo sella.
+   *
+   * Es el mecanismo del hallazgo 442, reparado en la respuesta de al lado ocho días antes: el
+   * bloque estructurado es el que citan Bing Copilot, ChatGPT, Perplexity y Gemini, donde ya
+   * no va acompañado ni del disclaimer ni de la checklist que sí lleva la cifra.
+   *
+   * Esperado: la respuesta del FAQPage sobre ingresos nombra el umbral sellado (5 veces el
+   * IPREM). Obtenido: no menciona el IPREM en ningún punto.
+   */
+  test('HALLAZGO B — el FAQPage debe dar el umbral de ingresos del art. 133.1.d, no remitirlo a la CA', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+    const bloques = await page.locator('script[type="application/ld+json"]').allInnerTexts();
+    const faq = bloques.map(b => JSON.parse(b)).find(b => b['@type'] === 'FAQPage');
+    const preguntas = (faq?.mainEntity ?? []) as Array<{ name: string; acceptedAnswer: { text: string } }>;
+    const ingresos = preguntas.find(q => /requisitos de ingresos/i.test(q.name));
+    expect(ingresos?.acceptedAnswer.text ?? '').toContain('IPREM');
+  });
+
+  /**
+   * HALLAZGO C (dato, bajo) — la deduplicación no llegó a `metadata.ts`.
+   *
+   * El commit e1a42c65 hizo que ocho literales normativos de `page.tsx` salieran del módulo
+   * sellado, y en la app hermana de la misma tanda (`simulador-heredar-vivienda`) derivó
+   * también el `metadata.ts`, importando `TRAMOS_GANANCIAS_PATRIMONIALES_2025`. Aquí no:
+   * `metadata.ts` mantiene la segunda copia entera a mano —300 €/mes, 200 €/mes, 4 años, el
+   * 60 %, la franja 18-35 y los 3.600 / 2.400 € anuales— en `description`, `twitter`, las
+   * `features` del WebApplication y tres respuestas del FAQPage.
+   *
+   * Hoy las dos copias dicen lo mismo, así que es riesgo de deriva y no un error a la vista.
+   * Pero es exactamente la deriva de los hallazgos 152 y 153 en esta misma app, que sirvió
+   * durante meses «hasta 250 €/mes durante 2 años» y «máximo 3.000 € anuales» del RD 42/2022
+   * mientras el motor ya calculaba con el RD 326/2026.
+   *
+   * Esperado: ningún importe del art. 137 tecleado en `metadata.ts` (que se derive, como en
+   * `page.tsx`). Obtenido: «300 €/mes» escrito a mano cuatro veces.
+   */
+  test('HALLAZGO C — metadata.ts no debe conservar la copia tecleada de las cuantías del art. 137', async () => {
+    test.fail();
+    const { readFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const fuente = readFileSync(
+      join(process.cwd(), 'app', 'simulador-bono-joven-alquiler', 'metadata.ts'),
+      'utf8',
+    );
+    expect(fuente).not.toContain('300 €/mes');
   });
 });
