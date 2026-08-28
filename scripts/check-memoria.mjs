@@ -16,9 +16,15 @@
  *   4. `name:` del frontmatter == nombre de fichero
  *   5. Frontmatter mínimo presente (name, description, type)
  *   6. Punteros externos vivos (agenda.json, _private/, scripts/, código, CLAUDE.md)
- *   7. MEMORY.md con margen sobre el límite de lectura, y su serie (delta por sesión)
+ *   7. MEMORY.md con margen sobre los DOS techos —bytes y líneas—, y su serie (delta por sesión)
  *   8. Ninguna autorreferencia [[a-sí-mismo]]
  *   9. Ningún `node scripts/…` citado que apunte a un script inexistente
+ *  10. Pronóstico de RITMO: días hasta el umbral al ritmo actual de fichas nuevas
+ *
+ * ⚠️ Al probar con MEMORIA_DIR, pasar también SERIE_MEMORIA a una ruta desechable: si no, la
+ * ejecución escribe su lectura en la serie real y mete una entrada falsa del día. Se repara
+ * volviendo a ejecutar el candado normal (la entrada del día se sobrescribe), pero es más
+ * limpio no ensuciarla. Descubierto probando el techo de líneas el 28/08/2026.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -40,6 +46,16 @@ const REPO = path.resolve(import.meta.dirname, '..');
 const UMBRAL_ERROR = 24_400;                              // límite de lectura (dato duro)
 const UMBRAL_AVISO = Math.round(UMBRAL_ERROR * 0.85);     // 20.740 B — margen para reaccionar
 const UMBRAL_CRITICO = Math.round(UMBRAL_ERROR * 0.94);   // 22.936 B — ya casi sin margen
+
+// El límite NO es solo de tamaño. La documentación oficial dice: «The first 200 lines of
+// MEMORY.md, or the first 25KB, whichever comes first» — son DOS techos y basta con tocar uno.
+// Hasta el 28/08/2026 aquí solo se vigilaban los bytes, así que el candado podía dar verde
+// mientras el índice se truncaba por líneas y nadie se enteraba. Hoy van casi parejos (129
+// líneas = 64 %, 16.914 B = 66 %), pero un índice de entradas cortas cruzaría antes el de
+// líneas, y uno de entradas largas antes el de bytes. Se vigilan los dos.
+const LINEAS_ERROR = 200;
+const LINEAS_AVISO = Math.round(LINEAS_ERROR * 0.85);     // 170
+const LINEAS_CRITICO = Math.round(LINEAS_ERROR * 0.94);   // 188
 
 // Lo que de verdad informa no es el nivel (constante durante semanas) sino el DELTA: el
 // índice pasó de 17.086 B a 19.450 en 5 días, y tres cuartas partes de esa subida no fueron
@@ -200,6 +216,16 @@ if (bytesIndice > UMBRAL_ERROR) {
   avisos.push(`MEMORY.md ${bytesIndice} B pasa del 85% del límite de lectura (${UMBRAL_AVISO} B) — queda poco margen`);
 }
 
+// El segundo techo: LÍNEAS. Se cruza el que llegue antes, así que se comprueban por separado.
+const lineasIndice = indice.split('\n').length;
+if (lineasIndice > LINEAS_ERROR) {
+  errores.push(`MEMORY.md tiene ${lineasIndice} líneas y supera el LÍMITE DE ${LINEAS_ERROR}: lo que pasa de ahí NO se carga`);
+} else if (lineasIndice > LINEAS_CRITICO) {
+  errores.push(`MEMORY.md tiene ${lineasIndice} líneas y roza el límite de ${LINEAS_ERROR} — agrupar entradas YA`);
+} else if (lineasIndice > LINEAS_AVISO) {
+  avisos.push(`MEMORY.md tiene ${lineasIndice} líneas, pasa del 85% del límite de ${LINEAS_ERROR} — agrupar varias fichas por línea`);
+}
+
 // Serie: una entrada por día (la del día se sobrescribe si se ejecuta varias veces).
 const hoy = new Date().toISOString().slice(0, 10);
 let serie = [];
@@ -267,8 +293,9 @@ if (serie.length >= MIN_LECTURAS) {
 
 // --- Informe ---
 const pct = ((bytesIndice / UMBRAL_ERROR) * 100).toFixed(0);
+const pctLineas = ((lineasIndice / LINEAS_ERROR) * 100).toFixed(0);
 console.log(`\n🧾 Memoria del proyecto — ${path.relative(os.homedir(), DIR)}`);
-console.log(`   ${ficheros.length} fichas · MEMORY.md ${(bytesIndice / 1024).toFixed(1)} KB (${pct}% del límite de lectura) · ${enlazados.size} enlaces${deltaTexto}${ritmoTexto}`);
+console.log(`   ${ficheros.length} fichas · MEMORY.md ${(bytesIndice / 1024).toFixed(1)} KB (${pct}%) · ${lineasIndice}/${LINEAS_ERROR} líneas (${pctLineas}%) · ${enlazados.size} enlaces${deltaTexto}${ritmoTexto}`);
 
 if (VERBOSE) {
   const porTipo = {};
