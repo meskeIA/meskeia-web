@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Conversor de líquidos: ml a gramos', description: 'Convierte ml a gramos según el líquido: agua, aceite, miel y más.', url: 'https://meskeia.com/densidad-liquidos', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Conversor de líquidos (ml a g)', description: 'ml a gramos según la densidad de cada líquido.' },
+  openGraph: { type: 'website', title: 'Conversor de líquidos: ml a gramos', description: 'Convierte ml a gramos según el líquido: agua, aceite, miel y más.', url: 'https://meskeia.com/densidad-liquidos', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Conversor de líquidos (ml a g)', description: 'ml a gramos según la densidad de cada líquido.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Densidad de líquidos meskeIA' },
   alternates: { canonical: 'https://meskeia.com/densidad-liquidos/' },
 };

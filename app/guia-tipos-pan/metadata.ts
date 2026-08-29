@@ -17,17 +17,17 @@ export const metadata: Metadata = {
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/coquinum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA',
     }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Guía de Tipos de Pan del Mundo | meskeIA',
     description: '35 tipos de pan del mundo: sourdough, baguette, naan, injera y más.',
-    images: ['https://meskeia.com/og-image.png']
+    images: ['https://meskeia.com/coquinum/og-image.png']
   },
   other: {
     'application-name': 'Guía de Tipos de Pan meskeIA',

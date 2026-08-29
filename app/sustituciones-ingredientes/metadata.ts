@@ -19,12 +19,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/sustituciones-ingredientes',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/coquinum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Sustituciones de ingredientes',
     description:
       'Con qué reemplazar huevo, mantequilla, azúcar, leche o harina, con proporciones y filtro por dieta.',
+    images: ['https://meskeia.com/coquinum/og-image.png'],
   },
   other: {
     'application-name': 'Sustituciones de ingredientes meskeIA',

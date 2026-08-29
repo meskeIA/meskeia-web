@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Guía de azúcares y endulzantes', description: 'Tipos de endulzante, su poder dulce y sus usos.', url: 'https://meskeia.com/guia-azucares', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Guía de azúcares y endulzantes', description: 'Tipos de endulzante, poder dulce y usos.' },
+  openGraph: { type: 'website', title: 'Guía de azúcares y endulzantes', description: 'Tipos de endulzante, su poder dulce y sus usos.', url: 'https://meskeia.com/guia-azucares', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Guía de azúcares y endulzantes', description: 'Tipos de endulzante, poder dulce y usos.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Guía de azúcares meskeIA' },
   alternates: { canonical: 'https://meskeia.com/guia-azucares/' },
 };

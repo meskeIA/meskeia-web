@@ -19,12 +19,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/tiempos-coccion',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/coquinum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Tiempos de cocción',
     description:
       'Cuánto cocer huevos, arroz, pasta, legumbres y verduras, con notas y ajuste por altitud.',
+    images: ['https://meskeia.com/coquinum/og-image.png'],
   },
   other: {
     'application-name': 'Tiempos de cocción meskeIA',

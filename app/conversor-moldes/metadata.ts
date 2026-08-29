@@ -19,11 +19,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/conversor-moldes',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/coquinum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Conversor de moldes de repostería',
     description: 'Multiplica los ingredientes según el molde que tengas y ajusta el tiempo de horno.',
+    images: ['https://meskeia.com/coquinum/og-image.png'],
   },
   other: { 'application-name': 'Conversor de moldes meskeIA' },
   alternates: { canonical: 'https://meskeia.com/conversor-moldes/' },

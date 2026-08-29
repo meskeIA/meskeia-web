@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Calculadora de merengue', description: 'Azúcar y agua para tu merengue según el tipo y el número de claras.', url: 'https://meskeia.com/calculadora-merengue', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Calculadora de merengue', description: 'Claras y azúcar para merengue francés, suizo o italiano.' },
+  openGraph: { type: 'website', title: 'Calculadora de merengue', description: 'Azúcar y agua para tu merengue según el tipo y el número de claras.', url: 'https://meskeia.com/calculadora-merengue', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Calculadora de merengue', description: 'Claras y azúcar para merengue francés, suizo o italiano.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Calculadora de merengue meskeIA' },
   alternates: { canonical: 'https://meskeia.com/calculadora-merengue/' },
 };

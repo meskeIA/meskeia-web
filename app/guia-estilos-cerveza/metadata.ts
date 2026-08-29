@@ -17,17 +17,17 @@ export const metadata: Metadata = {
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/coquinum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA',
     }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Guía de Estilos de Cerveza | meskeIA',
     description: '47 estilos de cerveza: IPA, NEIPA, Stout, Pilsner, Weizen, Mexican Lager. IBU, ABV y maridaje.',
-    images: ['https://meskeia.com/og-image.png']
+    images: ['https://meskeia.com/coquinum/og-image.png']
   },
   other: {
     'application-name': 'Guía de Estilos de Cerveza meskeIA',

@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/calculadora-puntos-azucar',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/coquinum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Calculadora de Puntos del Azúcar | meskeIA',
     description: 'Introduce la temperatura y descubre la fase del azúcar: almíbar, bola blanda, caramelo… Con tabla de las 9 fases.',
+    images: ['https://meskeia.com/coquinum/og-image.png'],
   },
   other: {
     'application-name': 'Calculadora Puntos del Azúcar meskeIA',

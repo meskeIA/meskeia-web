@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Medidas "a ojo" de las recetas', description: 'Cuánto es una pizca, un chorro, un vaso o un puñado en cantidades aproximadas.', url: 'https://meskeia.com/medidas-a-ojo', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Medidas a ojo de las recetas', description: 'Pizca, chorro, vaso, puñado… en cantidades aproximadas.' },
+  openGraph: { type: 'website', title: 'Medidas "a ojo" de las recetas', description: 'Cuánto es una pizca, un chorro, un vaso o un puñado en cantidades aproximadas.', url: 'https://meskeia.com/medidas-a-ojo', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Medidas a ojo de las recetas', description: 'Pizca, chorro, vaso, puñado… en cantidades aproximadas.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Medidas a ojo meskeIA' },
   alternates: { canonical: 'https://meskeia.com/medidas-a-ojo/' },
 };

@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Los 14 alérgenos alimentarios de declaración obligatoria', description: 'Los 14 alérgenos obligatorios en la UE, con ejemplos y dónde se esconden en los platos y productos.', url: 'https://meskeia.com/alergenos-alimentarios', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Los 14 alérgenos alimentarios', description: 'Los alérgenos de declaración obligatoria en la UE, con ejemplos y fuentes ocultas.' },
+  openGraph: { type: 'website', title: 'Los 14 alérgenos alimentarios de declaración obligatoria', description: 'Los 14 alérgenos obligatorios en la UE, con ejemplos y dónde se esconden en los platos y productos.', url: 'https://meskeia.com/alergenos-alimentarios', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Los 14 alérgenos alimentarios', description: 'Los alérgenos de declaración obligatoria en la UE, con ejemplos y fuentes ocultas.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Alérgenos alimentarios meskeIA' },
   alternates: { canonical: 'https://meskeia.com/alergenos-alimentarios/' },
 };

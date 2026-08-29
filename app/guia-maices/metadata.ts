@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Guía de maíces y nixtamal', description: 'Tipos de maíz y derivados, sus usos y qué es la nixtamalización.', url: 'https://meskeia.com/guia-maices', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Guía de maíces y nixtamal', description: 'Tipos de maíz, derivados y nixtamalización.' },
+  openGraph: { type: 'website', title: 'Guía de maíces y nixtamal', description: 'Tipos de maíz y derivados, sus usos y qué es la nixtamalización.', url: 'https://meskeia.com/guia-maices', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Guía de maíces y nixtamal', description: 'Tipos de maíz, derivados y nixtamalización.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Guía de maíces meskeIA' },
   alternates: { canonical: 'https://meskeia.com/guia-maices/' },
 };

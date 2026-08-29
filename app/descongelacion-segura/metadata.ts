@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Descongelación segura', description: 'Cuánto tarda en descongelarse un alimento según el peso y el método seguro.', url: 'https://meskeia.com/descongelacion-segura', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Descongelación segura', description: 'Tiempo de descongelación por peso y método, de forma segura.' },
+  openGraph: { type: 'website', title: 'Descongelación segura', description: 'Cuánto tarda en descongelarse un alimento según el peso y el método seguro.', url: 'https://meskeia.com/descongelacion-segura', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Descongelación segura', description: 'Tiempo de descongelación por peso y método, de forma segura.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Descongelación segura meskeIA' },
   alternates: { canonical: 'https://meskeia.com/descongelacion-segura/' },
 };

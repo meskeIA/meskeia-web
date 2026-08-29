@@ -19,12 +19,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/temperatura-coccion-carne',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/coquinum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Temperatura interna de cocción de la carne',
     description:
       'Puntos de cocción y temperatura mínima segura de vacuno, cerdo, pollo, picada y pescado.',
+    images: ['https://meskeia.com/coquinum/og-image.png'],
   },
   other: {
     'application-name': 'Temperatura de cocción de la carne meskeIA',

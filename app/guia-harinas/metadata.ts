@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Guía de harinas (fuerza W y usos)', description: 'Qué harina usar para cada cosa, con su fuerza, proteína y usos.', url: 'https://meskeia.com/guia-harinas', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Guía de harinas', description: 'Fuerza (W), proteína y usos de cada harina.' },
+  openGraph: { type: 'website', title: 'Guía de harinas (fuerza W y usos)', description: 'Qué harina usar para cada cosa, con su fuerza, proteína y usos.', url: 'https://meskeia.com/guia-harinas', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Guía de harinas', description: 'Fuerza (W), proteína y usos de cada harina.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Guía de harinas meskeIA' },
   alternates: { canonical: 'https://meskeia.com/guia-harinas/' },
 };

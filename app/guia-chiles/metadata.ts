@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Guía de chiles y pimientos (escala Scoville)', description: 'Los chiles del mundo ordenados por picor, con su origen y usos.', url: 'https://meskeia.com/guia-chiles', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Guía de chiles y pimientos', description: 'Picor (Scoville), origen y usos de los chiles del mundo.' },
+  openGraph: { type: 'website', title: 'Guía de chiles y pimientos (escala Scoville)', description: 'Los chiles del mundo ordenados por picor, con su origen y usos.', url: 'https://meskeia.com/guia-chiles', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Guía de chiles y pimientos', description: 'Picor (Scoville), origen y usos de los chiles del mundo.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Guía de chiles meskeIA' },
   alternates: { canonical: 'https://meskeia.com/guia-chiles/' },
 };

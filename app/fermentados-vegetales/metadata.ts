@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Calculadora de fermentados vegetales', description: 'La sal exacta para fermentar verduras en seco o en salmuera.', url: 'https://meskeia.com/fermentados-vegetales', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Calculadora de fermentados', description: 'La sal correcta para chucrut, kimchi y fermentados en salmuera.' },
+  openGraph: { type: 'website', title: 'Calculadora de fermentados vegetales', description: 'La sal exacta para fermentar verduras en seco o en salmuera.', url: 'https://meskeia.com/fermentados-vegetales', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Calculadora de fermentados', description: 'La sal correcta para chucrut, kimchi y fermentados en salmuera.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Fermentados vegetales meskeIA' },
   alternates: { canonical: 'https://meskeia.com/fermentados-vegetales/' },
 };

@@ -19,12 +19,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/conversor-tazas-gramos',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/coquinum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Conversor de tazas a gramos por ingrediente',
     description:
       'Convierte tazas, cucharadas y cucharaditas a gramos según el ingrediente. Recetas en tazas, sin liarte.',
+    images: ['https://meskeia.com/coquinum/og-image.png'],
   },
   other: {
     'application-name': 'Conversor tazas a gramos meskeIA',

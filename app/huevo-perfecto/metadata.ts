@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'El huevo perfecto', description: 'El tiempo exacto para el huevo en su punto, según tamaño y temperatura de partida.', url: 'https://meskeia.com/huevo-perfecto', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'El huevo perfecto', description: 'Tiempo de cocción del huevo según el punto, el tamaño y si está frío.' },
+  openGraph: { type: 'website', title: 'El huevo perfecto', description: 'El tiempo exacto para el huevo en su punto, según tamaño y temperatura de partida.', url: 'https://meskeia.com/huevo-perfecto', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'El huevo perfecto', description: 'Tiempo de cocción del huevo según el punto, el tamaño y si está frío.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'El huevo perfecto meskeIA' },
   alternates: { canonical: 'https://meskeia.com/huevo-perfecto/' },
 };

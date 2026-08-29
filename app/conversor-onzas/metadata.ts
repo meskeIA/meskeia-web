@@ -19,12 +19,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/conversor-onzas',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/coquinum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Conversor de onzas a gramos y mililitros',
     description:
       'Onza de peso (28,35 g) frente a onza líquida (29,57 ml): convierte sin liarte con las recetas en onzas.',
+    images: ['https://meskeia.com/coquinum/og-image.png'],
   },
   other: {
     'application-name': 'Conversor de onzas meskeIA',

@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Sous-vide: temperaturas y tiempos', description: 'Temperaturas y tiempos sous-vide por alimento y punto de cocción.', url: 'https://meskeia.com/sous-vide', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Sous-vide: temperaturas y tiempos', description: 'La guía de temperaturas y tiempos de cocción al vacío.' },
+  openGraph: { type: 'website', title: 'Sous-vide: temperaturas y tiempos', description: 'Temperaturas y tiempos sous-vide por alimento y punto de cocción.', url: 'https://meskeia.com/sous-vide', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Sous-vide: temperaturas y tiempos', description: 'La guía de temperaturas y tiempos de cocción al vacío.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Sous-vide meskeIA' },
   alternates: { canonical: 'https://meskeia.com/sous-vide/' },
 };

@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Tubérculos y raíces de Latinoamérica', description: 'Qué son y cómo cocinar la yuca, el boniato, la malanga, las papas andinas y más.', url: 'https://meskeia.com/guia-tuberculos-latam', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Tubérculos de Latinoamérica', description: 'Yuca, boniato, malanga, papas andinas y más.' },
+  openGraph: { type: 'website', title: 'Tubérculos y raíces de Latinoamérica', description: 'Qué son y cómo cocinar la yuca, el boniato, la malanga, las papas andinas y más.', url: 'https://meskeia.com/guia-tuberculos-latam', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Tubérculos de Latinoamérica', description: 'Yuca, boniato, malanga, papas andinas y más.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Tubérculos LATAM meskeIA' },
   alternates: { canonical: 'https://meskeia.com/guia-tuberculos-latam/' },
 };

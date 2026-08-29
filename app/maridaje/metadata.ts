@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Maridaje: vino y cerveza para cada plato', description: 'Qué vino y qué cerveza maridan mejor con cada plato, y por qué.', url: 'https://meskeia.com/maridaje', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Maridaje de comida', description: 'Qué vino o cerveza elegir según el plato.' },
+  openGraph: { type: 'website', title: 'Maridaje: vino y cerveza para cada plato', description: 'Qué vino y qué cerveza maridan mejor con cada plato, y por qué.', url: 'https://meskeia.com/maridaje', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Maridaje de comida', description: 'Qué vino o cerveza elegir según el plato.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Maridaje meskeIA' },
   alternates: { canonical: 'https://meskeia.com/maridaje/' },
 };

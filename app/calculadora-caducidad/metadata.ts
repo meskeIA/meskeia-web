@@ -19,11 +19,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/calculadora-caducidad',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/coquinum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Cuánto dura cada alimento',
     description: 'Tiempos de conservación en nevera, congelador y despensa, por alimento.',
+    images: ['https://meskeia.com/coquinum/og-image.png'],
   },
   other: { 'application-name': 'Caducidad de alimentos meskeIA' },
   alternates: { canonical: 'https://meskeia.com/calculadora-caducidad/' },

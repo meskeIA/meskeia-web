@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Calculadora de crema pastelera', description: 'Yemas, azúcar y maicena según la leche, para crema pastelera o inglesa.', url: 'https://meskeia.com/calculadora-crema-pastelera', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Calculadora de crema pastelera', description: 'Proporciones de crema pastelera e inglesa por la leche que uses.' },
+  openGraph: { type: 'website', title: 'Calculadora de crema pastelera', description: 'Yemas, azúcar y maicena según la leche, para crema pastelera o inglesa.', url: 'https://meskeia.com/calculadora-crema-pastelera', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Calculadora de crema pastelera', description: 'Proporciones de crema pastelera e inglesa por la leche que uses.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Crema pastelera meskeIA' },
   alternates: { canonical: 'https://meskeia.com/calculadora-crema-pastelera/' },
 };

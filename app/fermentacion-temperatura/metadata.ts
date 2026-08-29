@@ -19,12 +19,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/fermentacion-temperatura',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/coquinum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Tiempo de fermentación según la temperatura',
     description:
       'La temperatura manda en el levado: calcula el tiempo real de fermentación de tu masa.',
+    images: ['https://meskeia.com/coquinum/og-image.png'],
   },
   other: {
     'application-name': 'Fermentación según temperatura meskeIA',

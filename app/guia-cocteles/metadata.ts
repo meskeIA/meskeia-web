@@ -17,17 +17,17 @@ export const metadata: Metadata = {
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/coquinum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA',
     }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Guía de Cócteles Clásicos | meskeIA',
     description: '45 cócteles clásicos con ingredientes, método de preparación, copa, origen e historia. Filtros por familia y base.',
-    images: ['https://meskeia.com/og-image.png']
+    images: ['https://meskeia.com/coquinum/og-image.png']
   },
   other: {
     'application-name': 'Guía de Cócteles Clásicos meskeIA',

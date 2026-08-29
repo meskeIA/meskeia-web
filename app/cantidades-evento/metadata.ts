@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Cuánta comida y bebida por invitado', description: 'Las cantidades de comida y bebida para tu evento según los invitados.', url: 'https://meskeia.com/cantidades-evento', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Cantidades para un evento', description: 'Cuánta comida y bebida preparar por invitado.' },
+  openGraph: { type: 'website', title: 'Cuánta comida y bebida por invitado', description: 'Las cantidades de comida y bebida para tu evento según los invitados.', url: 'https://meskeia.com/cantidades-evento', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Cantidades para un evento', description: 'Cuánta comida y bebida preparar por invitado.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Cantidades para evento meskeIA' },
   alternates: { canonical: 'https://meskeia.com/cantidades-evento/' },
 };

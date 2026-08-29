@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Aguas frescas, limonada y horchata', description: 'Las proporciones para tus aguas frescas según los litros que prepares.', url: 'https://meskeia.com/aguas-frescas', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Aguas frescas y limonada', description: 'Proporciones de aguas frescas, limonada y horchata por litros.' },
+  openGraph: { type: 'website', title: 'Aguas frescas, limonada y horchata', description: 'Las proporciones para tus aguas frescas según los litros que prepares.', url: 'https://meskeia.com/aguas-frescas', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Aguas frescas y limonada', description: 'Proporciones de aguas frescas, limonada y horchata por litros.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Aguas frescas meskeIA' },
   alternates: { canonical: 'https://meskeia.com/aguas-frescas/' },
 };

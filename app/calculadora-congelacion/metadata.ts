@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Qué se puede congelar y cuánto dura', description: 'Qué alimentos se congelan bien, cuáles no y cuánto aguantan en el congelador.', url: 'https://meskeia.com/calculadora-congelacion', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Qué se puede congelar y cuánto dura', description: 'Qué congelar, qué no y cuánto aguanta cada alimento.' },
+  openGraph: { type: 'website', title: 'Qué se puede congelar y cuánto dura', description: 'Qué alimentos se congelan bien, cuáles no y cuánto aguantan en el congelador.', url: 'https://meskeia.com/calculadora-congelacion', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Qué se puede congelar y cuánto dura', description: 'Qué congelar, qué no y cuánto aguanta cada alimento.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Congelar alimentos meskeIA' },
   alternates: { canonical: 'https://meskeia.com/calculadora-congelacion/' },
 };

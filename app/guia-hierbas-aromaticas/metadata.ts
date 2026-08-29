@@ -20,10 +20,10 @@ export const metadata: Metadata = {
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/coquinum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA',
     }]
   },
   twitter: {
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     title: 'Guía de Hierbas Aromáticas | meskeIA',
     description:
       'Directorio de 27 hierbas aromáticas con perfil de sabor, maridaje, cocinas típicas y guía de cultivo en casa.',
-    images: ['https://meskeia.com/og-image.png']
+    images: ['https://meskeia.com/coquinum/og-image.png']
   },
   other: {
     'application-name': 'Guía Hierbas Aromáticas meskeIA',

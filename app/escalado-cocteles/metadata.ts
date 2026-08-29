@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Escalado de cócteles y graduación', description: 'Escala cócteles a las copas que necesites y calcula la graduación de la mezcla.', url: 'https://meskeia.com/escalado-cocteles', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Escalado de cócteles', description: 'Cócteles a escala para fiestas, con la graduación de la mezcla.' },
+  openGraph: { type: 'website', title: 'Escalado de cócteles y graduación', description: 'Escala cócteles a las copas que necesites y calcula la graduación de la mezcla.', url: 'https://meskeia.com/escalado-cocteles', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Escalado de cócteles', description: 'Cócteles a escala para fiestas, con la graduación de la mezcla.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Escalado de cócteles meskeIA' },
   alternates: { canonical: 'https://meskeia.com/escalado-cocteles/' },
 };

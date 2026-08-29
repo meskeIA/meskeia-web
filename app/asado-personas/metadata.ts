@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Cuánta carne para un asado por persona', description: 'La carne a comprar para tu asado según las personas, el apetito y las guarniciones.', url: 'https://meskeia.com/asado-personas', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Cuánta carne para un asado', description: 'La carne a comprar para tu barbacoa según las personas.' },
+  openGraph: { type: 'website', title: 'Cuánta carne para un asado por persona', description: 'La carne a comprar para tu asado según las personas, el apetito y las guarniciones.', url: 'https://meskeia.com/asado-personas', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Cuánta carne para un asado', description: 'La carne a comprar para tu barbacoa según las personas.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Carne para asado meskeIA' },
   alternates: { canonical: 'https://meskeia.com/asado-personas/' },
 };

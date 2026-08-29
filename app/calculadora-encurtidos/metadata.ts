@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Calculadora de encurtidos', description: 'Vinagre, agua, sal y azúcar para tu líquido de encurtido según el estilo y el volumen.', url: 'https://meskeia.com/calculadora-encurtidos', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Calculadora de encurtidos', description: 'El líquido de encurtido perfecto según el estilo y el volumen.' },
+  openGraph: { type: 'website', title: 'Calculadora de encurtidos', description: 'Vinagre, agua, sal y azúcar para tu líquido de encurtido según el estilo y el volumen.', url: 'https://meskeia.com/calculadora-encurtidos', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Calculadora de encurtidos', description: 'El líquido de encurtido perfecto según el estilo y el volumen.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Calculadora de encurtidos meskeIA' },
   alternates: { canonical: 'https://meskeia.com/calculadora-encurtidos/' },
 };

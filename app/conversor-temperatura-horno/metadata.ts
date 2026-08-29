@@ -19,12 +19,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/conversor-temperatura-horno',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/coquinum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Conversor de temperatura de horno',
     description:
       'Celsius, Fahrenheit y gas mark en un solo paso, con el ajuste para horno de ventilador.',
+    images: ['https://meskeia.com/coquinum/og-image.png'],
   },
   other: {
     'application-name': 'Conversor temperatura horno meskeIA',

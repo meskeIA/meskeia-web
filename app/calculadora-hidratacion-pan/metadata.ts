@@ -19,12 +19,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/calculadora-hidratacion-pan',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/coquinum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Calculadora de Hidratación del Pan',
     description:
       'Calcula el % de hidratación de tu masa o cuánta agua necesitas para una hidratación objetivo. Clasificación con ejemplos de panes.',
+    images: ['https://meskeia.com/coquinum/og-image.png'],
   },
   other: {
     'application-name': 'Calculadora Hidratación Pan meskeIA',

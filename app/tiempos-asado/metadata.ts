@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Tiempos de asado al horno por peso', description: 'Cuánto asar pollo, pavo, cordero, cerdo o ternera según el peso, con la temperatura interna objetivo.', url: 'https://meskeia.com/tiempos-asado', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Tiempos de asado al horno', description: 'Cuánto asar cada carne según el peso, con la temperatura interna objetivo.' },
+  openGraph: { type: 'website', title: 'Tiempos de asado al horno por peso', description: 'Cuánto asar pollo, pavo, cordero, cerdo o ternera según el peso, con la temperatura interna objetivo.', url: 'https://meskeia.com/tiempos-asado', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Tiempos de asado al horno', description: 'Cuánto asar cada carne según el peso, con la temperatura interna objetivo.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Tiempos de asado meskeIA' },
   alternates: { canonical: 'https://meskeia.com/tiempos-asado/' },
 };

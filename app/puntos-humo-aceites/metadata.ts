@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Puntos de humo de los aceites (cuál usar para freír)', description: 'La temperatura que aguanta cada aceite y grasa de cocina, del aliño en crudo a la fritura.', url: 'https://meskeia.com/puntos-humo-aceites', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Puntos de humo de los aceites', description: 'Qué aceite aguanta cada temperatura: del aliño en crudo a la fritura.' },
+  openGraph: { type: 'website', title: 'Puntos de humo de los aceites (cuál usar para freír)', description: 'La temperatura que aguanta cada aceite y grasa de cocina, del aliño en crudo a la fritura.', url: 'https://meskeia.com/puntos-humo-aceites', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Puntos de humo de los aceites', description: 'Qué aceite aguanta cada temperatura: del aliño en crudo a la fritura.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Puntos de humo de aceites meskeIA' },
   alternates: { canonical: 'https://meskeia.com/puntos-humo-aceites/' },
 };

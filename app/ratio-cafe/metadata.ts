@@ -19,11 +19,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/ratio-cafe',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/coquinum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Calculadora de ratio de café',
     description: 'Café y agua exactos según el método de preparación.',
+    images: ['https://meskeia.com/coquinum/og-image.png'],
   },
   other: { 'application-name': 'Ratio de café meskeIA' },
   alternates: { canonical: 'https://meskeia.com/ratio-cafe/' },

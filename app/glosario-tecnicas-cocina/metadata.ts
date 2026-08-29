@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Glosario de técnicas de cocina', description: 'Los verbos de las recetas explicados: blanquear, confitar, bresar, desglasar y muchos más, con ejemplos.', url: 'https://meskeia.com/glosario-tecnicas-cocina', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Glosario de técnicas de cocina', description: 'Blanquear, confitar, bresar, desglasar… los verbos de las recetas, explicados con ejemplos.' },
+  openGraph: { type: 'website', title: 'Glosario de técnicas de cocina', description: 'Los verbos de las recetas explicados: blanquear, confitar, bresar, desglasar y muchos más, con ejemplos.', url: 'https://meskeia.com/glosario-tecnicas-cocina', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Glosario de técnicas de cocina', description: 'Blanquear, confitar, bresar, desglasar… los verbos de las recetas, explicados con ejemplos.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Glosario de técnicas de cocina meskeIA' },
   alternates: { canonical: 'https://meskeia.com/glosario-tecnicas-cocina/' },
 };

@@ -35,11 +35,26 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/[nombre-app]',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    // OBLIGATORIO. Next NO hereda la imagen del layout raíz: el merge de metadata
+    // es *shallow*, así que declarar `openGraph` aquí reemplaza entero el del padre
+    // y la `ogImage` de `generateBaseMetadata()` no llega. Sin ella, X, WhatsApp o
+    // LinkedIn degradan la tarjeta a la pequeña con icono de documento pese al
+    // `summary_large_image` de abajo. Si la app entra en un portal vertical, usa la
+    // og de ese portal (p. ej. `/coquinum/og-image.png`) — lo vigila `check:og-image`.
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: '[Título para Twitter]',
     description: '[Descripción para Twitter]',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Nombre App meskeIA',

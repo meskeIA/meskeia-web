@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Calculadora de salmuera (brining)', description: 'Sal y agua para tu salmuera según la concentración, con tiempos por pieza.', url: 'https://meskeia.com/calculadora-salmuera', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Calculadora de salmuera', description: 'Sal y agua para tu salmuera, con tiempos por pieza.' },
+  openGraph: { type: 'website', title: 'Calculadora de salmuera (brining)', description: 'Sal y agua para tu salmuera según la concentración, con tiempos por pieza.', url: 'https://meskeia.com/calculadora-salmuera', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Calculadora de salmuera', description: 'Sal y agua para tu salmuera, con tiempos por pieza.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Calculadora de salmuera meskeIA' },
   alternates: { canonical: 'https://meskeia.com/calculadora-salmuera/' },
 };

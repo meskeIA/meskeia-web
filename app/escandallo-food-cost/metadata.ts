@@ -19,12 +19,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/escandallo-food-cost',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/coquinum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Escandallo y food cost',
     description:
       'Calcula coste por ración, food cost y precio de venta de tus platos. Para hostelería y catering.',
+    images: ['https://meskeia.com/coquinum/og-image.png'],
   },
   other: {
     'application-name': 'Escandallo y food cost meskeIA',

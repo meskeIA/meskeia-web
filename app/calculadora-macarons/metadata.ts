@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Calculadora de macarons', description: 'Almendra, azúcar glas, granulado y claras para tus macarons (método francés).', url: 'https://meskeia.com/calculadora-macarons', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Calculadora de macarons', description: 'Las cantidades exactas para tus macarons por el método francés.' },
+  openGraph: { type: 'website', title: 'Calculadora de macarons', description: 'Almendra, azúcar glas, granulado y claras para tus macarons (método francés).', url: 'https://meskeia.com/calculadora-macarons', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Calculadora de macarons', description: 'Las cantidades exactas para tus macarons por el método francés.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Calculadora de macarons meskeIA' },
   alternates: { canonical: 'https://meskeia.com/calculadora-macarons/' },
 };

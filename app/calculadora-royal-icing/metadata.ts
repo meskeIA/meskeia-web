@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Calculadora de glaseado real (royal icing)', description: 'Azúcar glas y claras para tu glasa según la consistencia que necesites.', url: 'https://meskeia.com/calculadora-royal-icing', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Calculadora de glaseado real', description: 'Glasa de azúcar para decorar galletas: contorno, media o relleno.' },
+  openGraph: { type: 'website', title: 'Calculadora de glaseado real (royal icing)', description: 'Azúcar glas y claras para tu glasa según la consistencia que necesites.', url: 'https://meskeia.com/calculadora-royal-icing', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Calculadora de glaseado real', description: 'Glasa de azúcar para decorar galletas: contorno, media o relleno.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Glaseado real meskeIA' },
   alternates: { canonical: 'https://meskeia.com/calculadora-royal-icing/' },
 };

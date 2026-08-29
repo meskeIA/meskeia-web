@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Guía de tipos de sal', description: 'Texturas, usos y diferencias de las sales de cocina.', url: 'https://meskeia.com/guia-tipos-sal', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Guía de tipos de sal', description: 'Qué sal usar para cada cosa.' },
+  openGraph: { type: 'website', title: 'Guía de tipos de sal', description: 'Texturas, usos y diferencias de las sales de cocina.', url: 'https://meskeia.com/guia-tipos-sal', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Guía de tipos de sal', description: 'Qué sal usar para cada cosa.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Guía de sal meskeIA' },
   alternates: { canonical: 'https://meskeia.com/guia-tipos-sal/' },
 };

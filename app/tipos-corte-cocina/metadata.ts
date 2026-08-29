@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Tipos de corte en cocina (dimensiones y usos)', description: 'Brunoise, juliana, mirepoix, bastón, chiffonade… qué mide cada corte y para qué se usa.', url: 'https://meskeia.com/tipos-corte-cocina', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Tipos de corte en cocina', description: 'Dimensiones y usos de los cortes clásicos: brunoise, juliana, mirepoix, chiffonade y más.' },
+  openGraph: { type: 'website', title: 'Tipos de corte en cocina (dimensiones y usos)', description: 'Brunoise, juliana, mirepoix, bastón, chiffonade… qué mide cada corte y para qué se usa.', url: 'https://meskeia.com/tipos-corte-cocina', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Tipos de corte en cocina', description: 'Dimensiones y usos de los cortes clásicos: brunoise, juliana, mirepoix, chiffonade y más.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Tipos de corte en cocina meskeIA' },
   alternates: { canonical: 'https://meskeia.com/tipos-corte-cocina/' },
 };

@@ -18,8 +18,16 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/calculadora-almibar',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/coquinum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA',
+      },
+    ],
   },
-  twitter: { card: 'summary_large_image', title: 'Calculadora de almíbar', description: 'Azúcar y agua para tu almíbar según el uso.' },
+  twitter: { card: 'summary_large_image', title: 'Calculadora de almíbar', description: 'Azúcar y agua para tu almíbar según el uso.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Calculadora de almíbar meskeIA' },
   alternates: { canonical: 'https://meskeia.com/calculadora-almibar/' },
 };

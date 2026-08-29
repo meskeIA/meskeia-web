@@ -467,6 +467,36 @@ dejar pasar— está en `scripts/pruebas/parser-numerico.tsx`.
 > el patrón—: veía 153 de 188 usos reales. Se descubrió comparándolo con un `grep` independiente,
 > no ejecutándolo.
 
+### Candado de la tarjeta social
+
+`npm run check:og-image` — lo ejecuta también `npm run build`. Vigila la imagen con la que un
+enlace se convierte en tarjeta en X, WhatsApp, LinkedIn o Slack.
+
+**Rompe el build** si una app de un portal vertical no declara la og de SU portal en `openGraph`
+y en `twitter`, si una página de portal se queda sin ella, si la imagen no existe en `public/`, o
+si la URL cae bajo un redirect de `next.config.ts` que la desvía a otro dominio.
+
+⚠️ **Next NO hereda la imagen del layout raíz.** El merge de metadata es *shallow*: declarar
+`openGraph` en la página reemplaza entero el del padre, así que la `ogImage` de
+`generateBaseMetadata()` no llega. Con `twitter:card = summary_large_image` y ninguna imagen
+detrás, la tarjeta se degrada a la pequeña con icono de documento. Por eso la plantilla
+`templates/app-base/` ya trae `images`: una app nueva nace con imagen.
+
+El pasivo de meskeIA (105 apps sin imagen al 29/08/2026, fuera de los portales) se **cuenta y se
+nombra pero no detiene el build**, mismo criterio que `check:a11y-jsx` y `check:parser`.
+`--todo` lo lista entero. Al abrir un vertical nuevo se añade su entrada a `PORTALES` en el
+script y el candado pasa a exigirlo — **Stemum y Delegum siguen pendientes de esa decisión**.
+
+> Sale de la pregunta de por qué los posts de X de Coquinum y Cronicum salían sin imagen y los de
+> meskeIA no (29/08/2026). No era X ni indexación: 159 apps declaraban `openGraph` sin `images`,
+> 54 de ellas del portal gastro, porque **la plantilla no la incluía**. Y la og de Cronicum
+> apuntaba a `meskeia.com/cronicum/og-image.png`, que el 308 canónico `/cronicum/:path+` desvía a
+> `cronicum.com/og-image.png` — la imagen de meskeIA: la de Cronicum **no se sirvió nunca**,
+> mientras el comentario del código afirmaba justo lo contrario. Ese segundo defecto es el que
+> ningún ojo detecta leyendo el metadata, y es el que obliga a que el candado cruce la URL con los
+> redirects. Los cuatro casos reinyectados —más los dos que debe dejar pasar— están en
+> `npm run og:probar-candado`.
+
 ### TypeScript
 
 - ⚠️ `ignoreBuildErrors: true` en `next.config.ts` — el build de producción NO type-chequea (limitación de RAM en Vercel: el type-check de +1.100 apps agota los 8 GB)

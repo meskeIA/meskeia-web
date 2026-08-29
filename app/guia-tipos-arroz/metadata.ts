@@ -23,10 +23,10 @@ export const metadata: Metadata = {
     locale: 'es_ES',
     siteName: 'meskeIA',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/coquinum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA',
     }]
   },
   twitter: {
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     title: 'Tipos de Arroz del Mundo: 30 Variedades Explicadas',
     description:
       'Aprende a elegir el arroz correcto para cada plato: 30 variedades del mundo, su origen, características y uso ideal.',
-    images: ['https://meskeia.com/og-image.png']
+    images: ['https://meskeia.com/coquinum/og-image.png']
   },
   alternates: {
     canonical: 'https://meskeia.com/guia-tipos-arroz/',

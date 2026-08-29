@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  openGraph: { type: 'website', title: 'Calculadora de mermelada', description: 'Azúcar y limón para tu mermelada según la fruta y el dulzor que quieras.', url: 'https://meskeia.com/calculadora-mermelada', siteName: 'meskeIA', locale: 'es_ES' },
-  twitter: { card: 'summary_large_image', title: 'Calculadora de mermelada', description: 'Azúcar y limón para tu mermelada casera según la fruta.' },
+  openGraph: { type: 'website', title: 'Calculadora de mermelada', description: 'Azúcar y limón para tu mermelada según la fruta y el dulzor que quieras.', url: 'https://meskeia.com/calculadora-mermelada', siteName: 'meskeIA', locale: 'es_ES', images: [{ url: 'https://meskeia.com/coquinum/og-image.png', width: 1200, height: 630, alt: 'Coquinum — el portal de cocina y gastronomía de meskeIA' }] },
+  twitter: { card: 'summary_large_image', title: 'Calculadora de mermelada', description: 'Azúcar y limón para tu mermelada casera según la fruta.', images: ['https://meskeia.com/coquinum/og-image.png'] },
   other: { 'application-name': 'Calculadora de mermelada meskeIA' },
   alternates: { canonical: 'https://meskeia.com/calculadora-mermelada/' },
 };
