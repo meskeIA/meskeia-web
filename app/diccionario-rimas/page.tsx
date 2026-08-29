@@ -20,6 +20,7 @@ import {
   indexarBloque,
   indiceVacio,
 } from './rimas';
+import { formasVerbalesFlexionadas } from './formas-verbales';
 
 const DICCIONARIO_URL = '/data/diccionario-es.txt';
 
@@ -70,6 +71,14 @@ export default function DiccionarioRimasPage() {
           .map((p) => p.trim())
           .filter(Boolean);
 
+        // El diccionario base es de LEMAS: gerundios y participios (el final
+        // de verso más frecuente en canciones y rap) casi no existen. Se
+        // añaden aparte, y se descartan los que el propio diccionario ya
+        // trae, para no duplicar la palabra en los resultados.
+        const yaExisten = new Set(palabras);
+        const formasVerbales = formasVerbalesFlexionadas().filter((f) => !yaExisten.has(f));
+        const todas = [...palabras, ...formasVerbales];
+
         setEstado('indexando');
         const nuevo = indiceVacio();
         let i = 0;
@@ -78,11 +87,11 @@ export default function DiccionarioRimasPage() {
         // sin esto, indexar 87.000 palabras deja la página sin responder.
         const siguienteBloque = () => {
           if (cancelado) return;
-          indexarBloque(nuevo, palabras.slice(i, i + TAMANO_BLOQUE));
+          indexarBloque(nuevo, todas.slice(i, i + TAMANO_BLOQUE));
           i += TAMANO_BLOQUE;
-          setProgreso(Math.min(100, Math.round((i / palabras.length) * 100)));
+          setProgreso(Math.min(100, Math.round((i / todas.length) * 100)));
 
-          if (i < palabras.length) {
+          if (i < todas.length) {
             setTimeout(siguienteBloque, 0);
           } else {
             setIndice(nuevo);
@@ -638,9 +647,12 @@ export default function DiccionarioRimasPage() {
             <summary>¿De dónde salen las palabras?</summary>
             <p>
               De un listado de unas 87.000 palabras del español, el mismo que usa el buscador de
-              palabras por patrón. Contiene formas de diccionario, así que verás{' '}
-              <em>cantar</em> pero no todas sus formas conjugadas. Si buscas una rima que sabes que
-              existe y no aparece, es muy probable que sea una forma flexionada.
+              palabras por patrón, más el <strong>gerundio y el participio</strong> (
+              <em>cantando</em>, <em>cantado</em>) de los verbos más comunes, que es el final de
+              verso más habitual en canción y rap. El resto de formas conjugadas (
+              <em>canto</em>, <em>cantas</em>, <em>cantaba</em>...) no está: si buscas una rima de
+              un tiempo verbal distinto al gerundio o el participio, es muy probable que sea esa la
+              forma que falta.
             </p>
           </details>
           <details className={styles.faq}>
