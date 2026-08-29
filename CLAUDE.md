@@ -492,10 +492,13 @@ script y el candado pasa a exigirlo. Los cuatro están cubiertos: **Coquinum** (
 **Cronicum** (sus 182 páginas salen de un solo `generateMetadata`) y **Delegum** (21 páginas de
 portal).
 
-⚠️ **Delegum es la excepción: sus apps NO llevan la og del portal.** Las apps que enlaza son de
-meskeIA y viven en `meskeia.com` —no hay lista de la que derivarlas, al contrario que
-`COQUINUM_APPS` o `STEMUM_APPS`—, así que conservan la og de meskeIA. Lo que sí es suyo son las
-páginas de su árbol: home, fichas de `/datos-fiscales/`, asistente y blog. De ahí que el candado
+⚠️ **Delegum es la excepción: sus apps NO llevan la og del portal.** No es por falta de lista
+—`DELEGUM_APP_SLUGS` existe, con 91 apps— sino porque **Delegum no sirve apps bajo su dominio**:
+su proxy no hace passthrough de slugs del catálogo, así que `delegum.com/estimador-irpf/` da 404
+mientras `coquinum.com/escandallo-food-cost/` da 200. Esas apps solo se ven bajo `meskeia.com`, de
+modo que ponerles la og de Delegum las marcaría con una marca que el visitante nunca llega a ver.
+`DELEGUM_APP_SLUGS` alimenta *Soluciones* (enrutado por journey), no pertenencia al portal. Lo que
+sí es suyo son las páginas de su árbol: home, fichas de `/datos-fiscales/`, asistente y blog. De ahí que el candado
 recorra el **árbol** de cada portal en vez de una lista de páginas: las 20 páginas propias de
 Delegum llevaban sin imagen desde siempre y ninguna lista las habría echado de menos.
 
