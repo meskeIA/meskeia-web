@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getHistoria, getAllHistoriaSlugs } from '@/data/historias/index';
 import { getPuerta, getAllPuertaSlugs, getPuertaDeCronologia } from '@/data/cronicum/puertas';
+import { OG_IMAGE } from '../metadata';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import HistoriaInteractivo from '../../visualizador-historia/[slug]/HistoriaInteractivo';
 import PuertaView, { type CronologiaItem } from './PuertaView';
@@ -23,6 +24,26 @@ export async function generateStaticParams() {
   return [...puertas, ...cronologias].map((slug) => ({ slug }));
 }
 
+/**
+ * Tarjeta social de las 12 puertas y las cronologías: todas comparten la imagen
+ * de marca de Cronicum.
+ *
+ * Va explícita porque Next **no** la hereda del layout raíz: el merge de metadata
+ * es *shallow*, así que declarar `openGraph` aquí reemplaza entero el del padre y
+ * la `ogImage` de `generateBaseMetadata()` no llega. Hasta el 29/08/2026 estas
+ * páginas salían sin `og:image` ni `twitter:image` y X, WhatsApp o LinkedIn
+ * degradaban la tarjeta a la pequeña con icono de documento — mientras la misma
+ * cronología bajo `meskeia.com/visualizador-historia/[slug]` sí la traía.
+ */
+const OG_IMAGENES = [
+  {
+    url: OG_IMAGE,
+    width: 1200,
+    height: 630,
+    alt: 'Cronicum — el portal de historia interactiva de meskeIA',
+  },
+];
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const url = `https://cronicum.com/${slug}/`;
@@ -41,6 +62,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         siteName: 'Cronicum',
         type: 'website',
         locale: 'es_ES',
+        images: OG_IMAGENES,
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description: puerta.descripcion,
+        images: [OG_IMAGE],
       },
     };
   }
@@ -59,11 +87,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       siteName: 'Cronicum',
       type: 'website',
       locale: 'es_ES',
+      images: OG_IMAGENES,
     },
     twitter: {
       card: 'summary_large_image',
       title: data.titulo,
       description: data.descripcionSEO,
+      images: [OG_IMAGE],
     },
   };
 }

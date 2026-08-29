@@ -2,6 +2,23 @@ import { Metadata } from 'next';
 
 const URL_CANONICA = 'https://cronicum.com/';
 
+/**
+ * Imagen de tarjeta social de Cronicum (1200×630), compartida por la home, las
+ * puertas y las cronologías (`[slug]/page.tsx` la importa de aquí).
+ *
+ * El host es `cronicum.com` **a propósito**. Hasta el 29/08/2026 apuntaba a
+ * `https://meskeia.com/cronicum/og-image.png` con el comentario «servida como
+ * estático directo (sin el host-rewrite del proxy)»: cierto respecto al proxy,
+ * pero FALSO respecto a `next.config.ts`, cuyo 308 canónico `/cronicum/:path+`
+ * → `cronicum.com/:path+/` también se traga la imagen. El salto terminaba en
+ * `cronicum.com/og-image.png`, que es `public/og-image.png` — la de meskeIA
+ * (53 KB) — así que la og de Cronicum (74 KB) NO se sirvió nunca. Bajo
+ * cronicum.com el proxy hace passthrough de todo lo que lleva extensión, de
+ * modo que esta URL resuelve directa a `public/cronicum/og-image.png`, sin
+ * redirección y con la imagen de marca correcta.
+ */
+export const OG_IMAGE = 'https://cronicum.com/cronicum/og-image.png';
+
 export const metadata: Metadata = {
   title: 'Cronicum — Historia interactiva de la humanidad | meskeIA',
   description:
@@ -22,8 +39,7 @@ export const metadata: Metadata = {
     locale: 'es_ES',
     images: [
       {
-        // Servida como estático directo (sin el host-rewrite del proxy).
-        url: 'https://meskeia.com/cronicum/og-image.png',
+        url: OG_IMAGE,
         width: 1200,
         height: 630,
         alt: 'Cronicum — el portal de historia interactiva de meskeIA',
@@ -35,7 +51,7 @@ export const metadata: Metadata = {
     title: 'Cronicum — Historia interactiva de la humanidad',
     description:
       'Cronologías interactivas de la historia universal. Navegable, sin registro, sin coste.',
-    images: ['https://meskeia.com/cronicum/og-image.png'],
+    images: [OG_IMAGE],
   },
   other: {
     'application-name': 'Cronicum',
