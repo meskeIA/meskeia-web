@@ -22,12 +22,21 @@ export const metadata: Metadata = {
     url: URL_CANONICA,
     siteName: 'Delegum',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://delegum.com/delegum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Delegum — el portal de fiscalidad y derecho de meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary',
     title: 'CNAE-2025 y epígrafes del IAE: qué código declara cada organismo',
     description:
       'CNAE (INE) frente a IAE (AEAT), secciones del IAE y retención de IRPF, y exención por cifra de negocio.',
+    images: ['https://delegum.com/delegum/og-image.png'],
   },
   alternates: {
     canonical: URL_CANONICA,

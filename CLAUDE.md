@@ -485,11 +485,17 @@ detrás, la tarjeta se degrada a la pequeña con icono de documento. Por eso la 
 El pasivo de meskeIA (96 apps sin imagen al 29/08/2026, fuera de los portales) se **cuenta y se
 nombra pero no detiene el build**, mismo criterio que `check:a11y-jsx` y `check:parser`.
 `--todo` lo lista entero. Al abrir un vertical nuevo se añade su entrada a `PORTALES` en el
-script y el candado pasa a exigirlo. Cubiertos: **Coquinum** (84), **Stemum** (139 apps + 12
-tablas de material de apoyo, que también se publican bajo stemum.com) y **Cronicum** (sus 182
-páginas salen de un solo `generateMetadata`). **Delegum sigue pendiente**, y su og está rota por
-la misma causa que estuvo la de Cronicum: `meskeia.com/delegum/og-image.png` da dos saltos y
-acaba sirviendo `public/og-image.png`, la de meskeIA.
+script y el candado pasa a exigirlo. Los cuatro están cubiertos: **Coquinum** (84 apps),
+**Stemum** (139 apps + 12 tablas de material de apoyo, que también se publican bajo stemum.com),
+**Cronicum** (sus 182 páginas salen de un solo `generateMetadata`) y **Delegum** (21 páginas de
+portal).
+
+⚠️ **Delegum es la excepción: sus apps NO llevan la og del portal.** Las apps que enlaza son de
+meskeIA y viven en `meskeia.com` —no hay lista de la que derivarlas, al contrario que
+`COQUINUM_APPS` o `STEMUM_APPS`—, así que conservan la og de meskeIA. Lo que sí es suyo son las
+páginas de su árbol: home, fichas de `/datos-fiscales/`, asistente y blog. De ahí que el candado
+recorra el **árbol** de cada portal en vez de una lista de páginas: las 20 páginas propias de
+Delegum llevaban sin imagen desde siempre y ninguna lista las habría echado de menos.
 
 > Sale de la pregunta de por qué los posts de X de Coquinum y Cronicum salían sin imagen y los de
 > meskeIA no (29/08/2026). No era X ni indexación: 159 apps declaraban `openGraph` sin `images`,

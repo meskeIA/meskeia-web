@@ -2,6 +2,23 @@ import { Metadata } from 'next';
 
 const URL_CANONICA = 'https://delegum.com/';
 
+/**
+ * Imagen de tarjeta social de Delegum (1200×630), compartida por la home, las
+ * fichas de datos fiscales, el asistente y el blog.
+ *
+ * El host es `delegum.com` **a propósito**. Hasta el 29/08/2026 apuntaba a
+ * `https://meskeia.com/delegum/og-image.png` con el comentario «servida como
+ * estático directo (sin el host-rewrite del proxy)»: cierto respecto al proxy,
+ * pero FALSO respecto a `next.config.ts`, cuyo 308 canónico `/delegum/:path+`
+ * → `delegum.com/:path+/` también se traga la imagen. El salto terminaba en
+ * `delegum.com/og-image.png`, que es `public/og-image.png` — la de meskeIA
+ * (53 KB) — así que la og de Delegum (60 KB) NO se sirvió nunca. El mismo
+ * defecto, palabra por palabra, que tenía Cronicum. Bajo delegum.com el proxy
+ * hace passthrough de todo lo que lleva extensión, de modo que esta URL resuelve
+ * directa a `public/delegum/og-image.png`, sin redirección.
+ */
+export const OG_IMAGE = 'https://delegum.com/delegum/og-image.png';
+
 export const metadata: Metadata = {
   title: 'Delegum — Plataforma de fiscalidad, derecho laboral y finanzas en España | meskeIA',
   description:
@@ -22,8 +39,7 @@ export const metadata: Metadata = {
     locale: 'es_ES',
     images: [
       {
-        // Servida como estático directo (sin el host-rewrite del proxy).
-        url: 'https://meskeia.com/delegum/og-image.png',
+        url: OG_IMAGE,
         width: 1200,
         height: 630,
         alt: 'Delegum — el portal de fiscalidad y derecho de meskeIA',
@@ -35,7 +51,7 @@ export const metadata: Metadata = {
     title: 'Delegum — Plataforma de fiscalidad, derecho laboral y finanzas',
     description:
       'Datos fiscales verificados, asistente de IA y calculadoras para España. Sin registro, sin coste.',
-    images: ['https://meskeia.com/delegum/og-image.png'],
+    images: [OG_IMAGE],
   },
   other: {
     'application-name': 'Delegum',

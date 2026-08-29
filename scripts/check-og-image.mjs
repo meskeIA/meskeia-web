@@ -62,7 +62,7 @@ const PORTALES = [
     // Fuente única del catálogo: la misma que usa `check:verticales`.
     catalogo: 'data/coquinum.ts',
     imagen: 'https://meskeia.com/coquinum/og-image.png',
-    paginas: ['app/coquinum/metadata.ts'],
+    arbol: 'app/coquinum',
   },
   {
     nombre: 'Stemum',
@@ -71,17 +71,40 @@ const PORTALES = [
     // publican bajo stemum.com y comparten por tanto la misma tarjeta.
     catalogo: 'data/stemum.ts',
     imagen: 'https://meskeia.com/stemum/og-image.png',
-    paginas: ['app/stemum/metadata.ts'],
+    arbol: 'app/stemum',
   },
   {
     nombre: 'Cronicum',
     // Sus cronologías no tienen metadata.ts propio: las 182 páginas salen del
-    // `generateMetadata` de [slug], así que se vigila ese fichero.
+    // `generateMetadata` de [slug], que el recorrido del árbol ya alcanza.
     catalogo: null,
     imagen: 'https://cronicum.com/cronicum/og-image.png',
-    paginas: ['app/cronicum/metadata.ts', 'app/cronicum/[slug]/page.tsx'],
+    arbol: 'app/cronicum',
+  },
+  {
+    nombre: 'Delegum',
+    // No tiene catálogo de apps: las apps de meskeIA vinculadas a Delegum
+    // conservan la og de meskeIA (decisión del 29/08/2026, porque no forman una
+    // lista de la que derivar). Lo que sí es suyo son las 21 páginas del árbol:
+    // home, fichas de /datos-fiscales/, asistente y blog.
+    catalogo: null,
+    imagen: 'https://delegum.com/delegum/og-image.png',
+    arbol: 'app/delegum',
   },
 ];
+
+/** Todos los .ts/.tsx bajo un directorio, recursivamente. */
+function ficherosDe(rel) {
+  const salida = [];
+  (function recorrer(dir) {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const p = path.join(dir, e.name);
+      if (e.isDirectory()) recorrer(p);
+      else if (/\.(ts|tsx)$/.test(e.name)) salida.push(path.relative(RAIZ, p).replaceAll('\\', '/'));
+    }
+  })(path.join(RAIZ, rel));
+  return salida;
+}
 
 /** Rango [ini, fin] del objeto `{...}` que sigue a `clave:`, con llaves balanceadas. */
 function bloque(texto, clave) {
@@ -137,27 +160,44 @@ for (const portal of PORTALES) {
     ok++;
   }
 
-  for (const rel of portal.paginas) {
-    if (!existe(rel)) {
-      errores.push(`[${portal.nombre}] falta ${rel}, que debería declarar la imagen del portal.`);
-      continue;
-    }
+  // Páginas propias del portal. Se recorre el árbol entero en vez de una lista a
+  // mano: así una página nueva queda vigilada desde que nace, que es justo lo que
+  // no ocurrió con las 20 de Delegum (fichas fiscales, asistente y blog), todas
+  // sin imagen sin que nada lo dijera.
+  let paginas = 0;
+  for (const rel of ficherosDe(portal.arbol)) {
     const t = leer(rel);
-    // Vale la URL literal o la constante importada del metadata del portal (así
-    // la declara `app/cronicum/[slug]/page.tsx`, para tener una sola definición).
-    // No basta con ver el nombre de la constante: se resuelve el import y se
-    // comprueba que el fichero de origen contiene de verdad la URL del portal.
-    if (t.includes(portal.imagen)) continue;
+    if (!/openGraph\s*:\s*\{/.test(t)) continue; // hereda del layout: no es cosa nuestra
+    paginas++;
+    // Se comprueba BLOQUE A BLOQUE, no sobre el fichero entero: que la URL
+    // aparezca en algún sitio no dice nada: un `openGraph` sin imagen colaba solo
+    // porque el `twitter` de al lado sí la tenía, y `og:image` es justamente el
+    // que leen casi todas las plataformas. Lo destapó `og:probar-candado`.
+    //
+    // Vale la URL literal o la constante OG_IMAGE del metadata del portal (así lo
+    // declaran `app/cronicum/[slug]/page.tsx` y la home de Delegum, para tener una
+    // sola definición). No basta con ver el nombre de la constante: se resuelve
+    // dónde vive y se comprueba que ahí está de verdad la URL del portal.
     const imp = t.match(/import\s*\{[^}]*\bOG_IMAGE\b[^}]*\}\s*from\s*'([^']+)'/);
-    const origen = imp && `${path.posix.join(path.posix.dirname(rel.replaceAll('\\', '/')), imp[1])}.ts`;
-    const resuelto = origen && existe(origen) && leer(origen).includes(portal.imagen);
-    if (!resuelto || !/images\s*:/.test(t) || !t.includes('OG_IMAGE')) {
-      errores.push(`[${portal.nombre}] ${rel} no declara la imagen del portal (${portal.imagen}), ni directamente ni por la constante OG_IMAGE.`);
+    const origen = imp ? `${path.posix.join(path.posix.dirname(rel), imp[1])}.ts` : rel;
+    const constanteVale = existe(origen) && leer(origen).includes(portal.imagen);
+
+    for (const clave of ['openGraph', 'twitter']) {
+      const b = bloque(t, clave);
+      if (!b) {
+        errores.push(`[${portal.nombre}] ${rel}: declara \`openGraph\` pero no \`${clave}\`, así que la tarjeta sale incompleta.`);
+        continue;
+      }
+      const dentro = t.slice(b[0], b[1]);
+      const ok = dentro.includes(portal.imagen) || (dentro.includes('OG_IMAGE') && constanteVale);
+      if (!ok) {
+        errores.push(`[${portal.nombre}] ${rel}: \`${clave}\` no declara la imagen del portal (${portal.imagen}).`);
+      }
     }
   }
 
   imagenesUsadas.add(portal.imagen);
-  resumen.push(`${portal.nombre}: ${ok} apps + ${portal.paginas.length} página(s) de portal con su og propia`);
+  resumen.push(`${portal.nombre}: ${ok} apps + ${paginas} página(s) de portal con su og propia`);
 }
 
 // ─── C. Toda imagen referenciada existe y nadie la desvía ───────────────────

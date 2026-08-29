@@ -22,12 +22,21 @@ export const metadata: Metadata = {
     url: URL_CANONICA,
     siteName: 'Delegum',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://delegum.com/delegum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Delegum — el portal de fiscalidad y derecho de meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary',
     title: 'Tipos del Impuesto de Sociedades 2026',
     description:
       'Tipos del IS en 2026: general, nueva creación, escala de microempresas y obligaciones, con fuente oficial.',
+    images: ['https://delegum.com/delegum/og-image.png'],
   },
   alternates: {
     canonical: URL_CANONICA,

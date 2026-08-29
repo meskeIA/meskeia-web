@@ -44,6 +44,20 @@ export async function generateMetadata({
       siteName: 'Delegum',
       locale: 'es_ES',
       publishedTime: post.fecha,
+      images: [
+        {
+          url: 'https://delegum.com/delegum/og-image.png',
+          width: 1200,
+          height: 630,
+          alt: 'Delegum — el portal de fiscalidad y derecho de meskeIA',
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.titulo,
+      description: post.resumen,
+      images: ['https://delegum.com/delegum/og-image.png'],
     },
   };
 }

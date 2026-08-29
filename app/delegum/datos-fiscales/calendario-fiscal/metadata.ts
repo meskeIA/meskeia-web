@@ -22,12 +22,21 @@ export const metadata: Metadata = {
     url: URL_CANONICA,
     siteName: 'Delegum',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://delegum.com/delegum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Delegum — el portal de fiscalidad y derecho de meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary',
     title: 'Calendario fiscal de España: plazos de los modelos',
     description:
       'Plazos recurrentes de los modelos trimestrales y anuales, la Renta y el Impuesto de Sociedades, con fuente oficial.',
+    images: ['https://delegum.com/delegum/og-image.png'],
   },
   alternates: {
     canonical: URL_CANONICA,

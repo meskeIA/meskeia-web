@@ -109,7 +109,20 @@ conRespaldo(['next.config.ts'], () => {
   );
 });
 
-// ── 4. La imagen no existe en public/ ───────────────────────────────────────
+// ── 4. Página propia de un portal sin imagen (las 20 de Delegum) ────────────
+conRespaldo(['app/delegum/datos-fiscales/iva-tipos/metadata.ts'], () => {
+  const f = abs('app/delegum/datos-fiscales/iva-tipos/metadata.ts');
+  const t = fs.readFileSync(f, 'utf8').replace(/\n\s*images: \[\n[\s\S]*?\n\s*\],(?=\n\s*\},)/, '');
+  fs.writeFileSync(f, t);
+  const { codigo, salida } = candado();
+  anotar(
+    'página del árbol de un portal sin `images` (las 20 de Delegum)',
+    codigo === 1 && /iva-tipos/.test(salida),
+    `exit ${codigo}; la página no aparece entre los errores`,
+  );
+});
+
+// ── 5. La imagen no existe en public/ ───────────────────────────────────────
 {
   const png = abs('public/coquinum/og-image.png');
   const escondida = `${png}.prueba`;

@@ -22,11 +22,20 @@ export const metadata: Metadata = {
     url: URL_CANONICA,
     siteName: 'Delegum',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://delegum.com/delegum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Delegum — el portal de fiscalidad y derecho de meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary',
     title: 'Salario Mínimo Interprofesional (SMI) 2026',
     description: SMI_2026.mensual14 + ' €/mes en 14 pagas · ' + SMI_2026.anual + ' €/año.',
+    images: ['https://delegum.com/delegum/og-image.png'],
   },
   alternates: { canonical: URL_CANONICA },
   icons: {
