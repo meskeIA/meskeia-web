@@ -19,12 +19,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/quiz-conceptos-inversion',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Quiz Conceptos de Inversión | meskeIA',
     description:
       'Sharpe, beta, duration, TER, rebalanceo y más. 25 preguntas con explicaciones detalladas.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Quiz Conceptos Inversión meskeIA',

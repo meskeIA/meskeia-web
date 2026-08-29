@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-escalas-musicales/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Escalas Musicales',
     description: 'Explora escalas mayor, menor, pentatónica, blues y modos griegos con visualización en teclado de piano.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Visualizador de Escalas Musicales meskeIA',

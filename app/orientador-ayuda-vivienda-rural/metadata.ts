@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/orientador-ayuda-vivienda-rural/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Orientador Ayudas Primera Vivienda Rural 2026',
     description: 'Hasta 15.000€ (o el 20% del precio) para comprar tu primera vivienda en un pueblo. Comprueba si te corresponde.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Orientador Ayudas Primera Vivienda Rural 2026 - meskeIA',

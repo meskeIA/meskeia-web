@@ -19,11 +19,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/generador-sudokus',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Generador de Sudokus por Dificultad',
     description: 'Cuatro niveles medidos por técnica, solución única garantizada.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Generador de Sudokus meskeIA',

@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/errores-escritura-creativa',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Errores de Escritura Creativa — 15 Fallos con Correcciones',
     description: '15 errores frecuentes en escritura creativa con ejemplos. Head-hopping, el truco del espejo, adjetivitis y más.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Errores de Escritura Creativa meskeIA',

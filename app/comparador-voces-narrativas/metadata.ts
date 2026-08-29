@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/comparador-voces-narrativas',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Comparador de Voces Narrativas | meskeIA',
     description: 'Flaubert vs Proust, Woolf vs Hemingway, Borges vs García Márquez: compara estilos en profundidad.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Comparador de Voces Narrativas meskeIA',

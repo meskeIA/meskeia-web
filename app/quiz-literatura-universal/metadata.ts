@@ -26,11 +26,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/quiz-literatura-universal',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Quiz de Literatura Universal | meskeIA',
     description: `${TOTAL_PREGUNTAS} preguntas de literatura universal en 3 niveles con explicaciones y puntuación.`,
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Quiz Literatura Universal meskeIA',

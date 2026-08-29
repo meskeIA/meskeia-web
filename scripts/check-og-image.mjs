@@ -228,29 +228,46 @@ for (const url of imagenesUsadas) {
 }
 resumen.push(`${imagenesUsadas.size} imágenes verificadas (existen y no las desvía ningún redirect)`);
 
-// ─── D. Pasivo de meskeIA: se cuenta y se nombra, no rompe ──────────────────
+// ─── D. Resto del catálogo: toda app con `openGraph` declara `images` ───────
+// Nació como aviso porque arrastraba 159 apps y romper por ellas habría dejado el
+// candado desactivado en una semana (criterio de `check:a11y-jsx` y
+// `check:parser`). El 29/08/2026 el pasivo se drenó entero —84 en Coquinum, 151
+// en Stemum, 21 en Delegum y las 96 restantes con la og de meskeIA—, así que la
+// regla ya puede romper: sin pasivo detrás, lo único que puede encenderla es una
+// app nueva escrita sin imagen. Escape para el caso legítimo que no se me ocurre
+// hoy: `og-ok: <razón>` en el metadata.ts.
 const slugsDePortal = new Set();
 for (const portal of PORTALES) {
-  if (!portal.catalogo) continue;
-  for (const m of leer(portal.catalogo).matchAll(/slug: '([a-z0-9-]+)'/g)) slugsDePortal.add(m[1]);
+  if (portal.catalogo) {
+    for (const m of leer(portal.catalogo).matchAll(/slug: '([a-z0-9-]+)'/g)) slugsDePortal.add(m[1]);
+  }
+  // El árbol del propio portal ya lo cubre la regla B; aquí sobra.
+  slugsDePortal.add(portal.arbol.replace('app/', ''));
 }
 
 const sinImagen = [];
+let exentas = 0;
 for (const dir of fs.readdirSync(path.join(RAIZ, 'app'), { withFileTypes: true })) {
   if (!dir.isDirectory() || slugsDePortal.has(dir.name)) continue;
   const rel = `app/${dir.name}/metadata.ts`;
   if (!existe(rel)) continue;
   const t = leer(rel);
   const b = bloque(t, 'openGraph');
-  if (b && !t.slice(b[0], b[1]).includes('images')) sinImagen.push(dir.name);
+  if (!b || t.slice(b[0], b[1]).includes('images')) continue;
+  if (/og-ok:/.test(t)) { exentas++; continue; }
+  sinImagen.push(dir.name);
 }
 
 if (sinImagen.length) {
-  avisos.push(`${sinImagen.length} apps de meskeIA declaran \`openGraph\` sin \`images\`: su tarjeta social sale sin imagen.`);
-  const muestra = VERBOSO ? sinImagen : sinImagen.slice(0, 8);
-  for (const s of muestra) avisos.push(`   app/${s}/metadata.ts`);
-  if (!VERBOSO && sinImagen.length > 8) avisos.push(`   … y ${sinImagen.length - 8} más (--todo para verlas)`);
+  const muestra = VERBOSO ? sinImagen : sinImagen.slice(0, 12);
+  for (const s of muestra) {
+    errores.push(`app/${s}/metadata.ts: declara \`openGraph\` sin \`images\`, así que su tarjeta social sale sin imagen. La plantilla ya la trae; cópiala de templates/app-base/metadata.template.ts.`);
+  }
+  if (!VERBOSO && sinImagen.length > 12) {
+    errores.push(`… y ${sinImagen.length - 12} apps más en el mismo caso (--todo para verlas).`);
+  }
 }
+resumen.push(`resto del catálogo: todas las apps con \`openGraph\` declaran imagen${exentas ? ` (${exentas} exentas con og-ok)` : ''}`);
 
 // ─── Resultado ──────────────────────────────────────────────────────────────
 if (avisos.length) {

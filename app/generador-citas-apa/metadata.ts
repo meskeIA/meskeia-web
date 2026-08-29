@@ -19,12 +19,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/generador-citas-apa',
     siteName: 'meskeIA',
     locale: 'es_MX',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Generador de citas APA, ISO 690, Vancouver e ICONTEC',
     description:
       'Referencias bibliográficas y citas en el texto con formato exacto, cursivas incluidas. Libros, artículos, webs, tesis, leyes y redes.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Generador de Citas y Bibliografía meskeIA',

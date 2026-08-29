@@ -25,6 +25,20 @@ export const metadata: Metadata = {
       'Escribe haiku, soneto, romance, lira y más con guía de sílabas en tiempo real y código de colores por rima.',
     url: 'https://meskeia.com/generador-poemas/',
     type: 'website',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Generador de Poemas por Forma — meskeIA',
+    description: 'Escribe haiku, soneto, romance, lira y más con guía de sílabas en tiempo real y código de colores por rima.',
+    images: ['https://meskeia.com/og-image.png'],
   },
 };
 

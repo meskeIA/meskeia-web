@@ -9,6 +9,20 @@ export const metadata: Metadata = {
     title: 'Predictor de Tiempos de Running',
     description: 'Predice tu tiempo en cualquier distancia con la fórmula Riegel.',
     type: 'website',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Predictor de Tiempos de Running',
+    description: 'Predice tu tiempo en cualquier distancia con la fórmula Riegel.',
+    images: ['https://meskeia.com/og-image.png'],
   },
 };
 

@@ -20,6 +20,20 @@ export const metadata = {
     title: 'El Reino Fungi — Clasificación Interactiva de los Hongos | meskeIA',
     description:
       'Visualizador interactivo del reino Fungi: 4 divisiones, diferencias con plantas, ciclo de vida y rol ecológico. Para estudiantes y curiosos.',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'El Reino Fungi — Clasificación Interactiva de los Hongos | meskeIA',
+    description: 'Visualizador interactivo del reino Fungi: 4 divisiones, diferencias con plantas, ciclo de vida y rol ecológico. Para estudiantes y curiosos.',
+    images: ['https://meskeia.com/og-image.png'],
   },
 };
 

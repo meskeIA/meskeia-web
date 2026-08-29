@@ -23,12 +23,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/comprobador-altavoces',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Test de Altavoces, Bocinas y Auriculares Online',
     description:
       'Comprueba canales, fase, graves y respuesta en frecuencia de tus altavoces o auriculares desde el navegador.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Comprobador de Altavoces meskeIA',

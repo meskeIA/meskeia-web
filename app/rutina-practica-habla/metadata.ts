@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/rutina-practica-habla/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Rutina Guiada de Práctica del Habla y la Voz',
     description: 'Practica fluidez, voz, articulación o lectura en voz alta con una sesión organizada por bloques.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Rutina Guiada de Práctica del Habla meskeIA',

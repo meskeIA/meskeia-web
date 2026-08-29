@@ -22,12 +22,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/validador-dni-nif-cif',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Validar DNI, NIF, NIE y CIF - Calcular la letra del DNI',
     description:
       'Validación instantánea de DNI, NIE y CIF con el cálculo de la letra explicado paso a paso.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Validador de DNI, NIF, NIE y CIF meskeIA',

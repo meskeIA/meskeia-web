@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/generador-incipit',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Generador de Íncipit — Primera Frase para tu Historia',
     description: 'Primera frase para tu novela o cuento. 62 íncipit por género y tono, con ejemplos de grandes autores.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Generador de Íncipit meskeIA',

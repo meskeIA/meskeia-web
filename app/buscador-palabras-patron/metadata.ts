@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/buscador-palabras-patron/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Buscador de Palabras por Patrón en Español',
     description: 'Encuentra palabras con huecos, perfecto para crucigramas y Scrabble.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Buscador de Palabras por Patrón meskeIA',

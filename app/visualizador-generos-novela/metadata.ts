@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-generos-novela',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Grandes Géneros de la Novela — Guía para Lectores',
     description: '11 géneros narrativos con características, autores fundacionales y lecturas de entrada.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Géneros de la Novela meskeIA',

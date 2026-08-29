@@ -19,11 +19,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/generador-fichas-calculo',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Generador de Fichas de Cálculo para Imprimir',
     description: 'Operaciones a medida, con soluciones y listas para el papel.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Generador de Fichas de Cálculo meskeIA',

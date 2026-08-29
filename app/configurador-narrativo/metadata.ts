@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/configurador-narrativo',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Configurador Narrativo — Persona, Narrador y Tiempo Verbal',
     description: 'Herramienta para escritores: analiza el efecto de cada combinación narrativa con ejemplos de grandes novelas.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Configurador Narrativo meskeIA',

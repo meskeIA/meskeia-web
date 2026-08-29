@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/simulador-ciclo-explotacion/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Simulador del Ciclo de Explotación - meskeIA',
     description: 'Visualiza el ciclo operativo de tu empresa: stock, fabricación, cobro y pago. Calcula PME, PMF y el fondo de maniobra que necesitas.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Simulador Ciclo de Explotación meskeIA',

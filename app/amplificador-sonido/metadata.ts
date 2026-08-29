@@ -19,12 +19,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/amplificador-sonido',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Amplificador de Sonido en Vivo',
     description:
       'Amplifica y realza el sonido de tu entorno en tiempo real con el micrófono y unos auriculares. Gratis y sin instalar.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Amplificador de Sonido meskeIA',

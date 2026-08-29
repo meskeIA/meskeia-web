@@ -22,12 +22,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/generador-curriculum/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Crear Currículum / CV / Hoja de Vida gratis',
     description:
       'Constructor de currículum con vista previa, plantilla ATS-friendly y exportación a PDF. Sin registro, todo en tu navegador.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Generador de Currículum meskeIA',

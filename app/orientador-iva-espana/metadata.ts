@@ -19,12 +19,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/orientador-iva-espana/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Orientador del IVA en España',
     description:
       'Qué IVA aplicar en cada operación: nacional, intracomunitario, exportación e importación. Con simulador de factura.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Orientador del IVA meskeIA',

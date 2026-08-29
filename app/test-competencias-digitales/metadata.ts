@@ -22,12 +22,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/test-competencias-digitales/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Test de Competencias Digitales (DigComp)',
     description:
       'Autoevaluación formativa de tus competencias digitales: nivel por competencia, gaps y plan de desarrollo. Basado en el marco europeo DigComp 2.2.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Test de Competencias Digitales meskeIA',

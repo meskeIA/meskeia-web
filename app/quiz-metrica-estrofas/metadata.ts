@@ -11,6 +11,20 @@ export const metadata = {
     siteName: 'meskeIA',
     locale: 'es_ES',
     type: 'website',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Quiz de Métrica y Estrofas | meskeIA',
+    description: 'Identifica tipos de verso, estrofas y esquemas de rima · 3 niveles · ESO, Bachillerato y Selectividad.',
+    images: ['https://meskeia.com/og-image.png'],
   },
 };
 

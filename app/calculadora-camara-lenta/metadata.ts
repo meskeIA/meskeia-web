@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/calculadora-camara-lenta/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Calculadora de Cámara Lenta (Slow Motion)',
     description: 'Calcula el factor de ralentización y el obturador correcto para slow motion real.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Calculadora de Cámara Lenta meskeIA',

@@ -17,6 +17,20 @@ export const metadata = {
     title: 'El Sistema Inmune — Defensas, Anticuerpos y Vacunas | meskeIA',
     description:
       'Visualizador interactivo del sistema inmune: 3 líneas de defensa, 6 células guardianas, anticuerpos IgG-IgA-IgM-IgE-IgD, 5 tipos de vacunas e inmunidad de rebaño.',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'El Sistema Inmune — Defensas, Anticuerpos y Vacunas | meskeIA',
+    description: 'Visualizador interactivo del sistema inmune: 3 líneas de defensa, 6 células guardianas, anticuerpos IgG-IgA-IgM-IgE-IgD, 5 tipos de vacunas e inmunidad de rebaño.',
+    images: ['https://meskeia.com/og-image.png'],
   },
 };
 

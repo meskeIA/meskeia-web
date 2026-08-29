@@ -19,12 +19,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/orientador-tipos-renta-irpf/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Orientador de tipos de renta en el IRPF',
     description:
       'Cómo tributa cada ingreso en el IRPF: base general o del ahorro, escala de tipos y retención aplicable.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Orientador de tipos de renta IRPF meskeIA',

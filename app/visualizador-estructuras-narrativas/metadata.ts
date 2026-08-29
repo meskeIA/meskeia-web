@@ -11,6 +11,20 @@ export const metadata = {
     siteName: 'meskeIA',
     locale: 'es_ES',
     type: 'website',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Estructuras Narrativas: 6 Modelos de Historia',
+    description: '6 modelos estructurales con diagramas de tensión y ejemplos: Freytag, 3 Actos, Héroe, Kishōtenketsu, Save the Cat, 5 Actos.',
+    images: ['https://meskeia.com/og-image.png'],
   },
 };
 

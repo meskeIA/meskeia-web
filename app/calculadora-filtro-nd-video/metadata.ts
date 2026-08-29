@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/calculadora-filtro-nd-video',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Calculadora de Filtro ND para Vídeo | meskeIA',
     description: 'Encuentra el filtro ND necesario para cumplir la regla de los 180° en videografía.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Calculadora Filtro ND Vídeo meskeIA',

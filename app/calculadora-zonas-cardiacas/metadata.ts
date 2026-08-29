@@ -19,12 +19,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/calculadora-zonas-cardiacas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Calculadora de Zonas Cardíacas',
     description:
       'Zonas de entrenamiento personalizadas con la fórmula Karvonen. Gratuito y sin registro.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Calculadora de Zonas Cardíacas meskeIA',

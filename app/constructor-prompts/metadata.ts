@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/constructor-prompts/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Constructor de Prompts Guiado — meskeIA',
     description: 'Crea prompts efectivos para ChatGPT, Claude y Gemini en 5 pasos. Sin registro.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Constructor de Prompts meskeIA',

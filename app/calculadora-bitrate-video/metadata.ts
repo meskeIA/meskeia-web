@@ -19,12 +19,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/calculadora-bitrate-video/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Calculadora de Bitrate y Tamaño de Vídeo | meskeIA',
     description:
       'Calcula el tamaño de archivo de vídeo según resolución, fps y códec. H.264, H.265, ProRes 422, RAW.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Calculadora de Bitrate de Vídeo meskeIA',

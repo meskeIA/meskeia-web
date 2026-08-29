@@ -18,6 +18,20 @@ export const metadata = {
     title: 'El Reino Vegetal — Clasificación Interactiva | meskeIA',
     description:
       'Árbol interactivo del reino vegetal: algas, briófitos, pteridófitos, gimnospermas y angiospermas. Para estudiantes de secundaria, preparatoria y Bachillerato.',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'El Reino Vegetal — Clasificación Interactiva | meskeIA',
+    description: 'Árbol interactivo del reino vegetal: algas, briófitos, pteridófitos, gimnospermas y angiospermas. Para estudiantes de secundaria, preparatoria y Bachillerato.',
+    images: ['https://meskeia.com/og-image.png'],
   },
 };
 

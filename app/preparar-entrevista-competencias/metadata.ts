@@ -23,12 +23,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/preparar-entrevista-competencias/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Entrevista por Competencias — Método STAR',
     description:
       'Prepara y guarda tus respuestas STAR para entrevistas de trabajo. Guía, ejemplos y banco de historias en tu navegador.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Preparar Entrevista por Competencias meskeIA',

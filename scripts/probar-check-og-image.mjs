@@ -59,11 +59,21 @@ console.log('  Debe DEJAR PASAR:');
   const { codigo, salida } = candado();
   anotar('el repositorio tal cual está', codigo === 0, `esperaba exit 0 y ha dado ${codigo}:\n${salida}`);
   anotar(
-    'el pasivo de meskeIA avisa pero no rompe',
-    codigo === 0 && /pasivo pendiente/.test(salida),
-    'el aviso del pasivo no aparece, o ha roto el build',
+    'el catálogo entero, ya sin pasivo',
+    codigo === 0 && /todas las apps con/.test(salida),
+    `esperaba el resumen del catálogo sin pasivo; exit ${codigo}`,
   );
 }
+
+// El escape, que solo sirve si de verdad deja pasar.
+conRespaldo(['app/generador-anagramas/metadata.ts'], () => {
+  const f = abs('app/generador-anagramas/metadata.ts');
+  const t = fs.readFileSync(f, 'utf8')
+    .replace(/\n\s*images: \[\{[\s\S]*?\}\]\n?(?=\s*\},)/, '\n    // og-ok: prueba del escape\n');
+  fs.writeFileSync(f, t);
+  const { codigo } = candado();
+  anotar('una app exenta con `og-ok:`', codigo === 0, `exit ${codigo}: el escape no funciona`);
+});
 
 console.log('\n  Debe CAZAR:');
 
@@ -122,7 +132,20 @@ conRespaldo(['app/delegum/datos-fiscales/iva-tipos/metadata.ts'], () => {
   );
 });
 
-// ── 5. La imagen no existe en public/ ───────────────────────────────────────
+// ── 5. App corriente del catálogo sin `images` (el pasivo, ya cerrado) ──────
+conRespaldo(['app/generador-anagramas/metadata.ts'], () => {
+  const f = abs('app/generador-anagramas/metadata.ts');
+  const t = fs.readFileSync(f, 'utf8').replace(/\n\s*images: \[\{[\s\S]*?\}\]\n?(?=\s*\},)/, '\n');
+  fs.writeFileSync(f, t);
+  const { codigo, salida } = candado();
+  anotar(
+    'app de meskeIA sin `images` (las 96 que arrastraba el catálogo)',
+    codigo === 1 && /generador-anagramas/.test(salida),
+    `exit ${codigo}; la app no aparece entre los errores`,
+  );
+});
+
+// ── 6. La imagen no existe en public/ ───────────────────────────────────────
 {
   const png = abs('public/coquinum/og-image.png');
   const escondida = `${png}.prueba`;

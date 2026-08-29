@@ -22,12 +22,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/evaluador-fortaleza-contrasena/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Evaluador de Fortaleza de Contraseñas',
     description:
       'Comprueba si tu contraseña es segura: entropía, tiempo de descifrado y errores comunes. Todo local, nada se envía a servidores.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Evaluador de Contraseñas meskeIA',

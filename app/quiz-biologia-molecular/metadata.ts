@@ -29,11 +29,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/quiz-biologia-molecular/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Quiz de Biología Molecular',
     description: '30 preguntas en 5 categorías: ADN/ARN, replicación, transcripción, traducción y mutaciones. ¡Con explicaciones!',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Quiz Biología Molecular meskeIA',

@@ -19,12 +19,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/generador-ruido-blanco/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Generador de Ruido Blanco, Rosa y Marrón',
     description:
       'Ruido blanco, rosa, marrón, azul y violeta sintetizados en el navegador, con temporizador y fundido de salida.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Generador de Ruido Blanco meskeIA',

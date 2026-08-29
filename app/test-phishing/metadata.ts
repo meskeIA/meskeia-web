@@ -22,12 +22,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/test-phishing/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Test ¿Es Phishing?',
     description:
       'Aprende a reconocer correos, SMS y webs fraudulentas con un test interactivo. Cada caso explica las señales del engaño.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Test ¿Es Phishing? meskeIA',

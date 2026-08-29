@@ -19,11 +19,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/generador-sopa-letras',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Generador de Sopas de Letras para Imprimir',
     description: 'Tus palabras, tu cuadrícula, tu sopa de letras lista en papel.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Generador de Sopas de Letras meskeIA',

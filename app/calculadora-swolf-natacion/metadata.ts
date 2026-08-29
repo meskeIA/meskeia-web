@@ -18,12 +18,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/calculadora-swolf-natacion/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Calculadora SWOLF — Eficiencia en Natación | meskeIA',
     description:
       'Calcula tu índice SWOLF y descubre tu nivel de eficiencia en natación. Compatible con piscinas de 25m y 50m.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Calculadora SWOLF Natación meskeIA',

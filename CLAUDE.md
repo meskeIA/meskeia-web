@@ -482,9 +482,11 @@ si la URL cae bajo un redirect de `next.config.ts` que la desvía a otro dominio
 detrás, la tarjeta se degrada a la pequeña con icono de documento. Por eso la plantilla
 `templates/app-base/` ya trae `images`: una app nueva nace con imagen.
 
-El pasivo de meskeIA (96 apps sin imagen al 29/08/2026, fuera de los portales) se **cuenta y se
-nombra pero no detiene el build**, mismo criterio que `check:a11y-jsx` y `check:parser`.
-`--todo` lo lista entero. Al abrir un vertical nuevo se añade su entrada a `PORTALES` en el
+**Sin pasivo**: rompe también si cualquier app del catálogo declara `openGraph` sin `images`.
+Nació como aviso —arrastraba 159 apps, y romper por ellas lo habría dejado desactivado en una
+semana, criterio de `check:a11y-jsx` y `check:parser`—, pero el 29/08/2026 se drenó entero en
+cuatro tandas, así que ya solo puede encenderlo una app nueva escrita sin imagen. Escape:
+`og-ok: <razón>` en el `metadata.ts`. Al abrir un vertical nuevo se añade su entrada a `PORTALES` en el
 script y el candado pasa a exigirlo. Los cuatro están cubiertos: **Coquinum** (84 apps),
 **Stemum** (139 apps + 12 tablas de material de apoyo, que también se publican bajo stemum.com),
 **Cronicum** (sus 182 páginas salen de un solo `generateMetadata`) y **Delegum** (21 páginas de
@@ -504,8 +506,14 @@ Delegum llevaban sin imagen desde siempre y ninguna lista las habría echado de 
 > `cronicum.com/og-image.png` — la imagen de meskeIA: la de Cronicum **no se sirvió nunca**,
 > mientras el comentario del código afirmaba justo lo contrario. Ese segundo defecto es el que
 > ningún ojo detecta leyendo el metadata, y es el que obliga a que el candado cruce la URL con los
-> redirects. Los cuatro casos reinyectados —más los dos que debe dejar pasar— están en
-> `npm run og:probar-candado`.
+> redirects. **Delegum tenía el mismo defecto, con el comentario falso palabra por palabra.** Los
+> seis casos reinyectados —más los tres que debe dejar pasar— están en `npm run og:probar-candado`.
+>
+> ⚠️ **Dos de esos casos los escribió el propio candado fallando.** El de una página de portal sin
+> imagen destapó que comprobaba la URL sobre el fichero entero, así que un `openGraph` sin imagen
+> colaba si el `twitter` de al lado sí la tenía —y `og:image` es el que leen casi todas las
+> plataformas—; ahora verifica bloque a bloque. Sin esa prueba, el candado habría dado luz verde a
+> exactamente el defecto que existe para prevenir.
 
 ### TypeScript
 

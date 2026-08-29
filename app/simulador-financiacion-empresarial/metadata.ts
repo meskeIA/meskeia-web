@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/simulador-financiacion-empresarial/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Simulador de Financiación Empresarial - meskeIA',
     description: 'Compara préstamo, leasing y ampliación de capital para financiar una inversión: coste neto, escudo fiscal, tesorería y dilución en una pantalla.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Simulador de Financiación Empresarial meskeIA',

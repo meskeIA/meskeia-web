@@ -19,12 +19,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/orientador-impuesto-patrimonio/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Orientador del Impuesto sobre el Patrimonio',
     description:
       'Cómo se valora cada bien en el Impuesto sobre el Patrimonio y si estás obligado a declarar.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Orientador Impuesto Patrimonio meskeIA',

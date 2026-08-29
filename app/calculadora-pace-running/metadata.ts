@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/calculadora-pace-running/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Calculadora de Pace de Running',
     description: 'Ritmo, velocidad, splits y proyecciones de carrera en una sola herramienta.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Calculadora de Pace de Running meskeIA',

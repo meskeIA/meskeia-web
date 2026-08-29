@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/comparador-ides-ia/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Comparador de IDEs con IA 2026 — meskeIA',
     description: 'Cursor vs Windsurf vs VS Code vs Zed vs JetBrains — guía comparativa completa.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: { 'application-name': 'Comparador IDEs IA meskeIA' },
 };

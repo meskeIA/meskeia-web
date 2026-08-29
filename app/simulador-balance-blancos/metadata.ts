@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/simulador-balance-blancos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Simulador de Balance de Blancos',
     description: 'Aprende balance de blancos con un slider Kelvin sobre 3 escenas distintas.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Simulador de Balance de Blancos meskeIA',

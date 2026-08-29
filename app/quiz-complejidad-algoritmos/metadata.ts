@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/quiz-complejidad-algoritmos',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Quiz Complejidad Algorítmica — Big O | meskeIA',
     description: 'Practica notación Big O con 25 preguntas: análisis de código, ordenación, estructuras de datos y comparativa. Explicaciones técnicas detalladas.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Quiz Complejidad Algorítmica meskeIA',

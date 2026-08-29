@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/quiz-mitos-ciencia/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: '¿Verdad o Mito? Quiz de Ciencia — 25 afirmaciones',
     description: 'Pon a prueba lo que crees saber sobre ciencia. 25 afirmaciones con explicación rigurosa en cada respuesta.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Quiz Mitos y Realidades de la Ciencia - meskeIA',

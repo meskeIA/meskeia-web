@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/simulador-fotografia/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Simulador del Triángulo de Exposición Fotográfico',
     description: 'Aprende fotografía moviendo ISO, apertura y velocidad. Resultado visual en tiempo real.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Simulador de Fotografía meskeIA',

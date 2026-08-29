@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/impuestos-divorcio',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Impuestos en el Divorcio — meskeIA',
     description: 'Conoce el impacto fiscal de tu divorcio: pensión compensatoria, hijos, vivienda e hipoteca.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Impuestos en el Divorcio meskeIA',

@@ -21,6 +21,20 @@ export const metadata = {
     title: 'El Sistema Nervioso — Neurona, Sinapsis y Neurotransmisores | meskeIA',
     description:
       'Neurona interactiva con partes clicables, SNC vs SNP, sinapsis química paso a paso y 6 neurotransmisores principales. Ideal para secundaria, Bachillerato y preparatoria.',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'El Sistema Nervioso — Neurona, Sinapsis y Neurotransmisores | meskeIA',
+    description: 'Neurona interactiva con partes clicables, SNC vs SNP, sinapsis química paso a paso y 6 neurotransmisores principales. Ideal para secundaria, Bachillerato y preparatoria.',
+    images: ['https://meskeia.com/og-image.png'],
   },
 };
 

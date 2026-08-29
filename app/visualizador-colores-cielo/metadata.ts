@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-colores-cielo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Colores del Cielo — 24h con Física Atmosférica',
     description: 'Golden hour, hora azul, mediodía: física real de la atmósfera + paleta HEX para fotógrafos y diseñadores.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Visualizador Colores del Cielo meskeIA',

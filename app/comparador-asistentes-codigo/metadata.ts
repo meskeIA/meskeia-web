@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/comparador-asistentes-codigo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Comparador de Asistentes de Código IA — meskeIA',
     description: 'Claude Code vs GitHub Copilot vs Gemini Code Assist vs Codex — guía comparativa 2026.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: { 'application-name': 'Comparador Asistentes Código meskeIA' },
 };

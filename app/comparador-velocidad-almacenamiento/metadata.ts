@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/comparador-velocidad-almacenamiento/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Comparador Velocidad de Almacenamiento - meskeIA',
     description: 'HDD vs SSD vs NVMe vs USB: calcula el tiempo de transferencia de cualquier archivo con un slider.',
+    images: ['https://meskeia.com/og-image.png'],
   },
   other: {
     'application-name': 'Comparador Velocidad Almacenamiento - meskeIA',
