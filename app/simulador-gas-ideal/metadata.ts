@@ -24,10 +24,10 @@ export const metadata: Metadata = {
     locale: 'es_ES',
     images: [
       {
-        url: 'https://meskeia.com/og-image.png',
+        url: 'https://meskeia.com/stemum/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'meskeIA',
+        alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
       },
     ],
   },
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Simulador de Gas Ideal y Termodinámica | meskeIA',
     description: 'Aprende termodinámica con diagramas PV interactivos',
-    images: ['https://meskeia.com/og-image.png'],
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
 };
 

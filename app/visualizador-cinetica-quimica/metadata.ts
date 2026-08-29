@@ -17,17 +17,17 @@ export const metadata: Metadata = {
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/stemum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
     }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Cinética Química - Explicador Visual',
     description: 'k = A·e^(-Ea/RT): por qué algunos procesos termodinámicamente favorables no ocurren a temperatura ambiente. Con Arrhenius y órdenes de reacción.',
-    images: ['https://meskeia.com/og-image.png']
+    images: ['https://meskeia.com/stemum/og-image.png']
   },
   other: { 'application-name': 'Cinética Química meskeIA' },
 };

@@ -30,17 +30,17 @@ export const metadata: Metadata = {
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/stemum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
     }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Radioactividad: Tipos de Radiación y Vida Media',
     description: 'Visualizador interactivo de física nuclear: desintegración exponencial, datación C-14, dosis de radiación y efectos biológicos.',
-    images: ['https://meskeia.com/og-image.png']
+    images: ['https://meskeia.com/stemum/og-image.png']
   },
   other: { 'application-name': 'Visualizador Radioactividad meskeIA' },
 };

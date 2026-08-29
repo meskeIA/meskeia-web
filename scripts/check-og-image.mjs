@@ -65,6 +65,15 @@ const PORTALES = [
     paginas: ['app/coquinum/metadata.ts'],
   },
   {
+    nombre: 'Stemum',
+    // Un solo catálogo para los dos grupos del portal: las 139 apps de
+    // `STEMUM_APPS` y las 12 tablas de `STEMUM_MATERIAL_APOYO`, que también se
+    // publican bajo stemum.com y comparten por tanto la misma tarjeta.
+    catalogo: 'data/stemum.ts',
+    imagen: 'https://meskeia.com/stemum/og-image.png',
+    paginas: ['app/stemum/metadata.ts'],
+  },
+  {
     nombre: 'Cronicum',
     // Sus cronologías no tienen metadata.ts propio: las 182 páginas salen del
     // `generateMetadata` de [slug], así que se vigila ese fichero.

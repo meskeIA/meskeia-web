@@ -9,11 +9,17 @@ export const metadata: Metadata = {
     description: 'El 65% de la energía de la gasolina se pierde en calor y fricción. Entiende por qué y cómo funciona el ciclo de 4 tiempos.',
     type: 'website',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/stemum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
     }]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Motor de Combustión — Ciclo Otto y Por Qué Solo Aprovecha el 35%',
+    description: 'El 65% de la energía de la gasolina se pierde en calor y fricción. Entiende por qué y cómo funciona el ciclo de 4 tiempos.',
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
 };
 

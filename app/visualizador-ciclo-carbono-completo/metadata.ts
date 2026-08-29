@@ -21,11 +21,17 @@ export const metadata: Metadata = {
       'Por qué los océanos absorben el 30% de nuestras emisiones y qué pasa cuando ese sumidero se satura.',
     type: 'website',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/stemum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
     }]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Ciclo del Carbono: Reservorios y Flujos | meskeIA',
+    description: 'Por qué los océanos absorben el 30% de nuestras emisiones y qué pasa cuando ese sumidero se satura.',
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
 };
 

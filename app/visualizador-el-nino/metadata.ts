@@ -21,11 +21,17 @@ export const metadata: Metadata = {
       'Por qué El Niño en el Pacífico causa sequías en Australia, lluvias en Perú e inviernos más cálidos en Europa.',
     type: 'website',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/stemum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
     }]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'El Niño y La Niña: ENSO Explicado | meskeIA',
+    description: 'Por qué El Niño en el Pacífico causa sequías en Australia, lluvias en Perú e inviernos más cálidos en Europa.',
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
 };
 

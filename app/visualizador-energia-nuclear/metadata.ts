@@ -10,11 +10,17 @@ export const metadata: Metadata = {
     description: 'Fisión vs fusión, reacción en cadena, tipos de reactor y comparativa con renovables.',
     url: 'https://meskeia.com/visualizador-energia-nuclear/',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/stemum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
     }]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Visualizador de Energía Nuclear | meskeIA',
+    description: 'Fisión vs fusión, reacción en cadena, tipos de reactor y comparativa con renovables.',
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
 };
 

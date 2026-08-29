@@ -23,11 +23,17 @@ export const metadata: Metadata = {
     description: 'Series de Taylor animadas con slider de términos, criterios de convergencia y cálculo de π con tres series clásicas.',
     type: 'website',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/stemum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
     }]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Visualizador de Series y Convergencia',
+    description: 'Series de Taylor animadas con slider de términos, criterios de convergencia y cálculo de π con tres series clásicas.',
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
 };
 

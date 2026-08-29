@@ -22,13 +22,13 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-curvas-bezier/',
     siteName: 'meskeIA',
     locale: 'es_ES',
-    images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }],
+    images: [{ url: 'https://meskeia.com/stemum/og-image.png', width: 1200, height: 630, alt: 'Stemum — el portal de ciencia interactiva de meskeIA' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Visualizador de Curvas de Bézier | meskeIA',
     description: 'Curvas de Bézier interactivas con puntos arrastrables y el algoritmo de De Casteljau animado',
-    images: ['https://meskeia.com/og-image.png'],
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
 };
 

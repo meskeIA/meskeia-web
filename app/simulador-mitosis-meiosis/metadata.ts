@@ -22,13 +22,13 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/simulador-mitosis-meiosis/',
     siteName: 'meskeIA',
     locale: 'es_ES',
-    images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }],
+    images: [{ url: 'https://meskeia.com/stemum/og-image.png', width: 1200, height: 630, alt: 'Stemum — el portal de ciencia interactiva de meskeIA' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Simulador de Mitosis y Meiosis | meskeIA',
     description: 'Aprende la división celular con visualizaciones interactivas paso a paso',
-    images: ['https://meskeia.com/og-image.png'],
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
 };
 

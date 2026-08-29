@@ -24,10 +24,10 @@ export const metadata: Metadata = {
     locale: 'es_ES',
     images: [
       {
-        url: 'https://meskeia.com/og-image.png',
+        url: 'https://meskeia.com/stemum/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'meskeIA',
+        alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
       },
     ],
   },
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     title: 'Tabla de Integrales Completa con Buscador | meskeIA',
     description:
       'Formulario de integrales con búsqueda instantánea, constante de integración siempre visible y ejemplos resueltos paso a paso.',
-    images: ['https://meskeia.com/og-image.png'],
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
   other: {
     'application-name': 'Tabla de Integrales meskeIA',

@@ -24,10 +24,10 @@ export const metadata: Metadata = {
     locale: 'es_ES',
     images: [
       {
-        url: 'https://meskeia.com/og-image.png',
+        url: 'https://meskeia.com/stemum/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'meskeIA',
+        alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
       },
     ],
   },
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     title: 'Tabla de Ka y Kb con Calculadora de pH | meskeIA',
     description:
       'Constantes de acidez y basicidad a 25 °C, con equilibrios, pares conjugados, cálculo de pH y ecuación de Henderson-Hasselbalch.',
-    images: ['https://meskeia.com/og-image.png'],
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
   other: {
     'application-name': 'Tabla de Ka y Kb meskeIA',

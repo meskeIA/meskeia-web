@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/simulador-tcp-handshake/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/stemum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Simulador del Handshake TCP | meskeIA',
     description: 'Diagrama de secuencia animado del TCP three-way handshake con números de secuencia y panel de detalles.',
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
   other: {
     'application-name': 'Simulador del Handshake TCP meskeIA',

@@ -22,13 +22,13 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/simulador-calorimetria/',
     siteName: 'meskeIA',
     locale: 'es_ES',
-    images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }],
+    images: [{ url: 'https://meskeia.com/stemum/og-image.png', width: 1200, height: 630, alt: 'Stemum — el portal de ciencia interactiva de meskeIA' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Simulador de Calorimetría - Calor Específico y Latente | meskeIA',
     description: 'Q = m·c·ΔT y Q = m·L tramo a tramo, con curva de calentamiento y temperatura de equilibrio',
-    images: ['https://meskeia.com/og-image.png'],
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
 };
 

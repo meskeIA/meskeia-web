@@ -24,10 +24,10 @@ export const metadata: Metadata = {
     locale: 'es_ES',
     images: [
       {
-        url: 'https://meskeia.com/og-image.png',
+        url: 'https://meskeia.com/stemum/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'meskeIA',
+        alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
       },
     ],
   },
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     title: 'Tabla de Constantes Físicas Fundamentales con Buscador | meskeIA',
     description:
       'Constantes físicas con valores CODATA 2022, su significado en una frase, la fórmula donde aparecen y la distinción entre exactas por definición y medidas.',
-    images: ['https://meskeia.com/og-image.png'],
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
   other: {
     'application-name': 'Tabla de Constantes Físicas meskeIA',

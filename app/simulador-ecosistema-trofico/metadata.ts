@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/simulador-ecosistema-trofico',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/stemum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Simulador de Ecosistema: Cadena Trófica',
     description: 'Simula sequías, plagas y caza excesiva en ecosistemas reales. Observa las cascadas tróficas en acción.',
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
   other: {
     'application-name': 'Simulador Cadena Trófica meskeIA',

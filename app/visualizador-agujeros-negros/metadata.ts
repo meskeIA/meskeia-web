@@ -26,11 +26,17 @@ export const metadata: Metadata = {
       'Visualizador interactivo de agujeros negros: anatomía SVG clicable, calculadora de Schwarzschild, animación de espaguetización y radiación de Hawking.',
     type: 'website',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/stemum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
     }]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Agujeros Negros: Anatomía y Fenomenología Visual',
+    description: 'Visualizador interactivo de agujeros negros: anatomía SVG clicable, calculadora de Schwarzschild, animación de espaguetización y radiación de Hawking.',
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
 };
 

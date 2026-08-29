@@ -10,11 +10,17 @@ export const metadata: Metadata = {
     description: 'Del campo magnético rotante al frenado regenerativo: todos los principios del motor eléctrico visualizados.',
     type: 'website',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/stemum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
     }]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Motor Eléctrico: Cómo Funciona | meskeIA',
+    description: 'Del campo magnético rotante al frenado regenerativo: todos los principios del motor eléctrico visualizados.',
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
 };
 

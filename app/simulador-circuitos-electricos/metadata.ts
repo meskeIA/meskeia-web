@@ -24,11 +24,17 @@ export const metadata: Metadata = {
     locale: 'es_ES',
     type: 'website',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/stemum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
     }]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Simulador de Circuitos Eléctricos | meskeIA',
+    description: 'Analiza circuitos en serie y paralelo: resistencia equivalente, tensiones, corrientes y potencia disipada por componente.',
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
   alternates: {
     canonical: 'https://meskeia.com/simulador-circuitos-electricos/',

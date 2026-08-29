@@ -19,11 +19,17 @@ export const metadata: Metadata = {
     description: 'La gravedad no es una fuerza: es la curvatura del espacio-tiempo. Visualiza la malla del universo deformada por una masa.',
     type: 'website',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/stemum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
     }]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Relatividad General: La Curvatura del Espacio-Tiempo',
+    description: 'La gravedad no es una fuerza: es la curvatura del espacio-tiempo. Visualiza la malla del universo deformada por una masa.',
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
 };
 

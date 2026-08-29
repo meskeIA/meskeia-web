@@ -19,12 +19,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/simulador-fotosintesis-factores',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/stemum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Simulador de Fotosíntesis: Factores Limitantes | meskeIA',
     description:
       'Descubre qué limita la fotosíntesis: luz, CO₂ o temperatura. Simulador interactivo basado en la Ley de Blackman para Bachillerato y EBAU (España), preparatoria y secundaria (Latinoamérica).',
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
   other: {
     'application-name': 'Simulador Fotosíntesis Factores meskeIA',

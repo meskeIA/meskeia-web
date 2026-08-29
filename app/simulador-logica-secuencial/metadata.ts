@@ -20,17 +20,17 @@ export const metadata: Metadata = {
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/stemum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
     }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Simulador de Lógica Secuencial: Biestables, Contadores y Registros | meskeIA',
     description: 'Biestables, contadores y registros ciclo a ciclo, con cronograma de señales generado en vivo.',
-    images: ['https://meskeia.com/og-image.png'],
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
 };
 

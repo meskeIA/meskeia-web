@@ -20,17 +20,17 @@ export const metadata: Metadata = {
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/stemum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
     }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Nomenclatura Orgánica: Nombra y Corrige Compuestos | meskeIA',
     description: 'Del esqueleto al nombre IUPAC, con la numeración razonada. Y del nombre al esqueleto, señalando el error si lo hay.',
-    images: ['https://meskeia.com/og-image.png'],
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
   other: {
     'application-name': 'Nomenclatura Orgánica meskeIA',

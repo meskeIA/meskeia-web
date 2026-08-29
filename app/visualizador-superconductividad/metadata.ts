@@ -21,11 +21,17 @@ export const metadata: Metadata = {
       'El efecto más espectacular de la física cuántica: conductividad perfecta y levitación magnética real. Visualizador interactivo con 8 materiales y animaciones.',
     type: 'website',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/stemum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
     }]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Superconductividad: Resistencia Cero y Levitación Magnética',
+    description: 'El efecto más espectacular de la física cuántica: conductividad perfecta y levitación magnética real. Visualizador interactivo con 8 materiales y animaciones.',
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
 };
 

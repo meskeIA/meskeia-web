@@ -21,13 +21,13 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/simulador-disoluciones/',
     siteName: 'meskeIA',
     locale: 'es_ES',
-    images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }],
+    images: [{ url: 'https://meskeia.com/stemum/og-image.png', width: 1200, height: 630, alt: 'Stemum — el portal de ciencia interactiva de meskeIA' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Simulador de Disoluciones: Molaridad y Dilución | meskeIA',
     description: 'Prepara y diluye disoluciones viendo la concentración y el color en tiempo real',
-    images: ['https://meskeia.com/og-image.png'],
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
 };
 

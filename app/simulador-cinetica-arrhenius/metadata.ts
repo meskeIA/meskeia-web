@@ -20,17 +20,17 @@ export const metadata: Metadata = {
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/stemum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
     }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Simulador de Cinética Química: Arrhenius | meskeIA',
     description: 'La regla del +10 °C, la barrera de activación y la magia de los catalizadores, todo visual.',
-    images: ['https://meskeia.com/og-image.png']
+    images: ['https://meskeia.com/stemum/og-image.png']
   },
 };
 

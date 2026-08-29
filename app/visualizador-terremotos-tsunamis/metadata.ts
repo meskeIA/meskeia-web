@@ -21,11 +21,17 @@ export const metadata: Metadata = {
       'De la falla geológica al tsunami en 800 km/h: todos los principios de la sismología y la alerta temprana.',
     type: 'website',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/stemum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
     }]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Terremotos y Tsunamis: Cómo Funcionan | meskeIA',
+    description: 'De la falla geológica al tsunami en 800 km/h: todos los principios de la sismología y la alerta temprana.',
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
 };
 

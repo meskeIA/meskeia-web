@@ -19,13 +19,13 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/simulador-mas-resorte/',
     siteName: 'meskeIA',
     locale: 'es_ES',
-    images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }],
+    images: [{ url: 'https://meskeia.com/stemum/og-image.png', width: 1200, height: 630, alt: 'Stemum — el portal de ciencia interactiva de meskeIA' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Simulador Masa-Resorte | meskeIA',
     description: 'Aprende el MAS con simulación interactiva del resorte y gráfica de posición',
-    images: ['https://meskeia.com/og-image.png'],
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
 };
 

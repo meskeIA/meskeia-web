@@ -20,17 +20,17 @@ export const metadata: Metadata = {
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/stemum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
     }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Simulador de Test de Hipótesis | meskeIA',
     description: 'Aprende α, β, p-valor y potencia con dos curvas N(μ₀,σ/√n) y N(μ₁,σ/√n) y regiones de rechazo en directo.',
-    images: ['https://meskeia.com/og-image.png']
+    images: ['https://meskeia.com/stemum/og-image.png']
   },
 };
 

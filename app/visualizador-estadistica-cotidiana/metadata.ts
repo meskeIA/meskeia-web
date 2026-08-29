@@ -10,11 +10,17 @@ export const metadata: Metadata = {
     description: 'Probabilidad, sesgos estadísticos y paradojas con ejemplos de la vida real.',
     type: 'website',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/stemum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
     }]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Estadística en la Vida Cotidiana | meskeIA',
+    description: 'Probabilidad, sesgos estadísticos y paradojas con ejemplos de la vida real.',
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
 };
 

@@ -19,12 +19,21 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-arquitectura-computador',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/stemum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Arquitectura del Computador — CPU, FDE y Memoria | meskeIA',
     description:
       'Von Neumann, ALU, registros y ciclo fetch-decode-execute explicados de forma visual e interactiva.',
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
   other: {
     'application-name': 'Arquitectura Computador meskeIA',

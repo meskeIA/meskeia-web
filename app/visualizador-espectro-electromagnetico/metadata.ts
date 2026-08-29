@@ -17,17 +17,17 @@ export const metadata: Metadata = {
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/stemum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
     }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Espectro Electromagnético - Explicador Visual Interactivo',
     description: 'Radio, microondas, infrarrojo, visible, UV, rayos X y gamma: el mismo fenómeno a distinta frecuencia.',
-    images: ['https://meskeia.com/og-image.png']
+    images: ['https://meskeia.com/stemum/og-image.png']
   },
   other: { 'application-name': 'Espectro Electromagnético meskeIA' },
 };

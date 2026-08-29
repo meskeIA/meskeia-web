@@ -9,11 +9,17 @@ export const metadata: Metadata = {
     description: 'Lo que los libros no explican bien sobre el vuelo: Bernoulli es real pero incompleto. La verdadera clave es el ángulo de ataque y la 3ª ley de Newton.',
     type: 'website',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/stemum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
     }]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Por qué Vuelan los Aviones — Bernoulli y el Ángulo de Ataque',
+    description: 'Lo que los libros no explican bien sobre el vuelo: Bernoulli es real pero incompleto. La verdadera clave es el ángulo de ataque y la 3ª ley de Newton.',
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
 };
 

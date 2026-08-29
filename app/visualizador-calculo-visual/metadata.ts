@@ -10,11 +10,17 @@ export const metadata: Metadata = {
     description: 'El teorema fundamental que une derivadas e integrales, animado para que lo entiendas de verdad.',
     type: 'website',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/stemum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
     }]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Cálculo Visual: Límites, Derivadas e Integrales',
+    description: 'El teorema fundamental que une derivadas e integrales, animado para que lo entiendas de verdad.',
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
 };
 

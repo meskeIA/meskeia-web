@@ -10,7 +10,8 @@ export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: URL },
-  openGraph: { title: TITLE, description: DESCRIPTION, url: URL, siteName: 'meskeIA', type: 'website' },
+  openGraph: { title: TITLE, description: DESCRIPTION, url: URL, siteName: 'meskeIA', type: 'website', images: [{ url: 'https://meskeia.com/stemum/og-image.png', width: 1200, height: 630, alt: 'Stemum — el portal de ciencia interactiva de meskeIA' }] },
+  twitter: { card: 'summary_large_image', images: ['https://meskeia.com/stemum/og-image.png'] },
 };
 
 export function generateJsonLd() {

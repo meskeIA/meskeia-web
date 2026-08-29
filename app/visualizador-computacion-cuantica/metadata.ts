@@ -23,11 +23,17 @@ export const metadata: Metadata = {
       'Qubits, puertas cuánticas y la amenaza al cifrado RSA explicados visualmente',
     url: 'https://meskeia.com/visualizador-computacion-cuantica/',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/stemum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
     }]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Computación Cuántica | meskeIA',
+    description: 'Qubits, puertas cuánticas y la amenaza al cifrado RSA explicados visualmente',
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
 };
 

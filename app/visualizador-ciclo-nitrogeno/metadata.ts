@@ -12,11 +12,17 @@ export const metadata: Metadata = {
     locale: 'es_ES',
     type: 'website',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/stemum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
     }]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Ciclo del Nitrógeno — meskeIA',
+    description: 'Ciclo completo del nitrógeno: fijación, nitrificación, desnitrificación e impacto humano.',
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
 };
 

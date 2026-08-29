@@ -20,17 +20,17 @@ export const metadata: Metadata = {
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/stemum/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'meskeIA',
+      alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
     }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Ajustar y Balancear Ecuaciones Químicas: Redox por Ion-Electrón | meskeIA',
     description: 'Ajusta cualquier ecuación química y desarrolla el método del ion-electrón paso a paso, en medio ácido y básico.',
-    images: ['https://meskeia.com/og-image.png'],
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
 };
 

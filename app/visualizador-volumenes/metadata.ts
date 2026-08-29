@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-volumenes/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [
+      {
+        url: 'https://meskeia.com/stemum/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Stemum — el portal de ciencia interactiva de meskeIA',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Visualizador de Volúmenes 3D - meskeIA',
     description: 'Calcula y visualiza volúmenes geométricos en 3D con sliders interactivos. Esfera, cubo, cilindro, cono y pirámide.',
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
   other: {
     'application-name': 'Visualizador Volúmenes 3D - meskeIA',

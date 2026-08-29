@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{
-      url: 'https://meskeia.com/og-image.png',
+      url: 'https://meskeia.com/stemum/og-image.png',
       width: 1200,
       height: 630,
       alt: 'meskeIA - Tendencias de la Tabla Periódica',
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Tendencias de la Tabla Periódica: Heatmap Interactivo | meskeIA',
     description: 'Selecciona una propiedad y observa cómo varía el color en los 118 elementos según sus tendencias periódicas.',
-    images: ['https://meskeia.com/og-image.png'],
+    images: ['https://meskeia.com/stemum/og-image.png'],
   },
 };
 
