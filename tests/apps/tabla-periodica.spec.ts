@@ -151,8 +151,9 @@ test.describe('CASO 1 · los datos de los elementos y la calculadora de masa mol
     // C6H12O6 = 6 × 12,011 + 12 × 1,008 + 6 × 15,999 = 72,066 + 12,096 + 95,994 = 180,156
     expect(await masaMolarDe(page, 'C6H12O6')).toContain('180,1560 g/mol');
 
-    // H2SO4 = 2 × 1,008 + 32,065 + 4 × 15,999 = 2,016 + 32,065 + 63,996 = 98,077
-    expect(await masaMolarDe(page, 'H2SO4')).toContain('98,0770 g/mol');
+    // H2SO4 = 2 × 1,008 + 32,06 + 4 × 15,999 = 2,016 + 32,06 + 63,996 = 98,072
+    // (masa del azufre CIAAW 2021, hallazgo 529: 32,06, no la de 2007, 32,065)
+    expect(await masaMolarDe(page, 'H2SO4')).toContain('98,0720 g/mol');
 
     // CaCO3 = 40,078 + 12,011 + 3 × 15,999 = 40,078 + 12,011 + 47,997 = 100,086
     expect(await masaMolarDe(page, 'CaCO3')).toContain('100,0860 g/mol');
@@ -351,8 +352,9 @@ test.describe('hallazgos abiertos', () => {
     // Mg(NO3)2 = 24,305 + 2 × (14,007 + 3 × 15,999) = 148,313 g/mol (hoy da 86,309).
     expect(await masaMolarDe(page, 'Mg(NO3)2')).toContain('148,3130 g/mol');
 
-    // Al2(SO4)3 = 2 × 26,982 + 3 × (32,065 + 4 × 15,999) = 342,147 g/mol (hoy da 150,025).
-    expect(await masaMolarDe(page, 'Al2(SO4)3')).toContain('342,1470 g/mol');
+    // Al2(SO4)3 = 2 × 26,982 + 3 × (32,06 + 4 × 15,999) = 342,132 g/mol (hoy da 150,025).
+    // (masa del azufre CIAAW 2021, hallazgo 529: 32,06, no la de 2007, 32,065)
+    expect(await masaMolarDe(page, 'Al2(SO4)3')).toContain('342,1320 g/mol');
   });
 
   test('HALLAZGO 2 · ninguna de las 118 celdas se puede abrir con el teclado', async ({ page }) => {
@@ -579,9 +581,8 @@ test.describe('CASO 6 · una búsqueda sin resultados y una fórmula rechazada',
 // Marcados con test.fail(): afirman lo que DEBERÍA pasar, así que hoy fallan a
 // propósito. Al repararse se les quita la marca y quedan como regresión.
 // ═══════════════════════════════════════════════════════════════════════════
-test.describe('hallazgos abiertos · 30/08/2026', () => {
-  test('HALLAZGO 4 · buscar sin tilde no encuentra nada en 14 de los 118 elementos', async ({ page }) => {
-    test.fail();
+test.describe('hallazgos reparados · 30/08/2026', () => {
+  test('528 · buscar sin tilde ya encuentra los 14 de 118 elementos con tilde o eñe', async ({ page }) => {
     await page.goto(RUTA);
 
     // El filtro es `el.nombre.toLowerCase().includes(query)`, sin normalizar los acentos.
@@ -608,8 +609,7 @@ test.describe('hallazgos abiertos · 30/08/2026', () => {
     }
   });
 
-  test('HALLAZGO 5 · cinco masas atómicas son de la tabla de 2007, no de la de 2021', async ({ page }) => {
-    test.fail();
+  test('529 · las cinco masas atómicas ya son las de CIAAW 2021, no las de 2007', async ({ page }) => {
     await page.goto(RUTA);
 
     // La cabecera de elementos-data.ts declara «Pesos atómicos estándar de la IUPAC /
@@ -641,8 +641,7 @@ test.describe('hallazgos abiertos · 30/08/2026', () => {
     }
   });
 
-  test('HALLAZGO 6 · los 34 elementos sin peso atómico estándar se muestran con tres decimales falsos', async ({ page }) => {
-    test.fail();
+  test('530 · los 34 elementos sin peso atómico estándar ya se muestran entre corchetes', async ({ page }) => {
     await page.goto(RUTA);
 
     // La ficha imprime siempre formatNumber(masa, 3). Para el oganesón, que no tiene peso
@@ -663,8 +662,7 @@ test.describe('hallazgos abiertos · 30/08/2026', () => {
     await cerrarFicha(page);
   });
 
-  test('HALLAZGO 7 · «Sintético» no es un estado físico y saca del filtro «Sólido» a 30 elementos', async ({ page }) => {
-    test.fail();
+  test('531 · el filtro «Sólido» ya no excluye a los 30 elementos que antes se marcaban «Sintético»', async ({ page }) => {
     await page.goto(RUTA);
 
     // El jsonLd de la app promete «Filtros por estado físico (sólido, líquido, gaseoso)»,
@@ -685,8 +683,7 @@ test.describe('hallazgos abiertos · 30/08/2026', () => {
     expect(astato).not.toContain('Estado: Sintético');
   });
 
-  test('HALLAZGO 8 · el recuento de resultados cambia sin anunciarse a un lector de pantalla', async ({ page }) => {
-    test.fail();
+  test('532 · el recuento de resultados ya se anuncia a un lector de pantalla', async ({ page }) => {
     await page.goto(RUTA);
 
     // Al escribir en #busqueda, lo ÚNICO que cambia de forma perceptible sin ver la pantalla

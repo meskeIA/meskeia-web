@@ -9,6 +9,19 @@ import { elementos, elementosPorSimbolo, FAMILIAS, ESTADOS, Elemento } from './e
 import { parsearFormulaQuimica } from '@/lib/formula-quimica';
 import { getRelatedApps } from '@/data/app-relations';
 
+/** Minúsculas sin diacríticos, para que buscar «oxigeno» sin tilde encuentre «Oxígeno»
+ *  (hallazgo 528: 14 de 118 elementos eran inalcanzables sin la tilde exacta). */
+const normalizaTexto = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
+/**
+ * Para los 34 elementos sin isótopos estables (masa ENTERA en este dataset: el número
+ * másico del isótopo más estable), IUPAC escribe el valor entre corchetes en vez de darlo
+ * como si fuera un peso atómico estándar medido. La celda de la rejilla ya evita los
+ * decimales falsos; el modal seguía imprimiendo «294,000 u» (hallazgo 530).
+ */
+const formatMasaAtomica = (masa: number): string =>
+  Number.isInteger(masa) ? `[${masa}]` : formatNumber(masa, 3);
+
 // Posiciones especiales en el grid de la tabla periódica
 const getPosicion = (elemento: Elemento): { fila: number; columna: number } => {
   // Lantánidos (57-71) van en fila 8
@@ -40,9 +53,9 @@ export default function TablaPerodicaPage() {
       if (filtroFamilia !== 'todos' && el.familia !== filtroFamilia) return false;
       if (filtroEstado !== 'todos' && el.estado !== filtroEstado) return false;
       if (busqueda) {
-        const query = busqueda.toLowerCase();
+        const query = normalizaTexto(busqueda);
         return (
-          el.nombre.toLowerCase().includes(query) ||
+          normalizaTexto(el.nombre).includes(query) ||
           el.simbolo.toLowerCase().includes(query) ||
           el.numero.toString().includes(query)
         );
@@ -197,7 +210,7 @@ export default function TablaPerodicaPage() {
           </button>
         </div>
 
-        <p className={styles.contadorElementos}>
+        <p className={styles.contadorElementos} role="status" aria-live="polite">
           Mostrando {elementosFiltrados.length} de {elementos.length} elementos
         </p>
       </div>
@@ -356,7 +369,7 @@ export default function TablaPerodicaPage() {
               <div className={styles.modalInfo}>
                 <h2 id="titulo-ficha-elemento">{elementoSeleccionado.nombre}</h2>
                 <p>Número atómico: {elementoSeleccionado.numero}</p>
-                <p>Masa atómica: {formatNumber(elementoSeleccionado.masa, 3)} u</p>
+                <p>Masa atómica: {formatMasaAtomica(elementoSeleccionado.masa)} u</p>
               </div>
             </div>
 

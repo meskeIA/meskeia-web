@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Visualizador de Volúmenes 3D - Calculadora Geométrica Interactiva - meskeIA',
-  description: 'Calcula y visualiza en 3D los volúmenes de esfera, cubo, cilindro, cono y pirámide. Cambia las dimensiones con sliders y ve la figura cambiar en tiempo real con su fórmula matemática.',
-  keywords: 'volumen figuras geométricas, calculadora volumen 3D, esfera cilindro cono pirámide cubo, fórmula volumen, geometría visual, matemáticas visualizador',
+  description: 'Calcula y visualiza en 3D los volúmenes de esfera, ortoedro, cilindro, cono y pirámide. Cambia las dimensiones con sliders o con el campo de medida exacta, y ve la figura cambiar en tiempo real con su fórmula matemática.',
+  keywords: 'volumen figuras geométricas, calculadora volumen 3D, esfera cilindro cono pirámide ortoedro, fórmula volumen, geometría visual, matemáticas visualizador',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Visualizador de Volúmenes 3D - meskeIA',
-    description: 'Explora y calcula volúmenes de esfera, cubo, cilindro, cono y pirámide con visualización 3D interactiva y fórmulas en tiempo real.',
+    description: 'Explora y calcula volúmenes de esfera, ortoedro, cilindro, cono y pirámide con visualización 3D interactiva y fórmulas en tiempo real.',
     url: 'https://meskeia.com/visualizador-volumenes/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Visualizador de Volúmenes 3D - meskeIA',
-    description: 'Calcula y visualiza volúmenes geométricos en 3D con sliders interactivos. Esfera, cubo, cilindro, cono y pirámide.',
+    description: 'Calcula y visualiza volúmenes geométricos en 3D con sliders o medidas exactas. Esfera, ortoedro, cilindro, cono y pirámide.',
     images: ['https://meskeia.com/stemum/og-image.png'],
   },
   other: {
@@ -38,12 +38,12 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Visualizador de Volúmenes 3D',
-  description: 'Herramienta interactiva para calcular y visualizar en 3D los volúmenes de esfera, paralelepípedo, cilindro, cono y pirámide. Mueve los sliders y la figura se redibuja en tiempo real con su fórmula matemática.',
+  description: 'Herramienta interactiva para calcular y visualizar en 3D los volúmenes de esfera, ortoedro, cilindro, cono y pirámide. Mueve los sliders o escribe la medida exacta, y la figura se redibuja en tiempo real con su fórmula matemática.',
   url: 'https://meskeia.com/visualizador-volumenes/',
   category: 'EducationalApplication',
   features: [
     'Visualización SVG isométrica en tiempo real de 5 figuras geométricas',
-    'Sliders interactivos para cada dimensión (radio, altura, lado, anchura)',
+    'Sliders interactivos para cada dimensión (radio, altura, lado, anchura), con un campo de medida exacta para valores fuera de su rango',
     'Cálculo instantáneo del volumen con la fórmula matemática',
     'Etiquetas de dimensiones sobre la figura 3D',
     'Tabla comparativa de fórmulas de volumen',

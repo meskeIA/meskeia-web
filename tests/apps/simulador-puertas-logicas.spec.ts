@@ -634,10 +634,13 @@ test.describe('RE-INSPECCIÓN · CASO 3 · lo que debe rechazarse', () => {
 
     // El hallazgo 135 (21/08/2026) era justo lo contrario: el fallo se tragaba en un catch
     // y salía una columna de ceros con pinta de resultado. Aquí se exige el mensaje.
+    //
+    // «A B» YA NO está en esta lista: con el AND implícito del hallazgo 534, dos variables
+    // seguidas (con o sin espacio, el tokenizador los ignora) son «A AND B» válida, no un
+    // error — está cubierto como caso positivo en el test 534 («AB»).
     const RECHAZOS: [string, string][] = [
       ['A AND', 'La expresión termina antes de tiempo.'],
       ['(A AND B', 'Falta cerrar un paréntesis.'],
-      ['A B', 'Falta un operador entre dos términos.'],
       ['A AND E', '«E» no es una variable válida. Usa A, B, C o D.'],
       ['A # B', 'No entiendo el carácter «#».'],
       ['A AND B)', 'Hay un paréntesis que se cierra sin haberse abierto.'],
@@ -668,14 +671,11 @@ test.describe('RE-INSPECCIÓN · CASO 3 · lo que debe rechazarse', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS de la re-inspección — afirman lo correcto y HOY fallan
-// (test.fail: Playwright los da por buenos mientras fallen; cuando se reparen,
-//  hay que quitarles la marca y quedan como regresión.)
+// Reparados el 30/08/2026 (Inspector, ronda 8, hallazgos 533-535). Estaban con
+// test.fail(); ahora sujetan la reparación como regresión.
 // ═══════════════════════════════════════════════════════════════════════════════
-test.describe('RE-INSPECCIÓN · hallazgos abiertos', () => {
-  test.fail();
-
-  test('HALLAZGO A · «Sintaxis válida» omite NAND, NOR y XNOR, que el evaluador SÍ admite', async ({ page }) => {
+test.describe('RE-INSPECCIÓN · hallazgos reparados', () => {
+  test('533 · «Sintaxis válida» ya nombra NAND, NOR y XNOR', async ({ page }) => {
     await abrirSimulador(page, 'Expresiones');
     const campo = page.getByLabel('Expresión Booleana');
 
@@ -697,7 +697,7 @@ test.describe('RE-INSPECCIÓN · hallazgos abiertos', () => {
     }
   });
 
-  test('HALLAZGO B · los símbolos ⊼ ⊽ ⊙ que la app usa para rotular sus puertas no se admiten', async ({ page }) => {
+  test('534 · los símbolos ⊼ ⊽ ⊙, la prima y el producto implícito ya se admiten', async ({ page }) => {
     await abrirSimulador(page, 'Expresiones');
     const campo = page.getByLabel('Expresión Booleana');
 
@@ -719,21 +719,20 @@ test.describe('RE-INSPECCIÓN · hallazgos abiertos', () => {
     expect(await columnaSalida(page)).toEqual([0, 0, 0, 1]);
   });
 
-  test('HALLAZGO C · una expresión sin variables no da tabla NI aviso: silencio', async ({ page }) => {
+  test('535 · una expresión sin variables ya da tabla (si es válida) o aviso (si está rota)', async ({ page }) => {
     await abrirSimulador(page, 'Expresiones');
     const campo = page.getByLabel('Expresión Booleana');
 
-    // page.tsx corta con `variables.length === 0` ANTES de llamar al evaluador, así que
-    // estas dos nunca llegan a él y la pantalla se queda en blanco sin explicar por qué.
-    //
     // «NOT» a secas está tan rota como «A AND» —que sí avisa—, y el propio motor tiene
-    // el mensaje preparado («La expresión termina antes de tiempo»): no se le pregunta.
+    // el mensaje preparado («La expresión termina antes de tiempo»): ahora se le pregunta.
     await campo.fill('NOT');
     await expect(page.locator(AVISO_EXPRESION), '«NOT» debería avisar como lo hace «A AND»').toHaveCount(1);
 
-    // Y «1 AND 0» es una expresión VÁLIDA —el motor admite las constantes 0 y 1— cuyo
-    // resultado es simplemente Y = 0. No hay tabla que pintar, pero tampoco se dice nada.
+    // «1 AND 0» es una expresión VÁLIDA —el motor admite las constantes 0 y 1— cuyo
+    // resultado es simplemente Y = 0. No hay variables que tabular, pero SÍ hay un
+    // resultado que dar: se muestra como una tabla de una fila, sin columnas de entrada.
     await campo.fill('1 AND 0');
-    await expect(page.locator(AVISO_EXPRESION)).toHaveCount(1);
+    await expect(page.locator(AVISO_EXPRESION)).toHaveCount(0);
+    expect(await columnaSalida(page)).toEqual([0]);
   });
 });

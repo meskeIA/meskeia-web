@@ -27,7 +27,7 @@ interface FiguraInfo {
 
 const FIGURAS: FiguraInfo[] = [
   { id: 'esfera', nombre: 'Esfera', icono: '⚽' },
-  { id: 'cubo', nombre: 'Paralelepípedo', icono: '📦' },
+  { id: 'cubo', nombre: 'Ortoedro', icono: '📦' },
   { id: 'cilindro', nombre: 'Cilindro', icono: '🥫' },
   { id: 'cono', nombre: 'Cono', icono: '🍦' },
   { id: 'piramide', nombre: 'Pirámide', icono: '🔺' },
@@ -294,13 +294,35 @@ function med(v: number): string {
  * llegaba al número que la app muestra (Inspector, 20/08/2026). Hasta seis decimales,
  * que es donde el campo deja de admitir más.
  */
+/** Dígito a superíndice unicode, para la notación científica (4,188790×10⁻⁶). */
+const SUPERINDICES: Record<string, string> = {
+  '-': '⁻', '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴',
+  '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹',
+};
+const superindice = (n: number): string =>
+  String(n).split('').map(c => SUPERINDICES[c] ?? c).join('');
+
+/**
+ * formatNumber (lib/formatters.ts) escribe «≈0» por debajo de 0,0001 — correcto para la
+ * mayoría del catálogo, pero aquí la propia guía educativa manda comprobar r=0,01 (una
+ * célula esférica, hallazgo 518) y espera un número real, no un cero. Notación científica
+ * en vez de delegar en formatNumber para este rango.
+ */
+function notacionCientifica(v: number, decimalesMantisa: number): string {
+  const exponente = Math.floor(Math.log10(v));
+  const mantisa = v / Math.pow(10, exponente);
+  return `${formatNumber(mantisa, decimalesMantisa)}×10${superindice(exponente)}`;
+}
+
 function medExacta(v: number): string {
+  if (v > 0 && v < 0.0001) return notacionCientifica(v, 3);
   if (Number.isInteger(v)) return formatNumber(v, 0);
   const decimales = Math.min(6, (String(v).split('.')[1] ?? '').length);
   return formatNumber(v, decimales);
 }
 
 function formatVolumen(v: number): string {
+  if (v > 0 && v < 0.0001) return notacionCientifica(v, 6);
   if (v < 10) return formatNumber(v, 4);
   if (v < 100) return formatNumber(v, 2);
   if (v < 100000) return formatNumber(v, 1);
@@ -437,7 +459,7 @@ export default function VisualizadorVolumenesPage() {
       <header className={styles.hero}>
         <h1 className={styles.title}><span aria-hidden="true">🔷</span> Visualizador de Volúmenes 3D</h1>
         <p className={styles.subtitle}>
-          Selecciona una figura, ajusta las dimensiones con los sliders y observa cómo cambia el volumen en tiempo real
+          Selecciona una figura, ajusta las dimensiones con los sliders o con el campo de medida exacta, y observa cómo cambia el volumen en tiempo real
         </p>
       </header>
 
@@ -555,7 +577,7 @@ export default function VisualizadorVolumenesPage() {
                   <td>Pelotas, depósitos, planetas</td>
                 </tr>
                 <tr>
-                  <td><strong>📦 Paralelepípedo</strong></td>
+                  <td><strong><span aria-hidden="true">📦</span> Ortoedro</strong></td>
                   <td>Anchura a, profundidad b, altura h</td>
                   <td><code>V = a × b × h</code></td>
                   <td>6×4×5 → 120</td>
@@ -706,14 +728,14 @@ export default function VisualizadorVolumenesPage() {
               <span className={styles.stepNumber}>1</span>
               <div className={styles.stepContent}>
                 <h3>Elige la figura</h3>
-                <p>Haz clic en uno de los cinco botones del selector: Esfera, Paralelepípedo, Cilindro, Cono o Pirámide. La figura aparecerá en el panel izquierdo con una vista 3D isométrica.</p>
+                <p>Haz clic en uno de los cinco botones del selector: Esfera, Ortoedro, Cilindro, Cono o Pirámide. La figura aparecerá en el panel izquierdo con una vista 3D isométrica.</p>
               </div>
             </div>
             <div className={styles.step}>
               <span className={styles.stepNumber}>2</span>
               <div className={styles.stepContent}>
                 <h3>Ajusta las dimensiones</h3>
-                <p>Mueve los sliders del panel derecho para cambiar el radio, altura o lado de la figura. El visualizador 3D se actualiza en tiempo real mostrando cómo cambia la forma con etiquetas de las dimensiones.</p>
+                <p>Mueve los sliders del panel derecho para cambiar el radio, altura o lado de la figura, o escribe la medida exacta en el campo junto a cada slider: los sliders van de {formatNumber(DIM_MIN, 0)} a {formatNumber(DIM_MAX, 0)}, pero el campo admite cualquier valor entre 0 y {formatNumber(DIM_MAX_CAMPO, 0)} — útil para medidas fuera de ese rango, como r = 0,01 o r = 120. El visualizador 3D se actualiza en tiempo real mostrando cómo cambia la forma con etiquetas de las dimensiones.</p>
               </div>
             </div>
             <div className={styles.step}>
@@ -776,7 +798,7 @@ export default function VisualizadorVolumenesPage() {
             </div>
             <ul className={styles.warningList}>
               <li><strong>Confundir radio con diámetro:</strong> El radio es la mitad del diámetro. Si mides de punta a punta, divide entre 2 antes de introducirlo. Un error aquí multiplica el volumen por 4 (cilindro) u 8 (esfera).</li>
-              <li><strong>Usar la altura slant en vez de la altura perpendicular:</strong> En conos y pirámides, la altura h es la distancia vertical desde la base hasta el vértice, no la longitud de la cara lateral (apotema lateral o generatriz). Son magnitudes distintas.</li>
+              <li><strong>Confundir la altura perpendicular con la generatriz:</strong> En conos y pirámides, la altura h es la distancia vertical desde la base hasta el vértice, no la longitud de la cara lateral (apotema lateral o generatriz). Son magnitudes distintas.</li>
               <li><strong>Olvidar el factor 1/3 en cono y pirámide:</strong> Es el error más frecuente en exámenes. Cono y pirámide son figuras "puntiagudas" que valen un tercio de su equivalente "lleno" (cilindro o prisma).</li>
               <li><strong>Mezclar unidades:</strong> Si una dimensión está en centímetros y otra en metros, el resultado será incorrecto. Convierte todo a la misma unidad antes de calcular.</li>
             </ul>

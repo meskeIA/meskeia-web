@@ -49,7 +49,8 @@ type Token =
   | { tipo: 'const'; valor: boolean }
   | { tipo: 'op'; nombre: NombreOperador }
   | { tipo: 'abre' }
-  | { tipo: 'cierra' };
+  | { tipo: 'cierra' }
+  | { tipo: 'prima' };
 
 /**
  * Los operadores en palabra se prueban de MÁS LARGO a más corto: si «NAND» se probara
@@ -79,8 +80,13 @@ const SIMBOLOS: Record<string, Token> = {
   '∨': { tipo: 'op', nombre: 'OR' },
   '^': { tipo: 'op', nombre: 'XOR' },
   '⊕': { tipo: 'op', nombre: 'XOR' },
+  '⊼': { tipo: 'op', nombre: 'NAND' },
+  '⊽': { tipo: 'op', nombre: 'NOR' },
+  '⊙': { tipo: 'op', nombre: 'XNOR' },
   '(': { tipo: 'abre' },
   ')': { tipo: 'cierra' },
+  "'": { tipo: 'prima' },
+  '’': { tipo: 'prima' },
 };
 
 function tokenizar(expr: string): { ok: true; tokens: Token[] } | { ok: false; error: string } {
@@ -132,36 +138,66 @@ function analizar(tokens: Token[], vars: Record<string, boolean>): ResultadoExpr
   const mirar = () => tokens[pos];
   const consumir = () => tokens[pos++];
 
-  /** NOT y paréntesis: lo que se ata más fuerte */
-  const unario = (): boolean => {
+  /** Variable, constante o paréntesis, seguido de cualquier número de primas postfijas
+   *  (A' equivale a NOT A, como en motor-retos.ts — hallazgo 534). */
+  const primario = (): boolean => {
     const tk = mirar();
     if (!tk) { fallo ??= 'La expresión termina antes de tiempo.'; return false; }
 
-    if (tk.tipo === 'op' && tk.nombre === 'NOT') { consumir(); return !unario(); }
+    let v: boolean;
     if (tk.tipo === 'abre') {
       consumir();
-      const v = or();
+      v = or();
       const cierre = mirar();
       if (!cierre || cierre.tipo !== 'cierra') { fallo ??= 'Falta cerrar un paréntesis.'; return v; }
       consumir();
-      return v;
+    } else if (tk.tipo === 'var') {
+      consumir();
+      v = Boolean(vars[tk.nombre]);
+    } else if (tk.tipo === 'const') {
+      consumir();
+      v = tk.valor;
+    } else {
+      fallo ??= `Falta un operando antes de «${tk.tipo === 'op' ? tk.nombre : tk.tipo === 'cierra' ? ')' : "'"}».`;
+      consumir();
+      return false;
     }
-    if (tk.tipo === 'var') { consumir(); return Boolean(vars[tk.nombre]); }
-    if (tk.tipo === 'const') { consumir(); return tk.valor; }
 
-    fallo ??= `Falta un operando antes de «${tk.tipo === 'op' ? tk.nombre : ')'}».`;
-    consumir();
-    return false;
+    while (mirar()?.tipo === 'prima') { consumir(); v = !v; }
+    return v;
+  };
+
+  /** NOT prefijo: lo que se ata más fuerte, junto a la prima postfija de `primario`. */
+  const unario = (): boolean => {
+    const tk = mirar();
+    if (tk && tk.tipo === 'op' && tk.nombre === 'NOT') { consumir(); return !unario(); }
+    return primario();
+  };
+
+  /** ¿El siguiente token puede empezar un `unario`? Hace falta para el AND implícito
+   *  (AB, A(B+C), A NOT B), que motor-retos.ts ya admite y este no (hallazgo 534). */
+  const empiezaUnario = (): boolean => {
+    const tk = mirar();
+    if (!tk) return false;
+    return tk.tipo === 'var' || tk.tipo === 'const' || tk.tipo === 'abre' || (tk.tipo === 'op' && tk.nombre === 'NOT');
   };
 
   const and = (): boolean => {
     let v = unario();
     for (;;) {
       const tk = mirar();
-      if (tk?.tipo !== 'op' || (tk.nombre !== 'AND' && tk.nombre !== 'NAND')) return v;
-      consumir();
-      const d = unario();
-      v = tk.nombre === 'AND' ? v && d : !(v && d);
+      if (tk?.tipo === 'op' && (tk.nombre === 'AND' || tk.nombre === 'NAND')) {
+        consumir();
+        const d = unario();
+        v = tk.nombre === 'AND' ? v && d : !(v && d);
+        continue;
+      }
+      // `unario()` se llama SIEMPRE, nunca dentro de `v && ...`: con v ya en false, el
+      // cortocircuito de && no llamaba a unario(), el token no se consumía y el bucle se
+      // quedaba girando sobre el mismo token para siempre (bug propio, cazado al probar
+      // «AB» con A=false: colgaba el hilo de JS sin lanzar ningún error).
+      if (empiezaUnario()) { const d = unario(); v = v && d; continue; }
+      return v;
     }
   };
 

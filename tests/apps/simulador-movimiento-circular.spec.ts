@@ -91,30 +91,14 @@ import { test, expect, Page } from '@playwright/test';
  *   (type="button" en los dos botones de modo, panel enganchado a la ω animada en MCNU,
  *   notación «a_c»/«a_t» en vez de «aₒ»/«αt»).
  *
- * HALLAZGOS ABIERTOS QUE ESTE FICHERO **NO** BLOQUEA (el Inspector no repara)
- * Los tres primeros están al final del fichero como tests con `test.fail()`: afirman lo que
- * debería pasar y hoy fallan a propósito, así que la suite queda VERDE y se pondrá en rojo
- * el día que se reparen.
- *   · Los tres <label> visibles («Radio (r) 2,5 m», «Velocidad angular (ω) 4,0 rad/s»,
- *     «Masa (m) 2,0 kg») NO están asociados a ningún control: ni htmlFor, ni el <input>
- *     anidado dentro, de modo que `label.control` es null en los tres. Además, pulsar el
- *     rótulo no lleva el foco al slider.
- *   · Tampoco hay aria-valuetext: los sliders se apoyan solo en aria-label, que no lleva
- *     unidad ni valor, así que un lector de pantalla dice «Masa de la partícula, 2,5» sin el
- *     «kg», justo en una app cuyo propio recuadro de errores frecuentes advierte de que
- *     equivocar la unidad invalida el resultado.
- *   · MCNU: mover SOLO el slider de radio reinicia la aceleración. Medido: tras 5 s el panel
- *     iba por ω = 3,47 rad/s y al pasar el radio de 2 a 4 m volvió a 1,12 rad/s (ω₀ = 1).
- *     Sale del useEffect [omega, radio, modo], que rearma omegaRef y pone theta a 0. Nada
- *     lo anuncia, y es precisamente el experimento que propone el bullet «Aumentar el radio
- *     a igual ω aumenta tanto v como a_c». En MCU es inocuo, porque ω no evoluciona.
- *   · MCNU no dibuja la aceleración tangencial. Con α = 0,5 rad/s² y r = 4 m vale
- *     a_t = α·r = 2 m/s², y la tabla de la propia app dice «Aceleración tangencial: at =
- *     α · r ≠ 0», pero en el lienzo solo hay v y a_c. Un alumno puede leer la flecha naranja
- *     como la aceleración total, que es el error que la tabla intenta evitar.
- *   · Notación desigual dentro de la misma página: la caja de fórmulas y el bullet escriben
- *     «a_c» y «a_t», mientras la tabla comparativa escribe «at» (tres veces) sin marca de
- *     subíndice.
+ * HALLAZGOS 540-544, REPARADOS el 30/08/2026 (Inspector, ronda 8)
+ * Estaban con `test.fail()`; ahora sujetan la reparación como regresión, al final del fichero.
+ *   · 540: los tres <label> visibles ya llevan htmlFor y su input el id correspondiente.
+ *   · 541: los tres sliders ya declaran aria-valuetext con la unidad completa.
+ *   · 542: el useEffect que sincronizaba omegaRef/thetaRef ya no lleva `radio` en sus
+ *     dependencias — solo se reinicia al cambiar ω₀ o el modo, nunca al cambiar el radio.
+ *   · 543: en MCNU el canvas ya dibuja también el vector de aceleración tangencial (a_t, rojo).
+ *   · 544: la tabla comparativa ya escribe «a_t», igual que la caja de fórmulas y el bullet.
  * ─────────────────────────────────────────────────────────────────────────────────────────
  */
 
@@ -562,15 +546,11 @@ test('accesibilidad — etiquetas de los controles y estado de los botones de mo
 });
 
 /* ═══════════════════════════════════════════════════════════════════════════════════════
- * HALLAZGOS ABIERTOS DEL 30/08/2026
- *
- * Los tres tests de aquí abajo afirman lo que DEBERÍA pasar y hoy fallan a propósito, con
- * `test.fail()`. El día que se reparen pasarán a ROJO («expected to fail, but passed») y
- * habrá que quitarles la marca, no reescribir el valor esperado. El Inspector no repara.
+ * Reparados el 30/08/2026 (Inspector, ronda 8, hallazgos 540-542). Estaban con
+ * `test.fail()`; ahora sujetan la reparación como regresión.
  * ═══════════════════════════════════════════════════════════════════════════════════════ */
 
-test('HALLAZGO ABIERTO — MCNU: mover solo el radio reinicia la aceleración', async ({ page }) => {
-  test.fail();
+test('542 — MCNU: mover solo el radio ya NO reinicia la aceleración', async ({ page }) => {
   // Medido el 30/08/2026: con ω₀ = 1 rad/s y r = 2 m, tras 5 s el panel iba por ω = 3,47
   // rad/s; al pasar el radio de 2 a 4 m volvió a 1,12 rad/s. Sale del
   // useEffect [omega, radio, modo] de page.tsx, que rearma omegaRef y pone theta a 0.
@@ -593,9 +573,8 @@ test('HALLAZGO ABIERTO — MCNU: mover solo el radio reinicia la aceleración', 
   ).toBeGreaterThan(antes - 0.5);
 });
 
-test('HALLAZGO ABIERTO — los tres <label> visibles no gobiernan ningún control', async ({ page }) => {
-  test.fail();
-  // «Radio (r) 2,0 m», «Velocidad angular (ω) 2,0 rad/s» y «Masa (m) 1,0 kg» son <label> sin
+test('540 — los tres <label> visibles ya gobiernan su control', async ({ page }) => {
+  // «Radio (r) 2,0 m», «Velocidad angular (ω) 2,0 rad/s» y «Masa (m) 1,0 kg» eran <label> sin
   // htmlFor y sin el <input> anidado dentro, así que `label.control` es null en los tres:
   // no etiquetan nada y pulsarlos no lleva el foco al slider. Los sliders se sostienen solo
   // sobre aria-label, que sí existe pero no lleva ni el valor ni la unidad.
@@ -605,9 +584,8 @@ test('HALLAZGO ABIERTO — los tres <label> visibles no gobiernan ningún contro
   expect(huerfanas, 'ningún <label> debería quedar sin control asociado').toBe(0);
 });
 
-test('HALLAZGO ABIERTO — los sliders no anuncian su valor con unidad', async ({ page }) => {
-  test.fail();
-  // Sin aria-valuetext, un lector de pantalla lee el número crudo del range: «Masa de la
+test('541 — los sliders ya anuncian su valor con unidad', async ({ page }) => {
+  // Sin aria-valuetext, un lector de pantalla leía el número crudo del range: «Masa de la
   // partícula, 2,5» sin el «kg», «Velocidad angular, 4» sin el «rad/s». La unidad solo está
   // en el <label> huérfano de al lado, que no se anuncia. Es una pérdida real en una app
   // cuyo propio recuadro de errores frecuentes avisa de que «la fórmula a_c = ω² · r requiere
@@ -619,4 +597,40 @@ test('HALLAZGO ABIERTO — los sliders no anuncian su valor con unidad', async (
       ).length,
   );
   expect(sinValueText, 'los tres sliders deberían declarar aria-valuetext con la unidad').toBe(0);
+});
+
+test('543 — en MCNU el canvas ya dibuja el vector de aceleración tangencial (a_t, rojo #DC2626)', async ({
+  page,
+}) => {
+  await page.goto(RUTA);
+  await configurar(page, 4, 1, 1);
+  await page.getByRole('button', { name: /^MCNU/ }).click();
+  await page.waitForTimeout(300); // deja arrancar el bucle rAF para que ω supere el umbral 0,01
+
+  const buscarColorAt = () =>
+    page.evaluate(() => {
+      const c = document.querySelector('canvas')!;
+      const d = c.getContext('2d')!.getImageData(0, 0, c.width, c.height).data;
+      for (let i = 0; i < d.length; i += 4) {
+        if (Math.abs(d[i] - 220) < 14 && Math.abs(d[i + 1] - 38) < 14 && Math.abs(d[i + 2] - 38) < 14) {
+          return true;
+        }
+      }
+      return false;
+    });
+
+  expect(await buscarColorAt(), 'en MCNU el canvas debería pintar el vector a_t').toBe(true);
+
+  // En MCU la aceleración tangencial es nula: el vector no debe pintarse
+  await page.getByRole('button', { name: /^MCU/ }).click();
+  await page.waitForTimeout(300);
+  expect(await buscarColorAt(), 'en MCU no hay a_t: el vector no debería pintarse').toBe(false);
+});
+
+test('544 — notación consistente: a_t en toda la app, nunca «at» sin subíndice', async ({ page }) => {
+  await page.goto(RUTA);
+  await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+  const cuerpo = (await page.locator('body').textContent()) ?? '';
+  expect(cuerpo).toContain('a_t');
+  expect(cuerpo).not.toMatch(/\(at\)|\bat\s*=/);
 });

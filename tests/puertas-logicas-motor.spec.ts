@@ -59,6 +59,38 @@ test.describe('Las siete puertas, en palabra', () => {
   });
 });
 
+test.describe('Símbolos ⊼ ⊽ ⊙, prima y AND implícito — hallazgo 534', () => {
+  test('los símbolos ⊼ ⊽ ⊙ dan lo mismo que NAND, NOR, XNOR', () => {
+    expect(tabla2('A ⊼ B')).toEqual(tabla2('A NAND B'));
+    expect(tabla2('A ⊽ B')).toEqual(tabla2('A NOR B'));
+    expect(tabla2('A ⊙ B')).toEqual(tabla2('A XNOR B'));
+  });
+
+  test('la prima es NOT postfijo: A\' equivale a NOT A', () => {
+    expect(tabla2("A'")).toEqual(tabla2('NOT A'));
+    expect(tabla2("(A AND B)'")).toEqual(tabla2('NOT (A AND B)'));
+  });
+
+  test('el producto implícito (AB) es AND, con o sin espacio', () => {
+    expect(tabla2('AB')).toEqual([0, 0, 0, 1]);
+    expect(tabla2('A B')).toEqual([0, 0, 0, 1]);
+    expect(tabla2('AB')).toEqual(tabla2('A AND B'));
+  });
+
+  /**
+   * REGRESIÓN — bug propio de esta reparación (30/08/2026), no un hallazgo del Inspector.
+   * `v = v && unario()` en la rama del AND implícito usaba el cortocircuito de JS: con v ya
+   * en false, `unario()` no llegaba a llamarse, el token no se consumía y el bucle giraba
+   * sobre el mismo token para siempre — sin lanzar ningún error, colgando el hilo de JS.
+   * Se cazó probando «AB» con A=false, que es justo el caso que este test fija.
+   */
+  test('el AND implícito no cuelga cuando el operando izquierdo ya es false', () => {
+    const r = evaluarExpresion('AB', { A: false, B: true });
+    expect(r.ok).toBe(true);
+    expect(r.ok && r.valor).toBe(false);
+  });
+});
+
 test.describe('Precedencia y asociatividad', () => {
   test('NOT se ata más fuerte que AND', () => {
     // NOT A AND B  =  (NOT A) AND B  → [0,1,0,0], no NOT(A AND B) = [1,1,1,0]
@@ -128,10 +160,6 @@ test.describe('Errores: se dicen, no se convierten en ceros', () => {
   test('operador sin operandos', () => {
     expect(error('A AND')).toContain('termina antes de tiempo');
     expect(error('AND B')).toContain('Falta un operando');
-  });
-
-  test('dos términos sin operador entre medias', () => {
-    expect(error('A B')).toContain('Falta un operador');
   });
 
   test('expresión vacía', () => {

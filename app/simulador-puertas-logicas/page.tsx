@@ -223,7 +223,14 @@ export default function SimuladorPuertasLogicasPage() {
   const resultadoExpresion = useMemo((): { filas: { inputs: boolean[]; output: boolean }[]; error: string } => {
     if (!expression.trim()) return { filas: [], error: '' };
     if (!analisisExpresion.ok) return { filas: [], error: analisisExpresion.error };
-    if (analisisExpresion.variables.length === 0) return { filas: [], error: '' };
+    if (analisisExpresion.variables.length === 0) {
+      // Sin variables la expresión puede ser una constante válida («1 AND 0») o estar rota
+      // («NOT», «()»): antes se cortaba aquí sin distinguir los dos casos, así que ni la
+      // tabla ni el aviso llegaban a mostrarse (hallazgo 535). Se evalúa igual que las demás.
+      const r = evaluarExpresion(expression, {});
+      if (!r.ok) return { filas: [], error: r.error };
+      return { filas: [{ inputs: [], output: r.valor }], error: '' };
+    }
 
     const vars = analisisExpresion.variables;
     const filas: { inputs: boolean[]; output: boolean }[] = [];
@@ -610,6 +617,15 @@ export default function SimuladorPuertasLogicasPage() {
               </div>
               <div className={styles.syntaxItem}>
                 <code>XOR</code> o <code>⊕</code>
+              </div>
+              <div className={styles.syntaxItem}>
+                <code>NAND</code> o <code>⊼</code>
+              </div>
+              <div className={styles.syntaxItem}>
+                <code>NOR</code> o <code>⊽</code>
+              </div>
+              <div className={styles.syntaxItem}>
+                <code>XNOR</code> o <code>⊙</code>
               </div>
               <div className={styles.syntaxItem}>
                 <code>(</code> <code>)</code> para agrupar

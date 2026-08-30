@@ -279,7 +279,7 @@ test.describe('visualizador-volumenes — regresiones del 21/08/2026', () => {
     await expect(page.locator('svg text').filter({ hasText: /^r=/ })).toHaveText('r=12,5');
 
     // Y en las otras figuras, que tienen sus propias etiquetas
-    await page.getByRole('button', { name: /Paralelepípedo|Prisma|Cubo/ }).first().click();
+    await page.getByRole('button', { name: /Ortoedro|Paralelepípedo|Prisma|Cubo/ }).first().click();
     await page.locator('input[type=text]').first().fill('2,5');
     await expect(page.locator('svg text').filter({ hasText: /^a=/ })).toHaveText('a=2,5');
   });
@@ -391,7 +391,7 @@ test.describe('re-inspección 30/08/2026', () => {
     await page.reload();
     await expect(valorVolumen(page)).toHaveText('523,6'); // esfera r=5
     await expect(formulaAplicada(page)).toHaveText('V = (4/3) × π × r³ = (4/3) × π × 5³');
-    await elegirFigura(page, /Paralelepípedo/);
+    await elegirFigura(page, /Ortoedro/);
     await expect(valorVolumen(page)).toHaveText('120,0'); // 6 × 4 × 5
     await expect(formulaAplicada(page)).toHaveText('V = a × b × h = 6 × 4 × 5');
     await elegirFigura(page, /Cilindro/);
@@ -415,7 +415,7 @@ test.describe('re-inspección 30/08/2026', () => {
 
   test('CASO 2 · el tope del deslizador no contamina el cálculo ni el dibujo', async ({ page }) => {
     // Cubo de 100.000 de arista: 1e15, sin ∞ ni notación científica
-    await elegirFigura(page, /Paralelepípedo/);
+    await elegirFigura(page, /Ortoedro/);
     await campo(page, 'Anchura (a)').fill('100000');
     await campo(page, 'Profundidad (b)').fill('100000');
     await campo(page, 'Altura (h)').fill('100000');
@@ -485,7 +485,7 @@ test.describe('re-inspección 30/08/2026', () => {
 // metros algo pequeño: un cucurucho de r=0,03 y h=0,05 da 4,7×10⁻⁵ → «≈0».
 // Caso: esfera r=0,01 → esperado 4,188790×10⁻⁶ (o su notación científica) · obtenido «≈0»,
 //       y con r=0,00005 la fórmula muestra «(4/3) × π × ≈0³» y el dibujo «r=≈0».
-test.fail('REGRESIÓN · un volumen diminuto sigue siendo un número, no «≈0»', async ({ page }) => {
+test('518 (reparado) · un volumen diminuto ya se muestra en notación científica, no «≈0»', async ({ page }) => {
   await campo(page, 'Radio (r)').fill('0,01');
   // (4/3)·π·0,01³ = 4,1887902047863905e-6
   await expect(valorVolumen(page)).not.toHaveText('≈0');
@@ -506,7 +506,7 @@ test.fail('REGRESIÓN · un volumen diminuto sigue siendo un número, no «≈0�
 // sliders. Quien lea la guía concluye que la herramienta llega hasta 50 y avanza de 0,5 en
 // 0,5, que es justo la limitación que la reparación levantó.
 // Caso: abrir la guía y buscar cualquier mención al campo → esperado ≥ 1 · obtenido 0.
-test.fail('REGRESIÓN · la guía de uso explica el campo de medida exacta', async ({ page }) => {
+test('519 (reparado) · la guía de uso ya explica el campo de medida exacta', async ({ page }) => {
   await page.getByRole('button', { name: /Ver guía educativa/i }).click();
   const guia = page.locator('section').filter({ hasText: 'Cómo usar el visualizador' }).first();
   const texto = (await guia.textContent()) ?? '';
@@ -521,7 +521,7 @@ test.fail('REGRESIÓN · la guía de uso explica el campo de medida exacta', asy
 // misma línea, toda la prosa dice «slider» mientras el aria-label del control dice «control
 // deslizante»: la app llama de dos maneras a su propio mando.
 // Caso: texto visible de la página → esperado sin «slant» · obtenido «la altura slant».
-test.fail('REGRESIÓN · el texto docente no deja términos en inglés sin traducir', async ({ page }) => {
+test('520 (reparado) · el texto docente ya no deja «slant» sin traducir', async ({ page }) => {
   await page.getByRole('button', { name: /Ver guía educativa/i }).click();
   const cuerpo = (await page.locator('body').textContent()) ?? '';
   expect(cuerpo).not.toMatch(/\bslant\b/i);
@@ -536,7 +536,7 @@ test.fail('REGRESIÓN · el texto docente no deja términos en inglés sin tradu
 // precisamente de los errores frecuentes de geometría, el nombre debería ser el exacto.
 // Caso: fila de la tabla con V = a × b × h → esperado «ortoedro» o «paralelepípedo recto» ·
 //       obtenido «📦 Paralelepípedo» a secas.
-test.fail('REGRESIÓN · la caja se nombra con el término geométrico exacto', async ({ page }) => {
+test('521 (reparado) · la caja ya se nombra con el término geométrico exacto (ortoedro)', async ({ page }) => {
   await page.getByRole('button', { name: /Ver guía educativa/i }).click();
   const fila = page.getByRole('row').filter({ hasText: 'V = a × b × h' });
   await expect(fila).toContainText(/ortoedro|prisma rectangular|paralelep[íi]pedo recto/i);

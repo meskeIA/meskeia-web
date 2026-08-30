@@ -85,13 +85,21 @@ export default function SimuladorMovimientoCircularPage() {
 
   const prevTimestampRef = useRef<number | null>(null);
 
-  // Sincronizar omegaRef con el estado cuando cambia
+  /**
+   * Reinicia la animación (ω vuelve a ω₀, θ a 0) solo cuando el usuario pide explícitamente
+   * empezar de nuevo: cambia ω₀ en el slider, o cambia de modo (MCU ↔ MCNU).
+   *
+   * `radio` NO va en las dependencias: es una magnitud geométrica del dibujo (v, a_c, F_c ya
+   * la leen directamente en el render), no del estado dinámico de giro. Con `radio` aquí, en
+   * MCNU mover solo ese slider rearmaba ω a ω₀ y ponía θ a 0 sin avisar — justo cuando el
+   * bloque educativo propone comparar la MISMA ω al variar el radio (hallazgo 542).
+   */
   useEffect(() => {
     omegaRef.current = omega;
     thetaRef.current = 0;
     prevTimestampRef.current = null;
     setOmegaAnimada(omega);
-  }, [omega, radio, modo]);
+  }, [omega, modo]);
 
   // Magnitudes derivadas (mostradas en panel)
   const omegaVal = modo === 'mcnu' ? omegaAnimada : omega;
@@ -130,6 +138,7 @@ export default function SimuladorMovimientoCircularPage() {
       const radiusColor = isDark ? '#555' : '#CCC';
       const velColor = '#48A9A6';
       const acColor = '#E07A1F';
+      const atColor = '#DC2626';
 
       ctx.clearRect(0, 0, w, h);
       ctx.fillStyle = bgColor;
@@ -229,6 +238,25 @@ export default function SimuladorMovimientoCircularPage() {
         ctx.fillText('a_c', acx2, acy2 - 8);
       }
 
+      // Vector aceleración tangencial (misma dirección que v, magnitud α·r constante).
+      // Solo en MCNU: la tabla comparativa afirma a_t ≠ 0 ahí y el canvas no lo dibujaba
+      // (hallazgo 543).
+      if (modo === 'mcnu' && omegaActual > 0.01) {
+        const atScale = 18;
+        const atMag = ALPHA_MCNU * radio;
+        const atLen = Math.min(atMag * atScale, maxPx * 0.4);
+        const tx = -Math.sin(theta);
+        const ty = Math.cos(theta);
+        const atx2 = px + atLen * tx;
+        const aty2 = py + atLen * (-ty);
+        drawArrow(ctx, px, py, atx2, aty2, atColor, 2);
+
+        ctx.fillStyle = atColor;
+        ctx.font = `bold ${Math.round(w * 0.028)}px system-ui`;
+        ctx.textAlign = 'left';
+        ctx.fillText('a_t', atx2 + 4, aty2 + 14);
+      }
+
       // Punto/partícula
       ctx.fillStyle = particleColor;
       ctx.strokeStyle = '#FFFFFF';
@@ -244,7 +272,7 @@ export default function SimuladorMovimientoCircularPage() {
       ctx.arc(cx, cy, 3, 0, 2 * Math.PI);
       ctx.fill();
     },
-    [radio],
+    [radio, modo],
   );
 
   // Bucle de animación
@@ -342,11 +370,12 @@ export default function SimuladorMovimientoCircularPage() {
       {/* SLIDERS */}
       <div className={styles.slidersGrid}>
         <div className={styles.sliderGroup}>
-          <label className={styles.sliderLabel}>
+          <label className={styles.sliderLabel} htmlFor="slider-radio">
             Radio (r){' '}
             <span className={styles.sliderValue}>{formatNumber(radio, 1)} m</span>
           </label>
           <input
+            id="slider-radio"
             type="range"
             min={0.5}
             max={5}
@@ -355,16 +384,18 @@ export default function SimuladorMovimientoCircularPage() {
             onChange={(e) => setRadio(parseFloat(e.target.value))}
             className={styles.slider}
             aria-label="Radio de la circunferencia"
+            aria-valuetext={`${formatNumber(radio, 1)} metros`}
           />
           <div className={styles.sliderTicks}><span>0,5</span><span>5</span></div>
         </div>
 
         <div className={styles.sliderGroup}>
-          <label className={styles.sliderLabel}>
+          <label className={styles.sliderLabel} htmlFor="slider-omega">
             Velocidad angular (ω){' '}
             <span className={styles.sliderValue}>{formatNumber(omega, 1)} rad/s</span>
           </label>
           <input
+            id="slider-omega"
             type="range"
             min={0}
             max={10}
@@ -373,16 +404,18 @@ export default function SimuladorMovimientoCircularPage() {
             onChange={(e) => setOmega(parseFloat(e.target.value))}
             className={styles.slider}
             aria-label="Velocidad angular"
+            aria-valuetext={`${formatNumber(omega, 1)} radianes por segundo`}
           />
           <div className={styles.sliderTicks}><span>0</span><span>10</span></div>
         </div>
 
         <div className={styles.sliderGroup}>
-          <label className={styles.sliderLabel}>
+          <label className={styles.sliderLabel} htmlFor="slider-masa">
             Masa (m){' '}
             <span className={styles.sliderValue}>{formatNumber(masa, 1)} kg</span>
           </label>
           <input
+            id="slider-masa"
             type="range"
             min={0.1}
             max={5}
@@ -391,6 +424,7 @@ export default function SimuladorMovimientoCircularPage() {
             onChange={(e) => setMasa(parseFloat(e.target.value))}
             className={styles.slider}
             aria-label="Masa de la partícula"
+            aria-valuetext={`${formatNumber(masa, 1)} kilogramos`}
           />
           <div className={styles.sliderTicks}><span>0,1</span><span>5</span></div>
         </div>
@@ -458,6 +492,12 @@ export default function SimuladorMovimientoCircularPage() {
           <span className={styles.legendDot} style={{ background: '#E07A1F' }} aria-hidden="true" />
           Vector aceleración centrípeta (a_c)
         </span>
+        {modo === 'mcnu' && (
+          <span className={styles.legendItem}>
+            <span className={styles.legendDot} style={{ background: '#DC2626' }} aria-hidden="true" />
+            Vector aceleración tangencial (a_t)
+          </span>
+        )}
         <span className={styles.legendItem}>
           <span className={styles.legendDot} style={{ background: '#2E86AB' }} aria-hidden="true" />
           Partícula
@@ -528,9 +568,9 @@ export default function SimuladorMovimientoCircularPage() {
                   <td>Varía porque ω varía</td>
                 </tr>
                 <tr>
-                  <td>Aceleración tangencial (at)</td>
-                  <td>Nula (at = 0)</td>
-                  <td>at = α · r ≠ 0</td>
+                  <td>Aceleración tangencial (a_t)</td>
+                  <td>Nula (a_t = 0)</td>
+                  <td>a_t = α · r ≠ 0</td>
                 </tr>
                 <tr>
                   <td>Energía cinética</td>
