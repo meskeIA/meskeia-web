@@ -34,8 +34,8 @@ import { SECCIONES_IAE } from '../../data/fiscal/cnae-iae';
  *     (meta.iae.fuente) y en `data/fiscal/cnae-iae.ts` (FISCAL_CNAE_IAE_META.iae).
  *   · Clases de la CNAE-2025 y correspondencia CNAE-2009 → CNAE-2025 — RD 10/2025 (INE),
  *     misma fuente declarada (meta.cnae.fuente). El catálogo servido lleva 1.060 entradas
- *     de CNAE, 1.431 de IAE, 629 correspondencias directas y 664 inversas, generado el
- *     20/07/2026.
+ *     de CNAE, 1.431 de IAE, 629 correspondencias directas y 664 inversas, regenerado el
+ *     30/08/2026 al reordenar los sinónimos (hallazgos 524-525).
  *   · Textos y porcentajes de retención por sección — SECCIONES_IAE de
  *     `data/fiscal/cnae-iae.ts`, importado arriba para que el valor esperado no se
  *     transcriba a mano en este fichero (15 % general y 7 % el año de inicio y los dos
@@ -306,13 +306,12 @@ test('REGRESIÓN — la app niega la conversión CNAE→IAE en la página, en el
     page.getByText('no decide qué código corresponde a tu actividad').first(),
   ).toBeVisible();
 
-  // DataReference con las dos fuentes normativas y su fecha de verificación (20/07/2026).
-  // El día 24/08/2026 esta línea esperaba «20/7/2026», sin el cero: era el formato que daba
-  // `formatDate` con `toLocaleDateString('es-ES')` a secas, y el test lo fijaba como contrato
-  // pese a incumplir el DD/MM/YYYY obligatorio del CLAUDE.md §2 (hallazgo 282 del Inspector).
+  // DataReference con las dos fuentes normativas y su fecha de verificación, que es
+  // meta.generado del catálogo: se regeneró el 30/08/2026 al reordenar los sinónimos
+  // (hallazgos 524-525), así que la fecha visible avanzó con él.
   await expect(page.getByText('RD 10/2025', { exact: false }).first()).toBeVisible();
   await expect(page.getByText('RD Legislativo 1175/1990', { exact: false }).first()).toBeVisible();
-  await expect(page.getByText('20/07/2026', { exact: false }).first()).toBeVisible();
+  await expect(page.getByText('30/08/2026', { exact: false }).first()).toBeVisible();
 
   // El FAQPage del JSON-LD dice lo mismo que la página: sin él, las IAs citarían la
   // app como si fuese un conversor.
@@ -907,8 +906,8 @@ test.describe('Buscador CNAE-IAE — la fecha de vigencia vista desde América',
 // reparación de la tanda 3 (commit 1e3837e5), sin dar el commit por bueno.
 //
 // Los valores esperados NO salen de lo que devuelve la app: salen del catálogo servido
-// (`public/datos/cnae-iae-catalogo.json`, generado el 20/07/2026 desde el RD 10/2025 del
-// INE y el RD Legislativo 1175/1990 de las Tarifas) resuelto A MANO con la lógica de
+// (`public/datos/cnae-iae-catalogo.json`, generado desde el RD 10/2025 del INE y el RD
+// Legislativo 1175/1990 de las Tarifas) resuelto A MANO con la lógica de
 // orden que documenta `app/conversor-cnae-iae/page.tsx`: primero el peso de nivel/tipo o
 // la relevancia según el catálogo, y `localeCompare` del código para deshacer empates.
 // ═══════════════════════════════════════════════════════════════════════════
@@ -998,13 +997,11 @@ test.describe('Buscador CNAE-IAE — re-verificación del 30/08/2026', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS del 30/08/2026 — con `test.fail()`: hoy fallan a propósito.
-// El día que se reparen pasarán a ROJO («expected to fail, but passed»): entonces se
-// les quita la marca y se quedan como regresión. No se reescribe el valor esperado.
+// Reparados el 30/08/2026 (Inspector, ronda 8, hallazgos 522-525). Estaban con
+// `test.fail()`; ahora sujetan la reparación como regresión.
 // ═══════════════════════════════════════════════════════════════════════════
-test.describe('Buscador CNAE-IAE — hallazgos abiertos del 30/08/2026', () => {
-  test('«deporte» pierde la Sección 3ª, que ANTES de la reparación sí se veía', async ({ page }) => {
-    test.fail();
+test.describe('Buscador CNAE-IAE — hallazgos reparados del 30/08/2026', () => {
+  test('522 — «deporte» conserva la Sección 3ª, que ya se veía antes de la reparación del 480', async ({ page }) => {
     await abrir(page);
 
     // Efecto colateral de `conRepresentacionDeSeccion` (la reparación del hallazgo 480).
@@ -1027,10 +1024,9 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 30/08/2026', () => {
     await expect(fichas(page).filter({ hasText: 'Sección 3ª' }).first()).toBeVisible();
   });
 
-  test('el contador dice «se muestran los 10 primeros» cuando lo que muestra NO son los 10 primeros', async ({
+  test('523 — el contador ya no dice «los 10 primeros» cuando el reajuste de sección cambia el corte', async ({
     page,
   }) => {
-    test.fail();
     await abrir(page);
 
     // Segunda cara de la misma reparación. Con «enseñanza», lo visible son las nueve
@@ -1043,10 +1039,9 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 30/08/2026', () => {
     await expect(contador(page)).not.toContainText('los 10 primeros');
   });
 
-  test('«food truck» devuelve una tienda de alimentación en vez de la clase «Puestos de comidas»', async ({
+  test('524 — «food truck» ya devuelve la clase «Puestos de comidas»', async ({
     page,
   }) => {
-    test.fail();
     await abrir(page);
 
     // El catálogo servido coloca el sinónimo «food truck» en 47.11 «Comercio al por menor
@@ -1063,8 +1058,7 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 30/08/2026', () => {
     await expect(fichas(page).first()).toContainText('Puestos de comidas');
   });
 
-  test('«chapuzas», «manitas» y «reformista» aterrizan en Ingeniería civil', async ({ page }) => {
-    test.fail();
+  test('525 — «chapuzas», «manitas» y «reformista» ya no aterrizan en Ingeniería civil', async ({ page }) => {
     await abrir(page);
 
     // Mismo mecanismo, otro bloque de términos. El catálogo pone «chapuzas», «maestro de

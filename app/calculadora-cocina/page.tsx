@@ -59,6 +59,18 @@ const densidadesIngredientes: Record<string, number> = {
   'avena': 0.4,
 };
 
+/**
+ * Cuántos gramos pesan `ml` de `ingrediente`, con la misma densidad que usa el conversor de
+ * arriba. Las tarjetas educativas escribían estas cifras a mano y se desincronizaban del
+ * motor: «1 cuchara sopera = 10 g de harina» cuando el conversor da 7,95 g (hallazgo 548).
+ */
+const gramosDeIngrediente = (ml: number, ingrediente: string): number =>
+  Math.round(ml * densidadesIngredientes[ingrediente]);
+
+/** 30 g de avena en tazas, para que el ejemplo del texto no vuelva a divergir del conversor
+ *  de arriba (hallazgo 546: el texto decía «≈ 3/4 cup» y el motor da 0,31 tazas). */
+const AVENA_30G_EN_TAZAS = 30 / densidadesIngredientes['avena'] / unidadesCocina['tazas'].aGramos;
+
 // ==================== DATOS DE TIEMPOS DE COCCIÓN ====================
 
 interface TiempoCoccion {
@@ -235,15 +247,21 @@ const sustitutosIngredientes: Sustituto[] = [
  *  no lo escribe nadie, pero «2 1/2 huevos» o «1 1/2 taza» sí. */
 const TOPE_FRACCIONES = 20;
 
-const formatearCantidad = (n: number): string => {
+/** Unidades que se pesan en báscula o se miden en un recipiente graduado: siempre en
+ *  decimal, nunca en fracción de cocina — nadie lee «12 1/2 g» en una báscula digital.
+ *  Las fracciones son para lo que se CUENTA (huevos, tazas, dientes de ajo), no para lo
+ *  que se pesa (hallazgo 549: formatearCantidad usaba la magnitud, no la unidad). */
+const UNIDAD_MEDIBLE = /^(g|gr|gramos?|kg|kilo(?:gramo)?s?|ml|mililitros?|l|litros?)\b/i;
+
+const formatearCantidad = (n: number, textoResto = ''): string => {
   if (Math.abs(n % 1) < 1e-9) return formatNumber(Math.round(n), 0);
-  if (n >= TOPE_FRACCIONES) return formatNumber(n, 1);
+  if (n >= TOPE_FRACCIONES || UNIDAD_MEDIBLE.test(textoResto.trim())) return formatNumber(n, 1);
   const entera = Math.floor(n);
-  const resto = n - entera;
+  const parteFraccional = n - entera;
   const fracciones: [number, string][] = [
     [1 / 4, '1/4'], [1 / 3, '1/3'], [1 / 2, '1/2'], [2 / 3, '2/3'], [3 / 4, '3/4'],
   ];
-  const encaje = fracciones.find(([v]) => Math.abs(resto - v) < 0.02);
+  const encaje = fracciones.find(([v]) => Math.abs(parteFraccional - v) < 0.02);
   if (encaje) return entera > 0 ? `${formatNumber(entera, 0)} ${encaje[1]}` : encaje[1];
   return formatNumber(n, 1);
 };
@@ -328,13 +346,43 @@ export default function CalculadoraCocinaPage() {
 
     const resultado = lineas.map(linea => {
       /**
-       * Se reconocen también las FRACCIONES y los mixtos («1/2 cebolla», «1 1/2 taza»).
+       * RANGOS de cantidad («2-3 dientes de ajo»), sintaxis corriente en recetas. Antes la
+       * regex de número simple capturaba solo el «2» y arrastraba «-3 dientes de ajo» al
+       * resto, así que ×2 daba «4 -3 dientes de ajo» (hallazgo 545). Se escalan los dos
+       * extremos por separado, con la misma unidad.
+       */
+      const conRango = linea.match(/^(\d+(?:[.,]\d+)?)\s*-\s*(\d+(?:[.,]\d+)?)\s*(.+)$/);
+      if (conRango) {
+        const desde = parseSpanishNumber(conRango[1]);
+        const hasta = parseSpanishNumber(conRango[2]);
+        const resto = conRango[3];
+        if (!isNaN(desde) && !isNaN(hasta)) {
+          return `${formatearCantidad(desde * factor, resto)}-${formatearCantidad(hasta * factor, resto)} ${resto}`;
+        }
+      }
+
+      /**
+       * Se reconocen también las FRACCIONES y los mixtos («1/2 cebolla», «1 1/2 taza»),
+       * tanto en ASCII como en unicode («½ cebolla», «1 ½ taza»): sin esto, la fracción
+       * unicode no empieza por dígito y caía en el return de reserva sin escalar ni avisar
+       * (hallazgo 547).
        *
        * La expresión anterior solo capturaba el numerador y arrastraba el «/2» al resto de
        * la línea: «1/2 cebolla» escalado ×2 daba «2 /2 cebolla». Y las fracciones son
        * justamente las de las recetas anglosajonas que esta app dice adaptar — su propia
        * tabla de sustitutos usa «1/2 plátano» y «1/2 cdta» (hallazgo 143 del Inspector).
        */
+      const FRACCIONES_UNICODE: Record<string, number> = {
+        '¼': 1 / 4, '½': 1 / 2, '¾': 3 / 4, '⅓': 1 / 3, '⅔': 2 / 3,
+      };
+      const conFraccionUnicode = linea.match(/^(?:(\d+)\s+)?([¼½¾⅓⅔])\s*(.+)$/);
+      if (conFraccionUnicode) {
+        const entera = conFraccionUnicode[1] ? parseInt(conFraccionUnicode[1], 10) : 0;
+        const valor = FRACCIONES_UNICODE[conFraccionUnicode[2]];
+        const resto = conFraccionUnicode[3];
+        return `${formatearCantidad((entera + valor) * factor, resto)} ${resto}`;
+      }
+
       const conFraccion =
         linea.match(/^(\d+)\s+(\d+)\/(\d+)\s*(.+)$/) ??   // «1 1/2 taza»
         linea.match(/^()(\d+)\/(\d+)\s*(.+)$/);           // «1/2 cebolla»
@@ -343,7 +391,7 @@ export default function CalculadoraCocinaPage() {
         const num = parseInt(conFraccion[2], 10);
         const den = parseInt(conFraccion[3], 10);
         const resto = conFraccion[4];
-        if (den > 0) return `${formatearCantidad((entera + num / den) * factor)} ${resto}`;
+        if (den > 0) return `${formatearCantidad((entera + num / den) * factor, resto)} ${resto}`;
       }
 
       // Buscar números en la línea (incluyendo decimales con coma o punto)
@@ -352,7 +400,7 @@ export default function CalculadoraCocinaPage() {
         const cantidadOriginal = parseSpanishNumber(match[1]);
         const resto = match[2];
         if (!isNaN(cantidadOriginal)) {
-          return `${formatearCantidad(cantidadOriginal * factor)} ${resto}`;
+          return `${formatearCantidad(cantidadOriginal * factor, resto)} ${resto}`;
         }
       }
       return linea; // Si no encuentra número, devolver línea original
@@ -760,19 +808,19 @@ export default function CalculadoraCocinaPage() {
               <div className={styles.tipCard}>
                 <h4>Con una cuchara sopera</h4>
                 <ul>
-                  <li>Harina: 10g</li>
-                  <li>Azúcar: 15g</li>
-                  <li>Aceite: 14g</li>
-                  <li>Miel: 21g</li>
+                  <li>Harina: {gramosDeIngrediente(15, 'harina')}g</li>
+                  <li>Azúcar: {gramosDeIngrediente(15, 'azucar')}g</li>
+                  <li>Aceite: {gramosDeIngrediente(15, 'aceite')}g</li>
+                  <li>Miel: {gramosDeIngrediente(15, 'miel')}g</li>
                 </ul>
               </div>
               <div className={styles.tipCard}>
                 <h4>Con un vaso de agua (200ml)</h4>
                 <ul>
-                  <li>Harina: 110g</li>
-                  <li>Azúcar: 180g</li>
-                  <li>Arroz: 180g</li>
-                  <li>Leche: 200g</li>
+                  <li>Harina: {gramosDeIngrediente(200, 'harina')}g</li>
+                  <li>Azúcar: {gramosDeIngrediente(200, 'azucar')}g</li>
+                  <li>Arroz: {gramosDeIngrediente(200, 'arroz')}g</li>
+                  <li>Leche: {gramosDeIngrediente(200, 'leche')}g</li>
                 </ul>
               </div>
               <div className={styles.tipCard}>
@@ -927,7 +975,7 @@ export default function CalculadoraCocinaPage() {
                   <strong>Persona con dieta que ajusta cantidades</strong>
                 </div>
                 <p className={styles.escenarioExample}>
-                  Sigue una dieta con macros controlados y necesita convertir &quot;1 tbsp de aceite de oliva&quot; a gramos: 14 g, o calcular exactamente 30 g de avena en tazas (≈ 3/4 cup).
+                  Sigue una dieta con macros controlados y necesita convertir &quot;1 tbsp de aceite de oliva&quot; a gramos: {gramosDeIngrediente(15, 'aceite')} g, o calcular exactamente 30 g de avena en tazas ({formatNumber(AVENA_30G_EN_TAZAS, 2)} tazas, ≈ 1/3 cup).
                 </p>
                 <p className={styles.escenarioTip}>
                   Clave: el aceite pesa menos que el agua (densidad 0,92), así que 1 ml ≠ 1 g.

@@ -12,12 +12,13 @@ import {
   DataReference,
   ShareCard, RegionBadge
 } from '@/components';
-import { formatCurrency, formatNumber, parseSpanishNumberOr } from '@/lib';
+import { formatCurrency, formatNumber, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   BONO_ALQUILER_JOVEN_2026,
   UMBRAL_IPREM_VIVIENDA_JOVEN,
   FISCAL_VIVIENDA_JOVEN_META,
+  IPREM_2026,
 } from '@/data/fiscal';
 
 /**
@@ -27,6 +28,10 @@ import {
  * que importa es que la cifra salga del módulo en vez de estar tecleada (hallazgo 444).
  */
 const eur = (n: number) => `${formatNumber(n, 0)} €`;
+
+/** El umbral de renta se computa sobre 14 pagas (IPREM_2026.anual14), la referencia que
+ *  el propio módulo fiscal declara para cálculo de topes (hallazgo 536). */
+const topeIngresos = (veces: number) => eur(IPREM_2026.anual14 * veces);
 
 interface Requisito {
   id: string;
@@ -44,8 +49,8 @@ const REQUISITOS: Requisito[] = [
   },
   {
     id: 'ingresos',
-    pregunta: `Tus rentas anuales no superan ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.general, 0)} veces el IPREM`,
-    explicacion: `El RD 326/2026 fija el umbral en ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.general, 0)} veces el IPREM, que sube a ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad33, 1)} con una discapacidad reconocida del 33 % o más (y si eres hijo o hija de víctima de violencia de género) y a ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad65, 0)} con una discapacidad del 65 % o más. Cada Comunidad Autónoma concreta el cómputo en su convocatoria.`,
+    pregunta: `Tus rentas anuales no superan ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.general, 0)} veces el IPREM (${topeIngresos(UMBRAL_IPREM_VIVIENDA_JOVEN.general)}/año)`,
+    explicacion: `El RD 326/2026 fija el umbral en ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.general, 0)} veces el IPREM (${topeIngresos(UMBRAL_IPREM_VIVIENDA_JOVEN.general)}/año), que sube a ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad33, 1)} (${topeIngresos(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad33)}/año) con una discapacidad reconocida del 33 % o más (y si eres hijo o hija de víctima de violencia de género) y a ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad65, 0)} (${topeIngresos(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad65)}/año) con una discapacidad del 65 % o más. Cada Comunidad Autónoma concreta el cómputo en su convocatoria.`,
     bloqueante: true,
   },
   {
@@ -105,6 +110,9 @@ export default function SimuladorBonoJovenAlquilerPage() {
   // navegador además normaliza la coma del teclado español al punto, así que tecleando
   // «1,500» ocurría lo mismo. Es justo el patrón que persigue `npm run check:parser`
   // (hallazgo 440).
+  const alquilerCrudo = parseSpanishNumber(alquilMensual);
+  /** Un negativo tecleado no es un campo vacío: hay que avisar, no pedir rellenarlo de nuevo (hallazgo 538) */
+  const alquilerInvalido = Number.isFinite(alquilerCrudo) && alquilerCrudo < 0;
   const alquilerNum = Math.max(0, parseSpanishNumberOr(alquilMensual));
   const bonificacionMaxima = BONO[tipoVivienda];
   // El bono no puede superar el 60% de la renta mensual (RD 326/2026, art. 137)
@@ -221,10 +229,18 @@ export default function SimuladorBonoJovenAlquilerPage() {
               onChange={e => setAlquilMensual(e.target.value)}
               placeholder="550"
               aria-label="Renta mensual en euros"
+              aria-invalid={alquilerInvalido}
+              aria-describedby={alquilerInvalido ? 'alquiler-error' : undefined}
             />
             <span>/mes</span>
           </div>
-          <span className={styles.helperText}>Introduce lo que pagas actualmente o lo que pagarás</span>
+          {alquilerInvalido ? (
+            <p className={styles.errorText} id="alquiler-error" role="alert">
+              La renta no puede ser un importe negativo.
+            </p>
+          ) : (
+            <span className={styles.helperText}>Introduce lo que pagas actualmente o lo que pagarás</span>
+          )}
         </div>
 
         <div className={styles.field}>
@@ -341,13 +357,22 @@ export default function SimuladorBonoJovenAlquilerPage() {
               <p className={styles.resultadoTexto}>
                 Cumples los requisitos obligatorios, aunque algunos aspectos adicionales (contrato registrado,
                 documentación completa, disponibilidad de fondos en tu CA) pueden condicionar la aprobación final.{' '}
-                {rentaDentroDelLimite === true ? (
+                {alquilerInvalido ? (
+                  <>La renta que has introducido no es válida: corrígela aquí arriba para poder comprobarla contra el tope del art. 133.1.e.</>
+                ) : rentaDentroDelLimite === true ? (
                   <>La renta ya está comprobada aquí arriba contra el tope del art. 133.1.e.</>
                 ) : (
                   <>Falta comprobar la renta: introdúcela aquí arriba para verificarla contra el tope del art. 133.1.e.</>
                 )}{' '}
                 Consulta con tu Comunidad Autónoma.
               </p>
+              {estados.comunidad === 'no' && (
+                <p className={styles.resultadoTexto}>
+                  <strong>Tu Comunidad Autónoma no tiene el Bono Joven activo ahora mismo</strong>: aunque
+                  cumplas el resto de requisitos, hoy no puedes solicitarlo hasta que abra su convocatoria.
+                  Los fondos y plazos varían cada año — vuelve a comprobarlo más adelante.
+                </p>
+              )}
             </div>
           )}
           {resultado === 'no-apto' && (
@@ -500,7 +525,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
             </div>
             <div className={styles.faqItem}>
               <h3>¿El propietario del piso debe cumplir algún requisito?</h3>
-              <p>El propietario no puede ser familiar hasta segundo grado del solicitante. Además, el piso no puede ser de protección oficial en algunos casos. El contrato debe ser legal y vigente.</p>
+              <p>El RD 326/2026 no fija a nivel estatal ninguna condición sobre el propietario: solo exige que el contrato de arrendamiento esté formalizado por escrito y con la fianza depositada (art. 133.1.e). Cada Comunidad Autónoma puede añadir condiciones adicionales en su convocatoria — comprueba si la tuya restringe el parentesco entre propietario e inquilino.</p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Cuánto tarda en resolverse la solicitud?</h3>

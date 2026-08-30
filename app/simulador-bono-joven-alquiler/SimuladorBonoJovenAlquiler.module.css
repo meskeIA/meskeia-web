@@ -74,6 +74,7 @@
 .field { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
 .label { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
 .helperText { font-size: 0.8rem; color: var(--text-secondary); }
+.errorText { font-size: 0.8rem; color: #E53E3E; margin: 0; font-weight: 500; }
 
 /* Slider de edad */
 .sliderRow { display: flex; align-items: center; gap: 1rem; }

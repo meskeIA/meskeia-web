@@ -341,34 +341,33 @@ test.describe('Escalador de recetas', () => {
     expect(await escalar(page, '4', '8', '1 1/2 taza harina')).toContain('3 taza harina');
   });
 
-  test('TESTIGO A · los RANGOS de una receta se destrozan al escalar', async ({ page }) => {
-    // «2-3 dientes de ajo» es sintaxis corriente en receta española. La regex
-    // /^([\d.,]+)\s*(.+)$/ captura solo el «2» y arrastra el «-3» al resto de la línea.
-    // HALLAZGO ABIERTO: lo esperable sería «4-6 dientes de ajo». Si se repara, esto fallará.
+  test('545 (reparado) · un RANGO de receta («2-3 dientes de ajo») escala los dos extremos', async ({ page }) => {
+    // «2-3 dientes de ajo» es sintaxis corriente en receta española. Antes la regex
+    // /^([\d.,]+)\s*(.+)$/ capturaba solo el «2» y arrastraba el «-3» al resto de la línea.
     const texto = await escalar(page, '4', '8', '2-3 dientes de ajo');
-    expect(texto).toContain('4 -3 dientes de ajo');
+    expect(texto).toContain('4-6 dientes de ajo');
+    expect(texto).not.toContain('4 -3 dientes de ajo');
   });
 
-  test('TESTIGO B · la fracción UNICODE no se escala, y no avisa', async ({ page }) => {
-    // «½ cebolla» no empieza por dígito, así que cae en el `return linea` de reserva y vuelve
-    // idéntica. Es el mismo fallback que deja intacto «Sal al gusto», pero aquí SÍ había una
-    // cantidad que escalar, y el usuario no tiene forma de notar que esa línea se quedó atrás.
-    // HALLAZGO ABIERTO: lo esperable sería «1 cebolla». Si se repara, esto fallará.
+  test('547 (reparado) · la fracción UNICODE (½) ya se escala como la ASCII', async ({ page }) => {
+    // «½ cebolla» no empezaba por dígito, así que caía en el `return linea` de reserva y
+    // volvía idéntica, sin avisar de que esa línea no se había escalado.
     const texto = await escalar(page, '4', '8', '½ cebolla');
-    expect(texto).toContain('½ cebolla');
-    expect(texto).not.toContain('1 cebolla');
+    expect(texto).toContain('1 cebolla');
+    expect(texto).not.toContain('½ cebolla');
   });
 
-  test('TESTIGO · bajo el tope, gramos y mililitros salen en fracción', async ({ page }) => {
+  test('549 (reparado) · bajo el tope, gramos y mililitros salen en decimal, no en fracción', async ({ page }) => {
     // 4 → 0,5 porciones, factor 0,125: 100 × 0,125 = 12,5 g y 150 × 0,125 = 18,75 ml.
-    // Como ambos quedan por debajo de TOPE_FRACCIONES (20), formatearCantidad los escribe
-    // «12 1/2 g» y «18 3/4 ml». El propio comentario del código dice que «187 1/2 ml no lo
-    // escribe nadie»; el tope usa la MAGNITUD como sustituto de «unidad que se cuenta»,
-    // y por debajo de 20 el sustituto falla igual con gramos y mililitros.
+    // Por debajo de TOPE_FRACCIONES (20) formatearCantidad usaba la MAGNITUD como sustituto
+    // de «unidad que se cuenta», y escribía «12 1/2 g» y «18 3/4 ml» — «187 1/2 ml» no lo
+    // escribe nadie, y por debajo de 20 el sustituto fallaba igual con gramos y mililitros.
     const texto = await escalar(page, '4', '0,5');
-    expect(texto).toContain('1/4 huevos'); // esto sí es lo que se quería: 2 × 0,125 = 1/4
-    expect(texto).toContain('12 1/2 g azúcar'); // HALLAZGO ABIERTO: se esperaría «12,5 g»
-    expect(texto).toContain('18 3/4 ml leche'); // HALLAZGO ABIERTO: se esperaría «18,8 ml»
+    expect(texto).toContain('1/4 huevos'); // lo que SÍ se cuenta conserva la fracción: 2 × 0,125 = 1/4
+    expect(texto).toContain('12,5 g azúcar');
+    expect(texto).toContain('18,8 ml leche');
+    expect(texto).not.toContain('12 1/2 g azúcar');
+    expect(texto).not.toContain('18 3/4 ml leche');
   });
 });
 
@@ -377,38 +376,46 @@ test.describe('El bloque educativo frente al motor de la misma página', () => {
     await page.goto(RUTA);
   });
 
-  test('TESTIGO C · «30 g de avena ≈ 3/4 cup» contradice al conversor', async ({ page }) => {
+  test('546 (reparado) · «30 g de avena» ya deriva del mismo conversor, no de un «3/4 cup» a mano', async ({ page }) => {
     // Motor: 30 g ÷ 0,4 g/ml = 75 ml ; 75 ÷ 240 = 0,3125 tazas → «0,31 Tazas (cup)».
     // Referencia externa: King Arthur Baking, 1 taza de copos de avena = 89 g → 30 g ≈ 1/3 cup.
-    // Las dos coinciden entre sí y contradicen al texto educativo, que dice 3/4 cup (≈ 2,4×).
     expect(await convertir(page, '30', 'gramos', 'tazas', 'avena')).toContain(
       '30,00 Gramos (g) de avena = 0,31 Tazas (cup)',
     );
     // El <EducationalSection> monta siempre su contenido pero lo oculta por CSS, así que hay
     // que desplegarlo para que innerText lo vea. Su botón toma el nombre del aria-label.
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
-    // HALLAZGO ABIERTO: el escenario «Persona con dieta que ajusta cantidades» sigue diciendo
-    // 3/4 cup. Cuando se corrija a 1/3, este expect fallará.
-    await expect(page.getByText(/30 g de avena en tazas \(≈ 3\/4 cup\)/)).toBeVisible();
+    // El escenario «Persona con dieta que ajusta cantidades» ya deriva del conversor: 0,31
+    // tazas, con la aproximación ≈ 1/3 cup en vez del «3/4 cup» que no cuadraba con nada.
+    await expect(page.getByText(/30 g de avena en tazas \(0,31 tazas, ≈ 1\/3 cup\)/)).toBeVisible();
+    await expect(page.getByText(/≈ 3\/4 cup/)).toHaveCount(0);
   });
 
-  test('TESTIGO D · las «medidas sin báscula» no las reproduce el motor', async ({ page }) => {
-    // La tarjeta «Con un vaso de agua (200ml)» declara arroz 180 g y azúcar 180 g;
-    // la de «Con una cuchara sopera», harina 10 g. Son valores COLMADOS, y la tarjeta
-    // «La cuchara rasa, no colmada» de más abajo dice justo lo contrario.
-    // 200 ml × 0,75 = 150 g de arroz  (el 180 g declarado implicaría 0,90 g/ml)
+  test('548 (reparado) · las «medidas sin báscula» ya derivan del mismo motor del conversor', async ({ page }) => {
+    // Antes eran valores COLMADOS escritos a mano (arroz 180 g, azúcar 180 g, harina 10 g),
+    // que contradecían tanto al motor como a la tarjeta «La cuchara rasa, no colmada» de al
+    // lado. Se comprueban primero contra el conversor y luego contra la tarjeta misma.
     expect(await convertir(page, '200', 'mililitros', 'gramos', 'arroz')).toContain(
       '= 150,00 Gramos (g)',
     );
-    // 200 ml × 0,85 = 170 g de azúcar (el 180 g declarado implicaría 0,90 g/ml)
     expect(await convertir(page, '200', 'mililitros', 'gramos', 'azucar')).toContain(
       '= 170,00 Gramos (g)',
     );
-    // 15 ml × 0,53 = 7,95 g de harina (el 10 g declarado implicaría 0,67 g/ml).
-    // King Arthur da 1 tbsp de harina = 8 g, o sea que el motor acierta y la tarjeta no.
+    // 15 ml × 0,53 = 7,95 g de harina, que Math.round dobla a 8 g — la propia referencia
+    // externa (King Arthur) da 1 tbsp de harina = 8 g.
     expect(await convertir(page, '15', 'mililitros', 'gramos', 'harina')).toContain(
       '= 7,95 Gramos (g)',
     );
+
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const tarjetaCuchara = page.locator('h4', { hasText: 'Con una cuchara sopera' }).locator('xpath=..');
+    await expect(tarjetaCuchara).toContainText('Harina: 8g');
+    await expect(tarjetaCuchara).not.toContainText('Harina: 10g');
+    const tarjetaVaso = page.locator('h4', { hasText: 'Con un vaso de agua' }).locator('xpath=..');
+    await expect(tarjetaVaso).toContainText('Azúcar: 170g');
+    await expect(tarjetaVaso).toContainText('Arroz: 150g');
+    await expect(tarjetaVaso).not.toContainText('Azúcar: 180g');
+    await expect(tarjetaVaso).not.toContainText('Arroz: 180g');
   });
 });
 

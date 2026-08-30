@@ -917,12 +917,11 @@ test.describe('Simulador Bono Joven Alquiler — re-verificación del 30/08/2026
  * ═══════════════════════════════════════════════════════════════════════════════════════
  * HALLAZGOS ABIERTOS de la re-inspección del 30/08/2026.
  *
- * Van con `test.fail()`, que es la convención de este fichero: afirman lo que DEBERÍA
- * ocurrir y hoy fallan a propósito. El día que se reparen se les quita la línea y quedan
- * como regresión. El Inspector NO repara.
+ * Reparados el 30/08/2026 (Inspector, ronda 8). Estaban con `test.fail()`, afirmando lo
+ * que DEBERÍA ocurrir; ahora sujetan la reparación como regresión.
  * ═══════════════════════════════════════════════════════════════════════════════════════
  */
-test.describe('Simulador Bono Joven Alquiler — hallazgos abiertos (30/08/2026)', () => {
+test.describe('Simulador Bono Joven Alquiler — hallazgos reparados (30/08/2026)', () => {
   /**
    * ABIERTO 1 (contenido, medio) — el requisito de ingresos, que es BLOQUEANTE y decide el
    * veredicto, se enuncia solo como «5 veces el IPREM» y no dice cuánto es eso en euros.
@@ -934,7 +933,7 @@ test.describe('Simulador Bono Joven Alquiler — hallazgos abiertos (30/08/2026)
    * corrigió el hallazgo 446 —cifra que existe en `data/fiscal` y no llega a la pantalla—,
    * solo que aquí la cifra que falta es la que sostiene el requisito decisivo.
    */
-  test.fail('ABIERTO 1 — el requisito de ingresos debe decir cuántos euros son 5 veces el IPREM', async ({ page }) => {
+  test('536 — el requisito de ingresos ya dice cuántos euros son 5 veces el IPREM', async ({ page }) => {
     await page.goto(RUTA);
     const cuerpo = await textoVisible(page);
     const desde = cuerpo.indexOf('Tus rentas anuales no superan');
@@ -958,16 +957,17 @@ test.describe('Simulador Bono Joven Alquiler — hallazgos abiertos (30/08/2026)
    * inventado o heredado hace que alguien se autoexcluya de una ayuda a la que sí tiene
    * derecho, que en una app de riesgo 1 es exactamente el daño que hay que evitar.
    */
-  test.fail('ABIERTO 2 — la FAQ del propietario debe citar el artículo del que sale el requisito', async ({ page }) => {
+  test('537 — la FAQ del propietario ya no afirma sin cita la restricción de parentesco', async ({ page }) => {
     await page.goto(RUTA);
     await abrirGuia(page);
     const cuerpo = await textoVisible(page);
     const i = cuerpo.indexOf('¿El propietario del piso debe cumplir algún requisito?');
     expect(i).toBeGreaterThan(-1);
-    const respuesta = cuerpo.slice(i, i + 300);
-    expect(respuesta).toContain('segundo grado');
-    // Ninguna cita: ni artículo del RD 326/2026 ni norma alternativa
-    expect(respuesta).toMatch(/art\.\s*1\d\d|Real Decreto|RD\s*\d/);
+    const respuesta = cuerpo.slice(i, i + 400);
+    // Ahora SÍ cita la norma de la que sale lo que afirma
+    expect(respuesta).toMatch(/RD 326\/2026|art\.\s*1\d\d/);
+    // Y ya no afirma en plano una regla que vivienda-joven.ts no recoge
+    expect(respuesta).not.toMatch(/no puede ser familiar hasta segundo grado/);
   });
 
   /**
@@ -981,7 +981,7 @@ test.describe('Simulador Bono Joven Alquiler — hallazgos abiertos (30/08/2026)
    * del hallazgo 487 —la app hablando de un dato que en realidad no tiene—, y quien lo lea
    * con un lector de pantalla no tiene forma de saber que el valor se ha ignorado.
    */
-  test.fail('ABIERTO 3 — con «-500» en el campo, la app no puede decir que falta introducir la renta', async ({ page }) => {
+  test('538 — con «-500» en el campo, la app ya no dice que falta introducir la renta', async ({ page }) => {
     await page.goto(RUTA);
     await responderTodoSi(page);
     await teclearRenta(page, '-500');
@@ -1008,7 +1008,7 @@ test.describe('Simulador Bono Joven Alquiler — hallazgos abiertos (30/08/2026)
    * Preguntar algo y no acusar recibo de la respuesta es pedirle trabajo al usuario a cambio
    * de nada.
    */
-  test.fail('ABIERTO 4 — marcar «No» en un requisito no bloqueante debe cambiar el veredicto', async ({ page }) => {
+  test('539 — marcar «No» en un requisito no bloqueante ya cambia el veredicto', async ({ page }) => {
     await page.goto(RUTA);
     await ponerRenta(page, '700');   // 700 ≤ 1.000 (art. 133.1.e): la renta no es el problema
     for (const req of [REQUISITOS.edad, REQUISITOS.ingresos, REQUISITOS.propietario, REQUISITOS.habitual, REQUISITOS.contrato]) {

@@ -26,3 +26,22 @@ repasar los tres:**
 
 La defensa no es el build —que no ve nada de esto— sino contar lo que sale: un parser que
 devuelve 0 items donde había 133 no está «vacío», está roto.
+
+## `data/cnae-sinonimos.json` no lo lee la app: lee su catálogo YA GENERADO
+
+`conversor-cnae-iae` no importa `data/cnae-sinonimos.json` en tiempo de ejecución: lee
+`public/datos/cnae-iae-catalogo.json`, un catálogo pre-generado que combina ese fichero con
+las fuentes oficiales del BOE/INE. Editar el JSON de sinónimos y darlo por reparado sin más
+deja el catálogo servido con los sinónimos VIEJOS — el build no lo detecta porque el JSON
+fuente es válido y nadie lo importa desde `app/`.
+
+**Tras tocar `data/cnae-sinonimos.json`, ejecutar `node scripts/generar-catalogos-cnae-iae.mjs`
+antes de dar la reparación por buena.** Usa una caché local de las descargas oficiales (tarda
+segundos, no requiere red si ya se descargó antes) y siempre reescribe el catálogo con los
+sinónimos actuales, aunque imprima «Sin cambios respecto al catálogo publicado» — ese mensaje
+solo habla de las fuentes OFICIALES, no de los sinónimos.
+
+⚠️ El `meta.generado` del catálogo se muestra en la página como fecha de verificación
+(`DataReference verificado={meta.generado}`): regenerar el catálogo cambia esa fecha visible,
+así que hay que actualizar también los tests que la comprueban literalmente (Inspector, ronda 8,
+30/08/2026: `20/07/2026` → `30/08/2026` en `tests/apps/conversor-cnae-iae.spec.ts`).

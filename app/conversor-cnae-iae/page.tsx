@@ -218,7 +218,30 @@ function conRepresentacionDeSeccion<T>(
     }
   }
   if (faltantes.length === 0) return prefijo;
-  const conservados = prefijo.slice(0, Math.max(1, limite - faltantes.length));
+
+  // Solo se puede sacrificar una entrada del prefijo cuya sección tenga OTRA representante
+  // en el propio prefijo: si no, esa sección desaparecería del corte, que es justo lo que
+  // esta función existe para evitar (hallazgo 522, la 3ª/04 salía del corte de «deporte»
+  // aunque ya se viera antes de la reparación). Se recorta desde el final (lo menos
+  // relevante) y, si no hay bastantes candidatos seguros, el corte crece en vez de perder
+  // una sección que ya estaba representada.
+  const cuentaEnPrefijo = new Map<string, number>();
+  for (const item of prefijo) {
+    const seccion = seccionDe(item);
+    cuentaEnPrefijo.set(seccion, (cuentaEnPrefijo.get(seccion) ?? 0) + 1);
+  }
+  const descartables: T[] = [];
+  for (let i = prefijo.length - 1; i >= 0 && descartables.length < faltantes.length; i--) {
+    const item = prefijo[i];
+    const seccion = seccionDe(item);
+    const cuenta = cuentaEnPrefijo.get(seccion)!;
+    if (cuenta > 1) {
+      descartables.push(item);
+      cuentaEnPrefijo.set(seccion, cuenta - 1);
+    }
+  }
+  const aDescartar = new Set(descartables);
+  const conservados = prefijo.filter((item) => !aDescartar.has(item));
   const visibles = new Set([...conservados, ...faltantes]);
   // Se mantiene el orden de relevancia original: solo cambia QUÉ entra en el corte.
   return ordenados.filter((item) => visibles.has(item));
@@ -1004,7 +1027,7 @@ export default function ConversorCnaeIaePage() {
                 {resultadosIae.length > LIMITE_RESULTADOS && !verTodosIae && (
                   <>
                     {' '}
-                    · se muestran los {LIMITE_RESULTADOS} primeros{' '}
+                    · se muestran {LIMITE_RESULTADOS}, con al menos uno de cada sección{' '}
                     <button
                       type="button"
                       className={styles.verTodos}

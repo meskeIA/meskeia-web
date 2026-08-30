@@ -103,15 +103,6 @@
     "promotor de obra",
     "reformas integrales"
   ],
-  "42.99": [
-    "chapuzas",
-    "maestro de obra",
-    "manitas",
-    "obrero",
-    "pequeñas obras",
-    "reformas",
-    "reformista"
-  ],
   "43.11": [
     "demoler",
     "demolición",
@@ -191,7 +182,14 @@
     "pintura de fachadas"
   ],
   "43.91": [
-    "albañil"
+    "albañil",
+    "chapuzas",
+    "maestro de obra",
+    "manitas",
+    "obrero",
+    "pequeñas obras",
+    "reformas",
+    "reformista"
   ],
   "46.18": [
     "bicicletería",
@@ -206,7 +204,6 @@
     "autoservicio",
     "colmado",
     "feriante",
-    "food truck",
     "mercadillo",
     "mercado de abastos",
     "minimarket",
@@ -502,7 +499,8 @@
     "take away"
   ],
   "56.12": [
-    "comidas"
+    "comidas",
+    "food truck"
   ],
   "56.21": [
     "banquetes",
