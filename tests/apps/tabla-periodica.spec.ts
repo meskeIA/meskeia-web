@@ -1,10 +1,14 @@
 import { test, expect, devices, Page } from '@playwright/test';
 
 /**
- * Inspector — tabla-periodica (segmento interactiva, riesgo 3, 1.055 usos reales)
+ * Inspector — tabla-periodica (segmento interactiva, riesgo 3, 1.182 usos reales)
  *
  * Primera inspección: 21/08/2026. Es una de las apps más visitadas del catálogo, así que
  * cualquier dato o cálculo torcido llega a mucha gente.
+ *
+ * RE-INSPECCIÓN 30/08/2026: los tres casos nuevos van al final (CASOS 4, 5 y 6), y detrás
+ * de ellos los HALLAZGOS ABIERTOS de esa fecha, con `test.fail()`. Los casos 1-3 y los tres
+ * hallazgos del 21/08 (ya reparados el 23/08) se conservan como regresión.
  *
  * QUÉ PROMETE
  *   <h1>      «⚛️ Tabla Periódica Interactiva»
@@ -391,5 +395,309 @@ test.describe('hallazgos abiertos', () => {
     // (d) «el cerio (Ce) sigue al bario (Ba) en el período 6» — al bario (56) le sigue el
     //     lantano (57); el cerio es el 58.
     await expect(cuerpo).not.toContainText('el cerio (Ce) sigue al bario (Ba)');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 30/08/2026 — tres casos nuevos, resueltos a mano ANTES de abrir
+// el navegador contra los valores estándar de la IUPAC / CIAAW (tabla 2021,
+// https://iupac.qmul.ac.uk/AtWt/), las configuraciones electrónicas del estado
+// fundamental y la escala de electronegatividad de Pauling.
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── CASO 4 — NORMAL: un elemento común, buscado y leído de punta a punta ──────
+test.describe('CASO 4 · normal: buscar el oxígeno y comprobar su ficha entera', () => {
+  test('la búsqueda deja solo el oxígeno y su ficha da los valores estándar', async ({ page }) => {
+    await page.goto(RUTA);
+
+    // El buscador promete «Nombre, símbolo o número atómico». Ningún otro de los 118
+    // nombres contiene la cadena «oxígeno», así que tiene que quedar exactamente uno.
+    await page.fill('#busqueda', 'oxígeno');
+    await expect(page.getByText('Mostrando 1 de 118 elementos')).toBeVisible();
+    expect(
+      await page.locator(CELDA_ACTIVA).evaluateAll((ns) => ns.map((n) => n.getAttribute('title'))),
+    ).toEqual(['Oxígeno (O)']);
+
+    // Oxígeno, resuelto a mano:
+    //   Z = 8                          (8 protones, define el elemento)
+    //   masa atómica = 15,999 u        (IUPAC/CIAAW 2021: [15,99903, 15,99977], abreviado 15,999)
+    //   grupo 16, período 2            (calcógenos, segunda fila)
+    //   configuración = [He] 2s² 2p⁴   (estado fundamental; 6 electrones de valencia)
+    //   electronegatividad = 3,44      (Pauling; solo el flúor, 3,98, lo supera)
+    //   radio atómico = 48 pm          (escala calculada de Clementi 1967, la que usa esta app)
+    //   estado = gas, familia = no metal
+    await page.fill('#busqueda', '');
+    const oxigeno = await fichaDe(page, 'Oxígeno (O)');
+    expect(oxigeno).toContain('Número atómico: 8');
+    expect(oxigeno).toContain('Masa atómica: 15,999 u');
+    expect(oxigeno).toContain('Grupo: 16');
+    expect(oxigeno).toContain('Período: 2');
+    expect(oxigeno).toContain('Familia: No Metales');
+    expect(oxigeno).toContain('Estado: Gas');
+    expect(oxigeno).toContain('Radio atómico: 48 pm');
+    expect(oxigeno).toContain('Electronegatividad: 3,44');
+    expect(oxigeno).toContain('[He] 2s² 2p⁴');
+    await cerrarFicha(page);
+
+    // Y la calculadora, con esa misma masa dentro de un compuesto corriente.
+    // Fe₂O₃ (óxido de hierro III, la herrumbre):
+    //   2 × 55,845 + 3 × 15,999 = 111,690 + 47,997 = 159,687 g/mol
+    expect(await masaMolarDe(page, 'Fe2O3')).toContain('159,6870 g/mol');
+
+    // El desglose tiene que enseñar los 3 oxígenos, no solo el total.
+    const desglose = (await page.locator('[class*="__desgloseMasa"]').innerText()).replace(/\s+/g, ' ');
+    expect(desglose).toContain('Fe (Hierro)');
+    expect(desglose).toContain('×3');
+    expect(desglose).toContain('47,9970');
+  });
+});
+
+// ── CASO 5 — LÍMITE: el último elemento de la tabla y el más ambiguo de todos ─
+test.describe('CASO 5 · límite: el oganesón (Z=118) y el hidrógeno', () => {
+  test('el oganesón, último de la tabla y sintético, se sitúa y se describe bien', async ({ page }) => {
+    await page.goto(RUTA);
+
+    // Oganesón, resuelto a mano:
+    //   Z = 118, el mayor confirmado (IUPAC 2016, junto con Nh, Mc y Ts)
+    //   grupo 18, período 7 → la ESQUINA inferior derecha de la rejilla
+    //   configuración predicha = [Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶ (capa p completa, de ahí gas noble)
+    //   sin electronegatividad ni radio atómico medidos → la ficha debe decir «N/D»,
+    //     no inventar un número
+    const og = await fichaDe(page, 'Oganesón (Og)');
+    expect(og).toContain('Número atómico: 118');
+    expect(og).toContain('Grupo: 18');
+    expect(og).toContain('Período: 7');
+    expect(og).toContain('Familia: Gases Nobles');
+    expect(og).toContain('[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶');
+    expect(og).toContain('Radio atómico: N/D');
+    expect(og).toContain('Electronegatividad: N/D');
+    await cerrarFicha(page);
+
+    // La esquina: grupo 18 / período 7 son literalmente la columna 18 y la fila 7 del grid.
+    // Las filas 8 y 9 quedan para lantánidos y actínidos, así que Og es la última celda
+    // del bloque principal.
+    const posicion = await page.locator('[title="Oganesón (Og)"]').evaluate((el) => ({
+      columna: (el as HTMLElement).style.gridColumn,
+      fila: (el as HTMLElement).style.gridRow,
+    }));
+    expect(posicion).toEqual({ columna: '18', fila: '7' });
+
+    // Y filtrando por gases nobles tiene que seguir dentro: son 7 con él
+    // (He, Ne, Ar, Kr, Xe, Rn, Og).
+    await page.selectOption('#filtroFamilia', 'gases-nobles');
+    await expect(page.getByText('Mostrando 7 de 118 elementos')).toBeVisible();
+    await expect(page.locator('[title="Oganesón (Og)"]')).not.toHaveClass(/__filtrado/);
+  });
+
+  test('el hidrógeno queda fuera de los alcalinos y dentro de los no metales', async ({ page }) => {
+    await page.goto(RUTA);
+
+    // El caso ambiguo por excelencia: el H ocupa la casilla del grupo 1 porque tiene 1s¹,
+    // pero NO es un metal alcalino — es un gas no metálico, con electronegatividad 2,20
+    // (Pauling), mientras los alcalinos van de 0,70 a 0,98. La IUPAC lo deja sin familia;
+    // la convención escolar, que es la que sigue esta app y la que su propio bloque
+    // educativo defiende («Hidrógeno no es un metal alcalino»), lo cuenta como no metal.
+    const hidrogeno = await fichaDe(page, 'Hidrógeno (H)');
+    expect(hidrogeno).toContain('Número atómico: 1');
+    expect(hidrogeno).toContain('Masa atómica: 1,008 u');   // IUPAC/CIAAW 2021, abreviado 1,008
+    expect(hidrogeno).toContain('Grupo: 1');                // la casilla sí es la del grupo 1
+    expect(hidrogeno).toContain('Familia: No Metales');     // pero la familia NO es alcalinos
+    expect(hidrogeno).toContain('Estado: Gas');
+    expect(hidrogeno).toContain('Electronegatividad: 2,20');
+    expect(hidrogeno).toContain('1s¹');
+    await cerrarFicha(page);
+
+    // Filtro «Metales Alcalinos»: son SEIS, y el hidrógeno no está entre ellos.
+    await page.selectOption('#filtroFamilia', 'metales-alcalinos');
+    await expect(page.getByText('Mostrando 6 de 118 elementos')).toBeVisible();
+    expect(
+      await page.locator(CELDA_ACTIVA).evaluateAll((ns) => ns.map((n) => n.getAttribute('title'))),
+    ).toEqual(['Litio (Li)', 'Sodio (Na)', 'Potasio (K)', 'Rubidio (Rb)', 'Cesio (Cs)', 'Francio (Fr)']);
+    // Y encima queda fuera del orden de tabulación, no como trampa clicable atenuada.
+    await expect(page.locator('[title="Hidrógeno (H)"]')).toHaveClass(/__filtrado/);
+    await expect(page.locator('[title="Hidrógeno (H)"]')).toBeDisabled();
+
+    // Filtro «No Metales»: SIETE, y ahí sí está el hidrógeno (H, C, N, O, P, S, Se).
+    await page.selectOption('#filtroFamilia', 'no-metales');
+    await expect(page.getByText('Mostrando 7 de 118 elementos')).toBeVisible();
+    expect(
+      await page.locator(CELDA_ACTIVA).evaluateAll((ns) => ns.map((n) => n.getAttribute('title'))),
+    ).toEqual([
+      'Hidrógeno (H)', 'Carbono (C)', 'Nitrógeno (N)', 'Oxígeno (O)',
+      'Fósforo (P)', 'Azufre (S)', 'Selenio (Se)',
+    ]);
+  });
+});
+
+// ── CASO 6 — VACÍO / RECHAZO: lo que no existe no puede devolver nada ─────────
+test.describe('CASO 6 · una búsqueda sin resultados y una fórmula rechazada', () => {
+  test('un nombre y un símbolo inexistentes dan 0, y la calculadora los rechaza', async ({ page }) => {
+    await page.goto(RUTA);
+
+    // «Vibranio» no es un elemento químico (es de ficción). Ninguno de los 118 nombres ni
+    // símbolos lo contiene → 0 resultados, y NINGUNA celda puede quedar activa.
+    await page.fill('#busqueda', 'Vibranio');
+    await expect(page.getByText('Mostrando 0 de 118 elementos')).toBeVisible();
+    await expect(page.locator(CELDA_ACTIVA)).toHaveCount(0);
+    // Las 118 celdas siguen visibles pero atenuadas y deshabilitadas: no se puede abrir
+    // una ficha por error desde un resultado vacío.
+    await expect(page.locator(CELDA)).toHaveCount(118);
+    expect(await page.locator(CELDA).evaluateAll((ns) => ns.filter((n) => !(n as HTMLButtonElement).disabled).length)).toBe(0);
+
+    // «Zz» no es el símbolo de ningún elemento (los dos únicos que empiezan por Z son
+    // Zn, zinc, y Zr, circonio).
+    await page.fill('#busqueda', 'Zz');
+    await expect(page.getByText('Mostrando 0 de 118 elementos')).toBeVisible();
+    await expect(page.locator(CELDA_ACTIVA)).toHaveCount(0);
+
+    // Y la calculadora de masa molar no puede sumar cero y llamarlo resultado:
+    // tiene que nombrar el símbolo que no reconoce.
+    await page.locator('input[placeholder^="Ej:"]').fill('Zz2');
+    await page.getByRole('button', { name: 'Calcular' }).click();
+    await expect(page.locator('[class*="__errorMasa"]')).toContainText('Elemento "Zz" no reconocido');
+    await expect(page.locator('[class*="__masaTotal"]')).toHaveCount(0);
+
+    // Vacío: se pide una fórmula en vez de devolver 0,0000 g/mol.
+    await page.locator('input[placeholder^="Ej:"]').fill('');
+    await page.getByRole('button', { name: 'Calcular' }).click();
+    await expect(page.locator('[class*="__errorMasa"]')).toContainText('Ingresa una fórmula química');
+
+    // Carácter que no pinta nada en una fórmula.
+    await page.locator('input[placeholder^="Ej:"]').fill('H2O!');
+    await page.getByRole('button', { name: 'Calcular' }).click();
+    await expect(page.locator('[class*="__errorMasa"]')).toContainText('solo admite letras, números y paréntesis');
+
+    // Paréntesis sin cerrar: se avisa, no se suma a medias.
+    await page.locator('input[placeholder^="Ej:"]').fill('Ca(OH2');
+    await page.getByRole('button', { name: 'Calcular' }).click();
+    await expect(page.locator('[class*="__errorMasa"]')).toContainText('Falta cerrar un paréntesis');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS de la re-inspección del 30/08/2026
+// Marcados con test.fail(): afirman lo que DEBERÍA pasar, así que hoy fallan a
+// propósito. Al repararse se les quita la marca y quedan como regresión.
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('hallazgos abiertos · 30/08/2026', () => {
+  test('HALLAZGO 4 · buscar sin tilde no encuentra nada en 14 de los 118 elementos', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+
+    // El filtro es `el.nombre.toLowerCase().includes(query)`, sin normalizar los acentos.
+    // Escribir «oxigeno» —como se teclea casi siempre, en España y en Latam— deja la tabla
+    // entera en gris y el contador en 0, sin ningún mensaje que explique por qué.
+    // Afecta a los 14 nombres con tilde o eñe: Hidrógeno, Nitrógeno, Oxígeno, Flúor, Neón,
+    // Fósforo, Argón, Níquel, Arsénico, Kriptón, Estaño, Xenón, Radón y Oganesón — entre
+    // ellos cuatro de los elementos más buscados por un estudiante.
+    // La receta ya existe en el propio repositorio: components/SearchBar.tsx normaliza con
+    // .normalize('NFD').replace(/[̀-ͯ]/g, '') antes de comparar.
+    for (const [sinTilde, esperado] of [
+      ['oxigeno', 'Oxígeno (O)'],
+      ['hidrogeno', 'Hidrógeno (H)'],
+      ['nitrogeno', 'Nitrógeno (N)'],
+      ['niquel', 'Níquel (Ni)'],
+      ['fosforo', 'Fósforo (P)'],
+      ['estano', 'Estaño (Sn)'],
+    ] as const) {
+      await page.fill('#busqueda', sinTilde);
+      await expect(page.getByText('Mostrando 1 de 118 elementos')).toBeVisible();
+      expect(
+        await page.locator(CELDA_ACTIVA).evaluateAll((ns) => ns.map((n) => n.getAttribute('title'))),
+      ).toEqual([esperado]);
+    }
+  });
+
+  test('HALLAZGO 5 · cinco masas atómicas son de la tabla de 2007, no de la de 2021', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+
+    // La cabecera de elementos-data.ts declara «Pesos atómicos estándar de la IUPAC /
+    // CIAAW, tabla 2021 · Verificado: 2026-08-23». Cinco elementos siguen con el valor
+    // ANTERIOR a la revisión de 2009-2017 — los mismos rezagados de familia que el selenio
+    // y el litio que se corrigieron en el hallazgo 125, pero que se quedaron sin drenar:
+    //
+    //   elemento   hoy       IUPAC/CIAAW 2021 (valor convencional abreviado)
+    //   B  boro    10,811 →  10,81      (intervalo [10,806, 10,821], revisión de 2009)
+    //   Si silicio 28,086 →  28,085     (intervalo [28,084, 28,086], revisión de 2009)
+    //   S  azufre  32,065 →  32,06      (intervalo [32,059, 32,076], revisión de 2009)
+    //   Cl cloro   35,453 →  35,45      (intervalo [35,446, 35,457], revisión de 2009)
+    //   Ar argón   39,948 →  39,95      (intervalo [39,792, 39,963], revisión de 2017)
+    //
+    // Los cinco caen dentro del intervalo IUPAC, así que el error es pequeño; lo que falla
+    // es la procedencia que el módulo declara, y que el número no coincide con el del libro
+    // de texto del que el estudiante viene comparando (35,45 para el cloro es el valor que
+    // aparece impreso en cualquier tabla actual).
+    const masas: Record<string, string> = {
+      'Boro (B)': 'Masa atómica: 10,810 u',
+      'Silicio (Si)': 'Masa atómica: 28,085 u',
+      'Azufre (S)': 'Masa atómica: 32,060 u',
+      'Cloro (Cl)': 'Masa atómica: 35,450 u',
+      'Argón (Ar)': 'Masa atómica: 39,950 u',
+    };
+    for (const [titulo, esperada] of Object.entries(masas)) {
+      expect(await fichaDe(page, titulo)).toContain(esperada);
+      await cerrarFicha(page);
+    }
+  });
+
+  test('HALLAZGO 6 · los 34 elementos sin peso atómico estándar se muestran con tres decimales falsos', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+
+    // La ficha imprime siempre formatNumber(masa, 3). Para el oganesón, que no tiene peso
+    // atómico estándar porque no tiene ningún isótopo con abundancia natural, el dato del
+    // módulo es el número másico del isótopo más estable (294), y la ficha lo enseña como
+    // «294,000 u»: tres decimales de una precisión que no existe. La IUPAC lo escribe entre
+    // corchetes justamente para marcar la diferencia — [294], no 294,000.
+    // Son 34 elementos: Tc, Pm, Po, At, Rn, Fr, Ra, Ac, Np y todos los Z ≥ 94.
+    // En la CELDA de la rejilla ya está bien resuelto (formatNumber con 0 decimales si la
+    // masa es entera, «294»); es solo la ficha la que añade los ceros.
+    const og = await fichaDe(page, 'Oganesón (Og)');
+    expect(og).toContain('[294]');
+    expect(og).not.toContain('294,000 u');
+    await cerrarFicha(page);
+
+    const tc = await fichaDe(page, 'Tecnecio (Tc)');
+    expect(tc).not.toContain('98,000 u');
+    await cerrarFicha(page);
+  });
+
+  test('HALLAZGO 7 · «Sintético» no es un estado físico y saca del filtro «Sólido» a 30 elementos', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+
+    // El jsonLd de la app promete «Filtros por estado físico (sólido, líquido, gaseoso)»,
+    // pero el desplegable mezcla el estado con el ORIGEN: la cuarta opción es «Sintético».
+    // Consecuencia medible: el plutonio y el francio son sólidos metálicos —el propio dato
+    // curioso del francio dice «metal alcalino más reactivo»— y quedan fuera del filtro
+    // «Sólido», que enseña 75 celdas y deja atenuados 30 elementos cuyo estado no se ha
+    // dejado de conocer, solo se ha sustituido por su origen.
+    await page.selectOption('#filtroEstado', 'solido');
+    await expect(page.locator('[title="Plutonio (Pu)"]')).not.toHaveClass(/__filtrado/);
+    await expect(page.locator('[title="Francio (Fr)"]')).not.toHaveClass(/__filtrado/);
+
+    // Y el propio FAQPage de metadata.ts dice «Los elementos del 1 al 94 se encuentran en la
+    // naturaleza; los del 95 al 118 son sintéticos», mientras la app marca como sintéticos
+    // seis elementos por debajo del 94: Tc (43), Pm (61), At (85), Fr (87), Np (93) y
+    // Pu (94). El astato lo desmiente su propia ficha: «solo ~25 g en corteza».
+    const astato = await fichaDe(page, 'Astato (At)');
+    expect(astato).not.toContain('Estado: Sintético');
+  });
+
+  test('HALLAZGO 8 · el recuento de resultados cambia sin anunciarse a un lector de pantalla', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+
+    // Al escribir en #busqueda, lo ÚNICO que cambia de forma perceptible sin ver la pantalla
+    // es el texto «Mostrando N de 118 elementos», que es un <p> sin aria-live ni role.
+    // Con 0 resultados las 118 celdas pasan a `disabled`, o sea que salen del orden de
+    // tabulación: quien navega con lector de pantalla se queda sin nada que explorar y sin
+    // ningún aviso de por qué. Basta con role="status" (o aria-live="polite") en el contador.
+    const contador = page.locator('[class*="__contadorElementos"]');
+    const anuncia = await contador.evaluate((el) =>
+      el.getAttribute('aria-live') !== null || el.getAttribute('role') === 'status',
+    );
+    expect(anuncia).toBe(true);
   });
 });

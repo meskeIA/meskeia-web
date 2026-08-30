@@ -10,6 +10,11 @@ import { SECCIONES_IAE } from '../../data/fiscal/cnae-iae';
  *   · RE-inspección  28/08/2026 → cierre verificado de los 5 del 27/08 (bloque «cierre
  *     verificado el 28/08/2026») y 4 hallazgos nuevos (CASOS 4 a 6 y el bloque de zona
  *     horaria, todos con `test.fail()` hasta que se reparen).
+ *   · RE-inspección  30/08/2026 → los 4 del 28/08 (479-482) se reparan en 1e3837e5 y se
+ *     RE-VERIFICAN de cero en el bloque «re-verificación del 30/08/2026», resolviendo los
+ *     tres casos a mano sobre el catálogo antes de abrir el navegador. Los cuatro siguen
+ *     cerrados. Aparecen 4 hallazgos nuevos —dos de ellos efecto colateral de esa misma
+ *     reparación— en el bloque «hallazgos abiertos del 30/08/2026», con `test.fail()`.
  *
  * POR QUÉ ESTA APP ES DELICADA
  *   No existe ninguna tabla oficial de correspondencia CNAE ⇄ IAE: el INE publica la
@@ -894,5 +899,184 @@ test.describe('Buscador CNAE-IAE — la fecha de vigencia vista desde América',
     await abrir(page);
     await buscarCnae(page, '4711');
     await expect(avisoAntiguo(page)).toContainText('Desde el 01/01/2026');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 30/08/2026 — los tres casos con los que se RE-VERIFICÓ de cero la
+// reparación de la tanda 3 (commit 1e3837e5), sin dar el commit por bueno.
+//
+// Los valores esperados NO salen de lo que devuelve la app: salen del catálogo servido
+// (`public/datos/cnae-iae-catalogo.json`, generado el 20/07/2026 desde el RD 10/2025 del
+// INE y el RD Legislativo 1175/1990 de las Tarifas) resuelto A MANO con la lógica de
+// orden que documenta `app/conversor-cnae-iae/page.tsx`: primero el peso de nivel/tipo o
+// la relevancia según el catálogo, y `localeCompare` del código para deshacer empates.
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('Buscador CNAE-IAE — re-verificación del 30/08/2026', () => {
+  test('CASO A (subcadena accidental) — «bar» ordena el sinónimo exacto por delante de «barnices»', async ({
+    page,
+  }) => {
+    await abrir(page);
+
+    // Resuelto a mano sobre el catálogo servido. «bar» aparece en 13 entradas; el orden
+    // lo fija primero PESO_NIVEL_CNAE (clase antes que grupo) y después la relevancia:
+    //   rel 3 (palabra completa en título o sinónimo) → 56.11 (sinónimo «bar restaurante»)
+    //          y 56.30 (sinónimo «bar»), empatados y desempatados por código;
+    //   rel 4 (subcadena accidental dentro del título) → 15.12 «talabartería», 20.30
+    //          «barnices», 30.12/30.13/33.15/33.18/46.14 «embarcaciones», 96.21 «barberías»;
+    //   rel 5 → 47.11 (solo el sinónimo «tienda de barrio»);
+    //   y ya en nivel «grupo», 15.1 y 20.3.
+    // Lo que fijaba el hallazgo 479: 56.30 «Servicios de bebidas» tiene que ir DELANTE de
+    // 20.30 «…barnices…», que es donde «bar» es un fragmento de otra palabra.
+    await buscarCnae(page, 'bar');
+    await expect(contador(page)).toContainText('13 resultados');
+    await expect(fichas(page)).toHaveCount(10);
+    await expect(fichas(page).nth(0)).toContainText('56.11');
+    await expect(fichas(page).nth(0)).toContainText('Restaurantes');
+    await expect(fichas(page).nth(1)).toContainText('56.30');
+    await expect(fichas(page).nth(1)).toContainText('Servicios de bebidas');
+    // Y «barnices» detrás, no delante: 20.30, en cuarta posición.
+    await expect(fichas(page).nth(3)).toContainText('20.30');
+    await expect(fichas(page).nth(3)).toContainText(
+      'Fabricación de pinturas, barnices y revestimientos similares, tintas de imprenta y masillas',
+    );
+  });
+
+  test('CASO B (sección que decide la retención) — «enseñanza» mete el grupo 821 de la Sección 2ª dentro del corte', async ({
+    page,
+  }) => {
+    await abrir(page);
+
+    // Resuelto a mano sobre el catálogo servido: «enseñanza» devuelve 19 entradas y las
+    // 14 primeras por relevancia son todas de la Sección 1ª (epígrafes 931.2 a 933.1 y
+    // sus grupos). El primer código de la Sección 2ª —la única con retención de IRPF—
+    // es el grupo 821 «Personal docente de Enseñanza Superior» (RD Leg. 1175/1990,
+    // Sección 2ª, División 8, Agrupación 82), y cae en la POSICIÓN 15 del orden natural.
+    // `conRepresentacionDeSeccion` lo sube al último hueco del corte de 10: si volviera a
+    // quedar fuera, quien da clases por cuenta propia no vería nunca que su sección retiene.
+    await buscarIae(page, 'enseñanza');
+    await expect(contador(page)).toContainText('19 resultados');
+    await expect(fichas(page)).toHaveCount(10);
+    const ultima = fichas(page).nth(9);
+    await expect(ultima).toContainText('821');
+    await expect(ultima).toContainText('Personal docente de Enseñanza Superior');
+    await expect(ultima).toContainText('Sección 2ª');
+    // El texto de la retención sale de SECCIONES_IAE, no se transcribe aquí.
+    await expect(ultima).toContainText(SECCION_2.retencion);
+    // Las nueve anteriores son las nueve primeras del orden natural, todas Sección 1ª.
+    await expect(fichas(page).nth(0)).toContainText('931.2');
+    await expect(fichas(page).nth(8)).toContainText('932');
+  });
+
+  test('CASO C (código de la CNAE-2009 sin homónima) — «14.11» resuelve su equivalencia en vez de vaciar la pantalla', async ({
+    page,
+  }) => {
+    await abrir(page);
+
+    // Resuelto a mano sobre el catálogo servido: 1411 es uno de los 117 códigos de la
+    // CNAE-2009 (de 629) que NO tienen clase homónima en la CNAE-2025 — no existe ninguna
+    // clase 14.11 vigente. Su correspondencia oficial del INE es correspondencia['1411']
+    // = ['14.24'], y la inversa correspondenciaInversa['1424'] = ['1411','1420'], de donde
+    // sale la nota «En la CNAE-2009 esto correspondía a 1411, 1420».
+    // Escrito con punto —como figura en escrituras y en la publicación del INE— el código
+    // no puede tratarse como vigente: no hay nada vigente con ese número.
+    await buscarCnae(page, '14.11');
+    await expect(contador(page)).toHaveText(/^1 resultado/);
+    await expect(avisoAntiguo(page)).toContainText('1411');
+    await expect(avisoAntiguo(page)).toContainText('existe en la CNAE-2009');
+    await expect(avisoAntiguo(page)).toContainText('Desde el 01/01/2026');
+    // Sin homónima vigente, el aviso NO puede insinuar que el número siga significando algo.
+    await expect(avisoAntiguo(page)).not.toContainText('conserva el mismo número');
+    await expect(avisoAntiguo(page)).not.toContainText('clase VIGENTE distinta');
+    await expect(fichas(page)).toHaveCount(1);
+    await expect(fichas(page).first()).toContainText('14.24');
+    await expect(fichas(page).first()).toContainText(
+      'Confección de prendas de vestir de cuero y peletería',
+    );
+    await expect(fichas(page).first()).toContainText('En la CNAE-2009 esto correspondía a 1411, 1420.');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS del 30/08/2026 — con `test.fail()`: hoy fallan a propósito.
+// El día que se reparen pasarán a ROJO («expected to fail, but passed»): entonces se
+// les quita la marca y se quedan como regresión. No se reescribe el valor esperado.
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('Buscador CNAE-IAE — hallazgos abiertos del 30/08/2026', () => {
+  test('«deporte» pierde la Sección 3ª, que ANTES de la reparación sí se veía', async ({ page }) => {
+    test.fail();
+    await abrir(page);
+
+    // Efecto colateral de `conRepresentacionDeSeccion` (la reparación del hallazgo 480).
+    // Orden natural de «deporte» (19 resultados, resuelto a mano sobre el catálogo):
+    // nueve epígrafes y grupos de la Sección 1ª y, en la POSICIÓN 10, la agrupación
+    // 3ª/04 «Actividades relacionadas con el deporte» —la sección artística, que SÍ
+    // practica retención de IRPF (SECCIONES_IAE, retencionIrpf = true)—. La Sección 2ª
+    // aparece por primera vez en la posición 18 (grupo 826).
+    //
+    // La función mira qué secciones faltan en el prefijo de 10, encuentra que falta la
+    // 2ª, y para hacerle sitio recorta el prefijo a `limite - faltantes` = 9 entradas…
+    // que es justo donde estaba la ÚNICA representante de la 3ª. Resultado: la app
+    // expulsa una sección que ya estaba visible para meter otra, y el usuario que busca
+    // «deporte» ve hoy MENOS secciones que antes de la reparación. Es el único caso en
+    // un barrido de las 1.905 palabras de los títulos del IAE, pero es la palabra natural
+    // con la que un deportista profesional buscaría su epígrafe.
+    await buscarIae(page, 'deporte');
+    await expect(contador(page)).toContainText('19 resultados');
+    await expect(fichas(page).filter({ hasText: 'Actividades relacionadas con el deporte' })).toHaveCount(1);
+    await expect(fichas(page).filter({ hasText: 'Sección 3ª' }).first()).toBeVisible();
+  });
+
+  test('el contador dice «se muestran los 10 primeros» cuando lo que muestra NO son los 10 primeros', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrir(page);
+
+    // Segunda cara de la misma reparación. Con «enseñanza», lo visible son las nueve
+    // primeras del orden natural MÁS la nº 15; con «deporte», nueve más la nº 18. El
+    // contador sigue afirmando que son «los 10 primeros», que es literalmente falso, y
+    // encima esconde lo único que el usuario necesitaría saber para fiarse del orden:
+    // que la última tarjeta está ahí por su sección, no por su relevancia.
+    await buscarIae(page, 'enseñanza');
+    await expect(contador(page)).toContainText('19 resultados');
+    await expect(contador(page)).not.toContainText('los 10 primeros');
+  });
+
+  test('«food truck» devuelve una tienda de alimentación en vez de la clase «Puestos de comidas»', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrir(page);
+
+    // El catálogo servido coloca el sinónimo «food truck» en 47.11 «Comercio al por menor
+    // no especializado con predominio de productos alimenticios, bebidas y tabaco», que es
+    // la clase del supermercado y el colmado (División 47, Comercio al por menor).
+    // La CNAE-2025 tiene una clase que describe exactamente esa actividad: 56.12 «Puestos
+    // de comidas», dentro del Grupo 56.1 «Restaurantes y puestos de comidas» (División 56,
+    // Servicios de comidas y bebidas) — el sitio donde el propio INE encuadra la venta de
+    // comida preparada para consumo inmediato. Hoy 56.12 solo tiene el sinónimo «comidas»,
+    // así que un food truck no la alcanza escribiendo cómo describe su trabajo, que es la
+    // promesa del panel.
+    await buscarCnae(page, 'food truck');
+    await expect(fichas(page).first()).toContainText('56.12');
+    await expect(fichas(page).first()).toContainText('Puestos de comidas');
+  });
+
+  test('«chapuzas», «manitas» y «reformista» aterrizan en Ingeniería civil', async ({ page }) => {
+    test.fail();
+    await abrir(page);
+
+    // Mismo mecanismo, otro bloque de términos. El catálogo pone «chapuzas», «maestro de
+    // obra», «manitas», «obrero», «pequeñas obras», «reformas» y «reformista» en 42.99
+    // «Construcción de otros proyectos de ingeniería civil n.c.o.p.», que cuelga de la
+    // División 42 «Ingeniería civil» — carreteras, vías férreas, puentes, túneles, redes y
+    // obras hidráulicas. Una reforma de vivienda no es ingeniería civil: la CNAE-2025 la
+    // encuadra en la División 43 «Actividades de construcción especializada», donde están
+    // 43.91 «Actividades de mampostería y albañilería» y la residual 43.99 «Otras
+    // actividades de construcción especializada n.c.o.p.», que hoy no tiene ni un sinónimo.
+    // La CNAE no cambia la factura, pero es el código del alta en la Seguridad Social.
+    await buscarCnae(page, 'chapuzas');
+    await expect(fichas(page).first()).not.toContainText('42.99');
   });
 });

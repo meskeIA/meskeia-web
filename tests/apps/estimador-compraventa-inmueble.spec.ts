@@ -1380,3 +1380,217 @@ test(
     await expect(page.getByText(/5% al 20%/)).toHaveCount(0);
   },
 );
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Inspector 30/08/2026 — RE-INSPECCIÓN del commit 0828da3e ("tanda 2 de reparación
+// — clúster de compraventa de inmuebles"). La cola marcó la app «invalidada», así
+// que aquí NO se da por bueno el commit: los tres casos están resueltos a mano
+// ANTES de abrir el navegador, anclados en data/fiscal y data/itp-ccaa, y recorren
+// justo los caminos que se tocaron.
+//
+//   CASO 21 (normal)   · península, vivienda usada — que la reparación no ha roto
+//                        el camino por defecto.
+//   CASO 22 (especial) · Melilla en obra nueva — cruza los DOS arreglos del clúster
+//                        en una sola pantalla: el IVA que allí no rige (IPSI) y el
+//                        rótulo del AJD, que debe publicar el tipo EFECTIVO tras la
+//                        bonificación del 50 % del art. 57 bis TRLITPAJD.
+//   CASO 23 (límite)   · vendedor sin precio de compra — el «SIN CUOTA» en verde.
+//
+// Y cuatro hallazgos NUEVOS, en `test.fail()` hasta que se reparen.
+// ══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Inspector 30/08/2026 — re-verificación de la tanda 2', () => {
+  test('CASO 21 (normal) — Galicia, segunda mano, vivienda de 320.000 €', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.locator('#ccaa-inmueble').selectOption('galicia');
+    await rellenar(page, 'Precio de la vivienda', '320000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
+
+    // ITP: ITP_CCAA.galicia.tipoGeneral = 8, que se LEE de TIPOS_ITP_CCAA_2025 'Galicia'
+    // (`data/fiscal/inmuebles.ts`). Galicia no tiene `tramosProgresivos` ni está en
+    // CIUDADES_CON_BONIFICACION → 320.000 × 8 % = 25.600
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (8,00%)');
+    expect(await valorTarjeta(page, /^ITP/)).toBe('25.600,00 €');
+
+    // Arancel notarial (ARANCELES_NOTARIO, nº 2 del RD 1426/1989) sobre 320.000 €:
+    //   90,15 + 24.040,49×0,45 % + 30.050,60×0,15 % + 90.151,82×0,10 % + 169.746,97×0,05 %
+    //   = 90,15 + 108,182205 + 45,0759 + 90,15182 + 84,873485 = 418,43341
+    //   con el 21 % de IVA = 506,3044261
+    // Factura (FACTURA_NOTARIAL, factores 1,5 y 2): min 759,456639 · max 1.012,608852
+    //   · medio 886,032746 ← el que suma la app
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('886,03 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain(
+      'Factura estimada entre 759,46 € y 1012,61 €',
+    );
+
+    // Registro (ARANCELES_REGISTRO, nº 2 del RD 1427/1989) sobre 320.000 €:
+    //   24,04 + 24.040,49×0,175 % + 30.050,60×0,125 % + 90.151,82×0,075 % + 169.746,97×0,030 %
+    //   = 24,04 + 42,0708575 + 37,56325 + 67,613865 + 50,924091 = 222,2120635 (< tope
+    //   REGISTRO_MAXIMO 2.181,67) + 6,010121 (nº 1) + 3,005061 (nº 4) = 231,2272455
+    //   con el 21 % de IVA = 279,7849671
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('279,78 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
+
+    // Total = 25.600 + 886,032746 + 279,784967 + 300 = 27.065,817713 → 8,4581 % del precio
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('27.065,82 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('8,46%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('347.065,82 €');
+    // Segunda mano: TPO y AJD son incompatibles (art. 31.2 TRLITPAJD)
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+  });
+
+  test('CASO 22 (territorio con régimen especial) — Melilla, primera mano, vivienda de 180.000 €', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Primera mano/ }).click();
+    await page.locator('#ccaa-inmueble').selectOption('melilla');
+    await rellenar(page, 'Precio de la vivienda', '180000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
+
+    // TERRITORIOS_SIN_IVA.melilla (`data/itp-ccaa.ts`) → IPSI: allí no se devenga IVA, así
+    // que la app nombra el impuesto y NO inventa cifra. Ni tarjeta de IVA, ni aviso del
+    // IVA del 4 % de VPO (IVA_INMUEBLES_2025.viviendaProtegida), que aquí no rebaja nada.
+    await expect(page.locator('h3', { hasText: /^IVA/ })).toHaveCount(0);
+    expect(await valorTarjeta(page, /^IPSI/)).toBe('No calculado');
+    await expect(page.getByText(/protección oficial de régimen especial/)).toHaveCount(0);
+    await expect(page.getByText(/no se aplica el IVA/)).toBeVisible();
+
+    // AJD: ITP_CCAA.melilla.ajd = 0,5 → 180.000 × 0,5 % = 900 ; el art. 57 bis.1 del
+    // TRLITPAJD bonifica al 50 % la cuota gradual cuando el Registro radica en Melilla
+    // (`aplicarBonificacionCiudad`) → 450. El rótulo tiene que publicar el tipo EFECTIVO
+    // 450/180.000 = 0,25 %, no el 0,5 % nominal de la tabla (hallazgo 473/484).
+    await expect(page.locator('h3', { hasText: /^AJD/ }).first()).toHaveText('AJD (0,25%)');
+    expect(await valorTarjeta(page, /^AJD/)).toBe('450,00 €');
+
+    // Arancel notarial sobre 180.000 €: 90,15 + 108,182205 + 45,0759 + 90,15182
+    //   + 29.746,97×0,05 % (=14,873485) = 348,43341 ; ×1,21 = 421,6044261 ; ×1,75 = 737,807746
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('737,81 €');
+    // Registro: 24,04 + 42,0708575 + 37,56325 + 67,613865 + 29.746,97×0,030 % (=8,924091)
+    //   = 180,2120635 ; + 9,015182 = 189,2272455 ; ×1,21 = 228,9649671
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('228,96 €');
+
+    // Total = 0 + 450 + 737,807746 + 228,964967 + 300 = 1.716,772713 → 0,9538 % del precio.
+    // Los rótulos tienen que decir que es PARCIAL: falta el IPSI, que la app no calcula.
+    await expect(page.locator('h3', { hasText: /Total gastos adicionales/ }).first()).toHaveText(
+      'Total gastos adicionales (parcial)',
+    );
+    expect(await valorTarjeta(page, /Total gastos adicionales/)).toBe('1716,77 €');
+    expect(await descripcionTarjeta(page, /Total gastos adicionales/)).toContain(
+      'SIN el IPSI, que no está incluido',
+    );
+    await expect(page.locator('h3', { hasText: /COSTE TOTAL/ }).first()).toHaveText(
+      'COSTE TOTAL (PARCIAL)',
+    );
+    expect(await valorTarjeta(page, /COSTE TOTAL/)).toBe('181.716,77 €');
+  });
+
+  test('CASO 23 (límite: sin precio de compra) — el IRPF no está exento, está sin calcular', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio de la vivienda', '250000');
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await rellenar(page, 'Años de propiedad', '8');
+    await rellenar(page, 'Valor catastral del suelo', '50000');
+    await rellenar(page, 'Valor catastral total (suelo + construcción)', '120000');
+    await rellenar(page, 'Comisión inmobiliaria (%)', '3');
+    // «Precio de compra original» se deja VACÍO a propósito: es el caso del hallazgo 483.
+
+    // Sin precio de compra no hay ganancia que calcular, así que ni la plusvalía municipal
+    // (necesita el incremento real, art. 104.5 TRLHL) ni el IRPF pueden salir. Un 0 en verde
+    // rotulado «EXENTO» afirmaría una exención que nadie ha comprobado.
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('Sin calcular');
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toContain(
+      'Falta el precio de compra original',
+    );
+    await expect(page.getByText('EXENTO', { exact: true })).toHaveCount(0);
+    // Sin valor de adquisición no se pintan las tarjetas derivadas
+    await expect(page.locator('h3', { hasText: 'Valor de adquisición' })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: 'Ganancia patrimonial' })).toHaveCount(0);
+
+    // Lo único que el neto SÍ descuenta es la comisión: 250.000 × 3 % = 7.500
+    // → neto = 250.000 − 7.500 = 242.500, y hay que decir que está incompleto.
+    expect(await valorTarjeta(page, 'Comisión inmobiliaria')).toBe('7500,00 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('7500,00 €');
+    expect(await descripcionTarjeta(page, 'Total gastos vendedor')).toBe(
+      'Sin la plusvalía municipal ni el IRPF de la ganancia',
+    );
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('242.500,00 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('INCOMPLETO');
+  });
+
+  // ⚠️ HALLAZGO ABIERTO (30/08/2026) — la tabla comparativa cobra al comprador un AJD
+  // que por ley paga el prestamista. La fila dice «AJD · 0 %-1,5 % (con hipoteca) ·
+  // ¿Quién paga? Comprador», y el propio `data/fiscal/inmuebles.ts` lo desmiente en
+  // TIPOS_AJD_2025.nota: «El AJD en hipotecas lo paga la entidad financiera desde la
+  // Ley 5/2019. En escrituras de compraventa sin hipoteca, lo paga el comprador».
+  // En segunda mano la app misma acota el AJD a la escritura de hipoteca (warningBox:
+  // «el AJD solo aplica en escrituras con hipoteca»), que es justo el caso en que NO lo
+  // paga el comprador: sobre una hipoteca de 200.000 € en Galicia son 3.000 € atribuidos
+  // a quien no los debe, en una app de riesgo fiscal 1.
+  test.fail(
+    'HALLAZGO — el AJD de la escritura de hipoteca no lo paga el comprador desde la Ley 5/2019',
+    async ({ page }) => {
+      await page.goto(RUTA);
+      await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+      const filaAJD = page.locator('table tbody tr', { hasText: /^AJD/ }).first();
+      // La celda «¿Quién paga?» tiene que distinguir la hipoteca del resto.
+      await expect(filaAJD.locator('td').nth(3)).toHaveText(/entidad financiera|banco|prestamista/i);
+    },
+  );
+
+  // ⚠️ HALLAZGO ABIERTO (30/08/2026) — efecto familia del hallazgo 490, que el commit
+  // 0828da3e reparó en trastero y en nave-industrial y NO propagó al hub del clúster.
+  // El botón «Primera mano» sigue rotulando «Paga IVA» con Melilla (o Ceuta, o Canarias)
+  // seleccionada, donde no rige el IVA sino el IPSI/IGIC — y es el propio aviso de
+  // debajo, en la misma pantalla, el que lo desmiente. Los dos hermanos ya escriben
+  // `Paga ${TERRITORIOS_SIN_IVA[ccaa].impuesto}`.
+  test.fail(
+    'HALLAZGO — el botón de primera mano promete un IVA que en Melilla no existe',
+    async ({ page }) => {
+      await page.goto(RUTA);
+      await page.locator('#ccaa-inmueble').selectOption('melilla');
+      await expect(page.getByRole('button', { name: /Primera mano/ })).toContainText('Paga IPSI');
+    },
+  );
+
+  // ⚠️ HALLAZGO ABIERTO (30/08/2026) — el aviso de neto incompleto pide un dato que ya
+  // está relleno. Con el precio de compra vacío, `faltanEnElNeto` acierta al nombrar las
+  // dos partidas, pero la frase «Rellena…» cae en la rama tercera y manda rellenar «el
+  // precio de compra original Y el valor catastral del suelo» aunque el suelo se haya
+  // introducido: el único dato que falta es el precio de compra (page.tsx:1148).
+  test.fail(
+    'HALLAZGO — el aviso del neto manda rellenar el valor catastral del suelo, que ya está puesto',
+    async ({ page }) => {
+      await page.goto(RUTA);
+      await rellenar(page, 'Precio de la vivienda', '250000');
+      await page.getByRole('button', { name: 'Vendedor' }).click();
+      await rellenar(page, 'Años de propiedad', '8');
+      await rellenar(page, 'Valor catastral del suelo', '50000');
+      await rellenar(page, 'Valor catastral total (suelo + construcción)', '120000');
+
+      expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).not.toContain(
+        'el valor catastral del suelo',
+      );
+    },
+  );
+
+  // ⚠️ HALLAZGO ABIERTO (30/08/2026) — residuo de la reparación del 21/08/2026. La tarjeta
+  // educativa «IRPF del vendedor» sigue diciendo que del precio de venta «se restan la
+  // comisión, LA GESTORÍA y la plusvalía municipal», mientras el campo del formulario avisa
+  // de lo contrario («La gestoría del comprador no cuenta, art. 35.1 LIRPF»), el caso «Ana»
+  // dos párrafos más abajo lo dice explícitamente y el motor `calcularGananciaInmueble` NO
+  // la resta. Es la única pieza de la página que quedó sin actualizar.
+  test.fail(
+    'HALLAZGO — el bloque educativo sigue restando «la gestoría» del valor de transmisión',
+    async ({ page }) => {
+      await page.goto(RUTA);
+      await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+      const tarjeta = page.locator('h4', { hasText: 'IRPF del vendedor' }).locator('xpath=..');
+      await expect(tarjeta).not.toHaveText(/se restan la comisión, la gestoría y la plusvalía/);
+    },
+  );
+});

@@ -1129,3 +1129,306 @@ test.describe('Hallazgos reparados — re-inspección del 28/08/2026', () => {
     await expect(page.getByRole('group', { name: /Tipo de garaje/i })).toHaveCount(0);
   });
 });
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 30/08/2026 — la cola invalidó esta app tras la «tanda 2 de reparación»
+// del clúster de compraventa (commit 0828da3e). Aquí NO se da por bueno el commit: los
+// tres casos se han resuelto a mano contra `data/fiscal` y `data/itp-ccaa.ts` ANTES de
+// abrir el navegador, y se han vuelto a ejecutar de cero.
+//
+// De dónde sale CADA cifra (ninguna de memoria):
+//  - Tipo general de ITP → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`, leído por
+//    `tipoGeneralDe()` (Andalucía = 7 %). Ceuta es la excepción declarada del fichero:
+//    `ITP_CCAA.ceuta.tipoGeneral = 6` con un reducido de UBICACIÓN al 3 %, que es el 6 %
+//    ya bonificado al 50 % por el art. 57 bis TRLITPAJD.
+//  - AJD por territorio → `ITP_CCAA` (`ceuta.ajd = 0.5`), bonificado al 50 % en
+//    `calcularAJD` → `aplicarBonificacionCiudad` (art. 57 bis.1 TRLITPAJD).
+//  - Territorios sin IVA → `TERRITORIOS_SIN_IVA` (Ceuta → IPSI).
+//  - Arancel notarial → `ARANCELES_NOTARIO` (RD 1426/1989, número 2) + la horquilla de
+//    `FACTURA_NOTARIAL` (×1,5 a ×2; la tarjeta enseña el punto medio ×1,75).
+//  - Arancel registral → `ARANCELES_REGISTRO` (RD 1427/1989, número 2) + los dos fijos de
+//    `REGISTRO_CONCEPTOS` (presentación 6,010121 € y nota simple 3,005061 €). 21 % de IVA
+//    dentro de ambos motores.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('RE-INSPECCIÓN 30/08/2026 — los tres casos, resueltos a mano antes de ejecutar', () => {
+  /**
+   * CASO 11 (NORMAL, PENÍNSULA) — el caso LITERAL que la propia app publica en su tarjeta
+   * educativa «Tipos reducidos de ITP para garaje»: «Carlos, 28 años, compra un garaje en
+   * Andalucía por 18.000 €». Se elige a propósito porque es donde el texto y el motor pueden
+   * separarse: el motor está bien y es el texto el que promete de más (ver el `test.fail` de
+   * más abajo).
+   *
+   * ITP — `elegirTipoITP('andalucia', 'joven', 18000, { viviendaHabitual: false })`:
+   *   el único candidato por nombre es «Jóvenes < 35 años» (3,5 %), y sus condiciones son
+   *   ['Menor de 35 años', 'Vivienda habitual', 'Valor ≤ 150.000 €']. Un garaje suelto NUNCA
+   *   es vivienda habitual, así que esa condición no se puede dar por cumplida y el reducido
+   *   cae en `noComprobables`. Se aplica el tipo general:
+   *     18.000 × 7 % =                                                          1.260,00
+   *   (con el 3,5 % del texto saldrían 630,00 €, la mitad)
+   *
+   * Notaría — ARANCELES_NOTARIO, arancel sin IVA:
+   *   tramo 1 (hasta 6.010,12 €)             →                                    90,15
+   *   tramo 2 (6.010,12→30.050,61, 0,45 %)   → 11.989,88 × 0,0045 =               53,95446
+   *   arancel                                 =                                  144,10446
+   *   con el 21 % de IVA                      = 144,10446 × 1,21 =               174,366397
+   *   FACTURA_NOTARIAL: ×1,5 = 261,549595 · ×2 = 348,732793 · medio =            305,141194
+   *
+   * Registro — ARANCELES_REGISTRO + REGISTRO_CONCEPTOS:
+   *   24,04 + 11.989,88 × 0,00175 = 24,04 + 20,98229 =                            45,02229
+   *   + presentación 6,010121 + nota simple 3,005061 =                            54,037472
+   *   con el 21 % de IVA = 54,037472 × 1,21 =                                     65,385341
+   *
+   * Total gastos = 1.260 + 305,141194 + 65,385341 + 300 =                      1.930,526535
+   *   % sobre el precio = 1.930,526535 / 18.000 =                                10,725147 %
+   * Coste total = 18.000 + 1.930,526535 =                                     19.930,526535
+   */
+  test('CASO 11 (normal) — Andalucía, 18.000 €, perfil Joven: se aplica el 7 % general, no el 3,5 %', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.selectOption('#select-ccaa', 'andalucia');
+    await page.selectOption('#select-perfil', 'joven');
+    await rellenar(page, 'Precio del garaje / plaza de parking', '18000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
+
+    expect(await valorTarjeta(page, 'ITP (7,00%)')).toBe('1260,00 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('305,14 €');
+    const notaria = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria).toContain('261,55 €');
+    expect(notaria).toContain('348,73 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('65,39 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1930,53 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('10,73%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('19.930,53 €');
+
+    // El reducido no aplicado se enseña como oportunidad, nunca como cifra, y se dice por qué
+    const aviso = page.locator('[role="note"]').filter({ hasText: 'Podrías pagar menos' });
+    await expect(aviso).toBeVisible();
+    await expect(aviso).toContainText('3,50% — Jóvenes < 35 años');
+    await expect(aviso).toContainText('Un garaje comprado por separado no es vivienda habitual');
+  });
+
+  /**
+   * CASO 12 (RÉGIMEN ESPECIAL) — Ceuta, que es donde se concentran tres de los cinco
+   * hallazgos que la tanda 2 reparó: la bonificación del 50 %, el rótulo del AJD y el IVA
+   * que allí no existe. Se prueban las dos ramas de la app en el mismo test.
+   *
+   * (a) SEGUNDA MANO — `elegirTipoITP('ceuta', 'general', 25000, …)`: «Bonificación general
+   *     50%» tiene condiciones de UBICACIÓN (`CONDICIONES_DE_UBICACION`), así que se aplica
+   *     sola con perfil General. Su `tipo: 3` ya es el 6 % bonificado (art. 57 bis.3.a
+   *     TRLITPAJD), y `importeITP` no vuelve a bonificar un reducido:
+   *       25.000 × 3 % =                                                           750,00
+   *     tipo EFECTIVO = 750 / 25.000 = 3,00 % → el rótulo dice «ITP (3,00%)»
+   *     Total gastos = 750 + 371,842444 + 80,207841 + 300 =                      1.502,050285
+   *
+   * (b) PRIMERA MANO — `TERRITORIOS_SIN_IVA.ceuta` = IPSI: no se cifra ningún impuesto
+   *     indirecto y el total se rotula PARCIAL.
+   *       AJD = 25.000 × 0,5 % = 125,00 nominales, bonificados al 50 % (art. 57 bis.1) →  62,50
+   *       tipo EFECTIVO = 62,50 / 25.000 = 0,25 % → el rótulo dice «AJD (0,25%)», no 0,50 %
+   *       Total gastos = 0 + 62,50 + 371,842444 + 80,207841 + 300 =                814,550285
+   *         % sobre el precio = 814,550285 / 25.000 =                               3,258201 %
+   *       Coste total = 25.000 + 814,550285 =                                   25.814,550285
+   *     (Notaría y registro de 25.000 €: los mismos 371,84 € y 80,21 € del CASO 1.)
+   */
+  test('CASO 12 (régimen especial) — Ceuta: ITP bonificado al 50 %, IPSI sin cifrar y AJD al tipo efectivo', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.selectOption('#select-ccaa', 'ceuta');
+    await page.selectOption('#select-perfil', 'general');
+    await rellenar(page, 'Precio del garaje / plaza de parking', '25000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
+
+    // (a) Segunda mano
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    expect(await tituloTarjeta(page, 'ITP')).toBe('ITP (3,00%)');
+    expect(await valorTarjeta(page, 'ITP')).toBe('750,00 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1502,05 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('26.502,05 €');
+
+    // (b) Primera mano: ni un solo 21 % ofrecido donde el IVA no rige
+    await page.getByRole('button', { name: /Primera mano/ }).click();
+    await expect(page.getByRole('group', { name: /Tipo de garaje/i })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: /^IVA/ })).toHaveCount(0);
+    expect(await valorTarjeta(page, 'IPSI')).toBe('No calculado');
+    await expect(page.getByText(/no se aplica el IVA/)).toBeVisible();
+
+    expect(await tituloTarjeta(page, 'AJD')).toBe('AJD (0,25%)');
+    expect(await valorTarjeta(page, 'AJD')).toBe('62,50 €');
+    expect(await tituloTarjeta(page, 'Total gastos adicionales')).toBe(
+      'Total gastos adicionales (parcial)',
+    );
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('814,55 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain(
+      'SIN el IPSI, que no está incluido',
+    );
+    expect(await tituloTarjeta(page, 'COSTE TOTAL')).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('25.814,55 €');
+  });
+
+  /**
+   * CASO 13 (LÍMITE) — el precio de compra vacío y el precio de compra a 0, que es el caso
+   * del que salió el hallazgo 428/483: el IRPF se anunciaba «SIN CUOTA» en verde cuando lo
+   * que pasaba es que faltaba el dato para calcularlo.
+   *
+   * Entrada: venta 25.000 € · comisión 3 % (el valor por defecto del campo) · sin precio de
+   *          compra, sin años y sin valor catastral.
+   *   comisión = 25.000 × 3 % =                                                     750,00
+   *   plusvalía municipal: NO calculable (faltan suelo, años y precio de compra) → 0, y NO
+   *     se suma al total ni al neto
+   *   IRPF: NO calculable (`irpfCalculado = false` porque `precioC > 0` es falso) → 0, y
+   *     tampoco entra en el neto
+   *   total gastos vendedor = 0 + 750 + 0 + 0 =                                     750,00
+   *   neto = 25.000 − 750 =                                                      24.250,00
+   *
+   * Lo que se exige: que ni el 0 de la plusvalía ni el 0 del IRPF se presenten como una
+   * exención («EXENTO», «SIN CUOTA» en verde), y que el neto se declare INCOMPLETO diciendo
+   * qué dos partidas le faltan.
+   */
+  test('CASO 13 (límite) — sin precio de compra, el IRPF es «Sin calcular» y el neto se declara incompleto', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio del garaje / plaza de parking', '25000');
+    await page.getByRole('tab', { name: /Vendedor/ }).click();
+
+    for (const precioCompra of ['', '0']) {
+      if (precioCompra !== '') {
+        await rellenar(page, 'Precio de compra original del garaje', precioCompra);
+      }
+
+      expect(await valorTarjeta(page, 'Precio de venta')).toBe('25.000,00 €');
+
+      // El 0 de la plusvalía no es una exención: es un dato que falta, y se nombra cuál
+      expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
+      const plusvalia = await descripcionTarjeta(page, 'Plusvalía municipal');
+      expect(plusvalia).toContain('el precio de compra original');
+      expect(plusvalia).toContain('el valor catastral del suelo');
+      expect(plusvalia).toContain('los años de propiedad');
+
+      // Y el 0 del IRPF tampoco: nada de «SIN CUOTA» en verde (hallazgo 428/483)
+      expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('Sin calcular');
+      expect(await valorTarjeta(page, 'IRPF sobre ganancia')).not.toBe('SIN CUOTA');
+      expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toContain(
+        'NO está incluido en el neto',
+      );
+
+      // Sin valor de adquisición no se pinta ganancia ni pérdida: no hay nada que comparar
+      await expect(page.locator('h3', { hasText: 'Valor de adquisición' })).toHaveCount(0);
+      await expect(page.locator('h3', { hasText: 'Ganancia patrimonial' })).toHaveCount(0);
+      await expect(page.locator('h3', { hasText: 'Pérdida patrimonial' })).toHaveCount(0);
+
+      // Total y neto: solo la comisión, y el neto avisa de las dos partidas que le faltan
+      expect(await valorTarjeta(page, 'Comisión inmobiliaria')).toBe('750,00 €');
+      expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('750,00 €');
+      expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('24.250,00 €');
+      const neto = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
+      expect(neto).toContain('INCOMPLETO');
+      expect(neto).toContain('la plusvalía municipal');
+      expect(neto).toContain('el IRPF de la ganancia');
+    }
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS de la re-inspección del 30/08/2026.
+// Marcados con `test.fail()`: afirman lo que DEBERÍA pasar, así que hoy fallan a propósito.
+// Al repararlos se les quita la marca y quedan como regresión.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('Hallazgos abiertos — re-inspección del 30/08/2026', () => {
+  // ❌ ABIERTO (alto) — contenido.
+  // La tarjeta educativa «Tipos reducidos de ITP para garaje» afirma: «Carlos, 28 años, compra
+  // un garaje en Andalucía por 18.000 €. Al ser joven, puede aplicar el tipo reducido
+  // autonómico. El simulador detecta el tipo reducido disponible y LO APLICA AUTOMÁTICAMENTE
+  // al seleccionar "Joven" en el perfil del comprador.»
+  // Con esa entrada exacta el simulador aplica el 7 % general (1.260,00 €) y NO el 3,5 %
+  // (630,00 €), porque el reducido de Andalucía exige «Vivienda habitual» y un garaje suelto
+  // no lo es nunca — que es justo lo que dice el aviso «Podrías pagar menos» de la misma
+  // pantalla. El texto describe el comportamiento ANTERIOR a la reparación del 14/08/2026 y
+  // contradice a la vez al motor y al aviso legal de la propia app. La fila «Tipos reducidos
+  // ITP → Sí (joven, discapacidad…)» de la tabla comparativa refuerza la misma promesa sin
+  // la condición que la anula.
+  // Caso: bloque educativo, tarjeta de Carlos → esperado que NO prometa aplicación automática
+  //       para un garaje suelto · obtenido «lo aplica automáticamente al seleccionar "Joven"».
+  test.fail(
+    'ABIERTO (contenido) — el ejemplo de Carlos no puede prometer un reducido que el motor descarta',
+    async ({ page }) => {
+      await page.goto(RUTA);
+      await page.selectOption('#select-ccaa', 'andalucia');
+      await page.selectOption('#select-perfil', 'joven');
+      await rellenar(page, 'Precio del garaje / plaza de parking', '18000');
+
+      // Lo que el motor hace de verdad con la entrada del ejemplo
+      expect(await valorTarjeta(page, 'ITP (7,00%)')).toBe('1260,00 €');
+
+      await page
+        .getByRole('button', { name: /Ver guía educativa|Todo lo que necesitas saber/i })
+        .click();
+      const carlos = (await page.getByText(/Carlos, 28 años/).innerText()).replace(/\s+/g, ' ');
+      expect(carlos).not.toMatch(/lo aplica autom[áa]ticamente/i);
+    },
+  );
+
+  // ❌ ABIERTO (medio) — contenido.
+  // Al elegir cualquier perfil distinto de «General», el panel izquierdo lista los tipos
+  // reducidos de la comunidad bajo el rótulo «Tipos reducidos DISPONIBLES en X» y SIN sus
+  // condiciones, mientras el panel derecho, en la misma pantalla, dice «En X existe:» y
+  // enseña solo los que el motor ha podido considerar. En Andalucía con perfil Joven: la
+  // izquierda anuncia cinco (6 % · 3,5 % · 3,5 % · 3,5 % · 3,5 %) y la derecha uno. Cuatro de
+  // los cinco exigen «Vivienda habitual», que un garaje suelto no cumple nunca — condición que
+  // la lista de la izquierda no muestra. Dos listas contradictorias en la misma pantalla, y la
+  // que se lee primero es la que promete de más.
+  // Caso: Andalucía · perfil Joven → esperado que la lista traiga la condición que la anula o
+  //       no rotule «disponibles» · obtenido cinco tipos «disponibles» sin condiciones.
+  test.fail(
+    'ABIERTO (contenido) — la lista de tipos reducidos no puede decir «disponibles» sin sus condiciones',
+    async ({ page }) => {
+      await page.goto(RUTA);
+      await page.selectOption('#select-ccaa', 'andalucia');
+      await page.selectOption('#select-perfil', 'joven');
+      await rellenar(page, 'Precio del garaje / plaza de parking', '18000');
+
+      const lista = page.locator('h4', { hasText: 'Tipos reducidos disponibles' }).locator('xpath=..');
+      // Si se anuncian como disponibles, tiene que verse por qué la mayoría no lo está
+      await expect(lista).toContainText('Vivienda habitual', { useInnerText: true });
+      await expect(lista).toContainText(
+        /no aplica|no se aplica|un garaje suelto|requisitos/i,
+      );
+    },
+  );
+
+  // ❌ ABIERTO (medio) — dato.
+  // La plusvalía municipal se calcula con `PLUSVALIA_MUNICIPAL_META.tipoOrientativo = 25`
+  // (data/fiscal/inmuebles.ts), un tipo INVENTADO como media: la ley solo fija el techo del
+  // 30 % y cada Ayuntamiento pone el suyo. Ese 25 % no aparece en ninguna parte de la página
+  // —el sello de datos solo menciona el máximo legal del 30 %— y el usuario no puede
+  // cambiarlo. La cifra no es decorativa: entra en el valor de transmisión, así que mueve
+  // también la ganancia, el IRPF y el neto.
+  // Caso: venta 22.000 · compra 15.000 · 10 años · suelo 5.000 · total 12.000 →
+  //       plusvalía 100,00 € = 5.000 × 0,08 (COEFICIENTES_IIVTNU_2025, 10 años) × 25 %.
+  //       En un municipio al 30 % serían 120,00 €. Esperado que la página publique el tipo
+  //       usado (o lo deje introducir) · obtenido «100,00 € — Método objetivo (más favorable)»
+  //       sin que el 25 % se lea en ningún sitio.
+  test.fail(
+    'ABIERTO (dato) — el tipo del 25 % con el que se calcula la plusvalía tiene que verse',
+    async ({ page }) => {
+      await page.goto(RUTA);
+      await rellenar(page, 'Precio del garaje / plaza de parking', '22000');
+      await page.getByRole('tab', { name: /Vendedor/ }).click();
+      await rellenar(page, 'Precio de compra original del garaje', '15000');
+      await rellenar(page, 'Años de propiedad', '10');
+      await rellenar(page, 'Valor catastral del suelo (€)', '5000');
+      await rellenar(page, 'Valor catastral total (suelo + construcción) (€)', '12000');
+
+      // 5.000 × 0,08 × 25 % = 100,00 — el importe es el que corresponde al 25 % orientativo
+      expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('100,00 €');
+
+      // …pero ese 25 % no se publica en ninguna parte de la página
+      const cuerpo = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
+      expect(cuerpo).toMatch(/25\s*%/);
+    },
+  );
+});

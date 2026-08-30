@@ -1,15 +1,17 @@
 import { test, expect, Page } from '@playwright/test';
 
 /**
- * Inspector — simulador-movimiento-circular (segmento interactiva/física, riesgo 3, 557 usos)
+ * Inspector — simulador-movimiento-circular (segmento interactiva/física, riesgo 3, 816 usos)
  *
- * Primera inspección: 21/08/2026. El <h1> promete «Simulador de Movimiento Circular» y el
- * subtítulo «Observa en tiempo real cómo se mueve una partícula en trayectoria circular.
- * Ajusta radio, velocidad angular y masa para ver los vectores de velocidad tangencial y
- * aceleración centrípeta». La metadata añade «Cálculo de v, a_c, F_c, T y frecuencia en
- * tiempo real» y un modo MCNU. Hay, por tanto, verdad física comprobable: el build no ve la
- * física mal, así que aquí se comprueban NÚMEROS contra fórmulas resueltas a mano y también
- * la GEOMETRÍA de la animación leyendo los píxeles del canvas.
+ * Primera inspección 21/08/2026 · RE-INSPECCIÓN 30/08/2026.
+ *
+ * El <h1> promete «Simulador de Movimiento Circular» y el subtítulo «Observa en tiempo real
+ * cómo se mueve una partícula en trayectoria circular. Ajusta radio, velocidad angular y masa
+ * para ver los vectores de velocidad tangencial y aceleración centrípeta». La metadata añade
+ * «Cálculo de v, a_c, F_c, T y frecuencia en tiempo real» y un modo MCNU. Hay, por tanto,
+ * verdad física comprobable: el build no ve la física mal, así que aquí se comprueban NÚMEROS
+ * contra fórmulas resueltas a mano y también la GEOMETRÍA de la animación leyendo los píxeles
+ * del canvas.
  *
  * DÓNDE VIVE EL CÁLCULO
  *   app/simulador-movimiento-circular/page.tsx  (no hay motor.ts; todo está en el componente)
@@ -25,29 +27,23 @@ import { test, expect, Page } from '@playwright/test';
  * NOTA DE FORMATO: es-ES (CLDR minimumGroupingDigits = 2) NO agrupa los números de cuatro
  * cifras, así que 2500 se escribe «2500,00» y no «2.500,00». Es la convención española
  * correcta, no un fallo del formateador. Toda la app pasa por formatNumber: no hay ni un
- * toFixed() crudo en page.tsx (verificado por grep), y los rótulos de los sliders salen con
- * coma decimal («2,0 m», «0,5», «0,1 kg»).
+ * toFixed() crudo en page.tsx, y los rótulos de los sliders salen con coma decimal.
  *
  * ─────────────────────────────────────────────────────────────────────────────────────────
- * LOS CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
+ * LOS TRES CASOS DE LA RE-INSPECCIÓN, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
+ * (ternas nuevas: si el cálculo se hubiese roto solo para valores no probados en agosto,
+ *  repetir las mismas cifras de entonces no lo vería)
  *
- *   CASO 1 (normal) — r = 2 m · ω = 3 rad/s · m = 1 kg, todos redondos a propósito
- *       v   = ω·r    = 3 · 2         = 6 m/s                       → «6,00»   m/s
- *       a_c = ω²·r   = 9 · 2         = 18 m/s²                     → «18,00»  m/s²
- *         (control cruzado con la otra fórmula: v²/r = 36/2 = 18 ✔ coinciden)
- *       F_c = m·a_c  = 1 · 18        = 18 N                        → «18,00»  N
- *       T   = 2π/ω   = 6,283185307/3 = 2,0943951 s                 → «2,09»   s
- *       f   = ω/(2π) = 3/6,283185307 = 0,4774648 Hz                → «0,477»  Hz
- *         (control: T·f = 2,0943951 · 0,4774648 = 1,000000 ✔ son inversos)
+ *   CASO 1 (normal) — r = 2,5 m · ω = 4 rad/s · m = 2 kg
+ *       T   = 2π/ω   = 6,283185307/4  = 1,570796327 s            → «1,57»   s
+ *       v   = ω·r    = 4 · 2,5        = 10 m/s                   → «10,00»  m/s
+ *       a_c = ω²·r   = 16 · 2,5       = 40 m/s²                  → «40,00»  m/s²
+ *         (control cruzado con la otra fórmula: v²/r = 100/2,5 = 40 ✔ coinciden)
+ *       F_c = m·a_c  = 2 · 40         = 80 N                     → «80,00»  N
+ *       f   = ω/(2π) = 4/6,283185307  = 0,636619772 Hz           → «0,637»  Hz
+ *         (control: f = 1/T = 1/1,570796 = 0,63662 ✔ son inversos)
  *
- *   CASO 1.bis (normal, segunda terna) — r = 4 m · ω = 5 rad/s · m = 3 kg
- *       v   = 5 · 4   = 20 m/s                                     → «20,00»  m/s
- *       a_c = 25 · 4  = 100 m/s²   (v²/r = 400/4 = 100 ✔)          → «100,00» m/s²
- *       F_c = 3 · 100 = 300 N                                      → «300,00» N
- *       T   = 2π/5    = 1,2566371 s                                → «1,26»   s
- *       f   = 5/(2π)  = 0,7957747 Hz                               → «0,796»  Hz
- *
- *   CASO 2 (límite) — los dos extremos de los tres sliders
+ *   CASO 2 (límite) — los dos extremos, incluido MÁS ALLÁ del rango del control
  *       (a) mínimos: r = 0,5 m · ω = 0 rad/s · m = 0,1 kg
  *           v = 0 · 0,5 = 0 · a_c = 0² · 0,5 = 0 · F_c = 0,1 · 0 = 0
  *           T = 2π/0 → no está definido: el período de algo que no gira es infinito.
@@ -55,44 +51,70 @@ import { test, expect, Page } from '@playwright/test';
  *           f = 0 Hz (cero vueltas por segundo) → «0,000»
  *           Nótese que a_c se calcula como ω²·r y NO como v²/r, así que ni siquiera con el
  *           radio en su mínimo hay división por cero; y el slider no deja bajar de 0,5 m.
- *       (b) máximos: r = 5 m · ω = 10 rad/s · m = 5 kg
- *           v   = 10 · 5  = 50 m/s                                 → «50,00»   m/s
- *           a_c = 100 · 5 = 500 m/s²                               → «500,00»  m/s²
- *           F_c = 5 · 500 = 2500 N                                 → «2500,00» N (sin punto de millar, ver nota)
- *           T   = 2π/10   = 0,6283185 s                            → «0,63»    s
- *           f   = 10/(2π) = 1,5915494 Hz                           → «1,592»   Hz
+ *       (b) más allá del tope: se piden 50 / 50 / 50, fuera de rango en los tres controles,
+ *           y el navegador satura en r = 5 m · ω = 10 rad/s · m = 5 kg
+ *           v   = 10 · 5  = 50 m/s                               → «50,00»   m/s
+ *           a_c = 100 · 5 = 500 m/s²                             → «500,00»  m/s²
+ *           F_c = 5 · 500 = 2500 N                               → «2500,00» N (sin punto de millar, ver nota)
+ *           T   = 2π/10   = 0,628318531 s                        → «0,63»    s
+ *           f   = 10/(2π) = 1,591549431 Hz                       → «1,592»   Hz
  *
  *   CASO 3 (rechazo) — magnitudes sin sentido físico: r = −3 m, ω = −5 rad/s, m = −2 kg
  *       Un radio o una masa negativos no existen, y una ω negativa aquí solo sería un
  *       cambio de sentido que el modelo no contempla. Los tres controles son <input
  *       type="range"> con min/max declarados, de modo que el propio navegador satura al
- *       mínimo (0,5 · 0 · 0,1) y nunca llega un número negativo al cálculo. Lo mismo por
- *       arriba con 999 (satura a 5 · 10 · 5) y con texto («abc» revierte al punto medio del
- *       recorrido). En ningún caso debe aparecer NaN, Infinity ni «No definido» en pantalla.
+ *       mínimo (0,5 · 0 · 0,1) y nunca llega un número negativo al cálculo:
+ *           v = 0 · 0,5 = 0 · a_c = 0 · F_c = 0 · T = ∞ · f = 0
+ *       Y con texto («abc») el <input type="range"> revierte al punto medio del recorrido
+ *       ajustado al step: r = 2,8 m (medio de [0,5; 5] = 2,75 → step 0,1), ω = 5 rad/s,
+ *       m = 2,6 kg (medio de [0,1; 5] = 2,55 → step 0,1). Con esa terna:
+ *           v   = 5 · 2,8    = 14 m/s                            → «14,00»  m/s
+ *           a_c = 25 · 2,8   = 70 m/s²                           → «70,00»  m/s²
+ *           F_c = 2,6 · 70   = 182 N                             → «182,00» N
+ *       En ningún caso debe aparecer NaN, Infinity ni «No definido» en pantalla.
  *
  *   CASO 4 (la animación, que es la mitad de la promesa) — se leen los píxeles del canvas
  *       · la partícula es #2E86AB; el vector v, #48A9A6; el vector a_c, #E07A1F.
  *       · la ω real, medida desenrollando el ángulo de la partícula, debe coincidir con la ω
- *         del panel (MCU). Con r = 3 m y ω = 1,5 rad/s: v ⊥ r (90°) y a_c antiparalela a r
+ *         del panel (MCU). Con r = 3 m y ω = 2,5 rad/s: v ⊥ r (90°) y a_c antiparalela a r
  *         (180°), que es literalmente lo que el bloque educativo afirma.
  *       · el radio dibujado debe ser proporcional a r (radioPx = r/5 · maxPx).
  *
+ *   CASO 5 (MCNU) — θ(t) = ω₀·t + ½·α·t² con α = 0,5 rad/s², y el panel debe SEGUIR a la
+ *       animación (fue el hallazgo 167, reparado el 23/08/2026).
+ *
  * ─────────────────────────────────────────────────────────────────────────────────────────
+ * RESULTADO DE LA RE-INSPECCIÓN DEL 30/08/2026
+ *   El cálculo está SANO. Las seis magnitudes coinciden dígito a dígito con las tres ternas
+ *   resueltas a mano, las unidades son las correctas, la ω medida en el canvas dio 2,500
+ *   rad/s frente a los 2,50 rotulados, y las reparaciones de agosto siguen puestas
+ *   (type="button" en los dos botones de modo, panel enganchado a la ω animada en MCNU,
+ *   notación «a_c»/«a_t» en vez de «aₒ»/«αt»).
+ *
  * HALLAZGOS ABIERTOS QUE ESTE FICHERO **NO** BLOQUEA (el Inspector no repara)
- *   · MCNU: el panel numérico NO se mueve. La animación sí acelera correctamente
- *     (θ(t) = ω₀·t + ½·α·t² con α = 0,5 rad/s²; medido por mínimos cuadrados: α = 0,510),
- *     pero ω, v, a_c, F_c, T y f siguen mostrando los valores derivados de la ω del slider.
- *     Con ω₀ = 2 rad/s, a los 5 s la partícula gira ya a ~4,5 rad/s (a_c real ≈ 40,5 m/s²) y
- *     el panel sigue rotulando «ω = 2,00 rad/s» y «a_c = 8,00 m/s²». Contradice a la propia
- *     tabla de la app, que dice «Aceleración centrípeta: varía porque ω varía».
- *     Ver los expect.soft del CASO 5.
- *   · Los dos botones MCU/MCNU no llevan type="button" (regla de oro del CLAUDE.md).
- *     Sí llevan aria-pressed correcto. Ver el expect.soft del test de accesibilidad.
- *   · Notación: la app rotula la aceleración centrípeta «aₒ» (a subíndice o) en panel,
- *     canvas, fórmula y tabla, mientras su propia metadata y su FAQPage usan «a_c».
- *   · El bullet «hay además aceleración tangencial αt = α · r» escribe αt donde toca a_t
- *     (la tabla de la misma página sí pone «at = α · r»). αt se lee como α·t, que es una
- *     velocidad angular, no una aceleración.
+ * Los tres primeros están al final del fichero como tests con `test.fail()`: afirman lo que
+ * debería pasar y hoy fallan a propósito, así que la suite queda VERDE y se pondrá en rojo
+ * el día que se reparen.
+ *   · Los tres <label> visibles («Radio (r) 2,5 m», «Velocidad angular (ω) 4,0 rad/s»,
+ *     «Masa (m) 2,0 kg») NO están asociados a ningún control: ni htmlFor, ni el <input>
+ *     anidado dentro, de modo que `label.control` es null en los tres. Además, pulsar el
+ *     rótulo no lleva el foco al slider.
+ *   · Tampoco hay aria-valuetext: los sliders se apoyan solo en aria-label, que no lleva
+ *     unidad ni valor, así que un lector de pantalla dice «Masa de la partícula, 2,5» sin el
+ *     «kg», justo en una app cuyo propio recuadro de errores frecuentes advierte de que
+ *     equivocar la unidad invalida el resultado.
+ *   · MCNU: mover SOLO el slider de radio reinicia la aceleración. Medido: tras 5 s el panel
+ *     iba por ω = 3,47 rad/s y al pasar el radio de 2 a 4 m volvió a 1,12 rad/s (ω₀ = 1).
+ *     Sale del useEffect [omega, radio, modo], que rearma omegaRef y pone theta a 0. Nada
+ *     lo anuncia, y es precisamente el experimento que propone el bullet «Aumentar el radio
+ *     a igual ω aumenta tanto v como a_c». En MCU es inocuo, porque ω no evoluciona.
+ *   · MCNU no dibuja la aceleración tangencial. Con α = 0,5 rad/s² y r = 4 m vale
+ *     a_t = α·r = 2 m/s², y la tabla de la propia app dice «Aceleración tangencial: at =
+ *     α · r ≠ 0», pero en el lienzo solo hay v y a_c. Un alumno puede leer la flecha naranja
+ *     como la aceleración total, que es el error que la tabla intenta evitar.
+ *   · Notación desigual dentro de la misma página: la caja de fórmulas y el bullet escriben
+ *     «a_c» y «a_t», mientras la tabla comparativa escribe «at» (tres veces) sin marca de
+ *     subíndice.
  * ─────────────────────────────────────────────────────────────────────────────────────────
  */
 
@@ -225,6 +247,24 @@ function desenrollar(serie: { theta: number; t: number }[]): { t: number; th: nu
   return puntos;
 }
 
+/**
+ * Lee el panel entero de UNA foto. En MCNU se re-renderiza cada ~100 ms y leer tarjeta a
+ * tarjeta deja los locators despegados a mitad de camino.
+ */
+async function fotoPanel(page: Page): Promise<Record<string, number>> {
+  return page.evaluate(() => {
+    const panel = document.querySelector('[class*="valuesPanel"]')!;
+    const salida: Record<string, number> = {};
+    for (const tarjeta of Array.from(panel.children)) {
+      const spans = tarjeta.querySelectorAll('span');
+      salida[spans[0].textContent!.trim()] = Number(
+        spans[1].textContent!.trim().replace(/\./g, '').replace(',', '.'),
+      );
+    }
+    return salida;
+  });
+}
+
 test.beforeEach(async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto(RUTA);
@@ -257,20 +297,20 @@ test('la app promete lo que este fichero verifica', async ({ page }) => {
   ).toBeVisible();
 });
 
-test('CASO 1 (normal) — r = 2 m, ω = 3 rad/s, m = 1 kg', async ({ page }) => {
-  await configurar(page, 2, 3, 1);
+test('CASO 1 (normal) — r = 2,5 m, ω = 4 rad/s, m = 2 kg', async ({ page }) => {
+  await configurar(page, 2.5, 4, 2);
 
   // Los rótulos de los sliders, con coma decimal y unidad (formato español obligatorio).
-  await expect(page.getByText('2,0 m', { exact: true })).toBeVisible();
-  await expect(page.getByText('3,0 rad/s', { exact: true })).toBeVisible();
-  await expect(page.getByText('1,0 kg', { exact: true })).toBeVisible();
+  await expect(page.getByText('2,5 m', { exact: true })).toBeVisible();
+  await expect(page.getByText('4,0 rad/s', { exact: true })).toBeVisible();
+  await expect(page.getByText('2,0 kg', { exact: true })).toBeVisible();
 
-  await expect(magnitud(page, 'ω')).toHaveText('3,00'); // la propia entrada
-  await expect(magnitud(page, 'v tangencial')).toHaveText('6,00'); // v = ω·r = 3 · 2
-  await expect(magnitud(page, 'Aceleración centrípeta')).toHaveText('18,00'); // a_c = ω²·r = 9 · 2 (= v²/r = 36/2)
-  await expect(magnitud(page, 'Fuerza centrípeta')).toHaveText('18,00'); // F_c = m·a_c = 1 · 18
-  await expect(magnitud(page, 'Período \\(T\\)')).toHaveText('2,09'); // T = 2π/ω = 6,283185/3 = 2,0943951
-  await expect(magnitud(page, 'Frecuencia \\(f\\)')).toHaveText('0,477'); // f = ω/2π = 3/6,283185 = 0,4774648
+  await expect(magnitud(page, 'ω')).toHaveText('4,00'); // la propia entrada
+  await expect(magnitud(page, 'v tangencial')).toHaveText('10,00'); // v = ω·r = 4 · 2,5
+  await expect(magnitud(page, 'Aceleración centrípeta')).toHaveText('40,00'); // a_c = ω²·r = 16 · 2,5 (= v²/r = 100/2,5)
+  await expect(magnitud(page, 'Fuerza centrípeta')).toHaveText('80,00'); // F_c = m·a_c = 2 · 40
+  await expect(magnitud(page, 'Período \\(T\\)')).toHaveText('1,57'); // T = 2π/ω = 6,283185/4 = 1,5707963
+  await expect(magnitud(page, 'Frecuencia \\(f\\)')).toHaveText('0,637'); // f = ω/2π = 4/6,283185 = 0,6366198 (= 1/T)
 
   // Las UNIDADES, que es donde estas apps se equivocan: rad/s no es rpm, y f va en Hz.
   await expect(unidad(page, 'ω')).toHaveText('rad/s');
@@ -279,29 +319,25 @@ test('CASO 1 (normal) — r = 2 m, ω = 3 rad/s, m = 1 kg', async ({ page }) => 
   await expect(unidad(page, 'Fuerza centrípeta')).toHaveText('N');
   await expect(unidad(page, 'Período \\(T\\)')).toHaveText('s');
   await expect(unidad(page, 'Frecuencia \\(f\\)')).toHaveText('Hz');
-});
 
-test('CASO 1.bis (normal) — r = 4 m, ω = 5 rad/s, m = 3 kg, y la masa solo entra en F_c', async ({ page }) => {
-  await configurar(page, 4, 5, 3);
-
-  await expect(magnitud(page, 'v tangencial')).toHaveText('20,00'); // v = 5 · 4
-  await expect(magnitud(page, 'Aceleración centrípeta')).toHaveText('100,00'); // a_c = 25 · 4 (= 400/4)
-  await expect(magnitud(page, 'Fuerza centrípeta')).toHaveText('300,00'); // F_c = 3 · 100
-  await expect(magnitud(page, 'Período \\(T\\)')).toHaveText('1,26'); // T = 2π/5 = 1,2566371
-  await expect(magnitud(page, 'Frecuencia \\(f\\)')).toHaveText('0,796'); // f = 5/2π = 0,7957747
-
-  // La masa NO debe tocar la cinemática: al subirla a 5 kg solo cambia F_c = 5 · 100 = 500 N.
+  // La masa NO debe tocar la cinemática: al subirla a 5 kg solo cambia F_c = 5 · 40 = 200 N.
   await mover(page, MASA, 5);
-  await expect(magnitud(page, 'Fuerza centrípeta')).toHaveText('500,00');
-  await expect(magnitud(page, 'v tangencial')).toHaveText('20,00');
-  await expect(magnitud(page, 'Aceleración centrípeta')).toHaveText('100,00');
-  await expect(magnitud(page, 'Período \\(T\\)')).toHaveText('1,26');
+  await expect(magnitud(page, 'Fuerza centrípeta')).toHaveText('200,00');
+  await expect(magnitud(page, 'v tangencial')).toHaveText('10,00');
+  await expect(magnitud(page, 'Aceleración centrípeta')).toHaveText('40,00');
+  await expect(magnitud(page, 'Período \\(T\\)')).toHaveText('1,57');
 
-  // Y a_c debe crecer con el CUADRADO de ω: 5 → 10 rad/s multiplica a_c por 4 (100 → 400),
-  // mientras v, que es lineal en ω, solo se dobla (20 → 40). Es el «aₒ crece con ω²» de la app.
-  await mover(page, OMEGA, 10); // a_c = 10² · 4 = 400 m/s²
-  await expect(magnitud(page, 'Aceleración centrípeta')).toHaveText('400,00');
-  await expect(magnitud(page, 'v tangencial')).toHaveText('40,00'); // v = 10 · 4
+  // Y a_c debe crecer con el CUADRADO de ω: 4 → 8 rad/s multiplica a_c por 4 (40 → 160),
+  // mientras v, que es lineal en ω, solo se dobla (10 → 20). Es el «a_c crece con ω²» de la app.
+  await mover(page, OMEGA, 8); // a_c = 8² · 2,5 = 160 m/s²
+  await expect(magnitud(page, 'Aceleración centrípeta')).toHaveText('160,00');
+  await expect(magnitud(page, 'v tangencial')).toHaveText('20,00'); // v = 8 · 2,5
+
+  // Y con una terna NO redonda, donde un error de fórmula ya no se disimula:
+  // r = 1,3 m · ω = 3,7 rad/s → v = 4,81 m/s · a_c = 3,7² · 1,3 = 17,797 (= 4,81²/1,3 ✔)
+  await configurar(page, 1.3, 3.7, 1);
+  await expect(magnitud(page, 'v tangencial')).toHaveText('4,81');
+  await expect(magnitud(page, 'Aceleración centrípeta')).toHaveText('17,80'); // 17,797 redondeado a 2 decimales
 });
 
 test('CASO 2a (límite) — con ω = 0 el período es infinito y no puede salir NaN', async ({ page }) => {
@@ -323,8 +359,13 @@ test('CASO 2a (límite) — con ω = 0 el período es infinito y no puede salir 
   await expect(page.locator('body')).not.toContainText('NaN');
 });
 
-test('CASO 2b (límite) — el tope de los tres sliders, con el millar a la española', async ({ page }) => {
-  await configurar(page, 5, 10, 5);
+test('CASO 2b (límite) — más allá del tope: 50/50/50 satura en 5/10/5', async ({ page }) => {
+  // Se piden valores FUERA del rango declarado en los tres controles a la vez.
+  await configurar(page, 50, 50, 50);
+
+  expect(await valorSlider(page, RADIO)).toBe('5');
+  expect(await valorSlider(page, OMEGA)).toBe('10');
+  expect(await valorSlider(page, MASA)).toBe('5');
 
   await expect(magnitud(page, 'v tangencial')).toHaveText('50,00'); // v = 10 · 5
   await expect(magnitud(page, 'Aceleración centrípeta')).toHaveText('500,00'); // a_c = 100 · 5
@@ -347,23 +388,24 @@ test('CASO 3 (rechazo) — radio, ω y masa negativos no llegan nunca al cálcul
 
   await configurar(page, -3, -5, -2);
   expect(await valorSlider(page, RADIO)).toBe('0.5'); // −3 m no es un radio
-  expect(await valorSlider(page, OMEGA)).toBe('0');
+  expect(await valorSlider(page, OMEGA)).toBe('0'); // −5 rad/s sería un giro que el modelo no contempla
   expect(await valorSlider(page, MASA)).toBe('0.1'); // −2 kg no es una masa
-  await expect(magnitud(page, 'Fuerza centrípeta')).toHaveText('0,00');
   await expect(magnitud(page, 'v tangencial')).toHaveText('0,00');
+  await expect(magnitud(page, 'Aceleración centrípeta')).toHaveText('0,00');
+  await expect(magnitud(page, 'Fuerza centrípeta')).toHaveText('0,00');
+  await expect(magnitud(page, 'Período \\(T\\)')).toHaveText('∞');
 
-  // Por arriba, saturación al máximo declarado.
-  await configurar(page, 999, 999, 999);
-  expect(await valorSlider(page, RADIO)).toBe('5');
-  expect(await valorSlider(page, OMEGA)).toBe('10');
-  expect(await valorSlider(page, MASA)).toBe('5');
-  await expect(magnitud(page, 'Aceleración centrípeta')).toHaveText('500,00'); // a_c = 10² · 5
-
-  // Y con texto, el <input type="range"> revierte al centro del recorrido en vez de
-  // entregar NaN a parseFloat: el panel sigue mostrando números reales.
+  // Y con texto, el <input type="range"> revierte al punto medio del recorrido ajustado al
+  // step, en vez de entregar NaN a parseFloat: r = 2,8 m (medio de [0,5; 5] = 2,75 → 2,8),
+  // ω = 5 rad/s (medio de [0; 10]) y m = 2,6 kg (medio de [0,1; 5] = 2,55 → 2,6).
   await configurar(page, 'abc', 'abc', 'abc');
-  expect(await valorSlider(page, OMEGA)).toBe('5'); // punto medio de [0, 10]
+  expect(await valorSlider(page, RADIO)).toBe('2.8');
+  expect(await valorSlider(page, OMEGA)).toBe('5');
+  expect(await valorSlider(page, MASA)).toBe('2.6');
   await expect(magnitud(page, 'ω')).toHaveText('5,00');
+  await expect(magnitud(page, 'v tangencial')).toHaveText('14,00'); // v = 5 · 2,8
+  await expect(magnitud(page, 'Aceleración centrípeta')).toHaveText('70,00'); // a_c = 25 · 2,8
+  await expect(magnitud(page, 'Fuerza centrípeta')).toHaveText('182,00'); // F_c = 2,6 · 70
   await expect(page.locator('body')).not.toContainText('NaN');
   await expect(page.locator('body')).not.toContainText('No definido');
 });
@@ -372,9 +414,9 @@ test('CASO 4 (animación) — la partícula gira a la ω del panel y los vectore
   page,
 }) => {
   await page.addScriptTag({ content: SONDA_CANVAS });
-  await configurar(page, 3, 1.5, 1); // v = 1,5 · 3 = 4,5 m/s · a_c = 1,5² · 3 = 6,75 m/s²
-  await expect(magnitud(page, 'v tangencial')).toHaveText('4,50');
-  await expect(magnitud(page, 'Aceleración centrípeta')).toHaveText('6,75');
+  await configurar(page, 3, 2.5, 1); // v = 2,5 · 3 = 7,5 m/s · a_c = 2,5² · 3 = 18,75 m/s²
+  await expect(magnitud(page, 'v tangencial')).toHaveText('7,50');
+  await expect(magnitud(page, 'Aceleración centrípeta')).toHaveText('18,75');
   await page.waitForTimeout(400);
 
   // (1) ω REAL de la animación, desenrollando el ángulo de la partícula.
@@ -385,11 +427,11 @@ test('CASO 4 (animación) — la partícula gira a la ω del panel y los vectore
   }
   const puntos = desenrollar(serie);
   const omegaMedida = puntos[puntos.length - 1].th / puntos[puntos.length - 1].t;
-  // Debe girar a 1,5 rad/s. El margen cubre el clamp dt = min(Δt, 0,05 s) del bucle rAF, que
-  // solo puede ralentizar la simulación bajo carga, nunca acelerarla. Y el signo positivo es
-  // la convención antihoraria que el propio código declara.
-  expect(omegaMedida, 'la animación debe girar a la ω que rotula el panel').toBeGreaterThan(1.3);
-  expect(omegaMedida, 'la animación debe girar a la ω que rotula el panel').toBeLessThan(1.65);
+  // Debe girar a 2,5 rad/s (medido el 30/08/2026: 2,500). El margen cubre el clamp
+  // dt = min(Δt, 0,05 s) del bucle rAF, que solo puede ralentizar la simulación bajo carga,
+  // nunca acelerarla. Y el signo positivo es la convención antihoraria que el código declara.
+  expect(omegaMedida, 'la animación debe girar a la ω que rotula el panel').toBeGreaterThan(2.2);
+  expect(omegaMedida, 'la animación debe girar a la ω que rotula el panel').toBeLessThan(2.7);
 
   // (2) GEOMETRÍA: v perpendicular al radio y a_c antiparalela al radio, en varias posiciones.
   for (let k = 0; k < 4; k++) {
@@ -464,28 +506,14 @@ test('CASO 5 (MCNU) — la animación acelera con α = 0,5 rad/s² y el panel la
 
   // REPARADO el 23/08/2026 (hallazgo 167). El panel se derivaba de `omega` —el estado del
   // slider— y no de `omegaRef`, que es lo que de verdad gira, así que en MCNU las seis
-  // tarjetas salían congeladas en ω₀ mientras la bola aceleraba en pantalla. Es justo lo que
-  // este bloque anticipaba: «si algún día el panel se engancha a omegaRef, son estos expect
-  // los que avisan».
+  // tarjetas salían congeladas en ω₀ mientras la bola aceleraba en pantalla.
   //
   // No se fijan cifras exactas porque dependen del instante de lectura. Lo que se comprueba
   // es más fuerte: que ω ha CRECIDO desde el 1,00 del slider, y que las demás magnitudes
   // siguen siendo coherentes con la ω que el propio panel enseña.
-  // Se toma UNA foto del panel entero: en MCNU se re-renderiza cada ~100 ms y leer tarjeta a
-  // tarjeta deja los locators despegados a mitad de camino.
-  const foto = await page.locator('[class*="valuesPanel"]').innerText();
-  const leerDeFoto = (rotulo: string): number => {
-    const linea = foto.split('\n').map((l) => l.trim());
-    const i = linea.findIndex((l) => l.toUpperCase() === rotulo.toUpperCase());
-    return Number((linea[i + 1] ?? '').replace(/\./g, '').replace(',', '.'));
-  };
-
-  const omegaPanel = leerDeFoto('ω');
+  const foto = await fotoPanel(page);
+  const omegaPanel = foto['ω'];
   expect(omegaPanel, 'MCNU: el panel sigue a la animación, no al slider').toBeGreaterThan(1.5);
-
-  const acPanel = leerDeFoto('Aceleración centrípeta');
-  const vPanel = leerDeFoto('v tangencial');
-  const tPanel = leerDeFoto('Período (T)');
 
   // Con r = 2 m:  a_c = ω²·r  ·  v = ω·r  ·  T = 2π/ω
   //
@@ -496,17 +524,18 @@ test('CASO 5 (MCNU) — la animación acelera con α = 0,5 rad/s² y el panel la
   const dOmega = 0.005;
   const r = 2;
   expect(
-    Math.abs(acPanel - omegaPanel ** 2 * r),
+    Math.abs(foto['Aceleración centrípeta'] - omegaPanel ** 2 * r),
     'a_c = ω²·r con la ω que enseña el propio panel',
   ).toBeLessThanOrEqual(2 * omegaPanel * r * dOmega + 0.01);
   expect(
-    Math.abs(vPanel - omegaPanel * r),
+    Math.abs(foto['v tangencial'] - omegaPanel * r),
     'v = ω·r con la ω que enseña el propio panel',
   ).toBeLessThanOrEqual(r * dOmega + 0.01);
   expect(
-    Math.abs(tPanel - (2 * Math.PI) / omegaPanel),
+    Math.abs(foto['Período (T)'] - (2 * Math.PI) / omegaPanel),
     'T = 2π/ω con la ω que enseña el propio panel',
   ).toBeLessThanOrEqual(((2 * Math.PI) / omegaPanel ** 2) * dOmega + 0.01);
+
   // Volver a MCU debe dejar panel y animación otra vez de acuerdo.
   await page.getByRole('button', { name: /^MCU/ }).click();
   await expect(page.getByRole('button', { name: /^MCU/ })).toHaveAttribute('aria-pressed', 'true');
@@ -530,4 +559,64 @@ test('accesibilidad — etiquetas de los controles y estado de los botones de mo
   // Regla de oro del CLAUDE.md: todo <button> lleva type="button". Reparado el 23/08/2026.
   await expect(page.getByRole('button', { name: /^MCU/ })).toHaveAttribute('type', 'button');
   await expect(page.getByRole('button', { name: /^MCNU/ })).toHaveAttribute('type', 'button');
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * HALLAZGOS ABIERTOS DEL 30/08/2026
+ *
+ * Los tres tests de aquí abajo afirman lo que DEBERÍA pasar y hoy fallan a propósito, con
+ * `test.fail()`. El día que se reparen pasarán a ROJO («expected to fail, but passed») y
+ * habrá que quitarles la marca, no reescribir el valor esperado. El Inspector no repara.
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+test('HALLAZGO ABIERTO — MCNU: mover solo el radio reinicia la aceleración', async ({ page }) => {
+  test.fail();
+  // Medido el 30/08/2026: con ω₀ = 1 rad/s y r = 2 m, tras 5 s el panel iba por ω = 3,47
+  // rad/s; al pasar el radio de 2 a 4 m volvió a 1,12 rad/s. Sale del
+  // useEffect [omega, radio, modo] de page.tsx, que rearma omegaRef y pone theta a 0.
+  // Nada lo anuncia en pantalla, y es justo el experimento que propone el bullet del bloque
+  // educativo: «Aumentar el radio a igual ω aumenta tanto v como a_c» — con ω rearmada, la
+  // comparación que el alumno intenta hacer no es a igual ω. En MCU es inocuo, porque ahí ω
+  // no evoluciona.
+  await configurar(page, 2, 1, 1);
+  await page.getByRole('button', { name: /^MCNU/ }).click();
+  await page.waitForTimeout(5000);
+  const antes = (await fotoPanel(page))['ω'];
+  expect(antes, 'tras 5 s a α = 0,5 rad/s² debe haber acelerado desde ω₀ = 1').toBeGreaterThan(2.5);
+
+  await mover(page, RADIO, 4); // se toca SOLO el radio: ni ω, ni el modo
+  await page.waitForTimeout(250);
+  const despues = (await fotoPanel(page))['ω'];
+  expect(
+    despues,
+    'cambiar solo el radio no debería devolver ω a ω₀ (= 1 rad/s) sin avisar',
+  ).toBeGreaterThan(antes - 0.5);
+});
+
+test('HALLAZGO ABIERTO — los tres <label> visibles no gobiernan ningún control', async ({ page }) => {
+  test.fail();
+  // «Radio (r) 2,0 m», «Velocidad angular (ω) 2,0 rad/s» y «Masa (m) 1,0 kg» son <label> sin
+  // htmlFor y sin el <input> anidado dentro, así que `label.control` es null en los tres:
+  // no etiquetan nada y pulsarlos no lleva el foco al slider. Los sliders se sostienen solo
+  // sobre aria-label, que sí existe pero no lleva ni el valor ni la unidad.
+  const huerfanas = await page.evaluate(
+    () => Array.from(document.querySelectorAll('label')).filter((l) => !l.control).length,
+  );
+  expect(huerfanas, 'ningún <label> debería quedar sin control asociado').toBe(0);
+});
+
+test('HALLAZGO ABIERTO — los sliders no anuncian su valor con unidad', async ({ page }) => {
+  test.fail();
+  // Sin aria-valuetext, un lector de pantalla lee el número crudo del range: «Masa de la
+  // partícula, 2,5» sin el «kg», «Velocidad angular, 4» sin el «rad/s». La unidad solo está
+  // en el <label> huérfano de al lado, que no se anuncia. Es una pérdida real en una app
+  // cuyo propio recuadro de errores frecuentes avisa de que «la fórmula a_c = ω² · r requiere
+  // ω en rad/s: si introduces rpm directamente el resultado es incorrecto».
+  const sinValueText = await page.evaluate(
+    () =>
+      Array.from(document.querySelectorAll('input[type="range"]')).filter(
+        (r) => !r.getAttribute('aria-valuetext'),
+      ).length,
+  );
+  expect(sinValueText, 'los tres sliders deberían declarar aria-valuetext con la unidad').toBe(0);
 });

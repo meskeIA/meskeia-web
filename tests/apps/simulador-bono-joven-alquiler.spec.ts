@@ -779,3 +779,246 @@ test.describe('Simulador Bono Joven Alquiler — hallazgos reparados (28/08/2026
     expect(fuente).not.toContain('300 €/mes');
   });
 });
+
+/**
+ * ═══════════════════════════════════════════════════════════════════════════════════════
+ * RE-VERIFICACIÓN del 30/08/2026 — commit 506891d6 («tanda 1 de reparación»).
+ *
+ * La cola marcó la app «invalidada» tras esa reparación, así que los dos hallazgos que
+ * cerraba se vuelven a comprobar DE CERO en el navegador, sin dar por bueno el commit:
+ *
+ *   · hallazgo 487 — la app afirmaba haber comprobado una renta que estaba vacía.
+ *   · hallazgo 489 — `metadata.ts` tenía las cuantías del art. 137 tecleadas a mano.
+ *
+ * Los dos están CERRADOS (ver los tres casos de abajo). Los casos se resolvieron a mano
+ * contra `data/fiscal/vivienda-joven.ts` ANTES de ejecutar la app, y el cálculo va escrito
+ * junto a cada aserción con su artículo.
+ * ═══════════════════════════════════════════════════════════════════════════════════════
+ */
+test.describe('Simulador Bono Joven Alquiler — re-verificación del 30/08/2026', () => {
+  /**
+   * CASO 1 (NORMAL) — joven que cumple los seis requisitos, vivienda completa a 700 €/mes.
+   *
+   * Resuelto a mano:
+   *   · art. 133.1.e — tope de renta en vivienda: 1.000 €. 700 ≤ 1.000 → da derecho.
+   *   · art. 137     — ayuda máxima 300 € y límite del 60 %: 700 × 0,6 = 420 € > 300 €
+   *                    → manda el máximo: ayuda 300,00 €/mes.
+   *   · pago real    — 700 − 300 = 400,00 €/mes.
+   *   · art. 134     — 24 + 24 meses: 300 × 48 = 14.400,00 €.
+   *   · la nota «Límite: 60% de la renta» NO debe salir: no hay recorte que anunciar.
+   *
+   * 700 € es una renta que ningún caso anterior probaba en vivienda completa, y está en la
+   * zona donde manda el techo de 300 € y no el del 60 %.
+   */
+  test('CASO 1 NORMAL — vivienda a 700 €/mes: 300 € de ayuda, 400 € de pago y 14.400 € en 4 años', async ({ page }) => {
+    await page.goto(RUTA);
+    await ponerRenta(page, '700');
+
+    expect(await valorPanel(page, 'Ayuda mensual')).toBe('300,00 €');
+    expect(await valorPanel(page, 'Tu pago real')).toBe('400,00 €');
+    expect(await valorPanel(page, 'Máximo en 4 años')).toBe('14.400,00 €');
+    await expect(page.locator('[class*="ahorroNota"]')).toHaveCount(0);
+
+    await responderTodoSi(page);
+    const veredicto = await textoResultado(page);
+    expect(veredicto).toContain('¡Cumples todos los requisitos!');
+    expect(veredicto).toContain('300,00 €');
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — el tope de renta de la HABITACIÓN, en su valor exacto y un euro después.
+   *
+   * El art. 133.1.e dice «igual o inferior»: el importe exacto SÍ da derecho. El borde de
+   * 1.000 € (vivienda) y el de 250 € (habitación en municipio pequeño) ya estaban fijados;
+   * el de 600 € —habitación en municipio normal— no lo miraba nadie.
+   *
+   * Resuelto a mano, habitación en municipio normal:
+   *   · 600 € = el tope exacto → concede.
+   *     art. 137: 600 × 0,6 = 360 € > 200 € de máximo → ayuda 200,00 €/mes.
+   *     pago real 600 − 200 = 400,00 € · acumulado 200 × 48 = 9.600 €.
+   *     Se imprime «9600,00 €»: es-ES no agrupa los millares de un número de cuatro cifras.
+   *   · 601 € → un euro por encima: deniega, y el aviso cita 600,00 € (el tope de la
+   *     habitación), no 1.000 € (vivienda) ni 250 € (habitación en municipio pequeño).
+   */
+  test('CASO 2 LÍMITE — habitación: 600 € es el tope exacto y concede, 601 € deniega', async ({ page }) => {
+    await page.goto(RUTA);
+    await responderTodoSi(page);
+    await page.getByRole('button', { name: /Habitación/ }).first().click();
+
+    await ponerRenta(page, '600');
+    expect(await valorPanel(page, 'Ayuda mensual')).toBe('200,00 €');
+    expect(await valorPanel(page, 'Tu pago real')).toBe('400,00 €');
+    expect(await valorPanel(page, 'Máximo en 4 años')).toBe('9600,00 €');
+    expect(await textoResultado(page)).toContain('¡Cumples todos los requisitos!');
+
+    await ponerRenta(page, '601');
+    const veredicto = await textoResultado(page);
+    expect(veredicto).toContain('No cumples los requisitos obligatorios');
+    expect(veredicto).toContain('601,00 €');
+    expect(veredicto).toContain('600,00 €');
+    expect(veredicto).not.toContain('1000,00 €');
+    expect(veredicto).not.toContain('250,00 €');
+    await expect(page.locator('[class*="ahorroPanel"]')).toHaveCount(0);
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — el caso que reparó el commit 506891d6, re-verificado de cero.
+   *
+   * Renta VACÍA con los seis requisitos en «Sí»: `rentaDentroDelLimite` vale `null`, o sea
+   * que la app no sabe la renta y no puede juzgar el art. 133.1.e. El veredicto tiene que
+   * pedirla, no afirmar que ya la comprobó (hallazgo 487), y no puede aparecer ninguna cifra
+   * de ayuda ni un NaN.
+   *
+   * Y a continuación el rechazo duro: 1.100 €/mes en vivienda completa supera el tope de
+   * 1.000 € del art. 133.1.e → deniega, citando las dos cifras y retirando el panel.
+   */
+  test('CASO 3 RECHAZO — con la renta vacía pide la renta, y con 1.100 € deniega', async ({ page }) => {
+    await page.goto(RUTA);
+    await responderTodoSi(page);
+
+    expect(await page.locator('#alquiler').inputValue()).toBe('');
+    const sinRenta = await textoResultado(page);
+    expect(sinRenta).toContain('Cumples los requisitos básicos');
+    expect(sinRenta).toContain('Falta comprobar la renta');
+    // Hallazgo 487: afirmar una comprobación que `rentaDentroDelLimite === null` desmiente
+    expect(sinRenta).not.toContain('La renta ya está comprobada');
+    expect(sinRenta).not.toContain('¡Cumples todos los requisitos!');
+    await expect(page.locator('[class*="ahorroPanel"]')).toHaveCount(0);
+    expect(await textoVisible(page)).not.toContain('NaN');
+
+    await ponerRenta(page, '1100');
+    const conRenta = await textoResultado(page);
+    expect(conRenta).toContain('No cumples los requisitos obligatorios');
+    expect(conRenta).toContain('1100,00 €');   // lo introducido
+    expect(conRenta).toContain('1000,00 €');   // el tope del art. 133.1.e
+    await expect(page.locator('[class*="ahorroPanel"]')).toHaveCount(0);
+  });
+
+  /**
+   * Hallazgo 489, re-verificado en el navegador y no solo en el fichero: las cuantías que
+   * viajan en la metadata y en el JSON-LD son las mismas que aplica el motor. Si el módulo se
+   * re-sella con otras cifras y la metadata deja de derivarlas, esto cae.
+   */
+  test('la metadata servida anuncia las mismas cuantías del art. 137 que aplica el motor', async ({ page }) => {
+    await page.goto(RUTA);
+    const descripcion = (await page.locator('meta[name="description"]').getAttribute('content')) ?? '';
+    expect(descripcion).toContain('300 €/mes');   // art. 137 · vivienda
+    expect(descripcion).toContain('200 €/mes');   // art. 137 · habitación
+    expect(descripcion).toContain('4 años');      // art. 134 · 48 meses
+
+    const bloques = await page.locator('script[type="application/ld+json"]').allInnerTexts();
+    const webapp = bloques.map(b => JSON.parse(b)).find(b => b['@type'] === 'WebApplication');
+    expect(webapp?.description ?? '').toContain('300 €/mes');
+    expect(webapp?.description ?? '').toContain('200 €/mes');
+  });
+});
+
+/**
+ * ═══════════════════════════════════════════════════════════════════════════════════════
+ * HALLAZGOS ABIERTOS de la re-inspección del 30/08/2026.
+ *
+ * Van con `test.fail()`, que es la convención de este fichero: afirman lo que DEBERÍA
+ * ocurrir y hoy fallan a propósito. El día que se reparen se les quita la línea y quedan
+ * como regresión. El Inspector NO repara.
+ * ═══════════════════════════════════════════════════════════════════════════════════════
+ */
+test.describe('Simulador Bono Joven Alquiler — hallazgos abiertos (30/08/2026)', () => {
+  /**
+   * ABIERTO 1 (contenido, medio) — el requisito de ingresos, que es BLOQUEANTE y decide el
+   * veredicto, se enuncia solo como «5 veces el IPREM» y no dice cuánto es eso en euros.
+   *
+   * El usuario tiene que contestar Sí o No a una pregunta que no puede evaluar: el IPREM no
+   * es una magnitud que nadie conozca de memoria. Y el proyecto YA tiene la cifra sellada en
+   * `data/fiscal/iprem.ts` (`IPREM_2026.anual12` = 7.200 €, `anual14` = 8.400 €), que esta
+   * app no importa, mientras deriva del módulo todo lo demás. Es el mismo defecto que
+   * corrigió el hallazgo 446 —cifra que existe en `data/fiscal` y no llega a la pantalla—,
+   * solo que aquí la cifra que falta es la que sostiene el requisito decisivo.
+   */
+  test.fail('ABIERTO 1 — el requisito de ingresos debe decir cuántos euros son 5 veces el IPREM', async ({ page }) => {
+    await page.goto(RUTA);
+    const cuerpo = await textoVisible(page);
+    const desde = cuerpo.indexOf('Tus rentas anuales no superan');
+    const hasta = cuerpo.indexOf('No eres propietario de una vivienda');
+    expect(desde).toBeGreaterThan(-1);
+    const bloque = cuerpo.slice(desde, hasta);
+    // Hoy el bloque entero no contiene ni un solo importe en euros
+    expect(bloque).toMatch(/\d[\d.]*\s?€/);
+  });
+
+  /**
+   * ABIERTO 2 (dato, medio) — la FAQ del propietario afirma requisitos de elegibilidad sin
+   * artículo ni respaldo en el módulo sellado.
+   *
+   * «El propietario no puede ser familiar hasta segundo grado del solicitante» y «el piso no
+   * puede ser de protección oficial en algunos casos» se dicen en plano, mientras que todas
+   * las demás afirmaciones normativas de la app citan su artículo (133.1.b, 133.1.e, 134,
+   * 136, 137). El módulo `vivienda-joven.ts`, sellado artículo por artículo contra el BOE
+   * sobre los arts. 132-139, no recoge ninguna regla de parentesco; la que circula viene de
+   * la ayuda GENERAL al alquiler del plan anterior, no de esta sección. Un requisito
+   * inventado o heredado hace que alguien se autoexcluya de una ayuda a la que sí tiene
+   * derecho, que en una app de riesgo 1 es exactamente el daño que hay que evitar.
+   */
+  test.fail('ABIERTO 2 — la FAQ del propietario debe citar el artículo del que sale el requisito', async ({ page }) => {
+    await page.goto(RUTA);
+    await abrirGuia(page);
+    const cuerpo = await textoVisible(page);
+    const i = cuerpo.indexOf('¿El propietario del piso debe cumplir algún requisito?');
+    expect(i).toBeGreaterThan(-1);
+    const respuesta = cuerpo.slice(i, i + 300);
+    expect(respuesta).toContain('segundo grado');
+    // Ninguna cita: ni artículo del RD 326/2026 ni norma alternativa
+    expect(respuesta).toMatch(/art\.\s*1\d\d|Real Decreto|RD\s*\d/);
+  });
+
+  /**
+   * ABIERTO 3 (operativa, bajo) — una renta negativa se descarta en silencio y la app dice
+   * que falta introducirla mientras el campo la enseña.
+   *
+   * `page.tsx` hace `Math.max(0, parseSpanishNumberOr(...))`, así que «-500» pasa a 0 y
+   * `rentaDentroDelLimite` vuelve a `null`. El campo conserva «-500» a la vista, el navegador
+   * lo marca `:invalid` por el `min={0}`, y no hay `aria-invalid` ni mensaje: el veredicto
+   * pide «introdúcela aquí arriba» sobre un campo que no está vacío. Es la cara simétrica
+   * del hallazgo 487 —la app hablando de un dato que en realidad no tiene—, y quien lo lea
+   * con un lector de pantalla no tiene forma de saber que el valor se ha ignorado.
+   */
+  test.fail('ABIERTO 3 — con «-500» en el campo, la app no puede decir que falta introducir la renta', async ({ page }) => {
+    await page.goto(RUTA);
+    await responderTodoSi(page);
+    await teclearRenta(page, '-500');
+
+    const campo = page.locator('#alquiler');
+    expect(await campo.inputValue()).toBe('-500');
+    expect(await campo.evaluate((el: HTMLInputElement) => el.validity.valid)).toBe(false);
+    // Si el campo tiene un valor a la vista, o se marca como inválido o no se dice que falta
+    const veredicto = await textoResultado(page);
+    const marcado = (await campo.getAttribute('aria-invalid')) === 'true';
+    expect(marcado || !veredicto.includes('Falta comprobar la renta')).toBe(true);
+  });
+
+  /**
+   * ABIERTO 4 (contenido, bajo) — responder «No» a un requisito no bloqueante no cambia nada
+   * de lo que el usuario ve.
+   *
+   * Con los cuatro imprescindibles en «Sí» y la renta dentro del tope, marcar «No» en «Tu
+   * Comunidad Autónoma tiene el Bono Joven activo» produce EXACTAMENTE el mismo veredicto,
+   * palabra por palabra, que dejarlo sin contestar, y el panel sigue anunciando 300,00 €/mes.
+   * El texto se limita a enumerar en genérico los tres aspectos que «pueden condicionar la
+   * aprobación» sin devolver cuál ha marcado el usuario como incumplido — y el de la CA no es
+   * un matiz: si la comunidad no tiene convocatoria abierta, no hay nada que solicitar.
+   * Preguntar algo y no acusar recibo de la respuesta es pedirle trabajo al usuario a cambio
+   * de nada.
+   */
+  test.fail('ABIERTO 4 — marcar «No» en un requisito no bloqueante debe cambiar el veredicto', async ({ page }) => {
+    await page.goto(RUTA);
+    await ponerRenta(page, '700');   // 700 ≤ 1.000 (art. 133.1.e): la renta no es el problema
+    for (const req of [REQUISITOS.edad, REQUISITOS.ingresos, REQUISITOS.propietario, REQUISITOS.habitual, REQUISITOS.contrato]) {
+      await responder(page, req, 'Sí');
+    }
+    const sinContestar = await textoResultado(page);
+
+    await responder(page, REQUISITOS.comunidad, 'No');
+    const contestandoNo = await textoResultado(page);
+
+    expect(contestandoNo).not.toBe(sinContestar);
+  });
+});

@@ -24,7 +24,12 @@
  *   6. CASOS 8-9 (MITAD B, 28/08) — el método REAL de la plusvalía ganando al objetivo por la
  *      proporción catastral, y el tope del coeficiente del IIVTNU a los 20 años.
  *   7. HALLAZGOS ABIERTOS 28/08 — cuatro, con `test.fail()` y UNA sola aserción de fondo cada
- *      uno. Tres son reparaciones que llegaron a las apps hermanas y no a esta.
+ *      uno. Tres son reparaciones que llegaron a las apps hermanas y no a esta. Reparados el
+ *      30/08 (commit 0828da3e) y hoy convertidos en regresión.
+ *   8. RE-INSPECCIÓN 30/08 — la cola invalidó lo anterior tras esa reparación. CASOS 11-13,
+ *      en territorio y precio que ninguna ronda había usado (Murcia 40.000 € y Melilla
+ *      30.000 €), que además vuelven a cerrar de cero los cinco defectos de la tanda 2. Al
+ *      final, UN hallazgo abierto con `test.fail()`.
  *
  * De dónde sale CADA cifra esperada (ninguna de memoria):
  *  - Tipo general de ITP por CCAA → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
@@ -1096,4 +1101,276 @@ test('CASO 10 (debe rechazarse) — una comisión negativa con el foco puesto ya
   await comision.fill('-10'); // sin blur: el min={0} de NumberInput aún no ha actuado
 
   expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('13.650,00 €');
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 30/08/2026 — la cola invalidó la anterior tras la reparación del
+// clúster de compraventa (commit 0828da3e, «tanda 2»). Se re-verifica DESDE CERO que
+// los cinco hallazgos de aquella tanda están cerrados en ESTA app y se abren tres
+// casos nuevos, resueltos a mano ANTES de tocar el navegador.
+//
+// Los tres casos eligen a propósito territorio y precio que ninguna ronda anterior
+// había usado (Murcia y Melilla; 40.000 € y 30.000 €), para que las cifras no puedan
+// venir copiadas de un caso ya escrito.
+//
+// De dónde sale cada cifra esperada:
+//  - Tipo general de Murcia (7,75 %) → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
+//    leído por `tipoGeneralDe()`. La Ley 3/2025 lo bajó del 8 % con efectos 25/07/2025.
+//  - Melilla → `ITP_CCAA.melilla` (tipoGeneral 6, reducido «Bonificación general 50%» del
+//    3 %, `ajd: 0.5`) y `aplicarBonificacionCiudad` (art. 57 bis TRLITPAJD, 50 % de la
+//    cuota gradual de AJD cuando el Registro radica allí) → AJD efectivo 0,25 %.
+//  - Melilla no liquida IVA sino IPSI → `TERRITORIOS_SIN_IVA` en `data/itp-ccaa.ts`.
+//  - Aranceles → `ARANCELES_NOTARIO` (RD 1426/1989 nº 2) × `FACTURA_NOTARIAL` (×1,5-×2,
+//    tarjeta = punto medio ×1,75) y `ARANCELES_REGISTRO` (RD 1427/1989 nº 2) +
+//    `REGISTRO_CONCEPTOS` (presentación 6,010121 € y nota simple 3,005061 €). Ambos
+//    terminan en `× 1.21` de IVA.
+//  - IRPF de la ganancia → `calcularGananciaInmueble` (art. 35 LIRPF) sobre
+//    `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (19 % hasta 6.000 · 21 % hasta 50.000).
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('RE-INSPECCIÓN 30/08/2026 — casos nuevos y cierre de la tanda 2', () => {
+  /**
+   * CASO 11 (NORMAL, península) — Murcia, la comunidad cuyo tipo general se movió en 2025
+   * (8 % → 7,75 %) y que ninguna ronda anterior había ejercitado. Precio 40.000 €, que cruza
+   * el tercer tramo de los dos aranceles y por tanto los ejercita más allá de la cuota fija.
+   */
+  test('CASO 11 (normal) — Murcia, segunda mano, 40.000 €, comprador general', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await selectCcaa(page).selectOption('murcia');
+    await selectPerfil(page).selectOption('general');
+    await rellenar(page, 'Precio del trastero', '40000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
+
+    // ITP = 40.000 × 7,75 % = 3.100,00. El 7,75 % es TIPOS_ITP_CCAA_2025 → { ccaa: 'Murcia',
+    // tipo: 7.75 }. Murcia NO tiene escala progresiva, así que el tipo efectivo que rotula la
+    // tarjeta coincide con el nominal. Ninguno de sus cuatro reducidos se aplica: los tres de
+    // colectivo exigen «Vivienda habitual» (y la app pasa `viviendaHabitual: false`, porque un
+    // trastero suelto nunca lo es) y el cuarto es VPO.
+    expect(await valorTarjeta(page, 'ITP (7,75%)')).toBe('3100,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (7,75%)')).toContain('Región de Murcia');
+
+    // Con perfil general y ningún reducido al alcance de cualquiera, no hay oportunidad que
+    // ofrecer: el aviso «Podrías pagar menos» NO debe salir.
+    await expect(page.getByText(/Podrías pagar menos/)).toHaveCount(0);
+
+    // Notaría — RD 1426/1989 nº 2 (ARANCELES_NOTARIO), tres tramos:
+    //   tramo 1 (hasta 6.010,12 €)                →                            90,15
+    //   tramo 2 (6.010,12→30.050,61, 0,45 %)      → 24.040,49 × 0,0045 =      108,182205
+    //   tramo 3 (30.050,61→40.000, 0,15 %)        →  9.949,39 × 0,0015 =       14,924085
+    //   arancel sin IVA                           =                           213,25629
+    //   con el 21 % de IVA                        = 213,25629 × 1,21 =        258,0401109
+    // FACTURA_NOTARIAL: ×1,5 = 387,06016635 · ×2 = 516,0802218 · medio ×1,75 = 451,570194075
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('451,57 €');
+    const notaria = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria).toContain('387,06 €');
+    expect(notaria).toContain('516,08 €');
+
+    // Registro — RD 1427/1989 nº 2 (ARANCELES_REGISTRO) + los dos fijos de REGISTRO_CONCEPTOS:
+    //   tramo 1                                   →                            24,04
+    //   tramo 2 (0,175 %)                         → 24.040,49 × 0,00175 =      42,0708575
+    //   tramo 3 (0,125 %)                         →  9.949,39 × 0,00125 =      12,4367375
+    //   inscripción                               =                            78,547595
+    //   + presentación 6,010121 + nota simple 3,005061 =                       87,562777
+    //   con el 21 % de IVA                        = 87,562777 × 1,21 =        105,95096017
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('105,95 €');
+
+    // En segunda mano no hay AJD: ITP y AJD son incompatibles en la misma transmisión.
+    await expect(page.locator('h3', { hasText: 'AJD' })).toHaveCount(0);
+
+    // Total = 3.100 + 451,570194075 + 105,95096017 + 300 = 3.957,521154245
+    //   % sobre el precio = 3.957,521154245 / 40.000 = 9,893803 %
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('3957,52 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('9,89%');
+
+    // Coste total = 40.000 + 3.957,521154245 = 43.957,521154245
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('43.957,52 €');
+
+    // Cierre de la tanda 2 (hallazgo 457/477): con la gestoría en negativo y SIN salir del
+    // campo, el total tiene que seguir siendo la suma de las líneas visibles —la tarjeta de
+    // gestoría desaparece— y no bajar 500 € por debajo de ellas.
+    const gestoria = page.locator('input[aria-label="Gastos de gestoría del comprador (€)"]');
+    await gestoria.fill('-500'); // sin blur: el min={0} de NumberInput aún no ha actuado
+    // 3.100 + 451,570194075 + 105,95096017 + 0 = 3.657,521154245
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('3657,52 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('43.657,52 €');
+    await expect(page.locator('h3', { hasText: 'Gastos de gestoría' })).toHaveCount(0);
+  });
+
+  /**
+   * CASO 12 (RÉGIMEN ESPECIAL) — Melilla, el territorio donde se cruzan los tres arreglos de
+   * la tanda 2 a la vez: allí no rige el IVA sino el IPSI (TERRITORIOS_SIN_IVA), el AJD va
+   * bonificado al 50 % por el art. 57 bis TRLITPAJD y la cuota de ITP también. Se comprueban
+   * las dos ramas, porque una reparación de «aquí no hay IVA» se pasa de largo justo en la
+   * segunda mano, donde sí hay un ITP que liquidar.
+   */
+  test('CASO 12 (régimen especial) — Melilla, 30.000 €: IPSI sin cifra, AJD bonificado e ITP al 3 %', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Primera mano/ }).click();
+    await selectCcaa(page).selectOption('melilla');
+    await rellenar(page, 'Precio del trastero', '30000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
+
+    // El botón no puede ofrecer un tipo de IVA donde no hay IVA (hallazgo 485/490):
+    // `Paga ${TERRITORIOS_SIN_IVA[ccaa].impuesto}` → «Paga IPSI», ni «Paga IVA 10%».
+    const rotulo = await texto(page.getByRole('button', { name: /Primera mano/ }));
+    expect(rotulo).toContain('Paga IPSI');
+    expect(rotulo).not.toMatch(/IVA/);
+
+    // Y el impuesto indirecto se queda SIN CIFRA, no se inventa un 10 % ni un 21 %.
+    await expect(page.locator('h3', { hasText: /^IVA/ })).toHaveCount(0);
+    expect(await valorTarjeta(page, 'IPSI')).toBe('No calculado');
+    expect(await descripcionTarjeta(page, 'IPSI')).toContain('no rige el IVA');
+    await expect(page.getByText(/no se aplica el IVA/)).toBeVisible();
+
+    // AJD — ITP_CCAA.melilla.ajd = 0.5, y `calcularAJD` aplica la bonificación del 50 %
+    // del art. 57 bis.1 TRLITPAJD: 30.000 × 0,5 % = 150 → × 0,5 = 75,00.
+    // El rótulo tiene que dar el tipo EFECTIVO (75 / 30.000 = 0,25 %), no el 0,5 % nominal
+    // de la tabla, que era el hallazgo 484 de la tanda 2.
+    expect(await valorTarjeta(page, 'AJD (0,25%)')).toBe('75,00 €');
+
+    // Notaría 30.000 € — 90,15 + (30.000 − 6.010,12) × 0,45 % = 198,10446 sin IVA
+    //   × 1,21 = 239,7063966 · ×1,5 = 359,5595949 · ×2 = 479,4127932 · medio = 419,48619405
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('419,49 €');
+    // Registro — 24,04 + 23.989,88 × 0,175 % = 66,02229 · + 6,010121 + 3,005061 = 75,037472
+    //   × 1,21 = 90,79534112
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('90,80 €');
+
+    // Total = 0 (IPSI, sin cifra) + 75 + 419,48619405 + 90,79534112 + 300 = 885,28153517
+    //   % sobre el precio = 885,28153517 / 30.000 = 2,950938 %
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('885,28 €');
+    const desglose = await descripcionTarjeta(page, 'Total gastos adicionales');
+    expect(desglose).toContain('2,95%');
+    expect(desglose).toContain('SIN el IPSI');
+    // Y el total no puede presentarse como completo mientras falte el impuesto indirecto.
+    const tituloTotal = await page.locator('h3', { hasText: /COSTE TOTAL/ }).first().innerText();
+    expect(tituloTotal).toMatch(/PARCIAL/i);
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('30.885,28 €');
+
+    // La modalidad vinculado/independiente no mueve nada aquí, y el aviso debe decirlo en vez
+    // de prometer el 21 % del art. 91.Uno.1.7º LIVA.
+    await page.getByRole('button', { name: /Independiente/ }).click();
+    expect(await valorTarjeta(page, 'IPSI')).toBe('No calculado');
+    await expect(page.locator('h3', { hasText: /^IVA/ })).toHaveCount(0);
+    await expect(page.getByText(/no cambia el impuesto en primera mano/)).toBeVisible();
+
+    // --- La contrapartida: en SEGUNDA mano sí hay impuesto que liquidar ---
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    // `elegirTipoITP` da por cumplidas las dos condiciones del reducido melillense
+    // («Inmueble situado en Melilla» y «Bonificación automática 50%»), que son de UBICACIÓN:
+    //   30.000 × 3 % = 900,00 — la mitad de los 1.800 € del tipo general del 6 %.
+    expect(await valorTarjeta(page, 'ITP (3,00%)')).toBe('900,00 €');
+    // El aviso de territorio sin IVA desaparece: en una transmisión por ITP no advierte nada.
+    await expect(page.getByText(/no se aplica el IVA/)).toHaveCount(0);
+    // Total = 900 + 419,48619405 + 90,79534112 + 300 = 1.710,28153517 → 5,700938 %
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1710,28 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('5,70%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('31.710,28 €');
+  });
+
+  /**
+   * CASO 13 (LÍMITE) — el precio de compra vacío o a cero en la pestaña del vendedor. Es el
+   * hallazgo 483 de la tanda 2 por su cara más peligrosa: un 0 € de IRPF anunciado en verde
+   * como «SIN CUOTA» se lee como una exención, cuando lo que pasa es que falta el dato con el
+   * que se calcula. Se comprueba además que el neto se rotula como TECHO y nombra las DOS
+   * cosas que le faltan, y que en cuanto llega el dato el cálculo aparece completo.
+   */
+  test('CASO 13 (límite) — sin precio de compra el IRPF no se calcula y el neto es un techo', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio del trastero', '15000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+
+    // Campo VACÍO: `parseSpanishNumber('')` es NaN y `precioC > 0` es falso, así que
+    // `irpfCalculado` es falso. Ni «SIN CUOTA» ni «0,00 €» ni «No definido» ni «NaN».
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('Sin calcular');
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toContain(
+      'NO está incluido en el neto',
+    );
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('SIN CALCULAR');
+    // Sin valor de adquisición no se pintan las tarjetas del art. 35 LIRPF.
+    await expect(page.locator('h3', { hasText: 'Valor de adquisición' })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: 'Ganancia patrimonial' })).toHaveCount(0);
+    await expect(page.getByText('No definido')).toHaveCount(0);
+    expect(await page.locator('body').innerText()).not.toContain('NaN');
+
+    // El neto SOLO lleva la comisión del 3 % que trae por defecto: 15.000 × 3 % = 450
+    //   total gastos = 0 (plusvalía sin calcular) + 450 + 0 + 0 (IRPF sin calcular) = 450
+    //   neto = 15.000 − 450 = 14.550
+    expect(await valorTarjeta(page, 'Comisión inmobiliaria (3%)')).toBe('450,00 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('450,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('14.550,00 €');
+    // …y tiene que decir que es un techo, nombrando las DOS cosas que faltan.
+    const neto = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
+    expect(neto).toContain('Techo');
+    expect(neto).toContain('plusvalía municipal');
+    expect(neto).toContain('IRPF');
+
+    // Un 0 escrito a mano es lo mismo que el campo vacío: sigue faltando el dato.
+    await rellenar(page, 'Precio de compra original', '0');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('Sin calcular');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('14.550,00 €');
+
+    // Y con el dato puesto, el cálculo aparece entero (art. 35 LIRPF):
+    //   valor de adquisición = 8.000 · valor de transmisión = 15.000 − 450 = 14.550
+    //   ganancia = 6.550 → 6.000 × 19 % + 550 × 21 % = 1.140 + 115,50 = 1.255,50
+    //   total gastos = 0 + 450 + 0 + 1.255,50 = 1.705,50 · neto = 15.000 − 1.705,50
+    await rellenar(page, 'Precio de compra original', '8000');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('8000,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('14.550,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('6550,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1255,50 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('1705,50 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('13.294,50 €');
+    // El neto sigue siendo techo, pero ya SOLO por la plusvalía.
+    const neto2 = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
+    expect(neto2).toContain('plusvalía municipal');
+    expect(neto2).not.toContain('IRPF');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// HALLAZGO ABIERTO — re-inspección del 30/08/2026.
+// Marcado con `test.fail()`: afirma lo que DEBERÍA pasar, así que hoy falla a propósito.
+// ═════════════════════════════════════════════════════════════════════════════
+
+// ⚠️ ABIERTO 30/08/2026 (medio) — dato.
+// La tarjeta «Tipos reducidos de ITP» del bloque educativo publica «y no el reducido del 0%
+// para jóvenes» en Galicia. Ese 0 % NO EXISTE: `ITP_CCAA.galicia` declara el reducido de
+// jóvenes al 3 % y `TIPOS_ITP_CCAA_2025` lo confirma (`{ ccaa: 'Galicia', reducido: 3 }`).
+// El defecto está en la derivación de `EJEMPLOS` (page.tsx):
+//     ITP_CCAA['galicia'].tiposReducidos.find(r => r.nombre.toLowerCase().includes('joven'))
+// El tipo se llama «Jóvenes < 36 años», y `'jóvenes'` NO contiene `'joven'` — la «ó» acentuada
+// rompe la subcadena—, así que `find` devuelve `undefined` y el `?? 0` de la línea siguiente
+// publica un cero en vez de fallar. `elegirTipoITP` esquiva la trampa con su helper
+// `normaliza()`, que descompone en NFD y quita los diacríticos antes de comparar; esta
+// derivación no lo usa. Es exactamente el efecto que la derivación venía a evitar: se escribió
+// el 21/08/2026 «para que el ejemplo no vuelva a envejecer solo», y lo que hace es publicar en
+// silencio una cifra que no está en ninguna tabla.
+// Caso: Galicia · segunda mano · perfil joven · 12.000 € → la app cobra «ITP (8,00%) 960,00 €»
+//       y su propio aviso «Podrías pagar menos» enumera «3,00% — Jóvenes < 36 años»; dos
+//       pantallas más abajo el ejemplo dice «no el reducido del 0% para jóvenes».
+//       Esperado «3%» · obtenido «0%», con la app contradiciéndose a sí misma.
+test('HALLAZGO 30/08 (dato) — el ejemplo de Galicia publica un reducido del 0 % que no existe', async ({
+  page,
+}) => {
+  test.fail(); // abierto: se retira esta línea al repararlo y queda como regresión
+  await page.goto(RUTA);
+  await selectCcaa(page).selectOption('galicia');
+  await rellenar(page, 'Precio del trastero', '12000');
+  await selectPerfil(page).selectOption('joven');
+  // Lo que la app SÍ hace bien: cobra el tipo general y ofrece el reducido real como
+  // oportunidad, con su cifra correcta.
+  expect(await valorTarjeta(page, 'ITP (8,00%)')).toBe('960,00 €');
+  expect(await texto(page.locator('[class*="avisoReducidos"]').first())).toContain('3,00%');
+
+  await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+  const ejemplo = await texto(
+    page.getByText(/Un joven de 30 años que compra un trastero en Galicia/),
+  );
+  expect(ejemplo).toContain('3%');
+  expect(ejemplo).not.toContain('0%');
 });

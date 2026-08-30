@@ -376,3 +376,364 @@ test.describe('Modo Retos en la página', () => {
     expect(fondo).not.toBe('rgba(0, 0, 0, 0)');
   });
 });
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 30/08/2026 — los tres casos del Inspector
+// ═══════════════════════════════════════════════════════════════════════════════
+/**
+ * La app se reparó el 23/08/2026 (tanda 3, hallazgos 135-140). Esta re-inspección
+ * vuelve a resolver todo A MANO con álgebra de Boole ANTES de abrir el navegador y
+ * compara; ningún valor de esta sección se ha copiado de la salida de la app.
+ *
+ * Orden de filas en todas las tablas: la primera variable es el bit MÁS significativo
+ * (con A y B: 00, 01, 10, 11), que es la invariante que comparten los cuatro modos.
+ *
+ * CASO 1 · NORMAL — la puerta XOR y sus cuatro combinaciones, exigida en los TRES
+ *   modos que la ofrecen, que deben coincidir entre sí.
+ * CASO 2 · COMPUESTO Y LÍMITE — expresiones de varias puertas encadenadas, el máximo
+ *   de 4 variables (16 filas), la puerta de una sola entrada y la precedencia.
+ * CASO 3 · RECHAZO Y DEGENERADO — lo que la app NO debe evaluar: debe decir cuál es
+ *   el problema en vez de pintar una columna de ceros (que es exactamente el defecto
+ *   del hallazgo 135) ni quedarse en blanco.
+ */
+
+const TABLA_VERDAD = 'table[class*="__truthTable"]';
+const BOTON_PUERTA = '[class*="__gateBtn"]';
+const AVISO_EXPRESION = '[class*="__expressionError"]';
+
+/** Símbolo con el que la app rotula cada puerta: «AND» a secas también casaría con NAND. */
+const SIMBOLO_DE: Record<string, string> = {
+  AND: '∧', OR: '∨', NOT: '¬', NAND: '⊼', NOR: '⊽', XOR: '⊕', XNOR: '⊙',
+};
+
+/** El banner global de transparencia es fijo y se solapa con los controles. */
+async function abrirSimulador(
+  page: import('@playwright/test').Page,
+  modo?: 'Circuitos' | 'Expresiones' | 'Retos',
+): Promise<void> {
+  await page.addInitScript(() => {
+    try { localStorage.setItem('meskeia_transparency_banner_dismissed', 'true'); } catch { /* modo privado */ }
+  });
+  await page.goto('/simulador-puertas-logicas/');
+  if (modo) await page.getByRole('button', { name: new RegExp(modo) }).first().click();
+}
+
+const cabeceraDe = (page: import('@playwright/test').Page): Promise<string[]> =>
+  page.locator(TABLA_VERDAD).first().locator('thead th').allInnerTexts();
+
+const filasDeTabla = (page: import('@playwright/test').Page): Promise<string[][]> =>
+  page.locator(TABLA_VERDAD).first().locator('tbody tr').evaluateAll((trs) =>
+    trs.map((tr) => [...tr.querySelectorAll('td')].map((td) => td.textContent?.trim() ?? '')));
+
+/** Columna de salida (la última) en 0/1, para poder leerla de un vistazo. */
+async function columnaSalida(page: import('@playwright/test').Page): Promise<number[]> {
+  return (await filasDeTabla(page)).map((f) => Number(f[f.length - 1]));
+}
+
+async function elegirPuerta(page: import('@playwright/test').Page, puerta: string): Promise<void> {
+  await page.locator(BOTON_PUERTA)
+    .filter({ hasText: new RegExp(`^${SIMBOLO_DE[puerta]}\\s*${puerta}$`) })
+    .click();
+}
+
+// ───────────────────────────────────────────────────────────────────────────────
+// CASO 1 · NORMAL — XOR, sus 4 combinaciones, en los tres modos que la ofrecen
+// ───────────────────────────────────────────────────────────────────────────────
+test.describe('RE-INSPECCIÓN · CASO 1 · la puerta XOR y sus cuatro combinaciones', () => {
+  /**
+   * XOR, de su definición: la salida es 1 cuando las entradas son DISTINTAS.
+   *   A=0 B=0 → iguales   → 0
+   *   A=0 B=1 → distintas → 1
+   *   A=1 B=0 → distintas → 1
+   *   A=1 B=1 → iguales   → 0
+   */
+  const XOR = [0, 1, 1, 0];
+  /** XNOR es su complemento exacto (1 cuando son IGUALES): 1-x fila a fila. */
+  const XNOR = [1, 0, 0, 1];
+
+  test('modo Tablas de Verdad: XOR da 0,1,1,0 y XNOR es su complemento', async ({ page }) => {
+    await abrirSimulador(page);
+
+    await elegirPuerta(page, 'XOR');
+    expect(await cabeceraDe(page)).toEqual(['A', 'B', 'Y']);
+    expect(await columnaSalida(page)).toEqual(XOR);
+
+    await elegirPuerta(page, 'XNOR');
+    expect(await columnaSalida(page)).toEqual(XNOR);
+    // Complementarias fila a fila, como afirma la FAQ de la propia app.
+    expect(XNOR).toEqual(XOR.map((v) => 1 - v));
+  });
+
+  test('modo Expresiones: «A XOR B» da la misma tabla que la puerta', async ({ page }) => {
+    await abrirSimulador(page, 'Expresiones');
+    const campo = page.getByLabel('Expresión Booleana');
+
+    await campo.fill('A XOR B');
+    expect(await cabeceraDe(page)).toEqual(['A', 'B', 'Y']);
+    expect(await columnaSalida(page)).toEqual(XOR);
+
+    await campo.fill('A XNOR B');
+    expect(await columnaSalida(page)).toEqual(XNOR);
+
+    // Y la palabra en minúscula es la misma palabra.
+    await campo.fill('a xor b');
+    expect(await columnaSalida(page)).toEqual(XOR);
+  });
+
+  test('modo Circuitos: la suma del Half Adder ES un XOR', async ({ page }) => {
+    await abrirSimulador(page, 'Circuitos');
+    await page.getByRole('button', { name: 'Half Adder (Semisumador)' }).click();
+
+    // S = A⊕B (columna 3) y C = A·B (columna 4). Sumar dos bits:
+    //   0+0 = 0 → S0 C0 · 0+1 = 1 → S1 C0 · 1+0 = 1 → S1 C0 · 1+1 = 2 → S0 C1
+    expect(await cabeceraDe(page)).toEqual(['A', 'B', 'S (Suma)', 'C (Acarreo)']);
+    expect(await filasDeTabla(page)).toEqual([
+      ['0', '0', '0', '0'],
+      ['0', '1', '1', '0'],
+      ['1', '0', '1', '0'],
+      ['1', '1', '0', '1'],
+    ]);
+    // La columna S, leída sola, es exactamente la tabla del XOR de arriba.
+    expect((await filasDeTabla(page)).map((f) => Number(f[2]))).toEqual(XOR);
+  });
+
+  test('las siete puertas del modo Tablas contra su definición', async ({ page }) => {
+    await abrirSimulador(page);
+    // Todas calculadas a mano desde el enunciado de cada puerta, filas 00,01,10,11.
+    const CANONICAS: [string, number[]][] = [
+      ['AND', [0, 0, 0, 1]],   // 1 solo si AMBAS son 1
+      ['OR', [0, 1, 1, 1]],    // 1 si al menos una es 1
+      ['NOT', [1, 0]],         // invierte (una sola entrada → 2 filas)
+      ['NAND', [1, 1, 1, 0]],  // AND negada
+      ['NOR', [1, 0, 0, 0]],   // OR negada
+      ['XOR', [0, 1, 1, 0]],   // 1 si son distintas
+      ['XNOR', [1, 0, 0, 1]],  // 1 si son iguales
+    ];
+    for (const [puerta, esperado] of CANONICAS) {
+      await elegirPuerta(page, puerta);
+      expect(await columnaSalida(page), `puerta ${puerta}`).toEqual(esperado);
+    }
+  });
+});
+
+// ───────────────────────────────────────────────────────────────────────────────
+// CASO 2 · COMPUESTO Y LÍMITE — varias puertas encadenadas y el máximo de variables
+// ───────────────────────────────────────────────────────────────────────────────
+test.describe('RE-INSPECCIÓN · CASO 2 · circuitos compuestos y límites', () => {
+  test('cuatro variables (el máximo) y tres puertas encadenadas', async ({ page }) => {
+    await abrirSimulador(page, 'Expresiones');
+
+    /**
+     * (A NAND B) XOR (C NOR D) — 16 filas, el tope que admite la app.
+     *
+     * A mano, por partes:
+     *   n = A NAND B = ¬(A·B) → (A,B)=00→1 · 01→1 · 10→1 · 11→0
+     *   m = C NOR  D = ¬(C+D) → (C,D)=00→1 · 01→0 · 10→0 · 11→0
+     *   Y = n ⊕ m (1 cuando n y m son distintos)
+     * Los tres primeros bloques de cuatro filas comparten n=1, así que Y = ¬m = 0,1,1,1.
+     * El último bloque (A=1,B=1) tiene n=0, así que Y = m = 1,0,0,0.
+     */
+    await page.getByLabel('Expresión Booleana').fill('(A NAND B) XOR (C NOR D)');
+    expect(await cabeceraDe(page)).toEqual(['A', 'B', 'C', 'D', 'Y']);
+    expect(await filasDeTabla(page)).toHaveLength(16); // 2⁴
+    expect(await columnaSalida(page)).toEqual([
+      0, 1, 1, 1, // A=0 B=0 → n=1
+      0, 1, 1, 1, // A=0 B=1 → n=1
+      0, 1, 1, 1, // A=1 B=0 → n=1
+      1, 0, 0, 0, // A=1 B=1 → n=0
+    ]);
+  });
+
+  test('la precedencia es NOT > AND/NAND > XOR/XNOR > OR/NOR', async ({ page }) => {
+    await abrirSimulador(page, 'Expresiones');
+    const campo = page.getByLabel('Expresión Booleana');
+
+    // NOT antes que NAND:  NOT A NAND B  =  ¬( (¬A)·B )
+    //   00: ¬A=1, B=0 → 1·0=0 → 1 · 01: 1·1=1 → 0 · 10: ¬A=0 → 0 → 1 · 11: 0 → 1
+    await campo.fill('NOT A NAND B');
+    expect(await columnaSalida(page)).toEqual([1, 0, 1, 1]);
+
+    // AND antes que XOR:  A XOR B AND C  =  A ⊕ (B·C)
+    //   000→0 · 001→0 · 010→0 · 011→0⊕1=1 · 100→1 · 101→1 · 110→1 · 111→1⊕1=0
+    await campo.fill('A XOR B AND C');
+    expect(await columnaSalida(page)).toEqual([0, 0, 0, 1, 1, 1, 1, 0]);
+
+    // OR y NOR al mismo nivel, por la izquierda:  A OR B NOR C  =  ¬((A+B)+C)
+    // Solo hay un 1: la fila 000, la única en la que no hay ningún uno que propagar.
+    await campo.fill('A OR B NOR C');
+    expect(await columnaSalida(page)).toEqual([1, 0, 0, 0, 0, 0, 0, 0]);
+
+    // Doble negación: NOT NOT A vuelve a A.
+    await campo.fill('NOT NOT A');
+    expect(await columnaSalida(page)).toEqual([0, 1]);
+  });
+
+  test('NAND no es asociativa, y la app lo demuestra con su propio evaluador', async ({ page }) => {
+    await abrirSimulador(page, 'Expresiones');
+    const campo = page.getByLabel('Expresión Booleana');
+
+    // El recuadro de errores frecuentes afirma que (A NAND B) NAND C ≠ A NAND (B NAND C).
+    // Las dos tablas, a mano:
+    //   izquierda  ¬(¬(A·B)·C) → 000:1 001:0 010:1 011:0 100:1 101:0 110:1 111:1
+    //   derecha    ¬(A·¬(B·C)) → 000:1 001:1 010:1 011:1 100:0 101:0 110:0 111:1
+    const IZQUIERDA = [1, 0, 1, 0, 1, 0, 1, 1];
+    const DERECHA = [1, 1, 1, 1, 0, 0, 0, 1];
+
+    await campo.fill('(A NAND B) NAND C');
+    expect(await columnaSalida(page)).toEqual(IZQUIERDA);
+
+    await campo.fill('A NAND (B NAND C)');
+    expect(await columnaSalida(page)).toEqual(DERECHA);
+
+    expect(IZQUIERDA).not.toEqual(DERECHA); // la afirmación del bloque educativo, comprobada
+
+    // Sin paréntesis la app agrupa por la izquierda, como cualquier parser de precedencia.
+    await campo.fill('A NAND B NAND C');
+    expect(await columnaSalida(page)).toEqual(IZQUIERDA);
+  });
+
+  test('caso frontera del Full Adder: 1+1+1 = «11» en binario', async ({ page }) => {
+    await abrirSimulador(page, 'Circuitos');
+    await page.getByRole('button', { name: 'Full Adder (Sumador Completo)' }).click();
+
+    const conmutadores = page.locator('[class*="__ioSwitch"]');
+    const leds = () => page.locator('[class*="__ioLed"]')
+      .evaluateAll((els) => els.map((e) => e.textContent?.match(/[01]/)?.[0]));
+
+    await expect(conmutadores).toHaveCount(3);
+    expect(await leds()).toEqual(['0', '0']); // 0+0+0 = 0 → S=0, Cout=0
+
+    for (let i = 0; i < 3; i++) await conmutadores.nth(i).click();
+    // 1+1+1 = 3, que en dos bits es «11»: suma 1 y acarreo 1.
+    expect(await leds()).toEqual(['1', '1']);
+    await expect(page.locator('tr[class*="__currentRow"]')).toHaveText('11111');
+  });
+
+  test('la puerta de una sola entrada tiene 2 filas y una sola columna de entrada', async ({ page }) => {
+    await abrirSimulador(page);
+
+    await elegirPuerta(page, 'NOT');
+    expect(await cabeceraDe(page)).toEqual(['A', 'Y']); // sin columna B
+    expect(await filasDeTabla(page)).toEqual([['0', '1'], ['1', '0']]);
+
+    // Y en el modo Expresiones, igual: una variable → 2 filas.
+    await page.getByRole('button', { name: /Expresiones/ }).first().click();
+    await page.getByLabel('Expresión Booleana').fill('NOT A');
+    expect(await cabeceraDe(page)).toEqual(['A', 'Y']);
+    expect(await columnaSalida(page)).toEqual([1, 0]);
+  });
+});
+
+// ───────────────────────────────────────────────────────────────────────────────
+// CASO 3 · RECHAZO — lo que la app NO debe evaluar
+// ───────────────────────────────────────────────────────────────────────────────
+test.describe('RE-INSPECCIÓN · CASO 3 · lo que debe rechazarse', () => {
+  test('cada expresión rota dice CUÁL es el problema y no pinta ninguna tabla', async ({ page }) => {
+    await abrirSimulador(page, 'Expresiones');
+    const campo = page.getByLabel('Expresión Booleana');
+
+    // El hallazgo 135 (21/08/2026) era justo lo contrario: el fallo se tragaba en un catch
+    // y salía una columna de ceros con pinta de resultado. Aquí se exige el mensaje.
+    const RECHAZOS: [string, string][] = [
+      ['A AND', 'La expresión termina antes de tiempo.'],
+      ['(A AND B', 'Falta cerrar un paréntesis.'],
+      ['A B', 'Falta un operador entre dos términos.'],
+      ['A AND E', '«E» no es una variable válida. Usa A, B, C o D.'],
+      ['A # B', 'No entiendo el carácter «#».'],
+      ['A AND B)', 'Hay un paréntesis que se cierra sin haberse abierto.'],
+      ['A AND AND B', 'Falta un operando antes de «AND».'],
+    ];
+
+    for (const [expresion, mensaje] of RECHAZOS) {
+      await campo.fill(expresion);
+      await expect(page.locator(AVISO_EXPRESION), expresion).toHaveText(mensaje);
+      // Y ninguna tabla: ni de ceros ni de nada.
+      await expect(page.locator(TABLA_VERDAD), expresion).toHaveCount(0);
+    }
+  });
+
+  test('el aviso es un role="alert" y desaparece al arreglar la expresión', async ({ page }) => {
+    await abrirSimulador(page, 'Expresiones');
+    const campo = page.getByLabel('Expresión Booleana');
+
+    await campo.fill('A AND E');
+    // Se filtra por la clase porque Next monta su propio role="alert" (el route announcer).
+    await expect(page.locator(AVISO_EXPRESION)).toHaveAttribute('role', 'alert');
+    await expect(page.locator(AVISO_EXPRESION)).toBeVisible();
+
+    await campo.fill('A AND B');
+    await expect(page.locator(AVISO_EXPRESION)).toHaveCount(0);
+    expect(await columnaSalida(page)).toEqual([0, 0, 0, 1]); // AND: 1 solo si ambas son 1
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS de la re-inspección — afirman lo correcto y HOY fallan
+// (test.fail: Playwright los da por buenos mientras fallen; cuando se reparen,
+//  hay que quitarles la marca y quedan como regresión.)
+// ═══════════════════════════════════════════════════════════════════════════════
+test.describe('RE-INSPECCIÓN · hallazgos abiertos', () => {
+  test.fail();
+
+  test('HALLAZGO A · «Sintaxis válida» omite NAND, NOR y XNOR, que el evaluador SÍ admite', async ({ page }) => {
+    await abrirSimulador(page, 'Expresiones');
+    const campo = page.getByLabel('Expresión Booleana');
+
+    // Las tres funcionan: comprobado a mano y en pantalla.
+    await campo.fill('A NAND B');
+    expect(await columnaSalida(page)).toEqual([1, 1, 1, 0]); // AND negada
+    await campo.fill('A NOR B');
+    expect(await columnaSalida(page)).toEqual([1, 0, 0, 0]); // OR negada
+    await campo.fill('A XNOR B');
+    expect(await columnaSalida(page)).toEqual([1, 0, 0, 1]); // 1 si son iguales
+
+    // Pero el panel que se titula «Sintaxis válida» —y que por su título se lee como una
+    // lista cerrada— solo nombra AND, OR, NOT y XOR. El <h1> promete las siete, el modo
+    // Tablas ofrece las siete, la comparativa educativa compara las siete y el JSON-LD
+    // anuncia «7 tipos de puertas lógicas»; la ayuda del modo Retos sí las lista todas.
+    const ayuda = page.locator('[class*="__syntaxHelp"]');
+    for (const operador of ['NAND', 'NOR', 'XNOR']) {
+      await expect(ayuda, `«Sintaxis válida» debería nombrar ${operador}`).toContainText(operador);
+    }
+  });
+
+  test('HALLAZGO B · los símbolos ⊼ ⊽ ⊙ que la app usa para rotular sus puertas no se admiten', async ({ page }) => {
+    await abrirSimulador(page, 'Expresiones');
+    const campo = page.getByLabel('Expresión Booleana');
+
+    // El modo Tablas rotula los botones «⊼ NAND», «⊽ NOR», «⊙ XNOR», y la comparativa
+    // educativa repite esos mismos símbolos. Copiarlos aquí devuelve «No entiendo el
+    // carácter «⊼»». El evaluador del modo Retos (motor-retos.ts) SÍ los acepta: dos
+    // parsers distintos en la misma app, con sintaxis distinta y sin decírselo al usuario.
+    await campo.fill('A ⊼ B');
+    expect(await columnaSalida(page)).toEqual([1, 1, 1, 0]);
+    await campo.fill('A ⊽ B');
+    expect(await columnaSalida(page)).toEqual([1, 0, 0, 0]);
+    await campo.fill('A ⊙ B');
+    expect(await columnaSalida(page)).toEqual([1, 0, 0, 1]);
+
+    // Lo mismo con la prima y el producto implícito, que la ayuda del modo Retos anuncia:
+    await campo.fill("A'");
+    expect(await columnaSalida(page)).toEqual([1, 0]);
+    await campo.fill('AB');
+    expect(await columnaSalida(page)).toEqual([0, 0, 0, 1]);
+  });
+
+  test('HALLAZGO C · una expresión sin variables no da tabla NI aviso: silencio', async ({ page }) => {
+    await abrirSimulador(page, 'Expresiones');
+    const campo = page.getByLabel('Expresión Booleana');
+
+    // page.tsx corta con `variables.length === 0` ANTES de llamar al evaluador, así que
+    // estas dos nunca llegan a él y la pantalla se queda en blanco sin explicar por qué.
+    //
+    // «NOT» a secas está tan rota como «A AND» —que sí avisa—, y el propio motor tiene
+    // el mensaje preparado («La expresión termina antes de tiempo»): no se le pregunta.
+    await campo.fill('NOT');
+    await expect(page.locator(AVISO_EXPRESION), '«NOT» debería avisar como lo hace «A AND»').toHaveCount(1);
+
+    // Y «1 AND 0» es una expresión VÁLIDA —el motor admite las constantes 0 y 1— cuyo
+    // resultado es simplemente Y = 0. No hay tabla que pintar, pero tampoco se dice nada.
+    await campo.fill('1 AND 0');
+    await expect(page.locator(AVISO_EXPRESION)).toHaveCount(1);
+  });
+});

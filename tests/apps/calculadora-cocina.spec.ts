@@ -1,12 +1,14 @@
 import { test, expect, Page } from '@playwright/test';
 
 /**
- * Inspector — calculadora-cocina (segmento cálculo, riesgo 2, 224 usos reales · vertical Coquinum)
+ * Inspector — calculadora-cocina (segmento cálculo, riesgo 2, 243 usos reales · vertical Coquinum)
  *
- * Primera inspección: 21/08/2026. La app promete en su <h1> «Calculadora de Cocina» y en su
- * subtítulo «Convierte unidades, escala recetas, consulta tiempos y encuentra sustitutos».
- * La metadata añade «convertir tazas a gramos, ml, onzas» y «escalar recetas según comensales».
- * Hay, por tanto, verdad comprobable: las dos primeras pestañas calculan.
+ * Primera inspección: 21/08/2026 (hallazgos 141-144). RE-INSPECCIÓN: 30/08/2026.
+ *
+ * La app promete en su <h1> «Calculadora de Cocina» y en su subtítulo «Convierte unidades,
+ * escala recetas, consulta tiempos y encuentra sustitutos». La metadata añade «convertir tazas
+ * a gramos, ml, onzas» y «escalar recetas según comensales». Hay, por tanto, verdad
+ * comprobable: las dos primeras pestañas calculan.
  *
  * DÓNDE VIVE EL CÁLCULO
  *   app/calculadora-cocina/page.tsx
@@ -14,8 +16,11 @@ import { test, expect, Page } from '@playwright/test';
  *     · densidadesIngredientes  ← g/ml de cada ingrediente, para el cruce peso↔volumen
  *     · convertirUnidades()     ← misma categoría: (cantidad × factorOrigen) / factorDestino
  *                                 volumen→peso: ml × densidad · peso→volumen: g ÷ densidad
- *     · escalarReceta()         ← factor = deseadas / originales, aplicado línea a línea con
- *                                 la regex /^([\d.,]+)\s*(.+)$/
+ *     · escalarReceta()         ← factor = deseadas / originales, aplicado línea a línea:
+ *                                 primero las fracciones («1 1/2 taza», «1/2 cebolla»),
+ *                                 luego /^([\d.,]+)\s*(.+)$/
+ *     · formatearCantidad()     ← entero exacto · fracción de cocina bajo TOPE_FRACCIONES (20)
+ *                                 · decimal con una cifra en lo demás
  *   lib/formatters.ts           ← parseSpanishNumber (entrada) y formatNumber (salida en es-ES)
  *
  * LA TABLA QUE PUBLICA LA PROPIA APP (manda sobre cualquier memoria):
@@ -23,46 +28,57 @@ import { test, expect, Page } from '@playwright/test';
  *   1 oz = 28,3495 g · 1 lb = 453,592 g · 1 fl oz = 29,5735 ml
  *   densidades (g/ml): agua 1 · leche 1,03 · aceite 0,92 · harina 0,53 · azúcar 0,85 ·
  *                      azúcar glass 0,48 · sal 1,2 · arroz 0,75 · miel 1,42 ·
- *                      mantequilla 0,946 · cacao 0,52 · avena 0,4
+ *                      mantequilla 0,946 · cacao 0,35 · avena 0,4
+ *   (el cacao era 0,52 —valor COMPACTADO— hasta el hallazgo 144; hoy 0,35 = 84 g/taza)
  *
- * LOS TRES CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
+ * ⚠️ es-ES NO agrupa los números de cuatro cifras (minimumGroupingDigits = 2): 5000 se
+ * escribe «5000» y 10000 se escribe «10.000». Los valores esperados de abajo lo respetan;
+ * no es un defecto de formato.
  *
- *   CASO 1 (normal) — 2 tazas de harina a gramos
- *       2 tazas × 240 ml/taza = 480 ml
- *       480 ml × 0,53 g/ml    = 254,4 g          → «254,40 Gramos (g)»
- *     Contraste de la densidad con fuente estándar: 0,53 g/ml × 240 ml = 127,20 g por taza,
- *     dentro de los 120–130 g que citan King Arthur Baking y la propia FAQ de la app. VÁLIDA.
- *     Y dos conversiones de la misma categoría, que no dependen de densidad:
- *       1 lb  → 1 × 453,592 / 1  = 453,592 g     → «453,59 Gramos (g)»
- *       10 oz → 10 × 28,3495 / 1 = 283,495 g     → «283,50 Gramos (g)»
- *     Y la vuelta atrás (peso→volumen), que divide en vez de multiplicar:
- *       500 g de harina → 500 / 0,53 = 943,396 ml ; 943,396 / 240 = 3,9308 tazas → «3,93 Tazas (cup)»
+ * ══ LOS TRES CASOS DE LA RE-INSPECCIÓN, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR ══
  *
- *   CASO 2 (límite) — el cero, el negativo y el salto al separador de millar
- *       0 y −5 no tienen sentido físico como cantidad: deben rechazarse, no dar 0,00 ni un negativo.
- *       1.000 tazas de harina (mil, en formato español) = 1000 × 240 × 0,53 = 127.200 g
- *         → «127.200,00 Gramos (g)», con punto de millar y coma decimal.
- *         Ojo: el eco de la entrada sale «1000,00» sin punto, y ES CORRECTO — es-ES no agrupa
- *         los números de cuatro cifras (minimumGroupingDigits = 2). Por eso el caso mira el
- *         resultado, de seis cifras, donde el separador de millar sí tiene que aparecer.
+ *   CASO 1 (normal) — conversión directa de unidades comunes
+ *       3 cucharaditas → cucharadas : (3 × 5) / 15   = 1        → «1,00 Cucharadas (tbsp)»
+ *         Contraste externo: la FAQ de la propia app y el estándar culinario internacional
+ *         dan 1 tbsp = 3 tsp. Cuadra.
+ *       1 taza → cucharadas         : (1 × 240) / 15 = 16       → «16,00 Cucharadas (tbsp)»
+ *         Contraste: la tabla comparativa de la propia app dice «16 cucharadas = 1 cup».
+ *       250 ml → fl oz              : 250 / 29,5735  = 8,4535   → «8,45 Onzas líquidas (fl oz)»
+ *       1 taza de cacao → g         : 240 ml × 0,35  = 84       → «84,00 Gramos (g)»
+ *         Contraste: King Arthur Baking da 1/2 taza de cacao = 42 g, o sea 84 g por taza.
+ *       2 cucharadas de aceite → g  : 30 ml × 0,92   = 27,6     → «27,60 Gramos (g)»
+ *         Contraste: la propia app dice «1 tbsp de aceite = 14 g»; 27,6 / 2 = 13,8. Cuadra.
  *
- *   CASO 3 (rechazo) — texto y vacío
- *       «abc» y «» → parseSpanishNumber devuelve NaN → mensaje de aviso.
+ *   CASO 2 (límite) — escalado a un número de comensales muy alto y muy bajo
+ *       Receta por defecto: 200g harina / 100g azúcar / 2 huevos / 150ml leche
+ *       4 → 200 porciones, factor 50:
+ *         200 × 50 = 10.000 g · 100 × 50 = 5000 g · 2 × 50 = 100 · 150 × 50 = 7500 ml
+ *       4 → 1 porción, factor 0,25:
+ *         200 × 0,25 = 50 g · 100 × 0,25 = 25 g · 2 × 0,25 = 0,5 → «1/2» (bajo TOPE_FRACCIONES)
+ *         150 × 0,25 = 37,5 → «37,5» (por encima del tope, decimal con coma)
+ *
+ *   CASO 3 (rechazo) — lo que no debe calcularse
+ *       Porciones originales 0 → división por cero: hay que rechazar, no dar ∞ ni «No definido».
+ *       Porciones deseadas −3 y porciones «abc» → rechazo.
+ *       Cantidad −2 en el conversor, «2 tazas» (número con letras) y «1.2.3» → rechazo.
  *       Lo que NO debe aparecer nunca: «NaN», «Infinity», «undefined» ni «No definido».
  *
- *   ESCALADOR, resuelto a mano con la receta que trae por defecto (200g harina / 100g azúcar /
- *   2 huevos / 150ml leche):
- *       4 → 6 porciones, factor 1,5 : 300 g harina · 150 g azúcar · 3 huevos · 225 ml leche
- *       4 → 5 porciones, factor 1,25: 250 g harina · 125 g azúcar · 2,5 huevos · 187,5 ml leche
- *         (2 × 1,25 = 2,5 → sale con COMA decimal, no con punto)
- *       4 → 0 porciones: rechazo, sin división por cero ni factor 0.
+ * HALLAZGOS ABIERTOS, escritos como TESTIGO (documentan lo que la app hace HOY; si se
+ * reparan, estos bloques fallarán y habrá que invertirlos). NO se corrigen desde el test:
+ *   A. El escalador destroza los RANGOS: «2-3 dientes de ajo» ×2 devuelve «4 -3 dientes de
+ *      ajo». Misma familia que el hallazgo 143 (fracciones), ya reparado, con otra sintaxis.
+ *   B. Las fracciones UNICODE («½ cebolla») se devuelven SIN escalar y sin aviso. La ASCII
+ *      («1/2 cebolla») sí se escala desde el hallazgo 143.
+ *   C. El bloque educativo se contradice con el motor: el escenario «Persona con dieta» dice
+ *      «30 g de avena ≈ 3/4 cup», y el conversor de la misma página devuelve 0,31 tazas.
+ *   D. La tarjeta «Medidas sin báscula» da valores COLMADOS que el motor no reproduce:
+ *      1 vaso de 200 ml = «180 g de arroz» (motor: 150 g) y «180 g de azúcar» (motor: 170 g);
+ *      1 cuchara sopera = «10 g de harina» (motor: 7,95 g).
  *
- * HALLAZGOS CONOCIDOS (se documentan aquí como testigo, NO se corrigen desde el test):
- *   1. Las cantidades en fracción se rompen: «1/2 cebolla» × 2 devuelve «2 /2 cebolla», porque la
- *      regex solo captura el numerador y deja «/2» dentro del resto de la línea.
- *   2. Ningún <button> lleva type="button" y las cuatro pestañas no exponen aria-pressed ni
- *      role="tab"+aria-selected: el estado activo viaja solo por la clase CSS.
- *   Si algún día se arreglan, los dos bloques marcados TESTIGO fallarán y habrá que invertirlos.
+ * REPARACIONES YA VERIFICADAS (hallazgos 141-144, primera inspección):
+ *   · Las cuatro pestañas llevan type="button" y aria-pressed.
+ *   · «1/2 cebolla» ×2 = «1 cebolla» (antes «2 /2 cebolla»).
+ *   · Cacao a 0,35 g/ml = 84 g por taza (antes 0,52 = 124,80 g, valor compactado).
  */
 
 const RUTA = '/calculadora-cocina/';
@@ -168,6 +184,110 @@ test.describe('Conversor de unidades — lo que promete el <h1>', () => {
   });
 });
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 30/08/2026 — los tres casos nuevos, resueltos a mano en la cabecera
+// ═══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Re-inspección 30/08/2026 — los tres casos', () => {
+  test('CASO 1 (normal) · conversión directa entre unidades comunes de cocina', async ({ page }) => {
+    await page.goto(RUTA);
+
+    // 3 cucharaditas = (3 × 5 ml) / 15 ml = 1 cucharada.
+    // La FAQ de la propia app: «1 cucharada = 15 ml = 3 cucharaditas».
+    expect(await convertir(page, '3', 'cucharaditas', 'cucharadas')).toContain(
+      '3,00 Cucharaditas (tsp) = 1,00 Cucharadas (tbsp)',
+    );
+
+    // 1 taza = (1 × 240 ml) / 15 ml = 16 cucharadas.
+    // La tabla comparativa de la propia app: «16 cucharadas = 1 cup».
+    expect(await convertir(page, '1', 'tazas', 'cucharadas')).toContain(
+      '1,00 Tazas (cup) = 16,00 Cucharadas (tbsp)',
+    );
+
+    // 250 ml ÷ 29,5735 ml/fl oz = 8,4535 → 8,45 a dos decimales.
+    expect(await convertir(page, '250', 'mililitros', 'onzas-liquidas')).toContain(
+      '250,00 Mililitros (ml) = 8,45 Onzas líquidas (fl oz)',
+    );
+
+    // Volumen→peso con densidad. 1 taza de cacao = 240 ml × 0,35 g/ml = 84 g.
+    // Referencia externa: King Arthur Baking, 1/2 taza de cacao = 42 g → 84 g por taza.
+    // (Es el valor que dejó la reparación del hallazgo 144; con el 0,52 previo salían 124,80 g.)
+    expect(await convertir(page, '1', 'tazas', 'gramos', 'cacao')).toContain(
+      '1,00 Tazas (cup) de cacao = 84,00 Gramos (g)',
+    );
+
+    // 2 cucharadas de aceite = 30 ml × 0,92 g/ml = 27,6 g.
+    // La propia app afirma «1 tbsp de aceite de oliva = 14 g»; 27,6 ÷ 2 = 13,8. Coherente.
+    expect(await convertir(page, '2', 'cucharadas', 'gramos', 'aceite')).toContain(
+      '2,00 Cucharadas (tbsp) de aceite = 27,60 Gramos (g)',
+    );
+  });
+
+  test('CASO 2 (límite) · escalado a 200 comensales y a 1 comensal', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: 'Escalador' }).click();
+
+    // Receta por defecto, 4 → 200 porciones. Factor 50.
+    // 200 × 50 = 10.000 · 100 × 50 = 5000 · 2 × 50 = 100 · 150 × 50 = 7500
+    // es-ES no agrupa cuatro cifras: 5000 y 7500 van SIN punto; 10.000, CON punto.
+    const alto = await escalar(page, '4', '200');
+    expect(alto).toContain('10.000 g harina');
+    expect(alto).toContain('5000 g azúcar');
+    expect(alto).toContain('100 huevos');
+    expect(alto).toContain('7500 ml leche');
+    expect(alto).not.toContain('10000 g'); // el millar de seis cifras sí se separa
+
+    // El otro extremo: 4 → 1 porción. Factor 0,25.
+    // 200 × 0,25 = 50 · 100 × 0,25 = 25 · 2 × 0,25 = 0,5 → «1/2» (bajo TOPE_FRACCIONES = 20)
+    // 150 × 0,25 = 37,5 → por encima del tope, decimal con COMA
+    const bajo = await escalar(page, '4', '1');
+    expect(bajo).toContain('50 g harina');
+    expect(bajo).toContain('25 g azúcar');
+    expect(bajo).toContain('1/2 huevos');
+    expect(bajo).toContain('37,5 ml leche');
+    expect(bajo).not.toContain('0,5 huevos'); // una receta escribe «1/2», no «0,5»
+    expect(bajo).not.toContain('37.5'); // punto decimal = formato US, prohibido
+  });
+
+  test('CASO 3 (rechazo) · cero comensales, negativos y cantidades no numéricas', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: 'Escalador' }).click();
+
+    // Porciones ORIGINALES a cero: es el divisor del factor. Sin guarda daría ∞.
+    expect(await escalar(page, '0', '8', '200g harina')).toContain(
+      'Introduce valores válidos para las porciones',
+    );
+    // Porciones deseadas negativas: no existe media receta negativa.
+    expect(await escalar(page, '4', '-3', '200g harina')).toContain(
+      'Introduce valores válidos para las porciones',
+    );
+    // Porciones no numéricas.
+    expect(await escalar(page, 'abc', '8', '200g harina')).toContain(
+      'Introduce valores válidos para las porciones',
+    );
+
+    await page.getByRole('button', { name: 'Conversor' }).click();
+    // Cantidad negativa en el conversor.
+    expect(await convertir(page, '-2', 'tazas', 'gramos', 'harina')).toContain(
+      'Introduce una cantidad válida',
+    );
+    // Número con letras pegadas: parseSpanishNumber devuelve NaN desde el 24/08/2026
+    // (antes parseFloat se quedaba con el prefijo y «2 tazas» habría valido 2).
+    expect(await convertir(page, '2 tazas', 'tazas', 'gramos', 'harina')).toContain(
+      'Introduce una cantidad válida',
+    );
+    // Dos separadores decimales: tampoco es un número.
+    expect(await convertir(page, '1.2.3', 'tazas', 'gramos', 'harina')).toContain(
+      'Introduce una cantidad válida',
+    );
+
+    const cuerpo = await page.locator('body').innerText();
+    expect(cuerpo).not.toMatch(/NaN|Infinity|undefined|No definido/);
+  });
+});
+
 test.describe('Escalador de recetas', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(RUTA);
@@ -209,18 +329,86 @@ test.describe('Escalador de recetas', () => {
     );
   });
 
-  test('TESTIGO · líneas sin número intactas, decimal español bien, fracción rota', async ({
-    page,
-  }) => {
+  test('la fracción ASCII se escala entera (hallazgo 143, REPARADO)', async ({ page }) => {
     const texto = await escalar(page, '4', '8', '1/2 cebolla\n1,5 tazas harina\nSal al gusto');
-    // Bien: la línea sin cantidad se devuelve tal cual y el decimal con coma se escala
+    // La línea sin cantidad se devuelve tal cual y el decimal con coma se escala
     expect(texto).toContain('Sal al gusto');
     expect(texto).toContain('3 tazas harina'); // 1,5 × 2 = 3
-    // HALLAZGO ABIERTO: lo esperado sería «1 cebolla» (media cebolla × 2). La regex captura solo
-    // el «1» y arrastra el «/2» al resto de la línea. Si se arregla, este expect fallará.
-    // REPARADO (hallazgo 143): la fracción se escala entera. «1/2» ×2 = «1», no «2 /2».
+    // Antes del hallazgo 143 salía «2 /2 cebolla»: la regex capturaba solo el numerador.
     expect(texto).toContain('1 cebolla');
     expect(texto).not.toContain('2 /2');
+    // Mixto: «1 1/2 taza» × 2 = 3 tazas
+    expect(await escalar(page, '4', '8', '1 1/2 taza harina')).toContain('3 taza harina');
+  });
+
+  test('TESTIGO A · los RANGOS de una receta se destrozan al escalar', async ({ page }) => {
+    // «2-3 dientes de ajo» es sintaxis corriente en receta española. La regex
+    // /^([\d.,]+)\s*(.+)$/ captura solo el «2» y arrastra el «-3» al resto de la línea.
+    // HALLAZGO ABIERTO: lo esperable sería «4-6 dientes de ajo». Si se repara, esto fallará.
+    const texto = await escalar(page, '4', '8', '2-3 dientes de ajo');
+    expect(texto).toContain('4 -3 dientes de ajo');
+  });
+
+  test('TESTIGO B · la fracción UNICODE no se escala, y no avisa', async ({ page }) => {
+    // «½ cebolla» no empieza por dígito, así que cae en el `return linea` de reserva y vuelve
+    // idéntica. Es el mismo fallback que deja intacto «Sal al gusto», pero aquí SÍ había una
+    // cantidad que escalar, y el usuario no tiene forma de notar que esa línea se quedó atrás.
+    // HALLAZGO ABIERTO: lo esperable sería «1 cebolla». Si se repara, esto fallará.
+    const texto = await escalar(page, '4', '8', '½ cebolla');
+    expect(texto).toContain('½ cebolla');
+    expect(texto).not.toContain('1 cebolla');
+  });
+
+  test('TESTIGO · bajo el tope, gramos y mililitros salen en fracción', async ({ page }) => {
+    // 4 → 0,5 porciones, factor 0,125: 100 × 0,125 = 12,5 g y 150 × 0,125 = 18,75 ml.
+    // Como ambos quedan por debajo de TOPE_FRACCIONES (20), formatearCantidad los escribe
+    // «12 1/2 g» y «18 3/4 ml». El propio comentario del código dice que «187 1/2 ml no lo
+    // escribe nadie»; el tope usa la MAGNITUD como sustituto de «unidad que se cuenta»,
+    // y por debajo de 20 el sustituto falla igual con gramos y mililitros.
+    const texto = await escalar(page, '4', '0,5');
+    expect(texto).toContain('1/4 huevos'); // esto sí es lo que se quería: 2 × 0,125 = 1/4
+    expect(texto).toContain('12 1/2 g azúcar'); // HALLAZGO ABIERTO: se esperaría «12,5 g»
+    expect(texto).toContain('18 3/4 ml leche'); // HALLAZGO ABIERTO: se esperaría «18,8 ml»
+  });
+});
+
+test.describe('El bloque educativo frente al motor de la misma página', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+  });
+
+  test('TESTIGO C · «30 g de avena ≈ 3/4 cup» contradice al conversor', async ({ page }) => {
+    // Motor: 30 g ÷ 0,4 g/ml = 75 ml ; 75 ÷ 240 = 0,3125 tazas → «0,31 Tazas (cup)».
+    // Referencia externa: King Arthur Baking, 1 taza de copos de avena = 89 g → 30 g ≈ 1/3 cup.
+    // Las dos coinciden entre sí y contradicen al texto educativo, que dice 3/4 cup (≈ 2,4×).
+    expect(await convertir(page, '30', 'gramos', 'tazas', 'avena')).toContain(
+      '30,00 Gramos (g) de avena = 0,31 Tazas (cup)',
+    );
+    // El <EducationalSection> monta siempre su contenido pero lo oculta por CSS, así que hay
+    // que desplegarlo para que innerText lo vea. Su botón toma el nombre del aria-label.
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    // HALLAZGO ABIERTO: el escenario «Persona con dieta que ajusta cantidades» sigue diciendo
+    // 3/4 cup. Cuando se corrija a 1/3, este expect fallará.
+    await expect(page.getByText(/30 g de avena en tazas \(≈ 3\/4 cup\)/)).toBeVisible();
+  });
+
+  test('TESTIGO D · las «medidas sin báscula» no las reproduce el motor', async ({ page }) => {
+    // La tarjeta «Con un vaso de agua (200ml)» declara arroz 180 g y azúcar 180 g;
+    // la de «Con una cuchara sopera», harina 10 g. Son valores COLMADOS, y la tarjeta
+    // «La cuchara rasa, no colmada» de más abajo dice justo lo contrario.
+    // 200 ml × 0,75 = 150 g de arroz  (el 180 g declarado implicaría 0,90 g/ml)
+    expect(await convertir(page, '200', 'mililitros', 'gramos', 'arroz')).toContain(
+      '= 150,00 Gramos (g)',
+    );
+    // 200 ml × 0,85 = 170 g de azúcar (el 180 g declarado implicaría 0,90 g/ml)
+    expect(await convertir(page, '200', 'mililitros', 'gramos', 'azucar')).toContain(
+      '= 170,00 Gramos (g)',
+    );
+    // 15 ml × 0,53 = 7,95 g de harina (el 10 g declarado implicaría 0,67 g/ml).
+    // King Arthur da 1 tbsp de harina = 8 g, o sea que el motor acierta y la tarjeta no.
+    expect(await convertir(page, '15', 'mililitros', 'gramos', 'harina')).toContain(
+      '= 7,95 Gramos (g)',
+    );
   });
 });
 
@@ -259,8 +447,8 @@ test.describe('Estructura y accesibilidad', () => {
     await page.goto(RUTA);
     for (const nombre of ['Conversor', 'Escalador', 'Tiempos', 'Sustitutos']) {
       const boton = page.getByRole('button', { name: nombre, exact: true });
-      // HALLAZGO ABIERTO: sin aria-pressed ni role="tab"+aria-selected, y sin type="button"
-      // (regla obligatoria del proyecto). Cuando se corrija, hay que invertir estos dos expect.
+      // Antes de la reparación no había ni aria-pressed ni type="button": el estado activo
+      // viajaba solo por la clase CSS.
       expect(await boton.getAttribute('aria-pressed')).not.toBeNull();
       expect(await boton.getAttribute('type')).toBe('button');
     }
