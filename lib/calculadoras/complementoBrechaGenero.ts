@@ -50,6 +50,7 @@ import {
   COMPLEMENTO_BRECHA_GENERO_2026,
   COMPLEMENTO_BRECHA_GENERO_META,
 } from '@/data/fiscal';
+import { formatFechaLarga } from '@/lib/formatters';
 
 /**
  * La exclusión del art. 60.4 LGSS, leída del módulo fiscal y no tecleada aquí: es un dato
@@ -58,6 +59,9 @@ import {
 const EXCLUSION_JUBILACION_PARCIAL = COMPLEMENTO_BRECHA_GENERO_2026.exclusiones.find(
   e => e.supuesto === 'jubilacion_parcial',
 )!;
+
+/** Fecha mínima del hecho causante, leída del módulo fiscal (hallazgo 504) */
+export const FECHA_MINIMA_HECHO_CAUSANTE = formatFechaLarga(COMPLEMENTO_BRECHA_GENERO_2026.fechaMinimaHechoCausante);
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
@@ -186,11 +190,21 @@ export function calcularComplementoBrechaGenero(
       [COMPLEMENTO_BRECHA_GENERO_META.nota],
     );
   }
+  // Red de seguridad: las tres exclusiones de arriba cubren los tres valores de TipoPensionBG
+  // que NO están en `pensionesElegibles` (hallazgo 504 — el dato no tenía consumidor). Si
+  // algún día se añade un tipo de pensión nuevo sin darle su propia rama, esta comprobación
+  // deniega con explicación en vez de conceder el complemento por defecto.
+  if (!(COMPLEMENTO_BRECHA_GENERO_2026.pensionesElegibles as readonly string[]).includes(p.tipoPension)) {
+    return noProcede(
+      `El complemento solo se reconoce sobre pensiones de ${COMPLEMENTO_BRECHA_GENERO_2026.pensionesElegibles.join(', ')}.`,
+      'Consulta con el INSS si tu modalidad de pensión da acceso a este complemento.',
+    );
+  }
 
   // Caso 2: hecho causante anterior al 04-feb-2021
   if (fecha === 'antes_2021') {
     return noProcede(
-      'La pensión se causó antes del 4 de febrero de 2021, fecha de entrada en vigor del complemento por brecha de género (RDL 3/2021). Para hechos causantes anteriores se aplicaba el antiguo complemento de maternidad, con reglas distintas.',
+      `La pensión se causó antes del ${FECHA_MINIMA_HECHO_CAUSANTE}, fecha de entrada en vigor del complemento por brecha de género (RDL 3/2021). Para hechos causantes anteriores se aplicaba el antiguo complemento de maternidad, con reglas distintas.`,
       'Si entonces percibías o se te denegó el antiguo complemento de maternidad, consulta a un profesional: la doctrina TJUE 2019 (caso WA) también afectó a aquel régimen.',
     );
   }

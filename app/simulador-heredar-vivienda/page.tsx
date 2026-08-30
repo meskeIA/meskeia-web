@@ -90,16 +90,21 @@ interface ResultadoIRPF {
  * Separar cónyuge de hijo arregla las dos cosas a la vez.
  */
 /**
-  * Las comunidades cuya bonificación al Grupo II es un porcentaje FIJO de al menos el 99 %,
-  * leídas de `BONIFICACIONES_CCAA_IS`. La tarjeta educativa las listaba a mano y contaba una
-  * versión que el motor de la misma página no calcula (hallazgo 465): metía a Castilla-La
-  * Mancha, que no tiene porcentaje fijo sino un escalonado que cae al 80 % por encima de
-  * 300.000 € de base —ahí la cuota no es «casi cero», son 8.416,51 €—, ponía a Cantabria y
-  * Aragón como «99 %» cuando lo suyo es una exención por tramos, y dejaba fuera a Canarias,
-  * que es la más generosa del régimen común. Derivada, la lista no puede volver a mentir.
+  * Las comunidades de RÉGIMEN COMÚN cuya bonificación al Grupo II es un porcentaje FIJO de al
+  * menos el 99 %, leídas de `BONIFICACIONES_CCAA_IS`. La tarjeta educativa las listaba a mano y
+  * contaba una versión que el motor de la misma página no calcula (hallazgo 465): metía a
+  * Castilla-La Mancha, que no tiene porcentaje fijo sino un escalonado que cae al 80 % por
+  * encima de 300.000 € de base —ahí la cuota no es «casi cero», son 8.416,51 €—, ponía a
+  * Cantabria como «99 %» cuando lo suyo es una exención por tramos (100 % hasta 100.000 €, 99 %
+  * a partir de ahí), y dejaba fuera a Canarias, que es la más generosa del régimen común.
+  *
+  * El filtro por `regimen !== 'foral'` es del hallazgo 502: sin él, entraba también País Vasco
+  * (0,99 fijo), cuyas propias notas piden consulta obligatoria a la Hacienda Foral — la frase
+  * que acompaña esta lista habla del régimen común, y meter ahí una comunidad foral la
+  * contradecía. Derivada, la lista no puede volver a mentir.
   */
 const CCAA_BONIFICACION_CASI_TOTAL = Object.values(BONIFICACIONES_CCAA_IS)
-  .filter((c) => typeof c.bonificaciones['II']?.porcentaje === 'number' && (c.bonificaciones['II'].porcentaje as number) >= 0.99)
+  .filter((c) => c.regimen !== 'foral' && typeof c.bonificaciones['II']?.porcentaje === 'number' && (c.bonificaciones['II'].porcentaje as number) >= 0.99)
   .map((c) => c.nombre);
 
 const PARENTESCOS: Array<{ id: Parentesco; label: string; grupo: string; reducKey: GrupoParentescoIS }> = [
@@ -1117,11 +1122,14 @@ export default function SimuladorHeredarViviendaPage() {
             <p>
               Reducción de parentesco ({formatCurrency(REDUCCIONES_PARENTESCO_IS['II'] ?? 0)}) + reducción
               vivienda habitual del 95% (hasta {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)}). En las
-              comunidades que bonifican la cuota al 99% o más ({CCAA_BONIFICACION_CASI_TOTAL.join(', ')})
-              el ISD se queda en casi nada. Ojo con las que bonifican <strong>por tramos</strong>:
-              Castilla-La Mancha empieza en el 100% pero baja al 80% por encima de 300.000 € de base
-              liquidable, y Cantabria y Aragón funcionan con una exención hasta cierto importe, no con
-              un porcentaje plano. Cambia la comunidad en el selector de arriba y el cálculo lo dice.
+              comunidades de régimen común que bonifican la cuota al 99% o más
+              ({CCAA_BONIFICACION_CASI_TOTAL.join(', ')}) el ISD se queda en casi nada — Aragón, eso sí,
+              deja de bonificar del todo por encima de 3.000.000 € de base liquidable. Ojo con las que
+              bonifican <strong>por tramos</strong>: Castilla-La Mancha empieza en el 100% pero baja al
+              80% por encima de 300.000 € de base liquidable, y Cantabria baja del 100% al 99% a partir
+              de 100.000 €. País Vasco bonifica también cerca del 99%, pero es régimen foral: la cifra
+              real depende de la Hacienda Foral correspondiente (Álava, Bizkaia o Gipuzkoa) y exige
+              consulta obligatoria. Cambia la comunidad en el selector de arriba y el cálculo lo dice.
               En cualquier caso quedan la plusvalía municipal y, si vende, el IRPF.
             </p>
           </div>

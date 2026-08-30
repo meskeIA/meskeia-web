@@ -38,6 +38,13 @@ export interface HerederoInput {
   patrimonioIdx?: IndicePatrimonioIS;
   /** Valor de la vivienda habitual incluida en su parte (€) para reducción 95% */
   viviendaHabitual?: number;
+  /**
+   * ¿Convivió con el causante los 2 años anteriores? Solo importa si `grupo` es 'III'
+   * (colateral): el art. 20.2.c LISD exige además tener 65 años o más (`edadHeredero`).
+   * Sin este dato el motor deniega la reducción por defecto (hallazgo 501: hasta esta
+   * reparación, faltaba en este consumidor igual que en la Action de ChatGPT).
+   */
+  convivenciaDosAnios?: boolean;
 }
 
 export interface ResultadoHeredero {
@@ -118,6 +125,7 @@ export function calcularHerenciaConjunta(
         discapacidad: h.discapacidad,
         patrimonioIdx: h.patrimonioIdx,
         viviendaHabitual: h.viviendaHabitual,
+        convivenciaDosAnios: h.convivenciaDosAnios,
       });
     } catch {
       resultado = null;

@@ -1223,25 +1223,21 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
   });
 
   /**
-   * ⚠️ HALLAZGO ABIERTO (28/08/2026) — la tarjeta educativa se contradice a sí misma en dos
-   * frases seguidas, y el test de regresión que la vigila no puede verlo.
+   * Hallazgo 502 — reparado. Dos defectos distintos en la misma tarjeta:
    *
-   * `CCAA_BONIFICACION_CASI_TOTAL` filtra `bonificaciones['II'].porcentaje >= 0.99`. Aragón
-   * lo declara como `{ porcentaje: 1.00, limite: 3000000 }`, así que ENTRA en la lista de
-   * «las comunidades que bonifican la cuota al 99% o más», y la frase siguiente de la misma
-   * tarjeta dice que «Cantabria y Aragón funcionan con una exención hasta cierto importe, no
-   * con un porcentaje plano». El comentario que justifica la derivación en `page.tsx` dice
-   * que ese era justo el caso a excluir.
-   *
-   * El test «REGRESIÓN — la lista de CCAA…» no lo caza porque re-deriva EL MISMO filtro y
-   * comprueba que la tarjeta lo refleja: valida el mecanismo contra sí mismo. Lo que hay que
-   * comprobar es la tarjeta contra su propia prosa, que es lo que lee el usuario.
-   *
-   * Ninguna cifra está mal —dentro del deslizador (2.000.000 € de tope) Aragón bonifica el
-   * 100 % de verdad— pero es una página de riesgo 1 afirmando dos cosas incompatibles sobre
-   * la misma comunidad en el mismo párrafo.
+   * 1. `CCAA_BONIFICACION_CASI_TOTAL` filtraba solo `porcentaje >= 0.99`, sin mirar el
+   *    régimen: País Vasco (0,99 fijo, pero FORAL) entraba en una lista cuya frase habla del
+   *    régimen común, con notas propias que piden consulta obligatoria a su Hacienda Foral.
+   *    Ahora el filtro excluye `regimen === 'foral'`, y País Vasco se explica aparte.
+   * 2. La tarjeta decía luego que «Cantabria y Aragón funcionan con una exención… no con un
+   *    porcentaje plano», que es falso para Aragón: dentro de su tope de 3.000.000 € de base
+   *    liquidable SÍ bonifica un 100 % plano (por eso entra, con razón, en la enumeración de
+   *    arriba); lo que tiene de especial no es que reparta por tramos como Cantabria o
+   *    Castilla-La Mancha, sino que la bonificación desaparece del todo por encima del tope.
+   *    Sacarlo de la enumeración habría sido mentir en la otra dirección — se corrigió la
+   *    frase, no la lista.
    */
-  test.fail('HALLAZGO — la tarjeta educativa mete a Aragón en la lista del «porcentaje plano» y en la de las que no lo son', async ({
+  test('REGRESIÓN — la tarjeta educativa no se contradice sobre Aragón, y excluye a País Vasco por foral', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -1253,36 +1249,33 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
       return (h4?.parentElement?.textContent ?? '').replace(/\s+/g, ' ').trim();
     });
 
-    // La frase «Cantabria y Aragón funcionan con una exención… no con un porcentaje plano»
-    // está en la tarjeta; Aragón no puede estar además en la enumeración de las que sí.
-    const enumeracion = tarjeta.slice(0, tarjeta.indexOf('el ISD se queda en casi nada'));
-    expect(enumeracion).not.toContain('Aragón');
+    // La enumeración derivada («99% o más») SÍ incluye a Aragón —bonifica el 100 % de
+    // verdad— y NO incluye a País Vasco, que es foral.
+    const enumeracion = tarjeta.match(/99% o más\s*\(([^)]*)\)/)?.[1] ?? '';
+    expect(enumeracion).toContain('Aragón');
+    expect(enumeracion).not.toContain('País Vasco');
+
+    // Ya no se afirma que Aragón "no es un porcentaje plano": es plano, con límite de base
+    expect(tarjeta).not.toContain('Cantabria y Aragón funcionan con una exención');
+    expect(tarjeta).toContain('3.000.000 € de base liquidable');
+
+    // País Vasco se explica aparte, como régimen foral con consulta obligatoria
+    expect(tarjeta).toContain('País Vasco bonifica también cerca del 99%, pero es régimen foral');
   });
 
   /**
-   * ⚠️ HALLAZGO ABIERTO (28/08/2026) — la deduplicación dejó viva una TERCERA copia.
+   * Hallazgo 500 — reparado. `app/estimador-impuesto-sucesiones/page.tsx` tenía una TERCERA
+   * copia de la regla del art. 20.2.c (además de `page.tsx` de esta app y del motor
+   * compartido), que concedía el 95 % a todo el Grupo III sin mirar edad ni convivencia — el
+   * defecto exacto del hallazgo 462. Ahora importa `evaluarReduccionVivienda` y el formulario
+   * ofrece edad y la casilla de convivencia cuando el grupo es 'III'.
    *
-   * El commit `e1a42c65` unificó la regla del art. 20.2.c entre `page.tsx` y el motor
-   * compartido. Pero la misma regla está escrita una tercera vez en
-   * `app/estimador-impuesto-sucesiones/page.tsx` (su paso «4. Reducción vivienda habitual»),
-   * que NO importa `evaluarReduccionVivienda` y concede el 95 % a todo el Grupo III sin
-   * mirar edad ni convivencia — el defecto exacto del hallazgo 462, intacto.
-   *
-   * Es la misma herencia del hallazgo 462 en la app hermana: Madrid, Grupo III, 200.000 € de
-   * vivienda habitual. Aquella app añade siempre el 3 % de ajuar (base 206.000 €):
-   *
-   *   con la regla única  → sin reducción de vivienda: base liquidable 198.006,54
-   *                         7.127,47 + 118.125,36 × 10,20 % = 19.176,25672
-   *                         × 1,5882 = 30.455,730922 → − 50 % = 15.227,87 €
-   *   lo que sirve hoy    → reduce 122.606,47: base liquidable 75.400,07
-   *                         2.648,88 + 43.443,20 × 9,35 % = 6.710,8192
-   *                         × 1,5882 = 10.658,123053 → − 50 % = 5329,06 €
-   *
-   * 9.898,81 € de menos, y el formulario de esa app ni siquiera ofrece la edad del heredero
-   * fuera del Grupo I: el requisito no es que se incumpla, es que no se puede expresar — la
-   * misma frase que el commit escribió sobre el MCP antes de arreglarlo allí.
+   * Misma herencia del hallazgo 462: Madrid, Grupo III, 200.000 € de vivienda habitual. Esa
+   * app añade siempre el 3 % de ajuar (base 206.000 €), y sin edad/convivencia declaradas la
+   * reducción de vivienda NO se aplica: base liquidable 198.006,54 → cuota final 15.227,87 €
+   * (golden GOLDEN-AH en `tests/calculadoras-invariantes.spec.ts`, mismo caso sobre el motor).
    */
-  test.fail('HALLAZGO — estimador-impuesto-sucesiones conserva su propia copia de la regla del art. 20.2.c', async ({
+  test('REGRESIÓN — estimador-impuesto-sucesiones usa la regla única del art. 20.2.c para el Grupo III', async ({
     page,
   }) => {
     await page.goto('/estimador-impuesto-sucesiones/');
@@ -1303,22 +1296,19 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
   });
 
   /**
-   * ⚠️ HALLAZGO ABIERTO (28/08/2026) — el otro consumidor del motor se quedó sin el
-   * parámetro nuevo.
-   *
-   * `evaluarReduccionVivienda` pasó a exigir `convivenciaDosAnios` para el Grupo III. Las dos
-   * tools del MCP Delegum lo exponen (`convivio_dos_anios`), pero
+   * Hallazgo 501 — reparado. `evaluarReduccionVivienda` exige `convivenciaDosAnios` para el
+   * Grupo III. Las dos tools del MCP Delegum ya lo exponían (`convivio_dos_anios`), pero
    * `app/api/chatgpt/sucesiones/route.ts` —la Action del GPT, que llama al MISMO
-   * `calcularSucesion`— no lo copia del body, así que el parámetro se pierde por el camino.
+   * `calcularSucesion`— no lo copiaba del body, así que el parámetro se perdía por el camino
+   * y el colateral con derecho no podía acreditarlo nunca por esa ruta.
    *
-   * Efecto: por esa ruta el colateral con derecho no puede acreditarlo NUNCA, y la respuesta
-   * afirma un hecho falso sobre quien pregunta («pariente colateral que no convivió los 2
-   * años anteriores») cuando el body decía lo contrario. Antes del commit esa misma llamada
-   * devolvía 4.883,57 € concediendo la reducción sin comprobar nada; ahora devuelve
-   * 14.741,88 € negándola sin poder comprobarla. La respuesta correcta para el body que se
-   * envía —edad 70 y convivencia acreditada— es 4.883,57 €, que es lo que da el MCP.
+   * Efecto familia encontrado al grepear los demás consumidores de `calcularSucesion`: el
+   * mismo dato faltaba en `lib/calculadoras/comparacionDonacionHerencia.ts` (tool MCP
+   * `comparar_donacion_vs_herencia`), donde ni siquiera existía el parámetro — se añadió
+   * `edadHeredero`/`convivenciaDosAnios` a su interfaz — y en `herenciaConjunta.ts`, sin
+   * consumidor activo hoy pero con la misma laguna.
    */
-  test.fail('HALLAZGO — /api/chatgpt/sucesiones ignora convivenciaDosAnios y niega la reducción al colateral con derecho', async ({
+  test('REGRESIÓN — /api/chatgpt/sucesiones respeta convivenciaDosAnios para el Grupo III', async ({
     request,
   }) => {
     const respuesta = await request.post('/api/chatgpt/sucesiones/', {

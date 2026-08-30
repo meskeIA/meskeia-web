@@ -1111,6 +1111,48 @@ test.describe('Golden — calcularSucesion (Capa 1 · tarifa ISD estatal + auton
     expect(res.tipoEfectivo).toBeCloseTo(0.08, 2);
   });
 
+  /**
+   * Hallazgo 500 del Inspector: `evaluarReduccionVivienda` es la fuente única de la reducción
+   * de vivienda habitual desde el 27/08/2026, pero `app/estimador-impuesto-sucesiones/page.tsx`
+   * tenía una TERCERA copia que concedía el 95% a todo el Grupo III sin comprobar el art.
+   * 20.2.c LISD (65 años + convivencia 2 años). Este golden fija el caso del acta: colateral SIN
+   * esos datos no debe recibir la reducción, aunque declare una vivienda habitual.
+   */
+  test('GOLDEN-AH: Madrid, Grupo III, vivienda 200.000 € sin edad/convivencia → sin reducción (hallazgo 500)', () => {
+    const res = calcularSucesion({
+      baseImponible: 200000, ccaa: 'madrid', grupo: 'III', incluyeAjuar: true, viviendaHabitual: 200000,
+    });
+    expect(res.baseImponibleConAjuar).toBeCloseTo(206000, 2);
+    expect(res.reduccionParentesco).toBeCloseTo(7993.46, 2);
+    expect(res.reduccionVivienda).toBe(0);
+    expect(res.reduccionViviendaNoAplicada).toContain('menor de');
+    expect(res.baseLiquidable).toBeCloseTo(198006.54, 2);
+    expect(res.cuotaIntegra).toBeCloseTo(19176.26, 2);
+    expect(res.coeficienteMultiplicador).toBeCloseTo(1.5882, 4);
+    expect(res.cuotaTributaria).toBeCloseTo(30455.74, 2);
+    expect(res.cuotaFinal).toBeCloseTo(15227.87, 2);
+  });
+
+  test('GOLDEN-AI: Madrid, Grupo III, ≥65 años y convivencia → SÍ hay reducción de vivienda (hallazgo 500)', () => {
+    const res = calcularSucesion({
+      baseImponible: 200000, ccaa: 'madrid', grupo: 'III', incluyeAjuar: true, viviendaHabitual: 200000,
+      edadHeredero: 70, convivenciaDosAnios: true,
+    });
+    expect(res.reduccionVivienda).toBeCloseTo(122606.47, 2);
+    expect(res.reduccionViviendaNoAplicada).toBeNull();
+    expect(res.baseLiquidable).toBeCloseTo(75400.07, 2);
+    expect(res.cuotaIntegra).toBeCloseTo(6710.82, 2);
+    expect(res.cuotaFinal).toBeCloseTo(5329.06, 2);
+  });
+
+  test('GOLDEN-AJ: Grupo III, edad ≥65 pero SIN convivencia → sin reducción, con motivo propio', () => {
+    const res = calcularSucesion({
+      baseImponible: 200000, ccaa: 'madrid', grupo: 'III', viviendaHabitual: 200000, edadHeredero: 70,
+    });
+    expect(res.reduccionVivienda).toBe(0);
+    expect(res.reduccionViviendaNoAplicada).toContain('no convivió');
+  });
+
 });
 
 // ────────────────────────────────────────────────────────────────────────────

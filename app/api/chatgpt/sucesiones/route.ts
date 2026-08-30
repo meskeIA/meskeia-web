@@ -30,6 +30,7 @@ export async function POST(req: NextRequest) {
       discapacidad:     body.discapacidad ?? '0',
       patrimonioIdx:    body.patrimonioIdx !== undefined ? Number(body.patrimonioIdx) as 1 | 2 | 3 | 4 : 1,
       viviendaHabitual: body.viviendaHabitual !== undefined ? Number(body.viviendaHabitual) : undefined,
+      convivenciaDosAnios: body.convivenciaDosAnios !== undefined ? Boolean(body.convivenciaDosAnios) : undefined,
       seguroVida:       body.seguroVida !== undefined ? Number(body.seguroVida) : undefined,
       incluyeAjuar:     body.incluyeAjuar ?? false,
     });

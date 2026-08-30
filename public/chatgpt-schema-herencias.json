@@ -153,6 +153,10 @@
             "minimum": 0,
             "description": "Valor de la vivienda habitual del causante incluida en la herencia (€). Permite aplicar reducción del 95% hasta 122.606€."
           },
+          "convivenciaDosAnios": {
+            "type": "boolean",
+            "description": "Solo relevante si grupo es 'III' (hermano/tío/sobrino) y hay viviendaHabitual: ¿el heredero convivió con el causante los 2 años anteriores al fallecimiento? El art. 20.2.c LISD exige además que el heredero tenga 65 años o más (ver edadHeredero). Sin este dato el colateral no puede acreditar la reducción."
+          },
           "seguroVida": {
             "type": "number",
             "minimum": 0,

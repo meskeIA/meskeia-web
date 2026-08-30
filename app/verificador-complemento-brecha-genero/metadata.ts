@@ -1,12 +1,20 @@
 import { Metadata } from 'next';
 import { COMPLEMENTO_BRECHA_GENERO_2026 } from '@/data/fiscal';
-import { formatCurrency } from '@/lib/formatters';
+import { formatCurrency, formatFechaLarga } from '@/lib/formatters';
 
 // Las cifras salen del módulo fiscal, nunca tecleadas: en la próxima revalorización el
 // snippet de buscadores y el JSON-LD envejecían en silencio mientras la app decía otra cosa.
 const CUANTIA = formatCurrency(COMPLEMENTO_BRECHA_GENERO_2026.cuantiaPorHijoMensual);
 const MAX_HIJOS = COMPLEMENTO_BRECHA_GENERO_2026.maxHijos;
 const MAX_MES = formatCurrency(COMPLEMENTO_BRECHA_GENERO_2026.maxMensual);
+const FECHA_MINIMA = formatFechaLarga(COMPLEMENTO_BRECHA_GENERO_2026.fechaMinimaHechoCausante);
+// Hallazgo 503: hasta esta reparación el faqJsonLd citaba estos dos artículos a mano —el
+// que excluye la jubilación parcial y el que hace compatible el complemento a mínimos—,
+// aunque el motivo por el que subieron a data/fiscal (hallazgo 280/472) era justo que el
+// FAQPage —lo que leen Bing Copilot y ChatGPT— dejara de tener su propia copia.
+const NORMA_EXCLUSION_JUBILACION_PARCIAL = COMPLEMENTO_BRECHA_GENERO_2026.exclusiones
+  .find(e => e.supuesto === 'jubilacion_parcial')!.norma;
+const NORMA_COMPATIBLE_MINIMOS = COMPLEMENTO_BRECHA_GENERO_2026.concurrencia.compatibleConComplementoAMinimos.norma;
 
 const title = 'Verificador del Complemento por Brecha de Género 2026 — ¿Te corresponde? | meskeIA';
 const description = `Comprueba si tienes derecho al complemento por brecha de género en tu pensión: ${CUANTIA}/mes por hijo (máximo ${MAX_HIJOS}). Incluye los cambios tras la sentencia TJUE 2025 que iguala el trato a hombres y mujeres.`;
@@ -82,7 +90,7 @@ export const faqJsonLd = {
       name: '¿Pueden los hombres cobrar el complemento por brecha de género?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. Tras la STJUE C-623/23 (15-mayo-2025) y la doctrina del Tribunal Supremo (9-julio-2025), los requisitos son idénticos para hombres y mujeres: pensión contributiva de jubilación, incapacidad permanente o viudedad con hecho causante desde el 4 de febrero de 2021, al menos un hijo o hija, y que el otro progenitor no perciba ya el complemento por los mismos hijos. Ya no se exige a los hombres ninguna condición adicional. Si a un hombre se le denegó el complemento antes de 2025 por no cumplir esos requisitos adicionales hoy eliminados, puede reclamarlo de forma retroactiva ante el Instituto Nacional de la Seguridad Social.',
+        text: `Sí. Tras la STJUE C-623/23 (15-mayo-2025) y la doctrina del Tribunal Supremo (9-julio-2025), los requisitos son idénticos para hombres y mujeres: pensión contributiva de jubilación, incapacidad permanente o viudedad con hecho causante desde el ${FECHA_MINIMA}, al menos un hijo o hija, y que el otro progenitor no perciba ya el complemento por los mismos hijos. Ya no se exige a los hombres ninguna condición adicional. Si a un hombre se le denegó el complemento antes de 2025 por no cumplir esos requisitos adicionales hoy eliminados, puede reclamarlo de forma retroactiva ante el Instituto Nacional de la Seguridad Social.`,
       },
     },
     {
@@ -90,7 +98,7 @@ export const faqJsonLd = {
       name: '¿Cómo saber si tengo derecho al complemento por brecha de género?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los requisitos son: ser titular de una pensión contributiva de jubilación, viudedad o incapacidad permanente con hecho causante desde el 4 de febrero de 2021; tener al menos un hijo o hija biológico o adoptado; y que el otro progenitor no perciba ya el complemento por los mismos hijos. No es necesario acreditar una interrupción concreta de la carrera laboral: el complemento se reconoce automáticamente si se cumplen estas condiciones. El verificador comprueba estas condiciones en 6 preguntas y calcula el importe estimado según el número de hijos.',
+        text: `Los requisitos son: ser titular de una pensión contributiva de jubilación, viudedad o incapacidad permanente con hecho causante desde el ${FECHA_MINIMA}; tener al menos un hijo o hija biológico o adoptado; y que el otro progenitor no perciba ya el complemento por los mismos hijos. No es necesario acreditar una interrupción concreta de la carrera laboral: el complemento se reconoce automáticamente si se cumplen estas condiciones. El verificador comprueba estas condiciones en 6 preguntas y calcula el importe estimado según el número de hijos.`,
       },
     },
     {
@@ -106,7 +114,7 @@ export const faqJsonLd = {
       name: '¿El complemento por brecha de género es compatible con cualquier tipo de pensión?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El complemento se reconoce sobre las pensiones contributivas de jubilación —ordinaria o anticipada—, incapacidad permanente (total, absoluta o gran invalidez) y viudedad. No procede en la jubilación parcial: el artículo 60.4 LGSS lo excluye expresamente, y solo se reconoce cuando desde ella se accede a la jubilación plena. Tampoco alcanza a las pensiones no contributivas. Sí es compatible con el complemento a mínimos: el artículo 60.3.e) LGSS dispone que su importe no cuenta como ingreso para determinar el derecho a ese complemento y que, cuando procede, se suma a la cuantía mínima reconocida.',
+        text: `El complemento se reconoce sobre las pensiones contributivas de jubilación —ordinaria o anticipada—, incapacidad permanente (total, absoluta o gran invalidez) y viudedad. No procede en la jubilación parcial: el ${NORMA_EXCLUSION_JUBILACION_PARCIAL} lo excluye expresamente, y solo se reconoce cuando desde ella se accede a la jubilación plena. Tampoco alcanza a las pensiones no contributivas. Sí es compatible con el complemento a mínimos: el ${NORMA_COMPATIBLE_MINIMOS} dispone que su importe no cuenta como ingreso para determinar el derecho a ese complemento y que, cuando procede, se suma a la cuantía mínima reconocida.`,
       },
     },
   ],

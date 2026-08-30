@@ -11,6 +11,7 @@ export {
   formatCurrency,
   formatDate,
   formatDateTime,
+  formatFechaLarga,
   formatPercentage,
   formatCompactNumber,
   formatDuration,

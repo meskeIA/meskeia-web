@@ -31,7 +31,7 @@ import { calcularFiniquito, type MotivoFiniquito } from '@/lib/calculadoras/fini
 import { calcularPensionDesempleo } from '@/lib/calculadoras/pensionDesempleo';
 import { calcularPensionPublica } from '@/lib/calculadoras/pensionPublica';
 import { calcularBrechaJubilacion } from '@/lib/calculadoras/brechaJubilacion';
-import { calcularComplementoBrechaGenero, type SexoBeneficiario as SexoBeneficiarioBG, type TipoPensionBG } from '@/lib/calculadoras/complementoBrechaGenero';
+import { calcularComplementoBrechaGenero, FECHA_MINIMA_HECHO_CAUSANTE, type SexoBeneficiario as SexoBeneficiarioBG, type TipoPensionBG } from '@/lib/calculadoras/complementoBrechaGenero';
 import { compararDonacionHerencia } from '@/lib/calculadoras/comparacionDonacionHerencia';
 import {
   calcularSucesion,
@@ -1439,12 +1439,12 @@ function crearServidorDelegum(): McpServer {
   // ── calcular_complemento_brecha_genero ───────────────────────────────────
   servidor.tool(
     'calcular_complemento_brecha_genero',
-    'Calcula el complemento de pensión para la reducción de la brecha de género (antiguo complemento de maternidad, art. 60 LGSS). Importe fijo por hijo/a (la cuantía vigente y el máximo de hijos salen de data/fiscal; se abona en 14 pagas) sobre pensiones contributivas de jubilación, incapacidad permanente o viudedad. IMPORTANTE: tras la STJUE C-623/23 (15-may-2025) y la STS de 09-jul-2025, hombres y mujeres tienen derecho en IGUALDAD de condiciones — ya NO se exigen requisitos adicionales a los hombres. Requisitos: pensión contributiva, hecho causante desde el 04/02/2021, al menos 1 hijo y que el otro progenitor no lo perciba por los mismos hijos.',
+    `Calcula el complemento de pensión para la reducción de la brecha de género (antiguo complemento de maternidad, art. 60 LGSS). Importe fijo por hijo/a (la cuantía vigente y el máximo de hijos salen de data/fiscal; se abona en 14 pagas) sobre pensiones contributivas de jubilación, incapacidad permanente o viudedad. IMPORTANTE: tras la STJUE C-623/23 (15-may-2025) y la STS de 09-jul-2025, hombres y mujeres tienen derecho en IGUALDAD de condiciones — ya NO se exigen requisitos adicionales a los hombres. Requisitos: pensión contributiva, hecho causante desde el ${FECHA_MINIMA_HECHO_CAUSANTE}, al menos 1 hijo y que el otro progenitor no lo perciba por los mismos hijos.`,
     {
       sexo: z.enum(['mujer', 'hombre']).describe('Sexo del beneficiario (informativo: desde la doctrina 2025 no afecta al derecho)'),
       num_hijos: z.number().int().min(0).describe('Número de hijos/as nacidos con vida o adoptados antes del hecho causante'),
       tipo_pension: z.enum(['jubilacion', 'jubilacion_parcial', 'incapacidad_permanente', 'viudedad', 'no_contributiva', 'ninguna']).describe('Tipo de pensión. Solo las contributivas dan acceso, y la jubilación parcial queda excluida por el art. 60.4 LGSS.'),
-      fecha_hecho_causante: z.enum(['antes_2021', 'desde_2021', 'sin_iniciar']).optional().describe('Momento del hecho causante. El complemento exige hecho causante desde el 04/02/2021. Por defecto desde_2021.'),
+      fecha_hecho_causante: z.enum(['antes_2021', 'desde_2021', 'sin_iniciar']).optional().describe(`Momento del hecho causante. El complemento exige hecho causante desde el ${FECHA_MINIMA_HECHO_CAUSANTE}. Por defecto desde_2021.`),
       otro_progenitor: z.enum(['no_percibe', 'percibe', 'denegado', 'no_aplica']).optional().describe('Situación del OTRO progenitor (no del solicitante): no_percibe, percibe (incompatible, el complemento ya se reconoció por esos hijos), denegado, no_aplica. Que se lo denegaran a ÉL no da derecho a reclamar: para eso está denegacion_propia. Por defecto no_percibe.'),
       denegacion_propia: z.boolean().optional().describe('¿Al SOLICITANTE le denegaron el complemento en su día y tiene una resolución denegatoria? Es lo que decide si procede reclamar (STJUE C-623/23 para denegaciones a hombres anteriores a 2025). Por defecto false.'),
       cuantia_pension_mensual: z.number().positive().optional().describe('Cuantía mensual de la pensión base (€/mes). Opcional: para mostrar la pensión total con complemento.'),
@@ -1497,6 +1497,8 @@ function crearServidorDelegum(): McpServer {
       grupo_parentesco: z.enum(['I-conyuge', 'I-descendiente', 'II', 'II-ascendiente', 'III', 'IV']).optional().describe('Parentesco del receptor: I-descendiente=hijo/nieto <21, II=hijo/nieto ≥21 (lo más común), I-conyuge=cónyuge/pareja, III=hermanos/tíos/sobrinos, IV=primos/extraños. Por defecto "II".'),
       edad_donante: z.number().int().min(0).max(120).optional().describe('Edad del titular que transmite. Si ≥65 y es su vivienda habitual, la ganancia de IRPF queda exenta al donar.'),
       es_vivienda_habitual: z.boolean().optional().describe('¿El inmueble es la vivienda habitual del titular? Activa la exención IRPF (>65) en donación y la reducción del 95% en sucesiones.'),
+      edad_receptor: z.number().int().min(0).max(120).optional().describe('Edad del RECEPTOR. Solo hace falta si grupo_parentesco es "III" (hermano/tío/sobrino): el art. 20.2.c LISD exige 65 años o más para la reducción de vivienda habitual en la vía herencia. Sin este dato, un colateral sale sin esa reducción aunque cumpla el requisito.'),
+      convivencia_dos_anios: z.boolean().optional().describe('¿El receptor convivió con el titular los 2 años anteriores? Solo importa si grupo_parentesco es "III"; es el segundo requisito del art. 20.2.c LISD para la reducción de vivienda habitual en la vía herencia.'),
       patrimonio_receptor: z.enum(['1', '2', '3', '4']).optional().describe('Patrimonio preexistente del receptor: 1=hasta 402.678€, 2=hasta 2M€, 3=hasta 4M€, 4=más. Por defecto "1".'),
       discapacidad: z.enum(['0', '33', '65']).optional().describe('Grado de discapacidad del receptor. Por defecto "0".'),
       valor_catastral_suelo: z.number().nonnegative().optional().describe('Valor catastral del suelo (€) — opcional, para calcular la plusvalía municipal (IIVTNU).'),
@@ -1515,6 +1517,8 @@ function crearServidorDelegum(): McpServer {
           grupo: (args.grupo_parentesco ?? 'II') as GrupoParentesco,
           edadDonante: args.edad_donante,
           esViviendaHabitual: args.es_vivienda_habitual,
+          edadHeredero: args.edad_receptor,
+          convivenciaDosAnios: args.convivencia_dos_anios,
           patrimonioIdx: args.patrimonio_receptor ? (Number(args.patrimonio_receptor) as IndicePatrimonio) : undefined,
           discapacidad: args.discapacidad as NivelDiscapacidad | undefined,
           valorCatastralSuelo: args.valor_catastral_suelo,

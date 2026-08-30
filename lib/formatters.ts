@@ -98,6 +98,25 @@ export function formatDateTime(date: Date): string {
 }
 
 /**
+ * Formatea una fecha ISO (YYYY-MM-DD) en prosa española: "4 de febrero de 2021".
+ *
+ * Parsea los componentes a mano y construye el `Date` en LOCAL (`new Date(y, m-1, d)`) en
+ * vez de `new Date(fechaISO)`: ese constructor interpreta la cadena como medianoche UTC, y
+ * en un huso horario negativo (América) se muestra el día ANTERIOR — el mismo gotcha del
+ * hallazgo 482 con `CNAE_VIGENCIA.desde`.
+ * @param fechaISO - Fecha en formato YYYY-MM-DD (ej: "2021-02-04")
+ * @returns String en prosa (ej: "4 de febrero de 2021")
+ */
+export function formatFechaLarga(fechaISO: string): string {
+  const [anio, mes, dia] = fechaISO.split('-').map(Number);
+  return new Date(anio, mes - 1, dia).toLocaleDateString('es-ES', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
+/**
  * Como `parseSpanishNumber`, pero un campo vacío o ilegible vale `porDefecto` (0) en vez
  * de NaN. Para los campos OPCIONALES de un formulario, que es donde el NaN hace daño.
  *

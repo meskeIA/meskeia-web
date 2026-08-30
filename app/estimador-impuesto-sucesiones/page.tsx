@@ -18,8 +18,6 @@ import {
   REDUCCION_EDAD_MENOR_21_IS,
   REDUCCION_EDAD_MENOR_21_MAX_IS,
   REDUCCION_SEGURO_VIDA_MAX_IS,
-  REDUCCION_VIVIENDA_PORC_IS,
-  REDUCCION_VIVIENDA_MAX_IS,
   REDUCCION_DISCAPACIDAD_33_IS,
   REDUCCION_DISCAPACIDAD_65_IS,
   PORC_AJUAR_DOMESTICO_IS,
@@ -27,6 +25,10 @@ import {
   TramoTarifaIS,
   BonificacionGrupoIS,
 } from '@/data/fiscal';
+import {
+  evaluarReduccionVivienda,
+  EDAD_MIN_COLATERAL_VIVIENDA_IS,
+} from '@/lib/calculadoras/sucesiones';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -52,6 +54,8 @@ interface ResultadoSucesiones {
   // Reducciones
   reducciones: DetalleReduccion[];
   totalReducciones: number;
+  /** Por qué NO se ha aplicado la reducción de vivienda habitual, si se declaró una y no cuenta */
+  viviendaNoAplicada: string | null;
   baseLiquidable: number;
   // Liquidación
   cuotaIntegra: number;
@@ -186,6 +190,8 @@ export default function EstimadorImpuestoSucesionesPage() {
   const [ccaa, setCcaa] = useState('');
   const [grupo, setGrupo] = useState<GrupoParentesco | ''>('');
   const [edad, setEdad] = useState('35');
+  // Solo interviene si el heredero es colateral (Grupo III): art. 20.2.c LISD
+  const [convivenciaDosAnios, setConvivenciaDosAnios] = useState(false);
   const [discapacidad, setDiscapacidad] = useState<NivelDiscapacidad>('0');
   const [patrimonioIdx, setPatrimonioIdx] = useState('1');
 
@@ -273,18 +279,22 @@ export default function EstimadorImpuestoSucesionesPage() {
       reducciones.push({ concepto: 'Seguro de vida', importe: reduccionSeguro });
     }
 
-    // 4. Reducción vivienda habitual (solo si hay vivienda y es grupo apto)
-    const gruposVivienda = ['I-conyuge', 'I-descendiente', 'II', 'II-ascendiente', 'III'];
-    if (gruposVivienda.includes(grupo) && v_vivienda > 0 && !esCataluna) {
-      const baseViviendaHeredero = v_vivienda * porcHerencia;
-      const reduccionVivienda = Math.min(
-        baseViviendaHeredero * REDUCCION_VIVIENDA_PORC_IS,
-        REDUCCION_VIVIENDA_MAX_IS
-      );
-      if (reduccionVivienda > 0) {
-        reducciones.push({ concepto: 'Vivienda habitual (95%)', importe: reduccionVivienda });
-      }
+    // 4. Reducción vivienda habitual — evaluarReduccionVivienda es la fuente única de esta
+    // regla desde el 27/08/2026 (hallazgo 500): esta app tenía su propia copia y concedía el
+    // 95% a todo el Grupo III sin comprobar los 65 años ni la convivencia de los 2 años
+    // anteriores que exige el art. 20.2.c LISD.
+    const baseViviendaHeredero = v_vivienda * porcHerencia;
+    const vivienda = evaluarReduccionVivienda({
+      valorVivienda: baseViviendaHeredero > 0 ? baseViviendaHeredero : undefined,
+      grupo,
+      ccaa,
+      edadHeredero: parseInt(edad) || undefined,
+      convivenciaDosAnios,
+    });
+    if (vivienda.reduccion > 0) {
+      reducciones.push({ concepto: 'Vivienda habitual (95%)', importe: vivienda.reduccion });
     }
+    const viviendaNoAplicada = vivienda.noAplicada;
 
     // 5. Reducción por discapacidad
     if (discapacidad === '33') {
@@ -334,6 +344,7 @@ export default function EstimadorImpuestoSucesionesPage() {
       baseAjustada,
       reducciones,
       totalReducciones,
+      viviendaNoAplicada,
       baseLiquidable,
       cuotaIntegra,
       coeficienteMultiplicador,
@@ -347,7 +358,7 @@ export default function EstimadorImpuestoSucesionesPage() {
       esForal,
     };
   }, [
-    ccaa, grupo, edad, discapacidad, patrimonioIdx, tipoAdquisicion, edadUsufructuario, porcentajeHerencia,
+    ccaa, grupo, edad, convivenciaDosAnios, discapacidad, patrimonioIdx, tipoAdquisicion, edadUsufructuario, porcentajeHerencia,
     saldosCuentas, accionesFondos, viviendaHabitual, otrosInmuebles, vehiculos, segurosVida, otrosBienes,
     hipotecas, otrosPrestamos, gastosSepelio, ccaaInfo,
   ]);
@@ -472,12 +483,30 @@ export default function EstimadorImpuestoSucesionesPage() {
               </select>
             </div>
 
-            {(grupo === 'I-descendiente') && (
+            {(grupo === 'I-descendiente' || grupo === 'III') && (
               <div className={styles.campo}>
                 <label className={styles.label}>Edad del heredero (años)</label>
                 <input type="number" className={styles.input} value={edad}
                   onChange={(e) => setEdad(e.target.value)} min="0" max="100" />
-                <span className={styles.helper}>Relevante si es menor de 21 años</span>
+                <span className={styles.helper}>
+                  {grupo === 'I-descendiente'
+                    ? 'Relevante si es menor de 21 años'
+                    : `Relevante para la reducción por vivienda habitual: el colateral solo tiene derecho con ${EDAD_MIN_COLATERAL_VIVIENDA_IS} años o más`}
+                </span>
+              </div>
+            )}
+
+            {grupo === 'III' && (
+              <div className={styles.campo}>
+                <label className={styles.radioLabel}>
+                  <input type="checkbox" checked={convivenciaDosAnios}
+                    onChange={(e) => setConvivenciaDosAnios(e.target.checked)} />
+                  Conviví con el fallecido los 2 años anteriores
+                </label>
+                <span className={styles.helper}>
+                  Requisito adicional del art. 20.2.c LISD para que un hermano, tío o sobrino
+                  acceda a la reducción por vivienda habitual
+                </span>
               </div>
             )}
 
@@ -639,7 +668,7 @@ export default function EstimadorImpuestoSucesionesPage() {
               )}
 
               {/* Reducciones */}
-              {resultado.reducciones.length > 0 && (
+              {(resultado.reducciones.length > 0 || resultado.viviendaNoAplicada) && (
                 <div className={styles.desglose}>
                   <h3 className={styles.desgloseTitle}>Reducciones</h3>
                   {resultado.reducciones.map((r, i) => (
@@ -648,6 +677,12 @@ export default function EstimadorImpuestoSucesionesPage() {
                       <span className={styles.lineaBonif}>{formatCurrency(r.importe)}</span>
                     </div>
                   ))}
+                  {resultado.viviendaNoAplicada && (
+                    <div className={styles.linea}>
+                      <span>Vivienda habitual</span>
+                      <span>No aplicable: {resultado.viviendaNoAplicada}</span>
+                    </div>
+                  )}
                   <div className={`${styles.linea} ${styles.lineaTotal}`}><span>Base liquidable</span><span>{formatCurrency(resultado.baseLiquidable)}</span></div>
                 </div>
               )}

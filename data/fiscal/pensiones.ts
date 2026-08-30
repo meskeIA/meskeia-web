@@ -468,6 +468,23 @@ export const COMPLEMENTO_BRECHA_GENERO_2026 = {
     },
   ] as const,
   /**
+   * Cómputo de hijos nacidos con vida que fallecen después del nacimiento. Hasta el
+   * 30/08/2026 esta regla se afirmaba en el FAQPage sin norma ni criterio ('la doctrina
+   * administrativa también los computa...'), así que quedaba fuera del alcance de
+   * /triaje-fiscal (hallazgo 505). Fuente: STS 748/2023 (ECLI:ES:TS:2023:748), Pleno Sala
+   * IV, 10-mar-2023: distingue el nacido con vida que fallece a las pocas horas (SÍ
+   * computa) del feto nacido sin vida (NO computa) — el art. 60.1 LGSS exige expresamente
+   * que el hijo «hubiera nacido con vida».
+   */
+  computoHijoFallecido: {
+    norma: 'art. 60.1 LGSS',
+    sentencia: 'STS 748/2023 (ECLI:ES:TS:2023:748), Pleno Sala IV, 10 de marzo de 2023',
+    computa: true,
+    detalle:
+      'El hijo o hija que nace con vida y fallece poco después SÍ computa para el complemento: ' +
+      'la ley exige que haya nacido con vida, no que siga viviendo. El feto nacido sin vida NO computa.',
+  },
+  /**
    * Reglas de concurrencia del art. 60.3 LGSS, con su subapartado. Estaban citadas en el JSX
    * de `verificador-complemento-brecha-genero` y en su FAQPage —o sea, en lo que leen Bing
    * Copilot y ChatGPT— pero fuera del alcance de cualquier revisión de vigencia, que es

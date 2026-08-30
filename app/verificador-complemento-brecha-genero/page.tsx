@@ -6,7 +6,7 @@ import {
   MeskeiaLogo, Footer, LegalNotice, EducationalSection, RelatedApps,
   ShareCard, DisclaimerCard, DataReference, RegionBadge,
 } from '@/components';
-import { formatCurrency } from '@/lib';
+import { formatCurrency, formatFechaLarga } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   COMPLEMENTO_BRECHA_GENERO_2026,
@@ -27,11 +27,22 @@ const CUANTIA_MES = formatCurrency(COMPLEMENTO_BRECHA_GENERO_2026.cuantiaPorHijo
 const MAX_HIJOS = COMPLEMENTO_BRECHA_GENERO_2026.maxHijos;
 const MAX_MES = formatCurrency(COMPLEMENTO_BRECHA_GENERO_2026.maxMensual);
 const PENSION_MAXIMA_MES = formatCurrency(LIMITES_PENSION_2025.maximaMensual);
+/**
+ * Fecha mínima del hecho causante, leída de `data/fiscal` y no tecleada aquí (hallazgo 504):
+ * hasta esta reparación el dato vivía declarado en el módulo fiscal sin ningún consumidor,
+ * mientras la página repetía «4 de febrero de 2021» a mano en seis sitios.
+ */
+const FECHA_MINIMA = formatFechaLarga(COMPLEMENTO_BRECHA_GENERO_2026.fechaMinimaHechoCausante);
+/** Igual que arriba, en formato corto DD-mes-AAAA para las opciones del formulario */
+const FECHA_MINIMA_CORTA = FECHA_MINIMA.replace(/ de (\w+) de /, (_, mes) => `-${mes.slice(0, 3)}-`);
 
 /** La exclusión del art. 60.4 LGSS, leída del módulo fiscal y no tecleada aquí. */
 const EXCLUSION_PARCIAL = COMPLEMENTO_BRECHA_GENERO_2026.exclusiones.find(
   e => e.supuesto === 'jubilacion_parcial',
 )!;
+
+/** Cómputo de hijos nacidos con vida que fallecen después — STS 748/2023 (hallazgo 505) */
+const COMPUTO_HIJO_FALLECIDO = COMPLEMENTO_BRECHA_GENERO_2026.computoHijoFallecido;
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -118,7 +129,7 @@ function evaluar(
       importeMensual: 0,
       importeAnual: 0,
       motivo:
-        'Tu pensión se causó antes del 4 de febrero de 2021, fecha en que entró en vigor el ' +
+        `Tu pensión se causó antes del ${FECHA_MINIMA}, fecha en que entró en vigor el ` +
         'complemento por brecha de género. Para hechos causantes anteriores se aplicaba el antiguo ' +
         'complemento de maternidad, con reglas distintas.',
       esReclamacion: false,
@@ -244,7 +255,13 @@ export default function VerificadorComplementoBrechaGeneroPage() {
    * en vez de convertirse en otro.
    */
   const [hijosTexto, setHijosTexto] = useState<string>('2');
-  const hijosEsValido = /^\d+$/.test(hijosTexto.trim()) && Number(hijosTexto) <= 20;
+  // Tope del CAMPO, no de la norma: es una guarda de interfaz contra valores disparatados
+  // (la propia tool del MCP no lo aplica). Separado de "es un entero" para el hallazgo 506:
+  // un texto que SÍ es un entero pero supera el tope no puede decir "no es un número entero".
+  const LIMITE_HIJOS_CAMPO = 20;
+  const hijosEsEntero = /^\d+$/.test(hijosTexto.trim());
+  const hijosSuperaLimite = hijosEsEntero && Number(hijosTexto) > LIMITE_HIJOS_CAMPO;
+  const hijosEsValido = hijosEsEntero && !hijosSuperaLimite;
   const hijos = hijosEsValido ? Number(hijosTexto) : 0;
   const [genero, setGenero] = useState<Genero>('mujer');
   const [otroProgenitor, setOtroProgenitor] = useState<EstadoOtroProgenitor>('no_percibe');
@@ -262,14 +279,16 @@ export default function VerificadorComplementoBrechaGeneroPage() {
           hijosComputables: 0,
           importeMensual: 0,
           importeAnual: 0,
-          motivo: `«${hijosTexto}» no es un número entero de hijos, así que no hay nada que calcular todavía.`,
+          motivo: hijosSuperaLimite
+            ? `«${hijosTexto}» supera el tope de ${LIMITE_HIJOS_CAMPO} hijos de este campo, así que no hay nada que calcular todavía.`
+            : `«${hijosTexto}» no es un número entero de hijos, así que no hay nada que calcular todavía.`,
           esReclamacion: false,
-          pasoSiguiente: 'Escribe en la pregunta 3 un número entero de 0 a 20 y vuelve a verificar.',
+          pasoSiguiente: `Escribe en la pregunta 3 un número entero de 0 a ${LIMITE_HIJOS_CAMPO} y vuelve a verificar.`,
         };
       }
       return evaluar(tipo, fecha, hijos, genero, otroProgenitor, denegacionPropia);
     },
-    [tipo, fecha, hijos, hijosEsValido, hijosTexto, genero, otroProgenitor, denegacionPropia],
+    [tipo, fecha, hijos, hijosEsValido, hijosSuperaLimite, hijosTexto, genero, otroProgenitor, denegacionPropia],
   );
 
   const reset = () => {
@@ -350,8 +369,8 @@ export default function VerificadorComplementoBrechaGeneroPage() {
             </p>
             <div className={styles.optionGrid}>
               {([
-                { id: 'antes_2021' as const, label: 'Antes del 4-feb-2021' },
-                { id: 'desde_2021' as const, label: 'El 4-feb-2021 o después' },
+                { id: 'antes_2021' as const, label: `Antes del ${FECHA_MINIMA_CORTA}` },
+                { id: 'desde_2021' as const, label: `El ${FECHA_MINIMA_CORTA} o después` },
                 { id: 'sin_iniciar' as const, label: 'Aún sin solicitar' },
               ] as const).map(opt => (
                 <button
@@ -366,7 +385,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               ))}
             </div>
             <p className={styles.hint}>
-              El 4 de febrero de 2021 es la fecha de entrada en vigor del complemento (RDL 3/2021).
+              El {FECHA_MINIMA} es la fecha de entrada en vigor del complemento (RDL 3/2021).
             </p>
           </div>
 
@@ -379,7 +398,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               id="hijos"
               type="number"
               min={0}
-              max={20}
+              max={LIMITE_HIJOS_CAMPO}
               className={styles.input}
               value={hijosTexto}
               onChange={e => { setHijosTexto(e.target.value); reset(); }}
@@ -388,8 +407,9 @@ export default function VerificadorComplementoBrechaGeneroPage() {
             />
             {!hijosEsValido && (
               <p className={styles.hint} role="alert">
-                <span aria-hidden="true">⚠️</span> Escribe un número entero de hijos, de 0 a 20. Mientras
-                esto no sea un número, el cálculo no se hace: «{hijosTexto}» no se interpreta.
+                <span aria-hidden="true">⚠️</span> {hijosSuperaLimite
+                  ? `«${hijosTexto}» supera el tope de ${LIMITE_HIJOS_CAMPO} hijos de este campo: el cálculo no se hace.`
+                  : `Escribe un número entero de hijos, de 0 a ${LIMITE_HIJOS_CAMPO}: «${hijosTexto}» no se interpreta.`}
               </p>
             )}
             <p className={styles.hint} id="hijos-ayuda">
@@ -641,7 +661,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
             <div className={styles.escenarioCard}>
               <h3><span aria-hidden="true">👩</span> Mujer con 3 hijos, jubilación 2024</h3>
               <p>
-                <strong>Situación:</strong> hecho causante posterior al 4-feb-2021, sin que el padre
+                <strong>Situación:</strong> hecho causante posterior al {FECHA_MINIMA_CORTA}, sin que el padre
                 lo perciba. <strong>Resultado:</strong> 3 × {CUANTIA_MES} ={' '}
                 <strong>{formatCurrency(3 * COMPLEMENTO_BRECHA_GENERO_2026.cuantiaPorHijoMensual)}/mes</strong>{' '}
                 ({formatCurrency(3 * COMPLEMENTO_BRECHA_GENERO_2026.cuantiaPorHijoMensual * COMPLEMENTO_BRECHA_GENERO_2026.pagasAnuales)}/año
@@ -709,8 +729,9 @@ export default function VerificadorComplementoBrechaGeneroPage() {
             <div className={styles.faqItem}>
               <h3>¿Y los hijos fallecidos antes de los 16 años?</h3>
               <p>
-                La doctrina administrativa también los computa si nacieron con vida, siempre que
-                concurran el resto de requisitos. En supuestos dudosos, mejor acudir a un asesor.
+                {COMPUTO_HIJO_FALLECIDO.detalle} Lo fija la {COMPUTO_HIJO_FALLECIDO.sentencia},
+                que distingue este caso del hijo nacido sin vida, a quien el {COMPUTO_HIJO_FALLECIDO.norma}{' '}
+                sí excluye. En supuestos dudosos, mejor acudir a un asesor.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -760,7 +781,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               <div className={styles.stepContent}>
                 <h3>Verifica los requisitos básicos</h3>
                 <p>
-                  Pensión contributiva, hecho causante posterior al 4-feb-2021 y al menos un hijo/a
+                  Pensión contributiva, hecho causante posterior al {FECHA_MINIMA_CORTA} y al menos un hijo/a
                   computable. Esta herramienta te orienta sobre los 5 puntos clave.
                 </p>
               </div>
@@ -871,8 +892,11 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               <span className={styles.tipIcon} aria-hidden="true">🤝</span>
               <h3>Consulta antes de actuar</h3>
               <p>
-                Un sindicato o abogado laboralista puede orientarte gratis (turno de oficio, asesoría
-                sindical) sobre si tu caso justifica una reclamación.
+                Un abogado laboralista o un sindicato pueden orientarte sobre si tu caso justifica
+                una reclamación, pero ninguno de los dos es gratis sin condición: el turno de
+                oficio exige que se te reconozca el derecho a la asistencia jurídica gratuita
+                (Ley 1/1996, por umbrales de renta), y la asesoría sindical suele requerir estar
+                afiliado. Si no cumples ninguna de las dos, infórmate del coste antes de consultar.
               </p>
             </div>
           </div>
@@ -891,11 +915,13 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               <li>
                 <strong>Confundirlo con el complemento de maternidad.</strong> Son figuras distintas
                 con cálculos y requisitos diferentes. El antiguo se aplica solo a pensiones causadas
-                antes del 4-feb-2021.
+                antes del {FECHA_MINIMA_CORTA}.
               </li>
               <li>
                 <strong>Olvidar la incompatibilidad entre progenitores.</strong> Si ambos lo
-                solicitan por los mismos hijos, solo lo cobrará uno. Acordadlo previamente.
+                solicitan por los mismos hijos, solo lo cobrará uno. No es un reparto que se
+                pacte entre ellos: en caso de concurrencia, la SS lo asigna de oficio al
+                progenitor con la pensión pública de menor cuantía.
               </li>
               <li>
                 <strong>No reclamar tras una denegación previa (hombres).</strong> Las denegaciones

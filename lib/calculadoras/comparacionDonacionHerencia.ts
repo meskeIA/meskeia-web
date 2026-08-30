@@ -56,6 +56,17 @@ export interface ParametrosComparacionDonacionHerencia {
   edadDonante?: number;
   /** ¿El inmueble es la vivienda habitual del transmitente/causante? */
   esViviendaHabitual?: boolean;
+  /**
+   * Edad del RECEPTOR. Solo hace falta cuando `grupo` es 'III' (colateral: hermano, tío,
+   * sobrino), a quien la vía HERENCIA exige además tener 65 años o más para la reducción de
+   * vivienda habitual (art. 20.2.c LISD) — ver `convivenciaDosAnios`. Sin este dato el motor
+   * deniega la reducción por defecto, que es la lectura correcta cuando falta el dato: hasta
+   * el hallazgo 501 el comparador ni siquiera podía recibirlo, así que un colateral con
+   * vivienda habitual salía SIEMPRE sin reducción, se cumpliera el requisito o no.
+   */
+  edadHeredero?: number;
+  /** ¿El receptor convivió con el transmitente los 2 años anteriores? Solo importa si `grupo` es 'III' */
+  convivenciaDosAnios?: boolean;
   /** Índice de patrimonio preexistente del receptor (1–4). Por defecto 1. */
   patrimonioIdx?: IndicePatrimonio;
   /** Grado de discapacidad del receptor. Por defecto '0'. */
@@ -170,10 +181,15 @@ export function compararDonacionHerencia(
     discapacidad: discapacidad as unknown as NivelDiscapacidadIS,
     patrimonioIdx: patrimonioIdx as unknown as IndicePatrimonioIS,
     viviendaHabitual: p.esViviendaHabitual ? p.valorInmueble : undefined,
+    edadHeredero: p.edadHeredero,
+    convivenciaDosAnios: p.convivenciaDosAnios,
   });
   // 2) IRPF del causante: SIEMPRE exento (no existe "plusvalía del muerto")
   const irpfCausante = 0;
   notas.push('En la herencia, la ganancia patrimonial del causante está exenta de IRPF (art. 33.3.b LIRPF): el heredero solo afronta el Impuesto de Sucesiones (y, en su caso, la plusvalía municipal).');
+  if (herIsd.reduccionViviendaNoAplicada) {
+    notas.push(`Reducción de vivienda habitual (95 %) NO aplicada en la vía herencia: ${herIsd.reduccionViviendaNoAplicada}.`);
+  }
 
   // ── Plusvalía municipal (IIVTNU) — opcional, misma base en ambas vías ────────
   let plusvalia: number | null = null;

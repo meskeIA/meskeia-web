@@ -992,26 +992,13 @@ test.describe('Verificador del complemento por brecha de género', () => {
   });
 
   /**
-   * HALLAZGO ABIERTO (28/08/2026) — LA COPIA SUPERVIVIENTE ESTÁ EN `metadata.ts`.
-   *
-   * El comentario que la reparación e1a42c65 dejó en `data/fiscal/pensiones.ts` dice por
-   * qué subieron allí los subapartados del art. 60.3: «Estaban citadas en el JSX de
-   * verificador-complemento-brecha-genero Y EN SU FAQPage —o sea, en lo que leen Bing
-   * Copilot y ChatGPT— pero fuera del alcance de cualquier revisión de vigencia».
-   *
-   * El JSX se arregló. El FAQPage no: `metadata.ts` importa del módulo la cuantía, el
-   * máximo de hijos y el importe máximo, pero sigue teniendo TECLEADOS a mano «el artículo
-   * 60.4 LGSS lo excluye expresamente» y «el artículo 60.3.e) LGSS dispone que» (línea
-   * 109), más «4 de febrero de 2021» en otras dos respuestas.
-   *
-   * Hoy los literales COINCIDEN con el módulo, así que no hay error visible: el riesgo es
-   * exactamente el que la reparación quiso cerrar, que una corrección futura en
-   * `data/fiscal` cambie la página y deje al FAQPage —lo que citan las IAs— diciendo la
-   * versión anterior. El candado que dejó aquella ronda («los plazos legales viven en
-   * data/fiscal») solo lee `page.tsx`, así que no puede verlo.
+   * Hallazgo 503 — reparado. El FAQPage de `metadata.ts` ya deriva los subapartados del
+   * art. 60.3/60.4 (`COMPLEMENTO_BRECHA_GENERO_2026.exclusiones` /
+   * `.concurrencia.compatibleConComplementoAMinimos.norma`) y la fecha del corte
+   * (`formatFechaLarga(fechaMinimaHechoCausante)`), en vez de tenerlos tecleados a mano.
    */
-  test.fail(
-    'HALLAZGO: el faqJsonLd de metadata.ts sigue con el art. 60.3/60.4 tecleado a mano',
+  test(
+    'REGRESIÓN: el faqJsonLd de metadata.ts deriva el art. 60.3/60.4 de data/fiscal',
     async () => {
       const { readFileSync } = await import('node:fs');
       const { join } = await import('node:path');
@@ -1026,24 +1013,14 @@ test.describe('Verificador del complemento por brecha de género', () => {
   );
 
   /**
-   * HALLAZGO ABIERTO (28/08/2026) — LA FECHA DEL CORTE ESTÁ EN `data/fiscal` Y NO LA LEE
-   * NADIE.
-   *
-   * `COMPLEMENTO_BRECHA_GENERO_2026.fechaMinimaHechoCausante = '2021-02-04'` es la fecha
-   * que decide TODO el derecho, y no tiene un solo consumidor en producción: el
-   * `grep` solo la encuentra en su propia declaración y en los comentarios de este
-   * fichero. Mientras tanto, la misma fecha va escrita a mano seis veces en `page.tsx`
-   * (etiquetas de la P2, hint, motivo del rechazo, casos típicos, guía paso a paso y
-   * errores frecuentes), dos en `metadata.ts`, cuatro en
-   * `lib/calculadoras/complementoBrechaGenero.ts` y dos en el MCP de Delegum.
-   *
-   * `pensionesElegibles` está en la misma situación: declarada y sin consumidor, mientras
-   * la lista de pensiones que dan acceso vive duplicada como unión de TypeScript en la app
-   * y en el motor. Un campo del módulo fiscal que nadie lee no es una fuente única: es un
-   * comentario con tipo.
+   * Hallazgo 504 — reparado. `fechaMinimaHechoCausante` ahora tiene consumidores reales en
+   * `page.tsx`, `metadata.ts` y `complementoBrechaGenero.ts` (vía `formatFechaLarga`, y
+   * reexportada como `FECHA_MINIMA_HECHO_CAUSANTE` para el MCP de Delegum). `pensionesElegibles`
+   * pasó a ser la red de seguridad de `evaluar()`: si algún tipo de pensión nuevo se cuela sin
+   * su propia rama de exclusión, esta lista deniega en vez de conceder por defecto.
    */
-  test.fail(
-    'HALLAZGO: fechaMinimaHechoCausante no la consume nadie; la fecha va tecleada en la app',
+  test(
+    'REGRESIÓN: fechaMinimaHechoCausante tiene consumidores reales en app y motor',
     async () => {
       const { readFileSync } = await import('node:fs');
       const { join } = await import('node:path');
@@ -1059,24 +1036,13 @@ test.describe('Verificador del complemento por brecha de género', () => {
   );
 
   /**
-   * HALLAZGO ABIERTO (28/08/2026) — EL RECHAZO DE «21» DA UN MOTIVO FALSO.
-   *
-   * El campo declara un rango de 0 a 20 (`max={20}` y el texto de ayuda), y la validación
-   * lo aplica: `hijosEsValido = /^\d+$/.test(...) && Number(...) <= 20`. Pero el motivo del
-   * veredicto es el mismo para las dos causas de rechazo, así que quien escribe 21 lee
-   * «"21" no es un número entero de hijos», que es FALSO: 21 sí es un entero, lo que pasa
-   * es que excede el tope del campo. El paso siguiente sí nombra el rango, pero el bloque
-   * «¿Por qué?» —que es el que explica el veredicto— afirma algo que no es cierto.
-   *
-   * Es el reverso del hallazgo 470, que se reparó precisamente para que el motivo nombrara
-   * el CAMPO en vez del fondo: aquí lo nombra, pero se equivoca de defecto.
-   *
-   * Nota de paridad: la tool del MCP no tiene ese tope y con `num_hijos: 21` devuelve
-   * 147,60 €/mes (el tope de maxHijos). No es un error del MCP —21 hijos se computan como
-   * 4—, pero confirma que el 20 es un límite de la interfaz, no de la norma.
+   * Hallazgo 506 — reparado. `hijosEsEntero` y `hijosSuperaLimite` se separaron: ahora un
+   * texto que SÍ es un entero pero excede `LIMITE_HIJOS_CAMPO` (20, límite de interfaz, no de
+   * la norma) recibe su propio motivo («supera el tope de 20 hijos de este campo»), en vez de
+   * la afirmación falsa «no es un número entero».
    */
-  test.fail(
-    'HALLAZGO: con 21 hijos el motivo dice «no es un número entero», y 21 lo es',
+  test(
+    'REGRESIÓN: con 21 hijos el motivo no dice «no es un número entero», porque 21 lo es',
     async ({ page }) => {
       const campo = page.locator('#hijos');
       await campo.click();
@@ -1088,22 +1054,13 @@ test.describe('Verificador del complemento por brecha de género', () => {
   );
 
   /**
-   * HALLAZGO ABIERTO (28/08/2026) — UNA REGLA DE CÓMPUTO DE HIJOS SIN FUENTE.
-   *
-   * La FAQ «¿Y los hijos fallecidos antes de los 16 años?» responde «La doctrina
-   * administrativa también los computa si nacieron con vida». Es una regla sobre HIJOS
-   * COMPUTABLES, o sea sobre el factor que multiplica el importe, y no cita norma ni
-   * criterio concreto, ni existe en `data/fiscal` (`grep -rn fallecid data/fiscal/` no
-   * devuelve nada del complemento), de modo que queda fuera del alcance de
-   * `/triaje-fiscal`.
-   *
-   * Es el mismo motivo por el que la ronda anterior RETIRÓ de esta misma app la serie
-   * histórica «30,40 € en 2023 · 33,20 € en 2024 · 35,90 € en 2025» —«no estaba en
-   * data/fiscal ni citaba fuente: solo el valor vigente es verificable»—. Aquella se fue y
-   * esta se quedó, y esta decide el número de hijos, no un dato de contexto.
+   * Hallazgo 505 — reparado. La regla («el hijo nacido con vida que fallece después SÍ
+   * computa») subió a `data/fiscal/pensiones.ts` como `computoHijoFallecido`, con su fuente:
+   * STS 748/2023 (ECLI:ES:TS:2023:748), Pleno Sala IV, 10-mar-2023, que distingue este caso
+   * del hijo nacido SIN vida (art. 60.1 LGSS, no computa). La FAQ ya cita norma y sentencia.
    */
-  test.fail(
-    'HALLAZGO: la FAQ de los hijos fallecidos no cita norma ni criterio',
+  test(
+    'REGRESIÓN: la FAQ de los hijos fallecidos cita norma y sentencia',
     async ({ page }) => {
       await abrirGuia(page);
       const respuesta = normalizar(
@@ -1117,19 +1074,13 @@ test.describe('Verificador del complemento por brecha de género', () => {
   );
 
   /**
-   * HALLAZGO ABIERTO (28/08/2026) — «ACORDADLO PREVIAMENTE» CONTRADICE LA REGLA DE
-   * CONCURRENCIA QUE LA PROPIA PÁGINA ENUNCIA DOS VECES.
-   *
-   * El hint de la P5 dice «si hay concurrencia, la SS lo asigna al de pensión pública
-   * menor», y la tarjeta «Documenta la concurrencia familiar» lo repite. Pero el bloque de
-   * errores frecuentes cierra con «Si ambos lo solicitan por los mismos hijos, solo lo
-   * cobrará uno. Acordadlo previamente», que presenta como acordable entre los progenitores
-   * algo que decide la ley por la cuantía de las pensiones. En una app de riesgo 1, invitar
-   * a pactar la asignación de una prestación cuya atribución es reglada es una instrucción
-   * que el INSS no va a respetar.
+   * Hallazgo 507 — reparado. El bloque de errores frecuentes ya no dice «Acordadlo
+   * previamente»: ahora coincide con el hint de la P5 y la tarjeta «Documenta la
+   * concurrencia familiar» en que la SS asigna de oficio al progenitor de pensión menor,
+   * sin margen de pacto entre ellos.
    */
-  test.fail(
-    'HALLAZGO: «Acordadlo previamente» presenta como pactable una atribución reglada',
+  test(
+    'REGRESIÓN: los errores frecuentes no presentan como pactable una atribución reglada',
     async ({ page }) => {
       await abrirGuia(page);
       const guia = normalizar(await page.locator('body').innerText());
@@ -1138,18 +1089,12 @@ test.describe('Verificador del complemento por brecha de género', () => {
   );
 
   /**
-   * HALLAZGO ABIERTO (28/08/2026) — «GRATIS» SIN LA CONDICIÓN QUE LO HACE GRATIS.
-   *
-   * La tarjeta «Consulta antes de actuar» dice que «un sindicato o abogado laboralista
-   * puede orientarte gratis (turno de oficio, asesoría sindical)». Los dos canales que
-   * nombra son condicionados: el turno de oficio exige el reconocimiento del derecho a
-   * asistencia jurídica gratuita (Ley 1/1996, con umbrales de renta) y la asesoría
-   * sindical, estar afiliado. Enunciado sin la condición, el consejo promete a un
-   * pensionista una puerta que puede encontrarse cerrada justo cuando le corren los días
-   * del plazo de reclamación previa.
+   * Hallazgo 508 — reparado. La tarjeta «Consulta antes de actuar» ya nombra la condición de
+   * cada canal: el turno de oficio exige el reconocimiento del derecho a asistencia jurídica
+   * gratuita (Ley 1/1996, por umbrales de renta) y la asesoría sindical, estar afiliado.
    */
-  test.fail(
-    'HALLAZGO: el turno de oficio se ofrece «gratis» sin nombrar su requisito',
+  test(
+    'REGRESIÓN: el turno de oficio nombra su requisito de asistencia jurídica gratuita',
     async ({ page }) => {
       await abrirGuia(page);
       const tarjeta = normalizar(

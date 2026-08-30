@@ -15,6 +15,7 @@ import {
   formatCurrency,
   formatDate,
   formatDateTime,
+  formatFechaLarga,
   parseSpanishNumber,
   parseSpanishNumberOr,
   formatPercentage,
@@ -103,6 +104,23 @@ test.describe('formatDateTime', () => {
     const result = formatDateTime(date);
     expect(result).toContain('25/11/2025');
     expect(result).toContain('14:30');
+  });
+});
+
+test.describe('formatFechaLarga', () => {
+  test('formatea una fecha ISO en prosa española', () => {
+    expect(formatFechaLarga('2021-02-04')).toBe('4 de febrero de 2021');
+  });
+
+  // El gotcha del hallazgo 482: new Date(fechaISO) interpreta la cadena como medianoche
+  // UTC, y en un huso horario negativo (América) muestra el día ANTERIOR. Este caso lo
+  // distingue: el 1 de enero es el que más fácil se desliza al 31 de diciembre anterior.
+  test('no se desliza al día anterior en husos horarios negativos', () => {
+    expect(formatFechaLarga('2026-01-01')).toBe('1 de enero de 2026');
+  });
+
+  test('rellena correctamente fin de mes y años bisiestos', () => {
+    expect(formatFechaLarga('2024-02-29')).toBe('29 de febrero de 2024');
   });
 });
 

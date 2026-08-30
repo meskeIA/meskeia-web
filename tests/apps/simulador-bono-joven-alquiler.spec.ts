@@ -734,54 +734,28 @@ test.describe('Simulador Bono Joven Alquiler — casos nuevos del 28/08/2026', (
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════════════
- * HALLAZGOS ABIERTOS de la re-inspección del 28/08/2026.
- *
- * Cada uno con UNA sola aserción de fondo: con `test.fail()` basta con fallar en algún punto,
- * así que dos aserciones pueden tapar que la que documenta el hallazgo ni se evalúa.
+ * Hallazgos 487/488/489 de la re-inspección del 28/08/2026 — reparados.
  * ═══════════════════════════════════════════════════════════════════════════════════════
  */
-test.describe('Simulador Bono Joven Alquiler — hallazgos abiertos (28/08/2026)', () => {
+test.describe('Simulador Bono Joven Alquiler — hallazgos reparados (28/08/2026)', () => {
   /**
-   * HALLAZGO A (contenido, medio) — el veredicto afirma haber comprobado una renta que no existe.
-   *
-   * Lo escribió el propio commit e1a42c65 al reparar el hallazgo 445: donde antes la nota
-   * listaba la renta entre los aspectos pendientes, ahora afirma «La renta ya está comprobada
-   * aquí arriba contra el tope del art. 133.1.e». Es cierto cuando hay una renta tecleada y
-   * FALSO cuando no la hay, que es justo el caso en que este veredicto aparece con los seis
-   * requisitos contestados: sin renta, `rentaDentroDelLimite` es `null` y la app no ha
-   * comprobado nada.
-   *
-   * Con el campo vacío y los seis «Sí»: esperado que el veredicto no dé por hecha una
-   * comprobación que no ha ocurrido. La misma frase sale con «-500» tecleado —el campo se ve
-   * lleno y `Math.max(0, …)` lo convierte en 0 sin decirlo—, que es la versión silenciosa.
+   * Hallazgo 487 (contenido, medio) — reparado. El veredicto «casi» distingue ahora
+   * `rentaDentroDelLimite === true` (comprobada, dentro del tope) de cualquier otro caso: sin
+   * renta tecleada dice «Falta comprobar la renta», en vez de afirmar una comprobación que
+   * `rentaDentroDelLimite === null` demuestra que no ha ocurrido.
    */
-  test('HALLAZGO A — sin renta tecleada, el veredicto no puede decir que la renta ya está comprobada', async ({ page }) => {
-    test.fail();
+  test('REGRESIÓN — sin renta tecleada, el veredicto no dice que la renta ya está comprobada', async ({ page }) => {
     await page.goto(RUTA);
     await responderTodoSi(page);
     expect(await textoResultado(page)).not.toContain('La renta ya está comprobada');
   });
 
   /**
-   * HALLAZGO B (dato, medio) — el FAQPage y la página contestan distinto a quién fija el
-   * umbral de ingresos.
-   *
-   * La reparación derivó el requisito visible de `UMBRAL_IPREM_VIVIENDA_JOVEN` y hoy la
-   * checklist dice «El RD 326/2026 fija el umbral en 5 veces el IPREM … Cada Comunidad
-   * Autónoma concreta el CÓMPUTO en su convocatoria». El FAQPage JSON-LD, que no se tocó,
-   * sigue contestando a la pregunta «¿Cuáles son los requisitos de ingresos…?» con «cada
-   * Comunidad Autónoma concreta ese UMBRAL en su propia convocatoria», sin la cifra del art.
-   * 133.1.d que el módulo sella.
-   *
-   * Es el mecanismo del hallazgo 442, reparado en la respuesta de al lado ocho días antes: el
-   * bloque estructurado es el que citan Bing Copilot, ChatGPT, Perplexity y Gemini, donde ya
-   * no va acompañado ni del disclaimer ni de la checklist que sí lleva la cifra.
-   *
-   * Esperado: la respuesta del FAQPage sobre ingresos nombra el umbral sellado (5 veces el
-   * IPREM). Obtenido: no menciona el IPREM en ningún punto.
+   * Hallazgo 488 (dato, medio) — reparado. La respuesta del FAQPage sobre requisitos de
+   * ingresos deriva ahora `UMBRAL_IPREM_VIVIENDA_JOVEN.general` (art. 133.1.d) en vez de
+   * remitir el umbral entero a la convocatoria autonómica.
    */
-  test('HALLAZGO B — el FAQPage debe dar el umbral de ingresos del art. 133.1.d, no remitirlo a la CA', async ({ page }) => {
-    test.fail();
+  test('REGRESIÓN — el FAQPage da el umbral de ingresos del art. 133.1.d, no lo remite a la CA', async ({ page }) => {
     await page.goto(RUTA);
     const bloques = await page.locator('script[type="application/ld+json"]').allInnerTexts();
     const faq = bloques.map(b => JSON.parse(b)).find(b => b['@type'] === 'FAQPage');
@@ -791,25 +765,11 @@ test.describe('Simulador Bono Joven Alquiler — hallazgos abiertos (28/08/2026)
   });
 
   /**
-   * HALLAZGO C (dato, bajo) — la deduplicación no llegó a `metadata.ts`.
-   *
-   * El commit e1a42c65 hizo que ocho literales normativos de `page.tsx` salieran del módulo
-   * sellado, y en la app hermana de la misma tanda (`simulador-heredar-vivienda`) derivó
-   * también el `metadata.ts`, importando `TRAMOS_GANANCIAS_PATRIMONIALES_2025`. Aquí no:
-   * `metadata.ts` mantiene la segunda copia entera a mano —300 €/mes, 200 €/mes, 4 años, el
-   * 60 %, la franja 18-35 y los 3.600 / 2.400 € anuales— en `description`, `twitter`, las
-   * `features` del WebApplication y tres respuestas del FAQPage.
-   *
-   * Hoy las dos copias dicen lo mismo, así que es riesgo de deriva y no un error a la vista.
-   * Pero es exactamente la deriva de los hallazgos 152 y 153 en esta misma app, que sirvió
-   * durante meses «hasta 250 €/mes durante 2 años» y «máximo 3.000 € anuales» del RD 42/2022
-   * mientras el motor ya calculaba con el RD 326/2026.
-   *
-   * Esperado: ningún importe del art. 137 tecleado en `metadata.ts` (que se derive, como en
-   * `page.tsx`). Obtenido: «300 €/mes» escrito a mano cuatro veces.
+   * Hallazgo 489 (dato, bajo) — reparado. `metadata.ts` deriva ahora las cuantías del art. 137
+   * de `BONO_ALQUILER_JOVEN_2026` con el mismo formateador `eur()` que `page.tsx`, en vez de
+   * tener una segunda copia tecleada a mano.
    */
-  test('HALLAZGO C — metadata.ts no debe conservar la copia tecleada de las cuantías del art. 137', async () => {
-    test.fail();
+  test('REGRESIÓN — metadata.ts deriva las cuantías del art. 137 en vez de tenerlas tecleadas', async () => {
     const { readFileSync } = await import('node:fs');
     const { join } = await import('node:path');
     const fuente = readFileSync(

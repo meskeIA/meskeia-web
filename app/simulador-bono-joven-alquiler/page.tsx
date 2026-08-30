@@ -340,8 +340,13 @@ export default function SimuladorBonoJovenAlquilerPage() {
               <h3 className={styles.resultadoTitulo}>Cumples los requisitos básicos</h3>
               <p className={styles.resultadoTexto}>
                 Cumples los requisitos obligatorios, aunque algunos aspectos adicionales (contrato registrado,
-                documentación completa, disponibilidad de fondos en tu CA) pueden condicionar la aprobación final.
-                La renta ya está comprobada aquí arriba contra el tope del art. 133.1.e. Consulta con tu Comunidad Autónoma.
+                documentación completa, disponibilidad de fondos en tu CA) pueden condicionar la aprobación final.{' '}
+                {rentaDentroDelLimite === true ? (
+                  <>La renta ya está comprobada aquí arriba contra el tope del art. 133.1.e.</>
+                ) : (
+                  <>Falta comprobar la renta: introdúcela aquí arriba para verificarla contra el tope del art. 133.1.e.</>
+                )}{' '}
+                Consulta con tu Comunidad Autónoma.
               </p>
             </div>
           )}
