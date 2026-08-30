@@ -1353,24 +1353,24 @@ test.describe('Hallazgos abiertos — re-inspección del 30/08/2026', () => {
   // la condición que la anula.
   // Caso: bloque educativo, tarjeta de Carlos → esperado que NO prometa aplicación automática
   //       para un garaje suelto · obtenido «lo aplica automáticamente al seleccionar "Joven"».
-  test.fail(
-    'ABIERTO (contenido) — el ejemplo de Carlos no puede prometer un reducido que el motor descarta',
-    async ({ page }) => {
-      await page.goto(RUTA);
-      await page.selectOption('#select-ccaa', 'andalucia');
-      await page.selectOption('#select-perfil', 'joven');
-      await rellenar(page, 'Precio del garaje / plaza de parking', '18000');
+  test('514 — el ejemplo de Carlos ya no promete un reducido que el motor descarta', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.selectOption('#select-ccaa', 'andalucia');
+    await page.selectOption('#select-perfil', 'joven');
+    await rellenar(page, 'Precio del garaje / plaza de parking', '18000');
 
-      // Lo que el motor hace de verdad con la entrada del ejemplo
-      expect(await valorTarjeta(page, 'ITP (7,00%)')).toBe('1260,00 €');
+    // Lo que el motor hace de verdad con la entrada del ejemplo
+    expect(await valorTarjeta(page, 'ITP (7,00%)')).toBe('1260,00 €');
 
-      await page
-        .getByRole('button', { name: /Ver guía educativa|Todo lo que necesitas saber/i })
-        .click();
-      const carlos = (await page.getByText(/Carlos, 28 años/).innerText()).replace(/\s+/g, ' ');
-      expect(carlos).not.toMatch(/lo aplica autom[áa]ticamente/i);
-    },
-  );
+    await page
+      .getByRole('button', { name: /Ver guía educativa|Todo lo que necesitas saber/i })
+      .click();
+    const carlos = (await page.getByText(/Carlos, 28 años/).innerText()).replace(/\s+/g, ' ');
+    expect(carlos).not.toMatch(/lo aplica autom[áa]ticamente/i);
+    expect(carlos).toMatch(/el reducido no aplica/i);
+  });
 
   // ❌ ABIERTO (medio) — contenido.
   // Al elegir cualquier perfil distinto de «General», el panel izquierdo lista los tipos
@@ -1383,22 +1383,20 @@ test.describe('Hallazgos abiertos — re-inspección del 30/08/2026', () => {
   // que se lee primero es la que promete de más.
   // Caso: Andalucía · perfil Joven → esperado que la lista traiga la condición que la anula o
   //       no rotule «disponibles» · obtenido cinco tipos «disponibles» sin condiciones.
-  test.fail(
-    'ABIERTO (contenido) — la lista de tipos reducidos no puede decir «disponibles» sin sus condiciones',
-    async ({ page }) => {
-      await page.goto(RUTA);
-      await page.selectOption('#select-ccaa', 'andalucia');
-      await page.selectOption('#select-perfil', 'joven');
-      await rellenar(page, 'Precio del garaje / plaza de parking', '18000');
+  test('515 — la lista de tipos reducidos muestra sus condiciones, no solo el tipo', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.selectOption('#select-ccaa', 'andalucia');
+    await page.selectOption('#select-perfil', 'joven');
+    await rellenar(page, 'Precio del garaje / plaza de parking', '18000');
 
-      const lista = page.locator('h4', { hasText: 'Tipos reducidos disponibles' }).locator('xpath=..');
-      // Si se anuncian como disponibles, tiene que verse por qué la mayoría no lo está
-      await expect(lista).toContainText('Vivienda habitual', { useInnerText: true });
-      await expect(lista).toContainText(
-        /no aplica|no se aplica|un garaje suelto|requisitos/i,
-      );
-    },
-  );
+    const lista = page.locator('h4', { hasText: /Tipos reducidos en/ }).locator('xpath=..');
+    // Ya no se anuncian como «disponibles»: cada línea trae sus condiciones reales,
+    // y la de Vivienda habitual es la que un garaje suelto nunca cumple.
+    await expect(lista).toContainText('Vivienda habitual', { useInnerText: true });
+    await expect(lista).toContainText(/TODAS sus condiciones/i);
+  });
 
   // ❌ ABIERTO (medio) — dato.
   // La plusvalía municipal se calcula con `PLUSVALIA_MUNICIPAL_META.tipoOrientativo = 25`
@@ -1412,23 +1410,25 @@ test.describe('Hallazgos abiertos — re-inspección del 30/08/2026', () => {
   //       En un municipio al 30 % serían 120,00 €. Esperado que la página publique el tipo
   //       usado (o lo deje introducir) · obtenido «100,00 € — Método objetivo (más favorable)»
   //       sin que el 25 % se lea en ningún sitio.
-  test.fail(
-    'ABIERTO (dato) — el tipo del 25 % con el que se calcula la plusvalía tiene que verse',
-    async ({ page }) => {
-      await page.goto(RUTA);
-      await rellenar(page, 'Precio del garaje / plaza de parking', '22000');
-      await page.getByRole('tab', { name: /Vendedor/ }).click();
-      await rellenar(page, 'Precio de compra original del garaje', '15000');
-      await rellenar(page, 'Años de propiedad', '10');
-      await rellenar(page, 'Valor catastral del suelo (€)', '5000');
-      await rellenar(page, 'Valor catastral total (suelo + construcción) (€)', '12000');
+  test('516 — el tipo del 25 % con el que se calcula la plusvalía ya se publica', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio del garaje / plaza de parking', '22000');
+    await page.getByRole('tab', { name: /Vendedor/ }).click();
+    await rellenar(page, 'Precio de compra original del garaje', '15000');
+    await rellenar(page, 'Años de propiedad', '10');
+    await rellenar(page, 'Valor catastral del suelo (€)', '5000');
+    await rellenar(page, 'Valor catastral total (suelo + construcción) (€)', '12000');
 
-      // 5.000 × 0,08 × 25 % = 100,00 — el importe es el que corresponde al 25 % orientativo
-      expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('100,00 €');
+    // 5.000 × 0,08 × 25 % = 100,00 — el importe es el que corresponde al 25 % orientativo
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('100,00 €');
 
-      // …pero ese 25 % no se publica en ninguna parte de la página
-      const cuerpo = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
-      expect(cuerpo).toMatch(/25\s*%/);
-    },
-  );
+    // El 25 % ahora se publica en la FAQ del bloque educativo
+    await page
+      .getByRole('button', { name: /Ver guía educativa|Todo lo que necesitas saber/i })
+      .click();
+    const cuerpo = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
+    expect(cuerpo).toMatch(/tipo del 25\s*%/);
+  });
 });

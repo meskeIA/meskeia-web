@@ -484,7 +484,7 @@ export default function SimuladorGarajeCompraventaPage() {
               </select>
               {perfilComprador !== 'general' && datosCcaaActual.tiposReducidos.length > 0 && (
                 <div className={styles.tiposReducidosInfo}>
-                  <h4>Tipos reducidos disponibles en {datosCcaaActual.nombre}:</h4>
+                  <h4>Tipos reducidos en {datosCcaaActual.nombre} (solo si se cumplen TODAS sus condiciones):</h4>
                   <ul>
                     {datosCcaaActual.tiposReducidos.map((tr, idx) => (
                       <li key={idx}>
@@ -492,6 +492,7 @@ export default function SimuladorGarajeCompraventaPage() {
                         {tr.valorMaximo && (
                           <span className={styles.limite}> (máx. {formatCurrency(tr.valorMaximo)})</span>
                         )}
+                        <span className={styles.limite}> · {tr.condiciones.join(', ')}</span>
                       </li>
                     ))}
                   </ul>
@@ -978,8 +979,8 @@ export default function SimuladorGarajeCompraventaPage() {
                 <span aria-hidden="true" className={styles.casoEmoji}>🎯</span>
                 <span className={styles.casoTag}>Tipos reducidos de ITP para garaje</span>
               </div>
-              <p>Carlos, 28 años, compra un garaje en Andalucía por 18.000 €. Al ser joven, puede aplicar el tipo reducido autonómico. El simulador detecta el tipo reducido disponible y lo aplica automáticamente al seleccionar "Joven" en el perfil del comprador.</p>
-              <div className={styles.casoResultado}>Tipos reducidos: aplican igual que en vivienda residencial</div>
+              <p>Carlos, 28 años, compra un garaje suelto en Andalucía por 18.000 €. El tipo reducido para jóvenes (3,5%) exige que sea su <strong>vivienda habitual</strong>, y un garaje suelto nunca lo es: el simulador liquida el tipo general (7,00% = 1.260,00 €) y avisa de que el reducido no aplica, en vez de dar por buenos 630,00 €. Solo tributa como vivienda habitual si se compra vinculado a ella, en el mismo acto.</p>
+              <div className={styles.casoResultado}>Tipos reducidos: NO aplican a un garaje suelto, solo vinculado a la vivienda habitual</div>
             </div>
           </div>
         </section>
@@ -1002,11 +1003,11 @@ export default function SimuladorGarajeCompraventaPage() {
             </div>
             <div className={styles.faqItem}>
               <h4>¿El vendedor de un garaje paga plusvalía municipal?</h4>
-              <p>Sí. El vendedor debe pagar el Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana (plusvalía municipal) al ayuntamiento donde esté ubicado el garaje. Desde 2021, puede elegir entre el método objetivo y el real, pagando el más favorable. Si vende por menos de lo que compró, puede quedar exento acreditando la pérdida.</p>
+              <p>Sí. El vendedor debe pagar el Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana (plusvalía municipal) al ayuntamiento donde esté ubicado el garaje. Desde 2021, puede elegir entre el método objetivo y el real, pagando el más favorable. Si vende por menos de lo que compró, puede quedar exento acreditando la pérdida. Esta calculadora aplica un <strong>tipo del 25%</strong> como referencia orientativa habitual; cada ayuntamiento fija su propio tipo, con un <strong>máximo legal del 30%</strong>.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Existen tipos reducidos de ITP para garajes?</h4>
-              <p>Sí, en muchas comunidades autónomas los tipos reducidos aplicables a inmuebles residenciales también se pueden aplicar a garajes, siempre que el garaje se compre junto con o en el mismo acto que la vivienda, o cuando se cumplan los requisitos del comprador (edad, ingresos, discapacidad). Conviene consultar la normativa específica de tu comunidad, ya que los requisitos varían.</p>
+              <p>Casi todos exigen que el inmueble sea <strong>vivienda habitual</strong>, además de cumplir el requisito del comprador (edad, familia numerosa, discapacidad). Un garaje suelto nunca es vivienda habitual, así que ese tipo reducido no aplica aunque el comprador cumpla el resto: solo tributa como vivienda habitual cuando se compra vinculado a ella, en el mismo acto y edificio. Conviene consultar la normativa específica de tu comunidad, ya que los requisitos varían.</p>
             </div>
           </div>
         </section>

@@ -84,6 +84,10 @@ interface ResultadosVendedor {
   irpfCalculado: boolean;
   exentoIRPF: boolean;
   motivoExencion: string | null;
+  /** Campos concretos sin rellenar, para no confundir «falta este dato» con «este cálculo no se hizo» */
+  faltaPrecioCompra: boolean;
+  faltaValorSuelo: boolean;
+  faltaAnios: boolean;
 }
 
 // ===== CONSTANTES =====
@@ -394,6 +398,11 @@ export default function SimuladorCompraventaPage() {
       irpfCalculado: hayDatosGanancia,
       exentoIRPF,
       motivoExencion: hayDatosGanancia ? g.motivoExencion : null,
+      // !(x > 0) y no «x <= 0»: con el campo vacío, parseSpanishNumber devuelve NaN, y
+      // NaN <= 0 es false — el mismo bug que el propio hallazgo 512 venía a cerrar.
+      faltaPrecioCompra: !(precioC > 0),
+      faltaValorSuelo: !(valorSuelo > 0),
+      faltaAnios: !(anios > 0),
     };
   }, [precioVenta, precioCompraOriginal, aniosPropiedad, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, gastosGestoria, otrosGastosVenta, gastosAdquisicion, mejoras, vendedorMayor65, esViviendaHabitual, reinvierte, importeReinversion, hipotecaPendiente]);
 
@@ -430,6 +439,20 @@ export default function SimuladorCompraventaPage() {
     ? [
         resultadosVendedor.plusvaliaCalculada ? null : 'la plusvalía municipal',
         resultadosVendedor.irpfCalculado ? null : 'el IRPF de la ganancia',
+      ].filter((x): x is string => x !== null)
+    : [];
+
+  /**
+   * Qué CAMPOS rellenar para que el neto se calcule entero. No se deduce de qué impuesto
+   * quedó sin calcular (plusvaliaCalculada/irpfCalculado): los dos dependen del precio de
+   * compra, así que con el suelo ya relleno y solo el precio en blanco, esa deducción pedía
+   * rellenar el suelo dos veces y nunca decía qué campo faltaba de verdad (hallazgo 512).
+   */
+  const camposQueFaltan = resultadosVendedor
+    ? [
+        resultadosVendedor.faltaPrecioCompra ? 'el precio de compra original' : null,
+        resultadosVendedor.faltaValorSuelo ? 'el valor catastral del suelo' : null,
+        resultadosVendedor.faltaAnios ? 'los años de tenencia' : null,
       ].filter((x): x is string => x !== null)
     : [];
 
@@ -473,7 +496,7 @@ export default function SimuladorCompraventaPage() {
       {/* Formulario principal */}
       <section className={styles.mainContent}>
         <div className={styles.formPanel}>
-          <h2 className={styles.sectionTitle}>📋 Datos de la operación</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">📋</span> Datos de la operación</h2>
 
           {/* Tipo de inmueble */}
           <div className={styles.inputGroup}>
@@ -565,7 +588,7 @@ export default function SimuladorCompraventaPage() {
               >
                 <span className={styles.transmisionIcon} aria-hidden="true">🆕</span>
                 <span>Primera mano</span>
-                <span className={styles.transmisionSub}>Paga IVA</span>
+                <span className={styles.transmisionSub}>Paga {TERRITORIOS_SIN_IVA[ccaa]?.impuesto ?? 'IVA'}</span>
               </button>
             </div>
           </div>
@@ -615,7 +638,7 @@ export default function SimuladorCompraventaPage() {
             </div>
             {datosCcaaActual.tramosProgresivos && (
               <p className={styles.infoCcaaNote}>
-                ⚠️ Esta comunidad aplica escala progresiva ({datosCcaaActual.tramosProgresivos.map(t => `${t.tipo}%`).join(' → ')})
+                <span aria-hidden="true">⚠️</span> Esta comunidad aplica escala progresiva ({datosCcaaActual.tramosProgresivos.map(t => `${t.tipo}%`).join(' → ')})
               </p>
             )}
             <p className={styles.infoCcaaNote}>{datosCcaaActual.notas}</p>
@@ -666,7 +689,7 @@ export default function SimuladorCompraventaPage() {
           {/* Enlace a Catastro */}
           <div className={styles.enlaceCatastro}>
             <a href={ENLACE_CATASTRO} target="_blank" rel="noopener noreferrer" className={styles.catastroLink}>
-              🔗 Consultar valor de referencia catastral en la Sede del Catastro
+              <span aria-hidden="true">🔗</span> Consultar valor de referencia catastral en la Sede del Catastro
             </a>
           </div>
         </div>
@@ -1145,7 +1168,7 @@ export default function SimuladorCompraventaPage() {
                     description={
                       faltanEnElNeto.length === 0
                         ? 'Lo que realmente recibes'
-                        : `INCOMPLETO: falta descontar ${faltanEnElNeto.join(' y ')}. Rellena ${resultadosVendedor.plusvaliaCalculada ? 'el precio de compra original' : resultadosVendedor.irpfCalculado ? 'el valor catastral del suelo' : 'el precio de compra original y el valor catastral del suelo'} para obtener el neto real.`
+                        : `INCOMPLETO: falta descontar ${faltanEnElNeto.join(' y ')}. Rellena ${camposQueFaltan.length <= 1 ? camposQueFaltan.join('') : `${camposQueFaltan.slice(0, -1).join(', ')} y ${camposQueFaltan[camposQueFaltan.length - 1]}`} para obtener el neto real.`
                     }
                   />
                 </>
@@ -1162,7 +1185,7 @@ export default function SimuladorCompraventaPage() {
 
       {/* Disclaimer Educativo */}
       <div className={styles.disclaimer}>
-        <h3>⚠️ Información Importante sobre Estimaciones</h3>
+        <h3><span aria-hidden="true">⚠️</span> Información Importante sobre Estimaciones</h3>
         <p>
           Esta calculadora proporciona <strong>estimaciones orientativas</strong>. Los importes reales pueden variar según:
         </p>
@@ -1173,21 +1196,21 @@ export default function SimuladorCompraventaPage() {
           <li>Aranceles notariales que pueden variar según la complejidad</li>
         </ul>
 
-        <h4>⚠️ Verificación de Datos Tributarios</h4>
+        <h4><span aria-hidden="true">⚠️</span> Verificación de Datos Tributarios</h4>
         <p>
           Los tipos de <strong>ITP, AJD y aranceles notariales</strong> pueden haber cambiado desde la última verificación
           de esta herramienta (ver fecha en &quot;Datos de referencia&quot; más arriba). <strong>Verifica los tipos vigentes</strong> con tu comunidad autónoma
           antes de tomar decisiones.
         </p>
 
-        <h4>⚠️ NO Sustituye Asesoramiento Profesional</h4>
+        <h4><span aria-hidden="true">⚠️</span> NO Sustituye Asesoramiento Profesional</h4>
         <p>
           Esta calculadora <strong>NO sustituye el asesoramiento</strong> de un notario, abogado o asesor fiscal.
           Usa los resultados como <strong>estimación orientativa</strong>, NO como base para decisiones legales
           o financieras definitivas.
         </p>
 
-        <h4>📋 Fuentes Oficiales de Consulta</h4>
+        <h4><span aria-hidden="true">📋</span> Fuentes Oficiales de Consulta</h4>
         <ul>
           <li><strong>ITP/IVA/AJD:</strong> Consulta la normativa tributaria de tu comunidad autónoma</li>
           <li><strong>Aranceles:</strong> Real Decreto 1426/1989 (notarías) y 1427/1989 (registros)</li>
@@ -1195,7 +1218,7 @@ export default function SimuladorCompraventaPage() {
           <li><strong>Agencia Tributaria:</strong> <a href="https://www.agenciatributaria.es" target="_blank" rel="noopener noreferrer">www.agenciatributaria.es</a></li>
         </ul>
 
-        <h4>💡 Exenciones y Bonificaciones</h4>
+        <h4><span aria-hidden="true">💡</span> Exenciones y Bonificaciones</h4>
         <p>
           <strong>Plusvalía en IRPF:</strong> Los mayores de 65 años que venden su vivienda habitual
           están exentos de tributar por la ganancia patrimonial en IRPF. Existen otras bonificaciones
@@ -1214,7 +1237,7 @@ export default function SimuladorCompraventaPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🔄 Segunda mano → ITP</h4>
+              <h4><span aria-hidden="true">🔄</span> Segunda mano → ITP</h4>
               <p>
                 El <strong>Impuesto de Transmisiones Patrimoniales</strong> grava las compras de inmuebles de segunda mano.
                 Cada comunidad autónoma fija su propio tipo, que va del {formatNumber(RANGO_ITP.min, 0)}% (País Vasco) al {formatNumber(RANGO_ITP.max, 0)}% (el tramo más alto de las escalas progresivas de Baleares y Cataluña).
@@ -1225,7 +1248,7 @@ export default function SimuladorCompraventaPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🆕 Primera mano → IVA + AJD</h4>
+              <h4><span aria-hidden="true">🆕</span> Primera mano → IVA + AJD</h4>
               <p>
                 Las viviendas nuevas (primera transmisión del promotor) pagan <strong>IVA al 10%</strong>.
                 Los locales comerciales, naves industriales y terrenos pagan <strong>IVA al 21%</strong>.
@@ -1236,7 +1259,7 @@ export default function SimuladorCompraventaPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🏛️ Plusvalía municipal</h4>
+              <h4><span aria-hidden="true">🏛️</span> Plusvalía municipal</h4>
               <p>
                 El vendedor debe pagar el <strong>Impuesto sobre el Incremento del Valor de los Terrenos</strong> (plusvalía municipal).
               </p>
@@ -1260,7 +1283,7 @@ export default function SimuladorCompraventaPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>💰 IRPF del vendedor</h4>
+              <h4><span aria-hidden="true">💰</span> IRPF del vendedor</h4>
               <p>
                 La ganancia patrimonial tributa en la <strong>base del ahorro</strong> con tipos del 19% al 30%
                 según el importe.
@@ -1268,8 +1291,8 @@ export default function SimuladorCompraventaPage() {
               <p>
                 No es la simple diferencia entre lo que pagaste y lo que cobras: al precio de compra se le suman
                 los <strong>impuestos y gastos de aquella compra</strong> y las mejoras, y del precio de venta se
-                restan la comisión, la gestoría y la <strong>plusvalía municipal</strong> (art. 35 LIRPF). Declararlos
-                puede rebajar la factura varios miles de euros.
+                restan la comisión, tu propia gestoría —la del comprador no cuenta, art. 35.1 LIRPF— y la
+                <strong> plusvalía municipal</strong>. Declararlos puede rebajar la factura varios miles de euros.
               </p>
               <p>
                 <strong>Exención total</strong> para mayores de 65 años que venden su vivienda habitual, y
@@ -1338,7 +1361,7 @@ export default function SimuladorCompraventaPage() {
                   <td>AJD</td>
                   <td>{formatNumber(RANGO_AJD.min, 0)}% – {formatNumber(RANGO_AJD.max, 1)}%</td>
                   <td>{formatNumber(RANGO_AJD.min, 0)}% – {formatNumber(RANGO_AJD.max, 1)}% (con hipoteca)</td>
-                  <td>Comprador</td>
+                  <td>Comprador · con hipoteca, la entidad financiera (Ley 5/2019)</td>
                 </tr>
                 <tr>
                   <td>Plusvalía municipal</td>

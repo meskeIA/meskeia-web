@@ -1333,31 +1333,12 @@ test.describe('RE-INSPECCIÓN 30/08/2026 — casos nuevos y cierre de la tanda 2
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
-// HALLAZGO ABIERTO — re-inspección del 30/08/2026.
-// Marcado con `test.fail()`: afirma lo que DEBERÍA pasar, así que hoy falla a propósito.
+// Reparados el 30/08/2026 (Inspector, ronda 8, hallazgos 526-527).
 // ═════════════════════════════════════════════════════════════════════════════
 
-// ⚠️ ABIERTO 30/08/2026 (medio) — dato.
-// La tarjeta «Tipos reducidos de ITP» del bloque educativo publica «y no el reducido del 0%
-// para jóvenes» en Galicia. Ese 0 % NO EXISTE: `ITP_CCAA.galicia` declara el reducido de
-// jóvenes al 3 % y `TIPOS_ITP_CCAA_2025` lo confirma (`{ ccaa: 'Galicia', reducido: 3 }`).
-// El defecto está en la derivación de `EJEMPLOS` (page.tsx):
-//     ITP_CCAA['galicia'].tiposReducidos.find(r => r.nombre.toLowerCase().includes('joven'))
-// El tipo se llama «Jóvenes < 36 años», y `'jóvenes'` NO contiene `'joven'` — la «ó» acentuada
-// rompe la subcadena—, así que `find` devuelve `undefined` y el `?? 0` de la línea siguiente
-// publica un cero en vez de fallar. `elegirTipoITP` esquiva la trampa con su helper
-// `normaliza()`, que descompone en NFD y quita los diacríticos antes de comparar; esta
-// derivación no lo usa. Es exactamente el efecto que la derivación venía a evitar: se escribió
-// el 21/08/2026 «para que el ejemplo no vuelva a envejecer solo», y lo que hace es publicar en
-// silencio una cifra que no está en ninguna tabla.
-// Caso: Galicia · segunda mano · perfil joven · 12.000 € → la app cobra «ITP (8,00%) 960,00 €»
-//       y su propio aviso «Podrías pagar menos» enumera «3,00% — Jóvenes < 36 años»; dos
-//       pantallas más abajo el ejemplo dice «no el reducido del 0% para jóvenes».
-//       Esperado «3%» · obtenido «0%», con la app contradiciéndose a sí misma.
-test('HALLAZGO 30/08 (dato) — el ejemplo de Galicia publica un reducido del 0 % que no existe', async ({
+test('526 — el ejemplo de Galicia ya publica el reducido real (3 %), no un 0 % inventado', async ({
   page,
 }) => {
-  test.fail(); // abierto: se retira esta línea al repararlo y queda como regresión
   await page.goto(RUTA);
   await selectCcaa(page).selectOption('galicia');
   await rellenar(page, 'Precio del trastero', '12000');
@@ -1373,4 +1354,14 @@ test('HALLAZGO 30/08 (dato) — el ejemplo de Galicia publica un reducido del 0 
   );
   expect(ejemplo).toContain('3%');
   expect(ejemplo).not.toContain('0%');
+});
+
+test('527 — la nota de cabecera ya no contradice el aviso de IGIC/IPSI en Melilla', async ({
+  page,
+}) => {
+  await page.goto(RUTA);
+  await selectCcaa(page).selectOption('melilla');
+  const nota = await texto(page.locator('[class*="trasteroNote"]').first());
+  expect(nota).toMatch(/Canarias, Ceuta y Melilla/i);
+  expect(nota).not.toMatch(/que no depende de la comunidad autónoma/i);
 });

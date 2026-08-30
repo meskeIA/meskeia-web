@@ -843,6 +843,15 @@ const CONDICIONES_DE_UBICACION = [
  *   la condición «Vivienda habitual» —que aparece en 53 de los tipos reducidos— no se
  *   cumple nunca por definición.
  */
+/**
+ * Minúsculas sin diacríticos, para comparar nombres de tipos reducidos por palabra
+ * ('jóvenes'.includes('joven') es false: la 'ó' no es una 'o'). Exportada porque el mismo
+ * bug reapareció fuera de elegirTipoITP, en la derivación de ejemplos de una app (hallazgo
+ * 526, Inspector 30/08/2026): con la tilde sin normalizar, el tipo reducido de Galicia para
+ * jóvenes no se encontraba y el ejemplo publicaba un 0% que no es el 3% real.
+ */
+export const normaliza = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
 export function elegirTipoITP(
   ccaa: ComunidadAutonoma,
   perfil: PerfilComprador,
@@ -853,7 +862,6 @@ export function elegirTipoITP(
   const general: TipoElegido = { tipo: datos.tipoGeneral, esReducido: false, noComprobables: [] };
   if (!datos.tiposReducidos.length) return general;
 
-  const normaliza = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
   // Bonificaciones que dependen del SITIO y no del comprador: se aplican con cualquier
   // perfil, incluido «general», así que se resuelven ANTES de salir por ese atajo.

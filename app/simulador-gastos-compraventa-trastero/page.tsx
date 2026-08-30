@@ -35,6 +35,7 @@ import {
   ENLACE_CATASTRO,
   RANGO_AJD,
   TERRITORIOS_SIN_IVA,
+  normaliza,
 } from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 
@@ -122,7 +123,7 @@ const EJEMPLOS = (() => {
   const galiciaPrecio = 12000;
   const galiciaElegido = elegirTipoITP('galicia', 'joven', galiciaPrecio, { viviendaHabitual: false });
   const galiciaItp = importeITP(galiciaPrecio, 'galicia', galiciaElegido);
-  const galiciaReducido = ITP_CCAA['galicia'].tiposReducidos.find(r => r.nombre.toLowerCase().includes('joven'));
+  const galiciaReducido = ITP_CCAA['galicia'].tiposReducidos.find(r => normaliza(r.nombre).includes('joven'));
 
   return {
     nuevoPrecio,
@@ -409,8 +410,9 @@ export default function SimuladorTrasteroCompraventaPage() {
         <p>
           <strong>Trastero vinculado a vivienda:</strong> tributa como anejo residencial (IVA 10% en obra nueva,
           ITP residencial en segunda mano). <strong>Trastero vendido de forma independiente:</strong> en obra nueva
-          pierde el tipo reducido y paga el IVA general del 21%, una diferencia estatal (art. 91.Uno.1.7º LIVA)
-          que no depende de la comunidad autónoma. En segunda mano paga el mismo ITP que el vinculado.
+          pierde el tipo reducido y paga el IVA general del 21% (art. 91.Uno.1.7º LIVA) en el territorio donde
+          rige el IVA, sin distinción por comunidad autónoma — salvo en Canarias, Ceuta y Melilla, donde no se
+          paga IVA sino IGIC o IPSI (ver aviso abajo). En segunda mano paga el mismo ITP que el vinculado.
         </p>
       </div>
 

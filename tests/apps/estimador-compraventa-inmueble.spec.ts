@@ -1522,75 +1522,46 @@ test.describe('Inspector 30/08/2026 — re-verificación de la tanda 2', () => {
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('INCOMPLETO');
   });
 
-  // ⚠️ HALLAZGO ABIERTO (30/08/2026) — la tabla comparativa cobra al comprador un AJD
-  // que por ley paga el prestamista. La fila dice «AJD · 0 %-1,5 % (con hipoteca) ·
-  // ¿Quién paga? Comprador», y el propio `data/fiscal/inmuebles.ts` lo desmiente en
-  // TIPOS_AJD_2025.nota: «El AJD en hipotecas lo paga la entidad financiera desde la
-  // Ley 5/2019. En escrituras de compraventa sin hipoteca, lo paga el comprador».
-  // En segunda mano la app misma acota el AJD a la escritura de hipoteca (warningBox:
-  // «el AJD solo aplica en escrituras con hipoteca»), que es justo el caso en que NO lo
-  // paga el comprador: sobre una hipoteca de 200.000 € en Galicia son 3.000 € atribuidos
-  // a quien no los debe, en una app de riesgo fiscal 1.
-  test.fail(
-    'HALLAZGO — el AJD de la escritura de hipoteca no lo paga el comprador desde la Ley 5/2019',
-    async ({ page }) => {
-      await page.goto(RUTA);
-      await page.getByRole('button', { name: 'Ver guía educativa' }).click();
-      const filaAJD = page.locator('table tbody tr', { hasText: /^AJD/ }).first();
-      // La celda «¿Quién paga?» tiene que distinguir la hipoteca del resto.
-      await expect(filaAJD.locator('td').nth(3)).toHaveText(/entidad financiera|banco|prestamista/i);
-    },
-  );
+  // Reparados el 30/08/2026 (Inspector, ronda 8, hallazgos 509-512). Los cuatro pasaron
+  // de `test.fail` a verde y se quedan como regresión.
+  test('509 — la fila AJD distingue la hipoteca (paga la entidad financiera, Ley 5/2019)', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const filaAJD = page.locator('table tbody tr', { hasText: /^AJD/ }).first();
+    // La celda «¿Quién paga?» tiene que distinguir la hipoteca del resto.
+    await expect(filaAJD.locator('td').nth(3)).toHaveText(/entidad financiera|banco|prestamista/i);
+  });
 
-  // ⚠️ HALLAZGO ABIERTO (30/08/2026) — efecto familia del hallazgo 490, que el commit
-  // 0828da3e reparó en trastero y en nave-industrial y NO propagó al hub del clúster.
-  // El botón «Primera mano» sigue rotulando «Paga IVA» con Melilla (o Ceuta, o Canarias)
-  // seleccionada, donde no rige el IVA sino el IPSI/IGIC — y es el propio aviso de
-  // debajo, en la misma pantalla, el que lo desmiente. Los dos hermanos ya escriben
-  // `Paga ${TERRITORIOS_SIN_IVA[ccaa].impuesto}`.
-  test.fail(
-    'HALLAZGO — el botón de primera mano promete un IVA que en Melilla no existe',
-    async ({ page }) => {
-      await page.goto(RUTA);
-      await page.locator('#ccaa-inmueble').selectOption('melilla');
-      await expect(page.getByRole('button', { name: /Primera mano/ })).toContainText('Paga IPSI');
-    },
-  );
+  test('510 — el botón de primera mano nombra el impuesto real del territorio (Melilla → IPSI)', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.locator('#ccaa-inmueble').selectOption('melilla');
+    await expect(page.getByRole('button', { name: /Primera mano/ })).toContainText('Paga IPSI');
+  });
 
-  // ⚠️ HALLAZGO ABIERTO (30/08/2026) — el aviso de neto incompleto pide un dato que ya
-  // está relleno. Con el precio de compra vacío, `faltanEnElNeto` acierta al nombrar las
-  // dos partidas, pero la frase «Rellena…» cae en la rama tercera y manda rellenar «el
-  // precio de compra original Y el valor catastral del suelo» aunque el suelo se haya
-  // introducido: el único dato que falta es el precio de compra (page.tsx:1148).
-  test.fail(
-    'HALLAZGO — el aviso del neto manda rellenar el valor catastral del suelo, que ya está puesto',
-    async ({ page }) => {
-      await page.goto(RUTA);
-      await rellenar(page, 'Precio de la vivienda', '250000');
-      await page.getByRole('button', { name: 'Vendedor' }).click();
-      await rellenar(page, 'Años de propiedad', '8');
-      await rellenar(page, 'Valor catastral del suelo', '50000');
-      await rellenar(page, 'Valor catastral total (suelo + construcción)', '120000');
+  test('512 — el aviso del neto solo pide el campo que de verdad falta', async ({ page }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio de la vivienda', '250000');
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await rellenar(page, 'Años de propiedad', '8');
+    await rellenar(page, 'Valor catastral del suelo', '50000');
+    await rellenar(page, 'Valor catastral total (suelo + construcción)', '120000');
+    // El suelo YA está relleno: el único dato que falta es el precio de compra.
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain(
+      'Rellena el precio de compra original para obtener el neto real',
+    );
+  });
 
-      expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).not.toContain(
-        'el valor catastral del suelo',
-      );
-    },
-  );
-
-  // ⚠️ HALLAZGO ABIERTO (30/08/2026) — residuo de la reparación del 21/08/2026. La tarjeta
-  // educativa «IRPF del vendedor» sigue diciendo que del precio de venta «se restan la
-  // comisión, LA GESTORÍA y la plusvalía municipal», mientras el campo del formulario avisa
-  // de lo contrario («La gestoría del comprador no cuenta, art. 35.1 LIRPF»), el caso «Ana»
-  // dos párrafos más abajo lo dice explícitamente y el motor `calcularGananciaInmueble` NO
-  // la resta. Es la única pieza de la página que quedó sin actualizar.
-  test.fail(
-    'HALLAZGO — el bloque educativo sigue restando «la gestoría» del valor de transmisión',
-    async ({ page }) => {
-      await page.goto(RUTA);
-      await page.getByRole('button', { name: 'Ver guía educativa' }).click();
-      const tarjeta = page.locator('h4', { hasText: 'IRPF del vendedor' }).locator('xpath=..');
-      await expect(tarjeta).not.toHaveText(/se restan la comisión, la gestoría y la plusvalía/);
-    },
-  );
+  test('511 — el bloque educativo ya no atribuye al vendedor la gestoría del comprador', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const tarjeta = page.locator('h4', { hasText: 'IRPF del vendedor' }).locator('xpath=..');
+    await expect(tarjeta).not.toHaveText(/se restan la comisión, la gestoría y la plusvalía/);
+    await expect(tarjeta).toContainText('la del comprador no cuenta');
+  });
 });
