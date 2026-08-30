@@ -79,6 +79,25 @@ export default function GeneradorTonosPage() {
   const oscillatorRef = useRef<OscillatorNode | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
   const sweepIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+
+  /**
+   * Un tono de prueba sostenido (calibrar altavoces, comprobar un pitido en el oído) se deja
+   * sonando sin tocar la pantalla: sin esto, el sistema la apaga sola a los pocos segundos.
+   */
+  const solicitarWakeLock = useCallback(async () => {
+    if (!('wakeLock' in navigator)) return;
+    try {
+      wakeLockRef.current = await navigator.wakeLock.request('screen');
+    } catch {
+      // Mejora progresiva: si se deniega, el tono sigue sonando igual.
+    }
+  }, []);
+
+  const liberarWakeLock = useCallback(() => {
+    wakeLockRef.current?.release().catch(() => {});
+    wakeLockRef.current = null;
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -97,6 +116,7 @@ export default function GeneradorTonosPage() {
       if (sweepIntervalRef.current) {
         clearInterval(sweepIntervalRef.current);
       }
+      wakeLockRef.current?.release().catch(() => {});
     };
   }, []);
 
@@ -128,10 +148,11 @@ export default function GeneradorTonosPage() {
       oscillatorRef.current = oscillator;
       gainNodeRef.current = gainNode;
       setReproduciendo(true);
+      void solicitarWakeLock();
     } catch (error) {
       console.error('No se pudo iniciar el generador de tonos:', error);
     }
-  }, [frecuencia, volumen, tipoOnda]);
+  }, [frecuencia, volumen, tipoOnda, solicitarWakeLock]);
 
   const detenerAudio = useCallback(() => {
     if (sweepIntervalRef.current) {
@@ -159,9 +180,10 @@ export default function GeneradorTonosPage() {
       if (oscillatorRef.current === oscillator) {
         oscillatorRef.current = null;
         setReproduciendo(false);
+        liberarWakeLock();
       }
     }, 50);
-  }, []);
+  }, [liberarWakeLock]);
 
   const toggleAudio = () => {
     if (reproduciendo) {
@@ -170,6 +192,18 @@ export default function GeneradorTonosPage() {
       iniciarAudio();
     }
   };
+
+  // El wake lock se libera solo al ocultar la pestaña; si se vuelve mientras el tono
+  // sigue sonando, hay que volver a pedirlo.
+  useEffect(() => {
+    const alCambiarVisibilidad = () => {
+      if (document.visibilityState === 'visible' && reproduciendo) {
+        void solicitarWakeLock();
+      }
+    };
+    document.addEventListener('visibilitychange', alCambiarVisibilidad);
+    return () => document.removeEventListener('visibilitychange', alCambiarVisibilidad);
+  }, [reproduciendo, solicitarWakeLock]);
 
   // Actualizar frecuencia en tiempo real
   useEffect(() => {

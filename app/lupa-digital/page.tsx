@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './LupaDigital.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber } from '@/lib';
@@ -52,6 +52,26 @@ export default function LupaDigitalPage() {
   const visorRef = useRef<HTMLDivElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const arrastreRef = useRef<{ x: number; y: number } | null>(null);
+  const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+
+  /**
+   * Usar la lupa con zoom sostenido (leer una etiqueta, enhebrar una aguja) no toca la
+   * pantalla en ningún momento: sin esto, el sistema la apaga sola a los pocos segundos
+   * con la cámara todavía encendida.
+   */
+  const solicitarWakeLock = useCallback(async () => {
+    if (!('wakeLock' in navigator)) return;
+    try {
+      wakeLockRef.current = await navigator.wakeLock.request('screen');
+    } catch {
+      // Mejora progresiva: si se deniega, la lupa sigue funcionando igual.
+    }
+  }, []);
+
+  const liberarWakeLock = useCallback(() => {
+    wakeLockRef.current?.release().catch(() => {});
+    wakeLockRef.current = null;
+  }, []);
 
   /**
    * El facingMode entra por parámetro (con la cámara actual por defecto) porque
@@ -85,6 +105,7 @@ export default function LupaDigitalPage() {
       }
 
       setActivo(true);
+      void solicitarWakeLock();
 
       // Intentar activar linterna si está solicitada
       if (linterna) {
@@ -113,6 +134,7 @@ export default function LupaDigitalPage() {
     setAvisoLinterna('');
     setCongelado(false);
     setDesplazamiento({ x: 0, y: 0 });
+    liberarWakeLock();
   };
 
   const toggleLinterna = async (estado: boolean) => {
@@ -164,6 +186,18 @@ export default function LupaDigitalPage() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [camaraActual]);
+
+  // El wake lock se libera solo al ocultar la pestaña; si se vuelve mientras la
+  // cámara sigue activa, hay que volver a pedirlo.
+  useEffect(() => {
+    const alCambiarVisibilidad = () => {
+      if (document.visibilityState === 'visible' && activo) {
+        void solicitarWakeLock();
+      }
+    };
+    document.addEventListener('visibilitychange', alCambiarVisibilidad);
+    return () => document.removeEventListener('visibilitychange', alCambiarVisibilidad);
+  }, [activo, solicitarWakeLock]);
 
   /**
    * Al ampliar z veces, la imagen sobresale del visor (z - 1) / 2 por cada lado:

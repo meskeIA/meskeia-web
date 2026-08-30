@@ -6912,6 +6912,17 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/tabla-potenciales-redox/', icon: '🔋', name: 'Potenciales Redox', description: 'Qué semirreacción se impone sobre cuál y con qué E°' },
     { url: '/simulador-titulacion/', icon: '🧪', name: 'Titulación Ácido-Base', description: 'La reacción ajustada, llevada al laboratorio' },
   ],
+  'conversor-pesetas-euros': [
+    { url: '/estimador-inflacion/', icon: '📈', name: 'Estimador de Inflación', description: 'Compara cualquier par de años en euros, sin pesetas de por medio' },
+    { url: '/conversor-divisas/', icon: '💱', name: 'Conversor de Divisas', description: 'Cambio entre monedas actuales' },
+    { url: '/conversor-numeros-letras/', icon: '✍️', name: 'Números a Letras', description: 'Escribe cualquier importe en palabras' },
+  ],
+  'estimador-inflacion': [
+    { url: '/conversor-pesetas-euros/', icon: '🪙', name: 'Pesetas a Euros', description: 'Valor real hoy de una cantidad en pesetas' },
+    { url: '/estimador-interes-compuesto/', icon: '📈', name: 'Interés Compuesto', description: 'Crecimiento de inversiones a largo plazo' },
+    { url: '/estimador-hipoteca/', icon: '🏠', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
+    { url: '/simulador-jubilacion-publica/', icon: '🏤', name: 'Simulador Jubilación Pública', description: 'Edad, pensión, anticipada y parcial' },
+  ],
 };
 
 /**

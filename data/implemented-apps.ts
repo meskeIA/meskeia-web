@@ -10,6 +10,7 @@
 export const implementedAppsUrls = [
   // Finanzas (apps universales, sin normativa española)
   "/estimador-inflacion/",
+  "/conversor-pesetas-euros/",
   "/visualizador-dinero-y-tiempo/",
   "/visualizador-sueldo-neto/",
   "/visualizador-anatomia-nomina/",

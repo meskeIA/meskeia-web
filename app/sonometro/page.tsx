@@ -211,6 +211,7 @@ export default function SonometroPage() {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const animationRef = useRef<number | null>(null);
+  const wakeLockRef = useRef<WakeLockSentinel | null>(null);
   // Media incremental de la ENERGÍA acústica (no de los dB) y nº de muestras: es lo
   // que define el LAeq. Van en refs porque el bucle de medición corre a ~60 fps y no
   // debe provocar re-render por muestra.
@@ -235,6 +236,38 @@ export default function SonometroPage() {
       stopMeasuring();
     };
   }, []);
+
+  /**
+   * El sistema apaga la pantalla a los pocos segundos de inactividad táctil, pero una
+   * medición de varios minutos no toca la pantalla en ningún momento: sin esto, una
+   * sesión nocturna para documentar ruido se corta sola a mitad de camino.
+   */
+  const solicitarWakeLock = useCallback(async () => {
+    if (!('wakeLock' in navigator)) return;
+    try {
+      wakeLockRef.current = await navigator.wakeLock.request('screen');
+    } catch {
+      // Mejora progresiva: si el navegador lo deniega (batería baja, pestaña oculta...)
+      // la medición sigue funcionando igual, solo que la pantalla podrá apagarse sola.
+    }
+  }, []);
+
+  const liberarWakeLock = useCallback(() => {
+    wakeLockRef.current?.release().catch(() => {});
+    wakeLockRef.current = null;
+  }, []);
+
+  // El wake lock se libera solo al ocultarse la pestaña (cambiar de app, bloquear el
+  // móvil a mano): si se vuelve mientras la medición sigue activa, hay que pedirlo de nuevo.
+  useEffect(() => {
+    const alCambiarVisibilidad = () => {
+      if (document.visibilityState === 'visible' && isActive) {
+        void solicitarWakeLock();
+      }
+    };
+    document.addEventListener('visibilitychange', alCambiarVisibilidad);
+    return () => document.removeEventListener('visibilitychange', alCambiarVisibilidad);
+  }, [isActive, solicitarWakeLock]);
 
   // Recuperar la calibración guardada. Se hace en efecto (no en el estado inicial)
   // para no romper la hidratación: el servidor no tiene localStorage.
@@ -499,6 +532,7 @@ export default function SonometroPage() {
 
       setIsActive(true);
       setHayMedicion(true);
+      void solicitarWakeLock();
       measureLoop();
 
     } catch (err) {
@@ -544,6 +578,7 @@ export default function SonometroPage() {
 
     analyserRef.current = null;
     setIsActive(false);
+    liberarWakeLock();
   };
 
   /**

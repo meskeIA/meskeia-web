@@ -13,6 +13,7 @@ export const APPS_REGION_ES: ReadonlySet<string> = new Set([
   'comparador-autonomo-vs-sl',
   'comparador-formas-juridicas',
   'conversor-cnae-iae',
+  'conversor-pesetas-euros',
   'curso-decisiones-inversion',
   'declaracion-renta-fallecidos',
   'estimacion-baja-maternal',
