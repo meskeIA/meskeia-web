@@ -1176,7 +1176,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-colores-cielo/', icon: '🌈', name: 'Colores del Cielo', description: 'La dispersión de Rayleigh y Mie explica cada fase del cielo' },
     { url: '/visualizador-leyes-newton/', icon: '🍎', name: 'Leyes de Newton', description: 'Las 3 leyes de la física' },
     { url: '/visualizador-pantallas/', icon: '🖥️', name: 'Cómo Funciona una Pantalla', description: 'Píxeles y resoluciones' },
-    { url: '/visualizador-escala-universo/', icon: '🔬', name: 'La Escala del Universo', description: 'Del quark a la galaxia' },
+    { url: '/visualizador-optica-ondulatoria/', icon: '🌊', name: 'Óptica Ondulatoria', description: 'Cuando λ no es despreciable frente al obstáculo: difracción, interferencia y polarización' },
   ],
   'visualizador-estados-materia': [
     { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Átomos que se reordenan' },
@@ -4553,7 +4553,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-termodinamica-quimica/', icon: '⚗️', name: 'Termodinámica Química', description: 'La termodinámica dice si una reacción puede ocurrir; la cinética dice a qué velocidad' },
     { url: '/visualizador-enzimas-cuerpo-humano/', icon: '🧬', name: 'Enzimas', description: 'Las enzimas son biocatalizadores — reducen la Ea de reacciones metabólicas vitales' },
     { url: '/visualizador-catalasa/', icon: '⚗️', name: 'Catalasa', description: 'La catalasa descompone H₂O₂ a 40 millones de reacciones por segundo — cinética enzimática extrema' },
-    { url: '/visualizador-estados-materia/', icon: '🔴', name: 'Estados de la Materia', description: 'La temperatura afecta tanto la cinética como los estados — el mismo parámetro, efectos diferentes' },
+    { url: '/simulador-cinetica-arrhenius/', icon: '🌡️', name: 'Cinética de Arrhenius', description: 'La ecuación k = A·e^(-Ea/RT) detrás de la dependencia con la temperatura que ves aquí' },
   ],
   'visualizador-electroquimica': [
     { url: '/visualizador-termodinamica-quimica/', icon: '⚗️', name: 'Termodinámica Química', description: 'FEM > 0 equivale a ΔG < 0 — la electroquímica y la termodinámica están matemáticamente conectadas' },
@@ -6127,7 +6127,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'simulador-derivada-pendiente': [
     { url: '/simulador-integral-area/', icon: '📐', name: 'Simulador Integrales', description: 'Área bajo la curva con sumas de Riemann' },
-    { url: '/simulador-distribucion-normal/', icon: '📊', name: 'Distribución Normal', description: 'Curva de Gauss interactiva' },
+    { url: '/simulador-funciones-transformaciones/', icon: '📉', name: 'Transformaciones de Funciones', description: "Cómo a, b, c, d cambian la pendiente y la propia f'(x)" },
     { url: '/visualizador-calculo-visual/', icon: '🔬', name: 'Cálculo Visual', description: 'Límites, tangentes y áreas en canvas' },
     { url: '/tabla-derivadas/', icon: '📄', name: 'Tabla de Derivadas', description: 'Ya lo entiendes: ahora la fórmula concreta' },
   ],
@@ -6169,7 +6169,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-optica-ondulatoria/', icon: '🌊', name: 'Óptica ondulatoria', description: 'Difracción, interferencia y polarización' },
   ],
   'simulador-cinetica-arrhenius': [
-    { url: '/simulador-fluidos-bernoulli/', icon: '🌊', name: 'Fluidos Bernoulli', description: 'Otro pilar Bachillerato: presión y velocidad' },
+    { url: '/visualizador-cinetica-quimica/', icon: '⚡', name: 'Cinética Química', description: 'La ecuación de Arrhenius explica por qué la velocidad de reacción depende de la temperatura' },
     { url: '/visualizador-termodinamica-quimica/', icon: '🌡️', name: 'Termodinámica Química', description: 'ΔH, ΔG, equilibrio y catalizadores' },
     { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Tipos, balanceo y átomos' },
     { url: '/visualizador-enzimas-cuerpo-humano/', icon: '🧬', name: 'Enzimas humanas', description: 'Catalizadores biológicos: bajan Ea drásticamente' },

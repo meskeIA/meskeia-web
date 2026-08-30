@@ -65,7 +65,6 @@ export default function ConversorPesetasEurosPage() {
 
   const hitosHistoricos = [
     { fecha: '1868', evento: 'Se crea la peseta como moneda decimal española' },
-    { fecha: '1975', evento: 'Fin del franquismo' },
     { fecha: '1986', evento: 'España entra en la CEE' },
     { fecha: '01/01/1999', evento: 'Se fija de forma irrevocable el tipo de cambio: 166,386 ptas/€' },
     { fecha: 'ene-feb 2002', evento: 'Doble circulación: euro y peseta a la vez' },
