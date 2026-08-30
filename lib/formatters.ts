@@ -98,18 +98,25 @@ export function formatDateTime(date: Date): string {
 }
 
 /**
+ * Parsea una fecha ISO (YYYY-MM-DD) a un `Date` en LOCAL, en vez de `new Date(fechaISO)`:
+ * ese constructor interpreta la cadena como medianoche UTC, y en un huso horario negativo
+ * (América) el día se desliza al ANTERIOR al formatearlo — el gotcha del hallazgo 482, que
+ * afectaba a `CNAE_VIGENCIA.desde` en dos sitios de `conversor-cnae-iae` y al sello
+ * «Última verificación» de `<DataReference>`, compartido por todo el catálogo.
+ * @param fechaISO - Fecha en formato YYYY-MM-DD (ej: "2026-01-01")
+ */
+export function parseISODateLocal(fechaISO: string): Date {
+  const [anio, mes, dia] = fechaISO.split('-').map(Number);
+  return new Date(anio, mes - 1, dia);
+}
+
+/**
  * Formatea una fecha ISO (YYYY-MM-DD) en prosa española: "4 de febrero de 2021".
- *
- * Parsea los componentes a mano y construye el `Date` en LOCAL (`new Date(y, m-1, d)`) en
- * vez de `new Date(fechaISO)`: ese constructor interpreta la cadena como medianoche UTC, y
- * en un huso horario negativo (América) se muestra el día ANTERIOR — el mismo gotcha del
- * hallazgo 482 con `CNAE_VIGENCIA.desde`.
  * @param fechaISO - Fecha en formato YYYY-MM-DD (ej: "2021-02-04")
  * @returns String en prosa (ej: "4 de febrero de 2021")
  */
 export function formatFechaLarga(fechaISO: string): string {
-  const [anio, mes, dia] = fechaISO.split('-').map(Number);
-  return new Date(anio, mes - 1, dia).toLocaleDateString('es-ES', {
+  return parseISODateLocal(fechaISO).toLocaleDateString('es-ES', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',

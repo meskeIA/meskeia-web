@@ -982,11 +982,11 @@ test.describe('generador-anagramas', () => {
     });
 
     // -------------------------------------------------------------------------------------
-    // HALLAZGOS ABIERTOS DE ESTA PASADA — cada uno con UNA sola aserción de fondo
+    // Hallazgos 497-499 de esta pasada — reparados
     // -------------------------------------------------------------------------------------
 
-    test.fail(
-      'HALLAZGO · modo frase: editar la frase deja en pantalla los repartos de la anterior',
+    test(
+      'REGRESIÓN · modo frase: editar la frase invalida los repartos de la anterior',
       async ({ page }) => {
         await abrirConDiccionario(page);
         await pestana(page, /Anagrama perfecto/).click();
@@ -997,16 +997,14 @@ test.describe('generador-anagramas', () => {
         // Se cambia la frase por otra que no comparte NINGUNA letra con la anterior.
         await page.fill('#anagram-frase', 'casa');
 
-        // El modo letras invalida sus resultados al editar el campo desde la reparación de los
-        // hallazgos 194 y 195; el modo frase no lo hace, y aquí es peor: en pantalla quedan
-        // «amor, maro, mora, ramo» bajo el título «Anagramas perfectos encontrados: 4», que
-        // ahora afirma que son los anagramas perfectos de «casa». Ninguno lo es.
+        // Hallazgo 497 — reparado. El onChange de #anagram-frase llama a setResultadoFrase(null),
+        // igual que ya hacía el modo de letras desde los hallazgos 194 y 195.
         await expect(page.locator('[class*="solucionCard"]')).toHaveCount(0);
       }
     );
 
-    test.fail(
-      'HALLAZGO · modo letras: cambiar la longitud mínima no invalida los resultados pintados',
+    test(
+      'REGRESIÓN · modo letras: cambiar la longitud mínima invalida los resultados pintados',
       async ({ page }) => {
         await abrirConDiccionario(page);
         await page.fill('#anagram-letters', 'amor');
@@ -1015,15 +1013,14 @@ test.describe('generador-anagramas', () => {
 
         await page.selectOption('#anagram-min', '4');
 
-        // El campo «Debe contener», que está en la misma fila de filtros, SÍ borra los
-        // resultados al tocarlo; los dos selectores de longitud no. Con «Longitud mínima: 4»
-        // en pantalla siguen los grupos «3 letras (7)» y «2 letras (4)».
+        // Hallazgo 498 — reparado. cambiarMinimo/cambiarMaximo limpian results, igual que ya
+        // hacía el campo «Debe contener».
         await expect(page.locator('[class*="groupTitle"]', { hasText: '2 letras' })).toHaveCount(0);
       }
     );
 
-    test.fail(
-      'HALLAZGO · la tarjeta de consejos da por válidas palabras que su propio lemario no tiene',
+    test(
+      'REGRESIÓN · la tarjeta de consejos no da por válidas palabras que su lemario no tiene',
       async ({ page }) => {
         await page.goto(RUTA);
         await page.getByRole('button', { name: 'Ver guía educativa' }).click();
@@ -1031,10 +1028,8 @@ test.describe('generador-anagramas', () => {
           hasText: 'Amplía tu vocabulario pasivo',
         });
 
-        // «Lista de palabras raras válidas: OHM, JOT, ZAG, QAT». De las cuatro, el lemario que
-        // la propia app declara como su diccionario solo tiene OHM: con el atril «jot» y
-        // longitud 3..3 la app responde «No se encontraron palabras con esas letras». JOT, ZAG
-        // y QAT son entradas del léxico Collins de Scrabble en INGLÉS, no del español.
+        // Hallazgo 499 — reparado. JOT, ZAG y QAT (léxico Collins de Scrabble en INGLÉS) se
+        // sustituyeron por ÑU, ZAS y YAK, confirmadas en el lemario de la app.
         await expect(tarjeta).not.toContainText(/JOT|ZAG|QAT/);
       }
     );

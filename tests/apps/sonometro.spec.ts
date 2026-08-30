@@ -1408,38 +1408,23 @@ test.describe('CASO 10 (móvil)', () => {
 });
 
 // ===========================================================================
-// HALLAZGOS ABIERTOS de la 4.ª pasada (28/08/2026)
-// Afirman lo que DEBERÍA ocurrir y hoy fallan a propósito: `test.fail()` los da por
-// esperados. Cada uno lleva UNA sola aserción de fondo, para que no pueda pasar por
-// «esperado» fallando por otro sitio. El día que se reparen, se les quita la marca.
+// Hallazgos 494-496 de la 4.ª pasada (28/08/2026) — reparados.
 // ===========================================================================
 
 // ---------------------------------------------------------------------------
-// HALLAZGO — en el móvil, guardar una medición deja el botón de modo oscuro fuera de la pantalla
+// Hallazgo 494 — reparado. `contain: paint` en `.tablaScroll` aísla su contenido para que
+// el min-width:760px de la tabla ya no se filtre al LAYOUT VIEWPORT del navegador móvil:
+// `overflow-x: auto` ahí y `overflow-x: hidden` en html/body solo ocultaban el scroll
+// visual, no aislaban el contenedor como containing block. La cabecera fija de
+// MeskeiaLogo (left:0;right:0) se maquetaba contra ese viewport estirado y su botón de
+// modo oscuro quedaba fuera de la pantalla, sin poder alcanzarlo.
 // ---------------------------------------------------------------------------
-// La tabla del registro mide 854 px de ancho intrínseco (nueve columnas con `white-space:
-// nowrap`, `min-width: 760px` y un campo de nota de 200 px mínimo). En un móvil eso estira el
-// VIEWPORT DE MAQUETACIÓN: con el registro vacío `window.innerWidth` vale 412 —lo mismo que
-// `documentElement.clientWidth`—, y en cuanto hay una fila pasa a 859 mientras la pantalla
-// sigue siendo de 412. La cabecera de `MeskeiaLogo` es `position: fixed; left: 0; right: 0`,
-// así que se maqueta contra ese viewport y se estira hasta 859: su botón de modo oscuro
-// —`justify-content: space-between`— se va a x = 806-844, fuera de la pantalla, y no hay forma
-// de llegar hasta él porque html y body llevan `overflow-x: hidden` (tras `scrollTo(9999, 0)`
-// el desplazamiento sigue siendo 0).
-// Medido el 28/08/2026 en Pixel 7 (412 px) y en iPhone 13 (390 px); en un escritorio estrecho
-// de 412 px SIN `isMobile` no ocurre (innerWidth = clientWidth = 412 y el botón queda en 397).
-// Que la causa es esta tabla se comprueba de dos maneras: ocultándola, `innerWidth` vuelve a
-// 412 en el acto; y borrando el registro y recargando, el botón vuelve a la pantalla.
-// El hit-test del navegador sí devuelve los botones de la app en su sitio, así que lo que se
-// pierde es la cabecera fija, no la herramienta.
-test.describe('HALLAZGO 4.ª pasada (móvil)', () => {
+test.describe('REGRESIÓN 4.ª pasada (móvil)', () => {
   test.use(PIXEL_7);
 
-  test('con una medición guardada, el botón de modo oscuro debería seguir en la pantalla', async ({
+  test('con una medición guardada, el botón de modo oscuro sigue en la pantalla', async ({
     page,
   }) => {
-    test.fail();
-
     await sembrarRegistro(page, [sesionDeJunio(12)]);
     await page.goto(RUTA);
     await page.waitForSelector('[class*="tablaRegistro"] tbody tr');
@@ -1461,18 +1446,12 @@ test.describe('HALLAZGO 4.ª pasada (móvil)', () => {
 });
 
 // ---------------------------------------------------------------------------
-// HALLAZGO — la misma medición dura un segundo distinto en el parte y en el CSV
+// Hallazgo 495 — reparado. El CSV trunca ahora con Math.floor antes de formatNumber, igual
+// que formatDuracion en la tabla y el parte impreso, en vez de redondear.
 // ---------------------------------------------------------------------------
-// La tabla (y con ella el parte impreso) usa `formatDuracion`, que TRUNCA: `Math.floor`. El
-// CSV usa `formatNumber(s.duracionSegundos, 0)`, que REDONDEA. Con 5,6 s el parte dice «5 s»
-// y el CSV «6». Son los dos documentos que la app ofrece como prueba de la misma medición, y
-// no dicen lo mismo: quien adjunte los dos a una reclamación tendrá que explicar por qué.
-// Visto también con una medición real (sonda del 28/08/2026: tabla «5 s», CSV «6»).
-test('la duración de una medición debería ser la misma en la tabla que en el CSV', async ({
+test('la duración de una medición es la misma en la tabla que en el CSV', async ({
   page,
 }) => {
-  test.fail();
-
   await sembrarRegistro(page, [{ ...sesionDeJunio(12), duracionSegundos: 5.6 }]);
   await page.goto(RUTA);
   await page.waitForSelector('[class*="tablaRegistro"] tbody tr');
@@ -1489,16 +1468,12 @@ test('la duración de una medición debería ser la misma en la tabla que en el 
 });
 
 // ---------------------------------------------------------------------------
-// HALLAZGO — dos de las tres tarjetas de estadísticas leen su emoji decorativo en voz alta
+// Hallazgo 496 — reparado. Las tres tarjetas de estadísticas (Mínimo, Máximo, LAeq) marcan
+// ahora su icono decorativo con aria-hidden="true".
 // ---------------------------------------------------------------------------
-// En el mismo grupo de tres tarjetas, la del LAeq marca su icono con `aria-hidden="true"`
-// (page.tsx, línea 815) y las de mínimo y máximo no (líneas 799 y 808). Un lector de pantalla
-// anuncia entonces «flecha hacia abajo 41,0 Mínimo (dB(A))» en dos de ellas y «61,0 LAeq
-// (dB(A))» en la tercera. Los tres iconos son decorativos: el dato ya lo dice la etiqueta.
-test('el icono decorativo de la tarjeta «Mínimo» debería estar oculto al lector, como el del LAeq', async ({
+test('el icono decorativo de la tarjeta «Mínimo» está oculto al lector, como el del LAeq', async ({
   page,
 }) => {
-  test.fail();
   test.setTimeout(60000);
 
   await micrófonoSintético(page, 1000, 0.05);

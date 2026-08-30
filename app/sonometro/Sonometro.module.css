@@ -1112,11 +1112,19 @@
 }
 
 /* Nueve columnas no caben en un móvil: la tabla se desplaza dentro de su caja
-   y nunca empuja el ancho de la página. */
+   y nunca empuja el ancho de la página.
+   `contain: paint` es lo que de verdad lo garantiza (hallazgo 494): sin él, el
+   min-width:760px de .tablaRegistro seguía filtrándose al LAYOUT VIEWPORT del
+   navegador móvil pese a overflow-x:auto aquí y overflow-x:hidden en html/body —
+   esos dos solo ocultan el scroll visual, no aíslan el contenedor como containing
+   block. Con la tabla ensanchando el viewport a 859 px, la cabecera fixed
+   (left:0;right:0) se maquetaba contra ESE ancho y su botón de modo oscuro
+   quedaba fuera de los 412 px reales, sin ninguna forma de alcanzarlo. */
 .tablaScroll {
   overflow-x: auto;
   border: 1px solid var(--border);
   border-radius: var(--radius);
+  contain: paint;
 }
 
 .tablaRegistro {

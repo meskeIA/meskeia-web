@@ -16,6 +16,7 @@ import {
   formatDate,
   formatDateTime,
   formatFechaLarga,
+  parseISODateLocal,
   parseSpanishNumber,
   parseSpanishNumberOr,
   formatPercentage,
@@ -121,6 +122,21 @@ test.describe('formatFechaLarga', () => {
 
   test('rellena correctamente fin de mes y años bisiestos', () => {
     expect(formatFechaLarga('2024-02-29')).toBe('29 de febrero de 2024');
+  });
+});
+
+test.describe('parseISODateLocal', () => {
+  test('construye la fecha en local, no en UTC', () => {
+    const d = parseISODateLocal('2026-01-01');
+    expect(d.getFullYear()).toBe(2026);
+    expect(d.getMonth()).toBe(0);
+    expect(d.getDate()).toBe(1);
+  });
+
+  // El gotcha del hallazgo 482: formatDate(new Date('2026-01-01')) se desliza al 31/12/2025
+  // en husos horarios negativos, porque new Date(isoString) interpreta medianoche UTC.
+  test('formatDate sobre el resultado no se desliza al día anterior', () => {
+    expect(formatDate(parseISODateLocal('2026-01-01'))).toBe('01/01/2026');
   });
 });
 

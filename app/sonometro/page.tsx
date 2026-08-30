@@ -624,7 +624,10 @@ export default function SonometroPage() {
       return [
         formatDate(fecha),
         fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-        formatNumber(s.duracionSegundos, 0),
+        // Truncado, no redondeado: igual que formatDuracion en la tabla y el parte
+        // imprimible (Math.floor en minutos y segundos). Antes el CSV redondeaba y una
+        // sesión de 5,6 s salía "5 s" en la tabla y "6" en el CSV (hallazgo 495).
+        formatNumber(Math.floor(s.duracionSegundos), 0),
         formatNumber(s.laeq, 1),
         formatNumber(s.minDb, 1),
         formatNumber(s.maxDb, 1),
@@ -796,7 +799,7 @@ export default function SonometroPage() {
             </h2>
             <div className={styles.statsGrid}>
               <div className={styles.statCard}>
-                <span className={styles.statIcon}>⬇️</span>
+                <span className={styles.statIcon} aria-hidden="true">⬇️</span>
                 <div className={styles.statInfo}>
                   <span className={styles.statValue}>
                     {minDb === Infinity ? '--' : formatNumber(minDb, 1)}
@@ -805,7 +808,7 @@ export default function SonometroPage() {
                 </div>
               </div>
               <div className={styles.statCard}>
-                <span className={styles.statIcon}>⬆️</span>
+                <span className={styles.statIcon} aria-hidden="true">⬆️</span>
                 <div className={styles.statInfo}>
                   <span className={styles.statValue}>{formatNumber(maxDb, 1)}</span>
                   <span className={styles.statLabel}>Máximo (dB(A))</span>

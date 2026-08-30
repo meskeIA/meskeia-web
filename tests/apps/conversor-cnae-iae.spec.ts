@@ -766,29 +766,17 @@ test.describe('Buscador CNAE-IAE — cierre verificado el 28/08/2026', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// RE-INSPECCIÓN 28/08/2026 · MITAD B — casos nuevos. Los tres destapan hallazgos
-// ABIERTOS, así que van con `test.fail()`: hoy fallan a propósito. Cuando se reparen
-// pasarán a ROJO («expected to fail, but passed»), se les quita la marca y se quedan
-// como regresión. No se reescribe el valor esperado.
+// RE-INSPECCIÓN 28/08/2026 · MITAD B — hallazgos 479-482, reparados.
 // ═══════════════════════════════════════════════════════════════════════════
 
 test('CASO 4 (normal) — «bar» tiene que llegar a la clase 56.30 «Servicios de bebidas»', async ({
   page,
 }) => {
-  test.fail();
   await abrir(page);
 
-  // La promesa del panel es literal: «Escribe cómo describirías tu trabajo» y «recorre
-  // también los términos coloquiales asociados a cada clase». En el catálogo servido,
-  // sinonimos['56.30'] contiene «bar», «poner un bar», «cafetería», «cervecería»,
-  // «taberna» y «pub»; 56.30 es «Servicios de bebidas» (CNAE-2025, RD 10/2025).
-  //
-  // Lo que ocurre: «bar» es subcadena de «talaBARtería», «BARnices», «emBARcaciones» y
-  // «BARberías», y el orden coloca antes cualquier título que la contenga (relevancia 3)
-  // que la clase que la lleva como sinónimo exacto (relevancia 4). Salen 13 resultados,
-  // se muestran 10, y 56.30 cae en el puesto 11: invisible salvo que se pulse «Ver los
-  // 13». Es el mismo mecanismo del hallazgo 66, que se reparó en el panel del IAE, pero
-  // en el de la CNAE y agravado por el corte de LIMITE_RESULTADOS.
+  // Hallazgo 479 — reparado. `coincidePalabraCompleta` da a «bar» como sinónimo EXACTO de
+  // 56.30 un nivel de relevancia mejor que a «barnices» (20.30), donde «bar» es solo un
+  // fragmento dentro de otra palabra. 56.30 entra ahora en los 10 primeros.
   await buscarCnae(page, 'bar');
   await expect(contador(page)).toContainText('13 resultados');
   await expect(fichas(page)).toHaveCount(10);
@@ -812,21 +800,12 @@ test('CASO 4 bis — al desplegar los 13, «Servicios de bebidas» sí está: el
 test('CASO 5 (límite) — «enseñanza» deja ver algún epígrafe de la Sección 2ª, que es la que retiene', async ({
   page,
 }) => {
-  test.fail();
   await abrir(page);
 
-  // «enseñanza» es uno de los cinco botones de ejemplo que ofrece el propio panel del
-  // IAE, cuyo texto dice «fíjate en la sección: es la distinción con más efecto práctico
-  // sobre tus facturas». En las Tarifas (RD Leg. 1175/1990) la enseñanza vive en las dos
-  // secciones: la 1ª como centro (grupos 931-934) y la 2ª como docente por cuenta propia
-  // (Agrupación 82 «Profesionales de la enseñanza», grupos 821, 822, 823 y 826), que es
-  // la que lleva retención de IRPF.
-  //
-  // Lo que ocurre: 19 resultados y los 10 visibles son TODOS de la Sección 1ª. Los cinco
-  // de la Sección 2ª caen en los puestos 15 a 19, porque sus títulos empiezan por
-  // «Personal docente…» y no por «Enseñanza…», de modo que la relevancia los manda al
-  // final y el corte de 10 los borra de la pantalla. Quien da clases particulares y
-  // teclea la palabra que la app le sugiere no ve ni una sola vez su sección.
+  // Hallazgo 480 — reparado. `conRepresentacionDeSeccion` garantiza que el corte visible
+  // de 10 incluya al menos una entrada de cada sección presente en los 19 resultados: la
+  // Sección es «la distinción con más efecto práctico sobre tus facturas» (retención de
+  // IRPF), así que no puede depender de que su título gane por relevancia textual.
   await buscarIae(page, 'enseñanza');
   await expect(contador(page)).toContainText('19 resultados');
   const visibles = fichas(page);
@@ -880,21 +859,12 @@ test('CASO 6 (debe rechazarse) — lo que no existe en ninguno de los dos catál
 test('CASO 6 bis (límite) — un código de la CNAE-2009 escrito con punto se reconoce igual', async ({
   page,
 }) => {
-  test.fail();
   await abrir(page);
 
-  // Efecto lateral de la reparación del hallazgo 424: la app deja de tratar como antiguo
-  // TODO lo que venga con formato «dd.dd», exista o no como clase vigente. Pero 117 de
-  // los 629 códigos de la CNAE-2009 del catálogo NO tienen clase homónima en la
-  // CNAE-2025, y para ellos el punto ya no devuelve nada.
-  //
-  // 1411 es uno: correspondencia['1411'] = ['14.24'] («Confección de prendas de vestir de
-  // cuero y peletería»), y no hay clase 14.11 en la CNAE-2025. Escribir «14.11» —que es
-  // como la CNAE-2009 numeraba sus clases y como aparece en escrituras y contratos— da
-  // hoy cero resultados; escribir «1411» da la equivalencia. La pantalla vacía sí nombra
-  // el remedio («escríbelo con sus cuatro dígitos y sin puntos»), que es lo que acota la
-  // gravedad, pero el buscador puede resolverlo solo: basta con exigir que exista clase
-  // vigente con esos dígitos antes de dar el formato por vigente.
+  // Hallazgo 481 — reparado. `consultaConFormatoVigente` ahora exige también que exista
+  // una clase vigente con esos dígitos (`vigenteHomonima !== null`): el formato «dd.dd» por
+  // sí solo no basta, porque 117 de los 629 códigos de la CNAE-2009 del catálogo no tienen
+  // clase homónima en la CNAE-2025. «14.11» ya no cae en ese vacío.
   await buscarCnae(page, '14.11');
   await expect(fichas(page).first()).toContainText('14.24');
   await expect(fichas(page).first()).toContainText(
@@ -914,20 +884,14 @@ test('CASO 6 ter — el mismo código sin punto sí devuelve su equivalencia', a
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HALLAZGO ABIERTO (28/08/2026) — la fecha de entrada en vigor se desplaza un día
-// al oeste de Greenwich. `new Date('2026-01-01')` es medianoche UTC y `formatDate`
-// la imprime en la zona del visitante, así que en América sale el día anterior.
+// Hallazgo 482 — reparado. `parseISODateLocal` construye el Date en LOCAL en vez de
+// `new Date(fechaISO)` (medianoche UTC), que se deslizaba un día al oeste de Greenwich.
 // ═══════════════════════════════════════════════════════════════════════════
 test.describe('Buscador CNAE-IAE — la fecha de vigencia vista desde América', () => {
   test.use({ timezoneId: 'America/Mexico_City', locale: 'es-ES' });
 
   test('la CNAE-2025 rige desde el 01/01/2026 se lea desde donde se lea', async ({ page }) => {
-    test.fail();
     await abrir(page);
-
-    // CNAE_VIGENCIA.desde = '2026-01-01' (RD 10/2025, de 14 de enero). La página lo pinta
-    // con formatDate(new Date(CNAE_VIGENCIA.desde)) en dos sitios: el aviso de código
-    // antiguo y el bloque educativo. Desde Ciudad de México ambos dicen «31/12/2025».
     await buscarCnae(page, '4711');
     await expect(avisoAntiguo(page)).toContainText('Desde el 01/01/2026');
   });

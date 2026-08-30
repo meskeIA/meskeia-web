@@ -509,11 +509,16 @@ export default function GeneradorAnagramasPage() {
   const OPCIONES_MIN = [2, 3, 4, 5, 6, 7];
   const OPCIONES_MAX = [4, 5, 6, 7, 8, 9, 10, 12, 15];
 
+  // Los dos selectores de longitud invalidan los resultados igual que «Debe contener»
+  // (hallazgo 498): sin esto, la lista quedaba en pantalla afirmando un rango de longitudes
+  // que ya no era el que la produjo.
   const cambiarMinimo = (valor: number) => {
     setMinLength(valor);
     if (valor > maxLength) {
       setMaxLength(OPCIONES_MAX.find((n) => n >= valor) ?? OPCIONES_MAX[OPCIONES_MAX.length - 1]);
     }
+    setResults([]);
+    setBuscado(false);
   };
 
   const cambiarMaximo = (valor: number) => {
@@ -521,6 +526,8 @@ export default function GeneradorAnagramasPage() {
     if (valor < minLength) {
       setMinLength([...OPCIONES_MIN].reverse().find((n) => n <= valor) ?? OPCIONES_MIN[0]);
     }
+    setResults([]);
+    setBuscado(false);
   };
 
   const handleClear = () => {
@@ -866,7 +873,11 @@ export default function GeneradorAnagramasPage() {
             type="text"
             className={styles.input}
             value={frase}
-            onChange={(e) => setFrase(e.target.value)}
+            // Invalida el reparto ya pintado (hallazgo 497): sin esto, las tarjetas seguían
+            // en pantalla presentándose como el reparto EXACTO de un texto que ya no era el
+            // del campo — más grave que en el modo de letras, porque aquí «anagrama perfecto»
+            // es una afirmación de exactitud, no una lista aproximada.
+            onChange={(e) => { setFrase(e.target.value); setResultadoFrase(null); }}
             placeholder="Ej: Salvador Dalí"
             maxLength={28}
             autoComplete="off"
@@ -882,7 +893,7 @@ export default function GeneradorAnagramasPage() {
               <button
                 key={ejemplo}
                 className={styles.exampleBtn}
-                onClick={() => setFrase(ejemplo)}
+                onClick={() => { setFrase(ejemplo); setResultadoFrase(null); }}
                 type="button"
               >
                 {ejemplo}
@@ -898,7 +909,7 @@ export default function GeneradorAnagramasPage() {
               id="anagram-max-palabras"
               className={styles.select}
               value={maxPalabras}
-              onChange={(e) => setMaxPalabras(Number(e.target.value))}
+              onChange={(e) => { setMaxPalabras(Number(e.target.value)); setResultadoFrase(null); }}
             >
               {[2, 3, 4, 5].map((n) => (
                 <option key={n} value={n}>{n} palabras</option>
@@ -912,7 +923,7 @@ export default function GeneradorAnagramasPage() {
               id="anagram-min-longitud"
               className={styles.select}
               value={minLongitud}
-              onChange={(e) => setMinLongitud(Number(e.target.value))}
+              onChange={(e) => { setMinLongitud(Number(e.target.value)); setResultadoFrase(null); }}
             >
               {[2, 3, 4, 5].map((n) => (
                 <option key={n} value={n}>{n} letras</option>
@@ -1275,7 +1286,10 @@ export default function GeneradorAnagramasPage() {
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcon}>📖</span>
               <h4>Amplía tu vocabulario pasivo</h4>
-              <p>No necesitas saber el significado exacto de una palabra para usarla en Scrabble — solo necesitas saber que existe y es válida. Lista de palabras raras válidas: OHM, JOT, ZAG, QAT (si aceptadas).</p>
+              {/* JOT, ZAG y QAT son del léxico Collins de Scrabble en INGLÉS: no están en el
+                  Lemario General del Español que usa este generador, y quien las jugara
+                  perdería el turno (hallazgo 499). ÑU, ZAS y YAK sí están, sin condicional. */}
+              <p>No necesitas saber el significado exacto de una palabra para usarla en Scrabble — solo necesitas saber que existe y es válida. Lista de palabras raras válidas: OHM, ÑU, ZAS, YAK.</p>
             </div>
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcon}>⚡</span>

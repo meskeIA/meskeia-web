@@ -13,7 +13,7 @@ import {
   ShareCard,
   Footer,
 } from '@/components';
-import { formatDate, formatNumber } from '@/lib';
+import { formatDate, formatNumber, parseISODateLocal } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   SECCIONES_IAE,
@@ -175,6 +175,53 @@ function normalizarTexto(texto: string): string {
 /** Deja solo los dígitos: «47.11» → «4711». */
 function soloDigitos(texto: string): string {
   return texto.replace(/\D/g, '');
+}
+
+/**
+ * ¿La consulta aparece como PALABRA COMPLETA en el texto (delimitada por espacios o los
+ * extremos), y no solo como fragmento dentro de otra palabra?
+ *
+ * Sin esto, «bar» encontraba antes «barnices» (subcadena accidental en el título) que el
+ * sinónimo EXACTO «bar» de 56.30 «Servicios de bebidas», que solo aparece en textoBusqueda
+ * porque el título no lo menciona. Los dos entraban en el mismo nivel de relevancia
+ * (hallazgo 479): esta función separa uno de otro.
+ */
+function coincidePalabraCompleta(texto: string, consulta: string): boolean {
+  if (!consulta) return false;
+  const escapada = consulta.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(^|\\s)${escapada}(\\s|$)`).test(texto);
+}
+
+/**
+ * Garantiza que el corte visible (`limite`) incluya al menos una entrada de cada sección
+ * presente en el conjunto ORDENADO completo, sin reordenar lo demás.
+ *
+ * Sin esto, una búsqueda cuyos resultados se reparten entre secciones puede dejar una
+ * sección entera por debajo del corte, aunque tenga entradas relevantes: la Sección es «la
+ * distinción con más efecto práctico sobre tus facturas» (retención de IRPF), así que
+ * ocultarla del corte por defecto es el defecto que más importa de esta app (hallazgo 480).
+ */
+function conRepresentacionDeSeccion<T>(
+  ordenados: T[],
+  limite: number,
+  seccionDe: (item: T) => string,
+): T[] {
+  if (ordenados.length <= limite) return ordenados;
+  const prefijo = ordenados.slice(0, limite);
+  const vistas = new Set(prefijo.map(seccionDe));
+  const faltantes: T[] = [];
+  for (const item of ordenados.slice(limite)) {
+    const seccion = seccionDe(item);
+    if (!vistas.has(seccion)) {
+      vistas.add(seccion);
+      faltantes.push(item);
+    }
+  }
+  if (faltantes.length === 0) return prefijo;
+  const conservados = prefijo.slice(0, Math.max(1, limite - faltantes.length));
+  const visibles = new Set([...conservados, ...faltantes]);
+  // Se mantiene el orden de relevancia original: solo cambia QUÉ entra en el corte.
+  return ordenados.filter((item) => visibles.has(item));
 }
 
 // ─── Página ──────────────────────────────────────────────────────────────────
@@ -348,12 +395,19 @@ export default function ConversorCnaeIaePage() {
 
   /**
    * ¿La consulta viene escrita con el formato de la CNAE-2025 (dos dígitos, punto, dos
-   * dígitos)? Entonces no es un código de la clasificación anterior, aunque sus cuatro
-   * dígitos también existan allí: quien tiene hoy la clase 47.11 y la escribe como figura
-   * en su alta recibía «4711 existe en la CNAE-2009, la clasificación anterior» sobre un
-   * código que está VIGENTE en el catálogo que la app acaba de servir (hallazgo 424).
+   * dígitos) Y existe de verdad una clase vigente con esos cuatro dígitos? Entonces no es
+   * un código de la clasificación anterior, aunque sus cuatro dígitos también existan allí:
+   * quien tiene hoy la clase 47.11 y la escribe como figura en su alta recibía «4711 existe
+   * en la CNAE-2009, la clasificación anterior» sobre un código que está VIGENTE en el
+   * catálogo que la app acaba de servir (hallazgo 424).
+   *
+   * El formato por sí solo no basta (hallazgo 481): 117 de los 629 códigos de la CNAE-2009
+   * del catálogo NO tienen clase homónima en la CNAE-2025, y para esos la notación con
+   * punto —la que aparece en escrituras, contratos y en la propia publicación del INE—
+   * dejaba de devolver nada. Exigir `vigenteHomonima` es lo que distingue «47.11, que hoy
+   * significa lo mismo» de «14.11, que hoy no significa nada: solo su equivalencia lo hace».
    */
-  const consultaConFormatoVigente = /^\s*\d{2}\.\d{2}\s*$/.test(consultaCnae);
+  const consultaConFormatoVigente = /^\s*\d{2}\.\d{2}\s*$/.test(consultaCnae) && vigenteHomonima !== null;
 
   /** Código anterior: 4 dígitos presentes en la tabla oficial CNAE-2009 → CNAE-2025. */
   const equivalenciaAntigua = useMemo<string[] | null>(() => {
@@ -391,8 +445,11 @@ export default function ConversorCnaeIaePage() {
       }
       const titulo = normalizarTexto(entrada.titulo);
       if (titulo.startsWith(consultaCnaeNormalizada)) return 2;
-      if (titulo.includes(consultaCnaeNormalizada)) return 3;
-      return 4;
+      // Palabra completa (en el título o en un sinónimo) antes que subcadena accidental:
+      // «bar» tiene que encontrar el sinónimo exacto de 56.30 antes que «barnices».
+      if (coincidePalabraCompleta(entrada.textoBusqueda, consultaCnaeNormalizada)) return 3;
+      if (titulo.includes(consultaCnaeNormalizada)) return 4;
+      return 5;
     };
 
     let base: CnaeIndexada[];
@@ -461,7 +518,8 @@ export default function ConversorCnaeIaePage() {
         return 1;
       }
       if (normalizarTexto(entrada.titulo).startsWith(consultaIaeNormalizada)) return 2;
-      return 3;
+      if (coincidePalabraCompleta(entrada.textoBusqueda, consultaIaeNormalizada)) return 3;
+      return 4;
     };
 
     let base = iaeIndexado;
@@ -497,7 +555,9 @@ export default function ConversorCnaeIaePage() {
   const sinCriterioIae = consultaIaeNormalizada.length === 0 && seccionIae === 'todas';
   const iaeMostrados = sinCriterioIae
     ? []
-    : resultadosIae.slice(0, verTodosIae ? undefined : LIMITE_RESULTADOS);
+    : verTodosIae
+      ? resultadosIae
+      : conRepresentacionDeSeccion(resultadosIae, LIMITE_RESULTADOS, (entrada) => entrada.seccion);
 
   // ─── Jerarquías ────────────────────────────────────────────────────────────
 
@@ -748,7 +808,7 @@ export default function ConversorCnaeIaePage() {
               <div className={styles.avisoAntiguo} role="note">
                 <p>
                   <strong>{digitosConsultaCnae}</strong> existe en la <strong>{CNAE_VIGENCIA.anterior}</strong>,
-                  la clasificación anterior. Desde el {formatDate(new Date(CNAE_VIGENCIA.desde))} rige la{' '}
+                  la clasificación anterior. Desde el {formatDate(parseISODateLocal(CNAE_VIGENCIA.desde))} rige la{' '}
                   {CNAE_VIGENCIA.vigente} ({CNAE_VIGENCIA.normaVigente}), y
                   estas son las clases actuales que recogen esa actividad
                   {homonimaEsOtraActividad && vigenteHomonima ? (
@@ -1054,7 +1114,7 @@ export default function ConversorCnaeIaePage() {
           <p className={styles.introText}>
             La CNAE vigente es la <strong>{CNAE_VIGENCIA.vigente}</strong>, aprobada por el{' '}
             {CNAE_VIGENCIA.normaVigente}, que sustituye a la {CNAE_VIGENCIA.anterior} desde{' '}
-            {formatDate(new Date(CNAE_VIGENCIA.desde))}. Muchos formularios, escrituras y
+            {formatDate(parseISODateLocal(CNAE_VIGENCIA.desde))}. Muchos formularios, escrituras y
             contratos anteriores siguen citando códigos de la CNAE-2009: por eso este buscador los
             reconoce y muestra a qué clase equivalen hoy. Las Tarifas del IAE, en cambio, siguen
             siendo las de 1990 con sus modificaciones posteriores, y su lenguaje refleja esa fecha.

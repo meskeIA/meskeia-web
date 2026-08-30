@@ -1,7 +1,7 @@
 'use client';
 
 import styles from './DataReference.module.css';
-import { formatDate } from '@/lib';
+import { formatDate, parseISODateLocal } from '@/lib';
 
 interface DataReferenceProps {
   /** Nombre de la normativa aplicada (ej: "IRPF 2025", "Demora comercial 2S-2025") */
@@ -42,7 +42,10 @@ export default function DataReference({
 }: DataReferenceProps) {
   const fechaFormateada = (() => {
     try {
-      return formatDate(new Date(verificado));
+      // parseISODateLocal, no `new Date(verificado)`: ese constructor interpreta la fecha
+      // como medianoche UTC, y al oeste de Greenwich el día se desliza al ANTERIOR
+      // (hallazgo 482 — «Última verificación» se veía un día antes en todo el catálogo).
+      return formatDate(parseISODateLocal(verificado));
     } catch {
       return verificado;
     }
