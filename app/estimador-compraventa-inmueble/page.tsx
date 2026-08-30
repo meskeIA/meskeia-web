@@ -25,6 +25,7 @@ import {
   RANGO_AJD,
   TERRITORIOS_SIN_IVA,
 } from '@/data/itp-ccaa';
+import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 
 // ===== TIPOS =====
 type TipoInmueble = 'vivienda' | 'garaje' | 'trastero' | 'local' | 'nave' | 'terreno';
@@ -297,9 +298,14 @@ export default function SimuladorCompraventaPage() {
 
     if (!Number.isFinite(precioV) || precioV <= 0) return null;
 
-    const comisionPct = parseSpanishNumberOr(comisionInmobiliaria) / 100;
+    // Se acota aquí y no solo en el blur del NumberInput: mientras el campo tiene el foco,
+    // un importe negativo se restaba de totalGastos y su tarjeta ni se pintaba (guard > 0),
+    // así que el neto del vendedor subía por encima del real sin ninguna línea que lo
+    // explicara. Mismo defecto que d787b81b ya acotó en la gestoría del comprador arriba,
+    // sin propagarlo a la partida gemela (hallazgos 476, 477).
+    const comisionPct = Math.max(0, parseSpanishNumberOr(comisionInmobiliaria)) / 100;
     const gestoria = parseSpanishNumberOr(gastosGestoria);
-    const otrosVenta = parseSpanishNumberOr(otrosGastosVenta);
+    const otrosVenta = Math.max(0, parseSpanishNumberOr(otrosGastosVenta));
     const comision = precioV * comisionPct;
 
     // Plusvalía municipal
@@ -1506,7 +1512,10 @@ export default function SimuladorCompraventaPage() {
               <div className={styles.stepContent}>
                 <strong>Liquida los impuestos en el plazo establecido</strong>
                 <p>El ITP o IVA+AJD debe liquidarse en un plazo de 30 días hábiles desde la firma.
-                El incumplimiento genera recargos del 5% al 20% e intereses de demora.</p>
+                El incumplimiento genera un recargo del {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}%
+                por cada mes completo hasta los {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses,
+                y el {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}% más intereses de demora a partir
+                de ahí ({ESCALA_RECARGO_EXTEMPORANEO.baseNormativa}).</p>
               </div>
             </li>
             <li className={styles.step}>
@@ -1579,7 +1588,9 @@ export default function SimuladorCompraventaPage() {
             <li><strong>Confundir ITP con AJD en segunda mano:</strong> En segunda mano solo se paga ITP; el AJD solo aplica en escrituras con hipoteca. No se duplican.</li>
             <li><strong>Olvidar los gastos del vendedor:</strong> La plusvalía municipal y la posible ganancia patrimonial en IRPF son cargas del vendedor que deben negociarse antes de fijar el precio final.</li>
             <li><strong>No comprobar bonificaciones autonómicas:</strong> Cada comunidad tiene tipos reducidos para ciertos colectivos. Ignorarlos puede costar miles de euros en impuestos innecesarios.</li>
-            <li><strong>Liquidar fuera de plazo:</strong> El ITP o IVA+AJD debe pagarse en 30 días hábiles desde la escritura. Pasado ese plazo, se generan recargos automáticos del 5% al 20%.</li>
+            <li><strong>Liquidar fuera de plazo:</strong> El ITP o IVA+AJD debe pagarse en 30 días hábiles desde la escritura. Pasado ese plazo, se genera un recargo automático
+            del {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}% por mes completo hasta los {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses,
+            y del {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}% más intereses a partir de ahí.</li>
           </ul>
         </div>
       </EducationalSection>

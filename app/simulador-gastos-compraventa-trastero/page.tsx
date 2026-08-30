@@ -79,6 +79,8 @@ interface ResultadosVendedor {
   esPerdida: boolean;
   gananciaPatrimonial: number;
   irpfGanancia: number;
+  /** false mientras falte el precio de compra: entonces el 0 no es una exención (hallazgo 483) */
+  irpfCalculado: boolean;
 }
 
 /**
@@ -285,8 +287,12 @@ export default function SimuladorTrasteroCompraventaPage() {
 
     if (!Number.isFinite(precioV) || precioV <= 0) return null;
 
-    const comisionPct = parseSpanishNumberOr(comisionInmobiliaria) / 100;
-    const gestoria = parseSpanishNumberOr(gastosGestoriaVenta);
+    // Se acota aquí y no solo en el blur del NumberInput: mientras el campo tiene el foco,
+    // un importe negativo se restaba de totalGastos y su tarjeta ni se pintaba (guard > 0),
+    // así que el neto del vendedor subía por encima del propio precio de venta sin ninguna
+    // línea que lo explicara (hallazgo 486, mismo defecto que el 457 ya acotó en el comprador).
+    const comisionPct = Math.max(0, parseSpanishNumberOr(comisionInmobiliaria)) / 100;
+    const gestoria = Math.max(0, parseSpanishNumberOr(gastosGestoriaVenta));
     const comision = precioV * comisionPct;
 
     // Plusvalía municipal
@@ -347,6 +353,7 @@ export default function SimuladorTrasteroCompraventaPage() {
       gananciaPatrimonial: hayDatosGanancia ? g.ganancia : 0,
       esPerdida: hayDatosGanancia && g.esPerdida,
       irpfGanancia: irpf,
+      irpfCalculado: hayDatosGanancia,
     };
   }, [precioVenta, precioCompraOriginal, aniosPropiedad, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, gastosGestoriaVenta, gastosAdquisicion]);
 
@@ -439,11 +446,22 @@ export default function SimuladorTrasteroCompraventaPage() {
             </div>
             {modalidadTrastero === 'independiente' && (
               <p className={styles.infoCcaaNote} style={{ marginTop: '0.5rem', color: '#856404' }}>
-                <span aria-hidden="true">⚠️</span> En obra nueva, el trastero independiente tributa al{' '}
-                <strong>IVA general del 21%</strong>, no al 10%: el tipo reducido solo se aplica a los anejos
-                transmitidos junto con la vivienda. En segunda mano paga ITP, pero los tipos reducidos por
-                perfil (joven, familia numerosa) suelen exigir que la compra sea de vivienda habitual.
-                Confirma tu caso con un asesor fiscal.
+                <span aria-hidden="true">⚠️</span>{' '}
+                {TERRITORIOS_SIN_IVA[ccaa] ? (
+                  <>
+                    En Canarias, Ceuta y Melilla no rige el IVA (allí se paga {TERRITORIOS_SIN_IVA[ccaa].impuesto}),
+                    así que la modalidad independiente/vinculada no cambia el impuesto en primera mano. En
+                    segunda mano paga ITP, pero los tipos reducidos por perfil (joven, familia numerosa) suelen
+                    exigir que la compra sea de vivienda habitual. Confirma tu caso con un asesor fiscal.
+                  </>
+                ) : (
+                  <>
+                    En obra nueva, el trastero independiente tributa al <strong>IVA general del 21%</strong>, no al
+                    10%: el tipo reducido solo se aplica a los anejos transmitidos junto con la vivienda. En
+                    segunda mano paga ITP, pero los tipos reducidos por perfil (joven, familia numerosa) suelen
+                    exigir que la compra sea de vivienda habitual. Confirma tu caso con un asesor fiscal.
+                  </>
+                )}
               </p>
             )}
           </div>
@@ -471,7 +489,11 @@ export default function SimuladorTrasteroCompraventaPage() {
                 <span aria-hidden="true" className={styles.transmisionIcon}>🆕</span>
                 <span>Primera mano</span>
                 <span className={styles.transmisionSub}>
-                  Paga IVA {modalidadTrastero === 'vinculado' ? '10%' : '21%'}
+                  {/* En Canarias, Ceuta y Melilla no rige el IVA (IGIC/IPSI), y la modalidad
+                      vinculado/independiente no cambia el resultado en nada (hallazgo 485). */}
+                  {TERRITORIOS_SIN_IVA[ccaa]
+                    ? `Paga ${TERRITORIOS_SIN_IVA[ccaa].impuesto}`
+                    : `Paga IVA ${modalidadTrastero === 'vinculado' ? '10%' : '21%'}`}
                 </span>
               </button>
             </div>
@@ -628,7 +650,10 @@ export default function SimuladorTrasteroCompraventaPage() {
 
                   {resultadosComprador.ajd > 0 && (
                     <ResultCard
-                      title={`AJD (${formatNumber(datosCcaaActual.ajd, 2)}%)`}
+                      // Tipo EFECTIVO, no el nominal de la tabla: en Ceuta y Melilla la cuota
+                      // gradual se bonifica al 50 % (art. 57 bis TRLITPAJD) y el nominal
+                      // desmentía el importe de al lado (hallazgo 484, efecto familia del 431).
+                      title={`AJD (${formatNumber((resultadosComprador.ajd / resultadosComprador.precioInmueble) * 100, 2)}%)`}
                       value={formatCurrency(resultadosComprador.ajd)}
                       variant="warning"
                       icon="📄"
@@ -854,10 +879,28 @@ export default function SimuladorTrasteroCompraventaPage() {
 
                   <ResultCard
                     title="IRPF sobre ganancia"
-                    value={resultadosVendedor.irpfGanancia > 0 ? formatCurrency(resultadosVendedor.irpfGanancia) : 'SIN CUOTA'}
-                    variant={resultadosVendedor.irpfGanancia > 0 ? 'warning' : 'success'}
+                    // «Sin calcular» y no «SIN CUOTA» en verde cuando falta el precio de compra:
+                    // ese 0 no es una exención, es un dato que falta (hallazgo 483).
+                    value={
+                      !resultadosVendedor.irpfCalculado
+                        ? 'Sin calcular'
+                        : resultadosVendedor.irpfGanancia > 0
+                          ? formatCurrency(resultadosVendedor.irpfGanancia)
+                          : 'SIN CUOTA'
+                    }
+                    variant={
+                      !resultadosVendedor.irpfCalculado
+                        ? 'default'
+                        : resultadosVendedor.irpfGanancia > 0
+                          ? 'warning'
+                          : 'success'
+                    }
                     icon="💸"
-                    description="Tributación en base del ahorro (19%-30%)"
+                    description={
+                      !resultadosVendedor.irpfCalculado
+                        ? 'Falta el precio de compra original. Este impuesto NO está incluido en el neto de abajo.'
+                        : 'Tributación en base del ahorro (19%-30%)'
+                    }
                   />
 
                   {resultadosVendedor.comisionInmobiliaria > 0 && (
@@ -893,9 +936,20 @@ export default function SimuladorTrasteroCompraventaPage() {
                     variant="highlight"
                     icon="💰"
                     description={
-                      resultadosVendedor.plusvaliaCalculada || resultadosVendedor.exentoPlusvalia
-                        ? 'Lo que realmente recibes tras los gastos'
-                        : 'Techo: aún NO incluye la plusvalía municipal. Añade los años de propiedad y el valor catastral del suelo para calcularla'
+                      // El IRPF también puede faltar por falta de precio de compra, y hasta el
+                      // hallazgo 483 este aviso solo nombraba la plusvalía: el IRPF quedaba
+                      // fuera del neto sin que nada lo mencionara.
+                      (() => {
+                        const faltan = [
+                          resultadosVendedor.plusvaliaCalculada || resultadosVendedor.exentoPlusvalia
+                            ? null
+                            : 'la plusvalía municipal (añade los años de propiedad y el valor catastral del suelo)',
+                          resultadosVendedor.irpfCalculado ? null : 'el IRPF de la ganancia (añade el precio de compra original)',
+                        ].filter((x): x is string => x !== null);
+                        return faltan.length === 0
+                          ? 'Lo que realmente recibes tras los gastos'
+                          : `Techo: aún NO incluye ${faltan.join(' ni ')}`;
+                      })()
                     }
                   />
                 </>

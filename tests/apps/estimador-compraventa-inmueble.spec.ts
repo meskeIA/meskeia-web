@@ -1331,27 +1331,10 @@ test.describe('Inspector 28/08/2026 — cierre del IVA en territorios sin IVA', 
   });
 });
 
-// ❌ ABIERTO 28/08/2026 — cálculo (MEDIO). Inspector, re-inspección de cierre.
-// El commit d787b81b acotó con `Math.max(0, …)` DENTRO del useMemo la gestoría del
-// comprador, con esta razón escrita al lado: «se acota aquí y no solo en el blur del
-// NumberInput: mientras el campo tiene el foco, un importe negativo se sumaba al total y
-// su tarjeta ni se pintaba (guard > 0)». Las dos partidas gemelas de la pestaña Vendedor
-// —«Otros gastos de la venta» y «Comisión inmobiliaria (%)»— siguen entrando por
-// `parseSpanishNumberOr` sin acotar, y reproducen el defecto entero: mientras el campo
-// tiene el foco (que es cuando se teclea) el importe negativo NO pinta tarjeta —los dos
-// render llevan el mismo guard `> 0`— y en cambio SÍ entra en `totalGastos`, restando en
-// vez de sumar, de modo que el «IMPORTE NETO VENDEDOR» sube. Es reparar donde se encontró
-// el fallo y no donde vive, que es justo lo que el acta de ese commit denunciaba.
-// Caso (sobre el montaje del CASO 20, cuyo neto correcto es 228.282,50 €):
-//   «Otros gastos de la venta» = −2.000, campo aún enfocado
-//   → esperado, acotado a 0: valor de transmisión 241.250,00 €, ganancia 61.250,00 €,
-//     IRPF 12.967,50 €, total gastos 21.717,50 € y neto 228.282,50 €
-//   → obtenido: valor de transmisión 243.250,00 €, ganancia 63.250,00 €, IRPF 13.427,50 €,
-//     total gastos 20.177,50 € y neto 229.822,50 € — 1.540 € de más, y ninguna tarjeta que
-//     explique de dónde salen. Al salir del campo el NumberInput lo devuelve a «0» y el
-//     neto vuelve a 228.282,50 €, así que el importe erróneo solo se ve mientras se teclea.
-test.fail(
-  'ABIERTO — un importe negativo en «Otros gastos de la venta» no puede subir el neto',
+// Hallazgo 476 — reparado. `otrosVenta` y `comisionPct` se acotan con `Math.max(0, …)` DENTRO
+// del useMemo, igual que d787b81b ya hizo con la gestoría del comprador.
+test(
+  'REGRESIÓN — un importe negativo en «Otros gastos de la venta» no sube el neto',
   async ({ page }) => {
     await page.goto(RUTA);
     await rellenar(page, 'Precio de la vivienda', '250000');
@@ -1368,16 +1351,9 @@ test.fail(
   },
 );
 
-// ❌ ABIERTO 28/08/2026 — cálculo (MEDIO). La misma falta de acotación, en el otro campo.
-// Caso (mismo montaje del CASO 20, con la comisión a −3 % y el campo aún enfocado):
-//   → esperado, acotado a 0 %: comisión 0 €, valor de transmisión 248.750,00 €, ganancia
-//     68.750,00 €, IRPF 14.692,50 €, total gastos 15.942,50 € y neto 234.057,50 €
-//   → obtenido: sin tarjeta de comisión, valor de transmisión 248.750,00 € (el motor sí
-//     acota con `positivo()`), ganancia 68.750,00 € e IRPF 14.692,50 € correctos, pero
-//     total gastos 8.442,50 € y neto 241.557,50 € — 7.500 € de más, porque el −7.500 €
-//     de comisión se resta del total de gastos del vendedor.
-test.fail(
-  'ABIERTO — una comisión negativa no puede restar del total de gastos del vendedor',
+// Hallazgo 477 — reparado. Misma acotación que el 476, en la comisión inmobiliaria.
+test(
+  'REGRESIÓN — una comisión negativa no resta del total de gastos del vendedor',
   async ({ page }) => {
     await page.goto(RUTA);
     await rellenar(page, 'Precio de la vivienda', '250000');
@@ -1393,26 +1369,10 @@ test.fail(
   },
 );
 
-// ❌ ABIERTO 28/08/2026 — dato (MEDIO). Inspector, re-inspección de cierre.
-// El propio commit d787b81b creó `ESCALA_RECARGO_EXTEMPORANEO` en
-// `lib/calculadoras/recargoPresentacionTardia.ts` con esta razón escrita al lado: «los
-// hallazgos 436 y 454 encontraron "recargos del 5% al 20%" en el bloque educativo de dos
-// apps del clúster: la escala ANTERIOR a la Ley 11/2021». La constante se aplicó en garaje
-// y en trastero, y esta app —el hub del clúster, reparada en ese mismo commit— sigue
-// publicando la escala vieja en DOS sitios de su bloque educativo (paso 5 de la guía y
-// último punto del recuadro de errores comunes). Es otra vez «se repara donde se encontró
-// el fallo, no donde vive».
-// La escala vigente del art. 27.2 LGT (redacción de la Ley 11/2021) es el 1 % por cada mes
-// completo de retraso hasta los 12 meses y el 15 % más intereses de demora a partir de ahí,
-// con reducción del 25 % si el recargo se paga en voluntario (art. 27.5 LGT).
-// Caso: abrir «Ver guía educativa» → el paso 5 dice «recargos del 5% al 20% e intereses de
-//       demora» y el recuadro de errores comunes «recargos automáticos del 5% al 20%»
-//       · esperado 0 apariciones de esa escala y, en su lugar, la que ya componen garaje y
-//       trastero desde ESCALA_RECARGO_EXTEMPORANEO · obtenido 2 apariciones. Sobre un ITP
-//       de 1.500 € liquidado con un mes de retraso, el texto hace temer 75 € donde el art.
-//       27.2 LGT cobra 15 €.
-test.fail(
-  'ABIERTO — el bloque educativo publica la escala de recargos anterior a la Ley 11/2021',
+// Hallazgo 478 — reparado. El bloque educativo deriva ahora los dos recargos de
+// `ESCALA_RECARGO_EXTEMPORANEO`, igual que ya hacían garaje y trastero.
+test(
+  'REGRESIÓN — el bloque educativo no publica la escala de recargos anterior a la Ley 11/2021',
   async ({ page }) => {
     await page.goto(RUTA);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();

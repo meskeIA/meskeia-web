@@ -67,6 +67,7 @@ interface ResultadosVendedor {
   precioVenta: number;
   plusvaliaMunicipal: number;
   metodoPlusvalia: string;
+  plusvaliaCalculada: boolean;
   exentoPlusvalia: boolean;
   comisionInmobiliaria: number;
   gastosGestoria: number;
@@ -77,6 +78,8 @@ interface ResultadosVendedor {
   gananciaPatrimonial: number;
   esPerdida: boolean;
   irpfGanancia: number;
+  /** false mientras falte el precio de compra: entonces el 0 no es una exención */
+  irpfCalculado: boolean;
 }
 
 // ===== CONSTANTES =====
@@ -215,8 +218,13 @@ export default function SimuladorGarajeCompraventaPage() {
 
     if (!Number.isFinite(precioV) || precioV <= 0) return null;
 
-    const comisionPct = parseSpanishNumberOr(comisionInmobiliaria) / 100;
-    const gestoria = parseSpanishNumberOr(gastosGestoriaVenta);
+    // Se acota aquí y no solo en el blur del NumberInput: mientras el campo tiene el foco,
+    // un importe negativo se restaba de totalGastos y su tarjeta ni se pintaba (guard > 0),
+    // así que el neto del vendedor subía por encima del real sin ninguna línea que lo
+    // explicara. El motor calcularGananciaInmueble sí acota internamente, pero totalGastos
+    // se calcula fuera con las variables crudas (hallazgo 474).
+    const comisionPct = Math.max(0, parseSpanishNumberOr(comisionInmobiliaria)) / 100;
+    const gestoria = Math.max(0, parseSpanishNumberOr(gastosGestoriaVenta));
     const comision = precioV * comisionPct;
 
     // Plusvalía municipal
@@ -271,6 +279,7 @@ export default function SimuladorGarajeCompraventaPage() {
       precioVenta: precioV,
       plusvaliaMunicipal: plusvalia,
       metodoPlusvalia,
+      plusvaliaCalculada: faltan.length === 0,
       exentoPlusvalia,
       comisionInmobiliaria: comision,
       gastosGestoria: gestoria,
@@ -281,10 +290,23 @@ export default function SimuladorGarajeCompraventaPage() {
       gananciaPatrimonial: hayDatosGanancia ? g.ganancia : 0,
       esPerdida: hayDatosGanancia && g.esPerdida,
       irpfGanancia: irpf,
+      irpfCalculado: hayDatosGanancia,
     };
   }, [precioGaraje, precioCompraOriginal, aniosPropiedad, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, gastosGestoriaVenta, gastosAdquisicion]);
 
   const datosCcaaActual = ITP_CCAA[ccaa];
+
+  /**
+   * Lo que el neto NO incluye por falta de datos, para que «IMPORTE NETO VENDEDOR» no se
+   * presente como definitivo cuando en realidad hay una partida sin calcular (efecto familia
+   * del hallazgo 483, ya reparado en estimador-compraventa-inmueble).
+   */
+  const faltanEnElNeto = resultadosVendedor
+    ? [
+        resultadosVendedor.plusvaliaCalculada ? null : 'la plusvalía municipal',
+        resultadosVendedor.irpfCalculado ? null : 'el IRPF de la ganancia',
+      ].filter((x): x is string => x !== null)
+    : [];
 
   return (
     <div className={styles.container}>
@@ -359,8 +381,10 @@ export default function SimuladorGarajeCompraventaPage() {
             </div>
           </div>
 
-          {/* Tipo de garaje (solo primera mano: determina el tipo de IVA) */}
-          {tipoTransmision === 'primera-mano' && (
+          {/* Tipo de garaje (solo primera mano: determina el tipo de IVA). Se oculta en
+              Canarias, Ceuta y Melilla: allí no rige el IVA (IGIC/IPSI) y la elección
+              vinculado/independiente no cambia el resultado en nada (hallazgo 475). */}
+          {tipoTransmision === 'primera-mano' && !TERRITORIOS_SIN_IVA[ccaa] && (
             <div className={styles.inputGroup}>
               <span className={styles.label} id="rotulo-tipo-garaje">Tipo de garaje</span>
               <div className={styles.transmisionGrid} role="group" aria-labelledby="rotulo-tipo-garaje">
@@ -555,7 +579,10 @@ export default function SimuladorGarajeCompraventaPage() {
                   />
                   {resultadosComprador.ajd > 0 && (
                     <ResultCard
-                      title={`AJD (${formatNumber(datosCcaaActual.ajd, 2)}%)`}
+                      // Tipo EFECTIVO, no el nominal de la tabla: en Ceuta y Melilla la cuota
+                      // gradual se bonifica al 50 % (art. 57 bis TRLITPAJD) y el nominal
+                      // desmentía el importe de al lado (hallazgo 473, efecto familia del 431).
+                      title={`AJD (${formatNumber((resultadosComprador.ajd / resultadosComprador.precioGaraje) * 100, 2)}%)`}
                       value={formatCurrency(resultadosComprador.ajd)}
                       variant="warning"
                       icon="📄"
@@ -722,8 +749,22 @@ export default function SimuladorGarajeCompraventaPage() {
                   />
                   <ResultCard
                     title="Plusvalía municipal"
-                    value={resultadosVendedor.exentoPlusvalia ? 'EXENTO' : formatCurrency(resultadosVendedor.plusvaliaMunicipal)}
-                    variant={resultadosVendedor.exentoPlusvalia ? 'success' : 'warning'}
+                    // «Sin calcular» y no «0,00 €»: un cero se lee como «no pagas nada», y aquí
+                    // significa «faltan datos». La partida tampoco se suma al total ni al neto.
+                    value={
+                      !resultadosVendedor.plusvaliaCalculada
+                        ? 'Sin calcular'
+                        : resultadosVendedor.exentoPlusvalia
+                          ? 'EXENTO'
+                          : formatCurrency(resultadosVendedor.plusvaliaMunicipal)
+                    }
+                    variant={
+                      !resultadosVendedor.plusvaliaCalculada
+                        ? 'default'
+                        : resultadosVendedor.exentoPlusvalia
+                          ? 'success'
+                          : 'warning'
+                    }
                     icon="🏛️"
                     description={resultadosVendedor.metodoPlusvalia}
                   />
@@ -766,10 +807,29 @@ export default function SimuladorGarajeCompraventaPage() {
                   )}
                   <ResultCard
                     title="IRPF sobre ganancia"
-                    value={resultadosVendedor.irpfGanancia > 0 ? formatCurrency(resultadosVendedor.irpfGanancia) : 'SIN CUOTA'}
-                    variant={resultadosVendedor.irpfGanancia > 0 ? 'warning' : 'success'}
+                    // «Sin calcular» y no «SIN CUOTA» en verde cuando falta el precio de compra:
+                    // ese 0 no es una exención, es un dato que falta (efecto familia del 483,
+                    // reparado en estimador-compraventa-inmueble con el hallazgo 428).
+                    value={
+                      !resultadosVendedor.irpfCalculado
+                        ? 'Sin calcular'
+                        : resultadosVendedor.irpfGanancia > 0
+                          ? formatCurrency(resultadosVendedor.irpfGanancia)
+                          : 'SIN CUOTA'
+                    }
+                    variant={
+                      !resultadosVendedor.irpfCalculado
+                        ? 'default'
+                        : resultadosVendedor.irpfGanancia > 0
+                          ? 'warning'
+                          : 'success'
+                    }
                     icon="💸"
-                    description="Tributación en base del ahorro (19%-30%)"
+                    description={
+                      !resultadosVendedor.irpfCalculado
+                        ? 'Falta el precio de compra original. Este impuesto NO está incluido en el neto de abajo.'
+                        : 'Tributación en base del ahorro (19%-30%)'
+                    }
                   />
                   {resultadosVendedor.comisionInmobiliaria > 0 && (
                     <ResultCard
@@ -799,7 +859,11 @@ export default function SimuladorGarajeCompraventaPage() {
                     value={formatCurrency(resultadosVendedor.netoVendedor)}
                     variant="highlight"
                     icon="💰"
-                    description="Lo que realmente recibes tras gastos e impuestos"
+                    description={
+                      faltanEnElNeto.length === 0
+                        ? 'Lo que realmente recibes tras gastos e impuestos'
+                        : `INCOMPLETO: falta descontar ${faltanEnElNeto.join(' y ')}. Rellena ${resultadosVendedor.plusvaliaCalculada ? 'el precio de compra original' : resultadosVendedor.irpfCalculado ? 'el valor catastral del suelo' : 'el precio de compra original y el valor catastral del suelo'} para obtener el neto real.`
+                    }
                   />
                 </div>
               ) : (

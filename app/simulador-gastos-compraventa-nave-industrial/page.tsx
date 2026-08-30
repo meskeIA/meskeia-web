@@ -251,7 +251,13 @@ export default function SimuladorNaveIndustrialPage() {
               >
                 <span className={styles.transmisionIcon} aria-hidden="true">🆕</span>
                 <span>Obra nueva / Promotor</span>
-                <span className={styles.transmisionSub}>Paga IVA {formatNumber(IVA_NAVE_INDUSTRIAL, 0)}% + AJD</span>
+                {/* En Canarias, Ceuta y Melilla no rige el IVA (IGIC/IPSI): el rótulo no puede
+                    prometer un IVA que el recuadro de abajo desmiente (hallazgo 490). */}
+                <span className={styles.transmisionSub}>
+                  {territorioActualSinIva
+                    ? `Paga ${territorioActualSinIva.impuesto} + AJD`
+                    : `Paga IVA ${formatNumber(IVA_NAVE_INDUSTRIAL, 0)}% + AJD`}
+                </span>
               </button>
               <button
                 type="button"
@@ -261,7 +267,11 @@ export default function SimuladorNaveIndustrialPage() {
               >
                 <span className={styles.transmisionIcon} aria-hidden="true">🤝</span>
                 <span>2ª mano con renuncia al IVA</span>
-                <span className={styles.transmisionSub}>IVA {formatNumber(IVA_NAVE_INDUSTRIAL, 0)}% (ISP) + AJD</span>
+                <span className={styles.transmisionSub}>
+                  {territorioActualSinIva
+                    ? `Paga ${territorioActualSinIva.impuesto} + AJD`
+                    : `IVA ${formatNumber(IVA_NAVE_INDUSTRIAL, 0)}% (ISP) + AJD`}
+                </span>
               </button>
             </div>
             {tipoTransmision === 'segunda-mano' && (
@@ -552,15 +562,16 @@ export default function SimuladorNaveIndustrialPage() {
             <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem' }}>
               <strong><span aria-hidden="true">🏭</span> Empresa compra nave nueva al promotor</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                Paga IVA 21% + AJD. Si la empresa está dada de alta en actividades sujetas a IVA,
-                puede deducir el IVA en la declaración trimestral (modelo 303).
+                Paga IVA {formatNumber(IVA_NAVE_INDUSTRIAL, 0)}% + AJD. Si la empresa está dada de alta en
+                actividades sujetas a IVA, puede deducir el IVA en la declaración trimestral (modelo 303).
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem' }}>
               <strong><span aria-hidden="true">🔄</span> Autónomo compra nave de segunda mano</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                Paga ITP al tipo general de su CCAA (no hay bonificaciones para naves industriales).
-                El ITP no es deducible como IVA, pero sí se añade al valor de adquisición del activo.
+                Paga ITP al tipo general de su CCAA — salvo en Ceuta y Melilla, donde la cuota se bonifica
+                un 50 % (art. 57 bis TRLITPAJD) para cualquier inmueble, también una nave. El ITP no es
+                deducible como IVA, pero sí se añade al valor de adquisición del activo.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem' }}>
@@ -626,8 +637,11 @@ export default function SimuladorNaveIndustrialPage() {
               <strong>¿Hay AJD en la compra de una nave industrial?</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
                 El AJD aplica en la compra de nave nueva (primera transmisión) junto con el IVA, igual que en
-                cualquier otro inmueble. En segunda mano, el AJD solo se pagaría sobre la escritura de hipoteca,
-                no sobre la compraventa en sí.
+                cualquier otro inmueble. En segunda mano sin renunciar a la exención se paga ITP y no AJD —ahí
+                el AJD solo se pagaría sobre la escritura de hipoteca, si la hay—. Pero si el comprador y el
+                vendedor renuncian a la exención (tercera opción de «Tipo de transmisión»), la operación
+                vuelve al IVA y sí devenga AJD sobre la propia compraventa, con varias comunidades aplicándole
+                un tipo incrementado.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
@@ -657,7 +671,7 @@ export default function SimuladorNaveIndustrialPage() {
               <span style={{ fontSize: '1.5rem' }} aria-hidden="true">📑</span>
               <strong>Consulta el régimen de IVA antes de comprar</strong>
               <p style={{ fontSize: '0.9rem' }}>
-                Si tu actividad está sujeta a IVA, comprar en primera mano (IVA 21%) puede ser más
+                Si tu actividad está sujeta a IVA, comprar en primera mano (IVA {formatNumber(IVA_NAVE_INDUSTRIAL, 0)}%) puede ser más
                 ventajoso que segunda mano (ITP no deducible), especialmente en naves de alto valor.
               </p>
             </div>
@@ -689,7 +703,7 @@ export default function SimuladorNaveIndustrialPage() {
             <strong>Limitaciones de este simulador</strong>
           </div>
           <ul style={{ paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column' as const, gap: '0.4rem' }}>
-            <li>El IVA del 21% solo es deducible si el comprador es sujeto pasivo de IVA con actividad sujeta y no exenta.</li>
+            <li>El IVA del {formatNumber(IVA_NAVE_INDUSTRIAL, 0)}% solo es deducible si el comprador es sujeto pasivo de IVA con actividad sujeta y no exenta.</li>
             <li>Los tipos de ITP y AJD pueden variar; verifica la normativa vigente de tu comunidad autónoma.</li>
             <li>El valor de referencia catastral puede ser la base imponible real del ITP si supera el precio escriturado.</li>
             <li>La renuncia a la exención de IVA en segunda mano SÍ se calcula, en la tercera opción de «Tipo de transmisión». Lo que esta calculadora no contempla son otras situaciones especiales: operaciones vinculadas, permutas, aportaciones no dinerarias a sociedades o transmisiones de unidad económica autónoma.</li>

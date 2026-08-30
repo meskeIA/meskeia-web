@@ -1039,27 +1039,15 @@ test.describe('MITAD B (28/08/2026) — zonas del motor que ninguna ronda anteri
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS — re-inspección del 28/08/2026.
-// Marcados con `test.fail()`: afirman lo que DEBERÍA pasar, así que hoy fallan a propósito.
-// UNA sola aserción de fondo por test: con `test.fail()` basta con que el test falle en
-// ALGÚN punto, así que varias aserciones pueden tapar que la que documenta el hallazgo ni
-// llega a evaluarse (ocurrió con el IRPF de 1022,20 € el 27/08).
+// Hallazgos 483-486 de la re-inspección del 28/08/2026 — reparados.
 // ═════════════════════════════════════════════════════════════════════════════
 
-// ❌ ABIERTO (medio) — contenido. REPARACIÓN NO PROPAGADA del commit d787b81b.
-// El rótulo del AJD publica `datosCcaaActual.ajd`, el tipo NOMINAL de la tabla, mientras el
-// importe sale de `calcularAJD`, que aplica la bonificación del 50 % del art. 57 bis
-// TRLITPAJD en Ceuta y Melilla. El título y la cifra de al lado no hablan del mismo
-// porcentaje. La hermana `nave-industrial` cerró exactamente esto el 27/08 pasando el rótulo
-// al tipo EFECTIVO (`ajd / precioInmueble`), y `estimador-compraventa-inmueble` igual; a
-// esta app y a `garaje`, `solar` y `local-comercial` no llegó.
-// Caso: Ceuta · primera mano · 30.000 € → esperado el rótulo «AJD (0,25%)» sobre los 75,00 €
-//       que la app cobra (30.000 × 0,5 % × 50 % de bonificación) · obtenido «AJD (0,50%)»
-//       con esos mismos 75,00 €, que son el 0,25 % del precio.
-test('HALLAZGO (contenido) — el rótulo del AJD en Ceuta anuncia el tipo nominal, no el bonificado', async ({
+// Hallazgo 484 — reparado. El rótulo del AJD da ahora el tipo EFECTIVO
+// (`ajd / precioInmueble`), no el nominal de la tabla, igual que ya hacían nave-industrial
+// y estimador-compraventa-inmueble.
+test('REGRESIÓN — el rótulo del AJD en Ceuta anuncia el tipo bonificado, no el nominal', async ({
   page,
 }) => {
-  test.fail();
   await page.goto(RUTA);
   await page.getByRole('button', { name: /Primera mano/ }).click();
   await selectCcaa(page).selectOption('ceuta');
@@ -1069,22 +1057,12 @@ test('HALLAZGO (contenido) — el rótulo del AJD en Ceuta anuncia el tipo nomin
   expect(titulo).toContain('0,25%');
 });
 
-// ❌ ABIERTO (alto) — operativa. REPARACIÓN NO PROPAGADA del commit d787b81b (hallazgo 428).
-// Sin precio de compra original, el IRPF no se puede calcular: `hayDatosGanancia` es falso y
-// la cuota se fuerza a 0. Pero la tarjeta no dice «no lo sé», dice «SIN CUOTA» en VERDE
-// (variante `success`) y describe «Tributación en base del ahorro (19%-30%)», que se lee como
-// que esta venta no tributa. Y el neto de abajo solo avisa de que le falta la plusvalía
-// municipal: el IRPF tampoco está descontado y nada lo menciona. La hermana
-// `estimador-compraventa-inmueble` cerró esto el 27/08 con `irpfCalculado` → «Sin calcular»
-// en variante neutra y un neto que nombra TODAS las partidas que faltan.
-// Caso: pestaña Vendedor · precio de venta 15.000 € · sin precio de compra → esperado «Sin
-//       calcular» y un neto que nombre el IRPF entre lo que falta · obtenido «SIN CUOTA» en
-//       verde y «IMPORTE NETO VENDEDOR 14.550,00 € — Techo: aún NO incluye la plusvalía
-//       municipal», sin una palabra sobre el IRPF que tampoco incluye.
-test('HALLAZGO (operativa) — sin precio de compra, el IRPF se anuncia «SIN CUOTA» en verde', async ({
+// Hallazgo 483 — reparado. Sin precio de compra original, `irpfCalculado` es falso y la
+// tarjeta dice «Sin calcular» en variante neutra (no «SIN CUOTA» en verde), y el neto nombra
+// también el IRPF entre lo que falta, igual que ya hacía estimador-compraventa-inmueble.
+test('REGRESIÓN — sin precio de compra, el IRPF no se anuncia «SIN CUOTA» en verde', async ({
   page,
 }) => {
-  test.fail();
   await page.goto(RUTA);
   await rellenar(page, 'Precio del trastero', '15000');
   await page.getByRole('button', { name: /Vendedor/ }).click();
@@ -1092,21 +1070,11 @@ test('HALLAZGO (operativa) — sin precio de compra, el IRPF se anuncia «SIN CU
   expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('Sin calcular');
 });
 
-// ❌ ABIERTO (medio) — contenido.
-// El botón «Primera mano» rotula el tipo de IVA aplicable —«Paga IVA 10%» o «Paga IVA 21%»
-// según la modalidad— sin mirar la comunidad, así que en Canarias, Ceuta y Melilla ofrece un
-// impuesto que allí no existe. Peor: en esos territorios la elección vinculado/independiente
-// NO cambia ni un céntimo del resultado (ambos dan 939,55 € de gastos sobre 25.000 €), pero
-// el rótulo promete una diferencia de once puntos. El aviso de modalidad independiente
-// («tributa al IVA general del 21%») tiene el mismo problema. La app ya sabe distinguir el
-// territorio: `TERRITORIOS_SIN_IVA` está importado y usado tres líneas más abajo.
-// Caso: Canarias · primera mano → esperado un rótulo que no prometa un tipo de IVA donde no
-//       rige · obtenido «Primera mano · Paga IVA 10%» (y «Paga IVA 21%» al marcar
-//       Independiente) a la izquierda de una tarjeta que dice «En Canarias no rige el IVA».
-test('HALLAZGO (contenido) — en Canarias el botón sigue ofreciendo un tipo de IVA', async ({
+// Hallazgo 485 — reparado. El botón «Primera mano» y el aviso de modalidad independiente
+// nombran ahora el impuesto local (IGIC/IPSI) en vez de prometer un IVA que allí no existe.
+test('REGRESIÓN — en Canarias el botón no ofrece un tipo de IVA', async ({
   page,
 }) => {
-  test.fail();
   await page.goto(RUTA);
   await page.getByRole('button', { name: /Primera mano/ }).click();
   await selectCcaa(page).selectOption('canarias');
@@ -1115,24 +1083,11 @@ test('HALLAZGO (contenido) — en Canarias el botón sigue ofreciendo un tipo de
   expect(rotulo).not.toMatch(/IVA\s*\d/);
 });
 
-// ❌ ABIERTO (bajo) — operativa. REPARACIÓN NO PROPAGADA del commit d787b81b (hallazgo 457).
-// CASO 10 (DEBE RECHAZARSE) — un porcentaje de comisión negativo.
-// Aquel hallazgo acotó con `Math.max(0, …)` la gestoría del COMPRADOR, dentro de su useMemo,
-// porque el `min={0}` de NumberInput solo actúa en el blur. Las dos partidas del VENDEDOR
-// —comisión inmobiliaria y gestoría propia— se quedaron sin acotar, así que mientras el campo
-// tiene el foco un negativo se resta del total de gastos y le sube el neto, y su tarjeta ni
-// se pinta (las guardas son `> 0`). El resultado es un neto MAYOR que el precio de venta y un
-// «Total gastos vendedor» negativo, sin ninguna línea visible que lo explique.
-// Caso: pestaña Vendedor · venta 15.000 € · compra 8.000 € · escribir «-10» en «Comisión
-//       inmobiliaria (%)» SIN salir del campo → esperado que el negativo se ignore, o sea
-//       IRPF 1.350,00 € (ganancia de 7.000: 6.000 × 19 % + 1.000 × 21 %), total gastos
-//       1.350,00 € y neto 13.650,00 € · obtenido «Total gastos vendedor -150,00 €» e
-//       «IMPORTE NETO VENDEDOR 15.150,00 €», 150 € POR ENCIMA del propio precio de venta.
-//       Con «-400» en la gestoría del vendedor: 950,00 € y 14.050,00 €.
-test('CASO 10 (debe rechazarse) — una comisión negativa con el foco puesto infla el neto del vendedor', async ({
+// Hallazgo 486 — reparado. La comisión y la gestoría del VENDEDOR se acotan ahora con
+// `Math.max(0, …)` dentro del useMemo, igual que el 457 ya acotó la gestoría del comprador.
+test('CASO 10 (debe rechazarse) — una comisión negativa con el foco puesto ya no infla el neto', async ({
   page,
 }) => {
-  test.fail();
   await page.goto(RUTA);
   await rellenar(page, 'Precio del trastero', '15000');
   await page.getByRole('button', { name: /Vendedor/ }).click();

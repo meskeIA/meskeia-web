@@ -1021,25 +1021,16 @@ test.describe('Cierre y casos nuevos — 28/08/2026', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS — re-inspección del 28/08/2026.
-// Afirman lo que DEBERÍA pasar y hoy fallan a propósito. UNA sola aserción de fondo cada
-// uno: con `test.fail()` basta con fallar en algún punto, y varias aserciones taparían que
-// la que documenta el hallazgo ni llega a evaluarse.
+// Hallazgos 490-493 de la re-inspección del 28/08/2026 — reparados.
 // ═══════════════════════════════════════════════════════════════════════════════
 
-test.describe('Hallazgos abiertos — 28/08/2026', () => {
+test.describe('Hallazgos reparados — 28/08/2026', () => {
   /**
-   * HALLAZGO F (contenido, medio) — el formulario ofrece dos controles rotulados con un IVA
-   * del 21 % en los tres territorios donde ese impuesto no existe.
-   *
-   * La reparación del `d787b81b` llegó al RESULTADO (tarjeta «IGIC · No calculado», total
-   * marcado parcial) y al recuadro de la comunidad, que ya rotula «IGIC (obra nueva) · No
-   * calculado». No llegó a los BOTONES, que es donde el usuario elige: con Canarias
-   * seleccionada siguen diciendo «Paga IVA 21% + AJD» e «IVA 21% (ISP) + AJD» tres
-   * centímetros por encima del aviso «En Canarias no se aplica el IVA». El usuario elige el
-   * supuesto leyendo una promesa que la misma pantalla desmiente. Igual en Ceuta y Melilla.
+   * Hallazgo 490 — reparado. Los botones del grupo «Tipo de transmisión» nombran ahora el
+   * impuesto local (IGIC/IPSI) en los tres territorios donde el IVA no rige, en vez de
+   * prometer un «IVA 21%» que el recuadro de la comunidad desmiente unos centímetros más abajo.
    */
-  test.fail('HALLAZGO F — en Canarias los botones siguen ofreciendo «IVA 21%»', async ({ page }) => {
+  test('REGRESIÓN — en Canarias los botones no ofrecen «IVA 21%»', async ({ page }) => {
     await page.goto(RUTA);
     await page.selectOption('#select-ccaa', 'canarias');
     const grupo = page.getByRole('group', { name: /Tipo de transmisión/ });
@@ -1050,18 +1041,11 @@ test.describe('Hallazgos abiertos — 28/08/2026', () => {
   });
 
   /**
-   * HALLAZGO G (contenido, medio) — la FAQ del bloque educativo niega el AJD que la app
-   * cobra en su tercera opción.
-   *
-   * «¿Hay AJD en la compra de una nave industrial?» responde: «En segunda mano, el AJD solo
-   * se pagaría sobre la escritura de hipoteca, no sobre la compraventa en sí». Pero con
-   * Cataluña · 2ª mano con renuncia · 800.000 € la app liquida 12.000 € de AJD sobre esa
-   * misma compraventa de segunda mano (lo comprueba el caso B2 de arriba), y su propio aviso
-   * bajo los botones advierte de que varias comunidades le aplican ahí un tipo incrementado.
-   * Es la misma reparación de `REPARADO B` —el recuadro de limitaciones, corregido el
-   * 27/08/2026— que no se propagó al párrafo de al lado.
+   * Hallazgo 491 — reparado. La FAQ «¿Hay AJD en la compra de una nave industrial?» ya
+   * distingue el caso sin renuncia (ITP, sin AJD salvo hipoteca) del caso con renuncia a la
+   * exención (tercera opción), donde la app sí liquida AJD sobre la propia compraventa.
    */
-  test.fail('HALLAZGO G — la FAQ dice que en segunda mano no hay AJD sobre la compraventa', async ({ page }) => {
+  test('REGRESIÓN — la FAQ no niega el AJD que la app cobra con renuncia a la exención', async ({ page }) => {
     await page.goto(RUTA);
     const bloque = (
       await page
@@ -1074,16 +1058,10 @@ test.describe('Hallazgos abiertos — 28/08/2026', () => {
   });
 
   /**
-   * HALLAZGO H (contenido, bajo) — «no hay bonificaciones para naves industriales» es falso
-   * en Ceuta y Melilla, y lo desmiente la propia app.
-   *
-   * La tarjeta «Autónomo compra nave de segunda mano» afirma que se paga «ITP al tipo general
-   * de su CCAA (no hay bonificaciones para naves industriales)». Tres bloques más abajo, su
-   * propia FAQ dice lo contrario: «en Ceuta y Melilla se descuenta el 50 % (art. 57 bis del
-   * TRLITPAJD), y ahí sí entra cualquier inmueble, también una nave». Y el motor la aplica:
-   * Ceuta · segunda mano · 500.000 € liquida 15.000 €, no 30.000 € (test HALLAZGO 157).
+   * Hallazgo 492 — reparado. La tarjeta «Autónomo compra nave de segunda mano» ya nombra la
+   * bonificación del 50 % de Ceuta y Melilla (art. 57 bis TRLITPAJD) en vez de negarla.
    */
-  test.fail('HALLAZGO H — el caso de uso del autónomo niega la bonificación de Ceuta y Melilla', async ({ page }) => {
+  test('REGRESIÓN — el caso de uso del autónomo no niega la bonificación de Ceuta y Melilla', async ({ page }) => {
     await page.goto(RUTA);
     const tarjeta = (
       await page
@@ -1096,16 +1074,11 @@ test.describe('Hallazgos abiertos — 28/08/2026', () => {
   });
 
   /**
-   * HALLAZGO I (dato, bajo) — el 21 % sigue escrito a mano en tres sitios del bloque
-   * educativo, con `IVA_INMUEBLES_2025.local` ya importado en el fichero.
-   *
-   * `REPARADO D` corrigió la tabla comparativa el 27/08/2026, pero dejó atrás los otros tres
-   * literales: «Paga IVA 21% + AJD» (caso de uso de la empresa), «comprar en primera mano
-   * (IVA 21%)» (consejo del régimen de IVA) y «El IVA del 21% solo es deducible…»
-   * (limitaciones). Es exactamente la divergencia-en-silencio del hallazgo 163: hoy coinciden,
-   * y el día que `IVA_INMUEBLES_2025.local` cambie, la app cobrará una cifra y contará otra.
+   * Hallazgo 493 — reparado. Los tres literales «21%» del bloque educativo (caso de uso de
+   * la empresa, consejo del régimen de IVA y limitaciones) derivan ahora de
+   * `IVA_NAVE_INDUSTRIAL` (= `IVA_INMUEBLES_2025.local`), igual que la tabla comparativa.
    */
-  test.fail('HALLAZGO I — quedan tres «21%» escritos a mano en el bloque educativo', async () => {
+  test('REGRESIÓN — no quedan «21%» escritos a mano en el bloque educativo', async () => {
     const fuente = await leerFuente();
     // El valor existe en data/fiscal y ya está importado aquí (lo fija `REPARADO D`).
     expect(fuente.match(/\b21%/g) ?? []).toHaveLength(0);

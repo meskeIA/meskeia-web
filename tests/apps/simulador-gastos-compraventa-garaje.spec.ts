@@ -1066,31 +1066,15 @@ test.describe('MITAD B — casos nuevos de la re-inspección (28/08/2026)', () =
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS — re-inspección del 28/08/2026.
-// Marcados con `test.fail()`: afirman lo que DEBERÍA pasar, así que hoy fallan a propósito.
-// Cuando se reparen, se les quita la marca y quedan como regresión.
-//
-// Cada test lleva UNA sola aserción de fondo, a propósito: con `test.fail()` basta con que el
-// test falle en algún punto, así que un test con varias podría estar tapando que la que
-// documenta el hallazgo ni siquiera se evalúa (la lección del commit d787b81b, decisión 2).
+// Hallazgos 473-475 de la re-inspección del 28/08/2026 — reparados.
 // ═════════════════════════════════════════════════════════════════════════════
 
-test.describe('HALLAZGOS ABIERTOS — re-inspección del 28/08/2026', () => {
-  test.fail();
-
-  // ⚠️ ABIERTO (medio) — contenido.
-  // La tarjeta del AJD se rotula con el tipo NOMINAL de la tabla
-  // (`AJD (${formatNumber(datosCcaaActual.ajd, 2)}%)`), pero el importe que enseña debajo lleva
-  // ya la bonificación del 50 % de Ceuta y Melilla que aplica `calcularAJD`. En Ceuta el rótulo
-  // dice 0,50 % y el importe es el 0,25 % del precio: el mismo defecto que el commit d787b81b
-  // reparó en la app hermana nave-industrial —«el rótulo del AJD en Ceuta (0,50 % nominal sobre
-  // un importe que es el 0,25 %)»— y que estimador-compraventa-inmueble ya trae corregido; a
-  // esta no le llegó, aunque iba en el mismo commit. Es efecto familia otra vez, y se comprueba
-  // por grep: garaje, trastero y local-comercial siguen con `datosCcaaActual.ajd` en el título,
-  // nave-industrial y estimador con `(ajd / precio) * 100`.
-  // Caso: Ceuta · primera mano · 25.000 € → esperado el tipo EFECTIVO «AJD (0,25%)» sobre
-  //       62,50 € · obtenido «AJD (0,50%)» sobre esos mismos 62,50 €, que serían 125,00 €.
-  test('el rótulo del AJD da el tipo efectivo, no el nominal, donde hay bonificación', async ({
+test.describe('Hallazgos reparados — re-inspección del 28/08/2026', () => {
+  // Hallazgo 473 — reparado. La tarjeta del AJD da ahora el tipo EFECTIVO
+  // (`ajd / precioGaraje * 100`), no el nominal de la tabla: en Ceuta y Melilla la
+  // bonificación del 50 % (art. 57 bis TRLITPAJD) hace que el nominal desmienta el importe
+  // de al lado, igual que ya reparó nave-industrial y estimador-compraventa-inmueble.
+  test('REGRESIÓN — el rótulo del AJD da el tipo efectivo, no el nominal, donde hay bonificación', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -1102,19 +1086,10 @@ test.describe('HALLAZGOS ABIERTOS — re-inspección del 28/08/2026', () => {
     expect(await tituloTarjeta(page, 'AJD')).toBe('AJD (0,25%)');
   });
 
-  // ⚠️ ABIERTO (medio) — cálculo.
-  // El commit d787b81b acotó con `Math.max(0, ...)` la gestoría del COMPRADOR, y escribió el
-  // porqué: «mientras el campo tiene el foco, un importe negativo se sumaba al total y su
-  // tarjeta ni se pintaba (guard > 0), así que el total en pantalla no cuadraba con las líneas
-  // visibles». Los dos campos del VENDEDOR —comisión y gestoría— siguen sin esa guarda
-  // (`parseSpanishNumberOr(comisionInmobiliaria) / 100` y `parseSpanishNumberOr(gastosGestoriaVenta)`),
-  // y sus tarjetas llevan el mismo `> 0`. El efecto aquí es peor que en el comprador: el neto
-  // sale por ENCIMA del real, que es el error caro en una app fiscal.
-  // Caso: pestaña Vendedor · venta 30.000 € · compra 18.000 € · comisión «-5» sin salir del
-  //       campo → esperado que se acote a 0 (total gastos 2.400,00 € y neto 27.600,00 €) ·
-  //       obtenido total gastos 900,00 € y neto 29.100,00 €, o sea 1.500 € de más, sin ninguna
-  //       tarjeta de comisión en pantalla que explique de dónde sale la diferencia.
-  test('la comisión negativa del vendedor se acota a 0 mientras el campo tiene el foco', async ({
+  // Hallazgo 474 — reparado. La comisión y la gestoría del VENDEDOR se acotan ahora con
+  // `Math.max(0, ...)` dentro del useMemo, igual que d787b81b ya hizo con la gestoría del
+  // comprador.
+  test('REGRESIÓN — la comisión negativa del vendedor se acota a 0 mientras el campo tiene el foco', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -1128,11 +1103,8 @@ test.describe('HALLAZGOS ABIERTOS — re-inspección del 28/08/2026', () => {
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('27.600,00 €');
   });
 
-  // ⚠️ ABIERTO (medio) — cálculo. El mismo defecto en el otro campo del vendedor.
-  // Caso: pestaña Vendedor · venta 30.000 € · compra 18.000 € · comisión 0 % · gestoría del
-  //       vendedor «-500» sin salir del campo → esperado neto 27.600,00 € · obtenido
-  //       28.100,00 €, 500 € de más y sin tarjeta de gestoría que lo justifique.
-  test('la gestoría negativa del vendedor se acota a 0 mientras el campo tiene el foco', async ({
+  // Hallazgo 474 — reparado. El mismo defecto en el otro campo del vendedor.
+  test('REGRESIÓN — la gestoría negativa del vendedor se acota a 0 mientras el campo tiene el foco', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -1146,18 +1118,9 @@ test.describe('HALLAZGOS ABIERTOS — re-inspección del 28/08/2026', () => {
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('27.600,00 €');
   });
 
-  // ⚠️ ABIERTO (bajo) — operativa.
-  // En Canarias, Ceuta y Melilla el cálculo ya no inventa IVA, pero el formulario sigue
-  // ofreciendo el selector «Tipo de garaje», cuyos dos botones se rotulan «IVA 10%» e
-  // «IVA 21%», y la nota que va debajo explica esos dos tipos. El bloque solo mira
-  // `tipoTransmision === 'primera-mano'`, no `TERRITORIOS_SIN_IVA`. Resultado: tres centímetros
-  // por encima del aviso «En Canarias no se aplica el IVA» hay un control que promete elegir
-  // entre dos tipos de IVA y que, comprobado, no cambia el resultado en nada.
-  // Caso: Canarias · primera mano · 25.000 € → esperado que el selector de tipo de garaje no
-  //       se ofrezca (o no se rotule con tipos de IVA) · obtenido el grupo «Tipo de garaje»
-  //       con «Vinculado a vivienda · IVA 10%» e «Independiente · IVA 21%», y el mismo coste
-  //       total (25.939,55 €) se elija el que se elija.
-  test('en un territorio sin IVA no se ofrece un selector de tipo de IVA', async ({ page }) => {
+  // Hallazgo 475 — reparado. El selector «Tipo de garaje» ya no se ofrece en Canarias, Ceuta
+  // y Melilla: la elección vinculado/independiente no cambiaba el resultado en nada allí.
+  test('REGRESIÓN — en un territorio sin IVA no se ofrece un selector de tipo de IVA', async ({ page }) => {
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Primera mano/ }).click();
     await page.selectOption('#select-ccaa', 'canarias');
