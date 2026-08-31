@@ -7,7 +7,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useId } from 'react';
 import styles from './NumberInput.module.css';
 
 interface NumberInputProps {
@@ -41,6 +41,10 @@ export default function NumberInput({
   error,
   suffix,
 }: NumberInputProps) {
+  const id = useId();
+  const helperId = `${id}-helper`;
+  const errorId = `${id}-error`;
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
 
@@ -74,12 +78,13 @@ export default function NumberInput({
 
   return (
     <div className={`${styles.inputGroup} ${className}`}>
-      <label className={styles.label}>
+      <label className={styles.label} htmlFor={id}>
         {label}
         {required && <span className={styles.required}>*</span>}
       </label>
 
       <input
+        id={id}
         type="text"
         inputMode="decimal"
         value={value}
@@ -90,17 +95,17 @@ export default function NumberInput({
         className={`${styles.input} ${error ? styles.inputError : ''}`}
         aria-label={label}
         aria-invalid={!!error}
-        aria-describedby={error ? `${label}-error` : helperText ? `${label}-helper` : undefined}
+        aria-describedby={error ? errorId : helperText ? helperId : undefined}
       />
 
       {helperText && !error && (
-        <p className={styles.helperText} id={`${label}-helper`}>
+        <p className={styles.helperText} id={helperId}>
           {helperText}
         </p>
       )}
 
       {error && (
-        <p className={styles.errorText} id={`${label}-error`} role="alert">
+        <p className={styles.errorText} id={errorId} role="alert">
           {error}
         </p>
       )}
