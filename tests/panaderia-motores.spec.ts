@@ -17,7 +17,11 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { calcularDDT } from '../lib/calculadoras/cocina';
+import {
+  calcularBakersPercentage,
+  calcularBakersPercentageDesdePeso,
+  calcularDDT,
+} from '../lib/calculadoras/cocina';
 import {
   ajustarFermentacion,
   formatearTiempo,
@@ -100,5 +104,51 @@ test.describe('Fermentación — el mismo pan a otra temperatura', () => {
     expect(formatearTiempo(1)).toBe('1 h');
     expect(formatearTiempo(0.5)).toBe('30 min');
     expect(formatearTiempo(0)).toBe('—');
+  });
+});
+
+test.describe('Porcentaje del panadero — modo inverso (peso final → gramos)', () => {
+  test('A MANO: masa de 1000 g al 65/2/0,3 % → harina ≈ 598 g (harina = peso / (1 + Σ%/100))', () => {
+    // harina = 1000 / (1 + 67,3/100) = 597,73 → redondeado 598
+    const r = calcularBakersPercentageDesdePeso(1000, [
+      { nombre: 'Agua', porcentaje: 65 },
+      { nombre: 'Sal', porcentaje: 2 },
+      { nombre: 'Levadura', porcentaje: 0.3 },
+    ]);
+    expect(r.harina_g).toBe(598);
+    expect(r.ingredientes.map(i => i.gramos)).toEqual([389, 12, 2]);
+    expect(r.hidratacion_pct).toBe(65);
+    // El peso real puede diferir 1-2 g del objetivo por el redondeo a gramos enteros.
+    expect(r.pesoMasa_g).toBe(1001);
+  });
+
+  test('PORCIONES: un molde de 540 g a 60/2/1 % en porciones de 90 g da exactamente 6', () => {
+    const r = calcularBakersPercentageDesdePeso(
+      540,
+      [
+        { nombre: 'Agua', porcentaje: 60 },
+        { nombre: 'Sal', porcentaje: 2 },
+        { nombre: 'Levadura', porcentaje: 1 },
+      ],
+      90,
+    );
+    expect(r.pesoMasa_g).toBe(540);
+    expect(r.rendimiento_porciones).toBe(6);
+  });
+
+  test('CONSISTENCIA IDA-VUELTA: invertir el resultado del modo directo reproduce los mismos gramos', () => {
+    const directo = calcularBakersPercentage(1000, [
+      { nombre: 'Agua', gramos: 650 },
+      { nombre: 'Sal', gramos: 20 },
+      { nombre: 'Levadura', gramos: 3 },
+    ]);
+    const inverso = calcularBakersPercentageDesdePeso(
+      directo.pesoMasa_g,
+      directo.ingredientes.map(i => ({ nombre: i.nombre, porcentaje: i.porcentajePanadero })),
+    );
+    expect(inverso.harina_g).toBe(directo.harina_g);
+    expect(inverso.ingredientes.map(i => i.gramos)).toEqual(
+      directo.ingredientes.map(i => i.gramos),
+    );
   });
 });
