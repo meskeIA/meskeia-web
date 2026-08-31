@@ -16,7 +16,8 @@ import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency } from '@/lib';
 import {
   TRAMOS_IRPF_2025,
-  FISCAL_AUTONOMOS_META,
+  MINIMOS_IRPF_2025,
+  FISCAL_IRPF_META,
 } from '@/data/fiscal';
 import styles from './SimuladorModulosVsDirecta.module.css';
 
@@ -201,7 +202,7 @@ function calcularIRPF(baseLiquidable: number): number {
 }
 
 // Mínimo personal orientativo (sin familia)
-const MINIMO_PERSONAL_ORIENTATIVO = 5550;
+const MINIMO_PERSONAL_ORIENTATIVO = MINIMOS_IRPF_2025.personal;
 
 interface ResultadoED {
   ingresos: number;
@@ -348,7 +349,8 @@ export default function SimuladorModulosVsDirectaPage() {
   const resModulos = useMemo(() => calcularModulos(comunes, modulos), [comunes, modulos]);
 
   const diferencia = resED.costeAnualTotal - resModulos.costeAnualTotal;
-  const ganaED = resED.costeAnualTotal < resModulos.costeAnualTotal;
+  // Si módulos no es apta, la única opción real es ED — no se compara por importe.
+  const ganaED = !resModulos.esApta || resED.costeAnualTotal < resModulos.costeAnualTotal;
 
   const aplicarCaso = useCallback((caso: CasoPreconfig) => {
     setComunes(caso.comunes);
@@ -356,7 +358,18 @@ export default function SimuladorModulosVsDirectaPage() {
   }, []);
 
   const cambiarActividad = useCallback((id: Actividad) => {
-    setModulos(prev => ({ ...prev, actividad: id }));
+    const info = ACTIVIDADES.find(a => a.id === id) ?? ACTIVIDADES[0];
+    setModulos(prev => ({
+      actividad: id,
+      // Los campos que la nueva actividad no muestra se reinician: si no, conservan el
+      // valor de la actividad anterior y falsean tanto la elegibilidad como las reducciones.
+      personalAsalariado: info.usaPersonalAsalariado ? prev.personalAsalariado : 0,
+      personalNoAsalariado: info.usaPersonalNoAsalariado ? prev.personalNoAsalariado : 0,
+      superficie: info.usaSuperficie ? prev.superficie : 0,
+      kwh: info.usaKwh ? prev.kwh : 0,
+      mesas: info.usaMesas ? prev.mesas : 0,
+      vehiculo: info.usaVehiculo ? prev.vehiculo : 0,
+    }));
   }, []);
 
   return (
@@ -376,10 +389,11 @@ export default function SimuladorModulosVsDirectaPage() {
       <DisclaimerCard variant="financial" severity="critical" />
 
       <DataReference
-        normativa="Autónomos y Módulos 2025"
-        fuente={FISCAL_AUTONOMOS_META.fuente}
-        verificado={FISCAL_AUTONOMOS_META.verificado}
-        urlOficial={FISCAL_AUTONOMOS_META.urlOficial}
+        normativa="IRPF 2025"
+        fuente={FISCAL_IRPF_META.fuente}
+        verificado={FISCAL_IRPF_META.verificado}
+        urlOficial={FISCAL_IRPF_META.urlOficial}
+        nota="El IRPF de ambos regímenes usa esta escala. La cuota RETA la introduces tú libremente (no hay tabla oficial enlazada) y el rendimiento de módulos usa una fórmula didáctica simplificada, no los coeficientes reales de la Orden HFP."
       />
 
       <LegalNotice />
@@ -745,21 +759,32 @@ export default function SimuladorModulosVsDirectaPage() {
 
           {/* Diferencia + recomendación */}
           <div className={styles.diferenciaBox} role="status" aria-live="polite">
-            <span className={styles.diferenciaTitulo}>
-              Pagas <strong>{formatCurrency(Math.abs(diferencia))}</strong> {ganaED ? 'MÁS' : 'MENOS'} con módulos
-              que con Estimación Directa
-            </span>
-            <span className={styles.diferenciaDetalle}>
-              ED: {formatCurrency(resED.costeAnualTotal)} · Módulos: {formatCurrency(resModulos.costeAnualTotal)}
-            </span>
+            {resModulos.esApta ? (
+              <>
+                <span className={styles.diferenciaTitulo}>
+                  Pagas <strong>{formatCurrency(Math.abs(diferencia))}</strong> {ganaED ? 'MÁS' : 'MENOS'} con módulos
+                  que con Estimación Directa
+                </span>
+                <span className={styles.diferenciaDetalle}>
+                  ED: {formatCurrency(resED.costeAnualTotal)} · Módulos: {formatCurrency(resModulos.costeAnualTotal)}
+                </span>
+              </>
+            ) : (
+              <span className={styles.diferenciaTitulo}>
+                Con estos datos, la actividad no parece elegible para módulos: la comparativa de
+                importes no aplica.
+              </span>
+            )}
           </div>
 
           <div className={styles.recomendacionBox}>
             <strong className={styles.recomendacionTitulo}>
-              Para tu situación, te conviene más: {ganaED ? 'Estimación Directa Simplificada' : 'Estimación Objetiva (Módulos)'}
+              Para tu situación, te conviene más: {!resModulos.esApta || ganaED ? 'Estimación Directa Simplificada' : 'Estimación Objetiva (Módulos)'}
             </strong>
             <p className={styles.recomendacionTexto}>
-              {ganaED
+              {!resModulos.esApta
+                ? 'Con los datos introducidos, la actividad no parece elegible para módulos, así que la única opción real es Estimación Directa Simplificada. Verifica la elegibilidad exacta de tu epígrafe con tu asesor.'
+                : ganaED
                 ? 'Tu margen real (ingresos − gastos) es relativamente bajo, así que tributar por beneficio real (ED) sale más barato que por unidades (módulos).'
                 : 'Tu margen real es alto, así que tributar por unidades (módulos) limita el rendimiento computable y reduce el IRPF respecto a tributar por beneficio real (ED).'}
             </p>

@@ -572,6 +572,14 @@ npm run build  # timeout: 600000
 4. **Si hay lock stale** (lock existe pero no hay proceso `next build` activo): eliminar con `rm -f .next/lock` y ENTONCES hacer UN solo build.
 5. **No usar `run_in_background`** para builds — ejecutar siempre en foreground con timeout de 600000ms para poder ver el resultado directamente.
 
+### Servidor local de pruebas: detenerlo siempre al terminar
+
+`npm run dev` y `npm run start` (puerto 3050) no terminan solos: quedan corriendo hasta que alguien los detiene. Si una tarea de implementación o verificación levanta el servidor para probar en navegador (Playwright u otro), **debe detenerse explícitamente antes de dar la tarea por terminada** — `Ctrl+C` en la terminal que lo lanzó, o `npx kill-port 3050`.
+
+⚠️ Un servidor Node huérfano lanzado de forma interactiva bajo la cuenta del usuario puede bloquear la descarga limpia de su registro de perfil (`NTUSER.DAT`) al apagar Windows — Visor de sucesos, `Microsoft-Windows-User Profiles Service`, eventos 1512/1517, "acceso denegado: la causa suelen ser servicios ejecutándose como cuentas de usuario". Consecuencia observada: la configuración de esa sesión (incluido el color de fondo de escritorio) no se persiste, y el siguiente arranque puede mostrar pantalla en negro. Diagnosticado el 31/08/2026: un `next start -p 3050` llevaba viva desde una sesión de pruebas anterior sin cerrar, coincidiendo con los eventos del Visor de sucesos.
+
+`npm run dev` ya se protegía solo (`predev: npx kill-port 3050`, mata cualquier proceso previo antes de arrancar); `npm run start` tenía el mismo hueco — no llevaba `prestart` — y es el comando usado para verificar rutas de API tras un build. Ya tiene el mismo guardián.
+
 ---
 
 ## Candados de juicio (OBLIGATORIO)

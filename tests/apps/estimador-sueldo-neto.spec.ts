@@ -40,19 +40,15 @@ import { test, expect, Page } from '@playwright/test';
  *       IRPF 38.649,68 € (tramos hasta el 45 %, base liquidable 106.107,06 €)
  *       neto anual 77.371,39 €
  *
- *   CASO 3 (rechazo) — campo vacío (Calcular sin escribir nada) frente a
- *       «-5000» (negativo, control)
- *       `NumberInput` sí filtra bien las letras: el regex `/^-?[\d.,]*$/` de
- *       su onChange impide que «abc» llegue a escribirse (el campo se queda
- *       vacío). Pero pulsar Calcular con el campo VACÍO — el estado inicial
- *       de la página, o tras «Limpiar» — SÍ es alcanzable sin escribir nada
- *       raro, y ahí está el hallazgo: `parseSpanishNumber('')` da NaN, y la
- *       guarda del botón es `if (salarioNum <= 0) alert(...)`. `NaN <= 0` es
- *       FALSE en JS, así que la guarda NO atrapa el campo vacío: no salta
- *       ningún alert y se pinta un panel de resultados con «No definido» en
- *       casi todos los campos, pero «Tipo de retención efectivo: 0,00 %» —
- *       una cifra que parece un resultado válido y no lo es. Con «-5000» sí
- *       funciona: `-5000 <= 0` es TRUE y salta el alert correcto.
+ *   CASO 3 (reparado, hallazgo 559) — campo vacío (Calcular sin escribir nada)
+ *       frente a «-5000» (negativo, control). `NumberInput` filtra bien las
+ *       letras (regex `/^-?[\d.,]*$/` del onChange impide que «abc» llegue a
+ *       escribirse), así que la vía real de disparo era el campo vacío: el
+ *       estado inicial de la página, o tras «Limpiar». `parseSpanishNumber('')`
+ *       da NaN, y la guarda ERA `if (salarioNum <= 0) alert(...)` — `NaN <= 0`
+ *       es FALSE en JS, así que no atrapaba el vacío. Ahora la guarda es
+ *       `if (!(salarioNum > 0)) alert(...)`: `!(NaN > 0)` es TRUE (NaN > 0 es
+ *       FALSE), así que el vacío dispara el aviso igual que el negativo.
  */
 
 const RUTA = '/estimador-sueldo-neto/';
@@ -154,14 +150,14 @@ test('CASO 2 (límite) · 120.000 € brutos: la base de cotización se clava en
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-test('CASO 3 (rechazo) · Calcular con el campo VACÍO no dispara el aviso que sí dispara «-5000»', async ({ page }) => {
+test('CASO 3 (reparado) · Calcular con el campo VACÍO dispara el mismo aviso que «-5000»', async ({ page }) => {
   const avisos: string[] = [];
   page.on('dialog', async (dialog) => {
     avisos.push(dialog.message());
     await dialog.accept();
   });
 
-  // Control: la guarda `salarioNum <= 0` SÍ funciona con un negativo.
+  // Control: la guarda SÍ funciona con un negativo (ya lo hacía antes de reparar).
   await calcular(page, '-5000');
   expect(avisos).toEqual(['Por favor, introduce un salario válido']);
   expect(await hayResultados(page)).toBe(false);
@@ -173,18 +169,64 @@ test('CASO 3 (rechazo) · Calcular con el campo VACÍO no dispara el aviso que s
   await page.getByPlaceholder('30000').pressSequentially('abc');
   await expect(page.getByPlaceholder('30000')).toHaveValue('');
 
-  // HALLAZGO — pero pulsar Calcular con el campo VACÍO (el estado inicial de
-  // la página, alcanzable sin escribir nada raro) sí cuela: parseSpanishNumber('')
-  // da NaN, y `NaN <= 0` es FALSE en JS. La guarda no dispara ningún alert() y
-  // la app pinta un panel de resultados con «No definido» en casi todo, pero
-  // con un «0,00 %» de retención que parece un cálculo real y no lo es.
+  // REPARADO (559) — pulsar Calcular con el campo VACÍO ahora dispara el mismo
+  // aviso que el negativo: `!(NaN > 0)` es TRUE, así que la guarda atrapa el
+  // vacío y ya no se pinta ningún panel de "resultados" con datos a medias.
   await page.getByRole('button', { name: 'Calcular', exact: true }).click();
-  expect(avisos).toEqual([]); // no salta ningún alert, a diferencia del negativo
-  expect(await hayResultados(page)).toBe(true); // pero SÍ se pinta un panel de "resultados"
+  expect(avisos).toEqual(['Por favor, introduce un salario válido']);
+  expect(await hayResultados(page)).toBe(false);
+});
 
-  expect(await valorTarjeta(page, 'Salario Bruto Anual')).toBe('No definido€');
-  expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('No definido€');
-  expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('No definido');
-  // La cifra engañosa: no es "No definido", es un 0,00% que parece un cálculo real.
-  expect(await filaDesglose(page, 'Tipo de retención efectivo')).toBe('0,00%');
+// ─────────────────────────────────────────────────────────────────────────────
+/**
+ * Hallazgo 560 — la tabla "Tramos IRPF 2025" del bloque educativo, el SMI 2026 (tres
+ * apariciones) y la base de cotización conjunta estaban escritos a mano en vez de
+ * derivarse de TRAMOS_IRPF_2025 / SMI_2026 / BASES_SS_2026 (data/fiscal). Hoy coinciden
+ * exactamente: el test ancla el DOM a esos módulos, no a memoria propia, así que si el
+ * dato deja de derivarse (o el módulo cambia y el JSX no lo sigue), este test lo detecta.
+ */
+test('Hallazgo 560 — la tabla de tramos IRPF y las cifras de SMI/SS del bloque educativo están ancladas a data/fiscal', async ({ page }) => {
+  await page.goto(RUTA);
+  // El bloque educativo nace colapsado (REGLA #7): hay que abrirlo para que
+  // innerText() lo recoja (el contenido está en el DOM pero oculto por CSS).
+  await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+  // limpiar(): formatCurrency separa la cifra del € con espacio duro (U+00A0), no ASCII.
+  const cuerpo = limpiar(await page.locator('body').innerText());
+
+  // TRAMOS_IRPF_2025, ahora derivada con formatCurrency (2 decimales, antes sin ellos)
+  expect(cuerpo).toContain('0,00 €');
+  expect(cuerpo).toContain('12.450,00 €');
+  expect(cuerpo).toContain('20.200,00 €');
+  expect(cuerpo).toContain('35.200,00 €');
+  expect(cuerpo).toContain('60.000,00 €');
+  expect(cuerpo).toContain('300.000,00 €');
+  expect(cuerpo).toContain('En adelante');
+
+  // SMI_2026 (mensual14=1.221, anual=17.094) — antes literal sin decimales.
+  // formatCurrency (es-ES) NO agrupa millares en importes de 4 dígitos (1221,00 €),
+  // solo desde 5 (17.094,00 €) — mismo comportamiento ya documentado en el spec de
+  // simulador-modulos-vs-directa.
+  expect(cuerpo).toMatch(/SMI 2026 es de 1221,00 €\/mes en 14 pagas/);
+  expect(cuerpo).toMatch(/17\.094,00 € brutos anuales/);
+  expect(cuerpo).toContain('Real Decreto 126/2026, de 18 de febrero, publicado en el BOE.');
+
+  // BASES_SS_2026.maxima (5101,20 €/mes — 4 dígitos, sin separador de millares)
+  expect(cuerpo).toMatch(/base de cotización máxima conjunta.*5101,20 €\/mes en 2026/);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+/**
+ * Hallazgo 561 — los 4 <button> de la app no llevaban type="button" (pasivo pre-23/08,
+ * regla obligatoria del CLAUDE.md global §5). Sin <form> envolviendo el formulario no
+ * había riesgo real de submit accidental, pero el candado check:a11y-jsx --todo lo
+ * detectaría igualmente. Los dos toggles ganan además aria-pressed, al ser botones que
+ * conmutan un estado visual.
+ */
+test('Hallazgo 561 — los 4 botones de la app llevan type="button"', async ({ page }) => {
+  await page.goto(RUTA);
+  for (const nombre of ['Bruto → Neto', 'Neto → Bruto', 'Calcular', 'Limpiar']) {
+    await expect(page.getByRole('button', { name: nombre, exact: true })).toHaveAttribute('type', 'button');
+  }
+  await expect(page.getByRole('button', { name: 'Bruto → Neto', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: 'Neto → Bruto', exact: true })).toHaveAttribute('aria-pressed', 'false');
 });

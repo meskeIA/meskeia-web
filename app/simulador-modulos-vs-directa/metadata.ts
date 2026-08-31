@@ -39,7 +39,7 @@ export const jsonLd = generateWebAppSchema({
     'Cálculo IRPF + RETA + IVA orientativo',
     '4 casos preconfigurados (bar rentable, bar con pérdidas, comercio, profesional)',
     'Aviso sobre actividades elegibles a módulos',
-    'Datos basados en LPGE 2025 y Orden HFP de módulos 2024',
+    'IRPF calculado según los tramos de la LPGE 2025; módulos con fórmula didáctica simplificada, no los coeficientes oficiales de la Orden HFP',
     'Solo orientativo — no sustituye al asesor fiscal',
     'En español',
   ],
@@ -87,7 +87,7 @@ export const faqJsonLd = {
       name: '¿El simulador de módulos vs estimación directa reemplaza al asesor fiscal?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'No. El simulador ofrece una comparativa orientativa basada en datos fiscales publicados (LPGE 2025 y Orden HFP de módulos) para ayudar a entender la diferencia entre ambos regímenes. La decisión final debe tomarse con un asesor fiscal o gestor que conozca la situación particular del autónomo, sus deducciones aplicables y las implicaciones del IVA.',
+        text: 'No. El simulador calcula el IRPF de ambos regímenes con los tramos oficiales de la LPGE 2025, pero el rendimiento de módulos usa una fórmula didáctica simplificada por actividad, no los coeficientes reales que publica la Orden HFP anual. Sirve para entender la lógica de la comparación, no para presentar una declaración. La decisión final debe tomarse con un asesor fiscal o gestor que conozca la situación particular del autónomo, sus deducciones aplicables y las implicaciones del IVA.',
       },
     },
   ],

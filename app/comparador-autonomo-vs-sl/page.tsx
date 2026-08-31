@@ -12,6 +12,7 @@ import {
   FISCAL_AUTONOMOS_META,
   FISCAL_SOCIEDADES_META,
   TRAMOS_IRPF_2025,
+  MINIMOS_IRPF_2025,
   TRAMOS_RETA_2025,
   TIPO_COTIZACION_RETA,
   RETENCIONES_IS_2025,
@@ -85,8 +86,8 @@ function calcularAutonomo(beneficio: number, gastosDeducibles: number): Resultad
   // Rendimiento neto = beneficio - gastos deducibles - cuota SS
   const rendimientoNeto = Math.max(0, beneficio - gastosDeducibles - cuotaRetaAnual);
 
-  // IRPF: reducción mínima de 5.550 (mínimo personal básico)
-  const minimoPersonal = 5550;
+  // IRPF: reducción mínima (mínimo personal básico)
+  const minimoPersonal = MINIMOS_IRPF_2025.personal;
   const baseLiquidable = Math.max(0, rendimientoNeto - minimoPersonal);
   const cuotaIRPF = calcularCuotaIRPF(baseLiquidable);
 

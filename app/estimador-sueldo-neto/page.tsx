@@ -7,7 +7,7 @@ import { MeskeiaLogo, LegalNotice, Footer, NumberInput, ResultCard, EducationalS
 } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { FISCAL_IRPF_META, TRAMOS_IRPF_2025, COTIZACIONES_SS_2026, BASES_SS_2026, MINIMOS_IRPF_2025, GASTOS_DEDUCIBLES_TRABAJO_2025, REDUCCION_RENDIMIENTOS_TRABAJO_2025, calcularDeduccionRentasBajas } from '@/data/fiscal';
+import { FISCAL_IRPF_META, TRAMOS_IRPF_2025, COTIZACIONES_SS_2026, BASES_SS_2026, MINIMOS_IRPF_2025, GASTOS_DEDUCIBLES_TRABAJO_2025, REDUCCION_RENDIMIENTOS_TRABAJO_2025, calcularDeduccionRentasBajas, SMI_2026 } from '@/data/fiscal';
 
 // Tipos de cálculo
 type TipoCalculo = 'brutoANeto' | 'netoABruto';
@@ -224,7 +224,7 @@ export default function EstimadorSueldoNetoPage() {
     const hijosMenores3Num = Math.min(parseInt(hijosMenores3) || 0, hijosNum);
     const pagasNum = parseInt(pagas) || 12;
 
-    if (salarioNum <= 0) {
+    if (!(salarioNum > 0)) {
       alert('Por favor, introduce un salario válido');
       return;
     }
@@ -305,12 +305,16 @@ export default function EstimadorSueldoNetoPage() {
 
             <div className={styles.toggleGroup}>
               <button
+                type="button"
+                aria-pressed={tipoCalculo === 'brutoANeto'}
                 className={`${styles.toggleBtn} ${tipoCalculo === 'brutoANeto' ? styles.active : ''}`}
                 onClick={() => { setTipoCalculo('brutoANeto'); setCalculado(false); }}
               >
                 Bruto → Neto
               </button>
               <button
+                type="button"
+                aria-pressed={tipoCalculo === 'netoABruto'}
                 className={`${styles.toggleBtn} ${tipoCalculo === 'netoABruto' ? styles.active : ''}`}
                 onClick={() => { setTipoCalculo('netoABruto'); setCalculado(false); }}
               >
@@ -373,10 +377,10 @@ export default function EstimadorSueldoNetoPage() {
             </div>
 
             <div className={styles.buttonGroup}>
-              <button onClick={calcular} className={styles.btnPrimary}>
+              <button type="button" onClick={calcular} className={styles.btnPrimary}>
                 Calcular
               </button>
-              <button onClick={limpiar} className={styles.btnSecondary}>
+              <button type="button" onClick={limpiar} className={styles.btnSecondary}>
                 Limpiar
               </button>
             </div>
@@ -442,19 +446,19 @@ export default function EstimadorSueldoNetoPage() {
                 <div className={styles.desgloseSection}>
                   <h4>Seguridad Social (Trabajador)</h4>
                   <div className={styles.desgloseRow}>
-                    <span>Contingencias comunes (4,70%)</span>
+                    <span>Contingencias comunes ({formatNumber(COTIZACIONES_SS_2026.contingenciasComunes, 2)}%)</span>
                     <span className={styles.desgloseValue}>{formatCurrency(resultado.ssDesglose.contingenciasComunes * 12)}</span>
                   </div>
                   <div className={styles.desgloseRow}>
-                    <span>Desempleo (1,55%)</span>
+                    <span>Desempleo ({formatNumber(COTIZACIONES_SS_2026.desempleo, 2)}%)</span>
                     <span className={styles.desgloseValue}>{formatCurrency(resultado.ssDesglose.desempleo * 12)}</span>
                   </div>
                   <div className={styles.desgloseRow}>
-                    <span>Formación profesional (0,10%)</span>
+                    <span>Formación profesional ({formatNumber(COTIZACIONES_SS_2026.formacionProfesional, 2)}%)</span>
                     <span className={styles.desgloseValue}>{formatCurrency(resultado.ssDesglose.formacionProfesional * 12)}</span>
                   </div>
                   <div className={styles.desgloseRow}>
-                    <span>MEF - Equidad Intergeneracional (0,15%)</span>
+                    <span>MEF - Equidad Intergeneracional ({formatNumber(COTIZACIONES_SS_2026.mef, 2)}%)</span>
                     <span className={styles.desgloseValue}>{formatCurrency(resultado.ssDesglose.mef * 12)}</span>
                   </div>
                   <div className={styles.desgloseRow + ' ' + styles.desgloseTotal}>
@@ -569,12 +573,16 @@ export default function EstimadorSueldoNetoPage() {
                 </tr>
               </thead>
               <tbody>
-                <tr><td>0 €</td><td>12.450 €</td><td>19%</td></tr>
-                <tr><td>12.450 €</td><td>20.200 €</td><td>24%</td></tr>
-                <tr><td>20.200 €</td><td>35.200 €</td><td>30%</td></tr>
-                <tr><td>35.200 €</td><td>60.000 €</td><td>37%</td></tr>
-                <tr><td>60.000 €</td><td>300.000 €</td><td>45%</td></tr>
-                <tr><td>300.000 €</td><td>En adelante</td><td>47%</td></tr>
+                {TRAMOS_IRPF_2025.map((tramo, i) => {
+                  const desde = i === 0 ? 0 : TRAMOS_IRPF_2025[i - 1].hasta;
+                  return (
+                    <tr key={tramo.hasta}>
+                      <td>{formatCurrency(desde)}</td>
+                      <td>{tramo.hasta === Infinity ? 'En adelante' : formatCurrency(tramo.hasta)}</td>
+                      <td>{formatNumber(tramo.tipo, 0)}%</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -611,11 +619,17 @@ export default function EstimadorSueldoNetoPage() {
             <div className={styles.contentCard}>
               <h4>👤 Lo que pagas tú (trabajador)</h4>
               <ul>
-                <li>Contingencias comunes: 4,70%</li>
-                <li>Desempleo: 1,55%</li>
-                <li>Formación profesional: 0,10%</li>
-                <li>MEF: 0,15%</li>
-                <li><strong>Total: 6,50%</strong></li>
+                <li>Contingencias comunes: {formatNumber(COTIZACIONES_SS_2026.contingenciasComunes, 2)}%</li>
+                <li>Desempleo: {formatNumber(COTIZACIONES_SS_2026.desempleo, 2)}%</li>
+                <li>Formación profesional: {formatNumber(COTIZACIONES_SS_2026.formacionProfesional, 2)}%</li>
+                <li>MEF: {formatNumber(COTIZACIONES_SS_2026.mef, 2)}%</li>
+                <li><strong>Total: {formatNumber(
+                  COTIZACIONES_SS_2026.contingenciasComunes +
+                  COTIZACIONES_SS_2026.desempleo +
+                  COTIZACIONES_SS_2026.formacionProfesional +
+                  COTIZACIONES_SS_2026.mef,
+                  2
+                )}%</strong></li>
               </ul>
             </div>
             <div className={styles.contentCard}>
@@ -843,16 +857,16 @@ export default function EstimadorSueldoNetoPage() {
             <div className={styles.faqItemPro}>
               <h4>¿Qué es el MEI (Mecanismo de Equidad Intergeneracional) y cuánto me descuentan?</h4>
               <p>
-                El MEI es una cotización adicional a la Seguridad Social creada por la reforma de pensiones de 2023 para financiar el Fondo de Reserva. En 2026, el trabajador paga el <strong>0,15%</strong> y la empresa el <strong>0,75%</strong> sobre la base de cotización. Para un sueldo de 30.000 € brutos esto representa <strong>~45 € anuales a cargo del trabajador</strong>. Su tipo irá incrementándose gradualmente hasta 2032.
+                El MEI es una cotización adicional a la Seguridad Social creada por la reforma de pensiones de 2023 para financiar el Fondo de Reserva. En 2026, el trabajador paga el <strong>{formatNumber(COTIZACIONES_SS_2026.mef, 2)}%</strong> y la empresa el <strong>0,75%</strong> sobre la base de cotización. Para un sueldo de 30.000 € brutos esto representa <strong>~45 € anuales a cargo del trabajador</strong>. Su tipo irá incrementándose gradualmente hasta 2032.
               </p>
             </div>
 
             <div className={styles.faqItemPro}>
               <h4>¿Mi empresa puede pagarme menos del salario mínimo interprofesional?</h4>
               <p>
-                No. El <strong>SMI 2026 es de 1.221 €/mes en 14 pagas</strong> (17.094 € brutos anuales). Ningún convenio colectivo ni contrato puede establecer un salario inferior. Si tu empresa te paga menos, puedes reclamar ante la Inspección de Trabajo. Ojo: el SMI es la retribución bruta, antes de IRPF y SS.
+                No. El <strong>SMI 2026 es de {formatCurrency(SMI_2026.mensual14)}/mes en 14 pagas</strong> ({formatCurrency(SMI_2026.anual)} brutos anuales). Ningún convenio colectivo ni contrato puede establecer un salario inferior. Si tu empresa te paga menos, puedes reclamar ante la Inspección de Trabajo. Ojo: el SMI es la retribución bruta, antes de IRPF y SS.
               </p>
-              <div className={styles.faqTipPro}>Referencia: Real Decreto 126/2026, de 18 de febrero, publicado en el BOE.</div>
+              <div className={styles.faqTipPro}>Referencia: {SMI_2026.boe}, publicado en el BOE.</div>
             </div>
 
             <div className={styles.faqItemPro}>
@@ -872,7 +886,7 @@ export default function EstimadorSueldoNetoPage() {
             <div className={styles.faqItemPro}>
               <h4>¿Cuánto es el SMI 2026 y cómo afecta a mi neto?</h4>
               <p>
-                El SMI 2026 es <strong>1.221 €/mes en 14 pagas = 17.094 € brutos anuales</strong>. Aplicando las deducciones estándar (soltero/a, sin hijos), el neto mensual estimado es de <strong>~1.126 €</strong>. Es importante saber que trabajadores con salarios de hasta el SMI que tengan rendimientos del trabajo por debajo de 22.000 € no están obligados a presentar la declaración de la renta (con un único pagador).
+                El SMI 2026 es <strong>{formatCurrency(SMI_2026.mensual14)}/mes en 14 pagas = {formatCurrency(SMI_2026.anual)} brutos anuales</strong>. Aplicando las deducciones estándar (soltero/a, sin hijos), el neto mensual estimado es de <strong>~1.126 €</strong>. Es importante saber que trabajadores con salarios de hasta el SMI que tengan rendimientos del trabajo por debajo de 22.000 € no están obligados a presentar la declaración de la renta (con un único pagador).
               </p>
             </div>
 
@@ -886,7 +900,7 @@ export default function EstimadorSueldoNetoPage() {
             <div className={styles.faqItemPro}>
               <h4>¿Cuánto cotizo si tengo dos empleos simultáneos?</h4>
               <p>
-                Si tienes dos contratos simultáneos, cotizas a la SS en ambos por separado, pero existe una <strong>base de cotización máxima conjunta</strong> de <strong>5.101,20 €/mes en 2026</strong>. Si la suma de tus bases supera ese límite, puedes solicitar la <strong>devolución del exceso cotizado</strong> a la Tesorería General de la SS tras finalizar el año. En IRPF, ambos empleadores retienen de forma independiente, lo que suele generar una retención insuficiente y una deuda en la renta.
+                Si tienes dos contratos simultáneos, cotizas a la SS en ambos por separado, pero existe una <strong>base de cotización máxima conjunta</strong> de <strong>{formatCurrency(BASES_SS_2026.maxima)}/mes en 2026</strong>. Si la suma de tus bases supera ese límite, puedes solicitar la <strong>devolución del exceso cotizado</strong> a la Tesorería General de la SS tras finalizar el año. En IRPF, ambos empleadores retienen de forma independiente, lo que suele generar una retención insuficiente y una deuda en la renta.
               </p>
             </div>
 
@@ -1019,7 +1033,7 @@ export default function EstimadorSueldoNetoPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">💶</span>
               <p>
-                <strong>SMI 2026: 1.221 €/mes en 14 pagas</strong> (17.094 € brutos anuales).
+                <strong>SMI 2026: {formatCurrency(SMI_2026.mensual14)}/mes en 14 pagas</strong> ({formatCurrency(SMI_2026.anual)} brutos anuales).
                 Ningún contrato puede pactarse por debajo. Los trabajadores con ingresos hasta 22.000 €
                 con un único pagador no están obligados a presentar declaración de la renta, aunque
                 pueden hacerlo si el borrador les sale a devolver.

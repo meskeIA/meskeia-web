@@ -174,14 +174,10 @@ test.describe('Simulador Módulos vs Estimación Directa — inspección 31/08/2
    * módulos — solo ED", y la app efectivamente marca `esApta = false` y pinta el aviso "NO
    * es elegible para módulos" en la columna de módulos.
    *
-   * ⚠️ HALLAZGO (queda documentado con `test.fail()`, no se repara aquí): la caja de
-   * recomendación final NO comprueba esa bandera y compara solo importes, así que para este
-   * mismo perfil —que la propia app acaba de decir que NO puede tributar por módulos—
-   * termina recomendando "Estimación Objetiva (Módulos)" y anunciando un ahorro de
-   * 8.500,50 €, contradiciendo el aviso que aparece unas líneas más arriba en la misma
-   * pantalla. Es el hallazgo de mayor severidad del acta (tipo "calculo", crítico): un
-   * simulador fiscal crítico no puede recomendar un régimen que el mismo cálculo acaba de
-   * excluir.
+   * REPARADO (hallazgo 552, crítico): la caja de recomendación y la de diferencia ahora
+   * comprueban `resModulos.esApta` antes de comparar importes — con esApta=false, la única
+   * recomendación posible es Estimación Directa, y la caja de diferencia deja de anunciar un
+   * ahorro con un régimen que la propia app acaba de excluir.
    *
    * ED (ancla: TRAMOS_IRPF_2025): ingresos 50.000, gastos 8.000 → rendimiento 42.000
    *   − Reducción 5% (tope 2.000) = −2.000 → reducido 40.000 → − mínimo 5.550 → base 34.450
@@ -193,31 +189,74 @@ test.describe('Simulador Módulos vs Estimación Directa — inspección 31/08/2
    *   Rendimiento previo = 4.500×1 + 1.000×0 + 8×0 = 4.500
    *   − Reducción 5% (min(225,2000)) = −225,00 · − incentivo empleo (0×100) = 0,00
    *   Reducido = 4.275 · − Mínimo personal 5.550 → base liquidable max(0, −1.275) = 0,00
-   *   IRPF = 0,00 · + RETA 3.600,00 → Coste Módulos = 3.600,00 €
+   *   IRPF = 0,00 · + RETA 3.600,00 → Coste Módulos = 3.600,00 € (cifra que ya no se anuncia
+   *   como ahorro, porque la actividad no es apta)
    */
-  test.fail(
-    'CASO 3 (rechazo) — "profesional puro" no apto para módulos, pero la recomendación igualmente lo aconseja',
-    async ({ page }) => {
-      await page.goto(RUTA);
-      await page.getByRole('button', { name: /Aplicar caso Profesional puro/ }).click();
+  test('CASO 3 (rechazo) — "profesional puro" no apto para módulos: la recomendación es ED, sin comparar importes', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Aplicar caso Profesional puro/ }).click();
 
-      expect(await linea(page, ED, '= Base liquidable')).toBe('34.450,00 €');
-      expect(await linea(page, ED, 'IRPF por tramos')).toBe('8500,50 €');
-      expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('12.100,50 €');
+    expect(await linea(page, ED, '= Base liquidable')).toBe('34.450,00 €');
+    expect(await linea(page, ED, 'IRPF por tramos')).toBe('8500,50 €');
+    expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('12.100,50 €');
 
-      expect(await linea(page, MOD, 'Rendimiento neto previo (módulos)')).toBe('4500,00 €');
-      expect(await linea(page, MOD, '= Base liquidable')).toBe('0,00 €');
-      expect(await linea(page, MOD, 'IRPF por tramos')).toBe('0,00 €');
-      expect(await linea(page, MOD, 'Coste fiscal anual total')).toBe('3600,00 €');
+    expect(await linea(page, MOD, 'Rendimiento neto previo (módulos)')).toBe('4500,00 €');
+    expect(await linea(page, MOD, '= Base liquidable')).toBe('0,00 €');
+    expect(await linea(page, MOD, 'IRPF por tramos')).toBe('0,00 €');
+    expect(await linea(page, MOD, 'Coste fiscal anual total')).toBe('3600,00 €');
 
-      // La app SÍ avisa de que la actividad no es elegible para módulos...
-      expect(await panel(page, MOD)).toContain('NO es elegible para módulos');
+    // La app avisa de que la actividad no es elegible para módulos...
+    expect(await panel(page, MOD)).toContain('NO es elegible para módulos');
 
-      // ...pero la recomendación final la ignora y aconseja módulos igualmente. Esta
-      // aserción es la que hace fallar el test a propósito (hallazgo abierto):
-      // lo correcto sería que, con esApta=false, NO se recomendara Estimación Objetiva.
-      const cuerpo = await page.locator('body').innerText();
-      expect(cuerpo).not.toMatch(/te conviene más: Estimación Objetiva \(Módulos\)/);
-    }
-  );
+    // ...y ahora la caja de diferencia y la recomendación respetan ese aviso: no comparan
+    // importes ni aconsejan un régimen que el propio cálculo acaba de excluir.
+    const estado = await page.locator('[role="status"]').innerText();
+    expect(estado.replace(/\s+/g, ' ')).toContain('no parece elegible para módulos');
+    expect(estado).not.toMatch(/Pagas/);
+
+    const cuerpo = await page.locator('body').innerText();
+    expect(cuerpo).toMatch(/te conviene más: Estimación Directa Simplificada/);
+    expect(cuerpo).not.toMatch(/te conviene más: Estimación Objetiva \(Módulos\)/);
+  });
+
+  /**
+   * CASO 4 (cambio de actividad, hallazgo 554) — estado inicial de la página: bar con
+   * mesas=6, personalAsalariado=1. Clic directo en el radio "Taxi (autotaxi)" SIN tocar
+   * ningún slider. Antes de la reparación, `cambiarActividad` solo sustituía el campo
+   * `actividad` y dejaba mesas/personalAsalariado heredados del bar, así que taxi salía
+   * "apta" (por las mesas del bar) y con una reducción de empleo que taxi ni siquiera
+   * expone. Ahora los campos que la actividad nueva no muestra se reinician a 0.
+   */
+  test('CASO 4 (cambio de actividad) — bar→taxi sin tocar sliders: taxi no hereda mesas/personal del bar', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('radio', { name: /Taxi \(autotaxi\)/ }).click();
+
+    // Sin vehículo afecto (queda en 0/No, heredado del bar que no lo usaba) y sin mesas ni
+    // personal asalariado heredados: taxi no es apta y la reducción de empleo es 0.
+    // (el "−" es el prefijo literal que la app antepone a toda línea "resta", no un signo
+    // negativo del valor: formatCurrency(0) da "0,00 €", nunca "-0,00 €")
+    expect(await panel(page, MOD)).toContain('NO es elegible para módulos');
+    expect(await linea(page, MOD, '− Reducción incentivos al empleo')).toBe('−0,00 €');
+
+    const cuerpo = await page.locator('body').innerText();
+    expect(cuerpo).toMatch(/te conviene más: Estimación Directa Simplificada/);
+  });
+
+  /**
+   * Hallazgo 555 — el <DataReference> citaba la fuente del RETA (que la app no usa: la cuota
+   * es un slider libre) y omitía la del IRPF (lo único que el motor realmente calcula).
+   * Ahora cita IRPF 2025 y la nota aclara qué SÍ y qué NO está anclado a normativa.
+   */
+  test('DataReference cita la fuente de lo que realmente se calcula (IRPF), no la del RETA sin usar', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    const referencia = page.locator('[aria-label="Datos de referencia normativos"]');
+    await expect(referencia).toContainText('IRPF 2025');
+    await expect(referencia).toContainText('fórmula didáctica simplificada');
+  });
 });
