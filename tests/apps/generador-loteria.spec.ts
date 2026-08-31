@@ -37,21 +37,22 @@ import { test, expect, Page } from '@playwright/test';
  *   salir "10", así que P(ninguna de las 80 lo sea) = (10/11)^80 ≈ 0,07 % — el test.fail() de
  *   abajo es, a efectos prácticos, determinista.
  *
- * HALLAZGO 1 (calculo, alto) — Reintegro/Clave puede salir "10", que no existe.
- *   `config.extraMax` vale 10 para primitiva/bonoloto/gordo, pero se usa como el VALOR máximo
- *   literal (no como "10 valores posibles"): con startFrom=0, generateUniqueNumbers calcula
- *   floor(rand × (10−0+1)) + 0 → rango [0,10], 11 valores. El Reintegro y la Clave reales solo
- *   tienen 10 valores, 0 a 9 (una sola casilla decimal en el boleto). Comparar con Euromillones
- *   y Lototurf, donde extraMax SÍ es el valor máximo real (12) y el resultado es correcto.
- *   Confirmado en el navegador: de 30 combinaciones de Primitiva salió un "10" (combo #4); de
- *   30 de Bonoloto, cuatro; de 30 de Gordo, dos — ver `resumen.json` de la sesión de inspección.
- *   Corrección evidente: extraMax debería ser 9 para estas tres modalidades.
+ * REPARADO — HALLAZGO 1 (calculo, alto) — Reintegro/Clave podía salir "10", que no existe.
+ *   `config.extraMax` valía 10 para primitiva/bonoloto/gordo, pero se usaba como el VALOR
+ *   máximo literal (no como "10 valores posibles"): con startFrom=0, generateUniqueNumbers
+ *   calculaba floor(rand × (10−0+1)) + 0 → rango [0,10], 11 valores. El Reintegro y la Clave
+ *   reales solo tienen 10 valores, 0 a 9 (una sola casilla decimal en el boleto). Comparar con
+ *   Euromillones y Lototurf, donde extraMax SÍ era el valor máximo real (12) y el resultado ya
+ *   era correcto. Confirmado en el navegador antes de reparar: de 30 combinaciones de
+ *   Primitiva salió un "10" (combo #4); de 30 de Bonoloto, cuatro; de 30 de Gordo, dos.
+ *   Reparado bajando `extraMax` a 9 en las tres modalidades (page.tsx).
  *
- * HALLAZGO 2 (contenido, bajo) — el botón "Generar" acentúa mal el plural.
- *   page.tsx: `` `Generar ${quantity} combinación${quantity > 1 ? 'es' : ''} de ${config.name}` ``
- *   Con quantity > 1 concatena "combinación" + "es" = "combinaciónes". El plural correcto de
- *   "combinación" es "combinaciones": el acento desaparece porque la sílaba tónica deja de ser
- *   la última. Visible en el botón principal de la herramienta cada vez que se piden 3, 5 o 10.
+ * REPARADO — HALLAZGO 2 (contenido, bajo) — el botón "Generar" acentuaba mal el plural.
+ *   page.tsx concatenaba: `` `Generar ${quantity} combinación${quantity > 1 ? 'es' : ''} de
+ *   ${config.name}` ``. Con quantity > 1 daba "combinación" + "es" = "combinaciónes". El
+ *   plural correcto de "combinación" es "combinaciones": el acento desaparece porque la
+ *   sílaba tónica deja de ser la última. Reparado con la palabra completa en cada rama en vez
+ *   de concatenar un sufijo.
  *
  * Sin hallazgos de accesibilidad: los botones ya llevan type="button", los toggles (selector
  * de modalidad, cantidad, favorito) llevan aria-pressed, y los emojis decorativos llevan
@@ -190,21 +191,21 @@ test.describe('Número(s) extra — Euromillones y Lototurf SÍ respetan su rang
   });
 });
 
-test.describe('HALLAZGO 1 (calculo, alto) — Reintegro/Clave puede salir "10", que no existe', () => {
-  // Regla oficial: Reintegro y Clave son UN dígito, 0 a 9 (10 valores). El código usa
-  // extraMax=10 como valor literal con startFrom=0, así que el rango real generado es
-  // [0,10] (11 valores). Con 80 muestras, P(no observar ningún "10") = (10/11)^80 ≈ 0,07%:
-  // el test.fail() de abajo falla hoy de forma, a efectos prácticos, determinista.
+test.describe('REPARADO — HALLAZGO 1 (calculo, alto) — Reintegro/Clave ya no puede salir "10"', () => {
+  // Regla oficial: Reintegro y Clave son UN dígito, 0 a 9 (10 valores). Antes de reparar,
+  // extraMax=10 se usaba como valor literal con startFrom=0, así que el rango generado era
+  // [0,10] (11 valores). Con 80 muestras, P(no observar ningún "10" por azar aunque el rango
+  // siguiera roto) = (10/11)^80 ≈ 0,07%: estos tests son, a efectos prácticos, deterministas.
 
-  test.fail('Primitiva: el Reintegro nunca debería salir "10" (80 muestras)', async ({ page }) => {
+  test('Primitiva: el Reintegro nunca sale "10" (80 muestras)', async ({ page }) => {
     const combos = await generarMuchas(page, 'primitiva', 8);
     const regla = REGLA_OFICIAL.primitiva;
     for (const combo of combos) {
-      expect(combo.extra[0]).toBeLessThanOrEqual(regla.extraMax); // 9 — hoy puede llegar a 10
+      expect(combo.extra[0]).toBeLessThanOrEqual(regla.extraMax); // 9
     }
   });
 
-  test.fail('Bonoloto: el Reintegro nunca debería salir "10" (80 muestras)', async ({ page }) => {
+  test('Bonoloto: el Reintegro nunca sale "10" (80 muestras)', async ({ page }) => {
     const combos = await generarMuchas(page, 'bonoloto', 8);
     const regla = REGLA_OFICIAL.bonoloto;
     for (const combo of combos) {
@@ -212,7 +213,7 @@ test.describe('HALLAZGO 1 (calculo, alto) — Reintegro/Clave puede salir "10", 
     }
   });
 
-  test.fail('El Gordo: la Clave nunca debería salir "10" (80 muestras)', async ({ page }) => {
+  test('El Gordo: la Clave nunca sale "10" (80 muestras)', async ({ page }) => {
     const combos = await generarMuchas(page, 'gordo', 8);
     const regla = REGLA_OFICIAL.gordo;
     for (const combo of combos) {
@@ -243,12 +244,12 @@ test.describe('Caso límite — máximo de combinaciones que la UI permite de go
   });
 });
 
-test.describe('HALLAZGO 2 (contenido, bajo) — el botón "Generar" acentúa mal el plural', () => {
-  test.fail('con cantidad > 1 debería decir "combinaciones", no "combinaciónes"', async ({ page }) => {
+test.describe('REPARADO — HALLAZGO 2 (contenido, bajo) — el botón "Generar" ya acentúa bien el plural', () => {
+  test('con cantidad > 1 dice "combinaciones", no "combinaciónes"', async ({ page }) => {
     await seleccionarLoteria(page, 'primitiva');
     await ponerCantidad(page, 10);
     const texto = (await botonGenerar(page).textContent())!;
-    expect(texto).toContain('combinaciones'); // hoy el DOM contiene "combinaciónes"
+    expect(texto).toContain('combinaciones');
     expect(texto).not.toContain('combinaciónes');
   });
 

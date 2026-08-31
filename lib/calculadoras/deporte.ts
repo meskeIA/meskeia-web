@@ -501,6 +501,15 @@ export function calcularSWOLF(
   brazadas_largo: number,
   metros_largo: number = 25,
 ): ResultadoSWOLF {
+  // Hoy la UI ya exige n>0 antes de llamar al motor, pero sin este backstop
+  // tiempo_s_largo=0 da velocidadMedia_m_s = Infinity si se reutiliza desde otro sitio.
+  if (!Number.isFinite(tiempo_s_largo) || tiempo_s_largo <= 0) {
+    throw new Error('El tiempo del largo debe ser un número mayor que 0 segundos.');
+  }
+  if (!Number.isFinite(brazadas_largo) || brazadas_largo <= 0) {
+    throw new Error('Las brazadas por largo deben ser un número mayor que 0.');
+  }
+
   const swolf = tiempo_s_largo + brazadas_largo;
 
   // Umbrales ajustados por longitud de piscina

@@ -72,7 +72,7 @@ export const faqJsonLd = {
       name: '¿Qué valores de SWOLF se consideran buenos para un nadador aficionado?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En piscina de 25 m, valores SWOLF por debajo de 35 son propios de nadadores élite, entre 35 y 45 corresponden a nivel avanzado, entre 45 y 60 a nivel intermedio y por encima de 60 a principiante. En piscina de 50 m los valores son más altos por la mayor distancia. Lo importante es la tendencia: un SWOLF que baja con el tiempo indica mejora técnica real, independientemente del valor absoluto.',
+        text: 'En piscina de 25 m, valores SWOLF hasta 25 son propios de nadadores élite, entre 26 y 30 corresponden a nivel avanzado, entre 31 y 38 a nivel intermedio y por encima de 38 a principiante. En piscina de 50 m los umbrales suben 8 puntos (hasta 33 élite, hasta 38 avanzado, hasta 46 intermedio, por encima principiante) para reflejar la mayor distancia. Lo importante es la tendencia: un SWOLF que baja con el tiempo indica mejora técnica real, independientemente del valor absoluto.',
       },
     },
     {

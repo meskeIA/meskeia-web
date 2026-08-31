@@ -43,7 +43,7 @@ const LOTTERY_CONFIG: Record<LotteryType, LotteryConfig> = {
     mainNumbers: 6,
     mainMax: 49,
     extraNumbers: 1,
-    extraMax: 10,
+    extraMax: 9,
     extraName: 'Reintegro',
     description: '6 números del 1 al 49 + Reintegro (0-9)',
     drawDays: 'Jueves y Sábados',
@@ -75,7 +75,7 @@ const LOTTERY_CONFIG: Record<LotteryType, LotteryConfig> = {
     mainNumbers: 6,
     mainMax: 49,
     extraNumbers: 1,
-    extraMax: 10,
+    extraMax: 9,
     extraName: 'Reintegro',
     description: '6 números del 1 al 49 + Reintegro (0-9)',
     drawDays: 'Lunes a Sábado',
@@ -91,7 +91,7 @@ const LOTTERY_CONFIG: Record<LotteryType, LotteryConfig> = {
     mainNumbers: 5,
     mainMax: 54,
     extraNumbers: 1,
-    extraMax: 10,
+    extraMax: 9,
     extraName: 'Clave',
     description: '5 números del 1 al 54 + Clave (0-9)',
     drawDays: 'Domingos',
@@ -277,7 +277,7 @@ export default function GeneradorLoteriaPage() {
           >
             {isGenerating
               ? <><span aria-hidden="true">🎲</span> Generando...</>
-              : <><span aria-hidden="true">🎯</span> {`Generar ${quantity} combinación${quantity > 1 ? 'es' : ''} de ${config.name}`}</>}
+              : <><span aria-hidden="true">🎯</span> {`Generar ${quantity} ${quantity > 1 ? 'combinaciones' : 'combinación'} de ${config.name}`}</>}
           </button>
         </div>
 

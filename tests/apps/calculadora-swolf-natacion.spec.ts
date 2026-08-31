@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { calcularSWOLF } from '../../lib/calculadoras/deporte';
 
 /**
  * Inspector — calculadora-swolf-natacion (segmento MOTOR de cálculo, riesgo 2)
@@ -60,20 +61,22 @@ import { test, expect, Page } from '@playwright/test';
  *         propio navegador descarta la pulsación antes de que React la vea.
  *
  * ─────────────────────────────────────────────────────────────────────────────────────────
- * HALLAZGOS
+ * HALLAZGOS — REPARADOS el 31/08/2026
  *
  *   1 [dato/alto] El FAQPage de metadata.ts (lo que leen Bing Copilot, ChatGPT o Perplexity)
- *     da para piscina de 25 m unos cortes que NO son los de la calculadora:
- *       FAQ:        élite < 35 · avanzado 35–45 · intermedio 45–60 · principiante > 60
- *       app real:   élite ≤ 25 · avanzado 26–30 · intermedio 31–38 · principiante > 38
- *     Un SWOLF de 40 es «avanzado» según el FAQ y «Principiante» según la propia herramienta:
- *     dos veredictos contrarios sobre el mismo número. Ver el test.fail() de más abajo.
+ *     daba para piscina de 25 m unos cortes que NO eran los de la calculadora:
+ *       FAQ (antes): élite < 35 · avanzado 35–45 · intermedio 45–60 · principiante > 60
+ *       app real:    élite ≤ 25 · avanzado 26–30 · intermedio 31–38 · principiante > 38
+ *     Un SWOLF de 40 era «avanzado» según el FAQ y «Principiante» según la propia herramienta:
+ *     dos veredictos contrarios sobre el mismo número. Reparado alineando el texto del FAQ con
+ *     los cortes reales del motor (que ya coincidían con la tabla visible en la propia página).
  *
- *   2 [calculo/bajo] calcularSWOLF() no valida sus argumentos, a diferencia de sus vecinas en
- *     el mismo fichero. HOY no es alcanzable desde la UI (el componente sí guarda n > 0), pero
- *     no hay ningún backstop en el motor si algún día se le llama desde otro sitio con
- *     tiempo_s_largo = 0 o negativo. No se escribe test de navegador porque no es alcanzable
- *     por ahí; queda anotado para quien toque el motor.
+ *   2 [calculo/bajo] calcularSWOLF() no validaba sus argumentos, a diferencia de sus vecinas en
+ *     el mismo fichero. NO era alcanzable desde la UI (el componente ya guarda n > 0), pero no
+ *     había ningún backstop en el motor si algún día se le llamaba desde otro sitio con
+ *     tiempo_s_largo = 0 o negativo (velocidadMedia_m_s = Infinity). Reparado con el mismo
+ *     patrón que calcularPotenciaCiclismo/calcularVatiosPorFuerzas: lanza Error. Probado sin
+ *     navegador, importando el motor directamente (ver el describe al final del fichero).
  * ─────────────────────────────────────────────────────────────────────────────────────────
  */
 
@@ -194,13 +197,12 @@ test.describe('CASO 3 (rechazo) — entradas que no describen ningún largo nada
 });
 
 /* ═══════════════════════════════════════════════════════════════════════════════════════
- * HALLAZGO 1 (dato/alto), abierto: se escribe con `test.fail()` — afirma lo que DEBERÍA pasar
- * y hoy falla a propósito. El día que se corrijan los rangos del FAQ, se quita el
- * `test.fail()` y este test queda como regresión.
+ * REPARADO — HALLAZGO 1 (dato/alto): el FAQPage (JSON-LD) ya da los mismos rangos que la
+ * propia calculadora en 25 m.
  * ═══════════════════════════════════════════════════════════════════════════════════════ */
 
-test.fail(
-  'el FAQPage (JSON-LD) debe dar los mismos rangos de nivel que la propia calculadora en 25 m',
+test(
+  'el FAQPage (JSON-LD) da los mismos rangos de nivel que la propia calculadora en 25 m',
   async ({ page }) => {
     await page.goto(RUTA);
 
@@ -211,9 +213,8 @@ test.fail(
     await expect(swolfScore(page)).toHaveText('40');
     await expect(nivelBadge(page)).toContainText('Principiante');
 
-    // El FAQPage (lo que leen Bing Copilot, ChatGPT o Perplexity) dice que en 25 m el corte de
-    // élite está en 35 y el de avanzado en 45, así que un SWOLF de 40 sería «avanzado» — lo
-    // contrario de lo que la calculadora acaba de mostrar en pantalla.
+    // El FAQPage (lo que leen Bing Copilot, ChatGPT o Perplexity) ahora dice lo mismo que la
+    // calculadora: un SWOLF de 40 en 25 m es Principiante (> 38), no «avanzado».
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const faq = bloques.map((b) => JSON.parse(b)).find((j) => j['@type'] === 'FAQPage');
     const textos: string[] = faq.mainEntity.map(
@@ -221,11 +222,38 @@ test.fail(
     );
     const rangos = textos.find((t) => t.includes('élite') && t.includes('25 m'))!;
 
-    // ESTO es lo que DEBERÍA decir el FAQ (coincidir con la app real) — hoy no lo dice, así
-    // que este test.fail() falla a propósito.
     expect(rangos).toContain('25');
     expect(rangos).toContain('38');
     expect(rangos).not.toContain('por debajo de 35');
     expect(rangos).not.toContain('entre 35 y 45');
   },
 );
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * REPARADO — HALLAZGO 2 (calculo/bajo): calcularSWOLF() ya valida sus argumentos. No es
+ * alcanzable desde la UI (el componente ya guarda n > 0 antes de llamar al motor), así que se
+ * prueba importando el motor directamente, sin navegador — mismo patrón que
+ * calcularPotenciaCiclismo/calcularVatiosPorFuerzas en el mismo fichero.
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+test.describe('HALLAZGO 2 (calculo/bajo) — calcularSWOLF valida tiempo y brazadas > 0', () => {
+  test('tiempo_s_largo = 0 lanza, en vez de devolver velocidadMedia_m_s = Infinity', () => {
+    expect(() => calcularSWOLF(0, 16, 25)).toThrow('El tiempo del largo debe ser un número mayor que 0 segundos.');
+  });
+
+  test('tiempo_s_largo negativo lanza', () => {
+    expect(() => calcularSWOLF(-5, 16, 25)).toThrow('El tiempo del largo debe ser un número mayor que 0 segundos.');
+  });
+
+  test('brazadas_largo = 0 lanza', () => {
+    expect(() => calcularSWOLF(22, 0, 25)).toThrow('Las brazadas por largo deben ser un número mayor que 0.');
+  });
+
+  test('brazadas_largo negativo lanza', () => {
+    expect(() => calcularSWOLF(22, -3, 25)).toThrow('Las brazadas por largo deben ser un número mayor que 0.');
+  });
+
+  test('valores válidos (control): no lanza y da el mismo SWOLF de siempre', () => {
+    expect(calcularSWOLF(22, 16, 25).swolf).toBe(38);
+  });
+});
