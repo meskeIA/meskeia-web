@@ -23,6 +23,27 @@ desde otra capa — y lo que sigue a esa conclusión suele ser retirarla.
 descolgado. La capa 3 no la puede cubrir: comprueba lo declarado, y no puede echar de menos
 una tabla que nadie declaró.
 
+## `app-relations.ts` tiene DOS formas de declarar el bloque de una app
+
+La mayoría de claves son un array literal (`'slug': [ {url:...}, ... ]`), pero un grupo de
+apps de finanzas/vivienda/familia comparte un array común y cada clave lo `.filter()` para
+excluirse a sí misma: `'amortizacion-hipoteca': finanzasHipotecaApps.filter(a => a.url !==
+'/amortizacion-hipoteca/')`. Los arrays compartidos (`finanzasHipotecaApps`,
+`finanzasPersonalesApps`, `finanzasInversionApps`, `inversionInmobiliariaApps`, `viajesApps`,
+`familiaApps`, `freelanceApps`...) viven al principio del fichero.
+
+⚠️ **Un grep o regex que solo busca `'slug': \[` da FALSOS positivos de "app sin relaciones"**:
+encontró 20 candidatas el 31/08/2026 y 8 ya tenían bloque vía este patrón — añadir un array
+literal con la misma clave rompe el build (`TS1117: object literal cannot have multiple
+properties with the same name`), porque sigue siendo el mismo objeto `appRelationsMap`. Antes
+de dar una app por "sin relaciones", comprobar con `grep -n "'slug':"` (sin anclar al `[`) y
+mirar si el valor es `identifier.filter(...)`.
+
+Aparte de esto, hay **26 claves muertas** (restos de apps renombradas `calculadora-*` →
+`estimador-*`/`orientador-*`, p. ej. `'calculadora-fondo-emergencia': ...filter(a => a.url !==
+'/estimador-fondo-emergencia/')`) que no generan 404 porque nadie las referencia como destino,
+solo ocupan sitio — deuda aceptada, ver `_private/BACKLOG.md` §3.
+
 ## Cambiar el FORMATO de estos ficheros rompe cosas fuera del build
 
 `stemum.ts`, `coquinum.ts`, `applications.ts`, `implemented-apps.ts` y `historias/*.ts` los
