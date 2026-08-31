@@ -6923,6 +6923,92 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/estimador-hipoteca/', icon: '🏠', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
     { url: '/simulador-jubilacion-publica/', icon: '🏤', name: 'Simulador Jubilación Pública', description: 'Edad, pensión, anticipada y parcial' },
   ],
+
+  // ==========================================
+  // FAMILIA: DELEGUM — apps de Soluciones sin bloque propio (enlazado interno)
+  // 12 apps curadas en data/delegum/soluciones.ts que ya recibían enlaces desde
+  // otras páginas pero nunca devolvían ninguno: getRelatedApps() daba [] y su
+  // sección de exploración salía vacía. Vecinos elegidos por PUERTA (misma
+  // situación en Soluciones), evitando iconos repetidos dentro del mismo bloque.
+  // (Otras 8 apps de la misma auditoría —amortizacion-hipoteca, calculadora-
+  // rentabilidad-alquiler, estimador-cartera-inversion, control-gastos,
+  // conversor-divisas, estimacion-prestacion-nacimiento, estimacion-deduccion-
+  // maternidad, generador-facturas— NO estaban huecas: ya tenían bloque propio
+  // vía los arrays compartidos de arriba, p. ej. finanzasHipotecaApps.filter(...).
+  // Un primer barrido por regex solo detectaba 'clave': [ y se los perdió.)
+  // ==========================================
+  'estimador-hipoteca': [
+    { url: '/amortizacion-hipoteca/', icon: '💰', name: 'Amortización Anticipada', description: 'Reducir cuota vs plazo' },
+    { url: '/estimador-compraventa-inmueble/', icon: '📋', name: 'Gastos de Compraventa', description: 'ITP, notaría y registro' },
+    { url: '/selector-tipo-hipoteca/', icon: '🏦', name: 'Comparador Hipotecas', description: 'Tipos fijo vs variable' },
+    { url: '/orientador-aval-ico/', icon: '🏡', name: 'Aval ICO Vivienda', description: 'Primera vivienda sin el 20% de entrada' },
+  ],
+  'estimador-prestamos': [
+    { url: '/selector-tipo-prestamo/', icon: '💳', name: 'Selector Tipo de Préstamo', description: '¿Qué financiación elegir?' },
+    { url: '/amortizacion-hipoteca/', icon: '💰', name: 'Amortización Anticipada', description: 'Reducir cuota vs plazo' },
+    { url: '/estimador-hipoteca/', icon: '🏠', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
+    { url: '/orientador-aval-ico/', icon: '🏡', name: 'Aval ICO Vivienda', description: 'Primera vivienda sin el 20% de entrada' },
+  ],
+  'orientador-alquiler-vs-compra': [
+    { url: '/calculadora-rentabilidad-alquiler/', icon: '🏘️', name: 'Rentabilidad Alquiler', description: 'ROI, cash flow y payback' },
+    { url: '/estimador-hipoteca/', icon: '🏠', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
+    { url: '/orientador-aval-ico/', icon: '🏡', name: 'Aval ICO Vivienda', description: 'Primera vivienda sin el 20% de entrada' },
+    { url: '/selector-tipo-hipoteca/', icon: '🏦', name: 'Comparador Hipotecas', description: 'Tipos fijo vs variable' },
+  ],
+  'estimador-gastos-comunidad': [
+    { url: '/calculadora-rentabilidad-alquiler/', icon: '🏘️', name: 'Rentabilidad Alquiler', description: 'ROI, cash flow y payback' },
+    { url: '/orientador-alquiler-habitaciones/', icon: '🏠', name: 'Alquiler por Habitaciones', description: 'Reglas en zona tensionada' },
+    { url: '/estimador-compraventa-inmueble/', icon: '📋', name: 'Gastos de Compraventa', description: 'ITP, notaría y registro' },
+    { url: '/selector-tipo-hipoteca/', icon: '🏦', name: 'Comparador Hipotecas', description: 'Tipos fijo vs variable' },
+  ],
+  'estimador-interes-compuesto': [
+    { url: '/estimador-inflacion/', icon: '📈', name: 'Estimador de Inflación', description: 'Tu poder adquisitivo en el tiempo' },
+    { url: '/estimador-fire/', icon: '🔥', name: 'Estimador FIRE', description: 'Independencia financiera' },
+    { url: '/estimador-cartera-inversion/', icon: '📊', name: 'Simulador Cartera', description: 'Monte Carlo y Sharpe' },
+    { url: '/estimador-tiempo-ahorro/', icon: '🎯', name: '¿Cuánto tardo en ahorrar?', description: 'Calcula cuándo alcanzarás tu objetivo' },
+  ],
+  'estimador-fire': [
+    { url: '/estimador-interes-compuesto/', icon: '📈', name: 'Interés Compuesto', description: 'Crecimiento de inversiones' },
+    { url: '/estimador-cartera-inversion/', icon: '📊', name: 'Simulador Cartera', description: 'Monte Carlo y Sharpe' },
+    { url: '/estimador-fondo-emergencia/', icon: '🛡️', name: 'Fondo de Emergencia', description: 'Cuánto ahorrar' },
+    { url: '/test-perfil-inversor/', icon: '🎯', name: 'Perfil Inversor', description: 'Descubre tu perfil' },
+  ],
+  'estimador-fondo-emergencia': [
+    { url: '/control-gastos/', icon: '💳', name: 'Control de Gastos', description: 'Gestiona tu presupuesto' },
+    { url: '/estimador-fire/', icon: '🔥', name: 'Estimador FIRE', description: 'Independencia financiera' },
+    { url: '/selector-tipo-ahorro/', icon: '💶', name: 'Selector Tipo de Ahorro', description: '¿Dónde poner tus ahorros?' },
+    { url: '/orientador-regla-50-30-20/', icon: '📊', name: 'Regla 50/30/20', description: 'Distribuye tu presupuesto' },
+  ],
+  'orientador-regla-50-30-20': [
+    { url: '/control-gastos/', icon: '💳', name: 'Control de Gastos', description: 'Gestiona tu presupuesto' },
+    { url: '/estimador-fondo-emergencia/', icon: '🛡️', name: 'Fondo de Emergencia', description: 'Cuánto ahorrar' },
+    { url: '/estimador-deuda/', icon: '🎯', name: 'Estimador de Deuda', description: 'Bola de nieve vs avalancha' },
+    { url: '/selector-tipo-ahorro/', icon: '💶', name: 'Selector Tipo de Ahorro', description: '¿Dónde poner tus ahorros?' },
+  ],
+  'estimador-deuda': [
+    { url: '/control-gastos/', icon: '💳', name: 'Control de Gastos', description: 'Gestiona tu presupuesto' },
+    { url: '/orientador-regla-50-30-20/', icon: '📊', name: 'Regla 50/30/20', description: 'Distribuye tu presupuesto' },
+    { url: '/estimador-fondo-emergencia/', icon: '🛡️', name: 'Fondo de Emergencia', description: 'Cuánto ahorrar' },
+    { url: '/selector-tipo-ahorro/', icon: '💶', name: 'Selector Tipo de Ahorro', description: '¿Dónde poner tus ahorros?' },
+  ],
+  'estimador-coste-plazos': [
+    { url: '/estimador-deuda/', icon: '🎯', name: 'Estimador de Deuda', description: 'Bola de nieve vs avalancha' },
+    { url: '/estimador-prestamos/', icon: '🏦', name: 'Simulador Préstamos', description: 'Compara sistemas' },
+    { url: '/selector-tipo-prestamo/', icon: '💳', name: 'Selector Tipo de Préstamo', description: '¿Qué financiación elegir?' },
+    { url: '/orientador-regla-50-30-20/', icon: '📊', name: 'Regla 50/30/20', description: 'Distribuye tu presupuesto' },
+  ],
+  'orientador-tarifa-freelance': [
+    { url: '/calculadora-precio-por-proyecto/', icon: '🧮', name: 'Precio por Proyecto', description: 'Cuánto cobrar' },
+    { url: '/calculadora-horas/', icon: '🕒', name: 'Calculadora de Horas', description: 'Suma tiempos y pásalos a decimal' },
+    { url: '/estimador-cuota-autonomo/', icon: '💼', name: 'Cuota Autónomo', description: 'Si eres autónomo, tu cuota RETA' },
+    { url: '/planificador-trimestres-freelance/', icon: '📅', name: 'Planificador Trimestral', description: 'Fechas modelos 303 y 130' },
+  ],
+  'estimador-tir-van': [
+    { url: '/calculadora-valoracion-empresa/', icon: '🏢', name: 'Valoración de Empresa', description: 'Estima cuánto vale tu empresa' },
+    { url: '/analizador-ratios-financieros/', icon: '📊', name: 'Analizador de Ratios', description: 'Analiza el balance con 12 ratios' },
+    { url: '/comparador-autonomo-vs-sl/', icon: '⚖️', name: 'Autónomo vs SL', description: 'Elige tu forma jurídica' },
+    { url: '/estimador-interes-compuesto/', icon: '📈', name: 'Interés Compuesto', description: 'Crecimiento de inversiones' },
+  ],
 };
 
 /**
