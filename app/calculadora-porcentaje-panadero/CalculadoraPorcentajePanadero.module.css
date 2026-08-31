@@ -81,6 +81,48 @@
   margin-bottom: var(--spacing-lg);
 }
 
+/* Modo de cálculo (gramos ↔ porcentaje) */
+.modoToggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.modoBtn {
+  flex: 1;
+  padding: 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modoBtn:hover {
+  border-color: var(--primary);
+}
+
+.modoBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.modoBtnActivo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.modoAyuda {
+  margin: -0.3rem 0 var(--spacing-md);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
 /* Harina row */
 .harinaRow {
   display: flex;
@@ -324,6 +366,11 @@
   font-size: 1.4rem;
   font-weight: 700;
   color: var(--primary);
+}
+
+.summaryNote {
+  font-size: 0.72rem;
+  color: var(--text-muted);
 }
 
 /* Tabla */

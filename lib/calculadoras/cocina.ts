@@ -44,6 +44,35 @@ export function calcularBakersPercentage(
   return { harina_g, ingredientes, hidratacion_pct, pesoMasa_g, rendimiento_porciones };
 }
 
+// Modo inverso: en vez de partir de gramos por ingrediente, se fija el peso final de la masa
+// (el molde, la bandeja) y los porcentajes de cada ingrediente sobre la harina, y se resuelve
+// cuánta harina hace falta. harina = pesoMasaTotal / (1 + Σporcentajes/100).
+export function calcularBakersPercentageDesdePeso(
+  pesoMasaTotal_g: number,
+  otros: { nombre: string; porcentaje: number }[],
+  peso_porcion_g?: number,
+): ResultadoBakersPercentage {
+  const sumaPorcentajes = otros.reduce((s, i) => s + i.porcentaje, 0);
+  const harina_g = Math.round(pesoMasaTotal_g / (1 + sumaPorcentajes / 100));
+
+  const ingredientes: IngredienteBaker[] = otros.map(i => ({
+    nombre: i.nombre,
+    gramos: Math.round((harina_g * i.porcentaje) / 100),
+    porcentajePanadero: i.porcentaje,
+  }));
+
+  const agua = otros.find(i => /agua|water|h2o/i.test(i.nombre));
+  const hidratacion_pct = agua ? agua.porcentaje : 0;
+
+  // El peso real puede diferir en 1-2 g del objetivo por el redondeo a gramos enteros.
+  const pesoMasa_g = harina_g + ingredientes.reduce((s, i) => s + i.gramos, 0);
+  const rendimiento_porciones = peso_porcion_g
+    ? Math.floor(pesoMasa_g / peso_porcion_g)
+    : undefined;
+
+  return { harina_g, ingredientes, hidratacion_pct, pesoMasa_g, rendimiento_porciones };
+}
+
 // ─── 2. Hidratación del pan (bidireccional) ───────────────────────────────────
 
 export interface ResultadoHidratacionPan {

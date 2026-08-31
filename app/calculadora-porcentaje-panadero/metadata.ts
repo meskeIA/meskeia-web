@@ -48,6 +48,7 @@ export const jsonLd = generateWebAppSchema({
   category: 'UtilityApplication',
   features: [
     'Calcula el porcentaje del panadero de cada ingrediente respecto a la harina',
+    'Modo inverso: fija un peso final de masa y los porcentajes, y obtén los gramos exactos',
     'Muestra la hidratación de la masa de forma destacada',
     'Permite añadir y eliminar ingredientes dinámicamente',
     'Calcula el número de porciones según el peso por porción',
@@ -89,6 +90,14 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Expresar una receta en porcentajes del panadero permite escalarla instantáneamente: si quieres hacer el doble de cantidad, simplemente doblas el peso de la harina y los demás ingredientes mantienen sus porcentajes. También facilita comparar recetas distintas (aunque tengan tamaños diferentes) y comunicar fórmulas de forma estandarizada en foros, libros y cursos de panadería.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo calcular los gramos a partir de un peso final de masa, en vez de al revés?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, con el modo inverso. En vez de introducir gramos y obtener porcentajes, se introducen los porcentajes de la fórmula (agua, sal, levadura...) y el peso final de masa que se necesita —el que cabe en un molde o una bandeja concreta— y la calculadora reparte los gramos exactos de harina y de cada ingrediente para llegar a ese peso.',
       },
     },
     {

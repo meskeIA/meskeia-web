@@ -15,6 +15,7 @@ import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   calcularBakersPercentage,
+  calcularBakersPercentageDesdePeso,
   calcularDDT,
   type ResultadoBakersPercentage,
   type TipoAmasadora,
@@ -27,13 +28,24 @@ import {
 interface OtroIngrediente {
   id: number;
   nombre: string;
-  gramos: string;
+  valor: string;
 }
 
-const ingredientesIniciales: OtroIngrediente[] = [
-  { id: 1, nombre: 'Agua', gramos: '650' },
-  { id: 2, nombre: 'Sal', gramos: '20' },
-  { id: 3, nombre: 'Levadura', gramos: '3' },
+type ModoCalculo = 'gramos' | 'porcentaje';
+
+// Modo 'gramos' (por defecto): se parte de gramos por ingrediente y se obtienen los porcentajes.
+const INGREDIENTES_POR_GRAMOS: OtroIngrediente[] = [
+  { id: 1, nombre: 'Agua', valor: '650' },
+  { id: 2, nombre: 'Sal', valor: '20' },
+  { id: 3, nombre: 'Levadura', valor: '3' },
+];
+
+// Modo 'porcentaje': se parte de los porcentajes de la fórmula y de un peso final de masa
+// (un molde, una bandeja) y se obtienen los gramos — el camino inverso al de arriba.
+const INGREDIENTES_POR_PORCENTAJE: OtroIngrediente[] = [
+  { id: 1, nombre: 'Agua', valor: '65' },
+  { id: 2, nombre: 'Sal', valor: '2' },
+  { id: 3, nombre: 'Levadura', valor: '0,3' },
 ];
 
 // Los dos pasos que vienen justo después de tener la fórmula: a qué temperatura poner el agua
@@ -55,12 +67,25 @@ function leerNumero(valor: string): number | null {
 }
 
 export default function CalculadoraPorcentajePanaderoPage() {
+  const [modo, setModo] = useState<ModoCalculo>('gramos');
   const [harinaStr, setHarinaStr] = useState('1000');
-  const [otros, setOtros] = useState<OtroIngrediente[]>(ingredientesIniciales);
+  const [otros, setOtros] = useState<OtroIngrediente[]>(INGREDIENTES_POR_GRAMOS);
   const [porcioStr, setPorcioStr] = useState('');
   const [resultado, setResultado] = useState<ResultadoBakersPercentage | null>(null);
+  const [objetivoCalculado, setObjetivoCalculado] = useState<number | null>(null);
   const [error, setError] = useState('');
   const [nextId, setNextId] = useState(10);
+
+  const cambiarModo = useCallback((nuevoModo: ModoCalculo) => {
+    if (nuevoModo === modo) return;
+    setModo(nuevoModo);
+    setHarinaStr('1000');
+    setOtros(nuevoModo === 'gramos' ? INGREDIENTES_POR_GRAMOS : INGREDIENTES_POR_PORCENTAJE);
+    setPorcioStr('');
+    setResultado(null);
+    setObjetivoCalculado(null);
+    setError('');
+  }, [modo]);
 
   // ── Paso 2: temperatura del agua de amasado (DDT) ──
   const [ddtAbierto, setDdtAbierto] = useState(false);
@@ -94,7 +119,7 @@ export default function CalculadoraPorcentajePanaderoPage() {
   }, [fermHoras, fermTempReceta, fermTempReal]);
 
   const agregarIngrediente = useCallback(() => {
-    setOtros(prev => [...prev, { id: nextId, nombre: '', gramos: '' }]);
+    setOtros(prev => [...prev, { id: nextId, nombre: '', valor: '' }]);
     setNextId(n => n + 1);
   }, [nextId]);
 
@@ -103,7 +128,7 @@ export default function CalculadoraPorcentajePanaderoPage() {
   }, []);
 
   const actualizarIngrediente = useCallback(
-    (id: number, campo: 'nombre' | 'gramos', valor: string) => {
+    (id: number, campo: 'nombre' | 'valor', valor: string) => {
       setOtros(prev =>
         prev.map(i => (i.id === id ? { ...i, [campo]: valor } : i)),
       );
@@ -113,28 +138,55 @@ export default function CalculadoraPorcentajePanaderoPage() {
 
   const calcular = useCallback(() => {
     setError('');
-    const harina_g = parseSpanishNumber(harinaStr);
-    if (!harina_g || harina_g <= 0) {
-      setError('Introduce un peso de harina válido (mayor que 0).');
+    const valorPrincipal = parseSpanishNumber(harinaStr);
+    if (!valorPrincipal || valorPrincipal <= 0) {
+      setError(
+        modo === 'gramos'
+          ? 'Introduce un peso de harina válido (mayor que 0).'
+          : 'Introduce un peso final de masa válido (mayor que 0).',
+      );
       return;
     }
 
     const otrosValidos = otros
-      .filter(i => i.nombre.trim() !== '' && i.gramos.trim() !== '')
+      .filter(i => i.nombre.trim() !== '' && i.valor.trim() !== '')
       .map(i => {
-        const gramos = parseSpanishNumber(i.gramos);
-        return { nombre: i.nombre.trim(), gramos: gramos > 0 ? gramos : 0 };
+        const valor = parseSpanishNumber(i.valor);
+        return { nombre: i.nombre.trim(), valor: valor > 0 ? valor : 0 };
       });
 
     if (otrosValidos.length === 0) {
-      setError('Añade al menos un ingrediente además de la harina.');
+      setError(
+        modo === 'gramos'
+          ? 'Añade al menos un ingrediente además de la harina.'
+          : 'Añade al menos un ingrediente con su porcentaje.',
+      );
       return;
     }
 
     const porcion = porcioStr.trim() ? parseSpanishNumber(porcioStr) : undefined;
-    const res = calcularBakersPercentage(harina_g, otrosValidos, porcion && porcion > 0 ? porcion : undefined);
-    setResultado(res);
-  }, [harinaStr, otros, porcioStr]);
+    const pesoPorcionValido = porcion && porcion > 0 ? porcion : undefined;
+
+    if (modo === 'gramos') {
+      setObjetivoCalculado(null);
+      setResultado(
+        calcularBakersPercentage(
+          valorPrincipal,
+          otrosValidos.map(i => ({ nombre: i.nombre, gramos: i.valor })),
+          pesoPorcionValido,
+        ),
+      );
+    } else {
+      setObjetivoCalculado(valorPrincipal);
+      setResultado(
+        calcularBakersPercentageDesdePeso(
+          valorPrincipal,
+          otrosValidos.map(i => ({ nombre: i.nombre, porcentaje: i.valor })),
+          pesoPorcionValido,
+        ),
+      );
+    }
+  }, [harinaStr, otros, porcioStr, modo]);
 
   return (
     <div className={styles.container}>
@@ -155,12 +207,32 @@ export default function CalculadoraPorcentajePanaderoPage() {
         <div className={styles.inputPanel}>
           <h2 className={styles.panelTitle}>Ingredientes de la receta</h2>
 
-          {/* Harina (siempre 100%) */}
+          {/* Modo: de gramos a porcentaje (por defecto) o de porcentaje a gramos (inverso) */}
+          <div className={styles.modoToggle} role="group" aria-label="Modo de cálculo">
+            <button
+              type="button"
+              className={`${styles.modoBtn} ${modo === 'gramos' ? styles.modoBtnActivo : ''}`}
+              aria-pressed={modo === 'gramos'}
+              onClick={() => cambiarModo('gramos')}
+            >
+              Por gramos
+            </button>
+            <button
+              type="button"
+              className={`${styles.modoBtn} ${modo === 'porcentaje' ? styles.modoBtnActivo : ''}`}
+              aria-pressed={modo === 'porcentaje'}
+              onClick={() => cambiarModo('porcentaje')}
+            >
+              Por peso final de masa
+            </button>
+          </div>
+
+          {/* Harina (modo gramos) o peso final de masa objetivo (modo porcentaje) */}
           <div className={styles.harinaRow}>
             <div className={styles.harinaLabel}>
-              <span className={styles.harinaBadge}>100%</span>
+              {modo === 'gramos' && <span className={styles.harinaBadge}>100%</span>}
               <label htmlFor="harina" className={styles.fieldLabel}>
-                Harina (base)
+                {modo === 'gramos' ? 'Harina (base)' : 'Peso final de masa'}
               </label>
             </div>
             <div className={styles.inputGroup}>
@@ -172,11 +244,23 @@ export default function CalculadoraPorcentajePanaderoPage() {
                 value={harinaStr}
                 onChange={e => setHarinaStr(e.target.value)}
                 placeholder="1000"
-                aria-label="Peso de la harina en gramos"
+                aria-label={
+                  modo === 'gramos'
+                    ? 'Peso de la harina en gramos'
+                    : 'Peso final de la masa en gramos'
+                }
               />
               <span className={styles.unidad}>g</span>
             </div>
           </div>
+
+          {modo === 'porcentaje' && (
+            <p className={styles.modoAyuda}>
+              Introduce el porcentaje de cada ingrediente respecto a la harina (el mismo que
+              verías en modo &quot;Por gramos&quot;) y la calculadora reparte los gramos para que
+              la masa dé justo ese peso final.
+            </p>
+          )}
 
           {/* Otros ingredientes */}
           <div className={styles.ingredientesList} role="list" aria-label="Lista de ingredientes">
@@ -195,12 +279,16 @@ export default function CalculadoraPorcentajePanaderoPage() {
                     type="text"
                     inputMode="decimal"
                     className={styles.inputField}
-                    value={ing.gramos}
-                    onChange={e => actualizarIngrediente(ing.id, 'gramos', e.target.value)}
+                    value={ing.valor}
+                    onChange={e => actualizarIngrediente(ing.id, 'valor', e.target.value)}
                     placeholder="0"
-                    aria-label={`Gramos de ${ing.nombre || 'ingrediente'}`}
+                    aria-label={
+                      modo === 'gramos'
+                        ? `Gramos de ${ing.nombre || 'ingrediente'}`
+                        : `Porcentaje de ${ing.nombre || 'ingrediente'}`
+                    }
                   />
-                  <span className={styles.unidad}>g</span>
+                  <span className={styles.unidad}>{modo === 'gramos' ? 'g' : '%'}</span>
                 </div>
                 <button
                   type="button"
@@ -266,6 +354,12 @@ export default function CalculadoraPorcentajePanaderoPage() {
                 <div className={styles.summaryCard}>
                   <span className={styles.summaryLabel}>Peso total de la masa</span>
                   <span className={styles.summaryValue}>{formatNumber(resultado.pesoMasa_g, 0)} g</span>
+                  {objetivoCalculado !== null &&
+                    Math.round(resultado.pesoMasa_g) !== Math.round(objetivoCalculado) && (
+                      <span className={styles.summaryNote}>
+                        objetivo: {formatNumber(objetivoCalculado, 0)} g
+                      </span>
+                    )}
                 </div>
                 <div className={`${styles.summaryCard} ${styles.summaryHidratacion}`}>
                   <span className={styles.summaryLabel}>Hidratación</span>
@@ -687,6 +781,18 @@ export default function CalculadoraPorcentajePanaderoPage() {
               Si quieres desglosar (p. ej. 800 g de harina de trigo + 200 g de centeno), suma
               ambas y añade el centeno como ingrediente aparte con su porcentaje real.
               Es habitual en panes de mezcla: el centeno aparecerá como &quot;Centeno — 20%&quot;.
+            </p>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h3>¿Puedo partir de un peso final de masa en vez de la harina?</h3>
+            <p>
+              Sí. El botón &quot;Por peso final de masa&quot; invierte el cálculo: en lugar de
+              introducir gramos y obtener porcentajes, introduces los porcentajes de tu fórmula
+              (agua, sal, levadura...) y el peso final que necesitas —el de un molde, una bandeja
+              o una hornada completa— y la calculadora reparte cuántos gramos de harina y de cada
+              ingrediente hacen falta. Es útil cuando el molde manda: sabes el peso de masa que
+              cabe y quieres la fórmula ajustada a ese peso, no al revés.
             </p>
           </div>
 
