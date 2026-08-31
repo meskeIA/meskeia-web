@@ -4,7 +4,12 @@ import { calcularSWOLF } from '../../lib/calculadoras/deporte';
 /**
  * Inspector — calculadora-swolf-natacion (segmento MOTOR de cálculo, riesgo 2)
  *
- * Primera inspección: 31/08/2026.
+ * Primera inspección: 31/08/2026 (hallazgos 1 y 2, reparados el mismo día).
+ * Re-inspección: 31/08/2026 — misma tarde, tras la reparación. Los 2 hallazgos anteriores
+ * (FAQPage desalineado y calcularSWOLF sin validar) se comprobaron desde cero y siguen
+ * reparados: el FAQ ya da los mismos cortes que la app en 25 m Y 50 m, y calcularSWOLF sigue
+ * lanzando con tiempo/brazadas ≤ 0. Único hallazgo nuevo: ningún caso anterior ejercitaba
+ * metros_largo=50 desde el navegador — se añade el CASO 2b para cerrar ese hueco de cobertura.
  *
  * QUÉ PROMETE
  *   <h1>: «🏊 Calculadora SWOLF»
@@ -149,6 +154,28 @@ test.describe('CASO 2 (límite) — 500 s y 100 brazadas: no realista, y la app 
     expect(texto).not.toContain('NaN');
     expect(texto).not.toContain('Infinity');
     expect(texto).not.toMatch(/no realista|dato improbable|revisa (el|tu) (tiempo|dato)/i);
+  });
+});
+
+test.describe('CASO 2b (límite) — piscina de 50 m con los valores MÍNIMOS del input (5 s, 1 brazada)', () => {
+  test('SWOLF 6, nivel Élite (con el ajuste +8 de 50 m) y velocidad 0:10 min/100m', async ({
+    page,
+  }) => {
+    // Re-inspección 31/08/2026: ninguno de los casos anteriores ejercita metros_largo=50 desde
+    // la UI, así que el ajuste +8 de los cortes (élite ≤ 33 en vez de ≤ 25) nunca se había
+    // probado en el navegador. Se usan además los mínimos declarados en los <input> (min={5} y
+    // min={1}) como el otro borde: valores fisiológicamente extremos pero válidos.
+    await elegirPiscina(page, 50);
+    await rellenar(page, { tiempo: '5', brazadas: '1' });
+
+    // swolf = 5 + 1 = 6
+    await expect(swolfScore(page)).toHaveText('6');
+    // Con ajuste +8 (piscina 50 m): élite ≤ 33 → 6 cae en Élite.
+    await expect(nivelBadge(page)).toContainText('Élite');
+    await expect(detalle(page, 0)).toHaveText('Excelente');
+    // velocidadMedia_m_s = 50/5 = 10 exacto → 100/10 = 10 s por 100 m → «0:10 min/100m»
+    await expect(detalle(page, 1)).toHaveText('0:10 min/100m');
+    await expect(detalle(page, 2)).toHaveText('Eficiencia de nadador avanzado o competitivo');
   });
 });
 

@@ -138,3 +138,63 @@ test.describe('calculadora-jugada-scrabble', () => {
     await expect(page.getByText(/Hay más de una jugada con/)).toHaveCount(0);
   });
 });
+
+/**
+ * Re-inspección independiente · 31/08/2026 — SIN hallazgos.
+ *
+ * Casos nuevos, resueltos a mano antes de tocar el navegador, para no repetir exactamente
+ * los mismos atriles (Z,A,P,A,T,O y Ñ,U) que ya cubre el bloque de arriba:
+ *
+ *   1) Normal — atril G,A,T,O sin gancho ni multiplicadores.
+ *      Valores: G=2 A=1 T=1 O=1 → 5 puntos. Con este multiconjunto también existen
+ *      GOTA y TOGA (mismas letras, mismos 5 puntos): desempate alfabético → GATO precede
+ *      a GOTA y a TOGA. Confirmado contra el motor real con Playwright.
+ *
+ *   2) Límite — atril P,A,A,A,L,B,R (7 fichas = PALABRA), ×2 letra y ×2 palabra, posición
+ *      de bonificación "auto". Puntos base: P=3 A=1 L=1 A=1 B=3 R=1 A=1 → suma 11.
+ *      "auto" da la bonificación a la ficha de más valor sin contar el gancho; P y B empatan
+ *      a 3, y el motor se queda con la PRIMERA en superar al mejor hasta el momento (no con
+ *      un empate posterior), así que la bonificación cae en la P, no en la B:
+ *      suma con ×2 en la P → (3×2)+1+1+1+3+1+1 = 14. Por la casilla de palabra ×2 → 28.
+ *      Al colocar las 7 fichas del atril se añaden los 50 puntos de bonificación DESPUÉS de
+ *      los multiplicadores → 28+50 = 78 puntos.
+ *
+ *   3) Rechazo — atril con una sola ficha (X). Ninguna palabra del lemario tiene menos de
+ *      2 letras, así que una ficha suelta sin gancho nunca puede casar con nada: el motor
+ *      debe devolver cero jugadas y mostrar el aviso de "sin resultados", no quedarse callado
+ *      ni lanzar un error.
+ */
+test.describe('calculadora-jugada-scrabble · re-inspección 31/08/2026', () => {
+  test('normal · G,A,T,O sin bonus da GATO 5 pts (empatada con GOTA/TOGA, desempate alfabético)', async ({ page }) => {
+    await conDiccionario(page);
+    for (const letra of ['G', 'A', 'T', 'O']) {
+      await añadirFicha(page, letra);
+    }
+    await buscar(page);
+    expect(await primeraJugada(page)).toBe('GATO 5 pts');
+  });
+
+  test('límite · P,A,A,A,L,B,R con ×2 letra + ×2 palabra + bonus 7 fichas da PALABRA 78 pts', async ({ page }) => {
+    await conDiccionario(page);
+    for (const letra of ['P', 'A', 'A', 'A', 'L', 'B', 'R']) {
+      await añadirFicha(page, letra);
+    }
+    await page.getByRole('button', { name: '×2 letra' }).click();
+    await page.getByRole('button', { name: '×2 palabra' }).click();
+    await buscar(page);
+    expect(await primeraJugada(page)).toBe('PALABRA 78 pts');
+    // El desglose confirma de dónde sale cada parte del cálculo, no solo el total.
+    const detalle = await page.locator('ol li').first().locator('p').first().innerText();
+    expect(detalle.replace(/\s+/g, ' ')).toContain('×2 en la P');
+    expect(detalle.replace(/\s+/g, ' ')).toContain('palabra ×2');
+    expect(detalle.replace(/\s+/g, ' ')).toContain('+50 por colocar las siete fichas');
+  });
+
+  test('rechazo · una sola ficha (X) sin gancho no puede casar con ninguna palabra', async ({ page }) => {
+    await conDiccionario(page);
+    await añadirFicha(page, 'X');
+    await page.getByRole('button', { name: 'Buscar la mejor jugada' }).click();
+    await expect(page.getByText(/Ninguna palabra encaja con esas fichas/)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('heading', { name: /Mejores jugadas/ })).toHaveCount(0);
+  });
+});

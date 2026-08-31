@@ -49,6 +49,16 @@ import { test, expect, Page } from '@playwright/test';
  *       es FALSE en JS, así que no atrapaba el vacío. Ahora la guarda es
  *       `if (!(salarioNum > 0)) alert(...)`: `!(NaN > 0)` es TRUE (NaN > 0 es
  *       FALSE), así que el vacío dispara el aviso igual que el negativo.
+ *
+ * ── Re-inspección independiente 31/08/2026 ──────────────────────────────────
+ * Los 5 tests de arriba se re-ejecutaron sin tocar el código de la app: los 5
+ * siguen en verde. Además de repetir CASO 1 (30.000 €) con 80.000 € (tope de
+ * BASES_SS_2026.maxima + entra en el tramo del 45 %) como segundo ancla al
+ * mismo caso límite, esta ronda encontró un hallazgo nuevo (ver test
+ * «Hallazgo — situación familiar» más abajo): el selector «Casado/a (un solo
+ * ingreso)» no aplica ninguna reducción frente a «Soltero/a» — la reducción
+ * por tributación conjunta (art. 84.2.4º LIRPF, ~3.400 €/año) no existe en
+ * `calcularMinimosPersonales` ni en `data/fiscal`.
  */
 
 const RUTA = '/estimador-sueldo-neto/';
@@ -229,4 +239,41 @@ test('Hallazgo 561 — los 4 botones de la app llevan type="button"', async ({ p
   }
   await expect(page.getByRole('button', { name: 'Bruto → Neto', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('button', { name: 'Neto → Bruto', exact: true })).toHaveAttribute('aria-pressed', 'false');
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+/**
+ * Hallazgo (re-inspección 31/08/2026) — «Casado/a (un solo ingreso)» es un selector
+ * sin efecto: `calcularMinimosPersonales` solo distingue 'familia_monoparental'
+ * (+2.150 €, y solo con hijos); para 'casado_un_ingreso' devuelve EXACTAMENTE el
+ * mismo mínimo que 'soltero'. En la declaración conjunta real, un matrimonio con un
+ * solo perceptor de rentas del trabajo tiene derecho a la reducción del art. 84.2.4º
+ * LIRPF (~3.400 €/año de reducción en la base imponible) — reducción que no está en
+ * `data/fiscal` ni en esta app. Resultado: para el mismo bruto, el estimador devuelve
+ * el MISMO neto para «Soltero/a» y para «Casado/a (un solo ingreso)», cuando en la
+ * realidad el segundo pagaría menos IRPF. Este test documenta el comportamiento
+ * ACTUAL (dos situaciones distintas dan resultados idénticos) para que un futuro
+ * cambio en `calcularMinimosPersonales` que trate a 'casado_un_ingreso' de forma
+ * distinta a 'soltero' se note aquí — momento en el que este test habrá que
+ * actualizarlo a la baja (fallará porque los importes YA NO coinciden, lo cual será
+ * la señal de que el hallazgo se reparó).
+ */
+test('Hallazgo — «Casado/a (un solo ingreso)» da el mismo neto que «Soltero/a» (falta la reducción por tributación conjunta, art. 84.2.4 LIRPF)', async ({ page }) => {
+  await page.goto(RUTA);
+  await calcular(page, '30000');
+  const netoSoltero = await valorTarjeta(page, 'Salario Neto Anual');
+  const irpfSoltero = await filaDesglose(page, 'Retención IRPF anual');
+  expect(netoSoltero).toBe('24.319,86€');
+  expect(irpfSoltero).toBe('3730,14 €');
+
+  await limpiarFormulario(page);
+  await page.locator('select').first().selectOption({ label: 'Casado/a (un solo ingreso)' });
+  await calcular(page, '30000');
+  const netoCasadoUnIngreso = await valorTarjeta(page, 'Salario Neto Anual');
+  const irpfCasadoUnIngreso = await filaDesglose(page, 'Retención IRPF anual');
+
+  // Comportamiento actual (el hallazgo): idénticos byte a byte al soltero.
+  // Si esto deja de cumplirse, la reducción por tributación conjunta ya se aplica.
+  expect(netoCasadoUnIngreso).toBe(netoSoltero);
+  expect(irpfCasadoUnIngreso).toBe(irpfSoltero);
 });
