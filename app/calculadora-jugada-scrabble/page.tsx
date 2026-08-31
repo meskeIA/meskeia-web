@@ -90,6 +90,19 @@ export default function CalculadoraJugadaScrabblePage() {
     [modo]
   );
 
+  // Mismo cómputo que `maxCasillas` en el motor (atril + la del gancho, si hay). Una posición
+  // fuera de este rango nunca puede caer sobre ninguna ficha colocada: el motor la descarta en
+  // silencio (`puntuar()` deja indiceBonus en -1) y el multiplicador se pierde sin avisar.
+  const maxCasillasBonus = atril.length + (gancho !== '' ? 1 : 0);
+
+  // Si el atril o el gancho cambian y la posición elegida deja de caber, no se queda fija en
+  // un valor ahora inalcanzable.
+  useEffect(() => {
+    if (typeof posicionBonus === 'number' && posicionBonus > maxCasillasBonus) {
+      setPosicionBonus('auto');
+    }
+  }, [maxCasillasBonus, posicionBonus]);
+
   const añadirFicha = (ficha: Ficha) => {
     if (atril.length >= FICHAS_ATRIL) return;
     setAtril([...atril, ficha]);
@@ -328,13 +341,15 @@ export default function CalculadoraJugadaScrabblePage() {
                   }}
                 >
                   <option value="auto">La ficha más valiosa (mejor caso)</option>
-                  {[1, 2, 3, 4, 5, 6, 7, 8].map((p) => (
+                  {Array.from({ length: maxCasillasBonus }, (_, i) => i + 1).map((p) => (
                     <option key={p} value={p}>Posición {p} de la palabra</option>
                   ))}
                 </select>
                 <p className={styles.ayudaCampo}>
-                  Las posiciones se cuentan desde la primera letra. Si eliges «la ficha más valiosa»,
-                  el resultado es el techo de la jugada: solo lo alcanzarás si la palabra encaja así en el tablero.
+                  Las posiciones se cuentan desde la primera letra, hasta las {maxCasillasBonus} casillas que
+                  tu atril{gancho !== '' ? ' y el gancho' : ''} pueden llegar a ocupar. Si eliges «la ficha más
+                  valiosa», el resultado es el techo de la jugada: solo lo alcanzarás si la palabra encaja así
+                  en el tablero.
                 </p>
               </div>
             )}
@@ -374,6 +389,12 @@ export default function CalculadoraJugadaScrabblePage() {
               <h2 className={styles.bloqueTitulo}>
                 Mejores jugadas <span className={styles.contador}>{jugadas.length}</span>
               </h2>
+              {jugadas.length > 1 && jugadas[0].puntos === jugadas[1].puntos && (
+                <p className={styles.ayuda}>
+                  Hay más de una jugada con {jugadas[0].puntos} puntos: en caso de empate se
+                  ordenan alfabéticamente, no por lo reconocible que sea la palabra.
+                </p>
+              )}
               <ol className={styles.listaJugadas}>
                 {jugadas.map((jugada, idx) => (
                   <li key={jugada.palabra} className={`${styles.jugada} ${idx === 0 ? styles.jugadaTop : ''}`}>

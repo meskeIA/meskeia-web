@@ -58,19 +58,17 @@ import { test, expect, Page } from '@playwright/test';
  * repo (scratchpad de sesión) y coincidieron EXACTAMENTE con el cálculo a mano, estadísticas
  * incluidas — no hay hallazgos de cálculo en estos tres casos.
  *
- * HALLAZGOS SÍ ENCONTRADOS (documentados como regresión más abajo, sin test.fail() porque no
- * son errores de cálculo sino brechas entre lo que la propia app promete y lo que hace):
+ * HALLAZGOS 557 y 558 — REPARADOS el 31/08/2026:
  *
- *   - «Comillas tipográficas» (FAQ #2 de metadata.ts, JSON-LD de FAQPage): promete que el
- *     limpiador «los detecta y sustituye por su equivalente en texto limpio». Verificado: la
- *     única opción capaz de tocar comillas curvas es «Caracteres especiales», y esa opción las
- *     BORRA (no las sustituye por comilla recta). "hola" → "hola" sin comillas de ningún tipo.
+ *   - «Comillas tipográficas» (FAQ #2 de metadata.ts, JSON-LD de FAQPage): prometía que el
+ *     limpiador «los detecta y sustituye por su equivalente en texto limpio», pero la única
+ *     opción capaz de tocar comillas curvas era «Caracteres especiales», y las BORRABA sin
+ *     sustituir. Reparado: ahora sustituye “”→" y ‘’→' antes de aplicar el filtro.
  *
  *   - «Espacios extra» frente a espacios de no separación (NBSP, U+00A0): el bloque educativo
- *     de la propia página anuncia esta opción como la indicada para «texto copiado de
- *     Word/PDF con dobles espacios», y precisamente Word/PDF suelen dejar NBSP en vez de
- *     espacio ASCII. El regex `/ {2,}/g` (línea 66) solo matchea el espacio U+0020: un NBSP
- *     doble, típico de ese origen, atraviesa la limpieza intacto.
+ *     anuncia esta opción para «texto copiado de Word/PDF con dobles espacios», y precisamente
+ *     Word/PDF suelen dejar NBSP en vez de espacio ASCII. El regex `/ {2,}/g` solo matcheaba
+ *     el espacio U+0020. Reparado: `/[  ]{2,}/g` colapsa también el NBSP.
  */
 
 const RUTA = '/limpiador-texto/';
@@ -142,8 +140,8 @@ test.describe('limpiador-texto', () => {
 
     // Solo desaparecen los tres caracteres dentro de los rangos de emoji del regex (😀🎉☕):
     // el espacio de ancho cero y las comillas curvas quedan intactos, porque «Emojis» no las
-    // toca (verificado también por separado: «Caracteres especiales» las BORRA sin sustituir,
-    // ver hallazgo documentado en la cabecera del fichero).
+    // toca (la sustitución de comillas vive en «Caracteres especiales», que aquí está inactiva
+    // — ver el test de esa opción más abajo).
     await expect(salida(page)).toHaveValue(
       'Emojis:  y símbolos: . Palabra con ZWSP: in\u200Bvisible. ' +
         'Comillas tipográficas: “hola” y ‘adiós’.'
@@ -171,44 +169,39 @@ test.describe('limpiador-texto', () => {
   });
 
   // ---------------------------------------------------------------------------------------
-  // REGRESIÓN — brechas entre lo prometido (metadata.ts / bloque educativo) y lo que hace el
-  // motor de limpieza. No son errores de cálculo del propio regex, sino casos donde el texto
-  // de la app dice más de lo que el código cumple. Documentados aquí para no perderlos.
+  // REPARADO — hallazgos 557 y 558 de la inspección del 31/08/2026: brechas entre lo prometido
+  // (metadata.ts / bloque educativo) y lo que hacía el motor de limpieza. Ya reparadas.
   // ---------------------------------------------------------------------------------------
 
-  test.describe('hallazgos de la inspección del 31/08/2026', () => {
-    test('«Caracteres especiales» BORRA las comillas tipográficas en vez de sustituirlas', async ({
+  test.describe('hallazgos 557/558, reparados', () => {
+    test('«Caracteres especiales» sustituye las comillas tipográficas por su equivalente recto', async ({
       page,
     }) => {
       // metadata.ts, FAQ #2 (FAQPage JSON-LD): «Word, PDF... añaden... comillas tipográficas...
-      // Un limpiador los detecta y sustituye por su equivalente en texto limpio». No hay
-      // sustitución: la única opción que toca comillas curvas las elimina sin más.
+      // Un limpiador los detecta y sustituye por su equivalente en texto limpio». Ahora sí:
+      // comillas curvas sustituidas por su equivalente recto antes del filtro.
       await setOpcion(page, 'Espacios extra', false);
       await setOpcion(page, 'Espacios inicio/fin', false);
       await setOpcion(page, 'Caracteres especiales', true);
 
       await entrada(page).fill('Comillas tipográficas: “hola” y ‘adiós’.');
 
-      // Esperable según la FAQ: comillas rectas de sustitución, p. ej. "hola" y 'adiós'.
-      // Obtenido: las comillas desaparecen sin dejar ningún carácter en su lugar.
-      await expect(salida(page)).toHaveValue('Comillas tipográficas: hola y adiós.');
+      await expect(salida(page)).toHaveValue('Comillas tipográficas: "hola" y \'adiós\'.');
     });
 
-    test('«Espacios extra» no colapsa espacios de no separación (NBSP), el caso Word/PDF que anuncia', async ({
+    test('«Espacios extra» colapsa también espacios de no separación (NBSP), el caso Word/PDF que anuncia', async ({
       page,
     }) => {
       // El bloque educativo (EducationalSection, sección «Guía de Opciones») dice literalmente:
-      // «Espacios extra → texto copiado de Word/PDF con dobles espacios». El regex / {2,}/g
-      // solo matchea el espacio ASCII U+0020; un NBSP (U+00A0) doble —justo lo que Word suele
-      // dejar al pegar— lo atraviesa intacto, mientras un espacio normal doble sí se colapsa.
+      // «Espacios extra → texto copiado de Word/PDF con dobles espacios». Ahora el regex
+      // /[ \u00A0]{2,}/g matchea tanto el espacio ASCII como el NBSP (U+00A0), así que un NBSP
+      // doble —justo lo que Word suele dejar al pegar— se colapsa igual que un espacio normal.
       await entrada(page).fill(
         'Palabra1\u00A0\u00A0Palabra2 con  doble espacio normal'
       );
 
-      // Esperable si «Espacios extra» cubriera el caso Word/PDF: NBSP también colapsado a uno.
-      // Obtenido: el NBSP doble sobrevive; solo el espacio ASCII doble se reduce.
       await expect(salida(page)).toHaveValue(
-        'Palabra1\u00A0\u00A0Palabra2 con doble espacio normal'
+        'Palabra1 Palabra2 con doble espacio normal'
       );
     });
   });

@@ -28,13 +28,17 @@ import { test, expect, Page } from '@playwright/test';
  *      (page.tsx: disabled={atril.length === 0 || ...}), así que no hay forma de lanzar una
  *      búsqueda sin fichas: comportamiento correcto, no un fallo.
  *
- * HALLAZGO ADICIONAL (no es de cálculo): el desplegable "Posición de la bonificación"
- * siempre ofrece 1..8, sin acotarlo al nº real de casillas de la jugada. Elegir una posición
- * fuera de rango no avisa: la bonificación se pierde en silencio y el resultado queda
- * indistinguible de no haber marcado ningún multiplicador de letra (mismo atril Z,A,P,A,T,O
- * con ×3 letra y posición=8 → TAPAZO 17 pts, igual que sin multiplicador). Se deja constancia
- * aquí como test de regresión porque es observable y estable, aunque el cálculo en sí es
- * correcto (una posición fuera de rango no debe multiplicar nada).
+ * REPARADO — HALLAZGO 550 (operativa, medio): el desplegable "Posición de la bonificación"
+ * ofrecía siempre 1..8, sin acotarlo al nº real de casillas de la jugada (atril + gancho).
+ * Elegir una posición fuera de rango no avisaba: la bonificación se perdía en silencio y el
+ * resultado quedaba indistinguible de no haber marcado ningún multiplicador de letra. Ahora
+ * el <select> solo ofrece hasta `atril.length + (gancho ? 1 : 0)` posiciones, y si el atril
+ * se reduce y la posición elegida deja de caber, vuelve sola a "auto".
+ *
+ * REPARADO — HALLAZGO 551 (contenido, bajo): el motor desempata jugadas con igual puntuación
+ * por orden alfabético (Z,A,P,A,T,O da TAPAZO antes que ZAPATO, el ejemplo del propio bloque
+ * educativo) sin decirlo en la interfaz. Ahora, cuando las dos primeras jugadas empatan en
+ * puntos, aparece una nota explicando el criterio de desempate.
  */
 
 const URL_APP = '/calculadora-jugada-scrabble/';
@@ -86,17 +90,51 @@ test.describe('calculadora-jugada-scrabble', () => {
     await expect(page.getByText(/Ninguna palabra encaja/)).toHaveCount(0);
   });
 
-  test('la posición de bonificación fuera de rango pierde el multiplicador sin avisar', async ({ page }) => {
+  test('REPARADO (550) · con 6 fichas y sin gancho, el desplegable de posición solo ofrece hasta la 6', async ({ page }) => {
     await conDiccionario(page);
     for (const letra of ['Z', 'A', 'P', 'A', 'T', 'O']) {
       await añadirFicha(page, letra);
     }
-    // 6 fichas sin gancho → como mucho hay 6 casillas en juego, pero el desplegable
-    // ofrece hasta 8: elegir la 8 (fuera de rango) debe anular el ×3 en silencio.
     await page.getByRole('button', { name: '×3 letra' }).click();
-    await page.selectOption('#posicion-bonus', '8');
+
+    const opciones = await page.locator('#posicion-bonus option').allTextContents();
+    // "La ficha más valiosa (mejor caso)" + posiciones 1 a 6 — ya no llega a la 7 ni a la 8.
+    expect(opciones).toHaveLength(7);
+    expect(opciones).toContain('Posición 6 de la palabra');
+    expect(opciones).not.toContain('Posición 7 de la palabra');
+    expect(opciones).not.toContain('Posición 8 de la palabra');
+  });
+
+  test('REPARADO (550) · quitar una ficha con posición 6 elegida vuelve sola a "auto"', async ({ page }) => {
+    await conDiccionario(page);
+    for (const letra of ['Z', 'A', 'P', 'A', 'T', 'O']) {
+      await añadirFicha(page, letra);
+    }
+    await page.getByRole('button', { name: '×3 letra' }).click();
+    await page.selectOption('#posicion-bonus', '6');
+    await expect(page.locator('#posicion-bonus')).toHaveValue('6');
+
+    // Quitar la última ficha del atril (queda en 5): la posición 6 ya no cabe.
+    await page.getByRole('button', { name: /Quitar la ficha O del atril/ }).click();
+    await expect(page.locator('#posicion-bonus')).toHaveValue('auto');
+  });
+
+  test('REPARADO (551) · Z,A,P,A,T,O sin bonus avisa del empate TAPAZO/ZAPATO y su criterio de desempate', async ({ page }) => {
+    await conDiccionario(page);
+    for (const letra of ['Z', 'A', 'P', 'A', 'T', 'O']) {
+      await añadirFicha(page, letra);
+    }
     await buscar(page);
-    // Mismo resultado que sin multiplicador: la bonificación no se aplicó a nada.
     expect(await primeraJugada(page)).toBe('TAPAZO 17 pts');
+    await expect(page.getByText(/Hay más de una jugada con 17 puntos/)).toBeVisible();
+    await expect(page.getByText(/en caso de empate se ordenan alfabéticamente/)).toBeVisible();
+  });
+
+  test('REPARADO (551) · Ñ,U sin empate (una sola jugada posible) no muestra la nota de desempate', async ({ page }) => {
+    await conDiccionario(page);
+    await añadirFicha(page, 'Ñ');
+    await añadirFicha(page, 'U');
+    await buscar(page);
+    await expect(page.getByText(/Hay más de una jugada con/)).toHaveCount(0);
   });
 });

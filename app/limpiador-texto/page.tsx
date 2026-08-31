@@ -63,7 +63,9 @@ export default function LimpiadorTextoPage() {
 
       switch (op.id) {
         case 'espaciosExtra':
-          resultado = resultado.replace(/ {2,}/g, ' ');
+          // Incluye el espacio de no separación (NBSP, U+00A0): Word y PDF lo dejan en vez
+          // de espacio normal, y el bloque educativo promete cubrir justo ese caso.
+          resultado = resultado.replace(/[ \u00A0]{2,}/g, ' ');
           break;
         case 'espaciosInicio':
           resultado = resultado.split('\n').map(linea => linea.trim()).join('\n');
@@ -91,7 +93,12 @@ export default function LimpiadorTextoPage() {
           resultado = resultado.replace(/\t/g, ' ');
           break;
         case 'caracteresEspeciales':
-          resultado = resultado.replace(/[^\w\sáéíóúüñÁÉÍÓÚÜÑ.,;:!?¿¡'"()-]/g, '');
+          // Sustituye las comillas tipográficas por su equivalente recto ANTES del filtro:
+          // si no, el filtro las borra sin dejar nada, contradiciendo lo que promete la FAQ.
+          resultado = resultado
+            .replace(/[“”]/g, '"')
+            .replace(/[‘’]/g, "'")
+            .replace(/[^\w\sáéíóúüñÁÉÍÓÚÜÑ.,;:!?¿¡'"()-]/g, '');
           break;
         case 'numeros':
           resultado = resultado.replace(/\d/g, '');
