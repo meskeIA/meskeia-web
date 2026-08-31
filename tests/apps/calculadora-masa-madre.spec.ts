@@ -354,3 +354,87 @@ test.describe('Sustitución de levadura por masa madre — lo que promete el <h1
     }
   });
 });
+
+/**
+ * RE-INSPECCIÓN — 31/08/2026 (254 usos, segmento motor, riesgo 3)
+ *
+ * Disparada porque `lib/calculadoras/cocina.ts` —el fichero que exporta
+ * `calcularSustitucionMasaMadre`— cambió desde la inspección del 25/08/2026: el commit
+ * `75eba218 feat(coquinum): modo inverso en calculadora-porcentaje-panadero` le añadió
+ * `calcularBakersPercentageDesdePeso`.
+ *
+ * COMPROBADO POR LECTURA DE CÓDIGO: ese commit solo TOCA la sección 1 (Baker's Percentage) del
+ * fichero — añade una función hermana nueva junto a `calcularBakersPercentage`. La sección 3
+ * (Sustitución de masa madre), que es la que usa esta app, queda byte a byte igual que el
+ * 25/08/2026. Es decir: **esta app NO comparte el motor del «modo inverso»** — ese modo vive
+ * solo en calculadora-porcentaje-panadero, sobre una función distinta con una fórmula distinta
+ * (fija el peso final de la masa y reparte porcentajes; calcularSustitucionMasaMadre no tiene
+ * ningún parámetro de peso final, parte siempre de gramos de levadura).
+ *
+ * Los 11 tests de arriba (fichero sin tocar desde el 25/08) se han vuelto a ejecutar contra el
+ * código actual y siguen en verde, lo que confirma por el lado de comportamiento lo que ya decía
+ * la lectura del diff: cero regresión. Los tres casos de abajo son la verificación INDEPENDIENTE
+ * de esta ronda —resueltos a mano antes de abrir el navegador, sobre combinaciones que la
+ * suite anterior no cubría (tipo "instantánea", nunca probado; y la notación científica sobre
+ * el campo de texto, no solo "12abc"/"10.5.3")—, no una repetición de los REGRESIÓN 288-292.
+ *
+ *   CASO 1 (normal) — instantánea, 12 g, hidratación 100 %
+ *       instantánea equivale a seca 1:1 → equivalente_seca = 12
+ *       harina prefermentada = 12 × 20 / 2 = 120
+ *       masa madre = round(120 × 200/100) = 240 g
+ *       harina a restar = round(240 × 100/200) = 120 g ; agua a restar = 240 − 120 = 120 g
+ *
+ *   CASO 2 (límite, tramo más alto del deslizador) — seca, 7 g, hidratación 150 %
+ *       harina prefermentada = 7 × 20/2 = 70 (el ancla, igual a cualquier hidratación)
+ *       masa madre = round(70 × 250/100) = 175 g
+ *       harina a restar = round(175 × 100/250) = 70 g ; agua a restar = 175 − 70 = 105 g
+ *       (175/70 = 2,5 → 250 % de harina+agua sobre harina, hidratación 150 % ✔)
+ *
+ *   CASO 3 (rechazo) — "1e3" en el campo de texto
+ *       parseSpanishNumber exige `/^[+-]?[\d.,]+$/`: la "e" de la notación científica no es
+ *       dígito ni separador, así que partesNumericas() devuelve null y el parser NaN. Antes del
+ *       hallazgo 290 esto colaba como `parseFloat` = 1000 y disparaba un resultado de 20.000 g.
+ *
+ * Los tres se ejecutaron contra http://localhost:3050/calculadora-masa-madre/ con Playwright vía
+ * `node_modules/playwright` (no MCP) y coincidieron con el cálculo a mano al gramo.
+ */
+test.describe('RE-INSPECCIÓN 31/08/2026 — motor sin tocar, verificación independiente', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+  });
+
+  test('CASO 1 (normal) · levadura instantánea, 12 g al 100 % = 240 g de masa madre, −120/−120', async ({ page }) => {
+    // instantánea = seca 1:1 → 12 × 20/2 = 120 g harina prefermentada → × 200/100 = 240 g MM
+    // harina = round(240 × 100/200) = 120 ; agua = 240 − 120 = 120
+    await page.getByRole('button', { name: /Levadura instantánea/ }).click();
+    await ponerGramos(page, '12');
+    await ponerHidratacion(page, '100');
+
+    expect(await masaMadre(page)).toBe('240 g');
+    expect(await hidratacionAplicada(page)).toBe('100 %');
+    expect(await restas(page)).toEqual(['− 120 g', '− 120 g']);
+  });
+
+  test('CASO 2 (límite) · seca, 7 g, deslizador en el tramo más alto (150 %) = 175 g, −70/−105', async ({ page }) => {
+    // Ancla: 7 g de seca → 70 g de harina prefermentada, la MISMA a cualquier hidratación.
+    // Al 150 %: MM = 70 × 250/100 = 175 ; harina = round(175 × 100/250) = 70 ; agua = 105
+    await page.getByRole('button', { name: /Levadura seca/ }).click();
+    await ponerGramos(page, '7');
+    await ponerHidratacion(page, '150');
+
+    expect(await masaMadre(page)).toBe('175 g');
+    expect(await hidratacionAplicada(page)).toBe('150 %');
+    expect(await restas(page)).toEqual(['− 70 g', '− 105 g']);
+  });
+
+  test('CASO 3 (rechazo) · "1e3" (notación científica) no produce resultado', async ({ page }) => {
+    // partesNumericas() exige solo dígitos/signo/separadores: la "e" la descarta → NaN.
+    // Antes del hallazgo 290, `parseFloat("1e3")` daba 1000 y el motor calculaba 20.000 g.
+    await ponerGramos(page, '1e3');
+
+    await expect(page.locator('[class*="resultValorGrande"]')).toHaveCount(0);
+    expect(await estado(page)).toBe(
+      'Introduce los gramos de levadura de tu receta original para ver el resultado.',
+    );
+  });
+});
