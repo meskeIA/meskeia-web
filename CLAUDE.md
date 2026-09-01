@@ -367,6 +367,10 @@ Cada agente DEBE incluir estas instrucciones EXACTAS en su prompt:
 
 **Razón**: Los agentes que no terminan limpiamente producen procesos zombie, locks de build, reintentos en cadena y docenas de notificaciones residuales. La clave es que cada agente cree sus archivos, verifique UNA vez, y termine inmediatamente.
 
+### 4. Modificar una app existente (bug o función nueva)
+
+Mismo criterio del PASO 4.bis de `/nueva-app-meskeia`: si la app tiene estado interactivo (temporizador, foco/teclado, varias fases), verificar con `npx playwright test tests/apps/<slug>.spec.ts` antes del build final — crear el fichero si no existe. Una calculadora normal no lo necesita.
+
 ---
 
 ## Stack Tecnológico: tRPC + React Query
@@ -707,18 +711,11 @@ Las rutas vivas son `ls app/api/analytics/`.
 
 Los comandos disponibles se ven con `/help`; las revisiones de código van por el `/code-review` integrado. Los plugins `code-review`, `audit`, `analyze-codebase`, `bug-detective`, `debugger` y `accessibility-expert` de `cc-marketplace` **se retiraron el 11/08/2026**: cero usos desde junio, y el primero además duplicaba el comando integrado.
 
-**Testing de frontend**: Playwright MCP, registrado en **ámbito de usuario** (`~/.claude.json`, vía
-`claude mcp add`), con `--browser chromium --headless`. Ese flag no es opcional: por defecto el MCP
-busca el **Chrome del sistema**, que en este PC no existe (el navegador es Vivaldi), y falla al abrir
-la primera página aunque `claude mcp list` diga `✔ Connected`. Con el flag usa el chromium que
-Playwright ya tiene en `%LOCALAPPDATA%\ms-playwright`.
-
-> ⚠️ **Un permiso no arranca un servidor.** Hasta el 12/08/2026 esta línea decía que Playwright estaba
-> «configurado en `settings.local.json`», y era falso: la declaración vivía en `~/.claude/mcp-config.json`,
-> que **solo se carga si se arranca con `claude --mcp-config <ruta>`**, mientras que `settings.json` únicamente
-> tenía el permiso `mcp__playwright__*`. Como el permiso sí estaba, no saltaba ningún diálogo y parecía
-> integrado — hasta que hizo falta y no existía. Los sitios que Claude Code carga solo son `~/.claude.json`
-> (usuario/local) y `.mcp.json` en la raíz del repositorio.
+**Testing de frontend interactivo**: sin MCP — verificado el 01/09/2026 que no hay ninguno
+registrado en esta máquina (un permiso en `settings.json` no es un registro). Se usa
+`@playwright/test` directo sobre el Chromium de `node_modules/playwright`:
+`npx playwright test tests/apps/<slug>.spec.ts` arranca y cierra el servidor de dev solo
+(`playwright.config.ts`). Lo usan `/inspector` y el PASO 4.bis de `/nueva-app-meskeia`.
 
 ---
 
