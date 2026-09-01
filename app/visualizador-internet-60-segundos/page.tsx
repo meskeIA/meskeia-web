@@ -94,7 +94,7 @@ const PASOS: PasoInternet[] = [
     tiempoMs: '10-200 ms',
     color: '#2E86AB',
     queOcurre: 'Tu petición viaja como pulsos de luz por fibra óptica: de tu casa al router del barrio, de ahí al proveedor, y de ahí a través de cables que cruzan océanos hasta el data center del servidor.',
-    detalleTecnico: 'Los datos viajan a ~2/3 de la velocidad de la luz en fibra óptica. Un paquete Madrid → Nueva York (~6.000 km de cable) tarda unos 30 ms en llegar. Pasa por 10-15 routers intermedios que lo redirigen.',
+    detalleTecnico: 'Los datos viajan a ~2/3 de la velocidad de la luz en fibra óptica. Un paquete transatlántico (~6.000 km de cable) tarda unos 30 ms en llegar. Pasa por 10-15 routers intermedios que lo redirigen.',
     datoSorprendente: 'Hay más de 550 cables submarinos activos que cruzan los océanos. Si se cortaran todos, los continentes quedarían incomunicados. Los tiburones a veces los muerden (Google tuvo que blindar los suyos).',
   },
   {
@@ -115,7 +115,7 @@ const PASOS: PasoInternet[] = [
     icono: '🌐',
     tiempoMs: '1-20 ms',
     color: '#f39c12',
-    queOcurre: 'Muchas webs usan CDNs (Content Delivery Networks): copias de la web distribuidas por todo el mundo. En lugar de ir al servidor original en EE.UU., tu petición puede ser servida desde un servidor en Madrid.',
+    queOcurre: 'Muchas webs usan CDNs (Content Delivery Networks): copias de la web distribuidas por todo el mundo. En lugar de ir al servidor original en EE.UU., tu petición puede ser servida desde un servidor mucho más cercano.',
     detalleTecnico: 'Las CDNs (Cloudflare, Vercel Edge, AWS CloudFront) cachean contenido estático en "nodos edge" distribuidos globalmente. Cuando pides una página, la CDN más cercana la sirve si la tiene en caché.',
     datoSorprendente: 'Cloudflare tiene servidores en más de 300 ciudades del mundo. Cuando visitas una web con Cloudflare, probablemente el servidor que te responde está a menos de 50 km de ti.',
   },
@@ -355,7 +355,7 @@ export default function VisualizadorInternet60SegundosPage() {
           <p>
             La fibra de 1 Gbps no hace que una web cargue instantáneamente. La <strong>latencia</strong>
             (tiempo que tarda un paquete en ir y volver) depende de la distancia física y los routers
-            intermedios. Desde Madrid a un servidor en Tokio, la latencia mínima posible (velocidad de la
+            intermedios. Desde Europa a un servidor en Tokio, la latencia mínima posible (velocidad de la
             luz) es ~70 ms — y en la práctica es ~200 ms.
           </p>
 

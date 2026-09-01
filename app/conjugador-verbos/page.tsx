@@ -390,7 +390,7 @@ export default function ConjugadorVerbosPage() {
             <div className={styles.casoCard}>
               <span className={styles.casoIcon}>📖</span>
               <div className={styles.casoTitle}>Estudiante de español</div>
-              <div className={styles.casoSubtitle}>ESO / Bachillerato</div>
+              <div className={styles.casoSubtitle}>Secundaria / preparatoria</div>
               <p className={styles.casoDesc}>
                 Verificar conjugaciones para redacciones, ejercicios y exámenes. Repasar
                 los tiempos irregulares antes de un examen de lengua.

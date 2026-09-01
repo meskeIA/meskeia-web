@@ -541,7 +541,7 @@ export default function ConversorCoordenadasPage() {
             <p>
               Porque la ruta más corta entre dos puntos de una esfera es un arco de círculo máximo, y
               ese arco va cruzando los meridianos con ángulos distintos. En trayectos cortos la
-              diferencia es inapreciable; en un Madrid-Tokio son decenas de grados. Mantener un rumbo
+              diferencia es inapreciable; en un Ciudad de México-Tokio son decenas de grados. Mantener un rumbo
               constante es navegar por una loxodroma, que es un camino distinto y más largo.
             </p>
           </details>
@@ -657,7 +657,7 @@ export default function ConversorCoordenadasPage() {
               punto aparece en el mar, es lo primero que hay que mirar.
             </li>
             <li>
-              <strong>Perder el signo de la longitud.</strong> En España casi todas son negativas
+              <strong>Perder el signo de la longitud.</strong> En el mundo hispanohablante casi todas son negativas
               (oeste). Sin el menos, Madrid se planta en Turquía.
             </li>
             <li>

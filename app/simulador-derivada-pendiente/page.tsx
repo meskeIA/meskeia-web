@@ -809,7 +809,7 @@ export default function SimuladorDerivadaPendientePage() {
             <strong>5 errores frecuentes al calcular derivadas</strong>
           </div>
           <ul className={styles.warningList}>
-            <li><strong>Olvidar la regla de la cadena</strong> — Para sen(2x), la derivada es 2·cos(2x), no cos(2x). Al componer funciones, hay que multiplicar por la derivada del &quot;dentro&quot;. Es el error más típico de Bachillerato.</li>
+            <li><strong>Olvidar la regla de la cadena</strong> — Para sen(2x), la derivada es 2·cos(2x), no cos(2x). Al componer funciones, hay que multiplicar por la derivada del &quot;dentro&quot;. Es el error más típico de secundaria y preparatoria.</li>
             <li><strong>Confundir derivada de cos con sen</strong> — Sen → cos (positivo). Cos → −sen (NEGATIVO). El signo negativo del coseno se olvida muy a menudo y arruina el resto del cálculo.</li>
             <li><strong>Tratar el producto como suma</strong> — (f·g)&apos; ≠ f&apos;·g&apos;. La regla del producto es f&apos;·g + f·g&apos;. Saltársela es uno de los errores más persistentes.</li>
             <li><strong>Aplicar mal la regla del cociente</strong> — Es f&apos;·g − f·g&apos; (en ese orden) dividido por g². Invertir el orden del numerador cambia el signo y arruina el problema.</li>

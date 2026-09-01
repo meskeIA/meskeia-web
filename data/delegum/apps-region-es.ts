@@ -89,6 +89,7 @@ export const APPS_REGION_ES: ReadonlySet<string> = new Set([
   'visualizador-coste-sanidad',
   'visualizador-estructura-costes-autonomo',
   'visualizador-jubilacion-perspectiva',
+  'visualizador-peso-numeros',
   'visualizador-sueldo-neto',
   'visualizador-tipos-cliente-freelance',
   'visualizador-viaje-impuestos',

@@ -465,7 +465,7 @@ export default function HuesosCuerpoHumanoPage() {
                 </tr>
                 <tr>
                   <td><strong>Ideal para estudiar</strong></td>
-                  <td>Biología ESO/Bachillerato, anatomía básica</td>
+                  <td>Biología de secundaria/preparatoria, anatomía básica</td>
                   <td>Fisioterapia, traumatología, deporte</td>
                 </tr>
               </tbody>
@@ -483,11 +483,11 @@ export default function HuesosCuerpoHumanoPage() {
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioIcon}>🎓</span>
-                <h3>Estudiante de ESO/Bachillerato</h3>
+                <h3>Estudiante de secundaria o preparatoria</h3>
               </div>
               <div className={styles.escenarioExample}>
                 <p><strong>Uso típico:</strong></p>
-                <code>Filtrar por región → "Extremidades inferiores" → repasar fémur, tibia, peroné antes del examen de biología de 2.º ESO</code>
+                <code>Filtrar por región → "Extremidades inferiores" → repasar fémur, tibia, peroné antes del examen de biología</code>
               </div>
               <p className={styles.escenarioTip}>
                 <strong>Por qué funciona:</strong> Los filtros permiten repasar hueso por hueso en 15 minutos. El nombre en latín y la curiosidad ayudan a fijar conceptos con menos esfuerzo que memorizando listas.
@@ -635,7 +635,7 @@ export default function HuesosCuerpoHumanoPage() {
               <div className={styles.stepContent}>
                 <h4>Divide el esqueleto en axial (80) y apendicular (126)</h4>
                 <p>
-                  Estudia primero el esqueleto axial: cráneo (22), vértebras (26), tórax (25), hioides (1), huesecillos del oído (6). Después el apendicular: cintura escapular (4), extremidades superiores (60), cintura pélvica (2), extremidades inferiores (60). Esta división aparece en casi todos los exámenes de bachillerato y selectividad.
+                  Estudia primero el esqueleto axial: cráneo (22), vértebras (26), tórax (25), hioides (1), huesecillos del oído (6). Después el apendicular: cintura escapular (4), extremidades superiores (60), cintura pélvica (2), extremidades inferiores (60). Esta división aparece en casi todos los exámenes de secundaria, preparatoria y admisión universitaria.
                 </p>
               </div>
             </div>

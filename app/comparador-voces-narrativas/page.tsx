@@ -681,7 +681,7 @@ export default function ComparadorVocesNarrativas() {
                   <span className={styles.escenarioIcono} aria-hidden="true">🏫</span>
                   <h4>Docente</h4>
                 </div>
-                <p>Diseña una clase de Bachillerato sobre la novela del siglo XX y necesita un recurso visual para mostrar las dimensiones del estilo.</p>
+                <p>Diseña una clase de secundaria o preparatoria sobre la novela del siglo XX y necesita un recurso visual para mostrar las dimensiones del estilo.</p>
                 <p className={styles.escenarioTip}>💡 Las barras de dimensiones sirven como soporte visual para la pizarra o proyección.</p>
               </div>
             </div>

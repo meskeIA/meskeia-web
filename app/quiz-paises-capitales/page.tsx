@@ -465,7 +465,7 @@ export default function QuizPaisesCapitalesPage() {
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
-                <strong>Estudiante de ESO/Bachillerato</strong>
+                <strong>Estudiante de secundaria o preparatoria</strong>
               </div>
               <p className={styles.escenarioExample}>
                 <em>Situación:</em> Examen de geografía la próxima semana con 40 capitales europeas.

@@ -493,7 +493,7 @@ export default function VisualizadorEstructurasMercadoPage() {
                 <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
                 <h3>Estudiante de economía</h3>
                 <p>
-                  Usa las tablas comparativas y los gráficos interactivos para consolidar los conceptos de microeconomía antes de exámenes. El dilema del prisionero y la curva de ingreso marginal son los temas más evaluados en selectividad y grado.
+                  Usa las tablas comparativas y los gráficos interactivos para consolidar los conceptos de microeconomía antes de exámenes. El dilema del prisionero y la curva de ingreso marginal son los temas más evaluados en el examen de admisión universitaria y el grado.
                 </p>
               </div>
               <div className={styles.escenarioCard}>

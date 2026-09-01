@@ -728,7 +728,7 @@ export default function VisualizadorOpticaPage() {
         {/* Sección educativa */}
         <EducationalSection
           title="Profundiza en la óptica"
-          subtitle="Conceptos clave para Bachillerato y más allá"
+          subtitle="Conceptos clave para secundaria, preparatoria y más allá"
           defaultOpen={false}
         >
           <h3>Naturaleza dual de la luz</h3>

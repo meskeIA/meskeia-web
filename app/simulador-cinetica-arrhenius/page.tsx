@@ -851,7 +851,7 @@ export default function SimuladorCineticaArrheniusPage() {
               <div className={styles.stepNumber}>3</div>
               <div className={styles.stepContent}>
                 <strong>Si comparas dos T: ln(k₂/k₁) = −Ea/R · (1/T₂ − 1/T₁)</strong>
-                <p>Esta forma de la ecuación es muy útil porque elimina el factor A (a menudo desconocido). Es la fórmula EBAU típica para calcular Ea a partir de dos pares (T, k).</p>
+                <p>Esta forma de la ecuación es muy útil porque elimina el factor A (a menudo desconocido). Es la fórmula típica del examen de admisión universitaria para calcular Ea a partir de dos pares (T, k).</p>
               </div>
             </div>
             <div className={styles.step}>

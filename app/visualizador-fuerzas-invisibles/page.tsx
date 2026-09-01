@@ -160,7 +160,7 @@ export default function VisualizadorFuerzasInvisiblesPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <p className={styles.heroTag} aria-hidden="true">Física para Bachillerato</p>
+          <p className={styles.heroTag} aria-hidden="true">Física para secundaria y preparatoria</p>
           <h1 className={styles.title}>Las Fuerzas Invisibles del Día a Día</h1>
           <p className={styles.subtitle}>
             Gravedad, fricción, inercia, presión atmosférica y tensión superficial. Las cinco fuerzas que mueven tu vida — aunque no las veas.
@@ -288,7 +288,7 @@ export default function VisualizadorFuerzasInvisiblesPage() {
 
         <EducationalSection
           title="Profundiza en la física de las fuerzas"
-          subtitle="Conceptos clave para Bachillerato y más allá"
+          subtitle="Conceptos clave para secundaria, preparatoria y más allá"
           defaultOpen={false}
         >
           <h3>Las Leyes de Newton: el marco de todo</h3>
@@ -306,7 +306,7 @@ export default function VisualizadorFuerzasInvisiblesPage() {
             y siempre atractiva. La constante gravitacional universal (G = 6,674 × 10⁻¹¹ N·m²/kg²) determina
             la atracción entre cualquier par de masas en el universo. Einstein la redefinió en la Relatividad
             General: la gravedad no es una fuerza, sino la curvatura del espacio-tiempo causada por la masa.
-            Pero para la física de Bachillerato, F = mg funciona perfectamente.
+            Pero para la física de secundaria y preparatoria, F = mg funciona perfectamente.
           </p>
 
           <h3>Fricción estática vs. cinética</h3>

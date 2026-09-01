@@ -513,7 +513,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
             Cada parámetro actúa de forma independiente sobre la gráfica: <strong>a</strong> escala verticalmente,
             <strong> b</strong> escala horizontalmente, <strong>c</strong> desplaza de izquierda a derecha
             y <strong>d</strong> desplaza hacia arriba o abajo. Entender esto de forma visual es la clave para
-            dominar el análisis de funciones en Bachillerato y más allá.
+            dominar el análisis de funciones en secundaria, preparatoria y más allá.
           </p>
           <p>
             El punto especial <strong>(c, d)</strong> marca el nuevo "origen" de la función transformada:

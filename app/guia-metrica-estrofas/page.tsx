@@ -546,7 +546,7 @@ export default function GuiaMetricaEstrofasPage() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <strong><span aria-hidden="true">🎓</span> Estudiante de literatura</strong>
-            <p>El análisis métrico es una competencia evaluada en los exámenes de selectividad y en los primeros cursos universitarios. Conocer los tipos de verso y estrofa permite identificar la forma de un poema de forma rápida y precisa.</p>
+            <p>El análisis métrico es una competencia evaluada en los exámenes de admisión universitaria y en los primeros cursos universitarios. Conocer los tipos de verso y estrofa permite identificar la forma de un poema de forma rápida y precisa.</p>
           </div>
           <div className={styles.escenarioCard}>
             <strong><span aria-hidden="true">✍️</span> Escritor de poesía</strong>

@@ -10,6 +10,7 @@ import {
   RelatedApps,
   LegalNotice,
   ShareCard,
+  RegionBadge,
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -157,6 +158,8 @@ export default function VisualizadorPesoNumerosPage() {
           <h1 className={styles.title}>El Peso de los Números</h1>
           <p className={styles.subtitle}>¿Qué significa realmente un millón? ¿Y un billón? Comparaciones que hacen tangibles las grandes cifras</p>
         </header>
+
+        <RegionBadge variant="es-data" />
 
         <LegalNotice />
 

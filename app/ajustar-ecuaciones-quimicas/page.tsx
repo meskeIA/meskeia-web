@@ -1470,21 +1470,21 @@ export default function AjustarEcuacionesQuimicas() {
                   <td>Asignar una incógnita a cada coeficiente y resolver el sistema</td>
                   <td>Cualquier ecuación, incluidas las que el tanteo no resuelve</td>
                   <td>Requiere resolver un sistema; es laborioso a mano</td>
-                  <td>Bachillerato y universidad</td>
+                  <td>Secundaria/preparatoria y universidad</td>
                 </tr>
                 <tr>
                   <td>Ion-electrón</td>
                   <td>Separar en semirreacciones de oxidación y reducción y ajustar cada una</td>
                   <td>Reacciones redox, sobre todo en disolución acuosa</td>
                   <td>Solo aplica si hay transferencia de electrones</td>
-                  <td>Bachillerato, EBAU y universidad</td>
+                  <td>Secundaria/preparatoria y universidad</td>
                 </tr>
                 <tr>
                   <td>Número de oxidación</td>
                   <td>Igualar el aumento y la disminución de los estados de oxidación</td>
                   <td>Redox en fase no acuosa, donde no hay H⁺ ni OH⁻ disponibles</td>
                   <td>No muestra el papel del disolvente</td>
-                  <td>Bachillerato y universidad</td>
+                  <td>Secundaria/preparatoria y universidad</td>
                 </tr>
               </tbody>
             </table>

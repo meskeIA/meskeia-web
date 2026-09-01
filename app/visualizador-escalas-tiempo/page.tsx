@@ -37,7 +37,7 @@ const FENOMENOS: Fenomeno[] = [
   // Escala humana
   { nombre: 'Hervir agua para un café', icono: '☕', segundos: 180, categoria: 'humano', explicacion: '~3 minutos en hervidor eléctrico. Tiempo suficiente para que tu cerebro cambie de tarea 2-3 veces.' },
   { nombre: 'Un partido de fútbol', icono: '⚽', segundos: 5400, categoria: 'humano', explicacion: '90 minutos de juego. Pero con descanso, tiempo añadido y parones, estás frente a la tele ~2 horas.' },
-  { nombre: 'Un vuelo Madrid–Nueva York', icono: '✈️', segundos: 30600, categoria: 'humano', explicacion: '~8,5 horas. En ese tiempo, la Tierra ha rotado 127° y la ISS ha dado 5,5 vueltas al planeta.' },
+  { nombre: 'Un vuelo transatlántico largo', icono: '✈️', segundos: 30600, categoria: 'humano', explicacion: '~8,5 horas. En ese tiempo, la Tierra ha rotado 127° y la ISS ha dado 5,5 vueltas al planeta.' },
   { nombre: 'Una gestación humana', icono: '🤰', segundos: 23328000, categoria: 'humano', explicacion: '~270 días (9 meses). De una célula a un ser humano completo con 37 billones de células.' },
   { nombre: 'Amortizar una hipoteca a 25 años', icono: '🏠', segundos: 788400000, categoria: 'humano', explicacion: '25 años = 9.125 días = 300 cuotas mensuales. Cuando la termines, habrás pagado ~1,5 veces el precio de la casa en total.' },
   { nombre: 'Una vida humana media (España)', icono: '👤', segundos: 2587000000, categoria: 'humano', explicacion: '82 años. ~30.000 días. ~700.000 horas. En ese tiempo tu corazón habrá latido ~3.000 millones de veces.' },

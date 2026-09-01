@@ -666,21 +666,21 @@ export default function CalculadoraMatematicaPage() {
                 <tr>
                   <td><strong>Potencias y raíces</strong></td>
                   <td>Multiplicaciones repetidas y sus inversas (2⁴ = 16, √16 = 4)</td>
-                  <td>ESO (12-16 años)</td>
+                  <td>Secundaria (12-16 años)</td>
                   <td>Calculadora científica</td>
                   <td>Interés compuesto, áreas, física (E = mc²)</td>
                 </tr>
                 <tr>
                   <td><strong>Logaritmos</strong></td>
                   <td>Exponentes inversos: log₁₀(100) = 2 porque 10² = 100</td>
-                  <td>Bachillerato (16-18 años)</td>
+                  <td>Preparatoria (16-18 años)</td>
                   <td>Calculadora científica o tabla logarítmica</td>
                   <td>Escala Richter, pH, decibelios, tiempo de duplicación</td>
                 </tr>
                 <tr>
                   <td><strong>Trigonometría</strong></td>
                   <td>Relaciones entre ángulos y lados de triángulos (seno, coseno)</td>
-                  <td>Bachillerato (16-18 años)</td>
+                  <td>Preparatoria (16-18 años)</td>
                   <td>Calculadora en modo grados o radianes</td>
                   <td>Navegación, arquitectura, física ondulatoria, GPS</td>
                 </tr>
@@ -703,7 +703,7 @@ export default function CalculadoraMatematicaPage() {
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioIcon} aria-hidden="true">🧒</span>
-                <h4>Estudiante de Primaria/ESO</h4>
+                <h4>Estudiante de primaria/secundaria</h4>
               </div>
               <p>Necesita resolver operaciones básicas y fracciones para exámenes y problemas cotidianos.</p>
               <div className={styles.escenarioExample}>
@@ -715,9 +715,9 @@ export default function CalculadoraMatematicaPage() {
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioIcon} aria-hidden="true">📐</span>
-                <h4>Estudiante de Bachillerato</h4>
+                <h4>Estudiante de preparatoria</h4>
               </div>
-              <p>Trabaja con funciones logarítmicas y exponenciales en matemáticas de 1º y 2º de bachillerato.</p>
+              <p>Trabaja con funciones logarítmicas y exponenciales en matemáticas de los últimos años de secundaria.</p>
               <div className={styles.escenarioExample}>
                 <strong>Ejemplo real:</strong> Resolver log₂(128) = 7 (porque 2⁷ = 128). También comprueba que ln(e³) = 3.
               </div>
