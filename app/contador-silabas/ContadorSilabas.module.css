@@ -741,6 +741,32 @@
   color: #fff;
 }
 
+.metroLibre {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.metroLibreLabel {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.metroLibreInput {
+  width: 56px;
+  padding: 5px 8px;
+  font-size: 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.metroLibreInput:focus-visible {
+  outline: 2px solid #2E86AB;
+  outline-offset: 1px;
+}
+
 .medidorVivo {
   margin-top: 12px;
   display: flex;

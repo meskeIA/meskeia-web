@@ -42,6 +42,9 @@ export default function ContadorSilabasPage() {
 
   // Modo composición: mide en vivo mientras se escribe, contra un metro elegido
   const [metroObjetivo, setMetroObjetivo] = useState<number | null>(null);
+  // Metro personalizado (letras de canciones: cualquier número de sílabas, no solo
+  // los cuatro versos clásicos). Vacío hasta que el usuario escribe algo.
+  const [metroPersonalizado, setMetroPersonalizado] = useState('');
 
   const analizar = () => {
     if (!texto.trim()) return;
@@ -226,16 +229,52 @@ sabañón garrafal, morado y frito.`,
                   type="button"
                   className={`${styles.ejemploBtn} ${metroObjetivo === m ? styles.ejemploBtnActivo : ''}`}
                   aria-pressed={metroObjetivo === m}
-                  onClick={() => setMetroObjetivo(metroObjetivo === m ? null : m)}
+                  onClick={() => {
+                    setMetroPersonalizado('');
+                    setMetroObjetivo(metroObjetivo === m ? null : m);
+                  }}
                 >
                   {nombreDelVerso(m)}
                 </button>
               ))}
+
+              {/* Metro personalizado: para letras de canciones, que no siempre encajan
+                  en los cuatro versos clásicos (endecasílabo, alejandrino...) */}
+              <form
+                className={styles.metroLibre}
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const n = Number(metroPersonalizado);
+                  if (Number.isInteger(n) && n >= 2 && n <= 20) setMetroObjetivo(n);
+                }}
+              >
+                <label htmlFor="metro-personalizado" className={styles.metroLibreLabel}>
+                  o fija tus sílabas:
+                </label>
+                <input
+                  id="metro-personalizado"
+                  type="number"
+                  min={2}
+                  max={20}
+                  inputMode="numeric"
+                  value={metroPersonalizado}
+                  onChange={(e) => setMetroPersonalizado(e.target.value)}
+                  placeholder="ej. 6"
+                  className={styles.metroLibreInput}
+                />
+                <button type="submit" className={styles.ejemploBtn}>
+                  Fijar
+                </button>
+              </form>
+
               {metroObjetivo !== null && (
                 <button
                   type="button"
                   className={styles.ejemploBtn}
-                  onClick={() => setMetroObjetivo(null)}
+                  onClick={() => {
+                    setMetroPersonalizado('');
+                    setMetroObjetivo(null);
+                  }}
                 >
                   Desactivar
                 </button>

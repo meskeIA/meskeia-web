@@ -3635,7 +3635,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/guia/accesibilidad/', icon: '♿', name: 'Guía de Accesibilidad', description: 'Kit completo de apoyos visuales en casa' },
     { url: '/lector-texto-voz/', icon: '🔊', name: 'Lector de Texto', description: 'Lee textos en voz alta' },
     { url: '/temporizador-visual/', icon: '⏱️', name: 'Temporizador Visual', description: 'Timer con círculo de colores' },
-    { url: '/semaforo-emocional/', icon: '🚦', name: 'Semáforo Emocional', description: 'Expresa tu estado emocional visualmente' },
+    { url: '/teclado-barrido-switch/', icon: '⌨️', name: 'Teclado de Barrido', description: 'Escribe con un único pulsador (switch)' },
   ],
   'ejercicios-vocalizacion': [
     rutinaHablaApp,
@@ -3650,6 +3650,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/amplificador-sonido/', icon: '🦻', name: 'Amplificador de Sonido', description: 'Micrófono y auriculares para oír mejor tu entorno' },
     { url: '/lector-texto-voz/', icon: '🔊', name: 'Lector de Texto a Voz', description: 'Convierte texto escrito en voz para practicar la lectura' },
     { url: '/tablero-comunicacion/', icon: '💬', name: 'Tablero Comunicación', description: 'Símbolos AAC con voz para la comunicación aumentativa' },
+  ],
+  'teclado-barrido-switch': [
+    { url: '/guia/accesibilidad/', icon: '♿', name: 'Guía de Accesibilidad', description: 'Kit completo de apoyos visuales en casa' },
+    { url: '/tablero-comunicacion/', icon: '💬', name: 'Tablero Comunicación', description: 'Símbolos AAC con voz para la comunicación aumentativa' },
+    { url: '/lector-texto-voz/', icon: '🔊', name: 'Lector de Texto a Voz', description: 'Lee cualquier texto en voz alta con resaltado' },
+    { url: '/lupa-digital/', icon: '🔍', name: 'Lupa Digital', description: 'Magnificación con cámara para baja visión' },
   ],
   'rutina-practica-habla': [
     { url: '/daf-retroalimentacion-auditiva/', icon: '🎧', name: 'DAF (Retardo Auditivo)', description: 'Oye tu voz con retardo para trabajar la fluidez' },

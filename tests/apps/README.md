@@ -1,9 +1,16 @@
-# Tests generados por el Inspector
+# Tests de apps
 
-Un fichero por app, `<slug>.spec.ts`, escrito por la skill `/inspector` al verificarla.
+Un fichero por app, `<slug>.spec.ts`. Dos orígenes posibles, y el encabezado de cada
+fichero dice cuál es el suyo:
 
-**Estos tests son el producto del Inspector, no un subproducto.** La segunda vuelta al
-catálogo no la hace el Inspector: la hacen estos tests, gratis y en cada build. El
+- **`/inspector`**, al verificar una app ya publicada (el caso más frecuente).
+- **`/nueva-app-meskeia` (PASO 4.bis)**, en apps con estado interactivo (temporizadores,
+  eventos de teclado, varias fases) escritas **antes del primer deploy** — aquí no hay
+  cálculo que verificar contra un valor a mano, sino transiciones de estado que un clic
+  manual no siempre delata (ver `teclado-barrido-switch.spec.ts` como ejemplo).
+
+**Estos tests son el producto, no un subproducto.** La segunda vuelta al catálogo no la
+hace una persona releyendo el código: la hacen estos tests, gratis y en cada build. El
 Inspector solo vuelve a una app cuando su código cambia, cuando su test se pone en rojo
 o cuando nunca se ha visto.
 

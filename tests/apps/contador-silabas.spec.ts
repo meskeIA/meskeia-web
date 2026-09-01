@@ -288,6 +288,27 @@ test.describe('contador-silabas', () => {
     await expect(page.locator('[class*="medidorFila"]')).toContainText('justo');
   });
 
+  test('TESTIGO · el metro personalizado mide contra cualquier número de sílabas, no solo los cuatro clásicos', async ({
+    page,
+  }) => {
+    // Añadido el 01/09/2026 (S0108): el modo composición solo ofrecía los cuatro versos
+    // clásicos (7/8/11/14), pero la propia app promociona "letras de canciones" como uso, y
+    // una frase musical puede necesitar cualquier número de sílabas. Verificado con Playwright
+    // antes de comprometer el cambio (PASO 4.bis de /nueva-app-meskeia).
+    await page.getByPlaceholder('ej. 6').fill('6');
+    await page.getByRole('button', { name: 'Fijar' }).click();
+
+    // El(1) cam-po(2) ver-de(2) = 5 fonéticas, última palabra llana → ±0. Objetivo 6: falta 1.
+    await page.fill('textarea', 'El campo verde');
+    await expect(page.locator('[class*="medidorFila"]')).toContainText('5/6');
+    await expect(page.locator('[class*="medidorFila"]')).toContainText('faltan 1');
+
+    // Puede refijarse a otro valor cualquiera, no solo la primera vez que se pulsa Fijar.
+    await page.getByPlaceholder('ej. 6').fill('9');
+    await page.getByRole('button', { name: 'Fijar' }).click();
+    await expect(page.locator('[class*="medidorFila"]')).toContainText('/9');
+  });
+
   // ---------------------------------------------------------------------------------------
   // REGRESIÓN — los ocho hallazgos de la primera inspección, reparados el 24/08/2026
   //

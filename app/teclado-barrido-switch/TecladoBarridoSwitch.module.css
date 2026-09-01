@@ -1,0 +1,340 @@
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Hero */
+.hero {
+  background: var(--hero-bg);
+  color: white;
+  padding: 35px 25px;
+  text-align: center;
+  border-radius: 16px;
+  margin-top: 80px;
+  margin-bottom: 25px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+/* Paneles genéricos */
+.panel {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 22px;
+  margin-bottom: 20px;
+}
+
+.panelTitle {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 14px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--border);
+}
+
+/* Ajustes (velocidad, switch, orden) */
+.ajustes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.ajusteGrupo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 180px;
+}
+
+.ajusteLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.ajusteValor {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.rangoVelocidad {
+  width: 100%;
+  accent-color: var(--primary);
+}
+
+.filaSwitch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.teclaActual {
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: var(--hover);
+  border: 1px solid var(--border);
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+.botonSecundario {
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.botonSecundario:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.botonSecundario:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.botonActivo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.botonActivo:hover {
+  background: var(--primary-hover);
+  color: #fff;
+}
+
+.capturandoAviso {
+  font-size: 0.8rem;
+  color: var(--warning);
+  margin: 0;
+}
+
+/* Control principal: iniciar/pausar + botón switch grande */
+.control {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.botonIniciar {
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  background: var(--secondary);
+  color: white;
+  cursor: pointer;
+}
+
+.botonIniciar:focus-visible {
+  outline: 2px solid var(--secondary);
+  outline-offset: 2px;
+}
+
+.botonSwitch {
+  flex: 1;
+  min-width: 200px;
+  padding: 22px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  border: 3px solid var(--primary);
+  border-radius: 14px;
+  background: var(--bg-card);
+  color: var(--primary);
+  cursor: pointer;
+}
+
+.botonSwitch:hover {
+  background: var(--focus);
+}
+
+.botonSwitch:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+
+.botonSwitch:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.estado {
+  margin: 12px 0 0 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  min-height: 1.2em;
+}
+
+/* Teclado */
+.teclado {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fila {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  border-radius: 10px;
+  padding: 4px;
+  transition: background-color 0.15s;
+}
+
+.filaResaltada {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+.tecla {
+  padding: 14px 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: center;
+}
+
+.tecla:hover {
+  border-color: var(--primary);
+}
+
+.tecla:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.teclaResaltada {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.teclaAncha {
+  grid-column: span 2;
+}
+
+/* Salida de texto */
+.salidaTexto {
+  width: 100%;
+  min-height: 70px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  resize: vertical;
+}
+
+.accionesSalida {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.aviso {
+  font-size: 0.85rem;
+  color: var(--secondary);
+  margin-top: 8px;
+}
+
+/* Caja de advertencia (bloque educativo) */
+.warningBox {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-top: 20px;
+  display: flex;
+  gap: 14px;
+}
+
+.warningIcono {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.warningBox strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.warningBox ul {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.warningBox li {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(245, 158, 11, 0.06);
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .hero {
+    margin-top: 60px;
+    padding: 25px 18px;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .fila {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .teclaAncha {
+    grid-column: span 4;
+  }
+
+  .tecla {
+    padding: 12px 2px;
+    font-size: 0.9rem;
+  }
+
+  .warningBox {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
