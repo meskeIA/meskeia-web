@@ -3202,7 +3202,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'identificador-color-camara': [
     { url: '/lupa-digital/', icon: '🔍', name: 'Lupa Digital', description: 'La misma cámara para ampliar texto y objetos hasta 5x' },
     { url: '/simulador-daltonismo/', icon: '🌈', name: 'Simulador de Daltonismo', description: 'Cómo se percibe una imagen con distintos tipos de daltonismo' },
-    { url: '/conversor-colores/', icon: '🎨', name: 'Conversor de Colores', description: 'Convierte el HEX que captas entre RGB, HSL, CMYK y paletas' },
+    { url: '/conversor-colores/', icon: '🎨', name: 'Conversor de Colores', description: 'Convierte el HEX que captas a RGB, HSL y CMYK, y descárgalo como imagen' },
     { url: '/contraste-colores/', icon: '🌗', name: 'Contraste de Colores', description: 'Comprueba si dos colores cumplen contraste accesible WCAG' },
   ],
   'espejo': [{ url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/lupa-digital/', icon: '🔍', name: 'Lupa Digital', description: 'Amplía con la cámara' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir luz ambiente' }],

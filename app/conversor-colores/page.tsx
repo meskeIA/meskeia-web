@@ -1,12 +1,19 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import styles from './ConversorColores.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, EducationalSection, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import {
+  buscarColores,
+  colorPorHex,
+  nombreDeColor,
+  FAMILIAS_COLOR,
+  type FamiliaColor,
+} from '@/data/colores-nombrados';
 
 interface ColorValues {
   hex: string;
@@ -104,16 +111,55 @@ function cmykToRgb(c: number, m: number, y: number, k: number): { r: number; g: 
   };
 }
 
-function getColorName(hex: string): string {
-  const colors: Record<string, string> = {
-    '#FF0000': 'Rojo', '#00FF00': 'Verde', '#0000FF': 'Azul',
-    '#FFFF00': 'Amarillo', '#FF00FF': 'Magenta', '#00FFFF': 'Cian',
-    '#FFFFFF': 'Blanco', '#000000': 'Negro', '#808080': 'Gris',
-    '#FFA500': 'Naranja', '#800080': 'Púrpura', '#FFC0CB': 'Rosa',
-    '#A52A2A': 'Marrón', '#2E86AB': 'Azul meskeIA', '#48A9A6': 'Teal meskeIA',
-  };
-  return colors[hex.toUpperCase()] || 'Color personalizado';
+/**
+ * Nombre del color, con dos respuestas que NO significan lo mismo:
+ *  - `exacto` → el HEX está en la tabla y ese es su nombre.
+ *  - aproximado → es el color con nombre más parecido, y la interfaz lo dice así.
+ *
+ * Hasta el 02/09/2026 esto era un diccionario de 14 HEX con coincidencia exacta: bastaba
+ * mover un slider un punto para que el rótulo dijera «Color personalizado» y dejara de
+ * informar. Solo acertaba con el color de arranque, que es justo el caso en el que nadie
+ * necesita que se lo nombren.
+ */
+function describirColor(hex: string): { nombre: string; exacto: boolean } {
+  const enTabla = colorPorHex(hex);
+  if (enTabla) return { nombre: enTabla.nombre, exacto: true };
+  const rgb = hexToRgb(hex);
+  if (!rgb) return { nombre: 'Color personalizado', exacto: false };
+  return { nombre: nombreDeColor(rgb.r, rgb.g, rgb.b), exacto: false };
 }
+
+/**
+ * Blanco o negro, el que más contraste dé sobre ese fondo. Luminancia relativa de la
+ * WCAG, no un umbral inventado: hay muestras muy claras (Marfil, Crema) y muy oscuras
+ * (Azul Prusia, Negro) en la misma parrilla.
+ */
+function textoLegibleSobre(hex: string): string {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return '#000000';
+  const canal = (v: number) => {
+    const s = v / 255;
+    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  };
+  const luminancia = 0.2126 * canal(rgb.r) + 0.7152 * canal(rgb.g) + 0.0722 * canal(rgb.b);
+  const contrasteConBlanco = 1.05 / (luminancia + 0.05);
+  const contrasteConNegro = (luminancia + 0.05) / 0.05;
+  return contrasteConBlanco >= contrasteConNegro ? '#FFFFFF' : '#000000';
+}
+
+/** Tamaños de descarga. El lado máximo (4096) es el límite seguro de lienzo en móviles. */
+const LADO_MAXIMO = 4096;
+const LADO_MINIMO = 16;
+
+const TAMANOS_DESCARGA = [
+  { id: 'fullhd', etiqueta: 'Full HD', detalle: '1920 × 1080', ancho: 1920, alto: 1080 },
+  { id: '4k', etiqueta: '4K', detalle: '3840 × 2160', ancho: 3840, alto: 2160 },
+  { id: 'movil', etiqueta: 'Móvil', detalle: '1080 × 1920', ancho: 1080, alto: 1920 },
+  { id: 'cuadrado', etiqueta: 'Cuadrado', detalle: '1080 × 1080', ancho: 1080, alto: 1080 },
+  { id: 'personalizado', etiqueta: 'A medida', detalle: 'tú eliges', ancho: 0, alto: 0 },
+] as const;
+
+type IdTamano = (typeof TAMANOS_DESCARGA)[number]['id'];
 
 export default function ConvertidorColoresPage() {
   const [color, setColor] = useState<ColorValues>({
@@ -129,6 +175,17 @@ export default function ConvertidorColoresPage() {
   // Estados para código HTML
   const [htmlCode, setHtmlCode] = useState<string>('');
   const [htmlExpanded, setHtmlExpanded] = useState(false);
+
+  // Elegir el color por su nombre
+  const [busqueda, setBusqueda] = useState('');
+  const [familia, setFamilia] = useState<FamiliaColor | 'todas'>('todas');
+
+  // Descarga del color como imagen
+  const [tamano, setTamano] = useState<IdTamano>('fullhd');
+  const [anchoLibre, setAnchoLibre] = useState(1920);
+  const [altoLibre, setAltoLibre] = useState(1080);
+  const [formato, setFormato] = useState<'png' | 'jpeg'>('png');
+  const [avisoDescarga, setAvisoDescarga] = useState<string | null>(null);
 
   const updateFromHex = useCallback((hex: string) => {
     const rgb = hexToRgb(hex);
@@ -182,6 +239,74 @@ export default function ConvertidorColoresPage() {
     setTimeout(() => setCopiedField(null), 1500);
   };
 
+  // Elegir por nombre ─────────────────────────────────────────────────────────
+  const descripcion = describirColor(color.hex);
+  const coloresVisibles = useMemo(() => buscarColores(busqueda, familia), [busqueda, familia]);
+
+  const elegirPorNombre = useCallback(
+    (hex: string) => {
+      setHexInput(hex);
+      updateFromHex(hex);
+    },
+    [updateFromHex],
+  );
+
+  // Descarga como imagen ──────────────────────────────────────────────────────
+  const dimensiones = useMemo(() => {
+    const acotar = (v: number) =>
+      Number.isFinite(v) ? Math.min(LADO_MAXIMO, Math.max(LADO_MINIMO, Math.round(v))) : LADO_MINIMO;
+    if (tamano === 'personalizado') {
+      return { ancho: acotar(anchoLibre), alto: acotar(altoLibre) };
+    }
+    const preset = TAMANOS_DESCARGA.find((t) => t.id === tamano)!;
+    return { ancho: preset.ancho, alto: preset.alto };
+  }, [tamano, anchoLibre, altoLibre]);
+
+  /**
+   * El nombre del fichero lleva el HEX FINAL, no el nombre del color que se eligiera al
+   * entrar: si alguien elige «Verde oliva» y luego mueve los sliders, un
+   * `fondo-verde-oliva.png` que ya no es verde oliva engaña más que no poner nombre.
+   * Además, un rectángulo de color sin el código en el nombre es irrecuperable a la semana.
+   */
+  const nombreFichero = `color-${color.hex.slice(1)}-${dimensiones.ancho}x${dimensiones.alto}.${formato}`;
+
+  const descargarImagen = useCallback(() => {
+    setAvisoDescarga(null);
+    const { ancho, alto } = dimensiones;
+    const lienzo = document.createElement('canvas');
+    lienzo.width = ancho;
+    lienzo.height = alto;
+    const ctx = lienzo.getContext('2d');
+    if (!ctx) {
+      setAvisoDescarga('Tu navegador no ha podido generar la imagen.');
+      return;
+    }
+    ctx.fillStyle = color.hex;
+    ctx.fillRect(0, 0, ancho, alto);
+
+    // JPEG a calidad máxima: aun así remuestrea el croma, por eso el formato por defecto
+    // es PNG. Ver la nota que la interfaz muestra junto al selector de formato.
+    lienzo.toBlob(
+      (blob) => {
+        if (!blob) {
+          setAvisoDescarga('Tu navegador no ha podido generar la imagen.');
+          return;
+        }
+        const url = URL.createObjectURL(blob);
+        const enlace = document.createElement('a');
+        enlace.href = url;
+        enlace.download = nombreFichero;
+        document.body.appendChild(enlace);
+        enlace.click();
+        enlace.remove();
+        // Se libera con margen: revocar de inmediato aborta la descarga en algunos navegadores.
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+      },
+      formato === 'png' ? 'image/png' : 'image/jpeg',
+      formato === 'jpeg' ? 1 : undefined,
+    );
+  }, [color.hex, dimensiones, formato, nombreFichero]);
+
   const formatRgb = `rgb(${color.rgb.r}, ${color.rgb.g}, ${color.rgb.b})`;
   const formatHsl = `hsl(${color.hsl.h}, ${color.hsl.s}%, ${color.hsl.l}%)`;
   const formatCmyk = `cmyk(${color.cmyk.c}%, ${color.cmyk.m}%, ${color.cmyk.y}%, ${color.cmyk.k}%)`;
@@ -193,7 +318,7 @@ export default function ConvertidorColoresPage() {
     codigo += '<div class="color-swatch">\n';
     codigo += '  <div class="color-preview" style="background-color: ' + color.hex + ';"></div>\n';
     codigo += '  <div class="color-info">\n';
-    codigo += '    <h4>' + getColorName(color.hex) + '</h4>\n';
+    codigo += '    <h4>' + describirColor(color.hex).nombre + '</h4>\n';
     codigo += '    <div class="color-values">\n';
     codigo += '      <span><strong>HEX:</strong> ' + color.hex + '</span>\n';
     codigo += '      <span><strong>RGB:</strong> ' + formatRgb + '</span>\n';
@@ -273,7 +398,10 @@ export default function ConvertidorColoresPage() {
           </div>
 
           <div className={styles.colorInfo}>
-            <span className={styles.colorName}>{getColorName(color.hex)}</span>
+            {!descripcion.exacto && (
+              <span className={styles.colorNameAprox}>lo más parecido a</span>
+            )}
+            <span className={styles.colorName}>{descripcion.nombre}</span>
           </div>
 
           <div className={styles.hexInputGroup}>
@@ -293,6 +421,72 @@ export default function ConvertidorColoresPage() {
             >
               {copiedField === 'hex' ? '✓' : '📋'}
             </button>
+          </div>
+
+          {/* Elegir el color por su nombre */}
+          <div className={styles.nombresBloque}>
+            <h3 className={styles.nombresTitulo}>Elegir por nombre</h3>
+            <input
+              type="search"
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              className={styles.nombresBuscador}
+              placeholder="ocre, lapislázuli, verde oliva…"
+              aria-label="Buscar un color por su nombre"
+              aria-describedby="nombres-resultado"
+            />
+
+            <div className={styles.nombresFiltros} role="group" aria-label="Filtrar por familia de color">
+              <button
+                type="button"
+                onClick={() => setFamilia('todas')}
+                aria-pressed={familia === 'todas'}
+                className={`${styles.nombresChip} ${familia === 'todas' ? styles.nombresChipActivo : ''}`}
+              >
+                Todas
+              </button>
+              {FAMILIAS_COLOR.map((f) => (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => setFamilia(f.id)}
+                  aria-pressed={familia === f.id}
+                  className={`${styles.nombresChip} ${familia === f.id ? styles.nombresChipActivo : ''}`}
+                >
+                  {f.etiqueta}
+                </button>
+              ))}
+            </div>
+
+            <p id="nombres-resultado" className={styles.nombresConteo} role="status" aria-live="polite">
+              {coloresVisibles.length === 0
+                ? 'Ningún color con ese nombre. Prueba con «verde», «azul» o borra el filtro.'
+                : `${coloresVisibles.length} ${coloresVisibles.length === 1 ? 'color' : 'colores'}`}
+            </p>
+
+            <div className={styles.nombresGrid}>
+              {coloresVisibles.map((c) => (
+                <button
+                  key={c.hex}
+                  type="button"
+                  onClick={() => elegirPorNombre(c.hex)}
+                  aria-pressed={color.hex === c.hex}
+                  className={`${styles.nombresMuestra} ${color.hex === c.hex ? styles.nombresMuestraActiva : ''}`}
+                  style={{ backgroundColor: c.hex, color: textoLegibleSobre(c.hex) }}
+                  aria-label={`${c.nombre}, ${c.hex}${c.nota ? `. ${c.nota}` : ''}`}
+                  title={c.nota ? `${c.nombre} · ${c.hex} — ${c.nota}` : `${c.nombre} · ${c.hex}`}
+                >
+                  <span className={styles.nombresMuestraTexto}>{c.nombre}</span>
+                </button>
+              ))}
+            </div>
+
+            <p className={styles.nombresNota}>
+              Los nombres de pigmento y de uso común (ocre, lapislázuli, terracota…) no tienen un
+              código oficial único: el valor que se ofrece es el convencional, y cada muestra lo
+              indica al posar el cursor. No se incluyen nombres de carta comercial de pintura
+              porque cada fabricante los mezcla distinto.
+            </p>
           </div>
         </div>
 
@@ -517,6 +711,133 @@ export default function ConvertidorColoresPage() {
           </div>
         </div>
       </div>
+
+      {/* Descargar el color como imagen */}
+      <section className={styles.descargaSection} aria-labelledby="descarga-titulo">
+        <div className={styles.descargaHeader}>
+          <div>
+            <h2 id="descarga-titulo">
+              <span aria-hidden="true">🖼️</span> Descargar el color como imagen
+            </h2>
+            <p className={styles.descargaSubtitulo}>
+              Un archivo de color plano, listo para usar como fondo de pantalla, fondo de una
+              diapositiva o base de un diseño. Se genera en tu navegador: el color no se envía a
+              ningún servidor.
+            </p>
+          </div>
+          <div
+            className={styles.descargaMuestra}
+            style={{ backgroundColor: color.hex }}
+            aria-hidden="true"
+          />
+        </div>
+
+        <div className={styles.descargaControles}>
+          <fieldset className={styles.descargaGrupo}>
+            <legend className={styles.descargaLeyenda}>Tamaño</legend>
+            <div className={styles.descargaOpciones}>
+              {TAMANOS_DESCARGA.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => setTamano(t.id)}
+                  aria-pressed={tamano === t.id}
+                  className={`${styles.descargaOpcion} ${tamano === t.id ? styles.descargaOpcionActiva : ''}`}
+                >
+                  <span className={styles.descargaOpcionEtiqueta}>{t.etiqueta}</span>
+                  <span className={styles.descargaOpcionDetalle}>{t.detalle}</span>
+                </button>
+              ))}
+            </div>
+
+            {tamano === 'personalizado' && (
+              <div className={styles.descargaMedida}>
+                <label htmlFor="ancho-libre">Ancho</label>
+                <input
+                  id="ancho-libre"
+                  type="number"
+                  min={LADO_MINIMO}
+                  max={LADO_MAXIMO}
+                  value={anchoLibre}
+                  onChange={(e) => setAnchoLibre(Number(e.target.value))}
+                  className={styles.valueInput}
+                />
+                <span aria-hidden="true">×</span>
+                <label htmlFor="alto-libre">Alto</label>
+                <input
+                  id="alto-libre"
+                  type="number"
+                  min={LADO_MINIMO}
+                  max={LADO_MAXIMO}
+                  value={altoLibre}
+                  onChange={(e) => setAltoLibre(Number(e.target.value))}
+                  className={styles.valueInput}
+                />
+                <span className={styles.descargaMedidaNota}>
+                  píxeles, entre {LADO_MINIMO} y {LADO_MAXIMO}
+                </span>
+              </div>
+            )}
+          </fieldset>
+
+          <fieldset className={styles.descargaGrupo}>
+            <legend className={styles.descargaLeyenda}>Formato</legend>
+            <div className={styles.descargaOpciones}>
+              <button
+                type="button"
+                onClick={() => setFormato('png')}
+                aria-pressed={formato === 'png'}
+                className={`${styles.descargaOpcion} ${formato === 'png' ? styles.descargaOpcionActiva : ''}`}
+              >
+                <span className={styles.descargaOpcionEtiqueta}>PNG</span>
+                <span className={styles.descargaOpcionDetalle}>color exacto</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setFormato('jpeg')}
+                aria-pressed={formato === 'jpeg'}
+                className={`${styles.descargaOpcion} ${formato === 'jpeg' ? styles.descargaOpcionActiva : ''}`}
+              >
+                <span className={styles.descargaOpcionEtiqueta}>JPEG</span>
+                <span className={styles.descargaOpcionDetalle}>máxima compatibilidad</span>
+              </button>
+            </div>
+            <p className={styles.descargaAvisoFormato}>
+              {formato === 'png' ? (
+                <>
+                  PNG conserva el color <strong>exacto</strong> y, al ser un color plano, ocupa unos
+                  pocos KB aunque pidas 4K.
+                </>
+              ) : (
+                <>
+                  <span aria-hidden="true">⚠️</span> JPEG comprime por bloques y remuestrea el color
+                  aunque se genere a calidad máxima: el píxel del archivo{' '}
+                  <strong>ya no será exactamente {color.hex}</strong>. Para un fondo se nota poco,
+                  pero si necesitas el código fiel, usa PNG.
+                </>
+              )}
+            </p>
+          </fieldset>
+        </div>
+
+        <div className={styles.descargaAccion}>
+          <button type="button" onClick={descargarImagen} className={styles.descargaBoton}>
+            <span aria-hidden="true">⬇️</span> Descargar {dimensiones.ancho} × {dimensiones.alto}
+          </button>
+          <p className={styles.descargaNombreFichero}>
+            Se guardará como <code>{nombreFichero}</code>
+            <span className={styles.descargaNombreNota}>
+              — el código va en el nombre para que puedas reconocer el archivo después.
+            </span>
+          </p>
+        </div>
+
+        {avisoDescarga && (
+          <p className={styles.descargaError} role="alert">
+            {avisoDescarga}
+          </p>
+        )}
+      </section>
 
       {/* Código HTML de implementación - Colapsable */}
       {htmlCode && (

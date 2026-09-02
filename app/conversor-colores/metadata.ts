@@ -3,8 +3,8 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Convertidor de Colores - HEX, RGB, HSL, CMYK | meskeIA',
-  description: 'Convierte colores entre HEX, RGB, HSL y CMYK al instante. Color picker visual, paletas automáticas y análisis de color para diseñadores web.',
-  keywords: 'convertidor colores, HEX RGB, RGB HSL, color picker, CMYK, conversión colores, diseño web',
+  description: 'Convierte colores entre HEX, RGB, HSL y CMYK al instante. Elige el color por su nombre (ocre, lapislázuli, verde oliva) y descárgalo como imagen PNG o JPEG para usarlo de fondo.',
+  keywords: 'convertidor colores, HEX RGB, RGB HSL, color picker, CMYK, conversión colores, diseño web, descargar color en png, fondo de color liso, nombres de colores en español',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Convertidor de Colores - meskeIA',
-    description: 'Convierte colores entre HEX, RGB, HSL y CMYK al instante',
+    description: 'Convierte entre HEX, RGB, HSL y CMYK, elige el color por su nombre y descárgalo como imagen',
     url: 'https://meskeia.com/conversor-colores/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -27,17 +27,18 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Convertidor de Colores - HEX, RGB, HSL, CMYK",
-  description: "Convierte colores entre HEX, RGB, HSL y CMYK al instante. Color picker visual, paletas automáticas y análisis de color para diseñadores web.",
+  description: "Convierte colores entre HEX, RGB, HSL y CMYK al instante. Elige el color por su nombre en español y descárgalo como imagen PNG o JPEG para usarlo de fondo de pantalla o de diapositiva.",
   url: 'https://meskeia.com/conversor-colores/',
   category: 'UtilityApplication',
   features: [
     'Conversión instantánea entre HEX, RGB, HSL y CMYK con actualización en tiempo real',
     'Color picker visual integrado para seleccionar cualquier color con el ratón o en pantalla táctil',
     'Sliders interactivos para ajustar canales RGB, tono/saturación/luminosidad HSL y CMYK',
-    'Generación de paleta armónica: complementarios, análogos y triádicos desde el color base',
+    'Buscador de 71 colores con nombre en español, incluidos pigmentos como ocre, lapislázuli, siena tostada o púrpura de Tiro',
+    'Descarga del color como imagen de color plano en PNG o JPEG, en Full HD, 4K, vertical de móvil, cuadrado o a medida',
+    'Nombre del color siempre informado: el exacto si está en la tabla, y el más parecido por distancia perceptual si no',
     'Exportación de código HTML/CSS listo para copiar y pegar en proyectos web',
-    'Vista previa en tiempo real del color resultante con nombre aproximado',
-    'Soporte de entrada directa en HEX con validación automática del formato',
+    'Todo el procesamiento ocurre en el navegador: ningún color ni imagen se envía a un servidor',
   ],
 });
 
@@ -79,10 +80,18 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Es posible encontrar colores similares o generar paletas a partir de un color base?',
+      name: '¿Cómo descargo una imagen de un solo color para usarla de fondo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'A partir de un color base es posible generar paletas armónicas usando relaciones como complementarios (tono opuesto en el círculo cromático), análogos (tonos adyacentes) o triádicos. Esta herramienta muestra sugerencias de paleta automáticas junto a la conversión, útiles para construir identidades visuales coherentes.',
+        text: 'Elige el color y descárgalo como archivo de color plano en el tamaño que necesites: Full HD (1920×1080), 4K (3840×2160), vertical de móvil (1080×1920), cuadrado o a medida. Conviene usar PNG y no JPEG: un color plano en PNG ocupa unos pocos KB aunque sea 4K y conserva el valor exacto, mientras que JPEG comprime por bloques y altera ligeramente el color, de modo que el píxel del archivo ya no coincide con el código elegido.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es el código HEX del ocre, el lapislázuli o el verde oliva?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El ocre se representa convencionalmente como #CC7722, el azul lapislázuli como #26619C y el verde oliva como #808000. Son valores convencionales, no oficiales: los pigmentos históricos y los nombres de uso común no tienen un código único, y cada fuente los fija de forma algo distinta. Por eso conviene tomarlos como punto de partida y ajustar después el tono a lo que necesite el proyecto.',
       },
     },
   ],
