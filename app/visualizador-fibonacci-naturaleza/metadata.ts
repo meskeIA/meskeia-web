@@ -54,7 +54,7 @@ export const faqJsonLd = {
       name: '¿Qué es la secuencia de Fibonacci?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La secuencia de Fibonacci es una serie numérica en la que cada término es la suma de los dos anteriores: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34… Fue descrita por el matemático italiano Leonardo de Pisa (Fibonacci) en el siglo XIII. Al dividir un término entre el anterior, la razón se aproxima cada vez más a φ (phi) = 1,618…, conocido como número o proporción áurea.',
+        text: 'La secuencia de Fibonacci es una serie numérica en la que cada término es la suma de los dos anteriores: 1, 1, 2, 3, 5, 8, 13, 21, 34… Fue descrita por el matemático italiano Leonardo de Pisa (Fibonacci) en el siglo XIII. Al dividir un término entre el anterior, la razón se aproxima cada vez más a φ (phi) = 1,618…, conocido como número o proporción áurea.',
       },
     },
     {

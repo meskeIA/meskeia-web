@@ -31,31 +31,30 @@ import { test, expect, Page, Locator } from '@playwright/test';
  *
  *   CASO 2 (límite — σ muy pequeña tras haber fijado a/b para una σ mayor) — se reduce σ de 1
  *     a su mínimo (0,1) SIN tocar a/b (que quedan en −1 y 1, es decir ±10σ de la nueva σ).
- *     Resuelto a mano: z(a) = (−1−0)/0,1 = −10 · z(b) = (1−0)/0,1 = 10.
- *       P(−10<Z<10) ≈ Φ(10)−Φ(−10) ≈ 1 (para z≥4, Φ(z) ya está a varios nueves de 1) → ≈100,00%
- *     Esta aritmética SALE correcta y coincide con lo que muestra la app: el hallazgo no está
- *     en el número. Está en que el propio <input type="range"> de "a" recalcula su min/max a
- *     partir de la nueva σ (ahora [−0,45, 0,45]) y el navegador clampa su valor DOM a −0,45,
- *     mientras el estado de React —y por tanto la etiqueta y el cálculo— se queda anclado en
- *     −1, un valor que ya ni cabe en el rango visible del propio slider. El pomo queda pegado
- *     al borde izquierdo mientras la etiqueta de encima sigue diciendo "-1,00". Un solo toque
- *     de teclado (flecha derecha) sobre ese slider desincronizado hace que "a" salte de −1,000
- *     a −0,446 de golpe —más de 5σ en una sola pulsación—, porque el navegador retoma como
- *     punto de partida el valor DOM clampado (−0,45), no el −1 que el panel mostraba.
+ *     El rango de los sliders a/b se recalcula a [−0,45, 0,45] (σ·4,5). Tras la reparación del
+ *     hallazgo 574 (02/09/2026), un `useEffect` reclampa a/b al nuevo rango en cuanto cambia,
+ *     así que a y b pasan de −1/1 a −0,45/0,45 — YA NO se quedan ancladas fuera del recorrido.
+ *       z(a) = (−0,45−0)/0,1 = −4,500 · z(b) = (0,45−0)/0,1 = 4,500
+ *       P(−4,5<Z<4,5) = 0,999993… → redondea a 100,00 % / decimal 1,0000 (para z≥4, Φ(z) ya
+ *       está a varios nueves de 1, así que el redondeo a 2/4 decimales no distingue este caso
+ *       del ±10σ que daba la versión rota).
+ *     Consecuencia observable: la etiqueta de "a" y el valor DOM del slider ya coinciden
+ *     (−0,45 los dos), así que una flecha de teclado avanza un solo paso —(0,45−(−0,45))/200 =
+ *     0,0045— en vez de saltar más de 5σ de golpe.
  *
  *   CASO 3 (rechazo) — intentar fijar σ = 0 o σ negativa
  *     La normal exige σ > 0. El slider declara min="0.1": escribir "0" o "-5" directamente en
  *     el <input type="range"> debe clampar al mínimo (0,1), nunca aceptar el valor inválido.
  * ─────────────────────────────────────────────────────────────────────────────────────────
- * HALLAZGOS
- *
- *   1 [operativa/medio] Al reducir σ después de haber fijado a/b para una σ mayor, el slider
- *     de "a" (o "b") se desincroniza: su posición visual queda clampada al nuevo extremo del
- *     recorrido mientras React sigue usando —y mostrando en la etiqueta— el valor anterior,
- *     que ya no cabe en ese recorrido. La siguiente interacción con ese slider (incluida una
- *     sola flecha de teclado) provoca entonces un salto brusco e inesperado en a/b, en lugar
- *     de un cambio gradual de un paso. Reproducible con cualquier σ ordinaria + arrastre hacia
- *     abajo, no requiere ninguna combinación rebuscada. Ver CASO 2.
+ * ── Reparado 02/09/2026 (hallazgo 574) ───────────────────────────────────────────────────
+ *   Antes: al reducir σ después de haber fijado a/b para una σ mayor, el slider de "a" (o "b")
+ *   se desincronizaba — el navegador clampaba su valor DOM al nuevo extremo del recorrido
+ *   mientras React seguía mostrando el valor anterior, que ya no cabía en ese recorrido. La
+ *   siguiente interacción (incluida una sola flecha de teclado) producía entonces un salto
+ *   brusco en a/b, en vez de un cambio gradual de un paso.
+ *   Ahora: un `useEffect` que depende de `rango` (a su vez de `mu`/`sigma`) reclampa `a` y `b`
+ *   al nuevo `[rango.xMin, rango.xMax]` en cuanto el rango cambia, así que el estado de React
+ *   nunca queda por detrás de lo que el propio slider puede mostrar. Ver CASO 2.
  * ─────────────────────────────────────────────────────────────────────────────────────────
  */
 
@@ -109,30 +108,32 @@ test.describe('CASO 1 (normal) — estado por defecto, N(0,1), P(−1<X<1)', () 
   });
 });
 
-test.describe('CASO 2 (límite) — σ muy pequeña con a/b heredados de una σ mayor', () => {
-  test('la aritmética sigue siendo correcta (≈100 %, z=±10) pero el slider "a" se desincroniza del estado', async ({
+test.describe('CASO 2 (límite, reparado) — σ muy pequeña con a/b heredados de una σ mayor', () => {
+  test('a/b se reclampan al nuevo rango: el slider "a" y el estado de React quedan sincronizados', async ({
     page,
   }) => {
-    // Reduce σ de 1 a su mínimo (0,1) sin tocar a (-1) ni b (1).
+    // Reduce σ de 1 a su mínimo (0,1) sin tocar a (-1) ni b (1) directamente.
     await mover(sigmaInput(page), 0.1);
 
-    // La aritmética, dado a=-1, b=1, sigma=0.1, sigue siendo correcta: z=±10, P≈100%.
-    await expect(probValueLarge(page)).toHaveText('100,00 %');
-    await expect(probDecimal(page)).toHaveText('= 1,0000');
-    await expect(valorZ(page, 'Z(a)')).toHaveText('-10,000');
-    await expect(valorZ(page, 'Z(b)')).toHaveText('10,000');
-
-    // HALLAZGO: el propio <input> de "a" ha clampado su valor DOM al nuevo mínimo del
-    // recorrido (-0,45), pero la etiqueta de arriba (calculada desde el estado de React)
-    // sigue diciendo "-1,00" — un valor que ya no cabe en el propio slider.
+    // REPARADO (574): el useEffect reclampa a/b al nuevo rango [-0,45, 0,45] — ya no
+    // se quedan ancladas en -1/1, fuera del recorrido visible del slider.
     await expect(aInput(page)).toHaveAttribute('min', '-0.45');
     await expect(aInput(page)).toHaveValue('-0.45');
-    await expect(probLabel(page)).toContainText('-1,00');
+    await expect(probLabel(page)).toContainText('-0,45');
+    await expect(probLabel(page)).not.toContainText('-1,00');
 
-    // Consecuencia: un solo toque de teclado sobre ese slider desincronizado provoca un salto
-    // de más de 5σ (-1,000 → -0,446), no un cambio gradual de un paso.
+    // z(a)=-4,500 y z(b)=4,500 (antes ±10): la probabilidad sigue redondeando a 100,00 %/1,0000,
+    // porque para z≥4 la cola ya está a varios nueves de 1.
+    await expect(probValueLarge(page)).toHaveText('100,00 %');
+    await expect(probDecimal(page)).toHaveText('= 1,0000');
+    await expect(valorZ(page, 'Z(a)')).toHaveText('-4,500');
+    await expect(valorZ(page, 'Z(b)')).toHaveText('4,500');
+
+    // Consecuencia: una flecha de teclado ahora avanza UN SOLO paso del slider
+    // ((0,45-(-0,45))/200 = 0,0045), no un salto de más de 5σ de golpe.
     await aInput(page).focus();
     await aInput(page).press('ArrowRight');
+    await expect(aInput(page)).toHaveValue('-0.4455');
     await expect(valorZ(page, 'Z(a)')).toHaveText('-4,455');
     await expect(probLabel(page)).toContainText('-0,446');
   });

@@ -58,14 +58,14 @@ import { test, expect, Page } from '@playwright/test';
  * (true solo en la sección activa); todos los emojis junto a texto llevan
  * aria-hidden="true".
  *
- * ÚNICO HALLAZGO (contenido/bajo) — el FAQPage de metadata.ts (lo que leen Bing
- * Copilot, ChatGPT o Perplexity) describe la secuencia con la definición matemática
- * ESTÁNDAR («0, 1, 1, 2, 3, 5, 8, 13, 21, 34…», con el término F(0)=0), mientras que
- * la app real NUNCA muestra un 0: ni en el subtítulo («1, 1, 2, 3, 5, 8, 13...») ni en
- * ningún término de la secuencia interactiva (F1=1, F2=1, ...). No afecta a ningún
- * cálculo ni veredicto — es solo una diferencia de convención entre lo que cuenta el
- * FAQ y lo que la propia herramienta enseña. Test que documenta el estado actual más
- * abajo.
+ * ── Reparado 02/09/2026 (hallazgo 573) ────────────────────────────────────────────
+ * El FAQPage de metadata.ts (lo que leen Bing Copilot, ChatGPT o Perplexity) describía
+ * la secuencia con la definición matemática ESTÁNDAR («0, 1, 1, 2, 3, 5, 8, 13, 21,
+ * 34…», con el término F(0)=0), mientras que la app real NUNCA muestra un 0: ni en el
+ * subtítulo («1, 1, 2, 3, 5, 8, 13...») ni en ningún término de la secuencia
+ * interactiva (F1=1, F2=1, ...). No afectaba a ningún cálculo ni veredicto — era solo
+ * una diferencia de convención entre el FAQ y la propia herramienta. Ahora el FAQ
+ * también empieza en «1, 1, 2, 3, 5, 8, 13, 21, 34…», sin el 0.
  */
 
 const RUTA = '/visualizador-fibonacci-naturaleza/';
@@ -219,15 +219,13 @@ test.describe('Accesibilidad básica (CLAUDE.md global §5)', () => {
 
 // ───────────────────────────────────────────────────────────────────────────────
 /**
- * Hallazgo (contenido/bajo) — el FAQPage (JSON-LD) describe la secuencia con la
- * definición matemática estándar, que incluye el término F(0)=0. La app real
- * (subtítulo y secuencia interactiva) usa la convención F1=F2=1 y NUNCA muestra un
- * 0. No afecta a ningún cálculo: es solo una diferencia de qué convención se cuenta
- * en cada sitio. Este test documenta el estado ACTUAL; si se alinea el FAQ con la
- * convención de la app (o viceversa), el primer expect empezará a fallar, que será
- * la señal de que el hallazgo se reparó.
+ * Hallazgo 573 (reparado 02/09/2026) — el FAQPage (JSON-LD) describía la secuencia
+ * con la definición matemática estándar, que incluye el término F(0)=0, mientras que
+ * la app real (subtítulo y secuencia interactiva) usa la convención F1=F2=1 y NUNCA
+ * muestra un 0. Ahora el FAQ también empieza en 1, 1 — la misma convención que enseña
+ * la propia herramienta.
  */
-test('Hallazgo — el FAQPage cuenta la secuencia con un F(0)=0 que la app nunca muestra', async ({
+test('Hallazgo 573 (reparado) — el FAQPage cuenta la secuencia con la misma convención que la app (F1=F2=1, sin F(0)=0)', async ({
   page,
 }) => {
   await page.goto(RUTA);
@@ -239,9 +237,10 @@ test('Hallazgo — el FAQPage cuenta la secuencia con un F(0)=0 que la app nunca
   expect(subtitulo).not.toMatch(/^0,/);
   await expect(celda(page, 0)).toContainText('1'); // F1 = 1, no F(0) = 0
 
-  // El FAQPage sí incluye el término 0.
+  // Reparado: el FAQPage ya NO incluye el término 0 — misma convención que la app.
   const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
   const faq = bloques.map((b) => JSON.parse(b)).find((j) => j['@type'] === 'FAQPage');
   const primeraRespuesta: string = faq.mainEntity[0].acceptedAnswer.text;
-  expect(primeraRespuesta).toContain('0, 1, 1, 2, 3, 5, 8, 13, 21, 34');
+  expect(primeraRespuesta).toContain('1, 1, 2, 3, 5, 8, 13, 21, 34');
+  expect(primeraRespuesta).not.toContain('0, 1, 1, 2, 3, 5, 8, 13, 21, 34');
 });

@@ -260,3 +260,22 @@ test.describe('REPARADO — HALLAZGO 2 (contenido, bajo) — el botón "Generar"
     expect(texto).toContain('Generar 1 combinación de La Primitiva');
   });
 });
+
+test.describe('REPARADO — HALLAZGO 570 (contenido, bajo) — el FAQPage ya no promete un número complementario que nadie genera ni elige', () => {
+  /**
+   * La FAQ de metadata.ts decía «se eligen 6 números del 1 al 49, más un número
+   * complementario y el Reintegro». La app nunca genera un complementario (solo
+   * mainNumbers + Reintegro), y en el juego real tampoco lo elige el jugador: lo
+   * determina el sorteo entre las bolas no premiadas. Reparado: la FAQ ya no lo
+   * presenta como algo que se «elige».
+   */
+  test('la primera respuesta del FAQPage no promete elegir un número complementario', async ({ page }) => {
+    await page.goto('/generador-loteria/');
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = bloques.map((b) => JSON.parse(b)).find((j) => j['@type'] === 'FAQPage');
+    const primeraRespuesta: string = faq.mainEntity[0].acceptedAnswer.text;
+    expect(primeraRespuesta).toContain('6 números del 1 al 49 y el Reintegro');
+    expect(primeraRespuesta).toContain('no lo elige el jugador');
+    expect(primeraRespuesta).not.toContain('más un número complementario');
+  });
+});

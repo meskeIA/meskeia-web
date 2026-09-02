@@ -181,6 +181,17 @@ export default function SimuladorDistribucionNormalPage() {
     return { xMin: mu - halfWidth, xMax: mu + halfWidth };
   }, [mu, sigma]);
 
+  // Al reducir sigma (o mover mu), el recorrido de los sliders `a`/`b` se
+  // estrecha: el navegador clampa el VALOR DOM del slider al nuevo min/max,
+  // pero el estado de React seguía con el valor anterior. La siguiente
+  // interacción partía entonces del valor DOM clampado, no del de React, y
+  // producía un salto brusco (hallazgo 574). Reclampar el estado en cuanto
+  // el rango cambia mantiene React y DOM sincronizados siempre.
+  useEffect(() => {
+    setA(prev => Math.min(Math.max(prev, rango.xMin), rango.xMax));
+    setB(prev => Math.min(Math.max(prev, rango.xMin), rango.xMax));
+  }, [rango]);
+
   // ============================================
   // PROBABILIDAD CALCULADA
   // ============================================
