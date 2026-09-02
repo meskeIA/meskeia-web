@@ -198,3 +198,95 @@ test.describe('calculadora-jugada-scrabble · re-inspección 31/08/2026', () => 
     await expect(page.getByRole('heading', { name: /Mejores jugadas/ })).toHaveCount(0);
   });
 });
+
+/**
+ * Marcador de partida (S0110, 02/09/2026) — historial de turnos + suma acumulada.
+ *
+ * Reutiliza el atril Ñ,U del bloque de arriba (único lema posible: "ÑU"), sin gancho ni
+ * multiplicadores esta vez: Ñ=8 + U=1 = 9 puntos, resuelto a mano antes de tocar el navegador.
+ */
+async function filaJugador(page: Page, nombreLabel: string) {
+  return page.locator('li').filter({ has: page.getByLabel(nombreLabel) });
+}
+
+test.describe('calculadora-jugada-scrabble · marcador de partida', () => {
+  test('cerrado por defecto; anotar una jugada lo abre, suma los puntos y pasa el turno', async ({ page }) => {
+    await conDiccionario(page);
+    await expect(page.getByRole('button', { name: /Marcador de partida/ })).toHaveAttribute('aria-expanded', 'false');
+
+    await añadirFicha(page, 'Ñ');
+    await añadirFicha(page, 'U');
+    await buscar(page);
+    await page.getByRole('button', { name: 'Anotar esta jugada a Jugador 1' }).click();
+
+    await expect(page.getByRole('button', { name: /Marcador de partida/ })).toHaveAttribute('aria-expanded', 'true');
+
+    const fila1 = await filaJugador(page, 'Nombre del jugador 1');
+    await expect(fila1).toContainText('9');
+    await expect(fila1).not.toContainText('Le toca');
+
+    const fila2 = await filaJugador(page, 'Nombre del jugador 2');
+    await expect(fila2).toContainText('Le toca');
+
+    // El atril se vacía y desaparecen los resultados: toca preparar el siguiente turno.
+    await expect(page.getByText('0/7', { exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Mejores jugadas/ })).toHaveCount(0);
+
+    // Queda registrada en el historial.
+    await expect(page.getByText('ÑU')).toBeVisible();
+  });
+
+  test('deshacer última anotación revierte los puntos, el turno y el historial', async ({ page }) => {
+    await conDiccionario(page);
+    await añadirFicha(page, 'Ñ');
+    await añadirFicha(page, 'U');
+    await buscar(page);
+    await page.getByRole('button', { name: 'Anotar esta jugada a Jugador 1' }).click();
+
+    await page.getByRole('button', { name: 'Deshacer última anotación' }).click();
+
+    const fila1 = await filaJugador(page, 'Nombre del jugador 1');
+    await expect(fila1).toContainText('Le toca');
+    await expect(page.getByText('ÑU')).toHaveCount(0);
+  });
+
+  test('añadir y quitar jugador; no se puede quitar el último si ya anotó', async ({ page }) => {
+    await conDiccionario(page);
+    await page.getByRole('button', { name: /Marcador de partida/ }).click();
+    await expect(page.getByLabel('Nombre del jugador 3')).toHaveCount(0);
+
+    await page.getByRole('button', { name: '+ Añadir jugador' }).click();
+    await expect(page.getByLabel('Nombre del jugador 3')).toBeVisible();
+    await page.getByRole('button', { name: '− Quitar último' }).click();
+    await expect(page.getByLabel('Nombre del jugador 3')).toHaveCount(0);
+
+    // Jugador 1 y Jugador 2 anotan por turnos; con jugadas ya anotadas, el último no se quita.
+    await añadirFicha(page, 'Ñ');
+    await añadirFicha(page, 'U');
+    await buscar(page);
+    await page.getByRole('button', { name: 'Anotar esta jugada a Jugador 1' }).click();
+    await añadirFicha(page, 'Ñ');
+    await añadirFicha(page, 'U');
+    await buscar(page);
+    await page.getByRole('button', { name: 'Anotar esta jugada a Jugador 2' }).click();
+
+    await expect(page.getByRole('button', { name: '− Quitar último' })).toBeDisabled();
+  });
+
+  test('el marcador persiste tras recargar la página', async ({ page }) => {
+    await conDiccionario(page);
+    await añadirFicha(page, 'Ñ');
+    await añadirFicha(page, 'U');
+    await buscar(page);
+    await page.getByRole('button', { name: 'Anotar esta jugada a Jugador 1' }).click();
+
+    await page.reload();
+    await expect(page.getByText(/Diccionario cargado/)).toBeVisible({ timeout: 15000 });
+    await page.getByRole('button', { name: /Marcador de partida/ }).click();
+
+    const fila1 = await filaJugador(page, 'Nombre del jugador 1');
+    await expect(fila1).toContainText('9');
+    const fila2 = await filaJugador(page, 'Nombre del jugador 2');
+    await expect(fila2).toContainText('Le toca');
+  });
+});

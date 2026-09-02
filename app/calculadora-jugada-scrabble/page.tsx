@@ -27,8 +27,24 @@ import {
  */
 const DICT_URL = '/data/diccionario-es.txt';
 const DICT_CACHE_KEY = 'meskeia_dict_es_v1';
+const MARCADOR_CACHE_KEY = 'meskeia_scrabble_marcador_v1';
+const MAX_JUGADORES = 4;
 
 type DictStatus = 'loading' | 'ready' | 'error';
+
+/** Una jugada ya anotada al marcador. Guarda el ÍNDICE del jugador, no su nombre,
+ *  para que renombrarlo a mitad de partida no desligue el historial de su autor. */
+interface JugadaAnotada {
+  jugadorIndice: number;
+  palabra: string;
+  puntos: number;
+}
+
+interface MarcadorGuardado {
+  jugadores?: string[];
+  turno?: number;
+  historial?: JugadaAnotada[];
+}
 
 /** Fichas agrupadas por valor, para la tabla de referencia. */
 const GRUPOS_VALOR: Array<{ puntos: number; fichas: string[] }> = [
@@ -55,6 +71,86 @@ export default function CalculadoraJugadaScrabblePage() {
 
   const [diccionario, setDiccionario] = useState<string[]>([]);
   const [dictStatus, setDictStatus] = useState<DictStatus>('loading');
+
+  // Marcador de partida: persiste en localStorage porque una partida real dura varios
+  // turnos y el atril se limpia entre ellos (a diferencia del diccionario, que es
+  // contenido estático y le basta con sessionStorage).
+  const [jugadores, setJugadores] = useState<string[]>(['Jugador 1', 'Jugador 2']);
+  const [turno, setTurno] = useState(0);
+  const [historialMarcador, setHistorialMarcador] = useState<JugadaAnotada[]>([]);
+  const [marcadorAbierto, setMarcadorAbierto] = useState(false);
+  const [marcadorCargado, setMarcadorCargado] = useState(false);
+
+  useEffect(() => {
+    try {
+      const guardado = localStorage.getItem(MARCADOR_CACHE_KEY);
+      if (guardado) {
+        const datos = JSON.parse(guardado) as MarcadorGuardado;
+        if (Array.isArray(datos.jugadores) && datos.jugadores.length > 0) setJugadores(datos.jugadores);
+        if (typeof datos.turno === 'number') setTurno(datos.turno);
+        if (Array.isArray(datos.historial)) setHistorialMarcador(datos.historial);
+      }
+    } catch { /* localStorage no disponible o dato corrupto: se arranca en blanco */ }
+    setMarcadorCargado(true);
+  }, []);
+
+  useEffect(() => {
+    if (!marcadorCargado) return;
+    try {
+      localStorage.setItem(
+        MARCADOR_CACHE_KEY,
+        JSON.stringify({ jugadores, turno, historial: historialMarcador })
+      );
+    } catch { /* localStorage lleno o no disponible */ }
+  }, [marcadorCargado, jugadores, turno, historialMarcador]);
+
+  const totalesMarcador = useMemo(() => {
+    const totales = jugadores.map(() => 0);
+    for (const entrada of historialMarcador) {
+      if (entrada.jugadorIndice < totales.length) totales[entrada.jugadorIndice] += entrada.puntos;
+    }
+    return totales;
+  }, [jugadores, historialMarcador]);
+
+  const ultimoJugadorTieneJugadas = historialMarcador.some(
+    (j) => j.jugadorIndice === jugadores.length - 1
+  );
+
+  const renombrarJugador = (indice: number, nombre: string) => {
+    setJugadores((previo) => previo.map((j, i) => (i === indice ? nombre : j)));
+  };
+
+  const añadirJugador = () => {
+    if (jugadores.length >= MAX_JUGADORES) return;
+    setJugadores((previo) => [...previo, `Jugador ${previo.length + 1}`]);
+  };
+
+  const quitarUltimoJugador = () => {
+    if (jugadores.length <= 1 || ultimoJugadorTieneJugadas) return;
+    setJugadores((previo) => previo.slice(0, -1));
+    setTurno((previo) => (previo >= jugadores.length - 1 ? 0 : previo));
+  };
+
+  const anotarJugada = (jugada: Jugada) => {
+    setHistorialMarcador((previo) => [
+      ...previo,
+      { jugadorIndice: turno, palabra: jugada.palabra, puntos: jugada.puntos },
+    ]);
+    setTurno((previo) => (previo + 1) % jugadores.length);
+    setMarcadorAbierto(true);
+    limpiar();
+  };
+
+  const deshacerUltimaAnotacion = () => {
+    if (historialMarcador.length === 0) return;
+    setHistorialMarcador((previo) => previo.slice(0, -1));
+    setTurno((previo) => (previo - 1 + jugadores.length) % jugadores.length);
+  };
+
+  const nuevaPartida = () => {
+    setHistorialMarcador([]);
+    setTurno(0);
+  };
 
   useEffect(() => {
     const cached = typeof window !== 'undefined' ? sessionStorage.getItem(DICT_CACHE_KEY) : null;
@@ -169,6 +265,104 @@ export default function CalculadoraJugadaScrabblePage() {
       <LegalNotice />
 
       <div className={styles.mainContent}>
+        <section className={styles.marcadorSeccion}>
+          <button
+            type="button"
+            className={styles.marcadorToggle}
+            aria-expanded={marcadorAbierto}
+            aria-controls="panel-marcador"
+            onClick={() => setMarcadorAbierto((previo) => !previo)}
+          >
+            <span><span aria-hidden="true">🏆</span> Marcador de partida</span>
+            {historialMarcador.length > 0 && (
+              <span className={styles.contador}>{historialMarcador.length} {historialMarcador.length === 1 ? 'jugada' : 'jugadas'}</span>
+            )}
+            <span className={styles.marcadorFlecha} aria-hidden="true">{marcadorAbierto ? '▲' : '▼'}</span>
+          </button>
+
+          {marcadorAbierto && (
+            <div id="panel-marcador" className={styles.marcadorPanel}>
+              <p className={styles.ayuda}>
+                Lleva el tanteo de la partida entre varios jugadores: anota cada jugada desde la
+                lista de resultados y el turno pasa solo al siguiente. Se guarda en este
+                navegador, así que sobrevive a cerrar la pestaña entre turnos.
+              </p>
+
+              <ul className={styles.marcadorJugadores}>
+                {jugadores.map((nombre, i) => (
+                  <li
+                    key={i}
+                    className={`${styles.marcadorJugador} ${i === turno ? styles.marcadorJugadorActivo : ''}`}
+                  >
+                    <label className={styles.marcadorNombreLabel}>
+                      <span className={styles.srOnly}>Nombre del jugador {i + 1}</span>
+                      <input
+                        type="text"
+                        className={styles.marcadorNombreInput}
+                        value={nombre}
+                        maxLength={24}
+                        onChange={(e) => renombrarJugador(i, e.target.value || `Jugador ${i + 1}`)}
+                      />
+                    </label>
+                    <span className={styles.marcadorPuntos}>{totalesMarcador[i]}</span>
+                    {i === turno && <span className={styles.marcadorTurno}>Le toca</span>}
+                  </li>
+                ))}
+              </ul>
+
+              <div className={styles.marcadorAcciones}>
+                <button
+                  type="button"
+                  className={styles.btnSecondary}
+                  onClick={añadirJugador}
+                  disabled={jugadores.length >= MAX_JUGADORES}
+                >
+                  + Añadir jugador
+                </button>
+                <button
+                  type="button"
+                  className={styles.btnSecondary}
+                  onClick={quitarUltimoJugador}
+                  disabled={jugadores.length <= 1 || ultimoJugadorTieneJugadas}
+                  title={ultimoJugadorTieneJugadas ? 'Ese jugador ya tiene jugadas anotadas' : undefined}
+                >
+                  − Quitar último
+                </button>
+                <button
+                  type="button"
+                  className={styles.btnSecondary}
+                  onClick={deshacerUltimaAnotacion}
+                  disabled={historialMarcador.length === 0}
+                >
+                  Deshacer última anotación
+                </button>
+                <button
+                  type="button"
+                  className={styles.btnSecondary}
+                  onClick={nuevaPartida}
+                  disabled={historialMarcador.length === 0}
+                >
+                  Nueva partida
+                </button>
+              </div>
+
+              {historialMarcador.length > 0 && (
+                <ol className={styles.marcadorHistorial}>
+                  {historialMarcador.map((entrada, i) => (
+                    <li key={i} className={styles.marcadorHistorialItem}>
+                      <span className={styles.marcadorHistorialJugador}>
+                        {jugadores[entrada.jugadorIndice] ?? `Jugador ${entrada.jugadorIndice + 1}`}
+                      </span>
+                      <span className={styles.marcadorHistorialPalabra}>{entrada.palabra}</span>
+                      <span className={styles.marcadorHistorialPuntos}>{entrada.puntos} pts</span>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </div>
+          )}
+        </section>
+
         {dictStatus === 'loading' && (
           <div className={`${styles.dictStatus} ${styles.dictStatusLoading}`} role="status" aria-live="polite">
             <span className={styles.dictSpinner} aria-hidden="true" />
@@ -439,6 +633,13 @@ export default function CalculadoraJugadaScrabblePage() {
                       {multPalabra > 1 && <> · palabra ×{multPalabra}</>}
                       {jugada.atrilCompleto && <> · <strong>+{50} por colocar las siete fichas</strong></>}
                     </p>
+                    <button
+                      type="button"
+                      className={styles.btnAnotar}
+                      onClick={() => anotarJugada(jugada)}
+                    >
+                      Anotar esta jugada a {jugadores[turno] ?? `Jugador ${turno + 1}`}
+                    </button>
                   </li>
                 ))}
               </ol>
@@ -551,7 +752,7 @@ export default function CalculadoraJugadaScrabblePage() {
             </table>
           </div>
 
-          <h3>Tres formas de usar la calculadora</h3>
+          <h3>Cuatro formas de usar la calculadora</h3>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <h4><span aria-hidden="true">🎯</span> Buscar la jugada del turno</h4>
@@ -572,6 +773,13 @@ export default function CalculadoraJugadaScrabblePage() {
               <p>
                 Prueba atriles difíciles (muchas consonantes, dos comodines) y observa qué palabras salen.
                 Es la forma más rápida de ampliar el repertorio de palabras cortas con fichas caras.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <h4><span aria-hidden="true">🏆</span> Llevar el marcador entre varios</h4>
+              <p>
+                Abre el marcador de partida, ponle nombre a cada jugador y anota cada jugada desde la
+                lista de resultados: el turno pasa solo y no hace falta sumar a mano.
               </p>
             </div>
           </div>

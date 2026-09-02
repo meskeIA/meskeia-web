@@ -50,6 +50,7 @@ export const jsonLd = generateWebAppSchema({
     'Bonificación automática de 50 puntos al colocar las siete fichas del atril',
     'Desglose de puntuación ficha a ficha en cada jugada propuesta',
     'Validación contra más de 87.000 lemas del español, sin enviar datos a ningún servidor',
+    'Marcador de partida con hasta 4 jugadores: anota cada jugada y el turno pasa solo al siguiente',
   ],
 });
 
@@ -95,6 +96,14 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Un generador de anagramas devuelve todas las palabras que pueden formarse con unas letras, ordenadas alfabéticamente o por longitud. Una calculadora de jugada va un paso más allá: puntúa cada opción con los valores reales de las fichas, tiene en cuenta la casilla en la que vas a jugar y ordena por puntuación, de modo que la palabra más larga no siempre encabeza la lista. En muchas posiciones, una palabra corta con la Z sobre una casilla de triple letra supera a una de siete letras.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Se puede llevar el marcador de la partida entre varios jugadores?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. El marcador de partida admite hasta 4 jugadores: al anotar una jugada desde la lista de resultados se suma a su total, el turno pasa solo al siguiente jugador y el atril se vacía para preparar la próxima consulta. Se guarda en el navegador, así que el marcador sobrevive a cerrar la pestaña entre turnos, y una nueva partida lo reinicia cuando haga falta.',
       },
     },
   ],
