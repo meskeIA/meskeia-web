@@ -1237,6 +1237,52 @@ export const REGISTRO_CONCEPTOS = {
 };
 
 /**
+ * Suma importes redondeando ANTES cada línea al céntimo, que es como los ve el usuario.
+ *
+ * ── De dónde sale (02/09/2026, hallazgo 594) ─────────────────────────────────
+ * El «Total gastos adicionales» redondeaba la suma exacta, mientras cada línea de la
+ * pantalla se redondeaba por su cuenta: el total no cuadraba con lo que había encima por
+ * un céntimo, en ambos sentidos y en los tres casos probados (País Vasco 22.000 €,
+ * Madrid 15.000 € y Baleares 2.500.000 €). Un céntimo no cambia ninguna decisión, pero un
+ * total que no suma lo que se ve encima pone en duda todo el desglose.
+ */
+export function sumarLineasVisibles(...importes: number[]): number {
+  return importes.reduce((suma, n) => suma + Math.round(n * 100) / 100, 0);
+}
+
+/**
+ * Banda de precios sobre la que se publican las horquillas ORIENTATIVAS de notaría y
+ * registro para vivienda. No es normativa: es el intervalo en el que se mueve la mayoría
+ * de las compraventas residenciales, y existe para que los textos y el JSON-LD digan
+ * exactamente lo que el motor cobra en sus extremos.
+ */
+export const BANDA_PRECIO_VIVIENDA = { min: 100000, max: 500000 };
+
+/**
+ * Horquilla de notaría y registro para una banda de precios, DERIVADA de los aranceles.
+ *
+ * ── De dónde sale (02/09/2026, hallazgo 584) ─────────────────────────────────
+ * `estimador-compraventa-inmueble` publicaba TRES rangos distintos para lo mismo: el
+ * FAQPage del JSON-LD decía «notaría 300 €-1.000 €» y «registro 100 €-600 €», la página
+ * visible «600 €-1.500 €» y «200 €-600 €», y otra pregunta del MISMO JSON-LD «700-900 €».
+ * Ninguno coincidía con lo que la app cobra (758,98 € de notaría para 200.000 €), y el
+ * peor de los tres es justo el que leen los asistentes de IA. Un rango es un dato
+ * derivado del arancel: escribirlo a mano garantiza que contradiga al motor.
+ */
+export function horquillaFedatarios(precioMin: number, precioMax: number): {
+  notaria: { min: number; max: number };
+  registro: { min: number; max: number };
+} {
+  return {
+    notaria: {
+      min: estimarFacturaNotarial(precioMin).min,
+      max: estimarFacturaNotarial(precioMax).max,
+    },
+    registro: { min: calcularRegistro(precioMin), max: calcularRegistro(precioMax) },
+  };
+}
+
+/**
  * Calcula gastos de registro de la propiedad
  */
 export function calcularRegistro(valor: number): number {

@@ -19,7 +19,10 @@ import {
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
-import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, calcularGananciaInmueble } from '@/data/fiscal';
+
+/** Importe en euros SIN decimales, para los ejemplos del bloque educativo */
+const eurosEnteros = (n: number) => `${formatNumber(n, 0)} €`;
+import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -36,6 +39,7 @@ import {
   RANGO_ITP,
   RANGO_AJD,
   TERRITORIOS_SIN_IVA,
+  sumarLineasVisibles,
 } from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 
@@ -68,6 +72,8 @@ interface ResultadosVendedor {
   plusvaliaMunicipal: number;
   metodoPlusvalia: string;
   plusvaliaCalculada: boolean;
+  /** Los campos concretos que faltan para poder calcular la plusvalía municipal */
+  camposQueFaltan: string[];
   exentoPlusvalia: boolean;
   comisionInmobiliaria: number;
   gastosGestoria: number;
@@ -83,6 +89,10 @@ interface ResultadosVendedor {
 }
 
 // ===== CONSTANTES =====
+/** Extremos de la escala del ahorro, derivados de data/fiscal (hallazgo 579) */
+const TIPO_AHORRO_MIN = TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo;
+const TIPO_AHORRO_MAX = TRAMOS_GANANCIAS_PATRIMONIALES_2025[TRAMOS_GANANCIAS_PATRIMONIALES_2025.length - 1].tipo;
+
 const COMUNIDADES: { value: ComunidadAutonoma; label: string }[] = [
   { value: 'andalucia', label: 'Andalucía' },
   { value: 'aragon', label: 'Aragón' },
@@ -188,7 +198,10 @@ export default function SimuladorGarajeCompraventaPage() {
     const notaria = estimarFacturaNotarial(precio);
     const notario = notaria.medio;
     const registro = calcularRegistro(precio);
-    const totalGastos = impuesto + ajd + notario + registro + gestoria;
+    // Se suman las líneas YA redondeadas al céntimo, que es como las ve el usuario: el
+    // total redondeaba la suma exacta y no cuadraba con el desglose de encima por un
+    // céntimo, en ambos sentidos (hallazgo 594).
+    const totalGastos = sumarLineasVisibles(impuesto, ajd, notario, registro, gestoria);
 
     return {
       precioGaraje: precio,
@@ -203,7 +216,7 @@ export default function SimuladorGarajeCompraventaPage() {
       gastosRegistro: registro,
       gastosGestoria: gestoria,
       totalGastos,
-      totalOperacion: precio + totalGastos,
+      totalOperacion: sumarLineasVisibles(precio, totalGastos),
       tipoElegido: elegido,
     };
   }, [precioGaraje, ccaa, tipoTransmision, tipoGaraje, perfilComprador, gastosGestoria]);
@@ -272,7 +285,7 @@ export default function SimuladorGarajeCompraventaPage() {
 
     const hayDatosGanancia = precioC > 0;
     const irpf = hayDatosGanancia ? g.cuotaIRPF : 0;
-    const totalGastos = plusvalia + comision + gestoria + irpf;
+    const totalGastos = sumarLineasVisibles(plusvalia, comision, gestoria, irpf);
     const neto = precioV - totalGastos;
 
     return {
@@ -280,6 +293,12 @@ export default function SimuladorGarajeCompraventaPage() {
       plusvaliaMunicipal: plusvalia,
       metodoPlusvalia,
       plusvaliaCalculada: faltan.length === 0,
+      /**
+       * Los campos que de verdad faltan, para que el pie del neto no los vuelva a deducir
+       * con un ternario de dos ramas que ignoraba la tercera causa: con los AÑOS DE
+       * PROPIEDAD en blanco mandaba a rellenar el valor del suelo, ya relleno (hallazgo 576).
+       */
+      camposQueFaltan: faltan,
       exentoPlusvalia,
       comisionInmobiliaria: comision,
       gastosGestoria: gestoria,
@@ -306,6 +325,18 @@ export default function SimuladorGarajeCompraventaPage() {
         resultadosVendedor.plusvaliaCalculada ? null : 'la plusvalía municipal',
         resultadosVendedor.irpfCalculado ? null : 'el IRPF de la ganancia',
       ].filter((x): x is string => x !== null)
+    : [];
+
+  /**
+   * Los campos concretos que hay que rellenar. Sale del motor (`camposQueFaltan`), que ya
+   * los conoce uno a uno: el pie los deducía con un ternario de dos ramas y con los años de
+   * propiedad vacíos mandaba a rellenar un campo que ya estaba relleno (hallazgo 576).
+   */
+  const camposPendientes = resultadosVendedor
+    ? Array.from(new Set([
+        ...resultadosVendedor.camposQueFaltan,
+        ...(resultadosVendedor.irpfCalculado ? [] : ['el precio de compra original']),
+      ]))
     : [];
 
   return (
@@ -347,7 +378,7 @@ export default function SimuladorGarajeCompraventaPage() {
         fuente={PLUSVALIA_MUNICIPAL_META.baseNormativa}
         verificado={PLUSVALIA_MUNICIPAL_META.verificado}
         urlOficial={PLUSVALIA_MUNICIPAL_META.urlReferencia}
-        nota={`${PLUSVALIA_MUNICIPAL_META.nota} ${PLUSVALIA_MUNICIPAL_META.aviso} El IRPF de la ganancia usa los tramos del ahorro de 2025 (19 % a 30 %).`}
+        nota={`${PLUSVALIA_MUNICIPAL_META.nota} ${PLUSVALIA_MUNICIPAL_META.aviso} El IRPF de la ganancia usa los tramos del ahorro de 2025 (${TIPO_AHORRO_MIN} % a ${TIPO_AHORRO_MAX} %).`}
       />
 
       {/* Formulario principal */}
@@ -531,7 +562,10 @@ export default function SimuladorGarajeCompraventaPage() {
           {/* Pestañas */}
           <div className={styles.tabs} role="tablist">
             <button
-              type="button"              role="tab"
+              type="button"
+              role="tab"
+              id="tab-comprador"
+              aria-controls="panel-comprador"
               aria-selected={pestanaActiva === 'comprador'}
               className={`${styles.tab} ${pestanaActiva === 'comprador' ? styles.active : ''}`}
               onClick={() => setPestanaActiva('comprador')}
@@ -539,7 +573,10 @@ export default function SimuladorGarajeCompraventaPage() {
               Comprador
             </button>
             <button
-              type="button"              role="tab"
+              type="button"
+              role="tab"
+              id="tab-vendedor"
+              aria-controls="panel-vendedor"
               aria-selected={pestanaActiva === 'vendedor'}
               className={`${styles.tab} ${pestanaActiva === 'vendedor' ? styles.active : ''}`}
               onClick={() => setPestanaActiva('vendedor')}
@@ -550,7 +587,7 @@ export default function SimuladorGarajeCompraventaPage() {
 
           {/* Resultados Comprador */}
           {pestanaActiva === 'comprador' && (
-            <div role="tabpanel">
+            <div role="tabpanel" id="panel-comprador" aria-labelledby="tab-comprador">
               {resultadosComprador ? (
                 <div className={styles.resultsInner}>
                   <ResultCard
@@ -677,7 +714,7 @@ export default function SimuladorGarajeCompraventaPage() {
 
           {/* Resultados Vendedor */}
           {pestanaActiva === 'vendedor' && (
-            <div role="tabpanel">
+            <div role="tabpanel" id="panel-vendedor" aria-labelledby="tab-vendedor">
               <div className={styles.formVendedor}>
                 <h3 className={styles.formVendedorTitle}>Datos adicionales del vendedor</h3>
                 <NumberInput
@@ -829,7 +866,7 @@ export default function SimuladorGarajeCompraventaPage() {
                     description={
                       !resultadosVendedor.irpfCalculado
                         ? 'Falta el precio de compra original. Este impuesto NO está incluido en el neto de abajo.'
-                        : 'Tributación en base del ahorro (19%-30%)'
+                        : `Tributación en base del ahorro (${TIPO_AHORRO_MIN}%-${TIPO_AHORRO_MAX}%)`
                     }
                   />
                   {resultadosVendedor.comisionInmobiliaria > 0 && (
@@ -863,7 +900,7 @@ export default function SimuladorGarajeCompraventaPage() {
                     description={
                       faltanEnElNeto.length === 0
                         ? 'Lo que realmente recibes tras gastos e impuestos'
-                        : `INCOMPLETO: falta descontar ${faltanEnElNeto.join(' y ')}. Rellena ${resultadosVendedor.plusvaliaCalculada ? 'el precio de compra original' : resultadosVendedor.irpfCalculado ? 'el valor catastral del suelo' : 'el precio de compra original y el valor catastral del suelo'} para obtener el neto real.`
+                        : `INCOMPLETO: falta descontar ${faltanEnElNeto.join(' y ')}. Rellena ${camposPendientes.join(' y ')} para obtener el neto real.`
                     }
                   />
                 </div>
@@ -907,8 +944,8 @@ export default function SimuladorGarajeCompraventaPage() {
                     en 2.750 € un garaje de 25.000 €, y presupuestar de menos es el error caro. */}
                 <tr>
                   <td>IVA obra nueva</td>
-                  <td>10% con la vivienda · 21% independiente</td>
-                  <td>10% (residencial)</td>
+                  <td>{formatNumber(IVA_INMUEBLES_2025.garageCon, 0)}% con la vivienda · {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}% independiente</td>
+                  <td>{formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}% (residencial)</td>
                 </tr>
                 <tr>
                   <td>Tipos reducidos ITP</td>
@@ -963,15 +1000,15 @@ export default function SimuladorGarajeCompraventaPage() {
                 <span aria-hidden="true" className={styles.casoEmoji}>🏗️</span>
                 <span className={styles.casoTag}>Garaje de obra nueva con vivienda</span>
               </div>
-              <p>Elena compra un piso nuevo con garaje incluido por 200.000 €. El conjunto tributa al 10% de IVA sobre el precio total. Si el garaje se escritura por separado (20.000 €) y está vinculado a la vivienda (máx. 2 plazas), el IVA del garaje es también el 10%. Si lo compra de forma independiente o en un edificio no residencial, el IVA sube al 21%.</p>
-              <div className={styles.casoResultado}>IVA 10% (vinculado) o 21% (independiente) en garaje de obra nueva</div>
+              <p>Elena compra un piso nuevo con garaje incluido por 200.000 €. El conjunto tributa al {formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}% de IVA sobre el precio total. Si el garaje se escritura por separado (20.000 €) y está vinculado a la vivienda (máx. 2 plazas), el IVA del garaje es también el {formatNumber(IVA_INMUEBLES_2025.garageCon, 0)}%. Si lo compra de forma independiente o en un edificio no residencial, el IVA sube al {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}%.</p>
+              <div className={styles.casoResultado}>IVA {formatNumber(IVA_INMUEBLES_2025.garageCon, 0)}% (vinculado) o {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}% (independiente) en garaje de obra nueva</div>
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
                 <span aria-hidden="true" className={styles.casoEmoji}>💸</span>
                 <span className={styles.casoTag}>Vender garaje con ganancia</span>
               </div>
-              <p>Ana compró un garaje por 15.000 € hace 10 años y lo vende por 22.000 €. La diferencia bruta son 7.000 €, pero no es la base que tributa: el art. 35 LIRPF resta del valor de transmisión los gastos que paga el vendedor. Con la comisión del 3% que trae el simulador (660 €), sin plusvalía municipal y sin declarar los gastos de aquella compra, la ganancia queda en 6.340 € y el IRPF en 1.211,40 € (19% hasta 6.000 € y 21% sobre el resto), no los 1.330 € que saldrían de los 7.000 € brutos. Si además hay plusvalía municipal, o Ana declara los impuestos y gastos que pagó al comprarlo, la ganancia baja todavía más.</p>
+              <p>Ana compró un garaje por 15.000 € hace 10 años y lo vende por 22.000 €. La diferencia bruta son 7.000 €, pero no es la base que tributa: el art. 35 LIRPF resta del valor de transmisión los gastos que paga el vendedor. Con la comisión del 3% que trae el simulador (660 €), sin plusvalía municipal y sin declarar los gastos de aquella compra, la ganancia queda en 6.340 € y el IRPF en 1.211,40 € ({formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo, 0)}% hasta {eurosEnteros(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].hasta)} y {formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[1].tipo, 0)}% sobre el resto), no los 1.330 € que saldrían de los 7.000 € brutos. Si además hay plusvalía municipal, o Ana declara los impuestos y gastos que pagó al comprarlo, la ganancia baja todavía más.</p>
               <div className={styles.casoResultado}>Ganancia tributa: IRPF ahorro + plusvalía municipal</div>
             </div>
             <div className={styles.casoCard}>
@@ -999,11 +1036,11 @@ export default function SimuladorGarajeCompraventaPage() {
             </div>
             <div className={styles.faqItem}>
               <h4>¿Garaje nuevo o de segunda mano: qué impuesto se paga?</h4>
-              <p>Un garaje de primera transmisión (nuevo, del promotor) paga IVA más AJD (del {formatNumber(RANGO_AJD.min, 0)}% al {formatNumber(RANGO_AJD.max, 1)}% según la comunidad: el País Vasco no lo cobra, por su régimen foral). El IVA es del 10% si el garaje va vinculado a la vivienda (máximo 2 plazas, mismo edificio y promotor) y del 21% si se adquiere de forma independiente o en un edificio de uso no residencial. Un garaje de segunda mano paga ITP al tipo general de la comunidad autónoma. No pueden coexistir ITP e IVA en la misma operación.</p>
+              <p>Un garaje de primera transmisión (nuevo, del promotor) paga IVA más AJD (del {formatNumber(RANGO_AJD.min, 0)}% al {formatNumber(RANGO_AJD.max, 1)}% según la comunidad: el País Vasco no lo cobra, por su régimen foral). El IVA es del {formatNumber(IVA_INMUEBLES_2025.garageCon, 0)}% si el garaje va vinculado a la vivienda (máximo 2 plazas, mismo edificio y promotor) y del {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}% si se adquiere de forma independiente o en un edificio de uso no residencial. Un garaje de segunda mano paga ITP al tipo general de la comunidad autónoma. No pueden coexistir ITP e IVA en la misma operación.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿El vendedor de un garaje paga plusvalía municipal?</h4>
-              <p>Sí. El vendedor debe pagar el Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana (plusvalía municipal) al ayuntamiento donde esté ubicado el garaje. Desde 2021, puede elegir entre el método objetivo y el real, pagando el más favorable. Si vende por menos de lo que compró, puede quedar exento acreditando la pérdida. Esta calculadora aplica un <strong>tipo del 25%</strong> como referencia orientativa habitual; cada ayuntamiento fija su propio tipo, con un <strong>máximo legal del 30%</strong>.</p>
+              <p>Sí. El vendedor debe pagar el Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana (plusvalía municipal) al ayuntamiento donde esté ubicado el garaje. Desde 2021, puede elegir entre el método objetivo y el real, pagando el más favorable. Si vende por menos de lo que compró, puede quedar exento acreditando la pérdida. Esta calculadora aplica un <strong>tipo del {formatNumber(PLUSVALIA_MUNICIPAL_META.tipoOrientativo, 0)}%</strong> como referencia orientativa habitual; cada ayuntamiento fija su propio tipo, con un <strong>máximo legal del {formatNumber(PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal, 0)}%</strong>.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Existen tipos reducidos de ITP para garajes?</h4>

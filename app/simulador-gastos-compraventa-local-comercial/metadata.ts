@@ -1,9 +1,18 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { RANGO_AJD, RANGO_ITP } from '@/data/itp-ccaa';
+import { IVA_INMUEBLES_2025 } from '@/data/fiscal';
+import { formatNumber } from '@/lib/formatters';
+
+/** Los rangos que cita el JSON-LD se DERIVAN de la tabla: escritos a mano contradecían al
+ *  panel, que muestra «AJD 0 %» en el País Vasco y el 0,25 % efectivo de Ceuta y Melilla
+ *  tras la bonificación (hallazgo 622). */
+const AJD_MIN = formatNumber(RANGO_AJD.min, 0);
+const AJD_MAX = formatNumber(RANGO_AJD.max, 1);
 
 export const metadata: Metadata = {
   title: 'Simulador Gastos Compraventa Local Comercial - IVA, ITP, Plusvalía e IRPF | meskeIA',
-  description: 'Calcula los gastos de compra y venta de un local comercial en España. Si compras: IVA 21% en obra nueva, ITP en segunda mano, renuncia a la exención de IVA (inversión del sujeto pasivo), AJD, notaría y registro. Si vendes: plusvalía municipal, IRPF de la ganancia y neto que recibes. Gratis y sin registro.',
+  description: `Calcula los gastos de compra y venta de un local comercial en España. Si compras: IVA ${IVA_INMUEBLES_2025.local}% en obra nueva, ITP en segunda mano, renuncia a la exención de IVA (inversión del sujeto pasivo), AJD, notaría y registro. Si vendes: plusvalía municipal, IRPF de la ganancia y neto que recibes. Gratis y sin registro.`,
   keywords: 'simulador gastos compra local comercial, simulador gastos venta local comercial, calculadora gastos venta local comercial, gastos compraventa local, IVA local comercial, ITP local comercial, renuncia exencion IVA local, inversion sujeto pasivo local, plusvalia venta local comercial, irpf venta local, calculadora local comercial españa',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -31,11 +40,11 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Simulador Gastos Compraventa Local Comercial',
-  description: 'Calculadora de gastos de compra y venta de local comercial en España. Para el comprador: IVA 21% en obra nueva, ITP por comunidad autónoma en segunda mano, renuncia a la exención de IVA con inversión del sujeto pasivo, AJD, notaría y registro. Para el vendedor: plusvalía municipal, IRPF sobre la ganancia patrimonial (con corrección por amortizaciones si el local estuvo afecto a una actividad) y neto resultante.',
+  description: `Calculadora de gastos de compra y venta de local comercial en España. Para el comprador: IVA ${IVA_INMUEBLES_2025.local}% en obra nueva, ITP por comunidad autónoma en segunda mano, renuncia a la exención de IVA con inversión del sujeto pasivo, AJD, notaría y registro. Para el vendedor: plusvalía municipal, IRPF sobre la ganancia patrimonial (con corrección por amortizaciones si el local estuvo afecto a una actividad) y neto resultante.`,
   url: 'https://meskeia.com/simulador-gastos-compraventa-local-comercial/',
   category: 'FinanceApplication',
   features: [
-    'IVA 21% en local comercial de nueva construcción',
+    `IVA ${IVA_INMUEBLES_2025.local}% en local comercial de nueva construcción`,
     'ITP por comunidad autónoma en segunda mano',
     'Renuncia a la exención de IVA (inversión del sujeto pasivo)',
     'AJD (Actos Jurídicos Documentados)',
@@ -58,7 +67,7 @@ export const faqJsonLd = {
       name: '¿Qué impuesto se paga al comprar un local comercial?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Depende del tipo de transmisión. Si el local es de nueva construcción y lo vende el promotor (primera entrega), se paga IVA al 21% más AJD (entre el 0,5% y el 1,5% según la comunidad autónoma). Si es una segunda transmisión, por regla general está exenta de IVA y se paga ITP al tipo general de la comunidad, habitualmente entre el 6% y el 10%. No coinciden IVA e ITP en la misma operación.',
+        text: `Depende del tipo de transmisión. Si el local es de nueva construcción y lo vende el promotor (primera entrega), se paga IVA al ${IVA_INMUEBLES_2025.local}% más AJD (del ${AJD_MIN}% al ${AJD_MAX}% según la comunidad autónoma; el País Vasco no lo cobra). Si es una segunda transmisión, por regla general está exenta de IVA y se paga ITP al tipo general de la comunidad, que va del ${formatNumber(RANGO_ITP.min, 0)}% al ${formatNumber(RANGO_ITP.max, 0)}%. No coinciden IVA e ITP en la misma operación.`,
       },
     },
     {
@@ -66,7 +75,7 @@ export const faqJsonLd = {
       name: '¿Qué es la renuncia a la exención de IVA en la compra de un local?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La segunda transmisión de un inmueble está exenta de IVA (artículo 20.Uno.22º de la Ley del IVA), por lo que tributa por ITP. Sin embargo, si comprador y vendedor son empresarios o profesionales con derecho a deducir el IVA, el vendedor puede renunciar a esa exención (artículo 20.Dos). Entonces la operación pasa a tributar por IVA al 21% en lugar de ITP, con inversión del sujeto pasivo: es el comprador quien autoliquida y, si tiene derecho, deduce el IVA.',
+        text: `La segunda transmisión de un inmueble está exenta de IVA (artículo 20.Uno.22º de la Ley del IVA), por lo que tributa por ITP. Sin embargo, si comprador y vendedor son empresarios o profesionales con derecho a deducir el IVA, el vendedor puede renunciar a esa exención (artículo 20.Dos). Entonces la operación pasa a tributar por IVA al ${IVA_INMUEBLES_2025.local}% en lugar de ITP, con inversión del sujeto pasivo: es el comprador quien autoliquida y, si tiene derecho, deduce el IVA.`,
       },
     },
     {

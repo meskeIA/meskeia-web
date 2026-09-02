@@ -29,6 +29,7 @@ import {
   ENLACE_CATASTRO,
   RANGO_AJD,
   TERRITORIOS_SIN_IVA,
+  sumarLineasVisibles,
 } from '@/data/itp-ccaa';
 import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META } from '@/data/fiscal';
 
@@ -142,7 +143,10 @@ export default function SimuladorSolarPage() {
     const notario = notaria.medio;
     const registro = calcularRegistro(precio);
 
-    const totalGastos = impuesto + ajd + notario + registro + gestoria;
+    // Se suman las líneas YA redondeadas al céntimo, que es como las ve el usuario: el
+    // total redondeaba la suma exacta y no cuadraba con el desglose de encima por un
+    // céntimo, en ambos sentidos (hallazgo 594).
+    const totalGastos = sumarLineasVisibles(impuesto, ajd, notario, registro, gestoria);
 
     return {
       precioInmueble: precio,
@@ -157,7 +161,7 @@ export default function SimuladorSolarPage() {
       gastosRegistro: registro,
       gastosGestoria: gestoria,
       totalGastos,
-      totalOperacion: precio + totalGastos,
+      totalOperacion: sumarLineasVisibles(precio, totalGastos),
       ivaRecuperable,
     };
   }, [precioVenta, ccaa, tipoVendedor, gastosGestoria]);

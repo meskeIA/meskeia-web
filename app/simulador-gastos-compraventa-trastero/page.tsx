@@ -19,7 +19,10 @@ import {
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
-import { IVA_INMUEBLES_2025, calcularGananciaInmueble, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META } from '@/data/fiscal';
+
+/** Importe en euros SIN decimales, para los ejemplos del bloque educativo */
+const eurosEnteros = (n: number) => `${formatNumber(n, 0)} €`;
+import { IVA_INMUEBLES_2025, calcularGananciaInmueble, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -36,6 +39,7 @@ import {
   RANGO_AJD,
   TERRITORIOS_SIN_IVA,
   normaliza,
+  sumarLineasVisibles,
 } from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 
@@ -63,6 +67,10 @@ interface ResultadosComprador {
   tipoElegido: TipoElegido | null;
 }
 
+/** Extremos de la escala del ahorro, derivados de data/fiscal (hallazgo 592) */
+const TIPO_AHORRO_MIN = TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo;
+const TIPO_AHORRO_MAX = TRAMOS_GANANCIAS_PATRIMONIALES_2025[TRAMOS_GANANCIAS_PATRIMONIALES_2025.length - 1].tipo;
+
 interface ResultadosVendedor {
   precioVenta: number;
   plusvaliaMunicipal: number;
@@ -71,6 +79,8 @@ interface ResultadosVendedor {
   /** Falso cuando faltan años de propiedad o valor catastral del suelo: entonces la
    *  plusvalía no es 0 €, es desconocida, y el neto que se muestra es un techo. */
   plusvaliaCalculada: boolean;
+  /** Los campos concretos que faltan para calcularla, para nombrarlos en el aviso */
+  camposQueFaltan: string[];
   comisionInmobiliaria: number;
   gastosGestoria: number;
   totalGastos: number;
@@ -258,7 +268,10 @@ export default function SimuladorTrasteroCompraventaPage() {
 
     const notario = notaria.medio;
     const registro = calcularRegistro(precio);
-    const totalGastos = impuesto + ajd + notario + registro + gestoria;
+    // Se suman las líneas YA redondeadas al céntimo, que es como las ve el usuario: el
+    // total redondeaba la suma exacta y no cuadraba con el desglose de encima por un
+    // céntimo, en ambos sentidos (hallazgo 594).
+    const totalGastos = sumarLineasVisibles(impuesto, ajd, notario, registro, gestoria);
 
     return {
       precioInmueble: precio,
@@ -273,7 +286,7 @@ export default function SimuladorTrasteroCompraventaPage() {
       gastosRegistro: registro,
       gastosGestoria: gestoria,
       totalGastos,
-      totalOperacion: precio + totalGastos,
+      totalOperacion: sumarLineasVisibles(precio, totalGastos),
       tipoElegido: elegido,
     };
   }, [precioVenta, ccaa, tipoTransmision, perfilComprador, gastosGestoria, modalidadTrastero]);
@@ -298,11 +311,20 @@ export default function SimuladorTrasteroCompraventaPage() {
 
     // Plusvalía municipal
     let plusvalia = 0;
-    let metodoPlusvalia = 'No calculada (faltan datos)';
+    // El aviso nombra lo que de VERDAD falta, uno a uno. Decía siempre «faltan datos» y
+    // el neto mandaba a rellenar «los años de propiedad y el valor catastral del suelo»,
+    // así que con solo los años en blanco releías un campo ya relleno y el precio de compra
+    // no se nombraba nunca (hallazgo 590; es el 437, que la app hermana garaje ya reparó).
+    const faltan = [
+      valorSuelo > 0 ? null : 'el valor catastral del suelo',
+      anios > 0 ? null : 'los años de propiedad',
+      precioC > 0 ? null : 'el precio de compra original',
+    ].filter((x): x is string => x !== null);
+    let metodoPlusvalia = `No calculada (falta ${faltan.join(', ')})`;
     let exentoPlusvalia = false;
     let plusvaliaCalculada = false;
 
-    if (valorSuelo > 0 && anios > 0 && precioC > 0) {
+    if (faltan.length === 0) {
       plusvaliaCalculada = true;
       const resultadoPlusvalia = calcularPlusvaliaMunicipal({
         valorCatastralSuelo: valorSuelo,
@@ -336,7 +358,7 @@ export default function SimuladorTrasteroCompraventaPage() {
 
     const hayDatosGanancia = precioC > 0;
     const irpf = hayDatosGanancia ? g.cuotaIRPF : 0;
-    const totalGastos = plusvalia + comision + gestoria + irpf;
+    const totalGastos = sumarLineasVisibles(plusvalia, comision, gestoria, irpf);
     const neto = precioV - totalGastos;
 
     return {
@@ -345,6 +367,8 @@ export default function SimuladorTrasteroCompraventaPage() {
       metodoPlusvalia,
       exentoPlusvalia,
       plusvaliaCalculada,
+      /** Los campos concretos que faltan, para que el aviso del neto no los adivine */
+      camposQueFaltan: faltan,
       comisionInmobiliaria: comision,
       gastosGestoria: gestoria,
       totalGastos,
@@ -366,7 +390,7 @@ export default function SimuladorTrasteroCompraventaPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>📦</span>
+        <span className={styles.heroIcon} aria-hidden="true">📦</span>
         <h1 className={styles.title}>Simulador de Gastos de Compraventa de Trastero</h1>
         <p className={styles.subtitle}>
           Calcula el ITP, notaría, registro y gastos al comprar o vender un trastero en España
@@ -406,11 +430,11 @@ export default function SimuladorTrasteroCompraventaPage() {
 
       {/* Nota informativa sobre trastero */}
       <div className={styles.trasteroNote}>
-        <span className={styles.trasteroNoteIcon}>ℹ️</span>
+        <span className={styles.trasteroNoteIcon} aria-hidden="true">ℹ️</span>
         <p>
-          <strong>Trastero vinculado a vivienda:</strong> tributa como anejo residencial (IVA 10% en obra nueva,
+          <strong>Trastero vinculado a vivienda:</strong> tributa como anejo residencial (IVA {formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}% en obra nueva,
           ITP residencial en segunda mano). <strong>Trastero vendido de forma independiente:</strong> en obra nueva
-          pierde el tipo reducido y paga el IVA general del 21% (art. 91.Uno.1.7º LIVA) en el territorio donde
+          pierde el tipo reducido y paga el IVA general del {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}% (art. 91.Uno.1.7º LIVA) en el territorio donde
           rige el IVA, sin distinción por comunidad autónoma — salvo en Canarias, Ceuta y Melilla, donde no se
           paga IVA sino IGIC o IPSI (ver aviso abajo). En segunda mano paga el mismo ITP que el vinculado.
         </p>
@@ -419,54 +443,7 @@ export default function SimuladorTrasteroCompraventaPage() {
       {/* Formulario principal */}
       <section className={styles.mainContent}>
         <div className={styles.formPanel}>
-          <h2 className={styles.sectionTitle}>📋 Datos de la operación</h2>
-
-          {/* Modalidad de trastero */}
-          <div className={styles.inputGroup}>
-            <span className={styles.label} id="rotulo-modalidad">Modalidad del trastero</span>
-            <div className={styles.transmisionGrid} role="group" aria-labelledby="rotulo-modalidad">
-              <button
-                type="button"
-                aria-pressed={modalidadTrastero === 'vinculado'}
-                className={`${styles.transmisionBtn} ${modalidadTrastero === 'vinculado' ? styles.active : ''}`}
-                onClick={() => setModalidadTrastero('vinculado')}
-              >
-                <span aria-hidden="true" className={styles.transmisionIcon}>🏠</span>
-                <span>Vinculado a vivienda</span>
-                <span className={styles.transmisionSub}>Anejo residencial</span>
-              </button>
-              <button
-                type="button"
-                aria-pressed={modalidadTrastero === 'independiente'}
-                className={`${styles.transmisionBtn} ${modalidadTrastero === 'independiente' ? styles.active : ''}`}
-                onClick={() => setModalidadTrastero('independiente')}
-              >
-                <span aria-hidden="true" className={styles.transmisionIcon}>📦</span>
-                <span>Independiente</span>
-                <span className={styles.transmisionSub}>Finca registral propia</span>
-              </button>
-            </div>
-            {modalidadTrastero === 'independiente' && (
-              <p className={styles.infoCcaaNote} style={{ marginTop: '0.5rem', color: '#856404' }}>
-                <span aria-hidden="true">⚠️</span>{' '}
-                {TERRITORIOS_SIN_IVA[ccaa] ? (
-                  <>
-                    En Canarias, Ceuta y Melilla no rige el IVA (allí se paga {TERRITORIOS_SIN_IVA[ccaa].impuesto}),
-                    así que la modalidad independiente/vinculada no cambia el impuesto en primera mano. En
-                    segunda mano paga ITP, pero los tipos reducidos por perfil (joven, familia numerosa) suelen
-                    exigir que la compra sea de vivienda habitual. Confirma tu caso con un asesor fiscal.
-                  </>
-                ) : (
-                  <>
-                    En obra nueva, el trastero independiente tributa al <strong>IVA general del 21%</strong>, no al
-                    10%: el tipo reducido solo se aplica a los anejos transmitidos junto con la vivienda. En
-                    segunda mano paga ITP, pero los tipos reducidos por perfil (joven, familia numerosa) suelen
-                    exigir que la compra sea de vivienda habitual. Confirma tu caso con un asesor fiscal.
-                  </>
-                )}
-              </p>
-            )}
-          </div>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">📋</span> Datos de la operación</h2>
 
           {/* Tipo de transmisión */}
           <div className={styles.inputGroup}>
@@ -495,11 +472,56 @@ export default function SimuladorTrasteroCompraventaPage() {
                       vinculado/independiente no cambia el resultado en nada (hallazgo 485). */}
                   {TERRITORIOS_SIN_IVA[ccaa]
                     ? `Paga ${TERRITORIOS_SIN_IVA[ccaa].impuesto}`
-                    : `Paga IVA ${modalidadTrastero === 'vinculado' ? '10%' : '21%'}`}
+                    : `Paga IVA ${modalidadTrastero === 'vinculado' ? IVA_INMUEBLES_2025.obraNueva : IVA_INMUEBLES_2025.garaje}%`}
                 </span>
               </button>
             </div>
           </div>
+
+          {/* Modalidad de trastero: solo en primera mano, que es donde decide el tipo de
+              IVA. En segunda mano no entra en el cálculo —ambas modalidades liquidan el ITP
+              general de la comunidad— y aun así se mostraba, con un aviso sobre el IVA de
+              obra nueva encima de una operación de segunda mano (hallazgo 595). Se oculta
+              también en Canarias, Ceuta y Melilla, donde no rige el IVA sino IGIC/IPSI: es
+              el mismo criterio que la app hermana garaje aplicó en el hallazgo 475. */}
+          {tipoTransmision === 'primera-mano' && !TERRITORIOS_SIN_IVA[ccaa] && (
+          <div className={styles.inputGroup}>
+            <span className={styles.label} id="rotulo-modalidad">Modalidad del trastero</span>
+            <div className={styles.transmisionGrid} role="group" aria-labelledby="rotulo-modalidad">
+              <button
+                type="button"
+                aria-pressed={modalidadTrastero === 'vinculado'}
+                className={`${styles.transmisionBtn} ${modalidadTrastero === 'vinculado' ? styles.active : ''}`}
+                onClick={() => setModalidadTrastero('vinculado')}
+              >
+                <span aria-hidden="true" className={styles.transmisionIcon}>🏠</span>
+                <span>Vinculado a vivienda</span>
+                <span className={styles.transmisionSub}>Anejo residencial</span>
+              </button>
+              <button
+                type="button"
+                aria-pressed={modalidadTrastero === 'independiente'}
+                className={`${styles.transmisionBtn} ${modalidadTrastero === 'independiente' ? styles.active : ''}`}
+                onClick={() => setModalidadTrastero('independiente')}
+              >
+                <span aria-hidden="true" className={styles.transmisionIcon}>📦</span>
+                <span>Independiente</span>
+                <span className={styles.transmisionSub}>Finca registral propia</span>
+              </button>
+            </div>
+            {/* El selector ya solo se pinta en primera mano y fuera de IGIC/IPSI, así que
+                aquí no hace falta la rama de territorios sin IVA: el aviso habla del tipo
+                que de verdad se está aplicando en pantalla. */}
+            {modalidadTrastero === 'independiente' && (
+              <p className={styles.infoCcaaNote} style={{ marginTop: '0.5rem', color: '#856404' }}>
+                <span aria-hidden="true">⚠️</span>{' '}
+                En obra nueva, el trastero independiente tributa al <strong>IVA general del {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}%</strong>, no al
+                {' '}{formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}%: el tipo reducido solo se aplica a los anejos transmitidos junto con la vivienda.
+                Confirma tu caso con un asesor fiscal.
+              </p>
+            )}
+          </div>
+          )}
 
           {/* Precio de venta */}
           <NumberInput
@@ -531,7 +553,7 @@ export default function SimuladorTrasteroCompraventaPage() {
           {/* Info CCAA */}
           <div className={styles.infoCcaa}>
             <div className={styles.infoCcaaHeader}>
-              <span className={styles.infoCcaaIcon}>📍</span>
+              <span className={styles.infoCcaaIcon} aria-hidden="true">📍</span>
               <span className={styles.infoCcaaNombre}>{datosCcaaActual.nombre}</span>
             </div>
             <div className={styles.infoCcaaGrid}>
@@ -546,7 +568,7 @@ export default function SimuladorTrasteroCompraventaPage() {
             </div>
             {datosCcaaActual.tramosProgresivos && (
               <p className={styles.infoCcaaNote}>
-                ⚠️ Esta comunidad aplica escala progresiva ({datosCcaaActual.tramosProgresivos.map(t => `${t.tipo}%`).join(' → ')})
+                <span aria-hidden="true">⚠️</span> Esta comunidad aplica escala progresiva ({datosCcaaActual.tramosProgresivos.map(t => `${t.tipo}%`).join(' → ')})
               </p>
             )}
             <p className={styles.infoCcaaNote}>{datosCcaaActual.notas}</p>
@@ -587,7 +609,7 @@ export default function SimuladorTrasteroCompraventaPage() {
           {/* Enlace a Catastro */}
           <div className={styles.enlaceCatastro}>
             <a href={ENLACE_CATASTRO} target="_blank" rel="noopener noreferrer" className={styles.catastroLink}>
-              🔗 Consultar valor de referencia catastral en la Sede del Catastro
+              <span aria-hidden="true">🔗</span> Consultar valor de referencia catastral en la Sede del Catastro
             </a>
           </div>
         </div>
@@ -602,7 +624,7 @@ export default function SimuladorTrasteroCompraventaPage() {
               className={`${styles.tab} ${pestanaActiva === 'comprador' ? styles.active : ''}`}
               onClick={() => setPestanaActiva('comprador')}
             >
-              🛒 Comprador
+              <span aria-hidden="true">🛒</span> Comprador
             </button>
             <button
               type="button"
@@ -610,7 +632,7 @@ export default function SimuladorTrasteroCompraventaPage() {
               className={`${styles.tab} ${pestanaActiva === 'vendedor' ? styles.active : ''}`}
               onClick={() => setPestanaActiva('vendedor')}
             >
-              💰 Vendedor
+              <span aria-hidden="true">💰</span> Vendedor
             </button>
           </div>
 
@@ -738,7 +760,7 @@ export default function SimuladorTrasteroCompraventaPage() {
                 </>
               ) : (
                 <div className={styles.placeholder}>
-                  <span className={styles.placeholderIcon}>📊</span>
+                  <span className={styles.placeholderIcon} aria-hidden="true">📊</span>
                   <p>Introduce el precio del trastero para ver el desglose de gastos del comprador</p>
                 </div>
               )}
@@ -901,7 +923,7 @@ export default function SimuladorTrasteroCompraventaPage() {
                     description={
                       !resultadosVendedor.irpfCalculado
                         ? 'Falta el precio de compra original. Este impuesto NO está incluido en el neto de abajo.'
-                        : 'Tributación en base del ahorro (19%-30%)'
+                        : `Tributación en base del ahorro (${TIPO_AHORRO_MIN}%-${TIPO_AHORRO_MAX}%)`
                     }
                   />
 
@@ -945,7 +967,7 @@ export default function SimuladorTrasteroCompraventaPage() {
                         const faltan = [
                           resultadosVendedor.plusvaliaCalculada || resultadosVendedor.exentoPlusvalia
                             ? null
-                            : 'la plusvalía municipal (añade los años de propiedad y el valor catastral del suelo)',
+                            : `la plusvalía municipal (añade ${resultadosVendedor.camposQueFaltan.join(' y ')})`,
                           resultadosVendedor.irpfCalculado ? null : 'el IRPF de la ganancia (añade el precio de compra original)',
                         ].filter((x): x is string => x !== null);
                         return faltan.length === 0
@@ -957,7 +979,7 @@ export default function SimuladorTrasteroCompraventaPage() {
                 </>
               ) : (
                 <div className={styles.placeholder}>
-                  <span className={styles.placeholderIcon}>📊</span>
+                  <span className={styles.placeholderIcon} aria-hidden="true">📊</span>
                   <p>Introduce el precio de venta y los datos adicionales para calcular el neto del vendedor</p>
                 </div>
               )}
@@ -988,20 +1010,23 @@ export default function SimuladorTrasteroCompraventaPage() {
               <tbody>
                 <tr>
                   <td>IVA en obra nueva</td>
-                  <td>10% (anejo de la vivienda)</td>
-                  <td>21% (tipo general)</td>
-                  <td>10% con la vivienda (máx. 2 plazas) · 21% independiente</td>
+                  <td>{formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}% (anejo de la vivienda)</td>
+                  <td>{formatNumber(IVA_INMUEBLES_2025.garaje, 0)}% (tipo general)</td>
+                  <td>{formatNumber(IVA_INMUEBLES_2025.garageCon, 0)}% con la vivienda (máx. 2 plazas) · {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}% independiente</td>
                 </tr>
                 <tr>
+                  {/* En segunda mano la modalidad NO entra en el cálculo: las tres columnas
+                       liquidan el tipo general de la comunidad. La celda del independiente
+                       decía «puede variar» y desmentía al motor y a la propia FAQ (hallazgo 593). */}
                   <td>ITP en segunda mano</td>
                   <td>Tipo general CCAA (residencial)</td>
-                  <td>Tipo general CCAA (puede variar)</td>
+                  <td>Tipo general CCAA (residencial)</td>
                   <td>Tipo general CCAA (residencial)</td>
                 </tr>
                 <tr>
                   <td>Tipos reducidos ITP</td>
                   <td>Según CCAA (anejo residencial)</td>
-                  <td>Variable según CCAA</td>
+                  <td>Según CCAA, pero casi todos exigen vivienda habitual</td>
                   <td>Según CCAA (anejo residencial)</td>
                 </tr>
                 <tr>
@@ -1018,9 +1043,9 @@ export default function SimuladorTrasteroCompraventaPage() {
                 </tr>
                 <tr>
                   <td>IRPF ganancia patrimonial</td>
-                  <td>19% – 30%</td>
-                  <td>19% – 30%</td>
-                  <td>19% – 30%</td>
+                  <td>{formatNumber(TIPO_AHORRO_MIN, 0)}% – {formatNumber(TIPO_AHORRO_MAX, 0)}%</td>
+                  <td>{formatNumber(TIPO_AHORRO_MIN, 0)}% – {formatNumber(TIPO_AHORRO_MAX, 0)}%</td>
+                  <td>{formatNumber(TIPO_AHORRO_MIN, 0)}% – {formatNumber(TIPO_AHORRO_MAX, 0)}%</td>
                 </tr>
               </tbody>
             </table>
@@ -1033,7 +1058,7 @@ export default function SimuladorTrasteroCompraventaPage() {
           <div className={styles.casosGrid}>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoEmoji}>🏗️</span>
+                <span className={styles.casoEmoji} aria-hidden="true">🏗️</span>
                 <span className={styles.casoTag}>Trastero con vivienda nueva</span>
               </div>
               <p>Al comprar un piso de obra nueva en Madrid por 280.000 € con trastero incluido por {formatCurrency(EJEMPLOS.nuevoPrecio)},
@@ -1044,7 +1069,7 @@ export default function SimuladorTrasteroCompraventaPage() {
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoEmoji}>🔄</span>
+                <span className={styles.casoEmoji} aria-hidden="true">🔄</span>
                 <span className={styles.casoTag}>Trastero de segunda mano</span>
               </div>
               <p>Una persona compra un trastero independiente en Cataluña por {formatCurrency(EJEMPLOS.usadoPrecio)}. Al ser segunda mano,
@@ -1054,19 +1079,19 @@ export default function SimuladorTrasteroCompraventaPage() {
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoEmoji}>💰</span>
+                <span className={styles.casoEmoji} aria-hidden="true">💰</span>
                 <span className={styles.casoTag}>Vender un trastero</span>
               </div>
               <p>El vendedor debe calcular la plusvalía municipal (si la hay) y la posible ganancia patrimonial
               en IRPF. Si compró el trastero por 8.000 € y lo vende por 15.000 €, la diferencia bruta son 7.000 €,
               pero el art. 35 LIRPF descuenta antes los gastos de la venta: con la comisión del 3% que trae el
               simulador ({formatCurrency(EJEMPLOS.ventaComision)}) la ganancia queda en {formatCurrency(EJEMPLOS.ventaGanancia)} y
-              el IRPF en {formatCurrency(EJEMPLOS.ventaIrpf)}, porque la base del ahorro no es plana: 19% hasta 6.000 € y 21% sobre el resto.</p>
+              el IRPF en {formatCurrency(EJEMPLOS.ventaIrpf)}, porque la base del ahorro no es plana: {formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo, 0)}% hasta {eurosEnteros(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].hasta)} y {formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[1].tipo, 0)}% sobre el resto.</p>
               <div className={styles.casoResultado}>Ganancia de {formatCurrency(EJEMPLOS.ventaGanancia)} → {formatCurrency(EJEMPLOS.ventaIrpf)} de IRPF</div>
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoEmoji}>🎯</span>
+                <span className={styles.casoEmoji} aria-hidden="true">🎯</span>
                 <span className={styles.casoTag}>Tipos reducidos de ITP</span>
               </div>
               <p>Un joven de 30 años que compra un trastero en Galicia por {formatCurrency(EJEMPLOS.galiciaPrecio)} paga
@@ -1087,17 +1112,17 @@ export default function SimuladorTrasteroCompraventaPage() {
               <h4>¿Qué IVA paga un trastero nuevo?</h4>
               <p>Depende de si se compra con la vivienda o por separado. Si el promotor lo transmite
               <strong> conjuntamente con la vivienda</strong> como anejo, se aplica el tipo reducido del
-              <strong> 10%</strong> (art. 91.Uno.1.7º de la Ley del IVA). Si se compra de forma
+              <strong> {formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}%</strong> (art. 91.Uno.1.7º de la Ley del IVA). Si se compra de forma
               <strong> independiente</strong> —finca registral propia, operación separada— tributa al tipo
-              general del <strong>21%</strong>. Es el mismo criterio que rige para las plazas de garaje.</p>
+              general del <strong>{formatNumber(IVA_INMUEBLES_2025.garaje, 0)}%</strong>. Es el mismo criterio que rige para las plazas de garaje.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Qué diferencia hay entre trastero vinculado y trastero independiente?</h4>
               <p>El <strong>trastero vinculado</strong> forma parte de la misma finca registral que la vivienda y se vende
               junto a ella como anejo. El <strong>trastero independiente</strong> tiene su propia referencia catastral
               y escritura y puede venderse por separado. La diferencia fiscal principal está en la obra nueva:
-              el vinculado paga <strong>IVA al 10%</strong> como anejo de la vivienda y el independiente al
-              <strong> 21%</strong>. En segunda mano ambos pagan ITP al tipo de la comunidad autónoma, aunque los
+              el vinculado paga <strong>IVA al {formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}%</strong> como anejo de la vivienda y el independiente al
+              <strong> {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}%</strong>. En segunda mano ambos pagan ITP al tipo de la comunidad autónoma, aunque los
               tipos reducidos por perfil del comprador suelen exigir que la compra sea de vivienda habitual.
               Consulta siempre con un asesor fiscal antes de la operación.</p>
             </div>
@@ -1132,19 +1157,19 @@ export default function SimuladorTrasteroCompraventaPage() {
           <h2>Consejos para comprar o vender un trastero</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔍</span>
               <strong>Comprueba el tipo de finca</strong>
               <p>Antes de comprar, consulta en el Registro de la Propiedad si el trastero tiene finca propia
               o está vinculado a otra. Esto afecta a la operación y a los impuestos.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏛️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏛️</span>
               <strong>Consulta el valor catastral</strong>
               <p>El ITP se calcula sobre el mayor valor entre el precio escriturado y el valor de referencia
               catastral. Compruébalo en la Sede Electrónica del Catastro antes de acordar el precio.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <strong>Liquida los impuestos a tiempo</strong>
               <p>
                 El ITP o el IVA+AJD debe liquidarse en 30 días hábiles desde la firma de la escritura.
@@ -1157,7 +1182,7 @@ export default function SimuladorTrasteroCompraventaPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📁</span>
+              <span className={styles.tipIcon} aria-hidden="true">📁</span>
               <strong>Guarda todos los justificantes</strong>
               <p>Conserva la escritura, el ITP pagado y los gastos de notaría. Si en el futuro vendes,
               estos gastos se suman al valor de adquisición y reducen la ganancia patrimonial en IRPF.</p>
@@ -1168,7 +1193,7 @@ export default function SimuladorTrasteroCompraventaPage() {
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Limitaciones de esta calculadora de gastos de trastero</strong>
           </div>
           <ul className={styles.warningList}>

@@ -23,7 +23,6 @@ import {
   ComunidadAutonoma,
   calcularITP,
   calcularAJD,
-  calcularNotario,
   estimarFacturaNotarial,
   calcularRegistro,
   ENLACE_CATASTRO,
@@ -31,6 +30,7 @@ import {
   RANGO_ITP,
   TERRITORIOS_SIN_IVA,
   CIUDADES_CON_BONIFICACION,
+  sumarLineasVisibles,
 } from '@/data/itp-ccaa';
 import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
 
@@ -154,7 +154,10 @@ export default function SimuladorNaveIndustrialPage() {
     const notario = notaria.medio;
     const registro = calcularRegistro(precio);
 
-    const totalGastos = impuesto + ajd + notario + registro + gestoria;
+    // Se suman las líneas YA redondeadas al céntimo, que es como las ve el usuario: el
+    // total redondeaba la suma exacta y no cuadraba con el desglose de encima por un
+    // céntimo, en ambos sentidos (hallazgo 594).
+    const totalGastos = sumarLineasVisibles(impuesto, ajd, notario, registro, gestoria);
 
     return {
       precioInmueble: precio,
@@ -170,13 +173,17 @@ export default function SimuladorNaveIndustrialPage() {
       gastosRegistro: registro,
       gastosGestoria: gestoria,
       totalGastos,
-      totalOperacion: precio + totalGastos,
+      totalOperacion: sumarLineasVisibles(precio, totalGastos),
     };
   }, [precioVenta, ccaa, tipoTransmision, gastosGestoria]);
 
   const datosCcaaActual = ITP_CCAA[ccaa];
   const territorioActualSinIva = TERRITORIOS_SIN_IVA[ccaa];
   const esCiudadBonificada = CIUDADES_CON_BONIFICACION.includes(ccaa);
+  /** Las dos ramas en las que el impuesto es IVA y, por tanto, la base es la contraprestación */
+  const conIvaEnPantalla =
+    (tipoTransmision === 'primera-mano' || tipoTransmision === 'segunda-mano-renuncia') &&
+    !territorioActualSinIva;
 
   return (
     <div className={styles.container}>
@@ -213,7 +220,7 @@ export default function SimuladorNaveIndustrialPage() {
 
       {/* Aviso IVA deducible */}
       <div className={styles.ivaAviso} role="note">
-        <strong>💡 Si eres empresa o autónomo:</strong> el IVA soportado en la compra de una nave industrial
+        <strong><span aria-hidden="true">💡</span> Si eres empresa o autónomo:</strong> el IVA soportado en la compra de una nave industrial
         puede ser <strong>deducible</strong> si tu actividad está sujeta a IVA. Consulta con tu asesor fiscal
         antes de tomar decisiones.
       </div>
@@ -293,13 +300,21 @@ export default function SimuladorNaveIndustrialPage() {
             )}
           </div>
 
-          {/* Precio */}
+          {/* Precio. La base del IVA es la contraprestación pactada (art. 78 Ley 37/1992); el
+              valor de referencia catastral es la base MÍNIMA del ITP/AJD. En obra nueva y en la
+              renuncia, seguir «el mayor de ambos» infla el impuesto sobre una base que la ley
+              del IVA no reconoce, y contradice al recuadro de limitaciones de esta misma
+              página, que sí acota el valor de referencia «al ITP» (hallazgo 601). */}
           <NumberInput
             value={precioVenta}
             onChange={setPrecioVenta}
             label="Precio de compra de la nave industrial"
             placeholder="500000"
-            helperText="Precio escriturado o valor de referencia catastral (el mayor de ambos)"
+            helperText={
+              conIvaEnPantalla
+                ? 'Contraprestación pactada en la escritura (base del IVA, art. 78 Ley 37/1992)'
+                : 'Precio escriturado o valor de referencia catastral (el mayor de ambos)'
+            }
             min={0}
           />
 
@@ -426,8 +441,14 @@ export default function SimuladorNaveIndustrialPage() {
                 description={
                   resultadosComprador.impuestoNoCalculado
                     ? `En ${datosCcaaActual.nombre} no rige el IVA: ${tipoTransmision === 'segunda-mano-renuncia' ? 'la renuncia a la exención' : 'la obra nueva'} tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
-                    : resultadosComprador.tipoImpuesto === 'IVA'
-                      ? 'Potencialmente deducible si eres empresa/autónomo sujeto a IVA'
+                    // startsWith y no igualdad estricta: con renuncia el rótulo es
+                    // «IVA (renuncia · ISP)» y caía al ramal del ITP, así que bajo un IVA de
+                    // 105.000 € se leía «naves industriales no tienen tipos reducidos», que
+                    // es del impuesto que en esa operación NO se paga (hallazgo 600).
+                    : resultadosComprador.tipoImpuesto.startsWith('IVA')
+                      ? tipoTransmision === 'segunda-mano-renuncia'
+                        ? 'Lo autoliquida el comprador por inversión del sujeto pasivo (no se paga al vendedor) y es deducible si tienes derecho'
+                        : 'Potencialmente deducible si eres empresa/autónomo sujeto a IVA'
                       : resultadosComprador.bonificado
                         ? 'Tipo general con la bonificación del 50 % de la cuota ya aplicada (art. 57 bis TRLITPAJD)'
                         : 'Tipo general — naves industriales no tienen tipos reducidos'

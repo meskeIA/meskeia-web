@@ -28,6 +28,7 @@ import {
   calcularRegistro,
   ENLACE_CATASTRO,
   TERRITORIOS_SIN_IVA,
+  sumarLineasVisibles,
 } from '@/data/itp-ccaa';
 import {
   IVA_INMUEBLES_2025,
@@ -148,7 +149,10 @@ export default function SimuladorTerrenoRusticoPage() {
     const notario = notaria.medio;
     const registro = calcularRegistro(precio);
 
-    const totalGastos = impuesto + ajd + notario + registro + gestoria;
+    // Se suman las líneas YA redondeadas al céntimo, que es como las ve el usuario: el
+    // total redondeaba la suma exacta y no cuadraba con el desglose de encima por un
+    // céntimo, en ambos sentidos (hallazgo 594).
+    const totalGastos = sumarLineasVisibles(impuesto, ajd, notario, registro, gestoria);
 
     return {
       precioInmueble: precio,
@@ -163,7 +167,7 @@ export default function SimuladorTerrenoRusticoPage() {
       gastosRegistro: registro,
       gastosGestoria: gestoria,
       totalGastos,
-      totalOperacion: precio + totalGastos,
+      totalOperacion: sumarLineasVisibles(precio, totalGastos),
       ivaRecuperable,
     };
   }, [precioVenta, ccaa, tipoOperacion, gastosGestoria]);

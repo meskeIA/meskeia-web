@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema, generateFAQSchema, combineSchemas } from '@/lib/schema-templates';
-import { ITP_CCAA, RANGO_ITP } from '@/data/itp-ccaa';
-import { IVA_INMUEBLES_2025 } from '@/data/fiscal';
+import { ITP_CCAA, RANGO_ITP, BANDA_PRECIO_VIVIENDA, horquillaFedatarios, estimarFacturaNotarial } from '@/data/itp-ccaa';
+import { IVA_INMUEBLES_2025, TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
 
 /**
  * Los tipos que cita el JSON-LD se LEEN de la tabla, no se escriben.
@@ -15,6 +15,24 @@ import { IVA_INMUEBLES_2025 } from '@/data/fiscal';
  * estructurada que leen Bing Copilot, ChatGPT y Perplexity envejecería sin aviso.
  */
 const pct = (n: number) => `${String(n).replace('.', ',')} %`;
+
+/**
+ * Las horquillas de notaría y registro salen del ARANCEL, no de la memoria.
+ *
+ * ── Por qué (02/09/2026, hallazgo 584) ────────────────────────────────────────
+ * Este mismo fichero publicaba «notaría 300 €-1.000 €» en una pregunta y «700-900 €» en
+ * otra, mientras la página visible decía «600 €-1.500 €» y el motor cobra 758,98 € para
+ * una vivienda de 200.000 €. Tres rangos para lo mismo, y el que leen los asistentes de
+ * IA era el peor. Ahora los tres sitios llaman a la misma función.
+ */
+const euros = (n: number) => `${(Math.round(n / 10) * 10).toLocaleString('es-ES')} €`;
+const TIPO_AHORRO_MIN = TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo;
+const TIPO_AHORRO_MAX = TRAMOS_GANANCIAS_PATRIMONIALES_2025[TRAMOS_GANANCIAS_PATRIMONIALES_2025.length - 1].tipo;
+const HORQUILLA = horquillaFedatarios(BANDA_PRECIO_VIVIENDA.min, BANDA_PRECIO_VIVIENDA.max);
+const notariaDe = (precio: number) => {
+  const f = estimarFacturaNotarial(precio);
+  return `${euros(f.min)} y ${euros(f.max)}`;
+};
 const tipoDe = (id: keyof typeof ITP_CCAA) => pct(ITP_CCAA[id].tipoGeneral);
 const techoDe = (id: keyof typeof ITP_CCAA) =>
   pct(Math.max(ITP_CCAA[id].tipoGeneral, ...(ITP_CCAA[id].tramosProgresivos ?? []).map((t) => t.tipo)));
@@ -78,7 +96,7 @@ const faqSchema = generateFAQSchema({
   mainEntity: [
     {
       question: '¿Qué diferencia hay entre ITP e IVA en la compra de una vivienda?',
-      answer: 'El ITP se aplica a viviendas de segunda mano (transmisiones entre particulares), mientras que el IVA al 10% se paga en viviendas nuevas (primera entrega del promotor). No pueden coexistir en la misma operación: o se paga uno u otro, nunca ambos.',
+      answer: `El ITP se aplica a viviendas de segunda mano (transmisiones entre particulares), mientras que el IVA al ${IVA_INMUEBLES_2025.obraNueva}% se paga en viviendas nuevas (primera entrega del promotor). No pueden coexistir en la misma operación: o se paga uno u otro, nunca ambos.`,
     },
     {
       question: '¿Cuánto hay que sumar al precio de una vivienda por gastos e impuestos?',
@@ -86,7 +104,7 @@ const faqSchema = generateFAQSchema({
     },
     {
       question: '¿Qué paga el vendedor de una vivienda?',
-      answer: 'El vendedor asume la plusvalía municipal (IIVTNU), el IRPF sobre la ganancia patrimonial (del 19% al 30% en la base del ahorro) y, si la hubo, la comisión de la inmobiliaria. Existen dos exenciones importantes en el IRPF que no se aplican a otros inmuebles: la reinversión del importe en otra vivienda habitual y la de los mayores de 65 años que venden su vivienda habitual.',
+      answer: `El vendedor asume la plusvalía municipal (IIVTNU), el IRPF sobre la ganancia patrimonial (del ${TIPO_AHORRO_MIN}% al ${TIPO_AHORRO_MAX}% en la base del ahorro) y, si la hubo, la comisión de la inmobiliaria. Existen dos exenciones importantes en el IRPF que no se aplican a otros inmuebles: la reinversión del importe en otra vivienda habitual y la de los mayores de 65 años que venden su vivienda habitual.`,
     },
     {
       question: '¿Puedo negociar quién paga cada gasto?',
@@ -134,7 +152,7 @@ export const faqJsonLd = {
       name: '¿Qué gastos tiene el comprador al adquirir una vivienda en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El comprador asume habitualmente: el ITP (segunda mano) o IVA + AJD (obra nueva), los gastos de notaría (entre 300 € y 1.000 €), los gastos de inscripción en el Registro de la Propiedad (entre 100 € y 600 €), y opcionalmente la gestoría (200-400 €). En total, los gastos de compraventa suelen representar entre el 8 % y el 13 % del precio de compra, dependiendo de la comunidad autónoma y si hay hipoteca.',
+        text: `El comprador asume habitualmente: el ITP (segunda mano) o IVA + AJD (obra nueva), los gastos de notaría (entre ${euros(HORQUILLA.notaria.min)} y ${euros(HORQUILLA.notaria.max)} para viviendas de ${euros(BANDA_PRECIO_VIVIENDA.min)} a ${euros(BANDA_PRECIO_VIVIENDA.max)}), los gastos de inscripción en el Registro de la Propiedad (entre ${euros(HORQUILLA.registro.min)} y ${euros(HORQUILLA.registro.max)} en esa misma banda), y opcionalmente la gestoría (200-400 €). En total, los gastos de compraventa suelen representar entre el 8 % y el 13 % del precio de compra, dependiendo de la comunidad autónoma y si hay hipoteca.`,
       },
     },
     {
@@ -142,7 +160,7 @@ export const faqJsonLd = {
       name: '¿Qué impuestos paga el vendedor al vender un inmueble?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El vendedor debe hacer frente a dos tributos principales: la plusvalía municipal (IIVTNU), que grava el incremento del valor del terreno durante los años de tenencia, y la ganancia patrimonial en el IRPF si el precio de venta supera el precio de adquisición. La ganancia patrimonial tributa entre el 19 % y el 30 % según el importe. Existen exenciones relevantes: reinversión en vivienda habitual, mayores de 65 años, vivienda habitual con hipoteca...',
+        text: `El vendedor debe hacer frente a dos tributos principales: la plusvalía municipal (IIVTNU), que grava el incremento del valor del terreno durante los años de tenencia, y la ganancia patrimonial en el IRPF si el precio de venta supera el precio de adquisición. La ganancia patrimonial tributa entre el ${TIPO_AHORRO_MIN} % y el ${TIPO_AHORRO_MAX} % según el importe. Existen exenciones relevantes: reinversión en vivienda habitual, mayores de 65 años, vivienda habitual con hipoteca...`,
       },
     },
     {
@@ -150,7 +168,7 @@ export const faqJsonLd = {
       name: '¿Cuánto cuesta la escritura notarial de una compraventa?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los honorarios del notario en una compraventa se calculan según el Arancel Notarial (RD 1426/1989) y dependen del precio del inmueble. Para una vivienda de 200.000 € los gastos de notaría rondan los 700-900 €; para 400.000 €, aproximadamente 900-1.200 €. Si hay hipoteca, desde 2019 los gastos de notaría de la hipoteca los paga el banco, no el comprador.',
+        text: `Los honorarios del notario en una compraventa se calculan según el Arancel Notarial (RD 1426/1989) y dependen del precio del inmueble. Para una vivienda de 200.000 € la factura notarial se sitúa entre ${notariaDe(200000)}; para 400.000 €, entre ${notariaDe(400000)}. Si hay hipoteca, desde 2019 los gastos de notaría de la hipoteca los paga el banco, no el comprador.`,
       },
     },
     {

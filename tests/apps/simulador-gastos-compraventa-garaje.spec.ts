@@ -584,9 +584,9 @@ test.describe('MITAD B — casos nuevos de la re-inspección (27/08/2026)', () =
     expect(notaria).toContain('1068,37 €');
     expect(notaria).toContain('1424,50 €');
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('405,75 €');
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('72.952,18 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('72.952,19 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('10,42%');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('772.952,18 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('772.952,19 €');
   });
 
   /**
@@ -1672,12 +1672,12 @@ test.describe('INSPECCIÓN 02/09/2026 — los tres casos, resueltos a mano antes
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS de la inspección del 02/09/2026.
-// Marcados con `test.fail()`: afirman lo que DEBERÍA pasar, así que hoy fallan a propósito.
-// Al repararlos se les quita la marca y quedan como regresión.
+// REGRESIÓN — los tres hallazgos de la inspección del 02/09/2026 (575, 576 y 577),
+// REPARADOS ese mismo día. Estaban escritos con `test.fail()` afirmando lo que DEBERÍA
+// pasar; al repararlos se les quitó la marca y se quedan como regresión.
 // ═════════════════════════════════════════════════════════════════════════════
 
-test.describe('Hallazgos abiertos — inspección del 02/09/2026', () => {
+test.describe('Regresión — hallazgos del 02/09/2026, reparados', () => {
   // ❌ ABIERTO (bajo) — operativa. Efecto familia del hallazgo 437, que el 27/08 arregló en la
   // TARJETA de la plusvalía y no en el pie del NETO. El texto del neto elige a qué campo mandar
   // al usuario con un ternario de dos ramas —`plusvaliaCalculada ? 'el precio de compra
@@ -1693,7 +1693,6 @@ test.describe('Hallazgos abiertos — inspección del 02/09/2026', () => {
   test('el aviso del neto nombra el dato que de verdad falta, igual que la tarjeta de arriba', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     await rellenar(page, 'Precio del garaje / plaza de parking', '30000');
     await page.getByRole('tab', { name: /Vendedor/ }).click();
@@ -1728,7 +1727,6 @@ test.describe('Hallazgos abiertos — inspección del 02/09/2026', () => {
   //       vivienda habitual · obtenido la disyuntiva «o cuando se cumplan los requisitos del
   //       comprador», sin mencionar la condición que la anula.
   test('el FAQPage del JSON-LD no promete el reducido que el motor descarta', async ({ page }) => {
-    test.fail();
     await page.goto(RUTA);
 
     const respuestas: string[] = await page.evaluate(() => {
@@ -1763,7 +1761,6 @@ test.describe('Hallazgos abiertos — inspección del 02/09/2026', () => {
   // Caso: abrir la app → `[role="tab"]` sin `id` ni `aria-controls` y `[role="tabpanel"]` sin
   //       `aria-labelledby` · esperado el par asociado en los dos sentidos.
   test('las pestañas Comprador/Vendedor asocian cada tab con su panel', async ({ page }) => {
-    test.fail();
     await page.goto(RUTA);
 
     const comprador = page.getByRole('tab', { name: 'Comprador' });

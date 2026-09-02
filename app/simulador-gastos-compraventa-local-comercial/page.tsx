@@ -31,6 +31,9 @@ import {
   calcularPlusvaliaMunicipal,
   ENLACE_CATASTRO,
   TERRITORIOS_SIN_IVA,
+  CIUDADES_CON_BONIFICACION,
+  RANGO_AJD,
+  sumarLineasVisibles,
 } from '@/data/itp-ccaa';
 
 // ===== TIPOS =====
@@ -53,6 +56,8 @@ interface ResultadosComprador {
   totalGastos: number;
   totalOperacion: number;
   ivaRecuperable: boolean; // true si el impuesto principal es IVA (deducible si el comprador es sujeto pasivo)
+  /** Cierto cuando se ha aplicado la bonificación del 50 % de Ceuta y Melilla (art. 57 bis TRLITPAJD) */
+  bonificado: boolean;
 }
 
 interface ResultadosVendedor {
@@ -123,6 +128,9 @@ export default function SimuladorLocalComercialPage() {
   const [pestanaActiva, setPestanaActiva] = useState<'comprador' | 'vendedor'>('comprador');
 
   const esRenuncia = tipoTransmision === 'segunda-mano-renuncia';
+  /** Las dos ramas en las que el impuesto es IVA y, por tanto, la base es la contraprestación */
+  const conIvaEnPantalla =
+    (tipoTransmision === 'primera-mano' || esRenuncia) && !TERRITORIOS_SIN_IVA[ccaa];
 
   // ===== CÁLCULOS =====
   const resultadosComprador = useMemo((): ResultadosComprador | null => {
@@ -142,6 +150,10 @@ export default function SimuladorLocalComercialPage() {
     let ajd = 0;
 
     const territorioSinIva = TERRITORIOS_SIN_IVA[ccaa];
+    // En Ceuta y Melilla `calcularITP` y `calcularAJD` descuentan solos el 50 % de la cuota
+    // (art. 57 bis TRLITPAJD). La pantalla tiene que decirlo: imprimía el tipo NOMINAL
+    // sobre un importe ya bonificado (hallazgos 619 y 623).
+    const bonificado = CIUDADES_CON_BONIFICACION.includes(ccaa);
     const conIva = tipoTransmision === 'primera-mano' || tipoTransmision === 'segunda-mano-renuncia';
 
     if (conIva && territorioSinIva) {
@@ -187,7 +199,10 @@ export default function SimuladorLocalComercialPage() {
     const notario = notaria.medio;
     const registro = calcularRegistro(precio);
 
-    const totalGastos = impuesto + ajd + notario + registro + gestoria;
+    // Se suman las líneas YA redondeadas al céntimo, que es como las ve el usuario: el
+    // total redondeaba la suma exacta y no cuadraba con el desglose de encima por un
+    // céntimo, en ambos sentidos (hallazgo 594).
+    const totalGastos = sumarLineasVisibles(impuesto, ajd, notario, registro, gestoria);
 
     return {
       precioInmueble: precio,
@@ -202,8 +217,9 @@ export default function SimuladorLocalComercialPage() {
       gastosRegistro: registro,
       gastosGestoria: gestoria,
       totalGastos,
-      totalOperacion: precio + totalGastos,
+      totalOperacion: sumarLineasVisibles(precio, totalGastos),
       ivaRecuperable,
+      bonificado,
     };
   }, [precioVenta, ccaa, tipoTransmision, gastosGestoria]);
 
@@ -267,7 +283,7 @@ export default function SimuladorLocalComercialPage() {
 
     const hayDatosGanancia = precioC > 0;
     const irpf = hayDatosGanancia ? g.cuotaIRPF : 0;
-    const totalGastos = plusvalia + comision + gestoria + irpf;
+    const totalGastos = sumarLineasVisibles(plusvalia, comision, gestoria, irpf);
 
     return {
       precioVenta: precioV,
@@ -296,6 +312,7 @@ export default function SimuladorLocalComercialPage() {
   ]);
 
   const datosCcaaActual = ITP_CCAA[ccaa];
+  const territorioActualSinIva = TERRITORIOS_SIN_IVA[ccaa];
 
   return (
     <div className={styles.container}>
@@ -377,7 +394,14 @@ export default function SimuladorLocalComercialPage() {
               >
                 <span className={styles.transmisionIcon} aria-hidden="true">🤝</span>
                 <span>2ª mano con renuncia IVA</span>
-                <span className={styles.transmisionSub}>IVA 21% (ISP) + AJD</span>
+                {/* En Canarias, Ceuta y Melilla no rige el IVA (IGIC/IPSI): el rótulo no puede
+                    prometer un IVA que el recuadro de abajo desmiente, y el tipo se lee de
+                    data/fiscal en vez de teclearse (hallazgos 620 y 621). */}
+                <span className={styles.transmisionSub}>
+                  {territorioActualSinIva
+                    ? `Paga ${territorioActualSinIva.impuesto} + AJD`
+                    : `IVA ${formatNumber(IVA_LOCAL_COMERCIAL, 0)}% (ISP) + AJD`}
+                </span>
               </button>
               <button
                 type="button"
@@ -387,7 +411,11 @@ export default function SimuladorLocalComercialPage() {
               >
                 <span className={styles.transmisionIcon} aria-hidden="true">🆕</span>
                 <span>Obra nueva / Promotor</span>
-                <span className={styles.transmisionSub}>Paga IVA 21% + AJD</span>
+                <span className={styles.transmisionSub}>
+                  {territorioActualSinIva
+                    ? `Paga ${territorioActualSinIva.impuesto} + AJD`
+                    : `Paga IVA ${formatNumber(IVA_LOCAL_COMERCIAL, 0)}% + AJD`}
+                </span>
               </button>
             </div>
           </div>
@@ -402,13 +430,20 @@ export default function SimuladorLocalComercialPage() {
             </div>
           )}
 
-          {/* Precio */}
+          {/* Precio. La base del IVA es la contraprestación pactada (art. 78 LIVA); el valor
+              de referencia catastral es la base MÍNIMA del ITP/AJD, no del IVA. Mandar a poner
+              «el mayor de ambos» en la rama de IVA infla el impuesto sobre una base que la ley
+              del IVA no reconoce (hallazgo 618). */}
           <NumberInput
             value={precioVenta}
             onChange={setPrecioVenta}
             label="Precio del local comercial"
             placeholder="200000"
-            helperText="Precio escriturado o valor de referencia catastral (el mayor de ambos)"
+            helperText={
+              conIvaEnPantalla
+                ? 'Contraprestación pactada en la escritura (base del IVA, art. 78 LIVA)'
+                : 'Precio escriturado o valor de referencia catastral (el mayor de ambos)'
+            }
             min={0}
           />
 
@@ -540,17 +575,29 @@ export default function SimuladorLocalComercialPage() {
                       ? 'Autorrepercutido por inversión del sujeto pasivo — deducible si eres sujeto pasivo de IVA'
                       : resultadosComprador.ivaRecuperable
                         ? 'Potencialmente deducible si eres empresa/autónomo sujeto a IVA'
-                        : 'Tipo general — los locales comerciales no tienen tipos reducidos'
+                        : resultadosComprador.bonificado
+                          ? 'Tipo general con la bonificación del 50 % de la cuota ya aplicada (art. 57 bis.3.a TRLITPAJD)'
+                          : 'Tipo general — los locales comerciales no tienen tipos reducidos'
                 }
               />
 
               {resultadosComprador.ajd > 0 && (
                 <ResultCard
-                  title={`AJD (${formatNumber(datosCcaaActual.ajd, 2)}%)`}
+                  // Tipo EFECTIVO, no el nominal de la tabla: en Ceuta y Melilla la cuota
+                  // gradual se bonifica al 50 % (art. 57 bis.1 TRLITPAJD), así que el nominal
+                  // se desmentía con el importe de al lado (hallazgo 619, ya reparado en la
+                  // app hermana de la nave industrial como hallazgo 447).
+                  title={`AJD (${formatNumber((resultadosComprador.ajd / resultadosComprador.precioInmueble) * 100, 2)}%)`}
                   value={formatCurrency(resultadosComprador.ajd)}
                   variant="warning"
                   icon="📄"
-                  description={esRenuncia ? 'Algunas CCAA aplican un tipo de AJD incrementado en la renuncia' : undefined}
+                  description={
+                    resultadosComprador.bonificado
+                      ? 'Con la bonificación del 50 % de Ceuta y Melilla aplicada'
+                      : esRenuncia
+                        ? 'Algunas CCAA aplican un tipo de AJD incrementado en la renuncia'
+                        : undefined
+                  }
                 />
               )}
 
@@ -854,7 +901,7 @@ export default function SimuladorLocalComercialPage() {
               <tbody>
                 <tr>
                   <td style={{ padding: '8px 10px', borderBottom: '1px solid var(--bg-primary)' }}>Obra nueva (promotor)</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', fontWeight: 700, color: 'var(--primary)' }}>IVA 21%</td>
+                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', fontWeight: 700, color: 'var(--primary)' }}>IVA {formatNumber(IVA_LOCAL_COMERCIAL, 0)}%</td>
                   <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>Sí</td>
                   <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', color: '#27ae60' }}>Sí (si sujeto pasivo)</td>
                 </tr>
@@ -866,7 +913,7 @@ export default function SimuladorLocalComercialPage() {
                 </tr>
                 <tr>
                   <td style={{ padding: '8px 10px' }}>Segunda mano con renuncia a la exención</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', fontWeight: 700, color: 'var(--primary)' }}>IVA 21% (ISP)</td>
+                  <td style={{ padding: '8px 10px', textAlign: 'center', fontWeight: 700, color: 'var(--primary)' }}>IVA {formatNumber(IVA_LOCAL_COMERCIAL, 0)}% (ISP)</td>
                   <td style={{ padding: '8px 10px', textAlign: 'center' }}>Sí (a menudo incrementado)</td>
                   <td style={{ padding: '8px 10px', textAlign: 'center', color: '#27ae60' }}>Sí (si sujeto pasivo)</td>
                 </tr>
@@ -882,7 +929,7 @@ export default function SimuladorLocalComercialPage() {
             <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem' }}>
               <strong><span aria-hidden="true">🆕</span> Autónomo compra local nuevo al promotor</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                Paga IVA 21% + AJD. Si está dado de alta en una actividad sujeta a IVA, deduce el IVA
+                Paga IVA {formatNumber(IVA_LOCAL_COMERCIAL, 0)}% + AJD. Si está dado de alta en una actividad sujeta a IVA, deduce el IVA
                 soportado en la declaración trimestral (modelo 303).
               </p>
             </div>
@@ -897,7 +944,7 @@ export default function SimuladorLocalComercialPage() {
               <strong><span aria-hidden="true">🤝</span> Empresa compra local usado a otra empresa</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
                 Si ambas partes tienen derecho a deducción, el vendedor puede renunciar a la exención de IVA.
-                La operación pasa a IVA 21% con inversión del sujeto pasivo: el comprador lo autoliquida y
+                La operación pasa a IVA {formatNumber(IVA_LOCAL_COMERCIAL, 0)}% con inversión del sujeto pasivo: el comprador lo autoliquida y
                 deduce, evitando un ITP que no recuperaría.
               </p>
             </div>
@@ -918,7 +965,7 @@ export default function SimuladorLocalComercialPage() {
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
               <strong>¿Se paga IVA o ITP al comprar un local comercial?</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
-                En obra nueva (primera entrega del promotor) se paga IVA al 21% más AJD. En segunda mano, por
+                En obra nueva (primera entrega del promotor) se paga IVA al {formatNumber(IVA_LOCAL_COMERCIAL, 0)}% más AJD. En segunda mano, por
                 regla general la operación está exenta de IVA y se paga ITP al tipo general de la comunidad
                 autónoma. La excepción es la renuncia a la exención de IVA entre empresarios. Nunca se pagan
                 IVA e ITP a la vez.
@@ -929,7 +976,7 @@ export default function SimuladorLocalComercialPage() {
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
                 La segunda transmisión de un inmueble está exenta de IVA (Art. 20.Uno.22º LIVA). Si comprador y
                 vendedor son empresarios con derecho a deducción, el vendedor puede renunciar a esa exención
-                (Art. 20.Dos): la compra tributa por IVA 21% con inversión del sujeto pasivo en lugar de ITP.
+                (Art. 20.Dos): la compra tributa por IVA {formatNumber(IVA_LOCAL_COMERCIAL, 0)}% con inversión del sujeto pasivo en lugar de ITP.
                 Interesa al comprador que puede deducir el IVA, porque el ITP es un coste no recuperable.
               </p>
             </div>
@@ -945,9 +992,10 @@ export default function SimuladorLocalComercialPage() {
               <strong>¿Cuánto AJD se paga si hay renuncia a la exención de IVA?</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
                 La escritura tributa por AJD y muchas comunidades aplican un tipo incrementado (habitualmente
-                entre el 1,5% y el 2%) cuando existe renuncia a la exención de IVA, frente al tipo general
-                (0,5%-1,5%). Este simulador aplica el AJD general de la CCAA; confirma el tipo incrementado
-                exacto de tu comunidad antes de firmar.
+                entre el 1,5% y el 2%) cuando existe renuncia a la exención de IVA, frente al tipo general,
+                que va del {formatNumber(RANGO_AJD.min, 0)}% al {formatNumber(RANGO_AJD.max, 1)}% según la comunidad: el País Vasco no lo cobra, por su
+                régimen foral, y en Ceuta y Melilla se descuenta el 50% de la cuota. Este simulador aplica el
+                AJD general de la CCAA; confirma el tipo incrementado exacto de tu comunidad antes de firmar.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>

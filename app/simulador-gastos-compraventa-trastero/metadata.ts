@@ -1,5 +1,12 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema, generateFAQSchema, combineSchemas } from '@/lib/schema-templates';
+import { IVA_INMUEBLES_2025 } from '@/data/fiscal';
+
+/** Los tipos de IVA se LEEN de data/fiscal, no se teclean: el mismo dato estaba escrito a
+ *  mano en ocho sitios entre página y metadata, y es lo que citan los asistentes de IA
+ *  (hallazgo 592). */
+const IVA_ANEJO = IVA_INMUEBLES_2025.obraNueva;
+const IVA_GENERAL = IVA_INMUEBLES_2025.garaje;
 
 export const metadata: Metadata = {
   title: 'Simulador Gastos Compraventa Trastero - ITP y Costes | meskeIA',
@@ -31,12 +38,12 @@ export const metadata: Metadata = {
 
 const webAppSchema = generateWebAppSchema({
   name: 'Simulador Gastos Compraventa Trastero',
-  description: 'Calculadora de gastos de compra y venta de trastero en España. Incluye ITP por comunidad autónoma, IVA en obra nueva (10% como anejo de la vivienda o 21% independiente), notaría, registro de la propiedad y plusvalía municipal.',
+  description: `Calculadora de gastos de compra y venta de trastero en España. Incluye ITP por comunidad autónoma, IVA en obra nueva (${IVA_ANEJO}% como anejo de la vivienda o ${IVA_GENERAL}% independiente), notaría, registro de la propiedad y plusvalía municipal.`,
   url: 'https://meskeia.com/simulador-gastos-compraventa-trastero/',
   category: 'FinanceApplication',
   features: [
     'ITP por comunidad autónoma para trastero (tipo residencial)',
-    'IVA 10% si va con la vivienda como anejo, 21% si es independiente (obra nueva)',
+    `IVA ${IVA_ANEJO}% si va con la vivienda como anejo, ${IVA_GENERAL}% si es independiente (obra nueva)`,
     'Gastos de notaría y registro de la propiedad',
     'Plusvalía municipal del vendedor',
     'IRPF sobre ganancia patrimonial',
@@ -51,11 +58,11 @@ const faqSchema = generateFAQSchema({
   mainEntity: [
     {
       question: '¿Qué IVA paga un trastero nuevo?',
-      answer: 'Depende de cómo se compre. Si el promotor transmite el trastero conjuntamente con la vivienda como anejo, se aplica el IVA reducido del 10% (art. 91.Uno.1.7º de la Ley del IVA). Si el trastero se adquiere de forma independiente, con su propia finca registral y en operación separada, tributa al tipo general del 21%. Es el mismo criterio que se aplica a las plazas de garaje.',
+      answer: `Depende de cómo se compre. Si el promotor transmite el trastero conjuntamente con la vivienda como anejo, se aplica el IVA reducido del ${IVA_ANEJO}% (art. 91.Uno.1.7º de la Ley del IVA). Si el trastero se adquiere de forma independiente, con su propia finca registral y en operación separada, tributa al tipo general del ${IVA_GENERAL}%. Es el mismo criterio que se aplica a las plazas de garaje.`,
     },
     {
       question: '¿Qué diferencia hay entre trastero vinculado y trastero independiente?',
-      answer: 'El trastero vinculado forma parte de la misma finca registral que la vivienda y se vende junto a ella como anejo. El trastero independiente tiene su propia referencia catastral y escritura y puede venderse por separado. La diferencia fiscal principal está en la obra nueva: el vinculado paga IVA al 10% como anejo y el independiente al 21%. En segunda mano ambos pagan ITP al tipo de la comunidad autónoma, aunque los tipos reducidos por perfil del comprador suelen exigir que la compra sea de vivienda habitual. Consulta siempre con un asesor fiscal antes de la operación.',
+      answer: `El trastero vinculado forma parte de la misma finca registral que la vivienda y se vende junto a ella como anejo. El trastero independiente tiene su propia referencia catastral y escritura y puede venderse por separado. La diferencia fiscal principal está en la obra nueva: el vinculado paga IVA al ${IVA_ANEJO}% como anejo y el independiente al ${IVA_GENERAL}%. En segunda mano ambos pagan ITP al tipo de la comunidad autónoma, aunque los tipos reducidos por perfil del comprador suelen exigir que la compra sea de vivienda habitual. Consulta siempre con un asesor fiscal antes de la operación.`,
     },
     {
       question: '¿Se puede comprar un trastero sin comprar también la vivienda?',
@@ -83,7 +90,7 @@ export const faqJsonLd = {
       name: '¿Qué IVA paga un trastero nuevo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Depende de cómo se compre. Si el promotor transmite el trastero conjuntamente con la vivienda como anejo, se aplica el IVA reducido del 10% (art. 91.Uno.1.7º de la Ley del IVA). Si el trastero se adquiere de forma independiente, con su propia finca registral y en operación separada, tributa al tipo general del 21%. Es el mismo criterio que se aplica a las plazas de garaje.',
+        text: `Depende de cómo se compre. Si el promotor transmite el trastero conjuntamente con la vivienda como anejo, se aplica el IVA reducido del ${IVA_ANEJO}% (art. 91.Uno.1.7º de la Ley del IVA). Si el trastero se adquiere de forma independiente, con su propia finca registral y en operación separada, tributa al tipo general del ${IVA_GENERAL}%. Es el mismo criterio que se aplica a las plazas de garaje.`,
       },
     },
     {
@@ -91,7 +98,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre trastero vinculado y trastero independiente?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El trastero vinculado forma parte de la misma finca registral que la vivienda y se vende junto a ella como anejo. El trastero independiente tiene su propia referencia catastral y escritura y puede venderse por separado. La diferencia fiscal principal está en la obra nueva: el vinculado paga IVA al 10% como anejo y el independiente al 21%. En segunda mano ambos pagan ITP al tipo de la comunidad autónoma, aunque los tipos reducidos por perfil del comprador suelen exigir que la compra sea de vivienda habitual. Consulta siempre con un asesor fiscal antes de la operación.',
+        text: `El trastero vinculado forma parte de la misma finca registral que la vivienda y se vende junto a ella como anejo. El trastero independiente tiene su propia referencia catastral y escritura y puede venderse por separado. La diferencia fiscal principal está en la obra nueva: el vinculado paga IVA al ${IVA_ANEJO}% como anejo y el independiente al ${IVA_GENERAL}%. En segunda mano ambos pagan ITP al tipo de la comunidad autónoma, aunque los tipos reducidos por perfil del comprador suelen exigir que la compra sea de vivienda habitual. Consulta siempre con un asesor fiscal antes de la operación.`,
       },
     },
     {

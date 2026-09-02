@@ -192,11 +192,11 @@ test.describe('Simulador de gastos de compra de solar — inspección 26/08/2026
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('841,35 €');
 
     // Total gastos = 275.000 + 2.389,886370 + 841,347431 + 500 = 278.731,233801
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('278.731,23 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('278.731,24 €');
     // 278.731,233801 / 2.500.000 = 11,1492494 % → «11,15%»
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('11,15%');
     // Coste total = 2.500.000 + 278.731,233801 = 2.778.731,233801
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('2.778.731,23 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('2.778.731,24 €');
   });
 
   /**
@@ -301,8 +301,8 @@ test.describe('Simulador de gastos de compra de solar — inspección 26/08/2026
     expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (3,00%)');
     expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('758,98 €');
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('236,22 €');
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('7495,21 €');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('207.495,21 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('7495,20 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('207.495,20 €');
   });
 
   /** El País Vasco no cobra AJD (`ITP_CCAA['pais-vasco'].ajd = 0`, régimen foral). */

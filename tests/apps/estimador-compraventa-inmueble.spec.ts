@@ -111,11 +111,11 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
 
     // Total gastos = 12.000 + 758,9827 + 236,2250 + 300 = 13.295,2077 → 6,65 % del precio
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('13.295,21 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('13.295,20 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('6,65%');
 
     // Coste total = 200.000 + 13.295,2077. En segunda mano NO hay AJD (TPO y AJD son incompatibles)
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('213.295,21 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('213.295,20 €');
     await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
   });
 
@@ -359,9 +359,9 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('841,35 €');
 
     // Total = 275.000 + 1.365,6494 + 830,4391 + 300 = 277.496,0884 → 11,10 % del precio
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('278.531,23 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('278.531,24 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('11,14%');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('2.778.531,23 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('2.778.531,24 €');
     // En segunda mano no hay AJD: TPO y AJD son incompatibles (art. 31.2 TRLITPAJD)
     await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
   });
@@ -681,9 +681,9 @@ test.describe('Inspector 20/08/2026 — factura notarial y registral', () => {
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('236,22 €');
 
     // Total = 12.000 + 758,982746 + 236,224967 + 300 = 13.295,207713 → 6,6476 % del precio
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('13.295,21 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('13.295,20 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('6,65%');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('213.295,21 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('213.295,20 €');
     // Segunda mano: TPO y AJD son incompatibles (art. 31.2 TRLITPAJD)
     await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
   });
@@ -880,8 +880,8 @@ test.describe('Inspector 27/08/2026 — caminos nuevos', () => {
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('405,75 €');
 
     // Total = 63.800 + 1.246,4362 + 405,7474 + 300 = 65.752,1836
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('65.752,18 €');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('765.752,18 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('65.752,19 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('765.752,19 €');
   });
 
   // La exención por reinversión del art. 38 LIRPF es PROPORCIONAL cuando no se reinvierte
@@ -929,7 +929,7 @@ test.describe('Inspector 27/08/2026 — caminos nuevos', () => {
     // 200.000 × 3 % = 6.000 (el 6 % general bonificado al 50 %), NO 12.000
     expect(await valorTarjeta(page, /^ITP/)).toBe('6000,00 €');
     // Total = 6.000 + 758,9827 + 236,2250 + 300 = 7.295,2077
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('7295,21 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('7295,20 €');
   });
 
   // Caso que DEBE rechazarse: texto que no es un número. `parseSpanishNumber` devuelve NaN
@@ -1181,12 +1181,12 @@ test.describe('Inspector 28/08/2026 — cierre del IVA en territorios sin IVA', 
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('236,22 €');
 
     await expect(page.locator('h3', { hasText: /Total gastos adicionales/ }).first()).toHaveText('Total gastos adicionales (parcial)');
-    expect(await valorTarjeta(page, /Total gastos adicionales/)).toBe('2795,21 €');
+    expect(await valorTarjeta(page, /Total gastos adicionales/)).toBe('2795,20 €');
     expect(await descripcionTarjeta(page, /Total gastos adicionales/)).toContain(
       'SIN el IGIC, que no está incluido',
     );
     await expect(page.locator('h3', { hasText: /COSTE TOTAL/ }).first()).toHaveText('COSTE TOTAL (PARCIAL)');
-    expect(await valorTarjeta(page, /COSTE TOTAL/)).toBe('202.795,21 €');
+    expect(await valorTarjeta(page, /COSTE TOTAL/)).toBe('202.795,20 €');
 
     // El aviso del IVA del 4 % de VPO no puede salir donde no hay IVA que rebajar
     await expect(page.getByText(/protección oficial de régimen especial/)).toHaveCount(0);
@@ -1212,9 +1212,9 @@ test.describe('Inspector 28/08/2026 — cierre del IVA en territorios sin IVA', 
     expect(await valorTarjeta(page, /^IVA/)).toBe('20.000,00 €');
     expect(await valorTarjeta(page, /^AJD/)).toBe('1500,00 €');
     await expect(page.locator('h3', { hasText: /Total gastos adicionales/ }).first()).toHaveText('Total gastos adicionales');
-    expect(await valorTarjeta(page, /Total gastos adicionales/)).toBe('22.795,21 €');
+    expect(await valorTarjeta(page, /Total gastos adicionales/)).toBe('22.795,20 €');
     await expect(page.locator('h3', { hasText: /COSTE TOTAL/ }).first()).toHaveText('COSTE TOTAL DE ADQUISICIÓN');
-    expect(await valorTarjeta(page, /COSTE TOTAL/)).toBe('222.795,21 €');
+    expect(await valorTarjeta(page, /COSTE TOTAL/)).toBe('222.795,20 €');
     await expect(page.getByText(/protección oficial de régimen especial/).first()).toBeVisible();
     await expect(page.getByText(/serían.*8000,00/).first()).toBeVisible();
   });
@@ -1251,11 +1251,11 @@ test.describe('Inspector 28/08/2026 — cierre del IVA en territorios sin IVA', 
     expect(await valorTarjeta(page, /^AJD/)).toBe('1000,00 €');
     expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('970,73 €');
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('308,82 €');
-    expect(await valorTarjeta(page, /Total gastos adicionales/)).toBe('2579,56 €');
+    expect(await valorTarjeta(page, /Total gastos adicionales/)).toBe('2579,55 €');
     expect(await descripcionTarjeta(page, /Total gastos adicionales/)).toContain(
       'SIN el IPSI, que no está incluido',
     );
-    expect(await valorTarjeta(page, /COSTE TOTAL/)).toBe('402.579,56 €');
+    expect(await valorTarjeta(page, /COSTE TOTAL/)).toBe('402.579,55 €');
     // Un local no es vivienda: el aviso del IVA del 4 % de VPO no le corresponde
     await expect(page.getByText(/protección oficial de régimen especial/)).toHaveCount(0);
   });
@@ -1434,9 +1434,9 @@ test.describe('Inspector 30/08/2026 — re-verificación de la tanda 2', () => {
     expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
 
     // Total = 25.600 + 886,032746 + 279,784967 + 300 = 27.065,817713 → 8,4581 % del precio
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('27.065,82 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('27.065,81 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('8,46%');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('347.065,82 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('347.065,81 €');
     // Segunda mano: TPO y AJD son incompatibles (art. 31.2 TRLITPAJD)
     await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
   });
@@ -1601,9 +1601,9 @@ test.describe('Inspector 02/09/2026 — comprador y vendedor de punta a punta', 
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('236,22 €');
     expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
     // 12.000 + 758,982746 + 236,224967 + 300 = 13.295,207713 → 6,6476 % del precio
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('13.295,21 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('13.295,20 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('6,65%');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('213.295,21 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('213.295,20 €');
 
     // ── Vendedor de la MISMA operación ──────────────────────────────────────
     await page.getByRole('button', { name: 'Vendedor' }).click();
@@ -1677,7 +1677,7 @@ test.describe('Inspector 02/09/2026 — comprador y vendedor de punta a punta', 
     await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
   });
 
-  // ⚠️ HALLAZGO ABIERTO (Inspector, 02/09/2026) — el NaN vuelve, ahora en el botón.
+  // ✅ REPARADO el 02/09/2026 (hallazgo 580) — el NaN volvía en el botón.
   // `estimarGastosAdquisicion` se protege dos veces con la MISMA comparación rota:
   //   disabled={parseSpanishNumber(precioCompraOriginal) <= 0}   (page.tsx:923)
   //   if (precioC <= 0) return;                                  (page.tsx:417)
@@ -1695,7 +1695,6 @@ test.describe('Inspector 02/09/2026 — comprador y vendedor de punta a punta', 
   test('CASO 26 (debe rechazarse) — «Estimar por mí» sin precio de compra no puede escribir texto en un campo de euros', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     await rellenar(page, 'Precio de la vivienda', '250000');
     await page.getByRole('button', { name: 'Vendedor' }).click();
@@ -1732,7 +1731,7 @@ test.describe('Inspector 02/09/2026 — comprador y vendedor de punta a punta', 
     ).toHaveValue('11.767');
   });
 
-  // ⚠️ HALLAZGO ABIERTO (dato) — el bloque educativo escribe a mano el tipo con el que
+  // ✅ REPARADO el 02/09/2026 (hallazgo 581) — el bloque educativo escribía a mano el tipo con el que
   // ESTA calculadora liquida la plusvalía («un tipo del 25%») y el techo legal («máximo
   // legal del 30%»), pudiendo leerlos de PLUSVALIA_MUNICIPAL_META (tipoOrientativo y
   // tipoMaximoLegal, data/fiscal/inmuebles.ts), que es de donde los toma el motor. Hoy
@@ -1770,7 +1769,7 @@ test.describe('Inspector 02/09/2026 — comprador y vendedor de punta a punta', 
     await expect(tarjeta).toContainText(`IVA al ${IVA_INMUEBLES_2025.local}%`);
   });
 
-  // ⚠️ HALLAZGO ABIERTO (accesibilidad) — 14 emojis decorativos en nodo propio sin
+  // ✅ REPARADO el 02/09/2026 (hallazgo 583) — 14 emojis decorativos en nodo propio sin
   // `aria-hidden="true"` (page.tsx:626, 864, 1177, 1401, 1412, 1422, 1435, 1561, 1567,
   // 1573, 1579, 1585, 1593, 1605). El más visible es el 📍 que precede al nombre de la
   // comunidad autónoma: un lector de pantalla lo anuncia justo delante del dato que más
@@ -1778,11 +1777,63 @@ test.describe('Inspector 02/09/2026 — comprador y vendedor de punta a punta', 
   test('CASO 27 (accesibilidad) — el icono de la comunidad es decorativo y debe ir oculto', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     await expect(page.locator('span[class*="infoCcaaIcon"]')).toHaveAttribute(
       'aria-hidden',
       'true',
     );
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// REGRESIÓN — hallazgo 584 (contenido, medio), REPARADO el 02/09/2026.
+//
+// La página publicaba TRES rangos distintos de notaría y registro para lo mismo: el
+// FAQPage del JSON-LD decía «notaría 300 €-1.000 €» y «registro 100 €-600 €», el bloque
+// visible «600 €-1.500 €» y «200 €-600 €», y otra pregunta del MISMO JSON-LD «700-900 €».
+// Ninguno coincidía con lo que la app cobra —758,98 € de notaría para 200.000 €— y el peor
+// era justo el que leen los asistentes de IA. Ahora los tres salen de `horquillaFedatarios`,
+// que deriva del arancel (RD 1426/1989 y RD 1427/1989).
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('Regresión — hallazgo 584, reparado', () => {
+  test('584 — el JSON-LD, el bloque visible y el motor dan la MISMA horquilla de notaría', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+
+    // Lo que cobra el motor para 200.000 €: arancel 433,7044 × 1,5 y × 2 → 650,56 y 867,41.
+    // La pregunta del JSON-LD sobre la escritura notarial cita esa misma pareja, redondeada
+    // a la decena: «entre 650 € y 870 €».
+    const respuestas: string[] = await page.evaluate(() => {
+      const salida: string[] = [];
+      for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
+        const datos = JSON.parse(s.textContent || '{}');
+        const grafo = datos['@graph'] ?? [datos];
+        for (const nodo of grafo) {
+          if (nodo['@type'] !== 'FAQPage') continue;
+          for (const q of nodo.mainEntity ?? []) salida.push(q.acceptedAnswer.text);
+        }
+      }
+      return salida;
+    });
+    expect(respuestas.length).toBeGreaterThan(0);
+    const todo = respuestas.join(' \u00b7 ').replace(ESPACIO_DURO, ' ');
+
+    // Los tres rangos viejos, que se desmentían entre sí, ya no pueden aparecer.
+    expect(todo).not.toContain('entre 300 € y 1.000 €');
+    expect(todo).not.toContain('entre 100 € y 600 €');
+    expect(todo).not.toContain('700-900 €');
+    // Y el que sí aparece es el del arancel para 200.000 €.
+    expect(todo).toContain('650 € y 870 €');
+
+    // El bloque visible dice lo mismo para la banda de 100.000 € a 500.000 €:
+    //   notaría  514,20 → 1.230,41  (redondeado a la decena: 510 € y 1.230 €)
+    //   registro 172,56 →   345,12  (170 € y 350 €)
+    const lista = page.getByText(/Notaría:\s*entre/);
+    const texto = (await lista.innerText()).replace(ESPACIO_DURO, ' ').replace(/\s+/g, ' ');
+    // es-ES no agrupa los millares de una cifra de cuatro dígitos: «1230 €», no «1.230 €».
+    expect(texto).toContain('510 €');
+    expect(texto).toContain('1230 €');
   });
 });

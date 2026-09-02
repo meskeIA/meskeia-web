@@ -178,11 +178,11 @@ test.describe('Simulador de gastos de compra de finca rústica — inspección 2
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('236,22 €');
 
     // Total gastos = 6.000 + 758,982746 + 236,224967 + 400 = 7.395,207713
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('7395,21 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('7395,20 €');
     // 7.395,207713 / 200.000 = 3,6976039 % → «3,70%»
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('3,70%');
     // Coste total = 200.000 + 7.395,207713 = 207.395,207713
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('207.395,21 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('207.395,20 €');
   });
 
   /**

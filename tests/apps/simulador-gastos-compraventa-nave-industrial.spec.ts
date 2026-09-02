@@ -251,8 +251,8 @@ test.describe('Simulador de gastos de compra de nave industrial — casos base',
     //   + 633.555,79 × 0,0002 = 126,711158 → 433,2268615 + 9,015182 = 442,2420435 × 1,21
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('535,11 €');
     // Total = 74.074,0734 + 1.586,020 + 535,112 + 500 = 76.695,21
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('76.695,21 €');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('1.311.263,10 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('76.695,20 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('1.311.263,09 €');
   });
 
   /**
@@ -485,8 +485,8 @@ test.describe('Regresión — reparación del 23/08/2026', () => {
     //   + 9,015182 = 695,328455 × 1,21 = 841,347431
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('841,35 €');
     // Total = 275.000 + 2.389,886370 + 841,347431 + 500 = 278.731,233801
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('278.731,23 €');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('2.778.731,23 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('278.731,24 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('2.778.731,24 €');
 
     // …y el texto ya no sostiene un techo que la app supera.
     await expect(page.getByText(/oscila entre el 4% \(País Vasco\) y el 10-11%/)).toHaveCount(0);
@@ -920,9 +920,9 @@ test.describe('Cierre y casos nuevos — 28/08/2026', () => {
     await expect(page.getByText('56.000,00 €')).toHaveCount(0);
     expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1246,44 €');
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('405,75 €');
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('62.152,18 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('62.152,19 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('8,88%');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('762.152,18 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('762.152,19 €');
   });
 
   /**
@@ -1211,9 +1211,9 @@ test.describe('Re-inspección 02/09/2026 — tres casos nuevos', () => {
     expect(notaria).toContain('1351,41 €');
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('381,42 €');
 
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('54.863,91 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('54.863,90 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('9,14%');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('654.863,91 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('654.863,90 €');
   });
 
   /**
@@ -1263,12 +1263,12 @@ test.describe('Re-inspección 02/09/2026 — tres casos nuevos', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS — re-inspección del 02/09/2026. Marcados con `test.fail()`: afirman lo
-// que DEBERÍA ocurrir y hoy fallan a propósito. Al repararlos se les quita la marca y quedan
-// como regresión, igual que se hizo con los hallazgos 156-166 y 490-493.
+// REGRESIÓN — los cinco hallazgos de la re-inspección del 02/09/2026 (600-604), REPARADOS
+// ese mismo día. Estaban escritos con `test.fail()` afirmando lo que DEBERÍA ocurrir; al
+// repararlos se les quitó la marca, igual que se hizo con los hallazgos 156-166 y 490-493.
 // ═══════════════════════════════════════════════════════════════════════════════
 
-test.describe('Hallazgos abiertos — 02/09/2026', () => {
+test.describe('Regresión — hallazgos del 02/09/2026, reparados', () => {
   /**
    * HALLAZGO 1 (contenido, medio) — con RENUNCIA a la exención, la tarjeta del impuesto lleva
    * debajo una descripción del ITP.
@@ -1284,7 +1284,7 @@ test.describe('Hallazgos abiertos — 02/09/2026', () => {
    * Verificado en Madrid con 500.000 € (2ª mano con renuncia). Alcanza a las 16 comunidades
    * donde rige el IVA: en Canarias, Ceuta y Melilla manda `impuestoNoCalculado` y no se ve.
    */
-  test.fail('HALLAZGO 1 — la tarjeta del IVA con renuncia describe el ITP', async ({ page }) => {
+  test('HALLAZGO 1 — la tarjeta del IVA con renuncia describe el ITP', async ({ page }) => {
     await page.goto(RUTA);
     await page.getByRole('button', { name: /renuncia al IVA/ }).click();
     await page.selectOption('#select-ccaa', 'madrid');
@@ -1313,7 +1313,7 @@ test.describe('Hallazgos abiertos — 02/09/2026', () => {
    * La página ya lo dice bien en otro sitio, y por eso se contradice: el recuadro de
    * limitaciones acota el valor de referencia «al ITP».
    */
-  test.fail('HALLAZGO 2 — el helper del precio ofrece la base del ITP también en los modos con IVA', async ({ page }) => {
+  test('HALLAZGO 2 — el helper del precio ofrece la base del ITP también en los modos con IVA', async ({ page }) => {
     await page.goto(RUTA);
     const helper = page
       .locator('input[aria-label="' + PRECIO + '"]')
@@ -1341,7 +1341,7 @@ test.describe('Hallazgos abiertos — 02/09/2026', () => {
    * No hay ninguna cifra equivocada hoy: lo que hay es la divergencia en silencio que ya costó
    * dos reparaciones, y encima en el texto que leen Google y los buscadores conversacionales.
    */
-  test.fail('HALLAZGO 3 — metadata.ts escribe «IVA 21%» a mano pudiendo derivarlo de data/fiscal', async () => {
+  test('HALLAZGO 3 — metadata.ts escribe «IVA 21%» a mano pudiendo derivarlo de data/fiscal', async () => {
     const meta = await leerMetadata();
     // El valor vive en data/fiscal y el fichero ya lo importa (lo usa el FAQPage).
     expect(IVA_INMUEBLES_2025.local).toBe(21);
@@ -1360,7 +1360,7 @@ test.describe('Hallazgos abiertos — 02/09/2026', () => {
    * hoy — sobrevive porque el candado juzga las líneas que un commit añade y esta es anterior.
    * Los demás emojis de la página sí van envueltos.
    */
-  test.fail('HALLAZGO 4 — el emoji del aviso de IVA deducible va sin aria-hidden', async () => {
+  test('HALLAZGO 4 — el emoji del aviso de IVA deducible va sin aria-hidden', async () => {
     const fuente = await leerFuente();
     expect(fuente).toContain('Si eres empresa o autónomo:');
     // Debería ser <span aria-hidden="true">💡</span>, como el resto de emojis del fichero.
@@ -1375,7 +1375,7 @@ test.describe('Hallazgos abiertos — 02/09/2026', () => {
    * exactamente el punto medio que la app ya pinta— pero deja en la cabecera una dependencia
    * muerta que sugiere un segundo camino de cálculo que no existe.
    */
-  test.fail('HALLAZGO 5 — import muerto de calcularNotario en page.tsx', async () => {
+  test('HALLAZGO 5 — import muerto de calcularNotario en page.tsx', async () => {
     const fuente = await leerFuente();
     const usos = fuente.match(/calcularNotario/g) ?? [];
     // Hoy aparece una sola vez: en el import.

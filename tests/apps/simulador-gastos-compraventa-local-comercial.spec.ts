@@ -92,10 +92,11 @@ test.describe('Simulador de gastos de compraventa de local comercial', () => {
     //   = 186,2121 ; + 6,010121 de presentación + 3,005061 de nota simple ; × 1,21 = 236,2250
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe(REGISTRO_200K);
 
-    // Total = 12.000 + 758,9827 + 236,2250 + 500 = 13.495,2077 → 6,7476 % de 200.000
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('13.495,21 €');
+    // Total = las CUATRO líneas ya redondeadas, que es como las ve el usuario (hallazgo 594):
+    //   12.000 + 758,98 + 236,22 + 500 = 13.495,20 → 6,7476 % de 200.000
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('13.495,20 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('6,75%');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('213.495,21 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('213.495,20 €');
 
     // ── 1b. Primera entrega del promotor: IVA 21 % + AJD, nunca ITP.
     // IVA_INMUEBLES_2025.local = 21 → 200.000 × 21 % = 42.000
@@ -106,10 +107,10 @@ test.describe('Simulador de gastos de compraventa de local comercial', () => {
     await expect(page.locator('h3', { hasText: /^AJD/ }).first()).toHaveText('AJD (0,75%)');
     expect(await valorTarjeta(page, /^AJD/)).toBe('1500,00 €');
     await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
-    // Total = 42.000 + 1.500 + 758,9827 + 236,2250 + 500 = 44.995,2077 → 22,4976 %
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('44.995,21 €');
+    // Total = 42.000 + 1.500 + 758,98 + 236,22 + 500 = 44.995,20 → 22,4976 %
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('44.995,20 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('22,50%');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('244.995,21 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('244.995,20 €');
 
     // ── 1c. Segunda mano CON renuncia a la exención (art. 20.Dos LIVA): IVA 21 % con
     // inversión del sujeto pasivo + AJD. Mismo importe que la obra nueva, distinto título
@@ -170,9 +171,9 @@ test.describe('Simulador de gastos de compraventa de local comercial', () => {
     await rellenar(page, 'Precio del local comercial', '200000');
     expect(await valorTarjeta(page, /^ITP/)).toBe('6000,00 €');
     await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (3,00%)');
-    // Total = 6.000 + 758,9827 + 236,2250 + 500 = 7.495,2077 → 3,7476 %
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('7495,21 €');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('207.495,21 €');
+    // Total = 6.000 + 758,98 + 236,22 + 500 = 7.495,20 → 3,7476 %
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('7495,20 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('207.495,20 €');
 
     // En Ceuta no rige el IVA sino el IPSI (TERRITORIOS_SIN_IVA): al pasar a obra nueva,
     // la app tiene que advertirlo en vez de callarse.
@@ -442,10 +443,10 @@ test.describe('Simulador de gastos de compraventa de local comercial', () => {
     // Registro: 24,04 + 42,07086 + 37,56325 + 67,61387 + 135,22772 + 379,79758 = 686,31327
     //   (por debajo del tope REGISTRO_MAXIMO de 2.181,67) ; + 9,015182 ; × 1,21 = 841,34743
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('841,35 €');
-    // Total = 275.000 + 2.389,88637 + 841,34743 + 500 = 278.731,2338 → 11,1492 %
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('278.731,23 €');
+    // Total = 275.000 + 2.389,89 + 841,35 + 500 = 278.731,24 → 11,1492 %
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('278.731,24 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('11,15%');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('2.778.731,23 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('2.778.731,24 €');
 
     // ── Canarias con RENUNCIA: allí no se devenga IVA sino IGIC (TERRITORIOS_SIN_IVA),
     // así que el impuesto principal no se calcula —no se inventa un 21 %— pero la cuota
@@ -506,5 +507,87 @@ test.describe('Simulador de gastos de compraventa de local comercial', () => {
     await gestoria.blur();
     await expect(gestoria).toHaveValue('0');
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('22.137,38 €');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// REGRESIÓN — los seis hallazgos de la re-inspección del 02/09/2026 (618-623),
+// REPARADOS ese mismo día. Los cinco primeros ya los había reparado la app hermana
+// nave-industrial (hallazgos 447, 490 y 601): aquí se comprueba que el clúster ya no
+// divergirá otra vez.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('Regresión — hallazgos del 02/09/2026, reparados', () => {
+  // 618 — la base del IVA es la contraprestación pactada (art. 78 LIVA), no el valor de
+  // referencia catastral, que es la base MÍNIMA del ITP/AJD (art. 10 TRLITPAJD).
+  test('618 — el texto de ayuda del precio cambia en la rama de IVA', async ({ page }) => {
+    await page.goto(RUTA);
+    const ayuda = page
+      .locator('input[aria-label="Precio del local comercial"]')
+      .locator('xpath=following-sibling::p[1]');
+
+    await page.getByRole('button', { name: /Segunda mano/ }).first().click();
+    expect((await ayuda.innerText()).replace(/\s+/g, ' ')).toContain('valor de referencia catastral');
+
+    await page.getByRole('button', { name: /Obra nueva/ }).click();
+    const enIva = (await ayuda.innerText()).replace(/\s+/g, ' ');
+    expect(enIva).not.toContain('valor de referencia catastral');
+    expect(enIva).toContain('Contraprestación pactada');
+
+    await page.getByRole('button', { name: /renuncia IVA/ }).click();
+    expect((await ayuda.innerText()).replace(/\s+/g, ' ')).toContain('Contraprestación pactada');
+  });
+
+  // 619 y 623 — Ceuta: el importe ya lleva la bonificación del 50 % de la cuota (art. 57 bis
+  // TRLITPAJD), así que la etiqueta tiene que ser el tipo EFECTIVO, no el nominal de la tabla.
+  //   ITP_CCAA.ceuta.ajd nominal = 0,5 % → 200.000 × 0,5 % = 1.000 ; bonificado = 500 €,
+  //   que es el 0,25 % del precio.
+  test('619 y 623 — en Ceuta el AJD imprime el tipo efectivo y el ITP nombra la bonificación', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.locator('#select-ccaa').selectOption('ceuta');
+    await rellenar(page, 'Precio del local comercial', '200000');
+
+    await page.getByRole('button', { name: /Obra nueva/ }).click();
+    await expect(page.locator('h3', { hasText: /^AJD/ }).first()).toHaveText('AJD (0,25%)');
+    expect(await valorTarjeta(page, /^AJD/)).toBe('500,00 €');
+    expect(await descripcionTarjeta(page, /^AJD/)).toContain('bonificación del 50 %');
+
+    // ITP de Ceuta: tipoGeneral 6 % con la bonificación del 50 % → 3 % efectivo = 6.000 €
+    await page.getByRole('button', { name: /Segunda mano/ }).first().click();
+    expect(await valorTarjeta(page, /^ITP/)).toBe('6000,00 €');
+    expect(await descripcionTarjeta(page, /^ITP/)).toContain('bonificación del 50 %');
+  });
+
+  // 620 y 621 — en Canarias, Ceuta y Melilla no rige el IVA (IGIC/IPSI): el rótulo no puede
+  // prometerlo, y el tipo sale de IVA_INMUEBLES_2025.local en vez de estar tecleado.
+  test('620 y 621 — los rótulos nombran IGIC donde no rige el IVA, y el 21 % se deriva', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.locator('#select-ccaa').selectOption('madrid');
+    await expect(page.getByRole('button', { name: /Obra nueva/ })).toContainText('IVA 21%');
+
+    await page.locator('#select-ccaa').selectOption('canarias');
+    const obraNueva = page.getByRole('button', { name: /Obra nueva/ });
+    await expect(obraNueva).not.toContainText('IVA');
+    await expect(obraNueva).toContainText('IGIC');
+    await expect(page.getByRole('button', { name: /renuncia IVA/ })).toContainText('IGIC');
+
+    // El literal ya no está en el JSX: el rótulo se construye con la constante.
+    const fuente = await import('node:fs/promises').then((fs) =>
+      fs.readFile('app/simulador-gastos-compraventa-local-comercial/page.tsx', 'utf8'),
+    );
+    expect(fuente).toContain('IVA_LOCAL_COMERCIAL');
+    expect(fuente).not.toContain('Paga IVA 21% + AJD');
+  });
+
+  // 622 — el rango de AJD de la FAQ se deriva de RANGO_AJD, que hoy arranca en 0 % (País Vasco).
+  test('622 — la FAQ del AJD ya no contradice al panel del País Vasco', async ({ page }) => {
+    await page.goto(RUTA);
+    // El contenido de EducationalSection se monta siempre en el DOM (por SEO), así que
+    // no hace falta abrirlo para leerlo.
+    const faq = page.getByText(/¿Cuánto AJD se paga si hay renuncia/).locator('xpath=..');
+    const texto = (await faq.innerText()).replace(/\s+/g, ' ');
+    expect(texto).not.toContain('(0,5%-1,5%)');
+    // RANGO_AJD se deriva de la tabla: min 0 % (País Vasco, régimen foral), max 1,5 %.
+    expect(texto).toContain('del 0% al 1,5%');
   });
 });

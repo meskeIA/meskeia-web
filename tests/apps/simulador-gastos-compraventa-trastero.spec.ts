@@ -169,11 +169,11 @@ test.describe('Simulador de gastos de compraventa de trastero — inspección 20
 
     // Total gastos = 900 + 276,55494405 + 59,03284112 + 300 = 1.535,58778517
     //   % sobre el precio = 1.535,58778517 / 15.000 = 10,237252 %
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1535,59 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1535,58 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('10,24%');
 
     // Coste total = 15.000 + 1.535,58778517 = 16.535,58778517
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('16.535,59 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('16.535,58 €');
   });
 
   /**
@@ -503,7 +503,10 @@ test('REGRESIÓN (operativa) — una plusvalía no calculada no puede presentars
   await rellenar(page, 'Precio del trastero', '15000');
   await page.getByRole('button', { name: /Vendedor/ }).click();
   await rellenar(page, 'Precio de compra original', '8000');
-  expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('faltan datos');
+  // Desde el hallazgo 590 el aviso NOMBRA los campos que faltan, uno a uno, en vez de decir
+  // «faltan datos» a secas.
+  expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('No calculada (falta');
+  expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('los años de propiedad');
   expect(await valorTarjeta(page, 'Plusvalía municipal')).not.toBe('0,00 €');
 });
 
@@ -681,7 +684,7 @@ test.describe('MITAD B — zonas no cubiertas por la inspección del 20/08/2026'
     await rellenar(page, 'Precio del trastero', '15000');
     await rellenar(page, 'Gastos de gestoría del comprador (€)', '1.2.3');
     // 900 de ITP + 276,55494405 de notaría + 59,03284112 de registro + 0 de gestoría
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1235,59 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1235,58 €');
     await expect(page.locator('h3', { hasText: 'Gastos de gestoría' })).toHaveCount(0);
   });
 });
@@ -813,6 +816,10 @@ test.describe('REGRESIÓN — hallazgos del 27/08/2026, reparados', () => {
     page,
   }) => {
     await page.goto(RUTA);
+    // En segunda mano solo hay UN grupo: desde el hallazgo 595 el selector de modalidad se
+    // oculta ahí, porque no cambia nada del cálculo. En primera mano vuelven a ser dos.
+    expect(await page.locator('[role="group"], [role="radiogroup"], fieldset').count()).toBe(1);
+    await page.getByRole('button', { name: /Primera mano/ }).click();
     const grupos = await page.locator('[role="group"], [role="radiogroup"], fieldset').count();
     expect(grupos).toBeGreaterThanOrEqual(2);
   });
@@ -860,8 +867,8 @@ test.describe('REGRESIÓN — hallazgos del 27/08/2026, reparados', () => {
     const gestoria = page.locator('input[aria-label="Gastos de gestoría del comprador (€)"]');
     await gestoria.fill('-500'); // sin blur: el min={0} de NumberInput aún no ha actuado
 
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1235,59 €');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('16.235,59 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1235,58 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('16.235,58 €');
   });
 });
 
@@ -1244,21 +1251,20 @@ test.describe('RE-INSPECCIÓN 30/08/2026 — casos nuevos y cierre de la tanda 2
 
     // Total = 0 (IPSI, sin cifra) + 75 + 419,48619405 + 90,79534112 + 300 = 885,28153517
     //   % sobre el precio = 885,28153517 / 30.000 = 2,950938 %
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('885,28 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('885,29 €');
     const desglose = await descripcionTarjeta(page, 'Total gastos adicionales');
     expect(desglose).toContain('2,95%');
     expect(desglose).toContain('SIN el IPSI');
     // Y el total no puede presentarse como completo mientras falte el impuesto indirecto.
     const tituloTotal = await page.locator('h3', { hasText: /COSTE TOTAL/ }).first().innerText();
     expect(tituloTotal).toMatch(/PARCIAL/i);
-    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('30.885,28 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('30.885,29 €');
 
-    // La modalidad vinculado/independiente no mueve nada aquí, y el aviso debe decirlo en vez
-    // de prometer el 21 % del art. 91.Uno.1.7º LIVA.
-    await page.getByRole('button', { name: /Independiente/ }).click();
-    expect(await valorTarjeta(page, 'IPSI')).toBe('No calculado');
-    await expect(page.locator('h3', { hasText: /^IVA/ })).toHaveCount(0);
-    await expect(page.getByText(/no cambia el impuesto en primera mano/)).toBeVisible();
+    // La modalidad vinculado/independiente no mueve nada aquí, así que desde el hallazgo 595
+    // el selector directamente NO se pinta en los territorios sin IVA: antes se mostraba y su
+    // aviso hablaba del 21 % del art. 91.Uno.1.7º LIVA, que en Melilla no rige.
+    await expect(page.getByRole('button', { name: /Independiente/ })).toHaveCount(0);
+    await expect(page.getByText('Modalidad del trastero')).toHaveCount(0);
 
     // --- La contrapartida: en SEGUNDA mano sí hay impuesto que liquidar ---
     await page.getByRole('button', { name: /Segunda mano/ }).click();
@@ -1268,10 +1274,11 @@ test.describe('RE-INSPECCIÓN 30/08/2026 — casos nuevos y cierre de la tanda 2
     expect(await valorTarjeta(page, 'ITP (3,00%)')).toBe('900,00 €');
     // El aviso de territorio sin IVA desaparece: en una transmisión por ITP no advierte nada.
     await expect(page.getByText(/no se aplica el IVA/)).toHaveCount(0);
-    // Total = 900 + 419,48619405 + 90,79534112 + 300 = 1.710,28153517 → 5,700938 %
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1710,28 €');
+    // Total = las líneas YA redondeadas (hallazgo 594): 900 + 419,49 + 90,80 + 300 = 1.710,29
+    //   % sobre el precio = 1.710,29 / 30.000 = 5,700967 %
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1710,29 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('5,70%');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('31.710,28 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('31.710,29 €');
   });
 
   /**
@@ -1459,11 +1466,11 @@ test.describe('RE-INSPECCIÓN 02/09/2026 — País Vasco, el tramo del 13 % y la
 
     // Total = 880 + 343,25619405 + 73,85534112 + 300 = 1.597,11153517
     //   % sobre el precio = 1.597,11153517 / 22.000 = 7,259598 %
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1597,11 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1597,12 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('7,26%');
 
     // Coste total = 22.000 + 1.597,11153517 = 23.597,11153517
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('23.597,11 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('23.597,12 €');
   });
 
   /**
@@ -1527,11 +1534,11 @@ test.describe('RE-INSPECCIÓN 02/09/2026 — País Vasco, el tramo del 13 % y la
 
     // Total = 275.000 + 2.389,886370025 + 841,34743116 + 300 = 278.531,23380119
     //   % sobre el precio = 278.531,2338 / 2.500.000 = 11,141249 %
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('278.531,23 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('278.531,24 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('11,14%');
 
     // Coste total = 2.500.000 + 278.531,2338 = 2.778.531,2338
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('2.778.531,23 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('2.778.531,24 €');
   });
 
   /**
@@ -1606,12 +1613,12 @@ test.describe('RE-INSPECCIÓN 02/09/2026 — País Vasco, el tramo del 13 % y la
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
-// HALLAZGO ABIERTO — re-inspección del 02/09/2026.
-// Marcado con `test.fail()`: afirma lo que DEBERÍA pasar, así que hoy falla a propósito.
-// Cuando se repare, se le quita la marca y queda como regresión.
+// REGRESIÓN — el hallazgo 590 de la re-inspección del 02/09/2026, REPARADO ese mismo día.
+// Estaba escrito con `test.fail()` afirmando lo que DEBERÍA pasar; al repararlo se le quitó
+// la marca y se queda como regresión.
 // ═════════════════════════════════════════════════════════════════════════════
 
-// ❌ ABIERTO (medio) — operativa.
+// ✅ REPARADO (medio) — operativa.
 // Cuando la plusvalía no se puede calcular, la app manda al usuario a rellenar campos que YA
 // tiene rellenos y no nombra el que de verdad falta. El texto de la tarjeta es fijo —«No
 // calculada (faltan datos)»— y el del neto también: «añade los años de propiedad y el valor
@@ -1626,8 +1633,8 @@ test.describe('RE-INSPECCIÓN 02/09/2026 — País Vasco, el tramo del 13 % y la
 //       rellenar el valor catastral del suelo, que ya vale 6.000 · obtenido «No calculada
 //       (faltan datos)» en la tarjeta y «Techo: aún NO incluye la plusvalía municipal (añade
 //       los años de propiedad y el valor catastral del suelo)» sobre un neto de 17.966,00 €.
-test.fail(
-  'ABIERTO (operativa) — el aviso de plusvalía manda a rellenar un campo que ya está relleno',
+test(
+  'REGRESIÓN (operativa) — el aviso de plusvalía nombra el campo que de verdad falta',
   async ({ page }) => {
     await page.goto(RUTA);
     await rellenar(page, 'Precio del trastero', '20000');
